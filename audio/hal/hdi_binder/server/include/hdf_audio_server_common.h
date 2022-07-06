@@ -76,7 +76,6 @@ int32_t HdiServiceRenderCaptureReadData(struct HdfSBuf *data,
     const char **adapterName, uint32_t *pid);
 int32_t AudioAdapterListGetRender(const char *adapterName,
     struct AudioRender **render, uint32_t pid);
-int32_t AudioAdapterListGetPid(const char *adapterName, uint32_t *pid);
 void AudioSetRenderStatus(const char *adapterName, bool renderStatus);
 int32_t AudioGetRenderStatus(const char *adapterName);
 int32_t AudioAdapterListCheckAndGetRender(struct AudioRender **render, struct HdfSBuf *data);

@@ -54,21 +54,21 @@ static int32_t AdapterManageInit(struct AudioInfoInAdapter *adapterManage,
     int32_t ret;
 
     if (adapterManage == NULL || adapterName == NULL) {
-        HDF_LOGE("%{public}s: Parameter error! ", __func__);
+        AUDIO_FUNC_LOGE("Parameter error! ");
 
         return HDF_FAILURE;
     }
 
     adapterManage->adapterName = (char *)calloc(1, MANAGER_ADAPTER_NAME_LEN);
     if (adapterManage->adapterName == NULL) {
-        HDF_LOGE("%{public}s: calloc adapter name failed!", __func__);
+        AUDIO_FUNC_LOGE("calloc adapter name failed!");
         return HDF_FAILURE;
     }
 
     ret = memcpy_s((void *)adapterManage->adapterName, MANAGER_ADAPTER_NAME_LEN,
         adapterName, MANAGER_ADAPTER_NAME_LEN);
     if (ret != EOK) {
-        HDF_LOGE("%{public}s: memcpy adapter name fail!", __func__);
+        AUDIO_FUNC_LOGE("memcpy adapter name fail!");
         AudioMemFree((void **)&adapterManage->adapterName);
 
         return HDF_FAILURE;
@@ -109,7 +109,7 @@ void AdaptersServerManageRelease(
     int32_t i;
 
     if (adaptersManage == NULL || num <= 0) {
-        HDF_LOGE("%{public}s: Parameter error! ", __func__);
+        AUDIO_FUNC_LOGE("Parameter error! ");
 
         return;
     }
@@ -136,7 +136,7 @@ int32_t AdaptersServerManageInit(const struct AudioAdapterDescriptor *descs, int
     struct AudioInfoInAdapter *adaptersManage = NULL;
 
     if (descs == NULL || num <= 0) {
-        HDF_LOGE("%{public}s: Parameter error! ", __func__);
+        AUDIO_FUNC_LOGE("Parameter error! ");
 
         return HDF_FAILURE;
     }
@@ -145,7 +145,7 @@ int32_t AdaptersServerManageInit(const struct AudioAdapterDescriptor *descs, int
     adaptersManage = (struct AudioInfoInAdapter *)calloc(1,
         num * sizeof(struct AudioInfoInAdapter));
     if (adaptersManage == NULL) {
-        HDF_LOGE("%{public}s: calloc adaptersManage failed! ", __func__);
+        AUDIO_FUNC_LOGE("calloc adaptersManage failed! ");
 
         return HDF_FAILURE;
     }
@@ -169,11 +169,11 @@ int32_t HdiServiceRenderCaptureReadData(struct HdfSBuf *data, const char **adapt
         return HDF_FAILURE;
     }
     if ((*adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s: adapterName Is NULL ", __func__);
+        AUDIO_FUNC_LOGE("adapterName Is NULL ");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, pid)) {
-        HDF_LOGE("%{public}s: read buf fail ", __func__);
+        AUDIO_FUNC_LOGE("read buf fail ");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -184,9 +184,9 @@ int32_t AudioAdapterListGetAdapterCapture(const char *adapterName,
 {
     int32_t i, num;
 
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (adapterName == NULL || adapter == NULL || capture == NULL) {
-        HDF_LOGE("%{public}s: The pointer is null ", __func__);
+        AUDIO_FUNC_LOGE("The pointer is null ");
         return HDF_ERR_INVALID_PARAM;
     }
     if (g_renderAndCaptureManage == NULL) {
@@ -195,10 +195,10 @@ int32_t AudioAdapterListGetAdapterCapture(const char *adapterName,
     num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : g_serverAdapterNum;
     for (i = 0; i < num; i++) {
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
-            HDF_LOGE("%{public}s: The pointer is null ", __func__);
+            AUDIO_FUNC_LOGE("The pointer is null ");
             return HDF_ERR_INVALID_PARAM;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             *adapter = g_renderAndCaptureManage[i].adapter;
             *capture = g_renderAndCaptureManage[i].capture;
             return HDF_SUCCESS;
@@ -211,9 +211,9 @@ int32_t AudioDestroyCaptureInfoInAdapter(const char *adapterName)
 {
     int32_t i;
 
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (adapterName == NULL) {
-        HDF_LOGE("%{public}s: Param Is NULL ", __func__);
+        AUDIO_FUNC_LOGE("Param Is NULL ");
         return HDF_FAILURE;
     }
 
@@ -226,7 +226,7 @@ int32_t AudioDestroyCaptureInfoInAdapter(const char *adapterName)
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_FAILURE;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             g_renderAndCaptureManage[i].captureStatus = 0;
             g_renderAndCaptureManage[i].capturePriority = -1;
             g_renderAndCaptureManage[i].capture = NULL;
@@ -234,22 +234,22 @@ int32_t AudioDestroyCaptureInfoInAdapter(const char *adapterName)
             return HDF_SUCCESS;
         }
     }
-    HDF_LOGE("%{public}s: Can not find Adapter! ", __func__);
+    AUDIO_FUNC_LOGE("Can not find Adapter! ");
     return HDF_FAILURE;
 }
 
 int32_t AudioDestroyFormerCapture(struct AudioInfoInAdapter *captureManage)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (captureManage == NULL || captureManage->adapter == NULL || captureManage->capture == NULL) {
-        HDF_LOGE("%{public}s: input para is NULL ", __func__);
+        AUDIO_FUNC_LOGE("input para is NULL ");
         return HDF_FAILURE;
     }
     int count = 0;
     captureManage->captureDestory = true;
     while (captureManage->captureBusy) {
         if (count > 1000) { // Less than 1000
-            HDF_LOGE("%{public}s: , count = %{public}d", __func__, count);
+            AUDIO_FUNC_LOGE(", count = %{public}d", count);
             captureManage->captureDestory = false;
             return AUDIO_HAL_ERR_AI_BUSY; // capture is busy now
         }
@@ -277,7 +277,7 @@ int32_t AudioJudgeCapturePriority(const int32_t priority, int which)
     }
     num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : g_serverAdapterNum;
     if (which < 0 || which >= num) {
-        HDF_LOGE("%{public}s: invalid value! ", __func__);
+        AUDIO_FUNC_LOGE("invalid value! ");
         return HDF_FAILURE;
     }
     if (!(g_renderAndCaptureManage[which].captureStatus)) {
@@ -296,7 +296,7 @@ int32_t AudioCreatCaptureCheck(const char *adapterName, const int32_t priority)
 {
     int32_t i, num;
 
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (adapterName == NULL) {
         return HDF_FAILURE;
     }
@@ -309,11 +309,11 @@ int32_t AudioCreatCaptureCheck(const char *adapterName, const int32_t priority)
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_FAILURE;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             return AudioJudgeCapturePriority(priority, i);
         }
     }
-    HDF_LOGE("%{public}s: Can not find Adapter! ", __func__);
+    AUDIO_FUNC_LOGE("Can not find Adapter! ");
     return HDF_FAILURE;
 }
 
@@ -326,7 +326,7 @@ int32_t AudioAddCaptureInfoInAdapter(const char *adapterName,
     int32_t i, num;
 
     if (adapterName == NULL || adapter == NULL || capture == NULL) {
-        HDF_LOGE("%{public}s: input para is NULL. ", __func__);
+        AUDIO_FUNC_LOGE("input para is NULL. ");
         return HDF_FAILURE;
     }
     if (g_renderAndCaptureManage == NULL) {
@@ -337,17 +337,17 @@ int32_t AudioAddCaptureInfoInAdapter(const char *adapterName,
         if (g_renderAndCaptureManage == NULL || g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_FAILURE;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             g_renderAndCaptureManage[i].captureStatus = 1;
             g_renderAndCaptureManage[i].capturePriority = priority;
             g_renderAndCaptureManage[i].capture = capture;
             g_renderAndCaptureManage[i].capturePid = capturePid;
-            HDF_LOGE("%{public}s: , (uint64_t)g_renderAndCaptureManage[i].capture = %{public}p",
-                __func__, g_renderAndCaptureManage[i].capture);
+            AUDIO_FUNC_LOGI(", (uint64_t)g_renderAndCaptureManage[%{public}d].capture = %{public}p",
+                i, g_renderAndCaptureManage[i].capture);
             return HDF_SUCCESS;
         }
     }
-    HDF_LOGE("%{public}s: Can not find Adapter! ", __func__);
+    AUDIO_FUNC_LOGE("Can not find Adapter! ");
     return HDF_FAILURE;
 }
 
@@ -454,12 +454,12 @@ int32_t AudioAdapterListGetAdapter(const char *adapterName, struct AudioAdapter 
 {
     int32_t i, num;
 
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (g_renderAndCaptureManage == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
     if (adapterName == NULL || adapter == NULL) {
-        HDF_LOGE("%{public}s: The pointer is null ", __func__);
+        AUDIO_FUNC_LOGE("The pointer is null ");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -469,7 +469,7 @@ int32_t AudioAdapterListGetAdapter(const char *adapterName, struct AudioAdapter 
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_ERR_INVALID_PARAM;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             *adapter = g_renderAndCaptureManage[i].adapter;
             return HDF_SUCCESS;
         }
@@ -479,16 +479,16 @@ int32_t AudioAdapterListGetAdapter(const char *adapterName, struct AudioAdapter 
 
 int32_t AudioDestroyFormerRender(struct AudioInfoInAdapter *renderManage)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (renderManage == NULL || renderManage->adapter == NULL || renderManage->render == NULL) {
-        HDF_LOGE("%{public}s: input para is NULL. ", __func__);
+        AUDIO_FUNC_LOGE("input para is NULL. ");
         return HDF_FAILURE;
     }
     int count = 0;
     renderManage->renderDestory = true;
     while (renderManage->renderBusy) {
         if (count > 1000) { // Less than 1000
-            HDF_LOGE("%{public}s: , count = %{public}d", __func__, count);
+            AUDIO_FUNC_LOGE(", count = %{public}d", count);
             renderManage->renderDestory = false;
             return AUDIO_HAL_ERR_AO_BUSY; // render is busy now
         }
@@ -514,7 +514,7 @@ int32_t AudioJudgeRenderPriority(const int32_t priority, int which)
 
     num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : g_serverAdapterNum;
     if (which < 0 || which >= num) {
-        HDF_LOGE("%{public}s: invalid value! ", __func__);
+        AUDIO_FUNC_LOGE("invalid value! ");
         return HDF_FAILURE;
     }
     if (g_renderAndCaptureManage == NULL) {
@@ -522,7 +522,7 @@ int32_t AudioJudgeRenderPriority(const int32_t priority, int which)
     }
     if (g_renderAndCaptureManage[which].renderPriority <= priority) {
         if (AudioDestroyFormerRender(&g_renderAndCaptureManage[which])) {
-            HDF_LOGE("%{public}s: AudioDestroyFormerRender: Fail. ", __func__);
+            AUDIO_FUNC_LOGE("AudioDestroyFormerRender: Fail. ");
             return HDF_FAILURE;
         }
         return HDF_SUCCESS;
@@ -536,7 +536,7 @@ int32_t AudioCreatRenderCheck(const char *adapterName, const int32_t priority)
 {
     int32_t i;
 
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (adapterName == NULL || g_renderAndCaptureManage == NULL) {
         return HDF_FAILURE;
     }
@@ -547,7 +547,7 @@ int32_t AudioCreatRenderCheck(const char *adapterName, const int32_t priority)
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_FAILURE;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             if (!(g_renderAndCaptureManage[i].renderStatus)) {
                 return HDF_SUCCESS;
             } else {
@@ -555,7 +555,7 @@ int32_t AudioCreatRenderCheck(const char *adapterName, const int32_t priority)
             }
         }
     }
-    HDF_LOGE("%{public}s: Can not find Adapter! ", __func__);
+    AUDIO_FUNC_LOGE("Can not find Adapter! ");
     return HDF_FAILURE;
 }
 
@@ -568,7 +568,7 @@ int32_t AudioAddRenderInfoInAdapter(const char *adapterName,
     int32_t i, num;
 
     if (adapterName == NULL || adapter == NULL || render == NULL) {
-        HDF_LOGE("%{public}s: input para is NULL. ", __func__);
+        AUDIO_FUNC_LOGE("input para is NULL. ");
         return HDF_FAILURE;
     }
     if (g_renderAndCaptureManage == NULL) {
@@ -579,7 +579,7 @@ int32_t AudioAddRenderInfoInAdapter(const char *adapterName,
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_FAILURE;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             g_renderAndCaptureManage[i].renderStatus = 1;
             g_renderAndCaptureManage[i].renderPriority = priority;
             g_renderAndCaptureManage[i].render = render;
@@ -587,7 +587,7 @@ int32_t AudioAddRenderInfoInAdapter(const char *adapterName,
             return HDF_SUCCESS;
         }
     }
-    HDF_LOGE("%{public}s: Can not find Adapter! ", __func__);
+    AUDIO_FUNC_LOGE("Can not find Adapter! ");
     return HDF_FAILURE;
 }
 
@@ -597,9 +597,9 @@ void AudioSetRenderStatus(const char *adapterName, bool renderStatus)
     if (g_renderAndCaptureManage == NULL) {
         return;
     }
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (adapterName == NULL) {
-        HDF_LOGE("%{public}s: adapterName is null ", __func__);
+        AUDIO_FUNC_LOGE("adapterName is null ");
         return;
     }
 
@@ -608,12 +608,12 @@ void AudioSetRenderStatus(const char *adapterName, bool renderStatus)
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             g_renderAndCaptureManage[i].renderBusy = renderStatus;
             return;
         }
     }
-    HDF_LOGE("%{public}s: AudioDestroyRenderInfoInAdapter: Can not find Adapter! ", __func__);
+    AUDIO_FUNC_LOGE("AudioDestroyRenderInfoInAdapter: Can not find Adapter! ");
     return;
 }
 
@@ -621,7 +621,7 @@ int32_t AudioGetRenderStatus(const char *adapterName)
 {
     int32_t i;
     int32_t num;
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (adapterName == NULL || g_renderAndCaptureManage == NULL) {
         return HDF_FAILURE;
     }
@@ -632,7 +632,7 @@ int32_t AudioGetRenderStatus(const char *adapterName)
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_FAILURE;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             if (!g_renderAndCaptureManage[i].renderDestory) {
                 return HDF_SUCCESS;
             } else {
@@ -641,7 +641,7 @@ int32_t AudioGetRenderStatus(const char *adapterName)
             }
         }
     }
-    HDF_LOGE("%{public}s: AudioDestroyRenderInfoInAdapter: Can not find Adapter! ", __func__);
+    AUDIO_FUNC_LOGE("AudioDestroyRenderInfoInAdapter: Can not find Adapter! ");
     return HDF_FAILURE;
 }
 
@@ -649,9 +649,9 @@ int32_t AudioDestroyRenderInfoInAdapter(const char *adapterName)
 {
     int32_t i, num;
 
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (adapterName == NULL) {
-        HDF_LOGE("%{public}s: adapterName is null ", __func__);
+        AUDIO_FUNC_LOGE("adapterName is null ");
         return HDF_FAILURE;
     }
 
@@ -663,7 +663,7 @@ int32_t AudioDestroyRenderInfoInAdapter(const char *adapterName)
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_FAILURE;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             g_renderAndCaptureManage[i].renderStatus = 0;
             g_renderAndCaptureManage[i].renderPriority = -1;
             g_renderAndCaptureManage[i].render = NULL;
@@ -671,34 +671,8 @@ int32_t AudioDestroyRenderInfoInAdapter(const char *adapterName)
             return HDF_SUCCESS;
         }
     }
-    HDF_LOGE("%{public}s: Can not find Adapter! ", __func__);
+    AUDIO_FUNC_LOGE("Can not find Adapter! ");
     return HDF_FAILURE;
-}
-
-int32_t AudioAdapterListGetPid(const char *adapterName, uint32_t *pid)
-{
-    LOG_FUN_INFO();
-    int32_t i, num;
-    if (g_renderAndCaptureManage == NULL) {
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (adapterName == NULL || pid == NULL) {
-        HDF_LOGE("%{public}s: The pointer is null ", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : g_serverAdapterNum;
-    for (i = 0; i < num; i++) {
-        if (g_renderAndCaptureManage[i].adapterName == NULL) {
-            return HDF_ERR_INVALID_PARAM;
-        }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
-            HDF_LOGE("%{public}s: i = %{public}d", __func__, i);
-            *pid = g_renderAndCaptureManage[i].renderPid;
-            HDF_LOGE("%{public}s: pid = %{public}u", __func__, *pid);
-            return HDF_SUCCESS;
-        }
-    }
-    return HDF_ERR_INVALID_PARAM;
 }
 
 int32_t AudioAdapterListGetAdapterRender(const char *adapterName,
@@ -706,12 +680,12 @@ int32_t AudioAdapterListGetAdapterRender(const char *adapterName,
 {
     int32_t i, num;
 
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (g_renderAndCaptureManage == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
     if (adapterName == NULL || adapter == NULL || render == NULL) {
-        HDF_LOGE("%{public}s: The pointer is null ", __func__);
+        AUDIO_FUNC_LOGE("The pointer is null ");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -720,7 +694,7 @@ int32_t AudioAdapterListGetAdapterRender(const char *adapterName,
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_ERR_INVALID_PARAM;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             *adapter = g_renderAndCaptureManage[i].adapter;
             *render = g_renderAndCaptureManage[i].render;
             return HDF_SUCCESS;
@@ -736,7 +710,7 @@ int32_t AudioAdapterListGetRender(const char *adapterName, struct AudioRender **
         return HDF_ERR_INVALID_PARAM;
     }
     if (adapterName == NULL || render == NULL) {
-        HDF_LOGE("%{public}s: pointer is null ", __func__);
+        AUDIO_FUNC_LOGE("pointer is null ");
         return HDF_ERR_INVALID_PARAM;
     }
     num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : g_serverAdapterNum;
@@ -744,9 +718,10 @@ int32_t AudioAdapterListGetRender(const char *adapterName, struct AudioRender **
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_ERR_INVALID_PARAM;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             if (g_renderAndCaptureManage[i].renderPid != pid) {
-                HDF_LOGE("%{public}s: renderPid != pid ", __func__);
+                AUDIO_FUNC_LOGE("[%{public}d].renderPid:%{public}d != pid:%{public}d ", i,
+                    g_renderAndCaptureManage[i].renderPid, pid);
                 return AUDIO_HAL_ERR_INVALID_OBJECT;
             }
             *render = g_renderAndCaptureManage[i].render;
@@ -760,7 +735,7 @@ int32_t AudioAdapterListGetCapture(const char *adapterName, struct AudioCapture 
 {
     int32_t i, num;
     if (adapterName == NULL || capture == NULL) {
-        HDF_LOGE("%{public}s: The pointer is null", __func__);
+        AUDIO_FUNC_LOGE("The pointer is null");
         return HDF_ERR_INVALID_PARAM;
     }
     if (g_renderAndCaptureManage == NULL) {
@@ -771,9 +746,10 @@ int32_t AudioAdapterListGetCapture(const char *adapterName, struct AudioCapture 
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_ERR_INVALID_PARAM;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             if (g_renderAndCaptureManage[i].capturePid != pid) {
-                HDF_LOGE("%{public}s: capturePid != pid ", __func__);
+                AUDIO_FUNC_LOGE("[%{public}d].capturePid:%{public}d != pid:%{public}d ", i,
+                    g_renderAndCaptureManage[i].capturePid, pid);
                 return AUDIO_HAL_ERR_INVALID_OBJECT;
             }
             *capture = g_renderAndCaptureManage[i].capture;
@@ -788,7 +764,7 @@ int32_t AudioAdapterFrameGetCapture(const char *adapterName,
 {
     int32_t i, num;
     if (adapterName == NULL || capture == NULL || index == NULL || g_renderAndCaptureManage == NULL) {
-        HDF_LOGE("%{public}s: The pointer is null", __func__);
+        AUDIO_FUNC_LOGE("The pointer is null");
         return HDF_ERR_INVALID_PARAM;
     }
     num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : g_serverAdapterNum;
@@ -797,9 +773,10 @@ int32_t AudioAdapterFrameGetCapture(const char *adapterName,
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_ERR_INVALID_PARAM;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             if (g_renderAndCaptureManage[i].capturePid != pid) {
-                HDF_LOGE("%{public}s: capturePid != pid ", __func__);
+                AUDIO_FUNC_LOGE("[%{public}d].capturePid:%{public}d != pid:%{public}d ", i,
+                    g_renderAndCaptureManage[i].capturePid, pid);
                 return AUDIO_HAL_ERR_INVALID_OBJECT;
             }
             if (!g_renderAndCaptureManage[i].captureDestory) {
@@ -818,13 +795,14 @@ int32_t AudioAdapterFrameGetCapture(const char *adapterName,
 int32_t AudioAdapterListCheckAndGetRender(struct AudioRender **render, struct HdfSBuf *data)
 {
     if (render == NULL || data == NULL) {
+        AUDIO_FUNC_LOGE("render or data is null!");
         return HDF_FAILURE;
     }
     struct AudioRender *renderTemp = NULL;
     const char *adapterName = NULL;
     uint32_t pid = 0;
     if (HdiServiceRenderCaptureReadData(data, &adapterName, &pid) < 0) {
-        HDF_LOGE("%{public}s: HdiServiceRenderStart: HdiServiceRenderCaptureReadData fail ", __func__);
+        AUDIO_FUNC_LOGE("HdiServiceRenderStart: HdiServiceRenderCaptureReadData fail ");
         return HDF_FAILURE;
     }
     int ret = AudioAdapterListGetRender(adapterName, &renderTemp, pid);
@@ -841,13 +819,14 @@ int32_t AudioAdapterListCheckAndGetRender(struct AudioRender **render, struct Hd
 int32_t AudioAdapterListCheckAndGetCapture(struct AudioCapture **capture, struct HdfSBuf *data)
 {
     if (capture == NULL || data == NULL) {
+        AUDIO_FUNC_LOGE("capture or data is null!");
         return HDF_FAILURE;
     }
     struct AudioCapture *captureTemp = NULL;
     const char *adapterName = NULL;
     uint32_t pid = 0;
     if (HdiServiceRenderCaptureReadData(data, &adapterName, &pid) < 0) {
-        HDF_LOGE("%{public}s: HdiServiceCaptureStart: HdiServiceRenderCaptureReadData fail ", __func__);
+        AUDIO_FUNC_LOGE("HdiServiceCaptureStart: HdiServiceRenderCaptureReadData fail ");
         return HDF_FAILURE;
     }
     int ret = AudioAdapterListGetCapture(adapterName, &captureTemp, pid);
@@ -865,12 +844,12 @@ int32_t AudioAdapterCheckListExist(const char *adapterName)
 {
     int32_t i, num;
 
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (g_renderAndCaptureManage == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (adapterName == NULL) {
-        HDF_LOGE("%{public}s: The pointer is null. ", __func__);
+        AUDIO_FUNC_LOGE("The pointer is null. ");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
@@ -879,7 +858,7 @@ int32_t AudioAdapterCheckListExist(const char *adapterName)
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return AUDIO_HAL_ERR_INVALID_PARAM;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             if (g_renderAndCaptureManage[i].adapterUserNum == 0) {
                 return AUDIO_HAL_ERR_INTERNAL;
             } else if (g_renderAndCaptureManage[i].adapterUserNum > 0) {
@@ -897,9 +876,9 @@ int32_t AudioAdapterListDestory(const char *adapterName, struct AudioAdapter **a
     if (adapter == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (adapterName == NULL) {
-        HDF_LOGE("%{public}s: adapterName is NULL. ", __func__);
+        AUDIO_FUNC_LOGE("adapterName is NULL. ");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (g_renderAndCaptureManage == NULL) {
@@ -910,7 +889,7 @@ int32_t AudioAdapterListDestory(const char *adapterName, struct AudioAdapter **a
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return AUDIO_HAL_ERR_INVALID_PARAM;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             if (g_renderAndCaptureManage[i].adapterUserNum == 1) {
                 g_renderAndCaptureManage[i].adapterUserNum--;
                 *adapter = g_renderAndCaptureManage[i].adapter;
@@ -929,9 +908,9 @@ int32_t AudioAdapterListAdd(const char *adapterName, struct AudioAdapter *adapte
 {
     int32_t i, num;
 
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (adapterName == NULL || adapter == NULL) {
-        HDF_LOGE("%{public}s: adapterName is NULL. ", __func__);
+        AUDIO_FUNC_LOGE("adapterName is NULL. ");
         return HDF_ERR_INVALID_PARAM;
     }
     num = (g_serverAdapterNum > MAX_AUDIO_ADAPTER_NUM_SERVER) ?
@@ -943,7 +922,7 @@ int32_t AudioAdapterListAdd(const char *adapterName, struct AudioAdapter *adapte
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_ERR_INVALID_PARAM;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             g_renderAndCaptureManage[i].adapter = adapter;
             g_renderAndCaptureManage[i].adapterUserNum = 1;
             return HDF_SUCCESS;
@@ -964,7 +943,7 @@ void AudioSetCaptureStatus(const char *adapterName, bool captureStatus)
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             g_renderAndCaptureManage[i].captureBusy = captureStatus;
             return;
         }
@@ -992,7 +971,7 @@ int32_t AudioGetCaptureStatus(const char *adapterName)
         if (g_renderAndCaptureManage[i].adapterName == NULL) {
             return HDF_FAILURE;
         }
-        if (!strcmp(g_renderAndCaptureManage[i].adapterName, adapterName)) {
+        if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             if (!g_renderAndCaptureManage[i].captureDestory) {
                 return HDF_SUCCESS;
             } else {
@@ -1026,11 +1005,12 @@ int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescripter *desc, struct H
 {
     int32_t ret;
     if (desc == NULL || data == NULL) {
+        AUDIO_FUNC_LOGE("desc or data is null!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     uint64_t memAddr = 0;
     if (!HdfSbufReadUint64(data, &memAddr)) {
-        HDF_LOGE("%{public}s: memAddr Is NULL", __func__);
+        AUDIO_FUNC_LOGE("memAddr Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     desc->memoryAddress = (void *)(uintptr_t)memAddr;
@@ -1057,23 +1037,22 @@ int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescripter *desc, struct H
 /**************************public************************/
 int32_t HdiServiceGetFuncs()
 {
-    HDF_LOGI("%{public}s: enter", __func__);
+    AUDIO_FUNC_LOGD("enter");
     if (g_serverManager != NULL) {
         return AUDIO_HAL_SUCCESS;
     }
     g_serverManager = GetAudioManagerFuncs();
     if (g_serverManager == NULL) {
-        HDF_LOGE("%{public}s: GetAudioManagerFuncs FAIL!", __func__);
+        AUDIO_FUNC_LOGE("GetAudioManagerFuncs FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    HDF_LOGI("%{public}s: end", __func__);
+    AUDIO_FUNC_LOGD("end");
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -1083,16 +1062,16 @@ int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,
     int32_t size = 0;
 
     if (manager == NULL) {
-        HDF_LOGE("%{public}s: Manager is NULL", __func__);
+        AUDIO_FUNC_LOGE("Manager is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = manager->GetAllAdapters(manager, &descs, &size);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: g_manager->GetAllAdapters error", __func__);
+        AUDIO_FUNC_LOGE("g_manager->GetAllAdapters error");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (size > MAX_AUDIO_ADAPTER_NUM_SERVER || size == 0 || descs == NULL || ret < 0) {
-        HDF_LOGE("%{public}s: size or g_descs is error", __func__);
+        AUDIO_FUNC_LOGE("size or g_descs is error");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     AudioSetFuzzCheckFlag(false);
@@ -1100,13 +1079,11 @@ int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,
     if (getAdaptersFlag) {  // Initialize only once
         ret = AdaptersServerManageInit(descs, size);
         if (ret != AUDIO_HAL_SUCCESS) {
-            HDF_LOGE("%{public}s: AdapterServerManageInit fail", __func__);
+            AUDIO_FUNC_LOGE("AdapterServerManageInit fail");
             return ret;
         }
         getAdaptersFlag = false;
     }
-    HDF_LOGI("%{public}s: end", __func__);
-
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -1130,12 +1107,12 @@ static int SwitchAdapter(struct AudioAdapterDescriptor *descs, const char *adapt
         for (uint32_t port = 0; port < desc->portNum; port++) {
             if (desc->ports[port].dir == portFlag) {
                 *renderPort = desc->ports[port];
-                HDF_LOGI("%{public}s: port=%{public}d index=%{public}d success!", __func__, portFlag, index);
+                AUDIO_FUNC_LOGI("portFlag=%{public}d index=%{public}d success!", portFlag, index);
                 return index;
             }
         }
     }
-    HDF_LOGE("%{public}s: out!", __func__);
+    AUDIO_FUNC_LOGE("out! adapterNameCase=%{public}s", adapterNameCase);
     return HDF_FAILURE;
 }
 
@@ -1162,24 +1139,24 @@ static int32_t MatchAppropriateAdapter(enum AudioAdapterType adapterType)
         case AUDIO_ADAPTER_PRIMARY:
         case AUDIO_ADAPTER_PRIMARY_EXT:
             if (AudioHdiGetLoadServerFlag() != AUDIO_SERVER_PRIMARY) {
-                LOGE("%s: Can't loadAdapterPrimary.", __func__);
+                AUDIO_FUNC_LOGE("Can't loadAdapterPrimary.");
                 return AUDIO_HAL_ERR_INTERNAL;
             }
             break;
         case AUDIO_ADAPTER_USB:
             if (AudioHdiGetLoadServerFlag() != AUDIO_SERVER_USB) {
-                LOGE("%s: Can't loadAdapterUsb.", __func__);
+                AUDIO_FUNC_LOGE("Can't loadAdapterUsb.");
                 return AUDIO_HAL_ERR_INTERNAL;
             }
             break;
         case AUDIO_ADAPTER_A2DP:
             if (AudioHdiGetLoadServerFlag() != AUDIO_SERVER_A2DP) {
-                LOGE("%s: Can't loadAdapterA2dp.", __func__);
+                AUDIO_FUNC_LOGE("Can't loadAdapterA2dp.");
                 return AUDIO_HAL_ERR_INTERNAL;
             }
             break;
         default:
-            LOGE("%s: An unsupported Adapter.", __func__);
+            AUDIO_FUNC_LOGE("An unsupported Adapter.");
             return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
 
@@ -1189,15 +1166,15 @@ static int32_t MatchAppropriateAdapter(enum AudioAdapterType adapterType)
 static int AudioServiceUpateDevice(struct HdfDeviceObject *device, const char *servInfo)
 {
     if (device == NULL || servInfo == NULL) {
-        HDF_LOGE("%{public}s: device or servInfo is null!", __func__);
+        AUDIO_FUNC_LOGE("device or servInfo is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (HdfDeviceObjectSetServInfo(device, servInfo) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: HdfDeviceObjectSetServInfo failed!", __func__);
+        AUDIO_FUNC_LOGE("HdfDeviceObjectSetServInfo failed!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (HdfDeviceObjectUpdate(device) != AUDIO_HAL_SUCCESS) {
-        HDF_LOGE("%{public}s: HdfDeviceObjectUpdate failed!", __func__);
+        AUDIO_FUNC_LOGE("HdfDeviceObjectUpdate failed!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
@@ -1207,7 +1184,7 @@ static int AudioServiceUpateDevice(struct HdfDeviceObject *device, const char *s
 int32_t AudioServiceStateChange(struct HdfDeviceObject *device, struct AudioEvent *audioSrvEvent)
 {
     if (device == NULL || audioSrvEvent == NULL) {
-        HDF_LOGE("%{public}s: device or audioSrvEvent is null!", __func__);
+        AUDIO_FUNC_LOGE("device or audioSrvEvent is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     g_audioEventService.eventType = audioSrvEvent->eventType;
@@ -1220,7 +1197,7 @@ int32_t AudioServiceStateChange(struct HdfDeviceObject *device, struct AudioEven
                          g_audioEventService.deviceType);
     if (ret >= 0) {
         if (AudioServiceUpateDevice(device, (const char *)strMsg) != AUDIO_HAL_SUCCESS) {
-            HDF_LOGE("%{public}s: AudioServiceUpate fail!", __func__);
+            AUDIO_FUNC_LOGE("AudioServiceUpate fail!");
             return AUDIO_HAL_ERR_INTERNAL;
         }
     }
@@ -1230,7 +1207,7 @@ int32_t AudioServiceStateChange(struct HdfDeviceObject *device, struct AudioEven
 static int32_t AudioLoadStateChange(struct HdfDeviceObject *device, struct AudioEvent *audioLoadEvent)
 {
     if (device == NULL || audioLoadEvent == NULL) {
-        HDF_LOGE("%{public}s: device or audioLoadEvent is null!", __func__);
+        AUDIO_FUNC_LOGE("device or audioLoadEvent is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     g_audioEventLoad.eventType = audioLoadEvent->eventType;
@@ -1243,7 +1220,7 @@ static int32_t AudioLoadStateChange(struct HdfDeviceObject *device, struct Audio
                          g_audioEventLoad.deviceType);
     if (ret >= 0) {
         if (AudioServiceUpateDevice(device, (const char *)strMsg) != AUDIO_HAL_SUCCESS) {
-            HDF_LOGE("%{public}s: AudioLoadUpate fail!", __func__);
+            AUDIO_FUNC_LOGE("AudioLoadUpate fail!");
             return AUDIO_HAL_ERR_INTERNAL;
         }
     }
@@ -1254,6 +1231,7 @@ int32_t HdiServiceDevOnLine(struct HdfDeviceObject *device, struct AudioManager 
     const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter, const char* adapterName)
 {
     if (device == NULL || manager == NULL || desc == NULL || adapter == NULL || adapterName == NULL) {
+        AUDIO_FUNC_LOGE("param is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = manager->LoadAdapter(manager, desc, adapter);
@@ -1263,14 +1241,14 @@ int32_t HdiServiceDevOnLine(struct HdfDeviceObject *device, struct AudioManager 
         g_audioEventLoad.eventType = HDF_AUDIO_LOAD_SUCCESS;
     }
     if (AudioLoadStateChange(device, &g_audioEventLoad) != AUDIO_HAL_SUCCESS) {
-        HDF_LOGE("%{public}s: AudioLoadStateChange fail!", __func__);
+        AUDIO_FUNC_LOGE("AudioLoadStateChange fail!");
     }
     if (*adapter == NULL) {
-        HDF_LOGE("%{public}s: load audio device failed", __func__);
+        AUDIO_FUNC_LOGE("load audio device failed");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioAdapterListAdd(adapterName, *adapter)) {
-        HDF_LOGE("%{public}s: AudioAdapterListAdd error!", __func__);
+        AUDIO_FUNC_LOGE("AudioAdapterListAdd error!");
         manager->UnloadAdapter(manager, *adapter);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -1280,11 +1258,12 @@ int32_t HdiServiceDevOnLine(struct HdfDeviceObject *device, struct AudioManager 
 int32_t HdiServiceDevOffLine(struct HdfDeviceObject *device)
 {
     if (device == NULL) {
+        AUDIO_FUNC_LOGE("device is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     g_audioEventLoad.eventType = HDF_AUDIO_LOAD_FAILURE;
     if (AudioLoadStateChange(device, &g_audioEventLoad) != AUDIO_HAL_SUCCESS) {
-        HDF_LOGE("%{public}s: AudioLoadStateChange fail!", __func__);
+        AUDIO_FUNC_LOGE("AudioLoadStateChange fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -1294,16 +1273,18 @@ int32_t HdiServiceLoadAdapterSubUsb(struct HdfDeviceObject *device, struct Audio
     const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter, const char* adapterName)
 {
     if (device == NULL || manager == NULL || desc == NULL || adapter == NULL || adapterName == NULL) {
+        AUDIO_FUNC_LOGE("param is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
     if (g_audioEventPnp.eventType == HDF_AUDIO_DEVICE_REMOVE || g_audioEventPnp.eventType == HDF_AUDIO_EVENT_UNKOWN) {
         HdiServiceDevOffLine(device);
+        AUDIO_FUNC_LOGE("eventType=0x%{public}x", g_audioEventPnp.eventType);
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     } else if (g_audioEventPnp.eventType == HDF_AUDIO_DEVICE_ADD) {
         return HdiServiceDevOnLine(device, manager, desc, adapter, adapterName);
     } else {
-        HDF_LOGE("%{public}s: eventType=0x%{public}x nothing", __func__, g_audioEventPnp.eventType);
+        AUDIO_FUNC_LOGE("eventType=0x%{public}x nothing", g_audioEventPnp.eventType);
         return AUDIO_HAL_ERR_INTERNAL;
     }
 }
@@ -1311,14 +1292,15 @@ int32_t HdiServiceLoadAdapterSubUsb(struct HdfDeviceObject *device, struct Audio
 static int32_t HdiServiceLoadAdapterSub(struct HdfDeviceObject *device, struct AudioManager *manager,
     const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter, const char* adapterName)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
+    AUDIO_FUNC_LOGD("enter");
     if (device == NULL || manager == NULL || desc == NULL || adapter == NULL || adapterName == NULL) {
+        AUDIO_FUNC_LOGE("param is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     enum AudioAdapterType sndCardType = MatchAdapterType(adapterName, desc->ports[0].portId);
     int32_t ret = MatchAppropriateAdapter(sndCardType);
     if (ret != AUDIO_HAL_SUCCESS) {
-        HDF_LOGE("%{public}s: load audio device not matched", __func__);
+        AUDIO_FUNC_LOGE("load audio device not matched");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     switch (sndCardType) {
@@ -1340,7 +1322,7 @@ static int32_t HdiServiceLoadAdapterSub(struct HdfDeviceObject *device, struct A
 int32_t HdiServiceLoadAdapter(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGI("%{public}s: enter", __func__);
+    AUDIO_FUNC_LOGD("enter");
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -1349,7 +1331,7 @@ int32_t HdiServiceLoadAdapter(const struct HdfDeviceIoClient *client,
     const char *adapterName = NULL;
     uint32_t tempDir = 0;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
+        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = AudioAdapterCheckListExist(adapterName);
@@ -1357,17 +1339,17 @@ int32_t HdiServiceLoadAdapter(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (ret == AUDIO_HAL_SUCCESS) {
-        HDF_LOGE("%{public}s: adapter already exist !", __func__);
+        AUDIO_FUNC_LOGE("adapte[%{public}s] already exist !", adapterName);
         return AUDIO_HAL_SUCCESS;
     }
     if (!HdfSbufReadUint32(data, &tempDir)) {
-        HDF_LOGE("%{public}s: adapter need Load!", __func__);
+        AUDIO_FUNC_LOGE("adapter need Load!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     enum AudioPortDirection port = (enum AudioPortDirection)tempDir;
     struct AudioManager *manager = g_serverManager;
     if (adapterName == NULL || manager == NULL || g_descs == NULL) {
-        HDF_LOGE("%{public}s: Point is NULL!", __func__);
+        AUDIO_FUNC_LOGE("Point is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int index = SwitchAdapter(g_descs, adapterName, port,
@@ -1383,22 +1365,21 @@ int32_t HdiServiceLoadAdapter(const struct HdfDeviceIoClient *client,
 int32_t HdiServiceInitAllPorts(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGI("%{public}s: enter!", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     const char *adapterName = NULL;
     struct AudioAdapter *adapter = NULL;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
+        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
-        HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (adapter->InitAllPorts(adapter)) {
-        HDF_LOGE("%{public}s: InitAllPorts fail", __func__);
+        AUDIO_FUNC_LOGE("InitAllPorts fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -1415,19 +1396,19 @@ int32_t HdiServiceUnloadAdapter(const struct HdfDeviceIoClient *client,
     int ret;
     struct AudioManager *manager = g_serverManager;
     if (manager == NULL) {
-        HDF_LOGE("%{public}s: Point is NULL!", __func__);
+        AUDIO_FUNC_LOGE("Point is NULL!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
+        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     ret = AudioAdapterListDestory(adapterName, &adapter);
     if (ret == AUDIO_HAL_ERR_INTERNAL) {
-        HDF_LOGI("%{public}s: Other dev Use the adapter", __func__);
+        AUDIO_FUNC_LOGI("Other dev Use the adapter");
         return AUDIO_HAL_SUCCESS;
     } else if (ret == AUDIO_HAL_ERR_INVALID_PARAM) {
-        HDF_LOGE("%{public}s: param invalid!", __func__);
+        AUDIO_FUNC_LOGE("param invalid!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (adapter == NULL) {
@@ -1436,16 +1417,15 @@ int32_t HdiServiceUnloadAdapter(const struct HdfDeviceIoClient *client,
     manager->UnloadAdapter(manager, adapter);
     g_audioEventLoad.eventType = HDF_AUDIO_UNLOAD;
     if (AudioLoadStateChange(client->device, &g_audioEventLoad) != AUDIO_HAL_SUCCESS) {
-        HDF_LOGE("%{public}s: AudioLoadStateChange fail!", __func__);
+        AUDIO_FUNC_LOGE("AudioLoadStateChange fail!");
     }
-    HDF_LOGI("%{public}s: Unload the adapter!", __func__);
+    AUDIO_FUNC_LOGI("Unload the adapter success!");
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t HdiServiceGetPortCapability(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s: enter", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -1455,7 +1435,7 @@ int32_t HdiServiceGetPortCapability(const struct HdfDeviceIoClient *client,
     const char *adapterName = NULL;
     uint32_t tempDir = 0;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
+        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (!HdfSbufReadUint32(data, &tempDir)) {
@@ -1468,18 +1448,18 @@ int32_t HdiServiceGetPortCapability(const struct HdfDeviceIoClient *client,
     if ((port.portName = HdfSbufReadString(data)) == NULL) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    HDF_LOGD("port.portName = %{public}s", port.portName);
+    AUDIO_FUNC_LOGD("port.portName = %{public}s", port.portName);
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
-        HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (adapter == NULL) {
-        HDF_LOGE("%{public}s: HdiServiceCreatRender adapter is NULL!", __func__);
+        AUDIO_FUNC_LOGE("HdiServiceCreatRender adapter is NULL!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = adapter->GetPortCapability(adapter, &port, &capability);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: ret failed", __func__);
+        AUDIO_FUNC_LOGE("GetPortCapability failed ret = %{public}d", ret);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -1488,7 +1468,6 @@ int32_t HdiServiceGetPortCapability(const struct HdfDeviceIoClient *client,
 int32_t HdiServiceSetPassthroughMode(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s: enter", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -1497,7 +1476,7 @@ int32_t HdiServiceSetPassthroughMode(const struct HdfDeviceIoClient *client,
     struct AudioAdapter *adapter = NULL;
     const char *adapterName = NULL;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
+        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     uint32_t tempDir = 0;
@@ -1505,27 +1484,27 @@ int32_t HdiServiceSetPassthroughMode(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     port.dir = (enum AudioPortDirection)tempDir;
-    HDF_LOGE("port.dir = %{public}d", port.dir);
+    AUDIO_FUNC_LOGD("port.dir = %{public}d", port.dir);
     if (!HdfSbufReadUint32(data, &port.portId)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if ((port.portName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("port.portName = %{public}s", port.portName);
+        AUDIO_FUNC_LOGE("port.portName = %{public}s", port.portName);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    HDF_LOGD("port.portName = %{public}s", port.portName);
+    AUDIO_FUNC_LOGD("port.portName = %{public}s", port.portName);
     uint32_t tempMode = 0;
     if (!HdfSbufReadUint32(data, &tempMode)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     mode = (enum AudioPortPassthroughMode)tempMode;
-    HDF_LOGE("%{public}s: ready in,mode = %{public}d", __func__, mode);
+    AUDIO_FUNC_LOGD("ready in, mode = %{public}d", mode);
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
-        HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (adapter == NULL) {
-        HDF_LOGE("%{public}s: HdiServiceCreatRender adapter is NULL!", __func__);
+        AUDIO_FUNC_LOGE("HdiServiceCreatRender adapter is NULL!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int ret = adapter->SetPassthroughMode(adapter, &port, mode);
@@ -1544,11 +1523,11 @@ int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *client,
     struct AudioPort port;
     int32_t ret = memset_s(&port, sizeof(struct AudioPort), 0, sizeof(struct AudioPort));
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: memset_s failed", __func__);
+        AUDIO_FUNC_LOGE("memset_s failed");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
+        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     uint32_t tempDir = port.dir;
@@ -1560,20 +1539,20 @@ int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if ((port.portName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("port.portName = %{public}s", port.portName);
+        AUDIO_FUNC_LOGE("port.portName = %{public}s", port.portName);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
-        HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (adapter == NULL) {
-        HDF_LOGE("%{public}s: adapter is NULL!", __func__);
+        AUDIO_FUNC_LOGE("adapter is NULL!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     ret = adapter->GetPassthroughMode(adapter, &port, &mode);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: GetPassthroughMode ret failed", __func__);
+        AUDIO_FUNC_LOGE("GetPassthroughMode ret failed");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     uint32_t tempMode = (uint32_t)mode;
@@ -1589,17 +1568,17 @@ static int32_t HdiServiceGetDevStatusByPnp(const struct HdfDeviceIoClient *clien
     (void)reply;
     const char *strDevPlugMsg = NULL;
     if (client == NULL || data == NULL) {
-        HDF_LOGE("%{public}s: client || data is  null!", __func__);
+        AUDIO_FUNC_LOGE("client or data is  null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if ((strDevPlugMsg = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s: data is null!", __func__);
+        AUDIO_FUNC_LOGE("data is null!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
     if ((AudioPnpMsgReadValue(strDevPlugMsg, "EVENT_TYPE", &(g_audioEventPnp.eventType)) != HDF_SUCCESS) ||
         (AudioPnpMsgReadValue(strDevPlugMsg, "DEVICE_TYPE", &(g_audioEventPnp.deviceType)) != HDF_SUCCESS)) {
-        HDF_LOGE("%{public}s: DeSerialize fail!", __func__);
+        AUDIO_FUNC_LOGE("DeSerialize fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (g_audioEventPnp.deviceType == HDF_AUDIO_USB_HEADSET ||
@@ -1614,7 +1593,7 @@ static int32_t HdiServiceGetDevStatusByPnp(const struct HdfDeviceIoClient *clien
         }
     }
     if (AudioServiceStateChange(client->device, &g_audioEventService) != AUDIO_HAL_SUCCESS) {
-        HDF_LOGE("%{public}s: AudioServiceStateChange fail!", __func__);
+        AUDIO_FUNC_LOGE("AudioServiceStateChange fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -1708,18 +1687,18 @@ int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, struct H
     struct HdfSBuf *reply)
 {
     unsigned int i;
-    HDF_LOGD("%{public}s: valid cmdId = %{public}d", __func__, cmdId);
+    AUDIO_FUNC_LOGD("cmdId = %{public}d", cmdId);
     if (client == NULL) {
-        HDF_LOGE("%{public}s: ControlDispatch: input para is NULL.", __func__);
+        AUDIO_FUNC_LOGE("ControlDispatch: input para is NULL.");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
     if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
-        HDF_LOGE("check interface token failed");
+        AUDIO_FUNC_LOGE("check interface token failed");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (cmdId > AUDIO_HDI_CAPTURE_DEV_DUMP || cmdId < 0) {
-        HDF_LOGE("ControlDispatch: invalid cmdId = %{public}d", cmdId);
+        AUDIO_FUNC_LOGE("ControlDispatch: invalid cmdId = %{public}d", cmdId);
         return AUDIO_HAL_ERR_INTERNAL;
     } else if (cmdId <= AUDIO_HDI_RENDER_DRAIN_BUFFER) {
         for (i = 0; i < sizeof(g_hdiServiceDispatchCmdHandleList) /

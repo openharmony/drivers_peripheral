@@ -57,17 +57,17 @@ int32_t IsPlaybackRoute(unsigned route)
         case DEV_OUT_SPEAKER_HEADPHONE_NORMAL_ROUTE:
             return true;
         default:
-            LOG_FUN_ERR("IsPlaybackRoute() Error route %d", route);
+            AUDIO_FUNC_LOGE("IsPlaybackRoute() Error route %d", route);
             return -EINVAL;
     }
 }
 
 const struct PathRoute *get_route_config(unsigned route)
 {
-    LOG_PARA_INFO("get_route_config() route %d", route);
+    AUDIO_FUNC_LOGI("get_route_config() route %d", route);
 
     if (!g_tinyalsaRouteTable) {
-        LOG_FUN_ERR("get_route_config() pathRouteMap is NULL!");
+        AUDIO_FUNC_LOGE("get_route_config() pathRouteMap is NULL!");
         return NULL;
     }
     switch (route) {
@@ -84,7 +84,7 @@ const struct PathRoute *get_route_config(unsigned route)
         case DEV_IN_MAIN_MIC_CAPTURE_ROUTE:
             return &(g_tinyalsaRouteTable->mainMicCapture);
         default:
-            LOG_FUN_ERR("get_route_config() Error route %d", route);
+            AUDIO_FUNC_LOGE("get_route_config() Error route %d", route);
             return NULL;
     }
 }
@@ -104,7 +104,7 @@ int32_t MixerCtlGetIntValue(struct mixer_ctl *contorl)
     elemValue.id.numid = contorl->info->id.numid;
     ret = ioctl(contorl->mixer->fd, SNDRV_CTL_IOCTL_ELEM_READ, &elemValue);
     if (ret < 0) {
-        LOG_FUN_ERR("read controls value failed");
+        AUDIO_FUNC_LOGE("read controls value failed");
         return ret;
     }
     return elemValue.value.integer.value[0];
@@ -220,7 +220,7 @@ void mixer_ctl_value_check(struct mixer_ctl *ctl, int64_t *value)
     int64_t max;
     int32_t ret = mixer_get_ctl_minmax(ctl, &min, &max);
     if (ret < 0) {
-        LOG_FUN_ERR("mixer_ctl_value_check() mixer_get_ctl_minmax error");
+        AUDIO_FUNC_LOGE("mixer_ctl_value_check() mixer_get_ctl_minmax error");
         return;
     }
     if (*value > max) {
@@ -280,9 +280,9 @@ int32_t set_controls(struct mixer *mixer, const struct RouteCfgInfo *ctls, const
 {
     struct mixer_ctl *ctl;
 
-    LOG_PARA_INFO("set_controls() ctls_count %d", ctls_count);
+    AUDIO_FUNC_LOGI("set_controls() ctls_count %d", ctls_count);
     if (!ctls || ctls_count <= 0) {
-        LOG_FUN_ERR("set_controls() ctls is NULL");
+        AUDIO_FUNC_LOGE("set_controls() ctls is NULL");
         return 0;
     }
 
@@ -296,26 +296,26 @@ int32_t set_controls(struct mixer *mixer, const struct RouteCfgInfo *ctls, const
             ctl->info->type != SNDRV_CTL_ELEM_TYPE_INTEGER &&
             ctl->info->type != SNDRV_CTL_ELEM_TYPE_INTEGER64 &&
             ctl->info->type != SNDRV_CTL_ELEM_TYPE_ENUMERATED) {
-            LOG_FUN_ERR("set_controls() ctl %s is not a type of INT or ENUMERATED", ctls[i].controlName);
+            AUDIO_FUNC_LOGE("set_controls() ctl %s is not a type of INT or ENUMERATED", ctls[i].controlName);
             return -EINVAL;
         }
 
         if (ctls[i].stringVal) {
             if (ctl->info->type != SNDRV_CTL_ELEM_TYPE_ENUMERATED) {
-                LOG_FUN_ERR("set_controls() ctl %s is not a type of ENUMERATED", ctls[i].controlName);
+                AUDIO_FUNC_LOGE("set_controls() ctl %s is not a type of ENUMERATED", ctls[i].controlName);
                 return -EINVAL;
             }
             if (mixer_ctl_enumerated_select(ctl, ctls[i].stringVal) != 0) {
-                LOG_FUN_ERR("set_controls() Can not set ctl %s to %s", ctls[i].controlName, ctls[i].stringVal);
+                AUDIO_FUNC_LOGE("set_controls() Can not set ctl %s to %s", ctls[i].controlName, ctls[i].stringVal);
                 return -EINVAL;
             }
-            LOG_PARA_INFO("set_controls() set ctl %s to %s", ctls[i].controlName, ctls[i].stringVal);
+            AUDIO_FUNC_LOGI("set_controls() set ctl %s to %s", ctls[i].controlName, ctls[i].stringVal);
         } else {
             if (mixer_ctl_set_int_double(ctl, ctls[i].intVal[0], ctls[i].intVal[1]) != 0) {
-                LOG_FUN_ERR("set_controls() can not set ctl %s to %d", ctls[i].controlName, ctls[i].intVal[0]);
+                AUDIO_FUNC_LOGE("set_controls() can not set ctl %s to %d", ctls[i].controlName, ctls[i].intVal[0]);
                 return -EINVAL;
             }
-            LOG_PARA_INFO("set_controls() set ctl %s to %d", ctls[i].controlName, ctls[i].intVal[0]);
+            AUDIO_FUNC_LOGI("set_controls() set ctl %s to %d", ctls[i].controlName, ctls[i].intVal[0]);
         }
     }
     return 0;
@@ -329,14 +329,14 @@ char* GetSndCardId(int32_t card, uint32_t *length)
     int32_t readLen = 0;
     char *sndCardId = (char *)malloc(SND_CARD_ID_LEN);
     if (sndCardId == NULL) {
-        LOG_FUN_ERR("sndCardId malloc failed");
+        AUDIO_FUNC_LOGE("sndCardId malloc failed");
         return NULL;
     }
     (void)memset_s(sndCardId, SND_CARD_ID_LEN, 0, SND_CARD_ID_LEN);
 
     int32_t ret = sprintf_s(path, sizeof(path) - 1, "/proc/asound/card%d/id", card);
     if (ret < 0) {
-        LOG_FUN_ERR("sndCardId path sprintf_s failed");
+        AUDIO_FUNC_LOGE("sndCardId path sprintf_s failed");
         free(sndCardId);
         sndCardId = NULL;
         return NULL;
@@ -345,7 +345,7 @@ char* GetSndCardId(int32_t card, uint32_t *length)
     if (fp) {
         readLen = fread(sndCardId, sizeof(char), SND_CARD_ID_LEN, fp);
         if (fclose(fp)) {
-            LOG_FUN_ERR("fclose(%s) failed", path);
+            AUDIO_FUNC_LOGE("fclose(%s) failed", path);
         }
     }
     sndCardId[readLen - 1] = '\0';
@@ -360,13 +360,13 @@ void MatchRouteTableInfo(char *sndCardId, uint32_t *length)
     for (int32_t i = 0; i < count; i++) {
         if (strncmp(g_sndCardCfgList[i].sndCardName, sndCardId, cardIdLength) == 0) {
             g_tinyalsaRouteTable = GetHdmiConfigTable();
-            LOG_PARA_INFO("Get route table for sound card0 %s", sndCardId);
+            AUDIO_FUNC_LOGI("Get route table for sound card0 %s", sndCardId);
         }
     }
 
     if (!g_tinyalsaRouteTable) {
         g_tinyalsaRouteTable = GetDefaultConfigTable();
-        LOG_FUN_ERR("Can not get config table for sound card0 %s, so get default config table.", sndCardId);
+        AUDIO_FUNC_LOGE("Can not get config table for sound card0 %s, so get default config table.", sndCardId);
     }
     return;
 }
@@ -376,11 +376,11 @@ int32_t SndCardRouteTableInit(int32_t card)
     uint32_t sndCardIdLength = 0;
     char *sndCardId = GetSndCardId(card, &sndCardIdLength);
     if (sndCardId == NULL) {
-        LOG_FUN_ERR("getSndCardId failed");
+        AUDIO_FUNC_LOGE("getSndCardId failed");
         return -1;
     }
 
-    LOG_FUN_ERR("Sound card%d is %s length is %d", card, sndCardId, sndCardIdLength);
+    AUDIO_FUNC_LOGE("Sound card%d is %s length is %d", card, sndCardId, sndCardIdLength);
     MatchRouteTableInfo(sndCardId, &sndCardIdLength);
     free(sndCardId);
     sndCardId = NULL;
@@ -395,20 +395,20 @@ int32_t RouteSetControls(unsigned route)
     struct mixer* mMixer;
 
     if (route >= MAX_ROUTE) {
-        LOG_FUN_ERR("route_set_controls() route %d error!", route);
+        AUDIO_FUNC_LOGE("route_set_controls() route %d error!", route);
         return -EINVAL;
     }
 
-    LOG_PARA_INFO("route_set_controls() set route %d", route);
+    AUDIO_FUNC_LOGI("route_set_controls() set route %d", route);
     mMixer = IsPlaybackRoute(route) ? g_mixerPlayback : g_mixerCapture;
     if (!mMixer) {
-        LOG_FUN_ERR("route_set_controls() mMixer is NULL!");
+        AUDIO_FUNC_LOGE("route_set_controls() mMixer is NULL!");
         return -EINVAL;
     }
 
     const struct PathRoute *routeInfo = get_route_config(route);
     if (!routeInfo) {
-        LOG_FUN_ERR("route_set_controls() Can not get config of route = %d", route);
+        AUDIO_FUNC_LOGE("route_set_controls() Can not get config of route = %d", route);
         return -EINVAL;
     }
 
@@ -482,7 +482,7 @@ void mixer_close_legacy(struct mixer *mixer)
 struct mixer *MixerInit(uint32_t count)
 {
     if (count <= 0) {
-        LOG_FUN_ERR("count <=0, mixer->ctl and mixer->info can not malloc");
+        AUDIO_FUNC_LOGE("count <=0, mixer->ctl and mixer->info can not malloc");
         return NULL;
     }
     struct mixer *mixer = calloc(1, sizeof(*mixer));
@@ -510,13 +510,13 @@ int32_t CtleNamesInit(struct snd_ctl_elem_info *elemInfo, struct mixer *mixer, i
     }
     uint32_t items = elemInfo->value.enumerated.items;
     if (items <= 0) {
-        LOG_FUN_ERR("items <=0, **enames can not malloc");
+        AUDIO_FUNC_LOGE("items <=0, **enames can not malloc");
         return NULL;
     }
     const int32_t enamesLen = 4; // 32bit pointer length is 4
     char **enames = calloc(items, enamesLen);
     if (enames == NULL) {
-        LOG_FUN_ERR("enumerated.items name malloc failed");
+        AUDIO_FUNC_LOGE("enumerated.items name malloc failed");
         return -1;
     }
 
@@ -531,7 +531,7 @@ int32_t CtleNamesInit(struct snd_ctl_elem_info *elemInfo, struct mixer *mixer, i
         uint32_t nameLen = strlen(tempInfo.value.enumerated.name) + 1;
         enames[i] = (char *)malloc(nameLen);
         if (!enames[i]) {
-            LOG_FUN_ERR("enumerated.items enames malloc failed");
+            AUDIO_FUNC_LOGE("enumerated.items enames malloc failed");
             return -1;
         }
         (void)memset_s(enames[i], nameLen, 0, nameLen);
@@ -573,12 +573,12 @@ struct mixer *mixer_open_legacy(int32_t card)
     char dname[sizeof(SOUND_CTL_PREFIX) + 20];
     int32_t ret = sprintf_s(dname, sizeof(dname),  SOUND_CTL_PREFIX, card);
     if (ret < 0) {
-        LOG_FUN_ERR("sound card control node path sprintf failed");
+        AUDIO_FUNC_LOGE("sound card control node path sprintf failed");
         return NULL;
     }
     int32_t fd = open(dname, O_RDWR);
     if (fd < 0) {
-        LOG_FUN_ERR("Can not open %s for card %d", dname, card);
+        AUDIO_FUNC_LOGE("Can not open %s for card %d", dname, card);
         return NULL;
     }
     struct snd_ctl_elem_list elemList;
@@ -625,7 +625,7 @@ int32_t RoutePcmClose(unsigned route)
 {
     if (route != DEV_OFF_PLAYBACK_OFF_ROUTE &&
         route != DEV_OFF_CAPTURE_OFF_ROUTE) {
-        LOG_FUN_ERR("RoutePcmClose() is not a off route");
+        AUDIO_FUNC_LOGE("RoutePcmClose() is not a off route");
         return 0;
     }
     // set controls
@@ -724,7 +724,7 @@ int32_t set_voice_volume(const char *ctlName, float volume)
         return 0;
     }
 
-    LOG_PARA_INFO("set_voice_volume volume %f", volume);
+    AUDIO_FUNC_LOGI("set_voice_volume volume %f", volume);
     return mixer_ctl_set_int(ctl, volume);
 }
 
@@ -741,10 +741,10 @@ int32_t set_capture_voice_volume(const char *ctlName, float volume)
         return 0;
     }
     if (mixer_get_ctl_minmax(ctl, &volMin, &volMax) < 0) {
-        LOG_FUN_ERR("mixer_get_dB_range() get control min max value fail");
+        AUDIO_FUNC_LOGE("mixer_get_dB_range() get control min max value fail");
         return 0;
     }
-    LOG_PARA_INFO("set_capture_voice_volume vol_min , vol_max");
+    AUDIO_FUNC_LOGI("set_capture_voice_volume vol_min , vol_max");
     return mixer_ctl_set_int(ctl, volume);
 }
 
@@ -753,7 +753,7 @@ int32_t RouteSetVoiceVolume(float volume)
     int32_t ret = -1;
     const char *mixer_l_ctl_name = "DACL Playback Volume";
     const char *mixer_r_ctl_name = "DACR Playback Volume";
-    LOG_PARA_INFO("RouteSetVoiceVolume %f", volume);
+    AUDIO_FUNC_LOGI("RouteSetVoiceVolume %f", volume);
     int32_t ret_l = set_voice_volume(mixer_l_ctl_name, volume);
     int32_t ret_r = set_voice_volume(mixer_r_ctl_name, volume);
     if (ret_l && ret_r) {
@@ -770,7 +770,7 @@ int32_t RouteSetCaptureVoiceVolume(float volume)
     int32_t ret_l = set_capture_voice_volume(mixer_l_ctl_name, volume);
     int32_t ret_r = set_capture_voice_volume(mixer_r_ctl_name, volume);
     if (ret_l && ret_r) {
-        LOG_FUN_ERR("RouteSetCaptureVoiceVolume fail");
+        AUDIO_FUNC_LOGE("RouteSetCaptureVoiceVolume fail");
         ret = 0;
     }
     return ret;
@@ -812,7 +812,7 @@ int32_t RouteGetVoiceMinMaxStep(int64_t *volMin, int64_t *volMax, char *ctlName,
         return 0;
     }
     if (mixer_get_ctl_minmax(ctl, volMin, volMax) < 0) {
-        LOG_FUN_ERR("mixer_get_dB_range() get control min max value fail");
+        AUDIO_FUNC_LOGE("mixer_get_dB_range() get control min max value fail");
         return 0;
     }
     return 1;
@@ -838,15 +838,15 @@ void RoutePcmCardOpen(int32_t card, uint32_t route)
     int32_t isPlayback;
 
     if (route >= MAX_ROUTE) {
-        LOG_FUN_ERR("route_pcm_card_open() route %d error!", route);
+        AUDIO_FUNC_LOGE("route_pcm_card_open() route %d error!", route);
         return;
     }
     if (card < 0) {
-        LOG_FUN_ERR("route_pcm_card_open() card %d error!", card);
+        AUDIO_FUNC_LOGE("route_pcm_card_open() card %d error!", card);
         return;
     }
 
-    LOG_PARA_INFO("route_pcm_card_open(card %d, route %d)", card, route);
+    AUDIO_FUNC_LOGI("route_pcm_card_open(card %d, route %d)", card, route);
     isPlayback = IsPlaybackRoute(route);
     if (!g_tinyalsaRouteTable) {
         SndCardRouteTableInit(card);
@@ -854,7 +854,7 @@ void RoutePcmCardOpen(int32_t card, uint32_t route)
 
     const struct PathRoute *routeInfo = get_route_config(route);
     if (!routeInfo) {
-        LOG_FUN_ERR("route_pcm_open() Can not get config of route");
+        AUDIO_FUNC_LOGE("route_pcm_open() Can not get config of route");
         return;
     }
 

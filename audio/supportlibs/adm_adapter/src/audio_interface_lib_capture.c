@@ -39,7 +39,7 @@ static struct AudioPcmHwParams g_hwParams;
 int32_t SetHwParamsCapture(const struct AudioHwCaptureParam * const handleData)
 {
     if (handleData == NULL) {
-        LOG_FUN_ERR("handleData is NULL!");
+        AUDIO_FUNC_LOGE("handleData is NULL!");
         return HDF_FAILURE;
     }
     (void)memset_s(&g_hwParams, sizeof(struct AudioPcmHwParams), 0, sizeof(struct AudioPcmHwParams));
@@ -58,9 +58,10 @@ int32_t SetHwParamsCapture(const struct AudioHwCaptureParam * const handleData)
     g_hwParams.stopThreshold = handleData->frameCaptureMode.attrs.stopThreshold;
     g_hwParams.silenceThreshold = handleData->frameCaptureMode.attrs.silenceThreshold;
 #ifdef ALSA_MODE
-    LOG_FUN_ERR("ALSA_MODE streamType %d, channels %d, rate %d, periodSize %d, periodCount %d, \
-        cardServiceName %s, format %d, period %d, frameSize %d, isBigEndian %d, isSignedData %d, \
-        startThreshold %d, stopThreshold %d, silenceThreshold %d",
+    AUDIO_FUNC_LOGI("ALSA_MODE streamType:%{public}d, channels:%{public}d, rate:%{public}d, periodSize:%{public}d, "
+        "periodCount:%{public}d, cardServiceName:%{public}s, format:%{public}d, period:%{public}d, "
+        "frameSize:%{public}d, isBigEndian:%{public}d, isSignedData:%{public}d, startThreshold:%{public}d, "
+        "stopThreshold:%{public}d, silenceThreshold:%{public}d",
         g_hwParams.streamType, g_hwParams.channels, g_hwParams.rate, g_hwParams.periodSize,
         g_hwParams.periodCount, g_hwParams.cardServiceName, g_hwParams.format, g_hwParams.period,
         g_hwParams.frameSize, g_hwParams.isBigEndian, g_hwParams.isSignedData, g_hwParams.startThreshold,
@@ -128,7 +129,7 @@ int32_t AudioCtlCaptureSetPauseBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
     return HDF_SUCCESS;
 #endif
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("handleData or sBuf is NULL!");
+        AUDIO_FUNC_LOGE("handleData or sBuf is NULL!");
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemCaptureValue;
@@ -137,19 +138,19 @@ int32_t AudioCtlCaptureSetPauseBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
     elemCaptureValue.id.itemName = "Main Playback Pause";
     elemCaptureValue.value[0] = (int32_t)handleData->captureMode.ctlParam.pause;
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.value[0])) {
-        LOG_FUN_ERR("CaptureSetPauseBuf pause Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetPauseBuf pause Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.id.iface)) {
-        LOG_FUN_ERR("CaptureSetPauseBuf iface Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetPauseBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.cardServiceName)) {
-        LOG_FUN_ERR("CaptureSetPauseBuf cardServiceName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetPauseBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.itemName)) {
-        LOG_FUN_ERR("CaptureSetPauseBuf itemName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetPauseBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -164,25 +165,25 @@ int32_t AudioCtlCaptureSetPauseStu(const struct DevHandleCapture *handle,
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("CaptureSetPauseStu paras is NULL!");
+        AUDIO_FUNC_LOGE("CaptureSetPauseStu paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("CaptureSetPauseStu Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("CaptureSetPauseStu Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     ret = AudioCtlCaptureSetPauseBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to Set Pause sBuf!");
+        AUDIO_FUNC_LOGE("Failed to Set Pause sBuf!");
         AudioBufReplyRecycle(sBuf, NULL);
         return ret;
     }
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("SetPauseStu Service is NULL!");
+        AUDIO_FUNC_LOGE("SetPauseStu Service is NULL!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
@@ -190,7 +191,7 @@ int32_t AudioCtlCaptureSetPauseStu(const struct DevHandleCapture *handle,
         AUDIO_DRV_PCM_IOCTRL_PAUSE_CAPTURE : AUDIO_DRV_PCM_IOCTRL_RESUME_CAPTURE;
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("SetPauseStu Failed to send service call!");
+        AUDIO_FUNC_LOGE("SetPauseStu Failed to send service call!");
     }
     AudioBufReplyRecycle(sBuf, NULL);
     return ret;
@@ -202,7 +203,7 @@ int32_t AudioCtlCaptureGetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwC
     return HDF_SUCCESS;
 #endif
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("CaptureGetVolumeSBuf  parameter is empty!");
+        AUDIO_FUNC_LOGE("CaptureGetVolumeSBuf  parameter is empty!");
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemCaptureValue;
@@ -210,15 +211,15 @@ int32_t AudioCtlCaptureGetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwC
     elemCaptureValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_ADC;
     elemCaptureValue.id.itemName = "Main Capture Volume";
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.id.iface)) {
-        LOG_FUN_ERR("CaptureGetVolumeSBuf iface Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetVolumeSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.cardServiceName)) {
-        LOG_FUN_ERR("CaptureGetVolumeSBuf cardServiceName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetVolumeSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.itemName)) {
-        LOG_FUN_ERR("CaptureGetVolumeSBuf itemName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetVolumeSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -238,25 +239,25 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
 #endif
     int32_t ret;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("CaptureGetVolume paras is NULL!");
+        AUDIO_FUNC_LOGE("CaptureGetVolume paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("CaptureGetVolume Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("CaptureGetVolume Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     reply = AudioObtainHdfSBuf();
     if (reply == NULL) {
-        LOG_FUN_ERR("Failed to obtain reply");
+        AUDIO_FUNC_LOGE("Failed to obtain reply");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     ret = AudioCtlCaptureGetVolumeSBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to Get Volume sBuf!");
+        AUDIO_FUNC_LOGE("Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
         return ret;
     }
@@ -264,13 +265,13 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
     cmdId = AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE - CTRL_NUM;
     ret = AudioServiceDispatch(service, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("GetVolume Dispatch Fail!");
+        AUDIO_FUNC_LOGE("GetVolume Dispatch Fail!");
         AudioBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
     int32_t elemValue = 0;
     if (!HdfSbufReadInt32(reply, &elemValue)) {
-        LOG_FUN_ERR("Failed to Get Volume sBuf!");
+        AUDIO_FUNC_LOGE("Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
@@ -285,7 +286,7 @@ int32_t AudioCtlCaptureSetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwC
     return HDF_SUCCESS;
 #endif
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("CaptureSetVolumeSBuf parameter is empty!");
+        AUDIO_FUNC_LOGE("CaptureSetVolumeSBuf parameter is empty!");
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemCaptureValue;
@@ -294,19 +295,19 @@ int32_t AudioCtlCaptureSetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwC
     elemCaptureValue.id.itemName = "Main Capture Volume";
     elemCaptureValue.value[0] = (int32_t)handleData->captureMode.ctlParam.volume;
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.value[0])) {
-        LOG_FUN_ERR("CaptureSetVolumeSBuf value[0] Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetVolumeSBuf value[0] Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.id.iface)) {
-        LOG_FUN_ERR("CaptureSetVolumeSBuf iface Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetVolumeSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.cardServiceName)) {
-        LOG_FUN_ERR("CaptureSetVolumeSBuf cardServiceName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetVolumeSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.itemName)) {
-        LOG_FUN_ERR("CaptureSetVolumeSBuf itemName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetVolumeSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -321,34 +322,34 @@ int32_t AudioCtlCaptureSetVolume(const struct DevHandleCapture *handle,
     return HDF_SUCCESS;
 #endif
     int32_t ret;
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("CaptureSetVolume paras is NULL!");
+        AUDIO_FUNC_LOGE("CaptureSetVolume paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("CaptureSetVolume Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("CaptureSetVolume Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     ret = AudioCtlCaptureSetVolumeSBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("CaptureSetVolume Failed to Set Volume sBuf!");
+        AUDIO_FUNC_LOGE("CaptureSetVolume Failed to Set Volume sBuf!");
         AudioBufReplyRecycle(sBuf, NULL);
         return ret;
     }
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("CaptureSetVolume Service is NULL!");
+        AUDIO_FUNC_LOGE("CaptureSetVolume Service is NULL!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     cmdId = AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE - CTRL_NUM;
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("CaptureSetVolume Failed to send service call!");
+        AUDIO_FUNC_LOGE("CaptureSetVolume Failed to send service call!");
     }
     AudioBufReplyRecycle(sBuf, NULL);
     return ret;
@@ -360,7 +361,7 @@ int32_t AudioCtlCaptureSetMuteSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
     return HDF_SUCCESS;
 #endif
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("handleData or sBuf is NULL!");
+        AUDIO_FUNC_LOGE("handleData or sBuf is NULL!");
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemCaptureValue;
@@ -369,19 +370,19 @@ int32_t AudioCtlCaptureSetMuteSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
     elemCaptureValue.id.itemName = "Capture Mute";
     elemCaptureValue.value[0] = (int32_t)handleData->captureMode.ctlParam.mute;
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.value[0])) {
-        LOG_FUN_ERR("CaptureSetMuteSBuf mute Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetMuteSBuf mute Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.id.iface)) {
-        LOG_FUN_ERR("CaptureSetMuteSBuf iface Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetMuteSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.cardServiceName)) {
-        LOG_FUN_ERR("CaptureSetMuteSBuf cardServiceName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetMuteSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.itemName)) {
-        LOG_FUN_ERR("CaptureSetMuteSBuf itemName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetMuteSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -396,32 +397,32 @@ int32_t AudioCtlCaptureSetMuteStu(const struct DevHandleCapture *handle,
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("CaptureSetMuteStu paras is NULL!");
+        AUDIO_FUNC_LOGE("CaptureSetMuteStu paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("CaptureSetMuteStu Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("CaptureSetMuteStu Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     ret = AudioCtlCaptureSetMuteSBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("CaptureSetMuteStu Failed to Get Mute sBuf!");
+        AUDIO_FUNC_LOGE("CaptureSetMuteStu Failed to Get Mute sBuf!");
         AudioBufReplyRecycle(sBuf, NULL);
         return ret;
     }
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("CaptureSetMuteStu Service is NULL!");
+        AUDIO_FUNC_LOGE("CaptureSetMuteStu Service is NULL!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     cmdId = AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE - CTRL_NUM;
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("CaptureSetMuteStu Failed to send service call!");
+        AUDIO_FUNC_LOGE("CaptureSetMuteStu Failed to send service call!");
     }
     AudioBufReplyRecycle(sBuf, NULL);
     return ret;
@@ -433,7 +434,7 @@ int32_t AudioCtlCaptureGetMuteSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
     return HDF_SUCCESS;
 #endif
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("The parameter is empty!");
+        AUDIO_FUNC_LOGE("The parameter is empty!");
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemCaptureValue;
@@ -441,15 +442,15 @@ int32_t AudioCtlCaptureGetMuteSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
     elemCaptureValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_ADC;
     elemCaptureValue.id.itemName = "Capture Mute";
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.id.iface)) {
-        LOG_FUN_ERR("CaptureGetMuteSBuf iface Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetMuteSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.cardServiceName)) {
-        LOG_FUN_ERR("CaptureGetMuteSBuf cardServiceName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetMuteSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.itemName)) {
-        LOG_FUN_ERR("CaptureGetMuteSBuf itemName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetMuteSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -464,25 +465,25 @@ int32_t AudioCtlCaptureGetMuteStu(const struct DevHandleCapture *handle,
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("CaptureGetMuteStu paras is NULL!");
+        AUDIO_FUNC_LOGE("CaptureGetMuteStu paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("CaptureGetMuteStu Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("CaptureGetMuteStu Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     reply = AudioObtainHdfSBuf();
     if (reply == NULL) {
-        LOG_FUN_ERR("Failed to obtain reply");
+        AUDIO_FUNC_LOGE("Failed to obtain reply");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     ret = AudioCtlCaptureGetMuteSBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to Get Mute sBuf!");
+        AUDIO_FUNC_LOGE("Failed to Get Mute sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
         return ret;
     }
@@ -490,13 +491,13 @@ int32_t AudioCtlCaptureGetMuteStu(const struct DevHandleCapture *handle,
     cmdId = AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE - CTRL_NUM;
     ret = AudioServiceDispatch(service, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("CaptureGetMuteStu Dispatch Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetMuteStu Dispatch Fail!");
         AudioBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
     int32_t muteValueStu = 0;
     if (!HdfSbufReadInt32(reply, &muteValueStu)) {
-        LOG_FUN_ERR("CaptureGetMuteStu Failed to Get Volume sBuf!");
+        AUDIO_FUNC_LOGE("CaptureGetMuteStu Failed to Get Volume sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
@@ -511,7 +512,7 @@ int32_t AudioCtlCaptureSetGainSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
     return HDF_SUCCESS;
 #endif
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("CaptureSetGainSBuf( handleData or sBuf is NULL!");
+        AUDIO_FUNC_LOGE("CaptureSetGainSBuf( handleData or sBuf is NULL!");
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemCaptureValue;
@@ -520,19 +521,19 @@ int32_t AudioCtlCaptureSetGainSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
     elemCaptureValue.id.itemName = "Mic Left Gain";
     elemCaptureValue.value[0] = handleData->captureMode.ctlParam.audioGain.gain;
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.value[0])) {
-        LOG_FUN_ERR("CaptureSetGainSBuf mute Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetGainSBuf mute Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.id.iface)) {
-        LOG_FUN_ERR("CaptureSetGainSBuf iface Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetGainSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.cardServiceName)) {
-        LOG_FUN_ERR("CaptureSetGainSBuf cardServiceName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetGainSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.itemName)) {
-        LOG_FUN_ERR("CaptureSetGainSBuf itemName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetGainSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -547,32 +548,32 @@ int32_t AudioCtlCaptureSetGainStu(const struct DevHandleCapture *handle,
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("CaptureSetGainStu paras is NULL!");
+        AUDIO_FUNC_LOGE("CaptureSetGainStu paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("CaptureSetGainStu Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("CaptureSetGainStu Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     ret = AudioCtlCaptureSetGainSBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("CaptureSetGainStu Failed to Get Gain sBuf!");
+        AUDIO_FUNC_LOGE("CaptureSetGainStu Failed to Get Gain sBuf!");
         AudioBufReplyRecycle(sBuf, NULL);
         return ret;
     }
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("CaptureSetGainStu Service is NULL!");
+        AUDIO_FUNC_LOGE("CaptureSetGainStu Service is NULL!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     cmdId = AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE - CTRL_NUM;
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("CaptureSetGainStu Failed to send service call!");
+        AUDIO_FUNC_LOGE("CaptureSetGainStu Failed to send service call!");
     }
     AudioBufReplyRecycle(sBuf, NULL);
     return ret;
@@ -584,7 +585,7 @@ int32_t AudioCtlCaptureGetGainSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
     return HDF_SUCCESS;
 #endif
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("CaptureGetGainSBuf paras is NULL!");
+        AUDIO_FUNC_LOGE("CaptureGetGainSBuf paras is NULL!");
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemCaptureValue;
@@ -592,15 +593,15 @@ int32_t AudioCtlCaptureGetGainSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
     elemCaptureValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN;
     elemCaptureValue.id.itemName = "Mic Left Gain";
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.id.iface)) {
-        LOG_FUN_ERR("CaptureGetGainSBuf iface Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetGainSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.cardServiceName)) {
-        LOG_FUN_ERR("CaptureGetGainSBuf cardServiceName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetGainSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.itemName)) {
-        LOG_FUN_ERR("CaptureGetGainSBuf itemName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetGainSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -615,25 +616,25 @@ int32_t AudioCtlCaptureGetGainStu(const struct DevHandleCapture *handle,
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("CaptureGetGainStu paras is NULL!");
+        AUDIO_FUNC_LOGE("CaptureGetGainStu paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("CaptureGetGainStu Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("CaptureGetGainStu Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     reply = AudioObtainHdfSBuf();
     if (reply == NULL) {
-        LOG_FUN_ERR("Failed to obtain reply");
+        AUDIO_FUNC_LOGE("Failed to obtain reply");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     ret = AudioCtlCaptureGetGainSBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to Get Gain sBuf!");
+        AUDIO_FUNC_LOGE("Failed to Get Gain sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
         return ret;
     }
@@ -641,13 +642,13 @@ int32_t AudioCtlCaptureGetGainStu(const struct DevHandleCapture *handle,
     cmdId = AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE - CTRL_NUM;
     ret = AudioServiceDispatch(service, cmdId, sBuf, reply);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("GetGainStu Dispatch Fail!");
+        AUDIO_FUNC_LOGE("GetGainStu Dispatch Fail!");
         AudioBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
     int32_t muteValueStu = 0;
     if (!HdfSbufReadInt32(reply, &muteValueStu)) {
-        LOG_FUN_ERR("Failed to GetGain sBuf!");
+        AUDIO_FUNC_LOGE("Failed to GetGain sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
@@ -663,11 +664,11 @@ int32_t AudioCtlCaptureSceneSelectSBuf(struct HdfSBuf *sBuf,
     return HDF_SUCCESS;
 #endif
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("CaptureSceneSelectSBuf handleData or sBufs is NULL!");
+        AUDIO_FUNC_LOGE("CaptureSceneSelectSBuf handleData or sBufs is NULL!");
         return HDF_FAILURE;
     }
     if (deviceIndex < 0 || deviceIndex > PATHPLAN_COUNT - 1) {
-        LOG_FUN_ERR("deviceIndex is Invalid!");
+        AUDIO_FUNC_LOGE("deviceIndex is Invalid!");
         return HDF_FAILURE;
     }
     struct AudioCtlElemValue elemCaptureValue;
@@ -677,19 +678,19 @@ int32_t AudioCtlCaptureSceneSelectSBuf(struct HdfSBuf *sBuf,
         handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].deviceSwitch;
     elemCaptureValue.value[0] = handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[deviceIndex].value;
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.value[0])) {
-        LOG_FUN_ERR("CaptureSceneSelectSBuf Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSceneSelectSBuf Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(sBuf, elemCaptureValue.id.iface)) {
-        LOG_FUN_ERR("CaptureSceneSelectSBuf iface Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSceneSelectSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.cardServiceName)) {
-        LOG_FUN_ERR("CaptureSceneSelectSBuf cardServiceName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSceneSelectSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureValue.id.itemName)) {
-        LOG_FUN_ERR("CaptureSceneSelectSBuf itemName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSceneSelectSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -704,20 +705,20 @@ int32_t AudioCtlCaptureSceneSelect(const struct DevHandleCapture *handle,
     int32_t index;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("CaptureSceneSelect parameter is empty!");
+        AUDIO_FUNC_LOGE("CaptureSceneSelect parameter is empty!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     service = (struct HdfIoService *)handle->object;
     int32_t deviceNum = handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum;
     if (deviceNum < AUDIO_MIN_DEVICENUM) {
-        LOG_FUN_ERR("AUDIO_MIN_ADAPTERNUM Failed!");
+        AUDIO_FUNC_LOGE("AUDIO_MIN_ADAPTERNUM Failed!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
@@ -725,17 +726,17 @@ int32_t AudioCtlCaptureSceneSelect(const struct DevHandleCapture *handle,
     for (index = 0; index < deviceNum; index++) {
         HdfSbufFlush(sBuf);
         if (AudioCtlCaptureSceneSelectSBuf(sBuf, handleData, index) < 0) {
-            LOG_FUN_ERR("AudioCtlCaptureSceneSelectSBuf Failed!");
+            AUDIO_FUNC_LOGE("AudioCtlCaptureSceneSelectSBuf Failed!");
             AudioBufReplyRecycle(sBuf, NULL);
             return HDF_FAILURE;
         }
         if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-            LOG_FUN_ERR("CaptureSceneSelect Service is NULL!");
+            AUDIO_FUNC_LOGE("CaptureSceneSelect Service is NULL!");
             AudioBufReplyRecycle(sBuf, NULL);
             return HDF_FAILURE;
         }
         if (service->dispatcher->Dispatch(&service->object, cmdId, sBuf, reply) < 0) {
-            LOG_FUN_ERR("CaptureSceneSelect Failed to send service call!");
+            AUDIO_FUNC_LOGE("CaptureSceneSelect Failed to send service call!");
             AudioBufReplyRecycle(sBuf, NULL);
             return HDF_FAILURE;
         }
@@ -750,7 +751,7 @@ int32_t AudioCtlCaptureGetGainThresholdSBuf(struct HdfSBuf *sBuf, const struct A
     return HDF_SUCCESS;
 #endif
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("CaptureGetGainThresholdSBuf paras is empty!");
+        AUDIO_FUNC_LOGE("CaptureGetGainThresholdSBuf paras is empty!");
         return HDF_FAILURE;
     }
     struct AudioCtrlElemInfo elemCaptureInfo;
@@ -758,15 +759,15 @@ int32_t AudioCtlCaptureGetGainThresholdSBuf(struct HdfSBuf *sBuf, const struct A
     elemCaptureInfo.id.iface = AUDIODRV_CTL_CAPTUREELEM_IFACE_MIXER;
     elemCaptureInfo.id.itemName = "Mic Left Gain";
     if (!HdfSbufWriteInt32(sBuf, elemCaptureInfo.id.iface)) {
-        LOG_FUN_ERR("CaptureGetGainThresholdSBuf iface Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetGainThresholdSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureInfo.id.cardServiceName)) {
-        LOG_FUN_ERR("CaptureGetGainThresholdSBuf cardServiceName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetGainThresholdSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureInfo.id.itemName)) {
-        LOG_FUN_ERR("CaptureGetGainThresholdSBuf itemName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetGainThresholdSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -781,25 +782,25 @@ int32_t AudioCtlCaptureGetGainThreshold(const struct DevHandleCapture *handle,
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("CaptureGetGainThreshold paras is NULL!");
+        AUDIO_FUNC_LOGE("CaptureGetGainThreshold paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("CaptureGetGainThreshold Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("CaptureGetGainThreshold Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     reply = AudioObtainHdfSBuf();
     if (reply == NULL) {
-        LOG_FUN_ERR("CaptureGetGainThreshold Failed to obtain reply");
+        AUDIO_FUNC_LOGE("CaptureGetGainThreshold Failed to obtain reply");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     ret = AudioCtlCaptureGetGainThresholdSBuf(sBuf, handleData);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("CaptureGetGainThreshold Failed to Get Threshold sBuf!");
+        AUDIO_FUNC_LOGE("CaptureGetGainThreshold Failed to Get Threshold sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
         return ret;
     }
@@ -813,12 +814,12 @@ int32_t AudioCtlCaptureGetGainThreshold(const struct DevHandleCapture *handle,
     struct AudioCtrlElemInfo gainThreshold;
     (void)memset_s(&gainThreshold, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
     if (!HdfSbufReadInt32(reply, &gainThreshold.type)) {
-        LOG_FUN_ERR("CaptureGetGainThreshold Failed to HdfSbufReadBuffer!");
+        AUDIO_FUNC_LOGE("CaptureGetGainThreshold Failed to HdfSbufReadBuffer!");
         AudioBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
     if (!HdfSbufReadInt32(reply, &gainThreshold.max)) {
-        LOG_FUN_ERR("CaptureGetGainThreshold Failed to HdfSbufReadBuffer!");
+        AUDIO_FUNC_LOGE("CaptureGetGainThreshold Failed to HdfSbufReadBuffer!");
         AudioBufReplyRecycle(sBuf, reply);
         return HDF_FAILURE;
     }
@@ -834,7 +835,7 @@ int32_t AudioCtlCaptureGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct Au
     return HDF_SUCCESS;
 #endif
     if (handleData == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("CaptureGetVolThresholdSBuf paras is empty!");
+        AUDIO_FUNC_LOGE("CaptureGetVolThresholdSBuf paras is empty!");
         return HDF_FAILURE;
     }
     struct AudioCtrlElemInfo elemCaptureInfo;
@@ -842,15 +843,15 @@ int32_t AudioCtlCaptureGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct Au
     elemCaptureInfo.id.iface = AUDIODRV_CTL_ELEM_IFACE_ADC;
     elemCaptureInfo.id.itemName = "Main Capture Volume";
     if (!HdfSbufWriteInt32(sBuf, elemCaptureInfo.id.iface)) {
-        LOG_FUN_ERR("elemCaptureInfo.id.iface iface Write Fail!");
+        AUDIO_FUNC_LOGE("elemCaptureInfo.id.iface iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureInfo.id.cardServiceName)) {
-        LOG_FUN_ERR("CaptureGetVolThresholdSBuf cardServiceName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetVolThresholdSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemCaptureInfo.id.itemName)) {
-        LOG_FUN_ERR("CaptureGetVolThresholdSBuf itemName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetVolThresholdSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -860,7 +861,7 @@ int32_t AudioCtlCaptureGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct Au
 int32_t TinyAlsaAudioCtlCaptureGetVolThreshold(struct AudioHwCaptureParam *handleData)
 {
     if (handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        AUDIO_FUNC_LOGE("paras is NULL!");
         return HDF_FAILURE;
     }
     int64_t volMin = 0;
@@ -884,23 +885,23 @@ int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
     return TinyAlsaAudioCtlCaptureGetVolThreshold(handleData);
 #endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        AUDIO_FUNC_LOGE("paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("Failed to Get sBuf");
+        AUDIO_FUNC_LOGE("Failed to Get sBuf");
         return HDF_FAILURE;
     }
     struct HdfSBuf *reply = AudioObtainHdfSBuf();
     if (reply == NULL) {
-        LOG_FUN_ERR("Failed to obtain reply");
+        AUDIO_FUNC_LOGE("Failed to obtain reply");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     int32_t ret = AudioCtlCaptureGetVolThresholdSBuf(sBuf, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to Get Threshold sBuf!");
+        AUDIO_FUNC_LOGE("Failed to Get Threshold sBuf!");
         AudioBufReplyRecycle(sBuf, reply);
         return ret;
     }
@@ -931,7 +932,7 @@ int32_t AudioCtlCaptureSetAcodecSBuf(struct HdfSBuf *sBuf, const char *codec,
 #endif
     struct AudioCtlElemValue elemValue;
     if (sBuf == NULL) {
-        LOG_FUN_ERR("handleData or sBuf is NULL!");
+        AUDIO_FUNC_LOGE("handleData or sBuf is NULL!");
         return HDF_FAILURE;
     }
     if (serviceNameMode == AUDIO_SERVICE_OUT) {
@@ -939,26 +940,26 @@ int32_t AudioCtlCaptureSetAcodecSBuf(struct HdfSBuf *sBuf, const char *codec,
     } else if (serviceNameMode == AUDIO_SERVICE_IN) {
         elemValue.id.cardServiceName = AUDIODRV_CTL_INTER_CARD_STR;
     } else {
-        LOG_FUN_ERR("serviceNameMode is fail!");
+        AUDIO_FUNC_LOGE("serviceNameMode is fail!");
         return HDF_FAILURE;
     }
     elemValue.id.iface = AUDIODRV_CTL_ELEM_IFACE_ACODEC;
     elemValue.id.itemName = codec;
     elemValue.value[0] = enable;
     if (!HdfSbufWriteInt32(sBuf, elemValue.value[0])) {
-        LOG_FUN_ERR("CaptureSetAcodecSBuf value Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetAcodecSBuf value Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(sBuf, elemValue.id.iface)) {
-        LOG_FUN_ERR("CaptureSetAcodecSBuf iface Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetAcodecSBuf iface Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemValue.id.cardServiceName)) {
-        LOG_FUN_ERR("CaptureSetAcodecSBuf cardServiceName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetAcodecSBuf cardServiceName Write Fail!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, elemValue.id.itemName)) {
-        LOG_FUN_ERR("CaptureSetAcodecSBuf itemName Write Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetAcodecSBuf itemName Write Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -972,7 +973,7 @@ int32_t AudioCtlCaptureChangeInAcodec(struct HdfIoService *service,
 #endif
     enum AudioServiceNameType serviceNameMode;
     if (service == NULL || sBuf == NULL) {
-        LOG_FUN_ERR("service or sBuf is NULL!");
+        AUDIO_FUNC_LOGE("service or sBuf is NULL!");
         return HDF_FAILURE;
     }
     if (cmdId == AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT_CAPTURE) {
@@ -994,18 +995,18 @@ int32_t AudioCtlCaptureSetAcodecMode(const struct DevHandleCapture *handle,
     return HDF_SUCCESS;
 #endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        AUDIO_FUNC_LOGE("paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfIoService *service = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     service = (struct HdfIoService *)handle->object;
     if (cmdId == AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN_CAPTURE) {
-        LOG_PARA_INFO("****Acodec is In****");
+        AUDIO_FUNC_LOGI("****Acodec is In****");
         /* enable Internally Codec */
         HdfSbufFlush(sBuf);
         if (AudioCtlCaptureChangeInAcodec(service, AUDIODRV_CTL_INTERNAL_CODEC_STR,
@@ -1014,7 +1015,7 @@ int32_t AudioCtlCaptureSetAcodecMode(const struct DevHandleCapture *handle,
             return HDF_FAILURE;
         }
     } else if (cmdId == AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT_CAPTURE) {
-        LOG_PARA_INFO("****Acodec is Out****");
+        AUDIO_FUNC_LOGI("****Acodec is Out****");
         /* enable External Codec */
         HdfSbufFlush(sBuf);
         if (AudioCtlCaptureChangeInAcodec(service, AUDIODRV_CTL_EXTERN_CODEC_STR,
@@ -1036,7 +1037,7 @@ int32_t AudioInterfaceLibCtlCapture(const struct DevHandleCapture *handle,
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        AUDIO_FUNC_LOGE("paras is NULL!");
         return HDF_FAILURE;
     }
     switch (cmdId) {
@@ -1074,7 +1075,7 @@ int32_t AudioInterfaceLibCtlCapture(const struct DevHandleCapture *handle,
             ret = AudioCtlCaptureGetVolThreshold(handle, cmdId, handleData);
             break;
         default:
-            LOG_FUN_ERR("Ctl Mode not support!");
+            AUDIO_FUNC_LOGE("Ctl Mode not support!");
             ret = HDF_FAILURE;
             break;
     }
@@ -1085,7 +1086,7 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("Function parameter is NULL!");
+        AUDIO_FUNC_LOGE("Function parameter is NULL!");
         return HDF_FAILURE;
     }
 #ifndef ALSA_MODE
@@ -1096,7 +1097,7 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
 #endif
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     if (SetHwParamsCapture(handleData) < 0) {
@@ -1110,13 +1111,13 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
 #ifndef ALSA_MODE
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("Function parameter is empty!");
+        AUDIO_FUNC_LOGE("Function parameter is empty!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Failed to send service call!");
+        AUDIO_FUNC_LOGE("Failed to send service call!");
     }
 #endif
     AudioBufReplyRecycle(sBuf, NULL);
@@ -1130,12 +1131,12 @@ int32_t AudioOutputCaptureOpen(const struct DevHandleCapture *handle,
     return HDF_SUCCESS;
 #endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("Function parameter is NULL!");
+        AUDIO_FUNC_LOGE("Function parameter is NULL!");
         return HDF_FAILURE;
     }
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
-        LOG_FUN_ERR("Failed to obtain sBuf");
+        AUDIO_FUNC_LOGE("Failed to obtain sBuf");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(sBuf, handleData->captureMode.hwInfo.cardServiceName)) {
@@ -1144,13 +1145,13 @@ int32_t AudioOutputCaptureOpen(const struct DevHandleCapture *handle,
     }
     struct HdfIoService *service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("Function parameter is empty!");
+        AUDIO_FUNC_LOGE("Function parameter is empty!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
     int32_t ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Failed to send service call!");
+        AUDIO_FUNC_LOGE("Failed to send service call!");
     }
     AudioBufReplyRecycle(sBuf, NULL);
     return ret;
@@ -1165,27 +1166,27 @@ int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, str
     uint32_t buffStatus = 0;
     int32_t tryNumReply = 100; // try get reply count
     if (service == NULL || reply == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        AUDIO_FUNC_LOGE("paras is NULL!");
         return HDF_FAILURE;
     }
     if (service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("service->dispatcher is null!");
+        AUDIO_FUNC_LOGE("service->dispatcher is null!");
         return HDF_FAILURE;
     }
     do {
         ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, reply);
         if (ret != HDF_SUCCESS) {
-            LOG_FUN_ERR("Failed to send service call!");
+            AUDIO_FUNC_LOGE("Failed to send service call!");
             HdfSbufRecycle(reply);
             return ret;
         }
         if (!HdfSbufReadUint32(reply, &buffStatus)) {
-            LOG_FUN_ERR("Failed to Get buffStatus!");
+            AUDIO_FUNC_LOGE("Failed to Get buffStatus!");
             HdfSbufRecycle(reply);
             return HDF_FAILURE;
         }
         if (buffStatus == CIR_BUFF_EMPTY) {
-            LOG_PARA_INFO("Cir buff empty wait 50ms");
+            AUDIO_FUNC_LOGI("Cir buff empty wait 50ms");
             tryNumReply--;
             HdfSbufFlush(reply);
             // wait (5 + tryNum)ms when buff empty
@@ -1196,49 +1197,60 @@ int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, str
     } while (tryNumReply > 0);
     if (tryNumReply <= 0) {
         HdfSbufRecycle(reply);
-        LOG_FUN_ERR("Out of tryNumReply!");
+        AUDIO_FUNC_LOGE("Out of tryNumReply!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
 
 #ifdef ALSA_MODE
+static void TinyalsaAudioOutputCaptureReadCreatePcm(void)
+{
+    // if pcm is null, need create it first
+    if (pcm) {
+        return;
+    }
+    int format = PCM_FORMAT_S16_LE;
+    if (g_hwParams.format == AUDIO_FORMAT_PCM_8_BIT) {
+        format = PCM_FORMAT_S8;
+    } else if (g_hwParams.format == AUDIO_FORMAT_PCM_16_BIT) {
+        format = PCM_FORMAT_S16_LE;
+    } else if (g_hwParams.format == AUDIO_FORMAT_PCM_24_BIT) {
+        format = PCM_FORMAT_S24_LE;
+    } else if (g_hwParams.format == AUDIO_FORMAT_PCM_32_BIT) {
+        format = PCM_FORMAT_S32_LE;
+    } else {
+        format = PCM_FORMAT_S16_LE;
+    }
+    ReadInSoundCard();
+    (void)memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
+    GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
+    struct PcmCaptureParam param;
+    (void)memset_s(&param, sizeof(param), 0, sizeof(param));
+    param.card = g_inDevInfo.card;
+    param.device = g_inDevInfo.device;
+    param.channels = g_hwParams.channels;
+    param.rate = g_hwParams.rate;
+    param.format = format;
+    param.periodSize = g_hwParams.periodSize / 4; // limited to 16K,periodSize/4.
+    param.periodCount = g_hwParams.periodCount / 2; // limited to 16K, periodCount/2.
+    CaptureSample(&pcm, &param);
+    RoutePcmCardOpen(g_inDevInfo.card, DEV_IN_HANDS_FREE_MIC_CAPTURE_ROUTE);
+    return;
+}
+
 int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
     char *buffer = NULL;
     uint32_t dataSize;
     if (!pcm) { // if pcm is num, need create it first
-        int format = PCM_FORMAT_S16_LE;
-        if (g_hwParams.format == AUDIO_FORMAT_PCM_8_BIT) {
-            format = PCM_FORMAT_S8;
-        } else if (g_hwParams.format == AUDIO_FORMAT_PCM_16_BIT) {
-            format = PCM_FORMAT_S16_LE;
-        } else if (g_hwParams.format == AUDIO_FORMAT_PCM_24_BIT) {
-            format = PCM_FORMAT_S24_LE;
-        } else if (g_hwParams.format == AUDIO_FORMAT_PCM_32_BIT) {
-            format = PCM_FORMAT_S32_LE;
-        } else {
-            format = PCM_FORMAT_S16_LE;
-        }
-        ReadInSoundCard();
-        (void)memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
-        GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
-        struct PcmCaptureParam param;
-        (void)memset_s(&param, sizeof(param), 0, sizeof(param));
-        param.card = g_inDevInfo.card;
-        param.device = g_inDevInfo.device;
-        param.channels = g_hwParams.channels;
-        param.rate = g_hwParams.rate;
-        param.format = format;
-        param.periodSize = g_hwParams.periodSize / 4; // limited to 16K,periodSize/4.
-        param.periodCount = g_hwParams.periodCount / 2; // limited to 16K, periodCount/2.
-        CaptureSample(&pcm, &param);
-        RoutePcmCardOpen(g_inDevInfo.card, DEV_IN_HANDS_FREE_MIC_CAPTURE_ROUTE);
+        TinyalsaAudioOutputCaptureReadCreatePcm();
     }
     if (pcm) {
         dataSize = pcm_frames_to_bytes(pcm, pcm_get_buffer_size(pcm));
         if (dataSize < 1) {
+            AUDIO_FUNC_LOGE("pcm_frames_to_bytes failed!");
             return HDF_FAILURE;
         }
         buffer = (char *)calloc(1, dataSize);
@@ -1301,22 +1313,23 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
     char *frame = NULL;
     struct HdfIoService *service = NULL;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        AUDIO_FUNC_LOGE("paras is NULL!");
         return HDF_FAILURE;
     }
     struct HdfSBuf *reply = HdfSbufTypedObtainCapacity(SBUF_RAW, replySize);
     if (reply == NULL) {
+        AUDIO_FUNC_LOGE("HdfSbufTypedObtainCapacity replySize failed!");
         return HDF_FAILURE;
     }
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("Service is NULL!");
+        AUDIO_FUNC_LOGE("Service is NULL!");
         AudioBufReplyRecycle(NULL, reply);
         return HDF_FAILURE;
     }
     int32_t ret = AudioOutputCaptureReadFrame(service, cmdId, reply);
     if (ret != 0) {
-        LOG_FUN_ERR("AudioOutputCaptureReadFrame is invalid!");
+        AUDIO_FUNC_LOGE("AudioOutputCaptureReadFrame is invalid!");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadBuffer(reply, (const void **)&frame, &dataSize)) {
@@ -1324,18 +1337,18 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
         return HDF_FAILURE;
     }
     if (dataSize > FRAME_DATA || handleData->frameCaptureMode.buffer == NULL) {
-        LOG_FUN_ERR("Buffer is NULL or DataSize overflow!");
+        AUDIO_FUNC_LOGE("Buffer is NULL or DataSize overflow!");
         HdfSbufRecycle(reply);
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(reply, &frameCount)) {
-        LOG_FUN_ERR("Failed to Get buffStatus!");
+        AUDIO_FUNC_LOGE("Failed to Get buffStatus!");
         HdfSbufRecycle(reply);
         return HDF_FAILURE;
     }
     ret = AudioInputCaptureReadInfoToHandleData(handleData, frame, frameCount, dataSize);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("AudioInputCaptureReadInfoToHandleData Failed!");
+        AUDIO_FUNC_LOGE("AudioInputCaptureReadInfoToHandleData Failed!");
         HdfSbufRecycle(reply);
         return ret;
     }
@@ -1352,17 +1365,17 @@ int32_t AudioOutputCaptureStartPrepare(const struct DevHandleCapture *handle,
     int32_t ret;
     struct HdfIoService *service = NULL;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("CaptureStartPrepare paras is NULL!");
+        AUDIO_FUNC_LOGE("CaptureStartPrepare paras is NULL!");
         return HDF_FAILURE;
     }
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("CaptureStartPrepare Service is NULL!");
+        AUDIO_FUNC_LOGE("CaptureStartPrepare Service is NULL!");
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, NULL);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("CaptureStartPrepare Failed to send service call!");
+        AUDIO_FUNC_LOGE("CaptureStartPrepare Failed to send service call!");
         return ret;
     }
     return HDF_SUCCESS;
@@ -1382,16 +1395,17 @@ int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
     int32_t ret;
     struct HdfIoService *service = NULL;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("CaptureStop paras is NULL!");
+        AUDIO_FUNC_LOGE("CaptureStop paras is NULL!");
         return HDF_FAILURE;
     }
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("CaptureStop Service is NULL!");
+        AUDIO_FUNC_LOGE("CaptureStop Service is NULL!");
         return HDF_FAILURE;
     }
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
+        AUDIO_FUNC_LOGE("AudioObtainHdfSBuf failed!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(sBuf, AUDIO_TURN_STANDBY_LATER)) {
@@ -1401,7 +1415,7 @@ int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         AudioBufReplyRecycle(sBuf, NULL);
-        LOG_FUN_ERR("CaptureStop Failed to send service call!");
+        AUDIO_FUNC_LOGE("CaptureStop Failed to send service call!");
         return ret;
     }
     AudioBufReplyRecycle(sBuf, NULL);
@@ -1414,10 +1428,12 @@ int32_t MmapDescWriteBufferCapture(struct HdfSBuf *sBuf, const struct AudioHwCap
     return HDF_SUCCESS;
 #endif
     if (sBuf == NULL || handleData == NULL) {
+        AUDIO_FUNC_LOGE("param sBuf or handleData is null!");
         return HDF_FAILURE;
     }
     uint64_t mmapAddr = (uint64_t)(uintptr_t)(handleData->frameCaptureMode.mmapBufDesc.memoryAddress);
     if (!HdfSbufWriteUint64(sBuf, mmapAddr)) {
+        AUDIO_FUNC_LOGE("HdfSbufWriteUint64 memoryAddress failed!");
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteInt32(sBuf, handleData->frameCaptureMode.mmapBufDesc.memoryFd)) {
@@ -1445,27 +1461,30 @@ int32_t AudioOutputCaptureReqMmapBuffer(const struct DevHandleCapture *handle,
     return HDF_SUCCESS;
 #endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
+        AUDIO_FUNC_LOGE("handle or handle->object or handleData is null!");
         return HDF_FAILURE;
     }
     int32_t ret;
     struct HdfIoService *service = NULL;
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
+        AUDIO_FUNC_LOGE("AudioObtainHdfSBuf failed!");
         return HDF_FAILURE;
     }
     if (MmapDescWriteBufferCapture(sBuf, handleData)) {
         AudioBufReplyRecycle(sBuf, NULL);
+        AUDIO_FUNC_LOGE("MmapDescWriteBufferCapture failed!");
         return HDF_FAILURE;
     }
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         AudioBufReplyRecycle(sBuf, NULL);
-        LOG_FUN_ERR("The pointer is empty!");
+        AUDIO_FUNC_LOGE("The pointer is empty!");
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Failed to send service call!");
+        AUDIO_FUNC_LOGE("Failed to send service call!");
         AudioBufReplyRecycle(sBuf, NULL);
         return HDF_FAILURE;
     }
@@ -1480,6 +1499,7 @@ int32_t AudioOutputCaptureGetMmapPosition(const struct DevHandleCapture *handle,
     return HDF_SUCCESS;
 #endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
+        AUDIO_FUNC_LOGE("handle or handle->object or handleData is null!");
         return HDF_FAILURE;
     }
     int32_t ret;
@@ -1487,23 +1507,23 @@ int32_t AudioOutputCaptureGetMmapPosition(const struct DevHandleCapture *handle,
     struct HdfSBuf *reply = NULL;
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        LOG_FUN_ERR("The pointer is empty!");
+        AUDIO_FUNC_LOGE("The pointer is empty!");
         return HDF_FAILURE;
     }
     reply = AudioObtainHdfSBuf();
     if (reply == NULL) {
-        LOG_FUN_ERR("CaptureGetMmapPosition Failed to obtain reply");
+        AUDIO_FUNC_LOGE("CaptureGetMmapPosition Failed to obtain reply");
         return HDF_FAILURE;
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, reply);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Failed to send service call!");
+        AUDIO_FUNC_LOGE("Failed to send service call!");
         AudioBufReplyRecycle(NULL, reply);
         return HDF_FAILURE;
     }
     uint64_t frames = 0;
     if (!HdfSbufReadUint64(reply, &frames)) {
-        LOG_FUN_ERR("Failed to Get frames sBuf!");
+        AUDIO_FUNC_LOGE("Failed to Get frames sBuf!");
         AudioBufReplyRecycle(NULL, reply);
         return HDF_FAILURE;
     }
@@ -1516,10 +1536,11 @@ int32_t AudioInterfaceLibOutputCapture(const struct DevHandleCapture *handle, in
                                        struct AudioHwCaptureParam *handleData)
 {
     if (handle == NULL) {
-        LOG_FUN_ERR("Input Capture handle is NULL!");
+        AUDIO_FUNC_LOGE("Input Capture handle is NULL!");
         return HDF_FAILURE;
     }
     if (handle->object == NULL || handleData == NULL) {
+        AUDIO_FUNC_LOGE("handle->object or handleData is null!");
         return HDF_FAILURE;
     }
     int32_t ret;
@@ -1551,7 +1572,7 @@ int32_t AudioInterfaceLibOutputCapture(const struct DevHandleCapture *handle, in
             ret = AudioOutputCaptureGetMmapPosition(handle, cmdId, handleData);
             break;
         default:
-            LOG_FUN_ERR("Output Mode not support!");
+            AUDIO_FUNC_LOGE("Output Mode not support!");
             ret = HDF_FAILURE;
             break;
     }
@@ -1562,25 +1583,25 @@ struct DevHandleCapture *AudioBindServiceCaptureObject(struct DevHandleCapture *
     const char *name)
 {
     if (handle == NULL || name == NULL) {
-        LOG_FUN_ERR("service name or handle is NULL!");
+        AUDIO_FUNC_LOGE("service name or handle is NULL!");
         return NULL;
     }
     char *serviceName = (char *)calloc(1, NAME_LEN);
     if (serviceName == NULL) {
-        LOG_FUN_ERR("Failed to OsalMemCalloc serviceName");
+        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc serviceName");
         AudioMemFree((void **)&handle);
         return NULL;
     }
     int ret = snprintf_s(serviceName, NAME_LEN - 1, SERVIC_NAME_MAX_LEN + 1, "hdf_audio_%s", name);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to snprintf_s");
+        AUDIO_FUNC_LOGE("Failed to snprintf_s");
         AudioMemFree((void **)&serviceName);
         AudioMemFree((void **)&handle);
         return NULL;
     }
     struct HdfIoService *service = HdfIoServiceBindName(serviceName);
     if (service == NULL) {
-        LOG_FUN_ERR("Failed to get service!");
+        AUDIO_FUNC_LOGE("Failed to get service!");
         AudioMemFree((void **)&serviceName);
         AudioMemFree((void **)&handle);
         return NULL;
@@ -1596,22 +1617,22 @@ struct DevHandleCapture *AudioBindServiceCapture(const char *name)
     struct DevHandleCapture *handle = NULL;
     struct DevHandleCapture *object = NULL;
     if (name == NULL) {
-        LOG_FUN_ERR("service name NULL!");
+        AUDIO_FUNC_LOGE("service name NULL!");
         return NULL;
     }
     handle = (struct DevHandleCapture *)calloc(1, sizeof(struct DevHandleCapture));
     if (handle == NULL) {
-        LOG_FUN_ERR("Failed to OsalMemCalloc handle");
+        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc handle");
         return NULL;
     }
     object = AudioBindServiceCaptureObject(handle, name);
     if (object != NULL) {
         handle->object = object;
     } else {
-        LOG_FUN_ERR("handle->object is NULL!");
+        AUDIO_FUNC_LOGE("handle->object is NULL!");
         return NULL;
     }
-    LOG_PARA_INFO("BIND SERVICE SUCCESS!");
+    AUDIO_FUNC_LOGI("BIND SERVICE SUCCESS!");
     return handle;
 }
 
@@ -1620,9 +1641,9 @@ void AudioCloseServiceCapture(const struct DevHandleCapture *handle)
 #ifdef ALSA_MODE
     return;
 #endif
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (handle == NULL || handle->object == NULL) {
-        LOG_FUN_ERR("Capture handle or handle->object is NULL");
+        AUDIO_FUNC_LOGE("Capture handle or handle->object is NULL");
         return;
     }
     struct HdfIoService *service = (struct HdfIoService *)handle->object;
@@ -1634,9 +1655,9 @@ void AudioCloseServiceCapture(const struct DevHandleCapture *handle)
 int32_t AudioInterfaceLibModeCapture(const struct DevHandleCapture *handle,
     struct AudioHwCaptureParam *handleData, int cmdId)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        AUDIO_FUNC_LOGE("paras is NULL!");
         return HDF_FAILURE;
     }
     switch (cmdId) {
@@ -1664,7 +1685,7 @@ int32_t AudioInterfaceLibModeCapture(const struct DevHandleCapture *handle,
         case AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE:
             return (AudioInterfaceLibCtlCapture(handle, cmdId, handleData));
         default:
-            LOG_FUN_ERR("Mode Error!");
+            AUDIO_FUNC_LOGE("Mode Error!");
             break;
     }
     return HDF_ERR_NOT_SUPPORT;

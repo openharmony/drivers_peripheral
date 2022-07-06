@@ -149,7 +149,7 @@ static bool dev_id_match(const char *info, const char *did)
         idx++;
     }
     if (strstr(id, did)) {
-        LOG_PARA_INFO("match dai!!!: %s %s", id, did);
+        AUDIO_FUNC_LOGI("match dai!!!: %s %s", id, did);
         return true;
     }
     return false;
@@ -182,7 +182,7 @@ static bool GetSpecifiedDevicesCheck(struct DevInfo *devinfo, int32_t card,
     if (!match[*index].did) { /* no exist dai info, exit */
         devinfo->card = card;
         devinfo->device = 0;
-        LOG_PARA_INFO("%s card, got card=%d,device=%d", devinfo->id,
+        AUDIO_FUNC_LOGI("%s card, got card=%d,device=%d", devinfo->id,
             devinfo->card, devinfo->device);
         return true;
     }
@@ -207,21 +207,21 @@ static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int32_t card,
         int32_t ret = sprintf_s(deviceInfoPath, sizeof(deviceInfoPath) - 1,
             "proc/asound/card%d/pcm%dp/info", card, device);
         if (ret < 0) {
-            LOG_PARA_INFO("out card %d devices %d info path sprintf failed", card, device);
+            AUDIO_FUNC_LOGI("out card %d devices %d info path sprintf failed", card, device);
             break;
         }
         if (access(deviceInfoPath, 0)) {
-            LOG_PARA_INFO("No exist %s, break and finish parsing", deviceInfoPath);
+            AUDIO_FUNC_LOGI("No exist %s, break and finish parsing", deviceInfoPath);
             break;
         }
         file = fopen(deviceInfoPath, "r");
         if (!file) {
-            LOG_PARA_INFO("Could reading %s property", deviceInfoPath);
+            AUDIO_FUNC_LOGI("Could reading %s property", deviceInfoPath);
             continue;
         }
         len = fread(info, sizeof(char), sizeof(info) / sizeof(char), file);
         if (fclose(file)) {
-            LOG_FUN_ERR("fclose(%s) failed", deviceInfoPath);
+            AUDIO_FUNC_LOGE("fclose(%s) failed", deviceInfoPath);
         }
         if (len == 0 || len > sizeof(info) / sizeof(char)) {
             continue;
@@ -231,7 +231,7 @@ static bool GetSpecifiedOutDev(struct DevInfo *devinfo, int32_t card,
         if (dev_id_match(info, match[index].did)) {
             devinfo->card = card;
             devinfo->device = device;
-            LOG_PARA_INFO("%s card, got card=%d,device=%d", devinfo->id,
+            AUDIO_FUNC_LOGI("%s card, got card=%d,device=%d", devinfo->id,
                 devinfo->card, devinfo->device);
             return true;
         }
@@ -257,21 +257,21 @@ static bool GetSpecifiedInDev(struct DevInfo *devinfo, int32_t card,
         int32_t ret = sprintf_s(deviceInfoPath, sizeof(deviceInfoPath) - 1,
             "proc/asound/card%d/pcm%dc/info", card, device);
         if (ret < 0) {
-            LOG_PARA_INFO("in card %d devices %d info path sprintf failed", card, device);
+            AUDIO_FUNC_LOGI("in card %d devices %d info path sprintf failed", card, device);
             break;
         }
         if (access(deviceInfoPath, 0)) {
-            LOG_PARA_INFO("No exist %s, break and finish parsing", deviceInfoPath);
+            AUDIO_FUNC_LOGI("No exist %s, break and finish parsing", deviceInfoPath);
             break;
         }
         file = fopen(deviceInfoPath, "r");
         if (!file) {
-            LOG_PARA_INFO("Could reading %s property", deviceInfoPath);
+            AUDIO_FUNC_LOGI("Could reading %s property", deviceInfoPath);
             continue;
         }
         len = fread(info, sizeof(char), sizeof(info) / sizeof(char), file);
         if (fclose(file)) {
-            LOG_FUN_ERR("fclose(%s) failed", deviceInfoPath);
+            AUDIO_FUNC_LOGE("fclose(%s) failed", deviceInfoPath);
         }
         if (len == 0 || len > sizeof(info) / sizeof(char)) {
             continue;
@@ -281,7 +281,7 @@ static bool GetSpecifiedInDev(struct DevInfo *devinfo, int32_t card,
         if (dev_id_match(info, match[index].did)) {
             devinfo->card = card;
             devinfo->device = device;
-            LOG_PARA_INFO("%s card, got card=%d,device=%d", devinfo->id,
+            AUDIO_FUNC_LOGI("%s card, got card=%d,device=%d", devinfo->id,
                 devinfo->card, devinfo->device);
             return true;
         }
@@ -291,10 +291,10 @@ static bool GetSpecifiedInDev(struct DevInfo *devinfo, int32_t card,
 
 static void dumpdev_info(const char *tag, struct DevInfo  *devInfo, int32_t count)
 {
-    LOG_PARA_INFO("dump %s device info", tag);
+    AUDIO_FUNC_LOGI("dump %s device info", tag);
     for (int32_t i = 0; i < count; i++) {
         if (devInfo[i].id && devInfo[i].card != SND_OUT_SOUND_CARD_UNKNOWN) {
-            LOG_PARA_INFO("dev_info %s  card=%d, device:%d",
+            AUDIO_FUNC_LOGI("dev_info %s  card=%d, device:%d",
                 devInfo[i].id, devInfo[i].card, devInfo[i].device);
         }
     }
@@ -312,21 +312,21 @@ void ReadInSoundCard(void)
     for (int32_t card = 0; card < SNDRV_CARDS; card++) {
         int32_t ret = sprintf_s(sndCardId, sizeof(sndCardId) - 1, "proc/asound/card%d/id", card);
         if (ret < 0) {
-            LOG_PARA_INFO("in card %d idinfo path sprintf failed", card);
+            AUDIO_FUNC_LOGI("in card %d idinfo path sprintf failed", card);
             break;
         }
         if (access(sndCardId, 0)) {
-            LOG_PARA_INFO("No exist %s, break and finish parsing", sndCardId);
+            AUDIO_FUNC_LOGI("No exist %s, break and finish parsing", sndCardId);
                 break;
         }
         file = fopen(sndCardId, "r");
         if (!file) {
-            LOG_PARA_INFO("Could reading %s property", sndCardId);
+            AUDIO_FUNC_LOGI("Could reading %s property", sndCardId);
             continue;
         }
         cardIdLen = fread(CardIdInfo, sizeof(char), sizeof(CardIdInfo) / sizeof(char), file);
         if (fclose(file)) {
-            LOG_FUN_ERR("fclose(%s) failed", sndCardId);
+            AUDIO_FUNC_LOGE("fclose(%s) failed", sndCardId);
         }
         if (cardIdLen == 0 || cardIdLen > sizeof(CardIdInfo) / sizeof(char)) {
             continue;
@@ -355,27 +355,27 @@ void ReadOutSoundCard(void)
     for (int32_t card = 0; card < SNDRV_CARDS; card++) {
         int32_t ret = sprintf_s(sndCardId, sizeof(sndCardId) - 1, "proc/asound/card%d/id", card);
         if (ret < 0) {
-            LOG_PARA_INFO("out card %d idinfo path sprintf failed", card);
+            AUDIO_FUNC_LOGI("out card %d idinfo path sprintf failed", card);
             break;
         }
         if (access(sndCardId, 0)) {
-            LOG_PARA_INFO("No exist %s, break and finish parsing", sndCardId);
+            AUDIO_FUNC_LOGI("No exist %s, break and finish parsing", sndCardId);
             break;
         }
         file = fopen(sndCardId, "r");
         if (!file) {
-            LOG_PARA_INFO("Could reading %s property", sndCardId);
+            AUDIO_FUNC_LOGI("Could reading %s property", sndCardId);
             continue;
         }
         cardIdLen = fread(CardIdInfo, sizeof(char), sizeof(CardIdInfo) / sizeof(char), file);
         if (fclose(file)) {
-            LOG_FUN_ERR("fclose(%s) failed", sndCardId);
+            AUDIO_FUNC_LOGE("fclose(%s) failed", sndCardId);
         }
         if (cardIdLen == 0 || cardIdLen > sizeof(CardIdInfo) / sizeof(char)) {
             continue;
         }
         CardIdInfo[cardIdLen - 1] = '\0';
-        LOG_PARA_INFO("card%d id:%s", card, CardIdInfo);
+        AUDIO_FUNC_LOGI("card%d id:%s", card, CardIdInfo);
         GetSpecifiedOutDev(&devOut[SND_OUT_SOUND_CARD_SPEAKER], card, CardIdInfo, SPEAKER_OUT_NAME);
         GetSpecifiedOutDev(&devOut[SND_OUT_SOUND_CARD_HDMI], card, CardIdInfo, HDMI_OUT_NAME);
         GetSpecifiedOutDev(&devOut[SND_OUT_SOUND_CARD_SPDIF], card, CardIdInfo, SPDIF_OUT_NAME);
@@ -417,7 +417,7 @@ int32_t AudioRenderParamCheck(struct pcm_params *params, uint32_t param, uint32_
     uint32_t min = pcm_params_get_min(params, param);
     uint32_t max = pcm_params_get_max(params, param);
     if ((value < min) || (value > max))  {
-        LOG_FUN_ERR("device supports %s\t min=%u%s \t max=%u%s, pls check it.\n", paramName,
+        AUDIO_FUNC_LOGE("device supports %s\t min=%u%s \t max=%u%s, pls check it.\n", paramName,
             min, paramUnit, max, paramUnit);
         paramIsOk = false;
     }
@@ -432,7 +432,7 @@ int32_t IsPlayable(uint32_t card, uint32_t device, uint32_t bits)
 
     params = pcm_params_get(card, device, PCM_OUT);
     if (params == NULL) {
-        LOG_FUN_ERR("Unable to open PCM device (/dev/snd/pcmC%uD%up)\n", card, device);
+        AUDIO_FUNC_LOGE("Unable to open PCM device (/dev/snd/pcmC%uD%up)\n", card, device);
         return 0;
     }
     struct RenderParamcheckList g_RenderParamcheckList[] = {
@@ -496,11 +496,11 @@ void RenderSample(struct pcm **pcm, struct PcmRenderParam *param)
 
     *pcm = pcm_open(param->card, param->device, PCM_OUT, &g_renderPcmCfg);
     if (((*pcm) == NULL) || !pcm_is_ready(*pcm)) {
-        LOG_FUN_ERR("Unable to open PCM device (/dev/snd/pcmC%uD%up):(%s)\n",
+        AUDIO_FUNC_LOGE("Unable to open PCM device (/dev/snd/pcmC%uD%up):(%s)\n",
             param->card, param->device, pcm_get_error(*pcm));
         return;
     }
-    LOG_FUN_ERR("Playing sample: %u ch, %u hz, %u\n", param->channels, param->rate, param->bits);
+    AUDIO_FUNC_LOGE("Playing sample: %u ch, %u hz, %u\n", param->channels, param->rate, param->bits);
 }
 
 uint32_t CaptureSample(struct pcm **pcm, struct PcmCaptureParam *param)
@@ -517,7 +517,7 @@ uint32_t CaptureSample(struct pcm **pcm, struct PcmCaptureParam *param)
     config.silence_threshold = 0;
     *pcm = pcm_open(param->card, param->device, PCM_IN, &config);
     if (((*pcm) == NULL) || !pcm_is_ready(*pcm)) {
-        LOG_FUN_ERR("Unable to open PCM device (/dev/snd/pcmC%uD%uc):(%s)\n",
+        AUDIO_FUNC_LOGE("Unable to open PCM device (/dev/snd/pcmC%uD%uc):(%s)\n",
             param->card, param->device, pcm_get_error(*pcm));
         return -1;
     }

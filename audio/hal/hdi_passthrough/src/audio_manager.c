@@ -100,7 +100,7 @@ PathSelAnalysisJson *AudioSoGetPathSelAnalysisJson(void)
 int32_t InitCaptureSoHandle(const char *captureSoPath)
 {
     if (captureSoPath == NULL) {
-        LOG_FUN_ERR("captureSoPath is NULL");
+        AUDIO_FUNC_LOGE("captureSoPath is NULL");
         return HDF_FAILURE;
     }
     char pathBuf[PATH_MAX] = {'\0'};
@@ -111,14 +111,14 @@ int32_t InitCaptureSoHandle(const char *captureSoPath)
         char *cPathBuf = pathBuf;
         g_ptrCaptureHandle = dlopen(cPathBuf, RTLD_LAZY);
         if (g_ptrCaptureHandle == NULL) {
-            LOG_FUN_ERR("open lib capture so fail, reason:%s", dlerror());
+            AUDIO_FUNC_LOGE("open lib capture so fail, reason:%{public}s", dlerror());
             return HDF_FAILURE;
         }
         g_bindServiceCapture = dlsym(g_ptrCaptureHandle, "AudioBindServiceCapture");
         g_interfaceLibModeCapture = dlsym(g_ptrCaptureHandle, "AudioInterfaceLibModeCapture");
         g_closeServiceCapture = dlsym(g_ptrCaptureHandle, "AudioCloseServiceCapture");
         if (g_bindServiceCapture == NULL || g_interfaceLibModeCapture == NULL || g_closeServiceCapture == NULL) {
-            LOG_FUN_ERR("lib capture so func not found!");
+            AUDIO_FUNC_LOGE("lib capture so func not found!");
             AudioDlClose(&g_ptrCaptureHandle);
             return HDF_FAILURE;
         }
@@ -129,7 +129,7 @@ int32_t InitCaptureSoHandle(const char *captureSoPath)
 int32_t InitRenderSoHandle(const char *renderSoPath)
 {
     if (renderSoPath == NULL) {
-        LOG_FUN_ERR("renderSoPath is NULL");
+        AUDIO_FUNC_LOGE("renderSoPath is NULL");
         return HDF_FAILURE;
     }
     char pathBuf[PATH_MAX] = {'\0'};
@@ -140,14 +140,14 @@ int32_t InitRenderSoHandle(const char *renderSoPath)
         char *cPathBuf = pathBuf;
         g_ptrRenderHandle = dlopen(cPathBuf, RTLD_LAZY);
         if (g_ptrRenderHandle == NULL) {
-            LOG_FUN_ERR("open lib render so fail, reason:%s", dlerror());
+            AUDIO_FUNC_LOGE("open lib render so fail, reason:%{public}s", dlerror());
             return HDF_FAILURE;
         }
         g_bindServiceRender = dlsym(g_ptrRenderHandle, "AudioBindServiceRender");
         g_interfaceLibModeRender = dlsym(g_ptrRenderHandle, "AudioInterfaceLibModeRender");
         g_closeServiceRender = dlsym(g_ptrRenderHandle, "AudioCloseServiceRender");
         if (g_bindServiceRender == NULL || g_interfaceLibModeRender == NULL || g_closeServiceRender == NULL) {
-            LOG_FUN_ERR("lib render so func not found!");
+            AUDIO_FUNC_LOGE("lib render so func not found!");
             AudioDlClose(&g_ptrRenderHandle);
             return HDF_FAILURE;
         }
@@ -159,7 +159,7 @@ int32_t InitRenderSoHandle(const char *renderSoPath)
 int32_t InitPathSelectSoHandle(const char *pathSelectSoPath)
 {
     if (pathSelectSoPath == NULL) {
-        LOG_FUN_ERR("pathSelectSoPath is NULL");
+        AUDIO_FUNC_LOGE("pathSelectSoPath is NULL");
         return HDF_FAILURE;
     }
     char pathBuf[PATH_MAX] = {'\0'};
@@ -170,13 +170,13 @@ int32_t InitPathSelectSoHandle(const char *pathSelectSoPath)
         char *cPathBuf = pathBuf;
         g_ptrPathSelHandle = dlopen(cPathBuf, RTLD_LAZY);
         if (g_ptrPathSelHandle == NULL) {
-            LOG_FUN_ERR("open lib PathSelct so fail, reason:%s", dlerror());
+            AUDIO_FUNC_LOGE("open lib PathSelct so fail, reason:%s", dlerror());
             return HDF_FAILURE;
         }
         g_pathSelGetConfToJsonObj = dlsym(g_ptrPathSelHandle, "AudioPathSelGetConfToJsonObj");
         g_pathSelAnalysisJson = dlsym(g_ptrPathSelHandle, "AudioPathSelAnalysisJson");
         if (g_pathSelGetConfToJsonObj == NULL || g_pathSelAnalysisJson == NULL) {
-            LOG_FUN_ERR("lib PathSelct so func not found!");
+            AUDIO_FUNC_LOGE("lib PathSelct so func not found!");
             AudioDlClose(&g_ptrPathSelHandle);
             return HDF_FAILURE;
         }
@@ -189,48 +189,49 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
                                    struct AudioAdapterDescriptor **descs,
                                    int *size)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (manager == NULL || descs == NULL || size == NULL) {
+        AUDIO_FUNC_LOGE("param manager or descs or size is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret = AudioAdaptersForUser(descs, size);
     if (ret < 0) {
-        LOG_FUN_ERR("AudioAdaptersForUser FAIL!");
+        AUDIO_FUNC_LOGE("AudioAdaptersForUser FAIL! ret = %{public}d", ret);
         return AUDIO_HAL_ERR_NOTREADY; // Failed to read sound card configuration file
     }
     if (g_captureSoPath == NULL || g_renderSoPath == NULL) {
-        LOG_FUN_ERR("sopath is error");
+        AUDIO_FUNC_LOGE("sopath is error");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (*descs != NULL && size != NULL && (*size) > 0) { // Fuzz test
         g_localAddrAudioAdapterOut  = *descs;
         g_localAdapterNum = *size;
     } else {
-        LOG_FUN_ERR("Get AudioAdapterDescriptor Failed");
+        AUDIO_FUNC_LOGE("Get AudioAdapterDescriptor Failed");
         return AUDIO_HAL_ERR_INVALID_OBJECT;
     }
     ret = InitCaptureSoHandle(g_captureSoPath);
     if (ret < 0) {
-        LOG_FUN_ERR("InitCaptureSoHandle FAIL!");
+        AUDIO_FUNC_LOGE("InitCaptureSoHandle FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = InitRenderSoHandle(g_renderSoPath);
     if (ret < 0) {
-        LOG_FUN_ERR("InitRenderSoHandle FAIL!");
+        AUDIO_FUNC_LOGE("InitRenderSoHandle FAIL!");
         AudioDlClose(&g_ptrCaptureHandle);
         return AUDIO_HAL_ERR_INTERNAL;
     }
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     ret = InitPathSelectSoHandle(g_pathSelectSoPath);
     if (ret < 0 || g_pathSelGetConfToJsonObj == NULL) {
-        LOG_FUN_ERR("InitPathSelectSoHandle FAIL!");
+        AUDIO_FUNC_LOGE("InitPathSelectSoHandle FAIL!");
         AudioDlClose(&g_ptrRenderHandle);
         AudioDlClose(&g_ptrCaptureHandle);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = g_pathSelGetConfToJsonObj();
     if (ret < 0) {
-        LOG_FUN_ERR("g_pathSelGetConfToJsonObj FAIL!");
+        AUDIO_FUNC_LOGE("g_pathSelGetConfToJsonObj FAIL!");
         AudioDlClose(&g_ptrRenderHandle);
         AudioDlClose(&g_ptrCaptureHandle);
         AudioDlClose(&g_ptrPathSelHandle);
@@ -243,11 +244,12 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
 static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
+        AUDIO_FUNC_LOGE("param desc or adapter is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(*hwAdapter));
     if (hwAdapter == NULL) {
-        LOGE("%s: calloc AudioHwAdapter failed", __func__);
+        AUDIO_FUNC_LOGE("calloc AudioHwAdapter failed");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;
@@ -263,7 +265,7 @@ static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, str
     hwAdapter->adapterMgrCaptureFlag = 0; // The adapterMgrCaptureFlag init is zero
     int32_t ret = AudioAddAdapterAddrToList((AudioHandle)(&hwAdapter->common), desc);
     if (ret < 0) { // add for Fuzz
-        LOG_FUN_ERR("AudioAdapterAddrGet check Failed");
+        AUDIO_FUNC_LOGE("AudioAdapterAddrGet check Failed");
         AudioMemFree((void **)&hwAdapter);
         return ret;
     }
@@ -275,11 +277,12 @@ static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, str
 static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
+        AUDIO_FUNC_LOGE("param attrs or adapter is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(*hwAdapter));
     if (hwAdapter == NULL) {
-        LOGE("%s: calloc AudioHwAdapter failed", __func__);
+        AUDIO_FUNC_LOGE("calloc AudioHwAdapter failed");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;
@@ -295,7 +298,7 @@ static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct 
     hwAdapter->adapterMgrCaptureFlag = 0; // The adapterMgrCaptureFlag init is zero
     int32_t ret = AudioAddAdapterAddrToList((AudioHandle)(&hwAdapter->common), desc);
     if (ret < 0) { // add for Fuzz
-        LOG_FUN_ERR("AudioAdapterAddrGet check Failed");
+        AUDIO_FUNC_LOGE("AudioAdapterAddrGet check Failed");
         AudioMemFree((void **)&hwAdapter);
         return ret;
     }
@@ -319,6 +322,7 @@ static int32_t selectAppropriateAdapter(enum AudioAdapterType adapterType,
     int32_t ret;
 
     if (desc == NULL || adapter == NULL) {
+        AUDIO_FUNC_LOGE("param desc or adapter is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     switch (adapterType) {
@@ -326,27 +330,27 @@ static int32_t selectAppropriateAdapter(enum AudioAdapterType adapterType,
         case AUDIO_ADAPTER_PRIMARY_EXT:
             ret = loadAdapterPrimary(desc, adapter);
             if (ret != AUDIO_HAL_SUCCESS) {
-                LOGE("%s: loadAdapterPrimary failed.", __func__);
+                AUDIO_FUNC_LOGE("loadAdapterPrimary failed. ret = %{public}d", ret);
                 return ret;
             }
             break;
         case AUDIO_ADAPTER_USB:
             ret = loadAdapterUsb(desc, adapter);
             if (ret != AUDIO_HAL_SUCCESS) {
-                LOGE("%s: loadAdapterUsb failed.", __func__);
+                AUDIO_FUNC_LOGE("loadAdapterUsb failed.ret = %{public}d", ret);
                 return ret;
             }
-            LOGE("%s: Can't loadAdapterUsb.", __func__);
+            AUDIO_FUNC_LOGE("Can't loadAdapterUsb.");
             break;
         case AUDIO_ADAPTER_A2DP:
             ret = loadAdapterA2dp(desc, adapter);
             if (ret != AUDIO_HAL_SUCCESS) {
-                LOGE("%s: loadAdapterA2dp failed.", __func__);
+                AUDIO_FUNC_LOGE("loadAdapterA2dp failed.");
                 return ret;
             }
             break;
         default:
-            LOGE("%s: An unsupported Adapter.", __func__);
+            AUDIO_FUNC_LOGE("An unsupported Adapter.");
             return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
 
@@ -356,12 +360,14 @@ static int32_t selectAppropriateAdapter(enum AudioAdapterType adapterType,
 int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct AudioAdapterDescriptor *desc,
     struct AudioAdapter **adapter)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (manager == NULL || desc == NULL || desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
+        AUDIO_FUNC_LOGE("param is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     bool descFlag = false;
     if (g_localAdapterNum <= 0 || g_localAdapterNum > SUPPORT_ADAPTER_NUM_MAX) {
+        AUDIO_FUNC_LOGE("g_localAdapterNum is invalid!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (g_localAddrAudioAdapterOut != NULL) { // Fuzz test
@@ -372,20 +378,20 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
             }
         }
         if (!descFlag) {
-            LOG_FUN_ERR("The desc address passed in is invalid");
+            AUDIO_FUNC_LOGE("The desc address passed in is invalid");
             return AUDIO_HAL_ERR_INVALID_OBJECT;
         }
     }
-    LOGV("%s: adapter name %s", __func__, desc->adapterName);
+    AUDIO_FUNC_LOGI("adapter name %{public}s", desc->adapterName);
     if (AudioAdapterExist(desc->adapterName)) {
-        LOGE("%s: not supported this adapter %s", __func__, desc->adapterName);
+        AUDIO_FUNC_LOGE("not supported this adapter %{public}s", desc->adapterName);
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
     enum AudioAdapterType sndCardType = MatchAdapterType(desc->adapterName, desc->ports[0].portId);
     int32_t ret = selectAppropriateAdapter(sndCardType, desc, adapter);
     if (ret != AUDIO_HAL_SUCCESS) {
-        LOGE("%s: Load adapter failed.", __func__);
+        AUDIO_FUNC_LOGE("Load adapter failed. ret = %{public}d\n", ret);
         return ret;
     }
 
@@ -396,7 +402,7 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
 {
     int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
     if (ret < 0) {
-        LOG_FUN_ERR("The adapter address passed in is invalid");
+        AUDIO_FUNC_LOGE("The adapter address passed in is invalid! ret = %{public}d", ret);
         return;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
@@ -415,7 +421,7 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
         AudioMemFree((void **)&hwAdapter->portCapabilitys);
     }
     if (AudioDelAdapterAddrFromList((AudioHandle)adapter)) {
-        LOG_FUN_ERR("adapter or render not in MgrList");
+        AUDIO_FUNC_LOGE("adapter or render not in MgrList");
     }
     AudioMemFree((void **)&adapter);
 }
@@ -433,7 +439,7 @@ bool ReleaseAudioManagerObject(struct AudioManager *object)
 static void AudioMgrConstruct(struct AudioManager *audioMgr)
 {
     if (audioMgr == NULL) {
-        LOG_FUN_ERR("Input pointer is null!");
+        AUDIO_FUNC_LOGE("Input pointer is null!");
         return;
     }
     audioMgr->GetAllAdapters = AudioManagerGetAllAdapters;

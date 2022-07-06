@@ -82,31 +82,6 @@ typedef enum {
     AUDIO_HAL_ERR_AO_BUSY = HDF_AUDIO_HAL_ERR_NUM(-3),         /* audio render is busy now */
 } AUDIO_HAL_ERR_CODE;
 
-#ifndef LOGE
-    #define LOGE(fmt, arg...) printf("[Audio:E]" fmt "\n", ##arg)
-#endif
-#ifndef LOGI
-    #define LOGI(fmt, arg...) printf("[Audio:I]" fmt "\n", ##arg)
-#endif
-#ifndef LOGV
-    #define LOGV(fmt, arg...) printf("[Audio:V]" fmt "\n", ##arg)
-#endif
-
-#if !LOG_ENABLE
-    #undef LOGE
-    #undef LOGI
-    #undef LOGV
-
-    #define LOGE(...)
-    #define LOGI(...)
-    #define LOGV(...)
-#else
-    #if !LOGV_ENABLE
-        #undef LOGV
-        #define LOGV(...)
-    #endif // !LOGV_ENABLE
-#endif // LOG_ENABLE
-
 #ifndef UNUSED
     #define UNUSED(x) ((void)(x))
 #endif

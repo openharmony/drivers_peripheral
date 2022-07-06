@@ -19,9 +19,9 @@
 #include <pthread.h>
 #include <linux/input.h>
 #include "hdf_audio_pnp_server.h"
-#include "hdf_log.h"
 #include "osal_time.h"
 #include "securec.h"
+#include "audio_hal_log.h"
 
 #define HDF_LOG_TAG             HDF_AUDIO_HAL_HOST
 #define INPUT_EVT_MAX_CNT       4
@@ -34,7 +34,7 @@ static int32_t AudioAnalogHeadsetDeviceCheck(struct input_event evt)
 {
     struct AudioEvent audioEvent;
 
-    HDF_LOGI("%{public}s: enter.", __func__);
+    AUDIO_FUNC_LOGI("enter.");
     audioEvent.eventType = (evt.value == 0) ? HDF_AUDIO_DEVICE_REMOVE : HDF_AUDIO_DEVICE_ADD;
     audioEvent.deviceType = HDF_AUDIO_DEVICE_UNKOWN;
     switch (evt.code) {
@@ -48,7 +48,7 @@ static int32_t AudioAnalogHeadsetDeviceCheck(struct input_event evt)
             audioEvent.deviceType = HDF_AUDIO_LINEOUT;
             break;
         default: // SW_JACK_PHYSICAL_INSERT = 0x7, SW_LINEIN_INSERT = 0xd and other.
-            HDF_LOGE("%{public}s: n't surpport code =0x%{public}x\n", __func__, evt.code);
+            AUDIO_FUNC_LOGE("n't surpport code =0x%{public}x\n", evt.code);
             return HDF_FAILURE;
     }
     return AudioPnpUpdateInfoOnly(audioEvent);
@@ -62,7 +62,7 @@ static void AudioPnpInputCheck(struct input_event evt)
         case EV_SW:
             // The code possible is SW_HEADPHONE_INSERT=2,SW_MICROPHONE_INSERT=4,SW_LINEOUT_INSERT=6
             // or SW_LINEIN_INSERT=13.
-            HDF_LOGD("%{public}s: evt.type = EV_SW5, code =0x%{public}d, value = %{public}d\n", __func__, evt.code,
+            AUDIO_FUNC_LOGD("evt.type = EV_SW5, code =0x%{public}d, value = %{public}d\n", evt.code,
                 evt.value);
             (void)AudioAnalogHeadsetDeviceCheck(evt);
             break;
@@ -71,8 +71,7 @@ static void AudioPnpInputCheck(struct input_event evt)
             // The code possible is KEY_MEDIA=226,KEY_KP7=0x71(mute),KEY_KP8=0x72(volumn-),
             // KEY_KP9=0x73(vol+) or KEY_KPMINUS=0x74(power).
             if ((evt.code == KEY_MEDIA) || (evt.code == KEY_KP7) || (evt.code == KEY_KP8) || (evt.code == KEY_KP9)) {
-                HDF_LOGD("%{public}s: evt.type = EV_KEY1, code = 0x%{public}x, value = %{public}d.",
-                    __func__, evt.code, evt.value);
+                AUDIO_FUNC_LOGD("evt.type = EV_KEY1, code = 0x%{public}x, value = %{public}d.", evt.code, evt.value);
             }
             break;
         case EV_REL: // mouse move event.
@@ -91,7 +90,7 @@ static int32_t AudioPnpInputPollAndRead(void)
 
     ret = poll(g_fdSets, n, -1);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: [poll] failed!", __func__);
+        AUDIO_FUNC_LOGE("[poll] failed!");
         return HDF_FAILURE;
     }
 
@@ -99,7 +98,7 @@ static int32_t AudioPnpInputPollAndRead(void)
         if (g_fdSets[i].revents & POLLIN) {
             ret = read(g_fdSets[i].fd, (void *)&evt, sizeof(evt));
             if (ret < 0) {
-                HDF_LOGE("%{public}s: [read] failed!", __func__);
+                AUDIO_FUNC_LOGE("[read] failed!");
                 return HDF_FAILURE;
             }
             AudioPnpInputCheck(evt);
@@ -120,15 +119,15 @@ static int32_t AudioPnpInputOpen(void)
         "/dev/input/event4"
     };
 
-    HDF_LOGI("%{public}s: enter.", __func__);
+    AUDIO_FUNC_LOGI("enter.");
     j = 0;
     for (i = 0; i < INPUT_EVT_MAX_CNT; i++) {
         g_fdSets[j].fd = open(devices[i], O_RDONLY);
         if (g_fdSets[j].fd < 0) {
-            HDF_LOGE("%{public}s: [open] %{public}s failed!", __func__, devices[i]);
+            AUDIO_FUNC_LOGE("[open] %{public}s failed!", devices[i]);
             continue;
         }
-        HDF_LOGI("%{public}s: [open] %{public}s success!", __func__, devices[i]);
+        AUDIO_FUNC_LOGI("[open] %{public}s success!", devices[i]);
         g_fdSets[j].events = POLLIN;
         j++;
     }
@@ -142,7 +141,7 @@ static void *AudioPnpInputStart(void *useless)
     int ret;
     (void)useless;
 
-    HDF_LOGI("%{public}s: audio input start.", __func__);
+    AUDIO_FUNC_LOGI("audio input start.");
     if (AudioPnpInputOpen() != HDF_SUCCESS) {
         return NULL;
     }
@@ -150,7 +149,7 @@ static void *AudioPnpInputStart(void *useless)
     do {
         ret = AudioPnpInputPollAndRead();
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: [AudioPnpInputPollAndRead] failed!", __func__);
+            AUDIO_FUNC_LOGE("[AudioPnpInputPollAndRead] failed!");
             return NULL;
         }
     } while (g_bRunThread);
@@ -163,12 +162,12 @@ int32_t AudioPnpInputStartThread(void)
     pthread_t thread;
     pthread_attr_t tidsAttr;
 
-    HDF_LOGI("%{public}s: enter.", __func__);
+    AUDIO_FUNC_LOGI("enter.");
     g_bRunThread = true;
     pthread_attr_init(&tidsAttr);
     pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
     if (pthread_create(&thread, &tidsAttr, AudioPnpInputStart, NULL)) {
-        HDF_LOGE("%{public}s: [pthread_create] failed!", __func__);
+        AUDIO_FUNC_LOGE("[pthread_create] failed!");
         g_bRunThread = false;
         return HDF_FAILURE;
     }
@@ -178,7 +177,7 @@ int32_t AudioPnpInputStartThread(void)
 
 void AudioPnpInputEndThread(void)
 {
-    HDF_LOGI("%{public}s: enter.", __func__);
+    AUDIO_FUNC_LOGI("enter.");
     g_bRunThread = false;
     OsalMSleep(WAIT_THREAD_END_TIME_MS);
 }
