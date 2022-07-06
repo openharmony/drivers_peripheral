@@ -55,11 +55,11 @@ int32_t AudioPathSelGetConfToJsonObj()
     }
     fpJson = fopen(CJSONFILE_CONFIG_PATH, "r");
     if (fpJson == NULL) {
-        LOG_FUN_ERR("audio_parse.json file fail!");
+        AUDIO_FUNC_LOGE("audio_paths.json file fail!");
         return HDF_FAILURE;
     }
     if (fseek(fpJson, 0, SEEK_END) != HDF_SUCCESS) {
-        LOG_FUN_ERR("fseek fail!");
+        AUDIO_FUNC_LOGE("fseek fail!");
         fclose(fpJson);
         return HDF_FAILURE;
     }
@@ -75,7 +75,7 @@ int32_t AudioPathSelGetConfToJsonObj()
         return HDF_FAILURE;
     }
     if (fread(pJsonStr, jsonStrSize, 1, fpJson) != 1) {
-        LOG_FUN_ERR("read to file fail!");
+        AUDIO_FUNC_LOGE("read to file fail!");
         fclose(fpJson);
         fpJson = NULL;
         AudioMemFree((void **)&pJsonStr);
@@ -84,11 +84,11 @@ int32_t AudioPathSelGetConfToJsonObj()
     fclose(fpJson);
     fpJson = NULL;
 #ifndef JSON_UNPRINT
-    LOG_PARA_INFO("pJsonStr = %s", pJsonStr);
+    AUDIO_FUNC_LOGI("pJsonStr = %{public}s", pJsonStr);
 #endif
     g_cJsonObj = cJSON_Parse(pJsonStr);
     if (g_cJsonObj == NULL) {
-        LOG_FUN_ERR("cJSON_GetErrorPtr() = %s", cJSON_GetErrorPtr());
+        AUDIO_FUNC_LOGE("cJSON_GetErrorPtr() = %{public}s", cJSON_GetErrorPtr());
         AudioMemFree((void **)&pJsonStr);
         return HDF_FAILURE;
     }
@@ -111,7 +111,7 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pins)
         case PATH_DEV_IN_HS_MIC:
             return HS_MIC;
         default:
-            LOG_FUN_ERR("UseCase not support!");
+            AUDIO_FUNC_LOGE("UseCase not support!");
             break;
     }
     return NULL;
@@ -133,53 +133,53 @@ const char *AudioPathSelGetUseCase(enum AudioCategory type)
 
 static int32_t AudioPathSelGetPlanRenderScene(struct AudioHwRenderParam *renderSceneParam)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret;
     if (renderSceneParam == NULL) {
-        LOG_FUN_ERR("AudioPathSelGetPlanRenderScene param Is NULL");
+        AUDIO_FUNC_LOGE("AudioPathSelGetPlanRenderScene param Is NULL");
         return HDF_FAILURE;
     }
     char pathName[PATH_NAME_LEN] = {0};
     enum AudioPortPin pins = renderSceneParam->renderMode.hwInfo.deviceDescript.pins;
     if (pins >= PATH_DEV_MAX || pins < PATH_DEV_NONE) {
-        LOG_FUN_ERR("deviceDescript pins error!");
+        AUDIO_FUNC_LOGE("deviceDescript pins error!");
         return HDF_FAILURE;
     }
     enum AudioCategory type = renderSceneParam->frameRenderMode.attrs.type;
     const char *useCase = AudioPathSelGetUseCase(type);
     const char *deviceType = AudioPathSelGetDeviceType(pins);
     if (useCase == NULL || deviceType == NULL) {
-        LOG_FUN_ERR("pins or type not support!");
+        AUDIO_FUNC_LOGE("pins or type not support!");
         return HDF_FAILURE;
     }
     if (snprintf_s(pathName, sizeof(pathName), sizeof(pathName) - 1, "%s %s", useCase, deviceType) < 0) {
-        LOG_FUN_ERR("snprintf_s Invalid!");
+        AUDIO_FUNC_LOGE("snprintf_s Invalid!");
         return HDF_FAILURE;
     }
     if (g_cJsonObj == NULL) {
-        LOG_FUN_ERR("g_cJsonObj is NULL!");
+        AUDIO_FUNC_LOGE("g_cJsonObj is NULL!");
         return HDF_FAILURE;
     }
     cJSON *pathNode = cJSON_GetObjectItem(g_cJsonObj, pathName);
     if (pathNode == NULL) {
-        LOG_FUN_ERR("Get Object Invalid!");
+        AUDIO_FUNC_LOGE("Get Object Invalid!");
         return HDF_ERR_NOT_SUPPORT;
     }
     cJSON *deviceNode = cJSON_GetObjectItem(g_cJsonObj, deviceType);
     if (deviceNode == NULL) {
-        LOG_FUN_ERR("Get Object Invalid!");
+        AUDIO_FUNC_LOGE("Get Object Invalid!");
         return HDF_ERR_NOT_SUPPORT;
     }
     ret = strncpy_s(renderSceneParam->renderMode.hwInfo.pathSelect.useCase,
                     NAME_LEN, useCase, strlen(useCase) + 1);
     if (ret != 0) {
-        LOG_FUN_ERR("strncpy_s failed!");
+        AUDIO_FUNC_LOGE("strncpy_s failed!");
         return HDF_FAILURE;
     }
     ret = strncpy_s(renderSceneParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceType,
                     NAME_LEN, deviceType, strlen(deviceType) + 1);
     if (ret != 0) {
-        LOG_FUN_ERR("strncpy_s failed!");
+        AUDIO_FUNC_LOGE("strncpy_s failed!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -187,53 +187,53 @@ static int32_t AudioPathSelGetPlanRenderScene(struct AudioHwRenderParam *renderS
 
 static int32_t AudioPathSelGetPlanCaptureScene(struct AudioHwCaptureParam *captureSceneParam)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret;
     if (captureSceneParam == NULL) {
-        LOG_FUN_ERR("AudioPathSelGetPlanCaptureScene param Is NULL");
+        AUDIO_FUNC_LOGE("AudioPathSelGetPlanCaptureScene param Is NULL");
         return HDF_FAILURE;
     }
     char pathName[PATH_NAME_LEN] = {0};
     enum AudioPortPin pins = captureSceneParam->captureMode.hwInfo.deviceDescript.pins;
     if (pins >= PATH_DEV_MAX || pins < PATH_DEV_MID) {
-        LOG_FUN_ERR("deviceDescript pins error!");
+        AUDIO_FUNC_LOGE("deviceDescript pins error!");
         return HDF_FAILURE;
     }
     enum AudioCategory type = captureSceneParam->frameCaptureMode.attrs.type;
     const char *useCase = AudioPathSelGetUseCase(type);
     const char *deviceType = AudioPathSelGetDeviceType(pins);
     if (useCase == NULL || deviceType == NULL) {
-        LOG_FUN_ERR("pins or type not support!");
+        AUDIO_FUNC_LOGE("pins or type not support!");
         return HDF_FAILURE;
     }
     if (snprintf_s(pathName, sizeof(pathName), sizeof(pathName) - 1, "%s %s", useCase, deviceType) < 0) {
-        LOG_FUN_ERR("snprintf_s failed!");
+        AUDIO_FUNC_LOGE("snprintf_s failed!");
         return HDF_FAILURE;
     }
     if (g_cJsonObj == NULL) {
-        LOG_FUN_ERR("g_cJsonObj is NULL!");
+        AUDIO_FUNC_LOGE("g_cJsonObj is NULL!");
         return HDF_FAILURE;
     }
     cJSON *pathNode = cJSON_GetObjectItem(g_cJsonObj, pathName);
     if (pathNode == NULL) {
-        LOG_FUN_ERR("Get Object Fail!");
+        AUDIO_FUNC_LOGE("Get Object Fail!");
         return HDF_ERR_NOT_SUPPORT;
     }
     cJSON *deviceNode = cJSON_GetObjectItem(g_cJsonObj, deviceType);
     if (deviceNode == NULL) {
-        LOG_FUN_ERR("Get Object Fail!");
+        AUDIO_FUNC_LOGE("Get Object Fail!");
         return HDF_ERR_NOT_SUPPORT;
     }
     ret = strncpy_s(captureSceneParam->captureMode.hwInfo.pathSelect.useCase,
                     NAME_LEN, useCase, strlen(useCase) + 1);
     if (ret != 0) {
-        LOG_FUN_ERR("strncpy_s failed!");
+        AUDIO_FUNC_LOGE("strncpy_s failed!");
         return HDF_FAILURE;
     }
     ret = strncpy_s(captureSceneParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceType,
                     NAME_LEN, deviceType, strlen(deviceType) + 1);
     if (ret != 0) {
-        LOG_FUN_ERR("strncpy_s failed!");
+        AUDIO_FUNC_LOGE("strncpy_s failed!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -243,7 +243,7 @@ static int32_t AudioPathSelGetPlanCaptureScene(struct AudioHwCaptureParam *captu
 static int32_t AudioCapturePathSelGetUsecaseDevice(struct AudioHwCaptureParam *captureParam, const char *pathName)
 {
     if (captureParam == NULL || pathName == NULL || g_cJsonObj == NULL) {
-        LOG_FUN_ERR("AudioCapturePathSelGetUsecaseDevice param Is NULL");
+        AUDIO_FUNC_LOGE("AudioCapturePathSelGetUsecaseDevice param Is NULL");
         return HDF_FAILURE;
     }
     int32_t pathIndex = 0;
@@ -251,18 +251,18 @@ static int32_t AudioCapturePathSelGetUsecaseDevice(struct AudioHwCaptureParam *c
     int32_t ret;
     cJSON *pathNode = cJSON_GetObjectItem(g_cJsonObj, pathName);
     if (pathNode == NULL) {
-        LOG_FUN_ERR("AudioCapturePathSel Get Object Fail!");
+        AUDIO_FUNC_LOGE("AudioCapturePathSel Get Object Fail!");
         return HDF_FAILURE;
     }
     cJSON *pathList = pathNode->child;
     if (pathList == NULL) {
-        LOG_FUN_ERR("AudioCapturePathSel Get pathList Fail!");
+        AUDIO_FUNC_LOGE("AudioCapturePathSel Get pathList Fail!");
         return HDF_FAILURE;
     }
     while (pathList != NULL) {
         cJSON *device = cJSON_GetObjectItem(pathList, "name");
         if (device == NULL) {
-            LOG_FUN_ERR("Get Object Invalid!");
+            AUDIO_FUNC_LOGE("Get Object Invalid!");
             return HDF_FAILURE;
         }
         pathKey = device->valuestring;
@@ -278,14 +278,14 @@ static int32_t AudioCapturePathSelGetUsecaseDevice(struct AudioHwCaptureParam *c
         ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.pathPlan[pathIndex].pathPlanName,
                         PATHPLAN_LEN, pathKey, strlen(pathKey) + 1);
         if (ret != 0) {
-            LOG_FUN_ERR("strncpy_s failed!");
+            AUDIO_FUNC_LOGE("strncpy_s failed!");
             return HDF_FAILURE;
         }
         pathList = pathList->next;
         pathIndex++;
     }
     if (pathIndex >= PATHPLAN_COUNT || pathIndex < 0) {
-        LOG_FUN_ERR("AudioCapturePathSel Get Object Fail!");
+        AUDIO_FUNC_LOGE("AudioCapturePathSel Get Object Fail!");
         return HDF_FAILURE;
     }
     captureParam->captureMode.hwInfo.pathSelect.useCaseDeviceNum = pathIndex;
@@ -294,20 +294,20 @@ static int32_t AudioCapturePathSelGetUsecaseDevice(struct AudioHwCaptureParam *c
 
 static int32_t AudioCapturePathSelGetDeviceSplit(struct AudioHwCaptureParam *captureParam, cJSON *deviceList)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t decIndex = 0;
     char *decKey = NULL;
     int32_t decValue;
     int32_t ret;
     cJSON *devObj = NULL;
     if (captureParam == NULL || deviceList == NULL) {
-        LOG_FUN_ERR("param Is NULL");
+        AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_FAILURE;
     }
     while (deviceList != NULL) {
         devObj = cJSON_GetObjectItem(deviceList, "name");
         if (devObj == NULL) {
-            LOG_FUN_ERR("Get Object Fail!");
+            AUDIO_FUNC_LOGE("Get Object Fail!");
             return HDF_FAILURE;
         }
         decKey = devObj->valuestring;
@@ -324,14 +324,14 @@ static int32_t AudioCapturePathSelGetDeviceSplit(struct AudioHwCaptureParam *cap
         ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[decIndex].deviceSwitch,
                         PATHPLAN_LEN, decKey, strlen(decKey) + 1);
         if (ret != 0) {
-            LOG_FUN_ERR("strncpy_s failed!");
+            AUDIO_FUNC_LOGE("strncpy_s failed!");
             return HDF_FAILURE;
         }
         deviceList = deviceList->next;
         decIndex++;
     }
     if (decIndex >= PATHPLAN_COUNT || decIndex < 0) {
-        LOG_FUN_ERR("Get Object Fail!");
+        AUDIO_FUNC_LOGE("Get Object Fail!");
         return HDF_FAILURE;
     }
     captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum = decIndex;
@@ -340,23 +340,23 @@ static int32_t AudioCapturePathSelGetDeviceSplit(struct AudioHwCaptureParam *cap
 
 static int32_t AudioCapturePathSelGetDevice(struct AudioHwCaptureParam *captureParam, const char *deviceType)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (captureParam == NULL || deviceType == NULL || g_cJsonObj == NULL) {
-        LOG_FUN_ERR("AudioCapturePathSelGetUsecaseDevice param Is NULL");
+        AUDIO_FUNC_LOGE("AudioCapturePathSelGetUsecaseDevice param Is NULL");
         return HDF_FAILURE;
     }
     cJSON *deviceNode = cJSON_GetObjectItem(g_cJsonObj, deviceType);
     if (deviceNode == NULL) {
-        LOG_FUN_ERR("Get deviceType Fail!");
+        AUDIO_FUNC_LOGE("Get deviceType Fail!");
         return HDF_FAILURE;
     }
     cJSON *deviceList = deviceNode->child;
     if (deviceList == NULL) {
-        LOG_FUN_ERR("Get deviceList Fail!");
+        AUDIO_FUNC_LOGE("Get deviceList Fail!");
         return HDF_FAILURE;
     }
     if (AudioCapturePathSelGetDeviceSplit(captureParam, deviceList) < 0) {
-        LOG_FUN_ERR("AudioCapturePathSelGetDeviceSplit Fail!");
+        AUDIO_FUNC_LOGE("AudioCapturePathSelGetDeviceSplit Fail!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -364,47 +364,47 @@ static int32_t AudioCapturePathSelGetDevice(struct AudioHwCaptureParam *captureP
 
 static int32_t AudioPathSelGetPlanCapture(struct AudioHwCaptureParam *captureParam)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret;
     if (captureParam == NULL) {
-        LOG_FUN_ERR("AudioPathSelGetPlanCapture param Is NULL");
+        AUDIO_FUNC_LOGE("AudioPathSelGetPlanCapture param Is NULL");
         return HDF_FAILURE;
     }
     char pathName[PATH_NAME_LEN] = {0};
     enum AudioPortPin pins = captureParam->captureMode.hwInfo.deviceDescript.pins;
     if (pins <= PATH_DEV_MID) {
-        LOG_FUN_ERR("deviceDescript pins error!");
+        AUDIO_FUNC_LOGE("deviceDescript pins error!");
         return HDF_FAILURE;
     }
     enum AudioCategory type = captureParam->frameCaptureMode.attrs.type;
     const char *useCase = AudioPathSelGetUseCase(type);
     const char *deviceType = AudioPathSelGetDeviceType(pins);
     if (useCase == NULL || deviceType == NULL) {
-        LOG_FUN_ERR("pins or type not support!");
+        AUDIO_FUNC_LOGE("pins or type not support!");
         return HDF_FAILURE;
     }
     ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.useCase,
                     NAME_LEN, useCase, strlen(useCase) + 1);
     if (ret != 0) {
-        LOG_FUN_ERR("strncpy_s failed!");
+        AUDIO_FUNC_LOGE("strncpy_s failed!");
         return HDF_FAILURE;
     }
     ret = strncpy_s(captureParam->captureMode.hwInfo.pathSelect.deviceInfo.deviceType,
                     NAME_LEN, deviceType, strlen(deviceType) + 1);
     if (ret != 0) {
-        LOG_FUN_ERR("strncpy_s failed!");
+        AUDIO_FUNC_LOGE("strncpy_s failed!");
         return HDF_FAILURE;
     }
     if (snprintf_s(pathName, sizeof(pathName), sizeof(pathName) - 1, "%s %s", useCase, deviceType) < 0) {
-        LOG_FUN_ERR("snprintf_s failed!");
+        AUDIO_FUNC_LOGE("snprintf_s failed!");
         return HDF_FAILURE;
     }
     if (AudioCapturePathSelGetUsecaseDevice(captureParam, pathName) < 0) {
-        LOG_FUN_ERR("AudioCapturePathSelGetUsecaseDevice failed!");
+        AUDIO_FUNC_LOGE("AudioCapturePathSelGetUsecaseDevice failed!");
         return HDF_FAILURE;
     }
     if (AudioCapturePathSelGetDevice(captureParam, deviceType) < 0) {
-        LOG_FUN_ERR("AudioCapturePathSelGetDevice failed!");
+        AUDIO_FUNC_LOGE("AudioCapturePathSelGetDevice failed!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -413,7 +413,7 @@ static int32_t AudioPathSelGetPlanCapture(struct AudioHwCaptureParam *capturePar
 static int32_t AudioRenderPathSelGetUsecaseDevice(struct AudioHwRenderParam *renderParam, const char *pathName)
 {
     if (renderParam == NULL || pathName == NULL || g_cJsonObj == NULL) {
-        LOG_FUN_ERR("AudioPathSelGetUsecaseDevice param Is NULL");
+        AUDIO_FUNC_LOGE("AudioPathSelGetUsecaseDevice param Is NULL");
         return HDF_FAILURE;
     }
     int32_t pathIndex = 0;
@@ -421,18 +421,18 @@ static int32_t AudioRenderPathSelGetUsecaseDevice(struct AudioHwRenderParam *ren
     int32_t ret;
     cJSON *pathNode = cJSON_GetObjectItem(g_cJsonObj, pathName);
     if (pathNode == NULL) {
-        LOG_FUN_ERR("AudioRenderPathSel Get Object Fail!");
+        AUDIO_FUNC_LOGE("AudioRenderPathSel Get Object Fail!");
         return HDF_FAILURE;
     }
     cJSON *pathList = pathNode->child;
     if (pathList == NULL) {
-        LOG_FUN_ERR("AudioRenderPathSel Get pathList Fail!");
+        AUDIO_FUNC_LOGE("AudioRenderPathSel Get pathList Fail!");
         return HDF_FAILURE;
     }
     while (pathList != NULL) {
         cJSON *device = cJSON_GetObjectItem(pathList, "name");
         if (device == NULL) {
-            LOG_FUN_ERR("Get Object Fail!");
+            AUDIO_FUNC_LOGE("Get Object Fail!");
             return HDF_FAILURE;
         }
         pathKey = device->valuestring;
@@ -448,14 +448,14 @@ static int32_t AudioRenderPathSelGetUsecaseDevice(struct AudioHwRenderParam *ren
         ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.pathPlan[pathIndex].pathPlanName,
                         PATHPLAN_LEN, pathKey, strlen(pathKey));
         if (ret != 0) {
-            LOG_FUN_ERR("strncpy_s is Fail!");
+            AUDIO_FUNC_LOGE("strncpy_s is Fail!");
             return HDF_FAILURE;
         }
         pathList = pathList->next;
         pathIndex++;
     }
     if (pathIndex >= PATHPLAN_COUNT || pathIndex < 0) {
-        LOG_FUN_ERR("AudioRenderPathSel Get Object Fail!");
+        AUDIO_FUNC_LOGE("AudioRenderPathSel Get Object Fail!");
         return HDF_FAILURE;
     }
     renderParam->renderMode.hwInfo.pathSelect.useCaseDeviceNum = pathIndex;
@@ -465,7 +465,7 @@ static int32_t AudioRenderPathSelGetUsecaseDevice(struct AudioHwRenderParam *ren
 static int32_t AudioRenderPathSelGetDevice(struct AudioHwRenderParam *renderParam, const char *deviceType)
 {
     if (renderParam == NULL || deviceType == NULL || g_cJsonObj == NULL) {
-        LOG_FUN_ERR("AudioPathSelGetDevice param Is NULL");
+        AUDIO_FUNC_LOGE("AudioPathSelGetDevice param Is NULL");
         return HDF_FAILURE;
     }
     char *decKey = NULL;
@@ -473,18 +473,18 @@ static int32_t AudioRenderPathSelGetDevice(struct AudioHwRenderParam *renderPara
     int32_t ret;
     cJSON *deviceNode = cJSON_GetObjectItem(g_cJsonObj, deviceType);
     if (deviceNode == NULL) {
-        LOG_FUN_ERR("Get Object Fail!");
+        AUDIO_FUNC_LOGE("Get Object Fail!");
         return HDF_FAILURE;
     }
     cJSON *deviceList = deviceNode->child;
     if (deviceList == NULL) {
-        LOG_FUN_ERR("deviceList is NULL!");
+        AUDIO_FUNC_LOGE("deviceList is NULL!");
         return HDF_FAILURE;
     }
     while (deviceList != NULL) {
         cJSON *device = cJSON_GetObjectItem(deviceList, "name");
         if (device == NULL) {
-            LOG_FUN_ERR("Get Object Invalid!");
+            AUDIO_FUNC_LOGE("Get Object Invalid!");
             return HDF_FAILURE;
         }
         decKey = device->valuestring;
@@ -500,14 +500,14 @@ static int32_t AudioRenderPathSelGetDevice(struct AudioHwRenderParam *renderPara
         ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceSwitchs[decIndex].deviceSwitch,
                         PATHPLAN_LEN, decKey, strlen(decKey) + 1);
         if (ret != 0) {
-            LOG_FUN_ERR("strncpy_s is Fail!");
+            AUDIO_FUNC_LOGE("strncpy_s is Fail!");
             return HDF_FAILURE;
         }
         deviceList = deviceList->next;
         decIndex++;
     }
     if (decIndex >= PATHPLAN_COUNT || decIndex < 0) {
-        LOG_FUN_ERR("Get Object Fail!");
+        AUDIO_FUNC_LOGE("Get Object Fail!");
         return HDF_FAILURE;
     }
     renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceNum = decIndex;
@@ -516,47 +516,47 @@ static int32_t AudioRenderPathSelGetDevice(struct AudioHwRenderParam *renderPara
 
 static int32_t AudioPathSelGetPlanRender(struct AudioHwRenderParam *renderParam)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret;
     if (renderParam == NULL) {
-        LOG_FUN_ERR("AudioPathSelGetPlanRender param Is NULL");
+        AUDIO_FUNC_LOGE("AudioPathSelGetPlanRender param Is NULL");
         return HDF_FAILURE;
     }
     char pathName[PATH_NAME_LEN] = {0};
     enum AudioPortPin pins = renderParam->renderMode.hwInfo.deviceDescript.pins;
     if (pins >= PATH_DEV_MID) {
-        LOG_FUN_ERR("deviceDescript pins error!");
+        AUDIO_FUNC_LOGE("deviceDescript pins error!");
         return HDF_FAILURE;
     }
     enum AudioCategory type = renderParam->frameRenderMode.attrs.type;
     const char *useCase = AudioPathSelGetUseCase(type);
     const char *deviceType = AudioPathSelGetDeviceType(pins);
     if (useCase == NULL || deviceType == NULL) {
-        LOG_FUN_ERR("pins or type not support!");
+        AUDIO_FUNC_LOGE("pins or type not support!");
         return HDF_FAILURE;
     }
     ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.useCase,
                     NAME_LEN, useCase, strlen(useCase) + 1);
     if (ret != 0) {
-        LOG_FUN_ERR("strncpy_s is Fail!");
+        AUDIO_FUNC_LOGE("strncpy_s is Fail!");
         return HDF_FAILURE;
     }
     ret = strncpy_s(renderParam->renderMode.hwInfo.pathSelect.deviceInfo.deviceType,
                     NAME_LEN, deviceType, strlen(deviceType) + 1);
     if (ret != 0) {
-        LOG_FUN_ERR("strncpy_s is Fail!");
+        AUDIO_FUNC_LOGE("strncpy_s is Fail!");
         return HDF_FAILURE;
     }
     if (snprintf_s(pathName, sizeof(pathName), sizeof(pathName) - 1, "%s %s", useCase, deviceType) < 0) {
-        LOG_FUN_ERR("snprintf_s failed!");
+        AUDIO_FUNC_LOGE("snprintf_s failed!");
         return HDF_FAILURE;
     }
     if (AudioRenderPathSelGetUsecaseDevice(renderParam, pathName) < 0) {
-        LOG_FUN_ERR("AudioRenderPathSelGetUsecaseDevice failed!");
+        AUDIO_FUNC_LOGE("AudioRenderPathSelGetUsecaseDevice failed!");
         return HDF_FAILURE;
     }
     if (AudioRenderPathSelGetDevice(renderParam, deviceType) < 0) {
-        LOG_FUN_ERR("AudioRenderPathSelGetDevice failed!");
+        AUDIO_FUNC_LOGE("AudioRenderPathSelGetDevice failed!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -564,9 +564,9 @@ static int32_t AudioPathSelGetPlanRender(struct AudioHwRenderParam *renderParam)
 
 int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdaptType adaptType)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (adaptType < 0 || adapterParam == NULL) {
-        LOG_FUN_ERR("Param Invalid!");
+        AUDIO_FUNC_LOGE("Param Invaild!");
         return HDF_FAILURE;
     }
     struct AudioHwRenderParam *renderParam = NULL;
@@ -588,7 +588,7 @@ int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdapt
             captureScenceCheck = (struct AudioHwCaptureParam *)adapterParam;
             return (AudioPathSelGetPlanCaptureScene(captureScenceCheck));
         default:
-            LOG_FUN_ERR("Path select mode invalid");
+            AUDIO_FUNC_LOGE("Path select mode invalid");
             break;
     }
     return HDF_FAILURE;

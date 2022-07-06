@@ -30,13 +30,13 @@ static void *g_mpiInitSo = NULL;
 
 void AudioHdiPrimaryServerRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: enter!", __func__);
+    AUDIO_FUNC_LOGI("enter!");
     /* g_renderAndCaptureManage release */
     AdaptersServerManageInfomationRecycle();
     ReleaseAudioManagerObjectComm(GetAudioManagerFuncs());
 
     if (deviceObject == NULL) {
-        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
+        AUDIO_FUNC_LOGE("deviceObject is null!");
         return;
     }
     deviceObject->service = NULL;
@@ -51,15 +51,15 @@ void AudioHdiPrimaryServerRelease(struct HdfDeviceObject *deviceObject)
     mpiExit();
     dlclose(g_mpiInitSo);
 #endif
-    HDF_LOGD("%{public}s: end!", __func__);
+    AUDIO_FUNC_LOGD("end!");
     return;
 }
 
 int AudioHdiPrimaryServerBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: enter!", __func__);
+    AUDIO_FUNC_LOGI("enter!");
     if (deviceObject == NULL) {
-        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
+        AUDIO_FUNC_LOGE("deviceObject is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     static struct IDeviceIoService hdiService = {
@@ -73,20 +73,20 @@ int AudioHdiPrimaryServerBind(struct HdfDeviceObject *deviceObject)
     }
     int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.audio_service");
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: failed to set interface desc", __func__);
+        AUDIO_FUNC_LOGE("failed to set interface desc");
         return ret;
     }
     deviceObject->service = &hdiService;
 
-    HDF_LOGD("%{public}s: end!", __func__);
+    AUDIO_FUNC_LOGD("end!");
     return AUDIO_HAL_SUCCESS;
 }
 
 int AudioHdiPrimaryServerInit(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: enter!", __func__);
+    AUDIO_FUNC_LOGI("enter!");
     if (deviceObject == NULL) {
-        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
+        AUDIO_FUNC_LOGE("deviceObject is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 #ifdef AUDIO_HAL_USER
@@ -104,7 +104,7 @@ int AudioHdiPrimaryServerInit(struct HdfDeviceObject *deviceObject)
     sdkInitSp();
 #endif
     if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO)) {
-        HDF_LOGE("%{public}s: Set Primary DEVICE_CLASS_AUDIO fail!", __func__);
+        AUDIO_FUNC_LOGE("Set Primary DEVICE_CLASS_AUDIO fail!");
     }
     struct AudioEvent audioSrvEvent = {
         .eventType = HDF_AUDIO_SERVICE_VALID,
@@ -112,7 +112,7 @@ int AudioHdiPrimaryServerInit(struct HdfDeviceObject *deviceObject)
     };
     AudioServiceStateChange(deviceObject, &audioSrvEvent);
 
-    HDF_LOGD("%{public}s: end!", __func__);
+    AUDIO_FUNC_LOGD("end!");
     return AUDIO_HAL_SUCCESS;
 }
 

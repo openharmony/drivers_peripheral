@@ -115,7 +115,7 @@ int32_t InitCardIns(void)
         g_audioCardIns = (struct AudioCardInfo *)calloc(MAX_CARD_NUM,
             sizeof(struct AudioCardInfo));
         if (g_audioCardIns == NULL) {
-            LOG_FUN_ERR("Failed to allocate memory!");
+            AUDIO_FUNC_LOGE("Failed to allocate memory!");
             return HDF_FAILURE;
         }
     }
@@ -129,12 +129,12 @@ static struct AudioCardInfo *AddCardIns(const char *cardName)
     int32_t ret;
 
     if (cardName == NULL || strlen(cardName) == 0) {
-        LOG_FUN_ERR("Invalid cardName!");
+        AUDIO_FUNC_LOGE("Invalid cardName!");
         return NULL;
     }
 
     if (g_audioCardIns == NULL) {
-        LOG_FUN_ERR("g_audioCardIns is NULL!");
+        AUDIO_FUNC_LOGE("g_audioCardIns is NULL!");
         return NULL;
     }
 
@@ -144,14 +144,14 @@ static struct AudioCardInfo *AddCardIns(const char *cardName)
             ret = strncpy_s(g_audioCardIns[i].cardName,
                             MAX_CARD_NAME_LEN + 1, cardName, strlen(cardName));
             if (ret != 0) {
-                LOG_FUN_ERR("strncpy_s failed!");
+                AUDIO_FUNC_LOGE("strncpy_s failed!");
                 return NULL;
             }
             g_audioCardIns[i].cardStatus++;
             return &(g_audioCardIns[i]);
         }
     }
-    LOG_FUN_ERR("Failed to AddCardIns!");
+    AUDIO_FUNC_LOGE("Failed to AddCardIns!");
 
     return NULL;
 }
@@ -161,12 +161,12 @@ static struct AudioCardInfo *FindCardIns(const char *cardName)
     int32_t i;
 
     if (cardName == NULL || strlen(cardName) == 0) {
-        LOG_FUN_ERR("Invalid cardName!");
+        AUDIO_FUNC_LOGE("Invalid cardName!");
         return NULL;
     }
 
     if (g_audioCardIns == NULL) {
-        LOG_FUN_ERR("g_audioCardIns is NULL!");
+        AUDIO_FUNC_LOGE("g_audioCardIns is NULL!");
         return NULL;
     }
 
@@ -184,7 +184,7 @@ static int32_t AudioAddCardIns(const char *cardName)
     struct AudioCardInfo *cardInfo = NULL;
 
     if (cardName == NULL) {
-        LOG_FUN_ERR("Invalid cardName!");
+        AUDIO_FUNC_LOGE("Invalid cardName!");
         return HDF_FAILURE;
     }
 
@@ -192,7 +192,7 @@ static int32_t AudioAddCardIns(const char *cardName)
     if (cardInfo == NULL) {
         cardInfo = AddCardIns(cardName);
         if (cardInfo == NULL) {
-            LOG_FUN_ERR("AddCardIns failed!");
+            AUDIO_FUNC_LOGE("AddCardIns failed!");
             return HDF_FAILURE;
         }
     }
@@ -203,7 +203,7 @@ static int32_t AudioAddCardIns(const char *cardName)
 struct AudioCardInfo *GetCardIns(const char *cardName)
 {
     if (cardName == NULL) {
-        LOG_FUN_ERR("Invalid cardName!");
+        AUDIO_FUNC_LOGE("Invalid cardName!");
         return NULL;
     }
 
@@ -214,7 +214,7 @@ void CheckCardStatus(struct AudioCardInfo *cardIns)
 {
     int32_t ret;
     if (cardIns == NULL) {
-        LOG_FUN_ERR("The parameter is empty!");
+        AUDIO_FUNC_LOGE("The parameter is empty!");
         return;
     }
     if (cardIns->cardStatus > 0) {
@@ -224,14 +224,14 @@ void CheckCardStatus(struct AudioCardInfo *cardIns)
         if (cardIns->renderPcmHandle != NULL) {
             ret = snd_pcm_close(cardIns->renderPcmHandle);
             if (ret < 0) {
-                LOG_FUN_ERR("snd_pcm_close fail: %{public}s", snd_strerror(ret));
+                AUDIO_FUNC_LOGE("snd_pcm_close fail: %{public}s", snd_strerror(ret));
             }
             cardIns->renderPcmHandle = NULL;
         }
         if (cardIns->capturePcmHandle != NULL) {
             ret = snd_pcm_close(cardIns->capturePcmHandle);
             if (ret < 0) {
-                LOG_FUN_ERR("snd_pcm_close fail: %{public}s", snd_strerror(ret));
+                AUDIO_FUNC_LOGE("snd_pcm_close fail: %{public}s", snd_strerror(ret));
             }
             cardIns->capturePcmHandle = NULL;
         }
@@ -246,7 +246,7 @@ int32_t DestroyCardList(void)
     if (g_audioCardIns != NULL) {
         for (i = 0; i < MAX_CARD_NUM; i++) {
             if (g_audioCardIns[i].cardStatus != 0) {
-                LOG_FUN_ERR("refCount is not zero, Sound card in use!");
+                AUDIO_FUNC_LOGE("refCount is not zero, Sound card in use!");
                 return HDF_ERR_DEVICE_BUSY;
             }
         }
@@ -264,7 +264,7 @@ static int32_t GetDevIns(struct AudioCardInfo *cardIns,
     int32_t ret;
 
     if (cardIns == NULL || cardId == NULL || pcmInfoId == NULL || strlen(cardId) == 0) {
-        LOG_FUN_ERR("The parameter is empty!");
+        AUDIO_FUNC_LOGE("The parameter is empty!");
         return HDF_FAILURE;
     }
 
@@ -275,19 +275,19 @@ static int32_t GetDevIns(struct AudioCardInfo *cardIns,
             ret = strncpy_s(cardIns->alsaDevIns[i].cardId,
                             MAX_CARD_NAME_LEN + 1, cardId, strlen(cardId));
             if (ret != 0) {
-                LOG_FUN_ERR("strncpy_s failed!");
+                AUDIO_FUNC_LOGE("strncpy_s failed!");
                 return HDF_FAILURE;
             }
             ret = strncpy_s(cardIns->alsaDevIns[i].pcmInfoId,
                             MAX_CARD_NAME_LEN + 1, pcmInfoId, strlen(pcmInfoId));
             if (ret != 0) {
-                LOG_FUN_ERR("strncpy_s failed!");
+                AUDIO_FUNC_LOGE("strncpy_s failed!");
                 return HDF_FAILURE;
             }
             return HDF_SUCCESS;
         }
     }
-    LOG_FUN_ERR("A maximum of %{public}d sound cards are supported!", MAX_CARD_NUM);
+    AUDIO_FUNC_LOGE("A maximum of %{public}d sound cards are supported!", MAX_CARD_NUM);
 
     return HDF_FAILURE;
 }
@@ -302,7 +302,7 @@ int32_t CloseMixerHandle(snd_mixer_t *alsaMixHandle)
 
     ret = snd_mixer_close(alsaMixHandle);
     if (ret < 0) {
-        LOG_FUN_ERR("mixer close error: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("mixer close error: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -314,42 +314,42 @@ void InitSound(snd_mixer_t **mixer, char *hwCtlName)
     int32_t ret;
 
     if (mixer == NULL || hwCtlName == NULL) {
-        LOG_FUN_ERR("The parameter is null.");
+        AUDIO_FUNC_LOGE("The parameter is null.");
         return;
     }
 
     ret = snd_mixer_open(mixer, 0);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to open mixer: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Failed to open mixer: %{public}s.", snd_strerror(ret));
         return;
     }
 
     ret = snd_mixer_attach(*mixer, hwCtlName);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to attach mixer: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Failed to attach mixer: %{public}s.", snd_strerror(ret));
         ret = snd_mixer_close(*mixer);
         if (ret < 0) {
-            LOG_FUN_ERR("mixer close error: %{public}s.", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("mixer close error: %{public}s.", snd_strerror(ret));
         }
         return;
     }
 
     ret = snd_mixer_selem_register(*mixer, NULL, NULL);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to register mixer element: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Failed to register mixer element: %{public}s.", snd_strerror(ret));
         ret = snd_mixer_close(*mixer);
         if (ret < 0) {
-            LOG_FUN_ERR("mixer close error: %{public}s.", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("mixer close error: %{public}s.", snd_strerror(ret));
         }
         return;
     }
 
     ret = snd_mixer_load(*mixer);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to load mixer element: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Failed to load mixer element: %{public}s.", snd_strerror(ret));
         ret = snd_mixer_close(*mixer);
         if (ret < 0) {
-            LOG_FUN_ERR("mixer close error: %{public}s.", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("mixer close error: %{public}s.", snd_strerror(ret));
         }
         return;
     }
@@ -369,14 +369,14 @@ static void GetDevCardsInfo(snd_ctl_t *handle, snd_ctl_card_info_t *info,
     int32_t ret;
 
     if (handle == NULL || info == NULL || pcmInfo == NULL || cardIns == NULL) {
-        LOG_FUN_ERR("The parameter is empty.");
+        AUDIO_FUNC_LOGE("The parameter is empty.");
         return;
     }
 
     while (1) {
         ret = snd_ctl_pcm_next_device(handle, &dev);
         if (ret < 0) {
-            LOG_FUN_ERR("snd_ctl_pcm_next_device error: %{public}s.", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("snd_ctl_pcm_next_device error: %{public}s.", snd_strerror(ret));
         }
         if (dev < 0) {
             break;
@@ -387,7 +387,7 @@ static void GetDevCardsInfo(snd_ctl_t *handle, snd_ctl_card_info_t *info,
         snd_pcm_info_set_stream(pcmInfo, cardStream.stream);
         if ((ret = snd_ctl_pcm_info(handle, pcmInfo)) < 0) {
             if (ret != -ENOENT) {
-                LOG_FUN_ERR("control digital audio info (%{public}d): %{public}s",
+                AUDIO_FUNC_LOGE("control digital audio info (%{public}d): %{public}s",
                     cardStream.card, snd_strerror(ret));
             }
             continue;
@@ -397,7 +397,7 @@ static void GetDevCardsInfo(snd_ctl_t *handle, snd_ctl_card_info_t *info,
         const char *pcmInfoId = snd_pcm_info_get_id(pcmInfo);
         ret = GetDevIns(cardIns, cardStream.card, cardId, dev, pcmInfoId);
         if (ret < 0) {
-            LOG_FUN_ERR("GetDevIns error.");
+            AUDIO_FUNC_LOGE("GetDevIns error.");
             return;
         }
     }
@@ -414,7 +414,7 @@ void GetDeviceList(struct AudioCardInfo *cardIns, snd_pcm_stream_t stream)
     struct CardStream cardStream;
 
     if (cardIns == NULL) {
-        LOG_FUN_ERR("The parameter is empty.");
+        AUDIO_FUNC_LOGE("The parameter is empty.");
         return;
     }
     snd_ctl_card_info_alloca(&info);
@@ -422,14 +422,14 @@ void GetDeviceList(struct AudioCardInfo *cardIns, snd_pcm_stream_t stream)
 
     ret = snd_card_next(&card);
     if (ret < 0 || card < 0) {
-        LOG_FUN_ERR("No soundcards found: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("No soundcards found: %{public}s.", snd_strerror(ret));
         return;
     }
     while (card >= 0) {
         (void)memset_s(deviceName, MAX_CARD_NAME_LEN, 0, MAX_CARD_NAME_LEN);
         ret = snprintf_s(deviceName, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1, "hw:%d", card);
         if (ret < 0) {
-            LOG_FUN_ERR("snprintf_s failed");
+            AUDIO_FUNC_LOGE("snprintf_s failed");
             return;
         }
 
@@ -443,14 +443,14 @@ void GetDeviceList(struct AudioCardInfo *cardIns, snd_pcm_stream_t stream)
             }
             ret = snd_ctl_close(handle);
             if (ret < 0) {
-                LOG_FUN_ERR("mixer close error: %{public}s.", snd_strerror(ret));
+                AUDIO_FUNC_LOGE("mixer close error: %{public}s.", snd_strerror(ret));
                 return;
             }
         }
 
         ret = snd_card_next(&card);
         if (ret < 0) {
-            LOG_FUN_ERR("snd_card_next error: %{public}s", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("snd_card_next error: %{public}s", snd_strerror(ret));
             return;
         }
     }
@@ -461,7 +461,7 @@ int32_t GetSelCardInfo(struct AudioCardInfo *cardIns, struct AlsaDevInfo *devIns
     int32_t ret;
 
     if (cardIns == NULL || devInsHandle == NULL) {
-        LOG_FUN_ERR("The parameter is empty.");
+        AUDIO_FUNC_LOGE("The parameter is empty.");
         return HDF_FAILURE;
     }
 
@@ -478,7 +478,7 @@ int32_t GetSelCardInfo(struct AudioCardInfo *cardIns, struct AlsaDevInfo *devIns
             }
         }
     }
-    LOG_FUN_ERR("snprintf_s failed");
+    AUDIO_FUNC_LOGE("snprintf_s failed");
 
     return HDF_FAILURE;
 }
@@ -489,7 +489,7 @@ static int32_t GetPrimaryCardInfo(struct AudioCardInfo *cardIns)
     int32_t ret;
 
     if (cardIns == NULL) {
-        LOG_FUN_ERR("The parameter is empty.");
+        AUDIO_FUNC_LOGE("The parameter is empty.");
         return HDF_FAILURE;
     }
 
@@ -498,7 +498,7 @@ static int32_t GetPrimaryCardInfo(struct AudioCardInfo *cardIns)
         if (strcmp(CODEC_CARD_ID, cardIns->alsaDevIns[i].cardId) == 0) {
             ret = GetSelCardInfo(cardIns, &cardIns->alsaDevIns[i]);
             if (ret != HDF_SUCCESS) {
-                LOG_FUN_ERR("GetSelCardInfo error.");
+                AUDIO_FUNC_LOGE("GetSelCardInfo error.");
             }
             return ret;
         }
@@ -513,7 +513,7 @@ static int32_t GetUsbCardInfo(struct AudioCardInfo *cardIns)
     int32_t ret;
 
     if (cardIns == NULL) {
-        LOG_FUN_ERR("The parameter is empty.");
+        AUDIO_FUNC_LOGE("The parameter is empty.");
         return HDF_FAILURE;
     }
 
@@ -522,7 +522,7 @@ static int32_t GetUsbCardInfo(struct AudioCardInfo *cardIns)
         if (strcmp(USB_AUDIO, cardIns->alsaDevIns[i].pcmInfoId) == 0) {
             ret = GetSelCardInfo(cardIns, &cardIns->alsaDevIns[i]);
             if (ret != HDF_SUCCESS) {
-                LOG_FUN_ERR("GetSelCardInfo error.");
+                AUDIO_FUNC_LOGE("GetSelCardInfo error.");
             }
             return ret;
         }
@@ -536,27 +536,27 @@ int32_t MatchSelAdapter(const char *adapterName, struct AudioCardInfo *cardIns)
     int32_t ret;
 
     if (adapterName == NULL || cardIns == NULL) {
-        LOG_FUN_ERR("The parameter is empty.");
+        AUDIO_FUNC_LOGE("The parameter is empty.");
         return HDF_FAILURE;
     }
 
     if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
         ret = GetPrimaryCardInfo(cardIns);
         if (ret < 0) {
-            LOG_FUN_ERR("GetPrimaryCardInfo error.");
+            AUDIO_FUNC_LOGE("GetPrimaryCardInfo error.");
             return HDF_FAILURE;
         }
     } else if (strncmp(adapterName, USB, strlen(USB)) == 0) {
         ret = GetUsbCardInfo(cardIns);
         if (ret < 0) {
-            LOG_FUN_ERR("GetPrimaryCardInfo error.");
+            AUDIO_FUNC_LOGE("GetPrimaryCardInfo error.");
             return HDF_FAILURE;
         }
     } else if (strncmp(adapterName, A2DP, strlen(A2DP)) == 0) {
-        LOG_FUN_ERR("Currently not supported A2DP, please check!");
+        AUDIO_FUNC_LOGE("Currently not supported A2DP, please check!");
         return HDF_ERR_NOT_SUPPORT;
     } else {
-        LOG_FUN_ERR("The selected sound card not find, please check!");
+        AUDIO_FUNC_LOGE("The selected sound card not find, please check!");
         return HDF_FAILURE;
     }
 
@@ -572,7 +572,7 @@ snd_mixer_elem_t *AudioUsbFindElement(snd_mixer_t *mixer)
     char *mixerCtlName = NULL;
 
     if (mixer == NULL) {
-        LOG_FUN_ERR("The parameter is NULL!");
+        AUDIO_FUNC_LOGE("The parameter is NULL!");
         return NULL;
     }
 
@@ -598,7 +598,7 @@ static snd_mixer_elem_t *AudioFindElement(const char *mixerCtlName, snd_mixer_el
     int32_t maxLoop = MAX_ELEMENT;
 
     if (mixerCtlName == NULL || element == NULL) {
-        LOG_FUN_ERR("The parameter is NULL!");
+        AUDIO_FUNC_LOGE("The parameter is NULL!");
         return NULL;
     }
 
@@ -613,7 +613,7 @@ static snd_mixer_elem_t *AudioFindElement(const char *mixerCtlName, snd_mixer_el
     }
 
     if (element == NULL || maxLoop < 0) {
-        LOG_FUN_ERR("snd_mixer_find_selem Err\n");
+        AUDIO_FUNC_LOGE("snd_mixer_find_selem Err\n");
         return NULL;
     }
 
@@ -626,7 +626,7 @@ int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *p
     const char *mixerCtrlRightVolName = "DACR";
 
     if (cardIns == NULL || pcmElement == NULL) {
-        LOG_FUN_ERR("The parameter is empty.");
+        AUDIO_FUNC_LOGE("The parameter is empty.");
         return HDF_FAILURE;
     }
 
@@ -644,23 +644,23 @@ int32_t AudioMixerSetCtrlMode(struct AudioCardInfo *cardIns,
     snd_ctl_elem_value_t *ctlElemValue = NULL;
 
     if (cardIns == NULL || adapterName == NULL || mixerCtrlName == NULL) {
-        LOG_FUN_ERR("AudioCtlRenderSetVolume parameter is NULL!");
+        AUDIO_FUNC_LOGE("AudioCtlRenderSetVolume parameter is NULL!");
         return HDF_FAILURE;
     }
 
     if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
         ret = snd_ctl_open(&alsaHandle, cardIns->ctrlName, 0);
         if (ret < 0) {
-            LOG_FUN_ERR("snd_ctl_open error: %{public}s", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("snd_ctl_open error: %{public}s", snd_strerror(ret));
             return HDF_FAILURE;
         }
 
         ret = snd_ctl_elem_value_malloc(&ctlElemValue);
         if (ret < 0) {
-            LOG_FUN_ERR("snd_ctl_elem_value_malloc error: %{public}s", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("snd_ctl_elem_value_malloc error: %{public}s", snd_strerror(ret));
             ret = snd_ctl_close(alsaHandle);
             if (ret < 0) {
-                LOG_FUN_ERR("snd_ctl_close error: %{public}s", snd_strerror(ret));
+                AUDIO_FUNC_LOGE("snd_ctl_close error: %{public}s", snd_strerror(ret));
             }
             return HDF_FAILURE;
         }
@@ -671,18 +671,18 @@ int32_t AudioMixerSetCtrlMode(struct AudioCardInfo *cardIns,
         snd_ctl_elem_value_set_integer(ctlElemValue, 0, item);
         ret = snd_ctl_elem_write(alsaHandle, ctlElemValue);
         if (ret < 0) {
-            LOG_FUN_ERR("snd_ctl_elem_write error: %{public}s", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("snd_ctl_elem_write error: %{public}s", snd_strerror(ret));
             snd_ctl_elem_value_free(ctlElemValue);
             ret = snd_ctl_close(alsaHandle);
             if (ret < 0) {
-                LOG_FUN_ERR("snd_ctl_close error: %{public}s", snd_strerror(ret));
+                AUDIO_FUNC_LOGE("snd_ctl_close error: %{public}s", snd_strerror(ret));
             }
             return HDF_FAILURE;
         }
         snd_ctl_elem_value_free(ctlElemValue);
         ret = snd_ctl_close(alsaHandle);
         if (ret < 0) {
-            LOG_FUN_ERR("snd_ctl_close error: %{public}s", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("snd_ctl_close error: %{public}s", snd_strerror(ret));
             return HDF_FAILURE;
         }
     }
@@ -696,33 +696,33 @@ struct AudioCardInfo *AudioGetCardInfo(const char *adapterName, snd_pcm_stream_t
     struct AudioCardInfo *cardIns = NULL;
 
     if (adapterName == NULL) {
-        LOG_FUN_ERR("The parameter is empty.");
+        AUDIO_FUNC_LOGE("The parameter is empty.");
         return NULL;
     }
 
     ret = InitCardIns();
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Failed to initialize sound card information.");
+        AUDIO_FUNC_LOGE("Failed to initialize sound card information.");
         return NULL;
     }
 
     ret = AudioAddCardIns(adapterName);
     if (ret < 0) {
-        LOG_FUN_ERR("AudioAddCardIns failed.");
+        AUDIO_FUNC_LOGE("AudioAddCardIns failed.");
         (void)DestroyCardList();
         return NULL;
     }
 
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("The cardIns is empty.");
+        AUDIO_FUNC_LOGE("The cardIns is empty.");
         (void)DestroyCardList();
         return NULL;
     }
 
     GetDeviceList(cardIns, stream);
     if (MatchSelAdapter(adapterName, cardIns) < 0) {
-        LOG_FUN_ERR("MatchSelAdapter is error.");
+        AUDIO_FUNC_LOGE("MatchSelAdapter is error.");
         CheckCardStatus(cardIns);
         (void)DestroyCardList();
         return NULL;
@@ -734,7 +734,7 @@ struct AudioCardInfo *AudioGetCardInfo(const char *adapterName, snd_pcm_stream_t
 int32_t CheckParaFormat(struct AudioPcmHwParams hwParams, snd_pcm_format_t *alsaPcmFormat)
 {
     if (alsaPcmFormat == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        AUDIO_FUNC_LOGE("paras is NULL!");
         return HDF_FAILURE;
     }
     enum AudioFormat audioFormat = hwParams.format;
