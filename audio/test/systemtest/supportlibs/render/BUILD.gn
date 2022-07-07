@@ -77,7 +77,7 @@ if (defined(ohos_lite)) {
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "../../common/lib_common/src/audio_lib_common.cpp",
     ]
-    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+    if (drivers_peripheral_audio_alsa_lib) {
       sources += [ "src/audio_alsa_librender_test.cpp" ]
     } else {
       sources += [ "src/audio_librender_test.cpp" ]
