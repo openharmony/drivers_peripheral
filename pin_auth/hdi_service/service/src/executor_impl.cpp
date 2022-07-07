@@ -175,6 +175,18 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, con
         CallError(callbackObj, HDF_FAILURE);
         return result;
     }
+    OHOS::UserIAM::PinAuth::PinCredentialInfo infoRet = {};
+    result = pinHdi_->QueryPinInfo(templateId, infoRet);
+    if (result != SUCCESS) {
+        IAM_LOGE("Get TemplateInfo failed, fail code : %{public}d", result);
+        CallError(callbackObj, HDF_FAILURE);
+        return result;
+    }
+    if (infoRet.remainTimes == 0 || infoRet.freezingTime > 0) {
+        IAM_LOGE("Pin authentication is now frozen state");
+        CallError(callbackObj, HDF_FAILURE);
+        return HDF_FAILURE;
+    }
     result = callbackObj->OnGetData(scheduleId, salt, 0);
     if (result != SUCCESS) {
         IAM_LOGE("Authenticate Pin failed, fail code : %{public}d", result);
