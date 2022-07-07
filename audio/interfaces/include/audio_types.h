@@ -424,6 +424,7 @@ enum AudioExtParamKey {
     AUDIO_EXT_PARAM_KEY_FOCUS = 2,    /**< Distributed audio extra param key focus event */
     AUDIO_EXT_PARAM_KEY_BUTTON = 3,   /**< Distributed audio extra param key media button event */
     AUDIO_EXT_PARAM_KEY_EFFECT = 4,   /**< Distributed audio extra param key audio effect event */
+    AUDIO_EXT_PARAM_KEY_STATUS = 5,   /**< Distributed audio extra param key device status event */
     AUDIO_EXT_PARAM_KEY_LOWPOWER = 1000, /**< Low power event type */
 };
 
