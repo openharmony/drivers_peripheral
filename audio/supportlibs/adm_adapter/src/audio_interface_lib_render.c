@@ -1354,7 +1354,7 @@ int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
             return HDF_FAILURE;
         }
         if (buffStatus == CIR_BUFF_FULL) {
-            AUDIO_FUNC_LOGI("Cir buff fulled wait 10ms");
+            AUDIO_FUNC_LOGD("Cir buff fulled wait 10ms");
             (void)AudioCallbackModeStatus(handleData, AUDIO_RENDER_FULL);
             tryNum--;
             usleep(AUDIO_WAIT_DELAY);
@@ -1437,7 +1437,6 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
     }
     int32_t ret = AudioOutputRenderWriteFrame(service, cmdId, sBuf, reply, handleData);
     if (ret != 0) {
-        AUDIO_FUNC_LOGE("AudioOutputRenderWriteFrame is Fail!");
         return HDF_FAILURE;
     }
 #endif

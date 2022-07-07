@@ -1186,7 +1186,7 @@ int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, str
             return HDF_FAILURE;
         }
         if (buffStatus == CIR_BUFF_EMPTY) {
-            AUDIO_FUNC_LOGI("Cir buff empty wait 50ms");
+            AUDIO_FUNC_LOGD("Cir buff empty wait 50ms");
             tryNumReply--;
             HdfSbufFlush(reply);
             // wait (5 + tryNum)ms when buff empty
@@ -1329,7 +1329,6 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
     }
     int32_t ret = AudioOutputCaptureReadFrame(service, cmdId, reply);
     if (ret != 0) {
-        AUDIO_FUNC_LOGE("AudioOutputCaptureReadFrame is invalid!");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadBuffer(reply, (const void **)&frame, &dataSize)) {
@@ -1655,7 +1654,6 @@ void AudioCloseServiceCapture(const struct DevHandleCapture *handle)
 int32_t AudioInterfaceLibModeCapture(const struct DevHandleCapture *handle,
     struct AudioHwCaptureParam *handleData, int cmdId)
 {
-    AUDIO_FUNC_LOGI();
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("paras is NULL!");
         return HDF_FAILURE;
