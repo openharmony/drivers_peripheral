@@ -857,7 +857,6 @@ int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
     }
     hwRender->renderParam.frameRenderMode.bufferFrameSize = (uint64_t)frameCount;
     if (AudioRenderRenderFramSplit(hwRender) < 0) {
-        AUDIO_FUNC_LOGE("AudioRenderRenderFramSplit failed");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     *replyBytes = requestBytes;
