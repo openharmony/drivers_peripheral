@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
+#include "hdf_audio_events.h"
 #include <stdlib.h>
 #include <string.h>
 #include "securec.h"
 #include "hdf_base.h"
-#include "hdf_log.h"
-#include "hdf_audio_events.h"
+#include "audio_hal_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_HOST
 
@@ -31,15 +31,15 @@ int32_t AudioPnpMsgReadValue(const char *pnpInfo, const char *typeName, uint32_t
     char *outTemp = NULL;
 
     if (pnpInfo == NULL || typeName == NULL || value == NULL) {
-        HDF_LOGE("%{public}s: pnpInfo || typeName || value is null!", __func__);
+        AUDIO_FUNC_LOGE("pnpInfo || typeName || value is null!");
         return HDF_FAILURE;
     }
     if (strlen(pnpInfo) > AUDIO_PNP_MSG_LEN_MAX || strlen(typeName) > AUDIO_PNP_MSG_LEN_MAX) {
-        HDF_LOGE("%{public}s: pnpInfo or typeName length error!", __func__);
+        AUDIO_FUNC_LOGE("pnpInfo or typeName length error!");
         return HDF_FAILURE;
     }
     if (memcpy_s(pnpInfoTemp, AUDIO_PNP_MSG_LEN_MAX, pnpInfo, strlen(pnpInfo)) != 0) {
-        HDF_LOGE("%{public}s: memcpy_s info fail!", __func__);
+        AUDIO_FUNC_LOGE("memcpy_s info fail!");
         return HDF_FAILURE;
     }
     typeNameTepm = strtok_s(pnpInfoTemp, ";", &outTemp);

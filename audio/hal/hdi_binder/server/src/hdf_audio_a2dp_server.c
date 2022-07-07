@@ -22,24 +22,24 @@
 
 void AudioHdiA2dpServerRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: enter!", __func__);
+    AUDIO_FUNC_LOGI("enter!");
     /* g_renderAndCaptureManage release */
     AdaptersServerManageInfomationRecycle();
 
     if (deviceObject == NULL) {
-        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
+        AUDIO_FUNC_LOGE("deviceObject is null!");
         return;
     }
     deviceObject->service = NULL;
-    HDF_LOGD("%{public}s: end!", __func__);
+    AUDIO_FUNC_LOGD("end!");
     return;
 }
 
 int AudioHdiA2dpServerBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: enter!", __func__);
+    AUDIO_FUNC_LOGI("enter!");
     if (deviceObject == NULL) {
-        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
+        AUDIO_FUNC_LOGE("deviceObject is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     static struct IDeviceIoService hdiService = {
@@ -53,27 +53,27 @@ int AudioHdiA2dpServerBind(struct HdfDeviceObject *deviceObject)
     }
     int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.audio_service");
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("failed to set interface desc");
+        AUDIO_FUNC_LOGE("failed to set interface desc");
         return ret;
     }
     deviceObject->service = &hdiService;
 
-    HDF_LOGD("%{public}s: end!", __func__);
+    AUDIO_FUNC_LOGD("end!");
     return AUDIO_HAL_SUCCESS;
 }
 
 int AudioHdiA2dpServerInit(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: enter!", __func__);
+    AUDIO_FUNC_LOGI("enter!");
     if (deviceObject == NULL) {
-        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
+        AUDIO_FUNC_LOGE("deviceObject is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO)) {
-        HDF_LOGE("%{public}s: Set A2dp DEVICE_CLASS_AUDIO fail!", __func__);
+        AUDIO_FUNC_LOGE("Set A2dp DEVICE_CLASS_AUDIO fail!");
     }
 
-    HDF_LOGD("%{public}s: end!", __func__);
+    AUDIO_FUNC_LOGD("end!");
     return AUDIO_HAL_SUCCESS;
 }
 

@@ -20,8 +20,8 @@
 #include <linux/netlink.h>
 #include "hdf_audio_pnp_server.h"
 #include "hdf_base.h"
-#include "hdf_log.h"
 #include "securec.h"
+#include "audio_hal_log.h"
 
 #define UEVENT_ACTION           "ACTION="
 #define UEVENT_NAME             "NAME="
@@ -76,7 +76,7 @@ struct AudioUsbPnpTag {
 static int32_t AudioUsbDeviceStateCheck(struct AudioPnpUevent *audioPnpUevent, struct AudioUsbPnpTag *pnpTag)
 {
     if (audioPnpUevent == NULL || pnpTag == NULL) {
-        HDF_LOGE("%{public}s: audioPnpUevent or pnpTag is null!", __func__);
+        AUDIO_FUNC_LOGE("audioPnpUevent or pnpTag is null!");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -93,20 +93,20 @@ static int32_t AudioUsbDigitalDeviceCheck(struct AudioPnpUevent *audioPnpUevent,
 {
     struct AudioEvent audioEvent;
     if (audioPnpUevent == NULL || pnpTag == NULL) {
-        HDF_LOGE("%{public}s: audioPnpUevent or pnpTag is null!", __func__);
+        AUDIO_FUNC_LOGE("audioPnpUevent or pnpTag is null!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (strstr(audioPnpUevent->name, UEVENT_NAME_DIGITAL_KEY) != NULL) {
         if (pnpTag->audioPnpState) {
             pnpTag->audioPnpDigitalState = AUDIO_PNP_STATE_OFF;
-            HDF_LOGI("%{public}s: USB-C DIGITAL HEADSET Online.", __func__);
+            AUDIO_FUNC_LOGI("USB-C DIGITAL HEADSET Online.");
             audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
             audioEvent.deviceType = HDF_AUDIO_USBA_HEADPHONE;
             AudioPnpUpdateAndSend(audioEvent);
         } else {
             pnpTag->audioPnpDigitalState = AUDIO_PNP_STATE_OFF;
-            HDF_LOGI("%{public}s: USB-C DIGITAL HEADSET Offline.", __func__);
+            AUDIO_FUNC_LOGI("USB-C DIGITAL HEADSET Offline.");
             audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
             audioEvent.deviceType = HDF_AUDIO_USBA_HEADPHONE;
             AudioPnpUpdateAndSend(audioEvent);
@@ -120,7 +120,7 @@ static int32_t AudioUsbAnalogDeviceCheck(struct AudioPnpUevent *audioPnpUevent, 
 {
     struct AudioEvent audioEvent;
     if (audioPnpUevent == NULL || pnpTag == NULL) {
-        HDF_LOGE("%{public}s: audioPnpUevent or pnpTag is null!", __func__);
+        AUDIO_FUNC_LOGE("audioPnpUevent or pnpTag is null!");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -131,13 +131,13 @@ static int32_t AudioUsbAnalogDeviceCheck(struct AudioPnpUevent *audioPnpUevent, 
         AUDIO_PNP_STATE_ON && pnpTag->audioPnpDigitalState != AUDIO_PNP_STATE_OFF) {
         if (strstr(audioPnpUevent->state, UEVENT_ANALOG_KEY) != NULL) {
             pnpTag->audioPnpAnalogState = AUDIO_PNP_STATE_INIT;
-            HDF_LOGI("%{public}s: USB-C ANALOG HEADSET Online.", __func__);
+            AUDIO_FUNC_LOGI("USB-C ANALOG HEADSET Online.");
             audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
             audioEvent.deviceType = HDF_AUDIO_USB_HEADPHONE;
             AudioPnpUpdateAndSend(audioEvent);
         } else if (strstr(audioPnpUevent->state, UEVENT_ANALOG_KEY) != NULL) {
             pnpTag->audioPnpAnalogState = AUDIO_PNP_STATE_INIT;
-            HDF_LOGI("%{public}s: USB-C ANALOG HEADSET Offline.", __func__);
+            AUDIO_FUNC_LOGI("USB-C ANALOG HEADSET Offline.");
             audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
             audioEvent.deviceType = HDF_AUDIO_USB_HEADPHONE;
             AudioPnpUpdateAndSend(audioEvent);
@@ -156,15 +156,15 @@ static int32_t AudioPnpUeventCompare(struct AudioPnpUevent *audioPnpUevent)
         .audioPnpDigitalState = AUDIO_PNP_STATE_INIT,
     };
     if (AudioUsbDeviceStateCheck(audioPnpUevent, &audioUsbPnpTag) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: usb status add/remove fail!", __func__);
+        AUDIO_FUNC_LOGE("usb status add/remove fail!");
         return HDF_FAILURE;
     }
     if (AudioUsbDigitalDeviceCheck(audioPnpUevent, &audioUsbPnpTag) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: usb digital headset/phone check fail!", __func__);
+        AUDIO_FUNC_LOGE("usb digital headset/phone check fail!");
         return HDF_FAILURE;
     }
     if (AudioUsbAnalogDeviceCheck(audioPnpUevent, &audioUsbPnpTag) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: usb analog headset/phone check fail!", __func__);
+        AUDIO_FUNC_LOGE("usb analog headset/phone check fail!");
         return HDF_FAILURE;
     }
 
@@ -176,13 +176,13 @@ static int32_t AudioAnalogHeadsetDeviceCheck(struct AudioPnpUevent *audioPnpUeve
     struct AudioEvent audioEvent;
     static int32_t h2wTypeLast = HDF_AUDIO_HEADSET;
     if (audioPnpUevent == NULL) {
-        HDF_LOGE("%{public}s: audioPnpUevent is null!", __func__);
+        AUDIO_FUNC_LOGE("audioPnpUevent is null!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (strncmp(audioPnpUevent->subSystem, UEVENT_SUBSYSTEM_SWITCH, strlen(UEVENT_SUBSYSTEM_SWITCH)) == 0) {
         if (strncmp(audioPnpUevent->switchName, UEVENT_SWITCH_NAME_H2W, strlen(UEVENT_SWITCH_NAME_H2W)) != 0) {
-            HDF_LOGE("%{public}s: the switch name of 'h2w' not found!", __func__);
+            AUDIO_FUNC_LOGE("the switch name of 'h2w' not found!");
             return HDF_FAILURE;
         }
         if (audioPnpUevent->switchState[0] == '0') {
@@ -201,11 +201,9 @@ static int32_t AudioAnalogHeadsetDeviceCheck(struct AudioPnpUevent *audioPnpUeve
             return HDF_FAILURE;
         }
         if (strstr(audioPnpUevent->name, UEVENT_NAME_HEADSET) == NULL) {
-            HDF_LOGE("%{public}s: don't surpport headset type, name = %{public}s!", __func__, audioPnpUevent->name);
             return HDF_FAILURE;
         }
         if (strncmp(audioPnpUevent->devType, UEVENT_TYPE_EXTCON, strlen(UEVENT_TYPE_EXTCON)) != 0) {
-            HDF_LOGE("%{public}s: don't surpport devType = %{public}s!", __func__, audioPnpUevent->devType);
             return HDF_FAILURE;
         }
         if (strstr(audioPnpUevent->state, UEVENT_STATE_ANALOG_HS0) != NULL) {
@@ -213,7 +211,6 @@ static int32_t AudioAnalogHeadsetDeviceCheck(struct AudioPnpUevent *audioPnpUeve
         } else if (strstr(audioPnpUevent->state, UEVENT_STATE_ANALOG_HS1) != NULL) {
             audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
         } else {
-            HDF_LOGE("%{public}s: don't surpport type, state = %{public}s!", __func__, audioPnpUevent->state);
             return HDF_FAILURE;
         }
         audioEvent.deviceType = HDF_AUDIO_HEADSET;
@@ -225,14 +222,14 @@ static int32_t AudioPnpUeventParse(const char *msg, const int32_t strLength)
 {
     errno_t ret;
     if (msg == NULL || strLength < 0 || strLength > UEVENT_MSG_LEN) {
-        HDF_LOGE("%{public}s: msg is null or strLength error!", __func__);
+        AUDIO_FUNC_LOGE("msg is null or strLength error!");
         return HDF_ERR_INVALID_PARAM;
     }
     char eventMsg[UEVENT_MSG_LEN] = {0};
     (void)memset_s(eventMsg, UEVENT_MSG_LEN, 0, UEVENT_MSG_LEN);
     ret = memcpy_s(eventMsg, UEVENT_MSG_LEN, msg, strLength);
     if (ret != EOK) {
-        HDF_LOGE("%{public}s: msg copy fail! ret = %{public}d", __func__, ret);
+        AUDIO_FUNC_LOGE("msg copy fail! ret = %{public}d", ret);
         return HDF_FAILURE;
     }
     struct AudioPnpUevent audioPnpUevent = {
@@ -281,7 +278,7 @@ static int AudioPnpUeventOpen(int *fd)
     int buffSize = UEVENT_SOCKET_BUFF_SIZE;
 
     if (memset_s(&addr, sizeof(addr), 0, sizeof(addr)) != EOK) {
-        HDF_LOGE("%{public}s: addr memset_s failed!", __func__);
+        AUDIO_FUNC_LOGE("addr memset_s failed!");
         return HDF_FAILURE;
     }
     addr.nl_family = AF_NETLINK;
@@ -290,16 +287,16 @@ static int AudioPnpUeventOpen(int *fd)
 
     socketfd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
     if (socketfd < 0) {
-        HDF_LOGE("%{public}s: socketfd failed! ret = %{public}d", __func__, socketfd);
+        AUDIO_FUNC_LOGE("socketfd failed! ret = %{public}d", socketfd);
         return HDF_FAILURE;
     }
 
     if (setsockopt(socketfd, SOL_SOCKET, SO_RCVBUF, &buffSize, sizeof(buffSize)) != 0) {
-        HDF_LOGE("%{public}s: setsockopt failed!", __func__);
+        AUDIO_FUNC_LOGE("setsockopt failed!");
         return HDF_FAILURE;
     }
     if (bind(socketfd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-        HDF_LOGE("%{public}s: bind socketfd failed!", __func__);
+        AUDIO_FUNC_LOGE("bind socketfd failed!");
         close(socketfd);
         return HDF_FAILURE;
     }
@@ -317,7 +314,7 @@ static void *AudioPnpUeventStart(void *useless)
     char msg[UEVENT_MSG_LEN];
     struct timeval tv;
 
-    HDF_LOGI("%{public}s: audio uevent start.", __func__);
+    AUDIO_FUNC_LOGI("audio uevent start.");
     if (AudioPnpUeventOpen(&socketfd) != HDF_SUCCESS) {
         return NULL;
     }
@@ -353,11 +350,11 @@ int32_t AudioPnpUeventStartThread(void)
     pthread_t thread;
     pthread_attr_t tidsAttr;
 
-    HDF_LOGI("%{public}s: create audio uevent thread.", __func__);
+    AUDIO_FUNC_LOGI("create audio uevent thread.");
     pthread_attr_init(&tidsAttr);
     pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
     if (pthread_create(&thread, &tidsAttr, AudioPnpUeventStart, NULL)) {
-        HDF_LOGE("%{public}s: create AudioPnpUeventStart thread failed!", __func__);
+        AUDIO_FUNC_LOGE("create AudioPnpUeventStart thread failed!");
         return HDF_FAILURE;
     }
 

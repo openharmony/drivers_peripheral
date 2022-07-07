@@ -34,19 +34,25 @@
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount)
 {
     if (frameRenderMode == NULL || frameCount == NULL) {
+        AUDIO_FUNC_LOGE("param frameRenderMode or frameCount is null!");
         return HDF_FAILURE;
     }
     uint32_t formatBits = 0;
     int32_t ret = FormatToBits(frameRenderMode->attrs.format, &formatBits);
     if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("FormatToBits failed! ret = %{public}d", ret);
         return ret;
     }
     /* channelCount Not greater than 4 , formatBits Not greater than 64 */
     if (frameRenderMode->attrs.channelCount > 4 || formatBits > 64) {
+        AUDIO_FUNC_LOGE("channelCount or formatBits check failed! channelCount = %{public}u, formatBits = %{public}u",
+            frameRenderMode->attrs.channelCount, formatBits);
         return HDF_FAILURE;
     }
     uint32_t frameSize = frameRenderMode->attrs.channelCount * (formatBits >> 3); // Bit to byte >> 3
     if (frameSize == 0) {
+        AUDIO_FUNC_LOGE("frameSize is zero! channelCount = %{public}u, formatBits = %{public}u",
+            frameRenderMode->attrs.channelCount, formatBits);
         return HDF_FAILURE;
     }
     *frameCount = (uint32_t)bytes / frameSize;
@@ -57,21 +63,21 @@ int32_t AudioRenderStart(AudioHandle handle)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
-        LOG_FUN_ERR("The pointer is null");
+        AUDIO_FUNC_LOGE("The pointer is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (!hwRender->renderParam.renderMode.ctlParam.stop) {
-        LOG_FUN_ERR("AudioRender already start!");
+        AUDIO_FUNC_LOGE("AudioRender already start!");
         return AUDIO_HAL_ERR_AO_BUSY; // render is busy now
     }
     if (hwRender->devDataHandle == NULL) {
@@ -80,7 +86,7 @@ int32_t AudioRenderStart(AudioHandle handle)
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam,
                                      AUDIO_DRV_PCM_IOCTRL_START);
     if (ret < 0) {
-        LOG_FUN_ERR("AudioRenderStart SetParams FAIL");
+        AUDIO_FUNC_LOGE("AudioRenderStart SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     hwRender->renderParam.renderMode.ctlParam.stop = false;
@@ -90,36 +96,36 @@ int32_t AudioRenderStart(AudioHandle handle)
 
 int32_t AudioRenderStop(AudioHandle handle)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
-        LOG_FUN_ERR("hwRender is invalid");
+        AUDIO_FUNC_LOGE("hwRender is invalid");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwRender->renderParam.renderMode.ctlParam.stop) {
-        LOG_FUN_ERR("Repeat invalid stop operation!");
+        AUDIO_FUNC_LOGE("Repeat invalid stop operation!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     hwRender->renderParam.renderMode.ctlParam.stop = true;
     if (hwRender->devDataHandle == NULL) {
-        LOG_FUN_ERR("RenderStart Bind Fail!");
+        AUDIO_FUNC_LOGE("RenderStart Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam,
                                      AUDIO_DRV_PCM_IOCTRL_STOP);
     hwRender->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_LATER;
     if (ret < 0) {
-        LOG_FUN_ERR("AudioRenderStop SetParams FAIL");
+        AUDIO_FUNC_LOGE("AudioRenderStop SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     AudioLogRecord(INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Render Stop");
@@ -130,29 +136,29 @@ int32_t AudioRenderPause(AudioHandle handle)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
-        LOG_FUN_ERR("hwRender is null");
+        AUDIO_FUNC_LOGE("hwRender is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwRender->renderParam.renderMode.ctlParam.stop) {
-        LOG_FUN_ERR("AudioRender already stop!");
+        AUDIO_FUNC_LOGE("AudioRender already stop!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (hwRender->renderParam.renderMode.ctlParam.pause) {
-        LOG_FUN_ERR("Audio is already pause!");
+        AUDIO_FUNC_LOGE("Audio is already pause!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     if (hwRender->devDataHandle == NULL) {
-        LOG_FUN_ERR("RenderPause Bind Fail!");
+        AUDIO_FUNC_LOGE("RenderPause Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     bool pauseStatus = hwRender->renderParam.renderMode.ctlParam.pause;
@@ -160,7 +166,7 @@ int32_t AudioRenderPause(AudioHandle handle)
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam,
                                      AUDIODRV_CTL_IOCTL_PAUSE_WRITE);
     if (ret < 0) {
-        LOG_FUN_ERR("RenderPause FAIL!");
+        AUDIO_FUNC_LOGE("RenderPause FAIL!");
         hwRender->renderParam.renderMode.ctlParam.pause = pauseStatus;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -170,10 +176,10 @@ int32_t AudioRenderPause(AudioHandle handle)
 
 int32_t AudioRenderResume(AudioHandle handle)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
@@ -181,16 +187,16 @@ int32_t AudioRenderResume(AudioHandle handle)
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (!hwRender->renderParam.renderMode.ctlParam.pause) {
-        LOG_FUN_ERR("Audio is already Resume !");
+        AUDIO_FUNC_LOGE("Audio is already Resume !");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     if (hwRender->devDataHandle == NULL) {
-        LOG_FUN_ERR("RenderResume Bind Fail!");
+        AUDIO_FUNC_LOGE("RenderResume Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     bool resumeStatus = hwRender->renderParam.renderMode.ctlParam.pause;
@@ -198,7 +204,7 @@ int32_t AudioRenderResume(AudioHandle handle)
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam,
                                      AUDIODRV_CTL_IOCTL_PAUSE_WRITE);
     if (ret < 0) {
-        LOG_FUN_ERR("RenderResume FAIL!");
+        AUDIO_FUNC_LOGE("RenderResume FAIL!");
         hwRender->renderParam.renderMode.ctlParam.pause = resumeStatus;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -208,14 +214,15 @@ int32_t AudioRenderResume(AudioHandle handle)
 
 int32_t AudioRenderFlush(AudioHandle handle)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid, ret = %{public}d", ret);
+        AUDIO_FUNC_LOGE("The render address passed in is invalid");
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
+        AUDIO_FUNC_LOGE("hwRender is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     bool callBackStatus = hwRender->renderParam.renderMode.hwInfo.callBackEnable;
@@ -229,11 +236,12 @@ int32_t AudioRenderGetFrameSize(AudioHandle handle, uint64_t *size)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || size == NULL) {
+        AUDIO_FUNC_LOGE("hwRender or size is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     uint32_t channelCount = hwRender->renderParam.frameRenderMode.attrs.channelCount;
@@ -241,6 +249,7 @@ int32_t AudioRenderGetFrameSize(AudioHandle handle, uint64_t *size)
     uint32_t formatBits = 0;
     ret = FormatToBits(format, &formatBits);
     if (ret != AUDIO_HAL_SUCCESS) {
+        AUDIO_FUNC_LOGE("FormatToBits failed! ret = %{public}d", ret);
         return ret;
     }
     *size = FRAME_SIZE * channelCount * (formatBits >> 3);
@@ -251,11 +260,12 @@ int32_t AudioRenderGetFrameCount(AudioHandle handle, uint64_t *count)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || count == NULL) {
+        AUDIO_FUNC_LOGE("hwRender or count is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     *count = hwRender->renderParam.frameRenderMode.frames;
@@ -266,15 +276,17 @@ int32_t AudioRenderSetSampleAttributes(AudioHandle handle, const struct AudioSam
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid, ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || attrs == NULL || hwRender->devDataHandle == NULL) {
+        AUDIO_FUNC_LOGE("hwRender or attrs or hwRender->devDataHandle is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     ret = AudioCheckParaAttr(attrs);
     if (ret != AUDIO_HAL_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioCheckParaAttr failed! ret = %{public}d", ret);
         return ret;
     }
     /* attrs temp */
@@ -294,14 +306,14 @@ int32_t AudioRenderSetSampleAttributes(AudioHandle handle, const struct AudioSam
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL || hwRender->devDataHandle == NULL) {
         hwRender->renderParam.frameRenderMode.attrs = tempAttrs;
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle,
                                              &hwRender->renderParam,
                                              AUDIO_DRV_PCM_IOCTL_HW_PARAMS);
     if (ret < 0) {
-        LOG_FUN_ERR("SetSampleAttributes FAIL");
+        AUDIO_FUNC_LOGE("SetSampleAttributes FAIL");
         hwRender->renderParam.frameRenderMode.attrs = tempAttrs;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -312,11 +324,12 @@ int32_t AudioRenderGetSampleAttributes(AudioHandle handle, struct AudioSampleAtt
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid");
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || attrs == NULL) {
+        AUDIO_FUNC_LOGE("hwRender or attrs is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     attrs->format = hwRender->renderParam.frameRenderMode.attrs.format;
@@ -336,14 +349,15 @@ int32_t AudioRenderGetSampleAttributes(AudioHandle handle, struct AudioSampleAtt
 
 int32_t AudioRenderGetCurrentChannelId(AudioHandle handle, uint32_t *channelId)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || channelId == NULL) {
+        AUDIO_FUNC_LOGE("hwRender or channelId is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     *channelId = hwRender->renderParam.frameRenderMode.attrs.channelCount;
@@ -353,14 +367,15 @@ int32_t AudioRenderGetCurrentChannelId(AudioHandle handle, uint32_t *channelId)
 int32_t AudioRenderCheckSceneCapability(AudioHandle handle, const struct AudioSceneDescriptor *scene,
                                         bool *supported)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || scene == NULL || supported == NULL) {
+        AUDIO_FUNC_LOGE("hwRender or scene or supported is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
@@ -371,16 +386,16 @@ int32_t AudioRenderCheckSceneCapability(AudioHandle handle, const struct AudioSc
     renderParam.renderMode.hwInfo.deviceDescript.pins = scene->desc.pins;
     PathSelAnalysisJson *pPathSelAnalysisJson = AudioSoGetPathSelAnalysisJson();
     if (pPathSelAnalysisJson == NULL) {
-        LOG_FUN_ERR("pPathSelAnalysisJson Is NULL!");
+        AUDIO_FUNC_LOGE("pPathSelAnalysisJson Is NULL!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     ret = (*pPathSelAnalysisJson)((void *)&renderParam, CHECKSCENE_PATH_SELECT);
     if (ret < 0) {
         if (ret == AUDIO_HAL_ERR_NOT_SUPPORT) {
-            LOG_FUN_ERR("AudioRenderCheckSceneCapability not Support!");
+            AUDIO_FUNC_LOGE("AudioRenderCheckSceneCapability not Support!");
             return AUDIO_HAL_ERR_NOT_SUPPORT;
         } else {
-            LOG_FUN_ERR("AudioRenderCheckSceneCapability fail!");
+            AUDIO_FUNC_LOGE("AudioRenderCheckSceneCapability fail!");
             return AUDIO_HAL_ERR_INTERNAL;
         }
     }
@@ -395,21 +410,22 @@ int32_t AudioRenderSelectScene(AudioHandle handle, const struct AudioSceneDescri
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || scene == NULL) {
+        AUDIO_FUNC_LOGE("hwRender or scene is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwRender->devCtlHandle == NULL) {
-        LOG_FUN_ERR("RenderSelectScene Bind Fail!");
+        AUDIO_FUNC_LOGE("RenderSelectScene Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     PathSelAnalysisJson *pPathSelAnalysisJson = AudioSoGetPathSelAnalysisJson();
     if (pPathSelAnalysisJson == NULL) {
-        LOG_FUN_ERR("pPathSelAnalysisJson Is NULL!");
+        AUDIO_FUNC_LOGE("pPathSelAnalysisJson Is NULL!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     enum AudioCategory sceneId = hwRender->renderParam.frameRenderMode.attrs.type;
@@ -417,14 +433,14 @@ int32_t AudioRenderSelectScene(AudioHandle handle, const struct AudioSceneDescri
     hwRender->renderParam.frameRenderMode.attrs.type = (enum AudioCategory)(scene->scene.id);
     hwRender->renderParam.renderMode.hwInfo.deviceDescript.pins = scene->desc.pins;
     if ((*pPathSelAnalysisJson)((void *)&hwRender->renderParam, RENDER_PATH_SELECT) < 0) {
-        LOG_FUN_ERR("AudioRenderSelectScene Fail!");
+        AUDIO_FUNC_LOGE("AudioRenderSelectScene Fail!");
         hwRender->renderParam.frameRenderMode.attrs.type = sceneId;
         hwRender->renderParam.renderMode.hwInfo.deviceDescript.pins = descPins;
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         hwRender->renderParam.frameRenderMode.attrs.type = sceneId;
         hwRender->renderParam.renderMode.hwInfo.deviceDescript.pins = descPins;
         return AUDIO_HAL_ERR_INTERNAL;
@@ -432,7 +448,7 @@ int32_t AudioRenderSelectScene(AudioHandle handle, const struct AudioSceneDescri
     ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam,
                                      AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE);
     if (ret < 0) {
-        LOG_FUN_ERR("SetParams FAIL!");
+        AUDIO_FUNC_LOGE("SetParams FAIL!");
         hwRender->renderParam.frameRenderMode.attrs.type = sceneId;
         hwRender->renderParam.renderMode.hwInfo.deviceDescript.pins = descPins;
         return AUDIO_HAL_ERR_INTERNAL;
@@ -447,7 +463,7 @@ int32_t AudioRenderSetMute(AudioHandle handle, bool mute)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *impl = (struct AudioHwRender *)handle;
@@ -455,19 +471,19 @@ int32_t AudioRenderSetMute(AudioHandle handle, bool mute)
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (impl->devCtlHandle == NULL) {
-        LOG_FUN_ERR("RenderSetMute Bind Fail!");
+        AUDIO_FUNC_LOGE("RenderSetMute Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     bool muteStatus = impl->renderParam.renderMode.ctlParam.mute;
     impl->renderParam.renderMode.ctlParam.mute = mute;
     ret = (*pInterfaceLibModeRender)(impl->devCtlHandle, &impl->renderParam, AUDIODRV_CTL_IOCTL_MUTE_WRITE);
     if (ret < 0) {
-        LOG_FUN_ERR("SetMute SetParams FAIL");
+        AUDIO_FUNC_LOGE("SetMute SetParams FAIL");
         impl->renderParam.renderMode.ctlParam.mute = muteStatus;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -479,30 +495,31 @@ int32_t AudioRenderGetMute(AudioHandle handle, bool *mute)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *impl = (struct AudioHwRender *)handle;
     if (impl == NULL || mute == NULL) {
+        AUDIO_FUNC_LOGE("impl or mute is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
     if (impl->devCtlHandle == NULL) {
-        LOG_FUN_ERR("RenderGetMute Bind Fail!");
+        AUDIO_FUNC_LOGE("RenderGetMute Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeRender)(impl->devCtlHandle, &impl->renderParam, AUDIODRV_CTL_IOCTL_MUTE_READ);
     if (ret < 0) {
-        LOG_FUN_ERR("Get Mute FAIL!");
+        AUDIO_FUNC_LOGE("Get Mute FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     *mute = impl->renderParam.renderMode.ctlParam.mute;
-    LOG_PARA_INFO("GetMute SUCCESS!");
+    AUDIO_FUNC_LOGI("GetMute SUCCESS!");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -510,7 +527,7 @@ int32_t AudioRenderSetVolume(AudioHandle handle, float volume)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
@@ -521,30 +538,30 @@ int32_t AudioRenderSetVolume(AudioHandle handle, float volume)
     float volMax = (float)hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
     float volMin = (float)hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
     if (volume < 0 || volume > 1) {
-        LOG_FUN_ERR("volume param Is error!");
+        AUDIO_FUNC_LOGE("volume param Is error!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwRender->devCtlHandle == NULL) {
-        LOG_FUN_ERR("RenderSetVolume Bind Fail!");
+        AUDIO_FUNC_LOGE("RenderSetVolume Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     volume = (volume == 0) ? 1 : (volume * VOLUME_CHANGE);
     /* change volume to db */
     float volTemp = ((volMax - volMin) / 2) * log10(volume) + volMin;
     if (volTemp < volMin || volTemp > volMax) {
-        LOG_FUN_ERR("volTemp fail");
+        AUDIO_FUNC_LOGE("volTemp fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     hwRender->renderParam.renderMode.ctlParam.volume = volTemp;
     ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam,
                                      AUDIODRV_CTL_IOCTL_ELEM_WRITE);
     if (ret < 0) {
-        LOG_FUN_ERR("RenderSetVolume FAIL!");
+        AUDIO_FUNC_LOGE("RenderSetVolume FAIL!");
         hwRender->renderParam.renderMode.ctlParam.volume = volumeTemp;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -555,32 +572,33 @@ int32_t AudioRenderGetVolume(AudioHandle handle, float *volume)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || volume == NULL) {
+        AUDIO_FUNC_LOGE("hwRender or volume is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwRender->devCtlHandle == NULL) {
-        LOG_FUN_ERR("RenderGetVolume Bind Fail!");
+        AUDIO_FUNC_LOGE("RenderGetVolume Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam, AUDIODRV_CTL_IOCTL_ELEM_READ);
     if (ret < 0) {
-        LOG_FUN_ERR("RenderGetVolume FAIL!");
+        AUDIO_FUNC_LOGE("RenderGetVolume FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     float volumeTemp = hwRender->renderParam.renderMode.ctlParam.volume;
     float volMax = (float)hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
     float volMin = (float)hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
     if ((volMax - volMin) == 0) {
-        LOG_FUN_ERR("Divisor cannot be zero!");
+        AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / 2);
@@ -591,29 +609,30 @@ int32_t AudioRenderGetVolume(AudioHandle handle, float *volume)
 
 int32_t AudioRenderGetGainThreshold(AudioHandle handle, float *min, float *max)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || min == NULL || max == NULL) {
+        AUDIO_FUNC_LOGE("hwRender or min or max is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwRender->devCtlHandle == NULL) {
-        LOG_FUN_ERR("RenderGetGainThreshold Bind Fail!");
+        AUDIO_FUNC_LOGE("RenderGetGainThreshold Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam,
                                      AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ);
     if (ret < 0) {
-        LOG_FUN_ERR("GetGainThreshold FAIL!");
+        AUDIO_FUNC_LOGE("GetGainThreshold FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     *max = hwRender->renderParam.renderMode.ctlParam.audioGain.gainMax;
@@ -623,67 +642,69 @@ int32_t AudioRenderGetGainThreshold(AudioHandle handle, float *min, float *max)
 
 int32_t AudioRenderGetGain(AudioHandle handle, float *gain)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *impl = (struct AudioHwRender *)handle;
     if (impl == NULL || gain == NULL) {
+        AUDIO_FUNC_LOGE("impl or gain is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (impl->devCtlHandle == NULL) {
-        LOG_FUN_ERR("RenderGetGain Bind Fail!");
+        AUDIO_FUNC_LOGE("RenderGetGain Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeRender)(impl->devCtlHandle, &impl->renderParam, AUDIODRV_CTL_IOCTL_GAIN_READ);
     if (ret < 0) {
-        LOG_FUN_ERR("RenderGetGain FAIL");
+        AUDIO_FUNC_LOGE("RenderGetGain FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     *gain = impl->renderParam.renderMode.ctlParam.audioGain.gain;
-    LOG_PARA_INFO("RenderGetGain SUCCESS!");
+    AUDIO_FUNC_LOGI("RenderGetGain SUCCESS!");
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderSetGain(AudioHandle handle, float gain)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *impl = (struct AudioHwRender *)handle;
     if (impl == NULL || gain < 0) {
+        AUDIO_FUNC_LOGE("ipml is null or gain < 0");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     float gainTemp = impl->renderParam.renderMode.ctlParam.audioGain.gain;
     impl->renderParam.renderMode.ctlParam.audioGain.gain = gain;
     if (impl->devCtlHandle == NULL) {
-        LOG_FUN_ERR("RenderSetGain Bind Fail!");
+        AUDIO_FUNC_LOGE("RenderSetGain Bind Fail!");
         impl->renderParam.renderMode.ctlParam.audioGain.gain = gainTemp;
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         impl->renderParam.renderMode.ctlParam.audioGain.gain = gainTemp;
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeRender)(impl->devCtlHandle, &impl->renderParam, AUDIODRV_CTL_IOCTL_GAIN_WRITE);
     if (ret < 0) {
-        LOG_FUN_ERR("RenderSetGain FAIL");
+        AUDIO_FUNC_LOGE("RenderSetGain FAIL");
         impl->renderParam.renderMode.ctlParam.audioGain.gain = gainTemp;
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    LOG_PARA_INFO("RenderSetGain SUCCESS!");
+    AUDIO_FUNC_LOGI("RenderSetGain SUCCESS!");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -691,17 +712,19 @@ int32_t AudioRenderGetLatency(struct AudioRender *render, uint32_t *ms)
 {
     int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *impl = (struct AudioHwRender *)render;
     if (impl == NULL || ms == NULL) {
+        AUDIO_FUNC_LOGE("ipml or ms is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     uint32_t byteRate = impl->renderParam.frameRenderMode.byteRate;
     uint32_t periodSize = impl->renderParam.frameRenderMode.periodSize;
     uint32_t periodCount = impl->renderParam.frameRenderMode.periodCount;
     if (byteRate == 0) {
+        AUDIO_FUNC_LOGE("divisor byteRate is zero!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     uint32_t period_ms = (periodCount * periodSize * 1000) / byteRate;
@@ -712,6 +735,7 @@ int32_t AudioRenderGetLatency(struct AudioRender *render, uint32_t *ms)
 static int32_t LogErrorGetRensonAndTime(struct AudioHwRender *hwRender, int errorReason)
 {
     if (hwRender == NULL) {
+        AUDIO_FUNC_LOGE("param hwRender is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwRender->errorLog.iter >= ERROR_LOG_MAX_NUM) {
@@ -721,7 +745,7 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwRender *hwRender, int erro
         hwRender->errorLog.errorDump[hwRender->errorLog.iter].reason
             = (char *)calloc(1, ERROR_REASON_DESC_LEN);
         if (hwRender->errorLog.errorDump[hwRender->errorLog.iter].reason == NULL) {
-            LOG_FUN_ERR("Calloc reasonDesc Fail!");
+            AUDIO_FUNC_LOGE("Calloc reasonDesc Fail!");
             return AUDIO_HAL_ERR_MALLOC_FAIL;
         }
     }
@@ -729,7 +753,7 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwRender *hwRender, int erro
         hwRender->errorLog.errorDump[hwRender->errorLog.iter].currentTime
             = (char *)calloc(1, ERROR_REASON_DESC_LEN);
         if (hwRender->errorLog.errorDump[hwRender->errorLog.iter].currentTime == NULL) {
-            LOG_FUN_ERR("Calloc time Fail!");
+            AUDIO_FUNC_LOGE("Calloc time Fail!");
             return AUDIO_HAL_ERR_MALLOC_FAIL;
         }
     }
@@ -739,12 +763,12 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwRender *hwRender, int erro
         ERROR_REASON_DESC_LEN, 0, ERROR_REASON_DESC_LEN);
     int32_t ret = GetErrorReason(errorReason, hwRender->errorLog.errorDump[hwRender->errorLog.iter].reason);
     if (ret < 0) {
-        LOG_FUN_ERR("GetErrorReason failed!");
+        AUDIO_FUNC_LOGE("GetErrorReason failed!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = GetCurrentTime(hwRender->errorLog.errorDump[hwRender->errorLog.iter].currentTime);
     if (ret < 0) {
-        LOG_FUN_ERR("GetCurrentTime Fail");
+        AUDIO_FUNC_LOGE("GetCurrentTime Fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -776,20 +800,22 @@ int32_t AudioRenderRenderFramSplit(struct AudioHwRender *hwRender)
 {
     int32_t ret;
     if (hwRender == NULL) {
+        AUDIO_FUNC_LOGE("param hwRender is null!");
         return HDF_FAILURE;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return HDF_FAILURE;
     }
     if (hwRender->devDataHandle == NULL) {
+        AUDIO_FUNC_LOGE("hwRender->devDataHandle is null!");
         return HDF_FAILURE;
     }
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam,
                                              AUDIO_DRV_PCM_IOCTL_WRITE);
     if (ret < 0) {
-        LOG_FUN_ERR("Render Frame FAIL!");
+        AUDIO_FUNC_LOGE("Render Frame FAIL!");
         LogError((AudioHandle)hwRender, WRITE_FRAME_ERROR_CODE, ret);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -799,29 +825,28 @@ int32_t AudioRenderRenderFramSplit(struct AudioHwRender *hwRender)
 int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
                                uint64_t requestBytes, uint64_t *replyBytes)
 {
-    LOG_FUN_INFO();
     int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL || frame == NULL || replyBytes == NULL ||
         hwRender->renderParam.frameRenderMode.buffer == NULL) {
-        LOG_FUN_ERR("Render Frame Paras is NULL!");
+        AUDIO_FUNC_LOGE("Render Frame Paras is NULL!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwRender->renderParam.renderMode.ctlParam.stop) {
-        LOG_FUN_ERR("Render not started!");
+        AUDIO_FUNC_LOGE("Render not started!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (FRAME_DATA < requestBytes) {
-        LOG_FUN_ERR("Out of FRAME_DATA size!");
+        AUDIO_FUNC_LOGE("Out of FRAME_DATA size!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = memcpy_s(hwRender->renderParam.frameRenderMode.buffer, FRAME_DATA, frame, (uint32_t)requestBytes);
     if (ret != EOK) {
-        LOG_FUN_ERR("memcpy_s fail");
+        AUDIO_FUNC_LOGE("memcpy_s fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     hwRender->renderParam.frameRenderMode.bufferSize = requestBytes;
@@ -832,18 +857,19 @@ int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
     }
     hwRender->renderParam.frameRenderMode.bufferFrameSize = (uint64_t)frameCount;
     if (AudioRenderRenderFramSplit(hwRender) < 0) {
+        AUDIO_FUNC_LOGE("AudioRenderRenderFramSplit failed");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     *replyBytes = requestBytes;
     hwRender->renderParam.frameRenderMode.frames += hwRender->renderParam.frameRenderMode.bufferFrameSize;
     if (hwRender->renderParam.frameRenderMode.attrs.sampleRate == 0) {
-        LOG_FUN_ERR("Divisor cannot be zero!");
+        AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (TimeToAudioTimeStamp(hwRender->renderParam.frameRenderMode.bufferFrameSize,
         &hwRender->renderParam.frameRenderMode.time,
         hwRender->renderParam.frameRenderMode.attrs.sampleRate) == HDF_FAILURE) {
-        LOG_FUN_ERR("Frame is NULL");
+        AUDIO_FUNC_LOGE("Frame is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -853,11 +879,12 @@ int32_t AudioRenderGetRenderPosition(struct AudioRender *render, uint64_t *frame
 {
     int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *impl = (struct AudioHwRender *)render;
     if (impl == NULL || frames == NULL || time == NULL) {
+        AUDIO_FUNC_LOGE("impl or frames or time is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     *frames = impl->renderParam.frameRenderMode.frames;
@@ -867,7 +894,7 @@ int32_t AudioRenderGetRenderPosition(struct AudioRender *render, uint64_t *frame
 
 int32_t AudioRenderSetRenderSpeed(struct AudioRender *render, float speed)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -877,7 +904,7 @@ int32_t AudioRenderSetRenderSpeed(struct AudioRender *render, float speed)
 
 int32_t AudioRenderGetRenderSpeed(struct AudioRender *render, float *speed)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL || speed == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -887,32 +914,33 @@ int32_t AudioRenderGetRenderSpeed(struct AudioRender *render, float *speed)
 
 int32_t AudioRenderSetChannelMode(struct AudioRender *render, enum AudioChannelMode mode)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid, ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *impl = (struct AudioHwRender *)render;
     if (impl == NULL) {
+        AUDIO_FUNC_LOGE("impl is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (impl->devCtlHandle == NULL) {
-        LOG_FUN_ERR("Bind Fail!");
+        AUDIO_FUNC_LOGE("Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     enum AudioChannelMode tempMode = impl->renderParam.frameRenderMode.mode;
     impl->renderParam.frameRenderMode.mode = mode;
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         impl->renderParam.frameRenderMode.mode = tempMode;
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeRender)(impl->devCtlHandle, &impl->renderParam,
                                      AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE);
     if (ret < 0) {
-        LOG_FUN_ERR("Set ChannelMode FAIL!");
+        AUDIO_FUNC_LOGE("Set ChannelMode FAIL!");
         impl->renderParam.frameRenderMode.mode = tempMode;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -921,24 +949,25 @@ int32_t AudioRenderSetChannelMode(struct AudioRender *render, enum AudioChannelM
 
 int32_t AudioRenderGetChannelMode(struct AudioRender *render, enum AudioChannelMode *mode)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *impl = (struct AudioHwRender *)render;
     if (impl == NULL || mode == NULL || impl->devCtlHandle == NULL) {
+        AUDIO_FUNC_LOGE("impl or mode or impl->devCtlHandle is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeRender)(impl->devCtlHandle, &impl->renderParam, AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ);
     if (ret < 0) {
-        LOG_FUN_ERR("Get ChannelMode FAIL!");
+        AUDIO_FUNC_LOGE("Get ChannelMode FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     *mode = impl->renderParam.frameRenderMode.mode;
@@ -948,6 +977,7 @@ int32_t AudioRenderGetChannelMode(struct AudioRender *render, enum AudioChannelM
 int32_t SetValue(struct ExtraParams mExtraParams, struct AudioHwRender *render)
 {
     if (render == NULL) {
+        AUDIO_FUNC_LOGE("param render is null!");
         return HDF_FAILURE;
     }
     if (mExtraParams.route != -1) {
@@ -972,11 +1002,12 @@ int32_t AudioRenderSetExtraParams(AudioHandle handle, const char *keyValueList)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL || keyValueList == NULL) {
+        AUDIO_FUNC_LOGE("render or keyValueList is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t count = 0;
@@ -997,11 +1028,12 @@ int32_t AudioRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL || keyValueList == NULL || listLenth <= 0) {
+        AUDIO_FUNC_LOGE("render or keyValueList or listLenth is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t bufferSize = strlen(ROUTE_SAMPLE) + strlen(FORMAT_SAMPLE) + strlen(CHANNELS_SAMPLE)
@@ -1041,11 +1073,13 @@ int32_t AudioRenderReqMmapBufferInit(struct AudioHwRender *render,
     int32_t reqSize, struct AudioMmapBufferDescripter *desc)
 {
     if (render == NULL || render->devDataHandle == NULL || desc == NULL) {
+        AUDIO_FUNC_LOGE("render or render->devDataHandle or desc is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     uint32_t formatBits = 0;
     int32_t ret = FormatToBits(render->renderParam.frameRenderMode.attrs.format, &formatBits);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("FormatToBits failed! ret = %{public}d", ret);
         return ret;
     }
     int32_t flags;
@@ -1056,18 +1090,18 @@ int32_t AudioRenderReqMmapBufferInit(struct AudioHwRender *render,
     }
     int64_t filesize = lseek(desc->memoryFd, 0, SEEK_END);
     if ((int64_t)reqSize > filesize) {
-        LOG_FUN_ERR("reqSize is out of file Size!");
+        AUDIO_FUNC_LOGE("reqSize is out of file Size!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     desc->memoryAddress = mmap(NULL, reqSize, PROT_READ | PROT_WRITE, flags, desc->memoryFd, 0);
     if (desc->memoryAddress == NULL || desc->memoryAddress == (void *)(-1)) {
-        LOG_FUN_ERR("AudioRenderReqMmapBuffer mmap FAIL and errno is:%d !", errno);
+        AUDIO_FUNC_LOGE("AudioRenderReqMmapBuffer mmap FAIL and errno is:%{public}d !", errno);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     desc->totalBufferFrames = reqSize / (render->renderParam.frameRenderMode.attrs.channelCount * (formatBits >> 3));
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         munmap(desc->memoryAddress, reqSize);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -1079,7 +1113,7 @@ int32_t AudioRenderReqMmapBufferInit(struct AudioHwRender *render,
     render->renderParam.frameRenderMode.mmapBufDesc.offset = desc->offset;
     ret = (*pInterfaceLibModeRender)(render->devDataHandle, &render->renderParam, AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER);
     if (ret < 0) {
-        LOG_FUN_ERR("AudioRenderReqMmapBuffer FAIL!");
+        AUDIO_FUNC_LOGE("AudioRenderReqMmapBuffer FAIL!");
         munmap(desc->memoryAddress, reqSize);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -1090,19 +1124,20 @@ int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct Aud
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL || render->devDataHandle == NULL || desc == NULL) {
+        AUDIO_FUNC_LOGE("render or render->devDataHandle or desc is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     ret = AudioRenderReqMmapBufferInit(render, reqSize, desc);
     if (ret < 0) {
-        LOG_FUN_ERR("AudioRenderReqMmapBufferInit failed!");
+        AUDIO_FUNC_LOGE("AudioRenderReqMmapBufferInit failed! ret = %{public}d", ret);
         return ret;
     }
-    LOG_PARA_INFO("AudioRenderReqMmapBuffer Success!");
+    AUDIO_FUNC_LOGI("AudioRenderReqMmapBuffer Success!");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -1110,26 +1145,28 @@ int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct 
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL || frames == NULL || time == NULL) {
+        AUDIO_FUNC_LOGE("render or frames or time is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 #ifndef AUDIO_HAL_USER
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeRender Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (render->devDataHandle == NULL) {
+        AUDIO_FUNC_LOGE("render->devDataHandle Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeRender)(render->devDataHandle,
                                      &render->renderParam, AUDIO_DRV_PCM_IOCTL_MMAP_POSITION);
     if (ret < 0) {
-        LOG_FUN_ERR("Get Position FAIL!");
+        AUDIO_FUNC_LOGE("Get Position FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
 #endif
@@ -1148,7 +1185,7 @@ int32_t AudioRenderAddEffect(AudioHandle handle, uint64_t effectid)
 {
     (void)handle;
     (void)effectid;
-    HDF_LOGI("%{public}s: add render effect success", __func__);
+    AUDIO_FUNC_LOGI("add render effect success");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -1156,7 +1193,7 @@ int32_t AudioRenderRemoveEffect(AudioHandle handle, uint64_t effectid)
 {
     (void)handle;
     (void)effectid;
-    HDF_LOGI("%{public}s: remove render effect success", __func__);
+    AUDIO_FUNC_LOGI("remove render effect success");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -1164,11 +1201,13 @@ int32_t AudioRenderTurnStandbyMode(AudioHandle handle)
 {
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL) {
+        AUDIO_FUNC_LOGE("render is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     render->renderParam.renderMode.ctlParam.turnStandbyStatus = AUDIO_TURN_STANDBY_NOW;
     int32_t ret = AudioRenderStop((AudioHandle)render);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioRenderStop failed [ ret = %{public}d ]!", ret);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -1178,11 +1217,12 @@ int32_t AudioRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL) {
+        AUDIO_FUNC_LOGE("render is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     dprintf(fd, "%s%d\n", "Number of errors: ", render->errorLog.totalErrors);
@@ -1214,7 +1254,7 @@ int32_t CallbackProcessing(AudioHandle handle, enum AudioCallbackType callBackTy
 {
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL) {
-        LOG_PARA_INFO("Unregistered callback.\n");
+        AUDIO_FUNC_LOGI("Unregistered callback.\n");
         return HDF_FAILURE;
     }
     if (render->renderParam.frameRenderMode.callback == NULL) {
@@ -1234,7 +1274,7 @@ int32_t CallbackProcessing(AudioHandle handle, enum AudioCallbackType callBackTy
             break;
     }
     if (!isCallBack) {
-        LOG_PARA_INFO("No callback processing is required.\n");
+        AUDIO_FUNC_LOGI("No callback processing is required.\n");
         return HDF_ERR_NOT_SUPPORT;
     }
     render->renderParam.frameRenderMode.callback(callBackType, NULL, render->renderParam.frameRenderMode.cookie);
@@ -1245,11 +1285,12 @@ int32_t AudioRenderRegCallback(struct AudioRender *render, RenderCallback callba
 {
     int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
-        LOG_FUN_ERR("The render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwRender *pRender = (struct AudioHwRender *)render;
     if (pRender == NULL) {
+        AUDIO_FUNC_LOGE("pRender is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     pRender->renderParam.frameRenderMode.callback = callback;

@@ -17,36 +17,26 @@
 #define AUDIO_HAL_LOG_H
 
 #include <stdio.h>
-#include "osal_time.h"
 #include "hdf_log.h"
 
-#define MAX_TIME_INFO_LEN 64
-
 #ifndef AUDIO_HAL_HDF_LOG
-#define LOG_FUN_INFO() do { \
+#define AUDIO_FUNC_LOGD(fmt, arg...) do { \
     } while (0)
 
-#define LOG_FUN_ERR(fmt, arg...) do { \
-        char s[MAX_TIME_INFO_LEN] = {0}; \
-        AudioGetSysTime(s, MAX_TIME_INFO_LEN); \
-        printf("%s %s: [%s]: [%d]:[ERROR]:" fmt"\n", s, __FILE__, __func__, __LINE__, ##arg); \
+#define AUDIO_FUNC_LOGI(fmt, arg...) do { \
     } while (0)
-
-#define LOG_PARA_INFO(fmt, arg...) do { \
-    } while (0)
-
 #else
-#define LOG_FUN_INFO() do { \
+#define AUDIO_FUNC_LOGD(fmt, arg...) do { \
+        HDF_LOGD("[%{public}s][line:%{public}d]: " fmt, __func__, __LINE__, ##arg); \
     } while (0)
 
-#define LOG_FUN_ERR(fmt, arg...) do { \
-        HDF_LOGE("[%{public}s][%{public}s][line:%{public}d]: " fmt, __FILE__, __func__, __LINE__, ##arg); \
+#define AUDIO_FUNC_LOGI(fmt, arg...) do { \
+        HDF_LOGI("[%{public}s][line:%{public}d]: " fmt, __func__, __LINE__, ##arg); \
     } while (0)
-
-#define LOG_PARA_INFO(fmt, arg...) do { \
-    } while (0)
-
 #endif
 
+#define AUDIO_FUNC_LOGE(fmt, arg...) do { \
+        HDF_LOGE("[%{public}s][%{public}s][line:%{public}d]: " fmt, __FILE__, __func__, __LINE__, ##arg); \
+    } while (0)
 
 #endif

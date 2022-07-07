@@ -36,7 +36,7 @@ static int32_t AudioSetMixerCapVolume(snd_mixer_elem_t *pcmElemen, long vol)
     int32_t ret;
 
     if (pcmElemen == NULL) {
-        LOG_FUN_ERR("parameter is NULL!");
+        AUDIO_FUNC_LOGE("parameter is NULL!");
         return HDF_FAILURE;
     }
 
@@ -46,14 +46,14 @@ static int32_t AudioSetMixerCapVolume(snd_mixer_elem_t *pcmElemen, long vol)
         ret = snd_mixer_selem_set_capture_volume(pcmElemen,
                                                  SND_MIXER_SCHN_MONO, vol);
         if (ret < 0) {
-            LOG_FUN_ERR("Failed to set volume: %{public}s.", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("Failed to set volume: %{public}s.", snd_strerror(ret));
             return HDF_FAILURE;
         }
     } else { // ret == 0: is not mono. (stereo)
         ret = snd_mixer_selem_set_capture_volume_all(pcmElemen, vol);
         if (ret < 0) {
-            LOG_FUN_ERR("Failed to set all channel volume: %{public}s.",
-                        snd_strerror(ret));
+            AUDIO_FUNC_LOGE("Failed to set all channel volume: %{public}s.",
+                snd_strerror(ret));
             return HDF_FAILURE;
         }
     }
@@ -66,20 +66,20 @@ static int32_t AudioCaptureSetPauseState(snd_pcm_t *pcm, int32_t pause)
     int32_t ret;
 
     if (pcm == NULL) {
-        LOG_FUN_ERR("Param is NULL!");
+        AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_FAILURE;
     }
 
     if (pause == AUDIO_ALSALIB_IOCTRL_RESUME) {
         ret = snd_pcm_resume(pcm);
         if (ret < 0) {
-            LOG_FUN_ERR("Resume fail: %{public}s", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("Resume fail: %{public}s", snd_strerror(ret));
             return HDF_FAILURE;
         }
     } else if (pause == AUDIO_ALSALIB_IOCTRL_PAUSE) {
         ret = snd_pcm_pause(pcm, pause);
         if (ret < 0) {
-            LOG_FUN_ERR("Pause fail: %{public}s", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("Pause fail: %{public}s", snd_strerror(ret));
             return HDF_FAILURE;
         }
     } else {
@@ -97,7 +97,7 @@ int32_t AudioCtlCaptureSetPauseStu(const struct DevHandleCapture *handle,
     struct AudioCardInfo *cardIns;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("Param is NULL!");
+        AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_FAILURE;
     }
 
@@ -111,7 +111,7 @@ int32_t AudioCtlCaptureSetPauseStu(const struct DevHandleCapture *handle,
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns or capturePcmHandle is NULL!");
+        AUDIO_FUNC_LOGE("cardIns or capturePcmHandle is NULL!");
         return HDF_FAILURE;
     }
 
@@ -119,7 +119,7 @@ int32_t AudioCtlCaptureSetPauseStu(const struct DevHandleCapture *handle,
             AUDIO_ALSALIB_IOCTRL_PAUSE : AUDIO_ALSALIB_IOCTRL_RESUME;
     ret = AudioCaptureSetPauseState(cardIns->capturePcmHandle, pause);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("set pause error!");
+        AUDIO_FUNC_LOGE("set pause error!");
         return HDF_FAILURE;
     }
 
@@ -136,14 +136,14 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
     struct AudioCardInfo *cardIns;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("AudioCtlRenderSetVolume parameter is NULL!");
+        AUDIO_FUNC_LOGE("AudioCtlRenderSetVolume parameter is NULL!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("Unable to obtain correct sound card information!");
+        AUDIO_FUNC_LOGE("Unable to obtain correct sound card information!");
         return HDF_FAILURE;
     }
 
@@ -154,7 +154,7 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
 
     ret = snd_mixer_handle_events(cardIns->mixer);
     if (ret < 0) {
-        LOG_FUN_ERR("snd_mixer_handle_events fail: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("snd_mixer_handle_events fail: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -162,12 +162,12 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
     ret = snd_mixer_selem_get_capture_volume(cardIns->ctrlLeftVolume,
         SND_MIXER_SCHN_FRONT_LEFT, &volLeft);
     if (ret < 0) {
-        LOG_FUN_ERR("Get left channel volume fail: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Get left channel volume fail: %{public}s.", snd_strerror(ret));
     }
     ret = snd_mixer_selem_get_capture_volume(cardIns->ctrlLeftVolume,
         SND_MIXER_SCHN_FRONT_RIGHT, &volRight);
     if (ret < 0) {
-        LOG_FUN_ERR("Get right channel volume fail: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Get right channel volume fail: %{public}s.", snd_strerror(ret));
     }
     volEverage = (volLeft + volRight) >> 1;
     handleData->captureMode.ctlParam.volume = (float)(volEverage);
@@ -183,7 +183,7 @@ int32_t AudioCtlCaptureSetVolume(const struct DevHandleCapture *handle,
     struct AudioCardInfo *cardIns;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("parameter is NULL!");
+        AUDIO_FUNC_LOGE("parameter is NULL!");
         return HDF_FAILURE;
     }
 
@@ -191,7 +191,7 @@ int32_t AudioCtlCaptureSetVolume(const struct DevHandleCapture *handle,
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
 
@@ -202,13 +202,13 @@ int32_t AudioCtlCaptureSetVolume(const struct DevHandleCapture *handle,
 
     ret = AudioSetMixerCapVolume(cardIns->ctrlLeftVolume, vol);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("AudioSetMixerVolume left fail!");
+        AUDIO_FUNC_LOGE("AudioSetMixerVolume left fail!");
         return ret;
     }
 
     ret = AudioSetMixerCapVolume(cardIns->ctrlRightVolume, vol);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("AudioSetMixerVolume right fail!");
+        AUDIO_FUNC_LOGE("AudioSetMixerVolume right fail!");
         return ret;
     }
 
@@ -223,14 +223,14 @@ int32_t AudioCtlCaptureSetMuteStu(const struct DevHandleCapture *handle,
     struct AudioCardInfo *cardIns;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("param is NULL!");
+        AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
 
@@ -247,7 +247,7 @@ int32_t AudioCtlCaptureSetMuteStu(const struct DevHandleCapture *handle,
                                     SND_OUT_CARD_MAIN_MIC);
     }
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("AudioMixerSetCtrlMode failed!");
+        AUDIO_FUNC_LOGE("AudioMixerSetCtrlMode failed!");
         return ret;
     }
     cardIns->captureMuteValue = (int32_t)handleData->captureMode.ctlParam.mute;
@@ -261,14 +261,14 @@ int32_t AudioCtlCaptureGetMuteStu(const struct DevHandleCapture *handle,
     struct AudioCardInfo *cardIns;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("param is NULL!");
+        AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
 
@@ -285,7 +285,7 @@ int32_t AudioCtlCaptureSetGainStu(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("param is NULL!");
+        AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
 
@@ -296,7 +296,7 @@ int32_t AudioCtlCaptureGetGainStu(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("param is NULL!");
+        AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
 
@@ -309,13 +309,13 @@ int32_t AudioCtlCaptureSceneSelect(const struct DevHandleCapture *handle,
     int32_t deviceNum;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("param is NULL!");
+        AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
 
     deviceNum = handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum;
     if (deviceNum < AUDIO_MIN_CARD_NUM) {
-        LOG_FUN_ERR("Not find device!");
+        AUDIO_FUNC_LOGE("Not find device!");
         return HDF_FAILURE;
     }
 
@@ -326,7 +326,7 @@ int32_t AudioCtlCaptureGetGainThreshold(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("param is NULL!");
+        AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
 
@@ -342,14 +342,14 @@ int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
     long volMin = MIN_VOLUME;
 
     if (handleData == NULL) {
-        LOG_FUN_ERR("Param is NULL!");
+        AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
 
@@ -362,7 +362,7 @@ int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
     ret = snd_mixer_selem_get_capture_volume_range(cardIns->ctrlLeftVolume,
                                                    &volMin, &volMax);
     if (ret < 0) {
-        LOG_FUN_ERR("Get capture volume range fail: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Get capture volume range fail: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
     handleData->captureMode.ctlParam.volThreshold.volMax = (int)volMax;
@@ -377,7 +377,7 @@ int32_t AudioInterfaceLibCtlCapture(const struct DevHandleCapture *handle,
     int32_t ret;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("param is NULL!");
+        AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
 
@@ -412,7 +412,7 @@ int32_t AudioInterfaceLibCtlCapture(const struct DevHandleCapture *handle,
             ret = AudioCtlCaptureGetVolThreshold(handle, cmdId, handleData);
             break;
         default:
-            LOG_FUN_ERR("Ctl Mode not support!");
+            AUDIO_FUNC_LOGE("Ctl Mode not support!");
             ret = HDF_FAILURE;
             break;
     }
@@ -423,7 +423,7 @@ int32_t AudioInterfaceLibCtlCapture(const struct DevHandleCapture *handle,
 static int32_t GetCapHwParams(struct AudioCardInfo *cardIns, const struct AudioHwCaptureParam *handleData)
 {
     if (cardIns == NULL || handleData == NULL) {
-        LOG_FUN_ERR("Parameter is NULL!");
+        AUDIO_FUNC_LOGE("Parameter is NULL!");
         return HDF_FAILURE;
     }
 
@@ -450,39 +450,39 @@ static int32_t SetHWParamsSub(snd_pcm_t *handle, snd_pcm_hw_params_t *params,
     int32_t ret;
     snd_pcm_format_t pcmFormat;
     if (handle == NULL || params == NULL) {
-        LOG_FUN_ERR("SetHWParamsSub parameter is null!");
+        AUDIO_FUNC_LOGE("SetHWParamsSub parameter is null!");
         return HDF_FAILURE;
     }
 
     ret = snd_pcm_hw_params_set_rate_resample(handle, params, g_resample);
     if (ret < 0) {
-        LOG_FUN_ERR("Resampling setup failed for capture: %{public}s", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Resampling setup failed for capture: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
     /* set the interleaved read/write format */
     ret = snd_pcm_hw_params_set_access(handle, params, access);
     if (ret < 0) {
-        LOG_FUN_ERR("Access type not available for capture: %{public}s", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Access type not available for capture: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
     }
     ret = CheckParaFormat(hwCapParams, &pcmFormat);
     if (ret < 0) {
-        LOG_FUN_ERR("CheckParaFormat error.");
+        AUDIO_FUNC_LOGE("CheckParaFormat error.");
         return HDF_FAILURE;
     }
     /* set the sample format */
     ret = snd_pcm_hw_params_set_format(handle, params, pcmFormat);
     if (ret < 0) {
-        LOG_FUN_ERR("Sample format not available for capture: %{public}s", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Sample format not available for capture: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
     /* set the count of channels */
     ret = snd_pcm_hw_params_set_channels(handle, params, hwCapParams.channels);
     if (ret < 0) {
-        LOG_FUN_ERR("Channels count (%{public}u) not available for capture: %{public}s",
-                    hwCapParams.channels, snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Channels count (%{public}u) not available for capture: %{public}s",
+            hwCapParams.channels, snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -496,7 +496,7 @@ static int32_t SetHWRate(snd_pcm_t *handle, snd_pcm_hw_params_t *params, uint32_
     int32_t dir = 0; /* dir Value range (-1,0,1) */
 
     if (handle == NULL || params == NULL || rate == NULL) {
-        LOG_FUN_ERR("SetHWParams parameter is null!");
+        AUDIO_FUNC_LOGE("SetHWParams parameter is null!");
         return HDF_FAILURE;
     }
 
@@ -504,16 +504,16 @@ static int32_t SetHWRate(snd_pcm_t *handle, snd_pcm_hw_params_t *params, uint32_
     rRate = *rate;
     ret = snd_pcm_hw_params_set_rate_near(handle, params, &rRate, dir);
     if (ret < 0) {
-        LOG_FUN_ERR("Rate %{public}uHz not available for capture: %{public}s",
-                    *rate, snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Rate %{public}uHz not available for capture: %{public}s",
+            *rate, snd_strerror(ret));
         return HDF_FAILURE;
     }
 
     if (rRate != *rate) {
         ret = snd_pcm_hw_params_set_rate_near(handle, params, &rRate, dir);
         if (ret < 0) {
-            LOG_FUN_ERR("Rate %{public}uHz not available for capture: %{public}s",
-                        *rate, snd_strerror(ret));
+            AUDIO_FUNC_LOGE("Rate %{public}uHz not available for capture: %{public}s",
+                *rate, snd_strerror(ret));
             return HDF_FAILURE;
         }
     }
@@ -532,21 +532,21 @@ static int32_t SetHWBuffer(snd_pcm_t *handle, snd_pcm_hw_params_t *params)
     snd_pcm_uframes_t size = 0;
 
     if (handle == NULL || params == NULL) {
-        LOG_FUN_ERR("SetHWParams parameter is null!");
+        AUDIO_FUNC_LOGE("SetHWParams parameter is null!");
         return HDF_FAILURE;
     }
 
     ret = snd_pcm_hw_params_set_buffer_time_near(handle, params, &g_bufferTime, &dir);
     if (ret < 0) {
-        LOG_FUN_ERR("Unable to set buffer time %u for capture: %{public}s",
-                    g_bufferTime, snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Unable to set buffer time %u for capture: %{public}s",
+            g_bufferTime, snd_strerror(ret));
         return HDF_FAILURE;
     }
 
     ret = snd_pcm_hw_params_get_buffer_size(params, &size);
     if (ret < 0) {
-        LOG_FUN_ERR("Unable to get buffer size for capture: %{public}s",
-                    snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Unable to get buffer size for capture: %{public}s",
+            snd_strerror(ret));
         return HDF_FAILURE;
     }
     g_bufferSize = size;
@@ -561,21 +561,21 @@ static int32_t SetHWPeriod(snd_pcm_t *handle, snd_pcm_hw_params_t *params)
     snd_pcm_uframes_t size = 0;
 
     if (handle == NULL || params == NULL) {
-        LOG_FUN_ERR("SetHWParams parameter is null!");
+        AUDIO_FUNC_LOGE("SetHWParams parameter is null!");
         return HDF_FAILURE;
     }
 
     ret = snd_pcm_hw_params_set_period_time_near(handle, params, &g_periodTime, &dir);
     if (ret < 0) {
-        LOG_FUN_ERR("Unable to set period time %{public}u for capture: %{public}s",
-                    g_periodTime, snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Unable to set period time %{public}u for capture: %{public}s",
+            g_periodTime, snd_strerror(ret));
         return HDF_FAILURE;
     }
 
     ret = snd_pcm_hw_params_get_period_size(params, &size, &dir);
     if (ret < 0) {
-        LOG_FUN_ERR("Unable to get period size for capture: %{public}s",
-                    snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Unable to get period size for capture: %{public}s",
+            snd_strerror(ret));
         return HDF_FAILURE;
     }
     g_periodSize = size;
@@ -589,46 +589,46 @@ static int32_t SetHWParams(snd_pcm_t *handle, snd_pcm_hw_params_t *params,
     int32_t ret;
 
     if (handle == NULL || params == NULL) {
-        LOG_FUN_ERR("SetHWParams parameter is null!");
+        AUDIO_FUNC_LOGE("SetHWParams parameter is null!");
         return HDF_FAILURE;
     }
 
     ret = snd_pcm_hw_params_any(handle, params); // choose all parameters
     if (ret < 0) {
-        LOG_FUN_ERR("Broken configuration for capture: no configurations available: %{public}s.",
-                    snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Broken configuration for capture: no configurations available: %{public}s.",
+            snd_strerror(ret));
         return HDF_FAILURE;
     }
 
     ret = SetHWParamsSub(handle, params, hwCapParams, access);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("SetHWParamsSub failed!");
+        AUDIO_FUNC_LOGE("SetHWParamsSub failed!");
         return ret;
     }
 
     ret = SetHWRate(handle, params, &(hwCapParams.rate));
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("SetHWRate failed!");
+        AUDIO_FUNC_LOGE("SetHWRate failed!");
         return ret;
     }
 
     ret = SetHWBuffer(handle, params);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("SetHWBuffer failed!");
+        AUDIO_FUNC_LOGE("SetHWBuffer failed!");
         return ret;
     }
 
     ret = SetHWPeriod(handle, params);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("SetHWPeriod failed!");
+        AUDIO_FUNC_LOGE("SetHWPeriod failed!");
         return ret;
     }
 
     /* write the parameters to device. */
     ret = snd_pcm_hw_params(handle, params);
     if (ret < 0) {
-        LOG_FUN_ERR("Unable to set hw params for capture: %{public}s",
-                    snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Unable to set hw params for capture: %{public}s",
+            snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -640,20 +640,20 @@ static int32_t SetSWParams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams)
     int32_t ret;
 
     if (handle == NULL || swparams == NULL) {
-        LOG_FUN_ERR("SetHWParams parameter is null!");
+        AUDIO_FUNC_LOGE("SetHWParams parameter is null!");
         return HDF_FAILURE;
     }
 
     /* get the current swparams */
     ret = snd_pcm_sw_params_current(handle, swparams);
     if (ret < 0) {
-        LOG_FUN_ERR("Unable to determine current swparams for capture: %{public}s.",
-                    snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Unable to determine current swparams for capture: %{public}s.",
+            snd_strerror(ret));
         return HDF_FAILURE;
     }
 
     if (g_periodSize == 0) {
-        LOG_FUN_ERR("error: g_periodSize cannot be zero!");
+        AUDIO_FUNC_LOGE("error: g_periodSize cannot be zero!");
         return HDF_FAILURE;
     }
     /* start the transfer when the buffer is almost full: */
@@ -661,7 +661,7 @@ static int32_t SetSWParams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams)
     ret = snd_pcm_sw_params_set_start_threshold(handle, swparams,
                                                 (g_bufferSize / g_periodSize) * g_periodSize);
     if (ret < 0) {
-        LOG_FUN_ERR("Unable to set start threshold mode for capture: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Unable to set start threshold mode for capture: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -669,7 +669,7 @@ static int32_t SetSWParams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams)
     /* or disable this mechanism when period event is enabled (aka interrupt like style processing) */
     ret = snd_pcm_sw_params_set_avail_min(handle, swparams, g_periodEvent ? g_bufferSize : g_periodSize);
     if (ret < 0) {
-        LOG_FUN_ERR("Unable to set avail min for capture: %{public}s", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Unable to set avail min for capture: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -677,7 +677,7 @@ static int32_t SetSWParams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams)
     if (g_periodEvent) {
         ret = snd_pcm_sw_params_set_period_event(handle, swparams, 1);
         if (ret < 0) {
-            LOG_FUN_ERR("Unable to set period event: %{public}s", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("Unable to set period event: %{public}s", snd_strerror(ret));
             return HDF_FAILURE;
         }
     }
@@ -685,7 +685,7 @@ static int32_t SetSWParams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams)
     /* write the parameters to the capture device */
     ret = snd_pcm_sw_params(handle, swparams);
     if (ret < 0) {
-        LOG_FUN_ERR("Unable to set sw params for capture: %{public}s", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Unable to set sw params for capture: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -701,20 +701,20 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
     snd_pcm_sw_params_t *swParams = NULL;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("The parameter is empty");
+        AUDIO_FUNC_LOGE("The parameter is empty");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
 
     ret = GetCapHwParams(cardIns, handleData);
     if (ret < 0) {
-        LOG_FUN_ERR("GetCapHwParams error.");
+        AUDIO_FUNC_LOGE("GetCapHwParams error.");
         return HDF_FAILURE;
     }
 
@@ -723,12 +723,12 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
     ret = SetHWParams(cardIns->capturePcmHandle, hwParams,
                       cardIns->hwCaptureParams, SND_PCM_ACCESS_RW_INTERLEAVED);
     if (ret < 0) {
-        LOG_FUN_ERR("Setting of hwparams failed: %{public}s", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Setting of hwparams failed: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
     }
     ret = SetSWParams(cardIns->capturePcmHandle, swParams);
     if (ret < 0) {
-        LOG_FUN_ERR("Setting of swparams failed: %{public}s", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Setting of swparams failed: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -741,7 +741,7 @@ static int32_t InitMixerCtrlCapVolumeRange(const char *adapterName,
     int32_t ret;
 
     if (cardIns == NULL || adapterName == NULL) {
-        LOG_FUN_ERR("The parameter is NULL");
+        AUDIO_FUNC_LOGE("The parameter is NULL");
         return HDF_FAILURE;
     }
 
@@ -753,7 +753,7 @@ static int32_t InitMixerCtrlCapVolumeRange(const char *adapterName,
     if (cardIns->ctrlLeftVolume != NULL) {
         ret = snd_mixer_selem_set_capture_volume_range(cardIns->ctrlLeftVolume, MIN_VOLUME, MAX_VOLUME);
         if (ret < 0) {
-            LOG_FUN_ERR("Failed to set capture left volume range");
+            AUDIO_FUNC_LOGE("Failed to set capture left volume range");
             return HDF_FAILURE;
         }
     }
@@ -761,7 +761,7 @@ static int32_t InitMixerCtrlCapVolumeRange(const char *adapterName,
     if (cardIns->ctrlRightVolume != NULL) {
         ret = snd_mixer_selem_set_capture_volume_range(cardIns->ctrlRightVolume, MIN_VOLUME, MAX_VOLUME);
         if (ret < 0) {
-            LOG_FUN_ERR("Failed to set capture right volume range");
+            AUDIO_FUNC_LOGE("Failed to set capture right volume range");
             return HDF_FAILURE;
         }
     }
@@ -775,7 +775,7 @@ static int32_t InitMixerCtlElement(const char *adapterName,
     int32_t ret;
 
     if (adapterName == NULL || cardIns == NULL || mixer == NULL) {
-        LOG_FUN_ERR("The parameter is empty.");
+        AUDIO_FUNC_LOGE("The parameter is empty.");
         return HDF_FAILURE;
     }
 
@@ -783,19 +783,19 @@ static int32_t InitMixerCtlElement(const char *adapterName,
     if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
         ret = GetPriMixerCtlElement(cardIns, pcmElement);
         if (ret < 0) {
-            LOG_FUN_ERR("Capture GetPriMixerCtlElement failed.");
+            AUDIO_FUNC_LOGE("Capture GetPriMixerCtlElement failed.");
             return HDF_FAILURE;
         }
     } else if (strncmp(adapterName, USB, strlen(USB)) == 0) {
         cardIns->ctrlLeftVolume = AudioUsbFindElement(mixer);
     } else {
-        LOG_FUN_ERR("The selected sound card not supported, please check!");
+        AUDIO_FUNC_LOGE("The selected sound card not supported, please check!");
         return HDF_FAILURE;
     }
 
     ret = InitMixerCtrlCapVolumeRange(adapterName, cardIns);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("InitMixerCtrlCapVolumeRange fail!");
+        AUDIO_FUNC_LOGE("InitMixerCtrlCapVolumeRange fail!");
         return ret;
     }
 
@@ -804,7 +804,7 @@ static int32_t InitMixerCtlElement(const char *adapterName,
                                 SND_CAP_MIC_PATH,
                                 SND_OUT_CARD_MAIN_MIC);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("AudioMixerSetCtrlMode failed!");
+        AUDIO_FUNC_LOGE("AudioMixerSetCtrlMode failed!");
         return ret;
     }
 
@@ -822,25 +822,25 @@ int32_t AudioOutputCaptureOpen(const struct DevHandleCapture *handle,
     struct AudioCardInfo *cardIns;
 
     if (handleData == NULL) {
-        LOG_FUN_ERR("Function parameter is NULL!");
+        AUDIO_FUNC_LOGE("Function parameter is NULL!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = AudioGetCardInfo(adapterName, SND_PCM_STREAM_CAPTURE);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("AudioRenderGetCardIns failed.");
+        AUDIO_FUNC_LOGE("AudioRenderGetCardIns failed.");
         return HDF_FAILURE;
     }
 
     if (cardIns->capturePcmHandle != NULL) {
-        LOG_FUN_ERR("Resource busy!!");
+        AUDIO_FUNC_LOGE("Resource busy!!");
         return HDF_ERR_DEVICE_BUSY;
     }
     ret = snd_pcm_open(&cardIns->capturePcmHandle, cardIns->devName,
         SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK);
     if (ret < 0) {
-        LOG_FUN_ERR("Capture open device error: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Capture open device error: %{public}s.", snd_strerror(ret));
         CheckCardStatus(cardIns);
         (void)DestroyCardList();
         return HDF_FAILURE;
@@ -849,7 +849,7 @@ int32_t AudioOutputCaptureOpen(const struct DevHandleCapture *handle,
     InitSound(&cardIns->mixer, cardIns->ctrlName);
     ret = InitMixerCtlElement(adapterName, cardIns, cardIns->mixer);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("capture InitMixerCtlElement failed!");
+        AUDIO_FUNC_LOGE("capture InitMixerCtlElement failed!");
         (void)CloseMixerHandle(cardIns->mixer);
         CheckCardStatus(cardIns);
         (void)DestroyCardList();
@@ -867,7 +867,7 @@ int32_t AudioCaptureResetParams(snd_pcm_t *handle,
     snd_pcm_sw_params_t *swParams = NULL;
 
     if (handle == NULL) {
-        LOG_FUN_ERR("handle is NULL!");
+        AUDIO_FUNC_LOGE("handle is NULL!");
         return HDF_FAILURE;
     }
 
@@ -875,15 +875,15 @@ int32_t AudioCaptureResetParams(snd_pcm_t *handle,
     snd_pcm_sw_params_alloca(&swParams);
     ret = SetHWParams(handle, hwParams, audioHwParams, access);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Setting of hwparams failed: %{public}s",
-                    snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Setting of hwparams failed: %{public}s",
+            snd_strerror(ret));
         return HDF_FAILURE;
     }
 
     ret = SetSWParams(handle, swParams);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Setting of swparams failed: %{public}s",
-                    snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Setting of swparams failed: %{public}s",
+            snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -899,19 +899,19 @@ static int32_t CaptureDataCopy(struct AudioHwCaptureParam *handleData,
     uint64_t recvDataSize;
 
     if (handleData == NULL || buffer == NULL || frames == 0) {
-        LOG_FUN_ERR("Param is NULL!");
+        AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_FAILURE;
     }
 
     if (g_canPause == 0) { /* Hardware does not support pause, enable soft solution */
         if (handleData->captureMode.ctlParam.pause) {
-            LOG_FUN_ERR("Currently in pause, please check!");
+            AUDIO_FUNC_LOGE("Currently in pause, please check!");
             return HDF_FAILURE;
         }
     }
 
     if (handleData->frameCaptureMode.buffer == NULL) {
-        LOG_FUN_ERR("frameCaptureMode.buffer is NULL!");
+        AUDIO_FUNC_LOGE("frameCaptureMode.buffer is NULL!");
         return HDF_FAILURE;
     }
     channels = handleData->frameCaptureMode.attrs.channelCount;
@@ -919,7 +919,7 @@ static int32_t CaptureDataCopy(struct AudioHwCaptureParam *handleData,
     recvDataSize = (uint64_t)(frames * channels * format);
     ret = memcpy_s(handleData->frameCaptureMode.buffer, CAPTURE_FRAME_DATA, buffer, recvDataSize);
     if (ret != EOK) {
-        LOG_FUN_ERR("memcpy frame data failed!");
+        AUDIO_FUNC_LOGE("memcpy frame data failed!");
         return HDF_FAILURE;
     }
     handleData->frameCaptureMode.bufferSize = recvDataSize;
@@ -936,18 +936,18 @@ static int32_t AudioCaptureReadFrame(struct AudioHwCaptureParam *handleData,
     char *buffer = NULL;
 
     if (handleData == NULL || cardIns == NULL) {
-        LOG_FUN_ERR("Param is NULL!");
+        AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_FAILURE;
     }
     buffer = calloc(1, bufferSize);
     if (buffer == NULL) {
-        LOG_FUN_ERR("Failed to Calloc buffer");
+        AUDIO_FUNC_LOGE("Failed to Calloc buffer");
         return HDF_FAILURE;
     }
 
     ret = snd_pcm_wait(cardIns->capturePcmHandle, -1);
     if (ret < 0) {
-        LOG_FUN_ERR("snd_pcm_wait failed: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("snd_pcm_wait failed: %{public}s.", snd_strerror(ret));
         AudioMemFree((void **)&buffer);
         return HDF_FAILURE;
     }
@@ -956,14 +956,14 @@ static int32_t AudioCaptureReadFrame(struct AudioHwCaptureParam *handleData,
         frames = snd_pcm_recover(cardIns->capturePcmHandle, frames, 0); // 0 for open log
     }
     if (frames < 0) {
-        LOG_FUN_ERR("snd_pcm_writei fail: %{public}s.", snd_strerror(frames));
+        AUDIO_FUNC_LOGE("snd_pcm_writei fail: %{public}s.", snd_strerror(frames));
         AudioMemFree((void **)&buffer);
         return HDF_FAILURE;
     }
 
     ret = CaptureDataCopy(handleData, buffer, (uint64_t)frames);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Failed to copy data. It may be paused. Check the status!");
+        AUDIO_FUNC_LOGE("Failed to copy data. It may be paused. Check the status!");
         AudioMemFree((void **)&buffer);
         return HDF_FAILURE;
     }
@@ -981,20 +981,20 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
     snd_pcm_uframes_t periodSize = 0;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("Param is NULL!");
+        AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
 
     ret = snd_pcm_get_params(cardIns->capturePcmHandle, &bufferSize, &periodSize);
     if (ret < 0) {
-        LOG_FUN_ERR("Get capture params error: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Get capture params error: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -1003,12 +1003,12 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
                                       cardIns->hwCaptureParams,
                                       SND_PCM_ACCESS_RW_INTERLEAVED);
         if (ret != HDF_SUCCESS) {
-            LOG_FUN_ERR("AudioSetParamsMmap failed!");
+            AUDIO_FUNC_LOGE("AudioSetParamsMmap failed!");
             return ret;
         }
         ret = snd_pcm_start(cardIns->capturePcmHandle);
         if (ret < 0) {
-            LOG_FUN_ERR("snd_pcm_start fail. %{public}s", snd_strerror(ret));
+            AUDIO_FUNC_LOGE("snd_pcm_start fail. %{public}s", snd_strerror(ret));
             return HDF_FAILURE;
         }
         cardIns->captureMmapFlag = true;
@@ -1016,7 +1016,7 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
 
     ret = AudioCaptureReadFrame(handleData, cardIns, bufferSize, periodSize);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("AudioOutputCaptureRead failed");
+        AUDIO_FUNC_LOGE("AudioOutputCaptureRead failed");
         return ret;
     }
 
@@ -1027,7 +1027,7 @@ int32_t AudioOutputCaptureStart(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("Param is NULL!");
+        AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_FAILURE;
     }
 
@@ -1041,20 +1041,20 @@ int32_t AudioOutputCapturePrepare(const struct DevHandleCapture *handle,
     struct AudioCardInfo *cardIns;
 
     if (handleData == NULL) {
-        LOG_FUN_ERR("Param is NULL!");
+        AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
 
     ret = snd_pcm_prepare(cardIns->capturePcmHandle);
     if (ret < 0) {
-        LOG_FUN_ERR("snd_pcm_prepare fail! %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("snd_pcm_prepare fail! %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -1068,14 +1068,14 @@ int32_t AudioOutputCaptureClose(const struct DevHandleCapture *handle,
     struct AudioCardInfo *cardIns;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("Parameter is NULL!");
+        AUDIO_FUNC_LOGE("Parameter is NULL!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
 
@@ -1095,7 +1095,7 @@ int32_t AudioOutputCaptureClose(const struct DevHandleCapture *handle,
         (void)memset_s(cardIns->cardName, MAX_CARD_NAME_LEN + 1, 0, MAX_CARD_NAME_LEN + 1);
         ret = DestroyCardList();
         if (ret != HDF_SUCCESS) {
-            LOG_FUN_ERR("DestroyCardList failed: %{public}d.", ret);
+            AUDIO_FUNC_LOGE("DestroyCardList failed: %{public}d.", ret);
             return ret;
         }
     }
@@ -1111,21 +1111,21 @@ int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
     struct AudioCardInfo *cardIns;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("Param is NULL!");
+        AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
 
     /* pass the remaining samples, otherwise they're dropped in close */
     ret = snd_pcm_drop(cardIns->capturePcmHandle);
     if (ret < 0) {
-        LOG_FUN_ERR("snd_pcm_drain failed: %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("snd_pcm_drain failed: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -1137,7 +1137,7 @@ static int32_t UpdateSetParams(struct AudioCardInfo *cardIns)
     int32_t ret;
 
     if (cardIns == NULL) {
-        LOG_FUN_ERR("param is NULL!");
+        AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
 
@@ -1145,13 +1145,13 @@ static int32_t UpdateSetParams(struct AudioCardInfo *cardIns)
     ret = AudioCaptureResetParams(cardIns->capturePcmHandle,
         cardIns->hwCaptureParams, SND_PCM_ACCESS_MMAP_INTERLEAVED);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("AudioSetParamsMmap failed!");
+        AUDIO_FUNC_LOGE("AudioSetParamsMmap failed!");
         return ret;
     }
 
     ret = snd_pcm_start(cardIns->capturePcmHandle);
     if (ret < 0) {
-        LOG_FUN_ERR("snd_pcm_start fail. %{public}s.", snd_strerror(ret));
+        AUDIO_FUNC_LOGE("snd_pcm_start fail. %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
     }
 
@@ -1168,20 +1168,20 @@ static int32_t MmapDescWriteBufferCapture(const struct AudioHwCaptureParam *hand
     struct AudioCardInfo *cardIns;
 
     if (handleData == NULL) {
-        LOG_FUN_ERR("param is NULL!");
+        AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
 
     ret = UpdateSetParams(cardIns);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Update set params failed!");
+        AUDIO_FUNC_LOGE("Update set params failed!");
         return HDF_FAILURE;
     }
 
@@ -1195,7 +1195,7 @@ static int32_t MmapDescWriteBufferCapture(const struct AudioHwCaptureParam *hand
                 snd_pcm_wait(cardIns->capturePcmHandle, AUDIO_PCM_WAIT);
                 continue;
             }
-            LOG_FUN_ERR("snd_pcm_mmap_readi: %{public}s", snd_strerror(xfer));
+            AUDIO_FUNC_LOGE("snd_pcm_mmap_readi: %{public}s", snd_strerror(xfer));
             return HDF_FAILURE;
         }
 
@@ -1215,13 +1215,13 @@ int32_t AudioOutputCaptureReqMmapBuffer(const struct DevHandleCapture *handle,
     int32_t ret;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("param is NULL!");
+        AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
 
     ret = MmapDescWriteBufferCapture(handleData);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("Capture mmap write buffer failed!");
+        AUDIO_FUNC_LOGE("Capture mmap write buffer failed!");
         return HDF_FAILURE;
     }
 
@@ -1234,14 +1234,14 @@ int32_t AudioOutputCaptureGetMmapPosition(const struct DevHandleCapture *handle,
     struct AudioCardInfo *cardIns;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("param is NULL!");
+        AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        LOG_FUN_ERR("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
     handleData->frameCaptureMode.frames = cardIns->capMmapFrames;
@@ -1257,26 +1257,26 @@ static int32_t AudioBindServiceCaptureObject(struct DevHandleCapture * const han
     struct HdfIoService *service;
 
     if (handle == NULL || name == NULL) {
-        LOG_FUN_ERR("service name or handle is NULL!");
+        AUDIO_FUNC_LOGE("service name or handle is NULL!");
         return HDF_FAILURE;
     }
 
     serviceName = (char *)calloc(1, NAME_LEN);
     if (serviceName == NULL) {
-        LOG_FUN_ERR("Failed to OsalMemCalloc serviceName");
+        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc serviceName");
         return HDF_FAILURE;
     }
 
     ret = snprintf_s(serviceName, NAME_LEN - 1, SERVIC_NAME_MAX_LEN + 1, "hdf_audio_%s", name);
     if (ret < 0) {
-        LOG_FUN_ERR("Failed to snprintf_s, err = %{public}d.", ret);
+        AUDIO_FUNC_LOGE("Failed to snprintf_s, err = %{public}d.", ret);
         AudioMemFree((void **)&serviceName);
         return HDF_FAILURE;
     }
 
     service = HdfIoServiceBindName(serviceName);
     if (service == NULL) {
-        LOG_FUN_ERR("Failed to get service!");
+        AUDIO_FUNC_LOGE("Failed to get service!");
         AudioMemFree((void **)&serviceName);
         return HDF_FAILURE;
     }
@@ -1293,23 +1293,23 @@ struct DevHandleCapture *AudioBindServiceCapture(const char *name)
     struct DevHandleCapture *handle = NULL;
 
     if (name == NULL) {
-        LOG_FUN_ERR("service name NULL!");
+        AUDIO_FUNC_LOGE("service name NULL!");
         return NULL;
     }
 
     handle = (struct DevHandleCapture *)calloc(1, sizeof(struct DevHandleCapture));
     if (handle == NULL) {
-        LOG_FUN_ERR("Failed to OsalMemCalloc handle");
+        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc handle");
         return NULL;
     }
 
     ret = AudioBindServiceCaptureObject(handle, name);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("AudioBindServiceCaptureObject failed!");
+        AUDIO_FUNC_LOGE("AudioBindServiceCaptureObject failed!");
         AudioMemFree((void **)&handle);
         return NULL;
     }
-    LOG_PARA_INFO("BIND SERVICE SUCCESS!");
+    AUDIO_FUNC_LOGI("BIND SERVICE SUCCESS!");
 
     return handle;
 }
@@ -1318,7 +1318,7 @@ void AudioCloseServiceCapture(const struct DevHandleCapture *handle)
 {
     if (handle != NULL) {
         if (handle->object == NULL) {
-            LOG_FUN_ERR("Capture handle or handle->object is NULL");
+            AUDIO_FUNC_LOGE("Capture handle or handle->object is NULL");
         }
         AudioMemFree((void **)&handle);
     }
@@ -1330,7 +1330,7 @@ int32_t AudioInterfaceLibOutputCapture(const struct DevHandleCapture *handle,
     int32_t ret;
 
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("Parameter is NULL!");
+        AUDIO_FUNC_LOGE("Parameter is NULL!");
         return HDF_FAILURE;
     }
 
@@ -1366,7 +1366,7 @@ int32_t AudioInterfaceLibOutputCapture(const struct DevHandleCapture *handle,
             ret = AudioOutputCaptureGetMmapPosition(handle, cmdId, handleData);
             break;
         default:
-            LOG_FUN_ERR("Output Mode not support!");
+            AUDIO_FUNC_LOGE("Output Mode not support!");
             ret = HDF_FAILURE;
             break;
     }
@@ -1377,9 +1377,9 @@ int32_t AudioInterfaceLibOutputCapture(const struct DevHandleCapture *handle,
 int32_t AudioInterfaceLibModeCapture(const struct DevHandleCapture *handle,
     struct AudioHwCaptureParam *handleData, int cmdId)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     if (handle == NULL || handleData == NULL) {
-        LOG_FUN_ERR("paras is NULL!");
+        AUDIO_FUNC_LOGE("paras is NULL!");
         return HDF_FAILURE;
     }
 
@@ -1406,7 +1406,7 @@ int32_t AudioInterfaceLibModeCapture(const struct DevHandleCapture *handle,
         case AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE:
             return (AudioInterfaceLibCtlCapture(handle, cmdId, handleData));
         default:
-            LOG_FUN_ERR("Mode Error!");
+            AUDIO_FUNC_LOGE("Mode Error!");
             break;
     }
 

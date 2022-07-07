@@ -22,26 +22,25 @@
 
 void AudioHdiUsbServerRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: enter!", __func__);
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI("enter!");
     /* g_renderAndCaptureManage release */
     AdaptersServerManageInfomationRecycle();
     ReleaseAudioManagerObjectComm(GetAudioManagerFuncs());
 
     if (deviceObject == NULL) {
-        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
+        AUDIO_FUNC_LOGE("deviceObject is null!");
         return;
     }
     deviceObject->service = NULL;
-    HDF_LOGD("%{public}s: end!", __func__);
+    AUDIO_FUNC_LOGD("end!");
     return;
 }
 
 int AudioHdiUsbServerBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: enter!", __func__);
+    AUDIO_FUNC_LOGI("enter!");
     if (deviceObject == NULL) {
-        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
+        AUDIO_FUNC_LOGE("deviceObject is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     static struct IDeviceIoService hdiService = {
@@ -55,25 +54,24 @@ int AudioHdiUsbServerBind(struct HdfDeviceObject *deviceObject)
     }
     int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.audio_service");
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("failed to set interface desc");
+        AUDIO_FUNC_LOGE("failed to set interface desc");
         return ret;
     }
     deviceObject->service = &hdiService;
-    HDF_LOGD("%{public}s: end!", __func__);
+    AUDIO_FUNC_LOGD("end!");
     return AUDIO_HAL_SUCCESS;
 }
 
 int AudioHdiUsbServerInit(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("%{public}s: enter!", __func__);
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI("enter!");
     if (deviceObject == NULL) {
-        HDF_LOGE("%{public}s: deviceObject is null!", __func__);
+        AUDIO_FUNC_LOGE("deviceObject is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
     if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO)) {
-        HDF_LOGE("%{public}s: Set USB DEVICE_CLASS_AUDIO fail!", __func__);
+        AUDIO_FUNC_LOGE("Set USB DEVICE_CLASS_AUDIO fail!");
     }
     struct AudioEvent audioSrvEvent = {
         .eventType = HDF_AUDIO_SERVICE_INVALID,
@@ -81,7 +79,7 @@ int AudioHdiUsbServerInit(struct HdfDeviceObject *deviceObject)
     };
     AudioServiceStateChange(deviceObject, &audioSrvEvent);
 
-    HDF_LOGD("%{public}s: end!", __func__);
+    AUDIO_FUNC_LOGD("end!");
     return AUDIO_HAL_SUCCESS;
 }
 

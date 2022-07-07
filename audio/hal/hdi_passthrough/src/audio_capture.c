@@ -29,39 +29,39 @@
 /* add For Capture Bytes To Frames */
 int32_t AudioCaptureStart(AudioHandle handle)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid");
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
-        LOG_FUN_ERR("The hwCapture is NULL");
+        AUDIO_FUNC_LOGE("The hwCapture is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (hwCapture->captureParam.frameCaptureMode.buffer != NULL) {
-        LOG_FUN_ERR("AudioCapture already start!");
+        AUDIO_FUNC_LOGE("AudioCapture already start!");
         return AUDIO_HAL_ERR_AI_BUSY; // capture is busy now
     }
     if (hwCapture->devDataHandle == NULL) {
-        LOG_FUN_ERR("CaptureStart Bind Fail!");
+        AUDIO_FUNC_LOGE("CaptureStart Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
                                               AUDIO_DRV_PCM_IOCTRL_START_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("AudioCaptureStart SetParams FAIL");
+        AUDIO_FUNC_LOGE("AudioCaptureStart SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     char *tbuffer = (char *)calloc(1, CAPTURE_FRAME_DATA);
     if (tbuffer == NULL) {
-        LOG_FUN_ERR("Calloc Capture tbuffer Fail!");
+        AUDIO_FUNC_LOGE("Calloc Capture tbuffer Fail!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     hwCapture->captureParam.frameCaptureMode.buffer = tbuffer;
@@ -71,36 +71,36 @@ int32_t AudioCaptureStart(AudioHandle handle)
 
 int32_t AudioCaptureStop(AudioHandle handle)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid");
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
-        LOG_FUN_ERR("hwCapture is null");
+        AUDIO_FUNC_LOGE("hwCapture is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwCapture->devDataHandle == NULL) {
-        LOG_FUN_ERR("CaptureStart Bind Fail!");
+        AUDIO_FUNC_LOGE("CaptureStart Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (hwCapture->captureParam.frameCaptureMode.buffer != NULL) {
         AudioMemFree((void **)&hwCapture->captureParam.frameCaptureMode.buffer);
     } else {
-        LOG_FUN_ERR("Repeat invalid stop operation!");
+        AUDIO_FUNC_LOGE("Repeat invalid stop operation!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
                                               AUDIO_DRV_PCM_IOCTRL_STOP_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("AudioCaptureStop SetParams FAIL");
+        AUDIO_FUNC_LOGE("AudioCaptureStop SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     AudioLogRecord(INFO, "[%s]-[%s]-[%d] :> [%s]", __FILE__, __func__, __LINE__, "Audio Capture Stop");
@@ -109,33 +109,33 @@ int32_t AudioCaptureStop(AudioHandle handle)
 
 int32_t AudioCapturePause(AudioHandle handle)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid");
         return ret;
     }
 
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
-        LOG_FUN_ERR("hwCapture is empty");
+        AUDIO_FUNC_LOGE("hwCapture is empty");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwCapture->captureParam.frameCaptureMode.buffer == NULL) {
-        LOG_FUN_ERR("AudioCapture already stop!");
+        AUDIO_FUNC_LOGE("AudioCapture already stop!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (hwCapture->captureParam.captureMode.ctlParam.pause) {
-        LOG_FUN_ERR("Audio capture is already pause!");
+        AUDIO_FUNC_LOGE("Audio capture is already pause!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     if (hwCapture->devDataHandle == NULL) {
-        LOG_FUN_ERR("CaptureStart Bind Fail!");
+        AUDIO_FUNC_LOGE("CaptureStart Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     bool pauseStatus = hwCapture->captureParam.captureMode.ctlParam.pause;
@@ -143,7 +143,7 @@ int32_t AudioCapturePause(AudioHandle handle)
     ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
                                               AUDIODRV_CTL_IOCTL_PAUSE_WRITE_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("Audio Capture Pause FAIL!");
+        AUDIO_FUNC_LOGE("Audio Capture Pause FAIL!");
         hwCapture->captureParam.captureMode.ctlParam.pause = pauseStatus;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -153,28 +153,29 @@ int32_t AudioCapturePause(AudioHandle handle)
 
 int32_t AudioCaptureResume(AudioHandle handle)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid");
         return ret;
     }
 
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (!hwCapture->captureParam.captureMode.ctlParam.pause) {
-        LOG_FUN_ERR("Audio capture is already Resume !");
+        AUDIO_FUNC_LOGE("Audio capture is already Resume !");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     if (hwCapture->devDataHandle == NULL) {
-        LOG_FUN_ERR("Capture Start Bind Fail!");
+        AUDIO_FUNC_LOGE("Capture Start Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     bool resumeStatus = hwCapture->captureParam.captureMode.ctlParam.pause;
@@ -182,7 +183,7 @@ int32_t AudioCaptureResume(AudioHandle handle)
     ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
                                               AUDIODRV_CTL_IOCTL_PAUSE_WRITE_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("Audio capture Resume FAIL!");
+        AUDIO_FUNC_LOGE("Audio capture Resume FAIL!");
         hwCapture->captureParam.captureMode.ctlParam.pause = resumeStatus;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -192,14 +193,15 @@ int32_t AudioCaptureResume(AudioHandle handle)
 
 int32_t AudioCaptureFlush(AudioHandle handle)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid, ret = %{public}d", ret);
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid, ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     return AUDIO_HAL_ERR_NOT_SUPPORT;
@@ -207,14 +209,15 @@ int32_t AudioCaptureFlush(AudioHandle handle)
 
 int32_t AudioCaptureGetFrameSize(AudioHandle handle, uint64_t *size)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid");
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || size == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture or size is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     uint32_t channelCount = hwCapture->captureParam.frameCaptureMode.attrs.channelCount;
@@ -222,6 +225,7 @@ int32_t AudioCaptureGetFrameSize(AudioHandle handle, uint64_t *size)
     uint32_t formatBitsCapture = 0;
     ret = FormatToBits(format, &formatBitsCapture);
     if (ret != AUDIO_HAL_SUCCESS) {
+        AUDIO_FUNC_LOGE("FormatToBits failed! ret = %{public}d", ret);
         return ret;
     }
     *size = FRAME_SIZE * channelCount * (formatBitsCapture >> 3);
@@ -230,14 +234,15 @@ int32_t AudioCaptureGetFrameSize(AudioHandle handle, uint64_t *size)
 
 int32_t AudioCaptureGetFrameCount(AudioHandle handle, uint64_t *count)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid");
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || count == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture or count is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     *count = hwCapture->captureParam.frameCaptureMode.frames;
@@ -246,18 +251,20 @@ int32_t AudioCaptureGetFrameCount(AudioHandle handle, uint64_t *count)
 
 int32_t AudioCaptureSetSampleAttributes(AudioHandle handle, const struct AudioSampleAttributes *attrs)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid");
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || attrs == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture or attrs is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     ret = AudioCheckParaAttr(attrs);
     if (ret != AUDIO_HAL_SUCCESS) {
+        AUDIO_FUNC_LOGE("udioCheckParaAttr failed! ret = %{public}d", ret);
         return ret;
     }
     struct AudioSampleAttributes tempAttrs = hwCapture->captureParam.frameCaptureMode.attrs;
@@ -276,7 +283,7 @@ int32_t AudioCaptureSetSampleAttributes(AudioHandle handle, const struct AudioSa
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
         hwCapture->captureParam.frameCaptureMode.attrs = tempAttrs;
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (hwCapture->devDataHandle == NULL) {
@@ -286,7 +293,7 @@ int32_t AudioCaptureSetSampleAttributes(AudioHandle handle, const struct AudioSa
     ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
                                               AUDIO_DRV_PCM_IOCTL_HW_PARAMS);
     if (ret < 0) {
-        LOG_FUN_ERR("CaptureSetSampleAttributes FAIL");
+        AUDIO_FUNC_LOGE("CaptureSetSampleAttributes FAIL");
         hwCapture->captureParam.frameCaptureMode.attrs = tempAttrs;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -295,14 +302,15 @@ int32_t AudioCaptureSetSampleAttributes(AudioHandle handle, const struct AudioSa
 
 int32_t AudioCaptureGetSampleAttributes(AudioHandle handle, struct AudioSampleAttributes *attrs)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || attrs == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture or attrs is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     attrs->format = hwCapture->captureParam.frameCaptureMode.attrs.format;
@@ -322,14 +330,15 @@ int32_t AudioCaptureGetSampleAttributes(AudioHandle handle, struct AudioSampleAt
 
 int32_t AudioCaptureGetCurrentChannelId(AudioHandle handle, uint32_t *channelId)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || channelId == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture or channelId is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     *channelId = hwCapture->captureParam.frameCaptureMode.attrs.channelCount;
@@ -339,14 +348,15 @@ int32_t AudioCaptureGetCurrentChannelId(AudioHandle handle, uint32_t *channelId)
 int32_t AudioCaptureCheckSceneCapability(AudioHandle handle, const struct AudioSceneDescriptor *scene,
                                          bool *supported)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || scene == NULL || supported == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture or scene or supported is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
@@ -357,16 +367,16 @@ int32_t AudioCaptureCheckSceneCapability(AudioHandle handle, const struct AudioS
     captureParam.captureMode.hwInfo.deviceDescript.pins = scene->desc.pins;
     PathSelAnalysisJson *pPathSelAnalysisJson = AudioSoGetPathSelAnalysisJson();
     if (pPathSelAnalysisJson == NULL || *pPathSelAnalysisJson == NULL) {
-        LOG_FUN_ERR("pPathSelAnalysisJson Is NULL!");
+        AUDIO_FUNC_LOGE("pPathSelAnalysisJson Is NULL!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     ret = (*pPathSelAnalysisJson)((void *)&captureParam, CHECKSCENE_PATH_SELECT_CAPTURE);
     if (ret < 0) {
         if (ret == AUDIO_HAL_ERR_NOT_SUPPORT) {
-            LOG_FUN_ERR("AudioCaptureCheckSceneCapability not Support!");
+            AUDIO_FUNC_LOGE("AudioCaptureCheckSceneCapability not Support!");
             return AUDIO_HAL_ERR_NOT_SUPPORT;
         } else {
-            LOG_FUN_ERR("AudioCaptureCheckSceneCapability fail!");
+            AUDIO_FUNC_LOGE("AudioCaptureCheckSceneCapability fail!");
             return AUDIO_HAL_ERR_INTERNAL;
         }
     }
@@ -381,21 +391,22 @@ int32_t AudioCaptureSelectScene(AudioHandle handle, const struct AudioSceneDescr
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || scene == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture or scene  is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwCapture->devCtlHandle == NULL) {
-        LOG_FUN_ERR("CaptureSelectScene Bind Fail!");
+        AUDIO_FUNC_LOGE("CaptureSelectScene Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     PathSelAnalysisJson *pPathSelAnalysisJson = AudioSoGetPathSelAnalysisJson();
     if (pPathSelAnalysisJson == NULL || *pPathSelAnalysisJson == NULL) {
-        LOG_FUN_ERR("pPathSelAnalysisJson Is NULL!");
+        AUDIO_FUNC_LOGE("pPathSelAnalysisJson Is NULL!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     enum AudioCategory typeTemp = hwCapture->captureParam.frameCaptureMode.attrs.type;
@@ -403,14 +414,14 @@ int32_t AudioCaptureSelectScene(AudioHandle handle, const struct AudioSceneDescr
     hwCapture->captureParam.frameCaptureMode.attrs.type = (enum AudioCategory)(scene->scene.id);
     hwCapture->captureParam.captureMode.hwInfo.deviceDescript.pins = scene->desc.pins;
     if ((*pPathSelAnalysisJson)((void *)&hwCapture->captureParam, CAPTURE_PATH_SELECT) < 0) {
-        LOG_FUN_ERR("AudioCaptureSelectScene Fail!");
+        AUDIO_FUNC_LOGE("AudioCaptureSelectScene Fail!");
         hwCapture->captureParam.frameCaptureMode.attrs.type = typeTemp;
         hwCapture->captureParam.captureMode.hwInfo.deviceDescript.pins = pinsTemp;
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Is NULL");
         hwCapture->captureParam.frameCaptureMode.attrs.type = typeTemp;
         hwCapture->captureParam.captureMode.hwInfo.deviceDescript.pins = pinsTemp;
         return AUDIO_HAL_ERR_INTERNAL;
@@ -418,7 +429,7 @@ int32_t AudioCaptureSelectScene(AudioHandle handle, const struct AudioSceneDescr
     ret = (*pInterfaceLibModeCapture)(hwCapture->devCtlHandle, &hwCapture->captureParam,
                                               AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("SetSelectSceneParams FAIL!");
+        AUDIO_FUNC_LOGE("SetSelectSceneParams FAIL!");
         hwCapture->captureParam.frameCaptureMode.attrs.type = typeTemp;
         hwCapture->captureParam.captureMode.hwInfo.deviceDescript.pins = pinsTemp;
         return AUDIO_HAL_ERR_INTERNAL;
@@ -431,10 +442,10 @@ int32_t AudioCaptureSelectScene(AudioHandle handle, const struct AudioSceneDescr
 
 int32_t AudioCaptureSetMute(AudioHandle handle, bool mute)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *impl = (struct AudioHwCapture *)handle;
@@ -442,12 +453,12 @@ int32_t AudioCaptureSetMute(AudioHandle handle, bool mute)
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (impl->devCtlHandle == NULL) {
-        LOG_FUN_ERR("CaptureSetMute Bind Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetMute Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     bool muteStatus = impl->captureParam.captureMode.ctlParam.mute;
@@ -455,7 +466,7 @@ int32_t AudioCaptureSetMute(AudioHandle handle, bool mute)
     ret = (*pInterfaceLibModeCapture)(impl->devCtlHandle, &impl->captureParam,
                                               AUDIODRV_CTL_IOCTL_MUTE_WRITE_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("SetMute SetParams FAIL");
+        AUDIO_FUNC_LOGE("SetMute SetParams FAIL");
         impl->captureParam.captureMode.ctlParam.mute = muteStatus;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -465,10 +476,10 @@ int32_t AudioCaptureSetMute(AudioHandle handle, bool mute)
 
 int32_t AudioCaptureGetMute(AudioHandle handle, bool *mute)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *impl = (struct AudioHwCapture *)handle;
@@ -476,66 +487,66 @@ int32_t AudioCaptureGetMute(AudioHandle handle, bool *mute)
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (impl->devCtlHandle == NULL) {
-        LOG_FUN_ERR("CaptureGetMute Bind Fail!");
+        AUDIO_FUNC_LOGE("CaptureGetMute Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeCapture)(impl->devCtlHandle, &impl->captureParam,
                                               AUDIODRV_CTL_IOCTL_MUTE_READ_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("GetMute SetParams FAIL");
+        AUDIO_FUNC_LOGE("GetMute SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     *mute = impl->captureParam.captureMode.ctlParam.mute;
-    LOG_PARA_INFO("Get Mute SUCCESS!");
+    AUDIO_FUNC_LOGI("Get Mute SUCCESS!");
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioCaptureSetVolume(AudioHandle handle, float volume)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
-        LOG_FUN_ERR("The pointer is null");
+        AUDIO_FUNC_LOGE("The pointer is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     float volumeTemp = hwCapture->captureParam.captureMode.ctlParam.volume;
     float volMax = (float)hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMax;
     float volMin = (float)hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMin;
     if (hwCapture->devCtlHandle == NULL) {
-        LOG_FUN_ERR("Bind Fail!");
+        AUDIO_FUNC_LOGE("Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (volume < 0 || volume > 1) {
-        LOG_FUN_ERR("volume param Is error!");
+        AUDIO_FUNC_LOGE("set volume [%{public}f] out of range:[0-1]!", volume);
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     volume = (volume == 0) ? 1 : (volume * VOLUME_CHANGE);
     /* change volume to db */
     float volTemp = ((volMax - volMin) / 2) * log10(volume) + volMin;
     if (volTemp < volMin || volTemp > volMax) {
-        LOG_FUN_ERR("volTemp fail");
+        AUDIO_FUNC_LOGE("volTemp fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     hwCapture->captureParam.captureMode.ctlParam.volume = volTemp;
     ret = (*pInterfaceLibModeCapture)(hwCapture->devCtlHandle, &hwCapture->captureParam,
                                               AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("SetParams FAIL!");
+        AUDIO_FUNC_LOGE("SetParams FAIL!");
         hwCapture->captureParam.captureMode.ctlParam.volume = volumeTemp;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -544,36 +555,37 @@ int32_t AudioCaptureSetVolume(AudioHandle handle, float volume)
 
 int32_t AudioCaptureGetVolume(AudioHandle handle, float *volume)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || volume == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture or volume is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwCapture->devCtlHandle == NULL) {
-        LOG_FUN_ERR("CaptureStart Bind Fail!");
+        AUDIO_FUNC_LOGE("CaptureStart Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeCapture)(hwCapture->devCtlHandle, &hwCapture->captureParam,
                                           AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("Get Volume FAIL!");
+        AUDIO_FUNC_LOGE("Get Volume FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     float volumeTemp = hwCapture->captureParam.captureMode.ctlParam.volume;
     float volMax = (float)hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMax;
     float volMin = (float)hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMin;
     if ((volMax - volMin) == 0) {
-        LOG_FUN_ERR("Divisor cannot be zero!");
+        AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / 2);
@@ -584,29 +596,30 @@ int32_t AudioCaptureGetVolume(AudioHandle handle, float *volume)
 
 int32_t AudioCaptureGetGainThreshold(AudioHandle handle, float *min, float *max)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || min == NULL || max == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture or min or max is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwCapture->devCtlHandle == NULL) {
-        LOG_FUN_ERR("AudioCaptureGetGainThreshold Bind Fail!");
+        AUDIO_FUNC_LOGE("AudioCaptureGetGainThreshold Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeCapture)(hwCapture->devCtlHandle, &hwCapture->captureParam,
                                               AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("SetParams FAIL!");
+        AUDIO_FUNC_LOGE("SetParams FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     *max = hwCapture->captureParam.captureMode.ctlParam.audioGain.gainMax;
@@ -616,29 +629,30 @@ int32_t AudioCaptureGetGainThreshold(AudioHandle handle, float *min, float *max)
 
 int32_t AudioCaptureGetGain(AudioHandle handle, float *gain)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *impl = (struct AudioHwCapture *)handle;
     if (impl == NULL || gain == NULL) {
+        AUDIO_FUNC_LOGE("impl or gain is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (impl->devCtlHandle == NULL) {
-        LOG_FUN_ERR("CaptureStart Bind Fail!");
+        AUDIO_FUNC_LOGE("CaptureStart Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeCapture)(impl->devCtlHandle, &impl->captureParam,
                                               AUDIODRV_CTL_IOCTL_GAIN_READ_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("Get Volume FAIL!");
+        AUDIO_FUNC_LOGE("Get Volume FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     *gain = impl->captureParam.captureMode.ctlParam.audioGain.gain;
@@ -647,32 +661,33 @@ int32_t AudioCaptureGetGain(AudioHandle handle, float *gain)
 
 int32_t AudioCaptureSetGain(AudioHandle handle, float gain)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *impl = (struct AudioHwCapture *)handle;
     if (impl == NULL || gain < 0) {
+        AUDIO_FUNC_LOGE("impl is null or gain < 0!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (impl->devCtlHandle == NULL) {
-        LOG_FUN_ERR("CaptureSetGain Bind Fail!");
+        AUDIO_FUNC_LOGE("CaptureSetGain Bind Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     float gainTemp = impl->captureParam.captureMode.ctlParam.audioGain.gain;
     impl->captureParam.captureMode.ctlParam.audioGain.gain = gain;
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         impl->captureParam.captureMode.ctlParam.audioGain.gain = gainTemp;
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = (*pInterfaceLibModeCapture)(impl->devCtlHandle, &impl->captureParam,
                                               AUDIODRV_CTL_IOCTL_GAIN_WRITE_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("CaptureSetGain FAIL!");
+        AUDIO_FUNC_LOGE("CaptureSetGain FAIL!");
         impl->captureParam.captureMode.ctlParam.audioGain.gain = gainTemp;
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -682,6 +697,7 @@ int32_t AudioCaptureSetGain(AudioHandle handle, float gain)
 static int32_t LogErrorGetRensonAndTime(struct AudioHwCapture *hwCapture, int errorReason)
 {
     if (hwCapture == NULL) {
+        AUDIO_FUNC_LOGE("param hwCapture is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwCapture->errorLog.iter >= ERROR_LOG_MAX_NUM) {
@@ -691,7 +707,7 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwCapture *hwCapture, int er
         hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].reason
             = (char *)calloc(1, ERROR_REASON_DESC_LEN);
         if (hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].reason == NULL) {
-            LOG_FUN_ERR("Calloc reasonDesc Fail!");
+            AUDIO_FUNC_LOGE("Calloc reasonDesc Fail!");
             return AUDIO_HAL_ERR_MALLOC_FAIL;
         }
     }
@@ -699,7 +715,7 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwCapture *hwCapture, int er
         hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].currentTime
             = (char *)calloc(1, ERROR_REASON_DESC_LEN);
         if (hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].currentTime == NULL) {
-            LOG_FUN_ERR("Calloc time Fail!");
+            AUDIO_FUNC_LOGE("Calloc time Fail!");
             return AUDIO_HAL_ERR_MALLOC_FAIL;
         }
     }
@@ -709,12 +725,12 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwCapture *hwCapture, int er
         ERROR_REASON_DESC_LEN, 0, ERROR_REASON_DESC_LEN);
     int32_t ret = GetErrorReason(errorReason, hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].reason);
     if (ret < 0) {
-        LOG_FUN_ERR("Capture GetErrorReason failed!");
+        AUDIO_FUNC_LOGE("Capture GetErrorReason failed! ret = %{public}d", ret);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = GetCurrentTime(hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].currentTime);
     if (ret < 0) {
-        LOG_FUN_ERR("Capture GetCurrentTime failed!");
+        AUDIO_FUNC_LOGE("Capture GetCurrentTime failed!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -724,6 +740,7 @@ void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
+        AUDIO_FUNC_LOGE("hwCapture is null!");
         return;
     }
     hwCapture->errorLog.totalErrors++;
@@ -746,21 +763,20 @@ void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
 int32_t AudioCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
                                  uint64_t requestBytes, uint64_t *replyBytes)
 {
-    LOG_FUN_INFO();
     int32_t ret = AudioCheckCaptureAddr((AudioHandle)capture);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid");
         return ret;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     if (hwCapture == NULL || frame == NULL || replyBytes == NULL ||
         hwCapture->captureParam.frameCaptureMode.buffer == NULL) {
-        LOG_FUN_ERR("Param is NULL Fail!");
+        AUDIO_FUNC_LOGE("Param is NULL Fail!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (hwCapture->devDataHandle == NULL) {
@@ -769,30 +785,30 @@ int32_t AudioCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
     ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
                                               AUDIO_DRV_PCM_IOCTL_READ);
     if (ret < 0) {
-        LOG_FUN_ERR("Capture Frame FAIL!");
+        AUDIO_FUNC_LOGE("Capture Frame FAIL!");
         LogErrorCapture(capture, WRITE_FRAME_ERROR_CODE, ret);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (requestBytes < hwCapture->captureParam.frameCaptureMode.bufferSize) {
-        LOG_FUN_ERR("Capture Frame requestBytes too little!");
+        AUDIO_FUNC_LOGE("Capture Frame requestBytes too little!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = memcpy_s(frame, (size_t)requestBytes, hwCapture->captureParam.frameCaptureMode.buffer,
         (size_t)hwCapture->captureParam.frameCaptureMode.bufferSize);
     if (ret != EOK) {
-        LOG_FUN_ERR("memcpy_s fail");
+        AUDIO_FUNC_LOGE("memcpy_s fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     *replyBytes = hwCapture->captureParam.frameCaptureMode.bufferSize;
     hwCapture->captureParam.frameCaptureMode.frames += hwCapture->captureParam.frameCaptureMode.bufferFrameSize;
     if (hwCapture->captureParam.frameCaptureMode.attrs.sampleRate == 0) {
-        LOG_FUN_ERR("Divisor cannot be zero!");
+        AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (TimeToAudioTimeStamp(hwCapture->captureParam.frameCaptureMode.bufferFrameSize,
         &hwCapture->captureParam.frameCaptureMode.time,
         hwCapture->captureParam.frameCaptureMode.attrs.sampleRate) == HDF_FAILURE) {
-        LOG_FUN_ERR("Frame is NULL");
+        AUDIO_FUNC_LOGE("Frame is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -800,14 +816,15 @@ int32_t AudioCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
 
 int32_t AudioCaptureGetCapturePosition(struct AudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time)
 {
-    LOG_FUN_INFO();
+    AUDIO_FUNC_LOGI();
     int32_t ret = AudioCheckCaptureAddr((AudioHandle)capture);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid");
         return ret;
     }
     struct AudioHwCapture *impl = (struct AudioHwCapture *)capture;
     if (impl == NULL || frames == NULL || time == NULL) {
+        AUDIO_FUNC_LOGE("impl or frames or time is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     *frames = impl->captureParam.frameCaptureMode.frames;
@@ -818,6 +835,7 @@ int32_t AudioCaptureGetCapturePosition(struct AudioCapture *capture, uint64_t *f
 int32_t SetValueCapture(struct ExtraParams mExtraParams, struct AudioHwCapture *capture)
 {
     if (capture == NULL) {
+        AUDIO_FUNC_LOGE("param capture is null!");
         return HDF_FAILURE;
     }
     if (mExtraParams.route != -1) {
@@ -842,11 +860,12 @@ int32_t AudioCaptureSetExtraParams(AudioHandle handle, const char *keyValueList)
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL || keyValueList == NULL) {
+        AUDIO_FUNC_LOGE("capture or keyValueList is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t sumOk = 0;
@@ -867,11 +886,12 @@ int32_t AudioCaptureGetExtraParams(const AudioHandle handle, char *keyValueList,
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid");
         return ret;
     }
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL || keyValueList == NULL || listLenth <= 0) {
+        AUDIO_FUNC_LOGE("capture or keyValueList is null or listLenth <= 0.");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t bufferSize = strlen(ROUTE_SAMPLE) + strlen(FORMAT_SAMPLE) + strlen(CHANNELS_SAMPLE)
@@ -911,6 +931,7 @@ int32_t AudioCaptureReqMmapBufferInit(struct AudioHwCapture *capture, int32_t re
     struct AudioMmapBufferDescripter *desc)
 {
     if (capture == NULL || capture->devDataHandle == NULL || desc == NULL) {
+        AUDIO_FUNC_LOGE("capture or capture->devDataHandle or desc is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t flags;
@@ -926,12 +947,12 @@ int32_t AudioCaptureReqMmapBufferInit(struct AudioHwCapture *capture, int32_t re
     }
     int64_t filesize = lseek(desc->memoryFd, 0, SEEK_END);
     if ((int64_t)reqSize > filesize) {
-        LOG_FUN_ERR("reqSize is out of file Size!");
+        AUDIO_FUNC_LOGE("reqSize is out of file Size!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     desc->memoryAddress = mmap(NULL, reqSize, PROT_READ | PROT_WRITE, flags, desc->memoryFd, 0);
     if (desc->memoryAddress == NULL || desc->memoryAddress == (void *)-1) {
-        LOG_FUN_ERR("AudioCaptureReqMmapBuffer mmap FAIL and errno is:%d !", errno);
+        AUDIO_FUNC_LOGE("AudioCaptureReqMmapBuffer mmap fail and errno is:%{public}d !", errno);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     // formatBits Move right 3
@@ -939,7 +960,7 @@ int32_t AudioCaptureReqMmapBufferInit(struct AudioHwCapture *capture, int32_t re
         reqSize / (capture->captureParam.frameCaptureMode.attrs.channelCount * (formatBits >> 3));
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Is NULL");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Is NULL");
         munmap(desc->memoryAddress, reqSize);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -952,7 +973,7 @@ int32_t AudioCaptureReqMmapBufferInit(struct AudioHwCapture *capture, int32_t re
     ret = (*pInterfaceLibModeCapture)(capture->devDataHandle, &capture->captureParam,
                                       AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("AudioCaptureReqMmapBuffer FAIL!");
+        AUDIO_FUNC_LOGE("AudioCaptureReqMmapBuffer FAIL!");
         munmap(desc->memoryAddress, reqSize);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -963,19 +984,20 @@ int32_t AudioCaptureReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct Au
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL || capture->devDataHandle == NULL || desc == NULL) {
+        AUDIO_FUNC_LOGE("capture or capture->devDataHandle or desc is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     ret = AudioCaptureReqMmapBufferInit(capture, reqSize, desc);
     if (ret < 0) {
-        LOG_FUN_ERR("AudioCaptureReqMmapBufferInit failed!");
+        AUDIO_FUNC_LOGE("AudioCaptureReqMmapBufferInit failed! ret = %{public}d", ret);
         return ret;
     }
-    LOG_PARA_INFO("AudioCaptureReqMmapBuffer Success!");
+    AUDIO_FUNC_LOGI("Success!");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -983,18 +1005,19 @@ int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
 
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL || frames == NULL || time == NULL) {
+        AUDIO_FUNC_LOGE("capture or frames or time is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 #ifndef AUDIO_HAL_USER
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        LOG_FUN_ERR("pInterfaceLibModeCapture Fail!");
+        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (capture->devDataHandle == NULL) {
@@ -1003,10 +1026,10 @@ int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct
     ret = (*pInterfaceLibModeCapture)(capture->devDataHandle, &capture->captureParam,
                                               AUDIO_DRV_PCM_IOCTL_MMAP_POSITION_CAPTURE);
     if (ret < 0) {
-        LOG_FUN_ERR("GetMmapPosition SetParams FAIL");
+        AUDIO_FUNC_LOGE("GetMmapPosition SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    LOG_PARA_INFO("GetMmapPosition SUCCESS!");
+    AUDIO_FUNC_LOGI("GetMmapPosition SUCCESS!");
 #endif
     *frames = capture->captureParam.frameCaptureMode.frames;
     capture->captureParam.frameCaptureMode.time.tvSec = (int64_t)(capture->captureParam.frameCaptureMode.frames /
@@ -1023,7 +1046,7 @@ int32_t AudioCaptureAddEffect(AudioHandle handle, uint64_t effectid)
 {
     (void)handle;
     (void)effectid;
-    HDF_LOGI("%{public}s: add capture effect success", __func__);
+    AUDIO_FUNC_LOGI("add capture effect success");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -1031,7 +1054,7 @@ int32_t AudioCaptureRemoveEffect(AudioHandle handle, uint64_t effectid)
 {
     (void)handle;
     (void)effectid;
-    HDF_LOGI("%{public}s: remove capture effect success", __func__);
+    AUDIO_FUNC_LOGI("remove capture effect success");
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -1039,17 +1062,18 @@ int32_t AudioCaptureTurnStandbyMode(AudioHandle handle)
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL) {
-        LOG_FUN_ERR("capture is null");
+        AUDIO_FUNC_LOGE("capture is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     capture->captureParam.captureMode.hwInfo.deviceDescript.pins = PIN_NONE;
     ret = AudioCaptureStop((AudioHandle)capture);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioCaptureStop failed! ret = %{public}d", ret);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -1059,7 +1083,7 @@ int32_t AudioCaptureAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        LOG_FUN_ERR("The capture address passed in is invalid");
+        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
         return ret;
     }
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
