@@ -254,7 +254,7 @@ static ResultCode ReadPinFile(uint8_t *data, uint32_t dataLen, uint64_t template
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
-static ResultCode WritePinFile(uint8_t *data, uint32_t dataLen, uint64_t templateId, const char *suffix)
+static ResultCode WritePinFile(const uint8_t *data, uint32_t dataLen, uint64_t templateId, const char *suffix)
 {
     FileOperator *fileOp = GetFileOperator(DEFAULT_FILE_OPERATOR);
     if (!IsFileOperatorValid(fileOp)) {
@@ -278,8 +278,33 @@ static ResultCode WritePinFile(uint8_t *data, uint32_t dataLen, uint64_t templat
     return RESULT_SUCCESS;
 }
 
+static ResultCode CoverData(const char *fileName, const FileOperator *fileOp)
+{
+    uint32_t fileLen = 0;
+    ResultCode ret = fileOp->getFileLen(fileName, &fileLen);
+    /* The maximum length of the fileName is CONST_PIN_DATA_EXPAND_LEN */
+    if (ret != RESULT_SUCCESS || fileLen > CONST_PIN_DATA_EXPAND_LEN) {
+        LOG_ERROR("getFileLen fail.");
+        return ret;
+    }
+    uint8_t *data = Malloc(fileLen);
+    if (data == NULL) {
+        LOG_ERROR("no memory.");
+        return RESULT_NO_MEMORY;
+    }
+    (void)memset_s(data, fileLen, 0, fileLen);
+    ret = fileOp->writeFile(fileName, data, fileLen);
+    Free(data);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("WritePinFile fail.");
+        return ret;
+    }
+
+    return RESULT_SUCCESS;
+}
+
 /* This is for example only, Should be implemented in trusted environment. */
-static ResultCode RemovePinFile(uint64_t templateId, const char *suffix)
+static ResultCode RemovePinFile(const uint64_t templateId, const char *suffix, bool needCover)
 {
     FileOperator *fileOp = GetFileOperator(DEFAULT_FILE_OPERATOR);
     if (!IsFileOperatorValid(fileOp)) {
@@ -292,6 +317,15 @@ static ResultCode RemovePinFile(uint64_t templateId, const char *suffix)
         LOG_ERROR("GenerateCryptoFileName fail.");
         return RESULT_UNKNOWN;
     }
+
+    /* Write data zeros before deleting data, In addition to anti-brute-force cracking */
+    if (needCover) {
+        ret = CoverData(fileName, fileOp);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("cover data fail.");
+            return RESULT_GENERAL_ERROR;
+        }
+    }
     if (fileOp->deleteFile(fileName) != RESULT_SUCCESS) {
         LOG_ERROR("file remove fail.");
         return RESULT_BAD_DEL;
@@ -301,20 +335,25 @@ static ResultCode RemovePinFile(uint64_t templateId, const char *suffix)
     return ret;
 }
 
-static ResultCode RemoveAllFile(uint64_t templateId)
+static ResultCode RemoveAllFile(const uint64_t templateId)
 {
-    ResultCode ret = RemovePinFile(templateId, CRYPTO_SUFFIX);
+    /* This is for example only, Anti-brute-force cracking files must have an anti-rollback zone */
+    ResultCode ret = RemovePinFile(templateId, ANTI_BRUTE_SUFFIX, false);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("RemovePinAntiBrute fail.");
+    }
+    ret = RemovePinFile(templateId, CRYPTO_SUFFIX, true);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("RemovePinCrypto fail.");
         return ret;
     }
-    ret = RemovePinFile(templateId, ANTI_BRUTE_SUFFIX);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("RemovePinAntiBrute fail.");
-    }
-    ret = RemovePinFile(templateId, SALT_SUFFIX);
+    ret = RemovePinFile(templateId, SALT_SUFFIX, true);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("RemovePinSalt fail.");
+    }
+    ret = RemovePinFile(templateId, SECRET_SUFFIX, true);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("RemovePinSecret fail.");
     }
 
     LOG_INFO("RemoveAllFile succ.");
@@ -343,7 +382,7 @@ static uint64_t GeneratePinTemplateId()
     return INVALID_TEMPLATE_ID;
 }
 
-static uint32_t SearchPinById(uint64_t templateId)
+static uint32_t SearchPinById(const uint64_t templateId)
 {
     if (g_pinDbOp.pinIndexLen == 0) {
         LOG_ERROR("no pin exist.");
@@ -359,7 +398,7 @@ static uint32_t SearchPinById(uint64_t templateId)
     return MAX_CRYPTO_INFO_SIZE;
 }
 
-static ResultCode DelPin(uint32_t index)
+static ResultCode DelPin(const uint32_t index)
 {
     /* This is for example only, Should be implemented in trusted environment. */
     ResultCode ret = RemoveAllFile(g_pinDbOp.pinIndex[index].templateId);
@@ -459,7 +498,7 @@ ERROR:
     return ret;
 }
 
-static ResultCode DelPinInDb(uint32_t index)
+static ResultCode DelPinInDb(const uint32_t index)
 {
     uint32_t pinIndexLen = g_pinDbOp.pinIndexLen - 1;
     if (pinIndexLen == 0) {
@@ -496,7 +535,7 @@ static ResultCode DelPinInDb(uint32_t index)
     return ret;
 }
 
-ResultCode DelPinById(uint64_t templateId)
+ResultCode DelPinById(const uint64_t templateId)
 {
     ResultCode ret = LoadPinDb();
     if (ret != RESULT_SUCCESS) {
@@ -596,34 +635,26 @@ static ResultCode InitAntiBruteInfo(AntiBruteInfo *info)
     return RESULT_SUCCESS;
 }
 
-ResultCode AddPin(PinEnrollParam *pinEnrollParam, uint64_t *templateId)
+static ResultCode WriteAddPinInfo(const Buffer *secret, const Buffer *pinCredentialData, const uint8_t *salt,
+    uint32_t saltLen, const uint64_t templateId)
 {
-    if (pinEnrollParam == NULL || templateId == NULL) {
-        LOG_ERROR("get invalid params.");
-        return RESULT_BAD_PARAM;
-    }
-    ResultCode ret = RefreshPinDb(templateId, pinEnrollParam->subType);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("RefreshPinDb fail.");
-        return ret;
-    }
-
-    /*
-     * Generate new templateId, Transferred to tid and returned.
-     * This is for example only, Should be implemented in trusted environment.
-     */
-    ret = WritePinFile(pinEnrollParam->pinData, CONST_PIN_DATA_LEN, *templateId, CRYPTO_SUFFIX);
+    ResultCode ret = WritePinFile(pinCredentialData->buf, pinCredentialData->contentSize, templateId, CRYPTO_SUFFIX);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("WriteCryptoFile fail.");
         return ret;
     }
 
-    ret = WritePinFile(pinEnrollParam->salt, CONST_SALT_LEN, *templateId, SALT_SUFFIX);
+    ret = WritePinFile(salt, saltLen, templateId, SALT_SUFFIX);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("WriteSaltFile fail.");
         return ret;
     }
 
+    ret = WritePinFile(secret->buf, secret->contentSize, templateId, SECRET_SUFFIX);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("WriteSecretFile fail.");
+        return ret;
+    }
     AntiBruteInfo *initAntiBrute = Malloc(sizeof(AntiBruteInfo));
     if (initAntiBrute == NULL) {
         LOG_ERROR("malloc PAntiBruteInfo data fail.");
@@ -634,19 +665,184 @@ ResultCode AddPin(PinEnrollParam *pinEnrollParam, uint64_t *templateId)
         LOG_ERROR("InitAntiBruteInfo fail.");
         goto EXIT;
     }
-    ret = WritePinFile((uint8_t *)initAntiBrute, sizeof(AntiBruteInfo), *templateId, ANTI_BRUTE_SUFFIX);
+    ret = WritePinFile((uint8_t *)initAntiBrute, sizeof(AntiBruteInfo), templateId, ANTI_BRUTE_SUFFIX);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("WriteAntiBruteFile fail.");
         goto EXIT;
     }
-    LOG_INFO("AddPin succ.");
 
 EXIT:
     Free(initAntiBrute);
     return ret;
 }
 
-ResultCode DoGetSalt(uint64_t templateId, uint8_t *salt, uint32_t *saltLen)
+static Buffer *GenerateExpandData(const char *str, const uint8_t *data, const uint32_t dataLen)
+{
+    /* CONST_EXPAND_DATA_LEN is twice the size of dataLen */
+    if (strlen(str) > dataLen || (CONST_EXPAND_DATA_LEN / 2) != dataLen) {
+        LOG_ERROR("bad param.");
+        return NULL;
+    }
+    Buffer *outBuff = CreateBufferBySize(CONST_EXPAND_DATA_LEN);
+    if (!IsBufferValid(outBuff)) {
+        LOG_ERROR("create buffer fail.");
+        return NULL;
+    }
+    (void)memset_s(outBuff->buf, outBuff->maxSize, 0, outBuff->maxSize);
+    outBuff->contentSize = outBuff->maxSize;
+    uint8_t *temp = outBuff->buf;
+    if (memcpy_s(temp, outBuff->maxSize, (uint8_t *)str, strlen(str)) != EOK) {
+        LOG_ERROR("copy str fail.");
+        DestoryBuffer(outBuff);
+        return NULL;
+    }
+
+    temp += dataLen;
+    if (memcpy_s(temp, outBuff->maxSize - dataLen, data, dataLen) != EOK) {
+        LOG_ERROR("copy data fail.");
+        DestoryBuffer(outBuff);
+        return NULL;
+    }
+
+    return outBuff;
+}
+
+static Buffer *GenerateRootSecret(const Buffer *deviceKey, const uint8_t *pinData, const uint32_t pinDataLen)
+{
+    Buffer *expandData = GenerateExpandData(SALT_PREFIX, pinData, pinDataLen);
+    if (!IsBufferValid(expandData)) {
+        LOG_ERROR("generate expand data fail.");
+        return NULL;
+    }
+
+    Buffer *hkdfSalt = Sha256Adaptor(expandData);
+    if (!IsBufferValid(hkdfSalt)) {
+        LOG_ERROR("generate sha256 fail.");
+        DestoryBuffer(expandData);
+        return NULL;
+    }
+    Buffer *rootSecret = Hkdf(hkdfSalt, deviceKey);
+    DestoryBuffer(expandData);
+    DestoryBuffer(hkdfSalt);
+    if (!IsBufferValid(rootSecret)) {
+        LOG_ERROR("generate rootSecret fail.");
+        return NULL;
+    }
+
+    return rootSecret;
+}
+
+static Buffer *GenerateEncryptionKey(const Buffer *deviceKey)
+{
+    Buffer *keyStrBuffer = CreateBufferBySize(CONST_CREDENTIAL_PREFIX_LEN);
+    if (!IsBufferValid(keyStrBuffer)) {
+        LOG_ERROR("generate expand data fail.");
+        return NULL;
+    }
+    (void)memset_s(keyStrBuffer->buf, keyStrBuffer->maxSize, 0, keyStrBuffer->maxSize);
+    if (memcpy_s(keyStrBuffer->buf, keyStrBuffer->maxSize,
+        (uint8_t *)CREDENTIAL_PREFIX, strlen(CREDENTIAL_PREFIX)) != EOK) {
+        LOG_ERROR("copy CREDENTIAL_PREFIX fail.");
+        DestoryBuffer(keyStrBuffer);
+        return NULL;
+    }
+    keyStrBuffer->contentSize = keyStrBuffer->maxSize;
+    Buffer *encryptionKey = Hkdf(keyStrBuffer, deviceKey);
+    DestoryBuffer(keyStrBuffer);
+    if (!IsBufferValid(encryptionKey)) {
+        LOG_ERROR("generate encryptionKey fail.");
+        return NULL;
+    }
+
+    return encryptionKey;
+}
+
+static ResultCode ProcessAddPin(const Buffer *deviceKey, const Buffer *secret, PinEnrollParam *pinEnrollParam,
+    uint64_t templateId)
+{
+    Buffer *encryptionKey = GenerateEncryptionKey(deviceKey);
+    if (!IsBufferValid(encryptionKey)) {
+        LOG_ERROR("generate encryptionKey fail.");
+        return RESULT_GENERAL_ERROR;
+    }
+    Buffer *pinDataBuffer = CreateBufferByData(pinEnrollParam->pinData, CONST_PIN_DATA_LEN);
+    if (!IsBufferValid(pinDataBuffer)) {
+        LOG_ERROR("generate pinDataBuffer fail.");
+        DestoryBuffer(encryptionKey);
+        return RESULT_GENERAL_ERROR;
+    }
+    Buffer *pinCredCiphertext = Aes256GcmEncryptNoPadding(pinDataBuffer, encryptionKey);
+    if (!IsBufferValid(pinCredCiphertext)) {
+        LOG_ERROR("generate pinCredCiphertext fail.");
+        DestoryBuffer(encryptionKey);
+        DestoryBuffer(pinDataBuffer);
+        return RESULT_GENERAL_ERROR;
+    }
+
+    ResultCode ret = WriteAddPinInfo(secret, pinCredCiphertext, pinEnrollParam->salt, CONST_SALT_LEN, templateId);
+    DestoryBuffer(encryptionKey);
+    DestoryBuffer(pinDataBuffer);
+    DestoryBuffer(pinCredCiphertext);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("write add pin info fail.");
+    }
+
+    return ret;
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+ResultCode AddPin(PinEnrollParam *pinEnrollParam, uint64_t *templateId, Buffer *outRootSecret)
+{
+    if (pinEnrollParam == NULL || templateId == NULL || !IsBufferValid(outRootSecret)) {
+        LOG_ERROR("get invalid params.");
+        return RESULT_BAD_PARAM;
+    }
+    ResultCode ret = RefreshPinDb(templateId, pinEnrollParam->subType);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("refresh pinDb fail.");
+        return ret;
+    }
+    Buffer *secret = CreateBufferBySize(SECRET_SIZE);
+    if (!IsBufferValid(secret) || SecureRandom(secret->buf, secret->maxSize) != RESULT_SUCCESS) {
+        LOG_ERROR("generate secure random number fail.");
+        DestoryBuffer(secret);
+        return RESULT_GENERAL_ERROR;
+    }
+    secret->contentSize = secret->maxSize;
+    Buffer *deviceKey = DeriveDeviceKey(secret);
+    if (!IsBufferValid(deviceKey)) {
+        LOG_ERROR("generate deviceKey fail.");
+        DestoryBuffer(secret);
+        return RESULT_GENERAL_ERROR;
+    }
+    Buffer *temp = GenerateRootSecret(deviceKey, pinEnrollParam->pinData, CONST_PIN_DATA_LEN);
+    if (!IsBufferValid(temp)) {
+        LOG_ERROR("generate rootSecret fail.");
+        DestoryBuffer(secret);
+        DestoryBuffer(deviceKey);
+        return RESULT_GENERAL_ERROR;
+    }
+    if (memcpy_s(outRootSecret->buf, outRootSecret->maxSize, temp->buf, temp->contentSize) != EOK) {
+        LOG_ERROR("copy temp buffer fail.");
+        ret = RESULT_GENERAL_ERROR;
+        goto ERROR;
+    }
+    outRootSecret->contentSize = temp->contentSize;
+    ret = ProcessAddPin(deviceKey, secret, pinEnrollParam, *templateId);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("process add pin fail.");
+        goto ERROR;
+    }
+    LOG_INFO("AddPin succ.");
+
+ERROR:
+    DestoryBuffer(secret);
+    DestoryBuffer(deviceKey);
+    DestoryBuffer(temp);
+    return ret;
+}
+
+ResultCode DoGetSalt(const uint64_t templateId, uint8_t *salt, uint32_t *saltLen)
 {
     if (salt == NULL || saltLen == NULL || templateId == INVALID_TEMPLATE_ID) {
         LOG_ERROR("get invalid salt params.");
@@ -770,7 +966,7 @@ static uint64_t ExponentialFuncTime(uint32_t authErrorConut)
     return FIRST_EXPONENTIAL_PARA * ret;
 }
 
-uint64_t GetWaitTime(uint32_t authErrorConut)
+uint64_t GetWaitTime(const uint32_t authErrorConut)
 {
     if (authErrorConut < FIRST_ANTI_BRUTE_COUNT) {
         return 0;
@@ -824,9 +1020,9 @@ ResultCode ComputeFreezeTime(uint64_t templateId, uint32_t *freezeTime, uint32_t
     return RESULT_SUCCESS;
 }
 
-static uint32_t ComputeRemainingTimes(uint32_t errorCount)
+static uint32_t ComputeRemainingTimes(const uint32_t errorCount)
 {
-    if (errorCount <= FIRST_ANTI_BRUTE_COUNT) {
+    if (errorCount < FIRST_ANTI_BRUTE_COUNT) {
         return FIRST_ANTI_BRUTE_COUNT - errorCount;
     }
     if (errorCount >= ATTI_BRUTE_FIRST_STAGE) {
@@ -859,14 +1055,14 @@ static ResultCode ClearAntiBruteInfoById(uint64_t templateId)
     return ret;
 }
 
-static ResultCode UpdateAntiBruteFile(uint64_t templateId, int32_t authResultSucc)
+static ResultCode UpdateAntiBruteFile(uint64_t templateId, bool authResultSucc)
 {
     if (templateId == INVALID_TEMPLATE_ID) {
         LOG_ERROR("check param fail.");
         return RESULT_BAD_PARAM;
     }
 
-    if (authResultSucc == RESULT_SUCCESS) {
+    if (authResultSucc) {
         ResultCode ret = ClearAntiBruteInfoById(templateId);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("ClearAntiBruteInfoById fail.");
@@ -891,7 +1087,8 @@ static ResultCode UpdateAntiBruteFile(uint64_t templateId, int32_t authResultSuc
     return ret;
 }
 
-static int32_t CompareData(uint8_t *inputData, uint32_t inputDataLen, uint8_t *storeData, uint32_t storeDataLen)
+static int32_t CompareData(const uint8_t *inputData, const uint32_t inputDataLen, const uint8_t *storeData,
+    const uint32_t storeDataLen)
 {
     if (inputDataLen != storeDataLen) {
         LOG_ERROR("get false len.");
@@ -905,52 +1102,123 @@ static int32_t CompareData(uint8_t *inputData, uint32_t inputDataLen, uint8_t *s
     return RESULT_COMPARE_FAIL;
 }
 
-ResultCode AuthPinById(uint8_t *inputData, uint32_t inputDataLen, uint64_t templateId)
+static Buffer *GenerateDecodeCredential(const Buffer *deviceKey, const Buffer *pinData)
 {
-    if (inputData == NULL || inputDataLen == 0 || templateId == INVALID_TEMPLATE_ID) {
+    Buffer *encryptionKey = GenerateEncryptionKey(deviceKey);
+    if (!IsBufferValid(encryptionKey)) {
+        LOG_ERROR("generate encryptionKey fail.");
+        return NULL;
+    }
+
+    Buffer *pinDecodeCredential = Aes256GcmDecryptNoPadding(pinData, encryptionKey);
+    DestoryBuffer(encryptionKey);
+    if (!IsBufferValid(pinDecodeCredential)) {
+        LOG_ERROR("generate pinDeCredCiphertext fail.");
+        return NULL;
+    }
+
+    return pinDecodeCredential;
+}
+
+static Buffer *ProcessAuthPin(const Buffer *storeData, const uint8_t *inputData, const uint32_t inputDataLen,
+    uint64_t templateId, Buffer *outRootSecret)
+{
+    Buffer *secret = CreateBufferBySize(SECRET_SIZE);
+    if (!IsBufferValid(secret)) {
+        LOG_ERROR("generate secret fail.");
+        return NULL;
+    }
+    if (ReadPinFile(secret->buf, secret->maxSize, templateId, SECRET_SUFFIX) != RESULT_SUCCESS) {
+        LOG_ERROR("read pin secret file fail.");
+        DestoryBuffer(secret);
+        return NULL;
+    }
+    secret->contentSize = secret->maxSize;
+    Buffer *deviceKey = DeriveDeviceKey(secret);
+    if (!IsBufferValid(deviceKey)) {
+        LOG_ERROR("generate deviceKey fail.");
+        DestoryBuffer(secret);
+        return NULL;
+    }
+    Buffer *temp = GenerateRootSecret(deviceKey, inputData, inputDataLen);
+    if (!IsBufferValid(temp)) {
+        LOG_ERROR("generate rootSecret fail.");
+        DestoryBuffer(secret);
+        DestoryBuffer(deviceKey);
+        return NULL;
+    }
+    if (memcpy_s(outRootSecret->buf, outRootSecret->maxSize, temp->buf, temp->contentSize) != EOK) {
+        LOG_ERROR("copy temp buffer fail");
+        DestoryBuffer(secret);
+        DestoryBuffer(deviceKey);
+        DestoryBuffer(temp);
+        return NULL;
+    }
+    outRootSecret->contentSize = temp->contentSize;
+    Buffer *pinDecodeCredential = GenerateDecodeCredential(deviceKey, storeData);
+    DestoryBuffer(secret);
+    DestoryBuffer(deviceKey);
+    DestoryBuffer(temp);
+    if (!IsBufferValid(pinDecodeCredential)) {
+        LOG_ERROR("generate pinDecodeCredential fail.");
+        return NULL;
+    }
+
+    return pinDecodeCredential;
+}
+
+/* This is for example only, Should be implemented in trusted environment. */
+ResultCode AuthPinById(const uint8_t *inputData, const uint32_t inputDataLen, uint64_t templateId,
+    Buffer *outRootSecret)
+{
+    if (inputData == NULL || inputDataLen == 0 || templateId == INVALID_TEMPLATE_ID || !IsBufferValid(outRootSecret)) {
         LOG_ERROR("get invalid params.");
         return RESULT_BAD_PARAM;
     }
-
-    uint32_t index = SearchPinById(templateId);
-    if (index == MAX_CRYPTO_INFO_SIZE) {
+    if (SearchPinById(templateId) == MAX_CRYPTO_INFO_SIZE) {
         LOG_ERROR("no pin match.");
         return RESULT_BAD_MATCH;
     }
-
-    uint32_t storeDataLen = inputDataLen;
-    uint8_t *storeData = Malloc(storeDataLen);
-    if (storeData == NULL) {
-        LOG_ERROR("malloc storeData fail.");
+    /* Update anti-brute-force information with authentication failure first */
+    if (UpdateAntiBruteFile(templateId, false) != RESULT_SUCCESS) {
+        LOG_ERROR("update antiBrute file fail.");
         return RESULT_GENERAL_ERROR;
     }
-
-    /* This is for example only, Should be implemented in trusted environment. */
-    ResultCode compareRet = RESULT_COMPARE_FAIL;
-    ResultCode ret = ReadPinFile(storeData, storeDataLen, templateId, CRYPTO_SUFFIX);
+    Buffer *storeData = CreateBufferBySize(CONST_PIN_DATA_EXPAND_LEN);
+    if (!IsBufferValid(storeData)) {
+        LOG_ERROR("generate storeData fail.");
+        return RESULT_GENERAL_ERROR;
+    }
+    ResultCode ret = ReadPinFile(storeData->buf, storeData->maxSize, templateId, CRYPTO_SUFFIX);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("Read pin store File fail.");
+        LOG_ERROR("read pin store file fail.");
+        DestoryBuffer(storeData);
+        return RESULT_BAD_READ;
+    }
+    storeData->contentSize = storeData->maxSize;
+    Buffer *pinDecodeCredential = ProcessAuthPin(storeData, inputData, inputDataLen, templateId, outRootSecret);
+    if (!IsBufferValid(pinDecodeCredential)) {
+        LOG_ERROR("process auth pin fail.");
+        ret = RESULT_GENERAL_ERROR;
         goto EXIT;
     }
-    compareRet = CompareData(inputData, inputDataLen, storeData, storeDataLen);
-    if (compareRet != RESULT_SUCCESS) {
+    ResultCode compareRet = CompareData(pinDecodeCredential->buf, pinDecodeCredential->contentSize,
+        inputData, inputDataLen);
+    if (compareRet == RESULT_SUCCESS) {
+        ret = UpdateAntiBruteFile(templateId, true);
+        if (ret != RESULT_SUCCESS) {
+            LOG_ERROR("UpdateAntiBruteFile fail.");
+            goto EXIT;
+        }
+    } else {
         LOG_ERROR("CompareData fail.");
+        ret = compareRet;
     }
-    /*
-     * If the authentication succeeds, set authErrorConut to 0 and set startFreezeTime to the default value.
-     * If the authentication fails, the value of authErrorConut is incremented by 1 and the
-     * current time(startFreezeTime) is recorded.
-     */
-    ret = UpdateAntiBruteFile(templateId, compareRet);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("UpdateAntiBruteFile fail.");
-        goto EXIT;
-    }
-    ret = compareRet;
     LOG_INFO("AuthPinById end.");
 
 EXIT:
-    Free(storeData);
+    DestoryBuffer(storeData);
+    DestoryBuffer(pinDecodeCredential);
     return ret;
 }
 

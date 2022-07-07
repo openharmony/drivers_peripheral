@@ -28,7 +28,7 @@ extern "C" {
 #define AES256_BLOCK_SIZE 16
 #define AES256_KEY_SIZE 32
 #define SECRET_SIZE 32
-#define HKDF_SALT_SIZE 64
+#define HKDF_SALT_SIZE 32
 #define HKDF_KEY_SIZE 32
 #define AES_GCM_VI_SIZE 12
 #define AES_GCM_TAG_SIZE 16
