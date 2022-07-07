@@ -30,6 +30,7 @@ ohos_shared_library("libbattery_interface_service_1.0") {
 
   deps = [
     "//drivers/interface/battery/v1_0:libbattery_stub_1.0",
+    "//drivers/interface/light/v1_0:liblight_proxy_1.0",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]
@@ -68,6 +69,7 @@ ohos_shared_library("libbattery_driver") {
 
   deps = [
     "//drivers/interface/battery/v1_0:libbattery_stub_1.0",
+    "//drivers/interface/light/v1_0:liblight_proxy_1.0",
     "//third_party/jsoncpp:jsoncpp",
     "//utils/native/base:utils",
   ]

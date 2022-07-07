@@ -41,6 +41,14 @@ constexpr int32_t VIBRATE_TIME_MS = 75;
 constexpr int32_t MAX_IMG_COUNT = 62;
 constexpr int32_t MAX_IMG_NAME_SIZE = 255;
 constexpr int32_t LOOP_TOP_PICTURES = 10;
+constexpr int32_t ANIMATION_LABEL_X = 90;
+constexpr int32_t ANIMATION_LABEL_Y = 240;
+constexpr int32_t ANIMATION_LABEL_WIDTH = 360;
+constexpr int32_t ANIMATION_LABEL_HEIGHT = 960;
+constexpr int32_t LABEL_SCALING = 3;
+constexpr int32_t UPDATE_INFO_LABEL_Y = 340;
+constexpr int32_t UPDATE_INFO_LABEL_HEIGHT = 100;
+
 const char* REBOOT_CMD = "";
 const char* SHUTDOWN_CMD = "shutdown";
 }
@@ -111,11 +119,13 @@ void ChargerThread::AnimationInit()
     g_hosFrame = new Frame(screenW, screenH, View::PixelFormat::BGRA888, sfDev);
     g_hosFrame->SetBackgroundColor(&bgColor);
 
-    g_animationLabel = new AnimationLabel(90, 240, 360, 960 >> 1, g_hosFrame);
+    g_animationLabel = new AnimationLabel(ANIMATION_LABEL_X, ANIMATION_LABEL_Y,
+        ANIMATION_LABEL_WIDTH, ANIMATION_LABEL_HEIGHT >> 1, g_hosFrame);
     g_animationLabel->SetBackgroundColor(&bgColor);
     LoadImages(g_animationLabel);
 
-    g_updateInfoLabel = new TextLabel(screenW / 3, 340, screenW / 3, 100, g_hosFrame);
+    g_updateInfoLabel = new TextLabel(screenW / LABEL_SCALING, UPDATE_INFO_LABEL_Y,
+        screenW / LABEL_SCALING, UPDATE_INFO_LABEL_HEIGHT, g_hosFrame);
     g_updateInfoLabel->SetOutLineBold(false, false);
     g_updateInfoLabel->SetBackgroundColor(&bgColor);
 
@@ -456,7 +466,7 @@ void ChargerThread::Init()
         BATTERY_HILOGE(FEATURE_CHARGING, "make_unique BatteryLed return nullptr");
         return;
     }
-    led_->InitLedsSysfs();
+    led_->InitLightInfo();
     led_->TurnOffLed();
 
     AnimationInit();
