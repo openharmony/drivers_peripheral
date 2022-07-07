@@ -25,7 +25,7 @@
 #include "audio_events.h"
 #include "hdf_audio_events.h"
 
-#define LOG_FUN_ERR(fmt, arg...) do { \
+#define AUDIO_FUNC_LOGE(fmt, arg...) do { \
         printf("%s: [%s]: [%d]:[ERROR]:" fmt"\n", __FILE__, __func__, __LINE__, ##arg); \
     } while (0)
 
@@ -288,7 +288,7 @@ static int AudioGetUsbPnpStatus(struct ServiceStatus *svcStatus)
 static void AudioUsbPnpOnSvcStatusReceived(struct ServiceStatusListener *listener, struct ServiceStatus *svcStatus)
 {
     if (listener == NULL || svcStatus == NULL) {
-        LOG_FUN_ERR("listener or svcStatus is NULL!");
+        AUDIO_FUNC_LOGE("listener or svcStatus is NULL!");
         return;
     }
 
@@ -315,13 +315,13 @@ static void StopListenerBySig(int32_t sig)
 {
     printf("%s: Signal = %d\n", __func__, sig);
     if (g_servmgr == NULL || g_listener == NULL) {
-        LOG_FUN_ERR("g_servmgr or g_listener is null!\n");
+        AUDIO_FUNC_LOGE("g_servmgr or g_listener is null!\n");
         return;
     }
 
     int32_t ret = g_servmgr->UnregisterServiceStatusListener(g_servmgr, g_listener);
     if (ret != HDF_SUCCESS) {
-        LOG_FUN_ERR("UnregisterServiceStatusListener fail! ret = %d.\n", ret);
+        AUDIO_FUNC_LOGE("UnregisterServiceStatusListener fail! ret = %d.\n", ret);
         return;
     }
     HDIServiceManagerRelease(g_servmgr);
@@ -335,12 +335,12 @@ int main(void)
     printf("%s: system audio listener start \n", __func__);
     g_servmgr = HDIServiceManagerGet();
     if (g_servmgr == NULL) {
-        LOG_FUN_ERR("HDIServiceManagerGet failed.\n");
+        AUDIO_FUNC_LOGE("HDIServiceManagerGet failed.\n");
         return HDF_FAILURE;
     }
     g_listener = HdiServiceStatusListenerNewInstance();
     if (g_listener == NULL) {
-        LOG_FUN_ERR("HdiServiceStatusListenerNewInstance failed.\n");
+        AUDIO_FUNC_LOGE("HdiServiceStatusListenerNewInstance failed.\n");
         HDIServiceManagerRelease(g_servmgr);
         g_servmgr = NULL;
         return HDF_FAILURE;
@@ -348,7 +348,7 @@ int main(void)
     g_listener->callback = AudioUsbPnpOnSvcStatusReceived;
     int32_t status = g_servmgr->RegisterServiceStatusListener(g_servmgr, g_listener, DEVICE_CLASS_AUDIO);
     if (status != HDF_SUCCESS) {
-        LOG_FUN_ERR("RegisterServiceStatusListener fail! ret = %d.\n", status);
+        AUDIO_FUNC_LOGE("RegisterServiceStatusListener fail! ret = %d.\n", status);
         HDIServiceManagerRelease(g_servmgr);
         g_servmgr = NULL;
         return HDF_FAILURE;

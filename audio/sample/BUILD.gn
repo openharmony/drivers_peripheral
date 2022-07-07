@@ -125,6 +125,7 @@ if (defined(ohos_lite)) {
   ohos_executable("audio_sample_event") {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
     ]
 

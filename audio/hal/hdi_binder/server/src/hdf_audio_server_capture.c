@@ -26,37 +26,37 @@ int32_t GetInitCaptureParaAttrs(struct HdfSBuf *data, struct AudioSampleAttribut
     }
     uint32_t tempCapturePara = 0;
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
-        HDF_LOGE("%{public}s: Capture read tempCapturePara fail", __func__);
+        AUDIO_FUNC_LOGE("Capture read tempCapturePara fail");
         return HDF_FAILURE;
     }
     attrs->type = (enum AudioCategory)tempCapturePara;
     if (!HdfSbufReadUint32(data, &attrs->period)) {
-        HDF_LOGE("%{public}s: Capture read period fail", __func__);
+        AUDIO_FUNC_LOGE("Capture read period fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &attrs->frameSize)) {
-        HDF_LOGE("%{public}s: Capture read frameSize fail", __func__);
+        AUDIO_FUNC_LOGE("Capture read frameSize fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &attrs->startThreshold)) {
-        HDF_LOGE("%{public}s: Capture read startThreshold fail", __func__);
+        AUDIO_FUNC_LOGE("Capture read startThreshold fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &attrs->stopThreshold)) {
-        HDF_LOGE("%{public}s: Capture read stopThreshold fail", __func__);
+        AUDIO_FUNC_LOGE("Capture read stopThreshold fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &attrs->silenceThreshold)) {
-        HDF_LOGE("%{public}s: Capture read silenceThreshold fail", __func__);
+        AUDIO_FUNC_LOGE("Capture read silenceThreshold fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
-        HDF_LOGE("%{public}s: Failed to Get Speed sBuf!", __func__);
+        AUDIO_FUNC_LOGE("Failed to Get Speed sBuf!");
         return HDF_FAILURE;
     }
     attrs->isBigEndian = (bool)tempCapturePara;
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
-        HDF_LOGE("%{public}s: Failed to Get Speed sBuf!", __func__);
+        AUDIO_FUNC_LOGE("Failed to Get Speed sBuf!");
         return HDF_FAILURE;
     }
     attrs->isSignedData = (bool)tempCapturePara;
@@ -71,20 +71,20 @@ int32_t GetInitCapturePara(struct HdfSBuf *data, struct AudioDeviceDescriptor *d
     }
     uint32_t tempCapturePara = 0;
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
-        HDF_LOGE("%{public}s: Failed to Get Speed sBuf!", __func__);
+        AUDIO_FUNC_LOGE("Failed to Get Speed sBuf!");
         return HDF_FAILURE;
     }
     attrs->format = (enum AudioFormat)tempCapturePara;
     if (!HdfSbufReadUint32(data, &attrs->channelCount)) {
-        HDF_LOGE("%{public}s: read channelCount fail", __func__);
+        AUDIO_FUNC_LOGE("read channelCount fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &attrs->sampleRate)) {
-        HDF_LOGE("%{public}s: read sampleRate fail", __func__);
+        AUDIO_FUNC_LOGE("read sampleRate fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
-        HDF_LOGE("%{public}s: Failed to Get Speed sBuf!", __func__);
+        AUDIO_FUNC_LOGE("Failed to Get Speed sBuf!");
         return HDF_FAILURE;
     }
     attrs->interleaved = (bool)tempCapturePara;
@@ -92,11 +92,11 @@ int32_t GetInitCapturePara(struct HdfSBuf *data, struct AudioDeviceDescriptor *d
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &devDesc->portId)) {
-        HDF_LOGE("%{public}s: read portId fail", __func__);
+        AUDIO_FUNC_LOGE("read portId fail");
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &tempCapturePara)) {
-        HDF_LOGE("%{public}s: read tempCapturePara fail", __func__);
+        AUDIO_FUNC_LOGE("read tempCapturePara fail");
         return HDF_FAILURE;
     }
     devDesc->pins = (enum AudioPortPin)tempCapturePara;
@@ -107,6 +107,7 @@ int32_t GetInitCapturePara(struct HdfSBuf *data, struct AudioDeviceDescriptor *d
 int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioAdapter *adapter = NULL;
@@ -116,40 +117,40 @@ int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct Hd
     const char *adapterName = NULL;
     uint32_t capturePid = 0;
     if ((adapterName = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s: adapterNameCase Is NULL", __func__);
+        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (!HdfSbufReadUint32(data, &capturePid)) {
-        HDF_LOGE("%{public}s: read capturePid fail", __func__);
+        AUDIO_FUNC_LOGE("read capturePid fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    HDF_LOGE("%{public}s, capturePid = %{public}u", __func__, capturePid);
+    AUDIO_FUNC_LOGD("capturePid = %{public}u", capturePid);
     int32_t ret = GetInitCapturePara(data, &devDesc, &attrs);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: read Render param failure!", __func__);
+        AUDIO_FUNC_LOGE("read Render param failure!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
-        HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (adapter == NULL) {
-        HDF_LOGE("%{public}s: adapter is empty!", __func__);
+        AUDIO_FUNC_LOGE("adapter is empty!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     const int32_t priority = attrs.type;
     ret = AudioCreatCaptureCheck(adapterName, priority);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: AudioCreatRenderCheck: Capture is working can not replace!", __func__);
+        AUDIO_FUNC_LOGE("AudioCreatRenderCheck: Capture is working can not replace!");
         return ret;
     }
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
     if (capture == NULL || ret < 0) {
-        HDF_LOGE("%{public}s: Failed to CreateCapture", __func__);
+        AUDIO_FUNC_LOGE("Failed to CreateCapture");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioAddCaptureInfoInAdapter(adapterName, capture, adapter, priority, capturePid)) {
-        HDF_LOGE("%{public}s: AudioAddRenderInfoInAdapter", __func__);
+        AUDIO_FUNC_LOGE("AudioAddRenderInfoInAdapter");
         adapter->DestroyCapture(adapter, capture);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -159,6 +160,7 @@ int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct Hd
 int32_t HdiServiceCaptureDestory(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioAdapter *adapter = NULL;
@@ -170,17 +172,17 @@ int32_t HdiServiceCaptureDestory(const struct HdfDeviceIoClient *client, struct 
     }
     int32_t ret = AudioAdapterListGetCapture(adapterName, &capture, pid);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
+        AUDIO_FUNC_LOGE("AudioAdapterListGetCapture failed ret = %{public}d", ret);
         return ret;
     }
     ret = AudioAdapterListGetAdapterCapture(adapterName, &adapter, &capture);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: AudioAdapterListGetAdapter fail", __func__);
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapterCapture failed ret = %{public}d", ret);
         return ret;
     }
     ret = adapter->DestroyCapture(adapter, capture);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: DestroyCapture failed!", __func__);
+        AUDIO_FUNC_LOGE("DestroyCapture failed!");
         return ret;
     }
     if (AudioDestroyCaptureInfoInAdapter(adapterName)) {
@@ -192,11 +194,13 @@ int32_t HdiServiceCaptureDestory(const struct HdfDeviceIoClient *client, struct 
 int32_t HdiServiceCaptureStart(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or repoly is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioCapture *capture = NULL;
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioAdapterListCheckAndGetCapture failed ret = %{public}d", ret);
         return ret;
     }
     return capture->control.Start((AudioHandle)capture);
@@ -291,6 +295,7 @@ int32_t HdiServiceCaptureGetFrameCount(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (!HdfSbufWriteUint64(reply, count)) {
+        AUDIO_FUNC_LOGE("write count failed!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -300,7 +305,7 @@ int32_t HdiServiceCaptureSetSampleAttr(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
-        HDF_LOGE("%{public}s: The pointer is null!", __func__);
+        AUDIO_FUNC_LOGE("The pointer is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int ret;
@@ -364,6 +369,7 @@ int32_t HdiServiceCaptureCheckSceneCapability(const struct HdfDeviceIoClient *cl
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioSceneDescriptor scene;
@@ -419,6 +425,7 @@ int32_t HdiServiceCaptureGetMute(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     int32_t ret;
@@ -430,6 +437,7 @@ int32_t HdiServiceCaptureGetMute(const struct HdfDeviceIoClient *client,
     }
     ret = capture->volume.GetMute((AudioHandle)capture, &mute);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("getmute failed! ret = %{public}d", ret);
         return ret;
     }
     uint32_t tempMute = (uint32_t)mute;
@@ -443,6 +451,7 @@ int32_t HdiServiceCaptureSetMute(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     bool mute = false;
@@ -463,6 +472,7 @@ int32_t HdiServiceCaptureSetVolume(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     uint32_t volume = 0;
@@ -482,6 +492,7 @@ int32_t HdiServiceCaptureGetVolume(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     float volume;
@@ -505,6 +516,7 @@ int32_t HdiServiceCaptureGetGainThreshold(const struct HdfDeviceIoClient *client
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     float min, max;
@@ -517,6 +529,7 @@ int32_t HdiServiceCaptureGetGainThreshold(const struct HdfDeviceIoClient *client
     }
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("GetGainThreshold failed! ret = %{public}d", ret);
         return ret;
     }
     tempMin = (uint32_t)min;
@@ -544,6 +557,7 @@ int32_t HdiServiceCaptureGetGain(const struct HdfDeviceIoClient *client,
     }
     ret = capture->volume.GetGain((AudioHandle)capture, &gain);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("GetGain failed! ret = %{public}d", ret);
         return ret;
     }
     uint32_t tempGain = (uint32_t)gain;
@@ -585,12 +599,12 @@ int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
     uint32_t pid = 0;
     uint32_t index = 0;
     if (HdiServiceRenderCaptureReadData(data, &adapterName, &pid) < 0) {
-        HDF_LOGE("%{public}s: HdiServiceRenderRenderFrame:HdiServiceRenderCaptureReadData fail!", __func__);
+        AUDIO_FUNC_LOGE("HdiServiceRenderRenderFrame:HdiServiceRenderCaptureReadData fail!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t ret = AudioAdapterFrameGetCapture(adapterName, &capture, pid, &index);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: AudioAdapterListGetRender fail", __func__);
+        AUDIO_FUNC_LOGE("AudioAdapterListGetRender fail");
         return ret;
     }
     if (!HdfSbufReadUint64(data, &requestBytes)) {
@@ -634,7 +648,7 @@ int32_t HdiServiceCaptureGetCapturePosition(const struct HdfDeviceIoClient *clie
     }
     ret = capture->GetCapturePosition((AudioHandle)capture, &frames, &time);
     if (ret < 0) {
-        HDF_LOGE("%{public}s: GetCapturePosition fail", __func__);
+        AUDIO_FUNC_LOGE("GetCapturePosition fail");
         return ret;
     }
     if (HdiServicePositionWrite(reply, frames, time) < 0) {
@@ -646,7 +660,6 @@ int32_t HdiServiceCaptureGetCapturePosition(const struct HdfDeviceIoClient *clie
 int32_t HdiServiceCaptureSetExtraParams(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s: enter", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -657,7 +670,7 @@ int32_t HdiServiceCaptureSetExtraParams(const struct HdfDeviceIoClient *client,
     }
     const char *keyValueList = NULL;
     if ((keyValueList = HdfSbufReadString(data)) == NULL) {
-        HDF_LOGE("%{public}s: keyValueList Is NULL", __func__);
+        AUDIO_FUNC_LOGE("keyValueList Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     return capture->attr.SetExtraParams((AudioHandle)capture, keyValueList);
@@ -666,7 +679,6 @@ int32_t HdiServiceCaptureSetExtraParams(const struct HdfDeviceIoClient *client,
 int32_t HdiServiceCaptureGetExtraParams(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s: enter", __func__);
     int32_t ret;
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -686,20 +698,19 @@ int32_t HdiServiceCaptureGetExtraParams(const struct HdfDeviceIoClient *client,
     char keyValueList[STR_MAX] = { 0 };
     ret = capture->attr.GetExtraParams((AudioHandle)capture, keyValueList, listLenth);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("GetExtraParams failed! ret = %{public}d", ret);
         return ret;
     }
     char *keyList = keyValueList;
     if (!HdfSbufWriteString(reply, keyList)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    HDF_LOGE("%{public}s: out", __func__);
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t HdiServiceCaptureReqMmapBuffer(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s: enter", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -723,7 +734,6 @@ int32_t HdiServiceCaptureReqMmapBuffer(const struct HdfDeviceIoClient *client,
 int32_t HdiServiceCaptureGetMmapPosition(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    HDF_LOGE("%{public}s: enter", __func__);
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -737,12 +747,12 @@ int32_t HdiServiceCaptureGetMmapPosition(const struct HdfDeviceIoClient *client,
 
     ret = capture->attr.GetMmapPosition((AudioHandle)capture, &frames, &time);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("GetMmapPosition failed! ret = %{public}d", ret);
         return ret;
     }
     if (HdiServicePositionWrite(reply, frames, time) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    HDF_LOGE("%{public}s: out", __func__);
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -759,12 +769,12 @@ int32_t HdiServiceCaptureAddEffect(const struct HdfDeviceIoClient *client,
     struct AudioCapture *capture = NULL;
     int32_t ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0 || capture == NULL) {
-        HDF_LOGE("%{public}s: capture is NULL or ret = %{public}d", __func__, ret);
+        AUDIO_FUNC_LOGE("capture is NULL or ret = %{public}d", ret);
         return ret;
     }
 
     if (!HdfSbufReadUint64(data, &effectid)) {
-        HDF_LOGE("%{public}s: read buf fail ", __func__);
+        AUDIO_FUNC_LOGE("read buf fail ");
         return HDF_FAILURE;
     }
 
@@ -784,12 +794,12 @@ int32_t HdiServiceCaptureRemoveEffect(const struct HdfDeviceIoClient *client,
     struct AudioCapture *capture = NULL;
     int32_t ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0 || capture == NULL) {
-        HDF_LOGE("%{public}s: capture is NULL or ret = %{public}d", __func__, ret);
+        AUDIO_FUNC_LOGE("capture is NULL or ret = %{public}d", ret);
         return ret;
     }
 
     if (!HdfSbufReadUint64(data, &effectid)) {
-        HDF_LOGE("%{public}s: read buf fail ", __func__);
+        AUDIO_FUNC_LOGE("read buf fail ");
         return HDF_FAILURE;
     }
 
@@ -800,7 +810,7 @@ int32_t HdiServiceCaptureTurnStandbyMode(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
-        HDF_LOGE("%{public}s: The pointer is null", __func__);
+        AUDIO_FUNC_LOGE("The pointer is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioCapture *capture = NULL;
@@ -815,7 +825,7 @@ int32_t HdiServiceCaptureDevDump(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || data == NULL || reply == NULL) {
-        HDF_LOGE("%{public}s: parameter Is NULL", __func__);
+        AUDIO_FUNC_LOGE("parameter Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioCapture *capture = NULL;
