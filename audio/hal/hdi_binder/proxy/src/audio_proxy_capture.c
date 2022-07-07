@@ -515,7 +515,6 @@ int32_t AudioProxyCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
     struct HdfSBuf *reply = NULL;
     ret = AudioProxyCaptureCaptureFrameSplit(capture, requestBytes, &data, &reply);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioProxyCaptureCaptureFrameSplit Fail!");
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
     }

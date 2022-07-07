@@ -597,7 +597,6 @@ void AudioSetRenderStatus(const char *adapterName, bool renderStatus)
     if (g_renderAndCaptureManage == NULL) {
         return;
     }
-    AUDIO_FUNC_LOGI();
     if (adapterName == NULL) {
         AUDIO_FUNC_LOGE("adapterName is null ");
         return;
@@ -621,7 +620,6 @@ int32_t AudioGetRenderStatus(const char *adapterName)
 {
     int32_t i;
     int32_t num;
-    AUDIO_FUNC_LOGI();
     if (adapterName == NULL || g_renderAndCaptureManage == NULL) {
         return HDF_FAILURE;
     }

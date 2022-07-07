@@ -629,7 +629,7 @@ int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
     ret = render->RenderFrame((AudioHandle)render, (const void *)frame, (uint64_t)requestBytes, &replyBytes);
     AudioSetRenderStatus(adapterName, false);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("HdiServiceRenderRenderFrame ");
+        AUDIO_FUNC_LOGE("HdiServiceRenderRenderFrame fail");
         return ret;
     }
     return AUDIO_HAL_SUCCESS;
