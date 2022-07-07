@@ -33,7 +33,6 @@ if (defined(ohos_lite)) {
       "$camera_path/buffer_manager/include",
       "$camera_path/buffer_manager/src/buffer_adapter/lite",
       "//third_party/googletest/googletest/include",
-      "//foundation/communication/ipc_lite/interfaces/kits",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "//drivers/hdf_core/framework/include/utils",
       "//drivers/hdf_core/adapter/uhdf2/osal/include",
