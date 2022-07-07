@@ -38,6 +38,7 @@ constexpr int32_t UVOL_TO_MVOL = 1000;
 constexpr int32_t MKDIR_WAIT_TIME = 1;
 constexpr int32_t NUM_ZERO = 0;
 const std::string POWER_SUPPLY_BASE_PATH = "/sys/class/power_supply";
+const std::string MOCK_POWER_SUPPLY_BASE_PATH = "/data/service/el0/battery";
 const std::string POWER_SUPPLY_BATTERY = "Battery";
 const std::string BATTERY_KEY_CAPACITY = "POWER_SUPPLY_CAPACITY=";
 const std::string BATTERY_KEY_VOLTAGE = "POWER_SUPPLY_VOLTAGE_NOW=";
@@ -495,7 +496,7 @@ void PowerSupplyProvider::SetSysFilePath(const std::string& path)
 {
     if (path.empty()) {
         BATTERY_HILOGI(FEATURE_BATT_INFO, "path is empty");
-        path_ = "/data/local/tmp";
+        path_ = MOCK_POWER_SUPPLY_BASE_PATH;
         return;
     }
     path_ = path;
@@ -865,58 +866,58 @@ BatterydInfo PowerSupplyProvider::GetBatteryInfo() const
 
 void PowerSupplyProvider::InitDefaultSysfs()
 {
-    std::string mockBatteryPath = "/data/local/tmp/battery";
-    std::string mockChargerPath = "/data/local/tmp/ohos_charger";
-    std::string mockTechPath = "/data/local/tmp/ohos-fgu";
+    std::string mockBatteryPath = MOCK_POWER_SUPPLY_BASE_PATH + "/battery";
+    std::string mockChargerPath = MOCK_POWER_SUPPLY_BASE_PATH + "/ohos_charger";
+    std::string mockTechPath = MOCK_POWER_SUPPLY_BASE_PATH + "/ohos-fgu";
     if (access(mockBatteryPath.c_str(), 0) == -1) {
-        mkdir("/data/local/tmp/battery", S_IRWXU);
+        mkdir(mockBatteryPath.c_str(), S_IRWXU);
         sleep(MKDIR_WAIT_TIME);
     }
 
     if (access(mockChargerPath.c_str(), 0) == -1) {
-        mkdir("/data/local/tmp/ohos_charger", S_IRWXU);
+        mkdir(mockChargerPath.c_str(), S_IRWXU);
         sleep(MKDIR_WAIT_TIME);
     }
 
     if (access(mockTechPath.c_str(), 0) == -1) {
-        mkdir("/data/local/tmp/ohos-fgu", S_IRWXU);
+        mkdir(mockTechPath.c_str(), S_IRWXU);
         sleep(MKDIR_WAIT_TIME);
     }
 
     BATTERY_HILOGI(FEATURE_BATT_INFO, "create mock path");
-    CreateFile("/data/local/tmp/ohos-fgu/capacity", "1000");
-    CreateFile("/data/local/tmp/ohos-fgu/current_avg", "1000");
-    CreateFile("/data/local/tmp/ohos-fgu/current_now", "1000");
-    CreateFile("/data/local/tmp/ohos-fgu/health", "Over voltage");
-    CreateFile("/data/local/tmp/ohos-fgu/present", "0");
-    CreateFile("/data/local/tmp/ohos-fgu/status", "Not charging");
-    CreateFile("/data/local/tmp/ohos-fgu/type", "Unknown");
-    CreateFile("/data/local/tmp/ohos-fgu/temp", "345");
-    CreateFile("/data/local/tmp/ohos-fgu/technology", "Li-ion");
-    CreateFile("/data/local/tmp/ohos_charger/type", "USB");
-    CreateFile("/data/local/tmp/ohos_charger/constant_charge_current", "0");
-    CreateFile("/data/local/tmp/ohos_charger/health", "Good");
-    CreateFile("/data/local/tmp/ohos_charger/online", "1");
-    CreateFile("/data/local/tmp/ohos_charger/status", "Charging");
-    CreateFile("/data/local/tmp/ohos_charger/type", "USB");
-    CreateFile("/data/local/tmp/battery/capacity", "11");
-    CreateFile("/data/local/tmp/battery/charge_control_limit", "0");
-    CreateFile("/data/local/tmp/battery/charge_counter", "4000000");
-    CreateFile("/data/local/tmp/battery/charge_full", "4000000");
-    CreateFile("/data/local/tmp/battery/charge_now", "4000000");
-    CreateFile("/data/local/tmp/battery/constant_charge_current", "0");
-    CreateFile("/data/local/tmp/battery/current_avg", "1000");
-    CreateFile("/data/local/tmp/battery/current_now", "1000");
-    CreateFile("/data/local/tmp/battery/health", "Good");
-    CreateFile("/data/local/tmp/battery/input_current_limit", "0");
-    CreateFile("/data/local/tmp/battery/online", "1");
-    CreateFile("/data/local/tmp/battery/present", "0");
-    CreateFile("/data/local/tmp/battery/status", "Full");
-    CreateFile("/data/local/tmp/battery/temp", "222");
-    CreateFile("/data/local/tmp/battery/voltage_avg", "4123456");
-    CreateFile("/data/local/tmp/battery/voltage_now", "4123456");
-    CreateFile("/data/local/tmp/battery/type", "Battery");
-    path_ = "/data/local/tmp";
+    CreateFile(mockTechPath + "/capacity", "1000");
+    CreateFile(mockTechPath + "/current_avg", "1000");
+    CreateFile(mockTechPath + "/current_now", "1000");
+    CreateFile(mockTechPath + "/health", "Over voltage");
+    CreateFile(mockTechPath + "/present", "0");
+    CreateFile(mockTechPath + "/status", "Not charging");
+    CreateFile(mockTechPath + "/type", "Unknown");
+    CreateFile(mockTechPath + "/temp", "345");
+    CreateFile(mockTechPath + "/technology", "Li-ion");
+    CreateFile(mockChargerPath + "/type", "USB");
+    CreateFile(mockChargerPath + "/constant_charge_current", "0");
+    CreateFile(mockChargerPath + "/health", "Good");
+    CreateFile(mockChargerPath + "/online", "1");
+    CreateFile(mockChargerPath + "/status", "Charging");
+    CreateFile(mockChargerPath + "/type", "USB");
+    CreateFile(mockBatteryPath + "/capacity", "11");
+    CreateFile(mockBatteryPath + "/charge_control_limit", "0");
+    CreateFile(mockBatteryPath + "/charge_counter", "4000000");
+    CreateFile(mockBatteryPath + "/charge_full", "4000000");
+    CreateFile(mockBatteryPath + "/charge_now", "4000000");
+    CreateFile(mockBatteryPath + "/constant_charge_current", "0");
+    CreateFile(mockBatteryPath + "/current_avg", "1000");
+    CreateFile(mockBatteryPath + "/current_now", "1000");
+    CreateFile(mockBatteryPath + "/health", "Good");
+    CreateFile(mockBatteryPath + "/input_current_limit", "0");
+    CreateFile(mockBatteryPath + "/online", "1");
+    CreateFile(mockBatteryPath + "/present", "0");
+    CreateFile(mockBatteryPath + "/status", "Full");
+    CreateFile(mockBatteryPath + "/temp", "222");
+    CreateFile(mockBatteryPath + "/voltage_avg", "4123456");
+    CreateFile(mockBatteryPath + "/voltage_now", "4123456");
+    CreateFile(mockBatteryPath + "/type", "Battery");
+    path_ = MOCK_POWER_SUPPLY_BASE_PATH;
 }
 }  // namespace V1_0
 }  // namespace Battery

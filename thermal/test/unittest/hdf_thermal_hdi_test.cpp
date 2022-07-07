@@ -55,9 +55,9 @@ namespace {
     std::mutex g_mutex;
     const uint32_t MAX_PATH = 256;
     const uint32_t WAIT_TIME = 1;
-    const std::string CPU_FREQ_PATH = "/data/cooling/cpu/freq";
-    const std::string GPU_FREQ_PATH = "/data/cooling/gpu/freq";
-    const std::string BATTERY_CHARGER_CURRENT_PATH = "/data/cooling/battery/current";
+    const std::string CPU_FREQ_PATH = "/data/service/el0/thermal/cooling/cpu/freq";
+    const std::string GPU_FREQ_PATH = "/data/service/el0/thermal/cooling/gpu/freq";
+    const std::string BATTERY_CHARGER_CURRENT_PATH = "/data/service/el0/thermal/cooling/battery/current";
 }
 
 class HdfThermalHdiTest : public testing::Test {

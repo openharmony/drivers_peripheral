@@ -38,15 +38,15 @@ const int32_t ARG_2 = 2;
 const int32_t ARG_3 = 3;
 const int32_t ARG_4 = 4;
 const int32_t NUM_ZERO = 0;
-const std::string SIMULATION_TYPE_DIR = "/data/sensor/%s/type";
-const std::string SIMULATION_TEMP_DIR = "/data/sensor/%s/temp";
-std::string thermalDir = "/data/sensor/";
-std::string thermalNodeDir = "/data/sensor/%s";
+const std::string SIMULATION_TYPE_DIR = "/data/service/el0/thermal/sensor/%s/type";
+const std::string SIMULATION_TEMP_DIR = "/data/service/el0/thermal/sensor/%s/temp";
+std::string thermalDir = "/data/service/el0/thermal/sensor/";
+std::string thermalNodeDir = "/data/service/el0/thermal/sensor/%s";
 std::string thermalFileDir = "%s/%s";
-std::string thermalTypeDir = "/data/sensor/%s/type";
-std::string thermalTempDir = "/data/sensor/%s/temp";
-std::string mitigationDir = "/data/cooling";
-std::string mitigationNodeDir = "/data/cooling/%s";
+std::string thermalTypeDir = "/data/service/el0/thermal/sensor/%s/type";
+std::string thermalTempDir = "/data/service/el0/thermal/sensor/%s/temp";
+std::string mitigationDir = "/data/service/el0/thermal/cooling";
+std::string mitigationNodeDir = "/data/service/el0/thermal/cooling/%s";
 std::string mitigationNodeFileDir = "%s/%s";
 }
 int32_t ThermalSimulationNode::NodeInit()
