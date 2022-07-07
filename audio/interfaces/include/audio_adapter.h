@@ -212,7 +212,8 @@ struct AudioAdapter {
      *
      * @param adapter Indicates the audio adapter.
      * @param key Indicates what kind of parameter type will be set.
-     * @param condition Indicates the specific extend parameter condition of AudioExtParamKey;
+     * @param condition Indicates the specific extend parameter condition of AudioExtParamKey.
+     * @param value Indicates the value of the specified condition.
      *
      * The format of condition is <i>key=value</i>. Separate multiple key-value pairs by semicolons (;).
      * When key equals to AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME, the format of condition must be like this:
@@ -231,7 +232,9 @@ struct AudioAdapter {
      *
      * @param adapter Indicates the audio adapter.
      * @param key Indicates what kind of parameter type will be get.
-     * @param condition Indicates the specific extend parameter condition of AudioExtParamKey;
+     * @param condition Indicates the specific extend parameter condition of AudioExtParamKey.
+     * @param value Indicates the value of the specified condition.
+     * @param lenth Indicates the length of the value pointer.
      *
      * The format of condition is <i>key=value</i>. Separate multiple key-value pairs by semicolons (;).
      * When key equals to AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME, the format of condition must be like this:
@@ -243,7 +246,7 @@ struct AudioAdapter {
      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      */
     int32_t (*GetExtraParams)(struct AudioAdapter *adapter, enum AudioExtParamKey key,
-                              const char *condition, char *value);
+                              const char *condition, char *value, int32_t lenth);
 
     /**
      * @brief Register extra audio parameters observer.
