@@ -43,7 +43,7 @@ config("audio_interface_config") {
   if (drivers_peripheral_audio_feature_mono_to_stereo) {
     cflags += [ "-DMONO_TO_STEREO" ]
   }
-  if (enable_audio_alsa_mode) {
+  if (drivers_peripheral_audio_alsa_lib) {
     cflags += [ "-DALSA_MODE" ]
   }
 
@@ -111,7 +111,7 @@ if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio_interface_lib_capture") {
     sources =
         [ "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c" ]
-    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+    if (drivers_peripheral_audio_alsa_lib) {
       sources += [
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_capture.c",
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_common.c",
@@ -136,7 +136,7 @@ if (defined(ohos_lite)) {
       defines = [ "AUDIO_HAL_HDF_LOG" ]
     }
 
-    if (enable_audio_alsa_mode) {
+    if (drivers_peripheral_audio_alsa_lib) {
       sources += [
         "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/alsa_mixer.c",
         "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/audio_hw.c",
@@ -148,7 +148,7 @@ if (defined(ohos_lite)) {
       ]
       deps += [ "//third_party/tinyalsa:libtinyalsa" ]
     }
-    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+    if (drivers_peripheral_audio_alsa_lib) {
       include_dirs += [
         "//third_party/alsa-lib/include",
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
@@ -181,7 +181,7 @@ if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio_interface_lib_render") {
     sources =
         [ "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c" ]
-    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+    if (drivers_peripheral_audio_alsa_lib) {
       sources += [
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_common.c",
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_render.c",
@@ -207,7 +207,7 @@ if (defined(ohos_lite)) {
       defines = [ "AUDIO_HAL_HDF_LOG" ]
     }
 
-    if (enable_audio_alsa_mode) {
+    if (drivers_peripheral_audio_alsa_lib) {
       sources += [
         "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/alsa_mixer.c",
         "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/audio_hw.c",
@@ -219,7 +219,7 @@ if (defined(ohos_lite)) {
       ]
       deps += [ "//third_party/tinyalsa:libtinyalsa" ]
     }
-    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+    if (drivers_peripheral_audio_alsa_lib) {
       include_dirs += [
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
         "//third_party/alsa-lib/include",
