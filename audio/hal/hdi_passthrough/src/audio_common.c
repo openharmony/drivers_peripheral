@@ -139,10 +139,10 @@ void AudioLogRecord(int errorLevel, const char *format, ...)
     FILE *fp = NULL;
     char timeStr[TIME_LEN];
     char fileName[FILE_NAME_LEN];
+    struct tm *tblock = NULL;
     char folderName[] = "/data/log/drivers_peripheral_audio";
     va_start(args, format);
     time_t timeLog = time(NULL);
-    struct tm *tblock;
     tblock = localtime(&timeLog);
     if (tblock == NULL) {
         return;
