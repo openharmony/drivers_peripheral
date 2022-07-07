@@ -92,7 +92,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
-    if (!defined(enable_audio_user_mode) || enable_audio_user_mode == false) {
+    if (!drivers_peripheral_audio_user_mode) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       external_deps = [ "hdf_core:libhdf_utils" ]
     } else {

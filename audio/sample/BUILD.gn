@@ -99,7 +99,7 @@ if (defined(ohos_lite)) {
       defines += [ "AUDIO_HAL_USER" ]
     }
 
-    if (defined(enable_audio_alsa_lib) && enable_audio_alsa_lib == true) {
+    if (drivers_peripheral_audio_alsa_lib) {
       defines += [ "ALSA_LIB_MODE" ]
     }
 

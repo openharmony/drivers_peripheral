@@ -43,10 +43,7 @@ config("hdi_service_proxy_config") {
   ldflags = [ "-Wl" ]
 }
 
-if ("$product_name" != "ohos-arm64") {
-  import("//vendor/$product_company/$product_name/hals/audio/product.gni")
-}
-if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
+if (drivers_peripheral_audio_hdf_proxy_stub == true) {
   if (defined(ohos_lite)) {
     ohos_shared_library("hdi_audio_client") {
       include_dirs = [
@@ -86,9 +83,6 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
       part_name = "drivers_peripheral_audio"
     }
   } else {
-    if ("$product_name" != "ohos-arm64") {
-      import("//vendor/$product_company/$product_name/hals/audio/product.gni")
-    }
     ohos_shared_library("hdi_audio_client") {
       include_dirs = [
         "//drivers/peripheral/audio/interfaces/include",
