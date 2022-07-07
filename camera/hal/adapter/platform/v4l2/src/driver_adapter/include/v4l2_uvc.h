@@ -46,6 +46,8 @@ private:
     void V4L2UvcMatchDev(const std::string      name, const std::string v4l2Device, bool inOut);
     void V4L2UvcEnmeDevices();
     void loopUvcDevice();
+    int CheckBuf(unsigned int len, char *buf);
+    void UpdateV4L2UvcMatchDev(std::string& action, std::string& subsystem, std::string& devnode);
     const char* V4L2GetUsbValue(const char* key, const char* str, int len);
     void V4L2GetUsbString(std::string& action, std::string& subsystem,
         std::string& devnode, char* buf, unsigned int len);
