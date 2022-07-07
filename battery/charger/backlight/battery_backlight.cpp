@@ -34,9 +34,9 @@ namespace V1_0 {
 namespace {
 constexpr uint32_t BACKLIGHT_ON = 128;
 constexpr uint32_t BACKLIGHT_OFF = 0;
-constexpr uint32_t MKDIR_WAIT_TIME = 1;
 std::vector<std::string> g_backlightNodeNames;
 const std::string BACKLIGHT_BASE_PATH = "/sys/class/leds";
+const std::string MOCK_BACKLIGHT_PATH = "/data/service/el0/display/brightness";
 std::string g_backlightNode = "backlight";
 }
 
@@ -136,14 +136,8 @@ void BatteryBacklight::CreateFile(const std::string& path, const std::string& co
 
 void BatteryBacklight::InitDefaultSysfs() const
 {
-    std::string brightnessPath = "/data";
-    if (access(brightnessPath.c_str(), 0) == -1) {
-        mkdir(brightnessPath.c_str(), S_IRWXU);
-        sleep(MKDIR_WAIT_TIME);
-    }
-
     BATTERY_HILOGI(FEATURE_CHARGING, "create default brightness path");
-    CreateFile("/data/brightness", "127");
+    CreateFile(MOCK_BACKLIGHT_PATH, "127");
 }
 
 void BatteryBacklight::InitDevicePah(std::string& path)
@@ -153,7 +147,7 @@ void BatteryBacklight::InitDevicePah(std::string& path)
         return;
     } else {
         BATTERY_HILOGI(FEATURE_CHARGING, "create mock backlight path");
-        path = "/data/brightness";
+        path = MOCK_BACKLIGHT_PATH;
         return;
     }
 
