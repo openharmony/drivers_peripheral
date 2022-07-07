@@ -34,7 +34,7 @@ void LocationVendorInterface::Init()
     HDF_LOGI("%{public}s.", __func__);
     g_vendorHandle = dlopen(VENDOR_NAME.c_str(), RTLD_LAZY);
     if (!g_vendorHandle) {
-        HDF_LOGE("%{public}s:dlopen %{public}s failed.", __func__, VENDOR_NAME.c_str());
+        HDF_LOGE("%{public}s:dlopen %{public}s failed: %{public}s", __func__, VENDOR_NAME.c_str(), dlerror());
         return;
     }
     GnssVendorDevice *gnssDevice = static_cast<GnssVendorDevice *>(dlsym(g_vendorHandle, "GnssVendorInterface"));
@@ -78,6 +78,7 @@ void LocationVendorInterface::CleanUp()
     }
     g_vendorInterface = nullptr;
     dlclose(g_vendorHandle);
+    g_vendorHandle = nullptr;
 }
 } // Location
 } // HDI
