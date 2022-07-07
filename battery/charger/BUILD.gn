@@ -44,6 +44,7 @@ ohos_executable("charger") {
   configs = [ ":batteryd_private_config" ]
 
   deps = [
+    "//drivers/interface/light/v1_0:liblight_proxy_1.0",
     "//drivers/peripheral/battery/charger/ui:libminui",
     "//third_party/jsoncpp:jsoncpp",
     "//third_party/libdrm:libdrm",
