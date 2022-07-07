@@ -43,10 +43,7 @@ config("hdi_service_config") {
   ldflags = [ "-Wl" ]
 }
 
-if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
-  if ("$product_name" != "ohos-arm64") {
-    import("//vendor/$product_company/$product_name/hals/audio/product.gni")
-  }
+if (drivers_peripheral_audio_hdf_proxy_stub == true) {
   ohos_shared_library("hdi_audio_primary_server") {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
@@ -64,7 +61,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
     ]
 
     deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
-    if (!defined(enable_audio_user_mode) || enable_audio_user_mode == false) {
+    if (!drivers_peripheral_audio_user_mode) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
     } else {
       deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
@@ -115,7 +112,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
     ]
 
     deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
-    if (!defined(enable_audio_user_mode) || enable_audio_user_mode == false) {
+    if (!drivers_peripheral_audio_user_mode) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
     } else {
       deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
@@ -161,7 +158,7 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
     ]
 
     deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
-    if (!defined(enable_audio_user_mode) || enable_audio_user_mode == false) {
+    if (!drivers_peripheral_audio_user_mode) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
     } else {
       deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]

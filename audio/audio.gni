@@ -7,8 +7,6 @@ if (defined(ohos_lite)) {
   if (product_name == "ohos-arm64") {
     enable_audio_alsa_mode = false
     enable_audio_hal_notsupport_pathselect = false
-  } else {
-    import("//vendor/${product_company}/${product_name}/hals/audio/product.gni")
   }
 }
 
@@ -24,6 +22,24 @@ declare_args() {
 
 if (product_name == "ohos-arm64") {
   drivers_peripheral_audio_hal_notsupport_pathselect = false
+}
+
+if (defined(ohos_lite)) {
+  if (defined(enable_audio_hal_notsupport_pathselect) &&
+      enable_audio_hal_notsupport_pathselect == true) {
+    drivers_peripheral_audio_hal_notsupport_pathselect = true
+  } else {
+    drivers_peripheral_audio_hal_notsupport_pathselect = false
+  }
+  if (defined(enable_audio_policy_config) &&
+      enable_audio_policy_config == true) {
+    drivers_peripheral_audio_policy_config = true
+  } else {
+    drivers_peripheral_audio_policy_config = false
+  }
+  if (defined(enable_hdf_audio_full_test_suite)) {
+    drivers_peripheral_audio_full_test_suite = true
+  }
 }
 
 #If set flag is false, the ADM version will be built; if set flag is true, the MPI version will be built.
