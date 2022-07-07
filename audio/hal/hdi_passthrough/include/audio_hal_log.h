@@ -35,8 +35,12 @@
     } while (0)
 #endif
 
+#define AUDIO_FUNC_LOGW(fmt, arg...) do { \
+        HDF_LOGW("[%{public}s][line:%{public}d]: " fmt, __func__, __LINE__, ##arg); \
+    } while (0)
+
 #define AUDIO_FUNC_LOGE(fmt, arg...) do { \
-        HDF_LOGE("[%{public}s][%{public}s][line:%{public}d]: " fmt, __FILE__, __func__, __LINE__, ##arg); \
+        HDF_LOGE("[%{public}s][line:%{public}d]: " fmt, __func__, __LINE__, ##arg); \
     } while (0)
 
 #endif
