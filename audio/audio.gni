@@ -14,6 +14,16 @@ if (defined(ohos_lite)) {
 
 declare_args() {
   drivers_peripheral_audio_feature_mono_to_stereo = false
+  drivers_peripheral_audio_hal_notsupport_pathselect = true
+  drivers_peripheral_audio_hdf_proxy_stub = true
+  drivers_peripheral_audio_user_mode = false
+  drivers_peripheral_audio_full_test_suite = false
+  drivers_peripheral_audio_policy_config = true
+  drivers_peripheral_audio_alsa_lib = false
+}
+
+if (product_name == "ohos-arm64") {
+  drivers_peripheral_audio_hal_notsupport_pathselect = false
 }
 
 #If set flag is false, the ADM version will be built; if set flag is true, the MPI version will be built.

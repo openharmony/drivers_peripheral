@@ -6,7 +6,15 @@
   "component": {
     "name": "drivers_peripheral_audio",
     "subsystem": "hdf",
-    "features": ["drivers_peripheral_audio_feature_mono_to_stereo"],
+    "features": [
+      "drivers_peripheral_audio_feature_mono_to_stereo",
+      "drivers_peripheral_audio_hal_notsupport_pathselect",
+      "drivers_peripheral_audio_hdf_proxy_stub",
+      "drivers_peripheral_audio_user_mode",
+      "drivers_peripheral_audio_full_test_suite",
+      "drivers_peripheral_audio_policy_config",
+      "drivers_peripheral_audio_alsa_lib"
+    ],
     "syscap": [ "" ],
     "adapter_system_type": ["standard", "small"],
     "rom": "1035KB",
