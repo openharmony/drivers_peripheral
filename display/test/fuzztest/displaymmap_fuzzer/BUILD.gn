@@ -32,10 +32,7 @@ ohos_fuzztest("DisplayMmapFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "displaymmap_fuzzer.cpp" ]
-  deps = [
-    "//drivers/peripheral/display/hdi_service/gralloc/client:libhdi_display_gralloc_client",
-    "//drivers/peripheral/display/hdi_service/gralloc/client:libhdi_display_gralloc_proxy",
-  ]
+  deps = [ "//drivers/peripheral/display/hdi_service/gralloc/client:libhdi_display_gralloc_client" ]
 
   external_deps = [
     "drivers_peripheral_display:hdi_gralloc_client",
