@@ -19,4 +19,13 @@ group("hdf_media_codec") {
     "hal:codec_hdi_omx",
     "hal/v1.0/buffer_manager:codec_buffer_manager",
   ]
+  OMX_IL_PATH = rebase_path(
+          "//device/soc/${device_company}/${product_name}/hardware/omx_il")
+  cmd = "if [ -f ${OMX_IL_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
+  HAVE_OMX_IL_PATH =
+      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+
+  if (HAVE_OMX_IL_PATH) {
+    deps += [ "${OMX_IL_PATH}:lib_omx" ]
+  }
 }
