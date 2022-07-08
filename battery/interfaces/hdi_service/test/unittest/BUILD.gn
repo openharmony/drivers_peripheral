@@ -52,7 +52,6 @@ ohos_unittest("test_hdisrv") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//drivers/interface/battery/v1_0:libbattery_stub_1.0",
     "//drivers/peripheral/battery/charger/ui:libminui",
     "//third_party/googletest:gmock_main",
@@ -91,7 +90,6 @@ ohos_unittest("test_capacity_shutdown") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//drivers/interface/battery/v1_0:libbattery_stub_1.0",
     "//drivers/peripheral/battery/charger/ui:libminui",
     "//third_party/googletest:gmock_main",

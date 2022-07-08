@@ -56,7 +56,6 @@ ohos_executable("charger") {
     "hdf_core:libhdf_utils",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "startup_l2:syspara",
     "utils_base:utils",
   ]
 
