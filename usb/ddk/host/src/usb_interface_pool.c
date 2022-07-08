@@ -580,7 +580,7 @@ static int32_t IfFillRequestByPipeType(struct UsbIfRequest *requestObj, UsbPipeT
         case USB_PIPE_TYPE_CONTROL:
             if (params->requestType != USB_REQUEST_PARAMS_CTRL_TYPE) {
                 ret = HDF_ERR_INVALID_PARAM;
-                HDF_LOGE("%s:%d params is not CTRL_TYPE", __func__, __LINE__);
+                HDF_LOGE("%{public}s:%d params is not CTRL_TYPE", __func__, __LINE__);
                 break;
             }
 
@@ -591,7 +591,7 @@ static int32_t IfFillRequestByPipeType(struct UsbIfRequest *requestObj, UsbPipeT
         case USB_PIPE_TYPE_ISOCHRONOUS:
             if (params->requestType != USB_REQUEST_PARAMS_DATA_TYPE) {
                 ret = HDF_ERR_INVALID_PARAM;
-                HDF_LOGE("%s:%d params is not DATA_TYPE", __func__, __LINE__);
+                HDF_LOGE("%{public}s:%d params is not DATA_TYPE", __func__, __LINE__);
                 break;
             }
 
@@ -600,7 +600,7 @@ static int32_t IfFillRequestByPipeType(struct UsbIfRequest *requestObj, UsbPipeT
         case USB_PIPE_TYPE_BULK:
             if (params->requestType != USB_REQUEST_PARAMS_DATA_TYPE) {
                 ret = HDF_ERR_INVALID_PARAM;
-                HDF_LOGE("%s:%d params is not DATA_TYPE", __func__, __LINE__);
+                HDF_LOGE("%{public}s:%d params is not DATA_TYPE", __func__, __LINE__);
                 break;
             }
 
@@ -609,7 +609,7 @@ static int32_t IfFillRequestByPipeType(struct UsbIfRequest *requestObj, UsbPipeT
         case USB_PIPE_TYPE_INTERRUPT:
             if (params->requestType != USB_REQUEST_PARAMS_DATA_TYPE) {
                 ret = HDF_ERR_INVALID_PARAM;
-                HDF_LOGE("%s:%d params is not DATA_TYPE", __func__, __LINE__);
+                HDF_LOGE("%{public}s:%d params is not DATA_TYPE", __func__, __LINE__);
                 break;
             }
 

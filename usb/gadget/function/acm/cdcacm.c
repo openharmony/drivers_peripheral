@@ -223,7 +223,7 @@ static int32_t SpeedReadThread(void *arg)
     return HDF_SUCCESS;
 }
 
-#define HDF_PROCESS_STACK_SIZE 10000
+#define HDF_PROCESS_STACK_SIZE 100000
 struct OsalThread g_threadRead;
 static int32_t StartThreadReadSpeed(struct UsbSerial *port)
 {

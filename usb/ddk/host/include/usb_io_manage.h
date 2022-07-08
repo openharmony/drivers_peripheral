@@ -21,8 +21,8 @@
 #include "usb_ddk_request.h"
 #include "usb_interface_pool.h"
 
-#define USB_IO_SEND_PROCESS_STACK_SIZE      10000
-#define USB_IO_RECEIVE_PROCESS_STACK_SIZE   10000
+#define USB_IO_SEND_PROCESS_STACK_SIZE      100000
+#define USB_IO_RECEIVE_PROCESS_STACK_SIZE   100000
 #define USB_IO_SUBMIT_RETRY_TIME_CNT        3
 #define USB_IO_SLEEP_MS_TIME                100
 #define USB_IO_STOP_WAIT_MAX_TIME           3
