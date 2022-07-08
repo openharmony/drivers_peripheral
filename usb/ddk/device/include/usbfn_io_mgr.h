@@ -24,7 +24,7 @@
 #include "adapter_if.h"
 #include "osal_thread.h"
 
-#define HDF_PROCESS_STACK_SIZE 10000
+#define HDF_PROCESS_STACK_SIZE 100000
 
 struct ReqList {
     struct UsbFnRequest req;
