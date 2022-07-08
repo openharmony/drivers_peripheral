@@ -89,7 +89,7 @@ static int32_t ReadThread(void *arg)
     }
     return 0;
 }
-#define HDF_PROCESS_STACK_SIZE 10000
+#define HDF_PROCESS_STACK_SIZE 100000
 static int32_t StartThreadRead()
 {
     int32_t ret;
