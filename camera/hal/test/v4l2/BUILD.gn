@@ -71,7 +71,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/base",
       "//drivers/peripheral/camera/interfaces/metadata/include",
       "//drivers/peripheral/display/interfaces/include",
-      "//foundation/communication/ipc_lite/interfaces/kits",
       "//foundation/graphic/surface/interfaces/kits",
       "//foundation/graphic/surface/interfaces/innerkits",
       "//foundation/graphic/utils/interfaces/kits",
