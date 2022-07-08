@@ -287,7 +287,7 @@ static int32_t GetCharThread(void *arg)
 }
 #endif
 
-#define HDF_PROCESS_STACK_SIZE 10000
+#define HDF_PROCESS_STACK_SIZE 100000
 static int32_t StartThreadGetChar()
 {
 #ifdef __LITEOS_USB_HOST_DDK_TEST__

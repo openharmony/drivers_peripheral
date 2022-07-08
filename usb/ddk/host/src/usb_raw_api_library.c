@@ -26,7 +26,7 @@ static void SyncRequestCallback(const void *requestArg)
 {
     struct UsbHostRequest *request = (struct UsbHostRequest *)requestArg;
     if (request == NULL || request->userData == NULL) {
-        HDF_LOGE("%s:%d invalid param requestArg.", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d invalid param requestArg.", __func__, __LINE__);
         return;
     }
 
@@ -56,7 +56,7 @@ static int32_t HandleSyncRequestCompletion(const struct UsbHostRequest *request,
         RawCancelRequest(request);
         RawHandleRequestCompletion((struct UsbHostRequest *)request, USB_REQUEST_TIMEOUT);
     } else if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalSemWait failed, ret = %d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%d OsalSemWait failed, ret = %d ", __func__, __LINE__, ret);
         goto OUT;
     }
 
@@ -81,7 +81,7 @@ static int32_t HandleSyncRequestCompletion(const struct UsbHostRequest *request,
             ret = HDF_ERR_IO;
             break;
         default:
-            HDF_LOGW("%s: unrecognised status code %d", __func__, request->status);
+            HDF_LOGW("%{public}s: unrecognised status code %d", __func__, request->status);
             ret = HDF_FAILURE;
             break;
     }
@@ -100,7 +100,7 @@ static int32_t HandleSyncRequest(struct UsbHostRequest *request, const struct Us
     if (UsbEndpointDirOut(requestData->endPoint)) {
         ret = memcpy_s(request->buffer, request->bufLen, requestData->data, requestData->length);
         if (ret != EOK) {
-            HDF_LOGE("%s:%d memcpy_s fail!", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%d memcpy_s fail!", __func__, __LINE__);
             return ret;
         }
     }
@@ -116,7 +116,7 @@ static int32_t HandleSyncRequest(struct UsbHostRequest *request, const struct Us
 
     ret = OsalSemInit(&request->sem, 0);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalSemInit failed, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%d OsalSemInit failed, ret=%d ", __func__, __LINE__, ret);
         return ret;
     }
 
@@ -138,7 +138,7 @@ static void GetInterfaceNumberDes(
 
     desc = (struct UsbiInterfaceDescriptor *)header;
     if (desc->bLength < USB_DDK_DT_INTERFACE_SIZE) {
-        HDF_LOGW("%s: invalid interface descriptor length %d, skipping", \
+        HDF_LOGW("%{public}s: invalid interface descriptor length %d, skipping", \
             __func__, desc->bLength);
         return;
     }
@@ -171,12 +171,12 @@ static int32_t GetInterfaceNumber(const uint8_t *buffer, size_t size, uint8_t nI
          size2 > 0;
          (buffer2 += header->bLength, size2 -= header->bLength)) {
         if (size2 < sizeof(struct UsbiDescriptorHeader)) {
-            HDF_LOGW("%s: descriptor has %zu excess bytes", __func__, size2);
+            HDF_LOGW("%{public}s: descriptor has %zu excess bytes", __func__, size2);
             break;
         }
         header = (struct UsbiDescriptorHeader *)buffer2;
         if ((header->bLength > size2) || (header->bLength < sizeof(struct UsbDescriptorHeader))) {
-            HDF_LOGW("%s: invalid descriptor length %hhu, skipping remainder",
+            HDF_LOGW("%{public}s: invalid descriptor length %hhu, skipping remainder",
                      __func__, header->bLength);
             break;
         }
@@ -212,26 +212,26 @@ static int32_t GetConfigDescriptor(const struct UsbDevice *dev, uint8_t configId
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
 
     if (dev == NULL) {
-        HDF_LOGE("%s: invalid param", __func__);
+        HDF_LOGE("%{public}s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!osAdapterOps->getConfigDescriptor) {
-        HDF_LOGE("%s: getConfigDescriptor is null", __func__);
+        HDF_LOGE("%{public}s: getConfigDescriptor is null", __func__);
         return HDF_ERR_NOT_SUPPORT;
     }
 
     ret = osAdapterOps->getConfigDescriptor(dev, configIdx, buffer, size);
     if (ret < 0) {
-        HDF_LOGE("%s: getConfigDescriptor error = %d", __func__, ret);
+        HDF_LOGE("%{public}s: getConfigDescriptor error = %d", __func__, ret);
         return ret;
     }
 
     if (ret < USB_DDK_DT_CONFIG_SIZE) {
-        HDF_LOGE("%s: short config descriptor read error = %d", __func__, ret);
+        HDF_LOGE("%{public}s: short config descriptor read error = %d", __func__, ret);
         return HDF_ERR_IO;
     } else if (ret != (int)size) {
-        HDF_LOGE("%s: short config descriptor read size = %zu, ret = %d", __func__, size, ret);
+        HDF_LOGE("%{public}s: short config descriptor read size = %zu, ret = %d", __func__, size, ret);
     }
 
     return ret;
@@ -242,7 +242,7 @@ static void ParseDescriptor(const void *source, enum UsbRawDescriptorType bDescr
     int32_t ret;
 
     if (source == NULL) {
-        HDF_LOGE("%s: invalid param", __func__);
+        HDF_LOGE("%{public}s: invalid param", __func__);
         return;
     }
 
@@ -251,7 +251,7 @@ static void ParseDescriptor(const void *source, enum UsbRawDescriptorType bDescr
             struct UsbConfigDescriptor *desc = (struct UsbConfigDescriptor *)dest;
             ret = memcpy_s(dest, sizeof(struct UsbConfigDescriptor), source, USB_DDK_DT_CONFIG_SIZE);
             if (ret != EOK) {
-                HDF_LOGE("%s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
+                HDF_LOGE("%{public}s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
                 break;
             }
             desc->wTotalLength = Le16ToCpu(desc->wTotalLength);
@@ -260,7 +260,7 @@ static void ParseDescriptor(const void *source, enum UsbRawDescriptorType bDescr
         case USB_RAW_INTERFACE_DESCRIPTOR_TYPE: {
             ret = memcpy_s(dest, sizeof(struct UsbInterfaceDescriptor), source, USB_DDK_DT_INTERFACE_SIZE);
             if (ret != EOK) {
-                HDF_LOGE("%s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
+                HDF_LOGE("%{public}s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
             }
             break;
         }
@@ -268,7 +268,7 @@ static void ParseDescriptor(const void *source, enum UsbRawDescriptorType bDescr
             struct UsbEndpointDescriptor *desc = (struct UsbEndpointDescriptor *)dest;
             ret = memcpy_s(dest, sizeof(struct UsbEndpointDescriptor), source, USB_DDK_DT_ENDPOINT_SIZE);
             if (ret != EOK) {
-                HDF_LOGE("%s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
+                HDF_LOGE("%{public}s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
                 break;
             }
             desc->wMaxPacketSize = Le16ToCpu(desc->wMaxPacketSize);
@@ -278,14 +278,14 @@ static void ParseDescriptor(const void *source, enum UsbRawDescriptorType bDescr
             struct UsbEndpointDescriptor *desc = (struct UsbEndpointDescriptor *)dest;
             ret = memcpy_s(dest, sizeof(struct UsbEndpointDescriptor), source, USB_DDK_DT_ENDPOINT_AUDIO_SIZE);
             if (ret != EOK) {
-                HDF_LOGE("%s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
+                HDF_LOGE("%{public}s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
                 break;
             }
             desc->wMaxPacketSize = Le16ToCpu(desc->wMaxPacketSize);
             break;
         }
         default:
-            HDF_LOGE("%s: error bDescriptorType = %d", __func__, bDescriptorType);
+            HDF_LOGE("%{public}s: error bDescriptorType = %d", __func__, bDescriptorType);
             break;
     }
 }
@@ -307,18 +307,18 @@ static int32_t ParseEndpoint(struct UsbRawEndpointDescriptor *endPoint, const ui
     int32_t ret;
 
     if (size < DESC_HEADER_LENGTH) {
-        HDF_LOGE("%s:size = %d is short endPoint descriptor ", __func__, size);
+        HDF_LOGE("%{public}s:size = %d is short endPoint descriptor ", __func__, size);
         return HDF_ERR_IO;
     }
 
     header = (const struct UsbiDescriptorHeader *)buffer;
     if ((header->bDescriptorType != USB_DDK_DT_ENDPOINT) ||
         (header->bLength > size)) {
-        HDF_LOGE("%s:%d unexpected descriptor, type = 0x%x, length = %hhu",
+        HDF_LOGE("%{public}s:%d unexpected descriptor, type = 0x%x, length = %hhu",
             __func__, __LINE__, header->bDescriptorType, header->bLength);
         return buffer - buffer0;
     } else if (header->bLength < USB_DDK_DT_ENDPOINT_SIZE) {
-        HDF_LOGE("%s:%d invalid endpoint length = %hhu", __func__, __LINE__, header->bLength);
+        HDF_LOGE("%{public}s:%d invalid endpoint length = %hhu", __func__, __LINE__, header->bLength);
         return HDF_ERR_IO;
     }
 
@@ -343,7 +343,7 @@ static int32_t ParseEndpoint(struct UsbRawEndpointDescriptor *endPoint, const ui
 
     ret = memcpy_s(extra, len + endPoint->extraLength, buffer, len);
     if (ret != EOK) {
-        HDF_LOGE("%s:%d memcpy_s failed!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d memcpy_s failed!", __func__, __LINE__);
         return HDF_ERR_IO;
     }
     endPoint->extra = extra;
@@ -359,19 +359,19 @@ static void ClearInterface(const struct UsbRawInterface *usbInterface)
     uint8_t j;
 
     if (usbInterface == NULL) {
-        HDF_LOGE("%s:%d usbInterface is null", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d usbInterface is null", __func__, __LINE__);
         return;
     }
 
     if (usbInterface->numAltsetting > USB_MAXALTSETTING) {
-        HDF_LOGE("%s:%d numAltsetting = %hhu is error", __func__, __LINE__, usbInterface->numAltsetting);
+        HDF_LOGE("%{public}s:%d numAltsetting = %hhu is error", __func__, __LINE__, usbInterface->numAltsetting);
         return;
     }
 
     for (i = 0; i < usbInterface->numAltsetting; i++) {
         infPtr = (struct UsbRawInterfaceDescriptor *)(usbInterface->altsetting + i);
         if (infPtr == NULL) {
-            HDF_LOGE("%s:%d altsetting is null", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%d altsetting is null", __func__, __LINE__);
             continue;
         }
 
@@ -401,12 +401,12 @@ static int32_t RawParseDescriptor(int32_t size, const uint8_t *buffer, enum UsbR
     ParseDescriptor(buffer, bDescriptorType, (void *)ifp);
     if ((ifp->interfaceDescriptor.bDescriptorType != USB_DDK_DT_INTERFACE) ||
         (ifp->interfaceDescriptor.bLength > size)) {
-        HDF_LOGE("%s: unexpected descriptor: type = 0x%x, size = %d",
+        HDF_LOGE("%{public}s: unexpected descriptor: type = 0x%x, size = %d",
                  __func__, ifp->interfaceDescriptor.bDescriptorType, size);
         ret = HDF_FAILURE;
     } else if ((ifp->interfaceDescriptor.bLength < USB_DDK_DT_INTERFACE_SIZE) ||
                (ifp->interfaceDescriptor.bNumEndpoints > USB_MAXENDPOINTS)) {
-        HDF_LOGE("%s: invalid descriptor: length = %u, numEndpoints = %u ", __func__,
+        HDF_LOGE("%{public}s: invalid descriptor: length = %u, numEndpoints = %u ", __func__,
                  ifp->interfaceDescriptor.bLength, ifp->interfaceDescriptor.bNumEndpoints);
         ret = HDF_ERR_IO;
     }
@@ -426,7 +426,7 @@ static int32_t ParseInterfaceCopy(struct UsbRawInterfaceDescriptor * const ifp, 
 
     ret = memcpy_s((void *)ifp->extra, len + ifp->extraLength, buffer, len);
     if (ret != EOK) {
-        HDF_LOGE("%s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%d memcpy_s failed, ret = %d", __func__, __LINE__, ret);
         goto ERR;
     }
     ifp->extraLength = len;
@@ -477,12 +477,12 @@ static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_
     bool tempFlag = false;
 
     if (usbInterface == NULL) {
-        HDF_LOGD("%s:%d usbInterface is null", __func__, __LINE__);
+        HDF_LOGD("%{public}s:%d usbInterface is null", __func__, __LINE__);
         ret = HDF_DEV_ERR_NORANGE;
         goto ERR;
     }
     if (usbInterface->numAltsetting > USB_MAXALTSETTING) {
-        HDF_LOGE("%s:%d numAltsetting = %hhu is error", __func__, __LINE__, usbInterface->numAltsetting);
+        HDF_LOGE("%{public}s:%d numAltsetting = %hhu is error", __func__, __LINE__, usbInterface->numAltsetting);
         ret = HDF_DEV_ERR_NORANGE;
         goto ERR;
     }
@@ -493,7 +493,7 @@ static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_
         if (ret == HDF_FAILURE) {
             return buffer - buffer0;
         } else if (ret == HDF_ERR_IO) {
-            HDF_LOGD("%s:%d ret = %d", __func__, __LINE__, ret);
+            HDF_LOGD("%{public}s:%d ret = %d", __func__, __LINE__, ret);
             goto ERR;
         }
 
@@ -556,7 +556,7 @@ static int32_t ParseConfigurationDes(struct UsbRawConfigDescriptor *config, cons
 
         ret = memcpy_s((void *)config->extra, len + config->extraLength, buffer, len);
         if (ret != EOK) {
-            HDF_LOGE("%s:%d memcpy_s failed! ret = %d", __func__, __LINE__, ret);
+            HDF_LOGE("%{public}s:%d memcpy_s failed! ret = %d", __func__, __LINE__, ret);
             goto ERR;
         }
         config->extraLength = len;
@@ -600,7 +600,7 @@ static int32_t ParseConfiguration(struct UsbRawConfigDescriptor *config, const u
     int32_t intfNum;
 
     if (size < USB_DDK_DT_CONFIG_SIZE || config == NULL) {
-        HDF_LOGE("%s:%d size = %d is short, or config is null!", __func__, __LINE__, size);
+        HDF_LOGE("%{public}s:%d size = %d is short, or config is null!", __func__, __LINE__, size);
         return HDF_ERR_IO;
     }
 
@@ -609,7 +609,7 @@ static int32_t ParseConfiguration(struct UsbRawConfigDescriptor *config, const u
         (config->configDescriptor.bLength < USB_DDK_DT_CONFIG_SIZE) ||
         (config->configDescriptor.bLength > (uint8_t)size) ||
         (config->configDescriptor.bNumInterfaces > USB_MAXINTERFACES)) {
-        HDF_LOGE("%s:%d invalid descriptor: type = 0x%x, length = %u", __func__, __LINE__,
+        HDF_LOGE("%{public}s:%d invalid descriptor: type = 0x%x, length = %u", __func__, __LINE__,
             config->configDescriptor.bDescriptorType, config->configDescriptor.bLength);
         return HDF_ERR_IO;
     }
@@ -620,7 +620,7 @@ static int32_t ParseConfiguration(struct UsbRawConfigDescriptor *config, const u
     for (i = 0; i < intfNum; ++i) {
         j = nAlts[i];
         if (j > USB_MAXALTSETTING) {
-            HDF_LOGW("%s: too many alternate settings: %hhu", __func__, j);
+            HDF_LOGW("%{public}s: too many alternate settings: %hhu", __func__, j);
             nAlts[i] = USB_MAXALTSETTING;
             j = USB_MAXALTSETTING;
         }
@@ -644,18 +644,18 @@ static int32_t DescToConfig(const uint8_t *buf, int32_t size, struct UsbRawConfi
     int32_t ret;
 
     if (tmpConfig == NULL) {
-        HDF_LOGE("%s: RawUsbMemCalloc failed", __func__);
+        HDF_LOGE("%{public}s: RawUsbMemCalloc failed", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
     ret = ParseConfiguration(tmpConfig, buf, size);
     if (ret < 0 && tmpConfig != NULL) {
-        HDF_LOGE("%s: ParseConfiguration failed with error = %d", __func__, ret);
+        HDF_LOGE("%{public}s: ParseConfiguration failed with error = %d", __func__, ret);
         RawUsbMemFree(tmpConfig);
         tmpConfig = NULL;
         return ret;
     } else if (ret > 0) {
-        HDF_LOGW("%s: still %d bytes of descriptor data left", __func__, ret);
+        HDF_LOGW("%{public}s: still %d bytes of descriptor data left", __func__, ret);
     }
 
     *config = tmpConfig;
@@ -680,7 +680,7 @@ static int32_t ControlRequestCompletion(
         RawCancelRequest(request);
         RawHandleRequestCompletion((struct UsbHostRequest *)request, USB_REQUEST_TIMEOUT);
     } else if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalSemWait failed, ret=%d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%d OsalSemWait failed, ret=%d ", __func__, __LINE__, ret);
         goto OUT;
     }
 
@@ -688,7 +688,7 @@ static int32_t ControlRequestCompletion(
         ret = memcpy_s(requestData->data, request->actualLength + requestData->length,
             ControlRequestGetData(request), request->actualLength);
         if (ret != EOK) {
-            HDF_LOGE("%s:%d memcpy_s failed! ret = %d", __func__, __LINE__, ret);
+            HDF_LOGE("%{public}s:%d memcpy_s failed! ret = %d", __func__, __LINE__, ret);
             goto OUT;
         }
     }
@@ -710,7 +710,7 @@ static int32_t ControlRequestCompletion(
             ret = HDF_ERR_IO;
             break;
         default:
-            HDF_LOGW("%s: status = %d is unrecognised", __func__, request->status);
+            HDF_LOGW("%{public}s: status = %d is unrecognised", __func__, request->status);
             ret = HDF_FAILURE;
             break;
     }
@@ -746,13 +746,13 @@ int32_t RawInit(struct UsbSession **session)
     OsalMutexInit(&tempSession->lock);
     if (session == NULL && g_usbRawDefaultSession == NULL) {
         g_usbRawDefaultSession = tempSession;
-        HDF_LOGI("%s: created default context", __func__);
+        HDF_LOGI("%{public}s: created default context", __func__);
     }
 
     if (osAdapterOps->init) {
         ret = osAdapterOps->init(tempSession);
         if (ret < 0) {
-            HDF_LOGE("%s: init error, return %d", __func__, ret);
+            HDF_LOGE("%{public}s: init error, return %d", __func__, ret);
             goto ERR_FREE_SESSION;
         }
     } else {
@@ -802,7 +802,7 @@ struct UsbDeviceHandle *RawOpenDevice(const struct UsbSession *session, uint8_t 
     struct UsbSession *realSession = NULL;
 
     if (osAdapterOps->openDevice == NULL) {
-        HDF_LOGE("%s: openDevice is null", __func__);
+        HDF_LOGE("%{public}s: openDevice is null", __func__);
         return NULL;
     }
 
@@ -819,7 +819,7 @@ int32_t RawCloseDevice(const struct UsbDeviceHandle *devHandle)
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
 
     if (devHandle == NULL) {
-        HDF_LOGE("%s devHandle is null", __func__);
+        HDF_LOGE("%{public}s devHandle is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -838,7 +838,7 @@ int32_t RawClaimInterface(struct UsbDeviceHandle *devHandle, int32_t interfaceNu
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
 
     if (devHandle == NULL || interfaceNumber < 0 || interfaceNumber >= USB_MAXINTERFACES) {
-        HDF_LOGE("%s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -892,18 +892,18 @@ int32_t RawFillBulkRequest(struct UsbHostRequest *request, const struct UsbDevic
     int32_t ret;
 
     if (request == NULL || request->buffer == NULL || devHandle == NULL || fillRequestData == NULL) {
-        HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (UsbEndpointDirOut(fillRequestData->endPoint)) {
         if (fillRequestData->buffer == NULL) {
-            HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
             return HDF_ERR_INVALID_PARAM;
         }
         ret = memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length);
         if (ret != EOK) {
-            HDF_LOGE("%s:%d memcpy_s failed!", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%d memcpy_s failed!", __func__, __LINE__);
             return ret;
         }
     }
@@ -924,7 +924,7 @@ int32_t RawFillControlSetup(const unsigned char *setup, const struct UsbControlR
     struct UsbRawControlSetup *setupData = (struct UsbRawControlSetup *)setup;
 
     if (setup == NULL || requestData == NULL) {
-        HDF_LOGE("%s: invalid param", __func__);
+        HDF_LOGE("%{public}s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -941,7 +941,7 @@ int32_t RawFillControlRequest(struct UsbHostRequest *request, const struct UsbDe
     const struct UsbFillRequestData *fillRequestData)
 {
     if (request == NULL || devHandle == NULL || fillRequestData == NULL) {
-        HDF_LOGE("%s: invalid param", __func__);
+        HDF_LOGE("%{public}s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -963,14 +963,14 @@ int32_t RawFillInterruptRequest(struct UsbHostRequest *request, const struct Usb
     int32_t ret;
 
     if (request == NULL || devHandle == NULL || fillRequestData == NULL) {
-        HDF_LOGE("%s:%d param is null!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d param is null!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (UsbEndpointDirOut(fillRequestData->endPoint)) {
         ret = memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length);
         if (ret != EOK) {
-            HDF_LOGE("%s:%d memcpy_s failed!", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%d memcpy_s failed!", __func__, __LINE__);
             return ret;
         }
     }
@@ -992,14 +992,14 @@ int32_t RawFillIsoRequest(struct UsbHostRequest *request, const struct UsbDevice
     int32_t ret;
 
     if (request == NULL || devHandle == NULL || fillRequestData == NULL) {
-        HDF_LOGE("%s:%d param is NULL!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d param is NULL!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (UsbEndpointDirOut(fillRequestData->endPoint)) {
         ret = memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length);
         if (ret != EOK) {
-            HDF_LOGE("%s:%d memcpy_s fail!", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%d memcpy_s fail!", __func__, __LINE__);
             return ret;
         }
     }
@@ -1025,7 +1025,7 @@ int32_t RawSendControlRequest(struct UsbHostRequest *request, const struct UsbDe
     int32_t ret;
 
     if (request == NULL || request->buffer == NULL || devHandle == NULL || requestData == NULL) {
-        HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1038,7 +1038,7 @@ int32_t RawSendControlRequest(struct UsbHostRequest *request, const struct UsbDe
             ret = memcpy_s(request->buffer + USB_RAW_CONTROL_SETUP_SIZE, fillRequestData.length,
                 requestData->data, requestData->length);
             if (ret != EOK) {
-                HDF_LOGE("%s:%d memcpy_s fail, requestData.length=%d",
+                HDF_LOGE("%{public}s:%d memcpy_s fail, requestData.length=%d",
                          __func__, __LINE__, requestData->length);
                 return ret;
             }
@@ -1055,7 +1055,7 @@ int32_t RawSendControlRequest(struct UsbHostRequest *request, const struct UsbDe
 
     ret = OsalSemInit(&request->sem, 0);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d OsalSemInit failed, ret = %d ", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%d OsalSemInit failed, ret = %d ", __func__, __LINE__, ret);
         return ret;
     }
 
@@ -1072,7 +1072,7 @@ int32_t RawSendBulkRequest(const struct UsbHostRequest *request, const struct Us
     const struct UsbRequestData *requestData)
 {
     if (request == NULL || devHandle == NULL || requestData == NULL) {
-        HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1083,7 +1083,7 @@ int32_t RawSendInterruptRequest(const struct UsbHostRequest *request, const stru
     const struct UsbRequestData *requestData)
 {
     if (request == NULL || devHandle == NULL || requestData == NULL) {
-        HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1095,7 +1095,7 @@ struct UsbHostRequest *RawAllocRequest(const struct UsbDeviceHandle *devHandle, 
     struct UsbHostRequest *request = NULL;
     request = (struct UsbHostRequest *)AllocRequest(devHandle, isoPackets, length);
     if (request == NULL) {
-        HDF_LOGE("%s:%d RawMemAlloc failed", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d RawMemAlloc failed", __func__, __LINE__);
         return NULL;
     }
     return request;
@@ -1104,7 +1104,7 @@ struct UsbHostRequest *RawAllocRequest(const struct UsbDeviceHandle *devHandle, 
 int32_t RawFreeRequest(const struct UsbHostRequest *request)
 {
     if (request == NULL) {
-        HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     return FreeRequest(request);
@@ -1119,24 +1119,24 @@ int32_t RawGetConfigDescriptor(const struct UsbDevice *dev, uint8_t configIndex,
     uint8_t *buf = NULL;
 
     if (dev == NULL) {
-        HDF_LOGE("%s: invalid param", __func__);
+        HDF_LOGE("%{public}s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (configIndex > dev->deviceDescriptor.bNumConfigurations) {
-        HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_BAD_FD;
     }
 
     ret = GetConfigDescriptor(dev, configIndex, tmpConfig.buf, sizeof(tmpConfig.buf));
     if (ret < HDF_SUCCESS) {
-        HDF_LOGE("%s:%d ret=%d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%d ret=%d", __func__, __LINE__, ret);
         return ret;
     }
     configLen = Le16ToCpu(tmpConfig.desc.wTotalLength);
     buf = RawUsbMemAlloc(configLen);
     if (buf == NULL) {
-        HDF_LOGE("%s:%d RawUsbMemAlloc failed", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d RawUsbMemAlloc failed", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
@@ -1156,7 +1156,7 @@ void RawClearConfiguration(struct UsbRawConfigDescriptor *config)
     uint8_t i;
 
     if (config == NULL) {
-        HDF_LOGE("%s:%d config is NULL", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d config is NULL", __func__, __LINE__);
         return;
     }
 
@@ -1178,12 +1178,12 @@ int32_t RawGetConfiguration(const struct UsbDeviceHandle *devHandle, int32_t *co
     uint8_t tmp = 0;
 
     if (devHandle == NULL || config == NULL) {
-        HDF_LOGE("%s:%d param is null", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d param is null", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!osAdapterOps->getConfiguration) {
-        HDF_LOGE("%s:%d adapter don't support getConfiguration", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d adapter don't support getConfiguration", __func__, __LINE__);
         return HDF_ERR_NOT_SUPPORT;
     }
 
@@ -1197,7 +1197,7 @@ int32_t RawSetConfiguration(const struct UsbDeviceHandle *devHandle, int32_t con
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
 
     if (configuration < -1 || configuration > (int)0xFF) {
-        HDF_LOGE("%s: invalid param", __func__);
+        HDF_LOGE("%{public}s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!osAdapterOps->setConfiguration) {
@@ -1214,7 +1214,7 @@ int32_t RawGetDescriptor(const struct UsbHostRequest *request, const struct UsbD
     struct UsbControlRequestData requestData;
 
     if (request == NULL || devHandle == NULL || param == NULL || data == NULL) {
-        HDF_LOGE("%s:%d param is NULL!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d param is NULL!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1233,7 +1233,7 @@ int32_t RawGetDescriptor(const struct UsbHostRequest *request, const struct UsbD
 struct UsbDevice *RawGetDevice(const struct UsbDeviceHandle *devHandle)
 {
     if (devHandle == NULL) {
-        HDF_LOGE("%s: invalid param", __func__);
+        HDF_LOGE("%{public}s: invalid param", __func__);
         return NULL;
     }
 
@@ -1243,7 +1243,7 @@ struct UsbDevice *RawGetDevice(const struct UsbDeviceHandle *devHandle)
 int32_t RawGetDeviceDescriptor(const struct UsbDevice *dev, struct UsbDeviceDescriptor *desc)
 {
     if (dev == NULL || desc == NULL || sizeof(dev->deviceDescriptor) != USB_DDK_DT_DEVICE_SIZE) {
-        HDF_LOGE("%s: struct UsbDeviceDescriptor is not expected size", __func__);
+        HDF_LOGE("%{public}s: struct UsbDeviceDescriptor is not expected size", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1257,7 +1257,8 @@ int32_t RawReleaseInterface(struct UsbDeviceHandle *devHandle, int32_t interface
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
 
     if (devHandle == NULL || interfaceNumber < 0 || interfaceNumber >= USB_MAXINTERFACES) {
-        HDF_LOGE("%s:%d param is NULL or interfaceNumber = %d is out of range", __func__, __LINE__, interfaceNumber);
+        HDF_LOGE("%{public}s:%d param is NULL or interfaceNumber = %d is out of range", __func__, __LINE__,
+            interfaceNumber);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1300,7 +1301,7 @@ int32_t RawSubmitRequest(const struct UsbHostRequest *request)
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
 
     if (request == NULL) {
-        HDF_LOGE("%s:%d invalid param", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1310,7 +1311,7 @@ int32_t RawSubmitRequest(const struct UsbHostRequest *request)
 
     ret = osAdapterOps->submitRequest((struct UsbHostRequest *)request);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d ret = %d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%d ret = %d", __func__, __LINE__, ret);
     }
 
     return ret;
@@ -1358,7 +1359,7 @@ int32_t RawClearHalt(const struct UsbDeviceHandle *devHandle, uint8_t pipeAddres
 int32_t RawHandleRequestCompletion(struct UsbHostRequest *request, UsbRequestStatus status)
 {
     if (request == NULL) {
-        HDF_LOGE("%s:%d request is NULL!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d request is NULL!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1406,14 +1407,14 @@ int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddR
     bool flag = false;
 
     if (cmdType != USB_PNP_NOTIFY_ADD_INTERFACE && cmdType != USB_PNP_NOTIFY_REMOVE_INTERFACE) {
-        HDF_LOGE("%s:%d invalid param cmdType", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d invalid param cmdType", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     struct HdfIoService *serv = HdfIoServiceBind(USB_HOST_PNP_SERVICE_NAME);
     if (serv == NULL || serv->dispatcher == NULL || serv->dispatcher->Dispatch == NULL) {
         ret = HDF_FAILURE;
-        HDF_LOGE("%s:%d failed to get service %s", __func__, __LINE__, USB_HOST_PNP_SERVICE_NAME);
+        HDF_LOGE("%{public}s:%d failed to get service %s", __func__, __LINE__, USB_HOST_PNP_SERVICE_NAME);
         return ret;
     }
 
@@ -1421,29 +1422,29 @@ int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddR
     pnpReply = HdfSbufObtainDefaultSize();
     if (pnpData == NULL || pnpReply == NULL) {
         ret = HDF_FAILURE;
-        HDF_LOGE("%s:%d GetService err", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d GetService err", __func__, __LINE__);
         goto ERR_SBUF;
     }
 
     if (!HdfSbufWriteBuffer(pnpData, (const void *)(&infoData), sizeof(struct UsbPnpAddRemoveInfo))) {
-        HDF_LOGE("%s:%d sbuf write infoData failed", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d sbuf write infoData failed", __func__, __LINE__);
         ret = HDF_FAILURE;
         goto OUT;
     }
 
     ret = serv->dispatcher->Dispatch(&serv->object, cmdType, pnpData, pnpReply);
     if (ret) {
-        HDF_LOGE("%s:%d Dispatch USB_PNP_NOTIFY_REMOVE_TEST failed ret = %d", __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%d Dispatch USB_PNP_NOTIFY_REMOVE_TEST failed ret = %d", __func__, __LINE__, ret);
         goto OUT;
     }
 
     flag = HdfSbufReadInt32(pnpReply, &replyData);
     if (!flag || replyData != INT32_MAX) {
         ret = HDF_FAILURE;
-        HDF_LOGE("%s:%d cmdType = %d reply failed", __func__, __LINE__, cmdType);
+        HDF_LOGE("%{public}s:%d cmdType = %d reply failed", __func__, __LINE__, cmdType);
         goto OUT;
     } else if (flag && replyData == INT32_MAX) {
-        HDF_LOGE("%s:%d cmdType = %d reply success", __func__, __LINE__, cmdType);
+        HDF_LOGE("%{public}s:%d cmdType = %d reply success", __func__, __LINE__, cmdType);
     }
 
     ret = HDF_SUCCESS;
@@ -1460,7 +1461,7 @@ ERR_SBUF:
 void RawRequestListInit(struct UsbDevice *deviceObj)
 {
     if (deviceObj == NULL) {
-        HDF_LOGE("%s:%d deviceObj is NULL!", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d deviceObj is NULL!", __func__, __LINE__);
         return;
     }
 
@@ -1489,7 +1490,7 @@ void *RawUsbMemCalloc(size_t size)
     int32_t ret = 0;
 
     if (size == 0) {
-        HDF_LOGE("%s:%d size is 0", __func__, __LINE__);
+        HDF_LOGE("%{public}s:%d size is 0", __func__, __LINE__);
         return NULL;
     }
     
@@ -1512,7 +1513,7 @@ void *RawUsbMemCalloc(size_t size)
         }
         testEntry = OsalMemAlloc(sizeof(struct RawUsbRamTestList));
         if (testEntry == NULL) {
-            HDF_LOGE("%s:%d testEntry is NULL", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%d testEntry is NULL", __func__, __LINE__);
             return buf;
         }
         testEntry->address = (uintptr_t)buf;

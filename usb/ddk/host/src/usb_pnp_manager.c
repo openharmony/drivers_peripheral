@@ -30,7 +30,7 @@ bool UsbPnpManagerWriteModuleName(struct HdfSBuf *sbuf, const char *moduleName)
 {
     char modName[MODULENAMESIZE] = {0};
     if (sprintf_s(modName, MODULENAMESIZE, "lib%s.z.so", moduleName) < 0) {
-        HDF_LOGE("%s: sprintf_s modName failed", __func__);
+        HDF_LOGE("%{public}s: sprintf_s modName failed", __func__);
         return false;
     }
 
