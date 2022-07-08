@@ -24,6 +24,14 @@ using namespace OHOS::HDI::Location::Geofence::V1_0;
 struct HdfGeofenceInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
+
+    HdfGeofenceInterfaceHost()
+    {
+        ioService.object.objectId = 0;
+        ioService.Open = nullptr;
+        ioService.Release = nullptr;
+        ioService.Dispatch = nullptr;
+    }
 };
 
 static int32_t GeofenceInterfaceDriverDispatch(struct HdfDeviceIoClient *client,
@@ -64,8 +72,6 @@ static int HdfGeofenceInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfGeofenceInterfaceHost->ioService.Dispatch = GeofenceInterfaceDriverDispatch;
-    hdfGeofenceInterfaceHost->ioService.Open = nullptr;
-    hdfGeofenceInterfaceHost->ioService.Release = nullptr;
 
     auto serviceImpl = IGeofenceInterface::Get(true);
     if (serviceImpl == nullptr) {
@@ -96,6 +102,7 @@ static void HdfGeofenceInterfaceDriverRelease(struct HdfDeviceObject *deviceObje
 
     auto *hdfGeofenceInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfGeofenceInterfaceHost, ioService);
     delete hdfGeofenceInterfaceHost;
+    deviceObject->service = nullptr;
 }
 
 static struct HdfDriverEntry g_geofenceinterfaceDriverEntry = {
