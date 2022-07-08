@@ -24,6 +24,14 @@ using namespace OHOS::HDI::Location::Agnss::V1_0;
 struct HdfAGnssInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
+
+    HdfAGnssInterfaceHost()
+    {
+        ioService.object.objectId = 0;
+        ioService.Open = nullptr;
+        ioService.Release = nullptr;
+        ioService.Dispatch = nullptr;
+    }
 };
 
 static int32_t AGnssInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
@@ -64,8 +72,6 @@ static int HdfAGnssInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     }
 
     hdfAGnssInterfaceHost->ioService.Dispatch = AGnssInterfaceDriverDispatch;
-    hdfAGnssInterfaceHost->ioService.Open = nullptr;
-    hdfAGnssInterfaceHost->ioService.Release = nullptr;
 
     auto serviceImpl = IAGnssInterface::Get(true);
     if (serviceImpl == nullptr) {
@@ -96,6 +102,7 @@ static void HdfAGnssInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 
     auto *hdfAGnssInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfAGnssInterfaceHost, ioService);
     delete hdfAGnssInterfaceHost;
+    deviceObject->service = nullptr;
 }
 
 static struct HdfDriverEntry g_agnssinterfaceDriverEntry = {

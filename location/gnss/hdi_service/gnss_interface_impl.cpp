@@ -56,8 +56,8 @@ static void LocationUpdate(GnssLocation *location)
     locationNew.direction = location->bearing;
     locationNew.timeStamp = location->timestamp;
     locationNew.timeSinceBoot = location->timestampSinceBoot;
-    for (auto iter = g_locationCallBackMap.begin(); iter != g_locationCallBackMap.end(); iter++) {
-        sptr<IGnssCallback> callback = iter->second;
+    for (const auto &iter : g_locationCallBackMap) {
+        auto &callback = iter.second;
         if (callback != nullptr) {
             callback->ReportLocation(locationNew);
         }
@@ -71,8 +71,8 @@ static void StatusCallback(uint16_t *status)
         return;
     }
     GnssWorkingStatus gnssStatus = static_cast<GnssWorkingStatus>(*status);
-    for (auto iter = g_locationCallBackMap.begin(); iter != g_locationCallBackMap.end(); iter++) {
-        sptr<IGnssCallback> callback = iter->second;
+    for (const auto &iter : g_locationCallBackMap) {
+        auto &callback = iter.second;
         if (callback != nullptr) {
             callback->ReportGnssWorkingStatus(gnssStatus);
         }
@@ -100,8 +100,8 @@ static void SvStatusCallback(GnssSatelliteStatus *svInfo)
         svStatus.carrierFrequencies.push_back(svInfo->satellitesList[i].carrierFrequencie);
         svStatus.carrierToNoiseDensitys.push_back(svInfo->satellitesList[i].cn0);
     }
-    for (auto iter = g_locationCallBackMap.begin(); iter != g_locationCallBackMap.end(); iter++) {
-        sptr<IGnssCallback> callback = iter->second;
+    for (const auto &iter : g_locationCallBackMap) {
+        auto &callback = iter.second;
         if (callback != nullptr) {
             callback->ReportSatelliteStatusInfo(svStatus);
         }
@@ -114,8 +114,8 @@ static void NmeaCallback(int64_t timestamp, const char *nmea, int length)
         HDF_LOGE("%{public}s:nmea is nullptr.", __func__);
         return;
     }
-    for (auto iter = g_locationCallBackMap.begin(); iter != g_locationCallBackMap.end(); iter++) {
-        sptr<IGnssCallback> callback = iter->second;
+    for (const auto &iter : g_locationCallBackMap) {
+        auto &callback = iter.second;
         if (callback != nullptr) {
             callback->ReportNmea(timestamp, nmea, length);
         }
@@ -217,7 +217,7 @@ int32_t GnssInterfaceImpl::DisableGnss()
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = gnssInterface->disable_gnss();
-    g_locationCallBackMap.erase(g_locationCallBackMap.begin(), g_locationCallBackMap.end());
+    g_locationCallBackMap.clear();
     return ret;
 }
 
@@ -237,7 +237,7 @@ int32_t GnssInterfaceImpl::StartGnss(GnssStartType type)
 int32_t GnssInterfaceImpl::StopGnss(GnssStartType type)
 {
     HDF_LOGI("%{public}s.", __func__);
-    int startType = int(type);
+    int startType = static_cast<int>(type);
     auto gnssInterface = LocationVendorInterface::GetVendorInterface();
     if (gnssInterface == nullptr) {
         HDF_LOGE("%{public}s:GetVendorInterface return nullptr.", __func__);

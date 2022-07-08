@@ -51,8 +51,8 @@ static void OnStatusChangedCb(const AGnssStatusInfo *status)
     agnssStatus.agnssType = static_cast<AGnssUserPlaneProtocol>(status->agnssType);
     agnssStatus.setUpType = static_cast<DataLinkSetUpType>(status->connStatus);
 
-    for (auto iter = g_agnssCallBackMap.begin(); iter != g_agnssCallBackMap.end(); iter++) {
-        sptr<IAGnssCallback> callback = iter->second;
+    for (const auto &iter : g_agnssCallBackMap) {
+        auto &callback = iter.second;
         if (callback != nullptr) {
             callback->RequestSetUpAgnssDataLink(agnssStatus);
         }
@@ -62,8 +62,8 @@ static void OnStatusChangedCb(const AGnssStatusInfo *status)
 static void GetSetidCb(uint16_t type)
 {
     HDF_LOGI("%{public}s.", __func__);
-    for (auto iter = g_agnssCallBackMap.begin(); iter != g_agnssCallBackMap.end(); iter++) {
-        sptr<IAGnssCallback> callback = iter->second;
+    for (const auto &iter : g_agnssCallBackMap) {
+        auto &callback = iter.second;
         if (callback != nullptr) {
             callback->RequestSubscriberSetId(static_cast<SubscriberSetIdType>(type));
         }
@@ -72,8 +72,8 @@ static void GetSetidCb(uint16_t type)
 static void GetRefLocationidCb(uint32_t type)
 {
     HDF_LOGI("%{public}s.", __func__);
-    for (auto iter = g_agnssCallBackMap.begin(); iter != g_agnssCallBackMap.end(); iter++) {
-        sptr<IAGnssCallback> callback = iter->second;
+    for (const auto &iter : g_agnssCallBackMap) {
+        auto &callback = iter.second;
         if (callback != nullptr) {
             callback->RequestAgnssRefInfo();
         }
@@ -97,7 +97,7 @@ AGnssInterfaceImpl::AGnssInterfaceImpl()
 
 AGnssInterfaceImpl::~AGnssInterfaceImpl()
 {
-    g_agnssCallBackMap.erase(g_agnssCallBackMap.begin(), g_agnssCallBackMap.end());
+    g_agnssCallBackMap.clear();
 }
 
 int32_t AGnssInterfaceImpl::SetAgnssCallback(const sptr<IAGnssCallback>& callbackObj)
@@ -125,14 +125,18 @@ int32_t AGnssInterfaceImpl::SetAgnssCallback(const sptr<IAGnssCallback>& callbac
 
     int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
     auto agnssInterface =
-        (const AGnssModuleInterface *)LocationVendorInterface::GetModuleInterface(moduleType);
+        static_cast<const AGnssModuleInterface *>(LocationVendorInterface::GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    int ret = agnssInterface->set_agnss_callback(&agnsscallback);
+    bool ret = agnssInterface->set_agnss_callback(&agnsscallback);
+    if (!ret) {
+        HDF_LOGE("set_agnss_callback failed.");
+        return HDF_FAILURE;
+    }
     g_agnssCallBackMap[remote.GetRefPtr()] = callbackObj;
-    return ret == true ? HDF_SUCCESS : HDF_FAILURE;
+    return HDF_SUCCESS;
 }
 
 int32_t AGnssInterfaceImpl::SetAgnssServer(const AGnssServerInfo& server)
@@ -140,27 +144,31 @@ int32_t AGnssInterfaceImpl::SetAgnssServer(const AGnssServerInfo& server)
     HDF_LOGI("%{public}s.", __func__);
     int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
     auto agnssInterface =
-        (const AGnssModuleInterface *)LocationVendorInterface::GetModuleInterface(moduleType);
+        static_cast<const AGnssModuleInterface *>(LocationVendorInterface::GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     uint16_t type = static_cast<uint16_t>(server.type);
-    int ret = agnssInterface->set_agnss_server(type, server.server.c_str(), server.server.length(), server.port);
-    return ret == true ? HDF_SUCCESS : HDF_FAILURE;
+    bool ret = agnssInterface->set_agnss_server(type, server.server.c_str(), server.server.length(), server.port);
+    if (!ret) {
+        HDF_LOGE("set_agnss_server failed.");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
 }
 
 int32_t AGnssInterfaceImpl::SetAgnssRefInfo(const AGnssRefInfo& refInfo)
 {
     int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
     auto agnssInterface =
-        (const AGnssModuleInterface *)LocationVendorInterface::GetModuleInterface(moduleType);
+        static_cast<const AGnssModuleInterface *>(LocationVendorInterface::GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     AGnssRefLocInfo loc;
-    loc.type = int(refInfo.type);
+    loc.type = static_cast<int>(refInfo.type);
     switch (refInfo.cellId.type) {
         case CELLID_TYPE_GSM:
             loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::GSM_CELLID);
@@ -183,8 +191,12 @@ int32_t AGnssInterfaceImpl::SetAgnssRefInfo(const AGnssRefInfo& refInfo)
     loc.u.cellId.cid = refInfo.cellId.cid;
     loc.u.cellId.tac = refInfo.cellId.tac;
     loc.u.cellId.pcid = refInfo.cellId.pcid;
-    int ret = agnssInterface->set_ref_location(&loc);
-    return ret == true ? HDF_SUCCESS : HDF_FAILURE;
+    bool ret = agnssInterface->set_ref_location(&loc);
+    if (!ret) {
+        HDF_LOGE("set_ref_location failed.");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
 }
 
 int32_t AGnssInterfaceImpl::SetSubscriberSetId(const SubscriberSetId& id)
@@ -192,14 +204,18 @@ int32_t AGnssInterfaceImpl::SetSubscriberSetId(const SubscriberSetId& id)
     HDF_LOGI("%{public}s.", __func__);
     int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
     auto agnssInterface =
-        (const AGnssModuleInterface *)LocationVendorInterface::GetModuleInterface(moduleType);
+        static_cast<const AGnssModuleInterface *>(LocationVendorInterface::GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     uint16_t type = static_cast<uint16_t>(id.type);
     int ret = agnssInterface->set_setid(type, id.id.c_str(), id.id.length());
-    return ret == true ? HDF_SUCCESS : HDF_FAILURE;
+    if (!ret) {
+        HDF_LOGE("set_setid failed.");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
 }
 } // V1_0
 } // Agnss
