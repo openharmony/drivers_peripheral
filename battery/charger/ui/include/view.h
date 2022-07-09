@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 class View {
 public:
     struct BRGA888Pixel {
@@ -77,7 +77,7 @@ private:
     bool focusable_ = false;
     bool isFocused_ = false;
 };
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

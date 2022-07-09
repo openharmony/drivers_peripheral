@@ -30,7 +30,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 constexpr int32_t CAPACITY_FULL = 100;
 constexpr int32_t MKDIR_WAIT_TIME = 1;
@@ -267,7 +267,7 @@ void BatteryLed::WriteLedNode(std::string& ledPath, int32_t brightness)
         BATTERY_HILOGW(FEATURE_CHARGING, "led file close failed, path=%{public}s", ledPath.c_str());
     }
 }
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

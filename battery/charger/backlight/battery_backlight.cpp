@@ -30,7 +30,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 constexpr uint32_t BACKLIGHT_ON = 128;
 constexpr uint32_t BACKLIGHT_OFF = 0;
@@ -173,7 +173,7 @@ int32_t BatteryBacklight::HandleBacklight(uint32_t backlight)
     }
     return ret;
 }
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

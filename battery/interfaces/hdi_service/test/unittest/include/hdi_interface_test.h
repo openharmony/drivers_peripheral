@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,29 +13,16 @@
  * limitations under the License.
  */
 
-#ifndef CHARGER_UI_SURFACE_DEV_H
-#define CHARGER_UI_SURFACE_DEV_H
+#ifndef HDI_INTERFACE_TEST_H
+#define HDI_INTERFACE_TEST_H
 
-#include <cstdint>
+#include <gtest/gtest.h>
 
-namespace OHOS {
-namespace HDI {
-namespace Battery {
-namespace V1_1 {
-class SurfaceDev {
+class HdiInterfaceTest : public testing::Test {
 public:
-    enum class DevType {
-        FB_DEVICE = 0,
-        DRM_DEVICE,
-    };
-
-    explicit SurfaceDev(SurfaceDev::DevType devType);
-    ~SurfaceDev();
-    void Flip(char* buf);
-    void GetScreenSize(int32_t& w, int32_t& h);
+    static void SetUpTestCase();
+    static void TearDownTestCase();
+    void SetUp();
+    void TearDown();
 };
-}  // namespace V1_1
-}  // namespace Battery
-}  // namespace HDI
-}  // namespace OHOS
-#endif // CHARGER_UI_SURFACE_DEV_H
+#endif // HDI_INTERFACE_TEST_H

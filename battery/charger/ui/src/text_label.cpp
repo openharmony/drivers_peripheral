@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 const std::string DEFAULT_FONT_NAME = "font";
 constexpr int32_t MAX_TEXT_SIZE = 512;
 constexpr int32_t MAX_FONT_BUFFER_SIZE_HW  = 4096;
@@ -377,7 +377,7 @@ void TextLabel::DrawFocus()
         }
     }
 }
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS
