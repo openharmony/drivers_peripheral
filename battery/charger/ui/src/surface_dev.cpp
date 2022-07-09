@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 struct BufferObject {
     uint32_t width;
     uint32_t height;
@@ -153,7 +153,7 @@ void SurfaceDev::GetScreenSize(int32_t& w, int32_t& h)
     w = screenSizeW;
     h = screenSizeH;
 }
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

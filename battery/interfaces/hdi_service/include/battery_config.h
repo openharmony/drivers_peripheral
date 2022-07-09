@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 class BatteryConfig {
 public:
     struct LedConf {
@@ -43,6 +43,8 @@ public:
     std::vector<LedConf> GetLedConf();
     BatteryConfig::TempConf GetTempConf();
     int32_t GetCapacityConf();
+    std::string GetCurrentLimitPathConf();
+    std::string GetVoltageLimitPathConf();
 
 private:
     enum JsonConfIndex {
@@ -55,12 +57,16 @@ private:
     int32_t ParseLedConf(Json::Value& root);
     int32_t ParseTemperatureConf(Json::Value& root);
     int32_t ParseCapacityConf(Json::Value& root);
+    int32_t ParseCurrentLimitConf(Json::Value& root);
+    int32_t ParseVoltageLimitConf(Json::Value& root);
     void ParseConfig(const std::string& filename);
     std::vector<BatteryConfig::LedConf> ledConf_;
     struct TempConf tempConf_;
     int32_t capacityConf_ = -1;
+    std::string currentPathConf_;
+    std::string voltagePathConf_;
 };
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

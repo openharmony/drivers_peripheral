@@ -30,7 +30,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 class ChargerThread : public BatteryThread {
 public:
     friend class BatteryThreadTest;
@@ -69,7 +69,7 @@ private:
     int32_t chargeState_ = PowerSupplyProvider::BatteryChargeState::CHARGE_STATE_RESERVED;
     bool started_ = false;
 };
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

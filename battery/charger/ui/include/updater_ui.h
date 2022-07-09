@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
     struct FocusInfo {
         bool focus;
         bool focusable;
@@ -38,7 +38,7 @@ namespace V1_0 {
 void MenuItemInit(int32_t height, int32_t width, View::BRGA888Pixel bgColor, Frame* gHosFrame);
 void TextLabelInit(TextLabel* t, const std::string& text, struct Bold bold, struct FocusInfo focus,
     View::BRGA888Pixel color);
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

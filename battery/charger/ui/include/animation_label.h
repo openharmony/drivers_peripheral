@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 class AnimationLabel : public View {
 public:
     enum class PlayMode {
@@ -68,7 +68,7 @@ private:
     int32_t staticImgSize_ = 0;
     static bool isVisible_;
 };
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

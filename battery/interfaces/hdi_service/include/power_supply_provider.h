@@ -22,11 +22,12 @@
 #include <map>
 #include <vector>
 #include "batteryd_api.h"
+#include "v1_1/ibattery_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 class PowerSupplyProvider {
 public:
     // Keep it same as the BatteryHealthState in battery_info.h
@@ -81,6 +82,7 @@ public:
     void UpdateInfoByReadSysFile(struct BatterydInfo* info) const;
     void SetSysFilePath(const std::string& path);
     void InitBatteryPath();
+    int32_t SetChargingLimit(const std::vector<ChargingLimit>& chargingLimit);
 
 private:
     struct PowerSupplySysfsInfo {
@@ -136,12 +138,14 @@ private:
     int32_t ParsePluggedMaxVoltage(int32_t* maxVoltage) const;
     void CopyBatteryInfo(const struct BatterydInfo* info) const;
     void CreateFile(const std::string& path, const std::string& content);
+    int32_t ReadFileToMap(std::map<std::string, std::string>& chargingLimitMap, std::string chargingLimitPath);
+    int32_t WriteChargingLimit(std::string chargingLimitPath, std::string& configStr);
     std::vector<std::string> nodeNames_;
     std::map<std::string, std::string> nodeNamePathMap_;
     std::string path_;
     int32_t index_;
 };
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

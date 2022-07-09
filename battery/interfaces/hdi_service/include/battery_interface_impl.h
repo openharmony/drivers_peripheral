@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_BATTERY_V1_0_BATTERYINTERFACEIMPL_H
-#define OHOS_HDI_BATTERY_V1_0_BATTERYINTERFACEIMPL_H
+#ifndef OHOS_HDI_BATTERY_V1_1_BATTERYINTERFACEIMPL_H
+#define OHOS_HDI_BATTERY_V1_1_BATTERYINTERFACEIMPL_H
 
 #include <iremote_object.h>
 #include <iproxy_broker.h>
@@ -23,12 +23,12 @@
 #include "battery_led.h"
 #include "battery_thread.h"
 #include "power_supply_provider.h"
-#include "v1_0/ibattery_interface.h"
+#include "v1_1/ibattery_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 class BatteryInterfaceImpl : public IBatteryInterface {
 public:
     BatteryInterfaceImpl() = default;
@@ -50,6 +50,7 @@ public:
     int32_t GetChargeState(BatteryChargeState& chargeState) override;
     int32_t GetPresent(bool& present) override;
     int32_t GetTechnology(std::string& technology) override;
+    int32_t SetChargingLimit(const std::vector<ChargingLimit>& chargingLimit) override;
     class BatteryDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
         explicit BatteryDeathRecipient(
@@ -60,15 +61,15 @@ public:
         wptr<BatteryInterfaceImpl> interfaceImpl_;
     };
 private:
-    std::unique_ptr<OHOS::HDI::Battery::V1_0::PowerSupplyProvider> provider_ = nullptr;
-    std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryThread> loop_ = nullptr;
-    std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryConfig> batteryConfig_ = nullptr;
-    std::unique_ptr<OHOS::HDI::Battery::V1_0::BatteryLed> batteryLed_ = nullptr;
+    std::unique_ptr<OHOS::HDI::Battery::V1_1::PowerSupplyProvider> provider_ = nullptr;
+    std::unique_ptr<OHOS::HDI::Battery::V1_1::BatteryThread> loop_ = nullptr;
+    std::unique_ptr<OHOS::HDI::Battery::V1_1::BatteryConfig> batteryConfig_ = nullptr;
+    std::unique_ptr<OHOS::HDI::Battery::V1_1::BatteryLed> batteryLed_ = nullptr;
     sptr<IBatteryCallback> batteryCallback_ = nullptr;
     int32_t AddBatteryDeathRecipient(const sptr<IBatteryCallback>& callback);
     int32_t RemoveBatteryDeathRecipient(const sptr<IBatteryCallback>& callback);
 };
-} // V1_0
+} // V1_1
 } // Battery
 } // HDI
 } // OHOS

@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 struct CmpByStartY {
     bool operator()(const View* v1, const View* v2) const
     {
@@ -55,7 +55,7 @@ private:
     std::condition_variable_any mCondFlush_;
     std::map<View*, int32_t, CmpByStartY> viewMapList_;
 };
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

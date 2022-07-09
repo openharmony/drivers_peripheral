@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 class TextLabel : public View {
 using ClickCallback = std::function<void(int32_t id)>;
 enum class FontType {
@@ -73,7 +73,7 @@ private:
     uint32_t fontWidth_ = 0;
     uint32_t fontHeight_ = 0;
 };
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

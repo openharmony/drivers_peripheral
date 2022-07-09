@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 constexpr int32_t RGBA_PIXEL_SIZE = 4;
 void* View::CreateBuffer(int32_t w, int32_t h, View::PixelFormat pixelFormat)
 {
@@ -180,7 +180,7 @@ void View::SetFocusAble(bool focusable)
 {
     focusable_ = focusable;
 }
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS
