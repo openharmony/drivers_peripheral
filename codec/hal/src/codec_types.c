@@ -19,7 +19,7 @@
 #include <osal_mem.h>
 #include <securec.h>
 #include <unistd.h>
-
+#include "codec_omx_ext.h"
 bool BufferHandleMarshalling(struct HdfSBuf *data, BufferHandle *handle)
 {
     if (handle == NULL) {
