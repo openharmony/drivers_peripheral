@@ -29,6 +29,7 @@
 #include "codec_callback_type_stub.h"
 #include "codec_component_manager.h"
 #include "codec_component_type.h"
+#include "codec_omx_ext.h"
 #include "hdf_io_service_if.h"
 
 #define HDF_LOG_TAG codec_hdi_test
@@ -366,21 +367,21 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetVersionTest_002, TestSize.Level1)
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetParameterTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    CodecPixFormatParam pixFormat;
+    CodecVideoPortFormatParam pixFormat;
     InitOhosParam(pixFormat);
     pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
-    auto ret = g_component->GetParameter(g_component, OMX_IndexParamCodecPixFormat,
+    auto ret = g_component->GetParameter(g_component, OMX_IndexCodecVideoPortFormat,
                                          reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
-    ASSERT_NE(ret, HDF_SUCCESS);
+    ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetParameterTest_002, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    CodecPixFormatParam pixFormat;
+    CodecVideoPortFormatParam pixFormat;
     InitOhosParam(pixFormat);
     pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    auto ret = g_component->GetParameter(g_component, OMX_IndexParamCodecPixFormat,
+    auto ret = g_component->GetParameter(g_component, OMX_IndexCodecVideoPortFormat,
                                          reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
@@ -493,14 +494,14 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetParameterTest_005, TestSize.Level1)
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetParameterTest_006, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    CodecPixFormatParam pixFormat;
+    CodecVideoPortFormatParam pixFormat;
     InitOhosParam(pixFormat);
     pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    auto ret = g_component->GetParameter(g_component, OMX_IndexParamCodecPixFormat,
+    auto ret = g_component->GetParameter(g_component, OMX_IndexCodecVideoPortFormat,
                                          reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
     ASSERT_EQ(ret, HDF_SUCCESS);
     pixFormat.codecColorFormat = PIXEL_FMT_RGB_555;
-    ret = g_component->SetParameter(g_component, OMX_IndexParamCodecPixFormat, reinterpret_cast<int8_t *>(&pixFormat),
+    ret = g_component->SetParameter(g_component, OMX_IndexCodecVideoPortFormat, reinterpret_cast<int8_t *>(&pixFormat),
                                     sizeof(pixFormat));
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
