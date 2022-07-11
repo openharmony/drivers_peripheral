@@ -127,7 +127,7 @@ void BatteryBacklight::CreateFile(const std::string& path, const std::string& co
 {
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "Cannot create file %{public}s", path.c_str());
+        BATTERY_HILOGD(FEATURE_CHARGING, "Cannot create file %{private}s", path.c_str());
         return;
     }
     stream << content.c_str() << std::endl;
@@ -159,7 +159,7 @@ int32_t BatteryBacklight::HandleBacklight(uint32_t backlight)
     FILE* fp = nullptr;
     int32_t ret = -1;
     std::string devicePath = BACKLIGHT_BASE_PATH + "/" + g_backlightNode + "/" + "brightness";
-    BATTERY_HILOGD(FEATURE_CHARGING, "backlight devicePath is %{public}s", devicePath.c_str());
+    BATTERY_HILOGD(FEATURE_CHARGING, "backlight devicePath is %{private}s", devicePath.c_str());
     InitDevicePah(devicePath);
 
     BATTERY_HILOGD(FEATURE_CHARGING, "backlight value is %{public}d", backlight);
@@ -169,7 +169,7 @@ int32_t BatteryBacklight::HandleBacklight(uint32_t backlight)
         fclose(fp);
     }
     if (ret <= 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "failed to set backlight path=%{public}s.", devicePath.c_str());
+        BATTERY_HILOGW(FEATURE_CHARGING, "failed to set backlight path=%{private}s.", devicePath.c_str());
     }
     return ret;
 }
