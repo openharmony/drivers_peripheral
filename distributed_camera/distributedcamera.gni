@@ -11,7 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-distributedcamera_hdf_path =
-    "//foundation/distributedhardware/distributed_camera"
+distributedcamera_hdf_path = "//drivers/peripheral/distributed_camera"
 
-hdi_service_path = "${distributedcamera_hdf_path}/camera_hdf"
+camera_hdf_path = "//drivers/peripheral"
+
+hdf_framework_path = "//drivers/hdf_core/framework"
+
+display_hdf_path = "//drivers/peripheral/display"
