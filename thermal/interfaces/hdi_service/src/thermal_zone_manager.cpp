@@ -71,7 +71,7 @@ void ThermalZoneManager::FormatThermalSysfsPaths(struct ThermalSysfsPathInfo *pT
     FormatThermalPaths(tzSysPathInfo_.typePath, sizeof(tzSysPathInfo_.typePath),
         THEERMAL_TYPE_PATH.c_str(), pTSysPathInfo->name);
 
-    THERMAL_HILOGI(COMP_HDI, "temp path: %{public}s, type path: %{public}s ",
+    THERMAL_HILOGI(COMP_HDI, "temp path: %{private}s, type path: %{private}s ",
         tzSysPathInfo_.temperturePath, tzSysPathInfo_.typePath);
 
     tzSysPathInfo_.fd = pTSysPathInfo->fd;
@@ -143,13 +143,13 @@ int32_t ThermalZoneManager::ReadSysfsFile(const char* path, char* buf, size_t si
     int32_t readSize;
     int32_t fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
-        THERMAL_HILOGE(COMP_HDI, "failed to open %{public}s", path);
+        THERMAL_HILOGE(COMP_HDI, "failed to open %{private}s", path);
         return HDF_ERR_IO;
     }
 
     readSize = read(fd, buf, size - 1);
     if (readSize < NUM_ZERO) {
-        THERMAL_HILOGE(COMP_HDI, "failed to read %{public}s", path);
+        THERMAL_HILOGE(COMP_HDI, "failed to read %{private}s", path);
         close(fd);
         return HDF_ERR_IO;
     }
@@ -318,7 +318,7 @@ void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<i
         if (reportTime % (sensorIter.second->multiple_) == NUM_ZERO) {
             for (auto iter : sensorIter.second->thermalDataList_) {
                 THERMAL_HILOGI(COMP_HDI, "data type %{public}s", iter.type.c_str());
-                THERMAL_HILOGI(COMP_HDI, "data temp path %{public}s", iter.tempPath.c_str());
+                THERMAL_HILOGI(COMP_HDI, "data temp path %{private}s", iter.tempPath.c_str());
                 ThermalZoneInfo info;
                 info.type = iter.type;
                 ret = ReadThermalSysfsToBuff(iter.tempPath.c_str(), tempBuf, sizeof(tempBuf));

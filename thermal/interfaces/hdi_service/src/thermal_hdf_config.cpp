@@ -76,7 +76,7 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string& path)
             this->trace_.interval = (char*)xmlGetProp(node, BAD_CAST"interval");
             this->trace_.record = (char*)xmlGetProp(node, BAD_CAST"record");
             this->trace_.outpath = (char*)xmlGetProp(node, BAD_CAST"outpath");
-            THERMAL_HILOGI(COMP_HDI, "interval: %{public}s, record: %{public}s, outpath: %{public}s",
+            THERMAL_HILOGI(COMP_HDI, "interval: %{public}s, record: %{public}s, outpath: %{private}s",
                 this->trace_.interval.c_str(), this->trace_.record.c_str(), this->trace_.outpath.c_str());
             ParseTracingNode(node);
         }
@@ -126,7 +126,7 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
                 tn.path = (char*)xmlGetProp(subNode, BAD_CAST"path");
                 SaveThermalDfxTraceInfo(subNode, tn);
 
-                THERMAL_HILOGI(COMP_HDI, "ParsePollingNode tntype: %{public}s, path: %{public}s",
+                THERMAL_HILOGI(COMP_HDI, "ParsePollingNode tntype: %{public}s, path: %{private}s",
                     tn.type.c_str(), tn.path.c_str());
                 xmlTnInfoList.push_back(tn);
             }
@@ -180,14 +180,14 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
             xmlChar* titlePath = xmlGetProp(subNode, BAD_CAST"path");
             if (titlePath != nullptr) {
                 namePath = (char*)titlePath;
-                THERMAL_HILOGD(COMP_HDI, "namePath in path: %{public}s", namePath.c_str());
+                THERMAL_HILOGD(COMP_HDI, "namePath in path: %{private}s", namePath.c_str());
                 xmlFree(titlePath);
             }
 
             xmlChar* titleName = xmlGetProp(subNode, BAD_CAST"name");
             if (titleName != nullptr) {
                 namePath = (char*)titleName;
-                THERMAL_HILOGD(COMP_HDI, "namePath in name: %{public}s", namePath.c_str());
+                THERMAL_HILOGD(COMP_HDI, "namePath in name: %{private}s", namePath.c_str());
                 xmlFree(titleName);
             }
         }

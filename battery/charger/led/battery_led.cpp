@@ -185,7 +185,8 @@ void BatteryLed::WriteLedInfoToSys(int32_t redBrightness, int32_t greenBrightnes
     if (!FileExists(LEDS_BASE_PATH)) {
         InitMockLedFile(redLedPath, greenLedPath, blueLedPath);
     }
-    BATTERY_HILOGD(FEATURE_CHARGING, "redLedPath is %{public}s, greenLedPath is %{public}s, blueLedPath is %{public}s",
+    BATTERY_HILOGD(FEATURE_CHARGING,
+        "redLedPath is %{private}s, greenLedPath is %{private}s, blueLedPath is %{private}s",
         redLedPath.c_str(), greenLedPath.c_str(), blueLedPath.c_str());
 
     WriteLedNode(redLedPath, redBrightness);
@@ -197,7 +198,7 @@ void BatteryLed::CreateMockLedFile(const std::string &path, const std::string& c
 {
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "cannot create file %{public}s", path.c_str());
+        BATTERY_HILOGD(FEATURE_CHARGING, "cannot create file %{private}s", path.c_str());
         return;
     }
     stream << content.c_str() << std::endl;
@@ -240,7 +241,7 @@ void BatteryLed::InitMockLedFile(std::string& redPath, std::string& greenPath, s
 void BatteryLed::CreateMockLedPath(const std::string& mockPath)
 {
     if (FileExists(mockPath)) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "mock led path exists, mockPath=%{public}s", mockPath.c_str());
+        BATTERY_HILOGD(FEATURE_CHARGING, "mock led path exists, mockPath=%{private}s", mockPath.c_str());
         return;
     }
     int32_t ret = mkdir(mockPath.c_str(), S_IRWXU);
@@ -255,16 +256,16 @@ void BatteryLed::WriteLedNode(std::string& ledPath, int32_t brightness)
 {
     FILE* file = fopen(ledPath.c_str(), "w");
     if (file == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "led file open failed, path=%{public}s", ledPath.c_str());
+        BATTERY_HILOGW(FEATURE_CHARGING, "led file open failed, path=%{private}s", ledPath.c_str());
         return;
     }
     int32_t ret = fprintf(file, "%d\n", brightness);
     if (ret < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "led file fprintf failed, path=%{public}s", ledPath.c_str());
+        BATTERY_HILOGW(FEATURE_CHARGING, "led file fprintf failed, path=%{private}s", ledPath.c_str());
     }
     ret = fclose(file);
     if (ret < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "led file close failed, path=%{public}s", ledPath.c_str());
+        BATTERY_HILOGW(FEATURE_CHARGING, "led file close failed, path=%{private}s", ledPath.c_str());
     }
 }
 }  // namespace V1_0
