@@ -37,7 +37,7 @@
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::HDI::Battery;
-using namespace OHOS::HDI::Battery::V1_0;
+using namespace OHOS::HDI::Battery::V1_1;
 using namespace std;
 
 namespace HdiServiceTest {
@@ -1037,7 +1037,7 @@ HWTEST_F (HdiServiceTest, HdiService009, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService010, TestSize.Level1)
 {
-    using namespace OHOS::HDI::Battery::V1_0;
+    using namespace OHOS::HDI::Battery::V1_1;
 
     BatteryThread bt;
     auto fd = OpenUeventSocketTest(bt);

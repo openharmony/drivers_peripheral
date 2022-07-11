@@ -27,7 +27,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 constexpr int32_t PNG_HEADER_SIZE = 8;
 constexpr int32_t MAX_PICTURE_CHANNELS = 3;
 constexpr int32_t MAX_BIT_DEPTH = 8;
@@ -303,7 +303,7 @@ void AnimationLabel::SetInterval(int32_t ms)
 {
     intervalMs_ = static_cast<uint32_t>(ms);
 }
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

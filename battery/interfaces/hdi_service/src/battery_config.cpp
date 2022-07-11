@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 const std::string CONFIG_FILE = "/system/etc/ledconfig/led_config.json";
 constexpr int32_t DEFAULT_CAPACITY_CONF = 3;
@@ -50,6 +50,16 @@ BatteryConfig::TempConf BatteryConfig::GetTempConf()
 int32_t BatteryConfig::GetCapacityConf()
 {
     return capacityConf_;
+}
+
+std::string BatteryConfig::GetCurrentLimitPathConf()
+{
+    return currentPathConf_;
+}
+
+std::string BatteryConfig::GetVoltageLimitPathConf()
+{
+    return voltagePathConf_;
 }
 
 int32_t BatteryConfig::ParseLedConf(Json::Value& root)
@@ -120,6 +130,32 @@ int32_t BatteryConfig::ParseCapacityConf(Json::Value& root)
     return HDF_SUCCESS;
 }
 
+int32_t BatteryConfig::ParseCurrentLimitConf(Json::Value& root)
+{
+    const size_t PATH_SIZE = 1;
+    size_t size = root["current_limit"]["path"].size();
+    if (size != PATH_SIZE) {
+        BATTERY_HILOGW(COMP_HDI, "parse current limit path config file fail.");
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    currentPathConf_ = root["current_limit"]["path"][INDEX_ZERO].asString();
+    BATTERY_HILOGD(COMP_HDI, "current limit path: %{public}s", currentPathConf_.c_str());
+    return HDF_SUCCESS;
+}
+
+int32_t BatteryConfig::ParseVoltageLimitConf(Json::Value& root)
+{
+    const size_t PATH_SIZE = 1;
+    size_t size = root["voltage_limit"]["path"].size();
+    if (size != PATH_SIZE) {
+        BATTERY_HILOGW(COMP_HDI, "parse charging limit path config file fail.");
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    voltagePathConf_ = root["voltage_limit"]["path"][INDEX_ZERO].asString();
+    BATTERY_HILOGD(COMP_HDI, "voltage limit path: %{public}s", voltagePathConf_.c_str());
+    return HDF_SUCCESS;
+}
+
 void BatteryConfig::ParseConfig(const std::string& filename)
 {
     Json::Value root;
@@ -147,10 +183,20 @@ void BatteryConfig::ParseConfig(const std::string& filename)
         if (ret != HDF_SUCCESS) {
             BATTERY_HILOGW(COMP_HDI, "parse soc config fail.");
         }
+
+        ret = ParseCurrentLimitConf(root);
+        if (ret != HDF_SUCCESS) {
+            BATTERY_HILOGW(COMP_HDI, "parse current path config fail.");
+        }
+
+        ret = ParseVoltageLimitConf(root);
+        if (ret != HDF_SUCCESS) {
+            BATTERY_HILOGW(COMP_HDI, "parse volage path config fail.");
+        }
     }
     ledConfig.close();
 }
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

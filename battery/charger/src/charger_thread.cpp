@@ -30,7 +30,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 constexpr int32_t SHUTDOWN_TIME_MS = 2000;
 constexpr int32_t SEC_TO_MSEC = 1000;
@@ -470,7 +470,7 @@ void ChargerThread::Run(void* service)
 
     std::make_unique<std::thread>(&ChargerThread::LoopingThreadEntry, this, service)->join();
 }
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

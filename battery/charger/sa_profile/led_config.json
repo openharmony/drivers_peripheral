@@ -14,5 +14,11 @@
     "soc":{
         "comments":"soc_lower",
         "table":[3]
+    },
+    "current_limit":{
+        "path":["/data/service/el0/battery/current_limit"]
+    },
+    "voltage_limit":{
+        "path":["/data/service/el0/battery/voltage_limit"]
     }
 }
