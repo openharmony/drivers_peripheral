@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 constexpr int32_t UEVENT_BUFF_SIZE = (64 * 1024);
 constexpr int32_t UEVENT_RESERVED_SIZE = 2;
@@ -327,7 +327,7 @@ void BatteryThread::Run(void* service)
 {
     std::make_unique<std::thread>(&BatteryThread::LoopingThreadEntry, this, service)->detach();
 }
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS

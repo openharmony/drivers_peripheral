@@ -17,18 +17,18 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <fstream>
-#include <iostream>
 #include <securec.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include "osal/osal_mem.h"
 #include "battery_log.h"
+#include "battery_config.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 namespace {
 constexpr int32_t MAX_SYSFS_SIZE = 64;
 constexpr int32_t MAX_BUFF_SIZE = 128;
@@ -919,7 +919,50 @@ void PowerSupplyProvider::InitDefaultSysfs()
     CreateFile(mockBatteryPath + "/type", "Battery");
     path_ = MOCK_POWER_SUPPLY_BASE_PATH;
 }
-}  // namespace V1_0
+
+int32_t PowerSupplyProvider::SetChargingLimit(const std::vector<ChargingLimit>& chargerLimitList)
+{
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "enter");
+    if (chargerLimitList.empty()) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "the parameter is empty");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    std::unique_ptr<BatteryConfig> batteryConfig = std::make_unique<BatteryConfig>();
+    if (batteryConfig == nullptr) {
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "make_unique BatteryConfig return nullptr");
+        return HDF_ERR_MALLOC_FAIL;
+    }
+    batteryConfig->Init();
+
+    std::string limitPath;
+    std::string chargeLimitStr;
+    for (auto& iter : chargerLimitList) {
+        if (iter.type == ChargingLimitType::TYPE_CURRENT) {
+            limitPath = batteryConfig->GetCurrentLimitPathConf();
+        } else if (iter.type == ChargingLimitType::TYPE_VOLTAGE) {
+            limitPath = batteryConfig->GetVoltageLimitPathConf();
+        }
+        chargeLimitStr = chargeLimitStr + (iter.protocol + " " + std::to_string(iter.value) + "\n");
+    }
+    int32_t ret = WriteChargingLimit(limitPath, chargeLimitStr);
+    if (ret < HDF_SUCCESS) {
+        return ret;
+    }
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "Exit");
+    return HDF_SUCCESS;
+}
+
+int32_t PowerSupplyProvider::WriteChargingLimit(std::string chargingLimitPath, std::string& str)
+{
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "Enter");
+    std::fstream out(chargingLimitPath, std::ios::out | std::ios::trunc);
+    out << str;
+    out.close();
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "Exit");
+    return HDF_SUCCESS;
+}
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

@@ -17,9 +17,9 @@
 #include "hdf_device_desc.h"
 #include "hdf_sbuf_ipc.h"
 #include "battery_log.h"
-#include "v1_0/battery_interface_stub.h"
+#include "v1_1/battery_interface_stub.h"
 
-using namespace OHOS::HDI::Battery::V1_0;
+using namespace OHOS::HDI::Battery::V1_1;
 using namespace OHOS::HDI::Battery;
 
 struct HdfBatteryInterfaceHost {

@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 class BatteryLed {
 public:
     int32_t InitLedsSysfs();
@@ -35,7 +35,7 @@ private:
     static void CreateMockLedFile(const std::string& path, const std::string& content) ;
     static void WriteLedNode(std::string& ledPath, int32_t brightness);
 };
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 class BatteryBacklight {
 public:
     BatteryBacklight();
@@ -37,7 +37,7 @@ private:
     static void TraversalBacklightNode();
     bool screenOn_ = false;
 };
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

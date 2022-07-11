@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 using namespace std;
 
 Frame::Frame(uint32_t w, uint32_t h, View::PixelFormat pixType, SurfaceDev* sfDev)
@@ -85,7 +85,7 @@ void Frame::OnDraw()
     flushFlag_ = true;
     mCondFlush_.notify_all();
 }
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

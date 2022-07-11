@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_0 {
+namespace V1_1 {
 constexpr int32_t LABEL_HEIGHT = 15;
 constexpr int32_t LABEL0_OFFSET = 0;
 constexpr int32_t LABEL2_OFFSET = 1;
@@ -74,7 +74,7 @@ void MenuItemInit(int32_t height, int32_t width, View::BRGA888Pixel bgColor, Fra
         return;
     }
 }
-}  // namespace V1_0
+}  // namespace V1_1
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS
