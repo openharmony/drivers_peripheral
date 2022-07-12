@@ -21,10 +21,11 @@ Vibrator驱动模型主要包含Vibrator（传感器）相关的HDI接口与实�
 Vibraor驱动下源代码目录结构如下所示：
 
 ```
-/drivers/peripheral/misc/vibrator
+/drivers/peripheral/vibrator
+├── chipset          # vibrator模块器件驱动代码
 ├── hal              # vibrator模块hal层代码
 │   ├── include      # vibrator模块hal层内部头文件
-│   └── src          # vibrator模块hal层代码的实现 
+│   └── src          # vibrator模块hal层代码的实现
 ├── interfaces       # vibrator模块对上层服务提供的驱动能力接口
 │   └── include      # vibrator模块对外提供的接口定义
 └── test             # vibrator模块测试代码
@@ -39,17 +40,19 @@ Vibraor驱动下源代码目录结构如下所示：
 
 **表 1**马达的主要接口
 
-| 接口名                                 | 功能描述                                                   |
-| -------------------------------------- | ---------------------------------------------------------- |
-| int32_t  StartOnce(uint32_t duration)  | 按照指定持续时间触发震动，duration为振动持续时长。         |
-| int32_t  Start(const char *effectType) | 按照指定预置效果启动马达，effectType表示预置的振动效果串。 |
-| int32_t  Stop(enum VibratorMode mode)  | 按照指定的振动模式停止震动。                               |
+| 接口名                                                       | 功能描述                                                     |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| int32_t  StartOnce(uint32_t duration)                        | 按照指定持续时间触发震动，duration为振动持续时长。           |
+| int32_t  Start(const char *effectType)                       | 按照指定预置效果启动马达，effectType表示预置的振动效果串。   |
+| int32_t  Stop(enum VibratorMode mode)                        | 按照指定的振动模式停止震动。                                 |
+| int32_t EnableVibratorModulation(uint32_t duration, int32_t intensity, int32_t frequency) | 按照指定振幅，频率、持续时间触发振动马达，duration为振动持续时长，intensity为振动强度，frequency为振动频率。 |
+| int32_t GetVibratorInfo(struct VibratorInfo **vibratorInfo); | 获取马达信息，包括是否支持振幅和频率的设置及振幅和频率的设置范围 。 |
 
 ### 使用说明
 
 代码示例
 
-```
+```c++
 #include "vibrator_if.h"
 
 enum VibratorMode {
@@ -59,19 +62,27 @@ enum VibratorMode {
 
 void VibratorSample(void)
 {
-	int32_t startRet;
-	int32_t endRet;
-	uint32_t g_duration = 1000;
-	uint32_t g_sleepTime1 = 2000;
-	uint32_t g_sleepTime2 = 5000;
-	const char *g_timeSequence = "haptic.clock.timer";
-	/* 创建传感器接口实例 */
+    int32_t startRet;
+    int32_t endRet;
+    uint32_t g_duration = 1000;
+    uint32_t g_sleepTime1 = 2000;
+    uint32_t g_sleepTime2 = 5000;
+    int32_t g_intensity1 = 30;
+    int32_t g_frequency1 = 200;
+    const char *g_timeSequence = "haptic.clock.timer";
+    struct VibratorInfo *g_vibratorInfo = nullptr;
+    /* 创建传感器接口实例 */
     struct VibratorInterface *g_vibratorDev = NewVibratorInterfaceInstance();
     if (g_vibratorDev == NULL) {
         return;
     }
-	/* 按照指定持续时间触发震动*/
-	startRet = g_vibratorDev->StartOnce(g_duration);
+    /* 获取马达信息，包括是否支持振幅和频率的设置及振幅和频率的设置范围。 */
+    startRet = g_vibratorDev->GetVibratorInfo(&g_vibratorInfo);
+    if (startRet != 0) {
+        return;
+    }
+    /* 按照指定持续时间触发震动*/
+    startRet = g_vibratorDev->StartOnce(g_duration);
     if (startRet != 0) {
         return;
     }
@@ -81,24 +92,25 @@ void VibratorSample(void)
     if (endRet != 0) {
         return;
     }
-    /* 释放传感器接口实例 */
-    ret = FreeVibratorInterfaceInstance();
-    if (ret != 0) {
-        return;
-    }
-    /* 创建传感器接口实例 */
-    struct VibratorInterface *g_vibratorDev = NewVibratorInterfaceInstance();
-    if (g_vibratorDev == NULL) {
-        return;
-    }
     /* 按照指定预置效果启动马达 */
     startRet = g_vibratorDev->Start(g_timeSequence);
     if (endRet != 0) {
         return;
     }
     OsalMSleep(g_sleepTime2);
-	/* 按照指定的振动模式停止震动 */ 
+    /* 按照指定的振动模式停止震动 */
     endRet = g_vibratorDev->Stop(VIBRATOR_MODE_PRESET);
+    if (endRet != 0) {
+        return;
+    }
+    /* 按照指定振幅，频率、持续时间触发振动马达。 */
+    startRet = g_vibratorDev->EnableVibratorModulation(g_duration, g_intensity1, g_frequency1);
+    if (endRet != 0) {
+        return;
+    }
+    OsalMSleep(g_sleepTime1);
+    /* 按照指定的振动模式停止震动 */
+    startRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
     if (endRet != 0) {
         return;
     }
@@ -114,10 +126,6 @@ void VibratorSample(void)
 
 [驱动子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E9%A9%B1%E5%8A%A8%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
 
-[drivers_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README_zh.md)
-
-[drivers_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README_zh.md)
-
-[drivers_adapter_khdf_linuk](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README_zh.md)
+[drivers_hdf_core](https://gitee.com/openharmony/drivers_hdf_core/blob/master/README_zh.md)
 
 [drivers_peripheral](https://gitee.com/openharmony/drivers_peripheral)
