@@ -968,6 +968,6 @@ int32_t HdiServiceRenderDrainBuffer(const struct HdfDeviceIoClient *client, stru
         return AUDIO_HAL_ERR_INTERNAL;
     }
     type = (enum AudioDrainNotifyType)tempType;
-    return render->DrainBuffer((AudioHandle)render, type);
+    return render->DrainBuffer((AudioHandle)render, &type);
 }
 

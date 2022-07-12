@@ -17,6 +17,7 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <pthread.h>
+#include <unistd.h>
 #include <linux/input.h>
 #include "hdf_audio_pnp_server.h"
 #include "osal_time.h"

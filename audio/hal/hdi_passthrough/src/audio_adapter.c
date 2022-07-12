@@ -281,15 +281,8 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     hwRender->renderParam.frameRenderMode.byteRate = DEFAULT_RENDER_SAMPLING_RATE;
     hwRender->renderParam.frameRenderMode.periodSize = DEEP_BUFFER_RENDER_PERIOD_SIZE;
     hwRender->renderParam.frameRenderMode.periodCount = DEEP_BUFFER_RENDER_PERIOD_COUNT;
-    hwRender->renderParam.frameRenderMode.attrs.period = attrs->period;
-    hwRender->renderParam.frameRenderMode.attrs.frameSize = attrs->frameSize;
-    hwRender->renderParam.frameRenderMode.attrs.startThreshold = attrs->startThreshold;
-    hwRender->renderParam.frameRenderMode.attrs.stopThreshold = attrs->stopThreshold;
-    hwRender->renderParam.frameRenderMode.attrs.silenceThreshold = attrs->silenceThreshold;
-    hwRender->renderParam.frameRenderMode.attrs.isBigEndian = attrs->isBigEndian;
-    hwRender->renderParam.frameRenderMode.attrs.isSignedData = attrs->isSignedData;
     hwRender->renderParam.frameRenderMode.renderhandle = (AudioHandle)hwRender;
-    if ((hwRender->renderParam.frameRenderMode.buffer = (char *)calloc(1, FRAME_DATA)) == NULL) {
+    if ((hwRender->renderParam.frameRenderMode.buffer = (char *)OsalMemCalloc(FRAME_DATA)) == NULL) {
         AUDIO_FUNC_LOGE("alloc frame render buffer failed");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
@@ -359,8 +352,8 @@ int32_t AudioAdapterInitAllPorts(struct AudioAdapter *adapter)
         AUDIO_FUNC_LOGE("portNum is zero!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    struct AudioPortAndCapability *portCapability =
-        (struct AudioPortAndCapability *)calloc(portNum, sizeof(struct AudioPortAndCapability));
+    struct AudioPortAndCapability *portCapability = (struct AudioPortAndCapability *)OsalMemCalloc(
+        portNum * sizeof(struct AudioPortAndCapability));
     if (portCapability == NULL) {
         AUDIO_FUNC_LOGE("portCapability is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
@@ -608,7 +601,7 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
         AUDIO_FUNC_LOGE("lib render func not exist");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)OsalMemCalloc(sizeof(*hwRender));
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is NULL!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
@@ -960,9 +953,9 @@ int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct Aud
         AUDIO_FUNC_LOGE("lib capture func not exist");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
+    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)OsalMemCalloc(sizeof(*hwCapture));
     if (hwCapture == NULL) {
-        AUDIO_FUNC_LOGE("calloc AudioHwCapture failed!");
+        AUDIO_FUNC_LOGE("alloc AudioHwCapture failed!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     ret = AudioAdapterCreateCapturePre(hwCapture, desc, attrs, hwAdapter);

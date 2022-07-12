@@ -14,6 +14,7 @@
  */
 
 #include "alsa_lib_common.h"
+#include "osal_mem.h"
 #include "audio_internal.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
@@ -112,7 +113,7 @@ struct CardStream {
 int32_t InitCardIns(void)
 {
     if (g_audioCardIns == NULL) {
-        g_audioCardIns = (struct AudioCardInfo *)calloc(MAX_CARD_NUM,
+        g_audioCardIns = (struct AudioCardInfo *)OsalMemCalloc(MAX_CARD_NUM *
             sizeof(struct AudioCardInfo));
         if (g_audioCardIns == NULL) {
             AUDIO_FUNC_LOGE("Failed to allocate memory!");

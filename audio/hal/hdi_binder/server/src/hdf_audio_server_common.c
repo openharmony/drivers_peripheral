@@ -14,6 +14,8 @@
  */
 
 #include "hdf_audio_server_common.h"
+#include "hdf_device_object.h"
+#include "osal_mem.h"
 #include "audio_adapter_info_common.h"
 #include "audio_events.h"
 #include "audio_hal_log.h"
@@ -59,9 +61,9 @@ static int32_t AdapterManageInit(struct AudioInfoInAdapter *adapterManage,
         return HDF_FAILURE;
     }
 
-    adapterManage->adapterName = (char *)calloc(1, MANAGER_ADAPTER_NAME_LEN);
+    adapterManage->adapterName = (char *)OsalMemCalloc(MANAGER_ADAPTER_NAME_LEN);
     if (adapterManage->adapterName == NULL) {
-        AUDIO_FUNC_LOGE("calloc adapter name failed!");
+        AUDIO_FUNC_LOGE("alloc adapter name failed!");
         return HDF_FAILURE;
     }
 
@@ -142,10 +144,10 @@ int32_t AdaptersServerManageInit(const struct AudioAdapterDescriptor *descs, int
     }
 
     num = (num > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : num;
-    adaptersManage = (struct AudioInfoInAdapter *)calloc(1,
+    adaptersManage = (struct AudioInfoInAdapter *)OsalMemCalloc(
         num * sizeof(struct AudioInfoInAdapter));
     if (adaptersManage == NULL) {
-        AUDIO_FUNC_LOGE("calloc adaptersManage failed! ");
+        AUDIO_FUNC_LOGE("alloc adaptersManage failed!");
 
         return HDF_FAILURE;
     }
