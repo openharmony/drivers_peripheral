@@ -35,6 +35,7 @@ ohos_shared_library("libcodec_hdi_omx_server") {
     "src/codec_types.c",
     "v2.0/hdi_impl/src/codec_dyna_buffer.cpp",
     "v2.0/hdi_impl/src/codec_handle_buffer.cpp",
+    "v2.0/hdi_impl/src/codec_omx_core.cpp",
     "v2.0/hdi_impl/src/codec_share_buffer.cpp",
     "v2.0/hdi_impl/src/component_mgr.cpp",
     "v2.0/hdi_impl/src/component_node.cpp",
