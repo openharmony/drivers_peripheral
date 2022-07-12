@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "hdf_remote_service.h"
+#include "osal_mem.h"
 #include "audio_adapter_info_common.h"
 #include "audio_hal_log.h"
 #include "audio_proxy_common.h"
@@ -265,8 +267,8 @@ int32_t AudioProxyAdapterInitAllPorts(struct AudioAdapter *adapter)
         AUDIO_FUNC_LOGE("ports is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    struct AudioPortAndCapability *portCapability = (struct AudioPortAndCapability *)calloc(portNum,
-        sizeof(struct AudioPortAndCapability));
+    struct AudioPortAndCapability *portCapability = (struct AudioPortAndCapability *)OsalMemCalloc(
+        portNum * sizeof(struct AudioPortAndCapability));
     if (portCapability == NULL) {
         AUDIO_FUNC_LOGE("portCapability is NULL!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
@@ -366,7 +368,7 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
     if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL || desc == NULL || attrs == NULL || render == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    struct AudioHwRender *hwRender = (struct AudioHwRender *)OsalMemCalloc(sizeof(*hwRender));
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is NULL!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
@@ -571,7 +573,7 @@ int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struc
         attrs == NULL || capture == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(struct AudioHwCapture));
+    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)OsalMemCalloc(sizeof(struct AudioHwCapture));
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is NULL!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;

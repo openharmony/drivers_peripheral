@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "audio_adapter_info_common.h"
 #include "audio_proxy_common.h"
 #include "audio_hal_log.h"
 

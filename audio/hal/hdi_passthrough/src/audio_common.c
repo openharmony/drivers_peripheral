@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include <osal_mem.h>
+#include "osal_mem.h"
 #include "osal_time.h"
 #include "audio_hal_log.h"
 #include "audio_internal.h"
@@ -32,7 +32,7 @@ void AudioDlClose(void **ppHandleSo)
 void AudioMemFree(void **ppMem)
 {
     if ((ppMem != NULL) && ((*ppMem) != NULL)) {
-        free(*ppMem);
+        OsalMemFree(*ppMem);
         *ppMem = NULL;
     }
     return;

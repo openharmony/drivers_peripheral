@@ -126,6 +126,7 @@ int32_t InitCardIns(void);
 struct AudioCardInfo *GetCardIns(const char *cardName);
 struct AudioCardInfo *AudioGetCardInfo(const char *adapterName, snd_pcm_stream_t stream);
 void CheckCardStatus(struct AudioCardInfo *cardIns);
+int32_t CheckParaFormat(struct AudioPcmHwParams hwParams, snd_pcm_format_t *alsaPcmFormat);
 int32_t DestroyCardList(void);
 void GetDeviceList(struct AudioCardInfo *cardIns, snd_pcm_stream_t stream);
 int32_t GetSelCardInfo(struct AudioCardInfo *cardIns, struct AlsaDevInfo *devInsHandle);

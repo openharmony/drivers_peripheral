@@ -14,6 +14,7 @@
  */
 
 #include "hdf_audio_server_capture.h"
+#include "osal_mem.h"
 #include "audio_hal_log.h"
 #include "hdf_audio_server_common.h"
 
@@ -610,7 +611,7 @@ int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint64(data, &requestBytes)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    frame = (char *)calloc(1, CAPTURE_FRAME_DATA); // 1 for one element
+    frame = (char *)OsalMemCalloc(CAPTURE_FRAME_DATA);
     if (frame == NULL) {
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }

@@ -14,6 +14,7 @@
  */
 
 #include "audio_interface_lib_capture.h"
+#include "osal_mem.h"
 #include "audio_hal_log.h"
 #ifdef ALSA_MODE
 #include "alsa_audio.h"
@@ -1144,7 +1145,7 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
             AUDIO_FUNC_LOGE("pcm_frames_to_bytes failed!");
             return HDF_FAILURE;
         }
-        buffer = (char *)calloc(1, dataSize);
+        buffer = (char *)OsalMemCalloc(dataSize);
         if (!buffer) {
             fprintf(stderr, "Unable to allocate \n");
             pcm_close(pcm);
@@ -1155,7 +1156,7 @@ int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
         }
         handleData->frameCaptureMode.bufferSize = dataSize;
         handleData->frameCaptureMode.bufferFrameSize = pcm_bytes_to_frames(pcm, dataSize);
-        free(buffer);
+        OsalMemFree(buffer);
         return HDF_SUCCESS;
     }
     return HDF_FAILURE;
@@ -1476,9 +1477,9 @@ struct DevHandleCapture *AudioBindServiceCaptureObject(struct DevHandleCapture *
         AUDIO_FUNC_LOGE("service name or handle is NULL!");
         return NULL;
     }
-    char *serviceName = (char *)calloc(1, NAME_LEN);
+    char *serviceName = (char *)OsalMemCalloc(NAME_LEN);
     if (serviceName == NULL) {
-        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc serviceName");
+        AUDIO_FUNC_LOGE("Failed to alloc serviceName");
         AudioMemFree((void **)&handle);
         return NULL;
     }
@@ -1510,9 +1511,9 @@ struct DevHandleCapture *AudioBindServiceCapture(const char *name)
         AUDIO_FUNC_LOGE("service name NULL!");
         return NULL;
     }
-    handle = (struct DevHandleCapture *)calloc(1, sizeof(struct DevHandleCapture));
+    handle = (struct DevHandleCapture *)OsalMemCalloc(sizeof(struct DevHandleCapture));
     if (handle == NULL) {
-        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc handle");
+        AUDIO_FUNC_LOGE("Failed to alloc handle");
         return NULL;
     }
     object = AudioBindServiceCaptureObject(handle, name);

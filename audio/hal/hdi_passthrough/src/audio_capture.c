@@ -14,6 +14,7 @@
  */
 
 #include "audio_capture.h"
+#include "osal_mem.h"
 #include "audio_adapter_info_common.h"
 #include "audio_hal_log.h"
 #include "audio_interface_lib_capture.h"
@@ -59,9 +60,9 @@ int32_t AudioCaptureStart(AudioHandle handle)
         AUDIO_FUNC_LOGE("AudioCaptureStart SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    char *tbuffer = (char *)calloc(1, CAPTURE_FRAME_DATA);
+    char *tbuffer = (char *)OsalMemCalloc(CAPTURE_FRAME_DATA);
     if (tbuffer == NULL) {
-        AUDIO_FUNC_LOGE("Calloc Capture tbuffer Fail!");
+        AUDIO_FUNC_LOGE("alloc Capture tbuffer Fail!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     hwCapture->captureParam.frameCaptureMode.buffer = tbuffer;
@@ -705,17 +706,17 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwCapture *hwCapture, int er
     }
     if (hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].reason == NULL) {
         hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].reason
-            = (char *)calloc(1, ERROR_REASON_DESC_LEN);
+            = (char *)OsalMemCalloc(ERROR_REASON_DESC_LEN);
         if (hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].reason == NULL) {
-            AUDIO_FUNC_LOGE("Calloc reasonDesc Fail!");
+            AUDIO_FUNC_LOGE("alloc reasonDesc Fail!");
             return AUDIO_HAL_ERR_MALLOC_FAIL;
         }
     }
     if (hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].currentTime == NULL) {
         hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].currentTime
-            = (char *)calloc(1, ERROR_REASON_DESC_LEN);
+            = (char *)OsalMemCalloc(ERROR_REASON_DESC_LEN);
         if (hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].currentTime == NULL) {
-            AUDIO_FUNC_LOGE("Calloc time Fail!");
+            AUDIO_FUNC_LOGE("alloc time Fail!");
             return AUDIO_HAL_ERR_MALLOC_FAIL;
         }
     }

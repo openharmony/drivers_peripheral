@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 #include "audio_render.h"
+#include "osal_mem.h"
 #include "audio_adapter_info_common.h"
 #include "audio_hal_log.h"
 #include "audio_interface_lib_render.h"
@@ -743,17 +744,17 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwRender *hwRender, int erro
     }
     if (hwRender->errorLog.errorDump[hwRender->errorLog.iter].reason == NULL) {
         hwRender->errorLog.errorDump[hwRender->errorLog.iter].reason
-            = (char *)calloc(1, ERROR_REASON_DESC_LEN);
+            = (char *)OsalMemCalloc(ERROR_REASON_DESC_LEN);
         if (hwRender->errorLog.errorDump[hwRender->errorLog.iter].reason == NULL) {
-            AUDIO_FUNC_LOGE("Calloc reasonDesc Fail!");
+            AUDIO_FUNC_LOGE("alloc reasonDesc Fail!");
             return AUDIO_HAL_ERR_MALLOC_FAIL;
         }
     }
     if (hwRender->errorLog.errorDump[hwRender->errorLog.iter].currentTime == NULL) {
         hwRender->errorLog.errorDump[hwRender->errorLog.iter].currentTime
-            = (char *)calloc(1, ERROR_REASON_DESC_LEN);
+            = (char *)OsalMemCalloc(ERROR_REASON_DESC_LEN);
         if (hwRender->errorLog.errorDump[hwRender->errorLog.iter].currentTime == NULL) {
-            AUDIO_FUNC_LOGE("Calloc time Fail!");
+            AUDIO_FUNC_LOGE("alloc time Fail!");
             return AUDIO_HAL_ERR_MALLOC_FAIL;
         }
     }
@@ -893,7 +894,9 @@ int32_t AudioRenderGetRenderPosition(struct AudioRender *render, uint64_t *frame
 
 int32_t AudioRenderSetRenderSpeed(struct AudioRender *render, float speed)
 {
+    (void)speed;
     AUDIO_FUNC_LOGI();
+
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
