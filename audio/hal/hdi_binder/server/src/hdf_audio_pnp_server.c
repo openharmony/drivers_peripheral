@@ -17,9 +17,11 @@
 #include "hdf_audio_input_event.h"
 #include "hdf_audio_pnp_uevent.h"
 #include "hdf_device_desc.h"
+#include "hdf_device_object.h"
 #include "hdf_io_service_if.h"
 #include "hdf_sbuf.h"
 #include "hdf_service_status.h"
+#include "securec.h"
 #include "servmgr_hdi.h"
 #include "audio_hal_log.h"
 

@@ -14,6 +14,7 @@
  */
 
 #include "alsa_lib_capture.h"
+#include "osal_mem.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 
@@ -939,9 +940,9 @@ static int32_t AudioCaptureReadFrame(struct AudioHwCaptureParam *handleData,
         AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_FAILURE;
     }
-    buffer = calloc(1, bufferSize);
+    buffer = OsalMemCalloc(bufferSize);
     if (buffer == NULL) {
-        AUDIO_FUNC_LOGE("Failed to Calloc buffer");
+        AUDIO_FUNC_LOGE("Failed to alloc buffer");
         return HDF_FAILURE;
     }
 
@@ -1261,9 +1262,9 @@ static int32_t AudioBindServiceCaptureObject(struct DevHandleCapture * const han
         return HDF_FAILURE;
     }
 
-    serviceName = (char *)calloc(1, NAME_LEN);
+    serviceName = (char *)OsalMemCalloc(NAME_LEN);
     if (serviceName == NULL) {
-        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc serviceName");
+        AUDIO_FUNC_LOGE("Failed to alloc serviceName");
         return HDF_FAILURE;
     }
 
@@ -1297,9 +1298,9 @@ struct DevHandleCapture *AudioBindServiceCapture(const char *name)
         return NULL;
     }
 
-    handle = (struct DevHandleCapture *)calloc(1, sizeof(struct DevHandleCapture));
+    handle = (struct DevHandleCapture *)OsalMemCalloc(sizeof(struct DevHandleCapture));
     if (handle == NULL) {
-        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc handle");
+        AUDIO_FUNC_LOGE("Failed to alloc handle");
         return NULL;
     }
 

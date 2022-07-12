@@ -14,6 +14,7 @@
  */
 
 #include "audio_interface_lib_render.h"
+#include "osal_mem.h"
 #include "audio_hal_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
@@ -1597,9 +1598,9 @@ int32_t AudioBindServiceRenderObject(struct DevHandle *handle, const char *name)
         AUDIO_FUNC_LOGE("service name or handle is NULL!");
         return HDF_FAILURE;
     }
-    char *serviceName = (char *)calloc(1, NAME_LEN);
+    char *serviceName = (char *)OsalMemCalloc(NAME_LEN);
     if (serviceName == NULL) {
-        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc serviceName");
+        AUDIO_FUNC_LOGE("Failed to alloc serviceName");
         return HDF_FAILURE;
     }
     int ret = snprintf_s(serviceName, NAME_LEN - 1, SERVIC_NAME_MAX_LEN + 1, "hdf_audio_%s", name);
@@ -1627,9 +1628,9 @@ struct DevHandle *AudioBindServiceRender(const char *name)
         AUDIO_FUNC_LOGE("service name NULL!");
         return NULL;
     }
-    handle = (struct DevHandle *)calloc(1, sizeof(struct DevHandle));
+    handle = (struct DevHandle *)OsalMemCalloc(sizeof(struct DevHandle));
     if (handle == NULL) {
-        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc handle");
+        AUDIO_FUNC_LOGE("Failed to alloc handle");
         return NULL;
     }
     int32_t ret = AudioBindServiceRenderObject(handle, name);

@@ -13,7 +13,9 @@
  * limitations under the License.
  */
 #include "audio_proxy_manager.h"
-#include <servmgr_hdi.h>
+#include "osal_mem.h"
+#include "servmgr_hdi.h"
+#include "audio_adapter_info_common.h"
 #include "audio_hal_log.h"
 #include "audio_proxy_common.h"
 #include "audio_proxy_internal.h"
@@ -205,9 +207,9 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioManager *manager, const struct 
         AUDIO_FUNC_LOGE("proxyManager is invalid!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(struct AudioHwAdapter));
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)OsalMemCalloc(sizeof(struct AudioHwAdapter));
     if (hwAdapter == NULL) {
-        AUDIO_FUNC_LOGE("calloc hwAdapter failed!");
+        AUDIO_FUNC_LOGE("alloc hwAdapter failed!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     if (AudioProxyAdapterGetRemoteHandle(proxyManager, hwAdapter, desc->adapterName) < 0) {

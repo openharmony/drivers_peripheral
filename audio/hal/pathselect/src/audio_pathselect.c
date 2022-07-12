@@ -14,6 +14,7 @@
  */
 
 #include "audio_pathselect.h"
+#include "osal_mem.h"
 #include "audio_hal_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
@@ -69,7 +70,7 @@ int32_t AudioPathSelGetConfToJsonObj()
         fclose(fpJson);
         return HDF_FAILURE;
     }
-    pJsonStr = (char *)calloc(1, jsonStrSize + 1);
+    pJsonStr = (char *)OsalMemCalloc(jsonStrSize + 1);
     if (pJsonStr == NULL) {
         fclose(fpJson);
         return HDF_FAILURE;

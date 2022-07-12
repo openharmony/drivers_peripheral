@@ -15,34 +15,6 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-config("hdi_service_config") {
-  visibility = [ ":*" ]
-
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-DGST_DISABLE_DEPRECATED",
-    "-DHAVE_CONFIG_H",
-    "-fno-strict-aliasing",
-    "-Wno-sign-compare",
-    "-Wno-builtin-requires-header",
-    "-Wno-implicit-function-declaration",
-    "-Wno-format",
-    "-Wno-int-conversion",
-    "-Wno-unused-function",
-    "-Wno-unused-parameter",
-    "-Wno-thread-safety-attributes",
-    "-Wno-inconsistent-missing-override",
-    "-fno-rtti",
-    "-fno-exceptions",
-    "-ffunction-sections",
-    "-fdata-sections",
-  ]
-
-  ldflags = [ "-Wl" ]
-}
-
 if (drivers_peripheral_audio_hdf_proxy_stub == true) {
   ohos_shared_library("hdi_audio_primary_server") {
     include_dirs = [
@@ -88,8 +60,6 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       defines += [ "AUDIO_HAL_HDF_LOG" ]
     }
 
-    public_configs = [ ":hdi_service_config" ]
-
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
@@ -133,8 +103,6 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     if (enable_audio_hal_hdf_log) {
       defines += [ "AUDIO_HAL_HDF_LOG" ]
     }
-
-    public_configs = [ ":hdi_service_config" ]
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
@@ -180,8 +148,6 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       defines += [ "AUDIO_HAL_HDF_LOG" ]
     }
 
-    public_configs = [ ":hdi_service_config" ]
-
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
@@ -218,8 +184,6 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     if (enable_audio_hal_hdf_log) {
       defines += [ "AUDIO_HAL_HDF_LOG" ]
     }
-
-    public_configs = [ ":hdi_service_config" ]
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
