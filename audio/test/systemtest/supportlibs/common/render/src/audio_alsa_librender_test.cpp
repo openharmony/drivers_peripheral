@@ -102,7 +102,7 @@ uint32_t AudioAlsaLibRenderTest::PcmBytesToFrames(const struct AudioFrameRenderM
     if (frameCount == 0) {
         return 0;
     }
-    return replyByte / frameSize;
+    return replyByte / frameCount;
 }
 
 /**
@@ -170,7 +170,7 @@ int32_t AudioAlsaLibRenderTest::CreatHwRender(struct AudioHwRender *&hwRender, c
     if (hwRender == nullptr) {
         return HDF_FAILURE;
     }
-    ret = InitHwRender(hwRender, adapterNameCase;
+    ret = InitHwRender(hwRender, adapterNameCase);
     if (ret != HDF_SUCCESS) {
         free(hwRender);
         hwRender = nullptr;

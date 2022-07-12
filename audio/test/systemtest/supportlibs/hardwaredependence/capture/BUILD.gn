@@ -50,15 +50,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/test/systemtest/supportlibs/hardwaredependence/capture/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-      "-std=c++11",
-    ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   }
