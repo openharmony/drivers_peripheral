@@ -81,7 +81,7 @@ std::string CreateFile(std::string path, std::string content)
 {
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        BATTERY_HILOGI(LABEL_TEST, "Cannot create file %{public}s", path.c_str());
+        BATTERY_HILOGI(LABEL_TEST, "Cannot create file %{private}s", path.c_str());
         return nullptr;
     }
     stream << content.c_str() << std::endl;
@@ -94,7 +94,7 @@ static void CheckSubfolderNode(const std::string& path)
     DIR *dir = nullptr;
     struct dirent* entry = nullptr;
     std::string batteryPath = SYSTEM_BATTERY_PATH + "/" + path;
-    BATTERY_HILOGI(LABEL_TEST, "subfolder path is:%{public}s", batteryPath.c_str());
+    BATTERY_HILOGI(LABEL_TEST, "subfolder path is:%{private}s", batteryPath.c_str());
 
     dir = opendir(batteryPath.c_str());
     if (dir == nullptr) {
@@ -228,17 +228,17 @@ static int32_t ReadTemperatureSysfs()
         }
     }
     std::string sysBattTemPath = SYSTEM_BATTERY_PATH + "/" + tempNode + "/" + "temp";
-    BATTERY_HILOGE(LABEL_TEST, "sysBattTemPath is %{public}s", sysBattTemPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattTemPath is %{private}s", sysBattTemPath.c_str());
 
     int fd = open(sysBattTemPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattTemPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysBattTemPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattTemPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysBattTemPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -266,17 +266,17 @@ static int32_t ReadVoltageSysfs()
         }
     }
     std::string sysBattVolPath = SYSTEM_BATTERY_PATH + "/" + voltageNode + "/" + "voltage_now";
-    BATTERY_HILOGE(LABEL_TEST, "sysBattVolPath is %{public}s", sysBattVolPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattVolPath is %{private}s", sysBattVolPath.c_str());
 
     int fd = open(sysBattVolPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattVolPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysBattVolPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattVolPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysBattVolPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -304,17 +304,17 @@ static int32_t ReadCapacitySysfs()
         }
     }
     std::string sysBattCapPath = SYSTEM_BATTERY_PATH + "/" + capacityNode + "/" + "capacity";
-    BATTERY_HILOGE(LABEL_TEST, "sysBattCapPath is %{public}s", sysBattCapPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattCapPath is %{private}s", sysBattCapPath.c_str());
 
     int fd = open(sysBattCapPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattCapPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysBattCapPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattCapPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysBattCapPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -343,17 +343,17 @@ static int32_t ReadTotalEnergySysfs()
         }
     }
     std::string sysBattTotalEnergyPath = SYSTEM_BATTERY_PATH + "/" + totalEnergyNode + "/" + "charge_full";
-    BATTERY_HILOGE(LABEL_TEST, "sysBattTotalEnergyPath is %{public}s", sysBattTotalEnergyPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattTotalEnergyPath is %{private}s", sysBattTotalEnergyPath.c_str());
 
     int fd = open(sysBattTotalEnergyPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattTotalEnergyPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysBattTotalEnergyPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattTotalEnergyPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysBattTotalEnergyPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -382,17 +382,17 @@ static int32_t ReadCurrentAverageSysfs()
         }
     }
     std::string sysBattCurrentAvgPath = SYSTEM_BATTERY_PATH + "/" + currentAvgNode + "/" + "current_avg";
-    BATTERY_HILOGE(LABEL_TEST, "sysBattCurrentAvgPath is %{public}s", sysBattCurrentAvgPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattCurrentAvgPath is %{private}s", sysBattCurrentAvgPath.c_str());
 
     int fd = open(sysBattCurrentAvgPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattCurrentAvgPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysBattCurrentAvgPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattCurrentAvgPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysBattCurrentAvgPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -421,17 +421,17 @@ static int32_t ReadCurrentNowSysfs()
         }
     }
     std::string sysBattCurrentNowPath = SYSTEM_BATTERY_PATH + "/" + currentNowNode + "/" + "current_now";
-    BATTERY_HILOGE(LABEL_TEST, "sysBattCurrentNowPath is %{public}s", sysBattCurrentNowPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattCurrentNowPath is %{private}s", sysBattCurrentNowPath.c_str());
 
     int fd = open(sysBattCurrentNowPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattCurrentNowPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysBattCurrentNowPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattCurrentNowPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysBattCurrentNowPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -460,17 +460,17 @@ static int32_t ReadRemainEnergySysfs()
         }
     }
     std::string sysBattChargeNowPath = SYSTEM_BATTERY_PATH + "/" + chargeNowNode + "/" + "charge_now";
-    BATTERY_HILOGE(LABEL_TEST, "sysBattChargeNowPath is %{public}s", sysBattChargeNowPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysBattChargeNowPath is %{private}s", sysBattChargeNowPath.c_str());
 
     int fd = open(sysBattChargeNowPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysBattChargeNowPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysBattChargeNowPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysBattChargeNowPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysBattChargeNowPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -530,17 +530,17 @@ static int32_t ReadHealthStateSysfs()
         }
     }
     std::string sysHealthStatePath = SYSTEM_BATTERY_PATH + "/" + healthNode + "/" + "health";
-    BATTERY_HILOGE(LABEL_TEST, "sysHealthStatePath is %{public}s", sysHealthStatePath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysHealthStatePath is %{private}s", sysHealthStatePath.c_str());
 
     int fd = open(sysHealthStatePath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysHealthStatePath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysHealthStatePath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysHealthStatePath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysHealthStatePath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -584,13 +584,13 @@ int32_t ReadSysfsFile(const char* path, char* buf, size_t size)
 {
     int fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", path);
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", path);
         return HDF_ERR_IO;
     }
 
     int32_t readSize = read(fd, buf, size - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", path);
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", path);
         close(fd);
         return HDF_ERR_IO;
     }
@@ -628,7 +628,7 @@ static int32_t ReadPluggedTypeSysfs()
         return ERROR;
     }
     std::string typePath = SYSTEM_BATTERY_PATH + "/" + node + "/" + "type";
-    BATTERY_HILOGI(LABEL_TEST, "type path is: %{public}s", typePath.c_str());
+    BATTERY_HILOGI(LABEL_TEST, "type path is: %{private}s", typePath.c_str());
     if (ReadSysfsFile(typePath.c_str(), buf, MAX_BUFF_SIZE) != HDF_SUCCESS) {
         BATTERY_HILOGI(LABEL_TEST, "read type path failed");
         return ERROR;
@@ -668,17 +668,17 @@ static int32_t ReadChargeStateSysfs()
         }
     }
     std::string sysChargeStatePath = SYSTEM_BATTERY_PATH + "/" + statusNode + "/" + "status";
-    BATTERY_HILOGE(LABEL_TEST, "sysChargeStatePath is %{public}s", sysChargeStatePath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysChargeStatePath is %{private}s", sysChargeStatePath.c_str());
 
     int fd = open(sysChargeStatePath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysChargeStatePath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysChargeStatePath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysChargeStatePath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysChargeStatePath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -704,17 +704,17 @@ static int32_t ReadChargeCounterSysfs()
         }
     }
     std::string sysChargeCounterPath = SYSTEM_BATTERY_PATH + "/" + counterNode + "/" + "charge_counter";
-    BATTERY_HILOGE(LABEL_TEST, "sysChargeCounterPath is %{public}s", sysChargeCounterPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysChargeCounterPath is %{private}s", sysChargeCounterPath.c_str());
 
     int fd = open(sysChargeCounterPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysChargeCounterPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysChargeCounterPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysChargeCounterPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysChargeCounterPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -743,17 +743,17 @@ static int32_t ReadPresentSysfs()
         }
     }
     std::string sysPresentPath = SYSTEM_BATTERY_PATH + "/" + presentNode + "/" + "present";
-    BATTERY_HILOGE(LABEL_TEST, "sysPresentPath is %{public}s", sysPresentPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysPresentPath is %{private}s", sysPresentPath.c_str());
 
     int fd = open(sysPresentPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysPresentPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysPresentPath.c_str());
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysPresentPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysPresentPath.c_str());
         close(fd);
         return HDF_FAILURE;
     }
@@ -780,17 +780,17 @@ static std::string ReadTechnologySysfs(std::string& battTechnology)
         }
     }
     std::string sysTechnologyPath = SYSTEM_BATTERY_PATH + "/" + technologyNode + "/" + "technology";
-    BATTERY_HILOGE(LABEL_TEST, "sysTechnologyPath is %{public}s", sysTechnologyPath.c_str());
+    BATTERY_HILOGE(LABEL_TEST, "sysTechnologyPath is %{private}s", sysTechnologyPath.c_str());
 
     int fd = open(sysTechnologyPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to open %{public}s", sysTechnologyPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", sysTechnologyPath.c_str());
         return "";
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(LABEL_TEST, "failed to read %{public}s", sysTechnologyPath.c_str());
+        BATTERY_HILOGE(LABEL_TEST, "failed to read %{private}s", sysTechnologyPath.c_str());
         close(fd);
         return "";
     }
