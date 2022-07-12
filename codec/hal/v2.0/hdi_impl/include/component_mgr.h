@@ -19,61 +19,44 @@
 #include <OMX_Core.h>
 #include <list>
 #include <map>
+#include <mutex>
 #include <vector>
-
+#include "codec_omx_core.h"
 #include "icomponent_mgr.h"
 namespace OHOS {
 namespace Codec {
 namespace Omx {
 class ComponentMgr : public IComponentMgr {
 public:
+    using OMXComponent = struct {
+        OMX_HANDLETYPE handle;
+        std::shared_ptr<CodecOMXCore> core;
+    };
+
+public:
     ComponentMgr();
     ~ComponentMgr();
     ComponentMgr(const ComponentMgr &) = delete;
     ComponentMgr &operator=(const ComponentMgr &) = delete;
 
-    virtual int32_t CreateComponentInstance(const char *componentName, const OMX_CALLBACKTYPE *callbacks,
-                                            void *appData, OMX_COMPONENTTYPE **component);
+    virtual int32_t CreateComponentInstance(const char *componentName, const OMX_CALLBACKTYPE *callbacks, void *appData,
+                                            OMX_COMPONENTTYPE **component);
 
     virtual int32_t DeleteComponentInstance(OMX_COMPONENTTYPE *component);
 
-    virtual int32_t EnumerateComponentsByIndex(uint32_t index, char *componentName, size_t componentNameSize);
-
     virtual int32_t GetRolesForComponent(const char *componentName, std::vector<std::string> *roles);
-
-    bool IsOMXHandleValid(OMX_COMPONENTTYPE *handle);
-
-    bool IsLoadLibSuc()
-    {
-        return loadLibSuc_;
-    }
 
 private:
     void AddVendorComponent();
     void AddSoftComponent();
     void AddComponentByLibName(const char *libName);
-    void AddComponentByInstance(IComponentMgr *);
     void CleanComponent();
 
 private:
-    bool loadLibSuc_;
-    struct ComponentInfo {
-        IComponentMgr *omxComponent;
-        void *LibHandle;
-    };
-    struct ComponentNameAndObjectPoint {
-        std::string componentName;
-        IComponentMgr *omxComponentMgr;
-    };
-    struct ComponentTypePointAndObjectPoint {
-        OMX_COMPONENTTYPE *componentType;
-        IComponentMgr *omxComponentMgr;
-    };
-    std::list<ComponentInfo> componentsList_;
-    std::vector<ComponentNameAndObjectPoint> componentNameAndObjectPoint_;
-    std::vector<ComponentTypePointAndObjectPoint> componentTypePointAndObjectPoint_;
-    OMX_COMPONENTTYPE *currentComType_;
-    std::string currentComName_;
+    std::vector<std::shared_ptr<CodecOMXCore>> cores_;                    // save all the core
+    std::map<std::string, std::shared_ptr<CodecOMXCore>> compoentsCore_;  // save the compoentname<--> core
+    std::vector<OMXComponent> components_;                                // save the opened compoents
+    std::mutex mutex_;
 };
 }  // namespace Omx
 }  // namespace Codec

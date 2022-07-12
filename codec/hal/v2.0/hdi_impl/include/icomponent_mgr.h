@@ -36,8 +36,6 @@ public:
 
     virtual int32_t DeleteComponentInstance(OMX_COMPONENTTYPE *component) = 0;
 
-    virtual int32_t EnumerateComponentsByIndex(uint32_t index, char *componentName, size_t componentNameSize) = 0;
-
     virtual int32_t GetRolesForComponent(const char *componentName, std::vector<std::string> *vRoles) = 0;
 };
 }  // namespace Omx

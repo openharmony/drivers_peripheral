@@ -38,12 +38,6 @@ int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *c
         HDF_LOGE("%{public}s create CodecComponentNode error", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
-
-    if (!g_mgr.IsLoadLibSuc()) {
-        HDF_LOGE("%{public}s load lib failed", __func__);
-        return HDF_ERR_NOT_SUPPORT;
-    }
-
     tempNode->node = std::make_shared<ComponentNode>(callbacks, appData);
     auto err = g_mgr.CreateComponentInstance(compName, &ComponentNode::callbacks_, tempNode->node.get(), &comp);
     if (err != OMX_ErrorNone) {
@@ -63,10 +57,6 @@ int32_t OmxAdapterDestroyComponent(struct CodecComponentNode *codecNode)
     if (codecNode == nullptr || codecNode->node == nullptr) {
         HDF_LOGE("%{public}s codecNode is null", __func__);
         return HDF_ERR_INVALID_PARAM;
-    }
-    if (!g_mgr.IsLoadLibSuc()) {
-        HDF_LOGE("%{public}s load lib failed", __func__);
-        return HDF_ERR_NOT_SUPPORT;
     }
     auto err = g_mgr.DeleteComponentInstance((OMX_COMPONENTTYPE *)codecNode->node->GetHandle());
     if (err != OMX_ErrorNone) {
