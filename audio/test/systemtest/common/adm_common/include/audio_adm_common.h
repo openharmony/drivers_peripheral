@@ -45,7 +45,8 @@ const int REGISTER_STATUS_ON = 0;
 const int REGISTER_STATUS_OFF = 1;
 const int AUDIO_SIZE_FRAME = 16 * 1024;
 const int AUDIO_REPLY_EXTEND = 16;
-const int CIR_BUFF_EMPTY = 3;
+const int CIR_BUFF_EMPTY = -3;
+const int CIR_BUFF_NORMAL = -1;
 const std::string CARD_SEVICE_NAME = "hdf_audio_codec_primary_dev0";
 
 enum StreamDispMethodCmd {

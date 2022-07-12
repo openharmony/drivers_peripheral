@@ -34,8 +34,8 @@ public:
     static TestAudioManager *(*GetAudioManager)();
     static void *handleSo;
     static struct DevHandle *(*BindServiceRenderSo)(const char *);
-    static int32_t (*InterfaceLibOutputRender)(struct DevHandle *, int, struct AudioHwRenderParam *);
-    static int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int, struct AudioHwRenderParam *);
+    static int32_t (*InterfaceLibOutputRender)(struct DevHandle *, int32_t, struct AudioHwRenderParam *);
+    static int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int32_t, struct AudioHwRenderParam *);
     static void (*CloseServiceRenderSo)(struct DevHandle *);
     static void *PtrHandle;
     static int32_t GetManager(struct PrepareAudioPara& audiopara);
@@ -378,55 +378,6 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0006, TestSize.Level1
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing GetVolthreshold value that
-*    Hardware equipment of Acodec_ChangeOut.
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0007
-* @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ.
-* @tc.author: zhouyongxiao
-*/
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0007, TestSize.Level1)
-{
-    int32_t ret = -1;
-    float thresholdValueMax = 0;
-    float thresholdValueMin = 0;
-    float expMax = 127;
-    float expMix = 40;
-    struct DevHandle *handle = nullptr;
-    struct AudioHwRender *hwRender = nullptr;
-
-    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_OUT, handle);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    thresholdValueMax = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
-    thresholdValueMin = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
-    EXPECT_EQ(expMax, thresholdValueMax);
-    EXPECT_EQ(expMix, thresholdValueMin);
-    CloseServiceRenderSo(handle);
-    free(hwRender);
-}
-/**
-* @tc.name  test InterfaceLibCtlRender API via using smartpa.
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0008
-* @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT.
-* @tc.author: zhouyongxiao
-*/
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0008, TestSize.Level1)
-{
-    int32_t ret = -1;
-    struct DevHandle *handle = nullptr;
-    struct AudioHwRender *hwRender = nullptr;
-    ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_OUT, handle);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    CloseServiceRenderSo(handle);
-    free(hwRender);
-}
-/**
 * @tc.name  test InterfaceLibCtlRender API via writing volume value of smartpa is normal value and reading
 *    this value.
 * @tc.number  SUB_Audio_Function_Smartpa_Test_0009
@@ -444,8 +395,6 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0009, TestSize.Level1
     struct AudioHwRender *hwRender = nullptr;
     ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_OUT, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     thresholdValueMaxOut = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
@@ -495,8 +444,6 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0010, TestSize.Level1
     struct AudioHwRender *hwRender = nullptr;
     ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_OUT, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     thresholdValueMax = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
@@ -535,8 +482,6 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0011, TestSize.Level1
     struct AudioHwRender *hwRender = nullptr;
     ret = BindServiceAndHwRender(hwRender, BIND_CONTROL.c_str(), ADAPTER_NAME_OUT, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN, &hwRender->renderParam);
-    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);

@@ -14,7 +14,6 @@
  */
 
 #include "audio_adapter.h"
-#include "osal_mem.h"
 #include "audio_adapter_info_common.h"
 #include "audio_hal_log.h"
 #include "audio_interface_lib_capture.h"
@@ -402,56 +401,6 @@ void AudioReleaseRenderHandle(struct AudioHwRender *hwRender)
     return;
 }
 
-int32_t AudioSetAcodeModeRender(struct AudioHwRender *hwRender,
-    const InterfaceLibModeRenderSo *pInterfaceLibMode)
-{
-    AUDIO_FUNC_LOGI();
-    if (hwRender == NULL || pInterfaceLibMode == NULL || hwRender->devCtlHandle == NULL) {
-        AUDIO_FUNC_LOGE("hwRender or pInterfaceLibMode or hwRender->devCtlHandle is null!");
-        return HDF_FAILURE;
-    }
-
-    uint32_t portId = hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId;
-    if ((portId >= AUDIO_PRIMARY_ID_MIN && portId <= AUDIO_PRIMARY_ID_MAX) ||
-            (portId >= AUDIO_USB_ID_MIN && portId <= AUDIO_USB_ID_MAX)) {
-        return(*pInterfaceLibMode)(hwRender->devCtlHandle, &hwRender->renderParam,
-                                         AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN);
-    } else if (portId >= AUDIO_PRIMARY_EXT_ID_MIN && portId <= AUDIO_PRIMARY_EXT_ID_MAX) {
-        return(*pInterfaceLibMode)(hwRender->devCtlHandle, &hwRender->renderParam,
-                                         AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT);
-    } else if (portId >= AUDIO_A2DP_ID_MIN && portId <= AUDIO_A2DP_ID_MAX) {
-        AUDIO_FUNC_LOGE("Not currently supported!");
-        return AUDIO_HAL_ERR_NOT_SUPPORT;
-    } else {
-        return HDF_FAILURE;
-    }
-}
-
-int32_t AudioSetAcodeModeCapture(struct AudioHwCapture *hwCapture,
-    const InterfaceLibModeCaptureSo *pInterfaceLibMode)
-{
-    AUDIO_FUNC_LOGI();
-    if (hwCapture == NULL || pInterfaceLibMode == NULL || hwCapture->devCtlHandle == NULL) {
-        AUDIO_FUNC_LOGE("hwCapture or pInterfaceLibMode or hwCapture->devCtlHandle is null!");
-        return HDF_FAILURE;
-    }
-
-    uint32_t portId = hwCapture->captureParam.captureMode.hwInfo.deviceDescript.portId;
-    if ((portId >= AUDIO_PRIMARY_ID_MIN && portId <= AUDIO_PRIMARY_ID_MAX) ||
-            (portId >= AUDIO_USB_ID_MIN && portId <= AUDIO_USB_ID_MAX)) {
-        return(*pInterfaceLibMode)(hwCapture->devCtlHandle, &hwCapture->captureParam,
-                                         AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN_CAPTURE);
-    } else if (portId >= AUDIO_PRIMARY_EXT_ID_MIN && portId <= AUDIO_PRIMARY_EXT_ID_MAX) {
-        return(*pInterfaceLibMode)(hwCapture->devCtlHandle, &hwCapture->captureParam,
-                                         AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT_CAPTURE);
-    } else if (portId >= AUDIO_A2DP_ID_MIN && portId <= AUDIO_A2DP_ID_MAX) {
-        AUDIO_FUNC_LOGE("Not currently supported!");
-        return AUDIO_HAL_ERR_NOT_SUPPORT;
-    } else {
-        return HDF_FAILURE;
-    }
-}
-
 int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
                                     const struct AudioSampleAttributes *attrs, const struct AudioHwAdapter *hwAdapter)
 {
@@ -475,13 +424,7 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
         AUDIO_FUNC_LOGE("InitHwRenderParam failed!");
         return HDF_FAILURE;
     }
-    /* Select Path */
-#ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-    if ((*pPathSelAnalysisJson)((void *)&hwRender->renderParam, RENDER_PATH_SELECT) < 0) {
-        AUDIO_FUNC_LOGE("Path Select Fail!");
-        return HDF_FAILURE;
-    }
-#endif
+
     if (hwAdapter->adapterDescriptor.adapterName == NULL) {
         AUDIO_FUNC_LOGE("pointer is null!");
         return HDF_FAILURE;
@@ -505,6 +448,15 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
         AUDIO_FUNC_LOGE("AudioMakeCardServiceName fail");
         return HDF_FAILURE;
     }
+
+    /* Select Path */
+#ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
+    if ((*pPathSelAnalysisJson)((void *)&hwRender->renderParam, RENDER_PATH_SELECT) < 0) {
+        AUDIO_FUNC_LOGE("Path Select Fail!");
+        return HDF_FAILURE;
+    }
+#endif
+
     return HDF_SUCCESS;
 }
 
@@ -550,20 +502,11 @@ static int32_t AudioSetParamToDev(struct AudioHwRender *hwRender, InterfaceLibMo
         AUDIO_FUNC_LOGE("The parameter is empty.");
         return HDF_FAILURE;
     }
-#ifndef AUDIO_HAL_USER
-    /* Select Codec Mode */
-    ret = AudioSetAcodeModeRender(hwRender, pInterfaceLibModeRender);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("Select Codec Mode FAIL! ret = %{public}d", ret);
-        return HDF_FAILURE;
-    }
-#endif
     /* Init RenderPathSelect send first */
     /* portId small than  AUDIO_SERVICE_PORTID_FLAG should SceneSelect */
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     uint32_t portId = hwRender->renderParam.renderMode.hwInfo.deviceDescript.portId;
-    if ((portId >= AUDIO_PRIMARY_ID_MIN && portId <= AUDIO_PRIMARY_ID_MAX) ||
-        (portId >= AUDIO_USB_ID_MIN && portId <= AUDIO_USB_ID_MAX)) {
+    if (portId < AUDIO_USB_ID_MIN) {
         ret = (*pInterfaceLibModeRender)(hwRender->devCtlHandle, &hwRender->renderParam,
             AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE);
         if (ret < 0) {
@@ -876,12 +819,7 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
         AUDIO_FUNC_LOGE("InitHwCaptureParam failed!");
         return HDF_FAILURE;
     }
-#ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-    if ((*pPathSelAnalysisJson)((void *)&hwCapture->captureParam, CAPTURE_PATH_SELECT) < 0) {
-        AUDIO_FUNC_LOGE("Path Select Fail!");
-        return HDF_FAILURE;
-    }
-#endif
+
     if (hwAdapter->adapterDescriptor.adapterName == NULL) {
         AUDIO_FUNC_LOGE("adapterName is NULL!");
         return HDF_FAILURE;
@@ -905,6 +843,14 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
         AUDIO_FUNC_LOGE("AudioMakeCardServiceName fail");
         return HDF_FAILURE;
     }
+
+#ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
+    if ((*pPathSelAnalysisJson)((void *)&hwCapture->captureParam, CAPTURE_PATH_SELECT) < 0) {
+        AUDIO_FUNC_LOGE("Path Select Fail!");
+        return HDF_FAILURE;
+    }
+#endif
+
     return HDF_SUCCESS;
 }
 
@@ -939,12 +885,7 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
         AUDIO_FUNC_LOGE("CAPTURE_OPEN FAIL");
         return HDF_FAILURE;
     }
-#ifndef AUDIO_HAL_USER
-    if (AudioSetAcodeModeCapture(hwCapture, LibCap) < 0) {
-        AUDIO_FUNC_LOGE("Select Codec Mode FAIL!");
-        return HDF_FAILURE;
-    }
-#endif
+
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     if ((*LibCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE) < 0) {
         AUDIO_FUNC_LOGE("SetParams FAIL!");

@@ -420,8 +420,6 @@ int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCap
 void AudioAdapterReleaseCapSubPorts(const struct AudioPortAndCapability *portCapabilitys, int32_t num);
 int32_t AudioAdapterInitAllPorts(struct AudioAdapter *adapter);
 void AudioReleaseRenderHandle(struct AudioHwRender *hwRender);
-int32_t AudioSetAcodeModeRender(struct AudioHwRender *hwRender,
-                                const InterfaceLibModeRenderSo *pInterfaceLibMode);
 int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
                                     const struct AudioSampleAttributes *attrs, const struct AudioHwAdapter *hwAdapter);
 int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender);

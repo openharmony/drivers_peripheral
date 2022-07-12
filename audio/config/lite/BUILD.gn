@@ -14,11 +14,23 @@
 import("//build/lite/config/component/lite_component.gni")
 
 copy("hdf_audio_adapter_json") {
-  sources = [ "//drivers/peripheral/audio/config/audio_adapter_config.json" ]
-  outputs = [ "${root_out_dir}/etc/audio_adapter_config.json" ]
+  if (product_name == "ipcamera_hispark_taurus") {
+    sources = [ "//vendor/${product_company}/hispark_taurus/hals/audio/audio_adapter.json" ]
+  } else {
+    sources = [ "//vendor/${product_company}/${product_name}/hals/audio/audio_adapter.json" ]
+  }
+  outputs = [ "${root_out_dir}/etc/audio_adapter.json" ]
 }
 
 copy("hdf_audio_path_json") {
-  sources = [ "//drivers/peripheral/audio/config/audio_parse.json" ]
-  outputs = [ "${root_out_dir}/etc/audio_parse.json" ]
+  if (product_name == "ipcamera_hispark_taurus") {
+    sources = [
+      "//vendor/${product_company}/hispark_taurus/hals/audio/audio_paths.json",
+    ]
+  } else {
+    sources = [
+      "//vendor/${product_company}/${product_name}/hals/audio/audio_paths.json",
+    ]
+  }
+  outputs = [ "${root_out_dir}/etc/audio_paths.json" ]
 }
