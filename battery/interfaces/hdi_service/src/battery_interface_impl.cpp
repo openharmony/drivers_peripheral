@@ -109,7 +109,7 @@ int32_t BatteryInterfaceImpl::UnRegister()
 
 int32_t BatteryInterfaceImpl::ChangePath(const std::string& path)
 {
-    BATTERY_HILOGD(COMP_HDI, "path is %{public}s", path.c_str());
+    BATTERY_HILOGD(COMP_HDI, "path is %{private}s", path.c_str());
     provider_->SetSysFilePath(path);
     provider_->InitPowerSupplySysfs();
     return HDF_SUCCESS;
