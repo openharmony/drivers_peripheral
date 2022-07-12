@@ -15,6 +15,7 @@
 
 #include "audio_manager.h"
 #include <limits.h>
+#include "osal_mem.h"
 #include "audio_adapter_info_common.h"
 #include "audio_hal_log.h"
 #include "audio_interface_lib_capture.h"
@@ -247,9 +248,9 @@ static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, str
         AUDIO_FUNC_LOGE("param desc or adapter is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(*hwAdapter));
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)OsalMemCalloc(sizeof(*hwAdapter));
     if (hwAdapter == NULL) {
-        AUDIO_FUNC_LOGE("calloc AudioHwAdapter failed");
+        AUDIO_FUNC_LOGE("alloc AudioHwAdapter failed");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;
@@ -280,9 +281,9 @@ static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct 
         AUDIO_FUNC_LOGE("param attrs or adapter is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(*hwAdapter));
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)OsalMemCalloc(sizeof(*hwAdapter));
     if (hwAdapter == NULL) {
-        AUDIO_FUNC_LOGE("calloc AudioHwAdapter failed");
+        AUDIO_FUNC_LOGE("alloc AudioHwAdapter failed");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;

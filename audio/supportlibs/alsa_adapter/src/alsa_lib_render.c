@@ -12,7 +12,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include "alsa_lib_render.h"
+#include "osal_mem.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 
@@ -1205,9 +1207,9 @@ int32_t AudioBindServiceRenderObject(struct DevHandle *handle, const char *name)
         return HDF_FAILURE;
     }
 
-    serviceName = (char *)calloc(1, NAME_LEN);
+    serviceName = (char *)OsalMemCalloc(NAME_LEN);
     if (serviceName == NULL) {
-        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc serviceName");
+        AUDIO_FUNC_LOGE("Failed to alloc serviceName");
         return HDF_FAILURE;
     }
 
@@ -1242,9 +1244,9 @@ struct DevHandle *AudioBindServiceRender(const char *name)
         return NULL;
     }
 
-    handle = (struct DevHandle *)calloc(1, sizeof(struct DevHandle));
+    handle = (struct DevHandle *)OsalMemCalloc(sizeof(struct DevHandle));
     if (handle == NULL) {
-        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc handle");
+        AUDIO_FUNC_LOGE("Failed to alloc handle");
         return NULL;
     }
 

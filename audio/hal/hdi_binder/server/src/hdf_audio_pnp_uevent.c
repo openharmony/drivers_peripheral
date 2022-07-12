@@ -15,6 +15,7 @@
 
 #include "hdf_audio_pnp_uevent.h"
 #include <pthread.h>
+#include <unistd.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <linux/netlink.h>

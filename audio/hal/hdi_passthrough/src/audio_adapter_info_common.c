@@ -343,72 +343,6 @@ int32_t AudioAdapterExist(const char *adapterName)
     return HDF_FAILURE;
 }
 
-static int32_t AudioAdapterPortSync(struct AudioPort *outPorts,
-    const struct AudioPort *desPorts, uint32_t portNum)
-{
-    uint32_t index;
-    int32_t ret;
-
-    if (outPorts == NULL || desPorts == NULL ||
-        portNum == 0 || portNum > SUPPORT_PORT_NUM_MAX) {
-        AUDIO_FUNC_LOGE("Invalid parameter!\n");
-
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    for (index = 0; index < portNum; index++) {
-        if (outPorts[index].portName && desPorts[index].portName) {
-            ret = memcpy_s((void *)outPorts[index].portName, PORT_NAME_LEN,
-                desPorts[index].portName, strlen(desPorts[index].portName));
-            if (ret != EOK) {
-                AUDIO_FUNC_LOGE("memcpy_s port name fail!\n");
-
-                return HDF_FAILURE;
-            }
-            outPorts[index].dir = desPorts[index].dir;
-            outPorts[index].portId = desPorts[index].portId;
-        }
-    }
-
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioAdaptersSync(void)
-{
-    int32_t i, ret;
-
-    if (g_audioAdapterDescs == NULL || g_audioAdapterOut == NULL ||
-        g_adapterNum <= 0 || g_adapterNum > SUPPORT_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("g_audioAdapterDescs or g_audioAdapterOut is null or g_adapterNum is invalid!");
-        return HDF_FAILURE;
-    }
-
-    for (i = 0; i < g_adapterNum; i++) {
-        if (g_audioAdapterDescs[i].adapterName &&
-            g_audioAdapterOut[i].adapterName) {
-            ret = memcpy_s((void *)g_audioAdapterOut[i].adapterName, ADAPTER_NAME_LEN,
-                g_audioAdapterDescs[i].adapterName,
-                strlen(g_audioAdapterDescs[i].adapterName));
-            if (ret != EOK) {
-                AUDIO_FUNC_LOGE("memcpy_s adapter name fail!\n");
-
-                return HDF_FAILURE;
-            }
-
-            g_audioAdapterOut[i].portNum = g_audioAdapterDescs[i].portNum;
-            ret = AudioAdapterPortSync(g_audioAdapterOut[i].ports,
-                g_audioAdapterDescs[i].ports, g_audioAdapterOut[i].portNum);
-            if (ret != HDF_SUCCESS) {
-                AUDIO_FUNC_LOGE("port sync fail!\n");
-
-                return HDF_FAILURE;
-            }
-        }
-    }
-
-    return HDF_SUCCESS;
-}
-
 static void AudioAdapterJudegReleaseDescs(const struct AudioAdapterDescriptor *desc)
 {
     uint32_t portIdx;
@@ -705,7 +639,7 @@ static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const
         return HDF_FAILURE;
     }
 
-    desc->ports = (struct AudioPort *)calloc(1, desc->portNum * sizeof(struct AudioPort));
+    desc->ports = (struct AudioPort *)OsalMemCalloc(desc->portNum * sizeof(struct AudioPort));
     if (desc->ports == NULL) {
         AUDIO_FUNC_LOGE("Out of memory!\n");
 
@@ -751,7 +685,7 @@ static int32_t AudioAdapterParseAdapter(struct AudioAdapterDescriptor *desc,
         return ret;
     }
 
-    desc->adapterName = (char *)calloc(1, ADAPTER_NAME_LEN);
+    desc->adapterName = (char *)OsalMemCalloc(ADAPTER_NAME_LEN);
     if (desc->adapterName == NULL) {
         AUDIO_FUNC_LOGE("Out of memory!\n");
 
@@ -803,9 +737,9 @@ static char *AudioAdaptersGetConfig(const char *fpath)
         fclose(fp);
         return NULL;
     }
-    pJsonStr = (char *)calloc(1, (uint32_t)jsonStrSize + 1);
+    pJsonStr = (char *)OsalMemCalloc((uint32_t)jsonStrSize + 1);
     if (pJsonStr == NULL) {
-        AUDIO_FUNC_LOGE("calloc pJsonStr failed!");
+        AUDIO_FUNC_LOGE("alloc pJsonStr failed!");
         fclose(fp);
         return NULL;
     }
@@ -864,10 +798,10 @@ static int32_t AudioAdaptersSetAdapter(struct AudioAdapterDescriptor **descs,
         return HDF_SUCCESS;
     }
 
-    *descs = (struct AudioAdapterDescriptor *)calloc(1,
+    *descs = (struct AudioAdapterDescriptor *)OsalMemCalloc(
         adapterNum * sizeof(struct AudioAdapterDescriptor));
     if (*descs == NULL) {
-        AUDIO_FUNC_LOGE("calloc g_audioAdapterDescs failed");
+        AUDIO_FUNC_LOGE("alloc g_audioAdapterDescs failed");
 
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -1093,8 +1027,8 @@ int32_t InitPortForCapabilitySub(struct AudioPort portIndex, struct AudioPortCap
     capabilityIndex->formatNum = 1;
     capabilityIndex->formats = &g_formatIdZero;
     capabilityIndex->subPortsNum = 1;
-    capabilityIndex->subPorts = (struct AudioSubPortCapability *)calloc(capabilityIndex->subPortsNum,
-        sizeof(struct AudioSubPortCapability));
+    capabilityIndex->subPorts = (struct AudioSubPortCapability *)OsalMemCalloc(
+        capabilityIndex->subPortsNum * sizeof(struct AudioSubPortCapability));
     if (capabilityIndex->subPorts == NULL) {
         AUDIO_FUNC_LOGE("The pointer is null!");
         return HDF_FAILURE;
