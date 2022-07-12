@@ -36,22 +36,22 @@ const int REGISTER_STATUS_OFF = 0;
 static struct AudioCtlElemValue g_elemValues[4] = {
     {
         .id.cardServiceName = "hdf_audio_codec_primary_dev0",
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Dacl enable",
         .value[0] = 0,
     }, {
         .id.cardServiceName = "hdf_audio_codec_primary_dev0",
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_DAC,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Dacr enable",
         .value[0] = 0,
     }, {
         .id.cardServiceName = "hdf_audio_codec_primary_dev0",
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_PGA,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "LPGA MIC Switch",
         .value[0] = 0,
     }, {
         .id.cardServiceName = "hdf_audio_codec_primary_dev0",
-        .id.iface = AUDIODRV_CTL_ELEM_IFACE_PGA,
+        .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "RPGA MIC Switch",
         .value[0] = 0,
     }

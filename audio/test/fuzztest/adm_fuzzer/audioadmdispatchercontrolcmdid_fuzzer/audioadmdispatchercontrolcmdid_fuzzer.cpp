@@ -29,7 +29,7 @@ namespace Audio {
 
         struct AudioCtlElemValue writeElemValue = {
             .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
-            .id.iface = AUDIODRV_CTL_ELEM_IFACE_GAIN,
+            .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
             .id.itemName = "Mic Left Gain",
             .value[0] = 5,
         };

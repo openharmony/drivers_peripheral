@@ -426,17 +426,6 @@ int32_t AudioCtlRenderGetChannelMode(const struct DevHandle *handle,
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtlRenderSetAcodecMode(const struct DevHandle *handle,
-    int cmdId, const struct AudioHwRenderParam *handleData)
-{
-    if (handle == NULL || handleData == NULL) {
-        AUDIO_FUNC_LOGE("param is NULL!");
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
-
 int32_t AudioInterfaceLibCtlRender(const struct DevHandle *handle,
     int cmdId, struct AudioHwRenderParam *handleData)
 {
@@ -471,9 +460,6 @@ int32_t AudioInterfaceLibCtlRender(const struct DevHandle *handle,
             return (AudioCtlRenderSceneSelect(handle, cmdId, handleData));
         case AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ:
             return (AudioCtlRenderSceneGetGainThreshold(handle, cmdId, handleData));
-        case AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN:
-        case AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT:
-            return (AudioCtlRenderSetAcodecMode(handle, cmdId, handleData));
         case AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ:
             return (AudioCtlRenderGetVolThreshold(handle, cmdId, handleData));
         default:
@@ -1313,8 +1299,6 @@ int32_t AudioInterfaceLibModeRender(const struct DevHandle *handle,
         case AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ:
         case AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE:
         case AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ:
-        case AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_IN:
-        case AUDIODRV_CTL_IOCTL_ACODEC_CHANGE_OUT:
         case AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ:
             return (AudioInterfaceLibCtlRender(handle, cmdId, handleData));
         default:

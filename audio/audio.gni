@@ -12,7 +12,7 @@ if (defined(ohos_lite)) {
 
 declare_args() {
   drivers_peripheral_audio_feature_mono_to_stereo = false
-  drivers_peripheral_audio_hal_notsupport_pathselect = true
+  drivers_peripheral_audio_hal_notsupport_pathselect = false
   drivers_peripheral_audio_hdf_proxy_stub = true
   drivers_peripheral_audio_user_mode = false
   drivers_peripheral_audio_full_test_suite = false

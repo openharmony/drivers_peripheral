@@ -29,7 +29,7 @@ namespace Audio {
             return false;
         }
         struct DevHandle *(*BindServiceRender)(const char *) = nullptr;
-        int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
+        int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int32_t, struct AudioHwRenderParam *) = nullptr;
         BindServiceRender = (struct DevHandle *(*)(const char *))dlsym(PtrHandle, "AudioBindServiceRender");
         if (BindServiceRender == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioBindServiceRender failed \n", __func__);
