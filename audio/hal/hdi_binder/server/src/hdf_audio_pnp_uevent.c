@@ -34,16 +34,15 @@
 #define UEVENT_ACTION_ADD       "add"
 #define UEVENT_ACTION_REMOVE    "remove"
 #define UEVENT_ACTION_CHANGE    "change"
-#define UEVENT_TYPE_PORT        "typec_port"
 #define UEVENT_TYPE_EXTCON      "extcon3"
-#define UEVENT_NAME_DIGITAL_KEY "USB-C HEADSET"
 #define UEVENT_NAME_HEADSET     "headset"
-#define UEVENT_USB_HOST         "USB-HOST=0"
-#define UEVENT_ANALOG_KEY       "HEADPHONE=0"
 #define UEVENT_STATE_ANALOG_HS0 "MICROPHONE=0"
 #define UEVENT_STATE_ANALOG_HS1 "MICROPHONE=1"
 #define UEVENT_SUBSYSTEM_SWITCH "switch"
 #define UEVENT_SWITCH_NAME_H2W  "h2w"
+#define UEVENT_HDI_NAME         "HID_NAME="
+#define UEVENT_USB_AUDIO        "USB Audio"
+#define UEVENT_USB_HEADSET      "HEADSET"
 
 #define UEVENT_SOCKET_BUFF_SIZE (64 * 1024)
 #define UEVENT_SOCKET_GROUPS    0xffffffff
@@ -51,10 +50,6 @@
 
 #define TIMEVAL_SECOND  0
 #define TIMEVAL_USECOND (100 * 1000)
-
-#define AUDIO_PNP_STATE_INIT 0
-#define AUDIO_PNP_STATE_ON   1
-#define AUDIO_PNP_STATE_OFF  (-1)
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_HOST
 
@@ -66,111 +61,8 @@ struct AudioPnpUevent {
     const char *subSystem;
     const char *switchName;
     const char *switchState;
+    const char *hidName;
 };
-
-struct AudioUsbPnpTag {
-    bool audioPnpState;
-    int32_t audioPnpAnalogState;
-    int32_t audioPnpDigitalState;
-};
-
-static int32_t AudioUsbDeviceStateCheck(struct AudioPnpUevent *audioPnpUevent, struct AudioUsbPnpTag *pnpTag)
-{
-    if (audioPnpUevent == NULL || pnpTag == NULL) {
-        AUDIO_FUNC_LOGE("audioPnpUevent or pnpTag is null!");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (strncmp(audioPnpUevent->action, UEVENT_ACTION_ADD, strlen(UEVENT_ACTION_ADD)) == 0) {
-        pnpTag->audioPnpState = true;
-    } else if (strncmp(audioPnpUevent->action, UEVENT_ACTION_REMOVE, strlen(UEVENT_ACTION_REMOVE)) == 0) {
-        pnpTag->audioPnpState = false;
-    }
-
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioUsbDigitalDeviceCheck(struct AudioPnpUevent *audioPnpUevent, struct AudioUsbPnpTag *pnpTag)
-{
-    struct AudioEvent audioEvent;
-    if (audioPnpUevent == NULL || pnpTag == NULL) {
-        AUDIO_FUNC_LOGE("audioPnpUevent or pnpTag is null!");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (strstr(audioPnpUevent->name, UEVENT_NAME_DIGITAL_KEY) != NULL) {
-        if (pnpTag->audioPnpState) {
-            pnpTag->audioPnpDigitalState = AUDIO_PNP_STATE_OFF;
-            AUDIO_FUNC_LOGI("USB-C DIGITAL HEADSET Online.");
-            audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
-            audioEvent.deviceType = HDF_AUDIO_USBA_HEADPHONE;
-            AudioPnpUpdateAndSend(audioEvent);
-        } else {
-            pnpTag->audioPnpDigitalState = AUDIO_PNP_STATE_OFF;
-            AUDIO_FUNC_LOGI("USB-C DIGITAL HEADSET Offline.");
-            audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
-            audioEvent.deviceType = HDF_AUDIO_USBA_HEADPHONE;
-            AudioPnpUpdateAndSend(audioEvent);
-        }
-    }
-
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioUsbAnalogDeviceCheck(struct AudioPnpUevent *audioPnpUevent, struct AudioUsbPnpTag *pnpTag)
-{
-    struct AudioEvent audioEvent;
-    if (audioPnpUevent == NULL || pnpTag == NULL) {
-        AUDIO_FUNC_LOGE("audioPnpUevent or pnpTag is null!");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (strncmp(audioPnpUevent->devType, UEVENT_TYPE_PORT, strlen(UEVENT_TYPE_PORT)) == 0) {
-        pnpTag->audioPnpAnalogState = AUDIO_PNP_STATE_ON;
-    }
-    if (strstr(audioPnpUevent->state, UEVENT_USB_HOST) != NULL && pnpTag->audioPnpAnalogState ==
-        AUDIO_PNP_STATE_ON && pnpTag->audioPnpDigitalState != AUDIO_PNP_STATE_OFF) {
-        if (strstr(audioPnpUevent->state, UEVENT_ANALOG_KEY) != NULL) {
-            pnpTag->audioPnpAnalogState = AUDIO_PNP_STATE_INIT;
-            AUDIO_FUNC_LOGI("USB-C ANALOG HEADSET Online.");
-            audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
-            audioEvent.deviceType = HDF_AUDIO_USB_HEADPHONE;
-            AudioPnpUpdateAndSend(audioEvent);
-        } else if (strstr(audioPnpUevent->state, UEVENT_ANALOG_KEY) != NULL) {
-            pnpTag->audioPnpAnalogState = AUDIO_PNP_STATE_INIT;
-            AUDIO_FUNC_LOGI("USB-C ANALOG HEADSET Offline.");
-            audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
-            audioEvent.deviceType = HDF_AUDIO_USB_HEADPHONE;
-            AudioPnpUpdateAndSend(audioEvent);
-        }
-        pnpTag->audioPnpDigitalState = AUDIO_PNP_STATE_INIT;
-    }
-
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioPnpUeventCompare(struct AudioPnpUevent *audioPnpUevent)
-{
-    static struct AudioUsbPnpTag audioUsbPnpTag = {
-        .audioPnpState = false,
-        .audioPnpAnalogState = AUDIO_PNP_STATE_INIT,
-        .audioPnpDigitalState = AUDIO_PNP_STATE_INIT,
-    };
-    if (AudioUsbDeviceStateCheck(audioPnpUevent, &audioUsbPnpTag) != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("usb status add/remove fail!");
-        return HDF_FAILURE;
-    }
-    if (AudioUsbDigitalDeviceCheck(audioPnpUevent, &audioUsbPnpTag) != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("usb digital headset/phone check fail!");
-        return HDF_FAILURE;
-    }
-    if (AudioUsbAnalogDeviceCheck(audioPnpUevent, &audioUsbPnpTag) != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("usb analog headset/phone check fail!");
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
 
 static int32_t AudioAnalogHeadsetDeviceCheck(struct AudioPnpUevent *audioPnpUevent)
 {
@@ -219,6 +111,42 @@ static int32_t AudioAnalogHeadsetDeviceCheck(struct AudioPnpUevent *audioPnpUeve
     return AudioPnpUpdateInfoOnly(audioEvent);
 }
 
+static int32_t AudioDigitalHeadsetDeviceCheck(struct AudioPnpUevent *audioPnpUevent)
+{
+    struct AudioEvent audioEvent;
+    if (audioPnpUevent == NULL) {
+        AUDIO_FUNC_LOGE("audioPnpUevent is null!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (audioPnpUevent->action == NULL || audioPnpUevent->hidName == NULL) {
+        AUDIO_FUNC_LOGE("action or hidName is null!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (strcmp(audioPnpUevent->action, UEVENT_ACTION_ADD) == 0 &&
+        ((strstr(audioPnpUevent->hidName, UEVENT_USB_AUDIO) != NULL) ||
+        (strstr(audioPnpUevent->hidName, UEVENT_USB_HEADSET) != NULL))) {
+        AUDIO_FUNC_LOGI("USB Audio(%{public}s) add", audioPnpUevent->hidName);
+        audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
+        audioEvent.deviceType = HDF_AUDIO_USB_HEADSET;
+        (void)AudioPnpUpdateAndSend(audioEvent);
+        return HDF_SUCCESS;
+    }
+
+    if (strcmp(audioPnpUevent->action, UEVENT_ACTION_REMOVE) == 0 &&
+        ((strstr(audioPnpUevent->hidName, UEVENT_USB_AUDIO) != NULL) ||
+        (strstr(audioPnpUevent->hidName, UEVENT_USB_HEADSET) != NULL))) {
+        AUDIO_FUNC_LOGI("USB Audio(%{public}s) remove", audioPnpUevent->hidName);
+        audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
+        audioEvent.deviceType = HDF_AUDIO_USB_HEADSET;
+        (void)AudioPnpUpdateAndSend(audioEvent);
+        return HDF_SUCCESS;
+    }
+
+    return HDF_SUCCESS;
+}
+
 static int32_t AudioPnpUeventParse(const char *msg, const int32_t strLength)
 {
     errno_t ret;
@@ -233,15 +161,8 @@ static int32_t AudioPnpUeventParse(const char *msg, const int32_t strLength)
         AUDIO_FUNC_LOGE("msg copy fail! ret = %{public}d", ret);
         return HDF_FAILURE;
     }
-    struct AudioPnpUevent audioPnpUevent = {
-        .action = "",
-        .name = "",
-        .state = "",
-        .devType = "",
-        .subSystem = "",
-        .switchName = "",
-        .switchState = ""
-    };
+
+    struct AudioPnpUevent audioPnpUevent = {"", "", "", "", "", "", "", ""};
     char *msgTmp = eventMsg;
     while (*msgTmp) {
         if (strncmp(msgTmp, UEVENT_ACTION, strlen(UEVENT_ACTION)) == 0) {
@@ -265,11 +186,16 @@ static int32_t AudioPnpUeventParse(const char *msg, const int32_t strLength)
         } else if (strncmp(msgTmp, UEVENT_SWITCH_STATE, strlen(UEVENT_SWITCH_STATE)) == 0) {
             msgTmp += strlen(UEVENT_SWITCH_STATE);
             audioPnpUevent.switchState = msgTmp;
+        } else if (strncmp(msgTmp, UEVENT_HDI_NAME, strlen(UEVENT_HDI_NAME)) == 0) {
+            msgTmp += strlen(UEVENT_HDI_NAME);
+            audioPnpUevent.hidName = msgTmp;
         }
         msgTmp += strlen(msgTmp) + 1; // 1 is a skip character '\0'
     }
+
     (void)AudioAnalogHeadsetDeviceCheck(&audioPnpUevent);
-    return AudioPnpUeventCompare(&audioPnpUevent);
+    (void)AudioDigitalHeadsetDeviceCheck(&audioPnpUevent);
+    return HDF_SUCCESS;
 }
 
 static int AudioPnpUeventOpen(int *fd)
