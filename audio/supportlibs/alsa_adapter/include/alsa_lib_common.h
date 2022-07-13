@@ -20,7 +20,7 @@
 #include "hdf_io_service_if.h"
 #include "hdf_sbuf.h"
 #include "osal_mem.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 #include "audio_if_lib_common.h"
 
 #define SERVIC_NAME_MAX_LEN 32

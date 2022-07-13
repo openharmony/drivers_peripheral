@@ -17,7 +17,7 @@
 #include "hdf_device_object.h"
 #include "audio_adapter_info_common.h"
 #include "audio_events.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 #include "hdf_audio_events.h"
 #include "hdf_audio_server_common.h"
 
