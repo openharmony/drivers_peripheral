@@ -689,9 +689,9 @@ int32_t WifiCmdCancelRemainOnChannel(const char *ifName)
     return ret;
 }
 
-int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd)
+int32_t WifiCmdAddIf(const char *ifName, const WifiIfAdd *ifAdd)
 {
-    if (ifname == NULL || ifAdd == NULL) {
+    if (ifName == NULL || ifAdd == NULL) {
         HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
@@ -701,8 +701,8 @@ int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd)
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
-    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifname);
-    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, ifAdd->type);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, ifAdd, sizeof(WifiIfAdd));
     int32_t ret;
     if (isSerializeFailed) {
         HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
@@ -714,9 +714,9 @@ int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd)
     return ret;
 }
 
-int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove)
+int32_t WifiCmdRemoveIf(const char *ifName, const WifiIfRemove *ifRemove)
 {
-    if (ifname == NULL || ifRemove == NULL) {
+    if (ifName == NULL || ifRemove == NULL) {
         HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
@@ -726,7 +726,7 @@ int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove)
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
-    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifname);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, ifRemove, sizeof(WifiIfRemove));
     int32_t ret;
     if (isSerializeFailed) {
@@ -739,9 +739,9 @@ int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove)
     return ret;
 }
 
-int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe)
+int32_t WifiCmdSetApWpsP2pIe(const char *ifName, const WifiAppIe *appIe)
 {
-    if (ifname == NULL || appIe == NULL) {
+    if (ifName == NULL || appIe == NULL) {
         HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
@@ -751,7 +751,7 @@ int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe)
         return RET_CODE_FAILURE;
     }
     bool isSerializeFailed = false;
-    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifname);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteString(data, ifName);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint32(data, appIe->ieLen);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint8(data, appIe->appIeType);
     if (appIe->ie == NULL) {
@@ -770,11 +770,11 @@ int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe)
     return ret;
 }
 
-int32_t WifiCmdGetDrvFlags(const char *ifname, WifiGetDrvFlags *params)
+int32_t WifiCmdGetDrvFlags(const char *ifName, WifiGetDrvFlags *params)
 {
     int32_t ret;
 
-    if (ifname == NULL || params == NULL) {
+    if (ifName == NULL || params == NULL) {
         HDF_LOGE("%s: input parameter invalid!", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
     }
@@ -787,7 +787,7 @@ int32_t WifiCmdGetDrvFlags(const char *ifname, WifiGetDrvFlags *params)
             break;
         }
 
-        if (!HdfSbufWriteString(data, ifname)) {
+        if (!HdfSbufWriteString(data, ifName)) {
             HDF_LOGE("%s: HdfSbufWriteString failed!", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;

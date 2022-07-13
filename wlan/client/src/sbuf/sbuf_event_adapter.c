@@ -243,7 +243,7 @@ int OnWiFiEvents(struct HdfDevEventlistener *listener,
     }
     const char *ifName = HdfSbufReadString(data);
     if (ifName == NULL) {
-        HDF_LOGE("%s fail to get ifname", __FUNCTION__);
+        HDF_LOGE("%s fail to get ifName", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
     HDF_LOGI("%s: WifiDriverEventProcess event=%d", __FUNCTION__, eventId);
