@@ -61,7 +61,7 @@ public:
     int32_t ParseThermalHdiXMLConfig(const std::string& path);
     void ParseBaseNode(xmlNodePtr node);
     void ParsePollingNode(xmlNodePtr node);
-    void SaveThermalDfxTraceInfo(xmlNodePtr node, XMLThermalNodeInfo tn);
+    void ParsePollingSubNode(xmlNodePtr node, XMLThermalNodeInfo& tn);
     void ParseTracingNode(xmlNodePtr node);
     void ParseTracingSubNode(xmlNodePtr node);
     void ParseConfigInfo(const xmlNode* cur, std::vector<XMLThermalZoneInfo>& tzInfoList,
