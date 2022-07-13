@@ -873,6 +873,39 @@ int32_t StartChannelMeas(const char *ifName, const struct MeasParam *measParam)
     return ret;
 }
 
+int32_t SetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *param)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct HdfSBuf *req = NULL;
+
+    req = HdfSbufObtainDefaultSize();
+    if (req == NULL) {
+        HDF_LOGE("%{public}s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
+        return ret;
+    }
+
+    do {
+        if (!HdfSbufWriteString(req, ifName)) {
+            HDF_LOGE("%{public}s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteInt32(req, param->cmdId)) {
+            HDF_LOGE("%{public}s: write cmd fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteBuffer(req, param->buf, param->bufLen)) {
+            HDF_LOGE("%{public}s: write buffer data fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_CONFIG_PROJECTION_SCREEN, req, NULL);
+        if (ret != RET_CODE_SUCCESS) {
+            HDF_LOGE("%{public}s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
+        }
+    } while (0);
+
+    HdfSbufRecycle(req);
+    return ret;
+}
 #ifdef __cplusplus
 #if __cplusplus
 }

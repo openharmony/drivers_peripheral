@@ -265,6 +265,19 @@ struct IWiFi {
      * @version 1.0
      */
     int32_t (*getChannelMeasResult)(const char *ifName, struct MeasResult *measResult);
+
+    /**
+     * @brief Config projection screen parameters.
+     *
+     * @param ifName Indicates the pointer to the network interface name.
+     * @param param Indicates the parameters used to config projection screen.
+     *
+     * @return Returns <b>0</b> if  Config projection screen parameters successful; returns a negative value otherwise.
+     *
+     * @since 3.2
+     * @version 1.0
+     */
+    int32_t (*setProjectionScreenParam)(const char *ifName, const ProjScrnCmdParam *param);
 };
 
 /**
