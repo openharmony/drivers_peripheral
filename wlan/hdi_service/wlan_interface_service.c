@@ -66,6 +66,7 @@ struct WlanInterfaceService *WlanInterfaceServiceGet(void)
     service->stub.interface.SetPowerMode = WlanInterfaceSetPowerMode;
     service->stub.interface.StartChannelMeas = WlanInterfaceStartChannelMeas;
     service->stub.interface.GetChannelMeasResult = WlanInterfaceGetChannelMeasResult;
+    service->stub.interface.SetProjectionScreenParam = WlanInterfaceSetProjectionScreenParam;
     return service;
 }
 

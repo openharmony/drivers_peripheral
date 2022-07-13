@@ -44,6 +44,14 @@ extern "C" {
 #define WIFI_POWER_MODE_THROUGH_WALL 2
 #define WIFI_POWER_MODE_NUM 3
 
+typedef enum {
+    CMD_CLOSE_GO_CAC,
+    CMD_SET_GO_CSA_CHANNEL,
+    CMD_SET_GO_RADAR_DETECT,
+    CMD_ID_MCC_STA_P2P_QUOTA_TIME,
+    CMD_ID_CTRL_ROAM_CHANNEL
+} ProjectionScreenCmd;
+
 /* common related interface */
 enum WifiDriverClientResultCode {
     RET_CODE_SUCCESS = 0,
@@ -224,6 +232,12 @@ struct MeasResult {
     int32_t noise;
 };
 
+typedef struct {
+    int32_t cmdId;
+    uint32_t bufLen;
+    int8_t buf[0];
+} ProjScrnCmdParam;
+
 int32_t WifiDriverClientInit(void);
 void WifiDriverClientDeinit(void);
 
@@ -231,15 +245,13 @@ int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result);
 int32_t IsSupportCombo(uint8_t *isSupportCombo);
 int32_t GetComboInfo(uint64_t *comboInfo, uint32_t size);
 int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len);
-int32_t GetDevMacAddr(const char *ifName,
-    int32_t type, uint8_t *mac, uint8_t len);
+int32_t GetDevMacAddr(const char *ifName, int32_t type, uint8_t *mac, uint8_t len);
 int32_t GetValidFreqByBand(const char *ifName, int32_t band,
     struct FreqInfoResult *result, uint32_t size);
 int32_t SetTxPower(const char *ifName, int32_t power);
 int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result);
 int32_t WifiSetCountryCode(const char *ifName, const char *code, uint32_t len);
 int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len);
-
 int32_t AcquireChipId(const char *ifName, uint8_t *chipId);
 int32_t GetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t *num);
 int32_t SetResetDriver(const uint8_t chipId, const char *ifName);
@@ -248,6 +260,7 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode);
 int32_t SetPowerMode(const char *ifName, uint8_t mode);
 int32_t StartChannelMeas(const char *ifName, const struct MeasParam *measParam);
 int32_t GetChannelMeasResult(const char *ifName, struct MeasResult *measResult);
+int32_t SetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *param);
 
 /* wpa related interface */
 #define MAX_SSID_LEN 32
@@ -464,9 +477,9 @@ int32_t WifiCmdSetNetdev(const char *ifName, WifiSetNewDev *info);
 int32_t WifiCmdStaRemove(const char *ifName, const uint8_t *addr, uint32_t addrLen);
 int32_t WifiCmdSendAction(const char *ifName, WifiActionData *actionData);
 int32_t WifiCmdSetClient(uint32_t clientNum);
-int32_t WifiCmdProbeReqReport(const char* ifName, const int32_t *report);
-int32_t WifiCmdRemainOnChannel(const char* ifName, const WifiOnChannel *onChannel);
-int32_t WifiCmdCancelRemainOnChannel(const char* ifName);
+int32_t WifiCmdProbeReqReport(const char *ifName, const int32_t *report);
+int32_t WifiCmdRemainOnChannel(const char *ifName, const WifiOnChannel *onChannel);
+int32_t WifiCmdCancelRemainOnChannel(const char *ifName);
 int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd);
 int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove);
 int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe);

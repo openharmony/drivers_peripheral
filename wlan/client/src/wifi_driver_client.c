@@ -15,6 +15,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <osal_mem.h>
 #include "wifi_common_cmd.h"
 #include "hdf_log.h"
 #include "securec.h"

@@ -51,13 +51,26 @@
 #define STR_WLAN1     "wlan1"
 #define STR_P2P0      "p2p0"
 #define STR_P2P0_X    "p2p0-"
+#define NET_DEVICE_INFO_PATH "/sys/class/net"
 
-#define PRIMARY_ID_POWER_MODE    0x8bfd
+#define PRIMARY_ID_POWER_MODE   0x8bfd
 #define SECONDARY_ID_POWER_MODE 0x101
 #define SET_POWER_MODE_SLEEP     "pow_mode sleep"
 #define SET_POWER_MODE_INIT      "pow_mode init"
 #define SET_POWER_MODE_THIRD     "pow_mode third"
 #define GET_POWER_MODE           "get_pow_mode"
+
+#define CMD_SET_CLOSE_GO_CAC      "SET_CLOSE_GO_CAC"
+#define CMD_SET_CHANGE_GO_CHANNEL "CMD_SET_CHANGE_GO_CHANNEL"
+#define CMD_SET_GO_DETECT_RADAR   "CMD_SET_GO_DETECT_RADAR"
+#define CMD_SET_DYNAMIC_DBAC_MODE "SET_DYNAMIC_DBAC_MODE"
+#define CMD_SET_P2P_SCENES        "CMD_SET_P2P_SCENES"
+#define P2P_BUF_SIZE              64
+#define MAX_PRIV_CMD_SIZE         4096
+#define 2_4G_LOW_LITMIT_FREQ      2400
+#define 2_4G_HIGH_LIMIT_FREQ      2500
+#define 5G_LOW_LIMIT_FREQ         5100
+#define 5G_HIGH_LIMIT_FREQ        5900
 
 // vendor attr
 enum AndrWifiAttr {
@@ -70,13 +83,13 @@ enum AndrWifiAttr {
 
 struct FamilyData {
     const char *group;
-    int id;
+    int32_t id;
 };
 
 struct WifiHalInfo {
     struct nl_sock *cmdSock;
     struct nl_sock *eventSock;
-    int familyId;
+    int32_t familyId;
 
     // thread controller info
     pthread_t thread;
@@ -100,6 +113,12 @@ typedef struct {
     char interfaceName[IFNAMSIZ];
     union HwprivReqData data;
 } HwprivIoctlData;
+
+typedef struct {
+    uint32_t size;
+    uint32_t len;
+    uint8_t *buf;
+} WifiPrivCmd;
 
 static struct WifiHalInfo g_wifiHalInfo = {0};
 
@@ -157,7 +176,7 @@ static void DisconnectCmdSocket(void)
 
 static int32_t CmdSocketErrorHandler(struct sockaddr_nl *nla, struct nlmsgerr *err, void *arg)
 {
-    int *ret = (int *)arg;
+    int32_t *ret = (int32_t *)arg;
 
     *ret = err->error;
     return NL_SKIP;
@@ -165,7 +184,7 @@ static int32_t CmdSocketErrorHandler(struct sockaddr_nl *nla, struct nlmsgerr *e
 
 static int32_t CmdSocketFinishHandler(struct nl_msg *msg, void *arg)
 {
-    int *ret = (int *)arg;
+    int32_t *ret = (int32_t *)arg;
 
     *ret = 0;
     return NL_SKIP;
@@ -173,7 +192,7 @@ static int32_t CmdSocketFinishHandler(struct nl_msg *msg, void *arg)
 
 static int32_t CmdSocketAckHandler(struct nl_msg *msg, void *arg)
 {
-    int *err = (int *)arg;
+    int32_t *err = (int32_t *)arg;
 
     *err = 0;
     return NL_STOP;
@@ -207,77 +226,94 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
         return RET_CODE_FAILURE;
     }
 
-    rc = nl_send_auto(g_wifiHalInfo.cmdSock, msg); // seq num auto add
-    if (rc < 0) {
-        HILOG_ERROR(LOG_CORE, "%s: nl_send_auto failed", __FUNCTION__);
-        goto out;
-    }
-
-    cb = nl_cb_alloc(NL_CB_DEFAULT);
-    if (cb == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: nl_cb_alloc failed", __FUNCTION__);
-        rc = RET_CODE_FAILURE;
-        goto out;
-    }
-    nl_cb_err(cb, NL_CB_CUSTOM, CmdSocketErrorHandler, &error);
-    nl_cb_set(cb, NL_CB_FINISH, NL_CB_CUSTOM, CmdSocketFinishHandler, &error);
-    nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, CmdSocketAckHandler, &error);
-    if (handler != NULL) {
-        nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, handler, data);
-    }
-    /* wait for reply */
-    error = 1;
-    while (error > 0) {
-        rc = nl_recvmsgs(g_wifiHalInfo.cmdSock, cb);
+    do {
+        rc = nl_send_auto(g_wifiHalInfo.cmdSock, msg);
         if (rc < 0) {
-            HILOG_ERROR(LOG_CORE, "%s: nl_recvmsgs failed: rc = %d, errno = %d, (%s)", __FUNCTION__, rc, errno,
-                strerror(errno));
+            HILOG_ERROR(LOG_CORE, "%s: nl_send_auto failed", __FUNCTION__);
+            break;
         }
-    }
-    nl_cb_put(cb);
-out:
+
+        cb = nl_cb_alloc(NL_CB_DEFAULT);
+        if (cb == NULL) {
+            HILOG_ERROR(LOG_CORE, "%s: nl_cb_alloc failed", __FUNCTION__);
+            rc = RET_CODE_FAILURE;
+            break;
+        }
+        nl_cb_err(cb, NL_CB_CUSTOM, CmdSocketErrorHandler, &error);
+        nl_cb_set(cb, NL_CB_FINISH, NL_CB_CUSTOM, CmdSocketFinishHandler, &error);
+        nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, CmdSocketAckHandler, &error);
+        if (handler != NULL) {
+            nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, handler, data);
+        }
+        /* wait for reply */
+        error = 1;
+        while (error > 0) {
+            rc = nl_recvmsgs(g_wifiHalInfo.cmdSock, cb);
+            if (rc < 0) {
+                HILOG_ERROR(LOG_CORE, "%s: nl_recvmsgs failed: rc = %d, errno = %d, (%s)", __FUNCTION__, rc, errno,
+                    strerror(errno));
+            }
+        }
+        nl_cb_put(cb);
+    } while (0);
+
     pthread_mutex_unlock(&g_wifiHalInfo.mutex);
     return ((rc == 0) ? RET_CODE_SUCCESS : RET_CODE_FAILURE);
 }
 
-static int FamilyIdHandler(struct nl_msg *msg, void *arg)
+static void ParseFamilyId(struct nlattr *attr, struct FamilyData *familyData)
+{
+    struct nlattr *tmp = NULL;
+    void *data = NULL;
+    int32_t len;
+    int32_t i;
+
+    nla_for_each_nested(tmp, attr, i) {
+        struct nlattr *attrMcastGrp[CTRL_ATTR_MCAST_GRP_MAX + 1];
+        data = nla_data(tmp);
+        len = nla_len(tmp);
+        nla_parse(attrMcastGrp, CTRL_ATTR_MCAST_GRP_MAX, data, len, NULL);
+        data = nla_data(attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME]);
+        len = nla_len(attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME]);
+        if (attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME] && attrMcastGrp[CTRL_ATTR_MCAST_GRP_ID] &&
+            strncmp((char *)data, familyData->group, len) == 0) {
+            familyData->id = nla_get_u32(attrMcastGrp[CTRL_ATTR_MCAST_GRP_ID]);
+        }
+    }
+}
+
+static int32_t FamilyIdHandler(struct nl_msg *msg, void *arg)
 {
     struct FamilyData *familyData = (struct FamilyData *)arg;
-    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
+    struct genlmsghdr *hdr = NULL;
     struct nlattr *attr[CTRL_ATTR_MAX + 1];
-    struct nlattr *mcastGrp = NULL;
-    int i;
+    void *data = NULL;
+    int32_t len;
 
+    hdr = nlmsg_data(nlmsg_hdr(msg));
     if (hdr == NULL) {
         HILOG_ERROR(LOG_CORE, "%s: get nlmsg header fail", __FUNCTION__);
         return NL_SKIP;
     }
 
-    nla_parse(attr, CTRL_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
+    data = genlmsg_attrdata(hdr, 0);
+    len = genlmsg_attrlen(hdr, 0)
+    nla_parse(attr, CTRL_ATTR_MAX, data, len, NULL);
     if (!attr[CTRL_ATTR_MCAST_GROUPS]) {
         return NL_SKIP;
     }
 
-    nla_for_each_nested(mcastGrp, attr[CTRL_ATTR_MCAST_GROUPS], i) {
-        struct nlattr *attrMcastGrp[CTRL_ATTR_MCAST_GRP_MAX + 1];
-        nla_parse(attrMcastGrp, CTRL_ATTR_MCAST_GRP_MAX, nla_data(mcastGrp), nla_len(mcastGrp), NULL);
-        if (attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME] && attrMcastGrp[CTRL_ATTR_MCAST_GRP_ID] &&
-            strncmp(nla_data(attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME]), familyData->group,
-                nla_len(attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME])) == 0) {
-            familyData->id = nla_get_u32(attrMcastGrp[CTRL_ATTR_MCAST_GRP_ID]);
-            break;
-        }
-    };
+    ParseFamilyId(attr[CTRL_ATTR_MCAST_GROUPS], familyData);
 
     return NL_SKIP;
 }
 
-static int GetMulticastId(const char *family, const char *group)
+static int32_t GetMulticastId(const char *family, const char *group)
 {
     struct nl_msg *msg = NULL;
-    int ret;
+    int32_t ret;
     static struct FamilyData familyData;
-    int familyId = genl_ctrl_resolve(g_wifiHalInfo.cmdSock, "nlctrl");
+    int32_t familyId = genl_ctrl_resolve(g_wifiHalInfo.cmdSock, "nlctrl");
 
     familyData.group = group;
     familyData.id = -ENOENT;
@@ -304,10 +340,10 @@ static int GetMulticastId(const char *family, const char *group)
     return ret;
 }
 
-static int NlsockAddMembership(struct nl_sock *sock, const char *group)
+static int32_t NlsockAddMembership(struct nl_sock *sock, const char *group)
 {
-    int id;
-    int ret;
+    int32_t id;
+    int32_t ret;
 
     id = GetMulticastId(NL80211_GENL_NAME, group);
     if (id < 0) {
@@ -327,7 +363,7 @@ static int NlsockAddMembership(struct nl_sock *sock, const char *group)
 
 static int32_t ConnectEventSocket(void)
 {
-    int ret;
+    int32_t ret;
 
     g_wifiHalInfo.eventSock = OpenNetlinkSocket();
     if (g_wifiHalInfo.eventSock == NULL) {
@@ -343,19 +379,19 @@ static int32_t ConnectEventSocket(void)
 
     ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_MLME);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for mlme failed.\n", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for mlme failed.", __FUNCTION__);
         goto err;
     }
 
     ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_REG);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for regulatory failed.\n", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for regulatory failed.", __FUNCTION__);
         goto err;
     }
 
     ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_VENDOR);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for vendor failed.\n", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for vendor failed.", __FUNCTION__);
         goto err;
     }
 
@@ -432,12 +468,12 @@ int32_t WifiDriverClientInit(void)
     }
 
     if (ConnectEventSocket() != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: connect event socket failed\n", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: connect event socket failed", __FUNCTION__);
         goto err_event;
     }
 
     if (WifiMsgRegisterEventListener() != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: WifiMsgRegisterEventListener failed\n", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: WifiMsgRegisterEventListener failed", __FUNCTION__);
         goto err_reg;
     }
 
@@ -574,57 +610,88 @@ struct PrivDevMac {
     uint8_t len;
 };
 
-static int32_t ParserValidFreq(struct nl_msg *msg, void *arg)
+static nlattr *GetWiphyBands(struct genlmsghdr *hdr)
 {
-    struct FreqInfoResult *result = (struct FreqInfoResult *)arg;
-    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
     struct nlattr *attrMsg[NL80211_ATTR_MAX + 1];
-    struct nlattr *attrBand[NL80211_BAND_ATTR_MAX + 1];
+    void *data = genlmsg_attrdata(hdr, 0);
+    int32_t len = genlmsg_attrlen(hdr, 0);
+    nla_parse(attrMsg, NL80211_ATTR_MAX, data, len, NULL);
+    if (!attrMsg[NL80211_ATTR_WIPHY_BANDS]) {
+        HILOG_ERROR(LOG_CORE, "%s: no wiphy bands", __FUNCTION__);
+    }
+    return attrMsg[NL80211_ATTR_WIPHY_BANDS];
+}
+
+static void GetCenterFreq(struct nlattr *bands, struct FreqInfoResult *result)
+{
     struct nlattr *attrFreq[NL80211_FREQUENCY_ATTR_MAX + 1];
-    struct nlattr *nlBand = NULL, *nlFreq = NULL;
-    int i, j;
+    struct nlattr *nlFreq = NULL;
+    void *data = NULL;
+    int32_t len;
+    int32_t i;
     int32_t freq;
     static struct nla_policy freqPolicy[NL80211_FREQUENCY_ATTR_MAX + 1];
     freqPolicy[NL80211_FREQUENCY_ATTR_FREQ].type = NLA_U32;
     freqPolicy[NL80211_FREQUENCY_ATTR_MAX_TX_POWER].type = NLA_U32;
 
-    nla_parse(attrMsg, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
-    if (!attrMsg[NL80211_ATTR_WIPHY_BANDS]) {
-        HILOG_ERROR(LOG_CORE, "%s: no wiphy bands", __FUNCTION__);
-        return NL_SKIP;
-    }
-    // get each ieee80211_supported_band
-    nla_for_each_nested(nlBand, attrMsg[NL80211_ATTR_WIPHY_BANDS], i)
+    // get each ieee80211_channel
+    nla_for_each_nested(nlFreq, bands, i)
     {
-        nla_parse(attrBand, NL80211_BAND_ATTR_MAX, nla_data(nlBand), nla_len(nlBand), NULL);
-        if (attrBand[NL80211_BAND_ATTR_FREQS] == NULL)
+        data = nla_data(nlFreq);
+        len = nla_len(nlFreq);
+        nla_parse(attrFreq, NL80211_FREQUENCY_ATTR_MAX, data, len, freqPolicy);
+        // get center freq
+        if (attrFreq[NL80211_FREQUENCY_ATTR_FREQ] == NULL) {
             continue;
-        // get each ieee80211_channel
-        nla_for_each_nested(nlFreq, attrBand[NL80211_BAND_ATTR_FREQS], j)
-        {
-            nla_parse(attrFreq, NL80211_FREQUENCY_ATTR_MAX, nla_data(nlFreq), nla_len(nlFreq), freqPolicy);
-            // get center freq
-            if (!attrFreq[NL80211_FREQUENCY_ATTR_FREQ] && attrFreq[NL80211_FREQUENCY_ATTR_MAX_TX_POWER])
-                continue;
-            freq = nla_get_u32(attrFreq[NL80211_FREQUENCY_ATTR_FREQ]);
-            switch (result->band) {
-                case NL80211_BAND_2GHZ:
-                    if (freq > 2400 && freq < 2500) {
+        }
+        freq = nla_get_u32(attrFreq[NL80211_FREQUENCY_ATTR_FREQ]);
+        switch (result->band) {
+            case NL80211_BAND_2GHZ:
+                if (attrFreq[NL80211_FREQUENCY_ATTR_MAX_TX_POWER]) {
+                    if (freq > 2_4G_LOW_LITMIT_FREQ && freq < 2_4G_HIGH_LITMIT_FREQ) {
                         result->freqs[result->nums] = freq;
                         result->txPower[result->nums] = nla_get_u32(attrFreq[NL80211_FREQUENCY_ATTR_MAX_TX_POWER]);
                         result->nums++;
                     }
-                    break;
-                case NL80211_BAND_5GHZ:
-                    if (freq > 5100 && freq < 5900) {
-                        result->freqs[result->nums] = freq;
-                        result->nums++;
-                    }
-                    break;
-                default:
-                    break;
-            }
+                }
+                break;
+            case NL80211_BAND_5GHZ:
+                if (freq > 5G_LOW_LIMIT_FREQ && freq < 5G_HIGH_LIMIT_FREQ) {
+                    result->freqs[result->nums] = freq;
+                    result->nums++;
+                }
+                break;
+            default:
+                break;
         }
+    }
+}
+
+static int32_t ParserValidFreq(struct nl_msg *msg, void *arg)
+{
+    struct FreqInfoResult *result = (struct FreqInfoResult *)arg;
+    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
+    struct nalttr *attrWiphyBands = NULL;
+    struct nlattr *attrBand[NL80211_BAND_ATTR_MAX + 1];
+    struct nlattr *nlBand = NULL;
+    int32_t i, j;
+    void *data = NULL;
+    int32_t len;
+
+    attrWiphyBands = GetWiphyBands(hdr);
+    if (GetWiphyBands == NULL) {
+        return NL_SKIP;
+    }
+
+    // get each ieee80211_supported_band
+    nla_for_each_nested(nlBand, attrWiphyBands, i)
+    {
+        data = nla_data(nlBand);
+        len = nla_len(nlBand);
+        nla_parse(attrBand, NL80211_BAND_ATTR_MAX, data, len, NULL);
+        if (attrBand[NL80211_BAND_ATTR_FREQS] == NULL)
+            continue;
+        GetCenterFreq(attrBand[NL80211_BAND_ATTR_FREQS], result);
     }
     return NL_SKIP;
 }
@@ -642,9 +709,8 @@ static bool IsWifiIface(const char *name)
 static int32_t GetAllIfaceInfo(struct NetworkInfoResult *infoResult)
 {
     struct dirent *de;
-
-    DIR *d = opendir("/sys/class/net");
-    if (d == 0) {
+    DIR *dir = opendir(NET_DEVICE_INFO_PATH);
+    if (dir == NULL) {
         return RET_CODE_FAILURE;
     }
     infoResult->nums = 0;
@@ -655,14 +721,16 @@ static int32_t GetAllIfaceInfo(struct NetworkInfoResult *infoResult)
         if (IsWifiIface(de->d_name)) {
             if (strncpy_s(infoResult->infos[infoResult->nums].name, IFNAMSIZ, de->d_name, sizeof(de->d_name)) != EOK) {
                 HILOG_ERROR(LOG_CORE, "%s: strncpy_s infoResult->infos failed", __FUNCTION__);
+                closedir(dir);
                 return RET_CODE_FAILURE;
             }
             infoResult->nums++;
         }
     }
-    closedir(d);
-    if (infoResult->nums == 0)
+    closedir(dir);
+    if (infoResult->nums == 0) {
         return RET_CODE_NOT_AVAILABLE;
+    }
     return RET_CODE_SUCCESS;
 }
 
@@ -800,7 +868,7 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
     }
     ret = ioctl(fd, SIOCSIFHWADDR, &req);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
+        HILOG_ERROR(LOG_CORE, "%s: ioctl failed, errno = %d, (%s)", __FUNCTION__, errno, strerror(errno));
         if (errno == EPERM) {
             ret = RET_CODE_NOT_SUPPORT;
         } else if (errno == EBUSY) {
@@ -838,7 +906,7 @@ static int32_t ParserChipId(struct nl_msg *msg, void *arg)
 int32_t GetDevMacAddr(const char *ifName, int32_t type, uint8_t *mac, uint8_t len)
 {
     (void)type;
-    int fd, ret;
+    int32_t fd, ret;
     struct ifreq req;
 
     fd = socket(AF_INET, SOCK_DGRAM, 0);
@@ -850,7 +918,7 @@ int32_t GetDevMacAddr(const char *ifName, int32_t type, uint8_t *mac, uint8_t le
     strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName));
     ret = ioctl(fd, SIOCGIFHWADDR, &req);
     if (ret != 0) {
-        HILOG_ERROR(LOG_CORE, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
+        HILOG_ERROR(LOG_CORE, "%s: ioctl failed, errno = %d, (%s)", __FUNCTION__, errno, strerror(errno));
         close(fd);
         return RET_CODE_FAILURE;
     }
@@ -1058,7 +1126,7 @@ int32_t AcquireChipId(const char *ifName, uint8_t *chipId)
 
     ret = NetlinkSendCmdSync(msg, ParserChipId, chipId);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: NetlinkSendCmdSync failed.\n", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: NetlinkSendCmdSync failed.", __FUNCTION__);
     }
 
     nlmsg_free(msg);
@@ -1098,21 +1166,29 @@ int32_t SetResetDriver(const uint8_t chipId, const char *ifName)
     return RET_CODE_SUCCESS;
 }
 
-static int NetDeviceInfoHandler(struct nl_msg *msg, void *arg)
+static int32_t NetDeviceInfoHandler(struct nl_msg *msg, struct NetDeviceInfo *info)
 {
     struct nlattr *attr[NL80211_ATTR_MAX + 1];
-    struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
-    struct NetDeviceInfo *info = (struct NetDeviceInfo *)arg;
+    struct genlmsghdr *hdr = NULL;
+    void *data = NULL;
+    int32_t len;
 
-    nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
-
+    hdr = nlmsg_data(nlmsg_hdr(msg));
+    if (hdr == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: get nlmsg header fail", __FUNCTION__);
+        return NL_SKIP;
+    }
+    data = genlmsg_attrdata(hdr, 0);
+    len = genlmsg_attrlen(hdr, 0);
+    nla_parse(attr, NL80211_ATTR_MAX, data, len, NULL);
     if (attr[NL80211_ATTR_IFTYPE]) {
         info->iftype = nla_get_u32(attr[NL80211_ATTR_IFTYPE]);
-        HILOG_ERROR(LOG_CORE, "%s: %s iftype is %hhu\n", __FUNCTION__, info->ifName, info->iftype);
+        HILOG_ERROR(LOG_CORE, "%s: %s iftype is %hhu", __FUNCTION__, info->ifName, info->iftype);
     }
-
     if (attr[NL80211_ATTR_MAC]) {
-        memcpy_s(info->mac, ETH_ADDR_LEN, nla_data(attr[NL80211_ATTR_MAC]), ETH_ADDR_LEN);
+        if (memcpy_s(info->mac, ETH_ADDR_LEN, nla_data(attr[NL80211_ATTR_MAC]), ETH_ADDR_LEN) != EOK) {
+            HILOG_ERROR(LOG_CORE, "%s: memcpy_s mac address fail", __FUNCTION__);
+        }
     }
 
     return NL_SKIP;
@@ -1121,10 +1197,10 @@ static int NetDeviceInfoHandler(struct nl_msg *msg, void *arg)
 static uint32_t GetIftypeAndMac(struct NetDeviceInfo *info)
 {
     struct nl_msg *msg = nlmsg_alloc();
-    int ret;
+    int32_t ret;
 
     if (msg == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: nlmsg_alloc failed.\n", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg_alloc failed.", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
 
@@ -1133,7 +1209,7 @@ static uint32_t GetIftypeAndMac(struct NetDeviceInfo *info)
 
     ret = NetlinkSendCmdSync(msg, NetDeviceInfoHandler, info);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: NetlinkSendCmdSync failed.\n", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: NetlinkSendCmdSync failed.", __FUNCTION__);
         nlmsg_free(msg);
         return RET_CODE_FAILURE;
     }
@@ -1168,10 +1244,10 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
     return RET_CODE_SUCCESS;
 }
 
-static int CmdScanPutMsg(struct nl_msg *msg, const WifiScan *scan)
+static int32_t CmdScanPutMsg(struct nl_msg *msg, const WifiScan *scan)
 {
     struct nlattr *nest = NULL;
-    int i;
+    int32_t i;
 
     if (scan->ssids) {
         nest = nla_nest_start(msg, NL80211_ATTR_SCAN_SSIDS);
@@ -1230,13 +1306,13 @@ int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
 
     ret = CmdScanPutMsg(msg, scan);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: put msg failed\n", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: put msg failed", __FUNCTION__);
         goto err;
     }
 
     ret = NetlinkSendCmdSync(msg, NULL, NULL);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: send cmd failed\n", __FUNCTION__);
+        HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
         goto err;
     }
 
@@ -1305,7 +1381,7 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode)
         }
         ret = ioctl(fd, PRIMARY_ID_POWER_MODE, &ioctlData);
         if (ret != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
+            HILOG_ERROR(LOG_CORE, "%s: ioctl failed, errno = %d, (%s)", __FUNCTION__, errno, strerror(errno));
             if (errno == EOPNOTSUPP) {
                 ret = RET_CODE_NOT_SUPPORT;
             } else {
@@ -1315,7 +1391,7 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode)
         }
         ret = ParsePowerMode(ioctlData.data.point.buf, ioctlData.data.point.length, mode);
         if (ret != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: ParsePowerMode failed\n", __FUNCTION__);
+            HILOG_ERROR(LOG_CORE, "%s: ParsePowerMode failed", __FUNCTION__);
             break;
         }
     } while (0);
@@ -1373,7 +1449,7 @@ int32_t SetPowerMode(const char *ifName, uint8_t mode)
         }
         ret = ioctl(fd, PRIMARY_ID_POWER_MODE, &ioctlData);
         if (ret != RET_CODE_SUCCESS) {
-            HILOG_ERROR(LOG_CORE, "%s: ioctl failed, errno = %d, (%s)\n", __FUNCTION__, errno, strerror(errno));
+            HILOG_ERROR(LOG_CORE, "%s: ioctl failed, errno = %d, (%s)", __FUNCTION__, errno, strerror(errno));
             if (errno == EOPNOTSUPP) {
                 ret = RET_CODE_NOT_SUPPORT;
             } else {
@@ -1402,4 +1478,173 @@ int32_t GetChannelMeasResult(const char *ifName, struct MeasResult *measResult)
     (void)ifName;
     (void)measResult;
     return RET_CODE_NOT_SUPPORT;
+}
+
+static int32_t SendCommandToDriver(const char *cmd, uint32_t len, const char *ifName)
+{
+    struct ifreq ifr = {0};
+    WifiPrivCmd privCmd = {0};
+    char buf[MAX_PRIV_CMD_SIZE] = {0};
+    int32_t ret = RET_CODE_FAILURE;
+
+    if (cmd == NULL) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: cmd is null", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
+    if (len > MAX_PRIV_CMD_SIZE) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: Size of command is too large", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
+    if (memcpy_s(buf, MAX_PRIV_CMD_SIZE, cmd, len) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s error", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    privCmd.buf = buf;
+    privCmd.size = sizeof(buf);
+    privCmd.len = len;
+    ifr.ifr_data = &privCmd;
+    if (strcpy_s(ifr.ifr_name, IFNAMSIZ, ifName) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%s: strcpy_s error", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    int32_t sock = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sock < 0) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: socket failed, errno = %{public}d, (%{public}s)", __FUNCTION__, errno,
+            strerror(errno));
+        return ret;
+    }
+    do {
+        ret = ioctl(sock, SIOCDEVPRIVATE + 1, &ifr);
+        if (ret < 0) {
+            HILOG_ERROR(LOG_CORE, "%{public}s: ioctl failed, errno = %{public}d, (%{public}s)", __FUNCTION__, errno,
+                strerror(errno));
+            ret = (errno == EOPNOTSUPP) ? RET_CODE_NOT_SUPPORT : RET_CODE_FAILURE;
+            break;
+        }
+        (void)memset_s((void *)cmd, len, 0, len);
+        if (memcpy_s((void *)cmd, len, privCmd.buf, len - 1) != EOK) {
+            HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s error", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+        }
+    } while (0);
+
+    close(sock);
+    return ret;
+}
+
+static int32_t DisableNextCacOnce(const char *ifName)
+{
+    char cmdBuf[P2P_BUF_SIZE] = {CMD_SET_CLOSE_GO_CAC};
+
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+}
+
+static int32_t SetGoChannel(const char *ifName, const int8_t *data, uint32_t len)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    char cmdBuf[P2P_BUF_SIZE] = {0};
+    uint32_t cmdLen;
+    
+    cmdLen = strlen(CMD_SET_CHANGE_GO_CHANNEL);
+    if ((cmdLen + len) >= P2P_BUF_SIZE) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: the length of input data is too large", __FUNCTION__);
+        return ret;
+    }
+    ret = snprintf_s(cmdBuf, P2P_BUF_SIZE, P2P_BUF_SIZE - 1, "%s %d", CMD_SET_CHANGE_GO_CHANNEL, *data);
+    if (ret < RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: ifName: %{public}s, ret = %{public}d", __FUNCTION__, ifName, ret);
+        return RET_CODE_FAILURE;
+    }
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+}
+
+static int32_t SetGoDetectRadar(const char *ifName, const int8_t *data, uint32_t len)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    char cmdBuf[P2P_BUF_SIZE] = {0};
+    uint32_t cmdLen;
+    
+    cmdLen = strlen(CMD_SET_GO_DETECT_RADAR);
+    if ((cmdLen + len) >= P2P_BUF_SIZE) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: the length of input data is too large", __FUNCTION__);
+        return ret;
+    }
+    ret = snprintf_s(cmdBuf, P2P_BUF_SIZE, P2P_BUF_SIZE - 1, "%s %d", CMD_SET_GO_DETECT_RADAR, *data);
+    if (ret < RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: ifName: %{public}s, ret = %{public}d", __FUNCTION__, ifName, ret);
+        return RET_CODE_FAILURE;
+    }
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+}
+
+static int32_t SetP2pScenes(const char *ifName, const int8_t *data, uint32_t len)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    char cmdBuf[P2P_BUF_SIZE] = {0};
+    uint32_t cmdLen;
+    
+    cmdLen = strlen(CMD_SET_P2P_SCENES);
+    if ((cmdLen + len) >= P2P_BUF_SIZE) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: the length of input data is too large", __FUNCTION__);
+        return ret;
+    }
+    ret = snprintf_s(cmdBuf, P2P_BUF_SIZE, P2P_BUF_SIZE - 1, "%s %d", CMD_SET_P2P_SCENES, *data);
+    if (ret < RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: ifName: %{public}s, ret = %{public}d", __FUNCTION__, ifName, ret);
+        return RET_CODE_FAILURE;
+    }
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+}
+
+static int32_t SetDynamicDbacMode(const char *ifName, int8_t *data, uint32_t len)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    char cmdBuf[P2P_BUF_SIZE] = {0};
+    uint32_t cmdLen;
+    
+    cmdLen = strlen(CMD_SET_DYNAMIC_DBAC_MODE);
+    if ((cmdLen + len) >= P2P_BUF_SIZE) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: the length of input data is too large", __FUNCTION__);
+        return ret;
+    }
+    ret = snprintf_s(cmdBuf, P2P_BUF_SIZE, P2P_BUF_SIZE - 1, "%s %d", CMD_SET_DYNAMIC_DBAC_MODE, *data);
+    if (ret < RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: ifName: %{public}s, ret = %{public}d", __FUNCTION__, ifName, ret);
+        return RET_CODE_FAILURE;
+    }
+    return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
+}
+
+int32_t SetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *param)
+{
+    int32_t ret;
+
+    if (strcmp(ifName, STR_WLAN0) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: %{public}s is not supported", __FUNCTION__, ifName);
+        return RET_CODE_NOT_SUPPORT;
+    }
+    switch (param->cmdId) {
+        case CMD_CLOSE_GO_CAC:
+            ret = DisableNextCacOnce(ifName);
+            break;
+        case CMD_SET_GO_CSA_CHANNEL:
+            ret = SetGoChannel(ifName, param->buf, param->bufLen);
+            break;
+        case CMD_SET_GO_RADAR_DETECT:
+            ret = SetGoDetectRadar(ifName, param->buf, param->bufLen);
+            break;
+        case CMD_ID_MCC_STA_P2P_QUOTA_TIME:
+            ret = SetDynamicDbacMode(ifName, param->buf, param->bufLen);
+            break;
+        case CMD_ID_CTRL_ROAM_CHANNEL:
+            ret = SetP2pScenes(ifName, param->buf, param->bufLen);
+            break;
+        default:
+            HILOG_ERROR(LOG_CORE, "%{public}s: Invalid command id", __FUNCTION__);
+            return RET_CODE_NOT_SUPPORT;
+    }
+    if (ret != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: Config projection screen fail, ret = %{public}d", __FUNCTION__, ret);
+    }
+    return ret;
 }

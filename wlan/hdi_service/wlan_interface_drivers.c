@@ -60,6 +60,7 @@ int HdfWlanInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
     }
     if (WlanInterfaceServiceInit() != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: wlan interface service init failed!", __func__);
+        OsalMutexDestroy(&stubData->mutex);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;

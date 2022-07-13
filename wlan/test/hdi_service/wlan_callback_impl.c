@@ -30,8 +30,8 @@ int32_t WlanCallbackResetDriver(struct IWlanCallback *self, uint32_t event, int3
     return HDF_SUCCESS;
 }
 
-int32_t WlanCallbackScanResult(
-    struct IWlanCallback *self, uint32_t event, const struct HdfWifiScanResult *scanResult, const char *ifName)
+int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event, const struct HdfWifiScanResult *scanResult,
+    const char *ifName)
 {
     (void)self;
     if (scanResult == NULL || ifName == NULL) {

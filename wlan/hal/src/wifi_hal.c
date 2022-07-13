@@ -282,13 +282,22 @@ static int32_t StartChannelMeasInner(const char *ifName, const struct MeasParam 
     return StartChannelMeas(ifName, measParam);
 }
 
-static int32_t GetChannelMeasResultInner(const char *ifName, struct MeasResult* measResult)
+static int32_t GetChannelMeasResultInner(const char *ifName, struct MeasResult *measResult)
 {
     if (ifName == NULL || measResult == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     return HDF_ERR_NOT_SUPPORT;
+}
+
+static int32_t SetProjectionScreenParamInner(const char *ifName, const ProjScrnCmdParam *param)
+{
+    if (ifName == NULL || param == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return SetProjectionScreenParam(ifName, param);
 }
 
 static int32_t Start(struct IWiFi *iwifi)
@@ -403,10 +412,18 @@ static int32_t WifiStartChannelMeas(const char *ifName, const struct MeasParam *
     return ret;
 }
 
-static int32_t WifiGetChannelMeasResult(const char *ifName, struct MeasResult* measResult)
+static int32_t WifiGetChannelMeasResult(const char *ifName, struct MeasResult *measResult)
 {
     HalMutexLock();
     int32_t ret = GetChannelMeasResultInner(ifName, measResult);
+    HalMutexUnlock();
+    return ret;
+}
+
+static int32_t WifiSetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *param)
+{
+    HalMutexLock();
+    int32_t ret = SetProjectionScreenParamInner(ifName, param);
     HalMutexUnlock();
     return ret;
 }
@@ -437,6 +454,7 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.setPowerMode = WifiSetPowerMode;
         singleWifiInstance.startChannelMeas = WifiStartChannelMeas;
         singleWifiInstance.getChannelMeasResult = WifiGetChannelMeasResult;
+        singleWifiInstance.setProjectionScreenParam = WifiSetProjectionScreenParam;
         InitIWiFiList();
         isInited = true;
     }
