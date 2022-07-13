@@ -72,7 +72,7 @@ HWTEST_F(PreviewTest, Camera_Preview_0004, TestSize.Level2)
     Test_->streamInfo->streamId_ = Test_->streamId_preview;
     Test_->streamInfo->width_ = 1280;
     Test_->streamInfo->height_ = 960;
-    Test_->streamInfo->datasapce_ = 8;
+    Test_->streamInfo->dataspace_ = 8;
     Test_->StreamInfoFormat();
     Test_->streamInfo->intent_ = Camera::PREVIEW;
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =

@@ -279,7 +279,7 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
             streamInfo->streamId_ = streamId_preview;
             streamInfo->width_ = 640; // 640:width of stream
             streamInfo->height_ = 480; // 480: height of stream
-            streamInfo->datasapce_ = 8; // 8:datasapce of stream
+            streamInfo->dataspace_ = 8; // 8:dataspace of stream
             streamInfo->intent_ = intent;
             streamInfo->tunneledMode_ = 5; // 5:tunneledMode of stream
             StreamInfoFormat();
@@ -301,7 +301,7 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
             streamInfo_video->streamId_ = streamId_video;
             streamInfo_video->width_ = 1280; // 1280:width of stream
             streamInfo_video->height_ = 960; // 960: height of stream
-            streamInfo_video->datasapce_ = 8; // 8:datasapce of stream
+            streamInfo_video->dataspace_ = 8; // 8:dataspace of stream
             streamInfo_video->intent_ = intent;
             streamInfo_video->encodeType_ = ENCODE_TYPE_H265;
             streamInfo_video->tunneledMode_ = 5; // 5:tunneledMode of stream
@@ -331,7 +331,7 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
             streamInfo_capture->streamId_ = streamId_capture;
             streamInfo_capture->width_ = 1280; // 1280:width of stream
             streamInfo_capture->height_ = 960; // 960: height of stream
-            streamInfo_capture->datasapce_ = 8; // 8:datasapce of stream
+            streamInfo_capture->dataspace_ = 8; // 8:dataspace of stream
             streamInfo_capture->intent_ = intent;
             streamInfo_capture->encodeType_ = ENCODE_TYPE_JPEG;
             streamInfo_capture->tunneledMode_ = 5; // 5:tunneledMode of stream

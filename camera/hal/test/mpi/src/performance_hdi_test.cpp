@@ -453,7 +453,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0120, TestSize.Level0)
     // Configure stream information
     Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
     Test_->streamInfo->streamId_ = 1001; // 1001:streamId
-    Test_->streamInfo->datasapce_ = 8;
+    Test_->streamInfo->dataspace_ = 8;
     Test_->streamInfo->intent_ = Camera::PREVIEW;
     Test_->streamInfo->width_ = 640; // 640:Stream width
     Test_->streamInfo->height_ = 480; // 480:Stream height
@@ -518,7 +518,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0130, TestSize.Level3)
         Test_->streamInfo->width_ = 1920;
         Test_->streamInfo->height_ = 1080;
         Test_->StreamInfoFormat();
-        Test_->streamInfo->datasapce_ = 10;
+        Test_->streamInfo->dataspace_ = 10;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
@@ -619,7 +619,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0170, TestSize.Level3)
         Test_->streamInfo->width_ = 1920;
         Test_->streamInfo->height_ = 1080;
         Test_->StreamInfoFormat();
-        Test_->streamInfo->datasapce_ = 10;
+        Test_->streamInfo->dataspace_ = 10;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
@@ -838,7 +838,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0210, TestSize.Level3)
         Test_->streamInfo->height_ = 480;
         Test_->StreamInfoFormat();
         Test_->streamInfo->intent_ = Camera::PREVIEW;
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         Test_->streamInfo->tunneledMode_ = 5;
         std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
         Test_->streamInfos.push_back(Test_->streamInfo);
@@ -910,7 +910,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0220, TestSize.Level3)
         Test_->streamInfo->width_ = 640;
         Test_->streamInfo->height_ = 480;
         Test_->StreamInfoFormat();
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         Test_->streamInfo->tunneledMode_ = 5;
         std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
         Test_->streamInfos.push_back(Test_->streamInfo);

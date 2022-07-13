@@ -197,7 +197,7 @@ void Test::SetPreviewStreamInfo()
     streamInfo_pre->width_ = preview_width;
     streamInfo_pre->height_ = preview_height;
     streamInfo_pre->format_ = preview_format;
-    streamInfo_pre->datasapce_ = datasapce;
+    streamInfo_pre->dataspace_ = dataspace;
     streamInfo_pre->intent_ = PREVIEW;
     streamInfo_pre->tunneledMode_ = tunneledMode;
     std::shared_ptr<StreamConsumer> consumer_pre = std::make_shared<StreamConsumer>();
@@ -216,7 +216,7 @@ void Test::SetVideoStreamInfo()
     streamInfo_video->width_ = video_width;
     streamInfo_video->height_ = video_height;
     streamInfo_video->format_ = video_format;
-    streamInfo_video->datasapce_ = datasapce;
+    streamInfo_video->dataspace_ = dataspace;
     streamInfo_video->intent_ = intent;
     streamInfo_video->encodeType_ = OHOS::Camera::ENCODE_TYPE_H265;
     streamInfo_video->tunneledMode_ = tunneledMode;
@@ -237,7 +237,7 @@ void Test::SetPhotoStreamInfo()
     streamInfo_capture->width_ = snapshot_width;
     streamInfo_capture->height_ = snapshot_height;
     streamInfo_capture->format_ = snapshot_format;
-    streamInfo_capture->datasapce_ = datasapce;
+    streamInfo_capture->dataspace_ = dataspace;
     streamInfo_capture->intent_ = intent;
     streamInfo_capture->encodeType_ = OHOS::Camera::ENCODE_TYPE_JPEG;
     streamInfo_capture->tunneledMode_ = tunneledMode;
@@ -260,7 +260,7 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
     } else {
         std::cout << "==========[test log]GetStreamOperator fail, rc = " << rc << std::endl;
     }
-    int datasapce = 8;
+    int dataspace = 8;
     int tunneledMode = 5;
     int bufferQueueSize = 8;
     streamInfo_pre = std::make_shared<Camera::StreamInfo>();

@@ -215,7 +215,7 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     streamInfo->width_ = 720;
     streamInfo->height_ = 480;
     streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    streamInfo->datasapce_ = 8;
+    streamInfo->dataspace_ = 8;
     streamInfo->intent_ = Camera::PREVIEW;
     StreamConsumer previewConsumer;
     streamInfo->bufferQueue_ = previewConsumer.CreateProducer(
@@ -231,7 +231,7 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     streamInfoSnapshot->width_ = 1920;
     streamInfoSnapshot->height_ = 1080;
     streamInfoSnapshot->format_ = PIXEL_FMT_YCRCB_420_SP;
-    streamInfoSnapshot->datasapce_ = 8;
+    streamInfoSnapshot->dataspace_ = 8;
     streamInfoSnapshot->intent_ = Camera::STILL_CAPTURE;
     StreamConsumer snapshotConsumer;
     streamInfoSnapshot->bufferQueue_ = snapshotConsumer.CreateProducer(
