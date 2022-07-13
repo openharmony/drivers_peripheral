@@ -18,6 +18,7 @@
 #include <unistd.h>
 #include <gtest/gtest.h>
 #include <securec.h>
+#include <vector>
 #include "hdf_base.h"
 #include "osal_time.h"
 #include "v1_0/imotion_interface.h"
@@ -27,7 +28,7 @@ using namespace OHOS::HDI::Motion::V1_0;
 using namespace testing::ext;
 
 namespace {
-    sptr<IMotionInterface>  g_motionInterface = nullptr;
+    sptr<IMotionInterface> g_motionInterface = nullptr;
     sptr<IMotionCallback> g_motionCallback = new MotionCallbackService();
     sptr<IMotionCallback> g_motionCallbackUnregistered = new MotionCallbackService();
 }
@@ -105,26 +106,34 @@ HWTEST_F(HdfMotionTest, EnableMotion_001, TestSize.Level1)
         return;
     }
 
+    vector<int> vec;
+    vec.push_back(HDF_MOTION_TYPE_PICKUP);
+    vec.push_back(HDF_MOTION_TYPE_FLIP);
+    vec.push_back(HDF_MOTION_TYPE_SHAKE);
+    vec.push_back(HDF_MOTION_TYPE_ROTATION);
+
     int32_t ret = g_motionInterface->Register(g_motionCallback);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
-    ret = g_motionInterface->EnableMotion(HDF_MOTION_TYPE_PICKUP);
-    if (ret == HDF_SUCCESS) {
-        printf("The pick up gesture is enabled successfully\n");
-    } else {
-        printf("Failed to enable the pick up gesture\n");
-    }
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    OsalSleep(15);
+    for (int i = 0; i < vec.size(); i++) {
+        ret = g_motionInterface->EnableMotion(vec[i]);
+        if (ret == HDF_SUCCESS) {
+            printf("Motion %d enabled successfully\n", vec[i]);
+        } else {
+            printf("Motion %d enable failed\n", vec[i]);
+        }
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        OsalSleep(15);
 
-    ret =  g_motionInterface->DisableMotion(HDF_MOTION_TYPE_PICKUP);
-    if (ret == HDF_SUCCESS) {
-        printf("The pick up gesture is disabled successfully\n");
-    } else {
-        printf("Failed to disable the pick up gesture\n");
+        ret = g_motionInterface->DisableMotion(vec[i]);
+        if (ret == HDF_SUCCESS) {
+            printf("Motion %d disabled successfully\n", vec[i]);
+        } else {
+            printf("Motion %d disable failed\n", vec[i]);
+        }
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        OsalSleep(2);
     }
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    OsalSleep(2);
 
     ret = g_motionInterface->Unregister(g_motionCallback);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -151,7 +160,7 @@ HWTEST_F(HdfMotionTest, DisableMotion_001, TestSize.Level1)
 
     ret = g_motionInterface->EnableMotion(HDF_MOTION_TYPE_PICKUP);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret =  g_motionInterface->DisableMotion(HDF_MOTION_TYPE_PICKUP);
+    ret = g_motionInterface->DisableMotion(HDF_MOTION_TYPE_PICKUP);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_motionInterface->Unregister(g_motionCallback);
