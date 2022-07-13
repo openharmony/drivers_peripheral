@@ -298,7 +298,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_020, TestSize.Level1)
     display_->streamInfo->width_ = 1280; // picture width
     display_->streamInfo->height_ = 960; // picture height
     display_->streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    display_->streamInfo->datasapce_ = 8; // picture datasapce
+    display_->streamInfo->dataspace_ = 8; // picture dataspace
     display_->streamInfo->intent_ = OHOS::Camera::STILL_CAPTURE;
     display_->streamInfo->tunneledMode_ = 5; // tunnel mode
     display_->streamInfo->encodeType_ = OHOS::Camera::ENCODE_TYPE_JPEG;
@@ -352,7 +352,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_021, TestSize.Level1)
     display_->streamInfo->width_ = 1280; // 640:picture width
     display_->streamInfo->height_ = 960; // 640:picture height
     display_->streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = OHOS::Camera::STILL_CAPTURE;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->encodeType_ = OHOS::Camera::ENCODE_TYPE_JPEG;

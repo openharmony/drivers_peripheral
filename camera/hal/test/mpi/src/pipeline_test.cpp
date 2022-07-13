@@ -121,7 +121,7 @@ HWTEST_F(PipelineTest, Camera_Ppl_0004, TestSize.Level2)
     Test_->streamInfo->width_ = 640;
     Test_->streamInfo->height_ = 480;
     Test_->StreamInfoFormat();
-    Test_->streamInfo->datasapce_ = 10;
+    Test_->streamInfo->dataspace_ = 10;
     Test_->streamInfo->intent_ = Camera::VIDEO;
     Test_->streamInfo->tunneledMode_ = 5;
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
@@ -208,7 +208,7 @@ HWTEST_F(PipelineTest, Camera_Ppl_0007, TestSize.Level1)
     Test_->streamInfo->streamId_ = Test_->streamId_preview;
     Test_->streamInfo->width_ = 1280;
     Test_->streamInfo->height_ = 960;
-    Test_->streamInfo->datasapce_ = 8;
+    Test_->streamInfo->dataspace_ = 8;
     Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
     Test_->streamInfo->intent_ = Camera::PREVIEW;
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
@@ -227,7 +227,7 @@ HWTEST_F(PipelineTest, Camera_Ppl_0007, TestSize.Level1)
     Test_->streamInfo2->streamId_ = Test_->streamId_preview_double;
     Test_->streamInfo2->width_ = 1280;
     Test_->streamInfo2->height_ = 960;
-    Test_->streamInfo2->datasapce_ = 8;
+    Test_->streamInfo2->dataspace_ = 8;
     Test_->streamInfo2->format_ = PIXEL_FMT_YCRCB_420_SP;
     Test_->streamInfo2->intent_ = Camera::PREVIEW;
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer2 =

@@ -101,7 +101,7 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0002, TestSize.Level3)
         Test_->streamInfo->width_ = 1920;
         Test_->streamInfo->height_ = 1080;
         Test_->StreamInfoFormat();
-        Test_->streamInfo->datasapce_ = 10;
+        Test_->streamInfo->dataspace_ = 10;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =

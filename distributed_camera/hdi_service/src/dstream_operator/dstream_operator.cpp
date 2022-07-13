@@ -669,7 +669,7 @@ void DStreamOperator::ConvertStreamInfo(std::shared_ptr<StreamInfo> &srcInfo, st
     dstInfo->width_ = srcInfo->width_;
     dstInfo->stride_ = srcInfo->width_;
     dstInfo->height_ = srcInfo->height_;
-    dstInfo->dataspace_ = srcInfo->datasapce_;
+    dstInfo->dataspace_ = srcInfo->dataspace_;
     dstInfo->encodeType_ = (DCEncodeType)srcInfo->encodeType_;
 
     if ((srcInfo->intent_ == STILL_CAPTURE) || (srcInfo->intent_ == POST_VIEW)) {

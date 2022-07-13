@@ -42,7 +42,7 @@ CamRetCode StreamOperator::IsStreamsSupported(OperationMode mode,
     si.width = pInfo->width_;
     si.height = pInfo->height_;
     si.format = pInfo->format_;
-    si.datasapce = pInfo->datasapce_;
+    si.dataspace = pInfo->dataspace_;
     si.intent = pInfo->intent_;
     si.tunneledMode = pInfo->tunneledMode_;
     si.minFrameDuration = pInfo->minFrameDuration_;
@@ -86,7 +86,7 @@ CamRetCode StreamOperator::CreateStreams(const std::vector<std::shared_ptr<Strea
         sis[i].width = streamInfos[i]->width_;
         sis[i].height = streamInfos[i]->height_;
         sis[i].format = streamInfos[i]->format_;
-        sis[i].datasapce = streamInfos[i]->datasapce_;
+        sis[i].dataspace = streamInfos[i]->dataspace_;
         sis[i].intent = streamInfos[i]->intent_;
         sis[i].tunneledMode = streamInfos[i]->tunneledMode_;
         sis[i].minFrameDuration = streamInfos[i]->minFrameDuration_;
@@ -170,7 +170,7 @@ CamRetCode StreamOperator::GetStreamAttributes(std::vector<std::shared_ptr<Strea
         it->width_ = sa[i].width;
         it->height_ = sa[i].height;
         it->overrideFormat_ = sa[i].overrideFormat;
-        it->overrideDatasapce_ = sa[i].overrideDatasapce;
+        it->overrideDataspace_ = sa[i].overrideDataspace;
         it->producerUsage_ = sa[i].producerUsage;
         it->producerBufferCount_ = sa[i].producerBufferCount;
         it->maxBatchCaptureCount_ = sa[i].maxBatchCaptureCount;

@@ -59,7 +59,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0130)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -112,7 +112,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0131)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -157,7 +157,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0132)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -203,7 +203,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0133)
     display_->streamInfo->width_ = -1;
     display_->streamInfo->height_ = 640;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -247,7 +247,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0134)
     display_->streamInfo->width_ = 2147483647;
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -301,7 +301,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0135)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = -1;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -345,7 +345,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0136)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 2147483647;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -389,7 +389,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0137)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480;
     display_->streamInfo->format_ = -1;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -433,7 +433,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0138)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480;
     display_->streamInfo->format_ = 2147483647;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -460,14 +460,14 @@ TEST_F(UtestHdiIterTest, camera_hdi_0138)
 
 /**
   * @tc.name: CreateStreams
-  * @tc.desc: CreateStreams, StreamInfo->datasapce = -1, return error.
+  * @tc.desc: CreateStreams, StreamInfo->dataspace = -1, return error.
   * @tc.level: Level2
   * @tc.size: MediumTest
   * @tc.type: Function
   */
 TEST_F(UtestHdiIterTest, camera_hdi_0139)
 {
-    std::cout << "==========[test log] CreateStreams, StreamInfo->datasapce = -1, return error." << std::endl;
+    std::cout << "==========[test log] CreateStreams, StreamInfo->dataspace = -1, return error." << std::endl;
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // Create data stream
@@ -487,7 +487,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0139)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = -1;
+    display_->streamInfo->dataspace_ = -1;
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -504,7 +504,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0139)
 
 /**
   * @tc.name: CreateStreams
-  * @tc.desc: CreateStreams, StreamInfo->datasapce = 2147483647, success.
+  * @tc.desc: CreateStreams, StreamInfo->dataspace = 2147483647, success.
   * @tc.level: Level2
   * @tc.size: MediumTest
   * @tc.type: Function
@@ -512,7 +512,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0139)
 TEST_F(UtestHdiIterTest, camera_hdi_0140)
 {
     std::cout << "==========[test log] CreateStreams,";
-    std::cout << "StreamInfo->datasapce = 2147483647, success." << std::endl;
+    std::cout << "StreamInfo->dataspace = 2147483647, success." << std::endl;
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // Create data stream
@@ -532,7 +532,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0140)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 2147483647;
+    display_->streamInfo->dataspace_ = 2147483647;
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -587,7 +587,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0141)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 1080;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -642,7 +642,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0142)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 1080;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::VIDEO;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -697,7 +697,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0143)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 1080;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::STILL_CAPTURE;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -752,7 +752,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0144)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 1080;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::POST_VIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -807,7 +807,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0145)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 1080;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::ANALYZE;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -862,7 +862,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0146)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = Camera::CUSTOM;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -909,7 +909,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0147)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 1080;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::CUSTOM;
     display_->streamInfo->tunneledMode_ = false;
     display_->streamInfo->bufferQueue_ = producer;
@@ -954,7 +954,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0148)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 1080;
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::CUSTOM;
     display_->streamInfo->tunneledMode_ = 0;
     display_->streamInfo->minFrameDuration_ = -1;
@@ -1000,7 +1000,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0149)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 0;
     display_->streamInfo->minFrameDuration_ = 2147483647;
@@ -1045,7 +1045,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0160)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -1098,7 +1098,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0161)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -1164,7 +1164,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0170)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -1218,7 +1218,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0171)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
@@ -1303,7 +1303,7 @@ TEST_F(UtestHdiIterTest, camera_hdi_0180)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;

@@ -62,7 +62,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
 #else
     Test_->streamInfo_pre->format_ = PIXEL_FMT_YCRCB_420_SP;
 #endif
-    Test_->streamInfo_pre->datasapce_ = 8; // 8:datasapce of stream
+    Test_->streamInfo_pre->dataspace_ = 8; // 8:dataspace of stream
     Test_->streamInfo_pre->intent_ = Camera::PREVIEW;
     Test_->streamInfo_pre->tunneledMode_ = 5; // 5:tunneledMode of stream
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
@@ -89,7 +89,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0001, TestSize.Level3)
 #else
     Test_->streamInfo_capture->format_ = PIXEL_FMT_YCRCB_420_SP;
 #endif
-    Test_->streamInfo_capture->datasapce_ = 8; // 8:datasapce of stream
+    Test_->streamInfo_capture->dataspace_ = 8; // 8:dataspace of stream
     Test_->streamInfo_capture->intent_ = Camera::STILL_CAPTURE;
     Test_->streamInfo_capture->encodeType_ = ENCODE_TYPE_JPEG;
     Test_->streamInfo_capture->tunneledMode_ = 5; // 5:tunneledMode of stream
@@ -167,7 +167,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
 #else
     Test_->streamInfo_pre->format_ = PIXEL_FMT_YCRCB_420_SP;
 #endif
-    Test_->streamInfo_pre->datasapce_ = 8; // 8:datasapce of stream
+    Test_->streamInfo_pre->dataspace_ = 8; // 8:dataspace of stream
     Test_->streamInfo_pre->intent_ = Camera::PREVIEW;
     Test_->streamInfo_pre->tunneledMode_ = 5; // 5:tunneledMode of stream
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
@@ -195,7 +195,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0002, TestSize.Level3)
 #else
     Test_->streamInfo_video->format_ = PIXEL_FMT_YCRCB_420_SP;
 #endif
-    Test_->streamInfo_video->datasapce_ = 8; // 8:datasapce of stream
+    Test_->streamInfo_video->dataspace_ = 8; // 8:dataspace of stream
     Test_->streamInfo_video->intent_ = Camera::VIDEO;
     Test_->streamInfo_video->encodeType_ = ENCODE_TYPE_H265;
     Test_->streamInfo_video->tunneledMode_ = 5; // 5:tunneledMode of stream
@@ -274,7 +274,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
 #else
     Test_->streamInfo_pre->format_ = PIXEL_FMT_YCRCB_420_SP;
 #endif
-    Test_->streamInfo_pre->datasapce_ = 8; // 8:datasapce of stream
+    Test_->streamInfo_pre->dataspace_ = 8; // 8:dataspace of stream
     Test_->streamInfo_pre->intent_ = Camera::PREVIEW;
     Test_->streamInfo_pre->tunneledMode_ = 5; // 5:tunneledMode of stream
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> preview_consumer =
@@ -302,7 +302,7 @@ HWTEST_F(ResolutionTest, Camera_Resolution_0003, TestSize.Level3)
 #else
     Test_->streamInfo_video->format_ = PIXEL_FMT_YCRCB_420_SP;
 #endif
-    Test_->streamInfo_video->datasapce_ = 8; // 8:datasapce of stream
+    Test_->streamInfo_video->dataspace_ = 8; // 8:dataspace of stream
     Test_->streamInfo_video->intent_ = Camera::VIDEO;
     Test_->streamInfo_video->encodeType_ = ENCODE_TYPE_H265;
     Test_->streamInfo_video->tunneledMode_ = 5; // 5:tunneledMode of stream

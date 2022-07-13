@@ -195,7 +195,7 @@ struct StreamInfo {
     /**
      * Image color space.
      */
-    int datasapce_;
+    int dataspace_;
 
     /**
      * Stream type.
@@ -278,7 +278,7 @@ struct StreamAttribute {
     /**
      * New image color space.
      */
-    int overrideDatasapce_;
+    int overrideDataspace_;
 
     /**
      * New procedure usage.

@@ -462,7 +462,7 @@ void TestDisplay::StartStream(std::vector<OHOS::Camera::StreamIntent> intents)
             streamInfoPre->width_ = PREVIEW_WIDTH; // 640:picture width
             streamInfoPre->height_ = PREVIEW_HEIGHT; // 480:picture height
             streamInfoPre->format_ = PIXEL_FMT_RGBA_8888;
-            streamInfoPre->datasapce_ = 8; // 8:picture datasapce
+            streamInfoPre->dataspace_ = 8; // 8:picture dataspace
             streamInfoPre->intent_ = intent;
             streamInfoPre->tunneledMode_ = 5; // 5:tunnel mode
             streamInfoPre->bufferQueue_ = streamCustomerPreview_->CreateProducer();
@@ -478,7 +478,7 @@ void TestDisplay::StartStream(std::vector<OHOS::Camera::StreamIntent> intents)
             streamInfoVideo->width_ = VIDEO_WIDTH; // 1280:picture width
             streamInfoVideo->height_ = VIDEO_HEIGHT; // 960:picture height
             streamInfoVideo->format_ = PIXEL_FMT_RGBA_8888;
-            streamInfoVideo->datasapce_ = 8; // 8:picture datasapce
+            streamInfoVideo->dataspace_ = 8; // 8:picture dataspace
             streamInfoVideo->intent_ = intent;
             streamInfoVideo->encodeType_ = OHOS::Camera::ENCODE_TYPE_H264;
             streamInfoVideo->tunneledMode_ = 5; // 5:tunnel mode
@@ -495,7 +495,7 @@ void TestDisplay::StartStream(std::vector<OHOS::Camera::StreamIntent> intents)
             streamInfoCapture->width_ = CAPTURE_WIDTH; // 1280:picture width
             streamInfoCapture->height_ = CAPTURE_HEIGHT; // 960:picture height
             streamInfoCapture->format_ = PIXEL_FMT_RGBA_8888;
-            streamInfoCapture->datasapce_ = 8; // 8:picture datasapce
+            streamInfoCapture->dataspace_ = 8; // 8:picture dataspace
             streamInfoCapture->intent_ = intent;
             streamInfoCapture->encodeType_ = OHOS::Camera::ENCODE_TYPE_JPEG;
             streamInfoCapture->tunneledMode_ = 5; // 5:tunnel mode
@@ -512,7 +512,7 @@ void TestDisplay::StartStream(std::vector<OHOS::Camera::StreamIntent> intents)
             streamInfoAnalyze->width_ = ANALYZE_WIDTH; // 640:picture width
             streamInfoAnalyze->height_ = ANALYZE_HEIGHT; // 480:picture height
             streamInfoAnalyze->format_ = PIXEL_FMT_RGBA_8888;
-            streamInfoAnalyze->datasapce_ = 8; // 8:picture datasapce
+            streamInfoAnalyze->dataspace_ = 8; // 8:picture dataspace
             streamInfoAnalyze->intent_ = intent;
             streamInfoAnalyze->tunneledMode_ = 5; // 5:tunnel mode
             streamInfoAnalyze->bufferQueue_ = streamCustomerAnalyze_->CreateProducer();

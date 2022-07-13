@@ -25,7 +25,7 @@ namespace DistributedHardware {
 DCamRetCode DCameraStream::InitDCameraStream(const shared_ptr<StreamInfo> &info)
 {
     if ((info->streamId_ < 0) || (info->width_ < 0) || (info->height_ < 0) ||
-        (info->format_ < 0) || (info->datasapce_ < 0)) {
+        (info->format_ < 0) || (info->dataspace_ < 0)) {
         DHLOGE("Stream info is invalid.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
@@ -35,7 +35,7 @@ DCamRetCode DCameraStream::InitDCameraStream(const shared_ptr<StreamInfo> &info)
     dcStreamInfo_->width_ = info->width_;
     dcStreamInfo_->height_ = info->height_;
     dcStreamInfo_->format_ = info->format_;
-    dcStreamInfo_->datasapce_ = info->datasapce_;
+    dcStreamInfo_->dataspace_ = info->dataspace_;
     dcStreamInfo_->intent_ = info->intent_;
     dcStreamInfo_->tunneledMode_ = info->tunneledMode_;
     dcStreamInfo_->bufferQueue_ = info->bufferQueue_;
@@ -51,7 +51,7 @@ DCamRetCode DCameraStream::InitDCameraStream(const shared_ptr<StreamInfo> &info)
     dcStreamAttribute_->width_ = dcStreamInfo_->width_;
     dcStreamAttribute_->height_ = dcStreamInfo_->height_;
     dcStreamAttribute_->overrideFormat_ = dcStreamInfo_->format_;
-    dcStreamAttribute_->overrideDatasapce_ = dcStreamInfo_->datasapce_;
+    dcStreamAttribute_->overrideDataspace_ = dcStreamInfo_->dataspace_;
     dcStreamAttribute_->producerUsage_ = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA;
 
     dcStreamAttribute_->producerBufferCount_ = BUFFER_QUEUE_SIZE;

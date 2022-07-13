@@ -86,7 +86,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_003, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = -1;
-    streamInfo->datasapce_ = 10; // 10:picture datasapce
+    streamInfo->dataspace_ = 10; // 10:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -175,7 +175,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_020, TestSize.Level1)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -228,7 +228,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_021, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -270,7 +270,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_022, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -323,7 +323,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_023, TestSize.Level2)
     streamInfo->width_ = -1;
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -366,7 +366,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_025, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = -1;
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -408,7 +408,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_027, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = -1;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -426,14 +426,14 @@ HWTEST_F(CameraPreviewTest, camera_preview_027, TestSize.Level2)
 
 /**
   * @tc.name: Preview
-  * @tc.desc: CreateStreams, StreamInfo->datasapce = 2147483647, success.
+  * @tc.desc: CreateStreams, StreamInfo->dataspace = 2147483647, success.
   * @tc.level: Level2
   * @tc.size: MediumTest
   * @tc.type: Function
   */
 HWTEST_F(CameraPreviewTest, camera_preview_030, TestSize.Level2)
 {
-    std::cout << "==========[test log] CreateStreams, StreamInfo->datasapce = 2147483647, success." << std::endl;
+    std::cout << "==========[test log] CreateStreams, StreamInfo->dataspace = 2147483647, success." << std::endl;
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // Create data stream
@@ -451,7 +451,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_030, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 2147483647;
+    streamInfo->dataspace_ = 2147483647;
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -579,7 +579,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_034, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::POST_VIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -633,7 +633,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_035, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::ANALYZE;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -685,7 +685,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_036, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::CUSTOM;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -728,7 +728,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_037, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = false;
     streamInfo->bufferQueue_ = producer;
@@ -772,7 +772,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_038, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 0;
     streamInfo->minFrameDuration_ = -1;
@@ -813,7 +813,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_039, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 0;
     streamInfo->minFrameDuration_ = 2147483647;
@@ -852,7 +852,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_040, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 0;
     streamInfo->bufferQueue_ = producer;
@@ -918,7 +918,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_060, TestSize.Level1)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -973,7 +973,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_061, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -1055,7 +1055,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_070, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -1112,7 +1112,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_071, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
@@ -1272,7 +1272,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_080, TestSize.Level2)
     streamInfo->width_ = 640; // 640:picture width
     streamInfo->height_ = 480; // 480:picture height
     streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    streamInfo->datasapce_ = 8; // 8:picture datasapce
+    streamInfo->dataspace_ = 8; // 8:picture dataspace
     streamInfo->intent_ = OHOS::Camera::PREVIEW;
     streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     streamInfo->bufferQueue_ = producer;
