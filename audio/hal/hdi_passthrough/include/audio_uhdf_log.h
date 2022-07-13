@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include "hdf_log.h"
 
-#ifndef AUDIO_HAL_HDF_LOG
+#ifndef AUDIO_HDF_LOG
 #define AUDIO_FUNC_LOGD(fmt, arg...) do { \
     } while (0)
 

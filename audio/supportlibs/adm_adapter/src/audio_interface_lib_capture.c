@@ -15,6 +15,7 @@
 
 #include "audio_interface_lib_capture.h"
 #include "osal_mem.h"
+#include "audio_common.h"
 #include "audio_uhdf_log.h"
 #ifdef ALSA_MODE
 #include "alsa_audio.h"

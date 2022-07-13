@@ -14,6 +14,7 @@
  */
 
 #include "audio_interface_lib_render.h"
+#include "audio_common.h"
 #include "audio_uhdf_log.h"
 #include "osal_mem.h"
 #include "osal_mutex.h"

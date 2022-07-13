@@ -40,8 +40,8 @@ PathSelGetConfToJsonObj g_pathSelGetConfToJsonObj = NULL;
 PathSelAnalysisJson g_pathSelAnalysisJson = NULL;
 #endif
 
-static const char *g_capturePassthroughPath = HDF_LIBRARY_FULL_PATH("libhdi_idl_audio_interface_lib_capture");
-static const char *g_renderPassthroughPath = HDF_LIBRARY_FULL_PATH("libhdi_idl_audio_interface_lib_render");
+static const char *g_capturePassthroughPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_capture");
+static const char *g_renderPassthroughPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_render");
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
 static const char *g_pathSelectPassthroughPath = HDF_LIBRARY_FULL_PATH("libhdi_idl_audio_path_select");
