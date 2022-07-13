@@ -39,7 +39,8 @@ bool AudioCreateCaptureAttrsFuzzTest(const uint8_t *data, size_t size)
     InitDevDesc(devDesc, capturePort->portId, PIN_IN_MIC);
     struct AudioCapture *capture = nullptr;
     struct AudioSampleAttributes attrsFuzz = {};
-    if (memcpy_s((void *)&attrsFuzz, sizeof(attrsFuzz), data, sizeof(attrsFuzz)) != 0) {
+    int32_t copySize = sizeof(attrsFuzz) > size ? size : sizeof(attrsFuzz);
+    if (memcpy_s((void *)&attrsFuzz, sizeof(attrsFuzz), data, copySize) != 0) {
         return false;
     }
     ret = adapter->CreateCapture(adapter, &devDesc, &attrsFuzz, &capture);

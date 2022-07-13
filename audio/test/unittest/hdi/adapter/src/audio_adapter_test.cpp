@@ -252,8 +252,13 @@ HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenParamIsVaild, TestSize.Level1)
     struct AudioSampleAttributes attrs;
     EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
     struct AudioHwRender hwRender;
+    hwRender.renderParam.frameRenderMode.buffer = nullptr;
     EXPECT_EQ(HDF_SUCCESS, InitHwRender(hwRender, desc, attrs));
     EXPECT_EQ(HDF_SUCCESS, InitHwRenderParam(&hwRender, &desc, &attrs));
+    if (hwRender.renderParam.frameRenderMode.buffer != nullptr) {
+        OsalMemFree(hwRender.renderParam.frameRenderMode.buffer);
+        hwRender.renderParam.frameRenderMode.buffer = nullptr;
+    }
 }
 
 HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenCapabilityIndexIsNull, TestSize.Level1)
@@ -319,7 +324,7 @@ HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenPortIdIsTwo, TestSize.Lev
     portIndex.dir = PORT_OUT;
     portIndex.portId = AUDIO_PORT_ID;
     struct AudioPortCapability capabilityIndex;
-    EXPECT_EQ(HDF_FAILURE, InitForGetPortCapability(portIndex, &capabilityIndex));
+    EXPECT_EQ(HDF_SUCCESS, InitForGetPortCapability(portIndex, &capabilityIndex));
 }
 
 HWTEST_F(AudioAdapterTest, AudioAdapterReleaseCapSubPortsWhenPortCapabilitysIsNull, TestSize.Level1)
@@ -808,7 +813,7 @@ HWTEST_F(AudioAdapterTest, AudioAdapterDestroyCaptureWhenCaptureIsNull, TestSize
 }
 
 HWTEST_F(AudioAdapterTest, AudioAdapterDestroyCaptureWhenBufferIsNotNull, TestSize.Level1)
-{ 
+{
     struct AudioDeviceDescriptor devDesc;
     EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(devDesc));
     struct AudioSampleAttributes attrs;

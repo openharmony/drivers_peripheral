@@ -33,7 +33,8 @@ namespace Audio {
         }
 
         struct AudioMmapBufferDescripter descFuzz = {};
-        if (memcpy_s((void *)&descFuzz, sizeof(descFuzz), data, sizeof(descFuzz)) != 0) {
+        int32_t copySize = sizeof(descFuzz) > size ? size : sizeof(descFuzz);
+        if (memcpy_s((void *)&descFuzz, sizeof(descFuzz), data, copySize) != 0) {
             return false;
         }
         ret = capture->attr.ReqMmapBuffer((AudioHandle)capture, size, &descFuzz);

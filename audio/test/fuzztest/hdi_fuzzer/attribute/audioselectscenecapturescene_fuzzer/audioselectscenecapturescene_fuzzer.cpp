@@ -32,7 +32,8 @@ namespace Audio {
         }
 
         struct AudioSceneDescriptor sceneFuzz = {};
-        if (memcpy_s((void *)&sceneFuzz, sizeof(sceneFuzz), data, sizeof(sceneFuzz)) != 0) {
+        int32_t copySize = sizeof(sceneFuzz) > size ? size : sizeof(sceneFuzz);
+        if (memcpy_s((void *)&sceneFuzz, sizeof(sceneFuzz), data, copySize) != 0) {
             return false;
         }
         ret = capture->scene.SelectScene(capture, &sceneFuzz);

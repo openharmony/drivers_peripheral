@@ -34,7 +34,7 @@ namespace Audio {
         struct AudioMmapBufferDescripter descFuzz {
             .memoryAddress = (void *)data,
             .memoryFd = *(int32_t *)data,
-            .totalBufferFrames = *(int32_t *)data,
+            .totalBufferFrames = size,
             .transferFrameSize = *(int32_t *)data,
             .isShareable = *(int32_t *)data,
             .offset = *(uint32_t *)data,

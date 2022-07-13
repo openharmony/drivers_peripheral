@@ -14,6 +14,7 @@
  */
 
 #include "audio_adapter.h"
+#include "osal_mem.h"
 #include "audio_adapter_info_common.h"
 #include "audio_hal_log.h"
 #include "audio_interface_lib_capture.h"
@@ -579,6 +580,15 @@ int32_t AudioRenderBindService(struct AudioHwRender *hwRender, BindServiceRender
     return AUDIO_HAL_SUCCESS;
 }
 
+void AudioCreateRenderRelease(struct AudioHwRender **hwRender)
+{
+    if (hwRender != NULL && *hwRender != NULL) {
+        AudioMemFree((void **)&((*hwRender)->renderParam.frameRenderMode.buffer));
+    }
+    AudioMemFree((void **)hwRender);
+    return;
+}
+
 int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
                                  const struct AudioSampleAttributes *attrs, struct AudioRender **render)
 {
@@ -609,14 +619,14 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
     ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwAdapter);
     if (ret != 0) {
         AUDIO_FUNC_LOGE("AudioAdapterCreateRenderPre fail");
-        AudioMemFree((void **)&hwRender);
+        AudioCreateRenderRelease(&hwRender);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = AudioRenderBindService(hwRender, pBindServiceRender);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("AudioRenderBindService fail ret = %{public}d", ret);
         AudioReleaseRenderHandle(hwRender);
-        AudioMemFree((void **)&hwRender);
+        AudioCreateRenderRelease(&hwRender);
         return ret;
     }
     /* add for Fuzz */
@@ -624,7 +634,7 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The render address get is invalid ret = %{public}d", ret);
         AudioReleaseRenderHandle(hwRender);
-        AudioMemFree((void **)&hwRender);
+        AudioCreateRenderRelease(&hwRender);
         return ret;
     }
     *render = &hwRender->common;
