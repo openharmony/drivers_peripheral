@@ -143,9 +143,10 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_0001, Te
 
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+#ifndef ALSA_LIB_MODE
     EXPECT_EQ(min, GAIN_MIN);
     EXPECT_EQ(max, GAIN_MAX);
-
+#endif
     adapter->DestroyRender(adapter, render);
     manager->UnloadAdapter(manager, adapter);
 }
@@ -230,17 +231,21 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_0004, Te
 HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    float min = 0;
-    float max = 0;
+    float gain = 10.8;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+#ifdef ALSA_LIB_MODE
+    ret = render->volume.SetGain(render, gain);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+#else
+    float min = 0;
+    float max = 0;
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    float gain = 10.8;
     float gainMax = max;
     float gainMin = min;
     float gainExpc = 10;
@@ -263,10 +268,11 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0001, TestSize.Le
     ret = render->volume.GetGain(render, &gainMin);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(gainMinExpc, gainMin);
-
+#endif
     adapter->DestroyRender(adapter, render);
     manager->UnloadAdapter(manager, adapter);
 }
+#ifndef ALSA_LIB_MODE
 /**
     * @tc.name  Test RenderSetGain API via set gain to the boundary value
     * @tc.number  SUB_Audio_HDI_RenderSetGain_0002
@@ -321,6 +327,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0003, TestSize.Le
     adapter->DestroyRender(adapter, render);
     manager->UnloadAdapter(manager, adapter);
 }
+#endif
 /**
     * @tc.name  Test RenderSetGain API via set the parameter render to nullptr
     * @tc.number  SUB_Audio_HDI_RenderSetGain_0004
@@ -545,7 +552,11 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetMute_0001, TestSi
     int32_t ret = -1;
     bool muteTrue = true;
     bool muteFalse = false;
+#ifdef PRODUCT_RK3568
+    bool defaultmute = false;
+#else
     bool defaultmute = true;
+#endif
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);

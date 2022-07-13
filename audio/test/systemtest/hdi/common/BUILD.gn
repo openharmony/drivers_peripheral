@@ -19,18 +19,22 @@ if (defined(ohos_lite)) {
   import("//drivers/peripheral/audio/audio.gni")
 }
 
-group("hdi") {
+group("hdi_common") {
   if (!defined(ohos_lite)) {
     testonly = true
   }
-  deps = [ "common:hdi_common" ]
-  if (!defined(drivers_peripheral_audio_alsa_lib) ||
-      drivers_peripheral_audio_alsa_lib == false) {
-    deps += [ "hdiperformace:hdi_performace" ]
-    if (!defined(ohos_lite)) {
-      if (enable_audio_adm_service) {
-        deps += [ "hdireliability:hdi_reliability" ]
-      }
-    }
-  }
+  deps = [
+    "adapter:hdf_audio_hdi_adapter_test",
+    "capture:hdf_audio_hdi_capture_attr_test",
+    "capture:hdf_audio_hdi_capture_control_test",
+    "capture:hdf_audio_hdi_capture_scene_test",
+    "capture:hdf_audio_hdi_capture_test",
+    "capture:hdf_audio_hdi_capture_volume_test",
+    "manager:hdf_audio_hdi_manager_test",
+    "render:hdf_audio_hdi_render_attr_test",
+    "render:hdf_audio_hdi_render_control_test",
+    "render:hdf_audio_hdi_render_scene_test",
+    "render:hdf_audio_hdi_render_test",
+    "render:hdf_audio_hdi_render_volume_test",
+  ]
 }

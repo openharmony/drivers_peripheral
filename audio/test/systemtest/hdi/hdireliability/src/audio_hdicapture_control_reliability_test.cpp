@@ -477,11 +477,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStop_R
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         void *result = nullptr;
         pthread_join(tids[i], &result);
-        if ((intptr_t)result == 0) {
-            EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
+        if ((int32_t)(intptr_t)result == 0) {
+            EXPECT_EQ(AUDIO_HAL_SUCCESS, (int32_t)(intptr_t)result);
             succeedcount = succeedcount + 1;
         } else {
-            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (intptr_t)result);
+            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (int32_t)(intptr_t)result);
             failcount = failcount + 1;
         }
     }
@@ -519,11 +519,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCapturePause_
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         void *result = nullptr;
         pthread_join(tids[i], &result);
-        if ((intptr_t)result == 0) {
-            EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
+        if ((int32_t)(intptr_t)result == 0) {
+            EXPECT_EQ(AUDIO_HAL_SUCCESS, (int32_t)(intptr_t)result);
             succeedcount = succeedcount + 1;
         } else {
-            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (intptr_t)result);
+            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (int32_t)(intptr_t)result);
             failcount = failcount + 1;
         }
     }
@@ -666,7 +666,6 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioGetPassthroug
     }
     g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
 }
-
 /**
 * @tc.name  test AudioCaptureResume API via Multithread call.
 * @tc.number  SUB_Audio_HDI_AudioCaptureResume_Reliability_0001
@@ -696,11 +695,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureResume
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         void *result = nullptr;
         pthread_join(tids[i], &result);
-        if ((intptr_t)result == 0) {
-            EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
+        if ((int32_t)(intptr_t)result == 0) {
+            EXPECT_EQ(AUDIO_HAL_SUCCESS, (int32_t)(intptr_t)result);
             succeedcount = succeedcount + 1;
         } else {
-            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (intptr_t)result);
+            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (int32_t)(intptr_t)result);
             failcount = failcount + 1;
         }
     }
@@ -711,7 +710,6 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureResume
         EXPECT_EQ(succeedcount, 1);
     }
 }
-
 /**
 * @tc.name  test AudioGetCapturePosition API via Multithread call.
 * @tc.number  SUB_Audio_HDI_AudioGetCapturePosition_Reliability_0001

@@ -428,7 +428,7 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderRegCallback_0001, Tes
     adapter->DestroyRender(adapter, render);
     manager->UnloadAdapter(manager, adapter);
 }
-
+#ifndef ALSA_LIB_MODE
 /**
 * @tc.name  Test AudioRenderRegCallback API via input "AUDIO_NONBLOCK_WRITE_COMPELETED"
 * @tc.number  SUB_Audio_HDI_AudioRenderRegCallback_0002
@@ -478,6 +478,7 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderRegCallback_0002, Tes
     manager->UnloadAdapter(manager, adapter);
     fclose(file);
 }
+#endif
 /**
 * @tc.name  Test AudioRenderTurnStandbyMode API via
 * @tc.number  SUB_Audio_HDI_AudioRenderTurnStandbyMode_0001
@@ -535,9 +536,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderAudioDevDump_0001, Te
         ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     sleep(1);
+    FrameStatus(0);
     ret = audiopara.render->control.Pause((AudioHandle)audiopara.render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
+    FrameStatus(1);
     ret = audiopara.render->control.Resume((AudioHandle)audiopara.render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = audiopara.render->control.AudioDevDump((AudioHandle)audiopara.render, RANGE, fd);

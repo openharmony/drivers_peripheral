@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -134,7 +134,7 @@ int32_t AudioHdiCaptureSceneTest::AudioCaptureStart(const string path, struct Au
         return HDF_FAILURE;
     }
     ret = FrameStartCapture(capture, file, attrs);
-    fclose(file);
+    (void)fclose(file);
     return ret;
 }
 void AudioHdiCaptureSceneTest::SetUp(void) {}
@@ -166,6 +166,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     adapter->DestroyCapture(adapter, capture);
     manager->UnloadAdapter(manager, adapter);
 }
+#ifndef ALSA_LIB_MODE
 /**
 * @tc.name   Test checking scene's capability where the scene is not configured in the json.
 * @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_0002
@@ -191,6 +192,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     adapter->DestroyCapture(adapter, capture);
     manager->UnloadAdapter(manager, adapter);
 }
+#endif
 /**
 * @tc.name   Test checking scene's capability where the capture is empty
 * @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_0003
@@ -376,6 +378,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0004, T
     adapter->DestroyCapture(adapter, capture);
     manager->UnloadAdapter(manager, adapter);
 }
+#ifndef ALSA_LIB_MODE
 /**
 * @tc.name  Test AudioCaptureSelectScene API where the scene is not configured in the json.
 * @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_0005
@@ -401,4 +404,5 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0005, T
     adapter->DestroyCapture(adapter, capture);
     manager->UnloadAdapter(manager, adapter);
 }
+#endif
 }
