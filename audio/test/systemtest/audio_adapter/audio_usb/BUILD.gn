@@ -15,10 +15,7 @@ import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-###########################systemtest##############################
 module_output_path = "drivers_peripheral_audio/audio"
-
-###########################hdf_audio_usb_adapter_test######################
 ohos_systemtest("hdf_audio_usb_adapter_test") {
   module_out_path = module_output_path
   sources = [
@@ -45,14 +42,6 @@ ohos_systemtest("hdf_audio_usb_adapter_test") {
     "//third_party/googletest/googletest/include/gtest",
     "//drivers/peripheral/audio/test/systemtest/audio_adapter/audio_usb/include",
   ]
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
-  ]
   deps = [
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -71,5 +60,3 @@ ohos_systemtest("hdf_audio_usb_adapter_test") {
     defines += [ "AUDIO_MPI_SERVICE" ]
   }
 }
-###########################end###########################
-#########################end###########################

@@ -61,7 +61,8 @@ if (defined(ohos_lite)) {
       "../../../common/hdi_common/src/audio_hdi_common.cpp",
       "../../../common/lib_common/src/audio_lib_common.cpp",
     ]
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (defined(drivers_peripheral_audio_alsa_lib) &&
+        drivers_peripheral_audio_alsa_lib == true) {
       sources += [ "src/audio_alsa_libcapture_test.cpp" ]
     } else {
       sources += [ "src/audio_libcapture_test.cpp" ]
