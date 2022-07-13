@@ -992,6 +992,22 @@ int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter)
     return AUDIO_SUCCESS;
 }
 
+void AudioSubPortCapabilityDestroy(struct AudioSubPortCapability *dataBlock, bool freeSelf)
+{
+    if (dataBlock == NULL) {
+        return;
+    }
+
+    if (dataBlock->desc != NULL) {
+        OsalMemFree(dataBlock->desc);
+        dataBlock->desc = NULL;
+    }
+
+    if (freeSelf) {
+        OsalMemFree(dataBlock);
+    }
+}
+
 static void AudioPortCapabilityDeepFree(struct AudioPortCapability *dataBlock, bool freeSelf)
 {
     if (dataBlock == NULL) {
@@ -1005,7 +1021,7 @@ static void AudioPortCapabilityDeepFree(struct AudioPortCapability *dataBlock, b
 
     if (dataBlock->subPorts != NULL) {
         for (uint32_t i = 0; i < dataBlock->subPortsLen; i++) {
-            AudioSubPortCapabilityFree(&dataBlock->subPorts[i], false);
+            AudioSubPortCapabilityDestroy(&dataBlock->subPorts[i], false);
         }
         OsalMemFree(dataBlock->subPorts);
         dataBlock->subPorts = NULL;

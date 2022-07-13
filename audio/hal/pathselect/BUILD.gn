@@ -34,7 +34,7 @@ if (defined(ohos_lite)) {
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [ "hdf_core:libhdf_utils" ]
     if (enable_audio_hal_hdf_log) {
-      defines = [ "AUDIO_HAL_HDF_LOG" ]
+      defines = [ "AUDIO_HDF_LOG" ]
     }
 
     subsystem_name = "hdf"
@@ -58,7 +58,7 @@ if (defined(ohos_lite)) {
 
     defines = []
     if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HAL_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     if (is_standard_system) {
