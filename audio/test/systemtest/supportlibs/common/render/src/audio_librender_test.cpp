@@ -649,7 +649,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Pause_0001, Test
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
     struct AudioHwRender *hwRender = nullptr;
-    ASSERT_TRUE((InterfaceLibOutputRender != nullptr && CloseServiceRenderSo != nullptr);
+    ASSERT_TRUE((InterfaceLibOutputRender != nullptr && CloseServiceRenderSo != nullptr));
     ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = LibHwOutputRender(hwRender, handle);
@@ -672,7 +672,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Resume_0001, Tes
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
     struct AudioHwRender *hwRender = nullptr;
-    ASSERT_TRUE((InterfaceLibOutputRender != nullptr && CloseServiceRenderSo != nullptr);
+    ASSERT_TRUE((InterfaceLibOutputRender != nullptr && CloseServiceRenderSo != nullptr));
     ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = LibHwOutputRender(hwRender, handle);
@@ -695,7 +695,7 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Abnormal_0001, T
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
     struct AudioHwRender *hwRender = nullptr;
-    ASSERT_TRUE((InterfaceLibOutputRender != nullptr && CloseServiceRenderSo != nullptr);
+    ASSERT_TRUE((InterfaceLibOutputRender != nullptr && CloseServiceRenderSo != nullptr));
     ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
