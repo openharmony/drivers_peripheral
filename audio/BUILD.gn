@@ -35,6 +35,10 @@ group("hdi_audio") {
         "hal/hdi_binder/server:hdi_audio_usb_server",
       ]
     }
+
+    if (drivers_peripheral_audio_alsa_lib) {
+      deps += [ "config/linux:hdf_alsa_adapter_json" ]
+    }
   }
 
   if (drivers_peripheral_audio_user_mode == false) {
