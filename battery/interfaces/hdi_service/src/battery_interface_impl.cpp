@@ -84,11 +84,10 @@ int32_t BatteryInterfaceImpl::Init()
 int32_t BatteryInterfaceImpl::Register(const sptr<IBatteryCallback>& callback)
 {
     if (callback == nullptr) {
-        BATTERY_HILOGD(FEATURE_BATT_INFO, "callback is nullptr");
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "callback is nullptr");
         return HDF_ERR_INVALID_PARAM;
     }
     batteryCallback_ = callback;
-    BATTERY_HILOGD(FEATURE_BATT_INFO, "IBatteryCallback registered, ref is %{public}p", callback.GetRefPtr());
     loop_->InitCallback(batteryCallback_);
 
     g_deathRecipient = new BatteryInterfaceImpl::BatteryDeathRecipient(this);

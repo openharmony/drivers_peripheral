@@ -42,7 +42,6 @@ static sptr<IBatteryCallback> g_callback;
 void BatteryThread::InitCallback(const sptr<IBatteryCallback>& callback)
 {
     g_callback = callback;
-    BATTERY_HILOGD(FEATURE_BATT_INFO, "g_callback is %{public}p", callback.GetRefPtr());
 }
 
 int32_t BatteryThread::OpenUeventSocket()
@@ -253,16 +252,6 @@ void BatteryThread::UpdateBatteryInfo(void* service)
     event.remainEnergy = batteryInfo->remainEnergy_;
     event.totalEnergy = batteryInfo->totalEnergy_;
 
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
-        "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
-        "pluggedMaxVoltage=%{public}d, chargeState=%{public}d, chargeCounter=%{public}d, present=%{public}d, " \
-        "technology=%{public}s, curNow==%{public}d, remainEnergy==%{public}d, totalEnergy==%{public}d",
-        batteryInfo->capacity_, batteryInfo->voltage_,
-        batteryInfo->temperature_, batteryInfo->healthState_, batteryInfo->pluggedType_,
-        batteryInfo->pluggedMaxCurrent_, batteryInfo->pluggedMaxVoltage_, batteryInfo->chargeState_,
-        batteryInfo->chargeCounter_, batteryInfo->present_, batteryInfo->technology_.c_str(),
-        batteryInfo->curNow_, batteryInfo->remainEnergy_, batteryInfo->totalEnergy_);
-
     if (g_callback != nullptr) {
         g_callback->Update(event);
     } else {
@@ -288,7 +277,6 @@ int32_t BatteryThread::LoopingThreadEntry(void* arg)
     size_t size = callbacks_.size();
     struct epoll_event events[size];
 
-    BATTERY_HILOGI(COMP_HDI, "start battery thread looping");
     while (true) {
         if (!nevents) {
             CycleMatters();
@@ -301,7 +289,6 @@ int32_t BatteryThread::LoopingThreadEntry(void* arg)
         if ((timeout < 0) || (waitTimeout > 0 && waitTimeout < timeout)) {
             timeout = waitTimeout;
         }
-        BATTERY_HILOGD(COMP_HDI, "timeout=%{public}d, nevents=%{public}d", timeout, nevents);
 
         nevents = epoll_wait(epFd_, events, static_cast<int32_t>(size), timeout);
         if (nevents <= 0) {

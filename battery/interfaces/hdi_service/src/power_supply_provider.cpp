@@ -356,7 +356,6 @@ int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
 {
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "buf is: %{public}s", buf);
     std::string currentMaxNode = POWER_SUPPLY_BATTERY;
     for (const auto& iter : nodeNamePathMap_) {
         if (iter.first == "current_max") {
@@ -370,7 +369,6 @@ int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
         return ret;
     }
     int32_t value = ParseInt(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "maxCurrent is %{public}d", value);
     *maxCurrent = value;
 
     return HDF_SUCCESS;
@@ -393,7 +391,6 @@ int32_t PowerSupplyProvider::ParsePluggedMaxVoltage(int32_t* maxVoltage) const
         return ret;
     }
     int32_t value = ParseInt(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "maxCurrent is %{public}d", value);
     *maxVoltage = value;
 
     return HDF_SUCCESS;
@@ -531,7 +528,6 @@ void PowerSupplyProvider::InitBatteryPath()
             BATTERY_HILOGI(FEATURE_BATT_INFO, "system Battery path is exist");
             return;
         }
-        BATTERY_HILOGI(FEATURE_BATT_INFO, "create mock battery path");
         InitDefaultSysfs();
     }
 }
@@ -560,7 +556,6 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs()
         }
 
         if (entry->d_type == DT_DIR || entry->d_type == DT_LNK) {
-            BATTERY_HILOGI(FEATURE_BATT_INFO, "init sysfs info of %{public}s", entry->d_name);
             if (index_ >= MAX_SYSFS_SIZE) {
                 BATTERY_HILOGW(FEATURE_BATT_INFO, "too many power supply types");
                 break;
@@ -573,7 +568,7 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs()
     nodeNamePathMap_.clear();
     TraversalNode();
     FormatSysfsPaths(&sysfsInfo);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "init power supply sysfs nodes, total count %{public}d", index_);
+    BATTERY_HILOGD(FEATURE_BATT_INFO, "init power supply sysfs nodes, total count %{public}d", index_);
     closedir(dir);
 
     return HDF_SUCCESS;
@@ -632,7 +627,7 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
 
     dir = opendir(batteryPath.c_str());
     if (dir == nullptr) {
-        BATTERY_HILOGI(FEATURE_BATT_INFO, "subfolder file is not exist.");
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "subfolder file is not exist.");
         return;
     }
 
@@ -674,7 +669,6 @@ int32_t PowerSupplyProvider::ParseCapacity(int32_t* capacity) const
     }
 
     int32_t value = ParseInt(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "capacity is %{public}d", value);
     *capacity = value;
 
     return HDF_SUCCESS;
@@ -690,7 +684,6 @@ int32_t PowerSupplyProvider::ParseTotalEnergy(int32_t* totalEnergy) const
     }
 
     int32_t value = ParseInt(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "totalEnergy is %{public}d", value);
     *totalEnergy = value;
 
     return HDF_SUCCESS;
@@ -706,7 +699,6 @@ int32_t PowerSupplyProvider::ParseCurrentAverage(int32_t* curAverage) const
     }
 
     int32_t value = ParseInt(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "curAverage is %{public}d", value);
     *curAverage = value;
 
     return HDF_SUCCESS;
@@ -722,7 +714,6 @@ int32_t PowerSupplyProvider::ParseCurrentNow(int32_t* curNow) const
     }
 
     int32_t value = ParseInt(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "curNow is %{public}d", value);
     *curNow = value;
 
     return HDF_SUCCESS;
@@ -738,7 +729,6 @@ int32_t PowerSupplyProvider::ParseRemainEnergy(int32_t* remainEnergy) const
     }
 
     int32_t value = ParseInt(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "remainEnergy is %{public}d", value);
     *remainEnergy = value;
 
     return HDF_SUCCESS;
@@ -753,7 +743,6 @@ int32_t PowerSupplyProvider::ParseVoltage(int32_t* voltage) const
     }
 
     int32_t value = ParseInt(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "voltage is %{public}d", value);
     *voltage = value;
 
     return HDF_SUCCESS;
@@ -768,7 +757,6 @@ int32_t PowerSupplyProvider::ParseTemperature(int32_t* temperature) const
     }
 
     int32_t value = ParseInt(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "temperature is %{public}d", value);
     *temperature = value;
 
     return HDF_SUCCESS;
@@ -784,7 +772,6 @@ int32_t PowerSupplyProvider::ParseHealthState(int32_t* healthState) const
 
     Trim(buf);
     *healthState = HealthStateEnumConverter(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "healthState is %{public}d", *healthState);
     return HDF_SUCCESS;
 }
 
@@ -798,7 +785,6 @@ int32_t PowerSupplyProvider::ParsePluggedType(int32_t* pluggedType) const
         return HDF_ERR_NOT_SUPPORT;
     }
 
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "return online plugged type %{public}d", type);
     *pluggedType = type;
     return HDF_SUCCESS;
 }
@@ -813,7 +799,6 @@ int32_t PowerSupplyProvider::ParseChargeState(int32_t* chargeState) const
 
     Trim(buf);
     *chargeState = ChargeStateEnumConverter(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "chargeState is %{public}d", *chargeState);
     return HDF_SUCCESS;
 }
 
@@ -826,7 +811,6 @@ int32_t PowerSupplyProvider::ParsePresent(int8_t* present) const
     }
 
     auto value = static_cast<int8_t>(ParseInt(buf));
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "present is %{public}d", value);
     *present = value;
     return HDF_SUCCESS;
 }
@@ -840,7 +824,6 @@ int32_t PowerSupplyProvider::ParseChargeCounter(int32_t* chargeCounter) const
     }
 
     int32_t value = ParseInt(buf);
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "temperature is %{public}d", value);
     *chargeCounter = value;
 
     return HDF_SUCCESS;
@@ -855,7 +838,6 @@ int32_t PowerSupplyProvider::ParseTechnology(std::string& technology) const
     }
 
     technology.assign(buf, strlen(buf));
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "technology is %{public}s", technology.c_str());
     return HDF_SUCCESS;
 }
 
