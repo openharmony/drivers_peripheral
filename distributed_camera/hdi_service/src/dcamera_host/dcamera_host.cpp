@@ -67,7 +67,33 @@ CamRetCode DCameraHost::GetCameraAbility(const std::string &cameraId,
     }
 
     auto iter = dCameraDeviceMap_.find(cameraId);
-    return (iter->second)->GetDCameraAbility(ability);
+    CamRetCode retCode = (iter->second)->GetDCameraAbility(ability);
+
+    do {
+        camera_metadata_item_t item;
+        constexpr uint32_t WIDTH_OFFSET = 1;
+        constexpr uint32_t HEIGHT_OFFSET = 2;
+        constexpr uint32_t UNIT_LENGTH = 3;
+        int32_t ret = Camera::FindCameraMetadataItem(ability->get(),
+            OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &item);
+        DHLOGI("FindCameraMetadataItem item=%u, count=%u, dataType=%u", item.item, item.count, item.data_type);
+        if (ret != CAM_META_SUCCESS) {
+            DHLOGE("Failed to find stream configuration in camera ability with return code %d", ret);
+            break;
+        }
+        if (item.count % UNIT_LENGTH != 0) {
+            DHLOGE("Invalid stream configuration count: %u", item.count);
+            break;
+        }
+        for (uint32_t index = 0; index < item.count; index += UNIT_LENGTH) {
+            int32_t format = item.data.i32[index];
+            int32_t width = item.data.i32[index + WIDTH_OFFSET];
+            int32_t height = item.data.i32[index + HEIGHT_OFFSET];
+            DHLOGD("format: %d, width: %d, height: %d", format, width, height);
+        }
+    } while (0);
+
+    return retCode;
 }
 
 CamRetCode DCameraHost::OpenCamera(const std::string &cameraId,
