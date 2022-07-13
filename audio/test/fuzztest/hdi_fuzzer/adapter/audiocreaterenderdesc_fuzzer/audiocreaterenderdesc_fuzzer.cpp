@@ -40,7 +40,8 @@ bool AudioCreaterenderDescFuzzTest(const uint8_t *data, size_t size)
 
     struct AudioRender *render = nullptr;
     struct AudioDeviceDescriptor devDescFuzz = {};
-    if (memcpy_s((void *)&devDescFuzz, sizeof(devDescFuzz), data, sizeof(devDescFuzz)) != 0) {
+    int32_t copySize = sizeof(devDescFuzz) > size ? size : sizeof(devDescFuzz);
+    if (memcpy_s((void *)&devDescFuzz, sizeof(devDescFuzz), data, copySize) != 0) {
         return false;
     }
     ret = adapter->CreateRender(adapter, &devDescFuzz, &attrs, &render);

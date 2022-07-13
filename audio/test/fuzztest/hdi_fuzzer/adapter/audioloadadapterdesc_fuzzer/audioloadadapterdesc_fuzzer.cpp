@@ -34,11 +34,11 @@ bool AudioLoadadapterDescFuzzTest(const uint8_t *data, size_t size)
     if (memcpy_s((void *)&port, sizeof(port), data, sizeof(port)) != 0) {
         return false;
     }
+    port.portName = (char *)data;
 
     struct AudioAdapterDescriptor descFuzz = {};
-    if (memcpy_s((void *)&descFuzz, sizeof(descFuzz), data, sizeof(descFuzz)) != 0) {
-        return false;
-    }
+    descFuzz.adapterName = (char *)data;
+    descFuzz.portNum = *(uint32_t *)data;
     descFuzz.ports = &port;
     struct AudioAdapter *adapter = nullptr;
     ret = manager->LoadAdapter(manager, &descFuzz, &adapter);

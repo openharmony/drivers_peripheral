@@ -32,7 +32,8 @@ namespace Audio {
         }
 
         struct AudioSampleAttributes attrsFuzz = {};
-        if (memcpy_s((void *)&attrsFuzz, sizeof(attrsFuzz), data, sizeof(attrsFuzz)) != 0) {
+        int32_t copySize = sizeof(attrsFuzz) > size ? size : sizeof(attrsFuzz);
+        if (memcpy_s((void *)&attrsFuzz, sizeof(attrsFuzz), data, copySize) != 0) {
             return false;
         }
         ret = capture->attr.SetSampleAttributes(capture, &attrsFuzz);
