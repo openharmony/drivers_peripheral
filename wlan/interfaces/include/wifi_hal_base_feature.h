@@ -106,7 +106,8 @@ struct IWiFiBaseFeature {
      *
      * @param baseFeature Indicates the pointer to the basic feature, as described in {@link IWiFiBaseFeature}.
      *
-     * @return Returns <b>0</b> if the network interface name is obtained; returns a negative value otherwise.
+     * @return Returns network interface name if the network interface name is obtained;
+     *         returns NULL otherwise.
      *
      * @since 1.0
      * @version 1.0
@@ -118,7 +119,7 @@ struct IWiFiBaseFeature {
      *
      * @param baseFeature Indicates the pointer to the basic feature, as described in {@link IWiFiBaseFeature}.
      *
-     * @return Returns <b>0</b> if the feature type is obtained; returns a negative value otherwise.
+     * @return Returns feature type if the feature type is obtained; returns a negative value otherwise.
      *
      * @since 1.0
      * @version 1.0
