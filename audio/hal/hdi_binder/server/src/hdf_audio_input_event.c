@@ -22,7 +22,7 @@
 #include "hdf_audio_pnp_server.h"
 #include "osal_time.h"
 #include "securec.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG             HDF_AUDIO_HAL_HOST
 #define INPUT_EVT_MAX_CNT       4

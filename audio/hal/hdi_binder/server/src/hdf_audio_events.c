@@ -18,7 +18,7 @@
 #include <string.h>
 #include "securec.h"
 #include "hdf_base.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_HOST
 

@@ -15,7 +15,7 @@
 
 #include "audio_adapter_info_common.h"
 #include "audio_proxy_common.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 

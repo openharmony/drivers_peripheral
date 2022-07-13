@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,18 +13,26 @@
  * limitations under the License.
  */
 
+#include "audio_common.h"
+#include <dlfcn.h>
+#include "hdf_types.h"
 #include "osal_mem.h"
 #include "osal_time.h"
-#include "audio_internal.h"
+#include "securec.h"
 #include "audio_uhdf_log.h"
+#include "audio_internal.h"
+#include "v1_0/audio_types.h"
 
-#define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
+#define FILE_NAME_LEN 256
+#define TIME_LEN      32
 
-void AudioDlClose(void **ppHandleSo)
+#define HDF_LOG_TAG AUDIO_HDI_IMPL
+
+void AudioDlClose(void **ppHandlePassthrough)
 {
-    if ((ppHandleSo != NULL) && ((*ppHandleSo) != NULL)) {
-        dlclose(*ppHandleSo);
-        *ppHandleSo = NULL;
+    if ((ppHandlePassthrough != NULL) && ((*ppHandlePassthrough) != NULL)) {
+        dlclose(*ppHandlePassthrough);
+        *ppHandlePassthrough = NULL;
     }
     return;
 }
@@ -38,24 +46,20 @@ void AudioMemFree(void **ppMem)
     return;
 }
 
-void AudioMemFreeOsalMem(void **ppMem)
-{
-    if ((ppMem != NULL) && ((*ppMem) != NULL)) {
-        OsalMemFree(*ppMem);
-        *ppMem = NULL;
-    }
-    return;
-}
-
 int32_t AudioGetSysTime(char *s, int32_t len)
 {
     OsalTimespec time;
     if (s == NULL) {
-        return -1;
+        return HDF_FAILURE;
     }
     OsalGetTime(&time);
     s[0] = 0;
+
     int32_t ret = snprintf_s(s, len, len - 1, "[%llu.%llu]", time.sec, time.usec);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("snprintf_s failed!");
+        return HDF_FAILURE;
+    }
     return ret;
 }
 
@@ -102,18 +106,23 @@ int32_t CheckAttrFormat(enum AudioFormat param)
 int32_t AudioCheckParaAttr(const struct AudioSampleAttributes *attrs)
 {
     if (attrs == NULL) {
+        AUDIO_FUNC_LOGE("param is null!");
         return HDF_FAILURE;
     }
-    int32_t ret;
+
     enum AudioCategory audioCategory = attrs->type;
     if (AUDIO_IN_MEDIA != audioCategory && AUDIO_IN_COMMUNICATION != audioCategory) {
+        AUDIO_FUNC_LOGE("audioCategory error!");
         return HDF_ERR_NOT_SUPPORT;
     }
+
     enum AudioFormat audioFormat = attrs->format;
-    ret = CheckAttrFormat(audioFormat);
+    int32_t ret = CheckAttrFormat(audioFormat);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("CheckAttrFormat error!");
         return ret;
     }
+
     uint32_t sampleRateTemp = attrs->sampleRate;
     return CheckAttrSamplingRate(sampleRateTemp);
 }
@@ -121,10 +130,14 @@ int32_t AudioCheckParaAttr(const struct AudioSampleAttributes *attrs)
 int32_t TimeToAudioTimeStamp(uint64_t bufferFrameSize, struct AudioTimeStamp *time, uint32_t sampleRate)
 {
     if (time == NULL || sampleRate == 0) {
+        AUDIO_FUNC_LOGE("param is null!");
         return HDF_FAILURE;
     }
+
     time->tvSec += (int64_t)(bufferFrameSize / sampleRate);
+
     int64_t lastBufFrames = bufferFrameSize % ((int64_t)sampleRate);
+
     time->tvNSec += (lastBufFrames * SEC_TO_NSEC) / ((int64_t)sampleRate);
     if (time->tvNSec >= SEC_TO_NSEC) {
         time->tvSec += 1;
@@ -139,29 +152,31 @@ void AudioLogRecord(int errorLevel, const char *format, ...)
     FILE *fp = NULL;
     char timeStr[TIME_LEN];
     char fileName[FILE_NAME_LEN];
-    struct tm *tblock = NULL;
-    char folderName[] = "/data/log/drivers_peripheral_audio";
+
     va_start(args, format);
+
     time_t timeLog = time(NULL);
-    tblock = localtime(&timeLog);
-    if (tblock == NULL) {
+    if (timeLog < 0) {
+        va_end(args);
         return;
     }
-    int32_t ret = strftime(fileName, sizeof(fileName), "//data/log/drivers_peripheral_audio/audio_%Y%m%d_%H%M%S.log",
-        tblock);
-    if (ret == 0) {
+
+    struct tm *tmInfo = localtime(&timeLog);
+    if (tmInfo == NULL) {
+        AUDIO_FUNC_LOGE("localtime failed!");
+        va_end(args);
         return;
     }
+
+    (void)strftime(fileName, sizeof(fileName), "//data/%Y-%m-%d_audio_history.log", tmInfo);
     if (fileName[0] == '\0') {
         va_end(args);
         return;
     }
-    if (access(folderName, 0) == -1) {
-        mkdir(folderName, 0770); // 0770: restore permission
-    }
+
     if ((fp = fopen(fileName, "a+")) != NULL) {
-        strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", localtime(&timeLog));
-        if (errorLevel == (int)INFO) {
+        (void)strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", tmInfo);
+        if (errorLevel == (int)AUDIO_INFO) {
             fprintf(fp, "[%s]-[%s]", timeStr, "INFO");
             vfprintf(fp, format, args);
             fprintf(fp, "\n");
