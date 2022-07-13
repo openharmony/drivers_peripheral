@@ -521,7 +521,7 @@ HWTEST_F(AudioHdiRenderTest, SUB_Audio_HDI_AudioRenderFrame_0005, TestSize.Level
     ret = RenderFramePrepare(AUDIO_FILE, frame, requestBytes);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->RenderFrame(render, frame, requestBytes, &replyBytes);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
     adapter->DestroyRender(adapter, render);
     manager->UnloadAdapter(manager, adapter);
