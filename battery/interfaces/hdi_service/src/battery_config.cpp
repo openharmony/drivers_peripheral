@@ -66,7 +66,6 @@ int32_t BatteryConfig::ParseLedConf(Json::Value& root)
 {
     struct LedConf ledConf = {0};
     size_t size = root["led"]["table"].size();
-    BATTERY_HILOGD(COMP_HDI, "led config size = %{public}zu", size);
     if (size == 0) {
         BATTERY_HILOGW(COMP_HDI, "read json file fail, use default led config");
         ledConf.capacityBegin = DEFAULT_CAPACITY_BEGIN_CONF;
@@ -89,8 +88,6 @@ int32_t BatteryConfig::ParseLedConf(Json::Value& root)
         ledConf.capacityEnd = root["led"]["table"][i][INDEX_ONE].asInt();
         ledConf.color = root["led"]["table"][i][INDEX_TWO].asInt();
         ledConf.brightness = root["led"]["table"][i][INDEX_THREE].asInt();
-        BATTERY_HILOGI(COMP_HDI, "capacityBegin= %{public}d, capacityEnd=%{public}d, color=%{public}d, \
-            brightness=%{public}d", ledConf.capacityBegin, ledConf.capacityEnd, ledConf.color, ledConf.brightness);
         ledConf_.emplace_back(ledConf);
     }
     return HDF_SUCCESS;
@@ -107,11 +104,9 @@ int32_t BatteryConfig::ParseTemperatureConf(Json::Value& root)
         tempConf_.upper = DEFAULT_UPPER_TEMP_CONF;
         return HDF_ERR_INVALID_OBJECT;
     }
+
     tempConf_.lower = root["temperature"]["table"][INDEX_ZERO].asInt();
     tempConf_.upper = root["temperature"]["table"][INDEX_ONE].asInt();
-    BATTERY_HILOGI(COMP_HDI, "tempConf_.lower=%{public}d, tempConf_.upper=%{public}d",
-                   tempConf_.lower, tempConf_.upper);
-
     return HDF_SUCCESS;
 }
 
@@ -126,7 +121,6 @@ int32_t BatteryConfig::ParseCapacityConf(Json::Value& root)
         return HDF_ERR_INVALID_OBJECT;
     }
     capacityConf_ = root["soc"]["table"][INDEX_ZERO].asInt();
-    BATTERY_HILOGI(COMP_HDI, "capacityConf_ = %{public}d", capacityConf_);
     return HDF_SUCCESS;
 }
 
