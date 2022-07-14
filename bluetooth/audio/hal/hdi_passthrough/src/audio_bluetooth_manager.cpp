@@ -29,7 +29,7 @@ using namespace bluetooth;
 
 sptr<IBluetoothA2dpSrc> g_proxy_ = nullptr;
 static sptr<BluetoothA2dpSrcObserver> g_btA2dpSrcObserverCallbacks = nullptr;
-int g_playState = false;
+int g_playState = A2DP_NOT_PLAYING;
 RawAddress g_device;
 
 static void AudioOnConnectionStateChanged(const RawAddress &device, int state)
@@ -131,6 +131,10 @@ int WriteFrame(const uint8_t *data, uint32_t size)
     HDF_LOGI("audio_bluetooth_manager WriteFrame");
     if (!g_proxy_) {
         HDF_LOGE("no proxy");
+        return RET_BAD_STATUS;
+    }
+    if (g_playState == A2DP_NOT_PLAYING) {
+        HDF_LOGE("playState is not playing");
         return RET_BAD_STATUS;
     }
     return g_proxy_->WriteFrame(data, size);
