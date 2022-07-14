@@ -67,10 +67,10 @@
 #define CMD_SET_P2P_SCENES        "CMD_SET_P2P_SCENES"
 #define P2P_BUF_SIZE              64
 #define MAX_PRIV_CMD_SIZE         4096
-#define 2_4G_LOW_LITMIT_FREQ      2400
-#define 2_4G_HIGH_LIMIT_FREQ      2500
-#define 5G_LOW_LIMIT_FREQ         5100
-#define 5G_HIGH_LIMIT_FREQ        5900
+#define LOW_LITMIT_FREQ_2_4G      2400
+#define HIGH_LIMIT_FREQ_2_4G      2500
+#define LOW_LIMIT_FREQ_5G         5100
+#define HIGH_LIMIT_FREQ_5G        5900
 
 // vendor attr
 enum AndrWifiAttr {
@@ -297,7 +297,7 @@ static int32_t FamilyIdHandler(struct nl_msg *msg, void *arg)
     }
 
     data = genlmsg_attrdata(hdr, 0);
-    len = genlmsg_attrlen(hdr, 0)
+    len = genlmsg_attrlen(hdr, 0);
     nla_parse(attr, CTRL_ATTR_MAX, data, len, NULL);
     if (!attr[CTRL_ATTR_MCAST_GROUPS]) {
         return NL_SKIP;
@@ -610,7 +610,7 @@ struct PrivDevMac {
     uint8_t len;
 };
 
-static nlattr *GetWiphyBands(struct genlmsghdr *hdr)
+static struct nlattr *GetWiphyBands(struct genlmsghdr *hdr)
 {
     struct nlattr *attrMsg[NL80211_ATTR_MAX + 1];
     void *data = genlmsg_attrdata(hdr, 0);
@@ -648,7 +648,7 @@ static void GetCenterFreq(struct nlattr *bands, struct FreqInfoResult *result)
         switch (result->band) {
             case NL80211_BAND_2GHZ:
                 if (attrFreq[NL80211_FREQUENCY_ATTR_MAX_TX_POWER]) {
-                    if (freq > 2_4G_LOW_LITMIT_FREQ && freq < 2_4G_HIGH_LITMIT_FREQ) {
+                    if (freq > LOW_LITMIT_FREQ_2_4G && freq < HIGH_LIMIT_FREQ_2_4G) {
                         result->freqs[result->nums] = freq;
                         result->txPower[result->nums] = nla_get_u32(attrFreq[NL80211_FREQUENCY_ATTR_MAX_TX_POWER]);
                         result->nums++;
@@ -656,7 +656,7 @@ static void GetCenterFreq(struct nlattr *bands, struct FreqInfoResult *result)
                 }
                 break;
             case NL80211_BAND_5GHZ:
-                if (freq > 5G_LOW_LIMIT_FREQ && freq < 5G_HIGH_LIMIT_FREQ) {
+                if (freq > LOW_LIMIT_FREQ_5G && freq < HIGH_LIMIT_FREQ_5G) {
                     result->freqs[result->nums] = freq;
                     result->nums++;
                 }
@@ -671,15 +671,15 @@ static int32_t ParserValidFreq(struct nl_msg *msg, void *arg)
 {
     struct FreqInfoResult *result = (struct FreqInfoResult *)arg;
     struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
-    struct nalttr *attrWiphyBands = NULL;
+    struct nlattr *attrWiphyBands = NULL;
     struct nlattr *attrBand[NL80211_BAND_ATTR_MAX + 1];
     struct nlattr *nlBand = NULL;
-    int32_t i, j;
+    int32_t i;
     void *data = NULL;
     int32_t len;
 
     attrWiphyBands = GetWiphyBands(hdr);
-    if (GetWiphyBands == NULL) {
+    if (attrWiphyBands == NULL) {
         return NL_SKIP;
     }
 
@@ -714,7 +714,7 @@ static int32_t GetAllIfaceInfo(struct NetworkInfoResult *infoResult)
         return RET_CODE_FAILURE;
     }
     infoResult->nums = 0;
-    while ((de = readdir(d))) {
+    while ((de = readdir(dir))) {
         if (de->d_name[0] == '.') {
             continue;
         }
@@ -1166,8 +1166,9 @@ int32_t SetResetDriver(const uint8_t chipId, const char *ifName)
     return RET_CODE_SUCCESS;
 }
 
-static int32_t NetDeviceInfoHandler(struct nl_msg *msg, struct NetDeviceInfo *info)
+static int32_t NetDeviceInfoHandler(struct nl_msg *msg, void *arg)
 {
+    struct NetDeviceInfo *info = (struct NetDeviceInfo *)arg;
     struct nlattr *attr[NL80211_ATTR_MAX + 1];
     struct genlmsghdr *hdr = NULL;
     void *data = NULL;
@@ -1484,7 +1485,7 @@ static int32_t SendCommandToDriver(const char *cmd, uint32_t len, const char *if
 {
     struct ifreq ifr = {0};
     WifiPrivCmd privCmd = {0};
-    char buf[MAX_PRIV_CMD_SIZE] = {0};
+    uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
     int32_t ret = RET_CODE_FAILURE;
 
     if (cmd == NULL) {
@@ -1502,7 +1503,7 @@ static int32_t SendCommandToDriver(const char *cmd, uint32_t len, const char *if
     privCmd.buf = buf;
     privCmd.size = sizeof(buf);
     privCmd.len = len;
-    ifr.ifr_data = &privCmd;
+    ifr.ifr_data = (void *)&privCmd;
     if (strcpy_s(ifr.ifr_name, IFNAMSIZ, ifName) != EOK) {
         HILOG_ERROR(LOG_CORE, "%s: strcpy_s error", __FUNCTION__);
         return RET_CODE_FAILURE;
@@ -1596,7 +1597,7 @@ static int32_t SetP2pScenes(const char *ifName, const int8_t *data, uint32_t len
     return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
 }
 
-static int32_t SetDynamicDbacMode(const char *ifName, int8_t *data, uint32_t len)
+static int32_t SetDynamicDbacMode(const char *ifName, const int8_t *data, uint32_t len)
 {
     int32_t ret = RET_CODE_FAILURE;
     char cmdBuf[P2P_BUF_SIZE] = {0};
