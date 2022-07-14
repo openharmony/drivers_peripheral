@@ -147,7 +147,7 @@ typedef struct {
     BitRateMode bitRatemode[BIT_RATE_MODE_NUM]; /* Bit Rate Mode. For details, see {@link BitRateMode}. */
     RangeValue frameRate;                       /* Frame Rate. */
     int32_t measuredFrameRate[MEASURED_FRAME_RATE_NUM]; /* Measured Frame Rate.  */
-} VideoPortCap;
+} CodecVideoPortCap;
 
 /**
  * @brief Defines the video encoding and decoding capabilities.
@@ -162,14 +162,14 @@ typedef struct {
                                                see {@link AudioSampleRate}. */
     int32_t channelLayouts[CHANNEL_NUM];   /** Supported audio channel layouts. */
     int32_t channelCount[CHANNEL_NUM];     /** Supported audio channels. */
-} AudioPortCap;
+} CodecAudioPortCap;
 
 /**
  * @brief Defines the audio and video encoding and decoding capabilities.
  */
 typedef union {
-    VideoPortCap video;               /** Video encoding and decoding capabilities */
-    AudioPortCap audio;               /** Audio encoding and decoding capabilities */
+    CodecVideoPortCap video;               /** Video encoding and decoding capabilities */
+    CodecAudioPortCap audio;               /** Audio encoding and decoding capabilities */
 } PortCap;
 
 /**
