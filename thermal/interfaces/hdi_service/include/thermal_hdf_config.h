@@ -39,12 +39,10 @@ struct XMLThermal {
 struct DfxTraceInfo {
     std::string title;
     std::string value;
-    std::string width;
 };
 
 struct XMLTracingInfo {
     std::string interval;
-    std::string record;
     std::string outpath;
 };
 
