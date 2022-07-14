@@ -476,7 +476,7 @@ bool AlignmentBlockUnmarshalling(struct HdfSBuf *data, Alignment *dataBlock)
     return true;
 }
 
-bool VideoPortCapBlockMarshalling(struct HdfSBuf *data, const VideoPortCap *dataBlock)
+bool VideoPortCapBlockMarshalling(struct HdfSBuf *data, const CodecVideoPortCap *dataBlock)
 {
     if (!RectBlockMarshalling(data, &dataBlock->minSize)) {
         HDF_LOGE("%{public}s: write dataBlock->minSize failed!", __func__);
@@ -518,7 +518,7 @@ bool VideoPortCapBlockMarshalling(struct HdfSBuf *data, const VideoPortCap *data
     return true;
 }
 
-bool VideoPortCapBlockUnmarshalling(struct HdfSBuf *data, VideoPortCap *dataBlock)
+bool VideoPortCapBlockUnmarshalling(struct HdfSBuf *data, CodecVideoPortCap *dataBlock)
 {
     if (dataBlock == NULL) {
         return false;
@@ -563,7 +563,7 @@ bool VideoPortCapBlockUnmarshalling(struct HdfSBuf *data, VideoPortCap *dataBloc
     return true;
 }
 
-bool AudioPortCapBlockMarshalling(struct HdfSBuf *data, const AudioPortCap *dataBlock)
+bool AudioPortCapBlockMarshalling(struct HdfSBuf *data, const CodecAudioPortCap *dataBlock)
 {
     for (uint32_t i = 0; i < SAMPLE_FORMAT_NUM; i++) {
         if (!HdfSbufWriteInt32(data, (dataBlock->sampleFormats)[i])) {
@@ -596,7 +596,7 @@ bool AudioPortCapBlockMarshalling(struct HdfSBuf *data, const AudioPortCap *data
     return true;
 }
 
-bool AudioPortCapBlockUnmarshalling(struct HdfSBuf *data, AudioPortCap *dataBlock)
+bool AudioPortCapBlockUnmarshalling(struct HdfSBuf *data, CodecAudioPortCap *dataBlock)
 {
     if (dataBlock == NULL) {
         return false;
@@ -633,7 +633,7 @@ bool AudioPortCapBlockUnmarshalling(struct HdfSBuf *data, AudioPortCap *dataBloc
     return true;
 }
 
-void AudioPortCapFree(AudioPortCap *dataBlock, bool freeSelf)
+void AudioPortCapFree(CodecAudioPortCap *dataBlock, bool freeSelf)
 {
     if (dataBlock == NULL) {
         return;
