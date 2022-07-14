@@ -31,7 +31,7 @@ void OhosCameraDemo::SetStreamInfo(std::shared_ptr<StreamInfo> &streamInfo,
     const std::shared_ptr<StreamCustomer> &streamCustomer,
     const int streamId, const StreamIntent intent)
 {
-    constexpr uint32_t datasapce = 8;
+    constexpr uint32_t dataspace = 8;
     constexpr uint32_t tunneledMode = 5;
 
     if (intent == PREVIEW) {
@@ -55,7 +55,7 @@ void OhosCameraDemo::SetStreamInfo(std::shared_ptr<StreamInfo> &streamInfo,
 
     streamInfo->streamId_ = streamId;
     streamInfo->format_ =  CAMERA_FORMAT;
-    streamInfo->datasapce_ = datasapce;
+    streamInfo->dataspace_ = dataspace;
     streamInfo->intent_ = intent;
     streamInfo->tunneledMode_ = tunneledMode;
     streamInfo->bufferQueue_ = streamCustomer->CreateProducer();

@@ -192,7 +192,7 @@ HWTEST_F(CaptureTest, Camera_Capture_0005, TestSize.Level2)
 #else
     streamInfo_capture->format_ = PIXEL_FMT_YCRCB_420_SP;
 #endif
-    streamInfo_capture->datasapce_ = 8;
+    streamInfo_capture->dataspace_ = 8;
     streamInfo_capture->intent_ = Camera::STILL_CAPTURE;
     streamInfo_capture->tunneledMode_ = 5;
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> capture_consumer =

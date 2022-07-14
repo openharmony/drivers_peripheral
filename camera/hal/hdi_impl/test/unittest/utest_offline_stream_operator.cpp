@@ -121,7 +121,7 @@ HWTEST_F(OffileStreamOperatorImplTest, UTestPreviewAndSnapshotCombineCapture, Te
     streamInfo->width_ = 720;
     streamInfo->height_ = 480;
     streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    streamInfo->datasapce_ = 8;
+    streamInfo->dataspace_ = 8;
     streamInfo->intent_ = PREVIEW;
     streamInfo->tunneledMode_ = 5;
     std::shared_ptr<StreamConsumer> previewConsumer = std::make_shared<StreamConsumer>();
@@ -142,7 +142,7 @@ HWTEST_F(OffileStreamOperatorImplTest, UTestPreviewAndSnapshotCombineCapture, Te
     streamInfoSnapshot->width_ = 720;
     streamInfoSnapshot->height_ = 480;
     streamInfoSnapshot->format_ = PIXEL_FMT_YCRCB_420_SP;
-    streamInfoSnapshot->datasapce_ = 8;
+    streamInfoSnapshot->dataspace_ = 8;
     streamInfoSnapshot->intent_ = STILL_CAPTURE;
     streamInfoSnapshot->tunneledMode_ = 5;
     std::shared_ptr<StreamConsumer> snapshotConsumer = std::make_shared<StreamConsumer>();;

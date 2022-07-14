@@ -314,7 +314,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0020, TestSize.Level3) {
         Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
         Test_->streamInfo->height_ = 480; // 480:height of stream
         Test_->streamInfo->width_ = 640; // 640:width of stream
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
         Test_->streamInfo->bufferQueue_ = consumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
@@ -369,7 +369,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0021, TestSize.Level3)
         Test_->streamInfo->width_ = 640;
         Test_->streamInfo->height_ = 480;
         Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
@@ -420,7 +420,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0022, TestSize.Level3)
         Test_->streamInfo->width_ = 640;
         Test_->streamInfo->height_ = 480;
         Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
@@ -501,7 +501,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0024, TestSize.Level3)
         Test_->streamInfo->height_ = 480;
         Test_->streamInfo->width_ = 640;
         Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
@@ -564,7 +564,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0025, TestSize.Level3)
         Test_->streamInfo->height_ = 480;
         Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         Test_->streamInfo->tunneledMode_ = 5;
         std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
         Test_->streamInfos.push_back(Test_->streamInfo);
@@ -1102,7 +1102,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0020, TestSize.Level3) {
         Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
         Test_->streamInfo->height_ = 480; // 480:height of stream
         Test_->streamInfo->width_ = 640; // 640:width of stream
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
         Test_->streamInfo->bufferQueue_ = consumer->CreateProducer([this](void* addr, uint32_t size) {
@@ -1153,7 +1153,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0021, TestSize.Level3)
         Test_->streamInfo->width_ = 640;
         Test_->streamInfo->height_ = 480;
         Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
@@ -1202,7 +1202,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0022, TestSize.Level3)
         Test_->streamInfo->width_ = 640;
         Test_->streamInfo->height_ = 480;
         Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer =
@@ -1280,7 +1280,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0024, TestSize.Level3)
         Test_->streamInfo->height_ = 480;
         Test_->streamInfo->width_ = 640;
         Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
         Test_->streamInfo->tunneledMode_ = 5;
         std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
@@ -1341,7 +1341,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0025, TestSize.Level3)
         Test_->streamInfo->height_ = 480;
         Test_->streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
         Test_->streamInfo->intent_ = Camera::PREVIEW;
-        Test_->streamInfo->datasapce_ = 8;
+        Test_->streamInfo->dataspace_ = 8;
         Test_->streamInfo->tunneledMode_ = 5;
         std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(Test_->streamInfos);
         Test_->streamInfos.push_back(Test_->streamInfo);

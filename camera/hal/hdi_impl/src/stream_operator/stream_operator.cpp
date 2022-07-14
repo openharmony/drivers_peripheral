@@ -174,7 +174,7 @@ DynamicStreamSwitchMode StreamOperator::CheckStreamsSupported(
         config.height = it->height_;
         PixelFormat pf = static_cast<PixelFormat>(it->format_);
         config.format = BufferAdapter::PixelFormatToCameraFormat(pf);
-        config.dataspace = it->datasapce_; // fix spell error
+        config.dataspace = it->dataspace_; // fix spell error
         config.tunnelMode = it->tunneledMode_;
         config.minFrameDuration = it->minFrameDuration_;
         config.encodeType = it->encodeType_;
@@ -209,7 +209,7 @@ CamRetCode StreamOperator::CreateStreams(const std::vector<std::shared_ptr<Strea
         scg.height = it->height_;
         PixelFormat pf = static_cast<PixelFormat>(it->format_);
         scg.format = BufferAdapter::PixelFormatToCameraFormat(pf);
-        scg.dataspace = it->datasapce_; // fix misspell
+        scg.dataspace = it->dataspace_; // fix misspell
         scg.tunnelMode = it->tunneledMode_;
         scg.minFrameDuration = it->minFrameDuration_;
         scg.encodeType = it->encodeType_;
@@ -342,7 +342,7 @@ CamRetCode StreamOperator::GetStreamAttributes(std::vector<std::shared_ptr<Strea
         attribute->width_ = configuration.width;
         attribute->height_ = configuration.height;
         attribute->overrideFormat_ = (int32_t)BufferAdapter::CameraFormatToPixelFormat(configuration.format);
-        attribute->overrideDatasapce_ = configuration.dataspace;
+        attribute->overrideDataspace_ = configuration.dataspace;
         attribute->producerUsage_ = BufferAdapter::CameraUsageToGrallocUsage(configuration.usage);
         attribute->producerBufferCount_ = configuration.bufferCount;
         attribute->maxBatchCaptureCount_ = configuration.maxCaptureCount;
@@ -537,7 +537,7 @@ CamRetCode StreamOperator::ChangeToOfflineStream(const std::vector<int>& streamI
 bool StreamOperator::CheckStreamInfo(const std::shared_ptr<StreamInfo>& streamInfo)
 {
     if (streamInfo->streamId_ < 0 || streamInfo->width_ < 0 || streamInfo->height_ < 0 || streamInfo->format_ < 0 ||
-        streamInfo->datasapce_ < 0 || streamInfo->intent_ > CUSTOM || streamInfo->intent_ < PREVIEW ||
+        streamInfo->dataspace_ < 0 || streamInfo->intent_ > CUSTOM || streamInfo->intent_ < PREVIEW ||
         streamInfo->minFrameDuration_ < 0) {
         return false;
     }

@@ -132,7 +132,7 @@ TEST_F(UtestPipelineTest, camera_ppl_0004)
     display_->streamInfo->width_ = 640; // 640:picture width // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 10; // 10:picture datasapce
+    display_->streamInfo->dataspace_ = 10; // 10:picture dataspace
     display_->streamInfo->intent_ = Camera::VIDEO;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;

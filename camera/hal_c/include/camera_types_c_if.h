@@ -113,7 +113,7 @@ typedef struct StreamAttributeCIF {
     /**
      * HAL覆盖的图像颜色空间
      */
-    int overrideDatasapce;
+    int overrideDataspace;
     /**
      * HAL需要的usage(需要等Graphic提供正式的BuferQueue定义)
      */
@@ -222,7 +222,7 @@ typedef struct StreamInfoCIF {
     int width;
     int height;
     int format;
-    int datasapce;
+    int dataspace;
     int /*StreamIntentCIF*/ intent;
     int tunneledMode;
     BufferProducerCIF producer;

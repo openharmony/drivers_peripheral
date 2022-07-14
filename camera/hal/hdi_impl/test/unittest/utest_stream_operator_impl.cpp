@@ -78,7 +78,7 @@ HWTEST_F(StreamOperatorImplTest, UTestIsStreamsSupported, TestSize.Level0)
     streamInfo->width_ = 1280;
     streamInfo->height_ = 720;
     streamInfo->format_ = CAMERA_FORMAT_RGBA_8888;
-    streamInfo->datasapce_ = 10;
+    streamInfo->dataspace_ = 10;
     streamInfo->intent_ = PREVIEW;
     streamInfo->tunneledMode_ = 5;
     std::vector<std::shared_ptr<StreamInfo>> infos;
@@ -99,7 +99,7 @@ HWTEST_F(StreamOperatorImplTest, UTestCapture, TestSize.Level0)
     streamInfo->width_ = 640;
     streamInfo->height_ = 480;
     streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    streamInfo->datasapce_ = 8;
+    streamInfo->dataspace_ = 8;
     streamInfo->intent_ = PREVIEW;
     std::shared_ptr<StreamConsumer> previewConsumer = std::make_shared<StreamConsumer>();
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
@@ -158,7 +158,7 @@ HWTEST_F(StreamOperatorImplTest, UTestCreateStreams, TestSize.Level0)
     streamInfo->height_ = 480;
     streamInfo->intent_ = PREVIEW;
     streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    streamInfo->datasapce_ = 8;
+    streamInfo->dataspace_ = 8;
     StreamConsumer previewConsumer;
     streamInfo->tunneledMode_ = 5;
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
@@ -177,7 +177,7 @@ HWTEST_F(StreamOperatorImplTest, UTestCreateStreams, TestSize.Level0)
     streamInfoSnapshot->width_ = 720;
     streamInfoSnapshot->height_ = 480;
     streamInfoSnapshot->format_ = PIXEL_FMT_YCRCB_420_SP;
-    streamInfoSnapshot->datasapce_ = 8;
+    streamInfoSnapshot->dataspace_ = 8;
     streamInfoSnapshot->intent_ = STILL_CAPTURE;
     StreamConsumer snapshotConsumer;
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
@@ -211,7 +211,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
     streamInfo->width_ = 720;
     streamInfo->height_ = 480;
     streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    streamInfo->datasapce_ = 8;
+    streamInfo->dataspace_ = 8;
     streamInfo->intent_ = PREVIEW;
     StreamConsumer previewConsumer;
     streamInfo->bufferQueue_ = previewConsumer.CreateProducer(
@@ -223,7 +223,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
     std::shared_ptr<StreamInfo> streamInfoSnapshot = std::make_shared<StreamInfo>();
     streamInfoSnapshot->streamId_ = 1012;
     streamInfoSnapshot->width_ = 1920;
-    streamInfoSnapshot->datasapce_ = 8;
+    streamInfoSnapshot->dataspace_ = 8;
     streamInfoSnapshot->height_ = 960;
     streamInfoSnapshot->intent_ = STILL_CAPTURE;
     streamInfoSnapshot->format_ = PIXEL_FMT_YCRCB_420_SP;
@@ -264,7 +264,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
     streamInfo->width_ = 720;
     streamInfo->height_ = 480;
     streamInfo->format_ = PIXEL_FMT_YCRCB_420_SP;
-    streamInfo->datasapce_ = 8;
+    streamInfo->dataspace_ = 8;
     streamInfo->intent_ = PREVIEW;
     StreamConsumer previewConsumer;
     streamInfo->bufferQueue_ = previewConsumer.CreateProducer(
@@ -276,7 +276,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
     std::shared_ptr<StreamInfo> streamInfoSnapshot = std::make_shared<StreamInfo>();
     streamInfoSnapshot->streamId_ = 1012;
     streamInfoSnapshot->width_ = 1920;
-    streamInfoSnapshot->datasapce_ = 8;
+    streamInfoSnapshot->dataspace_ = 8;
     streamInfoSnapshot->height_ = 960;
     streamInfoSnapshot->intent_ = STILL_CAPTURE;
     streamInfoSnapshot->format_ = PIXEL_FMT_YCRCB_420_SP;
