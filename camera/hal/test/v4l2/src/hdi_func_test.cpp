@@ -341,7 +341,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0210)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfos.push_back(display_->streamInfo);
@@ -393,7 +393,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0211)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfos.push_back(display_->streamInfo);
@@ -441,7 +441,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0212)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfos.push_back(display_->streamInfo);
@@ -494,7 +494,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0220)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfos.push_back(display_->streamInfo);
@@ -550,7 +550,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0221)
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    display_->streamInfo->datasapce_ = 8; // 8:picture datasapce
+    display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
     display_->streamInfo->intent_ = Camera::PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfos.push_back(display_->streamInfo);

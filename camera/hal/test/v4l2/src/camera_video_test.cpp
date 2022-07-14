@@ -385,7 +385,7 @@ HWTEST_F(CameraVideoTest, camera_video_030, TestSize.Level2)
     display_->streamInfo->width_ = 1280; // 1280:picture width
     display_->streamInfo->height_ = 960; // 960:picture height
     display_->streamInfo->format_ = PIXEL_FMT_RGBA_8888;
-    display_->streamInfo->datasapce_ = 10;
+    display_->streamInfo->dataspace_ = 10;
     display_->streamInfo->intent_ = OHOS::Camera::VIDEO;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;

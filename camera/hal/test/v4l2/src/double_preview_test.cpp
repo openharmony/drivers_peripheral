@@ -49,7 +49,7 @@ void DoublePreviewTest::SetStreamInfo(std::shared_ptr<OHOS::Camera::StreamInfo> 
             streamInfo->streamId_ = streamId;
         }
     }
-    streamInfo->datasapce_ = DATA_SPACE;
+    streamInfo->dataspace_ = DATA_SPACE;
     streamInfo->intent_ = intent;
     streamInfo->tunneledMode_ = TUNNEL_MODE;
     streamInfo->bufferQueue_ = streamCustomer->CreateProducer();

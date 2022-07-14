@@ -59,7 +59,7 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
     streamInfoPre->width_ = 640;
     streamInfoPre->height_ = 480;
     streamInfoPre->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    streamInfoPre->datasapce_ = 8;
+    streamInfoPre->dataspace_ = 8;
     streamInfoPre->intent_ = Camera::PREVIEW;
     streamInfoPre->tunneledMode_ = 5;
     streamInfoPre->bufferQueue_ = producer;
