@@ -12,12 +12,17 @@
 # limitations under the License
 
 import("//build/lite/config/component/lite_component.gni")
+import("//drivers/peripheral/audio/config/audio_config.gni")
 
 copy("hdf_audio_adapter_json") {
   if (product_name == "ipcamera_hispark_taurus") {
     sources = [ "//vendor/${product_company}/hispark_taurus/hals/audio/audio_adapter.json" ]
   } else {
-    sources = [ "//vendor/${product_company}/${product_name}/hals/audio/audio_adapter.json" ]
+    if (HAVE_AUDIO_ADAPTER_JSON) {
+      source = "${AUDIO_JSON_PATH}/audio_adapter.json"
+    } else {
+      source = "//drivers/peripheral/audio/config/audio_adapter.json"
+    }
   }
   outputs = [ "${root_out_dir}/etc/audio_adapter.json" ]
 }
@@ -28,9 +33,11 @@ copy("hdf_audio_path_json") {
       "//vendor/${product_company}/hispark_taurus/hals/audio/audio_paths.json",
     ]
   } else {
-    sources = [
-      "//vendor/${product_company}/${product_name}/hals/audio/audio_paths.json",
-    ]
+    if (HAVE_AUDIO_PATHS_JSON) {
+      source = "${AUDIO_JSON_PATH}/audio_paths.json"
+    } else {
+      source = "//drivers/peripheral/audio/config/audio_paths.json"
+    }
   }
   outputs = [ "${root_out_dir}/etc/audio_paths.json" ]
 }
