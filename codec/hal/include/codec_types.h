@@ -50,17 +50,17 @@ bool AlignmentBlockMarshalling(struct HdfSBuf *data, const Alignment *dataBlock)
 
 bool AlignmentBlockUnmarshalling(struct HdfSBuf *data, Alignment *dataBlock);
 
-bool VideoPortCapBlockMarshalling(struct HdfSBuf *data, const VideoPortCap *dataBlock);
+bool VideoPortCapBlockMarshalling(struct HdfSBuf *data, const CodecVideoPortCap *dataBlock);
 
-bool VideoPortCapBlockUnmarshalling(struct HdfSBuf *data, VideoPortCap *dataBlock);
+bool VideoPortCapBlockUnmarshalling(struct HdfSBuf *data, CodecVideoPortCap *dataBlock);
 
-void VideoPortCapFree(VideoPortCap *dataBlock, bool freeSelf);
+void VideoPortCapFree(CodecVideoPortCap *dataBlock, bool freeSelf);
 
-bool AudioPortCapBlockMarshalling(struct HdfSBuf *data, const AudioPortCap *dataBlock);
+bool AudioPortCapBlockMarshalling(struct HdfSBuf *data, const CodecAudioPortCap *dataBlock);
 
-bool AudioPortCapBlockUnmarshalling(struct HdfSBuf *data, AudioPortCap *dataBlock);
+bool AudioPortCapBlockUnmarshalling(struct HdfSBuf *data, CodecAudioPortCap *dataBlock);
 
-void AudioPortCapFree(AudioPortCap *dataBlock, bool freeSelf);
+void AudioPortCapFree(CodecAudioPortCap *dataBlock, bool freeSelf);
 
 bool CodecCompCapabilityBlockMarshalling(struct HdfSBuf *data, const CodecCompCapability *dataBlock);
 
