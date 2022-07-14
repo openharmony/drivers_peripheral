@@ -43,6 +43,7 @@ private:
     bool PrepareWriteDfxLog();
     int32_t ParseValue(const std::string& path, std::string& value);
     int32_t LoopingThreadEntry();
+    std::string GetFileNameIndex(const uint32_t index);
 };
 } // V1_0
 } // Thermal
