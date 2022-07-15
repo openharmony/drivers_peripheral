@@ -16,11 +16,9 @@
 
 using namespace testing::ext;
 
-void CameraAbilityTest::SetUpTestCase(void)
-{}
+void CameraAbilityTest::SetUpTestCase(void) {}
 
-void CameraAbilityTest::TearDownTestCase(void)
-{}
+void CameraAbilityTest::TearDownTestCase(void) {}
 
 void CameraAbilityTest::SetUp(void)
 {
@@ -30,10 +28,9 @@ void CameraAbilityTest::SetUp(void)
     display_->Init();
 }
 
-OHOS::Camera::RetCode CameraAbilityTest::GetSensorOrientation(
-    std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+OHOS::Camera::RetCode CameraAbilityTest::GetSensorOrientation(std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
 {
-    common_metadata_header_t* data = display_->ability->get();
+    common_metadata_header_t *data = display_->ability->get();
     int32_t sensorOrientation;
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
@@ -46,18 +43,79 @@ OHOS::Camera::RetCode CameraAbilityTest::GetSensorOrientation(
     return OHOS::Camera::RC_OK;
 }
 
+OHOS::Camera::RetCode CameraAbilityTest::GetFlashAvailable(std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+{
+    common_metadata_header_t *data = display_->ability->get();
+    uint8_t flashAvailable;
+    camera_metadata_item_t entry;
+    int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_ABILITY_FLASH_AVAILABLE, &entry);
+    if (ret != 0) {
+        std::cout << "==========[test log] get OHOS_ABILITY_FLASH_AVAILABLE error." << std::endl;
+        return OHOS::Camera::RC_ERROR;
+    }
+    flashAvailable = *(entry.data.u8);
+    std::cout << "==========[test log] get flashAvailable =" << static_cast<int>(flashAvailable) << std::endl;
+    return OHOS::Camera::RC_OK;
+}
+
+OHOS::Camera::RetCode CameraAbilityTest::GetAfAvailable(std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+{
+    common_metadata_header_t *data = display_->ability->get();
+    std::vector<uint8_t> afAvailable;
+    camera_metadata_item_t entry;
+    int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_CONTROL_AF_AVAILABLE_MODES, &entry);
+    if (ret != 0) {
+        std::cout << "==========[test log] get OHOS_CONTROL_AF_AVAILABLE_MODES error." << std::endl;
+        return OHOS::Camera::RC_ERROR;
+    }
+    uint32_t count = entry.count;
+    std::cout << "==========[test log] count =" << count << std::endl;
+
+    for (int i = 0; i < count; i++) {
+        afAvailable.push_back(*(entry.data.u8 + i));
+    }
+
+    for (auto it = afAvailable.begin(); it != afAvailable.end(); it++) {
+        std::cout << "==========[test log] afAvailable =" << static_cast<int>(*it) << std::endl;
+    }
+    return OHOS::Camera::RC_OK;
+}
+
+OHOS::Camera::RetCode CameraAbilityTest::GetZoomRatioRange(std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+{
+    common_metadata_header_t *data = display_->ability->get();
+    std::vector<float> zoomRatioRange;
+    camera_metadata_item_t entry;
+    int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_ABILITY_ZOOM_RATIO_RANGE, &entry);
+    if (ret != 0) {
+        std::cout << "==========[test log] get OHOS_ABILITY_ZOOM_RATIO_RANGE error." << std::endl;
+        return OHOS::Camera::RC_ERROR;
+    }
+    uint32_t count = entry.count;
+    std::cout << "==========[test log] count =" << count << std::endl;
+
+    for (int i = 0; i < count; i++) {
+        zoomRatioRange.push_back(*(entry.data.f + i));
+    }
+
+    for (auto it = zoomRatioRange.begin(); it != zoomRatioRange.end(); it++) {
+        std::cout << "==========[test log] zoomRatioRange =" << *it << std::endl;
+    }
+    return OHOS::Camera::RC_OK;
+}
+
 void CameraAbilityTest::TearDown(void)
 {
     display_->Close();
 }
 
 /**
-  * @tc.name: get camera ability
-  * @tc.desc: get camera ability
-  * @tc.level: Level1
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
+ * @tc.name: get camera ability
+ * @tc.desc: get camera ability
+ * @tc.level: Level1
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
 static HWTEST_F(CameraAbilityTest, camera_ability_001, TestSize.Level1)
 {
     if (display_->ability == nullptr) {
@@ -65,4 +123,7 @@ static HWTEST_F(CameraAbilityTest, camera_ability_001, TestSize.Level1)
         return;
     }
     GetSensorOrientation(display_->ability);
+    GetFlashAvailable(display_->ability);
+    GetAfAvailable(display_->ability);
+    GetZoomRatioRange(display_->ability);
 }

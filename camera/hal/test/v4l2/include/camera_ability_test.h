@@ -25,6 +25,9 @@ public:
     void SetUp(void);
     void TearDown(void);
     OHOS::Camera::RetCode GetSensorOrientation(std::shared_ptr<OHOS::Camera::CameraAbility> &ability);
+    OHOS::Camera::RetCode GetFlashAvailable(std::shared_ptr<OHOS::Camera::CameraAbility> &ability);
+    OHOS::Camera::RetCode GetAfAvailable(std::shared_ptr<OHOS::Camera::CameraAbility> &ability);
+    OHOS::Camera::RetCode GetZoomRatioRange(std::shared_ptr<OHOS::Camera::CameraAbility> &ability);
 
     std::shared_ptr<TestDisplay> display_ = nullptr;
 };
