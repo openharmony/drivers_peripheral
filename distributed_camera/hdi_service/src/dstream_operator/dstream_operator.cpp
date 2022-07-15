@@ -61,6 +61,9 @@ CamRetCode DStreamOperator::CreateStreams(const std::vector<std::shared_ptr<Stre
     }
 
     for (auto info : streamInfos) {
+        DHLOGI("DStreamOperator::CreateStreams, streamInfo: id=%d, intent=%d, width=%d, height=%d, format=%d, " +
+            "dataspace=%d, encodeType=%d", info->streamId_, info->intent_, info->width_, info->height_, info->format_,
+            info->dataspace_, info->encodeType_);
         if (halStreamMap_.find(info->streamId_) != halStreamMap_.end()) {
             return CamRetCode::INVALID_ARGUMENT;
         }
@@ -69,10 +72,6 @@ CamRetCode DStreamOperator::CreateStreams(const std::vector<std::shared_ptr<Stre
         }
 
         std::shared_ptr<DCameraStream> dcStream = std::make_shared<DCameraStream>();
-        if (!dcStream) {
-            DHLOGE("Create distributed camera stream failed.");
-            return CamRetCode::INSUFFICIENT_RESOURCES;
-        }
         DCamRetCode ret = dcStream->InitDCameraStream(info);
         if (ret != SUCCESS) {
             DHLOGE("Init distributed camera stream failed.");
@@ -83,9 +82,9 @@ CamRetCode DStreamOperator::CreateStreams(const std::vector<std::shared_ptr<Stre
         std::shared_ptr<DCStreamInfo> dcStreamInfo = std::make_shared<DCStreamInfo>();
         ConvertStreamInfo(info, dcStreamInfo);
         dcStreamInfoMap_[info->streamId_] = dcStreamInfo;
-
-        DHLOGI("Create stream info: id=%d, width=%d, height=%d, format=%d, intent=%d", info->streamId_,
-            info->width_, info->height_, info->format_, info->intent_);
+        DHLOGI("DStreamOperator::CreateStreams, dcStreamInfo: id=%d, type=%d, width=%d, height=%d, format=%d, " +
+            "dataspace=%d, encodeType=%d", dcStreamInfo->streamId_, dcStreamInfo->type_, dcStreamInfo->width_,
+            dcStreamInfo->height_, dcStreamInfo->format_, dcStreamInfo->dataspace_, dcStreamInfo->encodeType_);
     }
     DHLOGI("DStreamOperator::Create distributed camera streams success.");
     return CamRetCode::NO_ERROR;
@@ -680,6 +679,8 @@ void DStreamOperator::ConvertStreamInfo(std::shared_ptr<StreamInfo> &srcInfo, st
             dstInfo->format_ = OHOS_CAMERA_FORMAT_YCRCB_420_SP;
         }
     } else {
+        // Distributed Camera Do Not Support Encoding at HAL
+        dstInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_NULL;
         dstInfo->type_ = DCStreamType::CONTINUOUS_FRAME;
         dstInfo->format_ =
             static_cast<int>(DBufferManager::PixelFormatToDCameraFormat(static_cast<PixelFormat>(srcInfo->format_)));
@@ -689,27 +690,25 @@ void DStreamOperator::ConvertStreamInfo(std::shared_ptr<StreamInfo> &srcInfo, st
 DCamRetCode DStreamOperator::NegotiateSuitableCaptureInfo(const std::shared_ptr<CaptureInfo>& srcCaptureInfo,
     bool isStreaming)
 {
-    std::vector<std::shared_ptr<DCStreamInfo>> srcStreamInfo;
-    SetSrcStreamInfo(srcCaptureInfo, srcStreamInfo);
-    if (srcStreamInfo.empty()) {
-        DHLOGE("Input source stream info vector is empty.");
-        return DCamRetCode::INVALID_ARGUMENT;
+    for (auto streamId : srcCaptureInfo->streamIds_) {
+        DHLOGI("DStreamOperator::NegotiateSuitableCaptureInfo, streamId=%d, isStreaming=%d", streamId, isStreaming);
     }
 
-    std::shared_ptr<DCCaptureInfo> inputCaptureInfo = BuildSuitableCaptureInfo(srcCaptureInfo, srcStreamInfo);
-    inputCaptureInfo->type_ = isStreaming ? DCStreamType::CONTINUOUS_FRAME : DCStreamType::SNAPSHOT_FRAME;
-    inputCaptureInfo->isCapture_ = true;
+    std::shared_ptr<DCCaptureInfo> inputCaptureInfo = nullptr;
+    DCamRetCode ret = GetInputCaptureInfo(srcCaptureInfo, isStreaming, inputCaptureInfo);
+    if (ret != DCamRetCode::SUCCESS) {
+        DHLOGE("Negotiate input capture info failed.");
+        return ret;
+    }
 
     std::shared_ptr<DCCaptureInfo> appendCaptureInfo = nullptr;
     if (cachedDCaptureInfoList_.empty()) {
         std::vector<std::shared_ptr<DCStreamInfo>> appendStreamInfo;
-        auto iter = dcStreamInfoMap_.begin();
-        while (iter != dcStreamInfoMap_.end()) {
+        for (auto iter = dcStreamInfoMap_.begin(); iter != dcStreamInfoMap_.end(); iter++) {
             if ((isStreaming && (iter->second->type_ == DCStreamType::SNAPSHOT_FRAME)) ||
                 (!isStreaming && (iter->second->type_ == DCStreamType::CONTINUOUS_FRAME))) {
                 appendStreamInfo.push_back(iter->second);
             }
-            iter++;
         }
         if (!appendStreamInfo.empty()) {
             appendCaptureInfo = BuildSuitableCaptureInfo(srcCaptureInfo, appendStreamInfo);
@@ -725,27 +724,46 @@ DCamRetCode DStreamOperator::NegotiateSuitableCaptureInfo(const std::shared_ptr<
                 break;
             }
         }
-        if (isStreaming) {
-            inputCaptureInfo->isCapture_ = false;
-        }
+        inputCaptureInfo->isCapture_ = isStreaming ? false : true;
     }
     cachedDCaptureInfoList_.clear();
     cachedDCaptureInfoList_.push_back(inputCaptureInfo);
     if (appendCaptureInfo != nullptr) {
         cachedDCaptureInfoList_.push_back(appendCaptureInfo);
     }
+
+    for (auto info : cachedDCaptureInfoList_) {
+        std::string idString = "";
+        for (auto id : info->streamIds_) {
+            idString += (std::to_string(id) + ", ");
+        }
+        DHLOGI("cachedDCaptureInfo: ids=[%s], width=%d, height=%d, format=%d, type=%d, isCapture=%d",
+            idString.empty() ? idString.c_str() : (idString.substr(0, idString.length() - INGNORE_STR_LEN)).c_str(),
+            info->width_, info->height_, info->format_, info->type_, info->isCapture_);
+    }
     return SUCCESS;
 }
 
-void DStreamOperator::SetSrcStreamInfo(const std::shared_ptr<CaptureInfo>& srcCaptureInfo,
-    std::vector<std::shared_ptr<DCStreamInfo>>& srcStreamInfo)
+DCamRetCode DStreamOperator::GetInputCaptureInfo(const std::shared_ptr<CaptureInfo>& srcCaptureInfo, bool isStreaming,
+    std::shared_ptr<DCCaptureInfo>& inputCaptureInfo)
 {
+    std::vector<std::shared_ptr<DCStreamInfo>> srcStreamInfo;
     for (auto &id : srcCaptureInfo->streamIds_) {
         auto iter = dcStreamInfoMap_.find(id);
         if (iter != dcStreamInfoMap_.end()) {
             srcStreamInfo.push_back(iter->second);
         }
     }
+
+    if (srcStreamInfo.empty()) {
+        DHLOGE("Input source stream info vector is empty.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+
+    inputCaptureInfo = BuildSuitableCaptureInfo(srcCaptureInfo, srcStreamInfo);
+    inputCaptureInfo->type_ = isStreaming ? DCStreamType::CONTINUOUS_FRAME : DCStreamType::SNAPSHOT_FRAME;
+    inputCaptureInfo->isCapture_ = true;
+    return DCamRetCode::SUCCESS;
 }
 
 std::shared_ptr<DCCaptureInfo> DStreamOperator::BuildSuitableCaptureInfo(const shared_ptr<CaptureInfo>& srcCaptureInfo,
@@ -807,17 +825,23 @@ void DStreamOperator::ChooseSuitableResolution(std::vector<std::shared_ptr<DCStr
     }
     std::vector<DCResolution> supportedResolutionList = dcSupportedResolutionMap_[captureInfo->format_];
 
-    DCResolution tempResolution = { 0, 0 };
     for (auto stream : streamInfo) {
+        captureInfo->streamIds_.push_back(stream->streamId_);
+    }
+
+    DCResolution tempResolution = { 0, 0 };
+    for (auto iter : dcStreamInfoMap_) {
+        if (iter.second->type_ != (streamInfo.at(0))->type_) {
+            continue;
+        }
         for (auto resolution : supportedResolutionList) {
-            if ((resolution.width_ == stream->width_) && (resolution.height_ == stream->height_)) {
-                if (tempResolution < resolution) {
-                    tempResolution = resolution;
-                    break;
-                }
+            if ((resolution.width_ == iter.second->width_) &&
+                (resolution.height_ == iter.second->height_) &&
+                (tempResolution < resolution)) {
+                tempResolution = resolution;
+                break;
             }
         }
-        captureInfo->streamIds_.push_back(stream->streamId_);
     }
 
     if ((tempResolution.width_ == 0) || (tempResolution.height_ == 0)) {
