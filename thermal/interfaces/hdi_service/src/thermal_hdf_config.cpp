@@ -187,13 +187,13 @@ void ThermalHdfConfig::ParsePollingSubNode(xmlNodePtr node, XMLThermalNodeInfo& 
     DfxTraceInfo info;
 
     xmlChar* xmlType = xmlGetProp(node, BAD_CAST"type");
-    if (xmlType == nullptr) {
+    if (xmlType != nullptr) {
         tn.type = (char*)xmlType;
         xmlFree(xmlType);
     }
 
     xmlChar* xmlPath = xmlGetProp(node, BAD_CAST"path");
-    if (xmlPath == nullptr) {
+    if (xmlPath != nullptr) {
         tn.path = (char*)xmlPath;
         xmlFree(xmlPath);
     }
