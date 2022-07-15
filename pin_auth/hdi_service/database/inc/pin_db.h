@@ -36,6 +36,9 @@ extern "C" {
 #define CRYPTO_SUFFIX "_CryptoInfo"
 #define ANTI_BRUTE_SUFFIX "_BruteForceCount"
 #define SALT_SUFFIX "_salt"
+#define SECRET_SUFFIX "_secret"
+#define SALT_PREFIX "hkdf_salt"
+#define CREDENTIAL_PREFIX "template_encryption_key"
 #define INIT_AUTH_ERROR_COUNT 0
 #define INIT_START_FREEZE_TIMES 0
 #define DEFAULT_VALUE 1
@@ -57,9 +60,12 @@ extern "C" {
 #define THIRD_EXPONENTIAL_PARA 10
 #define MS_OF_S 1000ull
 #define CONST_PIN_DATA_LEN 64U
+#define CONST_PIN_DATA_EXPAND_LEN 92U
 #define CONST_SALT_LEN 32U
 #define CONST_PUB_KEY_LEN 32U
-#define RESULT_TLV_LEN 184U
+#define CONST_CREDENTIAL_PREFIX_LEN 32U
+#define CONST_EXPAND_DATA_LEN 128U
+#define RESULT_TLV_LEN 240U
 
 typedef struct {
     uint64_t templateId;
@@ -88,10 +94,11 @@ typedef struct {
 void InitPinDb(void);
 void DestroyPinDb(void);
 
-ResultCode AddPin(PinEnrollParam *pinEnrollParam, uint64_t *templateId);
+ResultCode AddPin(PinEnrollParam *pinEnrollParam, uint64_t *templateId, Buffer *outRootSecret);
 ResultCode DoGetSalt(uint64_t templateId, uint8_t *salt, uint32_t *saltLen);
 ResultCode DelPinById(uint64_t templateId);
-ResultCode AuthPinById(uint8_t *data, uint32_t dataLen, uint64_t templateId);
+ResultCode AuthPinById(const uint8_t *inputData, const uint32_t inputDataLen, uint64_t templateId,
+    Buffer *outRootSecret);
 ResultCode ComputeFreezeTime(uint64_t templateId, uint32_t *remainingFT, uint32_t count, uint64_t startFreezeTime);
 ResultCode GetRemainTimes(uint64_t templateId, uint32_t *remainingAuthTimes, uint32_t authErrorConut);
 ResultCode GetSubType(uint64_t templateId, uint64_t *subType);
