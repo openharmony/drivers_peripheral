@@ -22,7 +22,7 @@
 #include "sensor_manager.h"
 #include "sensor_type.h"
 
-#define HDF_LOG_TAG    hdf_sensor_dal
+#define HDF_LOG_TAG    uhdf_sensor
 
 #define ACCEL_ACCURACY    ((HDI_SENSOR_GRAVITY) / (HDI_SENSOR_UNITS) / (HDI_SENSOR_UNITS))
 #define GYRO_ACCURACY     ((1 / (HDI_SENSOR_FLOAT_UNITS)) * ((HDI_SENSOR_PI) / (HDI_SENSOR_SEMICIRCLE)))
@@ -132,7 +132,7 @@ static struct HdfDevEventlistener g_listener = {
     .priv = "hdi_sensor"
 };
 
-struct HdfDevEventlistener *GetSensorListener()
+struct HdfDevEventlistener *GetSensorListener(void)
 {
     return &g_listener;
 }

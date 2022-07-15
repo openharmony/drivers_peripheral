@@ -21,7 +21,7 @@
 #include <hdf_log.h>
 #include "callback_death_recipient.h"
 
-#define HDF_LOG_TAG hdf_sensor_dal
+#define HDF_LOG_TAG uhdf_sensor
 
 namespace OHOS {
 namespace HDI {
