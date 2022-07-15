@@ -47,7 +47,7 @@ struct SensorCovertCoff {
 
 int32_t Register(int32_t groupId, RecordDataCallback cb);
 int32_t Unregister(int32_t groupId, RecordDataCallback cb);
-struct HdfDevEventlistener *GetSensorListener();
+struct HdfDevEventlistener *GetSensorListener(void);
 void SetSensorIdBySensorType(enum SensorTypeTag type, int32_t sensorId);
 
 #endif /* HDI_SENSOR_CHANNEL_H */
