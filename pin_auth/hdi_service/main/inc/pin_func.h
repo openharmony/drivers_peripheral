@@ -25,7 +25,6 @@ extern "C" {
 #define TAG_AND_LEN_BYTE 8
 #define TAG_ANG_LEN_T 12
 #define TAG_AND_LEN_S 16
-#define MAX_TLV_LEN 224
 #define SIGN_DATA_LEN 64
 #define PIN_RET_TYPE_LEN 8
 #define PIN_RET_DATA_LEN 72
@@ -34,6 +33,7 @@ extern "C" {
 #define ED25519_FIX_PRIKEY_BUFFER_SIZE 64
 #define PIN_EXECUTOR_SECURITY_LEVEL 2
 #define PIN_AUTH_AIBNILITY 7
+#define ROOT_SECRET_LEN 32U
 
 typedef enum {
     /* Root tag */
@@ -83,7 +83,11 @@ typedef enum {
     /* capability level */
     AUTH_CAPABILITY_LEVEL = 100029,
     /* algorithm setinfo */
-    ALGORITHM_INFO,
+    ALGORITHM_INFO = 100030,
+    /* time stamp */
+    AUTH_TIME_STAMP = 100031,
+    /* root secret */
+    AUTH_ROOT_SECRET = 100032,
 } AuthAttributeType;
 
 typedef struct {
@@ -112,7 +116,8 @@ ResultCode DoEnrollPin(PinEnrollParam *pinEnrollParam, Buffer *retTlv);
 ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *data);
 ResultCode DoQueryPinInfo(uint64_t templateId, PinCredentialInfos *pinCredentialInfo);
 ResultCode DoDeleteTemplate(uint64_t templateId);
-ResultCode GenerateRetTlv(uint32_t result, uint64_t scheduleId, uint64_t templatedId, Buffer *retTlv);
+ResultCode GenerateRetTlv(uint32_t result, uint64_t scheduleId, uint64_t templatedId, Buffer *retTlv,
+    Buffer *rootSecret);
 ResultCode GenerateKeyPair();
 ResultCode DoGetExecutorInfo(PinExecutorInfo *pinExecutorInfo);
 ResultCode DoVerifyTemplateData(const uint64_t *templateIdList, uint32_t templateIdListLen);
