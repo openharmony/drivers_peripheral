@@ -53,6 +53,8 @@ public:
     EsFrameInfo GetEsFrameInfo() const override;
     int32_t GetEncodeType() const override;
     int32_t GetStreamId() const override;
+    uint32_t GetOffset() const override;
+    uint32_t GetLength() const override;
 
     void SetIndex(const int32_t index) override;
     void SetWidth(const uint32_t width) override;
@@ -77,6 +79,8 @@ public:
     void SetEsKeyFrame(const int32_t isKey) override;
     void SetEsFrameNum(const int32_t frameNum) override;
     void SetStreamId(const int32_t streamId) override;
+    void SetOffset(const uint32_t offset) override;
+    void SetLength(const uint32_t length) override;
 
     void Free() override;
     bool operator==(const IBuffer& u) override;
@@ -104,6 +108,8 @@ private:
     EsFrameInfo esInfo_ = {-1, -1, -1, -1, -1};
     int32_t streamId_ = -1;
     std::mutex l_;
+    uint32_t offset_ = 0;
+    uint32_t length_ = 0;
 };
 } // namespace OHOS::Camera
 #endif
