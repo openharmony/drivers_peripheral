@@ -19,7 +19,7 @@ ohos_executable("liteos_host_speed_test") {
     "//third_party/bounds_checking_function/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     "include",
-    "//prebuilts/lite/sysroot/usr/include/arm-liteos/netinet",
+    "$ohos_current_sysroot/usr/include/arm-liteos/netinet",
   ]
   deps = [
     "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
