@@ -38,6 +38,14 @@ public:
     {
         return size_;
     }
+    uint32_t GetOffset()
+    {
+        return offset_;
+    }
+    uint32_t GetLength()
+    {
+        return length_;
+    }
     void* GetVirAddress()
     {
         return virAddr_;
@@ -59,7 +67,17 @@ public:
         size_ = size;
         return;
     }
+    void SetOffset(const uint32_t offset)
+    {
+        offset_ = offset;
+        return;
+    }
 
+    void SetLength(const uint32_t length)
+    {
+        length_ = length;
+        return;
+    }
     void SetVirAddress(void* addr)
     {
         virAddr_ = addr;
@@ -77,6 +95,8 @@ private:
     uint32_t size_ = 0;
     void* virAddr_ = nullptr;
     uint64_t usage_ = 0;
+    uint32_t offset_ = 0;
+    uint32_t length_ = 0;
 };
 
 struct FrameSpec {

@@ -59,6 +59,7 @@ struct V4l2FmtDesc {
     uint32_t height;
     uint32_t sizeimage;
     struct V4l2Fract fps;
+    uint32_t capturemode;
 };
 
 using DeviceFormat = struct _V4l2DeviceFormat {
