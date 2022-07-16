@@ -31,13 +31,8 @@ bool AudioCaptureframeRequestbytesFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
     uint64_t replyBytes = 0;
-    char *frame = (char *)calloc(1, BUFFER_LENTH);
-    if (frame == NULL) {
-        return false;
-    }
-    uint64_t requestBytesFuzz = size;
-
-    ret = capture->CaptureFrame(capture, frame, requestBytesFuzz, &replyBytes);
+    char *frame = (char *)data;
+    ret = capture->CaptureFrame(capture, frame, size, &replyBytes);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
@@ -46,8 +41,6 @@ bool AudioCaptureframeRequestbytesFuzzTest(const uint8_t *data, size_t size)
     adapter->DestroyCapture(adapter, capture);
     manager->UnloadAdapter(manager, adapter);
     capture = nullptr;
-    free(frame);
-    frame = nullptr;
     return result;
 }
 }

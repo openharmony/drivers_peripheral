@@ -39,8 +39,7 @@ bool AudioCaptureframeCaptureFuzzTest(const uint8_t *data, size_t size)
         manager->UnloadAdapter(manager, adapter);
         return false;
     }
-    uint8_t *dataFuzz = const_cast<uint8_t *>(data);
-    struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(dataFuzz);
+    struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
     ret = capture->CaptureFrame(captureFuzz, frame, requestBytes, &replyBytes);
     if (ret == HDF_SUCCESS) {
         result = true;
