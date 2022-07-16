@@ -49,8 +49,7 @@ bool AudioGetcapturepositionCaptureFuzzTest(const uint8_t *data, size_t size)
     }
 
     replyBytes = 0;
-    uint8_t *dataFuzz = const_cast<uint8_t *>(data);
-    struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(dataFuzz);
+    struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
     ret = capture->GetCapturePosition(captureFuzz, &replyBytes, &time);
     if (ret == HDF_SUCCESS) {
         result = true;
