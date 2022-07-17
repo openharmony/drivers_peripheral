@@ -24,7 +24,7 @@
 #include "sensor_if.h"
 #include "sensor_manager.h"
 
-#define HDF_LOG_TAG    hdf_sensor_dal
+#define HDF_LOG_TAG    uhdf_sensor
 
 #define HDF_SENSOR_INFO_MAX_SIZE (4 * 1024) // 4kB
 
