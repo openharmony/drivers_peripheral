@@ -38,6 +38,18 @@ namespace {
     const int ERROR_GAIN_VALUE = MAX_GAIN_VALUE + 1;
     const int WAITE_TIME = 5;
     const int US_TO_MS = 1000;
+    constexpr int MIDDLE_VOlUME = 100;
+#ifdef PRODUCT_RK3568
+    constexpr int MAX_VOlUME = 255;
+    constexpr int MIN_VOlUME = 0;
+    constexpr int OVER_MAX_VOLUME = 256;
+    constexpr int BELOW_MIN_VOLUME = -1;
+#else
+    constexpr int MAX_VOlUME = 127;
+    constexpr int MIN_VOlUME = 40;
+    constexpr int OVER_MAX_VOLUME = 128;
+    constexpr int BELOW_MIN_VOLUME = 39;
+#endif
 
     class AudioAdmInterfaceTest : public testing::Test {
     public:
@@ -389,7 +401,6 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0007, TestSi
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0008, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t expectValue = AUDIO_CHANNEL_EXCHANGE;
     struct HdfIoService *service = nullptr;
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -401,9 +412,13 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0008, TestSi
         .value[0] = AUDIO_CHANNEL_EXCHANGE,
     };
     ret = WriteCtrlInfo(service, elemValue);
+#ifdef PRODUCT_RK3568
+    EXPECT_EQ(HDF_FAILURE, ret);
+#else
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = ReadCtrlInfo(service, elemValue.id, expectValue);
+    ret = ReadCtrlInfo(service, elemValue.id, AUDIO_CHANNEL_EXCHANGE);
     EXPECT_EQ(HDF_SUCCESS, ret);
+#endif
     HdfIoServiceRecycle(service);
 }
 /**
@@ -415,7 +430,6 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0008, TestSi
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0009, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t expectValue = AUDIO_CHANNEL_MIX;
     struct HdfIoService *service = nullptr;
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -427,9 +441,13 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0009, TestSi
         .value[0] = AUDIO_CHANNEL_MIX,
     };
     ret = WriteCtrlInfo(service, elemValue);
+#ifdef PRODUCT_RK3568
+        EXPECT_EQ(HDF_FAILURE, ret);
+#else
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = ReadCtrlInfo(service, elemValue.id, expectValue);
+    ret = ReadCtrlInfo(service, elemValue.id, AUDIO_CHANNEL_MIX);
     EXPECT_EQ(HDF_SUCCESS, ret);
+#endif
     HdfIoServiceRecycle(service);
 }
 /**
@@ -441,7 +459,6 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0009, TestSi
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0010, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t expectValue = AUDIO_CHANNEL_LEFT_MUTE;
     struct HdfIoService *service = nullptr;
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -453,9 +470,13 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0010, TestSi
         .value[0] = AUDIO_CHANNEL_LEFT_MUTE,
     };
     ret = WriteCtrlInfo(service, elemValue);
+#ifdef PRODUCT_RK3568
+        EXPECT_EQ(HDF_FAILURE, ret);
+#else
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = ReadCtrlInfo(service, elemValue.id, expectValue);
+    ret = ReadCtrlInfo(service, elemValue.id, AUDIO_CHANNEL_LEFT_MUTE);
     EXPECT_EQ(HDF_SUCCESS, ret);
+#endif
     HdfIoServiceRecycle(service);
 }
 /**
@@ -467,7 +488,6 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0010, TestSi
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0011, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t expectValue = AUDIO_CHANNEL_RIGHT_MUTE;
     struct HdfIoService *service = nullptr;
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -479,9 +499,13 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0011, TestSi
         .value[0] = AUDIO_CHANNEL_RIGHT_MUTE,
     };
     ret = WriteCtrlInfo(service, elemValue);
+#ifdef PRODUCT_RK3568
+    EXPECT_EQ(HDF_FAILURE, ret);
+#else
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = ReadCtrlInfo(service, elemValue.id, expectValue);
+    ret = ReadCtrlInfo(service, elemValue.id, AUDIO_CHANNEL_RIGHT_MUTE);
     EXPECT_EQ(HDF_SUCCESS, ret);
+#endif
     HdfIoServiceRecycle(service);
 }
 /**
@@ -493,7 +517,6 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0011, TestSi
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0012, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t expectValue = AUDIO_CHANNEL_BOTH_MUTE;
     struct HdfIoService *service = nullptr;
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -505,9 +528,13 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0012, TestSi
         .value[0] = AUDIO_CHANNEL_BOTH_MUTE,
     };
     ret = WriteCtrlInfo(service, elemValue);
+#ifdef PRODUCT_RK3568
+    EXPECT_EQ(HDF_FAILURE, ret);
+#else
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = ReadCtrlInfo(service, elemValue.id, expectValue);
+    ret = ReadCtrlInfo(service, elemValue.id, AUDIO_CHANNEL_BOTH_MUTE);
     EXPECT_EQ(HDF_SUCCESS, ret);
+#endif
     HdfIoServiceRecycle(service);
 }
 /**
@@ -591,7 +618,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0014, TestSi
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0015, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t expectValue = 100;
+    int32_t expectValue = MIDDLE_VOlUME;
     struct HdfIoService *service = nullptr;
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -600,7 +627,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0015, TestSi
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
-        .value[0] = 100,
+        .value[0] = MIDDLE_VOlUME,
     };
     ret = WriteCtrlInfo(service, elemValue);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -618,7 +645,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0015, TestSi
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0016, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t expectValue = 40;
+    int32_t expectValue = MIN_VOlUME;
     struct HdfIoService *service = nullptr;
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -627,7 +654,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0016, TestSi
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
-        .value[0] = 40,
+        .value[0] = MIN_VOlUME,
     };
     ret = WriteCtrlInfo(service, elemValue);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -644,7 +671,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0016, TestSi
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0017, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t expectValue = 127;
+    int32_t expectValue = MAX_VOlUME;
     struct HdfIoService *service = nullptr;
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -653,7 +680,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0017, TestSi
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
-        .value[0] = 127,
+        .value[0] = MAX_VOlUME,
     };
     ret = WriteCtrlInfo(service, elemValue);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -662,7 +689,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0017, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM control data which is writing invalid value of volume.
+* @tc.name  Test the ADM control data which is writing invlaid value of volume.
 * @tc.number  SUB_Audio_ControlHostElemWrite_read_0018
 * @tc.desc  Test the ADM control data,cmdid is AUDIODRV_CTRL_IOCTRL_ELEM_WRITE and AUDIODRV_CTRL_IOCTRL_ELEM_READ.
 * @tc.author: zhouyongxiao
@@ -675,7 +702,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0018, TestSi
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
-        .value[0] = 128,
+        .value[0] = OVER_MAX_VOLUME,
     };
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -685,7 +712,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0018, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM control data which is writing invalid value of volume.
+* @tc.name  Test the ADM control data which is writing invlaid value of volume.
 * @tc.number  SUB_Audio_ControlHostElemWrite_read_0019
 * @tc.desc  Test the ADM control data,cmdid is AUDIODRV_CTRL_IOCTRL_ELEM_WRITE and AUDIODRV_CTRL_IOCTRL_ELEM_READ.
 * @tc.author: zhouyongxiao
@@ -698,7 +725,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0019, TestSi
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
-        .value[0] = 39,
+        .value[0] = BELOW_MIN_VOLUME,
     };
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -1005,7 +1032,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0012, TestSize.Leve
         .isBigEndian = 0, .isSignedData = 1, .startThreshold = 16384
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
+#ifdef PRODUCT_RK3568
+    EXPECT_EQ(HDF_FAILURE, ret);
+#else
     EXPECT_EQ(HDF_SUCCESS, ret);
+#endif
     HdfIoServiceRecycle(service);
 }
 /**

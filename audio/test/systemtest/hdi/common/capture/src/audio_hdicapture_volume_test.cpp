@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -137,7 +137,7 @@ int32_t AudioHdiCaptureVolumeTest::AudioCaptureStart(const string path, struct A
         return HDF_FAILURE;
     }
     ret = FrameStartCapture(capture, file, attrs);
-    fclose(file);
+    (void)fclose(file);
     return ret;
 }
 
@@ -241,7 +241,11 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureGetMute_0001, Test
     int32_t ret = -1;
     bool muteTrue = true;
     bool muteFalse = false;
+#ifdef ALSA_LIB_MODE
+    bool defaultmute = false;
+#else
     bool defaultmute = true;
+#endif
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
@@ -509,9 +513,10 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGainThreshold_0001, 
 
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+#ifndef ALSA_LIB_MODE
     EXPECT_EQ(min, GAIN_MIN);
     EXPECT_EQ(max, GAIN_MAX);
-
+#endif
     adapter->DestroyCapture(adapter, capture);
     manager->UnloadAdapter(manager, adapter);
 }
@@ -635,6 +640,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureSetGain_0001, TestSize.
     adapter->DestroyCapture(adapter, capture);
     manager->UnloadAdapter(manager, adapter);
 }
+#ifndef ALSA_LIB_MODE
 /**
 * @tc.name  Test AudioCaptureSetGain API via setting gain greater than the maximum and less than the minimum
 * @tc.number  SUB_Audio_hdi_CaptureSetGain_0002
@@ -666,6 +672,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureSetGain_0002, TestSize.
     adapter->DestroyCapture(adapter, capture);
     manager->UnloadAdapter(manager, adapter);
 }
+#endif
 /**
 * @tc.name  Test AudioCaptureSetGain API via setting the incoming parameter handle is nullptr.
 * @tc.number  SUB_Audio_hdi_CaptureSetGain_0006

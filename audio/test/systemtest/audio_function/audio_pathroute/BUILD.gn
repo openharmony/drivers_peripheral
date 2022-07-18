@@ -20,14 +20,7 @@ if (defined(ohos_lite)) {
 import("//drivers/peripheral/audio/audio.gni")
 
 if (defined(ohos_lite)) {
-  ###########################LITEOS##########################################
-  ###########################hdf_audio_hdi_path_route_test###########################
-  unittest("hdf_audio_hdi_path_route_test") {
-    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
-      output_extension = "bin"
-      output_dir = "$root_out_dir/test/systemtest/hdf"
-    }
-
+  moduletest("hdf_audio_hdi_path_route_test") {
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "//drivers/hdf_core/framework/utils/src/hdf_sbuf.c",
@@ -55,14 +48,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/test/systemtest/audio_function/audio_pathroute/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-    ]
 
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
@@ -74,7 +59,6 @@ if (defined(ohos_lite)) {
 } else {
   module_output_path = "drivers_peripheral_audio/audio"
 
-  ###########################hdf_audio_hdi_path_route_test###########################
   ohos_systemtest("hdf_audio_hdi_path_route_test") {
     module_out_path = module_output_path
     sources = [
@@ -89,14 +73,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//drivers/peripheral/audio/test/systemtest/audio_function/audio_pathroute/include",
       "//third_party/googletest/googletest/include/gtest",
-    ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
     ]
     deps = [
       "//third_party/googletest:gmock_main",
@@ -124,4 +100,3 @@ if (defined(ohos_lite)) {
     }
   }
 }
-###########################end###########################

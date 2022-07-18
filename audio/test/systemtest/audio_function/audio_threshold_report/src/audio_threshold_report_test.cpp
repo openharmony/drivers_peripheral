@@ -26,6 +26,7 @@ using namespace testing::ext;
 using namespace OHOS::Audio;
 
 namespace {
+const string CODEC_SERVICE_NAME = "hdf_audio_codec_primary_dev0";
 constexpr int BUFFER_SIZE_BIT = 16 * 1024;
 constexpr uint64_t FILE_SIZE_BYTE = 64;
 constexpr uint64_t FILE_SIZE_BIT = FILE_SIZE_BYTE * 1024;
@@ -101,8 +102,10 @@ void AudioThresholdReportReceived(struct ServiceStatusListener *listener, struct
         return;
     }
     struct AudioEvent thresholdReportEvent = {};
-    AudioPnpMsgReadValue(svcStatus->info, "EVENT_TYPE", &(thresholdReportEvent.eventType));
-    AudioPnpMsgReadValue(svcStatus->info, "DEVICE_TYPE", &(thresholdReportEvent.deviceType));
+    if (!strcmp(svcStatus->serviceName, CODEC_SERVICE_NAME.c_str())) {
+        AudioPnpMsgReadValue(svcStatus->info, "EVENT_TYPE", &(thresholdReportEvent.eventType));
+        AudioPnpMsgReadValue(svcStatus->info, "DEVICE_TYPE", &(thresholdReportEvent.deviceType));
+    }
     if (thresholdReportEvent.eventType == HDF_AUDIO_CAPTURE_THRESHOLD &&
         thresholdReportEvent.deviceType == HDF_AUDIO_PRIMARY_DEVICE) {
         g_reportCount++;

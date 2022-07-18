@@ -10,7 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import("//drivers/peripheral/audio/audio.gni")
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
@@ -31,12 +31,17 @@ if (defined(ohos_lite)) {
     testonly = true
 
     deps = [
-      "adm:adm",
-      "audio_function:function",
       "hdi:hdi",
       "supportlibs:supportlibs",
 
       #"audio_adapter:audio_adapter",
     ]
+    if (!defined(drivers_peripheral_audio_alsa_lib) ||
+        drivers_peripheral_audio_alsa_lib == false) {
+      deps += [
+        "adm:adm",
+        "audio_function:function",
+      ]
+    }
   }
 }

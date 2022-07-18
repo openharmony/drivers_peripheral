@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -20,14 +20,7 @@ if (defined(ohos_lite)) {
 }
 
 if (defined(ohos_lite)) {
-  ###########################LITEOS##########################################
-  ###########################hdf_audio_hdi_render_reliability_test###########################
-  unittest("hdf_audio_hdi_render_reliability_test") {
-    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
-      output_extension = "bin"
-      output_dir = "$root_out_dir/test/systemtest/hdf"
-    }
-
+  moduletest("hdf_audio_hdi_render_reliability_test") {
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdirender_reliability_test.cpp",
@@ -54,26 +47,10 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/hdireliability/include",
     ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-      "-std=c++11",
-    ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   }
-
-  ###########################end###########################
-  ###########################hdf_audio_hdi_capture_reliability_test###########################
-  unittest("hdf_audio_hdi_capture_reliability_test") {
-    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
-      output_extension = "bin"
-      output_dir = "$root_out_dir/test/systemtest/hdf"
-    }
+  moduletest("hdf_audio_hdi_capture_reliability_test") {
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdicapture_reliability_test.cpp",
@@ -104,13 +81,7 @@ if (defined(ohos_lite)) {
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   }
 
-  ###########################end###########################
-  ###########################hdf_audio_hdi_capture_control_reliability_test###########################
-  unittest("hdf_audio_hdi_capture_control_reliability_test") {
-    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
-      output_extension = "bin"
-      output_dir = "$root_out_dir/test/systemtest/hdf"
-    }
+  moduletest("hdf_audio_hdi_capture_control_reliability_test") {
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdicapture_control_reliability_test.cpp",
@@ -141,13 +112,7 @@ if (defined(ohos_lite)) {
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   }
 
-  ###########################end###########################
-  ###########################hdf_audio_hdi_render_control_reliability_test###########################
-  unittest("hdf_audio_hdi_render_control_reliability_test") {
-    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
-      output_extension = "bin"
-      output_dir = "$root_out_dir/test/systemtest/hdf"
-    }
+  moduletest("hdf_audio_hdi_render_control_reliability_test") {
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdirender_control_reliability_test.cpp",
@@ -178,10 +143,8 @@ if (defined(ohos_lite)) {
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   }
 } else {
-  ###########################systemtest##############################
   module_output_path = "drivers_peripheral_audio/audio"
 
-  ###########################hdf_audio_hdi_render_reliability_test###########################
   ohos_systemtest("hdf_audio_hdi_render_reliability_test") {
     module_out_path = module_output_path
     sources = [
@@ -205,14 +168,6 @@ if (defined(ohos_lite)) {
       "hdf_core:libhdf_utils",
       "utils_base:utils",
     ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-    ]
     defines = []
     if (enable_audio_adm_so) {
       defines += [ "AUDIO_ADM_SO" ]
@@ -228,8 +183,6 @@ if (defined(ohos_lite)) {
     }
   }
 
-  ###########################end###########################
-  ###########################hdf_audio_hdi_capture_reliability_test###########################
   ohos_systemtest("hdf_audio_hdi_capture_reliability_test") {
     module_out_path = module_output_path
     sources = [
@@ -253,14 +206,6 @@ if (defined(ohos_lite)) {
       "hdf_core:libhdf_utils",
       "utils_base:utils",
     ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-    ]
     defines = []
     if (enable_audio_adm_so) {
       defines += [ "AUDIO_ADM_SO" ]
@@ -276,8 +221,6 @@ if (defined(ohos_lite)) {
     }
   }
 
-  ###########################end###########################
-  ###########################hdf_audio_hdi_capture_control_reliability_test###########################
   ohos_systemtest("hdf_audio_hdi_capture_control_reliability_test") {
     module_out_path = module_output_path
     sources = [
@@ -301,14 +244,6 @@ if (defined(ohos_lite)) {
       "hdf_core:libhdf_utils",
       "utils_base:utils",
     ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-    ]
     defines = []
     if (enable_audio_adm_so) {
       defines += [ "AUDIO_ADM_SO" ]
@@ -324,8 +259,6 @@ if (defined(ohos_lite)) {
     }
   }
 
-  ###########################end###########################
-  ###########################hdf_audio_hdi_render_control_reliability_test###########################
   ohos_systemtest("hdf_audio_hdi_render_control_reliability_test") {
     module_out_path = module_output_path
     sources = [
@@ -349,14 +282,6 @@ if (defined(ohos_lite)) {
       "hdf_core:libhdf_utils",
       "utils_base:utils",
     ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-    ]
     defines = []
     if (enable_audio_adm_so) {
       defines += [ "AUDIO_ADM_SO" ]
@@ -372,4 +297,14 @@ if (defined(ohos_lite)) {
     }
   }
 }
-###########################end###########################
+group("hdi_reliability") {
+  if (!defined(ohos_lite)) {
+    testonly = true
+  }
+  deps = [
+    ":hdf_audio_hdi_capture_control_reliability_test",
+    ":hdf_audio_hdi_capture_reliability_test",
+    ":hdf_audio_hdi_render_control_reliability_test",
+    ":hdf_audio_hdi_render_reliability_test",
+  ]
+}
