@@ -16,9 +16,8 @@
 #ifndef OHOS_HDI_LOCATION_LOCATION_VENDOR_INTERFACE_H
 #define OHOS_HDI_LOCATION_LOCATION_VENDOR_INTERFACE_H
 
-#include <functional>
-#include <vector>
-#include "singleton.h"
+#include <mutex>
+
 #include "location_vendor_lib.h"
 
 namespace OHOS {
@@ -26,10 +25,20 @@ namespace HDI {
 namespace Location {
 class LocationVendorInterface {
 public:
-    static void Init();
-    static void CleanUp();
-    static const GnssVendorInterface *GetVendorInterface();
-    static const void *GetModuleInterface(int moduleId);
+    const GnssVendorInterface *GetGnssVendorInterface();
+    const void *GetModuleInterface(int moduleId);
+    static LocationVendorInterface* GetInstance();
+    static void DestroyInstance();
+private:
+    LocationVendorInterface();
+    ~LocationVendorInterface();
+    void Init();
+    void CleanUp();
+
+    static LocationVendorInterface* instance_;
+    static std::mutex mutex_;
+    void *vendorHandle_ = nullptr;
+    const GnssVendorInterface *vendorInterface_ = nullptr;
 };
 } // Location
 } // HDI

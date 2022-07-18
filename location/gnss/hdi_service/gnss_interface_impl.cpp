@@ -162,12 +162,10 @@ static void GetGnssCallbackMethods(GnssCallbackStruct *device)
 
 GnssInterfaceImpl::GnssInterfaceImpl()
 {
-    LocationVendorInterface::Init();
 }
 
 GnssInterfaceImpl::~GnssInterfaceImpl()
 {
-    LocationVendorInterface::CleanUp();
 }
 
 int32_t GnssInterfaceImpl::SetGnssConfigPara(const GnssConfigPara& para)
@@ -197,9 +195,9 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
     }
     static GnssCallbackStruct gnssCallback;
     GetGnssCallbackMethods(&gnssCallback);
-    auto gnssInterface = LocationVendorInterface::GetVendorInterface();
+    auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
-        HDF_LOGE("%{public}s:GetVendorInterface return nullptr.", __func__);
+        HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = gnssInterface->enable_gnss(&gnssCallback);
@@ -211,9 +209,9 @@ int32_t GnssInterfaceImpl::DisableGnss()
 {
     HDF_LOGI("%{public}s.", __func__);
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto gnssInterface = LocationVendorInterface::GetVendorInterface();
+    auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
-        HDF_LOGE("%{public}s:GetVendorInterface return nullptr.", __func__);
+        HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = gnssInterface->disable_gnss();
@@ -225,9 +223,9 @@ int32_t GnssInterfaceImpl::StartGnss(GnssStartType type)
 {
     HDF_LOGI("%{public}s.", __func__);
     int startType = int(type);
-    auto gnssInterface = LocationVendorInterface::GetVendorInterface();
+    auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
-        HDF_LOGE("%{public}s:GetVendorInterface return nullptr.", __func__);
+        HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = gnssInterface->start_gnss(startType);
@@ -238,9 +236,9 @@ int32_t GnssInterfaceImpl::StopGnss(GnssStartType type)
 {
     HDF_LOGI("%{public}s.", __func__);
     int startType = static_cast<int>(type);
-    auto gnssInterface = LocationVendorInterface::GetVendorInterface();
+    auto gnssInterface = LocationVendorInterface::GetInstance()->GetGnssVendorInterface();
     if (gnssInterface == nullptr) {
-        HDF_LOGE("%{public}s:GetVendorInterface return nullptr.", __func__);
+        HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     int ret = gnssInterface->stop_gnss(startType);
