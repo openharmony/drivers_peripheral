@@ -1483,7 +1483,7 @@ int32_t GetChannelMeasResult(const char *ifName, struct MeasResult *measResult)
 
 static int32_t SendCommandToDriver(const char *cmd, uint32_t len, const char *ifName)
 {
-    struct ifreq ifr = {0};
+    struct ifreq ifr;
     WifiPrivCmd privCmd = {0};
     uint8_t buf[MAX_PRIV_CMD_SIZE] = {0};
     int32_t ret = RET_CODE_FAILURE;
@@ -1495,6 +1495,10 @@ static int32_t SendCommandToDriver(const char *cmd, uint32_t len, const char *if
     if (len > MAX_PRIV_CMD_SIZE) {
         HILOG_ERROR(LOG_CORE, "%{public}s: Size of command is too large", __FUNCTION__);
         return RET_CODE_INVALID_PARAM;
+    }
+    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%s: memset_s ifr failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
     }
     if (memcpy_s(buf, MAX_PRIV_CMD_SIZE, cmd, len) != EOK) {
         HILOG_ERROR(LOG_CORE, "%{public}s: memcpy_s error", __FUNCTION__);
