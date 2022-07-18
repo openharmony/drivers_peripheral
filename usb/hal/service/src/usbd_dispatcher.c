@@ -2664,7 +2664,7 @@ static int32_t UsbdBulkWriteRemoteCallback(struct HdfRemoteService *service, int
 
 static int32_t UsbdBulkASyncPutAsmData(struct UsbdBufferHandle *handle, uint8_t *buffer, uint32_t len)
 {
-    int32_t tlen = len;
+    uint32_t tlen;
     int32_t ret = HDF_SUCCESS;
     if ((handle == NULL) || (buffer == NULL) || (len < 1)) {
         HDF_LOGE("%{public}s:%{public}d invalid param len:%{public}d", __func__, __LINE__, len);
