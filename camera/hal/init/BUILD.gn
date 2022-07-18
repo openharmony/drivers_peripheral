@@ -85,18 +85,16 @@ if (defined(ohos_lite)) {
 
   ohos_executable("ohos_camera_demo") {
     install_enable = true
-    sources = [
-      "./demo_main.cpp",
-    ]
+    sources = [ "./demo_main.cpp" ]
     if ("${product_name}" == "imx8mm") {
       sources += [
-          "//device/board/osware/imx8mm/drivers/camera/src/driver_adapter/main_test/ohos_camera_demo.cpp",
-          "//device/board/osware/imx8mm/drivers/camera/src/driver_adapter/main_test/stream_customer.cpp",
+        "//device/board/osware/imx8mm/drivers/camera/src/driver_adapter/main_test/ohos_camera_demo.cpp",
+        "//device/board/osware/imx8mm/drivers/camera/src/driver_adapter/main_test/stream_customer.cpp",
       ]
     } else {
       sources += [
-      "./ohos_camera_demo.cpp",
-      "./stream_customer.cpp",
+        "./ohos_camera_demo.cpp",
+        "./stream_customer.cpp",
       ]
     }
     include_dirs = [
