@@ -15,6 +15,8 @@
 
 #include "thermal_dfx.h"
 #include <cerrno>
+#include <cstdio>
+#include <deque>
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -35,6 +37,7 @@ namespace HDI {
 namespace Thermal {
 namespace V1_0 {
 namespace {
+constexpr uint8_t LOG_INDEX_LEN = 4;
 constexpr int32_t SEC_TO_MSEC = 1000;
 constexpr int32_t MSEC_TO_SEC = 1000;
 constexpr int32_t NSEC_TO_MSEC = 1000000;
@@ -43,14 +46,19 @@ constexpr int32_t MAX_FILE_SIZE = 10 * 1024 *1024;
 constexpr int32_t DEFAULT_INTERVAL_MS = 5000;
 constexpr int32_t MAX_TIME_LEN = 20;
 constexpr int32_t MAX_BUFF_SIZE = 128;
-const std::string TIMESTAMP_TITLE = "timestamp(ms)";
+constexpr int32_t TIME_FORMAT_1 = 1;
+constexpr int32_t TIME_FORMAT_2 = 2;
+const std::string TIMESTAMP_TITLE = "timestamp";
+uint32_t g_currentLogIndex;
 int32_t g_timerInterval = -1;
-int32_t g_logNumber = 0;
+bool g_firstCreate = true;
 bool g_gzLogCycle = false;
+std::deque<std::string> g_saveLogFile;
+std::string g_logTime = "";
 XMLTracingInfo g_xmlTraceInfo;
 }
 
-static std::string GetCurrentTime()
+static std::string GetCurrentTime(const int32_t format)
 {
     struct tm* pTime;
     char strTime[MAX_TIME_LEN] = {0};
@@ -61,12 +69,29 @@ static std::string GetCurrentTime()
     }
 
     pTime = localtime(&t);
-    if (strftime(strTime, sizeof(strTime), "%Y-%m-%d %H:%M:%S", pTime) == 0U) {
-        THERMAL_HILOGW(COMP_HDI, "call strfime failed");
+    if (format == TIME_FORMAT_1) {
+        if (strftime(strTime, sizeof(strTime), "%Y%m%d-%H%M%S", pTime) == 0U) {
+            THERMAL_HILOGW(COMP_HDI, "call strfime failed");
+            return "";
+        }
+    } else if (format == TIME_FORMAT_2) {
+        if (strftime(strTime, sizeof(strTime), "%Y-%m-%d %H:%M:%S", pTime) == 0U) {
+            THERMAL_HILOGW(COMP_HDI, "call strfime failed");
+            return "";
+        }
+    } else {
+        THERMAL_HILOGW(COMP_HDI, "invalid format value");
         return "";
     }
-
     return strTime;
+}
+
+std::string ThermalDfx::GetFileNameIndex(const uint32_t index)
+{
+    char res[LOG_INDEX_LEN];
+    (void)snprintf_s(res, sizeof(res), sizeof(res) - 1, "%03d", index % MAX_FILE_NUM);
+    std::string fileNameIndex(res);
+    return fileNameIndex;
 }
 
 void ThermalDfx::UpdateInterval()
@@ -88,7 +113,8 @@ void ThermalDfx::UpdateInterval()
 void ThermalDfx::CompressFile()
 {
     unsigned long size;
-    std::string unCompressFile = g_xmlTraceInfo.outpath + "/" + "log" + std::to_string(g_logNumber) + ".txt";
+    std::string unCompressFile = g_xmlTraceInfo.outpath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
+        "." + g_logTime;
 
     FILE* fp = fopen(unCompressFile.c_str(), "rb");
     if (fp == nullptr) {
@@ -113,27 +139,26 @@ void ThermalDfx::CompressFile()
         THERMAL_HILOGW(COMP_HDI, "fclose() failed");
     }
 
-    std::string compressFile = g_xmlTraceInfo.outpath + "/" + "log" + std::to_string(g_logNumber) + ".gz";
-    if (g_gzLogCycle) {
-        if (remove(compressFile.c_str()) != 0) {
-            THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", compressFile.c_str());
-        }
-    }
-
+    std::string compressFile = g_xmlTraceInfo.outpath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
+        "." + g_logTime + ".gz";
     if (!Developtools::HiPerf::CompressFile(unCompressFile, compressFile)) {
         THERMAL_HILOGE(COMP_HDI, "CompressFile fail");
         return;
     }
+
     if (remove(unCompressFile.c_str()) != 0) {
         THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", unCompressFile.c_str());
     }
 
-    if (g_logNumber < MAX_FILE_NUM) {
-        g_logNumber++;
-    } else {
-        g_logNumber = 0;
-        g_gzLogCycle = true;
+    if (g_saveLogFile.size() > MAX_FILE_NUM) {
+        if (remove(g_saveLogFile.front().c_str()) != 0) {
+            THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", compressFile.c_str());
+        }
+        g_saveLogFile.pop_front();
     }
+    g_saveLogFile.push_back(compressFile);
+    g_currentLogIndex++;
+    g_logTime = GetCurrentTime(TIME_FORMAT_1);
 }
 
 int32_t ThermalDfx::ParseValue(const std::string& path, std::string& value)
@@ -161,8 +186,8 @@ bool ThermalDfx::PrepareWriteDfxLog()
         return false;
     }
 
-    std::string paramStart = OHOS::system::GetParameter("persist.thermal.log.start", "true");
-    if (paramStart == "false") {
+    std::string paramEnable = OHOS::system::GetParameter("persist.thermal.log.enable", "true");
+    if (paramEnable == "false") {
         THERMAL_HILOGD(COMP_HDI, "param does not start recording");
         return false;
     }
@@ -176,8 +201,13 @@ void ThermalDfx::CreateLogFile()
         THERMAL_HILOGD(COMP_HDI, "prepare write dfx log failed");
         return;
     }
-
-    std::string logFile = g_xmlTraceInfo.outpath + "/" + "log" + std::to_string(g_logNumber) + ".txt";
+    if (g_firstCreate) {
+        g_currentLogIndex = 0;
+        g_logTime = GetCurrentTime(TIME_FORMAT_1);
+        g_firstCreate = false;
+    }
+    std::string logFile = g_xmlTraceInfo.outpath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
+        "." + g_logTime;
     if (access(g_xmlTraceInfo.outpath.c_str(), 0) == -1) {
         auto ret = ForceCreateDirectory(g_xmlTraceInfo.outpath.c_str());
         if (!ret) {
@@ -202,11 +232,11 @@ void ThermalDfx::CreateLogFile()
 
 void ThermalDfx::ProcessLogInfo(std::string& logFile, bool isEmpty)
 {
-    std::string width = OHOS::system::GetParameter("persist.thermal.log.width", "10");
+    std::string width = OHOS::system::GetParameter("persist.thermal.log.width", "20");
     std::string interval = OHOS::system::GetParameter("persist.thermal.log.interval", "5000");
     uint32_t paramWidth = std::stoi(width.c_str());
 
-    std::string currentTime = GetCurrentTime();
+    std::string currentTime = GetCurrentTime(TIME_FORMAT_2);
     std::ofstream wStream(logFile, std::ios::app);
     if (wStream.is_open()) {
         if (isEmpty) {
@@ -223,8 +253,7 @@ void ThermalDfx::ProcessLogInfo(std::string& logFile, bool isEmpty)
                 }
                 wStream << info.title;
                 if (info.value == logInfo.back().value &&
-                    info.title == logInfo.back().title &&
-                    info.width == logInfo.back().width) {
+                    info.title == logInfo.back().title) {
                     break;
                 }
                 for (uint32_t i = 0; i < paramWidth; ++i) {
@@ -255,8 +284,7 @@ void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime, u
         ParseValue(valuePath, info.value);
         wStream << info.value;
         if (info.value == logInfo.back().value &&
-            info.title == logInfo.back().title &&
-            info.width == logInfo.back().width) {
+            info.title == logInfo.back().title) {
             break;
         }
 
@@ -274,22 +302,19 @@ void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime, u
 void ThermalDfx::GetTraceInfo()
 {
     XMLTracingInfo info = ThermalHdfConfig::GetInsance().GetXmlTraceInfo();
-    THERMAL_HILOGD(COMP_HDI, "info.interval = %{public}s, info.record = %{public}s, info.outpath = %{private}s",
-        info.interval.c_str(), info.record.c_str(), info.outpath.c_str());
+    THERMAL_HILOGD(COMP_HDI, "info.interval = %{public}s, info.outpath = %{private}s",
+        info.interval.c_str(), info.outpath.c_str());
 
     g_xmlTraceInfo.interval = info.interval;
-    g_xmlTraceInfo.record = info.record;
     g_xmlTraceInfo.outpath = info.outpath;
 
     std::vector<DfxTraceInfo> logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
     for (auto info : logInfo) {
-        THERMAL_HILOGD(COMP_HDI, "info.title = %{public}s, info.value = %{public}s, info.width = %{public}s",
-            info.title.c_str(), info.value.c_str(), info.width.c_str());
+        THERMAL_HILOGD(COMP_HDI, "info.title = %{public}s, info.value = %{public}s",
+            info.title.c_str(), info.value.c_str());
     }
 
-    if (info.record == "true") {
-        CreateLogFile();
-    }
+    CreateLogFile();
 }
 
 int32_t ThermalDfx::LoopingThreadEntry()
