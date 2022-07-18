@@ -979,21 +979,6 @@ int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
     return HDF_SUCCESS;
 }
 
-int32_t GetCaptureHandle(char *path)
-{
-#ifdef CONFIG_DRIVERS_HDF_AUDIO_IMX8MM
-    g_captureHandle = dlopen(path, 1);
-#else
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(path, pathBuf) == NULL) {
-        return HDF_FAILURE;
-    }
-    g_captureHandle = dlopen(pathBuf, 1);
-#endif
-
-    return HDF_SUCCESS;
-}
-
 int32_t InitParam(void)
 {
     char resolvedPath[PATH_LEN] = {0};
@@ -1001,8 +986,11 @@ int32_t InitParam(void)
     if (SelectLoadingMode(resolvedPath, PATH_LEN, func, PATH_LEN) < 0) {
         return HDF_FAILURE;
     }
-
-    GetCaptureHandle(resolvedPath);
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(resolvedPath, pathBuf) == NULL) {
+        return HDF_FAILURE;
+    }
+    g_captureHandle = dlopen(pathBuf, 1);
     if (g_captureHandle == NULL) {
         AUDIO_FUNC_LOGE("Open so Fail, reason:%s", dlerror());
         return HDF_FAILURE;
