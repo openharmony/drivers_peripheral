@@ -29,6 +29,7 @@ typedef struct AuthResult {
     int32_t freezingTime;
     int32_t remainTimes;
     int32_t result;
+    Buffer *rootSecret;
 } AuthResult;
 
 int32_t GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules);
