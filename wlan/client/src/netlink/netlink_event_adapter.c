@@ -67,7 +67,7 @@ static int HandleCtrlEvent(int fd)
 
     ret = TEMP_FAILURE_RETRY(read(fd, buf, sizeof(buf)));
     if (ret < 0) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: Read after POLL returned %zd, error no = %d (%s)",
+        HILOG_ERROR(LOG_DOMAIN, "%s: Read after POLL returned %d, error no = %d (%s)",
             __FUNCTION__, ret, errno, strerror(errno));
     }
 

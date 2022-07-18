@@ -265,7 +265,7 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
     uint32_t freqLen = WLAN_FREQ_MAX_NUM ;
     wifiInfo.band = IEEE80211_BAND_2GHZ;
     wifiInfo.size = WLAN_FREQ_MAX_NUM;
-    int i;
+    uint32_t i;
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlan_type, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
