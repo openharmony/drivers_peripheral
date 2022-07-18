@@ -24,42 +24,75 @@ namespace OHOS {
 namespace HDI {
 namespace Location {
 namespace {
-void *g_vendorHandle = nullptr;
-const GnssVendorInterface *g_vendorInterface = nullptr;
 const std::string VENDOR_NAME = "vendorGnssAdapter.so";
 } // namespace
+
+std::mutex LocationVendorInterface::mutex_;
+LocationVendorInterface* LocationVendorInterface::instance_ = nullptr;
+
+LocationVendorInterface::LocationVendorInterface()
+{
+    Init();
+    HDF_LOGI("%{public}s constructed.", __func__);
+}
+
+LocationVendorInterface::~LocationVendorInterface()
+{
+    CleanUp();
+    HDF_LOGI("%{public}s destructed.", __func__);
+}
+ 
+LocationVendorInterface* LocationVendorInterface::GetInstance()
+{
+    if (instance_ == nullptr) {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (instance_ == nullptr) {
+            instance_ = new LocationVendorInterface();
+        }
+    }
+    return instance_;
+}
+
+void LocationVendorInterface::DestroyInstance()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (instance_ != nullptr) {
+        delete instance_;
+        instance_ = nullptr;
+    }
+}
 
 void LocationVendorInterface::Init()
 {
     HDF_LOGI("%{public}s.", __func__);
-    g_vendorHandle = dlopen(VENDOR_NAME.c_str(), RTLD_LAZY);
-    if (!g_vendorHandle) {
+    vendorHandle_ = dlopen(VENDOR_NAME.c_str(), RTLD_LAZY);
+    if (!vendorHandle_) {
         HDF_LOGE("%{public}s:dlopen %{public}s failed: %{public}s", __func__, VENDOR_NAME.c_str(), dlerror());
         return;
     }
-    GnssVendorDevice *gnssDevice = static_cast<GnssVendorDevice *>(dlsym(g_vendorHandle, "GnssVendorInterface"));
+    GnssVendorDevice *gnssDevice = static_cast<GnssVendorDevice *>(dlsym(vendorHandle_, "GnssVendorInterface"));
     if (gnssDevice == nullptr) {
         HDF_LOGE("%{public}s:dlsym GnssInterface failed.", __func__);
         return;
     }
-    g_vendorInterface = gnssDevice->get_gnss_interface();
-    if (g_vendorInterface == nullptr) {
+    vendorInterface_ = gnssDevice->get_gnss_interface();
+    if (vendorInterface_ == nullptr) {
         HDF_LOGE("%{public}s:get_gnss_interface failed.", __func__);
         return;
     }
 }
 
-const GnssVendorInterface *LocationVendorInterface::GetVendorInterface()
+const GnssVendorInterface *LocationVendorInterface::GetGnssVendorInterface()
 {
-    if (g_vendorInterface == nullptr) {
-        HDF_LOGE("%{public}s:GetVendorInterface() failed.", __func__);
+    if (vendorInterface_ == nullptr) {
+        HDF_LOGE("%{public}s:GetGnssVendorInterface() failed.", __func__);
     }
-    return g_vendorInterface;
+    return vendorInterface_;
 }
 
 const void *LocationVendorInterface::GetModuleInterface(int moduleId)
 {
-    auto vendorInterface = GetVendorInterface();
+    auto vendorInterface = GetGnssVendorInterface();
     if (vendorInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get vendorInterface.", __func__);
         return nullptr;
@@ -73,12 +106,12 @@ const void *LocationVendorInterface::GetModuleInterface(int moduleId)
 
 void LocationVendorInterface::CleanUp()
 {
-    if (g_vendorInterface == nullptr) {
+    if (vendorInterface_ == nullptr) {
         return;
     }
-    g_vendorInterface = nullptr;
-    dlclose(g_vendorHandle);
-    g_vendorHandle = nullptr;
+    vendorInterface_ = nullptr;
+    dlclose(vendorHandle_);
+    vendorHandle_ = nullptr;
 }
 } // Location
 } // HDI

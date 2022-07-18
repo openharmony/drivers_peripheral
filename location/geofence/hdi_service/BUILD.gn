@@ -31,6 +31,8 @@ ohos_shared_library("libgeofence_interface_service_1.0") {
     "-fno-strict-aliasing",
   ]
 
+  ldflags = [ "-rdynamic" ]
+
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_location_geofence:location_geofence_idl_headers",
