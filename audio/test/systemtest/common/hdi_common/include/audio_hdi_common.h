@@ -117,6 +117,20 @@ const std::string HDF_CAPTURE_SERVICE = "hdf_audio_capture";
 
 const int AUDIODRV_CTL_ELEM_IFACE_MIXER = 2; /* virtual adc device */
 
+constexpr int SAMPLE_RATE_8000 = 8000;
+constexpr int SAMPLE_RATE_11025 = 11025;
+constexpr int SAMPLE_RATE_22050 = 22050;
+constexpr int SAMPLE_RATE_32000 = 32000;
+constexpr int SAMPLE_RATE_44100 = 44100;
+constexpr int SAMPLE_RATE_48000 = 48000;
+constexpr int SAMPLE_RATE_12000 = 12000;
+constexpr int SAMPLE_RATE_16000 = 16000;
+constexpr int SAMPLE_RATE_24000 = 24000;
+constexpr int SAMPLE_RATE_64000 = 64000;
+constexpr int SAMPLE_RATE_96000 = 96000;
+constexpr int DOUBLE_CHANNEL_COUNT = 2;
+constexpr int SINGLE_CHANNEL_COUNT = 1;
+
 enum ControlDispMethodCmd {
     AUDIODRV_CTRL_IOCTRL_ELEM_INFO,
     AUDIODRV_CTRL_IOCTRL_ELEM_READ,
