@@ -860,6 +860,7 @@ int32_t PowerSupplyProvider::ParseTechnology(std::string& technology) const
 
 BatterydInfo PowerSupplyProvider::GetBatteryInfo() const
 {
+    UpdateInfoByReadSysFile(&g_batteryInfo);
     return g_batteryInfo;
 }
 
