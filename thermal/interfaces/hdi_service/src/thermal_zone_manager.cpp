@@ -53,7 +53,7 @@ const int32_t NUM_ZERO = 0;
 
 void ThermalZoneManager::FormatThermalPaths(char *path, size_t size, const char *format, const char* name)
 {
-    if (snprintf_s(path, PATH_MAX, size - 1, format, name) < HDF_SUCCESS) {
+    if (snprintf_s(path, size, size - 1, format, name) < EOK) {
         THERMAL_HILOGW(COMP_HDI, "failed to format path of %{public}s", name);
     }
 }
