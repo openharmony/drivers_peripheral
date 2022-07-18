@@ -20,14 +20,7 @@ if (defined(ohos_lite)) {
 import("//drivers/peripheral/audio/audio.gni")
 
 if (defined(ohos_lite)) {
-  ###########################LITEOS##########################################
-  ###########################hdf_audio_smartpa_test###########################
-  unittest("hdf_audio_smartpa_test") {
-    if (defined(enable_liteos_test_bin) && enable_liteos_test_bin == true) {
-      output_extension = "bin"
-      output_dir = "$root_out_dir/test/systemtest/hdf"
-    }
-
+  moduletest("hdf_audio_smartpa_test") {
     sources = [
       "../../common/adm_common/src/audio_adm_common.cpp",
       "../../common/hdi_common/src/audio_hdi_common.cpp",
@@ -57,15 +50,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/test/systemtest/adm/audio_adm_interface/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-      "-std=c++11",
-    ]
 
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
@@ -77,8 +61,6 @@ if (defined(ohos_lite)) {
 } else {
   module_output_path = "drivers_peripheral_audio/audio"
 
-  ###########################systemtest##############################
-  ###########################hdf_audio_smartpa_test###########################
   ohos_systemtest("hdf_audio_smartpa_test") {
     module_out_path = module_output_path
     sources = [
@@ -102,14 +84,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/test/systemtest/adm/audio_adm_interface/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-    ]
+
     deps = [
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
@@ -136,4 +111,3 @@ if (defined(ohos_lite)) {
     }
   }
 }
-###########################end###########################

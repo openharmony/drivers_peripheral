@@ -75,14 +75,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/test/systemtest/supportlibs/hardwaredependence/render/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-    ]
+
     deps = [
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",

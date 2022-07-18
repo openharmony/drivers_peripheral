@@ -25,7 +25,8 @@ group("supportlibs") {
     testonly = true
     if (enable_audio_adm_so) {
       deps += [ "common:lib_common" ]
-      if (!drivers_peripheral_audio_alsa_lib) {
+      if (!defined(drivers_peripheral_audio_alsa_lib) ||
+          drivers_peripheral_audio_alsa_lib == false) {
         deps += [ "hardwaredependence:lib_hardwaredependence" ]
       }
     }

@@ -639,7 +639,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0001, Test
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
-    enum AudioPortPassthroughMode modeLpcm = PORT_PASSTHROUGH_AUTO;
+    AudioPortPassthroughMode modeLpcm = PORT_PASSTHROUGH_AUTO;
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -714,7 +714,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0004, Test
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
     struct AudioPort *audioPortNull = nullptr;
-    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
@@ -767,7 +767,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0001, Test
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
-    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_AUTO;
+    AudioPortPassthroughMode mode = PORT_PASSTHROUGH_AUTO;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
@@ -798,7 +798,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0002, Test
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
-    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
     struct AudioAdapter *adapter = nullptr;
     struct AudioAdapter *adapterNull = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
@@ -826,7 +826,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0003, Test
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
     struct AudioPort *audioPortNull = nullptr;
-    enum AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+    AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
@@ -854,7 +854,7 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0004, Test
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
-    enum AudioPortPassthroughMode *modeNull = nullptr;
+    AudioPortPassthroughMode *modeNull = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);
     TestAudioManager* manager = GetAudioManager();
