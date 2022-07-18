@@ -438,11 +438,12 @@ typedef struct {
 
 
 typedef struct {
+    uint8_t ifName[IFNAMSIZ];
     uint8_t type;
 } WifiIfAdd;
 
 typedef struct {
-    uint8_t ifname[IFNAMSIZ];
+    uint8_t ifName[IFNAMSIZ];
 } WifiIfRemove;
 
 typedef struct {
@@ -480,10 +481,10 @@ int32_t WifiCmdSetClient(uint32_t clientNum);
 int32_t WifiCmdProbeReqReport(const char *ifName, const int32_t *report);
 int32_t WifiCmdRemainOnChannel(const char *ifName, const WifiOnChannel *onChannel);
 int32_t WifiCmdCancelRemainOnChannel(const char *ifName);
-int32_t WifiCmdAddIf(const char *ifname, const WifiIfAdd *ifAdd);
-int32_t WifiCmdRemoveIf(const char *ifname, const WifiIfRemove *ifRemove);
-int32_t WifiCmdSetApWpsP2pIe(const char *ifname, const WifiAppIe *appIe);
-int32_t WifiCmdGetDrvFlags(const char *ifname, WifiGetDrvFlags *params);
+int32_t WifiCmdAddIf(const char *ifName, const WifiIfAdd *ifAdd);
+int32_t WifiCmdRemoveIf(const char *ifName, const WifiIfRemove *ifRemove);
+int32_t WifiCmdSetApWpsP2pIe(const char *ifName, const WifiAppIe *appIe);
+int32_t WifiCmdGetDrvFlags(const char *ifName, WifiGetDrvFlags *params);
 #ifdef __cplusplus
 #if __cplusplus
 }
