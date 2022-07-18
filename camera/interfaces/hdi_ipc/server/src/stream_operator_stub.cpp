@@ -80,6 +80,7 @@ int32_t StreamOperatorStub::OnRemoteRequest(uint32_t code, MessageParcel &data, 
 int32_t StreamOperatorStub::StreamOperatorStubIsStreamsSupported(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -119,6 +120,7 @@ int32_t StreamOperatorStub::StreamOperatorStubIsStreamsSupported(
 int32_t StreamOperatorStub::StreamOperatorStubCreateStreams(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -144,6 +146,7 @@ int32_t StreamOperatorStub::StreamOperatorStubCreateStreams(
 int32_t StreamOperatorStub::StreamOperatorStubReleaseStreams(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -167,6 +170,7 @@ int32_t StreamOperatorStub::StreamOperatorStubReleaseStreams(
 int32_t StreamOperatorStub::StreamOperatorStubCommitStreams(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -189,6 +193,7 @@ int32_t StreamOperatorStub::StreamOperatorStubCommitStreams(
 int32_t StreamOperatorStub::StreamOperatorStubGetStreamAttributes(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -220,6 +225,7 @@ int32_t StreamOperatorStub::StreamOperatorStubGetStreamAttributes(
 int32_t StreamOperatorStub::StreamOperatorStubAttachBufferQueue(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -242,6 +248,7 @@ int32_t StreamOperatorStub::StreamOperatorStubAttachBufferQueue(
 int32_t StreamOperatorStub::StreamOperatorStubDetachBufferQueue(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -260,6 +267,7 @@ int32_t StreamOperatorStub::StreamOperatorStubDetachBufferQueue(
 int32_t StreamOperatorStub::StreamOperatorStubCapture(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -297,6 +305,7 @@ int32_t StreamOperatorStub::StreamOperatorStubCapture(
 int32_t StreamOperatorStub::StreamOperatorStubCancelCapture(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;
@@ -315,6 +324,7 @@ int32_t StreamOperatorStub::StreamOperatorStubCancelCapture(
 int32_t StreamOperatorStub::StreamOperatorStubChangeToOfflineStream(
     MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
+    (void)option;
     if (data.ReadInterfaceToken() != StreamOperatorStub::GetDescriptor()) {
         HDF_LOGE("%{public}s: invalid interface descriptor.", __func__);
         return INVALID_ARGUMENT;

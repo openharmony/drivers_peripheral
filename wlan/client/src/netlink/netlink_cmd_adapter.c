@@ -1275,8 +1275,9 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode)
 {
     int32_t fd = socket(PF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
     int32_t ret;
-    HwprivIoctlData ioctlData = {0};
+    HwprivIoctlData ioctlData;
 
+    (void)memset_s(&ioctlData, sizeof(ioctlData), 0, sizeof(ioctlData));
     if (fd < 0) {
         HILOG_ERROR(LOG_DOMAIN, "%s: open socket failed", __FUNCTION__);
         return RET_CODE_FAILURE;
@@ -1326,7 +1327,8 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode)
 
 static int32_t FillHwprivIoctlData(HwprivIoctlData *ioctlData, uint8_t mode)
 {
-    char *strTable[WIFI_POWER_MODE_NUM] = {SET_POWER_MODE_SLEEP, SET_POWER_MODE_THIRD, SET_POWER_MODE_INIT};
+    const char *strTable[WIFI_POWER_MODE_NUM] = {SET_POWER_MODE_SLEEP, SET_POWER_MODE_THIRD, SET_POWER_MODE_INIT};
+    const char *modeStr = strTable[mode];
 
     ioctlData->data.point.length = strlen(strTable[mode]) + 1;
     ioctlData->data.point.buf = calloc(ioctlData->data.point.length, sizeof(char));
@@ -1335,9 +1337,8 @@ static int32_t FillHwprivIoctlData(HwprivIoctlData *ioctlData, uint8_t mode)
         return RET_CODE_NOMEM;
     }
     ioctlData->data.point.flags = SECONDARY_ID_POWER_MODE;
-    if (sprintf_s(ioctlData->data.point.buf, ioctlData->data.point.length, "%s", strTable[mode]) !=
-        strlen(strTable[mode])) {
-        HILOG_ERROR(LOG_DOMAIN, "%s: sprintf failed", __FUNCTION__);
+    if (strncpy_s(ioctlData->data.point.buf, ioctlData->data.point.length, modeStr, strlen(modeStr)) != EOK) {
+        HILOG_ERROR(LOG_DOMAIN, "%s: strncpy_s failed", __FUNCTION__);
         free(ioctlData->data.point.buf);
         return RET_CODE_FAILURE;
     }
@@ -1349,8 +1350,9 @@ int32_t SetPowerMode(const char *ifName, uint8_t mode)
 {
     int32_t fd;
     int32_t ret;
-    HwprivIoctlData ioctlData = {0};
+    HwprivIoctlData ioctlData;
 
+    (void)memset_s(&ioctlData, sizeof(ioctlData), 0, sizeof(ioctlData));
     fd = socket(PF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
     if (fd < 0) {
         HILOG_ERROR(LOG_DOMAIN, "%s: open socket failed", __FUNCTION__);
