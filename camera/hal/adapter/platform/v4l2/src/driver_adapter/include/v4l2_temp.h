@@ -67,6 +67,7 @@ public:
         size_ = size;
         return;
     }
+
     void SetOffset(const uint32_t offset)
     {
         offset_ = offset;
