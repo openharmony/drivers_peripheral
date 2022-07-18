@@ -139,6 +139,9 @@ static ResultCode ParseExecutorResultInfo(const Buffer *data, ExecutorResultInfo
         goto EXIT;
     }
 
+    // Only pin auth can have rootsecret
+    result->rootSecret = GetBuffPara(parseBody->next, AUTH_ROOT_SECRET);
+
 EXIT:
     DestroyTlvList(parseBody);
     return ret;
@@ -259,6 +262,9 @@ void DestoryExecutorResultInfo(ExecutorResultInfo *result)
 {
     if (result == NULL) {
         return;
+    }
+    if (result->rootSecret != NULL) {
+        DestoryBuffer(result->rootSecret);
     }
     Free(result);
 }

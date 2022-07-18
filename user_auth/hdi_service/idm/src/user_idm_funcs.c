@@ -154,11 +154,17 @@ static int32_t GetCredentialInfoFromSchedule(const ExecutorResultInfo *executorI
     return RESULT_SUCCESS;
 }
 
-int32_t AddCredentialFunc(const Buffer *scheduleResult, uint64_t *credentialId)
+int32_t AddCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint64_t *credentialId, Buffer **rootSecret)
 {
-    if (!IsBufferValid(scheduleResult) || credentialId == NULL) {
+    if (!IsBufferValid(scheduleResult) || credentialId == NULL || rootSecret == NULL) {
         LOG_ERROR("param is null");
         return RESULT_BAD_PARAM;
+    }
+    int32_t sessionUserId;
+    int32_t ret = GetUserId(&sessionUserId);
+    if (ret != RESULT_SUCCESS || sessionUserId != userId) {
+        LOG_ERROR("userId mismatch");
+        return RESULT_UNKNOWN;
     }
     ExecutorResultInfo *executorResultInfo = CreateExecutorResultInfo(scheduleResult);
     if (executorResultInfo == NULL) {
@@ -166,15 +172,9 @@ int32_t AddCredentialFunc(const Buffer *scheduleResult, uint64_t *credentialId)
         return RESULT_UNKNOWN;
     }
     CredentialInfoHal credentialInfo;
-    int32_t ret = GetCredentialInfoFromSchedule(executorResultInfo, &credentialInfo);
+    ret = GetCredentialInfoFromSchedule(executorResultInfo, &credentialInfo);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("failed to get credential info result");
-        goto EXIT;
-    }
-    int32_t userId;
-    ret = GetUserId(&userId);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get userId failed");
         goto EXIT;
     }
     ret = AddCredentialInfo(userId, &credentialInfo);
@@ -182,13 +182,20 @@ int32_t AddCredentialFunc(const Buffer *scheduleResult, uint64_t *credentialId)
         LOG_ERROR("add credential failed");
         goto EXIT;
     }
-    if (credentialInfo.authType == PIN_AUTH &&
-        SetPinSubType(userId, executorResultInfo->authSubType) != RESULT_SUCCESS) {
-        LOG_ERROR("set pin sub type failed");
-        ret = RESULT_UNKNOWN;
+    *credentialId = credentialInfo.credentialId;
+    if (credentialInfo.authType != PIN_AUTH) {
         goto EXIT;
     }
-    *credentialId = credentialInfo.credentialId;
+    ret = SetPinSubType(userId, executorResultInfo->authSubType);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("set pin sub type failed");
+        goto EXIT;
+    }
+    *rootSecret = CopyBuffer(executorResultInfo->rootSecret);
+    if (!IsBufferValid(*rootSecret)) {
+        LOG_ERROR("rootSecret is invalid");
+        ret = RESULT_NO_MEMORY;
+    }
 
 EXIT:
     DestoryExecutorResultInfo(executorResultInfo);
@@ -300,6 +307,12 @@ static int32_t CheckResultValid(uint64_t scheduleId, int32_t userId)
         LOG_ERROR("schedule is mismatch");
         return RESULT_REACH_LIMIT;
     }
+    int32_t userIdGet;
+    ret = GetUserId(&userIdGet);
+    if (ret != RESULT_SUCCESS || userId != userIdGet) {
+        LOG_ERROR("check userId failed");
+        return RESULT_REACH_LIMIT;
+    }
     if (scheduleAuthType != PIN_AUTH) {
         LOG_ERROR("only pin is allowed to be updated");
         return RESULT_UNKNOWN;
@@ -308,9 +321,9 @@ static int32_t CheckResultValid(uint64_t scheduleId, int32_t userId)
 }
 
 int32_t UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint64_t *credentialId,
-    CredentialInfoHal *deletedCredential)
+    CredentialInfoHal *deletedCredential, Buffer **rootSecret)
 {
-    if (!IsBufferValid(scheduleResult) || credentialId == NULL || deletedCredential == NULL) {
+    if (!IsBufferValid(scheduleResult) || credentialId == NULL || deletedCredential == NULL || rootSecret == NULL) {
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
@@ -324,18 +337,12 @@ int32_t UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint6
         LOG_ERROR("check result failed");
         goto EXIT;
     }
-    int32_t userIdGet;
-    ret = GetUserId(&userIdGet);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("check userId failed");
-        goto EXIT;
-    }
-    ret = GetDeletedCredential(userIdGet, deletedCredential);
+    ret = GetDeletedCredential(userId, deletedCredential);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("get old credential failed");
         goto EXIT;
     }
-    ret = DeleteCredentialInfo(userIdGet, deletedCredential->credentialId, deletedCredential);
+    ret = DeleteCredentialInfo(userId, deletedCredential->credentialId, deletedCredential);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("delete failed");
         goto EXIT;
@@ -348,9 +355,16 @@ int32_t UpdateCredentialFunc(int32_t userId, const Buffer *scheduleResult, uint6
     }
     CredentialInfoHal credentialInfo;
     GetInfoFromResult(&credentialInfo, executorResultInfo, schedule);
-    ret = AddCredentialInfo(userIdGet, &credentialInfo);
-    if (ret == RESULT_SUCCESS) {
-        *credentialId = credentialInfo.credentialId;
+    ret = AddCredentialInfo(userId, &credentialInfo);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("failed to add credential");
+        goto EXIT;
+    }
+    *credentialId = credentialInfo.credentialId;
+    *rootSecret = CopyBuffer(executorResultInfo->rootSecret);
+    if (!IsBufferValid(*rootSecret)) {
+        LOG_ERROR("rootSecret is invalid");
+        ret = RESULT_NO_MEMORY;
     }
 
 EXIT:
