@@ -229,7 +229,18 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
             info.token.clear();
             return RESULT_BAD_COPY;
         }
+        if (authResult.rootSecret != NULL) {
+            info.rootSecret.resize(authResult.rootSecret->contentSize);
+            if (memcpy_s(info.rootSecret.data(), info.rootSecret.size(),
+                authResult.rootSecret->buf, authResult.rootSecret->contentSize) != EOK) {
+                IAM_LOGE("copy secret failed");
+                info.rootSecret.clear();
+                info.token.clear();
+                return RESULT_BAD_COPY;
+            }
+        }
     }
+    DestoryBuffer(authResult.rootSecret);
     return CreateExecutorCommand(info);
 }
 
@@ -252,7 +263,7 @@ int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, AuthTy
     param.contextId = contextId;
     param.authType = static_cast<uint32_t>(authType);
     param.executorSensorHint = executorSensorHint;
-    if (memcpy_s(&param.challenge, sizeof(uint64_t), &challenge[0], challenge.size()) != EOK) {
+    if (memcpy_s(&param.challenge, sizeof(uint64_t), challenge.data(), challenge.size()) != EOK) {
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
@@ -338,7 +349,7 @@ int32_t UserAuthInterfaceService::OpenSession(int32_t userId, std::vector<uint8_
     uint64_t challengeU64 = 0;
     int32_t ret = OpenEditSession(userId, &challengeU64);
     challenge.resize(sizeof(uint64_t));
-    if (memcpy_s(&challenge[0], challenge.size(), &challengeU64, sizeof(uint64_t)) != EOK) {
+    if (memcpy_s(challenge.data(), challenge.size(), &challengeU64, sizeof(uint64_t)) != EOK) {
         IAM_LOGE("challengeU64 copy failed");
         challenge.clear();
         return RESULT_BAD_COPY;
@@ -436,12 +447,22 @@ int32_t UserAuthInterfaceService::UpdateEnrollmentResult(int32_t userId, const s
         DestoryBuffer(scheduleResultBuffer);
         return ret;
     }
+    Buffer *rootSecret = NULL;
     if (isUpdate) {
         CredentialInfoHal oldCredentialHal = {};
-        ret = UpdateCredentialFunc(userId, scheduleResultBuffer, &info.credentialId, &oldCredentialHal);
+        ret = UpdateCredentialFunc(userId, scheduleResultBuffer, &info.credentialId, &oldCredentialHal, &rootSecret);
         CopyCredentialInfo(oldCredentialHal, info.oldInfo);
     } else {
-        ret = AddCredentialFunc(scheduleResultBuffer, &info.credentialId);
+        ret = AddCredentialFunc(userId, scheduleResultBuffer, &info.credentialId, &rootSecret);
+    }
+    if (rootSecret != NULL) {
+        info.rootSecret.resize(rootSecret->contentSize);
+        if (memcpy_s(info.rootSecret.data(), info.rootSecret.size(), rootSecret->buf, rootSecret->contentSize) != EOK) {
+            IAM_LOGE("failed to copy rootSecret");
+            info.rootSecret.clear();
+            ret = RESULT_BAD_COPY;
+        }
+        DestoryBuffer(rootSecret);
     }
     DestoryBuffer(scheduleResultBuffer);
     return ret;

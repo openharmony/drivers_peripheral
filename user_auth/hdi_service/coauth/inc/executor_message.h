@@ -78,6 +78,8 @@ typedef enum AuthAttributeType {
     ALGORITHM_INFO = 100030,
     /* time stamp */
     AUTH_TIME_STAMP = 100031,
+    /* root secret */
+    AUTH_ROOT_SECRET = 100032,
 } AuthAttributeType; // the new tag must be consistent with userauth SA
 
 typedef struct ExecutorResultInfo {
@@ -88,6 +90,7 @@ typedef struct ExecutorResultInfo {
     uint32_t capabilityLevel;
     int32_t freezingTime;
     int32_t remainTimes;
+    Buffer *rootSecret;
 } ExecutorResultInfo;
 
 typedef struct ExecutorMsg {
