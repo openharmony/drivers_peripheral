@@ -116,9 +116,6 @@ if (defined(ohos_lite)) {
     if (enable_audio_hal_hdf_log) {
       defines = [ "AUDIO_HAL_HDF_LOG" ]
     }
-    if (defined(enable_audio_imx8mm_64bit) && enable_audio_imx8mm_64bit) {
-      defines += [ "AUDIO_NXP_IMX8MM" ]
-    }
     if (drivers_peripheral_audio_alsa_lib) {
       sources += [
         "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/alsa_mixer.c",
@@ -188,10 +185,6 @@ if (defined(ohos_lite)) {
 
     if (enable_audio_hal_hdf_log) {
       defines = [ "AUDIO_HAL_HDF_LOG" ]
-    }
-
-    if (defined(enable_audio_imx8mm_64bit) && enable_audio_imx8mm_64bit) {
-      defines += [ "AUDIO_NXP_IMX8MM" ]
     }
 
     if (drivers_peripheral_audio_alsa_lib) {
