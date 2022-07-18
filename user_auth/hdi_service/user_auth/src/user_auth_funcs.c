@@ -44,11 +44,26 @@ int32_t GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
     return ret;
 }
 
+static int32_t SetAuthResult(uint32_t authType, const ExecutorResultInfo *info, AuthResult *result)
+{
+    result->freezingTime = info->freezingTime;
+    result->remainTimes = info->remainTimes;
+    result->result = info->result;
+    if (result->result == RESULT_SUCCESS && authType == PIN_AUTH) {
+        result->rootSecret = CopyBuffer(info->rootSecret);
+        if (!IsBufferValid(result->rootSecret)) {
+            LOG_ERROR("rootSecret is invalid");
+            return RESULT_NO_MEMORY;
+        }
+    }
+    return RESULT_SUCCESS;
+}
+
 int32_t RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, UserAuthTokenHal *authToken,
     AuthResult *result)
 {
-    if (!IsBufferValid(scheduleResult) || authToken == NULL || result == NULL) {
-        LOG_ERROR("param is null");
+    if (!IsBufferValid(scheduleResult) || authToken == NULL || result == NULL || result->rootSecret != NULL) {
+        LOG_ERROR("param is invalid");
         DestoryContextbyId(contextId);
         return RESULT_BAD_PARAM;
     }
@@ -86,9 +101,11 @@ int32_t RequestAuthResultFunc(uint64_t contextId, const Buffer *scheduleResult, 
     } else {
         (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
     }
-    result->freezingTime = executorResultInfo->freezingTime;
-    result->remainTimes = executorResultInfo->remainTimes;
-    result->result = executorResultInfo->result;
+    ret = SetAuthResult(userAuthContext->authType, executorResultInfo, result);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("set result failed");
+        (void)memset_s(authToken, sizeof(UserAuthTokenHal), 0, sizeof(UserAuthTokenHal));
+    }
 
 EXIT:
     DestoryExecutorResultInfo(executorResultInfo);
