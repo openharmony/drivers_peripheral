@@ -967,7 +967,7 @@ static int32_t SerialClose(const struct SerialDevice *port, struct HdfSBuf *data
 
 static int32_t SerialWrite(const struct SerialDevice *port, struct HdfSBuf *data)
 {
-    int32_t size;
+    uint32_t size;
     int32_t ret;
     const char *tmp = NULL;
 
@@ -1005,14 +1005,14 @@ static int32_t SerialWrite(const struct SerialDevice *port, struct HdfSBuf *data
     if (ret != EOK) {
         HDF_LOGE("memcpy_s failed, ret = %d", ret);
     }
-    wb->len = (int)size;
+    wb->len = size;
     
     ret = AcmStartWb(acm, wb, acm->dataOutPipe);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AcmStartWb failed, ret=%d", __func__, ret);
         return HDF_FAILURE;
     }
-    return size;
+    return (int32_t)size;
 }
 
 static int32_t SerialAddOrRemoveInterface(int32_t cmd, const struct SerialDevice *port, const struct HdfSBuf *data)

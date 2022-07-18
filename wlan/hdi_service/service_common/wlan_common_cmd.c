@@ -181,7 +181,7 @@ int32_t WlanInterfaceGetAsscociatedStas(struct IWlanInterface *self, const struc
         OsalMemFree(wifiStaInfo);
         return ret;
     }
-    for (int i = 0; i < *staInfoLen; i++) {
+    for (uint32_t i = 0; i < *staInfoLen; i++) {
         staInfo[i].mac = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * ETH_ADDR_LEN);
         if (staInfo[i].mac != NULL) {
             if (memcpy_s(staInfo[i].mac, WIFI_MAC_ADDR_LENGTH, wifiStaInfo[i].mac, WIFI_MAC_ADDR_LENGTH) != EOK) {
@@ -820,7 +820,7 @@ int32_t WlanInterfaceGetNetDevInfo(struct IWlanInterface *self, struct HdfNetDev
         return HDF_FAILURE;
     }
     netDeviceInfoResult->deviceInfosLen = MAX_NETDEVICE_COUNT;
-    for (int i = 0; i < netDeviceInfoResult->deviceInfosLen; i++) {
+    for (uint32_t i = 0; i < netDeviceInfoResult->deviceInfosLen; i++) {
         netDeviceInfoResult->deviceInfos[i].index = netDeviceInfo->deviceInfos[i].index;
         netDeviceInfoResult->deviceInfos[i].iftype = netDeviceInfo->deviceInfos[i].iftype;
         netDeviceInfoResult->deviceInfos[i].ifName = (char *)OsalMemCalloc(sizeof(char) * IFNAMSIZ);
