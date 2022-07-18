@@ -18,6 +18,7 @@
 #include <openssl/evp.h>
 #include <openssl/rand.h>
 #include <securec.h>
+#include "defines.h"
 #include "iam_logger.h"
 #include "parameter.h"
 #include "sysparam_errno.h"
@@ -126,13 +127,13 @@ int32_t ExecutorImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &ex
     std::vector<uint8_t> salt;
     if (NewSalt(salt) != HDF_SUCCESS) {
         IAM_LOGE("new salt failed");
-        CallError(callbackObj, HDF_FAILURE);
+        CallError(callbackObj, GENERAL_ERROR);
         return HDF_FAILURE;
     }
     int32_t result = scheduleMap_.AddScheduleInfo(scheduleId, ENROLL_PIN, callbackObj, 0, salt);
     if (result != HDF_SUCCESS) {
         IAM_LOGE("Add scheduleInfo failed, fail code : %{public}d", result);
-        CallError(callbackObj, HDF_FAILURE);
+        CallError(callbackObj, GENERAL_ERROR);
         return result;
     }
     result = callbackObj->OnGetData(scheduleId, salt, 0);
@@ -158,7 +159,7 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, con
     }
     if (pinHdi_ == nullptr) {
         IAM_LOGE("pinHdi_ is nullptr");
-        CallError(callbackObj, HDF_FAILURE);
+        CallError(callbackObj, INVALID_PARAMETERS);
         return HDF_FAILURE;
     }
     static_cast<void>(extraInfo);
@@ -166,25 +167,25 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, con
     int32_t result = pinHdi_->GetSalt(templateId, salt);
     if (result  != SUCCESS) {
         IAM_LOGE("get salt failed, fail code : %{public}d", result);
-        CallError(callbackObj, HDF_FAILURE);
-        return result;
+        CallError(callbackObj, GENERAL_ERROR);
+        return HDF_FAILURE;
     }
     result = scheduleMap_.AddScheduleInfo(scheduleId, AUTH_PIN, callbackObj, templateId, salt);
     if (result != HDF_SUCCESS) {
         IAM_LOGE("Add scheduleInfo failed, fail code : %{public}d", result);
-        CallError(callbackObj, HDF_FAILURE);
+        CallError(callbackObj, GENERAL_ERROR);
         return result;
     }
     OHOS::UserIAM::PinAuth::PinCredentialInfo infoRet = {};
     result = pinHdi_->QueryPinInfo(templateId, infoRet);
     if (result != SUCCESS) {
         IAM_LOGE("Get TemplateInfo failed, fail code : %{public}d", result);
-        CallError(callbackObj, HDF_FAILURE);
-        return result;
+        CallError(callbackObj, result);
+        return HDF_FAILURE;
     }
     if (infoRet.remainTimes == 0 || infoRet.freezingTime > 0) {
         IAM_LOGE("Pin authentication is now frozen state");
-        CallError(callbackObj, HDF_FAILURE);
+        CallError(callbackObj, LOCKED);
         return HDF_FAILURE;
     }
     result = callbackObj->OnGetData(scheduleId, salt, 0);
