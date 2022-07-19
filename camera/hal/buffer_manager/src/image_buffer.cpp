@@ -146,16 +146,6 @@ int32_t ImageBuffer::GetStreamId() const
     return streamId_;
 }
 
-uint32_t ImageBuffer::GetOffset() const
-{
-    return offset_;
-}
-
-uint32_t ImageBuffer::GetLength() const
-{
-    return length_;
-}
-
 void ImageBuffer::SetIndex(const int32_t index)
 {
     std::lock_guard<std::mutex> l(l_);
@@ -317,20 +307,6 @@ void ImageBuffer::SetStreamId(const int32_t streamId)
     return;
 }
 
-void ImageBuffer::SetOffset(const uint32_t offset)
-{
-    std::lock_guard<std::mutex> l(l_);
-    offset_ = offset;
-    return;
-}
-
-void ImageBuffer::SetLength(const uint32_t length)
-{
-    std::lock_guard<std::mutex> l(l_);
-    length_ = length;
-    return;
-}
-
 void ImageBuffer::Free()
 {
     index_ = -1;
@@ -343,8 +319,6 @@ void ImageBuffer::Free()
     virAddr_ = nullptr;
     phyAddr_ = 0;
     fd_ = -1;
-    offset_ = 0;
-    length_ = 0;
 
     return;
 }

@@ -85,9 +85,8 @@ if (defined(ohos_lite)) {
 
   ohos_executable("ohos_camera_demo") {
     install_enable = true
-    sources = [ "./demo_main.cpp" ]
-
-    sources += [
+    sources = [
+      "./demo_main.cpp",
       "./ohos_camera_demo.cpp",
       "./stream_customer.cpp",
     ]
