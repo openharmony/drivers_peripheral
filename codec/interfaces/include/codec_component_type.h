@@ -193,22 +193,6 @@ typedef struct {
 } CodecCompCapability;
 
 /**
- * @brief Enumerates the buffer types.
- */
-enum CodecBufferType {
-    /** Invalid buffer type. */
-    CODEC_BUFFER_TYPE_INVALID = 0,
-    /** Virtual address type. */
-    CODEC_BUFFER_TYPE_VIRTUAL_ADDR = 0x1,
-    /** Shared memory. */
-    CODEC_BUFFER_TYPE_AVSHARE_MEM_FD = 0x2,
-    /** Handle. */
-    CODEC_BUFFER_TYPE_HANDLE = 0x4,
-    /** Dynamic handle. */
-    CODEC_BUFFER_TYPE_DYNAMIC_HANDLE = 0x8,
-};
-
-/**
  * @brief Enumerate the shared memory types.
  */
 enum ShareMemTypes {
@@ -225,7 +209,8 @@ struct OmxCodecBuffer {
     uint32_t bufferId;               /** Buffer ID. */
     uint32_t size;                   /** Size of the structure. */
     union OMX_VERSIONTYPE version;   /** Component version. */
-    enum CodecBufferType bufferType; /** Codec buffer type. */
+    uint32_t bufferType;             /** Codec buffer type. For details,
+                                         see {@link CodecBufferType}. */
     uint8_t *buffer;                 /** Buffer used for encoding or decoding. */
     uint32_t bufferLen;              /** Size of the buffer. */
     uint32_t allocLen;               /** Size of the buffer allocated. */
@@ -236,29 +221,6 @@ struct OmxCodecBuffer {
     enum ShareMemTypes type;         /** Shared memory type. */
     int64_t pts;                     /** Timestamp. */
     uint32_t flag;                   /** Flag. */
-};
-
-/**
- * @brief Enumerates the extended codec indexes.
- */
-enum OmxIndexCodecExType {
-    /** Extended BufferType index */
-    OMX_IndexExtBufferTypeStartUnused = OMX_IndexKhronosExtensions + 0x00a00000,
-    /** SupportBuffer */
-    OMX_IndexParamSupportBufferType,
-    /** UseBuffer */
-    OMX_IndexParamUseBufferType,
-    /** GetBufferHandleUsage */
-    OMX_IndexParamGetBufferHandleUsage,
-    /** CodecPixFormatParam */
-    OMX_IndexParamCodecPixFormat,
-};
-
-/**
- * @brief Enumerates the extended codec codingtyps.
- */
-enum OmxVideoExType {
-    OMX_VIDEO_CodingHEVC = 11,  /** HEVC Index in Codec HDI */
 };
 
 /**
@@ -280,46 +242,6 @@ struct EventInfo {
     uint32_t data2;                 /** Data 2 carried in the event. */
     int8_t *eventData;              /** The pointer of data carried in the event. */
     uint32_t eventDataLen;          /** The length of <b>eventData</b>, in bytes. */
-};
-
-/**
- * @brief Defines the <b>SupportBuffer</b>.
- */
-struct SupportBufferType {
-    uint32_t size;                                          /** Size of the structure */
-    union OMX_VERSIONTYPE version;                          /** Component version */
-    uint32_t portIndex;                                     /** Port index */
-    uint32_t bufferTypes;                                   /** Supported buffer types */
-};
-
-/**
- * @brief Define the <b>UseBuffer</b>.
- */
-struct UseBufferType {
-    uint32_t size;                                         /** Size of the structure */
-    union OMX_VERSIONTYPE version;                         /** Component version */
-    uint32_t portIndex;                                    /** Port index */
-    uint32_t bufferType;                                   /** Buffer type */
-};
-
-/**
- * @brief Defines the <b>BufferHandleUsage</b>.
- */
-struct GetBufferHandleUsageParams {
-    uint32_t size;                                         /** Size of the structure */
-    union OMX_VERSIONTYPE version;                         /** Component version */
-    uint32_t portIndex;                                    /** Port index */
-    uint32_t usage;                                        /** Usage */
-};
-
-/**
- * @brief Defines the <b>CodecPixFormatParam</b>.
- */
-struct CodecPixFormatParam {
-    uint32_t size;                                         /** Size of the structure */
-    union OMX_VERSIONTYPE version;                         /** Component version */
-    uint32_t portIndex;                                    /** Port index */
-    uint32_t codecColorFormat;                             /** Color format defined in Display */
 };
 
 #ifdef __cplusplus
