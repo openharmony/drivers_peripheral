@@ -51,8 +51,6 @@ public:
     virtual EsFrameInfo GetEsFrameInfo() const = 0;
     virtual int32_t GetEncodeType() const = 0;
     virtual int32_t GetStreamId() const = 0;
-    virtual uint32_t GetOffset() const = 0;
-    virtual uint32_t GetLength() const = 0;
 
     virtual void SetIndex(const int32_t index) = 0;
     virtual void SetWidth(const uint32_t width) = 0;
@@ -77,8 +75,6 @@ public:
     virtual void SetEsKeyFrame(const int32_t isKey) = 0;
     virtual void SetEsFrameNum(const int32_t frameNum) = 0;
     virtual void SetStreamId(const int32_t streamId) = 0;
-    virtual void SetOffset(const uint32_t offset) = 0;
-    virtual void SetLength(const uint32_t length) = 0;
 
     virtual void Free() = 0;
 

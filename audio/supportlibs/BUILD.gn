@@ -116,6 +116,7 @@ if (defined(ohos_lite)) {
     if (enable_audio_hal_hdf_log) {
       defines = [ "AUDIO_HAL_HDF_LOG" ]
     }
+
     if (drivers_peripheral_audio_alsa_lib) {
       sources += [
         "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/alsa_mixer.c",
