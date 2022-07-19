@@ -29,8 +29,6 @@ ohos_shared_library("libgnss_interface_service_1.0") {
     "-fno-strict-aliasing",
   ]
 
-  ldflags = [ "-rdynamic" ]
-
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_location_gnss:location_gnss_idl_headers",
