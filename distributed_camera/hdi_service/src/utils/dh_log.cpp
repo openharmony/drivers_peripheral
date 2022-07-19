@@ -47,7 +47,7 @@ static void DHLogOut(DHLogLevel logLevel, const char *logBuf)
         default:
             break;
     }
-    (void)HiLogPrint(LOG_CORE, hiLogLevel, LOG_DOMAIN, DH_LOG_TITLE_TAG.c_str(), "%{public}s", logBuf);
+    (void)HiLogPrint(LOG_CORE, hiLogLevel, LOG_DOMAIN, DC_LOG_TITLE_TAG.c_str(), "%{public}s", logBuf);
 #else
     switch (logLevel) {
         case DH_LOG_DEBUG:
