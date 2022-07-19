@@ -22,7 +22,9 @@
 #include "usbd.h"
 #include "v1_0/iusb_interface.h"
 
-#define HEX_NUM_09 0x09
+#define BASE_CLASS_HUB 0x09
+
+constexpr uint8_t MAX_INTERFACEID = 0xFF;
 
 namespace OHOS {
 namespace HDI {
@@ -94,12 +96,12 @@ public:
 
 private:
     void MakeUsbControlParams(
-        UsbControlParams *controlParams, uint8_t *buffer, uint32_t *length, uint16_t value, uint16_t index);
+        UsbControlParams *controlParams, uint8_t *buffer, uint16_t length, uint16_t value, uint16_t index);
     void MakeGetActiveUsbControlParams(
-        UsbControlParams *controlParams, uint8_t *buffer, uint32_t *length, uint16_t value, uint16_t index);
+        UsbControlParams *controlParams, uint8_t *buffer, uint16_t length, uint16_t value, uint16_t index);
     int32_t UsbControlTransferEx(HostDevice *dev, UsbControlParams *ctrParams, int32_t timeout);
     void MakeSetActiveUsbControlParams(
-        UsbControlParams *controlParams, uint8_t *buffer, uint32_t *length, uint16_t value, uint16_t index);
+        UsbControlParams *controlParams, uint8_t *buffer, uint16_t length, uint16_t value, uint16_t index);
     static int32_t ReOpenDevice(HostDevice *port);
     int32_t UsbdFindRequestSyncAndCreat(
         HostDevice *port, uint8_t interfaceId, uint8_t pipeAddr, UsbdRequestSync **request);
