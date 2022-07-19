@@ -34,18 +34,22 @@ public:
     {
         return index_;
     }
+
     uint32_t GetSize()
     {
         return size_;
     }
+
     uint32_t GetOffset()
     {
         return offset_;
     }
+
     uint32_t GetLength()
     {
         return length_;
     }
+
     void* GetVirAddress()
     {
         return virAddr_;
