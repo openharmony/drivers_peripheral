@@ -14,7 +14,7 @@
  */
 
 #include "codeccommon_fuzzer.h"
-
+#include "codec_omx_ext.h"
 namespace OHOS {
 namespace Codec {
     static const int32_t DATA_BUFFERID = 10;

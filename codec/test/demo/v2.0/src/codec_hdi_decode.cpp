@@ -21,6 +21,7 @@
 #include <securec.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include "codec_omx_ext.h"
 
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiDecode::gralloc_ = nullptr;
 using namespace std;
@@ -242,7 +243,7 @@ bool CodecHdiDecode::Configure()
     if (codecMime_ == codecMime::AVC) {
         param.eCompressionFormat = OMX_VIDEO_CodingAVC;  // H264
     } else {
-        param.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)OMX_VIDEO_CodingHEVC;  // H265
+        param.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;  // H265
     }
 
     err = client_->SetParameter(client_, OMX_IndexParamVideoPortFormat, (int8_t *)&param, sizeof(param));
