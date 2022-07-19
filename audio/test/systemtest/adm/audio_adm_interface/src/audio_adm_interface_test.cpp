@@ -1296,7 +1296,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
         ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_READ, nullptr, reply);
         EXPECT_EQ(HDF_SUCCESS, ret);
         EXPECT_GE(HdfSbufReadUint32(reply, &buffStatus), HDF_SUCCESS);
-        if (buffStatus != CIR_BUFF_NORMAL) {
+        if ((int32_t)buffStatus != CIR_BUFF_NORMAL) {
             int32_t ms = buffStatus >= 0 ? buffStatus : WAITE_TIME;
             tryNumReply--;
             HdfSbufFlush(reply);
