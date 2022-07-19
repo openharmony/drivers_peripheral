@@ -632,8 +632,8 @@ static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const
         return HDF_FAILURE;
     }
     ret = AudioAdaptersGetArraySize(adapterPorts, &realSize);
-    if (ret != HDF_SUCCESS || realSize != desc->portNum) {
-        AUDIO_FUNC_LOGE("realSize = %{public}d, portNum = %{public}d.\n", realSize, desc->portNum);
+    if (ret != HDF_SUCCESS || realSize != (int32_t)desc->portNum) {
+        AUDIO_FUNC_LOGE("realSize = %{public}d, portNum = %{public}u.\n", realSize, desc->portNum);
         AUDIO_FUNC_LOGE("The defined portnum does not match the actual portnum!\n");
 
         return HDF_FAILURE;
