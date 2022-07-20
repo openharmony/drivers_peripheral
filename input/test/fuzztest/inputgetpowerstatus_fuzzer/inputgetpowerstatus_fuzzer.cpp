@@ -14,6 +14,7 @@
  */
 
 #include "inputgetpowerstatus_fuzzer.h"
+#include <securec.h>
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "input_manager.h"
@@ -24,11 +25,12 @@ namespace OHOS {
     {
         bool result = false;
         int32_t ret;
-        uint32_t getStatus = 0;
         const int MAX_DEVICES = 32;
         InputDevDesc sta[MAX_DEVICES];
+        uint32_t getStatus = 0;
         IInputInterface *g_inputInterface;
 
+        (void)memset_s(sta, MAX_DEVICES * sizeof(InputDevDesc), 0, MAX_DEVICES * sizeof(InputDevDesc));
         ret = GetInputInterface(&g_inputInterface);
         if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: get input hdi failed, ret %d", __func__, ret);
@@ -42,6 +44,7 @@ namespace OHOS {
             if (sta[i].devIndex == 0) {
                 break;
             }
+
             ret = g_inputInterface->iInputManager->OpenInputDevice(sta[i].devIndex);
             if (ret != INPUT_SUCCESS) {
                 HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
@@ -52,6 +55,19 @@ namespace OHOS {
         if (!ret) {
             HDF_LOGE("%s: get device1's power status failed, ret %d", __func__, ret);
         }
+
+        for (int32_t i = 0; i < MAX_DEVICES; i++) {
+            if (sta[i].devIndex == 0) {
+                break;
+            }
+
+            ret = g_inputInterface->iInputManager->CloseInputDevice(sta[i].devIndex);
+            if (ret != INPUT_SUCCESS) {
+                HDF_LOGE("%s: close input device failed, ret %d", __func__, ret);
+            }
+        }
+
+        ReleaseInputInterface(g_inputInterface);
         return result;
     }
 }
