@@ -18,6 +18,7 @@
 #include "hdf_log.h"
 #include "input_manager.h"
 #include "input_type.h"
+#include <securec.h>
 
 namespace OHOS {
     bool CloseInputDeviceFuzzTest(const uint8_t* data, size_t size)
@@ -28,6 +29,7 @@ namespace OHOS {
         InputDevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
 
+        (void)memset_s(sta, MAX_DEVICES * sizeof(InputDevDesc), 0, MAX_DEVICES * sizeof(InputDevDesc));
         ret = GetInputInterface(&g_inputInterface);
         if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: get input hdi failed, ret %d", __func__, ret);
@@ -41,6 +43,7 @@ namespace OHOS {
             if (sta[i].devIndex == 0) {
                 break;
             }
+
             ret = g_inputInterface->iInputManager->OpenInputDevice(sta[i].devIndex);
             if (ret != INPUT_SUCCESS) {
                 HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
@@ -51,6 +54,8 @@ namespace OHOS {
         if (!ret) {
             result = true;
         }
+
+        ReleaseInputInterface(g_inputInterface);
         return result;
     }
 }
