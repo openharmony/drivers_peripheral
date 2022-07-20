@@ -38,13 +38,18 @@ namespace OHOS {
     bool SensorUnregisterCallbackFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
-        sptr<ISensorInterface> g_sensorInterface = ISensorInterface::Get();
-        sptr<ISensorCallback> g_traditionalCallback = new SensorUnregisterCallbackFuzzer();
-        if (!g_sensorInterface->Register(*(int32_t *)data, g_traditionalCallback)) {
-            result = true;
+        int32_t ret;
+        sptr<ISensorInterface> sensorInterface = ISensorInterface::Get();
+        sptr<ISensorCallback> registerCallback = new SensorUnregisterCallbackFuzzer();
+        sptr<ISensorCallback> unRegisterCallback = registerCallback;
+        ret = sensorInterface->Register(*(int32_t *)data, registerCallback);
+        if (ret != HDF_SUCCESS) {
+            unRegisterCallback = new SensorUnregisterCallbackFuzzer();
         }
-        if (!g_sensorInterface->Unregister(*(int32_t *)data, g_traditionalCallback)) {
-            result = true;
+
+        sensorInterface->Unregister(*(int32_t *)data, unRegisterCallback);
+        if (ret != HDF_SUCCESS) {
+            return true;
         }
         return result;
     }
