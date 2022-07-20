@@ -25,7 +25,7 @@ typedef enum camera_ability_section {
     OHOS_CAMERA_STATISTICS,
 
     // Camera device image acquisition
-    OHOS_DEVICE_CONTROL  = 0x1000, // Overall control, such as turning off automatic 3A, operating mode
+    OHOS_DEVICE_CONTROL = 0x1000, // Overall control, such as turning off automatic 3A, operating mode
     OHOS_DEVICE_EXPOSURE,
     OHOS_DEVICE_FOCUS,
     OHOS_DEVICE_WHITE_BLANCE,
@@ -33,17 +33,17 @@ typedef enum camera_ability_section {
     OHOS_DEVICE_ZOOM,
 
     // Camera image post-processing related
-    OHOS_POST_PROCESS_CONTROL  = 0x2000,
+    OHOS_POST_PROCESS_CONTROL = 0x2000,
     OHOS_POST_PROCESS_COLOR,
     OHOS_POST_PROCESS_HDR,
     OHOS_POST_PROCESS_PORTRAIT,
     OHOS_POST_PROCESS_NIGHT,
 
     // Camera flow control related
-    OHOS_STREAM_ABILITY  = 0x3000,
-    OHOS_STREAM_CONTROL,   // General control: frame rate, resolution, mirroring
+    OHOS_STREAM_ABILITY = 0x3000,
+    OHOS_STREAM_CONTROL, // General control: frame rate, resolution, mirroring
     OHOS_STREAM_JPEG,
-    OHOS_STREAM_VIDEO,     // Video encoding related
+    OHOS_STREAM_VIDEO, // Video encoding related
     OHOS_STREAM_DEPTH,
     OHOS_STREAM_METADATA,
     OHOS_STREAM_METADATA_FACE,
@@ -57,7 +57,7 @@ typedef enum camera_device_metadata_section_start {
     OHOS_CAMERA_LENS_START = OHOS_CAMERA_LENS << 16,
     OHOS_CAMERA_SENSOR_START = OHOS_CAMERA_SENSOR << 16,
     OHOS_CAMERA_SENSOR_INFO_START = OHOS_CAMERA_SENSOR_INFO << 16,
-    OHOS_CAMERA_STATISTICS_START = OHOS_CAMERA_STATISTICS <<16,
+    OHOS_CAMERA_STATISTICS_START = OHOS_CAMERA_STATISTICS << 16,
 
     OHOS_DEVICE_CONTROL_START = OHOS_DEVICE_CONTROL << 16,
     OHOS_DEVICE_EXPOSURE_START = OHOS_DEVICE_EXPOSURE << 16,
@@ -88,6 +88,7 @@ typedef enum camera_device_metadata_tag {
     OHOS_ABILITY_CAMERA_TYPE,
     OHOS_ABILITY_CAMERA_CONNECTION_TYPE,
     OHOS_ABILITY_FPS_RANGES,
+    OHOS_ABILITY_FLASH_AVAILABLE,
     OHOS_CAMERA_PROPERTIES_END,
 
     OHOS_SENSOR_EXPOSURE_TIME = OHOS_CAMERA_SENSOR_START,
@@ -276,7 +277,8 @@ typedef enum camera_ae_mode {
     OHOS_CAMERA_AE_MODE_ON_EXTERNAL_FLASH,
 } camera_ae_mode_t;
 
-// OHOS_CONTROL_AF_MODE enumeration values
+// OHOS_CONTROL_AF_MODE
+// and OHOS_CONTROL_AF_AVAILABLE_MODES enumeration values
 typedef enum camera_af_mode {
     OHOS_CAMERA_AF_MODE_OFF,
     OHOS_CAMERA_AF_MODE_AUTO,
@@ -374,9 +376,9 @@ typedef enum camera_mirror {
 // OHOS_JPEG_ORIENTATION enumeration values
 typedef enum camera_jpeg_orientation {
     OHOS_CAMERA_JPEG_ROTATION_0 = 0,
-    OHOS_CAMERA_JPEG_ROTATION_90 = 1,
-    OHOS_CAMERA_JPEG_ROTATION_180 = 2,
-    OHOS_CAMERA_JPEG_ROTATION_270 = 3,
+    OHOS_CAMERA_JPEG_ROTATION_90 = 90,
+    OHOS_CAMERA_JPEG_ROTATION_180 = 180,
+    OHOS_CAMERA_JPEG_ROTATION_270 = 270,
 } camera_jpeg_orientation_t;
 
 // OHOS_JPEG_QUALITY enumeration values
@@ -395,5 +397,11 @@ typedef enum camera_video_stabilization_mode {
     OHOS_CAMERA_VIDEO_STABILIZATION_HIGH,
     OHOS_CAMERA_VIDEO_STABILIZATION_AUTO,
 } CameraVideoStabilizationMode;
+
+// OHOS_ABILITY_FLASH_AVAILABLE enumeration values
+typedef enum camera_flash_available {
+    OHOS_CAMERA_FLASH_FALSE = 0,
+    OHOS_CAMERA_FLASH_TRUE,
+} CameraFlashAvailable;
 
 #endif
