@@ -14,10 +14,10 @@
  */
 
 #include "inputsetgesturemode_fuzzer.h"
+#include <securec.h>
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "input_manager.h"
-#include <securec.h>
 
 struct AllParameters {
     uint32_t devIndex;
