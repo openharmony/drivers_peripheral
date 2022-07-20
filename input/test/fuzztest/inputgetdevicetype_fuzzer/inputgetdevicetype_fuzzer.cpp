@@ -14,6 +14,7 @@
  */
 
 #include "inputgetdevicetype_fuzzer.h"
+#include <securec.h>
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "input_manager.h"
@@ -30,6 +31,7 @@ namespace OHOS {
         const int INIT_DEFAULT_VALUE = 255;
         uint32_t devType = INIT_DEFAULT_VALUE;
 
+        (void)memset_s(sta, MAX_DEVICES * sizeof(InputDevDesc), 0, MAX_DEVICES * sizeof(InputDevDesc));
         ret = GetInputInterface(&g_inputInterface);
         if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: get input hdi failed, ret %d", __func__, ret);
@@ -43,6 +45,7 @@ namespace OHOS {
             if (sta[i].devIndex == 0) {
                 break;
             }
+
             ret = g_inputInterface->iInputManager->OpenInputDevice(sta[i].devIndex);
             if (ret != INPUT_SUCCESS) {
                 HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
@@ -55,6 +58,19 @@ namespace OHOS {
                 HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
             }
         }
+
+        for (int32_t i = 0; i < MAX_DEVICES; i++) {
+            if (sta[i].devIndex == 0) {
+                break;
+            }
+
+            ret = g_inputInterface->iInputManager->CloseInputDevice(sta[i].devIndex);
+            if (ret != INPUT_SUCCESS) {
+                HDF_LOGE("%s: close input device failed, ret %d", __func__, ret);
+            }
+        }
+
+        ReleaseInputInterface(g_inputInterface);
         return result;
     }
 }

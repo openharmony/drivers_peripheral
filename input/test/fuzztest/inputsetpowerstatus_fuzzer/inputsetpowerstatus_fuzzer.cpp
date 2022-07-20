@@ -14,9 +14,15 @@
  */
 
 #include "inputsetpowerstatus_fuzzer.h"
+#include <securec.h>
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "input_manager.h"
+
+struct AllParameters {
+    uint32_t devIndex;
+    uint32_t status;
+};
 
 namespace OHOS {
     bool InputSetPowerStatusFuzzTest(const uint8_t* data, size_t size)
@@ -26,7 +32,19 @@ namespace OHOS {
         const int MAX_DEVICES = 32;
         InputDevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
+        struct AllParameters params;
 
+        if (data == nullptr) {
+            HDF_LOGE("%{public}s:data is null", __func__);
+            return false;
+        }
+
+        if (memcpy_s((void *)&params, sizeof(params), data, sizeof(params)) != INPUT_SUCCESS) {
+            HDF_LOGE("%{public}s:memcpy data failed", __func__);
+            return false;
+        }
+
+        (void)memset_s(sta, MAX_DEVICES * sizeof(InputDevDesc), 0, MAX_DEVICES * sizeof(InputDevDesc));
         ret = GetInputInterface(&g_inputInterface);
         if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: get input hdi failed, ret %d", __func__, ret);
@@ -40,17 +58,30 @@ namespace OHOS {
             if (sta[i].devIndex == 0) {
                 break;
             }
+
             ret = g_inputInterface->iInputManager->OpenInputDevice(sta[i].devIndex);
             if (ret != INPUT_SUCCESS) {
                 HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
             }
         }
 
-        ret = g_inputInterface->iInputController->SetPowerStatus(*(uint32_t *)data,
-            *(uint32_t *)data);
+        ret = g_inputInterface->iInputController->SetPowerStatus(params.devIndex, params.status);
         if (!ret) {
             result = true;
         }
+
+        for (int32_t i = 0; i < MAX_DEVICES; i++) {
+            if (sta[i].devIndex == 0) {
+                break;
+            }
+
+            ret = g_inputInterface->iInputManager->CloseInputDevice(sta[i].devIndex);
+            if (ret != INPUT_SUCCESS) {
+                HDF_LOGE("%s: close input device failed, ret %d", __func__, ret);
+            }
+        }
+
+        ReleaseInputInterface(g_inputInterface);
         return result;
     }
 }
