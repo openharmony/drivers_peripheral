@@ -83,6 +83,7 @@ typedef enum AuthPropertyMode {
 #define MAX_DUPLICATE_CHECK 100
 #define INVALID_SENSOR_HINT 0
 #define MAX_TEMPLATE_OF_SCHEDULE 10
+#define CHALLENGE_LEN 32
 
 #ifdef __cplusplus
 }

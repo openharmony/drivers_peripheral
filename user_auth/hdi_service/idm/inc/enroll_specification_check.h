@@ -31,7 +31,7 @@ extern "C" {
 #define INVALID_AUTH_TYPE_EROLL_NUMBER 0
 
 ResultCode CheckSpecification(int32_t userId, uint32_t authType);
-ResultCode CheckEnrollToken(int32_t userId, UserAuthTokenHal *authToken);
+ResultCode CheckIdmOperationToken(int32_t userId, UserAuthTokenHal *authToken);
 
 #ifdef __cplusplus
 }

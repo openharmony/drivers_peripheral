@@ -34,7 +34,7 @@ extern "C" {
 
 typedef struct {
     uint32_t version;
-    uint64_t challenge;
+    uint8_t challenge[CHALLENGE_LEN];
     uint64_t secureUid;
     uint64_t enrolledId;
     uint64_t credentialId;
