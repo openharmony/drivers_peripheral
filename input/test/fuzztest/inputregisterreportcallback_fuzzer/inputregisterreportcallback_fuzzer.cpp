@@ -14,10 +14,10 @@
  */
 
 #include "inputregisterreportcallback_fuzzer.h"
+#include <securec.h>
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "input_manager.h"
-#include <securec.h>
 
 namespace OHOS {
     bool DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)

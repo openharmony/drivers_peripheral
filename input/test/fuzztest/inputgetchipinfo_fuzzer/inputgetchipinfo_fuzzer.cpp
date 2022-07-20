@@ -14,11 +14,11 @@
  */
 
 #include "inputgetchipinfo_fuzzer.h"
+#include <securec.h>
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "input_manager.h"
 #include "input_type.h"
-#include <securec.h>
 
 namespace OHOS {
     bool InputGetchipInfoFuzzTest(const uint8_t* data, size_t size)
