@@ -31,7 +31,6 @@ namespace {
 constexpr int32_t UEVENT_BUFF_SIZE = (64 * 1024);
 constexpr int32_t UEVENT_RESERVED_SIZE = 2;
 constexpr int32_t UEVENT_MSG_LEN = (2 * 1024);
-constexpr int32_t TIMER_INTERVAL = 10;
 constexpr int32_t TIMER_FAST_SEC = 2;
 constexpr int32_t TIMER_SLOW_SEC = 10;
 constexpr int32_t SEC_TO_MSEC = 1000;
@@ -93,30 +92,6 @@ int32_t BatteryThread::RegisterCallback(int32_t fd, EventType et)
     return HDF_SUCCESS;
 }
 
-void BatteryThread::SetTimerInterval(int32_t interval)
-{
-    struct itimerspec itval = {};
-
-    if (timerFd_ == INVALID_FD) {
-        BATTERY_HILOGW(COMP_HDI, "invalid timer fd");
-        return;
-    }
-
-    timerInterval_ = interval;
-    if (interval < 0) {
-        interval = 0;
-    }
-
-    itval.it_interval.tv_sec = interval;
-    itval.it_interval.tv_nsec = 0;
-    itval.it_value.tv_sec = interval;
-    itval.it_value.tv_nsec = 0;
-
-    if (timerfd_settime(timerFd_, 0, &itval, nullptr) == -1) {
-        BATTERY_HILOGE(COMP_HDI, "timerfd_settime failed");
-    }
-}
-
 void BatteryThread::UpdateEpollInterval(const int32_t chargeState)
 {
     int32_t interval;
@@ -127,10 +102,6 @@ void BatteryThread::UpdateEpollInterval(const int32_t chargeState)
     } else {
         interval = TIMER_SLOW_SEC;
         epollInterval_ = -1;
-    }
-
-    if ((interval != timerInterval_) && (timerInterval_ > 0)) {
-        SetTimerInterval(interval);
     }
 }
 
@@ -166,7 +137,6 @@ int32_t BatteryThread::Init([[maybe_unused]] void* service)
         return HDF_ERR_BAD_FD;
     }
 
-    InitTimer();
     InitUevent();
 
     return HDF_SUCCESS;
@@ -175,37 +145,6 @@ int32_t BatteryThread::Init([[maybe_unused]] void* service)
 int32_t BatteryThread::UpdateWaitInterval()
 {
     return HDF_FAILURE;
-}
-
-int32_t BatteryThread::InitTimer()
-{
-    timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
-    if (timerFd_ == INVALID_FD) {
-        BATTERY_HILOGE(COMP_HDI, "epoll create failed, timerFd_ is invalid");
-        return HDF_ERR_BAD_FD;
-    }
-
-    SetTimerInterval(TIMER_INTERVAL);
-    fcntl(timerFd_, F_SETFL, O_NONBLOCK);
-    callbacks_.insert(std::make_pair(timerFd_, &BatteryThread::TimerCallback));
-
-    if (RegisterCallback(timerFd_, EVENT_TIMER_FD)) {
-        BATTERY_HILOGE(COMP_HDI, "register Timer event failed");
-    }
-
-    return HDF_SUCCESS;
-}
-
-void BatteryThread::TimerCallback(void* service)
-{
-    uint64_t timers;
-
-    if (read(timerFd_, &timers, sizeof(timers)) == -1) {
-        BATTERY_HILOGE(COMP_HDI, "read timerFd_ failed");
-        return;
-    }
-
-    UpdateBatteryInfo(service);
 }
 
 void BatteryThread::UeventCallback(void* service)
