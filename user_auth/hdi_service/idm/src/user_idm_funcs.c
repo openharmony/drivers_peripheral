@@ -59,7 +59,7 @@ int32_t CheckEnrollPermission(PermissionCheckParam param, uint64_t *scheduleId)
         return ret;
     }
     if (param.authType != PIN_AUTH) {
-        ret = CheckEnrollToken(param.userId, authToken);
+        ret = CheckIdmOperationToken(param.userId, authToken);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("a valid token is required");
             return ret;
@@ -213,22 +213,12 @@ int32_t DeleteCredentialFunc(CredentialDeleteParam param, CredentialInfoHal *cre
         LOG_ERROR("token copy failed");
         return RESULT_BAD_COPY;
     }
-    if (token.authType != PIN_AUTH) {
-        LOG_ERROR("pin token is needed");
-        return RESULT_BAD_SIGN;
-    }
-    uint64_t challenge;
-    int32_t ret = GetChallenge(&challenge);
-    if (ret != RESULT_SUCCESS || challenge != token.challenge || IsSessionTimeout()) {
-        LOG_ERROR("check challenge failed");
-        return RESULT_BAD_SIGN;
+    int32_t ret = CheckIdmOperationToken(param.userId, &token);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("token is invalid");
+        return ret;
     }
 
-    ret = UserAuthTokenVerify(&token);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("failed to verify the token");
-        return RESULT_BAD_SIGN;
-    }
     ret = DeleteCredentialInfo(param.userId, param.credentialId, credentialInfo);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("delete database info failed");

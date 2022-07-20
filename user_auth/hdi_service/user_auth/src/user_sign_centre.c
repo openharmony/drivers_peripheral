@@ -131,13 +131,16 @@ ResultCode GetTokenDataAndSign(const UserAuthContext *context,
         LOG_ERROR("get secure uid failed");
         return ret;
     }
+    if (memcpy_s(authToken->challenge, CHALLENGE_LEN, context->challenge, CHALLENGE_LEN) != EOK) {
+        LOG_ERROR("failed to copy challenge");
+        return RESULT_BAD_COPY;
+    }
     authToken->authTrustLevel = context->authTrustLevel;
     authToken->authType = context->authType;
     authToken->authMode = authMode;
     authToken->secureUid = secureUid;
     authToken->credentialId = credentialId;
     authToken->enrolledId = enrolledInfo.enrolledId;
-    authToken->challenge = context->challenge;
     authToken->time = GetSystemTime();
     authToken->version = TOKEN_VERSION;
     return UserAuthTokenSign(authToken);
