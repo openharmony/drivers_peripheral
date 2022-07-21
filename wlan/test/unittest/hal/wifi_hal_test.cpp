@@ -34,6 +34,7 @@ const uint32_t MAX_IF_NAME_LENGTH = 16;
 const uint32_t TEST_PARAM_BUF_SIZE = 64;
 const uint32_t SIZE = 4;
 const int32_t TEST_CMD = 123;
+const uint32_t RESET_TIME = 20;
 
 class WifiHalTest : public testing::Test {
 public:
@@ -146,7 +147,7 @@ HWTEST_F(WifiHalTest, WifiHalGetFeatureByIfName001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_NE(nullptr, apFeature);
     ret = g_wifi->getFeatureByIfName(nullptr, (struct IWiFiBaseFeature **)&apFeatureGet);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getFeatureByIfName(ifName0, (struct IWiFiBaseFeature **)&apFeatureGet);
     EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getFeatureByIfName(apFeature->baseFeature.ifName, (struct IWiFiBaseFeature **)&apFeatureGet);
@@ -220,7 +221,7 @@ HWTEST_F(WifiHalTest, WifiHalGetNetworkIfaceName001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_NE(nullptr, apFeature);
     const char *ifnameTest = apFeature->baseFeature.getNetworkIfaceName(nullptr);
-    EXPECT_EQ(ifnameTest, nullptr);
+    EXPECT_EQ(nullptr, ifnameTest);
     const char *ifName = apFeature->baseFeature.getNetworkIfaceName((const struct IWiFiBaseFeature *)apFeature);
     EXPECT_NE(nullptr, ifName);
 
@@ -250,7 +251,7 @@ HWTEST_F(WifiHalTest, WifiHalGetGetFeatureType001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_NE(nullptr, apFeature);
     type = apFeature->baseFeature.getFeatureType(nullptr);
-    EXPECT_EQ(type, HDF_FAILURE);
+    EXPECT_EQ(HDF_FAILURE, type);
     type = apFeature->baseFeature.getFeatureType((struct IWiFiBaseFeature *)apFeature);
     EXPECT_EQ(PROTOCOL_80211_IFTYPE_AP, type);
 
@@ -275,13 +276,13 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_NE(nullptr, apFeature);
     ret = apFeature->baseFeature.setMacAddress(nullptr, mac, ETH_ADDR_LEN);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)apFeature, nullptr, ETH_ADDR_LEN);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)apFeature, mac, 0);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)apFeature, errorMac, ETH_ADDR_LEN);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)apFeature, mac, ETH_ADDR_LEN);
     printf("%s: ret = %d\n", __func__, ret);
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_DEVICE_BUSY);
@@ -308,13 +309,13 @@ HWTEST_F(WifiHalTest, WifiHalSetMacAddress002, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_NE(nullptr, staFeature);
     ret = staFeature->baseFeature.setMacAddress(nullptr, mac, ETH_ADDR_LEN);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)staFeature, nullptr, ETH_ADDR_LEN);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)staFeature, mac, 0);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)staFeature, errorMac, ETH_ADDR_LEN);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)staFeature, mac, ETH_ADDR_LEN);
     printf("%s: ret = %d\n", __func__, ret);
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_DEVICE_BUSY);
@@ -339,7 +340,7 @@ HWTEST_F(WifiHalTest, WifiHalSetTxPower001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_NE(nullptr, apFeature);
     ret = apFeature->baseFeature.setTxPower(nullptr, WLAN_TX_POWER);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->baseFeature.setTxPower((struct IWiFiBaseFeature *)apFeature, 0);
     EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->baseFeature.setTxPower((struct IWiFiBaseFeature *)apFeature, WLAN_TX_POWER);
@@ -364,13 +365,14 @@ HWTEST_F(WifiHalTest, WifiHalSetCountryCode001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_NE(nullptr, apFeature);
     ret = apFeature->setCountryCode(apFeature, nullptr, 0);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->setCountryCode(nullptr, "CN", 2);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->setCountryCode(apFeature, "CN", 3);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->setCountryCode(apFeature, "99", 2);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     ret = apFeature->setCountryCode(apFeature, "CN", 2);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
@@ -402,7 +404,7 @@ HWTEST_F(WifiHalTest, WifiHalGetIfNamesByChipId001, TestSize.Level1)
     ret = staFeature->baseFeature.getIfNamesByChipId(chipId, nullptr, nullptr);
     EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->baseFeature.getIfNamesByChipId(100, &ifNames, &num);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->baseFeature.getIfNamesByChipId(chipId, &ifNames, &num);
     EXPECT_NE(nullptr, ifNames);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -464,23 +466,23 @@ HWTEST_F(WifiHalTest, GetPowerMode001, TestSize.Level1)
     uint8_t mode;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(apFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
     printf("GetPowerMode001: ifname is %s\n", apFeature->baseFeature.ifName);
     ret = g_wifi->getPowerMode(nullptr, &mode);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getPowerMode(ifName, nullptr);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getPowerMode(ifName, &mode);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getPowerMode(apFeature->baseFeature.ifName, nullptr);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getPowerMode(apFeature->baseFeature.ifName, &mode);
     printf("%s: ret = %d\n", __func__, ret);
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -497,27 +499,27 @@ HWTEST_F(WifiHalTest, GetPowerMode002, TestSize.Level1)
     uint8_t mode;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
     printf("GetPowerMode002: ifname is %s\n", staFeature->baseFeature.ifName);
     ret = g_wifi->getPowerMode(nullptr, &mode);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getPowerMode(ifName, nullptr);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getPowerMode(ifName, &mode);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getPowerMode(staFeature->baseFeature.ifName, nullptr);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getPowerMode(staFeature->baseFeature.ifName, &mode);
     printf("%s: ret = %d\n", __func__, ret);
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
- * @tc.name: GetPowerModeTest_001
+ * @tc.name: SetPowerMode001
  * @tc.desc: Wifi hdi set power mode function test
  * @tc.type: FUNC
  * @tc.require: AR000H60O7
@@ -529,21 +531,21 @@ HWTEST_F(WifiHalTest, SetPowerMode001, TestSize.Level1)
     const char *ifName = "eth0";
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(apFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
     printf("SetPowerMode001: ifname is %s\n", apFeature->baseFeature.ifName);
     ret = g_wifi->setPowerMode(nullptr, WIFI_POWER_MODE_NUM);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_NUM);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(apFeature->baseFeature.ifName, WIFI_POWER_MODE_NUM);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
- * @tc.name: GetPowerModeTest_002
+ * @tc.name: SetPowerMode002
  * @tc.desc: Wifi hdi set power mode function test
  * @tc.type: FUNC
  * @tc.require: AR000H60O7
@@ -555,22 +557,22 @@ HWTEST_F(WifiHalTest, SetPowerMode002, TestSize.Level1)
     const char *ifName = "eth0";
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(apFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
     printf("SetPowerMode002: ifname is %s\n", apFeature->baseFeature.ifName);
     ret = g_wifi->setPowerMode(nullptr, WIFI_POWER_MODE_SLEEPING);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_SLEEPING);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(apFeature->baseFeature.ifName, WIFI_POWER_MODE_SLEEPING);
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
- * @tc.name: GetPowerModeTest_003
+ * @tc.name: SetPowerMode003
  * @tc.desc: Wifi hdi set power mode function test
  * @tc.type: FUNC
  * @tc.require: AR000H60O7
@@ -582,22 +584,22 @@ HWTEST_F(WifiHalTest, SetPowerMode003, TestSize.Level1)
     const char *ifName = "eth0";
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(apFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
     printf("SetPowerMode003: ifname is %s\n", apFeature->baseFeature.ifName);
     ret = g_wifi->setPowerMode(nullptr, WIFI_POWER_MODE_GENERAL);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_GENERAL);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(apFeature->baseFeature.ifName, WIFI_POWER_MODE_GENERAL);
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
- * @tc.name: GetPowerModeTest_004
+ * @tc.name: SetPowerMode004
  * @tc.desc: Wifi hdi set power mode function test
  * @tc.type: FUNC
  * @tc.require: AR000H60O7
@@ -609,22 +611,22 @@ HWTEST_F(WifiHalTest, SetPowerMode004, TestSize.Level1)
     const char *ifName = "eth0";
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(apFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
     printf("SetPowerMode004: ifname is %s\n", apFeature->baseFeature.ifName);
     ret = g_wifi->setPowerMode(nullptr, WIFI_POWER_MODE_THROUGH_WALL);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_THROUGH_WALL);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(apFeature->baseFeature.ifName, WIFI_POWER_MODE_THROUGH_WALL);
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
- * @tc.name: GetPowerModeTest_005
+ * @tc.name: SetPowerMode005
  * @tc.desc: Wifi hdi set power mode function test
  * @tc.type: FUNC
  * @tc.require: AR000H60O7
@@ -636,21 +638,21 @@ HWTEST_F(WifiHalTest, SetPowerMode005, TestSize.Level1)
     const char *ifName = "eth0";
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
     printf("SetPowerMode005: ifname is %s\n", staFeature->baseFeature.ifName);
     ret = g_wifi->setPowerMode(nullptr, WIFI_POWER_MODE_NUM);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_NUM);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(staFeature->baseFeature.ifName, WIFI_POWER_MODE_NUM);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
- * @tc.name: GetPowerModeTest_006
+ * @tc.name: SetPowerMode006
  * @tc.desc: Wifi hdi set power mode function test
  * @tc.type: FUNC
  * @tc.require: AR000H60O7
@@ -662,22 +664,22 @@ HWTEST_F(WifiHalTest, SetPowerMode006, TestSize.Level1)
     const char *ifName = "eth0";
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
     printf("SetPowerMode005: ifname is %s\n", staFeature->baseFeature.ifName);
     ret = g_wifi->setPowerMode(nullptr, WIFI_POWER_MODE_SLEEPING);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_SLEEPING);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(staFeature->baseFeature.ifName, WIFI_POWER_MODE_SLEEPING);
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
- * @tc.name: GetPowerModeTest_007
+ * @tc.name: SetPowerMode007
  * @tc.desc: Wifi hdi set power mode function test
  * @tc.type: FUNC
  * @tc.require: AR000H60O7
@@ -689,22 +691,22 @@ HWTEST_F(WifiHalTest, SetPowerMode007, TestSize.Level1)
     const char *ifName = "eth0";
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
     printf("SetPowerMode005: ifname is %s\n", staFeature->baseFeature.ifName);
     ret = g_wifi->setPowerMode(nullptr, WIFI_POWER_MODE_GENERAL);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_GENERAL);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(staFeature->baseFeature.ifName, WIFI_POWER_MODE_GENERAL);
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
- * @tc.name: GetPowerModeTest_008
+ * @tc.name: SetPowerMode008
  * @tc.desc: Wifi hdi set power mode function test
  * @tc.type: FUNC
  * @tc.require: AR000H60O7
@@ -716,18 +718,18 @@ HWTEST_F(WifiHalTest, SetPowerMode008, TestSize.Level1)
     const char *ifName = "eth0";
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
     printf("SetPowerMode005: ifname is %s\n", staFeature->baseFeature.ifName);
     ret = g_wifi->setPowerMode(nullptr, WIFI_POWER_MODE_THROUGH_WALL);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(ifName, WIFI_POWER_MODE_THROUGH_WALL);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->setPowerMode(staFeature->baseFeature.ifName, WIFI_POWER_MODE_THROUGH_WALL);
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -747,11 +749,11 @@ HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_NE(nullptr, staFeature);
+    EXPECT_NE(staFeature, nullptr);
     ret = staFeature->startScan(nullptr, &scan);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->startScan(ifName, nullptr);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->startScan(ifName, &scan);
     EXPECT_EQ(HDF_SUCCESS, ret);
     sleep(10);
@@ -774,9 +776,9 @@ HWTEST_F(WifiHalTest, WifiHalCreateFeature003, TestSize.Level1)
     EXPECT_EQ(ret, HDF_FAILURE);
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_NUM, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->createFeature(-1, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
 }
 
 /**
@@ -793,18 +795,18 @@ HWTEST_F(WifiHalTest, WifiHalGetFeatureByIfName002, TestSize.Level1)
     const char *ifName0 = "wlanTest";
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
     ret = g_wifi->getFeatureByIfName(nullptr, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getFeatureByIfName(ifName0, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = g_wifi->getFeatureByIfName(staFeature->baseFeature.ifName, (struct IWiFiBaseFeature **)&staFeatureGet);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeatureGet, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeatureGet);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -818,9 +820,9 @@ HWTEST_F(WifiHalTest, WifiHalRegisterEventCallback002, TestSize.Level1)
     int32_t ret;
 
     ret = g_wifi->registerEventCallback(nullptr, "wlan0");
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->registerEventCallback(HalCallbackEvent, nullptr);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 
 /**
@@ -834,9 +836,9 @@ HWTEST_F(WifiHalTest, WifiHalUnRegisterEventCallback002, TestSize.Level1)
     int32_t ret;
 
     ret = g_wifi->unregisterEventCallback(nullptr, "wlan0");
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->unregisterEventCallback(HalCallbackEvent, nullptr);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 
 /**
@@ -851,12 +853,12 @@ HWTEST_F(WifiHalTest, GetSupportFeature001, TestSize.Level1)
     uint8_t supType[PROTOCOL_80211_IFTYPE_NUM + 1] = {0};
 
     ret = g_wifi->getSupportFeature(nullptr, PROTOCOL_80211_IFTYPE_NUM + 1);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->getSupportFeature(supType, PROTOCOL_80211_IFTYPE_NUM);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 
     ret = g_wifi->getSupportFeature(supType, PROTOCOL_80211_IFTYPE_NUM + 1);
-    EXPECT_EQ(ret, RET_CODE_SUCCESS);
+    EXPECT_EQ(RET_CODE_SUCCESS, ret);
 }
 
 /**
@@ -871,22 +873,22 @@ HWTEST_F(WifiHalTest, WifiHalGetNetworkIfaceName002, TestSize.Level1)
     struct IWiFiSta *staFeature = nullptr;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
 
     const char *ifnameTest = staFeature->baseFeature.getNetworkIfaceName(nullptr);
-    EXPECT_EQ(ifnameTest, nullptr);
+    EXPECT_EQ(nullptr, ifnameTest);
     const char *ifName = staFeature->baseFeature.getNetworkIfaceName((const struct IWiFiBaseFeature *)staFeature);
-    EXPECT_NE(ifName, nullptr);
+    EXPECT_NE(nullptr, ifName);
     if (strncmp(ifName, "wlan", 4) == 0 || strncmp(ifName, "nan", 3) == 0 || strncmp(ifName, "p2p", 3) == 0) {
         ret = 0;
     } else {
         ret = -1;
     }
-    EXPECT_EQ(ret, 0);
+    EXPECT_EQ(0, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -902,16 +904,16 @@ HWTEST_F(WifiHalTest, WifiHalGetGetFeatureType002, TestSize.Level1)
     int32_t type;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
 
     type = staFeature->baseFeature.getFeatureType(nullptr);
-    EXPECT_EQ(type, HDF_FAILURE);
+    EXPECT_EQ(HDF_FAILURE, type);
     type = staFeature->baseFeature.getFeatureType((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(type, PROTOCOL_80211_IFTYPE_STATION);
+    EXPECT_EQ(PROTOCOL_80211_IFTYPE_STATION, type);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -926,21 +928,21 @@ HWTEST_F(WifiHalTest, GetDeviceMacAddress001, TestSize.Level1)
     struct IWiFiAp *apFeature = nullptr;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(apFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
 
     unsigned char readMac[ETH_ADDR_LEN] = {0};
     ret = apFeature->baseFeature.getDeviceMacAddress(nullptr, readMac, ETH_ADDR_LEN);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = apFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)apFeature, nullptr, 0);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = apFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)apFeature, readMac, 0);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = apFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)apFeature, readMac, ETH_ADDR_LEN);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -955,21 +957,21 @@ HWTEST_F(WifiHalTest, GetDeviceMacAddress002, TestSize.Level1)
     struct IWiFiSta *staFeature = nullptr;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
 
     unsigned char readMac[ETH_ADDR_LEN] = {0};
     ret = staFeature->baseFeature.getDeviceMacAddress(nullptr, readMac, ETH_ADDR_LEN);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = staFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)staFeature, nullptr, 0);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = staFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)staFeature, readMac, 0);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = staFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)staFeature, readMac, ETH_ADDR_LEN);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -989,27 +991,27 @@ HWTEST_F(WifiHalTest, GetValidFreqsWithBand001, TestSize.Level1)
     uint32_t num = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
     ret = staFeature->baseFeature.getValidFreqsWithBand(nullptr, band, freqs, size, &num);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = staFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)staFeature,
                                                         band, nullptr, size, &num);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = staFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)staFeature, band, freqs, 10, &num);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = staFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)staFeature,
                                                         band, freqs, size, nullptr);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = staFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)staFeature,
                                                         bandNotSupport, freqs, size, &num);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)staFeature,
                                                         band, freqs, size, &num);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -1029,25 +1031,25 @@ HWTEST_F(WifiHalTest, GetValidFreqsWithBand002, TestSize.Level1)
     uint32_t num = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(apFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
     ret = apFeature->baseFeature.getValidFreqsWithBand(nullptr, band, freqs, size, &num);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature, band, nullptr, size, &num);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature, band, freqs, 10, &num);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature,
                                                        band, freqs, size, nullptr);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature,
                                                        bandNotSupport, freqs, size, &num);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->baseFeature.getValidFreqsWithBand((struct IWiFiBaseFeature *)apFeature, band, freqs, size, &num);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -1062,17 +1064,17 @@ HWTEST_F(WifiHalTest, WifiHalSetTxPower002, TestSize.Level1)
     struct IWiFiSta *staFeature = nullptr;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
     ret = staFeature->baseFeature.setTxPower(nullptr, WLAN_TX_POWER);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->baseFeature.setTxPower((struct IWiFiBaseFeature *)staFeature, -1);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->baseFeature.setTxPower((struct IWiFiBaseFeature *)staFeature, WLAN_TX_POWER);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -1091,19 +1093,19 @@ HWTEST_F(WifiHalTest, WifiHalGetIfNamesByChipId002, TestSize.Level1)
     uint8_t i;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(apFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
     ret = apFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)apFeature, &chipId);
     ASSERT_TRUE(chipId < MAX_WLAN_DEVICE);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = apFeature->baseFeature.getIfNamesByChipId(chipId, nullptr, nullptr);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->baseFeature.getIfNamesByChipId(100, &ifNames, &num);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->baseFeature.getIfNamesByChipId(chipId, &ifNames, &num);
-    EXPECT_NE(ifNames, nullptr);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_NE(nullptr, ifNames);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     bool flag = (num <= IFNAME_MAX_NUM && num >= IFNAME_MIN_NUM);
     ASSERT_TRUE(flag);
     for (i = 0; i < num; i++) {
@@ -1112,7 +1114,7 @@ HWTEST_F(WifiHalTest, WifiHalGetIfNamesByChipId002, TestSize.Level1)
     free(ifNames);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -1128,19 +1130,19 @@ HWTEST_F(WifiHalTest, HalGetChipId001, TestSize.Level1)
     unsigned char chipId = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
 
     ret = staFeature->baseFeature.getChipId(nullptr, &chipId);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, nullptr);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, &chipId);
     ASSERT_TRUE(chipId < MAX_WLAN_DEVICE);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -1156,18 +1158,18 @@ HWTEST_F(WifiHalTest, HalGetChipId002, TestSize.Level1)
     unsigned char chipId = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(apFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
     ret = apFeature->baseFeature.getChipId(nullptr, &chipId);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)apFeature, nullptr);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)apFeature, &chipId);
     ASSERT_TRUE(chipId < MAX_WLAN_DEVICE);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -1185,21 +1187,21 @@ HWTEST_F(WifiHalTest, GetAsscociatedStas001, TestSize.Level1)
     uint32_t num = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(apFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
     ret = apFeature->getAsscociatedStas(nullptr, staInfo, MAX_ASSOC_STA_NUM, &num);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->getAsscociatedStas(apFeature, nullptr, MAX_ASSOC_STA_NUM, &num);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->getAsscociatedStas(apFeature, staInfo, 0, &num);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->getAsscociatedStas(apFeature, staInfo, MAX_ASSOC_STA_NUM, nullptr);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = apFeature->getAsscociatedStas(apFeature, staInfo, MAX_ASSOC_STA_NUM, &num);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -1215,21 +1217,21 @@ HWTEST_F(WifiHalTest, SetScanningMacAddress001, TestSize.Level1)
     unsigned char scanMac[WIFI_MAC_ADDR_LENGTH] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
 
     ret = staFeature->setScanningMacAddress(nullptr, scanMac, WIFI_MAC_ADDR_LENGTH);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->setScanningMacAddress(staFeature, nullptr, WIFI_MAC_ADDR_LENGTH);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->setScanningMacAddress(staFeature, scanMac, 0);
-    EXPECT_NE(ret, HDF_SUCCESS);
+    EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->setScanningMacAddress(staFeature, scanMac, WIFI_MAC_ADDR_LENGTH);
     bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -1326,19 +1328,19 @@ HWTEST_F(WifiHalTest, ResetDriver001, TestSize.Level1)
     uint8_t chipIdInvalid = 20;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(staFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
     ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, &chipId);
     ASSERT_TRUE(chipId < MAX_WLAN_DEVICE);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->resetDriver(chipIdInvalid, "wlan0");
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->resetDriver(chipId, nullptr);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->resetDriver(chipId, staFeature->baseFeature.ifName);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    sleep(RESET_TIME);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
@@ -1357,19 +1359,19 @@ HWTEST_F(WifiHalTest, ResetDriver002, TestSize.Level1)
     uint8_t chipIdInvalid = 20;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-    EXPECT_NE(apFeature, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
     ret = apFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)apFeature, &chipId);
     ASSERT_TRUE(chipId < MAX_WLAN_DEVICE);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->resetDriver(chipIdInvalid, "wlan0");
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->resetDriver(chipId, nullptr);
-    EXPECT_EQ(ret, HDF_ERR_INVALID_PARAM);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = g_wifi->resetDriver(chipId, apFeature->baseFeature.ifName);
-    EXPECT_EQ(ret, HDF_SUCCESS);
-
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    sleep(RESET_TIME);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
