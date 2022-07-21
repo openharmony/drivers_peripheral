@@ -18,7 +18,7 @@
         "utils_base"
       ],
       "third_part": [
-        "libcrypto_static"
+        "openssl"
       ]
     },
     "build": {

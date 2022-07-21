@@ -37,11 +37,10 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
     "service/src/executor_impl.cpp",
     "service/src/pin_auth_interface_service.cpp",
   ]
-  public_deps = [ "//third_party/openssl:libcrypto_static" ]
 
   deps = [
     "//base/useriam/user_auth_framework/common:iam_utils",
-    "//third_party/openssl:libcrypto_static",
+    "//third_party/openssl:libcrypto_shared",
     "//utils/native/base:utils",
   ]
 
