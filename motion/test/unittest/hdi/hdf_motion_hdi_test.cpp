@@ -106,7 +106,7 @@ HWTEST_F(HdfMotionTest, EnableMotion_001, TestSize.Level1)
         return;
     }
 
-    vector<int> vec;
+    vector<int32_t> vec;
     vec.push_back(HDF_MOTION_TYPE_PICKUP);
     vec.push_back(HDF_MOTION_TYPE_FLIP);
     vec.push_back(HDF_MOTION_TYPE_SHAKE);
@@ -115,7 +115,7 @@ HWTEST_F(HdfMotionTest, EnableMotion_001, TestSize.Level1)
     int32_t ret = g_motionInterface->Register(g_motionCallback);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
-    for (int i = 0; i < vec.size(); i++) {
+    for (size_t i = 0; i < vec.size(); i++) {
         ret = g_motionInterface->EnableMotion(vec[i]);
         if (ret == HDF_SUCCESS) {
             printf("Motion %d enabled successfully\n", vec[i]);
