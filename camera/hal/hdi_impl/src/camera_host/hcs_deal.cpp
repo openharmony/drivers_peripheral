@@ -175,6 +175,7 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
     DealAvalialbleFlash(node, metadata);
     DealAvalialbleAutoFocus(node, metadata);
     DealZoomRationRange(node, metadata);
+    DealJpegOrientation(node, metadata);
     cameraMetadataMap_.insert(std::make_pair(cameraId, metadata));
 
     return RC_OK;
@@ -846,6 +847,37 @@ RetCode HcsDeal::DealZoomRationRange(
         return RC_ERROR;
     }
     CAMERA_LOGI("zoomRatioRange add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealJpegOrientation(
+    const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    const char *nodeValue = nullptr;
+    int32_t jpegOrientation;
+
+    int32_t rc = pDevResIns->GetString(&metadataNode, "jpegOrientation", &nodeValue, nullptr);
+    if (rc != 0 || (nodeValue == nullptr)) {
+        CAMERA_LOGE("get jpegOrientation failed");
+        return RC_ERROR;
+    }
+
+    jpegOrientation = atoi(nodeValue);
+    CAMERA_LOGI("jpegOrientation  = %{public}d", jpegOrientation);
+
+    if (jpegOrientation != OHOS_CAMERA_JPEG_ROTATION_0 && jpegOrientation != OHOS_CAMERA_JPEG_ROTATION_90 &&
+        jpegOrientation != OHOS_CAMERA_JPEG_ROTATION_180 && jpegOrientation != OHOS_CAMERA_JPEG_ROTATION_270) {
+        CAMERA_LOGE("jpegOrientation invalid argument");
+        return RC_ERROR;
+    }
+
+    constexpr uint32_t DATA_COUNT = 1;
+    bool ret = metadata->addEntry(OHOS_JPEG_ORIENTATION, static_cast<const void *>(&jpegOrientation), DATA_COUNT);
+    if (!ret) {
+        CAMERA_LOGE("jpegOrientation add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("jpegOrientation add success");
     return RC_OK;
 }
 
