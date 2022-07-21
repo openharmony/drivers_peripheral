@@ -254,11 +254,15 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
                     strerror(errno));
             }
         }
+        if (error == -NLE_MSGTYPE_NOSUPPORT) {
+            HILOG_ERROR(LOG_CORE, "%s: Netlink message type is not supported", __FUNCTION__);
+            rc = RET_CODE_NOT_SUPPORT;
+        }
         nl_cb_put(cb);
     } while (0);
 
     pthread_mutex_unlock(&g_wifiHalInfo.mutex);
-    return ((rc == 0) ? RET_CODE_SUCCESS : RET_CODE_FAILURE);
+    return rc;
 }
 
 static void ParseFamilyId(struct nlattr *attr, struct FamilyData *familyData)
@@ -335,7 +339,6 @@ static int32_t GetMulticastId(const char *family, const char *group)
     if (ret == 0) {
         ret = familyData.id;
     }
-
     nlmsg_free(msg);
     return ret;
 }
@@ -348,7 +351,7 @@ static int32_t NlsockAddMembership(struct nl_sock *sock, const char *group)
     id = GetMulticastId(NL80211_GENL_NAME, group);
     if (id < 0) {
         HILOG_ERROR(LOG_CORE, "%s: get multicast id failed", __FUNCTION__);
-        return RET_CODE_FAILURE;
+        return id;
     }
 
     ret = nl_socket_add_membership(sock, id);
@@ -370,35 +373,31 @@ static int32_t ConnectEventSocket(void)
         HILOG_ERROR(LOG_CORE, "%s: fail to open event socket", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-
-    ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_SCAN);
-    if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for scan event failed.", __FUNCTION__);
-        goto err;
-    }
-
-    ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_MLME);
-    if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for mlme failed.", __FUNCTION__);
-        goto err;
-    }
-
-    ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_REG);
-    if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for regulatory failed.", __FUNCTION__);
-        goto err;
-    }
-
-    ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_VENDOR);
-    if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for vendor failed.", __FUNCTION__);
-        goto err;
-    }
-
-    return RET_CODE_SUCCESS;
-err:
+    do {
+        ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_SCAN);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for scan event failed.", __FUNCTION__);
+            break;
+        }
+        ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_MLME);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for mlme failed.\n", __FUNCTION__);
+            break;
+        }
+        ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_REG);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for regulatory failed.\n", __FUNCTION__);
+            break;
+        }
+        ret = NlsockAddMembership(g_wifiHalInfo.eventSock, NL80211_MULTICAST_GROUP_VENDOR);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nlsock add membership for vendor failed.\n", __FUNCTION__);
+            break;
+        }
+        return RET_CODE_SUCCESS;
+    } while (0);
     CloseNetlinkSocket(g_wifiHalInfo.eventSock);
-    return RET_CODE_FAILURE;
+    return ret;
 }
 
 void DisconnectEventSocket(void)
@@ -799,12 +798,9 @@ int32_t IsSupportCombo(uint8_t *isSupportCombo)
     ret = NetlinkSendCmdSync(msg, ParserIsSupportCombo, isSupportCombo);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
-        nlmsg_free(msg);
-        return RET_CODE_FAILURE;
     }
     nlmsg_free(msg);
-
-    return RET_CODE_SUCCESS;
+    return ret;
 }
 
 int32_t GetComboInfo(uint64_t *comboInfo, uint32_t size)
@@ -838,11 +834,9 @@ int32_t GetComboInfo(uint64_t *comboInfo, uint32_t size)
     ret = NetlinkSendCmdSync(msg, ParserSupportComboInfo, comboInfo);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
-        nlmsg_free(msg);
-        return RET_CODE_FAILURE;
     }
     nlmsg_free(msg);
-    return RET_CODE_SUCCESS;
+    return ret;
 }
 
 int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
@@ -972,11 +966,9 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResu
     ret = NetlinkSendCmdSync(msg, ParserValidFreq, result);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
-        nlmsg_free(msg);
-        return RET_CODE_FAILURE;
     }
     nlmsg_free(msg);
-    return RET_CODE_SUCCESS;
+    return ret;
 }
 
 int32_t SetTxPower(const char *ifName, int32_t power)
@@ -1004,12 +996,11 @@ int32_t SetTxPower(const char *ifName, int32_t power)
     ret = NetlinkSendCmdSync(msg, NULL, NULL);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
-        nlmsg_free(msg);
-        return RET_CODE_FAILURE;
+    } else {
+        HILOG_INFO(LOG_CORE, "%s: send end success", __FUNCTION__);
     }
     nlmsg_free(msg);
-    HILOG_INFO(LOG_CORE, "%s: send end success", __FUNCTION__);
-    return RET_CODE_SUCCESS;
+    return ret;
 }
 
 int32_t GetAssociatedStas(const char *ifName, struct AssocStaInfoResult *result)
@@ -1128,7 +1119,6 @@ int32_t AcquireChipId(const char *ifName, uint8_t *chipId)
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_CORE, "%s: NetlinkSendCmdSync failed.", __FUNCTION__);
     }
-
     nlmsg_free(msg);
     return ret;
 }
@@ -1210,13 +1200,10 @@ static uint32_t GetIftypeAndMac(struct NetDeviceInfo *info)
 
     ret = NetlinkSendCmdSync(msg, NetDeviceInfoHandler, info);
     if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: NetlinkSendCmdSync failed.", __FUNCTION__);
-        nlmsg_free(msg);
-        return RET_CODE_FAILURE;
+        HILOG_ERROR(LOG_CORE, "%s: NetlinkSendCmdSync failed.\n", __FUNCTION__);
     }
-
     nlmsg_free(msg);
-    return RET_CODE_SUCCESS;
+    return ret;
 }
 
 int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
@@ -1238,7 +1225,7 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
         ret = GetIftypeAndMac(&netDeviceInfoResult->deviceInfos[i]);
         if (ret != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%s: get iftype and mac failed", __FUNCTION__);
-            return RET_CODE_FAILURE;
+            return ret;
         }
     }
 
@@ -1304,24 +1291,20 @@ int32_t WifiCmdScan(const char *ifName, WifiScan *scan)
 
     genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_TRIGGER_SCAN, 0);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
-
-    ret = CmdScanPutMsg(msg, scan);
-    if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: put msg failed", __FUNCTION__);
-        goto err;
-    }
-
-    ret = NetlinkSendCmdSync(msg, NULL, NULL);
-    if (ret != RET_CODE_SUCCESS) {
-        HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
-        goto err;
-    }
-
+    do {
+        ret = CmdScanPutMsg(msg, scan);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: put msg failed\n", __FUNCTION__);
+            break;
+        }
+        ret = NetlinkSendCmdSync(msg, NULL, NULL);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: send cmd failed\n", __FUNCTION__);
+            break;
+        }
+    } while (0);
     nlmsg_free(msg);
-    return RET_CODE_SUCCESS;
-err:
-    nlmsg_free(msg);
-    return RET_CODE_FAILURE;
+    return ret;
 }
 
 static int32_t ParsePowerMode(const char *buf, uint16_t len, uint8_t *mode)
