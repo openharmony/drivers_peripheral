@@ -49,7 +49,7 @@ ohos_unittest("test_transfer") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "utils_base:utils",
   ]
   module_out_path = module_output_path
@@ -75,7 +75,7 @@ ohos_unittest("test_device") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "utils_base:utils",
   ]
   module_out_path = module_output_path
@@ -97,7 +97,7 @@ ohos_unittest("test_function") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "utils_base:utils",
   ]
   module_out_path = module_output_path
@@ -125,7 +125,7 @@ ohos_unittest("test_request") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
     "utils_base:utils",
   ]
   module_out_path = module_output_path

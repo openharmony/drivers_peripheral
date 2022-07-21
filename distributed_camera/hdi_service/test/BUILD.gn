@@ -66,7 +66,7 @@ ohos_executable("dcamera_hdi_sample") {
     "graphic_chipsetsdk:surface",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   part_name = "distributed_camera"
