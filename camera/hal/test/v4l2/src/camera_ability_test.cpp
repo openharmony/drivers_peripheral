@@ -104,6 +104,21 @@ OHOS::Camera::RetCode CameraAbilityTest::GetZoomRatioRange(std::shared_ptr<OHOS:
     return OHOS::Camera::RC_OK;
 }
 
+OHOS::Camera::RetCode CameraAbilityTest::GetJpegOrientation(std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+{
+    common_metadata_header_t *data = display_->ability->get();
+    int32_t jpegOrientation;
+    camera_metadata_item_t entry;
+    int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_JPEG_ORIENTATION, &entry);
+    if (ret != 0) {
+        std::cout << "==========[test log] get OHOS_JPEG_ORIENTATION error." << std::endl;
+        return OHOS::Camera::RC_ERROR;
+    }
+    jpegOrientation = *(entry.data.i32);
+    std::cout << "==========[test log] get jpegOrientation =" << jpegOrientation << std::endl;
+    return OHOS::Camera::RC_OK;
+}
+
 void CameraAbilityTest::TearDown(void)
 {
     display_->Close();
@@ -126,4 +141,5 @@ static HWTEST_F(CameraAbilityTest, camera_ability_001, TestSize.Level1)
     GetFlashAvailable(display_->ability);
     GetAfAvailable(display_->ability);
     GetZoomRatioRange(display_->ability);
+    GetJpegOrientation(display_->ability);
 }
