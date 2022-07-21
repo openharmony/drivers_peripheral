@@ -58,10 +58,19 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string& path)
     }
 
     if (!xmlStrcmp(rootNode->name, BAD_CAST"thermal")) {
-        this->thermal_.version = std::stof((char*)xmlGetProp(rootNode, BAD_CAST"version"));
-        this->thermal_.product = (char*)xmlGetProp(rootNode, BAD_CAST"product");
-        THERMAL_HILOGI(COMP_HDI, "version: %{public}s, product: %{public}s",
-            this->thermal_.version.c_str(), this->thermal_.product.c_str());
+        xmlChar* xmlVersion = xmlGetProp(rootNode, BAD_CAST"version");
+        if (xmlVersion != nullptr) {
+            this->thermal_.version = std::stof((char*)xmlVersion);
+            xmlFree(xmlVersion);
+            THERMAL_HILOGD(COMP_HDI, "version: %{public}s", this->thermal_.version.c_str());
+        }
+
+        xmlChar* xmlProduct = xmlGetProp(rootNode, BAD_CAST"product");
+        if (xmlProduct != nullptr) {
+            this->thermal_.product = (char*)xmlProduct;
+            xmlFree(xmlProduct);
+            THERMAL_HILOGD(COMP_HDI, "product: %{public}s", this->thermal_.product.c_str());
+        }
     }
 
     for (auto node = rootNode->children; node; node = node->next) {
@@ -73,11 +82,6 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string& path)
         } else if (!xmlStrcmp(node->name, BAD_CAST"polling")) {
             ParsePollingNode(node);
         } else if (!xmlStrcmp(node->name, BAD_CAST"tracing")) {
-            this->trace_.interval = (char*)xmlGetProp(node, BAD_CAST"interval");
-            this->trace_.record = (char*)xmlGetProp(node, BAD_CAST"record");
-            this->trace_.outpath = (char*)xmlGetProp(node, BAD_CAST"outpath");
-            THERMAL_HILOGI(COMP_HDI, "interval: %{public}s, record: %{public}s, outpath: %{public}s",
-                this->trace_.interval.c_str(), this->trace_.record.c_str(), this->trace_.outpath.c_str());
             ParseTracingNode(node);
         }
     }
@@ -86,14 +90,45 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string& path)
 
 void ThermalHdfConfig::ParseBaseNode(xmlNodePtr node)
 {
+    xmlChar* xmlInterval = xmlGetProp(node, BAD_CAST"interval");
+    if (xmlInterval != nullptr) {
+        this->trace_.interval = (char*)xmlInterval;
+        xmlFree(xmlInterval);
+        THERMAL_HILOGD(COMP_HDI, "interval: %{public}s", this->trace_.interval.c_str());
+    }
+
+    xmlChar* xmlRecord = xmlGetProp(node, BAD_CAST"record");
+    if (xmlRecord != nullptr) {
+        this->trace_.record = (char*)xmlRecord;
+        xmlFree(xmlRecord);
+        THERMAL_HILOGD(COMP_HDI, "record: %{public}s", this->trace_.record.c_str());
+    }
+
+    xmlChar* xmlOutpath = xmlGetProp(node, BAD_CAST"outpath");
+    if (xmlOutpath != nullptr) {
+        this->trace_.outpath = (char*)xmlOutpath;
+        xmlFree(xmlOutpath);
+        THERMAL_HILOGD(COMP_HDI, "outpath: %{private}s", this->trace_.outpath.c_str());
+    }
+
     auto cur = node->xmlChildrenNode;
     std::vector<BaseItem> vBase;
     while (cur != nullptr) {
         BaseItem item;
-        item.tag = (char*)xmlGetProp(cur, BAD_CAST"tag");
-        item.value = (char*)xmlGetProp(cur, BAD_CAST"value");
-        THERMAL_HILOGI(COMP_HDI, "ParseBaseNode tag: %{public}s, value: %{public}s",
-            item.tag.c_str(), item.value.c_str());
+        xmlChar* xmlTag = xmlGetProp(cur, BAD_CAST"tag");
+        if (xmlTag != nullptr) {
+            item.tag = (char*)xmlTag;
+            xmlFree(xmlTag);
+            THERMAL_HILOGD(COMP_HDI, "ParseBaseNode tag: %{public}s", item.tag.c_str());
+        }
+
+        xmlChar* xmlValue = xmlGetProp(cur, BAD_CAST"value");
+        if (xmlValue != nullptr) {
+            item.value = (char*)xmlValue;
+            xmlFree(xmlValue);
+            THERMAL_HILOGD(COMP_HDI, "ParseBaseNode value: %{public}s", item.value.c_str());
+        }
+
         vBase.push_back(item);
         cur = cur->next;
     }
@@ -105,12 +140,23 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
     auto cur  = node->xmlChildrenNode;
     while (cur != nullptr) {
         std::shared_ptr<SensorInfoConfig> sensorInfo = std::make_shared<SensorInfoConfig>();
-        std::string groupName = (char*)xmlGetProp(cur, BAD_CAST"name");
-        sensorInfo->SetGroupName(groupName);
-        uint32_t interval = atoi((char*)xmlGetProp(cur, BAD_CAST"interval"));
-        THERMAL_HILOGI(COMP_HDI, "ParsePollingNode groupName: %{public}s, interval: %{public}d",
-            groupName.c_str(), interval);
-        sensorInfo->SetGroupInterval(interval);
+        std::string groupName;
+        xmlChar* xmlName = xmlGetProp(cur, BAD_CAST"name");
+        if (xmlName != nullptr) {
+            groupName = (char*)xmlName;
+            xmlFree(xmlName);
+            sensorInfo->SetGroupName(groupName);
+            THERMAL_HILOGD(COMP_HDI, "ParsePollingNode groupName: %{public}s", groupName.c_str());
+        }
+
+        xmlChar* xmlInterval = xmlGetProp(cur, BAD_CAST"interval");
+        if (xmlInterval != nullptr) {
+            uint32_t interval = atoi((char*)xmlInterval);
+            xmlFree(xmlInterval);
+            THERMAL_HILOGD(COMP_HDI, "ParsePollingNode interval: %{public}d", interval);
+            sensorInfo->SetGroupInterval(interval);
+        }
+
         std::vector<XMLThermalZoneInfo> xmlTzInfoList;
         std::vector<XMLThermalNodeInfo> xmlTnInfoList;
         for (auto subNode = cur->children; subNode; subNode = subNode->next) {
@@ -122,10 +168,7 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
                 xmlTzInfoList.push_back(tz);
             } else if (!xmlStrcmp(subNode->name, BAD_CAST"thermal_node")) {
                 XMLThermalNodeInfo tn;
-                tn.type = (char*)xmlGetProp(subNode, BAD_CAST"type");
-                tn.path = (char*)xmlGetProp(subNode, BAD_CAST"path");
-                SaveThermalDfxTraceInfo(subNode, tn);
-
+                ParsePollingSubNode(subNode, tn);
                 THERMAL_HILOGI(COMP_HDI, "ParsePollingNode tntype: %{public}s, path: %{public}s",
                     tn.type.c_str(), tn.path.c_str());
                 xmlTnInfoList.push_back(tn);
@@ -138,10 +181,22 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
     }
 }
 
-void ThermalHdfConfig::SaveThermalDfxTraceInfo(xmlNodePtr node, XMLThermalNodeInfo tn)
+void ThermalHdfConfig::ParsePollingSubNode(xmlNodePtr node, XMLThermalNodeInfo& tn)
 {
     std::string rec;
     DfxTraceInfo info;
+
+    xmlChar* xmlType = xmlGetProp(node, BAD_CAST"type");
+    if (xmlType != nullptr) {
+        tn.type = (char*)xmlType;
+        xmlFree(xmlType);
+    }
+
+    xmlChar* xmlPath = xmlGetProp(node, BAD_CAST"path");
+    if (xmlPath != nullptr) {
+        tn.path = (char*)xmlPath;
+        xmlFree(xmlPath);
+    }
 
     xmlChar* isRecord = xmlGetProp(node, BAD_CAST"record");
     if (isRecord != nullptr) {
@@ -193,11 +248,19 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
         }
 
         if (!xmlStrcmp(subNode->name, BAD_CAST"value")) {
-            valuePath = (char*)xmlGetProp(subNode, BAD_CAST"path");
+            xmlChar* xmlValuePath = xmlGetProp(subNode, BAD_CAST"path");
+            if (xmlValuePath != nullptr) {
+                valuePath = (char*)xmlValuePath;
+                xmlFree(xmlValuePath);
+            }
         }
 
         if (!xmlStrcmp(subNode->name, BAD_CAST"width")) {
-            info.width = (char*)xmlGetProp(subNode, BAD_CAST"value");
+            xmlChar* xmlWidthValue = xmlGetProp(subNode, BAD_CAST"value");
+            if (xmlWidthValue != nullptr) {
+                info.width = (char*)xmlWidthValue;
+                xmlFree(xmlWidthValue);
+            }
         }
     }
 
@@ -213,7 +276,12 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
 
 void ThermalHdfConfig::GetThermalZoneNodeInfo(XMLThermalZoneInfo& tz, const xmlNode* node)
 {
-    tz.type = (char*)xmlGetProp(node, BAD_CAST"type");
+    xmlChar* xmlType = xmlGetProp(node, BAD_CAST"type");
+    if (xmlType != nullptr) {
+        tz.type = (char*)xmlType;
+        xmlFree(xmlType);
+    }
+
     auto replace = xmlGetProp(node, BAD_CAST("replace"));
     if (replace != nullptr) {
         tz.replace = (char*)replace;
