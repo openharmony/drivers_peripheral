@@ -99,6 +99,8 @@ private:
         const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
     RetCode DealZoomRationRange(
         const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
+    RetCode DealJpegOrientation(
+        const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata);
 
 private:
     std::string sPathName;
