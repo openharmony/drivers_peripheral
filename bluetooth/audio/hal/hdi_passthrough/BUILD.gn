@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-samgr_dir = "//foundation/distributedschedule/samgr"
+samgr_dir = "//foundation/systemabilitymgr/samgr"
 
 config("hdi_audio_config") {
   visibility = [ ":*" ]

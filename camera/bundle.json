@@ -16,7 +16,7 @@
         "hdf_core",
         "hiviewdfx_hilog_native",
         "multimedia_camera_standard",
-        "samgr_standard",
+        "samgr",
         "drivers_peripheral_display",
         "ipc",
         "utils_base"
