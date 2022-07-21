@@ -21,6 +21,7 @@
 #include <securec.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include "codec_omx_ext.h"
 
 using namespace std;
 using namespace OHOS;
