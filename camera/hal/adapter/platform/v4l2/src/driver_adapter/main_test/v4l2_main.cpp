@@ -540,7 +540,7 @@ static void Usage(FILE* fp)
             "-c | --capture       capture one picture\n"
             "-w | --set WB        Set white balance Cloudy\n"
             "-e | --Set AE        Set exposure time\n"
-            "-v | --video         capture Viedeo of 10s\n"
+            "-v | --video         capture Video of 10s\n"
             "-u | --uvc           start preview on uvc preview\n"
             "-a | --Set ATE       Set Auto exposure\n"
             "-q | --quit          stop preview and quit this app\n");

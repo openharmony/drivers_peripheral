@@ -26,7 +26,7 @@ static void Usage(FILE* fp)
             "-o | --offline       stream offline test\n"
             "-c | --capture       capture one picture\n"
             "-w | --set WB        Set white balance Cloudy\n"
-            "-v | --video         capture Viedeo of 10s\n"
+            "-v | --video         capture Video of 10s\n"
             "-a | --Set AE        Set Auto exposure\n"
             "-e | --Set Metadeta  Set Metadata\n"
             "-f | --Set Flashlight        Set flashlight ON 5s OFF\n"
