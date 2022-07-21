@@ -67,7 +67,7 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
   ]
   deps = [
     "//base/useriam/user_auth_framework/common:iam_utils",
-    "//third_party/openssl:libcrypto_static",
+    "//third_party/openssl:libcrypto_shared",
   ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
