@@ -18,10 +18,13 @@
 #include "gtest/gtest.h"
 #include "display_gralloc.h"
 #include "display_test.h"
-#include "hi_gbm_internal.h"
 
 namespace {
+#define ALIGN_UP(x, a) ((((x) + ((a)-1)) / (a)) * (a))
+#define WIDTH_ALIGN 8U
+
 const AllocTestPrms GRALLOC_TEST_SETS[] = {
+    // num0
     {
         .allocInfo = {
             .width = 1920,
@@ -32,7 +35,7 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
         .expectStride = 1920 * 4,
         .expectSize = 1920 * 1080 * 4
     },
-
+    // num1
     {
         .allocInfo = {
             .width = 1080,
@@ -40,10 +43,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBX_8888
             },
-        .expectStride = 1080 * 4,
-        .expectSize = 1080 * 1920 * 4
+        .expectStride = 4352,
+        .expectSize = 8355840
     },
-
+    // num2
     {
         .allocInfo = {
             .width = 1280,
@@ -54,7 +57,7 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
         .expectStride = 1280 * 4,
         .expectSize = 1280 * 720 * 4
     },
-
+    // num3
     {
         .allocInfo = {
             .width = 1080,
@@ -62,10 +65,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBA_8888
             },
-        .expectStride = 1080 * 4,
-        .expectSize = 1080 * 1920 * 4
+        .expectStride = 4352,
+        .expectSize = 8355840
     },
-
+    // num4
     {
         .allocInfo = {
             .width = 1080,
@@ -73,10 +76,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGB_888
         },
-        .expectStride = 1080 * 3,
-        .expectSize = 1080 * 1920 * 3
+        .expectStride = 3264,
+        .expectSize = 6266880
     },
-
+    // num5
     {
         .allocInfo = {
             .width = 1080,
@@ -84,10 +87,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRA_8888
             },
-        .expectStride = 1080 * 4,
-        .expectSize = 1080 * 1920 * 4
+        .expectStride = 4352,
+        .expectSize = 8355840
     },
-
+    // num6
     {
         .allocInfo = {
             .width = 1080,
@@ -95,10 +98,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRX_8888
         },
-        .expectStride = 1080 * 4,
-        .expectSize = 1080 * 1920 * 4
+        .expectStride = 4352,
+        .expectSize = 8355840
     },
-
+    // num7
     {
         .allocInfo = {
             .width = 1080,
@@ -106,10 +109,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBA_4444
         },
-        .expectStride = 1080 * 2,
-        .expectSize = 1080 * 1920 * 2
+        .expectStride = 2176,
+        .expectSize = 4177920
     },
-
+    // num8
     {
         .allocInfo =
         {
@@ -118,10 +121,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBX_4444
         },
-        .expectStride = 1080 * 2,
-        .expectSize = 1080 * 1920 * 2
+        .expectStride = 2176,
+        .expectSize = 4177920
     },
-
+    // num9
     {
         .allocInfo = {
             .width = 1080,
@@ -129,10 +132,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRA_4444
         },
-        .expectStride = 1080 * 2,
-        .expectSize = 1080 * 1920 * 2
+        .expectStride = 2176,
+        .expectSize = 4177920
     },
-
+    // num10
     {
         .allocInfo = {
             .width = 1080,
@@ -140,10 +143,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRX_4444
         },
-        .expectStride = 1080 * 2,
-        .expectSize = 1080 * 1920 * 2
+        .expectStride = 2176,
+        .expectSize = 4177920
     },
-
+    // num11
     {
         .allocInfo = {
             .width = 1080,
@@ -151,10 +154,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGR_565
         },
-        .expectStride = 1080 * 2,
-        .expectSize = 1080 * 1920 * 2
+        .expectStride = 2176,
+        .expectSize = 4177920
     },
-
+    // num12
     {
         .allocInfo = {
             .width = 1080,
@@ -162,10 +165,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRA_5551
         },
-        .expectStride = 1080 * 2,
-        .expectSize = 1080 * 1920 * 2
+        .expectStride = 2176,
+        .expectSize = 4177920
     },
-
+    // num13
     {
         .allocInfo = {
             .width = 1080,
@@ -173,10 +176,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRX_5551
         },
-        .expectStride = 1080 * 2,
-        .expectSize = 1080 * 1920 * 2
+        .expectStride = 2176,
+        .expectSize = 4177920
     },
-
+    // num14
     {
         .allocInfo = {
             .width = 1080,
@@ -184,10 +187,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCBCR_420_SP
         },
-        .expectStride = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN),
-        .expectSize = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN) * 1920,
+        .expectStride = 1664,
+        .expectSize = 3194880,
     },
-
+    // num15
     {
         .allocInfo = {
             .width = 1080,
@@ -195,10 +198,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCRCB_420_SP
         },
-        .expectStride = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN),
-        .expectSize = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN) * 1920,
+        .expectStride = 1664,
+        .expectSize = 3194880,
     },
-
+    // num16
     {
         .allocInfo = {
             .width = 1080,
@@ -206,10 +209,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCBCR_420_P
         },
-        .expectStride = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN),
-        .expectSize = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN) * 1920,
+        .expectStride = 1664,
+        .expectSize = 3194880
     },
-
+    // num17
     {
         .allocInfo = {
             .width = 1080,
@@ -217,10 +220,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCRCB_420_P
         },
-        .expectStride = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN),
-        .expectSize = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN) * 1920,
+        .expectStride = 1664,
+        .expectSize = 3194880
     },
-
+    // num18
     {
         .allocInfo = {
             .width = 1080,
@@ -228,10 +231,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA,
             .format = PIXEL_FMT_RGBX_8888
         },
-        .expectStride = 1080 * 4,
-        .expectSize = 1080 * 1920 * 4,
+        .expectStride = 4352,
+        .expectSize = 8355840
     },
-
+    // num19
     {
         .allocInfo = {
             .width = 1080,
@@ -239,10 +242,10 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ,
             .format = PIXEL_FMT_RGBX_8888
         },
-        .expectStride = 1080 * 4,
-        .expectSize = 1080 * 1920 * 4,
+        .expectStride = 4352, // expectStride
+        .expectSize = 8355840 // expectSize
     },
-
+    // num20
     {
         .allocInfo = {
             .width = 1080,
@@ -250,8 +253,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBX_8888
         },
-        .expectStride = 1080 * 4,
-        .expectSize = 1080 * 1920 * 4,
+        .expectStride = 4352, // expectStride
+        .expectSize = 8355840 // expectSize
     },
 };
 
@@ -293,7 +296,7 @@ int32_t GrallocAllocTest::AllocMemTest(AllocTestPrms &info)
 {
     int ret;
     BufferHandle *buffer = nullptr;
-    const int testCount = 1; // test 40 times
+    const int testCount = 21; // test 40 times
     for (int i = 0; i < testCount; i++) {
         ret = mGrallocFuncs->AllocMem(&info.allocInfo, &buffer);
         if (ret != DISPLAY_SUCCESS) {
