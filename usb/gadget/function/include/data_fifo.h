@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -80,7 +80,7 @@ static inline void DataFifoSkip(struct DataFifo *fifo, uint32_t size)
 static inline uint32_t DataFifoWrite(struct DataFifo *fifo, uint8_t *data, uint32_t size)
 {
     uint32_t mask = fifo->size - 1;
-    uint8_t *buf = fifo->data;
+    uint8_t *buf = (uint8_t *)fifo->data;
     uint8_t *end;
 
     size = MIN(size, DataFifoAvailSize(fifo));
@@ -94,7 +94,7 @@ static inline uint32_t DataFifoWrite(struct DataFifo *fifo, uint8_t *data, uint3
 static inline uint32_t DataFifoRead(struct DataFifo *fifo, uint8_t *data, uint32_t size)
 {
     uint32_t mask = fifo->size - 1;
-    uint8_t *buf = fifo->data;
+    uint8_t *buf = (uint8_t *)fifo->data;
     uint8_t *end;
 
     size = MIN(size, DataFifoLen(fifo));
