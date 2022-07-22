@@ -113,28 +113,28 @@ int32_t ThermalSimulationNode::AddSensorTypeTemp()
     sensor["shell"] = 0;
     CreateNodeDir(thermalDir);
     for (auto dir : sensor) {
-        ret = snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - ARG_1, thermalNodeDir.c_str(), dir.first.c_str());
-        if (ret < NUM_ZERO) {
+        ret = snprintf_s(nodeBuf, MAX_PATH, sizeof(nodeBuf) - ARG_1, thermalNodeDir.c_str(), dir.first.c_str());
+        if (ret < EOK) {
             return HDF_FAILURE;
         }
         THERMAL_HILOGI(COMP_HDI, "node name: %{public}s", nodeBuf);
         CreateNodeDir(static_cast<std::string>(nodeBuf));
         for (auto file : vFile) {
-            ret = snprintf_s(fileBuf, PATH_MAX, sizeof(fileBuf) - ARG_1, thermalFileDir.c_str(), nodeBuf, file.c_str());
-            if (ret < NUM_ZERO) {
+            ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, thermalFileDir.c_str(), nodeBuf, file.c_str());
+            if (ret < EOK) {
                 return HDF_FAILURE;
             }
             THERMAL_HILOGI(COMP_HDI, "file name: %{public}s", fileBuf);
             CreateNodeFile(static_cast<std::string>(fileBuf));
         }
-        ret = snprintf_s(typeBuf, PATH_MAX, sizeof(typeBuf) - ARG_1, thermalTypeDir.c_str(), dir.first.c_str());
-        if (ret < NUM_ZERO) {
+        ret = snprintf_s(typeBuf, MAX_PATH, sizeof(typeBuf) - ARG_1, thermalTypeDir.c_str(), dir.first.c_str());
+        if (ret < EOK) {
             return HDF_FAILURE;
         }
         std::string type = dir.first;
         WriteFile(typeBuf, type, type.length());
-        ret = snprintf_s(tempBuf, PATH_MAX, sizeof(tempBuf) - ARG_1, thermalTempDir.c_str(), dir.first.c_str());
-        if (ret < NUM_ZERO) {
+        ret = snprintf_s(tempBuf, MAX_PATH, sizeof(tempBuf) - ARG_1, thermalTempDir.c_str(), dir.first.c_str());
+        if (ret < EOK) {
             return HDF_FAILURE;
         }
         std::string temp = std::to_string(dir.second);
@@ -159,32 +159,32 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
     std::string sTemp = std::to_string(temp);
     CreateNodeDir(mitigationDir);
     for (auto dir : vSensor) {
-        ret = snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - ARG_1, mitigationNodeDir.c_str(), dir.c_str());
-        if (ret < NUM_ZERO) return HDF_FAILURE;
+        ret = snprintf_s(nodeBuf, MAX_PATH, sizeof(nodeBuf) - ARG_1, mitigationNodeDir.c_str(), dir.c_str());
+        if (ret < EOK) return HDF_FAILURE;
         CreateNodeDir(static_cast<std::string>(nodeBuf));
         vFile.push_back(nodeBuf);
     }
-    ret = snprintf_s(fileBuf, PATH_MAX, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_0].c_str(),
+    ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_0].c_str(),
         cpu.c_str());
-    if (ret < NUM_ZERO) return HDF_FAILURE;
+    if (ret < EOK) return HDF_FAILURE;
     CreateNodeFile(static_cast<std::string>(fileBuf));
     WriteFile(fileBuf, sTemp, sTemp.length());
-    ret = snprintf_s(fileBuf, PATH_MAX, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_1].c_str(),
+    ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_1].c_str(),
         charger.c_str());
-    if (ret < NUM_ZERO) return HDF_FAILURE;
+    if (ret < EOK) return HDF_FAILURE;
     CreateNodeFile(static_cast<std::string>(fileBuf));
     WriteFile(fileBuf, sTemp, sTemp.length());
-    ret = snprintf_s(fileBuf, PATH_MAX, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_2].c_str(),
+    ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_2].c_str(),
         gpu.c_str());
-    if (ret < NUM_ZERO) {
+    if (ret < EOK) {
         return HDF_FAILURE;
     }
     CreateNodeFile(static_cast<std::string>(fileBuf));
     WriteFile(fileBuf, sTemp, sTemp.length());
     for (auto b : vBattery) {
-        ret = snprintf_s(fileBuf, PATH_MAX, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(),
+        ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(),
             vFile[ARG_3].c_str(), b.c_str());
-        if (ret < NUM_ZERO) {
+        if (ret < EOK) {
             return HDF_FAILURE;
         }
         CreateNodeFile(static_cast<std::string>(fileBuf));
