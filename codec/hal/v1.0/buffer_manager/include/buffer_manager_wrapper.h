@@ -28,16 +28,16 @@ struct BufferManagerWrapper {
     void *outputBufferManager;
 
     bool (*IsInputDataBufferReady)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    InputInfo* (*GetInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    InputInfo* (*GetUsedInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    void (*PutInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, InputInfo *info);
-    void (*PutUsedInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, InputInfo *info);
+    CodecBuffer* (*GetInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
+    CodecBuffer* (*GetUsedInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
+    void (*PutInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
+    void (*PutUsedInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
 
     bool (*IsUsedOutputDataBufferReady)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    OutputInfo* (*GetOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    OutputInfo* (*GetUsedOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    void (*PutOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, OutputInfo *info);
-    void (*PutUsedOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, OutputInfo *info);
+    CodecBuffer* (*GetOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
+    CodecBuffer* (*GetUsedOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
+    void (*PutOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
+    void (*PutUsedOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
 };
 
 struct BufferManagerWrapper* GetBufferManager(void);

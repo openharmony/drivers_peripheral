@@ -27,20 +27,23 @@ extern "C" {
 
 typedef int32_t (*CodecInitType)(void);
 typedef int32_t (*CodecDeinitType)(void);
-typedef int32_t (*CodecCreateType)(const char* name, const Param *attr, int32_t len, CODEC_HANDLETYPE *handle);
+typedef int32_t (*CodecCreateType)(const char* name, CODEC_HANDLETYPE *handle);
 typedef int32_t (*CodecDestroyType)(CODEC_HANDLETYPE handle);
-typedef int32_t (*CodecSetPortModeType)(CODEC_HANDLETYPE handle, DirectionType type, BufferMode mode);
+typedef int32_t (*CodecSetPortModeType)(CODEC_HANDLETYPE handle, DirectionType direct,
+    AllocateBufferMode mode, BufferType type);
+typedef int32_t (*CodecGetPortModeType)(CODEC_HANDLETYPE handle, DirectionType direct,
+    AllocateBufferMode *mode, BufferType *type);
 typedef int32_t (*CodecSetParameterType)(CODEC_HANDLETYPE handle, const Param *params, int32_t paramCnt);
 typedef int32_t (*CodecGetParameterType)(CODEC_HANDLETYPE handle, Param *params, int32_t paramCnt);
 typedef int32_t (*CodecStartType)(CODEC_HANDLETYPE handle);
 typedef int32_t (*CodecStopType)(CODEC_HANDLETYPE handle);
 typedef int32_t (*CodecFlushType)(CODEC_HANDLETYPE handle, DirectionType directType);
 typedef int32_t (*CodecSetCallbackType)(CODEC_HANDLETYPE handle, const CodecCallback *cb, UINTPTR instance);
-typedef int32_t (*CodecDecodeType)(CODEC_HANDLETYPE handle, InputInfo inputData, OutputInfo outInfo,
+typedef int32_t (*CodecDecodeType)(CODEC_HANDLETYPE handle, CodecBuffer *inputData, CodecBuffer *outInfo,
     uint32_t timeoutMs);
-typedef int32_t (*CodecEncodeType)(CODEC_HANDLETYPE handle, InputInfo inputData, OutputInfo outInfo,
+typedef int32_t (*CodecEncodeType)(CODEC_HANDLETYPE handle, CodecBuffer *inputData, CodecBuffer *outInfo,
     uint32_t timeoutMs);
-typedef int32_t (*CodecEncodeHeaderType)(CODEC_HANDLETYPE handle, OutputInfo outInfo, uint32_t timeoutMs);
+typedef int32_t (*CodecEncodeHeaderType)(CODEC_HANDLETYPE handle, CodecBuffer outInfo, uint32_t timeoutMs);
 
 struct CodecOemIf {
     CodecInitType CodecInit;

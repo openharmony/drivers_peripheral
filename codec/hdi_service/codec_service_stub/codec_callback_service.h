@@ -23,10 +23,9 @@ extern "C" {
 #endif /* __cplusplus */
 
 void CodecCallbackServiceConstruct(struct ICodecCallback *service);
-int CodecCallbackOnEvent(UINTPTR comp, UINTPTR appData, EventType event,
-                         uint32_t data1, uint32_t data2, UINTPTR eventData);
-int CodecCallbackInputBufferAvailable(UINTPTR comp, UINTPTR appData, InputInfo *inBuf);
-int CodecCallbackOutputBufferAvailable(UINTPTR comp, UINTPTR appData, OutputInfo *outBuf);
+int CodecCallbackOnEvent(UINTPTR userData, EventType event, uint32_t length, int32_t eventData[]);
+int CodecCallbackInputBufferAvailable(UINTPTR userData, CodecBuffer *inBuf, int32_t *acquireFd);
+int CodecCallbackOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t *acquireFd);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

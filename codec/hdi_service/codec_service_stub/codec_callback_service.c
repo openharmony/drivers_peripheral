@@ -20,18 +20,17 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int CodecCallbackOnEvent(UINTPTR comp, UINTPTR appData, EventType event,
-                         uint32_t data1, uint32_t data2, UINTPTR eventData)
+int CodecCallbackOnEvent(UINTPTR userData, EventType event, uint32_t length, int32_t eventData[])
 {
     return HDF_SUCCESS;
 }
 
-int CodecCallbackInputBufferAvailable(UINTPTR comp, UINTPTR appData, InputInfo *inBuf)
+int CodecCallbackInputBufferAvailable(UINTPTR userData, CodecBuffer *inBuf, int32_t *acquireFd)
 {
     return HDF_SUCCESS;
 }
 
-int CodecCallbackOutputBufferAvailable(UINTPTR comp, UINTPTR appData, OutputInfo *outBuf)
+int CodecCallbackOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t *acquireFd)
 {
     return HDF_SUCCESS;
 }

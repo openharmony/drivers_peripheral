@@ -20,6 +20,11 @@
 #include "hdf_log.h"
 
 #define HDF_LOG_TAG "codec_config_parser"
+#ifdef __ARM64__
+#define MASK_NUM_LIMIT  64
+#else
+#define MASK_NUM_LIMIT  32
+#endif
 
 static CodecCapablites codecCapabilites = {0};
 static const struct DeviceResourceNode *resourceNode;
@@ -51,140 +56,9 @@ static int32_t GetGroupCapabilitiesNumber(const struct DeviceResourceNode *node,
     return HDF_SUCCESS;
 }
 
-static int32_t GetUintTableConfig(const struct DeviceResourceIface *iface,
-    const struct DeviceResourceNode *node, const char *attrName, ResizableArray *table)
+static int32_t GetCapabilityBase(const struct DeviceResourceIface *iface,
+    const struct DeviceResourceNode *childNode, CodecCapability *cap)
 {
-    int32_t count = iface->GetElemNum(node, attrName);
-    table->actualLen = 0;
-    if (count <= 0) {
-        HDF_LOGE("%{public}s, %{public}s not set!", __func__, attrName);
-        return HDF_FAILURE;
-    }
-    if (count > ELEMENT_MAX_LEN) {
-        HDF_LOGE("%{public}s, table size: %{public}d, exceeded max size %{public}d!",
-            __func__, count, ELEMENT_MAX_LEN);
-        return HDF_FAILURE;
-    }
-    iface->GetUint32Array(node, attrName, table->element, count, 0);
-    table->actualLen = count;
-    return HDF_SUCCESS;
-}
-
-static int32_t GetMaskedConfig(const struct DeviceResourceIface *iface,
-    const struct DeviceResourceNode *node, const char *attrName, uint32_t *mask)
-{
-    int32_t index = 0;
-    uint32_t *values = NULL;
-    int32_t count = iface->GetElemNum(node, attrName);
-
-    *mask = 0;
-    if (count <= 0) {
-        HDF_LOGE("%{public}s, %{public}s not set!", __func__, attrName);
-        return HDF_FAILURE;
-    }
-
-    values = (uint32_t *)OsalMemAlloc(sizeof(uint32_t) * count);
-    if (values == NULL) {
-        HDF_LOGE("%{public}s, failed to allocate mem for %{public}s!", __func__, attrName);
-        return HDF_FAILURE;
-    }
-    iface->GetUint32Array(node, attrName, values, count, 0);
-    for (index = 0; index < count; index++) {
-        *mask |= values[index];
-    }
-    OsalMemFree(values);
-
-    return HDF_SUCCESS;
-}
-
-static int32_t GetAudioOfCapability(const struct DeviceResourceIface *iface,
-    const struct DeviceResourceNode *childNode, CodecCapbility *cap)
-{
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_BITRATE, (uint32_t*)&cap->minBitRate, 0) != HDF_SUCCESS) {
-        cap->mime = MEDIA_MIMETYPE_INVALID;
-        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
-            __func__, CODEC_CONFIG_KEY_MIN_BITRATE, childNode->name);
-        return HDF_FAILURE;
-    }
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MAX_BITRATE, (uint32_t*)&cap->maxBitRate, 0) != HDF_SUCCESS) {
-        cap->mime = MEDIA_MIMETYPE_INVALID;
-        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
-            __func__, CODEC_CONFIG_KEY_MAX_BITRATE, childNode->name);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-static int32_t GetVideoOfCapability(const struct DeviceResourceIface *iface,
-    const struct DeviceResourceNode *childNode, CodecCapbility *cap)
-{
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_WIDTH_ALIGNMENT,
-        (uint32_t*)&cap->whAlignment.widthAlignment, 0) != HDF_SUCCESS) {
-        cap->mime = MEDIA_MIMETYPE_INVALID;
-        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
-            __func__, CODEC_CONFIG_KEY_WIDTH_ALIGNMENT, childNode->name);
-        return HDF_FAILURE;
-    }
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_HEIGHT_ALIGNMENT,
-        (uint32_t*)&cap->whAlignment.heightAlignment, 0) != HDF_SUCCESS) {
-        cap->mime = MEDIA_MIMETYPE_INVALID;
-        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
-            __func__, CODEC_CONFIG_KEY_HEIGHT_ALIGNMENT, childNode->name);
-        return HDF_FAILURE;
-    }
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_WIDTH, (uint32_t*)&cap->minSize.width, 0) != HDF_SUCCESS) {
-        cap->mime = MEDIA_MIMETYPE_INVALID;
-        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
-            __func__, CODEC_CONFIG_KEY_MIN_WIDTH, childNode->name);
-        return HDF_FAILURE;
-    }
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_HEIGHT, (uint32_t*)&cap->minSize.height, 0) != HDF_SUCCESS) {
-        cap->mime = MEDIA_MIMETYPE_INVALID;
-        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
-            __func__, CODEC_CONFIG_KEY_MIN_HEIGHT, childNode->name);
-        return HDF_FAILURE;
-    }
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MAX_WIDTH, (uint32_t*)&cap->maxSize.width, 0) != HDF_SUCCESS) {
-        cap->mime = MEDIA_MIMETYPE_INVALID;
-        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
-            __func__, CODEC_CONFIG_KEY_MAX_WIDTH, childNode->name);
-        return HDF_FAILURE;
-    }
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MAX_HEIGHT, (uint32_t*)&cap->maxSize.height, 0) != HDF_SUCCESS) {
-        cap->mime = MEDIA_MIMETYPE_INVALID;
-        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
-            __func__, CODEC_CONFIG_KEY_MAX_HEIGHT, childNode->name);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-static int32_t GetBufferConfig(const struct DeviceResourceIface *iface,
-    const struct DeviceResourceNode *childNode, CodecCapbility *cap)
-{
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_INPUT_BUFFER_NUM, &cap->minInputBufferNum, 0)
-        != HDF_SUCCESS) {
-        cap->mime = MEDIA_MIMETYPE_INVALID;
-        HDF_LOGE("%{public}s,  %{public}s:%{public}s not config.",
-            __func__, childNode->name, CODEC_CONFIG_KEY_MIN_INPUT_BUFFER_NUM);
-        return HDF_FAILURE;
-    }
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_OUTPUT_BUFFER_NUM, &cap->minOutputBufferNum, 0)
-        != HDF_SUCCESS) {
-        cap->mime = MEDIA_MIMETYPE_INVALID;
-        HDF_LOGE("%{public}s, %{public}s:%{public}s not config.",
-            __func__, childNode->name, CODEC_CONFIG_KEY_MIN_OUTPUT_BUFFER_NUM);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-static int32_t GetOneCapability(const struct DeviceResourceIface *iface,
-    const struct DeviceResourceNode *childNode, CodecCapbility *cap)
-{
-    if (iface == NULL || childNode == NULL || cap == NULL) {
-        return HDF_FAILURE;
-    }
     if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIME,
         (uint32_t*)&cap->mime, MEDIA_MIMETYPE_INVALID) != HDF_SUCCESS) {
         cap->mime = MEDIA_MIMETYPE_INVALID;
@@ -197,34 +71,276 @@ static int32_t GetOneCapability(const struct DeviceResourceIface *iface,
         HDF_LOGE("%{public}s, failed to get type for: %{public}s! Discarded", __func__, childNode->name);
         return HDF_FAILURE;
     }
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MAX_BITRATE, (uint32_t*)&cap->maxBitRate, 0) != HDF_SUCCESS) {
+    const char *name = NULL;
+    if (iface->GetString(childNode, CODEC_CONFIG_KEY_NAME, &name, "") != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, failed to get name for: %{public}s! Discarded", __func__, childNode->name);
+        return HDF_FAILURE;
+    }
+    if (name == NULL || strlen(name) >= NAME_LENGTH || strlen(name) == 0) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, name(%{public}s) is illegal", __func__, childNode->name);
+        return HDF_FAILURE;
+    }
+    int32_t ret = strcpy_s(cap->name, NAME_LENGTH, name);
+    if (ret != EOK) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, strcpy_s is failed, error code: %{public}d!", __func__, ret);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t GetUintTableConfig(const struct DeviceResourceIface *iface,
+    const struct DeviceResourceNode *node, ConfigUintArrayNodeAttr *attr)
+{
+    if (iface == NULL || node == NULL || attr == NULL) {
+        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (attr->array == NULL || attr->attrName == NULL) {
+        HDF_LOGE("%{public}s, failed, invalid attr!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    int32_t count = iface->GetElemNum(node, attr->attrName);
+    if (count < 0 || count >= attr->length) {
+        HDF_LOGE("%{public}s, %{public}s table size: %{public}d incorrect or exceed max size %{public}d!",
+            __func__, attr->attrName, count, attr->length - 1);
+        return HDF_FAILURE;
+    }
+
+    if (count > 0) {
+        iface->GetUint32Array(node, attr->attrName, (uint32_t *)attr->array, count, 0);
+    }
+    attr->array[count] = attr->endValue;
+
+    return HDF_SUCCESS;
+}
+
+static int32_t GetMaskedConfig(const struct DeviceResourceIface *iface,
+    const struct DeviceResourceNode *node, const char *attrName, uint32_t *mask)
+{
+    if (iface == NULL || node == NULL || attrName == NULL || mask == NULL) {
+        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    uint32_t *values = NULL;
+    int32_t count = iface->GetElemNum(node, attrName);
+
+    *mask = 0;
+    if (count < 0 || count > MASK_NUM_LIMIT) {
+        HDF_LOGE("%{public}s, failed, %{public}s count %{public}d incorrect!", __func__, attrName, count);
+        return HDF_FAILURE;
+    } else if (count == 0) {
+        // mask is not set, do not need to read
+        return HDF_SUCCESS;
+    }
+
+    values = (uint32_t *)OsalMemAlloc(sizeof(uint32_t) * count);
+    if (values == NULL) {
+        HDF_LOGE("%{public}s, failed to allocate mem for %{public}s!", __func__, attrName);
+        return HDF_FAILURE;
+    }
+    iface->GetUint32Array(node, attrName, values, count, 0);
+    for (int32_t index = 0; index < count; index++) {
+        *mask |= values[index];
+    }
+    OsalMemFree(values);
+
+    return HDF_SUCCESS;
+}
+
+static int32_t GetBufferConfig(const struct DeviceResourceIface *iface,
+    const struct DeviceResourceNode *childNode, CodecCapability *cap)
+{
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_INPUT_BUFFER_NUM, (uint32_t*)&cap->inputBufferNum.min, 0)
+        != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s,  %{public}s:min%{public}s not config.",
+            __func__, childNode->name, CODEC_CONFIG_KEY_MIN_INPUT_BUFFER_NUM);
+        return HDF_FAILURE;
+    }
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MAX_INPUT_BUFFER_NUM, (uint32_t*)&cap->inputBufferNum.max, 0)
+        != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s,  %{public}s:max%{public}s not config.",
+            __func__, childNode->name, CODEC_CONFIG_KEY_MAX_INPUT_BUFFER_NUM);
+        return HDF_FAILURE;
+    }
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_OUTPUT_BUFFER_NUM, (uint32_t*)&cap->outputBufferNum.min, 0)
+        != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, %{public}s:min%{public}s not config.",
+            __func__, childNode->name, CODEC_CONFIG_KEY_MIN_OUTPUT_BUFFER_NUM);
+        return HDF_FAILURE;
+    }
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MAX_OUTPUT_BUFFER_NUM, (uint32_t*)&cap->outputBufferNum.max, 0)
+        != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, %{public}s:max%{public}s not config.",
+            __func__, childNode->name, CODEC_CONFIG_KEY_MAX_OUTPUT_BUFFER_NUM);
+        return HDF_FAILURE;
+    }
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_INPUT_BUFFER_SIZE, (uint32_t*)&cap->inputBufferSize, 0)
+        != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, %{public}s:%{public}s not config.",
+            __func__, childNode->name, CODEC_CONFIG_KEY_INPUT_BUFFER_SIZE);
+        return HDF_FAILURE;
+    }
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_OUTPUT_BUFFER_SIZE, (uint32_t*)&cap->outputBufferSize, 0)
+        != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, %{public}s:%{public}s not config.",
+            __func__, childNode->name, CODEC_CONFIG_KEY_OUTPUT_BUFFER_SIZE);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t GetBitRateConfig(const struct DeviceResourceIface *iface,
+    const struct DeviceResourceNode *childNode, CodecCapability *cap)
+{
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_BITRATE, (uint32_t*)&cap->bitRate.min, 0)
+        != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s,  %{public}s:min%{public}s not config.",
+            __func__, childNode->name, CODEC_CONFIG_KEY_MIN_BITRATE);
+        return HDF_FAILURE;
+    }
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MAX_BITRATE, (uint32_t*)&cap->bitRate.max, 0)
+        != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s,  %{public}s:max%{public}s not config.",
+            __func__, childNode->name, CODEC_CONFIG_KEY_MAX_BITRATE);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t GetAudioOfCapability(const struct DeviceResourceIface *iface,
+    const struct DeviceResourceNode *childNode, CodecCapability *cap)
+{
+    ConfigUintArrayNodeAttr sampleFormatsAttr = {CODEC_CONFIG_KEY_SAMPLE_FORMATS, cap->port.audio.sampleFormats,
+        SAMPLE_FORMAT_NUM, 0};
+    if (GetUintTableConfig(iface, childNode, &sampleFormatsAttr) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s!",
+            __func__, CODEC_CONFIG_KEY_SAMPLE_FORMATS, childNode->name);
+        return HDF_FAILURE;
+    }
+
+    ConfigUintArrayNodeAttr sampleRateAttr = {CODEC_CONFIG_KEY_SAMPLE_RATE, cap->port.audio.sampleRate,
+        SAMPLE_RATE_NUM, 0};
+    if (GetUintTableConfig(iface, childNode, &sampleRateAttr) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s!",
+            __func__, CODEC_CONFIG_KEY_SAMPLE_RATE, childNode->name);
+        return HDF_FAILURE;
+    }
+
+    ConfigUintArrayNodeAttr channelLayoutsAttr = {CODEC_CONFIG_KEY_CHANNEL_LAYOUTS, cap->port.audio.channelLayouts,
+        CHANNEL_NUM, 0};
+    if (GetUintTableConfig(iface, childNode, &channelLayoutsAttr) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s!",
+            __func__, CODEC_CONFIG_KEY_CHANNEL_LAYOUTS, childNode->name);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t GetVideoOfCapability(const struct DeviceResourceIface *iface,
+    const struct DeviceResourceNode *childNode, CodecCapability *cap)
+{
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_WIDTH, (uint32_t*)&cap->port.video.minSize.width, 0)
+        != HDF_SUCCESS) {
         cap->mime = MEDIA_MIMETYPE_INVALID;
         HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
-            __func__, CODEC_CONFIG_KEY_MAX_BITRATE, childNode->name);
+            __func__, CODEC_CONFIG_KEY_MIN_WIDTH, childNode->name);
         return HDF_FAILURE;
     }
-    if ((GetUintTableConfig(iface, childNode, CODEC_CONFIG_KEY_SUPPORT_PROFILES, &(cap->supportProfiles))
-            != HDF_SUCCESS)
-        || (GetUintTableConfig(iface, childNode, CODEC_CONFIG_KEY_SUPPORT_LEVELS, &(cap->supportLevels))
-            != HDF_SUCCESS)
-        || (GetUintTableConfig(iface, childNode, CODEC_CONFIG_KEY_SUPPORT_PIXELF_MTS, &(cap->supportPixelFormats))
-            != HDF_SUCCESS)) {
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MIN_HEIGHT, (uint32_t*)&cap->port.video.minSize.height, 0)
+        != HDF_SUCCESS) {
         cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
+            __func__, CODEC_CONFIG_KEY_MIN_HEIGHT, childNode->name);
         return HDF_FAILURE;
     }
-    if ((GetMaskedConfig(iface, childNode, CODEC_CONFIG_KEY_ALLOCATE_MASK, &cap->allocateMask) != HDF_SUCCESS)
-        || (GetMaskedConfig(iface, childNode, CODEC_CONFIG_KEY_CAPS_MASK, &cap->capsMask) != HDF_SUCCESS)) {
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MAX_WIDTH, (uint32_t*)&cap->port.video.maxSize.width, 0)
+        != HDF_SUCCESS) {
         cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
+            __func__, CODEC_CONFIG_KEY_MAX_WIDTH, childNode->name);
+        return HDF_FAILURE;
+    }
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_MAX_HEIGHT, (uint32_t*)&cap->port.video.maxSize.height, 0)
+        != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
+            __func__, CODEC_CONFIG_KEY_MAX_HEIGHT, childNode->name);
+        return HDF_FAILURE;
+    }
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_WIDTH_ALIGNMENT,
+        (uint32_t*)&cap->port.video.whAlignment.widthAlignment, 0) != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
+            __func__, CODEC_CONFIG_KEY_WIDTH_ALIGNMENT, childNode->name);
+        return HDF_FAILURE;
+    }
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_HEIGHT_ALIGNMENT,
+        (uint32_t*)&cap->port.video.whAlignment.heightAlignment, 0) != HDF_SUCCESS) {
+        cap->mime = MEDIA_MIMETYPE_INVALID;
+        HDF_LOGE("%{public}s, failed to get %{public}s for: %{public}s! Discarded",
+            __func__, CODEC_CONFIG_KEY_HEIGHT_ALIGNMENT, childNode->name);
+        return HDF_FAILURE;
+    }
+    ConfigUintArrayNodeAttr attr = {CODEC_CONFIG_KEY_SUPPORT_PIXELF_MTS, cap->port.video.supportPixFmts,
+        PIX_FMT_NUM, INVALID_PROFILE};
+    if (GetUintTableConfig(iface, childNode, &attr) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+static int32_t GetOneCapability(const struct DeviceResourceIface *iface,
+    const struct DeviceResourceNode *childNode, CodecCapability *cap, bool isVideoGroup)
+{
+    if (iface == NULL || childNode == NULL || cap == NULL) {
+        HDF_LOGE("%{public}s, failed, invalid param!", __func__);
+        return HDF_FAILURE;
+    }
+    if (GetCapabilityBase(iface, childNode, cap) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    ConfigUintArrayNodeAttr attr = {CODEC_CONFIG_KEY_SUPPORT_PROFILES,
+        cap->supportProfiles, PROFILE_NUM, INVALID_PROFILE};
+    if (GetUintTableConfig(iface, childNode, &attr) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    cap->isSoftwareCodec = iface->GetBool(childNode, CODEC_CONFIG_KEY_IS_SOFTWARE_CODEC);
+    if (GetMaskedConfig(iface, childNode, CODEC_CONFIG_KEY_PROCESS_MODE_MASK,
+        (uint32_t *)&cap->processModeMask) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    if (GetMaskedConfig(iface, childNode, CODEC_CONFIG_KEY_CAPS_MASK, &cap->capsMask) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    if (GetMaskedConfig(iface, childNode, CODEC_CONFIG_KEY_ALLOCATE_MASK, &cap->allocateMask) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
     if (GetBufferConfig(iface, childNode, cap) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    if (GetAudioOfCapability(iface, childNode, cap) != HDF_SUCCESS) {
+    if (GetBitRateConfig(iface, childNode, cap) != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
-    if (GetVideoOfCapability(iface, childNode, cap) != HDF_SUCCESS) {
-        return HDF_FAILURE;
+    if (isVideoGroup) {
+        if (GetVideoOfCapability(iface, childNode, cap) != HDF_SUCCESS) {
+            return HDF_FAILURE;
+        }
+    } else {
+        if (GetAudioOfCapability(iface, childNode, cap) != HDF_SUCCESS) {
+            return HDF_FAILURE;
+        }
     }
     return HDF_SUCCESS;
 }
@@ -232,8 +348,9 @@ static int32_t GetOneCapability(const struct DeviceResourceIface *iface,
 static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
     const char *nodeName, CodecCapablityGroup *capsGroup)
 {
-    CodecCapbility *cap;
+    CodecCapability *cap;
     int32_t index = 0;
+    bool isVideoGroup = true;
     const struct DeviceResourceNode *codecGroupNode = NULL;
     struct DeviceResourceNode *childNode = NULL;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
@@ -248,13 +365,16 @@ static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
         HDF_LOGE("%{public}s, failed to get child node: %{public}s!", __func__, nodeName);
         return HDF_FAILURE;
     }
+    if (strstr(nodeName, "Video") == NULL) {
+        isVideoGroup = false;
+    }
     DEV_RES_NODE_FOR_EACH_CHILD_NODE(codecGroupNode, childNode) {
         if (index >= capsGroup->num) {
             HDF_LOGE("%{public}s, failed to get child node: %{public}s, index error!", __func__, nodeName);
             return HDF_FAILURE;
         }
         cap = &(capsGroup->capablitis[index++]);
-        GetOneCapability(iface, childNode, cap);
+        GetOneCapability(iface, childNode, cap, isVideoGroup);
     }
     return HDF_SUCCESS;
 }
@@ -285,8 +405,8 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node)
         if (GetGroupCapabilitiesNumber(node, codecGroupsNodeName[index], &codecNum) == HDF_SUCCESS) {
             codecCapGroup->num = codecNum;
             if (codecNum > 0) {
-                size_t capablitisSize = sizeof(CodecCapbility) * codecNum;
-                codecCapGroup->capablitis = (CodecCapbility *)OsalMemAlloc(capablitisSize);
+                size_t capablitisSize = sizeof(CodecCapability) * codecNum;
+                codecCapGroup->capablitis = (CodecCapability *)OsalMemAlloc(capablitisSize);
                 memset_s(codecCapGroup->capablitis, capablitisSize, 0, capablitisSize);
             } else {
                 codecCapGroup->capablitis = NULL;

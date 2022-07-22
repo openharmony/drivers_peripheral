@@ -143,5 +143,4 @@ void BufferManager<T>::PutUsedBuffer(T *info)
     OsalMutexUnlock(&usedBufferQueueLock);
 }
 
-template class BufferManager<InputInfo>;
-template class BufferManager<OutputInfo>;
+template class BufferManager<CodecBuffer>;

@@ -52,8 +52,8 @@ static struct ICodec *g_codecProxy = NULL;
 static CODEC_HANDLETYPE g_handle = NULL;
 ShareMemory *g_inputBuffers = NULL;
 ShareMemory *g_outputBuffers = NULL;
-InputInfo *g_inputInfosData = NULL;
-OutputInfo *g_outputInfosData = NULL;
+CodecBuffer **g_inputInfosData = NULL;
+CodecBuffer **g_outputInfosData = NULL;
 struct ICodecCallback *g_callback = NULL;
 
 CodecCmd g_cmd = {0};
@@ -129,74 +129,71 @@ static void ReleaseShm(void)
     }
 }
 
-static void ReleaseInfoBuffer(void)
+static void ReleaseCodecBuffer(void)
 {
     int32_t i;
     if (g_inputInfosData != NULL) {
         for (i = 0; i < STREAM_PACKET_BUFFER_NUM; i++) {
-            if (g_inputInfosData[i].buffers != NULL) {
-                OsalMemFree(g_inputInfosData[i].buffers);
+            if (g_inputInfosData[i] != NULL) {
+                OsalMemFree(g_inputInfosData[i]);
             }
         }
     }
     if (g_outputInfosData != NULL) {
         for (i = 0; i < MEDIA_FRAME_BUFFER_NUM; i++) {
-            if (g_outputInfosData[i].buffers != NULL) {
-                OsalMemFree(g_outputInfosData[i].buffers);
+            if (g_outputInfosData[i] != NULL) {
+                OsalMemFree(g_outputInfosData[i]);
             }
         }
     }
 }
 
-static bool InitBuffer(int32_t packetBufferNum, int32_t packetBufferSize,
-    int32_t frameBufferNum, int32_t frameBufferSize)
+static bool InitBuffer(int32_t inputBufferNum, int32_t inputBufferSize,
+    int32_t outputBufferNum, int32_t outputBufferSize)
 {
     int32_t queueRet = 0;
-    g_inputBuffers = (ShareMemory *)OsalMemCalloc(sizeof(ShareMemory) * STREAM_PACKET_BUFFER_NUM);
-    g_outputBuffers = (ShareMemory *)OsalMemCalloc(sizeof(ShareMemory) * MEDIA_FRAME_BUFFER_NUM);
-    g_inputInfosData = (InputInfo *)OsalMemCalloc(sizeof(InputInfo) * STREAM_PACKET_BUFFER_NUM);
-    g_outputInfosData = (OutputInfo *)OsalMemCalloc(sizeof(OutputInfo) * MEDIA_FRAME_BUFFER_NUM);
+    g_inputBuffers = (ShareMemory *)OsalMemCalloc(sizeof(ShareMemory) * inputBufferNum);
+    g_outputBuffers = (ShareMemory *)OsalMemCalloc(sizeof(ShareMemory) * outputBufferNum);
+    g_inputInfosData = (CodecBuffer **)OsalMemCalloc(sizeof(CodecBuffer*) * inputBufferNum);
+    g_outputInfosData = (CodecBuffer **)OsalMemCalloc(sizeof(CodecBuffer*) * outputBufferNum);
     if (g_inputBuffers == NULL || g_outputBuffers == NULL || g_inputInfosData == NULL || g_outputInfosData == NULL) {
         HDF_LOGE("%{public}s: buffer and info mem alloc failed!", __func__);
         return false;
     }
 
-    for (int32_t i = 0; i < packetBufferNum; i++) {
+    int32_t bufCount = 1;
+    for (int32_t i = 0; i < inputBufferNum; i++) {
         g_inputBuffers[i].id = i;
-        g_inputBuffers[i].size = packetBufferSize;
+        g_inputBuffers[i].size = inputBufferSize;
         CreateShareMemory(&g_inputBuffers[i]);
-        g_inputInfosData[i].bufferCnt = 1;
-        g_inputInfosData[i].flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
-        g_inputInfosData[i].buffers = (CodecBufferInfo *)OsalMemCalloc(sizeof(CodecBufferInfo));
-        if (g_inputInfosData[i].buffers != NULL) {
-            g_inputInfosData[i].buffers->type = BUFFER_TYPE_FD;
-            g_inputInfosData[i].buffers->fd = g_inputBuffers[i].fd;
-            g_inputInfosData[i].buffers->offset = g_inputBuffers[i].id;
-            g_inputInfosData[i].buffers->size = packetBufferSize;
-        }
+        g_inputInfosData[i] = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * bufCount);
+        g_inputInfosData[i]->bufferCnt = 1;
+        g_inputInfosData[i]->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
+        g_inputInfosData[i]->bufferId = g_inputBuffers[i].id;
+        g_inputInfosData[i]->buffer[0].type = BUFFER_TYPE_FD;
+        g_inputInfosData[i]->buffer[0].buf = (intptr_t)g_inputBuffers[i].fd;
+        g_inputInfosData[i]->buffer[0].capacity = inputBufferSize;
         queueRet = g_codecProxy->CodecQueueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle,
-            &g_inputInfosData[i], (uint32_t)0);
+            g_inputInfosData[i], (uint32_t)0, -1);
         if (queueRet != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: input buffer initial failed!", __func__);
             return false;
         }
     }
 
-    for (int32_t j = 0; j < frameBufferNum; j++) {
+    for (int32_t j = 0; j < outputBufferNum; j++) {
         g_outputBuffers[j].id = STREAM_PACKET_BUFFER_NUM + j;
-        g_outputBuffers[j].size = frameBufferSize;
+        g_outputBuffers[j].size = outputBufferSize;
         CreateShareMemory(&g_outputBuffers[j]);
-        g_outputInfosData[j].bufferCnt = 1;
-        g_outputInfosData[j].flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
-        g_outputInfosData[j].buffers = (CodecBufferInfo *)OsalMemCalloc(sizeof(CodecBufferInfo));
-        if (g_outputInfosData[j].buffers != NULL) {
-            g_outputInfosData[j].buffers->type = BUFFER_TYPE_FD;
-            g_outputInfosData[j].buffers->fd = g_outputBuffers[j].fd;
-            g_outputInfosData[j].buffers->offset = g_outputBuffers[j].id;
-            g_outputInfosData[j].buffers->size = frameBufferSize;
-        }
+        g_outputInfosData[j] = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * bufCount);
+        g_outputInfosData[j]->bufferCnt = 1;
+        g_outputInfosData[j]->bufferId = g_outputBuffers[j].id;
+        g_outputInfosData[j]->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
+        g_outputInfosData[j]->buffer[0].type = BUFFER_TYPE_FD;
+        g_outputInfosData[j]->buffer[0].buf = (intptr_t)g_outputBuffers[j].fd;
+        g_outputInfosData[j]->buffer[0].capacity = outputBufferSize;
         queueRet = g_codecProxy->CodecQueueOutput(g_codecProxy, (CODEC_HANDLETYPE)g_handle,
-            &g_outputInfosData[j], (uint32_t)0, 1);
+            g_outputInfosData[j], (uint32_t)0, -1);
         if (queueRet != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: output buffer initial failed!", __func__);
             return false;
@@ -205,22 +202,21 @@ static bool InitBuffer(int32_t packetBufferNum, int32_t packetBufferSize,
     return true;
 }
 
-int32_t TestOnEvent(UINTPTR comp, UINTPTR appData, EventType event,
-    uint32_t data1, uint32_t data2, UINTPTR eventData)
+int32_t TestOnEvent(UINTPTR userData, EventType event, uint32_t length, int32_t eventData[])
 {
     HDF_LOGI("%{public}s: TestOnEvent : event = %{public}d", __func__, event);
     return HDF_SUCCESS;
 }
 
-int32_t TestInputBufferAvailable(UINTPTR comp, UINTPTR appData, InputInfo *inBuf)
+int32_t TestInputBufferAvailable(UINTPTR userData, CodecBuffer *inBuf, int32_t *acquireFd)
 {
     HDF_LOGI("%{public}s: TestInputBufferAvailable enter", __func__);
     return HDF_SUCCESS;
 }
 
-int32_t TestOutputBufferAvailable(UINTPTR comp, UINTPTR appData, OutputInfo *outBuf)
+int32_t TestOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t *acquireFd)
 {
-    HDF_LOGI("%{public}s: TestOutputBufferAvailable write %{public}d", __func__, outBuf->buffers->size);
+    HDF_LOGI("%{public}s: TestOutputBufferAvailable write %{public}d", __func__, outBuf->buffer[0].length);
     return HDF_SUCCESS;
 }
 
@@ -233,7 +229,7 @@ int32_t SetExtDecParameter(void)
     // set split_parse enable mpp internal frame spliter when the input
     paramCnt = 1;
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
-    param.key = (ParamKey)KEY_SPLIT_PARSE_RK;
+    param.key = (ParamKey)KEY_EXT_SPLIT_PARSE_RK;
     int32_t needSplit = 1;
     param.val = &needSplit;
     param.size = sizeof(int32_t);
@@ -247,7 +243,7 @@ int32_t SetExtDecParameter(void)
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
     paramCnt = 1;
     int32_t num = g_data.frameNum;
-    param.key = (ParamKey)KEY_DEC_FRAME_NUM_RK;
+    param.key = (ParamKey)KEY_EXT_DEC_FRAME_NUM_RK;
     param.val = &num;
     param.size = sizeof(int32_t);
     ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
@@ -280,7 +276,7 @@ int32_t SetDecParameter(void)
     // get default config
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
     paramCnt = 1;
-    param.key = (ParamKey)KEY_DEFAULT_CFG_RK;
+    param.key = (ParamKey)KEY_EXT_DEFAULT_CFG_RK;
     int32_t needDefault = 1;
     param.val = &needDefault;
     param.size = sizeof(int32_t);
@@ -294,7 +290,7 @@ int32_t SetDecParameter(void)
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
     paramCnt = 1;
     param.key = KEY_PIXEL_FORMAT;
-    CodecPixelFormat fmt = PIX_FORMAT_INVALID;
+    CodecPixelFormat fmt = PIXEL_FORMAT_NONE;
     param.val = &fmt;
     param.size = sizeof(CodecPixelFormat);
     ret = g_codecProxy->CodecGetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
@@ -315,32 +311,30 @@ void DecodeLoopHandleInput(MpiDecLoopData *g_data)
     int32_t ret = 0;
     uint8_t readData[STREAM_PACKET_BUFFER_SIZE];
     int32_t readSize = 0;
-    CodecBufferInfo inputBuffer;
+    int32_t acquireFd = 0;
 
-    memset_s(&inputBuffer, sizeof(CodecBufferInfo), 0, sizeof(CodecBufferInfo));
-    inputBuffer.type = BUFFER_TYPE_FD;
-    InputInfo inputData;
-    memset_s(&inputData, sizeof(InputInfo), 0, sizeof(InputInfo));
-    inputData.bufferCnt = 1;
-    inputData.buffers = &inputBuffer;
-    inputData.flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
-    
-    ret = g_codecProxy->CodecDequeInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, QUEUE_TIME_OUT, &inputData);
+    CodecBuffer *inputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
+    inputData->buffer[0].type = BUFFER_TYPE_FD;
+    inputData->bufferCnt = 1;
+    inputData->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
+    ret = g_codecProxy->CodecDequeueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, QUEUE_TIME_OUT,
+        &acquireFd, inputData);
     if (ret == HDF_SUCCESS) {
         // when packet size is valid read the input binary file
         readSize = ReadInputFromFile(g_data->fpInput, readData);
         g_pktEos = (readSize <= 0);
         if (g_pktEos) {
             HDF_LOGD("%{public}s: client inputData reach STREAM_FLAG_EOS", __func__);
-            inputData.flag = STREAM_FLAG_EOS;
+            inputData->flag = STREAM_FLAG_EOS;
         }
     
         g_totalSrcSize += readSize;
-        ShareMemory *sm = GetShareMemoryById(inputBuffer.offset);
+        ShareMemory *sm = GetShareMemoryById(inputData->bufferId);
         memcpy_s(sm->virAddr, readSize, (uint8_t*)readData, readSize);
-        inputBuffer.size = readSize;
-        g_codecProxy->CodecQueueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &inputData, QUEUE_TIME_OUT);
+        inputData->buffer[0].capacity = readSize;
+        g_codecProxy->CodecQueueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, inputData, QUEUE_TIME_OUT, -1);
     }
+    OsalMemFree(inputData);
 }
 
 static int32_t DecodeLoop(MpiDecLoopData *g_data)
@@ -351,38 +345,34 @@ static int32_t DecodeLoop(MpiDecLoopData *g_data)
         DecodeLoopHandleInput(g_data);
     }
 
-    CodecBufferInfo outputBuffer;
-    memset_s(&outputBuffer, sizeof(CodecBufferInfo), 0, sizeof(CodecBufferInfo));
-    outputBuffer.type = BUFFER_TYPE_FD;
-    OutputInfo outputData;
-    memset_s(&outputData, sizeof(OutputInfo), 0, sizeof(OutputInfo));
-    outputData.bufferCnt = 1;
-    outputData.buffers = &outputBuffer;
-    outputData.flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
+    CodecBuffer *outputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
+    outputData->buffer[0].type = BUFFER_TYPE_FD;
+    outputData->bufferCnt = 1;
+    outputData->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
 
     int32_t acquireFd = 0;
     ret = g_codecProxy->CodecDequeueOutput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, QUEUE_TIME_OUT,
-        &acquireFd, &outputData);
+        &acquireFd, outputData);
     if (ret == HDF_SUCCESS) {
         g_totalFrames++;
-        ShareMemory *sm = GetShareMemoryById(outputBuffer.offset);
+        ShareMemory *sm = GetShareMemoryById(outputData->bufferId);
+        HDF_LOGD("%{public}s: get output, g_currentFrames:%{public}d", __func__, g_totalFrames);
         DumpOutputToFile(g_data->fp_output, sm->virAddr);
-        CodecBufferInfo queOutputBuffer;
-        memset_s(&queOutputBuffer, sizeof(CodecBufferInfo), 0, sizeof(CodecBufferInfo));
-        queOutputBuffer.type = BUFFER_TYPE_FD;
-        queOutputBuffer.fd = outputData.buffers->fd;
-        queOutputBuffer.offset = outputData.buffers->offset;
-        OutputInfo queOutputData;
-        memset_s(&queOutputData, sizeof(OutputInfo), 0, sizeof(OutputInfo));
-        queOutputData.bufferCnt = 1;
-        queOutputData.buffers = &queOutputBuffer;
-        queOutputData.flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
-        g_codecProxy->CodecQueueOutput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &queOutputData, QUEUE_TIME_OUT, 1);
-        if (outputData.flag & STREAM_FLAG_EOS) {
+
+        CodecBuffer *queOutputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
+        queOutputData->buffer[0].type = BUFFER_TYPE_FD;
+        queOutputData->buffer[0].buf = outputData->buffer[0].buf;
+        queOutputData->bufferId = outputData->bufferId;
+        queOutputData->bufferCnt = 1;
+        queOutputData->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
+        g_codecProxy->CodecQueueOutput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, queOutputData, QUEUE_TIME_OUT, -1);
+        if (outputData->flag & STREAM_FLAG_EOS) {
             HDF_LOGD("%{public}s: reach STREAM_FLAG_EOS, loop_end, g_totalFrames:%{public}d", __func__, g_totalFrames);
             g_data->loop_end = 1;
         }
+        OsalMemFree(queOutputData);
     }
+    OsalMemFree(outputData);
 
     return ret;
 }
@@ -423,7 +413,7 @@ void RevertDecodeStep2(void)
 void RevertDecodeStep3(void)
 {
     ReleaseShm();
-    ReleaseInfoBuffer();
+    ReleaseCodecBuffer();
 
     if (g_inputBuffers != NULL) {
         OsalMemFree(g_inputBuffers);
@@ -498,13 +488,7 @@ int32_t Decode(void)
         return HDF_FAILURE;
     }
 
-    Param params;
-    memset_s(&params, sizeof(Param), 0, sizeof(Param));
-    int32_t val = VIDEO_DECODER;
-    params.key = KEY_CODEC_TYPE;
-    params.val = &val;
-    params.size = sizeof(val);
-    ret = g_codecProxy->CodecCreate(g_codecProxy, g_data.codecName, &params, 1, &g_handle);
+    ret = g_codecProxy->CodecCreate(g_codecProxy, g_data.codecName, &g_handle);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: CodecCreate failed, ret:%{public}d", __func__, ret);
         RevertDecodeStep2();

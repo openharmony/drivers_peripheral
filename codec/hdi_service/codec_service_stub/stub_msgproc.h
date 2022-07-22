@@ -22,13 +22,13 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int32_t CodecSerPackCapbility(struct HdfSBuf *reply, CodecCapbility *cap);
+int32_t CodecSerPackCapability(struct HdfSBuf *reply, CodecCapability *cap);
 int32_t CodecSerParseParam(struct HdfSBuf *data, Param *param);
 int32_t CodecSerPackParam(struct HdfSBuf *reply, Param *param);
-int32_t CodecSerPackInputInfo(struct HdfSBuf *reply, InputInfo *inputData);
-int32_t CodecSerParseInputInfo(struct HdfSBuf *data, InputInfo *inputData);
-int32_t CodecSerParseOutputInfo(struct HdfSBuf *data, OutputInfo *outInfo);
-int32_t CodecSerPackOutputInfo(struct HdfSBuf *reply, OutputInfo *outInfo);
+int32_t CodecSerParseCodecBuffer(struct HdfSBuf *data, CodecBuffer *codecBuffer);
+int32_t CodecSerPackCodecBuffer(struct HdfSBuf *reply, const CodecBuffer *codecBuffer);
+int32_t CodecSerParseFenceFd(struct HdfSBuf *data, int32_t *fenceFd);
+int32_t CodecSerPackFenceFd(struct HdfSBuf *reply, int32_t fenceFd);
 
 #ifdef __cplusplus
 }
