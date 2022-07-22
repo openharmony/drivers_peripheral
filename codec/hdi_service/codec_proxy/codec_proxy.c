@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
-#include "proxy_msgproc.h"
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include <servmgr_hdi.h>
 #include "icodec.h"
+#include "proxy_msgproc.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -114,7 +114,7 @@ int32_t CodecProxyDeinit(struct ICodec *self)
     return ret;
 }
 
-int32_t CodecProxyEnumerateCapbility(struct ICodec *self, uint32_t index, CodecCapbility *cap)
+int32_t CodecProxyEnumerateCapability(struct ICodec *self, uint32_t index, CodecCapability *cap)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -142,8 +142,8 @@ int32_t CodecProxyEnumerateCapbility(struct ICodec *self, uint32_t index, CodecC
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
-    if (CodecProxyParseGottenCapbility(reply, cap) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: CodecProxyParseGottenCapbility failed!", __func__);
+    if (CodecProxyParseGottenCapability(reply, cap) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: CodecProxyParseGottenCapability failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -151,8 +151,8 @@ int32_t CodecProxyEnumerateCapbility(struct ICodec *self, uint32_t index, CodecC
     return ret;
 }
 
-int32_t CodecProxyGetCapbility(struct ICodec *self, AvCodecMime mime, CodecType type,
-                               uint32_t flags, CodecCapbility *cap)
+int32_t CodecProxyGetCapability(struct ICodec *self, AvCodecMime mime, CodecType type,
+    uint32_t flags, CodecCapability *cap)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -190,8 +190,8 @@ int32_t CodecProxyGetCapbility(struct ICodec *self, AvCodecMime mime, CodecType 
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
-    if (CodecProxyParseGottenCapbility(reply, cap) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: CodecProxyParseGottenCapbility failed!", __func__);
+    if (CodecProxyParseGottenCapability(reply, cap) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: CodecProxyParseGottenCapability failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -199,11 +199,11 @@ int32_t CodecProxyGetCapbility(struct ICodec *self, AvCodecMime mime, CodecType 
     return ret;
 }
 
-int32_t CodecProxyCreate(struct ICodec *self, const char* name, const Param *attr, int len, CODEC_HANDLETYPE *handle)
+int32_t CodecProxyCreate(struct ICodec *self, const char* name, CODEC_HANDLETYPE *handle)
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (self == NULL || name == NULL || attr == NULL || handle == NULL) {
+    if (self == NULL || name == NULL || handle == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
@@ -211,22 +211,6 @@ int32_t CodecProxyCreate(struct ICodec *self, const char* name, const Param *att
         return HDF_FAILURE;
     }
     if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data) || !HdfSbufWriteString(data, name)) {
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufWriteUint32(data, attr->key)) {
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufWriteInt32(data, attr->size)) {
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufWriteBuffer(data, attr->val, attr->size)) {
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufWriteInt32(data, len)) {
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -278,7 +262,8 @@ int32_t CodecProxyDestroy(struct ICodec *self, CODEC_HANDLETYPE handle)
     return ret;
 }
 
-int32_t CodecProxySetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionType type, BufferMode mode)
+int32_t CodecProxySetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle,
+    DirectionType direct, AllocateBufferMode mode, BufferType type)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -296,17 +281,22 @@ int32_t CodecProxySetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle, Dire
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
-        HDF_LOGE("%{public}s: Read size failed!", __func__);
+        HDF_LOGE("%{public}s: write handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)type)) {
-        HDF_LOGE("%{public}s: Read size failed!", __func__);
+    if (!HdfSbufWriteUint32(data, (uint32_t)direct)) {
+        HDF_LOGE("%{public}s: write DirectionType failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, (uint32_t)mode)) {
-        HDF_LOGE("%{public}s: Read size failed!", __func__);
+        HDF_LOGE("%{public}s: write AllocateBufferMode failed!", __func__);
+        CodecProxySBufRecycle(data, reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufWriteUint32(data, (uint32_t)type)) {
+        HDF_LOGE("%{public}s: write BufferType failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -316,6 +306,54 @@ int32_t CodecProxySetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle, Dire
     }
     CodecProxySBufRecycle(data, reply);
     return ret;
+}
+
+int32_t CodecProxyGetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle,
+    DirectionType direct, AllocateBufferMode *mode, BufferType *type)
+{
+    int32_t ret;
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    if (self == NULL || handle == NULL) {
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        return HDF_FAILURE;
+    }
+    if (!HdfRemoteServiceWriteInterfaceToken(self->remote, data)) {
+        HDF_LOGE("write interface token failed");
+        CodecProxySBufRecycle(data, reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
+        HDF_LOGE("%{public}s: write handle failed!", __func__);
+        CodecProxySBufRecycle(data, reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufWriteUint32(data, (uint32_t)direct)) {
+        HDF_LOGE("%{public}s: write DirectionType failed!", __func__);
+        CodecProxySBufRecycle(data, reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ret = CodecProxyCall(self, CMD_CODEC_GET_MODE, data, reply);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
+        CodecProxySBufRecycle(data, reply);
+        return ret;
+    }
+    if (!HdfSbufReadUint32(reply, (uint32_t*)mode)) {
+        HDF_LOGE("%{public}s: read AllocateBufferMode failed!", __func__);
+        CodecProxySBufRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufReadUint32(reply, (uint32_t*)type)) {
+        HDF_LOGE("%{public}s: read BufferType failed!", __func__);
+        CodecProxySBufRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+    CodecProxySBufRecycle(data, reply);
+    return HDF_SUCCESS;
 }
 
 int32_t CodecProxySetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, const Param *params, int paramCnt)
@@ -400,7 +438,7 @@ int32_t CodecProxyGetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, Par
         return ret;
     }
     for (int32_t i = 0; i < paramCnt; i++) {
-        if (CodecProxyParseParam(data, &params[i]) != HDF_SUCCESS) {
+        if (CodecProxyParseParam(reply, &params[i]) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: read params failed!", __func__);
             CodecProxySBufRecycle(data, reply);
             return HDF_ERR_INVALID_PARAM;
@@ -409,6 +447,7 @@ int32_t CodecProxyGetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, Par
     CodecProxySBufRecycle(data, reply);
     return ret;
 }
+
 int32_t CodecProxyStart(struct ICodec *self, CODEC_HANDLETYPE handle)
 {
     int32_t ret;
@@ -439,6 +478,7 @@ int32_t CodecProxyStart(struct ICodec *self, CODEC_HANDLETYPE handle)
     CodecProxySBufRecycle(data, reply);
     return ret;
 }
+
 int32_t CodecProxyStop(struct ICodec *self, CODEC_HANDLETYPE handle)
 {
     int32_t ret;
@@ -469,6 +509,7 @@ int32_t CodecProxyStop(struct ICodec *self, CODEC_HANDLETYPE handle)
     CodecProxySBufRecycle(data, reply);
     return ret;
 }
+
 int32_t CodecProxyFlush(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionType directType)
 {
     int32_t ret;
@@ -504,8 +545,9 @@ int32_t CodecProxyFlush(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionT
     CodecProxySBufRecycle(data, reply);
     return ret;
 }
+
 int32_t CodecPorxyQueueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
-                             const InputInfo *inputData, uint32_t timeoutMs)
+    const CodecBuffer *inputData, uint32_t timeoutMs, int releaseFenceFd)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -528,13 +570,18 @@ int32_t CodecPorxyQueueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (CodecProxyPackInputInfo(data, inputData)) {
+    if (CodecProxyPackCodecBuffer(data, inputData)) {
         HDF_LOGE("%{public}s: write input buffer failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, timeoutMs)) {
         HDF_LOGE("%{public}s: write input timeoutMs failed!", __func__);
+        CodecProxySBufRecycle(data, reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (CodecProxyPackFenceFd(data, releaseFenceFd) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write releaseFenceFd failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -545,9 +592,10 @@ int32_t CodecPorxyQueueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
     CodecProxySBufRecycle(data, reply);
     return ret;
 }
-int32_t CodecProxyDequeInput(struct ICodec *self, CODEC_HANDLETYPE handle, uint32_t timeoutMs, InputInfo *inputData)
+
+int32_t CodecProxyDequeueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
+    uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *inputData)
 {
-    int32_t ret;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     if (self == NULL || handle == NULL || inputData == NULL || inputData->bufferCnt == 0) {
@@ -578,7 +626,7 @@ int32_t CodecProxyDequeInput(struct ICodec *self, CODEC_HANDLETYPE handle, uint3
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = CodecProxyCall(self, CMD_CODEC_DEQUEQUE_INPUT, data, reply);
+    int32_t ret = CodecProxyCall(self, CMD_CODEC_DEQUEQUE_INPUT, data, reply);
     if (ret != HDF_SUCCESS) {
         if (ret != HDF_ERR_TIMEOUT) {
             HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
@@ -586,16 +634,21 @@ int32_t CodecProxyDequeInput(struct ICodec *self, CODEC_HANDLETYPE handle, uint3
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
-    if (CodecProxyParseInputInfo(reply, inputData)) {
-        HDF_LOGE("%{public}s: read struct reply failed!", __func__);
+    if (CodecProxyParseFenceFd(reply, acquireFd) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: read acquireFd failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
+    }
+    if (CodecProxyParseCodecBuffer(reply, inputData)) {
+        HDF_LOGE("%{public}s: read input CodecBuffer failed!", __func__);
+        ret = HDF_ERR_INVALID_PARAM;
     }
     CodecProxySBufRecycle(data, reply);
     return ret;
 }
-int32_t CodecProxyQueueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, OutputInfo *outInfo,
-                              uint32_t timeoutMs, int releaseFenceFd)
+
+int32_t CodecProxyQueueOutput(struct ICodec *self, CODEC_HANDLETYPE handle,
+    CodecBuffer *outInfo, uint32_t timeoutMs, int releaseFenceFd)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -614,22 +667,22 @@ int32_t CodecProxyQueueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, Outp
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint64(data, (uint64_t)(uintptr_t)handle)) {
-        HDF_LOGE("%{public}s: write input handle failed!", __func__);
+        HDF_LOGE("%{public}s: write handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (CodecProxyPackOutputInfo(data, outInfo)) {
-        HDF_LOGE("%{public}s: write output buffer failed!", __func__);
+    if (CodecProxyPackCodecBuffer(data, outInfo)) {
+        HDF_LOGE("%{public}s: write buffer failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, timeoutMs)) {
-        HDF_LOGE("%{public}s: write input timeoutMs failed!", __func__);
+        HDF_LOGE("%{public}s: write timeoutMs failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteFileDescriptor(data, releaseFenceFd)) {
-        HDF_LOGE("%{public}s: write input releaseFenceFd failed!", __func__);
+    if (CodecProxyPackFenceFd(data, releaseFenceFd) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write releaseFenceFd failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -640,8 +693,9 @@ int32_t CodecProxyQueueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, Outp
     CodecProxySBufRecycle(data, reply);
     return ret;
 }
-int32_t CodecProxyDequeueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, uint32_t timeoutMs,
-                                int *acquireFd, OutputInfo *outInfo)
+
+int32_t CodecProxyDequeueOutput(struct ICodec *self, CODEC_HANDLETYPE handle,
+    uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *outInfo)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -661,7 +715,7 @@ int32_t CodecProxyDequeueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, ui
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, timeoutMs)) {
-        HDF_LOGE("%{public}s: write input timeoutMs failed!", __func__);
+        HDF_LOGE("%{public}s: write timeoutMs failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -678,14 +732,13 @@ int32_t CodecProxyDequeueOutput(struct ICodec *self, CODEC_HANDLETYPE handle, ui
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
-    *acquireFd = HdfSbufReadFileDescriptor(reply);
-    if (*acquireFd < 0) {
+    if (CodecProxyParseFenceFd(reply, acquireFd) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read acquireFd failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (CodecProxyParseOutputInfo(reply, outInfo)) {
-        HDF_LOGE("%{public}s: read reply failed!", __func__);
+    if (CodecProxyParseCodecBuffer(reply, outInfo)) {
+        HDF_LOGE("%{public}s: read output CodecBuffer failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -739,18 +792,19 @@ static void CodecIpmlConstruct(struct ICodec *instance)
 {
     instance->CodecInit = CodecPorxyInit;
     instance->CodecDeinit = CodecProxyDeinit;
-    instance->CodecEnumerateCapbility = CodecProxyEnumerateCapbility;
-    instance->CodecGetCapbility = CodecProxyGetCapbility;
+    instance->CodecEnumerateCapability = CodecProxyEnumerateCapability;
+    instance->CodecGetCapability = CodecProxyGetCapability;
     instance->CodecCreate = CodecProxyCreate;
     instance->CodecDestroy = CodecProxyDestroy;
     instance->CodecSetPortMode = CodecProxySetPortMode;
+    instance->CodecGetPortMode = CodecProxyGetPortMode;
     instance->CodecSetParameter = CodecProxySetParameter;
     instance->CodecGetParameter = CodecProxyGetParameter;
     instance->CodecStart = CodecProxyStart;
     instance->CodecStop = CodecProxyStop;
     instance->CodecFlush = CodecProxyFlush;
     instance->CodecQueueInput = CodecPorxyQueueInput;
-    instance->CodecDequeInput = CodecProxyDequeInput;
+    instance->CodecDequeueInput = CodecProxyDequeueInput;
     instance->CodecQueueOutput = CodecProxyQueueOutput;
     instance->CodecDequeueOutput = CodecProxyDequeueOutput;
     instance->CodecSetCallback = CodecProxySetCallback;

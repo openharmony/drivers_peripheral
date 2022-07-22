@@ -177,6 +177,37 @@ typedef enum {
     PROCESS_NONBLOCKING_CONTROL_FLOW  = 0X400,
 } CodecProcessMode;
 
+/**
+ * @brief Enumerate the audio sampling formats.
+ *
+ * For the planar sampling format, the data of each channel is independently stored in data.
+ * For the packed sampling format, only the first data is used, and the data of each channel is interleaved.
+ */
+typedef enum {
+    /** Unsigned 8 bits, packed */
+    AUDIO_SAMPLE_FMT_U8,
+    /** Signed 16 bits, packed */
+    AUDIO_SAMPLE_FMT_S16,
+    /** Signed 32 bits, packed */
+    AUDIO_SAMPLE_FMT_S32,
+    /** Float, packed */
+    AUDIO_SAMPLE_FMT_FLOAT,
+    /** Double, packed */
+    AUDIO_SAMPLE_FMT_DOUBLE,
+    /** Unsigned 8 bits, planar */
+    AUDIO_SAMPLE_FMT_U8P,
+    /** Signed 16 bits, planar */
+    AUDIO_SAMPLE_FMT_S16P,
+    /** Signed 32 bits, planar */
+    AUDIO_SAMPLE_FMT_S32P,
+    /** Float, planar */
+    AUDIO_SAMPLE_FMT_FLOATP,
+    /** Double, planar */
+    AUDIO_SAMPLE_FMT_DOUBLEP,
+    /** Invalid sampling format */
+    AUDIO_SAMPLE_FMT_INVALID,
+} CodecAudioSampleFormat;
+
 #ifdef __cplusplus
 #if __cplusplus
 }

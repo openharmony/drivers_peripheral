@@ -54,11 +54,11 @@ static int32_t SerCodecDeinit(struct HdfDeviceIoClient *client, struct HdfSBuf *
     return errNum;
 }
 
-static int32_t SerCodecEnumerateCapbility(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
+static int32_t SerCodecEnumerateCapability(struct HdfDeviceIoClient *client, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
     uint32_t index;
-    CodecCapbility capbility;
+    CodecCapability Capability;
 
     if (!HdfSbufReadUint32(data, &index)) {
         HDF_LOGE("%{public}s: read index failed!", __func__);
@@ -68,27 +68,27 @@ static int32_t SerCodecEnumerateCapbility(struct HdfDeviceIoClient *client, stru
         HDF_LOGE("%{public}s: codec capabilities not inited!", __func__);
         return HDF_FAILURE;
     }
-    if (CodecEnumerateCapbility(index, &capbility) != HDF_SUCCESS) {
+    if (CodecEnumerateCapability(index, &Capability) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: EnumrateCapablity - no more capability to Enumrate!", __func__);
         return HDF_FAILURE;
     }
-    if (capbility.mime == MEDIA_MIMETYPE_INVALID) {
+    if (Capability.mime == MEDIA_MIMETYPE_INVALID) {
         HDF_LOGE("%{public}s: Capability invalid, discard!", __func__);
         return HDF_FAILURE;
     }
-    if (CodecSerPackCapbility(reply, &capbility) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: write capbility to sbuf failed!", __func__);
+    if (CodecSerPackCapability(reply, &Capability) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write Capability to sbuf failed!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
 
-static int32_t SerCodecGetCapbility(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerCodecGetCapability(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t flags;
     AvCodecMime mime;
     CodecType type;
-    CodecCapbility capbility;
+    CodecCapability Capability;
 
     if (!HdfSbufReadUint32(data, (uint32_t*)&mime)) {
         HDF_LOGE("%{public}s: read input mime failed!", __func__);
@@ -102,12 +102,12 @@ static int32_t SerCodecGetCapbility(struct HdfDeviceIoClient *client, struct Hdf
         HDF_LOGE("%{public}s: read input flags failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (CodecGetCapbility(mime, type, flags, &capbility) != HDF_SUCCESS) {
+    if (CodecGetCapability(mime, type, flags, &Capability) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: GetCapability - got nothing!", __func__);
         return HDF_FAILURE;
     }
-    if (CodecSerPackCapbility(reply, &capbility) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: write capbility to sbuf failed!", __func__);
+    if (CodecSerPackCapability(reply, &Capability) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write Capability to sbuf failed!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -115,31 +115,12 @@ static int32_t SerCodecGetCapbility(struct HdfDeviceIoClient *client, struct Hdf
 
 static int32_t SerCodecCreate(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    int32_t len = 0;
     int32_t errNum;
     uint64_t handle = 0;
-    uint32_t dateSize = 0;
     const char *name = NULL;
-    Param attr;
 
     name = HdfSbufReadString(data);
     if (name == NULL) {
-        HDF_LOGE("%{public}s: Read name failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadUint32(data, (uint32_t *)&attr.key)) {
-        HDF_LOGE("%{public}s: Read name failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadInt32(data, &attr.size)) {
-        HDF_LOGE("%{public}s: Read size failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadBuffer(data, (const void **)&attr.val, &dateSize)) {
-        HDF_LOGE("%{public}s: struct attr's value Read failed", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadInt32(data, &len)) {
         HDF_LOGE("%{public}s: Read name failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -147,7 +128,7 @@ static int32_t SerCodecCreate(struct HdfDeviceIoClient *client, struct HdfSBuf *
         HDF_LOGE("%{public}s: Read handle failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    errNum = CodecCreate(name, (const Param *)&attr, len, (CODEC_HANDLETYPE *)&handle);
+    errNum = CodecCreate(name, (CODEC_HANDLETYPE *)&handle);
     if (errNum != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call CodecCreate fuc failed!", __func__);
         return errNum;
@@ -158,6 +139,7 @@ static int32_t SerCodecCreate(struct HdfDeviceIoClient *client, struct HdfSBuf *
     }
     return errNum;
 }
+
 static int32_t SerCodecDestroy(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t errNum;
@@ -178,27 +160,64 @@ static int32_t SerCodecSetPortMode(struct HdfDeviceIoClient *client, struct HdfS
 {
     int32_t errNum;
     uint64_t handle = 0;
-    DirectionType type;
-    BufferMode mode;
+    DirectionType direct;
+    AllocateBufferMode mode;
+    BufferType type;
 
     if (!HdfSbufReadUint64(data, &handle)) {
-        HDF_LOGE("%{public}s: Read size failed!", __func__);
+        HDF_LOGE("%{public}s: Read handle failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint32(data, (uint32_t*)&type)) {
-        HDF_LOGE("%{public}s: Read size failed!", __func__);
+    if (!HdfSbufReadUint32(data, (uint32_t*)&direct)) {
+        HDF_LOGE("%{public}s: Read DirectionType failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufReadUint32(data, (uint32_t*)&mode)) {
-        HDF_LOGE("%{public}s: Read size failed!", __func__);
+        HDF_LOGE("%{public}s: Read AllocateBufferMode failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    errNum = CodecSetPortMode((CODEC_HANDLETYPE)(uintptr_t)handle, type, mode);
+    if (!HdfSbufReadUint32(data, (uint32_t*)&type)) {
+        HDF_LOGE("%{public}s: Read BufferType failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    errNum = CodecSetPortMode((CODEC_HANDLETYPE)(uintptr_t)handle, direct, mode, type);
     if (errNum != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call CodecSetPortMode fuc failed!", __func__);
         return errNum;
     }
     return errNum;
+}
+
+static int32_t SerCodecGetPortMode(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    int32_t errNum;
+    uint64_t handle = 0;
+    DirectionType direct;
+    AllocateBufferMode mode;
+    BufferType type;
+
+    if (!HdfSbufReadUint64(data, &handle)) {
+        HDF_LOGE("%{public}s: Read handle failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufReadUint32(data, (uint32_t*)&direct)) {
+        HDF_LOGE("%{public}s: Read DirectionType failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    errNum = CodecGetPortMode((CODEC_HANDLETYPE)(uintptr_t)handle, direct, &mode, &type);
+    if (errNum != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call CodecSetPortMode fuc failed!", __func__);
+        return errNum;
+    }
+    if (!HdfSbufWriteUint32(reply, (uint32_t)mode)) {
+        HDF_LOGE("%{public}s: write AllocateBufferMode failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufWriteUint32(reply, (uint32_t)type)) {
+        HDF_LOGE("%{public}s: write BufferType failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HDF_SUCCESS;
 }
 
 static void FreeParams(Param *params, int32_t paramCnt)
@@ -255,6 +274,7 @@ static int32_t SerCodecSetParameter(struct HdfDeviceIoClient *client, struct Hdf
     FreeParams(params, paramCnt);
     return errNum;
 }
+
 static int32_t SerCodecGetParameter(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t errNum;
@@ -303,6 +323,7 @@ static int32_t SerCodecGetParameter(struct HdfDeviceIoClient *client, struct Hdf
     FreeParams(params, paramCnt);
     return errNum;
 }
+
 static int32_t SerCodecStart(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t errNum;
@@ -334,6 +355,7 @@ static int32_t SerCodecStop(struct HdfDeviceIoClient *client, struct HdfSBuf *da
     }
     return errNum;
 }
+
 static int32_t SerCodecFlush(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint64_t handle = 0;
@@ -353,54 +375,65 @@ static int32_t SerCodecFlush(struct HdfDeviceIoClient *client, struct HdfSBuf *d
     }
     return errNum;
 }
-int32_t SerCodecQueueInput(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
+
+static int32_t SerCodecQueueInput(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t timeoutMs = 0;
+    int releaseFenceFd = -1;
     uint64_t handle = 0;
-    uint32_t bufCnt;
-    InputInfo inputData = {0};
+    uint32_t bufCnt = 0;
+    CodecBuffer *inputData = NULL;
     if (!HdfSbufReadUint64(data, &handle)) {
         HDF_LOGE("%{public}s: read handle data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint32(data, (uint32_t *)&inputData.bufferCnt)) {
+    if (!HdfSbufReadUint32(data, &bufCnt)) {
         HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    bufCnt = inputData.bufferCnt;
     if (bufCnt <= 0) {
         HDF_LOGE("%{public}s: Param bufCnt err!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    inputData.buffers = (CodecBufferInfo *)OsalMemAlloc(sizeof(CodecBufferInfo) * bufCnt);
-    if (inputData.buffers == NULL) {
+    inputData = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * bufCnt);
+    if (inputData == NULL) {
         HDF_LOGE("%{public}s: OsalMemAlloc failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_ERR_MALLOC_FAIL;
     }
-    if (CodecSerParseInputInfo(data, &inputData)) {
+    inputData->bufferCnt = bufCnt;
+    if (CodecSerParseCodecBuffer(data, inputData)) {
         HDF_LOGE("%{public}s: read inputData failed!", __func__);
-        OsalMemFree(inputData.buffers);
+        OsalMemFree(inputData);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufReadUint32(data, &timeoutMs)) {
         HDF_LOGE("%{public}s: read timeoutMs data failed!", __func__);
-        OsalMemFree(inputData.buffers);
+        OsalMemFree(inputData);
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t errNum = CodecQueueInput((CODEC_HANDLETYPE)(uintptr_t)handle, &inputData, timeoutMs);
+    if (CodecSerParseFenceFd(data, &releaseFenceFd) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: read releaseFenceFd failed!", __func__);
+        OsalMemFree(inputData);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    int32_t errNum = CodecQueueInput((CODEC_HANDLETYPE)(uintptr_t)handle, inputData, timeoutMs, releaseFenceFd);
     if (errNum != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call CodecQueueInput fuc failed!", __func__);
-        OsalMemFree(inputData.buffers);
+        OsalMemFree(inputData);
         return errNum;
     }
-    OsalMemFree(inputData.buffers);
-    return errNum;
+
+    OsalMemFree(inputData);
+    return HDF_SUCCESS;
 }
-static int32_t SerCodecDequeInput(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
+
+static int32_t SerCodecDequeueInput(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t timeoutMs = 0;
     uint64_t handle = 0;
-    InputInfo inputData = {0};
+    uint32_t bufCnt = 0;
+    int32_t acquireFd = 0;
+    CodecBuffer *inputData = NULL;
     if (!HdfSbufReadUint64(data, &handle)) {
         HDF_LOGE("%{public}s: read handle data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -409,85 +442,100 @@ static int32_t SerCodecDequeInput(struct HdfDeviceIoClient *client, struct HdfSB
         HDF_LOGE("%{public}s: read timeoutMs data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint32(data, &inputData.bufferCnt)) {
-        HDF_LOGE("%{public}s: read bufferCnt data failed!", __func__);
+    if (!HdfSbufReadUint32(data, &bufCnt)) {
+        HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (inputData.bufferCnt <= 0) {
-        HDF_LOGE("%{public}s: Param bufferCnt err!", __func__);
+    if (bufCnt <= 0) {
+        HDF_LOGE("%{public}s: Param bufCnt err!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    inputData.buffers = (CodecBufferInfo *)OsalMemAlloc(sizeof(CodecBufferInfo) * (inputData.bufferCnt));
-    if (inputData.buffers == NULL) {
+    inputData = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * bufCnt);
+    if (inputData == NULL) {
         HDF_LOGE("%{public}s: OsalMemAlloc failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_ERR_MALLOC_FAIL;
     }
-    int32_t errNum = CodecDequeInput((CODEC_HANDLETYPE)(uintptr_t)handle, timeoutMs, &inputData);
+    inputData->bufferCnt = bufCnt;
+    int32_t errNum = CodecDequeueInput((CODEC_HANDLETYPE)(uintptr_t)handle, timeoutMs, &acquireFd, inputData);
     if (errNum != HDF_SUCCESS) {
         if (errNum != HDF_ERR_TIMEOUT) {
             HDF_LOGE("%{public}s: call CodecDequeInput fuc failed!", __func__);
         }
-        OsalMemFree(inputData.buffers);
+        OsalMemFree(inputData);
         return errNum;
     }
-    if (CodecSerPackInputInfo(reply, &inputData)) {
-        HDF_LOGE("%{public}s: struct inputData write failed!", __func__);
-        OsalMemFree(inputData.buffers);
+    if (CodecSerPackFenceFd(reply, acquireFd) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write acquireFd failed!", __func__);
+        OsalMemFree(inputData);
         return HDF_ERR_INVALID_PARAM;
     }
-    OsalMemFree(inputData.buffers);
-    return errNum;
+    if (CodecSerPackCodecBuffer(reply, inputData)) {
+        HDF_LOGE("%{public}s: struct inputData write failed!", __func__);
+        OsalMemFree(inputData);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    OsalMemFree(inputData);
+    return HDF_SUCCESS;
 }
+
 static int32_t SerCodecQueueOutput(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t timeoutMs = 0;
-    int releaseFenceFd = 1;
+    int releaseFenceFd = -1;
     uint64_t handle = 0;
-    uint32_t bufCnt;
-    OutputInfo outInfo = {0};
+    uint32_t bufCnt = 0;
+    CodecBuffer *outInfo = NULL;
     if (!HdfSbufReadUint64(data, &handle)) {
         HDF_LOGE("%{public}s: read handle data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint32(data, (uint32_t *)&outInfo.bufferCnt)) {
+    if (!HdfSbufReadUint32(data, &bufCnt)) {
         HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    bufCnt = outInfo.bufferCnt;
     if (bufCnt <= 0) {
-        HDF_LOGE("%{public}s: Param bufferCnt err!", __func__);
+        HDF_LOGE("%{public}s: Param bufCnt err!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    outInfo.buffers = (CodecBufferInfo *)OsalMemAlloc(sizeof(CodecBufferInfo) * bufCnt);
-    if (outInfo.buffers == NULL) {
+    outInfo = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * bufCnt);
+    if (outInfo == NULL) {
         HDF_LOGE("%{public}s: OsalMemAlloc failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_ERR_MALLOC_FAIL;
     }
-    if (CodecSerParseOutputInfo(data, &outInfo)) {
+    outInfo->bufferCnt = bufCnt;
+    if (CodecSerParseCodecBuffer(data, outInfo)) {
         HDF_LOGE("%{public}s: read struct data failed!", __func__);
-        OsalMemFree(outInfo.buffers);
+        OsalMemFree(outInfo);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufReadUint32(data, &timeoutMs)) {
         HDF_LOGE("%{public}s: read timeoutMs data failed!", __func__);
-        OsalMemFree(outInfo.buffers);
+        OsalMemFree(outInfo);
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t errNum = CodecQueueOutput((CODEC_HANDLETYPE)(uintptr_t)handle, &outInfo, timeoutMs, releaseFenceFd);
+    if (CodecSerParseFenceFd(data, &releaseFenceFd) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: read releaseFenceFd failed!", __func__);
+        OsalMemFree(outInfo);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    int32_t errNum = CodecQueueOutput((CODEC_HANDLETYPE)(uintptr_t)handle, outInfo, timeoutMs, releaseFenceFd);
     if (errNum != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call CodecQueueOutput fuc failed!", __func__);
-        OsalMemFree(outInfo.buffers);
+        OsalMemFree(outInfo);
         return errNum;
     }
-    OsalMemFree(outInfo.buffers);
-    return errNum;
+
+    OsalMemFree(outInfo);
+    return HDF_SUCCESS;
 }
+
 static int32_t SerCodecDequeueOutput(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     uint32_t timeoutMs = 0;
-    int acquireFd = 0;
+    int32_t acquireFd = 0;
     uint64_t handle = 0;
-    OutputInfo outInfo = {0};
+    uint32_t bufCnt = 0;
+    CodecBuffer *outInfo = NULL;
     if (!HdfSbufReadUint64(data, &handle)) {
         HDF_LOGE("%{public}s: read handle data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -496,35 +544,41 @@ static int32_t SerCodecDequeueOutput(struct HdfDeviceIoClient *client, struct Hd
         HDF_LOGE("%{public}s: read timeoutMs data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint32(data, &outInfo.bufferCnt)) {
-        HDF_LOGE("%{public}s: read bufferCnt data failed!", __func__);
+    if (!HdfSbufReadUint32(data, &bufCnt)) {
+        HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    outInfo.buffers = (CodecBufferInfo *)OsalMemAlloc(sizeof(CodecBufferInfo) * (outInfo.bufferCnt));
-    if (outInfo.buffers == NULL) {
+    if (bufCnt <= 0) {
+        HDF_LOGE("%{public}s: Param bufCnt err!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    outInfo = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * bufCnt);
+    if (outInfo == NULL) {
         HDF_LOGE("%{public}s: OsalMemAlloc failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_ERR_MALLOC_FAIL;
     }
-    int32_t errNum = CodecDequeueOutput((CODEC_HANDLETYPE)(uintptr_t)handle, timeoutMs, &acquireFd, &outInfo);
+    outInfo->bufferCnt = bufCnt;
+
+    int32_t errNum = CodecDequeueOutput((CODEC_HANDLETYPE)(uintptr_t)handle, timeoutMs, &acquireFd, outInfo);
     if (errNum != HDF_SUCCESS) {
         if (errNum != HDF_ERR_TIMEOUT) {
             HDF_LOGE("%{public}s: call CodecDequeueOutput fuc failed!", __func__);
         }
-        OsalMemFree(outInfo.buffers);
+        OsalMemFree(outInfo);
         return errNum;
     }
-    if (!HdfSbufWriteFileDescriptor(reply, acquireFd)) {
+    if (CodecSerPackFenceFd(reply, acquireFd) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: write acquireFd failed!", __func__);
-        OsalMemFree(outInfo.buffers);
+        OsalMemFree(outInfo);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (CodecSerPackOutputInfo(reply, &outInfo)) {
+    if (CodecSerPackCodecBuffer(reply, outInfo)) {
         HDF_LOGE("%{public}s: write outInfo buffer failed!", __func__);
-        OsalMemFree(outInfo.buffers);
+        OsalMemFree(outInfo);
         return HDF_ERR_INVALID_PARAM;
     }
-    OsalMemFree(outInfo.buffers);
-    return errNum;
+    OsalMemFree(outInfo);
+    return HDF_SUCCESS;
 }
 
 static int32_t SerCodecSetCallback(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
@@ -554,33 +608,26 @@ static int32_t SerCodecSetCallback(struct HdfDeviceIoClient *client, struct HdfS
     return errNum;
 }
 
-int32_t CodecServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdId,
+int32_t HandleRequestCmd(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
-        HDF_LOGE("check interface token failed");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if ((cmdId == CMD_CODEC_ENUM_CAP) || (cmdId == CMD_CODEC_GET_CAP)) {
-        if (!CodecCapablitesInited()) {
-            ReloadCapabilities();
-        }
-    }
     switch (cmdId) {
         case CMD_CODEC_INIT:
             return SerCodecInit(client, data, reply);
         case CMD_CODEC_DEINIT:
             return SerCodecDeinit(client, data, reply);
         case CMD_CODEC_ENUM_CAP:
-            return SerCodecEnumerateCapbility(client, data, reply);
+            return SerCodecEnumerateCapability(client, data, reply);
         case CMD_CODEC_GET_CAP:
-            return SerCodecGetCapbility(client, data, reply);
+            return SerCodecGetCapability(client, data, reply);
         case CMD_CODEC_CREATE:
             return SerCodecCreate(client, data, reply);
         case CMD_CODEC_DESTROY:
             return SerCodecDestroy(client, data, reply);
         case CMD_CODEC_SET_MODE:
             return SerCodecSetPortMode(client, data, reply);
+        case CMD_CODEC_GET_MODE:
+            return SerCodecGetPortMode(client, data, reply);
         case CMD_CODEC_SET_PARAMS:
             return SerCodecSetParameter(client, data, reply);
         case CMD_CODEC_GET_PARAMS:
@@ -594,7 +641,7 @@ int32_t CodecServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdId,
         case CMD_CODEC_QUEQUE_INPUT:
             return SerCodecQueueInput(client, data, reply);
         case CMD_CODEC_DEQUEQUE_INPUT:
-            return SerCodecDequeInput(client, data, reply);
+            return SerCodecDequeueInput(client, data, reply);
         case CMD_CODEC_QUEQUE_OUTPUT:
             return SerCodecQueueOutput(client, data, reply);
         case CMD_CODEC_DEQUEQUE_OUTPUT:
@@ -606,4 +653,19 @@ int32_t CodecServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdId,
             return HDF_ERR_INVALID_PARAM;
         }
     }
+}
+
+int32_t CodecServiceOnRemoteRequest(struct HdfDeviceIoClient *client, int cmdId,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
+        HDF_LOGE("check interface token failed");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if ((cmdId == CMD_CODEC_ENUM_CAP) || (cmdId == CMD_CODEC_GET_CAP)) {
+        if (!CodecCapablitesInited()) {
+            ReloadCapabilities();
+        }
+    }
+    return HandleRequestCmd(client, cmdId, data, reply);
 }
