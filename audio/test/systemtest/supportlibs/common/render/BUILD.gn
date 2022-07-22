@@ -87,7 +87,7 @@ if (defined(ohos_lite)) {
       "utils_base:utils",
     ]
     defines = []
-    if (enable_audio_adm_so) {
+    if (enable_audio_adm_passthrough) {
       defines += [ "AUDIO_ADM_SO" ]
     }
     if (enable_audio_adm_service) {

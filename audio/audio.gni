@@ -46,7 +46,7 @@ enable_audio_hal_hdf_log = true
 
 # testcase build switch
 #If flag is true, the ADM_SO version testcase will be built; if set flag is false, the other version will be built.
-enable_audio_adm_so = false
+enable_audio_adm_passthrough = false
 
 #If flag is true, the ADM_SERVICE version testcase will be built; if set flag is false, the other version will be built.
 enable_audio_adm_service = true
