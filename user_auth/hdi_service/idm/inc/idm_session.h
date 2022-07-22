@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-ResultCode OpenEditSession(int32_t userId, uint64_t *challenge);
+ResultCode OpenEditSession(int32_t userId, uint8_t *challenge, uint32_t challengeLen);
 ResultCode CloseEditSession();
 
 ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, bool isUpdate);
@@ -33,7 +33,7 @@ void BreakOffCoauthSchedule(void);
 bool IsSessionTimeout(void);
 bool IsSessionValid(int32_t userId);
 ResultCode GetUserId(int32_t *userId);
-ResultCode GetChallenge(uint64_t *challenge);
+ResultCode CheckChallenge(uint8_t *challenge, uint32_t challengeLen);
 ResultCode GetIsUpdate(bool *isUpdate);
 ResultCode GetEnrollScheduleInfo(uint64_t *scheduleId, uint32_t *authType);
 

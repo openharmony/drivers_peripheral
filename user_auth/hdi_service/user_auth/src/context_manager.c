@@ -58,9 +58,13 @@ static UserAuthContext *InitAuthContext(AuthSolutionHal params)
         return NULL;
     }
     (void)memset_s(context, sizeof(UserAuthContext), 0, sizeof(UserAuthContext));
+    if (memcpy_s(context->challenge, CHALLENGE_LEN, params.challenge, CHALLENGE_LEN) != EOK) {
+        LOG_ERROR("failed to copy challenge");
+        Free(context);
+        return NULL;
+    }
     context->contextId = params.contextId;
     context->userId = params.userId;
-    context->challenge = params.challenge;
     context->authType = params.authType;
     context->authTrustLevel = params.authTrustLevel;
     context->collectorSensorHint = params.executorSensorHint;
@@ -123,9 +127,13 @@ static UserAuthContext *InitIdentifyContext(const IdentifyParam *params)
         return NULL;
     }
     (void)memset_s(context, sizeof(UserAuthContext), 0, sizeof(UserAuthContext));
+    if (memcpy_s(context->challenge, CHALLENGE_LEN, params->challenge, CHALLENGE_LEN) != EOK) {
+        LOG_ERROR("failed to copy challenge");
+        Free(context);
+        return NULL;
+    }
     context->contextId = params->contextId;
     context->authType = params->authType;
-    context->challenge = params->challenge;
     context->collectorSensorHint = params->executorSensorHint;
     context->scheduleList = CreateLinkedList(DestroyScheduleNode);
     if (context->scheduleList == NULL) {

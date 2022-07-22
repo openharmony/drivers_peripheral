@@ -29,7 +29,7 @@ extern "C" {
 typedef struct UserAuthContext {
     uint64_t contextId;
     int32_t userId;
-    uint64_t challenge;
+    uint8_t challenge[CHALLENGE_LEN];
     uint32_t authType;
     uint32_t authTrustLevel;
     uint32_t collectorSensorHint;
@@ -39,7 +39,7 @@ typedef struct UserAuthContext {
 typedef struct {
     uint64_t contextId;
     int32_t userId;
-    uint64_t challenge;
+    uint8_t challenge[CHALLENGE_LEN];
     uint32_t authType;
     uint32_t authTrustLevel;
     uint32_t executorSensorHint;
@@ -47,7 +47,7 @@ typedef struct {
 
 typedef struct IdentifyParam {
     uint64_t contextId;
-    uint64_t challenge;
+    uint8_t challenge[CHALLENGE_LEN];
     uint32_t authType;
     uint32_t executorSensorHint;
 } IdentifyParam;

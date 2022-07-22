@@ -25,7 +25,6 @@
 
 #define SESSION_VALIDITY_PERIOD (10 * 60 * 1000)
 #define MAX_CHALLENGE_GENERATION_TIMES 5
-#define INVALID_CHALLENGE 0
 
 // User IDM session information.
 struct SessionInfo {
@@ -33,7 +32,7 @@ struct SessionInfo {
     uint32_t authType;
     uint64_t time;
     uint64_t validAuthTokenTime;
-    uint64_t challenge;
+    uint8_t challenge[CHALLENGE_LEN];
     uint64_t scheduleId;
     bool isUpdate;
     bool isScheduleValid;
@@ -48,28 +47,31 @@ static bool IsSessionExist()
     return true;
 }
 
-static uint64_t GenerateChallenge()
+static ResultCode GenerateChallenge(uint8_t *challenge, uint32_t challengeLen)
 {
-    uint64_t challenge = 0;
-
     for (uint32_t i = 0; i < MAX_CHALLENGE_GENERATION_TIMES; ++i) {
-        if (SecureRandom((uint8_t *)&challenge, sizeof(uint64_t)) != RESULT_SUCCESS) {
+        if (SecureRandom(challenge, challengeLen) != RESULT_SUCCESS) {
             LOG_ERROR("get challenge failed");
-            return INVALID_CHALLENGE;
+            return RESULT_GENERAL_ERROR;
         }
-        if (challenge != INVALID_CHALLENGE) {
-            break;
+        for (uint32_t j = 0; j < challengeLen; j++) {
+            if (challenge[j] != 0) {
+                return RESULT_SUCCESS;
+            }
         }
+        LOG_INFO("challenge is invalid, get again.");
     }
-    return challenge;
+    LOG_ERROR("a rare failture");
+    return RESULT_GENERAL_ERROR;
 }
 
-ResultCode OpenEditSession(int32_t userId, uint64_t *challenge)
+ResultCode OpenEditSession(int32_t userId, uint8_t *challenge, uint32_t challengeLen)
 {
-    if (challenge == NULL) {
+    if (challenge == NULL || challengeLen != CHALLENGE_LEN) {
         LOG_ERROR("challenge is null");
         return RESULT_BAD_PARAM;
     }
+    (void)memset_s(challenge, CHALLENGE_LEN, 0, CHALLENGE_LEN);
     if (IsSessionExist()) {
         (void)CloseEditSession();
     }
@@ -85,17 +87,22 @@ ResultCode OpenEditSession(int32_t userId, uint64_t *challenge)
         return RESULT_GENERAL_ERROR;
     }
     g_session->userId = userId;
-    g_session->challenge = GenerateChallenge();
-    if (g_session->challenge == INVALID_CHALLENGE) {
-        LOG_ERROR("challenge is invalid");
+    ResultCode ret = GenerateChallenge(g_session->challenge, CHALLENGE_LEN);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("failed to generate challenge");
         Free(g_session);
         g_session = NULL;
-        return RESULT_GENERAL_ERROR;
+        return ret;
     }
     g_session->time = GetSystemTime();
     g_session->validAuthTokenTime = g_session->time;
 
-    *challenge = g_session->challenge;
+    if (memcpy_s(challenge, CHALLENGE_LEN, g_session->challenge, CHALLENGE_LEN) != EOK) {
+        LOG_ERROR("failed to copy challenge");
+        Free(g_session);
+        g_session = NULL;
+        return ret;
+    }
     g_session->isScheduleValid = false;
     return RESULT_SUCCESS;
 }
@@ -138,13 +145,20 @@ ResultCode GetUserId(int32_t *userId)
     return RESULT_SUCCESS;
 }
 
-ResultCode GetChallenge(uint64_t *challenge)
+ResultCode CheckChallenge(uint8_t *challenge, uint32_t challengeLen)
 {
-    if (challenge == NULL || !IsSessionExist()) {
+    if (challenge == NULL || challengeLen != CHALLENGE_LEN) {
         LOG_ERROR("param is invalid");
         return RESULT_BAD_PARAM;
     }
-    *challenge = g_session->challenge;
+    if (!IsSessionExist()) {
+        LOG_ERROR("param is invalid");
+        return RESULT_NEED_INIT;
+    }
+    if (memcmp(challenge, g_session->challenge, CHALLENGE_LEN) != EOK) {
+        LOG_ERROR("failed to compare challenge");
+        return RESULT_BAD_MATCH;
+    }
     return RESULT_SUCCESS;
 }
 
@@ -215,7 +229,7 @@ ResultCode GetIsUpdate(bool *isUpdate)
 
 bool IsSessionValid(int32_t userId)
 {
-    if (!IsSessionExist()) {
+    if (!IsSessionExist() || IsSessionTimeout()) {
         return false;
     }
     if (g_session->userId == userId) {
