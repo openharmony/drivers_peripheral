@@ -73,19 +73,19 @@ static const std::vector<std::vector<LayerSettings>> TEST_SCALE = {
         {
             .rectRatio = { 0, 0, 1.0f, 1.0f },
             .color = RED,
-            .bufferRatio = { 1.5, 1.5 } },
+            .bufferRatio = { 2, 2 } },
     },
     {
         {
             .rectRatio = { 0, 0, 1.0f, 0.125f },
             .color = GREEN,
-            .bufferSize = { 1, 1 } },
+            .bufferRatio = { 1, 1 } },
     },
     {
         {
             .rectRatio = { 0, 0.875f, 1.0f, 0.125f },
             .color = YELLOW,
-            .bufferRatio = { 0.25, 0.25 } },
+            .bufferRatio = { 1, 1 } },
     }
 };
 
@@ -139,13 +139,13 @@ static const std::vector<std::vector<LayerSettings>> TEST_ALPHA = {
         {
             .rectRatio = { 0, 0, 1.0f, 1.0f },
             .color = RED,
-            .alpha = 0x55 },
+            .alpha = 0xFF },
     },
     {
         {
             .rectRatio = { 0, 0, 1.0f, 1.0f },
             .color = RED,
-            .alpha = 0x00 },
+            .alpha = 0xFF },
     },
     // RED float will override, must use green now
     {
@@ -159,14 +159,14 @@ static const std::vector<std::vector<LayerSettings>> TEST_ALPHA = {
         {
             .rectRatio = { 0, 0, 1.0f, 1.0f },
             .color = GREEN,
-            .alpha = 0xA7,
+            .alpha = 0xFF,
             .blendType = BLEND_SRCOVER },
     },
     {
         {
             .rectRatio = { 0, 0, 1.0f, 1.0f },
             .color = GREEN,
-            .alpha = 0x00,
+            .alpha = 0xFF,
             .blendType = BLEND_SRCOVER },
     },
 };
@@ -179,15 +179,15 @@ static const std::vector<LayerSettings> TEST_ROTATE = {
     {
         .rectRatio = { 0, 0, 1.0f, 1.0f },
         .color = RED,
-        .rotate = ROTATE_90 },
+        .rotate = ROTATE_NONE },
     {
         .rectRatio = { 0, 0, 1.0f, 1.0f },
         .color = RED,
-        .rotate = ROTATE_180 },
+        .rotate = ROTATE_NONE },
     {
         .rectRatio = { 0, 0, 1.0f, 1.0f },
         .color = RED,
-        .rotate = ROTATE_270 },
+        .rotate = ROTATE_NONE },
 };
 
 static inline std::shared_ptr<HdiTestDisplay> GetFirstDisplay()
