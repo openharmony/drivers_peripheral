@@ -141,7 +141,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest002, TestSize.Level1)
     char cpuBuf[MAX_PATH] = {0};
     char freqValue[MAX_PATH] = {0};
 
-    if (snprintf_s(cpuBuf, PATH_MAX, sizeof(cpuBuf) - 1, CPU_FREQ_PATH.c_str()) < HDF_SUCCESS) {
+    if (snprintf_s(cpuBuf, MAX_PATH, sizeof(cpuBuf) - 1, CPU_FREQ_PATH.c_str()) < EOK) {
         return;
     }
 
@@ -174,7 +174,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest003, TestSize.Level1)
     char cpuBuf[MAX_PATH] = {0};
     char freqValue[MAX_PATH] = {0};
 
-    if (snprintf_s(cpuBuf, PATH_MAX, sizeof(cpuBuf) - 1, GPU_FREQ_PATH.c_str()) < HDF_SUCCESS) {
+    if (snprintf_s(cpuBuf, MAX_PATH, sizeof(cpuBuf) - 1, GPU_FREQ_PATH.c_str()) < EOK) {
         return;
     }
 
@@ -207,7 +207,7 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest004, TestSize.Level1)
     char cpuBuf[MAX_PATH] = {0};
     char currentValue[MAX_PATH] = {0};
 
-    if (snprintf_s(cpuBuf, PATH_MAX, sizeof(cpuBuf) - 1, BATTERY_CHARGER_CURRENT_PATH.c_str()) < HDF_SUCCESS) {
+    if (snprintf_s(cpuBuf, MAX_PATH, sizeof(cpuBuf) - 1, BATTERY_CHARGER_CURRENT_PATH.c_str()) < EOK) {
         return;
     }
 
