@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -12,20 +12,19 @@
 # limitations under the License.
 
 if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
-  group("hdf_test_usb") {
-    testonly = true
-    deps = [
-      "moduletest:hdf_peripheral_usb_test_module",
-      "//drivers/peripheral/usb/sample/device/liteos:usb_dev_test",
-      "//drivers/peripheral/usb/sample/host:usbhost_ddk_test",
-      "//drivers/peripheral/usb/sample/host/liteos_test:liteos_host_speed_test",
-    ]
-  }
 } else {
-  group("hdf_test_usb") {
+  import("//build/test.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("//drivers/peripheral/audio/audio.gni")
+}
+
+group("hdi_hardwaredependence") {
+  if (!defined(ohos_lite)) {
     testonly = true
-    deps = [ "unittest/hal:hal_test" ]
   }
+  deps = [
+    "capture:hdf_audio_hdi_capture_hardware_dependence_test",
+    "render:hdf_audio_hdi_render_hardware_dependence_test",
+  ]
 }
