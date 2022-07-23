@@ -116,12 +116,7 @@ private:
     int32_t GetRequestMsgData(
         HostDevice *port, UsbdRequestASync *reqMsg, int32_t timeout, uint8_t **buffer, uint32_t *length);
 
-    inline int32_t BindUsbSubscriber(const sptr<IUsbdSubscriber> &subscriber)
-    {
-        subscriber_ = subscriber;
-        UsbdAddDevicesOnStart();
-        return HDF_SUCCESS;
-    }
+    int32_t BindUsbSubscriber(const sptr<IUsbdSubscriber> &subscriber);
 
     inline int32_t UnbindUsbSubscriber()
     {
