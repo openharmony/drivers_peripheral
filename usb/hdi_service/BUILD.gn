@@ -60,6 +60,8 @@ ohos_shared_library("libusb_interface_service_1.0") {
     "src/usbd_port.cpp",
   ]
 
+  configs = [ ":usbd_private_config" ]
+
   public_configs = [ ":usbd_public_config" ]
 
   deps = [ "${usb_driver_path}/ddk:libusb_core" ]
@@ -95,6 +97,8 @@ ohos_shared_library("libusb_driver") {
     ":libusb_interface_service_1.0",
     "//drivers/interface/usb/v1_0:libusb_stub_1.0",
   ]
+
+  configs = [ ":usbd_private_config" ]
 
   public_configs = [ ":usbd_public_config" ]
 
