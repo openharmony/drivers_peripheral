@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,6 +38,10 @@
 
 #include "usb_ddk.h"
 #include "usb_session.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Defines the maximum number of USB interfaces.
@@ -509,6 +513,10 @@ int32_t UsbRawCancelRequest(const struct UsbRawRequest *request);
  * otherwise.
  */
 int32_t UsbRawHandleRequests(const UsbRawHandle *devHandle);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* USB_RAW_API_H */
 /** @} */
