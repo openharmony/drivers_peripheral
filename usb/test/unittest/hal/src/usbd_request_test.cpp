@@ -17,9 +17,9 @@
 #include <iostream>
 #include <vector>
 #include "hdf_log.h"
-#include "usbd_client.h"
 #include "UsbSubscriberTest.h"
-#include "usb_errors.h"
+#include "v1_0/iusb_interface.h"
+#include "v1_0/usb_types.h"
 
 const int SLEEP_TIME = 3;
 const uint8_t BUS_NUM_255 = 255;
@@ -33,53 +33,62 @@ const int TAG_NUM_11 = 11;
 const uint8_t INTERFACEID_1 = 1;
 const int32_t INT32_INTERFACEID_1 = 1;
 const uint8_t POINTID_1 = 1;
-const uint8_t POINTID_129 = 129;
+const uint8_t POINTID_129 = 130;
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
+using namespace OHOS::HDI::Usb::V1_0;
+
+namespace {
+    sptr<IUsbInterface> g_usbInterface = nullptr;
+}
 
 struct UsbDev UsbdRequestTest::dev_ = {0, 0};
 
 void UsbdRequestTest::SetUpTestCase(void)
 {
-    auto ret = UsbdClient::GetInstance().SetPortRole(1, 1, 1);
+    g_usbInterface = IUsbInterface::Get();
+    if (g_usbInterface == nullptr) {
+        HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->SetPortRole(1, 1, 1);
     sleep(SLEEP_TIME);
-    HDF_LOGI("UsbdFunctionTest::[Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    HDF_LOGI("UsbdRequestTest::[Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     if (ret != 0) {
         exit(0);
     }
 
     sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (UsbdClient::GetInstance().BindUsbdSubscriber(subscriber) != UEC_OK) {
+    if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: bind usbd subscriber failed", __func__);
         exit(0);
     }
-    dev_ = {subscriber->busNum_, subscriber->devAddr_};
 
     std::cout << "please connect device, press enter to continue" << std::endl;
     int c;
-    while ((c = getchar()) != '\n' && c != EOF) {
-    }
+    while ((c = getchar()) != '\n' && c != EOF) {}
+    dev_ = {subscriber->busNum_, subscriber->devAddr_};
 
-    ret = UsbdClient::GetInstance().OpenDevice(dev_);
+    ret = g_usbInterface->OpenDevice(dev_);
     HDF_LOGI("UsbdRequestTest:: %{public}d OpenDevice=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 void UsbdRequestTest::TearDownTestCase(void)
 {
     sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (UsbdClient::GetInstance().BindUsbdSubscriber(subscriber) != UEC_OK) {
+    if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: bind usbd subscriber failed", __func__);
         exit(0);
     }
     dev_ = {subscriber->busNum_, subscriber->devAddr_};
-    auto ret = UsbdClient::GetInstance().CloseDevice(dev_);
+    auto ret = g_usbInterface->CloseDevice(dev_);
     HDF_LOGI("UsbdRequestTest:: %{public}d Close=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 void UsbdRequestTest::SetUp(void) {}
@@ -97,9 +106,9 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig001, TestSize.Level1)
 {
     uint8_t configIndex = 1;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().SetConfig(dev, configIndex);
+    auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfigConfig001 %{public}d SetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -113,9 +122,9 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig002, TestSize.Level1)
 {
     uint8_t configIndex = 1;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
-    auto ret = UsbdClient::GetInstance().SetConfig(dev, configIndex);
+    auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig002 %{public}d SetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -129,9 +138,9 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig003, TestSize.Level1)
 {
     uint8_t configIndex = 1;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
-    auto ret = UsbdClient::GetInstance().SetConfig(dev, configIndex);
+    auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig003 %{public}d SetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -145,12 +154,12 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig004, TestSize.Level1)
 {
     uint8_t configIndex = 222;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().SetConfig(dev, configIndex);
-    ASSERT_TRUE(ret != 0);
+    auto ret = g_usbInterface->SetConfig(dev, configIndex);
+    ASSERT_NE(ret, 0);
     configIndex = 1;
-    ret = UsbdClient::GetInstance().SetConfig(dev, configIndex);
+    ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig004 %{public}d SetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -164,9 +173,9 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig005, TestSize.Level1)
 {
     uint8_t configIndex = 1;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
-    auto ret = UsbdClient::GetInstance().SetConfig(dev, configIndex);
+    auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig005 %{public}d SetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -180,9 +189,9 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig006, TestSize.Level1)
 {
     uint8_t configIndex = 222;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
-    auto ret = UsbdClient::GetInstance().SetConfig(dev, configIndex);
+    auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig006 %{public}d SetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -196,9 +205,9 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig007, TestSize.Level1)
 {
     uint8_t configIndex = 222;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
-    auto ret = UsbdClient::GetInstance().SetConfig(dev, configIndex);
+    auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig007 %{public}d SetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -212,9 +221,9 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig008, TestSize.Level1)
 {
     uint8_t configIndex = 222;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
-    auto ret = UsbdClient::GetInstance().SetConfig(dev, configIndex);
+    auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig008 %{public}d SetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**********************************************************************************************************/
@@ -230,9 +239,9 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfig001, TestSize.Level1)
 {
     uint8_t configIndex = 1;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().GetConfig(dev, configIndex);
+    auto ret = g_usbInterface->GetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfig001 %{public}d GetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -246,9 +255,9 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfig002, TestSize.Level1)
 {
     uint8_t configIndex = 1;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
-    auto ret = UsbdClient::GetInstance().GetConfig(dev, configIndex);
+    auto ret = g_usbInterface->GetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfig002 %{public}d GetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -262,9 +271,9 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfig003, TestSize.Level1)
 {
     uint8_t configIndex = 1;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
-    auto ret = UsbdClient::GetInstance().GetConfig(dev, configIndex);
+    auto ret = g_usbInterface->GetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfig003 %{public}d GetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -278,9 +287,9 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfig004, TestSize.Level1)
 {
     uint8_t configIndex = 1;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
-    auto ret = UsbdClient::GetInstance().GetConfig(dev, configIndex);
+    auto ret = g_usbInterface->GetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfig004 %{public}d GetConfig=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -294,9 +303,9 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface001, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -311,9 +320,9 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface002, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = dev_;
     dev.busNum = 20;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface002 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -327,9 +336,9 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface003, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface003 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -344,9 +353,9 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface004, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = dev_;
     interfaceId = 255;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface004 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -360,9 +369,9 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface005, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = {BUS_NUM_255, DEV_ADDR_255};
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface005 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -376,9 +385,9 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface006, TestSize.Level1)
 {
     uint8_t interfaceId = 255;
     struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface006 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -392,9 +401,9 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface007, TestSize.Level1)
 {
     uint8_t interfaceId = 255;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface007 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -408,9 +417,9 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface008, TestSize.Level1)
 {
     uint8_t interfaceId = 255;
     struct UsbDev dev = {BUS_NUM_255, DEV_ADDR_255};
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface008 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**********************************************************************************************************/
@@ -427,12 +436,12 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface001, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t altIndex = 0;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
-    ret = UsbdClient::GetInstance().SetInterface(dev, interfaceId, altIndex);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface001 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -447,13 +456,13 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface002, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t altIndex = 0;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.busNum = BUS_NUM_222;
-    ret = UsbdClient::GetInstance().SetInterface(dev, interfaceId, altIndex);
+    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface002 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -468,13 +477,13 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface003, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t altIndex = 0;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.devAddr = DEV_ADDR_222;
-    ret = UsbdClient::GetInstance().SetInterface(dev, interfaceId, altIndex);
+    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface003 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -489,13 +498,13 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface004, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t altIndex = 222;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     interfaceId = 222;
-    ret = UsbdClient::GetInstance().SetInterface(dev, interfaceId, altIndex);
+    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface004 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -510,14 +519,14 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface005, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t altIndex = 0;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.busNum = 233;
     dev.devAddr = 233;
-    ret = UsbdClient::GetInstance().SetInterface(dev, interfaceId, altIndex);
+    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface005 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -532,14 +541,14 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface006, TestSize.Level1)
     int32_t interfaceId = INT32_INTERFACEID_1;
     uint8_t altIndex = 1;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface006 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.busNum = 224;
     interfaceId = 224;
-    ret = UsbdClient::GetInstance().SetInterface(dev, interfaceId, altIndex);
+    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface006 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -554,14 +563,14 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface007, TestSize.Level1)
     int32_t interfaceId = INT32_INTERFACEID_1;
     uint8_t altIndex = 225;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface007 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.devAddr = 225;
     interfaceId = 225;
-    ret = UsbdClient::GetInstance().SetInterface(dev, interfaceId, altIndex);
+    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface007 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -576,15 +585,15 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface008, TestSize.Level1)
     uint8_t altIndex = 225;
     int32_t interfaceId = INT32_INTERFACEID_1;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface008 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.busNum = 225;
     dev.devAddr = 225;
     interfaceId = 225;
-    ret = UsbdClient::GetInstance().SetInterface(dev, interfaceId, altIndex);
+    ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface008 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -600,10 +609,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor001, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     struct UsbDev dev = dev_;
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
+    auto ret = g_usbInterface->GetDeviceDescriptor(dev, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor001 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -619,10 +628,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor002, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
+    auto ret = g_usbInterface->GetDeviceDescriptor(dev, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor002 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -639,10 +648,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor003, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {dev_.busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
+    auto ret = g_usbInterface->GetDeviceDescriptor(dev, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor003 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -658,10 +667,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor004, TestSize.Level1)
     uint32_t length = 0;
     struct UsbDev dev = dev_;
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
+    auto ret = g_usbInterface->GetDeviceDescriptor(dev, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor004 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -679,10 +688,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor005, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
+    auto ret = g_usbInterface->GetDeviceDescriptor(dev, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor005 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -698,10 +707,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor006, TestSize.Level1)
     uint32_t length = 0;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
+    auto ret = g_usbInterface->GetDeviceDescriptor(dev, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor006 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -717,10 +726,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor007, TestSize.Level1)
     uint32_t length = 0;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
+    auto ret = g_usbInterface->GetDeviceDescriptor(dev, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor007 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -738,10 +747,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor008, TestSize.Level1)
     uint32_t length = 0;
     struct UsbDev dev = {busNum, devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetDeviceDescriptor(dev, devdata);
+    auto ret = g_usbInterface->GetDeviceDescriptor(dev, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetDeviceDescriptor008 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**********************************************************************************************************/
@@ -760,10 +769,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor001, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = dev_;
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
+    auto ret = g_usbInterface->GetStringDescriptor(dev, stringId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor001 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -780,10 +789,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor002, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = dev_;
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
+    auto ret = g_usbInterface->GetStringDescriptor(dev, stringId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor002 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -800,10 +809,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor003, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = dev_;
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
+    auto ret = g_usbInterface->GetStringDescriptor(dev, stringId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor003 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -820,10 +829,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor004, TestSize.Level1)
     uint32_t length = 8;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
+    auto ret = g_usbInterface->GetStringDescriptor(dev, stringId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor004 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -840,10 +849,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor005, TestSize.Level1)
     uint32_t length = 8;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
+    auto ret = g_usbInterface->GetStringDescriptor(dev, stringId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor005 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -860,10 +869,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor006, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
+    auto ret = g_usbInterface->GetStringDescriptor(dev, stringId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor006 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -880,10 +889,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor007, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
+    auto ret = g_usbInterface->GetStringDescriptor(dev, stringId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor007 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -900,10 +909,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor008, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetStringDescriptor(dev, stringId, devdata);
+    auto ret = g_usbInterface->GetStringDescriptor(dev, stringId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetStringDescriptor008 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**********************************************************************************************************/
@@ -922,10 +931,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor001, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = dev_;
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
+    auto ret = g_usbInterface->GetConfigDescriptor(dev, configId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor001 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -942,10 +951,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor002, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
+    auto ret = g_usbInterface->GetConfigDescriptor(dev, configId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor002 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -962,10 +971,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor003, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
+    auto ret = g_usbInterface->GetConfigDescriptor(dev, configId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor003 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -982,10 +991,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor004, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = dev_;
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
+    auto ret = g_usbInterface->GetConfigDescriptor(dev, configId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor004 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1002,10 +1011,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor005, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
+    auto ret = g_usbInterface->GetConfigDescriptor(dev, configId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor005 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1022,10 +1031,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor006, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
+    auto ret = g_usbInterface->GetConfigDescriptor(dev, configId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor006 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1042,10 +1051,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor007, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
+    auto ret = g_usbInterface->GetConfigDescriptor(dev, configId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor007 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1062,10 +1071,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor008, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
     std::vector<uint8_t> devdata(buffer, buffer + length);
-    auto ret = UsbdClient::GetInstance().GetConfigDescriptor(dev, configId, devdata);
+    auto ret = g_usbInterface->GetConfigDescriptor(dev, configId, devdata);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfigDescriptor008 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         devdata.size(), sizeof(devdata), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1079,10 +1088,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor001, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     std::vector<uint8_t> rawData;
-    auto ret = UsbdClient::GetInstance().GetRawDescriptor(dev, rawData);
+    auto ret = g_usbInterface->GetRawDescriptor(dev, rawData);
     HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor001 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         rawData.size(), sizeof(rawData), ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1096,10 +1105,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor002, TestSize.Level1)
 {
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
     std::vector<uint8_t> rawData;
-    auto ret = UsbdClient::GetInstance().GetRawDescriptor(dev, rawData);
+    auto ret = g_usbInterface->GetRawDescriptor(dev, rawData);
     HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor002 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         rawData.size(), sizeof(rawData), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1113,10 +1122,10 @@ HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor003, TestSize.Level1)
 {
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
     std::vector<uint8_t> rawData;
-    auto ret = UsbdClient::GetInstance().GetRawDescriptor(dev, rawData);
+    auto ret = g_usbInterface->GetRawDescriptor(dev, rawData);
     HDF_LOGI("UsbdRequestTest::UsbdGetRawDescriptor003 length=%{public}zu buffer=%{public}zu ret=%{public}d",
         rawData.size(), sizeof(rawData), ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1130,9 +1139,9 @@ HWTEST_F(UsbdRequestTest, GetFileDescriptor001, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     int32_t fd = 0;
-    auto ret = UsbdClient::GetInstance().GetFileDescriptor(dev, fd);
+    auto ret = g_usbInterface->GetFileDescriptor(dev, fd);
     HDF_LOGI("UsbdRequestTest::GetFileDescriptor001 %{public}d fd=%{public}d ret=%{public}d", __LINE__, fd, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1146,9 +1155,9 @@ HWTEST_F(UsbdRequestTest, GetFileDescriptor002, TestSize.Level1)
 {
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
     int32_t fd = 0;
-    auto ret = UsbdClient::GetInstance().GetFileDescriptor(dev, fd);
+    auto ret = g_usbInterface->GetFileDescriptor(dev, fd);
     HDF_LOGI("UsbdRequestTest::GetFileDescriptor002 %{public}d fd=%{public}d ret=%{public}d", __LINE__, fd, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1162,9 +1171,9 @@ HWTEST_F(UsbdRequestTest, GetFileDescriptor003, TestSize.Level1)
 {
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
     int32_t fd = 0;
-    auto ret = UsbdClient::GetInstance().GetFileDescriptor(dev, fd);
+    auto ret = g_usbInterface->GetFileDescriptor(dev, fd);
     HDF_LOGI("UsbdRequestTest::GetFileDescriptor003 %{public}d fd=%{public}d ret=%{public}d", __LINE__, fd, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1178,9 +1187,9 @@ HWTEST_F(UsbdRequestTest, GetFileDescriptor004, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     int32_t fd = LENGTH_NUM_255;
-    auto ret = UsbdClient::GetInstance().GetFileDescriptor(dev, fd);
+    auto ret = g_usbInterface->GetFileDescriptor(dev, fd);
     HDF_LOGI("UsbdRequestTest::GetFileDescriptor004 %{public}d fd=%{public}d ret=%{public}d", __LINE__, fd, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1196,19 +1205,19 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue001, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue001 interfaceId=%{public}d pointid=%{public}d ret=%{public}d",
         interfaceId, pointid, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1224,9 +1233,9 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue002, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
@@ -1234,10 +1243,10 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue002, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue002 interfaceId=%{public}d pointid=%{public}d ret=%{public}d",
         interfaceId, pointid, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1255,18 +1264,18 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue003, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     struct UsbDev dev = dev_;
     uint32_t length = LENGTH_NUM_255;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     dev.devAddr = DEV_ADDR_222;
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue003 interfaceId=%{public}d pointid=%{public}d ret=%{public}d",
         interfaceId, pointid, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1282,9 +1291,9 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue004, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     interfaceId = 222;
     dev.busNum = BUS_NUM_222;
@@ -1293,10 +1302,10 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue004, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue004 interfaceId=%{public}d pointid=%{public}d ret=%{public}d",
         interfaceId, pointid, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1314,17 +1323,17 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue005, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     dev.busNum = BUS_NUM_222;
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue005 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1342,9 +1351,9 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue006, TestSize.Level1)
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
     uint32_t length = LENGTH_NUM_255;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue006 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     dev.busNum = BUS_NUM_222;
     interfaceId = 222;
@@ -1352,9 +1361,9 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue006, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue006 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1372,16 +1381,16 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue007, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     uint8_t pointid = POINTID_1;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue007 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue write";
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_11};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue007 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1399,17 +1408,17 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue008, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     uint8_t pointid = POINTID_1;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue008 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue write";
     interfaceId = 222;
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_11};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue008 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1427,18 +1436,18 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue009, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     uint8_t pointid = POINTID_1;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue009 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue write";
     interfaceId = 222;
     pointid = 222;
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_11};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestQueue009 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**********************************************************************************************************/
@@ -1456,23 +1465,23 @@ HWTEST_F(UsbdRequestTest, UsbdRequestWait001, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t buffer[LENGTH_NUM_255] = {};
     uint32_t length = LENGTH_NUM_255;
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait001 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t *clientObj = new uint8_t[10];
     std::vector<uint8_t> waitdata = {clientObj, clientObj + 10};
-    ret = UsbdClient::GetInstance().RequestWait(dev, waitdata, bufferdata, 10000);
+    ret = g_usbInterface->RequestWait(dev, waitdata, bufferdata, 10000);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait001 %{public}d RequestWait=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     delete[] clientObj;
     clientObj = nullptr;
 }
@@ -1490,24 +1499,24 @@ HWTEST_F(UsbdRequestTest, UsbdRequestWait002, TestSize.Level1)
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t buffer[LENGTH_NUM_255] = {};
     uint32_t length = LENGTH_NUM_255;
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbPipe pipe = {interfaceId, pointid};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait002 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.busNum = BUS_NUM_222;
     uint8_t *clientObj = new uint8_t[10];
     std::vector<uint8_t> waitdata = {clientObj, clientObj + 10};
-    ret = UsbdClient::GetInstance().RequestWait(dev, waitdata, bufferdata, 10000);
+    ret = g_usbInterface->RequestWait(dev, waitdata, bufferdata, 10000);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait002 %{public}d RequestWait=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
     delete[] clientObj;
     clientObj = nullptr;
 }
@@ -1525,24 +1534,24 @@ HWTEST_F(UsbdRequestTest, UsbdRequestWait003, TestSize.Level1)
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     uint8_t buffer[LENGTH_NUM_255] = {};
     uint32_t length = LENGTH_NUM_255;
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait003 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t *clientObj = new uint8_t[10];
     dev.devAddr = DEV_ADDR_222;
     std::vector<uint8_t> waitdata = {clientObj, clientObj + 10};
-    ret = UsbdClient::GetInstance().RequestWait(dev, waitdata, bufferdata, 10000);
+    ret = g_usbInterface->RequestWait(dev, waitdata, bufferdata, 10000);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait003 %{public}d RequestWait=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
     delete[] clientObj;
     clientObj = nullptr;
 }
@@ -1560,23 +1569,23 @@ HWTEST_F(UsbdRequestTest, UsbdRequestWait004, TestSize.Level1)
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t buffer[LENGTH_NUM_255] = {};
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     uint32_t length = LENGTH_NUM_255;
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait004 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t *clientObj = new uint8_t[10];
     std::vector<uint8_t> waitdata = {clientObj, clientObj + 10};
-    ret = UsbdClient::GetInstance().RequestWait(dev, waitdata, bufferdata, -10000);
+    ret = g_usbInterface->RequestWait(dev, waitdata, bufferdata, -10000);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait004 %{public}d RequestWait=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     delete[] clientObj;
     clientObj = nullptr;
 }
@@ -1594,25 +1603,25 @@ HWTEST_F(UsbdRequestTest, UsbdRequestWait005, TestSize.Level1)
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint32_t length = LENGTH_NUM_255;
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     uint8_t buffer[LENGTH_NUM_255] = {};
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait005 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t *clientObj = new uint8_t[10];
     std::vector<uint8_t> waitdata = {clientObj, clientObj + 10};
     dev.devAddr = DEV_ADDR_255;
     dev.busNum = BUS_NUM_255;
-    ret = UsbdClient::GetInstance().RequestWait(dev, waitdata, bufferdata, 10000);
+    ret = g_usbInterface->RequestWait(dev, waitdata, bufferdata, 10000);
     HDF_LOGI("UsbdRequestTest::UsbdRequestWait005 %{public}d RequestWait=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
     delete[] clientObj;
     clientObj = nullptr;
 }
@@ -1634,18 +1643,18 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel001, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t buffer[LENGTH_NUM_255] = "request001";
     uint32_t length = LENGTH_NUM_255;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     EXPECT_TRUE(ret == 0);
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel001 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel001 %{public}d RequestCancel=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1663,23 +1672,23 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel002, TestSize.Level1)
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t buffer[LENGTH_NUM_255] = "request002";
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     EXPECT_TRUE(ret == 0);
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ;
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel002 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.busNum = BUS_NUM_222;
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
+    ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel002 %{public}d RequestCancel=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
     dev.busNum = dev_.busNum;
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
-    ASSERT_TRUE(ret == 0);
+    ret = g_usbInterface->RequestCancel(dev, pipe);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1697,22 +1706,22 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel003, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     EXPECT_TRUE(ret == 0);
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbPipe pipe = {interfaceId, pointid};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel003 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.devAddr = DEV_ADDR_222;
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
+    ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel003 %{public}d RequestCancel=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
     dev.devAddr = dev_.devAddr;
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
-    ASSERT_TRUE(ret == 0);
+    ret = g_usbInterface->RequestCancel(dev, pipe);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1730,20 +1739,20 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel004, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = "request004";
     uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     EXPECT_TRUE(ret == 0);
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
-    pipe.interfaceId = 222;
+    ASSERT_EQ(0, ret);
+    pipe.intfId = 222;
     pipe.endpointId = 222;
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
+    ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d RequestCancel=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1760,19 +1769,19 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel005, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     uint8_t pointid = POINTID_1;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     EXPECT_TRUE(ret == 0);
     struct UsbPipe pipe = {interfaceId, pointid};
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue Write";
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_11};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel005 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel005 %{public}d RequestCancel=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1789,25 +1798,25 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel006, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     uint8_t pointid = POINTID_1;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel006 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     EXPECT_TRUE(ret == 0);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue Write";
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_11};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbPipe pipe = {interfaceId, pointid};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel006 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.busNum = 224;
-    pipe.interfaceId = 224;
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
+    pipe.intfId = 224;
+    ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel006 %{public}d RequestCancel=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
     dev.busNum = dev_.busNum;
-    pipe.interfaceId = INTERFACEID_1;
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
-    ASSERT_TRUE(ret == 0);
+    pipe.intfId = INTERFACEID_1;
+    ret = g_usbInterface->RequestCancel(dev, pipe);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1824,25 +1833,25 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel007, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     uint8_t pointid = POINTID_1;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel007 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     EXPECT_TRUE(ret == 0);
     struct UsbPipe pipe = {interfaceId, pointid};
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue Write";
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_11};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel007 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.devAddr = 224;
-    pipe.interfaceId = 224;
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
+    pipe.intfId = 224;
+    ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel007 %{public}d RequestCancel=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
     dev.devAddr = dev_.devAddr;
-    pipe.interfaceId = INTERFACEID_1;
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
-    ASSERT_TRUE(ret == 0);
+    pipe.intfId = INTERFACEID_1;
+    ret = g_usbInterface->RequestCancel(dev, pipe);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1859,26 +1868,26 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel008, TestSize.Level1)
     uint8_t pointid = POINTID_1;
     uint8_t interfaceId = INTERFACEID_1;
     uint32_t length = LENGTH_NUM_255;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel008 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     EXPECT_TRUE(ret == 0);
     uint8_t tag[TAG_LENGTH_NUM_1000] = "queue Write";
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_11};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().RequestQueue(dev, pipe, clientdata, bufferdata);
+    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel008 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.busNum = BUS_NUM_222;
     dev.devAddr = DEV_ADDR_222;
-    pipe.interfaceId = 222;
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
+    pipe.intfId = 222;
+    ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel008 %{public}d RequestCancel=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
     dev = dev_;
-    pipe.interfaceId = INTERFACEID_1;
-    ret = UsbdClient::GetInstance().RequestCancel(dev, pipe);
-    ASSERT_TRUE(ret == 0);
+    pipe.intfId = INTERFACEID_1;
+    ret = g_usbInterface->RequestCancel(dev, pipe);
+    ASSERT_EQ(0, ret);
 }
 
 /**********************************************************************************************************/
@@ -1894,9 +1903,9 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface001, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = UsbdClient::GetInstance().ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface001 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1910,9 +1919,9 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface002, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
-    auto ret = UsbdClient::GetInstance().ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface002 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1926,9 +1935,9 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface003, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
-    auto ret = UsbdClient::GetInstance().ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface003 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1942,9 +1951,9 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface004, TestSize.Level1)
 {
     uint8_t interfaceId = 255;
     struct UsbDev dev = dev_;
-    auto ret = UsbdClient::GetInstance().ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface004 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1958,9 +1967,9 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface005, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = {BUS_NUM_255, DEV_ADDR_255};
-    auto ret = UsbdClient::GetInstance().ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface005 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1974,9 +1983,9 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface006, TestSize.Level1)
 {
     int32_t interfaceId = 255;
     struct UsbDev dev = {DEV_ADDR_255, dev_.devAddr};
-    auto ret = UsbdClient::GetInstance().ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface006 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1990,9 +1999,9 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface007, TestSize.Level1)
 {
     int32_t interfaceId = 255;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
-    auto ret = UsbdClient::GetInstance().ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface007 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -2006,7 +2015,7 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface008, TestSize.Level1)
 {
     int32_t interfaceId = 255;
     struct UsbDev dev = {BUS_NUM_255, DEV_ADDR_255};
-    auto ret = UsbdClient::GetInstance().ReleaseInterface(dev, interfaceId);
+    auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface008 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
