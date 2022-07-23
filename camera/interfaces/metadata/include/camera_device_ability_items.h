@@ -374,9 +374,9 @@ typedef enum camera_mirror {
 // OHOS_JPEG_ORIENTATION enumeration values
 typedef enum camera_jpeg_orientation {
     OHOS_CAMERA_JPEG_ROTATION_0 = 0,
-    OHOS_CAMERA_JPEG_ROTATION_90 = 1,
-    OHOS_CAMERA_JPEG_ROTATION_180 = 2,
-    OHOS_CAMERA_JPEG_ROTATION_270 = 3,
+    OHOS_CAMERA_JPEG_ROTATION_90 = 90,
+    OHOS_CAMERA_JPEG_ROTATION_180 = 180,
+    OHOS_CAMERA_JPEG_ROTATION_270 = 270,
 } camera_jpeg_orientation_t;
 
 // OHOS_JPEG_QUALITY enumeration values
