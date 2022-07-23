@@ -32,6 +32,7 @@
 #include "ed25519_key.h"
 #include "user_auth_funcs.h"
 #include "user_idm_funcs.h"
+#include "enroll_specification_check.h"
 
 #define LOG_LABEL OHOS::UserIAM::Common::LABEL_USER_AUTH_HDI
 
@@ -104,17 +105,13 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
     std::vector<ScheduleInfo> &infos)
 {
     IAM_LOGI("start");
-    if (param.challenge.size() != sizeof(uint64_t)) {
-        IAM_LOGE("challenge copy failed");
-        return RESULT_BAD_PARAM;
-    }
     infos.clear();
     AuthSolutionHal solutionIn = {};
     solutionIn.contextId = contextId;
     solutionIn.userId = param.userId;
     solutionIn.authType = static_cast<uint32_t>(param.authType);
     solutionIn.authTrustLevel = param.authTrustLevel;
-    if (memcpy_s(&solutionIn.challenge, sizeof(uint64_t), &param.challenge[0],
+    if (!param.challenge.empty() && memcpy_s(solutionIn.challenge, CHALLENGE_LEN, param.challenge.data(),
         param.challenge.size()) != EOK) {
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
@@ -255,7 +252,7 @@ int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, AuthTy
     const std::vector<uint8_t> &challenge, uint32_t executorSensorHint, ScheduleInfo &scheduleInfo)
 {
     IAM_LOGI("start");
-    if (challenge.size() != sizeof(uint64_t) || authType == PIN) {
+    if (authType == PIN) {
         IAM_LOGE("param is invalid");
         return RESULT_BAD_PARAM;
     }
@@ -263,7 +260,7 @@ int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, AuthTy
     param.contextId = contextId;
     param.authType = static_cast<uint32_t>(authType);
     param.executorSensorHint = executorSensorHint;
-    if (memcpy_s(&param.challenge, sizeof(uint64_t), challenge.data(), challenge.size()) != EOK) {
+    if (!challenge.empty() && memcpy_s(param.challenge, CHALLENGE_LEN, challenge.data(), challenge.size()) != EOK) {
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
@@ -346,13 +343,11 @@ int32_t UserAuthInterfaceService::OpenSession(int32_t userId, std::vector<uint8_
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> lock(INTERFACE_MUTEX);
-    uint64_t challengeU64 = 0;
-    int32_t ret = OpenEditSession(userId, &challengeU64);
-    challenge.resize(sizeof(uint64_t));
-    if (memcpy_s(challenge.data(), challenge.size(), &challengeU64, sizeof(uint64_t)) != EOK) {
-        IAM_LOGE("challengeU64 copy failed");
+    challenge.resize(CHALLENGE_LEN);
+    int32_t ret = OpenEditSession(userId, challenge.data(), challenge.size());
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("failed to open session");
         challenge.clear();
-        return RESULT_BAD_COPY;
     }
     return ret;
 }
@@ -559,15 +554,9 @@ int32_t UserAuthInterfaceService::DeleteUser(int32_t userId, const std::vector<u
         IAM_LOGE("authTokenStruct copy failed");
         return RESULT_BAD_COPY;
     }
-    uint64_t challenge;
-    int32_t ret = GetChallenge(&challenge);
+    int32_t ret = CheckIdmOperationToken(userId, &authTokenStruct);
     if (ret != RESULT_SUCCESS) {
-        IAM_LOGE("get challenge failed");
-        return ret;
-    }
-    if (challenge != authTokenStruct.challenge || !IsValidTokenTime(authTokenStruct.time) ||
-        authTokenStruct.authType != PIN || UserAuthTokenVerify(&authTokenStruct) != RESULT_SUCCESS) {
-        IAM_LOGE("verify token failed");
+        IAM_LOGE("failed to verify token");
         return RESULT_BAD_SIGN;
     }
     return EnforceDeleteUser(userId, deletedInfos);

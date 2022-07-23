@@ -40,15 +40,14 @@ static uint32_t GetMaxNumber(uint32_t authType)
     return INVALID_AUTH_TYPE_EROLL_NUMBER;
 }
 
-ResultCode CheckEnrollToken(int32_t userId, UserAuthTokenHal *authToken)
+ResultCode CheckIdmOperationToken(int32_t userId, UserAuthTokenHal *authToken)
 {
     if (authToken->authType != PIN_AUTH) {
         LOG_ERROR("need pin token");
         return RESULT_VERIFY_TOKEN_FAIL;
     }
-    uint64_t challenge;
-    ResultCode ret = GetChallenge(&challenge);
-    if (ret != RESULT_SUCCESS || challenge != authToken->challenge) {
+    ResultCode ret = CheckChallenge(authToken->challenge, CHALLENGE_LEN);
+    if (ret != RESULT_SUCCESS) {
         LOG_ERROR("check challenge failed, token is invalid");
         return RESULT_BAD_MATCH;
     }
