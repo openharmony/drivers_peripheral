@@ -39,7 +39,7 @@ namespace V1_0 {
 namespace {
 constexpr uint8_t LOG_INDEX_LEN = 4;
 constexpr int32_t MSEC_TO_SEC = 1000;
-constexpr int32_t MAX_FILE_NUM = 9;
+constexpr int32_t MAX_FILE_NUM = 10;
 constexpr int32_t MAX_FILE_SIZE = 10 * 1024 *1024;
 constexpr int32_t DEFAULT_INTERVAL_MS = 5000;
 constexpr int32_t MAX_TIME_LEN = 20;
@@ -48,7 +48,7 @@ constexpr int32_t TIME_FORMAT_1 = 1;
 constexpr int32_t TIME_FORMAT_2 = 2;
 constexpr int32_t COMPRESS_READ_BUF_SIZE = 4096;
 const std::string TIMESTAMP_TITLE = "timestamp";
-uint32_t g_currentLogIndex;
+uint32_t g_currentLogIndex = 0;
 int32_t g_timerInterval = -1;
 bool g_firstCreate = true;
 std::deque<std::string> g_saveLogFile;
@@ -216,7 +216,7 @@ void ThermalDfx::CompressFile()
         THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", unCompressFile.c_str());
     }
 
-    if (g_saveLogFile.size() > MAX_FILE_NUM) {
+    if (g_saveLogFile.size() >= MAX_FILE_NUM) {
         if (remove(g_saveLogFile.front().c_str()) != 0) {
             THERMAL_HILOGW(COMP_HDI, "failed to remove file %{public}s", compressFile.c_str());
         }
