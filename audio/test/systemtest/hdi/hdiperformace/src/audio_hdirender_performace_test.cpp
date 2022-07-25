@@ -53,39 +53,13 @@ public:
     void TearDown();
     static TestAudioManager *(*GetAudioManager)();
     static void *handleSo;
-#ifdef AUDIO_MPI_SO
-    static int32_t (*SdkInit)();
-    static void (*SdkExit)();
-    static void *sdkSo;
-#endif
 };
 
 TestAudioManager *(*AudioHdiRenderPerformaceTest::GetAudioManager)() = nullptr;
 void *AudioHdiRenderPerformaceTest::handleSo = nullptr;
-#ifdef AUDIO_MPI_SO
-    int32_t (*AudioHdiRenderPerformaceTest::SdkInit)() = nullptr;
-    void (*AudioHdiRenderPerformaceTest::SdkExit)() = nullptr;
-    void *AudioHdiRenderPerformaceTest::sdkSo = nullptr;
-#endif
 
 void AudioHdiRenderPerformaceTest::SetUpTestCase(void)
 {
-#ifdef AUDIO_MPI_SO
-    char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
-    sdkSo = dlopen(sdkResolvedPath, RTLD_LAZY);
-    if (sdkSo == nullptr) {
-        return;
-    }
-    SdkInit = (int32_t (*)())(dlsym(sdkSo, "MpiSdkInit"));
-    if (SdkInit == nullptr) {
-        return;
-    }
-    SdkExit = (void (*)())(dlsym(sdkSo, "MpiSdkExit"));
-    if (SdkExit == nullptr) {
-        return;
-    }
-    SdkInit();
-#endif
     char absPath[PATH_MAX] = {0};
     if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
         return;
@@ -102,21 +76,6 @@ void AudioHdiRenderPerformaceTest::SetUpTestCase(void)
 
 void AudioHdiRenderPerformaceTest::TearDownTestCase(void)
 {
-#ifdef AUDIO_MPI_SO
-    if (SdkExit != nullptr) {
-        SdkExit();
-    }
-    if (sdkSo != nullptr) {
-        dlclose(sdkSo);
-        sdkSo = nullptr;
-    }
-    if (SdkInit != nullptr) {
-        SdkInit = nullptr;
-    }
-    if (SdkExit != nullptr) {
-        SdkExit = nullptr;
-    }
-#endif
     if (handleSo != nullptr) {
         dlclose(handleSo);
         handleSo = nullptr;

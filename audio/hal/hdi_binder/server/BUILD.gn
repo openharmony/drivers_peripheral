@@ -40,9 +40,6 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     }
 
     defines = []
-    if (enable_audio_device_mpi) {
-      defines += [ "AUDIO_HAL_USER" ]
-    }
     if (is_standard_system) {
       external_deps = [
         "hdf_core:libhdf_host",

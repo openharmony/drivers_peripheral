@@ -37,10 +37,6 @@ public:
         struct AudioHwRenderParam *handleData);
     static void (*CloseServiceRenderSo)(struct DevHandle *handle);
     static void *ptrHandle;
-#ifdef AUDIO_MPI_SO
-    static int32_t (*SdkInit)();
-    static void (*SdkExit)();
-#endif
     uint32_t PcmBytesToFrames(const struct AudioFrameRenderMode &frameRenderMode, uint64_t bytes) const;
     int32_t FrameLibStart(FILE *file, struct AudioSampleAttributes attrs,
         struct AudioHeadInfo wavHeadInfo, struct AudioHwRender *hwRender) const;
@@ -58,10 +54,6 @@ int32_t (*AudioLibRenderTest::InterfaceLibCtlRender)(struct DevHandle *handle, i
     struct AudioHwRenderParam *handleData) = nullptr;
 void (*AudioLibRenderTest::CloseServiceRenderSo)(struct DevHandle *handle) = nullptr;
 void *AudioLibRenderTest::ptrHandle = nullptr;
-#ifdef AUDIO_MPI_SO
-    int32_t (*AudioLibRenderTest::SdkInit)() = nullptr;
-    void (*AudioLibRenderTest::SdkExit)() = nullptr;
-#endif
 
 void AudioLibRenderTest::SetUpTestCase(void)
 {
@@ -81,17 +73,6 @@ void AudioLibRenderTest::SetUpTestCase(void)
         dlclose(ptrHandle);
         return;
     }
-#ifdef AUDIO_MPI_SO
-    SdkInit = (int32_t (*)())(dlsym(ptrHandle, "MpiSdkInit"));
-    if (SdkInit == nullptr) {
-        return;
-    }
-    SdkExit = (void (*)())(dlsym(ptrHandle, "MpiSdkExit"));
-    if (SdkExit == nullptr) {
-        return;
-    }
-    SdkInit();
-#endif
 }
 
 void AudioLibRenderTest::TearDownTestCase(void)
@@ -108,15 +89,6 @@ void AudioLibRenderTest::TearDownTestCase(void)
     if (InterfaceLibCtlRender != nullptr) {
         InterfaceLibCtlRender = nullptr;
     }
-#ifdef AUDIO_MPI_SO
-    SdkExit();
-    if (SdkInit != nullptr) {
-        SdkInit = nullptr;
-    }
-    if (SdkExit != nullptr) {
-        SdkExit = nullptr;
-    }
-#endif
     if (ptrHandle != nullptr) {
         dlclose(ptrHandle);
         ptrHandle = nullptr;

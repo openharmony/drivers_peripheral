@@ -522,13 +522,11 @@ static int32_t AudioSetParamToDev(struct AudioHwRender *hwRender, InterfaceLibMo
         AUDIO_FUNC_LOGE("SetParams FAIL!");
         return HDF_FAILURE;
     }
-#ifndef AUDIO_HAL_USER
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTL_PREPARE);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("AudioRender perpare FAIL");
         return HDF_FAILURE;
     }
-#endif
     return HDF_SUCCESS;
 }
 
@@ -906,14 +904,11 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
         (void)AudioCtrlCaptureClose(hwCapture, LibCap);
         return HDF_FAILURE;
     }
-#ifdef AUDIO_HAL_USER
-#else
     if ((*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE) < 0) {
         AUDIO_FUNC_LOGE("AudioCaptureStart prepare FAIL");
         (void)AudioCtrlCaptureClose(hwCapture, LibCap);
         return HDF_FAILURE;
     }
-#endif
     return HDF_SUCCESS;
 }
 

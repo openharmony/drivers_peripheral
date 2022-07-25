@@ -89,14 +89,8 @@ if (defined(ohos_lite)) {
     if (enable_audio_adm_so) {
       defines += [ "AUDIO_ADM_SO" ]
     }
-    if (enable_audio_mpi_so) {
-      defines += [ "AUDIO_MPI_SO" ]
-    }
     if (enable_audio_adm_service) {
       defines += [ "AUDIO_ADM_SERVICE" ]
-    }
-    if (enable_audio_mpi_service) {
-      defines += [ "AUDIO_MPI_SERVICE" ]
     }
   }
 }
