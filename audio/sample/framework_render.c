@@ -112,11 +112,6 @@ static int32_t g_closeEnd = 0;
 pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t g_functionCond = PTHREAD_COND_INITIALIZER;
 int g_waitSleep = 0;
-#ifdef AUDIO_HAL_USER
-void *g_sdkHandle;
-int (*g_sdkInitSp)() = NULL;
-void (*g_sdkExitSp)() = NULL;
-#endif
 enum RenderMenuId {
     RENDER_START = 1,
     RENDER_STOP,
@@ -425,15 +420,6 @@ void StopRenderBySig(int32_t sig)
     soMode = PrepareStopAndUloadAdapter();
     dlclose(g_handle);
     g_closeEnd = 1;
-
-#ifdef AUDIO_HAL_USER
-    if (soMode) {
-        g_sdkExitSp();
-        if (g_sdkHandle != NULL) {
-            dlclose(g_sdkHandle);
-        }
-    }
-#endif
 
     (void)signal(sig, SIG_DFL);
     return;
@@ -944,25 +930,6 @@ int32_t InitParam(void)
             AUDIO_FUNC_LOGE("GetPassthroughManagerFunc Fail");
             return HDF_FAILURE;
         }
-#ifdef AUDIO_HAL_USER
-        char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
-        g_sdkHandle = dlopen(sdkResolvedPath, 1);
-        if (g_sdkHandle == NULL) {
-            AUDIO_FUNC_LOGE("Open so Fail, reason:%s", dlerror());
-            return HDF_FAILURE;
-        }
-        g_sdkInitSp = (int32_t (*)())(dlsym(g_sdkHandle, "MpiSdkInit"));
-        if (g_sdkInitSp == NULL) {
-            AUDIO_FUNC_LOGE("Get sdk init Funcs Fail");
-            return HDF_FAILURE;
-        }
-        g_sdkExitSp = (void (*)())(dlsym(g_sdkHandle, "MpiSdkExit"));
-        if (g_sdkExitSp == NULL) {
-            AUDIO_FUNC_LOGE("Get sdk exit Funcs Fail");
-            return HDF_FAILURE;
-        }
-        g_sdkInitSp();
-#endif
     } else {
         if (GetRenderProxyManagerFunc(adapterNameCase) < 0) {
             AUDIO_FUNC_LOGE("GetProxyManagerFunc Fail");
@@ -1384,14 +1351,6 @@ int32_t main(int32_t argc, char const *argv[])
 
     Choice();
     soMode = PrepareStopAndUloadAdapter();
-#ifdef AUDIO_HAL_USER
-    if (soMode) {
-        g_sdkExitSp();
-        if (g_sdkHandle != NULL) {
-            dlclose(g_sdkHandle);
-        }
-    }
-#endif
     dlclose(g_handle);
     return 0;
 }

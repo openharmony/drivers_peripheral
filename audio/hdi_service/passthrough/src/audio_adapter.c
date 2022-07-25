@@ -531,14 +531,12 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
         (void)AudioCtrlRenderClose(hwRender, pInterfaceLibModeRender);
         return HDF_FAILURE;
     }
-#ifndef AUDIO_HAL_USER
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTL_PREPARE);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("AudioRender perpare FAIL");
         (void)AudioCtrlRenderClose(hwRender, pInterfaceLibModeRender);
         return HDF_FAILURE;
     }
-#endif
     return HDF_SUCCESS;
 }
 
@@ -863,8 +861,6 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
         (void)AudioCtrlCaptureClose(hwCapture, pInterfaceLibModeCapture);
         return HDF_FAILURE;
     }
-#ifdef AUDIO_HAL_USER
-#else
     ret = (*pInterfaceLibModeCapture)(
         hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE);
     if (ret < 0) {
@@ -872,7 +868,6 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
         (void)AudioCtrlCaptureClose(hwCapture, pInterfaceLibModeCapture);
         return HDF_FAILURE;
     }
-#endif
     return HDF_SUCCESS;
 }
 
