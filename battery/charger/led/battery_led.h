@@ -24,16 +24,10 @@ namespace Battery {
 namespace V1_1 {
 class BatteryLed {
 public:
-    int32_t InitLedsSysfs();
+    void InitLightInfo();
     static void TurnOffLed();
-    static void WriteLedInfoToSys(int32_t  redBrightness, int32_t  greenBrightness, int32_t  blueBrightness);
+    static void WriteLedInfo(int32_t redBrightness, int32_t greenBrightness, int32_t blueBrightness);
     void UpdateLedColor(int32_t chargeState, int32_t capacity);
-private:
-    static void InitMockLedFile(std::string& redPath, std::string& greenPath, std::string& bluePath) ;
-    static void TraversalNode();
-    static void CreateMockLedPath(const std::string& mockPath) ;
-    static void CreateMockLedFile(const std::string& path, const std::string& content) ;
-    static void WriteLedNode(std::string& ledPath, int32_t brightness);
 };
 }  // namespace V1_1
 }  // namespace Battery
