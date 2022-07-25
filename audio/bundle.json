@@ -27,8 +27,7 @@
       ],
       "third_part": [
         "bounds_checking_function",
-        "googletest",
-        "tinyalsa"
+        "googletest"
       ]
     },
     "build": {
