@@ -725,31 +725,35 @@ static char *AudioAdaptersGetConfig(const char *fpath)
         AUDIO_FUNC_LOGE("Can not open config file [ %{public}s ].\n", fpath);
         return NULL;
     }
-    fseek(fp, 0, SEEK_END);
+    if (fseek(fp, 0, SEEK_END) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("fseek fail!");
+        (void)fclose(fp);
+        return NULL;
+    }
     int32_t jsonStrSize = ftell(fp);
     if (jsonStrSize <= 0) {
-        fclose(fp);
+        (void)fclose(fp);
         return NULL;
     }
     rewind(fp);
     if (jsonStrSize > CONFIG_FILE_SIZE_MAX) {
         AUDIO_FUNC_LOGE("The configuration file is too large to load!\n");
-        fclose(fp);
+        (void)fclose(fp);
         return NULL;
     }
     pJsonStr = (char *)OsalMemCalloc((uint32_t)jsonStrSize + 1);
     if (pJsonStr == NULL) {
         AUDIO_FUNC_LOGE("alloc pJsonStr failed!");
-        fclose(fp);
+        (void)fclose(fp);
         return NULL;
     }
     if (fread(pJsonStr, jsonStrSize, 1, fp) != 1) {
         AUDIO_FUNC_LOGE("read to file fail!");
-        fclose(fp);
+        (void)fclose(fp);
         AudioMemFree((void **)&pJsonStr);
         return NULL;
     }
-    fclose(fp);
+    (void)fclose(fp);
     return pJsonStr;
 }
 
