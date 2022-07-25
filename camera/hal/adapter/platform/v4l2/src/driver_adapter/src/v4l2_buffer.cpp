@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef V4L2_MAIN_TEST
+#include "ibuffer.h"
+#endif
 #include "v4l2_buffer.h"
 
 namespace OHOS::Camera {
@@ -90,7 +93,9 @@ RetCode HosV4L2Buffers::V4L2QueueBuffer(int fd, const std::shared_ptr<FrameSpec>
     std::lock_guard<std::mutex> l(bufferLock_);
     int rc = ioctl(fd, VIDIOC_QBUF, &buf);
     if (rc < 0) {
-        CAMERA_LOGE("ioctl VIDIOC_QBUF failed: %s\n", strerror(errno));
+        CAMERA_LOGE("ioctl VIDIOC_QBUF failed: %{public}d %{public}s\n", errno, strerror(errno));
+        frameSpec->buffer_->SetBufferStatus(CAMERA_BUFFER_STATUS_DROP);
+        dequeueBuffer_(frameSpec);
         return RC_ERROR;
     }
 
