@@ -109,7 +109,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
     } else {
         cb->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
     }
-    restBuffers++;
+    restBuffers.fetch_add(1, std::memory_order_release);
     return cb;
 }
 
@@ -147,11 +147,8 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
         bufferQueue_->CancelBuffer(sb);
     }
 
-    {
-        restBuffers--;
-        std::unique_lock<std::mutex> l(finishLock_);
-        finishCV_.notify_all();
-    }
+    restBuffers.fetch_sub(1, std::memory_order_release);
+    finishCV_.notify_all();
     {
         std::unique_lock<std::mutex> l(waitLock_);
         wakeup_ = true;
@@ -204,7 +201,8 @@ void StreamTunnel::WaitForAllBufferReturned()
 {
     std::unique_lock<std::mutex> l(finishLock_);
     finishCV_.wait(l, [this] {
-        return restBuffers == 0;
+        CAMERA_LOGD("restBuffers=%{public}u", restBuffers.load(std::memory_order_acquire));
+        return restBuffers.load(std::memory_order_acquire) == 0;
         });
 
     return;

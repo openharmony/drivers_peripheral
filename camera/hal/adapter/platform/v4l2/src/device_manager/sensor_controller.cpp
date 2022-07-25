@@ -114,17 +114,18 @@ RetCode SensorController::Stop()
 
 RetCode SensorController::SendFrameBuffer(std::shared_ptr<FrameSpec> buffer)
 {
+    RetCode ret = RC_OK;
     if (buffCont_ >= 1) {
-        CAMERA_LOGI("%s buffCont_ %d", __FUNCTION__, buffCont_);
+        CAMERA_LOGI("buffCont_ %{public}d", buffCont_);
         sensorVideo_->CreatBuffer(GetName(), buffer);
         if (buffCont_ == 1) {
-            sensorVideo_->StartStream(GetName());
+            ret = sensorVideo_->StartStream(GetName());
         }
         buffCont_--;
     } else {
-        sensorVideo_->QueueBuffer(GetName(), buffer);
+        ret = sensorVideo_->QueueBuffer(GetName(), buffer);
     }
-    return RC_OK;
+    return ret;
 }
 
 void SensorController::SetNodeCallBack(const NodeBufferCb cb)
