@@ -22,9 +22,6 @@ config("audio_interface_config") {
   if (drivers_peripheral_audio_feature_mono_to_stereo) {
     cflags += [ "-DMONO_TO_STEREO" ]
   }
-  if (drivers_peripheral_audio_alsa_lib) {
-    cflags += [ "-DALSA_MODE" ]
-  }
 
   ldflags = [ "-Wl" ]
 }
@@ -118,18 +115,6 @@ if (defined(ohos_lite)) {
     }
 
     if (drivers_peripheral_audio_alsa_lib) {
-      sources += [
-        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/alsa_mixer.c",
-        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/audio_hw.c",
-        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/route_config.c",
-      ]
-      include_dirs += [
-        "//third_party/tinyalsa/include",
-        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/include",
-      ]
-      deps += [ "//third_party/tinyalsa:libtinyalsa" ]
-    }
-    if (drivers_peripheral_audio_alsa_lib) {
       include_dirs += [
         "//third_party/alsa-lib/include",
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
@@ -188,18 +173,6 @@ if (defined(ohos_lite)) {
       defines = [ "AUDIO_HAL_HDF_LOG" ]
     }
 
-    if (drivers_peripheral_audio_alsa_lib) {
-      sources += [
-        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/alsa_mixer.c",
-        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/audio_hw.c",
-        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/src/route_config.c",
-      ]
-      include_dirs += [
-        "//third_party/tinyalsa/include",
-        "//drivers/peripheral/audio/supportlibs/tinyalsa_adapter/include",
-      ]
-      deps += [ "//third_party/tinyalsa:libtinyalsa" ]
-    }
     if (drivers_peripheral_audio_alsa_lib) {
       include_dirs += [
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
