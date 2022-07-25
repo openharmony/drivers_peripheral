@@ -27,7 +27,6 @@ if (defined(ohos_lite)) {
     testonly = true
     deps = [
       "fuzztest:hdf_display_fuzztest",
-      "unittest/standard:hdf_unittest_display",
     ]
   }
 }
