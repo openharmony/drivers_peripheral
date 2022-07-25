@@ -105,10 +105,10 @@ int32_t ThermalDeviceMitigation::ExecuteCpuRequest(uint32_t freq, const std::str
         return ret;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    if (snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - 1, "%s", path.c_str()) < NUM_ZERO) {
+    if (snprintf_s(nodeBuf, MAX_BUF_PATH, sizeof(nodeBuf) - 1, "%s", path.c_str()) < EOK) {
         return ret;
     }
-    if (snprintf_s(freqBuf, PATH_MAX, sizeof(freqBuf) - 1, "%d", freq) < NUM_ZERO) {
+    if (snprintf_s(freqBuf, MAX_PATH, sizeof(freqBuf) - 1, "%d", freq) < EOK) {
         return ret;
     }
     if (WriteSysfsFile(nodeBuf, freqBuf, strlen(freqBuf)) > NUM_ZERO) {
@@ -150,12 +150,12 @@ int32_t ThermalDeviceMitigation::GpuRequest(uint32_t freq)
     char nodeBuf[MAX_BUF_PATH] = {0};
 
     std::lock_guard<std::mutex> lock(mutex_);
-    ret = snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - 1, "%s", GPU_FREQ_PATH.c_str());
-    if (ret < NUM_ZERO) {
+    ret = snprintf_s(nodeBuf, MAX_BUF_PATH, sizeof(nodeBuf) - 1, "%s", GPU_FREQ_PATH.c_str());
+    if (ret < EOK) {
         return ret;
     }
-    ret = snprintf_s(freqBuf, PATH_MAX, sizeof(freqBuf) - 1, "%d", freq);
-    if (ret < NUM_ZERO) {
+    ret = snprintf_s(freqBuf, MAX_PATH, sizeof(freqBuf) - 1, "%d", freq);
+    if (ret < EOK) {
         return ret;
     }
     if (WriteSysfsFile(nodeBuf, freqBuf, strlen(freqBuf)) > NUM_ZERO) {
@@ -179,12 +179,12 @@ int32_t ThermalDeviceMitigation::ExecuteChargerRequest(uint32_t current, const s
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
-    ret = snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - 1, "%s", path.c_str());
-    if (ret < NUM_ZERO) {
+    ret = snprintf_s(nodeBuf, MAX_BUF_PATH, sizeof(nodeBuf) - 1, "%s", path.c_str());
+    if (ret < EOK) {
         return ret;
     }
-    ret = snprintf_s(currentBuf, PATH_MAX, sizeof(currentBuf) - 1, "%d%s", current, "\n");
-    if (ret < NUM_ZERO) {
+    ret = snprintf_s(currentBuf, MAX_PATH, sizeof(currentBuf) - 1, "%d%s", current, "\n");
+    if (ret < EOK) {
         return ret;
     }
     if (WriteSysfsFile(nodeBuf, currentBuf, strlen(currentBuf)) > NUM_ZERO) {
@@ -205,12 +205,12 @@ int32_t ThermalDeviceMitigation::BatteryCurrentRequest(uint32_t current)
     char nodeBuf[MAX_BUF_PATH] = {0};
 
     std::lock_guard<std::mutex> lock(mutex_);
-    ret = snprintf_s(nodeBuf, PATH_MAX, sizeof(nodeBuf) - 1, "%s", SIM_BATTERY_CURRENT_PATH.c_str());
-    if (ret < NUM_ZERO) {
+    ret = snprintf_s(nodeBuf, MAX_BUF_PATH, sizeof(nodeBuf) - 1, "%s", SIM_BATTERY_CURRENT_PATH.c_str());
+    if (ret < EOK) {
         return ret;
     }
-    ret = snprintf_s(currentBuf, PATH_MAX, sizeof(currentBuf) - 1, "%d", current);
-    if (ret < NUM_ZERO) {
+    ret = snprintf_s(currentBuf, MAX_PATH, sizeof(currentBuf) - 1, "%d", current);
+    if (ret < EOK) {
         return ret;
     }
     if (WriteSysfsFile(nodeBuf, currentBuf, strlen(currentBuf)) > NUM_ZERO) {
@@ -230,12 +230,12 @@ int32_t ThermalDeviceMitigation::BatteryVoltageRequest(uint32_t voltage)
     char voltageNode[MAX_BUF_PATH] = {0};
 
     std::lock_guard<std::mutex> lock(mutex_);
-    ret = snprintf_s(voltageNode, PATH_MAX, sizeof(voltageNode) - 1, "%s", BATTERY_VOLTAGE_PATH.c_str());
-    if (ret < NUM_ZERO) {
+    ret = snprintf_s(voltageNode, MAX_BUF_PATH, sizeof(voltageNode) - 1, "%s", BATTERY_VOLTAGE_PATH.c_str());
+    if (ret < EOK) {
         return ret;
     }
-    ret = snprintf_s(voltageBuf, PATH_MAX, sizeof(voltageBuf) - 1, "%d", voltage);
-    if (ret < NUM_ZERO) {
+    ret = snprintf_s(voltageBuf, MAX_PATH, sizeof(voltageBuf) - 1, "%d", voltage);
+    if (ret < EOK) {
         return ret;
     }
     if (WriteSysfsFile(voltageNode, voltageBuf, strlen(voltageBuf)) > NUM_ZERO) {
