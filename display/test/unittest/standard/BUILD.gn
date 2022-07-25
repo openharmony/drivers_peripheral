@@ -17,7 +17,6 @@ group("hdf_unittest_display") {
   testonly = true
   deps = [
     ":devicetest",
-    ":gfxtest",
     ":gralloctest",
   ]
 }
