@@ -580,6 +580,9 @@ int32_t WifiCmdSendAction(const char *ifName, WifiActionData *actionData)
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, actionData->dst, ETH_ADDR_LEN);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, actionData->src, ETH_ADDR_LEN);
     isSerializeFailed = isSerializeFailed || !HdfSbufWriteBuffer(data, actionData->data, actionData->dataLen);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint32(data, actionData->freq);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteUint32(data, actionData->wait);
+    isSerializeFailed = isSerializeFailed || !HdfSbufWriteInt32(data, actionData->noCck);
     if (isSerializeFailed) {
         HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
         ret = RET_CODE_FAILURE;
