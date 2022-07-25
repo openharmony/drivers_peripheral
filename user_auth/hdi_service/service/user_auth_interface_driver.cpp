@@ -23,7 +23,7 @@
 #include "v1_0/user_auth_interface_stub.h"
 
 using namespace OHOS::HDI::UserAuth::V1_0;
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_USER_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 
 struct HdfUserAuthInterfaceHost {
     struct IDeviceIoService ioService;

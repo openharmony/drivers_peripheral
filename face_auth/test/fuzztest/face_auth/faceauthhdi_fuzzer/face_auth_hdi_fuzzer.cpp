@@ -25,7 +25,7 @@
 
 #include "executor_impl.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_FACE_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_HDI
 
 #undef private
 

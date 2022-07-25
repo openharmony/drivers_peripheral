@@ -20,7 +20,7 @@
 #include "iam_logger.h"
 #include "v1_0/fingerprint_auth_interface_stub.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_FINGERPRINT_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_FINGERPRINT_AUTH_HDI
 
 using namespace OHOS::HDI::FingerprintAuth::V1_0;
 

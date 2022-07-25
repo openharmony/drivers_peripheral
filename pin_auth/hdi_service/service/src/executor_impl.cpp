@@ -23,7 +23,7 @@
 #include "parameter.h"
 #include "sysparam_errno.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_PIN_AUTH_IMPL
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_PIN_AUTH_IMPL
 
 namespace OHOS {
 namespace HDI {

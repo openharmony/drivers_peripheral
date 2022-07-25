@@ -21,7 +21,7 @@
 #include "iam_logger.h"
 #include "iam_ptr.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_PIN_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_PIN_AUTH_HDI
 
 using namespace OHOS::HDI::PinAuth::V1_0;
 
