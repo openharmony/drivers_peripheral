@@ -101,11 +101,6 @@ FILE *g_file;
 char *g_frame;
 void *g_handle;
 char g_path[256] = {'\0'};
-#ifdef AUDIO_HAL_USER
-void *g_sdkHandle;
-int (*g_sdkInitSp)() = NULL;
-void (*g_sdkExitSp)() = NULL;
-#endif
 
 enum AudioCaptureMode {
     CAPTURE_POLL   = 1,
@@ -1005,25 +1000,6 @@ int32_t InitParam(void)
             AUDIO_FUNC_LOGE("GetCapturePassthroughManagerFunc Fail");
             return HDF_FAILURE;
         }
-#ifdef AUDIO_HAL_USER
-        char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
-        g_sdkHandle = dlopen(sdkResolvedPath, 1);
-        if (g_sdkHandle == NULL) {
-            AUDIO_FUNC_LOGE("Open so Invalid, reason:%s", dlerror());
-            return HDF_FAILURE;
-        }
-        g_sdkInitSp = (int32_t (*)())(dlsym(g_sdkHandle, "MpiSdkInit"));
-        if (g_sdkInitSp == NULL) {
-            AUDIO_FUNC_LOGE("Get sdk init Funcs Invalid");
-            return HDF_FAILURE;
-        }
-        g_sdkExitSp = (void (*)())(dlsym(g_sdkHandle, "MpiSdkExit"));
-        if (g_sdkExitSp == NULL) {
-            AUDIO_FUNC_LOGE("Get sdk exit Funcs Invalid");
-            return HDF_FAILURE;
-        }
-        g_sdkInitSp();
-#endif
     } else {
         if (GetCaptureProxyManagerFunc(adapterNameCase) < 0) {
             AUDIO_FUNC_LOGE("GetCaptureProxyManagerFunc Fail");
@@ -1510,16 +1486,7 @@ int32_t main(int32_t argc, char const *argv[])
             g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
         }
     }
-#ifdef AUDIO_HAL_USER
-        if (soMode) {
-            g_sdkExitSp();
-            if (g_sdkHandle != NULL) {
-                dlclose(g_sdkHandle);
-            }
-        }
-#endif
     dlclose(g_handle);
     printf("Record file path:%s\n", g_path);
     return 0;
 }
-
