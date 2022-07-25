@@ -32,6 +32,7 @@ extern "C" {
 
 #define MAX_CALL_BACK_COUNT 10
 static struct CallbackEvent *g_callbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
+static struct Hid2dEvent *g_Hid2dEventMap[MAX_CALL_BACK_COUNT] = {NULL};
 
 void WifiEventReport(const char *ifName, uint32_t event, void *data)
 {
@@ -101,6 +102,78 @@ void WifiUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, co
             g_callbackEventMap[i]->onRecFunc = NULL;
             free(g_callbackEventMap[i]);
             g_callbackEventMap[i] = NULL;
+            return;
+        }
+    }
+}
+
+void Hid2dEventReport(const char *ifName, const uint8_t *msg, uint32_t msgLen)
+{
+    uint32_t i;
+
+    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (g_Hid2dEventMap[i] != NULL && (strcmp(g_Hid2dEventMap[i]->ifName, ifName) == 0)) {
+            HDF_LOGI("%s: Hid2dEventReport ifName = %s", __FUNCTION__, ifName);
+            g_Hid2dEventMap[i]->func(msg, msgLen);
+        }
+    }
+}
+
+int32_t WifiRegisterHid2dCallback(Hid2dCallback func, const char *ifName)
+{
+    struct Hid2dEvent *event = NULL;
+    uint32_t i;
+
+    if (func == NULL || ifName == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return RET_CODE_INVALID_PARAM;
+    }
+    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (g_Hid2dEventMap[i] != NULL && (strcmp(g_Hid2dEventMap[i]->ifName, ifName) == 0) &&
+            g_Hid2dEventMap[i]->func == func) {
+            HDF_LOGI("%s the callback function has been registered!", __FUNCTION__);
+            return RET_CODE_SUCCESS;
+        }
+    }
+    event = (struct Hid2dEvent *)OsalMemCalloc(sizeof(struct Hid2dEvent));
+    if (event == NULL) {
+        HDF_LOGE("%s fail: OsalMemCalloc fail!", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    do {
+        if (strcpy_s(event->ifName, IFNAMSIZ, ifName) != RET_CODE_SUCCESS) {
+            HDF_LOGE("%s: ifName strcpy_s fail", __FUNCTION__);
+            break;
+        }
+        event->func = func;
+        for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+            if (g_Hid2dEventMap[i] == NULL) {
+                g_Hid2dEventMap[i] = event;
+                HDF_LOGD("%s: WifiRegisterHid2dCallback successful", __FUNCTION__);
+                return RET_CODE_SUCCESS;
+            }
+        }
+    } while (0);
+    
+    OsalMemFree(event);
+    HDF_LOGE("%s fail: register onRecFunc num more than %d!", __FUNCTION__, MAX_CALL_BACK_COUNT);
+    return RET_CODE_FAILURE;
+}
+
+void WifiUnregisterHid2dCallback(Hid2dCallback func, const char *ifName)
+{
+    uint32_t i;
+
+    if (func == NULL || ifName == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return;
+    }
+    for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
+        if (g_Hid2dEventMap[i] != NULL && (strcmp(g_Hid2dEventMap[i]->ifName, ifName) == 0) &&
+            g_Hid2dEventMap[i]->func == func) {
+            g_Hid2dEventMap[i]->func = NULL;
+            OsalMemFree(g_Hid2dEventMap[i]);
+            g_Hid2dEventMap[i] = NULL;
             return;
         }
     }
