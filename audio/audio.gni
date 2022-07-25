@@ -5,7 +5,6 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/ohos.gni")
   if (product_name == "ohos-arm64") {
-    enable_audio_alsa_mode = false
     enable_audio_hal_notsupport_pathselect = false
   }
 }
