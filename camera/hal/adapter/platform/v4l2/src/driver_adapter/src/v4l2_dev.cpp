@@ -234,12 +234,12 @@ void HosV4L2Dev::loopBuffers()
     int nfds, rc;
     struct epoll_event events[MAXSTREAMCOUNT];
 
-    CAMERA_LOGD("!!! loopBuffers enter\n");
+    CAMERA_LOGD("!!! loopBuffers enter, streamNumber_=%{public}d\n", streamNumber_);
     prctl(PR_SET_NAME, "v4l2_loopbuffer");
 
     while (streamNumber_ > 0) {
         nfds = epoll_wait(epollFd_, events, MAXSTREAMCOUNT, -1);
-        CAMERA_LOGD("loopBuffers: epoll_wait rc = %d streamNumber_ == %d\n", nfds, streamNumber_);
+        CAMERA_LOGD("loopBuffers: epoll_wait rc = %{public}d streamNumber_ == %%{public}d\n", nfds, streamNumber_);
 
         for (int n = 0; nfds > 0; ++n, --nfds) {
             if ((events[n].events & EPOLLIN) && (events[n].data.fd != eventFd_)) {
@@ -256,7 +256,7 @@ void HosV4L2Dev::loopBuffers()
             }
         }
     }
-    CAMERA_LOGD("!!! loopBuffers exit\n");
+    CAMERA_LOGD("!!! loopBuffers exit, streamNumber_=%{public}d\n", streamNumber_);
 }
 
 RetCode HosV4L2Dev::CreateEpoll(int fd, const unsigned int streamNumber)
@@ -341,14 +341,15 @@ RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
     }
 
     if (streamNumber_ == 0) {
+        streamNumber_++;
+        CAMERA_LOGE("go start thread loopBuffers, streamNumber_=%{public}d\n", streamNumber_);
         streamThread_ = new (std::nothrow) std::thread(&HosV4L2Dev::loopBuffers, this);
         if (streamThread_ == nullptr) {
             CAMERA_LOGE("V4L2 StartStream start thread failed\n");
+            streamNumber_--;
             return RC_ERROR;
         }
     }
-
-    streamNumber_++;
 
     return RC_OK;
 }

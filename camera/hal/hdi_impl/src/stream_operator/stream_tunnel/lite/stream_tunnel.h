@@ -56,15 +56,15 @@ protected:
     int32_t index = -1;
     uint64_t frameCount_ = 0;
     std::shared_ptr<OHOS::Surface> bufferQueue_ = nullptr;
-    std::unordered_map<std::shared_ptr<IBuffer>, OHOS::SurfaceBuffer*> buffers = {};
-    std::mutex lock_ = {};
-    std::mutex waitLock_ = {};
-    std::condition_variable waitCV_ = {};
+    std::unordered_map<std::shared_ptr<IBuffer>, OHOS::SurfaceBuffer*> buffers;
+    std::mutex lock_;
+    std::mutex waitLock;
+    std::condition_variable waitCV_;
     std::atomic<bool> wakeup_ = false;
     std::atomic<bool> stop_ = false;
     std::atomic<uint32_t> restBuffers = 0;
-    std::mutex finishLock_ = {};
-    std::condition_variable finishCV_ = {};
+    std::mutex finishLock_;
+    std::condition_variable finishCV_;
 };
 } // namespace OHOS::Camera
 #endif
