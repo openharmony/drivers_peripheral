@@ -42,10 +42,11 @@
 #define AUDIO_CHANNELCOUNT 2
 #define AUDIO_SAMPLE_RATE_48K 48000
 #define PATH_LEN 256
-#define DEEP_BUFFER_RENDER_PERIOD_SIZE 4096
+#define DEEP_BUFFER_RENDER_PERIOD_SIZE 1024
 #define DEEP_BUFFER_RENDER_PERIOD_COUNT 8
 #define INT_32_MAX 0x7fffffff
 #define PERIOD_SIZE 1024
+#define ATTR_PERIOD_MIN 2048
 #define EXT_PARAMS_MAXLEN 107
 
 enum AudioPCMBit {
@@ -210,7 +211,7 @@ int32_t InitAttrs(struct AudioSampleAttributes *attrs)
     attrs->sampleRate = AUDIO_SAMPLE_RATE_48K;
     attrs->interleaved = 1;
     attrs->type = AUDIO_IN_MEDIA;
-    attrs->period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    attrs->period = ATTR_PERIOD_MIN;
     attrs->frameSize = PCM_16_BIT * attrs->channelCount / PCM_8_BIT;
     attrs->isBigEndian = false;
     attrs->isSignedData = true;
