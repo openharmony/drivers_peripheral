@@ -274,7 +274,7 @@ void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime, u
 void ThermalDfx::GetTraceInfo()
 {
     XMLTracingInfo info = ThermalHdfConfig::GetInsance().GetXmlTraceInfo();
-    THERMAL_HILOGD(COMP_HDI, "info.interval = %{public}s, info.record = %{public}s, info.outpath = %{public}s",
+    THERMAL_HILOGD(COMP_HDI, "info.interval = %{public}s, info.record = %{public}s, info.outpath = %{private}s",
         info.interval.c_str(), info.record.c_str(), info.outpath.c_str());
 
     g_xmlTraceInfo.interval = info.interval;
