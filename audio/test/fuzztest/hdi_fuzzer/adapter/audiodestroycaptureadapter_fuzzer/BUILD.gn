@@ -46,7 +46,7 @@ ohos_fuzztest("AudioDestroycaptureAdapterFuzzTest") {
   ]
   external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
   defines = []
-  if (enable_audio_adm_so) {
+  if (enable_audio_adm_passthrough) {
     defines += [ "AUDIO_ADM_SO" ]
   }
   if (enable_audio_adm_service) {

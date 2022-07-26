@@ -765,8 +765,8 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, SUB_Audio_HDI_AudioCaptureGetSam
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
     EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
-    EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.sampleRate);
-    EXPECT_EQ(SAMPLE_RATE_32000, attrsValue.channelCount);
+    EXPECT_EQ(SAMPLE_RATE_32000, attrsValue.sampleRate);
+    EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 #endif
 
     adapter->DestroyCapture(adapter, capture);
