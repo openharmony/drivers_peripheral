@@ -1155,7 +1155,6 @@ int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct 
         AUDIO_FUNC_LOGE("render or frames or time is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-#ifndef AUDIO_HAL_USER
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
         AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
@@ -1171,7 +1170,6 @@ int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct 
         AUDIO_FUNC_LOGE("Get Position FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-#endif
     *frames = render->renderParam.frameRenderMode.frames;
     render->renderParam.frameRenderMode.time.tvSec = (int64_t)(render->renderParam.frameRenderMode.frames /
         render->renderParam.frameRenderMode.attrs.sampleRate);

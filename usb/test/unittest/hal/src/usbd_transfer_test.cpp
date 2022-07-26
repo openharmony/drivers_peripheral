@@ -17,9 +17,9 @@
 #include <iostream>
 #include <vector>
 #include "hdf_log.h"
-#include "usbd_client.h"
 #include "UsbSubscriberTest.h"
-#include "usb_errors.h"
+#include "v1_0/usb_types.h"
+#include "v1_0/iusb_interface.h"
 
 const int SLEEP_TIME = 3;
 uint8_t BUS_NUM_1 = 0;
@@ -30,51 +30,63 @@ const uint8_t BUS_NUM_222 = 222;
 const uint32_t LENGTH_NUM_255 = 255;
 const uint8_t INTERFACEID_1 = 1;
 const uint8_t POINTID_1 = 1;
-const uint8_t POINTID_129 = 129;
+const uint8_t POINTID_129 = 130;
 
 using namespace testing::ext;
 using namespace OHOS;
 using namespace OHOS::USB;
 using namespace std;
+using namespace OHOS::HDI::Usb::V1_0;
+
+namespace {
+    sptr<IUsbInterface> g_usbInterface = nullptr;
+}
 
 struct UsbDev UsbdTransferTest::dev_ = {0, 0};
 
 void UsbdTransferTest::SetUpTestCase(void)
 {
-    auto ret = UsbdClient::GetInstance().SetPortRole(1, 1, 1);
+    g_usbInterface = IUsbInterface::Get();
+    if (g_usbInterface == nullptr) {
+        HDF_LOGE("%{public}s:IUsbInterface::Get() failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->SetPortRole(1, 1, 1);
     sleep(SLEEP_TIME);
-    HDF_LOGI("UsbdFunctionTest::[Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    HDF_LOGI("UsbdTransferTest::[Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
     if (ret != 0) {
         exit(0);
     }
+
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: bind usbd subscriber failed\n", __func__);
+        exit(0);
+    }
+
     std::cout << "please connect device, press enter to continue" << std::endl;
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {
     }
 
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (UsbdClient::GetInstance().BindUsbdSubscriber(subscriber) != UEC_OK) {
-        HDF_LOGE("%{public}s: bind usbd subscriber failed\n", __func__);
-        exit(0);
-    }
     dev_ = {subscriber->busNum_, subscriber->devAddr_};
-    ret = UsbdClient::GetInstance().OpenDevice(dev_);
+    ret = g_usbInterface->OpenDevice(dev_);
     HDF_LOGI("UsbdTransferTest:: %{public}d OpenDevice=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 void UsbdTransferTest::TearDownTestCase(void)
 {
     sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (UsbdClient::GetInstance().BindUsbdSubscriber(subscriber) != UEC_OK) {
+    if (g_usbInterface->BindUsbdSubscriber(subscriber) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: bind usbd subscriber failed\n", __func__);
         exit(0);
     }
     dev_ = {subscriber->busNum_, subscriber->devAddr_};
-    auto ret = UsbdClient::GetInstance().CloseDevice(dev_);
+    auto ret = g_usbInterface->CloseDevice(dev_);
     HDF_LOGI("UsbdTransferTest:: %{public}d Close=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 void UsbdTransferTest::SetUp(void) {}
@@ -94,9 +106,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer001, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000000, 8, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer001 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -112,9 +124,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer002, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000000, 8, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer002 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -130,9 +142,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer003, TestSize.Level1)
     uint32_t length = LENGTH_NUM_255;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000000, 8, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer003 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -148,9 +160,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer004, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000000, 6, 0x100, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer004 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -165,9 +177,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer005, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000000, 6, 0x100, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer005 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -182,9 +194,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer006, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000000, 6, 0x100, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer006 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -200,9 +212,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer007, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000001, 0X0A, 0, intercafeidex, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer007 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -218,9 +230,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer008, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000001, 0X0A, 0, intercafeidex, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer008 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -236,9 +248,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer009, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000001, 0X0A, 0, intercafeidex, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer009 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -253,9 +265,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer010, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000000, 0, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer010 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -270,9 +282,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer011, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000000, 0, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer011 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -287,9 +299,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer012, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000000, 0, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer012 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -304,9 +316,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer013, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000001, 0, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer013 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -321,9 +333,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer014, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000001, 0, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer014 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -338,9 +350,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer015, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000001, 0, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer015 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -355,9 +367,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer016, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000010, 0, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer016 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -372,9 +384,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer017, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000010, 0, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer017 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -389,9 +401,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer018, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {0};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000010, 0, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer018 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -406,9 +418,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer019, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000010, 0X0C, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer019 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -423,9 +435,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer020, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000010, 0X0C, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer020 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -440,9 +452,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer021, TestSize.Level1)
     uint8_t buffer[LENGTH_NUM_255] = {};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     struct UsbCtrlTransfer ctrlparmas = {0b10000010, 0X0C, 0, 0, 1000};
-    auto ret = UsbdClient::GetInstance().ControlTransfer(dev, ctrlparmas, bufferdata);
+    auto ret = g_usbInterface->ControlTransferRead(dev, ctrlparmas, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdControlTransfer021 %{public}d ControlTransfer=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -456,16 +468,16 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead001, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead001 %{public}d UsbdBulkTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -479,17 +491,17 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead002, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead002 %{public}d ReleaseInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.busNum = BUS_NUM_222;
     uint32_t length = 100;
     uint8_t buffer[100] = {0};
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead002 %{public}d UsbdBulkTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -503,17 +515,17 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead003, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.devAddr = 244;
     uint32_t length = 100;
     uint8_t buffer[100] = {0};
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead003 %{public}d UsbdBulkTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -527,17 +539,17 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead004, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t buffer[100] = {0};
     uint32_t length = 100;
     struct UsbPipe pipe = {interfaceId, pointid};
-    pipe.interfaceId = 244;
+    pipe.intfId = 244;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead004 %{public}d UsbdBulkTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -551,17 +563,17 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead005, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint32_t length = 100;
     uint8_t buffer[100] = {};
     struct UsbPipe pipe = {interfaceId, pointid};
     pipe.endpointId = 244;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead005 %{public}d UsbdBulkTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -575,16 +587,16 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite001, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world bulk writ01";
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite001 %{public}d BulkTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -598,17 +610,17 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite002, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     dev.busNum = 99;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world bulk writ02";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite002 %{public}d BulkTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -622,17 +634,17 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite003, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.devAddr = 244;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world bulk writ03";
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite003 %{public}d BulkTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -646,17 +658,17 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite004, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
-    pipe.interfaceId = 255;
+    pipe.intfId = 255;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world bulk writ04";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite004 %{public}d BulkTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -670,17 +682,17 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite005, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     pipe.endpointId = 255;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world bulk writ05";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite005 %{public}d BulkTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -694,18 +706,18 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite006, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite006 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     dev.busNum = 99;
     dev.devAddr = 99;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world bulk writ06";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite006 %{public}d BulkTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -719,16 +731,16 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite007, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = 99;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite007 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world bulk writ07";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->BulkTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite007 %{public}d BulkTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -742,16 +754,16 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite008, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite008 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world bulk writ08";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().BulkTransferWrite(dev, pipe, -1, bufferdata);
+    ret = g_usbInterface->BulkTransferWrite(dev, pipe, -1, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferWrite008 %{public}d BulkTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -765,17 +777,17 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead001, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->InterruptTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead001 %{public}d UsbdInterruptTransferRead=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -789,18 +801,18 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead002, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead002 %{public}d ReleaseInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.busNum = BUS_NUM_222;
     uint32_t length = 100;
     uint8_t buffer[100] = {0};
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->InterruptTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead002 %{public}d UsbdInterruptTransferRead=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -814,16 +826,16 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead003, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.devAddr = 244;
     uint32_t length = 100;
     uint8_t buffer[100] = {0};
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferRead(dev, pipe, 1000, bufferdata);
-    ASSERT_TRUE(ret != 0);
+    ret = g_usbInterface->InterruptTransferRead(dev, pipe, 1000, bufferdata);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -837,18 +849,18 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead004, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t buffer[100] = {0};
     uint32_t length = 100;
     struct UsbPipe pipe = {interfaceId, pointid};
-    pipe.interfaceId = 244;
+    pipe.intfId = 244;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->InterruptTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead004 %{public}d UsbdInterruptTransferRead=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -862,18 +874,18 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead005, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint32_t length = 100;
     uint8_t buffer[100] = {};
     struct UsbPipe pipe = {interfaceId, pointid};
     pipe.endpointId = 244;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->InterruptTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead005 %{public}d UsbdInterruptTransferRead=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -887,17 +899,17 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite001, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Interrupt writ01";
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite001 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -911,18 +923,18 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite002, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     dev.busNum = 99;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Interrupt writ02";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite002 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -936,18 +948,18 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite003, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.devAddr = 244;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Interrupt writ03";
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite003 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -961,18 +973,18 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite004, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
-    pipe.interfaceId = 255;
+    pipe.intfId = 255;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Interrupt writ04";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite004 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -986,18 +998,18 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite005, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     pipe.endpointId = 255;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Interrupt writ05";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite005 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1011,19 +1023,19 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite006, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite006 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     dev.busNum = 99;
     dev.devAddr = 99;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Interrupt writ06";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite006 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1037,17 +1049,17 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite007, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = 99;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite007 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Interrupt writ07";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite007 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1061,17 +1073,17 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite008, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite008 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Interrupt writ08";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().InterruptTransferWrite(dev, pipe, -1, bufferdata);
+    ret = g_usbInterface->InterruptTransferWrite(dev, pipe, -1, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite008 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
              ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1085,16 +1097,16 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead001, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead001 %{public}d UsbdIsoTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1109,17 +1121,17 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead002, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead002 %{public}d interfaceId=%{public}d", __LINE__, interfaceId);
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead002 %{public}d ReleaseInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.busNum = BUS_NUM_222;
     uint32_t length = 100;
     uint8_t buffer[100] = {0};
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead002 %{public}d UsbdIsoTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1133,17 +1145,17 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead003, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.devAddr = 244;
     uint32_t length = 100;
     uint8_t buffer[100] = {0};
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead003 %{public}d UsbdIsoTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1157,17 +1169,17 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead004, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint8_t buffer[100] = {0};
     uint32_t length = 100;
     struct UsbPipe pipe = {interfaceId, pointid};
-    pipe.interfaceId = 244;
+    pipe.intfId = 244;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead004 %{public}d UsbdIsoTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1181,17 +1193,17 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead005, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint32_t length = 100;
     uint8_t buffer[100] = {};
     struct UsbPipe pipe = {interfaceId, pointid};
     pipe.endpointId = 244;
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferRead(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead005 %{public}d UsbdIsoTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1205,16 +1217,16 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite001, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Iso writ01";
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite001 %{public}d IsoTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -1228,17 +1240,17 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite002, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     dev.busNum = 99;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Iso writ02";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite002 %{public}d IsoTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1252,17 +1264,17 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite003, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     dev.devAddr = 244;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Iso writ03";
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite003 %{public}d IsoTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1276,17 +1288,17 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite004, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
-    pipe.interfaceId = 255;
+    pipe.intfId = 255;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Iso writ04";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite004 %{public}d IsoTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1300,17 +1312,17 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite005, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     pipe.endpointId = 255;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Iso writ05";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite005 %{public}d IsoTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1324,18 +1336,18 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite006, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite006 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     dev.busNum = 99;
     dev.devAddr = 99;
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Iso writ06";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite006 %{public}d IsoTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1349,16 +1361,16 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite007, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = 99;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite007 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Iso writ07";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferWrite(dev, pipe, 1000, bufferdata);
+    ret = g_usbInterface->IsoTransferWrite(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite007 %{public}d IsoTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret != 0);
+    ASSERT_NE(ret, 0);
 }
 
 /**
@@ -1372,14 +1384,14 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite008, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
-    auto ret = UsbdClient::GetInstance().ClaimInterface(dev, interfaceId, true);
+    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, true);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite008 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
     struct UsbPipe pipe = {interfaceId, pointid};
     uint32_t length = 100;
     uint8_t buffer[100] = "hello world Iso writ08";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = UsbdClient::GetInstance().IsoTransferWrite(dev, pipe, -1, bufferdata);
+    ret = g_usbInterface->IsoTransferWrite(dev, pipe, -1, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite008 %{public}d IsoTransferWrite=%{public}d", __LINE__, ret);
-    ASSERT_TRUE(ret == 0);
+    ASSERT_EQ(0, ret);
 }

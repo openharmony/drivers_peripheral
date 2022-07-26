@@ -429,6 +429,9 @@ typedef struct {
     uint8_t bssid[ETH_ADDR_LEN];
     uint8_t *data;
     uint32_t dataLen;
+    uint32_t freq;
+    uint32_t wait;
+    int32_t noCck;
 } WifiActionData;
 
 typedef struct {

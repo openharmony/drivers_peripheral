@@ -23,12 +23,6 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_HOST
 
-#ifdef AUDIO_HAL_USER
-static void *g_mpiInitSo = NULL;
-#define SO_INTERFACE_LIB_MPI_PATH HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_mpi")
-#endif
-
-
 void AudioHdiPrimaryServerRelease(struct HdfDeviceObject *deviceObject)
 {
     AUDIO_FUNC_LOGI("enter!");
@@ -41,17 +35,6 @@ void AudioHdiPrimaryServerRelease(struct HdfDeviceObject *deviceObject)
         return;
     }
     deviceObject->service = NULL;
-#ifdef AUDIO_HAL_USER
-    if (g_mpiInitSo == NULL) {
-        return;
-    }
-    int32_t (*mpiExit)() = dlsym(g_mpiInitSo, "AudioMpiSysExit");
-    if (mpiExit == NULL) {
-        return;
-    }
-    mpiExit();
-    dlclose(g_mpiInitSo);
-#endif
     AUDIO_FUNC_LOGD("end!");
     return;
 }
@@ -90,20 +73,6 @@ int AudioHdiPrimaryServerInit(struct HdfDeviceObject *deviceObject)
         AUDIO_FUNC_LOGE("deviceObject is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-#ifdef AUDIO_HAL_USER
-    void *sdkHandle;
-    int (*sdkInitSp)() = NULL;
-    char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
-    sdkHandle = dlopen(sdkResolvedPath, RTLD_LAZY);
-    if (sdkHandle == NULL) {
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    sdkInitSp = (int32_t (*)())(dlsym(sdkHandle, "MpiSdkInit"));
-    if (sdkInitSp == NULL) {
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    sdkInitSp();
-#endif
     if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO)) {
         AUDIO_FUNC_LOGE("Set Primary DEVICE_CLASS_AUDIO fail!");
     }

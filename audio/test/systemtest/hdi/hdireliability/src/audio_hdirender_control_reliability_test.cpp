@@ -40,11 +40,6 @@ public:
     void TearDown();
     static TestAudioManager *(*GetAudioManager)();
     static void *handleSo;
-#ifdef AUDIO_MPI_SO
-    static int32_t (*SdkInit)();
-    static void (*SdkExit)();
-    static void *sdkSo;
-#endif
     static int32_t RelGetAllAdapter(struct PrepareAudioPara& ptr);
     static int32_t RelLoadAdapter(struct PrepareAudioPara& ptr);
     static int32_t RelUnloadAdapter(struct PrepareAudioPara& ptr);
@@ -61,30 +56,9 @@ using THREAD_FUNC = void *(*)(void *);
 
 TestAudioManager *(*AudioHdiRenderControlReliabilityTest::GetAudioManager)() = nullptr;
 void *AudioHdiRenderControlReliabilityTest::handleSo = nullptr;
-#ifdef AUDIO_MPI_SO
-    int32_t (*AudioHdiRenderControlReliabilityTest::SdkInit)() = nullptr;
-    void (*AudioHdiRenderControlReliabilityTest::SdkExit)() = nullptr;
-    void *AudioHdiRenderControlReliabilityTest::sdkSo = nullptr;
-#endif
 
 void AudioHdiRenderControlReliabilityTest::SetUpTestCase(void)
 {
-#ifdef AUDIO_MPI_SO
-    char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
-    sdkSo = dlopen(sdkResolvedPath, RTLD_LAZY);
-    if (sdkSo == nullptr) {
-        return;
-    }
-    SdkInit = (int32_t (*)())(dlsym(sdkSo, "MpiSdkInit"));
-    if (SdkInit == nullptr) {
-        return;
-    }
-    SdkExit = (void (*)())(dlsym(sdkSo, "MpiSdkExit"));
-    if (SdkExit == nullptr) {
-        return;
-    }
-    SdkInit();
-#endif
     char absPath[PATH_MAX] = {0};
     if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
         return;
@@ -101,19 +75,6 @@ void AudioHdiRenderControlReliabilityTest::SetUpTestCase(void)
 
 void AudioHdiRenderControlReliabilityTest::TearDownTestCase(void)
 {
-#ifdef AUDIO_MPI_SO
-    SdkExit();
-    if (sdkSo != nullptr) {
-        dlclose(sdkSo);
-        sdkSo = nullptr;
-    }
-    if (SdkInit != nullptr) {
-        SdkInit = nullptr;
-    }
-    if (SdkExit != nullptr) {
-        SdkExit = nullptr;
-    }
-#endif
     if (handleSo != nullptr) {
         dlclose(handleSo);
         handleSo = nullptr;
