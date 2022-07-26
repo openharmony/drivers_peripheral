@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace HDI {
-namespace MemoryTracker {
+namespace Memorytracker {
 namespace V1_0 {
 #define HDF_LOG_TAG           hdf_memorytracker_impl
 
@@ -38,6 +38,6 @@ int32_t MemoryTrackerInterfaceImpl::GetDevMem(int32_t pid, MemoryTrackerType typ
     return HDF_SUCCESS;
 }
 } // V1_0
-} // MemoryTracker
+} // Memorytracker
 } // HDI
 } // OHOS
