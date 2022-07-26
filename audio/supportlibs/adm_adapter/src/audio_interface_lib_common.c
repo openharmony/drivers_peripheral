@@ -41,9 +41,19 @@ void AudioBufReplyRecycle(struct HdfSBuf *sBuf, struct HdfSBuf *reply)
 {
     if (sBuf != NULL) {
         HdfSbufRecycle(sBuf);
+        sBuf = NULL;
     }
     if (reply != NULL) {
         HdfSbufRecycle(reply);
+        reply = NULL;
+    }
+}
+
+void AudioSbufRecycle(struct HdfSBuf *sBuf)
+{
+    if (sBuf != NULL) {
+        HdfSbufRecycle(sBuf);
+        sBuf = NULL;
     }
 }
 

@@ -69,6 +69,7 @@ struct AudioCtrlElemInfo {
 
 struct HdfIoService *HdfIoServiceBindName(const char *serviceName);
 void AudioBufReplyRecycle(struct HdfSBuf *sBuf, struct HdfSBuf *reply);
+void AudioSbufRecycle(struct HdfSBuf *sBuf);
 int32_t AudioServiceDispatch(struct HdfIoService *service, int cmdId,
     struct HdfSBuf *sBuf, struct HdfSBuf *reply);
 struct HdfSBuf *AudioObtainHdfSBuf(void);
