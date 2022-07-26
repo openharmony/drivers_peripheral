@@ -82,18 +82,6 @@ typedef struct {
     void *(*Mmap)(BufferHandle *handle);
 
     /**
-     * @brief Maps memory for YUV.
-     *
-     * @param handle Indicates the pointer to the buffer of the memory to map.
-     * @param info Indicates the pointer to the YUVDescInfo of the memory to map.
-     *
-     * @return Returns the pointer to a valid address if the operation is successful; returns <b>NULL</b> otherwise.
-     * @since 3.2
-     * @version 1.0
-     */
-    void *(*MmapYUV)(BufferHandle *handle, YUVDescInfo *info);
-
-    /**
      * @brief Maps memory to memory with cache in the process's address space.
      *
      * @param handle Indicates the pointer to the buffer of the memory to map.
@@ -165,6 +153,18 @@ typedef struct {
      * @version 1.0
      */
     int32_t (*IsSupportedAlloc)(uint32_t num, const VerifyAllocInfo *infos, bool *supporteds);
+
+    /**
+     * @brief Maps memory for YUV.
+     *
+     * @param handle Indicates the pointer to the buffer of the memory to map.
+     * @param info Indicates the pointer to the YUVDescInfo of the memory to map.
+     *
+     * @return Returns the pointer to a valid address if the operation is successful; returns <b>NULL</b> otherwise.
+     * @since 3.2
+     * @version 1.0
+     */
+    void *(*MmapYUV)(BufferHandle *handle, YUVDescInfo *info);
 } GrallocFuncs;
 
 /**
