@@ -18,11 +18,11 @@
 
 namespace OHOS {
 namespace USB {
-int32_t UsbSubscriberTest::DeviceEvent(const UsbInfo &info)
+int32_t UsbSubscriberTest::DeviceEvent(const USBDeviceInfo &info)
 {
-    busNum_ = info.getDevInfoBusNum();
-    devAddr_ = info.getDevInfoDevNum();
-    HDF_LOGI("%{public}s: busNum is %{public}d, devAddris %{public}d", __func__, busNum_, devAddr_);
+    busNum_ = info.busNum;
+    devAddr_ = info.devNum;
+    HDF_LOGI("%{public}s: busNum is %{public}d, devAddr is %{public}d", __func__, busNum_, devAddr_);
     return 0;
 }
 } // namespace USB

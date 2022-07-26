@@ -16,11 +16,6 @@
 #include "audio_interface_lib_capture.h"
 #include "osal_mem.h"
 #include "audio_hal_log.h"
-#ifdef ALSA_MODE
-#include "alsa_audio.h"
-struct pcm *pcm;
-struct DevInfo g_inDevInfo;
-#endif
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 
@@ -55,24 +50,11 @@ int32_t SetHwParamsCapture(const struct AudioHwCaptureParam * const handleData)
     g_hwParams.startThreshold = handleData->frameCaptureMode.attrs.startThreshold;
     g_hwParams.stopThreshold = handleData->frameCaptureMode.attrs.stopThreshold;
     g_hwParams.silenceThreshold = handleData->frameCaptureMode.attrs.silenceThreshold;
-#ifdef ALSA_MODE
-    AUDIO_FUNC_LOGI("ALSA_MODE streamType:%{public}d, channels:%{public}d, rate:%{public}d, periodSize:%{public}d, "
-        "periodCount:%{public}d, cardServiceName:%{public}s, format:%{public}d, period:%{public}d, "
-        "frameSize:%{public}d, isBigEndian:%{public}d, isSignedData:%{public}d, startThreshold:%{public}d, "
-        "stopThreshold:%{public}d, silenceThreshold:%{public}d",
-        g_hwParams.streamType, g_hwParams.channels, g_hwParams.rate, g_hwParams.periodSize,
-        g_hwParams.periodCount, g_hwParams.cardServiceName, g_hwParams.format, g_hwParams.period,
-        g_hwParams.frameSize, g_hwParams.isBigEndian, g_hwParams.isSignedData, g_hwParams.startThreshold,
-        g_hwParams.stopThreshold, g_hwParams.silenceThreshold);
-#endif
     return HDF_SUCCESS;
 }
 
 int32_t ParamsSbufWriteBuffer(struct HdfSBuf *sBuf)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (sBuf == NULL) {
         return HDF_FAILURE;
     }
@@ -123,9 +105,6 @@ int32_t ParamsSbufWriteBuffer(struct HdfSBuf *sBuf)
 
 int32_t AudioCtlCaptureSetPauseBuf(struct HdfSBuf *sBuf, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -157,9 +136,6 @@ int32_t AudioCtlCaptureSetPauseBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
 int32_t AudioCtlCaptureSetPauseStu(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -196,9 +172,6 @@ int32_t AudioCtlCaptureSetPauseStu(const struct DevHandleCapture *handle,
 
 int32_t AudioCtlCaptureGetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("CaptureGetVolumeSBuf  parameter is empty!");
         return HDF_FAILURE;
@@ -225,15 +198,6 @@ int32_t AudioCtlCaptureGetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwC
 int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    char *ctlName = "DACL Capture Volume";
-    ReadInSoundCard();
-    (void)memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
-    GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
-    MixerOpenLegacy(false, g_inDevInfo.card);
-    handleData->captureMode.ctlParam.volume = RouteGetVoiceVolume(ctlName, false);
-    return HDF_SUCCESS;
-#endif
     int32_t ret;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("CaptureGetVolume paras is NULL!");
@@ -279,9 +243,6 @@ int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
 
 int32_t AudioCtlCaptureSetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("CaptureSetVolumeSBuf parameter is empty!");
         return HDF_FAILURE;
@@ -313,11 +274,6 @@ int32_t AudioCtlCaptureSetVolumeSBuf(struct HdfSBuf *sBuf, const struct AudioHwC
 int32_t AudioCtlCaptureSetVolume(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    float volume = handleData->captureMode.ctlParam.volume;
-    RouteSetCaptureVoiceVolume(volume);
-    return HDF_SUCCESS;
-#endif
     int32_t ret;
     AUDIO_FUNC_LOGI();
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -354,9 +310,6 @@ int32_t AudioCtlCaptureSetVolume(const struct DevHandleCapture *handle,
 
 int32_t AudioCtlCaptureSetMuteSBuf(struct HdfSBuf *sBuf, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -388,9 +341,6 @@ int32_t AudioCtlCaptureSetMuteSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
 int32_t AudioCtlCaptureSetMuteStu(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -426,9 +376,6 @@ int32_t AudioCtlCaptureSetMuteStu(const struct DevHandleCapture *handle,
 
 int32_t AudioCtlCaptureGetMuteSBuf(struct HdfSBuf *sBuf, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("The parameter is empty!");
         return HDF_FAILURE;
@@ -455,9 +402,6 @@ int32_t AudioCtlCaptureGetMuteSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
 int32_t AudioCtlCaptureGetMuteStu(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -504,9 +448,6 @@ int32_t AudioCtlCaptureGetMuteStu(const struct DevHandleCapture *handle,
 
 int32_t AudioCtlCaptureSetGainSBuf(struct HdfSBuf *sBuf, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("CaptureSetGainSBuf( handleData or sBuf is NULL!");
         return HDF_FAILURE;
@@ -538,9 +479,6 @@ int32_t AudioCtlCaptureSetGainSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
 int32_t AudioCtlCaptureSetGainStu(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -576,9 +514,6 @@ int32_t AudioCtlCaptureSetGainStu(const struct DevHandleCapture *handle,
 
 int32_t AudioCtlCaptureGetGainSBuf(struct HdfSBuf *sBuf, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("CaptureGetGainSBuf paras is NULL!");
         return HDF_FAILURE;
@@ -605,9 +540,6 @@ int32_t AudioCtlCaptureGetGainSBuf(struct HdfSBuf *sBuf, const struct AudioHwCap
 int32_t AudioCtlCaptureGetGainStu(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -655,9 +587,6 @@ int32_t AudioCtlCaptureGetGainStu(const struct DevHandleCapture *handle,
 int32_t AudioCtlCaptureSceneSelectSBuf(struct HdfSBuf *sBuf,
     const struct AudioHwCaptureParam *handleData, int32_t deviceIndex)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("CaptureSceneSelectSBuf handleData or sBufs is NULL!");
         return HDF_FAILURE;
@@ -694,9 +623,6 @@ int32_t AudioCtlCaptureSceneSelectSBuf(struct HdfSBuf *sBuf,
 int32_t AudioCtlCaptureSceneSelect(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     int32_t index;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -741,9 +667,6 @@ int32_t AudioCtlCaptureSceneSelect(const struct DevHandleCapture *handle,
 
 int32_t AudioCtlCaptureGetGainThresholdSBuf(struct HdfSBuf *sBuf, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("CaptureGetGainThresholdSBuf paras is empty!");
         return HDF_FAILURE;
@@ -770,9 +693,6 @@ int32_t AudioCtlCaptureGetGainThresholdSBuf(struct HdfSBuf *sBuf, const struct A
 int32_t AudioCtlCaptureGetGainThreshold(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     int32_t ret;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -825,9 +745,6 @@ int32_t AudioCtlCaptureGetGainThreshold(const struct DevHandleCapture *handle,
 
 int32_t AudioCtlCaptureGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("CaptureGetVolThresholdSBuf paras is empty!");
         return HDF_FAILURE;
@@ -851,33 +768,9 @@ int32_t AudioCtlCaptureGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct Au
     return HDF_SUCCESS;
 }
 
-#ifdef ALSA_MODE
-int32_t TinyAlsaAudioCtlCaptureGetVolThreshold(struct AudioHwCaptureParam *handleData)
-{
-    if (handleData == NULL) {
-        AUDIO_FUNC_LOGE("paras is NULL!");
-        return HDF_FAILURE;
-    }
-    int64_t volMin = 0;
-    int64_t volMax = 0;
-    char *ctlName = "DACL Capture Volume";
-    ReadInSoundCard();
-    (void)memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
-    GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
-    MixerOpenLegacy(false, g_inDevInfo.card);
-    RouteGetVoiceMinMaxStep(&volMin, &volMax, ctlName, false);
-    handleData->captureMode.ctlParam.volThreshold.volMax = volMax;
-    handleData->captureMode.ctlParam.volThreshold.volMin = volMin;
-    return HDF_SUCCESS;
-}
-#endif
-
 int32_t AudioCtlCaptureGetVolThreshold(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return TinyAlsaAudioCtlCaptureGetVolThreshold(handleData);
-#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("paras is NULL!");
         return HDF_FAILURE;
@@ -972,12 +865,8 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
         AUDIO_FUNC_LOGE("Function parameter is NULL!");
         return HDF_FAILURE;
     }
-#ifndef ALSA_MODE
     int32_t ret;
     struct HdfIoService *service = NULL;
-#else
-    int32_t ret = HDF_SUCCESS;
-#endif
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
         AUDIO_FUNC_LOGE("Failed to obtain sBuf");
@@ -991,7 +880,6 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
         AudioSbufRecycle(sBuf);
         return HDF_FAILURE;
     }
-#ifndef ALSA_MODE
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         AUDIO_FUNC_LOGE("Function parameter is empty!");
@@ -1002,17 +890,13 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Failed to send service call!");
     }
-#endif
-    AudioSbufRecycle(sBuf);
+    AudioBufReplyRecycle(sBuf, NULL);
     return ret;
 }
 
 int32_t AudioOutputCaptureOpen(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("Function parameter is NULL!");
         return HDF_FAILURE;
@@ -1042,9 +926,6 @@ int32_t AudioOutputCaptureOpen(const struct DevHandleCapture *handle,
 
 int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, struct HdfSBuf *reply)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     int32_t ret;
     int32_t buffStatus = 0;
     int32_t tryNumReply = 100; // try get reply count
@@ -1088,74 +969,6 @@ int32_t AudioOutputCaptureReadFrame(struct HdfIoService *service, int cmdId, str
     return HDF_SUCCESS;
 }
 
-#ifdef ALSA_MODE
-static void TinyalsaAudioOutputCaptureReadCreatePcm(void)
-{
-    // if pcm is null, need create it first
-    if (pcm) {
-        return;
-    }
-    int format = PCM_FORMAT_S16_LE;
-    if (g_hwParams.format == AUDIO_FORMAT_PCM_8_BIT) {
-        format = PCM_FORMAT_S8;
-    } else if (g_hwParams.format == AUDIO_FORMAT_PCM_16_BIT) {
-        format = PCM_FORMAT_S16_LE;
-    } else if (g_hwParams.format == AUDIO_FORMAT_PCM_24_BIT) {
-        format = PCM_FORMAT_S24_LE;
-    } else if (g_hwParams.format == AUDIO_FORMAT_PCM_32_BIT) {
-        format = PCM_FORMAT_S32_LE;
-    } else {
-        format = PCM_FORMAT_S16_LE;
-    }
-    ReadInSoundCard();
-    (void)memset_s(&g_inDevInfo, sizeof(struct DevInfo), 0, sizeof(struct DevInfo));
-    GetInDevInfo(SND_IN_SOUND_CARD_MIC, &g_inDevInfo);
-    struct PcmCaptureParam param;
-    (void)memset_s(&param, sizeof(param), 0, sizeof(param));
-    param.card = g_inDevInfo.card;
-    param.device = g_inDevInfo.device;
-    param.channels = g_hwParams.channels;
-    param.rate = g_hwParams.rate;
-    param.format = format;
-    param.periodSize = g_hwParams.periodSize / 4; // limited to 16K,periodSize/4.
-    param.periodCount = g_hwParams.periodCount / 2; // limited to 16K, periodCount/2.
-    CaptureSample(&pcm, &param);
-    RoutePcmCardOpen(g_inDevInfo.card, DEV_IN_HANDS_FREE_MIC_CAPTURE_ROUTE);
-    return;
-}
-
-int32_t TinyalsaAudioOutputCaptureRead(const struct DevHandleCapture *handle,
-    int cmdId, struct AudioHwCaptureParam *handleData)
-{
-    char *buffer = NULL;
-    uint32_t dataSize;
-    if (!pcm) { // if pcm is num, need create it first
-        TinyalsaAudioOutputCaptureReadCreatePcm();
-    }
-    if (pcm) {
-        dataSize = pcm_frames_to_bytes(pcm, pcm_get_buffer_size(pcm));
-        if (dataSize < 1) {
-            AUDIO_FUNC_LOGE("pcm_frames_to_bytes failed!");
-            return HDF_FAILURE;
-        }
-        buffer = (char *)OsalMemCalloc(dataSize);
-        if (!buffer) {
-            fprintf(stderr, "Unable to allocate \n");
-            pcm_close(pcm);
-            return HDF_FAILURE;
-        }
-        if (!pcm_read(pcm, buffer, dataSize)) {
-            memcpy_s(handleData->frameCaptureMode.buffer, FRAME_DATA, buffer, dataSize);
-        }
-        handleData->frameCaptureMode.bufferSize = dataSize;
-        handleData->frameCaptureMode.bufferFrameSize = pcm_bytes_to_frames(pcm, dataSize);
-        OsalMemFree(buffer);
-        return HDF_SUCCESS;
-    }
-    return HDF_FAILURE;
-}
-#endif
-
 #ifdef MONO_TO_STEREO
 void CaptureChannelFixed(void *data, uint32_t len)
 {
@@ -1189,9 +1002,6 @@ int32_t AudioInputCaptureReadInfoToHandleData(struct AudioHwCaptureParam *handle
 int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return TinyalsaAudioOutputCaptureRead(handle, cmdId, handleData);
-#endif
     uint32_t dataSize = 0;
     uint32_t frameCount = 0;
     size_t replySize = AUDIO_SIZE_FRAME_16K + AUDIO_REPLY_EXTEND;
@@ -1238,9 +1048,6 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
 int32_t AudioOutputCaptureStartPrepare(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     int32_t ret;
     struct HdfIoService *service = NULL;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -1262,14 +1069,6 @@ int32_t AudioOutputCaptureStartPrepare(const struct DevHandleCapture *handle,
 int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    if (pcm) {
-        pcm_close(pcm);
-        pcm = NULL;
-    }
-    RoutePcmClose(DEV_OFF_CAPTURE_OFF_ROUTE);
-    return HDF_SUCCESS;
-#endif
     int32_t ret;
     struct HdfIoService *service = NULL;
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
@@ -1300,9 +1099,6 @@ int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
 
 int32_t MmapDescWriteBufferCapture(struct HdfSBuf *sBuf, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (sBuf == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("param sBuf or handleData is null!");
         return HDF_FAILURE;
@@ -1333,9 +1129,6 @@ int32_t MmapDescWriteBufferCapture(struct HdfSBuf *sBuf, const struct AudioHwCap
 int32_t AudioOutputCaptureReqMmapBuffer(const struct DevHandleCapture *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("handle or handle->object or handleData is null!");
         return HDF_FAILURE;
@@ -1369,9 +1162,6 @@ int32_t AudioOutputCaptureReqMmapBuffer(const struct DevHandleCapture *handle,
 int32_t AudioOutputCaptureGetMmapPosition(const struct DevHandleCapture *handle,
     int cmdId, struct AudioHwCaptureParam *handleData)
 {
-#ifdef ALSA_MODE
-    return HDF_SUCCESS;
-#endif
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("handle or handle->object or handleData is null!");
         return HDF_FAILURE;
@@ -1512,9 +1302,6 @@ struct DevHandleCapture *AudioBindServiceCapture(const char *name)
 
 void AudioCloseServiceCapture(const struct DevHandleCapture *handle)
 {
-#ifdef ALSA_MODE
-    return;
-#endif
     AUDIO_FUNC_LOGI();
     if (handle == NULL || handle->object == NULL) {
         AUDIO_FUNC_LOGE("Capture handle or handle->object is NULL");

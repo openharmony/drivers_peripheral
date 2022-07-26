@@ -26,11 +26,11 @@
 #include <hdf_base.h>
 
 #include "directory_ex.h"
-#include "thermal_log.h"
-#include "zlib.h"
-#include "utilities.h"
-#include "thermal_zone_manager.h"
 #include "parameters.h"
+#include "securec.h"
+#include "thermal_log.h"
+#include "thermal_zone_manager.h"
+#include "zlib.h"
 
 namespace OHOS {
 namespace HDI {
@@ -38,9 +38,7 @@ namespace Thermal {
 namespace V1_0 {
 namespace {
 constexpr uint8_t LOG_INDEX_LEN = 4;
-constexpr int32_t SEC_TO_MSEC = 1000;
 constexpr int32_t MSEC_TO_SEC = 1000;
-constexpr int32_t NSEC_TO_MSEC = 1000000;
 constexpr int32_t MAX_FILE_NUM = 9;
 constexpr int32_t MAX_FILE_SIZE = 10 * 1024 *1024;
 constexpr int32_t DEFAULT_INTERVAL_MS = 5000;
@@ -48,11 +46,11 @@ constexpr int32_t MAX_TIME_LEN = 20;
 constexpr int32_t MAX_BUFF_SIZE = 128;
 constexpr int32_t TIME_FORMAT_1 = 1;
 constexpr int32_t TIME_FORMAT_2 = 2;
+constexpr int32_t COMPRESS_READ_BUF_SIZE = 4096;
 const std::string TIMESTAMP_TITLE = "timestamp";
 uint32_t g_currentLogIndex;
 int32_t g_timerInterval = -1;
 bool g_firstCreate = true;
-bool g_gzLogCycle = false;
 std::deque<std::string> g_saveLogFile;
 std::string g_logTime = "";
 XMLTracingInfo g_xmlTraceInfo;
@@ -110,6 +108,74 @@ void ThermalDfx::UpdateInterval()
     g_timerInterval = interval;
 }
 
+std::string ThermalDfx::CanonicalizeSpecPath(const char* src)
+{
+    if (src == nullptr || strlen(src) >= PATH_MAX) {
+        fprintf(stderr, "Error: CanonicalizeSpecPath %s failed", src);
+        return "";
+    }
+    char resolvedPath[PATH_MAX] = { 0 };
+    if (access(src, F_OK) == 0) {
+        if (realpath(src, resolvedPath) == nullptr) {
+            fprintf(stderr, "Error: realpath %s failed", src);
+            return "";
+        }
+    } else {
+        std::string fileName(src);
+        if (fileName.find("..") == std::string::npos) {
+            if (snprintf_s(resolvedPath, PATH_MAX, sizeof(resolvedPath) - 1, src) == -1) {
+                fprintf(stderr, "Error: sprintf_s %s failed", src);
+                return "";
+            }
+        } else {
+            fprintf(stderr, "Error: find .. %s failed", src);
+            return "";
+        }
+    }
+
+    std::string res(resolvedPath);
+    return res;
+}
+
+bool ThermalDfx::Compress(const std::string& dataFile, const std::string& destFile)
+{
+    std::string resolvedPath = CanonicalizeSpecPath(dataFile.c_str());
+    FILE* fp = fopen(resolvedPath.c_str(), "rb");
+    if (fp == nullptr) {
+        THERMAL_HILOGE(COMP_HDI, "Fail to open data file %{public}s", dataFile.c_str());
+        perror("Fail to fopen(rb)");
+        return false;
+    }
+
+    std::unique_ptr<gzFile_s, decltype(&gzclose)> fgz(gzopen(destFile.c_str(), "wb"), gzclose);
+    if (fgz == nullptr) {
+        THERMAL_HILOGE(COMP_HDI, "Fail to call gzopen(%{public}s)", destFile.c_str());
+        fclose(fp);
+        return false;
+    }
+
+    std::vector<char> buf(COMPRESS_READ_BUF_SIZE);
+    size_t len = 0;
+    while ((len = fread(buf.data(), sizeof(uint8_t), buf.size(), fp))) {
+        if (gzwrite(fgz.get(), buf.data(), len) == 0) {
+            THERMAL_HILOGE(COMP_HDI, "Fail to call gzwrite for %{public}zu bytes", len);
+            fclose(fp);
+            return false;
+        }
+    }
+    if (!feof(fp)) {
+        if (ferror(fp) != 0) {
+            THERMAL_HILOGE(COMP_HDI, "ferror return err");
+            fclose(fp);
+            return false;
+        }
+    }
+    if (fclose(fp) < 0) {
+        return false;
+    }
+    return true;
+}
+
 void ThermalDfx::CompressFile()
 {
     unsigned long size;
@@ -141,7 +207,7 @@ void ThermalDfx::CompressFile()
 
     std::string compressFile = g_xmlTraceInfo.outpath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
         "." + g_logTime + ".gz";
-    if (!Developtools::HiPerf::CompressFile(unCompressFile, compressFile)) {
+    if (!Compress(unCompressFile, compressFile)) {
         THERMAL_HILOGE(COMP_HDI, "CompressFile fail");
         return;
     }

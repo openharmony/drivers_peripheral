@@ -49,11 +49,6 @@ public:
     void TearDown();
     static TestAudioManager *(*GetAudioManager)();
     static void *handleSo;
-#ifdef AUDIO_MPI_SO
-    static int32_t (*SdkInit)();
-    static void (*SdkExit)();
-    static void *sdkSo;
-#endif
     static int32_t GetManager(struct PrepareAudioPara& audiopara);
 };
 
@@ -61,30 +56,9 @@ using THREAD_FUNC = void *(*)(void *);
 
 TestAudioManager *(*AudioHdiRenderSceneTest::GetAudioManager)() = nullptr;
 void *AudioHdiRenderSceneTest::handleSo = nullptr;
-#ifdef AUDIO_MPI_SO
-    int32_t (*AudioHdiRenderSceneTest::SdkInit)() = nullptr;
-    void (*AudioHdiRenderSceneTest::SdkExit)() = nullptr;
-    void *AudioHdiRenderSceneTest::sdkSo = nullptr;
-#endif
 
 void AudioHdiRenderSceneTest::SetUpTestCase(void)
 {
-#ifdef AUDIO_MPI_SO
-    char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
-    sdkSo = dlopen(sdkResolvedPath, RTLD_LAZY);
-    if (sdkSo == nullptr) {
-        return;
-    }
-    SdkInit = (int32_t (*)())(dlsym(sdkSo, "MpiSdkInit"));
-    if (SdkInit == nullptr) {
-        return;
-    }
-    SdkExit = (void (*)())(dlsym(sdkSo, "MpiSdkExit"));
-    if (SdkExit == nullptr) {
-        return;
-    }
-    SdkInit();
-#endif
     char absPath[PATH_MAX] = {0};
     if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
         return;
@@ -101,19 +75,6 @@ void AudioHdiRenderSceneTest::SetUpTestCase(void)
 
 void AudioHdiRenderSceneTest::TearDownTestCase(void)
 {
-#ifdef AUDIO_MPI_SO
-    SdkExit();
-    if (sdkSo != nullptr) {
-        dlclose(sdkSo);
-        sdkSo = nullptr;
-    }
-    if (SdkInit != nullptr) {
-        SdkInit = nullptr;
-    }
-    if (SdkExit != nullptr) {
-        SdkExit = nullptr;
-    }
-#endif
     if (handleSo != nullptr) {
         dlclose(handleSo);
         handleSo = nullptr;

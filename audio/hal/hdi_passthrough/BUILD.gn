@@ -77,9 +77,6 @@ if (defined(ohos_lite)) {
       ]
 
       defines = []
-      if (enable_audio_device_mpi) {
-        defines += [ "AUDIO_HAL_USER" ]
-      }
 
       if (drivers_peripheral_audio_hal_notsupport_pathselect) {
         defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
@@ -162,9 +159,6 @@ if (defined(ohos_lite)) {
     ]
 
     defines = []
-    if (enable_audio_device_mpi) {
-      defines += [ "AUDIO_HAL_USER" ]
-    }
 
     if (drivers_peripheral_audio_hal_notsupport_pathselect) {
       defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]

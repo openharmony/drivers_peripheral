@@ -46,13 +46,10 @@ if (defined(ohos_lite)) {
 
     deps = [
       "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
+      "//drivers/peripheral/audio/supportlibs:hdi_audio_interface_lib_capture",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
-
-    if (!enable_audio_device_mpi) {
-      deps += [ "//drivers/peripheral/audio/supportlibs:hdi_audio_interface_lib_capture" ]
-    }
 
     cflags = [
       "-Wall",
@@ -84,13 +81,11 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
+      "//drivers/peripheral/audio/supportlibs:hdi_audio_interface_lib_capture",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
     external_deps = [ "hdf_core:libhdf_utils" ]
-    if (!enable_audio_device_mpi) {
-      deps += [ "//drivers/peripheral/audio/supportlibs:hdi_audio_interface_lib_capture" ]
-    }
 
     cflags = [
       "-Wall",

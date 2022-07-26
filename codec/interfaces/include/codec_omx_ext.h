@@ -86,6 +86,16 @@ struct CodecVideoPortFormatParam {
 };
 
 /**
+ * @brief Defines the <b>ControlRateConstantQuality</b>.
+ */
+struct ControlRateConstantQuality {
+    uint32_t size;                                         /** Size of the structure */
+    union OMX_VERSIONTYPE version;                         /** Component version */
+    uint32_t portIndex;                                    /** Port index */
+    uint32_t qualityValue;                                 /** Control rate constant quality */
+};
+
+/**
  * @brief Enumerates the extended codec indexes.
  */
 enum OmxIndexCodecExType {
@@ -99,6 +109,8 @@ enum OmxIndexCodecExType {
     OMX_IndexParamGetBufferHandleUsage,
     /** CodecVideoPortFormatParam */
     OMX_IndexCodecVideoPortFormat,
+    /** ControlRateConstantQuality */
+    OMX_IndexParamControlRateConstantQuality,
 };
 #ifdef __cplusplus
 #if __cplusplus

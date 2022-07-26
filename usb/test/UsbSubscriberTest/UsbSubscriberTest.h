@@ -16,16 +16,19 @@
 #ifndef USBSUBSCRIBERTEST_H
 #define USBSUBSCRIBERTEST_H
 
-#include "usbd_subscriber.h"
+#include "v1_0/iusbd_subscriber.h"
+
+using OHOS::HDI::Usb::V1_0::PortInfo;
+using OHOS::HDI::Usb::V1_0::USBDeviceInfo;
 
 namespace OHOS {
 namespace USB {
-class UsbSubscriberTest : public UsbdSubscriber {
+class UsbSubscriberTest : public OHOS::HDI::Usb::V1_0::IUsbdSubscriber {
 public:
     UsbSubscriberTest() = default;
     ~UsbSubscriberTest() = default;
-    int32_t DeviceEvent(const UsbInfo &info) override;
-    int32_t PortChangedEvent(int32_t portId, int32_t powerRole, int32_t dataRole, int32_t mode) override
+    int32_t DeviceEvent(const USBDeviceInfo &info) override;
+    int32_t PortChangedEvent(const PortInfo &info) override
     {
         return 0;
     };

@@ -16,7 +16,9 @@
 #define USBD_DEVICE_TEST_H
 
 #include <gtest/gtest.h>
-#include "usb_param.h"
+#include "v1_0/usb_types.h"
+
+using OHOS::HDI::Usb::V1_0::UsbDev;
 
 class UsbdDeviceTest : public testing::Test {
 public:
@@ -25,6 +27,6 @@ public:
     void SetUp();
     void TearDown();
 
-    static struct OHOS::USB::UsbDev dev_;
+    static struct UsbDev dev_;
 };
 #endif // USBD_DEVICE_TEST_H
