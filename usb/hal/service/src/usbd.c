@@ -19,6 +19,7 @@
 #include "hdf_device_object.h"
 #include "usb_ddk_pnp_loader.h"
 #include "usbd_dispatcher.h"
+#include "ddk_pnp_listener_mgr.h"
 
 #define HDF_LOG_TAG Usbd
 #define HEX_NUM_09 0x09
@@ -39,7 +40,6 @@ int32_t UsbdDeviceCreateAndAttach(struct UsbdService *service, uint8_t busNum, u
 int32_t UsbdDeviceDettach(struct UsbdService *service, uint8_t busNum, uint8_t devAddr);
 int32_t UsbdRemoveBusDev(struct UsbdService *service, uint8_t busNum);
 
-#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, struct HdfSBuf *data)
 {
     struct UsbPnpNotifyMatchInfoTable *infoTable = NULL;
@@ -81,22 +81,20 @@ static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, struct HdfSBu
     }
     return HDF_SUCCESS;
 }
-#endif
+
 
 static int32_t UsbdEventHandle(const struct UsbdService *inst)
 {
-#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-    g_usbPnpServ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     g_usbPnpListener.callBack = UsbdPnpLoaderEventReceived;
     g_usbPnpListener.priv = (void *)(inst);
-
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
+    g_usbPnpServ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     if (g_usbPnpServ == NULL) {
         HDF_LOGE("%{public}s: HdfIoServiceBind failed.", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    int32_t status;
-    status = HdfDeviceRegisterEventListener(g_usbPnpServ, &g_usbPnpListener);
+    int32_t status = HdfDeviceRegisterEventListener(g_usbPnpServ, &g_usbPnpListener);
     if (status != HDF_SUCCESS) {
         HDF_LOGE("HdfDeviceRegisterEventListener failed status=%{public}d", status);
         return status;
@@ -298,6 +296,12 @@ int32_t BindUsbSubscriber(struct UsbdService *service, struct UsbdSubscriber *su
     }
     service->subscriber = subscriber;
     UsbdAddDevicesOnStart(service);
+#ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
+    if (DdkListenerMgrAdd(&g_usbPnpListener) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: register listerer failed", __func__);
+        return HDF_FAILURE;
+    }
+#endif
     return HDF_SUCCESS;
 }
 
