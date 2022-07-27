@@ -34,7 +34,7 @@
 #include "user_idm_funcs.h"
 #include "enroll_specification_check.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_USER_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 
 namespace OHOS {
 namespace HDI {

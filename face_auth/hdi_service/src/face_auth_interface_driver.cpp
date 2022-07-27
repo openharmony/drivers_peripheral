@@ -20,7 +20,7 @@
 #include "iam_logger.h"
 #include "v1_0/face_auth_interface_stub.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_FACE_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_HDI
 
 using namespace OHOS::HDI::FaceAuth::V1_0;
 
