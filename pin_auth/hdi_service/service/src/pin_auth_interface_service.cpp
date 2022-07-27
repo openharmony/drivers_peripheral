@@ -40,7 +40,7 @@ int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutor>> &e
 {
     IAM_LOGI("start");
     std::shared_ptr<OHOS::UserIAM::PinAuth::PinAuth> pinHdi =
-        OHOS::UserIAM::Common::MakeShared<OHOS::UserIAM::PinAuth::PinAuth>();
+        OHOS::UserIam::Common::MakeShared<OHOS::UserIAM::PinAuth::PinAuth>();
     if (pinHdi == nullptr) {
         IAM_LOGE("Generate pinHdi failed");
         return HDF_FAILURE;
