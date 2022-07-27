@@ -93,6 +93,7 @@ if (defined(ohos_lite)) {
       sources += [
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_capture.c",
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_common.c",
+        "//third_party/cJSON/cJSON.c",
       ]
     } else {
       sources += [
@@ -118,6 +119,7 @@ if (defined(ohos_lite)) {
       include_dirs += [
         "//third_party/alsa-lib/include",
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
+        "//third_party/cJSON",
       ]
       deps += [ "//third_party/alsa-lib:libasound" ]
     } else {
@@ -151,6 +153,7 @@ if (defined(ohos_lite)) {
       sources += [
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_common.c",
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_render.c",
+        "//third_party/cJSON/cJSON.c",
       ]
     } else {
       sources += [
@@ -177,6 +180,7 @@ if (defined(ohos_lite)) {
       include_dirs += [
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
         "//third_party/alsa-lib/include",
+        "//third_party/cJSON",
       ]
       deps += [ "//third_party/alsa-lib:libasound" ]
     } else {
