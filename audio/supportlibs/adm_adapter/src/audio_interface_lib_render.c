@@ -1124,7 +1124,6 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
         AUDIO_FUNC_LOGE("AudioOutputRenderWriteFrame is Fail!");
         return HDF_FAILURE;
     }
-    AudioBufReplyRecycle(sBuf, reply);
     return HDF_SUCCESS;
 }
 
