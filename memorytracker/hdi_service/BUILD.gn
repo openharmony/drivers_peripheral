@@ -41,7 +41,7 @@ ohos_shared_library("libmemorytracker_driver") {
   sources = [ "src/memorytracker_interface_driver.cpp" ]
   deps = [
     ":libmemory_tracker_interface_service_1.0",
-    "//drivers/interface/memory_tracker/v1_0:libmemorytracker_stub_1.0",
+    "//drivers/interface/memorytracker/v1_0:libmemorytracker_stub_1.0",
   ]
 
   external_deps = [

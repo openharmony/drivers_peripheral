@@ -20,7 +20,7 @@
 
 #include "v1_0/memory_tracker_interface_stub.h"
 
-using namespace OHOS::HDI::MemoryTracker::V1_0;
+using namespace OHOS::HDI::Memorytracker::V1_0;
 
 struct HdfMemoryTrackerInterfaceHost {
     struct IDeviceIoService ioService;
