@@ -70,7 +70,7 @@ static int HdfPinAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
         return HDF_ERR_INVALID_PARAM;
     }
     std::shared_ptr<OHOS::UserIAM::PinAuth::PinAuth> pinHdi =
-        OHOS::UserIAM::Common::MakeShared<OHOS::UserIAM::PinAuth::PinAuth>();
+        OHOS::UserIam::Common::MakeShared<OHOS::UserIAM::PinAuth::PinAuth>();
     constexpr uint32_t SUCCESS = 0;
     if (pinHdi == nullptr || pinHdi->Init() != SUCCESS) {
         IAM_LOGE("Pin hal init failed");
