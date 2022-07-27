@@ -16,7 +16,7 @@
 #ifndef ALSA_LIB_CAPTURE_H
 #define ALSA_LIB_CAPTURE_H
 
-#include "alsa_lib_common.h"
 #include "audio_if_lib_capture.h"
+#include "alsa_lib_common.h"
 
 #endif /* ALSA_LIB_CAPTURE_H */
