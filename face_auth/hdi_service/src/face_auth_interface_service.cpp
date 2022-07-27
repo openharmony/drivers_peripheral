@@ -20,7 +20,7 @@
 #include "executor_impl.h"
 #include "iam_logger.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_FACE_AUTH_IMPL
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_IMPL
 
 namespace OHOS {
 namespace HDI {

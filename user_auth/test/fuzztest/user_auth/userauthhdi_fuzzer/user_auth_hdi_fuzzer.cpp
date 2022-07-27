@@ -23,7 +23,7 @@
 #include "iam_fuzz_test.h"
 #include "iam_logger.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_USER_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 
 #undef private
 
