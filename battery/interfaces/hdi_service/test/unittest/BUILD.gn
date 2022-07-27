@@ -62,6 +62,7 @@ ohos_unittest("test_hdisrv") {
   ]
 
   external_deps = [
+    "drivers_interface_light:liblight_proxy_1.0",
     "drivers_peripheral_input:hdi_input",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
@@ -100,6 +101,7 @@ ohos_unittest("test_capacity_shutdown") {
   ]
 
   external_deps = [
+    "drivers_interface_light:liblight_proxy_1.0",
     "drivers_peripheral_input:hdi_input",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
