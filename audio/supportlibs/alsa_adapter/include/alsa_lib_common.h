@@ -25,62 +25,68 @@
 
 #define SERVIC_NAME_MAX_LEN 32
 
-#define MAX_VOLUME         100
-#define MIN_VOLUME         0
-#define AUDIO_MIN_CARD_NUM 1
-#define AUDIO_MAX_CARD_NUM 8
-#define CARD_ID_LEN_MAX    32
-#define MAX_CARD_NAME_LEN  64
-#define MAX_CARD_NUM       (4 * (AUDIO_MAX_CARD_NUM))
+#define MAX_VOLUME  100
+#define MIN_VOLUME  0
+#define MAX_ELEMENT 100
+#define AUDIO_MIN_CARD_NUM  1
+#define AUDIO_MAX_CARD_NUM  8
+#define MAX_CARD_NAME_LEN   64
+#define MAX_CARD_NUM        (4 * AUDIO_MAX_CARD_NUM)
+
+#define SND_DEVCICE_DEFAULT     "default"   /** about SND_DEVCICE0 */
+#define SND_DEVCICE0            "hw:0,0"
+#define SND_DEVCICE1            "hw:1,0"
+
+#define CTRL_DEVCICE_DEFAULT    "hw:0"
+
+#define  USB_AUDIO              "USB Audio"
+
+/** Codec list supported by current driver */
+#define CODEC_CARD_ID     "rockchiprk809co"   /** rockchip,rk809-codec cid */
 
 #define AUDIO_ALSALIB_IOCTRL_RESUME 0
 #define AUDIO_ALSALIB_IOCTRL_PAUSE  1
 #define AUDIO_ALSALIB_MMAP_MAX      10
-#define AUDIO_ALSALIB_RETYR         3
 
 enum SndRKPlayPathItem {
-    SND_OUT_CARD_OFF,            /* close play path */
-    SND_OUT_CARD_RCV,            /* speaker */
-    SND_OUT_CARD_SPK,            /* speaker */
-    SND_OUT_CARD_HP,             /* headphone */
-    SND_OUT_CARD_HP_NO_MIC,      /* headphone */
-    SND_OUT_CARD_BT,             /* bluetooth (Don't set!!!) */
-    SND_OUT_CARD_SPK_HP,         /* speaker and headphone */
-    SND_OUT_CARD_RING_SPK,       /* speaker */
-    SND_OUT_CARD_RING_HP,        /* headphone */
-    SND_OUT_CARD_RING_HP_NO_MIC, /* headphone */
-    SND_OUT_CARD_RING_SPK_HP     /* speaker and headphone */
+    SND_OUT_CARD_OFF,
+    SND_OUT_CARD_RCV,
+    SND_OUT_CARD_SPK,
+    SND_OUT_CARD_HP,
+    SND_OUT_CARD_HP_NO_MIC,
+    SND_OUT_CARD_BT,
+    SND_OUT_CARD_SPK_HP,
+    SND_OUT_CARD_RING_SPK,
+    SND_OUT_CARD_RING_HP,
+    SND_OUT_CARD_RING_HP_NO_MIC,
+    SND_OUT_CARD_RING_SPK_HP
 };
 
 enum SndRKCapPathItem {
-    SND_IN_CARD_MIC_OFF,        /* close capture path */
-    SND_IN_CARD_MAIN_MIC,       /* main mic */
-    SND_IN_CARD_HANDS_FREE_MIC, /* hands free mic */
-    SND_IN_CARD_BT_SCO_MIC      /* bluetooth sco mic (Don't set!!!) */
+    SND_OUT_CARD_MIC_OFF,
+    SND_OUT_CARD_MAIN_MIC,
+    SND_OUT_CARD_HANDS_FREE_MIC,
+    SND_OUT_CARD_BT_SCO_MIC
 };
 
 enum SndRKCtrlNumId {
-    SND_PLAY_PATH = 1, /* play path  */
-    SND_CAP_MIC_PATH,  /* capture path */
-    SND_DACL_PLAY_VOL, /* play left volume path */
-    SND_DACR_PLAY_VOL, /* play right volume path */
-    SND_DACL_CAP_VOL,  /* capture left volume path */
-    SND_DACR_CAP_VOL   /* capture right volume path */
+    SND_PLAY_PATH = 1,
+    SND_CAP_MIC_PATH,
+    SND_DACL_PLAY_VOL,
+    SND_DACR_PLAY_VOL,
+    SND_DACL_CAP_VOL,
+    SND_DACR_CAP_VOL
 };
 
-enum SndCardType {
-    SND_CARD_UNKNOWN = -1,
-    SND_CARD_PRIMARY = 0,
-    SND_CARD_HDMI,
-    SND_CARD_USB,
-    SND_CARD_BT,
-    SND_CARD_MAX
+struct DeviceInfo {
+    const char *id;
+    int32_t card;
+    int32_t device;
 };
 
 struct DevProcInfo {
-    char cardName[CARD_ID_LEN_MAX];
-    char cid[CARD_ID_LEN_MAX]; /* cardX/id match */
-    char did[CARD_ID_LEN_MAX]; /* dai id match */
+    const char *cid; /* cardX/id match */
+    const char *did; /* dai id match */
 };
 
 struct AlsaDevInfo {
@@ -101,7 +107,6 @@ struct AudioCardInfo {
     bool captureMmapFlag;
     int32_t renderMuteValue;
     int32_t captureMuteValue;
-    float tempVolume;
     uint64_t renderMmapFrames;
     uint64_t capMmapFrames;
     uint64_t mmapFrames;
@@ -127,9 +132,8 @@ void GetDeviceList(struct AudioCardInfo *cardIns, snd_pcm_stream_t stream);
 int32_t GetSelCardInfo(struct AudioCardInfo *cardIns, struct AlsaDevInfo *devInsHandle);
 int32_t MatchSelAdapter(const char *adapterName, struct AudioCardInfo *cardIns);
 int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement);
-int32_t AudioMixerSetCtrlMode(
-    struct AudioCardInfo *cardIns, const char *adapterName, const char *mixerCtrlName, int numId, int item);
+int32_t AudioMixerSetCtrlMode(struct AudioCardInfo *cardIns,
+    const char *adapterName, const char *mixerCtrlName, int numId, int item);
 snd_mixer_elem_t *AudioUsbFindElement(snd_mixer_t *mixer);
-int32_t CardInfoParseFromConfig(void);
 
 #endif /* ALSA_LIB_COMMON_H */
