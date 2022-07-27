@@ -21,10 +21,10 @@
       },
       "build": {
         "sub_component": [
-          "//drivers/peripheral/memory_tracker:memorytracker_entry"
+          "//drivers/peripheral/memorytracker:memorytracker_entry"
         ],
         "test": [
-          "//drivers/peripheral/memory_tracker/test:memorytracker_unittest"
+          "//drivers/peripheral/memorytracker/test:memorytracker_unittest"
         ],
         "inner_kits": []
       }

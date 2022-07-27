@@ -26,7 +26,7 @@ namespace OHOS {
 namespace Memory {
 using namespace testing;
 using namespace testing::ext;
-using namespace OHOS::HDI::MemoryTracker::V1_0;
+using namespace OHOS::HDI::Memorytracker::V1_0;
 
 class HdfMemoryTrackerTest : public testing::Test {
 public:
