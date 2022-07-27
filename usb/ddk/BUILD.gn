@@ -71,9 +71,16 @@ ohos_shared_library("libusb_ddk_host") {
 }
 
 ohos_shared_library("libusb_pnp_manager") {
-  include_dirs = [ "$hdf_framework_path/model/usb/include" ]
+  include_dirs = [
+    "$hdf_framework_path/model/usb/include",
+    "host/include",
+  ]
   sources = [
     "$hdf_framework_path/model/usb/src/usb_ddk_pnp_loader.c",
+    "host/src/ddk_device_manager.c",
+    "host/src/ddk_pnp_listener_mgr.c",
+    "host/src/ddk_sysfs_device.c",
+    "host/src/ddk_uevent_handle.c",
     "host/src/usb_pnp_manager.c",
   ]
 
@@ -84,6 +91,7 @@ ohos_shared_library("libusb_pnp_manager") {
   if (is_standard_system) {
     external_deps = [
       "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "utils_base:utils",

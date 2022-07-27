@@ -28,6 +28,7 @@
 #include "usbd_dispatcher.h"
 #include "usbd_function.h"
 #include "usbd_port.h"
+#include "ddk_pnp_listener_mgr.h"
 
 namespace OHOS {
 namespace HDI {
@@ -842,7 +843,6 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbImpl *super, 
     return ret;
 }
 
-#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data)
 {
     UsbImpl *super = (UsbImpl *)priv;
@@ -873,15 +873,13 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
     ret = UsbdPnpNotifyAddAndRemoveDevice(data, super, id);
     return ret;
 }
-#endif
 
 int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
 {
-#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-    usbPnpServ_ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     usbPnpListener_.callBack = UsbdPnpLoaderEventReceived;
     usbPnpListener_.priv = (void *)(inst.GetRefPtr());
-
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
+    usbPnpServ_ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
     if (usbPnpServ_ == nullptr) {
         HDF_LOGE("%{public}s: HdfIoServiceBind faile.", __func__);
         return HDF_ERR_INVALID_OBJECT;
@@ -1835,6 +1833,19 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
     ReleaseAsmBufferHandle(&list->asmHandle);
     BulkRequestCancel(list);
     list->cb = tcb;
+    return HDF_SUCCESS;
+}
+
+int32_t UsbImpl::BindUsbSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+{
+    subscriber_ = subscriber;
+    UsbdAddDevicesOnStart();
+#ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
+    if (DdkListenerMgrAdd(&usbPnpListener_) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: register listerer failed", __func__);
+        return HDF_FAILURE;
+    }
+#endif
     return HDF_SUCCESS;
 }
 } // namespace V1_0
