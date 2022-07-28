@@ -38,30 +38,30 @@ extern int32_t OmxAdapterComponentVersion(struct CodecComponentNode *codecNode, 
 /**
  * @brief Send command to the component.
  */
-extern int32_t OmxAdapterSendCommand(struct CodecComponentNode *codecNode, enum OMX_COMMANDTYPE cmd, uint32_t param,
+extern int32_t OmxAdapterSendCommand(struct CodecComponentNode *codecNode, OMX_COMMANDTYPE cmd, uint32_t param,
                                      int8_t *cmdData, uint32_t cmdDataLen);
 /**
  * @brief Get the parameter by index.
  */
-extern int32_t OmxAdapterGetParameter(struct CodecComponentNode *codecNode, enum OMX_INDEXTYPE paramIndex,
-                                      int8_t *param, uint32_t paramLen);
+extern int32_t OmxAdapterGetParameter(struct CodecComponentNode *codecNode, OMX_INDEXTYPE paramIndex, int8_t *param,
+                                      uint32_t paramLen);
 /**
  * @brief Set the parameter by index.
  */
-extern int32_t OmxAdapterSetParameter(struct CodecComponentNode *codecNode, enum OMX_INDEXTYPE index, int8_t *param,
+extern int32_t OmxAdapterSetParameter(struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *param,
                                       uint32_t paramLen);
 /**
  * @brief Get the config by index.
  *
  * This func can be invoked when the component is in any state except the OMX_StateInvalid state.
  */
-extern int32_t OmxAdapterGetConfig(struct CodecComponentNode *codecNode, enum OMX_INDEXTYPE index, int8_t *config,
+extern int32_t OmxAdapterGetConfig(struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *config,
                                    uint32_t configLen);
-extern int32_t OmxAdapterSetConfig(struct CodecComponentNode *codecNode, enum OMX_INDEXTYPE index, int8_t *config,
+extern int32_t OmxAdapterSetConfig(struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *config,
                                    uint32_t configLen);
 extern int32_t OmxAdapterGetExtensionIndex(struct CodecComponentNode *codecNode, const char *parameterName,
-                                           enum OMX_INDEXTYPE *indexType);
-extern int32_t OmxAdapterGetState(struct CodecComponentNode *codecNode, enum OMX_STATETYPE *state);
+                                           OMX_INDEXTYPE *indexType);
+extern int32_t OmxAdapterGetState(struct CodecComponentNode *codecNode, OMX_STATETYPE *state);
 /**
  * @brief Set up tunneled communication between an output port and an input port.
  */

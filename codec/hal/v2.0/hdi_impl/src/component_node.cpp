@@ -101,7 +101,7 @@ int32_t ComponentNode::GetComponentVersion(struct CompVerInfo &verInfo)
     return err;
 }
 
-int32_t ComponentNode::SendCommand(enum OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData, uint32_t cmdDataLen)
+int32_t ComponentNode::SendCommand(OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData, uint32_t cmdDataLen)
 {
     if (comp_ == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null ", __func__);
@@ -111,7 +111,7 @@ int32_t ComponentNode::SendCommand(enum OMX_COMMANDTYPE cmd, uint32_t param, int
     return OMX_SendCommand(comp_, cmd, param, cmdData);
 }
 
-int32_t ComponentNode::GetParameter(enum OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen)
+int32_t ComponentNode::GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen)
 {
     if (comp_ == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null ", __func__);
@@ -121,7 +121,7 @@ int32_t ComponentNode::GetParameter(enum OMX_INDEXTYPE paramIndex, int8_t *param
     return OMX_GetParameter(comp_, paramIndex, param);
 }
 
-int32_t ComponentNode::SetParameter(enum OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen)
+int32_t ComponentNode::SetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen)
 {
     if (comp_ == nullptr || param == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null or param is null ", __func__);
@@ -131,7 +131,7 @@ int32_t ComponentNode::SetParameter(enum OMX_INDEXTYPE paramIndex, int8_t *param
     return OMX_SetParameter(comp_, paramIndex, param);
 }
 
-int32_t ComponentNode::GetConfig(enum OMX_INDEXTYPE index, int8_t *config, uint32_t configLen)
+int32_t ComponentNode::GetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t configLen)
 {
     if (comp_ == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null ", __func__);
@@ -141,7 +141,7 @@ int32_t ComponentNode::GetConfig(enum OMX_INDEXTYPE index, int8_t *config, uint3
     return OMX_GetConfig(comp_, index, config);
 }
 
-int32_t ComponentNode::SetConfig(enum OMX_INDEXTYPE index, int8_t *config, uint32_t configLen)
+int32_t ComponentNode::SetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t configLen)
 {
     if (comp_ == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null ", __func__);
@@ -151,7 +151,7 @@ int32_t ComponentNode::SetConfig(enum OMX_INDEXTYPE index, int8_t *config, uint3
     return OMX_SetConfig(comp_, index, config);
 }
 
-int32_t ComponentNode::GetExtensionIndex(const char *parameterName, enum OMX_INDEXTYPE *indexType)
+int32_t ComponentNode::GetExtensionIndex(const char *parameterName, OMX_INDEXTYPE *indexType)
 {
     if (comp_ == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null ", __func__);
@@ -161,7 +161,7 @@ int32_t ComponentNode::GetExtensionIndex(const char *parameterName, enum OMX_IND
     return OMX_GetExtensionIndex(comp_, const_cast<char *>(parameterName), indexType);
 }
 
-int32_t ComponentNode::GetState(enum OMX_STATETYPE *state)
+int32_t ComponentNode::GetState(OMX_STATETYPE *state)
 {
     if (comp_ == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null ", __func__);

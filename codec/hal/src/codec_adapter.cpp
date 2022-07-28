@@ -78,7 +78,7 @@ int32_t OmxAdapterComponentVersion(struct CodecComponentNode *codecNode, struct 
     return codecNode->node->GetComponentVersion(*verInfo);
 }
 
-int32_t OmxAdapterSendCommand(struct CodecComponentNode *codecNode, enum OMX_COMMANDTYPE cmd, uint32_t param,
+int32_t OmxAdapterSendCommand(struct CodecComponentNode *codecNode, OMX_COMMANDTYPE cmd, uint32_t param,
                               int8_t *cmdData, uint32_t cmdDataLen)
 {
     if (codecNode == nullptr || codecNode->node == nullptr) {
@@ -88,7 +88,7 @@ int32_t OmxAdapterSendCommand(struct CodecComponentNode *codecNode, enum OMX_COM
     return codecNode->node->SendCommand(cmd, param, cmdData, cmdDataLen);
 }
 
-int32_t OmxAdapterGetParameter(struct CodecComponentNode *codecNode, enum OMX_INDEXTYPE paramIndex, int8_t *param,
+int32_t OmxAdapterGetParameter(struct CodecComponentNode *codecNode, OMX_INDEXTYPE paramIndex, int8_t *param,
                                uint32_t paramLen)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || param == nullptr) {
@@ -99,7 +99,7 @@ int32_t OmxAdapterGetParameter(struct CodecComponentNode *codecNode, enum OMX_IN
     return codecNode->node->GetParameter(paramIndex, param, paramLen);
 }
 
-int32_t OmxAdapterSetParameter(struct CodecComponentNode *codecNode, enum OMX_INDEXTYPE index, int8_t *param,
+int32_t OmxAdapterSetParameter(struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *param,
                                uint32_t paramLen)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || param == nullptr) {
@@ -109,7 +109,7 @@ int32_t OmxAdapterSetParameter(struct CodecComponentNode *codecNode, enum OMX_IN
     return codecNode->node->SetParameter(index, param, paramLen);
 }
 
-int32_t OmxAdapterGetConfig(struct CodecComponentNode *codecNode, enum OMX_INDEXTYPE index, int8_t *config,
+int32_t OmxAdapterGetConfig(struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *config,
                             uint32_t configLen)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || config == nullptr) {
@@ -119,7 +119,7 @@ int32_t OmxAdapterGetConfig(struct CodecComponentNode *codecNode, enum OMX_INDEX
     return codecNode->node->GetConfig(index, config, configLen);
 }
 
-int32_t OmxAdapterSetConfig(struct CodecComponentNode *codecNode, enum OMX_INDEXTYPE index, int8_t *config,
+int32_t OmxAdapterSetConfig(struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *config,
                             uint32_t configLen)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || config == nullptr) {
@@ -130,7 +130,7 @@ int32_t OmxAdapterSetConfig(struct CodecComponentNode *codecNode, enum OMX_INDEX
 }
 
 int32_t OmxAdapterGetExtensionIndex(struct CodecComponentNode *codecNode, const char *parameterName,
-                                    enum OMX_INDEXTYPE *indexType)
+                                    OMX_INDEXTYPE *indexType)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || parameterName == nullptr || indexType == nullptr) {
         HDF_LOGE("%{public}s codecNode, node , parameterName or indexType is null", __func__);
@@ -139,7 +139,7 @@ int32_t OmxAdapterGetExtensionIndex(struct CodecComponentNode *codecNode, const 
     return codecNode->node->GetExtensionIndex(parameterName, indexType);
 }
 
-int32_t OmxAdapterGetState(struct CodecComponentNode *codecNode, enum OMX_STATETYPE *state)
+int32_t OmxAdapterGetState(struct CodecComponentNode *codecNode, OMX_STATETYPE *state)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || state == nullptr) {
         HDF_LOGE("%{public}s codecNode, node or state is null", __func__);
