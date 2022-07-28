@@ -37,19 +37,19 @@ public:
 
     int32_t GetComponentVersion(struct CompVerInfo &verInfo);
 
-    int32_t SendCommand(enum OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData, uint32_t cmdDataLen);
+    int32_t SendCommand(OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData, uint32_t cmdDataLen);
 
-    int32_t GetParameter(enum OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen);
+    int32_t GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen);
 
-    int32_t SetParameter(enum OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen);
+    int32_t SetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen);
 
-    int32_t GetConfig(enum OMX_INDEXTYPE index, int8_t *config, uint32_t configLen);
+    int32_t GetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t configLen);
 
-    int32_t SetConfig(enum OMX_INDEXTYPE index, int8_t *config, uint32_t configLen);
+    int32_t SetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t configLen);
 
-    int32_t GetExtensionIndex(const char *parameterName, enum OMX_INDEXTYPE *indexType);
+    int32_t GetExtensionIndex(const char *parameterName, OMX_INDEXTYPE *indexType);
 
-    int32_t GetState(enum OMX_STATETYPE *state);
+    int32_t GetState(OMX_STATETYPE *state);
 
     int32_t ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
                                    struct OMX_TUNNELSETUPTYPE *tunnelSetup);
