@@ -14,7 +14,7 @@
  */
 
 #include "audio_interface_lib_common.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 
