@@ -17,14 +17,12 @@
 #define USER_IAM_TOKEN_KEY
 
 #include "buffer.h"
-#include "defines.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 Buffer *GetTokenKey(void);
-ResultCode InitTokenKey(void);
 
 #ifdef __cplusplus
 }
