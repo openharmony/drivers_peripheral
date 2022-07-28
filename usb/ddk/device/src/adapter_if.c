@@ -987,6 +987,7 @@ static int32_t UsbFnAdapterDelDevice(const char *deviceName, const char *udcName
     return 0;
 }
 
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 static int32_t UsbFnAdapterWaitUDC(const char *deviceName, const char *udcName)
 {
     int32_t ret, i;
@@ -1011,15 +1012,18 @@ static int32_t UsbFnAdapterWaitUDC(const char *deviceName, const char *udcName)
     }
     return HDF_ERR_IO;
 }
+#endif
 
 static int32_t EnableDevice(const char *udcName,
     const char *devName, struct UsbFnDeviceDesc *descriptor)
 {
     int32_t ret;
+#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
     (void)UsbFnAdapterWriteUDC(devName, "none", 0);
     if (!UsbFnAdapterWaitUDC(devName, udcName)) {
         return 0;
     }
+#endif
     ret = UsbFnAdapterWriteUDC(devName, udcName, 1);
     if (ret) {
         (void)UsbFnAdapterDelDevice(devName, udcName, descriptor);
