@@ -63,7 +63,7 @@ int32_t BatteryInterfaceImpl::Init()
         BATTERY_HILOGE(COMP_HDI, "make_unique BatteryLed error");
         return HDF_ERR_MALLOC_FAIL;
     }
-    batteryLed_->InitLedsSysfs();
+    batteryLed_->InitLightInfo();
 
     loop_ = std::make_unique<OHOS::HDI::Battery::V1_1::BatteryThread>();
     if (loop_ == nullptr) {

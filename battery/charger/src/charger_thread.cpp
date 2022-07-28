@@ -456,7 +456,7 @@ void ChargerThread::Init()
         BATTERY_HILOGE(FEATURE_CHARGING, "make_unique BatteryLed return nullptr");
         return;
     }
-    led_->InitLedsSysfs();
+    led_->InitLightInfo();
     led_->TurnOffLed();
 
     AnimationInit();
