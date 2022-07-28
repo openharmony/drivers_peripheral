@@ -22,7 +22,7 @@
 #include "hdf_audio_pnp_server.h"
 #include "hdf_base.h"
 #include "securec.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 
 #define UEVENT_ACTION           "ACTION="
 #define UEVENT_NAME             "NAME="

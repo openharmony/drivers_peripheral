@@ -15,7 +15,7 @@
 
 #include "hdf_audio_server_capture.h"
 #include "osal_mem.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 #include "hdf_audio_server_common.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
