@@ -99,6 +99,13 @@ typedef enum {
     WIFI_EVENT_BUTT
 } WifiEventType;
 
+typedef enum {
+    CMD_HID2D_MODULE_INIT,
+    CMD_SET_BATTERY_LEVEL,
+    CMD_SET_SUPP_COEX_CHAN_LIST,
+    CMD_SET_CHAN_ADJUST
+} Hid2dCmdType;
+
 typedef struct {
     int32_t reassoc;
     uint32_t ieLen;
@@ -164,9 +171,12 @@ enum WifiClientType {
 };
 
 typedef int32_t (*OnReceiveFunc)(uint32_t event, void *data, const char *ifName);
+typedef int32_t (*Hid2dCallback)(const uint8_t *recvMsg, uint32_t recvMsgLen);
 
 int32_t WifiRegisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
 void WifiUnregisterEventCallback(OnReceiveFunc onRecFunc, uint32_t eventType, const char *ifName);
+int32_t WifiRegisterHid2dCallback(Hid2dCallback func, const char *ifName);
+void WifiUnregisterHid2dCallback(Hid2dCallback func, const char *ifName);
 
 /* hal related interface */
 #define MAX_WLAN_DEVICE 3
@@ -261,6 +271,7 @@ int32_t SetPowerMode(const char *ifName, uint8_t mode);
 int32_t StartChannelMeas(const char *ifName, const struct MeasParam *measParam);
 int32_t GetChannelMeasResult(const char *ifName, struct MeasResult *measResult);
 int32_t SetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *param);
+int32_t SendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t *paramBuf, uint32_t paramBufLen);
 
 /* wpa related interface */
 #define MAX_SSID_LEN 32

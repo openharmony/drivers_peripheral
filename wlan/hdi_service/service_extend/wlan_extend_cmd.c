@@ -65,6 +65,65 @@ int32_t WlanInterfaceGetChannelMeasResult(struct IWlanInterface *self, const cha
     return ret;
 }
 
+int32_t WlanInterfaceWifiSendCmdIoctl(struct IWlanInterface *self, const char *ifName, int32_t cmdId,
+    const int8_t *paramBuf, uint32_t paramBufLen)
+{
+    int32_t ret;
+
+    (void)self;
+    if (ifName == NULL || paramBuf == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_wifi == NULL) {
+        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = g_wifi->sendCmdIoctl(ifName, cmdId, paramBuf, paramBufLen);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: send ioctl command failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t WlanInterfaceRegisterHid2dCallback(Hid2dCallbackFunc func, const char *ifName)
+{
+    int ret;
+
+    if (func == NULL || ifName == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_wifi == NULL) {
+        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = g_wifi->registerHid2dCallback(func, ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Register hid2d callback failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
+int32_t WlanInterfaceUnregisterHid2dCallback(Hid2dCallbackFunc func, const char *ifName)
+{
+    int ret;
+
+    if (func == NULL || ifName == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_wifi == NULL) {
+        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = g_wifi->unregisterHid2dCallback(func, ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Unregister hid2d callback failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
 int32_t WlanExtendInterfaceWifiConstruct(void)
 {
     int32_t ret;

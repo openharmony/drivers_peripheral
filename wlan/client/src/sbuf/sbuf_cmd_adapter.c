@@ -906,6 +906,40 @@ int32_t SetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *par
     HdfSbufRecycle(req);
     return ret;
 }
+
+int32_t SendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t *paramBuf, uint32_t paramBufLen)
+{
+    int ret = RET_CODE_FAILURE;
+    struct HdfSBuf *req = NULL;
+
+    req = HdfSbufObtainDefaultSize();
+    if (req == NULL) {
+        HDF_LOGE("%{public}s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
+        return ret;
+    }
+
+    do {
+        if (!HdfSbufWriteString(req, ifName)) {
+            HDF_LOGE("%{public}s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteInt32(req, cmdId)) {
+            HDF_LOGE("%{public}s: write cmd fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteBuffer(req, paramBuf, paramBufLen)) {
+            HDF_LOGE("%{public}s: write buffer data fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_SET_CMD_IOCTL, req, NULL);
+        if (ret != RET_CODE_SUCCESS) {
+            HDF_LOGE("%{public}s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
+        }
+    } while (0);
+
+    HdfSbufRecycle(req);
+    return ret;
+}
 #ifdef __cplusplus
 #if __cplusplus
 }

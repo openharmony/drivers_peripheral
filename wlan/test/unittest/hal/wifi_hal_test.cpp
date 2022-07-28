@@ -35,6 +35,7 @@ const uint32_t TEST_PARAM_BUF_SIZE = 64;
 const uint32_t SIZE = 4;
 const int32_t TEST_CMD = 123;
 const uint32_t RESET_TIME = 20;
+const uint32_t TEST_BUF_SIZE = 64;
 
 class WifiHalTest : public testing::Test {
 public:
@@ -1292,7 +1293,7 @@ HWTEST_F(WifiHalTest, SetProjectionScreenParam002, TestSize.Level1)
     param->cmdId = TEST_CMD;
     param->bufLen = 1;
     param->buf[0] = 0;
-    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&staFeature);
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
     ret = g_wifi->setProjectionScreenParam(nullptr, nullptr);
     EXPECT_NE(ret, HDF_SUCCESS);
@@ -1312,6 +1313,72 @@ HWTEST_F(WifiHalTest, SetProjectionScreenParam002, TestSize.Level1)
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
     OsalMemFree(param);
+}
+
+/**
+ * @tc.name: SendCmdIoctl001
+ * @tc.desc: wifi hal send ioctl command function test
+ * @tc.type: FUNC
+ * @tc.require: AR000HDUEE
+ */
+HWTEST_F(WifiHalTest, SendCmdIoctl001, TestSize.Level1)
+{
+    int32_t cmdId = 0;
+    int32_t ret;
+    bool flag;
+    struct IWiFiAp *apFeature = nullptr;
+    int8_t data[TEST_BUF_SIZE] = {0};
+    const char *ifName = "wlan0";
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    ret = g_wifi->sendCmdIoctl(nullptr, cmdId, nullptr, TEST_BUF_SIZE);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendCmdIoctl(ifName, cmdId, nullptr, TEST_BUF_SIZE);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendCmdIoctl(nullptr, cmdId, data, TEST_BUF_SIZE);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    for (cmdId = CMD_HID2D_MODULE_INIT; cmdId <= CMD_SET_CHAN_ADJUST; cmdId++) {
+        ret = g_wifi->sendCmdIoctl(ifName, cmdId, data, TEST_BUF_SIZE);
+        printf("sendCmdIoctl_%d: ret = %d\n", __LINE__, ret);
+        flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+    }
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: SendCmdIoctl002
+ * @tc.desc: wifi hal send ioctl command function test
+ * @tc.type: FUNC
+ * @tc.require: AR000HDUEE
+ */
+HWTEST_F(WifiHalTest, SendCmdIoctl002, TestSize.Level1)
+{
+    int32_t cmdId = 0;
+    int32_t ret;
+    bool flag;
+    struct IWiFiSta *staFeature = nullptr;
+    int8_t data[TEST_BUF_SIZE] = {0};
+    const char *ifName = "wlan0";
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    ret = g_wifi->sendCmdIoctl(nullptr, cmdId, nullptr, TEST_BUF_SIZE);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendCmdIoctl(ifName, cmdId, nullptr, TEST_BUF_SIZE);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->sendCmdIoctl(nullptr, cmdId, data, TEST_BUF_SIZE);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    for (cmdId = CMD_HID2D_MODULE_INIT; cmdId <= CMD_SET_CHAN_ADJUST; cmdId++) {
+        ret = g_wifi->sendCmdIoctl(ifName, cmdId, data, TEST_BUF_SIZE);
+        printf("sendCmdIoctl_%d: ret = %d\n", __LINE__, ret);
+        flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+        ASSERT_TRUE(flag);
+    }
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
 }
 
 /**

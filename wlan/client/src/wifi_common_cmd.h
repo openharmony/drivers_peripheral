@@ -57,7 +57,8 @@ enum BaseCommands {
     CMD_BASE_GET_POWER_MODE,
     CMD_BASE_SET_POWER_MODE,
     CMD_BASE_START_CHANNEL_MEAS,
-    CMD_BASE_SET_PROJECTION_SCREEN_PARAM
+    CMD_BASE_SET_PROJECTION_SCREEN_PARAM,
+    CMD_BASE_SEND_CMD_IOCTL
 };
 
 enum APCommands {
@@ -109,6 +110,7 @@ typedef enum {
     WIFI_HAL_CMD_SET_POWER_MODE = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_SET_POWER_MODE),
     WIFI_HAL_CMD_START_CHANNEL_MEAS = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_START_CHANNEL_MEAS),
     WIFI_HAL_CMD_CONFIG_PROJECTION_SCREEN = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_SET_PROJECTION_SCREEN_PARAM),
+    WIFI_HAL_CMD_SET_CMD_IOCTL = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_SEND_CMD_IOCTL),
 } WifiHalCmd;
 
 typedef enum {
@@ -149,6 +151,12 @@ struct CallbackEvent {
     OnReceiveFunc onRecFunc;
 };
 
+struct Hid2dEvent {
+    char ifName[IFNAMSIZ + 1];
+    Hid2dCallback func;
+};
+
 void WifiEventReport(const char *ifName, uint32_t event, void *data);
+void Hid2dEventReport(const char *ifName, const uint8_t *msg, uint32_t msgLen);
 
 #endif /* end of wifi_common_cmd.h */
