@@ -77,7 +77,7 @@ void CodecHdiDecode::WaitForStatusChanged()
     statusCondition_.wait(autoLock);
 }
 
-void CodecHdiDecode::onStatusChanged()
+void CodecHdiDecode::OnStatusChanged()
 {
     statusCondition_.notify_one();
 }
@@ -125,7 +125,7 @@ bool CodecHdiDecode::Init(CommandOpt &opt)
     this->width_ = opt.width;
     this->height_ = opt.height;
     this->codecMime_ = opt.codec;
-    this->stride_ = align_up(opt.width);
+    this->stride_ = AlignUp(opt.width);
     this->useBufferHandle_ = opt.useBuffer;
     HDF_LOGI("width[%{public}d], height[%{public}d],stride_[%{public}d],infile[%{public}s],outfile[%{public}s]", width_,
              height_, stride_, opt.fileInput.c_str(), opt.fileOutput.c_str());
@@ -326,7 +326,7 @@ bool CodecHdiDecode::UseBuffers()
     }
 
     HDF_LOGI("Wait for OMX_StateIdle status");
-    enum OMX_STATETYPE status;
+    OMX_STATETYPE status;
     err = client_->GetState(client_, &status);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s GetState err [%{public}x]", __func__, err);
@@ -511,7 +511,7 @@ void CodecHdiDecode::FreeBuffers()
     unUsedInBuffers_.clear();
     unUsedOutBuffers_.clear();
 
-    enum OMX_STATETYPE status;
+    OMX_STATETYPE status;
     auto err = client_->GetState(client_, &status);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
@@ -593,7 +593,7 @@ void CodecHdiDecode::Run()
             break;
         }
         if (bufferID < 0) {
-            usleep(10000);
+            usleep(10000);  // 10000: sleep time 10ms
             continue;
         }
         auto iter = omxBuffers_.find(bufferID);
@@ -616,7 +616,7 @@ void CodecHdiDecode::Run()
     }
     // wait
     while (!this->exit_) {
-        usleep(10000);
+        usleep(10000);  // 10000: sleep time 10ms
         continue;
     }
     auto t2 = std::chrono::system_clock::now();
@@ -626,7 +626,7 @@ void CodecHdiDecode::Run()
     (void)client_->SendCommand(client_, OMX_CommandStateSet, OMX_StateIdle, NULL, 0);
     return;
 }
-int32_t CodecHdiDecode::OnEvent(struct CodecCallbackType *self, enum OMX_EVENTTYPE event, struct EventInfo *info)
+int32_t CodecHdiDecode::OnEvent(struct CodecCallbackType *self, OMX_EVENTTYPE event, struct EventInfo *info)
 {
     HDF_LOGI("%{public}s: appData[%{public}" PRId64 "] eEvent [%{public}d], nData1[%{public}d]", __func__,
              info->appData, event, info->data1);
@@ -635,7 +635,7 @@ int32_t CodecHdiDecode::OnEvent(struct CodecCallbackType *self, enum OMX_EVENTTY
             OMX_COMMANDTYPE cmd = (OMX_COMMANDTYPE)info->data1;
             if (OMX_CommandStateSet == cmd) {
                 HDF_LOGI("OMX_CommandStateSet reached, status is %{public}d", info->data2);
-                g_core->onStatusChanged();
+                g_core->OnStatusChanged();
             }
             break;
         }
