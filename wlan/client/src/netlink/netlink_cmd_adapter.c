@@ -1636,3 +1636,12 @@ int32_t SetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *par
     }
     return ret;
 }
+
+int32_t SendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t *paramBuf, uint32_t paramBufLen)
+{
+    (void)ifName;
+    (void)cmdId;
+    (void)paramBuf;
+    (void)paramBufLen;
+    return RET_CODE_NOT_SUPPORT;
+}

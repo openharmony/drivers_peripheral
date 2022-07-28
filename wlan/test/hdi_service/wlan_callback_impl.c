@@ -46,6 +46,22 @@ int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event, const
     return HDF_SUCCESS;
 }
 
+int32_t WlanCallbackNetlinkMessage(struct IWlanCallback *self, const uint8_t *msg, uint32_t msgLen)
+{
+    int32_t i;
+    (void)self;
+    if (msg == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    HDF_LOGI("%{public}s: receive message from netlink", __func__);
+    for (i = 0; i < msgLen; i++) {
+        HDF_LOGI("%02x", msg[i]);
+    }
+    return HDF_SUCCESS;
+}
+
 struct IWlanCallback *WlanCallbackServiceGet(void)
 {
     struct WlanCallbackService *service =
@@ -63,6 +79,7 @@ struct IWlanCallback *WlanCallbackServiceGet(void)
 
     service->stub.interface.ResetDriverResult = WlanCallbackResetDriver;
     service->stub.interface.ScanResult = WlanCallbackScanResult;
+    service->stub.interface.WifiNetlinkMessage = WlanCallbackNetlinkMessage;
     return &service->stub.interface;
 }
 
