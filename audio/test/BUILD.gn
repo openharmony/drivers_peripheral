@@ -21,11 +21,13 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("audio_test_entry") {
-    testonly = true
-    deps = [
-      "fuzztest:fuzztest",
-      "systemtest:systemtest",
-      "unittest:audiotest",
-    ]
+    if (drivers_peripheral_audio_hdf_proxy_stub == true) {
+      testonly = true
+      deps = [
+        "fuzztest:fuzztest",
+        "systemtest:systemtest",
+        "unittest:audiotest",
+      ]
+    }
   }
 }
