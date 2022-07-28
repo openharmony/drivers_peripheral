@@ -24,7 +24,6 @@
 #include "context_manager.h"
 #include "adaptor_log.h"
 #include "ed25519_key.h"
-#include "token_key.h"
 
 namespace OHOS {
 namespace UserIAM {
@@ -48,10 +47,6 @@ int32_t Init()
     }
     if (InitCoAuth() != RESULT_SUCCESS) {
         LOG_ERROR("init user auth failed");
-        goto FAIL;
-    }
-    if (InitTokenKey() != RESULT_SUCCESS) {
-        LOG_ERROR("init token key failed");
         goto FAIL;
     }
     if (GenerateKeyPair() != RESULT_SUCCESS) {
