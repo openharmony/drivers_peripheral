@@ -68,7 +68,7 @@ void CodecHdiEncode::WaitForStatusChanged()
     statusCondition_.wait(autoLock);
 }
 
-void CodecHdiEncode::onStatusChanged()
+void CodecHdiEncode::OnStatusChanged()
 {
     statusCondition_.notify_one();
 }
@@ -87,7 +87,7 @@ bool CodecHdiEncode::Init(CommandOpt &opt)
 {
     this->width_ = opt.width;
     this->height_ = opt.height;
-    this->stride_ = align_up(width_);
+    this->stride_ = AlignUp(width_);
     this->useBufferHandle_ = opt.useBuffer;
     HDF_LOGI("width[%{public}d], height[%{public}d]", width_, height_);
     // gralloc init
@@ -221,13 +221,13 @@ bool CodecHdiEncode::UseBuffers()
         return false;
     }
 
-    if (useBufferHandle_ && createBufferHandle() != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s createBufferHandle error", __func__);
+    if (useBufferHandle_ && CreateBufferHandle() != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s CreateBufferHandle error", __func__);
         return false;
     }
 
     // wait executing state
-    enum OMX_STATETYPE status;
+    OMX_STATETYPE status;
     err = client_->GetState(client_, &status);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s GetState err [%{public}x]", __func__, err);
@@ -407,7 +407,7 @@ void CodecHdiEncode::FreeBuffers()
     unUsedInBuffers_.clear();
     unUsedOutBuffers_.clear();
 
-    enum OMX_STATETYPE status;
+    OMX_STATETYPE status;
     auto err = client_->GetState(client_, &status);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
@@ -478,7 +478,7 @@ void CodecHdiEncode::Run()
             break;
         }
         if (bufferID < 0) {
-            usleep(10000);
+            usleep(10000);  // 10000: sleep time 10ms
             continue;
         }
         auto iter = omxBuffers_.find(bufferID);
@@ -496,7 +496,7 @@ void CodecHdiEncode::Run()
         }
     }
     while (!this->exit_) {
-        usleep(10000);
+        usleep(10000);  // 10000: sleep time 10ms
         continue;
     }
     (void)client_->SendCommand(client_, OMX_CommandStateSet, OMX_StateIdle, NULL, 0);
@@ -540,7 +540,7 @@ bool CodecHdiEncode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, boo
     return true;
 }
 
-int32_t CodecHdiEncode::createBufferHandle()
+int32_t CodecHdiEncode::CreateBufferHandle()
 {
     if (gralloc_ == nullptr) {
         HDF_LOGE("%{public}s gralloc_ is null", __func__);
@@ -575,7 +575,7 @@ int32_t CodecHdiEncode::OnEvent(struct CodecCallbackType *self, enum OMX_EVENTTY
             OMX_COMMANDTYPE cmd = (OMX_COMMANDTYPE)info->data1;
             if (OMX_CommandStateSet == cmd) {
                 HDF_LOGI("OMX_CommandStateSet reached");
-                g_core->onStatusChanged();
+                g_core->OnStatusChanged();
             }
             break;
         }
