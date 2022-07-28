@@ -15,37 +15,14 @@
 
 #include "token_key.h"
 
-#include <stddef.h>
-
-#include "adaptor_algorithm.h"
-#include "adaptor_log.h"
-#include "buffer.h"
-#include "defines.h"
-
-#define SHA256_KEY_LEN 32
-
-// This is for example only. Should be implemented in trusted environment.
-static Buffer *g_tokenKey = NULL;
+/*
+ * The key here is only for example.
+ * The real scene key needs to be obtained from huks, and the key life cycle is consistent with huks key.
+ */
+#define HKS_DEFAULT_USER_AT_KEY "huks_default_user_auth_token_key"
+#define HKS_DEFAULT_USER_AT_KEY_LEN 32
 
 Buffer *GetTokenKey(void)
 {
-    return CopyBuffer(g_tokenKey);
-}
-
-ResultCode InitTokenKey(void)
-{
-    if (g_tokenKey != NULL) {
-        return RESULT_SUCCESS;
-    }
-    g_tokenKey = CreateBufferBySize(SHA256_KEY_LEN);
-    if (g_tokenKey == NULL) {
-        LOG_ERROR("g_tokenKey: create buffer failed");
-        return RESULT_NO_MEMORY;
-    }
-    if (SecureRandom(g_tokenKey->buf, g_tokenKey->maxSize) != RESULT_SUCCESS) {
-        LOG_ERROR("get random failed");
-        return RESULT_GENERAL_ERROR;
-    }
-    g_tokenKey->contentSize = g_tokenKey->maxSize;
-    return RESULT_SUCCESS;
+    return CreateBufferByData((uint8_t *)HKS_DEFAULT_USER_AT_KEY, HKS_DEFAULT_USER_AT_KEY_LEN);
 }
