@@ -134,13 +134,13 @@ void ChargerThread::LoadImages(AnimationLabel* animationLabel)
 
         if (i < LOOP_TOP_PICTURES) {
             if (snprintf_s(nameBuf, MAX_IMG_NAME_SIZE, MAX_IMG_NAME_SIZE - 1,
-                           "/system/etc/resources/loop0000%d.png", i) == -1) {
+                           "/vendor/etc/charger/resources/loop0000%d.png", i) == -1) {
                 BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s failed, index=%{public}d", i);
                 return;
             }
         } else {
             if (snprintf_s(nameBuf, MAX_IMG_NAME_SIZE, MAX_IMG_NAME_SIZE - 1,
-                           "/system/etc/resources/loop000%d.png", i) == -1) {
+                           "/vendor/etc/charger/resources/loop000%d.png", i) == -1) {
                 BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s failed, index=%{public}d", i);
                 return;
             }
