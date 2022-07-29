@@ -58,7 +58,7 @@ static int32_t SerCodecEnumerateCapability(struct HdfDeviceIoClient *client, str
     struct HdfSBuf *reply)
 {
     uint32_t index;
-    CodecCapability Capability;
+    CodecCapability capability;
 
     if (!HdfSbufReadUint32(data, &index)) {
         HDF_LOGE("%{public}s: read index failed!", __func__);
@@ -68,16 +68,16 @@ static int32_t SerCodecEnumerateCapability(struct HdfDeviceIoClient *client, str
         HDF_LOGE("%{public}s: codec capabilities not inited!", __func__);
         return HDF_FAILURE;
     }
-    if (CodecEnumerateCapability(index, &Capability) != HDF_SUCCESS) {
+    if (CodecEnumerateCapability(index, &capability) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: EnumrateCapablity - no more capability to Enumrate!", __func__);
         return HDF_FAILURE;
     }
-    if (Capability.mime == MEDIA_MIMETYPE_INVALID) {
+    if (capability.mime == MEDIA_MIMETYPE_INVALID) {
         HDF_LOGE("%{public}s: Capability invalid, discard!", __func__);
         return HDF_FAILURE;
     }
-    if (CodecSerPackCapability(reply, &Capability) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: write Capability to sbuf failed!", __func__);
+    if (CodecSerPackCapability(reply, &capability) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write capability to sbuf failed!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -88,7 +88,7 @@ static int32_t SerCodecGetCapability(struct HdfDeviceIoClient *client, struct Hd
     uint32_t flags;
     AvCodecMime mime;
     CodecType type;
-    CodecCapability Capability;
+    CodecCapability capability;
 
     if (!HdfSbufReadUint32(data, (uint32_t*)&mime)) {
         HDF_LOGE("%{public}s: read input mime failed!", __func__);
@@ -102,12 +102,12 @@ static int32_t SerCodecGetCapability(struct HdfDeviceIoClient *client, struct Hd
         HDF_LOGE("%{public}s: read input flags failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (CodecGetCapability(mime, type, flags, &Capability) != HDF_SUCCESS) {
+    if (CodecGetCapability(mime, type, flags, &capability) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: GetCapability - got nothing!", __func__);
         return HDF_FAILURE;
     }
-    if (CodecSerPackCapability(reply, &Capability) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: write Capability to sbuf failed!", __func__);
+    if (CodecSerPackCapability(reply, &capability) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: write capability to sbuf failed!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;

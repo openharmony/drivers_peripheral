@@ -63,10 +63,10 @@ struct CodecInstance {
 };
 
 struct CodecInstance* GetCodecInstance(void);
-void InitCodecInstance(struct CodecInstance *instance);
-void RunCodecInstance(struct CodecInstance *instance);
-void StopCodecInstance(struct CodecInstance *instance);
-void DestroyCodecInstance(struct CodecInstance *instance);
+int32_t InitCodecInstance(struct CodecInstance *instance);
+int32_t RunCodecInstance(struct CodecInstance *instance);
+int32_t StopCodecInstance(struct CodecInstance *instance);
+int32_t DestroyCodecInstance(struct CodecInstance *instance);
 void AddInputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId);
 void AddOutputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId);
 ShareMemory* GetInputShm(struct CodecInstance *instance, int32_t id);
