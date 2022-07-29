@@ -22,13 +22,13 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int32_t CodecProxyParseGottenCapbility(struct HdfSBuf *reply, CodecCapbility *cap);
+int32_t CodecProxyParseGottenCapability(struct HdfSBuf *reply, CodecCapability *cap);
 int32_t CodecProxyPackParam(struct HdfSBuf *data, const Param *param);
-int32_t CodecProxyPackInputInfo(struct HdfSBuf *data, const InputInfo *inputData);
-int32_t CodecProxyParseInputInfo(struct HdfSBuf *reply, InputInfo *inputData);
-int32_t CodecProxyParseOutputInfo(struct HdfSBuf *reply, OutputInfo *outInfo);
 int32_t CodecProxyParseParam(struct HdfSBuf *reply, Param *param);
-int32_t CodecProxyPackOutputInfo(struct HdfSBuf *data, OutputInfo *outInfo);
+int32_t CodecProxyPackCodecBuffer(struct HdfSBuf *data, const CodecBuffer *codecBuffer);
+int32_t CodecProxyParseCodecBuffer(struct HdfSBuf *reply, CodecBuffer *codecBuffer);
+int32_t CodecProxyParseFenceFd(struct HdfSBuf *reply, int32_t *fenceFd);
+int32_t CodecProxyPackFenceFd(struct HdfSBuf *data, int32_t fenceFd);
 
 #ifdef __cplusplus
 }
