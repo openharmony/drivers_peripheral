@@ -25,7 +25,7 @@ struct DevInfo g_inDevInfo;
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 
 /* virtual mixer device */
-#define AUDIO_REPLY_EXTEND 16
+#define AUDIO_REPLY_EXTEND 64
 #define AUDIO_SIZE_FRAME_16K (16 * 1024)
 #define AUDIO_TRYNUM 2
 #define AUDIO_TRYNUM_TIME 3000
@@ -1042,8 +1042,8 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
         AudioSbufRecycle(reply);
         return HDF_FAILURE;
     }
-    AudioSbufRecycle(reply);
     ret = AudioInputCaptureReadInfoToHandleData(handleData, frame, frameCount, dataSize);
+    AudioSbufRecycle(reply);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("AudioInputCaptureReadInfoToHandleData Failed!");
     }
