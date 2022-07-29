@@ -126,12 +126,12 @@ typedef enum {
  * @version 1.0
  */
 typedef enum {
-    AUDIO_SAMPLE_FMT_S8 = 0, /**< 8-bit integer for a single sample */
-    AUDIO_SAMPLE_FMT_S16,    /**< 16-bit integer for a single sample */
-    AUDIO_SAMPLE_FMT_S24,    /**< 24-bit integer for a single sample */
-    AUDIO_SAMPLE_FMT_S32,    /**< 32-bit integer for a single sample */
-    AUDIO_SAMPLE_FMT_FLOAT,  /**< Single-precision floating point number for a single sample */
-} AudioSampleFmt;
+    FORMAT_AUDIO_SAMPLE_FMT_S8 = 0, /**< 8-bit integer for a single sample */
+    FORMAT_AUDIO_SAMPLE_FMT_S16,    /**< 16-bit integer for a single sample */
+    FORMAT_AUDIO_SAMPLE_FMT_S24,    /**< 24-bit integer for a single sample */
+    FORMAT_AUDIO_SAMPLE_FMT_S32,    /**< 32-bit integer for a single sample */
+    FORMAT_AUDIO_SAMPLE_FMT_FLOAT,  /**< Single-precision floating point number for a single sample */
+} FormatAudioSampleFmt;
 
 /**
  * @brief Enumerates subtitle frame types.
@@ -586,7 +586,7 @@ typedef struct {
     CodecFormat codecType; /**< Audio encoding type, for details, see {@link CodecFormat}. */
     uint32_t sampleRate; /**< Sampling rate */
     uint32_t channelCount; /**< Number of audio channels */
-    AudioSampleFmt sampleBitWidth; /**< Bit width */
+    FormatAudioSampleFmt sampleBitWidth; /**< Bit width */
     uint32_t samplesPerFrame; /**< Number of samples per frame */
     uint32_t avgBytesPerSec; /**< Average bit rate, in byte/s */
 } AudioTrackSourceInfo;

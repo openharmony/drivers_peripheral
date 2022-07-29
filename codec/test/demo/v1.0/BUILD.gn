@@ -28,8 +28,8 @@ ohos_executable("codec_decode_test_ipc") {
     "//device/soc/rockchip/rk3568/hardware/mpp/include",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
-    "//drivers/peripheral/codec/hdi_service/codec_proxy/",
-    "//drivers/peripheral/codec/hdi_service/codec_service_stub/",
+    "//drivers/peripheral/codec/hdi_service/codec_proxy",
+    "//drivers/peripheral/codec/hdi_service/codec_service_stub",
   ]
 
   cflags_c = [
@@ -54,6 +54,8 @@ ohos_executable("codec_decode_test_ipc") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_peripheral_display:hdi_gralloc_client",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
@@ -83,8 +85,8 @@ ohos_executable("codec_encode_test_ipc") {
     "//device/soc/rockchip/rk3568/hardware/mpp/include",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
-    "//drivers/peripheral/codec/hdi_service/codec_proxy/",
-    "//drivers/peripheral/codec/hdi_service/codec_service_stub/",
+    "//drivers/peripheral/codec/hdi_service/codec_proxy",
+    "//drivers/peripheral/codec/hdi_service/codec_service_stub",
   ]
 
   cflags_c = [
@@ -108,6 +110,8 @@ ohos_executable("codec_encode_test_ipc") {
   ]
   if (is_standard_system) {
     external_deps = [
+      "drivers_peripheral_display:hdi_gralloc_client",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

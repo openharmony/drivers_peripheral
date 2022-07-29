@@ -16,7 +16,7 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libcodec_client") {
   include_dirs = [
     "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-    "//drivers/peripheral/codec/interfaces/include/",
+    "//drivers/peripheral/codec/interfaces/include",
   ]
   sources = [
     "codec_proxy/codec_callback_proxy.c",
@@ -26,11 +26,14 @@ ohos_shared_library("libcodec_client") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_peripheral_display:hdi_gralloc_client",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
+      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -47,8 +50,8 @@ group("codec_client") {
 
 ohos_shared_library("libcodec_server") {
   include_dirs = [
-    "//drivers/peripheral/codec/interfaces/include/",
-    "//drivers/peripheral/codec/hdi_service/codec_proxy/",
+    "//drivers/peripheral/codec/interfaces/include",
+    "//drivers/peripheral/codec/hdi_service/codec_proxy",
     "//drivers/peripheral/codec/hal/v1.0/codec_instance/include",
     "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
     "//drivers/peripheral/codec/hal/v1.0/oem_interface/include",
@@ -83,6 +86,8 @@ ohos_shared_library("libcodec_server") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_peripheral_display:hdi_gralloc_client",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

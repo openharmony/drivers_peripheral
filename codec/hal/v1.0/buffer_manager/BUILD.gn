@@ -26,6 +26,8 @@ ohos_shared_library("libcodec_buffer_manager") {
 
   if (is_standard_system) {
     external_deps = [
+      "drivers_peripheral_display:hdi_gralloc_client",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",

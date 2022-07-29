@@ -43,8 +43,8 @@ struct CodecInstance {
     ShareMemory outputBuffers[MAX_BUFFER_NUM];
     int32_t inputBuffersCount;
     int32_t outputBuffersCount;
-    InputInfo   *inputInfos[MAX_BUFFER_NUM];
-    OutputInfo  *outputInfos[MAX_BUFFER_NUM];
+    CodecBuffer *inputInfos[MAX_BUFFER_NUM];
+    CodecBuffer *outputInfos[MAX_BUFFER_NUM];
     int32_t inputInfoCount;
     int32_t outputInfoCount;
 
@@ -64,23 +64,25 @@ struct CodecInstance {
 
 struct CodecInstance* GetCodecInstance(void);
 void InitCodecInstance(struct CodecInstance *instance);
-void AddInputShm(struct CodecInstance *instance, CodecBufferInfo *bufferInfo);
-void AddOutputShm(struct CodecInstance *instance, CodecBufferInfo *bufferInfo);
+void RunCodecInstance(struct CodecInstance *instance);
+void StopCodecInstance(struct CodecInstance *instance);
+void DestroyCodecInstance(struct CodecInstance *instance);
+void AddInputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId);
+void AddOutputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId);
 ShareMemory* GetInputShm(struct CodecInstance *instance, int32_t id);
 ShareMemory* GetOutputShm(struct CodecInstance *instance, int32_t id);
 int32_t GetFdById(struct CodecInstance *instance, int32_t id);
 void ReleaseInputShm(struct CodecInstance *instance);
 void ReleaseOutputShm(struct CodecInstance *instance);
-void AddInputInfo(struct CodecInstance *instance, InputInfo *info);
-void AddOutputInfo(struct CodecInstance *instance, OutputInfo *info);
-InputInfo* GetInputInfo(struct CodecInstance *instance, int32_t id);
-OutputInfo* GetOutputInfo(struct CodecInstance *instance, int32_t id);
+void AddInputInfo(struct CodecInstance *instance, CodecBuffer *info);
+void AddOutputInfo(struct CodecInstance *instance, CodecBuffer *info);
+CodecBuffer* GetInputInfo(struct CodecInstance *instance, uint32_t id);
+CodecBuffer* GetOutputInfo(struct CodecInstance *instance, uint32_t id);
 void ReleaseInputInfo(struct CodecInstance *instance);
 void ReleaseOutputInfo(struct CodecInstance *instance);
 void ResetBuffers(struct CodecInstance *instance);
-void RunCodecInstance(struct CodecInstance *instance);
-void StopCodecInstance(struct CodecInstance *instance);
-void DestroyCodecInstance(struct CodecInstance *instance);
+bool CopyCodecBuffer(CodecBuffer *dst, const CodecBuffer *src);
+CodecBuffer* DupCodecBuffer(const CodecBuffer *src);
 
 #ifdef __cplusplus
 }

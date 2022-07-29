@@ -61,8 +61,7 @@ void CodecCallbackProxySBufRecycle(struct HdfSBuf *data, struct HdfSBuf *reply)
     return;
 }
 
-static int CodecCallbackProxyOnEvent(UINTPTR comp, UINTPTR appData, EventType event,
-                                     uint32_t data1, uint32_t data2, UINTPTR eventData)
+static int CodecCallbackProxyOnEvent(UINTPTR userData, EventType event, uint32_t length, int32_t eventData[])
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -71,13 +70,8 @@ static int CodecCallbackProxyOnEvent(UINTPTR comp, UINTPTR appData, EventType ev
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)comp)) {
-        HDF_LOGE("%{public}s: write input comp failed!", __func__);
-        CodecCallbackProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufWriteUint32(data, (uint32_t)appData)) {
-        HDF_LOGE("%{public}s: write input appData failed!", __func__);
+    if (!HdfSbufWriteUint32(data, (uint32_t)userData)) {
+        HDF_LOGE("%{public}s: write input userData failed!", __func__);
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -86,20 +80,16 @@ static int CodecCallbackProxyOnEvent(UINTPTR comp, UINTPTR appData, EventType ev
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)data1)) {
-        HDF_LOGE("%{public}s: write input data1 failed!", __func__);
+    if (!HdfSbufWriteUint32(data, (uint32_t)length)) {
+        HDF_LOGE("%{public}s: write input length failed!", __func__);
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)data2)) {
-        HDF_LOGE("%{public}s: write input data2 failed!", __func__);
-        CodecCallbackProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufWriteUint32(data, (uint32_t)eventData)) {
-        HDF_LOGE("%{public}s: write input eventData failed!", __func__);
-        CodecCallbackProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
+    for (uint32_t i = 0; i < length; i++) {
+        if (!HdfSbufWriteInt32(data, eventData[i])) {
+            HDF_LOGE("%{public}s: write eventData failed!", __func__);
+            return HDF_ERR_INVALID_PARAM;
+        }
     }
     ret = CodecCallbackProxyCall(CMD_CODEC_ON_EVENT, data, reply);
     if (ret != HDF_SUCCESS) {
@@ -111,7 +101,7 @@ static int CodecCallbackProxyOnEvent(UINTPTR comp, UINTPTR appData, EventType ev
     return ret;
 }
 
-static int CodecCallbackProxyInputBufferAvailable(UINTPTR comp, UINTPTR appData, InputInfo *inBuf)
+static int CodecCallbackProxyInputBufferAvailable(UINTPTR userData, CodecBuffer *inBuf, int32_t *acquireFd)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -123,17 +113,12 @@ static int CodecCallbackProxyInputBufferAvailable(UINTPTR comp, UINTPTR appData,
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)comp)) {
-        HDF_LOGE("%{public}s: write input comp failed!", __func__);
+    if (!HdfSbufWriteUint32(data, (uint32_t)userData)) {
+        HDF_LOGE("%{public}s: write input userData failed!", __func__);
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)appData)) {
-        HDF_LOGE("%{public}s: write input appData failed!", __func__);
-        CodecCallbackProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (CodecProxyPackInputInfo(data, inBuf)) {
+    if (CodecProxyPackCodecBuffer(data, inBuf)) {
         HDF_LOGE("%{public}s: write input buffer failed!", __func__);
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
@@ -148,7 +133,7 @@ static int CodecCallbackProxyInputBufferAvailable(UINTPTR comp, UINTPTR appData,
     return ret;
 }
 
-static int CodecCallbackProxyOutputBufferAvailable(UINTPTR comp, UINTPTR appData, OutputInfo *outBuf)
+static int CodecCallbackProxyOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t *acquireFd)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -160,18 +145,13 @@ static int CodecCallbackProxyOutputBufferAvailable(UINTPTR comp, UINTPTR appData
         HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)comp)) {
-        HDF_LOGE("%{public}s: write input comp failed!", __func__);
+    if (!HdfSbufWriteUint32(data, (uint32_t)userData)) {
+        HDF_LOGE("%{public}s: write input userData failed!", __func__);
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufWriteUint32(data, (uint32_t)appData)) {
-        HDF_LOGE("%{public}s: write input appData failed!", __func__);
-        CodecCallbackProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (CodecProxyPackOutputInfo(data, outBuf)) {
-        HDF_LOGE("%{public}s: write input buffer failed!", __func__);
+    if (CodecProxyPackCodecBuffer(data, outBuf)) {
+        HDF_LOGE("%{public}s: write output buffer failed!", __func__);
         CodecCallbackProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
