@@ -59,6 +59,7 @@ ohos_executable("charger") {
     "utils_base:utils",
   ]
 
+  install_images = [ chipset_base_dir ]
   part_name = "drivers_peripheral_battery"
 }
 
@@ -72,6 +73,7 @@ group("led_service") {
 
 group("resources_service") {
   deps = [
+    "resources:init.charger.cfg",
     "resources:resources_config",
     "resources:resources_config1",
     "resources:resources_config10",
@@ -135,7 +137,6 @@ group("resources_service") {
     "resources:resources_config63",
     "resources:resources_config64",
     "resources:resources_config65",
-    "resources:resources_config66",
     "resources:resources_config7",
     "resources:resources_config8",
     "resources:resources_config9",
