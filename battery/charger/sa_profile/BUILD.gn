@@ -13,9 +13,10 @@
 
 import("//build/ohos.gni")
 
-## Install led_config.json to /system/etc/ledconfig/led_config.json
+## Install led_config.json to /vendor/etc/ledconfig/led_config.json
 ohos_prebuilt_etc("led_config") {
   source = "led_config.json"
+  install_images = [ chipset_base_dir ]
   relative_install_dir = "ledconfig"
   part_name = "drivers_peripheral_battery"
   subsystem_name = "hdf"
