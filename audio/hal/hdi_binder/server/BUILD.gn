@@ -72,10 +72,14 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
       ]
 
       deps = [
-        "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+        "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common",
         "//third_party/bounds_checking_function:libsec_shared",
       ]
-
+      if (!defined(enable_audio_user_mode) || !enable_audio_user_mode) {
+        deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+      } else {
+        deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
+      }
       if (enable_audio_hal_hdf_log) {
         defines = [ "AUDIO_HAL_HDF_LOG" ]
       }
@@ -103,8 +107,12 @@ if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
         "src/pnp_message_report.c",
       ]
 
-      deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
-
+      deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
+      if (!defined(enable_audio_user_mode) || !enable_audio_user_mode) {
+        deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+      } else {
+        deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
+      }
       defines = []
       if (enable_audio_device_mpi) {
         defines += [ "AUDIO_HAL_USER" ]
