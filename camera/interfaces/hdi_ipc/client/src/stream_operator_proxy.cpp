@@ -17,6 +17,7 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <message_parcel.h>
+#include <securec.h>
 #include "istream_operator_callback.h"
 #include "ioffline_stream_operator.h"
 #include "camera_metadata_info.h"
@@ -207,10 +208,10 @@ CamRetCode StreamOperatorProxy::GetStreamAttributes(
     int32_t count = reply.ReadInt32();
     for (int i = 0; i < count; i++) {
         const uint8_t *buffer = data.ReadBuffer(sizeof(StreamAttribute));
-        std::shared_ptr<StreamAttribute> attribute =
-        std::shared_ptr<StreamAttribute>(
-        reinterpret_cast<StreamAttribute*>(
-        const_cast<uint8_t *>(buffer)));
+        std::shared_ptr<StreamAttribute> attribute = std::make_shared<StreamAttribute>();
+        if (memcpy_s(attribute.get(), sizeof(StreamAttribute), buffer, sizeof(StreamAttribute)) != EOK) {
+            return INVALID_ARGUMENT;
+        }
         attributes.push_back(attribute);
     }
 
