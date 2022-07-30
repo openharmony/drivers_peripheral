@@ -210,7 +210,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetDefaultCfgTest_008, TestSize.Level1)
     params->val = nullptr;
     params->size = 0;
 
-    int32_t errorCode = g_codecObj->CodecGetParameter(g_codecObj, g_handle, params, paramCnt);
+    int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
     OsalMemFree(params);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }

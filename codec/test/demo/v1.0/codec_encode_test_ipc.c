@@ -295,7 +295,7 @@ void CalcBpsRange(RKHdiEncodeSetup *encSetup)
         }
     }
     /* setup qp for different codec and rc_mode */
-    switch (encSetup->codecType.mimeCodecType) {
+    switch (encSetup->codecMime.mimeCodecType) {
         case MPP_VIDEO_CodingAVC:
         case MPP_VIDEO_CodingHEVC: {
             SetQpValue(encSetup);
@@ -307,9 +307,9 @@ void CalcBpsRange(RKHdiEncodeSetup *encSetup)
     }
 }
 
-void SetCodecTypeData(RKHdiCodecTypeSetup *codecTypeSet)
+void SetCodecTypeData(RKHdiCodecMimeSetup *codecMimeSet)
 {
-    switch (codecTypeSet->mimeCodecType) {
+    switch (codecMimeSet->mimeCodecType) {
         case MEDIA_MIMETYPE_VIDEO_AVC: {
             /*
             * H.264 profile_idc parameter
@@ -317,7 +317,7 @@ void SetCodecTypeData(RKHdiCodecTypeSetup *codecTypeSet)
             * 77  - Main profile
             * 100 - High profile
             */
-            codecTypeSet->avcSetup.profile = AVC_SETUP_PROFILE_DEFAULT;
+            codecMimeSet->avcSetup.profile = AVC_SETUP_PROFILE_DEFAULT;
             /*
             * H.264 level_idc parameter
             * 10 / 11 / 12 / 13    - qcif@15fps / cif@7.5fps / cif@15fps / cif@30fps
@@ -326,20 +326,73 @@ void SetCodecTypeData(RKHdiCodecTypeSetup *codecTypeSet)
             * 40 / 41 / 42         - 1080p@30fps / 1080p@30fps / 1080p@60fps
             * 50 / 51 / 52         - 4K@30fps
             */
-            codecTypeSet->avcSetup.level = AVC_SETUP_LEVEL_DEFAULT;
-            codecTypeSet->avcSetup.cabacEn = AVC_SETUP_CABAC_EN_DEFAULT;
-            codecTypeSet->avcSetup.cabacIdc = AVC_SETUP_CABAC_IDC_DEFAULT;
-            codecTypeSet->avcSetup.trans8x8 = AVC_SETUP_TRANS_DEFAULT;
+            codecMimeSet->avcSetup.level = AVC_SETUP_LEVEL_DEFAULT;
+            codecMimeSet->avcSetup.cabacEn = AVC_SETUP_CABAC_EN_DEFAULT;
+            codecMimeSet->avcSetup.cabacIdc = AVC_SETUP_CABAC_IDC_DEFAULT;
+            codecMimeSet->avcSetup.trans8x8 = AVC_SETUP_TRANS_DEFAULT;
             break;
         }
         case MEDIA_MIMETYPE_VIDEO_HEVC: {
             break;
         }
         default: {
-            HDF_LOGE("%{public}s: unsupport encoder coding type %{public}d", __func__, codecTypeSet->mimeCodecType);
+            HDF_LOGE("%{public}s: unsupport encoder coding type %{public}d", __func__, codecMimeSet->mimeCodecType);
             break;
         }
     }
+}
+
+void FreeParams(Param *params, int32_t paramCnt)
+{
+    if (params == NULL || paramCnt <= 0) {
+        HDF_LOGE("%{public}s: params is null or invalid count!", __func__);
+        return;
+    }
+    for (int32_t j = 0; j < paramCnt; j++) {
+        if (params[j].val != NULL && params[j].size > 0) {
+            OsalMemFree(params[j].val);
+            params[j].val = NULL;
+        }
+    }
+    OsalMemFree(params);
+}
+
+void CheckEncSetup(Param *setParams, Param *getParams, int32_t paramCnt)
+{
+    if (setParams == NULL || getParams == NULL || paramCnt <= 0) {
+        HDF_LOGE("%{public}s: params is null or invalid count!", __func__);
+        return;
+    }
+    for (int32_t i = 0; i < paramCnt; i++) {
+        if (setParams[i].size != getParams[i].size) {
+            HDF_LOGE("%{public}s: params size incorrect!", __func__);
+            return;
+        }
+        if (memcmp(setParams[i].val, getParams[i].val, setParams[i].size) != 0) {
+            HDF_LOGE("%{public}s: params val incorrect! index:%{public}d", __func__, i);
+            return;
+        }
+    }
+    
+    HDF_LOGI("%{public}s: get all params correctly!", __func__);
+}
+
+int32_t GetSetupParams(Param *setParams, int32_t paramCnt)
+{
+    Param *getParams = (Param *)OsalMemCalloc(sizeof(Param) * paramCnt);
+
+    for (int32_t i = 0; i < paramCnt; i++) {
+        getParams[i].key = setParams[i].key;
+    }
+    int32_t ret = g_codecProxy->CodecGetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, getParams, paramCnt);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: CodecGetParameter failed, ret:%{public}d", __func__, ret);
+        FreeParams(getParams, paramCnt);
+        return HDF_FAILURE;
+    }
+    CheckEncSetup(setParams, getParams, paramCnt);
+    FreeParams(getParams, paramCnt);
+    return HDF_SUCCESS;
 }
 
 int32_t SetupExtEncParams(Param *params, RKHdiEncodeSetup *encSetup, int32_t count)
@@ -357,16 +410,16 @@ int32_t SetupExtEncParams(Param *params, RKHdiEncodeSetup *encSetup, int32_t cou
 
     param = &params[paramCount++];
     param->key = KEY_MIMETYPE;
-    encSetup->codecType.mimeCodecType = MEDIA_MIMETYPE_VIDEO_AVC;
-    SetCodecTypeData(&encSetup->codecType);
-    param->val = &(encSetup->codecType);
-    param->size = sizeof(encSetup->codecType);
+    encSetup->codecMime.mimeCodecType = MEDIA_MIMETYPE_VIDEO_AVC;
+    SetCodecTypeData(&encSetup->codecMime);
+    param->val = &(encSetup->codecMime);
+    param->size = sizeof(encSetup->codecMime);
 
     param = &params[paramCount++];
     param->key = KEY_CODEC_TYPE;
-    CodecType codecType = VIDEO_ENCODER;
-    param->val = &codecType;
-    param->size = sizeof(codecType);
+    encSetup->codecType = VIDEO_ENCODER;
+    param->val = &encSetup->codecType;
+    param->size = sizeof(encSetup->codecType);
 
     param = &params[paramCount++];
     param->key = KEY_VIDEO_RC_MODE;
@@ -438,9 +491,16 @@ int32_t SetupEncParams(RKHdiEncodeSetup *encSetup)
     paramCount = SetupExtEncParams(params, encSetup, paramCount);
     int32_t ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, params, paramCount);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: CodecSetParameter KEY_ENC_SETUP_RK failed", __func__);
-        return HDF_FAILURE;
+        HDF_LOGE("%{public}s: CodecSetParameter failed, ret:%{public}d", __func__, ret);
+        return ret;
     }
+
+    ret = GetSetupParams(params, paramCount - 1);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: GetSetupParams failed", __func__);
+        return ret;
+    }
+    
     return HDF_SUCCESS;
 }
 
@@ -471,7 +531,7 @@ void EncodeLoopHandleInput(CodecEnvData *p_data, uint8_t *readData)
         g_totalSrcSize += readSize;
         ShareMemory *sm = GetShareMemoryById(inputData->bufferId);
         memcpy_s(sm->virAddr, readSize, (uint8_t*)readData, readSize);
-        inputData->buffer[0].capacity = readSize;
+        inputData->buffer[0].length = readSize;
         g_codecProxy->CodecQueueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, inputData, QUEUE_TIME_OUT, -1);
     }
     OsalMemFree(inputData);
