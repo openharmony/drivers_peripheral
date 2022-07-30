@@ -23,7 +23,7 @@
 
 int32_t ComponentTypeGetComponentVersion(struct CodecComponentType *self, struct CompVerInfo *verInfo)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -34,7 +34,7 @@ int32_t ComponentTypeGetComponentVersion(struct CodecComponentType *self, struct
 int32_t ComponentTypeSendCommand(struct CodecComponentType *self,
     enum OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData, uint32_t cmdDataLen)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -45,7 +45,7 @@ int32_t ComponentTypeSendCommand(struct CodecComponentType *self,
 int32_t ComponentTypeGetParameter(struct CodecComponentType *self,
     uint32_t paramIndex, int8_t *paramStruct, uint32_t paramStructLen)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -56,7 +56,7 @@ int32_t ComponentTypeGetParameter(struct CodecComponentType *self,
 int32_t ComponentTypeSetParameter(struct CodecComponentType *self,
     uint32_t index, int8_t *paramStruct, uint32_t paramStructLen)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -67,7 +67,7 @@ int32_t ComponentTypeSetParameter(struct CodecComponentType *self,
 int32_t ComponentTypeGetConfig(struct CodecComponentType *self,
     uint32_t index, int8_t *cfgStruct, uint32_t cfgStructLen)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -78,7 +78,7 @@ int32_t ComponentTypeGetConfig(struct CodecComponentType *self,
 int32_t ComponentTypeSetConfig(struct CodecComponentType *self,
     uint32_t index, int8_t *cfgStruct, uint32_t cfgStructLen)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -89,7 +89,7 @@ int32_t ComponentTypeSetConfig(struct CodecComponentType *self,
 int32_t ComponentTypeGetExtensionIndex(struct CodecComponentType *self,
     const char *paramName, uint32_t *indexType)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -99,7 +99,7 @@ int32_t ComponentTypeGetExtensionIndex(struct CodecComponentType *self,
 
 int32_t ComponentTypeGetState(struct CodecComponentType *self, enum OMX_STATETYPE *state)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -111,7 +111,7 @@ int32_t ComponentTypeComponentTunnelRequest(struct CodecComponentType *self,
     uint32_t port, int32_t tunneledComp, uint32_t tunneledPort,
     struct OMX_TUNNELSETUPTYPE *tunnelSetup)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -122,7 +122,7 @@ int32_t ComponentTypeComponentTunnelRequest(struct CodecComponentType *self,
 int32_t ComponentTypeUseBuffer(struct CodecComponentType *self,
     uint32_t portIndex, struct OmxCodecBuffer *buffer)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -133,7 +133,7 @@ int32_t ComponentTypeUseBuffer(struct CodecComponentType *self,
 int32_t ComponentTypeAllocateBuffer(struct CodecComponentType *self,
     uint32_t portIndex, struct OmxCodecBuffer *buffer)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -144,7 +144,7 @@ int32_t ComponentTypeAllocateBuffer(struct CodecComponentType *self,
 int32_t ComponentTypeFreeBuffer(struct CodecComponentType *self, uint32_t portIndex,
     const struct OmxCodecBuffer *buffer)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -155,7 +155,7 @@ int32_t ComponentTypeFreeBuffer(struct CodecComponentType *self, uint32_t portIn
 int32_t ComponentTypeEmptyThisBuffer(struct CodecComponentType *self,
     const struct OmxCodecBuffer *buffer)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -166,7 +166,7 @@ int32_t ComponentTypeEmptyThisBuffer(struct CodecComponentType *self,
 int32_t ComponentTypeFillThisBuffer(struct CodecComponentType *self,
     const struct OmxCodecBuffer *buffer)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -177,7 +177,7 @@ int32_t ComponentTypeFillThisBuffer(struct CodecComponentType *self,
 int32_t ComponentTypeSetCallbacks(struct CodecComponentType *self,
     struct CodecCallbackType* callback, int64_t appData)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -187,7 +187,7 @@ int32_t ComponentTypeSetCallbacks(struct CodecComponentType *self,
 
 int32_t ComponentTypeComponentDeInit(struct CodecComponentType *self)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -198,7 +198,7 @@ int32_t ComponentTypeComponentDeInit(struct CodecComponentType *self)
 int32_t ComponentTypeUseEglImage(struct CodecComponentType *self,
     struct OmxCodecBuffer *buffer, uint32_t portIndex, int8_t *eglImage, uint32_t eglImageLen)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -209,7 +209,7 @@ int32_t ComponentTypeUseEglImage(struct CodecComponentType *self,
 int32_t ComponentTypeComponentRoleEnum(struct CodecComponentType *self,
     uint8_t *role, uint32_t roleLen, uint32_t index)
 {
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)self;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
         HDF_LOGE("%{public}s: info is null", __func__);
         return HDF_FAILURE;
@@ -258,7 +258,7 @@ void CodecComponentTypeRelease(struct CodecComponentType *instance)
         HDF_LOGE("%{public}s:  instanceis null", __func__);
         return;
     }
-    struct CodecComponentTypeInfo *info = (struct CodecComponentTypeInfo *)instance;
+    struct CodecComponentTypeInfo *info = CONTAINER_OF(instance, struct CodecComponentTypeInfo, instance);
     if (info != NULL) {
         HDF_LOGI("%{public}s:  OsalMemFree info ", __func__);
         OsalMemFree(info);

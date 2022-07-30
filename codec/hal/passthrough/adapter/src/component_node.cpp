@@ -531,8 +531,6 @@ int32_t ComponentNode::EmptyThisBuffer(const OmxCodecBuffer &buffer)
     int32_t ret = CodecQueueInput(comp_, codecBuffer, 0, buffer.fenceFd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s error, CodecQueueInput failed", __func__);
-        OsalMemFree(codecBuffer);
-        return ret;
     }
     OsalMemFree(codecBuffer);
 

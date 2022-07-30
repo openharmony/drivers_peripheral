@@ -27,6 +27,7 @@
 #include "codec_component_manager.h"
 #include "codec_component_type.h"
 #include "hdf_io_service_if.h"
+#include "codec_omx_ext.h"
 
 #define HDF_LOG_TAG codec_hdi_test
 
@@ -679,7 +680,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiIdleToExecutingTest_001, TestSize.Level
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiExecutingTToIdleTest_001, TestSize.Level1)
+HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiExecutingToIdleTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     int32_t ret = g_component->SendCommand(g_component, OMX_CommandStateSet, OMX_StateIdle, nullptr, 0);
@@ -803,8 +804,16 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiRoleEnumTest_001, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
-// Executing to Idle
-HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiExecutingToIdleTest_001, TestSize.Level1)
+// Executing to Pause
+HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiExecutingToPauseTest_001, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    int32_t ret = g_component->SendCommand(g_component, OMX_CommandStateSet, OMX_StatePause, nullptr, 0);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+}
+
+// Pause to Idle
+HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiPauseToIdleTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     int32_t ret = g_component->SendCommand(g_component, OMX_CommandStateSet, OMX_StateIdle, nullptr, 0);
@@ -816,23 +825,32 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiFreeBufferTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     auto iter = outputBuffers.begin();
-    if (iter != outputBuffers.end()) {
-        auto omxBuffer = iter->second->omxBuffer;
-        auto tempId = omxBuffer->bufferId;
-        omxBuffer->bufferId = BUFFER_ID_ERROR;
-        int32_t ret = g_component->FreeBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, omxBuffer.get());
+    while (iter != outputBuffers.end()) {
+        int32_t ret =
+            g_component->FreeBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, iter->second->omxBuffer.get());
         ASSERT_NE(ret, HDF_SUCCESS);
-        omxBuffer->bufferId = tempId;
+        iter = outputBuffers.erase(iter);
     }
 }
 
-// When ComponentDeInit, must change to Loaded State
+HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiFreeBufferTest_002, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    auto iter = inputBuffers.begin();
+    while (iter != inputBuffers.end()) {
+        int32_t ret =
+            g_component->FreeBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_INPUT, iter->second->omxBuffer.get());
+        ASSERT_NE(ret, HDF_SUCCESS);
+        iter = inputBuffers.erase(iter);
+    }
+}
+
 HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiIdleToLoadedTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     int32_t ret = g_component->SendCommand(g_component, OMX_CommandStateSet, OMX_StateLoaded, nullptr, 0);
     ASSERT_EQ(ret, HDF_SUCCESS);
-    // State changed OMX_StateIdle when release all this buffer
+
     OMX_STATETYPE state = OMX_StateInvalid;
     do {
         usleep(100);

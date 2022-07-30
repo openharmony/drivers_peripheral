@@ -88,8 +88,15 @@ ohos_shared_library("libcodec_hdi_passthrough_impl") {
 }
 
 group("codec_hdi_passthrough") {
-  deps = [
-    ":codec_adapter_capabilities.hcb",
-    ":libcodec_hdi_passthrough_impl",
-  ]
+  CODEC_HCS_PATH = rebase_path(
+          "//vendor/${product_company}/${product_name}/hdf_config/uhdf/media_codec")
+  cmd = "if [ -f ${CODEC_HCS_PATH}/codec_adapter_capabilities.hcs ]; then echo true; else echo false; fi"
+  HAVE_CODEC_HCS_PATH =
+      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+  if (HAVE_CODEC_HCS_PATH) {
+    deps = [
+      ":codec_adapter_capabilities.hcb",
+      ":libcodec_hdi_passthrough_impl",
+    ]
+  }
 }
