@@ -49,11 +49,15 @@ if (defined(ohos_lite)) {
 
     deps = [
       "//drivers/adapter/uhdf2/utils:libhdf_utils",
-      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
-
+    if (!defined(enable_audio_user_mode) || !enable_audio_user_mode) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    } else {
+      deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
+    }
     cflags = [
       "-Wall",
       "-Wextra",
@@ -87,11 +91,16 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
-    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    if (!defined(enable_audio_user_mode) || !enable_audio_user_mode) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+      external_deps = [ "device_driver_framework:libhdf_utils" ]
+    } else {
+      deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
+    }
     cflags = [
       "-Wall",
       "-Wextra",

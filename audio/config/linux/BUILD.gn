@@ -13,8 +13,20 @@
 
 import("//build/ohos.gni")
 if (is_standard_system) {
+  AUDIO_JSON_PATH =
+    rebase_path("//vendor/${product_company}/${product_name}/hals/audio")
+
+  cmd1 = "if [ -f ${AUDIO_JSON_PATH}/adapter_config.json ]; then echo true; else echo false; fi"
+
+  HAVE_AUDIO_ADAPTER_JSON =
+    exec_script("//build/lite/run_shell_cmd.py", [ cmd1 ], "value")
+
   ohos_prebuilt_etc("hdf_audio_json") {
-    source = "//drivers/peripheral/audio/config/adapter_config.json"
+    if (HAVE_AUDIO_ADAPTER_JSON) {
+      source = "${AUDIO_JSON_PATH}/adapter_config.json"
+    } else {
+      source = "//drivers/peripheral/audio/config/adapter_config.json"
+    }
     relative_install_dir = "hdfconfig"
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
