@@ -51,6 +51,7 @@ static int32_t DefaultCbInputBufferAvailable(UINTPTR userData, CodecBuffer *inBu
     }
     inputInfo->buffer[0].buf = (intptr_t)GetFdById(g_codecInstance, inBuf->bufferId);
     inputInfo->buffer[0].type = BUFFER_TYPE_FD;
+    inputInfo->buffer[0].length = 0;
     g_codecInstance->bufferManagerWrapper->PutUsedInputDataBuffer(g_codecInstance->bufferManagerWrapper, inputInfo);
     return HDF_SUCCESS;
 }
@@ -87,14 +88,21 @@ static int32_t DefaultCbOutputBufferAvailable(UINTPTR userData, CodecBuffer *out
 int32_t CodecInit()
 {
     g_codecInstance = GetCodecInstance();
-    InitCodecInstance(g_codecInstance);
-
-    if (g_codecInstance == NULL || g_codecInstance->codecOemIface == NULL) {
-        HDF_LOGE("%{public}s: g_codecInstance or oemIface is NULL!", __func__);
+    if (g_codecInstance == NULL) {
+        HDF_LOGE("%{public}s: g_codecInstance is NULL!", __func__);
         return HDF_FAILURE;
     }
-    g_codecInstance->codecOemIface->CodecInit();
-    return HDF_SUCCESS;
+    int32_t ret = InitCodecInstance(g_codecInstance);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: InitCodecInstance failed!", __func__);
+        return ret;
+    }
+
+    if (g_codecInstance->codecOemIface == NULL) {
+        HDF_LOGE("%{public}s: oemIface is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    return g_codecInstance->codecOemIface->CodecInit();
 }
 
 int32_t CodecDeinit()
@@ -104,7 +112,11 @@ int32_t CodecDeinit()
         return HDF_FAILURE;
     }
     g_codecInstance->codecOemIface->CodecDeinit();
-    DestroyCodecInstance(g_codecInstance);
+    int32_t ret = DestroyCodecInstance(g_codecInstance);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: CodecDeinit failed!", __func__);
+        return ret;
+    }
     g_codecInstance = NULL;
     return HDF_SUCCESS;
 }
@@ -171,7 +183,10 @@ int32_t CodecCreate(const char* name, CODEC_HANDLETYPE *handle)
         HDF_LOGE("%{public}s: g_codecInstance or oemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
-    g_codecInstance->codecOemIface->CodecCreate(name, handle);
+    int32_t ret = g_codecInstance->codecOemIface->CodecCreate(name, handle);
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
     g_codecInstance->handle = *handle;
     HDF_LOGI("%{public}s codec created", __func__);
     return HDF_SUCCESS;
@@ -183,8 +198,7 @@ int32_t CodecDestroy(CODEC_HANDLETYPE handle)
         HDF_LOGE("%{public}s: g_codecInstance or oemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
-    g_codecInstance->codecOemIface->CodecDestroy(handle);
-    return HDF_SUCCESS;
+    return g_codecInstance->codecOemIface->CodecDestroy(handle);
 }
 
 int32_t CodecSetPortMode(CODEC_HANDLETYPE handle, DirectionType direct, AllocateBufferMode mode, BufferType type)
@@ -214,8 +228,7 @@ int32_t CodecSetParameter(CODEC_HANDLETYPE handle, const Param *params, int32_t 
             g_codecInstance->codecType = codecType;
         }
     }
-    g_codecInstance->codecOemIface->CodecSetParameter(handle, params, paramCnt);
-    return HDF_SUCCESS;
+    return g_codecInstance->codecOemIface->CodecSetParameter(handle, params, paramCnt);
 }
 
 int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramCnt)
@@ -228,8 +241,7 @@ int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
         HDF_LOGE("%{public}s: params empty!", __func__);
         return HDF_FAILURE;
     }
-    g_codecInstance->codecOemIface->CodecGetParameter(handle, params, paramCnt);
-    return HDF_SUCCESS;
+    return g_codecInstance->codecOemIface->CodecGetParameter(handle, params, paramCnt);
 }
 
 int32_t CodecStart(CODEC_HANDLETYPE handle)
@@ -244,8 +256,7 @@ int32_t CodecStart(CODEC_HANDLETYPE handle)
         g_codecInstance->defaultCb.OutputBufferAvailable = DefaultCbOutputBufferAvailable;
         g_codecInstance->codecOemIface->CodecSetCallback(handle, &(g_codecInstance->defaultCb), 0);
     }
-    RunCodecInstance(g_codecInstance);
-    return HDF_SUCCESS;
+    return RunCodecInstance(g_codecInstance);
 }
 
 int32_t CodecStop(CODEC_HANDLETYPE handle)
@@ -254,8 +265,7 @@ int32_t CodecStop(CODEC_HANDLETYPE handle)
         HDF_LOGE("%{public}s: g_codecInstance is NULL!", __func__);
         return HDF_FAILURE;
     }
-    StopCodecInstance(g_codecInstance);
-    return HDF_SUCCESS;
+    return StopCodecInstance(g_codecInstance);
 }
 
 int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType)
@@ -264,8 +274,7 @@ int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType)
         HDF_LOGE("%{public}s: g_codecInstance or oemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
-    g_codecInstance->codecOemIface->CodecFlush(handle, directType);
-    return HDF_SUCCESS;
+    return g_codecInstance->codecOemIface->CodecFlush(handle, directType);
 }
 
 int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const CodecBuffer *inputData, uint32_t timeoutMs, int releaseFenceFd)
@@ -343,6 +352,7 @@ int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, CodecBuffer *outInfo, uint32_t
     } else if (g_codecInstance->codecStatus == CODEC_STATUS_STARTED) {
         CodecBuffer *info = GetOutputInfo(g_codecInstance, outInfo->bufferId);
         CopyCodecBuffer(info, outInfo);
+        info->buffer[0].length = 0;
         g_codecInstance->bufferManagerWrapper->PutUsedOutputDataBuffer(g_codecInstance->bufferManagerWrapper, info);
         return HDF_SUCCESS;
     } else if (g_codecInstance->codecStatus == CODEC_STATUS_STOPED) {
@@ -377,7 +387,9 @@ int32_t CodecSetCallback(CODEC_HANDLETYPE handle, const CodecCallback *cb, UINTP
         HDF_LOGE("%{public}s: g_codecInstance or oemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
-    g_codecInstance->codecOemIface->CodecSetCallback(handle, cb, instance);
-    g_codecInstance->hasCallback = true;
-    return HDF_SUCCESS;
+    int32_t ret = g_codecInstance->codecOemIface->CodecSetCallback(handle, cb, instance);
+    if (ret == HDF_SUCCESS) {
+        g_codecInstance->hasCallback = true;
+    }
+    return ret;
 }

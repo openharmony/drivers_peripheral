@@ -230,9 +230,9 @@ int32_t SetExtDecParameter(void)
     paramCnt = 1;
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
     param.key = (ParamKey)KEY_EXT_SPLIT_PARSE_RK;
-    int32_t needSplit = 1;
+    uint32_t needSplit = 1;
     param.val = &needSplit;
-    param.size = sizeof(int32_t);
+    param.size = sizeof(uint32_t);
     ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: CodecSetParameter failed", __func__);
@@ -280,7 +280,7 @@ int32_t SetDecParameter(void)
     int32_t needDefault = 1;
     param.val = &needDefault;
     param.size = sizeof(int32_t);
-    ret = g_codecProxy->CodecGetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
+    ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: CodecSetParameter failed", __func__);
         return HDF_FAILURE;
@@ -331,7 +331,7 @@ void DecodeLoopHandleInput(MpiDecLoopData *g_data)
         g_totalSrcSize += readSize;
         ShareMemory *sm = GetShareMemoryById(inputData->bufferId);
         memcpy_s(sm->virAddr, readSize, (uint8_t*)readData, readSize);
-        inputData->buffer[0].capacity = readSize;
+        inputData->buffer[0].length = readSize;
         g_codecProxy->CodecQueueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, inputData, QUEUE_TIME_OUT, -1);
     }
     OsalMemFree(inputData);
