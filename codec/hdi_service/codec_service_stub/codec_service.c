@@ -21,7 +21,9 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include "ashmem_wrapper.h"
+#ifndef CODEC_HAL_PASSTHROUGH
 #include "codec_config_parser.h"
+#endif
 #include "hdf_log.h"
 #include "osal_mem.h"
 
@@ -32,9 +34,16 @@
 #define AUDIO_HARDWARE_DECODER_INDEX 5
 
 struct CodecInstance *g_codecInstance = NULL;
+#ifdef CODEC_HAL_PASSTHROUGH
+const CodecCallback *g_codecCallback = NULL;
+UINTPTR g_userData;
+#endif
 
 static int32_t DefaultCbOnEvent(UINTPTR userData, EventType event, uint32_t length, int32_t eventData[])
 {
+#ifdef CODEC_HAL_PASSTHROUGH
+    g_codecCallback->OnEvent(g_userData, event, length, eventData);
+#endif
     return HDF_SUCCESS;
 }
 
@@ -53,6 +62,9 @@ static int32_t DefaultCbInputBufferAvailable(UINTPTR userData, CodecBuffer *inBu
     inputInfo->buffer[0].type = BUFFER_TYPE_FD;
     inputInfo->buffer[0].length = 0;
     g_codecInstance->bufferManagerWrapper->PutUsedInputDataBuffer(g_codecInstance->bufferManagerWrapper, inputInfo);
+#ifdef CODEC_HAL_PASSTHROUGH
+    g_codecCallback->InputBufferAvailable(g_userData, inBuf, acquireFd);
+#endif
     return HDF_SUCCESS;
 }
 
@@ -72,7 +84,9 @@ static int32_t DefaultCbOutputBufferAvailable(UINTPTR userData, CodecBuffer *out
     outputInfo->buffer[0].buf = (intptr_t)GetFdById(g_codecInstance, outBuf->bufferId);
     outputInfo->buffer[0].type = BUFFER_TYPE_FD;
     bmWrapper->PutOutputDataBuffer(bmWrapper, outputInfo);
-
+#ifdef CODEC_HAL_PASSTHROUGH
+    g_codecCallback->OutputBufferAvailable(g_userData, outputInfo, acquireFd);
+#endif
     // get a new OutputBuffer
     CodecBuffer *output = NULL;
     while (output == NULL && g_codecInstance->codecStatus == CODEC_STATUS_STARTED) {
@@ -123,6 +137,7 @@ int32_t CodecDeinit()
 
 int32_t CodecEnumerateCapability(uint32_t index, CodecCapability *cap)
 {
+#ifndef CODEC_HAL_PASSTHROUGH
     int32_t loopIndex;
     uint32_t cursor = index;
     CodecCapablityGroup *group = NULL;
@@ -142,12 +157,13 @@ int32_t CodecEnumerateCapability(uint32_t index, CodecCapability *cap)
             cursor -= group->num;
         }
     }
-
+#endif
     return HDF_FAILURE;
 }
 
 int32_t CodecGetCapability(AvCodecMime mime, CodecType type, uint32_t flags, CodecCapability *cap)
 {
+#ifndef CODEC_HAL_PASSTHROUGH
     int32_t groupIndex;
     int32_t capIndex;
     CodecCapablityGroup *group = NULL;
@@ -173,7 +189,7 @@ int32_t CodecGetCapability(AvCodecMime mime, CodecType type, uint32_t flags, Cod
             }
         }
     }
-
+#endif
     return HDF_FAILURE;
 }
 
@@ -387,7 +403,16 @@ int32_t CodecSetCallback(CODEC_HANDLETYPE handle, const CodecCallback *cb, UINTP
         HDF_LOGE("%{public}s: g_codecInstance or oemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
+#ifndef CODEC_HAL_PASSTHROUGH
     int32_t ret = g_codecInstance->codecOemIface->CodecSetCallback(handle, cb, instance);
+#else
+    g_codecInstance->defaultCb.OnEvent = DefaultCbOnEvent;
+    g_codecInstance->defaultCb.InputBufferAvailable = DefaultCbInputBufferAvailable;
+    g_codecInstance->defaultCb.OutputBufferAvailable = DefaultCbOutputBufferAvailable;
+    int32_t ret = g_codecInstance->codecOemIface->CodecSetCallback(handle, &(g_codecInstance->defaultCb), 0);
+    g_codecCallback = cb;
+    g_userData = instance;
+#endif
     if (ret == HDF_SUCCESS) {
         g_codecInstance->hasCallback = true;
     }

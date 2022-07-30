@@ -96,6 +96,15 @@ struct ControlRateConstantQuality {
 };
 
 /**
+ * @brief Defines the <b>PassthroughParam</b>.
+ */
+struct PassthroughParam {
+    int32_t key;   /**< Parameter type index */
+    void *val;     /**< Pointer to the parameter value */
+    int size;      /**< Parameter value size */
+};
+
+/**
  * @brief Enumerates the extended codec indexes.
  */
 enum OmxIndexCodecExType {
@@ -111,6 +120,8 @@ enum OmxIndexCodecExType {
     OMX_IndexCodecVideoPortFormat,
     /** ControlRateConstantQuality */
     OMX_IndexParamControlRateConstantQuality,
+    /** PassthroughParam */
+    OMX_IndexParamPassthrough,
 };
 #ifdef __cplusplus
 #if __cplusplus

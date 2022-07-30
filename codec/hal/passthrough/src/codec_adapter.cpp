@@ -21,6 +21,7 @@
 #include "codec_component_capability.h"
 #include "component_manager.h"
 #include "component_node.h"
+#include "codec_omx_ext.h"
 using namespace OHOS::Codec::CodecAdapter;
 
 #define HDF_LOG_TAG codec_hdi_adapter
@@ -76,6 +77,9 @@ int32_t CodecAdapterCreateComponent(struct CodecComponentNode **codecNode, char 
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s SetCallbacks error", __func__);
             g_mgr.DeleteComponentInstance(comp);
+            tempNode->node = nullptr;
+            delete tempNode;
+            tempNode = nullptr;
             return ret;
         }
     }
