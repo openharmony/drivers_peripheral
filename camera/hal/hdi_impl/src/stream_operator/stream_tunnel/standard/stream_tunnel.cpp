@@ -62,12 +62,14 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
     CHECK_IF_PTR_NULL_RETURN_VALUE(bufferQueue_, nullptr);
     OHOS::sptr<OHOS::SurfaceBuffer> sb = nullptr;
     int32_t fence = 0;
+    constexpr int32_t SLEEP_TIME = 2000;
     OHOS::SurfaceError sfError = OHOS::SURFACE_ERROR_OK;
     do {
         sfError = bufferQueue_->RequestBuffer(sb, fence, requestConfig_);
         if (sfError == OHOS::SURFACE_ERROR_NO_BUFFER) {
             std::unique_lock<std::mutex> l(waitLock_);
             waitCV_.wait(l, [this] { return wakeup_ == true; });
+            usleep(SLEEP_TIME);
         }
     } while (!stop_ && sfError == OHOS::SURFACE_ERROR_NO_BUFFER);
     wakeup_ = false;
