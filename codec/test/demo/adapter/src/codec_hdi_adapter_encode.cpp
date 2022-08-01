@@ -457,7 +457,7 @@ void CodecHdiAdapterEncode::Run()
         if (!FillCodecBuffer(bufferInfo, endFlag)) {
             break;
         }
-        HDF_LOGD("read buffer len:%{public}d", bufferInfo->omxBuffer->filledLen);
+
         ret = client_->EmptyThisBuffer(client_, bufferInfo->omxBuffer.get());
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s errNo[%{public}d] EmptyThisBuffer error", __func__, ret);
@@ -611,8 +611,6 @@ int32_t CodecHdiAdapterEncode::OnFillBufferDone(const struct OmxCodecBuffer &buf
 
     auto bufferInfo = iter->second;
     const void *addr = bufferInfo->avSharedPtr->ReadFromAshmem(buffer.filledLen, buffer.offset);
-    // save to file
-    HDF_LOGI("save to file len[%{public}d]", buffer.filledLen);
     (void)fwrite(addr, 1, buffer.filledLen, fpOut_);
     (void)fflush(fpOut_);
     if (buffer.flag == OMX_BUFFERFLAG_EOS) {
