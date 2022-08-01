@@ -723,7 +723,7 @@ int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen)
     char *soPathHdi = NULL;
     char *soPathProxy = NULL;
     int32_t ret;
-    soPathHdi = HDF_LIBRARY_FULL_PATH("libidl_audio_passthrough");
+    soPathHdi = HDF_LIBRARY_FULL_PATH("libhdi_audio_passthrough");
 #ifdef __aarch64__
     soPathProxy = "/system/lib64/libaudio_proxy_1.0.z.so";
 #else
@@ -758,6 +758,26 @@ int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen)
             break;
     }
     return HDF_SUCCESS;
+}
+
+void AudioAdapterDescriptorFree(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
+{
+    if (dataBlock == NULL) {
+        return;
+    }
+
+    if (dataBlock->adapterName != NULL) {
+        OsalMemFree(dataBlock->adapterName);
+        dataBlock->adapterName = NULL;
+    }
+
+    if (dataBlock->ports != NULL) {
+        OsalMemFree(dataBlock->ports);
+    }
+
+    if (freeSelf) {
+        OsalMemFree(dataBlock);
+    }
 }
 
 void ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen)

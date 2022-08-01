@@ -54,7 +54,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     }
 
     if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HAL_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     install_images = [ chipset_base_dir ]
@@ -98,7 +98,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     }
     defines = []
     if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HAL_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     install_images = [ chipset_base_dir ]
@@ -142,7 +142,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     }
     defines = []
     if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HAL_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     install_images = [ chipset_base_dir ]
@@ -179,7 +179,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     }
     defines = []
     if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HAL_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     install_images = [ chipset_base_dir ]

@@ -346,7 +346,7 @@ int32_t AudioRenderCheckSceneCapability(
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     *supported = false;
     /* Temporary storage does not save the structure */
-    struct AudioHwRenderParam renderParam;
+    struct AudioHwRenderParam renderParam = hwRender->renderParam;
     renderParam.frameRenderMode.attrs.type = (enum AudioCategory)scene->scene.id;
     renderParam.renderMode.hwInfo.deviceDescript.pins = scene->desc.pins;
 

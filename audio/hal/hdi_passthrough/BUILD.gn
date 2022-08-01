@@ -44,7 +44,7 @@ if (defined(ohos_lite)) {
     }
 
     if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HAL_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
     ldflags = [
       "-L$ohos_root_path/sysroot/usr/lib",

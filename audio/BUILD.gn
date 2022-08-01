@@ -35,6 +35,7 @@ group("hdi_audio") {
         "hal/hdi_binder/server:hdi_audio_usb_server",
       ]
     }
+    deps += [ "hdi_service:idl_audio" ]
   }
 
   if (drivers_peripheral_audio_user_mode == false) {
