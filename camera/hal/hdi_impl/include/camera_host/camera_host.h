@@ -19,7 +19,7 @@
 #include "icamera_host_callback.h"
 #include "icamera_device_callback.h"
 #include "camera.h"
-#include "types.h"
+#include "v1_0/types.h"
 
 namespace OHOS::Camera {
 class ICameraDevice;

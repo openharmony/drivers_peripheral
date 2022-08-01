@@ -14,30 +14,32 @@
  */
 
 #include <hdf_log.h>
+#include <hdf_base.h>
 #include "stream_operator_callback.h"
 
 namespace OHOS::Camera {
-void StreamOperatorCallback::OnCaptureStarted(int32_t captureId,
-    const std::vector<int32_t> &streamId)
+int32_t StreamOperatorCallback::OnCaptureStarted(int32_t captureId, const std::vector<int32_t>& streamIds)
 {
     HDF_LOGV("%{public}s, enter.", __func__);
+    return HDF_SUCCESS;
 }
 
-void StreamOperatorCallback::OnCaptureEnded(int32_t captureId,
-    const std::vector<std::shared_ptr<CaptureEndedInfo>> &info)
+int32_t StreamOperatorCallback::OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos)
 {
     HDF_LOGV("%{public}s, enter.", __func__);
+    return HDF_SUCCESS;
 }
 
-void StreamOperatorCallback::OnCaptureError(int32_t captureId,
-    const std::vector<std::shared_ptr<CaptureErrorInfo>> &info)
+int32_t StreamOperatorCallback::OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos)
 {
     HDF_LOGV("%{public}s, enter.", __func__);
+    return HDF_SUCCESS;
 }
 
-void StreamOperatorCallback::OnFrameShutter(int32_t captureId,
-    const std::vector<int32_t> &streamId, uint64_t timestamp)
+int32_t StreamOperatorCallback::OnFrameShutter(int32_t captureId,
+    const std::vector<int32_t>& streamIds, uint64_t timestamp)
 {
     HDF_LOGV("%{public}s, enter.", __func__);
+    return HDF_SUCCESS;
 }
 }

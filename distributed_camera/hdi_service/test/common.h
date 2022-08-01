@@ -32,28 +32,25 @@
 #include "camera_metadata_info.h"
 #include "display_type.h"
 #include "distributed_hardware_log.h"
-#include "drivers/peripheral/camera/interfaces/include/types.h"
-#include "icamera_device.h"
-#include "icamera_host.h"
 #include "idistributed_hardware_source.h"
-#include "ioffline_stream_operator.h"
 #include "iservice_registry.h"
-#include "istream_operator.h"
 #include "securec.h"
 #include "surface.h"
 
 #include "constants.h"
 #include "dcamera.h"
-#include "dcamera_device_callback.h"
 #include "dcamera_host.h"
-#include "dcamera_host_callback.h"
-#include "dcamera_host_proxy.h"
-#include "dstream_operator_callback.h"
 #include "v1_0/dcamera_types.h"
+#include "v1_0/icamera_device.h"
+#include "v1_0/icamera_host.h"
+#include "v1_0/ioffline_stream_operator.h"
+#include "v1_0/istream_operator.h"
+#include "v1_0/types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::HDI::DistributedCamera::V1_0;
+using namespace OHOS::HDI::Camera::V1_0;
 class Test {
 public:
     void Init();
@@ -63,7 +60,7 @@ public:
     uint64_t GetCurrentLocalTimeStamp();
     int32_t SaveYUV(const char* type, const void* buffer, int32_t size);
     int32_t SaveVideoFile(const char* type, const void* buffer, int32_t size, int32_t operationMode);
-    void StartStream(std::vector<Camera::StreamIntent> intents);
+    void StartStream(std::vector<StreamIntent> intents);
     void StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming);
     void StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds);
     void StopOfflineStream(int captureId);
@@ -77,15 +74,13 @@ public:
     OHOS::sptr<DCameraHostCallback> hostCallback = nullptr;
     OHOS::sptr<DCameraDeviceCallback> deviceCallback = nullptr;
     OHOS::sptr<IStreamOperator> streamOperator = nullptr;
-    OHOS::sptr<Camera::IOfflineStreamOperator> offlineStreamOperator = nullptr;
+    OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
     OHOS::sptr<IStreamOperatorCallback> offlineStreamOperatorCallback = nullptr;
-    std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = nullptr;
-    std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> streamInfos;
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo = nullptr;
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo2 = nullptr;
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo_pre = nullptr;
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo_video = nullptr;
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo_capture = nullptr;
+    CaptureInfo captureInfo;
+    std::vector<StreamInfo> streamInfos;
+    StreamInfo streamInfo_pre;
+    StreamInfo streamInfo_video;
+    StreamInfo streamInfo_capture;
     std::vector<std::string> cameraIds;
     int streamId_preview = 1000;
     int streamId_preview_double = 1001;
@@ -106,16 +101,16 @@ public:
     int video_height = 1080;
     std::vector<int> captureIds;
     std::vector<int> streamIds;
-    std::vector<Camera::StreamIntent> intents;
-    OHOS::Camera::CamRetCode rc;
-    OHOS::sptr<OHOS::Camera::ICameraHost> service = nullptr;
-    std::shared_ptr<CameraAbility> ability = nullptr;
+    std::vector<StreamIntent> intents;
+    OHOS::HDI::Camera::V1_0::CamRetCode rc;
+    OHOS::sptr<OHOS::HDI::Camera::V1_0::ICameraHost> service = nullptr;
+    std::vector<uint8_t> ability;
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
     bool status;
     int previewBufCnt = 0;
     int32_t videoFd = -1;
     class StreamConsumer;
-    std::map<OHOS::Camera::StreamIntent, std::shared_ptr<StreamConsumer>> consumerMap_ = {};
+    std::map<OHOS::HDI::Camera::V1_0::StreamIntent, std::shared_ptr<StreamConsumer>> consumerMap_ = {};
 
     class TestBufferConsumerListener : public IBufferConsumerListener {
     public:

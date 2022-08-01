@@ -19,14 +19,14 @@
 #include "surface.h"
 #include "dimage_buffer.h"
 #include "dbuffer_manager.h"
-#include "v1_0/dcamera_types.h"
 
-#include <drivers/peripheral/camera/interfaces/include/types.h>
+#include "v1_0/dcamera_types.h"
+#include "v1_0/types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace std;
-using namespace OHOS::Camera;
+using namespace OHOS::HDI::Camera::V1_0;
 using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DCameraStream {
 public:
@@ -38,11 +38,11 @@ public:
     DCameraStream &operator=(DCameraStream &&other) = delete;
 
 public:
-    DCamRetCode InitDCameraStream(const shared_ptr<StreamInfo> &info);
+    DCamRetCode InitDCameraStream(const StreamInfo &info);
     DCamRetCode GetDCameraStreamInfo(shared_ptr<StreamInfo> &info);
-    DCamRetCode SetDCameraBufferQueue(const OHOS::sptr<OHOS::IBufferProducer> producer);
+    DCamRetCode SetDCameraBufferQueue(const OHOS::sptr<BufferProducerSequenceable> &producer);
     DCamRetCode ReleaseDCameraBufferQueue();
-    DCamRetCode GetDCameraStreamAttribute(shared_ptr<StreamAttribute> &attribute);
+    DCamRetCode GetDCameraStreamAttribute(StreamAttribute &attribute);
     DCamRetCode GetDCameraBuffer(DCameraBuffer &buffer);
     DCamRetCode ReturnDCameraBuffer(const DCameraBuffer &buffer);
     DCamRetCode FlushDCameraBuffer();
@@ -58,7 +58,7 @@ private:
     int32_t index_ = -1;
     int dcStreamId_;
     shared_ptr<StreamInfo> dcStreamInfo_ = nullptr;
-    shared_ptr<StreamAttribute> dcStreamAttribute_ = nullptr;
+    StreamAttribute dcStreamAttribute_;
     shared_ptr<DBufferManager> dcStreamBufferMgr_ = nullptr;
     OHOS::sptr<OHOS::Surface> dcStreamProducer_ = nullptr;
     map<shared_ptr<DImageBuffer>, tuple<OHOS::sptr<OHOS::SurfaceBuffer>, int, int>> bufferConfigMap_;

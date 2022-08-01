@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,8 +17,6 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-
-#include "dcamera_host.h"
 #include "v1_0/camera_host_stub.h"
 
 using namespace OHOS::HDI::Camera::V1_0;
@@ -52,15 +50,7 @@ static int32_t CameraHostDriverDispatch(struct HdfDeviceIoClient *client, int cm
 static int HdfCameraHostDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfCameraHostDriverInit enter");
-    if (deviceObject == nullptr) {
-        HDF_LOGE("HdfCameraHostDriverInit:: HdfDeviceObject is NULL !");
-        return HDF_FAILURE;
-    }
-
-    if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_CAMERA)) {
-        HDF_LOGE("HdfCameraHostDriverInit set camera class failed");
-        return HDF_FAILURE;
-    }
+    (void)deviceObject;
     return HDF_SUCCESS;
 }
 
@@ -78,7 +68,7 @@ static int HdfCameraHostDriverBind(struct HdfDeviceObject *deviceObject)
     hdfCameraHostHost->ioService.Open = NULL;
     hdfCameraHostHost->ioService.Release = NULL;
 
-    auto serviceImpl = OHOS::DistributedHardware::DCameraHost::GetInstance();
+    auto serviceImpl = ICameraHost::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfCameraHostHost;
@@ -100,28 +90,27 @@ static int HdfCameraHostDriverBind(struct HdfDeviceObject *deviceObject)
 static void HdfCameraHostDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfCameraHostDriverRelease enter");
-    if (deviceObject == nullptr || deviceObject->service == nullptr) {
+    if (deviceObject->service == nullptr) {
         HDF_LOGE("HdfCameraHostDriverRelease not initted");
         return;
     }
+
     auto *hdfCameraHostHost = CONTAINER_OF(deviceObject->service, struct HdfCameraHostHost, ioService);
     delete hdfCameraHostHost;
 }
 
 static struct HdfDriverEntry g_camerahostDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "distributed_camera_service",
+    .moduleName = "camera_service",
     .Bind = HdfCameraHostDriverBind,
     .Init = HdfCameraHostDriverInit,
     .Release = HdfCameraHostDriverRelease,
 };
 
-#ifdef __cplusplus
+#ifndef __cplusplus
 extern "C" {
-#endif /* __cplusplus */
-
+#endif
 HDF_INIT(g_camerahostDriverEntry);
-
-#ifdef __cplusplus
+#ifndef __cplusplus
 }
-#endif /* __cplusplus */
+#endif

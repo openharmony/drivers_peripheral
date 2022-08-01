@@ -16,15 +16,17 @@
 #ifndef CAMERA_DEVICE_CAMERA_DEVICE_IMPL_H
 #define CAMERA_DEVICE_CAMERA_DEVICE_IMPL_H
 
-#include "camera_device.h"
+#include "v1_0/icamera_device.h"
+#include "v1_0/icamera_device_callback.h"
 #include "camera.h"
 #include "camera_metadata_info.h"
 #include "stream_operator.h"
 #include <mutex>
 
 namespace OHOS::Camera {
+using namespace OHOS::HDI::Camera::V1_0;
 class IPipelineCore;
-class CameraDeviceImpl : public CameraDevice, public std::enable_shared_from_this<CameraDeviceImpl> {
+class CameraDeviceImpl : public ICameraDevice, public std::enable_shared_from_this<CameraDeviceImpl> {
 public:
     CameraDeviceImpl(const std::string &cameraId,
         const std::shared_ptr<IPipelineCore> &pipelineCore);
@@ -36,30 +38,28 @@ public:
     CameraDeviceImpl& operator=(CameraDeviceImpl &&other) = delete;
 
 public:
-    CamRetCode GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback> &callback,
-        OHOS::sptr<IStreamOperator> &streamOperator) override;
-    CamRetCode UpdateSettings(const std::shared_ptr<CameraSetting> &settings) override;
-    CamRetCode SetResultMode(const ResultCallbackMode &mode) override;
-    CamRetCode GetEnabledResults(std::vector<MetaType> &results) override;
-    CamRetCode EnableResult(const std::vector<MetaType> &results) override;
-    CamRetCode DisableResult(const std::vector<MetaType> &results) override;
-    void Close() override;
+    int32_t GetStreamOperator(const sptr<IStreamOperatorCallback>& callbackObj,
+        sptr<IStreamOperator>& streamOperator) override;
+    int32_t UpdateSettings(const std::vector<uint8_t>& settings) override;
+    int32_t SetResultMode(ResultCallbackMode mode) override;
+    int32_t GetEnabledResults(std::vector<int32_t>& results) override;
+    int32_t EnableResult(const std::vector<int32_t>& results) override;
+    int32_t DisableResult(const std::vector<int32_t>& results) override;
+    int32_t Close() override;
 
-    std::shared_ptr<IPipelineCore> GetPipelineCore() const override;
-    CamRetCode SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback) override;
-    ResultCallbackMode GetMetaResultMode() const override;
+    static std::shared_ptr<CameraDeviceImpl> CreateCameraDevice(const std::string &cameraId);
+    std::shared_ptr<IPipelineCore> GetPipelineCore() const;
+    CamRetCode SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback);
+    ResultCallbackMode GetMetaResultMode() const;
     /* RC_OK: metadata changed；RC_ERROR: metadata unchanged； */
-    RetCode GetMetadataResults(std::shared_ptr<CameraMetadata> &metadata) override;
-    void ResultMetadata() override;
-    void GetCameraId(std::string &cameraId) const override;
-    bool IsOpened() const override;
-    void SetStatus(bool isOpened) override;
+    RetCode GetMetadataResults(std::shared_ptr<CameraMetadata> &metadata);
+    void ResultMetadata();
+    void GetCameraId(std::string &cameraId) const;
+    void SetStatus(bool isOpened);
     void OnRequestTimeout();
-
-protected:
-    void OnMetadataChanged(const std::shared_ptr<CameraMetadata> &metadata) override;
-    void OnDevStatusErr() override;
-
+    void OnMetadataChanged(const std::shared_ptr<CameraMetadata> &metadata);
+    void OnDevStatusErr();
+    bool IsOpened() const;
 private:
     RetCode GetEnabledFromCfg();
     bool CompareTagData(const camera_metadata_item_t &baseEntry,

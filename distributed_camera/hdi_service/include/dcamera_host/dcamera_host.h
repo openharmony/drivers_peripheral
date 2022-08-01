@@ -16,20 +16,19 @@
 #ifndef DISTRIBUTED_CAMERA_HOST_H
 #define DISTRIBUTED_CAMERA_HOST_H
 
-#include "dcamera.h"
 #include "dcamera_base.h"
 #include "dcamera_device.h"
-#include "icamera_device.h"
-#include "icamera_host_callback.h"
-#include "icamera_device_callback.h"
-#include "v1_0/dcamera_types.h"
 
-#include <drivers/peripheral/camera/interfaces/include/types.h>
+#include "v1_0/icamera_host.h"
+#include "v1_0/icamera_host_callback.h"
+#include "v1_0/dcamera_types.h"
+#include "v1_0/types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::HDI::DistributedCamera::V1_0;
-class DCameraHost {
+using namespace OHOS::HDI::Camera::V1_0;
+class DCameraHost : public ICameraHost {
 public:
     DCameraHost() = default;
     virtual ~DCameraHost() = default;
@@ -39,13 +38,13 @@ public:
     DCameraHost& operator=(DCameraHost &&other) = delete;
 
 public:
-    static std::shared_ptr<DCameraHost> GetInstance();
-    CamRetCode SetCallback(const OHOS::sptr<ICameraHostCallback> &callback);
-    CamRetCode GetCameraIds(std::vector<std::string> &cameraIds);
-    CamRetCode GetCameraAbility(const std::string &cameraId, std::shared_ptr<CameraAbility> &ability);
-    CamRetCode OpenCamera(const std::string &cameraId, const OHOS::sptr<ICameraDeviceCallback> &callback,
-                          OHOS::sptr<ICameraDevice> &pDevice);
-    CamRetCode SetFlashlight(const std::string &cameraId,  bool &isEnable);
+    static OHOS::sptr<DCameraHost> GetInstance();
+    int32_t SetCallback(const sptr<ICameraHostCallback> &callbackObj) override;
+    int32_t GetCameraIds(std::vector<std::string> &cameraIds) override;
+    int32_t GetCameraAbility(const std::string &cameraId, std::vector<uint8_t> &cameraAbility) override;
+    int32_t OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+         sptr<ICameraDevice> &device) override;
+    int32_t SetFlashlight(const std::string &cameraId, bool isEnable) override;
 
     DCamRetCode AddDCameraDevice(const DHBase &dhBase, const std::string &abilityInfo,
         const sptr<IDCameraProviderCallback> &callback);
@@ -69,7 +68,7 @@ private:
         }
     };
     static AutoRelease autoRelease_;
-    static std::shared_ptr<DCameraHost> instance_;
+    static OHOS::sptr<DCameraHost> instance_;
 
     OHOS::sptr<ICameraHostCallback> dCameraHostCallback_;
     std::map<DCameraBase, std::string> dhBaseHashDCamIdMap_;

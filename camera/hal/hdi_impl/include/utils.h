@@ -16,12 +16,13 @@
 #ifndef CAMERA_DEVICE_DRIVER_UTILS_H
 #define CAMERA_DEVICE_DRIVER_UTILS_H
 
-#include <types.h>
 #include <camera.h>
 #include <device_manager_adapter.h>
+#include "v1_0/types.h"
 #include "surface.h"
 
 namespace OHOS::Camera {
+using namespace OHOS::HDI::Camera::V1_0;
 using StreamSupported = struct _StreamSupported {
     OperationMode operationMode_;
     StreamSupportType streamSupportType_;
