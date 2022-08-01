@@ -68,11 +68,11 @@ ohos_fuzztest("CameraIpcCameraDeviceRemoteFuzzTest") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/hdi_ipc/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
-    "$camera_path/hdi_impl:camera_hdi_impl",
+    "$camera_path/hdi_impl:camera_host_service_1.0",
     "$camera_path/pipeline_core:camera_pipeline_core",
+    "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
   ]
 
@@ -148,11 +148,11 @@ ohos_fuzztest("CameraIpcCameraHostServiceFuzzTest") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/hdi_ipc/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
-    "$camera_path/hdi_impl:camera_hdi_impl",
+    "$camera_path/hdi_impl:camera_host_service_1.0",
     "$camera_path/pipeline_core:camera_pipeline_core",
+    "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
   ]
 
@@ -228,11 +228,11 @@ ohos_fuzztest("CameraIpcOfflineFuzzTest") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/hdi_ipc/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
-    "$camera_path/hdi_impl:camera_hdi_impl",
+    "$camera_path/hdi_impl:camera_host_service_1.0",
     "$camera_path/pipeline_core:camera_pipeline_core",
+    "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
   ]
 
@@ -307,11 +307,11 @@ ohos_fuzztest("CameraIpcStreamOperatorFuzzTest") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/hdi_ipc/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
-    "$camera_path/hdi_impl:camera_hdi_impl",
+    "$camera_path/hdi_impl:camera_host_service_1.0",
     "$camera_path/pipeline_core:camera_pipeline_core",
+    "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
   ]
 
@@ -389,11 +389,11 @@ ohos_fuzztest("CameraIpcCameraDeviceCallbackFuzzTest") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/hdi_ipc/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
-    "$camera_path/hdi_impl:camera_hdi_impl",
+    "$camera_path/hdi_impl:camera_host_service_1.0",
     "$camera_path/pipeline_core:camera_pipeline_core",
+    "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
   ]
 
@@ -469,11 +469,11 @@ ohos_fuzztest("CameraIpcCameraHostCallbackFuzzTest") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/hdi_ipc/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
-    "$camera_path/hdi_impl:camera_hdi_impl",
+    "$camera_path/hdi_impl:camera_host_service_1.0",
     "$camera_path/pipeline_core:camera_pipeline_core",
+    "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
   ]
 
@@ -549,11 +549,11 @@ ohos_fuzztest("CameraIpcStreamOperatorCallbackFuzzTest") {
   ]
 
   deps = [
-    "$camera_path/../interfaces/hdi_ipc/client:libcamera_client",
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
-    "$camera_path/hdi_impl:camera_hdi_impl",
+    "$camera_path/hdi_impl:camera_host_service_1.0",
     "$camera_path/pipeline_core:camera_pipeline_core",
+    "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
   ]
 

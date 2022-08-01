@@ -17,23 +17,24 @@
 #define CAMERA_HOST_CAMERA_HOST_IMPL_H
 
 #include <map>
-#include "camera_host.h"
+#include "v1_0/icamera_host.h"
 #include "utils.h"
-#include "icamera_device.h"
+#include "v1_0/icamera_device.h"
+#include "camera_device_impl.h"
 
 namespace OHOS::Camera {
-class CameraDevice;
-class CameraHostImpl : public CameraHost {
+using namespace OHOS::HDI::Camera::V1_0;
+
+class CameraHostImpl : public ICameraHost {
 public:
     CamRetCode Init();
-    CamRetCode SetCallback(const OHOS::sptr<ICameraHostCallback> &callback) override;
-    CamRetCode GetCameraIds(std::vector<std::string> &cameraIds) override;
-    CamRetCode GetCameraAbility(const std::string &cameraId,
-        std::shared_ptr<CameraAbility> &ability) override;
-    CamRetCode OpenCamera(const std::string &cameraId,
-        const OHOS::sptr<ICameraDeviceCallback> &callback,
-        OHOS::sptr<ICameraDevice> &pDevice) override;
-    CamRetCode SetFlashlight(const std::string &cameraId, bool &isEnable) override;
+    int32_t SetCallback(const sptr<ICameraHostCallback>& callbackObj) override;
+    int32_t GetCameraIds(std::vector<std::string> &cameraIds) override;
+    int32_t GetCameraAbility(const std::string &cameraId,
+        std::vector<uint8_t>& cameraAbility) override;
+    int32_t OpenCamera(const std::string& cameraId, const sptr<ICameraDeviceCallback>& callbackObj,
+        sptr<ICameraDevice>& device) override;
+    int32_t SetFlashlight(const std::string &cameraId, bool isEnable) override;
 
 public:
     CameraHostImpl();
@@ -54,7 +55,7 @@ private:
 
 private:
     // key: cameraId, value: CameraDevice
-    using CameraDeviceMap = std::map<std::string, std::shared_ptr<CameraDevice>>;
+    using CameraDeviceMap = std::map<std::string, std::shared_ptr<CameraDeviceImpl>>;
     CameraDeviceMap cameraDeviceMap_;
     OHOS::sptr<ICameraHostCallback> cameraHostCallback_;
     // to keep remote object OHOS::sptr<ICameraDevice> alive

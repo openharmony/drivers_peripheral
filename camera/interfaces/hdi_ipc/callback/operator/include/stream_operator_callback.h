@@ -16,22 +16,20 @@
 #ifndef HDI_STREAM_OPERATOR_CALLBACK_H
 #define HDI_STREAM_OPERATOR_CALLBACK_H
 
-#include "stream_operator_callback_stub.h"
+#include "v1_0/istream_operator_callback.h"
 
 namespace OHOS::Camera {
-class StreamOperatorCallback : public StreamOperatorCallbackStub {
+using namespace OHOS::HDI::Camera::V1_0;
+class StreamOperatorCallback : public IStreamOperatorCallback {
 public:
     StreamOperatorCallback() = default;
     virtual ~StreamOperatorCallback() = default;
 
 public:
-    void OnCaptureStarted(int32_t captureId, const std::vector<int32_t> &streamId) override;
-    void OnCaptureEnded(int32_t captureId,
-        const std::vector<std::shared_ptr<CaptureEndedInfo>> &info) override;
-    void OnCaptureError(int32_t captureId,
-        const std::vector<std::shared_ptr<CaptureErrorInfo>> &info) override;
-    void OnFrameShutter(int32_t captureId,
-        const std::vector<int32_t> &streamId, uint64_t timestamp) override;
+    int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t>& streamIds) override;
+    int32_t OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos) override;
+    int32_t OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos) override;
+    int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t>& streamIds, uint64_t timestamp) override;
 };
 }
 #endif // HDI_STREAM_OPERATOR_CALLBACK_H

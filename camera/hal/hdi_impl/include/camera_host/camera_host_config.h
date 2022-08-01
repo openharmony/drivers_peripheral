@@ -20,6 +20,7 @@
 #include <map>
 #include <list>
 #include "utils.h"
+#include "camera.h"
 
 namespace OHOS::Camera {
 class HcsDeal;

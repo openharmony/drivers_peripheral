@@ -16,17 +16,18 @@
 #ifndef HDI_CAMERA_DEVICE_CALLBACK_H
 #define HDI_CAMERA_DEVICE_CALLBACK_H
 
-#include "camera_device_callback_stub.h"
+#include "v1_0/icamera_device_callback.h"
 
 namespace OHOS::Camera {
-class CameraDeviceCallback : public CameraDeviceCallbackStub {
+using namespace OHOS::HDI::Camera::V1_0;
+class CameraDeviceCallback : public ICameraDeviceCallback {
 public:
     CameraDeviceCallback() = default;
     virtual ~CameraDeviceCallback() = default;
 
 public:
-    void OnError(ErrorType type, int32_t errorMsg) override;
-    void OnResult(uint64_t timestamp, const std::shared_ptr<CameraMetadata> &result) override;
+    int32_t OnError(ErrorType type, int32_t errorCode) override;
+    int32_t OnResult(uint64_t timestamp, const std::vector<uint8_t>& result) override;
 };
 }
 #endif // HDI_CAMERA_DEVICE_CALLBACK_H

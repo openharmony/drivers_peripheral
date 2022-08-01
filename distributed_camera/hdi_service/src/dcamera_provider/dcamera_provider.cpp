@@ -61,7 +61,7 @@ int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::st
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    std::shared_ptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
+    OHOS::sptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
     if (dCameraHost == nullptr) {
         DHLOGE("DCameraProvider::EnableDCameraDevice, dcamera host is null.");
         return DCamRetCode::DEVICE_NOT_INIT;
@@ -84,7 +84,7 @@ int32_t DCameraProvider::DisableDCameraDevice(const DHBase& dhBase)
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    std::shared_ptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
+    OHOS::sptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
     if (dCameraHost == nullptr) {
         DHLOGE("DCameraProvider::DisableDCameraDevice, dcamera host is null.");
         return DCamRetCode::DEVICE_NOT_INIT;
@@ -100,7 +100,7 @@ int32_t DCameraProvider::DisableDCameraDevice(const DHBase& dhBase)
 
 int32_t DCameraProvider::AcquireBuffer(const DHBase& dhBase, int32_t streamId, DCameraBuffer& buffer)
 {
-    DHLOGI("DCameraProvider::AcquireBuffer for {devId: %s, dhId: %s}, streamId: %d.",
+    DHLOGD("DCameraProvider::AcquireBuffer for {devId: %s, dhId: %s}, streamId: %d.",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str(), streamId);
 
     OHOS::sptr<DCameraDevice> device = GetDCameraDevice(dhBase);
@@ -309,7 +309,7 @@ sptr<IDCameraProviderCallback> DCameraProvider::GetCallbackBydhBase(const DHBase
 
 OHOS::sptr<DCameraDevice> DCameraProvider::GetDCameraDevice(const DHBase &dhBase)
 {
-    std::shared_ptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
+    OHOS::sptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
     if (dCameraHost == nullptr) {
         DHLOGE("DCameraProvider::GetDCameraDevice, dcamera host is null.");
         return nullptr;

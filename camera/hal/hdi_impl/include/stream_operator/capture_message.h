@@ -17,7 +17,7 @@
 #define STREAM_OPERATOR_CAPTURE_MESSAGE_H
 
 #include "camera.h"
-#include "types.h"
+#include "v1_0/types.h"
 #include <condition_variable>
 #include <list>
 #include <thread>
@@ -25,6 +25,7 @@
 #include <vector>
 
 namespace OHOS::Camera {
+using namespace OHOS::HDI::Camera::V1_0;
 enum CaptureMessageType {
     CAPTURE_MESSAGE_TYPE_INVALID = 0,
     CAPTURE_MESSAGE_TYPE_ON_STARTED,

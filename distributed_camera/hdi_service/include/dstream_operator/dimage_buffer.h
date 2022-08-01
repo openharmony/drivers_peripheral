@@ -17,7 +17,9 @@
 #define DISTRIBUTED_CAMERA_IMAGE_BUFFER_H
 
 #include <mutex>
+
 #include "constants.h"
+#include "v1_0/dcamera_types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
