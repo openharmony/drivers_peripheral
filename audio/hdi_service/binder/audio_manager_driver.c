@@ -100,14 +100,16 @@ static int32_t AudioManagerServiceLoadAdapter(
     struct AudioManager *manager, const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
 {
     AUDIO_FUNC_LOGI("enter!");
+    int32_t ret;
     if (manager == NULL || desc == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (AudioManagerLoadAdapter(manager, desc, adapter) != HDF_SUCCESS) {
+    ret = AudioManagerLoadAdapter(manager, desc, adapter);
+    if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("LoadAdapter error!");
-        return HDF_FAILURE;
+        return ret;
     }
 
     struct AudioAdapterStub *adapterStub = CONTAINER_OF(*adapter, struct AudioAdapterStub, interface);
@@ -260,7 +262,7 @@ static void HdfAudioManagerDriverRelease(struct HdfDeviceObject *deviceObject)
 
 static struct HdfDriverEntry g_audiomanagerDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "idl_audio_server",
+    .moduleName = "audio_manager_service",
     .Bind = HdfAudioManagerDriverBind,
     .Init = HdfAudioManagerDriverInit,
     .Release = HdfAudioManagerDriverRelease,
