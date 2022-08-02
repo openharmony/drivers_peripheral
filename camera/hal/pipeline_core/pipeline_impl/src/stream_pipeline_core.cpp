@@ -89,7 +89,6 @@ RetCode StreamPipelineCore::Start(const std::vector<int>& streamIds)
 
 RetCode StreamPipelineCore::Stop(const std::vector<int>& streamIds)
 {
-    std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     for (const auto& it : streamIds) {
         CAMERA_LOGV("stop stream %{public}d begin", it);
