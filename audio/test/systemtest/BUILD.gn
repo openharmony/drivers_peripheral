@@ -32,6 +32,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "hdi:hdi",
+      "hdi_service:hdi_service_st",
       "supportlibs:supportlibs",
 
       #"audio_adapter:audio_adapter",

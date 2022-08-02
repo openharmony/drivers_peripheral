@@ -1274,7 +1274,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostWrite_0001, TestSize.Level1)
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
 {
     int32_t tryNumReply = 100;
-    int32_t buffStatus = 0;
+    uint32_t buffStatus = 0;
     uint32_t readSize = 0;
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
@@ -1295,8 +1295,8 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
     do {
         ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_READ, nullptr, reply);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        EXPECT_GE(HdfSbufReadInt32(reply, &buffStatus), HDF_SUCCESS);
-        if (buffStatus != CIR_BUFF_NORMAL) {
+        EXPECT_GE(HdfSbufReadUint32(reply, &buffStatus), HDF_SUCCESS);
+        if ((int32_t)buffStatus != CIR_BUFF_NORMAL) {
             int32_t ms = buffStatus >= 0 ? buffStatus : WAITE_TIME;
             tryNumReply--;
             HdfSbufFlush(reply);

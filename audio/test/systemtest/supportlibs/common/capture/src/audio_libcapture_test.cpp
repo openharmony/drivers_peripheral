@@ -345,6 +345,8 @@ HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_HwParams_001,
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
     hwCapture = nullptr;
@@ -369,6 +371,8 @@ HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_Prepare_001, 
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
@@ -396,6 +400,10 @@ HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_Start_001, Te
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_START_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_STOP_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
@@ -525,6 +533,10 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Pause_001, Tes
     hwCapture->captureParam.captureMode.ctlParam.pause = 1;
     ret = InterfaceLibOutputCapture(handle, AUDIODRV_CTL_IOCTL_PAUSE_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_STOP_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);
     hwCapture = nullptr;
@@ -553,6 +565,10 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Resume_001, Te
     EXPECT_EQ(HDF_SUCCESS, ret);
     hwCapture->captureParam.captureMode.ctlParam.pause = 0;
     ret = InterfaceLibOutputCapture(handle, AUDIODRV_CTL_IOCTL_PAUSE_WRITE_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_STOP_CAPTURE, &hwCapture->captureParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceCaptureSo(handle);
     free(hwCapture);

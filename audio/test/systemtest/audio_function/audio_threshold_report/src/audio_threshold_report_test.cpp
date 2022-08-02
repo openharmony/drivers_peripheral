@@ -17,6 +17,7 @@
 #include "hdf_io_service_if.h"
 #include "hdf_service_status.h"
 #include "ioservstat_listener.h"
+#include "servstat_listener_hdi.h"
 #include "svcmgr_ioservice.h"
 #include "audio_events.h"
 #include "audio_hdi_common.h"
@@ -87,6 +88,7 @@ void AudioThresholdReportTest::TearDownTestCase(void)
         GetAudioManager = nullptr;
     }
     (void)servmgr->UnregisterServiceStatusListener(servmgr, listener);
+    (void)HdiServiceStatusListenerFree(listener);
     listener = nullptr;
     (void)SvcMgrIoserviceRelease(servmgr);
     servmgr = nullptr;
