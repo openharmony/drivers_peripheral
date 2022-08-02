@@ -161,7 +161,7 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, SUB_Audio_HDI_AudioCaptureSetSam
 * @tc.desc  Test AudioCaptureSetSampleAttributes ,the setting parameters are as follows.
 *    attrs.type = AUDIO_IN_MEDIA;
 *    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
-*    attrs.sampleRate = BROADCAST_FM_RATE;
+*    attrs.sampleRate = SAMPLE_RATE_22050;
 *    attrs.channelCount = 1;
 * @tc.author: ZHANGHAILIN
 */
@@ -176,7 +176,7 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, SUB_Audio_HDI_AudioCaptureSetSam
     TestAudioManager* manager = GetAudioManager();
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, 1, BROADCAST_FM_RATE);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, 1, SAMPLE_RATE_22050);
 
     ret = AudioCaptureSetGetSampleAttributes(attrs, attrsValue, capture);
 #ifdef PRODUCT_RK3568
@@ -185,7 +185,7 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, SUB_Audio_HDI_AudioCaptureSetSam
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
     EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
-    EXPECT_EQ(BROADCAST_FM_RATE, attrsValue.sampleRate);
+    EXPECT_EQ(SAMPLE_RATE_22050, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 #endif
 
@@ -565,7 +565,7 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, SUB_Audio_HDI_AudioCaptureSetSam
 #else
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 #endif
-    InitAttrsUpdate(attrs3, AUDIO_FORMAT_AAC_MAIN, SINGLE_CHANNEL_COUNT, BROADCAST_FM_RATE);
+    InitAttrsUpdate(attrs3, AUDIO_FORMAT_AAC_MAIN, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_22050);
     ret = capture->attr.SetSampleAttributes(capture, &attrs3);
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
@@ -709,8 +709,8 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, SUB_Audio_HDI_AudioCaptureSetSam
 *    attrs.type = AUDIO_IN_MEDIA;
 *    attrs.format = AUDIO_FORMAT_PCM_16_BIT
 *    attrs.sampleRate = SAMPLE_RATE_8000;
-*    attrs.channelCount = 5;
-*    silenceThreshold = 4*1024 "the value of silenceThreshold is less than requested";
+*    attrs.channelCount = 2;
+*    silenceThreshold = 2*1024 "the value of silenceThreshold is less than requested";
 * @tc.author: ZENG LIFENG
 */
 HWTEST_F(AudioHdiCaptureHardwareDependenceTest, SUB_Audio_HDI_AudioCaptureSetSampleAttributes_019, TestSize.Level1)
