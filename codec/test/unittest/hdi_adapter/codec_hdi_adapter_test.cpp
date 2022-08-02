@@ -680,7 +680,14 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiIdleToExecutingTest_001, TestSize.Level
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiExecutingToIdleTest_001, TestSize.Level1)
+HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiExecutingToPauseTest_001, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    int32_t ret = g_component->SendCommand(g_component, OMX_CommandStateSet, OMX_StatePause, nullptr, 0);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiPauseToIdleTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     int32_t ret = g_component->SendCommand(g_component, OMX_CommandStateSet, OMX_StateIdle, nullptr, 0);
@@ -728,16 +735,6 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiWaitStateTest_001, TestSize.Level1)
 HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiFillThisBufferTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    int32_t ret = g_component->SendCommand(g_component, OMX_CommandStateSet, OMX_StateExecuting, nullptr, 0);
-    ASSERT_EQ(ret, HDF_SUCCESS);
-    OMX_STATETYPE state = OMX_StateInvalid;
-    do {
-        ret = g_component->GetState(g_component, &state);
-        ASSERT_EQ(ret, HDF_SUCCESS);
-        usleep(100);
-    } while (state != OMX_StateExecuting);
-
-    // fill this buffer need OMX_StateExecuting
     auto iter = outputBuffers.begin();
     if (iter != outputBuffers.end()) {
         int32_t ret = g_component->FillThisBuffer(g_component, iter->second->omxBuffer.get());
@@ -802,22 +799,6 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiRoleEnumTest_001, TestSize.Level1)
     uint8_t role[ROLE_LEN] = {0};
     int32_t ret = g_component->ComponentRoleEnum(g_component, role, ROLE_LEN, 0);
     ASSERT_NE(ret, HDF_SUCCESS);
-}
-
-// Executing to Pause
-HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiExecutingToPauseTest_001, TestSize.Level1)
-{
-    ASSERT_TRUE(g_component != nullptr);
-    int32_t ret = g_component->SendCommand(g_component, OMX_CommandStateSet, OMX_StatePause, nullptr, 0);
-    ASSERT_EQ(ret, HDF_SUCCESS);
-}
-
-// Pause to Idle
-HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiPauseToIdleTest_001, TestSize.Level1)
-{
-    ASSERT_TRUE(g_component != nullptr);
-    int32_t ret = g_component->SendCommand(g_component, OMX_CommandStateSet, OMX_StateIdle, nullptr, 0);
-    ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
 // Test FreeBuffer Adapter not support
