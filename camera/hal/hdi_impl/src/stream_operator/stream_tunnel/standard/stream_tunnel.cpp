@@ -198,10 +198,16 @@ void StreamTunnel::NotifyStart()
 void StreamTunnel::WaitForAllBufferReturned()
 {
     std::unique_lock<std::mutex> l(finishLock_);
-    finishCV_.wait(l, [this] {
-        return restBuffers == 0;
-        });
-
-    return;
+    auto timeout = std::chrono::system_clock::now() + std::chrono::microseconds(1000 * 200); // 200ms
+    if (!finishCV_.wait_until(l, timeout, [this] {
+            CAMERA_LOGD("%{public}p restBuffers=%{public}u", this, restBuffers.load(std::memory_order_acquire));
+            return restBuffers.load(std::memory_order_acquire) == 0;
+        })) {
+        CAMERA_LOGW(
+            "WaitForAllBufferReturned timeout, restBuffers=%{public}u", restBuffers.load(std::memory_order_acquire));
+    } else {
+        CAMERA_LOGW(
+            "WaitForAllBufferReturned done, restBuffers=%{public}u", restBuffers.load(std::memory_order_acquire));
+    }
 }
 } // namespace OHOS::Camera
