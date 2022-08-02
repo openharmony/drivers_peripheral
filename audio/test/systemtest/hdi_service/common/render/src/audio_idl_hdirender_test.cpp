@@ -30,7 +30,7 @@ public:
     struct AudioRender *render = nullptr;;
     static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
-    static void *handleSo;
+    static void *handle;
     static void (*AudioManagerRelease)(struct AudioManager *);
     static void (*AudioAdapterRelease)(struct AudioAdapter *);
     static void (*AudioRenderRelease)(struct AudioRender *);
@@ -40,7 +40,7 @@ public:
 using THREAD_FUNC = void *(*)(void *);
 TestAudioManager *(*AudioIdlHdiRenderTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiRenderTest::manager = nullptr;
-void *AudioIdlHdiRenderTest::handleSo = nullptr;
+void *AudioIdlHdiRenderTest::handle = nullptr;
 void (*AudioIdlHdiRenderTest::AudioManagerRelease)(struct AudioManager *) = nullptr;
 void (*AudioIdlHdiRenderTest::AudioAdapterRelease)(struct AudioAdapter *) = nullptr;
 void (*AudioIdlHdiRenderTest::AudioRenderRelease)(struct AudioRender *) = nullptr;
@@ -49,17 +49,17 @@ void AudioIdlHdiRenderTest::SetUpTestCase(void)
     char absPath[PATH_MAX] = {0};
     char *path = realpath(RESOLVED_PATH.c_str(), absPath);
     ASSERT_NE(nullptr, path);
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handleSo);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handleSo, FUNCTION_NAME.c_str()));
+    handle = dlopen(absPath, RTLD_LAZY);
+    ASSERT_NE(nullptr, handle);
+    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handle, FUNCTION_NAME.c_str()));
     ASSERT_NE(nullptr, GetAudioManager);
     manager = GetAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
+    AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(handle, "AudioManagerRelease"));
     ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
+    AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(handle, "AudioAdapterRelease"));
     ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioRenderRelease = (void (*)(struct AudioRender *))(dlsym(handleSo, "AudioRenderRelease"));
+    AudioRenderRelease = (void (*)(struct AudioRender *))(dlsym(handle, "AudioRenderRelease"));
     ASSERT_NE(nullptr, AudioRenderRelease);
 }
 
@@ -72,9 +72,9 @@ void AudioIdlHdiRenderTest::TearDownTestCase(void)
     if (GetAudioManager != nullptr) {
         GetAudioManager = nullptr;
     }
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        dlclose(handle);
+        handle = nullptr;
     }
 }
 
@@ -93,7 +93,7 @@ void AudioIdlHdiRenderTest::TearDown(void)
 
 void AudioIdlHdiRenderTest::ReleaseAudioSource(void)
 {
-    int32_t ret = -1;
+    int32_t ret;
     if (render != nullptr && AudioRenderRelease != nullptr) {
         ret = adapter->DestroyRender(adapter);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -116,7 +116,7 @@ void AudioIdlHdiRenderTest::ReleaseAudioSource(void)
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetLatency_001, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint32_t latencyTime = 0;
     uint32_t expectLatency = 0;
     ASSERT_NE(nullptr, render);
@@ -137,7 +137,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetLatency_001, TestSize.Lev
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetLatency_Null_002, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint32_t latencyTime = 0;
     struct AudioRender *renderNull = nullptr;
     ASSERT_NE(nullptr, render);
@@ -157,7 +157,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetLatency_Null_002, TestSiz
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetLatency_Null_003, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint32_t *latencyTime = nullptr;
     ASSERT_NE(nullptr, render);
     ret = AudioRenderStartAndOneFrame(render);
@@ -176,7 +176,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetLatency_Null_003, TestSiz
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderFrame_001, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint64_t requestBytes = 0;
     uint64_t replyBytes = 0;
     char *frame = nullptr;
@@ -203,7 +203,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderFrame_001, TestSize.Level1)
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderFrame_Null_002, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint64_t requestBytes = 0;
     uint64_t replyBytes = 0;
     struct AudioRender *renderNull = nullptr;
@@ -232,7 +232,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderFrame_Null_002, TestSize.Lev
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderFrame_Null_003, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint64_t requestBytes = 0;
     uint64_t replyBytes = 0;
     char *frame = nullptr;
@@ -253,7 +253,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderFrame_Null_003, TestSize.Lev
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderFrame_Null_004, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint64_t requestBytes = 0;
     char *frame = nullptr;
     uint64_t *replyBytes = nullptr;
@@ -281,7 +281,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderFrame_Null_004, TestSize.Lev
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderFrame_005, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint64_t replyBytes = 0;
     uint64_t requestBytes = 0;
     char *frame = nullptr;
@@ -306,7 +306,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderFrame_005, TestSize.Level1)
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_001, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint64_t frames = 0;
     int64_t timeExp = 0;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
@@ -336,7 +336,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_001, TestS
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_002, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     int64_t timeExp = 0;
     uint64_t frames = 0;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
@@ -378,7 +378,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_002, TestS
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_003, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     int64_t timeExp = 0;
     uint64_t frames = 0;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
@@ -401,7 +401,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_003, TestS
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_004, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint64_t frames = 0;
     int64_t timeExp = 0;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
@@ -419,7 +419,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_004, TestS
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_Null_005, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint64_t frames = 0;
     struct AudioTimeStamp time = {};
     struct AudioRender *renderNull = nullptr;
@@ -436,7 +436,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_Null_005, 
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_Null_006, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint64_t *framesNull = nullptr;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
 
@@ -452,7 +452,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_Null_006, 
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_Null_007, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     uint64_t frames = 0;
     struct AudioTimeStamp *timeNull = nullptr;
 
@@ -468,7 +468,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_Null_007, 
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_008, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     int64_t timeExp = 0;
     uint64_t frames = 0;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
@@ -491,7 +491,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderPosition_008, TestS
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderSetRenderSpeed_001, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     float speed = 100;
     ASSERT_NE(nullptr, render);
     ret = AudioRenderStartAndOneFrame(render);
@@ -509,7 +509,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderSetRenderSpeed_001, TestSize
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderSetRenderSpeed_Null_002, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     float speed = 0;
     struct AudioRender *renderNull = nullptr;
     ASSERT_NE(nullptr, render);
@@ -528,7 +528,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderSetRenderSpeed_Null_002, Tes
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderSpeed_001, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     float speed = 0;
     ASSERT_NE(nullptr, render);
     ret = AudioRenderStartAndOneFrame(render);
@@ -545,7 +545,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderSpeed_001, TestSize
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderSpeed_Null_002, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     struct AudioRender *renderNull = nullptr;
     float speed = 0;
     ASSERT_NE(nullptr, render);
@@ -565,7 +565,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderSpeed_Null_002, Tes
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderSpeed_Null_003, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     float *speedNull = nullptr;
     ASSERT_NE(nullptr, render);
     ret = AudioRenderStartAndOneFrame(render);
@@ -585,7 +585,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetRenderSpeed_Null_003, Tes
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderRegCallback_001, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
 
     ASSERT_NE(nullptr, render);
     struct AudioCallback audioCallBack;
@@ -608,7 +608,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderRegCallback_001, TestSize.Le
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderRegCallback_002, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     struct AudioSampleAttributes attrs;
     struct AudioHeadInfo headInfo;
     ASSERT_NE(nullptr, render);
@@ -649,7 +649,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderRegCallback_002, TestSize.Le
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderRegCallback_003, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     struct AudioRender *renderNull = nullptr;
     ASSERT_NE(nullptr, render);
     struct AudioCallback audioCallBack;
@@ -666,7 +666,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderRegCallback_003, TestSize.Le
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderRegCallback_004, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     struct AudioCallback *AudioRenderCallbackNull = nullptr;
     ASSERT_NE(nullptr, render);
 
@@ -681,7 +681,7 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderRegCallback_004, TestSize.Le
 */
 HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderRegCallback_005, TestSize.Level1)
 {
-    int32_t ret = -1;
+    int32_t ret;
     ASSERT_NE(nullptr, render);
     struct AudioCallback audioCallBack;
     audioCallBack.RenderCallback = nullptr;
@@ -689,4 +689,101 @@ HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderRegCallback_005, TestSize.Le
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 #endif
+/**
+    * @tc.name    Test SetChannelMode API via setting channel mode after render object is created
+    * @tc.number  SUB_Audio_HDI_RenderSetChannelMode_003
+    * @tc.desc    Test SetChannelMode interface,return 0 if set channel mode after render object is created
+    * @tc.author: liweiming
+*/
+HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderSetChannelMode_003, TestSize.Level1)
+{
+    int32_t ret;
+    AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    ASSERT_NE(nullptr, render);
+
+    ret = render->SetChannelMode(render, mode);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = render->GetChannelMode(render, &mode);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_CHANNEL_NORMAL, mode);
+}
+
+/**
+    * @tc.name    Test SetChannelMode API via setting the parameter render is nullptr
+    * @tc.number  SUB_Audio_HDI_RenderSetChannelMode_Null_004
+    * @tc.desc    Test SetChannelMode interface,return -3/-4 if set the parameter render is nullptr
+    * @tc.author: liweiming
+*/
+HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderSetChannelMode_Null_004, TestSize.Level1)
+{
+    int32_t ret;
+    struct AudioRender *renderNull = nullptr;
+    AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    ASSERT_NE(nullptr, render);
+
+    ret = render->SetChannelMode(renderNull, mode);
+    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+}
+/**
+    * @tc.name    Test GetChannelMode API via getting the channel mode after setting
+    * @tc.number  SUB_Audio_HDI_RenderGetChannelMode_001
+    * @tc.desc    Test GetChannelMode interface,return 0 if getting the channel mode after setting
+    * @tc.author: liweiming
+*/
+HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetChannelMode_001, TestSize.Level1)
+{
+    int32_t ret;
+    AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    ASSERT_NE(nullptr, render);
+    ret = AudioRenderStartAndOneFrame(render);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = render->GetChannelMode(render, &mode);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = render->SetChannelMode(render, mode);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = render->GetChannelMode(render, &mode);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_CHANNEL_NORMAL, mode);
+    render->Stop(render);
+}
+/**
+    * @tc.name    Test GetChannelMode API via getting the parameter render is nullptr
+    * @tc.number  SUB_Audio_HDI_RenderGetChannelMode_Null_002
+    * @tc.desc    Test GetChannelMode interface,return -3/-4 if getting the parameter render is nullptr
+    * @tc.author: liweiming
+*/
+HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetChannelMode_Null_002, TestSize.Level1)
+{
+    int32_t ret;
+    struct AudioRender *renderNull = nullptr;
+    AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    AudioChannelMode *modeNull = nullptr;
+
+    ASSERT_NE(nullptr, render);
+    ret = AudioRenderStartAndOneFrame(render);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = render->GetChannelMode(renderNull, &mode);
+    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ret = render->GetChannelMode(render, modeNull);
+    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    render->Stop(render);
+}
+/**
+    * @tc.name    Test GetChannelMode API via getting the channel mode after the render object is created
+    * @tc.number  SUB_Audio_HDI_enderGetChannelMode_003
+    * @tc.desc    Test GetChannelMode interface,return 0 if getting the channel mode after the object is created
+    * @tc.author: liweiming
+*/
+HWTEST_F(AudioIdlHdiRenderTest, SUB_Audio_HDI_RenderGetChannelMode_003, TestSize.Level1)
+{
+    int32_t ret;
+    AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
+    ASSERT_NE(nullptr, render);
+
+    ret = render->GetChannelMode(render, &mode);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_EQ(AUDIO_CHANNEL_NORMAL, mode);
+}
 }
