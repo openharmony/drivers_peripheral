@@ -894,3 +894,18 @@ int32_t AudioProxyAdapterGetPassthroughMode(struct AudioAdapter *adapter,
     AudioProxyBufReplyRecycle(data, reply);
     return AUDIO_HAL_SUCCESS;
 }
+
+int32_t AudioProxyAdapterSetMicMute(struct AudioAdapter *adapter, bool mute)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioProxyAdapterGetMicMute(struct AudioAdapter *adapter, bool *mute)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioProxyAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
