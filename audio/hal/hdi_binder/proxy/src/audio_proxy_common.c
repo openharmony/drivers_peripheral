@@ -455,3 +455,18 @@ int32_t AudioProxyReqMmapBufferWrite(struct HdfSBuf *data, int32_t reqSize,
     }
     return HDF_SUCCESS;
 }
+
+int32_t SetMicMute(struct AudioAdapter *adapter, bool mute)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t GetMicMute(struct AudioAdapter *adapter, bool *mute)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t SetVoiceVolume(struct AudioAdapter *adapter, float volume)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
