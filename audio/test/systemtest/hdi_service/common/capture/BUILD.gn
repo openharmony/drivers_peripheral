@@ -22,7 +22,7 @@ if (!defined(ohos_lite)) {
 
   ohos_systemtest("hdf_audio_idlhdi_capture_test") {
     module_out_path = module_output_path
-    public_deps = [ "//drivers/interface/audio/v1_0:libaudio_proxy_1.0" ]
+    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
     sources = [
       "../../../common/hdi_service_common/src/hdi_service_common.cpp",
       "src/audio_idl_hdicapture_attr_test.cpp",
