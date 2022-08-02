@@ -595,4 +595,40 @@ attr-sampling-rate=48000";
     ret = capture->Stop(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
+/**
+* @tc.name  Test AudioCaptureSetSampleAttributes API via setting the capture is nullptr .
+* @tc.number  SUB_Audio_HDI_CaptureSetSampleAttributes_Null_007
+* @tc.desc   Test AudioCaptureSetSampleAttributes interface, return -3/-4 if the capture is nullptr.
+* @tc.author: ZengLifeng
+*/
+HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetSampleAttributes_Null_007, TestSize.Level1)
+{
+    int32_t ret;
+    struct AudioSampleAttributes attrs = {};
+    struct AudioCapture *captureNull = nullptr;
+    ASSERT_NE(nullptr, capture);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
+    ret = capture->SetSampleAttributes(captureNull, &attrs);
+    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ret = capture->SetSampleAttributes(capture, nullptr);
+    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+}
+/**
+* @tc.name  Test AudioCaptureGetSampleAttributes API via setting the capture is nullptr .
+* @tc.number  SUB_Audio_HDI_CaptureGetSampleAttributes_Null_002
+* @tc.desc   Test AudioCaptureGetSampleAttributes interface, return -3/-4 if the capture is nullptr.
+* @tc.author: ZengLifeng
+*/
+HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetSampleAttributes_Null_002, TestSize.Level1)
+{
+    int32_t ret;
+    struct AudioSampleAttributes attrs = {};
+    struct AudioCapture *captureNull = nullptr;
+    ASSERT_NE(nullptr, capture);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_48000);
+    ret = capture->GetSampleAttributes(captureNull, &attrs);
+    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+    ret = capture->GetSampleAttributes(capture, nullptr);
+    EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
+}
 }
