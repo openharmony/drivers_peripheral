@@ -20,19 +20,12 @@ if (defined(ohos_lite)) {
   import("//drivers/peripheral/audio/audio.gni")
 }
 
-###########################group###########################
 group("lib") {
   if (!defined(ohos_lite)) {
     testonly = true
   }
-  deps = []
-  if (!drivers_peripheral_audio_alsa_lib) {
-    deps += [
-      "interface_lib_capture:hdf_audio_lib_capture_test",
-      "interface_lib_render:hdf_audio_lib_render_test",
-    ]
-  }
+  deps = [
+    "interface_lib_capture:hdf_audio_lib_capture_test",
+    "interface_lib_render:hdf_audio_lib_render_test",
+  ]
 }
-
-############################end############################
-
