@@ -126,10 +126,10 @@ static struct HdfDriverEntry g_usbInterfaceDriverEntry = {
     .Release = HdfUsbInterfaceDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_usbInterfaceDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */

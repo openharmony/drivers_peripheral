@@ -106,10 +106,10 @@ struct HdfDriverEntry g_inputinterfacesDriverEntry = {
     .Release = HdfInputInterfacesDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_inputinterfacesDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */

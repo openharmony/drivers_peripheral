@@ -85,10 +85,10 @@ struct HdfDriverEntry g_bthciDriverEntry = {
     .Release = HdfBtHciDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_bthciDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
