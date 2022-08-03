@@ -47,11 +47,8 @@ config("hdi_audio_config") {
 if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio") {
     sources = [
-      "//third_party/cJSON/cJSON.c",
       "src/audio_adapter.c",
-      "src/audio_adapter_info_common.c",
       "src/audio_capture.c",
-      "src/audio_common.c",
       "src/audio_manager.c",
       "src/audio_render.c",
     ]
@@ -65,6 +62,7 @@ if (defined(ohos_lite)) {
     ]
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
     external_deps = [ "device_driver_framework:libhdf_utils" ]
@@ -90,13 +88,11 @@ if (defined(ohos_lite)) {
     part_name = "audio_device_driver"
   }
 } else {
+  if (!defined(enable_audio_user_mode) || !enable_audio_user_mode) {
   ohos_shared_library("hdi_audio") {
     sources = [
-      "//third_party/cJSON/cJSON.c",
       "src/audio_adapter.c",
-      "src/audio_adapter_info_common.c",
       "src/audio_capture.c",
-      "src/audio_common.c",
       "src/audio_manager.c",
       "src/audio_render.c",
     ]
@@ -134,6 +130,7 @@ if (defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
 
     public_configs = [ ":hdi_audio_config" ]
 
@@ -148,6 +145,86 @@ if (defined(ohos_lite)) {
 
       ldflags = [ "--coverage" ]
     }
+
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "audio_device_driver"
+  }
+  }
+}
+
+if (defined(ohos_lite)) {
+  ohos_shared_library("hdi_audio_common") {
+    sources = [
+      "//third_party/cJSON/cJSON.c",
+      "src/audio_adapter_info_common.c",
+      "src/audio_common.c",
+    ]
+
+    include_dirs = [
+      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
+      "//third_party/cJSON",
+      "//drivers/peripheral/audio/interfaces/include",
+      "//third_party/bounds_checking_function/include",
+    ]
+    deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
+    external_deps = [ "device_driver_framework:libhdf_utils" ]
+    defines = []
+    if (enable_audio_hal_notsupport_pathselect) {
+      defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
+    }
+
+    public_configs = [ ":hdi_audio_config" ]
+
+    subsystem_name = "hdf"
+    part_name = "audio_device_driver"
+  }
+} else {
+  ohos_shared_library("hdi_audio_common") {
+    sources = [
+      "//third_party/cJSON/cJSON.c",
+      "src/audio_adapter_info_common.c",
+      "src/audio_common.c",
+    ]
+
+    include_dirs = [
+      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
+      "//third_party/cJSON",
+      "//drivers/peripheral/audio/interfaces/include",
+      "//third_party/bounds_checking_function/include",
+    ]
+
+    defines = []
+    if (enable_audio_device_mpi) {
+      defines += [ "AUDIO_HAL_USER" ]
+    }
+
+    if (enable_audio_hal_notsupport_pathselect) {
+      defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
+    }
+
+    if (is_standard_system) {
+      external_deps = [
+        "device_driver_framework:libhdf_host",
+        "device_driver_framework:libhdf_ipc_adapter",
+        "device_driver_framework:libhdf_utils",
+        "device_driver_framework:libhdi",
+        "hiviewdfx_hilog_native:libhilog",
+        "utils_base:utils",
+      ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+
+    public_configs = [ ":hdi_audio_config" ]
+
+    cflags = []
+    ldflags = []
 
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
