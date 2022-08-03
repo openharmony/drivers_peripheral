@@ -11,27 +11,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//drivers/peripheral/audio/audio.gni")
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
+  import("//drivers/peripheral/audio/audio.gni")
 } else {
   import("//build/test.gni")
   import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("//drivers/peripheral/audio/audio.gni")
 }
 
-group("audiotest") {
+group("hdi_passthrough") {
   if (!defined(ohos_lite)) {
     testonly = true
   }
-
-  # hal ut
   deps = [
-    "hdi/passthrough:hdi_passthrough",
-    "lib:lib",
+    "adapter:hdf_audio_hdi_adapter_test",
+    "capture:hdf_audio_hdi_capture_test",
+    "manager:hdf_audio_hdi_manager_test",
+    "render:hdf_audio_hdi_render_test",
   ]
-
-  # adm + driver ut
-  if (drivers_peripheral_audio_full_test_suite) {
-    deps += [ "adm:khdf_audio_adm_test" ]
-  }
 }
