@@ -420,8 +420,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetMute_001, TestSize.
     int32_t ret = -1;
     bool muteTrue = true;
     bool muteFalse = false;
+#ifdef ALSA_LIB_MODE
+    bool defaultmute = false;
+#else
     bool defaultmute = true;
-
+#endif
     ASSERT_NE(nullptr, render);
     ret = render->GetMute(render, &muteTrue);
     EXPECT_EQ(HDF_SUCCESS, ret);
