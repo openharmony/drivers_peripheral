@@ -185,7 +185,7 @@ int32_t CodecHdiAdapterDecode::ConfigMppPassthrough()
     int32_t needDefault = 1;
     param.val = &needDefault;
     param.size = sizeof(int32_t);
-    ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
+    ret = client_->GetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] key is KEY_EXT_DEFAULT_CFG_RK", __func__, ret);
         return ret;

@@ -280,7 +280,7 @@ int32_t SetDecParameter(void)
     int32_t needDefault = 1;
     param.val = &needDefault;
     param.size = sizeof(int32_t);
-    ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
+    ret = g_codecProxy->CodecGetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: CodecSetParameter failed", __func__);
         return HDF_FAILURE;
