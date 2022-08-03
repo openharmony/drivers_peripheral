@@ -52,7 +52,7 @@ extern "C" IUserAuthInterface *UserAuthInterfaceImplGetInstance(void)
         return nullptr;
     }
     std::lock_guard<std::mutex> lock(INTERFACE_MUTEX);
-    OHOS::UserIAM::Common::Init();
+    OHOS::UserIam::Common::Init();
     return userAuthInterfaceService;
 }
 
@@ -60,8 +60,8 @@ int32_t UserAuthInterfaceService::Init()
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> lock(INTERFACE_MUTEX);
-    OHOS::UserIAM::Common::Close();
-    return OHOS::UserIAM::Common::Init();
+    OHOS::UserIam::Common::Close();
+    return OHOS::UserIam::Common::Init();
 }
 
 static bool CopyScheduleInfo(const CoAuthSchedule *in, ScheduleInfo *out)
