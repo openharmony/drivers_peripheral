@@ -19,7 +19,7 @@ group("hdi_audio") {
   if (drivers_peripheral_audio_user_mode == false) {
     deps = [ "hal/hdi_passthrough:hdi_audio" ]
   } else {
-    deps = [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+    deps = [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
   }
 
   if (defined(ohos_lite)) {
