@@ -113,10 +113,10 @@ struct HdfDriverEntry g_nfcinterfaceDriverEntry = {
     .Release = HdfNfcInterfaceDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_nfcinterfaceDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
