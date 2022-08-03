@@ -20,13 +20,13 @@
 #include "stdint.h"
 
 namespace OHOS {
-namespace UserIAM {
+namespace UserIam {
 namespace Common {
 int32_t Init();
 int32_t Close();
 bool IsIAMInited();
 } // Common
-} // UserIAM
+} // UserIam
 } // OHOS
 
 #endif // USER_IAM_COMMON_INTERFACE

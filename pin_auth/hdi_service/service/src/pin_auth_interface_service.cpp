@@ -39,8 +39,8 @@ extern "C" IPinAuthInterface *PinAuthInterfaceImplGetInstance(void)
 int32_t PinAuthInterfaceService::GetExecutorList(std::vector<sptr<IExecutor>> &executorList)
 {
     IAM_LOGI("start");
-    std::shared_ptr<OHOS::UserIAM::PinAuth::PinAuth> pinHdi =
-        OHOS::UserIam::Common::MakeShared<OHOS::UserIAM::PinAuth::PinAuth>();
+    std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi =
+        OHOS::UserIam::Common::MakeShared<OHOS::UserIam::PinAuth::PinAuth>();
     if (pinHdi == nullptr) {
         IAM_LOGE("Generate pinHdi failed");
         return HDF_FAILURE;
