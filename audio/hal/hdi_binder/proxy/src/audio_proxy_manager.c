@@ -168,6 +168,9 @@ int32_t GetAudioProxyAdapterFunc(struct AudioHwAdapter *hwAdapter)
     hwAdapter->common.GetPortCapability = AudioProxyAdapterGetPortCapability;
     hwAdapter->common.SetPassthroughMode = AudioProxyAdapterSetPassthroughMode;
     hwAdapter->common.GetPassthroughMode = AudioProxyAdapterGetPassthroughMode;
+    hwAdapter->common.SetMicMute = AudioProxyAdapterSetMicMute;
+    hwAdapter->common.GetMicMute = AudioProxyAdapterGetMicMute;
+    hwAdapter->common.SetVoiceVolume = AudioProxyAdapterSetVoiceVolume;
     return HDF_SUCCESS;
 }
 int32_t AudioProxyManagerLoadAdapterDispatch(struct AudioHwAdapter *hwAdapter, struct AudioProxyManager *proxyManager,

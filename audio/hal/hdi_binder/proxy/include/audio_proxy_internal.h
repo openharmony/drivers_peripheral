@@ -111,5 +111,8 @@ int32_t AudioProxyCaptureReqMmapBuffer(const AudioHandle capture,
 int32_t AudioProxyCaptureGetMmapPosition(const AudioHandle capture, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioProxyCaptureTurnStandbyMode(const AudioHandle capture);
 int32_t AudioProxyCaptureAudioDevDump(AudioHandle capture, int32_t range, int32_t fd);
+int32_t AudioProxyAdapterSetMicMute(struct AudioAdapter *adapter, bool mute);
+int32_t AudioProxyAdapterGetMicMute(struct AudioAdapter *adapter, bool *mute);
+int32_t AudioProxyAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume);
 
 #endif
