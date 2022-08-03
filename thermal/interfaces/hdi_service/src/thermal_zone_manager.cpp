@@ -111,6 +111,7 @@ int32_t ThermalZoneManager::InitThermalZoneSysfs()
             THERMAL_HILOGI(COMP_HDI, "init sysfs info of %{public}s", sysfsInfo.name);
             int32_t ret = sscanf_s(sysfsInfo.name, THERMAL_ZONE_DIR_NAME.c_str(), &id);
             if (ret < HDF_SUCCESS) {
+                closedir(dir);
                 return ret;
             }
 
