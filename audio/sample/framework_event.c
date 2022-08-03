@@ -41,7 +41,6 @@ static int32_t AudioServiceDeviceVal(enum AudioDeviceType deviceType)
         case HDF_AUDIO_A2DP_DEVICE: // A2dp Service
             return HDF_ERR_NOT_SUPPORT;
         default:
-            printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
 }
@@ -58,7 +57,6 @@ static int32_t AudioServiceDeviceInVal(enum AudioDeviceType deviceType)
         case HDF_AUDIO_A2DP_DEVICE: // A2dp Service
             return HDF_ERR_NOT_SUPPORT;
         default:
-            printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
 }
@@ -77,7 +75,6 @@ static int32_t AudioServiceMsgParse(struct AudioEvent *svcMsg)
         case HDF_AUDIO_SERVICE_INVALID:
             return AudioServiceDeviceInVal(svcMsg->deviceType);
         default:
-            printf("Unknown event type.\n");
             return HDF_FAILURE;
     }
 }
@@ -119,7 +116,6 @@ static int32_t AudioLoadDeviceSucc(enum AudioDeviceType deviceType)
         case HDF_AUDIO_A2DP_DEVICE: // A2dp load
             return HDF_ERR_NOT_SUPPORT;
         default:
-            printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
 }
@@ -136,7 +132,6 @@ static int32_t AudioLoadDeviceFail(enum AudioDeviceType deviceType)
         case HDF_AUDIO_A2DP_DEVICE: // A2dp load
             return HDF_ERR_NOT_SUPPORT;
         default:
-            printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
 }
@@ -153,7 +148,6 @@ static int32_t AudioUnLoadDevice(enum AudioDeviceType deviceType)
         case HDF_AUDIO_A2DP_DEVICE: // A2dp load
             return HDF_ERR_NOT_SUPPORT;
         default:
-            printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
 }
@@ -172,7 +166,6 @@ static int32_t AudioLoadMsgParse(struct AudioEvent *loadMsg)
         case HDF_AUDIO_UNLOAD:
             return AudioUnLoadDevice(loadMsg->deviceType);
         default:
-            printf("Unknown event type.\n");
             return HDF_FAILURE;
     }
 }
@@ -205,18 +198,17 @@ static int AudioGetLoadStatus(struct ServiceStatus *svcStatus)
 static int32_t AudioPnpDeviceAdd(enum AudioDeviceType deviceType)
 {
     switch (deviceType) {
-        case HDF_AUDIO_USB_HEADPHONE: // USB Type-C Add
+        case HDF_AUDIO_USB_HEADPHONE: // USB Audio Add
         case HDF_AUDIO_USBA_HEADPHONE:
-            printf("*****************: USB type-C earphone microphone add.\n");
+            printf("*****************: USB Audio earphone microphone add.\n");
             return HDF_SUCCESS;
         case HDF_AUDIO_USB_HEADSET:
         case HDF_AUDIO_USBA_HEADSET:
-            printf("*****************: USB type-C earphone mic&speaker add.\n");
+            printf("*****************: USB Audio earphone mic&speaker add.\n");
             return HDF_SUCCESS;
         case HDF_AUDIO_A2DP_DEVICE: // A2dp Add
             return HDF_ERR_NOT_SUPPORT;
         default:
-            printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
 }
@@ -224,18 +216,17 @@ static int32_t AudioPnpDeviceAdd(enum AudioDeviceType deviceType)
 static int32_t AudioPnpDeviceRemove(enum AudioDeviceType deviceType)
 {
     switch (deviceType) {
-        case HDF_AUDIO_USB_HEADPHONE: // USB Type-C Remove
+        case HDF_AUDIO_USB_HEADPHONE: // USB Audio Remove
         case HDF_AUDIO_USBA_HEADPHONE:
-            printf("*****************: USB type-C earphone microphone remove.\n");
+            printf("*****************: USB Audio earphone microphone remove.\n");
             return HDF_SUCCESS;
         case HDF_AUDIO_USB_HEADSET:
         case HDF_AUDIO_USBA_HEADSET:
-            printf("*****************: USB Type-C earphone mic&speaker remove.\n");
+            printf("*****************: USB Audio earphone mic&speaker remove.\n");
             return HDF_SUCCESS;
         case HDF_AUDIO_A2DP_DEVICE: // A2dp Remove
             return HDF_ERR_NOT_SUPPORT;
         default:
-            printf("Unknown device type.\n");
             return HDF_FAILURE;
     }
 }
@@ -255,7 +246,6 @@ static int32_t AudioPnpMsgParse(struct AudioEvent *pnpMsg)
         case HDF_AUDIO_DEVICE_REMOVE:
             return AudioPnpDeviceRemove(pnpMsg->deviceType);
         default:
-            printf("Unknown event type.\n");
             return HDF_FAILURE;
     }
 }
@@ -300,11 +290,9 @@ static void AudioUsbPnpOnSvcStatusReceived(struct ServiceStatusListener *listene
            "\n===============================================================================\n",
            svcStatus->serviceName, svcStatus->deviceClass, svcStatus->status, svcStatus->info);
 
-    AudioGetUsbPnpStatus(svcStatus);
-    AudioGetLoadStatus(svcStatus);
-    AudioGetServiceStatus(svcStatus);
-
-    return;
+    (void)AudioGetUsbPnpStatus(svcStatus);
+    (void)AudioGetLoadStatus(svcStatus);
+    (void)AudioGetServiceStatus(svcStatus);
 }
 
 static struct HDIServiceManager *g_servmgr = NULL;
@@ -324,6 +312,7 @@ static void StopListenerBySig(int32_t sig)
         AUDIO_FUNC_LOGE("UnregisterServiceStatusListener fail! ret = %d.\n", ret);
         return;
     }
+    HdiServiceStatusListenerFree(g_listener);
     HDIServiceManagerRelease(g_servmgr);
     g_listenerState = false;
     g_servmgr = NULL;
@@ -351,6 +340,7 @@ int main(void)
         AUDIO_FUNC_LOGE("RegisterServiceStatusListener fail! ret = %d.\n", status);
         HDIServiceManagerRelease(g_servmgr);
         g_servmgr = NULL;
+        HdiServiceStatusListenerFree(g_listener);
         return HDF_FAILURE;
     }
     g_listenerState = true;
