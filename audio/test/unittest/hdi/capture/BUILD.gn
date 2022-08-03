@@ -97,7 +97,7 @@ if (defined(ohos_lite)) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       external_deps = [ "hdf_core:libhdf_utils" ]
     } else {
-      deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+      deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
     }
 
     cflags = [
