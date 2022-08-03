@@ -39,6 +39,16 @@ enum AudioInterfaceLibCaptureCtrl {
     AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE, // scene threshold
 };
 
+int32_t AudioOutputCaptureOpen(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioOutputCapturePrepare(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioOutputCaptureStart(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioOutputCaptureClose(const struct DevHandleCapture *handle,
+    int cmdId, const struct AudioHwCaptureParam *handleData);
+int32_t AudioOutputCaptureGetMmapPosition(const struct DevHandleCapture *handle,
+    int cmdId, struct AudioHwCaptureParam *handleData);
 struct DevHandleCapture *AudioBindServiceCapture(const char *name);
 void AudioCloseServiceCapture(const struct DevHandleCapture *handle);
 int32_t AudioInterfaceLibModeCapture(const struct DevHandleCapture *handle,
