@@ -21,7 +21,7 @@
 #include "nocopyable.h"
 
 namespace OHOS {
-namespace UserIAM {
+namespace UserIam {
 namespace PinAuth {
 struct PinCredentialInfo {
     uint64_t subType;
@@ -50,6 +50,6 @@ private:
     int32_t PinResultToCoAuthResult(int resultCode);
 };
 } // namespace PinAuth
-} // namespace UserIAM
+} // namespace UserIam
 } // namespace OHOS
 #endif // PIN_AUTH_H

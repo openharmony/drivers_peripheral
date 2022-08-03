@@ -62,7 +62,7 @@ private:
     int32_t onGetDataResult_;
 };
 
-ExecutorImpl g_executorImpl(make_shared<OHOS::UserIAM::PinAuth::PinAuth>());
+ExecutorImpl g_executorImpl(make_shared<OHOS::UserIam::PinAuth::PinAuth>());
 
 void FillFuzzExecutorInfo(Parcel &parcel, ExecutorInfo &executorInfo)
 {

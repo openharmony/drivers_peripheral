@@ -26,7 +26,7 @@
 #include "ed25519_key.h"
 
 namespace OHOS {
-namespace UserIAM {
+namespace UserIam {
 namespace Common {
 static bool g_isInitUserIAM = false;
 
@@ -78,5 +78,5 @@ bool IsIAMInited()
     return g_isInitUserIAM;
 }
 } // Common
-} // UserIAM
+} // UserIam
 } // OHOS
