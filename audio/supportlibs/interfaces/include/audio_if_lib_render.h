@@ -40,6 +40,18 @@ enum AudioInterfaceLibRenderCtrl {
     AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ,  // get VolThreshold
 };
 
+int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioOutputRenderClose(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioOutputRenderPrepare(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioOutputRenderStart(const struct DevHandle *handle,
+    int cmdId, const struct AudioHwRenderParam *handleData);
+int32_t AudioOutputRenderGetMmapPosition(const struct DevHandle *handle,
+    int cmdId, struct AudioHwRenderParam *handleData);
 struct DevHandle *AudioBindServiceRender(const char *name);
 void AudioCloseServiceRender(const struct DevHandle *handle);
 int32_t AudioInterfaceLibModeRender(const struct DevHandle *handle,
