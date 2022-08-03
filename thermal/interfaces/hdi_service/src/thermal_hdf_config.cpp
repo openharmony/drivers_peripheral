@@ -286,6 +286,7 @@ void ThermalHdfConfig::GetThermalZoneNodeInfo(XMLThermalZoneInfo& tz, const xmlN
     if (replace != nullptr) {
         tz.replace = (char*)replace;
         tz.isReplace = true;
+        xmlFree(replace);
     }
 }
 } // V1_0
