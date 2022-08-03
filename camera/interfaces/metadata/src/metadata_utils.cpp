@@ -230,8 +230,6 @@ std::shared_ptr<CameraMetadata> MetadataUtils::DecodeFromString(std::string sett
         METADATA_ERR_LOG("MetadataUtils::DecodeFromString Failed to copy memory for metadata header");
         return {};
     }
-    header.item_capacity = header.item_count;
-    header.data_capacity = header.data_count;
     std::shared_ptr<CameraMetadata> metadata
         = std::make_shared<CameraMetadata>(header.item_capacity, header.data_capacity);
     common_metadata_header_t *meta = metadata->get();
