@@ -11,6 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-persist.thermal.log.start=true
+persist.thermal.log.enable=true
 persist.thermal.log.interval=5000
 persist.thermal.log.width=10
