@@ -145,10 +145,10 @@ static struct HdfDriverEntry g_pinAuthInterfaceDriverEntry = {
     .Release = HdfPinAuthInterfaceDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_pinAuthInterfaceDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */

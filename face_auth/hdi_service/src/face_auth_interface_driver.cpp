@@ -138,10 +138,10 @@ struct HdfDriverEntry g_faceAuthInterfaceDriverEntry = {
 };
 } // namespace
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_faceAuthInterfaceDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */

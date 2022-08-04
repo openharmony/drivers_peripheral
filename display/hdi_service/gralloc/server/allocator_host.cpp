@@ -72,12 +72,12 @@ struct HdfDriverEntry g_AllocatorDriverEntry = {
     .Release = HdfAllocatorDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 HDF_INIT(g_AllocatorDriverEntry);
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
