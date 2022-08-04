@@ -15,9 +15,10 @@
 #define HOST_STREAM_DATA_STRUCTURE_
 #include <cstdint>
 #include <functional>
-#include "types.h"
+#include "v1_0/types.h"
 #include "ibuffer.h"
 namespace OHOS::Camera {
+using namespace OHOS::HDI::Camera::V1_0;
 struct HostStreamInfo {
     StreamIntent type_;
     int32_t streamId_;

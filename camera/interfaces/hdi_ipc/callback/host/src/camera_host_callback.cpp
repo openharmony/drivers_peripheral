@@ -14,23 +14,27 @@
  */
 
 #include <hdf_log.h>
+#include <hdf_base.h>
 #include "camera_host_callback.h"
 
 namespace OHOS::Camera {
-void CameraHostCallback::OnCameraStatus(const std::string &cameraId, CameraStatus status)
+int32_t CameraHostCallback::OnCameraStatus(const std::string& cameraId, CameraStatus status)
 {
     HDF_LOGV("%{public}s, enter.", __func__);
+    return HDF_SUCCESS;
 }
 
-void CameraHostCallback::OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status)
+int32_t CameraHostCallback::OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status)
 {
     HDF_LOGV("%{public}s, enter. cameraId = %s, status = %d",
         __func__, cameraId.c_str(), static_cast<int>(status));
+    return HDF_SUCCESS;
 }
 
-void CameraHostCallback::OnCameraEvent(const std::string &cameraId, CameraEvent event)
+int32_t CameraHostCallback::OnCameraEvent(const std::string& cameraId, CameraEvent event)
 {
     HDF_LOGV("%{public}s, enter. cameraId = %s, event = %d",
         __func__, cameraId.c_str(), static_cast<int>(event));
+    return HDF_SUCCESS;
 }
 }

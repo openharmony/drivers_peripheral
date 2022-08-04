@@ -16,13 +16,17 @@
 #ifndef DISTRIBUTED_CAMERA_H
 #define DISTRIBUTED_CAMERA_H
 
-#include <drivers/peripheral/camera/interfaces/include/types.h>
+#include "camera_metadata_info.h"
+
 #include "v1_0/dcamera_types.h"
+#include "v1_0/types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::Camera;
+using namespace OHOS::HDI::Camera::V1_0;
 using namespace OHOS::HDI::DistributedCamera::V1_0;
+using CameraAbility = OHOS::Camera::CameraMetadata;
+using CameraSetting = OHOS::Camera::CameraMetadata;
 using RetCode = uint32_t;
 using MetaType = int32_t;
 const std::string BASE_64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";

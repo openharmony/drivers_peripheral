@@ -16,6 +16,74 @@
 #include "utils_data_stub.h"
 
 namespace OHOS::Camera {
+bool UtilsDataStub::WriteMetadataDataToVec(const camera_metadata_item_t &entry, std::vector<uint8_t>& cameraAbility)
+{
+    if (entry.data_type == META_TYPE_BYTE) {
+        for (size_t i = 0; i < entry.count; i++) {
+            WriteData<int8_t>(*(entry.data.u8 + i), cameraAbility);
+        }
+    } else if (entry.data_type == META_TYPE_INT32) {
+        for (size_t i = 0; i < entry.count; i++) {
+            WriteData<int32_t>(*(entry.data.i32 + i), cameraAbility);
+        }
+    } else if (entry.data_type == META_TYPE_FLOAT) {
+        for (size_t i = 0; i < entry.count; i++) {
+            WriteData<float>(*(entry.data.f + i), cameraAbility);
+        }
+    } else if (entry.data_type == META_TYPE_INT64) {
+        for (size_t i = 0; i < entry.count; i++) {
+            WriteData<int64_t>(*(entry.data.i64 + i), cameraAbility);
+        }
+    } else if (entry.data_type == META_TYPE_DOUBLE) {
+        for (size_t i = 0; i < entry.count; i++) {
+            WriteData<double>(*(entry.data.d + i), cameraAbility);
+        }
+    } else if (entry.data_type == META_TYPE_RATIONAL) {
+        for (size_t i = 0; i < entry.count; i++) {
+            WriteData<int32_t>((*(entry.data.r + i)).numerator, cameraAbility);
+            WriteData<int32_t>((*(entry.data.r + i)).denominator, cameraAbility);
+        }
+    }
+
+    return true;
+}
+
+bool UtilsDataStub::ConvertMetadataToVec(const std::shared_ptr<CameraMetadata> &metadata,
+    std::vector<uint8_t>& cameraAbility)
+{
+    if (metadata == nullptr) {
+        return false;
+    }
+
+    bool bRet = true;
+    uint32_t tagCount = 0;
+    common_metadata_header_t *meta = metadata->get();
+    if (meta != nullptr) {
+        tagCount = GetCameraMetadataItemCount(meta);
+        WriteData<uint32_t>(tagCount, cameraAbility);
+        WriteData<uint32_t>(GetCameraMetadataItemCapacity(meta), cameraAbility);
+        WriteData<uint32_t>(GetCameraMetadataDataSize(meta), cameraAbility);
+        for (uint32_t i = 0; i < tagCount; i++) {
+            camera_metadata_item_t item;
+            int ret = GetCameraMetadataItem(meta, i, &item);
+            if (ret != CAM_META_SUCCESS) {
+                return false;
+            }
+
+            WriteData<uint32_t>(item.index, cameraAbility);
+            WriteData<uint32_t>(item.item, cameraAbility);
+            WriteData<uint32_t>(item.data_type, cameraAbility);
+            WriteData<uint32_t>(item.count, cameraAbility);
+
+            bRet = WriteMetadataDataToVec(item, cameraAbility);
+        }
+    } else {
+        cameraAbility.push_back(tagCount);
+    }
+
+    return bRet;
+}
+
 bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<CameraMetadata> &metadata,
     MessageParcel &data)
 {
@@ -47,6 +115,109 @@ bool UtilsDataStub::EncodeCameraMetadata(const std::shared_ptr<CameraMetadata> &
         bRet = data.WriteInt32(tagCount);
     }
     return bRet;
+}
+
+bool UtilsDataStub::ReadMetadataDataFromVec(int32_t &index, camera_metadata_item_t &entry,
+    const std::vector<uint8_t>& cameraAbility)
+{
+    if (entry.data_type == META_TYPE_BYTE) {
+        entry.data.u8 = new(std::nothrow) uint8_t[entry.count];
+        if (entry.data.u8 != nullptr) {
+            for (size_t i = 0; i < entry.count; i++) {
+                ReadData<uint8_t>(entry.data.u8[i], index, cameraAbility);
+            }
+        }
+    } else if (entry.data_type == META_TYPE_INT32) {
+        entry.data.i32 = new(std::nothrow) int32_t[entry.count];
+        if (entry.data.i32 != nullptr) {
+            for (size_t i = 0; i < entry.count; i++) {
+                ReadData<int32_t>(entry.data.i32[i], index, cameraAbility);
+            }
+        }
+    } else if (entry.data_type == META_TYPE_FLOAT) {
+        entry.data.f = new(std::nothrow) float[entry.count];
+        if (entry.data.f != nullptr) {
+            for (size_t i = 0; i < entry.count; i++) {
+                ReadData<float>(entry.data.f[i], index, cameraAbility);
+            }
+        }
+    } else if (entry.data_type == META_TYPE_INT64) {
+        entry.data.i64 = new(std::nothrow) int64_t[entry.count];
+        if (entry.data.i64 != nullptr) {
+            for (size_t i = 0; i < entry.count; i++) {
+                ReadData<int64_t>(entry.data.i64[i], index, cameraAbility);
+            }
+        }
+    } else if (entry.data_type == META_TYPE_DOUBLE) {
+        entry.data.d = new(std::nothrow) double[entry.count];
+        if (entry.data.d != nullptr) {
+            for (size_t i = 0; i < entry.count; i++) {
+                ReadData<double>(entry.data.d[i], index, cameraAbility);
+            }
+        }
+    } else if (entry.data_type == META_TYPE_RATIONAL) {
+        entry.data.r = new(std::nothrow) camera_rational_t[entry.count];
+        if (entry.data.r != nullptr) {
+            for (size_t i = 0; i < entry.count; i++) {
+                ReadData<int32_t>(entry.data.r[i].numerator, index, cameraAbility);
+                ReadData<int32_t>(entry.data.r[i].denominator, index, cameraAbility);
+            }
+        }
+    }
+
+    return true;
+}
+
+void UtilsDataStub::ConvertVecToMetadata(const std::vector<uint8_t>& cameraAbility,
+    std::shared_ptr<CameraMetadata> &metadata)
+{
+    int32_t index = 0;
+    uint32_t tagCount = 0;
+    uint32_t itemCapacity = 0;
+    uint32_t dataCapacity = 0;
+    constexpr uint32_t MAX_SUPPORTED_TAGS = 1000;
+    constexpr uint32_t MAX_SUPPORTED_ITEMS = 1000;
+    constexpr uint32_t MAX_ITEM_CAPACITY = (1000 * 10);
+    constexpr uint32_t MAX_DATA_CAPACITY = (1000 * 10 * 10);
+
+    ReadData<uint32_t>(tagCount, index, cameraAbility);
+    if (tagCount > MAX_SUPPORTED_TAGS) {
+        tagCount = MAX_SUPPORTED_TAGS;
+        METADATA_ERR_LOG("MetadataUtils::DecodeCameraMetadata tagCount is more than supported value");
+    }
+    ReadData<uint32_t>(itemCapacity, index, cameraAbility);
+    if (itemCapacity > MAX_ITEM_CAPACITY) {
+        itemCapacity = MAX_ITEM_CAPACITY;
+        METADATA_ERR_LOG("MetadataUtils::DecodeCameraMetadata itemCapacity is more than supported value");
+    }
+    ReadData<uint32_t>(dataCapacity, index, cameraAbility);
+    if (dataCapacity > MAX_DATA_CAPACITY) {
+        dataCapacity = MAX_DATA_CAPACITY;
+        METADATA_ERR_LOG("MetadataUtils::DecodeCameraMetadata dataCapacity is more than supported value");
+    }
+
+    std::vector<camera_metadata_item_t> items;
+    for (int32_t i = 0; i < tagCount; i++) {
+        camera_metadata_item_t item;
+        ReadData<uint32_t>(item.index, index, cameraAbility);
+        ReadData<uint32_t>(item.item, index, cameraAbility);
+        ReadData<uint32_t>(item.data_type, index, cameraAbility);
+        ReadData<uint32_t>(item.count, index, cameraAbility);
+        if (item.count > MAX_SUPPORTED_ITEMS) {
+            item.count = MAX_SUPPORTED_ITEMS;
+            METADATA_ERR_LOG("MetadataUtils::DecodeCameraMetadata item.count is more than supported value");
+        }
+        ReadMetadataDataFromVec(index, item, cameraAbility);
+        items.push_back(item);
+    }
+
+    metadata = std::make_shared<CameraMetadata>(itemCapacity, dataCapacity);
+    common_metadata_header_t *meta = metadata->get();
+    for (auto &item_ : items) {
+        void *buffer = nullptr;
+        MetadataUtils::ItemDataToBuffer(item_, &buffer);
+        (void)AddCameraMetadataItem(meta, item_.item, buffer, item_.count);
+    }
 }
 
 void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<CameraMetadata> &metadata)
@@ -90,10 +261,10 @@ bool UtilsDataStub::EncodeStreamInfo(const std::shared_ptr<StreamInfo> &pInfo, M
     bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(pInfo->format_)));
     bRet = (bRet = (bRet && parcel.WriteInt32(pInfo->intent_)));
     bRet = (bRet && parcel.WriteBool(pInfo->tunneledMode_));
-    bool bufferQueueFlag = (pInfo->bufferQueue_ != nullptr) ? true : false;
+    bool bufferQueueFlag = (pInfo->bufferQueue_->producer_ != nullptr) ? true : false;
     bRet = (bRet && parcel.WriteBool(bufferQueueFlag));
     if (bufferQueueFlag) {
-        bRet = (bRet && parcel.WriteRemoteObject(pInfo->bufferQueue_->AsObject()));
+        bRet = (bRet && parcel.WriteRemoteObject(pInfo->bufferQueue_->producer_->AsObject()));
     }
     bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(pInfo->minFrameDuration_)));
     bRet = (bRet && parcel.WriteInt32(pInfo->encodeType_));
@@ -111,7 +282,7 @@ void UtilsDataStub::DecodeStreamInfo(MessageParcel &parcel, std::shared_ptr<Stre
     bool bufferQueueFlag = parcel.ReadBool();
     if (bufferQueueFlag) {
         sptr<IRemoteObject> remoteBufferProducer = parcel.ReadRemoteObject();
-        pInfo->bufferQueue_ = OHOS::iface_cast<OHOS::IBufferProducer>(remoteBufferProducer);
+        pInfo->bufferQueue_->producer_ = OHOS::iface_cast<OHOS::IBufferProducer>(remoteBufferProducer);
     }
     pInfo->minFrameDuration_ = static_cast<int>(parcel.ReadInt32());
     pInfo->encodeType_ = static_cast<EncodeType>(parcel.ReadInt32());

@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace DistributedHardware {
 using ErrorCallback = std::function<void (ErrorType, int32_t)>;
-using ResultCallback = std::function<void (uint64_t, std::shared_ptr<Camera::CameraMetadata>)>;
+using ResultCallback = std::function<void (uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)>;
 DCameraDevice::DCameraDevice(const DHBase &dhBase, const std::string &abilityInfo)
     : isOpened_(false),
       dCameraId_(GenerateCameraId(dhBase)),
@@ -72,10 +72,12 @@ DCamRetCode DCameraDevice::CreateDStreamOperator()
             }
         };
     ResultCallback onResultCallback =
-        [this](uint64_t timestamp, const std::shared_ptr<Camera::CameraMetadata> &result) -> void {
+        [this](uint64_t timestamp, const std::shared_ptr<OHOS::Camera::CameraMetadata> &result) -> void {
             if (dCameraDeviceCallback_) {
                 DHLOGI("DCameraDevice onResultCallback timestamp: %llu", timestamp);
-                dCameraDeviceCallback_->OnResult(timestamp, result);
+                std::vector<uint8_t> metadata;
+                OHOS::Camera::MetadataUtils::ConvertMetadataToVec(result, metadata);
+                dCameraDeviceCallback_->OnResult(timestamp, metadata);
             }
         };
     dCameraStreamOperator_->SetDeviceCallback(onErrorCallback, onResultCallback);
@@ -83,22 +85,22 @@ DCamRetCode DCameraDevice::CreateDStreamOperator()
     return ret;
 }
 
-CamRetCode DCameraDevice::GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback> &callback,
-    OHOS::sptr<IStreamOperator> &streamOperator)
+int32_t DCameraDevice::GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
+    sptr<IStreamOperator> &streamOperator)
 {
     if (dCameraStreamOperator_ == nullptr) {
         DHLOGE("Distributed camera stream operator not init.");
         return CamRetCode::DEVICE_ERROR;
     }
 
-    if (callback == nullptr) {
-        DHLOGE("Input callback is null.");
+    if (callbackObj == nullptr) {
+        DHLOGE("Input callbackObj is null.");
         return CamRetCode::INVALID_ARGUMENT;
     }
 
-    DCamRetCode ret = dCameraStreamOperator_->SetCallBack(callback);
+    DCamRetCode ret = dCameraStreamOperator_->SetCallBack(callbackObj);
     if (ret != SUCCESS) {
-        DHLOGE("Set stream operator callback failed, ret=%d.", ret);
+        DHLOGE("Set stream operator callbackObj failed, ret=%d.", ret);
         return MapToExternalRetCode(ret);
     }
 
@@ -106,9 +108,9 @@ CamRetCode DCameraDevice::GetStreamOperator(const OHOS::sptr<IStreamOperatorCall
     return CamRetCode::NO_ERROR;
 }
 
-CamRetCode DCameraDevice::UpdateSettings(const std::shared_ptr<CameraSetting> &settings)
+int32_t DCameraDevice::UpdateSettings(const std::vector<uint8_t>& settings)
 {
-    if (settings == nullptr) {
+    if (settings.empty()) {
         DHLOGE("DCameraDevice::UpdateSettings, input settings is null.");
         return CamRetCode::INVALID_ARGUMENT;
     }
@@ -118,7 +120,9 @@ CamRetCode DCameraDevice::UpdateSettings(const std::shared_ptr<CameraSetting> &s
         return CamRetCode::CAMERA_CLOSED;
     }
 
-    std::string abilityString = Camera::MetadataUtils::EncodeToString(settings);
+    std::shared_ptr<OHOS::Camera::CameraMetadata> updateSettings = nullptr;
+    OHOS::Camera::MetadataUtils::ConvertVecToMetadata(settings, updateSettings);
+    std::string abilityString = OHOS::Camera::MetadataUtils::EncodeToString(updateSettings);
     std::string encodeString = Base64Encode(reinterpret_cast<const unsigned char *>(abilityString.c_str()),
         abilityString.length());
 
@@ -139,7 +143,7 @@ CamRetCode DCameraDevice::UpdateSettings(const std::shared_ptr<CameraSetting> &s
     return MapToExternalRetCode(static_cast<DCamRetCode>(ret));
 }
 
-CamRetCode DCameraDevice::SetResultMode(const ResultCallbackMode &mode)
+int32_t DCameraDevice::SetResultMode(ResultCallbackMode mode)
 {
     if (dMetadataProcessor_ == nullptr) {
         DHLOGE("Metadata processor not init.");
@@ -153,7 +157,7 @@ CamRetCode DCameraDevice::SetResultMode(const ResultCallbackMode &mode)
     return MapToExternalRetCode(ret);
 }
 
-CamRetCode DCameraDevice::GetEnabledResults(std::vector<MetaType> &results)
+int32_t DCameraDevice::GetEnabledResults(std::vector<int32_t> &results)
 {
     if (dMetadataProcessor_ == nullptr) {
         DHLOGE("Metadata processor not init.");
@@ -167,7 +171,7 @@ CamRetCode DCameraDevice::GetEnabledResults(std::vector<MetaType> &results)
     return MapToExternalRetCode(ret);
 }
 
-CamRetCode DCameraDevice::EnableResult(const std::vector<MetaType> &results)
+int32_t DCameraDevice::EnableResult(const std::vector<int32_t> &results)
 {
     if (dMetadataProcessor_ == nullptr) {
         DHLOGE("Metadata processor not init.");
@@ -197,7 +201,7 @@ CamRetCode DCameraDevice::EnableResult(const std::vector<MetaType> &results)
     return MapToExternalRetCode(static_cast<DCamRetCode>(retProv));
 }
 
-CamRetCode DCameraDevice::DisableResult(const std::vector<MetaType> &results)
+int32_t DCameraDevice::DisableResult(const std::vector<int32_t> &results)
 {
     if (dMetadataProcessor_ == nullptr) {
         DHLOGE("Metadata processor not init.");
@@ -227,7 +231,7 @@ CamRetCode DCameraDevice::DisableResult(const std::vector<MetaType> &results)
     return MapToExternalRetCode(static_cast<DCamRetCode>(retProv));
 }
 
-void DCameraDevice::Close()
+int32_t DCameraDevice::Close()
 {
     DHLOGI("DCameraDevice::Close distributed camera: %s", GetAnonyString(dCameraId_).c_str());
 
@@ -249,6 +253,7 @@ void DCameraDevice::Close()
     dCameraDeviceCallback_ = nullptr;
     isOpenSessFailed_ = false;
     isOpened_ = false;
+    return CamRetCode::NO_ERROR;
 }
 
 CamRetCode DCameraDevice::OpenDCamera(const OHOS::sptr<ICameraDeviceCallback> &callback)

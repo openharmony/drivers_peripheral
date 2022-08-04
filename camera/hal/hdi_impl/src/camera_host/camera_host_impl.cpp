@@ -17,12 +17,23 @@
 #include <algorithm>
 #include "idevice_manager.h"
 #include "camera_host_config.h"
-#include "camera_device_impl.h"
+#include "metadata_utils.h"
 
-#include "icamera_host_callback.h"
-#include "icamera_device.h"
+#include "v1_0/icamera_host_callback.h"
+#include "v1_0/icamera_device.h"
 
 namespace OHOS::Camera {
+extern "C" ICameraHost *CameraHostImplGetInstance(void)
+{
+    using OHOS::Camera::CameraHostImpl;
+    CameraHostImpl *service = new (std::nothrow) CameraHostImpl();
+    if (service == nullptr) {
+        return nullptr;
+    }
+
+    service->Init();
+    return service;
+}
 
 CameraHostImpl::CameraHostImpl()
 {
@@ -66,8 +77,8 @@ CamRetCode CameraHostImpl::Init()
         if (rc != RC_OK) {
             continue;
         }
-        std::shared_ptr<CameraDevice> cameraDevice =
-            CameraDevice::CreateCameraDevice(cameraId);
+        std::shared_ptr<CameraDeviceImpl> cameraDevice =
+            CameraDeviceImpl::CreateCameraDevice(cameraId);
         if (cameraDevice != nullptr) {
             cameraDeviceMap_.insert(std::make_pair(cameraId, cameraDevice));
         } else {
@@ -80,25 +91,25 @@ CamRetCode CameraHostImpl::Init()
             CameraStatus cameraStatus = status ? AVAILABLE : UN_AVAILABLE;
             OnCameraStatus(cameraId, cameraStatus, meta);
         });
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
-CamRetCode CameraHostImpl::SetCallback(const OHOS::sptr<ICameraHostCallback> &callback)
+int32_t CameraHostImpl::SetCallback(const OHOS::sptr<ICameraHostCallback> &callbackObj)
 {
     DFX_LOCAL_HITRACE_BEGIN;
 
-    if (callback == nullptr) {
+    if (callbackObj == nullptr) {
         CAMERA_LOGW("host callback is null.");
         return INVALID_ARGUMENT;
     }
 
-    cameraHostCallback_ = callback;
+    cameraHostCallback_ = callbackObj;
 
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
-CamRetCode CameraHostImpl::GetCameraIds(std::vector<std::string> &cameraIds)
+int32_t CameraHostImpl::GetCameraIds(std::vector<std::string> &cameraIds)
 {
     DFX_LOCAL_HITRACE_BEGIN;
 
@@ -112,32 +123,34 @@ CamRetCode CameraHostImpl::GetCameraIds(std::vector<std::string> &cameraIds)
     }
 
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
-CamRetCode CameraHostImpl::GetCameraAbility(const std::string &cameraId,
-    std::shared_ptr<CameraAbility> &ability)
+int32_t CameraHostImpl::GetCameraAbility(const std::string &cameraId,
+    std::vector<uint8_t>& cameraAbility)
 {
     DFX_LOCAL_HITRACE_BEGIN;
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     if (config == nullptr) {
         return INVALID_ARGUMENT;
     }
+    std::shared_ptr<CameraAbility> ability;
     RetCode rc = config->GetCameraAbility(cameraId, ability);
     if (rc != RC_OK) {
         return INVALID_ARGUMENT;
     }
+
+    MetadataUtils::ConvertMetadataToVec(ability, cameraAbility);
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
-CamRetCode CameraHostImpl::OpenCamera(const std::string &cameraId,
-    const OHOS::sptr<ICameraDeviceCallback> &callback,
-    OHOS::sptr<ICameraDevice> &device)
+int32_t CameraHostImpl::OpenCamera(const std::string& cameraId, const sptr<ICameraDeviceCallback>& callbackObj,
+    sptr<ICameraDevice>& device)
 {
     CAMERA_LOGD("OpenCamera entry");
     DFX_LOCAL_HITRACE_BEGIN;
-    if (CameraIdInvalid(cameraId) != RC_OK || callback == nullptr) {
+    if (CameraIdInvalid(cameraId) != RC_OK || callbackObj == nullptr) {
         CAMERA_LOGW("open camera id is empty or callback is null.");
         return INVALID_ARGUMENT;
     }
@@ -149,15 +162,14 @@ CamRetCode CameraHostImpl::OpenCamera(const std::string &cameraId,
     }
     CAMERA_LOGD("OpenCamera cameraId find success.");
 
-    std::shared_ptr<CameraDeviceImpl> cameraDevice =
-        std::static_pointer_cast<CameraDeviceImpl>(itr->second);
+    std::shared_ptr<CameraDeviceImpl> cameraDevice = itr->second;
     if (cameraDevice == nullptr) {
         CAMERA_LOGE("camera device is null.");
         return INSUFFICIENT_RESOURCES;
     }
 
-    CamRetCode ret = cameraDevice->SetCallback(callback);
-    CHECK_IF_NOT_EQUAL_RETURN_VALUE(ret, NO_ERROR, ret);
+    CamRetCode ret = cameraDevice->SetCallback(callbackObj);
+    CHECK_IF_NOT_EQUAL_RETURN_VALUE(ret, HDI::Camera::V1_0::NO_ERROR, ret);
 
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     CHECK_IF_PTR_NULL_RETURN_VALUE(config, INVALID_ARGUMENT);
@@ -186,7 +198,7 @@ CamRetCode CameraHostImpl::OpenCamera(const std::string &cameraId,
     cameraDevice->SetStatus(true);
     CAMERA_LOGD("open camera success.");
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
 RetCode CameraHostImpl::CameraIdInvalid(const std::string &cameraId)
@@ -273,7 +285,7 @@ void CameraHostImpl::CameraPowerDown(const std::vector<std::string> &phyCameraId
     }
 }
 
-CamRetCode CameraHostImpl::SetFlashlight(const std::string &cameraId,  bool &isEnable)
+int32_t CameraHostImpl::SetFlashlight(const std::string &cameraId,  bool isEnable)
 {
     DFX_LOCAL_HITRACE_BEGIN;
     if (CameraIdInvalid(cameraId) != RC_OK) {
@@ -282,7 +294,8 @@ CamRetCode CameraHostImpl::SetFlashlight(const std::string &cameraId,  bool &isE
     }
 
     for (auto &itr : cameraDeviceMap_) {
-        if (itr.second->IsOpened()) {
+        std::shared_ptr<CameraDeviceImpl> cameraDevice = itr.second;
+        if (cameraDevice->IsOpened()) {
             CAMERA_LOGE("camera id opend [cameraId = %{public}s].", itr.first.c_str());
             return METHOD_NOT_SUPPORTED;
         }
@@ -305,7 +318,7 @@ CamRetCode CameraHostImpl::SetFlashlight(const std::string &cameraId,  bool &isE
         if (cameraHostCallback_ != nullptr) {
             cameraHostCallback_->OnFlashlightStatus(cameraId, flashlightStatus);
         }
-        return NO_ERROR;
+        return HDI::Camera::V1_0::NO_ERROR;
     } else {
         return DEVICE_ERROR;
     }
@@ -364,8 +377,8 @@ void CameraHostImpl::OnCameraStatus(CameraId cameraId,
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);
             }
         }
-        std::shared_ptr<CameraDevice> cameraDevice =
-            CameraDevice::CreateCameraDevice(logicalCameraId);
+        std::shared_ptr<CameraDeviceImpl> cameraDevice =
+            CameraDeviceImpl::CreateCameraDevice(logicalCameraId);
         if (cameraDevice != nullptr) {
             cameraDeviceMap_[logicalCameraId] = cameraDevice;
         }

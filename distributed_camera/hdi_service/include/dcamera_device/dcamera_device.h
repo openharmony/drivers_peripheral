@@ -18,16 +18,18 @@
 
 #include <vector>
 #include <string>
-#include "dcamera_device_stub.h"
 #include "dmetadata_processor.h"
 #include "dstream_operator.h"
-#include "icamera_device_callback.h"
-#include "types.h"
+
+#include "v1_0/icamera_device.h"
+#include "v1_0/icamera_device_callback.h"
 #include "v1_0/id_camera_provider_callback.h"
+#include "v1_0/types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DCameraDevice : public DCameraDeviceStub {
+using namespace OHOS::HDI::Camera::V1_0;
+class DCameraDevice : public ICameraDevice {
 public:
     DCameraDevice(const DHBase &dhBase, const std::string &abilityInfo);
     DCameraDevice() = default;
@@ -38,14 +40,14 @@ public:
     DCameraDevice& operator=(DCameraDevice &&other) = delete;
 
 public:
-    CamRetCode GetStreamOperator(const OHOS::sptr<IStreamOperatorCallback> &callback,
-                                 OHOS::sptr<IStreamOperator> &streamOperator) override;
-    CamRetCode UpdateSettings(const std::shared_ptr<CameraSetting> &settings) override;
-    CamRetCode SetResultMode(const ResultCallbackMode &mode) override;
-    CamRetCode GetEnabledResults(std::vector<MetaType> &results) override;
-    CamRetCode EnableResult(const std::vector<MetaType> &results) override;
-    CamRetCode DisableResult(const std::vector<MetaType> &results) override;
-    void Close() override;
+    int32_t GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
+        sptr<IStreamOperator> &streamOperator) override;
+    int32_t UpdateSettings(const std::vector<uint8_t> &settings) override;
+    int32_t SetResultMode(ResultCallbackMode mode) override;
+    int32_t GetEnabledResults(std::vector<int32_t> &results) override;
+    int32_t EnableResult(const std::vector<int32_t> &results) override;
+    int32_t DisableResult(const std::vector<int32_t> &results) override;
+    int32_t Close() override;
 
     CamRetCode OpenDCamera(const OHOS::sptr<ICameraDeviceCallback> &callback);
     CamRetCode GetDCameraAbility(std::shared_ptr<CameraAbility> &ability);
