@@ -28,7 +28,7 @@ OfflineStreamOperator::~OfflineStreamOperator()
     offlineStreamMap_.clear();
 }
 
-CamRetCode OfflineStreamOperator::CancelCapture(int captureId)
+int32_t OfflineStreamOperator::CancelCapture(int32_t captureId)
 {
     CHECK_IF_EQUAL_RETURN_VALUE(captureId < 0, true, INVALID_ARGUMENT);
 
@@ -38,7 +38,7 @@ CamRetCode OfflineStreamOperator::CancelCapture(int captureId)
     std::shared_ptr<OfflineStream> stream = FindStreamByCaptureId(captureId);
     if (stream == nullptr) {
         CAMERA_LOGD("can't find stream by captureId %{public}d, buffer all returned.", captureId);
-        return NO_ERROR;
+        return HDI::Camera::V1_0::NO_ERROR;
     }
     RetCode ret = stream->CancelCapture(captureId);
     if (ret != RC_OK) {
@@ -47,10 +47,10 @@ CamRetCode OfflineStreamOperator::CancelCapture(int captureId)
     }
 
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
-CamRetCode OfflineStreamOperator::ReleaseStreams(const std::vector<int>& streamIds)
+int32_t OfflineStreamOperator::ReleaseStreams(const std::vector<int32_t>& streamIds)
 {
     PLACE_A_SELFKILL_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
@@ -68,10 +68,10 @@ CamRetCode OfflineStreamOperator::ReleaseStreams(const std::vector<int>& streamI
     }
 
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
-CamRetCode OfflineStreamOperator::Release()
+int32_t OfflineStreamOperator::Release()
 {
     PLACE_A_SELFKILL_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
@@ -86,7 +86,7 @@ CamRetCode OfflineStreamOperator::Release()
     }
 
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
 RetCode OfflineStreamOperator::CommitOfflineStream(const std::shared_ptr<OfflineStream>& of)

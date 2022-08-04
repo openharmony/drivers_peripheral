@@ -37,49 +37,23 @@ ohos_shared_library("libdistributed_camera_provider_config") {
 
 ohos_shared_library("libdistributed_camera_host_config") {
   include_dirs = [
-    "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/host",
-    "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/device",
-    "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/operator",
-    "${distributedcamera_hdf_path}/hdi_service/include/dcamera_host",
     "${distributedcamera_hdf_path}/hdi_service/include/dcamera_device",
+    "${distributedcamera_hdf_path}/hdi_service/include/dcamera_host",
     "${distributedcamera_hdf_path}/hdi_service/include/dstream_operator",
     "${distributedcamera_hdf_path}/hdi_service/include/utils",
-    "//utils/native/base/include",
-    "//utils/system/safwk/native/include",
-    "${camera_hdf_path}/camera/interfaces/include",
-    "${camera_hdf_path}/camera/interfaces/hdi_ipc",
-    "${hdf_framework_path}/include/utils",
-    "${hdf_framework_path}/include/core",
-    "${hdf_framework_path}/include/osal",
-    "${hdf_uhdf_path}/include/hdi",
-    "${hdf_uhdf_path}/osal/include",
-    "${hdf_uhdf_path}/ipc/include",
-    "${hdf_uhdf_path}/include/host",
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//third_party/jsoncpp/include",
   ]
-
   sources = [ "./src/config/dcamera_host_config.cpp" ]
-
-  deps = [
-    "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0",
-    "//utils/native/base:utils",
-  ]
-
-  public_deps = [ "//drivers/interface/distributed_camera/v1_0:libdistributed_camera_provider_stub_1.0" ]
-
-  defines = [
-    "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"distributedcamerahdf\"",
-    "LOG_DOMAIN=0xD004100",
-  ]
+  deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0" ]
 
   external_deps = [
-    "graphic_chipsetsdk:buffer_handle",
-    "graphic_chipsetsdk:surface",
     "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
+    "utils_base:utils",
   ]
 
   install_images = [ chipset_base_dir ]
@@ -94,10 +68,6 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "include/dcamera_provider",
     "include/dstream_operator",
     "include/utils",
-    "../interfaces/hdi_ipc",
-    "../interfaces/hdi_ipc/server/device",
-    "../interfaces/hdi_ipc/server/host",
-    "../interfaces/hdi_ipc/server/operator",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
     "${display_hdf_path}/interfaces/include",
@@ -110,18 +80,9 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "${hdf_uhdf_path}/include/host",
     "//third_party/jsoncpp/include",
     "//drivers/peripheral/camera/interfaces/metadata/include",
-    "${camera_hdf_path}/camera/interfaces/include",
-    "${camera_hdf_path}/camera/interfaces/hdi_ipc",
   ]
 
   sources = [
-    "../interfaces/hdi_ipc/server/device/dcamera_device_callback_proxy.cpp",
-    "../interfaces/hdi_ipc/server/device/dcamera_device_stub.cpp",
-    "../interfaces/hdi_ipc/server/host/dcamera_host_callback_proxy.cpp",
-    "../interfaces/hdi_ipc/server/host/dcamera_host_stub.cpp",
-    "../interfaces/hdi_ipc/server/operator/doffline_stream_operator_stub.cpp",
-    "../interfaces/hdi_ipc/server/operator/dstream_operator_callback_proxy.cpp",
-    "../interfaces/hdi_ipc/server/operator/dstream_operator_stub.cpp",
     "src/dcamera_device/dcamera_device.cpp",
     "src/dcamera_device/dmetadata_processor.cpp",
     "src/dcamera_host/dcamera_host.cpp",
@@ -136,7 +97,10 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "src/utils/dh_log.cpp",
   ]
 
-  public_deps = [ "//drivers/interface/distributed_camera/v1_0:libdistributed_camera_provider_stub_1.0" ]
+  public_deps = [
+    "//drivers/interface/camera/v1_0:libcamera_stub_1.0",
+    "//drivers/interface/distributed_camera/v1_0:libdistributed_camera_provider_stub_1.0",
+  ]
 
   deps = [
     "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",

@@ -61,7 +61,7 @@ int main()
 
     std::cout << "==========[test log]Preview stream, 640*480, expected success." << std::endl;
     // 启动流
-    test->intents = {OHOS::Camera::PREVIEW};
+    test->intents = {OHOS::HDI::Camera::V1_0::PREVIEW};
     test->StartStream(test->intents);
     sleepSeconds = 1;
     sleep(sleepSeconds);

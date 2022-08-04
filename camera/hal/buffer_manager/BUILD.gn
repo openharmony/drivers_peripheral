@@ -129,6 +129,7 @@ if (defined(ohos_lite)) {
       "src/buffer_adapter/standard",
       "$camera_path/include",
       "//utils/native/base/include",
+      "//drivers/peripheral/camera/interfaces/metadata/include",
     ]
 
     libs = []

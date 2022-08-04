@@ -18,7 +18,7 @@ if (defined(ohos_lite)) {
     deps = [
       "buffer_manager:camera_buffer_manager",
       "device_manager:camera_device_manager",
-      "hdi_impl:camera_hdi_impl",
+      "hdi_impl:camera_host_service_1.0",
       "init:ohos_camera_demo",
       "pipeline_core:camera_pipeline_core",
       "utils:camera_utils",
@@ -32,13 +32,12 @@ if (defined(ohos_lite)) {
   group("camera_hal") {
     if (is_standard_system) {
       if (target_cpu == "x86_64") {
-        deps = [ "$camera_path/../interfaces/hdi_ipc/client:libcamera_client" ]
+        deps = []
       } else {
         deps = [
-          "$camera_path/../interfaces/hdi_ipc/client:libcamera_client",
           "buffer_manager:camera_buffer_manager",
           "device_manager:camera_device_manager",
-          "hdi_impl:camera_hdi_impl",
+          "hdi_impl:camera_host_service_1.0",
           "init:ohos_camera_demo",
           "pipeline_core:camera_pipeline_core",
           "utils:camera_utils",

@@ -31,18 +31,6 @@
       ],
       "inner_kits": [
         {
-          "name": "//drivers/peripheral/camera/interfaces/hdi_ipc/client:libcamera_client",
-          "header": {
-            "header_files": [
-              "camera_device_proxy.h",
-              "camera_host_proxy.h",
-              "offline_stream_operator_proxy.h",
-              "stream_operator_proxy.h"
-            ],
-            "header_base": "//drivers/peripheral/camera/interfaces/hdi_ipc/client/include"
-          }
-        },
-        {
           "name": "//drivers/peripheral/camera/interfaces/metadata:metadata",
           "header": {
             "header_files": [

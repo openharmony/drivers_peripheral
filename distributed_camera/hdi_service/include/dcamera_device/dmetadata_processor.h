@@ -22,13 +22,13 @@
 #include <vector>
 #include "constants.h"
 #include "dcamera.h"
-#include "v1_0/dcamera_types.h"
 
-#include <drivers/peripheral/camera/interfaces/include/types.h>
+#include "v1_0/dcamera_types.h"
+#include "v1_0/types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-using namespace OHOS::Camera;
+using namespace OHOS::HDI::Camera::V1_0;
 using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DMetadataProcessor {
 public:
@@ -49,7 +49,7 @@ public:
     DCamRetCode ResetEnableResults();
     DCamRetCode SaveResultMetadata(std::string resultStr);
     void UpdateResultMetadata(const uint64_t &resultTimestamp);
-    void SetResultCallback(std::function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> &resultCbk);
+    void SetResultCallback(std::function<void(uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)> &resultCbk);
     void PrintDCameraMetadata(const common_metadata_header_t *metadata);
 
 private:
@@ -58,7 +58,7 @@ private:
     DCamRetCode AddAbilityEntry(uint32_t tag, const void *data, size_t size);
     DCamRetCode UpdateAbilityEntry(uint32_t tag, const void *data, size_t size);
     void ConvertToCameraMetadata(common_metadata_header_t *&input,
-                                 std::shared_ptr<Camera::CameraMetadata> &output);
+        std::shared_ptr<OHOS::Camera::CameraMetadata> &output);
     void ResizeMetadataHeader(common_metadata_header_t *&header, uint32_t itemCapacity, uint32_t dataCapacity);
     void UpdateAllResult(const uint64_t &resultTimestamp);
     void UpdateOnChanged(const uint64_t &resultTimestamp);
@@ -68,7 +68,7 @@ private:
     void InitDcameraBaseAbility();
 
 private:
-    std::function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> resultCallback_;
+    std::function<void(uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)> resultCallback_;
     std::shared_ptr<CameraAbility> dCameraAbility_;
     std::string protocolVersion_;
     std::string dCameraPosition_;
@@ -80,10 +80,10 @@ private:
     std::mutex producerMutex_;
 
     // The latest result metadata that received from the sink device.
-    std::shared_ptr<Camera::CameraMetadata> latestProducerMetadataResult_;
+    std::shared_ptr<OHOS::Camera::CameraMetadata> latestProducerMetadataResult_;
 
     // The latest result metadata that replied to the camera service.
-    std::shared_ptr<Camera::CameraMetadata> latestConsumerMetadataResult_;
+    std::shared_ptr<OHOS::Camera::CameraMetadata> latestConsumerMetadataResult_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

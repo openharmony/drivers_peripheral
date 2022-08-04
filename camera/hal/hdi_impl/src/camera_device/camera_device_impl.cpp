@@ -20,6 +20,7 @@
 #include "idevice_manager.h"
 #include "camera_metadata_info.h"
 #include "watchdog.h"
+#include "metadata_utils.h"
 
 #define HDI_DEVICE_PLACE_A_WATCHDOG \
     PLACE_A_NOKILL_WATCHDOG(std::bind(&CameraDeviceImpl::OnRequestTimeout, this));
@@ -38,18 +39,53 @@ CameraDeviceImpl::CameraDeviceImpl(const std::string &cameraId,
 {
 }
 
-CamRetCode CameraDeviceImpl::GetStreamOperator(
-    const OHOS::sptr<IStreamOperatorCallback> &callback,
-    OHOS::sptr<IStreamOperator> &streamOperator)
+std::shared_ptr<CameraDeviceImpl> CameraDeviceImpl::CreateCameraDevice(const std::string &cameraId)
+{
+    // create pipelineCore
+    std::shared_ptr<IPipelineCore> pipelineCore = IPipelineCore::Create();
+    if (pipelineCore == nullptr) {
+        CAMERA_LOGW("create pipeline core failed. [cameraId = %{public}s]", cameraId.c_str());
+        return nullptr;
+    }
+
+    RetCode rc = pipelineCore->Init();
+    if (rc != RC_OK) {
+        CAMERA_LOGW("pipeline core init failed. [cameraId = %{public}s]", cameraId.c_str());
+        return nullptr;
+    }
+
+    std::shared_ptr<CameraDeviceImpl> device = std::make_shared<CameraDeviceImpl>(cameraId, pipelineCore);
+    if (device == nullptr) {
+        CAMERA_LOGW("create camera device failed. [cameraId = %{public}s]", cameraId.c_str());
+        return nullptr;
+    }
+    CAMERA_LOGD("create camera device success. [cameraId = %{public}s]", cameraId.c_str());
+
+    // set deviceManager metadata & dev status callback
+    std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
+    if (deviceManager != nullptr) {
+        deviceManager->SetMetaDataCallBack([device](const std::shared_ptr<CameraMetadata> &metadata) {
+            device->OnMetadataChanged(metadata);
+        });
+        deviceManager->SetDevStatusCallBack([device]() {
+            device->OnDevStatusErr();
+        });
+    }
+
+    return device;
+}
+
+int32_t CameraDeviceImpl::GetStreamOperator(const sptr<IStreamOperatorCallback>& callbackObj,
+    sptr<IStreamOperator>& streamOperator)
 {
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
-    if (callback == nullptr) {
+    if (callbackObj == nullptr) {
         CAMERA_LOGW("input callback is null.");
         return INVALID_ARGUMENT;
     }
 
-    spCameraDeciceCallback_ = callback;
+    spCameraDeciceCallback_ = callbackObj;
     if (spStreamOperator_ == nullptr) {
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
         spStreamOperator_ = std::make_shared<StreamOperator>(spCameraDeciceCallback_, shared_from_this());
@@ -72,15 +108,15 @@ CamRetCode CameraDeviceImpl::GetStreamOperator(
     });
 #endif
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
-CamRetCode CameraDeviceImpl::UpdateSettings(const std::shared_ptr<CameraSetting> &settings)
+int32_t CameraDeviceImpl::UpdateSettings(const std::vector<uint8_t>& settings)
 {
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
-    if (settings == nullptr) {
-        CAMERA_LOGE("input settings is null.");
+    if (settings.empty()) {
+        CAMERA_LOGE("input vector settings is empty.");
         return INVALID_ARGUMENT;
     }
 
@@ -89,12 +125,14 @@ CamRetCode CameraDeviceImpl::UpdateSettings(const std::shared_ptr<CameraSetting>
         return CAMERA_CLOSED;
     }
 
-    pipelineCore_->UpdateMetadata(settings);
+    std::shared_ptr<CameraMetadata> updateSettings;
+    MetadataUtils::ConvertVecToMetadata(settings, updateSettings);
+    pipelineCore_->UpdateMetadata(updateSettings);
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
-CamRetCode CameraDeviceImpl::SetResultMode(const ResultCallbackMode &mode)
+int32_t CameraDeviceImpl::SetResultMode(ResultCallbackMode mode)
 {
     CAMERA_LOGD("entry.");
     if (mode < PER_FRAME || mode > ON_CHANGED) {
@@ -106,7 +144,7 @@ CamRetCode CameraDeviceImpl::SetResultMode(const ResultCallbackMode &mode)
     }
 
     metaResultMode_ = mode;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
 ResultCallbackMode CameraDeviceImpl::GetMetaResultMode() const
@@ -114,7 +152,7 @@ ResultCallbackMode CameraDeviceImpl::GetMetaResultMode() const
     return metaResultMode_;
 }
 
-CamRetCode CameraDeviceImpl::GetEnabledResults(std::vector<MetaType> &results)
+int32_t CameraDeviceImpl::GetEnabledResults(std::vector<int32_t>& results)
 {
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
@@ -129,7 +167,7 @@ CamRetCode CameraDeviceImpl::GetEnabledResults(std::vector<MetaType> &results)
     std::unique_lock<std::mutex> l(enabledRstMutex_);
     results = enabledResults_;
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
 RetCode CameraDeviceImpl::GetEnabledFromCfg()
@@ -171,7 +209,7 @@ RetCode CameraDeviceImpl::GetEnabledFromCfg()
     return RC_OK;
 }
 
-CamRetCode CameraDeviceImpl::EnableResult(const std::vector<MetaType> &results)
+int32_t CameraDeviceImpl::EnableResult(const std::vector<int32_t>& results)
 {
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
@@ -192,14 +230,14 @@ CamRetCode CameraDeviceImpl::EnableResult(const std::vector<MetaType> &results)
     }
     deviceManager->SetAbilityMetaDataTag(enabledResults_);
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
-CamRetCode CameraDeviceImpl::DisableResult(const std::vector<MetaType> &results)
+int32_t CameraDeviceImpl::DisableResult(const std::vector<int32_t>& results)
 {
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
-    CamRetCode ret = NO_ERROR;
+    CamRetCode ret = HDI::Camera::V1_0::NO_ERROR;
     std::unique_lock<std::mutex> l(enabledRstMutex_);
     for (auto &metaType : results) {
         auto itr = std::find(enabledResults_.begin(), enabledResults_.end(), metaType);
@@ -218,7 +256,7 @@ CamRetCode CameraDeviceImpl::DisableResult(const std::vector<MetaType> &results)
     }
     deviceManager1->SetAbilityMetaDataTag(enabledResults_);
     DFX_LOCAL_HITRACE_END;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
 RetCode CameraDeviceImpl::GetMetadataResults(std::shared_ptr<CameraMetadata> &metadata)
@@ -316,7 +354,7 @@ bool CameraDeviceImpl::CompareTagData(const camera_metadata_item_t &baseEntry,
     return true;
 }
 
-void CameraDeviceImpl::Close()
+int32_t CameraDeviceImpl::Close()
 {
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
@@ -329,20 +367,20 @@ void CameraDeviceImpl::Close()
     std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
     if (deviceManager == nullptr) {
         CAMERA_LOGW("device manager is null [dm name MpiDeviceManager].");
-        return;
+        return INVALID_ARGUMENT;
     }
 
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     if (config == nullptr) {
         CAMERA_LOGD("CameraHostConfig get failed.");
-        return;
+        return INVALID_ARGUMENT;
     }
 
     std::vector<std::string> phyCameraIds;
     RetCode rc = config->GetPhysicCameraIds(cameraId_, phyCameraIds);
     if (rc != RC_OK) {
         CAMERA_LOGW("get physic cameraId failed.[cameraId = %{public}s]", cameraId_.c_str());
-        return;
+        return INVALID_ARGUMENT;
     }
 
     for (auto &phyCameraId : phyCameraIds) {
@@ -363,6 +401,7 @@ void CameraDeviceImpl::Close()
     isOpened_ = false;
     DFX_LOCAL_HITRACE_END;
     CAMERA_LOGD("camera close success.");
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
 CamRetCode CameraDeviceImpl::SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback)
@@ -371,7 +410,7 @@ CamRetCode CameraDeviceImpl::SetCallback(const OHOS::sptr<ICameraDeviceCallback>
         return INVALID_ARGUMENT;
     }
     cameraDeciceCallback_ = callback;
-    return NO_ERROR;
+    return HDI::Camera::V1_0::NO_ERROR;
 }
 
 std::shared_ptr<IPipelineCore> CameraDeviceImpl::GetPipelineCore() const
@@ -386,11 +425,13 @@ void CameraDeviceImpl::ResultMetadata()
         return;
     }
 
+    std::vector<uint8_t> result;
     std::shared_ptr<CameraMetadata> metadata;
     RetCode rc = GetMetadataResults(metadata);
     if (rc == RC_OK || metaResultMode_ == PER_FRAME) {
         uint64_t timestamp = GetCurrentLocalTimeStamp();
-        cameraDeciceCallback_->OnResult(timestamp, metadata);
+        MetadataUtils::ConvertMetadataToVec(metadata, result);
+        cameraDeciceCallback_->OnResult(timestamp, result);
     }
 }
 
