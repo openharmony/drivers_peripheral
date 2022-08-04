@@ -87,7 +87,7 @@ if (defined(ohos_lite)) {
     if (!drivers_peripheral_audio_user_mode) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
     } else {
-      deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+      deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
     }
 
     if (is_standard_system) {
