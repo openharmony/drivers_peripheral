@@ -139,11 +139,11 @@ struct HdfDriverEntry g_fingerprintAuthInterfaceDriverEntry = {
 };
 } // namespace
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_fingerprintAuthInterfaceDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 

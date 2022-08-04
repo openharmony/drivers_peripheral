@@ -88,12 +88,12 @@ struct HdfDriverEntry g_cameraHostDriverEntry = {
     .Release = HdfCameraHostDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 HDF_INIT(g_cameraHostDriverEntry);
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
