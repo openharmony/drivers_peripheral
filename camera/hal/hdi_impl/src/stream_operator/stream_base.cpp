@@ -426,6 +426,7 @@ void StreamBase::HandleResult(std::shared_ptr<IBuffer>& buffer)
             }
             if (r->GetCaptureId() == captureId) {
                 request = r;
+                break;
             }
         }
     }
@@ -440,7 +441,6 @@ void StreamBase::HandleResult(std::shared_ptr<IBuffer>& buffer)
     // To synchronize multiple stream, bottom-layer device stream need be synchronized first.
     request->OnResult(streamId_);
     lastRequest_ = request;
-    return;
 }
 
 RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
