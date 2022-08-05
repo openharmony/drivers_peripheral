@@ -43,7 +43,7 @@ RetCode StreamPipelineCore::PreConfig(const ModeMeta& meta)
 
 RetCode StreamPipelineCore::CreatePipeline(const int32_t& mode)
 {
-    std::lock_guard<std::recursive_mutex> l(mutex_);
+    std::lock_guard<std::mutex> l(mutex_);
     std::shared_ptr<PipelineSpec> spec = strategy_->GeneratePipelineSpec(mode);
     if (spec == nullptr) {
         return RC_ERROR;
@@ -57,7 +57,7 @@ RetCode StreamPipelineCore::CreatePipeline(const int32_t& mode)
 
 RetCode StreamPipelineCore::DestroyPipeline(const std::vector<int>& streamIds)
 {
-    std::lock_guard<std::recursive_mutex> l(mutex_);
+    std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     for (const auto& it : streamIds) {
         re = dispatcher_->Destroy(it) | re;
@@ -69,7 +69,7 @@ RetCode StreamPipelineCore::DestroyPipeline(const std::vector<int>& streamIds)
 
 RetCode StreamPipelineCore::Prepare(const std::vector<int>& streamIds)
 {
-    std::lock_guard<std::recursive_mutex> l(mutex_);
+    std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     for (const auto& it : streamIds) {
         re = dispatcher_->Prepare(it) | re;
@@ -79,7 +79,7 @@ RetCode StreamPipelineCore::Prepare(const std::vector<int>& streamIds)
 
 RetCode StreamPipelineCore::Start(const std::vector<int>& streamIds)
 {
-    std::lock_guard<std::recursive_mutex> l(mutex_);
+    std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     for (const auto& it : streamIds) {
         re = dispatcher_->Start(it) | re;
@@ -90,7 +90,7 @@ RetCode StreamPipelineCore::Start(const std::vector<int>& streamIds)
 RetCode StreamPipelineCore::SetCallback(const MetaDataCb cb)
 {
     CAMERA_LOGE("StreamPipelineCore %{public}s: line: %{public}d", __FUNCTION__, __LINE__);
-    std::lock_guard<std::recursive_mutex> l(mutex_);
+    std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     dispatcher_->SetCallback(cb);
     return re;
@@ -109,7 +109,7 @@ RetCode StreamPipelineCore::Stop(const std::vector<int>& streamIds)
 
 RetCode StreamPipelineCore::Config(const std::vector<int>& streamIds, const CaptureMeta& meta)
 {
-    std::lock_guard<std::recursive_mutex> l(mutex_);
+    std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     for (const auto& it : streamIds) {
         re = dispatcher_->Config(it, meta) | re;
@@ -120,7 +120,7 @@ RetCode StreamPipelineCore::Config(const std::vector<int>& streamIds, const Capt
 RetCode StreamPipelineCore::UpdateSettingsConfig(const CaptureMeta& meta)
 {
     CAMERA_LOGE("StreamPipelineCore %{public}s: line: %{public}d", __FUNCTION__, __LINE__);
-    std::lock_guard<std::recursive_mutex> l(mutex_);
+    std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     dispatcher_->UpdateSettingsConfig(meta);
     return re;
@@ -128,7 +128,7 @@ RetCode StreamPipelineCore::UpdateSettingsConfig(const CaptureMeta& meta)
 
 RetCode StreamPipelineCore::Capture(const std::vector<int>& streamIds, const int32_t captureId)
 {
-    std::lock_guard<std::recursive_mutex> l(mutex_);
+    std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     for (const auto& it : streamIds) {
         re = dispatcher_->Capture(it, captureId) | re;
@@ -138,7 +138,7 @@ RetCode StreamPipelineCore::Capture(const std::vector<int>& streamIds, const int
 
 RetCode StreamPipelineCore::CancelCapture(const std::vector<int>& streamIds)
 {
-    std::lock_guard<std::recursive_mutex> l(mutex_);
+    std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     for (const auto& it : streamIds) {
         re = dispatcher_->CancelCapture(it) | re;
@@ -148,7 +148,7 @@ RetCode StreamPipelineCore::CancelCapture(const std::vector<int>& streamIds)
 
 RetCode StreamPipelineCore::Flush(const std::vector<int>& streamIds)
 {
-    std::lock_guard<std::recursive_mutex> l(mutex_);
+    std::lock_guard<std::mutex> l(mutex_);
     RetCode re = RC_OK;
     for (const auto& it : streamIds) {
         CAMERA_LOGV("flush stream %{public}d begin", it);
@@ -160,7 +160,7 @@ RetCode StreamPipelineCore::Flush(const std::vector<int>& streamIds)
 
 std::shared_ptr<OfflinePipeline> StreamPipelineCore::GetOfflinePipeline(const int32_t id)
 {
-    std::lock_guard<std::recursive_mutex> l(mutex_);
+    std::lock_guard<std::mutex> l(mutex_);
     std::shared_ptr<INode> node = dispatcher_->GetNode(id, "ipp");
     return std::static_pointer_cast<IppNode>(node);
 }
