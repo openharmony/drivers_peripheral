@@ -94,6 +94,7 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
     ]
+    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
 
     if (drivers_peripheral_audio_alsa_lib) {
       include_dirs += [
@@ -111,7 +112,6 @@ if (defined(ohos_lite)) {
       defines = [ "AUDIO_HDF_LOG" ]
     }
 
-    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
     if (is_standard_system) {
       external_deps = [
         "hdf_core:libhdf_host",
@@ -146,21 +146,20 @@ if (defined(ohos_lite)) {
         "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_render.c",
       ]
     }
-    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hdi_service/passthrough/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
     ]
+    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
 
     if (drivers_peripheral_audio_alsa_lib) {
       include_dirs += [
         "//third_party/cJSON",
-        "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
         "//third_party/alsa-lib/include",
+        "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
       ]
       public_deps += [ "//third_party/alsa-lib:libasound" ]
     } else {

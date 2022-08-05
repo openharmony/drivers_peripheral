@@ -25,6 +25,7 @@ ohos_systemtest("hdf_audio_idlhdi_adapter_test") {
     "src/audio_idlhdi_adapter_test.cpp",
   ]
   external_deps = [
+    "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
