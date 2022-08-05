@@ -36,10 +36,10 @@ static int32_t StartLinearVibrator()
         return HDF_FAILURE;
     }
 
-    ret = GpioWrite(drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_LOW);
+    ret = GpioWrite(drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_HIGH);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: pull gpio%d to %d level failed", __func__,
-            drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_LOW);
+            drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_HIGH);
         return ret;
     }
     return HDF_SUCCESS;
@@ -63,10 +63,10 @@ static int32_t StopLinearVibrator()
         return HDF_FAILURE;
     }
 
-    ret = GpioWrite(drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_HIGH);
+    ret = GpioWrite(drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_LOW);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: pull gpio%d to %d level failed", __func__,
-            drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_HIGH);
+            drvData->linearCfgData->vibratorBus.GpioNum, GPIO_VAL_LOW);
         return ret;
     }
     return HDF_SUCCESS;
