@@ -17,7 +17,6 @@
 #include "audio_common.h"
 #include "audio_uhdf_log.h"
 #include "osal_mem.h"
-#include "osal_mutex.h"
 #include "osal_mem.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
@@ -26,7 +25,6 @@
 
 /* Out Put Render */
 static struct AudioPcmHwParams g_hwParams;
-static struct OsalMutex g_renderMutex;
 
 int32_t SetHwParams(const struct AudioHwRenderParam *handleData)
 {
@@ -1327,7 +1325,6 @@ int32_t AudioInterfaceLibOutputRender(const struct DevHandle *handle,
         return HDF_FAILURE;
     }
     int32_t ret;
-    (void)OsalMutexLock(&g_renderMutex);
     switch (cmdId) {
         case AUDIO_DRV_PCM_IOCTL_HW_PARAMS:
             ret = AudioOutputRenderHwParams(handle, cmdId, handleData);
@@ -1360,7 +1357,6 @@ int32_t AudioInterfaceLibOutputRender(const struct DevHandle *handle,
             ret = HDF_FAILURE;
             break;
     }
-    (void)OsalMutexUnlock(&g_renderMutex);
     return ret;
 }
 
@@ -1411,7 +1407,6 @@ struct DevHandle *AudioBindServiceRender(const char *name)
         AudioMemFree((void **)&handle);
         return NULL;
     }
-    OsalMutexInit(&g_renderMutex);
     AUDIO_FUNC_LOGI("BIND SERVICE SUCCESS!");
     return handle;
 }
@@ -1422,7 +1417,6 @@ void AudioCloseServiceRender(const struct DevHandle *handle)
         AUDIO_FUNC_LOGE("Render handle or handle->object is NULL");
         return;
     }
-    OsalMutexDestroy(&g_renderMutex);
     struct HdfIoService *service = (struct HdfIoService *)handle->object;
     HdfIoServiceRecycle(service);
     AudioMemFree((void **)&handle);

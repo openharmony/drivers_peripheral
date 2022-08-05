@@ -23,7 +23,6 @@
 #include "hdf_audio_server_render.h"
 #include "hdf_device_object.h"
 #include "osal_mem.h"
-#include "osal_mutex.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
 
@@ -35,7 +34,6 @@ struct AudioManager *g_serverManager = NULL;
 
 int32_t g_serverAdapterNum = 0;
 struct AudioInfoInAdapter *g_renderAndCaptureManage = NULL;
-struct OsalMutex g_serverLock;
 
 static struct AudioEvent g_audioEventPnp = {
     .eventType = HDF_AUDIO_EVENT_UNKOWN,
@@ -117,7 +115,6 @@ void AdaptersServerManageRelease(
 
         return;
     }
-    OsalMutexDestroy(&g_serverLock);
     num = (num > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : num;
     for (i = 0; i < num; i++) {
         if (adaptersManage[i].adapterName != NULL) {
@@ -163,7 +160,6 @@ int32_t AdaptersServerManageInit(const struct AudioAdapterDescriptor *descs, int
     }
     g_serverAdapterNum = num;
     g_renderAndCaptureManage = adaptersManage;
-    OsalMutexInit(&g_serverLock);
 
     return HDF_SUCCESS;
 }
@@ -1686,7 +1682,7 @@ static struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleCapLi
     {AUDIO_HDI_CAPTURE_DEV_DUMP, HdiServiceCaptureDevDump},
 };
 
-int32_t AudioDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
+int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
 {
     unsigned int i;
@@ -1721,15 +1717,4 @@ int32_t AudioDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBu
         }
     }
     return AUDIO_HAL_ERR_INTERNAL;
-}
-
-int32_t HdiServiceDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
-    struct HdfSBuf *reply)
-{
-    int32_t ret;
-    (void)OsalMutexLock(&g_serverLock);
-    ret = AudioDispatch(client, cmdId, data, reply);
-    (void)OsalMutexUnlock(&g_serverLock);
-
-    return ret;
 }
