@@ -26,10 +26,9 @@
 
 namespace OHOS::Camera {
 enum CameraBufferStatus {
-    CAMERA_BUFFER_STATUS_OK = 0,
     CAMERA_BUFFER_STATUS_DROP,
-    CAMERA_BUFFER_STATUS_INVALID,
 };
+
 class IBuffer {
 public:
     IBuffer() {}
