@@ -73,7 +73,4 @@ group("audio_sample_client") {
       "sample:audio_sample_render",
     ]
   }
-  if (!defined(ohos_lite)) {
-    deps += [ "sample:audio_sample_event" ]
-  }
 }
