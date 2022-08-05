@@ -24,6 +24,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include "hdf_base.h"
+#include "hdf_remote_adapter_if.h"
 #include "inttypes.h"
 #include "osal_mem.h"
 #include "v1_0/audio_manager.h"
@@ -796,6 +797,9 @@ int32_t GetManagerAndLoadAdapter(const char *adapterNameCase, struct AudioPort *
     if (getAudioManager == NULL) {
         return HDF_FAILURE;
     }
+
+    (void)HdfRemoteGetCallingPid();
+
     struct AudioManager *audioManagerIns = getAudioManager(SERVICE_NAME);
     if (audioManagerIns == NULL) {
         AUDIO_FUNC_LOGE("Get audio Manager Fail");

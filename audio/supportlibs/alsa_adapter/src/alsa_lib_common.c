@@ -16,9 +16,11 @@
 #include "alsa_lib_common.h"
 #include <ctype.h>
 #include <limits.h>
+#include "audio_common.h"
+#include "audio_internal.h"
 #include "cJSON.h"
 #include "osal_mem.h"
-#include "audio_internal.h"
+#include "securec.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 
