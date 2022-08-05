@@ -37,7 +37,7 @@
 
 namespace OHOS {
 namespace Audio {
-#ifdef AUDIO_ADM_SO
+#ifdef AUDIO_ADM_PASSTHROUGH
     const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_passthrough");
     const int IS_ADM = true;
 #endif

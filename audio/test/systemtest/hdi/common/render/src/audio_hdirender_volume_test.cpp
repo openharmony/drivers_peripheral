@@ -513,7 +513,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetMute_0001, TestSi
     int32_t ret = -1;
     bool muteTrue = true;
     bool muteFalse = false;
-#ifdef PRODUCT_RK3568
+#ifdef ALSA_LIB_MODE
     bool defaultmute = false;
 #else
     bool defaultmute = true;
