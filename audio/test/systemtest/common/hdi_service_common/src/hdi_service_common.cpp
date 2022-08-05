@@ -209,11 +209,33 @@ int32_t WavHeadAnalysis(struct AudioHeadInfo &wavHeadInfo, FILE *file, struct Au
     }
     return HDF_SUCCESS;
 }
+
+static void TestAudioAdapterDescriptorFree(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
+{
+    if (dataBlock == NULL) {
+        return;
+    }
+
+    if (dataBlock->adapterName != NULL) {
+        OsalMemFree(dataBlock->adapterName);
+        dataBlock->adapterName = NULL;
+    }
+
+    if (dataBlock->ports != NULL) {
+        OsalMemFree(dataBlock->ports);
+        dataBlock->ports = NULL;
+    }
+
+    if (freeSelf) {
+        OsalMemFree(dataBlock);
+    }
+}
+
 void TestReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen)
 {
     if (descsLen > 0 && descs != nullptr && (*descs) != nullptr) {
         for (uint32_t i = 0; i < descsLen; i++) {
-            AudioAdapterDescriptorFree(&(*descs)[i], false);
+            TestAudioAdapterDescriptorFree(&(*descs)[i], false);
         }
         OsalMemFree(*descs);
         *descs = nullptr;
