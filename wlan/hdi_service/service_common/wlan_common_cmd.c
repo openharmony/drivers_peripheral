@@ -190,6 +190,7 @@ int32_t WlanInterfaceGetAsscociatedStas(struct IWlanInterface *self, const struc
                 ret = HDF_FAILURE;
                 break;
             }
+            staInfo[i].macLen = WIFI_MAC_ADDR_LENGTH;
         }
     }
     OsalMemFree(wifiStaInfo);
