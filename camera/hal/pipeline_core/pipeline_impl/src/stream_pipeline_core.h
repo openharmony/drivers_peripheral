@@ -45,7 +45,7 @@ public:
         const ModeMeta& meta, const std::vector<StreamConfiguration>& configs) override;
 
 protected:
-    std::recursive_mutex mutex_;
+    std::mutex mutex_;
     OperationMode mode_ = NORMAL;
     std::shared_ptr<NodeContext> context_ = nullptr;
     std::unique_ptr<StreamPipelineStrategy> strategy_ = nullptr;

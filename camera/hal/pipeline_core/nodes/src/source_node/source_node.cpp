@@ -257,12 +257,12 @@ RetCode SourceNode::PortHandler::StartDistributeBuffers()
 RetCode SourceNode::PortHandler::StopDistributeBuffers()
 {
     CAMERA_LOGV("SourceNode::PortHandler::StopDistributeBuffers enter");
+    FlushBuffers();
     dbtRun = false;
     rbcv.notify_one();
     if (distributor != nullptr) {
         distributor->join();
     }
-    FlushBuffers(); // flush buffers after stopping distributor
     CAMERA_LOGV("SourceNode::PortHandler::StopDistributeBuffers exit");
     return RC_OK;
 }
