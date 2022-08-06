@@ -30,8 +30,8 @@ extern "C" IDisplayComposer *DisplayComposerImplGetInstance(void)
     return new (std::nothrow) DisplayComposerService();
 }
 
-DisplayComposerService::DisplayComposerService() :
-    libHandle_(nullptr),
+DisplayComposerService::DisplayComposerService()
+    : libHandle_(nullptr),
     createHwiFunc_(nullptr),
     destroyHwiFunc_(nullptr),
     hwiImpl_(nullptr),
