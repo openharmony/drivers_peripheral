@@ -281,7 +281,6 @@ static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName,
     int32_t ret, i;
     char tmp[MAX_PATHLEN] = {0};
     char udcTmp[MAX_NAMELEN] = {0};
-    char tmpCmd[MAX_PATHLEN] = {0};
     if (deviceName == NULL || udcName == NULL || IsDeviceDirExist(deviceName) == false) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -304,13 +303,25 @@ static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName,
             return HDF_ERR_IO;
         }
     } else {
-        ret = snprintf_s(tmpCmd, MAX_PATHLEN, MAX_PATHLEN - 1, "echo \"\" > %s/%s/UDC",
-            CONFIGFS_DIR, deviceName);
-        if (ret < 0) {
-            HDF_LOGE("%{public}s: snprintf_s failed", __func__);
-            return HDF_ERR_IO;
+        FILE *fp = fopen(tmp, "w+");
+        if (fp == NULL) {
+            HDF_LOGE("%{public}s: fopen tmp failure!", __func__);
+            return HDF_ERR_BAD_FD;
         }
-        system(tmpCmd);
+        
+        ret = fputs("\0", fp);
+        if (ret == EOF) {
+            if (fclose(fp)) {
+                HDF_LOGE("%{public}s:fputs and fclose failure!", __func__);
+                return HDF_FAILURE;
+            }
+            HDF_LOGE("%{public}s:fputs null failure!", __func__);
+            return HDF_FAILURE;
+        }
+        if (fclose(fp)) {
+            HDF_LOGE("%{public}s:fclose failure!", __func__);
+            return HDF_FAILURE;
+        }
     }
     return 0;
 }
