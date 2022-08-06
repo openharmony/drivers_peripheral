@@ -37,7 +37,7 @@ MapperInterfaceService::MapperInterfaceService()
 {
     int32_t ret = LoadHwi();
     if (ret == HDF_SUCCESS) {
-        hwiImpl_ = createHwi_(); 
+        hwiImpl_ = createHwi_();
         CHECK_NULLPOINTER_RETURN(hwiImpl_);
     } else {
         HDF_LOGE("error: LoadHwi failure, lib path:%{public}s",

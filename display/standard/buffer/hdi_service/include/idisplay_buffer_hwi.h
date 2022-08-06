@@ -144,7 +144,6 @@ typedef IDisplayBufferHwi* Create_DisplayBufferHwiFunc_t();
 typedef void Destroy_DisplayBufferHwiFunc_t(IDisplayBufferHwi*);
 extern "C" IDisplayBufferHwi* Create_DisplayBufferHwi();
 extern "C" void Destroy_DisplayBufferHwi(IDisplayBufferHwi*);
-
 } // namespace V1_0
 } // namespace Buffer
 } // namespace Display

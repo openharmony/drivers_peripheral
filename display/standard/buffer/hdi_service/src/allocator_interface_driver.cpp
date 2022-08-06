@@ -26,10 +26,11 @@ struct HdfAllocatorInterfaceHost {
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t AllocatorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
-    struct HdfSBuf *reply)
+static int32_t AllocatorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    auto *hdfAllocatorInterfaceHost = CONTAINER_OF(client->device->service, struct HdfAllocatorInterfaceHost, ioService);
+    auto *hdfAllocatorInterfaceHost = CONTAINER_OF(client->device->service,
+        struct HdfAllocatorInterfaceHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
@@ -86,7 +87,8 @@ static int HdfAllocatorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-static void HdfAllocatorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject){
+static void HdfAllocatorInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+{
     HDF_LOGI("HdfAllocatorInterfaceDriverRelease enter");
     if (deviceObject->service == nullptr) {
         HDF_LOGE("HdfAllocatorInterfaceDriverRelease not initted");
@@ -97,7 +99,7 @@ static void HdfAllocatorInterfaceDriverRelease(struct HdfDeviceObject *deviceObj
     delete hdfAllocatorInterfaceHost;
 }
 
-struct HdfDriverEntry g_allocatorinterfaceDriverEntry = {
+static struct HdfDriverEntry g_allocatorinterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "display_buffer",
     .Bind = HdfAllocatorInterfaceDriverBind,
@@ -105,10 +107,10 @@ struct HdfDriverEntry g_allocatorinterfaceDriverEntry = {
     .Release = HdfAllocatorInterfaceDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 HDF_INIT(g_allocatorinterfaceDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
 #endif

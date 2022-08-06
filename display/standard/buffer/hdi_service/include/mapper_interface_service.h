@@ -26,7 +26,6 @@ namespace HDI {
 namespace Display {
 namespace Buffer {
 namespace V1_0 {
-
 class MapperInterfaceService : public IMapperInterface {
 public:
     MapperInterfaceService();
