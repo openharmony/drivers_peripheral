@@ -94,7 +94,7 @@ ohos_fuzztest("CameraIpcCameraDeviceRemoteFuzzTest") {
 
   external_deps += [
     "ipc:ipc_single",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   install_enable = true
@@ -174,7 +174,7 @@ ohos_fuzztest("CameraIpcCameraHostServiceFuzzTest") {
 
   external_deps += [
     "ipc:ipc_single",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   install_enable = true
@@ -253,7 +253,7 @@ ohos_fuzztest("CameraIpcOfflineFuzzTest") {
 
   external_deps += [
     "ipc:ipc_single",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   install_enable = true
@@ -332,7 +332,7 @@ ohos_fuzztest("CameraIpcStreamOperatorFuzzTest") {
 
   external_deps += [
     "ipc:ipc_single",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   install_enable = true
@@ -414,7 +414,7 @@ ohos_fuzztest("CameraIpcCameraDeviceCallbackFuzzTest") {
 
   external_deps += [
     "ipc:ipc_single",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   install_enable = true
@@ -494,7 +494,7 @@ ohos_fuzztest("CameraIpcCameraHostCallbackFuzzTest") {
 
   external_deps += [
     "ipc:ipc_single",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   install_enable = true
@@ -574,7 +574,7 @@ ohos_fuzztest("CameraIpcStreamOperatorCallbackFuzzTest") {
 
   external_deps += [
     "ipc:ipc_single",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
 
   install_enable = true

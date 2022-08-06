@@ -79,7 +79,7 @@ if (defined(ohos_lite)) {
       external_deps = [
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
-        "samgr_standard:samgr_proxy",
+        "samgr:samgr_proxy",
         "utils_base:utils",
       ]
     } else {
@@ -88,7 +88,7 @@ if (defined(ohos_lite)) {
 
     external_deps += [
       "ipc:ipc_single",
-      "samgr_standard:samgr_proxy",
+      "samgr:samgr_proxy",
     ]
     public_configs = [ ":buffer_manager_utest_config" ]
   }
