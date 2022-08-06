@@ -16,8 +16,9 @@
 #include "display_composer_service.h"
 #include <dlfcn.h>
 #include <hdf_base.h>
-#include "hdf_log.h"
+
 #include "display_log.h"
+#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -29,8 +30,8 @@ extern "C" IDisplayComposer *DisplayComposerImplGetInstance(void)
     return new (std::nothrow) DisplayComposerService();
 }
 
-DisplayComposerService::DisplayComposerService()
-    : libHandle_(nullptr),
+DisplayComposerService::DisplayComposerService() :
+    libHandle_(nullptr),
     createHwiFunc_(nullptr),
     destroyHwiFunc_(nullptr),
     hwiImpl_(nullptr),
@@ -45,8 +46,7 @@ DisplayComposerService::DisplayComposerService()
         cmdResponser_ = HdiDisplayCmdResponser::Create(hwiImpl_);
         CHECK_NULLPOINTER_RETURN(cmdResponser_);
     } else {
-        HDF_LOGE("error: LoadHwi failure, lib path:%{public}s",
-            DISPLAY_COMPOSER_HWI_LIBRARY_PATH);
+        HDF_LOGE("error: LoadHwi failure, lib name:%{public}s", DISPLAY_COMPOSER_HWI_LIBRARY_NAME);
     }
 }
 
@@ -63,23 +63,21 @@ DisplayComposerService::~DisplayComposerService()
 
 int32_t DisplayComposerService::LoadHwi()
 {
-    const char* errStr = dlerror();
+    const char *errStr = dlerror();
     if (errStr) {
         HDF_LOGI("warning, existing dlerror: %{public}s", errStr);
     }
-    libHandle_ = dlopen(DISPLAY_COMPOSER_HWI_LIBRARY_PATH, RTLD_LAZY);
+    libHandle_ = dlopen(DISPLAY_COMPOSER_HWI_LIBRARY_NAME, RTLD_LAZY);
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 
-    createHwiFunc_ =
-        reinterpret_cast<CreateComposerHwiFunc_t*>(dlsym(libHandle_, "CreateComposerHwi"));
+    createHwiFunc_ = reinterpret_cast<CreateComposerHwiFunc_t *>(dlsym(libHandle_, "CreateComposerHwi"));
     errStr = dlerror();
     if (errStr) {
         HDF_LOGE("error: %{public}s", errStr);
         return HDF_FAILURE;
     }
 
-    destroyHwiFunc_ =
-        reinterpret_cast<DestroyComposerHwiFunc_t*>(dlsym(libHandle_, "DestroyComposerHwi"));
+    destroyHwiFunc_ = reinterpret_cast<DestroyComposerHwiFunc_t *>(dlsym(libHandle_, "DestroyComposerHwi"));
     errStr = dlerror();
     if (errStr) {
         HDF_LOGE("error: %{public}s", errStr);
@@ -89,11 +87,10 @@ int32_t DisplayComposerService::LoadHwi()
     return HDF_SUCCESS;
 }
 
-void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* data)
+void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void *data)
 {
     if (data != nullptr) {
-        sptr<IHotPlugCallback> remoteCb =
-            reinterpret_cast<DisplayComposerService *>(data)->hotPlugCb_;
+        sptr<IHotPlugCallback> remoteCb = reinterpret_cast<DisplayComposerService *>(data)->hotPlugCb_;
         if (remoteCb != nullptr) {
             remoteCb->OnHotPlug(outputId, connected);
         } else {
@@ -107,9 +104,9 @@ void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* 
 
 void DisplayComposerService::OnVBlank(unsigned int sequence, uint64_t ns, void *data)
 {
-    IVBlankCallback* remoteCb;
+    IVBlankCallback *remoteCb;
     if (data != nullptr) {
-        remoteCb = reinterpret_cast<IVBlankCallback*>(data);
+        remoteCb = reinterpret_cast<IVBlankCallback *>(data);
         if (remoteCb != nullptr) {
             remoteCb->OnVBlank(sequence, ns);
         } else {
@@ -121,117 +118,101 @@ void DisplayComposerService::OnVBlank(unsigned int sequence, uint64_t ns, void *
     return;
 }
 
-int32_t DisplayComposerService::RegHotPlugCallback(const sptr<IHotPlugCallback>& cb)
+int32_t DisplayComposerService::RegHotPlugCallback(const sptr<IHotPlugCallback> &cb)
 {
     hotPlugCb_ = cb;
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->RegHotPlugCallback(OnHotPlug, this);
-    return ec;
+    return hwiImpl_->RegHotPlugCallback(OnHotPlug, this);
 }
 
-int32_t DisplayComposerService::GetDisplayCapability(uint32_t devId, DisplayCapability& info)
+int32_t DisplayComposerService::GetDisplayCapability(uint32_t devId, DisplayCapability &info)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->GetDisplayCapability(devId, info);
-    return ec;
+    return hwiImpl_->GetDisplayCapability(devId, info);
 }
 
-int32_t DisplayComposerService::GetDisplaySupportedModes(uint32_t devId,
-    std::vector<DisplayModeInfo>& modes)
+int32_t DisplayComposerService::GetDisplaySupportedModes(uint32_t devId, std::vector<DisplayModeInfo> &modes)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->GetDisplaySupportedModes(devId, modes);
-    return ec;
+    return hwiImpl_->GetDisplaySupportedModes(devId, modes);
 }
 
-int32_t DisplayComposerService::GetDisplayMode(uint32_t devId, uint32_t& modeId)
+int32_t DisplayComposerService::GetDisplayMode(uint32_t devId, uint32_t &modeId)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->GetDisplayMode(devId, modeId);
-    return ec;
+    return hwiImpl_->GetDisplayMode(devId, modeId);
 }
 
 int32_t DisplayComposerService::SetDisplayMode(uint32_t devId, uint32_t modeId)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->SetDisplayMode(devId, modeId);
-    return ec;
+    return hwiImpl_->SetDisplayMode(devId, modeId);
 }
 
-int32_t DisplayComposerService::GetDisplayPowerStatus(uint32_t devId, DispPowerStatus& status)
+int32_t DisplayComposerService::GetDisplayPowerStatus(uint32_t devId, DispPowerStatus &status)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->GetDisplayPowerStatus(devId, status);
-    return ec;
+    return hwiImpl_->GetDisplayPowerStatus(devId, status);
 }
 
 int32_t DisplayComposerService::SetDisplayPowerStatus(uint32_t devId, DispPowerStatus status)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->SetDisplayPowerStatus(devId, status);
-    return ec;
+    return hwiImpl_->SetDisplayPowerStatus(devId, status);
 }
 
-int32_t DisplayComposerService::GetDisplayBacklight(uint32_t devId, uint32_t& level)
+int32_t DisplayComposerService::GetDisplayBacklight(uint32_t devId, uint32_t &level)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->GetDisplayBacklight(devId, level);
-    return ec;
+    return hwiImpl_->GetDisplayBacklight(devId, level);
 }
 
 int32_t DisplayComposerService::SetDisplayBacklight(uint32_t devId, uint32_t level)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->SetDisplayBacklight(devId, level);
-    return ec;
+    return hwiImpl_->SetDisplayBacklight(devId, level);
 }
 
-int32_t DisplayComposerService::GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t& value)
+int32_t DisplayComposerService::GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t &value)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->GetDisplayProperty(devId, id, value);
-    return ec;
+    return hwiImpl_->GetDisplayProperty(devId, id, value);
 }
 
-int32_t DisplayComposerService::GetDisplayCompChange(uint32_t devId, std::vector<uint32_t>& layers,
-    std::vector<int32_t>& type)
+int32_t DisplayComposerService::GetDisplayCompChange(
+    uint32_t devId, std::vector<uint32_t> &layers, std::vector<int32_t> &type)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->GetDisplayCompChange(devId, layers, type);
-    return ec;
+    return hwiImpl_->GetDisplayCompChange(devId, layers, type);
 }
 
-int32_t DisplayComposerService::SetDisplayClientCrop(uint32_t devId, const IRect& rect)
+int32_t DisplayComposerService::SetDisplayClientCrop(uint32_t devId, const IRect &rect)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->SetDisplayClientCrop(devId, rect);
-    return ec;
+    return hwiImpl_->SetDisplayClientCrop(devId, rect);
 }
 
-int32_t DisplayComposerService::SetDisplayClientDestRect(uint32_t devId, const IRect& rect)
+int32_t DisplayComposerService::SetDisplayClientDestRect(uint32_t devId, const IRect &rect)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->SetDisplayClientDestRect(devId, rect);
-    return ec;
+    return hwiImpl_->SetDisplayClientDestRect(devId, rect);
 }
 
 int32_t DisplayComposerService::SetDisplayVsyncEnabled(uint32_t devId, bool enabled)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->SetDisplayVsyncEnabled(devId, enabled);
-    return ec;
+    return hwiImpl_->SetDisplayVsyncEnabled(devId, enabled);
 }
 
-int32_t DisplayComposerService::RegDisplayVBlankCallback(uint32_t devId, const sptr<IVBlankCallback>& cb)
+int32_t DisplayComposerService::RegDisplayVBlankCallback(uint32_t devId, const sptr<IVBlankCallback> &cb)
 {
     vBlankCb_ = cb;
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->RegDisplayVBlankCallback(devId, OnVBlank, vBlankCb_.GetRefPtr());
-    return ec;
+    return hwiImpl_->RegDisplayVBlankCallback(devId, OnVBlank, vBlankCb_.GetRefPtr());
 }
 
-int32_t DisplayComposerService::GetDisplayReleaseFence(uint32_t devId, std::vector<uint32_t>& layers,
-    std::vector<sptr<HdifdParcelable>>& fences)
+int32_t DisplayComposerService::GetDisplayReleaseFence(
+    uint32_t devId, std::vector<uint32_t> &layers, std::vector<sptr<HdifdParcelable>> &fences)
 {
     std::vector<int32_t> outFences;
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
@@ -245,74 +226,65 @@ int32_t DisplayComposerService::GetDisplayReleaseFence(uint32_t devId, std::vect
     return ec;
 }
 
-int32_t DisplayComposerService::CreateVirtualDisplay(uint32_t width, uint32_t height, int32_t& format, uint32_t& devId)
+int32_t DisplayComposerService::CreateVirtualDisplay(uint32_t width, uint32_t height, int32_t &format, uint32_t &devId)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->CreateVirtualDisplay(width, height, format, devId);
-    return ec;
+    return hwiImpl_->CreateVirtualDisplay(width, height, format, devId);
 }
 
 int32_t DisplayComposerService::DestroyVirtualDisplay(uint32_t devId)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->DestroyVirtualDisplay(devId);
-    return ec;
+    return hwiImpl_->DestroyVirtualDisplay(devId);
 }
 
-int32_t DisplayComposerService::SetVirtualDisplayBuffer(uint32_t devId, const sptr<BufferHandleParcelable>& buffer,
-    const sptr<HdifdParcelable>& fence)
+int32_t DisplayComposerService::SetVirtualDisplayBuffer(
+    uint32_t devId, const sptr<BufferHandleParcelable> &buffer, const sptr<HdifdParcelable> &fence)
 {
-    BufferHandle* handle = buffer->GetBufferHandle();
+    BufferHandle *handle = buffer->GetBufferHandle();
     int32_t inFence = fence->GetFd();
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->SetVirtualDisplayBuffer(devId, *handle, inFence);
-    return ec;
+    return hwiImpl_->SetVirtualDisplayBuffer(devId, *handle, inFence);
 }
 
 int32_t DisplayComposerService::SetDisplayProperty(uint32_t devId, uint32_t id, uint64_t value)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->SetDisplayProperty(devId, id, value);
-    return ec;
+    return hwiImpl_->SetDisplayProperty(devId, id, value);
 }
 
-int32_t DisplayComposerService::CreateLayer(uint32_t devId, const LayerInfo& layerInfo, uint32_t& layerId)
+int32_t DisplayComposerService::CreateLayer(uint32_t devId, const LayerInfo &layerInfo, uint32_t &layerId)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->CreateLayer(devId, layerInfo, layerId);
-    return ec;
+    return hwiImpl_->CreateLayer(devId, layerInfo, layerId);
 }
 
 int32_t DisplayComposerService::DestroyLayer(uint32_t devId, uint32_t layerId)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->DestroyLayer(devId, layerId);
-    return ec;
+    return hwiImpl_->DestroyLayer(devId, layerId);
 }
 
-int32_t DisplayComposerService::InitCmdRequest(const std::shared_ptr<SharedMemQueue<int32_t>>& request)
+int32_t DisplayComposerService::InitCmdRequest(const std::shared_ptr<SharedMemQueue<int32_t>> &request)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = cmdResponser_->InitCmdRequest(request);
-    return ec;
+    return cmdResponser_->InitCmdRequest(request);
 }
 
-int32_t DisplayComposerService::CmdRequest(uint32_t inEleCnt, const std::vector<HdifdInfo>& inFds,
-    uint32_t& outEleCnt, std::vector<HdifdInfo>& outFds)
+int32_t DisplayComposerService::CmdRequest(
+    uint32_t inEleCnt, const std::vector<HdifdInfo> &inFds, uint32_t &outEleCnt, std::vector<HdifdInfo> &outFds)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = cmdResponser_->CmdRequest(inEleCnt, inFds, outEleCnt, outFds);
-    return ec;
+    return cmdResponser_->CmdRequest(inEleCnt, inFds, outEleCnt, outFds);
 }
 
-int32_t DisplayComposerService::GetCmdReply(std::shared_ptr<SharedMemQueue<int32_t>>& reply)
+int32_t DisplayComposerService::GetCmdReply(std::shared_ptr<SharedMemQueue<int32_t>> &reply)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = cmdResponser_->GetCmdReply(reply);
-    return ec;
+    return cmdResponser_->GetCmdReply(reply);
 }
-} // V1_0
-} // Composer
-} // Display
-} // HDI
-} // OHOS
+} // namespace V1_0
+} // namespace Composer
+} // namespace Display
+} // namespace HDI
+} // namespace OHOS

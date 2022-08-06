@@ -25,25 +25,16 @@ ohos_shared_library("libdisplay_composer_service_1.0") {
     "//drivers/interface/display/composer",
     "//drivers/hdf_core/adapter/uhdf2/model/display/composer",
     "//drivers/hdf_core/adapter/uhdf2/model/display/base/command_pack",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/display/standard/utils/include",
     "//drivers/peripheral/display/standard/composer/hdi_service/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-    "//foundation/graphic/graphic_2d/utils/buffer_handle/export",
   ]
   sources = [ "src/display_composer_service.cpp" ]
 
   deps = [
+    "c_utils:utils",
     "//drivers/interface/display/composer/v1_0:libdisplay_composer_stub_1.0",
     "//foundation/graphic/graphic_2d/utils/buffer_handle:buffer_handle",
-    "//utils/native/base:utils",
-  ]
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
   ]
 
   if (is_standard_system) {
@@ -73,15 +64,6 @@ ohos_shared_library("libdisplay_composer_driver_1.0") {
     "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/interface/display/composer/v1_0:libdisplay_composer_stub_1.0",
     "//utils/native/base:utils",
-  ]
-
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
   ]
 
   if (is_standard_system) {

@@ -17,9 +17,9 @@
 #define OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPERINTERFACESERVICE_H
 
 #include "buffer_handle_parcelable.h"
-#include "v1_0/imapper_interface.h"
-#include "v1_0/display_buffer_type.h"
 #include "idisplay_buffer_hwi.h"
+#include "v1_0/display_buffer_type.h"
+#include "v1_0/imapper_interface.h"
 
 namespace OHOS {
 namespace HDI {
@@ -31,34 +31,28 @@ public:
     MapperInterfaceService();
     virtual ~MapperInterfaceService();
 
-    int32_t FreeMem(const sptr<BufferHandleParcelable>& handle) override;
-
-    int32_t Mmap(const sptr<BufferHandleParcelable>& handle) override;
-
-    int32_t MmapCache(const sptr<BufferHandleParcelable>& buffer) override;
-
-    int32_t Unmap(const sptr<BufferHandleParcelable>& handle) override;
-
-    int32_t FlushCache(const sptr<BufferHandleParcelable>& handle) override;
-
-    int32_t FlushMCache(const sptr<BufferHandleParcelable>& buffer) override;
-
-    int32_t InvalidateCache(const sptr<BufferHandleParcelable>& handle) override;
+    int32_t FreeMem(const sptr<BufferHandleParcelable> &handle) override;
+    int32_t Mmap(const sptr<BufferHandleParcelable> &handle) override;
+    int32_t MmapCache(const sptr<BufferHandleParcelable> &buffer) override;
+    int32_t Unmap(const sptr<BufferHandleParcelable> &handle) override;
+    int32_t FlushCache(const sptr<BufferHandleParcelable> &handle) override;
+    int32_t FlushMCache(const sptr<BufferHandleParcelable> &buffer) override;
+    int32_t InvalidateCache(const sptr<BufferHandleParcelable> &handle) override;
 
 private:
     int32_t LoadHwi();
 
 private:
-    void* libHandle_;
-    IDisplayBufferHwi* hwiImpl_;
+    void *libHandle_;
+    IDisplayBufferHwi *hwiImpl_;
 
-    Create_DisplayBufferHwiFunc_t* createHwi_;
-    Destroy_DisplayBufferHwiFunc_t* destroyHwi_;
+    Create_DisplayBufferHwiFunc_t *createHwi_;
+    Destroy_DisplayBufferHwiFunc_t *destroyHwi_;
 };
-} // V1_0
-} // Buffer
-} // Display
-} // HDI
-} // OHOS
+} // namespace V1_0
+} // namespace Buffer
+} // namespace Display
+} // namespace HDI
+} // namespace OHOS
 
 #endif // OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPERINTERFACESERVICE_H

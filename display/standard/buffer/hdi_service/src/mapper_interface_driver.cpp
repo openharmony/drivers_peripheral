@@ -26,8 +26,8 @@ struct HdfMapperInterfaceHost {
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t MapperInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
-    struct HdfSBuf *reply)
+static int32_t MapperInterfaceDriverDispatch(
+    struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     auto *hdfMapperInterfaceHost = CONTAINER_OF(client->device->service, struct HdfMapperInterfaceHost, ioService);
 
@@ -74,8 +74,8 @@ static int HdfMapperInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
         return HDF_FAILURE;
     }
 
-    hdfMapperInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        IMapperInterface::GetDescriptor());
+    hdfMapperInterfaceHost->stub =
+        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, IMapperInterface::GetDescriptor());
     if (hdfMapperInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfMapperInterfaceHost;

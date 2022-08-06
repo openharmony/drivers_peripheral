@@ -16,8 +16,8 @@
 #include "allocator_interface_service.h"
 #include <dlfcn.h>
 #include <hdf_base.h>
-#include "hdf_log.h"
 #include "display_log.h"
+#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -29,19 +29,15 @@ extern "C" IAllocatorInterface *AllocatorInterfaceImplGetInstance(void)
     return new (std::nothrow) AllocatorInterfaceService();
 }
 
-AllocatorInterfaceService::AllocatorInterfaceService()
-    : libHandle_(nullptr),
-    hwiImpl_(nullptr),
-    createHwi_(nullptr),
-    destroyHwi_(nullptr)
+AllocatorInterfaceService::AllocatorInterfaceService() :
+    libHandle_(nullptr), hwiImpl_(nullptr), createHwi_(nullptr), destroyHwi_(nullptr)
 {
     int32_t ret = LoadHwi();
     if (ret == HDF_SUCCESS) {
         hwiImpl_ = createHwi_();
         CHECK_NULLPOINTER_RETURN(hwiImpl_);
     } else {
-        HDF_LOGE("error: LoadHwi failure, lib path:%{public}s",
-            DISPLAY_BUFFER_HWI_LIBRARY_PATH);
+        HDF_LOGE("error: LoadHwi failure, lib path:%{public}s", DISPLAY_BUFFER_HWI_LIBRARY_PATH);
     }
 }
 
@@ -57,23 +53,21 @@ AllocatorInterfaceService::~AllocatorInterfaceService()
 
 int32_t AllocatorInterfaceService::LoadHwi()
 {
-    const char* errStr = dlerror();
+    const char *errStr = dlerror();
     if (errStr) {
         HDF_LOGI("warning, existing dlerror: %{public}s", errStr);
     }
     libHandle_ = dlopen(DISPLAY_BUFFER_HWI_LIBRARY_PATH, RTLD_NOW);
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 
-    createHwi_ = reinterpret_cast<Create_DisplayBufferHwiFunc_t*>(dlsym(libHandle_,
-        "Create_DisplayBufferHwi"));
+    createHwi_ = reinterpret_cast<Create_DisplayBufferHwiFunc_t *>(dlsym(libHandle_, "Create_DisplayBufferHwi"));
     errStr = dlerror();
     if (errStr) {
         HDF_LOGE("error: %{public}s", errStr);
         return HDF_FAILURE;
     }
 
-    destroyHwi_ = reinterpret_cast<Destroy_DisplayBufferHwiFunc_t*>(dlsym(libHandle_,
-        "Destroy_DisplayBufferHwi"));
+    destroyHwi_ = reinterpret_cast<Destroy_DisplayBufferHwiFunc_t *>(dlsym(libHandle_, "Destroy_DisplayBufferHwi"));
     errStr = dlerror();
     if (errStr) {
         HDF_LOGE("error: %{public}s", errStr);
@@ -83,22 +77,21 @@ int32_t AllocatorInterfaceService::LoadHwi()
     return HDF_SUCCESS;
 }
 
-int32_t AllocatorInterfaceService::AllocMem(const AllocInfo &info,
-    sptr<BufferHandleParcelable> &handle)
+int32_t AllocatorInterfaceService::AllocMem(const AllocInfo &info, sptr<BufferHandleParcelable> &handle)
 {
-    BufferHandle* buffer = nullptr;
+    BufferHandle *buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
     int32_t ec = hwiImpl_->AllocMem(info, buffer);
     if (ec == HDF_SUCCESS) {
         CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     }
-    BufferHandleParcelable* hdiBuffer = new BufferHandleParcelable(*buffer);
+    BufferHandleParcelable *hdiBuffer = new BufferHandleParcelable(*buffer);
     CHECK_NULLPOINTER_RETURN_VALUE(hdiBuffer, HDF_FAILURE);
     handle = hdiBuffer;
     return HDF_SUCCESS;
 }
 } // namespace V1_0
-} // Buffer
-} // Display
+} // namespace Buffer
+} // namespace Display
 } // namespace HDI
 } // namespace OHOS
