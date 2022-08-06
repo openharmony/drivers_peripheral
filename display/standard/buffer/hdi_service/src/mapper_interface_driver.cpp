@@ -86,7 +86,8 @@ static int HdfMapperInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-static void HdfMapperInterfaceDriverRelease(struct HdfDeviceObject *deviceObject){
+static void HdfMapperInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+{
     HDF_LOGI("HdfMapperInterfaceDriverRelease enter");
     if (deviceObject->service == nullptr) {
         HDF_LOGE("HdfMapperInterfaceDriverRelease not initted");
@@ -97,7 +98,7 @@ static void HdfMapperInterfaceDriverRelease(struct HdfDeviceObject *deviceObject
     delete hdfMapperInterfaceHost;
 }
 
-struct HdfDriverEntry g_mapperinterfaceDriverEntry = {
+static struct HdfDriverEntry g_mapperinterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "display_buffer",
     .Bind = HdfMapperInterfaceDriverBind,
@@ -105,10 +106,10 @@ struct HdfDriverEntry g_mapperinterfaceDriverEntry = {
     .Release = HdfMapperInterfaceDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 HDF_INIT(g_mapperinterfaceDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
 #endif

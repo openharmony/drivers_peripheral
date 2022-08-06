@@ -26,18 +26,18 @@ namespace HDI {
 namespace Display {
 namespace Buffer {
 namespace V1_0 {
-
 class AllocatorInterfaceService : public IAllocatorInterface {
 public:
     AllocatorInterfaceService();
     virtual ~AllocatorInterfaceService();
     int32_t AllocMem(const AllocInfo& info, sptr<BufferHandleParcelable>& handle) override;
+
 private:
     int32_t LoadHwi();
+
 private:
     void* libHandle_;
     IDisplayBufferHwi* hwiImpl_;
-
     Create_DisplayBufferHwiFunc_t* createHwi_;
     Destroy_DisplayBufferHwiFunc_t* destroyHwi_;
 };

@@ -98,7 +98,7 @@ static void HdfDisplayComposerDriverRelease(struct HdfDeviceObject *deviceObject
     delete hdfDisplayComposerHost;
 }
 
-struct HdfDriverEntry g_displaycomposerDriverEntry = {
+static struct HdfDriverEntry g_displaycomposerDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "display_composer",
     .Bind = HdfDisplayComposerDriverBind,
@@ -106,4 +106,10 @@ struct HdfDriverEntry g_displaycomposerDriverEntry = {
     .Release = HdfDisplayComposerDriverRelease,
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 HDF_INIT(g_displaycomposerDriverEntry);
+#ifdef __cplusplus
+}
+#endif

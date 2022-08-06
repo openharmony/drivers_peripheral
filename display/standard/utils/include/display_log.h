@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,47 +36,45 @@ extern "C" {
 #define DISPLAY_UNUSED(x) (void)(x)
 #endif
 
-#define __DISPLAY_FILENAME__ (strrchr(__FILE__, '/') ? (strrchr(__FILE__, '/') + 1) : __FILE__)
-
 #ifndef DISPLAY_DEBUG_ENABLE
 #define DISPLAY_DEBUG_ENABLE 1
 #endif
 
 #ifndef DISPLAY_LOGD
-#define DISPLAY_LOGD(format, ...)                                                                                     \
-    do {                                                                                                              \
-        if (DISPLAY_DEBUG_ENABLE) {                                                                                   \
-            HILOG_DEBUG(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n",                                  \
-                __FUNCTION__, __DISPLAY_FILENAME__, __LINE__,                                                                 \
-                ##__VA_ARGS__);                                                                                       \
-        }                                                                                                             \
+#define DISPLAY_LOGD(format, ...)                                                             \
+    do {                                                                                      \
+        if (DISPLAY_DEBUG_ENABLE) {                                                           \
+            HILOG_DEBUG(LOG_CORE, "[%{public}s:%{public}d] " format "\n",                     \
+                __FUNCTION__, __LINE__,                                                       \
+                ##__VA_ARGS__);                                                               \
+        }                                                                                     \
     } while (0)
 #endif
 
 #ifndef DISPLAY_LOGI
-#define DISPLAY_LOGI(format, ...)                                                                                     \
-    do {                                                                                                              \
-        HILOG_INFO(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, __DISPLAY_FILENAME__, __LINE__, \
-            ##__VA_ARGS__);                                                                                           \
+#define DISPLAY_LOGI(format, ...)                                                             \
+    do {                                                                                      \
+        HILOG_INFO(LOG_CORE, "[%{public}s:%{public}d] " format "\n",                          \
+        __FUNCTION__, __LINE__, ##__VA_ARGS__);                                               \
     } while (0)
 #endif
 
 #ifndef DISPLAY_LOGW
-#define DISPLAY_LOGW(format, ...)                                                                                     \
-    do {                                                                                                              \
-        HILOG_WARN(LOG_CORE, "[%{public}s@%{public}s:%{public}d] " format "\n", __FUNCTION__, __DISPLAY_FILENAME__, __LINE__, \
-            ##__VA_ARGS__);                                                                                           \
+#define DISPLAY_LOGW(format, ...)                                                             \
+    do {                                                                                      \
+        HILOG_WARN(LOG_CORE, "[%{public}s:%{public}d] " format "\n",                          \
+        __FUNCTION__, __LINE__, ##__VA_ARGS__);                                               \
     } while (0)
 #endif
 
 #ifndef DISPLAY_LOGE
-#define DISPLAY_LOGE(format, ...)                                 \
-    do {                                                          \
-        HILOG_ERROR(LOG_CORE,                                     \
-            "\033[0;32;31m"                                       \
-            "[%{public}s@%{public}s:%{public}d] " format "\033[m" \
-            "\n",                                                 \
-            __FUNCTION__, __DISPLAY_FILENAME__, __LINE__, ##__VA_ARGS__); \
+#define DISPLAY_LOGE(format, ...)                                         \
+    do {                                                                  \
+        HILOG_ERROR(LOG_CORE,                                             \
+            "\033[0;32;31m"                                               \
+            "[%{public}s:%{public}d] " format "\033[m"                    \
+            "\n",                                                         \
+            __FUNCTION__, __LINE__, ##__VA_ARGS__);                       \
     } while (0)
 #endif
 
@@ -111,7 +109,7 @@ extern "C" {
 #endif
 
 #ifndef DISPLAY_CHK_RETURN_NOT_VALUE
-#define DISPLAY_CHK_RETURN_NOT_VALUE(val, ...) \
+#define DISPLAY_CHK_RETURN_NOT_VALUE(val, ...)      \
     do {                                            \
         if (val) {                                  \
             __VA_ARGS__;                            \
@@ -124,4 +122,4 @@ extern "C" {
 }
 #endif
 
-#endif /* DISPLAY_LOG_H */
+#endif // DISPLAY_LOG_H

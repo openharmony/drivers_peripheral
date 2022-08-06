@@ -24,7 +24,6 @@ namespace HDI {
 namespace Display {
 namespace Buffer {
 namespace V1_0 {
-
 extern "C" IAllocatorInterface *AllocatorInterfaceImplGetInstance(void)
 {
     return new (std::nothrow) AllocatorInterfaceService();
@@ -38,7 +37,7 @@ AllocatorInterfaceService::AllocatorInterfaceService()
 {
     int32_t ret = LoadHwi();
     if (ret == HDF_SUCCESS) {
-        hwiImpl_ = createHwi_(); 
+        hwiImpl_ = createHwi_();
         CHECK_NULLPOINTER_RETURN(hwiImpl_);
     } else {
         HDF_LOGE("error: LoadHwi failure, lib path:%{public}s",
