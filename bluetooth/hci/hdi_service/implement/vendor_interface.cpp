@@ -29,7 +29,8 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
+namespace Bluetooth {
+namespace Hci {
 namespace V1_0 {
 constexpr int MAX_BUFFER_SIZE = 1024;
 bt_vendor_callbacks_t VendorInterface::vendorCallbacks_ = {
@@ -58,21 +59,21 @@ bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
     }
 
     if (channelCount == 1) {
-        auto h4 = std::make_shared<HCI::H4Protocol>(channel[0],
+        auto h4 = std::make_shared<Hci::H4Protocol>(channel[0],
             receiveCallback.onAclReceive,
             receiveCallback.onScoReceive,
             std::bind(&VendorInterface::OnEventReceived, this, std::placeholders::_1));
-        watcher_.AddFdToWatcher(channel[0], std::bind(&HCI::H4Protocol::ReadData, h4, std::placeholders::_1));
+        watcher_.AddFdToWatcher(channel[0], std::bind(&Hci::H4Protocol::ReadData, h4, std::placeholders::_1));
         hci_ = h4;
     } else {
-        auto mct = std::make_shared<HCI::MctProtocol>(channel,
+        auto mct = std::make_shared<Hci::MctProtocol>(channel,
             receiveCallback.onAclReceive,
             receiveCallback.onScoReceive,
             std::bind(&VendorInterface::OnEventReceived, this, std::placeholders::_1));
         watcher_.AddFdToWatcher(
-            channel[hci_channels_t::HCI_ACL_IN], std::bind(&HCI::MctProtocol::ReadAclData, mct, std::placeholders::_1));
+            channel[hci_channels_t::HCI_ACL_IN], std::bind(&Hci::MctProtocol::ReadAclData, mct, std::placeholders::_1));
         watcher_.AddFdToWatcher(
-            channel[hci_channels_t::HCI_EVT], std::bind(&HCI::MctProtocol::ReadEventData, mct, std::placeholders::_1));
+            channel[hci_channels_t::HCI_EVT], std::bind(&Hci::MctProtocol::ReadEventData, mct, std::placeholders::_1));
         hci_ = mct;
     }
 
@@ -82,20 +83,20 @@ bool VendorInterface::WatchHciChannel(const ReceiveCallback &receiveCallback)
 bool VendorInterface::Initialize(
     InitializeCompleteCallback initializeCompleteCallback, const ReceiveCallback &receiveCallback)
 {
-    HDF_LOGI("%{public}s, ", __func__);
+    HDF_LOGI("VendorInterface %{public}s, ", __func__);
     initializeCompleteCallback_ = initializeCompleteCallback;
     eventDataCallback_ = receiveCallback.onEventReceive;
 
-    vendorHandle_ = dlopen(VENDOR_NAME.c_str(), RTLD_NOW);
+    vendorHandle_ = dlopen(BT_VENDOR_NAME, RTLD_NOW);
     if (vendorHandle_ == nullptr) {
-        HDF_LOGE("dlopen %s failed.", VENDOR_NAME.c_str());
+        HDF_LOGE("VendorInterface dlopen %{public}s failed.", BT_VENDOR_NAME);
         return false;
     }
 
     vendorInterface_ =
-        reinterpret_cast<bt_vendor_interface_t *>(dlsym(vendorHandle_, VENDOR_INTERFACE_SYMBOL_NAME.c_str()));
+        reinterpret_cast<bt_vendor_interface_t *>(dlsym(vendorHandle_, BT_VENDOR_INTERFACE_SYMBOL_NAME));
     if (vendorInterface_ == nullptr) {
-        HDF_LOGE("dlsym %s failed.", VENDOR_INTERFACE_SYMBOL_NAME.c_str());
+        HDF_LOGE("VendorInterface dlsym %{public}s failed.", BT_VENDOR_INTERFACE_SYMBOL_NAME);
         return false;
     }
 
@@ -151,7 +152,7 @@ void VendorInterface::CleanUp()
     dlclose(vendorHandle_);
 }
 
-size_t VendorInterface::SendPacket(HCI::HciPacketType type, const std::vector<uint8_t> &packet)
+size_t VendorInterface::SendPacket(Hci::HciPacketType type, const std::vector<uint8_t> &packet)
 {
     {
         std::lock_guard<std::mutex> lock(wakeupMutex_);
@@ -209,12 +210,12 @@ size_t VendorInterface::OnCmdXmitCallback(uint16_t opcode, void *buf)
     VendorInterface::GetInstance()->vendorSentOpcode_ = opcode;
 
     return VendorInterface::GetInstance()->SendPacket(
-        HCI::HCI_PACKET_TYPE_COMMAND, std::vector<uint8_t>(hdr->data, hdr->data + hdr->len));
+        Hci::HCI_PACKET_TYPE_COMMAND, std::vector<uint8_t>(hdr->data, hdr->data + hdr->len));
 }
 
 void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
 {
-    if (data[0] == HCI::HCI_EVENT_CODE_VENDOR_SPECIFIC) {
+    if (data[0] == Hci::HCI_EVENT_CODE_VENDOR_SPECIFIC) {
         size_t buffSize = sizeof(HC_BT_HDR) + data.size();
         HC_BT_HDR *buff = reinterpret_cast<HC_BT_HDR *>(new uint8_t[buffSize]);
         buff->event = data[0];
@@ -224,8 +225,8 @@ void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
         (void)memcpy_s(buff->data, buffSize - sizeof(HC_BT_HDR), data.data(), data.size());
         vendorInterface_->op(bt_opcode_t::BT_OP_EVENT_CALLBACK, buff);
         delete[] buff;
-    } else if (vendorSentOpcode_ != 0 && data[0] == HCI::HCI_EVENT_CODE_COMMAND_COMPLETE) {
-        uint8_t opcodeOffset = hci_->GetPacketHeaderInfo(HCI::HCI_PACKET_TYPE_EVENT).headerSize + 1;
+    } else if (vendorSentOpcode_ != 0 && data[0] == Hci::HCI_EVENT_CODE_COMMAND_COMPLETE) {
+        uint8_t opcodeOffset = hci_->GetPacketHeaderInfo(Hci::HCI_PACKET_TYPE_EVENT).headerSize + 1;
         uint16_t opcode = data[opcodeOffset] + (data[opcodeOffset + 1] << 0x08);
         if (opcode == vendorSentOpcode_) {
             size_t buffSize = sizeof(HC_BT_HDR) + data.size();
@@ -254,6 +255,7 @@ void VendorInterface::WatcherTimeout()
     activity_ = false;
 }
 }  // namespace V1_0
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS

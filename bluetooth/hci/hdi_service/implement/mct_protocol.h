@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BT_HAL_MCT_PROTOCOL_H
-#define BT_HAL_MCT_PROTOCOL_H
+#ifndef OHOS_HDI_BLUETOOTH_HCI_MCT_PROTOCOL_H
+#define OHOS_HDI_BLUETOOTH_HCI_MCT_PROTOCOL_H
 
 #include "hci_protocol.h"
 
@@ -22,8 +22,8 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace HCI {
+namespace Bluetooth {
+namespace Hci {
 class MctProtocol : public HciProtocol {
 public:
     MctProtocol(int fds[HCI_MAX_CHANNEL], HciDataCallback onAclReceive, HciDataCallback onScoReceive,
@@ -43,8 +43,8 @@ private:
     std::vector<uint8_t> eventPacket_;
     uint32_t eventReadLength_ = 0;
 };
-}  // namespace HCI
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS
-#endif /* BT_HAL_MCT_PROTOCOL_H */
+#endif /* OHOS_HDI_BLUETOOTH_HCI_MCT_PROTOCOL_H */
