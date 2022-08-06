@@ -136,14 +136,14 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    virtual int32_t IsSupportedAlloc(const std::vector<VerifyAllocInfo> &infos,
-                                     std::vector<bool> &supporteds) const = 0;
+    virtual int32_t IsSupportedAlloc(
+        const std::vector<VerifyAllocInfo> &infos, std::vector<bool> &supporteds) const = 0;
 };
 
-typedef IDisplayBufferHwi* Create_DisplayBufferHwiFunc_t();
-typedef void Destroy_DisplayBufferHwiFunc_t(IDisplayBufferHwi*);
-extern "C" IDisplayBufferHwi* Create_DisplayBufferHwi();
-extern "C" void Destroy_DisplayBufferHwi(IDisplayBufferHwi*);
+using IDisplayBufferHwi *Create_DisplayBufferHwiFunc_t();
+using void Destroy_DisplayBufferHwiFunc_t(IDisplayBufferHwi *hwi);
+extern "C" IDisplayBufferHwi *Create_DisplayBufferHwi();
+extern "C" void Destroy_DisplayBufferHwi(IDisplayBufferHwi *hwi);
 } // namespace V1_0
 } // namespace Buffer
 } // namespace Display

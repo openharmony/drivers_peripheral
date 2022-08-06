@@ -26,11 +26,11 @@ struct HdfAllocatorInterfaceHost {
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t AllocatorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t AllocatorInterfaceDriverDispatch(
+    struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    auto *hdfAllocatorInterfaceHost = CONTAINER_OF(client->device->service,
-        struct HdfAllocatorInterfaceHost, ioService);
+    auto *hdfAllocatorInterfaceHost =
+        CONTAINER_OF(client->device->service, struct HdfAllocatorInterfaceHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
@@ -75,8 +75,8 @@ static int HdfAllocatorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
         return HDF_FAILURE;
     }
 
-    hdfAllocatorInterfaceHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        IAllocatorInterface::GetDescriptor());
+    hdfAllocatorInterfaceHost->stub =
+        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, IAllocatorInterface::GetDescriptor());
     if (hdfAllocatorInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfAllocatorInterfaceHost;

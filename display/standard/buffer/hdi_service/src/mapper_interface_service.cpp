@@ -16,8 +16,8 @@
 #include "mapper_interface_service.h"
 #include <dlfcn.h>
 #include <hdf_base.h>
-#include "hdf_log.h"
 #include "display_log.h"
+#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -29,19 +29,15 @@ extern "C" IMapperInterface *MapperInterfaceImplGetInstance(void)
     return new (std::nothrow) MapperInterfaceService();
 }
 
-MapperInterfaceService::MapperInterfaceService()
-    : libHandle_(nullptr),
-    hwiImpl_(nullptr),
-    createHwi_(nullptr),
-    destroyHwi_(nullptr)
+MapperInterfaceService::MapperInterfaceService() :
+    libHandle_(nullptr), hwiImpl_(nullptr), createHwi_(nullptr), destroyHwi_(nullptr)
 {
     int32_t ret = LoadHwi();
     if (ret == HDF_SUCCESS) {
         hwiImpl_ = createHwi_();
         CHECK_NULLPOINTER_RETURN(hwiImpl_);
     } else {
-        HDF_LOGE("error: LoadHwi failure, lib path:%{public}s",
-            DISPLAY_BUFFER_HWI_LIBRARY_PATH);
+        HDF_LOGE("error: LoadHwi failure, lib path:%{public}s", DISPLAY_BUFFER_HWI_LIBRARY_PATH);
     }
 }
 
@@ -57,23 +53,21 @@ MapperInterfaceService::~MapperInterfaceService()
 
 int32_t MapperInterfaceService::LoadHwi()
 {
-    const char* errStr = dlerror();
+    const char *errStr = dlerror();
     if (errStr) {
         HDF_LOGI("warning, existing dlerror: %{public}s", errStr);
     }
     libHandle_ = dlopen(DISPLAY_BUFFER_HWI_LIBRARY_PATH, RTLD_NOW);
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 
-    createHwi_ = reinterpret_cast<Create_DisplayBufferHwiFunc_t*>(dlsym(libHandle_,
-        "Create_DisplayBufferHwi"));
+    createHwi_ = reinterpret_cast<Create_DisplayBufferHwiFunc_t *>(dlsym(libHandle_, "Create_DisplayBufferHwi"));
     errStr = dlerror();
     if (errStr) {
         HDF_LOGE("error: %{public}s", errStr);
         return HDF_FAILURE;
     }
 
-    destroyHwi_ = reinterpret_cast<Destroy_DisplayBufferHwiFunc_t*>(dlsym(libHandle_,
-        "Destroy_DisplayBufferHwi"));
+    destroyHwi_ = reinterpret_cast<Destroy_DisplayBufferHwiFunc_t *>(dlsym(libHandle_, "Destroy_DisplayBufferHwi"));
     errStr = dlerror();
     if (errStr) {
         HDF_LOGE("error: %{public}s", errStr);
@@ -92,7 +86,7 @@ int32_t MapperInterfaceService::FreeMem(const sptr<BufferHandleParcelable> &hand
 int32_t MapperInterfaceService::Mmap(const sptr<BufferHandleParcelable> &handle)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    void* retPtr = hwiImpl_->Mmap(*handle->GetBufferHandle());
+    void *retPtr = hwiImpl_->Mmap(*handle->GetBufferHandle());
     HDF_LOGD("%{public}s@%{public}d virAddr=%{public}p", __func__, __LINE__, handle->GetBufferHandle()->virAddr);
     CHECK_NULLPOINTER_RETURN_VALUE(retPtr, HDF_FAILURE);
     return HDF_SUCCESS;
@@ -101,7 +95,7 @@ int32_t MapperInterfaceService::Mmap(const sptr<BufferHandleParcelable> &handle)
 int32_t MapperInterfaceService::MmapCache(const sptr<BufferHandleParcelable> &handle)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    void* retPtr = hwiImpl_->MmapCache(*handle->GetBufferHandle());
+    void *retPtr = hwiImpl_->MmapCache(*handle->GetBufferHandle());
     CHECK_NULLPOINTER_RETURN_VALUE(retPtr, HDF_FAILURE);
     return HDF_SUCCESS;
 }
@@ -134,7 +128,7 @@ int32_t MapperInterfaceService::InvalidateCache(const sptr<BufferHandleParcelabl
     return ec;
 }
 } // namespace V1_0
-} // Buffer
-} // Display
+} // namespace Buffer
+} // namespace Display
 } // namespace HDI
 } // namespace OHOS

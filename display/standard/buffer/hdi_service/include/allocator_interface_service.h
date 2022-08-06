@@ -17,9 +17,9 @@
 #define OHOS_HDI_DISPLAY_BUFFER_V1_0_ALLOCATORINTERFACESERVICE_H
 
 #include "buffer_handle_parcelable.h"
-#include "v1_0/iallocator_interface.h"
-#include "v1_0/display_buffer_type.h"
 #include "idisplay_buffer_hwi.h"
+#include "v1_0/display_buffer_type.h"
+#include "v1_0/iallocator_interface.h"
 
 namespace OHOS {
 namespace HDI {
@@ -30,21 +30,20 @@ class AllocatorInterfaceService : public IAllocatorInterface {
 public:
     AllocatorInterfaceService();
     virtual ~AllocatorInterfaceService();
-    int32_t AllocMem(const AllocInfo& info, sptr<BufferHandleParcelable>& handle) override;
+    int32_t AllocMem(const AllocInfo &info, sptr<BufferHandleParcelable> &handle) override;
 
 private:
     int32_t LoadHwi();
 
 private:
-    void* libHandle_;
-    IDisplayBufferHwi* hwiImpl_;
-    Create_DisplayBufferHwiFunc_t* createHwi_;
-    Destroy_DisplayBufferHwiFunc_t* destroyHwi_;
+    void *libHandle_;
+    IDisplayBufferHwi *hwiImpl_;
+    Create_DisplayBufferHwiFunc_t *createHwi_;
+    Destroy_DisplayBufferHwiFunc_t *destroyHwi_;
 };
-} // V1_0
-} // Buffer
-} // Display
-} // HDI
-} // OHOS
-
+} // namespace V1_0
+} // namespace Buffer
+} // namespace Display
+} // namespace HDI
+} // namespace OHOS
 #endif // OHOS_HDI_DISPLAY_BUFFER_V1_0_ALLOCATORINTERFACESERVICE_H

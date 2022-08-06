@@ -26,8 +26,8 @@ struct HdfDisplayComposerHost {
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t DisplayComposerDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
-    struct HdfSBuf *reply)
+static int32_t DisplayComposerDriverDispatch(
+    struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     auto *hdfDisplayComposerHost = CONTAINER_OF(client->device->service, struct HdfDisplayComposerHost, ioService);
 
@@ -74,8 +74,8 @@ static int HdfDisplayComposerDriverBind(struct HdfDeviceObject *deviceObject)
         return HDF_FAILURE;
     }
 
-    hdfDisplayComposerHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
-        IDisplayComposer::GetDescriptor());
+    hdfDisplayComposerHost->stub =
+        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, IDisplayComposer::GetDescriptor());
     if (hdfDisplayComposerHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfDisplayComposerHost;

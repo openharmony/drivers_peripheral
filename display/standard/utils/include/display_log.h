@@ -15,10 +15,10 @@
 
 #ifndef DISPLAY_LOG_H
 #define DISPLAY_LOG_H
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 #include "hilog/log.h"
-#include "stdio.h"
+
 #ifdef HDF_LOG_TAG
 #undef HDF_LOG_TAG
 #endif
@@ -28,9 +28,9 @@ extern "C" {
 #endif
 
 #undef LOG_TAG
-#undef LOG_DOMAIN
 #define LOG_TAG "DISP"
-#define LOG_DOMAIN 0xD001400
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD002500
 
 #ifndef DISPLAY_UNUSED
 #define DISPLAY_UNUSED(x) (void)(x)
@@ -41,40 +41,36 @@ extern "C" {
 #endif
 
 #ifndef DISPLAY_LOGD
-#define DISPLAY_LOGD(format, ...)                                                             \
-    do {                                                                                      \
-        if (DISPLAY_DEBUG_ENABLE) {                                                           \
-            HILOG_DEBUG(LOG_CORE, "[%{public}s:%{public}d] " format "\n",                     \
-                __FUNCTION__, __LINE__,                                                       \
-                ##__VA_ARGS__);                                                               \
-        }                                                                                     \
+#define DISPLAY_LOGD(format, ...)                                                                                 \
+    do {                                                                                                          \
+        if (DISPLAY_DEBUG_ENABLE) {                                                                               \
+            HILOG_DEBUG(LOG_CORE, "[%{public}s:%{public}d] " format "\n", __FUNCTION__, __LINE__, ##__VA_ARGS__); \
+        }                                                                                                         \
     } while (0)
 #endif
 
 #ifndef DISPLAY_LOGI
-#define DISPLAY_LOGI(format, ...)                                                             \
-    do {                                                                                      \
-        HILOG_INFO(LOG_CORE, "[%{public}s:%{public}d] " format "\n",                          \
-        __FUNCTION__, __LINE__, ##__VA_ARGS__);                                               \
+#define DISPLAY_LOGI(format, ...)                                                                            \
+    do {                                                                                                     \
+        HILOG_INFO(LOG_CORE, "[%{public}s:%{public}d] " format "\n", __FUNCTION__, __LINE__, ##__VA_ARGS__); \
     } while (0)
 #endif
 
 #ifndef DISPLAY_LOGW
-#define DISPLAY_LOGW(format, ...)                                                             \
-    do {                                                                                      \
-        HILOG_WARN(LOG_CORE, "[%{public}s:%{public}d] " format "\n",                          \
-        __FUNCTION__, __LINE__, ##__VA_ARGS__);                                               \
+#define DISPLAY_LOGW(format, ...)                                                                            \
+    do {                                                                                                     \
+        HILOG_WARN(LOG_CORE, "[%{public}s:%{public}d] " format "\n", __FUNCTION__, __LINE__, ##__VA_ARGS__); \
     } while (0)
 #endif
 
 #ifndef DISPLAY_LOGE
-#define DISPLAY_LOGE(format, ...)                                         \
-    do {                                                                  \
-        HILOG_ERROR(LOG_CORE,                                             \
-            "\033[0;32;31m"                                               \
-            "[%{public}s:%{public}d] " format "\033[m"                    \
-            "\n",                                                         \
-            __FUNCTION__, __LINE__, ##__VA_ARGS__);                       \
+#define DISPLAY_LOGE(format, ...)                      \
+    do {                                               \
+        HILOG_ERROR(LOG_CORE,                          \
+            "\033[0;32;31m"                            \
+            "[%{public}s:%{public}d] " format "\033[m" \
+            "\n",                                      \
+            __FUNCTION__, __LINE__, ##__VA_ARGS__);    \
     } while (0)
 #endif
 
@@ -109,12 +105,12 @@ extern "C" {
 #endif
 
 #ifndef DISPLAY_CHK_RETURN_NOT_VALUE
-#define DISPLAY_CHK_RETURN_NOT_VALUE(val, ...)      \
-    do {                                            \
-        if (val) {                                  \
-            __VA_ARGS__;                            \
-            return;                                 \
-        }                                           \
+#define DISPLAY_CHK_RETURN_NOT_VALUE(val, ...) \
+    do {                                       \
+        if (val) {                             \
+            __VA_ARGS__;                       \
+            return;                            \
+        }                                      \
     } while (0)
 #endif
 
