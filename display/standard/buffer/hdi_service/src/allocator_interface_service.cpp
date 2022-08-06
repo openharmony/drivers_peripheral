@@ -29,8 +29,11 @@ extern "C" IAllocatorInterface *AllocatorInterfaceImplGetInstance(void)
     return new (std::nothrow) AllocatorInterfaceService();
 }
 
-AllocatorInterfaceService::AllocatorInterfaceService() :
-    libHandle_(nullptr), hwiImpl_(nullptr), createHwi_(nullptr), destroyHwi_(nullptr)
+AllocatorInterfaceService::AllocatorInterfaceService()
+    : libHandle_(nullptr),
+    hwiImpl_(nullptr),
+    createHwi_(nullptr),
+    destroyHwi_(nullptr)
 {
     int32_t ret = LoadHwi();
     if (ret == HDF_SUCCESS) {
