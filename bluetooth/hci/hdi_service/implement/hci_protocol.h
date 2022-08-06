@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BT_HAL_HCI_PROTOCOL_H
-#define BT_HAL_HCI_PROTOCOL_H
+#ifndef OHOS_HDI_BLUETOOTH_HCI_HCI_PROTOCOL_H
+#define OHOS_HDI_BLUETOOTH_HCI_HCI_PROTOCOL_H
 
 #include <cstdio>
 #include <vector>
@@ -23,8 +23,8 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace HCI {
+namespace Bluetooth {
+namespace Hci {
 class HciProtocol {
 public:
     using HciDataCallback = std::function<void(const std::vector<uint8_t> &data)>;
@@ -42,8 +42,8 @@ protected:
 
     static const PacketHeader header_[HCI_PACKET_TYPE_MAX];
 };
-}  // namespace HCI
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS
-#endif /* BT_HAL_HCI_PROTOCOL_H */
+#endif /* OHOS_HDI_BLUETOOTH_HCI_HCI_PROTOCOL_H */

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,39 +13,39 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HARDWARE_BT_V1_0_BTHCISERVICE_H
-#define OHOS_HARDWARE_BT_V1_0_BTHCISERVICE_H
+#ifndef OHOS_HDI_BLUETOOTH_HCI_V1_0_HCIINTERFACEIMPL_H
+#define OHOS_HDI_BLUETOOTH_HCI_V1_0_HCIINTERFACEIMPL_H
 
-#include <hdf_base.h>
-#include "ibt_hci.h"
+#include "v1_0/ihci_interface.h"
+#include "v1_0/ihci_callback.h"
 #include "remote_death_recipient.h"
 
-namespace ohos {
-namespace hardware {
-namespace bt {
-namespace v1_0 {
-class BtHciService : public IBtHci {
+namespace OHOS {
+namespace HDI {
+namespace Bluetooth {
+namespace Hci {
+namespace V1_0 {
+class HciInterfaceImpl : public IHciInterface {
 public:
-    BtHciService();
-    ~BtHciService() override;
+    HciInterfaceImpl();
+    virtual ~HciInterfaceImpl();
 
-    int32_t Init(const sptr<IBtHciCallbacks>& callbacks) override;
+    int32_t Init(const sptr<IHciCallback>& callbackObj) override;
 
     int32_t SendHciPacket(BtType type, const std::vector<uint8_t>& data) override;
 
     int32_t Close() override;
-
 private:
     void OnRemoteDied(const wptr<IRemoteObject> &object);
-
-private:
-    sptr<IBtHciCallbacks> callbacks_ = nullptr;
+    sptr<IHciCallback> callbacks_ = nullptr;
     sptr<RemoteDeathRecipient> remoteDeathRecipient_ = nullptr;
+    int32_t AddHciDeathRecipient(const sptr<IHciCallback>& callbackObj);
+    int32_t RemoveHciDeathRecipient(const sptr<IHciCallback>& callbackObj);
 };
-} // v1_0
-} // bt
-} // hardware
-} // ohos
+} // V1_0
+} // Hci
+} // Bluetooth
+} // HDI
+} // OHOS
 
-#endif // OHOS_HARDWARE_BT_V1_0_BTHCISERVICE_H
-
+#endif // OHOS_HDI_BLUETOOTH_HCI_V1_0_HCIINTERFACEIMPL_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BT_HAL_BLUETOOTH_ADDRESS_H
-#define BT_HAL_BLUETOOTH_ADDRESS_H
+#ifndef OHOS_HDI_BLUETOOTH_HCI_BLUETOOTH_ADDRESS_H
+#define OHOS_HDI_BLUETOOTH_HCI_BLUETOOTH_ADDRESS_H
 
 #include <memory>
 #include <string>
@@ -24,8 +24,8 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace V1_0 {
+namespace Bluetooth {
+namespace Hci {
 class BluetoothAddress {
 public:
     BluetoothAddress();
@@ -41,8 +41,8 @@ private:
 private:
     std::vector<uint8_t> address_;
 };
-}  // namespace V1_0
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS
-#endif
+#endif /* OHOS_HDI_BLUETOOTH_HCI_BLUETOOTH_ADDRESS_H */

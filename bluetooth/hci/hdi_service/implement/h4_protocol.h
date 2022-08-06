@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,15 +13,15 @@
  * limitations under the License.
  */
 
-#ifndef BT_HAL_H4_PROTOCOL_H
-#define BT_HAL_H4_PROTOCOL_H
+#ifndef OHOS_HDI_BLUETOOTH_HCI_H4_PROTOCOL_H
+#define OHOS_HDI_BLUETOOTH_HCI_H4_PROTOCOL_H
 
 #include "hci_protocol.h"
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace HCI {
+namespace Bluetooth {
+namespace Hci {
 class H4Protocol : public HciProtocol {
 public:
     H4Protocol(int fd, HciDataCallback onAclReceive, HciDataCallback onScoReceive, HciDataCallback onEventReceive);
@@ -42,9 +42,9 @@ private:
     std::vector<uint8_t> hciPacket_;
     uint32_t readLength_ = 0;
 };
-}  // namespace HCI
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS
 
-#endif /* BT_HAL_H4_PROTOCOL_H */
+#endif /* OHOS_HDI_BLUETOOTH_HCI_H4_PROTOCOL_H */
