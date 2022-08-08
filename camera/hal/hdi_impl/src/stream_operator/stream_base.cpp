@@ -219,7 +219,7 @@ RetCode StreamBase::StopStream()
         return RC_ERROR;
     }
 
-    if (lastRequest_->IsContinous() && !inTransitList_.empty()) {
+    if (lastRequest_ != nullptr && lastRequest_->IsContinous() && !inTransitList_.empty()) {
         std::shared_ptr<ICaptureMessage> endMessage =
             std::make_shared<CaptureEndedMessage>(streamId_, lastRequest_->GetCaptureId(),
             lastRequest_->GetEndTime(), lastRequest_->GetOwnerCount(), tunnel_->GetFrameCount());
