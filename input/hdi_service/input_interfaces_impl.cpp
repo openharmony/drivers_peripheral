@@ -18,6 +18,7 @@
 #include <hdf_log.h>
 #include <iproxy_broker.h>
 #include <mutex>
+#include <securec.h>
 #include "input_manager.h"
 #include "input_type.h"
 
@@ -122,7 +123,6 @@ void InputEventDataCallback(const InputEventPackage **pkgs, uint32_t count, uint
         tmp.push_back(InputEvents);
     }
 
-    std::lock_guard<std::mutex> lock(g_mutex);
     if (g_inputEventCallback == nullptr) {
         HDF_LOGE("%{public}s: g_inputEventCallback is nullptr", __func__);
         return;
@@ -142,7 +142,6 @@ void HotplugEventDataCallback(const InputHotPlugEvent *event)
     HotPlugEvent.devType = event->devType;
     HotPlugEvent.status = event->status;
 
-    std::lock_guard<std::mutex> lock(g_mutex);
     if (g_hotplugEventCallback == nullptr) {
         HDF_LOGE("%{public}s: g_hotplugEventCallback is nullptr", __func__);
         return;
@@ -170,8 +169,13 @@ int32_t InputInterfacesImpl::ScanInputDevice(std::vector<DevDesc> &staArr)
     }
 
     InputDevDesc staArrHdf[MAX_DEVICES];
+    int32_t ret = memset_s(staArrHdf, MAX_DEVICES * sizeof(InputDevDesc), 0, MAX_DEVICES * sizeof(InputDevDesc));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: memset failed", __func__);
+        return HDF_FAILURE;
+    }
 
-    int32_t ret = inputInterface_->iInputManager->ScanInputDevice(staArrHdf, MAX_DEVICES);
+    ret = inputInterface_->iInputManager->ScanInputDevice(staArrHdf, MAX_DEVICES);
     if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
         return HDF_FAILURE;
@@ -449,17 +453,8 @@ int32_t InputInterfacesImpl::RegisterReportCallback(uint32_t devIndex, const spt
     }
 
     if (eventPkgCallback == nullptr) {
-        HDF_LOGE("%{public}s: hotPlugCallback is null", __func__);
+        HDF_LOGE("%{public}s: eventPkgCallback is null", __func__);
         return HDF_FAILURE;
-    }
-
-    std::lock_guard<std::mutex> lock(g_mutex);
-    if (g_inputEventCallback != nullptr) {
-        sptr<IRemoteObject> lhs = OHOS::HDI::hdi_objcast<IInputCallback>(eventPkgCallback);
-        sptr<IRemoteObject> rhs = OHOS::HDI::hdi_objcast<IInputCallback>(g_inputEventCallback);
-        if (lhs == rhs) {
-            return HDF_SUCCESS;
-        }
     }
 
     int32_t ret = HDF_FAILURE;
@@ -469,6 +464,7 @@ int32_t InputInterfacesImpl::RegisterReportCallback(uint32_t devIndex, const spt
         return ret;
     }
 
+    std::lock_guard<std::mutex> lock(g_mutex);
     g_inputEventCallback = eventPkgCallback;
 
     return ret;
@@ -487,10 +483,6 @@ int32_t InputInterfacesImpl::UnregisterReportCallback(uint32_t devIndex)
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
         return ret;
     }
-
-    std::lock_guard<std::mutex> lock(g_mutex);
-    g_inputEventCallback = nullptr;
-
     return ret;
 }
 
@@ -507,7 +499,6 @@ int32_t InputInterfacesImpl::RegisterHotPlugCallback(const sptr<IInputCallback> 
         return HDF_FAILURE;
     }
 
-    std::lock_guard<std::mutex> lock(g_mutex);
     if (g_hotplugEventCallback != nullptr) {
         sptr<IRemoteObject> lhs = OHOS::HDI::hdi_objcast<IInputCallback>(hotPlugCallback);
         sptr<IRemoteObject> rhs = OHOS::HDI::hdi_objcast<IInputCallback>(g_hotplugEventCallback);
@@ -523,6 +514,7 @@ int32_t InputInterfacesImpl::RegisterHotPlugCallback(const sptr<IInputCallback> 
         return ret;
     }
 
+    std::lock_guard<std::mutex> lock(g_mutex);
     g_hotplugEventCallback = hotPlugCallback;
 
     return ret;
