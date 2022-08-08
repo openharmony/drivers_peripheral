@@ -22,9 +22,9 @@ if (defined(ohos_lite)) {
 
 if (defined(ohos_lite)) {
   ###########################LITEOS###########################
-  ###########################hdf_audio_lib_capture_test###########################
-  unittest("hdf_audio_lib_capture_test") {
-    sources = [ "//drivers/peripheral/audio/test/unittest/lib/interface_lib_capture/src/audio_adm_if_lib_capture_test.cpp" ]
+  ###########################hdf_audio_lib_render_test###########################
+  unittest("hdf_audio_lib_render_test") {
+    sources = [ "//drivers/peripheral/audio/test/unittest/supportlibs/interface_lib_render/src/audio_adm_if_lib_render_test.cpp" ]
 
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
@@ -45,7 +45,7 @@ if (defined(ohos_lite)) {
 
     deps = [
       "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
-      "//drivers/peripheral/audio/supportlibs:hdi_audio_interface_lib_capture",
+      "//drivers/peripheral/audio/supportlibs:hdi_audio_interface_lib_render",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
@@ -54,19 +54,19 @@ if (defined(ohos_lite)) {
   ###########################unittest###########################
   module_output_path = "hdf/audio"
 
-  ###########################hdf_audio_lib_capture_test###########################
-  ohos_unittest("hdf_audio_lib_capture_test") {
+  ###########################hdf_audio_lib_render_test###########################
+  ohos_unittest("hdf_audio_lib_render_test") {
     module_out_path = module_output_path
     sources = []
     include_dirs = []
     if (drivers_peripheral_audio_alsa_lib) {
-      sources += [ "//drivers/peripheral/audio/test/unittest/lib/interface_lib_capture/src/audio_alsa_if_lib_capture_test.cpp" ]
+      sources += [ "//drivers/peripheral/audio/test/unittest/supportlibs/interface_lib_render/src/audio_alsa_if_lib_render_test.cpp" ]
       include_dirs += [
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
         "//third_party/alsa-lib/include",
       ]
     } else {
-      sources += [ "//drivers/peripheral/audio/test/unittest/lib/interface_lib_capture/src/audio_adm_if_lib_capture_test.cpp" ]
+      sources += [ "//drivers/peripheral/audio/test/unittest/supportlibs/interface_lib_render/src/audio_adm_if_lib_render_test.cpp" ]
       include_dirs +=
           [ "//drivers/peripheral/audio/supportlibs/adm_adapter/include" ]
     }
@@ -80,7 +80,7 @@ if (defined(ohos_lite)) {
     ]
 
     deps = [
-      "//drivers/peripheral/audio/supportlibs:hdi_audio_interface_lib_capture",
+      "//drivers/peripheral/audio/supportlibs:hdi_audio_interface_lib_render",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
@@ -91,8 +91,6 @@ if (defined(ohos_lite)) {
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",
       ]
-    } else {
-      external_deps = [ "hilog:libhilog" ]
     }
   }
 }
