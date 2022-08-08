@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <securec.h>
+#include <sys/stat.h>
 #include "codec_callback_stub.h"
 #include "codec_utils.h"
 #include "hdf_log.h"
@@ -60,6 +61,7 @@ CodecCmd g_cmd = {0};
 MpiDecLoopData g_data = {0};
 
 bool g_pktEos = false;
+int32_t g_SrcFileSize = 0;
 int32_t g_totalSrcSize = 0;
 int32_t g_totalFrames = 0;
 
@@ -322,13 +324,13 @@ void DecodeLoopHandleInput(MpiDecLoopData *g_data)
     if (ret == HDF_SUCCESS) {
         // when packet size is valid read the input binary file
         readSize = ReadInputFromFile(g_data->fpInput, readData);
+        g_totalSrcSize += readSize;
         g_pktEos = (readSize <= 0);
         if (g_pktEos) {
-            HDF_LOGD("%{public}s: client inputData reach STREAM_FLAG_EOS", __func__);
+            HDF_LOGI("%{public}s: client inputData reach STREAM_FLAG_EOS", __func__);
             inputData->flag = STREAM_FLAG_EOS;
         }
     
-        g_totalSrcSize += readSize;
         ShareMemory *sm = GetShareMemoryById(inputData->bufferId);
         memcpy_s(sm->virAddr, readSize, (uint8_t*)readData, readSize);
         inputData->buffer[0].length = readSize;
@@ -367,7 +369,7 @@ static int32_t DecodeLoop(MpiDecLoopData *g_data)
         queOutputData->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
         g_codecProxy->CodecQueueOutput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, queOutputData, QUEUE_TIME_OUT, -1);
         if (outputData->flag & STREAM_FLAG_EOS) {
-            HDF_LOGD("%{public}s: reach STREAM_FLAG_EOS, loop_end, g_totalFrames:%{public}d", __func__, g_totalFrames);
+            HDF_LOGI("%{public}s: reach STREAM_FLAG_EOS, loop_end, g_totalFrames:%{public}d", __func__, g_totalFrames);
             g_data->loop_end = 1;
         }
         OsalMemFree(queOutputData);
@@ -436,6 +438,11 @@ void RevertDecodeStep3(void)
 
 int32_t OpenFile(void)
 {
+    struct stat fileStat = {0};
+    stat(g_cmd.file_input, &fileStat);
+    g_SrcFileSize = fileStat.st_size;
+    HDF_LOGI("%{public}s: input file size %{public}d", __func__, g_SrcFileSize);
+
     g_data.fpInput = fopen(g_cmd.file_input, "rb");
     if (g_data.fpInput == NULL) {
         HDF_LOGE("%{public}s: failed to open input file %{public}s", __func__, g_cmd.file_input);
