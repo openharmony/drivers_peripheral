@@ -139,7 +139,6 @@ void AudioLogRecord(int errorLevel, const char *format, ...)
     FILE *fp = NULL;
     char timeStr[TIME_LEN];
     char fileName[FILE_NAME_LEN];
-    char pathBuf[PATH_MAX] = {'\0'};
     struct tm *tblock = NULL;
     char folderName[] = "/data/log/drivers_peripheral_audio";
     va_start(args, format);
