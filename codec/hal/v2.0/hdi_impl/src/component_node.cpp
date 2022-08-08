@@ -223,8 +223,18 @@ int32_t ComponentNode::ComponentRoleEnum(uint8_t *role, uint32_t roleLen, uint32
         HDF_LOGE("%{public}s error, ComponentRoleEnum ret err [0x%{public}x] ", __func__, err);
         return err;
     }
+
     size_t omxRoleLen = strlen((const char *)omxRole);
-    (void)memcpy_s(role, roleLen, omxRole, omxRoleLen);
+    if (omxRoleLen == 0) {
+        HDF_LOGW("%{public}s error, omxRoleLen is 0 [%{public}d] ", __func__, omxRoleLen);
+    } else {
+        int32_t ret = memcpy_s(role, roleLen, omxRole, omxRoleLen);
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s error, memcpy_s ret [%{public}d]", __func__, ret);
+            return HDF_ERR_INVALID_PARAM;
+        }
+    }
+
     return OMX_ErrorNone;
 }
 
