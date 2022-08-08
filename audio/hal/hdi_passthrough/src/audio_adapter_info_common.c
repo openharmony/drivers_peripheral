@@ -851,7 +851,10 @@ static void AudioAdaptersNamesRepair(void)
 
 static void AudioPortsNamesRepair(void)
 {
-    int i, j, adapterNum, portNum;
+    int32_t i;
+    int32_t j;
+    int32_t adapterNum;
+    uint32_t portNum;
 
     if (g_audioAdapterOut == NULL ||
         g_audioAdapterDescs == NULL || g_adapterNum <= 0) {
@@ -892,7 +895,10 @@ static void AudioAdaptersNamesRecord(void)
 
 static void AudioPortsNamesRecord(void)
 {
-    int i, j, adapterCurNum, portCurNum;
+    int32_t i;
+    int32_t j;
+    int32_t adapterCurNum;
+    uint32_t portCurNum;
 
     if (g_audioAdapterOut == NULL || g_audioAdapterDescs == NULL || g_adapterNum <= 0) {
         return;
@@ -1227,7 +1233,10 @@ int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamVal
     char *tempBuf = buffer;
     char *outPtr = NULL;
     char *inPtr = NULL;
-    while (i < MAP_MAX && ((mParaMap[i] = strtok_r(tempBuf, ";", &outPtr)) != NULL)) {
+    while (i < MAP_MAX) {
+        if ((mParaMap[i] = strtok_r(tempBuf, ";", &outPtr)) == NULL) {
+            break;
+        }
         tempBuf = mParaMap[i];
         if ((mParaMap[i] = strtok_r(tempBuf, "=", &inPtr)) != NULL) {
             ret = strncpy_s(mParamValMap[i].key, EXTPARAM_LEN - 1, mParaMap[i], strlen(mParaMap[i]) + 1);
