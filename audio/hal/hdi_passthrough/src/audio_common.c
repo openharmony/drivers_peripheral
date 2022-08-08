@@ -124,7 +124,7 @@ int32_t TimeToAudioTimeStamp(uint64_t bufferFrameSize, struct AudioTimeStamp *ti
         return HDF_FAILURE;
     }
     time->tvSec += (int64_t)(bufferFrameSize / sampleRate);
-    int64_t lastBufFrames = bufferFrameSize % ((int64_t)sampleRate);
+    int64_t lastBufFrames = (int64_t)bufferFrameSize % ((int64_t)sampleRate);
     time->tvNSec += (lastBufFrames * SEC_TO_NSEC) / ((int64_t)sampleRate);
     if (time->tvNSec >= SEC_TO_NSEC) {
         time->tvSec += 1;
@@ -147,7 +147,7 @@ void AudioLogRecord(int errorLevel, const char *format, ...)
     if (tblock == NULL) {
         return;
     }
-    int32_t ret = strftime(fileName, sizeof(fileName), "//data/log/drivers_peripheral_audio/audio_%Y%m%d_%H%M%S.log",
+    uint32_t ret = strftime(fileName, sizeof(fileName), "//data/log/drivers_peripheral_audio/audio_%Y%m%d.log",
         tblock);
     if (ret == 0) {
         return;
