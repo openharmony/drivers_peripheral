@@ -15,7 +15,6 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libthermal_interface_service_1.0") {
   include_dirs = [
-    "//base/startup/init_lite/interfaces/innerkits/include/syspara",
     "//developtools/hiperf/include",
     "//drivers/hdf_core/adapter/uhdf2/shared/include",
     "//third_party/libxml2/include",
@@ -34,8 +33,6 @@ ohos_shared_library("libthermal_interface_service_1.0") {
   ]
 
   deps = [
-    "//base/startup/init_lite/interfaces/innerkits:libbegetutil",
-    "//developtools/hiperf:hiperf_platform_common",
     "//drivers/interface/thermal/v1_0:thermal_idl_headers",
     "//third_party/libxml2:xml2",
     "//third_party/zlib:libz",
@@ -46,12 +43,14 @@ ohos_shared_library("libthermal_interface_service_1.0") {
       "drivers_interface_thermal:thermal_idl_headers",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
+      "init:libbegetutil",
       "ipc:ipc_single",
       "utils_base:utils",
     ]
   } else {
     external_deps = [
       "hilog:libhilog",
+      "init_lite:libbegetutil",
       "ipc:ipc_single",
     ]
   }
