@@ -89,8 +89,8 @@ void BufferManager<T>::ConstructTimespec(struct timespec *time, uint32_t timeout
 {
     memset_s(time, sizeof(timespec), 0, sizeof(timespec));
     clock_gettime(CLOCK_REALTIME, time);
-    time->tv_sec += timeoutMs / HDF_KILO_UNIT;
-    time->tv_nsec += (timeoutMs % HDF_KILO_UNIT) * HDF_KILO_UNIT * HDF_KILO_UNIT;
+    time->tv_sec += static_cast<int32_t>(timeoutMs) / HDF_KILO_UNIT;
+    time->tv_nsec += (static_cast<int32_t>(timeoutMs) % HDF_KILO_UNIT) * HDF_KILO_UNIT * HDF_KILO_UNIT;
     if (time->tv_nsec >= HDF_NANO_UNITS) {
         time->tv_nsec -= HDF_NANO_UNITS;
         time->tv_sec += 1;
