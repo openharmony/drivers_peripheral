@@ -38,7 +38,7 @@ constexpr off_t MISC_PARTITION_UNBOOT_SLOT_SIZE = 4;
 int32_t PartitionSlotManager::GetCurrentSlot(int32_t& numOfSlots)
 {
     HILOG_DEBUG(LOG_CORE, "%{public}s called!", __func__);
-    numOfSlots = system::GetIntParameter("ohos.boot.bootslot", 1);
+    numOfSlots = system::GetIntParameter("ohos.boot.bootslots", 1);
     char miscDev[PATH_MAX] = { 0 };
     int ret = GetBlockDevicePath("/misc", miscDev, PATH_MAX);
     if (ret != 0) {
