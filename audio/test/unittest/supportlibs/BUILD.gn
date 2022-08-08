@@ -20,7 +20,7 @@ if (defined(ohos_lite)) {
   import("//drivers/peripheral/audio/audio.gni")
 }
 
-group("lib") {
+group("interface_lib") {
   if (!defined(ohos_lite)) {
     testonly = true
   }

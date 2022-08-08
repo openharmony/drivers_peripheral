@@ -30,7 +30,7 @@ group("audiotest") {
     deps += [
       "hdi/client:hdi_client",
       "hdi/passthrough:hdi_passthrough",
-      "lib:lib",
+      "supportlibs:interface_lib",
     ]
   }
 
