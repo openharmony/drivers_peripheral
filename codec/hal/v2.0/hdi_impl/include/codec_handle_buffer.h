@@ -40,7 +40,7 @@ private:
     void ResetBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
 
 private:
-    BufferHandle *bufferHandle_;
+    BufferHandle *bufferHandle_ = nullptr;
 };
 }  // namespace Omx
 }  // namespace Codec

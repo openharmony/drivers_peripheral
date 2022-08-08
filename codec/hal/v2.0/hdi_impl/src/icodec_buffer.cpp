@@ -70,7 +70,7 @@ struct OmxCodecBuffer &ICodecBuffer::GetCodecBuffer()
 
 void ICodecBuffer::SetBufferId(int32_t bufferId)
 {
-    codecBuffer_.bufferId = bufferId;
+    codecBuffer_.bufferId = static_cast<uint32_t>(bufferId);
 }
 
 bool ICodecBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
