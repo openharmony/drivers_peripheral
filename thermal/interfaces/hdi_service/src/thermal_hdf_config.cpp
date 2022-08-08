@@ -90,27 +90,6 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string& path)
 
 void ThermalHdfConfig::ParseBaseNode(xmlNodePtr node)
 {
-    xmlChar* xmlInterval = xmlGetProp(node, BAD_CAST"interval");
-    if (xmlInterval != nullptr) {
-        this->trace_.interval = (char*)xmlInterval;
-        xmlFree(xmlInterval);
-        THERMAL_HILOGD(COMP_HDI, "interval: %{public}s", this->trace_.interval.c_str());
-    }
-
-    xmlChar* xmlRecord = xmlGetProp(node, BAD_CAST"record");
-    if (xmlRecord != nullptr) {
-        this->trace_.record = (char*)xmlRecord;
-        xmlFree(xmlRecord);
-        THERMAL_HILOGD(COMP_HDI, "record: %{public}s", this->trace_.record.c_str());
-    }
-
-    xmlChar* xmlOutpath = xmlGetProp(node, BAD_CAST"outpath");
-    if (xmlOutpath != nullptr) {
-        this->trace_.outpath = (char*)xmlOutpath;
-        xmlFree(xmlOutpath);
-        THERMAL_HILOGD(COMP_HDI, "outpath: %{private}s", this->trace_.outpath.c_str());
-    }
-
     auto cur = node->xmlChildrenNode;
     std::vector<BaseItem> vBase;
     while (cur != nullptr) {
@@ -216,6 +195,20 @@ void ThermalHdfConfig::ParsePollingSubNode(xmlNodePtr node, XMLThermalNodeInfo& 
 
 void ThermalHdfConfig::ParseTracingNode(xmlNodePtr node)
 {
+    xmlChar* xmlInterval = xmlGetProp(node, BAD_CAST"interval");
+    if (xmlInterval != nullptr) {
+        this->trace_.interval = (char*)xmlInterval;
+        xmlFree(xmlInterval);
+        THERMAL_HILOGD(COMP_HDI, "interval: %{public}s", this->trace_.interval.c_str());
+    }
+
+    xmlChar* xmlOutpath = xmlGetProp(node, BAD_CAST"outpath");
+    if (xmlOutpath != nullptr) {
+        this->trace_.outpath = (char*)xmlOutpath;
+        xmlFree(xmlOutpath);
+        THERMAL_HILOGD(COMP_HDI, "outpath: %{private}s", this->trace_.outpath.c_str());
+    }
+
     auto cur  = node->xmlChildrenNode;
     while (cur != nullptr) {
         ParseTracingSubNode(cur);
