@@ -754,7 +754,7 @@ void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
     }
     if (errorCode == WRITE_FRAME_ERROR_CODE) {
         hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].errorCode = errorCode;
-        hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].count = hwCapture->errorLog.iter;
+        hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].count = (int32_t)hwCapture->errorLog.iter;
         hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].frames =
             hwCapture->captureParam.frameCaptureMode.frames;
         hwCapture->errorLog.iter++;
@@ -958,7 +958,7 @@ int32_t AudioCaptureReqMmapBufferInit(struct AudioHwCapture *capture, int32_t re
     }
     // formatBits Move right 3
     desc->totalBufferFrames =
-        reqSize / (capture->captureParam.frameCaptureMode.attrs.channelCount * (formatBits >> 3));
+        reqSize / (int32_t)(capture->captureParam.frameCaptureMode.attrs.channelCount * (formatBits >> 3));
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
         AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Is NULL");

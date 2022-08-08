@@ -1060,7 +1060,7 @@ int32_t AudioAdapterGetPortCapability(struct AudioAdapter *adapter, const struct
         AUDIO_FUNC_LOGE("hwAdapter portCapabilitys is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    int32_t portNum = hwAdapter->adapterDescriptor.portNum;
+    uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
     while (hwAdapterPortCapabilitys != NULL && portNum) {
         if (hwAdapterPortCapabilitys->port.portId == port->portId) {
             *capability = hwAdapterPortCapabilitys->capability;
@@ -1085,7 +1085,7 @@ int32_t AudioAdapterSetPassthroughModeExec(struct AudioHwAdapter *hwAdapter, uin
     }
     struct AudioPortAndCapability *portCapabilityTemp = hwAdapter->portCapabilitys;
     struct AudioPortCapability *portCapability = NULL;
-    int32_t portNum = hwAdapter->adapterDescriptor.portNum;
+    uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
     while (portCapabilityTemp != NULL && portNum > 0) {
         if (portCapabilityTemp->port.portId == portId) {
             portCapability = &portCapabilityTemp->capability;
@@ -1103,7 +1103,7 @@ int32_t AudioAdapterSetPassthroughModeExec(struct AudioHwAdapter *hwAdapter, uin
         AUDIO_FUNC_LOGE("portCapability->subPorts is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    int32_t subPortNum = portCapability->subPortsNum;
+    uint32_t subPortNum = portCapability->subPortsNum;
     while (subPortCapability != NULL && subPortNum > 0) {
         if (subPortCapability->mask == mode) {
             portCapabilityTemp->mode = mode;
@@ -1165,7 +1165,7 @@ int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struc
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioPortAndCapability *portCapabilitys = hwAdapter->portCapabilitys;
-    int32_t portNum = hwAdapter->adapterDescriptor.portNum;
+    uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
     while (portCapabilitys != NULL && portNum > 0) {
         if (portCapabilitys->port.portId == port->portId) {
             *mode = portCapabilitys->mode;
