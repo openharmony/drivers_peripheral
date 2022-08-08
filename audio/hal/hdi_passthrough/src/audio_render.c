@@ -790,7 +790,7 @@ void LogError(AudioHandle handle, int32_t errorCode, int reason)
     }
     if (errorCode == WRITE_FRAME_ERROR_CODE) {
         hwRender->errorLog.errorDump[hwRender->errorLog.iter].errorCode = errorCode;
-        hwRender->errorLog.errorDump[hwRender->errorLog.iter].count = hwRender->errorLog.iter;
+        hwRender->errorLog.errorDump[hwRender->errorLog.iter].count = (int32_t)hwRender->errorLog.iter;
         hwRender->errorLog.errorDump[hwRender->errorLog.iter].frames = hwRender->renderParam.frameRenderMode.frames;
         hwRender->errorLog.iter++;
     }
@@ -1099,7 +1099,8 @@ int32_t AudioRenderReqMmapBufferInit(struct AudioHwRender *render,
         AUDIO_FUNC_LOGE("AudioRenderReqMmapBuffer mmap FAIL and errno is:%{public}d !", errno);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    desc->totalBufferFrames = reqSize / (render->renderParam.frameRenderMode.attrs.channelCount * (formatBits >> 3));
+    desc->totalBufferFrames = reqSize / (int32_t)(render->renderParam.frameRenderMode.attrs
+        .channelCount * (formatBits >> 3));
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
         AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
