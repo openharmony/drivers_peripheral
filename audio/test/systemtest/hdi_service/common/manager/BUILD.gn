@@ -30,6 +30,7 @@ if (!defined(ohos_lite)) {
     include_dirs = [ "//drivers/peripheral/audio/test/systemtest/common/hdi_service_common/include" ]
     if (is_standard_system) {
       external_deps = [
+        "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
       ]
