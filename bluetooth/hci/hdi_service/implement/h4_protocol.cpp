@@ -22,8 +22,8 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace HCI {
+namespace Bluetooth {
+namespace Hci {
 H4Protocol::H4Protocol(
     int fd, HciDataCallback onAclReceive, HciDataCallback onScoReceive, HciDataCallback onEventReceive)
     : hciFd_(fd), onAclReceive_(onAclReceive), onScoReceive_(onScoReceive), onEventReceive_(onEventReceive)
@@ -127,7 +127,7 @@ void H4Protocol::PacketCallback()
             break;
     }
 }
-}  // namespace HCI
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS

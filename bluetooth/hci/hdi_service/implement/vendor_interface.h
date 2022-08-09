@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BT_HAL_VENDOR_INTERFACE_H
-#define BT_HAL_VENDOR_INTERFACE_H
+#ifndef OHOS_HDI_BLUETOOTH_HCI_V1_0_VENDOR_INTERFACE_H
+#define OHOS_HDI_BLUETOOTH_HCI_V1_0_VENDOR_INTERFACE_H
 
 #include <functional>
 #include <vector>
@@ -28,12 +28,13 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
+namespace Bluetooth {
+namespace Hci {
 namespace V1_0 {
 class VendorInterface : public DelayedSingleton<VendorInterface> {
 public:
     using InitializeCompleteCallback = std::function<void(bool isSuccess)>;
-    using ReceiveDataCallback = HCI::HciProtocol::HciDataCallback;
+    using ReceiveDataCallback = Hci::HciProtocol::HciDataCallback;
     struct ReceiveCallback {
         ReceiveDataCallback onAclReceive;
         ReceiveDataCallback onScoReceive;
@@ -42,7 +43,7 @@ public:
 
     bool Initialize(InitializeCompleteCallback initializeCompleteCallback, const ReceiveCallback &receiveCallback);
     void CleanUp();
-    size_t SendPacket(HCI::HciPacketType type, const std::vector<uint8_t> &packet);
+    size_t SendPacket(Hci::HciPacketType type, const std::vector<uint8_t> &packet);
 
 private:
     static void OnInitCallback(bt_op_result_t result);
@@ -61,7 +62,7 @@ private:
     bt_vendor_interface_t *vendorInterface_ = nullptr;
     static bt_vendor_callbacks_t vendorCallbacks_;
     HciWatcher watcher_;
-    std::shared_ptr<HCI::HciProtocol> hci_ = nullptr;
+    std::shared_ptr<Hci::HciProtocol> hci_ = nullptr;
     uint16_t vendorSentOpcode_ = 0;
     uint32_t lpmTimer_ = 0;
     std::mutex wakeupMutex_;
@@ -72,7 +73,8 @@ private:
     DISALLOW_COPY_AND_MOVE(VendorInterface);
 };
 }  // namespace V1_0
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS
-#endif /* BT_HAL_VENDOR_INTERFACE_H */
+#endif /* OHOS_HDI_BLUETOOTH_HCI_V1_0_VENDOR_INTERFACE_H */

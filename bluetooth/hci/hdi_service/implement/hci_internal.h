@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef BT_HAL_HCI_INTERNAL_H
-#define BT_HAL_HCI_INTERNAL_H
+#ifndef OHOS_HDI_BLUETOOTH_HCI_HCI_INTERNAL_H
+#define OHOS_HDI_BLUETOOTH_HCI_HCI_INTERNAL_H
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace HCI {
+namespace Bluetooth {
+namespace Hci {
 enum HciPacketType : uint8_t {
     HCI_PACKET_TYPE_UNKNOWN = 0,
     HCI_PACKET_TYPE_COMMAND = 1,
@@ -37,8 +37,8 @@ struct PacketHeader {
 
 constexpr uint8_t HCI_EVENT_CODE_COMMAND_COMPLETE = 0x0E;
 constexpr uint8_t HCI_EVENT_CODE_VENDOR_SPECIFIC = 0xFF;
-}  // namespace HCI
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS
-#endif /* BT_HAL_HCI_INTERNAL_H */
+#endif /* OHOS_HDI_BLUETOOTH_HCI_HCI_INTERNAL_H */
