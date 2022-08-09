@@ -139,12 +139,14 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
             buf.index, (void*)buf.m.userptr, buf.length);
     }
 
-    auto IterMap = queueBuffers_.find(fd);
-    if (IterMap == queueBuffers_.end()) {
+    std::lock_guard<std::mutex> l(bufferLock_);
+
+    auto iterMap = queueBuffers_.find(fd);
+    if (iterMap == queueBuffers_.end()) {
         CAMERA_LOGE("std::map queueBuffers_ no fd\n");
         return RC_ERROR;
     }
-    auto& bufferMap = IterMap->second;
+    auto& bufferMap = iterMap->second;
 
     auto Iter = bufferMap.find(buf.index);
     if (Iter == bufferMap.end()) {
@@ -154,14 +156,12 @@ RetCode HosV4L2Buffers::V4L2DequeueBuffer(int fd)
 
     if (dequeueBuffer_ == nullptr) {
         CAMERA_LOGE("V4L2DequeueBuffer buf.index == %{public}d no callback\n", buf.index);
-        std::lock_guard<std::mutex> l(bufferLock_);
         bufferMap.erase(Iter);
         return RC_ERROR;
     }
 
     // callback to up
     dequeueBuffer_(Iter->second);
-    std::lock_guard<std::mutex> l(bufferLock_);
     bufferMap.erase(Iter);
 
     return RC_OK;
@@ -240,7 +240,31 @@ void HosV4L2Buffers::SetCallback(BufCallback cb)
 }
 RetCode HosV4L2Buffers::Flush(int fd)
 {
-    CAMERA_LOGE("HosV4L2Buffers::Flush\n");
+    CAMERA_LOGD("HosV4L2Buffers::Flush enter\n");
+    std::lock_guard<std::mutex> l(bufferLock_);
+
+    if (dequeueBuffer_ == nullptr) {
+        CAMERA_LOGE("HosV4L2Buffers::Flush  dequeueBuffer_ == nullptr");
+        return RC_ERROR;
+    }
+
+    auto iterMap = queueBuffers_.find(fd);
+    if (iterMap == queueBuffers_.end()) {
+        CAMERA_LOGE("HosV4L2Buffers::Flush std::map queueBuffers_ no fd");
+        return RC_ERROR;
+    }
+    auto& bufferMap = iterMap->second;
+
+    for (auto& it : bufferMap) {
+        std::shared_ptr<FrameSpec> frameSpec = it.second;
+        CAMERA_LOGD("HosV4L2Buffers::Flush throw up buffer begin, buffpool=%{public}d",
+            (int32_t)frameSpec->bufferPoolId_);
+        frameSpec->buffer_->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
+        dequeueBuffer_(frameSpec);
+        CAMERA_LOGD("HosV4L2Buffers::Flush throw up buffer end");
+    }
+
+    bufferMap.clear();
     return RC_OK;
 }
 } // namespace OHOS::Camera

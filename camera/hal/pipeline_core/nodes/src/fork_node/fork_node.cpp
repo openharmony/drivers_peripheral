@@ -22,30 +22,49 @@ ForkNode::ForkNode(const std::string& name, const std::string& type) : NodeBase(
 
 ForkNode::~ForkNode()
 {
-    streamRunning_ = false;
-    cv_.notify_all();
-    if (forkThread_ != nullptr) {
-        CAMERA_LOGI("forkThread need join");
-        forkThread_->join();
-        forkThread_ = nullptr;
-    }
-    CAMERA_LOGI("fork Node exit.");
+    StopForkThread();
 }
 
 RetCode ForkNode::Start(const int32_t streamId)
 {
+    int32_t id = 0;
+    uint64_t bufferPoolId = 0;
+
     CAMERA_LOGI("ForkNode::Start streamId = %{public}d\n", streamId);
 
-    if (streamRunning_ == true)
+    if (streamRunning_) {
         return RC_OK;
+    }
 
     inPutPorts_ = GetInPorts();
     outPutPorts_ = GetOutPorts();
-    if (streamRunning_ == false) {
-        CAMERA_LOGI("ForkNode::Start::streamrunning = false");
-        streamRunning_ = true;
-        ForkBuffers();
+
+    for (auto& in : inPutPorts_) {
+        for (auto& out : outPutPorts_) {
+            if (out->format_.streamId_ != in->format_.streamId_) {
+                id = out->format_.streamId_;
+                bufferPoolId = out->format_.bufferPoolId_;
+                CAMERA_LOGI("fork buffer get buffer streamId = %{public}d", out->format_.streamId_);
+            }
+        }
     }
+
+    BufferManager* bufferManager = Camera::BufferManager::GetInstance();
+    if (bufferManager == nullptr) {
+        CAMERA_LOGE("fork buffer get instance failed");
+        return RC_ERROR;
+    }
+
+    bufferPool_ = bufferManager->GetBufferPool(bufferPoolId);
+    if (bufferPool_ == nullptr) {
+        CAMERA_LOGE("get bufferpool failed: %{public}zu", bufferPoolId);
+        return RC_ERROR;
+    }
+
+    streamId_ = id;
+    RunForkThread();
+    streamRunning_ = true;
+
     return RC_OK;
 }
 
@@ -53,19 +72,25 @@ RetCode ForkNode::Stop(const int32_t streamId)
 {
     CAMERA_LOGI("ForkNode::Stop streamId = %{public}d\n", streamId);
 
-    streamRunning_ = false;
-    cv_.notify_all();
-    if (forkThread_ != nullptr) {
-        CAMERA_LOGI("ForkNode::Stop need join");
-        forkThread_->join();
-        forkThread_ = nullptr;
+    if (!streamRunning_) {
+        return RC_OK;
     }
+
+    StopForkThread();
+    DrainForkBufferPool();
+
+    streamRunning_ = false;
+
     return RC_OK;
 }
 
 RetCode ForkNode::Flush(const int32_t streamId)
 {
-    CAMERA_LOGI("ForkNode::Flush streamId = %{public}d\n", streamId);
+    if (streamId_ == streamId) {
+        StopForkThread();
+        DrainForkBufferPool();
+    }
+
     return RC_OK;
 }
 
@@ -75,12 +100,24 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
         CAMERA_LOGE("frameSpec is null");
         return;
     }
-    int32_t id = buffer->GetStreamId();
-    {
+
+    if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK && bufferPool_ != nullptr) {
         std::unique_lock <std::mutex> lck(mtx_);
-        tmpBuffer_ = buffer;
-        cv_.notify_one();
+        // If previous pending buffer was not handled, do not replace it.
+        if (pendingBuffer_ == nullptr) {
+            pendingBuffer_ = bufferPool_->AcquireBuffer(0);
+            if (pendingBuffer_ != nullptr) {
+                if (memcpy_s(pendingBuffer_->GetVirAddress(), pendingBuffer_->GetSize(),
+                    buffer->GetVirAddress(), buffer->GetSize()) != 0) {
+                    pendingBuffer_->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
+                    CAMERA_LOGE("memcpy_s failed.");
+                }
+                cv_.notify_all();
+            }
+        }
     }
+
+    int32_t id = buffer->GetStreamId();
     for (auto& it : outPutPorts_) {
         if (it->format_.streamId_ == id) {
             it->DeliverBuffer(buffer);
@@ -120,39 +157,47 @@ RetCode ForkNode::CancelCapture(const int32_t streamId)
     return RC_OK;
 }
 
-void ForkNode::ForkBuffers()
+void ForkNode::RunForkThread()
 {
-    int32_t id = 0;
-    uint64_t bufferPoolId = 0;
-    for (auto& in : inPutPorts_) {
-        for (auto& out : outPutPorts_) {
-            if (out->format_.streamId_ != in->format_.streamId_) {
-                id = out->format_.streamId_;
-                bufferPoolId = out->format_.bufferPoolId_;
-                CAMERA_LOGI("fork buffer get buffer streamId = %{public}d", out->format_.streamId_);
-            }
-        }
+    if (forkThread_ != nullptr) {
+        CAMERA_LOGI("Fork thread is running.");
+        return;
     }
-    forkThread_ = std::make_shared<std::thread>([this, id, bufferPoolId] {
-        prctl(PR_SET_NAME, "fork_buffers");
-        std::shared_ptr<FrameSpec> frameSpec = std::make_shared<FrameSpec>();
+
+    forkThreadRunFlag_ = true;
+
+    forkThread_ = std::make_shared<std::thread>([this] {
+        prctl(PR_SET_NAME, "deliver_fork_buffers");
         std::shared_ptr<IBuffer> buffer = nullptr;
-        while (streamRunning_ == true) {
-            if (CopyBuffer(bufferPoolId, buffer) != RC_OK) {
-                continue;
+        int32_t id = streamId_;
+
+        while (true) {
+            {
+                std::unique_lock <std::mutex> lck(mtx_);
+                // Break the loop when stream was stopped and there was no pending buffer.
+                if (!forkThreadRunFlag_ && (pendingBuffer_ == nullptr)) {
+                    break;
+                }
+
+                if (pendingBuffer_ == nullptr) {
+                    cv_.wait(lck);
+                    continue; // rewind to the front of loop to check breaking condition.
+                }
+                // go ahead to deliver buffer.
+                buffer = pendingBuffer_;
+                pendingBuffer_ = nullptr;
             }
+
             for (auto& it : outPutPorts_) {
                 if (it->format_.streamId_ == id) {
-                    CAMERA_LOGI("fork node deliver buffer streamid = %{public}d", it->format_.streamId_);
+                    CAMERA_LOGI("fork node deliver buffer streamid = %{public}d begin", it->format_.streamId_);
 
                     int32_t id = buffer->GetStreamId();
                     {
                         std::lock_guard<std::mutex> l(requestLock_);
                         CAMERA_LOGV("ForkNode::deliver a buffer to stream id:%{public}d, queue size:%{public}u",
                             id, captureRequests_[id].size());
-                        if (captureRequests_.count(id) == 0) {
-                            buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
-                        } else if (captureRequests_[id].empty()) {
+                        if (captureRequests_.count(id) == 0 || captureRequests_[id].empty()) {
                             buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
                         } else {
                             buffer->SetCaptureId(captureRequests_[id].front());
@@ -164,44 +209,42 @@ void ForkNode::ForkBuffers()
                 }
             }
         }
-        CAMERA_LOGI("fork thread closed");
+	CAMERA_LOGI("ForkNode RunForkThread closed");
         return RC_OK;
     });
     return;
 }
 
-RetCode ForkNode::CopyBuffer(uint64_t poolId, std::shared_ptr<IBuffer>& buffer)
+void ForkNode::StopForkThread()
 {
-    BufferManager* bufferManager = Camera::BufferManager::GetInstance();
-    CHECK_IF_PTR_NULL_RETURN_VALUE(bufferManager, RC_ERROR);
-    std::unique_lock <std::mutex> lck(mtx_);
-    cv_.wait(lck);
-
-    if (tmpBuffer_ == nullptr) {
-        CAMERA_LOGE("tempBuffer_ is null");
-        return RC_ERROR;
+    if (forkThread_ != nullptr) {
+        {
+            std::unique_lock <std::mutex> lck(mtx_);
+            forkThreadRunFlag_ = false;
+            cv_.notify_all();
+        }
+        forkThread_->join();
+        forkThread_ = nullptr;
     }
-
-    std::shared_ptr<IBufferPool> bufferPool = bufferManager->GetBufferPool(poolId);
-    if (bufferPool == nullptr) {
-        CAMERA_LOGE("get bufferpool failed");
-        return RC_ERROR;
-    }
-    CAMERA_LOGI("fork node acquirebuffer enter");
-    buffer = bufferPool->AcquireBuffer();
-    CAMERA_LOGI("fork node acquirebuffer exit");
-    if (buffer == nullptr) {
-        CAMERA_LOGE("acquire buffer failed.");
-        return RC_ERROR;
-    }
-    if (memcpy_s(buffer->GetVirAddress(), buffer->GetSize(),
-        tmpBuffer_->GetVirAddress(), tmpBuffer_->GetSize()) != 0) {
-            CAMERA_LOGE("memcpy_s failed.");
-    }
-    buffer->SetEsFrameSize(buffer->GetSize());
-    buffer->SetEsTimestamp(tmpBuffer_->GetEsFrameInfo().timestamp);
-    return RC_OK;
 }
 
+void ForkNode::DrainForkBufferPool()
+{
+    // Drain all buffers from Buffer Pool to Stream Tunnel.
+    if (bufferPool_ != nullptr) {
+        std::shared_ptr<IBuffer> buffer = nullptr;
+
+        while ((buffer = bufferPool_->AcquireBuffer(0)) != nullptr) {
+            buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
+
+            for (auto& it : outPutPorts_) {
+                if (it->format_.streamId_ == streamId_) {
+                    it->DeliverBuffer(buffer);
+                    break;
+                }
+            }
+        }
+    }
+}
 REGISTERNODE(ForkNode, {"fork"})
 } // namespace OHOS::Camera
