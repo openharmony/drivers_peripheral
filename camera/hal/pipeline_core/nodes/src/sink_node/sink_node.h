@@ -15,10 +15,10 @@
 #define HOS_CAMERA_SINK_NODE_H
 
 #include <vector>
-#include "device_manager_adapter.h"
-#include "utils.h"
 #include "camera.h"
+#include "device_manager_adapter.h"
 #include "node_base.h"
+#include "utils.h"
 
 namespace OHOS::Camera {
 class SinkNode : virtual public NodeBase {
@@ -34,7 +34,7 @@ public:
     }
 
 protected:
-    BufferCb  cb_;
+    BufferCb cb_;
 };
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera
 #endif
