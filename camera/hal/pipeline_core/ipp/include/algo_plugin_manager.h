@@ -18,8 +18,6 @@
 
 #include "algo_plugin.h"
 #include "camera.h"
-#include "memory.h"
-#include <list>
 #include "ipp_algo_parser.h"
 
 namespace OHOS::Camera {
