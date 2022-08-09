@@ -295,7 +295,7 @@ HWTEST_F(AudioProxyAdapterTest, AdapterSetPassthroughMode_003, TestSize.Level1)
     port.portId = 0;
     port.portName = "AOP";
     int32_t ret = AudioProxyAdapterSetPassthroughMode(adapter, &port, PORT_PASSTHROUGH_LPCM);
-    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 
 HWTEST_F(AudioProxyAdapterTest, AdapterSetPassthroughMode_004, TestSize.Level1)

@@ -1005,7 +1005,8 @@ int32_t AudioProxyRenderDrainBuffer(struct AudioRender *render, enum AudioDrainN
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
     }
-    if (render == NULL) {
+    if (render == NULL || type == NULL) {
+        AUDIO_FUNC_LOGE("The hwRender parameter is empty");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct HdfSBuf *data = NULL;
