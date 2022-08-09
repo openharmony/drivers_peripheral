@@ -27,6 +27,7 @@ ohos_systemtest("hdf_audio_idlhdi_render_hardware_dependence_test") {
   include_dirs = [ "//drivers/peripheral/audio/test/systemtest/common/hdi_service_common/include" ]
 
   external_deps = [
+    "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
   ]

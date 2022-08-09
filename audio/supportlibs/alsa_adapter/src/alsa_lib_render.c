@@ -14,7 +14,9 @@
  */
 
 #include "alsa_lib_render.h"
+#include "audio_common.h"
 #include "osal_mem.h"
+#include "securec.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 

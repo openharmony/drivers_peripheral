@@ -25,6 +25,7 @@
 #include <unistd.h>
 #include "hdf_base.h"
 #include "hdf_io_service_if.h"
+#include "hdf_remote_adapter_if.h"
 #include "hdf_service_status.h"
 #include "inttypes.h"
 #include "ioservstat_listener.h"
@@ -803,6 +804,9 @@ int32_t GetManagerAndLoadAdapter(const char *adapterNameCase, struct AudioPort *
     if (getAudioManager == NULL) {
         return HDF_FAILURE;
     }
+
+    (void)HdfRemoteGetCallingPid();
+
     struct AudioManager *audioManager = getAudioManager("idl_audio_service");
     if (audioManager == NULL) {
         AUDIO_FUNC_LOGE("Get audio Manager Fail");

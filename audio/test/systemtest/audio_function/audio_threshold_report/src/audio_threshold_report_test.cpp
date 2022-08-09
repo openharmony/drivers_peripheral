@@ -15,6 +15,7 @@
 
 #include "hdf_audio_events.h"
 #include "hdf_io_service_if.h"
+#include "hdf_remote_adapter_if.h"
 #include "hdf_service_status.h"
 #include "ioservstat_listener.h"
 #include "servstat_listener_hdi.h"
@@ -60,6 +61,7 @@ void AudioThresholdReportTest::SetUpTestCase(void)
     ASSERT_NE(nullptr, path);
     handleSo = dlopen(absPath, RTLD_LAZY);
     ASSERT_NE(nullptr, handleSo);
+    (void)HdfRemoteGetCallingPid();
     GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
     ASSERT_NE(nullptr, GetAudioManager);
     manager = GetAudioManager();

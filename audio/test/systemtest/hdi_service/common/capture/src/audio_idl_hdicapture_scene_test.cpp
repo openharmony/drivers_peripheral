@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "hdf_remote_adapter_if.h"
 #include "hdi_service_common.h"
 
 using namespace std;
@@ -55,6 +56,7 @@ void AudioIdlHdiCaptureSceneTest::SetUpTestCase(void)
     ASSERT_NE(nullptr, handleSo);
     GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handleSo, FUNCTION_NAME.c_str()));
     ASSERT_NE(nullptr, GetAudioManager);
+    (void)HdfRemoteGetCallingPid();
     manager = GetAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
     AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
