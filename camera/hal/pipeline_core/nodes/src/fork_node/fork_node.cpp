@@ -176,6 +176,12 @@ RetCode ForkNode::CopyBuffer(uint64_t poolId, std::shared_ptr<IBuffer>& buffer)
     CHECK_IF_PTR_NULL_RETURN_VALUE(bufferManager, RC_ERROR);
     std::unique_lock <std::mutex> lck(mtx_);
     cv_.wait(lck);
+
+    if (tmpBuffer_ == nullptr) {
+        CAMERA_LOGE("tempBuffer_ is null");
+        return RC_ERROR;
+    }
+
     std::shared_ptr<IBufferPool> bufferPool = bufferManager->GetBufferPool(poolId);
     if (bufferPool == nullptr) {
         CAMERA_LOGE("get bufferpool failed");
