@@ -14,10 +14,9 @@
 #ifndef NODE_BASE_H
 #define NODE_BASE_H
 
-#include <atomic>
-#include "inode.h"
 #include "buffer_manager.h"
 #include "idevice_manager.h"
+#include "inode.h"
 
 namespace OHOS::Camera {
 class PortBase : public IPort {

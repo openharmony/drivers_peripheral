@@ -16,7 +16,6 @@
 
 #include "ipp_algo_parser.h"
 #include "hcs_dm_parser.h"
-#include <cstdlib>
 
 #define ENUM_TO_STRING(e) #e
 
