@@ -1382,6 +1382,82 @@ HWTEST_F(WifiHalTest, SendCmdIoctl002, TestSize.Level1)
 }
 
 /**
+ * @tc.name: GetStationInfo001
+ * @tc.desc: Wifi hdi get station information function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, GetStationInfo001, TestSize.Level1)
+{
+    int32_t ret;
+    StationInfo info;
+    bool flag;
+    uint8_t mac[ETH_ADDR_LEN] = {0};
+    struct IWiFiAp *apFeature = nullptr;
+    const char *ifName = "wlan0";
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(nullptr, nullptr, nullptr, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(ifName, nullptr, nullptr, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(nullptr, &info, nullptr, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(nullptr, nullptr, mac, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(ifName, &info, nullptr, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(nullptr, &info, mac, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(ifName, nullptr, mac, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(ifName, &info, mac, ETH_ADDR_LEN);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: GetStationInfo002
+ * @tc.desc: Wifi hdi get station information function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, GetStationInfo002, TestSize.Level1)
+{
+    int32_t ret;
+    StationInfo info;
+    bool flag;
+    uint8_t mac[ETH_ADDR_LEN] = {0};
+    struct IWiFiSta *staFeature = nullptr;
+    const char *ifName = "wlan0";
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(nullptr, nullptr, nullptr, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(ifName, nullptr, nullptr, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(nullptr, &info, nullptr, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(nullptr, nullptr, mac, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(ifName, &info, nullptr, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(nullptr, &info, mac, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(ifName, nullptr, mac, ETH_ADDR_LEN);
+    EXPECT_NE(ret, HDF_SUCCESS);
+    ret = g_wifi->getStationInfo(ifName, &info, mac, ETH_ADDR_LEN);
+    flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
  * @tc.name: ResetDriver001
  * @tc.desc: wifi hal reset driver function test
  * @tc.type: FUNC
