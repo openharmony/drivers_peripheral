@@ -248,6 +248,18 @@ typedef struct {
     int8_t buf[0];
 } ProjScrnCmdParam;
 
+typedef struct {
+    uint32_t rxRate;
+    uint32_t txRate;
+    uint32_t flags; /* bitfield of STA_DRV_DATA_* */
+    uint8_t rxVhtmcs;
+    uint8_t txVhtmcs;
+    uint8_t rxMcs;
+    uint8_t txMcs;
+    uint8_t rxVhtNss;
+    uint8_t txVhtNss;
+} __attribute__ ((aligned(8))) StationInfo;
+
 int32_t WifiDriverClientInit(void);
 void WifiDriverClientDeinit(void);
 
@@ -272,6 +284,7 @@ int32_t StartChannelMeas(const char *ifName, const struct MeasParam *measParam);
 int32_t GetChannelMeasResult(const char *ifName, struct MeasResult *measResult);
 int32_t SetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *param);
 int32_t SendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t *paramBuf, uint32_t paramBufLen);
+int32_t GetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen);
 
 /* wpa related interface */
 #define MAX_SSID_LEN 32

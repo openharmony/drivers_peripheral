@@ -57,6 +57,8 @@ int32_t WlanInterfaceGetPowerMode(struct IWlanInterface *self, const struct HdfF
 int32_t WlanInterfaceSetPowerMode(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature, uint8_t mode);
 int32_t WlanInterfaceSetProjectionScreenParam(struct IWlanInterface *self, const char *ifName,
     const struct ProjectionScreenCmdParam *param);
+int32_t WlanInterfaceGetStaInfo(struct IWlanInterface *self, const char *ifName, struct WifiStationInfo *info,
+    const uint8_t *mac, uint32_t macLen);
 int32_t WlanInterfaceWifiConstruct(void);
 int32_t WlanInterfaceWifiDestruct(void);
 #endif

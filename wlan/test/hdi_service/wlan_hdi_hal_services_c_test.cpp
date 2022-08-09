@@ -823,11 +823,31 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_036, TestSize.Level1)
     int32_t rc;
     int32_t cmdId;
     int8_t data[TEST_BUF_SIZE] = {0};
+    bool flag;
 
     for (cmdId = CMD_HID2D_MODULE_INIT; cmdId <= CMD_SET_CHAN_ADJUST; cmdId++) {
         rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, cmdId, data, TEST_BUF_SIZE);
-        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+        flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
         ASSERT_TRUE(flag);
     }
+}
+
+/**
+ * @tc.name: GetStaInfo_037
+ * @tc.desc: Wifi hdi get station information function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, GetStaInfo_037, TestSize.Level1)
+{
+    const char *ifName = "wlan0";
+    int32_t rc;
+    struct WifiStationInfo info;
+    bool flag;
+    uint8_t mac[ETH_ADDR_LEN] = {0};
+
+    rc = g_wlanObj->GetStaInfo(g_wlanObj, ifName, &info, mac, ETH_ADDR_LEN);
+    flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
 }
 };
