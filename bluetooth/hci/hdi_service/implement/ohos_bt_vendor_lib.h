@@ -111,7 +111,7 @@ typedef enum {
  */
 typedef void (*init_callback)(bt_op_result_t result);
 
-/** 
+/**
  * call the callback to malloc a size of buf.
  */
 typedef void* (*malloc_callback)(int size);
@@ -124,7 +124,7 @@ typedef void (*free_callback)(void* buf);
 /**
  *  hci command packet transmit callback
  *  Vendor lib calls cmd_xmit_cb function in order to send a HCI Command
- *  packet to BT Controller. 
+ *  packet to BT Controller.
  *
  *  The opcode parameter gives the HCI OpCode (combination of OGF and OCF) of
  *  HCI Command packet. For example, opcode = 0x0c03 for the HCI_RESET command

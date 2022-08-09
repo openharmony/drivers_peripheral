@@ -24,8 +24,8 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace HCI {
+namespace Bluetooth {
+namespace Hci {
 const PacketHeader HciProtocol::header_[HCI_PACKET_TYPE_MAX] = {
     {.headerSize = 0, .dataLengthOffset = 0, .dataLengthSize = 0}, /* HCI_PACKET_TYPE_UNKNOWN */
     {.headerSize = 3, .dataLengthOffset = 2, .dataLengthSize = 1}, /* HCI_PACKET_TYPE_COMMAND */
@@ -66,7 +66,7 @@ ssize_t HciProtocol::Write(int fd, const uint8_t *data, size_t length)
     }
     return ret;
 }
-}  // namespace HCI
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS

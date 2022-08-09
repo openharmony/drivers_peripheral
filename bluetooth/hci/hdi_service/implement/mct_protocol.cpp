@@ -22,8 +22,8 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace HCI {
+namespace Bluetooth {
+namespace Hci {
 MctProtocol::MctProtocol(int fds[HCI_MAX_CHANNEL], HciDataCallback onAclReceive, HciDataCallback onScoReceive,
     HciDataCallback onEventReceive)
 {
@@ -127,7 +127,7 @@ void MctProtocol::ReadAclData(int fd)
         }
     }
 }
-}  // namespace HCI
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS

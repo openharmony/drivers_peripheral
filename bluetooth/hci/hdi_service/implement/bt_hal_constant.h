@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BT_HAL_CONSTANT_H
-#define BT_HAL_CONSTANT_H
+#ifndef OHOS_HDI_BLUETOOTH_HCI_CONSTANT_H
+#define OHOS_HDI_BLUETOOTH_HCI_CONSTANT_H
 
 #include <string>
 
@@ -22,18 +22,16 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace V1_0 {
-static const std::string VENDOR_NAME = "libbt_vendor.z.so";
-static const std::string VENDOR_INTERFACE_SYMBOL_NAME = "BLUETOOTH_VENDOR_LIB_INTERFACE";
-
-static const std::string BT_DEVICE_ADDRESS_PATH = "/mnt/vendor/btmac.txt";
-
-static const int THREAD_POLICY = SCHED_RR;
-static const int THREAD_PRIORITY = 1;
-}  // namespace V1_0
-}  // namespace BT
+namespace Bluetooth {
+namespace Hci {
+constexpr const char *BT_VENDOR_NAME = "libbt_vendor.z.so";
+constexpr const char *BT_VENDOR_INTERFACE_SYMBOL_NAME = "BLUETOOTH_VENDOR_LIB_INTERFACE";
+constexpr const char *BT_DEVICE_ADDRESS_PATH = "/mnt/vendor/btmac.txt";
+constexpr int BT_THREAD_POLICY = SCHED_RR;
+constexpr int BT_THREAD_PRIORITY = 1;
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS
 
-#endif /* BT_HAL_CONSTANT_H */
+#endif /* OHOS_HDI_BLUETOOTH_HCI_CONSTANT_H */

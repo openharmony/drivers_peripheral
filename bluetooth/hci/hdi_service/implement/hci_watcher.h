@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BT_HAL_HCI_WATCHER_H
-#define BT_HAL_HCI_WATCHER_H
+#ifndef OHOS_HDI_BLUETOOTH_HCI_WATCHER_H
+#define OHOS_HDI_BLUETOOTH_HCI_WATCHER_H
 
 #include <atomic>
 #include <ctime>
@@ -26,8 +26,8 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace V1_0 {
+namespace Bluetooth {
+namespace Hci {
 class HciWatcher {
 public:
     using HciDataCallback = std::function<void(int fd)>;
@@ -56,8 +56,8 @@ private:
     std::mutex timeoutMutex_;
     std::thread thread_;
 };
-}  // namespace V1_0
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS
-#endif /* BT_HAL_WATCHER_H */
+#endif /* OHOS_HDI_BLUETOOTH_HCI_WATCHER_H */

@@ -24,8 +24,8 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace V1_0 {
+namespace Bluetooth {
+namespace Hci {
 namespace {
 constexpr int ADDRESS_STR_LEN = 17;
 constexpr int ADDRESS_SIZE = 6;
@@ -126,7 +126,7 @@ void BluetoothAddress::ReadAddress(std::string &address) const
         offset += ret;
     }
 }
-}  // namespace V1_0
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS

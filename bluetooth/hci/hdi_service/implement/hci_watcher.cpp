@@ -23,8 +23,8 @@
 
 namespace OHOS {
 namespace HDI {
-namespace BT {
-namespace V1_0 {
+namespace Bluetooth {
+namespace Hci {
 HciWatcher::HciWatcher()
 {}
 
@@ -79,8 +79,8 @@ bool HciWatcher::Start()
         return false;
     }
 
-    int policy = THREAD_POLICY;
-    sched_param params = {.sched_priority = THREAD_PRIORITY};
+    int policy = BT_THREAD_POLICY;
+    sched_param params = {.sched_priority = BT_THREAD_PRIORITY};
     if (pthread_setschedparam(thread_.native_handle(), policy, &params)) {
         HDF_LOGW("pthread_setschedparam failed tid[%lu] policy[%d]", thread_.native_handle(), policy);
     }
@@ -162,7 +162,7 @@ void HciWatcher::ThreadWakeup()
     uint8_t buff = 0;
     TEMP_FAILURE_RETRY(write(wakeupPipe_[1], &buff, sizeof(buff)));
 }
-}  // namespace V1_0
-}  // namespace BT
+}  // namespace Hci
+}  // namespace Bluetooth
 }  // namespace HDI
 }  // namespace OHOS
