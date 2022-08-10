@@ -105,13 +105,6 @@ void DMetadataProcessor::InitDcameraBaseAbility()
     const uint8_t aeMode = OHOS_CAMERA_AE_MODE_OFF;
     AddAbilityEntry(OHOS_CONTROL_AE_MODE, &aeMode, 1);
 
-    std::vector<int32_t> fpsRanges;
-    fpsRanges.push_back(MIN_SUPPORT_DEFAULT_FPS);
-    fpsRanges.push_back(MAX_SUPPORT_DEFAULT_FPS);
-    AddAbilityEntry(OHOS_CONTROL_AE_TARGET_FPS_RANGE, fpsRanges.data(), fpsRanges.size());
-
-    AddAbilityEntry(OHOS_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES, fpsRanges.data(), fpsRanges.size());
-
     const uint8_t afMode = OHOS_CAMERA_AF_MODE_OFF;
     AddAbilityEntry(OHOS_CONTROL_AF_MODE, &afMode, 1);
 
@@ -150,6 +143,16 @@ void DMetadataProcessor::InitDcameraBaseAbility()
 
     const uint8_t deviceFocusModes = OHOS_CAMERA_FOCUS_MODE_AUTO;
     AddAbilityEntry(OHOS_ABILITY_DEVICE_AVAILABLE_FOCUSMODES, &deviceFocusModes, 1);
+    SetFpsRanges();
+}
+
+void DMetadataProcessor::SetFpsRanges()
+{
+    std::vector<int32_t> fpsRanges;
+    fpsRanges.push_back(MIN_SUPPORT_DEFAULT_FPS);
+    fpsRanges.push_back(MAX_SUPPORT_DEFAULT_FPS);
+    AddAbilityEntry(OHOS_CONTROL_AE_TARGET_FPS_RANGE, fpsRanges.data(), fpsRanges.size());
+    AddAbilityEntry(OHOS_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES, fpsRanges.data(), fpsRanges.size());
 }
 
 DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string &abilityInfo)
