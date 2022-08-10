@@ -21,7 +21,7 @@
 
 namespace {
 #define ALIGN_UP(x, a) ((((x) + ((a)-1)) / (a)) * (a))
-#define WIDTH_ALIGN 8U
+static constexpr uint8_t WIDTH_ALIGN = 8;
 
 const AllocTestPrms GRALLOC_TEST_SETS[] = {
     {
