@@ -38,6 +38,7 @@ ohos_shared_library("libwlan_service_extend") {
     "-fsigned-char",
     "-fno-common",
     "-fno-strict-aliasing",
+    "-fstack-protector-all",
   ]
 
   if (is_standard_system) {
