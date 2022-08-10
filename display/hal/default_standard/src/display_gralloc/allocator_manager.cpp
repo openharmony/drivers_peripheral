@@ -50,7 +50,9 @@ int32_t AllocatorManager::Init()
     }
 
     init_ = true;
-    DISPLAY_LOGD("init success");
+    std::lock_guard lock(allocMutex_);
+    this->referCount_++;
+    DISPLAY_LOGD("init success, referCount_ = %{public}d", this->referCount_);
     return DISPLAY_SUCCESS;
 }
 
@@ -58,8 +60,13 @@ int32_t AllocatorManager::DeInit()
 {
     DISPLAY_LOGD();
     init_ = false;
-    frameBufferAllocator_.reset();
-    allocator_.reset();
+    std::lock_guard lock(allocMutex_);
+    this->referCount_--;
+    if (this->referCount_ < 0) {
+        frameBufferAllocator_.reset();
+        allocator_.reset();
+    }
+    DISPLAY_LOGD("DeInit success, referCount_ = %{public}d", this->referCount_);
     return DISPLAY_SUCCESS;
 }
 

@@ -15,6 +15,7 @@
 #ifndef ALLOCATOR_MANAGER_H
 #define ALLOCATOR_MANAGER_H
 #include <memory>
+#include <mutex>
 #include "allocator.h"
 namespace OHOS {
 namespace HDI {
@@ -34,6 +35,8 @@ private:
     bool init_ = false;
     std::shared_ptr<Allocator> frameBufferAllocator_ = nullptr;
     std::shared_ptr<Allocator> allocator_ = nullptr;
+    int32_t referCount_ = 0;
+    std::mutex allocMutex_;
 };
 }
 }
