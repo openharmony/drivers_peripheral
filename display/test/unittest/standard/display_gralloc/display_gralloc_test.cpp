@@ -18,9 +18,11 @@
 #include "gtest/gtest.h"
 #include "display_gralloc.h"
 #include "display_test.h"
-#include "hi_gbm_internal.h"
 
 namespace {
+#define ALIGN_UP(x, a) ((((x) + ((a)-1)) / (a)) * (a))
+#define WIDTH_ALIGN 8U
+
 const AllocTestPrms GRALLOC_TEST_SETS[] = {
     {
         .allocInfo = {
@@ -184,8 +186,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCBCR_420_SP
         },
-        .expectStride = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN),
-        .expectSize = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN) * 1920,
+        .expectStride = ALIGN_UP(1080, WIDTH_ALIGN),
+        .expectSize = (ALIGN_UP(1080, WIDTH_ALIGN) * 1920) * 3 / 2,
     },
 
     {
@@ -195,8 +197,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCRCB_420_SP
         },
-        .expectStride = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN),
-        .expectSize = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN) * 1920,
+        .expectStride = ALIGN_UP(1080, WIDTH_ALIGN),
+        .expectSize = (ALIGN_UP(1080, WIDTH_ALIGN) * 1920) * 3 / 2,
     },
 
     {
@@ -206,8 +208,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCBCR_420_P
         },
-        .expectStride = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN),
-        .expectSize = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN) * 1920,
+        .expectStride = ALIGN_UP(1080, WIDTH_ALIGN),
+        .expectSize = (ALIGN_UP(1080, WIDTH_ALIGN) * 1920) * 3 / 2,
     },
 
     {
@@ -217,8 +219,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCRCB_420_P
         },
-        .expectStride = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN),
-        .expectSize = ALIGN_UP(1080 * 3 / 2, WIDTH_ALIGN) * 1920,
+        .expectStride = ALIGN_UP(1080, WIDTH_ALIGN),
+        .expectSize = (ALIGN_UP(1080, WIDTH_ALIGN) * 1920) * 3 / 2,
     },
 
     {

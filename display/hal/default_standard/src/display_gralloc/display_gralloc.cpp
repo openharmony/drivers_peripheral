@@ -22,42 +22,54 @@ static int32_t AllocMem(const AllocInfo *info, BufferHandle **handle)
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((info == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("info is nullptr"));
     DISPLAY_CHK_RETURN((handle == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("handle is nullptr"));
-    return AllocatorManager::GetInstance().GetAllocator(info->usage)->AllocMem(*info, handle);
+    Allocator* allocPtr = AllocatorManager::GetInstance().GetAllocator(info->usage);
+    CHECK_NULLPOINTER_RETURN_VALUE(allocPtr, DISPLAY_NULL_PTR);
+    return allocPtr->AllocMem(*info, handle);
 }
 
 static void FreeMem(BufferHandle *handle)
 {
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN_NOT_VALUE((handle == nullptr), DISPLAY_LOGE("handle is nullptr"));
-    AllocatorManager::GetInstance().GetAllocator(handle->usage)->FreeMem(handle);
+    Allocator* allocPtr = AllocatorManager::GetInstance().GetAllocator(handle->usage);
+    CHECK_NULLPOINTER_RETURN(allocPtr);
+    allocPtr->FreeMem(handle);
 }
 
 static void *Mmap(BufferHandle *handle)
 {
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((handle == nullptr), nullptr, DISPLAY_LOGE("handle is nullptr"));
-    return AllocatorManager::GetInstance().GetAllocator(handle->usage)->Mmap(*handle);
+    Allocator* allocPtr = AllocatorManager::GetInstance().GetAllocator(handle->usage);
+    CHECK_NULLPOINTER_RETURN_VALUE(allocPtr, nullptr);
+    return allocPtr->Mmap(*handle);
 }
 
 static int32_t Unmap(BufferHandle *handle)
 {
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((handle == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("handle is nullptr"));
-    return AllocatorManager::GetInstance().GetAllocator(handle->usage)->Unmap(*handle);
+    Allocator* allocPtr = AllocatorManager::GetInstance().GetAllocator(handle->usage);
+    CHECK_NULLPOINTER_RETURN_VALUE(allocPtr, DISPLAY_NULL_PTR);
+    return allocPtr->Unmap(*handle);
 }
 
 static int32_t FlushCache(BufferHandle *handle)
 {
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((handle == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("handle is nullptr"));
-    return AllocatorManager::GetInstance().GetAllocator(handle->usage)->FlushCache(*handle);
+    Allocator* allocPtr = AllocatorManager::GetInstance().GetAllocator(handle->usage);
+    CHECK_NULLPOINTER_RETURN_VALUE(allocPtr, DISPLAY_NULL_PTR);
+    return allocPtr->FlushCache(*handle);
 }
 
 static int32_t InvalidateCache(BufferHandle *handle)
 {
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((handle == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("handle is nullptr"));
-    return AllocatorManager::GetInstance().GetAllocator(handle->usage)->InvalidateCache(*handle);
+    Allocator* allocPtr = AllocatorManager::GetInstance().GetAllocator(handle->usage);
+    CHECK_NULLPOINTER_RETURN_VALUE(allocPtr, DISPLAY_NULL_PTR);
+    return allocPtr->InvalidateCache(*handle);
 }
 
 extern "C" {
