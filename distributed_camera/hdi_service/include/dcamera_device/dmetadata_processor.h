@@ -66,6 +66,7 @@ private:
     void* GetMetadataItemData(const camera_metadata_item_t &item);
     std::map<int, std::vector<DCResolution>> GetDCameraSupportedFormats(const std::string &abilityInfo);
     void InitDcameraBaseAbility();
+    void SetFpsRanges();
 
 private:
     std::function<void(uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)> resultCallback_;
