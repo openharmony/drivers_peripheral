@@ -116,22 +116,35 @@ static bool CodecCapabilityRangeValueUnmarshalling(struct HdfSBuf *reply, RangeV
 
 static bool CodecCapabilityPortUnmarshalling(struct HdfSBuf *reply, CodecCapability *cap)
 {
+    int32_t ret;
     if (cap->type < AUDIO_DECODER) {
         const VideoPortCap *video = (const VideoPortCap *)HdfSbufReadUnpadBuffer(reply, sizeof(VideoPortCap));
         if (video == NULL) {
             HDF_LOGE("%{public}s: read video failed!", __func__);
             return false;
         }
-        (void)memcpy_s(&cap->port, sizeof(VideoPortCap), video, sizeof(VideoPortCap));
+        ret = memcpy_s(&cap->port, sizeof(VideoPortCap), video, sizeof(VideoPortCap));
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s video failed, error code: %{public}d", __func__, ret);
+            return false;
+        }
     } else if (cap->type < INVALID_TYPE) {
         const AudioPortCap *audio = (const AudioPortCap *)HdfSbufReadUnpadBuffer(reply, sizeof(AudioPortCap));
         if (audio == NULL) {
             HDF_LOGE("%{public}s: read audio failed!", __func__);
             return false;
         }
-        (void)memcpy_s(&cap->port, sizeof(AudioPortCap), audio, sizeof(AudioPortCap));
+        ret = memcpy_s(&cap->port, sizeof(AudioPortCap), audio, sizeof(AudioPortCap));
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s audio failed, error code: %{public}d", __func__, ret);
+            return false;
+        }
     } else {
-        (void)memset_s(&cap->port, sizeof(cap->port), 0, sizeof(cap->port));
+        ret = memset_s(&cap->port, sizeof(cap->port), 0, sizeof(cap->port));
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s: memset_s cap->port failed, error code: %{public}d", __func__, ret);
+            return false;
+        }
     }
     return true;
 }
