@@ -208,6 +208,14 @@ int32_t CodecCreate(const char* name, CODEC_HANDLETYPE *handle)
     return HDF_SUCCESS;
 }
 
+int32_t CodecCreateByType(CodecType type, AvCodecMime mime, CODEC_HANDLETYPE *handle)
+{
+    (void)type;
+    (void)mime;
+    (void)handle;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
 int32_t CodecDestroy(CODEC_HANDLETYPE handle)
 {
     if (g_codecInstance == NULL || g_codecInstance->codecOemIface == NULL) {
@@ -219,12 +227,20 @@ int32_t CodecDestroy(CODEC_HANDLETYPE handle)
 
 int32_t CodecSetPortMode(CODEC_HANDLETYPE handle, DirectionType direct, AllocateBufferMode mode, BufferType type)
 {
-    return HDF_SUCCESS;
+    (void)handle;
+    (void)direct;
+    (void)mode;
+    (void)type;
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t CodecGetPortMode(CODEC_HANDLETYPE handle, DirectionType direct, AllocateBufferMode *mode, BufferType *type)
 {
-    return HDF_SUCCESS;
+    (void)handle;
+    (void)direct;
+    (void)mode;
+    (void)type;
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t CodecSetParameter(CODEC_HANDLETYPE handle, const Param *params, int32_t paramCnt)
@@ -282,6 +298,12 @@ int32_t CodecStop(CODEC_HANDLETYPE handle)
         return HDF_FAILURE;
     }
     return StopCodecInstance(g_codecInstance);
+}
+
+int32_t CodecReset(CODEC_HANDLETYPE handle)
+{
+    (void)handle;
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType)
