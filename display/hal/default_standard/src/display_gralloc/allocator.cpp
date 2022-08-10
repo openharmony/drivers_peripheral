@@ -65,6 +65,7 @@ uint32_t Allocator::UpdatePixelInfo(BufferInfo &bufferInfo)
                 bufferInfo.bitsPerPixel_ = 24; // 24 bits per pixel
                 break;
             case PIXEL_FMT_RGB_565:
+            case PIXEL_FMT_BGR_565:
             case PIXEL_FMT_BGRX_4444:
             case PIXEL_FMT_BGRA_4444:
             case PIXEL_FMT_RGBA_4444:
