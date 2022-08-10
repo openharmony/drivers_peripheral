@@ -17,6 +17,7 @@
 #define OHOS_HDI_INPUT_V1_0_INPUTCALLBACKIMPL_H
 
 #include "v1_0/iinput_callback.h"
+#include "input_interfaces_impl.h"
 
 namespace OHOS {
 namespace HDI {
@@ -24,10 +25,13 @@ namespace Input {
 namespace V1_0 {
 class InputCallbackImpl : public IInputCallback {
 public:
-    InputCallbackImpl() = default;
+    InputCallbackImpl(const wptr<IInputInterfaces> &inputInterfaces, const wptr<InputCallbackImpl> &otherCallback);
     virtual ~InputCallbackImpl() = default;
     int32_t EventPkgCallback(const std::vector<EventPackage> &pkgs, uint32_t devIndex) override;
     int32_t HotPlugCallback(const HotPlugEvent &event) override;
+private:
+    wptr<IInputInterfaces> inputInterfaces_;
+    wptr<IInputCallback> reportCallback_;
 };
 } // V1_0
 } // Input
