@@ -24,6 +24,7 @@ ohos_unittest("hdi_unittest_input") {
     "//drivers/peripheral/input/interfaces/include",
     "//drivers/peripheral/input/interfaces",
     "//third_party/FreeBSD/sys/dev/evdev",
+    "//drivers/peripheral/input/hdi_service",
   ]
 
   sources = [
