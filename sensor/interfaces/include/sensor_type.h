@@ -175,6 +175,8 @@ struct SensorInformation {
     float maxRange;       /**< Maximum measurement range of the sensor */
     float accuracy;       /**< Sensor accuracy */
     float power;          /**< Sensor power */
+    int64_t minDelay;     /**< Minimum sample period allowed in microseconds */
+    int64_t maxDelay;     /**< Maxmum sample period allowed in microseconds */
 };
 
 /**
