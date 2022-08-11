@@ -281,7 +281,7 @@ static ResultCode WritePinFile(const uint8_t *data, uint32_t dataLen, uint64_t t
 static ResultCode CoverData(const char *fileName, const FileOperator *fileOp)
 {
     uint32_t fileLen = 0;
-    ResultCode ret = fileOp->getFileLen(fileName, &fileLen);
+    ResultCode ret = (ResultCode)fileOp->getFileLen(fileName, &fileLen);
     /* The maximum length of the fileName is CONST_PIN_DATA_EXPAND_LEN */
     if (ret != RESULT_SUCCESS || fileLen > CONST_PIN_DATA_EXPAND_LEN) {
         LOG_ERROR("getFileLen fail.");
@@ -966,7 +966,7 @@ static uint64_t ExponentialFuncTime(uint32_t authErrorConut)
     return FIRST_EXPONENTIAL_PARA * ret;
 }
 
-uint64_t GetWaitTime(const uint32_t authErrorConut)
+static uint64_t GetWaitTime(const uint32_t authErrorConut)
 {
     if (authErrorConut < FIRST_ANTI_BRUTE_COUNT) {
         return 0;
@@ -1087,7 +1087,7 @@ static ResultCode UpdateAntiBruteFile(uint64_t templateId, bool authResultSucc)
     return ret;
 }
 
-static int32_t CompareData(const uint8_t *inputData, const uint32_t inputDataLen, const uint8_t *storeData,
+static ResultCode CompareData(const uint8_t *inputData, const uint32_t inputDataLen, const uint8_t *storeData,
     const uint32_t storeDataLen)
 {
     if (inputDataLen != storeDataLen) {
