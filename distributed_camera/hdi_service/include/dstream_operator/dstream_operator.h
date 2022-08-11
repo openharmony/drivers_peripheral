@@ -90,6 +90,9 @@ private:
     void ExtractCameraAttr(Json::Value &rootValue, std::set<int> &allFormats, std::vector<int> &photoFormats);
     DCamRetCode GetInputCaptureInfo(const CaptureInfo& srcCaptureInfo, bool isStreaming,
         std::shared_ptr<DCCaptureInfo>& inputCaptureInfo);
+    void AppendCaptureInfo(std::shared_ptr<DCCaptureInfo> &appendCaptureInfo, bool isStreaming,
+        std::shared_ptr<DCCaptureInfo> &inputCaptureInfo, const CaptureInfo& srcCaptureInfo);
+    int32_t HalStreamCommit(const DCStreamInfo &streamInfo);
 
 private:
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor_;

@@ -24,16 +24,22 @@ public:
 
     int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status)
     {
+        (void)cameraId;
+        (void)status;
         return 0;
     }
 
     int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status)
     {
+        (void)cameraId;
+        (void)status;
         return 0;
     }
 
     int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event)
     {
+        (void)cameraId;
+        (void)event;
         return 0;
     }
 };
@@ -45,11 +51,15 @@ public:
 
     int32_t OnError(ErrorType type, int32_t errorCode)
     {
+        (void)type;
+        (void)errorCode;
         return 0;
     }
 
     int32_t OnResult(uint64_t timestamp, const std::vector<uint8_t>& result)
     {
+        (void)timestamp;
+        (void)result;
         return 0;
     }
 };
@@ -61,21 +71,30 @@ public:
 
     int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t>& streamIds)
     {
+        (void)captureId;
+        (void)streamIds;
         return 0;
     }
 
     int32_t OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos)
     {
+        (void)captureId;
+        (void)infos;
         return 0;
     }
 
     int32_t OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos)
     {
+        (void)captureId;
+        (void)infos;
         return 0;
     }
 
     int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t>& streamIds, uint64_t timestamp)
     {
+        (void)captureId;
+        (void)streamIds;
+        (void)timestamp;
         return 0;
     }
 };
