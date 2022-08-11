@@ -53,6 +53,7 @@ private:
     DCamRetCode InitDCameraBufferManager();
     DCamRetCode GetNextRequest();
     DCamRetCode CheckRequestParam();
+    void SetSurfaceBuffer(OHOS::sptr<OHOS::SurfaceBuffer>& surfaceBuffer, const DCameraBuffer &buffer);
 
 private:
     int32_t index_ = -1;

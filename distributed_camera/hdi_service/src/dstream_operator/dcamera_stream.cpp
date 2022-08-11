@@ -281,18 +281,7 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
         .timestamp = 0
     };
     if (dcStreamProducer_ != nullptr) {
-        int64_t timeStamp = static_cast<int64_t>(GetCurrentLocalTimeStamp());
-        if (dcStreamInfo_->intent_ == StreamIntent::VIDEO) {
-            int32_t size = (dcStreamInfo_->width_) * (dcStreamInfo_->height_) * YUV_WIDTH_RATIO / YUV_HEIGHT_RATIO;
-            surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
-            surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
-            surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
-        } else if (dcStreamInfo_->intent_ == StreamIntent::STILL_CAPTURE) {
-            int32_t size = buffer.size_;
-            surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
-            surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
-            surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
-        }
+        SetSurfaceBuffer(surfaceBuffer, buffer);
         int ret = dcStreamProducer_->FlushBuffer(surfaceBuffer, fence, flushConf);
         if (ret != 0) {
             DHLOGI("FlushBuffer error: %d", ret);
@@ -304,6 +293,22 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
         cv_.notify_one();
     }
     return DCamRetCode::SUCCESS;
+}
+
+void DCameraStream::SetSurfaceBuffer(OHOS::sptr<OHOS::SurfaceBuffer>& surfaceBuffer, const DCameraBuffer &buffer)
+{
+    int64_t timeStamp = static_cast<int64_t>(GetCurrentLocalTimeStamp());
+    if (dcStreamInfo_->intent_ == StreamIntent::VIDEO) {
+        int32_t size = (dcStreamInfo_->width_) * (dcStreamInfo_->height_) * YUV_WIDTH_RATIO / YUV_HEIGHT_RATIO;
+        surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
+        surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
+        surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
+    } else if (dcStreamInfo_->intent_ == StreamIntent::STILL_CAPTURE) {
+        int32_t size = buffer.size_;
+        surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
+        surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
+        surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
+    }
 }
 
 DCamRetCode DCameraStream::FlushDCameraBuffer()
