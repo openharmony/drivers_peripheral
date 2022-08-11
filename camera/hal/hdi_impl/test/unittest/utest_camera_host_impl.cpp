@@ -18,6 +18,7 @@
 using namespace OHOS;
 using namespace testing::ext;
 using namespace OHOS::Camera;
+using namespace OHOS::HDI::Camera::V1_0;
 
 HWTEST_F(CameraHostImplTest, UTestCreateCameraHost, TestSize.Level0)
 {
@@ -42,11 +43,10 @@ HWTEST_F(CameraHostImplTest, UTestGetCameraAbility, TestSize.Level0)
     ret = GetCameraIds();
     EXPECT_EQ(true, ret);
 
-    std::shared_ptr<CameraAbility> ability = nullptr;
+    std::vector<uint8_t> ability;
     std::string cameraId = cameraIds_.front();
-    OHOS::Camera::CamRetCode rc =
-        cameraHost_->GetCameraAbility(cameraId, ability);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::NO_ERROR, rc);
+    CamRetCode rc = (CamRetCode)cameraHost_->GetCameraAbility(cameraId, ability);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 }
 
 #ifndef CAMERA_BUILT_ON_OHOS_LITE
@@ -61,15 +61,14 @@ HWTEST_F(CameraHostImplTest, UTestSetFlashlight, TestSize.Level0)
     std::shared_ptr<CameraAbility> ability = nullptr;
     std::string cameraId = cameraIds_.front();
     bool isEnable = true;
-    OHOS::Camera::CamRetCode rc =
-        cameraHost_->SetFlashlight(cameraId, isEnable);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::NO_ERROR, rc);
+    CamRetCode rc = (CamRetCode)cameraHost_->SetFlashlight(cameraId, isEnable);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 
     sleep(5);
 
     isEnable = false;
-    rc = cameraHost_->SetFlashlight(cameraId, isEnable);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::NO_ERROR, rc);
+    rc = (CamRetCode)cameraHost_->SetFlashlight(cameraId, isEnable);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 }
 #endif
 
@@ -85,11 +84,10 @@ HWTEST_F(CameraHostImplTest, UTestOpenCamera, TestSize.Level0)
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<CameraDeviceCallback> deviceCallback = std::make_shared<CameraDeviceCallback>();
 #else
-    OHOS::sptr<CameraDeviceCallback> deviceCallback = new CameraDeviceCallback();
+    sptr<ICameraDeviceCallback> deviceCallback = new DemoCameraDeviceCallback();
 #endif
-    OHOS::Camera::CamRetCode rc = cameraHost_->OpenCamera(
-        cameraId, deviceCallback, cameraDevice_);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::NO_ERROR, rc);
+    CamRetCode rc = (CamRetCode)cameraHost_->OpenCamera(cameraId, deviceCallback, cameraDevice_);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 
     if (cameraDevice_ != nullptr) {
         cameraDevice_->Close();
@@ -109,11 +107,10 @@ HWTEST_F(CameraHostImplTest, OpenCamera_CallbackIsNull, TestSize.Level0)
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<CameraDeviceCallback> deviceCallback = nullptr;
 #else
-    OHOS::sptr<CameraDeviceCallback> deviceCallback = nullptr;
+    OHOS::sptr<ICameraDeviceCallback> deviceCallback = nullptr;
 #endif
-    OHOS::Camera::CamRetCode rc = cameraHost_->OpenCamera(
-        cameraId, deviceCallback, cameraDevice_);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::INVALID_ARGUMENT, rc);
+    CamRetCode rc = (CamRetCode)cameraHost_->OpenCamera(cameraId, deviceCallback, cameraDevice_);
+    EXPECT_EQ(INVALID_ARGUMENT, rc);
 
     if (cameraDevice_ != nullptr) {
         cameraDevice_->Close();
@@ -130,11 +127,10 @@ HWTEST_F(CameraHostImplTest, OpenCamera_CameraIdIsEmpty, TestSize.Level0)
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<CameraDeviceCallback> deviceCallback = std::make_shared<CameraDeviceCallback>();
 #else
-    OHOS::sptr<CameraDeviceCallback> deviceCallback = new CameraDeviceCallback();
+    sptr<ICameraDeviceCallback> deviceCallback = new DemoCameraDeviceCallback();
 #endif
-    OHOS::Camera::CamRetCode rc = cameraHost_->OpenCamera(
-        cameraId, deviceCallback, cameraDevice_);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::INVALID_ARGUMENT, rc);
+    CamRetCode rc = (CamRetCode)cameraHost_->OpenCamera(cameraId, deviceCallback, cameraDevice_);
+    EXPECT_EQ(INVALID_ARGUMENT, rc);
 
     if (cameraDevice_ != nullptr) {
         cameraDevice_->Close();
@@ -151,11 +147,10 @@ HWTEST_F(CameraHostImplTest, OpenCamera_CameraIdIsNotFound, TestSize.Level0)
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<CameraDeviceCallback> deviceCallback = std::make_shared<CameraDeviceCallback>();
 #else
-    OHOS::sptr<CameraDeviceCallback> deviceCallback = new CameraDeviceCallback();
+    OHOS::sptr<ICameraDeviceCallback> deviceCallback = new DemoCameraDeviceCallback();
 #endif
-    OHOS::Camera::CamRetCode rc = cameraHost_->OpenCamera(
-        cameraId, deviceCallback, cameraDevice_);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::INVALID_ARGUMENT, rc);
+    CamRetCode rc = (CamRetCode)cameraHost_->OpenCamera(cameraId, deviceCallback, cameraDevice_);
+    EXPECT_EQ(INVALID_ARGUMENT, rc);
 
     if (cameraDevice_ != nullptr) {
         cameraDevice_->Close();
@@ -170,8 +165,8 @@ HWTEST_F(CameraHostImplTest, UtestSetCallback, TestSize.Level0)
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<CameraHostCallback> callback = std::make_shared<CameraHostCallback>();
 #else
-    OHOS::sptr<CameraHostCallback> callback = new CameraHostCallback();
+    OHOS::sptr<ICameraHostCallback> callback = new DemoCameraHostCallback();
 #endif
-    OHOS::Camera::CamRetCode rc = cameraHost_->SetCallback(callback);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::NO_ERROR, rc);
+    CamRetCode rc = (CamRetCode)cameraHost_->SetCallback(callback);
+    EXPECT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 }

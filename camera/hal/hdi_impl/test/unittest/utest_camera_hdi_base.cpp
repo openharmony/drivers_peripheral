@@ -43,7 +43,7 @@ bool CameraHdiBaseTest::InitCameraHost()
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     cameraHost_ = OHOS::Camera::CameraHost::CreateCameraHost();
 #else
-    cameraHost_ = ICameraHost::Get(TEST_SERVICE_NAME);
+    cameraHost_ = ICameraHost::Get(TEST_SERVICE_NAME, false);
 #endif
     if (cameraHost_ == nullptr) {
         return false;
@@ -65,9 +65,9 @@ bool CameraHdiBaseTest::GetCameraDevice()
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<CameraDeviceCallback> deviceCallback = std::make_shared<CameraDeviceCallback>();
 #else
-    OHOS::sptr<CameraDeviceCallback> deviceCallback = new CameraDeviceCallback();
+    sptr<DemoCameraDeviceCallback> deviceCallback = new DemoCameraDeviceCallback();
 #endif
-    CamRetCode rc = cameraHost_->OpenCamera(cameraId, deviceCallback, cameraDevice_);
+    CamRetCode rc = (CamRetCode)cameraHost_->OpenCamera(cameraId, deviceCallback, cameraDevice_);
     if (cameraDevice_ == nullptr) {
         return false;
     }
@@ -87,7 +87,7 @@ bool CameraHdiBaseTest::GetStreamOperator()
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<StreamOperatorCallback> streamOperatorCallback = std::make_shared<StreamOperatorCallback>();
 #else
-    OHOS::sptr<StreamOperatorCallback> streamOperatorCallback = new StreamOperatorCallback();
+    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = new DemoStreamOperatorCallback();
 #endif
     (void)cameraDevice_->GetStreamOperator(streamOperatorCallback, streamOperator_);
     if (streamOperator_ == nullptr) {
@@ -135,4 +135,130 @@ uint64_t CameraHdiBaseTest::GetCurrentLocalTimeStamp() const
         std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());
     auto tmp = std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch());
     return tmp.count();
+}
+
+int32_t CameraHdiBaseTest::SaveYUV(const char* type, const void* buffer, int32_t size)
+{
+    if (strncmp(type, "preview", strlen(type)) == 0) {
+        previewBufCnt += 1;
+        if (previewBufCnt % 8 != 0) { // 8:Save one frame every eight frames
+            std::cout << "receive preview buffer not save" << std::endl;
+            return 0;
+        }
+    }
+
+    char path[PATH_MAX] = {0};
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    if (strncmp(type, "preview", strlen(type)) == 0) {
+        system("mkdir -p /userdata/camera");
+        char prefix[] = "/userdata/camera/";
+
+        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "%s%s_%lld.yuv",
+            prefix, type, GetCurrentLocalTimeStamp()) < 0) {
+            CAMERA_LOGE("%s: sprintf path failed", __func__);
+            return 0;
+        }
+    } else {
+        system("mkdir -p /userdata/camera");
+        char prefix[] = "/userdata/camera/";
+
+        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "%s%s_%lld.jpg",
+            prefix, type, GetCurrentLocalTimeStamp()) < 0) {
+            CAMERA_LOGE("%s: sprintf path failed", __func__);
+            return 0;
+        }
+    }
+#else
+    if (strncmp(type, "preview", strlen(type)) == 0) {
+        system("mkdir -p /data/camera/preview");
+        char prefix[] = "/data/camera/preview/";
+
+        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "%s%s_%lld.yuv",
+            prefix, type, GetCurrentLocalTimeStamp()) < 0) {
+            CAMERA_LOGE("%s: sprintf path failed", __func__);
+            return 0;
+        }
+    } else {
+        system("mkdir -p /data/camera/capture");
+        char prefix[] = "/data/camera/capture/";
+
+        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "%s%s_%lld.jpg",
+            prefix, type, GetCurrentLocalTimeStamp()) < 0) {
+            CAMERA_LOGE("%s: sprintf path failed", __func__);
+            return 0;
+        }
+    }
+#endif
+    std::cout << "save yuv to file:" << path << std::endl;
+    int imgFd = open(path, O_RDWR | O_CREAT | O_APPEND, 00766); // 00766:file jurisdiction
+    if (imgFd == -1) {
+        std::cout << "open file failed, errno = " << strerror(errno) << std::endl;
+        return -1;
+    }
+
+    int32_t ret = write(imgFd, buffer, size);
+    if (ret == -1) {
+        std::cout << "write file failed, error = " << strerror(errno) << std::endl;
+        close(imgFd);
+        return -1;
+    }
+    close(imgFd);
+    return 0;
+}
+
+int32_t DemoCameraHostCallback::OnCameraStatus(const std::string& cameraId, CameraStatus status)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
+}
+
+int32_t DemoCameraHostCallback::OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status)
+{
+    CAMERA_LOGI("%{public}s, enter. cameraId = %s, status = %d",
+        __func__, cameraId.c_str(), static_cast<int>(status));
+    return RC_OK;
+}
+
+int32_t DemoCameraHostCallback::OnCameraEvent(const std::string& cameraId, CameraEvent event)
+{
+    CAMERA_LOGI("%{public}s, enter. cameraId = %s, event = %d",
+        __func__, cameraId.c_str(), static_cast<int>(event));
+    return RC_OK;
+}
+
+int32_t DemoStreamOperatorCallback::OnCaptureStarted(int32_t captureId, const std::vector<int32_t>& streamIds)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
+}
+
+int32_t DemoStreamOperatorCallback::OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
+}
+
+int32_t DemoStreamOperatorCallback::OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
+}
+
+int32_t DemoStreamOperatorCallback::OnFrameShutter(int32_t captureId,
+    const std::vector<int32_t>& streamIds, uint64_t timestamp)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
+}
+
+int32_t DemoCameraDeviceCallback::OnError(ErrorType type, int32_t errorCode)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
+}
+
+int32_t DemoCameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector<uint8_t>& result)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
 }

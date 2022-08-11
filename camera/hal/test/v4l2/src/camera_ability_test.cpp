@@ -28,7 +28,7 @@ void CameraAbilityTest::SetUp(void)
     display_->Init();
 }
 
-OHOS::Camera::RetCode CameraAbilityTest::GetSensorOrientation(std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+OHOS::Camera::RetCode CameraAbilityTest::GetSensorOrientation(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t *data = display_->ability->get();
     int32_t sensorOrientation;
@@ -43,7 +43,7 @@ OHOS::Camera::RetCode CameraAbilityTest::GetSensorOrientation(std::shared_ptr<OH
     return OHOS::Camera::RC_OK;
 }
 
-OHOS::Camera::RetCode CameraAbilityTest::GetFlashAvailable(std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+OHOS::Camera::RetCode CameraAbilityTest::GetFlashAvailable(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t *data = display_->ability->get();
     uint8_t flashAvailable;
@@ -58,7 +58,7 @@ OHOS::Camera::RetCode CameraAbilityTest::GetFlashAvailable(std::shared_ptr<OHOS:
     return OHOS::Camera::RC_OK;
 }
 
-OHOS::Camera::RetCode CameraAbilityTest::GetAfAvailable(std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+OHOS::Camera::RetCode CameraAbilityTest::GetAfAvailable(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t *data = display_->ability->get();
     std::vector<uint8_t> afAvailable;
@@ -81,7 +81,7 @@ OHOS::Camera::RetCode CameraAbilityTest::GetAfAvailable(std::shared_ptr<OHOS::Ca
     return OHOS::Camera::RC_OK;
 }
 
-OHOS::Camera::RetCode CameraAbilityTest::GetZoomRatioRange(std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+OHOS::Camera::RetCode CameraAbilityTest::GetZoomRatioRange(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t *data = display_->ability->get();
     std::vector<float> zoomRatioRange;
@@ -104,7 +104,7 @@ OHOS::Camera::RetCode CameraAbilityTest::GetZoomRatioRange(std::shared_ptr<OHOS:
     return OHOS::Camera::RC_OK;
 }
 
-OHOS::Camera::RetCode CameraAbilityTest::GetJpegOrientation(std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+OHOS::Camera::RetCode CameraAbilityTest::GetJpegOrientation(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t *data = display_->ability->get();
     int32_t jpegOrientation;

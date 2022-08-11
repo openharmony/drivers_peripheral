@@ -33,7 +33,7 @@ void CameraStabiliTest::TearDown(void)
 }
 
 void CameraStabiliTest::GetAvalialbleVideoStabilizationModes(
-    std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+    std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     videoStabilizationAvailableModes_.clear();
@@ -71,20 +71,22 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_001, TestSize.Level1)
     display_->AchieveStreamOperator();
 
     // start stream
-    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::VIDEO};
+    display_->intents = {PREVIEW, VIDEO};
     display_->StartStream(display_->intents);
 
     // updateSettings
     constexpr uint32_t ITEM_CAPACITY = 100;
     constexpr uint32_t DATA_CAPACITY = 2000;
     constexpr uint32_t DATA_COUNT = 1;
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
         ITEM_CAPACITY, DATA_CAPACITY);
     uint8_t videoStabiliMode = videoStabilizationAvailableModes_[0];
     bool addEntryRet = meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &videoStabiliMode, DATA_COUNT);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
 
-    display_->rc = display_->cameraDevice->UpdateSettings(meta);
-    if (display_->rc == OHOS::Camera::NO_ERROR) {
+    display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
+    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
         std::cout << "==========[test log] UpdateSettings success" << std::endl;
     } else {
         std::cout << "==========[test log] UpdateSettings fail, rc = " << display_->rc << std::endl;

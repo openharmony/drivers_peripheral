@@ -51,11 +51,10 @@ TEST_F(UtestOpenCameraTest, camera_open_0001)
         std::cout << "cameraId = " << cameraId << std::endl;
     }
     std::string cameraId = cameraIds.front();
-    const OHOS::sptr<OHOS::Camera::CameraDeviceCallback> callback =
-        new OHOS::Camera::CameraDeviceCallback();
-    OHOS::sptr<OHOS::Camera::ICameraDevice> cameraDevice;
-    display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, cameraDevice);
-    EXPECT_EQ(true, display_->rc == OHOS::Camera::NO_ERROR);
+    const OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
+    OHOS::sptr<ICameraDevice> cameraDevice;
+    display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, cameraDevice);
+    EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
 }
 
 /**
@@ -68,14 +67,13 @@ TEST_F(UtestOpenCameraTest, camera_open_0001)
 TEST_F(UtestOpenCameraTest, camera_open_0010)
 {
     std::cout << "==========[test log] OpenCamera, cameraID is not found."<< std::endl;
-    std::shared_ptr<OHOS::Camera::CameraHost> cameraHost = OHOS::Camera::CameraHost::CreateCameraHost();
+    sptr<ICameraHost> cameraHost = display_->CameraHostImplGetInstance();
     std::string cameraId = "qwerty";
-    OHOS::sptr<OHOS::Camera::CameraDeviceCallback> callback =
-        new OHOS::Camera::CameraDeviceCallback();
+    OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
     std::cout << "opencamera begin" << std::endl;
-    display_->rc = cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
+    display_->rc = (CamRetCode)cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
     std::cout << "opencamera end" << std::endl;
-    EXPECT_EQ(OHOS::Camera::CamRetCode::INVALID_ARGUMENT, display_->rc);
+    EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
 }
 
 /**
@@ -89,10 +87,9 @@ TEST_F(UtestOpenCameraTest, camera_open_0011)
 {
     std::cout << "==========[test log] OpenCamera, cameraID is illegal."<< std::endl;
     std::string cameraId = "1";
-    OHOS::sptr<OHOS::Camera::CameraDeviceCallback> callback =
-        new OHOS::Camera::CameraDeviceCallback();
-    display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::INVALID_ARGUMENT, display_->rc);
+    OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
+    display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
+    EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
 }
 
 /**
@@ -106,10 +103,9 @@ TEST_F(UtestOpenCameraTest, camera_open_0012)
 {
     std::cout << "==========[test log] OpenCamera, cameraID is Empty."<< std::endl;
     std::string cameraId;
-    OHOS::sptr<OHOS::Camera::CameraDeviceCallback> callback =
-        new OHOS::Camera::CameraDeviceCallback();
-    display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::INVALID_ARGUMENT, display_->rc);
+    OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
+    display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
+    EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
 }
 
 /**
@@ -123,9 +119,9 @@ TEST_F(UtestOpenCameraTest, camera_open_0020)
 {
     std::cout << "==========[test log] OpenCamera, Callback is Null."<< std::endl;
     std::string cameraId = "CAMERA_FIRST";
-    OHOS::sptr<OHOS::Camera::CameraDeviceCallback> callback = nullptr;
-    display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::INVALID_ARGUMENT, display_->rc);
+    OHOS::sptr<ICameraDeviceCallback> callback = nullptr;
+    display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
+    EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
 }
 
 /**
@@ -138,13 +134,13 @@ TEST_F(UtestOpenCameraTest, camera_open_0020)
 TEST_F(UtestOpenCameraTest, camera_open_0030)
 {
     std::cout << "==========[test log] OpenCamera, cameraID is not found, callback is null."<< std::endl;
-    std::shared_ptr<OHOS::Camera::CameraHost> cameraHost = OHOS::Camera::CameraHost::CreateCameraHost();
+    sptr<ICameraHost> cameraHost = display_->CameraHostImplGetInstance();
     std::string cameraId = "qwerty";
-    OHOS::sptr<OHOS::Camera::CameraDeviceCallback> callback = nullptr;
+    OHOS::sptr<ICameraDeviceCallback> callback = nullptr;
     std::cout << "opencamera begin" << std::endl;
-    display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
+    display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
     std::cout << "opencamera end" << std::endl;
-    EXPECT_EQ(OHOS::Camera::CamRetCode::INVALID_ARGUMENT, display_-> rc);
+    EXPECT_EQ(INVALID_ARGUMENT, display_-> rc);
 }
 
 /**
@@ -158,9 +154,9 @@ TEST_F(UtestOpenCameraTest, camera_open_0031)
 {
     std::cout << "==========[test log] OpenCamera, cameraID is illegal, callback is null."<< std::endl;
     std::string cameraId = "1";
-    OHOS::sptr<OHOS::Camera::CameraDeviceCallback> callback = nullptr;
-    display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::INVALID_ARGUMENT, display_-> rc);
+    OHOS::sptr<ICameraDeviceCallback> callback = nullptr;
+    display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
+    EXPECT_EQ(INVALID_ARGUMENT, display_-> rc);
 }
 
 /**
@@ -174,9 +170,9 @@ TEST_F(UtestOpenCameraTest, camera_open_0032)
 {
     std::cout << "==========[test log] OpenCamera, cameraID is Empty, callback is null."<< std::endl;
     std::string cameraId;
-    OHOS::sptr<OHOS::Camera::CameraDeviceCallback> callback = nullptr;
-    display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-    EXPECT_EQ(OHOS::Camera::CamRetCode::INVALID_ARGUMENT, display_->rc);
+    OHOS::sptr<ICameraDeviceCallback> callback = nullptr;
+    display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
+    EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
 }
 
 /**
@@ -193,11 +189,10 @@ TEST_F(UtestOpenCameraTest, camera_open_0050)
     display_->cameraHost->GetCameraIds(cameraIds);
     for (auto &cameraId : cameraIds) {
         std::cout << "cameraId = " << cameraId << std::endl;
-        const OHOS::sptr<OHOS::Camera::CameraDeviceCallback> callback =
-            new OHOS::Camera::CameraDeviceCallback();
-        display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-        EXPECT_EQ(true, display_->rc == OHOS::Camera::NO_ERROR);
-        if (display_->rc == OHOS::Camera::NO_ERROR) {
+        const OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
+        display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
+        EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
+        if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
             std::cout << "==========[test log] OpenCamera success, cameraId = " << cameraId << std::endl;
             } else {
                 std::cout << "==========[test log] OpenCamera fail, rc = ";

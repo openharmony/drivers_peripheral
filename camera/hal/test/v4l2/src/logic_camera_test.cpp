@@ -54,29 +54,29 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
         return;
     };
     producer->SetCallback(callback);
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoPre = std::make_shared<OHOS::Camera::StreamInfo>();
+    std::shared_ptr<StreamInfo> streamInfoPre = std::make_shared<StreamInfo>();
     streamInfoPre->streamId_ = display_->streamId_preview;
     streamInfoPre->width_ = 640;
     streamInfoPre->height_ = 480;
     streamInfoPre->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     streamInfoPre->dataspace_ = 8;
-    streamInfoPre->intent_ = Camera::PREVIEW;
+    streamInfoPre->intent_ = PREVIEW;
     streamInfoPre->tunneledMode_ = 5;
     streamInfoPre->bufferQueue_ = producer;
     display_->streamInfos.push_back(streamInfoPre);
     display_->rc = display_->streamOperator->CreateStreams(display_->streamInfos);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success, streamId = ";
-        std::cout << display_->streamId_capture <<", intent = Camera::STILL_CAPTURE" << std::endl;
+        std::cout << display_->streamId_capture <<", intent = STILL_CAPTURE" << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc <<" , streamId = ";
-        std::cout << display_->streamId_capture <<", intent = Camera::STILL_CAPTURE" << std::endl;
+        std::cout << display_->streamId_capture <<", intent = STILL_CAPTURE" << std::endl;
     }
     // Submit stream information
     display_->rc = display_->streamOperator->CommitStreams(DUAL, nullptr);
-    EXPECT_EQ(false, display_->rc != Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(false, display_->rc != NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] CommitStreams DUAL success." << std::endl;
     } else {
         std::cout << "==========[test log] CommitStreams DUAL fail, rc = " << display_->rc << std::endl;
