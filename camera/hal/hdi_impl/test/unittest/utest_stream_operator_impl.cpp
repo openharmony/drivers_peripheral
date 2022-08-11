@@ -30,7 +30,7 @@ void StreamOperatorImplTest::TearDownTestCase(void)
     std::cout << "Camera::StreamOperatorImpl TearDownTestCase" << std::endl;
 }
 
-void StreamOperatorImplTest::SetUp(void)
+void StreamOperatorImplTest::SetUp(void) const
 {
     bool ret = InitCameraHost();
     if (!ret) {
@@ -57,7 +57,7 @@ void StreamOperatorImplTest::SetUp(void)
     }
 }
 
-void StreamOperatorImplTest::TearDown(void)
+void StreamOperatorImplTest::TearDown(void) const
 {
     std::cout << "Camera::StreamOperatorImpl TearDown.." << std::endl;
 }

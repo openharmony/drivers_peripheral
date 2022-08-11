@@ -29,9 +29,7 @@ protected:
     BufferCb   callBack_;
 };
 
-HostStreamImpl::HostStreamImpl(const HostStreamInfo& info, BufferCb c) :
-    info_(info),
-    callBack_(c)
+HostStreamImpl::HostStreamImpl(const HostStreamInfo& info, BufferCb c) : info_(info), callBack_(c)
 {
 }
 
