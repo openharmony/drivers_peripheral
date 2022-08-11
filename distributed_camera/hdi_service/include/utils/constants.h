@@ -54,7 +54,7 @@ const uint32_t WAIT_OPEN_TIMEOUT_SEC = 5;
 const std::string ENCODE_TYPE_STR_H264 = "OMX_hisi_video_encoder_avc";
 const std::string ENCODE_TYPE_STR_H265 = "OMX_hisi_video_encoder_hevc";
 const std::string ENCODE_TYPE_STR_JPEG = "jpeg";
-const std::string DH_LOG_TITLE_TAG = "DHFWK";
+const std::string DC_LOG_TITLE_TAG = "DCAMERA";
 constexpr int32_t LOG_MAX_LEN = 4096;
 
 typedef enum {
