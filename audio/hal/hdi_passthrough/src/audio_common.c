@@ -142,7 +142,8 @@ void AudioLogRecord(int errorLevel, const char *format, ...)
     struct tm *tblock = NULL;
     char folderName[] = "/data/log/drivers_peripheral_audio";
     va_start(args, format);
-    time_t timeLog = time(NULL);
+    time_t timeLog;
+    (void)time(&timeLog);
     tblock = localtime(&timeLog);
     if (tblock == NULL) {
         return;
@@ -160,7 +161,7 @@ void AudioLogRecord(int errorLevel, const char *format, ...)
         mkdir(folderName, 0770); // 0770: restore permission
     }
     if ((fp = fopen(fileName, "a+")) != NULL) {
-        strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", localtime(&timeLog));
+        strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", tblock);
         if (errorLevel == (int)INFO) {
             fprintf(fp, "[%s]-[%s]", timeStr, "INFO");
             vfprintf(fp, format, args);
