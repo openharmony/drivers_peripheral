@@ -14,6 +14,7 @@
  */
 
 #include "camera_device_impl.h"
+#include "camera_host_config.h"
 #include "ipipeline_core.h"
 #include "idevice_manager.h"
 
@@ -49,9 +50,38 @@ std::shared_ptr<CameraDevice> CameraDevice::CreateCameraDevice(const std::string
         deviceManager->SetDevStatusCallBack([device]() {
             std::static_pointer_cast<CameraDevice>(device)->OnDevStatusErr();
         });
+        SetMemoryType(deviceManager, cameraId);
     }
 
     return device;
+}
+
+void CameraDevice::SetMemoryType(std::shared_ptr<IDeviceManager> deviceManager, const std::string &cameraId)
+{
+    std::shared_ptr<CameraAbility> ability = nullptr;
+    CameraHostConfig *config = CameraHostConfig::GetInstance();
+    if (config == nullptr) {
+        return;
+    }
+    RetCode rc = config->GetCameraAbility(cameraId, ability);
+    if (rc != RC_OK) {
+        return;
+    }
+    common_metadata_header_t *metadata = ability->get();
+    if (metadata == nullptr) {
+        CAMERA_LOGE("CameraDevice::SetMemoryType ability get metadata is null.");
+        return;
+    }
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(metadata, OHOS_ABILITY_MEMORY_TYPE, &entry);
+    if (ret != 0) {
+        CAMERA_LOGE("CameraDevice::SetMemoryType FindCameraMetadataItem err.");
+        return;
+    }
+    uint8_t memType = *(entry.data.u8);
+    CAMERA_LOGD("func[CameraDevice::%{public}s] memType[%{public}d]", __func__, memType);
+    deviceManager->SetMemoryType(memType);
+    return;
 }
 } // end namespace OHOS::Camera
 

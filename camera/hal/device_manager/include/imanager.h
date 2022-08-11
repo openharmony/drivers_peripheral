@@ -104,6 +104,11 @@ public:
         (void)metaDataFlag;
         return;
     }
+    virtual void SetMemoryType(uint8_t &memType)
+    {
+        (void)(memType);
+        return;
+    }
 
 private:
     ManagerId managerID_;

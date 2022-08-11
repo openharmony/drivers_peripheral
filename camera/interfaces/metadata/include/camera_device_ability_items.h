@@ -87,6 +87,7 @@ typedef enum camera_device_metadata_tag {
     OHOS_ABILITY_CAMERA_POSITION = OHOS_CAMERA_PROPERTIES_START,
     OHOS_ABILITY_CAMERA_TYPE,
     OHOS_ABILITY_CAMERA_CONNECTION_TYPE,
+    OHOS_ABILITY_MEMORY_TYPE,
     OHOS_ABILITY_FPS_RANGES,
     OHOS_ABILITY_FLASH_AVAILABLE,
     OHOS_CAMERA_PROPERTIES_END,
@@ -403,5 +404,13 @@ typedef enum camera_flash_available {
     OHOS_CAMERA_FLASH_FALSE = 0,
     OHOS_CAMERA_FLASH_TRUE,
 } CameraFlashAvailable;
+
+// OHOS_ABILITY_MEMORY_TYPE enumeration values
+typedef enum camera_memory_type_enum {
+    OHOS_CAMERA_MEMORY_MMAP = 1,
+    OHOS_CAMERA_MEMORY_USERPTR,
+    OHOS_CAMERA_MEMORY_OVERLAY,
+    OHOS_CAMERA_MEMORY_DMABUF,
+} camera_memory_type_enum_t;
 
 #endif

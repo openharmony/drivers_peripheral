@@ -25,6 +25,7 @@ std::map<std::string, camera_device_metadata_tag_t> MetadataTagMap = {
     {"OHOS_ABILITY_CAMERA_POSITION",                       OHOS_ABILITY_CAMERA_POSITION                      },
     {"OHOS_ABILITY_CAMERA_TYPE",                           OHOS_ABILITY_CAMERA_TYPE                          },
     {"OHOS_ABILITY_CAMERA_CONNECTION_TYPE",                OHOS_ABILITY_CAMERA_CONNECTION_TYPE               },
+    {"OHOS_ABILITY_MEMORY_TYPE",                           OHOS_ABILITY_MEMORY_TYPE                          },
     {"OHOS_SENSOR_INFO_ACTIVE_ARRAY_SIZE",                 OHOS_SENSOR_INFO_ACTIVE_ARRAY_SIZE                },
     {"OHOS_SENSOR_INFO_SENSITIVITY_RANGE",                 OHOS_SENSOR_INFO_SENSITIVITY_RANGE                },
     {"OHOS_SENSOR_INFO_MAX_FRAME_DURATION",                OHOS_SENSOR_INFO_MAX_FRAME_DURATION               },
@@ -201,6 +202,13 @@ std::map<std::string, camera_face_detect_mode_t> FaceDetectModeMap = {
 std::map<std::string, camera_histogram_mode_t> HistogramModeMap = {
     {"OHOS_CAMERA_HISTOGRAM_MODE_OFF", OHOS_CAMERA_HISTOGRAM_MODE_OFF},
     {"OHOS_CAMERA_HISTOGRAM_MODE_ON",  OHOS_CAMERA_HISTOGRAM_MODE_ON },
+};
+
+std::map<std::string, camera_memory_type_enum_t> CameraMemoryTypeMap = {
+    {"OHOS_CAMERA_MEMORY_MMAP", OHOS_CAMERA_MEMORY_MMAP},
+    {"OHOS_CAMERA_MEMORY_USERPTR", OHOS_CAMERA_MEMORY_USERPTR},
+    {"OHOS_CAMERA_MEMORY_OVERLAY", OHOS_CAMERA_MEMORY_OVERLAY},
+    {"OHOS_CAMERA_MEMORY_DMABUF", OHOS_CAMERA_MEMORY_DMABUF},
 };
 
 #endif /* CAMERA_HOST_METADATA_ENUM_MAP_H */

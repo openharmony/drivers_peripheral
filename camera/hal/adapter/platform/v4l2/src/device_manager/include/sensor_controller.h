@@ -45,6 +45,7 @@ public:
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag);
     RetCode GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta);
     RetCode Flush(int32_t streamId);
+    void SetMemoryType(uint8_t &memType);
 
 private:
     RetCode SendSensorMetaData(std::shared_ptr<CameraMetadata> meta);

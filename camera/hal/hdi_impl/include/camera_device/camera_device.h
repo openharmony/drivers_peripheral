@@ -17,6 +17,7 @@
 #define CAMERA_DEVICE_CAMERA_DEVICE_H
 
 #include "icamera_device.h"
+#include "idevice_manager.h"
 #include "camera_device_stub.h"
 #include "camera.h"
 
@@ -26,6 +27,7 @@ class IPipelineCore;
 class CameraDevice : public CameraDeviceStub {
 public:
     static std::shared_ptr<CameraDevice> CreateCameraDevice(const std::string &cameraId);
+    static void SetMemoryType(std::shared_ptr<IDeviceManager> deviceManager, const std::string &cameraId);
     CameraDevice() = default;
     virtual ~CameraDevice() = default;
     CameraDevice(const CameraDevice &other) = delete;

@@ -30,6 +30,14 @@
 #endif
 
 namespace OHOS::Camera {
+struct AdapterBuff {
+    void* start;
+    uint32_t length;
+    uint32_t offset;
+    void* userBufPtr;
+    int32_t heapfd;
+    int32_t dmafd;
+};
 class HosV4L2Buffers {
 public:
     HosV4L2Buffers(enum v4l2_memory memType, enum v4l2_buf_type bufferType);
@@ -48,10 +56,21 @@ public:
     RetCode Flush(int fd);
 
 private:
+    RetCode SetAdapterBuffer(int fd, struct v4l2_buffer &buf, const std::shared_ptr<FrameSpec>& frameSpec);
+    RetCode SetDmabufOn(struct v4l2_buffer &buf, const std::shared_ptr<FrameSpec>& frameSpec);
+    void MakeInqueueBuffer(struct v4l2_buffer &buf, const std::shared_ptr<FrameSpec>& frameSpec);
+    void SetInqueueBuffer(struct v4l2_buffer &buf, const std::shared_ptr<FrameSpec>& frameSpec);
+    void SetMmapInqueueBuffer(struct v4l2_buffer &buf, const std::shared_ptr<FrameSpec>& frameSpec);
+    void SetDmaInqueueBuffer(struct v4l2_buffer &buf, const std::shared_ptr<FrameSpec>& frameSpec);
+
+private:
     BufCallback dequeueBuffer_;
 
     using FrameMap = std::map<unsigned int, std::shared_ptr<FrameSpec>>;
     std::map<int, FrameMap> queueBuffers_;
+
+    using AdapterBuffer = struct AdapterBuff;
+    std::map<uint32_t, AdapterBuffer> adapterBufferMap_;
 
     std::mutex bufferLock_;
 

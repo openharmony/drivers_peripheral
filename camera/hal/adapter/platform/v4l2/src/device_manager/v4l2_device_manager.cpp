@@ -396,4 +396,17 @@ CameraId V4L2DeviceManager::ReturnEnableCameraId(std::string hardwareName)
     }
     return CAMERA_MAX;
 }
+
+void V4L2DeviceManager::SetMemoryType(uint8_t &memType)
+{
+    if (managerList_.size() == 0) {
+        return;
+    }
+    for (auto iter = managerList_.cbegin(); iter != managerList_.cend(); iter++) {
+        if ((*iter)->GetManagerId() == DM_M_SENSOR) {
+            (std::static_pointer_cast<SensorManager>(*iter))->SetMemoryType(memType);
+        }
+    }
+    return;
+}
 } // namespace OHOS::Camera

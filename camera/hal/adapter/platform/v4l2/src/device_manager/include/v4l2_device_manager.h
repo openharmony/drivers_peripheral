@@ -45,6 +45,7 @@ public:
     void SetMetaDataCallBack(const MetaDataCb cb, CameraId cameraId = CAMERA_MAX);
     void SetHotplugDevCallBack(HotplugDevCb cb);
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag);
+    void SetMemoryType(uint8_t &memType);
 
 private:
     void UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl,

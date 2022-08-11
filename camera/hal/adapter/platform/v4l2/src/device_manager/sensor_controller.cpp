@@ -753,4 +753,10 @@ RetCode SensorController::Flush(int32_t streamId)
 {
     return sensorVideo_->Flush(GetName());
 }
+
+void SensorController::SetMemoryType(uint8_t &memType)
+{
+    sensorVideo_->SetMemoryType(memType);
+    return;
+}
 } // namespace OHOS::Camera
