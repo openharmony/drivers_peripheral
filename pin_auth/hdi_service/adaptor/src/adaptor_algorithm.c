@@ -320,7 +320,12 @@ static Buffer *CreateCiphertext(EVP_CIPHER_CTX *ctx, const Buffer *plaintext)
         DestoryBuffer(ciphertext);
         return NULL;
     }
-    ciphertext->contentSize = outLen;
+    if (outLen < 0) {
+        LOG_ERROR("outLen out of range");
+        DestoryBuffer(ciphertext);
+        return NULL;
+    }
+    ciphertext->contentSize = (uint32_t)outLen;
     if (ciphertext->maxSize < ciphertext->contentSize) {
         LOG_ERROR("memory overflow occurred, please check");
         DestoryBuffer(ciphertext);
@@ -486,7 +491,11 @@ static int32_t SetPlaintext(EVP_CIPHER_CTX *ctx, const Buffer *ciphertext, const
         LOG_ERROR("failed to update");
         return RESULT_GENERAL_ERROR;
     }
-    plaintext->contentSize = outLen;
+    if (outLen < 0) {
+        LOG_ERROR("outLen out of range");
+        return RESULT_GENERAL_ERROR;
+    }
+    plaintext->contentSize = (uint32_t)outLen;
     if (plaintext->maxSize < plaintext->contentSize) {
         LOG_ERROR("memory overflow occurred, please check");
         return RESULT_GENERAL_ERROR;

@@ -134,7 +134,7 @@ static ResultCode GetAsl(uint32_t authType, uint32_t *asl)
     return RESULT_SUCCESS;
 }
 
-static ResultCode GetAcl(uint32_t userId, uint32_t authType, uint32_t *acl)
+static ResultCode GetAcl(int32_t userId, uint32_t authType, uint32_t *acl)
 {
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, authType);
@@ -161,7 +161,7 @@ static ResultCode GetAcl(uint32_t userId, uint32_t authType, uint32_t *acl)
     return RESULT_SUCCESS;
 }
 
-ResultCode SingleAuthTrustLevel(uint32_t userId, uint32_t authType, uint32_t *atl)
+ResultCode SingleAuthTrustLevel(int32_t userId, uint32_t authType, uint32_t *atl)
 {
     if (atl == NULL) {
         LOG_ERROR("atl is null");
