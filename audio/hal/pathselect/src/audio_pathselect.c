@@ -61,28 +61,28 @@ int32_t AudioPathSelGetConfToJsonObj()
     }
     if (fseek(fpJson, 0, SEEK_END) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("fseek fail!");
-        fclose(fpJson);
+        (void)fclose(fpJson);
         return HDF_FAILURE;
     }
     int32_t jsonStrSize = ftell(fpJson);
     rewind(fpJson);
     if (jsonStrSize <= 0) {
-        fclose(fpJson);
+        (void)fclose(fpJson);
         return HDF_FAILURE;
     }
     pJsonStr = (char *)OsalMemCalloc(jsonStrSize + 1);
     if (pJsonStr == NULL) {
-        fclose(fpJson);
+        (void)fclose(fpJson);
         return HDF_FAILURE;
     }
     if (fread(pJsonStr, jsonStrSize, 1, fpJson) != 1) {
         AUDIO_FUNC_LOGE("read to file fail!");
-        fclose(fpJson);
+        (void)fclose(fpJson);
         fpJson = NULL;
         AudioMemFree((void **)&pJsonStr);
         return HDF_FAILURE;
     }
-    fclose(fpJson);
+    (void)fclose(fpJson);
     fpJson = NULL;
 #ifndef JSON_UNPRINT
     AUDIO_FUNC_LOGI("pJsonStr = %{public}s", pJsonStr);

@@ -172,7 +172,7 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureStartAndCaputreFrame(stru
     g_testMutex.lock();
     ret = FrameStartCapture(ptr.capture, file, attrs);
     g_testMutex.unlock();
-    fclose(file);
+    (void)fclose(file);
     return ret;
 }
 

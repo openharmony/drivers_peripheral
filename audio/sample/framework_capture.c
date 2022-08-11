@@ -107,7 +107,7 @@ enum AudioCaptureMode {
     CAPTURE_INTERUPT,
 };
 
-int g_CaptureModeFlag = CAPTURE_POLL;
+int g_captureModeFlag = CAPTURE_POLL;
 
 #ifndef __LITEOS__
 int g_receiveFrameCount = 0;
@@ -153,6 +153,14 @@ void CleanStdin(void)
     } while (c != '\n' && c != EOF);
 }
 
+void SystemInputFail(void)
+{
+    printf("please ENTER to go on...\n");
+    while (getchar() != '\n') {
+        continue;
+    }
+}
+
 int32_t CheckInputName(int type, void *val)
 {
     if (val == NULL) {
@@ -167,7 +175,7 @@ int32_t CheckInputName(int type, void *val)
         case INPUT_INT:
             ret = scanf_s("%d", &inputInt);
             if (inputInt < 0 || inputInt > GET_CAPTURE_POSITION + 1) {
-                AUDIO_FUNC_LOGE("Input failure");
+                SystemInputFail();
                 return HDF_FAILURE;
             }
             *(int *)val = inputInt;
@@ -195,14 +203,7 @@ int32_t CheckInputName(int type, void *val)
     }
     return HDF_SUCCESS;
 }
-void SystemInputFail(void)
-{
-    printf("please ENTER to go on...");
-    while (getchar() != '\n') {
-        continue;
-    }
-    printf("%c", getchar());
-}
+
 int32_t InitAttrsCapture(struct AudioSampleAttributes *attrs)
 {
     if (attrs == NULL) {
@@ -252,7 +253,7 @@ uint32_t PcmFormatToBits(enum AudioFormat format)
 void StreamClose(int32_t sig)
 {
     /* allow the stream to be closed gracefully */
-    signal(sig, SIG_IGN);
+    (void)signal(sig, SIG_IGN);
     g_closeEnd = 1;
 }
 
@@ -380,7 +381,7 @@ int UnRegisterListen(void)
 static inline void FileClose(FILE **file)
 {
     if ((file != NULL) && ((*file) != NULL)) {
-        fclose(*file);
+        (void)fclose(*file);
         *file = NULL;
     }
     return;
@@ -392,7 +393,7 @@ uint32_t StringToInt(const char *flag)
         return 0;
     }
     uint32_t temp = flag[0];
-    for (int32_t i = strlen(flag) - 1; i >= 0; i--) {
+    for (int32_t i = (int32_t)strlen(flag) - 1; i >= 0; i--) {
         temp <<= MOVE_LEFT_NUM;
         temp += flag[i];
     }
@@ -419,14 +420,14 @@ int32_t AddWavFileHeader(struct StrParaCapture *StrParam)
     headInfo.audioSampleRate = StrParam->attrs.sampleRate;
     headInfo.audioByteRate = headInfo.audioSampleRate * headInfo.audioChannelNum * headInfo.audioFileFmtSize
                              / PCM_8_BIT;
-    headInfo.audioBlockAlign = headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT;
-    headInfo.audioBitsPerSample = headInfo.audioFileFmtSize;
+    headInfo.audioBlockAlign = (uint16_t)(headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT);
+    headInfo.audioBitsPerSample = (uint16_t)headInfo.audioFileFmtSize;
     headInfo.dataId = StringToInt("data");
     headInfo.dataSize = (uint32_t)ftell(g_file) - WAV_HEAD_OFFSET;
 
     rewind(g_file);
 
-    ssize_t ret = fwrite(&headInfo, sizeof(struct AudioHeadInfo), 1, g_file);
+    size_t ret = fwrite(&headInfo, sizeof(struct AudioHeadInfo), 1, g_file);
     if (ret != 1) {
         printf("write wav file head error");
         return HDF_FAILURE;
@@ -472,7 +473,7 @@ int32_t StopButtonCapture(struct AudioCapture **captureS)
     }
 
     FileClose(&g_file);
-    if (g_CaptureModeFlag == CAPTURE_INTERUPT) {
+    if (g_captureModeFlag == CAPTURE_INTERUPT) {
 #ifndef __LITEOS__
         ret = UnRegisterListen();
         if (ret < 0) {
@@ -659,7 +660,7 @@ int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *StrParam, struct Au
     StrParam->file = g_file;
     StrParam->attrs = g_attrs;
     StrParam->frame = g_frame;
-    if (g_CaptureModeFlag == CAPTURE_INTERUPT) {
+    if (g_captureModeFlag == CAPTURE_INTERUPT) {
 #ifndef __LITEOS__
         ret = RegisterListen(&g_str);
         if (ret != 0) {
@@ -1396,10 +1397,10 @@ void Choice0(void)
     }
     switch (choice) {
         case CAPTURE_POLL:
-            g_CaptureModeFlag = CAPTURE_POLL;
+            g_captureModeFlag = CAPTURE_POLL;
             break;
         case CAPTURE_INTERUPT:
-            g_CaptureModeFlag = CAPTURE_INTERUPT;
+            g_captureModeFlag = CAPTURE_INTERUPT;
             break;
         default:
             printf("Input error,Switched to Poll mode in for you,");
@@ -1455,7 +1456,7 @@ int32_t CheckAndOpenFile(int32_t argc, char const *argv[])
         printf("failed to open '%s',Please enter the correct file name \n", g_path);
         return HDF_FAILURE;
     }
-    fclose(file);
+    (void)fclose(file);
     return HDF_SUCCESS;
 }
 

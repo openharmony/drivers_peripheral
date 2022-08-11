@@ -282,7 +282,7 @@ uint32_t StringToInt(const char *flag)
         return 0;
     }
     uint32_t temp = flag[0];
-    for (int32_t i = strlen(flag) - 1; i >= 0; i--) {
+    for (int32_t i = (int32_t)strlen(flag) - 1; i >= 0; i--) {
         temp <<= MOVE_LEFT_NUM;
         temp += flag[i];
     }
@@ -309,14 +309,14 @@ int32_t AddWavFileHeader(struct StrParaCapture *StrParam)
     headInfo.audioSampleRate = StrParam->attrs.sampleRate;
     headInfo.audioByteRate =
         headInfo.audioSampleRate * headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT;
-    headInfo.audioBlockAlign = headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT;
-    headInfo.audioBitsPerSample = headInfo.audioFileFmtSize;
+    headInfo.audioBlockAlign = (uint16_t)(headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT);
+    headInfo.audioBitsPerSample = (uint16_t)headInfo.audioFileFmtSize;
     headInfo.dataId = StringToInt("data");
     headInfo.dataSize = (uint32_t)ftell(g_file) - WAV_HEAD_OFFSET;
 
     rewind(g_file);
 
-    ssize_t ret = fwrite(&headInfo, sizeof(struct AudioHeadInfo), 1, g_file);
+    size_t ret = fwrite(&headInfo, sizeof(struct AudioHeadInfo), 1, g_file);
     if (ret != 1) {
         AUDIO_FUNC_LOGE("write wav file head error");
         return HDF_FAILURE;

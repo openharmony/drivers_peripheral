@@ -209,7 +209,7 @@ static int AudioPnpUeventOpen(int *fd)
         return HDF_FAILURE;
     }
     addr.nl_family = AF_NETLINK;
-    addr.nl_pid = getpid();
+    addr.nl_pid = (sa_family_t)getpid();
     addr.nl_groups = UEVENT_SOCKET_GROUPS;
 
     socketfd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
@@ -235,7 +235,7 @@ static void *AudioPnpUeventStart(void *useless)
 {
     (void)useless;
     int ret;
-    int rcvlen;
+    ssize_t rcvlen;
     int socketfd = 0;
     fd_set fds;
     char msg[UEVENT_MSG_LEN];
@@ -267,7 +267,7 @@ static void *AudioPnpUeventStart(void *useless)
             if (rcvlen == UEVENT_MSG_LEN) {
                 continue;
             }
-            AudioPnpUeventParse(msg, rcvlen);
+            AudioPnpUeventParse(msg, (int32_t)rcvlen);
         } while (rcvlen > 0);
     } while (1);
 }
