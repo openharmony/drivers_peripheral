@@ -183,11 +183,11 @@ HWTEST_F(StreamOperatorImplTest, UTestCreateStreams, TestSize.Level0)
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     streamInfoSnapshot->bufferQueue_ = snapshotConsumer.CreateProducer(
             [](OHOS::SurfaceBuffer* buffer) {
-               std::cout << "received a snapshot buffer ..." << std::endl; });
+                std::cout << "received a snapshot buffer ..." << std::endl; });
 #else
     streamInfoSnapshot->bufferQueue_ = snapshotConsumer.CreateProducer(
             [](void* addr, uint32_t size) {
-               std::cout << "received a snapshot buffer ..." << std::endl; });
+                std::cout << "received a snapshot buffer ..." << std::endl; });
 #endif
     streamInfoSnapshot->tunneledMode_ = 5;
     streamInfos.push_back(streamInfoSnapshot);
@@ -230,7 +230,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
     StreamConsumer snapshotConsumer;
     streamInfoSnapshot->bufferQueue_ = snapshotConsumer.CreateProducer(
             [](OHOS::SurfaceBuffer* buffer) {
-               std::cout << "received a snapshot buffer ..." << std::endl; });
+                std::cout << "received a snapshot buffer ..." << std::endl; });
     streamInfoSnapshot->tunneledMode_ = 5;
     streamInfos.push_back(streamInfoSnapshot);
 
@@ -283,7 +283,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
     StreamConsumer snapshotConsumer;
     streamInfoSnapshot->bufferQueue_ = snapshotConsumer.CreateProducer(
             [](void* addr, uint32_t size) {
-               std::cout << "received a snapshot buffer ..." << std::endl; });
+                std::cout << "received a snapshot buffer ..." << std::endl; });
     streamInfoSnapshot->tunneledMode_ = 5;
     streamInfos.push_back(streamInfoSnapshot);
 

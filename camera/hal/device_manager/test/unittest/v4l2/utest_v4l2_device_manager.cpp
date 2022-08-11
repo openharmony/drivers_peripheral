@@ -44,7 +44,7 @@ HWTEST_F(UtestV4l2DeviceManager, Init_Success, TestSize.Level0)
 {
     DM = IDeviceManager::GetInstance();
     RetCode rc;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         rc = DM->Init();
     }
     EXPECT_EQ(RC_OK, rc);
@@ -53,7 +53,7 @@ HWTEST_F(UtestV4l2DeviceManager, Init_Success, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, PowerUp_Success, TestSize.Level0)
 {
     RetCode rc;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         rc = DM->PowerUp(CAMERA_FIRST);
     }
     EXPECT_EQ(RC_OK, rc);
@@ -62,7 +62,7 @@ HWTEST_F(UtestV4l2DeviceManager, PowerUp_Success, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, PowerUp_Failed, TestSize.Level0)
 {
     RetCode rc;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         rc = DM->PowerUp(CAMERA_THIRD);
     }
     EXPECT_EQ(RC_ERROR, rc);
@@ -71,7 +71,7 @@ HWTEST_F(UtestV4l2DeviceManager, PowerUp_Failed, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, PowerDown_Success, TestSize.Level0)
 {
     RetCode rc;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         rc = DM->PowerDown(CAMERA_FIRST);
     }
     EXPECT_EQ(RC_OK, rc);
@@ -80,7 +80,7 @@ HWTEST_F(UtestV4l2DeviceManager, PowerDown_Success, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, GetSensor_Success, TestSize.Level0)
 {
     std::shared_ptr<ISensor> sensor;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_FIRST);
     }
     CameraMetadata meta(100, 2000);
@@ -91,7 +91,7 @@ HWTEST_F(UtestV4l2DeviceManager, GetSensor_Success, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, GetSensor_Success2, TestSize.Level0)
 {
     std::shared_ptr<ISensor> sensor;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_SECOND);
     }
     CameraMetadata meta(100, 2000);;
@@ -103,7 +103,7 @@ HWTEST_F(UtestV4l2DeviceManager, GetSensor_Success2, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, GetSensor_Failed, TestSize.Level0)
 {
     std::shared_ptr<ISensor> sensor;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_THIRD);
     }
     EXPECT_EQ(true, sensor == nullptr);
@@ -112,7 +112,7 @@ HWTEST_F(UtestV4l2DeviceManager, GetSensor_Failed, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, GetManager_Success, TestSize.Level0)
 {
     std::shared_ptr<IManager> manager;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         manager = DM->GetManager(DM_M_SENSOR);
     }
     EXPECT_EQ(true, manager != nullptr);
@@ -121,7 +121,7 @@ HWTEST_F(UtestV4l2DeviceManager, GetManager_Success, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, GetManager_Failed, TestSize.Level0)
 {
     std::shared_ptr<IManager> manager;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         manager = DM->GetManager(DM_M_VO);
     }
     EXPECT_EQ(true, manager == nullptr);
@@ -130,7 +130,7 @@ HWTEST_F(UtestV4l2DeviceManager, GetManager_Failed, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, GetController_Success, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         controller = DM->GetController(CAMERA_FIRST, DM_M_SENSOR, DM_C_SENSOR);
     }
     EXPECT_EQ(true, controller != nullptr);
@@ -139,7 +139,7 @@ HWTEST_F(UtestV4l2DeviceManager, GetController_Success, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, GetController_Failed1, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         controller = DM->GetController(CAMERA_FIRST, DM_M_VI, DM_C_SENSOR);
     }
     EXPECT_EQ(true, controller == nullptr);
@@ -148,7 +148,7 @@ HWTEST_F(UtestV4l2DeviceManager, GetController_Failed1, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, GetController_Failed2, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         controller = DM->GetController(CAMERA_FIRST, DM_M_VPSS, DM_C_VO);
     }
     EXPECT_EQ(true, controller == nullptr);
@@ -157,7 +157,7 @@ HWTEST_F(UtestV4l2DeviceManager, GetController_Failed2, TestSize.Level0)
 HWTEST_F(UtestV4l2DeviceManager, GetCameraId_Success, TestSize.Level0)
 {
     std::vector<CameraId> cameraId;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         cameraId = DM->GetCameraId();
     }
     for (auto iter = cameraId.cbegin(); iter != cameraId.cend(); iter++) {
