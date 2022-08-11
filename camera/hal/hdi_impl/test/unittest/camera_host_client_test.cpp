@@ -51,7 +51,7 @@ using namespace OHOS::Camera;
 
 constexpr const char *TEST_SERVICE_NAME = "camera_service";
 
-class TestStreamConsumerListener: public IBufferConsumerListener {
+class TestStreamConsumerListener : public IBufferConsumerListener {
     public:
         TestStreamConsumerListener()
         {
@@ -220,7 +220,7 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     StreamConsumer previewConsumer;
     streamInfo->bufferQueue_ = previewConsumer.CreateProducer(
             [](void* addr, uint32_t size) {
-               CAMERA_LOGI("received a preview buffer ..."); });
+                CAMERA_LOGI("received a preview buffer ..."); });
     streamInfo->tunneledMode_ = 5;
     streamInfos.push_back(streamInfo);
     ret = streamOperator->IsStreamsSupported(NORMAL, ability, streamInfo, supportType);
@@ -236,7 +236,7 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     StreamConsumer snapshotConsumer;
     streamInfoSnapshot->bufferQueue_ = snapshotConsumer.CreateProducer(
             [](void* addr, uint32_t size) {
-               std::cout << "received a snapshot buffer ..." << std::endl; });
+                std::cout << "received a snapshot buffer ..." << std::endl; });
     streamInfoSnapshot->tunneledMode_ = 5;
     streamInfos.push_back(streamInfoSnapshot);
 

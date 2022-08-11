@@ -31,7 +31,7 @@ public:
             TestBufferConsumerListener()
             {
             }
-             void OnBufferAvailable()
+            void OnBufferAvailable()
             {
             }
             ~TestBufferConsumerListener()
