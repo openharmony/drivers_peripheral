@@ -1564,30 +1564,33 @@ int32_t UsbImpl::RequestQueue(
         return HDF_ERR_DEVICE_BUSY;
     }
 
-    uint8_t *clientDataAddr = (uint8_t *)OsalMemAlloc(sizeof(uint8_t) * clientData.size());
-    if (clientDataAddr == nullptr) {
-        HDF_LOGE("%{public}s:%{public}d UsbdHdfReadBufAndMalloc failed", __func__, __LINE__);
-        return HDF_ERR_INVALID_PARAM;
+    uint8_t *clientDataAddr = nullptr;
+    int32_t ret = UsbdDispatcher::UsbdMallocAndFill(clientDataAddr, clientData);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:clientDataAddr UsbdMallocAndFill failed", __func__);
+        return HDF_FAILURE;
     }
-
-    uint8_t *bufferAddr = (uint8_t *)OsalMemAlloc(sizeof(uint8_t) * buffer.size());
-    if (bufferAddr == nullptr) {
-        HDF_LOGE("%{public}s:%{public}d UsbdHdfReadBufAndMalloc failed", __func__, __LINE__);
+    
+    uint8_t *bufferAddr = nullptr;
+    ret = UsbdDispatcher::UsbdMallocAndFill(bufferAddr, buffer);
+    if (ret != HDF_SUCCESS) {
         OsalMemFree(clientDataAddr);
         clientDataAddr = nullptr;
-        return HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s:bufferAddr UsbdMallocAndFill failed", __func__);
+        return HDF_FAILURE;
     }
-
+    
     reqAsync->reqMsg.clientData = (void *)clientDataAddr;
-    reqAsync->reqMsg.clientLength = clientData.size();
-    int32_t ret = FunRequestQueueFillAndSubmit(port, reqAsync, bufferAddr, buffer.size());
+    reqAsync->reqMsg.clientLength = sizeof(uint8_t) * clientData.size();
+    ret = FunRequestQueueFillAndSubmit(port, reqAsync, bufferAddr, sizeof(uint8_t) * buffer.size());
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:FunRequestQueueFillAndSubmit failed:%{public}d", __func__, ret);
-        OsalMemFree(bufferAddr);
-        bufferAddr = nullptr;
         OsalMemFree(clientDataAddr);
         clientDataAddr = nullptr;
     }
+    
+    OsalMemFree(bufferAddr);
+    bufferAddr = nullptr;
     return ret;
 }
 

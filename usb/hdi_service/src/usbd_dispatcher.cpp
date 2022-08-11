@@ -651,6 +651,31 @@ void UsbdDispatcher::UsbdRelease(HostDevice *dev)
     dev->initFlag = false;
 }
 
+int32_t UsbdDispatcher::UsbdMallocAndFill(uint8_t *&dataAddr, const std::vector<uint8_t> &data)
+{
+    uint32_t length = sizeof(uint8_t) * data.size();
+    if (length == 0) {
+        HDF_LOGI("%{public}s: data is empty", __func__);
+        dataAddr = nullptr;
+        return HDF_SUCCESS;
+    }
+    
+    dataAddr = (uint8_t *)OsalMemAlloc(length);
+    if (dataAddr == nullptr) {
+        HDF_LOGE("%{public}s: OsalMemAlloc failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    int32_t err = memcpy_s((void *)dataAddr, length, data.data(), length);
+    if (err != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+        OsalMemFree(dataAddr);
+        dataAddr = nullptr;
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t UsbdDispatcher::FillReqAyncParams(
     UsbdRequestASync *userData, UsbPipeInfo *pipe, UsbRequestParams *params, const uint8_t *buffer, int32_t length)
 {
