@@ -174,4 +174,15 @@ RetCode SensorManager::DestroyController(ControllerId controllerId, std::string 
     }
     return RC_ERROR;
 }
+
+void SensorManager::SetMemoryType(uint8_t &memType)
+{
+    if (sensorList_.size() == 0) {
+        return;
+    }
+    for (auto iter = sensorList_.cbegin(); iter != sensorList_.cend(); iter++) {
+        (*iter)->SetMemoryType(memType);
+    }
+    return;
+}
 } // namespace OHOS::Camera

@@ -157,6 +157,7 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
     DealCameraPosition(node, metadata);
     DealCameraType(node, metadata);
     DealCameraConnectionType(node, metadata);
+    DealCameraMemoryType(node, metadata);
     DealCameraFaceDetectMaxNum(node, metadata);
     DealAeCompensationRange(node, metadata);
     DealAeCompensationSteps(node, metadata);
@@ -334,6 +335,35 @@ RetCode HcsDeal::DealCameraConnectionType(
         return RC_ERROR;
     }
     CAMERA_LOGD("cameraConnectionType add success");
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealCameraMemoryType(
+    const struct DeviceResourceNode &metadataNode,
+    std::shared_ptr<CameraMetadata> &metadata)
+{
+    CAMERA_LOGD("cameraMemoryType in...");
+    const char *nodeValue = nullptr;
+    uint8_t cameraMemoryType = 0;
+    int32_t rc = pDevResIns->GetString(&metadataNode, "cameraMemoryType", &nodeValue, nullptr);
+    if (rc != 0 || (nodeValue == nullptr)) {
+        CAMERA_LOGE("get cameraMemoryType failed");
+        return RC_ERROR;
+    }
+    auto findIf = CameraMemoryTypeMap.find(std::string(nodeValue));
+    if (findIf == CameraMemoryTypeMap.end()) {
+        CAMERA_LOGE("value of cameraMemoryType err.[%{public}s]", nodeValue);
+        return RC_ERROR;
+    }
+    cameraMemoryType = CameraMemoryTypeMap[std::string(nodeValue)];
+    CAMERA_LOGD("cameraMemoryType  = %{public}d", cameraMemoryType);
+    bool ret = metadata->addEntry(OHOS_ABILITY_MEMORY_TYPE,
+        static_cast<const void*>(&cameraMemoryType), sizeof(cameraMemoryType));
+    if (!ret) {
+        CAMERA_LOGE("cameraMemoryType add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGD("cameraMemoryType add success");
     return RC_OK;
 }
 
