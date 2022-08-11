@@ -24,7 +24,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp(void);
     void TearDown(void);
-    void GetAvalialbleVideoStabilizationModes(std::shared_ptr<OHOS::Camera::CameraAbility> &ability);
+    void GetAvalialbleVideoStabilizationModes(std::shared_ptr<CameraAbility> &ability);
     std::shared_ptr<TestDisplay> display_ = nullptr;
     std::vector<uint8_t> videoStabilizationAvailableModes_;
 };

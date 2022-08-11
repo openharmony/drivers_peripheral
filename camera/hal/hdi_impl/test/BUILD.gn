@@ -180,8 +180,6 @@ if (defined(ohos_lite)) {
       "$camera_path/../interfaces/include",
       "$camera_path/../interfaces/hdi_ipc",
       "$camera_path/../interfaces/hdi_ipc/utils/include",
-      "$camera_path/../interfaces/hdi_ipc/client/include",
-      "$camera_path/../interfaces/hdi_ipc/server/include",
       "$camera_path/../interfaces/hdi_ipc/callback/host/include",
       "$camera_path/../interfaces/hdi_ipc/callback/device/include",
       "$camera_path/../interfaces/hdi_ipc/callback/operator/include",

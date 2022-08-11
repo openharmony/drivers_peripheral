@@ -42,7 +42,7 @@ TEST_F(UtestDeviceManagerTest, camera_devMan_0001)
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);

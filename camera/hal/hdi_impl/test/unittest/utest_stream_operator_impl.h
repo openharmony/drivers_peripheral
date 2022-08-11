@@ -141,7 +141,7 @@ public:
 
 private:
     void Init();
-    void OnError(Camera::ErrorType type, int32_t errorMsg);
+    void OnError(HDI::Camera::V1_0::ErrorType type, int32_t errorMsg);
     void OnResult(uint64_t timestamp, const std::shared_ptr<CameraMetadata>& result);
     void ForkProcess();
     void StopProcess();

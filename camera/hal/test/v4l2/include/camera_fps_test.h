@@ -24,7 +24,7 @@ public:
     static void TearDownTestCase(void);
     void SetUp(void);
     void TearDown(void);
-    void GetFpsRange(std::shared_ptr<OHOS::Camera::CameraAbility> &ability);
+    void GetFpsRange(std::shared_ptr<CameraAbility> &ability);
     std::shared_ptr<TestDisplay> display_ = nullptr;
     std::vector<int32_t> fpsRange_;
 };

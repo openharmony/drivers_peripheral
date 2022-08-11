@@ -42,7 +42,7 @@ TEST_F(UtestHdiTest, camera_hdi_0010)
     if (display_->cameraDevice == nullptr) {
         sleep(3);
         display_->rc = display_->cameraHost->GetCameraIds(display_->cameraIds);
-        EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+        EXPECT_EQ(true, display_->rc == NO_ERROR);
         EXPECT_LT(0, display_->cameraIds.size());
         std::cout << "==========[test log] cameraIds.size()= ."<< display_->cameraIds.size() << std::endl;
     }
@@ -58,16 +58,16 @@ TEST_F(UtestHdiTest, camera_hdi_0010)
 TEST_F(UtestHdiTest, camera_hdi_0020)
 {
     std::cout << "==========[test log] GetCameraAbility, normal cameraId." << std::endl;
-    std::shared_ptr<OHOS::Camera::CameraAbility> ability;
+    std::shared_ptr<CameraAbility> ability;
     if (display_->cameraDevice == nullptr) {
         sleep(3);
         display_->rc = display_->cameraHost->GetCameraIds(display_->cameraIds);
-        EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+        EXPECT_EQ(true, display_->rc == NO_ERROR);
         for (int i = 0; i < display_->cameraIds.size(); i++) {
             display_->rc = display_->cameraHost->GetCameraAbility(display_->cameraIds[i], ability);
             std::cout << "==========[test log] GetCameraAbility, cameraid = ";
             std::cout << display_->cameraIds[i] << std::endl;
-            EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+            EXPECT_EQ(true, display_->rc == NO_ERROR);
         }
     }
 }
@@ -83,12 +83,12 @@ TEST_F(UtestHdiTest, camera_hdi_0021)
 {
     std::string cameraId = "abc";
     std::cout << "==========[test log] GetCameraAbility, abnormal cameraId = 'abc'." << std::endl;
-    std::shared_ptr<OHOS::Camera::CameraAbility> ability;
+    std::shared_ptr<CameraAbility> ability;
     if (display_->cameraDevice == nullptr) {
         sleep(3);
         display_->rc = display_->cameraHost->GetCameraAbility(cameraId, ability);
         std::cout << "==========[test log] display_->rc ="<< display_->rc << std::endl;
-        EXPECT_EQ(true, display_->rc == Camera::CamRetCode::INVALID_ARGUMENT);
+        EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
     }
 }
 
@@ -103,12 +103,12 @@ TEST_F(UtestHdiTest, camera_hdi_0022)
 {
     std::string cameraId = "";
     std::cout << "==========[test log] GetCameraAbility, abnormal cameraId = ''." << std::endl;
-    std::shared_ptr<OHOS::Camera::CameraAbility> ability;
+    std::shared_ptr<CameraAbility> ability;
     if (display_->cameraDevice == nullptr) {
         sleep(2);
         display_->rc = display_->cameraHost->GetCameraAbility(cameraId, ability);
         std::cout << "==========[test log] display_->rc ="<< display_->rc << std::endl;
-        EXPECT_EQ(true, display_->rc == Camera::CamRetCode::INVALID_ARGUMENT);
+        EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
     }
 }
 
@@ -125,12 +125,12 @@ TEST_F(UtestHdiTest, camera_hdi_0030)
     if (display_->cameraDevice == nullptr) {
         sleep(3);
         display_->cameraHost->GetCameraIds(display_->cameraIds);
-        const std::shared_ptr<OHOS::Camera::ICameraDeviceCallback> callback =
-            std::make_shared<OHOS::Camera::ICameraDeviceCallback>();
+        const std::shared_ptr<ICameraDeviceCallback> callback =
+            std::make_shared<ICameraDeviceCallback>();
         display_->rc = display_->cameraHost->OpenCamera(display_->cameraIds.front(),
             callback, display_->cameraDevice);
-        EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-        if (display_->rc != Camera::NO_ERROR || display_->cameraDevice == nullptr) {
+        EXPECT_EQ(true, display_->rc == NO_ERROR);
+        if (display_->rc != NO_ERROR || display_->cameraDevice == nullptr) {
             std::cout << "==========[test log] OpenCamera failed." << std::endl;
             return;
         }
@@ -150,11 +150,11 @@ TEST_F(UtestHdiTest, camera_hdi_0031)
     std::cout << "==========[test log] OpenCamera, cameraID is not found."<< std::endl;
     std::string cameraId = "qwerty";
     if (display_->cameraDevice == nullptr) {
-        const std::shared_ptr<OHOS::Camera::ICameraDeviceCallback> callback =
-            std::make_shared<OHOS::Camera::ICameraDeviceCallback>();
+        const std::shared_ptr<ICameraDeviceCallback> callback =
+            std::make_shared<ICameraDeviceCallback>();
         sleep(3);
         display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-        EXPECT_EQ(true, display_->rc == Camera::INVALID_ARGUMENT);
+        EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
     }
 }
 
@@ -170,11 +170,11 @@ TEST_F(UtestHdiTest, camera_hdi_0032)
     std::cout << "==========[test log] OpenCamera, cameraID is illegal."<< std::endl;
     std::string cameraId = "1";
     if (display_->cameraDevice == nullptr) {
-        const std::shared_ptr<OHOS::Camera::ICameraDeviceCallback> callback =
-            std::make_shared<OHOS::Camera::ICameraDeviceCallback>();
+        const std::shared_ptr<ICameraDeviceCallback> callback =
+            std::make_shared<ICameraDeviceCallback>();
         sleep(3);
         display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-        EXPECT_EQ(true, display_->rc == Camera::INVALID_ARGUMENT);
+        EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
     }
 }
 
@@ -190,11 +190,11 @@ TEST_F(UtestHdiTest, camera_hdi_0033)
     std::cout << "==========[test log] OpenCamera, cameraID is Empty."<< std::endl;
     std::string cameraId = "";
     if (display_->cameraDevice == nullptr) {
-        const std::shared_ptr<OHOS::Camera::ICameraDeviceCallback> callback =
-            std::make_shared<OHOS::Camera::ICameraDeviceCallback>();
+        const std::shared_ptr<ICameraDeviceCallback> callback =
+            std::make_shared<ICameraDeviceCallback>();
         sleep(3);
         display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-        EXPECT_EQ(true, display_->rc == Camera::INVALID_ARGUMENT);
+        EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
     }
 }
 
@@ -211,10 +211,10 @@ TEST_F(UtestHdiTest, camera_hdi_0034)
     if (display_->cameraDevice == nullptr) {
         sleep(3);
         display_->cameraHost->GetCameraIds(display_->cameraIds);
-        const std::shared_ptr<OHOS::Camera::ICameraDeviceCallback> callback = nullptr;
+        const std::shared_ptr<ICameraDeviceCallback> callback = nullptr;
         display_->rc = display_->cameraHost->OpenCamera(display_->cameraIds.front(),
             callback, display_->cameraDevice);
-        EXPECT_EQ(true, display_->rc == Camera::INVALID_ARGUMENT);
+        EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
     }
 }
 
@@ -230,10 +230,10 @@ TEST_F(UtestHdiTest, camera_hdi_0035)
     std::cout << "==========[test log] OpenCamera, cameraID is not found, callback is null."<< std::endl;
     std::string cameraId = "abc";
     if (display_->cameraDevice == nullptr) {
-        const std::shared_ptr<OHOS::Camera::ICameraDeviceCallback> callback = nullptr;
+        const std::shared_ptr<ICameraDeviceCallback> callback = nullptr;
         sleep(3);
         display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-        EXPECT_EQ(true, display_->rc == Camera::INVALID_ARGUMENT);
+        EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
     }
 }
 
@@ -249,10 +249,10 @@ TEST_F(UtestHdiTest, camera_hdi_0050)
     std::cout << "==========[test log] GetStreamOprator, normal callback input." << std::endl;
     sleep(3);
     display_->OpenCamera();
-    display_->streamOperatorCallback = std::make_shared<OHOS::Camera::IStreamOperatorCallback>();
+    display_->streamOperatorCallback = std::make_shared<IStreamOperatorCallback>();
     display_->rc = display_->cameraDevice->GetStreamOperator(display_->streamOperatorCallback,
         display_->streamOperator);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -270,7 +270,7 @@ TEST_F(UtestHdiTest, camera_hdi_0051)
     display_->streamOperatorCallback = nullptr;
     display_->rc = display_->cameraDevice->GetStreamOperator(display_->streamOperatorCallback,
         display_->streamOperator);
-    EXPECT_EQ(true, display_->rc == Camera::INVALID_ARGUMENT);
+    EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
 }
 
 /**
@@ -286,11 +286,11 @@ TEST_F(UtestHdiTest, camera_hdi_0060)
     sleep(3);
     display_->OpenCamera();
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -307,11 +307,11 @@ TEST_F(UtestHdiTest, camera_hdi_0061)
     sleep(3);
     display_->OpenCamera();
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -328,11 +328,11 @@ TEST_F(UtestHdiTest, camera_hdi_0063)
     sleep(3);
     display_->OpenCamera();
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_TWILIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -349,11 +349,11 @@ TEST_F(UtestHdiTest, camera_hdi_0065)
     sleep(3);
     display_->OpenCamera();
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -370,11 +370,11 @@ TEST_F(UtestHdiTest, camera_hdi_0066)
     sleep(3);
     display_->OpenCamera();
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -390,12 +390,12 @@ TEST_F(UtestHdiTest, camera_hdi_0070)
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     std::vector<OHOS::Camera::MetaType> enableTypes;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(enableTypes);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     for (auto &type : enableTypes) {
         std::cout << "==========[test log] type = " << type << std::endl;
     }
     display_->rc = display_->cameraDevice->SetResultMode(Camera::PER_FRAME);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -411,12 +411,12 @@ TEST_F(UtestHdiTest, camera_hdi_0071)
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     std::vector<OHOS::Camera::MetaType> enableTypes;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(enableTypes);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     for (auto &type : enableTypes) {
         std::cout << "==========[test log] type = " << type << std::endl;
     }
     display_->rc = display_->cameraDevice->SetResultMode(Camera::ON_CHANGED);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -431,7 +431,7 @@ TEST_F(UtestHdiTest, camera_hdi_0080)
     std::cout << "==========[test log] GetEnabledReuslts expected success." << std::endl;
     std::vector<OHOS::Camera::MetaType> results;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(results);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     std::cout << "GetEnabledReuslts is :" << std::endl;
     for (int i = 0; i<results.size(); ++i) {
         std::cout << results.at(i) << std::endl;
@@ -453,13 +453,13 @@ TEST_F(UtestHdiTest, camera_hdi_0090)
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
     std::cout << "resultsOriginal.size = " << resultsOriginal.size() << std::endl;
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     // add this tag
     std::vector<OHOS::Camera::MetaType> enableTag;
     std::cout << "==========[test log] 2. Enable the tag: " << resultsOriginal[0] << std::endl;
     enableTag.push_back(resultsOriginal[1]);
     display_->rc = display_->cameraDevice->EnableResult(enableTag);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -475,27 +475,27 @@ TEST_F(UtestHdiTest, camera_hdi_0091)
     // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 
     // Disable all tags
     std::cout << "then, disable the tag..." << std::endl;
     display_->rc = display_->cameraDevice->DisableResult(resultsOriginal);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 
     // Get the parameter tag currently supported by the device again
     std::vector<OHOS::Camera::MetaType> results;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(results);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     EXPECT_GT(results.size(), 0);
 
     // Add multiple tags
     std::cout << "then, enable the tag..." << std::endl;
     display_->rc = display_->cameraDevice->EnableResult(resultsOriginal);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 
     // Get the parameter tag currently supported by the device again
     display_->rc = display_->cameraDevice->GetEnabledReuslts(results);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -511,14 +511,14 @@ TEST_F(UtestHdiTest, camera_hdi_0092)
     // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 
     // add a tag
     std::vector<OHOS::Camera::MetaType> enableTag;
     enableTag.push_back(0);
     std::cout << "then, enable the tag..." << std::endl;
     display_->rc = display_->cameraDevice->EnableResult(enableTag);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -534,7 +534,7 @@ TEST_F(UtestHdiTest, camera_hdi_0100)
     // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     std::cout << "==========[test log] GetEnabledReuslts, size = " << resultsOriginal.size() << std::endl;
 
     // disable a tag
@@ -542,13 +542,13 @@ TEST_F(UtestHdiTest, camera_hdi_0100)
     disableTag.push_back(resultsOriginal[0]);
     display_->rc = display_->cameraDevice->DisableResult(disableTag);
     std::cout << "rc = " << display_->rc << std::endl;
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     std::cout << "==========[test log] DisableResult the tag:" << resultsOriginal[0] << std::endl;
 
     // Get the parameter tag currently supported by the device again
     std::vector<OHOS::Camera::MetaType> results;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(results);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -564,17 +564,17 @@ TEST_F(UtestHdiTest, camera_hdi_0101)
     // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 
     // Disable all tags
     std::cout << "then, disable the tag..." << std::endl;
     display_->rc = display_->cameraDevice->DisableResult(resultsOriginal);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 
     // Get the parameter tag currently supported by the device again
     std::vector<OHOS::Camera::MetaType> results;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(results);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**
@@ -590,7 +590,7 @@ TEST_F(UtestHdiTest, camera_hdi_0102)
     // Get the parameter tag currently supported by the device
     std::vector<OHOS::Camera::MetaType> resultsOriginal;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(resultsOriginal);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 
     // disable a tag
     std::vector<OHOS::Camera::MetaType> disableTag;
@@ -598,12 +598,12 @@ TEST_F(UtestHdiTest, camera_hdi_0102)
     std::cout << "then, disenable the tag..." << std::endl;
     display_->rc = display_->cameraDevice->DisableResult(disableTag);
     std::cout << "==========[test log] rc = " << display_->rc << std::endl;
-    EXPECT_EQ(false, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(false, display_->rc == NO_ERROR);
 
     // Get the parameter tag currently supported by the device again
     std::vector<OHOS::Camera::MetaType> results;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(results);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
 }
 
 /**

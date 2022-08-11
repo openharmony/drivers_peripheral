@@ -43,7 +43,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0190)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // Create data stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
@@ -67,16 +67,16 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0191)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     int captureId = 2001;
-    std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
+    std::shared_ptr<CaptureInfo> captureInfo = std::make_shared<CaptureInfo>();
     captureInfo->streamIds_ = {-1};
     captureInfo->enableShutterCallback_ = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, true);
-    EXPECT_EQ(Camera::CamRetCode::INVALID_ARGUMENT, display_->rc);
-    if (display_->rc == Camera::CamRetCode::INVALID_ARGUMENT)
+    EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
+    if (display_->rc == INVALID_ARGUMENT)
     {
         std::cout << "==========[test log] Capture fail." << std::endl;
     } else {
@@ -99,25 +99,25 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0192)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     int captureId = 2001;
-    std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
+    std::shared_ptr<CaptureInfo> captureInfo = std::make_shared<CaptureInfo>();
     captureInfo->streamIds_ = {2147483647};
     captureInfo->enableShutterCallback_ = true;
     bool isStreaming = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, isStreaming);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] Capture success." << std::endl;
     } else {
         std::cout << "==========[test log] Capture fail, rc = " << display_->rc << std::endl;
     }
     sleep(5);
     display_->rc = display_->streamOperator->CancelCapture(captureId);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] CancelCapture success." << std::endl;
     } else {
         std::cout << "==========[test log] CancelCapture fail, rc = " << display_->rc << std::endl;
@@ -140,7 +140,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0193)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
@@ -164,27 +164,27 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0194)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     int captureId = 2001;
-    std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
+    std::shared_ptr<CaptureInfo> captureInfo = std::make_shared<CaptureInfo>();
     captureInfo->streamIds_ = {display_->streamId_preview};
     captureInfo->enableShutterCallback_ = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, false);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     sleep(5);
     display_->streamOperator->CancelCapture(captureId);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] CancelCapture success." << std::endl;
     } else {
         std::cout << "==========[test log] CancelCapture fail, rc = " << display_->rc << std::endl;
     }
     // release stream
     display_->rc = display_->streamOperator->ReleaseStreams(captureInfo->streamIds_);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] ReleaseStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] ReleaseStreams fail, rc = " << display_->rc << std::endl;
@@ -205,17 +205,17 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0195)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     int captureId = -1;
-    std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
+    std::shared_ptr<CaptureInfo> captureInfo = std::make_shared<CaptureInfo>();
     captureInfo->streamIds_ = {display_->streamId_preview};
     captureInfo->enableShutterCallback_ = false;
     bool isStreaming = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, isStreaming);
-    EXPECT_EQ(Camera::CamRetCode::INVALID_ARGUMENT, display_->rc);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] Capture success." << std::endl;
     } else {
         std::cout << "==========[test log] Capture fail, rc = " << display_->rc << std::endl;
@@ -237,7 +237,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0196)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, true, true);
@@ -260,7 +260,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0200)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
@@ -283,30 +283,30 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0201)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     int captureId = 100;
-    std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
+    std::shared_ptr<CaptureInfo> captureInfo = std::make_shared<CaptureInfo>();
     captureInfo->streamIds_ = {display_->streamId_preview};
     captureInfo->enableShutterCallback_ = false;
     bool isStreaming = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, isStreaming);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     sleep(5);
     display_->rc = display_->streamOperator->CancelCapture(-1);
-    EXPECT_EQ(Camera::CamRetCode::INVALID_ARGUMENT, display_->rc);
+    EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
     display_->rc = display_->streamOperator->CancelCapture(captureId);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] CancelCapture success." << std::endl;
     } else {
         std::cout << "==========[test log] CancelCapture fail, rc = " << display_->rc << std::endl;
     }
     // release stream
     display_->rc = display_->streamOperator->ReleaseStreams(captureInfo->streamIds_);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] ReleaseStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] ReleaseStreams fail, rc = " << display_->rc << std::endl;
@@ -336,26 +336,26 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0210)
     };
     producer->SetCallback(callback);
 
-    display_->streamInfo = std::make_shared<OHOS::Camera::StreamInfo>();
+    display_->streamInfo = std::make_shared<StreamInfo>();
     display_->streamInfo->streamId_ = 1001;
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
-    display_->streamInfo->intent_ = Camera::PREVIEW;
+    display_->streamInfo->intent_ = PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfos.push_back(display_->streamInfo);
     display_->rc = display_->streamOperator->CreateStreams(display_->streamInfos);
     std::cout << "==========[test log] streamOperator->CreateStreams's RetCode = " << display_->rc << std::endl;
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }
     display_->rc = display_->streamOperator->AttachBufferQueue(display_->streamInfo->streamId_, producer);
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] AttachBufferQueue success. " << std::endl;
     } else {
         std::cout << "==========[test log] AttachBufferQueue fail, rc = " << display_->rc << std::endl;
@@ -378,7 +378,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0211)
     std::cout << "==========[test log] AttachBufferQueue, streamID is not exist.." << std::endl;
     display_->AchieveStreamOperator();
     // Create data stream
-    display_->streamInfo = std::make_shared<OHOS::Camera::StreamInfo>();
+    display_->streamInfo = std::make_shared<StreamInfo>();
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
@@ -394,20 +394,20 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0211)
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
-    display_->streamInfo->intent_ = Camera::PREVIEW;
+    display_->streamInfo->intent_ = PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfos.push_back(display_->streamInfo);
     display_->rc = display_->streamOperator->CreateStreams(display_->streamInfos);
     std::cout << "==========[test log] streamOperator->CreateStreams's RetCode = " << display_->rc << std::endl;
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }
     display_->rc = display_->streamOperator->AttachBufferQueue(0, producer);
-    EXPECT_EQ(true, display_->rc != Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc != NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] AttachBufferQueue success. " << std::endl;
     } else {
         std::cout << "==========[test log] AttachBufferQueue fail, rc = " << display_->rc << std::endl;
@@ -429,34 +429,34 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0212)
 {
     std::cout << "==========[test log] AttachBufferQueue, producer is nullptr." << std::endl;
     display_->AchieveStreamOperator();
-    if (display_->rc == Camera::NO_ERROR) {
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] GetStreamOperator success. " << std::endl;
     } else {
         std::cout << "==========[test log] GetStreamOperator fail, rc = " << display_->rc << std::endl;
     }
     std::shared_ptr<IBufferProducer> producer = nullptr;
     // Create data stream
-    display_->streamInfo = std::make_shared<OHOS::Camera::StreamInfo>();
+    display_->streamInfo = std::make_shared<StreamInfo>();
     display_->streamInfo->streamId_ = 1001;
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
-    display_->streamInfo->intent_ = Camera::PREVIEW;
+    display_->streamInfo->intent_ = PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfos.push_back(display_->streamInfo);
     display_->rc = display_->streamOperator->CreateStreams(display_->streamInfos);
     std::cout << "==========[test log] streamOperator->CreateStreams's RetCode = ";
     std::cout << display_->rc << std::endl;
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success. " << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }
     display_->rc = display_->streamOperator->AttachBufferQueue(display_->streamInfo->streamId_, nullptr);
-    EXPECT_EQ(true, display_->rc != Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc != NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] AttachBufferQueue success. " << std::endl;
     } else {
         std::cout << "==========[test log] AttachBufferQueue fail, rc = " << display_->rc << std::endl;
@@ -489,31 +489,31 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0220)
         return;
     };
     producer->SetCallback(callback);
-    display_->streamInfo = std::make_shared<OHOS::Camera::StreamInfo>();
+    display_->streamInfo = std::make_shared<StreamInfo>();
     display_->streamInfo->streamId_ = 1001;
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
-    display_->streamInfo->intent_ = Camera::PREVIEW;
+    display_->streamInfo->intent_ = PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfos.push_back(display_->streamInfo);
     display_->rc = display_->streamOperator->CreateStreams(display_->streamInfos);
     std::cout << "==========[test log] streamOperator->CreateStreams's RetCode = ";
     std::cout << display_->rc << std::endl;
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     std::cout << "==========[test log] CreateStreams success. " << std::endl;
     display_->rc = display_->streamOperator->AttachBufferQueue(display_->streamInfo->streamId_, producer);
     std::cout << "==========[test log] streamOperator->AttachBufferQueue's RetCode = ";
     std::cout << display_->rc << std::endl;
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     sleep(3);
     std::cout << "==========[test log] AttachBufferQueue success. " << std::endl;
     display_->rc = display_->streamOperator->DetachBufferQueue(display_->streamInfo->streamId_);
     std::cout << "==========[test log] streamOperator->DetachBufferQueue's RetCode = ";
     std::cout << display_->rc << std::endl;
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] DetachBufferQueue success. " << std::endl;
     } else {
         std::cout << "==========[test log] DetachBufferQueue fail, rc = " << display_->rc << std::endl;
@@ -545,30 +545,30 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0221)
         return;
     };
     producer->SetCallback(callback);
-    display_->streamInfo = std::make_shared<OHOS::Camera::StreamInfo>();
+    display_->streamInfo = std::make_shared<StreamInfo>();
     display_->streamInfo->streamId_ = 1001;
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     display_->streamInfo->dataspace_ = 8; // 8:picture dataspace
-    display_->streamInfo->intent_ = Camera::PREVIEW;
+    display_->streamInfo->intent_ = PREVIEW;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfos.push_back(display_->streamInfo);
     display_->rc = display_->streamOperator->CreateStreams(display_->streamInfos);
     std::cout << "==========[test log] streamOperator->CreateStreams's RetCode = ";
     std::cout << display_->rc << std::endl;
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     std::cout << "==========[test log] CreateStreams success. " << std::endl;
     display_->rc = display_->streamOperator->AttachBufferQueue(display_->streamInfo->streamId_, producer);
     std::cout << "==========[test log] streamOperator->AttachBufferQueue's RetCode = " << display_->rc << std::endl;
-    EXPECT_EQ(true, display_->rc == Camera::NO_ERROR);
+    EXPECT_EQ(true, display_->rc == NO_ERROR);
     std::cout << "==========[test log] AttachBufferQueue success. " << std::endl;
     sleep(3);
 
     display_->rc = display_->streamOperator->DetachBufferQueue(0);
     std::cout << "==========[test log] streamOperator->DetachBufferQueue's RetCode = " << display_->rc << std::endl;
-    EXPECT_EQ(true, display_->rc != Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(true, display_->rc != NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] DetachBufferQueue success. " << std::endl;
     } else {
         std::cout << "==========[test log] DetachBufferQueue fail, rc = " << display_->rc << std::endl;
