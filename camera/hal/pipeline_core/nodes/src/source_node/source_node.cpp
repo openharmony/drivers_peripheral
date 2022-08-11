@@ -257,30 +257,33 @@ RetCode SourceNode::PortHandler::StartDistributeBuffers()
 RetCode SourceNode::PortHandler::StopDistributeBuffers()
 {
     CAMERA_LOGV("SourceNode::PortHandler::StopDistributeBuffers enter");
-    FlushBuffers();
     dbtRun = false;
     rbcv.notify_one();
     if (distributor != nullptr) {
         distributor->join();
     }
+    FlushBuffers(); // flush buffers after stopping distributor
     CAMERA_LOGV("SourceNode::PortHandler::StopDistributeBuffers exit");
     return RC_OK;
 }
 
 void SourceNode::PortHandler::DistributeBuffers()
 {
-    std::unique_lock<std::mutex> l(rblock);
-    rbcv.wait(l, [this] { return dbtRun == false || !respondBufferList.empty(); });
-    if (!dbtRun) {
-        return;
+    std::shared_ptr<IBuffer> buffer = nullptr;
+    {
+        std::unique_lock<std::mutex> l(rblock);
+        rbcv.wait(l, [this] { return dbtRun == false || !respondBufferList.empty(); });
+        if (!dbtRun) {
+            return;
+        }
+
+        buffer = respondBufferList.front();
+        respondBufferList.pop_front();
     }
 
     auto node = port->GetNode();
     CHECK_IF_PTR_NULL_RETURN_VOID(node);
-    auto buffer = respondBufferList.front();
     node->DeliverBuffer(buffer);
-
-    respondBufferList.pop_front();
 
     return;
 }
