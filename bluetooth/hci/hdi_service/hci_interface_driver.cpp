@@ -56,6 +56,7 @@ static int32_t HciInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int 
 
 static int HdfHciInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
     HDF_LOGI("HdfHciInterfaceDriverInit enter");
     return HDF_SUCCESS;
 }
