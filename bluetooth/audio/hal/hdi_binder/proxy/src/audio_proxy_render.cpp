@@ -266,6 +266,7 @@ int32_t AudioProxyRenderSelectScene(const AudioHandle handle, const struct Audio
 
 int32_t AudioProxyRenderSetMute(const AudioHandle handle, bool mute)
 {
+    (void)mute;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
@@ -469,6 +470,7 @@ int32_t AudioProxyRenderGetRenderPosition(struct AudioRender *render, uint64_t *
 
 int32_t AudioProxyRenderSetRenderSpeed(struct AudioRender *render, float speed)
 {
+    (void)speed;
     struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(render);
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
