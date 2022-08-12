@@ -61,7 +61,7 @@ class TestStreamConsumerListener : public IBufferConsumerListener {
         {
         }
 
-        void OnBufferAvailable()
+        void OnBufferAvailable() const
         {
         }
 };
@@ -112,7 +112,7 @@ class StreamConsumer {
             return producer;
         }
 
-        void WaitSnapshotEnd()
+        void WaitSnapshotEnd() const
         {
             std::unique_lock<std::mutex> l(l_);
             cv_.wait(l, [this]() { return shotCount_ == 0; });
@@ -146,8 +146,8 @@ class CameraRemoteTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
-    void SetUp() {}
-    void TearDown() {}
+    void SetUp() const {}
+    void TearDown() const {}
 };
 
 HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)

@@ -21,7 +21,7 @@ std::unique_ptr<StreamPipelineDispatcher> StreamPipelineDispatcher::Create()
 }
 
 void StreamPipelineDispatcher::GenerateNodeSeq(std::vector<std::shared_ptr<INode>>& nodeVec,
-            const std::shared_ptr<INode>& node)
+    const std::shared_ptr<INode>& node)
 {
     if (node != nullptr) {
         nodeVec.push_back(node);

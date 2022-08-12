@@ -62,16 +62,16 @@ public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
 
-    void SetUp(void);
-    void TearDown(void);
+    void SetUp(void) const;
+    void TearDown(void) const;
 
 protected:
     virtual bool InitCameraHost();
     virtual bool GetCameraDevice();
     virtual bool GetStreamOperator();
     virtual bool GetCameraIds();
-    int32_t SaveToFile(const std::string path, const void* buffer, int32_t size);
-    uint64_t GetCurrentLocalTimeStamp();
+    int32_t SaveToFile(const std::string path, const void* buffer, int32_t size) const;
+    uint64_t GetCurrentLocalTimeStamp() const;
 
 protected:
 #ifdef CAMERA_BUILT_ON_OHOS_LITE

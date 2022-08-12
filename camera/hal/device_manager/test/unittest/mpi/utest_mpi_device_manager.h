@@ -20,7 +20,7 @@
 #include <gtest/gtest.h>
 #include "device_manager_adapter.h"
 
-namespace OHOS::Camera{
+namespace OHOS::Camera {
 class UtestMpiDeviceManager : public testing::Test {
 public:
     static void SetUpTestCase(void);
