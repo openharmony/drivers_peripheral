@@ -1185,7 +1185,7 @@ static int32_t NetDeviceInfoHandler(struct nl_msg *msg, void *arg)
     return NL_SKIP;
 }
 
-static uint32_t GetIftypeAndMac(struct NetDeviceInfo *info)
+static int32_t GetIftypeAndMac(struct NetDeviceInfo *info)
 {
     struct nl_msg *msg = nlmsg_alloc();
     int32_t ret;
@@ -1219,9 +1219,17 @@ int32_t GetNetDeviceInfo(struct NetDeviceInfoResult *netDeviceInfoResult)
     }
 
     for (i = 0; i < networkInfo.nums && i < MAX_NETDEVICE_COUNT; i++) {
-        memset_s(&netDeviceInfoResult->deviceInfos[i], sizeof(struct NetDeviceInfo), 0, sizeof(struct NetDeviceInfo));
+        if (memset_s(&netDeviceInfoResult->deviceInfos[i], sizeof(struct NetDeviceInfo), 0,
+            sizeof(struct NetDeviceInfo)) != EOK) {
+            HILOG_ERROR(LOG_CORE, "%s: memset_s fail", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
         netDeviceInfoResult->deviceInfos[i].index = i + 1;
-        strncpy_s(netDeviceInfoResult->deviceInfos[i].ifName, IFNAMSIZ, networkInfo.infos[i].name, IFNAMSIZ);
+        if (strncpy_s(netDeviceInfoResult->deviceInfos[i].ifName, IFNAMSIZ,
+            networkInfo.infos[i].name, IFNAMSIZ) != EOK) {
+            HILOG_ERROR(LOG_CORE, "%s: strncpy_s fail", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
         ret = GetIftypeAndMac(&netDeviceInfoResult->deviceInfos[i]);
         if (ret != RET_CODE_SUCCESS) {
             HILOG_ERROR(LOG_CORE, "%s: get iftype and mac failed", __FUNCTION__);

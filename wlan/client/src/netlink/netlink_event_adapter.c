@@ -137,11 +137,11 @@ static void DoGetScanResult(struct nlattr *attr[], int len, WifiScanResult *scan
 {
     if (attr[NL80211_BSS_INFORMATION_ELEMENTS]) {
         scanResult->ie = nla_data(attr[NL80211_BSS_INFORMATION_ELEMENTS]);
-        scanResult->ieLen = nla_len(attr[NL80211_BSS_INFORMATION_ELEMENTS]);
+        scanResult->ieLen = (uint32_t)nla_len(attr[NL80211_BSS_INFORMATION_ELEMENTS]);
     }
     if (attr[NL80211_BSS_BEACON_IES]) {
         scanResult->beaconIe = nla_data(attr[NL80211_BSS_BEACON_IES]);
-        scanResult->beaconIeLen = nla_len(attr[NL80211_BSS_BEACON_IES]);
+        scanResult->beaconIeLen = (uint32_t)nla_len(attr[NL80211_BSS_BEACON_IES]);
     }
     if (attr[NL80211_BSS_BSSID]) {
         scanResult->bssid = nla_data(attr[NL80211_BSS_BSSID]);
@@ -156,16 +156,17 @@ static void DoGetScanResult(struct nlattr *attr[], int len, WifiScanResult *scan
         scanResult->caps = nla_get_u16(attr[NL80211_BSS_CAPABILITY]);
     }
     if (attr[NL80211_BSS_SIGNAL_MBM]) {
-        scanResult->level = nla_get_u32(attr[NL80211_BSS_SIGNAL_MBM]) / SIGNALLEVELCONFFICIENT; /* mBm to dBm */
+         /* mBm to dBm */
+        scanResult->level = (int32_t)nla_get_u32(attr[NL80211_BSS_SIGNAL_MBM]) / SIGNALLEVELCONFFICIENT;
         scanResult->flags |= SCAN_LEVEL_DBM | SCAN_QUAL_INVALID;
     } else if (attr[NL80211_BSS_SIGNAL_UNSPEC]) {
-        scanResult->level = nla_get_u8(attr[NL80211_BSS_SIGNAL_UNSPEC]);
+        scanResult->level = (int32_t)nla_get_u8(attr[NL80211_BSS_SIGNAL_UNSPEC]);
         scanResult->flags |= SCAN_QUAL_INVALID;
     } else {
         scanResult->flags |= SCAN_LEVEL_INVALID | SCAN_QUAL_INVALID;
     }
     if (attr[NL80211_BSS_SEEN_MS_AGO]) {
-        scanResult->age = nla_get_u32(attr[NL80211_BSS_SEEN_MS_AGO]);
+        scanResult->age = (int32_t)nla_get_u32(attr[NL80211_BSS_SEEN_MS_AGO]);
     }
 }
 
