@@ -338,7 +338,7 @@ int32_t SerializeTlvWrapper(TlvListNode *head, uint8_t *buffer, uint32_t maxSize
             LOG_ERROR("tlv is NULL");
             return PARAM_ERR;
         }
-        int32_t type = Ntohl(tlv->type);
+        int32_t type = (int32_t)Ntohl(tlv->type);
         if ((offset > UINT32_MAX - sizeof(int32_t) || offset + sizeof(int32_t) > maxSize) ||
             (memcpy_s(buffer + offset, sizeof(int32_t), &type, sizeof(int32_t)) != EOK)) {
             LOG_ERROR("copy type failed");

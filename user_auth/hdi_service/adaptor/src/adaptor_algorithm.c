@@ -177,7 +177,7 @@ EXIT:
     return ret;
 }
 
-int32_t Ed25519Verify(const Buffer *pubKey, const Buffer *data, const Buffer *sign)
+ResultCode Ed25519Verify(const Buffer *pubKey, const Buffer *data, const Buffer *sign)
 {
     if (!CheckBufferWithSize(pubKey, ED25519_FIX_PUBKEY_BUFFER_SIZE) || !IsBufferValid(data) ||
         !CheckBufferWithSize(sign, ED25519_FIX_SIGN_BUFFER_SIZE)) {
