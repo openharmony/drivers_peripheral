@@ -56,8 +56,8 @@ extern "C" {
 #define FORMAT_MAX_LANGUAGE_NUM 4    /**< Indicates the number of languages in the subtitle file. */
 #define FORMAT_LANGUAGE_LEN 4        /**< Indicates the number of characters contained in the language description. */
 #define FORMAT_TITLE_LEN 64          /**< Indicates the number of title characters. */
-#define FORMAT_INVALID_TRACK_ID -1   /**< Indicates an invalid track ID. */
-#define FORMAT_INVALID_PROGRAM_ID -1 /**< Indicates an invalid program ID. */
+#define FORMAT_INVALID_TRACK_ID (-1)   /**< Indicates an invalid track ID. */
+#define FORMAT_INVALID_PROGRAM_ID (-1) /**< Indicates an invalid program ID. */
 
 /**
  * @brief define FormatHandle type.
@@ -626,14 +626,14 @@ typedef struct {
  * @since 1.0
  * @version 1.0
  */
-typedef void *CALLBACK_HANDLE;
+typedef void *CallbackHandle;
 
 /**
  * @brief Defines listener callbacks for the format.
  */
 typedef struct {
     /** Private data handle */
-    CALLBACK_HANDLE privateDataHandle;
+    CallbackHandle privateDataHandle;
 
     /**
      * @brief Called when a format error occurs during capturing. This callback is used to report the errors.
@@ -645,7 +645,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*OnError)(CALLBACK_HANDLE privateDataHandle, int32_t errorType, int32_t errorCode);
+    int32_t (*OnError)(CallbackHandle privateDataHandle, int32_t errorType, int32_t errorCode);
 
     /**
      * @brief Called when an information event occurs during capturing.
@@ -658,7 +658,7 @@ typedef struct {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*OnInfo)(CALLBACK_HANDLE privateDataHandle, int32_t type, int32_t extra);
+    int32_t (*OnInfo)(CallbackHandle privateDataHandle, int32_t type, int32_t extra);
 } FormatCallback;
 
 #ifdef __cplusplus
