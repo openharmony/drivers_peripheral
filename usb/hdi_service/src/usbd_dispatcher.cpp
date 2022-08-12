@@ -656,7 +656,6 @@ int32_t UsbdDispatcher::UsbdMallocAndFill(uint8_t *&dataAddr, const std::vector<
     uint32_t length = sizeof(uint8_t) * data.size();
     if (length == 0) {
         HDF_LOGI("%{public}s: data is empty", __func__);
-        dataAddr = nullptr;
         return HDF_SUCCESS;
     }
     
@@ -677,7 +676,7 @@ int32_t UsbdDispatcher::UsbdMallocAndFill(uint8_t *&dataAddr, const std::vector<
 }
 
 int32_t UsbdDispatcher::FillReqAyncParams(
-    UsbdRequestASync *userData, UsbPipeInfo *pipe, UsbRequestParams *params, const uint8_t *buffer, int32_t length)
+    UsbdRequestASync *userData, UsbPipeInfo *pipe, UsbRequestParams *params, const uint8_t *buffer, uint32_t length)
 {
     if (userData == nullptr || pipe == nullptr || params == nullptr) {
         HDF_LOGE("%{public}s:invalid param", __func__);
@@ -1168,7 +1167,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncPutAsmData(UsbdBufferHandle *handle, uint8_
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t tlen = len;
+    uint32_t tlen = len;
     int32_t ret = HDF_SUCCESS;
     OsalMutexLock(&handle->lock);
     do {

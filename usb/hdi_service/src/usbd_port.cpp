@@ -70,7 +70,7 @@ int32_t UsbdPort::WritePortFile(int32_t powerRole, int32_t dataRole, int32_t mod
         return HDF_FAILURE;
     }
 
-    int32_t len = modeStr.size();
+    uint32_t len = modeStr.size();
     int32_t fd = open(PORT_FILE_PATH, O_WRONLY | O_TRUNC);
     if (fd < 0) {
         HDF_LOGE("%{public}s: file open error fd = %{public}d", __func__, fd);
