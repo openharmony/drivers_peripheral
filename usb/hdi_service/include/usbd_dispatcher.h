@@ -99,6 +99,7 @@ public:
     static int32_t UsbdBulkASyncReqRelease(UsbdBulkASyncReqList *list);
     static int32_t UsbdBulkASyncListRelease(UsbdBulkASyncList *list);
     static void UsbdRelease(HostDevice *dev);
+    static int32_t UsbdMallocAndFill(uint8_t *&dataAddr, const std::vector<uint8_t> &data);
     static int32_t FillReqAyncParams(
         UsbdRequestASync *userData, UsbPipeInfo *pipe,
         UsbRequestParams *parmas, const uint8_t *buffer, int32_t length);
