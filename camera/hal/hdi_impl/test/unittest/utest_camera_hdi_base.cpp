@@ -27,11 +27,11 @@ void CameraHdiBaseTest::TearDownTestCase(void)
 {
 }
 
-void CameraHdiBaseTest::SetUp(void)
+void CameraHdiBaseTest::SetUp(void) const
 {
 }
 
-void CameraHdiBaseTest::TearDown(void)
+void CameraHdiBaseTest::TearDown(void) const
 {
 }
 
@@ -107,7 +107,7 @@ bool CameraHdiBaseTest::GetCameraIds()
     return true;
 }
 
-int32_t CameraHdiBaseTest::SaveToFile(const std::string path, const void* buffer, int32_t size)
+int32_t CameraHdiBaseTest::SaveToFile(const std::string path, const void* buffer, int32_t size) const
 {
     char checkPath[PATH_MAX] = {0};
     if (::realpath(path.c_str(), checkPath) == nullptr) {
@@ -129,7 +129,7 @@ int32_t CameraHdiBaseTest::SaveToFile(const std::string path, const void* buffer
     return 0;
 }
 
-uint64_t CameraHdiBaseTest::GetCurrentLocalTimeStamp()
+uint64_t CameraHdiBaseTest::GetCurrentLocalTimeStamp() const
 {
     std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp =
         std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::now());

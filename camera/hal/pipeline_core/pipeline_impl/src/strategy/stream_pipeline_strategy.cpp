@@ -16,9 +16,7 @@
 
 namespace OHOS::Camera {
 StreamPipelineStrategy::StreamPipelineStrategy(const std::shared_ptr<HostStreamMgr>& streamMgr,
-    const std::shared_ptr<PipelineSpec>& spec) :
-    hostStreamMgr_(streamMgr),
-    pipelineSpec_(spec)
+    const std::shared_ptr<PipelineSpec>& spec) : hostStreamMgr_(streamMgr), pipelineSpec_(spec)
 {
 }
 

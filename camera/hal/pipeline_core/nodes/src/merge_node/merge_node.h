@@ -21,7 +21,7 @@
 #include "camera.h"
 #include "node_base.h"
 
-namespace OHOS::Camera{
+namespace OHOS::Camera {
 class MergeNode : public NodeBase
 {
 public:

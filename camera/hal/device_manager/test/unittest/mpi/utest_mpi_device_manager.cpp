@@ -24,8 +24,7 @@
 
 using namespace testing::ext;
 namespace OHOS::Camera {
-class TestNode
-{
+class TestNode {
 public:
     ~TestNode() {}
     TestNode() {}
@@ -40,8 +39,7 @@ public:
     }
 };
 
-class TestDevice
-{
+class TestDevice {
 public:
     TestDevice() {};
     ~TestDevice() {};
