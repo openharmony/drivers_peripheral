@@ -129,11 +129,11 @@ typedef struct {
 } WifiTxStatus;
 
 typedef struct {
-    int32_t flags;
+    uint32_t flags;
     uint8_t *bssid;
-    int16_t caps;
-    int32_t freq;
-    int16_t beaconInt;
+    uint16_t caps;
+    uint32_t freq;
+    uint16_t beaconInt;
     int32_t qual;
     uint32_t beaconIeLen;
     int32_t level;
