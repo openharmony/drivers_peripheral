@@ -628,9 +628,7 @@ static int32_t CodecProxyDequeueInput(struct ICodec *self, CODEC_HANDLETYPE hand
     }
     int32_t ret = CodecProxyCall(self, CMD_CODEC_DEQUEQUE_INPUT, data, reply);
     if (ret != HDF_SUCCESS) {
-        if (ret != HDF_ERR_TIMEOUT) {
-            HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
-        }
+        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
         CodecProxySBufRecycle(data, reply);
         return ret;
     }

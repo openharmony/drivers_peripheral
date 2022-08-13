@@ -661,11 +661,10 @@ int32_t SplitParam(int32_t paramIndex, int8_t *paramIn, Param *paramOut, int32_t
         case OMX_IndexParamPassthrough:
             SplitParamPassthrough(paramIn, paramOut, paramCnt, setMark);
             break;
-        default: {
+        default:
             HDF_LOGE("%{public}s error,paramIndex[%{public}d] is not support!", __func__, paramIndex);
             ret = HDF_ERR_NOT_SUPPORT;
             break;
-        }
     }
     return ret;
 }
@@ -1107,11 +1106,10 @@ int32_t ParseParam(int32_t paramIndex, Param *paramIn, int32_t paramCnt, int8_t 
             ret = ParseParamPassthrough(paramIn, paramOut, paramCnt);
             break;
 
-        default: {
+        default:
             HDF_LOGE("%{public}s error, unsupport paramIndex[%{public}d]", __func__, paramIndex);
             ret = HDF_ERR_NOT_SUPPORT;
             break;
-        }
     }
     return ret;
 }
