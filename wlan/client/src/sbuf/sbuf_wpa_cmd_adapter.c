@@ -371,7 +371,7 @@ int32_t WifiCmdGetOwnMac(const char *ifName, char *buf, uint32_t len)
             HDF_LOGE("%s: Serialize failed!", __FUNCTION__);
             ret = RET_CODE_FAILURE;
         }
-        if (ret) {
+        if (ret != RET_CODE_SUCCESS) {
             ret = RET_CODE_FAILURE;
             break;
         }
@@ -417,7 +417,7 @@ int32_t WifiCmdGetHwFeature(const char *ifName, WifiHwFeatureData *hwFeatureData
             HDF_LOGE("%s: HdfSbufWriteString failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
         }
-        if (ret) {
+        if (ret != RET_CODE_SUCCESS) {
             ret = RET_CODE_FAILURE;
             break;
         }

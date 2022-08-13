@@ -89,7 +89,7 @@ enum P2PCommands {
 };
 
 #define MESSAGE_CMD_BITS 16
-#define HDF_WIFI_CMD(SERVICEID, CMDID) (((uint32_t)SERVICEID) << MESSAGE_CMD_BITS) | (CMDID)
+#define HDF_WIFI_CMD(SERVICEID, CMDID) ((((uint32_t)SERVICEID) << MESSAGE_CMD_BITS) | (CMDID))
 
 typedef enum {
     WIFI_HAL_CMD_GET_NETWORK_INFO = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_GET_NETWORK_INFO),
@@ -146,7 +146,7 @@ typedef enum {
 } WifiWPACmdType;
 
 struct CallbackEvent {
-    uint32_t eventType;   //eventmap
+    uint32_t eventType; /* eventmap */
     char ifName[IFNAMSIZ + 1];
     OnReceiveFunc onRecFunc;
 };

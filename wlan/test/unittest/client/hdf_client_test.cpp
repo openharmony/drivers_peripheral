@@ -180,13 +180,13 @@ HWTEST_F(WifiClientTest, WifiClientGetValidFreqByBand001, TestSize.Level1)
     uint32_t size = 14;
     uint32_t i;
 
-    result.freqs = (int32_t *)OsalMemCalloc(35 * sizeof(int32_t));
+    result.freqs = (uint32_t *)OsalMemCalloc(35 * sizeof(uint32_t));
     if (result.freqs == NULL) {
         printf("%s: OsalMemCalloc failed", __FUNCTION__);
         return;
     }
 
-    result.txPower = (int32_t *)OsalMemCalloc(35 * sizeof(int32_t));
+    result.txPower = (uint32_t *)OsalMemCalloc(35 * sizeof(uint32_t));
     if (result.txPower == NULL) {
         printf("%s: OsalMemCalloc failed", __FUNCTION__);
         OsalMemFree(result.freqs);
