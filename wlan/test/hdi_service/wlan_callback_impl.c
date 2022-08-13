@@ -23,15 +23,15 @@ struct WlanCallbackService {
     struct WlanCallbackStub stub;
 };
 
-int32_t WlanCallbackResetDriver(struct IWlanCallback *self, uint32_t event, int32_t code, const char *ifName)
+static int32_t WlanCallbackResetDriver(struct IWlanCallback *self, uint32_t event, int32_t code, const char *ifName)
 {
     (void)self;
     HDF_LOGE("WlanCallbackResetDriver: receive resetStatus=%{public}d \n", code);
     return HDF_SUCCESS;
 }
 
-int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event, const struct HdfWifiScanResult *scanResult,
-    const char *ifName)
+static int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event,
+    const struct HdfWifiScanResult *scanResult, const char *ifName)
 {
     (void)self;
     if (scanResult == NULL || ifName == NULL) {
@@ -46,7 +46,7 @@ int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event, const
     return HDF_SUCCESS;
 }
 
-int32_t WlanCallbackNetlinkMessage(struct IWlanCallback *self, const uint8_t *msg, uint32_t msgLen)
+static int32_t WlanCallbackNetlinkMessage(struct IWlanCallback *self, const uint8_t *msg, uint32_t msgLen)
 {
     int32_t i;
     (void)self;

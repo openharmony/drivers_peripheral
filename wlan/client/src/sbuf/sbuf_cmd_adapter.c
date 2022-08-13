@@ -25,7 +25,7 @@ extern "C" {
 #endif
 #endif
 
-const char *DRIVER_SERVICE_NAME = "hdfwifi";
+#define DRIVER_SERVICE_NAME "hdfwifi"
 static struct HdfDevEventlistener g_wifiDevEventListener;
 static bool g_isHasRegisterListener = false;
 
@@ -113,7 +113,7 @@ static int32_t ParserFreqInfo(struct HdfSBuf *reply, struct FreqInfoResult *resu
         HDF_LOGE("%s: read freqs failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    if (memcpy_s(result->freqs, size * sizeof(int32_t), replayData, replayDataSize) != EOK) {
+    if (memcpy_s(result->freqs, size * sizeof(uint32_t), replayData, replayDataSize) != EOK) {
         HDF_LOGE("%s: memcpy failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
@@ -182,7 +182,7 @@ static void WifiMsgUnregisterEventListener(struct HdfDevEventlistener *listener)
     if (listener == NULL) {
         return;
     }
-    if (HdfDeviceUnregisterEventListener(wifiService, listener)) {
+    if (HdfDeviceUnregisterEventListener(wifiService, listener) != HDF_SUCCESS) {
         HDF_LOGE("%s: fail to unregister event listener, line: %d", __FUNCTION__, __LINE__);
     }
     g_isHasRegisterListener = false;

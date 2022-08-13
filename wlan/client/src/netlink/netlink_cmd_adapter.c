@@ -198,19 +198,30 @@ static int32_t CmdSocketAckHandler(struct nl_msg *msg, void *arg)
     return NL_STOP;
 }
 
-int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data)
+static struct nl_cb *NetlinkSetCallback(const RespHandler handler, int32_t *error, void *data)
 {
-    int32_t rc;
-    int32_t error;
-    int32_t count = 0;
     struct nl_cb *cb = NULL;
 
-    if (g_wifiHalInfo.cmdSock == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: sock is null", __FUNCTION__);
-        return RET_CODE_INVALID_PARAM;
+    cb = nl_cb_alloc(NL_CB_DEFAULT);
+    if (cb == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nl_cb_alloc failed", __FUNCTION__);
+        return NULL;
     }
+    nl_cb_err(cb, NL_CB_CUSTOM, CmdSocketErrorHandler, error);
+    nl_cb_set(cb, NL_CB_FINISH, NL_CB_CUSTOM, CmdSocketFinishHandler, error);
+    nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, CmdSocketAckHandler, error);
+    if (handler != NULL) {
+        nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, handler, data);
+    }
+    return cb;
+}
 
-    while ((rc = pthread_mutex_trylock(&g_wifiHalInfo.mutex)) == EBUSY) {
+static int32_t PthreadMutexLock(void)
+{
+    int32_t rc;
+    int32_t count = 0;
+
+    while ((rc = pthrad_mutex_trylock(&g_wifiHalInfo.mutex)) == EBUSY) {
         if (count < RETRIES) {
             HILOG_ERROR(LOG_CORE, "%s: pthread b trylock", __FUNCTION__);
             count++;
@@ -220,8 +231,21 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
             return RET_CODE_SUCCESS;
         }
     }
+    return rc;
+}
 
-    if (rc != RET_CODE_SUCCESS) {
+int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *data)
+{
+    int32_t rc;
+    int32_t error;
+    struct nl_cb *cb = NULL;
+
+    if (g_wifiHalInfo.cmdSock == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: sock is null", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
+
+    if (PthreadMutexLock() != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_CORE, "%s: pthread trylock failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
@@ -232,18 +256,11 @@ int32_t NetlinkSendCmdSync(struct nl_msg *msg, const RespHandler handler, void *
             HILOG_ERROR(LOG_CORE, "%s: nl_send_auto failed", __FUNCTION__);
             break;
         }
-
-        cb = nl_cb_alloc(NL_CB_DEFAULT);
+        cb = NetlinkSetCallback(handler, &error, data);
         if (cb == NULL) {
             HILOG_ERROR(LOG_CORE, "%s: nl_cb_alloc failed", __FUNCTION__);
             rc = RET_CODE_FAILURE;
             break;
-        }
-        nl_cb_err(cb, NL_CB_CUSTOM, CmdSocketErrorHandler, &error);
-        nl_cb_set(cb, NL_CB_FINISH, NL_CB_CUSTOM, CmdSocketFinishHandler, &error);
-        nl_cb_set(cb, NL_CB_ACK, NL_CB_CUSTOM, CmdSocketAckHandler, &error);
-        if (handler != NULL) {
-            nl_cb_set(cb, NL_CB_VALID, NL_CB_CUSTOM, handler, data);
         }
         /* wait for reply */
         error = 1;
@@ -281,7 +298,7 @@ static void ParseFamilyId(struct nlattr *attr, struct FamilyData *familyData)
         len = nla_len(attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME]);
         if (attrMcastGrp[CTRL_ATTR_MCAST_GRP_NAME] && attrMcastGrp[CTRL_ATTR_MCAST_GRP_ID] &&
             strncmp((char *)data, familyData->group, len) == 0) {
-            familyData->id = nla_get_u32(attrMcastGrp[CTRL_ATTR_MCAST_GRP_ID]);
+            familyData->id = (int32_t)nla_get_u32(attrMcastGrp[CTRL_ATTR_MCAST_GRP_ID]);
         }
     }
 }
@@ -628,7 +645,7 @@ static void GetCenterFreq(struct nlattr *bands, struct FreqInfoResult *result)
     void *data = NULL;
     int32_t len;
     int32_t i;
-    int32_t freq;
+    uint32_t freq;
     static struct nla_policy freqPolicy[NL80211_FREQUENCY_ATTR_MAX + 1];
     freqPolicy[NL80211_FREQUENCY_ATTR_FREQ].type = NLA_U32;
     freqPolicy[NL80211_FREQUENCY_ATTR_MAX_TX_POWER].type = NLA_U32;
@@ -955,7 +972,7 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResu
     genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_WIPHY, 0);
     nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
-    ret = memset_s(result->freqs, size * sizeof(int32_t), 0, sizeof(result->freqs));
+    ret = memset_s(result->freqs, size * sizeof(uint32_t), 0, sizeof(result->freqs));
     if (ret != EOK) {
         HILOG_ERROR(LOG_CORE, "%s: memset_s result->freqs  failed", __FUNCTION__);
         nlmsg_free(msg);
@@ -1353,7 +1370,7 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode)
         return RET_CODE_FAILURE;
     }
     do {
-        if (strcpy_s(ioctlData.interfaceName, IFNAMSIZ, ifName)) {
+        if (strcpy_s(ioctlData.interfaceName, IFNAMSIZ, ifName) != EOK) {
             HILOG_ERROR(LOG_CORE, "%s: strcpy_s failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
@@ -1366,7 +1383,8 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode)
             ret = RET_CODE_NOMEM;
             break;
         }
-        if (memcpy_s(ioctlData.data.point.buf, ioctlData.data.point.length, GET_POWER_MODE, strlen(GET_POWER_MODE))) {
+        if (memcpy_s(ioctlData.data.point.buf, ioctlData.data.point.length,
+            GET_POWER_MODE, strlen(GET_POWER_MODE)) != EOK) {
             HILOG_ERROR(LOG_CORE, "%s: memcpy_s failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
@@ -1430,7 +1448,7 @@ int32_t SetPowerMode(const char *ifName, uint8_t mode)
     }
 
     do {
-        if (strcpy_s(ioctlData.interfaceName, IFNAMSIZ, ifName)) {
+        if (strcpy_s(ioctlData.interfaceName, IFNAMSIZ, ifName) != EOK) {
             HILOG_ERROR(LOG_CORE, "%s: strcpy_s failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;

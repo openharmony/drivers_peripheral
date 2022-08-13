@@ -105,7 +105,7 @@ static void WifiEventVendorProcess(const char *ifName, struct nlattr **attr)
     uint32_t vendor_id;
     uint32_t subcmd;
     uint8_t *data = NULL;
-    size_t len;
+    uint32_t len;
 
     if (attr[NL80211_ATTR_VENDOR_ID] == NULL) {
         HILOG_ERROR(LOG_CORE, "%s: failed to get vendor id", __FUNCTION__);
