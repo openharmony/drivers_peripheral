@@ -36,7 +36,7 @@ static int32_t CodecProxyCall(struct ICodec *self,
     return self->remote->dispatcher->Dispatch(self->remote, id, data, reply);
 }
 
-int32_t CodecProxyReqSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
+static int32_t CodecProxyReqSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
 {
     *data = HdfSbufTypedObtain(SBUF_IPC);
     if (*data == NULL) {
@@ -51,7 +51,7 @@ int32_t CodecProxyReqSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
     }
     return HDF_SUCCESS;
 }
-void CodecProxySBufRecycle(struct HdfSBuf *data, struct HdfSBuf *reply)
+static void CodecProxySBufRecycle(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (data != NULL) {
         HdfSbufRecycle(data);
@@ -62,7 +62,7 @@ void CodecProxySBufRecycle(struct HdfSBuf *data, struct HdfSBuf *reply)
     return;
 }
 
-int32_t CodecPorxyInit(struct ICodec *self)
+static int32_t CodecPorxyInit(struct ICodec *self)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -87,7 +87,7 @@ int32_t CodecPorxyInit(struct ICodec *self)
     return ret;
 }
 
-int32_t CodecProxyDeinit(struct ICodec *self)
+static int32_t CodecProxyDeinit(struct ICodec *self)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -114,7 +114,7 @@ int32_t CodecProxyDeinit(struct ICodec *self)
     return ret;
 }
 
-int32_t CodecProxyEnumerateCapability(struct ICodec *self, uint32_t index, CodecCapability *cap)
+static int32_t CodecProxyEnumerateCapability(struct ICodec *self, uint32_t index, CodecCapability *cap)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -151,7 +151,7 @@ int32_t CodecProxyEnumerateCapability(struct ICodec *self, uint32_t index, Codec
     return ret;
 }
 
-int32_t CodecProxyGetCapability(struct ICodec *self, AvCodecMime mime, CodecType type,
+static int32_t CodecProxyGetCapability(struct ICodec *self, AvCodecMime mime, CodecType type,
     uint32_t flags, CodecCapability *cap)
 {
     int32_t ret;
@@ -199,7 +199,7 @@ int32_t CodecProxyGetCapability(struct ICodec *self, AvCodecMime mime, CodecType
     return ret;
 }
 
-int32_t CodecProxyCreate(struct ICodec *self, const char* name, CODEC_HANDLETYPE *handle)
+static int32_t CodecProxyCreate(struct ICodec *self, const char* name, CODEC_HANDLETYPE *handle)
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
@@ -231,7 +231,7 @@ int32_t CodecProxyCreate(struct ICodec *self, const char* name, CODEC_HANDLETYPE
     return ret;
 }
 
-int32_t CodecProxyDestroy(struct ICodec *self, CODEC_HANDLETYPE handle)
+static int32_t CodecProxyDestroy(struct ICodec *self, CODEC_HANDLETYPE handle)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -262,7 +262,7 @@ int32_t CodecProxyDestroy(struct ICodec *self, CODEC_HANDLETYPE handle)
     return ret;
 }
 
-int32_t CodecProxySetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle,
+static int32_t CodecProxySetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle,
     DirectionType direct, AllocateBufferMode mode, BufferType type)
 {
     int32_t ret;
@@ -308,7 +308,7 @@ int32_t CodecProxySetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle,
     return ret;
 }
 
-int32_t CodecProxyGetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle,
+static int32_t CodecProxyGetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle,
     DirectionType direct, AllocateBufferMode *mode, BufferType *type)
 {
     int32_t ret;
@@ -356,7 +356,7 @@ int32_t CodecProxyGetPortMode(struct ICodec *self, CODEC_HANDLETYPE handle,
     return HDF_SUCCESS;
 }
 
-int32_t CodecProxySetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, const Param *params, int paramCnt)
+static int32_t CodecProxySetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, const Param *params, int paramCnt)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -400,7 +400,7 @@ int32_t CodecProxySetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, con
 }
 
 // params需客户端调用点释放
-int32_t CodecProxyGetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, Param *params, int paramCnt)
+static int32_t CodecProxyGetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, Param *params, int paramCnt)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -448,7 +448,7 @@ int32_t CodecProxyGetParameter(struct ICodec *self, CODEC_HANDLETYPE handle, Par
     return ret;
 }
 
-int32_t CodecProxyStart(struct ICodec *self, CODEC_HANDLETYPE handle)
+static int32_t CodecProxyStart(struct ICodec *self, CODEC_HANDLETYPE handle)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -479,7 +479,7 @@ int32_t CodecProxyStart(struct ICodec *self, CODEC_HANDLETYPE handle)
     return ret;
 }
 
-int32_t CodecProxyStop(struct ICodec *self, CODEC_HANDLETYPE handle)
+static int32_t CodecProxyStop(struct ICodec *self, CODEC_HANDLETYPE handle)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -510,7 +510,7 @@ int32_t CodecProxyStop(struct ICodec *self, CODEC_HANDLETYPE handle)
     return ret;
 }
 
-int32_t CodecProxyFlush(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionType directType)
+static int32_t CodecProxyFlush(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionType directType)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;
@@ -546,7 +546,7 @@ int32_t CodecProxyFlush(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionT
     return ret;
 }
 
-int32_t CodecPorxyQueueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
+static int32_t CodecPorxyQueueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
     const CodecBuffer *inputData, uint32_t timeoutMs, int releaseFenceFd)
 {
     int32_t ret;
@@ -593,7 +593,7 @@ int32_t CodecPorxyQueueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
     return ret;
 }
 
-int32_t CodecProxyDequeueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
+static int32_t CodecProxyDequeueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
     uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *inputData)
 {
     struct HdfSBuf *data = NULL;
@@ -647,7 +647,7 @@ int32_t CodecProxyDequeueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
     return ret;
 }
 
-int32_t CodecProxyQueueOutput(struct ICodec *self, CODEC_HANDLETYPE handle,
+static int32_t CodecProxyQueueOutput(struct ICodec *self, CODEC_HANDLETYPE handle,
     CodecBuffer *outInfo, uint32_t timeoutMs, int releaseFenceFd)
 {
     int32_t ret;
@@ -694,7 +694,7 @@ int32_t CodecProxyQueueOutput(struct ICodec *self, CODEC_HANDLETYPE handle,
     return ret;
 }
 
-int32_t CodecProxyDequeueOutput(struct ICodec *self, CODEC_HANDLETYPE handle,
+static int32_t CodecProxyDequeueOutput(struct ICodec *self, CODEC_HANDLETYPE handle,
     uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *outInfo)
 {
     int32_t ret;
@@ -746,7 +746,8 @@ int32_t CodecProxyDequeueOutput(struct ICodec *self, CODEC_HANDLETYPE handle,
     return ret;
 }
 
-int32_t CodecProxySetCallback(struct ICodec *self, CODEC_HANDLETYPE handle, struct ICodecCallback *cb, UINTPTR instance)
+static int32_t CodecProxySetCallback(struct ICodec *self, CODEC_HANDLETYPE handle,
+                                     struct ICodecCallback *cb, UINTPTR instance)
 {
     int32_t ret;
     struct HdfSBuf *data = NULL;

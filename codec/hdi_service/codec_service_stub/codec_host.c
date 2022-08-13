@@ -26,14 +26,14 @@ static int32_t CodecServiceDispatch(struct HdfDeviceIoClient *client, int cmdId,
     return CodecServiceOnRemoteRequest(client, cmdId, data, reply);
 }
 
-void HdfCodecDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfCodecDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     struct IDeviceIoService *testService = deviceObject->service;
     OsalMemFree(testService);
     ClearCapabilityGroup();
 }
 
-int HdfCodecDriverBind(struct HdfDeviceObject *deviceObject)
+static int HdfCodecDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfCodecDriverBind enter!");
 
@@ -55,7 +55,7 @@ int HdfCodecDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-int HdfCodecDriverInit(struct HdfDeviceObject *deviceObject)
+static int HdfCodecDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfSampleDriverCInit enter, new hdi impl");
     if (LoadCodecCapabilityFromHcs(deviceObject->property) != HDF_SUCCESS) {

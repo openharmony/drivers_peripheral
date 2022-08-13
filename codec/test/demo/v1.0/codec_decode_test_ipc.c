@@ -95,7 +95,7 @@ void DumpOutputToFile(FILE *fp, uint8_t *addr)
     }
 }
 
-int32_t ReadInputFromFile(FILE *fp, uint8_t *addr)
+static int32_t ReadInputFromFile(FILE *fp, uint8_t *addr)
 {
     return fread(addr, 1, STREAM_PACKET_BUFFER_SIZE, fp);
 }
@@ -222,7 +222,7 @@ int32_t TestOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t
     return HDF_SUCCESS;
 }
 
-int32_t SetExtDecParameter(void)
+static int32_t SetExtDecParameter(void)
 {
     Param param;
     int32_t paramCnt;
@@ -257,7 +257,7 @@ int32_t SetExtDecParameter(void)
     return HDF_SUCCESS;
 }
 
-int32_t SetDecParameter(void)
+static int32_t SetDecParameter(void)
 {
     Param param;
     int32_t paramCnt = 1;
@@ -308,7 +308,7 @@ int32_t SetDecParameter(void)
     return HDF_SUCCESS;
 }
 
-void DecodeLoopHandleInput(MpiDecLoopData *g_data)
+static void DecodeLoopHandleInput(MpiDecLoopData *g_data)
 {
     int32_t ret = 0;
     uint8_t readData[STREAM_PACKET_BUFFER_SIZE];
@@ -379,7 +379,7 @@ static int32_t DecodeLoop(MpiDecLoopData *g_data)
     return ret;
 }
 
-void *DecodeThread(void *arg)
+static void *DecodeThread(void *arg)
 {
     MpiDecLoopData *g_data = (MpiDecLoopData *)arg;
 
@@ -391,7 +391,7 @@ void *DecodeThread(void *arg)
     return NULL;
 }
 
-void RevertDecodeStep1(void)
+static void RevertDecodeStep1(void)
 {
     if (g_data.fpInput) {
         fclose(g_data.fpInput);
@@ -403,7 +403,7 @@ void RevertDecodeStep1(void)
     }
 }
 
-void RevertDecodeStep2(void)
+static void RevertDecodeStep2(void)
 {
     int32_t ret = g_codecProxy->CodecDeinit(g_codecProxy);
     if (ret != HDF_SUCCESS) {
@@ -412,7 +412,7 @@ void RevertDecodeStep2(void)
     RevertDecodeStep1();
 }
 
-void RevertDecodeStep3(void)
+static void RevertDecodeStep3(void)
 {
     ReleaseShm();
     ReleaseCodecBuffer();
@@ -436,7 +436,7 @@ void RevertDecodeStep3(void)
     RevertDecodeStep2();
 }
 
-int32_t OpenFile(void)
+static int32_t OpenFile(void)
 {
     struct stat fileStat = {0};
     stat(g_cmd.file_input, &fileStat);
@@ -458,7 +458,7 @@ int32_t OpenFile(void)
     return HDF_SUCCESS;
 }
 
-void DecodeEnd(void)
+static void DecodeEnd(void)
 {
     DirectionType directType = ALL_TYPE;
     int32_t ret = g_codecProxy->CodecFlush(g_codecProxy, (CODEC_HANDLETYPE)g_handle, directType);
@@ -477,7 +477,7 @@ void DecodeEnd(void)
     }
 }
 
-int32_t Decode(void)
+static int32_t Decode(void)
 {
     pthread_t thd;
     pthread_attr_t attr;

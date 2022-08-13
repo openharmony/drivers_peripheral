@@ -227,7 +227,7 @@ int32_t CodecSerPackParam(struct HdfSBuf *reply, Param *param)
     return HDF_SUCCESS;
 }
 
-int32_t CodecSerPackBufferInfo(struct HdfSBuf *reply, const CodecBufferInfo *buffer)
+static int32_t CodecSerPackBufferInfo(struct HdfSBuf *reply, const CodecBufferInfo *buffer)
 {
     if (reply == NULL || buffer == NULL) {
         HDF_LOGE("%{public}s: params null!", __func__);
@@ -265,7 +265,7 @@ int32_t CodecSerPackBufferInfo(struct HdfSBuf *reply, const CodecBufferInfo *buf
     return HDF_SUCCESS;
 }
 
-int32_t CodecSerParseBufferInfo(struct HdfSBuf *data, CodecBufferInfo *buffer)
+static int32_t CodecSerParseBufferInfo(struct HdfSBuf *data, CodecBufferInfo *buffer)
 {
     uint32_t readLen = 0;
     if (data == NULL || buffer == NULL) {
