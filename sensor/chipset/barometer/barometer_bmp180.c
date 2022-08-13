@@ -19,7 +19,7 @@
 
 static struct Bmp180DrvData *g_bmp180DrvData = NULL;
 
-struct Bmp180DrvData *Bmp180GetDrvData(void)
+static struct Bmp180DrvData *Bmp180GetDrvData(void)
 {
     return g_bmp180DrvData;
 }

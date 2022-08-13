@@ -30,12 +30,12 @@ struct Mxc6655xaDrvData *Mxc6655xaGetDrvData(void)
     return g_Mxc6655xaDrvData;
 }
 
-static int sensor_convert_data(char high_byte, char low_byte)
+static int SensorConvertData(char highByte, char lowByte)
 {
     int32_t result;
 
-    result = ((uint32_t)high_byte << (MXC6655_PRECISION - MXC6655_ACCEL_OUTPUT_MSB)) |
-        ((uint32_t)low_byte >> (MXC6655_ACCEL_OUTPUT_16BIT - MXC6655_PRECISION));
+    result = ((uint32_t)highByte << (MXC6655_PRECISION - MXC6655_ACCEL_OUTPUT_MSB)) |
+        ((uint32_t)lowByte >> (MXC6655_ACCEL_OUTPUT_16BIT - MXC6655_PRECISION));
 
     if (result < MXC6655_BOUNDARY) {
         result = result * MXC6655_GRAVITY_STEP;
@@ -91,9 +91,9 @@ static int32_t ReadMxc6655xaRawData(struct SensorCfgData *data, struct AccelData
     ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_Z_MSB_ADDR, &reg[ACCEL_Z_AXIS_MSB], sizeof(int32_t));
     CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
 
-    x = sensor_convert_data(reg[ACCEL_X_AXIS_MSB], reg[ACCEL_X_AXIS_LSB]);
-    y = sensor_convert_data(reg[ACCEL_Y_AXIS_MSB], reg[ACCEL_Y_AXIS_LSB]);
-    z = sensor_convert_data(reg[ACCEL_Z_AXIS_MSB], reg[ACCEL_Z_AXIS_LSB]);
+    x = SensorConvertData(reg[ACCEL_X_AXIS_MSB], reg[ACCEL_X_AXIS_LSB]);
+    y = SensorConvertData(reg[ACCEL_Y_AXIS_MSB], reg[ACCEL_Y_AXIS_LSB]);
+    z = SensorConvertData(reg[ACCEL_Z_AXIS_MSB], reg[ACCEL_Z_AXIS_LSB]);
     rawData->x = x;
     rawData->y = y;
     rawData->z = z;
