@@ -23,7 +23,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-int32_t SerCodecOnEvent(struct ICodecCallback *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerCodecOnEvent(struct ICodecCallback *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
     UINTPTR userData = 0;
@@ -67,7 +67,8 @@ int32_t SerCodecOnEvent(struct ICodecCallback *serviceImpl, struct HdfSBuf *data
     return ret;
 }
 
-int32_t SerCodecInputBufferAvailable(struct ICodecCallback *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerCodecInputBufferAvailable(struct ICodecCallback *serviceImpl,
+                                            struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret = HDF_FAILURE;
     uint32_t bufCnt = 0;
@@ -108,7 +109,8 @@ int32_t SerCodecInputBufferAvailable(struct ICodecCallback *serviceImpl, struct 
     return ret;
 }
 
-int32_t SerCodecOutputBufferAvailable(struct ICodecCallback *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerCodecOutputBufferAvailable(struct ICodecCallback *serviceImpl,
+                                             struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret = HDF_FAILURE;
     uint32_t bufCnt = 0;
@@ -149,8 +151,8 @@ int32_t SerCodecOutputBufferAvailable(struct ICodecCallback *serviceImpl, struct
     return ret;
 }
 
-int32_t CodecCallbackServiceOnRemoteRequest(struct HdfRemoteService *service, int cmdId,
-                                            struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t CodecCallbackServiceOnRemoteRequest(struct HdfRemoteService *service, int cmdId,
+                                                   struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct ICodecCallback *serviceImpl = (struct ICodecCallback *)service;
     switch (cmdId) {

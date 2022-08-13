@@ -45,7 +45,7 @@ static int32_t CodecComponentTypeDriverDispatch(struct HdfDeviceIoClient *client
                                                                data, reply);
 }
 
-int32_t HdfCodecComponentTypeDriverInit(struct HdfDeviceObject *deviceObject)
+static int32_t HdfCodecComponentTypeDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfCodecComponentTypeDriverInit enter.");
     if (deviceObject == NULL) {
@@ -58,7 +58,7 @@ int32_t HdfCodecComponentTypeDriverInit(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObject)
+static int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfCodecComponentTypeDriverBind enter.");
 
@@ -97,7 +97,7 @@ void HdfCodecComponentTypeDriverRelease(struct HdfDeviceObject *deviceObject)
     ClearCapabilityData();
 }
 
-struct HdfDriverEntry g_omxcomponenttypeDriverEntry = {
+struct HdfDriverEntry g_codecComponentDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "codec_hdi_omx_server",
     .Bind = HdfCodecComponentTypeDriverBind,
@@ -105,4 +105,4 @@ struct HdfDriverEntry g_omxcomponenttypeDriverEntry = {
     .Release = HdfCodecComponentTypeDriverRelease,
 };
 
-HDF_INIT(g_omxcomponenttypeDriverEntry);
+HDF_INIT(g_codecComponentDriverEntry);
