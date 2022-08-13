@@ -221,7 +221,7 @@ static int32_t PthreadMutexLock(void)
     int32_t rc;
     int32_t count = 0;
 
-    while ((rc = pthrad_mutex_trylock(&g_wifiHalInfo.mutex)) == EBUSY) {
+    while ((rc = pthread_mutex_trylock(&g_wifiHalInfo.mutex)) == EBUSY) {
         if (count < RETRIES) {
             HILOG_ERROR(LOG_CORE, "%s: pthread b trylock", __FUNCTION__);
             count++;
