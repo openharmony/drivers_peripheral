@@ -506,7 +506,7 @@ static int32_t SetupEncParams(RKHdiEncodeSetup *encSetup)
     return HDF_SUCCESS;
 }
 
-static void EncodeLoopHandleInput(CodecEnvData *p_data, uint8_t *readData)
+static void EncodeLoopHandleInput(const CodecEnvData *p_data, uint8_t *readData)
 {
     int32_t ret = 0;
     int32_t readSize = 0;
