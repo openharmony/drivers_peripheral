@@ -203,8 +203,8 @@ struct NetworkInfoResult {
 struct FreqInfoResult {
     int32_t band;
     uint32_t nums;
-    int32_t *freqs;
-    int32_t *txPower;
+    uint32_t *freqs;
+    uint32_t *txPower;
 };
 
 #define MAX_ASSOC_STA_NUM 8
