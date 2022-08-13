@@ -49,6 +49,7 @@ static int32_t MapperInterfaceDriverDispatch(
 
 static int HdfMapperInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
     HDF_LOGI("HdfMapperInterfaceDriverInit enter");
     return HDF_SUCCESS;
 }

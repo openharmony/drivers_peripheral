@@ -50,6 +50,7 @@ static int32_t AllocatorInterfaceDriverDispatch(
 
 static int HdfAllocatorInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
     HDF_LOGI("HdfAllocatorInterfaceDriverInit enter");
     return HDF_SUCCESS;
 }
