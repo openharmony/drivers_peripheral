@@ -72,6 +72,7 @@ static inline void BlendNone(ColorRGBAf &src, ColorRGBAf &dst)
 // blend clear
 static inline void BlendClear(ColorRGBAf &src, ColorRGBAf &dst)
 {
+    (void)src;
     dst.mA = 0;
     dst.mR = 0;
     dst.mG = 0;

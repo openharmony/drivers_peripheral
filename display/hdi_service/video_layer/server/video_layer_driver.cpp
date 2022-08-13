@@ -35,6 +35,7 @@ static int32_t DisplayHdiServiceDispatch(struct HdfDeviceIoClient *client, int c
 
 static int32_t HdfDisplayHostDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
     HDF_LOGI("%{public}s: enter", __func__);
     return HDF_SUCCESS;
 }
