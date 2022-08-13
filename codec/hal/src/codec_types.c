@@ -708,13 +708,10 @@ bool CodecCompCapabilityBlockUnmarshalling(struct HdfSBuf *data, CodecCompCapabi
     if (dataBlock == NULL) {
         return false;
     }
-    if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->role)) {
-        HDF_LOGE("%{public}s: read dataBlock->role failed!", __func__);
-        return false;
-    }
 
-    if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->type)) {
-        HDF_LOGE("%{public}s: read dataBlock->type failed!", __func__);
+    if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->role) ||
+        !HdfSbufReadInt32(data, (int32_t *)&dataBlock->type)) {
+        HDF_LOGE("%{public}s: read dataBlock->role or dataBlock->type failed!", __func__);
         return false;
     }
 

@@ -603,7 +603,6 @@ void CodecHdiDecode::Run()
         auto bufferInfo = iter->second;
         void *sharedAddr = (void *)bufferInfo->avSharedPtr->ReadFromAshmem(0, 0);
         eosFlag = this->ReadOnePacket(fpIn_, (char *)sharedAddr, bufferInfo->omxBuffer->filledLen);
-        HDF_LOGI("read data size is %{public}d", bufferInfo->omxBuffer->filledLen);
         bufferInfo->omxBuffer->offset = 0;
         if (eosFlag) {
             bufferInfo->omxBuffer->flag = OMX_BUFFERFLAG_EOS;
