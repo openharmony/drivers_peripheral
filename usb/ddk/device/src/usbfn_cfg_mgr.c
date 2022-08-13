@@ -14,15 +14,16 @@
  */
 
 #include "usbfn_cfg_mgr.h"
-#include <securec.h>
+#include <device_resource_if.h>
+#include <hcs_tree_if.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include <osal_thread.h>
-#include <device_resource_if.h>
-#include <hcs_tree_if.h>
-#include "usbfn_dev_mgr.h"
+#include <securec.h>
+
 #include "adapter_if.h"
+#include "usbfn_dev_mgr.h"
 
 #define HDF_LOG_TAG usbfn_cfg
 static struct DListHead g_cfgEntry = {0};
@@ -40,14 +41,14 @@ static uint32_t UsbFnCfgMgrParseDevDesc(const struct DeviceResourceNode *devDesc
         HDF_LOGE("%{public}s: dev desc length is not ringht!", __func__);
         return HDF_FAILURE;
     }
-    if (drsOps->GetUint8(devDescNode, DESC_TYPE, &devDesc->bDescriptorType, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(devDescNode, USBDEV_CLASS, &devDesc->bDeviceClass, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(devDescNode, USBDEV_SUBCLASS, &devDesc->bDeviceSubClass, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(devDescNode, USBDEV_PROTOCOL, &devDesc->bDeviceProtocol, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(devDescNode, USBDEV_MAXSIZE, &devDesc->bMaxPacketSize0, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(devDescNode, USBDEV_MANUFACTURER, &devDesc->iManufacturer, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(devDescNode, USBDEV_PRODUCT, &devDesc->iProduct, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(devDescNode, USBDEV_SERIALNUM, &devDesc->iSerialNumber, 0) != HDF_SUCCESS || \
+    if (drsOps->GetUint8(devDescNode, DESC_TYPE, &devDesc->bDescriptorType, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(devDescNode, USBDEV_CLASS, &devDesc->bDeviceClass, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(devDescNode, USBDEV_SUBCLASS, &devDesc->bDeviceSubClass, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(devDescNode, USBDEV_PROTOCOL, &devDesc->bDeviceProtocol, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(devDescNode, USBDEV_MAXSIZE, &devDesc->bMaxPacketSize0, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(devDescNode, USBDEV_MANUFACTURER, &devDesc->iManufacturer, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(devDescNode, USBDEV_PRODUCT, &devDesc->iProduct, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(devDescNode, USBDEV_SERIALNUM, &devDesc->iSerialNumber, 0) != HDF_SUCCESS ||
         drsOps->GetUint8(devDescNode, USBDEV_NUMCFG, &devDesc->bNumConfigurations, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
@@ -80,8 +81,7 @@ static uint32_t UsbFnCfgMgrParseDevDesc(const struct DeviceResourceNode *devDesc
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseUsbFnDevDesc(const struct DeviceResourceNode *node,
-    struct UsbFnDeviceDesc *fnDevDesc)
+static int32_t UsbFnCfgMgrParseUsbFnDevDesc(const struct DeviceResourceNode *node, struct UsbFnDeviceDesc *fnDevDesc)
 {
     struct DeviceResourceIface *drsOps = NULL;
     const char *childNodeName = NULL;
@@ -104,8 +104,7 @@ static int32_t UsbFnCfgMgrParseUsbFnDevDesc(const struct DeviceResourceNode *nod
         HDF_LOGE("%{public}s: childDevDescNode is null!", __func__);
         return HDF_FAILURE;
     }
-    fnDevDesc->deviceDesc =
-        (struct UsbDeviceDescriptor *)UsbFnMemCalloc(sizeof(struct UsbDeviceDescriptor));
+    fnDevDesc->deviceDesc = (struct UsbDeviceDescriptor *)UsbFnMemCalloc(sizeof(struct UsbDeviceDescriptor));
     if (fnDevDesc->deviceDesc == NULL) {
         HDF_LOGE("%{public}s: UsbFnMemCalloc failure!", __func__);
         return HDF_FAILURE;
@@ -120,8 +119,8 @@ FAIL:
     return HDF_FAILURE;
 }
 
-static int32_t UsbFnCfgMgrParseString(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, struct UsbFnStrings *fnString)
+static int32_t UsbFnCfgMgrParseString(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, struct UsbFnStrings *fnString)
 {
     int32_t iCount;
     int32_t strCount;
@@ -173,8 +172,8 @@ FREE_USB_STRING:
     return HDF_FAILURE;
 }
 
-static struct UsbFnStrings **UsbFnCfgMgrParseStrings(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps)
+static struct UsbFnStrings **UsbFnCfgMgrParseStrings(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps)
 {
     int32_t strTabCount;
     int32_t count;
@@ -196,8 +195,7 @@ static struct UsbFnStrings **UsbFnCfgMgrParseStrings(const struct DeviceResource
     }
     fnStrings[strTabCount] = NULL;
     for (count = 0; count < strTabCount; count++) {
-        fnStrings[count] =
-            (struct UsbFnStrings *)UsbFnMemCalloc(sizeof(struct UsbFnStrings));
+        fnStrings[count] = (struct UsbFnStrings *)UsbFnMemCalloc(sizeof(struct UsbFnStrings));
         if (fnStrings[count] == NULL) {
             goto FREE_STRING;
         }
@@ -222,8 +220,7 @@ FREE_STRING:
     return NULL;
 }
 
-static int32_t UsbFnCfgMgrParseUsbFnDevStrings(const struct DeviceResourceNode *node,
-    struct UsbFnDeviceDesc *fnDevDesc)
+static int32_t UsbFnCfgMgrParseUsbFnDevStrings(const struct DeviceResourceNode *node, struct UsbFnDeviceDesc *fnDevDesc)
 {
     struct DeviceResourceIface *drsOps = NULL;
     const char *fnDevStrNodeName = NULL;
@@ -256,8 +253,8 @@ static int32_t UsbFnCfgMgrParseUsbFnDevStrings(const struct DeviceResourceNode *
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseAccocInterfaceDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
+static int32_t UsbFnCfgMgrParseAccocInterfaceDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
 {
     struct UsbInterfaceAssocDescriptor *desc = NULL;
 
@@ -265,13 +262,13 @@ static int32_t UsbFnCfgMgrParseAccocInterfaceDesc(const struct DeviceResourceNod
         return HDF_FAILURE;
     }
     desc = (struct UsbInterfaceAssocDescriptor *)descBuff;
-    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, INTERFACE_FIRST, &desc->bFirstInterface, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, INTERFACE_COUNT, &desc->bInterfaceCount, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, FUNCTION_CLASS, &desc->bFunctionClass, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, FUNCTION_SUBCLASS, &desc->bFunctionSubClass, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, FUNCTION_PROTOCOL, &desc->bFunctionProtocol, 0) != HDF_SUCCESS || \
+    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, INTERFACE_FIRST, &desc->bFirstInterface, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, INTERFACE_COUNT, &desc->bInterfaceCount, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, FUNCTION_CLASS, &desc->bFunctionClass, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, FUNCTION_SUBCLASS, &desc->bFunctionSubClass, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, FUNCTION_PROTOCOL, &desc->bFunctionProtocol, 0) != HDF_SUCCESS ||
         drsOps->GetUint8(node, FUNCTION_INDEX, &desc->iFunction, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
@@ -280,23 +277,23 @@ static int32_t UsbFnCfgMgrParseAccocInterfaceDesc(const struct DeviceResourceNod
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseInterfaceDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
+static int32_t UsbFnCfgMgrParseInterfaceDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
 {
     struct UsbInterfaceDescriptor *desc = NULL;
 
     if (node == NULL || drsOps == NULL || descBuff == NULL) {
-    return HDF_FAILURE;
+        return HDF_FAILURE;
     }
     desc = (struct UsbInterfaceDescriptor *)descBuff;
-    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, INTERFACE_NUMBER, &desc->bInterfaceNumber, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, INTERFACE_ALTERNATE, &desc->bAlternateSetting, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, INTERFACE_NENDPOINT, &desc->bNumEndpoints, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, INTERFACE_CLASS, &desc->bInterfaceClass, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, INTERFACE_SUBCLASS, &desc->bInterfaceSubClass, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, INTERFACE_PROTOCOL, &desc->bInterfaceProtocol, 0) != HDF_SUCCESS || \
+    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, INTERFACE_NUMBER, &desc->bInterfaceNumber, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, INTERFACE_ALTERNATE, &desc->bAlternateSetting, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, INTERFACE_NENDPOINT, &desc->bNumEndpoints, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, INTERFACE_CLASS, &desc->bInterfaceClass, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, INTERFACE_SUBCLASS, &desc->bInterfaceSubClass, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, INTERFACE_PROTOCOL, &desc->bInterfaceProtocol, 0) != HDF_SUCCESS ||
         drsOps->GetUint8(node, INTERFACE_INTERFACE, &desc->iInterface, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
@@ -305,8 +302,8 @@ static int32_t UsbFnCfgMgrParseInterfaceDesc(const struct DeviceResourceNode *no
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseEndpointDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
+static int32_t UsbFnCfgMgrParseEndpointDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
 {
     struct UsbEndpointDescriptor *desc = NULL;
     uint16_t value;
@@ -315,18 +312,18 @@ static int32_t UsbFnCfgMgrParseEndpointDesc(const struct DeviceResourceNode *nod
         return HDF_FAILURE;
     }
     desc = (struct UsbEndpointDescriptor *)descBuff;
-    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, ENDPOINT_ADDRESS, &desc->bEndpointAddress, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, ENDPOINT_MATTR, &desc->bmAttributes, 0) != HDF_SUCCESS || \
-        drsOps->GetUint16(node, ENDPOINT_MAXPACKSIZE_W, &value, 0) != HDF_SUCCESS || \
+    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, ENDPOINT_ADDRESS, &desc->bEndpointAddress, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, ENDPOINT_MATTR, &desc->bmAttributes, 0) != HDF_SUCCESS ||
+        drsOps->GetUint16(node, ENDPOINT_MAXPACKSIZE_W, &value, 0) != HDF_SUCCESS ||
         drsOps->GetUint8(node, ENDPOINT_INTERVAL, &desc->bInterval, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
     }
     desc->wMaxPacketSize = Le16ToCpu(value);
     if (USB_DDK_DT_ENDPOINT_AUDIO_SIZE == desc->bLength) {
-        if (drsOps->GetUint8(node, ENDPOINT_REFRESH, &desc->bRefresh, 0) != HDF_SUCCESS || \
+        if (drsOps->GetUint8(node, ENDPOINT_REFRESH, &desc->bRefresh, 0) != HDF_SUCCESS ||
             drsOps->GetUint8(node, ENDPOINT_SYNCADDR, &desc->bSynchAddress, 0) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: read fail!", __func__);
             return HDF_FAILURE;
@@ -335,8 +332,8 @@ static int32_t UsbFnCfgMgrParseEndpointDesc(const struct DeviceResourceNode *nod
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseStringDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
+static int32_t UsbFnCfgMgrParseStringDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
 {
     struct UsbStringDescriptor *desc = NULL;
     uint16_t value;
@@ -345,8 +342,8 @@ static int32_t UsbFnCfgMgrParseStringDesc(const struct DeviceResourceNode *node,
         return HDF_FAILURE;
     }
     desc = (struct UsbStringDescriptor *)descBuff;
-    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
+    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
         drsOps->GetUint16(node, STRING_DATA, &value, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
@@ -356,8 +353,8 @@ static int32_t UsbFnCfgMgrParseStringDesc(const struct DeviceResourceNode *node,
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseSspIsocEndpointDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
+static int32_t UsbFnCfgMgrParseSspIsocEndpointDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
 {
     struct UsbSspIsocEpCompDescriptor *desc = NULL;
     uint16_t sValue;
@@ -367,9 +364,9 @@ static int32_t UsbFnCfgMgrParseSspIsocEndpointDesc(const struct DeviceResourceNo
         return HDF_FAILURE;
     }
     desc = (struct UsbSspIsocEpCompDescriptor *)descBuff;
-    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
-        drsOps->GetUint16(node, SSP_ISOC_EPCOMP_WReseved, &sValue, 0) != HDF_SUCCESS || \
+    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
+        drsOps->GetUint16(node, SSP_ISOC_EPCOMP_WReseved, &sValue, 0) != HDF_SUCCESS ||
         drsOps->GetUint32(node, SSP_ISOC_EPCOMP_DWPERINTERVAL, &iValue, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
@@ -380,8 +377,8 @@ static int32_t UsbFnCfgMgrParseSspIsocEndpointDesc(const struct DeviceResourceNo
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseSsEndpointDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
+static int32_t UsbFnCfgMgrParseSsEndpointDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
 {
     struct UsbSsEpCompDescriptor *desc = NULL;
     uint16_t sValue;
@@ -390,10 +387,10 @@ static int32_t UsbFnCfgMgrParseSsEndpointDesc(const struct DeviceResourceNode *n
         return HDF_FAILURE;
     }
     desc = (struct UsbSsEpCompDescriptor *)descBuff;
-    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, SS_EP_COMP_MAXBURST, &desc->bMaxBurst, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, SS_EP_COMP_MTTRIBUTE, &desc->bmAttributes, 0) != HDF_SUCCESS || \
+    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, SS_EP_COMP_MAXBURST, &desc->bMaxBurst, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, SS_EP_COMP_MTTRIBUTE, &desc->bmAttributes, 0) != HDF_SUCCESS ||
         drsOps->GetUint16(node, SS_EP_COMP_WPERINTERVAL, &sValue, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
@@ -403,8 +400,8 @@ static int32_t UsbFnCfgMgrParseSsEndpointDesc(const struct DeviceResourceNode *n
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseQualifierDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
+static int32_t UsbFnCfgMgrParseQualifierDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
 {
     struct UsbQualifierDescriptor *desc = NULL;
     uint16_t sValue;
@@ -413,13 +410,13 @@ static int32_t UsbFnCfgMgrParseQualifierDesc(const struct DeviceResourceNode *no
         return HDF_FAILURE;
     }
     desc = (struct UsbQualifierDescriptor *)descBuff;
-    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, QUALIFIER_CLASS, &desc->bDeviceClass, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, QUALIFIER_SUBCLASS, &desc->bDeviceSubClass, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, QUALIFIER_PROTOCOL, &desc->bDeviceProtocol, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, QUALIFIER_MAXSIZE, &desc->bMaxPacketSize0, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, QUALIFIER_NUMCFG, &desc->bNumConfigurations, 0) != HDF_SUCCESS || \
+    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, QUALIFIER_CLASS, &desc->bDeviceClass, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, QUALIFIER_SUBCLASS, &desc->bDeviceSubClass, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, QUALIFIER_PROTOCOL, &desc->bDeviceProtocol, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, QUALIFIER_MAXSIZE, &desc->bMaxPacketSize0, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, QUALIFIER_NUMCFG, &desc->bNumConfigurations, 0) != HDF_SUCCESS ||
         drsOps->GetUint16(node, QUALIFIER_BCD, &sValue, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
@@ -429,8 +426,8 @@ static int32_t UsbFnCfgMgrParseQualifierDesc(const struct DeviceResourceNode *no
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseOtgDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, uint8_t *descBuff, uint8_t length)
+static int32_t UsbFnCfgMgrParseOtgDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff, uint8_t length)
 {
     struct UsbOtg20Descriptor *desc2 = NULL;
     struct UsbOtgDescriptor *desc = NULL;
@@ -441,13 +438,13 @@ static int32_t UsbFnCfgMgrParseOtgDesc(const struct DeviceResourceNode *node,
     }
     desc = (struct UsbOtgDescriptor *)descBuff;
 
-    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
+    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
         drsOps->GetUint8(node, OTG_MTTRIBUTE, &desc->bmAttributes, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
     }
-    if (length == sizeof (struct UsbOtg20Descriptor)) {
+    if (length == sizeof(struct UsbOtg20Descriptor)) {
         desc2 = (struct UsbOtg20Descriptor *)descBuff;
         if (drsOps->GetUint16(node, QUALIFIER_BCD, &sValue, 0) != HDF_SUCCESS) {
             return HDF_FAILURE;
@@ -458,8 +455,8 @@ static int32_t UsbFnCfgMgrParseOtgDesc(const struct DeviceResourceNode *node,
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseDebugDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
+static int32_t UsbFnCfgMgrParseDebugDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
 {
     struct UsbDebugDescriptor *desc = NULL;
 
@@ -467,9 +464,9 @@ static int32_t UsbFnCfgMgrParseDebugDesc(const struct DeviceResourceNode *node,
         return HDF_FAILURE;
     }
     desc = (struct UsbDebugDescriptor *)descBuff;
-    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, DEBUG_IN, &desc->bDebugInEndpoint, 0) != HDF_SUCCESS || \
+    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, DEBUG_IN, &desc->bDebugInEndpoint, 0) != HDF_SUCCESS ||
         drsOps->GetUint8(node, DEBUG_OUT, &desc->bDebugOutEndpoint, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
@@ -478,8 +475,8 @@ static int32_t UsbFnCfgMgrParseDebugDesc(const struct DeviceResourceNode *node,
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseSecurityDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
+static int32_t UsbFnCfgMgrParseSecurityDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
 {
     struct UsbSecurityDescriptor *desc = NULL;
     uint16_t sValue;
@@ -488,9 +485,9 @@ static int32_t UsbFnCfgMgrParseSecurityDesc(const struct DeviceResourceNode *nod
         return HDF_FAILURE;
     }
     desc = (struct UsbSecurityDescriptor *)descBuff;
-    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS || \
-        drsOps->GetUint8(node, SECURITY_ENCRYTYPE, &desc->bNumEncryptionTypes, 0) != HDF_SUCCESS || \
+    if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
+        drsOps->GetUint8(node, SECURITY_ENCRYTYPE, &desc->bNumEncryptionTypes, 0) != HDF_SUCCESS ||
         drsOps->GetUint16(node, SECURITY_TOTALLENGTH, &sValue, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
@@ -500,8 +497,8 @@ static int32_t UsbFnCfgMgrParseSecurityDesc(const struct DeviceResourceNode *nod
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseOtherDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, uint8_t *descBuff, uint8_t length)
+static int32_t UsbFnCfgMgrParseOtherDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff, uint8_t length)
 {
     if (node == NULL || drsOps == NULL || descBuff == NULL) {
         return HDF_FAILURE;
@@ -521,7 +518,7 @@ static int32_t UsbFnCfgMgrParseDescriptor(const struct DeviceResourceNode *node,
     int32_t ret;
 
     if (node == NULL || drsOps == NULL || descBuff == NULL) {
-    return HDF_FAILURE;
+        return HDF_FAILURE;
     }
     switch (descType) {
         case USB_DDK_DT_INTERFACE:
@@ -565,8 +562,8 @@ static int32_t UsbFnCfgMgrParseDescriptor(const struct DeviceResourceNode *node,
     return ret;
 }
 
-static struct UsbDescriptorHeader *UsbFnCfgMgrParseDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps)
+static struct UsbDescriptorHeader *UsbFnCfgMgrParseDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps)
 {
     uint8_t length;
     uint8_t descType;
@@ -590,8 +587,7 @@ static struct UsbDescriptorHeader *UsbFnCfgMgrParseDesc(const struct DeviceResou
     }
     ret = UsbFnCfgMgrParseDescriptor(node, drsOps, descBuff, descType, length);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: length = 0x%x, descType = 0x%x Parse fail!",
-            __func__, length, descType);
+        HDF_LOGE("%{public}s: length = 0x%x, descType = 0x%x Parse fail!", __func__, length, descType);
         UsbFnMemFree(descBuff);
         return NULL;
     }
@@ -599,8 +595,8 @@ static struct UsbDescriptorHeader *UsbFnCfgMgrParseDesc(const struct DeviceResou
     return (struct UsbDescriptorHeader *)descBuff;
 }
 
-static struct UsbDescriptorHeader **UsbFnCfgMgrParseFunDesc(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, const char *descName)
+static struct UsbDescriptorHeader **UsbFnCfgMgrParseFunDesc(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, const char *descName)
 {
     int32_t descCount;
     int32_t iCount;
@@ -615,8 +611,7 @@ static struct UsbDescriptorHeader **UsbFnCfgMgrParseFunDesc(const struct DeviceR
     if (descCount <= 0) {
         return NULL;
     }
-    descriptors = \
-        (struct UsbDescriptorHeader **)UsbFnMemCalloc((descCount + 1) * sizeof(struct UsbDescriptorHeader *));
+    descriptors = (struct UsbDescriptorHeader **)UsbFnMemCalloc((descCount + 1) * sizeof(struct UsbDescriptorHeader *));
     if (descriptors == NULL) {
         HDF_LOGE("%{public}s: UsbFnMemCalloc failure!", __func__);
         return NULL;
@@ -644,8 +639,8 @@ FREE_DESC_HEAD:
     return NULL;
 }
 
-static int32_t UsbFnCfgMgrParseUsbFnFunction(const struct DeviceResourceNode *node,
-    const struct DeviceResourceIface *drsOps, struct UsbFnFunction *fun)
+static int32_t UsbFnCfgMgrParseUsbFnFunction(
+    const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, struct UsbFnFunction *fun)
 {
     if (node == NULL || fun == NULL) {
         HDF_LOGE("%{public}s: node or fnDevDesc or drsOps is null!", __func__);
@@ -680,8 +675,8 @@ static int32_t UsbFnCfgMgrParseUsbFnFunction(const struct DeviceResourceNode *no
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseUsbFnFunctions(const struct DeviceResourceNode *node,
-    struct DeviceResourceIface *drsOps, struct UsbFnConfiguration *fnConfig)
+static int32_t UsbFnCfgMgrParseUsbFnFunctions(
+    const struct DeviceResourceNode *node, struct DeviceResourceIface *drsOps, struct UsbFnConfiguration *fnConfig)
 {
     int32_t iCount;
     int32_t funCount;
@@ -694,16 +689,14 @@ static int32_t UsbFnCfgMgrParseUsbFnFunctions(const struct DeviceResourceNode *n
         HDF_LOGE("%{public}s: get functionList num failed!", __func__);
         return HDF_FAILURE;
     }
-    fnConfig->functions = \
-        (struct UsbFnFunction **)UsbFnMemCalloc((funCount + 1) * sizeof(struct UsbFnFunction *));
+    fnConfig->functions = (struct UsbFnFunction **)UsbFnMemCalloc((funCount + 1) * sizeof(struct UsbFnFunction *));
     if (fnConfig->functions == NULL) {
         HDF_LOGE("%{public}s: UsbFnMemCalloc failure!", __func__);
         return HDF_FAILURE;
     }
     fnConfig->functions[funCount] = NULL;
     for (iCount = 0; iCount < funCount; iCount++) {
-        fnConfig->functions[iCount] = \
-            (struct UsbFnFunction *)UsbFnMemCalloc(sizeof(struct UsbFnFunction));
+        fnConfig->functions[iCount] = (struct UsbFnFunction *)UsbFnMemCalloc(sizeof(struct UsbFnFunction));
         if (fnConfig->functions[iCount] == NULL) {
             HDF_LOGE("%{public}s: UsbFnMemCalloc failure!", __func__);
             goto FREE_FUNTION;
@@ -733,8 +726,8 @@ FREE_FUNTION:
     return HDF_FAILURE;
 }
 
-static int32_t UsbFnCfgMgrParseUsbFnConfiguration(const struct DeviceResourceNode *node,
-    struct DeviceResourceIface *drsOps, struct UsbFnConfiguration *fnConfig)
+static int32_t UsbFnCfgMgrParseUsbFnConfiguration(
+    const struct DeviceResourceNode *node, struct DeviceResourceIface *drsOps, struct UsbFnConfiguration *fnConfig)
 {
     if (node == NULL || fnConfig == NULL || drsOps == NULL) {
         HDF_LOGE("%{public}s: node or fnDevDesc or drsOps is null!", __func__);
@@ -763,8 +756,8 @@ static int32_t UsbFnCfgMgrParseUsbFnConfiguration(const struct DeviceResourceNod
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgMgrParseUsbFnCfgLists(const struct DeviceResourceNode *configNode,
-    struct DeviceResourceIface *drsOps, struct UsbFnDeviceDesc *fnDevDesc)
+static int32_t UsbFnCfgMgrParseUsbFnCfgLists(
+    const struct DeviceResourceNode *configNode, struct DeviceResourceIface *drsOps, struct UsbFnDeviceDesc *fnDevDesc)
 {
     int32_t configCount;
     int32_t count;
@@ -785,8 +778,7 @@ static int32_t UsbFnCfgMgrParseUsbFnCfgLists(const struct DeviceResourceNode *co
     }
     fnDevDesc->configs[configCount] = NULL;
     for (count = 0; count < configCount; count++) {
-        fnDevDesc->configs[count] = \
-            (struct UsbFnConfiguration *)UsbFnMemCalloc(sizeof(struct UsbFnConfiguration));
+        fnDevDesc->configs[count] = (struct UsbFnConfiguration *)UsbFnMemCalloc(sizeof(struct UsbFnConfiguration));
         if (fnDevDesc->configs[count] == NULL) {
             HDF_LOGE("%{public}s: UsbFnMemCalloc failure!", __func__);
             goto FREE_CONFIG;
@@ -801,8 +793,7 @@ static int32_t UsbFnCfgMgrParseUsbFnCfgLists(const struct DeviceResourceNode *co
             HDF_LOGE("%{public}s: StrNode is null!", __func__);
             goto FREE_CONFIG;
         }
-        if (UsbFnCfgMgrParseUsbFnConfiguration(childConfigNode, drsOps,
-            fnDevDesc->configs[count]) != HDF_SUCCESS) {
+        if (UsbFnCfgMgrParseUsbFnConfiguration(childConfigNode, drsOps, fnDevDesc->configs[count]) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: parse config failure!", __func__);
             goto FREE_CONFIG;
         }
@@ -817,8 +808,8 @@ FREE_CONFIG:
     return HDF_FAILURE;
 }
 
-static int32_t UsbFnCfgMgrParseUsbFnConfigurations(const struct DeviceResourceNode *node,
-    struct UsbFnDeviceDesc *fnDevDesc)
+static int32_t UsbFnCfgMgrParseUsbFnConfigurations(
+    const struct DeviceResourceNode *node, struct UsbFnDeviceDesc *fnDevDesc)
 {
     struct DeviceResourceIface *drsOps = NULL;
     const char *configNodeName = NULL;
@@ -859,8 +850,7 @@ struct UsbFnDeviceDesc *UsbFnCfgMgrGetInstanceFromHCS(const struct DeviceResourc
         return NULL;
     }
 
-    usbDevDesc =
-        (struct UsbFnDeviceDesc *)UsbFnMemCalloc(sizeof(*usbDevDesc));
+    usbDevDesc = (struct UsbFnDeviceDesc *)UsbFnMemCalloc(sizeof(*usbDevDesc));
     if (usbDevDesc == NULL) {
         HDF_LOGE("%{public}s: UsbFnMemCalloc failure!", __func__);
         return NULL;
@@ -883,13 +873,13 @@ struct UsbFnDeviceDesc *UsbFnCfgMgrGetInstanceFromHCS(const struct DeviceResourc
 
     return usbDevDesc;
 
- FAIL_DEV_STRING:
+FAIL_DEV_STRING:
     UsbFnMemFree(usbDevDesc->deviceDesc);
     UsbFnMemFree(usbDevDesc);
     return NULL;
 }
 
-void UsbFnCfgMgrFreeFnStrings(struct UsbFnStrings **fnStrings)
+static void UsbFnCfgMgrFreeFnStrings(struct UsbFnStrings **fnStrings)
 {
     int8_t iCount;
 
@@ -899,7 +889,7 @@ void UsbFnCfgMgrFreeFnStrings(struct UsbFnStrings **fnStrings)
     UsbFnMemFree(fnStrings);
 }
 
-void UsbFnCfgMgrFreeFuncDescHead(struct UsbDescriptorHeader **descHeads)
+static void UsbFnCfgMgrFreeFuncDescHead(struct UsbDescriptorHeader **descHeads)
 {
     int8_t iCount;
 
@@ -909,7 +899,7 @@ void UsbFnCfgMgrFreeFuncDescHead(struct UsbDescriptorHeader **descHeads)
     UsbFnMemFree(descHeads);
 }
 
-void UsbFnCfgMgrFreeFunctions(struct UsbFnFunction **fnFunctions)
+static void UsbFnCfgMgrFreeFunctions(struct UsbFnFunction **fnFunctions)
 {
     int8_t iCount;
 
@@ -934,7 +924,7 @@ void UsbFnCfgMgrFreeFunctions(struct UsbFnFunction **fnFunctions)
     UsbFnMemFree(fnFunctions);
 }
 
-void UsbFnCfgMgrFreeConfigs(struct UsbFnConfiguration **fnConfigs)
+static void UsbFnCfgMgrFreeConfigs(struct UsbFnConfiguration **fnConfigs)
 {
     int8_t iCount;
 
@@ -970,8 +960,7 @@ static uint8_t IsPropRegisted(const struct UsbFnInterface *intf, const char *nam
     struct UsbFnCfgPropMgr *obj = NULL;
     struct UsbFnCfgPropMgr *temp = NULL;
 
-    DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_cfgEntry, \
-        struct UsbFnCfgPropMgr, entry) {
+    DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_cfgEntry, struct UsbFnCfgPropMgr, entry) {
         if (obj->intf && (obj->intf == intf) && strcmp(name, obj->name) == 0) {
             return 1;
         }
@@ -979,8 +968,7 @@ static uint8_t IsPropRegisted(const struct UsbFnInterface *intf, const char *nam
     return 0;
 }
 
-static int32_t IsDevDescPropAndGetValue(const struct UsbFnInterface *intf, const char *name,
-    uint16_t *value)
+static int32_t IsDevDescPropAndGetValue(const struct UsbFnInterface *intf, const char *name, uint16_t *value)
 {
     struct UsbFnDeviceMgr *fnDevMgr = NULL;
 
@@ -1028,13 +1016,12 @@ static int32_t IsDevDescProp(const char *name)
     if (name == NULL) {
         return 0;
     }
-    if ((strcmp(USBDEV_SUBCLASS, name) == 0) || (strcmp(DESC_TYPE, name) == 0) ||
-        (strcmp(USBDEV_CLASS, name) == 0) || (strcmp(USBDEV_PROTOCOL, name) == 0) ||
-        (strcmp(USBDEV_MAXSIZE, name) == 0) || (strcmp(USBDEV_MANUFACTURER, name) == 0) ||
-        (strcmp(USBDEV_PRODUCT, name) == 0) || (strcmp(USBDEV_SERIALNUM, name) == 0) ||
-        (strcmp(USBDEV_NUMCFG, name) == 0) || (strcmp(USBDEV_BCD, name) == 0) ||
-        (strcmp(USBDEV_VENDOR, name) == 0) || (strcmp(USBDEV_IDPRODUCT, name) == 0) ||
-        (strcmp(USBDEV_BCDDEVICE, name) == 0)) {
+    if ((strcmp(USBDEV_SUBCLASS, name) == 0) || (strcmp(DESC_TYPE, name) == 0) || (strcmp(USBDEV_CLASS, name) == 0) ||
+        (strcmp(USBDEV_PROTOCOL, name) == 0) || (strcmp(USBDEV_MAXSIZE, name) == 0) ||
+        (strcmp(USBDEV_MANUFACTURER, name) == 0) || (strcmp(USBDEV_PRODUCT, name) == 0) ||
+        (strcmp(USBDEV_SERIALNUM, name) == 0) || (strcmp(USBDEV_NUMCFG, name) == 0) ||
+        (strcmp(USBDEV_BCD, name) == 0) || (strcmp(USBDEV_VENDOR, name) == 0) ||
+        (strcmp(USBDEV_IDPRODUCT, name) == 0) || (strcmp(USBDEV_BCDDEVICE, name) == 0)) {
         return 1;
     }
     return 0;
@@ -1095,9 +1082,8 @@ static const char *UsbFnCfgGetPropValueFromPropList(const struct UsbFnDeviceMgr 
     return NULL;
 }
 
-static const char *UsbFnCfgGetPropValueFromHcs(const struct UsbFnDeviceMgr *fnDevMgr,
-    const struct UsbFnInterface *intf, const struct DeviceResourceIface *drsOps,
-    const struct DeviceResourceNode *customNode, const char *name)
+static const char *UsbFnCfgGetPropValueFromHcs(const struct UsbFnDeviceMgr *fnDevMgr, const struct UsbFnInterface *intf,
+    const struct DeviceResourceIface *drsOps, const struct DeviceResourceNode *customNode, const char *name)
 {
     int32_t propTabCount;
     int32_t count;
@@ -1160,8 +1146,7 @@ static const char *UsbFnCfgFindPropFromHcs(const struct UsbFnInterface *intf, co
     return propValue;
 }
 
-static int32_t UsbFnCfgChangeUdcName(const struct UsbFnDeviceMgr *fnDevMgr,
-    struct UsbFnAdapterOps *fnOps)
+static int32_t UsbFnCfgChangeUdcName(const struct UsbFnDeviceMgr *fnDevMgr, struct UsbFnAdapterOps *fnOps)
 {
     int32_t ret;
 
@@ -1180,30 +1165,27 @@ static int32_t UsbFnCfgChangeUdcName(const struct UsbFnDeviceMgr *fnDevMgr,
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgChangeStrings(const struct UsbFnDeviceMgr *fnDevMgr,
-    struct UsbFnAdapterOps *fnOps, uint32_t index, const char *propName)
+static int32_t UsbFnCfgChangeStrings(
+    const struct UsbFnDeviceMgr *fnDevMgr, struct UsbFnAdapterOps *fnOps, uint32_t index, const char *propName)
 {
     int32_t i;
     int32_t ret;
     struct UsbFnStrings **strings = NULL;
 
-    if (fnDevMgr == NULL || fnDevMgr->des == NULL || \
-        fnDevMgr->des->deviceStrings == NULL) {
+    if (fnDevMgr == NULL || fnDevMgr->des == NULL || fnDevMgr->des->deviceStrings == NULL) {
         return HDF_FAILURE;
     }
     strings = fnDevMgr->des->deviceStrings;
     for (i = 0; strings[i] != NULL; i++) {
-        ret = fnOps->writeDesString(fnDevMgr->name, strings[i]->language, propName,
-            strings[i]->strings[index].s);
+        ret = fnOps->writeDesString(fnDevMgr->name, strings[i]->language, propName, strings[i]->strings[index].s);
         if (ret) {
-        return HDF_FAILURE;
+            return HDF_FAILURE;
         }
     }
     return HDF_SUCCESS;
 }
 
-static int32_t UsbFnCfgChangeDevceDes(const struct UsbFnInterface *intf, const char *name,
-    const char *value)
+static int32_t UsbFnCfgChangeDevceDes(const struct UsbFnInterface *intf, const char *name, const char *value)
 {
     int32_t ret;
     uint32_t data;
@@ -1245,8 +1227,7 @@ static struct UsbFnCfgPropMgr *UsbfnCfgMgrFindPropMgr(const struct UsbFnInterfac
     struct UsbFnCfgPropMgr *obj = NULL;
     struct UsbFnCfgPropMgr *temp = NULL;
 
-    DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_cfgEntry, \
-        struct UsbFnCfgPropMgr, entry) {
+    DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_cfgEntry, struct UsbFnCfgPropMgr, entry) {
         if (obj->intf && (obj->intf == intf) && strcmp(name, obj->name) == 0) {
             return obj;
         }
@@ -1254,8 +1235,7 @@ static struct UsbFnCfgPropMgr *UsbfnCfgMgrFindPropMgr(const struct UsbFnInterfac
     return NULL;
 }
 
-int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf,
-    const struct UsbFnRegistInfo *registInfo)
+int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf, const struct UsbFnRegistInfo *registInfo)
 {
     struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
     uint8_t isDevProp;
@@ -1418,4 +1398,3 @@ int32_t UsbFnCfgMgrSetProp(const struct UsbFnInterface *intf, const char *name, 
     }
     return HDF_SUCCESS;
 }
-

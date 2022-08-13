@@ -74,7 +74,7 @@ static void WriteSpeedDone(void)
     }
 }
 
-void StopWriteSpeedTest(int32_t signo)
+static void StopWriteSpeedTest(int32_t signo)
 {
     (void)signo;
     WriteSpeedDone();

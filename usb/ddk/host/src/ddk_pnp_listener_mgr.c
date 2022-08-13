@@ -42,7 +42,7 @@ struct UsbDdkDeviceHanldePriv {
 
 static struct UsbDdkListenerList g_ddkListenerList = {.isInit = false};
 
-bool DdkListenerMgrIsExists(const struct HdfDevEventlistener *listener)
+static bool DdkListenerMgrIsExists(const struct HdfDevEventlistener *listener)
 {
     OsalMutexLock(&g_ddkListenerList.listMutex);
     if (DListIsEmpty(&g_ddkListenerList.listenerList)) {
@@ -65,7 +65,7 @@ bool DdkListenerMgrIsExists(const struct HdfDevEventlistener *listener)
     return findFlag;
 }
 
-int32_t DdkListenerMgrNotifyOne(const struct UsbPnpNotifyMatchInfoTable *device, void *priv)
+static int32_t DdkListenerMgrNotifyOne(const struct UsbPnpNotifyMatchInfoTable *device, void *priv)
 {
     struct UsbDdkDeviceHanldePriv *handlePriv = priv;
     const struct HdfDevEventlistener *listener = handlePriv->listener;

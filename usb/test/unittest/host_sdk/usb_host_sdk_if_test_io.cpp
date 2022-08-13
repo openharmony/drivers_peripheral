@@ -34,31 +34,10 @@ using namespace testing::ext;
 
 namespace {
 class UsbHostSdkIfTestIo : public testing::Test {
-public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
 };
 
 static struct AcmDevice g_deviceService;
 static struct AcmDevice *g_acm = &g_deviceService;
-
-void UsbHostSdkIfTestIo::SetUpTestCase()
-{
-}
-
-void UsbHostSdkIfTestIo::TearDownTestCase()
-{
-}
-
-void UsbHostSdkIfTestIo::SetUp()
-{
-}
-
-void UsbHostSdkIfTestIo::TearDown()
-{
-}
 
 static void AcmReadBulk(struct UsbRequest *req)
 {

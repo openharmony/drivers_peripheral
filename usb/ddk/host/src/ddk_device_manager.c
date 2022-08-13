@@ -42,7 +42,7 @@ struct UsbDdkDeviceList {
 
 static struct UsbDdkDeviceList g_ddkDevList = {.isInit = false};
 
-struct UsbDdkDeviceInfo *DdkDevMgrIsDevExists(uint64_t devAddr)
+static struct UsbDdkDeviceInfo *DdkDevMgrIsDevExists(uint64_t devAddr)
 {
     OsalMutexLock(&g_ddkDevList.listMutex);
     if (DListIsEmpty(&g_ddkDevList.devList)) {
@@ -64,7 +64,7 @@ struct UsbDdkDeviceInfo *DdkDevMgrIsDevExists(uint64_t devAddr)
     return res;
 }
 
-int32_t DdkDevMgrAddDevice(struct UsbDdkDeviceInfo *device)
+static int32_t DdkDevMgrAddDevice(struct UsbDdkDeviceInfo *device)
 {
     if (device == NULL) {
         HDF_LOGE("%{public}s: invalid param", __func__);
@@ -107,7 +107,7 @@ int32_t DdkDevMgrRemoveDevice(int32_t busNum, int32_t devNum, struct UsbPnpNotif
     return HDF_SUCCESS;
 }
 
-int32_t DdkDevMgrInitDevice(struct UsbDdkDeviceInfo *deviceInfo)
+static int32_t DdkDevMgrInitDevice(struct UsbDdkDeviceInfo *deviceInfo)
 {
     (void)memset_s(deviceInfo, sizeof(struct UsbDdkDeviceInfo), 0, sizeof(struct UsbDdkDeviceInfo));
     int32_t ret = OsalMutexInit(&deviceInfo->deviceMutex);
@@ -157,7 +157,7 @@ const struct UsbPnpNotifyMatchInfoTable *DdkDevMgrCreateDevice(const char *devic
     return status == HDF_SUCCESS ? &device->info : NULL;
 }
 
-int32_t DdkDevMgrScanSysfs(const char *sysfsDevDir)
+static int32_t DdkDevMgrScanSysfs(const char *sysfsDevDir)
 {
     if (sysfsDevDir == NULL) {
         HDF_LOGE("%{public}s: invalid param", __func__);

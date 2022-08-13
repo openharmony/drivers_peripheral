@@ -41,7 +41,7 @@ struct HdfSBuf *g_data;
 struct HdfSBuf *g_reply;
 struct HdfIoService *g_acmService;
 
-int32_t check_service()
+static int32_t check_service()
 {
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {
         HDF_LOGE("%s: GetService err", __func__);
@@ -105,7 +105,7 @@ void acm_write(const char *buf)
     printf("acm_write:%s\n", buf);
 }
 
-void acm_read(char *str, int32_t timeout)
+void acm_read(char * const str, int32_t timeout)
 {
     int32_t ret;
     uint32_t maxLen = 256;
