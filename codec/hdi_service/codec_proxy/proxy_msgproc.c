@@ -249,7 +249,7 @@ int32_t CodecProxyParseParam(struct HdfSBuf *reply, Param *param)
     return HDF_SUCCESS;
 }
 
-int32_t CodecProxyPackBufferInfo(struct HdfSBuf *data, const CodecBufferInfo *buffer)
+static int32_t CodecProxyPackBufferInfo(struct HdfSBuf *data, const CodecBufferInfo *buffer)
 {
     if (data == NULL || buffer == NULL) {
         HDF_LOGE("%{public}s: params NULL!", __func__);
@@ -290,7 +290,7 @@ int32_t CodecProxyPackBufferInfo(struct HdfSBuf *data, const CodecBufferInfo *bu
     return HDF_SUCCESS;
 }
 
-int32_t CodecProxyParseBufferInfo(struct HdfSBuf *reply, CodecBufferInfo *buffer)
+static int32_t CodecProxyParseBufferInfo(struct HdfSBuf *reply, CodecBufferInfo *buffer)
 {
     uint32_t readLen = 0;
     if (reply == NULL || buffer == NULL) {

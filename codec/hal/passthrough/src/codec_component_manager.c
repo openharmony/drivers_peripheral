@@ -29,7 +29,7 @@
 
 struct ComponentManagerList *g_list = NULL;
 uint32_t g_componentId = 0;
-uint32_t GetNextComponentId()
+static uint32_t GetNextComponentId()
 {
     uint32_t tempId = 0;
     if (g_list == NULL) {
@@ -52,7 +52,7 @@ uint32_t GetNextComponentId()
     return tempId;
 }
 
-int32_t ComponentManagerGetComponentNum()
+static int32_t ComponentManagerGetComponentNum()
 {
     int32_t num = 0;
     if (GetComponentNum(&num) != HDF_SUCCESS) {
@@ -61,7 +61,7 @@ int32_t ComponentManagerGetComponentNum()
     return num;
 }
 
-int32_t ComponentManagerGetComponentCapabilityList(CodecCompCapability *capList, int32_t count)
+static int32_t ComponentManagerGetComponentCapabilityList(CodecCompCapability *capList, int32_t count)
 {
     if (capList == NULL || count <= 0) {
         HDF_LOGE("%{public}s, capList is null or count[%{public}d] <= 0!", __func__, count);
@@ -74,8 +74,8 @@ int32_t ComponentManagerGetComponentCapabilityList(CodecCompCapability *capList,
     return ret;
 }
 
-int32_t ComponentManagerCreateComponent(struct CodecComponentType **component, uint32_t *componentId, char *compName,
-                                        int64_t appData, struct CodecCallbackType *callbacks)
+static int32_t ComponentManagerCreateComponent(struct CodecComponentType **component, uint32_t *componentId,
+                                               char *compName, int64_t appData, struct CodecCallbackType *callbacks)
 {
     if (g_list == NULL) {
         HDF_LOGE("%{public}s, g_list is not init!", __func__);
@@ -121,7 +121,7 @@ int32_t ComponentManagerCreateComponent(struct CodecComponentType **component, u
     return HDF_SUCCESS;
 }
 
-int32_t ComponentManagerDestoryComponent(uint32_t componentId)
+static int32_t ComponentManagerDestoryComponent(uint32_t componentId)
 {
     if (g_list == NULL) {
         HDF_LOGE("%{public}s, g_list is not init!", __func__);
@@ -158,7 +158,7 @@ int32_t ComponentManagerDestoryComponent(uint32_t componentId)
     return ret;
 }
 
-int32_t InitComponentConfig(void)
+static int32_t InitComponentConfig(void)
 {
     ReleaseHcsTree();
     const struct DeviceResourceIface *pDevResIns = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);

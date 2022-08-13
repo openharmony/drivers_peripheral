@@ -665,8 +665,8 @@ static int32_t SerStubComponentRoleEnum(struct CodecComponentType *serviceImpl, 
     return ret;
 }
 
-int32_t CodecComponentTypeServiceOnRemoteRequest(struct HdfRemoteService *remote, int32_t cmdId, struct HdfSBuf *data,
-                                                 struct HdfSBuf *reply)
+static int32_t CodecComponentTypeServiceOnRemoteRequest(struct HdfRemoteService *remote,
+                                                        int32_t cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct CodecComponentType *serviceImpl = (struct CodecComponentType *)remote;
     if (!HdfRemoteServiceCheckInterfaceToken(serviceImpl->AsObject(serviceImpl), data)) {

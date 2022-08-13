@@ -34,7 +34,7 @@ static int32_t CodecCallbackProxyCall(int32_t id, struct HdfSBuf *data, struct H
     return g_callback->remote->dispatcher->Dispatch(g_callback->remote, id, data, reply);
 }
 
-int32_t CodecCallbackProxyReqSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
+static int32_t CodecCallbackProxyReqSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
 {
     *data = HdfSbufTypedObtain(SBUF_IPC);
     if (*data == NULL) {
@@ -50,7 +50,7 @@ int32_t CodecCallbackProxyReqSBuf(struct HdfSBuf **data, struct HdfSBuf **reply)
     return HDF_SUCCESS;
 }
 
-void CodecCallbackProxySBufRecycle(struct HdfSBuf *data, struct HdfSBuf *reply)
+static void CodecCallbackProxySBufRecycle(struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (data != NULL) {
         HdfSbufRecycle(data);

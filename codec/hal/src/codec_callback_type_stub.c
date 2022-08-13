@@ -195,7 +195,7 @@ static int32_t SerStubFillBufferDone(struct CodecCallbackType *serviceImpl,
     return ret;
 }
 
-int32_t CodecCallbackTypeServiceOnRemoteRequest(struct HdfRemoteService *service, int32_t code,
+static int32_t CodecCallbackTypeServiceOnRemoteRequest(struct HdfRemoteService *service, int32_t code,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct CodecCallbackType *serviceImpl = (struct CodecCallbackType*)service;
