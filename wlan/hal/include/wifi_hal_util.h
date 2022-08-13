@@ -24,10 +24,10 @@ extern "C" {
 #endif
 #endif
 
-int32_t HalMutexInit();
-int32_t HalMutexDestroy();
-void HalMutexLock();
-void HalMutexUnlock();
+int32_t HalMutexInit(void);
+int32_t HalMutexDestroy(void);
+void HalMutexLock(void);
+void HalMutexUnlock(void);
 
 #ifdef __cplusplus
 #if __cplusplus

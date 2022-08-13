@@ -47,7 +47,7 @@ static int32_t WlanInterfaceDriverDispatch(
         &wlaninterfaceHost->service->stub.interface, cmdId, data, reply);
 }
 
-int HdfWlanInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+static int HdfWlanInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     int32_t ret;
     HDF_LOGI("HdfWlanInterfaceDriverInit enter.");
@@ -66,7 +66,7 @@ int HdfWlanInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-int HdfWlanInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+static int HdfWlanInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfWlanInterfaceDriverBind enter.");
 
@@ -96,7 +96,7 @@ int HdfWlanInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-void HdfWlanInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfWlanInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfWlanInterfaceDriverRelease enter.");
     struct HdfWlanRemoteNode *pos = NULL;

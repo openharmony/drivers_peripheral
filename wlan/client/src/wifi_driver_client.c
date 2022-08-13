@@ -32,7 +32,7 @@ extern "C" {
 
 #define MAX_CALL_BACK_COUNT 10
 static struct CallbackEvent *g_callbackEventMap[MAX_CALL_BACK_COUNT] = {NULL};
-static struct Hid2dEvent *g_Hid2dEventMap[MAX_CALL_BACK_COUNT] = {NULL};
+static struct Hid2dEvent *g_hid2dEventMap[MAX_CALL_BACK_COUNT] = {NULL};
 
 void WifiEventReport(const char *ifName, uint32_t event, void *data)
 {
@@ -112,9 +112,9 @@ void Hid2dEventReport(const char *ifName, const uint8_t *msg, uint32_t msgLen)
     uint32_t i;
 
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_Hid2dEventMap[i] != NULL && (strcmp(g_Hid2dEventMap[i]->ifName, ifName) == 0)) {
+        if (g_hid2dEventMap[i] != NULL && (strcmp(g_hid2dEventMap[i]->ifName, ifName) == 0)) {
             HDF_LOGI("%s: Hid2dEventReport ifName = %s", __FUNCTION__, ifName);
-            g_Hid2dEventMap[i]->func(msg, msgLen);
+            g_hid2dEventMap[i]->func(msg, msgLen);
         }
     }
 }
@@ -129,8 +129,8 @@ int32_t WifiRegisterHid2dCallback(Hid2dCallback func, const char *ifName)
         return RET_CODE_INVALID_PARAM;
     }
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_Hid2dEventMap[i] != NULL && (strcmp(g_Hid2dEventMap[i]->ifName, ifName) == 0) &&
-            g_Hid2dEventMap[i]->func == func) {
+        if (g_hid2dEventMap[i] != NULL && (strcmp(g_hid2dEventMap[i]->ifName, ifName) == 0) &&
+            g_hid2dEventMap[i]->func == func) {
             HDF_LOGI("%s the callback function has been registered!", __FUNCTION__);
             return RET_CODE_SUCCESS;
         }
@@ -147,8 +147,8 @@ int32_t WifiRegisterHid2dCallback(Hid2dCallback func, const char *ifName)
         }
         event->func = func;
         for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-            if (g_Hid2dEventMap[i] == NULL) {
-                g_Hid2dEventMap[i] = event;
+            if (g_hid2dEventMap[i] == NULL) {
+                g_hid2dEventMap[i] = event;
                 HDF_LOGD("%s: WifiRegisterHid2dCallback successful", __FUNCTION__);
                 return RET_CODE_SUCCESS;
             }
@@ -169,11 +169,11 @@ void WifiUnregisterHid2dCallback(Hid2dCallback func, const char *ifName)
         return;
     }
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
-        if (g_Hid2dEventMap[i] != NULL && (strcmp(g_Hid2dEventMap[i]->ifName, ifName) == 0) &&
-            g_Hid2dEventMap[i]->func == func) {
-            g_Hid2dEventMap[i]->func = NULL;
-            OsalMemFree(g_Hid2dEventMap[i]);
-            g_Hid2dEventMap[i] = NULL;
+        if (g_hid2dEventMap[i] != NULL && (strcmp(g_hid2dEventMap[i]->ifName, ifName) == 0) &&
+            g_hid2dEventMap[i]->func == func) {
+            g_hid2dEventMap[i]->func = NULL;
+            OsalMemFree(g_hid2dEventMap[i]);
+            g_hid2dEventMap[i] = NULL;
             return;
         }
     }

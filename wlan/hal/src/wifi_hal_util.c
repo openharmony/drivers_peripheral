@@ -28,7 +28,7 @@ extern "C" {
 OSAL_DECLARE_MUTEX(g_mutex);
 static bool g_isInitMutex = false;
 
-int32_t HalMutexInit()
+int32_t HalMutexInit(void)
 {
     int32_t ret = HDF_SUCCESS;
     if (!g_isInitMutex) {
@@ -42,7 +42,7 @@ int32_t HalMutexInit()
     return ret;
 }
 
-int32_t HalMutexDestroy()
+int32_t HalMutexDestroy(void)
 {
     int32_t ret = HDF_SUCCESS;
     if (g_isInitMutex) {
@@ -56,14 +56,14 @@ int32_t HalMutexDestroy()
     return ret;
 }
 
-void HalMutexLock()
+void HalMutexLock(void)
 {
     if (OsalMutexLock(&g_mutex) != HDF_SUCCESS) {
         HDF_LOGE("%s: OsalMutexLock failed, line: %d\n", __FUNCTION__, __LINE__);
     }
 }
 
-void HalMutexUnlock()
+void HalMutexUnlock(void)
 {
     if (OsalMutexUnlock(&g_mutex) != HDF_SUCCESS) {
         HDF_LOGE("%s: OsalMutexUnlock failed, line: %d\n", __FUNCTION__, __LINE__);
