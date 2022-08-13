@@ -21,7 +21,7 @@
 
 #define HDF_LOG_TAG codec_hdi_passthrough
 
-int32_t ComponentTypeGetComponentVersion(struct CodecComponentType *self, struct CompVerInfo *verInfo)
+static int32_t ComponentTypeGetComponentVersion(struct CodecComponentType *self, struct CompVerInfo *verInfo)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
@@ -31,7 +31,7 @@ int32_t ComponentTypeGetComponentVersion(struct CodecComponentType *self, struct
     return CodecAdapterGetComponentVersion(info->codecNode, verInfo);
 }
 
-int32_t ComponentTypeSendCommand(struct CodecComponentType *self,
+static int32_t ComponentTypeSendCommand(struct CodecComponentType *self,
     enum OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData, uint32_t cmdDataLen)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -42,7 +42,7 @@ int32_t ComponentTypeSendCommand(struct CodecComponentType *self,
     return CodecAdapterSendCommand(info->codecNode, cmd, param, cmdData, cmdDataLen);
 }
 
-int32_t ComponentTypeGetParameter(struct CodecComponentType *self,
+static int32_t ComponentTypeGetParameter(struct CodecComponentType *self,
     uint32_t paramIndex, int8_t *paramStruct, uint32_t paramStructLen)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -53,7 +53,7 @@ int32_t ComponentTypeGetParameter(struct CodecComponentType *self,
     return CodecAdapterGetParameter(info->codecNode, paramIndex, paramStruct, paramStructLen);
 }
 
-int32_t ComponentTypeSetParameter(struct CodecComponentType *self,
+static int32_t ComponentTypeSetParameter(struct CodecComponentType *self,
     uint32_t index, int8_t *paramStruct, uint32_t paramStructLen)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -64,7 +64,7 @@ int32_t ComponentTypeSetParameter(struct CodecComponentType *self,
     return CodecAdapterSetParameter(info->codecNode, index, paramStruct, paramStructLen);
 }
 
-int32_t ComponentTypeGetConfig(struct CodecComponentType *self,
+static int32_t ComponentTypeGetConfig(struct CodecComponentType *self,
     uint32_t index, int8_t *cfgStruct, uint32_t cfgStructLen)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -75,7 +75,7 @@ int32_t ComponentTypeGetConfig(struct CodecComponentType *self,
     return CodecAdapterGetConfig(info->codecNode, index, cfgStruct, cfgStructLen);
 }
 
-int32_t ComponentTypeSetConfig(struct CodecComponentType *self,
+static int32_t ComponentTypeSetConfig(struct CodecComponentType *self,
     uint32_t index, int8_t *cfgStruct, uint32_t cfgStructLen)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -86,7 +86,7 @@ int32_t ComponentTypeSetConfig(struct CodecComponentType *self,
     return CodecAdapterSetConfig(info->codecNode, index, cfgStruct, cfgStructLen);
 }
 
-int32_t ComponentTypeGetExtensionIndex(struct CodecComponentType *self,
+static int32_t ComponentTypeGetExtensionIndex(struct CodecComponentType *self,
     const char *paramName, uint32_t *indexType)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -97,7 +97,7 @@ int32_t ComponentTypeGetExtensionIndex(struct CodecComponentType *self,
     return CodecAdapterGetExtensionIndex(info->codecNode, paramName, indexType);
 }
 
-int32_t ComponentTypeGetState(struct CodecComponentType *self, enum OMX_STATETYPE *state)
+static int32_t ComponentTypeGetState(struct CodecComponentType *self, enum OMX_STATETYPE *state)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
@@ -107,7 +107,7 @@ int32_t ComponentTypeGetState(struct CodecComponentType *self, enum OMX_STATETYP
     return CodecAdapterGetState(info->codecNode, state);
 }
 
-int32_t ComponentTypeComponentTunnelRequest(struct CodecComponentType *self,
+static int32_t ComponentTypeComponentTunnelRequest(struct CodecComponentType *self,
     uint32_t port, int32_t tunneledComp, uint32_t tunneledPort,
     struct OMX_TUNNELSETUPTYPE *tunnelSetup)
 {
@@ -119,7 +119,7 @@ int32_t ComponentTypeComponentTunnelRequest(struct CodecComponentType *self,
     return CodecAdapterComponentTunnelRequest(info->codecNode, port, tunneledComp, tunneledPort, tunnelSetup);
 }
 
-int32_t ComponentTypeUseBuffer(struct CodecComponentType *self,
+static int32_t ComponentTypeUseBuffer(struct CodecComponentType *self,
     uint32_t portIndex, struct OmxCodecBuffer *buffer)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -130,7 +130,7 @@ int32_t ComponentTypeUseBuffer(struct CodecComponentType *self,
     return CodecAdapterUseBuffer(info->codecNode, portIndex, buffer);
 }
 
-int32_t ComponentTypeAllocateBuffer(struct CodecComponentType *self,
+static int32_t ComponentTypeAllocateBuffer(struct CodecComponentType *self,
     uint32_t portIndex, struct OmxCodecBuffer *buffer)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -141,7 +141,7 @@ int32_t ComponentTypeAllocateBuffer(struct CodecComponentType *self,
     return CodecAdapterAllocateBuffer(info->codecNode, portIndex, buffer);
 }
 
-int32_t ComponentTypeFreeBuffer(struct CodecComponentType *self, uint32_t portIndex,
+static int32_t ComponentTypeFreeBuffer(struct CodecComponentType *self, uint32_t portIndex,
     const struct OmxCodecBuffer *buffer)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -152,7 +152,7 @@ int32_t ComponentTypeFreeBuffer(struct CodecComponentType *self, uint32_t portIn
     return CodecAdapterFreeBuffer(info->codecNode, portIndex, buffer);
 }
 
-int32_t ComponentTypeEmptyThisBuffer(struct CodecComponentType *self,
+static int32_t ComponentTypeEmptyThisBuffer(struct CodecComponentType *self,
     const struct OmxCodecBuffer *buffer)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -163,7 +163,7 @@ int32_t ComponentTypeEmptyThisBuffer(struct CodecComponentType *self,
     return CodecAdapterEmptyThisBuffer(info->codecNode, buffer);
 }
 
-int32_t ComponentTypeFillThisBuffer(struct CodecComponentType *self,
+static int32_t ComponentTypeFillThisBuffer(struct CodecComponentType *self,
     const struct OmxCodecBuffer *buffer)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -174,7 +174,7 @@ int32_t ComponentTypeFillThisBuffer(struct CodecComponentType *self,
     return CodecAdapterFillThisBuffer(info->codecNode, buffer);
 }
 
-int32_t ComponentTypeSetCallbacks(struct CodecComponentType *self,
+static int32_t ComponentTypeSetCallbacks(struct CodecComponentType *self,
     struct CodecCallbackType* callback, int64_t appData)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -185,7 +185,7 @@ int32_t ComponentTypeSetCallbacks(struct CodecComponentType *self,
     return CodecAdapterSetCallbacks(info->codecNode, callback, appData);
 }
 
-int32_t ComponentTypeComponentDeInit(struct CodecComponentType *self)
+static int32_t ComponentTypeComponentDeInit(struct CodecComponentType *self)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
     if (info == NULL) {
@@ -195,7 +195,7 @@ int32_t ComponentTypeComponentDeInit(struct CodecComponentType *self)
     return CodecAdapterComponentDeInit(info->codecNode);
 }
 
-int32_t ComponentTypeUseEglImage(struct CodecComponentType *self,
+static int32_t ComponentTypeUseEglImage(struct CodecComponentType *self,
     struct OmxCodecBuffer *buffer, uint32_t portIndex, int8_t *eglImage, uint32_t eglImageLen)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);
@@ -206,7 +206,7 @@ int32_t ComponentTypeUseEglImage(struct CodecComponentType *self,
     return CodecAdapterUseEglImage(info->codecNode, buffer, portIndex, eglImage, eglImageLen);
 }
 
-int32_t ComponentTypeComponentRoleEnum(struct CodecComponentType *self,
+static int32_t ComponentTypeComponentRoleEnum(struct CodecComponentType *self,
     uint8_t *role, uint32_t roleLen, uint32_t index)
 {
     struct CodecComponentTypeInfo *info = CONTAINER_OF(self, struct CodecComponentTypeInfo, instance);

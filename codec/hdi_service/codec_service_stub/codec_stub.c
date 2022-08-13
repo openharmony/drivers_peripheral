@@ -608,7 +608,7 @@ static int32_t SerCodecSetCallback(struct HdfDeviceIoClient *client, struct HdfS
     return errNum;
 }
 
-int32_t HandleRequestCmd(struct HdfDeviceIoClient *client, int cmdId,
+static int32_t HandleRequestCmd(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     switch (cmdId) {

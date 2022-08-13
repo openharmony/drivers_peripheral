@@ -103,7 +103,7 @@ void DumpOutputToFile(FILE *fp, uint8_t *addr, uint32_t len)
     }
 }
 
-int32_t ReadInputFromFile(FILE *fp, uint8_t *addr)
+static int32_t ReadInputFromFile(FILE *fp, uint8_t *addr)
 {
     int32_t readSize = 0;
     int32_t frameSize = g_cmd.width * g_cmd.height * FRAME_SIZE_MULTI / FRAME_SIZE_OPERATOR;
@@ -239,7 +239,7 @@ int32_t TestOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t
     return HDF_SUCCESS;
 }
 
-void SetQpValue(RKHdiEncodeSetup *encSetup)
+static void SetQpValue(RKHdiEncodeSetup *encSetup)
 {
     switch (encSetup->rc.rcMode) {
         case MPP_ENC_RC_MODE_FIXQP: {
@@ -269,7 +269,7 @@ void SetQpValue(RKHdiEncodeSetup *encSetup)
     }
 }
 
-void CalcBpsRange(RKHdiEncodeSetup *encSetup)
+static void CalcBpsRange(RKHdiEncodeSetup *encSetup)
 {
     switch (encSetup->rc.rcMode) {
         case MPP_ENC_RC_MODE_FIXQP: {
@@ -309,7 +309,7 @@ void CalcBpsRange(RKHdiEncodeSetup *encSetup)
     }
 }
 
-void SetCodecTypeData(RKHdiCodecMimeSetup *codecMimeSet)
+static void SetCodecTypeData(RKHdiCodecMimeSetup *codecMimeSet)
 {
     switch (codecMimeSet->mimeCodecType) {
         case MEDIA_MIMETYPE_VIDEO_AVC: {
@@ -344,7 +344,7 @@ void SetCodecTypeData(RKHdiCodecMimeSetup *codecMimeSet)
     }
 }
 
-void FreeParams(Param *params, int32_t paramCnt)
+static void FreeParams(Param *params, int32_t paramCnt)
 {
     if (params == NULL || paramCnt <= 0) {
         HDF_LOGE("%{public}s: params is null or invalid count!", __func__);
@@ -359,7 +359,7 @@ void FreeParams(Param *params, int32_t paramCnt)
     OsalMemFree(params);
 }
 
-void CheckEncSetup(Param *setParams, Param *getParams, int32_t paramCnt)
+static void CheckEncSetup(Param *setParams, Param *getParams, int32_t paramCnt)
 {
     if (setParams == NULL || getParams == NULL || paramCnt <= 0) {
         HDF_LOGE("%{public}s: params is null or invalid count!", __func__);
@@ -379,7 +379,7 @@ void CheckEncSetup(Param *setParams, Param *getParams, int32_t paramCnt)
     HDF_LOGI("%{public}s: get all params correctly!", __func__);
 }
 
-int32_t GetSetupParams(Param *setParams, int32_t paramCnt)
+static int32_t GetSetupParams(Param *setParams, int32_t paramCnt)
 {
     Param *getParams = (Param *)OsalMemCalloc(sizeof(Param) * paramCnt);
 
@@ -397,7 +397,7 @@ int32_t GetSetupParams(Param *setParams, int32_t paramCnt)
     return HDF_SUCCESS;
 }
 
-int32_t SetupExtEncParams(Param *params, RKHdiEncodeSetup *encSetup, int32_t count)
+static int32_t SetupExtEncParams(Param *params, RKHdiEncodeSetup *encSetup, int32_t count)
 {
     Param *param = NULL;
     int32_t paramCount = count;
@@ -448,7 +448,7 @@ int32_t SetupExtEncParams(Param *params, RKHdiEncodeSetup *encSetup, int32_t cou
     return paramCount;
 }
 
-int32_t SetupEncParams(RKHdiEncodeSetup *encSetup)
+static int32_t SetupEncParams(RKHdiEncodeSetup *encSetup)
 {
     Param params[PARAM_ARRAY_LEN] = {0};
     Param *param = NULL;
@@ -506,7 +506,7 @@ int32_t SetupEncParams(RKHdiEncodeSetup *encSetup)
     return HDF_SUCCESS;
 }
 
-void EncodeLoopHandleInput(CodecEnvData *p_data, uint8_t *readData)
+static void EncodeLoopHandleInput(CodecEnvData *p_data, uint8_t *readData)
 {
     int32_t ret = 0;
     int32_t readSize = 0;
@@ -577,7 +577,7 @@ static int32_t EncodeLoop(CodecEnvData *p_data, uint8_t *readData)
     return ret;
 }
 
-void *EncodeThread(void *arg)
+static void *EncodeThread(void *arg)
 {
     CodecEnvData *p_data = (CodecEnvData *)arg;
     uint8_t *readData = (uint8_t*)OsalMemCalloc(g_cmd.width * g_cmd.height * 2);
@@ -596,7 +596,7 @@ void *EncodeThread(void *arg)
     return NULL;
 }
 
-void RevertEncodeStep1(void)
+static void RevertEncodeStep1(void)
 {
     if (g_data.fpInput) {
         fclose(g_data.fpInput);
@@ -608,7 +608,7 @@ void RevertEncodeStep1(void)
     }
 }
 
-void RevertEncodeStep2(void)
+static void RevertEncodeStep2(void)
 {
     int32_t ret = g_codecProxy->CodecDeinit(g_codecProxy);
     if (ret != HDF_SUCCESS) {
@@ -617,7 +617,7 @@ void RevertEncodeStep2(void)
     RevertEncodeStep1();
 }
 
-void RevertEncodeStep3(void)
+static void RevertEncodeStep3(void)
 {
     ReleaseShm();
     ReleaseCodecBuffer();
@@ -641,7 +641,7 @@ void RevertEncodeStep3(void)
     RevertEncodeStep2();
 }
 
-int32_t OpenFile(void)
+static int32_t OpenFile(void)
 {
     struct stat fileStat = {0};
     stat(g_cmd.file_input, &fileStat);
@@ -665,7 +665,7 @@ int32_t OpenFile(void)
     return HDF_SUCCESS;
 }
 
-void EncodeEnd(void)
+static void EncodeEnd(void)
 {
     DirectionType directType = ALL_TYPE;
     int32_t ret = g_codecProxy->CodecFlush(g_codecProxy, (CODEC_HANDLETYPE)g_handle, directType);
@@ -685,7 +685,7 @@ void EncodeEnd(void)
     }
 }
 
-int32_t Encode(void)
+static int32_t Encode(void)
 {
     pthread_t thd;
     pthread_attr_t attr;
