@@ -15,7 +15,7 @@
 
 #ifndef HDI_DEVICE_DEVICE_COMMON_H
 #define HDI_DEVICE_DEVICE_COMMON_H
-#include <stdlib.h>
+#include <cstdlib>
 #include <queue>
 #include <string>
 #include <vector>

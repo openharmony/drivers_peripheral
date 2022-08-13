@@ -49,6 +49,7 @@ static int32_t DisplayComposerDriverDispatch(
 
 static int HdfDisplayComposerDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
     HDF_LOGI("HdfDisplayComposerDriverInit enter");
     return HDF_SUCCESS;
 }
