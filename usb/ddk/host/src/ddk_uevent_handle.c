@@ -76,7 +76,7 @@ static int DdkUeventOpen(int *fd)
     return HDF_SUCCESS;
 }
 
-int32_t DdkUeventAddDevice(const char *devPath)
+static int32_t DdkUeventAddDevice(const char *devPath)
 {
     char *pos = strrchr(devPath, '/');
     if (pos == NULL) {
@@ -93,7 +93,7 @@ int32_t DdkUeventAddDevice(const char *devPath)
     return HDF_SUCCESS;
 }
 
-int32_t DdkUeventRemoveDevice(const char *busNum, const char *devNum)
+static int32_t DdkUeventRemoveDevice(const char *busNum, const char *devNum)
 {
     struct UsbPnpNotifyMatchInfoTable dev;
     int32_t ret = DdkDevMgrRemoveDevice(strtol(busNum, NULL, 10), strtol(devNum, NULL, 10), &dev); // 10 means decimal
@@ -105,7 +105,7 @@ int32_t DdkUeventRemoveDevice(const char *busNum, const char *devNum)
     return HDF_SUCCESS;
 }
 
-void DdkDispatchUevent(const struct DdkUeventInfo *info)
+static void DdkDispatchUevent(const struct DdkUeventInfo *info)
 {
     if (strcmp(info->subSystem, "usb") != 0) {
         return;
@@ -123,7 +123,7 @@ void DdkDispatchUevent(const struct DdkUeventInfo *info)
     }
 }
 
-void DdkHandleUevent(const char msg[], int32_t rcvLen)
+static void DdkHandleUevent(const char msg[], int32_t rcvLen)
 {
     struct DdkUeventInfo info = {
         .action = "",

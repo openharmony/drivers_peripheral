@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
+#include "usbfn_cfg_mgr.h"
+#include "usbfn_dev_mgr.h"
 #include "usbfn_device.h"
-#include "usbfn_request.h"
 #include "usbfn_interface.h"
 #include "usbfn_io_mgr.h"
-#include "usbfn_dev_mgr.h"
-#include "usbfn_cfg_mgr.h"
+#include "usbfn_request.h"
 
 #define HDF_LOG_TAG usbfn_sdk_if
 
@@ -62,41 +62,38 @@ ERR_DES:
     return HDF_ERR_INVALID_PARAM;
 }
 
-static void ChangeDescriptorDoSwitch(struct UsbDescriptorHeader *descriptor, int8_t *intfIndex)
+static void ChangeDescriptorDoSwitch(struct UsbDescriptorHeader * const descriptor, int8_t * const intfIndex)
 {
     switch (descriptor->bDescriptorType) {
-        case USB_DDK_DT_INTERFACE_ASSOCIATION:
-            {
-                struct UsbInterfaceAssocDescriptor *iadDescriptor = NULL;
-                iadDescriptor = (struct UsbInterfaceAssocDescriptor *)descriptor;
-                iadDescriptor->bFirstInterface = 0;
-            }
+        case USB_DDK_DT_INTERFACE_ASSOCIATION: {
+            struct UsbInterfaceAssocDescriptor *iadDescriptor = NULL;
+            iadDescriptor = (struct UsbInterfaceAssocDescriptor *)descriptor;
+            iadDescriptor->bFirstInterface = 0;
             break;
-        case USB_DDK_DT_INTERFACE:
-            {
-                struct UsbInterfaceDescriptor *intfDescriptor = NULL;
-                intfDescriptor = (struct UsbInterfaceDescriptor *)descriptor;
-                intfDescriptor->bInterfaceNumber = (*intfIndex)++;
-            }
+        }
+        case USB_DDK_DT_INTERFACE: {
+            struct UsbInterfaceDescriptor *intfDescriptor = NULL;
+            intfDescriptor = (struct UsbInterfaceDescriptor *)descriptor;
+            intfDescriptor->bInterfaceNumber = (*intfIndex)++;
             break;
-        case USB_DDK_DT_CS_INTERFACE:
-            {
-                struct UsbCdcUnionDesc *unionDescriptor = NULL;
-                if (descriptor->bLength == sizeof(struct UsbCdcUnionDesc)) {
-                    unionDescriptor = (struct UsbCdcUnionDesc *)descriptor;
-                    if (unionDescriptor->bDescriptorSubType == USB_DDK_CDC_UNION_TYPE) {
-                        unionDescriptor->bMasterInterface0 = 0;
-                        unionDescriptor->bSlaveInterface0 = 1;
-                    }
+        }
+        case USB_DDK_DT_CS_INTERFACE: {
+            struct UsbCdcUnionDesc *unionDescriptor = NULL;
+            if (descriptor->bLength == sizeof(struct UsbCdcUnionDesc)) {
+                unionDescriptor = (struct UsbCdcUnionDesc *)descriptor;
+                if (unionDescriptor->bDescriptorSubType == USB_DDK_CDC_UNION_TYPE) {
+                    unionDescriptor->bMasterInterface0 = 0;
+                    unionDescriptor->bSlaveInterface0 = 1;
                 }
             }
             break;
+        }
         default:
             break;
     }
 }
 
-static void UsbFnChangeDescriptor(struct UsbDescriptorHeader **descriptors)
+static void UsbFnChangeDescriptor(struct UsbDescriptorHeader ** const descriptors)
 {
     int8_t iCount;
     int8_t intfIndex = 0;
@@ -109,7 +106,7 @@ static void UsbFnChangeDescriptor(struct UsbDescriptorHeader **descriptors)
     }
 }
 
-static void UsbFnChangeDescInfo(uint8_t functionMask, struct UsbFnFunction *function)
+static void UsbFnChangeDescInfo(uint8_t functionMask, struct UsbFnFunction * const function)
 {
     if (FUNCTION_ECM_MASK & functionMask) {
         HDF_LOGI("%{public}s: not need change", __func__);
@@ -121,11 +118,10 @@ static void UsbFnChangeDescInfo(uint8_t functionMask, struct UsbFnFunction *func
     UsbFnChangeDescriptor(function->sspDescriptors);
 }
 
-static void DoChangeFunction(struct UsbFnFunction *function, struct UsbFnDescriptorData *descriptor)
+static void DoChangeFunction(struct UsbFnFunction * const function, struct UsbFnDescriptorData * const descriptor)
 {
     function->enable = true;
-    if (strncmp(function->funcName,
-        FUNCTION_GENERIC_ACM, strlen(FUNCTION_GENERIC_ACM)) == 0) {
+    if (strncmp(function->funcName, FUNCTION_GENERIC_ACM, strlen(FUNCTION_GENERIC_ACM)) == 0) {
         if (descriptor->functionMask & FUNCTION_ACM_MASK) {
             UsbFnChangeDescInfo(descriptor->functionMask, function);
             HDF_LOGI("%{public}s:  enable function = %s", __func__, FUNCTION_GENERIC_ACM);
@@ -133,8 +129,7 @@ static void DoChangeFunction(struct UsbFnFunction *function, struct UsbFnDescrip
             function->enable = false;
             HDF_LOGI("%{public}s:  disable function = %s", __func__, FUNCTION_GENERIC_ACM);
         }
-    } else if (strncmp(function->funcName,
-        FUNCTION_GENERIC_ECM, strlen(FUNCTION_GENERIC_ECM)) == 0) {
+    } else if (strncmp(function->funcName, FUNCTION_GENERIC_ECM, strlen(FUNCTION_GENERIC_ECM)) == 0) {
         if (descriptor->functionMask & FUNCTION_ECM_MASK) {
             function->enable = true;
             HDF_LOGI("%{public}s:  enable function = %s", __func__, FUNCTION_GENERIC_ECM);
@@ -143,12 +138,11 @@ static void DoChangeFunction(struct UsbFnFunction *function, struct UsbFnDescrip
             HDF_LOGI("%{public}s:  disable function = %s", __func__, FUNCTION_GENERIC_ECM);
         }
     } else {
-        HDF_LOGE("%{public}s: unspport function = %s", __func__,
-            function->funcName);
+        HDF_LOGE("%{public}s: unspport function = %s", __func__, function->funcName);
     }
 }
 
-static void UsbFnChangeFunction(struct UsbFnDeviceDesc *des, struct UsbFnDescriptorData *descriptor)
+static void UsbFnChangeFunction(struct UsbFnDeviceDesc * const des, struct UsbFnDescriptorData * const descriptor)
 {
     uint32_t i;
     uint32_t j;
@@ -163,8 +157,7 @@ static void UsbFnChangeFunction(struct UsbFnDeviceDesc *des, struct UsbFnDescrip
     }
 }
 
-const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName,
-    struct UsbFnDescriptorData *descriptor)
+const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName, struct UsbFnDescriptorData *descriptor)
 {
     int32_t ret;
     const struct DeviceResourceNode *property = NULL;
@@ -224,8 +217,7 @@ int32_t UsbFnGetDeviceState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devS
     return UsbFnMgrDeviceGetState(fnDevice, devState);
 }
 
-const struct UsbFnInterface *UsbFnGetInterface(struct UsbFnDevice *fnDevice,
-    uint8_t interfaceIndex)
+const struct UsbFnInterface *UsbFnGetInterface(struct UsbFnDevice *fnDevice, uint8_t interfaceIndex)
 {
     if (fnDevice == NULL) {
         HDF_LOGE("%{public}s: INVALID PARAM", __func__);
@@ -234,8 +226,8 @@ const struct UsbFnInterface *UsbFnGetInterface(struct UsbFnDevice *fnDevice,
     return (struct UsbFnInterface *)UsbFnMgrDeviceGetInterface(fnDevice, interfaceIndex);
 }
 
-int32_t UsbFnStartRecvInterfaceEvent(struct UsbFnInterface *interface,
-    uint32_t eventMask, UsbFnEventCallback callback, void *context)
+int32_t UsbFnStartRecvInterfaceEvent(
+    struct UsbFnInterface *interface, uint32_t eventMask, UsbFnEventCallback callback, void *context)
 {
     if (interface == NULL || eventMask == 0 || callback == NULL) {
         HDF_LOGE("%{public}s: INVALID_PARAM", __func__);
@@ -271,8 +263,7 @@ int32_t UsbFnCloseInterface(UsbFnInterfaceHandle handle)
     return UsbFnIoMgrInterfaceClose((struct UsbHandleMgr *)handle);
 }
 
-int32_t UsbFnGetInterfacePipeInfo(struct UsbFnInterface *interface,
-    uint8_t pipeId, struct UsbFnPipeInfo *info)
+int32_t UsbFnGetInterfacePipeInfo(struct UsbFnInterface *interface, uint8_t pipeId, struct UsbFnPipeInfo *info)
 {
     if (info == NULL || interface == NULL) {
         HDF_LOGE("%{public}s: INVALID PARAM", __func__);
@@ -281,8 +272,7 @@ int32_t UsbFnGetInterfacePipeInfo(struct UsbFnInterface *interface,
     return UsbFnIoMgrInterfaceGetPipeInfo(interface, pipeId, info);
 }
 
-int32_t UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
-    const struct UsbFnRegistInfo *registInfo)
+int32_t UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface, const struct UsbFnRegistInfo *registInfo)
 {
     if (registInfo == NULL || interface == NULL) {
         HDF_LOGE("%{public}s: INVALID PARAM", __func__);
@@ -291,8 +281,7 @@ int32_t UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
     return UsbFnCfgMgrRegisterProp(interface, registInfo);
 }
 
-int32_t UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
-    const char *name, char *value)
+int32_t UsbFnGetInterfaceProp(const struct UsbFnInterface *interface, const char *name, char *value)
 {
     if (name == NULL || interface == NULL || value == NULL) {
         HDF_LOGE("%{public}s: INVALID PARAM", __func__);
@@ -301,8 +290,7 @@ int32_t UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
     return UsbFnCfgMgrGetProp(interface, name, value);
 }
 
-int32_t UsbFnSetInterfaceProp(const struct UsbFnInterface *interface,
-    const char *name, const char *value)
+int32_t UsbFnSetInterfaceProp(const struct UsbFnInterface *interface, const char *name, const char *value)
 {
     if (name == NULL || interface == NULL) {
         HDF_LOGE("%{public}s: INVALID PARAM", __func__);
@@ -337,7 +325,7 @@ int32_t UsbFnFreeRequest(struct UsbFnRequest *req)
         HDF_LOGE("%{public}s: INVALID PARAM", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    return  UsbFnIoMgrRequestFree(req);
+    return UsbFnIoMgrRequestFree(req);
 }
 
 int32_t UsbFnGetRequestStatus(struct UsbFnRequest *req, UsbRequestStatus *status)
@@ -380,4 +368,3 @@ int32_t UsbFnMemTestTrigger(bool enable)
 {
     return UsbFnAdpMemTestTrigger(enable);
 }
-

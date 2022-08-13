@@ -17,6 +17,7 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
+
 #include "hdf_usb_pnp_manage.h"
 #include "usb_impl.h"
 #include "usbd_dispatcher.h"
@@ -52,7 +53,7 @@ static int32_t UsbInterfaceDriverDispatch(
     return hdfUsbInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int HdfUsbInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+static int HdfUsbInterfaceDriverInit(struct HdfDeviceObject * const deviceObject)
 {
     if (deviceObject == nullptr) {
         HDF_LOGE("%{public}s:deviceObject is nullptr", __func__);
@@ -61,7 +62,7 @@ static int HdfUsbInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-static int HdfUsbInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+static int HdfUsbInterfaceDriverBind(struct HdfDeviceObject * const deviceObject)
 {
     if (deviceObject == nullptr) {
         HDF_LOGE("%{public}s:deviceObject is nullptr", __func__);
@@ -103,7 +104,7 @@ static int HdfUsbInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-static void HdfUsbInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfUsbInterfaceDriverRelease(struct HdfDeviceObject * const deviceObject)
 {
     if (deviceObject->service == nullptr) {
         HDF_LOGE("HdfUsbInterfaceDriverRelease not initted");

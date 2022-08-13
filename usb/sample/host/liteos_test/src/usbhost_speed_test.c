@@ -57,7 +57,7 @@ static enum speedServer spdserver = SDKAPI_SERVER;
 static sigset_t mask;
 pid_t stopHandlerTid;
 
-void speedTest(struct UsbSpeedTest test)
+static void SpeedTest(struct UsbSpeedTest test)
 {
     OsalMutexLock(&g_lock);
     HdfSbufFlush(g_data);
@@ -74,7 +74,7 @@ RET:
     OsalMutexUnlock(&g_lock);
 }
 
-void speedInit()
+static void SpeedInit()
 {
     int32_t status;
 
@@ -113,7 +113,7 @@ void speedInit()
     }
 }
 
-void speedExit()
+static void SpeedExit()
 {
     int32_t status = g_service->dispatcher->Dispatch(&g_service->object, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {
@@ -148,7 +148,7 @@ static void *StopHandler(void)
 
         if ((signo == SIGINT) || (signo == SIGQUIT)) {
             printf("normal exit\n");
-            speedExit();
+            SpeedExit();
             return 0;
         } else {
             printf("Unexpected signal %d\n", signo);
@@ -267,8 +267,8 @@ int32_t main(int32_t argc, char *argv[])
         goto END;
     }
 
-    speedInit();
-    speedTest(test);
+    SpeedInit();
+    SpeedTest(test);
     kill(stopHandlerTid, SIGINT);
     pthread_join(threads, NULL);
 END:

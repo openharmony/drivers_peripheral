@@ -25,28 +25,7 @@ using namespace testing::ext;
 namespace {
 static struct AcmDevice *g_acmDevice = nullptr;
 class UsbDeviceSdkIoTest : public testing::Test {
-public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
 };
-
-void UsbDeviceSdkIoTest::SetUpTestCase()
-{
-}
-
-void UsbDeviceSdkIoTest::TearDownTestCase()
-{
-}
-
-void UsbDeviceSdkIoTest::SetUp()
-{
-}
-
-void UsbDeviceSdkIoTest::TearDown()
-{
-}
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCreateDevice001, TestSize.Level1)
 {

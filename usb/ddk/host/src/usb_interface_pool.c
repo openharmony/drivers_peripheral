@@ -84,8 +84,8 @@ static HDF_STATUS IfDestroyPipeObj(const struct UsbSdkInterface *interfaceObj, c
 
     if (!found) {
         ret = HDF_FAILURE;
-        HDF_LOGE("%{public}s:%{public}d the pipe object to be destroyed does not exist, ret = %d",
-            __func__, __LINE__, ret);
+        HDF_LOGE(
+            "%{public}s:%{public}d the pipe object to be destroyed does not exist, ret = %d", __func__, __LINE__, ret);
     }
 
     return ret;
@@ -194,15 +194,14 @@ static HDF_STATUS IfDestroyInterfacePool(const struct UsbInterfacePool *interfac
         return HDF_SUCCESS;
     }
 
-    DLIST_FOR_EACH_ENTRY_SAFE(interfacePoolPos, interfacePoolTemp, &session->ifacePoolList,
-        struct UsbInterfacePool, object.entry) {
+    DLIST_FOR_EACH_ENTRY_SAFE(
+        interfacePoolPos, interfacePoolTemp, &session->ifacePoolList, struct UsbInterfacePool, object.entry) {
         if (interfacePoolPos->object.objectId == interfacePool->object.objectId) {
             found = true;
             DListRemove(&interfacePoolPos->object.entry);
             ret = IfFreeInterfacePool(interfacePoolPos);
             if (ret != HDF_SUCCESS) {
-                HDF_LOGE("%{public}s:%{public}d IfFreeInterfacePool failed, ret = %d",
-                    __func__, __LINE__, ret);
+                HDF_LOGE("%{public}s:%{public}d IfFreeInterfacePool failed, ret = %d", __func__, __LINE__, ret);
                 break;
             }
             interfacePoolPos = NULL;
@@ -212,15 +211,14 @@ static HDF_STATUS IfDestroyInterfacePool(const struct UsbInterfacePool *interfac
 
     if (!found) {
         ret = HDF_FAILURE;
-        HDF_LOGE("%{public}s:%{public}d the interfacePool object to be destroyed does not exist",
-            __func__, __LINE__);
+        HDF_LOGE("%{public}s:%{public}d the interfacePool object to be destroyed does not exist", __func__, __LINE__);
     }
 
     return ret;
 }
 
-static void IfInterfaceRefCount(const struct UsbSdkInterface *interfaceObj,
-    uint8_t interfaceIndex, bool refCountFlag, bool *claimFlag)
+static void IfInterfaceRefCount(
+    const struct UsbSdkInterface *interfaceObj, uint8_t interfaceIndex, bool refCountFlag, bool *claimFlag)
 {
     if (refCountFlag && interfaceIndex != USB_CTRL_INTERFACE_ID) {
         if (OsalAtomicRead((OsalAtomic *)&interfaceObj->refCount) == 0) {
@@ -245,8 +243,8 @@ static struct UsbPipe *IfFindPipeObj(const struct UsbSdkInterface *interfaceObj,
 
     if (interfaceObj == NULL || DListIsEmpty(&interfaceObj->pipeList) ||
         interfaceObj->status == USB_INTERFACE_STATUS_REMOVE) {
-        HDF_LOGE("%{public}s:%{public}d interfaceObj is null or status is remove or pipe list is empty",
-            __func__, __LINE__);
+        HDF_LOGE(
+            "%{public}s:%{public}d interfaceObj is null or status is remove or pipe list is empty", __func__, __LINE__);
         return NULL;
     }
 
@@ -293,18 +291,18 @@ static struct UsbSdkInterface *IfFindInterfaceObj(const struct UsbInterfacePool 
     }
 
     OsalMutexLock((struct OsalMutex *)&interfacePool->interfaceLock);
-    DLIST_FOR_EACH_ENTRY_SAFE(interfacePos, interfaceTemp, &interfacePool->interfaceList, \
-        struct UsbSdkInterface, interface.object.entry) {
+    DLIST_FOR_EACH_ENTRY_SAFE(
+        interfacePos, interfaceTemp, &interfacePool->interfaceList, struct UsbSdkInterface, interface.object.entry) {
         switch (queryPara.type) {
             case USB_INTERFACE_INTERFACE_INDEX_TYPE:
-                if ((interfacePos->interface.info.interfaceIndex == queryPara.interfaceIndex)
-                && (interfacePos->interface.info.curAltSetting == interfacePos->altSettingId)) {
+                if ((interfacePos->interface.info.interfaceIndex == queryPara.interfaceIndex) &&
+                    (interfacePos->interface.info.curAltSetting == interfacePos->altSettingId)) {
                     found = true;
                 }
                 break;
             case USB_INTERFACE_ALT_SETTINGS_TYPE:
-                if ((interfacePos->interface.info.interfaceIndex == queryPara.interfaceIndex)
-                && (interfacePos->altSettingId == queryPara.altSettingId)) {
+                if ((interfacePos->interface.info.interfaceIndex == queryPara.interfaceIndex) &&
+                    (interfacePos->altSettingId == queryPara.altSettingId)) {
                     found = true;
                 }
                 break;
@@ -352,12 +350,12 @@ static struct UsbInterfacePool *IfFindInterfacePool(
         return NULL;
     }
 
-    DLIST_FOR_EACH_ENTRY_SAFE(interfacePoolPos, interfacePoolTemp, ifacePoolList, \
-        struct UsbInterfacePool, object.entry) {
+    DLIST_FOR_EACH_ENTRY_SAFE(
+        interfacePoolPos, interfacePoolTemp, ifacePoolList, struct UsbInterfacePool, object.entry) {
         switch (queryPara.type) {
             case USB_POOL_NORMAL_TYPE:
-                if ((interfacePoolPos->busNum == queryPara.busNum) \
-                    && (interfacePoolPos->devAddr == queryPara.usbAddr)) {
+                if ((interfacePoolPos->busNum == queryPara.busNum) &&
+                    (interfacePoolPos->devAddr == queryPara.usbAddr)) {
                     found = true;
                 }
                 break;
@@ -432,8 +430,8 @@ static int32_t IfGetRequestPipeType(
     return HDF_SUCCESS;
 }
 
-static int32_t IfFillControlRequest(struct UsbHostRequest *hostRequest,
-    const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
+static int32_t IfFillControlRequest(
+    struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
 {
     struct UsbFillRequestData fillRequestData;
     struct UsbControlRequest ctrlReq = params->ctrlReq;
@@ -451,26 +449,26 @@ static int32_t IfFillControlRequest(struct UsbHostRequest *hostRequest,
             ret = memcpy_s(hostRequest->buffer + USB_RAW_CONTROL_SETUP_SIZE,
                 USB_RAW_CONTROL_SETUP_SIZE + ctrlReq.length, ctrlReq.buffer, ctrlReq.length);
             if (ret != EOK) {
-                HDF_LOGE("%{public}s:%{public}d memcpy_s failed, ctrlReq.length = %{public}u",
-                    __func__, __LINE__, ctrlReq.length);
+                HDF_LOGE("%{public}s:%{public}d memcpy_s failed, ctrlReq.length = %{public}u", __func__, __LINE__,
+                    ctrlReq.length);
                 return ret;
             }
         }
     } else {
-        fillRequestData.endPoint = (((uint8_t)ctrlReq.directon)  << USB_DIR_OFFSET);
+        fillRequestData.endPoint = (((uint8_t)ctrlReq.directon) << USB_DIR_OFFSET);
     }
     /* fill control request */
     fillRequestData.length = USB_RAW_CONTROL_SETUP_SIZE + ctrlReq.length;
     fillRequestData.userCallback = params->callback;
-    fillRequestData.callback     = UsbIoSetRequestCompletionInfo;
-    fillRequestData.userData     = params->userData;
-    fillRequestData.timeout      = params->timeout;
+    fillRequestData.callback = UsbIoSetRequestCompletionInfo;
+    fillRequestData.userData = params->userData;
+    fillRequestData.timeout = params->timeout;
 
     return RawFillControlRequest(hostRequest, devHandle, &fillRequestData);
 }
 
-static int32_t IfFillIsoRequest(struct UsbHostRequest *hostRequest,
-    const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
+static int32_t IfFillIsoRequest(
+    struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
 {
     if (devHandle == NULL || params == NULL) {
         HDF_LOGE("%{public}s: %{public}d invalid param", __func__, __LINE__);
@@ -482,20 +480,20 @@ static int32_t IfFillIsoRequest(struct UsbHostRequest *hostRequest,
     struct UsbRequestParamsData requestData = params->dataReq;
     UsbRequestDirection dir = requestData.directon;
 
-    fillRequestData.endPoint      = (((uint8_t)dir) << USB_DIR_OFFSET) | pipeAddress;
-    fillRequestData.buffer        = requestData.buffer;
-    fillRequestData.length        = requestData.length;
+    fillRequestData.endPoint = (((uint8_t)dir) << USB_DIR_OFFSET) | pipeAddress;
+    fillRequestData.buffer = requestData.buffer;
+    fillRequestData.length = requestData.length;
     fillRequestData.numIsoPackets = requestData.numIsoPackets;
-    fillRequestData.userCallback  = params->callback;
-    fillRequestData.callback      = UsbIoSetRequestCompletionInfo;
-    fillRequestData.userData      = params->userData;
-    fillRequestData.timeout       = params->timeout;
+    fillRequestData.userCallback = params->callback;
+    fillRequestData.callback = UsbIoSetRequestCompletionInfo;
+    fillRequestData.userData = params->userData;
+    fillRequestData.timeout = params->timeout;
 
     return RawFillIsoRequest(hostRequest, devHandle, &fillRequestData);
 }
 
-static int32_t IfFillBulkRequest(struct UsbHostRequest *hostRequest,
-    const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
+static int32_t IfFillBulkRequest(
+    struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
 {
     struct UsbRequestParamsData requestData = params->dataReq;
     UsbRequestDirection dir = params->dataReq.directon;
@@ -508,20 +506,20 @@ static int32_t IfFillBulkRequest(struct UsbHostRequest *hostRequest,
             return HDF_ERR_IO;
         }
     }
-    hostRequest->devHandle    = (struct UsbDeviceHandle *)devHandle;
-    hostRequest->endPoint     = (((uint8_t)dir) << USB_DIR_OFFSET) | pipeAddress;
-    hostRequest->requestType  = USB_PIPE_TYPE_BULK;
-    hostRequest->timeout      = params->timeout;
-    hostRequest->length       = requestData.length;
-    hostRequest->userData     = params->userData;
-    hostRequest->callback     = UsbIoSetRequestCompletionInfo;
+    hostRequest->devHandle = (struct UsbDeviceHandle *)devHandle;
+    hostRequest->endPoint = (((uint8_t)dir) << USB_DIR_OFFSET) | pipeAddress;
+    hostRequest->requestType = USB_PIPE_TYPE_BULK;
+    hostRequest->timeout = params->timeout;
+    hostRequest->length = requestData.length;
+    hostRequest->userData = params->userData;
+    hostRequest->callback = UsbIoSetRequestCompletionInfo;
     hostRequest->userCallback = params->callback;
 
     return HDF_SUCCESS;
 }
 
-static int32_t IfFillInterrupteRequest(struct UsbHostRequest *hostRequest,
-    const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
+static int32_t IfFillInterrupteRequest(
+    struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
 {
     struct UsbFillRequestData fillRequestData;
     uint8_t pipeAddress = params->pipeAddress;
@@ -529,12 +527,12 @@ static int32_t IfFillInterrupteRequest(struct UsbHostRequest *hostRequest,
     UsbRequestDirection dir = requestData.directon;
 
     fillRequestData.endPoint = (((uint8_t)dir) << USB_DIR_OFFSET) | pipeAddress;
-    fillRequestData.buffer   = requestData.buffer;
-    fillRequestData.length   = requestData.length;
+    fillRequestData.buffer = requestData.buffer;
+    fillRequestData.length = requestData.length;
     fillRequestData.userCallback = params->callback;
     fillRequestData.callback = UsbIoSetRequestCompletionInfo;
     fillRequestData.userData = params->userData;
-    fillRequestData.timeout  = params->timeout;
+    fillRequestData.timeout = params->timeout;
 
     return RawFillInterruptRequest(hostRequest, devHandle, &fillRequestData);
 }
@@ -571,8 +569,7 @@ static int32_t IfSubmitRequestToQueue(const struct UsbIfRequest *requestObj)
 }
 
 static int32_t IfFillRequestByPipeType(struct UsbIfRequest *requestObj, UsbPipeType pipeType,
-    struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle,
-    const struct UsbRequestParams *params)
+    struct UsbHostRequest *hostRequest, const struct UsbDeviceHandle *devHandle, const struct UsbRequestParams *params)
 {
     int32_t ret;
 
@@ -674,8 +671,7 @@ static struct UsbInterfacePool *IfGetInterfacePool(
 
     ret = UsbProtocalParseDescriptor(*devHandle, busNum, usbAddr);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbProtocalParseDescriptor failed, ret = %d",
-            __func__, __LINE__, ret);
+        HDF_LOGE("%{public}s:%{public}d UsbProtocalParseDescriptor failed, ret = %d", __func__, __LINE__, ret);
         (void)RawCloseDevice(*devHandle);
         return NULL;
     }
@@ -755,8 +751,8 @@ int32_t UsbIfCreatInterfaceObj(const struct UsbInterfacePool *interfacePool, str
     return HDF_SUCCESS;
 }
 
-HDF_STATUS UsbIfDestroyInterfaceObj(const struct UsbInterfacePool *interfacePool,
-    const struct UsbSdkInterface *interfaceObj)
+HDF_STATUS UsbIfDestroyInterfaceObj(
+    const struct UsbInterfacePool *interfacePool, const struct UsbSdkInterface *interfaceObj)
 {
     HDF_STATUS ret = HDF_SUCCESS;
     struct UsbSdkInterface *interfacePos = NULL;
@@ -783,10 +779,10 @@ HDF_STATUS UsbIfDestroyInterfaceObj(const struct UsbInterfacePool *interfacePool
     }
 
     OsalMutexLock((struct OsalMutex *)&interfacePool->interfaceLock);
-    DLIST_FOR_EACH_ENTRY_SAFE(interfacePos, interfaceTemp, &interfacePool->interfaceList, \
-        struct UsbSdkInterface, interface.object.entry) {
-        if (destroyFlag || (!destroyFlag &&
-            interfacePos->interface.object.objectId == interfaceObj->interface.object.objectId)) {
+    DLIST_FOR_EACH_ENTRY_SAFE(
+        interfacePos, interfaceTemp, &interfacePool->interfaceList, struct UsbSdkInterface, interface.object.entry) {
+        if (destroyFlag ||
+            (!destroyFlag && interfacePos->interface.object.objectId == interfaceObj->interface.object.objectId)) {
             found = true;
             DListRemove(&interfacePos->interface.object.entry);
             ret = IfFreeInterfaceObj(interfacePos);
@@ -810,8 +806,8 @@ HDF_STATUS UsbIfDestroyInterfaceObj(const struct UsbInterfacePool *interfacePool
     return ret;
 }
 
-int32_t UsbIfCreatInterfacePool(const struct UsbSession *session, uint8_t busNum, uint8_t devAddr,
-    struct UsbInterfacePool **interfacePool)
+int32_t UsbIfCreatInterfacePool(
+    const struct UsbSession *session, uint8_t busNum, uint8_t devAddr, struct UsbInterfacePool **interfacePool)
 {
     struct UsbInterfacePool *interfacePoolTemp = NULL;
     static int32_t idNum = 0;
@@ -902,8 +898,7 @@ struct UsbInterface *UsbClaimInterface(
     if (interfacePool == NULL || interfacePool->device == NULL) {
         interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
         if (interfacePool == NULL || interfacePool->device == NULL) {
-            HDF_LOGE("%{public}s:%{public}d interfacePool or interfacePool->device is null",
-                __func__, __LINE__);
+            HDF_LOGE("%{public}s:%{public}d interfacePool or interfacePool->device is null", __func__, __LINE__);
             return NULL;
         }
     }
@@ -1006,8 +1001,7 @@ int32_t UsbAddOrRemoveInterface(const struct UsbSession *session, uint8_t busNum
     }
 
     if (interfaceObj->status == status) {
-        HDF_LOGE("%{public}s:%{public}d interfaceObj->status = %d is error",
-            __func__, __LINE__, interfaceObj->status);
+        HDF_LOGE("%{public}s:%{public}d interfaceObj->status = %d is error", __func__, __LINE__, interfaceObj->status);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -1046,10 +1040,9 @@ UsbInterfaceHandle *UsbOpenInterface(const struct UsbInterface *interfaceObj)
     }
 
     struct UsbSdkInterface *interfaceSdk = (struct UsbSdkInterface *)interfaceObj;
-    if (interfaceSdk != NULL && (interfaceSdk->session == NULL ||
-        interfaceSdk->status == USB_INTERFACE_STATUS_REMOVE)) {
-        HDF_LOGE("%{public}s:%{public}d interfaceSdk->status = %d is error",
-            __func__, __LINE__, interfaceSdk->status);
+    if (interfaceSdk != NULL &&
+        (interfaceSdk->session == NULL || interfaceSdk->status == USB_INTERFACE_STATUS_REMOVE)) {
+        HDF_LOGE("%{public}s:%{public}d interfaceSdk->status = %d is error", __func__, __LINE__, interfaceSdk->status);
         return NULL;
     }
 
@@ -1167,8 +1160,8 @@ int32_t UsbSelectInterfaceSetting(
     }
 
     OsalMutexLock(&interfacePool->interfaceLock);
-    DLIST_FOR_EACH_ENTRY_SAFE(interfacePos, interfaceTemp, &interfacePool->interfaceList,
-                              struct UsbSdkInterface, interface.object.entry) {
+    DLIST_FOR_EACH_ENTRY_SAFE(
+        interfacePos, interfaceTemp, &interfacePool->interfaceList, struct UsbSdkInterface, interface.object.entry) {
         if (interfacePos->interface.info.interfaceIndex == ifaceHdl->interfaceIndex) {
             interfacePos->interface.info.curAltSetting = settingIndex;
         }
@@ -1189,8 +1182,8 @@ int32_t UsbSelectInterfaceSetting(
     return HDF_SUCCESS;
 }
 
-int32_t UsbGetPipeInfo(const UsbInterfaceHandle *interfaceHandle, uint8_t altSettingIndex,
-    uint8_t pipeId, struct UsbPipeInfo *pipeInfo)
+int32_t UsbGetPipeInfo(
+    const UsbInterfaceHandle *interfaceHandle, uint8_t altSettingIndex, uint8_t pipeId, struct UsbPipeInfo *pipeInfo)
 {
     struct UsbInterfaceHandleEntity *ifaceHdl = (struct UsbInterfaceHandleEntity *)interfaceHandle;
     struct UsbInterfacePool *interfacePool = NULL;
@@ -1199,8 +1192,8 @@ int32_t UsbGetPipeInfo(const UsbInterfaceHandle *interfaceHandle, uint8_t altSet
     struct UsbPipeQueryPara pipeQueryPara;
     struct UsbPipe *pipeObj = NULL;
 
-    if (interfaceHandle == NULL || pipeInfo == NULL || ifaceHdl == NULL ||
-        ifaceHdl->devHandle == NULL || ifaceHdl->devHandle->dev == NULL) {
+    if (interfaceHandle == NULL || pipeInfo == NULL || ifaceHdl == NULL || ifaceHdl->devHandle == NULL ||
+        ifaceHdl->devHandle->dev == NULL) {
         HDF_LOGE("%{public}s:%{publid}d invalid parameter", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -1314,7 +1307,7 @@ int32_t UsbFreeRequest(const struct UsbRequest *request)
     return ret;
 }
 
-int32_t UsbSubmitRequestAsync(const struct UsbRequest *request)
+int32_t UsbSubmitRequestAsync(const struct UsbRequest * const request)
 {
     int32_t ret;
 
@@ -1333,8 +1326,8 @@ int32_t UsbSubmitRequestAsync(const struct UsbRequest *request)
     return IfSubmitRequestToQueue(requestObj);
 }
 
-int32_t UsbFillRequest(const struct UsbRequest *request, const UsbInterfaceHandle *interfaceHandle,
-    const struct UsbRequestParams *params)
+int32_t UsbFillRequest(
+    const struct UsbRequest *request, const UsbInterfaceHandle *interfaceHandle, const struct UsbRequestParams *params)
 {
     struct UsbInterfaceHandleEntity *ifaceHdl = (struct UsbInterfaceHandleEntity *)interfaceHandle;
     struct UsbIfRequest *requestObj = (struct UsbIfRequest *)request;
@@ -1444,4 +1437,3 @@ int32_t UsbMemTestTrigger(bool enable)
 {
     return RawUsbMemTestTrigger(enable);
 }
-
