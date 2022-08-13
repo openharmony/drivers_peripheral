@@ -48,15 +48,10 @@ extern "C" ISensorInterface *SensorInterfaceImplGetInstance(void)
     return service;
 }
 
-int32_t TradtionalSensorDataCallback(const struct SensorEvents *event)
+int32_t ReportSensorEventsData(int32_t sensorType, const struct SensorEvents *event)
 {
-    if (event == nullptr || event->data == nullptr) {
-        HDF_LOGE("%{public}s failed, event or event.data is nullptr", __func__);
-        return SENSOR_FAILURE;
-    }
-
     std::lock_guard<std::mutex> lock(g_mutex);
-    auto groupCallBackIter = g_groupIdCallBackMap.find(TRADITIONAL_SENSOR_TYPE);
+    auto groupCallBackIter = g_groupIdCallBackMap.find(sensorType);
     if (groupCallBackIter == g_groupIdCallBackMap.end()) {
         return SENSOR_SUCCESS;
     }
@@ -71,14 +66,26 @@ int32_t TradtionalSensorDataCallback(const struct SensorEvents *event)
     uint32_t len = event->dataLen;
     uint8_t *tmp = event->data;
 
-    while (len--) {
+    while ((len--) != 0) {
         hdfSensorEvents.data.push_back(*tmp);
         tmp++;
     }
 
-    for (auto callBack : g_groupIdCallBackMap[TRADITIONAL_SENSOR_TYPE]) {
+    for (auto callBack : g_groupIdCallBackMap[sensorType]) {
         callBack->OnDataEvent(hdfSensorEvents);
     }
+
+    return SENSOR_SUCCESS;
+}
+
+int32_t TradtionalSensorDataCallback(const struct SensorEvents *event)
+{
+    if (event == nullptr || event->data == nullptr) {
+        HDF_LOGE("%{public}s failed, event or event.data is nullptr", __func__);
+        return SENSOR_FAILURE;
+    }
+
+    (void)ReportSensorEventsData(TRADITIONAL_SENSOR_TYPE, event);
 
     return SENSOR_SUCCESS;
 }
@@ -90,40 +97,16 @@ int32_t MedicalSensorDataCallback(const struct SensorEvents *event)
         return SENSOR_FAILURE;
     }
 
-    std::lock_guard<std::mutex> lock(g_mutex);
-    auto groupCallBackIter = g_groupIdCallBackMap.find(MEDICAL_SENSOR_TYPE);
-    if (groupCallBackIter == g_groupIdCallBackMap.end()) {
-        return SENSOR_SUCCESS;
-    }
-
-    HdfSensorEvents hdfSensorEvents;
-    hdfSensorEvents.sensorId = event->sensorId;
-    hdfSensorEvents.version = event->version;
-    hdfSensorEvents.timestamp = event->timestamp;
-    hdfSensorEvents.option = event->option;
-    hdfSensorEvents.mode = event->mode;
-    hdfSensorEvents.dataLen = event->dataLen;
-    uint32_t len = event->dataLen;
-    uint8_t *tmp = event->data;
-
-    while (len--) {
-        hdfSensorEvents.data.push_back(*tmp);
-        tmp++;
-    }
-
-    for (auto callBack : g_groupIdCallBackMap[MEDICAL_SENSOR_TYPE]) {
-        callBack->OnDataEvent(hdfSensorEvents);
-    }
+    (void)ReportSensorEventsData(MEDICAL_SENSOR_TYPE, event);
 
     return SENSOR_SUCCESS;
 }
 
-SensorImpl::~SensorImpl()
+void  SensorImpl::RemoveDeathNotice(int32_t sensorType)
 {
-    std::lock_guard<std::mutex> lock(g_mutex);
-    auto iter = g_groupIdCallBackMap.find(TRADITIONAL_SENSOR_TYPE);
+    auto iter = g_groupIdCallBackMap.find(sensorType);
     if (iter != g_groupIdCallBackMap.end()) {
-        for (auto callback : g_groupIdCallBackMap[TRADITIONAL_SENSOR_TYPE]) {
+        for (auto callback : g_groupIdCallBackMap[sensorType]) {
             const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISensorCallback>(callback);
             auto recipientIter = g_callBackDeathRecipientMap.find(remote.GetRefPtr());
             if (recipientIter != g_callBackDeathRecipientMap.end()) {
@@ -134,19 +117,15 @@ SensorImpl::~SensorImpl()
             }
         }
     }
-    iter = g_groupIdCallBackMap.find(MEDICAL_SENSOR_TYPE);
-    if (iter != g_groupIdCallBackMap.end()) {
-        for (auto callback : g_groupIdCallBackMap[MEDICAL_SENSOR_TYPE]) {
-            const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISensorCallback>(callback);
-            auto recipientIter = g_callBackDeathRecipientMap.find(remote.GetRefPtr());
-            if (recipientIter != g_callBackDeathRecipientMap.end()) {
-                bool removeResult = remote->RemoveDeathRecipient(recipientIter->second);
-                if (!removeResult) {
-                    HDF_LOGE("%{public}s: when destroyed, callback RemoveSensorDeathRecipient fail", __func__);
-                }
-            }
-        }
-    }
+}
+
+SensorImpl::~SensorImpl()
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+
+    RemoveDeathNotice(TRADITIONAL_SENSOR_TYPE);
+    RemoveDeathNotice(MEDICAL_SENSOR_TYPE);
+
     FreeSensorInterfaceInstance();
 }
 

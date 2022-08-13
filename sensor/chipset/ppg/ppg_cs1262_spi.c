@@ -13,13 +13,15 @@
 
 #define CS1262_HEAD_BUF_SINGLEREG_LEN 4
 #define CS1262_HEAD_BUF_FULL_LEN 6
+#define OFFSET_BITS_8 8
+#define OFFSET_BITS_2 2
 
 static struct SensorBusCfg *g_busCfg = NULL;
 
 static inline uint16_t ReverseEndianInt16(uint16_t data)
 {
-    return (((data & 0x00FF) << 8) |
-            ((data & 0xFF00) >> 8));
+    return (((data & 0x00FF) << OFFSET_BITS_8) |
+            ((data & 0xFF00) >> OFFSET_BITS_8));
 }
 
 static inline uint16_t Cs1262RegAddrConvert(uint16_t reg)
@@ -27,12 +29,12 @@ static inline uint16_t Cs1262RegAddrConvert(uint16_t reg)
     /* CS1262 takes the register address from bit[2] to bit[15], bit[1~0] fixed as 00,
      * so reg needs to be shifted left by 2 bits to convert it to the address format required by CS1262
      */
-    return (reg << 2) & 0x0FFC;
+    return (reg << OFFSET_BITS_2) & 0x0FFC;
 }
 
 static inline uint8_t Cs1262GetHighByteInt16(uint16_t data)
 {
-    return (data & 0xFF00) >> 8;
+    return (data & 0xFF00) >> OFFSET_BITS_8;
 }
 
 static inline uint8_t Cs1262GetLowByteInt16(uint16_t data)

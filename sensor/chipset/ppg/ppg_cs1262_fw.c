@@ -13,6 +13,7 @@
 
 #define PPG_CONFIG_START_MAGIC 0x1262
 #define HDF_LOG_TAG hdf_sensor_cs1262_fw
+#define REG_TAB_INDEX_HALF 2
 
 static Cs1262RegConfigTab g_heartRegTab = {
     0x1262,
@@ -75,7 +76,7 @@ static int32_t validateTab(uint8_t *regTab, uint16_t valiSize)
     /* real checksum stored in the last 2 bytes, and one item of regTab has 2 bytes,
      * needs to be divided by 2 when calculating the real checksum's index.
      */
-    index = (valiSize / 2) - 1;
+    index = (valiSize / REG_TAB_INDEX_HALF) - 1;
     return (checksum == ((uint16_t *)regTab)[index]) ? HDF_SUCCESS : HDF_FAILURE;
 }
 
