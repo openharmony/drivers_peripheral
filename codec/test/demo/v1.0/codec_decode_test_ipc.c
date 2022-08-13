@@ -308,7 +308,7 @@ static int32_t SetDecParameter(void)
     return HDF_SUCCESS;
 }
 
-static void DecodeLoopHandleInput(MpiDecLoopData *g_data)
+static void DecodeLoopHandleInput(const MpiDecLoopData *g_data)
 {
     int32_t ret = 0;
     uint8_t readData[STREAM_PACKET_BUFFER_SIZE];
