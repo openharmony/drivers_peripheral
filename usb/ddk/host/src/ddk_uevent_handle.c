@@ -53,7 +53,7 @@ static int DdkUeventOpen(int *fd)
         return HDF_FAILURE;
     }
     addr.nl_family = AF_NETLINK;
-    addr.nl_pid = getpid();
+    addr.nl_pid = (uint32_t)getpid();
     addr.nl_groups = UEVENT_SOCKET_GROUPS;
 
     int socketfd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);

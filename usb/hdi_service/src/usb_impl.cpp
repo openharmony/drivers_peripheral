@@ -376,8 +376,8 @@ int32_t UsbImpl::UsbdBulkReadSyncBase(
     }
 
     int32_t ret = HDF_FAILURE;
-    uint64_t intTimeout = timeout < 0 ? 0 : timeout;
-    int32_t timeonce = 500;
+    uint64_t intTimeout = timeout < 0 ? 0 : (uint64_t)timeout;
+    uint32_t timeonce = 500;
     uint64_t stime = OsalGetSysTimeMs();
     uint64_t ntime = 0;
     uint32_t tcur = 0;
@@ -434,7 +434,7 @@ int32_t UsbImpl::UsbdBulkWriteSyncBase(
 
     int32_t ret = HDF_FAILURE;
     OsalMutexLock(&requestSync->lock);
-    int32_t initTimeout = timeout < 0 ? 0 : timeout;
+    uint32_t initTimeout = timeout < 0 ? 0 : (uint32_t)timeout;
     requestSync->params.timeout = initTimeout;
     requestSync->params.userData = port;
     uint16_t tcur = 0;
@@ -1356,7 +1356,7 @@ int32_t UsbImpl::BulkTransferWrite(
 
 int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data)
 {
-    if ((ctrl.requestType & USB_ENDPOINT_DIR_MASK) == USB_ENDPOINT_DIR_OUT) {
+    if (((uint32_t)ctrl.requestType & USB_ENDPOINT_DIR_MASK) == USB_ENDPOINT_DIR_OUT) {
         HDF_LOGE("%{public}s: this function is read, not write", __func__);
         return HDF_FAILURE;
     }
@@ -1375,9 +1375,10 @@ int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &c
     controlParams.request = (uint8_t)ctrl.requestCmd;
     controlParams.value = ctrl.value;
     controlParams.index = ctrl.index;
-    controlParams.target = (UsbRequestTargetType)(ctrl.requestType & USB_RECIP_MASK);
-    controlParams.directon = (UsbRequestDirection)((ctrl.requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
-    controlParams.reqType = (UsbControlRequestType)((ctrl.requestType >> CMD_OFFSET_5) & CMD_TYPE_MASK);
+    controlParams.target = (UsbRequestTargetType)((uint32_t)ctrl.requestType & USB_RECIP_MASK);
+    controlParams.directon = (UsbRequestDirection)
+                            (((uint32_t)ctrl.requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
+    controlParams.reqType = (UsbControlRequestType)(((uint32_t)ctrl.requestType >> CMD_OFFSET_5) & CMD_TYPE_MASK);
     controlParams.size = MAX_CONTROL_BUFF_SIZE;
     controlParams.data = (void *)OsalMemAlloc(controlParams.size);
     if (controlParams.data == nullptr) {
@@ -1401,7 +1402,7 @@ int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &c
 
 int32_t UsbImpl::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &ctrl, const std::vector<uint8_t> &data)
 {
-    if ((ctrl.requestType & USB_ENDPOINT_DIR_MASK) != USB_ENDPOINT_DIR_OUT) {
+    if (((uint32_t)ctrl.requestType & USB_ENDPOINT_DIR_MASK) != USB_ENDPOINT_DIR_OUT) {
         HDF_LOGE("%{public}s: this function is write, not read", __func__);
         return HDF_FAILURE;
     }
@@ -1420,9 +1421,10 @@ int32_t UsbImpl::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &
     controlParams.request = (uint8_t)ctrl.requestCmd;
     controlParams.value = ctrl.value;
     controlParams.index = ctrl.index;
-    controlParams.target = (UsbRequestTargetType)(ctrl.requestType & USB_RECIP_MASK);
-    controlParams.directon = (UsbRequestDirection)((ctrl.requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
-    controlParams.reqType = (UsbControlRequestType)((ctrl.requestType >> CMD_OFFSET_5) & CMD_TYPE_MASK);
+    controlParams.target = (UsbRequestTargetType)((uint32_t)ctrl.requestType & USB_RECIP_MASK);
+    controlParams.directon = (UsbRequestDirection)
+                            (((uint32_t)ctrl.requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
+    controlParams.reqType = (UsbControlRequestType)(((uint32_t)ctrl.requestType >> CMD_OFFSET_5) & CMD_TYPE_MASK);
     controlParams.size = data.size();
     controlParams.data = (void *)data.data();
     int32_t ret = UsbControlTransferEx(port, &controlParams, ctrl.timeout);
