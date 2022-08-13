@@ -132,7 +132,7 @@ int32_t AdmRenderFramePrepare(const std::string& path, char *&frame, uint32_t& r
         return HDF_FAILURE;
     }
     frameSize = readSize / (attrs.channelCount * (PcmFormatToBits(attrs.format) >> MOVE_RIGHT_NUM));
-    fclose(file);
+    (void)fclose(file);
     return HDF_SUCCESS;
 }
 

@@ -290,11 +290,13 @@ HWTEST_F(AudioProxyAdapterTest, AdapterSetPassthroughMode_002, TestSize.Level1)
 HWTEST_F(AudioProxyAdapterTest, AdapterSetPassthroughMode_003, TestSize.Level1)
 {
     ASSERT_NE(adapter, nullptr);
+    int32_t ret = AudioProxyAdapterInitAllPorts(adapter);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     struct AudioPort port;
     port.dir = PORT_OUT;
     port.portId = 0;
     port.portName = "AOP";
-    int32_t ret = AudioProxyAdapterSetPassthroughMode(adapter, &port, PORT_PASSTHROUGH_LPCM);
+    ret = AudioProxyAdapterSetPassthroughMode(adapter, &port, PORT_PASSTHROUGH_LPCM);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 

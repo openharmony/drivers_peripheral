@@ -244,7 +244,7 @@ uint32_t StringToInt(const char *flag)
         return 0;
     }
     uint32_t temp = flag[0];
-    for (int32_t i = strlen(flag) - 1; i >= 0; i--) {
+    for (int32_t i = (int32_t)strlen(flag) - 1; i >= 0; i--) {
         temp <<= MOVE_LEFT_NUM;
         temp += flag[i];
     }
@@ -255,7 +255,7 @@ int32_t WavHeadAnalysis(FILE *file, struct AudioSampleAttributes *attrs)
     if (file == NULL || attrs == NULL) {
         return HDF_FAILURE;
     }
-    uint32_t ret;
+    size_t ret;
     const char *audioRiffIdParam = "RIFF";
     const char *audioFileFmtParam = "WAVE";
     const char *aduioDataIdParam = "data";
@@ -420,7 +420,7 @@ int32_t FrameStartMmap(const struct StrPara *param)
         fclose(fp);
         return HDF_FAILURE;
     }
-    int32_t reqSize = ftell(fp);
+    int32_t reqSize = (int32_t)ftell(fp);
     if (reqSize < 0) {
         fclose(fp);
         return HDF_FAILURE;
@@ -461,7 +461,7 @@ int32_t FrameStart(const struct StrPara *param)
     int32_t bufferSize = strParam->bufferSize;
     int32_t ret;
     int32_t readSize;
-    int32_t remainingDataSize = g_wavHeadInfo.testFileRiffSize;
+    int32_t remainingDataSize = (int32_t)g_wavHeadInfo.testFileRiffSize;
     uint32_t numRead;
     (void)signal(SIGINT, StreamClose);
     uint64_t replyBytes;
@@ -473,14 +473,14 @@ int32_t FrameStart(const struct StrPara *param)
     }
     do {
         readSize = (remainingDataSize > bufferSize) ? bufferSize : remainingDataSize;
-        numRead = fread(frame, 1, readSize, g_file);
+        numRead = (uint32_t)fread(frame, 1, readSize, g_file);
         if (numRead > 0) {
-            ret = render->RenderFrame(render, (int8_t *)frame, numRead, &replyBytes);
+            ret = render->RenderFrame(render, (int8_t *)frame, (size_t)numRead, &replyBytes);
             if (ret == HDF_ERR_INVALID_OBJECT) {
                 AUDIO_FUNC_LOGE("Render already stop!");
                 break;
             }
-            remainingDataSize -= numRead;
+            remainingDataSize -= (int32_t)numRead;
         }
         while (g_waitSleep) {
             printf("music pause now.\n");
@@ -516,7 +516,7 @@ int32_t InitPlayingAudioParam(struct AudioRender *render)
     }
     (void)memset_s(&g_str, sizeof(struct StrPara), 0, sizeof(struct StrPara));
     g_str.render = render;
-    g_str.bufferSize = bufferSize;
+    g_str.bufferSize = (int32_t)bufferSize;
     g_str.frame = g_frame;
     return HDF_SUCCESS;
 }
