@@ -74,14 +74,14 @@ int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned c
 
 int32_t UsbdFunction::RemoveHdc()
 {
-    uint8_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_OFF);
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_OFF);
     if (status) {
-        HDF_LOGE("%{public}s:remove hdc config error = %{public}hhu", __func__, status);
+        HDF_LOGE("%{public}s:remove hdc config error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_OFF);
     if (status) {
-        HDF_LOGE("%{public}s:remove hdc configfs error = %{public}hhu", __func__, status);
+        HDF_LOGE("%{public}s:remove hdc configfs error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -89,14 +89,14 @@ int32_t UsbdFunction::RemoveHdc()
 
 int32_t UsbdFunction::AddHdc()
 {
-    uint8_t status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_ON);
+    int32_t status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_ON);
     if (status) {
-        HDF_LOGE("%{public}s:add hdc configfs error = %{public}hhu", __func__, status);
+        HDF_LOGE("%{public}s:add hdc configfs error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_ON);
     if (status) {
-        HDF_LOGE("%{public}s:add hdc config error = %{public}hhu", __func__, status);
+        HDF_LOGE("%{public}s:add hdc config error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -165,7 +165,7 @@ int32_t UsbdFunction::SetFunctionToACMECM()
 
 int32_t UsbdFunction::UsbdSetFunction(int funcs)
 {
-    uint8_t acmEcm = funcs & USB_FUNCTION_ACM_ECM;
+    uint32_t acmEcm = (uint32_t)funcs & USB_FUNCTION_ACM_ECM;
     if (funcs < USB_FUNCTION_NONE || funcs >= FUNCTIONS_MAX) {
         HDF_LOGI("%{public}s:funcs invalid", __func__);
         return HDF_FAILURE;
@@ -175,7 +175,7 @@ int32_t UsbdFunction::UsbdSetFunction(int funcs)
         HDF_LOGI("%{public}s:setFunctionToNone error", __func__);
     }
 
-    if (funcs & USB_FUNCTION_HDC) {
+    if ((uint32_t)funcs & USB_FUNCTION_HDC) {
         if (UsbdFunction::AddHdc()) {
             HDF_LOGE("%{public}s:AddHdc error", __func__);
             return HDF_FAILURE;

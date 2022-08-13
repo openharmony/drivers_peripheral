@@ -44,8 +44,8 @@ inline uint64_t DdkSysfsMakeDevAddr(uint32_t busNum, uint32_t devNum)
 
 int32_t DdkSysfsReadProperty(const char *deviceDir, const char *propName, int64_t *value, uint64_t maxVal)
 {
-    char path[SYSFS_PATH_LEN] = {0};
-    int32_t num = sprintf_s(path, SYSFS_PATH_LEN, "%s%s/%s", SYSFS_DEVICES_DIR, deviceDir, propName);
+    char pathTmp[SYSFS_PATH_LEN] = {0};
+    int32_t num = sprintf_s(pathTmp, SYSFS_PATH_LEN, "%s%s/%s", SYSFS_DEVICES_DIR, deviceDir, propName);
     if (num <= 0) {
         HDF_LOGE(
             "%{public}s: sprintf_s error deviceDir:%{public}s, propName:%{public}s", __func__, deviceDir, propName);
@@ -53,6 +53,11 @@ int32_t DdkSysfsReadProperty(const char *deviceDir, const char *propName, int64_
     }
 
     // read string  from file
+    char path[SYSFS_PATH_LEN];
+    if (realpath(pathTmp, path) == NULL) {
+        HDF_LOGE("file %{public}s is invalid", pathTmp);
+        return HDF_FAILURE;
+    }
     int32_t fd = open(path, O_RDONLY | O_CLOEXEC);
     if (fd == -1) {
         HDF_LOGE("%{public}s: open file failed path:%{public}s, errno:%{public}d", __func__, path, errno);

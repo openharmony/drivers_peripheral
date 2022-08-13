@@ -273,7 +273,7 @@ struct UsbRequestParams {
     /** Pointer to the user data */
     void *userData;
     /** Request timeout interval */
-    unsigned int timeout;
+    uint32_t timeout;
     /** Request parameter type */
     UsbRequestParamsType requestType;
     /** Request parameter */

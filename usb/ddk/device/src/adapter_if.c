@@ -303,25 +303,24 @@ static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName,
             return HDF_ERR_IO;
         }
     } else {
-        FILE *fp = fopen(tmp, "w+");
+        char path[MAX_PATHLEN];
+        if (realpath(tmp, path) == NULL) {
+            HDF_LOGE("file %{public}s is invalid", tmp);
+            return HDF_FAILURE;
+        }
+        FILE *fp = fopen(path, "w+");
         if (fp == NULL) {
-            HDF_LOGE("%{public}s: fopen tmp failure!", __func__);
+            HDF_LOGE("%{public}s: fopen path failure!", __func__);
             return HDF_ERR_BAD_FD;
         }
         
         ret = fputs("\0", fp);
         if (ret == EOF) {
-            if (fclose(fp)) {
-                HDF_LOGE("%{public}s:fputs and fclose failure!", __func__);
-                return HDF_FAILURE;
-            }
+            (void)fclose(fp);
             HDF_LOGE("%{public}s:fputs null failure!", __func__);
             return HDF_FAILURE;
         }
-        if (fclose(fp)) {
-            HDF_LOGE("%{public}s:fclose failure!", __func__);
-            return HDF_FAILURE;
-        }
+        (void)fclose(fp);
     }
     return 0;
 }
@@ -757,7 +756,7 @@ static int32_t WriteConfPowerAttributes(const char *devName,
     char tmp[MAX_PATHLEN], val[MAX_NAMELEN];
     memset_s(configName, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(configName, MAX_PATHLEN, MAX_PATHLEN - 1,
-        "%s/%s/configs/b.%d", CONFIGFS_DIR, devName, confVal);
+        "%s/%s/configs/b.%u", CONFIGFS_DIR, devName, confVal);
     if (ret < 0) {
         return HDF_ERR_IO;
     }
@@ -773,7 +772,7 @@ static int32_t WriteConfPowerAttributes(const char *devName,
         return HDF_ERR_IO;
     }
     memset_s(val, MAX_NAMELEN, 0, MAX_NAMELEN);
-    ret = snprintf_s(val, MAX_NAMELEN, MAX_NAMELEN - 1, "%d", config->maxPower);
+    ret = snprintf_s(val, MAX_NAMELEN, MAX_NAMELEN - 1, "%u", config->maxPower);
     if (ret < 0) {
         return HDF_ERR_IO;
     }
@@ -814,7 +813,7 @@ static int32_t CreatKernelFunc(const char *devName, const struct UsbFnFunction *
     }
 
     memset_s(configPath, MAX_PATHLEN, 0, MAX_PATHLEN);
-    ret = snprintf_s(configPath, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/configs/b.%d/%s",
+    ret = snprintf_s(configPath, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/configs/b.%u/%s",
         CONFIGFS_DIR, devName, confVal, functions->funcName);
     if (ret < 0) {
         return HDF_ERR_IO;
