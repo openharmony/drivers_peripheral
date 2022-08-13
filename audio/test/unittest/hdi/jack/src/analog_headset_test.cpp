@@ -40,11 +40,9 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_DRIVER
 namespace {
-    const int INIT_DEFAULT_VALUE = 255;
-    const int NAME_MAX_LEN = 10;
-    const int KEEP_ALIVE_TIME_MS = 15000;
-}
-
+const int INIT_DEFAULT_VALUE = 255;
+const int NAME_MAX_LEN = 10;
+const int KEEP_ALIVE_TIME_MS = 15000;
 using namespace testing::ext;
 static IInputInterface *CommonGetInputInterface(void)
 {
@@ -519,4 +517,5 @@ HWTEST_F(HdfAnalogHeadsetTest, AnalogHeadsetFunctionTest001, TestSize.Level1)
 
     HDF_LOGI("%s: finished.", __func__);
     EXPECT_EQ(ret, INPUT_SUCCESS);
+}
 }

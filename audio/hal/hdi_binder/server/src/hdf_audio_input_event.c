@@ -28,7 +28,7 @@
 #define INPUT_EVT_MAX_CNT       4
 #define WAIT_THREAD_END_TIME_MS 1
 static struct pollfd g_fdSets[INPUT_EVT_MAX_CNT];
-static int8_t g_inputDevCnt = 0;
+static int32_t g_inputDevCnt = 0;
 static bool g_bRunThread = false;
 
 static int32_t AudioAnalogHeadsetDeviceCheck(struct input_event evt)
@@ -89,7 +89,7 @@ static int32_t AudioPnpInputPollAndRead(void)
     int32_t n = g_inputDevCnt;
     struct input_event evt;
 
-    ret = poll(g_fdSets, n, -1);
+    ret = poll(g_fdSets, (nfds_t)n, -1);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("[poll] failed!");
         return HDF_FAILURE;
@@ -97,8 +97,7 @@ static int32_t AudioPnpInputPollAndRead(void)
 
     for (i = 0; i < n; i++) {
         if (g_fdSets[i].revents & POLLIN) {
-            ret = read(g_fdSets[i].fd, (void *)&evt, sizeof(evt));
-            if (ret < 0) {
+            if (read(g_fdSets[i].fd, (void *)&evt, sizeof(evt)) < 0) {
                 AUDIO_FUNC_LOGE("[read] failed!");
                 return HDF_FAILURE;
             }

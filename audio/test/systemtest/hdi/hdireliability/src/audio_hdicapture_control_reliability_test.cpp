@@ -205,7 +205,7 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioCaptureStartAndCaputreFra
         fclose(file);
         return ret;
     }
-    fclose(file);
+    (void)fclose(file);
     return ret;
 }
 

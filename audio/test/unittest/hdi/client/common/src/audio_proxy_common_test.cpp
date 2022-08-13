@@ -16,14 +16,10 @@
 #include <unistd.h>
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-#include "hdf_remote_service.h"
 #include "audio_proxy_common.h"
 #include "audio_proxy_common_fun_test.h"
-
-struct HdfSBuf {
-    struct HdfSBufImpl *impl;
-    uint32_t type;
-};
+#include "hdf_remote_service.h"
+#include "hdf_sbuf.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -57,22 +53,26 @@ HWTEST_F(AudioProxyCommonTest, AudioProxyObtainHdfSBuf_001, TestSize.Level1)
 HWTEST_F(AudioProxyCommonTest, AudioProxyDispatchCall_001, TestSize.Level1)
 {
     int32_t id = 0;
-    struct HdfSBuf data;
-    struct HdfSBuf reply;
+    struct HdfSBuf *data = AudioProxyObtainHdfSBuf();
+    struct HdfSBuf *reply = AudioProxyObtainHdfSBuf();
     struct HdfRemoteService self;
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyDispatchCall(nullptr, id, &data, &reply));
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyDispatchCall(&self, id, nullptr, &reply));
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyDispatchCall(&self, id, &data, nullptr));
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyDispatchCall(nullptr, id, data, reply));
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyDispatchCall(&self, id, nullptr, reply));
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyDispatchCall(&self, id, data, nullptr));
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
 }
 
 HWTEST_F(AudioProxyCommonTest, AudioProxyDispatchCall_002, TestSize.Level1)
 {
     int32_t id = 0;
-    struct HdfSBuf data;
-    struct HdfSBuf reply;
+    struct HdfSBuf *data = AudioProxyObtainHdfSBuf();
+    struct HdfSBuf *reply = AudioProxyObtainHdfSBuf();
     struct HdfRemoteService self;
     self.dispatcher = nullptr;
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyDispatchCall(nullptr, id, &data, &reply));
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyDispatchCall(nullptr, id, data, reply));
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
 }
 
 HWTEST_F(AudioProxyCommonTest, AdapterGetRemoteHandle_001, TestSize.Level1)
@@ -115,18 +115,20 @@ HWTEST_F(AudioProxyCommonTest, AudioProxyPreprocessCapture_001, TestSize.Level1)
 
 HWTEST_F(AudioProxyCommonTest, AudioProxyWriteSampleAttributes_001, TestSize.Level1)
 {
-    struct HdfSBuf data;
+    struct HdfSBuf *data = AudioProxyObtainHdfSBuf();
     struct AudioSampleAttributes attrs;
     EXPECT_EQ(HDF_FAILURE, AudioProxyWriteSampleAttributes(nullptr, &attrs));
-    EXPECT_EQ(HDF_FAILURE, AudioProxyWriteSampleAttributes(&data, nullptr));
+    EXPECT_EQ(HDF_FAILURE, AudioProxyWriteSampleAttributes(data, nullptr));
+    HdfSbufRecycle(data);
 }
 
 HWTEST_F(AudioProxyCommonTest, AudioProxyReadSapmleAttrbutes_001, TestSize.Level1)
 {
-    struct HdfSBuf data;
+    struct HdfSBuf *data = AudioProxyObtainHdfSBuf();
     struct AudioSampleAttributes attrs;
     EXPECT_EQ(HDF_FAILURE, AudioProxyReadSapmleAttrbutes(nullptr, &attrs));
-    EXPECT_EQ(HDF_FAILURE, AudioProxyReadSapmleAttrbutes(&data, nullptr));
+    EXPECT_EQ(HDF_FAILURE, AudioProxyReadSapmleAttrbutes(data, nullptr));
+    HdfSbufRecycle(data);
 }
 
 HWTEST_F(AudioProxyCommonTest, SetRenderCtrlParam_001, TestSize.Level1)
@@ -209,19 +211,21 @@ HWTEST_F(AudioProxyCommonTest, GetCaptureCtrlParam_001, TestSize.Level1)
 HWTEST_F(AudioProxyCommonTest, GetMmapPositionRead_001, TestSize.Level1)
 {
     uint64_t frames = 0;
-    struct HdfSBuf reply;
+    struct HdfSBuf *reply = AudioProxyObtainHdfSBuf();
     struct AudioTimeStamp time;
     EXPECT_EQ(HDF_FAILURE, AudioProxyGetMmapPositionRead(nullptr, &frames, &time));
-    EXPECT_EQ(HDF_FAILURE, AudioProxyGetMmapPositionRead(&reply, nullptr, &time));
-    EXPECT_EQ(HDF_FAILURE, AudioProxyGetMmapPositionRead(&reply, &frames, nullptr));
+    EXPECT_EQ(HDF_FAILURE, AudioProxyGetMmapPositionRead(reply, nullptr, &time));
+    EXPECT_EQ(HDF_FAILURE, AudioProxyGetMmapPositionRead(reply, &frames, nullptr));
+    HdfSbufRecycle(reply);
 }
 
 HWTEST_F(AudioProxyCommonTest, ReqMmapBufferWrite_001, TestSize.Level1)
 {
     int32_t reqSize = 0;
-    struct HdfSBuf data;
+    struct HdfSBuf *data = AudioProxyObtainHdfSBuf();
     struct AudioMmapBufferDescripter desc;
     EXPECT_EQ(HDF_FAILURE, AudioProxyReqMmapBufferWrite(nullptr, reqSize, &desc));
-    EXPECT_EQ(HDF_FAILURE, AudioProxyReqMmapBufferWrite(&data, reqSize, nullptr));
+    EXPECT_EQ(HDF_FAILURE, AudioProxyReqMmapBufferWrite(data, reqSize, nullptr));
+    HdfSbufRecycle(data);
 }
 }

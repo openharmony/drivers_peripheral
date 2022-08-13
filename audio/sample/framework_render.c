@@ -197,7 +197,6 @@ void SystemInputFail(void)
     while (getchar() != '\n') {
         continue;
     }
-    printf("%c", getchar());
 }
 
 int32_t InitAttrs(struct AudioSampleAttributes *attrs)
@@ -239,7 +238,7 @@ uint32_t StringToInt(const char *flag)
         return 0;
     }
     uint32_t temp = flag[0];
-    for (int32_t i = strlen(flag) - 1; i >= 0; i--) {
+    for (int32_t i = (int32_t)strlen(flag) - 1; i >= 0; i--) {
         temp <<= MOVE_LEFT_NUM;
         temp += flag[i];
     }
@@ -251,7 +250,7 @@ int32_t WavHeadAnalysis(FILE *file, struct AudioSampleAttributes *attrs)
         printf("params is null\n");
         return HDF_FAILURE;
     }
-    uint32_t ret;
+    size_t ret;
     const char *audioRiffIdParam = "RIFF";
     const char *audioFileFmtParam = "WAVE";
     const char *aduioDataIdParam = "data";
@@ -344,7 +343,7 @@ uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
 static inline void FileClose(FILE **file)
 {
     if ((file != NULL) && ((*file) != NULL)) {
-        fclose(*file);
+        (void)fclose(*file);
         *file = NULL;
     }
     return;
@@ -467,15 +466,20 @@ int32_t FrameStartMmap(const AudioHandle param)
     FILE *fp = NULL;
     if (MmapInitFile(&fp) < 0) {
         if (fp != NULL) {
-            fclose(fp);
+            (void)fclose(fp);
+            return HDF_FAILURE;
         }
     }
-    int32_t reqSize = ftell(fp);
+    int32_t reqSize = (int32_t)ftell(fp);
+    if (reqSize == -1) {
+        (void)fclose(fp);
+        return HDF_FAILURE;
+    }
     // Converts a file pointer to a device descriptor
     int fd = fileno(fp);
     if (fd == -1) {
         printf("fileno failed, fd is %d\n", fd);
-        fclose(fp);
+        (void)fclose(fp);
         return HDF_FAILURE;
     }
     // Init param
@@ -485,17 +489,17 @@ int32_t FrameStartMmap(const AudioHandle param)
     desc.offset = sizeof(g_wavHeadInfo);
     // start
     if (render == NULL || render->attr.ReqMmapBuffer == NULL) {
-        fclose(fp);
+        (void)fclose(fp);
         return HDF_FAILURE;
     }
     int32_t ret = render->attr.ReqMmapBuffer(render, reqSize, &desc);
     if (ret < 0 || reqSize <= 0) {
         printf("Request map fail,please check.\n");
-        fclose(fp);
+        (void)fclose(fp);
         return HDF_FAILURE;
     }
     munmap(desc.memoryAddress, reqSize);
-    fclose(fp);
+    (void)fclose(fp);
     if (g_render != NULL) {
         ret = StopAudioFiles(&render);
         if (ret < 0) {
@@ -515,9 +519,9 @@ int32_t FrameStart(const AudioHandle param)
     char *frame = strParam->frame;
     int32_t bufferSize = strParam->bufferSize;
     int32_t ret;
-    int32_t readSize;
-    int32_t remainingDataSize = g_wavHeadInfo.testFileRiffSize;
-    uint32_t numRead;
+    size_t readSize;
+    int32_t remainingDataSize = (int32_t)g_wavHeadInfo.testFileRiffSize;
+    size_t numRead;
     ProcessCommonSig();
     uint64_t replyBytes;
     if (g_file == NULL) {
@@ -527,7 +531,7 @@ int32_t FrameStart(const AudioHandle param)
         return HDF_FAILURE;
     }
     do {
-        readSize = (remainingDataSize > bufferSize) ? bufferSize : remainingDataSize;
+        readSize = (size_t)((remainingDataSize > bufferSize) ? bufferSize : remainingDataSize);
         numRead = fread(frame, 1, readSize, g_file);
         if (numRead > 0) {
             ret = render->RenderFrame(render, frame, numRead, &replyBytes);
@@ -535,7 +539,7 @@ int32_t FrameStart(const AudioHandle param)
                 AUDIO_FUNC_LOGE("Render already stop!");
                 break;
             }
-            remainingDataSize -= numRead;
+            remainingDataSize -= (int32_t)numRead;
         }
         while (g_waitSleep) {
             printf("music pause now.\n");
@@ -562,7 +566,7 @@ int32_t InitPlayingAudioParam(struct AudioRender *render)
     }
     (void)memset_s(&g_str, sizeof(struct StrPara), 0, sizeof(struct StrPara));
     g_str.render = render;
-    g_str.bufferSize = bufferSize;
+    g_str.bufferSize = (int32_t)bufferSize;
     g_str.frame = g_frame;
     return HDF_SUCCESS;
 }
@@ -1343,7 +1347,7 @@ int32_t main(int32_t argc, char const *argv[])
         printf("Failed to open '%s',Please enter the correct file name \n", g_path);
         return HDF_FAILURE;
     }
-    fclose(file);
+    (void)fclose(file);
     bool soMode = false;
     if (InitParam()) { // init
         AUDIO_FUNC_LOGE("InitParam Fail!");
