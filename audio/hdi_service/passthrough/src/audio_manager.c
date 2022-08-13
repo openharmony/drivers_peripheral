@@ -107,8 +107,7 @@ int32_t InitCapturePassthroughHandle(const char *capturePassthroughPath)
         return HDF_FAILURE;
     }
     if (g_ptrCaptureHandle == NULL) {
-        char *cPathBuf = pathBuf;
-        g_ptrCaptureHandle = dlopen(cPathBuf, RTLD_LAZY);
+        g_ptrCaptureHandle = dlopen(pathBuf, RTLD_LAZY);
         if (g_ptrCaptureHandle == NULL) {
             AUDIO_FUNC_LOGE("open lib capture so fail, reason:%{public}s", dlerror());
             return HDF_FAILURE;
@@ -136,8 +135,7 @@ int32_t InitRenderPassthroughHandle(const char *renderPassthroughPath)
         return HDF_FAILURE;
     }
     if (g_ptrRenderHandle == NULL) {
-        char *cPathBuf = pathBuf;
-        g_ptrRenderHandle = dlopen(cPathBuf, RTLD_LAZY);
+        g_ptrRenderHandle = dlopen(pathBuf, RTLD_LAZY);
         if (g_ptrRenderHandle == NULL) {
             AUDIO_FUNC_LOGE("open lib render so fail, reason:%{public}s", dlerror());
             return HDF_FAILURE;
@@ -166,8 +164,7 @@ int32_t InitPathSelectPassthroughHandle(const char *pathSelectPassthroughPath)
         return HDF_FAILURE;
     }
     if (g_ptrPathSelHandle == NULL) {
-        char *cPathBuf = pathBuf;
-        g_ptrPathSelHandle = dlopen(cPathBuf, RTLD_LAZY);
+        g_ptrPathSelHandle = dlopen(pathBuf, RTLD_LAZY);
         if (g_ptrPathSelHandle == NULL) {
             AUDIO_FUNC_LOGE("open lib PathSelct so fail, reason:%{public}s", dlerror());
             return HDF_FAILURE;
