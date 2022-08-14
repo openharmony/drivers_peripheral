@@ -30,7 +30,7 @@ int32_t InputCallbackImpl::EventPkgCallback(const std::vector<EventPackage> &pkg
 {
     if (pkgs.empty()) {
         HDF_LOGE("%s: event packages are null\n", __func__);
-        return INPUT_FAILURE;
+        return HDF_FAILURE;
     }
     for (uint32_t i = 0; i < pkgs.size(); i++) {
         printf("%s: pkgs[%u] = 0x%x, 0x%x, %d\n", __func__, i, pkgs[i].type, pkgs[i].code, pkgs[i].value);
@@ -55,7 +55,7 @@ int32_t InputCallbackImpl::HotPlugCallback(const HotPlugEvent &event)
         }
 
         ret  = inputInterfaces_->RegisterReportCallback(event.devIndex, reportCallback_.GetRefPtr());
-        if (ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: register callback failed for device[%d], ret %d", __func__, event.devIndex, ret);
             return HDF_FAILURE;
         }
