@@ -27,7 +27,7 @@
 #endif
 
 static CodecCapablites codecCapabilites = {0};
-static const struct DeviceResourceNode *resourceNode;
+static const struct DeviceResourceNode *g_resourceNode;
 
 static int32_t GetGroupCapabilitiesNumber(const struct DeviceResourceNode *node,
     const char *nodeName, int32_t *num)
@@ -38,7 +38,7 @@ static int32_t GetGroupCapabilitiesNumber(const struct DeviceResourceNode *node,
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
 
     *num = 0;
-    if (iface ==NULL || node == NULL || nodeName == NULL) {
+    if (iface == NULL || node == NULL || nodeName == NULL) {
         HDF_LOGE("%{public}s, failed for codecs %{public}s, variable NULL!", __func__, nodeName);
         return HDF_FAILURE;
     }
@@ -355,7 +355,7 @@ static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
     struct DeviceResourceNode *childNode = NULL;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
 
-    if (iface ==NULL || node == NULL || nodeName == NULL) {
+    if (iface == NULL || node == NULL || nodeName == NULL) {
         HDF_LOGE("%{public}s, failed for node %{public}s, variable NULL!", __func__, nodeName);
         return HDF_FAILURE;
     }
@@ -389,7 +389,7 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node)
         HDF_LOGE("%{public}s, load capability failed, node is null!", __func__);
         return HDF_FAILURE;
     }
-    resourceNode = node;
+    g_resourceNode = node;
 
     char *codecGroupsNodeName[] = {
         NODE_VIDEO_HARDWARE_ENCODERS, NODE_VIDEO_HARDWARE_DECODERS,
@@ -474,6 +474,6 @@ bool CodecCapablitesInited()
 int32_t ReloadCapabilities()
 {
     ClearCapabilityGroup();
-    LoadCodecCapabilityFromHcs(resourceNode);
+    LoadCodecCapabilityFromHcs(g_resourceNode);
     return HDF_SUCCESS;
 }

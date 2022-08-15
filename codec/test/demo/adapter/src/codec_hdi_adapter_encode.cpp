@@ -55,13 +55,13 @@ namespace {
     constexpr int32_t FRAME = (30 << 16);
     constexpr int32_t BUFFER_COUNT = 10;
     constexpr int32_t FD_SIZE = sizeof(int);
-    constexpr const char *encoder_avc = "rk.video_encoder.avc";
+    constexpr const char *ENCODER_AVC = "rk.video_encoder.avc";
 }
 
 #define AV_COLOR_FORMAT OMX_COLOR_FormatYUV420SemiPlanar
 
-constexpr int32_t denominator = 2;
-constexpr int32_t numerator = 3;
+constexpr int32_t DENOMINATOR = 2;
+constexpr int32_t NUMERATOR = 3;
 static CodecHdiAdapterEncode *g_core = nullptr;
 
 CodecHdiAdapterEncode::CodecHdiAdapterEncode() : fpIn_(nullptr), fpOut_(nullptr)
@@ -102,7 +102,7 @@ void CodecHdiAdapterEncode::OnStatusChanged()
 bool CodecHdiAdapterEncode::ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount)
 {
     bool ret = false;
-    filledCount = fread(buf, 1, width_ * height_ * numerator / denominator, fp);
+    filledCount = fread(buf, 1, width_ * height_ * NUMERATOR / DENOMINATOR, fp);
     if (feof(fp)) {
         ret = true;
     }
@@ -140,7 +140,7 @@ bool CodecHdiAdapterEncode::Init(CommandOpt &opt)
 
     // create a component
     auto ret =
-        omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(encoder_avc), (int64_t)this, callback_);
+        omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(ENCODER_AVC), (int64_t)this, callback_);
     if (ret != HDF_SUCCESS || client_ == nullptr) {
         HDF_LOGE("%{public}s errNo[%{public}d] CreateComponent or client is null", __func__, ret);
         return false;
@@ -248,7 +248,7 @@ int32_t CodecHdiAdapterEncode::UseBufferOnPort(PortIndex portIndex)
     portEnable = param.bEnabled;
 
     if (portIndex == PortIndex::PORT_INDEX_INPUT) {
-        bufferSize = width_ * height_ * denominator;
+        bufferSize = width_ * height_ * DENOMINATOR;
     } else if (bufferSize == 0) {
         bufferSize = width_ * height_;
     }

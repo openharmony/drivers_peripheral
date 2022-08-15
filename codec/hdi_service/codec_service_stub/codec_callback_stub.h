@@ -22,7 +22,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-struct ICodecCallback *CodecCallbackStubObtain();
+struct ICodecCallback *CodecCallbackStubObtain(void);
 void CodecCallbackStubRelease(struct ICodecCallback *stub);
 
 #ifdef __cplusplus
