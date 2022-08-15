@@ -30,6 +30,7 @@ static ComponentManager g_mgr;
 struct CodecComponentNode {
     std::shared_ptr<ComponentNode> node;
 };
+
 #ifdef __cplusplus
 extern "C" {
 #endif

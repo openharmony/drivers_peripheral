@@ -29,32 +29,35 @@ using namespace OHOS;
 
 #define HDF_LOG_TAG codec_omx_hdi_enc
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiAdapterEncode::gralloc_ = nullptr;
-constexpr int16_t BPS_BASE = 16;
-constexpr int16_t BPS_MAX = 17;
-constexpr int16_t BPS_MEDIUM = 15;
-constexpr int16_t BPS_MIN = 1;
-constexpr int16_t BPS_TARGET = 2;
-constexpr int16_t FIXQP_INIT_VALUE = 20;
-constexpr int16_t FIXQP_MAX_VALUE = 20;
-constexpr int16_t FIXQP_MIN_VALUE = 20;
-constexpr int16_t FIXQP_MAX_I_VALUE = 20;
-constexpr int16_t FIXQP_MIN_I_VALUE = 20;
-constexpr int16_t FIXQP_IP_VALUE = 2;
-constexpr int16_t OTHER_QP_INIT_VALUE = 26;
-constexpr int16_t OTHER_QP_MAX_VALUE = 51;
-constexpr int16_t OTHER_QP_MIN_VALUE = 10;
-constexpr int16_t OTHER_QP_MAX_I_VALUE = 51;
-constexpr int16_t OTHER_QP_MIN_I_VALUE = 10;
-constexpr int16_t OTHER_QP_IP_VALUE = 2;
-constexpr int16_t AVC_SETUP_LEVEL_DEFAULT = 40;
-constexpr int16_t AVC_SETUP_CABAC_EN_DEFAULT = 1;
-constexpr int16_t AVC_SETUP_CABAC_IDC_DEFAULT = 0;
-constexpr int16_t AVC_SETUP_TRANS_DEFAULT = 1;
-constexpr int16_t AVC_SETUP_PROFILE_DEFAULT = 100;
-constexpr int32_t FRAME = (30 << 16);
-constexpr int32_t BUFFER_COUNT = 10;
-constexpr int32_t FD_SIZE = sizeof(int);
-constexpr const char *encoder_avc = "rk.video_encoder.avc";
+namespace {
+    constexpr int16_t BPS_BASE = 16;
+    constexpr int16_t BPS_MAX = 17;
+    constexpr int16_t BPS_MEDIUM = 15;
+    constexpr int16_t BPS_MIN = 1;
+    constexpr int16_t BPS_TARGET = 2;
+    constexpr int16_t FIXQP_INIT_VALUE = 20;
+    constexpr int16_t FIXQP_MAX_VALUE = 20;
+    constexpr int16_t FIXQP_MIN_VALUE = 20;
+    constexpr int16_t FIXQP_MAX_I_VALUE = 20;
+    constexpr int16_t FIXQP_MIN_I_VALUE = 20;
+    constexpr int16_t FIXQP_IP_VALUE = 2;
+    constexpr int16_t OTHER_QP_INIT_VALUE = 26;
+    constexpr int16_t OTHER_QP_MAX_VALUE = 51;
+    constexpr int16_t OTHER_QP_MIN_VALUE = 10;
+    constexpr int16_t OTHER_QP_MAX_I_VALUE = 51;
+    constexpr int16_t OTHER_QP_MIN_I_VALUE = 10;
+    constexpr int16_t OTHER_QP_IP_VALUE = 2;
+    constexpr int16_t AVC_SETUP_LEVEL_DEFAULT = 40;
+    constexpr int16_t AVC_SETUP_CABAC_EN_DEFAULT = 1;
+    constexpr int16_t AVC_SETUP_CABAC_IDC_DEFAULT = 0;
+    constexpr int16_t AVC_SETUP_TRANS_DEFAULT = 1;
+    constexpr int16_t AVC_SETUP_PROFILE_DEFAULT = 100;
+    constexpr int32_t FRAME = (30 << 16);
+    constexpr int32_t BUFFER_COUNT = 10;
+    constexpr int32_t FD_SIZE = sizeof(int);
+    constexpr const char *encoder_avc = "rk.video_encoder.avc";
+}
+
 #define AV_COLOR_FORMAT OMX_COLOR_FormatYUV420SemiPlanar
 
 constexpr int32_t denominator = 2;

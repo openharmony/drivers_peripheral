@@ -26,18 +26,20 @@
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiDecode::gralloc_ = nullptr;
 using namespace std;
 using namespace OHOS;
-constexpr int32_t FD_SIZE = sizeof(int);
-constexpr int32_t FRAME = 30 << 16;
-constexpr int32_t denominator = 2;
-constexpr int32_t numerator = 3;
-constexpr int32_t START_CODE_OFFSET_ONE = -1;
-constexpr int32_t START_CODE_OFFSET_SEC = -2;
-constexpr int32_t START_CODE_OFFSET_THIRD = -3;
-constexpr int32_t START_CODE_SIZE_FRAME = 4;
-constexpr int32_t START_CODE_SIZE_SLICE = 3;
-constexpr char START_CODE = 0x1;
-constexpr const char *decoder_avc = "OMX.rk.video_decoder.avc";
-constexpr const char *decoder_hevc = "OMX.rk.video_decoder.avc";
+namespace {
+    constexpr int32_t FD_SIZE = sizeof(int);
+    constexpr int32_t FRAME = 30 << 16;
+    constexpr int32_t denominator = 2;
+    constexpr int32_t numerator = 3;
+    constexpr int32_t START_CODE_OFFSET_ONE = -1;
+    constexpr int32_t START_CODE_OFFSET_SEC = -2;
+    constexpr int32_t START_CODE_OFFSET_THIRD = -3;
+    constexpr int32_t START_CODE_SIZE_FRAME = 4;
+    constexpr int32_t START_CODE_SIZE_SLICE = 3;
+    constexpr char START_CODE = 0x1;
+    constexpr const char *decoder_avc = "OMX.rk.video_decoder.avc";
+    constexpr const char *decoder_hevc = "OMX.rk.video_decoder.avc";
+}
 
 #define HDF_LOG_TAG codec_omx_hdi_dec
 
