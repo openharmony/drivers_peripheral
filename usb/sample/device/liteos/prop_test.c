@@ -43,7 +43,7 @@ static struct HdfSBuf *g_data;
 static struct HdfSBuf *g_reply;
 static struct HdfIoService *g_acmService;
 
-static void ShowUsage()
+static void ShowUsage(void)
 {
     HDF_LOGE("Usage options:\n");
     HDF_LOGE("g : name of getting prop, as: g idProduct");

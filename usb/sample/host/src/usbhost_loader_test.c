@@ -41,14 +41,8 @@ static int32_t UsbPnpTestEventReceived(void *priv, uint32_t id, struct HdfSBuf *
 {
     (void)priv;
     (void)data;
-    int32_t ret;
-
-    switch (id) {
-        default:
-            ret = HDF_ERR_INVALID_PARAM;
-            break;
-    }
-    HDF_LOGI("%s:%d ret=%d DONE", __func__, __LINE__, ret);
+    int32_t ret = HDF_ERR_INVALID_PARAM;
+    HDF_LOGI("%s:%d id is %u", __func__, __LINE__, id);
     return ret;
 }
 
