@@ -74,7 +74,7 @@ RET:
     OsalMutexUnlock(&g_lock);
 }
 
-static void SpeedInit()
+static void SpeedInit(void)
 {
     int32_t status;
 
@@ -94,8 +94,10 @@ static void SpeedInit()
         return;
     }
 
-    g_data = HdfSbufObtain(2000);
-    g_reply = HdfSbufObtain(2000);
+    // usb info max size is 2000
+    uint32_t usbInfoMaxSize = 2000;
+    g_data = HdfSbufObtain(usbInfoMaxSize);
+    g_reply = HdfSbufObtain(usbInfoMaxSize);
     if (g_data == NULL || g_reply == NULL) {
         printf("%s: HdfSbufTypedObtain err", __func__);
         return;
@@ -113,7 +115,7 @@ static void SpeedInit()
     }
 }
 
-static void SpeedExit()
+static void SpeedExit(void)
 {
     int32_t status = g_service->dispatcher->Dispatch(&g_service->object, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {
