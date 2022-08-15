@@ -528,9 +528,8 @@ int32_t AudioCtlRenderGetGainStu(const struct DevHandle *handle, int cmdId, stru
     return ret;
 }
 
-int32_t AudioCtlRenderSceneSelectSBuf(struct HdfSBuf *sBuf,
-                                      const struct AudioHwRenderParam *handleData,
-                                      const int32_t deviceIndex)
+int32_t AudioCtlRenderSceneSelectSBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData,
+    const int32_t deviceIndex)
 {
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("RenderSceneSelectSBuf handleData or sBuf is NULL!");
@@ -635,7 +634,8 @@ int32_t AudioCtlRenderGetVolThresholdSBuf(struct HdfSBuf *sBuf, const struct Aud
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtlRenderSceneGetGainThresholdSBuf(struct HdfSBuf *sBuf, const struct AudioHwRenderParam *handleData)
+int32_t AudioCtlRenderSceneGetGainThresholdSBuf(struct HdfSBuf *sBuf,
+    const struct AudioHwRenderParam *handleData)
 {
     if (handleData == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("RenderSceneGetGainThresholdSBuf paras is NULL!");
@@ -891,7 +891,8 @@ int32_t AudioCtlRenderGetChannelMode(const struct DevHandle *handle, int cmdId, 
     return ret;
 }
 
-int32_t AudioInterfaceLibCtlRender(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
+int32_t AudioInterfaceLibCtlRender(const struct DevHandle *handle, int cmdId,
+    struct AudioHwRenderParam *handleData)
 {
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("paras is NULL!");
