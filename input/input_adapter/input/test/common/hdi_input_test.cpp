@@ -80,7 +80,7 @@ static void ReportEventPkgCallback(const EventPackage **pkgs, uint32_t count, ui
     }
     for (uint32_t i = 0; i < count; i++) {
         printf("device action Index:%d  devIndex: %d type:%d code:%d value %d\n",
-                i, devIndex, pkgs[i]->type, pkgs[i]->code, pkgs[i]->value);
+            i, devIndex, pkgs[i]->type, pkgs[i]->code, pkgs[i]->value);
     }
 }
 
@@ -132,7 +132,7 @@ HWTEST_F(HdiInputTest, OpenInputDev001, TestSize.Level1)
     printf("%s: [Input] OpenInputDev001 enter %d\n", __func__, __LINE__);
     int32_t ret = g_inputInterface->iInputManager->OpenInputDevice(TOUCH_INDEX);
     printf("%s: [Input] OpenInputDev001 enter %d\n", __func__, __LINE__);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: open device1 failed, ret %d\n", __func__, ret);
     }
     printf("%s: [Input] OpenInputDev001 enter %d\n", __func__, __LINE__);
@@ -195,7 +195,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     int32_t ret = g_inputInterface->iInputManager->CloseInputDevice(TOUCH_INDEX);
     printf("%s: [Input] CloseInputDev001 enter %d\n", __func__, __LINE__);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: close device1 failed, ret %d\n", __func__, ret);
     }
     printf("%s: [Input] CloseInputDev001 enter %d\n", __func__, __LINE__);
@@ -257,7 +257,7 @@ HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     int32_t ret = g_inputInterface->iInputManager->GetInputDevice(TOUCH_INDEX, &dev);
     printf("%s: [Input] GetInputDevice001 enter %d\n", __func__, __LINE__);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device1 failed, ret %d\n", __func__, ret);
     }
     printf("GetInputDevice001 %s: devindex = %d, devType = %d\n", __func__, dev->devIndex, dev->devType);
@@ -282,7 +282,7 @@ HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     int32_t ret = g_inputInterface->iInputManager->GetInputDevice(INVALID_INDEX1, &dev);
     printf("%s: [Input] GetInputDevice001 enter %d\n", __func__, __LINE__);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device1 failed, ret %d\n", __func__, ret);
     }
     printf("GetInputDevice001 %s: devindex = %d, devType = %d\n", __func__, dev->devIndex, dev->devType);
@@ -307,7 +307,7 @@ HWTEST_F(HdiInputTest, GetInputDevice003, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     int32_t ret = g_inputInterface->iInputManager->GetInputDevice(INVALID_INDEX, &dev);
     printf("%s: [Input] GetInputDevice001 enter %d\n", __func__, __LINE__);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device1 failed, ret %d\n", __func__, ret);
     }
     printf("GetInputDevice001 %s: devindex = %d, devType = %d\n", __func__, dev->devIndex, dev->devType);
@@ -333,7 +333,7 @@ HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputManager->GetInputDeviceList(&num, &dev, MAX_INPUT_DEV_NUM);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: get device list failed, ret %d\n", __func__, ret);
     }
     /* num <= MAX_INPUT_DEV_NUM return true */
@@ -366,22 +366,22 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     ret  = g_inputInterface->iInputReporter->RegisterReportCallback(TOUCH_INDEX, &g_callback);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: register callback failed for device 1, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
     ret  = g_inputInterface->iInputReporter->RegisterReportCallback(2, &g_callback);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: register callback failed for device 2, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
     ret  = g_inputInterface->iInputReporter->RegisterReportCallback(3, &g_callback);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: register callback failed for device 3, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
     ret  = g_inputInterface->iInputReporter->RegisterHotPlugCallback(&g_hotplugCb);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: register callback failed for device manager, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -410,16 +410,16 @@ HWTEST_F(HdiInputTest, UnregisterReportCallback001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     ret  = g_inputInterface->iInputReporter->UnregisterHotPlugCallback();
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: register callback failed for device manager, ret %d\n", __func__, ret);
     }
     ret  = g_inputInterface->iInputReporter->UnregisterReportCallback(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: unregister callback failed for device1, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
     ret = g_inputInterface->iInputManager->CloseInputDevice(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         printf("%s: close device1 failed, ret %d\n", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);

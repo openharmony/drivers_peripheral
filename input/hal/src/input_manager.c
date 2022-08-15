@@ -52,7 +52,7 @@ static int32_t GetInputDevice(uint32_t devIndex, InputDeviceInfo **devInfo)
         return INPUT_INVALID_PARAM;
     }
 
-    while (count--) {
+    while ((count--) > 0) {
         ret = UpdateDevFullInfo(devIndex);
         if (ret == INPUT_SUCCESS) {
             break;

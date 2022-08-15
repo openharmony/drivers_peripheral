@@ -58,7 +58,7 @@ HWTEST_F(InputManagerImplTetst, UTestScanInputDevice, TestSize.Level0)
     ASSERT_TRUE(InputHostObj != nullptr);
     auto arrLen = sizeof(sta)/sizeof(DevDesc);
     auto rc = InputHostObj->ScanInputDevice(sta, arrLen);
-    for (auto i=0; i< arrLen ; i++) {
+    for (auto i = 0; i < arrLen ; i++) {
         std::cout<<"Index: "<<sta[i].devIndex << "Type: " << sta[i].devType << std::endl;
     }
     EXPECT_EQ(INPUT_SUCCESS, rc);
@@ -126,7 +126,7 @@ HWTEST_F(InputManagerImplTetst, UTestGetGetInputDevice, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     auto ret = InputHostObj->GetInputDevice(devIndex, &dev);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s: get device1 failed, ret %{public}d", __func__, ret);
     }
     HDF_LOGI("####$%{public}s: devindex = %{public}u, devType = %{public}u",
@@ -145,7 +145,7 @@ HWTEST_F(InputManagerImplTetst, UTestGetGetInputDeviceFailed, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     auto ret = InputHostObj->GetInputDevice(devIndex, &dev);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s: get device1 failed, ret %{public}d", __func__, ret);
     }
     HDF_LOGI("####$%{public}s: devindex = %{public}u, devType = %{public}u",
@@ -201,9 +201,9 @@ HWTEST_F(InputManagerImplTetst, GetVendorName001, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     char* vendorName = new char[MAX_NODE_PATH_LEN];
-    for (auto i=1; i<4; i++) {
+    for (auto i = 1; i < 4; i++) {
         ret = InputHostObj->GetVendorName(i, vendorName, MAX_NODE_PATH_LEN);
-        if (ret) {
+        if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%{public}s: get device1's vendor name failed, ret %{public}d", __func__, ret);
         }
         HDF_LOGI("#####%{public}s: device1's vendor name is: %{public}s", __func__, vendorName);
@@ -222,7 +222,7 @@ HWTEST_F(InputManagerImplTetst, GetChipInfo, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     ret = InputHostObj->GetChipInfo(devIndex, chipInfo, length);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s: get device1's chipInfo failed, ret %{public}d", __func__, ret);
     }
     HDF_LOGI("#####%{public}s: device1's chipInfo is %{public}s:", __func__, chipInfo);
@@ -239,7 +239,7 @@ HWTEST_F(InputManagerImplTetst, GetChipInfoFailed, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     ret = InputHostObj->GetChipInfo(devIndex, chipInfo, length);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s: get device1's chipInfo failed, ret %{public}d", __func__, ret);
     }
     HDF_LOGI("#####%{public}s: device1's chipInfo is %{public}s:", __func__, chipInfo);
@@ -256,7 +256,7 @@ HWTEST_F(InputManagerImplTetst, GetChipName, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     ret = InputHostObj->GetChipName(devIndex, chipName, length);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s: get device1's vendor name failed, ret %{public}d", __func__, ret);
     }
     HDF_LOGI("#####%{public}s: device1's chipName is %{public}s:", __func__, chipName);
@@ -273,7 +273,7 @@ HWTEST_F(InputManagerImplTetst, GetChipNameFailed, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     ret = InputHostObj->GetChipName(devIndex, chipName, length);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s: get device1's vendor name failed, ret %{public}d", __func__, ret);
     }
     HDF_LOGI("#####%{public}s: device1's chipName is %{public}s:", __func__, chipName);
@@ -290,20 +290,20 @@ HWTEST_F(InputManagerImplTetst, RegisterReportCallback, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     ret = InputHostObj->RegisterReportCallback(devIndex, callback);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s:RegisterHotPlugCallback failed, ret %{public}d", __func__, ret);
     }
     ret = InputHostObj->RegisterReportCallback(DEV_INDEX2, callback);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s:RegisterHotPlugCallback failed, ret %{public}d", __func__, ret);
     }
     ret = InputHostObj->RegisterReportCallback(DEV_INDEX3, callback);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s:RegisterHotPlugCallback failed, ret %{public}d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
     ret = InputHostObj->RegisterHotPlugCallback(callback1);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s: RegisterReportCallback failed, ret %{public}d", __func__, ret);
     }
     HDF_LOGI("#####%{public}s: %{public}d:", __func__, __LINE__);
@@ -322,7 +322,7 @@ HWTEST_F(InputManagerImplTetst, UnregisterReportCallback, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     ret = InputHostObj->UnregisterReportCallback(devIndex);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s: get device1's vendor name failed, ret %{public}d", __func__, ret);
     }
     HDF_LOGI("#####%{public}s: %{public}d:", __func__, __LINE__);
@@ -337,7 +337,7 @@ HWTEST_F(InputManagerImplTetst, UnregisterReportCallback1, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     ret = InputHostObj->UnregisterReportCallback(devIndex);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s: get device1's vendor name failed, ret %{public}d", __func__, ret);
     }
     HDF_LOGI("#####%{public}s: %{public}d:", __func__, __LINE__);
@@ -351,7 +351,7 @@ HWTEST_F(InputManagerImplTetst, RegisterHotPlugCallback, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     ret = InputHostObj->RegisterHotPlugCallback(callback1);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s:RegisterHotPlugCallback failed, ret %{public}d", __func__, ret);
     }
     HDF_LOGI("#####%{public}s: %{public}d:", __func__, __LINE__);
@@ -373,7 +373,7 @@ HWTEST_F(InputManagerImplTetst, UnregisterHotPlugCallback, TestSize.Level0)
     OHOS::sptr<IInputHost> InputHostObj = IInputHost::Get("input_service");
     ASSERT_TRUE(InputHostObj != nullptr);
     ret = InputHostObj->UnregisterHotPlugCallback();
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%{public}s:UnregisterHotPlugCallback failed, ret %{public}d", __func__, ret);
     }
     HDF_LOGI("#####%{public}s: %{public}d:", __func__, __LINE__);
