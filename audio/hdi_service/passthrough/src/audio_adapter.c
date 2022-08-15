@@ -454,7 +454,7 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
     return HDF_SUCCESS;
 }
 
-int32_t BindServiceRenderOpen(struct AudioHwRender *hwRender,
+static int32_t BindServiceRenderOpen(struct AudioHwRender *hwRender,
     InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender)
 {
     if (hwRender == NULL || hwRender->devDataHandle == NULL || pInterfaceLibModeRender == NULL ||
@@ -546,7 +546,7 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
     return HDF_SUCCESS;
 }
 
-int32_t AudioRenderBindService(struct AudioHwRender *hwRender, BindServiceRenderPassthrough *pBindServiceRender)
+static int32_t AudioRenderBindService(struct AudioHwRender *hwRender, BindServiceRenderPassthrough *pBindServiceRender)
 {
     if (hwRender == NULL || pBindServiceRender == NULL || *pBindServiceRender == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -818,7 +818,7 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtrlCaptureClose(struct AudioHwCapture *hwCapture,
+static int32_t AudioCtrlCaptureClose(struct AudioHwCapture *hwCapture,
     InterfaceLibModeCapturePassthrough *pInterfaceLibModeCapture)
 {
     if (hwCapture == NULL || hwCapture->devDataHandle == NULL || pInterfaceLibModeCapture == NULL ||
@@ -992,7 +992,7 @@ int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter)
     return AUDIO_SUCCESS;
 }
 
-void AudioSubPortCapabilityDestroy(struct AudioSubPortCapability *dataBlock, bool freeSelf)
+static void AudioSubPortCapabilityDestroy(struct AudioSubPortCapability *dataBlock, bool freeSelf)
 {
     if (dataBlock == NULL) {
         return;
@@ -1205,7 +1205,7 @@ int32_t AudioAdapterGetPassthroughMode(
         return AUDIO_ERR_INTERNAL;
     }
     struct AudioPortAndCapability *portCapabilitys = hwAdapter->portCapabilitys;
-    int32_t portsLen = hwAdapter->adapterDescriptor.portsLen;
+    uint32_t portsLen = hwAdapter->adapterDescriptor.portsLen;
     while (portCapabilitys != NULL && portsLen > 0) {
         if (portCapabilitys->port.portId == port->portId) {
             *mode = portCapabilitys->mode;

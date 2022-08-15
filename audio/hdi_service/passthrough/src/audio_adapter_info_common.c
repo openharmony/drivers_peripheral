@@ -221,7 +221,7 @@ static int32_t AudioAdapterParsePort(struct AudioPort *info, const cJSON *port)
         AUDIO_FUNC_LOGE("Get portID error!");
         return HDF_FAILURE;
     }
-    uint32_t tmpId = portID->valueint;
+    int32_t tmpId = portID->valueint;
     if (tmpId < 0 || tmpId > SUPPORT_PORT_ID_MAX) {
         AUDIO_FUNC_LOGE("portID error!");
         return HDF_FAILURE;

@@ -126,7 +126,7 @@ static const char *AudioPathSelGetDeviceType(enum AudioPortPin pins)
     return NULL;
 }
 
-const char *AudioPathSelGetUseCase(enum AudioCategory type)
+static const char *AudioPathSelGetUseCase(enum AudioCategory type)
 {
     static const char *usecaseType[PATH_USE_TYPE_MAX + 1] = {
         [PATH_USE_IN_MEDIA] = "deep-buffer-playback",

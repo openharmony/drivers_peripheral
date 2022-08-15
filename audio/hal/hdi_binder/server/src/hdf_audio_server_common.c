@@ -239,7 +239,7 @@ int32_t AudioDestroyCaptureInfoInAdapter(const char *adapterName)
     return HDF_FAILURE;
 }
 
-int32_t AudioDestroyFormerCapture(struct AudioInfoInAdapter *captureManage)
+static int32_t AudioDestroyFormerCapture(struct AudioInfoInAdapter *captureManage)
 {
     AUDIO_FUNC_LOGI();
     if (captureManage == NULL || captureManage->adapter == NULL || captureManage->capture == NULL) {
@@ -270,7 +270,7 @@ int32_t AudioDestroyFormerCapture(struct AudioInfoInAdapter *captureManage)
     return HDF_SUCCESS;
 }
 
-int32_t AudioJudgeCapturePriority(const int32_t priority, int which)
+static int32_t AudioJudgeCapturePriority(const int32_t priority, int which)
 {
     int num;
     if (g_renderAndCaptureManage == NULL) {
@@ -478,7 +478,7 @@ int32_t AudioAdapterListGetAdapter(const char *adapterName, struct AudioAdapter 
     return HDF_ERR_INVALID_PARAM;
 }
 
-int32_t AudioDestroyFormerRender(struct AudioInfoInAdapter *renderManage)
+static int32_t AudioDestroyFormerRender(struct AudioInfoInAdapter *renderManage)
 {
     AUDIO_FUNC_LOGI();
     if (renderManage == NULL || renderManage->adapter == NULL || renderManage->render == NULL) {
@@ -509,7 +509,7 @@ int32_t AudioDestroyFormerRender(struct AudioInfoInAdapter *renderManage)
     return HDF_SUCCESS;
 }
 
-int32_t AudioJudgeRenderPriority(const int32_t priority, int which)
+static int32_t AudioJudgeRenderPriority(const int32_t priority, int which)
 {
     int32_t num;
 
@@ -1226,7 +1226,7 @@ static int32_t AudioLoadStateChange(struct HdfDeviceObject *device, struct Audio
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t HdiServiceDevOnLine(struct HdfDeviceObject *device, struct AudioManager *manager,
+static int32_t HdiServiceDevOnLine(struct HdfDeviceObject *device, struct AudioManager *manager,
     const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter, const char* adapterName)
 {
     if (device == NULL || manager == NULL || desc == NULL || adapter == NULL || adapterName == NULL) {
@@ -1254,7 +1254,7 @@ int32_t HdiServiceDevOnLine(struct HdfDeviceObject *device, struct AudioManager 
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t HdiServiceDevOffLine(struct HdfDeviceObject *device)
+static int32_t HdiServiceDevOffLine(struct HdfDeviceObject *device)
 {
     if (device == NULL) {
         AUDIO_FUNC_LOGE("device is null!");
@@ -1268,7 +1268,7 @@ int32_t HdiServiceDevOffLine(struct HdfDeviceObject *device)
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t HdiServiceLoadAdapterSubUsb(struct HdfDeviceObject *device, struct AudioManager *manager,
+static int32_t HdiServiceLoadAdapterSubUsb(struct HdfDeviceObject *device, struct AudioManager *manager,
     const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter, const char* adapterName)
 {
     if (device == NULL || manager == NULL || desc == NULL || adapter == NULL || adapterName == NULL) {

@@ -20,7 +20,7 @@
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
 struct OsalMutex g_renderLock;
 
-int32_t GetInitRenderParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
+static int32_t GetInitRenderParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
 {
     if (data == NULL || attrs == NULL) {
         return HDF_FAILURE;
@@ -59,7 +59,7 @@ int32_t GetInitRenderParaAttrs(struct HdfSBuf *data, struct AudioSampleAttribute
     return HDF_SUCCESS;
 }
 
-int32_t GetInitRenderPara(struct HdfSBuf *data, struct AudioDeviceDescriptor *devDesc,
+static int32_t GetInitRenderPara(struct HdfSBuf *data, struct AudioDeviceDescriptor *devDesc,
     struct AudioSampleAttributes *attrs)
 {
     if (data == NULL || devDesc == NULL || attrs == NULL) {

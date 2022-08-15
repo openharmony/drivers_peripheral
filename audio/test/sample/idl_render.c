@@ -146,7 +146,7 @@ struct ProcessRenderMenuSwitchList {
     AudioRenderOperation operation;
 };
 
-void CleanStdin(void)
+static void CleanStdin(void)
 {
     int c;
     do {
@@ -154,7 +154,7 @@ void CleanStdin(void)
     } while (c != '\n' && c != EOF);
 }
 
-int32_t CheckInputName(int type, void *val)
+static int32_t CheckInputName(int type, void *val)
 {
     int ret;
     int inputInt = 0;
@@ -197,7 +197,7 @@ int32_t CheckInputName(int type, void *val)
     return HDF_SUCCESS;
 }
 
-void SystemInputFail(void)
+static void SystemInputFail(void)
 {
     printf("please ENTER to go on...");
     while (getchar() != '\n') {
@@ -205,7 +205,7 @@ void SystemInputFail(void)
     }
 }
 
-int32_t InitAttrs(struct AudioSampleAttributes *attrs)
+static int32_t InitAttrs(struct AudioSampleAttributes *attrs)
 {
     if (attrs == NULL) {
         return HDF_FAILURE;
@@ -226,7 +226,7 @@ int32_t InitAttrs(struct AudioSampleAttributes *attrs)
     return HDF_SUCCESS;
 }
 
-int32_t InitDevDesc(struct AudioDeviceDescriptor *devDesc, uint32_t portId)
+static int32_t InitDevDesc(struct AudioDeviceDescriptor *devDesc, uint32_t portId)
 {
     if (devDesc == NULL) {
         return HDF_FAILURE;
@@ -238,7 +238,7 @@ int32_t InitDevDesc(struct AudioDeviceDescriptor *devDesc, uint32_t portId)
     return HDF_SUCCESS;
 }
 
-uint32_t StringToInt(const char *flag)
+static uint32_t StringToInt(const char *flag)
 {
     if (flag == NULL) {
         return 0;
@@ -250,7 +250,7 @@ uint32_t StringToInt(const char *flag)
     }
     return temp;
 }
-int32_t WavHeadAnalysis(FILE *file, struct AudioSampleAttributes *attrs)
+static int32_t WavHeadAnalysis(FILE *file, struct AudioSampleAttributes *attrs)
 {
     if (file == NULL || attrs == NULL) {
         return HDF_FAILURE;
@@ -295,7 +295,7 @@ int32_t WavHeadAnalysis(FILE *file, struct AudioSampleAttributes *attrs)
     return HDF_SUCCESS;
 }
 
-int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs, const char *adapterNameCase,
+static int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs, const char *adapterNameCase,
     enum AudioPortDirection portFlag, struct AudioPort *renderPort, int32_t size)
 {
     struct AudioAdapterDescriptor *desc = NULL;
@@ -325,14 +325,14 @@ int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs, const char *adapterN
     return HDF_ERR_NOT_SUPPORT;
 }
 
-void StreamClose(int32_t sig)
+static void StreamClose(int32_t sig)
 {
     /* allow the stream to be closed gracefully */
     (void)signal(sig, SIG_IGN);
     g_closeEnd = 1;
 }
 
-uint32_t PcmFormatToBits(enum AudioFormat formatBit)
+static uint32_t PcmFormatToBits(enum AudioFormat formatBit)
 {
     switch (formatBit) {
         case AUDIO_FORMAT_PCM_16_BIT:
@@ -344,12 +344,12 @@ uint32_t PcmFormatToBits(enum AudioFormat formatBit)
     };
 }
 
-uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
+static uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
 {
     return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> 3);
 }
 
-int32_t StopAudioFiles(struct AudioRender **renderS)
+static int32_t StopAudioFiles(struct AudioRender **renderS)
 {
     if (renderS == NULL) {
         return HDF_FAILURE;
@@ -395,7 +395,7 @@ int32_t StopAudioFiles(struct AudioRender **renderS)
     return ret;
 }
 
-int32_t FrameStartMmap(const struct StrPara *param)
+static int32_t FrameStartMmap(const struct StrPara *param)
 {
     if (param == NULL) {
         return HDF_FAILURE;
@@ -450,7 +450,7 @@ int32_t FrameStartMmap(const struct StrPara *param)
     return HDF_SUCCESS;
 }
 
-int32_t FrameStart(const struct StrPara *param)
+static int32_t FrameStart(const struct StrPara *param)
 {
     if (param == NULL) {
         return HDF_FAILURE;
@@ -495,7 +495,7 @@ int32_t FrameStart(const struct StrPara *param)
     return HDF_SUCCESS;
 }
 
-void FileClose(FILE **file)
+static void FileClose(FILE **file)
 {
     if ((file != NULL) && ((*file) != NULL)) {
         fclose(*file);
@@ -504,7 +504,7 @@ void FileClose(FILE **file)
     return;
 }
 
-int32_t InitPlayingAudioParam(struct AudioRender *render)
+static int32_t InitPlayingAudioParam(struct AudioRender *render)
 {
     if (render == NULL) {
         return HDF_FAILURE;
@@ -521,7 +521,7 @@ int32_t InitPlayingAudioParam(struct AudioRender *render)
     return HDF_SUCCESS;
 }
 
-void PrintPlayMode(void)
+static void PrintPlayMode(void)
 {
     printf(" ============= Play Render Mode ==========\n");
     printf("| 1. Render non-mmap                     |\n");
@@ -529,7 +529,7 @@ void PrintPlayMode(void)
     printf(" ======================================== \n");
 }
 
-int32_t SelectPlayMode(int32_t *palyModeFlag)
+static int32_t SelectPlayMode(int32_t *palyModeFlag)
 {
     if (palyModeFlag == NULL) {
         AUDIO_FUNC_LOGE("palyModeFlag is null");
@@ -549,7 +549,7 @@ int32_t SelectPlayMode(int32_t *palyModeFlag)
     return HDF_SUCCESS;
 }
 
-int32_t StartPlayThread(int32_t palyModeFlag)
+static int32_t StartPlayThread(int32_t palyModeFlag)
 {
     pthread_attr_t tidsAttr;
     pthread_attr_init(&tidsAttr);
@@ -579,7 +579,7 @@ int32_t StartPlayThread(int32_t palyModeFlag)
     return HDF_SUCCESS;
 }
 
-int32_t PlayingAudioInitFile(void)
+static int32_t PlayingAudioInitFile(void)
 {
     if (g_file != NULL) {
         AUDIO_FUNC_LOGE("the music is playing,please stop first");
@@ -604,7 +604,7 @@ int32_t PlayingAudioInitFile(void)
     return HDF_SUCCESS;
 }
 
-int32_t PlayingAudioInitRender(struct AudioRender **renderTemp)
+static int32_t PlayingAudioInitRender(struct AudioRender **renderTemp)
 {
     if (renderTemp == NULL) {
         AUDIO_FUNC_LOGE("render is null");
@@ -632,7 +632,7 @@ int32_t PlayingAudioInitRender(struct AudioRender **renderTemp)
     return HDF_SUCCESS;
 }
 
-int32_t PlayingAudioFiles(struct AudioRender **renderS)
+static int32_t PlayingAudioFiles(struct AudioRender **renderS)
 {
     if (renderS == NULL || g_adapter == NULL || g_adapter->CreateRender == NULL) {
         return HDF_FAILURE;
@@ -667,7 +667,7 @@ int32_t PlayingAudioFiles(struct AudioRender **renderS)
     return HDF_SUCCESS;
 }
 
-void PrintMenu0(void)
+static void PrintMenu0(void)
 {
     printf(" ============= Play Render Sound Card Mode ==========\n");
     printf("| 1. Render Primary                                 |\n");
@@ -675,7 +675,7 @@ void PrintMenu0(void)
     printf(" =================================================== \n");
 }
 
-void PrintMenu1(void)
+static void PrintMenu1(void)
 {
     printf(" ============== Play Render Loading Mode ===========\n");
     printf("| 1. Render Direct Loading                         |\n");
@@ -685,7 +685,7 @@ void PrintMenu1(void)
     printf(" ================================================== \n");
 }
 
-int32_t SwitchInternalOrExternal(char *adapterNameCase, int32_t nameLen)
+static int32_t SwitchInternalOrExternal(char *adapterNameCase, int32_t nameLen)
 {
     system("clear");
     int choice = 0;
@@ -711,7 +711,7 @@ int32_t SwitchInternalOrExternal(char *adapterNameCase, int32_t nameLen)
     return HDF_SUCCESS;
 }
 
-int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen)
+static int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen)
 {
     system("clear");
     int choice = 0;
@@ -774,7 +774,7 @@ void AudioAdapterDescriptorFree(struct AudioAdapterDescriptor *dataBlock, bool f
     }
 }
 
-void ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen)
+static void ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen)
 {
     if (descsLen > 0 && descs != NULL && (*descs) != NULL) {
         for (uint32_t i = 0; i < descsLen; i++) {
@@ -785,7 +785,7 @@ void ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLe
     }
 }
 
-int32_t GetManagerAndLoadAdapter(const char *adapterNameCase, struct AudioPort *renderPort)
+static int32_t GetManagerAndLoadAdapter(const char *adapterNameCase, struct AudioPort *renderPort)
 {
     if (adapterNameCase == NULL || renderPort == NULL) {
         AUDIO_FUNC_LOGE("The Parameter is NULL");
@@ -840,7 +840,7 @@ int32_t GetManagerAndLoadAdapter(const char *adapterNameCase, struct AudioPort *
     return HDF_SUCCESS;
 }
 
-int32_t InitRenderParam(const char *adapterNameCase, uint32_t portId)
+static int32_t InitRenderParam(const char *adapterNameCase, uint32_t portId)
 {
     if (adapterNameCase == NULL) {
         AUDIO_FUNC_LOGE("The Parameter is NULL");
@@ -867,7 +867,7 @@ int32_t InitRenderParam(const char *adapterNameCase, uint32_t portId)
     return HDF_SUCCESS;
 }
 
-int32_t RenderGetAdapterAndInitEnvParams(const char *adapterNameCase)
+static int32_t RenderGetAdapterAndInitEnvParams(const char *adapterNameCase)
 {
     struct AudioPort renderPort;
     int32_t ret = GetManagerAndLoadAdapter(adapterNameCase, &renderPort);
@@ -883,7 +883,7 @@ int32_t RenderGetAdapterAndInitEnvParams(const char *adapterNameCase)
     return HDF_SUCCESS;
 }
 
-int32_t InitReleaseFun(void)
+static int32_t InitReleaseFun(void)
 {
     g_AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(g_handle, "AudioManagerRelease"));
     if (g_AudioManagerRelease == NULL) {
@@ -902,7 +902,7 @@ int32_t InitReleaseFun(void)
     }
     return HDF_SUCCESS;
 }
-int32_t InitParam(void)
+static int32_t InitParam(void)
 {
     /* Internal and external switch,begin */
     if (SwitchInternalOrExternal(g_adapterName, PATH_LEN) < 0) {
@@ -938,7 +938,7 @@ int32_t InitParam(void)
     return HDF_SUCCESS;
 }
 
-int32_t SetRenderMute(struct AudioRender **render)
+static int32_t SetRenderMute(struct AudioRender **render)
 {
     (void)render;
     int32_t val;
@@ -972,7 +972,7 @@ int32_t SetRenderMute(struct AudioRender **render)
     return ret;
 }
 
-int32_t SetRenderVolume(struct AudioRender **render)
+static int32_t SetRenderVolume(struct AudioRender **render)
 {
     (void)render;
     int32_t ret;
@@ -1009,7 +1009,7 @@ int32_t SetRenderVolume(struct AudioRender **render)
     return ret;
 }
 
-int32_t GetRenderGain(struct AudioRender **render)
+static int32_t GetRenderGain(struct AudioRender **render)
 {
     (void)render;
     int32_t ret;
@@ -1028,7 +1028,7 @@ int32_t GetRenderGain(struct AudioRender **render)
     return HDF_SUCCESS;
 }
 
-int32_t SetRenderPause(struct AudioRender **render)
+static int32_t SetRenderPause(struct AudioRender **render)
 {
     (void)render;
     if (g_waitSleep) {
@@ -1049,7 +1049,7 @@ int32_t SetRenderPause(struct AudioRender **render)
     return HDF_SUCCESS;
 }
 
-int32_t SetRenderResume(struct AudioRender **render)
+static int32_t SetRenderResume(struct AudioRender **render)
 {
     (void)render;
     if (!g_waitSleep) {
@@ -1072,7 +1072,7 @@ int32_t SetRenderResume(struct AudioRender **render)
     pthread_mutex_unlock(&g_mutex);
     return HDF_SUCCESS;
 }
-void PrintAttributesFromat(void)
+static void PrintAttributesFromat(void)
 {
     printf(" ============= Render Sample Attributes Fromat =============== \n");
     printf("| 1. Render AUDIO_FORMAT_PCM_8_BIT                            |\n");
@@ -1081,7 +1081,7 @@ void PrintAttributesFromat(void)
     printf("| 4. Render AUDIO_FORMAT_PCM_32_BIT                           |\n");
     printf(" ============================================================= \n");
 }
-int32_t SelectAttributesFomat(uint32_t *fomat)
+static int32_t SelectAttributesFomat(uint32_t *fomat)
 {
     if (fomat == NULL) {
         AUDIO_FUNC_LOGE("fomat is null!");
@@ -1115,7 +1115,7 @@ int32_t SelectAttributesFomat(uint32_t *fomat)
     return HDF_SUCCESS;
 }
 
-int32_t SetRenderAttributes(struct AudioRender **render)
+static int32_t SetRenderAttributes(struct AudioRender **render)
 {
     (void)render;
     struct AudioSampleAttributes attrs;
@@ -1165,7 +1165,7 @@ int32_t SetRenderAttributes(struct AudioRender **render)
     return ret;
 }
 
-int32_t SelectRenderScene(struct AudioRender **render)
+static int32_t SelectRenderScene(struct AudioRender **render)
 {
     (void)render;
     system("clear");
@@ -1206,7 +1206,7 @@ int32_t SelectRenderScene(struct AudioRender **render)
     return ret;
 }
 
-int32_t GetExtParams(struct AudioRender **render)
+static int32_t GetExtParams(struct AudioRender **render)
 {
     (void)render;
     char keyValueList[BUFFER_LEN] = {0};
@@ -1224,7 +1224,7 @@ int32_t GetExtParams(struct AudioRender **render)
     return HDF_SUCCESS;
 }
 
-int32_t GetRenderMmapPosition(struct AudioRender **render)
+static int32_t GetRenderMmapPosition(struct AudioRender **render)
 {
     (void)render;
     int32_t ret;
@@ -1245,7 +1245,7 @@ int32_t GetRenderMmapPosition(struct AudioRender **render)
     return HDF_SUCCESS;
 }
 
-void PrintMenu2(void)
+static void PrintMenu2(void)
 {
     printf(" ================== Play Render Menu ================== \n");
     printf("| 1. Render Start                                      |\n");
@@ -1277,7 +1277,7 @@ static struct ProcessRenderMenuSwitchList g_processRenderMenuSwitchList[] = {
     {GET_RENDER_POSITION, GetRenderMmapPosition},
 };
 
-void ProcessMenu(int32_t choice)
+static void ProcessMenu(int32_t choice)
 {
     int32_t i;
     if (choice == GET_RENDER_POSITION + 1) {
@@ -1297,7 +1297,7 @@ void ProcessMenu(int32_t choice)
     }
 }
 
-void Choice(void)
+static void Choice(void)
 {
     int32_t choice = 0;
     int ret;

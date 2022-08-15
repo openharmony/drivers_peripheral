@@ -1203,7 +1203,7 @@ int32_t AudioOutputCaptureGetMmapPosition(const struct DevHandleCapture *handle,
 }
 
 int32_t AudioInterfaceLibOutputCapture(const struct DevHandleCapture *handle, int cmdId,
-                                       struct AudioHwCaptureParam *handleData)
+    struct AudioHwCaptureParam *handleData)
 {
     if (handle == NULL) {
         AUDIO_FUNC_LOGE("Input Capture handle is NULL!");
