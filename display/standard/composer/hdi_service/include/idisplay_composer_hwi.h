@@ -69,7 +69,7 @@ public:
     virtual int32_t SetTransformMode(uint32_t devId, uint32_t layerId, TransformType type) = 0;
     virtual int32_t SetLayerDirtyRegion(uint32_t devIdHWI, uint32_t layerId, const IRect &region) = 0;
     virtual int32_t SetLayerVisibleRegion(uint32_t devId, uint32_t layerId, std::vector<IRect> &rects) = 0;
-    virtual int32_t SetLayerBuffer(uint32_t devId, uint32_t layerId, BufferHandle &buffer, int32_t fence) = 0;
+    virtual int32_t SetLayerBuffer(uint32_t devId, uint32_t layerId, const BufferHandle &buffer, int32_t fence) = 0;
     virtual int32_t SetLayerCompositionType(uint32_t devId, uint32_t layerId, CompositionType type) = 0;
     virtual int32_t SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType type) = 0;
     virtual int32_t SetLayerVisible(uint32_t devId, uint32_t layerId, bool visible) = 0;

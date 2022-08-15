@@ -281,7 +281,7 @@ int32_t DisplayComposerHwiImpl::SetLayerVisibleRegion(uint32_t devId, uint32_t l
 }
 
 int32_t DisplayComposerHwiImpl::SetLayerBuffer(uint32_t devId, uint32_t layerId,
-    BufferHandle& buffer, int32_t fence)
+    const BufferHandle& buffer, int32_t fence)
 {
     const BufferHandle* holder = &buffer;
     int32_t ec = composerModel_->CallLayerFunction(devId, layerId, &HdiLayer::SetLayerBuffer,
