@@ -25,7 +25,7 @@
 #include "securec.h"
 
 namespace OHOS {
-namespace UserIAM {
+namespace UserIam {
 namespace PinAuth {
 std::map<int32_t, ResultCodeForCoAuth> g_convertResult = {
     {RESULT_SUCCESS, ResultCodeForCoAuth::SUCCESS},
@@ -355,5 +355,5 @@ int32_t PinAuth::VerifyTemplateData(std::vector<uint64_t> templateIdList)
     return PinResultToCoAuthResult(result);
 }
 } // namespace PinAuth
-} // namespace UserIAM
+} // namespace UserIam
 } // namespace OHOS

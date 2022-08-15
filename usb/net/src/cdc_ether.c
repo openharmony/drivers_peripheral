@@ -15,6 +15,7 @@
 
 #include "cdc_ether.h"
 #include <unistd.h>
+
 #include "hdf_base.h"
 #include "hdf_device_info.h"
 #include "hdf_log.h"
@@ -24,16 +25,16 @@
 #include "securec.h"
 #include "usb_ddk_interface.h"
 
-#define HDF_LOG_TAG   USB_HOST_ECM
+#define HDF_LOG_TAG USB_HOST_ECM
 
 static bool g_ecmReleaseFlag = false;
 
 static void EcmWriteBulk(struct UsbRequest *req);
-void EcmAllocWriteReq(struct EcmDevice *ecm);
-void EcmFreeWriteReq(struct EcmDevice *ecm);
-int32_t EcmAllocIntReq(struct EcmDevice *ecm);
-void EcmAllocReadReq(struct EcmDevice *ecm);
-void EcmFreeReadReq(struct EcmDevice *ecm);
+static void EcmAllocWriteReq(struct EcmDevice *ecm);
+static void EcmFreeWriteReq(struct EcmDevice *ecm);
+static int32_t EcmAllocIntReq(struct EcmDevice *ecm);
+static void EcmAllocReadReq(struct EcmDevice *ecm);
+static void EcmFreeReadReq(struct EcmDevice *ecm);
 static int32_t EcmInit(struct EcmDevice *ecm);
 static void EcmRelease(struct EcmDevice *ecm);
 static struct UsbInterface *EcmGetUsbInterfaceById(struct EcmDevice *ecm, uint8_t interfaceIndex);
@@ -111,8 +112,7 @@ static int32_t EcmWbIsAvail(struct EcmDevice *ecm)
     return n;
 }
 
-static int32_t EcmStartWb(struct EcmDevice *ecm,
-    struct EcmWb *wb)
+static int32_t EcmStartWb(struct EcmDevice *ecm, struct EcmWb *wb)
 {
     int32_t rc;
     struct UsbRequestParams parmas = {};
@@ -181,7 +181,7 @@ static int32_t EcmWriteBufFree(struct EcmDevice *ecm)
 static void EcmWriteBulk(struct UsbRequest *req)
 {
     int32_t status = req->compInfo.status;
-    struct EcmWb *wb  = (struct EcmWb *)req->compInfo.userData;
+    struct EcmWb *wb = (struct EcmWb *)req->compInfo.userData;
     struct EcmDevice *ecm = wb->ecm;
     ecm->writeReqNum--;
 
@@ -202,7 +202,7 @@ EXIT:
     return;
 }
 
-static struct UsbControlRequest EcmUsbControlMsg(struct EcmControlParams *controlParams)
+static struct UsbControlRequest EcmUsbControlMsg(const struct EcmControlParams * const controlParams)
 {
     struct UsbControlRequest dr;
     dr.target = controlParams->requestType & TARGET_MASK;
@@ -216,8 +216,7 @@ static struct UsbControlRequest EcmUsbControlMsg(struct EcmControlParams *contro
     return dr;
 }
 
-static int32_t EcmCtrlMsg(struct EcmDevice *ecm, uint8_t request,
-    uint16_t value, void *buf, uint16_t len)
+static int32_t EcmCtrlMsg(struct EcmDevice *ecm, uint8_t request, uint16_t value, void *buf, uint16_t len)
 {
     int32_t ret;
     const uint16_t index = 0;
@@ -279,9 +278,8 @@ static int32_t EcmRead(struct EcmDevice *ecm, struct HdfSBuf *reply)
     }
 
     for (int32_t i = 0; i < ECM_NR; i++) {
-        if(ecm->readReq[i]->compInfo.status != USB_REQUEST_COMPLETED) {
-            HDF_LOGE("%s:%d i=%d status=%d!",
-                __func__, __LINE__, i, ecm->readReq[i]->compInfo.status);
+        if (ecm->readReq[i]->compInfo.status != USB_REQUEST_COMPLETED) {
+            HDF_LOGE("%s:%d i=%d status=%d!", __func__, __LINE__, i, ecm->readReq[i]->compInfo.status);
             return HDF_FAILURE;
         }
     }
@@ -315,7 +313,6 @@ OUT:
     return ret;
 }
 
-
 static int32_t EcmOpen(struct EcmDevice *ecm, struct HdfSBuf *data)
 {
     int32_t ret;
@@ -334,7 +331,7 @@ static int32_t EcmOpen(struct EcmDevice *ecm, struct HdfSBuf *data)
     ret = EcmInit(ecm);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d EcmInit failed", __func__, __LINE__);
-        return  HDF_FAILURE;
+        return HDF_FAILURE;
     }
 
     if ((cmdType == HOST_ECM_ADD_INTERFACE) || (cmdType == HOST_ECM_REMOVE_INTERFACE)) {
@@ -345,7 +342,7 @@ static int32_t EcmOpen(struct EcmDevice *ecm, struct HdfSBuf *data)
     ret = EcmAllocFifo(&ecm->readFifo, READ_BUF_SIZE);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbSerialAllocFifo failed", __func__);
-        return  HDF_ERR_INVALID_PARAM;
+        return HDF_ERR_INVALID_PARAM;
     }
     ecm->openFlag = true;
     ecm->readReqNum = 0;
@@ -378,7 +375,7 @@ static void EcmClostRelease(struct EcmDevice *ecm)
         return;
     }
 
-    for (int32_t i = 0; i < ECM_NR; i++ ) {
+    for (int32_t i = 0; i < ECM_NR; i++) {
         ret = UsbCancelRequest(ecm->readReq[i]);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("UsbCancelRequest rd failed, ret=%d ", ret);
@@ -513,8 +510,8 @@ static int32_t EcmAddOrRemoveInterface(int32_t cmd, struct EcmDevice *ecm, struc
     return UsbAddOrRemoveInterface(ecm->session, ecm->busNum, ecm->devAddr, index, status);
 }
 
-static int32_t EcmDeviceDispatch(struct HdfDeviceIoClient *client, int32_t cmd,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t EcmDeviceDispatch(
+    struct HdfDeviceIoClient *client, int32_t cmd, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct EcmDevice *ecm = NULL;
     if (client == NULL) {
@@ -588,8 +585,8 @@ static void EcmFreePipes(struct EcmDevice *ecm)
     }
 }
 
-static struct UsbPipeInfo *EcmEnumePipe(struct EcmDevice *ecm, uint8_t interfaceIndex,
-    UsbPipeType pipeType, UsbPipeDirection pipeDirection)
+static struct UsbPipeInfo *EcmEnumePipe(
+    struct EcmDevice *ecm, uint8_t interfaceIndex, UsbPipeType pipeType, UsbPipeDirection pipeDirection)
 {
     uint8_t i;
     int32_t ret;
@@ -603,7 +600,7 @@ static struct UsbPipeInfo *EcmEnumePipe(struct EcmDevice *ecm, uint8_t interface
         interfaceHandle = ecm->devHandle[interfaceIndex];
     }
 
-    for (i = 0;  i <= info->pipeNum; i++) {
+    for (i = 0; i <= info->pipeNum; i++) {
         struct UsbPipeInfo p;
         ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &p);
         if (ret < HDF_SUCCESS) {
@@ -623,8 +620,7 @@ static struct UsbPipeInfo *EcmEnumePipe(struct EcmDevice *ecm, uint8_t interface
     return NULL;
 }
 
-static struct UsbPipeInfo *EcmGetPipe(struct EcmDevice *ecm,
-    UsbPipeType pipeType, UsbPipeDirection pipeDirection)
+static struct UsbPipeInfo *EcmGetPipe(struct EcmDevice *ecm, UsbPipeType pipeType, UsbPipeDirection pipeDirection)
 {
     uint8_t i;
     if (ecm == NULL) {
@@ -657,8 +653,7 @@ static int32_t EcmGetPipes(struct EcmDevice *ecm)
         HDF_LOGE("dataOutPipe is NULL\n");
         goto ERROR;
     }
-    ecm->ctrPipe = EcmEnumePipe(ecm, ecm->ctrIface->info.interfaceIndex,
-                                USB_PIPE_TYPE_CONTROL, USB_PIPE_DIRECTION_OUT);
+    ecm->ctrPipe = EcmEnumePipe(ecm, ecm->ctrIface->info.interfaceIndex, USB_PIPE_TYPE_CONTROL, USB_PIPE_DIRECTION_OUT);
     if (ecm->ctrPipe == NULL) {
         HDF_LOGE("ctrPipe is NULL\n");
         goto ERROR;
@@ -669,10 +664,10 @@ static int32_t EcmGetPipes(struct EcmDevice *ecm)
         goto ERROR;
     }
 
-    ecm->readSize  = ecm->dataInPipe->maxPacketSize;
+    ecm->readSize = ecm->dataInPipe->maxPacketSize;
     ecm->writeSize = ecm->dataOutPipe->maxPacketSize;
-    ecm->ctrlSize  = ecm->ctrPipe->maxPacketSize;
-    ecm->intSize   = ecm->intPipe->maxPacketSize;
+    ecm->ctrlSize = ecm->ctrPipe->maxPacketSize;
+    ecm->intSize = ecm->intPipe->maxPacketSize;
 
     return HDF_SUCCESS;
 
@@ -703,11 +698,10 @@ static int32_t EcmDriverBind(struct HdfDeviceObject *device)
         ecm->busNum = (uint8_t)info->busNum;
         ecm->devAddr = (uint8_t)info->devNum;
         ecm->interfaceCnt = info->interfaceLength;
-        err = memcpy_s((void *)(ecm->interfaceIndex), USB_MAX_INTERFACES,
-            (const void*)info->interfaceNumber, info->interfaceLength);
+        err = memcpy_s((void *)(ecm->interfaceIndex), USB_MAX_INTERFACES, (const void *)info->interfaceNumber,
+            info->interfaceLength);
         if (err != EOK) {
-            HDF_LOGE("%s:%d memcpy_s failed err=%d", \
-                __func__, __LINE__, err);
+            HDF_LOGE("%s:%d memcpy_s failed err=%d", __func__, __LINE__, err);
             goto ERROR;
         }
     } else {
@@ -715,7 +709,7 @@ static int32_t EcmDriverBind(struct HdfDeviceObject *device)
         goto ERROR;
     }
 
-    ecm->device  = device;
+    ecm->device = device;
     device->service = &(ecm->service);
     ecm->device->service->Dispatch = EcmDeviceDispatch;
     HDF_LOGD("EcmDriverBind=========================OK");
@@ -732,14 +726,13 @@ static void EcmProcessNotification(struct EcmDevice *ecm, unsigned char *buf)
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)buf;
     switch (dr->bNotificationType) {
         case USB_DDK_CDC_NOTIFY_NETWORK_CONNECTION:
-            HDF_LOGE("%s - network connection: %s\n", __func__,  (dr->wValue ? "on" : "off"));
+            HDF_LOGE("%s - network connection: %s\n", __func__, (dr->wValue ? "on" : "off"));
             break;
         case USB_DDK_CDC_NOTIFY_SPEED_CHANGE:
             HDF_LOGE("%s - speed change wLength: %d\n", __func__, dr->wLength);
             break;
         default:
-            HDF_LOGE("%s-%d received: index %d len %d\n",
-             __func__, dr->bNotificationType, dr->wIndex, dr->wLength);
+            HDF_LOGE("%s-%d received: index %d len %d\n", __func__, dr->bNotificationType, dr->wIndex, dr->wLength);
     }
     return;
 }
@@ -763,7 +756,7 @@ static void EcmCtrlIrq(struct UsbRequest *req)
         default:
             goto EXIT;
     }
-    if (ecm->nbIndex){
+    if (ecm->nbIndex) {
         dr = (struct UsbCdcNotification *)ecm->notificationBuffer;
     }
     expectedSize = sizeof(struct UsbCdcNotification) + Le16ToCpu(dr->wLength);
@@ -775,14 +768,14 @@ static void EcmCtrlIrq(struct UsbRequest *req)
             }
             allocSize = expectedSize;
             ecm->notificationBuffer = OsalMemCalloc(allocSize);
-            if (!ecm->notificationBuffer){
+            if (!ecm->notificationBuffer) {
                 goto EXIT;
             }
             ecm->nbSize = allocSize;
         }
         copySize = MIN(currentSize, expectedSize - ecm->nbIndex);
-        ret = memcpy_s(&ecm->notificationBuffer[ecm->nbIndex], ecm->nbSize - ecm->nbIndex,
-               req->compInfo.buffer, copySize);
+        ret = memcpy_s(
+            &ecm->notificationBuffer[ecm->nbIndex], ecm->nbSize - ecm->nbIndex, req->compInfo.buffer, copySize);
         if (ret != EOK) {
             HDF_LOGE("memcpy_s fail, ret=%d", ret);
         }
@@ -842,7 +835,7 @@ static void EcmReadBulk(struct UsbRequest *req)
     }
 }
 
-void EcmAllocWriteReq(struct EcmDevice *ecm)
+static void EcmAllocWriteReq(struct EcmDevice * const ecm)
 {
     if (EcmWriteBufAlloc(ecm) < 0) {
         HDF_LOGE("EcmAllocWriteReq buf alloc failed\n");
@@ -861,11 +854,11 @@ void EcmAllocWriteReq(struct EcmDevice *ecm)
     }
     return;
 ERR:
-   EcmWriteBufFree(ecm);
-   return;
+    EcmWriteBufFree(ecm);
+    return;
 }
 
-void EcmFreeWriteReq(struct EcmDevice *ecm)
+static void EcmFreeWriteReq(struct EcmDevice * const ecm)
 {
     OsalMutexLock(&ecm->writeLock);
     for (int32_t i = 0; i < ECM_NW; i++) {
@@ -877,7 +870,7 @@ void EcmFreeWriteReq(struct EcmDevice *ecm)
     EcmWriteBufFree(ecm);
 }
 
-int32_t EcmAllocIntReq(struct EcmDevice *ecm)
+static int32_t EcmAllocIntReq(struct EcmDevice *ecm)
 {
     int32_t ret;
     struct UsbRequestParams intParmas = {};
@@ -907,7 +900,7 @@ int32_t EcmAllocIntReq(struct EcmDevice *ecm)
     return HDF_SUCCESS;
 }
 
-void EcmAllocReadReq(struct EcmDevice *ecm)
+static void EcmAllocReadReq(struct EcmDevice *ecm)
 {
     int32_t ret;
     struct UsbRequestParams readParmas = {};
@@ -935,7 +928,7 @@ void EcmAllocReadReq(struct EcmDevice *ecm)
     }
 }
 
-void EcmFreeReadReq(struct EcmDevice *ecm)
+static void EcmFreeReadReq(struct EcmDevice *ecm)
 {
     int32_t ret;
     for (int32_t i = 0; i < ECM_NR; i++) {
@@ -964,8 +957,7 @@ static void UsbFreeNotifyReqeust(struct EcmDevice *ecm)
     if (ret == HDF_SUCCESS) {
         ecm->notifyReq = NULL;
     } else {
-        HDF_LOGE("%s: UsbFreeNotifyReqeust failed, ret=%d",
-            __func__, ret);
+        HDF_LOGE("%s: UsbFreeNotifyReqeust failed, ret=%d", __func__, ret);
     }
 }
 
@@ -1080,10 +1072,10 @@ static int32_t EcmInit(struct EcmDevice *ecm)
         HDF_LOGE("interfaceCnt invalid : %u\n", ecm->interfaceCnt);
         goto ERROR_OPEN_INTERFACES;
     }
-    
+
     /* set altsetting */
-    ret = UsbSelectInterfaceSetting(ecm->devHandle[ecm->interfaceCnt-1], altsetting,
-        &ecm->iface[ecm->interfaceCnt-1]);
+    ret = UsbSelectInterfaceSetting(
+        ecm->devHandle[ecm->interfaceCnt - 1], altsetting, &ecm->iface[ecm->interfaceCnt - 1]);
     if (ret) {
         HDF_LOGE("UsbSelectInterfaceSetting fail\n");
         goto ERROR_SELECT_SETTING;
@@ -1101,8 +1093,8 @@ static int32_t EcmInit(struct EcmDevice *ecm)
         goto ERROR_ALLOC_REQ;
     }
     if (0) {
-        EcmCtrlMsg(ecm, USB_DDK_CDC_SET_ETHERNET_PACKET_FILTER, USB_DDK_CDC_PACKET_TYPE_DIRECTED
-            | USB_DDK_CDC_PACKET_TYPE_BROADCAST, NULL, 0);
+        EcmCtrlMsg(ecm, USB_DDK_CDC_SET_ETHERNET_PACKET_FILTER,
+            USB_DDK_CDC_PACKET_TYPE_DIRECTED | USB_DDK_CDC_PACKET_TYPE_BROADCAST, NULL, 0);
         ret = UsbSubmitRequestAsync(ecm->notifyReq);
         if (ret != HDF_SUCCESS) {
             return ret;
@@ -1196,10 +1188,10 @@ static void EcmDriverRelease(struct HdfDeviceObject *device)
 
 struct HdfDriverEntry g_ecmUsbDriverEntry = {
     .moduleVersion = 1,
-    .moduleName    = "usbhost_ecm",
-    .Bind          = EcmDriverBind,
-    .Init          = EcmDriverInit,
-    .Release       = EcmDriverRelease,
+    .moduleName = "usbhost_ecm",
+    .Bind = EcmDriverBind,
+    .Init = EcmDriverInit,
+    .Release = EcmDriverRelease,
 };
 
 HDF_INIT(g_ecmUsbDriverEntry);

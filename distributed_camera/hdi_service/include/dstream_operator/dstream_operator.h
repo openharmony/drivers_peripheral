@@ -19,21 +19,22 @@
 #include <map>
 #include <set>
 #include <vector>
-#include "istream_operator.h"
-#include "dstream_operator_stub.h"
-#include "dcamera.h"
-#include "dmetadata_processor.h"
-#include "types.h"
+
 #include "constants.h"
+#include "dcamera.h"
 #include "dcamera_stream.h"
+#include "dmetadata_processor.h"
 
 #include "json/json.h"
+#include "v1_0/istream_operator.h"
+#include "v1_0/types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace std;
+using namespace OHOS::HDI::Camera::V1_0;
 class DCameraProvider;
-class DStreamOperator : public DStreamOperatorStub {
+class DStreamOperator : public IStreamOperator {
 public:
     explicit DStreamOperator(std::shared_ptr<DMetadataProcessor> &dMetadataProcessor);
     DStreamOperator() = default;
@@ -44,31 +45,32 @@ public:
     DStreamOperator& operator=(DStreamOperator &&other) = delete;
 
 public:
-    CamRetCode IsStreamsSupported(OperationMode mode, const std::shared_ptr<Camera::CameraMetadata> &modeSetting,
-        const std::vector<std::shared_ptr<StreamInfo>> &info, StreamSupportType &type) override;
-    CamRetCode CreateStreams(const std::vector<std::shared_ptr<StreamInfo>>& streamInfos) override;
-    CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override;
-    CamRetCode CommitStreams(OperationMode mode, const std::shared_ptr<Camera::CameraMetadata>& modeSetting) override;
-    CamRetCode GetStreamAttributes(std::vector<std::shared_ptr<StreamAttribute>>& attributes) override;
-    CamRetCode AttachBufferQueue(int streamId, const OHOS::sptr<OHOS::IBufferProducer>& producer) override;
-    CamRetCode DetachBufferQueue(int streamId) override;
-    CamRetCode Capture(int captureId, const std::shared_ptr<CaptureInfo>& captureInfo, bool isStreaming) override;
-    CamRetCode CancelCapture(int captureId) override;
-    CamRetCode ChangeToOfflineStream(const std::vector<int>& streamIds, OHOS::sptr<IStreamOperatorCallback>& callback,
-        OHOS::sptr<IOfflineStreamOperator>& offlineOperator) override;
+    int32_t IsStreamsSupported(OperationMode mode, const std::vector<uint8_t> &modeSetting,
+        const std::vector<StreamInfo> &infos, StreamSupportType &type) override;
+    int32_t CreateStreams(const std::vector<StreamInfo> &streamInfos) override;
+    int32_t ReleaseStreams(const std::vector<int32_t> &streamIds) override;
+    int32_t CommitStreams(OperationMode mode, const std::vector<uint8_t> &modeSetting) override;
+    int32_t GetStreamAttributes(std::vector<StreamAttribute> &attributes) override;
+    int32_t AttachBufferQueue(int32_t streamId, const sptr<BufferProducerSequenceable> &bufferProducer) override;
+    int32_t DetachBufferQueue(int32_t streamId) override;
+    int32_t Capture(int32_t captureId, const CaptureInfo &info, bool isStreaming) override;
+    int32_t CancelCapture(int32_t captureId) override;
+    int32_t ChangeToOfflineStream(const std::vector<int32_t> &streamIds,
+        const sptr<IStreamOperatorCallback> &callbackObj, sptr<IOfflineStreamOperator> &offlineOperator) override;
+
     DCamRetCode InitOutputConfigurations(const DHBase &dhBase, const std::string &abilityInfo);
     DCamRetCode AcquireBuffer(int streamId, DCameraBuffer &buffer);
     DCamRetCode ShutterBuffer(int streamId, const DCameraBuffer &buffer);
     DCamRetCode SetCallBack(OHOS::sptr<IStreamOperatorCallback> const &callback);
     DCamRetCode SetDeviceCallback(function<void(ErrorType, int)> &errorCbk,
-        function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> &resultCbk);
+        function<void(uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)> &resultCbk);
     void Release();
     std::vector<int> GetStreamIds();
 
 private:
     bool IsCapturing();
     void SetCapturing(bool isCapturing);
-    DCamRetCode NegotiateSuitableCaptureInfo(const std::shared_ptr<CaptureInfo>& srcCaptureInfo, bool isStreaming);
+    DCamRetCode NegotiateSuitableCaptureInfo(const CaptureInfo& srcCaptureInfo, bool isStreaming);
     void ChooseSuitableFormat(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
         std::shared_ptr<DCCaptureInfo> &captureInfo);
     void ChooseSuitableResolution(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
@@ -77,17 +79,20 @@ private:
         std::shared_ptr<DCCaptureInfo> &captureInfo);
     void ChooseSuitableEncodeType(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
         std::shared_ptr<DCCaptureInfo> &captureInfo);
-    void ConvertStreamInfo(std::shared_ptr<StreamInfo> &srcInfo, std::shared_ptr<DCStreamInfo> &dstInfo);
+    void ConvertStreamInfo(const StreamInfo &srcInfo, std::shared_ptr<DCStreamInfo> &dstInfo);
     DCEncodeType ConvertDCEncodeType(std::string &srcEncodeType);
-    std::shared_ptr<DCCaptureInfo> BuildSuitableCaptureInfo(const shared_ptr<CaptureInfo>& srcCaptureInfo,
+    std::shared_ptr<DCCaptureInfo> BuildSuitableCaptureInfo(const CaptureInfo& srcCaptureInfo,
         std::vector<std::shared_ptr<DCStreamInfo>> &srcStreamInfo);
     void SnapShotStreamOnCaptureEnded(int32_t captureId, int streamId);
     bool HasContinuousCaptureInfo(int captureId);
     void ExtractStreamInfo(DCStreamInfo &dstStreamInfo, const std::shared_ptr<DCStreamInfo> &srcStreamInfo);
     void ExtractCaptureInfo(std::vector<DCCaptureInfo> &captureInfos);
     void ExtractCameraAttr(Json::Value &rootValue, std::set<int> &allFormats, std::vector<int> &photoFormats);
-    DCamRetCode GetInputCaptureInfo(const std::shared_ptr<CaptureInfo>& srcCaptureInfo, bool isStreaming,
+    DCamRetCode GetInputCaptureInfo(const CaptureInfo& srcCaptureInfo, bool isStreaming,
         std::shared_ptr<DCCaptureInfo>& inputCaptureInfo);
+    void AppendCaptureInfo(std::shared_ptr<DCCaptureInfo> &appendCaptureInfo, bool isStreaming,
+        std::shared_ptr<DCCaptureInfo> &inputCaptureInfo, const CaptureInfo& srcCaptureInfo);
+    int32_t HalStreamCommit(const DCStreamInfo &streamInfo);
 
 private:
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor_;
@@ -110,7 +115,7 @@ private:
     bool isCapturing_ = false;
     std::mutex isCapturingLock_;
     OperationMode currentOperMode_ = OperationMode::NORMAL;
-    std::shared_ptr<Camera::CameraMetadata> latestStreamSetting_;
+    std::shared_ptr<OHOS::Camera::CameraMetadata> latestStreamSetting_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

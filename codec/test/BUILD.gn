@@ -16,6 +16,7 @@ group("hdf_test_media_codec") {
   deps = [ "fuzztest:hdf_fuzztest_media_codec" ]
   if (product_name == "rk3568") {
     deps += [
+      "demo/adapter:codec_hdi_adapter_demo",
       "demo/v1.0:codec_hdi_demo",
       "demo/v2.0:codec_hdi_omx_demo",
       "unittest:hdf_unittest_codec",

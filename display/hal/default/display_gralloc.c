@@ -34,8 +34,8 @@
 #define INVALID_SHMID -1
 #define BITS_PER_BYTE 8
 
-#define DIV_ROUND_UP(n, d)   (((n) + (d)-1) / (d))
-#define ALIGN_UP(x, a)       ((((x) + ((a)-1)) / (a)) * (a))
+#define DIV_ROUND_UP(n, d)   (((n) + (d) - 1) / (d))
+#define ALIGN_UP(x, a)       ((((x) + ((a) - 1)) / (a)) * (a))
 #define HEIGHT_ALIGN         2U
 #define WIDTH_ALIGN          8U
 #define MAX_PLANES           3

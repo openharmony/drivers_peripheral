@@ -17,7 +17,7 @@
 #include "offline_pipeline_manager.h"
 
 namespace OHOS::Camera {
-OfflineStream::OfflineStream(int32_t id, OHOS::sptr<IStreamOperatorCallback>& callback)
+OfflineStream::OfflineStream(int32_t id, const OHOS::sptr<IStreamOperatorCallback>& callback)
 {
     streamId_ = id;
     callback_ = callback;
@@ -189,26 +189,26 @@ void OfflineStream::HandleMessage(MessageGroup& message)
     CaptureMessageType type = message[0]->GetMessageType();
     switch (type) {
         case CAPTURE_MESSAGE_TYPE_ON_ERROR: {
-            std::vector<std::shared_ptr<CaptureErrorInfo>> info = {};
-            for (auto cm : message) {
+            std::vector<CaptureErrorInfo> info = {};
+            for (const auto& cm : message) {
                 auto m = std::static_pointer_cast<CaptureErrorMessage>(cm);
                 CHECK_IF_PTR_NULL_RETURN_VOID(m);
-                auto edi = std::make_shared<CaptureErrorInfo>();
-                edi->streamId_ = m->GetStreamId();
-                edi->error_ = m->GetStreamError();
+                CaptureErrorInfo edi = {0};
+                edi.streamId_ = m->GetStreamId();
+                edi.error_ = m->GetStreamError();
                 info.push_back(edi);
             }
             OnCaptureError(message[0]->GetCaptureId(), info);
             break;
         }
         case CAPTURE_MESSAGE_TYPE_ON_ENDED: {
-            std::vector<std::shared_ptr<CaptureEndedInfo>> info = {};
-            for (auto cm : message) {
+            std::vector<CaptureEndedInfo> info = {};
+            for (const auto& cm : message) {
                 auto m = std::static_pointer_cast<CaptureEndedMessage>(cm);
                 CHECK_IF_PTR_NULL_RETURN_VOID(m);
-                auto edi = std::make_shared<CaptureEndedInfo>();
-                edi->streamId_ = m->GetStreamId();
-                edi->frameCount_ = (int32_t)(m->GetFrameCount());
+                CaptureEndedInfo edi = {0};
+                edi.streamId_ = m->GetStreamId();
+                edi.frameCount_ = (int32_t)(m->GetFrameCount());
                 info.push_back(edi);
             }
             OnCaptureEnded(message[0]->GetCaptureId(), info);
@@ -220,13 +220,13 @@ void OfflineStream::HandleMessage(MessageGroup& message)
     return;
 }
 
-void OfflineStream::OnCaptureEnded(int32_t captureId, const std::vector<std::shared_ptr<CaptureEndedInfo>>& infos)
+void OfflineStream::OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos)
 {
     CHECK_IF_EQUAL_RETURN_VOID(callback_, nullptr);
     callback_->OnCaptureEnded(captureId, infos);
 }
 
-void OfflineStream::OnCaptureError(int32_t captureId, const std::vector<std::shared_ptr<CaptureErrorInfo>>& infos)
+void OfflineStream::OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos)
 {
     CHECK_IF_EQUAL_RETURN_VOID(callback_, nullptr);
     callback_->OnCaptureError(captureId, infos);

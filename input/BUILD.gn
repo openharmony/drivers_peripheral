@@ -19,7 +19,6 @@ if (defined(ohos_lite)) {
   group("input_entry") {
     deps = [
       "hal:hdi_input",
-      "udriver:libhdf_input_hotplug",
       "//drivers/peripheral/input/hdi_service:hdi_input_service",
     ]
   }

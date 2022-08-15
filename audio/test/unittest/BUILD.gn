@@ -23,18 +23,19 @@ group("audiotest") {
   if (!defined(ohos_lite)) {
     testonly = true
   }
+  deps = []
 
   # hal ut
-  deps = [
-    "hdi:hdi",
-    "lib:lib",
-  ]
-
-  # adm + driver ut
   if (drivers_peripheral_audio_full_test_suite) {
     deps += [
-      "adm:khdf_audio_adm_test",
-      "driver:khdf_audio_driver_test",
+      "hdi/client:hdi_client",
+      "hdi/passthrough:hdi_passthrough",
+      "supportlibs:interface_lib",
     ]
+  }
+
+  if (drivers_peripheral_audio_full_test_suite &&
+      !drivers_peripheral_audio_alsa_lib) {
+    deps += [ "adm:khdf_audio_adm_test" ]
   }
 }

@@ -29,20 +29,6 @@
         "//drivers/peripheral/usb/test:hdf_test_usb"
       ],
       "inner_kits": [
-        {
-          "name": "//drivers/peripheral/usb/hal/client:usbd_client",
-          "header": {
-            "header_files": [
-              "usb_errors.h",
-              "usb_info.h",
-              "usb_param.h",
-              "usbd_client.h",
-              "usbd_subscriber.h",
-              "usbd_type.h"
-            ],
-            "header_base": "//drivers/peripheral/usb/hal/client/include"
-          }
-        }
       ]
     }
   }

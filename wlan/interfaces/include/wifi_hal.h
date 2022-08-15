@@ -63,6 +63,19 @@ extern "C" {
 typedef int32_t (*CallbackFunc)(uint32_t event, void *data, const char *ifName);
 
 /**
+ * @brief Defines a hid2d callback to listen for <b>IWiFi</b> asynchronous events.
+ *
+ * @param recvMsg Indicates message received.
+ * @param recvMsgLen Indicates the length of message.
+ *
+ * @return Returns <b>0</b> if the <b>IWiFi</b> hid2d callback is defined; returns a negative value otherwise.
+ *
+ * @since 1.0
+ * @version 1.0
+ */
+typedef int32_t (*Hid2dCallbackFunc)(const uint8_t *recvMsg, uint32_t recvMsgLen);
+
+/**
  * @brief Defines the basic WLAN features provided by the hardware abstraction layer (HAL).
  *
  * The basic features include creating and stopping a channel between the HAL and the WLAN driver,
@@ -278,6 +291,62 @@ struct IWiFi {
      * @version 1.0
      */
     int32_t (*setProjectionScreenParam)(const char *ifName, const ProjScrnCmdParam *param);
+
+    /**
+     * @brief Send ioctl command to driver.
+     *
+     * @param ifName Indicates the pointer to the network interface name.
+     * @param cmdId Indicates the command identity document.
+     * @param paramBuf Indicates the paramter send to driver.
+     * @param paramBufLen Indicates the length of parameter.
+     *
+     * @return Returns <b>0</b> if  Send ioctl command successful; returns a negative value otherwise.
+     *
+     * @since 3.2
+     * @version 1.0
+     */
+    int32_t (*sendCmdIoctl)(const char *ifName, int32_t cmdId, const int8_t *paramBuf, uint32_t paramBufLen);
+
+    /**
+     * @brief Registers a hid2d callback to listen for <b>IWiFi</b> asynchronous events.
+     *
+     * @param func Indicates the callback function to register.
+     * @param ifName Indicates the pointer to the network interface name.
+     *
+     * @return Returns <b>0</b> if the hid2d callback is registered; returns a negative value otherwise.
+     *
+     * @since 3.2
+     * @version 1.0
+     */
+    int32_t (*registerHid2dCallback)(Hid2dCallback func, const char *ifName);
+
+    /**
+     * @brief Unegisters a hid2d callback to listen for <b>IWiFi</b> asynchronous events.
+     *
+     * @param func Indicates the callback function to unregister.
+     * @param ifName Indicates the pointer to the network interface name.
+     *
+     * @return Returns <b>0</b> if the hid2d callback is unregistered; returns a negative value otherwise.
+     *
+     * @since 3.2
+     * @version 1.0
+     */
+    int32_t (*unregisterHid2dCallback)(Hid2dCallback func, const char *ifName);
+
+    /**
+     * @brief Get station information.
+     *
+     * @param ifName Indicates the pointer to the network interface name.
+     * @param info Indicates the Station information.
+     * @param mac Indicates the mac address of station.
+     * @param param Indicates the length of mac address.
+     *
+     * @return Returns <b>0</b> if get station information successful; returns a negative value otherwise.
+     *
+     * @since 3.2
+     * @version 1.0
+     */
+    int32_t (*getStationInfo)(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen);
 };
 
 /**

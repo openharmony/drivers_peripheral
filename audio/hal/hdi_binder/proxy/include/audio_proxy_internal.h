@@ -18,6 +18,9 @@
 
 #include "audio_adapter.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 int32_t AudioProxyAdapterInitAllPorts(struct AudioAdapter *adapter);
 int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter,
     const struct AudioDeviceDescriptor *desc,
@@ -111,5 +114,10 @@ int32_t AudioProxyCaptureReqMmapBuffer(const AudioHandle capture,
 int32_t AudioProxyCaptureGetMmapPosition(const AudioHandle capture, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioProxyCaptureTurnStandbyMode(const AudioHandle capture);
 int32_t AudioProxyCaptureAudioDevDump(AudioHandle capture, int32_t range, int32_t fd);
-
+int32_t AudioProxyAdapterSetMicMute(struct AudioAdapter *adapter, bool mute);
+int32_t AudioProxyAdapterGetMicMute(struct AudioAdapter *adapter, bool *mute);
+int32_t AudioProxyAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume);
+#ifdef __cplusplus
+}
+#endif
 #endif

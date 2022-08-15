@@ -34,6 +34,8 @@ public:
     int32_t Init();
 private:
     void UpdateInterval();
+    std::string CanonicalizeSpecPath(const char* src);
+    bool Compress(const std::string& dataFile, const std::string& destFile);
     void GetTraceInfo();
     void StartThread();
     void CreateLogFile();

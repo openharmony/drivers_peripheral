@@ -419,7 +419,7 @@ int32_t AudioCreateStartCapture(TestAudioManager *manager, struct AudioCapture *
         fclose(file);
         return ret;
     }
-    fclose(file);
+    (void)fclose(file);
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -437,7 +437,7 @@ int32_t AudioCaptureStartAndOneFrame(struct AudioCapture *capture)
         fclose(file);
         return ret;
     }
-    fclose(file);
+    (void)fclose(file);
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -528,7 +528,7 @@ int32_t FrameStartCapture(struct AudioCapture *capture, FILE *file, const struct
         }
     }
     uint32_t requestByte = static_cast<uint32_t>(replyBytes);
-    fwrite(frame, requestByte, 1, file);
+    (void)fwrite(frame, requestByte, 1, file);
     free(frame);
     return AUDIO_HAL_SUCCESS;
 }
@@ -570,7 +570,7 @@ int32_t RenderFramePrepare(const std::string &path, char *&frame, uint64_t &read
         fclose(file);
         return HDF_FAILURE;
     }
-    fclose(file);
+    (void)fclose(file);
     return HDF_SUCCESS;
 }
 
@@ -905,7 +905,7 @@ int32_t RecordAudio(struct PrepareAudioPara &audiopara)
         fclose(file);
         return ret;
     }
-    fclose(file);
+    (void)fclose(file);
     return AUDIO_HAL_SUCCESS;
 }
 int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescripter &desc, int32_t &reqSize, bool flag)
@@ -965,7 +965,7 @@ int32_t PlayMapAudioFile(struct PrepareAudioPara &audiopara)
     if (ret == 0) {
         munmap(desc.memoryAddress, reqSize);
     }
-    fclose(fp);
+    (void)fclose(fp);
     return ret;
 }
 int32_t RecordMapAudio(struct PrepareAudioPara &audiopara)
@@ -992,7 +992,7 @@ int32_t RecordMapAudio(struct PrepareAudioPara &audiopara)
         return ret;
     }
     ret = audiopara.capture->attr.ReqMmapBuffer((AudioHandle)(audiopara.capture), reqSize, &desc);
-    fclose(fp);
+    (void)fclose(fp);
     if (ret == 0) {
         munmap(desc.memoryAddress, reqSize);
     }

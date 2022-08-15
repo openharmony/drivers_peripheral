@@ -16,7 +16,7 @@
 #include "audio_adapter.h"
 #include "osal_mem.h"
 #include "audio_adapter_info_common.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 #include "audio_interface_lib_capture.h"
 #include "audio_interface_lib_render.h"
 
@@ -183,15 +183,15 @@ static int32_t AudioCheckDescPortId(const struct AudioAdapterDescriptor *adapter
         AUDIO_FUNC_LOGE("Get adapterNum fail!");
         return HDF_FAILURE;
     }
-    struct AudioAdapterDescriptor *Descs = AudioAdapterGetConfigOut();
-    if (Descs == NULL) {
+    struct AudioAdapterDescriptor *descs = AudioAdapterGetConfigOut();
+    if (descs == NULL) {
         AUDIO_FUNC_LOGE("Get adapterDescs is NULL!");
         return HDF_FAILURE;
     }
     bool checkFlag = false;
     for (int index = 0; index < adapterNum; index++) {
-        if (strcmp(Descs[index].adapterName, adapterDescriptor->adapterName) == 0) {
-            if (Descs[index].ports[0].portId == portId) {
+        if (strcmp(descs[index].adapterName, adapterDescriptor->adapterName) == 0) {
+            if (descs[index].ports[0].portId == portId) {
                 checkFlag = true;
                 break;
             } else {
@@ -205,10 +205,10 @@ static int32_t AudioCheckDescPortId(const struct AudioAdapterDescriptor *adapter
         return HDF_FAILURE;
     }
     for (int index = 0; index < adapterNum; index++) {
-        if (strncmp(Descs[index].adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
-            if (Descs[index].ports[0].portId <= AUDIO_PRIMARY_ID_MAX &&
-                Descs[index].ports[0].portId >= AUDIO_PRIMARY_ID_MIN) {
-                *id = Descs[index].ports[0].portId;
+        if (strncmp(descs[index].adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+            if (descs[index].ports[0].portId <= AUDIO_PRIMARY_ID_MAX &&
+                descs[index].ports[0].portId >= AUDIO_PRIMARY_ID_MIN) {
+                *id = descs[index].ports[0].portId;
                 break;
             }
         }
@@ -522,13 +522,11 @@ static int32_t AudioSetParamToDev(struct AudioHwRender *hwRender, InterfaceLibMo
         AUDIO_FUNC_LOGE("SetParams FAIL!");
         return HDF_FAILURE;
     }
-#ifndef AUDIO_HAL_USER
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTL_PREPARE);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("AudioRender perpare FAIL");
         return HDF_FAILURE;
     }
-#endif
     return HDF_SUCCESS;
 }
 
@@ -906,14 +904,11 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
         (void)AudioCtrlCaptureClose(hwCapture, LibCap);
         return HDF_FAILURE;
     }
-#ifdef AUDIO_HAL_USER
-#else
     if ((*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE) < 0) {
         AUDIO_FUNC_LOGE("AudioCaptureStart prepare FAIL");
         (void)AudioCtrlCaptureClose(hwCapture, LibCap);
         return HDF_FAILURE;
     }
-#endif
     return HDF_SUCCESS;
 }
 
@@ -1065,7 +1060,7 @@ int32_t AudioAdapterGetPortCapability(struct AudioAdapter *adapter, const struct
         AUDIO_FUNC_LOGE("hwAdapter portCapabilitys is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    int32_t portNum = hwAdapter->adapterDescriptor.portNum;
+    uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
     while (hwAdapterPortCapabilitys != NULL && portNum) {
         if (hwAdapterPortCapabilitys->port.portId == port->portId) {
             *capability = hwAdapterPortCapabilitys->capability;
@@ -1090,7 +1085,7 @@ int32_t AudioAdapterSetPassthroughModeExec(struct AudioHwAdapter *hwAdapter, uin
     }
     struct AudioPortAndCapability *portCapabilityTemp = hwAdapter->portCapabilitys;
     struct AudioPortCapability *portCapability = NULL;
-    int32_t portNum = hwAdapter->adapterDescriptor.portNum;
+    uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
     while (portCapabilityTemp != NULL && portNum > 0) {
         if (portCapabilityTemp->port.portId == portId) {
             portCapability = &portCapabilityTemp->capability;
@@ -1108,7 +1103,7 @@ int32_t AudioAdapterSetPassthroughModeExec(struct AudioHwAdapter *hwAdapter, uin
         AUDIO_FUNC_LOGE("portCapability->subPorts is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    int32_t subPortNum = portCapability->subPortsNum;
+    uint32_t subPortNum = portCapability->subPortsNum;
     while (subPortCapability != NULL && subPortNum > 0) {
         if (subPortCapability->mask == mode) {
             portCapabilityTemp->mode = mode;
@@ -1170,7 +1165,7 @@ int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struc
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioPortAndCapability *portCapabilitys = hwAdapter->portCapabilitys;
-    int32_t portNum = hwAdapter->adapterDescriptor.portNum;
+    uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
     while (portCapabilitys != NULL && portNum > 0) {
         if (portCapabilitys->port.portId == port->portId) {
             *mode = portCapabilitys->mode;

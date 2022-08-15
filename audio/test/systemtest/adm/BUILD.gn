@@ -28,7 +28,7 @@ group("adm") {
   if (defined(ohos_lite)) {
     deps += [ "audio_adm_interface:hdf_audio_adm_interface_test" ]
   } else {
-    if (enable_audio_adm_so || enable_audio_adm_service) {
+    if (enable_audio_adm_passthrough || enable_audio_adm_service) {
       deps += [ "audio_adm_interface:hdf_audio_adm_interface_test" ]
     }
   }

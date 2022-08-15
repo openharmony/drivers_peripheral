@@ -16,7 +16,7 @@
         "hdf_core",
         "hiviewdfx_hilog_native",
         "multimedia_camera_framework",
-        "samgr_standard",
+        "samgr",
         "drivers_peripheral_display",
         "ipc",
         "utils_base"
@@ -30,18 +30,6 @@
         "//drivers/peripheral/camera/hal:camera_hal"
       ],
       "inner_kits": [
-        {
-          "name": "//drivers/peripheral/camera/interfaces/hdi_ipc/client:libcamera_client",
-          "header": {
-            "header_files": [
-              "camera_device_proxy.h",
-              "camera_host_proxy.h",
-              "offline_stream_operator_proxy.h",
-              "stream_operator_proxy.h"
-            ],
-            "header_base": "//drivers/peripheral/camera/interfaces/hdi_ipc/client/include"
-          }
-        },
         {
           "name": "//drivers/peripheral/camera/interfaces/metadata:metadata",
           "header": {

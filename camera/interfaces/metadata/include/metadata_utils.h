@@ -33,11 +33,42 @@ public:
 
     static std::string EncodeToString(std::shared_ptr<CameraMetadata> metadata);
     static std::shared_ptr<CameraMetadata> DecodeFromString(std::string setting);
-
+    static bool ConvertMetadataToVec(const std::shared_ptr<CameraMetadata> &metadata,
+        std::vector<uint8_t>& cameraAbility);
+    static void ConvertVecToMetadata(const std::vector<uint8_t>& cameraAbility,
+        std::shared_ptr<CameraMetadata> &metadata);
 private:
     static bool WriteMetadata(const camera_metadata_item_t &item, MessageParcel &data);
     static bool ReadMetadata(camera_metadata_item_t &item, MessageParcel &data);
     static void ItemDataToBuffer(const camera_metadata_item_t &item, void **buffer);
+    static bool WriteMetadataDataToVec(const camera_metadata_item_t &entry, std::vector<uint8_t>& cameraAbility);
+    static bool ReadMetadataDataFromVec(int32_t &index, camera_metadata_item_t &entry,
+        const std::vector<uint8_t>& cameraAbility);
+    template <class T> static void WriteData(T data, std::vector<uint8_t>& cameraAbility);
+    template <class T> static void ReadData(T &data, int32_t &index, const std::vector<uint8_t>& cameraAbility);
 };
+
+template <class T>
+void MetadataUtils::WriteData(T data, std::vector<uint8_t>& cameraAbility)
+{
+    T dataTemp = data;
+    uint8_t *dataPtr = (uint8_t *)&dataTemp;
+    for (size_t j = 0; j < sizeof(T); j++) {
+        cameraAbility.push_back(*(dataPtr + j));
+    }
+}
+
+template <class T>
+void MetadataUtils::ReadData(T &data, int32_t &index, const std::vector<uint8_t>& cameraAbility)
+{
+    constexpr uint32_t typeLen = sizeof(T);
+    uint8_t array[typeLen] = {0};
+    T *ptr = nullptr;
+    for (size_t j = 0; j < sizeof(T); j++) {
+        array[j] = cameraAbility.at(index++);
+    }
+    ptr = (T *)array;
+    data = *ptr;
+}
 } // namespace Camera
 #endif // OHOS_CAMERA_METADATA_UTILS_H

@@ -23,7 +23,10 @@ group("hdi") {
   if (!defined(ohos_lite)) {
     testonly = true
   }
-  deps = [ "common:hdi_common" ]
+  deps = [
+    "common:hdi_common",
+    "hardwaredependence:hdi_hardwaredependence",
+  ]
   if (!defined(drivers_peripheral_audio_alsa_lib) ||
       drivers_peripheral_audio_alsa_lib == false) {
     deps += [ "hdiperformace:hdi_performace" ]

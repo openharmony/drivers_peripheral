@@ -74,14 +74,14 @@ int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned c
 
 int32_t UsbdFunction::RemoveHdc()
 {
-    uint8_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_OFF);
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_OFF);
     if (status) {
-        HDF_LOGE("%{public}s:remove hdc config error = %{public}hhu\n", __func__, status);
+        HDF_LOGE("%{public}s:remove hdc config error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_OFF);
     if (status) {
-        HDF_LOGE("%{public}s:remove hdc configs error = %{public}hhu\n", __func__, status);
+        HDF_LOGE("%{public}s:remove hdc configfs error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -89,14 +89,14 @@ int32_t UsbdFunction::RemoveHdc()
 
 int32_t UsbdFunction::AddHdc()
 {
-    uint8_t status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_ON);
+    int32_t status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_ON);
     if (status) {
-        HDF_LOGE("%{public}s:add hdc configfs error = %{public}hhu\n", __func__, status);
+        HDF_LOGE("%{public}s:add hdc configfs error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_ON);
     if (status) {
-        HDF_LOGE("%{public}s:add hdc config error = %{public}hhu\n", __func__, status);
+        HDF_LOGE("%{public}s:add hdc config error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -119,12 +119,12 @@ int32_t UsbdFunction::SetFunctionToNone()
 int32_t UsbdFunction::SetFunctionToACM()
 {
     if (UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_ADD, USB_FUNCTION_ACM)) {
-        HDF_LOGE("%{public}s:create acm dev error ", __func__);
+        HDF_LOGE("%{public}s:create acm dev error", __func__);
         return HDF_FAILURE;
     }
 
     if (UsbdFunction::SendCmdToService(ACM_SERVICE_NAME, ACM_INIT, USB_FUNCTION_ACM)) {
-        HDF_LOGE("%{public}s:acm init error ", __func__);
+        HDF_LOGE("%{public}s:acm init error", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -133,12 +133,12 @@ int32_t UsbdFunction::SetFunctionToACM()
 int32_t UsbdFunction::SetFunctionToECM()
 {
     if (UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_ADD, USB_FUNCTION_ECM)) {
-        HDF_LOGE("%{public}s:create ecm dev error ", __func__);
+        HDF_LOGE("%{public}s:create ecm dev error", __func__);
         return HDF_FAILURE;
     }
 
     if (UsbdFunction::SendCmdToService(ECM_SERVICE_NAME, ECM_INIT, USB_FUNCTION_ECM)) {
-        HDF_LOGE("%{public}s:ecm init error ", __func__);
+        HDF_LOGE("%{public}s:ecm init error", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -147,17 +147,17 @@ int32_t UsbdFunction::SetFunctionToECM()
 int32_t UsbdFunction::SetFunctionToACMECM()
 {
     if (UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_ADD, USB_FUNCTION_ACM_ECM)) {
-        HDF_LOGE("%{public}s:create acm&ecm dev error ", __func__);
+        HDF_LOGE("%{public}s:create acm&ecm dev error", __func__);
         return HDF_FAILURE;
     }
 
     if (UsbdFunction::SendCmdToService(ACM_SERVICE_NAME, ACM_INIT, USB_FUNCTION_ACM)) {
-        HDF_LOGE("%{public}s:acm init error ", __func__);
+        HDF_LOGE("%{public}s:acm init error", __func__);
         return HDF_FAILURE;
     }
 
     if (UsbdFunction::SendCmdToService(ECM_SERVICE_NAME, ECM_INIT, USB_FUNCTION_ECM)) {
-        HDF_LOGE("%{public}s:ecm init dev error ", __func__);
+        HDF_LOGE("%{public}s:ecm init dev error", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -165,36 +165,36 @@ int32_t UsbdFunction::SetFunctionToACMECM()
 
 int32_t UsbdFunction::UsbdSetFunction(int funcs)
 {
-    uint8_t acmEcm = funcs & USB_FUNCTION_ACM_ECM;
+    uint32_t acmEcm = (uint32_t)funcs & USB_FUNCTION_ACM_ECM;
     if (funcs < USB_FUNCTION_NONE || funcs >= FUNCTIONS_MAX) {
-        HDF_LOGI("%{public}s:funcs invalid \n", __func__);
+        HDF_LOGI("%{public}s:funcs invalid", __func__);
         return HDF_FAILURE;
     }
 
     if (UsbdFunction::SetFunctionToNone()) {
-        HDF_LOGI("%{public}s:setFunctionToNone error \n", __func__);
+        HDF_LOGI("%{public}s:setFunctionToNone error", __func__);
     }
 
-    if (funcs & USB_FUNCTION_HDC) {
+    if ((uint32_t)funcs & USB_FUNCTION_HDC) {
         if (UsbdFunction::AddHdc()) {
-            HDF_LOGE("%{public}s:AddHdc error ", __func__);
+            HDF_LOGE("%{public}s:AddHdc error", __func__);
             return HDF_FAILURE;
         }
     }
 
     if (acmEcm == USB_FUNCTION_ACM) {
         if (SetFunctionToACM()) {
-            HDF_LOGE("%{public}s:set function to acm error ", __func__);
+            HDF_LOGE("%{public}s:set function to acm error", __func__);
             return HDF_FAILURE;
         }
     } else if (acmEcm == USB_FUNCTION_ECM) {
         if (SetFunctionToECM()) {
-            HDF_LOGE("%{public}s:set function to ecm error ", __func__);
+            HDF_LOGE("%{public}s:set function to ecm error", __func__);
             return HDF_FAILURE;
         }
     } else if (acmEcm == USB_FUNCTION_ACM_ECM) {
         if (SetFunctionToACMECM()) {
-            HDF_LOGE("%{public}s:set function to acm&ecm error ", __func__);
+            HDF_LOGE("%{public}s:set function to acm&ecm error", __func__);
             return HDF_FAILURE;
         }
     }

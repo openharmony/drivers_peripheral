@@ -1139,14 +1139,30 @@ static struct UsbHostRequest *AdapterAllocRequest(const struct UsbDeviceHandle *
                 + (sizeof(struct UsbIsoPacketDesc) * (size_t)isoPackets)
                 + (sizeof(unsigned char) * len);
 
+    unsigned char *bufTmp = NULL;
+#ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
+    memBuf = RawUsbMemCalloc(sizeof(struct UsbHostRequest));
+    if (memBuf == NULL) {
+        HDF_LOGE("%{public}s: alloc UsbHostRequest failed", __func__);
+        return NULL;
+    }
+    bufTmp = (unsigned char *)RawUsbMemCalloc(len);
+    if (bufTmp == NULL) {
+        HDF_LOGE("%{public}s: alloc bufTmp failed", __func__);
+        RawUsbMemFree(memBuf);
+        return NULL;
+    }
+#else
     memBuf = mmap(NULL, len, PROT_READ | PROT_WRITE, MAP_SHARED, handle->fd, 0);
     if (memBuf == MAP_FAILED) {
         HDF_LOGE("%{public}s:%d mmap failed, errno=%d", __func__, __LINE__, errno);
         return NULL;
     }
+    bufTmp = (unsigned char *)memBuf + allocSize - len;
+#endif
     request = (struct UsbHostRequest *)memBuf;
     request->numIsoPackets = isoPackets;
-    request->buffer = (unsigned char *)request + allocSize - len;
+    request->buffer = bufTmp;
     request->bufLen = len;
     request->bulkUrb = RawUsbMemCalloc(sizeof(struct UsbAdapterUrb));
     if (request->bulkUrb == NULL) {
@@ -1172,11 +1188,15 @@ static int32_t AdapterFreeRequest(struct UsbHostRequest *request)
         request->bulkUrb = NULL;
     }
     request->urbs = NULL;
+#ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
+    RawUsbMemFree(request->buffer);
+    RawUsbMemFree(request);
+#else
     if (munmap((void *)request, allocSize) != 0) {
         HDF_LOGE("%{public}s:%d munmap failed, errno=%d", __func__, __LINE__, errno);
         return HDF_ERR_IO;
     }
-
+#endif
     return HDF_SUCCESS;
 }
 

@@ -577,6 +577,29 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
     return ret;
 }
 
+static int32_t HdfWlanNetlinkCallbackFun(const uint8_t *recvMsg, uint32_t recvMsgLen)
+{
+    struct HdfWlanRemoteNode *pos = NULL;
+    struct DListHead *head = &HdfStubDriver()->remoteListHead;
+    int32_t ret = HDF_FAILURE;
+
+    if (recvMsg == NULL) {
+        HDF_LOGE("%{public}s: recvMsg or ifName is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    DLIST_FOR_EACH_ENTRY(pos, head, struct HdfWlanRemoteNode, node) {
+        if (pos->service == NULL || pos->callbackObj == NULL) {
+            HDF_LOGW("%{public}s: pos->service or pos->callbackObj NULL", __func__);
+            continue;
+        }
+        ret = pos->callbackObj->WifiNetlinkMessage(pos->callbackObj, recvMsg, recvMsgLen);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: dispatch code fialed, error code: %{public}d", __func__, ret);
+        }
+    }
+    return ret;
+}
+
 static void HdfWlanDelRemoteObj(struct IWlanCallback *self)
 {
     struct HdfWlanRemoteNode *pos = NULL;
@@ -609,18 +632,27 @@ int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct I
         return HDF_FAILURE;
     }
     (void)OsalMutexLock(&HdfStubDriver()->mutex);
-    ret = HdfWlanAddRemoteObj(cbFunc);
-    if (ret != HDF_SUCCESS) {
-        (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
-        HDF_LOGE("%{public}s: HdfSensorAddRemoteObj false", __func__);
-        return ret;
-    }
-    ret = g_wifi->registerEventCallback(HdfWLanCallbackFun, ifName);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Register failed!, error code: %{public}d", __func__, ret);
-        HdfWlanDelRemoteObj(cbFunc);
-    }
     
+    do {
+        ret = HdfWlanAddRemoteObj(cbFunc);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: HdfSensorAddRemoteObj false", __func__);
+            break;
+        }
+        ret = g_wifi->registerEventCallback(HdfWLanCallbackFun, ifName);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: Register failed!, error code: %{public}d", __func__, ret);
+            HdfWlanDelRemoteObj(cbFunc);
+            break;
+        }
+        ret = WlanInterfaceRegisterHid2dCallback(HdfWlanNetlinkCallbackFun, ifName);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: Register failed!, error code: %{public}d", __func__, ret);
+            g_wifi->unregisterEventCallback(HdfWLanCallbackFun, ifName);
+            HdfWlanDelRemoteObj(cbFunc);
+        }
+    } while (0);
+
     (void)OsalMutexUnlock(&HdfStubDriver()->mutex);
     return ret;
 }
@@ -1037,6 +1069,27 @@ int32_t WlanInterfaceSetProjectionScreenParam(struct IWlanInterface *self, const
     } while (0);
     
     OsalMemFree(projScrnCmdParam);
+    return ret;
+}
+
+int32_t WlanInterfaceGetStaInfo(struct IWlanInterface *self, const char *ifName, struct WifiStationInfo *info,
+    const uint8_t *mac, uint32_t macLen)
+{
+    int32_t ret;
+
+    (void)self;
+    if (ifName == NULL || info == NULL || mac == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_wifi == NULL) {
+        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = g_wifi->getStationInfo(ifName, (StationInfo *)info, mac, macLen);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get station information failed!, error code: %{public}d", __func__, ret);
+    }
     return ret;
 }
 

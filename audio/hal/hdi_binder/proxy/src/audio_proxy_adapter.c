@@ -16,9 +16,9 @@
 #include "hdf_remote_service.h"
 #include "osal_mem.h"
 #include "audio_adapter_info_common.h"
-#include "audio_hal_log.h"
 #include "audio_proxy_common.h"
 #include "audio_proxy_internal.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 
@@ -736,6 +736,7 @@ int32_t AudioProxyAdapterGetPortCapability(struct AudioAdapter *adapter,
 int32_t AudioProxyAdapterSetAndGetPassthroughModeSBuf(struct HdfSBuf *data,
     const struct HdfSBuf *reply, const struct AudioPort *port)
 {
+    (void)reply;
     if (data == NULL || port == NULL || port->portName == NULL) {
         return HDF_FAILURE;
     }
@@ -893,4 +894,25 @@ int32_t AudioProxyAdapterGetPassthroughMode(struct AudioAdapter *adapter,
     *mode = (enum AudioPortPassthroughMode)tempMode;
     AudioProxyBufReplyRecycle(data, reply);
     return AUDIO_HAL_SUCCESS;
+}
+
+int32_t AudioProxyAdapterSetMicMute(struct AudioAdapter *adapter, bool mute)
+{
+    (void)adapter;
+    (void)mute;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioProxyAdapterGetMicMute(struct AudioAdapter *adapter, bool *mute)
+{
+    (void)adapter;
+    (void)mute;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioProxyAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume)
+{
+    (void)adapter;
+    (void)volume;
+    return HDF_ERR_NOT_SUPPORT;
 }

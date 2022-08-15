@@ -38,15 +38,15 @@ namespace {
     const int ERROR_GAIN_VALUE = MAX_GAIN_VALUE + 1;
     const int WAITE_TIME = 5;
     const int US_TO_MS = 1000;
-    constexpr int MIDDLE_VOlUME = 100;
+    constexpr int MIDDLE_VOLUME = 100;
 #ifdef PRODUCT_RK3568
-    constexpr int MAX_VOlUME = 255;
-    constexpr int MIN_VOlUME = 0;
+    constexpr int MAX_VOLUME = 255;
+    constexpr int MIN_VOLUME = 0;
     constexpr int OVER_MAX_VOLUME = 256;
     constexpr int BELOW_MIN_VOLUME = -1;
 #else
-    constexpr int MAX_VOlUME = 127;
-    constexpr int MIN_VOlUME = 40;
+    constexpr int MAX_VOLUME = 127;
+    constexpr int MIN_VOLUME = 40;
     constexpr int OVER_MAX_VOLUME = 128;
     constexpr int BELOW_MIN_VOLUME = 39;
 #endif
@@ -618,7 +618,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0014, TestSi
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0015, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t expectValue = MIDDLE_VOlUME;
+    int32_t expectValue = MIDDLE_VOLUME;
     struct HdfIoService *service = nullptr;
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -627,7 +627,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0015, TestSi
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
-        .value[0] = MIDDLE_VOlUME,
+        .value[0] = MIDDLE_VOLUME,
     };
     ret = WriteCtrlInfo(service, elemValue);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -645,7 +645,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0015, TestSi
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0016, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t expectValue = MIN_VOlUME;
+    int32_t expectValue = MIN_VOLUME;
     struct HdfIoService *service = nullptr;
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -654,7 +654,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0016, TestSi
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
-        .value[0] = MIN_VOlUME,
+        .value[0] = MIN_VOLUME,
     };
     ret = WriteCtrlInfo(service, elemValue);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -671,7 +671,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0016, TestSi
 HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0017, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t expectValue = MAX_VOlUME;
+    int32_t expectValue = MAX_VOLUME;
     struct HdfIoService *service = nullptr;
     service = HdfIoServiceBind(HDF_CONTROL_SERVICE.c_str());
     ASSERT_NE(nullptr, service);
@@ -680,7 +680,7 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0017, TestSi
         .id.cardServiceName = CARD_SEVICE_NAME.c_str(),
         .id.iface = AUDIODRV_CTL_ELEM_IFACE_MIXER,
         .id.itemName = "Main Playback Volume",
-        .value[0] = MAX_VOlUME,
+        .value[0] = MAX_VOLUME,
     };
     ret = WriteCtrlInfo(service, elemValue);
     EXPECT_EQ(HDF_SUCCESS, ret);

@@ -15,7 +15,7 @@
 
 #include "hdf_audio_server_capture.h"
 #include "osal_mem.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 #include "hdf_audio_server_common.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
@@ -131,7 +131,7 @@ int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct Hd
         AUDIO_FUNC_LOGE("read Render param failure!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
+    if (AudioAdapterListGetAdapter(adapterName, &adapter) < 0) {
         AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -186,7 +186,7 @@ int32_t HdiServiceCaptureDestory(const struct HdfDeviceIoClient *client, struct 
         AUDIO_FUNC_LOGE("DestroyCapture failed!");
         return ret;
     }
-    if (AudioDestroyCaptureInfoInAdapter(adapterName)) {
+    if (AudioDestroyCaptureInfoInAdapter(adapterName) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;

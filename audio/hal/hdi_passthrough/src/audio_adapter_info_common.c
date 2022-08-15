@@ -18,7 +18,7 @@
 #include <limits.h>
 #include "cJSON.h"
 #include "osal_mem.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
@@ -725,31 +725,35 @@ static char *AudioAdaptersGetConfig(const char *fpath)
         AUDIO_FUNC_LOGE("Can not open config file [ %{public}s ].\n", fpath);
         return NULL;
     }
-    fseek(fp, 0, SEEK_END);
+    if (fseek(fp, 0, SEEK_END) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("fseek fail!");
+        (void)fclose(fp);
+        return NULL;
+    }
     int32_t jsonStrSize = ftell(fp);
     if (jsonStrSize <= 0) {
-        fclose(fp);
+        (void)fclose(fp);
         return NULL;
     }
     rewind(fp);
     if (jsonStrSize > CONFIG_FILE_SIZE_MAX) {
         AUDIO_FUNC_LOGE("The configuration file is too large to load!\n");
-        fclose(fp);
+        (void)fclose(fp);
         return NULL;
     }
     pJsonStr = (char *)OsalMemCalloc((uint32_t)jsonStrSize + 1);
     if (pJsonStr == NULL) {
         AUDIO_FUNC_LOGE("alloc pJsonStr failed!");
-        fclose(fp);
+        (void)fclose(fp);
         return NULL;
     }
     if (fread(pJsonStr, jsonStrSize, 1, fp) != 1) {
         AUDIO_FUNC_LOGE("read to file fail!");
-        fclose(fp);
+        (void)fclose(fp);
         AudioMemFree((void **)&pJsonStr);
         return NULL;
     }
-    fclose(fp);
+    (void)fclose(fp);
     return pJsonStr;
 }
 
@@ -847,7 +851,10 @@ static void AudioAdaptersNamesRepair(void)
 
 static void AudioPortsNamesRepair(void)
 {
-    int i, j, adapterNum, portNum;
+    int32_t i;
+    int32_t j;
+    int32_t adapterNum;
+    uint32_t portNum;
 
     if (g_audioAdapterOut == NULL ||
         g_audioAdapterDescs == NULL || g_adapterNum <= 0) {
@@ -888,7 +895,10 @@ static void AudioAdaptersNamesRecord(void)
 
 static void AudioPortsNamesRecord(void)
 {
-    int i, j, adapterCurNum, portCurNum;
+    int32_t i;
+    int32_t j;
+    int32_t adapterCurNum;
+    uint32_t portCurNum;
 
     if (g_audioAdapterOut == NULL || g_audioAdapterDescs == NULL || g_adapterNum <= 0) {
         return;
@@ -1223,7 +1233,10 @@ int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamVal
     char *tempBuf = buffer;
     char *outPtr = NULL;
     char *inPtr = NULL;
-    while (i < MAP_MAX && ((mParaMap[i] = strtok_r(tempBuf, ";", &outPtr)) != NULL)) {
+    while (i < MAP_MAX) {
+        if ((mParaMap[i] = strtok_r(tempBuf, ";", &outPtr)) == NULL) {
+            break;
+        }
         tempBuf = mParaMap[i];
         if ((mParaMap[i] = strtok_r(tempBuf, "=", &inPtr)) != NULL) {
             ret = strncpy_s(mParamValMap[i].key, EXTPARAM_LEN - 1, mParaMap[i], strlen(mParaMap[i]) + 1);

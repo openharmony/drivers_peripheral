@@ -17,17 +17,11 @@
 #include "hdf_device_object.h"
 #include "audio_adapter_info_common.h"
 #include "audio_events.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 #include "hdf_audio_events.h"
 #include "hdf_audio_server_common.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_HOST
-
-#ifdef AUDIO_HAL_USER
-static void *g_mpiInitSo = NULL;
-#define SO_INTERFACE_LIB_MPI_PATH HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_mpi")
-#endif
-
 
 void AudioHdiPrimaryServerRelease(struct HdfDeviceObject *deviceObject)
 {
@@ -41,17 +35,6 @@ void AudioHdiPrimaryServerRelease(struct HdfDeviceObject *deviceObject)
         return;
     }
     deviceObject->service = NULL;
-#ifdef AUDIO_HAL_USER
-    if (g_mpiInitSo == NULL) {
-        return;
-    }
-    int32_t (*mpiExit)() = dlsym(g_mpiInitSo, "AudioMpiSysExit");
-    if (mpiExit == NULL) {
-        return;
-    }
-    mpiExit();
-    dlclose(g_mpiInitSo);
-#endif
     AUDIO_FUNC_LOGD("end!");
     return;
 }
@@ -69,7 +52,7 @@ int AudioHdiPrimaryServerBind(struct HdfDeviceObject *deviceObject)
         .Release = NULL,
     };
     AudioHdiSetLoadServerFlag(AUDIO_SERVER_PRIMARY);
-    if (HdiServiceGetFuncs()) {
+    if (HdiServiceGetFuncs() < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.audio_service");
@@ -90,20 +73,6 @@ int AudioHdiPrimaryServerInit(struct HdfDeviceObject *deviceObject)
         AUDIO_FUNC_LOGE("deviceObject is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-#ifdef AUDIO_HAL_USER
-    void *sdkHandle;
-    int (*sdkInitSp)() = NULL;
-    char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
-    sdkHandle = dlopen(sdkResolvedPath, RTLD_LAZY);
-    if (sdkHandle == NULL) {
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    sdkInitSp = (int32_t (*)())(dlsym(sdkHandle, "MpiSdkInit"));
-    if (sdkInitSp == NULL) {
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    sdkInitSp();
-#endif
     if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO)) {
         AUDIO_FUNC_LOGE("Set Primary DEVICE_CLASS_AUDIO fail!");
     }

@@ -16,8 +16,8 @@
 #ifndef DISTRIBUTED_CONSTANTS_H
 #define DISTRIBUTED_CONSTANTS_H
 
+#include <string>
 #include <vector>
-#include "types.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -54,7 +54,7 @@ const uint32_t WAIT_OPEN_TIMEOUT_SEC = 5;
 const std::string ENCODE_TYPE_STR_H264 = "OMX_hisi_video_encoder_avc";
 const std::string ENCODE_TYPE_STR_H265 = "OMX_hisi_video_encoder_hevc";
 const std::string ENCODE_TYPE_STR_JPEG = "jpeg";
-const std::string DH_LOG_TITLE_TAG = "DHFWK";
+const std::string DC_LOG_TITLE_TAG = "DCAMERA";
 constexpr int32_t LOG_MAX_LEN = 4096;
 
 typedef enum {
@@ -93,22 +93,6 @@ enum DCameraBufferUsage : uint64_t {
     CAMERA_USAGE_SW_READ_OFTEN = (1 << 0),
     CAMERA_USAGE_SW_WRITE_OFTEN = (1 << 1),
     CAMERA_USAGE_MEM_DMA = (1 << 2),
-};
-
-/* Each virtual camera must include these default resolution. */
-const std::vector<std::pair<uint32_t, uint32_t>> DEFAULT_FMT_VEC {
-/*
-    pair<uint32_t, uint32_t>(320, 240),
-    pair<uint32_t, uint32_t>(480, 360),
-    pair<uint32_t, uint32_t>(640, 360),
-    pair<uint32_t, uint32_t>(640, 480),
-    pair<uint32_t, uint32_t>(720, 540),
-    pair<uint32_t, uint32_t>(960, 540),
-    pair<uint32_t, uint32_t>(960, 720),
-    pair<uint32_t, uint32_t>(1280, 720),
-    pair<uint32_t, uint32_t>(1440, 1080),
-    pair<uint32_t, uint32_t>(1920, 1080)
-*/
 };
 
 using DCSceneType = enum _DCSceneType : int32_t {

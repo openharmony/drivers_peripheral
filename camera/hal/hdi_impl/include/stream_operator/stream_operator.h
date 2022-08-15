@@ -16,39 +16,36 @@
 #ifndef STREAM_OPERATOR_STREAM_OPERATOR_H
 #define STREAM_OPERATOR_STREAM_OPERATOR_H
 
-#include "camera_device.h"
+#include <set>
+#include "v1_0/icamera_device.h"
 #include "capture_message.h"
 #include "istream.h"
-#include "istream_operator.h"
+#include "v1_0/istream_operator.h"
 #include "offline_stream_operator.h"
 #include "offline_stream.h"
-#include "stream_operator_stub.h"
 #include "surface.h"
-#include "types.h"
+#include "v1_0/types.h"
+
 namespace OHOS::Camera {
-class StreamOperator : public StreamOperatorStub {
+using namespace OHOS::HDI::Camera::V1_0;
+class StreamOperator : public IStreamOperator {
 public:
-    CamRetCode IsStreamsSupported(OperationMode mode,
-                                          const std::shared_ptr<CameraMetadata>& modeSetting,
-                                          const std::vector<std::shared_ptr<StreamInfo>>& pInfo,
-                                          StreamSupportType& type) override;
-    CamRetCode CreateStreams(const std::vector<std::shared_ptr<StreamInfo>>& streamInfos) override;
-    CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override;
-    CamRetCode CommitStreams(OperationMode mode,
-                                     const std::shared_ptr<CameraMetadata>& modeSetting) override;
-    CamRetCode GetStreamAttributes(std::vector<std::shared_ptr<StreamAttribute>>& attributes) override;
-    CamRetCode AttachBufferQueue(int streamId, const OHOS::sptr<OHOS::IBufferProducer>& producer) override;
-    CamRetCode DetachBufferQueue(int streamId) override;
-    CamRetCode
-        Capture(int captureId, const std::shared_ptr<CaptureInfo>& captureInfo, bool isStreaming) override;
-    CamRetCode CancelCapture(int captureId) override;
-    CamRetCode ChangeToOfflineStream(const std::vector<int>& streamIds,
-                                             OHOS::sptr<IStreamOperatorCallback>& callback,
-                                             OHOS::sptr<IOfflineStreamOperator>& offlineOperator) override;
+    int32_t IsStreamsSupported(OperationMode mode, const std::vector<uint8_t>& modeSetting,
+                               const std::vector<StreamInfo>& infos, StreamSupportType& type) override;
+    int32_t CreateStreams(const std::vector<StreamInfo>& streamInfos) override;
+    int32_t ReleaseStreams(const std::vector<int32_t>& streamIds) override;
+    int32_t CommitStreams(OperationMode mode, const std::vector<uint8_t>& modeSetting) override;
+    int32_t GetStreamAttributes(std::vector<StreamAttribute>& attributes) override;
+    int32_t AttachBufferQueue(int32_t streamId, const sptr<BufferProducerSequenceable>& bufferProducer);
+    int32_t DetachBufferQueue(int32_t streamId) override;
+    int32_t Capture(int32_t captureId, const CaptureInfo& info, bool isStreaming) override;
+    int32_t CancelCapture(int32_t captureId) override;
+    int32_t ChangeToOfflineStream(const std::vector<int32_t>& streamIds,
+        const sptr<IStreamOperatorCallback>& callbackObj, sptr<IOfflineStreamOperator>& offlineOperator) override;
 
 public:
     StreamOperator() = default;
-    StreamOperator(const OHOS::sptr<IStreamOperatorCallback>& callback, const std::weak_ptr<CameraDevice>& device);
+    StreamOperator(const OHOS::sptr<IStreamOperatorCallback>& callback, const std::weak_ptr<ICameraDevice>& device);
     virtual ~StreamOperator();
     StreamOperator(const StreamOperator& other) = delete;
     StreamOperator(StreamOperator&& other) = delete;
@@ -61,17 +58,20 @@ public:
 private:
     void HandleCallbackMessage(MessageGroup& message);
     void OnCaptureStarted(int32_t captureId, const std::vector<int32_t>& streamIds);
-    void OnCaptureEnded(int32_t captureId, const std::vector<std::shared_ptr<CaptureEndedInfo>>& infos);
-    void OnCaptureError(int32_t captureId, const std::vector<std::shared_ptr<CaptureErrorInfo>>& infos);
+    void OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos);
+    void OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos);
     void OnFrameShutter(int32_t captureId, const std::vector<int32_t>& streamIds, uint64_t timestamp);
-    bool CheckStreamInfo(const std::shared_ptr<StreamInfo>& streamInfo);
+    bool CheckStreamInfo(const StreamInfo streamInfo);
     DynamicStreamSwitchMode CheckStreamsSupported(OperationMode mode,
                                                   const std::shared_ptr<CameraMetadata>& modeSetting,
-                                                  const std::vector<std::shared_ptr<StreamInfo>>& infos);
-
+                                                  const std::vector<StreamInfo>& infos);
+    void StreamInfoToStreamConfiguration(StreamConfiguration &scg, const StreamInfo info);
+    void GetStreamSupportType(std::set<int32_t> inputIDSet,
+                              DynamicStreamSwitchMode method,
+                              StreamSupportType& type);
 private:
     OHOS::sptr<IStreamOperatorCallback> callback_ = nullptr;
-    std::weak_ptr<CameraDevice> device_;
+    std::weak_ptr<ICameraDevice> device_;
     std::shared_ptr<IPipelineCore> pipelineCore_ = nullptr;
     std::shared_ptr<IStreamPipelineCore> streamPipeline_ = nullptr;
     std::shared_ptr<CaptureMessageOperator> messenger_ = nullptr;

@@ -122,6 +122,7 @@ int DisplayDeviceDriverBind(struct HdfDeviceObject *deviceObject)
 
 int DisplayDeviceDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
     DISPLAY_START;
     DISPLAY_END;
     return HDF_SUCCESS;

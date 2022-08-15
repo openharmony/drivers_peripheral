@@ -16,12 +16,12 @@
 #ifndef DISTRIBUTED_CAMERA_OFFLINE_STREAM_OPERATOR_H
 #define DISTRIBUTED_CAMERA_OFFLINE_STREAM_OPERATOR_H
 
-#include "doffline_stream_operator_stub.h"
-#include "dcamera.h"
+#include "v1_0/ioffline_stream_operator.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-class DOfflineStreamOperator : public DOfflineStreamOperatorStub {
+using namespace OHOS::HDI::Camera::V1_0;
+class DOfflineStreamOperator : public IOfflineStreamOperator {
 public:
     DOfflineStreamOperator() = default;
     virtual ~DOfflineStreamOperator() = default;
@@ -31,9 +31,9 @@ public:
     DOfflineStreamOperator& operator=(DOfflineStreamOperator &&other) = delete;
 
 public:
-    virtual CamRetCode CancelCapture(int captureId) override;
-    virtual CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override;
-    virtual CamRetCode Release() override;
+    int32_t CancelCapture(int32_t captureId) override;
+    int32_t ReleaseStreams(const std::vector<int32_t>& streamIds) override;
+    int32_t Release() override;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

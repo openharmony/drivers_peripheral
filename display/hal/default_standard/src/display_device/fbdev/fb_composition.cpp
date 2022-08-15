@@ -69,6 +69,7 @@ int32_t FbComposition::SetLayers(std::vector<HdiLayer*> &layers, HdiLayer &clien
 
 int32_t FbComposition::Apply(bool modeSet)
 {
+    (void)modeSet;
     DISPLAY_LOGD("mCompLayers size %{public}zu", mCompLayers.size());
     for (uint32_t i = 0; i < mCompLayers.size(); i++) {
         int fence = -1;

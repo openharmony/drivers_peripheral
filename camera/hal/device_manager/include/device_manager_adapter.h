@@ -41,7 +41,7 @@ enum ManagerId {
     DM_M_MAX
 };
 
-enum ControllerId : uint32_t{
+enum ControllerId : uint32_t {
     DM_C_ISP,
     DM_C_SENSOR,
     DM_C_FLASH,

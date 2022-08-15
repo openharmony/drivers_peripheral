@@ -341,7 +341,7 @@ static struct Serial *SerialAlloc(void)
     return port;
 }
 
-static int32_t ParseInterfaces(struct AcmDevice *acmDevice)
+static int32_t ParseInterfaces(struct AcmDevice *const acmDevice)
 {
     uint32_t i;
     uint32_t j;
@@ -662,7 +662,7 @@ static void Resume(struct AcmDevice *acm)
     OsalMutexUnlock(&port->lock);
 }
 
-void AcmEventCallback(struct UsbFnEvent *event)
+void AcmEventCallback(struct UsbFnEvent * const event)
 {
     struct AcmDevice *acm = nullptr;
 
@@ -754,7 +754,7 @@ static int32_t FreeNotifyRequest(struct AcmDevice *acmDevice)
     return HDF_SUCCESS;
 }
 
-static int32_t FreeCtrlRequests(struct AcmDevice *acmDevice)
+static int32_t FreeCtrlRequests(struct AcmDevice * const acmDevice)
 {
     struct DListHead *head = &acmDevice->ctrlPool;
     struct UsbFnRequest *req = nullptr;

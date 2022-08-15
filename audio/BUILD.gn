@@ -19,7 +19,7 @@ group("hdi_audio") {
   if (drivers_peripheral_audio_user_mode == false) {
     deps = [ "hal/hdi_passthrough:hdi_audio" ]
   } else {
-    deps = [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+    deps = [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
   }
 
   if (defined(ohos_lite)) {
@@ -34,6 +34,11 @@ group("hdi_audio") {
         "hal/hdi_binder/server:hdi_audio_primary_server",
         "hal/hdi_binder/server:hdi_audio_usb_server",
       ]
+    }
+    deps += [ "hdi_service:idl_audio" ]
+
+    if (drivers_peripheral_audio_alsa_lib) {
+      deps += [ "config/linux:hdf_alsa_adapter_json" ]
     }
   }
 
@@ -67,8 +72,5 @@ group("audio_sample_client") {
       "sample:audio_sample_capture",
       "sample:audio_sample_render",
     ]
-  }
-  if (defined(ohos_lite) && ohos_lite == false) {
-    deps += [ "sample:audio_sample_event" ]
   }
 }

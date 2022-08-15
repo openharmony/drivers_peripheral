@@ -35,6 +35,7 @@ static int32_t DisplayHdiServiceDispatch(struct HdfDeviceIoClient *client, int c
 
 static int32_t HdfDisplayHostDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
     HDF_LOGI("%{public}s: enter", __func__);
     return HDF_SUCCESS;
 }
@@ -72,12 +73,12 @@ struct HdfDriverEntry g_displayHostDriverEntry = {
     .Release = HdfDisplayHostDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 HDF_INIT(g_displayHostDriverEntry);
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */

@@ -17,9 +17,9 @@
 #include <limits.h>
 #include "osal_mem.h"
 #include "audio_adapter_info_common.h"
-#include "audio_hal_log.h"
 #include "audio_interface_lib_capture.h"
 #include "audio_interface_lib_render.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
@@ -109,8 +109,7 @@ int32_t InitCaptureSoHandle(const char *captureSoPath)
         return HDF_FAILURE;
     }
     if (g_ptrCaptureHandle == NULL) {
-        char *cPathBuf = pathBuf;
-        g_ptrCaptureHandle = dlopen(cPathBuf, RTLD_LAZY);
+        g_ptrCaptureHandle = dlopen(pathBuf, RTLD_LAZY);
         if (g_ptrCaptureHandle == NULL) {
             AUDIO_FUNC_LOGE("open lib capture so fail, reason:%{public}s", dlerror());
             return HDF_FAILURE;
@@ -138,8 +137,7 @@ int32_t InitRenderSoHandle(const char *renderSoPath)
         return HDF_FAILURE;
     }
     if (g_ptrRenderHandle == NULL) {
-        char *cPathBuf = pathBuf;
-        g_ptrRenderHandle = dlopen(cPathBuf, RTLD_LAZY);
+        g_ptrRenderHandle = dlopen(pathBuf, RTLD_LAZY);
         if (g_ptrRenderHandle == NULL) {
             AUDIO_FUNC_LOGE("open lib render so fail, reason:%{public}s", dlerror());
             return HDF_FAILURE;
@@ -168,8 +166,7 @@ int32_t InitPathSelectSoHandle(const char *pathSelectSoPath)
         return HDF_FAILURE;
     }
     if (g_ptrPathSelHandle == NULL) {
-        char *cPathBuf = pathBuf;
-        g_ptrPathSelHandle = dlopen(cPathBuf, RTLD_LAZY);
+        g_ptrPathSelHandle = dlopen(pathBuf, RTLD_LAZY);
         if (g_ptrPathSelHandle == NULL) {
             AUDIO_FUNC_LOGE("open lib PathSelct so fail, reason:%s", dlerror());
             return HDF_FAILURE;
@@ -411,7 +408,7 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
         return;
     }
     if (hwAdapter->portCapabilitys != NULL) {
-        int32_t portNum = hwAdapter->adapterDescriptor.portNum;
+        uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
         int32_t i = 0;
         while (i < portNum) {
             if (&hwAdapter->portCapabilitys[i] != NULL) {

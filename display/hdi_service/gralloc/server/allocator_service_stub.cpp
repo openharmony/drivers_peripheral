@@ -40,7 +40,6 @@ int32_t AllocatorServiceStub::AllocaltorStubAllocMem(MessageParcel &data, Messag
     }
     BufferHandle *buffer = nullptr;
     int32_t errCode = AllocMem(info, buffer);
-
     if (!reply.WriteInt32(errCode)) {
         HDF_LOGE("AllocMem: write reply failed!");
         return HDF_FAILURE;

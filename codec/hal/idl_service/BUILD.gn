@@ -1,0 +1,112 @@
+# Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+import("//build/ohos.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+
+ohos_shared_library("libcodec_component_manager_service_1.0") {
+  include_dirs = [
+    "//drivers/peripheral/codec/hal/buffersequence/",
+    "//drivers/peripheral/codec/interfaces/include/",
+    "//third_party/openmax/api/1.1.2",
+    "include",
+  ]
+  sources = [
+    "src/codec_component_config.cpp",
+    "src/codec_component_manager_service.cpp",
+    "src/codec_component_service.cpp",
+    "src/codec_dyna_buffer.cpp",
+    "src/codec_handle_buffer.cpp",
+    "src/codec_omx_core.cpp",
+    "src/codec_share_buffer.cpp",
+    "src/component_mgr.cpp",
+    "src/component_node.cpp",
+    "src/icodec_buffer.cpp",
+  ]
+
+  cflags_cc = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-#warnings",
+    "-Wno-missing-braces",
+    "-Wno-missing-field-initializers",
+  ]
+
+  deps = [
+    "//drivers/peripheral/codec/hal/buffersequence:libbufferhandle_parcelable",
+    "//third_party/libdrm:libdrm",
+  ]
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_codec:codec_idl_headers",
+      "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_single",
+      "utils_base:utils",
+    ]
+  } else {
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+}
+
+ohos_shared_library("libcodec_driver") {
+  include_dirs = [
+    "//drivers/peripheral/codec/interfaces/include/",
+    "//drivers/peripheral/codec/hal/buffersequence",
+    "include",
+  ]
+
+  sources = [ "src/codec_component_manager_driver.cpp" ]
+
+  deps = [ ":libcodec_component_manager_service_1.0" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_codec:codec_idl_headers",
+      "drivers_interface_codec:libcodec_stub_1.0",
+      "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_single",
+      "utils_base:utils",
+    ]
+  } else {
+    external_deps = [
+      "hilog:libhilog",
+      "ipc:ipc_single",
+    ]
+  }
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+}
+
+group("codec_idl_omx_service") {
+  deps = [
+    ":libcodec_component_manager_service_1.0",
+    ":libcodec_driver",
+  ]
+}

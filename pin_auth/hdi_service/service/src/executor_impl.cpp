@@ -23,7 +23,7 @@
 #include "parameter.h"
 #include "sysparam_errno.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_PIN_AUTH_IMPL
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_PIN_AUTH_IMPL
 
 namespace OHOS {
 namespace HDI {
@@ -35,7 +35,7 @@ static constexpr uint32_t AUTH_PIN = 1;
 static constexpr uint32_t OPENSSL_SUCCESS = 1;
 static constexpr uint32_t SUCCESS = 0;
 
-ExecutorImpl::ExecutorImpl(std::shared_ptr<OHOS::UserIAM::PinAuth::PinAuth> pinHdi) : pinHdi_(pinHdi) {}
+ExecutorImpl::ExecutorImpl(std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi) : pinHdi_(pinHdi) {}
 
 int32_t ExecutorImpl::GetExecutorInfo(ExecutorInfo &info)
 {
@@ -67,7 +67,7 @@ int32_t ExecutorImpl::GetTemplateInfo(uint64_t templateId, TemplateInfo &info)
         IAM_LOGE("pinHdi_ is nullptr");
         return HDF_FAILURE;
     }
-    OHOS::UserIAM::PinAuth::PinCredentialInfo infoRet = {};
+    OHOS::UserIam::PinAuth::PinCredentialInfo infoRet = {};
     int32_t result = pinHdi_->QueryPinInfo(templateId, infoRet);
     if (result != SUCCESS) {
         IAM_LOGE("Get TemplateInfo failed, fail code : %{public}d", result);
@@ -176,7 +176,7 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, con
         CallError(callbackObj, GENERAL_ERROR);
         return result;
     }
-    OHOS::UserIAM::PinAuth::PinCredentialInfo infoRet = {};
+    OHOS::UserIam::PinAuth::PinCredentialInfo infoRet = {};
     result = pinHdi_->QueryPinInfo(templateId, infoRet);
     if (result != SUCCESS) {
         IAM_LOGE("Get TemplateInfo failed, fail code : %{public}d", result);

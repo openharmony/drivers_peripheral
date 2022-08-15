@@ -108,11 +108,11 @@ static void WifiEventScanResultProcess(const char *ifName, uint32_t event, struc
     WifiScanResult scanResult = { 0 };
     uint32_t len = 0;
 
-    if (!HdfSbufReadInt16(reqData, &(scanResult.beaconInt))) {
+    if (!HdfSbufReadUint16(reqData, &(scanResult.beaconInt))) {
         HDF_LOGE("%s: fail to get beaconInt", __FUNCTION__);
         return;
     }
-    if (!HdfSbufReadInt16(reqData, &(scanResult.caps))) {
+    if (!HdfSbufReadUint16(reqData, &(scanResult.caps))) {
         HDF_LOGE("%s: fail to get caps", __FUNCTION__);
         return;
     }
@@ -120,11 +120,11 @@ static void WifiEventScanResultProcess(const char *ifName, uint32_t event, struc
         HDF_LOGE("%s: fail to get level", __FUNCTION__);
         return;
     }
-    if (!HdfSbufReadInt32(reqData, &(scanResult.freq))) {
+    if (!HdfSbufReadUint32(reqData, &(scanResult.freq))) {
         HDF_LOGE("%s: fail to get freq", __FUNCTION__);
         return;
     }
-    if (!HdfSbufReadInt32(reqData, &(scanResult.flags))) {
+    if (!HdfSbufReadUint32(reqData, &(scanResult.flags))) {
         HDF_LOGE("%s: fail to get flags", __FUNCTION__);
         return;
     }

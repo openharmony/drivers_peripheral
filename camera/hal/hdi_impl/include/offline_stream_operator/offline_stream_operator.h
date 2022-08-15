@@ -17,19 +17,20 @@
 #define HOS_CAMERA_OFFLINE_STREAM_OPERATOR_H
 
 #include "camera.h"
-#include "offline_stream_operator_stub.h"
+#include "v1_0/ioffline_stream_operator.h"
 #include "offline_stream.h"
 #include <map>
 #include <mutex>
 
 namespace OHOS::Camera {
-class OfflineStreamOperator : public OfflineStreamOperatorStub {
+using namespace OHOS::HDI::Camera::V1_0;
+class OfflineStreamOperator : public IOfflineStreamOperator {
 public:
     OfflineStreamOperator();
     virtual ~OfflineStreamOperator();
-    CamRetCode CancelCapture(int captureId) override;
-    CamRetCode ReleaseStreams(const std::vector<int>& streamIds) override;
-    CamRetCode Release() override;
+    int32_t CancelCapture(int32_t captureId)  override;
+    int32_t ReleaseStreams(const std::vector<int32_t>& streamIds) override;
+    int32_t Release() override;
 
 public:
     RetCode CommitOfflineStream(const std::shared_ptr<OfflineStream>& of);

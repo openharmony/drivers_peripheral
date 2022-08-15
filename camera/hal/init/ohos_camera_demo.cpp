@@ -14,6 +14,7 @@
  */
 
 #include "ohos_camera_demo.h"
+#include "metadata_utils.h"
 
 namespace OHOS::Camera {
 OhosCameraDemo::OhosCameraDemo() {}
@@ -27,39 +28,42 @@ const int32_t AF_REGIONS_X = 400;
 const int32_t AF_REGIONS_Y = 200;
 const int32_t FPS_RANGE = 30;
 
-void OhosCameraDemo::SetStreamInfo(std::shared_ptr<StreamInfo> &streamInfo,
+void OhosCameraDemo::SetStreamInfo(StreamInfo& streamInfo,
     const std::shared_ptr<StreamCustomer> &streamCustomer,
     const int streamId, const StreamIntent intent)
 {
     constexpr uint32_t dataspace = 8;
     constexpr uint32_t tunneledMode = 5;
+    sptr<OHOS::IBufferProducer> producer;
 
     if (intent == PREVIEW) {
         constexpr uint32_t width = CAMERA_PREVIEW_WIDTH;
         constexpr uint32_t height = CAMERA_PREVIEW_HEIGHT;
-        streamInfo->width_ = width;
-        streamInfo->height_ = height;
+        streamInfo.width_ = width;
+        streamInfo.height_ = height;
     } else if (intent == STILL_CAPTURE) {
         constexpr uint32_t width = CAMERA_CAPTURE_WIDTH;
         constexpr uint32_t height = CAMERA_CAPTURE_HEIGHT;
-        streamInfo->width_ = width;
-        streamInfo->height_ = height;
-        streamInfo->encodeType_ = CAMERA_CAPTURE_ENCODE_TYPE;
+        streamInfo.width_ = width;
+        streamInfo.height_ = height;
+        streamInfo.encodeType_ = CAMERA_CAPTURE_ENCODE_TYPE;
     } else {
         constexpr uint32_t width = CAMERA_VIDEO_WIDTH;
         constexpr uint32_t height = CAMERA_VIDEO_HEIGHT;
-        streamInfo->width_ = width;
-        streamInfo->height_ = height;
-        streamInfo->encodeType_ = CAMERA_VIDEO_ENCODE_TYPE;
+        streamInfo.width_ = width;
+        streamInfo.height_ = height;
+        streamInfo.encodeType_ = CAMERA_VIDEO_ENCODE_TYPE;
     }
 
-    streamInfo->streamId_ = streamId;
-    streamInfo->format_ =  CAMERA_FORMAT;
-    streamInfo->dataspace_ = dataspace;
-    streamInfo->intent_ = intent;
-    streamInfo->tunneledMode_ = tunneledMode;
-    streamInfo->bufferQueue_ = streamCustomer->CreateProducer();
-    streamInfo->bufferQueue_->SetQueueSize(8); // 8:set bufferQueue size
+    streamInfo.streamId_ = streamId;
+    streamInfo.format_ =  CAMERA_FORMAT;
+    streamInfo.dataspace_ = dataspace;
+    streamInfo.intent_ = intent;
+    streamInfo.tunneledMode_ = tunneledMode;
+
+    producer = streamCustomer->CreateProducer();
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
 }
 
 void OhosCameraDemo::GetStreamOpt()
@@ -69,12 +73,12 @@ void OhosCameraDemo::GetStreamOpt()
     if (streamOperator_ == nullptr) {
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
         const std::shared_ptr<IStreamOperatorCallback> streamOperatorCallback =
-            std::make_shared<StreamOperatorCallback>();
+            std::make_shared<DemoStreamOperatorCallback>();
 #else
-        const sptr<IStreamOperatorCallback> streamOperatorCallback = new StreamOperatorCallback();
+        const sptr<IStreamOperatorCallback> streamOperatorCallback = new DemoStreamOperatorCallback();
 #endif
         rc = demoCameraDevice_->GetStreamOperator(streamOperatorCallback, streamOperator_);
-        if (rc != Camera::NO_ERROR) {
+        if (rc != HDI::Camera::V1_0::NO_ERROR) {
             CAMERA_LOGE("demo test: GetStreamOpt GetStreamOperator fail\n");
             streamOperator_ = nullptr;
         }
@@ -109,19 +113,20 @@ RetCode OhosCameraDemo::CaptureON(const int streamId,
         captureSetting_->addEntry(OHOS_JPEG_GPS_COORDINATES, gps_.data(), gps_.size());
     }
 
-    captureInfo_ = std::make_shared<CaptureInfo>();
-    captureInfo_->streamIds_ = {streamId};
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(captureSetting_, setting);
+    captureInfo_.streamIds_ = {streamId};
     if (mode == CAPTURE_SNAPSHOT) {
-        captureInfo_->captureSetting_ = captureSetting_;
+        captureInfo_.captureSetting_ = setting;
     } else {
-        captureInfo_->captureSetting_ = ability_;
+        captureInfo_.captureSetting_ = cameraAbility_;
     }
-    captureInfo_->enableShutterCallback_ = false;
+    captureInfo_.enableShutterCallback_ = false;
 
     int rc = streamOperator_->Capture(captureId, captureInfo_, true);
-    if (rc != Camera::NO_ERROR) {
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("demo test: CaptureStart Capture error\n");
-        streamOperator_->ReleaseStreams(captureInfo_->streamIds_);
+        streamOperator_->ReleaseStreams(captureInfo_.streamIds_);
         return RC_ERROR;
     }
 
@@ -166,7 +171,7 @@ RetCode OhosCameraDemo::CaptureOff(const int captureId, const CaptureMode mode)
         videoFd_ = -1;
     }
 
-    if (rc != Camera::NO_ERROR) {
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("demo test: CaptureOff CancelCapture error mode %{public}d rc == %{public}d\n", mode, rc);
         return RC_ERROR;
     }
@@ -187,30 +192,25 @@ RetCode OhosCameraDemo::CreateStream(const int streamId, std::shared_ptr<StreamC
         return RC_ERROR;
     }
 
-    std::shared_ptr<StreamInfo> streamInfo = std::make_shared<StreamInfo>();
-    if (streamInfo == nullptr) {
-        CAMERA_LOGE("demo test: std::make_shared<Camera::StreamInfo>() is nullptr\n");
-        return RC_ERROR;
-    }
+    StreamInfo streamInfo = {0};
 
     SetStreamInfo(streamInfo, streamCustomer, streamId, intent);
-    if (streamInfo->bufferQueue_ == nullptr) {
+    if (streamInfo.bufferQueue_->producer_ == nullptr) {
         CAMERA_LOGE("demo test: CreateStream CreateProducer(); is nullptr\n");
         return RC_ERROR;
     }
 
-    std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    std::vector<std::shared_ptr<StreamInfo>>().swap(streamInfos);
+    std::vector<StreamInfo> streamInfos;
     streamInfos.push_back(streamInfo);
 
     rc = streamOperator_->CreateStreams(streamInfos);
-    if (rc != Camera::NO_ERROR) {
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("demo test: CreateStream CreateStreams error\n");
         return RC_ERROR;
     }
 
-    rc = streamOperator_->CommitStreams(Camera::NORMAL, ability_);
-    if (rc != Camera::NO_ERROR) {
+    rc = streamOperator_->CommitStreams(NORMAL, cameraAbility_);
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("demo test: CreateStream CommitStreams error\n");
         std::vector<int> streamIds;
         streamIds.push_back(streamId);
@@ -239,12 +239,9 @@ RetCode OhosCameraDemo::InitCameraDevice()
         return RC_ERROR;
     }
     const std::string cameraId = cameraIds_.front();
-    demoCameraHost_->GetCameraAbility(cameraId, ability_);
+    demoCameraHost_->GetCameraAbility(cameraId, cameraAbility_);
 
-    if (ability_ == nullptr) {
-        CAMERA_LOGE("demo test: InitCameraDevice ability_ == nullptr");
-        return RC_ERROR;
-    }
+    MetadataUtils::ConvertVecToMetadata(cameraAbility_, ability_);
 
     GetFaceDetectMode(ability_);
     GetFocalLength(ability_);
@@ -268,7 +265,7 @@ RetCode OhosCameraDemo::InitCameraDevice()
     sptr<DemoCameraDeviceCallback> callback = new DemoCameraDeviceCallback();
 #endif
     rc = demoCameraHost_->OpenCamera(cameraIds_.front(), callback, demoCameraDevice_);
-    if (rc != Camera::NO_ERROR || demoCameraDevice_ == nullptr) {
+    if (rc != HDI::Camera::V1_0::NO_ERROR || demoCameraDevice_ == nullptr) {
         CAMERA_LOGE("demo test: InitCameraDevice OpenCamera failed");
         return RC_ERROR;
     }
@@ -300,7 +297,7 @@ RetCode OhosCameraDemo::InitSensors()
     demoCameraHost_ = OHOS::Camera::CameraHost::CreateCameraHost();
 #else
     constexpr const char *DEMO_SERVICE_NAME = "camera_service";
-    demoCameraHost_ = ICameraHost::Get(DEMO_SERVICE_NAME);
+    demoCameraHost_ = ICameraHost::Get(DEMO_SERVICE_NAME, false);
 #endif
     if (demoCameraHost_ == nullptr) {
         CAMERA_LOGE("demo test: ICameraHost::Get error");
@@ -308,12 +305,12 @@ RetCode OhosCameraDemo::InitSensors()
     }
 
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
-    hostCallback_ = std::make_shared<CameraHostCallback>();
+    hostCallback_ = std::make_shared<DemoCameraHostCallback>();
 #else
-    hostCallback_ = new CameraHostCallback();
+    hostCallback_ = new DemoCameraHostCallback();
 #endif
     rc = demoCameraHost_->SetCallback(hostCallback_);
-    if (rc != Camera::NO_ERROR) {
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("demo test: demoCameraHost_->SetCallback(hostCallback_) error");
         return RC_ERROR;
     }
@@ -393,8 +390,8 @@ void OhosCameraDemo::OpenVideoFile()
 RetCode OhosCameraDemo::CreateStreams(const int streamIdSecond, StreamIntent intent)
 {
     int rc = 0;
-    std::vector<std::shared_ptr<StreamInfo>> streamInfos;
-    std::vector<std::shared_ptr<StreamInfo>>().swap(streamInfos);
+    std::vector<StreamInfo> streamInfos;
+    std::vector<StreamInfo>().swap(streamInfos);
 
     CAMERA_LOGD("demo test: CreateStreams streamIdSecond = %{public}d", streamIdSecond);
     GetStreamOpt();
@@ -403,24 +400,16 @@ RetCode OhosCameraDemo::CreateStreams(const int streamIdSecond, StreamIntent int
         return RC_ERROR;
     }
 
-    std::shared_ptr<StreamInfo> previewStreamInfo = std::make_shared<StreamInfo>();
-    if (previewStreamInfo == nullptr) {
-        CAMERA_LOGE("demo test: CreateStreams previewStreamInfo is nullptr\n");
-        return RC_ERROR;
-    }
+    StreamInfo previewStreamInfo = {0};
 
     SetStreamInfo(previewStreamInfo, streamCustomerPreview_, STREAM_ID_PREVIEW, PREVIEW);
-    if (previewStreamInfo->bufferQueue_ == nullptr) {
+    if (previewStreamInfo.bufferQueue_->producer_ == nullptr) {
         CAMERA_LOGE("demo test: CreateStream CreateProducer(); is nullptr\n");
         return RC_ERROR;
     }
     streamInfos.push_back(previewStreamInfo);
 
-    std::shared_ptr<StreamInfo> secondStreamInfo = std::make_shared<StreamInfo>();
-    if (secondStreamInfo == nullptr) {
-        CAMERA_LOGE("demo test: CreateStreams previewStreamInfo is nullptr\n");
-        return RC_ERROR;
-    }
+    StreamInfo secondStreamInfo = {0};
 
     if (streamIdSecond == STREAM_ID_CAPTURE) {
         SetStreamInfo(secondStreamInfo, streamCustomerCapture_, STREAM_ID_CAPTURE, intent);
@@ -428,20 +417,20 @@ RetCode OhosCameraDemo::CreateStreams(const int streamIdSecond, StreamIntent int
         SetStreamInfo(secondStreamInfo, streamCustomerVideo_, STREAM_ID_VIDEO, intent);
     }
 
-    if (secondStreamInfo->bufferQueue_ == nullptr) {
+    if (secondStreamInfo.bufferQueue_->producer_ == nullptr) {
         CAMERA_LOGE("demo test: CreateStreams CreateProducer() secondStreamInfo is nullptr\n");
         return RC_ERROR;
     }
     streamInfos.push_back(secondStreamInfo);
 
     rc = streamOperator_->CreateStreams(streamInfos);
-    if (rc != Camera::NO_ERROR) {
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("demo test: CreateStream CreateStreams error\n");
         return RC_ERROR;
     }
 
-    rc = streamOperator_->CommitStreams(Camera::NORMAL, ability_);
-    if (rc != Camera::NO_ERROR) {
+    rc = streamOperator_->CommitStreams(NORMAL, cameraAbility_);
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("demo test: CreateStream CommitStreams error\n");
         std::vector<int> streamIds = {STREAM_ID_PREVIEW, streamIdSecond};
         streamOperator_->ReleaseStreams(streamIds);
@@ -456,29 +445,29 @@ RetCode OhosCameraDemo::CaptureOnDualStreams(const int streamIdSecond)
     int rc = 0;
     CAMERA_LOGD("demo test: CaptuCaptureOnDualStreamsreON enter");
 
-    std::shared_ptr<CaptureInfo> previewCaptureInfo = std::make_shared<CaptureInfo>();
-    previewCaptureInfo->streamIds_ = {STREAM_ID_PREVIEW};
-    previewCaptureInfo->captureSetting_ = ability_;
-    previewCaptureInfo->enableShutterCallback_ = false;
+    CaptureInfo previewCaptureInfo;
+    previewCaptureInfo.streamIds_ = {STREAM_ID_PREVIEW};
+    previewCaptureInfo.captureSetting_ = cameraAbility_;
+    previewCaptureInfo.enableShutterCallback_ = false;
 
     rc = streamOperator_->Capture(CAPTURE_ID_PREVIEW, previewCaptureInfo, true);
-    if (rc != Camera::NO_ERROR) {
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("demo test: CaptureOnDualStreams preview Capture error\n");
-        streamOperator_->ReleaseStreams(previewCaptureInfo->streamIds_);
+        streamOperator_->ReleaseStreams(previewCaptureInfo.streamIds_);
         return RC_ERROR;
     }
     streamCustomerPreview_->ReceiveFrameOn(nullptr);
 
-    std::shared_ptr<CaptureInfo> secondCaptureInfo = std::make_shared<CaptureInfo>();
-    secondCaptureInfo->streamIds_ = {streamIdSecond};
-    secondCaptureInfo->captureSetting_ = ability_;
-    previewCaptureInfo->enableShutterCallback_ = false;
+    CaptureInfo secondCaptureInfo;
+    secondCaptureInfo.streamIds_ = {streamIdSecond};
+    secondCaptureInfo.captureSetting_ = cameraAbility_;
+    previewCaptureInfo.enableShutterCallback_ = false;
 
     if (streamIdSecond == STREAM_ID_CAPTURE) {
         rc = streamOperator_->Capture(CAPTURE_ID_CAPTURE, secondCaptureInfo, true);
-        if (rc != Camera::NO_ERROR) {
+        if (rc != HDI::Camera::V1_0::NO_ERROR) {
             CAMERA_LOGE("demo test: CaptureOnDualStreams CAPTURE_ID_CAPTURE error\n");
-            streamOperator_->ReleaseStreams(secondCaptureInfo->streamIds_);
+            streamOperator_->ReleaseStreams(secondCaptureInfo.streamIds_);
             return RC_ERROR;
         }
 
@@ -487,9 +476,9 @@ RetCode OhosCameraDemo::CaptureOnDualStreams(const int streamIdSecond)
         });
     } else {
         rc = streamOperator_->Capture(CAPTURE_ID_VIDEO, secondCaptureInfo, true);
-        if (rc != Camera::NO_ERROR) {
+        if (rc != HDI::Camera::V1_0::NO_ERROR) {
             CAMERA_LOGE("demo test: CaptureOnDualStreams CAPTURE_ID_VIDEO error\n");
-            streamOperator_->ReleaseStreams(secondCaptureInfo->streamIds_);
+            streamOperator_->ReleaseStreams(secondCaptureInfo.streamIds_);
             return RC_ERROR;
         }
 
@@ -678,10 +667,12 @@ void OhosCameraDemo::SetAwbMode(const int mode) const
     constexpr size_t dataCapacity = 2000;
 
     std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(entryCapacity, dataCapacity);
+    std::vector<uint8_t> result;
 
     const uint8_t awbMode = mode;
     metaData->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
-    demoCameraDevice_->UpdateSettings(metaData);
+    MetadataUtils::ConvertMetadataToVec(metaData, result);
+    demoCameraDevice_->UpdateSettings(result);
 
     CAMERA_LOGD("demo test: SetAwbMode exit\n");
 }
@@ -696,6 +687,7 @@ void OhosCameraDemo::SetAeExpo()
     constexpr size_t dataCapacity = 2000;
 
     std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(entryCapacity, dataCapacity);
+    std::vector<uint8_t> result;
 
     if (aeStatus_) {
         expo = 0xa0;
@@ -704,7 +696,8 @@ void OhosCameraDemo::SetAeExpo()
     }
     aeStatus_ = !aeStatus_;
     metaData->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
-    demoCameraDevice_->UpdateSettings(metaData);
+    MetadataUtils::ConvertMetadataToVec(metaData, result);
+    demoCameraDevice_->UpdateSettings(result);
 
     CAMERA_LOGD("demo test: SetAeExpo exit\n");
 }
@@ -773,7 +766,9 @@ void OhosCameraDemo::SetMetadata()
     uint8_t faceMode = OHOS_CAMERA_FACE_DETECT_MODE_SIMPLE;
     metaData->addEntry(OHOS_STATISTICS_FACE_DETECT_SWITCH, &faceMode, sizeof(faceMode));
 
-    demoCameraDevice_->UpdateSettings(metaData);
+    std::vector<uint8_t> result;
+    MetadataUtils::ConvertMetadataToVec(metaData, result);
+    demoCameraDevice_->UpdateSettings(result);
 
     CAMERA_LOGI("demo test: SetMetadata exit\n");
 }
@@ -798,16 +793,16 @@ RetCode OhosCameraDemo::StreamOffline(const int streamId)
     constexpr size_t offlineDelayTime = 4;
     CAMERA_LOGD("demo test: StreamOffline enter\n");
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
-    std::shared_ptr<IStreamOperatorCallback> streamOperatorCallback = std::make_shared<StreamOperatorCallback>();
+    std::shared_ptr<IStreamOperatorCallback> streamOperatorCallback = std::make_shared<DemoStreamOperatorCallback>();
     std::shared_ptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
 #else
-    sptr<IStreamOperatorCallback> streamOperatorCallback = new StreamOperatorCallback();
+    sptr<IStreamOperatorCallback> streamOperatorCallback = new DemoStreamOperatorCallback();
     sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
 #endif
     std::vector<int> streamIds;
     streamIds.push_back(streamId);
     rc = streamOperator_->ChangeToOfflineStream(streamIds, streamOperatorCallback, offlineStreamOperator);
-    if (rc != NO_ERROR) {
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("demo test: StreamOffline ChangeToOfflineStream error\n");
         return RC_ERROR;
     }
@@ -821,13 +816,13 @@ RetCode OhosCameraDemo::StreamOffline(const int streamId)
 
     CAMERA_LOGD("demo test: begin to release offlne stream");
     rc = offlineStreamOperator->CancelCapture(CAPTURE_ID_CAPTURE);
-    if (rc != NO_ERROR) {
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("demo test: StreamOffline offlineStreamOperator->CancelCapture error\n");
         return RC_ERROR;
     }
 
     rc = offlineStreamOperator->Release();
-    if (rc != OHOS::Camera::NO_ERROR) {
+    if (rc != HDI::Camera::V1_0::NO_ERROR) {
         CAMERA_LOGE("demo test: StreamOffline offlineStreamOperator->Release() error\n");
         return RC_ERROR;
     }
@@ -1130,38 +1125,40 @@ RetCode OhosCameraDemo::GetFaceDetectMaxNum(std::shared_ptr<CameraAbility> &abil
 }
 
 #ifndef CAMERA_BUILT_ON_OHOS_LITE
-void DemoCameraDeviceCallback::OnError(const Camera::ErrorType type, const int32_t errorMsg)
+int32_t DemoCameraDeviceCallback::OnError(ErrorType type, int32_t errorCode)
 {
-    CAMERA_LOGI("demo test: OnError type : %{public}d, errorMsg : %{public}d", type, errorMsg);
+    CAMERA_LOGI("demo test: OnError type : %{public}d, errorCode : %{public}d", type, errorCode);
 }
 
-void DemoCameraDeviceCallback::OnResult(const uint64_t timestamp,
-                                        const std::shared_ptr<Camera::CameraMetadata>& result)
+int32_t DemoCameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector<uint8_t>& result)
 {
     CAMERA_LOGI("demo test: OnResult timestamp : %{public}ld,", timestamp);
+    std::shared_ptr<CameraMetadata> updateSettings;
+
+    MetadataUtils::ConvertVecToMetadata(result, updateSettings);
     for (auto it = results_list_.cbegin(); it != results_list_.cend(); it++) {
         switch (*it) {
             case OHOS_CONTROL_FOCUS_MODE: {
-                common_metadata_header_t* data = result->get();
+                common_metadata_header_t* data = updateSettings->get();
                 uint8_t focusMode;
                 camera_metadata_item_t entry;
                 int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FOCUS_MODE, &entry);
                 if (ret != 0) {
                     CAMERA_LOGE("demo test: get OHOS_CONTROL_FOCUS_MODE error\n");
-                    break;
+                    return RC_ERROR;
                 }
                 focusMode = *(entry.data.u8);
                 CAMERA_LOGI("demo test: focusMode %{public}d\n", focusMode);
                 break;
             }
             case OHOS_CONTROL_EXPOSURE_MODE: {
-                common_metadata_header_t* data = result->get();
+                common_metadata_header_t* data = updateSettings->get();
                 uint8_t exposureMode;
                 camera_metadata_item_t entry;
                 int ret = FindCameraMetadataItem(data, OHOS_CONTROL_EXPOSURE_MODE, &entry);
                 if (ret != 0) {
                     CAMERA_LOGE("demo test: get OHOS_CONTROL_EXPOSURE_MODE error\n");
-                    break;
+                    return RC_ERROR;
                 }
                 exposureMode = *(entry.data.u8);
                 CAMERA_LOGI("demo test: exposureMode %{public}d\n", exposureMode);
@@ -1169,6 +1166,54 @@ void DemoCameraDeviceCallback::OnResult(const uint64_t timestamp,
             }
         }
     }
+
+    return RC_OK;
 }
+
+int32_t DemoCameraHostCallback::OnCameraStatus(const std::string& cameraId, CameraStatus status)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
+}
+
+int32_t DemoCameraHostCallback::OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status)
+{
+    CAMERA_LOGI("%{public}s, enter. cameraId = %s, status = %d",
+        __func__, cameraId.c_str(), static_cast<int>(status));
+    return RC_OK;
+}
+
+int32_t DemoCameraHostCallback::OnCameraEvent(const std::string& cameraId, CameraEvent event)
+{
+    CAMERA_LOGI("%{public}s, enter. cameraId = %s, event = %d",
+        __func__, cameraId.c_str(), static_cast<int>(event));
+    return RC_OK;
+}
+
+int32_t DemoStreamOperatorCallback::OnCaptureStarted(int32_t captureId, const std::vector<int32_t>& streamIds)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
+}
+
+int32_t DemoStreamOperatorCallback::OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
+}
+
+int32_t DemoStreamOperatorCallback::OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
+}
+
+int32_t DemoStreamOperatorCallback::OnFrameShutter(int32_t captureId,
+    const std::vector<int32_t>& streamIds, uint64_t timestamp)
+{
+    CAMERA_LOGI("%{public}s, enter.", __func__);
+    return RC_OK;
+}
+
 #endif
 } // namespace OHOS::Camera

@@ -53,12 +53,12 @@ static int HdfDCameraProviderDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfDCameraProviderDriverInit enter");
     if (deviceObject == nullptr) {
-        HDF_LOGE("HdfDCameraHostDriverInit:: HdfDeviceObject is NULL !");
+        HDF_LOGE("HdfDCameraProviderDriverInit:: HdfDeviceObject is NULL !");
         return HDF_FAILURE;
     }
 
     if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_CAMERA)) {
-        HDF_LOGE("HdfDCameraHostDriverInit set camera class failed");
+        HDF_LOGE("HdfDCameraProviderDriverInit set camera class failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -116,10 +116,10 @@ static struct HdfDriverEntry g_dcameraproviderDriverEntry = {
     .Release = HdfDCameraProviderDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_dcameraproviderDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */

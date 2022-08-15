@@ -23,15 +23,15 @@ public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
 
-    void SetUp(void);
-    void TearDown(void);
+    void SetUp(void) const;
+    void TearDown(void) const;
 
     class TestBufferConsumerListener: public IBufferConsumerListener {
         public:
             TestBufferConsumerListener()
             {
             }
-             void OnBufferAvailable()
+            void OnBufferAvailable() const
             {
             }
             ~TestBufferConsumerListener()
@@ -89,7 +89,7 @@ public:
             shotCount_++;
         }
 
-        void WaitSnapshotEnd()
+        void WaitSnapshotEnd() const
         {
             std::unique_lock<std::mutex> l(l_);
             cv_.wait(l, [this]() { return shotCount_ == 0; });

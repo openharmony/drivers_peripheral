@@ -120,6 +120,7 @@ int32_t HdiDrmComposition::UpdateMode(std::unique_ptr<DrmModeBlock> &modeBlock, 
 
 int32_t HdiDrmComposition::Apply(bool modeSet)
 {
+    (void)modeSet;
     uint64_t crtcOutFence = -1;
     int ret;
     std::unique_ptr<DrmModeBlock> modeBlock;

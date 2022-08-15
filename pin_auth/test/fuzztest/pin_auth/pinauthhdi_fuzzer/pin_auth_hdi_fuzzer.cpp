@@ -25,12 +25,12 @@
 #include "iam_fuzz_test.h"
 #include "executor_impl.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_PIN_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_PIN_AUTH_HDI
 
 #undef private
 
 using namespace std;
-using namespace OHOS::UserIAM::Common;
+using namespace OHOS::UserIam::Common;
 
 namespace OHOS {
 namespace HDI {
@@ -62,7 +62,7 @@ private:
     int32_t onGetDataResult_;
 };
 
-ExecutorImpl g_executorImpl(make_shared<OHOS::UserIAM::PinAuth::PinAuth>());
+ExecutorImpl g_executorImpl(make_shared<OHOS::UserIam::PinAuth::PinAuth>());
 
 void FillFuzzExecutorInfo(Parcel &parcel, ExecutorInfo &executorInfo)
 {

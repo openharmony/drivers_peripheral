@@ -134,7 +134,7 @@ RetCode CameraHostConfig::AddCameraId(const std::string &logicalCameraId,
 std::string CameraHostConfig::SubtractCameraId(const std::vector<std::string> &physicalCameraIds)
 {
     if (physicalCameraIds.size() > 1) {
-         CAMERA_LOGE("physicalCameraIds %{public}d >1 Error", physicalCameraIds.size());
+        CAMERA_LOGE("physicalCameraIds %{public}d >1 Error", physicalCameraIds.size());
     }
     std::string logicalCameraId = ReturnLogicalCameraIdToString(physicalCameraIds[0]);
     if (logicalCameraId.size() == 0) {

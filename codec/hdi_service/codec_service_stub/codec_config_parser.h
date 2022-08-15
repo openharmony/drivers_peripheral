@@ -27,8 +27,10 @@
 
 #define CODEC_CONFIG_KEY_MIME                   "mime"
 #define CODEC_CONFIG_KEY_TYPE                   "type"
+#define CODEC_CONFIG_KEY_NAME                   "name"
 #define CODEC_CONFIG_KEY_SUPPORT_PROFILES       "supportProfiles"
 #define CODEC_CONFIG_KEY_IS_SOFTWARE_CODEC      "isSoftwareCodec"
+#define CODEC_CONFIG_KEY_PROCESS_MODE_MASK      "processModeMask"
 #define CODEC_CONFIG_KEY_CAPS_MASK              "capsMask"
 #define CODEC_CONFIG_KEY_ALLOCATE_MASK          "allocateMask"
 #define CODEC_CONFIG_KEY_MIN_INPUT_BUFFER_NUM   "minInputBufferNum"
@@ -37,7 +39,8 @@
 #define CODEC_CONFIG_KEY_MAX_OUTPUT_BUFFER_NUM  "maxOutputBufferNum"
 #define CODEC_CONFIG_KEY_MIN_BITRATE            "minBitRate"
 #define CODEC_CONFIG_KEY_MAX_BITRATE            "maxBitRate"
-#define CODEC_CONFIG_KEY_BUFFER_SIZE            "bufferSize"
+#define CODEC_CONFIG_KEY_INPUT_BUFFER_SIZE      "inputBufferSize"
+#define CODEC_CONFIG_KEY_OUTPUT_BUFFER_SIZE     "outputBufferSize"
 #define CODEC_CONFIG_KEY_MIN_WIDTH              "minWidth"
 #define CODEC_CONFIG_KEY_MIN_HEIGHT             "minHeight"
 #define CODEC_CONFIG_KEY_MAX_WIDTH              "maxWidth"
@@ -45,10 +48,10 @@
 #define CODEC_CONFIG_KEY_WIDTH_ALIGNMENT        "widthAlignment"
 #define CODEC_CONFIG_KEY_HEIGHT_ALIGNMENT       "heightAlignment"
 #define CODEC_CONFIG_KEY_SUPPORT_PIXELF_MTS     "supportPixelFmts"
-#define CODEC_CONFIG_KEY_SUPPORT_LEVELS         "supportLevels"
+
 #define CODEC_CONFIG_KEY_SAMPLE_FORMATS          "sampleFormats"
 #define CODEC_CONFIG_KEY_SAMPLE_RATE             "sampleRate"
-#define CODEC_CONFIG_KEY_CHANNEL_COUNT           "channelCount"
+#define CODEC_CONFIG_KEY_CHANNEL_LAYOUTS         "channelLayouts"
 
 #define CODEC_CAPABLITY_GROUP_NUM  8
 
@@ -62,7 +65,7 @@ typedef enum {
 
 typedef struct {
     int num;
-    CodecCapbility *capablitis;
+    CodecCapability *capablitis;
 } CodecCapablityGroup;
 
 typedef struct {
@@ -76,6 +79,13 @@ typedef struct {
     CodecCapablityGroup audioSwEncoderGroup;
     CodecCapablityGroup audioSwDecoderGroup;
 } CodecCapablites;
+
+typedef struct {
+    const char *attrName;
+    int32_t *array;
+    int32_t length;
+    int32_t endValue;
+} ConfigUintArrayNodeAttr;
 
 int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node);
 int32_t ClearCapabilityGroup();

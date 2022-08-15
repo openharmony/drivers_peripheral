@@ -1,0 +1,49 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
+import("//drivers/peripheral/audio/audio.gni")
+
+module_output_path = "drivers_peripheral_audio/audio"
+
+ohos_systemtest("hdf_audio_idlhdi_capture_hardware_dependence_test") {
+  module_out_path = module_output_path
+  public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
+  sources = [
+    "../../../common/hdi_service_common/src/hdi_service_common.cpp",
+    "src/audio_idl_hdicapture_hardware_dependence_test.cpp",
+  ]
+  include_dirs = [ "//drivers/peripheral/audio/test/systemtest/common/hdi_service_common/include" ]
+  external_deps = [
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+
+  deps = [
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+  defines = []
+  if (enable_audio_adm_passthrough) {
+    defines += [ "AUDIO_ADM_PASSTHROUGH" ]
+  }
+  if (enable_audio_adm_service) {
+    defines += [ "AUDIO_ADM_SERVICE" ]
+  }
+
+  if (drivers_peripheral_audio_alsa_lib) {
+    defines += [ "ALSA_LIB_MODE" ]
+  }
+}

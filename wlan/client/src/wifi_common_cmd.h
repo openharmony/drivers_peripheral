@@ -57,7 +57,9 @@ enum BaseCommands {
     CMD_BASE_GET_POWER_MODE,
     CMD_BASE_SET_POWER_MODE,
     CMD_BASE_START_CHANNEL_MEAS,
-    CMD_BASE_SET_PROJECTION_SCREEN_PARAM
+    CMD_BASE_SET_PROJECTION_SCREEN_PARAM,
+    CMD_BASE_SEND_CMD_IOCTL,
+    CMD_BASE_GET_STATION_INFO
 };
 
 enum APCommands {
@@ -88,7 +90,7 @@ enum P2PCommands {
 };
 
 #define MESSAGE_CMD_BITS 16
-#define HDF_WIFI_CMD(SERVICEID, CMDID) (((uint32_t)SERVICEID) << MESSAGE_CMD_BITS) | (CMDID)
+#define HDF_WIFI_CMD(SERVICEID, CMDID) ((((uint32_t)SERVICEID) << MESSAGE_CMD_BITS) | (CMDID))
 
 typedef enum {
     WIFI_HAL_CMD_GET_NETWORK_INFO = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_GET_NETWORK_INFO),
@@ -109,6 +111,8 @@ typedef enum {
     WIFI_HAL_CMD_SET_POWER_MODE = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_SET_POWER_MODE),
     WIFI_HAL_CMD_START_CHANNEL_MEAS = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_START_CHANNEL_MEAS),
     WIFI_HAL_CMD_CONFIG_PROJECTION_SCREEN = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_SET_PROJECTION_SCREEN_PARAM),
+    WIFI_HAL_CMD_SET_CMD_IOCTL = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_SEND_CMD_IOCTL),
+    WIFI_HAL_CMD_GET_STATION_INFO = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_GET_STATION_INFO)
 } WifiHalCmd;
 
 typedef enum {
@@ -144,11 +148,17 @@ typedef enum {
 } WifiWPACmdType;
 
 struct CallbackEvent {
-    uint32_t eventType;   //eventmap
+    uint32_t eventType; /* eventmap */
     char ifName[IFNAMSIZ + 1];
     OnReceiveFunc onRecFunc;
 };
 
+struct Hid2dEvent {
+    char ifName[IFNAMSIZ + 1];
+    Hid2dCallback func;
+};
+
 void WifiEventReport(const char *ifName, uint32_t event, void *data);
+void Hid2dEventReport(const char *ifName, const uint8_t *msg, uint32_t msgLen);
 
 #endif /* end of wifi_common_cmd.h */

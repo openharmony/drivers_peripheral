@@ -14,16 +14,19 @@
  */
 
 #include <hdf_log.h>
+#include <hdf_base.h>
 #include "camera_device_callback.h"
 
 namespace OHOS::Camera {
-void CameraDeviceCallback::OnError(ErrorType type, int32_t errorMsg)
+int32_t CameraDeviceCallback::OnError(ErrorType type, int32_t errorCode)
 {
     HDF_LOGV("%{public}s, enter.", __func__);
+    return HDF_SUCCESS;
 }
 
-void CameraDeviceCallback::OnResult(uint64_t timestamp, const std::shared_ptr<CameraMetadata> &result)
+int32_t CameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector<uint8_t>& result)
 {
     HDF_LOGV("%{public}s, enter.", __func__);
+    return HDF_SUCCESS;
 }
 }

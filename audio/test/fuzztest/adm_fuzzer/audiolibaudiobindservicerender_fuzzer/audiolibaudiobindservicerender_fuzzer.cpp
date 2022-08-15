@@ -24,14 +24,14 @@ namespace Audio {
         bool result = false;
         struct DevHandle *(*BindServiceRender)(const char *) = nullptr;
         char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
-        void *PtrHandle = dlopen(resolvedPath, RTLD_LAZY);
-        if (PtrHandle == nullptr) {
+        void *ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
+        if (ptrHandle == nullptr) {
             HDF_LOGE("%{public}s: dlopen failed \n", __func__);
             return false;
         }
-        BindServiceRender = (struct DevHandle *(*)(const char *))dlsym(PtrHandle, "AudioBindServiceRender");
+        BindServiceRender = (struct DevHandle *(*)(const char *))dlsym(ptrHandle, "AudioBindServiceRender");
         if (BindServiceRender == nullptr) {
-            dlclose(PtrHandle);
+            dlclose(ptrHandle);
             HDF_LOGE("%{public}s: dlsym AudioBindServiceRender failed \n", __func__);
             return false;
         }
@@ -40,7 +40,7 @@ namespace Audio {
         if (handle != nullptr) {
             result = true;
         }
-        dlclose(PtrHandle);
+        dlclose(ptrHandle);
         return result;
     }
 }

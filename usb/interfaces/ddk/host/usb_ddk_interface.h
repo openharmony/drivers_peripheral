@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,6 +36,10 @@
 #define USB_INTERFACE_H
 
 #include "usb_session.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Defines the default ID of the USB control interface.
@@ -269,7 +273,7 @@ struct UsbRequestParams {
     /** Pointer to the user data */
     void *userData;
     /** Request timeout interval */
-    unsigned int timeout;
+    uint32_t timeout;
     /** Request parameter type */
     UsbRequestParamsType requestType;
     /** Request parameter */
@@ -483,6 +487,10 @@ int32_t UsbCancelRequest(const struct UsbRequest *request);
  */
 int32_t UsbSubmitRequestSync(const struct UsbRequest *request);
 int32_t UsbMemTestTrigger(bool enable);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* USB_INTERFACE_H */
 /** @} */

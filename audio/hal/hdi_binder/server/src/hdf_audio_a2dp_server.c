@@ -16,7 +16,7 @@
 #include "hdf_device_desc.h"
 #include "hdf_device_object.h"
 #include "audio_adapter_info_common.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 #include "hdf_audio_server_common.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_HOST
@@ -49,7 +49,7 @@ int AudioHdiA2dpServerBind(struct HdfDeviceObject *deviceObject)
         .Release = NULL,
     };
     AudioHdiSetLoadServerFlag(AUDIO_SERVER_A2DP);
-    if (HdiServiceGetFuncs()) {
+    if (HdiServiceGetFuncs() < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.audio_service");

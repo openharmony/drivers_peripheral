@@ -14,16 +14,12 @@
  */
 
 #include "audio_interface_lib_common.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 
 struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
 {
-#ifdef ALSA_MODE
-    static struct HdfIoService hdfIoService;
-    return &hdfIoService;
-#else
     if (serviceName == NULL) {
         AUDIO_FUNC_LOGE("service name NULL!");
         return NULL;
@@ -39,25 +35,31 @@ struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
     }
     AUDIO_FUNC_LOGE("service name not support!");
     return NULL;
-#endif
 }
 
 void AudioBufReplyRecycle(struct HdfSBuf *sBuf, struct HdfSBuf *reply)
 {
     if (sBuf != NULL) {
         HdfSbufRecycle(sBuf);
+        sBuf = NULL;
     }
     if (reply != NULL) {
         HdfSbufRecycle(reply);
+        reply = NULL;
+    }
+}
+
+void AudioSbufRecycle(struct HdfSBuf *sBuf)
+{
+    if (sBuf != NULL) {
+        HdfSbufRecycle(sBuf);
+        sBuf = NULL;
     }
 }
 
 int32_t AudioServiceDispatch(struct HdfIoService *service,
     int cmdId, struct HdfSBuf *sBuf, struct HdfSBuf *reply)
 {
-#ifdef ALSA_MODE
-    return 0;
-#else
     if (service == NULL || service->dispatcher == NULL ||
         service->dispatcher->Dispatch == NULL || sBuf == NULL) {
         AUDIO_FUNC_LOGE("param is null!");
@@ -65,7 +67,6 @@ int32_t AudioServiceDispatch(struct HdfIoService *service,
     }
 
     return service->dispatcher->Dispatch(&(service->object), cmdId, sBuf, reply);
-#endif
 }
 
 struct HdfSBuf *AudioObtainHdfSBuf(void)

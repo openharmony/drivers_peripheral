@@ -36,7 +36,7 @@ RetCode HosV4L2Streams::V4L2StreamOn(int fd)
     buf_type = bufferType_;
     rc = ioctl(fd, VIDIOC_STREAMON, &buf_type);
     if (rc < 0) {
-        CAMERA_LOGE("error: ioctl VIDIOC_STREAMON failed: %s\n", strerror(errno));
+        CAMERA_LOGE("error: ioctl VIDIOC_STREAMON failed: %{public}s\n", strerror(errno));
         return RC_ERROR;
     }
 

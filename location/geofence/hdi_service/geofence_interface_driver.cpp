@@ -113,10 +113,10 @@ static struct HdfDriverEntry g_geofenceinterfaceDriverEntry = {
     .Release = HdfGeofenceInterfaceDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_geofenceinterfaceDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */

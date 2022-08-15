@@ -27,8 +27,7 @@
       ],
       "third_part": [
         "bounds_checking_function",
-        "googletest",
-        "tinyalsa"
+        "googletest"
       ]
     },
     "build": {
@@ -36,8 +35,28 @@
         "//drivers/peripheral/audio:hdi_audio"
       ],
       "test": [
+        "//drivers/peripheral/audio:audio_sample_client",
         "//drivers/peripheral/audio/test:audio_test_entry",
-        "//drivers/peripheral/audio:audio_sample_client"
+        "//drivers/peripheral/audio/test/sample:idl_audio_sample"
+      ],
+      "inner_kits":[
+        {
+          "name": "//drivers/interface/audio/v1_0:libaudio_proxy_1.0",
+          "header": {
+            "header_files": [
+              "audio_adapter.h",
+              "audio_attribute.h",
+              "audio_capture.h",
+              "audio_control.h",
+              "audio_manager.h",
+              "audio_render.h",
+              "audio_scene.h",
+              "audio_types.h",
+              "audio_volume.h"
+            ],
+            "header_base": "//drivers/peripheral/audio/interfaces/include"
+          }
+        }
       ]
     }
   }

@@ -28,9 +28,6 @@ if (defined(ohos_lite)) {
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
-    if (enable_audio_device_mpi) {
-      defines += [ "AUDIO_HAL_USER" ]
-    }
     install_enable = true
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
@@ -49,9 +46,6 @@ if (defined(ohos_lite)) {
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
-    if (enable_audio_device_mpi) {
-      defines += [ "AUDIO_HAL_USER" ]
-    }
     install_enable = true
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
@@ -63,9 +57,6 @@ if (defined(ohos_lite)) {
     sources = [ "framework_render.c" ]
 
     defines = []
-    if (enable_audio_device_mpi) {
-      defines += [ "AUDIO_HAL_USER" ]
-    }
 
     if (is_standard_system) {
       external_deps = [
@@ -95,9 +86,6 @@ if (defined(ohos_lite)) {
     sources = [ "framework_capture.c" ]
 
     defines = []
-    if (enable_audio_device_mpi) {
-      defines += [ "AUDIO_HAL_USER" ]
-    }
 
     if (drivers_peripheral_audio_alsa_lib) {
       defines += [ "ALSA_LIB_MODE" ]
@@ -135,9 +123,6 @@ if (defined(ohos_lite)) {
     ]
 
     defines = []
-    if (enable_audio_device_mpi) {
-      defines += [ "AUDIO_HAL_USER" ]
-    }
 
     if (is_standard_system) {
       external_deps = [

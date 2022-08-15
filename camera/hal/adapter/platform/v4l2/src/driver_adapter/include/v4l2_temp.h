@@ -25,10 +25,15 @@
 #include <stdlib.h>
 
 namespace OHOS::Camera {
+enum CameraBufferStatus {
+    CAMERA_BUFFER_STATUS_OK = 0,
+    CAMERA_BUFFER_STATUS_DROP,
+    CAMERA_BUFFER_STATUS_INVALID,
+};
 class IBuffer {
 public:
     IBuffer() {}
-    ~IBuffer(){}
+    ~IBuffer() {}
 
     int32_t GetIndex()
     {
@@ -70,6 +75,10 @@ public:
     {
         usage_ = usage;
         return;
+    }
+    void SetBufferStatus(const CameraBufferStatus flag)
+    {
+        (void)flag;
     }
 
 private:

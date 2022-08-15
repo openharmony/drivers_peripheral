@@ -25,12 +25,12 @@
 
 #include "executor_impl.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_FACE_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_HDI
 
 #undef private
 
 using namespace std;
-using namespace OHOS::UserIAM::Common;
+using namespace OHOS::UserIam::Common;
 
 namespace OHOS {
 namespace HDI {

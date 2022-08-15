@@ -80,6 +80,7 @@ if (defined(ohos_lite)) {
     ]
     include_dirs = [
       "//drivers/peripheral/camera/hal/include",
+      "//drivers/peripheral/camera/interfaces/metadata/include",
       "//third_party/libexif",
       "watchdog",
       "exif",

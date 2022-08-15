@@ -16,18 +16,21 @@
 #ifndef HDI_CAMERA_HOST_CALLBACK_H
 #define HDI_CAMERA_HOST_CALLBACK_H
 
-#include "camera_host_callback_stub.h"
+#include "v1_0/icamera_host_callback.h"
 
 namespace OHOS::Camera {
-class CameraHostCallback : public CameraHostCallbackStub {
+using namespace OHOS::HDI::Camera::V1_0;
+class CameraHostCallback : public ICameraHostCallback {
 public:
     CameraHostCallback() = default;
     virtual ~CameraHostCallback() = default;
 
 public:
-    void OnCameraStatus(const std::string &cameraId, CameraStatus status) override;
-    void OnFlashlightStatus(const std::string &cameraId, FlashlightStatus status) override;
-    void OnCameraEvent(const std::string &cameraId, CameraEvent event) override;
+    int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status) override;
+
+    int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status) override;
+
+    int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event) override;
 };
 }
 #endif // HDI_CAMERA_HOST_CALLBACK_H

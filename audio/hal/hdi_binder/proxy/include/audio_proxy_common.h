@@ -23,6 +23,9 @@
 #define GAIN_MAX 50.0
 #define STR_MAX 512
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 struct HdfSBuf *AudioProxyObtainHdfSBuf(void);
 void AudioProxyBufReplyRecycle(struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t AudioProxyPreprocessSBuf(struct HdfSBuf **data, struct HdfSBuf **reply);
@@ -45,4 +48,7 @@ int32_t AudioProxyRenderAddEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioProxyRenderRemoveEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioProxyCaptureAddEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioProxyCaptureRemoveEffect(AudioHandle handle, uint64_t effectid);
+#ifdef __cplusplus
+}
+#endif
 #endif

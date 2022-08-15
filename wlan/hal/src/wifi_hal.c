@@ -236,6 +236,30 @@ static int32_t UnregisterEventCallbackInner(OnReceiveFunc onRecFunc, const char 
     return HDF_SUCCESS;
 }
 
+static int32_t RegisterHid2dCallbackInner(Hid2dCallback func, const char *ifName)
+{
+    int32_t ret;
+    if (func == NULL || ifName == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ret = WifiRegisterHid2dCallback(func, ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: register hid2d callback fail!", __FUNCTION__);
+    }
+    return ret;
+}
+
+static int32_t UnregisterHid2dCallbackInner(Hid2dCallback func, const char *ifName)
+{
+    if (func == NULL || ifName == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    WifiUnregisterHid2dCallback(func, ifName);
+    return HDF_SUCCESS;
+}
+
 static int32_t ResetDriverInner(uint8_t chipId, const char *ifName)
 {
     if (ifName == NULL || chipId >= MAX_WLAN_DEVICE) {
@@ -298,6 +322,24 @@ static int32_t SetProjectionScreenParamInner(const char *ifName, const ProjScrnC
         return HDF_ERR_INVALID_PARAM;
     }
     return SetProjectionScreenParam(ifName, param);
+}
+
+static int32_t SendCmdIoctlInner(const char *ifName, int32_t cmdId, const int8_t *paramBuf, uint32_t paramBufLen)
+{
+    if (ifName == NULL || paramBuf == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return SendCmdIoctl(ifName, cmdId, paramBuf, paramBufLen);
+}
+
+static int32_t GetStationInfoInner(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen)
+{
+    if (ifName == NULL || info == NULL || mac == NULL || macLen < ETH_ADDR_LEN) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return GetStationInfo(ifName, info, mac, macLen);
 }
 
 static int32_t Start(struct IWiFi *iwifi)
@@ -372,6 +414,22 @@ static int32_t HalUnregisterEventCallback(OnReceiveFunc onRecFunc, const char *i
     return ret;
 }
 
+static int32_t HalRegisterHid2dCallback(Hid2dCallback func, const char *ifName)
+{
+    HalMutexLock();
+    int32_t ret = RegisterHid2dCallbackInner(func, ifName);
+    HalMutexUnlock();
+    return ret;
+}
+
+static int32_t HalUnregisterHid2dCallback(Hid2dCallback func, const char *ifName)
+{
+    HalMutexLock();
+    int32_t ret = UnregisterHid2dCallbackInner(func, ifName);
+    HalMutexUnlock();
+    return ret;
+}
+
 static int32_t ResetDriver(const uint8_t chipId, const char *ifName)
 {
     HalMutexLock();
@@ -428,6 +486,22 @@ static int32_t WifiSetProjectionScreenParam(const char *ifName, const ProjScrnCm
     return ret;
 }
 
+static int32_t WifiSendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t *paramBuf, uint32_t paramBufLen)
+{
+    HalMutexLock();
+    int32_t ret = SendCmdIoctlInner(ifName, cmdId, paramBuf, paramBufLen);
+    HalMutexUnlock();
+    return ret;
+}
+
+static int32_t WifiGetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen)
+{
+    HalMutexLock();
+    int32_t ret = GetStationInfoInner(ifName, info, mac, macLen);
+    HalMutexUnlock();
+    return ret;
+}
+
 int32_t WifiConstruct(struct IWiFi **wifiInstance)
 {
     static bool isInited = false;
@@ -435,7 +509,7 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
 
     if (!isInited) {
         if (HalMutexInit() != HDF_SUCCESS) {
-            HDF_LOGE("%s: HalMutexInit failed, line: %d\n", __FUNCTION__, __LINE__);
+            HDF_LOGE("%s: HalMutexInit failed, line: %d", __FUNCTION__, __LINE__);
             return HDF_FAILURE;
         }
 
@@ -455,6 +529,10 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.startChannelMeas = WifiStartChannelMeas;
         singleWifiInstance.getChannelMeasResult = WifiGetChannelMeasResult;
         singleWifiInstance.setProjectionScreenParam = WifiSetProjectionScreenParam;
+        singleWifiInstance.sendCmdIoctl = WifiSendCmdIoctl;
+        singleWifiInstance.registerHid2dCallback = HalRegisterHid2dCallback;
+        singleWifiInstance.unregisterHid2dCallback = HalUnregisterHid2dCallback;
+        singleWifiInstance.getStationInfo = WifiGetStationInfo;
         InitIWiFiList();
         isInited = true;
     }

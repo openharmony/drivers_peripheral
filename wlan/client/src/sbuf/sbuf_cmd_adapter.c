@@ -25,7 +25,7 @@ extern "C" {
 #endif
 #endif
 
-const char *DRIVER_SERVICE_NAME = "hdfwifi";
+#define DRIVER_SERVICE_NAME "hdfwifi"
 static struct HdfDevEventlistener g_wifiDevEventListener;
 static bool g_isHasRegisterListener = false;
 
@@ -113,7 +113,7 @@ static int32_t ParserFreqInfo(struct HdfSBuf *reply, struct FreqInfoResult *resu
         HDF_LOGE("%s: read freqs failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    if (memcpy_s(result->freqs, size * sizeof(int32_t), replayData, replayDataSize) != EOK) {
+    if (memcpy_s(result->freqs, size * sizeof(uint32_t), replayData, replayDataSize) != EOK) {
         HDF_LOGE("%s: memcpy failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
@@ -182,7 +182,7 @@ static void WifiMsgUnregisterEventListener(struct HdfDevEventlistener *listener)
     if (listener == NULL) {
         return;
     }
-    if (HdfDeviceUnregisterEventListener(wifiService, listener)) {
+    if (HdfDeviceUnregisterEventListener(wifiService, listener) != HDF_SUCCESS) {
         HDF_LOGE("%s: fail to unregister event listener, line: %d", __FUNCTION__, __LINE__);
     }
     g_isHasRegisterListener = false;
@@ -770,7 +770,7 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode)
             break;
         }
         if (!HdfSbufReadUint8(reply, mode)) {
-            HDF_LOGE("%s: HdfSbufReadBuffer failed", __FUNCTION__);
+            HDF_LOGE("%s: HdfSbufReadUint8 failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }
@@ -904,6 +904,82 @@ int32_t SetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *par
     } while (0);
 
     HdfSbufRecycle(req);
+    return ret;
+}
+
+int32_t SendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t *paramBuf, uint32_t paramBufLen)
+{
+    int ret = RET_CODE_FAILURE;
+    struct HdfSBuf *req = NULL;
+
+    req = HdfSbufObtainDefaultSize();
+    if (req == NULL) {
+        HDF_LOGE("%{public}s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
+        return ret;
+    }
+
+    do {
+        if (!HdfSbufWriteString(req, ifName)) {
+            HDF_LOGE("%{public}s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteInt32(req, cmdId)) {
+            HDF_LOGE("%{public}s: write cmd fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteBuffer(req, paramBuf, paramBufLen)) {
+            HDF_LOGE("%{public}s: write buffer data fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_SET_CMD_IOCTL, req, NULL);
+        if (ret != RET_CODE_SUCCESS) {
+            HDF_LOGE("%{public}s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
+        }
+    } while (0);
+
+    HdfSbufRecycle(req);
+    return ret;
+}
+
+int32_t GetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    const uint8_t *replayData = NULL;
+    uint32_t size;
+
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+        return RET_CODE_FAILURE;
+    }
+
+    do {
+        if (!HdfSbufWriteString(data, ifName)) {
+            HDF_LOGE("%{public}s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteBuffer(data, mac, macLen)) {
+            HDF_LOGE("%{public}s: write mac address fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_GET_STATION_INFO, data, reply);
+        if (ret != RET_CODE_SUCCESS) {
+            HDF_LOGE("%{public}s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
+            break;
+        }
+        if (!HdfSbufReadBuffer(reply, (const void **)(&replayData), &size)) {
+            HDF_LOGE("%{public}s: read station information fail!", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        if (memcpy_s(info, sizeof(StationInfo), replayData, size) != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s fail", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+        }
+    } while (0);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 #ifdef __cplusplus

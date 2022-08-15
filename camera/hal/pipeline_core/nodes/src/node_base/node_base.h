@@ -14,17 +14,14 @@
 #ifndef NODE_BASE_H
 #define NODE_BASE_H
 
-#include <atomic>
-#include "inode.h"
 #include "buffer_manager.h"
 #include "idevice_manager.h"
+#include "inode.h"
 
 namespace OHOS::Camera {
 class PortBase : public IPort {
 public:
-    PortBase(const std::string& name, const std::weak_ptr<INode>& n):
-        name_(name),
-        owner_(n)
+    PortBase(const std::string& name, const std::weak_ptr<INode>& n) : name_(name), owner_(n)
     {
     }
     ~PortBase() override = default;

@@ -12,11 +12,12 @@
 # limitations under the License.
 import("//build/ohos.gni")
 
-## Install thermal.para to /system/etc/param/thermal.para
+## Install thermal.para to /vendor/etc/param/thermal.para
 
 ohos_prebuilt_etc("thermal.para") {
   source = "thermal.para"
   relative_install_dir = "param"
-  part_name = "thermal_device_driver"
+  install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
+  part_name = "drivers_peripheral_thermal"
 }

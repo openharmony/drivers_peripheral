@@ -189,7 +189,7 @@ static void ManuList(const std::shared_ptr<OhosCameraDemo>& mainDemo,
     int awb = 1;
     const char *shortOptions = "h:cwvaeqof:";
     c = getopt_long(argc, argv, shortOptions, longOptions, &idx);
-    while(1) {
+    while (1) {
         switch (c) {
             case 'h':
                 c = PutMenuAndGetChr();

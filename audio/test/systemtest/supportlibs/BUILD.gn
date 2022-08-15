@@ -23,7 +23,7 @@ group("supportlibs") {
   deps = []
   if (!defined(ohos_lite)) {
     testonly = true
-    if (enable_audio_adm_so) {
+    if (enable_audio_adm_passthrough) {
       deps += [ "common:lib_common" ]
       if (!defined(drivers_peripheral_audio_alsa_lib) ||
           drivers_peripheral_audio_alsa_lib == false) {

@@ -50,10 +50,10 @@ struct UsbdBulkASyncList;
 class UsbImpl;
 struct UsbdBufferHandle {
     int32_t fd;   /**< buffer fd, -1 if not supported */
-    int32_t size; /* < size of memory */
+    uint32_t size; /* < size of memory */
     uint8_t *starAddr;
-    int32_t cur;
-    int32_t rcur;
+    uint32_t cur;
+    uint32_t rcur;
     uint8_t cbflg;
     struct OsalMutex lock;
 };

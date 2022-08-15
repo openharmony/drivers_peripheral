@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,91 +16,112 @@
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
-#include <osal_mem.h>
+#include <hdf_sbuf_ipc.h>
 
-#include "dcamera_host_stub.h"
+#include "dcamera_host.h"
+#include "v1_0/camera_host_stub.h"
 
-struct HdfDCameraService {
-    struct IDeviceIoService ioservice;
-    void *instance;
+using namespace OHOS::HDI::Camera::V1_0;
+
+struct HdfCameraHostHost {
+    struct IDeviceIoService ioService;
+    OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t DCameraServiceDispatch(struct HdfDeviceIoClient *client, int cmdId,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t CameraHostDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
+    struct HdfSBuf *reply)
 {
-    HdfDCameraService *service = CONTAINER_OF(client->device->service, HdfDCameraService, ioservice);
-    if (service == nullptr) {
-        HDF_LOGE("HdfDCameraService CONTAINER_OF failed!");
-        return HDF_FAILURE;
+    auto *hdfCameraHostHost = CONTAINER_OF(client->device->service, struct HdfCameraHostHost, ioService);
+
+    OHOS::MessageParcel *dataParcel = nullptr;
+    OHOS::MessageParcel *replyParcel = nullptr;
+    OHOS::MessageOption option;
+
+    if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
     }
-    return DCHostServiceOnRemoteRequest(service->instance, cmdId, data, reply);
+    if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    return hdfCameraHostHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int HdfDCameraHostDriverInit(struct HdfDeviceObject *deviceObject)
+static int HdfCameraHostDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    HDF_LOGI("HdfCameraHostDriverInit enter");
     if (deviceObject == nullptr) {
-        HDF_LOGE("HdfDCameraHostDriverInit:: HdfDeviceObject is NULL !");
+        HDF_LOGE("HdfCameraHostDriverInit:: HdfDeviceObject is NULL !");
         return HDF_FAILURE;
     }
 
     if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_CAMERA)) {
-        HDF_LOGE("HdfDCameraHostDriverInit set camera class failed");
+        HDF_LOGE("HdfCameraHostDriverInit set camera class failed");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
 
-static int HdfDCameraHostDriverBind(HdfDeviceObject *deviceObject)
+static int HdfCameraHostDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfDCameraHostDriverBind enter!");
-    if (deviceObject == nullptr) {
-        HDF_LOGE("HdfDCameraHostDriverBind: HdfDeviceObject is NULL !");
+    HDF_LOGI("HdfCameraHostDriverBind enter");
+
+    auto *hdfCameraHostHost = new (std::nothrow) HdfCameraHostHost;
+    if (hdfCameraHostHost == nullptr) {
+        HDF_LOGE("%{public}s: failed to create create HdfCameraHostHost object", __func__);
         return HDF_FAILURE;
     }
 
-    HdfDCameraService *service = reinterpret_cast<HdfDCameraService *>(malloc(sizeof(HdfDCameraService)));
-    if (service == nullptr) {
-        HDF_LOGE("HdfDCameraHostDriverBind malloc HdfDCameraService failed!");
+    hdfCameraHostHost->ioService.Dispatch = CameraHostDriverDispatch;
+    hdfCameraHostHost->ioService.Open = NULL;
+    hdfCameraHostHost->ioService.Release = NULL;
+
+    auto serviceImpl = OHOS::DistributedHardware::DCameraHost::GetInstance();
+    if (serviceImpl == nullptr) {
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        delete hdfCameraHostHost;
         return HDF_FAILURE;
     }
 
-    service->ioservice.Dispatch = DCameraServiceDispatch;
-    service->ioservice.Open = nullptr;
-    service->ioservice.Release = nullptr;
-    service->instance = DCameraHostStubInstance();
+    hdfCameraHostHost->stub = OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl,
+        ICameraHost::GetDescriptor());
+    if (hdfCameraHostHost->stub == nullptr) {
+        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfCameraHostHost;
+        return HDF_FAILURE;
+    }
 
-    deviceObject->service = &service->ioservice;
+    deviceObject->service = &hdfCameraHostHost->ioService;
     return HDF_SUCCESS;
 }
 
-static void HdfDCameraHostDriverRelease(HdfDeviceObject *deviceObject)
+static void HdfCameraHostDriverRelease(struct HdfDeviceObject *deviceObject)
 {
+    HDF_LOGI("HdfCameraHostDriverRelease enter");
     if (deviceObject == nullptr || deviceObject->service == nullptr) {
-        HDF_LOGE("HdfDCameraHostDriverRelease: deviceObject or deviceObject->service is NULL!");
+        HDF_LOGE("HdfCameraHostDriverRelease not initted");
         return;
     }
-    HdfDCameraService *service = CONTAINER_OF(deviceObject->service, HdfDCameraService, ioservice);
-    if (service == nullptr) {
-        HDF_LOGE("HdfDCameraHostDriverRelease: service is NULL!");
-        return;
-    }
-    free(service);
+    auto *hdfCameraHostHost = CONTAINER_OF(deviceObject->service, struct HdfCameraHostHost, ioService);
+    delete hdfCameraHostHost;
 }
 
-static struct HdfDriverEntry g_dCameraHostDriverEntry = {
+static struct HdfDriverEntry g_camerahostDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "distributed_camera_service",
-    .Bind = HdfDCameraHostDriverBind,
-    .Init = HdfDCameraHostDriverInit,
-    .Release = HdfDCameraHostDriverRelease,
+    .Bind = HdfCameraHostDriverBind,
+    .Init = HdfCameraHostDriverInit,
+    .Release = HdfCameraHostDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif // __cplusplus
+#endif /* __cplusplus */
 
-HDF_INIT(g_dCameraHostDriverEntry);
+HDF_INIT(g_camerahostDriverEntry);
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif // __cplusplus
+#endif /* __cplusplus */

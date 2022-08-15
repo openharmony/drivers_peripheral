@@ -26,10 +26,10 @@ extern "C" {
 #endif
 
 extern void BindStreamOperatorCallback(const OHOS::sptr<OHOS::Camera::IStreamOperatorCallback>& callback);
-extern void StreamCBOnCaptureStarted(int captureId, int* streamId, int count);
+extern void StreamCBOnCaptureStarted(int captureId, const int* streamId, int count);
 extern void StreamCBOnCaptureEnded(int captureId, CaptureEndedInfoCIF* info, int count);
 extern void StreamCBOnCaptureError(int captureId, CaptureErrorInfoCIF* info, int count);
-extern void StreamCBOnFrameShutter(int captureId, int* streamId, int count, uint64_t timestamp);
+extern void StreamCBOnFrameShutter(int captureId, const int* streamId, int count, uint64_t timestamp);
 
 #ifdef __cplusplus
 }
