@@ -195,6 +195,7 @@ static void UsbSerialReadComplete(uint8_t pipe, struct UsbFnRequest *req)
 
 static int32_t SpeedReadThread(void *arg)
 {
+    (void)arg;
     g_readCnt = 0;
     g_isReadDone = false;
     g_readSpeed = 0;
@@ -255,6 +256,7 @@ static int32_t StartThreadReadSpeed(struct UsbSerial *port)
 
 static int32_t UsbSerialGetTempReadSpeed(struct UsbSerial *port, struct HdfSBuf *reply)
 {
+    (void)port;
     if (!HdfSbufWriteFloat(reply, g_readSpeed)) {
         HDF_LOGE("%s: HdfSbufWriteFloat failed", __func__);
         return HDF_FAILURE;
@@ -264,6 +266,7 @@ static int32_t UsbSerialGetTempReadSpeed(struct UsbSerial *port, struct HdfSBuf 
 
 static int32_t UsbSerialGetTempReadSpeedInt(struct UsbSerial *port, struct HdfSBuf *reply)
 {
+    (void)port;
     uint32_t calc = 10000;
     if (!HdfSbufWriteUint32(reply, (uint32_t)(g_readSpeed * calc))) {
         HDF_LOGE("%s: HdfSbufWriteUint32 failed", __func__);
@@ -274,6 +277,7 @@ static int32_t UsbSerialGetTempReadSpeedInt(struct UsbSerial *port, struct HdfSB
 
 static int32_t UsbSerialReadSpeedDone(struct UsbSerial *port)
 {
+    (void)port;
     gettimeofday(&g_readTimeEnd, NULL);
     g_isReadDone = true;
     g_isStartRead = false;
@@ -595,6 +599,7 @@ static int32_t StartThreadSpeed(struct UsbSerial *port)
 
 static int32_t UsbSerialGetTempSpeed(struct UsbSerial *port, struct HdfSBuf *reply)
 {
+    (void)port;
     if (!HdfSbufWriteFloat(reply, g_speed)) {
         HDF_LOGE("%s: HdfSbufWriteFloat failed", __func__);
         return HDF_FAILURE;
@@ -604,6 +609,7 @@ static int32_t UsbSerialGetTempSpeed(struct UsbSerial *port, struct HdfSBuf *rep
 
 static int32_t UsbSerialGetTempSpeedInt(struct UsbSerial *port, struct HdfSBuf *reply)
 {
+    (void)port;
     uint32_t calc = 10000;
     if (!HdfSbufWriteUint32(reply, (uint32_t)(g_speed * calc))) {
         HDF_LOGE("%s: HdfSbufWriteUint32 failed", __func__);
@@ -614,6 +620,7 @@ static int32_t UsbSerialGetTempSpeedInt(struct UsbSerial *port, struct HdfSBuf *
 
 static int32_t UsbSerialSpeedDone(struct UsbSerial *port)
 {
+    (void)port;
     gettimeofday(&g_timeEnd, NULL);
     g_isWriteDone = true;
     return HDF_SUCCESS;
@@ -1625,7 +1632,8 @@ static int32_t UsbSerialRelease(struct UsbAcmDevice *acm)
 
 static int32_t AcmDriverInit(struct HdfDeviceObject *device)
 {
-    HDF_LOGI("%s: do nothing...", __func__);
+    (void)device;
+    HDF_LOGI("%s: do nothing", __func__);
     return 0;
 }
 

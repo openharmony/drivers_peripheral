@@ -236,7 +236,7 @@ int32_t UsbRawExit(const struct UsbSession *session);
  * @param usbAddr Indicates the USB device address.
  *
  * @return Returns the pointer to the <b>UsbRawHandle</b> if the operation is successful; returns <b>NULL</b>
- * otherwise. 
+ * otherwise.
  */
 UsbRawHandle *UsbRawOpenDevice(const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr);
 
@@ -408,7 +408,7 @@ int32_t UsbRawResetDevice(const UsbRawHandle *devHandle);
  * @param length Indicates the size of the user space to allocate.
  *
  * @return Returns the pointer to the <b>UsbHostRequest</b> structure if the operation is successful; returns
- * <b>NULL</b> otherwise. 
+ * <b>NULL</b> otherwise.
  */
 struct UsbRawRequest *UsbRawAllocRequest(const UsbRawHandle *devHandle, int32_t isoPackets, int32_t length);
 

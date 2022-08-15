@@ -79,6 +79,7 @@ static int32_t AcmDbIsAvail(struct AcmDevice * const acm)
 
 static UsbInterfaceHandle *InterfaceIdToHandle(const struct AcmDevice *acm, uint8_t id)
 {
+    (void)pipe;
     UsbInterfaceHandle *devHandle = NULL;
 
     if (id == 0xFF) {
@@ -96,6 +97,8 @@ static UsbInterfaceHandle *InterfaceIdToHandle(const struct AcmDevice *acm, uint
 
 static int32_t AcmStartDb(struct AcmDevice *acm, struct AcmDb *db, struct UsbPipeInfo *pipe)
 {
+    (void)acm;
+    (void)pipe;
     int32_t rc;
     rc = UsbSubmitRequestAsync(db->request);
     if (rc < 0) {

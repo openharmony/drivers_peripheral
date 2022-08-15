@@ -214,6 +214,7 @@ static void AcmReadBulkCallback(const void *requestArg)
 
 static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
 {
+    (void)acm;
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)buf;
 
     printf("%s:%d entry!", __func__, __LINE__);
@@ -305,6 +306,7 @@ static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 
 static void AcmCtrlReqCallback(const void *requestArg)
 {
+    (void)requestArg;
     printf("%s:%d entry!", __func__, __LINE__);
 }
 

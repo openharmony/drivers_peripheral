@@ -99,6 +99,7 @@ static void ReadSpeedDone()
 
 static void *StopHandler(void *arg)
 {
+    (void)arg;
     int32_t err, signo;
     while (1) {
         err = sigwait(&g_mask, &signo);
@@ -137,6 +138,8 @@ static void StartStopHandler()
 
 int32_t acm_speed_read(int32_t argc, const char *argv[])
 {
+    (void)argc;
+    (void)argv;
     int32_t status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {

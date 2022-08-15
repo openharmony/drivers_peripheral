@@ -136,8 +136,9 @@ int32_t UsbHostDdkTestInit(const char *apiType)
     return HDF_SUCCESS;
 }
 
-static void TestModuleWriteLog(int32_t cmdType, const char *string, struct TestUsbDeviceDescriptor *data)
+static void TestModuleWriteLog(int32_t cmdType, const char *str, struct TestUsbDeviceDescriptor *data)
 {
+    (void)data;
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
     bool runFlag = false;
 #else
@@ -155,32 +156,32 @@ static void TestModuleWriteLog(int32_t cmdType, const char *string, struct TestU
             case HOST_ACM_SYNC_READ:
                 fp = fopen("/data/acm_read_xts", "a+");
                 ret = snprintf_s(buffer, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1,
-                    "[XTSCHECK] %d.%06d, recv data[%s] from device\n", time.tv_sec, time.tv_usec, string);
+                    "[XTSCHECK] %d.%06d, recv data[%s] from device\n", time.tv_sec, time.tv_usec, str);
                 break;
             case HOST_ACM_SYNC_WRITE:
                 fp = fopen("/data/acm_write_xts", "a+");
                 ret = snprintf_s(buffer, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1,
-                    "[XTSCHECK] %d.%06d, send data[%s] to device\n", time.tv_sec, time.tv_usec, string);
+                    "[XTSCHECK] %d.%06d, send data[%s] to device\n", time.tv_sec, time.tv_usec, str);
                 break;
             case HOST_ACM_ASYNC_READ:
                 fp = fopen("/data/acm_read_xts", "a+");
                 ret = snprintf_s(buffer, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1,
-                    "[XTSCHECK] %d.%06d, recv data[%s] from device\n", time.tv_sec, time.tv_usec, string);
+                    "[XTSCHECK] %d.%06d, recv data[%s] from device\n", time.tv_sec, time.tv_usec, str);
                 break;
             case HOST_ACM_ASYNC_WRITE:
                 fp = fopen("/data/acm_write_xts", "a+");
                 ret = snprintf_s(buffer, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1,
-                    "[XTSCHECK] %d.%06d, send data[%s] to device\n", time.tv_sec, time.tv_usec, string);
+                    "[XTSCHECK] %d.%06d, send data[%s] to device\n", time.tv_sec, time.tv_usec, str);
                 break;
             case HOST_ACM_CTRL_READ:
                 fp = fopen("/data/acm_read_xts", "a+");
                 ret = snprintf_s(buffer, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1, "[XTSCHECK] %d.%06d, %s\n", time.tv_sec,
-                    time.tv_usec, string);
+                    time.tv_usec, str);
                 break;
             case HOST_ACM_CTRL_WRITE:
                 fp = fopen("/data/acm_write_xts", "a+");
                 ret = snprintf_s(buffer, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1,
-                    "[XTSCHECK] %d.%06d, usb serial control command[%s] done\n", time.tv_sec, time.tv_usec, string);
+                    "[XTSCHECK] %d.%06d, usb serial control command[%s] done\n", time.tv_sec, time.tv_usec, str);
                 break;
             case HOST_ACM_SPEED_TEST:
                 ret = HDF_SUCCESS;

@@ -301,7 +301,7 @@ static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName,
             return HDF_ERR_IO;
         }
     } else {
-        char path[MAX_PATHLEN];
+        char path[PATH_MAX] = {'\0'};
         if (realpath(tmp, path) == NULL) {
             HDF_LOGE("file %{public}s is invalid", tmp);
             return HDF_FAILURE;

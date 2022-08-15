@@ -779,11 +779,13 @@ static int32_t UsbFnAdapterGetPipeInfo(int32_t ep, struct UsbFnPipeInfo * const 
 
 static int32_t UsbFnAdapterQueueInit(int32_t ep)
 {
+    (void)ep;
     return 0;
 }
 
 static int32_t UsbFnAdapterQueueDel(int32_t ep)
 {
+    (void)ep;
     return 0;
 }
 

@@ -108,6 +108,7 @@ static UsbInterfaceHandle *InterfaceIdToHandle(const struct AcmDevice *acm, uint
 
 static int32_t AcmStartWb(struct AcmDevice *acm, struct AcmWb *wb, struct UsbPipeInfo *pipe)
 {
+    (void)pipe;
     int32_t rc;
     struct UsbRequestParams parmas = {};
     acm->transmitting++;
@@ -138,6 +139,7 @@ static int32_t AcmStartWb(struct AcmDevice *acm, struct AcmWb *wb, struct UsbPip
 
 static int32_t AcmStartWbSync(struct AcmDevice *acm, struct AcmWb *wb, struct UsbPipeInfo *pipe)
 {
+    (void)pipe;
     int32_t rc;
     struct UsbRequestParams parmas = {};
     parmas.interfaceId = acm->dataOutPipe->interfaceId;
@@ -634,6 +636,7 @@ static int32_t SerialSetBaudrate(struct SerialDevice *port, const struct HdfSBuf
 
 static int32_t UsbCtrlMsg(struct SerialDevice *port, struct HdfSBuf *data)
 {
+    (void)data;
     int32_t ret;
     struct AcmDevice *acm = port->acm;
     struct UsbCdcLineCoding lineCoding = {
@@ -1233,6 +1236,7 @@ ERROR:
 
 static void AcmProcessNotification(const struct AcmDevice *acm, const unsigned char *buf)
 {
+    (void)acm;
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)buf;
     switch (dr->bNotificationType) {
         case USB_DDK_CDC_NOTIFY_NETWORK_CONNECTION:
