@@ -22,23 +22,23 @@ namespace Audio {
 bool AudioStopRenderFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *stopFuzzManager = nullptr;
+    struct AudioAdapter *stopFuzzAdapter = nullptr;
+    struct AudioRender *stopFuzzRender = nullptr;
+    int32_t ret = AudioGetManagerCreateStartRender(stopFuzzManager, &stopFuzzAdapter, &stopFuzzRender);
+    if (ret < 0 || stopFuzzAdapter == nullptr || stopFuzzRender == nullptr || stopFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
 
     struct AudioRender *renderFuzz = (struct AudioRender *)data;
-    ret = render->control.Stop((AudioHandle)renderFuzz);
+    ret = stopFuzzRender->control.Stop((AudioHandle)renderFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
-    render = nullptr;
+    stopFuzzAdapter->DestroyRender(stopFuzzAdapter, stopFuzzRender);
+    stopFuzzManager->UnloadAdapter(stopFuzzManager, stopFuzzAdapter);
+    stopFuzzRender = nullptr;
     return result;
 }
 }

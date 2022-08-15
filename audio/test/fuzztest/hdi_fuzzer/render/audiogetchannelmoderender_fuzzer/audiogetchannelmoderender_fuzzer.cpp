@@ -22,25 +22,27 @@ namespace Audio {
 bool AudioGetchannelmodeRenderFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *getChannelFuzzManager = nullptr;
+    struct AudioAdapter *getChannelFuzzAdapter = nullptr;
+    struct AudioRender *getChannelFuzzRender = nullptr;
+    int32_t ret = AudioGetManagerCreateStartRender(getChannelFuzzManager,
+        &getChannelFuzzAdapter, &getChannelFuzzRender);
+    if (ret < 0 || getChannelFuzzAdapter == nullptr ||
+        getChannelFuzzRender == nullptr || getChannelFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
 
     struct AudioRender *renderFuzz = (struct AudioRender *)data;
-    ret = render->GetChannelMode(renderFuzz, &mode);
+    ret = getChannelFuzzRender->GetChannelMode(renderFuzz, &mode);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    render->control.Stop((AudioHandle)render);
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
-    render = nullptr;
+    getChannelFuzzRender->control.Stop((AudioHandle)getChannelFuzzRender);
+    getChannelFuzzAdapter->DestroyRender(getChannelFuzzAdapter, getChannelFuzzRender);
+    getChannelFuzzManager->UnloadAdapter(getChannelFuzzManager, getChannelFuzzAdapter);
+    getChannelFuzzRender = nullptr;
     return result;
 }
 }

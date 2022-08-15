@@ -22,31 +22,31 @@ namespace Audio {
 bool AudioFlushRenderFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *flushFuzzManager = nullptr;
+    struct AudioAdapter *flushFuzzAdapter = nullptr;
+    struct AudioRender *flushFuzzRender = nullptr;
+    int32_t ret = AudioGetManagerCreateStartRender(flushFuzzManager, &flushFuzzAdapter, &flushFuzzRender);
+    if (ret < 0 || flushFuzzAdapter == nullptr || flushFuzzRender == nullptr || flushFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
-    ret = render->control.Stop((AudioHandle)render);
+    ret = flushFuzzRender->control.Stop((AudioHandle)flushFuzzRender);
     if (ret < 0) {
-        adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
-        render = nullptr;
+        flushFuzzAdapter->DestroyRender(flushFuzzAdapter, flushFuzzRender);
+        flushFuzzManager->UnloadAdapter(flushFuzzManager, flushFuzzAdapter);
+        flushFuzzRender = nullptr;
         HDF_LOGE("%{public}s: Stop failed \n", __func__);
         return false;
     }
 
     struct AudioRender *renderFuzz = (struct AudioRender *)data;
-    ret = render->control.Flush((AudioHandle)renderFuzz);
+    ret = flushFuzzRender->control.Flush((AudioHandle)renderFuzz);
     if (ret == HDF_ERR_NOT_SUPPORT) {
         result = true;
     }
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
-    render = nullptr;
+    flushFuzzAdapter->DestroyRender(flushFuzzAdapter, flushFuzzRender);
+    flushFuzzManager->UnloadAdapter(flushFuzzManager, flushFuzzAdapter);
+    flushFuzzRender = nullptr;
     return result;
 }
 }

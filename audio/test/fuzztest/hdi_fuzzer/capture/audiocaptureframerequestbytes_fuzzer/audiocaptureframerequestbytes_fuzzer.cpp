@@ -22,25 +22,26 @@ namespace Audio {
 bool AudioCaptureframeRequestbytesFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *reqBytesFuzzManager = nullptr;
+    struct AudioAdapter *reqBytesFuzzAdapter = nullptr;
+    struct AudioCapture *reqBytesFuzzCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateStartCapture(reqBytesFuzzManager, &reqBytesFuzzAdapter, &reqBytesFuzzCapture);
+    if (ret < 0 || reqBytesFuzzAdapter == nullptr ||
+        reqBytesFuzzCapture == nullptr || reqBytesFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
     uint64_t replyBytes = 0;
     char *frame = (char *)data;
-    ret = capture->CaptureFrame(capture, frame, size, &replyBytes);
+    ret = reqBytesFuzzCapture->CaptureFrame(reqBytesFuzzCapture, frame, size, &replyBytes);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
 
-    capture->control.Stop((AudioHandle)capture);
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
-    capture = nullptr;
+    reqBytesFuzzCapture->control.Stop((AudioHandle)reqBytesFuzzCapture);
+    reqBytesFuzzAdapter->DestroyCapture(reqBytesFuzzAdapter, reqBytesFuzzCapture);
+    reqBytesFuzzManager->UnloadAdapter(reqBytesFuzzManager, reqBytesFuzzAdapter);
+    reqBytesFuzzCapture = nullptr;
     return result;
 }
 }

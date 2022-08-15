@@ -22,34 +22,34 @@ namespace Audio {
 bool AudioGetextraparamsCaptureFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *getextFuzzManager = nullptr;
+    struct AudioAdapter *getextFuzzAdapter = nullptr;
+    struct AudioCapture *getextFuzzCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateStartCapture(getextFuzzManager, &getextFuzzAdapter, &getextFuzzCapture);
+    if (ret < 0 || getextFuzzAdapter == nullptr || getextFuzzCapture == nullptr || getextFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
     char keyValueListValue[256] = {};
     int32_t listLenth = 256;
-    ret = capture->attr.SetExtraParams(capture, keyValueList);
+    ret = getextFuzzCapture->attr.SetExtraParams(getextFuzzCapture, keyValueList);
     if (ret < 0) {
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        getextFuzzAdapter->DestroyCapture(getextFuzzAdapter, getextFuzzCapture);
+        getextFuzzManager->UnloadAdapter(getextFuzzManager, getextFuzzAdapter);
         HDF_LOGE("%{public}s: SetExtraParams failed \n", __func__);
         return false;
     }
     uint8_t *dataFuzz = const_cast<uint8_t *>(data);
     struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(dataFuzz);
-    ret = capture->attr.GetExtraParams(captureFuzz, keyValueListValue, listLenth);
+    ret = getextFuzzCapture->attr.GetExtraParams(captureFuzz, keyValueListValue, listLenth);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    capture->control.Stop((AudioHandle)capture);
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
-    capture = nullptr;
+    getextFuzzCapture->control.Stop((AudioHandle)getextFuzzCapture);
+    getextFuzzAdapter->DestroyCapture(getextFuzzAdapter, getextFuzzCapture);
+    getextFuzzManager->UnloadAdapter(getextFuzzManager, getextFuzzAdapter);
+    getextFuzzCapture = nullptr;
     return result;
 }
 }

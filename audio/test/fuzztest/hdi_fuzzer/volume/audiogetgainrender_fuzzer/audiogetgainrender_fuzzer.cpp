@@ -23,22 +23,22 @@ bool AudioGetgainRenderFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
     float gain = 0;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *getGainRenManager = nullptr;
+    struct AudioAdapter *getGainRenAdapter = nullptr;
+    struct AudioRender *getGainRenRender = nullptr;
+    int32_t ret = AudioGetManagerCreateRender(getGainRenManager, &getGainRenAdapter, &getGainRenRender);
+    if (ret < 0 || getGainRenAdapter == nullptr || getGainRenRender == nullptr || getGainRenManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
         return false;
     }
 
     struct AudioRender *handle = (struct AudioRender *)data;
-    ret = render->volume.SetGain(handle, gain);
+    ret = getGainRenRender->volume.SetGain(handle, gain);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
+    getGainRenAdapter->DestroyRender(getGainRenAdapter, getGainRenRender);
+    getGainRenManager->UnloadAdapter(getGainRenManager, getGainRenAdapter);
     return result;
 }
 }

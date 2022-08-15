@@ -25,11 +25,12 @@ namespace Audio {
         bool supported = false;
         struct AudioSceneDescriptor scenes = {};
         scenes.scene.id = 0;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
-        struct AudioRender *render = nullptr;
-        int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-        if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        TestAudioManager *checkSceFuzzManager = nullptr;
+        struct AudioAdapter *checkSceFuzzAdapter = nullptr;
+        struct AudioRender *checkSceFuzzRender = nullptr;
+        int32_t ret = AudioGetManagerCreateRender(checkSceFuzzManager, &checkSceFuzzAdapter, &checkSceFuzzRender);
+        if (ret < 0 || checkSceFuzzAdapter == nullptr ||
+            checkSceFuzzRender == nullptr || checkSceFuzzManager == nullptr) {
             return false;
         }
 
@@ -38,12 +39,12 @@ namespace Audio {
         if (memcpy_s((void *)&sceneFuzz, sizeof(sceneFuzz), data, copySize) != 0) {
             return false;
         }
-        ret = render->scene.CheckSceneCapability(render, &sceneFuzz, &supported);
+        ret = checkSceFuzzRender->scene.CheckSceneCapability(checkSceFuzzRender, &sceneFuzz, &supported);
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
+        checkSceFuzzAdapter->DestroyRender(checkSceFuzzAdapter, checkSceFuzzRender);
+        checkSceFuzzManager->UnloadAdapter(checkSceFuzzManager, checkSceFuzzAdapter);
         return result;
     }
 }

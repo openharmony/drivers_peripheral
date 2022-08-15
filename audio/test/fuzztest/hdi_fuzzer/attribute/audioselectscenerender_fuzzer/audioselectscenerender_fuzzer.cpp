@@ -24,22 +24,22 @@ namespace Audio {
         bool result = false;
         struct AudioSceneDescriptor scenes = {};
         scenes.scene.id = 0;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
-        struct AudioRender *render = nullptr;
-        int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-        if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        TestAudioManager *selectFuzzManager = nullptr;
+        struct AudioAdapter *selectFuzzAdapter = nullptr;
+        struct AudioRender *selectFuzzRender = nullptr;
+        int32_t ret = AudioGetManagerCreateRender(selectFuzzManager, &selectFuzzAdapter, &selectFuzzRender);
+        if (ret < 0 || selectFuzzAdapter == nullptr || selectFuzzRender == nullptr || selectFuzzManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
             return false;
         }
 
         struct AudioRender *handle = (struct AudioRender *)data;
-        ret = render->scene.SelectScene(handle, &scenes);
+        ret = selectFuzzRender->scene.SelectScene(handle, &scenes);
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
+        selectFuzzAdapter->DestroyRender(selectFuzzAdapter, selectFuzzRender);
+        selectFuzzManager->UnloadAdapter(selectFuzzManager, selectFuzzAdapter);
         return result;
     }
 }

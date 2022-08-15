@@ -24,22 +24,22 @@ bool AudioGetgainthresholdRenderFuzzTest(const uint8_t *data, size_t size)
     bool result = false;
     float min = 0;
     float max = 0;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *geGainRenManager = nullptr;
+    struct AudioAdapter *geGainRenAdapter = nullptr;
+    struct AudioRender *geGainRenRender = nullptr;
+    int32_t ret = AudioGetManagerCreateRender(geGainRenManager, &geGainRenAdapter, &geGainRenRender);
+    if (ret < 0 || geGainRenAdapter == nullptr || geGainRenRender == nullptr || geGainRenManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
         return false;
     }
 
     struct AudioRender *handle = (struct AudioRender *)data;
-    ret = render->volume.GetGainThreshold(handle, &min, &max);
+    ret = geGainRenRender->volume.GetGainThreshold(handle, &min, &max);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
+    geGainRenAdapter->DestroyRender(geGainRenAdapter, geGainRenRender);
+    geGainRenManager->UnloadAdapter(geGainRenManager, geGainRenAdapter);
     return result;
 }
 }

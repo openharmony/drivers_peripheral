@@ -25,21 +25,23 @@ namespace Audio {
         bool supported = false;
         struct AudioSceneDescriptor scenes = {};
         scenes.scene.id = 0;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
-        struct AudioCapture *capture = nullptr;
-        int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-        if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+        TestAudioManager *checkSceneFuzzManager = nullptr;
+        struct AudioAdapter *checkSceneFuzzAdapter = nullptr;
+        struct AudioCapture *checkSceneFuzzCapture = nullptr;
+        int32_t ret = AudioGetManagerCreateCapture(checkSceneFuzzManager,
+            &checkSceneFuzzAdapter, &checkSceneFuzzCapture);
+        if (ret < 0 || checkSceneFuzzAdapter == nullptr ||
+            checkSceneFuzzCapture == nullptr || checkSceneFuzzManager == nullptr) {
             return false;
         }
 
         struct AudioCapture *handle = (struct AudioCapture *)data;
-        ret = capture->scene.CheckSceneCapability(handle, &scenes, &supported);
+        ret = checkSceneFuzzCapture->scene.CheckSceneCapability(handle, &scenes, &supported);
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        checkSceneFuzzAdapter->DestroyCapture(checkSceneFuzzAdapter, checkSceneFuzzCapture);
+        checkSceneFuzzManager->UnloadAdapter(checkSceneFuzzManager, checkSceneFuzzAdapter);
 
         return result;
     }

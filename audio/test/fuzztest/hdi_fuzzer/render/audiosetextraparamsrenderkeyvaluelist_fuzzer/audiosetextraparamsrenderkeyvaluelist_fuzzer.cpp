@@ -22,23 +22,23 @@ namespace Audio {
 bool AudioSetextraparamsRenderKeyvaluelistFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *renKeyValueManager = nullptr;
+    struct AudioAdapter *renKeyValueAdapter = nullptr;
+    struct AudioRender *renKeyValueRender = nullptr;
+    int32_t ret = AudioGetManagerCreateStartRender(renKeyValueManager, &renKeyValueAdapter, &renKeyValueRender);
+    if (ret < 0 || renKeyValueAdapter == nullptr || renKeyValueRender == nullptr || renKeyValueManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
     char *keyValueListFuzz = (char *)data;
-    ret = render->attr.SetExtraParams(render, keyValueListFuzz);
+    ret = renKeyValueRender->attr.SetExtraParams(renKeyValueRender, keyValueListFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    render->control.Stop((AudioHandle)render);
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
-    render = nullptr;
+    renKeyValueRender->control.Stop((AudioHandle)renKeyValueRender);
+    renKeyValueAdapter->DestroyRender(renKeyValueAdapter, renKeyValueRender);
+    renKeyValueManager->UnloadAdapter(renKeyValueManager, renKeyValueAdapter);
+    renKeyValueRender = nullptr;
     return result;
 }
 }

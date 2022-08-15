@@ -21,26 +21,26 @@ namespace Audio {
 bool AudioInitallportsFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    int32_t ret = GetManager(manager);
-    if (ret < 0 || manager == nullptr) {
+    TestAudioManager *initallFuzzManager = nullptr;
+    int32_t ret = GetManager(initallFuzzManager);
+    if (ret < 0 || initallFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
-    struct AudioAdapter *adapter = nullptr;
+    struct AudioAdapter *initallFuzzAdapter = nullptr;
     struct AudioPort *audioPort = nullptr;
-    ret = GetLoadAdapter(manager, &adapter, audioPort);
-    if (ret < 0 || adapter == nullptr) {
+    ret = GetLoadAdapter(initallFuzzManager, &initallFuzzAdapter, audioPort);
+    if (ret < 0 || initallFuzzAdapter == nullptr) {
         HDF_LOGE("%{public}s: GetLoadAdapter failed \n", __func__);
         return false;
     }
 
     struct AudioAdapter *adapterFuzz = (struct AudioAdapter *)data;
-    ret = adapter->InitAllPorts(adapterFuzz);
+    ret = initallFuzzAdapter->InitAllPorts(adapterFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    manager->UnloadAdapter(manager, adapter);
+    initallFuzzManager->UnloadAdapter(initallFuzzManager, initallFuzzAdapter);
     return result;
 }
 }

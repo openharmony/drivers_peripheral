@@ -22,23 +22,23 @@ namespace Audio {
     bool AudioSetSampleAttributesRenderFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
-        struct AudioRender *render = nullptr;
+        TestAudioManager *setSampleManager = nullptr;
+        struct AudioAdapter *setSampleAdapter = nullptr;
+        struct AudioRender *setSampleRender = nullptr;
         struct AudioSampleAttributes attrs = {};
-        int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-        if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        int32_t ret = AudioGetManagerCreateRender(setSampleManager, &setSampleAdapter, &setSampleRender);
+        if (ret < 0 || setSampleAdapter == nullptr || setSampleRender == nullptr || setSampleManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
             return false;
         }
         InitAttrs(attrs);
         struct AudioRender *handle = (struct AudioRender *)data;
-        ret = render->attr.SetSampleAttributes(handle, &attrs);
+        ret = setSampleRender->attr.SetSampleAttributes(handle, &attrs);
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
+        setSampleAdapter->DestroyRender(setSampleAdapter, setSampleRender);
+        setSampleManager->UnloadAdapter(setSampleManager, setSampleAdapter);
         return result;
     }
 }
