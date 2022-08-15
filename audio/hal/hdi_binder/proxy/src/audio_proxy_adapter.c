@@ -736,6 +736,7 @@ int32_t AudioProxyAdapterGetPortCapability(struct AudioAdapter *adapter,
 int32_t AudioProxyAdapterSetAndGetPassthroughModeSBuf(struct HdfSBuf *data,
     const struct HdfSBuf *reply, const struct AudioPort *port)
 {
+    (void)reply;
     if (data == NULL || port == NULL || port->portName == NULL) {
         return HDF_FAILURE;
     }
@@ -897,15 +898,21 @@ int32_t AudioProxyAdapterGetPassthroughMode(struct AudioAdapter *adapter,
 
 int32_t AudioProxyAdapterSetMicMute(struct AudioAdapter *adapter, bool mute)
 {
+    (void)adapter;
+    (void)mute;
     return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t AudioProxyAdapterGetMicMute(struct AudioAdapter *adapter, bool *mute)
 {
+    (void)adapter;
+    (void)mute;
     return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t AudioProxyAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume)
 {
+    (void)adapter;
+    (void)volume;
     return HDF_ERR_NOT_SUPPORT;
 }

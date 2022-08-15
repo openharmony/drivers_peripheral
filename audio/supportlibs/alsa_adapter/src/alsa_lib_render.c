@@ -29,7 +29,7 @@ static snd_pcm_sframes_t g_periodSize = 0;
 static unsigned int g_bufferTime = 500000; /* (0.5s): ring buffer length in us */
 static unsigned int g_periodTime = 100000; /* (0.1s): period time in us */
 static int g_resample = 1;                 /* enable alsa-lib resampling */
-static int g_periodEvent = 0;              /* produce poll event after each period */
+static bool g_periodEvent = false;              /* produce poll event after each period */
 static int g_canPause = 0;                 /* 0 Hardware doesn't support pause, 1 Hardware supports pause */
 
 static int32_t GetHwParams(struct AudioCardInfo *cardIns, const struct AudioHwRenderParam *handleData)

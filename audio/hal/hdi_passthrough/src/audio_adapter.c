@@ -183,15 +183,15 @@ static int32_t AudioCheckDescPortId(const struct AudioAdapterDescriptor *adapter
         AUDIO_FUNC_LOGE("Get adapterNum fail!");
         return HDF_FAILURE;
     }
-    struct AudioAdapterDescriptor *Descs = AudioAdapterGetConfigOut();
-    if (Descs == NULL) {
+    struct AudioAdapterDescriptor *descs = AudioAdapterGetConfigOut();
+    if (descs == NULL) {
         AUDIO_FUNC_LOGE("Get adapterDescs is NULL!");
         return HDF_FAILURE;
     }
     bool checkFlag = false;
     for (int index = 0; index < adapterNum; index++) {
-        if (strcmp(Descs[index].adapterName, adapterDescriptor->adapterName) == 0) {
-            if (Descs[index].ports[0].portId == portId) {
+        if (strcmp(descs[index].adapterName, adapterDescriptor->adapterName) == 0) {
+            if (descs[index].ports[0].portId == portId) {
                 checkFlag = true;
                 break;
             } else {
@@ -205,10 +205,10 @@ static int32_t AudioCheckDescPortId(const struct AudioAdapterDescriptor *adapter
         return HDF_FAILURE;
     }
     for (int index = 0; index < adapterNum; index++) {
-        if (strncmp(Descs[index].adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
-            if (Descs[index].ports[0].portId <= AUDIO_PRIMARY_ID_MAX &&
-                Descs[index].ports[0].portId >= AUDIO_PRIMARY_ID_MIN) {
-                *id = Descs[index].ports[0].portId;
+        if (strncmp(descs[index].adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+            if (descs[index].ports[0].portId <= AUDIO_PRIMARY_ID_MAX &&
+                descs[index].ports[0].portId >= AUDIO_PRIMARY_ID_MIN) {
+                *id = descs[index].ports[0].portId;
                 break;
             }
         }

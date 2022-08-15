@@ -15,13 +15,13 @@
 
 /**
  * @file analog_headset_test.cpp
- * 
+ *
  * @brief The test equipment is an analog headset (headset_jack_index);
  * First test the API of the input module called;
  * Then test the headset plug-in recognition function, including four
  * comprehensive tests: normal multiple plug-in, fast, slow, headset
  * and headphone switching.
- * 
+ *
  * @since 1.0
  */
 

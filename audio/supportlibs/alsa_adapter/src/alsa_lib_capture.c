@@ -32,7 +32,7 @@ static unsigned int g_periodTime = 100000; /* (0.1s): period time in us */
 static snd_pcm_sframes_t g_bufferSize = 0;
 static snd_pcm_sframes_t g_periodSize = 0;
 static int g_resample = 1;    /* enable alsa-lib resampling */
-static int g_periodEvent = 0; /* produce poll event after each period */
+static bool g_periodEvent = false; /* produce poll event after each period */
 static int g_canPause = 0;    /* 0 Hardware doesn't support pause, 1 Hardware supports pause */
 
 static int32_t AudioSetMixerCapVolume(snd_mixer_elem_t *pcmElemen, long vol)

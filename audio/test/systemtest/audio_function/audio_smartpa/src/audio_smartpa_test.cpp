@@ -37,7 +37,7 @@ public:
     static int32_t (*InterfaceLibOutputRender)(struct DevHandle *, int32_t, struct AudioHwRenderParam *);
     static int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int32_t, struct AudioHwRenderParam *);
     static void (*CloseServiceRenderSo)(struct DevHandle *);
-    static void *PtrHandle;
+    static void *ptrHandle;
     static int32_t GetManager(struct PrepareAudioPara& audiopara);
     int32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender, const std::string BindName,
          const std::string adapterNameCase, struct DevHandle *&handle) const;
@@ -49,7 +49,7 @@ struct DevHandle *(*AudioSmartPaTest::BindServiceRenderSo)(const char *) = nullp
 int32_t (*AudioSmartPaTest::InterfaceLibOutputRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
 int32_t (*AudioSmartPaTest::InterfaceLibCtlRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
 void (*AudioSmartPaTest::CloseServiceRenderSo)(struct DevHandle *) = nullptr;
-void *AudioSmartPaTest::PtrHandle = nullptr;
+void *AudioSmartPaTest::ptrHandle = nullptr;
 using THREAD_FUNC = void *(*)(void *);
 
 void AudioSmartPaTest::SetUpTestCase(void)
@@ -67,19 +67,19 @@ void AudioSmartPaTest::SetUpTestCase(void)
         return;
     }
     string resolvedPathOne = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
-    PtrHandle = dlopen(resolvedPathOne.c_str(), RTLD_LAZY);
-    if (PtrHandle == nullptr) {
+    ptrHandle = dlopen(resolvedPathOne.c_str(), RTLD_LAZY);
+    if (ptrHandle == nullptr) {
         return;
     }
-    BindServiceRenderSo = (struct DevHandle* (*)(const char *))dlsym(PtrHandle, "AudioBindServiceRender");
+    BindServiceRenderSo = (struct DevHandle* (*)(const char *))dlsym(ptrHandle, "AudioBindServiceRender");
     InterfaceLibOutputRender = (int32_t (*)(struct DevHandle *, int,
-        struct AudioHwRenderParam *))dlsym(PtrHandle, "AudioInterfaceLibOutputRender");
+        struct AudioHwRenderParam *))dlsym(ptrHandle, "AudioInterfaceLibOutputRender");
     InterfaceLibCtlRender = (int32_t (*)(struct DevHandle *, int,
-        struct AudioHwRenderParam *))dlsym(PtrHandle, "AudioInterfaceLibCtlRender");
-    CloseServiceRenderSo = (void (*)(struct DevHandle *))dlsym(PtrHandle, "AudioCloseServiceRender");
+        struct AudioHwRenderParam *))dlsym(ptrHandle, "AudioInterfaceLibCtlRender");
+    CloseServiceRenderSo = (void (*)(struct DevHandle *))dlsym(ptrHandle, "AudioCloseServiceRender");
     if (BindServiceRenderSo == nullptr || CloseServiceRenderSo == nullptr ||
         InterfaceLibCtlRender == nullptr || InterfaceLibOutputRender == nullptr) {
-        dlclose(PtrHandle);
+        dlclose(ptrHandle);
         return;
     }
 }
@@ -93,9 +93,9 @@ void AudioSmartPaTest::TearDownTestCase(void)
     if (GetAudioManager != nullptr) {
         GetAudioManager = nullptr;
     }
-    if (PtrHandle != nullptr) {
-        dlclose(PtrHandle);
-        PtrHandle = nullptr;
+    if (ptrHandle != nullptr) {
+        dlclose(ptrHandle);
+        ptrHandle = nullptr;
     }
     if (BindServiceRenderSo != nullptr) {
         BindServiceRenderSo = nullptr;

@@ -985,7 +985,7 @@ static cJSON *AudioGetItemString(cJSON *adapter, char *name)
 
     ret = AudioAdapterCheckName(item->valuestring);
     if (ret < 0) {
-        if (strncmp(name, "daiId", sizeof("daiId"))) {
+        if (strncmp(name, "daiId", sizeof("daiId")) != 0) {
             AUDIO_FUNC_LOGE("The %{public}s name incorrect!", name);
         }
         return NULL;

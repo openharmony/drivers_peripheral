@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_IDlHDI_COMMON_H
-#define AUDIO_IDlHDI_COMMON_H
+#ifndef AUDIO_IDLHDI_COMMON_H
+#define AUDIO_IDLHDI_COMMON_H
 #include <dlfcn.h>
 #include <inttypes.h>
 #include <limits.h>

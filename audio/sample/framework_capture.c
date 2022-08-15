@@ -400,9 +400,9 @@ uint32_t StringToInt(const char *flag)
     return temp;
 }
 
-int32_t AddWavFileHeader(struct StrParaCapture *StrParam)
+int32_t AddWavFileHeader(struct StrParaCapture *strParam)
 {
-    if (StrParam == NULL) {
+    if (strParam == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
         return HDF_FAILURE;
     }
@@ -414,12 +414,12 @@ int32_t AddWavFileHeader(struct StrParaCapture *StrParam)
     headInfo.riffSize = (uint32_t)ftell(g_file) - WAV_HEAD_RIFF_OFFSET;
     headInfo.riffType = StringToInt("WAVE");
     headInfo.audioFileFmtId = StringToInt("fmt ");
-    headInfo.audioFileFmtSize = PcmFormatToBits(StrParam->attrs.format);
+    headInfo.audioFileFmtSize = PcmFormatToBits(strParam->attrs.format);
     headInfo.audioFileFormat = 1;
-    headInfo.audioChannelNum = StrParam->attrs.channelCount;
-    headInfo.audioSampleRate = StrParam->attrs.sampleRate;
-    headInfo.audioByteRate = headInfo.audioSampleRate * headInfo.audioChannelNum * headInfo.audioFileFmtSize
-                             / PCM_8_BIT;
+    headInfo.audioChannelNum = strParam->attrs.channelCount;
+    headInfo.audioSampleRate = strParam->attrs.sampleRate;
+    headInfo.audioByteRate = headInfo.audioSampleRate * headInfo.audioChannelNum *
+        headInfo.audioFileFmtSize / PCM_8_BIT;
     headInfo.audioBlockAlign = (uint16_t)(headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT);
     headInfo.audioBitsPerSample = (uint16_t)headInfo.audioFileFmtSize;
     headInfo.dataId = StringToInt("data");
@@ -647,19 +647,19 @@ int32_t StartPlayThread(int32_t palyModeFlag)
     return HDF_SUCCESS;
 }
 
-int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *StrParam, struct AudioCapture *capture,
+int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *strParam, struct AudioCapture *capture,
     int32_t palyModeFlag)
 {
-    if (StrParam == NULL || capture == NULL) {
+    if (strParam == NULL || capture == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
         return HDF_FAILURE;
     }
     int32_t ret;
-    (void)memset_s(StrParam, sizeof(struct StrParaCapture), 0, sizeof(struct StrParaCapture));
-    StrParam->capture = capture;
-    StrParam->file = g_file;
-    StrParam->attrs = g_attrs;
-    StrParam->frame = g_frame;
+    (void)memset_s(strParam, sizeof(struct StrParaCapture), 0, sizeof(struct StrParaCapture));
+    strParam->capture = capture;
+    strParam->file = g_file;
+    strParam->attrs = g_attrs;
+    strParam->frame = g_frame;
     if (g_captureModeFlag == CAPTURE_INTERUPT) {
 #ifndef __LITEOS__
         ret = RegisterListen(&g_str);
@@ -894,8 +894,7 @@ int32_t GetCapturePassthroughManagerFunc(const char *adapterNameCase)
         return HDF_FAILURE;
     }
     int32_t ret = manager->GetAllAdapters(manager, &descs, &size);
-    int32_t param = size == 0 || descs == NULL || ret < 0;
-    if (param) {
+    if ((size == 0) || (descs == NULL) || (ret < 0)) {
         AUDIO_FUNC_LOGE("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
     }
@@ -943,8 +942,7 @@ int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
         return HDF_FAILURE;
     }
     int32_t ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
-    int32_t check = size == 0 || descs == NULL || ret < 0;
-    if (check) {
+    if ((size == 0) || (descs == NULL) || (ret < 0)) {
         AUDIO_FUNC_LOGE("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
     }
@@ -1467,7 +1465,7 @@ int32_t main(int32_t argc, char const *argv[])
         return ret;
     }
     bool soMode = false;
-    if (InitParam()) { // init
+    if (InitParam() < 0) { // init
         AUDIO_FUNC_LOGE("InitParam Fail");
         return HDF_FAILURE;
     }
