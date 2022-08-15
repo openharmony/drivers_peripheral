@@ -333,6 +333,15 @@ static int32_t SendCmdIoctlInner(const char *ifName, int32_t cmdId, const int8_t
     return SendCmdIoctl(ifName, cmdId, paramBuf, paramBufLen);
 }
 
+static int32_t GetStationInfoInner(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen)
+{
+    if (ifName == NULL || info == NULL || mac == NULL || macLen < ETH_ADDR_LEN) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return GetStationInfo(ifName, info, mac, macLen);
+}
+
 static int32_t Start(struct IWiFi *iwifi)
 {
     HalMutexLock();
@@ -485,6 +494,14 @@ static int32_t WifiSendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t 
     return ret;
 }
 
+static int32_t WifiGetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen)
+{
+    HalMutexLock();
+    int32_t ret = GetStationInfoInner(ifName, info, mac, macLen);
+    HalMutexUnlock();
+    return ret;
+}
+
 int32_t WifiConstruct(struct IWiFi **wifiInstance)
 {
     static bool isInited = false;
@@ -492,7 +509,7 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
 
     if (!isInited) {
         if (HalMutexInit() != HDF_SUCCESS) {
-            HDF_LOGE("%s: HalMutexInit failed, line: %d\n", __FUNCTION__, __LINE__);
+            HDF_LOGE("%s: HalMutexInit failed, line: %d", __FUNCTION__, __LINE__);
             return HDF_FAILURE;
         }
 
@@ -515,6 +532,7 @@ int32_t WifiConstruct(struct IWiFi **wifiInstance)
         singleWifiInstance.sendCmdIoctl = WifiSendCmdIoctl;
         singleWifiInstance.registerHid2dCallback = HalRegisterHid2dCallback;
         singleWifiInstance.unregisterHid2dCallback = HalUnregisterHid2dCallback;
+        singleWifiInstance.getStationInfo = WifiGetStationInfo;
         InitIWiFiList();
         isInited = true;
     }

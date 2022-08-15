@@ -190,7 +190,6 @@ int32_t WlanInterfaceGetAsscociatedStas(struct IWlanInterface *self, const struc
                 ret = HDF_FAILURE;
                 break;
             }
-            staInfo[i].macLen = WIFI_MAC_ADDR_LENGTH;
         }
     }
     OsalMemFree(wifiStaInfo);
@@ -1070,6 +1069,27 @@ int32_t WlanInterfaceSetProjectionScreenParam(struct IWlanInterface *self, const
     } while (0);
     
     OsalMemFree(projScrnCmdParam);
+    return ret;
+}
+
+int32_t WlanInterfaceGetStaInfo(struct IWlanInterface *self, const char *ifName, struct WifiStationInfo *info,
+    const uint8_t *mac, uint32_t macLen)
+{
+    int32_t ret;
+
+    (void)self;
+    if (ifName == NULL || info == NULL || mac == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_wifi == NULL) {
+        HDF_LOGE("%{public}s g_wifi is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = g_wifi->getStationInfo(ifName, (StationInfo *)info, mac, macLen);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get station information failed!, error code: %{public}d", __func__, ret);
+    }
     return ret;
 }
 
