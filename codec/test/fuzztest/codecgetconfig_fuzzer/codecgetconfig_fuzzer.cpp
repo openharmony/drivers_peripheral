@@ -18,11 +18,13 @@
 
 #include <securec.h>
 
-struct AllParameters {
-    uint32_t index;
-    int8_t *cfgStruct;
-    uint32_t cfgStructLen;
-};
+namespace {
+    struct AllParameters {
+        uint32_t index;
+        int8_t *cfgStruct;
+        uint32_t cfgStructLen;
+    };
+}
 
 namespace OHOS {
 namespace Codec {

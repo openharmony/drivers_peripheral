@@ -27,11 +27,13 @@
 
 using namespace std;
 using namespace OHOS;
-constexpr int32_t FD_SIZE = sizeof(int);
-constexpr int32_t FRAME = (30 << 16);
-constexpr int32_t HEIGHT_OPERATOR = 2;
-constexpr const char *decoder_avc = "rk.video_decoder.avc";
-constexpr const char *decoder_hevc = "rk.video_decoder.hevc";
+namespace {
+    constexpr int32_t FD_SIZE = sizeof(int);
+    constexpr int32_t FRAME = (30 << 16);
+    constexpr int32_t HEIGHT_OPERATOR = 2;
+    constexpr const char *decoder_avc = "rk.video_decoder.avc";
+    constexpr const char *decoder_hevc = "rk.video_decoder.hevc";
+}
 
 #define HDF_LOG_TAG codec_omx_hdi_dec
 

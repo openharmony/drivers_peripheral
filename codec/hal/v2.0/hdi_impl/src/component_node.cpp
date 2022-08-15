@@ -26,7 +26,10 @@
 
 #define HDF_LOG_TAG codec_hdi_server
 #define FD_SIZE     sizeof(int)
-constexpr int ROLE_MAX_LEN = 256;
+namespace {
+    constexpr int ROLE_MAX_LEN = 256;
+}
+
 namespace OHOS {
 namespace Codec {
 namespace Omx {

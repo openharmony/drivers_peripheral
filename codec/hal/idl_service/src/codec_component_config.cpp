@@ -17,49 +17,51 @@
 #include <osal_mem.h>
 #include "codec_log_wrapper.h"
 
-constexpr int32_t MASK_NUM_LIMIT = 32;
-constexpr char NODE_VIDEO_HARDWARE_ENCODERS[] = "VideoHwEncoders";
-constexpr char NODE_VIDEO_HARDWARE_DECODERS[] = "VideoHwDecoders";
-constexpr char NODE_VIDEO_SOFTWARE_ENCODERS[] = "VideoSwEncoders";
-constexpr char NODE_VIDEO_SOFTWARE_DECODERS[] = "VideoSwDecoders";
-constexpr char NODE_AUDIO_HARDWARE_ENCODERS[] = "AudioHwEncoders";
-constexpr char NODE_AUDIO_HARDWARE_DECODERS[] = "AudioHwDecoders";
-constexpr char NODE_AUDIO_SOFTWARE_ENCODERS[] = "AudioSwEncoders";
-constexpr char NODE_AUDIO_SOFTWARE_DECODERS[] = "AudioSwDecoders";
-
-constexpr char CODEC_CONFIG_KEY_ROLE[] = "role";
-constexpr char CODEC_CONFIG_KEY_TYPE[] = "type";
-constexpr char CODEC_CONFIG_KEY_NAME[] = "name";
-constexpr char CODEC_CONFIG_KEY_SUPPORT_PROFILES[] = "supportProfiles";
-constexpr char CODEC_CONFIG_KEY_MAX_INST[] = "maxInst";
-constexpr char CODEC_CONFIG_KEY_IS_SOFTWARE_CODEC[] = "isSoftwareCodec";
-constexpr char CODEC_CONFIG_KEY_PROCESS_MODE_MASK[] = "processModeMask";
-constexpr char CODEC_CONFIG_KEY_CAPS_MASK[] = "capsMask";
-constexpr char CODEC_CONFIG_KEY_MIN_BITRATE[] = "minBitRate";
-constexpr char CODEC_CONFIG_KEY_MAX_BITRATE[] = "maxBitRate";
-
-constexpr char CODEC_CONFIG_KEY_MIN_WIDTH[] = "minWidth";
-constexpr char CODEC_CONFIG_KEY_MIN_HEIGHT[] = "minHeight";
-constexpr char CODEC_CONFIG_KEY_MAX_WIDTH[] = "maxWidth";
-constexpr char CODEC_CONFIG_KEY_MAX_HEIGHT[] = "maxHeight";
-constexpr char CODEC_CONFIG_KEY_WIDTH_ALIGNMENT[] = "widthAlignment";
-constexpr char CODEC_CONFIG_KEY_HEIGHT_ALIGNMENT[] = "heightAlignment";
-constexpr char CODEC_CONFIG_KEY_MIN_BLOCK_COUNT[] = "minBlockCount";
-constexpr char CODEC_CONFIG_KEY_MAX_BLOCK_COUNT[] = "maxBlockCount";
-constexpr char CODEC_CONFIG_KEY_MIN_BLOCKS_PER_SECOND[] = "minBlocksPerSecond";
-constexpr char CODEC_CONFIG_KEY_MAX_BLOCKS_PER_SECOND[] = "maxBlocksPerSecond";
-constexpr char CODEC_CONFIG_KEY_SUPPORT_PIXEL_FMTS[] = "supportPixelFmts";
-constexpr char CODEC_CONFIG_KEY_BLOCK_SIZE_WIDTH[] = "blockSizeWidth";
-constexpr char CODEC_CONFIG_KEY_BLOCK_SIZE_HEIGHT[] = "blockSizeHeight";
-constexpr char CODEC_CONFIG_KEY_MIN_FRAME_RATE[] = "minFrameRate";
-constexpr char CODEC_CONFIG_KEY_MAX_FRAME_RATE[] = "maxFrameRate";
-constexpr char CODEC_CONFIG_KEY_BITE_RATE_MODE[] = "bitRateMode";
-constexpr char CODEC_CONFIG_KEY_MESURED_FRAME_RATE[] = "measuredFrameRate";
-
-constexpr char CODEC_CONFIG_KEY_SAMPLE_FORMATS[] = "sampleFormats";
-constexpr char CODEC_CONFIG_KEY_SAMPLE_RATE[] = "sampleRate";
-constexpr char CODEC_CONFIG_KEY_CHANNEL_LAYOUTS[] = "channelLayouts";
-constexpr char CODEC_CONFIG_KEY_CHANNEL_COUNT[] = "channelCount";
+namespace {
+    constexpr int32_t MASK_NUM_LIMIT = 32;
+    constexpr char NODE_VIDEO_HARDWARE_ENCODERS[] = "VideoHwEncoders";
+    constexpr char NODE_VIDEO_HARDWARE_DECODERS[] = "VideoHwDecoders";
+    constexpr char NODE_VIDEO_SOFTWARE_ENCODERS[] = "VideoSwEncoders";
+    constexpr char NODE_VIDEO_SOFTWARE_DECODERS[] = "VideoSwDecoders";
+    constexpr char NODE_AUDIO_HARDWARE_ENCODERS[] = "AudioHwEncoders";
+    constexpr char NODE_AUDIO_HARDWARE_DECODERS[] = "AudioHwDecoders";
+    constexpr char NODE_AUDIO_SOFTWARE_ENCODERS[] = "AudioSwEncoders";
+    constexpr char NODE_AUDIO_SOFTWARE_DECODERS[] = "AudioSwDecoders";
+    
+    constexpr char CODEC_CONFIG_KEY_ROLE[] = "role";
+    constexpr char CODEC_CONFIG_KEY_TYPE[] = "type";
+    constexpr char CODEC_CONFIG_KEY_NAME[] = "name";
+    constexpr char CODEC_CONFIG_KEY_SUPPORT_PROFILES[] = "supportProfiles";
+    constexpr char CODEC_CONFIG_KEY_MAX_INST[] = "maxInst";
+    constexpr char CODEC_CONFIG_KEY_IS_SOFTWARE_CODEC[] = "isSoftwareCodec";
+    constexpr char CODEC_CONFIG_KEY_PROCESS_MODE_MASK[] = "processModeMask";
+    constexpr char CODEC_CONFIG_KEY_CAPS_MASK[] = "capsMask";
+    constexpr char CODEC_CONFIG_KEY_MIN_BITRATE[] = "minBitRate";
+    constexpr char CODEC_CONFIG_KEY_MAX_BITRATE[] = "maxBitRate";
+    
+    constexpr char CODEC_CONFIG_KEY_MIN_WIDTH[] = "minWidth";
+    constexpr char CODEC_CONFIG_KEY_MIN_HEIGHT[] = "minHeight";
+    constexpr char CODEC_CONFIG_KEY_MAX_WIDTH[] = "maxWidth";
+    constexpr char CODEC_CONFIG_KEY_MAX_HEIGHT[] = "maxHeight";
+    constexpr char CODEC_CONFIG_KEY_WIDTH_ALIGNMENT[] = "widthAlignment";
+    constexpr char CODEC_CONFIG_KEY_HEIGHT_ALIGNMENT[] = "heightAlignment";
+    constexpr char CODEC_CONFIG_KEY_MIN_BLOCK_COUNT[] = "minBlockCount";
+    constexpr char CODEC_CONFIG_KEY_MAX_BLOCK_COUNT[] = "maxBlockCount";
+    constexpr char CODEC_CONFIG_KEY_MIN_BLOCKS_PER_SECOND[] = "minBlocksPerSecond";
+    constexpr char CODEC_CONFIG_KEY_MAX_BLOCKS_PER_SECOND[] = "maxBlocksPerSecond";
+    constexpr char CODEC_CONFIG_KEY_SUPPORT_PIXEL_FMTS[] = "supportPixelFmts";
+    constexpr char CODEC_CONFIG_KEY_BLOCK_SIZE_WIDTH[] = "blockSizeWidth";
+    constexpr char CODEC_CONFIG_KEY_BLOCK_SIZE_HEIGHT[] = "blockSizeHeight";
+    constexpr char CODEC_CONFIG_KEY_MIN_FRAME_RATE[] = "minFrameRate";
+    constexpr char CODEC_CONFIG_KEY_MAX_FRAME_RATE[] = "maxFrameRate";
+    constexpr char CODEC_CONFIG_KEY_BITE_RATE_MODE[] = "bitRateMode";
+    constexpr char CODEC_CONFIG_KEY_MESURED_FRAME_RATE[] = "measuredFrameRate";
+    
+    constexpr char CODEC_CONFIG_KEY_SAMPLE_FORMATS[] = "sampleFormats";
+    constexpr char CODEC_CONFIG_KEY_SAMPLE_RATE[] = "sampleRate";
+    constexpr char CODEC_CONFIG_KEY_CHANNEL_LAYOUTS[] = "channelLayouts";
+    constexpr char CODEC_CONFIG_KEY_CHANNEL_COUNT[] = "channelCount";
+}
 
 using namespace OHOS::HDI::Codec::V1_0;
 namespace OHOS {
