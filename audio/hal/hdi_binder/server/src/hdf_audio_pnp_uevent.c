@@ -269,7 +269,7 @@ static void *AudioPnpUeventStart(void *useless)
             }
             AudioPnpUeventParse(msg, (int32_t)rcvlen);
         } while (rcvlen > 0);
-    } while (1);
+    } while (true);
 }
 
 int32_t AudioPnpUeventStartThread(void)
@@ -280,7 +280,7 @@ int32_t AudioPnpUeventStartThread(void)
     AUDIO_FUNC_LOGI("create audio uevent thread.");
     pthread_attr_init(&tidsAttr);
     pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
-    if (pthread_create(&thread, &tidsAttr, AudioPnpUeventStart, NULL)) {
+    if (pthread_create(&thread, &tidsAttr, AudioPnpUeventStart, NULL) != 0) {
         AUDIO_FUNC_LOGE("create AudioPnpUeventStart thread failed!");
         return HDF_FAILURE;
     }

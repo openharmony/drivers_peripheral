@@ -834,6 +834,9 @@ int32_t RecordMapAudio(struct PrepareAudioPara &audiopara)
 int32_t AudioRenderCallback(struct AudioCallback *self, AudioCallbackType type, int8_t* reserved,
     int8_t* cookie)
 {
+    (void)self;
+    (void)reserved;
+    (void)cookie;
     switch (type) {
         case AUDIO_NONBLOCK_WRITE_COMPELETED:
             g_writeCompleted = AUDIO_WRITE_COMPELETED_VALUE;

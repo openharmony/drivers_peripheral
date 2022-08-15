@@ -200,7 +200,7 @@ int32_t AudioProxyCaptureGetSampleAttributes(const AudioHandle handle, struct Au
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
     }
-    if (AudioProxyReadSapmleAttrbutes(reply, attrs)) {
+    if (AudioProxyReadSapmleAttrbutes(reply, attrs) < 0) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }

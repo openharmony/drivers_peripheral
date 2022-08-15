@@ -1472,8 +1472,8 @@ HWTEST_F(AudioUsbRenderTest, SUB_Audio_HDI_RenderGetGain_0001, TestSize.Level1)
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    float gain = min+1;
-    float gainValue = min+1;
+    float gain = min + 1;
+    float gainValue = min + 1;
     ret = render->volume.SetGain(render, gain);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGain(render, &gain);

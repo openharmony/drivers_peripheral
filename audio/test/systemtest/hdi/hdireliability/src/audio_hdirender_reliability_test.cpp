@@ -406,7 +406,7 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetFrameCount_R
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_LT(INITIAL_VALUE, g_para[0].character.getframecount);
     }
-    if (g_para[0].adapter != nullptr){
+    if (g_para[0].adapter != nullptr) {
         ret = StopAudio(g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         g_para[0].render = nullptr;
@@ -490,7 +490,7 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudiorenderSetMute_Reliabi
         pthread_join(tids[i], &result);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
     }
-    if (g_para[0].adapter != nullptr){
+    if (g_para[0].adapter != nullptr) {
         ret = StopAudio(g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         g_para[0].render = nullptr;
@@ -571,7 +571,7 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudiorenderSetVolume_Relia
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(volumeHighExpc, arrpara[i].character.getvolume);
     }
-    if (g_para[0].adapter != nullptr){
+    if (g_para[0].adapter != nullptr) {
         ret = StopAudio(g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         g_para[0].render = nullptr;

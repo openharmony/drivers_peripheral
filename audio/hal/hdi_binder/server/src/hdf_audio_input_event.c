@@ -96,7 +96,7 @@ static int32_t AudioPnpInputPollAndRead(void)
     }
 
     for (i = 0; i < n; i++) {
-        if (g_fdSets[i].revents & POLLIN) {
+        if ((uint32_t)g_fdSets[i].revents & POLLIN) {
             if (read(g_fdSets[i].fd, (void *)&evt, sizeof(evt)) < 0) {
                 AUDIO_FUNC_LOGE("[read] failed!");
                 return HDF_FAILURE;
@@ -166,7 +166,7 @@ int32_t AudioPnpInputStartThread(void)
     g_bRunThread = true;
     pthread_attr_init(&tidsAttr);
     pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
-    if (pthread_create(&thread, &tidsAttr, AudioPnpInputStart, NULL)) {
+    if (pthread_create(&thread, &tidsAttr, AudioPnpInputStart, NULL) != 0) {
         AUDIO_FUNC_LOGE("[pthread_create] failed!");
         g_bRunThread = false;
         return HDF_FAILURE;

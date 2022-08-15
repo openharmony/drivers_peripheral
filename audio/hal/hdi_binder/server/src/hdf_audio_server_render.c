@@ -129,7 +129,7 @@ int32_t HdiServiceCreatRender(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("GetInitRenderPara fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
+    if (AudioAdapterListGetAdapter(adapterName, &adapter) < 0) {
         AUDIO_FUNC_LOGE("fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -188,7 +188,7 @@ int32_t HdiServiceRenderDestory(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("DestroyRender failed!");
         return ret;
     }
-    if (AudioDestroyRenderInfoInAdapter(adapterName)) {
+    if (AudioDestroyRenderInfoInAdapter(adapterName) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
