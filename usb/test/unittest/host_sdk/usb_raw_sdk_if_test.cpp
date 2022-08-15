@@ -35,8 +35,6 @@ class UsbRawSdkIfTest : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
 };
 
 #define USB_RAW_IO_SLEEP_MS_TIME    500
@@ -147,14 +145,6 @@ void UsbRawSdkIfTest::TearDownTestCase()
     if (UsbStopIo(g_acm) != HDF_SUCCESS) {
         HDF_LOGW("%s:%d UsbStopIo error!", __func__, __LINE__);
     }
-}
-
-void UsbRawSdkIfTest::SetUp()
-{
-}
-
-void UsbRawSdkIfTest::TearDown()
-{
 }
 
 static void AcmWriteBulkCallback(const void *requestArg)
@@ -347,7 +337,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConf
                 acm->notifyEp = (UsbEndpoint *)OsalMemAlloc(sizeof(struct UsbEndpoint));
                 if (acm->notifyEp == nullptr) {
                     printf("%s:%d allocate endpoint failed\n", __func__, __LINE__);
-                    return;
+                    return HDF_ERR_MALLOC_FAIL;
                 }
                 /* get the first endpoint by default */
                 acm->notifyEp->addr = interface->altsetting->endPoint[0].endpointDescriptor.bEndpointAddress;

@@ -300,7 +300,7 @@ static void UsbEcmFreeFifo(struct DataFifo *fifo)
     DataFifoInit(fifo, 0, NULL);
 }
 
-int32_t UsbEcmOpen(struct UsbEcm *port)
+static int32_t UsbEcmOpen(struct UsbEcm *port)
 {
     int32_t ret;
 
@@ -341,7 +341,7 @@ OUT:
     return HDF_SUCCESS;
 }
 
-int32_t UsbEcmClose(struct UsbEcm *port)
+static int32_t UsbEcmClose(struct UsbEcm *port)
 {
     if (port == NULL) {
         return HDF_ERR_INVALID_PARAM;

@@ -158,7 +158,7 @@ static void UsbSerialRxPush(struct UsbSerial *port)
     }
 }
 
-static void UsbSerialFreeRequests(struct DListHead *head, int32_t *allocated)
+static void UsbSerialFreeRequests(struct DListHead * const head, int32_t *allocated)
 {
     struct UsbFnRequest *req = NULL;
     while (!DListIsEmpty(head)) {
@@ -409,7 +409,7 @@ static void UsbSerialFreeFifo(struct DataFifo *fifo)
     DataFifoInit(fifo, 0, NULL);
 }
 
-int32_t UsbSerialOpen(struct UsbSerial *port)
+static int32_t UsbSerialOpen(struct UsbSerial *port)
 {
     int32_t ret;
 
@@ -452,7 +452,7 @@ OUT:
     return HDF_SUCCESS;
 }
 
-int32_t UsbSerialClose(struct UsbSerial *port)
+static int32_t UsbSerialClose(struct UsbSerial *port)
 {
     struct UsbAcmDevice *acm = NULL;
 

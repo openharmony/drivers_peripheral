@@ -53,7 +53,7 @@ static int32_t UsbPnpSampleTestServiceDispatch(struct HdfDeviceIoClient *client,
     return HDF_SUCCESS;
 }
 
-int32_t UsbPnpSampleTestDriverBind(struct HdfDeviceObject *deviceObject)
+static int32_t UsbPnpSampleTestDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%s: %d enter", __func__, __LINE__);
     static struct IDeviceIoService testService = {
@@ -66,7 +66,7 @@ int32_t UsbPnpSampleTestDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-int32_t UsbPnpSampleTestDriverInit(struct HdfDeviceObject *deviceObject)
+static int32_t UsbPnpSampleTestDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%s: %d", __func__, __LINE__);
 
@@ -75,7 +75,7 @@ int32_t UsbPnpSampleTestDriverInit(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-void UsbPnpSampleTestDriverRelease(struct HdfDeviceObject *deviceObject)
+static void UsbPnpSampleTestDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%s: %d", __func__, __LINE__);
 

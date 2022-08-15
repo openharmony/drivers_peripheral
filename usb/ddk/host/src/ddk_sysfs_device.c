@@ -14,7 +14,6 @@
  */
 
 #include "ddk_sysfs_device.h"
-
 #include <dirent.h>
 #include <fcntl.h>
 #include <inttypes.h>
@@ -29,7 +28,7 @@
 #define PROPERTY_MAX_LEN 128
 #define HDF_LOG_TAG      usb_ddk_sysfs_dev
 
-inline int32_t DdkSysfsGetBase(const char *propName)
+static inline int32_t DdkSysfsGetBase(const char *propName)
 {
     if (strcmp(propName, "idProduct") == 0 || strcmp(propName, "idVendor") == 0) {
         return 16; // 16 means hexadecimal
@@ -42,7 +41,7 @@ inline uint64_t DdkSysfsMakeDevAddr(uint32_t busNum, uint32_t devNum)
     return (((uint64_t)busNum << 32) | devNum); // 32 means left shift 32 bit
 }
 
-int32_t DdkSysfsReadProperty(const char *deviceDir, const char *propName, int64_t *value, uint64_t maxVal)
+static int32_t DdkSysfsReadProperty(const char *deviceDir, const char *propName, int64_t *value, uint64_t maxVal)
 {
     char pathTmp[SYSFS_PATH_LEN] = {0};
     int32_t num = sprintf_s(pathTmp, SYSFS_PATH_LEN, "%s%s/%s", SYSFS_DEVICES_DIR, deviceDir, propName);
@@ -96,7 +95,8 @@ int32_t DdkSysfsReadProperty(const char *deviceDir, const char *propName, int64_
     return ret;
 }
 
-int32_t DdkSysfsGetInterface(const char *deviceDir, const char *intfDir, struct UsbPnpNotifyInterfaceInfo *intf)
+static int32_t DdkSysfsGetInterface(
+    const char *deviceDir, const char *intfDir, struct UsbPnpNotifyInterfaceInfo * const intf)
 {
     char intfPath[SYSFS_PATH_LEN] = {0};
     int32_t num = sprintf_s(intfPath, SYSFS_PATH_LEN, "%s/%s", deviceDir, intfDir);
@@ -121,7 +121,8 @@ int32_t DdkSysfsGetInterface(const char *deviceDir, const char *intfDir, struct 
     return HDF_SUCCESS;
 }
 
-int32_t DdkSysfsGetActiveInterfaces(const char *deviceDir, uint8_t intfNum, struct UsbPnpNotifyInterfaceInfo intfs[])
+static int32_t DdkSysfsGetActiveInterfaces(
+    const char *deviceDir, uint8_t intfNum, struct UsbPnpNotifyInterfaceInfo intfs[])
 {
     if (intfNum == 0) {
         HDF_LOGW("%{public}s: infNum is zero", __func__);
@@ -178,7 +179,7 @@ int32_t DdkSysfsGetActiveInterfaces(const char *deviceDir, uint8_t intfNum, stru
     return HDF_SUCCESS;
 }
 
-int32_t DdkSysfsStandardizeDevice(struct UsbPnpNotifyMatchInfoTable *device)
+static int32_t DdkSysfsStandardizeDevice(struct UsbPnpNotifyMatchInfoTable * const device)
 {
     device->usbDevAddr = DdkSysfsMakeDevAddr(device->busNum, device->devNum);
     return HDF_SUCCESS;

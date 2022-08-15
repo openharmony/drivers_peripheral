@@ -13,34 +13,38 @@
  * limitations under the License.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
+#include "usbhost_nosdk_speed.h"
+
 #include <dirent.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
+#include <errno.h>
 #include <fcntl.h>
-#include <sys/time.h>
-#include <signal.h>
 #include <osal_sem.h>
 #include <osal_thread.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
 #include <sys/syscall.h>
+#include <sys/time.h>
 #include <time.h>
-#include "usbhost_nosdk_speed.h"
-#include "osal_time.h"
-#include "osal_mem.h"
+#include <unistd.h>
+
 #include "implementation/global_implementation.h"
 #include "liteos_ddk_usb.h"
+#include "osal_mem.h"
+#include "osal_time.h"
 #include "usb_pnp_notify.h"
 
-#define USB_DEV_FS_PATH "/dev/bus/usb"
+#define USB_DEV_FS_PATH                 "/dev/bus/usb"
 #define URB_COMPLETE_PROCESS_STACK_SIZE 8196
-#define ENDPOINT_IN_OFFSET 7
+#define ENDPOINT_IN_OFFSET              7
+#define DEFAULT_BUSNUM 1
+#define DEFAULT_DEVADDR 2
 static int32_t g_speedFlag = 0;
-static int32_t g_busNum = 1;
-static int32_t g_devAddr = 2;
+static int32_t g_busNum = DEFAULT_BUSNUM;
+static int32_t g_devAddr = DEFAULT_DEVADDR;
 static struct OsalSem sem;
 static struct OsalSem timeSem;
 
@@ -83,7 +87,7 @@ static int32_t ClaimInterface(unsigned int iface)
     return HDF_SUCCESS;
 }
 
-void SpeedPrint(void)
+static void SpeedPrint(void)
 {
     double speed;
     uint64_t count;
@@ -93,8 +97,8 @@ void SpeedPrint(void)
     if (count >= TEST_TIME) {
         g_speedFlag = true;
     }
-    speed = (g_byteTotal * TEST_DOUBLE_COUNT) /
-        (sigCnt * TEST_PRINT_TIME * TEST_BYTE_COUNT_UINT * TEST_BYTE_COUNT_UINT);
+    speed =
+        (g_byteTotal * TEST_DOUBLE_COUNT) / (sigCnt * TEST_PRINT_TIME * TEST_BYTE_COUNT_UINT * TEST_BYTE_COUNT_UINT);
     printf("\nSpeed:%f MB/s\n", speed);
 }
 
@@ -135,7 +139,7 @@ static void UrbCompleteHandle(const struct urb *curUrb)
 {
     if (g_printData) {
         for (int32_t i = 0; i < curUrb->actual_length; i++) {
-            printf("%c", *(((char*)curUrb->transfer_buffer) + i));
+            printf("%c", *(((char *)curUrb->transfer_buffer) + i));
         }
         fflush(stdout);
     } else if (g_recv_count % TEST_PRINT_MAX_RANGE == 0) {
@@ -265,7 +269,7 @@ static void ShowHelp(const char *name)
     printf("\n");
 }
 
-static void UsbGetDevInfo(int32_t *busNum, int32_t *devNum)
+static void UsbGetDevInfo(int32_t * const busNum, int32_t * const devNum)
 {
     struct UsbGetDevicePara paraData;
     struct usb_device *usbPnpDevice = NULL;
@@ -294,7 +298,7 @@ static int32_t UsbSerialClose(void)
     return HDF_SUCCESS;
 }
 
-static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int32_t *ifaceNum)
+static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest * const input, int32_t * const ifaceNum)
 {
     int32_t ret = HDF_SUCCESS;
     if (input == NULL) {
@@ -309,8 +313,8 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int32_t *ifa
     g_printData = false;
     g_writeOrRead = TEST_WRITE;
     sigCnt = 0;
-    g_busNum = 1;
-    g_devAddr = 2;
+    g_busNum = DEFAULT_BUSNUM;
+    g_devAddr = DEFAULT_DEVADDR;
 
     UsbGetDevInfo(&g_busNum, &g_devAddr);
     if (input->paramNum == INPUT_COMPARE_PARAMNUM) {
@@ -420,8 +424,8 @@ END:
     return ret;
 }
 
-static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int32_t cmd,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t AcmDeviceDispatch(
+    struct HdfDeviceIoClient * const client, int32_t cmd, struct HdfSBuf * const data, struct HdfSBuf * const reply)
 {
     if (client == NULL) {
         HDF_LOGE("%s: client is NULL", __func__);
@@ -467,7 +471,7 @@ static int32_t AcmDriverBind(struct HdfDeviceObject *device)
         return HDF_FAILURE;
     }
 
-    acm->device  = device;
+    acm->device = device;
     device->service = &(acm->service);
     if (acm->device && acm->device->service) {
         acm->device->service->Dispatch = AcmDeviceDispatch;
@@ -480,16 +484,14 @@ static int32_t AcmDriverInit(struct HdfDeviceObject *device)
     return 0;
 }
 
-static void AcmDriverRelease(struct HdfDeviceObject *device)
-{
-}
+static void AcmDriverRelease(struct HdfDeviceObject *device) {}
 
 struct HdfDriverEntry g_usbNoSdkSpeedDriverEntry = {
     .moduleVersion = 1,
-    .moduleName    = "usb_nosdkspeed",
-    .Bind          = AcmDriverBind,
-    .Init          = AcmDriverInit,
-    .Release       = AcmDriverRelease,
+    .moduleName = "usb_nosdkspeed",
+    .Bind = AcmDriverBind,
+    .Init = AcmDriverInit,
+    .Release = AcmDriverRelease,
 };
 
 HDF_INIT(g_usbNoSdkSpeedDriverEntry);
