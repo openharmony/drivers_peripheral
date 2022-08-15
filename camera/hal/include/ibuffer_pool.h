@@ -21,7 +21,7 @@
 namespace OHOS::Camera {
 class IBufferPool {
 public:
-    virtual ~IBufferPool(){}
+    virtual ~IBufferPool() {}
 
     // init a buffer pool, bufferSourceType indicates where buffers come from.
     virtual RetCode Init(const uint32_t width,

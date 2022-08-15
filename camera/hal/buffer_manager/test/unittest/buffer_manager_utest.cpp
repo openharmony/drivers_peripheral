@@ -487,7 +487,7 @@ void BufferManagerTest::Stream::StartExternalStream()
         return;
     }
 
-    for (uint32_t i = 0; i < queueSize_; i++) {
+    for (uint32_t indexOfSize = 0; indexOfSize < queueSize_; indexOfSize++) {
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     OHOS::SurfaceBuffer *sb = nullptr;
     sb = producer_->RequestBuffer();
@@ -654,7 +654,7 @@ bool BufferManagerTest::Pipeline::AddStream(std::shared_ptr<Stream>& stream)
     if (localStream_ == nullptr) {
         return false;
     }
-    localStream_->stream_ = stream;
+    localStream_->stream = stream;
     return true;
 }
 
@@ -671,7 +671,7 @@ void BufferManagerTest::Pipeline::StartStream()
 
 bool BufferManagerTest::Pipeline::BuildPipeline()
 {
-    BufferTracking::AddTrackingStreamBegin(0, localStream_->stream_->GetPoolId());
+    BufferTracking::AddTrackingStreamBegin(0, localStream_->stream->GetPoolId());
     sourceNode_ = std::make_shared<SourceNode>("SourceNode");
     if (sourceNode_ == nullptr) {
         return false;
@@ -691,7 +691,7 @@ bool BufferManagerTest::Pipeline::BuildPipeline()
     if (sinkNode == nullptr) {
         return false;
     }
-    sinkNode->BindCallback([this](std::shared_ptr<IBuffer>& buffer) { localStream_->stream_->DequeueBuffer(buffer); });
+    sinkNode->BindCallback([this](std::shared_ptr<IBuffer>& buffer) { localStream_->stream->DequeueBuffer(buffer); });
     std::shared_ptr<Node> node = sinkNode;
     tmpNode->Connect(node);
     BufferTracking::AddTrackingNode(0, sinkNode->GetName());
@@ -704,7 +704,7 @@ void BufferManagerTest::Pipeline::CollectBuffers()
 {
     collectThread_ = new std::thread([this] {
         while (running == true) {
-            auto bufferPool = localStream_->stream_->GetBufferPool();
+            auto bufferPool = localStream_->stream->GetBufferPool();
             if (bufferPool == nullptr) {
                 continue;
             }
@@ -713,8 +713,8 @@ void BufferManagerTest::Pipeline::CollectBuffers()
                 continue;
             }
 
-            std::lock_guard<std::mutex> deviceL(localStream_->deviceLock_);
-            localStream_->deviceBufferList_.emplace_back(buffer);
+            std::lock_guard<std::mutex> deviceL(localStream_->deviceLock);
+            localStream_->deviceBufferList.emplace_back(buffer);
         }
     });
 
@@ -731,18 +731,18 @@ void BufferManagerTest::Pipeline::DeliverBuffer(std::shared_ptr<IBuffer>& buffer
 
 void BufferManagerTest::Pipeline::DeliverBuffer()
 {
-    localStream_->deliverThread_ = new std::thread([this] {
+    localStream_->deliverThread = new std::thread([this] {
         while (running == true) {
             std::this_thread::sleep_for(std::chrono::microseconds(FRAME_INTERVAL_US));
             std::shared_ptr<IBuffer> buffer = nullptr;
             {
                 std::cout << "load device buffer ..." << std::endl;
-                std::lock_guard<std::mutex> l(localStream_->deviceLock_);
-                if (localStream_->deviceBufferList_.empty()) {
+                std::lock_guard<std::mutex> l(localStream_->deviceLock);
+                if (localStream_->deviceBufferList.empty()) {
                     continue;
                 }
-                buffer = localStream_->deviceBufferList_.front();
-                localStream_->deviceBufferList_.pop_front();
+                buffer = localStream_->deviceBufferList.front();
+                localStream_->deviceBufferList.pop_front();
             }
             DeliverBuffer(buffer);
         }
@@ -756,7 +756,7 @@ void BufferManagerTest::Pipeline::StopStream()
     running = false;
     collectThread_->join();
 
-    localStream_->deliverThread_->join();
+    localStream_->deliverThread->join();
 
     BufferTracking::DeleteTrackingStream(0);
     BufferTracking::StopTracking();

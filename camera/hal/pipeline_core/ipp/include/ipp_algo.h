@@ -30,7 +30,7 @@ enum IppAlgoMode {
 
 typedef struct IppAlgoMeta {
     int mode;
-    int face_rect[4][2];
+    int faceRect[4][2];
     char reserved[64];
 } IppAlgoMeta;
 

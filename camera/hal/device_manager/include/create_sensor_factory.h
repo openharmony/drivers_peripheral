@@ -25,7 +25,7 @@ namespace Camera {
 typedef std::shared_ptr<ISensor> (*createClass) (void);
 class CreateSensorFactory {
 public:
-    virtual ~CreateSensorFactory(){}
+    virtual ~CreateSensorFactory() {}
     std::shared_ptr<ISensor> GetSensorByName(std::string className)
     {
         std::map<std::string, createClass>::const_iterator iter;
@@ -48,7 +48,7 @@ public:
     }
 
 private:
-    CreateSensorFactory(){}
+    CreateSensorFactory() {}
     std::map<std::string, createClass> senorMap_;
 };
 

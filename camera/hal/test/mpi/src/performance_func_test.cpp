@@ -15,8 +15,8 @@
 #include "performance_func_test.h"
 #include <fstream>
 namespace {
-    static const int TimeTransformation_us = 1000000;
-    static const int Times = 1000;
+    static const int TIME_TRANSFORMATION_US = 1000000; // 1000000:1000000 microseconds
+    static const int CYCLE_TIMES = 1000; // 1000:Cycle 1000 times
     std::ofstream writeIntoFile;
 }
 
@@ -27,7 +27,7 @@ using namespace OHOS::Camera;
 float PerformanceFuncTest::calTime(struct timeval start, struct timeval end)
 {
     float time_use = 0;
-    time_use = (end.tv_sec - start.tv_sec) * TimeTransformation_us + (end.tv_usec - start.tv_usec);
+    time_use = (end.tv_sec - start.tv_sec) * TIME_TRANSFORMATION_US + (end.tv_usec - start.tv_usec);
     return time_use;
 }
 void PerformanceFuncTest::SetUpTestCase(void) {}
@@ -52,7 +52,7 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0001, TestSize.Level3)
     float time_use;
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
-    for (int i= 0; i < Times; i++) {
+    for (int i= 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_ = std::make_shared<OHOS::Camera::Test>();
@@ -64,7 +64,7 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0001, TestSize.Level3)
         // Post-processing, turn off the camera
         Test_->Close();
     }
-    float avrg_time = totle_time_use/ Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     EXPECT_LT(avrg_time, 80000);
     std::cout << "==========[test log] Performance: Open camera's average time consuming: ";
     std::cout << avrg_time << "us." << std::endl;
@@ -89,7 +89,7 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0002, TestSize.Level3)
     Test_ = std::make_shared<OHOS::Camera::Test>();
     Test_->Init();
     Test_->Open();
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         // Create and get streamOperator information
         Test_->CreateStreamOperatorCallback();
@@ -132,7 +132,7 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0002, TestSize.Level3)
         Test_->rc = Test_->streamOperator->ReleaseStreams({1001});
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     EXPECT_LT(avrg_time, 100000);
     std::cout << "==========[test log] Performance: Start Streams's average time consuming: ";
     std::cout << avrg_time << "us." << std::endl;
@@ -156,7 +156,7 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0003, TestSize.Level3)
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     Test_ = std::make_shared<OHOS::Camera::Test>();
     Test_->Init();
-    for (int i= 0; i < Times; i++) {
+    for (int i= 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         Test_->Open();
         gettimeofday(&start, NULL);
@@ -165,7 +165,7 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0003, TestSize.Level3)
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
     }
-    float avrg_time = totle_time_use/ Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     EXPECT_LT(avrg_time, 100000);
     std::cout << "==========[test log] Performance: Close camera's average time consuming: ";
     std::cout << avrg_time << "us." << std::endl;

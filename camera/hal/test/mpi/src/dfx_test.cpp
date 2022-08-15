@@ -21,8 +21,8 @@
 #endif
 
 namespace {
-    static const int TimeTransformation_us = 1000000;
-    static const int Times = 1000;
+    static const int TIME_TRANSFORMATION_US = 1000000; // 1000000:1000000 microseconds
+    static const int CYCLE_TIMES = 1000; // 1000:Cycle 1000 times
     std::ofstream writeIntoFile;
 }
 
@@ -33,7 +33,7 @@ using namespace OHOS::Camera;
 float DfxTest::calTime(struct timeval start, struct timeval end)
 {
     float time_use = 0;
-    time_use = (end.tv_sec - start.tv_sec) * TimeTransformation_us + (end.tv_usec - start.tv_usec);
+    time_use = (end.tv_sec - start.tv_sec) * TIME_TRANSFORMATION_US + (end.tv_usec - start.tv_usec);
     return time_use;
 }
 void DfxTest::SetUpTestCase(void) {}

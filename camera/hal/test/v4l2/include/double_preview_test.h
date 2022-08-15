@@ -25,8 +25,8 @@
 #define CAMERA_VIDEO_HEIGHT 480
 
 enum {
-    streamId_preview_double = 1004, // double preview streamID
-    captureId_preview_double = 2004, // double preview captureId
+    STREAMID_PREVIEW_DOUBLE = 1004, // double preview streamID
+    CAPTUREID_PREVIEW_DOUBLE = 2004, // double preview captureId
 };
 
 class DoublePreviewTest : public testing::Test {

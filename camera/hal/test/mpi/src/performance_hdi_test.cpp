@@ -15,8 +15,8 @@
 #include <fstream>
 #include "performance_hdi_test.h"
 namespace {
-    const int Times = 1000; // 1000:Cycle 1000 times
-    const int TimeTransformation_us = 1000000; // 1000000:1000000 microseconds
+    const int CYCLE_TIMES = 1000; // 1000:Cycle 1000 times
+    const int TIME_TRANSFORMATION_US = 1000000; // 1000000:1000000 microseconds
     std::ofstream writeIntoFile;
 }
 
@@ -27,7 +27,7 @@ using namespace OHOS::Camera;
 float PerformanceHdiTest::calTime(struct timeval start, struct timeval end)
 {
     float time_use = 0;
-    time_use = (end.tv_sec - start.tv_sec) * TimeTransformation_us + (end.tv_usec - start.tv_usec);
+    time_use = (end.tv_sec - start.tv_sec) * TIME_TRANSFORMATION_US + (end.tv_usec - start.tv_usec);
     return time_use;
     // return time us
 }
@@ -57,7 +57,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0010, TestSize.Level3)
     float time_use;
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
-    for (int i= 0; i < Times; i++) {
+    for (int i= 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->service->GetCameraIds(Test_->cameraIds);
@@ -66,7 +66,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0010, TestSize.Level3)
         totle_time_use = totle_time_use + time_use;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use/ Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_GetCameraIds's average time consuming: ";
     std::cout << avrg_time << "us." << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_GetCameraIds's average time consuming: ";
@@ -90,7 +90,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0020, TestSize.Level0)
     if (Test_->cameraDevice == nullptr) {
         Test_->rc = Test_->service->GetCameraIds(Test_->cameraIds);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-        for (int i= 0; i < Times; i++) {
+        for (int i= 0; i < CYCLE_TIMES; i++) {
             std::cout << "Running " << i << " time" << std::endl;
             gettimeofday(&start, NULL);
             Test_->rc = Test_->service->GetCameraAbility(Test_->cameraIds.front(), Test_->ability);
@@ -99,7 +99,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0020, TestSize.Level0)
             totle_time_use = totle_time_use + time_use;
             EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         }
-        float avrg_time = totle_time_use/ Times;
+        float avrg_time = totle_time_use / CYCLE_TIMES;
         std::cout << "==========[test log] Performance: GetCameraAbility's average time consuming: ";
         std::cout << avrg_time << "us." << std::endl;
         writeIntoFile << "==========[test log] Performance: GetCameraAbility's average time consuming: ";
@@ -124,7 +124,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0030, TestSize.Level3)
     float time_use;
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
-    for (int i= 0; i < Times; i++) {
+    for (int i= 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->service->OpenCamera(cameraId, Test_->deviceCallback, Test_->cameraDevice);
@@ -133,7 +133,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0030, TestSize.Level3)
         totle_time_use = totle_time_use + time_use;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use/Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_OpenCamera's average time consuming: ";
     std::cout << avrg_time << "us." << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_OpenCamera's average time consuming: ";
@@ -158,7 +158,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0040, TestSize.Level3)
     struct timeval end;
     float time_use;
     float totle_time_use = 0;
-    for (int i = 0; i < Times/2; i++) {
+    for (int i = 0; i < CYCLE_TIMES / 2; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         // Turn on the flashlight
         status = true;
@@ -175,7 +175,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0040, TestSize.Level3)
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_SetFlashlight's average time consuming: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_SetFlashlight's average time consuming: ";
@@ -204,7 +204,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0050, TestSize.Level3)
     float time_use;
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
@@ -213,7 +213,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0050, TestSize.Level3)
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_cameraDevice->GetStreamOperator's average time: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_cameraDevice->GetStreamOperator's average time: ";
@@ -249,7 +249,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0060, TestSize.Level3)
     float time_use;
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
-    for (int round = 0; round < Times; round ++) {
+    for (int round = 0; round < CYCLE_TIMES; round ++) {
         int i = rand() % 9;
         std::cout << "round = "<< round << ", i = " << i << std::endl;
         meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode.at(i), 1);
@@ -260,7 +260,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0060, TestSize.Level3)
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_UpdateSettings's  turn on average time : ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_UpdateSettings's  turn on average time : ";
@@ -287,7 +287,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0070, TestSize.Level3)
     std::vector<Camera::MetaType> enableTypes;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(enableTypes);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->cameraDevice->SetResultMode(Camera::PER_FRAME);
@@ -296,7 +296,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0070, TestSize.Level3)
         totle_time_use = totle_time_use + time_use;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_cameraDevice->SetResultMode's average time: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_cameraDevice->SetResultMode's average time: ";
@@ -320,7 +320,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0080, TestSize.Level3)
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     Test_->Open();
     std::vector<Camera::MetaType> results;
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
@@ -329,7 +329,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0080, TestSize.Level3)
         totle_time_use = totle_time_use + time_use;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_cameraDevice->GetEnabledResults's average time: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_cameraDevice->GetEnabledResults's average time: ";
@@ -362,7 +362,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0090, TestSize.Level3)
     // Add this tag
     std::vector<Camera::MetaType> enable_tag;
     enable_tag.push_back(results_original[1]);
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->cameraDevice->EnableResult(enable_tag);
@@ -371,7 +371,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0090, TestSize.Level3)
         totle_time_use = totle_time_use + time_use;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_cameraDevice->EnableResult's average time: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_cameraDevice->EnableResult's average time: ";
@@ -404,7 +404,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0100, TestSize.Level3)
     // Disable this tag
     std::vector<Camera::MetaType> disable_tag;
     disable_tag.push_back(results_original[1]);
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->cameraDevice->DisableResult(disable_tag);
@@ -413,7 +413,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0100, TestSize.Level3)
         totle_time_use = totle_time_use + time_use;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_cameraDevice->DisableResult's average time: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_cameraDevice->DisableResult's average time: ";
@@ -473,7 +473,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0120, TestSize.Level0)
     Test_->streamInfo->bufferQueue_->SetQueueSize(8);
     Test_->consumerMap_[Test_->streamInfo->intent_] = consumer;
     Camera::StreamSupportType pType;
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> stre;
@@ -484,7 +484,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0120, TestSize.Level0)
         totle_time_use = totle_time_use + time_use;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_IsStreamsSupported's average time: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "HDI_IsStreamsSupported's average time: " << avrg_time << "us. " << std::endl;
@@ -506,7 +506,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0130, TestSize.Level3)
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     Test_->Open();
-    for (int i = 0; i < Times; i ++) {
+    for (int i = 0; i < CYCLE_TIMES; i ++) {
         std::cout << "Running " << i << " time" << std::endl;
         // Create and get streamOperator information
         Test_->CreateStreamOperatorCallback();
@@ -547,7 +547,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0130, TestSize.Level3)
         Test_->rc = Test_->streamOperator->ReleaseStreams({1001});
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_CreateStreams's average time consuming: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_CreateStreams's average time consuming: ";
@@ -570,8 +570,8 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0160, TestSize.Level3)
     float totle_time_use = 0;
     Test_->Open();
     writeIntoFile.open("TimeConsuming.txt", ios::app);
-    for (int i = 0; i < Times; i ++) {
-        std::cout  << "Times =" << i << std::endl;
+    for (int i = 0; i < CYCLE_TIMES; i ++) {
+        std::cout  << "CYCLE_TIMES =" << i << std::endl;
         // Start stream
         Test_->intents = {Camera::PREVIEW};
         Test_->StartStream(Test_->intents);
@@ -583,7 +583,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0160, TestSize.Level3)
         time_use = calTime(start, end);
         totle_time_use = totle_time_use + time_use;
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_ReleaseStreams's average time consuming: ";
     std::cout  << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_ReleaseStreams's average time consuming: ";
@@ -607,7 +607,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0170, TestSize.Level3)
     float totle_time_use = 0;
     writeIntoFile.open("TimeConsuming.txt", ios::app);
     Test_->Open();
-    for (int i = 0; i < Times; i ++) {
+    for (int i = 0; i < CYCLE_TIMES; i ++) {
         std::cout << "Running " << i << " time" << std::endl;
         // Create and get streamOperator information
         Test_->CreateStreamOperatorCallback();
@@ -652,7 +652,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0170, TestSize.Level3)
         Test_->rc = Test_->streamOperator->ReleaseStreams({1001});
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: CommitStreams's average time consuming: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: CommitStreams's average time consuming: ";
@@ -679,7 +679,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0180, TestSize.Level3)
     Test_->intents = {Camera::PREVIEW};
     Test_->StartStream(Test_->intents);
     std::vector<std::shared_ptr<Camera::StreamAttribute>> attributes;
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->streamOperator->GetStreamAttributes(attributes);
@@ -688,7 +688,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0180, TestSize.Level3)
         totle_time_use = totle_time_use + time_use;
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_GetStreamAttributes's average time: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_GetStreamAttributes's average time: ";
@@ -725,8 +725,8 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0190, TestSize.Level3)
     Test_->captureInfo->streamIds_ = {Test_->streamId_preview};
     Test_->captureInfo->captureSetting_ = Test_->ability;
     Test_->captureInfo->enableShutterCallback_ = true;
-    for (int i = 0; i < Times; i++) {
-        std::cout  << "Times =" << i << std::endl;
+    for (int i = 0; i < CYCLE_TIMES; i++) {
+        std::cout  << "CYCLE_TIMES =" << i << std::endl;
         gettimeofday(&start, NULL);
         Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, true);
         if (Test_->rc == Camera::NO_ERROR) {
@@ -748,7 +748,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0190, TestSize.Level3)
         }
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_Capture's average time consuming: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_Capture's average time consuming: ";
@@ -785,8 +785,8 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0200, TestSize.Level3)
     Test_->captureInfo->streamIds_ = {Test_->streamId_preview};
     Test_->captureInfo->captureSetting_ = Test_->ability;
     Test_->captureInfo->enableShutterCallback_ = true;
-    for (int i = 0; i < Times; i++) {
-        std::cout  << "Times =" << i << std::endl;
+    for (int i = 0; i < CYCLE_TIMES; i++) {
+        std::cout  << "CYCLE_TIMES =" << i << std::endl;
         Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, true);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         sleep(1);
@@ -798,7 +798,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0200, TestSize.Level3)
         totle_time_use = totle_time_use + time_use;
         captureId++;
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_CancelCapture's average time consuming: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_CancelCapture's average time consuming: ";
@@ -829,7 +829,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0210, TestSize.Level3)
     Test_->CreateStreamOperatorCallback();
     Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         // Create data flow
         Test_->streamInfo = std::make_shared<Camera::StreamInfo>();
@@ -875,7 +875,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0210, TestSize.Level3)
         Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_AttachBufferQueue's average time consuming: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_AttachBufferQueue's average time consuming: ";
@@ -898,7 +898,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0220, TestSize.Level3)
     float totle_time_use = 0;
     Test_->Open();
     writeIntoFile.open("TimeConsuming.txt", ios::app);
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         Test_->CreateStreamOperatorCallback();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
@@ -948,7 +948,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0220, TestSize.Level3)
         Test_->rc = Test_->streamOperator->ReleaseStreams(Test_->streamIds);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_DetachBufferQueue's average time consuming: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_DetachBufferQueue's average time consuming: ";
@@ -971,7 +971,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0230, TestSize.Level0)
     float totle_time_use = 0;
     Test_->Open();
     writeIntoFile.open("TimeConsuming.txt", ios::app);
-    for (int i = 0; i < Times; i++) {
+    for (int i = 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         // 1、Configure two stream information
         Test_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
@@ -1010,7 +1010,7 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0230, TestSize.Level0)
         sleep(1);
         Test_->StopOfflineStream(Test_->captureId_capture);
     }
-    float avrg_time = totle_time_use / Times;
+    float avrg_time = totle_time_use / CYCLE_TIMES;
     std::cout << "==========[test log] Performance: HDI_ChangeToOfflineStream's average time consuming: ";
     std::cout << avrg_time << "us. " << std::endl;
     writeIntoFile << "==========[test log] Performance: HDI_ChangeToOfflineStream's average time consuming: ";
