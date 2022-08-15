@@ -1140,7 +1140,7 @@ static struct UsbHostRequest *AdapterAllocRequest(const struct UsbDeviceHandle *
                 + (sizeof(unsigned char) * len);
 
 #ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-    memBuf = RawUsbMemCalloc(sizeof(struct UsbHostRequest));
+    memBuf = RawUsbMemCalloc(allocSize);
     if (memBuf == NULL) {
         HDF_LOGE("%{public}s: alloc UsbHostRequest failed", __func__);
         return NULL;
