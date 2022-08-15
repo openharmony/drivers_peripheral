@@ -12,40 +12,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include <inttypes.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
+#include "usbhost_nosdk_speed.h"
 #include <dirent.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
+#include <errno.h>
 #include <fcntl.h>
-#include <sys/time.h>
-#include <signal.h>
+#include <inttypes.h>
 #include <osal_sem.h>
 #include <osal_thread.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
 #include <sys/syscall.h>
+#include <sys/time.h>
 #include <time.h>
-#include "usbhost_nosdk_speed.h"
-#include "osal_time.h"
-#include "osal_mem.h"
-#include "securec.h"
-#include "hdf_log.h"
+#include <unistd.h>
 
-#define USB_DEV_FS_PATH "/dev/bus/usb"
+#include "hdf_log.h"
+#include "osal_mem.h"
+#include "osal_time.h"
+#include "securec.h"
+
+#define USB_DEV_FS_PATH                 "/dev/bus/usb"
 #define URB_COMPLETE_PROCESS_STACK_SIZE 8196
 
-#define TEST_LENGTH     512
-#define TEST_CYCLE      30
-#define TEST_TIME       0xffffffff
-#define TEST_PRINT_TIME 2
-#define TEST_PRINT_TIME_UINT    1000
-#define ENDPOINT_IN_OFFSET 7
-#define PATH_MAX_LENGTH 24
-
+#define TEST_LENGTH          512
+#define TEST_CYCLE           30
+#define TEST_TIME            0xffffffff
+#define TEST_PRINT_TIME      2
+#define TEST_PRINT_TIME_UINT 1000
+#define ENDPOINT_IN_OFFSET   7
+#define PATH_MAX_LENGTH      24
 
 static pid_t tid;
 static int32_t exitOk = false;
@@ -114,7 +113,7 @@ static void FillUrb(struct UsbAdapterUrb *urb, int32_t len)
     int32_t ret;
 
     if (urb == NULL) {
-        urb = OsalMemCalloc(sizeof(*urb));
+        urb = OsalMemCalloc(sizeof(struct UsbAdapterUrb));
         urb->userContext = (void *)(urb);
         urb->type = USB_ADAPTER_URB_TYPE_BULK;
         urb->streamId = 0;
@@ -128,7 +127,7 @@ static void FillUrb(struct UsbAdapterUrb *urb, int32_t len)
     }
 }
 
-void SignalHandler(int32_t signo)
+static void SignalHandler(int32_t signo)
 {
     static uint32_t sigCnt = 0;
     struct itimerval new_value, old_value;
@@ -140,7 +139,7 @@ void SignalHandler(int32_t signo)
                 g_speedFlag = 1;
                 break;
             }
-            speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME  * 1024 * 1024);
+            speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME * 1024 * 1024);
             printf("\nSpeed:%f MB/s\n", speed);
             new_value.it_value.tv_sec = TEST_PRINT_TIME;
             new_value.it_value.tv_usec = 0;
@@ -153,7 +152,7 @@ void SignalHandler(int32_t signo)
             break;
         default:
             break;
-   }
+    }
 }
 
 static int32_t SendProcess(void *argurb)
@@ -186,7 +185,7 @@ static int32_t SendProcess(void *argurb)
     return 0;
 }
 
-static int32_t ReapProcess(void *argurb)
+static int32_t ReapProcess(void * const argurb)
 {
     (void)argurb;
     int32_t r;
@@ -217,7 +216,7 @@ static int32_t ReapProcess(void *argurb)
             g_recv_count++;
             g_byteTotal += urbrecv->actualLength;
         }
-        unsigned char *recvBuf = (unsigned char*)urbrecv->buffer;
+        unsigned char *recvBuf = (unsigned char *)urbrecv->buffer;
 
         if (g_printData) {
             for (int32_t i = 0; i < urbrecv->actualLength; i++)
@@ -228,7 +227,7 @@ static int32_t ReapProcess(void *argurb)
             fflush(stdout);
         }
 
-        struct UsbAdapterUrbs * urbs = urbrecv->userContext;
+        struct UsbAdapterUrbs *urbs = urbrecv->userContext;
         urbs->inUse = 0;
         OsalSemPost(&sem);
     }
@@ -278,7 +277,7 @@ static int32_t BeginProcess(unsigned char endPoint)
     for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].inUse = 1;
         urb[i].urbNum = transNum;
-        urb[i].urb->userContext = (void*)(&urb[i]);
+        urb[i].urb->userContext = (void *)(&urb[i]);
         sendUrb = urb[i].urb;
         r = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
         if (r < 0) {
@@ -319,9 +318,8 @@ int32_t main(int32_t argc, char *argv[])
         g_devAddr = atoi(argv[2]);
         ifaceNum = atoi(argv[3]);
         endNum = atoi(argv[4]);
-        if (endNum >> 7 != 0)
-        {
-            g_printData = (strncmp(argv[5], "printdata", 1))?false:true;
+        if (endNum >> 7 != 0) {
+            g_printData = (strncmp(argv[5], "printdata", 1)) ? false : true;
         }
     } else if (argc == 5) {
         g_busNum = atoi(argv[1]);
@@ -396,4 +394,3 @@ ERR:
     CloseDevice();
     return ret;
 }
-

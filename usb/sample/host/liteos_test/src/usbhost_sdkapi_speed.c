@@ -14,19 +14,20 @@
  */
 
 #include "usbhost_sdkapi_speed.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <errno.h>
-#include <string.h>
 #include <dirent.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
+#include <errno.h>
 #include <fcntl.h>
-#include <sys/time.h>
-#include <signal.h>
 #include <osal_sem.h>
 #include <osal_thread.h>
+#include <signal.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/ioctl.h>
+#include <sys/mman.h>
+#include <sys/time.h>
+#include <unistd.h>
+
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "hdf_usb_pnp_manage.h"
@@ -37,7 +38,7 @@
 #include "usb_ddk_interface.h"
 #include "usb_pnp_notify.h"
 
-#define HDF_LOG_TAG   USB_HOST_ACM
+#define HDF_LOG_TAG USB_HOST_ACM
 
 static bool g_speedFlag = false;
 static uint64_t g_recv_count = 0;
@@ -50,7 +51,7 @@ static struct OsalSem timeSem;
 static uint32_t sigCnt = 0;
 
 static void AcmTestBulkCallback(struct UsbRequest *req);
-static int32_t SerialBegin(struct AcmDevice *acm);
+static int32_t SerialBegin(struct AcmDevice * const acm);
 
 static int32_t AcmDbAlloc(struct AcmDevice *acm)
 {
@@ -101,8 +102,7 @@ static UsbInterfaceHandle *InterfaceIdToHandle(const struct AcmDevice *acm, uint
     return devHandle;
 }
 
-static int32_t AcmStartDb(struct AcmDevice *acm,
-    struct AcmDb *db, struct UsbPipeInfo *pipe)
+static int32_t AcmStartDb(struct AcmDevice *acm, struct AcmDb * const db, struct UsbPipeInfo *pipe)
 {
     int32_t rc;
     rc = UsbSubmitRequestAsync(db->request);
@@ -156,7 +156,7 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
         return;
     }
     int32_t status = req->compInfo.status;
-    struct AcmDb *db  = (struct AcmDb *)req->compInfo.userData;
+    struct AcmDb *db = (struct AcmDb *)req->compInfo.userData;
     if (status == 0) {
         if (g_byteTotal == 0) {
             OsalSemPost(&timeSem);
@@ -188,7 +188,7 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
     }
 }
 
-static int32_t SerialBegin(struct AcmDevice *acm)
+static int32_t SerialBegin(struct AcmDevice * const acm)
 {
     int32_t ret;
     struct AcmDb *db = NULL;
@@ -209,15 +209,13 @@ static int32_t SerialBegin(struct AcmDevice *acm)
     return ret;
 }
 
-
-static struct UsbInterface *GetUsbInterfaceById(const struct AcmDevice *acm,
-    uint8_t interfaceIndex)
+static struct UsbInterface *GetUsbInterfaceById(const struct AcmDevice *acm, uint8_t interfaceIndex)
 {
     return UsbClaimInterface(NULL, acm->busNum, acm->devAddr, interfaceIndex);
 }
 
-static struct UsbPipeInfo *EnumePipe(const struct AcmDevice *acm,
-    uint8_t interfaceIndex, UsbPipeType pipeType, UsbPipeDirection pipeDirection)
+static struct UsbPipeInfo *EnumePipe(
+    const struct AcmDevice *acm, uint8_t interfaceIndex, UsbPipeType pipeType, UsbPipeDirection pipeDirection)
 {
     uint8_t i;
     int32_t ret;
@@ -231,7 +229,7 @@ static struct UsbPipeInfo *EnumePipe(const struct AcmDevice *acm,
         interfaceHandle = InterfaceIdToHandle(acm, info->interfaceIndex);
     }
 
-    for (i = 0;  i <= info->pipeNum; i++) {
+    for (i = 0; i <= info->pipeNum; i++) {
         struct UsbPipeInfo p;
         ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &p);
         if (ret < 0) {
@@ -251,8 +249,7 @@ static struct UsbPipeInfo *EnumePipe(const struct AcmDevice *acm,
     return NULL;
 }
 
-static struct UsbPipeInfo *GetPipe(const struct AcmDevice *acm,
-    UsbPipeType pipeType, UsbPipeDirection pipeDirection)
+static struct UsbPipeInfo *GetPipe(const struct AcmDevice *acm, UsbPipeType pipeType, UsbPipeDirection pipeDirection)
 {
     uint8_t i;
     if (acm == NULL) {
@@ -294,7 +291,7 @@ static void ShowHelp(const char *name)
     printf("\n");
 }
 
-static void UsbGetDevInfo(int32_t *busNum, int32_t *devNum)
+static void UsbGetDevInfo(int32_t * const busNum, int32_t * const devNum)
 {
     struct UsbGetDevicePara paraData;
     struct usb_device *usbPnpDevice = NULL;
@@ -531,8 +528,8 @@ END:
     return ret;
 }
 
-static int32_t AcmDeviceDispatch(struct HdfDeviceIoClient *client, int32_t cmd,
-    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t AcmDeviceDispatch(
+    struct HdfDeviceIoClient * const client, int32_t cmd, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL) {
         HDF_LOGE("%s: client is NULL", __func__);
@@ -578,7 +575,7 @@ static int32_t AcmDriverBind(struct HdfDeviceObject *device)
         return HDF_FAILURE;
     }
 
-    g_acm->device  = device;
+    g_acm->device = device;
     device->service = &(g_acm->service);
     if (g_acm->device && g_acm->device->service) {
         g_acm->device->service->Dispatch = AcmDeviceDispatch;
@@ -600,11 +597,10 @@ static void AcmDriverRelease(struct HdfDeviceObject *device)
 
 struct HdfDriverEntry g_usbSdkApiSpeedDriverEntry = {
     .moduleVersion = 1,
-    .moduleName    = "usb_sdkapispeed",
-    .Bind          = AcmDriverBind,
-    .Init          = AcmDriverInit,
-    .Release       = AcmDriverRelease,
+    .moduleName = "usb_sdkapispeed",
+    .Bind = AcmDriverBind,
+    .Init = AcmDriverInit,
+    .Release = AcmDriverRelease,
 };
 
 HDF_INIT(g_usbSdkApiSpeedDriverEntry);
-

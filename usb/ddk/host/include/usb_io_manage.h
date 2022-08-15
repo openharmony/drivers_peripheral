@@ -16,16 +16,16 @@
 #ifndef USB_IO_MANAGE_H
 #define USB_IO_MANAGE_H
 
-#include "usb_session.h"
 #include "usb_ddk_device.h"
 #include "usb_ddk_request.h"
 #include "usb_interface_pool.h"
+#include "usb_session.h"
 
-#define USB_IO_SEND_PROCESS_STACK_SIZE      100000
-#define USB_IO_RECEIVE_PROCESS_STACK_SIZE   100000
-#define USB_IO_SUBMIT_RETRY_TIME_CNT        3
-#define USB_IO_SLEEP_MS_TIME                100
-#define USB_IO_STOP_WAIT_MAX_TIME           3
+#define USB_IO_SEND_PROCESS_STACK_SIZE    100000
+#define USB_IO_RECEIVE_PROCESS_STACK_SIZE 100000
+#define USB_IO_SUBMIT_RETRY_TIME_CNT      3
+#define USB_IO_SLEEP_MS_TIME              100
+#define USB_IO_STOP_WAIT_MAX_TIME         3
 
 HDF_STATUS UsbIoCreateQueue(const struct UsbInterfacePool *interfacePool);
 HDF_STATUS UsbIoDestroyQueue(const struct UsbInterfacePool *interfacePool);

@@ -33,7 +33,7 @@ int32_t run;
 static struct OsalThread      g_Getchar;
 #endif
 
-void TestHelp(void)
+static void TestHelp(void)
 {
     printf("usage: usbhost_ddk_test [options]\n");
     printf("\n");
