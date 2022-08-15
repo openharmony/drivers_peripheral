@@ -1,0 +1,42 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+
+module_output_path = "hdf/display_buffer"
+
+ohos_unittest("dispbuf_ut") {
+  module_out_path = module_output_path
+  sources = [ "display_buffer_ut.cpp" ]
+  deps = [
+    "//drivers/interface/display/buffer/v1_0:libdisplay_buffer_proxy_1.0",
+    "//drivers/interface/display/composer/v1_0:libdisplay_composer_proxy_1.0",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/buffer/v1_0:libdisplay_buffer_hdi_impl",
+    "//third_party/googletest:gtest_main",
+  ]
+  include_dirs = [
+    "utils",
+    "//drivers/interface/display/buffer",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/buffer",
+    "//drivers/peripheral/base",
+    "//foundation/graphic/standard/utils/include",
+  ]
+  external_deps = [
+    "hdf_core:libhdf_utils",
+    "utils_base:utils",
+    "ipc:ipc_core",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_display"
+}

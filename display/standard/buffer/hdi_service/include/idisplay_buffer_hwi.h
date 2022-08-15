@@ -25,7 +25,7 @@ namespace HDI {
 namespace Display {
 namespace Buffer {
 namespace V1_0 {
-#define DISPLAY_BUFFER_HWI_LIBRARY_PATH "/vendor/lib/libdisplay_buffer_hwi_impl.z.so"
+#define DISPLAY_BUFFER_HWI_LIBRARY_PATH "libdisplay_buffer_hwi_impl.z.so"
 
 class IDisplayBufferHwi {
 public:
@@ -140,10 +140,10 @@ public:
         const std::vector<VerifyAllocInfo> &infos, std::vector<bool> &supporteds) const = 0;
 };
 
-using IDisplayBufferHwi *Create_DisplayBufferHwiFunc_t();
-using void Destroy_DisplayBufferHwiFunc_t(IDisplayBufferHwi *hwi);
-extern "C" IDisplayBufferHwi *Create_DisplayBufferHwi();
-extern "C" void Destroy_DisplayBufferHwi(IDisplayBufferHwi *hwi);
+using CreateDisplayBufferHwiFunc = IDisplayBufferHwi* (*)();
+using DestroyDisplayBufferHwiFunc = void (*)(IDisplayBufferHwi *hwi);
+extern "C" IDisplayBufferHwi *CreateDisplayBufferHwi();
+extern "C" void DestroyDisplayBufferHwi(IDisplayBufferHwi *hwi);
 } // namespace V1_0
 } // namespace Buffer
 } // namespace Display

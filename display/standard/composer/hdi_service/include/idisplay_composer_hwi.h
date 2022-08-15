@@ -75,9 +75,9 @@ public:
     virtual int32_t SetLayerVisible(uint32_t devId, uint32_t layerId, bool visible) = 0;
 };
 
-using IDisplayComposerHwi *CreateComposerHwiFunc_t();
+using CreateComposerHwiFunc = IDisplayComposerHwi* (*)();
+using DestroyComposerHwiFunc = void (*)(IDisplayComposerHwi *hwi);
 extern "C" IDisplayComposerHwi *CreateComposerHwi();
-using void DestroyComposerHwiFunc_t(IDisplayComposerHwi *hwi);
 extern "C" void DestroyComposerHwi(IDisplayComposerHwi *hwi);
 } // namespace V1_0
 } // namespace Composer
