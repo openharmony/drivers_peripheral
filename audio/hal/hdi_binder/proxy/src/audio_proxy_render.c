@@ -19,7 +19,7 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 
-int32_t AudioProxyRenderCtrl(int cmId, AudioHandle handle)
+static int32_t AudioProxyRenderCtrl(int cmId, AudioHandle handle)
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
@@ -94,7 +94,7 @@ int32_t AudioProxyRenderFlush(AudioHandle handle)
     return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioProxyRenderGetFrameParameter(int cmId, const AudioHandle handle, uint64_t *param)
+static int32_t AudioProxyRenderGetFrameParameter(int cmId, const AudioHandle handle, uint64_t *param)
 {
     if (param == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;

@@ -36,7 +36,7 @@ static struct AudioAdapterDescriptor *g_localAudioProxyAdapterAddrOut = NULL; //
 int g_localAudioProxyAdapterNum = 0; // add for Fuzz
 static struct AudioProxyManager g_localAudioProxyMgr = {0}; // serverManager
 
-int32_t AudioProxySendGetAllAdapter(struct HdfRemoteService *remoteHandle)
+static int32_t AudioProxySendGetAllAdapter(struct HdfRemoteService *remoteHandle)
 {
     if (remoteHandle == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -103,8 +103,8 @@ int32_t AudioProxyManagerGetAllAdapters(struct AudioManager *manager,
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t LoadAdapterPrepareParameters(struct HdfRemoteService * remoteObj, const struct AudioAdapterDescriptor *desc,
-    struct HdfSBuf **data, struct HdfSBuf **reply)
+static int32_t LoadAdapterPrepareParameters(struct HdfRemoteService * remoteObj,
+    const struct AudioAdapterDescriptor *desc, struct HdfSBuf **data, struct HdfSBuf **reply)
 {
     if (remoteObj == NULL || desc == NULL || desc->adapterName == NULL || desc->ports == NULL || data == NULL ||
         reply == NULL) {
@@ -155,7 +155,7 @@ int32_t LoadAdapterPrepareParameters(struct HdfRemoteService * remoteObj, const 
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t GetAudioProxyAdapterFunc(struct AudioHwAdapter *hwAdapter)
+static int32_t GetAudioProxyAdapterFunc(struct AudioHwAdapter *hwAdapter)
 {
     if (hwAdapter == NULL) {
         return HDF_FAILURE;
@@ -173,8 +173,9 @@ int32_t GetAudioProxyAdapterFunc(struct AudioHwAdapter *hwAdapter)
     hwAdapter->common.SetVoiceVolume = AudioProxyAdapterSetVoiceVolume;
     return HDF_SUCCESS;
 }
-int32_t AudioProxyManagerLoadAdapterDispatch(struct AudioHwAdapter *hwAdapter, struct AudioProxyManager *proxyManager,
-    const struct AudioAdapterDescriptor *desc, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t AudioProxyManagerLoadAdapterDispatch(struct AudioHwAdapter *hwAdapter,
+    struct AudioProxyManager *proxyManager, const struct AudioAdapterDescriptor *desc,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (hwAdapter == NULL || proxyManager == NULL || desc == NULL || data == NULL || reply == NULL) {
         AUDIO_FUNC_LOGE("param is null!");
@@ -296,7 +297,7 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
     return;
 }
 
-bool ReleaseProxyAudioManagerObject(struct AudioManager *object)
+static bool ReleaseProxyAudioManagerObject(struct AudioManager *object)
 {
     if (object == NULL) {
         AUDIO_FUNC_LOGE("Input pointer is null!");

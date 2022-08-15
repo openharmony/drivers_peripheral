@@ -455,7 +455,7 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
 }
 
 
-int32_t BindServiceRenderOpen(struct AudioHwRender *hwRender,
+static int32_t BindServiceRenderOpen(struct AudioHwRender *hwRender,
     InterfaceLibModeRenderSo *pInterfaceLibModeRender)
 {
     if (hwRender == NULL || hwRender->devDataHandle == NULL ||
@@ -472,7 +472,7 @@ int32_t BindServiceRenderOpen(struct AudioHwRender *hwRender,
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtrlRenderClose(struct AudioHwRender *hwRender, InterfaceLibModeRenderSo *pInterfaceLibModeRender)
+static int32_t AudioCtrlRenderClose(struct AudioHwRender *hwRender, InterfaceLibModeRenderSo *pInterfaceLibModeRender)
 {
     if (hwRender == NULL || hwRender->devDataHandle == NULL ||
         pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
@@ -553,7 +553,7 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
     return HDF_SUCCESS;
 }
 
-int32_t AudioRenderBindService(struct AudioHwRender *hwRender, BindServiceRenderSo *pBindServiceRender)
+static int32_t AudioRenderBindService(struct AudioHwRender *hwRender, BindServiceRenderSo *pBindServiceRender)
 {
     if (hwRender == NULL || pBindServiceRender == NULL || *pBindServiceRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender or pBindServiceRender or *pBindServiceRender is null!");
@@ -578,7 +578,7 @@ int32_t AudioRenderBindService(struct AudioHwRender *hwRender, BindServiceRender
     return AUDIO_HAL_SUCCESS;
 }
 
-void AudioCreateRenderRelease(struct AudioHwRender **hwRender)
+static void AudioCreateRenderRelease(struct AudioHwRender **hwRender)
 {
     if (hwRender != NULL && *hwRender != NULL) {
         AudioMemFree((void **)&((*hwRender)->renderParam.frameRenderMode.buffer));
@@ -855,7 +855,8 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtrlCaptureClose(struct AudioHwCapture *hwCapture, InterfaceLibModeCaptureSo *pInterfaceLibModeCapture)
+static int32_t AudioCtrlCaptureClose(struct AudioHwCapture *hwCapture,
+    InterfaceLibModeCaptureSo *pInterfaceLibModeCapture)
 {
     if (hwCapture == NULL || hwCapture->devDataHandle == NULL ||
         pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {

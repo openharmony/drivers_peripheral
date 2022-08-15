@@ -736,7 +736,7 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwCapture *hwCapture, int er
     return AUDIO_HAL_SUCCESS;
 }
 
-void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
+static void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
@@ -832,7 +832,7 @@ int32_t AudioCaptureGetCapturePosition(struct AudioCapture *capture, uint64_t *f
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t SetValueCapture(struct ExtraParams mExtraParams, struct AudioHwCapture *capture)
+static int32_t SetValueCapture(struct ExtraParams mExtraParams, struct AudioHwCapture *capture)
 {
     if (capture == NULL) {
         AUDIO_FUNC_LOGE("param capture is null!");
@@ -927,7 +927,7 @@ int32_t AudioCaptureGetExtraParams(const AudioHandle handle, char *keyValueList,
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t AudioCaptureReqMmapBufferInit(struct AudioHwCapture *capture, int32_t reqSize,
+static int32_t AudioCaptureReqMmapBufferInit(struct AudioHwCapture *capture, int32_t reqSize,
     struct AudioMmapBufferDescripter *desc)
 {
     if (capture == NULL || capture->devDataHandle == NULL || desc == NULL) {

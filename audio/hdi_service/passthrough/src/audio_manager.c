@@ -96,7 +96,7 @@ PathSelAnalysisJson *AudioPassthroughGetPathSelAnalysisJson(void)
 }
 #endif
 
-int32_t InitCapturePassthroughHandle(const char *capturePassthroughPath)
+static int32_t InitCapturePassthroughHandle(const char *capturePassthroughPath)
 {
     if (capturePassthroughPath == NULL) {
         AUDIO_FUNC_LOGE("capturePassthroughPath is NULL");
@@ -124,7 +124,7 @@ int32_t InitCapturePassthroughHandle(const char *capturePassthroughPath)
     return HDF_SUCCESS;
 }
 
-int32_t InitRenderPassthroughHandle(const char *renderPassthroughPath)
+static int32_t InitRenderPassthroughHandle(const char *renderPassthroughPath)
 {
     if (renderPassthroughPath == NULL) {
         AUDIO_FUNC_LOGE("renderPassthroughPath is NULL");
@@ -153,7 +153,7 @@ int32_t InitRenderPassthroughHandle(const char *renderPassthroughPath)
 }
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-int32_t InitPathSelectPassthroughHandle(const char *pathSelectPassthroughPath)
+static int32_t InitPathSelectPassthroughHandle(const char *pathSelectPassthroughPath)
 {
     if (pathSelectPassthroughPath == NULL) {
         AUDIO_FUNC_LOGE("pathSelectPassthroughPath is NULL");
@@ -181,7 +181,7 @@ int32_t InitPathSelectPassthroughHandle(const char *pathSelectPassthroughPath)
 }
 #endif
 
-int32_t AudioManagerServiceGetFreeAdapterPos(struct AudioManager *manager, const char *adapterName)
+static int32_t AudioManagerServiceGetFreeAdapterPos(struct AudioManager *manager, const char *adapterName)
 {
     int32_t i;
     if (manager == NULL || adapterName == NULL || strlen(adapterName) == 0) {
@@ -208,7 +208,7 @@ int32_t AudioManagerServiceGetFreeAdapterPos(struct AudioManager *manager, const
     return SUPPORT_ADAPTER_NUM_MAX;
 }
 
-int32_t AudioManagerServiceAddAdapter(struct AudioManager *manager, struct AudioAdapter *adapter, int32_t pos)
+static int32_t AudioManagerServiceAddAdapter(struct AudioManager *manager, struct AudioAdapter *adapter, int32_t pos)
 {
     struct AudioHwManager *hwManager = (struct AudioHwManager *)manager;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
@@ -236,7 +236,7 @@ int32_t AudioManagerServiceAddAdapter(struct AudioManager *manager, struct Audio
     return AUDIO_SUCCESS;
 }
 
-uint32_t AudioManagerServiceFindAdapterPos(struct AudioManager *manager, const char *adapterName)
+static uint32_t AudioManagerServiceFindAdapterPos(struct AudioManager *manager, const char *adapterName)
 {
     uint32_t i;
     if (manager == NULL || adapterName == NULL || strlen(adapterName) == 0) {
@@ -405,7 +405,7 @@ static int32_t selectAppropriateAdapter(
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioManagerServiceRemvAdapter(struct AudioManager *manager, uint32_t pos)
+static int32_t AudioManagerServiceRemvAdapter(struct AudioManager *manager, uint32_t pos)
 {
     if (manager == NULL || pos >= SUPPORT_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("Invalid input param!");
@@ -420,7 +420,7 @@ int32_t AudioManagerServiceRemvAdapter(struct AudioManager *manager, uint32_t po
         return AUDIO_ERR_INVALID_PARAM;
     }
     if (hwAdapter->portCapabilitys != NULL) {
-        int32_t portsLen = hwAdapter->adapterDescriptor.portsLen;
+        uint32_t portsLen = hwAdapter->adapterDescriptor.portsLen;
         int32_t i = 0;
         while (i < portsLen) {
             if (&hwAdapter->portCapabilitys[i] != NULL) {

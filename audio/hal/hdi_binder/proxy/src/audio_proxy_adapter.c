@@ -22,7 +22,7 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 
-int32_t AudioProxyCommonInitAttrs(struct HdfSBuf *data, const struct AudioSampleAttributes *attrs)
+static int32_t AudioProxyCommonInitAttrs(struct HdfSBuf *data, const struct AudioSampleAttributes *attrs)
 {
     if (data == NULL || attrs == NULL) {
         AUDIO_FUNC_LOGE("data == NULL || attrs == NULL");
@@ -72,7 +72,7 @@ int32_t AudioProxyCommonInitAttrs(struct HdfSBuf *data, const struct AudioSample
     return HDF_SUCCESS;
 }
 
-int32_t AudioProxyCommonInitCreateData(struct HdfSBuf *data, const struct AudioHwAdapter *adapter,
+static int32_t AudioProxyCommonInitCreateData(struct HdfSBuf *data, const struct AudioHwAdapter *adapter,
     const struct AudioDeviceDescriptor *desc, const struct AudioSampleAttributes *attrs)
 {
     AUDIO_FUNC_LOGI();
@@ -123,7 +123,7 @@ int32_t AudioProxyCommonInitCreateData(struct HdfSBuf *data, const struct AudioH
     return HDF_SUCCESS;
 }
 
-int32_t GetAudioProxyRenderFunc(struct AudioHwRender *hwRender)
+static int32_t GetAudioProxyRenderFunc(struct AudioHwRender *hwRender)
 {
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is null");
@@ -216,7 +216,7 @@ void AudioAdapterReleaseCapSubPorts(const struct AudioPortAndCapability *portCap
     }
     return;
 }
-int32_t InitAllPortsDispatchSplit(struct AudioHwAdapter *hwAdapter)
+static int32_t InitAllPortsDispatchSplit(struct AudioHwAdapter *hwAdapter)
 {
     if (hwAdapter == NULL || hwAdapter->adapterDescriptor.adapterName == NULL || hwAdapter->proxyRemoteHandle == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -292,7 +292,8 @@ int32_t AudioProxyAdapterInitAllPorts(struct AudioAdapter *adapter)
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t AudioProxyAdapterCreateRenderSplit(const struct AudioHwAdapter *hwAdapter, struct AudioHwRender *hwRender)
+static int32_t AudioProxyAdapterCreateRenderSplit(const struct AudioHwAdapter *hwAdapter,
+    struct AudioHwRender *hwRender)
 {
     if (hwAdapter == NULL || hwRender == NULL) {
         return HDF_FAILURE;
@@ -312,7 +313,7 @@ int32_t AudioProxyAdapterCreateRenderSplit(const struct AudioHwAdapter *hwAdapte
     return HDF_SUCCESS;
 }
 
-int32_t AudioProxyRenderDispatchSplit(const struct AudioHwAdapter *hwAdapter,
+static int32_t AudioProxyRenderDispatchSplit(const struct AudioHwAdapter *hwAdapter,
     struct AudioHwRender *hwRender, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (hwAdapter == NULL || hwRender == NULL ||
@@ -445,7 +446,7 @@ int32_t AudioProxyAdapterDestroyRender(struct AudioAdapter *adapter, struct Audi
     return ret;
 }
 
-int32_t GetAudioProxyCaptureFunc(struct AudioHwCapture *hwCapture)
+static int32_t GetAudioProxyCaptureFunc(struct AudioHwCapture *hwCapture)
 {
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is null");
@@ -483,8 +484,8 @@ int32_t GetAudioProxyCaptureFunc(struct AudioHwCapture *hwCapture)
     return HDF_SUCCESS;
 }
 
-int32_t InitProxyHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
-                                const struct AudioSampleAttributes *attrs)
+static int32_t InitProxyHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs)
 {
     if (hwCapture == NULL || desc == NULL || attrs == NULL) {
         AUDIO_FUNC_LOGE("InitHwCaptureParam param Is NULL");
@@ -495,7 +496,8 @@ int32_t InitProxyHwCaptureParam(struct AudioHwCapture *hwCapture, const struct A
     return HDF_SUCCESS;
 }
 
-int32_t AudioProxyAdapterCreateCaptureSplit(const struct AudioHwAdapter *hwAdapter, struct AudioHwCapture *hwCapture)
+static int32_t AudioProxyAdapterCreateCaptureSplit(const struct AudioHwAdapter *hwAdapter,
+    struct AudioHwCapture *hwCapture)
 {
     if (hwAdapter == NULL || hwCapture == NULL) {
         AUDIO_FUNC_LOGE("param Is NULL");
@@ -516,7 +518,7 @@ int32_t AudioProxyAdapterCreateCaptureSplit(const struct AudioHwAdapter *hwAdapt
     return HDF_SUCCESS;
 }
 
-int32_t AudioProxyCaptureDispatchSplit(const struct AudioHwAdapter *hwAdapter,
+static int32_t AudioProxyCaptureDispatchSplit(const struct AudioHwAdapter *hwAdapter,
     struct AudioHwCapture *hwCapture, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (hwAdapter == NULL || hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL ||
@@ -649,7 +651,7 @@ int32_t AudioProxyAdapterDestroyCapture(struct AudioAdapter *adapter, struct Aud
     AudioProxyBufReplyRecycle(data, reply);
     return ret;
 }
-int32_t AudioProxyAdapterWritePortCapability(const struct AudioHwAdapter *hwAdapter,
+static int32_t AudioProxyAdapterWritePortCapability(const struct AudioHwAdapter *hwAdapter,
     const struct AudioPort *port, struct HdfSBuf *data)
 {
     if (hwAdapter == NULL || port == NULL || data == NULL) {
@@ -733,7 +735,7 @@ int32_t AudioProxyAdapterGetPortCapability(struct AudioAdapter *adapter,
     return AUDIO_HAL_ERR_INTERNAL;
 }
 
-int32_t AudioProxyAdapterSetAndGetPassthroughModeSBuf(struct HdfSBuf *data,
+static int32_t AudioProxyAdapterSetAndGetPassthroughModeSBuf(struct HdfSBuf *data,
     const struct HdfSBuf *reply, const struct AudioPort *port)
 {
     (void)reply;
@@ -754,7 +756,7 @@ int32_t AudioProxyAdapterSetAndGetPassthroughModeSBuf(struct HdfSBuf *data,
     return HDF_SUCCESS;
 }
 
-int32_t AudioProxyWriteTokenAndNameForSetPassThrough(struct AudioHwAdapter *hwAdapter, struct HdfSBuf *data)
+static int32_t AudioProxyWriteTokenAndNameForSetPassThrough(struct AudioHwAdapter *hwAdapter, struct HdfSBuf *data)
 {
     if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL ||
         hwAdapter->adapterDescriptor.adapterName == NULL) {
@@ -828,7 +830,7 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t AudioProxyWriteTokenAndNameForGetPassThrough(struct AudioHwAdapter *hwAdapter, struct HdfSBuf *data)
+static int32_t AudioProxyWriteTokenAndNameForGetPassThrough(struct AudioHwAdapter *hwAdapter, struct HdfSBuf *data)
 {
     if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL ||
         hwAdapter->adapterDescriptor.adapterName == NULL) {

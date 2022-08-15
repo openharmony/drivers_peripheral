@@ -20,7 +20,7 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
 
-int32_t GetInitCaptureParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
+static int32_t GetInitCaptureParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
 {
     if (data == NULL || attrs == NULL) {
         return HDF_FAILURE;
@@ -64,8 +64,8 @@ int32_t GetInitCaptureParaAttrs(struct HdfSBuf *data, struct AudioSampleAttribut
     return HDF_SUCCESS;
 }
 
-int32_t GetInitCapturePara(struct HdfSBuf *data, struct AudioDeviceDescriptor *devDesc,
-                           struct AudioSampleAttributes *attrs)
+static int32_t GetInitCapturePara(struct HdfSBuf *data, struct AudioDeviceDescriptor *devDesc,
+    struct AudioSampleAttributes *attrs)
 {
     if (data == NULL || devDesc == NULL || attrs == NULL) {
         return HDF_FAILURE;

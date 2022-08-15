@@ -731,7 +731,7 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwRender *hwRender, int erro
     return AUDIO_SUCCESS;
 }
 
-void LogError(AudioHandle handle, int32_t errorCode, int reason)
+static void LogError(AudioHandle handle, int32_t errorCode, int reason)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
@@ -758,7 +758,7 @@ void LogError(AudioHandle handle, int32_t errorCode, int reason)
     }
 }
 
-int32_t AudioRenderRenderFramSplit(struct AudioHwRender *hwRender)
+static int32_t AudioRenderRenderFramSplit(struct AudioHwRender *hwRender)
 {
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is null!");
@@ -925,7 +925,7 @@ int32_t AudioRenderGetChannelMode(struct AudioRender *render, enum AudioChannelM
     return AUDIO_SUCCESS;
 }
 
-int32_t SetValue(struct ExtraParams mExtraParams, struct AudioHwRender *render)
+static int32_t SetValue(struct ExtraParams mExtraParams, struct AudioHwRender *render)
 {
     if (render == NULL) {
         AUDIO_FUNC_LOGE("render is NULL!");
@@ -1014,7 +1014,7 @@ int32_t AudioRenderGetExtraParams(struct AudioRender *handle, char *keyValueList
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderReqMmapBufferInit(
+static int32_t AudioRenderReqMmapBufferInit(
     struct AudioHwRender *render, int32_t reqSize, const struct AudioMmapBufferDescripter *tempDesc)
 {
     if (render == NULL || render->devDataHandle == NULL || tempDesc == NULL) {
