@@ -139,7 +139,7 @@ static inline int32_t ClearIFR(uint16_t it)
     return Cs1262WriteRegbit(CS1262_IFR_REG, it, CS1262_REG_BIT_SET);
 }
 
-int32_t Cs1262SetOption(uint32_t option)
+static int32_t Cs1262SetOption(uint32_t option)
 {
     HDF_LOGI("%s: cs1262 setOption :%d", __func__, option);
     return HDF_SUCCESS;
@@ -173,7 +173,7 @@ static int32_t Writefw(Cs1262RegConfigTab *regTab)
     return ret;
 }
 
-int32_t Cs1262SetMode(uint32_t mode)
+static int32_t Cs1262SetMode(uint32_t mode)
 {
     int32_t ret;
     Cs1262RegConfigTab *regTab = NULL;
@@ -205,7 +205,7 @@ int32_t Cs1262SetMode(uint32_t mode)
     return HDF_SUCCESS;
 }
 
-int32_t Cs1262ReadData(uint8_t *outBuf, uint16_t outBufMaxLen, uint16_t *outLen)
+static int32_t Cs1262ReadData(uint8_t *outBuf, uint16_t outBufMaxLen, uint16_t *outLen)
 {
     uint8_t ret;
     uint16_t ifr = 0;
@@ -232,7 +232,7 @@ int32_t Cs1262ReadData(uint8_t *outBuf, uint16_t outBufMaxLen, uint16_t *outLen)
     return HDF_SUCCESS;
 }
 
-int32_t Cs1262Enable()
+static int32_t Cs1262Enable()
 {
     int32_t ret;
     struct Cs1262DrvData *drvData = GetDrvData();
@@ -277,7 +277,7 @@ int32_t Cs1262Enable()
     return HDF_SUCCESS;
 }
 
-int32_t Cs1262Disable()
+static int32_t Cs1262Disable()
 {
     int32_t ret;
 

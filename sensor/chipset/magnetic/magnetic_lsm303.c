@@ -18,7 +18,7 @@
 
 static struct Lsm303DrvData *g_lsm303DrvData = NULL;
 
-struct Lsm303DrvData *Lsm303GetDrvData(void)
+static struct Lsm303DrvData *Lsm303GetDrvData(void)
 {
     return g_lsm303DrvData;
 }

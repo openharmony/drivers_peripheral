@@ -18,7 +18,7 @@
 
 static struct Ak8789DrvData *g_ak8789DrvData = NULL;
 
-struct Ak8789DrvData *Ak8789GetDrvData(void)
+static struct Ak8789DrvData *Ak8789GetDrvData(void)
 {
     return g_ak8789DrvData;
 }

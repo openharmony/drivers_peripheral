@@ -44,6 +44,7 @@ private:
     int32_t AddSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
     int32_t RemoveSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
     int32_t UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj);
+    void RemoveDeathNotice(int32_t sensorType);
 };
 } // V1_0
 } // Sensor
