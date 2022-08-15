@@ -23,7 +23,7 @@
 #include "metadata_utils.h"
 
 #define HDI_DEVICE_PLACE_A_WATCHDOG \
-    PLACE_A_NOKILL_WATCHDOG(std::bind(&CameraDeviceImpl::OnRequestTimeout, this));
+    PLACE_A_NOKILL_WATCHDOG(std::bind(&CameraDeviceImpl::OnRequestTimeout, this))
 
 namespace OHOS::Camera {
 CameraDeviceImpl::CameraDeviceImpl(const std::string &cameraId,

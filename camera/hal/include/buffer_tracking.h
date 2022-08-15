@@ -18,9 +18,9 @@
 
 #include "buffer_trace.h"
 
-#define PIPELINE_REPORT_BUFFER_LOCATION(I, F, N) TRACKING_REPORT_BUFFER_LOCATION(I, F, N, false);
+#define PIPELINE_REPORT_BUFFER_LOCATION(I, F, N) TRACKING_REPORT_BUFFER_LOCATION(I, F, N, false)
 
-#define POOL_REPORT_BUFFER_LOCATION(I, F) TRACKING_REPORT_BUFFER_LOCATION(I, F, "", true);
+#define POOL_REPORT_BUFFER_LOCATION(I, F) TRACKING_REPORT_BUFFER_LOCATION(I, F, "", true)
 
 #define TRACKING_REPORT_BUFFER_LOCATION(I, F, N, R)         \
     do {                                                    \
@@ -30,7 +30,7 @@
         m->nodeName = N;                                    \
         m->isReturnBack = R;                                \
         BufferTracking::ReportBufferLocation(m);            \
-    } while (0);
+    } while (0)
 
 namespace OHOS::Camera {
 class BufferTracking {

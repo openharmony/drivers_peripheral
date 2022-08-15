@@ -186,7 +186,7 @@ static void ManuList(const std::shared_ptr<OhosCameraDemo>& mainDemo,
     const int argc, char** argv)
 {
     int idx, c;
-    int awb = 1;
+    bool isAwb = true;
     const char *shortOptions = "h:cwvaeqof:";
     c = getopt_long(argc, argv, shortOptions, longOptions, &idx);
     while(1) {
@@ -207,12 +207,12 @@ static void ManuList(const std::shared_ptr<OhosCameraDemo>& mainDemo,
                 c = PutMenuAndGetChr();
                 break;
             case 'w':
-                if (awb) {
+                if (isAwb) {
                     mainDemo->SetAwbMode(OHOS_CAMERA_AWB_MODE_INCANDESCENT);
                 } else {
                     mainDemo->SetAwbMode(OHOS_CAMERA_AWB_MODE_OFF);
                 }
-                awb = !awb;
+                isAwb = !isAwb;
                 c = PutMenuAndGetChr();
                 break;
             case 'a':
