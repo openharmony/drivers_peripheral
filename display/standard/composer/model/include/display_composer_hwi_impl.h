@@ -78,7 +78,7 @@ public:
     virtual int32_t SetLayerVisibleRegion(uint32_t devId, uint32_t layerId,
         std::vector<IRect>& rects) override;
     virtual int32_t SetLayerBuffer(uint32_t devId, uint32_t layerId,
-        BufferHandle& buffer, int32_t fence) override;
+        const BufferHandle& buffer, int32_t fence) override;
     virtual int32_t SetLayerCompositionType(uint32_t devId, uint32_t layerId,
         CompositionType type) override;
     virtual int32_t SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType type) override;
