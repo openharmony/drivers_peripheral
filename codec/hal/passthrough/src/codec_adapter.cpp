@@ -106,7 +106,7 @@ int32_t CodecAdapterDestroyComponent(struct CodecComponentNode *codecNode)
     return HDF_SUCCESS;
 }
 
-int32_t CodecAdapterGetComponentVersion(struct CodecComponentNode *codecNode, struct CompVerInfo *verInfo)
+int32_t CodecAdapterGetComponentVersion(const struct CodecComponentNode *codecNode, struct CompVerInfo *verInfo)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || verInfo == nullptr) {
         HDF_LOGE("%{public}s codecNode, node or verInfois is null", __func__);
@@ -115,7 +115,7 @@ int32_t CodecAdapterGetComponentVersion(struct CodecComponentNode *codecNode, st
     return codecNode->node->GetComponentVersion(*verInfo);
 }
 
-int32_t CodecAdapterSendCommand(struct CodecComponentNode *codecNode, OMX_COMMANDTYPE cmd, uint32_t param,
+int32_t CodecAdapterSendCommand(const struct CodecComponentNode *codecNode, OMX_COMMANDTYPE cmd, uint32_t param,
                                 int8_t *cmdData, uint32_t cmdDataLen)
 {
     if (codecNode == nullptr || codecNode->node == nullptr) {
@@ -125,7 +125,7 @@ int32_t CodecAdapterSendCommand(struct CodecComponentNode *codecNode, OMX_COMMAN
     return codecNode->node->SendCommand(cmd, param, cmdData, cmdDataLen);
 }
 
-int32_t CodecAdapterGetParameter(struct CodecComponentNode *codecNode, OMX_INDEXTYPE paramIndex, int8_t *param,
+int32_t CodecAdapterGetParameter(const struct CodecComponentNode *codecNode, OMX_INDEXTYPE paramIndex, int8_t *param,
                                  uint32_t paramLen)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || param == nullptr) {
@@ -140,7 +140,7 @@ int32_t CodecAdapterGetParameter(struct CodecComponentNode *codecNode, OMX_INDEX
     return codecNode->node->GetParameter(paramIndex, param, paramLen);
 }
 
-int32_t CodecAdapterSetParameter(struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *param,
+int32_t CodecAdapterSetParameter(const struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *param,
                                  uint32_t paramLen)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || param == nullptr) {
@@ -155,7 +155,7 @@ int32_t CodecAdapterSetParameter(struct CodecComponentNode *codecNode, OMX_INDEX
     return codecNode->node->SetParameter(index, param, paramLen);
 }
 
-int32_t CodecAdapterGetConfig(struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *config,
+int32_t CodecAdapterGetConfig(const struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *config,
                               uint32_t configLen)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || config == nullptr) {
@@ -165,7 +165,7 @@ int32_t CodecAdapterGetConfig(struct CodecComponentNode *codecNode, OMX_INDEXTYP
     return codecNode->node->GetConfig(index, config, configLen);
 }
 
-int32_t CodecAdapterSetConfig(struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *config,
+int32_t CodecAdapterSetConfig(const struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *config,
                               uint32_t configLen)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || config == nullptr) {
@@ -175,7 +175,7 @@ int32_t CodecAdapterSetConfig(struct CodecComponentNode *codecNode, OMX_INDEXTYP
     return codecNode->node->SetConfig(index, config, configLen);
 }
 
-int32_t CodecAdapterGetExtensionIndex(struct CodecComponentNode *codecNode, const char *parameterName,
+int32_t CodecAdapterGetExtensionIndex(const struct CodecComponentNode *codecNode, const char *parameterName,
                                       OMX_INDEXTYPE *indexType)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || parameterName == nullptr || indexType == nullptr) {
@@ -185,7 +185,7 @@ int32_t CodecAdapterGetExtensionIndex(struct CodecComponentNode *codecNode, cons
     return codecNode->node->GetExtensionIndex(parameterName, indexType);
 }
 
-int32_t CodecAdapterGetState(struct CodecComponentNode *codecNode, OMX_STATETYPE *state)
+int32_t CodecAdapterGetState(const struct CodecComponentNode *codecNode, OMX_STATETYPE *state)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || state == nullptr) {
         HDF_LOGE("%{public}s codecNode, node or state is null", __func__);
@@ -194,7 +194,7 @@ int32_t CodecAdapterGetState(struct CodecComponentNode *codecNode, OMX_STATETYPE
     return codecNode->node->GetState(state);
 }
 
-int32_t CodecAdapterComponentTunnelRequest(struct CodecComponentNode *codecNode, uint32_t port,
+int32_t CodecAdapterComponentTunnelRequest(const struct CodecComponentNode *codecNode, uint32_t port,
                                            int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
                                            struct OMX_TUNNELSETUPTYPE *tunnelSetup)
 {
@@ -205,7 +205,7 @@ int32_t CodecAdapterComponentTunnelRequest(struct CodecComponentNode *codecNode,
     return codecNode->node->ComponentTunnelRequest(port, omxHandleTypeTunneledComp, tunneledPort, tunnelSetup);
 }
 
-int32_t CodecAdapterUseBuffer(struct CodecComponentNode *codecNode, uint32_t portIndex,
+int32_t CodecAdapterUseBuffer(const struct CodecComponentNode *codecNode, uint32_t portIndex,
                               struct OmxCodecBuffer *omxBuffer)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || omxBuffer == nullptr) {
@@ -215,7 +215,7 @@ int32_t CodecAdapterUseBuffer(struct CodecComponentNode *codecNode, uint32_t por
     return codecNode->node->UseBuffer(portIndex, *omxBuffer);
 }
 
-int32_t CodecAdapterAllocateBuffer(struct CodecComponentNode *codecNode, uint32_t portIndex,
+int32_t CodecAdapterAllocateBuffer(const struct CodecComponentNode *codecNode, uint32_t portIndex,
                                    struct OmxCodecBuffer *omxBuffer)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || omxBuffer == nullptr) {
@@ -225,7 +225,7 @@ int32_t CodecAdapterAllocateBuffer(struct CodecComponentNode *codecNode, uint32_
     return codecNode->node->AllocateBuffer(portIndex, *omxBuffer);
 }
 
-int32_t CodecAdapterFreeBuffer(struct CodecComponentNode *codecNode, uint32_t portIndex,
+int32_t CodecAdapterFreeBuffer(const struct CodecComponentNode *codecNode, uint32_t portIndex,
                                const struct OmxCodecBuffer *omxBuffer)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || omxBuffer == nullptr) {
@@ -235,7 +235,7 @@ int32_t CodecAdapterFreeBuffer(struct CodecComponentNode *codecNode, uint32_t po
     return codecNode->node->FreeBuffer(portIndex, *omxBuffer);
 }
 
-int32_t CodecAdapterEmptyThisBuffer(struct CodecComponentNode *codecNode, const struct OmxCodecBuffer *omxBuffer)
+int32_t CodecAdapterEmptyThisBuffer(const struct CodecComponentNode *codecNode, const struct OmxCodecBuffer *omxBuffer)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || omxBuffer == nullptr) {
         HDF_LOGE("%{public}s codecNode, node or omxBuffer is null", __func__);
@@ -244,7 +244,7 @@ int32_t CodecAdapterEmptyThisBuffer(struct CodecComponentNode *codecNode, const 
     return codecNode->node->EmptyThisBuffer(*omxBuffer);
 }
 
-int32_t CodecAdapterFillThisBuffer(struct CodecComponentNode *codecNode, const struct OmxCodecBuffer *omxBuffer)
+int32_t CodecAdapterFillThisBuffer(const struct CodecComponentNode *codecNode, const struct OmxCodecBuffer *omxBuffer)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || omxBuffer == nullptr) {
         HDF_LOGE("%{public}s codecNode, node or omxBuffer is null", __func__);
@@ -253,7 +253,7 @@ int32_t CodecAdapterFillThisBuffer(struct CodecComponentNode *codecNode, const s
     return codecNode->node->FillThisBuffer(*omxBuffer);
 }
 
-int32_t CodecAdapterSetCallbacks(struct CodecComponentNode *codecNode, struct CodecCallbackType *omxCallback,
+int32_t CodecAdapterSetCallbacks(const struct CodecComponentNode *codecNode, struct CodecCallbackType *omxCallback,
                                  int64_t appData)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || omxCallback == nullptr) {
@@ -263,7 +263,7 @@ int32_t CodecAdapterSetCallbacks(struct CodecComponentNode *codecNode, struct Co
     return codecNode->node->SetCallbacks(omxCallback, appData);
 }
 
-int32_t CodecAdapterComponentDeInit(struct CodecComponentNode *codecNode)
+int32_t CodecAdapterComponentDeInit(const struct CodecComponentNode *codecNode)
 {
     if (codecNode == nullptr || codecNode->node == nullptr) {
         HDF_LOGE("%{public}s codecNode or node is null", __func__);
@@ -272,8 +272,8 @@ int32_t CodecAdapterComponentDeInit(struct CodecComponentNode *codecNode)
     return codecNode->node->ComponentDeInit();
 }
 
-int32_t CodecAdapterUseEglImage(struct CodecComponentNode *codecNode, struct OmxCodecBuffer *buffer, uint32_t portIndex,
-                                int8_t *eglImage, uint32_t eglImageLen)
+int32_t CodecAdapterUseEglImage(const struct CodecComponentNode *codecNode, struct OmxCodecBuffer *buffer,
+                                uint32_t portIndex, int8_t *eglImage, uint32_t eglImageLen)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || buffer == nullptr || eglImage == nullptr) {
         HDF_LOGE("%{public}s codecNode, node, buffer or eglImage is null", __func__);
@@ -282,7 +282,7 @@ int32_t CodecAdapterUseEglImage(struct CodecComponentNode *codecNode, struct Omx
     return codecNode->node->UseEglImage(*buffer, portIndex, eglImage, eglImageLen);
 }
 
-int32_t CodecAdapterComponentRoleEnum(struct CodecComponentNode *codecNode, uint8_t *role, uint32_t roleLen,
+int32_t CodecAdapterComponentRoleEnum(const struct CodecComponentNode *codecNode, uint8_t *role, uint32_t roleLen,
                                       uint32_t index)
 {
     if (codecNode == nullptr || codecNode->node == nullptr || role == nullptr) {
