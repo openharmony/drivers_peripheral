@@ -49,7 +49,7 @@ int AudioHdiA2dpServerBind(struct HdfDeviceObject *deviceObject)
         .Release = NULL,
     };
     AudioHdiSetLoadServerFlag(AUDIO_SERVER_A2DP);
-    if (HdiServiceGetFuncs()) {
+    if (HdiServiceGetFuncs() < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.audio_service");

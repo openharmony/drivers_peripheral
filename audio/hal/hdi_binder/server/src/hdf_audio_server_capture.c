@@ -131,7 +131,7 @@ int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct Hd
         AUDIO_FUNC_LOGE("read Render param failure!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
+    if (AudioAdapterListGetAdapter(adapterName, &adapter) < 0) {
         AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -186,7 +186,7 @@ int32_t HdiServiceCaptureDestory(const struct HdfDeviceIoClient *client, struct 
         AUDIO_FUNC_LOGE("DestroyCapture failed!");
         return ret;
     }
-    if (AudioDestroyCaptureInfoInAdapter(adapterName)) {
+    if (AudioDestroyCaptureInfoInAdapter(adapterName) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;

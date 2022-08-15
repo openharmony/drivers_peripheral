@@ -115,7 +115,7 @@ enum AudioCaptureMode {
     CAPTURE_INTERUPT,
 };
 
-int g_CaptureModeFlag = CAPTURE_POLL;
+int g_captureModeFlag = CAPTURE_POLL;
 
 #ifndef __LITEOS__
 int g_receiveFrameCount = 0;
@@ -289,9 +289,9 @@ uint32_t StringToInt(const char *flag)
     return temp;
 }
 
-int32_t AddWavFileHeader(struct StrParaCapture *StrParam)
+int32_t AddWavFileHeader(struct StrParaCapture *strParam)
 {
-    if (StrParam == NULL) {
+    if (strParam == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
         return HDF_FAILURE;
     }
@@ -303,10 +303,10 @@ int32_t AddWavFileHeader(struct StrParaCapture *StrParam)
     headInfo.riffSize = (uint32_t)ftell(g_file) - WAV_HEAD_RIFF_OFFSET;
     headInfo.riffType = StringToInt("WAVE");
     headInfo.audioFileFmtId = StringToInt("fmt ");
-    headInfo.audioFileFmtSize = PcmFormatToBits(StrParam->attrs.format);
+    headInfo.audioFileFmtSize = PcmFormatToBits(strParam->attrs.format);
     headInfo.audioFileFormat = 1;
-    headInfo.audioChannelNum = StrParam->attrs.channelCount;
-    headInfo.audioSampleRate = StrParam->attrs.sampleRate;
+    headInfo.audioChannelNum = strParam->attrs.channelCount;
+    headInfo.audioSampleRate = strParam->attrs.sampleRate;
     headInfo.audioByteRate =
         headInfo.audioSampleRate * headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT;
     headInfo.audioBlockAlign = (uint16_t)(headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT);
@@ -363,7 +363,7 @@ int32_t StopButtonCapture(struct AudioCapture **captureS)
     }
 
     FileClose(&g_file);
-    if (g_CaptureModeFlag == CAPTURE_INTERUPT) {
+    if (g_captureModeFlag == CAPTURE_INTERUPT) {
         AUDIO_FUNC_LOGE("litoOs  not support!");
     }
     printf("Stop Successful\n");
@@ -524,18 +524,18 @@ int32_t StartPlayThread(int32_t palyModeFlag)
 }
 
 int32_t CaptureChoiceModeAndRecording(
-    struct StrParaCapture *StrParam, struct AudioCapture *capture, int32_t palyModeFlag)
+    struct StrParaCapture *strParam, struct AudioCapture *capture, int32_t palyModeFlag)
 {
-    if (StrParam == NULL || capture == NULL) {
+    if (strParam == NULL || capture == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
         return HDF_FAILURE;
     }
-    memset_s(StrParam, sizeof(struct StrParaCapture), 0, sizeof(struct StrParaCapture));
-    StrParam->capture = capture;
-    StrParam->file = g_file;
-    StrParam->attrs = g_attrs;
-    StrParam->frame = g_frame;
-    if (g_CaptureModeFlag == CAPTURE_INTERUPT) {
+    memset_s(strParam, sizeof(struct StrParaCapture), 0, sizeof(struct StrParaCapture));
+    strParam->capture = capture;
+    strParam->file = g_file;
+    strParam->attrs = g_attrs;
+    strParam->frame = g_frame;
+    if (g_captureModeFlag == CAPTURE_INTERUPT) {
         printf("not suport liteos!");
     } else {
         if (StartPlayThread(palyModeFlag) < 0) {
@@ -1341,10 +1341,10 @@ void Choice0(void)
     }
     switch (choice) {
         case CAPTURE_POLL:
-            g_CaptureModeFlag = CAPTURE_POLL;
+            g_captureModeFlag = CAPTURE_POLL;
             break;
         case CAPTURE_INTERUPT:
-            g_CaptureModeFlag = CAPTURE_INTERUPT;
+            g_captureModeFlag = CAPTURE_INTERUPT;
             break;
         default:
             printf("Input error,Switched to Poll mode in for you,");
@@ -1409,7 +1409,7 @@ int32_t main(int32_t argc, char const *argv[])
     if (ret != HDF_SUCCESS) {
         return ret;
     }
-    if (InitParam()) { // init
+    if (InitParam() < 0) { // init
         AUDIO_FUNC_LOGE("InitParam Fail");
         return HDF_FAILURE;
     }

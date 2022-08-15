@@ -1524,8 +1524,8 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetGain_0001, TestSize.Level1
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    float gain = min+1;
-    float gainValue = min+1;
+    float gain = min + 1;
+    float gainValue = min + 1;
     ret = capture->volume.SetGain((AudioHandle)capture, gain);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGain((AudioHandle)capture, &gain);

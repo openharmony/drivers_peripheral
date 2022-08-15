@@ -67,7 +67,7 @@ void AudioIdlHdiRenderSceneTest::SetUpTestCase(void)
 
 void AudioIdlHdiRenderSceneTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease !=nullptr) {
+    if (AudioManagerRelease != nullptr) {
         AudioManagerRelease(manager);
         manager = nullptr;
     }

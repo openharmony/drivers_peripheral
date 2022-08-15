@@ -50,7 +50,7 @@ int AudioHdiUsbServerBind(struct HdfDeviceObject *deviceObject)
         .Release = NULL,
     };
     AudioHdiSetLoadServerFlag(AUDIO_SERVER_USB);
-    if (HdiServiceGetFuncs()) {
+    if (HdiServiceGetFuncs() < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.audio_service");
