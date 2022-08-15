@@ -166,7 +166,7 @@ static void DoGetScanResult(struct nlattr *attr[], int len, WifiScanResult *scan
         scanResult->flags |= SCAN_LEVEL_INVALID | SCAN_QUAL_INVALID;
     }
     if (attr[NL80211_BSS_SEEN_MS_AGO]) {
-        scanResult->age = (int32_t)nla_get_u32(attr[NL80211_BSS_SEEN_MS_AGO]);
+        scanResult->age = nla_get_u32(attr[NL80211_BSS_SEEN_MS_AGO]);
     }
 }
 
