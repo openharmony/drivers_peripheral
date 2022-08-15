@@ -1692,7 +1692,7 @@ static void ParseStaTxRate(struct nlattr **stats, uint32_t size, StationInfo *in
 
     if (size < NL80211_STA_INFO_MAX + 1) {
         HILOG_ERROR(LOG_CORE, "%{public}s: size of stats is not enough", __FUNCTION__);
-        return RET_CODE_INVALID_PARAM;
+        return;
     }
     ratePolicy[NL80211_RATE_INFO_BITRATE].type = NLA_U16;
     ratePolicy[NL80211_RATE_INFO_BITRATE32].type = NLA_U32;
@@ -1732,7 +1732,7 @@ static void ParseStaRxRate(struct nlattr **stats, uint32_t size, StationInfo *in
 
     if (size < NL80211_STA_INFO_MAX + 1) {
         HILOG_ERROR(LOG_CORE, "%{public}s: size of stats is not enough", __FUNCTION__);
-        return RET_CODE_INVALID_PARAM;
+        return;
     }
     ratePolicy[NL80211_RATE_INFO_BITRATE].type = NLA_U16;
     ratePolicy[NL80211_RATE_INFO_BITRATE32].type = NLA_U32;
