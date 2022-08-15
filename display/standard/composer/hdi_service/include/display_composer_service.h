@@ -67,8 +67,8 @@ private:
 
 private:
     void *libHandle_;
-    CreateComposerHwiFunc_t *createHwiFunc_;
-    DestroyComposerHwiFunc_t *destroyHwiFunc_;
+    CreateComposerHwiFunc createHwiFunc_;
+    DestroyComposerHwiFunc destroyHwiFunc_;
 
     std::shared_ptr<IDisplayComposerHwi> hwiImpl_;
     std::unique_ptr<HdiDisplayCmdResponser> cmdResponser_;
