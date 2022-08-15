@@ -199,7 +199,7 @@ int32_t AudioProxyRenderGetSampleAttributes(const AudioHandle handle,
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
     }
-    if (AudioProxyReadSapmleAttrbutes(reply, attrs)) {
+    if (AudioProxyReadSapmleAttrbutes(reply, attrs) < 0) {
         AUDIO_FUNC_LOGE("AudioProxyReadSapmleAttrbutes FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;

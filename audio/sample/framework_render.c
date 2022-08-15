@@ -112,7 +112,7 @@ char g_path[256];
 static int32_t g_closeEnd = 0;
 pthread_mutex_t g_mutex = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t g_functionCond = PTHREAD_COND_INITIALIZER;
-int g_waitSleep = 0;
+bool g_waitSleep = false;
 enum RenderMenuId {
     RENDER_START = 1,
     RENDER_STOP,
@@ -356,7 +356,7 @@ int32_t StopAudioFiles(struct AudioRender **renderS)
     }
     if (g_waitSleep) {
         pthread_mutex_lock(&g_mutex);
-        g_waitSleep = 0;
+        g_waitSleep = false;
         pthread_cond_signal(&g_functionCond);
         pthread_mutex_unlock(&g_mutex);
     }
@@ -1049,7 +1049,7 @@ int32_t SetRenderPause(struct AudioRender **render)
         return HDF_FAILURE;
     }
     printf("Pause success!\n");
-    g_waitSleep = 1;
+    g_waitSleep = true;
     return HDF_SUCCESS;
 }
 
@@ -1071,7 +1071,7 @@ int32_t SetRenderResume(struct AudioRender **render)
     }
     printf("resume success!\n");
     pthread_mutex_lock(&g_mutex);
-    g_waitSleep = 0;
+    g_waitSleep = false;
     pthread_cond_signal(&g_functionCond);
     pthread_mutex_unlock(&g_mutex);
     return HDF_SUCCESS;

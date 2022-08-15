@@ -24,15 +24,15 @@ namespace Audio {
         bool result = false;
         struct DevHandle *(*BindServiceCapture)(const char *) = nullptr;
         char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
-        void *PtrHandle = dlopen(resolvedPath, RTLD_LAZY);
-        if (PtrHandle == nullptr) {
+        void *ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
+        if (ptrHandle == nullptr) {
             HDF_LOGE("%{public}s: dlopen failed \n", __func__);
             return false;
         }
-        BindServiceCapture = (struct DevHandle *(*)(const char *))dlsym(PtrHandle, "AudioBindServiceCapture");
+        BindServiceCapture = (struct DevHandle *(*)(const char *))dlsym(ptrHandle, "AudioBindServiceCapture");
         if (BindServiceCapture == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioBindServiceCapture failed \n", __func__);
-            dlclose(PtrHandle);
+            dlclose(ptrHandle);
             return false;
         }
         char *bindFuzz = (char *)data;
@@ -40,7 +40,7 @@ namespace Audio {
         if (handle == nullptr) {
             result = true;
         }
-        dlclose(PtrHandle);
+        dlclose(ptrHandle);
         return result;
     }
 }

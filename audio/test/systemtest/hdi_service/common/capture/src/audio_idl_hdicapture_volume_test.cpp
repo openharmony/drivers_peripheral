@@ -69,7 +69,7 @@ void AudioIdlHdiCaptureVolumeTest::SetUpTestCase(void)
 
 void AudioIdlHdiCaptureVolumeTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease !=nullptr) {
+    if (AudioManagerRelease != nullptr) {
         AudioManagerRelease(manager);
         manager = nullptr;
     }
@@ -497,8 +497,8 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetGain_002, TestSiz
     ret = capture->GetGainThreshold(capture, &min, &max);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
-    float gainOne = max+1;
-    float gainSec = min-1;
+    float gainOne = max + 1;
+    float gainSec = min - 1;
     ret = capture->SetGain(capture, gainOne);
     EXPECT_EQ(HDF_FAILURE, ret);
 
@@ -537,8 +537,8 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGain_001, TestSiz
     ret = capture->GetGainThreshold(capture, &min, &max);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
-    float gain = min+1;
-    float gainValue = min+1;
+    float gain = min + 1;
+    float gainValue = min + 1;
     ret = capture->SetGain(capture, gain);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->GetGain(capture, &gain);

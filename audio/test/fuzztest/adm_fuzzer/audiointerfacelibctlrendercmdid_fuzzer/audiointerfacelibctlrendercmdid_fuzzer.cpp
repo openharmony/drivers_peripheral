@@ -23,30 +23,30 @@ namespace Audio {
     {
         bool result = false;
         char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
-        void *PtrHandle = dlopen(resolvedPath, RTLD_LAZY);
-        if (PtrHandle == nullptr) {
+        void *ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
+        if (ptrHandle == nullptr) {
             HDF_LOGE("%{public}s: dlopen failed \n", __func__);
             return false;
         }
         struct DevHandle *(*BindServiceRender)(const char *) = nullptr;
         int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int32_t, struct AudioHwRenderParam *) = nullptr;
-        BindServiceRender = (struct DevHandle *(*)(const char *))dlsym(PtrHandle, "AudioBindServiceRender");
+        BindServiceRender = (struct DevHandle *(*)(const char *))dlsym(ptrHandle, "AudioBindServiceRender");
         if (BindServiceRender == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioBindServiceRender failed \n", __func__);
-            dlclose(PtrHandle);
+            dlclose(ptrHandle);
             return false;
         }
         struct DevHandle *handle = BindServiceRender(BIND_CONTROL.c_str());
         if (handle == nullptr) {
             HDF_LOGE("%{public}s: BindServiceRender failed \n", __func__);
-            dlclose(PtrHandle);
+            dlclose(ptrHandle);
             return false;
         }
         InterfaceLibCtlRender = (int32_t (*)(struct DevHandle *, int,
-            struct AudioHwRenderParam *))dlsym(PtrHandle, "AudioInterfaceLibCtlRender");
+            struct AudioHwRenderParam *))dlsym(ptrHandle, "AudioInterfaceLibCtlRender");
         if (InterfaceLibCtlRender == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioInterfaceLibCtlRender failed \n", __func__);
-            dlclose(PtrHandle);
+            dlclose(ptrHandle);
             return false;
         }
         struct AudioHwRender *hwRender = nullptr;
@@ -59,14 +59,14 @@ namespace Audio {
         }
         free(hwRender);
         void (*CloseService)(const struct DevHandle *) = nullptr;
-        CloseService = (void (*)(const struct DevHandle *))dlsym(PtrHandle, "AudioCloseServiceRender");
+        CloseService = (void (*)(const struct DevHandle *))dlsym(ptrHandle, "AudioCloseServiceRender");
         if (CloseService == nullptr) {
             HDF_LOGE("%{public}s:dlsym AudioCloseServiceRender failed \n", __func__);
-            dlclose(PtrHandle);
+            dlclose(ptrHandle);
             return false;
         }
         CloseService(handle);
-        dlclose(PtrHandle);
+        dlclose(ptrHandle);
         return result;
     }
 }

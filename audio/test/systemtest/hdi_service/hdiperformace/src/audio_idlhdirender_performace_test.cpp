@@ -72,7 +72,7 @@ void AudioIdlHdiRenderPerformaceTest::SetUpTestCase(void)
 
 void AudioIdlHdiRenderPerformaceTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease !=nullptr) {
+    if (AudioManagerRelease != nullptr) {
         AudioManagerRelease(manager);
         manager = nullptr;
     }
@@ -1351,8 +1351,8 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderGetGain_Performanc
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = audiopara.render->GetGainThreshold(audiopara.render, &min, &max);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    float gain = min+1;
-    float gainValue = min+1;
+    float gain = min + 1;
+    float gainValue = min + 1;
 
     for (int i = 0; i < COUNT; ++i) {
         ret = audiopara.render->SetGain(audiopara.render, gain);
