@@ -22,6 +22,7 @@ namespace OHOS {
 namespace USB {
     bool UsbSetPortRoleFuzzTest(const uint8_t* data, size_t size)
     {
+        (void)size;
         bool result = false;
         int32_t ret = UsbdClient::GetInstance().SetPortRole(*(int32_t *)data,
             *(int32_t *)data, *(int32_t *)data);

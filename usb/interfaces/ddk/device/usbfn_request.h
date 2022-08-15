@@ -137,7 +137,7 @@ int32_t UsbFnSubmitRequestAsync(struct UsbFnRequest *req);
 /**
  * @brief Cancels a USB request based on the passed request.
  *
- * 
+ *
  *
  * @param req Indicates the pointer to the USB request.
  *

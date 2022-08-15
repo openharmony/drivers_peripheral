@@ -25,9 +25,9 @@
 #ifndef USBFN_DEVICE_H
 #define USBFN_DEVICE_H
 
-#include "usb_object.h"
 #include "device_resource_if.h"
 #include "usb_ddk.h"
+#include "usb_object.h"
 #include "usbfn_interface.h"
 
 /**
@@ -61,22 +61,22 @@ typedef enum {
  */
 struct UsbString {
     /** String ID */
-    uint8_t                     id;
+    uint8_t id;
     /** String encoded in UTF-8 format */
-    const char                  *s;
+    const char *s;
 };
 
 /**
  * @brief Defines a USB string in a specific language.
  *
- * 
+ *
  * @see http://www.usb.org/developers/docs/USB_LANGIDs.pdf
  */
 struct UsbFnStrings {
     /** Language of USB strings, for example, 0x0409 for en-us */
-    uint16_t                    language;
+    uint16_t language;
     /** Pointer to USB strings */
-    struct UsbString            *strings;
+    struct UsbString *strings;
 };
 
 /**
@@ -94,10 +94,10 @@ struct UsbFnFunction {
      * A value does not need to be assigned to the descriptor.
      * You can simply use <b>UsbFnCreateDevice</b> to create a device.
      */
-    bool                       enable;
-    const char                 *funcName;
+    bool enable;
+    const char *funcName;
     /** Double pointer to USB strings in a specified language */
-    struct UsbFnStrings        **strings;
+    struct UsbFnStrings **strings;
     /** Double pointer to Full-Speed descriptors */
     struct UsbDescriptorHeader **fsDescriptors;
     /** Double pointer to High-Speed descriptors */
@@ -113,15 +113,15 @@ struct UsbFnFunction {
  */
 struct UsbFnConfiguration {
     /** Configuration ID */
-    uint8_t                     configurationValue;
+    uint8_t configurationValue;
     /** Configuration string index */
-    uint8_t                     iConfiguration;
+    uint8_t iConfiguration;
     /** Configuration attributes */
-    uint8_t                     attributes;
+    uint8_t attributes;
     /** Maximum current */
-    uint16_t                    maxPower;
+    uint16_t maxPower;
     /** Double pointer to USB devices */
-    struct UsbFnFunction        **functions;
+    struct UsbFnFunction **functions;
 };
 
 /**
@@ -131,9 +131,9 @@ struct UsbFnDeviceDesc {
     /** Pointer to the standard USB device descriptor */
     struct UsbDeviceDescriptor *deviceDesc;
     /** Double pointer to USB strings in a specified language */
-    struct UsbFnStrings          **deviceStrings;
+    struct UsbFnStrings **deviceStrings;
     /** Double pointer to USB configuration descriptors */
-    struct UsbFnConfiguration    **configs;
+    struct UsbFnConfiguration **configs;
 };
 
 /**
@@ -146,7 +146,7 @@ struct UsbFnDescriptorData {
         /** Pointer to the USB device descriptor */
         struct UsbFnDeviceDesc *descriptor;
     };
-        /** Descriptor type */
+    /** Descriptor type */
     UsbFnDescDataType type;
     uint8_t functionMask;
 };
@@ -167,7 +167,7 @@ const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName, struct UsbFnDes
 /**
  * @brief Deletes a specified USB device.
  *
- * 
+ *
  *
  * @param fnDevice Indicates the pointer to the USB device object.
  *
@@ -181,7 +181,7 @@ int32_t UsbFnGetDeviceState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devS
 /**
  * @brief Obtains a USB interface based on the specified interface index.
  *
- * 
+ *
  *
  * @param fnDevice Indicates the pointer to the USB device object.
  * @param interfaceIndex Indicates the interface index, which is numbered from <b>0</b>.

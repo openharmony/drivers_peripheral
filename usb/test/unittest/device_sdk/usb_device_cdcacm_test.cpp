@@ -20,211 +20,208 @@ extern "C" {
 using namespace std;
 
 static struct UsbInterfaceAssocDescriptor g_acmIadDescriptor = {
-    .bLength           = sizeof(g_acmIadDescriptor),
-    .bDescriptorType   = USB_DDK_DT_INTERFACE_ASSOCIATION,
+    .bLength = sizeof(g_acmIadDescriptor),
+    .bDescriptorType = USB_DDK_DT_INTERFACE_ASSOCIATION,
 #ifdef CDC_ECM
-    .bFirstInterface   = 0x02,
+    .bFirstInterface = 0x02,
 #else
-    .bFirstInterface   = 0,
+    .bFirstInterface = 0,
 #endif
-    .bInterfaceCount   = INTF_COUNT,
-    .bFunctionClass    = USB_DDK_CLASS_COMM,
+    .bInterfaceCount = INTF_COUNT,
+    .bFunctionClass = USB_DDK_CLASS_COMM,
     .bFunctionSubClass = USB_DDK_CDC_SUBCLASS_ACM,
     .bFunctionProtocol = USB_DDK_CDC_ACM_PROTO_AT_V25TER,
-    .iFunction         = ACM_IAD_IDX,
+    .iFunction = ACM_IAD_IDX,
 };
 
 static struct UsbInterfaceDescriptor g_acmControlInterfaceDesc = {
-    .bLength            = USB_DDK_DT_INTERFACE_SIZE,
-    .bDescriptorType    = USB_DDK_DT_INTERFACE,
+    .bLength = USB_DDK_DT_INTERFACE_SIZE,
+    .bDescriptorType = USB_DDK_DT_INTERFACE,
 #ifdef CDC_ECM
-    .bInterfaceNumber   = 0x02,
+    .bInterfaceNumber = 0x02,
 #else
-    .bInterfaceNumber   = 0,
+    .bInterfaceNumber = 0,
 #endif
-    .bAlternateSetting  = 0,
-    .bNumEndpoints      = NOTIFY_EP_NUM,
-    .bInterfaceClass    = USB_DDK_CLASS_COMM,
+    .bAlternateSetting = 0,
+    .bNumEndpoints = NOTIFY_EP_NUM,
+    .bInterfaceClass = USB_DDK_CLASS_COMM,
     .bInterfaceSubClass = USB_DDK_CDC_SUBCLASS_ACM,
     .bInterfaceProtocol = USB_DDK_CDC_ACM_PROTO_AT_V25TER,
-    .iInterface         = ACM_CTRL_IDX,
+    .iInterface = ACM_CTRL_IDX,
 };
 
 static struct UsbInterfaceDescriptor g_acmDataInterfaceDesc = {
-    .bLength            = USB_DDK_DT_INTERFACE_SIZE,
-    .bDescriptorType    = USB_DDK_DT_INTERFACE,
+    .bLength = USB_DDK_DT_INTERFACE_SIZE,
+    .bDescriptorType = USB_DDK_DT_INTERFACE,
 #ifdef CDC_ECM
-    .bInterfaceNumber   = 0x03,
+    .bInterfaceNumber = 0x03,
 #else
-    .bInterfaceNumber   = 1,
+    .bInterfaceNumber = 1,
 #endif
-    .bAlternateSetting  = 0,
-    .bNumEndpoints      = DATA_EP_NUM,
-    .bInterfaceClass    = USB_DDK_CLASS_CDC_DATA,
+    .bAlternateSetting = 0,
+    .bNumEndpoints = DATA_EP_NUM,
+    .bInterfaceClass = USB_DDK_CLASS_CDC_DATA,
     .bInterfaceSubClass = 0,
     .bInterfaceProtocol = 2,
-    .iInterface         = ACM_DATA_IDX,
+    .iInterface = ACM_DATA_IDX,
 };
 
 static struct UsbCdcHeaderDesc g_acmHeaderDesc = {
-    .bLength            = sizeof(g_acmHeaderDesc),
-    .bDescriptorType    = USB_DDK_DT_CS_INTERFACE,
+    .bLength = sizeof(g_acmHeaderDesc),
+    .bDescriptorType = USB_DDK_DT_CS_INTERFACE,
     .bDescriptorSubType = USB_DDK_CDC_HEADER_TYPE,
-    .bcdCDC             = CpuToLe16(0x0110),
+    .bcdCDC = CpuToLe16(0x0110),
 };
 
 static struct UsbCdcCallMgmtDescriptor g_acmCallMgmtDescriptor = {
-    .bLength            = sizeof(g_acmCallMgmtDescriptor),
-    .bDescriptorType    = USB_DDK_DT_CS_INTERFACE,
+    .bLength = sizeof(g_acmCallMgmtDescriptor),
+    .bDescriptorType = USB_DDK_DT_CS_INTERFACE,
     .bDescriptorSubType = USB_DDK_CDC_CALL_MANAGEMENT_TYPE,
-    .bmCapabilities     = 0,
-    .bDataInterface     = 1,
+    .bmCapabilities = 0,
+    .bDataInterface = 1,
 };
 
 static struct UsbCdcAcmDescriptor g_acmDescriptor = {
-    .bLength            = sizeof(g_acmDescriptor),
-    .bDescriptorType    = USB_DDK_DT_CS_INTERFACE,
+    .bLength = sizeof(g_acmDescriptor),
+    .bDescriptorType = USB_DDK_DT_CS_INTERFACE,
     .bDescriptorSubType = USB_DDK_CDC_ACM_TYPE,
-    .bmCapabilities     = USB_DDK_CDC_CAP_LINE,
+    .bmCapabilities = USB_DDK_CDC_CAP_LINE,
 };
 
 static struct UsbCdcUnionDesc g_acmUnionDesc = {
-    .bLength            = sizeof(g_acmUnionDesc),
-    .bDescriptorType    = USB_DDK_DT_CS_INTERFACE,
+    .bLength = sizeof(g_acmUnionDesc),
+    .bDescriptorType = USB_DDK_DT_CS_INTERFACE,
     .bDescriptorSubType = USB_DDK_CDC_UNION_TYPE,
 #ifdef CDC_ECM
-    .bMasterInterface0  = 0x02,
-    .bSlaveInterface0   = 0x03,
+    .bMasterInterface0 = 0x02,
+    .bSlaveInterface0 = 0x03,
 #else
-    .bMasterInterface0  = 0,
-    .bSlaveInterface0   = 1,
+    .bMasterInterface0 = 0,
+    .bSlaveInterface0 = 1,
 #endif
 };
 
 static struct UsbEndpointDescriptor g_acmFsNotifyDesc = {
-    .bLength          = USB_DDK_DT_ENDPOINT_SIZE,
-    .bDescriptorType  = USB_DDK_DT_ENDPOINT,
+    .bLength = USB_DDK_DT_ENDPOINT_SIZE,
+    .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_NOTIFY | USB_DDK_DIR_IN,
-    .bmAttributes     = USB_DDK_ENDPOINT_XFER_INT,
-    .wMaxPacketSize   = CpuToLe16(ACM_NOTIFY_MAXPACKET),
-    .bInterval        = ACM_NOTIFY_INTERVAL,
+    .bmAttributes = USB_DDK_ENDPOINT_XFER_INT,
+    .wMaxPacketSize = CpuToLe16(ACM_NOTIFY_MAXPACKET),
+    .bInterval = ACM_NOTIFY_INTERVAL,
 };
 
 static struct UsbEndpointDescriptor g_acmFsInDesc = {
-    .bLength          = USB_DDK_DT_ENDPOINT_SIZE,
-    .bDescriptorType  = USB_DDK_DT_ENDPOINT,
+    .bLength = USB_DDK_DT_ENDPOINT_SIZE,
+    .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_DATA_IN | USB_DDK_DIR_IN,
-    .bmAttributes     = USB_DDK_ENDPOINT_XFER_BULK,
+    .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
 };
 
 static struct UsbEndpointDescriptor g_acmFsOutDesc = {
-    .bLength          = USB_DDK_DT_ENDPOINT_SIZE,
-    .bDescriptorType  = USB_DDK_DT_ENDPOINT,
+    .bLength = USB_DDK_DT_ENDPOINT_SIZE,
+    .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_DATA_OUT | USB_DDK_DIR_OUT,
-    .bmAttributes     = USB_DDK_ENDPOINT_XFER_BULK,
+    .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
 };
 
 static struct UsbDescriptorHeader *g_acmFsFunction[] = {
-    (struct UsbDescriptorHeader *) &g_acmIadDescriptor,
-    (struct UsbDescriptorHeader *) &g_acmControlInterfaceDesc,
-    (struct UsbDescriptorHeader *) &g_acmHeaderDesc,
-    (struct UsbDescriptorHeader *) &g_acmCallMgmtDescriptor,
-    (struct UsbDescriptorHeader *) &g_acmDescriptor,
-    (struct UsbDescriptorHeader *) &g_acmUnionDesc,
-    (struct UsbDescriptorHeader *) &g_acmFsNotifyDesc,
-    (struct UsbDescriptorHeader *) &g_acmDataInterfaceDesc,
-    (struct UsbDescriptorHeader *) &g_acmFsInDesc,
-    (struct UsbDescriptorHeader *) &g_acmFsOutDesc,
+    (struct UsbDescriptorHeader *)&g_acmIadDescriptor,
+    (struct UsbDescriptorHeader *)&g_acmControlInterfaceDesc,
+    (struct UsbDescriptorHeader *)&g_acmHeaderDesc,
+    (struct UsbDescriptorHeader *)&g_acmCallMgmtDescriptor,
+    (struct UsbDescriptorHeader *)&g_acmDescriptor,
+    (struct UsbDescriptorHeader *)&g_acmUnionDesc,
+    (struct UsbDescriptorHeader *)&g_acmFsNotifyDesc,
+    (struct UsbDescriptorHeader *)&g_acmDataInterfaceDesc,
+    (struct UsbDescriptorHeader *)&g_acmFsInDesc,
+    (struct UsbDescriptorHeader *)&g_acmFsOutDesc,
     nullptr,
 };
 
 static struct UsbEndpointDescriptor g_acmHsNotifyDesc = {
-    .bLength          = USB_DDK_DT_ENDPOINT_SIZE,
-    .bDescriptorType  = USB_DDK_DT_ENDPOINT,
+    .bLength = USB_DDK_DT_ENDPOINT_SIZE,
+    .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_NOTIFY | USB_DDK_DIR_IN,
-    .bmAttributes     = USB_DDK_ENDPOINT_XFER_INT,
-    .wMaxPacketSize   = CpuToLe16(ACM_NOTIFY_MAXPACKET),
-    .bInterval        = ACM_HS_NOTIFY_INTERVAL,
+    .bmAttributes = USB_DDK_ENDPOINT_XFER_INT,
+    .wMaxPacketSize = CpuToLe16(ACM_NOTIFY_MAXPACKET),
+    .bInterval = ACM_HS_NOTIFY_INTERVAL,
 };
 
 static struct UsbEndpointDescriptor g_acmHsInDesc = {
-    .bLength          = USB_DDK_DT_ENDPOINT_SIZE,
-    .bDescriptorType  = USB_DDK_DT_ENDPOINT,
+    .bLength = USB_DDK_DT_ENDPOINT_SIZE,
+    .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_DATA_IN | USB_DDK_DIR_IN,
-    .bmAttributes     = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize   = CpuToLe16(MAX_PACKET_SIZE),
+    .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
+    .wMaxPacketSize = CpuToLe16(MAX_PACKET_SIZE),
 };
 
 static struct UsbEndpointDescriptor g_acmHsOutDesc = {
-    .bLength           = USB_DDK_DT_ENDPOINT_SIZE,
-    .bDescriptorType   = USB_DDK_DT_ENDPOINT,
-    .bEndpointAddress  = EP_ADD_DATA_OUT | USB_DDK_DIR_OUT,
-    .bmAttributes      = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize    = CpuToLe16(MAX_PACKET_SIZE),
+    .bLength = USB_DDK_DT_ENDPOINT_SIZE,
+    .bDescriptorType = USB_DDK_DT_ENDPOINT,
+    .bEndpointAddress = EP_ADD_DATA_OUT | USB_DDK_DIR_OUT,
+    .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
+    .wMaxPacketSize = CpuToLe16(MAX_PACKET_SIZE),
 };
 
 static struct UsbDescriptorHeader *g_acmHsFunction[] = {
-    (struct UsbDescriptorHeader *) &g_acmIadDescriptor,
-    (struct UsbDescriptorHeader *) &g_acmControlInterfaceDesc,
-    (struct UsbDescriptorHeader *) &g_acmHeaderDesc,
-    (struct UsbDescriptorHeader *) &g_acmCallMgmtDescriptor,
-    (struct UsbDescriptorHeader *) &g_acmDescriptor,
-    (struct UsbDescriptorHeader *) &g_acmUnionDesc,
-    (struct UsbDescriptorHeader *) &g_acmHsNotifyDesc,
-    (struct UsbDescriptorHeader *) &g_acmDataInterfaceDesc,
-    (struct UsbDescriptorHeader *) &g_acmHsInDesc,
-    (struct UsbDescriptorHeader *) &g_acmHsOutDesc,
+    (struct UsbDescriptorHeader *)&g_acmIadDescriptor,
+    (struct UsbDescriptorHeader *)&g_acmControlInterfaceDesc,
+    (struct UsbDescriptorHeader *)&g_acmHeaderDesc,
+    (struct UsbDescriptorHeader *)&g_acmCallMgmtDescriptor,
+    (struct UsbDescriptorHeader *)&g_acmDescriptor,
+    (struct UsbDescriptorHeader *)&g_acmUnionDesc,
+    (struct UsbDescriptorHeader *)&g_acmHsNotifyDesc,
+    (struct UsbDescriptorHeader *)&g_acmDataInterfaceDesc,
+    (struct UsbDescriptorHeader *)&g_acmHsInDesc,
+    (struct UsbDescriptorHeader *)&g_acmHsOutDesc,
     nullptr,
 };
 
 static struct UsbEndpointDescriptor g_acmSsInDesc = {
-    .bLength          = USB_DDK_DT_ENDPOINT_SIZE,
-    .bDescriptorType  = USB_DDK_DT_ENDPOINT,
+    .bLength = USB_DDK_DT_ENDPOINT_SIZE,
+    .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_DATA_IN | USB_DDK_DIR_IN,
-    .bmAttributes     = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize   = CpuToLe16(SS_MAX_PACKET_SIZE),
+    .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
+    .wMaxPacketSize = CpuToLe16(SS_MAX_PACKET_SIZE),
 };
 
 static struct UsbEndpointDescriptor g_acmSsOutDesc = {
-    .bLength          = USB_DDK_DT_ENDPOINT_SIZE,
-    .bDescriptorType  = USB_DDK_DT_ENDPOINT,
+    .bLength = USB_DDK_DT_ENDPOINT_SIZE,
+    .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_DATA_OUT | USB_DDK_DIR_OUT,
-    .bmAttributes     = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize   = CpuToLe16(SS_MAX_PACKET_SIZE),
+    .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
+    .wMaxPacketSize = CpuToLe16(SS_MAX_PACKET_SIZE),
 };
 
 static struct UsbSsEpCompDescriptor g_acmSsBulkCompDesc = {
-    .bLength         = sizeof(g_acmSsBulkCompDesc),
+    .bLength = sizeof(g_acmSsBulkCompDesc),
     .bDescriptorType = USB_DDK_DT_SS_ENDPOINT_COMP,
 };
 
 static struct UsbDescriptorHeader *g_acmSsFunction[] = {
-    (struct UsbDescriptorHeader *) &g_acmIadDescriptor,
-    (struct UsbDescriptorHeader *) &g_acmControlInterfaceDesc,
-    (struct UsbDescriptorHeader *) &g_acmHeaderDesc,
-    (struct UsbDescriptorHeader *) &g_acmCallMgmtDescriptor,
-    (struct UsbDescriptorHeader *) &g_acmDescriptor,
-    (struct UsbDescriptorHeader *) &g_acmUnionDesc,
-    (struct UsbDescriptorHeader *) &g_acmHsNotifyDesc,
-    (struct UsbDescriptorHeader *) &g_acmSsBulkCompDesc,
-    (struct UsbDescriptorHeader *) &g_acmDataInterfaceDesc,
-    (struct UsbDescriptorHeader *) &g_acmSsInDesc,
-    (struct UsbDescriptorHeader *) &g_acmSsBulkCompDesc,
-    (struct UsbDescriptorHeader *) &g_acmSsOutDesc,
-    (struct UsbDescriptorHeader *) &g_acmSsBulkCompDesc,
+    (struct UsbDescriptorHeader *)&g_acmIadDescriptor,
+    (struct UsbDescriptorHeader *)&g_acmControlInterfaceDesc,
+    (struct UsbDescriptorHeader *)&g_acmHeaderDesc,
+    (struct UsbDescriptorHeader *)&g_acmCallMgmtDescriptor,
+    (struct UsbDescriptorHeader *)&g_acmDescriptor,
+    (struct UsbDescriptorHeader *)&g_acmUnionDesc,
+    (struct UsbDescriptorHeader *)&g_acmHsNotifyDesc,
+    (struct UsbDescriptorHeader *)&g_acmSsBulkCompDesc,
+    (struct UsbDescriptorHeader *)&g_acmDataInterfaceDesc,
+    (struct UsbDescriptorHeader *)&g_acmSsInDesc,
+    (struct UsbDescriptorHeader *)&g_acmSsBulkCompDesc,
+    (struct UsbDescriptorHeader *)&g_acmSsOutDesc,
+    (struct UsbDescriptorHeader *)&g_acmSsBulkCompDesc,
     nullptr,
 };
 
 static struct UsbString g_acmStringDefs[] = {
-    [0].s = "CDC Abstract Control Model (ACM)",
-    [1].s = "CDC ACM Data",
-    [2].s = "CDC Serial",
-    {  } /* end of list */
+    [0].s = "CDC Abstract Control Model (ACM)", [1].s = "CDC ACM Data", [2].s = "CDC Serial", {} /* end of list */
 };
 
 static struct UsbFnStrings g_acmStringTable = {
     .language = 0x0409, /* en-us */
-    .strings  = g_acmStringDefs,
+    .strings = g_acmStringDefs,
 };
 
 static struct UsbFnStrings *g_acmStrings[] = {
@@ -233,55 +230,55 @@ static struct UsbFnStrings *g_acmStrings[] = {
 };
 
 static struct UsbFnFunction g_acmFunction = {
-    .funcName       = "f_generic.a",
-    .strings        = g_acmStrings,
-    .fsDescriptors  = g_acmFsFunction,
-    .hsDescriptors  = g_acmHsFunction,
-    .ssDescriptors  = g_acmSsFunction,
+    .funcName = "f_generic.a",
+    .strings = g_acmStrings,
+    .fsDescriptors = g_acmFsFunction,
+    .hsDescriptors = g_acmHsFunction,
+    .ssDescriptors = g_acmSsFunction,
     .sspDescriptors = nullptr,
 };
 
 /** device **/
-#define BCD_USB                 0x0200
-#define DEVICE_VENDOR_ID        0x12D1
-#define DEVICE_PRODUCT_ID       0x5000
-#define DEVICE_VERSION          0x0223
+#define BCD_USB           0x0200
+#define DEVICE_VENDOR_ID  0x12D1
+#define DEVICE_PRODUCT_ID 0x5000
+#define DEVICE_VERSION    0x0223
 
-#define USB_MAX_PACKET_SIZE     0x40
-#define POWER                   500
+#define USB_MAX_PACKET_SIZE 0x40
+#define POWER               500
 
 #define USB_FUNC_CONFIG_IDX USB_FUNC_FIRST_AVAIL_IDX
-#define DRIVER_DESC "HDC Device"
-#define CONFIG_DESC "hdc"
+#define DRIVER_DESC         "HDC Device"
+#define CONFIG_DESC         "hdc"
 
 static struct UsbDeviceDescriptor g_cdcMasterDeviceDesc = {
-    .bLength            = sizeof(g_cdcMasterDeviceDesc),
-    .bDescriptorType    = USB_DDK_DT_DEVICE,
-    .bcdUSB             = CpuToLe16(BCD_USB),
-    .bDeviceClass       = 0,
-    .bDeviceSubClass    = 0,
-    .bDeviceProtocol    = 0,
-    .bMaxPacketSize0    = USB_MAX_PACKET_SIZE,
-    .idVendor           = CpuToLe16(DEVICE_VENDOR_ID),
-    .idProduct          = CpuToLe16(DEVICE_PRODUCT_ID),
-    .bcdDevice          = CpuToLe16(DEVICE_VERSION),
-    .iManufacturer      = USB_FUNC_MANUFACTURER_IDX,
-    .iProduct           = USB_FUNC_PRODUCT_IDX,
-    .iSerialNumber      = USB_FUNC_SERIAL_IDX,
+    .bLength = sizeof(g_cdcMasterDeviceDesc),
+    .bDescriptorType = USB_DDK_DT_DEVICE,
+    .bcdUSB = CpuToLe16(BCD_USB),
+    .bDeviceClass = 0,
+    .bDeviceSubClass = 0,
+    .bDeviceProtocol = 0,
+    .bMaxPacketSize0 = USB_MAX_PACKET_SIZE,
+    .idVendor = CpuToLe16(DEVICE_VENDOR_ID),
+    .idProduct = CpuToLe16(DEVICE_PRODUCT_ID),
+    .bcdDevice = CpuToLe16(DEVICE_VERSION),
+    .iManufacturer = USB_FUNC_MANUFACTURER_IDX,
+    .iProduct = USB_FUNC_PRODUCT_IDX,
+    .iSerialNumber = USB_FUNC_SERIAL_IDX,
     .bNumConfigurations = 1,
 };
 
 static struct UsbString g_stringsDev[] = {
     {USB_FUNC_MANUFACTURER_IDX, "HISILICON"},
-    {USB_FUNC_PRODUCT_IDX, DRIVER_DESC},
-    {USB_FUNC_SERIAL_IDX, "0123456789POPLAR"},
-    {USB_FUNC_CONFIG_IDX, CONFIG_DESC},
-    {  } /* end of list */
+    {USB_FUNC_PRODUCT_IDX,                         DRIVER_DESC},
+    {USB_FUNC_SERIAL_IDX,"0123456789POPLAR"},
+    {USB_FUNC_CONFIG_IDX,       CONFIG_DESC},
+    {       }  /* end of list */
 };
 
 static struct UsbFnStrings g_stringTabDev = {
-    .language   = 0x0409,       /* en-us */
-    .strings    = g_stringsDev,
+    .language = 0x0409, /* en-us */
+    .strings = g_stringsDev,
 };
 
 static struct UsbFnStrings *g_devStrings[] = {
@@ -296,15 +293,14 @@ struct UsbFnFunction *g_functions[] = {
 #ifdef CDC_ACM
     &g_acmFunction,
 #endif
-    nullptr
-};
+    nullptr};
 
 static struct UsbFnConfiguration g_masterConfig = {
     .configurationValue = 1,
-    .iConfiguration     = USB_FUNC_CONFIG_IDX,
-    .attributes         = USB_CFG_BUS_POWERED,
-    .maxPower           = POWER,
-    .functions          = g_functions,
+    .iConfiguration = USB_FUNC_CONFIG_IDX,
+    .attributes = USB_CFG_BUS_POWERED,
+    .maxPower = POWER,
+    .functions = g_functions,
 };
 
 static struct UsbFnConfiguration *g_configs[] = {
@@ -313,9 +309,9 @@ static struct UsbFnConfiguration *g_configs[] = {
 };
 
 struct UsbFnDeviceDesc g_acmFnDevice = {
-    .deviceDesc    = &g_cdcMasterDeviceDesc,
+    .deviceDesc = &g_cdcMasterDeviceDesc,
     .deviceStrings = g_devStrings,
-    .configs       = g_configs,
+    .configs = g_configs,
 };
 
 enum DevMasterCmd {
@@ -341,7 +337,7 @@ static struct Serial *SerialAlloc(void)
     return port;
 }
 
-static int32_t ParseInterfaces(struct AcmDevice *const acmDevice)
+static int32_t ParseInterfaces(struct AcmDevice * const acmDevice)
 {
     uint32_t i;
     uint32_t j;
@@ -426,13 +422,13 @@ static int32_t AllocCtrlRequests(struct AcmDevice *acmDevice)
             return -1;
         }
         ctrlInfo->acm = acmDevice;
-        req = UsbFnAllocCtrlRequest(acmDevice->ctrlIface.handle,
-            sizeof(struct UsbCdcLineCoding) + sizeof(struct UsbCdcLineCoding));
+        req = UsbFnAllocCtrlRequest(
+            acmDevice->ctrlIface.handle, sizeof(struct UsbCdcLineCoding) + sizeof(struct UsbCdcLineCoding));
         if (nullptr == req) {
             return -1;
         }
         req->complete = CtrlComplete;
-        req->context  = ctrlInfo;
+        req->context = ctrlInfo;
         DListInsertTail(&req->list, head);
         acmDevice->ctrlReqNum++;
     }
@@ -440,8 +436,7 @@ static int32_t AllocCtrlRequests(struct AcmDevice *acmDevice)
     return 0;
 }
 
-static int32_t SendNotifyRequest(struct AcmDevice *acm, uint8_t type,
-    uint16_t value, void *data, uint32_t length)
+static int32_t SendNotifyRequest(struct AcmDevice *acm, uint8_t type, uint16_t value, void *data, uint32_t length)
 {
     if (acm == nullptr) {
         HDF_LOGE("%{public}s:%{public}d req is nullptr", __func__, __LINE__);
@@ -457,8 +452,8 @@ static int32_t SendNotifyRequest(struct AcmDevice *acm, uint8_t type,
         return -1;
     }
     acm->notifyReq = nullptr;
-    acm->pending   = false;
-    req->length    = sizeof(*notify) + length;
+    acm->pending = false;
+    req->length = sizeof(*notify) + length;
 
     notify = (struct UsbCdcNotification *)req->buf;
     notify->bmRequestType = USB_DDK_DIR_IN | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
@@ -480,8 +475,7 @@ static int32_t NotifySerialState(struct AcmDevice *acm)
     OsalMutexLock(&acm->lock);
     if (acm->notifyReq) {
         serialState = CpuToLe16(acm->serialState);
-        ret = SendNotifyRequest(acm, USB_DDK_CDC_NOTIFY_SERIAL_STATE,
-            0, &serialState, sizeof(acm->serialState));
+        ret = SendNotifyRequest(acm, USB_DDK_CDC_NOTIFY_SERIAL_STATE, 0, &serialState, sizeof(acm->serialState));
     } else {
         acm->pending = true;
     }
@@ -512,8 +506,8 @@ static void NotifyComplete(uint8_t pipe, struct UsbFnRequest *req)
 static int32_t AllocNotifyRequest(struct AcmDevice *acmDevice)
 {
     /* allocate notification request */
-    acmDevice->notifyReq = UsbFnAllocRequest(acmDevice->ctrlIface.handle, acmDevice->notifyPipe.id,
-        sizeof(struct UsbCdcNotification));
+    acmDevice->notifyReq =
+        UsbFnAllocRequest(acmDevice->ctrlIface.handle, acmDevice->notifyPipe.id, sizeof(struct UsbCdcNotification));
     if (acmDevice->notifyReq == nullptr) {
         return -1;
     }
@@ -558,9 +552,9 @@ static int32_t SendBreak(struct AcmDevice *acm, int32_t duration)
 }
 
 static struct AcmNotifyMethod g_notifyMethod = {
-    .Connect    = Connect,
+    .Connect = Connect,
     .Disconnect = Disconnect,
-    .SendBreak  = SendBreak,
+    .SendBreak = SendBreak,
 };
 
 static uint32_t Enable(struct AcmDevice *acm)
@@ -585,6 +579,7 @@ static uint32_t Enable(struct AcmDevice *acm)
 
 static uint32_t Disable(struct AcmDevice *acm)
 {
+    (void)acm;
     return HDF_SUCCESS;
 }
 
@@ -603,7 +598,7 @@ static void Setup(struct AcmDevice *acm, struct UsbFnCtrlRequest *setup)
 {
     struct UsbFnRequest *req = nullptr;
     struct CtrlInfo *ctrlInfo = nullptr;
-    uint16_t value  = Le16ToCpu(setup->value);
+    uint16_t value = Le16ToCpu(setup->value);
     uint16_t length = Le16ToCpu(setup->length);
     int32_t ret = 0;
     req = GetCtrlReq(acm);
@@ -618,8 +613,7 @@ static void Setup(struct AcmDevice *acm, struct UsbFnCtrlRequest *setup)
             ret = length;
             break;
         case USB_DDK_CDC_REQ_GET_LINE_CODING:
-            ret = (length > sizeof(struct UsbCdcLineCoding)) ? \
-                sizeof(struct UsbCdcLineCoding) : length;
+            ret = (length > sizeof(struct UsbCdcLineCoding)) ? sizeof(struct UsbCdcLineCoding) : length;
             if (acm->lineCoding.dwDTERate == 0) {
                 acm->lineCoding = acm->port->lineCoding;
             }
@@ -695,7 +689,7 @@ void AcmEventCallback(struct UsbFnEvent * const event)
     }
 }
 
-struct AcmDevice * SetUpAcmDevice(void)
+struct AcmDevice *SetUpAcmDevice(void)
 {
     int32_t ret;
 
@@ -782,4 +776,3 @@ void ReleaseAcmDevice(struct AcmDevice *acm)
     UsbFnStopRecvInterfaceEvent(acm->ctrlIface.fn);
     OsalMemFree(acm->port);
 }
-

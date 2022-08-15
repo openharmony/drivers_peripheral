@@ -125,6 +125,7 @@ static void DdkDispatchUevent(const struct DdkUeventInfo *info)
 
 static void DdkHandleUevent(const char msg[], int32_t rcvLen)
 {
+    (void) rcvLen;
     struct DdkUeventInfo info = {
         .action = "",
         .subSystem = "",

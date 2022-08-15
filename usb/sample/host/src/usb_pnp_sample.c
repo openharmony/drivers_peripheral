@@ -25,7 +25,7 @@
 #define HDF_LOG_TAG     USB_PNP_SAMPLE_TEST
 #define STR_LEN         1024
 
-static void UsbPnpSampleTestWriteLog(char *string)
+static void UsbPnpSampleTestWriteLog(char *strTmp)
 {
     char str[STR_LEN];
     FILE *fp = NULL;
@@ -40,7 +40,7 @@ static void UsbPnpSampleTestWriteLog(char *string)
     }
 
     (void)snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, %s\n",
-        time.tv_sec, time.tv_usec, string);
+        time.tv_sec, time.tv_usec, strTmp);
 
     (void)fwrite(str, strlen(str), 1, fp);
     (void)fclose(fp);
@@ -49,6 +49,10 @@ static void UsbPnpSampleTestWriteLog(char *string)
 static int32_t UsbPnpSampleTestServiceDispatch(struct HdfDeviceIoClient *client, int32_t cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    (void)client;
+    (void)cmdId;
+    (void)data;
+    (void)reply;
     HDF_LOGI("%s: %d", __func__, __LINE__);
     return HDF_SUCCESS;
 }
@@ -69,20 +73,16 @@ static int32_t UsbPnpSampleTestDriverBind(struct HdfDeviceObject *deviceObject)
 static int32_t UsbPnpSampleTestDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%s: %d", __func__, __LINE__);
-
+    (void)deviceObject;
     UsbPnpSampleTestWriteLog("usb pnp sample device driver was loaded successfully");
-
     return HDF_SUCCESS;
 }
 
 static void UsbPnpSampleTestDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%s: %d", __func__, __LINE__);
-
     (void)deviceObject;
-
     UsbPnpSampleTestWriteLog("usb pnp sample device driver was unloaded successfully");
-
     return;
 }
 
