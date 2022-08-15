@@ -294,7 +294,7 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
 int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
 {
     if (capabilityIndex == NULL) {
-        AUDIO_FUNC_LOGE("capabilityIndex Is NULL");
+        AUDIO_FUNC_LOGE("capabilityIndex is null");
         return HDF_FAILURE;
     }
     /* get capabilityIndex from driver or default */

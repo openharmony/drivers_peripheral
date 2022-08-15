@@ -90,14 +90,14 @@ int32_t AudioCtlRenderSetVolume(const struct DevHandle *handle, int cmdId, const
 
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
-        AUDIO_FUNC_LOGE("Parameter error!");
+        AUDIO_FUNC_LOGE("Invalid parameters!!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->renderMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("Get card instance failed!");
         return HDF_FAILURE;
     }
 
@@ -311,7 +311,6 @@ int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle, int cmdId, cons
 {
     int32_t ret;
     int32_t muteState;
-    struct AudioCardInfo *cardIns = NULL;
 
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
@@ -320,9 +319,9 @@ int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle, int cmdId, cons
     }
 
     const char *adapterName = handleData->renderMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
+    struct AudioCardInfo *cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("GetCardIns error!!!");
         return HDF_FAILURE;
     }
 
@@ -349,7 +348,7 @@ int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle, int cmdId, cons
 
 int32_t AudioCtlRenderGetMuteStu(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
 {
-    struct AudioCardInfo *cardIns = NULL;
+    struct AudioCardInfo *cardInstance = NULL;
 
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
@@ -358,12 +357,12 @@ int32_t AudioCtlRenderGetMuteStu(const struct DevHandle *handle, int cmdId, stru
     }
 
     const char *adapterName = handleData->renderMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
-    if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+    cardInstance = GetCardIns(adapterName);
+    if (cardInstance == NULL) {
+        AUDIO_FUNC_LOGE("cardInstance is NULL!");
         return HDF_FAILURE;
     }
-    handleData->renderMode.ctlParam.mute = (bool)cardIns->renderMuteValue;
+    handleData->renderMode.ctlParam.mute = (bool)cardInstance->renderMuteValue;
 
     return HDF_SUCCESS;
 }
@@ -398,14 +397,14 @@ int32_t AudioCtlRenderSceneSelect(
 
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
-        AUDIO_FUNC_LOGE("Parameter error!");
+        AUDIO_FUNC_LOGE("Invalid parameters!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->renderMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("Cant't get card Instance!");
         return HDF_FAILURE;
     }
 
@@ -764,8 +763,8 @@ int32_t AudioOutputRenderHwParams(
         return HDF_FAILURE;
     }
 
-    const char *adapterName = handleData->renderMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
+    const char *cardName = handleData->renderMode.hwInfo.adapterName;
+    cardIns = GetCardIns(cardName);
     if (cardIns == NULL) {
         AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
@@ -820,10 +819,10 @@ static int32_t AudioRenderWriteFrameSub(snd_pcm_t *pcm, char *dataBuf, size_t bu
 
         if (frames == -EBADFD) {
             /* not #SND_PCM_STATE_PREPARED or #SND_PCM_STATE_RUNNING */
-            AUDIO_FUNC_LOGE("PCM is not in the right state: %{public}s", snd_strerror(frames));
+            AUDIO_FUNC_LOGE("render PCM is not in the right state: %{public}s", snd_strerror(frames));
             ret = snd_pcm_prepare(pcm);
             if (ret < 0) {
-                AUDIO_FUNC_LOGE("snd_pcm_prepare fail: %{public}s", snd_strerror(ret));
+                AUDIO_FUNC_LOGE("render snd_pcm_prepare fail: %{public}s", snd_strerror(ret));
                 return HDF_FAILURE;
             }
         } else {
@@ -831,9 +830,9 @@ static int32_t AudioRenderWriteFrameSub(snd_pcm_t *pcm, char *dataBuf, size_t bu
              * stream is suspended and waiting for an application recovery.
              * -EPIPE: an underrun occurred.
              */
-            frames = snd_pcm_recover(pcm, frames, 0); // 0 for open log
-            if (frames < 0) {
-                AUDIO_FUNC_LOGE("snd_pcm_writei failed: %{public}s", snd_strerror(frames));
+            ret = snd_pcm_recover(pcm, frames, 0); // 0 for open render recover log.
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("snd_pcm_writei failed: %{public}s", snd_strerror(ret));
                 return HDF_FAILURE;
             }
             usleep(AUDIO_RENDER_RECOVER_DELAY);
@@ -921,7 +920,7 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle, int cmdId, const 
 int32_t AudioOutputRenderPrepare(const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
 {
     int32_t ret;
-    struct AudioCardInfo *cardIns = NULL;
+    struct AudioCardInfo *sndCardIns = NULL;
 
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
@@ -929,14 +928,14 @@ int32_t AudioOutputRenderPrepare(const struct DevHandle *handle, int cmdId, cons
         return HDF_FAILURE;
     }
 
-    const char *adapterName = handleData->renderMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
-    if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+    const char *sndCardName = handleData->renderMode.hwInfo.adapterName;
+    sndCardIns = GetCardIns(sndCardName);
+    if (sndCardIns == NULL) {
+        AUDIO_FUNC_LOGE("sndCardIns is NULL!");
         return HDF_FAILURE;
     }
 
-    ret = snd_pcm_prepare(cardIns->renderPcmHandle);
+    ret = snd_pcm_prepare(sndCardIns->renderPcmHandle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("snd_pcm_prepare fail: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
@@ -1112,41 +1111,42 @@ int32_t AudioOutputRenderStop(const struct DevHandle *handle, int cmdId, const s
 int32_t AudioOutputRenderClose(const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
 {
     int32_t ret;
-    struct AudioCardInfo *cardIns = NULL;
+    struct AudioCardInfo *alsaCardIns = NULL;
 
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
-        AUDIO_FUNC_LOGE("Parameter error!");
+        AUDIO_FUNC_LOGE("parameter error!!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->renderMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
-    if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+    /* Gets the specified sound card instance */
+    alsaCardIns = GetCardIns(adapterName);
+    if (alsaCardIns == NULL) {
+        AUDIO_FUNC_LOGE("cardInstance is empty pointer!");
         return HDF_FAILURE;
     }
 
-    if (cardIns->renderPcmHandle != NULL) {
-        ret = snd_pcm_close(cardIns->renderPcmHandle);
+    if (alsaCardIns->renderPcmHandle != NULL) {
+        ret = snd_pcm_close(alsaCardIns->renderPcmHandle);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("snd_pcm_close fail: %{public}s", snd_strerror(ret));
         }
-        cardIns->renderPcmHandle = NULL;
+        alsaCardIns->renderPcmHandle = NULL;
     }
 
-    if (cardIns->cardStatus > 0) {
-        cardIns->cardStatus -= 1;
+    if (alsaCardIns->cardStatus > 0) {
+        alsaCardIns->cardStatus -= 1;
     }
-    if (cardIns->cardStatus == 0) {
-        if (cardIns->mixer != NULL) {
-            ret = snd_mixer_close(cardIns->mixer);
+    if (alsaCardIns->cardStatus == 0) {
+        if (alsaCardIns->mixer != NULL) {
+            ret = snd_mixer_close(alsaCardIns->mixer);
             if (ret < 0) {
                 AUDIO_FUNC_LOGE("snd_mixer_close fail: %{public}s", snd_strerror(ret));
             }
-            cardIns->mixer = NULL;
+            alsaCardIns->mixer = NULL;
         }
-        (void)memset_s(cardIns->cardName, MAX_CARD_NAME_LEN + 1, 0, MAX_CARD_NAME_LEN + 1);
+        (void)memset_s(alsaCardIns->cardName, MAX_CARD_NAME_LEN + 1, 0, MAX_CARD_NAME_LEN + 1);
         ret = DestroyCardList();
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("DestroyCardList failed, reason: %{public}d.", ret);
@@ -1224,7 +1224,7 @@ int32_t AudioOutputRenderReqMmapBuffer(
     const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
 {
     int32_t ret;
-    struct AudioCardInfo *cardIns = NULL;
+    struct AudioCardInfo *mmapCardIns = NULL;
 
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
@@ -1233,20 +1233,20 @@ int32_t AudioOutputRenderReqMmapBuffer(
     }
 
     const char *adapterName = handleData->renderMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
-    if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+    mmapCardIns = GetCardIns(adapterName);
+    if (mmapCardIns == NULL) {
+        AUDIO_FUNC_LOGE("cardInstance is NULL!");
         return HDF_FAILURE;
     }
-    cardIns->renderMmapFlag = false;
+    mmapCardIns->renderMmapFlag = false;
 
-    ret = AudioResetParams(cardIns->renderPcmHandle, cardIns->hwRenderParams, SND_PCM_ACCESS_MMAP_INTERLEAVED);
+    ret = AudioResetParams(mmapCardIns->renderPcmHandle, mmapCardIns->hwRenderParams, SND_PCM_ACCESS_MMAP_INTERLEAVED);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("AudioSetParamsMmap failed!");
         return HDF_FAILURE;
     }
 
-    ret = RenderWriteiMmap(handleData, cardIns);
+    ret = RenderWriteiMmap(handleData, mmapCardIns);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("RenderWriteiMmap error!");
         return HDF_FAILURE;
@@ -1258,7 +1258,7 @@ int32_t AudioOutputRenderReqMmapBuffer(
 int32_t AudioOutputRenderGetMmapPosition(
     const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
 {
-    struct AudioCardInfo *cardIns = NULL;
+    struct AudioCardInfo *alsaMmapCardIns = NULL;
 
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
@@ -1266,13 +1266,14 @@ int32_t AudioOutputRenderGetMmapPosition(
         return HDF_FAILURE;
     }
 
+    /* Get the ALSA sound card instance corresponding to AdapterName */
     const char *adapterName = handleData->renderMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
-    if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+    alsaMmapCardIns = GetCardIns(adapterName);
+    if (alsaMmapCardIns == NULL) {
+        AUDIO_FUNC_LOGE("Can't find card Instance!");
         return HDF_FAILURE;
     }
-    handleData->frameRenderMode.frames = cardIns->renderMmapFrames;
+    handleData->frameRenderMode.frames = alsaMmapCardIns->renderMmapFrames;
 
     return HDF_SUCCESS;
 }
@@ -1334,7 +1335,6 @@ int32_t AudioInterfaceLibOutputRender(const struct DevHandle *handle, int cmdId,
 int32_t AudioBindServiceRenderObject(struct DevHandle *handle, const char *name)
 {
     int32_t ret;
-    char *serviceName = NULL;
     struct HdfIoService *service = NULL;
 
     if (handle == NULL || name == NULL) {
@@ -1342,22 +1342,22 @@ int32_t AudioBindServiceRenderObject(struct DevHandle *handle, const char *name)
         return HDF_FAILURE;
     }
 
-    serviceName = (char *)OsalMemCalloc(NAME_LEN);
+    char *serviceName = (char *)OsalMemCalloc(NAME_LEN);
     if (serviceName == NULL) {
-        AUDIO_FUNC_LOGE("Failed to allocate memory!");
+        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc memory!");
         return HDF_FAILURE;
     }
 
     ret = snprintf_s(serviceName, NAME_LEN - 1, SERVIC_NAME_MAX_LEN + 1, "hdf_audio_%s", name);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("Failed to snprintf_s");
+        AUDIO_FUNC_LOGE("Render: Failed to snprintf_s");
         AudioMemFree((void **)&serviceName);
         return HDF_FAILURE;
     }
 
     service = HdfIoServiceBindName(serviceName);
     if (service == NULL) {
-        AUDIO_FUNC_LOGE("Failed to get service!");
+        AUDIO_FUNC_LOGE("Render: Failed to get service!");
         AudioMemFree((void **)&serviceName);
         return HDF_FAILURE;
     }
@@ -1371,30 +1371,29 @@ int32_t AudioBindServiceRenderObject(struct DevHandle *handle, const char *name)
 struct DevHandle *AudioBindServiceRender(const char *name)
 {
     int32_t ret;
-    struct DevHandle *handle = NULL;
 
     if (name == NULL) {
         AUDIO_FUNC_LOGE("service name NULL!");
         return NULL;
     }
 
-    handle = (struct DevHandle *)OsalMemCalloc(sizeof(struct DevHandle));
+    struct DevHandle *handle = (struct DevHandle *)OsalMemCalloc(sizeof(struct DevHandle));
     if (handle == NULL) {
-        AUDIO_FUNC_LOGE("Failed to alloc handle");
+        AUDIO_FUNC_LOGE("OsalMemCalloc handle failed!!!");
         return NULL;
     }
 
     ret = AudioBindServiceRenderObject(handle, name);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("handle->object is NULL!");
+        AUDIO_FUNC_LOGE("Bind Service Render Object failed!");
         AudioMemFree((void **)&handle);
         return NULL;
     }
 
-    /* Parsing primary sound card from configuration file */
+    /* Render: Parsing primary sound card from configuration file */
     ret = CardInfoParseFromConfig();
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("CardInfoParseFromConfig failed!");
+        AUDIO_FUNC_LOGE("Render: parse config file failed!");
         AudioMemFree((void **)&handle);
         return NULL;
     }

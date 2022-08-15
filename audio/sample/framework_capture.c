@@ -18,8 +18,6 @@
 #include <pthread.h>
 #include <securec.h>
 #include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -31,12 +29,8 @@
 #include "svcmgr_ioservice.h"
 #include "audio_events.h"
 #include "audio_manager.h"
-#include "audio_types.h"
+#include "framework_common.h"
 #include "hdf_audio_events.h"
-
-#define AUDIO_FUNC_LOGE(fmt, arg...) do { \
-        printf("%s: [%s]: [%d]:[ERROR]:" fmt"\n", __FILE__, __func__, __LINE__, ##arg); \
-    } while (0)
 
 #define WAV_HEAD_OFFSET 44
 #define WAV_HEAD_RIFF_OFFSET 8
@@ -51,32 +45,12 @@
 #define INT_32_MAX 0x7fffffff
 #define PERIOD_SIZE 1024
 #define AUDIO_BUFF_SIZE (1024 * 16)
-#define AUDIO_ALSA_LIB_BUFF_SIZE (1000 * 24)
-#define PCM_8_BIT 8
-#define MOVE_LEFT_NUM 8
-#define PCM_16_BIT 16
 #define AUDIO_TOTALSIZE_15M (1024 * 15)
 #define AUDIO_RECORD_INTERVAL_512KB 512
 #define FILE_CAPTURE_SIZE (1024 * 1024 * 3) // 3M
 #define BUFFER_LEN 256
 #define EXT_PARAMS_MAXLEN 107
 #define ONE_MS 1000
-
-struct AudioHeadInfo {
-    uint32_t riffId;
-    uint32_t riffSize;
-    uint32_t riffType;
-    uint32_t audioFileFmtId;
-    uint32_t audioFileFmtSize;
-    uint16_t audioFileFormat;
-    uint16_t audioChannelNum;
-    uint32_t audioSampleRate;
-    uint32_t audioByteRate;
-    uint16_t audioBlockAlign;
-    uint16_t audioBitsPerSample;
-    uint32_t dataId;
-    uint32_t dataSize;
-};
 
 struct StrParaCapture {
     struct AudioCapture *capture;
@@ -144,23 +118,6 @@ struct ProcessCaptureMenuSwitchList {
 };
 
 static int32_t g_closeEnd = 0;
-
-static void CleanStdin(void)
-{
-    int c;
-    do {
-        c = getchar();
-    } while (c != '\n' && c != EOF);
-}
-
-static void SystemInputFail(void)
-{
-    printf("please ENTER to go on...\n");
-    while (getchar() != '\n') {
-        continue;
-    }
-}
-
 static int32_t CheckInputName(int type, void *val)
 {
     if (val == NULL) {
@@ -204,24 +161,24 @@ static int32_t CheckInputName(int type, void *val)
     return HDF_SUCCESS;
 }
 
-static int32_t InitAttrsCapture(struct AudioSampleAttributes *attrs)
+static int32_t InitAttrsCapture(struct AudioSampleAttributes *captureAttrs)
 {
-    if (attrs == NULL) {
+    if (captureAttrs == NULL) {
         return HDF_FAILURE;
     }
     /* Initialization of audio parameters for playback */
-    attrs->format = AUDIO_FORMAT_PCM_16_BIT;
-    attrs->channelCount = AUDIO_CHANNELCOUNT;
-    attrs->sampleRate = AUDIO_SAMPLE_RATE_48K;
-    attrs->interleaved = 1;
-    attrs->type = AUDIO_IN_MEDIA;
-    attrs->period = BUFFER_PERIOD_SIZE;
-    attrs->frameSize = PCM_16_BIT * attrs->channelCount / PCM_8_BIT;
-    attrs->isBigEndian = false;
-    attrs->isSignedData = true;
-    attrs->startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs->frameSize);
-    attrs->stopThreshold = INT_32_MAX;
-    attrs->silenceThreshold = AUDIO_BUFF_SIZE;
+    captureAttrs->format = AUDIO_FORMAT_PCM_16_BIT;
+    captureAttrs->channelCount = AUDIO_CHANNELCOUNT;
+    captureAttrs->sampleRate = AUDIO_SAMPLE_RATE_48K;
+    captureAttrs->interleaved = 1;
+    captureAttrs->type = AUDIO_IN_MEDIA;
+    captureAttrs->period = BUFFER_PERIOD_SIZE;
+    captureAttrs->frameSize = PCM_16_BIT * captureAttrs->channelCount / PCM_8_BIT;
+    captureAttrs->isBigEndian = false;
+    captureAttrs->isSignedData = true;
+    captureAttrs->startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (captureAttrs->frameSize);
+    captureAttrs->stopThreshold = INT_32_MAX;
+    captureAttrs->silenceThreshold = AUDIO_BUFF_SIZE;
     return 0;
 }
 
@@ -236,18 +193,6 @@ static int32_t InitDevDescCapture(struct AudioDeviceDescriptor *devDesc,
     devDesc->pins = PIN_IN_MIC;
     devDesc->desc = NULL;
     return 0;
-}
-
-static uint32_t PcmFormatToBits(enum AudioFormat format)
-{
-    switch (format) {
-        case AUDIO_FORMAT_PCM_16_BIT:
-            return PCM_16_BIT;
-        case AUDIO_FORMAT_PCM_8_BIT:
-            return PCM_8_BIT;
-        default:
-            return PCM_16_BIT;
-    }
 }
 
 void StreamClose(int32_t sig)
@@ -378,29 +323,7 @@ static int UnRegisterListen(void)
 }
 #endif
 
-static inline void FileClose(FILE **file)
-{
-    if ((file != NULL) && ((*file) != NULL)) {
-        (void)fclose(*file);
-        *file = NULL;
-    }
-    return;
-}
-
-static uint32_t StringToInt(const char *flag)
-{
-    if (flag == NULL) {
-        return 0;
-    }
-    uint32_t temp = flag[0];
-    for (int32_t i = (int32_t)strlen(flag) - 1; i >= 0; i--) {
-        temp <<= MOVE_LEFT_NUM;
-        temp += flag[i];
-    }
-    return temp;
-}
-
-static int32_t AddWavFileHeader(struct StrParaCapture *strParam)
+int32_t AddWavFileHeader(struct StrParaCapture *strParam)
 {
     if (strParam == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
@@ -412,7 +335,7 @@ static int32_t AddWavFileHeader(struct StrParaCapture *strParam)
 
     headInfo.riffId = StringToInt("RIFF");
     headInfo.riffSize = (uint32_t)ftell(g_file) - WAV_HEAD_RIFF_OFFSET;
-    headInfo.riffType = StringToInt("WAVE");
+    headInfo.waveType = StringToInt("WAVE");
     headInfo.audioFileFmtId = StringToInt("fmt ");
     headInfo.audioFileFmtSize = PcmFormatToBits(strParam->attrs.format);
     headInfo.audioFileFormat = 1;
@@ -543,13 +466,8 @@ static int32_t FrameStartCapture(const AudioHandle param)
     if (param == NULL) {
         return HDF_FAILURE;
     }
-#ifdef ALSA_LIB_MODE
-    uint32_t bufferSize = AUDIO_ALSA_LIB_BUFF_SIZE;
-    uint64_t requestBytes = AUDIO_ALSA_LIB_BUFF_SIZE;
-#else
     uint32_t bufferSize = AUDIO_BUFF_SIZE;
     uint64_t requestBytes = AUDIO_BUFF_SIZE;
-#endif
     struct StrParaCapture *strParam = (struct StrParaCapture *)param;
     struct AudioCapture *capture = strParam->capture;
     uint64_t replyBytes = 0;
@@ -589,7 +507,7 @@ static int32_t FrameStartCapture(const AudioHandle param)
     }
     return HDF_SUCCESS;
 }
-static void PrintPlayMode(void)
+static void PrintRecordMode(void)
 {
     printf(" ============= Play Capture Mode ==========\n");
     printf("| 1. Capture non-mmap                     |\n");
@@ -597,32 +515,32 @@ static void PrintPlayMode(void)
     printf(" ========================================= \n");
 }
 
-static int32_t SelectPlayMode(int32_t *palyModeFlag)
+static int32_t SelectPlayMode(int32_t *recordModeFlag)
 {
-    if (palyModeFlag == NULL) {
-        AUDIO_FUNC_LOGE("palyModeFlag is null");
+    if (recordModeFlag == NULL) {
+        AUDIO_FUNC_LOGE("recordModeFlag is null");
         return HDF_FAILURE;
     }
     system("clear");
     int choice = 0;
-    PrintPlayMode();
+    PrintRecordMode();
     printf("Please enter your choice:");
     int32_t ret = CheckInputName(INPUT_INT, (void *)&choice);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("CheckInputName Fail");
         return HDF_FAILURE;
     } else {
-        *palyModeFlag = choice;
+        *recordModeFlag = choice;
     }
     return HDF_SUCCESS;
 }
 
-static int32_t StartPlayThread(int32_t palyModeFlag)
+static int32_t StartRecordThread(int32_t recordModeFlag)
 {
     pthread_attr_t tidsAttr;
     pthread_attr_init(&tidsAttr);
     pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
-    switch (palyModeFlag) {
+    switch (recordModeFlag) {
         case 1: // 1. Stander Loading
             if (pthread_create(&g_tids, &tidsAttr, (void *)(&FrameStartCapture), &g_str) != 0) {
                 AUDIO_FUNC_LOGE("Create Thread Fail");
@@ -648,7 +566,7 @@ static int32_t StartPlayThread(int32_t palyModeFlag)
 }
 
 static int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *strParam, struct AudioCapture *capture,
-    int32_t palyModeFlag)
+    int32_t recordModeFlag)
 {
     if (strParam == NULL || capture == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
@@ -672,7 +590,7 @@ static int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *strParam, st
         return HDF_FAILURE;
 #endif
     } else {
-        if (StartPlayThread(palyModeFlag) < 0) {
+        if (StartRecordThread(recordModeFlag) < 0) {
             AUDIO_FUNC_LOGE("Create Thread Fail");
             return HDF_FAILURE;
         }
@@ -680,7 +598,7 @@ static int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *strParam, st
     return HDF_SUCCESS;
 }
 
-static int32_t PlayingAudioInitFile(void)
+static int32_t RecordingAudioInitFile(void)
 {
     if (g_file != NULL) {
         AUDIO_FUNC_LOGE("the capture is playing,please stop first");
@@ -705,7 +623,7 @@ static int32_t PlayingAudioInitFile(void)
     return HDF_SUCCESS;
 }
 
-static int32_t PlayingAudioInitCapture(struct AudioCapture **captureTemp)
+static int32_t RecordingAudioInitCapture(struct AudioCapture **captureTemp)
 {
     if (captureTemp == NULL) {
         AUDIO_FUNC_LOGE("captureTemp is null");
@@ -742,23 +660,23 @@ static int32_t StartButtonCapture(struct AudioCapture **captureS)
     if (captureS == NULL || g_adapter == NULL || g_adapter->CreateCapture == NULL) {
         return HDF_FAILURE;
     }
-    if (PlayingAudioInitFile() < 0) {
-        AUDIO_FUNC_LOGE("PlayingAudioInitFile Fail");
+    if (RecordingAudioInitFile() < 0) {
+        AUDIO_FUNC_LOGE("Init file Failed.");
         return HDF_FAILURE;
     }
-    int32_t palyModeFlag = 0;
-    if (SelectPlayMode(&palyModeFlag) < 0) {
+    int32_t recordModeFlag = 0;
+    if (SelectPlayMode(&recordModeFlag) < 0) {
         AUDIO_FUNC_LOGE("SelectPlayMode Fail");
         FileClose(&g_file);
         return HDF_FAILURE;
     }
     struct AudioCapture *capture = NULL;
-    if (PlayingAudioInitCapture(&capture) < 0) {
-        AUDIO_FUNC_LOGE("PlayingAudioInitCapture Fail");
+    if (RecordingAudioInitCapture(&capture) < 0) {
+        AUDIO_FUNC_LOGE("RecordingAudioInitCapture Fail");
         FileClose(&g_file);
         return HDF_FAILURE;
     }
-    if (CaptureChoiceModeAndRecording(&g_str, capture, palyModeFlag) < 0) {
+    if (CaptureChoiceModeAndRecording(&g_str, capture, recordModeFlag) < 0) {
         AUDIO_FUNC_LOGE("CaptureChoiceModeAndRecording failed");
         FileClose(&g_file);
         if (g_adapter != NULL && g_adapter->DestroyCapture != NULL) {
@@ -816,45 +734,18 @@ static int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen, char *func
 {
     system("clear");
     int choice = 0;
-    char *soPathHdi = NULL;
-    char *soPathProxy = NULL;
     int32_t ret;
-    soPathHdi = HDF_LIBRARY_FULL_PATH("libhdi_audio");
-    soPathProxy = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
     PrintMenu1();
     printf("Please enter your choice:");
     ret = CheckInputName(INPUT_INT, (void *)&choice);
-    if (ret < 0) return HDF_FAILURE;
-    switch (choice) {
-        case 1: // 1. Capture Direct Loading
-            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", soPathHdi) < 0) {
-                AUDIO_FUNC_LOGE("snprintf_s failed!");
-                return HDF_FAILURE;
-            }
-            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
-                AUDIO_FUNC_LOGE("snprintf_s failed!");
-                return HDF_FAILURE;
-            }
-            break;
-        case 2: // 2. Capture Service Loading
-            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", soPathProxy) < 0) {
-                AUDIO_FUNC_LOGE("snprintf_s failed!");
-                return HDF_FAILURE;
-            }
-            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
-                return HDF_FAILURE;
-            }
-            break;
-        default:
-            printf("Input error,Switched to direct loading in for you,");
-            SystemInputFail();
-            if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", soPathHdi) < 0) {
-                return HDF_FAILURE;
-            }
-            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
-                return HDF_FAILURE;
-            }
-            break;
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("capture CheckInputName failed!");
+        return HDF_FAILURE;
+    }
+    ret = FormatLoadLibPath(resolvedPath, pathLen, func, funcpathLen, choice);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("capture FormatLoadLibPath failed!");
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
@@ -1161,35 +1052,23 @@ static void PrintAttributesFromat(void)
     printf(" ============================================================== \n");
 }
 
-static int32_t SelectAttributesFomat(uint32_t *fomat)
+static int32_t SelectAttributesFomat(uint32_t *pcmFomat)
 {
-    if (fomat == NULL) {
+    int32_t ret;
+    int val = 0;
+    if (pcmFomat == NULL) {
         return HDF_FAILURE;
     }
     PrintAttributesFromat();
     printf("Please select audio format,If not selected, the default is 16bit:");
-    int32_t ret;
-    int val = 0;
     ret = CheckInputName(INPUT_INT, (void *)&val);
     if (ret < 0) {
         return HDF_FAILURE;
     }
-    switch (val) {
-        case AUDIO_FORMAT_PCM_8_BIT:
-            *fomat = AUDIO_FORMAT_PCM_8_BIT;
-            break;
-        case AUDIO_FORMAT_PCM_16_BIT:
-            *fomat = AUDIO_FORMAT_PCM_16_BIT;
-            break;
-        case AUDIO_FORMAT_PCM_24_BIT:
-            *fomat = AUDIO_FORMAT_PCM_24_BIT;
-            break;
-        case AUDIO_FORMAT_PCM_32_BIT:
-            *fomat = AUDIO_FORMAT_PCM_32_BIT;
-            break;
-        default:
-            *fomat = AUDIO_FORMAT_PCM_16_BIT;
-            break;
+    ret = CheckPcmFormat(val, pcmFomat);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Capture CheckPcmFormat failed!");
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }

@@ -184,7 +184,7 @@ enum AudioFormat g_formatIdZero = AUDIO_FORMAT_PCM_16_BIT;
 int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
 {
     if (capabilityIndex == NULL) {
-        AUDIO_FUNC_LOGE("capabilityIndex Is NULL");
+        AUDIO_FUNC_LOGE("Parameter is null");
         return HDF_FAILURE;
     }
     /* get capabilityIndex from driver or default */
@@ -195,7 +195,7 @@ int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCap
         return HDF_SUCCESS;
     }
     if (InitPortForCapabilitySub(portIndex, capabilityIndex) != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("PortInitForCapability fail");
+        AUDIO_FUNC_LOGE("InitPortForCapability fail");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -339,9 +339,9 @@ static int32_t AudioProxyRenderDispatchSplit(const struct AudioHwAdapter *hwAdap
     return AUDIO_HAL_SUCCESS;
 }
 
-static inline int32_t AudioProxyWriteTokenAndInitDataForRender(struct AudioHwAdapter *hwAdapter, struct HdfSBuf *data,
-                                                               const struct AudioDeviceDescriptor *desc,
-                                                               const struct AudioSampleAttributes *attrs)
+static inline int32_t AudioProxyWriteTokenAndInitData(struct AudioHwAdapter *hwAdapter, struct HdfSBuf *data,
+    const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs)
 {
     if (!HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
         AUDIO_FUNC_LOGE("write interface token failed");
@@ -388,8 +388,8 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
         AudioMemFree((void **)&hwRender);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (AudioProxyWriteTokenAndInitDataForRender(hwAdapter, data, desc, attrs) != AUDIO_HAL_SUCCESS) {
-        AUDIO_FUNC_LOGE("write interface token or initdata failed");
+    if (AudioProxyWriteTokenAndInitData(hwAdapter, data, desc, attrs) != AUDIO_HAL_SUCCESS) {
+        AUDIO_FUNC_LOGE("Render write interface token or initdata failed");
         AudioProxyBufReplyRecycle(data, reply);
         AudioMemFree((void **)&hwRender);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -544,21 +544,6 @@ static int32_t AudioProxyCaptureDispatchSplit(const struct AudioHwAdapter *hwAda
     return AUDIO_HAL_SUCCESS;
 }
 
-static inline int32_t AudioProxyWriteTokenAndInitDataForCapture(struct AudioHwAdapter *hwAdapter, struct HdfSBuf *data,
-                                                                const struct AudioDeviceDescriptor *desc,
-                                                                const struct AudioSampleAttributes *attrs)
-{
-    if (!HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
-        AUDIO_FUNC_LOGE("write interface token failed");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (AudioProxyCommonInitCreateData(data, hwAdapter, desc, attrs) < 0) {
-        AUDIO_FUNC_LOGE("Failed to obtain reply");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    return AUDIO_HAL_SUCCESS;
-}
-
 int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
                                        const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
 {
@@ -594,8 +579,8 @@ int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struc
         AudioMemFree((void **)&hwCapture);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (AudioProxyWriteTokenAndInitDataForCapture(hwAdapter, data, desc, attrs) != AUDIO_HAL_SUCCESS) {
-        AUDIO_FUNC_LOGE("write interface token or initdata failed");
+    if (AudioProxyWriteTokenAndInitData(hwAdapter, data, desc, attrs) != AUDIO_HAL_SUCCESS) {
+        AUDIO_FUNC_LOGE("Capture write interface token or initdata failed");
         AudioProxyBufReplyRecycle(data, reply);
         AudioMemFree((void **)&hwCapture);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -779,14 +764,15 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
     const struct AudioPort *port, enum AudioPortPassthroughMode mode)
 {
     AUDIO_FUNC_LOGI();
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
     int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy adapter address passed in is invalid");
         return ret;
     }
-    struct HdfSBuf *data = NULL;
-    struct HdfSBuf *reply = NULL;
     if (adapter == NULL || port == NULL || port->portName == NULL) {
+        AUDIO_FUNC_LOGE("Params is null.");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (port->dir != PORT_OUT || port->portId < 0 || strcmp(port->portName, "AOP") != 0) {
