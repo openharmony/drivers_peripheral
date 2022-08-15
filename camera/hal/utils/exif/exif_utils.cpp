@@ -64,7 +64,7 @@ static ExifEntry *CreateTag(ExifData *exif, ExifIfd ifd, ExifTag tag, size_t len
 }
 
 uint32_t ExifUtils::AddLatOrLongInfo(ExifData *exif,
-    double number, int32_t LatOrLong)
+    double number, LatOrLong latOrLongType)
 {
     ExifEntry *entry = nullptr;
     char gpsRef[2] = {0}; // Index
@@ -77,7 +77,7 @@ uint32_t ExifUtils::AddLatOrLongInfo(ExifData *exif,
     int32_t minute = 0;
     int32_t second = 0;
 
-    if (LatOrLong == Latitude) {
+    if (latOrLongType == LATITUDE_TYPE) {
         if (number > 0) {
             if (strncpy_s(gpsRef, sizeof(gpsRef), north, strlen(north)) != 0) {
                 CAMERA_LOGE("%{public}s exif strncpy_s failed.", __FUNCTION__);
@@ -112,8 +112,8 @@ uint32_t ExifUtils::AddLatOrLongInfo(ExifData *exif,
     gpsRational[2].numerator = second; // Index
     gpsRational[2].denominator = 1;
 
-    // Latitude/Longitude reference
-    if (LatOrLong == Latitude) {
+    // LATITUDE_TYPE/LONGITUDE_TYPE reference
+    if (latOrLongType == LATITUDE_TYPE) {
         entry = CreateTag(exif, EXIF_IFD_GPS, EXIF_TAG_GPS_LATITUDE_REF, sizeof(gpsRef), EXIF_FORMAT_ASCII);
     } else {
         entry = CreateTag(exif, EXIF_IFD_GPS, EXIF_TAG_GPS_LONGITUDE_REF, sizeof(gpsRef), EXIF_FORMAT_ASCII);
@@ -122,9 +122,9 @@ uint32_t ExifUtils::AddLatOrLongInfo(ExifData *exif,
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
         return RC_ERROR;
     }
-    // Latitude/Longitude value
+    // LATITUDE_TYPE/LONGITUDE_TYPE value
     constexpr uint32_t gpsDmsCount = 3;
-    if (LatOrLong == Latitude) {
+    if (latOrLongType == LATITUDE_TYPE) {
         entry = CreateTag(exif, EXIF_IFD_GPS, EXIF_TAG_GPS_LATITUDE,
             gpsDmsCount * exif_format_get_size(EXIF_FORMAT_RATIONAL),
             EXIF_FORMAT_RATIONAL);
@@ -246,10 +246,10 @@ uint32_t ExifUtils::AddCustomExifInfo(exif_data info,
     exif_data_set_option(exif, EXIF_DATA_OPTION_FOLLOW_SPECIFICATION);
     exif_data_set_data_type(exif, EXIF_DATA_TYPE_COMPRESSED);
     exif_data_set_byte_order(exif, FILE_BYTE_ORDER);
-    if (AddLatOrLongInfo(exif, latitudeNumber, Latitude) != RC_OK) {
+    if (AddLatOrLongInfo(exif, latitudeNumber, LATITUDE_TYPE) != RC_OK) {
         return RC_ERROR;
     }
-    if (AddLatOrLongInfo(exif, longitudeNumber, Longitude) != RC_OK) {
+    if (AddLatOrLongInfo(exif, longitudeNumber, LONGITUDE_TYPE) != RC_OK) {
         return RC_ERROR;
     }
     if (AddAltitudeInfo(exif, info.altitude) != RC_OK) {

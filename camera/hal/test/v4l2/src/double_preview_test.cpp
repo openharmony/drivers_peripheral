@@ -45,7 +45,7 @@ void DoublePreviewTest::SetStreamInfo(std::shared_ptr<OHOS::Camera::StreamInfo> 
         streamInfo->format_ = PIXEL_FMT_RGBA_8888;
         if (streamId == display_->streamId_preview) {
             streamInfo->streamId_ = streamId;
-        } else if (streamId == streamId_preview_double) {
+        } else if (streamId == STREAMID_PREVIEW_DOUBLE) {
             streamInfo->streamId_ = streamId;
         }
     }
@@ -71,7 +71,7 @@ void DoublePreviewTest::CreateStream(int streamId, OHOS::Camera::StreamIntent in
                     std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>>().swap(streamInfos_);
                     streamInfos_.push_back(streamInfo);
                 }
-        } else if (streamId == streamId_preview_double) {
+        } else if (streamId == STREAMID_PREVIEW_DOUBLE) {
             if (streamCustomerPreviewDouble_ == nullptr) {
                 streamCustomerPreviewDouble_ = std::make_shared<StreamCustomer>();
                 SetStreamInfo(streamInfo, streamCustomerPreviewDouble_, streamId, intent);
@@ -119,7 +119,7 @@ void DoublePreviewTest::StartCapture(int streamId, int captureId, bool shutterCa
             std::cout << "==========[test log]preview size= " <<
                 size << std::endl;
         });
-    } else if (captureId == captureId_preview_double) {
+    } else if (captureId == CAPTUREID_PREVIEW_DOUBLE) {
         streamCustomerPreviewDouble_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
             std::cout << "==========[test log]preview double size= " <<
                 size << std::endl;
@@ -136,7 +136,7 @@ void DoublePreviewTest::StopStream(std::vector<int> &captureIds, std::vector<int
         for (auto &captureId : captureIds_) {
             if (captureId == display_->captureId_preview) {
                 streamCustomerPreview_->ReceiveFrameOff();
-            } else if (captureId == captureId_preview_double) {
+            } else if (captureId == CAPTUREID_PREVIEW_DOUBLE) {
                 streamCustomerPreviewDouble_->ReceiveFrameOff();
             } else {
                 std::cout << "==========[test log]StopStream ignore command. " <<  std::endl;
@@ -180,20 +180,20 @@ static HWTEST_F(DoublePreviewTest, double_preview_001, TestSize.Level1)
 
     // Start stream
     CreateStream(display_->streamId_preview, OHOS::Camera::PREVIEW);
-    CreateStream(streamId_preview_double, OHOS::Camera::PREVIEW);
+    CreateStream(STREAMID_PREVIEW_DOUBLE, OHOS::Camera::PREVIEW);
 
     // Commit stream
     CommitStream();
 
     // Get preview
     StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    StartCapture(streamId_preview_double, captureId_preview_double, false, true);
+    StartCapture(STREAMID_PREVIEW_DOUBLE, CAPTUREID_PREVIEW_DOUBLE, false, true);
 
     constexpr uint32_t SLEEP_SECOND_TEN = 10; // sleep ten second
     sleep(SLEEP_SECOND_TEN);
 
-    streamIds_ = {display_->streamId_preview, streamId_preview_double};
-    captureIds_ = {display_->captureId_preview, captureId_preview_double};
+    streamIds_ = {display_->streamId_preview, STREAMID_PREVIEW_DOUBLE};
+    captureIds_ = {display_->captureId_preview, CAPTUREID_PREVIEW_DOUBLE};
     StopStream(captureIds_, streamIds_);
 }
 
@@ -211,13 +211,13 @@ static HWTEST_F(DoublePreviewTest, double_preview_002, TestSize.Level1)
 
     // Start stream
     CreateStream(display_->streamId_preview, OHOS::Camera::PREVIEW);
-    CreateStream(streamId_preview_double, OHOS::Camera::PREVIEW);
+    CreateStream(STREAMID_PREVIEW_DOUBLE, OHOS::Camera::PREVIEW);
     display_->intents = { OHOS::Camera::STILL_CAPTURE};
     display_->StartStream(display_->intents);
 
     // Get preview
     StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    StartCapture(streamId_preview_double, captureId_preview_double, false, true);
+    StartCapture(STREAMID_PREVIEW_DOUBLE, CAPTUREID_PREVIEW_DOUBLE, false, true);
     // add dumy exif info
     constexpr double latitude = 27.987500; // dummy data: Qomolangma latitde
     constexpr double longitude = 86.927500; // dummy data: Qomolangma longituude
@@ -251,8 +251,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_002, TestSize.Level1)
     constexpr uint32_t SLEEP_SECOND_FIVE = 5; // sleep five second
     sleep(SLEEP_SECOND_FIVE);
 
-    streamIds_ = {display_->streamId_preview, streamId_preview_double};
-    captureIds_ = {display_->captureId_preview, captureId_preview_double};
+    streamIds_ = {display_->streamId_preview, STREAMID_PREVIEW_DOUBLE};
+    captureIds_ = {display_->captureId_preview, CAPTUREID_PREVIEW_DOUBLE};
     std::vector<int> captureIds =  {display_->captureId_capture};
     std::vector<int> streamIds = {display_->streamId_capture};
     StopStream(captureIds_, streamIds_);
@@ -273,20 +273,20 @@ static HWTEST_F(DoublePreviewTest, double_preview_003, TestSize.Level1)
 
     // Start stream
     CreateStream(display_->streamId_preview, OHOS::Camera::PREVIEW);
-    CreateStream(streamId_preview_double, OHOS::Camera::PREVIEW);
+    CreateStream(STREAMID_PREVIEW_DOUBLE, OHOS::Camera::PREVIEW);
     display_->intents = { OHOS::Camera::VIDEO};
     display_->StartStream(display_->intents);
 
     // Get preview
     StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    StartCapture(streamId_preview_double, captureId_preview_double, false, true);
+    StartCapture(STREAMID_PREVIEW_DOUBLE, CAPTUREID_PREVIEW_DOUBLE, false, true);
     display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
 
     constexpr uint32_t SLEEP_SECOND_FIVE = 5; // sleep five second
     sleep(SLEEP_SECOND_FIVE);
 
-    streamIds_ = {display_->streamId_preview, streamId_preview_double};
-    captureIds_ = {display_->captureId_preview, captureId_preview_double};
+    streamIds_ = {display_->streamId_preview, STREAMID_PREVIEW_DOUBLE};
+    captureIds_ = {display_->captureId_preview, CAPTUREID_PREVIEW_DOUBLE};
     std::vector<int> captureIds =  {display_->captureId_video};
     std::vector<int> streamIds = {display_->streamId_video};
     StopStream(captureIds_, streamIds_);

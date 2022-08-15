@@ -11,8 +11,8 @@
  * limitations under the License.
  */
 
-#ifndef HOST_STREAM_DATA_STRUCTURE_
-#define HOST_STREAM_DATA_STRUCTURE_
+#ifndef HOST_STREAM_DATA_STRUCTURE_H
+#define HOST_STREAM_DATA_STRUCTURE_H
 #include <cstdint>
 #include <functional>
 #include "v1_0/types.h"

@@ -92,7 +92,7 @@ public:
     };
 
 #ifndef CAMERA_BUILT_ON_OHOS_LITE
-    class TestBufferConsumerListener: public IBufferConsumerListener {
+    class TestBufferConsumerListener : public IBufferConsumerListener {
         public:
             TestBufferConsumerListener()
             {
@@ -102,7 +102,7 @@ public:
             {
             }
 
-            void OnBufferAvailable()
+            void OnBufferAvailable() const
             {
             }
     };
@@ -174,10 +174,10 @@ public:
         uint64_t frameNumber_ = 0;
 
         struct LocalStream {
-            std::mutex deviceLock_;
-            std::shared_ptr<Stream> stream_ = nullptr;
-            std::thread* deliverThread_ = nullptr;
-            std::list<std::shared_ptr<IBuffer>> deviceBufferList_ = {};
+            std::mutex deviceLock;
+            std::shared_ptr<Stream> stream = nullptr;
+            std::thread* deliverThread = nullptr;
+            std::list<std::shared_ptr<IBuffer>> deviceBufferList = {};
         };
         std::shared_ptr<LocalStream> localStream_ = nullptr;
     };

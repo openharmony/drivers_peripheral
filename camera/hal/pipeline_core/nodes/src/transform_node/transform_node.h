@@ -21,7 +21,7 @@
 #include "node_base.h"
 
 namespace OHOS::Camera {
-class TransformNode:public NodeBase {
+class TransformNode : public NodeBase {
 public:
     TransformNode(const std::string& name, const std::string& type);
     ~TransformNode() override = default;
