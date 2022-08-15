@@ -552,7 +552,7 @@ int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor *descs, uint32_t *siz
     return HDF_SUCCESS;
 }
 
-bool ReleaseAudioManagerObjectComm(struct AudioManager *object)
+bool ReleaseAudioManagerObjectComm(struct IAudioManager *object)
 {
     if (object == NULL) {
         return false;

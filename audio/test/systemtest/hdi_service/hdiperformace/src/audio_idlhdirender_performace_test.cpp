@@ -36,19 +36,19 @@ public:
     static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
     static void *handle;
-    static void (*AudioManagerRelease)(struct AudioManager *);
-    static void (*AudioAdapterRelease)(struct AudioAdapter *);
-    static void (*AudioRenderRelease)(struct AudioRender *);
+    static void (*AudioManagerRelease)(struct IAudioManager *);
+    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
+    static void (*AudioRenderRelease)(struct IAudioRender *);
     static int32_t CreateRender(TestAudioManager *manager, int pins, const std::string &adapterName,
-        struct AudioAdapter **adapter, struct AudioRender **render);
+        struct IAudioAdapter **adapter, struct IAudioRender **render);
 };
 using THREAD_FUNC = void *(*)(void *);
 TestAudioManager *(*AudioIdlHdiRenderPerformaceTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiRenderPerformaceTest::manager = nullptr;
 void *AudioIdlHdiRenderPerformaceTest::handle = nullptr;
-void (*AudioIdlHdiRenderPerformaceTest::AudioManagerRelease)(struct AudioManager *) = nullptr;
-void (*AudioIdlHdiRenderPerformaceTest::AudioAdapterRelease)(struct AudioAdapter *) = nullptr;
-void (*AudioIdlHdiRenderPerformaceTest::AudioRenderRelease)(struct AudioRender *) = nullptr;
+void (*AudioIdlHdiRenderPerformaceTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
+void (*AudioIdlHdiRenderPerformaceTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
+void (*AudioIdlHdiRenderPerformaceTest::AudioRenderRelease)(struct IAudioRender *) = nullptr;
 
 void AudioIdlHdiRenderPerformaceTest::SetUpTestCase(void)
 {
@@ -62,11 +62,11 @@ void AudioIdlHdiRenderPerformaceTest::SetUpTestCase(void)
     (void)HdfRemoteGetCallingPid();
     manager = GetAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(handle, "AudioManagerRelease"));
+    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handle, "AudioManagerRelease"));
     ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(handle, "AudioAdapterRelease"));
+    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handle, "AudioAdapterRelease"));
     ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioRenderRelease = (void (*)(struct AudioRender *))(dlsym(handle, "AudioRenderRelease"));
+    AudioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(handle, "AudioRenderRelease"));
     ASSERT_NE(nullptr, AudioRenderRelease);
 }
 
@@ -90,7 +90,7 @@ void AudioIdlHdiRenderPerformaceTest::SetUp(void) {}
 void AudioIdlHdiRenderPerformaceTest::TearDown(void) {}
 
 int32_t AudioIdlHdiRenderPerformaceTest::CreateRender(TestAudioManager *manager, int pins,
-    const std::string &adapterName, struct AudioAdapter **adapter, struct AudioRender **render)
+    const std::string &adapterName, struct IAudioAdapter **adapter, struct IAudioRender **render)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};

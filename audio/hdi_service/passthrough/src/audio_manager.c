@@ -181,7 +181,7 @@ static int32_t InitPathSelectPassthroughHandle(const char *pathSelectPassthrough
 }
 #endif
 
-static int32_t AudioManagerServiceGetFreeAdapterPos(struct AudioManager *manager, const char *adapterName)
+static int32_t AudioManagerServiceGetFreeAdapterPos(struct IAudioManager *manager, const char *adapterName)
 {
     int32_t i;
     if (manager == NULL || adapterName == NULL || strlen(adapterName) == 0) {
@@ -208,7 +208,8 @@ static int32_t AudioManagerServiceGetFreeAdapterPos(struct AudioManager *manager
     return SUPPORT_ADAPTER_NUM_MAX;
 }
 
-static int32_t AudioManagerServiceAddAdapter(struct AudioManager *manager, struct AudioAdapter *adapter, int32_t pos)
+static int32_t AudioManagerServiceAddAdapter(
+    struct IAudioManager *manager, struct IAudioAdapter *adapter, int32_t pos)
 {
     struct AudioHwManager *hwManager = (struct AudioHwManager *)manager;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
@@ -236,7 +237,7 @@ static int32_t AudioManagerServiceAddAdapter(struct AudioManager *manager, struc
     return AUDIO_SUCCESS;
 }
 
-static uint32_t AudioManagerServiceFindAdapterPos(struct AudioManager *manager, const char *adapterName)
+static uint32_t AudioManagerServiceFindAdapterPos(struct IAudioManager *manager, const char *adapterName)
 {
     uint32_t i;
     if (manager == NULL || adapterName == NULL || strlen(adapterName) == 0) {
@@ -256,7 +257,7 @@ static uint32_t AudioManagerServiceFindAdapterPos(struct AudioManager *manager, 
     return SUPPORT_ADAPTER_NUM_MAX;
 }
 
-int32_t AudioManagerGetAllAdapters(struct AudioManager *manager, struct AudioAdapterDescriptor *descs, uint32_t *size)
+int32_t AudioManagerGetAllAdapters(struct IAudioManager *manager, struct AudioAdapterDescriptor *descs, uint32_t *size)
 {
     AUDIO_FUNC_LOGI("enter!");
     if (manager == NULL || descs == NULL || size == NULL) {
@@ -302,7 +303,7 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager, struct AudioAda
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+static int32_t loadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         return AUDIO_ERR_INVALID_PARAM;
@@ -327,7 +328,7 @@ static int32_t loadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("primary desc or adapter is null");
@@ -342,7 +343,7 @@ static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, str
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("usb desc or adapter is null");
@@ -357,7 +358,7 @@ static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct 
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+static int32_t loadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         return AUDIO_ERR_INVALID_PARAM;
@@ -367,7 +368,7 @@ static int32_t loadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct
 }
 
 static int32_t selectAppropriateAdapter(
-    enum AudioAdapterType adapterType, const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+    enum AudioAdapterType adapterType, const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     int32_t ret;
 
@@ -405,7 +406,7 @@ static int32_t selectAppropriateAdapter(
     return AUDIO_SUCCESS;
 }
 
-static int32_t AudioManagerServiceRemvAdapter(struct AudioManager *manager, uint32_t pos)
+static int32_t AudioManagerServiceRemvAdapter(struct IAudioManager *manager, uint32_t pos)
 {
     if (manager == NULL || pos >= SUPPORT_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("Invalid input param!");
@@ -440,7 +441,7 @@ static int32_t AudioManagerServiceRemvAdapter(struct AudioManager *manager, uint
 }
 
 int32_t AudioManagerLoadAdapter(
-    struct AudioManager *manager, const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+    struct IAudioManager *manager, const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (manager == NULL || desc == NULL || desc->adapterName == NULL || desc->ports == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("Invalid input param!");
@@ -477,7 +478,7 @@ int32_t AudioManagerLoadAdapter(
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioManagerUnloadAdapter(struct AudioManager *manager, const char *adapterName)
+int32_t AudioManagerUnloadAdapter(struct IAudioManager *manager, const char *adapterName)
 {
     uint32_t pos = AudioManagerServiceFindAdapterPos(manager, adapterName);
     if (pos >= SUPPORT_ADAPTER_NUM_MAX) {
@@ -495,13 +496,13 @@ int32_t AudioManagerUnloadAdapter(struct AudioManager *manager, const char *adap
     return AUDIO_SUCCESS;
 }
 
-int32_t ReleaseAudioManagerObject(struct AudioManager *object)
+int32_t ReleaseAudioManagerObject(struct IAudioManager *object)
 {
     ReleaseAudioManagerObjectComm(object);
     return AUDIO_SUCCESS;
 }
 
-struct AudioManager *AudioManagerGetInstance(const char *serviceName)
+struct IAudioManager *AudioManagerGetInstance(const char *serviceName)
 {
     (void)serviceName;
     struct AudioHwManager *service = (struct AudioHwManager *)OsalMemCalloc(sizeof(struct AudioHwManager));
@@ -516,7 +517,7 @@ struct AudioManager *AudioManagerGetInstance(const char *serviceName)
     return &(service->interface);
 }
 
-void AudioManagerRelease(struct AudioManager *instance)
+void AudioManagerRelease(struct IAudioManager *instance)
 {
     ReleaseAudioManagerObject(instance);
 }
