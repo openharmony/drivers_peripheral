@@ -43,44 +43,44 @@ int32_t UsbRawCloseDevice(const UsbRawHandle *devHandle)
     return RawCloseDevice((const struct UsbDeviceHandle *)devHandle);
 }
 
-int32_t UsbRawSendControlRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbControlRequestData *requestData)
+int32_t UsbRawSendControlRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbControlRequestData *requestData)
 {
     if ((request == NULL) || (devHandle == NULL) || (requestData == NULL)) {
         HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    return RawSendControlRequest((struct UsbHostRequest *)request, (const struct UsbDeviceHandle *)devHandle,
-        requestData);
+    return RawSendControlRequest(
+        (struct UsbHostRequest *)request, (const struct UsbDeviceHandle *)devHandle, requestData);
 }
 
-int32_t UsbRawSendBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRequestData *requestData)
+int32_t UsbRawSendBulkRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRequestData *requestData)
 {
     if ((request == NULL) || (devHandle == NULL) || (requestData == NULL)) {
         HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    return RawSendBulkRequest((const struct UsbHostRequest *)request, (const struct UsbDeviceHandle *)devHandle,
-        requestData);
+    return RawSendBulkRequest(
+        (const struct UsbHostRequest *)request, (const struct UsbDeviceHandle *)devHandle, requestData);
 }
 
-int32_t UsbRawSendInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRequestData *requestData)
+int32_t UsbRawSendInterruptRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRequestData *requestData)
 {
     if ((request == NULL) || (devHandle == NULL) || (requestData == NULL)) {
         HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    return RawSendInterruptRequest((const struct UsbHostRequest *)request, (const struct UsbDeviceHandle *)devHandle,
-        requestData);
+    return RawSendInterruptRequest(
+        (const struct UsbHostRequest *)request, (const struct UsbDeviceHandle *)devHandle, requestData);
 }
 
-int32_t UsbRawGetConfigDescriptor(const UsbRawDevice *rawDev, uint8_t configIndex,
-    struct UsbRawConfigDescriptor **config)
+int32_t UsbRawGetConfigDescriptor(
+    const UsbRawDevice *rawDev, uint8_t configIndex, struct UsbRawConfigDescriptor ** const config)
 {
     if ((rawDev == NULL) || (config == NULL)) {
         HDF_LOGE("%{public}s:%d rawDev or config is NULL", __func__, __LINE__);
@@ -101,7 +101,7 @@ void UsbRawFreeConfigDescriptor(const struct UsbRawConfigDescriptor *config)
     RawUsbMemFree((void *)config);
 }
 
-int32_t UsbRawGetConfiguration(const UsbRawHandle *devHandle, int32_t *config)
+int32_t UsbRawGetConfiguration(const UsbRawHandle * const devHandle, int32_t *config)
 {
     if ((devHandle == NULL) || (config == NULL)) {
         HDF_LOGE("%{public}s:%d dev or config is NULL", __func__, __LINE__);
@@ -129,11 +129,11 @@ int32_t UsbRawGetDescriptor(const struct UsbRawRequest *request, const UsbRawHan
         return HDF_ERR_INVALID_PARAM;
     }
 
-    return RawGetDescriptor((const struct UsbHostRequest *)request, (const struct UsbDeviceHandle *)devHandle,
-        param, data);
+    return RawGetDescriptor(
+        (const struct UsbHostRequest *)request, (const struct UsbDeviceHandle *)devHandle, param, data);
 }
 
-UsbRawDevice *UsbRawGetDevice(const UsbRawHandle *devHandle)
+UsbRawDevice *UsbRawGetDevice(const UsbRawHandle * const devHandle)
 {
     if (devHandle == NULL) {
         HDF_LOGE("%{public}s:%d devHandle is NULL ", __func__, __LINE__);
@@ -203,8 +203,8 @@ int32_t UsbRawFreeRequest(const struct UsbRawRequest *request)
     return RawFreeRequest((const struct UsbHostRequest *)request);
 }
 
-int32_t UsbRawFillBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRawFillRequestData *fillData)
+int32_t UsbRawFillBulkRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRawFillRequestData *fillData)
 {
     if ((request == NULL) || (devHandle == NULL) || (fillData == NULL)) {
         HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
@@ -225,8 +225,8 @@ int32_t UsbRawFillControlSetup(const unsigned char *setup, const struct UsbContr
     return RawFillControlSetup(setup, requestData);
 }
 
-int32_t UsbRawFillControlRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRawFillRequestData *fillData)
+int32_t UsbRawFillControlRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRawFillRequestData *fillData)
 {
     if ((request == NULL) || (devHandle == NULL) || (fillData == NULL)) {
         HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
@@ -237,8 +237,8 @@ int32_t UsbRawFillControlRequest(const struct UsbRawRequest *request, const UsbR
         (const struct UsbFillRequestData *)fillData);
 }
 
-int32_t UsbRawFillInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRawFillRequestData *fillData)
+int32_t UsbRawFillInterruptRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRawFillRequestData *fillData)
 {
     if ((request == NULL) || (devHandle == NULL) || (fillData == NULL)) {
         HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
@@ -249,8 +249,8 @@ int32_t UsbRawFillInterruptRequest(const struct UsbRawRequest *request, const Us
         (const struct UsbFillRequestData *)fillData);
 }
 
-int32_t UsbRawFillIsoRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRawFillRequestData *fillData)
+int32_t UsbRawFillIsoRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRawFillRequestData *fillData)
 {
     if ((request == NULL) || (devHandle == NULL) || (fillData == NULL)) {
         HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);

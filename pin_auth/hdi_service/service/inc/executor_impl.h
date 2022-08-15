@@ -30,7 +30,7 @@ namespace PinAuth {
 namespace V1_0 {
 class ExecutorImpl : public IExecutor, public NoCopyable {
 public:
-    explicit ExecutorImpl(std::shared_ptr<OHOS::UserIAM::PinAuth::PinAuth> pinHdi);
+    explicit ExecutorImpl(std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi);
     virtual ~ExecutorImpl() {}
     int32_t GetExecutorInfo(ExecutorInfo &info) override;
     int32_t GetTemplateInfo(uint64_t templateId, TemplateInfo &info) override;
@@ -70,7 +70,7 @@ private:
 private:
     uint32_t NewSalt(std::vector<uint8_t> &salt);
     void CallError(const sptr<IExecutorCallback> &callbackObj, const uint32_t errorCode);
-    std::shared_ptr<OHOS::UserIAM::PinAuth::PinAuth> pinHdi_;
+    std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi_;
     ScheduleMap scheduleMap_;
 };
 } // V1_0

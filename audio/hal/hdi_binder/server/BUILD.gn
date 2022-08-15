@@ -36,13 +36,10 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     if (!drivers_peripheral_audio_user_mode) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
     } else {
-      deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+      deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
     }
 
     defines = []
-    if (enable_audio_device_mpi) {
-      defines += [ "AUDIO_HAL_USER" ]
-    }
     if (is_standard_system) {
       external_deps = [
         "hdf_core:libhdf_host",
@@ -57,7 +54,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     }
 
     if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HAL_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     install_images = [ chipset_base_dir ]
@@ -85,7 +82,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     if (!drivers_peripheral_audio_user_mode) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
     } else {
-      deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+      deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
     }
     if (is_standard_system) {
       external_deps = [
@@ -101,7 +98,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     }
     defines = []
     if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HAL_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     install_images = [ chipset_base_dir ]
@@ -129,7 +126,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     if (!drivers_peripheral_audio_user_mode) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
     } else {
-      deps += [ "//device/soc/hisilicon/common/hal/media:hdi_audio" ]
+      deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
     }
     if (is_standard_system) {
       external_deps = [
@@ -145,7 +142,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     }
     defines = []
     if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HAL_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     install_images = [ chipset_base_dir ]
@@ -182,7 +179,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     }
     defines = []
     if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HAL_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     install_images = [ chipset_base_dir ]

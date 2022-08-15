@@ -13,136 +13,146 @@
  * limitations under the License.
  */
 
-#include "stub_msgproc.h"
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include <servmgr_hdi.h>
 #include "codec_callback_service.h"
+#include "stub_msgproc.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-int32_t SerCodecOnEvent(struct ICodecCallback *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t SerCodecOnEvent(struct ICodecCallback *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
-    UINTPTR comp = 0;
-    UINTPTR appData = 0;
+    UINTPTR userData = 0;
     EventType event = 0;
-    uint32_t data1 = 0;
-    uint32_t data2 = 0;
-    UINTPTR eventData = 0;
-    if (!HdfSbufReadUint32(data, (uint32_t *)&comp)) {
+    uint32_t length = 0;
+    int32_t *eventData = NULL;
+
+    if (!HdfSbufReadUint32(data, (uint32_t *)&userData)) {
         HDF_LOGE("%{public}s: read comp data failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadUint32(data, (uint32_t *)&appData)) {
-        HDF_LOGE("%{public}s: read appData data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufReadUint32(data, (uint32_t *)&event)) {
         HDF_LOGE("%{public}s: read event data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint32(data, &data1)) {
+    if (!HdfSbufReadUint32(data, &length)) {
         HDF_LOGE("%{public}s: read data1 data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint32(data, &data2)) {
-        HDF_LOGE("%{public}s: read data2 data failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+    if (length > 0) {
+        eventData = (int32_t *)OsalMemCalloc(length);
+        if (eventData == NULL) {
+            HDF_LOGE("%{public}s: OsalMemAlloc eventData failed!", __func__);
+            return HDF_ERR_INVALID_PARAM;
+        }
+        for (uint32_t i = 0; i < length; i++) {
+            if (!HdfSbufReadInt32(data, &eventData[i])) {
+                HDF_LOGE("%{public}s: read eventData failed!", __func__);
+                OsalMemFree(eventData);
+                return HDF_ERR_INVALID_PARAM;
+            }
+        }
     }
-    if (!HdfSbufReadUint32(data, (uint32_t *)&eventData)) {
-        HDF_LOGE("%{public}s: read event data failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    ret = serviceImpl->callback.OnEvent(comp, appData, event, data1, data2, eventData);
+    ret = serviceImpl->callback.OnEvent(userData, event, length, eventData);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call OnEvent fuc failed!", __func__);
-    }
-    return ret;
-}
-
-int32_t SerCodecInputBufferAvailable(struct ICodecCallback *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
-{
-    int32_t ret;
-    uint32_t bufCnt;
-    UINTPTR comp = 0;
-    UINTPTR appData = 0;
-    InputInfo inBuf = {0};
-    if (!HdfSbufReadUint32(data, (uint32_t *)&comp)) {
-        HDF_LOGE("%{public}s: read comp data failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadUint32(data, (uint32_t *)&appData)) {
-        HDF_LOGE("%{public}s: read appData data failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadUint32(data, (uint32_t *)&inBuf.bufferCnt)) {
-        HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
-        return HDF_FAILURE;
-    }
-    bufCnt = inBuf.bufferCnt;
-    inBuf.buffers = (CodecBufferInfo *)OsalMemAlloc(sizeof(CodecBufferInfo) * bufCnt);
-    if (inBuf.buffers == NULL) {
-        HDF_LOGE("%{public}s: OsalMemAlloc CodecCallbackStub obj failed!", __func__);
-        return HDF_ERR_MALLOC_FAIL;
-    }
-    if (CodecSerParseInputInfo(data, &inBuf)) {
-        HDF_LOGE("%{public}s: read struct reply failed!", __func__);
-        OsalMemFree(inBuf.buffers);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    ret = serviceImpl->callback.InputBufferAvailable(comp, appData, &inBuf);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call OnEvent fuc failed!", __func__);
-    }
-    OsalMemFree(inBuf.buffers);
-    return ret;
-}
-
-int32_t SerCodecOutputBufferAvailable(struct ICodecCallback *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
-{
-    int32_t ret;
-    uint32_t bufCnt;
-    UINTPTR comp = 0;
-    UINTPTR appData = 0;
-    OutputInfo outBuf = {0};
-    if (!HdfSbufReadUint32(data, (uint32_t *)&comp)) {
-        HDF_LOGE("%{public}s: read comp data failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadUint32(data, (uint32_t *)&appData)) {
-        HDF_LOGE("%{public}s: read appData data failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadUint32(data, (uint32_t *)&outBuf.bufferCnt)) {
-        HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
-        return HDF_FAILURE;
-    }
-    bufCnt = outBuf.bufferCnt;
-    outBuf.buffers = (CodecBufferInfo *)OsalMemAlloc(sizeof(CodecBufferInfo) * bufCnt);
-    if (outBuf.buffers == NULL) {
-        HDF_LOGE("%{public}s: OsalMemAlloc failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (CodecSerParseOutputInfo(data, &outBuf)) {
-        HDF_LOGE("%{public}s: read struct outBuf failed!", __func__);
-        OsalMemFree(outBuf.buffers);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    ret = serviceImpl->callback.OutputBufferAvailable(comp, appData, &outBuf);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call OnEvent fuc failed!", __func__);
-        OsalMemFree(outBuf.buffers);
+        OsalMemFree(eventData);
         return ret;
     }
-    OsalMemFree(outBuf.buffers);
+    OsalMemFree(eventData);
     return ret;
 }
 
-int32_t CodecCallbackServiceOnRemoteRequest(struct HdfRemoteService *service, int cmdId,
+static int32_t SerCodecInputBufferAvailable(struct ICodecCallback *serviceImpl,
                                             struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    int32_t ret = HDF_FAILURE;
+    uint32_t bufCnt = 0;
+    UINTPTR userData = 0;
+    CodecBuffer *inBuf = NULL;
+    int32_t acquireFd;
+
+    if (!HdfSbufReadUint32(data, (uint32_t *)&userData)) {
+        HDF_LOGE("%{public}s: read userData failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufReadUint32(data, &bufCnt)) {
+        HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
+        return HDF_FAILURE;
+    }
+    if (bufCnt <= 0) {
+        HDF_LOGE("%{public}s: invalid bufferCnt!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    inBuf = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * bufCnt);
+    if (inBuf == NULL) {
+        HDF_LOGE("%{public}s: OsalMemAlloc inBuf failed!", __func__);
+        return HDF_ERR_MALLOC_FAIL;
+    }
+    inBuf->bufferCnt = bufCnt;
+    if (CodecSerParseCodecBuffer(data, inBuf)) {
+        HDF_LOGE("%{public}s: read inBuf failed!", __func__);
+        OsalMemFree(inBuf);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ret = serviceImpl->callback.InputBufferAvailable(userData, inBuf, &acquireFd);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call InputBufferAvailable fuc failed!", __func__);
+        OsalMemFree(inBuf);
+        return ret;
+    }
+    OsalMemFree(inBuf);
+    return ret;
+}
+
+static int32_t SerCodecOutputBufferAvailable(struct ICodecCallback *serviceImpl,
+                                             struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    int32_t ret = HDF_FAILURE;
+    uint32_t bufCnt = 0;
+    UINTPTR userData = 0;
+    CodecBuffer *outBuf = NULL;
+    int32_t acquireFd;
+
+    if (!HdfSbufReadUint32(data, (uint32_t *)&userData)) {
+        HDF_LOGE("%{public}s: read userData failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufReadUint32(data, (uint32_t *)&bufCnt)) {
+        HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (bufCnt == 0) {
+        HDF_LOGE("%{public}s: invalid bufferCnt!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    outBuf = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * bufCnt);
+    if (outBuf == NULL) {
+        HDF_LOGE("%{public}s: OsalMemAlloc outBuf failed!", __func__);
+        return HDF_ERR_MALLOC_FAIL;
+    }
+    outBuf->bufferCnt = bufCnt;
+    if (CodecSerParseCodecBuffer(data, outBuf)) {
+        HDF_LOGE("%{public}s: read outBuf failed!", __func__);
+        OsalMemFree(outBuf);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    ret = serviceImpl->callback.OutputBufferAvailable(userData, outBuf, &acquireFd);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call OutputBufferAvailable fuc failed!", __func__);
+        OsalMemFree(outBuf);
+        return ret;
+    }
+    OsalMemFree(outBuf);
+    return ret;
+}
+
+static int32_t CodecCallbackServiceOnRemoteRequest(struct HdfRemoteService *service, int cmdId,
+                                                   struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct ICodecCallback *serviceImpl = (struct ICodecCallback *)service;
     switch (cmdId) {
@@ -164,7 +174,7 @@ struct CodecCallbackStub {
     struct HdfRemoteDispatcher dispatcher;
 };
 
-struct ICodecCallback *CodecCallbackStubObtain()
+struct ICodecCallback *CodecCallbackStubObtain(void)
 {
     struct CodecCallbackStub *stub = (struct CodecCallbackStub *)OsalMemAlloc(sizeof(struct CodecCallbackStub));
     if (stub == NULL) {

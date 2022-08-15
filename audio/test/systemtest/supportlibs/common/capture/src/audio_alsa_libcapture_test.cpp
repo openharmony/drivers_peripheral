@@ -30,7 +30,7 @@ public:
     void TearDown();
     static int32_t (*InterfaceLibOutputCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *);
     static int32_t (*InterfaceLibCtlCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *);
-    static void *PtrHandle;
+    static void *ptrHandle;
     static struct DevHandle *handle;
     static struct DevHandle *(*BindServiceCapture)(const char *);
     static void (*CloseServiceCapture)(struct DevHandle *);
@@ -42,24 +42,24 @@ int32_t (*AudioAlsaLibCaptureTest::InterfaceLibOutputCapture)(struct DevHandle *
     struct AudioHwCaptureParam *) = nullptr;
 int32_t (*AudioAlsaLibCaptureTest::InterfaceLibCtlCapture)(struct DevHandle *, int,
     struct AudioHwCaptureParam *) = nullptr;
-void *AudioAlsaLibCaptureTest::PtrHandle = nullptr;
+void *AudioAlsaLibCaptureTest::ptrHandle = nullptr;
 struct DevHandle *AudioAlsaLibCaptureTest::handle = nullptr;
 struct DevHandle *(*AudioAlsaLibCaptureTest::BindServiceCapture)(const char *) = nullptr;
 void (*AudioAlsaLibCaptureTest::CloseServiceCapture)(struct DevHandle *) = nullptr;
 void AudioAlsaLibCaptureTest::SetUpTestCase(void)
 {
     char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
-    PtrHandle = dlopen(resolvedPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, PtrHandle);
+    ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
+    ASSERT_NE(nullptr, ptrHandle);
     InterfaceLibOutputCapture = (int32_t (*)(struct DevHandle *, int,
-                                 struct AudioHwCaptureParam *))dlsym(PtrHandle, "AudioInterfaceLibOutputCapture");
+                                 struct AudioHwCaptureParam *))dlsym(ptrHandle, "AudioInterfaceLibOutputCapture");
     ASSERT_NE(nullptr, InterfaceLibOutputCapture);
     InterfaceLibCtlCapture = (int32_t (*)(struct DevHandle *, int,
-                                          struct AudioHwCaptureParam *))dlsym(PtrHandle, "AudioInterfaceLibCtlCapture");
+                                          struct AudioHwCaptureParam *))dlsym(ptrHandle, "AudioInterfaceLibCtlCapture");
     ASSERT_NE(nullptr, InterfaceLibCtlCapture);
-    BindServiceCapture = (struct DevHandle* (*)(const char *))dlsym(PtrHandle, "AudioBindServiceCapture");
+    BindServiceCapture = (struct DevHandle* (*)(const char *))dlsym(ptrHandle, "AudioBindServiceCapture");
     ASSERT_NE(nullptr, BindServiceCapture);
-    CloseServiceCapture = (void (*)(struct DevHandle *))dlsym(PtrHandle, "AudioCloseServiceCapture");
+    CloseServiceCapture = (void (*)(struct DevHandle *))dlsym(ptrHandle, "AudioCloseServiceCapture");
     ASSERT_NE(nullptr, CloseServiceCapture);
 }
 
@@ -71,9 +71,9 @@ void AudioAlsaLibCaptureTest::TearDownTestCase(void)
     if (InterfaceLibOutputCapture != nullptr) {
         InterfaceLibOutputCapture = nullptr;
     }
-    if (PtrHandle != nullptr) {
-        dlclose(PtrHandle);
-        PtrHandle = nullptr;
+    if (ptrHandle != nullptr) {
+        dlclose(ptrHandle);
+        ptrHandle = nullptr;
     }
 }
 

@@ -17,6 +17,88 @@
 
 namespace OHOS {
 namespace DistributedHardware {
+class DCameraHostCallback : public ICameraHostCallback {
+public:
+    DCameraHostCallback() = default;
+    virtual ~DCameraHostCallback() = default;
+
+    int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status)
+    {
+        (void)cameraId;
+        (void)status;
+        return 0;
+    }
+
+    int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status)
+    {
+        (void)cameraId;
+        (void)status;
+        return 0;
+    }
+
+    int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event)
+    {
+        (void)cameraId;
+        (void)event;
+        return 0;
+    }
+};
+
+class DCameraDeviceCallback : public ICameraDeviceCallback {
+public:
+    DCameraDeviceCallback() = default;
+    virtual ~DCameraDeviceCallback() = default;
+
+    int32_t OnError(ErrorType type, int32_t errorCode)
+    {
+        (void)type;
+        (void)errorCode;
+        return 0;
+    }
+
+    int32_t OnResult(uint64_t timestamp, const std::vector<uint8_t>& result)
+    {
+        (void)timestamp;
+        (void)result;
+        return 0;
+    }
+};
+
+class DStreamOperatorCallback : public IStreamOperatorCallback {
+public:
+    DStreamOperatorCallback() = default;
+    virtual ~DStreamOperatorCallback() = default;
+
+    int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t>& streamIds)
+    {
+        (void)captureId;
+        (void)streamIds;
+        return 0;
+    }
+
+    int32_t OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos)
+    {
+        (void)captureId;
+        (void)infos;
+        return 0;
+    }
+
+    int32_t OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos)
+    {
+        (void)captureId;
+        (void)infos;
+        return 0;
+    }
+
+    int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t>& streamIds, uint64_t timestamp)
+    {
+        (void)captureId;
+        (void)streamIds;
+        (void)timestamp;
+        return 0;
+    }
+};
+
 uint64_t Test::GetCurrentLocalTimeStamp()
 {
     std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds> tp =
@@ -117,11 +199,11 @@ void Test::Init()
     service->SetCallback(hostCallback);
 }
 
-std::shared_ptr<CameraAbility> Test::GetCameraAbility()
+std::vector<uint8_t> Test::GetCameraAbility()
 {
     if (cameraDevice == nullptr) {
         rc = service->GetCameraIds(cameraIds);
-        if (rc != Camera::NO_ERROR) {
+        if (rc != NO_ERROR) {
             std::cout << "==========[test log]GetCameraIds failed." << std::endl;
             return ability;
         } else {
@@ -139,12 +221,14 @@ std::shared_ptr<CameraAbility> Test::GetCameraAbility()
 void Test::GetCameraMetadata()
 {
     rc = service->GetCameraAbility(cameraIds.front(), ability);
-    if (rc != Camera::NO_ERROR) {
+    if (rc != NO_ERROR) {
         std::cout << "==========[test log]GetCameraAbility failed, rc = " << rc << std::endl;
     }
-    common_metadata_header_t* data = ability->get();
+    std::shared_ptr<OHOS::Camera::CameraMetadata> abililyMeta = nullptr;
+    OHOS::Camera::MetadataUtils::ConvertVecToMetadata(abilily, abililyMeta);
+    common_metadata_header_t* data = abililyMeta->get();
     camera_metadata_item_t entry;
-    int ret = Camera::FindCameraMetadataItem(data, OHOS_CONTROL_AE_AVAILABLE_MODES, &entry);
+    int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_CONTROL_AE_AVAILABLE_MODES, &entry);
     if (ret == 0) {
         std::cout << "==========[test log] get OHOS_CONTROL_AE_AVAILABLE_MODES success" << std::endl;
     }
@@ -161,7 +245,7 @@ void Test::Open()
         GetCameraMetadata();
         deviceCallback = new DCameraDeviceCallback();
         rc = service->OpenCamera(cameraIds.front(), deviceCallback, cameraDevice);
-        if (rc != Camera::NO_ERROR || cameraDevice == nullptr) {
+        if (rc != NO_ERROR || cameraDevice == nullptr) {
             std::cout << "==========[test log]OpenCamera failed, rc = " << rc << std::endl;
             return;
         }
@@ -178,84 +262,94 @@ void Test::Close()
     }
     consumerMap_.clear();
     if (hostCallback != nullptr) {
-        delete hostCallback;
         hostCallback = nullptr;
     }
     if (deviceCallback != nullptr) {
-        delete deviceCallback;
         deviceCallback = nullptr;
     }
     if (streamOperatorCallback != nullptr) {
-        delete streamOperatorCallback;
         streamOperatorCallback = nullptr;
     }
 }
 
 void Test::SetPreviewStreamInfo()
 {
-    streamInfo_pre->streamId_ = streamId_preview;
-    streamInfo_pre->width_ = preview_width;
-    streamInfo_pre->height_ = preview_height;
-    streamInfo_pre->format_ = preview_format;
-    streamInfo_pre->dataspace_ = dataspace;
-    streamInfo_pre->intent_ = PREVIEW;
-    streamInfo_pre->tunneledMode_ = tunneledMode;
+    int dataspace = 8;
+    int tunneledMode = 5;
+    int bufferQueueSize = 8;
+    streamInfo_pre.streamId_ = streamId_preview;
+    streamInfo_pre.width_ = preview_width;
+    streamInfo_pre.height_ = preview_height;
+    streamInfo_pre.format_ = preview_format;
+    streamInfo_pre.dataspace_ = dataspace;
+    streamInfo_pre.intent_ = PREVIEW;
+    streamInfo_pre.tunneledMode_ = tunneledMode;
     std::shared_ptr<StreamConsumer> consumer_pre = std::make_shared<StreamConsumer>();
     std::cout << "==========[test log]received a preview buffer ... 0" << std::endl;
-    streamInfo_pre->bufferQueue_ = consumer_pre->CreateProducer([this](void* addr, uint32_t size) {
+    streamInfo_pre.bufferQueue_ = new BufferProducerSequenceable();
+    streamInfo_pre.bufferQueue_->producer_ = consumer_pre->CreateProducer([this](void* addr, uint32_t size) {
         SaveYUV("preview", addr, size);
     });
-    streamInfo_pre->bufferQueue_->SetQueueSize(bufferQueueSize);
+    streamInfo_pre.bufferQueue_->producer_->SetQueueSize(bufferQueueSize);
     consumerMap_[intent] = consumer_pre;
     streamInfos.push_back(streamInfo_pre);
 }
 
 void Test::SetVideoStreamInfo()
 {
-    streamInfo_video->streamId_ = streamId_video;
-    streamInfo_video->width_ = video_width;
-    streamInfo_video->height_ = video_height;
-    streamInfo_video->format_ = video_format;
-    streamInfo_video->dataspace_ = dataspace;
-    streamInfo_video->intent_ = intent;
-    streamInfo_video->encodeType_ = OHOS::Camera::ENCODE_TYPE_H265;
-    streamInfo_video->tunneledMode_ = tunneledMode;
+    int dataspace = 8;
+    int tunneledMode = 5;
+    int bufferQueueSize = 8;
+    streamInfo_video.streamId_ = streamId_video;
+    streamInfo_video.width_ = video_width;
+    streamInfo_video.height_ = video_height;
+    streamInfo_video.format_ = video_format;
+    streamInfo_video.dataspace_ = dataspace;
+    streamInfo_video.intent_ = VIDEO;
+    streamInfo_video.encodeType_ = OHOS::HDI::Camera::V1_0::ENCODE_TYPE_H265;
+    streamInfo_video.tunneledMode_ = tunneledMode;
     std::shared_ptr<StreamConsumer> consumer_video = std::make_shared<StreamConsumer>();
     std::cout << "==========[test log]received a video buffer ... 1" << std::endl;
     SaveVideoFile("video", nullptr, 0, 0);
-    streamInfo_video->bufferQueue_ = consumer_video->CreateProducer([this](void* addr, uint32_t size) {
+    streamInfo_video.bufferQueue_ = new BufferProducerSequenceable();
+    streamInfo_video.bufferQueue_->producer_ = consumer_video->CreateProducer([this](void* addr, uint32_t size) {
         SaveVideoFile("video", addr, size, 1);
     });
-    streamInfo_video->bufferQueue_->SetQueueSize(bufferQueueSize);
+    streamInfo_video.bufferQueue_->producer_->SetQueueSize(bufferQueueSize);
     consumerMap_[intent] = consumer_video;
     streamInfos.push_back(streamInfo_video);
 }
 
 void Test::SetPhotoStreamInfo()
 {
-    streamInfo_capture->streamId_ = streamId_capture;
-    streamInfo_capture->width_ = snapshot_width;
-    streamInfo_capture->height_ = snapshot_height;
-    streamInfo_capture->format_ = snapshot_format;
-    streamInfo_capture->dataspace_ = dataspace;
-    streamInfo_capture->intent_ = intent;
-    streamInfo_capture->encodeType_ = OHOS::Camera::ENCODE_TYPE_JPEG;
-    streamInfo_capture->tunneledMode_ = tunneledMode;
+    int dataspace = 8;
+    int tunneledMode = 5;
+    int bufferQueueSize = 8;
+    streamInfo_capture.streamId_ = streamId_capture;
+    streamInfo_capture.width_ = snapshot_width;
+    streamInfo_capture.height_ = snapshot_height;
+    streamInfo_capture.format_ = snapshot_format;
+    streamInfo_capture.dataspace_ = dataspace;
+    streamInfo_capture.intent_ = STILL_CAPTURE;
+    streamInfo_capture.encodeType_ = OHOS::HDI::Camera::V1_0::ENCODE_TYPE_JPEG;
+    streamInfo_capture.tunneledMode_ = tunneledMode;
     std::shared_ptr<StreamConsumer> consumer_capture = std::make_shared<StreamConsumer>();
     std::cout << "==========[test log]received a capture buffer ... 2" << std::endl;
-    streamInfo_capture->bufferQueue_ = consumer_capture->CreateProducer([this](void* addr, uint32_t size) {
-        SaveYUV("capture", addr, size);
+    streamInfo_capture.bufferQueue_ = new BufferProducerSequenceable();
+    streamInfo_capture.bufferQueue_->producer_ =
+        consumer_capture->CreateProducer([this](void* addr, uint32_t size) {
+            SaveYUV("capture", addr, size);
     });
-    streamInfo_capture->bufferQueue_->SetQueueSize(bufferQueueSize);
+    streamInfo_capture.bufferQueue_->producer_->SetQueueSize(bufferQueueSize);
     consumerMap_[intent] = consumer_capture;
     streamInfos.push_back(streamInfo_capture);
 }
 
-void Test::StartStream(std::vector<Camera::StreamIntent> intents)
+void Test::StartStream(std::vector<StreamIntent> intents)
 {
     streamOperatorCallback = new DStreamOperatorCallback();
     rc = cameraDevice->GetStreamOperator(streamOperatorCallback, streamOperator);
-    if (rc == Camera::NO_ERROR) {
+    if (rc == NO_ERROR) {
         std::cout << "==========[test log]GetStreamOperator success." << std::endl;
     } else {
         std::cout << "==========[test log]GetStreamOperator fail, rc = " << rc << std::endl;
@@ -263,9 +357,6 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
     int dataspace = 8;
     int tunneledMode = 5;
     int bufferQueueSize = 8;
-    streamInfo_pre = std::make_shared<Camera::StreamInfo>();
-    streamInfo_video = std::make_shared<Camera::StreamInfo>();
-    streamInfo_capture = std::make_shared<Camera::StreamInfo>();
     for (auto& intent : intents) {
         if (intent == 0) {
             SetPreviewStreamInfo();
@@ -277,30 +368,29 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
     }
 
     rc = streamOperator->CreateStreams(streamInfos);
-    if (rc == Camera::NO_ERROR) {
+    if (rc == NO_ERROR) {
         std::cout << "==========[test log]CreateStreams success." << std::endl;
     } else {
         std::cout << "==========[test log]CreateStreams fail, rc = " << rc << std::endl;
     }
-    rc = streamOperator->CommitStreams(Camera::NORMAL, ability);
-    if (rc == Camera::NO_ERROR) {
+    rc = streamOperator->CommitStreams(NORMAL, ability);
+    if (rc == NO_ERROR) {
         std::cout << "==========[test log]CommitStreams success." << std::endl;
     } else {
         std::cout << "==========[test log]CommitStreams fail, rc = " << rc << std::endl;
     }
     unsigned int sleepSeconds = 2;
     sleep(sleepSeconds);
-    std::vector<std::shared_ptr<Camera::StreamInfo>>().swap(streamInfos);
+    std::vector<std::shared_ptr<StreamInfo>>().swap(streamInfos);
 }
 
 void Test::StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming)
 {
-    captureInfo = std::make_shared<Camera::CaptureInfo>();
-    captureInfo->streamIds_ = {streamId};
-    captureInfo->captureSetting_ = ability;
-    captureInfo->enableShutterCallback_ = shutterCallback;
+    captureInfo.streamIds_ = { streamId };
+    captureInfo.captureSetting_ = ability;
+    captureInfo.enableShutterCallback_ = shutterCallback;
     rc = streamOperator->Capture(captureId, captureInfo, isStreaming);
-    if (rc == Camera::NO_ERROR) {
+    if (rc == NO_ERROR) {
         std::cout << "==========[test log]check Capture: Capture success, " << captureId << std::endl;
     } else {
         std::cout << "==========[test log]check Capture: Capture fail, rc = " << rc << std::endl;
@@ -314,7 +404,7 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
     if (sizeof(captureIds) > 0) {
         for (auto &captureId : captureIds) {
             rc = streamOperator->CancelCapture(captureId);
-            if (rc == Camera::NO_ERROR) {
+            if (rc == NO_ERROR) {
                 std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
             } else {
                 std::cout << "==========[test log]check Capture: CancelCapture fail, rc = " << rc;
@@ -326,7 +416,7 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
     SaveVideoFile("video", nullptr, 0, operationMode);
     if (sizeof(streamIds) > 0) {
         rc = streamOperator->ReleaseStreams(streamIds);
-        if (rc == Camera::NO_ERROR) {
+        if (rc == NO_ERROR) {
             std::cout << "==========[test log]check Capture: ReleaseStreams success." << std::endl;
         } else {
             std::cout << "==========[test log]check Capture: ReleaseStreams fail, rc = " << rc << std::endl;
@@ -337,14 +427,14 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 void Test::StopOfflineStream(int captureId)
 {
     rc = offlineStreamOperator->CancelCapture(captureId);
-    if (rc == Camera::NO_ERROR) {
+    if (rc == NO_ERROR) {
         std::cout << "==========[test log]check offline: CancelCapture success," << captureId << std::endl;
     } else {
         std::cout << "==========[test log]check offline: CancelCapture fail, rc = " << rc;
         std::cout << "captureId = " << captureId << std::endl;
     }
     rc = offlineStreamOperator->Release();
-    if (rc == Camera::NO_ERROR) {
+    if (rc == NO_ERROR) {
         std::cout << "==========[test log]Check offline stream: offline Release success." << std::endl;
     } else {
         std::cout << "==========[test log]Check offline stream: offline Release fail, rc = " << rc << std::endl;

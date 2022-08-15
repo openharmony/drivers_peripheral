@@ -32,10 +32,12 @@ enum {
     CMD_CODEC_CREATE,
     CMD_CODEC_DESTROY,
     CMD_CODEC_SET_MODE,
+    CMD_CODEC_GET_MODE,
     CMD_CODEC_SET_PARAMS,
     CMD_CODEC_GET_PARAMS,
     CMD_CODEC_START,
     CMD_CODEC_STOP,
+    CMD_CODEC_RESET,
     CMD_CODEC_FLUSH,
     CMD_CODEC_QUEQUE_INPUT,
     CMD_CODEC_DEQUEQUE_INPUT,
@@ -48,26 +50,30 @@ struct ICodec {
     struct HdfRemoteService *remote;
     int32_t (*CodecInit)(struct ICodec *self);
     int32_t (*CodecDeinit)(struct ICodec *self);
-    int32_t (*CodecEnumerateCapbility)(struct ICodec *self, uint32_t index, CodecCapbility *cap);
-    int32_t (*CodecGetCapbility)(struct ICodec *self, AvCodecMime mime, CodecType type,
-                                 uint32_t flags, CodecCapbility *cap);
-    int32_t (*CodecCreate)(struct ICodec *self, const char* name, const Param *attr,
-                           int len, CODEC_HANDLETYPE *handle);
+    int32_t (*CodecEnumerateCapability)(struct ICodec *self, uint32_t index, CodecCapability *cap);
+    int32_t (*CodecGetCapability)(struct ICodec *self, AvCodecMime mime, CodecType type,
+                                 uint32_t flags, CodecCapability *cap);
+    int32_t (*CodecCreate)(struct ICodec *self, const char* name, CODEC_HANDLETYPE *handle);
+    int32_t (*CodecCreateByType)(struct ICodec *self, CodecType type, AvCodecMime mime, CODEC_HANDLETYPE *handle);
     int32_t (*CodecDestroy)(struct ICodec *self, CODEC_HANDLETYPE handle);
-    int32_t (*CodecSetPortMode)(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionType type, BufferMode mode);
+    int32_t (*CodecSetPortMode)(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionType direct,
+                                AllocateBufferMode mode, BufferType type);
+    int32_t (*CodecGetPortMode)(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionType direct,
+                                AllocateBufferMode *mode, BufferType *type);
     int32_t (*CodecSetParameter)(struct ICodec *self, CODEC_HANDLETYPE handle, const Param *params, int paramCnt);
     int32_t (*CodecGetParameter)(struct ICodec *self, CODEC_HANDLETYPE handle, Param *params, int paramCnt);
     int32_t (*CodecStart)(struct ICodec *self, CODEC_HANDLETYPE handle);
     int32_t (*CodecStop)(struct ICodec *self, CODEC_HANDLETYPE handle);
+    int32_t (*CodecReset)(struct ICodec *self, CODEC_HANDLETYPE handle);
     int32_t (*CodecFlush)(struct ICodec *self, CODEC_HANDLETYPE handle, DirectionType directType);
     int32_t (*CodecQueueInput)(struct ICodec *self, CODEC_HANDLETYPE handle,
-                               const InputInfo *inputData, uint32_t timeoutMs);
-    int32_t (*CodecDequeInput)(struct ICodec *self, CODEC_HANDLETYPE handle,
-                               uint32_t timeoutMs, InputInfo *inputData);
-    int32_t (*CodecQueueOutput)(struct ICodec *self, CODEC_HANDLETYPE handle, OutputInfo *outInfo,
-                                uint32_t timeoutMs, int releaseFenceFd);
-    int32_t (*CodecDequeueOutput)(struct ICodec *self, CODEC_HANDLETYPE handle, uint32_t timeoutMs,
-                                  int *acquireFd, OutputInfo *outInfo);
+                               const CodecBuffer *inputData, uint32_t timeoutMs, int releaseFenceFd);
+    int32_t (*CodecDequeueInput)(struct ICodec *self, CODEC_HANDLETYPE handle,
+                                uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *inputData);
+    int32_t (*CodecQueueOutput)(struct ICodec *self, CODEC_HANDLETYPE handle,
+                                CodecBuffer *outInfo, uint32_t timeoutMs, int releaseFenceFd);
+    int32_t (*CodecDequeueOutput)(struct ICodec *self, CODEC_HANDLETYPE handle,
+                                  uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *outInfo);
     int32_t (*CodecSetCallback)(struct ICodec *self, CODEC_HANDLETYPE handle,
                                 struct ICodecCallback *cb, UINTPTR instance);
 };

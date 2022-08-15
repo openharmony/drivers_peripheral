@@ -16,9 +16,8 @@
 #include "audio_capture.h"
 #include "osal_mem.h"
 #include "audio_adapter_info_common.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 #include "audio_interface_lib_capture.h"
-
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
@@ -754,7 +753,7 @@ void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
     }
     if (errorCode == WRITE_FRAME_ERROR_CODE) {
         hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].errorCode = errorCode;
-        hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].count = hwCapture->errorLog.iter;
+        hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].count = (int32_t)hwCapture->errorLog.iter;
         hwCapture->errorLog.errorDump[hwCapture->errorLog.iter].frames =
             hwCapture->captureParam.frameCaptureMode.frames;
         hwCapture->errorLog.iter++;
@@ -958,7 +957,7 @@ int32_t AudioCaptureReqMmapBufferInit(struct AudioHwCapture *capture, int32_t re
     }
     // formatBits Move right 3
     desc->totalBufferFrames =
-        reqSize / (capture->captureParam.frameCaptureMode.attrs.channelCount * (formatBits >> 3));
+        reqSize / (int32_t)(capture->captureParam.frameCaptureMode.attrs.channelCount * (formatBits >> 3));
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
         AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Is NULL");
@@ -1015,7 +1014,6 @@ int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct
         AUDIO_FUNC_LOGE("capture or frames or time is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-#ifndef AUDIO_HAL_USER
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
         AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Fail!");
@@ -1031,7 +1029,6 @@ int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct
         return AUDIO_HAL_ERR_INTERNAL;
     }
     AUDIO_FUNC_LOGI("GetMmapPosition SUCCESS!");
-#endif
     *frames = capture->captureParam.frameCaptureMode.frames;
     capture->captureParam.frameCaptureMode.time.tvSec = (int64_t)(capture->captureParam.frameCaptureMode.frames /
         capture->captureParam.frameCaptureMode.attrs.sampleRate);

@@ -53,7 +53,7 @@ extern "C" {
  * display device is connected, and <b>false</b> means the opposite.
  * @param data Indicates the private data carried by the graphics service. This parameter carries the private data
  * address transferred when <b>RegHotPlugCallback</b> is called. For details, see {@link RegHotPlugCallback}.
- *  
+ *
  *
  * @since 1.0
  * @version 1.0
@@ -386,7 +386,7 @@ typedef struct {
      * service needs to refresh the display, and disabled when display refresh is not required. The display does not
      * need to refresh when <b>VBlankCallback</b> is invoked and the graphics service composes layers and sends the
      * composition result to the device for display.
-     * 
+     *
      * @param devId Indicates the ID of the display device.
      * @param enabled Specifies whether to enable the vertical sync signal. The value <b>true</b> means to enable the
      * vertical sync signal, and <b>false</b> means to disable it.
@@ -572,7 +572,7 @@ typedef struct {
 
     /* *
      * @brief Destroys a virtual display device.
-     * 
+     *
      * @param devId Indicates the ID of the display device.
      *
      * @return Returns <b>0</b> if the operation is successful; returns an error code defined

@@ -15,41 +15,39 @@
 
 #ifndef USB_HOST_NO_SDK_SPEED_H
 #define USB_HOST_NO_SDK_SPEED_H
-
+#include "data_fifo.h"
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "osal_atomic.h"
 #include "usb_ddk.h"
 #include "usb_ddk_interface.h"
 #include "usb_session.h"
-#include "data_fifo.h"
 
-#define TEST_LENGTH             512
-#define TEST_CYCLE              30
-#define TEST_TIME               0xffffffff
-#define TEST_PRINT_TIME         2
-#define TEST_PRINT_TIME_UINT    1000
-#define TEST_PRINT_MAX_RANGE    10000
+#define TEST_LENGTH            512
+#define TEST_CYCLE             30
+#define TEST_TIME              0xffffffff
+#define TEST_PRINT_TIME        2
+#define TEST_PRINT_TIME_UINT   1000
+#define TEST_PRINT_MAX_RANGE   10000
 #define TEST_DOUBLE_COUNT      (1.0)
-#define TEST_BYTE_COUNT_UINT    1024
-#define INPUT_COMPARE_PARAMNUM  6
-#define INPUT_COMPARE_NUMONE    3
-#define INPUT_COMPARE_NUMTWO    5
+#define TEST_BYTE_COUNT_UINT   1024
+#define INPUT_COMPARE_PARAMNUM 6
+#define INPUT_COMPARE_NUMONE   3
+#define INPUT_COMPARE_NUMTWO   5
 
-#define TEST_WRITE              true
-#define TEST_READ               false
-#define USB_MAX_INTERFACES      32
-#define DATARATE                9600
-#define DATA_BITS_LENGTH        8
-#define ACM_NW                  30
-#define ACM_NR                  30
-#define READ_BUF_SIZE           8192
-#define DIRECTION_MASK          0x1
-#define USB_CTRL_SET_TIMEOUT    0
-#define USB_PIPE_DIR_OFFSET     7
-#define USB_DEVICE_VENDOR_ID 0x12D1
+#define TEST_WRITE            true
+#define TEST_READ             false
+#define USB_MAX_INTERFACES    32
+#define DATARATE              9600
+#define DATA_BITS_LENGTH      8
+#define ACM_NW                30
+#define ACM_NR                30
+#define READ_BUF_SIZE         8192
+#define DIRECTION_MASK        0x1
+#define USB_CTRL_SET_TIMEOUT  0
+#define USB_PIPE_DIR_OFFSET   7
+#define USB_DEVICE_VENDOR_ID  0x12D1
 #define USB_DEVICE_PRODUCT_ID 0x5000
-
 
 struct UsbAdapterUrbs {
     struct urb *urb;
@@ -92,12 +90,12 @@ struct AcmDevice {
     struct IDeviceIoService service;
     struct HdfDeviceObject *device;
     struct UsbInterface *ctrIface;
-    struct UsbPipeInfo  *ctrPipe;
-    struct UsbPipeInfo  *intPipe;
-    struct UsbPipeInfo  *dataInPipe;
-    struct UsbPipeInfo  *dataOutPipe;
-    struct UsbPipeInfo  *dataPipe;
-    struct AcmDb  db[TEST_CYCLE];
+    struct UsbPipeInfo *ctrPipe;
+    struct UsbPipeInfo *intPipe;
+    struct UsbPipeInfo *dataInPipe;
+    struct UsbPipeInfo *dataOutPipe;
+    struct UsbPipeInfo *dataPipe;
+    struct AcmDb db[TEST_CYCLE];
     struct UsbPipeInfo wPipeInfo;
     struct OsalMutex writeLock;
     struct OsalMutex readLock;
@@ -130,4 +128,4 @@ struct AcmDevice {
     bool busy;
 };
 
-#endif  /* USB_HOST_NO_SDK_SPEED_H */
+#endif /* USB_HOST_NO_SDK_SPEED_H */

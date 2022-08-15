@@ -101,18 +101,13 @@ FILE *g_file;
 char *g_frame;
 void *g_handle;
 char g_path[256] = {'\0'};
-#ifdef AUDIO_HAL_USER
-void *g_sdkHandle;
-int (*g_sdkInitSp)() = NULL;
-void (*g_sdkExitSp)() = NULL;
-#endif
 
 enum AudioCaptureMode {
     CAPTURE_POLL   = 1,
     CAPTURE_INTERUPT,
 };
 
-int g_CaptureModeFlag = CAPTURE_POLL;
+int g_captureModeFlag = CAPTURE_POLL;
 
 #ifndef __LITEOS__
 int g_receiveFrameCount = 0;
@@ -158,6 +153,14 @@ void CleanStdin(void)
     } while (c != '\n' && c != EOF);
 }
 
+void SystemInputFail(void)
+{
+    printf("please ENTER to go on...\n");
+    while (getchar() != '\n') {
+        continue;
+    }
+}
+
 int32_t CheckInputName(int type, void *val)
 {
     if (val == NULL) {
@@ -172,7 +175,7 @@ int32_t CheckInputName(int type, void *val)
         case INPUT_INT:
             ret = scanf_s("%d", &inputInt);
             if (inputInt < 0 || inputInt > GET_CAPTURE_POSITION + 1) {
-                AUDIO_FUNC_LOGE("Input failure");
+                SystemInputFail();
                 return HDF_FAILURE;
             }
             *(int *)val = inputInt;
@@ -200,14 +203,7 @@ int32_t CheckInputName(int type, void *val)
     }
     return HDF_SUCCESS;
 }
-void SystemInputFail(void)
-{
-    printf("please ENTER to go on...");
-    while (getchar() != '\n') {
-        continue;
-    }
-    printf("%c", getchar());
-}
+
 int32_t InitAttrsCapture(struct AudioSampleAttributes *attrs)
 {
     if (attrs == NULL) {
@@ -257,7 +253,7 @@ uint32_t PcmFormatToBits(enum AudioFormat format)
 void StreamClose(int32_t sig)
 {
     /* allow the stream to be closed gracefully */
-    signal(sig, SIG_IGN);
+    (void)signal(sig, SIG_IGN);
     g_closeEnd = 1;
 }
 
@@ -385,7 +381,7 @@ int UnRegisterListen(void)
 static inline void FileClose(FILE **file)
 {
     if ((file != NULL) && ((*file) != NULL)) {
-        fclose(*file);
+        (void)fclose(*file);
         *file = NULL;
     }
     return;
@@ -397,16 +393,16 @@ uint32_t StringToInt(const char *flag)
         return 0;
     }
     uint32_t temp = flag[0];
-    for (int32_t i = strlen(flag) - 1; i >= 0; i--) {
+    for (int32_t i = (int32_t)strlen(flag) - 1; i >= 0; i--) {
         temp <<= MOVE_LEFT_NUM;
         temp += flag[i];
     }
     return temp;
 }
 
-int32_t AddWavFileHeader(struct StrParaCapture *StrParam)
+int32_t AddWavFileHeader(struct StrParaCapture *strParam)
 {
-    if (StrParam == NULL) {
+    if (strParam == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
         return HDF_FAILURE;
     }
@@ -418,20 +414,20 @@ int32_t AddWavFileHeader(struct StrParaCapture *StrParam)
     headInfo.riffSize = (uint32_t)ftell(g_file) - WAV_HEAD_RIFF_OFFSET;
     headInfo.riffType = StringToInt("WAVE");
     headInfo.audioFileFmtId = StringToInt("fmt ");
-    headInfo.audioFileFmtSize = PcmFormatToBits(StrParam->attrs.format);
+    headInfo.audioFileFmtSize = PcmFormatToBits(strParam->attrs.format);
     headInfo.audioFileFormat = 1;
-    headInfo.audioChannelNum = StrParam->attrs.channelCount;
-    headInfo.audioSampleRate = StrParam->attrs.sampleRate;
-    headInfo.audioByteRate = headInfo.audioSampleRate * headInfo.audioChannelNum * headInfo.audioFileFmtSize
-                             / PCM_8_BIT;
-    headInfo.audioBlockAlign = headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT;
-    headInfo.audioBitsPerSample = headInfo.audioFileFmtSize;
+    headInfo.audioChannelNum = strParam->attrs.channelCount;
+    headInfo.audioSampleRate = strParam->attrs.sampleRate;
+    headInfo.audioByteRate = headInfo.audioSampleRate * headInfo.audioChannelNum *
+        headInfo.audioFileFmtSize / PCM_8_BIT;
+    headInfo.audioBlockAlign = (uint16_t)(headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT);
+    headInfo.audioBitsPerSample = (uint16_t)headInfo.audioFileFmtSize;
     headInfo.dataId = StringToInt("data");
     headInfo.dataSize = (uint32_t)ftell(g_file) - WAV_HEAD_OFFSET;
 
     rewind(g_file);
 
-    ssize_t ret = fwrite(&headInfo, sizeof(struct AudioHeadInfo), 1, g_file);
+    size_t ret = fwrite(&headInfo, sizeof(struct AudioHeadInfo), 1, g_file);
     if (ret != 1) {
         printf("write wav file head error");
         return HDF_FAILURE;
@@ -477,7 +473,7 @@ int32_t StopButtonCapture(struct AudioCapture **captureS)
     }
 
     FileClose(&g_file);
-    if (g_CaptureModeFlag == CAPTURE_INTERUPT) {
+    if (g_captureModeFlag == CAPTURE_INTERUPT) {
 #ifndef __LITEOS__
         ret = UnRegisterListen();
         if (ret < 0) {
@@ -651,20 +647,20 @@ int32_t StartPlayThread(int32_t palyModeFlag)
     return HDF_SUCCESS;
 }
 
-int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *StrParam, struct AudioCapture *capture,
+int32_t CaptureChoiceModeAndRecording(struct StrParaCapture *strParam, struct AudioCapture *capture,
     int32_t palyModeFlag)
 {
-    if (StrParam == NULL || capture == NULL) {
+    if (strParam == NULL || capture == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
         return HDF_FAILURE;
     }
     int32_t ret;
-    (void)memset_s(StrParam, sizeof(struct StrParaCapture), 0, sizeof(struct StrParaCapture));
-    StrParam->capture = capture;
-    StrParam->file = g_file;
-    StrParam->attrs = g_attrs;
-    StrParam->frame = g_frame;
-    if (g_CaptureModeFlag == CAPTURE_INTERUPT) {
+    (void)memset_s(strParam, sizeof(struct StrParaCapture), 0, sizeof(struct StrParaCapture));
+    strParam->capture = capture;
+    strParam->file = g_file;
+    strParam->attrs = g_attrs;
+    strParam->frame = g_frame;
+    if (g_captureModeFlag == CAPTURE_INTERUPT) {
 #ifndef __LITEOS__
         ret = RegisterListen(&g_str);
         if (ret != 0) {
@@ -898,8 +894,7 @@ int32_t GetCapturePassthroughManagerFunc(const char *adapterNameCase)
         return HDF_FAILURE;
     }
     int32_t ret = manager->GetAllAdapters(manager, &descs, &size);
-    int32_t param = size == 0 || descs == NULL || ret < 0;
-    if (param) {
+    if ((size == 0) || (descs == NULL) || (ret < 0)) {
         AUDIO_FUNC_LOGE("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
     }
@@ -947,8 +942,7 @@ int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
         return HDF_FAILURE;
     }
     int32_t ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
-    int32_t check = size == 0 || descs == NULL || ret < 0;
-    if (check) {
+    if ((size == 0) || (descs == NULL) || (ret < 0)) {
         AUDIO_FUNC_LOGE("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
     }
@@ -1005,25 +999,6 @@ int32_t InitParam(void)
             AUDIO_FUNC_LOGE("GetCapturePassthroughManagerFunc Fail");
             return HDF_FAILURE;
         }
-#ifdef AUDIO_HAL_USER
-        char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
-        g_sdkHandle = dlopen(sdkResolvedPath, 1);
-        if (g_sdkHandle == NULL) {
-            AUDIO_FUNC_LOGE("Open so Invalid, reason:%s", dlerror());
-            return HDF_FAILURE;
-        }
-        g_sdkInitSp = (int32_t (*)())(dlsym(g_sdkHandle, "MpiSdkInit"));
-        if (g_sdkInitSp == NULL) {
-            AUDIO_FUNC_LOGE("Get sdk init Funcs Invalid");
-            return HDF_FAILURE;
-        }
-        g_sdkExitSp = (void (*)())(dlsym(g_sdkHandle, "MpiSdkExit"));
-        if (g_sdkExitSp == NULL) {
-            AUDIO_FUNC_LOGE("Get sdk exit Funcs Invalid");
-            return HDF_FAILURE;
-        }
-        g_sdkInitSp();
-#endif
     } else {
         if (GetCaptureProxyManagerFunc(adapterNameCase) < 0) {
             AUDIO_FUNC_LOGE("GetCaptureProxyManagerFunc Fail");
@@ -1420,10 +1395,10 @@ void Choice0(void)
     }
     switch (choice) {
         case CAPTURE_POLL:
-            g_CaptureModeFlag = CAPTURE_POLL;
+            g_captureModeFlag = CAPTURE_POLL;
             break;
         case CAPTURE_INTERUPT:
-            g_CaptureModeFlag = CAPTURE_INTERUPT;
+            g_captureModeFlag = CAPTURE_INTERUPT;
             break;
         default:
             printf("Input error,Switched to Poll mode in for you,");
@@ -1479,7 +1454,7 @@ int32_t CheckAndOpenFile(int32_t argc, char const *argv[])
         printf("failed to open '%s',Please enter the correct file name \n", g_path);
         return HDF_FAILURE;
     }
-    fclose(file);
+    (void)fclose(file);
     return HDF_SUCCESS;
 }
 
@@ -1490,7 +1465,7 @@ int32_t main(int32_t argc, char const *argv[])
         return ret;
     }
     bool soMode = false;
-    if (InitParam()) { // init
+    if (InitParam() < 0) { // init
         AUDIO_FUNC_LOGE("InitParam Fail");
         return HDF_FAILURE;
     }
@@ -1510,16 +1485,7 @@ int32_t main(int32_t argc, char const *argv[])
             g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
         }
     }
-#ifdef AUDIO_HAL_USER
-        if (soMode) {
-            g_sdkExitSp();
-            if (g_sdkHandle != NULL) {
-                dlclose(g_sdkHandle);
-            }
-        }
-#endif
     dlclose(g_handle);
     printf("Record file path:%s\n", g_path);
     return 0;
 }
-

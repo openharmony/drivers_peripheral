@@ -20,7 +20,7 @@
 #include <securec.h>
 #include <unistd.h>
 #include "codec_omx_ext.h"
-bool BufferHandleMarshalling(struct HdfSBuf *data, BufferHandle *handle)
+static bool BufferHandleMarshalling(struct HdfSBuf *data, BufferHandle *handle)
 {
     if (handle == NULL) {
         HDF_LOGE("%{public}s: handle is NULL!", __func__);
@@ -65,7 +65,7 @@ bool BufferHandleMarshalling(struct HdfSBuf *data, BufferHandle *handle)
     return true;
 }
 
-bool BufferHandleUnmarshalling(struct HdfSBuf *data, BufferHandle **handle)
+static bool BufferHandleUnmarshalling(struct HdfSBuf *data, BufferHandle **handle)
 {
     uint8_t validFd = 0;
     uint32_t reserveFds = 0;
@@ -708,13 +708,10 @@ bool CodecCompCapabilityBlockUnmarshalling(struct HdfSBuf *data, CodecCompCapabi
     if (dataBlock == NULL) {
         return false;
     }
-    if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->role)) {
-        HDF_LOGE("%{public}s: read dataBlock->role failed!", __func__);
-        return false;
-    }
 
-    if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->type)) {
-        HDF_LOGE("%{public}s: read dataBlock->type failed!", __func__);
+    if (!HdfSbufReadInt32(data, (int32_t *)&dataBlock->role) ||
+        !HdfSbufReadInt32(data, (int32_t *)&dataBlock->type)) {
+        HDF_LOGE("%{public}s: read dataBlock->role or dataBlock->type failed!", __func__);
         return false;
     }
 

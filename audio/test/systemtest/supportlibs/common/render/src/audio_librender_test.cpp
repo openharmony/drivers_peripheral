@@ -37,10 +37,6 @@ public:
         struct AudioHwRenderParam *handleData);
     static void (*CloseServiceRenderSo)(struct DevHandle *handle);
     static void *ptrHandle;
-#ifdef AUDIO_MPI_SO
-    static int32_t (*SdkInit)();
-    static void (*SdkExit)();
-#endif
     uint32_t PcmBytesToFrames(const struct AudioFrameRenderMode &frameRenderMode, uint64_t bytes) const;
     int32_t FrameLibStart(FILE *file, struct AudioSampleAttributes attrs,
         struct AudioHeadInfo wavHeadInfo, struct AudioHwRender *hwRender) const;
@@ -58,10 +54,6 @@ int32_t (*AudioLibRenderTest::InterfaceLibCtlRender)(struct DevHandle *handle, i
     struct AudioHwRenderParam *handleData) = nullptr;
 void (*AudioLibRenderTest::CloseServiceRenderSo)(struct DevHandle *handle) = nullptr;
 void *AudioLibRenderTest::ptrHandle = nullptr;
-#ifdef AUDIO_MPI_SO
-    int32_t (*AudioLibRenderTest::SdkInit)() = nullptr;
-    void (*AudioLibRenderTest::SdkExit)() = nullptr;
-#endif
 
 void AudioLibRenderTest::SetUpTestCase(void)
 {
@@ -81,17 +73,6 @@ void AudioLibRenderTest::SetUpTestCase(void)
         dlclose(ptrHandle);
         return;
     }
-#ifdef AUDIO_MPI_SO
-    SdkInit = (int32_t (*)())(dlsym(ptrHandle, "MpiSdkInit"));
-    if (SdkInit == nullptr) {
-        return;
-    }
-    SdkExit = (void (*)())(dlsym(ptrHandle, "MpiSdkExit"));
-    if (SdkExit == nullptr) {
-        return;
-    }
-    SdkInit();
-#endif
 }
 
 void AudioLibRenderTest::TearDownTestCase(void)
@@ -108,15 +89,6 @@ void AudioLibRenderTest::TearDownTestCase(void)
     if (InterfaceLibCtlRender != nullptr) {
         InterfaceLibCtlRender = nullptr;
     }
-#ifdef AUDIO_MPI_SO
-    SdkExit();
-    if (SdkInit != nullptr) {
-        SdkInit = nullptr;
-    }
-    if (SdkExit != nullptr) {
-        SdkExit = nullptr;
-    }
-#endif
     if (ptrHandle != nullptr) {
         dlclose(ptrHandle);
         ptrHandle = nullptr;
@@ -477,8 +449,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_HwParams_0001, T
     ASSERT_TRUE((InterfaceLibOutputRender != nullptr && CloseServiceRenderSo != nullptr));
     ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
-
+    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
@@ -498,10 +473,13 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Prepare_0001, Te
     ASSERT_TRUE((InterfaceLibOutputRender != nullptr && CloseServiceRenderSo != nullptr));
     ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
-
+    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_PREPARE, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
@@ -521,12 +499,17 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Start_0001, Test
     ASSERT_TRUE((InterfaceLibOutputRender != nullptr && CloseServiceRenderSo != nullptr));
     ret = BindServiceAndHwRender(hwRender, BIND_RENDER.c_str(), ADAPTER_NAME, handle);
     ASSERT_EQ(HDF_SUCCESS, ret);
-
+    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_HW_PARAMS, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTL_PREPARE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_START, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_STOP, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
@@ -657,6 +640,10 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Pause_0001, Test
     hwRender->renderParam.renderMode.ctlParam.pause = 1;
     ret = InterfaceLibOutputRender(handle, AUDIODRV_CTL_IOCTL_PAUSE_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_STOP, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);
     hwRender = nullptr;
@@ -679,6 +666,10 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Resume_0001, Tes
     EXPECT_EQ(HDF_SUCCESS, ret);
     hwRender->renderParam.renderMode.ctlParam.pause = 0;
     ret = InterfaceLibOutputRender(handle, AUDIODRV_CTL_IOCTL_PAUSE_WRITE, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_STOP, &hwRender->renderParam);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = InterfaceLibOutputRender(handle, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     CloseServiceRenderSo(handle);
     free(hwRender);

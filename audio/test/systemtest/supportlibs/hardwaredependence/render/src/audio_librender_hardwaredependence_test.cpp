@@ -50,10 +50,6 @@ public:
     static int32_t (*InterfaceLibCtlRender)(struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData);
     static void (*CloseServiceRenderSo)(struct DevHandle *handle);
     static void *ptrHandle;
-#ifdef AUDIO_MPI_SO
-    static int32_t (*SdkInit)();
-    static void (*SdkExit)();
-#endif
     int32_t LibHwOutputRender(struct AudioHwRender *hwRender, struct DevHandle *handlerender) const;
     int32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender,
         const std::string BindName, const std::string adapterNameCase, struct DevHandle *&handle) const;
@@ -66,10 +62,6 @@ int32_t (*AudioLibRenderHardwareDependenceTest::InterfaceLibCtlRender)(struct De
     struct AudioHwRenderParam *handleData) = nullptr;
 void (*AudioLibRenderHardwareDependenceTest::CloseServiceRenderSo)(struct DevHandle *handle) = nullptr;
 void *AudioLibRenderHardwareDependenceTest::ptrHandle = nullptr;
-#ifdef AUDIO_MPI_SO
-    int32_t (*AudioLibRenderHardwareDependenceTest::SdkInit)() = nullptr;
-    void (*AudioLibRenderHardwareDependenceTest::SdkExit)() = nullptr;
-#endif
 
 void AudioLibRenderHardwareDependenceTest::SetUpTestCase(void)
 {
@@ -89,17 +81,6 @@ void AudioLibRenderHardwareDependenceTest::SetUpTestCase(void)
         dlclose(ptrHandle);
         return;
     }
-#ifdef AUDIO_MPI_SO
-    SdkInit = (int32_t (*)())(dlsym(ptrHandle, "MpiSdkInit"));
-    if (SdkInit == nullptr) {
-        return;
-    }
-    SdkExit = (void (*)())(dlsym(ptrHandle, "MpiSdkExit"));
-    if (SdkExit == nullptr) {
-        return;
-    }
-    SdkInit();
-#endif
 }
 
 void AudioLibRenderHardwareDependenceTest::TearDownTestCase(void)
@@ -116,15 +97,6 @@ void AudioLibRenderHardwareDependenceTest::TearDownTestCase(void)
     if (InterfaceLibCtlRender != nullptr) {
         InterfaceLibCtlRender = nullptr;
     }
-#ifdef AUDIO_MPI_SO
-    SdkExit();
-    if (SdkInit != nullptr) {
-        SdkInit = nullptr;
-    }
-    if (SdkExit != nullptr) {
-        SdkExit = nullptr;
-    }
-#endif
     if (ptrHandle != nullptr) {
         dlclose(ptrHandle);
         ptrHandle = nullptr;

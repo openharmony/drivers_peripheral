@@ -21,7 +21,7 @@
 #include "iam_logger.h"
 #include "iam_ptr.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_PIN_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_PIN_AUTH_HDI
 
 using namespace OHOS::HDI::PinAuth::V1_0;
 
@@ -69,8 +69,8 @@ static int HdfPinAuthInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
         IAM_LOGE("deviceObject is nullptr");
         return HDF_ERR_INVALID_PARAM;
     }
-    std::shared_ptr<OHOS::UserIAM::PinAuth::PinAuth> pinHdi =
-        OHOS::UserIAM::Common::MakeShared<OHOS::UserIAM::PinAuth::PinAuth>();
+    std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi =
+        OHOS::UserIam::Common::MakeShared<OHOS::UserIam::PinAuth::PinAuth>();
     constexpr uint32_t SUCCESS = 0;
     if (pinHdi == nullptr || pinHdi->Init() != SUCCESS) {
         IAM_LOGE("Pin hal init failed");
@@ -145,10 +145,10 @@ static struct HdfDriverEntry g_pinAuthInterfaceDriverEntry = {
     .Release = HdfPinAuthInterfaceDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_pinAuthInterfaceDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */

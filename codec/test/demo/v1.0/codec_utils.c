@@ -22,7 +22,7 @@
 #define CMD_OPTION_MARK_OFFSET  0
 #define CMD_OPTION_NAME_OFFSET  1
 
-int32_t GetCodecName(CodecCmd* cmd)
+static int32_t GetCodecName(CodecCmd* cmd)
 {
     int32_t ret = HDF_SUCCESS;
     if (strstr(cmd->codecName, "avc") || strstr(cmd->codecName, "AVC")) {
@@ -45,7 +45,7 @@ int32_t GetCodecName(CodecCmd* cmd)
     return ret;
 }
 
-int32_t ParseCmdOption(CodecCmd* cmd, const char *opt, const char *next)
+static int32_t ParseCmdOption(CodecCmd* cmd, const char *opt, const char *next)
 {
     int32_t ret = HDF_SUCCESS;
     if (cmd == NULL || opt == NULL || next == NULL) {

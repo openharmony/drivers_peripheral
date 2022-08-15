@@ -133,7 +133,7 @@ static void WriteThread()
     }
 }
 
-void StopAcmTest(int32_t signo)
+static void StopAcmTest(int32_t signo)
 {
     int32_t status;
     running = 0;

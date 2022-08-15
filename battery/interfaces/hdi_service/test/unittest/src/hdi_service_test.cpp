@@ -1162,7 +1162,7 @@ HWTEST_F (HdiServiceTest, HdiService016, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService017, TestSize.Level1)
 {
-    std::string filename = "error_path/system/etc/ledconfig/led_config.json";
+    std::string filename = "error_path/vendor/etc/ledconfig/led_config.json";
     BatteryConfig bc;
 
     ParseConfigTest(filename, bc);
@@ -1178,7 +1178,7 @@ HWTEST_F (HdiServiceTest, HdiService017, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService018, TestSize.Level1)
 {
-    std::string filename = "error_path/system/etc/ledconfig/led_config.json";
+    std::string filename = "error_path/vendor/etc/ledconfig/led_config.json";
     BatteryConfig bc;
 
     ParseConfigTest(filename, bc);
@@ -1196,7 +1196,7 @@ HWTEST_F (HdiServiceTest, HdiService018, TestSize.Level1)
  */
 HWTEST_F (HdiServiceTest, HdiService019, TestSize.Level1)
 {
-    std::string filename = "error_path/system/etc/ledconfig/led_config.json";
+    std::string filename = "error_path/vendor/etc/ledconfig/led_config.json";
     BatteryConfig bc;
 
     ParseConfigTest(filename, bc);

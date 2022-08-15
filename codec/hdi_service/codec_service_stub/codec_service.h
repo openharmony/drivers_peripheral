@@ -27,20 +27,21 @@ extern "C"
 
 int32_t CodecInit();
 int32_t CodecDeinit();
-int32_t CodecEnumerateCapbility(uint32_t index, CodecCapbility *cap);
-int32_t CodecGetCapbility(AvCodecMime mime, CodecType type, uint32_t flags, CodecCapbility *cap);
-int32_t CodecCreate(const char* name, const Param *attr, int len, CODEC_HANDLETYPE *handle);
+int32_t CodecEnumerateCapability(uint32_t index, CodecCapability *cap);
+int32_t CodecGetCapability(AvCodecMime mime, CodecType type, uint32_t flags, CodecCapability *cap);
+int32_t CodecCreate(const char* name, CODEC_HANDLETYPE *handle);
 int32_t CodecDestroy(CODEC_HANDLETYPE handle);
-int32_t CodecSetPortMode(CODEC_HANDLETYPE handle, DirectionType type, BufferMode mode);
+int32_t CodecSetPortMode(CODEC_HANDLETYPE handle, DirectionType direct, AllocateBufferMode mode, BufferType type);
+int32_t CodecGetPortMode(CODEC_HANDLETYPE handle, DirectionType direct, AllocateBufferMode *mode, BufferType *type);
 int32_t CodecSetParameter(CODEC_HANDLETYPE handle, const Param *params, int paramCnt);
 int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int paramCnt);
 int32_t CodecStart(CODEC_HANDLETYPE handle);
 int32_t CodecStop(CODEC_HANDLETYPE handle);
 int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType);
-int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const InputInfo *inputData, uint32_t timeoutMs);
-int32_t CodecDequeInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, InputInfo *inputData);
-int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, OutputInfo *outInfo, uint32_t timeoutMs, int releaseFenceFd);
-int32_t CodecDequeueOutput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int *acquireFd, OutputInfo *outInfo);
+int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const CodecBuffer *inputData, uint32_t timeoutMs, int releaseFenceFd);
+int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *inputData);
+int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, CodecBuffer *outInfo, uint32_t timeoutMs, int releaseFenceFd);
+int32_t CodecDequeueOutput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *outInfo);
 int32_t CodecSetCallback(CODEC_HANDLETYPE handle, const CodecCallback *cb, UINTPTR instance);
 
 #ifdef __cplusplus

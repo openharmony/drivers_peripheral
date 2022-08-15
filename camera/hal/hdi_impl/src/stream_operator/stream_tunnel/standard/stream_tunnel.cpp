@@ -62,12 +62,14 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
     CHECK_IF_PTR_NULL_RETURN_VALUE(bufferQueue_, nullptr);
     OHOS::sptr<OHOS::SurfaceBuffer> sb = nullptr;
     int32_t fence = 0;
+    constexpr int32_t SLEEP_TIME = 2000;
     OHOS::SurfaceError sfError = OHOS::SURFACE_ERROR_OK;
     do {
         sfError = bufferQueue_->RequestBuffer(sb, fence, requestConfig_);
         if (sfError == OHOS::SURFACE_ERROR_NO_BUFFER) {
             std::unique_lock<std::mutex> l(waitLock_);
             waitCV_.wait(l, [this] { return wakeup_ == true; });
+            usleep(SLEEP_TIME);
         }
     } while (!stop_ && sfError == OHOS::SURFACE_ERROR_NO_BUFFER);
     wakeup_ = false;
@@ -109,7 +111,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
     } else {
         cb->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
     }
-    restBuffers++;
+    restBuffers.fetch_add(1, std::memory_order_release);
     return cb;
 }
 
@@ -147,11 +149,8 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
         bufferQueue_->CancelBuffer(sb);
     }
 
-    {
-        restBuffers--;
-        std::unique_lock<std::mutex> l(finishLock_);
-        finishCV_.notify_all();
-    }
+    restBuffers.fetch_sub(1, std::memory_order_release);
+    finishCV_.notify_all();
     {
         std::unique_lock<std::mutex> l(waitLock_);
         wakeup_ = true;
@@ -203,10 +202,16 @@ void StreamTunnel::NotifyStart()
 void StreamTunnel::WaitForAllBufferReturned()
 {
     std::unique_lock<std::mutex> l(finishLock_);
-    finishCV_.wait(l, [this] {
-        return restBuffers == 0;
-        });
-
-    return;
+    auto timeout = std::chrono::system_clock::now() + std::chrono::microseconds(1000 * 200); //200ms
+    if (!finishCV_.wait_until(l, timeout, [this] {
+            CAMERA_LOGD("%{public}p restBuffers=%{public}u", this, restBuffers.load(std::memory_order_acquire));
+            return restBuffers.load(std::memory_order_acquire) == 0;
+        })) {
+        CAMERA_LOGW(
+            "WaitForAllBufferReturned timeout, restBuffers=%{public}u", restBuffers.load(std::memory_order_acquire));
+    } else {
+        CAMERA_LOGW(
+            "WaitForAllBufferReturned done, restBuffers=%{public}u", restBuffers.load(std::memory_order_acquire));
+    }
 }
 } // namespace OHOS::Camera

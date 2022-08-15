@@ -79,7 +79,7 @@ public:
     void FreeBuffers();
     void Run();
     void Release();
-    static int32_t OnEvent(struct CodecCallbackType *self, enum OMX_EVENTTYPE event, struct EventInfo *info);
+    static int32_t OnEvent(struct CodecCallbackType *self, OMX_EVENTTYPE event, struct EventInfo *info);
 
     static int32_t OnEmptyBufferDone(struct CodecCallbackType *self, int64_t appData,
                                      const struct OmxCodecBuffer *buffer);
@@ -100,7 +100,7 @@ public:
         param.version.s.nVersionMajor = 1;  // mVersion.s.nVersionMajor;
     }
     void WaitForStatusChanged();
-    void onStatusChanged();
+    void OnStatusChanged();
     bool ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount);
 
 private:
@@ -114,8 +114,8 @@ private:
     int32_t CheckAndUseBufferHandle();
     int32_t UseDynaBuffer(int bufferCount, int bufferSize);
     bool FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, bool &endFlag);
-    int32_t createBufferHandle();
-    uint32_t inline align_up(uint32_t width)
+    int32_t CreateBufferHandle();
+    uint32_t inline AlignUp(uint32_t width)
     {
         return (((width) + alignment_ - 1) & (~(alignment_ - 1)));
     }

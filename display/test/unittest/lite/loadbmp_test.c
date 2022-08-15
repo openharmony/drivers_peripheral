@@ -259,7 +259,7 @@ static int32_t Copy2BitsAnd4Bits(OsdLogo *videoLogo, uint32_t stride, uint8_t *o
     for (i = 0; i < videoLogo->height; i++) {
         for (j = 0; j < videoLogo->width; j++) {
             ret = memcpy_s((pRGBBuf + i * videoLogo->stride + j * videoLogo->bpp), videoLogo->len,
-                (origBuf + ((videoLogo->height - 1) - i)*stride + j * videoLogo->bpp), videoLogo->bpp);
+                (origBuf + ((videoLogo->height - 1) - i) * stride + j * videoLogo->bpp), videoLogo->bpp);
             if (ret != EOK) {
                 HDF_LOGE("%s: file: %s, line: %d, memcpy_s failure", __func__, __FILE__, __LINE__);
                 return DISPLAY_FAILURE;

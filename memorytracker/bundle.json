@@ -1,0 +1,32 @@
+{
+    "name": "drivers_peripheral_memorytracker",
+    "description": "memorytracker_hdf",
+    "version": "3.1",
+    "license": "Apache License 2.0",
+    "component": {
+      "name": "drivers_peripheral_memorytracker",
+      "subsystem": "hdf",
+      "syscap": [""],
+      "adapter_system_type": ["standard"],
+      "rom": "45KB",
+      "ram": "100KB",
+      "deps": {
+        "components": [
+          "ipc",
+          "hdf_core",
+          "hiviewdfx_hilog_native",
+          "utils_base"
+        ],
+        "third_part": []
+      },
+      "build": {
+        "sub_component": [
+          "//drivers/peripheral/memorytracker:memorytracker_entry"
+        ],
+        "test": [
+          "//drivers/peripheral/memorytracker/test:memorytracker_unittest"
+        ],
+        "inner_kits": []
+      }
+    }
+  }

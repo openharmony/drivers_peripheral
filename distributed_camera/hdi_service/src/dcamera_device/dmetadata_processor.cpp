@@ -41,7 +41,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &abilityInf
                 std::string decodeString = Base64Decode(metadataStr);
                 DHLOGI("Decode distributed camera metadata from string, hash: %zu, length: %zu",
                     h(decodeString), decodeString.length());
-                dCameraAbility_ = Camera::MetadataUtils::DecodeFromString(decodeString);
+                dCameraAbility_ = OHOS::Camera::MetadataUtils::DecodeFromString(decodeString);
                 DHLOGI("Decode distributed camera metadata from string success.");
             }
         }
@@ -52,7 +52,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &abilityInf
         dCameraAbility_ = std::make_shared<CameraAbility>(DEFAULT_ENTRY_CAPACITY, DEFAULT_DATA_CAPACITY);
     }
 
-    if (Camera::GetCameraMetadataItemCount(dCameraAbility_->get()) <= 0) {
+    if (OHOS::Camera::GetCameraMetadataItemCount(dCameraAbility_->get()) <= 0) {
         DCamRetCode ret = InitDCameraDefaultAbilityKeys(abilityInfo);
         if (ret != SUCCESS) {
             DHLOGE("Init distributed camera defalult abilily keys failed.");
@@ -68,7 +68,7 @@ DCamRetCode DMetadataProcessor::InitDCameraAbility(const std::string &abilityInf
         return ret;
     }
 
-    camera_metadata_item_entry_t* itemEntry = Camera::GetMetadataItems(dCameraAbility_->get());
+    camera_metadata_item_entry_t* itemEntry = OHOS::Camera::GetMetadataItems(dCameraAbility_->get());
     uint32_t count = dCameraAbility_->get()->item_count;
     for (uint32_t i = 0; i < count; i++, itemEntry++) {
         allResultSet_.insert((MetaType)(itemEntry->item));
@@ -104,13 +104,6 @@ void DMetadataProcessor::InitDcameraBaseAbility()
 
     const uint8_t aeMode = OHOS_CAMERA_AE_MODE_OFF;
     AddAbilityEntry(OHOS_CONTROL_AE_MODE, &aeMode, 1);
-
-    std::vector<int32_t> fpsRanges;
-    fpsRanges.push_back(MIN_SUPPORT_DEFAULT_FPS);
-    fpsRanges.push_back(MAX_SUPPORT_DEFAULT_FPS);
-    AddAbilityEntry(OHOS_CONTROL_AE_TARGET_FPS_RANGE, fpsRanges.data(), fpsRanges.size());
-
-    AddAbilityEntry(OHOS_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES, fpsRanges.data(), fpsRanges.size());
 
     const uint8_t afMode = OHOS_CAMERA_AF_MODE_OFF;
     AddAbilityEntry(OHOS_CONTROL_AF_MODE, &afMode, 1);
@@ -150,6 +143,16 @@ void DMetadataProcessor::InitDcameraBaseAbility()
 
     const uint8_t deviceFocusModes = OHOS_CAMERA_FOCUS_MODE_AUTO;
     AddAbilityEntry(OHOS_ABILITY_DEVICE_AVAILABLE_FOCUSMODES, &deviceFocusModes, 1);
+    SetFpsRanges();
+}
+
+void DMetadataProcessor::SetFpsRanges()
+{
+    std::vector<int32_t> fpsRanges;
+    fpsRanges.push_back(MIN_SUPPORT_DEFAULT_FPS);
+    fpsRanges.push_back(MAX_SUPPORT_DEFAULT_FPS);
+    AddAbilityEntry(OHOS_CONTROL_AE_TARGET_FPS_RANGE, fpsRanges.data(), fpsRanges.size());
+    AddAbilityEntry(OHOS_CONTROL_AE_AVAILABLE_TARGET_FPS_RANGES, fpsRanges.data(), fpsRanges.size());
 }
 
 DCamRetCode DMetadataProcessor::InitDCameraDefaultAbilityKeys(const std::string &abilityInfo)
@@ -255,7 +258,7 @@ DCamRetCode DMetadataProcessor::AddAbilityEntry(uint32_t tag, const void *data, 
     }
 
     camera_metadata_item_t item;
-    int ret = Camera::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
+    int ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
     if (ret) {
         if (!dCameraAbility_->addEntry(tag, data, size)) {
             DHLOGE("Add tag %u failed.", tag);
@@ -273,7 +276,7 @@ DCamRetCode DMetadataProcessor::UpdateAbilityEntry(uint32_t tag, const void *dat
     }
 
     camera_metadata_item_t item;
-    int ret = Camera::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
+    int ret = OHOS::Camera::FindCameraMetadataItem(dCameraAbility_->get(), tag, &item);
     if (ret) {
         if (!dCameraAbility_->addEntry(tag, data, size)) {
             DHLOGE("Add tag %u failed.", tag);
@@ -385,18 +388,19 @@ void DMetadataProcessor::UpdateResultMetadata(const uint64_t &resultTimestamp)
 }
 
 void DMetadataProcessor::SetResultCallback(
-    std::function<void(uint64_t, std::shared_ptr<Camera::CameraMetadata>)> &resultCbk)
+    std::function<void(uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)> &resultCbk)
 {
     resultCallback_ = resultCbk;
 }
 
 void DMetadataProcessor::UpdateAllResult(const uint64_t &resultTimestamp)
 {
-    uint32_t itemCap = Camera::GetCameraMetadataItemCapacity(latestProducerMetadataResult_->get());
-    uint32_t dataSize = Camera::GetCameraMetadataDataSize(latestProducerMetadataResult_->get());
+    uint32_t itemCap = OHOS::Camera::GetCameraMetadataItemCapacity(latestProducerMetadataResult_->get());
+    uint32_t dataSize = OHOS::Camera::GetCameraMetadataDataSize(latestProducerMetadataResult_->get());
     DHLOGD("DMetadataProcessor::UpdateAllResult itemCapacity: %u, dataSize: %u", itemCap, dataSize);
-    std::shared_ptr<Camera::CameraMetadata> result = std::make_shared<Camera::CameraMetadata>(itemCap, dataSize);
-    int32_t ret = Camera::CopyCameraMetadataItems(result->get(), latestProducerMetadataResult_->get());
+    std::shared_ptr<OHOS::Camera::CameraMetadata> result =
+        std::make_shared<OHOS::Camera::CameraMetadata>(itemCap, dataSize);
+    int32_t ret = OHOS::Camera::CopyCameraMetadataItems(result->get(), latestProducerMetadataResult_->get());
     if (ret != CAM_META_SUCCESS) {
         DHLOGE("DMetadataProcessor::UpdateAllResult copy metadata item failed, ret: %d", ret);
         return;
@@ -407,17 +411,18 @@ void DMetadataProcessor::UpdateAllResult(const uint64_t &resultTimestamp)
 void DMetadataProcessor::UpdateOnChanged(const uint64_t &resultTimestamp)
 {
     bool needReturn = false;
-    uint32_t itemCap = Camera::GetCameraMetadataItemCapacity(latestProducerMetadataResult_->get());
-    uint32_t dataSize = Camera::GetCameraMetadataDataSize(latestProducerMetadataResult_->get());
+    uint32_t itemCap = OHOS::Camera::GetCameraMetadataItemCapacity(latestProducerMetadataResult_->get());
+    uint32_t dataSize = OHOS::Camera::GetCameraMetadataDataSize(latestProducerMetadataResult_->get());
     DHLOGD("DMetadataProcessor::UpdateOnChanged itemCapacity: %u, dataSize: %u", itemCap, dataSize);
-    std::shared_ptr<Camera::CameraMetadata> result = std::make_shared<Camera::CameraMetadata>(itemCap, dataSize);
+    std::shared_ptr<OHOS::Camera::CameraMetadata> result =
+        std::make_shared<OHOS::Camera::CameraMetadata>(itemCap, dataSize);
     DHLOGD("DMetadataProcessor::UpdateOnChanged enabledResultSet size: %d", enabledResultSet_.size());
     for (auto tag : enabledResultSet_) {
         DHLOGD("DMetadataProcessor::UpdateOnChanged cameta device metadata tag: %d", tag);
         camera_metadata_item_t item;
         camera_metadata_item_t anoItem;
-        int ret1 = Camera::FindCameraMetadataItem(latestProducerMetadataResult_->get(), tag, &item);
-        int ret2 = Camera::FindCameraMetadataItem(latestConsumerMetadataResult_->get(), tag, &anoItem);
+        int ret1 = OHOS::Camera::FindCameraMetadataItem(latestProducerMetadataResult_->get(), tag, &item);
+        int ret2 = OHOS::Camera::FindCameraMetadataItem(latestConsumerMetadataResult_->get(), tag, &anoItem);
         DHLOGD("DMetadataProcessor::UpdateOnChanged find metadata item ret: %d, %d", ret1, ret2);
         if (ret1 != CAM_META_SUCCESS) {
             continue;
@@ -460,13 +465,13 @@ DCamRetCode DMetadataProcessor::SaveResultMetadata(std::string resultStr)
     std::string metadataStr = Base64Decode(resultStr);
     std::lock_guard<std::mutex> autoLock(producerMutex_);
     latestConsumerMetadataResult_ = latestProducerMetadataResult_;
-    latestProducerMetadataResult_ = Camera::MetadataUtils::DecodeFromString(metadataStr);
+    latestProducerMetadataResult_ = OHOS::Camera::MetadataUtils::DecodeFromString(metadataStr);
     if (latestProducerMetadataResult_ == nullptr) {
         DHLOGE("Failed to decode metadata setting from string.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    if (!Camera::GetCameraMetadataItemCount(latestProducerMetadataResult_->get())) {
+    if (!OHOS::Camera::GetCameraMetadataItemCount(latestProducerMetadataResult_->get())) {
         DHLOGE("Input result metadata item is empty.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
@@ -482,7 +487,7 @@ DCamRetCode DMetadataProcessor::SaveResultMetadata(std::string resultStr)
         return SUCCESS;
     }
 
-    camera_metadata_item_entry_t* itemEntry = Camera::GetMetadataItems(latestProducerMetadataResult_->get());
+    camera_metadata_item_entry_t* itemEntry = OHOS::Camera::GetMetadataItems(latestProducerMetadataResult_->get());
     uint32_t count = latestProducerMetadataResult_->get()->item_count;
     for (uint32_t i = 0; i < count; i++, itemEntry++) {
         enabledResultSet_.insert((MetaType)(itemEntry->item));
@@ -492,9 +497,9 @@ DCamRetCode DMetadataProcessor::SaveResultMetadata(std::string resultStr)
 }
 
 void DMetadataProcessor::ConvertToCameraMetadata(common_metadata_header_t *&input,
-    std::shared_ptr<Camera::CameraMetadata> &output)
+    std::shared_ptr<OHOS::Camera::CameraMetadata> &output)
 {
-    auto ret = Camera::CopyCameraMetadataItems(output->get(), input);
+    auto ret = OHOS::Camera::CopyCameraMetadataItems(output->get(), input);
     if (ret != CAM_META_SUCCESS) {
         DHLOGE("Failed to copy the old metadata to new metadata.");
         output = nullptr;
@@ -505,9 +510,9 @@ void DMetadataProcessor::ResizeMetadataHeader(common_metadata_header_t *&header,
     uint32_t itemCapacity, uint32_t dataCapacity)
 {
     if (header) {
-        Camera::FreeCameraMetadataBuffer(header);
+        OHOS::Camera::FreeCameraMetadataBuffer(header);
     }
-    header = Camera::AllocateCameraMetadataBuffer(itemCapacity, dataCapacity);
+    header = OHOS::Camera::AllocateCameraMetadataBuffer(itemCapacity, dataCapacity);
 }
 
 uint32_t DMetadataProcessor::GetDataSize(uint32_t type)
@@ -650,16 +655,16 @@ void DMetadataProcessor::PrintDCameraMetadata(const common_metadata_header_t *me
         return;
     }
 
-    uint32_t tagCount = Camera::GetCameraMetadataItemCount(metadata);
+    uint32_t tagCount = OHOS::Camera::GetCameraMetadataItemCount(metadata);
     DHLOGD("DMetadataProcessor::PrintDCameraMetadata, input metadata item count = %d.", tagCount);
     for (uint32_t i = 0; i < tagCount; i++) {
         camera_metadata_item_t item;
-        int ret = Camera::GetCameraMetadataItem(metadata, i, &item);
+        int ret = OHOS::Camera::GetCameraMetadataItem(metadata, i, &item);
         if (ret != 0) {
             continue;
         }
 
-        const char *name = Camera::GetCameraMetadataItemName(item.item);
+        const char *name = OHOS::Camera::GetCameraMetadataItemName(item.item);
         if (item.data_type == META_TYPE_BYTE) {
             for (size_t k = 0; k < item.count; k++) {
                 DHLOGI("tag index:%d, name:%s, value:%d", item.index, name, (uint8_t)(item.data.u8[k]));

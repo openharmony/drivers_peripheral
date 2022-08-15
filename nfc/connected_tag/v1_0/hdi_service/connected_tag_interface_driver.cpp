@@ -84,10 +84,10 @@ static struct HdfDriverEntry g_nfchdiDriverEntry = {
     .Release = HdfNfcHdiDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_nfchdiDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */

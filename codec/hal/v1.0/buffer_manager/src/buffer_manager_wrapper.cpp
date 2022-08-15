@@ -29,52 +29,52 @@ static bool IsInputDataBufferReadyImpl(struct BufferManagerWrapper *bufferManage
         return false;
     }
 
-    InputInfo *buffer =
-        ((BufferManager<InputInfo>*)(bufferManagerWrapper->inputBufferManager))->GetBuffer(timeoutMs, true);
+    CodecBuffer *buffer =
+        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->GetBuffer(timeoutMs, true);
     return (buffer != nullptr);
 }
 
-static InputInfo* GetInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
+static CodecBuffer* GetInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
 {
     if (bufferManagerWrapper == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return nullptr;
     }
 
-    InputInfo *buffer =
-        ((BufferManager<InputInfo>*)(bufferManagerWrapper->inputBufferManager))->GetBuffer(timeoutMs, false);
+    CodecBuffer *buffer =
+        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->GetBuffer(timeoutMs, false);
     return buffer;
 }
 
-static InputInfo* GetUsedInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
+static CodecBuffer* GetUsedInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
 {
     if (bufferManagerWrapper == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return nullptr;
     }
 
-    InputInfo *buffer =
-        ((BufferManager<InputInfo>*)(bufferManagerWrapper->inputBufferManager))->GetUsedBuffer(timeoutMs, false);
+    CodecBuffer *buffer =
+        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->GetUsedBuffer(timeoutMs, false);
     return buffer;
 }
 
-static void PutInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, InputInfo *info)
+static void PutInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
 {
     if (bufferManagerWrapper == nullptr || info == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return;
     }
 
-    ((BufferManager<InputInfo>*)(bufferManagerWrapper->inputBufferManager))->PutBuffer(info);
+    ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->PutBuffer(info);
 }
 
-static void PutUsedInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, InputInfo *info)
+static void PutUsedInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
 {
     if (bufferManagerWrapper == nullptr || info == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return;
     }
-    ((BufferManager<InputInfo>*)(bufferManagerWrapper->inputBufferManager))->PutUsedBuffer(info);
+    ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->PutUsedBuffer(info);
 }
 
 static bool IsUsedOutputDataBufferReadyImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
@@ -84,52 +84,52 @@ static bool IsUsedOutputDataBufferReadyImpl(struct BufferManagerWrapper *bufferM
         return false;
     }
 
-    OutputInfo *buffer =
-        ((BufferManager<OutputInfo>*)(bufferManagerWrapper->outputBufferManager))->GetUsedBuffer(timeoutMs, true);
+    CodecBuffer *buffer =
+        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->outputBufferManager))->GetUsedBuffer(timeoutMs, true);
     return (buffer != nullptr);
 }
 
-static OutputInfo* GetOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
+static CodecBuffer* GetOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
 {
     if (bufferManagerWrapper == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return nullptr;
     }
 
-    OutputInfo *buffer =
-        ((BufferManager<OutputInfo>*)(bufferManagerWrapper->outputBufferManager))->GetBuffer(timeoutMs, false);
+    CodecBuffer *buffer =
+        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->outputBufferManager))->GetBuffer(timeoutMs, false);
     return buffer;
 }
 
-static OutputInfo* GetUsedOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
+static CodecBuffer* GetUsedOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
 {
     if (bufferManagerWrapper == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return nullptr;
     }
 
-    OutputInfo *buffer =
-        ((BufferManager<OutputInfo>*)(bufferManagerWrapper->outputBufferManager))->GetUsedBuffer(timeoutMs, false);
+    CodecBuffer *buffer =
+        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->outputBufferManager))->GetUsedBuffer(timeoutMs, false);
     return buffer;
 }
 
-static void PutOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, OutputInfo *info)
+static void PutOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
 {
     if (bufferManagerWrapper == nullptr || info == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return;
     }
 
-    ((BufferManager<OutputInfo>*)(bufferManagerWrapper->outputBufferManager))->PutBuffer(info);
+    ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->outputBufferManager))->PutBuffer(info);
 }
 
-static void PutUsedOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, OutputInfo *info)
+static void PutUsedOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
 {
     if (bufferManagerWrapper == nullptr || info == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return;
     }
-    ((BufferManager<OutputInfo>*)(bufferManagerWrapper->outputBufferManager))->PutUsedBuffer(info);
+    ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->outputBufferManager))->PutUsedBuffer(info);
 }
 
 static void ConstructBufferManager(struct BufferManagerWrapper *bufferManager)
@@ -149,16 +149,16 @@ static void ConstructBufferManager(struct BufferManagerWrapper *bufferManager)
 struct BufferManagerWrapper* GetBufferManager(void)
 {
     struct BufferManagerWrapper *bufferManager = new struct BufferManagerWrapper;
-    bufferManager->inputBufferManager = new BufferManager<InputInfo>();
-    bufferManager->outputBufferManager = new BufferManager<OutputInfo>();
+    bufferManager->inputBufferManager = new BufferManager<CodecBuffer>();
+    bufferManager->outputBufferManager = new BufferManager<CodecBuffer>();
     ConstructBufferManager(bufferManager);
     return bufferManager;
 }
 
 void DeleteBufferManager(struct BufferManagerWrapper **ppBufferManager)
 {
-    delete (BufferManager<InputInfo>*)((*ppBufferManager)->inputBufferManager);
-    delete (BufferManager<OutputInfo>*)((*ppBufferManager)->outputBufferManager);
+    delete (BufferManager<CodecBuffer>*)((*ppBufferManager)->inputBufferManager);
+    delete (BufferManager<CodecBuffer>*)((*ppBufferManager)->outputBufferManager);
     delete *ppBufferManager;
 }
 

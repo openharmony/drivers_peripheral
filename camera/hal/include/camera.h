@@ -29,6 +29,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <string>
+#include "camera_metadata_info.h"
 
 #ifdef HITRACE_LOG_ENABLED
 #include "hitrace.h"
@@ -66,6 +67,10 @@ namespace Camera {
 
 constexpr uint32_t FRAME_SIZE_TAG_UINT32 = 100;
 const std::string FRAME_SIZE_TAG_STRING = "FRAME_SIZE";
+
+using CameraAbility = CameraMetadata;
+using CameraSetting = CameraMetadata;
+using MetaType = int32_t;
 
 using RetCode = uint32_t;
 enum Ret : uint32_t {

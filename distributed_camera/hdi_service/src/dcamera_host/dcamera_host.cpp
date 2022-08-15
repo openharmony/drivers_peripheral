@@ -14,18 +14,25 @@
  */
 
 #include "dcamera_host.h"
+
 #include "anonymous_string.h"
 #include "distributed_hardware_log.h"
+#include "metadata_utils.h"
 
 namespace OHOS {
 namespace DistributedHardware {
-std::shared_ptr<DCameraHost> DCameraHost::instance_ = nullptr;
+OHOS::sptr<DCameraHost> DCameraHost::instance_ = nullptr;
 DCameraHost::AutoRelease DCameraHost::autoRelease_;
 
-std::shared_ptr<DCameraHost> DCameraHost::GetInstance()
+extern "C" ICameraHost *CameraHostImplGetInstance(void)
+{
+    return static_cast<ICameraHost *>(DCameraHost::GetInstance().GetRefPtr());
+}
+
+OHOS::sptr<DCameraHost> DCameraHost::GetInstance()
 {
     if (instance_ == nullptr) {
-        instance_ = std::make_shared<DCameraHost>();
+        instance_ = new DCameraHost();
         if (instance_ == nullptr) {
             DHLOGE("Get distributed camera host instance failed.");
             return nullptr;
@@ -34,17 +41,17 @@ std::shared_ptr<DCameraHost> DCameraHost::GetInstance()
     return instance_;
 }
 
-CamRetCode DCameraHost::SetCallback(const OHOS::sptr<ICameraHostCallback> &callback)
+int32_t DCameraHost::SetCallback(const sptr<ICameraHostCallback> &callbackObj)
 {
-    if (callback == nullptr) {
+    if (callbackObj == nullptr) {
         DHLOGE("DCameraHost::SetCallback, camera host callback is null.");
         return CamRetCode::INVALID_ARGUMENT;
     }
-    dCameraHostCallback_ = callback;
+    dCameraHostCallback_ = callbackObj;
     return CamRetCode::NO_ERROR;
 }
 
-CamRetCode DCameraHost::GetCameraIds(std::vector<std::string> &cameraIds)
+int32_t DCameraHost::GetCameraIds(std::vector<std::string> &cameraIds)
 {
     auto iter = dhBaseHashDCamIdMap_.begin();
     while (iter != dhBaseHashDCamIdMap_.end()) {
@@ -56,8 +63,7 @@ CamRetCode DCameraHost::GetCameraIds(std::vector<std::string> &cameraIds)
     return CamRetCode::NO_ERROR;
 }
 
-CamRetCode DCameraHost::GetCameraAbility(const std::string &cameraId,
-    std::shared_ptr<CameraAbility> &ability)
+int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<uint8_t> &cameraAbility)
 {
     DHLOGE("DCameraHost::GetCameraAbility for cameraId: %s", GetAnonyString(cameraId).c_str());
 
@@ -67,14 +73,24 @@ CamRetCode DCameraHost::GetCameraAbility(const std::string &cameraId,
     }
 
     auto iter = dCameraDeviceMap_.find(cameraId);
-    CamRetCode retCode = (iter->second)->GetDCameraAbility(ability);
+    std::shared_ptr<CameraAbility> ability = nullptr;
+    int32_t ret = (iter->second)->GetDCameraAbility(ability);
+    if (ret != CamRetCode::NO_ERROR) {
+        DHLOGE("DCameraHost::GetCameraAbility, GetDCameraAbility failed, ret: %d.", ret);
+        return ret;
+    }
+    bool retBool = OHOS::Camera::MetadataUtils::ConvertMetadataToVec(ability, cameraAbility);
+    if (!retBool) {
+        DHLOGE("DCameraHost::GetCameraAbility, ConvertMetadataToVec failed.");
+        return CamRetCode::INVALID_ARGUMENT;
+    }
 
     do {
         camera_metadata_item_t item;
         constexpr uint32_t WIDTH_OFFSET = 1;
         constexpr uint32_t HEIGHT_OFFSET = 2;
         constexpr uint32_t UNIT_LENGTH = 3;
-        int32_t ret = Camera::FindCameraMetadataItem(ability->get(),
+        int32_t ret = OHOS::Camera::FindCameraMetadataItem(ability->get(),
             OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &item);
         DHLOGI("FindCameraMetadataItem item=%u, count=%u, dataType=%u", item.item, item.count, item.data_type);
         if (ret != CAM_META_SUCCESS) {
@@ -92,17 +108,15 @@ CamRetCode DCameraHost::GetCameraAbility(const std::string &cameraId,
             DHLOGD("format: %d, width: %d, height: %d", format, width, height);
         }
     } while (0);
-
-    return retCode;
+    return CamRetCode::NO_ERROR;
 }
 
-CamRetCode DCameraHost::OpenCamera(const std::string &cameraId,
-    const OHOS::sptr<ICameraDeviceCallback> &callback,
-    OHOS::sptr<ICameraDevice> &pDevice)
+int32_t DCameraHost::OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
+    sptr<ICameraDevice> &device)
 {
     DHLOGI("DCameraHost::OpenCamera for cameraId: %s", GetAnonyString(cameraId).c_str());
 
-    if (IsCameraIdInvalid(cameraId) || callback == nullptr) {
+    if (IsCameraIdInvalid(cameraId) || callbackObj == nullptr) {
         DHLOGE("DCameraHost::OpenCamera, open camera id is empty or callback is null.");
         return CamRetCode::INVALID_ARGUMENT;
     }
@@ -124,18 +138,18 @@ CamRetCode DCameraHost::OpenCamera(const std::string &cameraId,
         return CamRetCode::CAMERA_BUSY;
     }
 
-    CamRetCode ret = dcameraDevice->OpenDCamera(callback);
+    CamRetCode ret = dcameraDevice->OpenDCamera(callbackObj);
     if (ret != CamRetCode::NO_ERROR) {
         DHLOGE("DCameraHost::OpenCamera, open camera failed.");
         return ret;
     }
-    pDevice = dcameraDevice;
+    device = dcameraDevice;
 
     DHLOGI("DCameraHost::OpenCamera, open camera %s success.", GetAnonyString(cameraId).c_str());
     return CamRetCode::NO_ERROR;
 }
 
-CamRetCode DCameraHost::SetFlashlight(const std::string &cameraId,  bool &isEnable)
+int32_t DCameraHost::SetFlashlight(const std::string &cameraId, bool isEnable)
 {
     (void)cameraId;
     (void)isEnable;

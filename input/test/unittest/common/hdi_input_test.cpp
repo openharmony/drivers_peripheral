@@ -63,7 +63,7 @@ void HdiInputTest::SetUpTestCase()
     g_callback.EventPkgCallback = ReportEventPkgCallback;
     g_hotplugCb.HotPlugCallback = ReportHotPlugEventPkgCallback;
     ret = g_inputInterface->iInputManager->ScanInputDevice(sta, MAX_DEVICES);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: scan device failed, ret %d", __func__, ret);
     }
     for (int32_t i = 0; i < MAX_DEVICES; i++) {
@@ -114,22 +114,22 @@ static void ReportHotPlugEventPkgCallback(const InputHotPlugEvent *msg)
 
     if (msg->status == 0) {
         ret = g_inputInterface->iInputManager->OpenInputDevice(msg->devIndex);
-        if (ret) {
+        if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: open device[%u] failed, ret %d", __func__, msg->devIndex, ret);
         }
 
         ret  = g_inputInterface->iInputReporter->RegisterReportCallback(msg->devIndex, &g_callback);
-        if (ret) {
+        if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: register callback failed for device[%d], ret %d", __func__, msg->devIndex, ret);
         }
     } else {
         ret = g_inputInterface->iInputReporter->UnregisterReportCallback(msg->devIndex);
-        if (ret) {
+        if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: unregister callback failed, ret %d", __func__, ret);
         }
 
         ret = g_inputInterface->iInputManager->CloseInputDevice(msg->devIndex);
-        if (ret) {
+        if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: close device failed, ret %d", __func__, ret);
         }
     }
@@ -138,7 +138,7 @@ static void ReportHotPlugEventPkgCallback(const InputHotPlugEvent *msg)
 static void OpenOnlineDev(InputDevDesc *sta, int32_t len)
 {
     int32_t ret = g_inputInterface->iInputManager->ScanInputDevice(sta, len);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: scan device failed, ret %d", __func__, ret);
     }
     ASSERT_EQ(ret, INPUT_SUCCESS);
@@ -148,13 +148,13 @@ static void OpenOnlineDev(InputDevDesc *sta, int32_t len)
             break;
         }
         ret = g_inputInterface->iInputManager->OpenInputDevice(sta[i].devIndex);
-        if (ret) {
+        if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: open device[%d] failed, ret %d", __func__, sta[i].devIndex, ret);
         }
         ASSERT_EQ(ret, INPUT_SUCCESS);
 
         ret  = g_inputInterface->iInputReporter->RegisterReportCallback(sta[i].devIndex, &g_callback);
-        if (ret) {
+        if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: register callback failed for device[%d], ret %d", __func__, sta[i].devIndex, ret);
         }
         ASSERT_EQ(ret, INPUT_SUCCESS);
@@ -164,7 +164,7 @@ static void OpenOnlineDev(InputDevDesc *sta, int32_t len)
 static void CloseOnlineDev(InputDevDesc *sta, int32_t len)
 {
     int32_t ret = g_inputInterface->iInputManager->ScanInputDevice(sta, len);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: scan device failed, ret %d", __func__, ret);
     }
     ASSERT_EQ(ret, INPUT_SUCCESS);
@@ -174,13 +174,13 @@ static void CloseOnlineDev(InputDevDesc *sta, int32_t len)
             break;
         }
         ret = g_inputInterface->iInputReporter->UnregisterReportCallback(sta[i].devIndex);
-        if (ret) {
+        if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: register callback failed for device[%d], ret %d", __func__, sta[i].devIndex, ret);
         }
         ASSERT_EQ(ret, INPUT_SUCCESS);
 
         ret = g_inputInterface->iInputManager->CloseInputDevice(sta[i].devIndex);
-        if (ret) {
+        if (ret != INPUT_SUCCESS) {
             HDF_LOGE("%s: close device[%d] failed, ret %d", __func__, sta[i].devIndex, ret);
         }
         ASSERT_EQ(ret, INPUT_SUCCESS);
@@ -221,7 +221,7 @@ HWTEST_F(HdiInputTest, HotPlugCallback, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
 
     ret = g_inputInterface->iInputReporter->RegisterHotPlugCallback(&g_hotplugCb);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: register hotplug callback failed for device manager, ret %d", __func__, ret);
     }
     ASSERT_EQ(ret, INPUT_SUCCESS);
@@ -240,7 +240,7 @@ HWTEST_F(HdiInputTest, HotPlugCallback, TestSize.Level1)
     CloseOnlineDev(sta, MAX_DEVICES);
 
     ret = g_inputInterface->iInputReporter->UnregisterHotPlugCallback();
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: unregister hotplug callback failed for device manager, ret %d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -259,7 +259,7 @@ HWTEST_F(HdiInputTest, OpenInputDev001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     int32_t ret = g_inputInterface->iInputManager->OpenInputDevice(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: open device1 failed, ret %d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -279,7 +279,7 @@ HWTEST_F(HdiInputTest, OpenInputDevice002, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     /* Device "5" is used for testing nonexistent device node */
     int32_t ret = g_inputInterface->iInputManager->OpenInputDevice(INVALID_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: device5 dose not exist, can't open it, ret %d", __func__, ret);
     }
     EXPECT_NE(ret, INPUT_SUCCESS);
@@ -298,7 +298,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     int32_t ret = g_inputInterface->iInputManager->CloseInputDevice(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: close device1 failed, ret %d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -318,7 +318,7 @@ HWTEST_F(HdiInputTest, CloseInputDevice002, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     /* Device "5" is used for testing nonexistent device node */
     int32_t ret = g_inputInterface->iInputManager->CloseInputDevice(INVALID_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: device5 doesn't exist, can't close it, ret %d", __func__, ret);
     }
     EXPECT_NE(ret, INPUT_SUCCESS);
@@ -339,13 +339,13 @@ HWTEST_F(HdiInputTest, GetInputDevice001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
 
     int32_t ret = g_inputInterface->iInputManager->OpenInputDevice(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: open device1 failed, ret %d", __func__, ret);
     }
     ASSERT_EQ(ret, INPUT_SUCCESS);
 
     ret = g_inputInterface->iInputManager->GetInputDevice(TOUCH_INDEX, &dev);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1 failed, ret %d", __func__, ret);
     }
 
@@ -373,7 +373,7 @@ HWTEST_F(HdiInputTest, GetInputDeviceList001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputManager->GetInputDeviceList(&num, dev, MAX_INPUT_DEV_NUM);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device list failed, ret %d", __func__, ret);
     }
     ret = num <= MAX_INPUT_DEV_NUM ? HDF_SUCCESS : HDF_FAILURE;  /* num <= MAX_INPUT_DEV_NUM return true */
@@ -406,7 +406,7 @@ HWTEST_F(HdiInputTest, GetDeviceType001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputController->GetDeviceType(TOUCH_INDEX, &devType);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's type failed, ret %d", __func__, ret);
     }
     HDF_LOGI("%s: device1's type is %u", __func__, devType);
@@ -429,7 +429,7 @@ HWTEST_F(HdiInputTest, GetChipInfo001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputController->GetChipInfo(TOUCH_INDEX, chipInfo, CHIP_INFO_LEN);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's chip info failed, ret %d", __func__, ret);
     }
     HDF_LOGI("%s: device1's chip info is %s", __func__, chipInfo);
@@ -452,7 +452,7 @@ HWTEST_F(HdiInputTest, GetInputDevice002, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputManager->GetInputDevice(TOUCH_INDEX, &dev);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1 failed, ret %d", __func__, ret);
     }
 
@@ -480,7 +480,7 @@ HWTEST_F(HdiInputTest, RegisterCallback001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
     /* Device "5" is used for testing nonexistent device node */
     ret  = g_inputInterface->iInputReporter->RegisterReportCallback(INVALID_INDEX, &g_callback);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: device2 dose not exist, can't register callback to it, ret %d", __func__, ret);
     }
     EXPECT_NE(ret, INPUT_SUCCESS);
@@ -502,7 +502,7 @@ HWTEST_F(HdiInputTest, SetPowerStatus001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputController->SetPowerStatus(TOUCH_INDEX, setStatus);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: set device1's power status failed, ret %d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -525,7 +525,7 @@ HWTEST_F(HdiInputTest, SetPowerStatus002, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     /* Device "5" is used for testing nonexistent device node */
     ret = g_inputInterface->iInputController->SetPowerStatus(INVALID_INDEX, setStatus);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: set device5's power status failed, ret %d", __func__, ret);
     }
     EXPECT_NE(ret, INPUT_SUCCESS);
@@ -547,7 +547,7 @@ HWTEST_F(HdiInputTest, GetPowerStatus001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputController->GetPowerStatus(TOUCH_INDEX, &getStatus);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's power status failed, ret %d", __func__, ret);
     }
     HDF_LOGI("%s: device1's power status is %d:", __func__, getStatus);
@@ -571,7 +571,7 @@ HWTEST_F(HdiInputTest, GetPowerStatus002, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     /* Device "5" is used for testing nonexistent device node */
     ret = g_inputInterface->iInputController->GetPowerStatus(INVALID_INDEX, &getStatus);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device5's power status failed, ret %d", __func__, ret);
     }
     EXPECT_NE(ret, INPUT_SUCCESS);
@@ -593,7 +593,7 @@ HWTEST_F(HdiInputTest, GetVendorName001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputController->GetVendorName(TOUCH_INDEX, vendorName, NAME_MAX_LEN);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's vendor name failed, ret %d", __func__, ret);
     }
     HDF_LOGI("%s: device1's vendor name is %s:", __func__, vendorName);
@@ -617,7 +617,7 @@ HWTEST_F(HdiInputTest, GetVendorName002, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     /* Device "5" is used for testing nonexistent device node */
     ret = g_inputInterface->iInputController->GetVendorName(INVALID_INDEX, vendorName, NAME_MAX_LEN);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device5's vendor name failed, ret %d", __func__, ret);
     }
     EXPECT_NE(ret, INPUT_SUCCESS);
@@ -639,7 +639,7 @@ HWTEST_F(HdiInputTest, GetChipName001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputController->GetChipName(TOUCH_INDEX, chipName, NAME_MAX_LEN);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's chip name failed, ret %d", __func__, ret);
     }
     HDF_LOGI("%s: device1's chip name is %s", __func__, chipName);
@@ -663,7 +663,7 @@ HWTEST_F(HdiInputTest, GetChipName002, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     /* Device "5" is used for testing nonexistent device node */
     ret = g_inputInterface->iInputController->GetChipName(INVALID_INDEX, chipName, NAME_MAX_LEN);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device5's chip name failed, ret %d", __func__, ret);
     }
     EXPECT_NE(ret, INPUT_SUCCESS);
@@ -685,7 +685,7 @@ HWTEST_F(HdiInputTest, SetGestureMode001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputController->SetGestureMode(TOUCH_INDEX, gestureMode);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's gestureMode failed, ret %d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -708,7 +708,7 @@ HWTEST_F(HdiInputTest, SetGestureMode002, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     /* Device "5" is used for testing nonexistent device node */
     ret = g_inputInterface->iInputController->SetGestureMode(INVALID_INDEX, gestureMode);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's gestureMode failed, ret %d", __func__, ret);
     }
     EXPECT_NE(ret, INPUT_SUCCESS);
@@ -731,7 +731,7 @@ HWTEST_F(HdiInputTest, RunCapacitanceTest001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputController->RunCapacitanceTest(TOUCH_INDEX, testType, result, TEST_RESULT_LEN);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's gestureMode failed, ret %d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -755,7 +755,7 @@ HWTEST_F(HdiInputTest, RunExtraCommand001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputController, INPUT_NULL_PTR);
     ret = g_inputInterface->iInputController->RunExtraCommand(TOUCH_INDEX, &extraCmd);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: get device1's gestureMode failed, ret %d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -777,7 +777,7 @@ HWTEST_F(HdiInputTest, RegisterCallbackAndReportData001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputReporter, INPUT_NULL_PTR);
 
     ret  = g_inputInterface->iInputReporter->RegisterReportCallback(TOUCH_INDEX, &g_callback);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: register callback failed for device 1, ret %d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
@@ -802,13 +802,13 @@ HWTEST_F(HdiInputTest, UnregisterReportCallback001, TestSize.Level1)
     INPUT_CHECK_NULL_POINTER(g_inputInterface->iInputManager, INPUT_NULL_PTR);
 
     ret  = g_inputInterface->iInputReporter->UnregisterReportCallback(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: unregister callback failed for device1, ret %d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
 
     ret = g_inputInterface->iInputManager->CloseInputDevice(TOUCH_INDEX);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: close device1 failed, ret %d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);

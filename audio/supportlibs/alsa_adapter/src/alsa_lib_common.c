@@ -14,87 +14,30 @@
  */
 
 #include "alsa_lib_common.h"
-#include "osal_mem.h"
+#include <ctype.h>
+#include <limits.h>
+#include "audio_common.h"
 #include "audio_internal.h"
+#include "cJSON.h"
+#include "osal_mem.h"
+#include "securec.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 
+#define USB_AUDIO "USB Audio"
+
+#define MAX_ELEMENT           100
+#define ALSA_CARD_CONFIG_FILE HDF_CONFIG_DIR "/alsa_adapter.json"
+#define ALSA_CONFIG_FILE_MAX  (2 * 1024) // 2KB
+
+struct CardStream {
+    int card;
+    snd_pcm_stream_t stream; /** Playback stream or Capture stream */
+};
+
 static struct AudioCardInfo *g_audioCardIns = NULL;
-struct AlsaDevInfo *g_alsadevInfo           = NULL;
-
-struct DevProcInfo g_speakerOutName[] = {
-    {"realtekrt5616c", NULL},
-    {"realtekrt5651co", "rt5651-aif1"},
-    {"realtekrt5670c", NULL},
-    {"realtekrt5672c", NULL},
-    {"realtekrt5678co", NULL},
-    {"rkhdmianalogsnd", NULL},
-    {"rockchipcx2072x", NULL},
-    {"rockchipes8316c", NULL},
-    {"rockchipes8323c", NULL},
-    {"rockchipes8388c", NULL},
-    {"rockchipes8396c", NULL},
-    {"rockchiprk", NULL},
-    {"rockchiprk809co", NULL},
-    {"rockchiprk817co", NULL},
-    {"rockchiprt5640c", "rt5640-aif1"},
-    {"rockchiprt5670c", NULL},
-    {"rockchiprt5672c", NULL},
-    {NULL, NULL}
-};
-
-struct DevProcInfo g_hdmiOutName[] = {
-    {"realtekrt5651co", "i2s-hifi"},
-    {"realtekrt5670co", "i2s-hifi"},
-    {"rkhdmidpsound", NULL},
-    {"hdmisound", NULL},
-    {"rockchiphdmi", NULL},
-    {"rockchiprt5640c", "i2s-hifi"},
-    {NULL, NULL}
-};
-
-struct DevProcInfo g_SPDIFOutName[] = {
-    {"ROCKCHIPSPDIF", "dit-hifi"},
-    {"rockchipspdif", NULL},
-    {"rockchipcdndp", NULL},
-    {NULL, NULL}
-};
-
-struct DevProcInfo g_BTOutName[] = {
-    {"rockchipbt", NULL},
-    {NULL, NULL}
-};
-
-struct DevProcInfo g_micInName[] = {
-    {"realtekrt5616c", NULL},
-    {"realtekrt5651co", "rt5651-aif1"},
-    {"realtekrt5670c", NULL},
-    {"realtekrt5672c", NULL},
-    {"realtekrt5678co", NULL},
-    {"rockchipes8316c", NULL},
-    {"rockchipes8323c", NULL},
-    {"rockchipes8396c", NULL},
-    {"rockchipes7210", NULL},
-    {"rockchipes7243", NULL},
-    {"rockchiprk", NULL},
-    {"rockchiprk809co", NULL},
-    {"rockchiprk817co", NULL},
-    {"rockchiprt5640c", NULL},
-    {"rockchiprt5670c", NULL},
-    {"rockchiprt5672c", NULL},
-    {NULL, NULL}
-};
-
-struct DevProcInfo HdmiInName[] = {
-    {"realtekrt5651co", "tc358749x-audio"},
-    {"hdmiin", NULL},
-    {NULL, NULL}
-};
-
-struct DevProcInfo BTInName[] = {
-    {"rockchipbt", NULL},
-    {NULL, NULL}
-};
+struct AlsaDevInfo *g_alsadevInfo = NULL;
+static bool g_parseFlag = false;
 
 char *g_usbVolCtlNameTable[] = {
     "Earpiece",
@@ -105,16 +48,17 @@ char *g_usbVolCtlNameTable[] = {
     "PCM",
 };
 
-struct CardStream {
-    int card;
-    snd_pcm_stream_t stream; /** Playback stream or Capture stream */
-};
+static struct DevProcInfo *g_sndCardList[SND_CARD_MAX][AUDIO_MAX_CARD_NUM] = {{NULL}};
+
+static struct DevProcInfo **AudioGetSoundCardsInfo(enum SndCardType cardType)
+{
+    return (struct DevProcInfo **)(g_sndCardList + cardType);
+}
 
 int32_t InitCardIns(void)
 {
     if (g_audioCardIns == NULL) {
-        g_audioCardIns = (struct AudioCardInfo *)OsalMemCalloc(MAX_CARD_NUM *
-            sizeof(struct AudioCardInfo));
+        g_audioCardIns = (struct AudioCardInfo *)OsalMemCalloc(MAX_CARD_NUM * sizeof(struct AudioCardInfo));
         if (g_audioCardIns == NULL) {
             AUDIO_FUNC_LOGE("Failed to allocate memory!");
             return HDF_FAILURE;
@@ -142,8 +86,7 @@ static struct AudioCardInfo *AddCardIns(const char *cardName)
     for (i = 0; i < MAX_CARD_NUM; i++) {
         if (g_audioCardIns[i].cardStatus == 0) {
             (void)memset_s(&g_audioCardIns[i], sizeof(struct AudioCardInfo), 0, sizeof(struct AudioCardInfo));
-            ret = strncpy_s(g_audioCardIns[i].cardName,
-                            MAX_CARD_NAME_LEN + 1, cardName, strlen(cardName));
+            ret = strncpy_s(g_audioCardIns[i].cardName, MAX_CARD_NAME_LEN + 1, cardName, strlen(cardName));
             if (ret != 0) {
                 AUDIO_FUNC_LOGE("strncpy_s failed!");
                 return NULL;
@@ -240,6 +183,19 @@ void CheckCardStatus(struct AudioCardInfo *cardIns)
     }
 }
 
+static void CardInfoRelease(void)
+{
+    for (int i = 0; i < SND_CARD_MAX; i++) {
+        for (int j = 0; j < AUDIO_MAX_CARD_NUM; j++) {
+            if (g_sndCardList[i][j] != NULL) {
+                AudioMemFree((void **)&(g_sndCardList[i][j]));
+                g_sndCardList[i][j] = NULL;
+            }
+        }
+    }
+    g_parseFlag = false;
+}
+
 int32_t DestroyCardList(void)
 {
     int32_t i;
@@ -253,13 +209,15 @@ int32_t DestroyCardList(void)
         }
         AudioMemFree((void **)&g_audioCardIns);
         g_audioCardIns = NULL;
+
+        /* Release the sound card configuration space */
+        CardInfoRelease();
     }
 
     return HDF_SUCCESS;
 }
 
-static int32_t GetDevIns(struct AudioCardInfo *cardIns,
-    int card, const char *cardId, int dev, const char *pcmInfoId)
+static int32_t GetDevIns(struct AudioCardInfo *cardIns, int card, const char *cardId, int dev, const char *pcmInfoId)
 {
     int32_t i;
     int32_t ret;
@@ -273,14 +231,12 @@ static int32_t GetDevIns(struct AudioCardInfo *cardIns,
         if (strlen(cardIns->alsaDevIns[i].cardId) == 0) {
             cardIns->alsaDevIns[i].card = card;
             cardIns->alsaDevIns[i].device = dev;
-            ret = strncpy_s(cardIns->alsaDevIns[i].cardId,
-                            MAX_CARD_NAME_LEN + 1, cardId, strlen(cardId));
+            ret = strncpy_s(cardIns->alsaDevIns[i].cardId, MAX_CARD_NAME_LEN + 1, cardId, strlen(cardId));
             if (ret != 0) {
                 AUDIO_FUNC_LOGE("strncpy_s failed!");
                 return HDF_FAILURE;
             }
-            ret = strncpy_s(cardIns->alsaDevIns[i].pcmInfoId,
-                            MAX_CARD_NAME_LEN + 1, pcmInfoId, strlen(pcmInfoId));
+            ret = strncpy_s(cardIns->alsaDevIns[i].pcmInfoId, MAX_CARD_NAME_LEN + 1, pcmInfoId, strlen(pcmInfoId));
             if (ret != 0) {
                 AUDIO_FUNC_LOGE("strncpy_s failed!");
                 return HDF_FAILURE;
@@ -358,13 +314,14 @@ void InitSound(snd_mixer_t **mixer, char *hwCtlName)
 
 struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
 {
+    (void)serviceName;
     /* Nothing to do */
     static struct HdfIoService hdfIoService;
     return &hdfIoService;
 }
 
-static void GetDevCardsInfo(snd_ctl_t *handle, snd_ctl_card_info_t *info,
-    snd_pcm_info_t *pcmInfo, struct AudioCardInfo *cardIns, struct CardStream cardStream)
+static void GetDevCardsInfo(snd_ctl_t *handle, snd_ctl_card_info_t *info, snd_pcm_info_t *pcmInfo,
+    struct AudioCardInfo *cardIns, struct CardStream cardStream)
 {
     int dev = -1;
     int32_t ret;
@@ -388,8 +345,8 @@ static void GetDevCardsInfo(snd_ctl_t *handle, snd_ctl_card_info_t *info,
         snd_pcm_info_set_stream(pcmInfo, cardStream.stream);
         if ((ret = snd_ctl_pcm_info(handle, pcmInfo)) < 0) {
             if (ret != -ENOENT) {
-                AUDIO_FUNC_LOGE("control digital audio info (%{public}d): %{public}s",
-                    cardStream.card, snd_strerror(ret));
+                AUDIO_FUNC_LOGE(
+                    "control digital audio info (%{public}d): %{public}s", cardStream.card, snd_strerror(ret));
             }
             continue;
         }
@@ -466,14 +423,12 @@ int32_t GetSelCardInfo(struct AudioCardInfo *cardIns, struct AlsaDevInfo *devIns
         return HDF_FAILURE;
     }
 
-    ret = snprintf_s(cardIns->devName, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1,
-        "hw:%d,%d", devInsHandle->card, devInsHandle->device);
+    ret = snprintf_s(cardIns->devName, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1, "hw:%d,%d", devInsHandle->card,
+        devInsHandle->device);
     if (ret >= 0) {
-        ret = snprintf_s(cardIns->ctrlName, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1,
-            "hw:%d", devInsHandle->card);
+        ret = snprintf_s(cardIns->ctrlName, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1, "hw:%d", devInsHandle->card);
         if (ret >= 0) {
-            ret = snprintf_s(cardIns->alsaCardId, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1,
-                "%s", devInsHandle->cardId);
+            ret = snprintf_s(cardIns->alsaCardId, MAX_CARD_NAME_LEN, MAX_CARD_NAME_LEN - 1, "%s", devInsHandle->cardId);
             if (ret >= 0) {
                 return HDF_SUCCESS;
             }
@@ -484,19 +439,57 @@ int32_t GetSelCardInfo(struct AudioCardInfo *cardIns, struct AlsaDevInfo *devIns
     return HDF_FAILURE;
 }
 
+static const char *MatchProfileSoundCard(struct DevProcInfo *cardInfo[], char *adapterName)
+{
+    if (cardInfo == NULL || adapterName == NULL) {
+        AUDIO_FUNC_LOGE("The parameter is empty.");
+        return NULL;
+    }
+
+    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) != 0) {
+        AUDIO_FUNC_LOGE("The user sound card name %{public}s is incorrect!", adapterName);
+        return NULL;
+    }
+
+    for (int i = 0; i < AUDIO_MAX_CARD_NUM; i++) {
+        if (cardInfo[i] != NULL) {
+            if (strncmp(cardInfo[i]->cardName, PRIMARY, strlen(PRIMARY)) == 0) {
+                return cardInfo[i]->cid;
+            }
+        }
+    }
+    AUDIO_FUNC_LOGE("No sound card selected by the user is matched from the configuration file.");
+
+    return NULL;
+}
+
 static int32_t GetPrimaryCardInfo(struct AudioCardInfo *cardIns)
 {
     int32_t i;
     int32_t ret;
+    const char *cardId = NULL;
+    struct DevProcInfo **cardInfoPri = NULL;
 
     if (cardIns == NULL) {
         AUDIO_FUNC_LOGE("The parameter is empty.");
         return HDF_FAILURE;
     }
 
+    cardInfoPri = AudioGetSoundCardsInfo(SND_CARD_PRIMARY);
+    if (cardInfoPri == NULL) {
+        AUDIO_FUNC_LOGE("The parameter is empty.");
+        return HDF_FAILURE;
+    }
+
+    cardId = MatchProfileSoundCard(cardInfoPri, cardIns->cardName);
+    if (cardId == NULL) {
+        AUDIO_FUNC_LOGE("get cardId is null.");
+        return HDF_FAILURE;
+    }
+
     for (i = 0; i < MAX_CARD_NUM; i++) {
         /** Built in codec */
-        if (strcmp(CODEC_CARD_ID, cardIns->alsaDevIns[i].cardId) == 0) {
+        if (strcmp(cardId, cardIns->alsaDevIns[i].cardId) == 0) {
             ret = GetSelCardInfo(cardIns, &cardIns->alsaDevIns[i]);
             if (ret != HDF_SUCCESS) {
                 AUDIO_FUNC_LOGE("GetSelCardInfo error.");
@@ -550,7 +543,7 @@ int32_t MatchSelAdapter(const char *adapterName, struct AudioCardInfo *cardIns)
     } else if (strncmp(adapterName, USB, strlen(USB)) == 0) {
         ret = GetUsbCardInfo(cardIns);
         if (ret < 0) {
-            AUDIO_FUNC_LOGE("GetPrimaryCardInfo error.");
+            AUDIO_FUNC_LOGE("GetUsbCardInfo error.");
             return HDF_FAILURE;
         }
     } else if (strncmp(adapterName, A2DP, strlen(A2DP)) == 0) {
@@ -578,8 +571,7 @@ snd_mixer_elem_t *AudioUsbFindElement(snd_mixer_t *mixer)
     }
 
     count = sizeof(g_usbVolCtlNameTable) / sizeof(char *);
-    for (element = snd_mixer_first_elem(mixer);
-         element != NULL && maxLoop >= 0;
+    for (element = snd_mixer_first_elem(mixer); element != NULL && maxLoop >= 0;
          element = snd_mixer_elem_next(element)) {
         for (i = 0; i < count; i++) {
             mixerCtlName = g_usbVolCtlNameTable[i];
@@ -637,8 +629,8 @@ int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *p
     return HDF_SUCCESS;
 }
 
-int32_t AudioMixerSetCtrlMode(struct AudioCardInfo *cardIns,
-    const char *adapterName, const char *mixerCtrlName, int numId, int item)
+int32_t AudioMixerSetCtrlMode(
+    struct AudioCardInfo *cardIns, const char *adapterName, const char *mixerCtrlName, int numId, int item)
 {
     int32_t ret;
     snd_ctl_t *alsaHandle = NULL;
@@ -745,37 +737,414 @@ int32_t CheckParaFormat(struct AudioPcmHwParams hwParams, snd_pcm_format_t *alsa
     if (!isBigEndian) {
         switch (audioFormat) {
             case AUDIO_FORMAT_PCM_8_BIT:
-                *alsaPcmFormat = SND_PCM_FORMAT_S8;    /** Signed 8 bit */
-                return HDF_SUCCESS;
+                *alsaPcmFormat = SND_PCM_FORMAT_S8; /** Signed 8 bit */
+                break;
             case AUDIO_FORMAT_PCM_16_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S16_LE; /** Signed 16 bit Little Endian */
-                return HDF_SUCCESS;
+                break;
             case AUDIO_FORMAT_PCM_24_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S24_LE; /** Signed 24 bit Little Endian */
-                return HDF_SUCCESS;
+                break;
             case AUDIO_FORMAT_PCM_32_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S32_LE; /** Signed 32 bit Little Endian */
-                return HDF_SUCCESS;
+                break;
             default:
                 return HDF_ERR_NOT_SUPPORT;
         }
     } else { /** Big Endian */
         switch (audioFormat) {
             case AUDIO_FORMAT_PCM_8_BIT:
-                *alsaPcmFormat = SND_PCM_FORMAT_S8;    /** Signed 8 bit */
-                return HDF_SUCCESS;
+                *alsaPcmFormat = SND_PCM_FORMAT_S8; /** Signed 8 bit */
+                break;
             case AUDIO_FORMAT_PCM_16_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S16_BE; /** Signed 16 bit Big Endian */
-                return HDF_SUCCESS;
+                break;
             case AUDIO_FORMAT_PCM_24_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S24_BE; /** Signed 24 bit Big Endian */
-                return HDF_SUCCESS;
+                break;
             case AUDIO_FORMAT_PCM_32_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S32_BE; /** Signed 32 bit Big Endian */
-                return HDF_SUCCESS;
+                break;
             default:
                 return HDF_ERR_NOT_SUPPORT;
         }
     }
+
+    return HDF_SUCCESS;
 }
 
+static char *AudioAdaptersGetConfig(const char *fpath)
+{
+    int32_t jsonStrSize;
+    FILE *fp = NULL;
+    char *pJsonStr = NULL;
+    char pathBuf[PATH_MAX] = {0};
+
+    if (fpath == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return NULL;
+    }
+    if (realpath(fpath, pathBuf) == NULL) {
+        AUDIO_FUNC_LOGE("file name invalid!");
+        return NULL;
+    }
+
+    fp = fopen(pathBuf, "r");
+    if (fp == NULL) {
+        AUDIO_FUNC_LOGE("Can not open config file [ %{public}s ].", fpath);
+        return NULL;
+    }
+    if (fseek(fp, 0, SEEK_END) != 0) {
+        AUDIO_FUNC_LOGE("fseek configuration file error!");
+        (void)fclose(fp);
+        return NULL;
+    }
+    jsonStrSize = ftell(fp);
+    if (jsonStrSize <= 0) {
+        AUDIO_FUNC_LOGE("The configuration file size error!");
+        (void)fclose(fp);
+        return NULL;
+    }
+    rewind(fp);
+    if (jsonStrSize > ALSA_CONFIG_FILE_MAX) {
+        AUDIO_FUNC_LOGE("The configuration file is too large to load!");
+        (void)fclose(fp);
+        return NULL;
+    }
+    pJsonStr = (char *)OsalMemCalloc((uint32_t)jsonStrSize + 1);
+    if (pJsonStr == NULL) {
+        AUDIO_FUNC_LOGE("calloc pJsonStr failed!");
+        (void)fclose(fp);
+        return NULL;
+    }
+    if (fread(pJsonStr, jsonStrSize, 1, fp) != 1) {
+        AUDIO_FUNC_LOGE("read to file fail!");
+        (void)fclose(fp);
+        AudioMemFree((void **)&pJsonStr);
+        return NULL;
+    }
+    (void)fclose(fp);
+
+    return pJsonStr;
+}
+
+static cJSON *AudioCardGetConfig(const char *fpath)
+{
+    char *pJsonStr = NULL;
+    cJSON *cJsonObj = NULL;
+
+    if (fpath == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return NULL;
+    }
+
+    pJsonStr = AudioAdaptersGetConfig(fpath);
+    if (pJsonStr == NULL) {
+        AUDIO_FUNC_LOGE("AudioAdaptersGetConfig failed!");
+        return NULL;
+    }
+
+    cJsonObj = cJSON_Parse(pJsonStr);
+    if (cJsonObj == NULL) {
+        AUDIO_FUNC_LOGE("AudioAdaptersGetConfig failed!");
+        AudioMemFree((void **)&pJsonStr);
+        return NULL;
+    }
+    AudioMemFree((void **)&pJsonStr);
+
+    return cJsonObj;
+}
+
+static int32_t AudioAdapterCheckName(const char *name)
+{
+    uint32_t len;
+    const char *strName = name;
+
+    if (strName == NULL) {
+        AUDIO_FUNC_LOGE("Invalid parameter!");
+        return HDF_FAILURE;
+    }
+
+    len = strlen(strName);
+    if (len == 0 || len >= CARD_ID_LEN_MAX) {
+        AUDIO_FUNC_LOGE("name len is zero or too long!");
+        return HDF_FAILURE;
+    }
+
+    if (!isalpha(*strName++)) { // Names must begin with a letter
+        AUDIO_FUNC_LOGE("The name of the illegal!");
+        return HDF_FAILURE;
+    }
+
+    while (*strName != '\0') {
+        if (*strName == '_' || *strName == '-') {
+            strName++;
+            continue;
+        }
+
+        if (!isalnum(*strName++)) {
+            AUDIO_FUNC_LOGE("The name of the illegal!");
+            return HDF_FAILURE;
+        }
+    }
+
+    return HDF_SUCCESS;
+}
+
+static enum SndCardType AudioAdapterNameToType(const char *name)
+{
+    enum SndCardType cardType = SND_CARD_UNKNOWN;
+
+    if (name == NULL) {
+        AUDIO_FUNC_LOGE("Invalid parameter!");
+        return SND_CARD_UNKNOWN;
+    }
+
+    if (strcmp(name, "primary") == 0) {
+        cardType = SND_CARD_PRIMARY;
+    } else if (strcmp(name, "hdmi") == 0) {
+        cardType = SND_CARD_HDMI;
+    } else if (strcmp(name, "usb") == 0) {
+        cardType = SND_CARD_USB;
+    } else if (strcmp(name, "bt") == 0) {
+        cardType = SND_CARD_BT;
+    }
+
+    return cardType;
+}
+
+static int32_t AudioAdapterInfoSet(struct DevProcInfo *cardDev, enum SndCardType cardType)
+{
+    int32_t ret;
+    struct DevProcInfo *adapter = NULL;
+
+    if (cardDev == NULL) {
+        AUDIO_FUNC_LOGE("Invalid parameter!");
+        return HDF_FAILURE;
+    }
+
+    adapter = (struct DevProcInfo *)OsalMemCalloc(sizeof(struct DevProcInfo));
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("calloc cardDev failed!");
+        return HDF_FAILURE;
+    }
+
+    ret = memcpy_s(adapter->cardName, CARD_ID_LEN_MAX - 1, cardDev->cardName, CARD_ID_LEN_MAX - 1);
+    if (ret != EOK) {
+        AUDIO_FUNC_LOGE("memcpy_s adapter card name fail!");
+        AudioMemFree((void **)&adapter);
+        return HDF_FAILURE;
+    }
+    ret = memcpy_s(adapter->cid, CARD_ID_LEN_MAX - 1, cardDev->cid, CARD_ID_LEN_MAX - 1);
+    if (ret != EOK) {
+        AUDIO_FUNC_LOGE("memcpy_s adapter card id fail!");
+        AudioMemFree((void **)&adapter);
+        return HDF_FAILURE;
+    }
+    ret = memcpy_s(adapter->did, CARD_ID_LEN_MAX - 1, cardDev->did, CARD_ID_LEN_MAX - 1);
+    if (ret != EOK) {
+        AUDIO_FUNC_LOGE("memcpy_s adapter dai id fail!");
+        /* Only log is printed and cannot be returned */
+    }
+
+    for (int cardNum = 0; cardNum < AUDIO_MAX_CARD_NUM; cardNum++) {
+        if (g_sndCardList[cardType][cardNum] == NULL) {
+            g_sndCardList[cardType][cardNum] = adapter;
+            break;
+        }
+
+        if (cardNum == AUDIO_MAX_CARD_NUM - 1) {
+            AUDIO_FUNC_LOGE("The maximum limit for a single type of sound card is %{public}d.", AUDIO_MAX_CARD_NUM);
+            AudioMemFree((void **)&adapter);
+            return HDF_FAILURE;
+        }
+    }
+
+    return HDF_SUCCESS;
+}
+
+static cJSON *AudioGetItemString(cJSON *adapter, char *name)
+{
+    int32_t ret;
+    cJSON *item = NULL;
+
+    if (adapter == NULL || name == NULL) {
+        AUDIO_FUNC_LOGE("Invalid parameter!");
+        return NULL;
+    }
+
+    item = cJSON_GetObjectItem(adapter, name);
+    if (item == NULL) {
+        AUDIO_FUNC_LOGE("item is null!");
+        return NULL;
+    }
+    if (item->valuestring == NULL) {
+        AUDIO_FUNC_LOGE("item valuestring is null!");
+        return NULL;
+    }
+
+    ret = AudioAdapterCheckName(item->valuestring);
+    if (ret < 0) {
+        if (strncmp(name, "daiId", sizeof("daiId")) != 0) {
+            AUDIO_FUNC_LOGE("The %{public}s name incorrect!", name);
+        }
+        return NULL;
+    }
+
+    return item;
+}
+
+static int32_t AudioGetAllItem(cJSON *adapter, struct DevProcInfo *cardDev)
+{
+    int32_t ret;
+    cJSON *adapterName = NULL;
+    cJSON *cid = NULL;
+    cJSON *did = NULL;
+
+    if (adapter == NULL || cardDev == NULL) {
+        AUDIO_FUNC_LOGE("Invalid parameter!");
+        return HDF_FAILURE;
+    }
+
+    adapterName = AudioGetItemString(adapter, "name");
+    if (adapterName == NULL) {
+        AUDIO_FUNC_LOGE("Get adapterName failed!");
+        return HDF_FAILURE;
+    }
+    ret = memcpy_s(cardDev->cardName, CARD_ID_LEN_MAX - 1, adapterName->valuestring, CARD_ID_LEN_MAX - 1);
+    if (ret != EOK) {
+        AUDIO_FUNC_LOGE("memcpy_s adapter card name fail!");
+        return HDF_FAILURE;
+    }
+
+    cid = AudioGetItemString(adapter, "cardId");
+    if (cid == NULL) {
+        AUDIO_FUNC_LOGE("Get cid failed!");
+        return HDF_FAILURE;
+    }
+    ret = memcpy_s(cardDev->cid, CARD_ID_LEN_MAX - 1, cid->valuestring, CARD_ID_LEN_MAX - 1);
+    if (ret != EOK) {
+        AUDIO_FUNC_LOGE("memcpy_s adapter card id fail!");
+        return HDF_FAILURE;
+    }
+
+    did = AudioGetItemString(adapter, "daiId");
+    if (did == NULL) { // Not all sound cards have dai id.
+        return HDF_SUCCESS;
+    }
+    ret = memcpy_s(cardDev->did, CARD_ID_LEN_MAX - 1, did->valuestring, CARD_ID_LEN_MAX - 1);
+    if (ret != EOK) {
+        AUDIO_FUNC_LOGE("memcpy_s adapter card id fail!");
+        /* Only log is printed and cannot be returned */
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioParseAdapter(cJSON *adapter)
+{
+    int ret;
+    struct DevProcInfo cardDev;
+    enum SndCardType cardType = SND_CARD_UNKNOWN;
+
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!\n");
+        return HDF_FAILURE;
+    }
+
+    (void)memset_s(&cardDev, sizeof(struct DevProcInfo), 0, sizeof(struct DevProcInfo));
+    ret = AudioGetAllItem(adapter, &cardDev);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioGetAllItem failed!\n");
+        return ret;
+    }
+    cardType = AudioAdapterNameToType(cardDev.cardName);
+    switch (cardType) {
+        case SND_CARD_PRIMARY:
+        case SND_CARD_HDMI:
+        case SND_CARD_USB:
+        case SND_CARD_BT:
+            ret = AudioAdapterInfoSet(&cardDev, cardType);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("AudioAdapterInfoSet failed!\n");
+                return ret;
+            }
+            break;
+        default:
+            AUDIO_FUNC_LOGE("Sound card unknown!\n");
+            return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioAdaptersSetAdapterVar(cJSON *cJsonObj)
+{
+    int32_t ret, adaptersArraySize;
+    cJSON *adapterObj = NULL;
+
+    if (cJsonObj == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return HDF_FAILURE;
+    }
+
+    adaptersArraySize = cJSON_GetArraySize(cJsonObj);
+    if (adaptersArraySize <= 0) {
+        AUDIO_FUNC_LOGE("Failed to get JSON array size!");
+        return HDF_FAILURE;
+    }
+    if (adaptersArraySize > MAX_CARD_NUM) {
+        AUDIO_FUNC_LOGE("Read adapters number is %{public}d!", adaptersArraySize);
+        AUDIO_FUNC_LOGE("The number of sound cards exceeds the upper limit %{public}d.", MAX_CARD_NUM);
+        return HDF_FAILURE;
+    }
+
+    for (int32_t i = 0; i < adaptersArraySize; i++) {
+        adapterObj = cJSON_GetArrayItem(cJsonObj, i);
+        if (adapterObj != NULL) {
+            ret = AudioParseAdapter(adapterObj);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("AudioParseAdapter (%{public}d) error!", i);
+                return HDF_FAILURE;
+            }
+            adapterObj = NULL;
+        }
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t CardInfoParseFromConfig(void)
+{
+    int32_t ret;
+    cJSON *cJsonObj = NULL;
+    cJSON *adaptersObj = NULL;
+
+    if (g_parseFlag) {
+        return HDF_SUCCESS;
+    }
+
+    cJsonObj = AudioCardGetConfig(ALSA_CARD_CONFIG_FILE);
+    if (cJsonObj == NULL) {
+        AUDIO_FUNC_LOGE("AudioCardGetConfig failed!\n");
+        return HDF_FAILURE;
+    }
+
+    adaptersObj = cJSON_GetObjectItem(cJsonObj, "adapters");
+    if (adaptersObj == NULL) {
+        AUDIO_FUNC_LOGE("cJSON_GetObjectItem adapters failed!\n");
+        cJSON_Delete(cJsonObj);
+        return HDF_FAILURE;
+    }
+
+    ret = AudioAdaptersSetAdapterVar(adaptersObj);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioAdaptersSetAdapterVar is failed!\n");
+        cJSON_Delete(cJsonObj);
+        return HDF_FAILURE;
+    }
+    cJSON_Delete(cJsonObj);
+    g_parseFlag = true;
+
+    return HDF_SUCCESS;
+}

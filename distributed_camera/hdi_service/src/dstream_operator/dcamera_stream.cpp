@@ -22,41 +22,35 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-DCamRetCode DCameraStream::InitDCameraStream(const shared_ptr<StreamInfo> &info)
+DCamRetCode DCameraStream::InitDCameraStream(const StreamInfo &info)
 {
-    if ((info->streamId_ < 0) || (info->width_ < 0) || (info->height_ < 0) ||
-        (info->format_ < 0) || (info->dataspace_ < 0)) {
+    if ((info.streamId_ < 0) || (info.width_ < 0) || (info.height_ < 0) ||
+        (info.format_ < 0) || (info.dataspace_ < 0)) {
         DHLOGE("Stream info is invalid.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
-    dcStreamId_ = info->streamId_;
+    dcStreamId_ = info.streamId_;
     dcStreamInfo_ = std::make_shared<StreamInfo>();
-    dcStreamInfo_->streamId_ = info->streamId_;
-    dcStreamInfo_->width_ = info->width_;
-    dcStreamInfo_->height_ = info->height_;
-    dcStreamInfo_->format_ = info->format_;
-    dcStreamInfo_->dataspace_ = info->dataspace_;
-    dcStreamInfo_->intent_ = info->intent_;
-    dcStreamInfo_->tunneledMode_ = info->tunneledMode_;
-    dcStreamInfo_->bufferQueue_ = info->bufferQueue_;
-    dcStreamInfo_->minFrameDuration_ = info->minFrameDuration_;
+    dcStreamInfo_->streamId_ = info.streamId_;
+    dcStreamInfo_->width_ = info.width_;
+    dcStreamInfo_->height_ = info.height_;
+    dcStreamInfo_->format_ = info.format_;
+    dcStreamInfo_->dataspace_ = info.dataspace_;
+    dcStreamInfo_->intent_ = info.intent_;
+    dcStreamInfo_->tunneledMode_ = info.tunneledMode_;
+    dcStreamInfo_->bufferQueue_ = info.bufferQueue_;
+    dcStreamInfo_->minFrameDuration_ = info.minFrameDuration_;
 
-    if (dcStreamAttribute_ == nullptr) {
-        dcStreamAttribute_ = std::make_shared<StreamAttribute>();
-        if (dcStreamAttribute_ == nullptr) {
-            return DCamRetCode::FAILED;
-        }
-    }
-    dcStreamAttribute_->streamId_ = dcStreamInfo_->streamId_;
-    dcStreamAttribute_->width_ = dcStreamInfo_->width_;
-    dcStreamAttribute_->height_ = dcStreamInfo_->height_;
-    dcStreamAttribute_->overrideFormat_ = dcStreamInfo_->format_;
-    dcStreamAttribute_->overrideDataspace_ = dcStreamInfo_->dataspace_;
-    dcStreamAttribute_->producerUsage_ = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA;
+    dcStreamAttribute_.streamId_ = dcStreamInfo_->streamId_;
+    dcStreamAttribute_.width_ = dcStreamInfo_->width_;
+    dcStreamAttribute_.height_ = dcStreamInfo_->height_;
+    dcStreamAttribute_.overrideFormat_ = dcStreamInfo_->format_;
+    dcStreamAttribute_.overrideDataspace_ = dcStreamInfo_->dataspace_;
+    dcStreamAttribute_.producerUsage_ = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA;
 
-    dcStreamAttribute_->producerBufferCount_ = BUFFER_QUEUE_SIZE;
-    dcStreamAttribute_->maxBatchCaptureCount_ = BUFFER_QUEUE_SIZE;
-    dcStreamAttribute_->maxCaptureCount_ = 1;
+    dcStreamAttribute_.producerBufferCount_ = BUFFER_QUEUE_SIZE;
+    dcStreamAttribute_.maxBatchCaptureCount_ = BUFFER_QUEUE_SIZE;
+    dcStreamAttribute_.maxCaptureCount_ = 1;
 
     DCamRetCode ret = DCamRetCode::SUCCESS;
     if (dcStreamInfo_->bufferQueue_ != nullptr) {
@@ -75,8 +69,8 @@ DCamRetCode DCameraStream::InitDCameraBufferManager()
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    if (dcStreamInfo_->bufferQueue_ != nullptr) {
-        dcStreamProducer_ = OHOS::Surface::CreateSurfaceAsProducer(dcStreamInfo_->bufferQueue_);
+    if (dcStreamInfo_->bufferQueue_ != nullptr && dcStreamInfo_->bufferQueue_->producer_ != nullptr) {
+        dcStreamProducer_ = OHOS::Surface::CreateSurfaceAsProducer(dcStreamInfo_->bufferQueue_->producer_);
     }
     if (dcStreamProducer_ == nullptr) {
         DHLOGE("Distributed camera stream producer is invalid.");
@@ -101,7 +95,7 @@ DCamRetCode DCameraStream::GetDCameraStreamInfo(shared_ptr<StreamInfo> &info)
     return DCamRetCode::SUCCESS;
 }
 
-DCamRetCode DCameraStream::SetDCameraBufferQueue(const OHOS::sptr<OHOS::IBufferProducer> producer)
+DCamRetCode DCameraStream::SetDCameraBufferQueue(const OHOS::sptr<BufferProducerSequenceable> &producer)
 {
     if (dcStreamInfo_->bufferQueue_) {
         DHLOGE("Stream [%d] has already have bufferQueue.", dcStreamId_);
@@ -123,6 +117,9 @@ DCamRetCode DCameraStream::ReleaseDCameraBufferQueue()
         DHLOGE("Release distributed camera buffer queue failed.");
         return ret;
     }
+    if (dcStreamInfo_->bufferQueue_ != nullptr) {
+        dcStreamInfo_->bufferQueue_->producer_ = nullptr;
+    }
     dcStreamInfo_->bufferQueue_ = nullptr;
     dcStreamProducer_ = nullptr;
     dcStreamBufferMgr_ = nullptr;
@@ -130,12 +127,9 @@ DCamRetCode DCameraStream::ReleaseDCameraBufferQueue()
     return DCamRetCode::SUCCESS;
 }
 
-DCamRetCode DCameraStream::GetDCameraStreamAttribute(shared_ptr<StreamAttribute> &attribute)
+DCamRetCode DCameraStream::GetDCameraStreamAttribute(StreamAttribute &attribute)
 {
     attribute = dcStreamAttribute_;
-    if (attribute == nullptr) {
-        return DCamRetCode::INVALID_ARGUMENT;
-    }
     return DCamRetCode::SUCCESS;
 }
 
@@ -287,18 +281,7 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
         .timestamp = 0
     };
     if (dcStreamProducer_ != nullptr) {
-        int64_t timeStamp = static_cast<int64_t>(GetCurrentLocalTimeStamp());
-        if (dcStreamInfo_->intent_ == StreamIntent::VIDEO) {
-            int32_t size = (dcStreamInfo_->width_) * (dcStreamInfo_->height_) * YUV_WIDTH_RATIO / YUV_HEIGHT_RATIO;
-            surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
-            surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
-            surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
-        } else if (dcStreamInfo_->intent_ == StreamIntent::STILL_CAPTURE) {
-            int32_t size = buffer.size_;
-            surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
-            surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
-            surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
-        }
+        SetSurfaceBuffer(surfaceBuffer, buffer);
         int ret = dcStreamProducer_->FlushBuffer(surfaceBuffer, fence, flushConf);
         if (ret != 0) {
             DHLOGI("FlushBuffer error: %d", ret);
@@ -310,6 +293,22 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
         cv_.notify_one();
     }
     return DCamRetCode::SUCCESS;
+}
+
+void DCameraStream::SetSurfaceBuffer(OHOS::sptr<OHOS::SurfaceBuffer>& surfaceBuffer, const DCameraBuffer &buffer)
+{
+    int64_t timeStamp = static_cast<int64_t>(GetCurrentLocalTimeStamp());
+    if (dcStreamInfo_->intent_ == StreamIntent::VIDEO) {
+        int32_t size = (dcStreamInfo_->width_) * (dcStreamInfo_->height_) * YUV_WIDTH_RATIO / YUV_HEIGHT_RATIO;
+        surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
+        surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
+        surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
+    } else if (dcStreamInfo_->intent_ == StreamIntent::STILL_CAPTURE) {
+        int32_t size = buffer.size_;
+        surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
+        surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
+        surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
+    }
 }
 
 DCamRetCode DCameraStream::FlushDCameraBuffer()

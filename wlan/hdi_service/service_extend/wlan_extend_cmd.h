@@ -20,6 +20,10 @@ int32_t WlanInterfaceStartChannelMeas(struct IWlanInterface *self, const char *i
     const struct MeasChannelParam *measChannelParam);
 int32_t WlanInterfaceGetChannelMeasResult(struct IWlanInterface *self, const char *ifName,
     struct MeasChannelResult *measChannelResult);
+int32_t WlanInterfaceWifiSendCmdIoctl(struct IWlanInterface *self, const char *ifName, int32_t cmdId,
+    const int8_t *paramBuf, uint32_t paramBufLen);
+int32_t WlanInterfaceRegisterHid2dCallback(Hid2dCallbackFunc func, const char *ifName);
+int32_t WlanInterfaceUnregisterHid2dCallback(Hid2dCallbackFunc func, const char *ifName);
 int32_t WlanExtendInterfaceWifiConstruct(void);
 int32_t WlanExtendInterfaceWifiDestruct(void);
 #endif

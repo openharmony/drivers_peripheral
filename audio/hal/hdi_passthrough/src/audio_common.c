@@ -15,8 +15,8 @@
 
 #include "osal_mem.h"
 #include "osal_time.h"
-#include "audio_hal_log.h"
 #include "audio_internal.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
@@ -124,7 +124,7 @@ int32_t TimeToAudioTimeStamp(uint64_t bufferFrameSize, struct AudioTimeStamp *ti
         return HDF_FAILURE;
     }
     time->tvSec += (int64_t)(bufferFrameSize / sampleRate);
-    int64_t lastBufFrames = bufferFrameSize % ((int64_t)sampleRate);
+    int64_t lastBufFrames = (int64_t)bufferFrameSize % ((int64_t)sampleRate);
     time->tvNSec += (lastBufFrames * SEC_TO_NSEC) / ((int64_t)sampleRate);
     if (time->tvNSec >= SEC_TO_NSEC) {
         time->tvSec += 1;
@@ -142,12 +142,13 @@ void AudioLogRecord(int errorLevel, const char *format, ...)
     struct tm *tblock = NULL;
     char folderName[] = "/data/log/drivers_peripheral_audio";
     va_start(args, format);
-    time_t timeLog = time(NULL);
+    time_t timeLog;
+    (void)time(&timeLog);
     tblock = localtime(&timeLog);
     if (tblock == NULL) {
         return;
     }
-    int32_t ret = strftime(fileName, sizeof(fileName), "//data/log/drivers_peripheral_audio/audio_%Y%m%d_%H%M%S.log",
+    uint32_t ret = strftime(fileName, sizeof(fileName), "//data/log/drivers_peripheral_audio/audio_%Y%m%d.log",
         tblock);
     if (ret == 0) {
         return;
@@ -160,7 +161,7 @@ void AudioLogRecord(int errorLevel, const char *format, ...)
         mkdir(folderName, 0770); // 0770: restore permission
     }
     if ((fp = fopen(fileName, "a+")) != NULL) {
-        strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", localtime(&timeLog));
+        strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", tblock);
         if (errorLevel == (int)INFO) {
             fprintf(fp, "[%s]-[%s]", timeStr, "INFO");
             vfprintf(fp, format, args);

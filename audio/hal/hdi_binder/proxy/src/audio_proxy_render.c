@@ -15,7 +15,7 @@
 
 #include "audio_adapter_info_common.h"
 #include "audio_proxy_common.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 
@@ -199,7 +199,7 @@ int32_t AudioProxyRenderGetSampleAttributes(const AudioHandle handle,
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
     }
-    if (AudioProxyReadSapmleAttrbutes(reply, attrs)) {
+    if (AudioProxyReadSapmleAttrbutes(reply, attrs) < 0) {
         AUDIO_FUNC_LOGE("AudioProxyReadSapmleAttrbutes FAIL");
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -1005,7 +1005,8 @@ int32_t AudioProxyRenderDrainBuffer(struct AudioRender *render, enum AudioDrainN
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
     }
-    if (render == NULL) {
+    if (render == NULL || type == NULL) {
+        AUDIO_FUNC_LOGE("The hwRender parameter is empty");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct HdfSBuf *data = NULL;

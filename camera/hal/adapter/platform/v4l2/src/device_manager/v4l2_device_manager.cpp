@@ -43,13 +43,13 @@ RetCode V4L2DeviceManager::Init()
     }
 
     for (auto iter = hardware.cbegin(); iter != hardware.cend(); iter++) {
-        bool eraseHardwareNameFlage = true;
+        bool eraseHardwareNameFlag = true;
         for (auto iterName = hardwareName.cbegin(); iterName != hardwareName.cend(); iterName++) {
             if ((*iter).controllerId == DM_C_SENSOR && (*iterName) == (*iter).hardwareName) {
-                eraseHardwareNameFlage = false;
+                eraseHardwareNameFlag = false;
             }
         }
-        if (eraseHardwareNameFlage == true && (*iter).controllerId == DM_C_SENSOR) {
+        if (eraseHardwareNameFlag == true && (*iter).controllerId == DM_C_SENSOR) {
             hardware.erase(iter);
         }
     }

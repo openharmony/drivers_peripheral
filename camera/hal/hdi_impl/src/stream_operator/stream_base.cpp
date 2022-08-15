@@ -219,7 +219,7 @@ RetCode StreamBase::StopStream()
         return RC_ERROR;
     }
 
-    if (lastRequest_->IsContinous() && !inTransitList_.empty()) {
+    if (lastRequest_ != nullptr && lastRequest_->IsContinous() && !inTransitList_.empty()) {
         std::shared_ptr<ICaptureMessage> endMessage =
             std::make_shared<CaptureEndedMessage>(streamId_, lastRequest_->GetCaptureId(),
             lastRequest_->GetEndTime(), lastRequest_->GetOwnerCount(), tunnel_->GetFrameCount());
@@ -426,6 +426,7 @@ void StreamBase::HandleResult(std::shared_ptr<IBuffer>& buffer)
             }
             if (r->GetCaptureId() == captureId) {
                 request = r;
+                break;
             }
         }
     }
@@ -440,7 +441,6 @@ void StreamBase::HandleResult(std::shared_ptr<IBuffer>& buffer)
     // To synchronize multiple stream, bottom-layer device stream need be synchronized first.
     request->OnResult(streamId_);
     lastRequest_ = request;
-    return;
 }
 
 RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
@@ -455,6 +455,11 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
                 std::make_shared<CaptureErrorMessage>(streamId_, request->GetCaptureId(), request->GetEndTime(),
                                                       request->GetOwnerCount(), static_cast<StreamError>(status));
             messenger_->SendMessage(errorMessage);
+        } else {
+            CAMERA_LOGE("stream [id:%{public}d] drop buffer index:%{public}d, status:%{public}d",
+                streamId_, buffer->GetIndex(), buffer->GetBufferStatus());
+            ReceiveBuffer(buffer);
+            return RC_OK;
         }
     }
     if (request->NeedShutterCallback() && messenger_ != nullptr) {

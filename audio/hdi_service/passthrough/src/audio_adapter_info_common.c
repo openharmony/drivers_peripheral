@@ -19,8 +19,8 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include "audio_common.h"
-#include "audio_hal_log.h"
 #include "audio_internal.h"
+#include "audio_uhdf_log.h"
 #include "cJSON.h"
 #include "osal_mem.h"
 #include "securec.h"
@@ -988,13 +988,13 @@ int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count, struct Ext
 
     if (keyValueList == NULL || count == NULL || mExtraParams == NULL || sumOk == NULL) {
         AUDIO_FUNC_LOGE("Invalid parameter!");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
+        return AUDIO_ERR_INVALID_PARAM;
     }
 
     int32_t ret = KeyValueListToMap(keyValueList, mParamValMap, count);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Convert to map FAIL!");
-        return AUDIO_HAL_ERR_INTERNAL;
+        return AUDIO_ERR_INTERNAL;
     }
     mExtraParams->route = -1;
     mExtraParams->format = -1;
@@ -1005,13 +1005,13 @@ int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count, struct Ext
     while (index < *count) {
         ret = SetExtParam(mParamValMap[index].key, mParamValMap[index].value, mExtraParams);
         if (ret < 0) {
-            return AUDIO_HAL_ERR_INTERNAL;
+            return AUDIO_ERR_INTERNAL;
         } else {
             (*sumOk)++;
         }
         index++;
     }
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_SUCCESS;
 }
 
 int32_t SetDescParam(
@@ -1019,25 +1019,25 @@ int32_t SetDescParam(
 {
     if (fp == NULL || desc == NULL || fileSize == NULL || flags == NULL) {
         AUDIO_FUNC_LOGE("Invalid parameter!");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
+        return AUDIO_ERR_INVALID_PARAM;
     }
 
     *flags = desc->isShareable ? MAP_SHARED : MAP_PRIVATE;
     desc->memoryFd = fileno(fp);
     if (desc->memoryFd == -1) {
         AUDIO_FUNC_LOGE("fileno failed, fd is %{public}d", desc->memoryFd);
-        return AUDIO_HAL_ERR_INTERNAL;
+        return AUDIO_ERR_INTERNAL;
     }
     *fileSize = lseek(desc->memoryFd, 0, SEEK_END);
     if ((int64_t)reqSize > *fileSize) {
         AUDIO_FUNC_LOGE("reqSize is out of file Size!");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
+        return AUDIO_ERR_INVALID_PARAM;
     }
     desc->memoryAddress = mmap(NULL, reqSize, PROT_READ | PROT_WRITE, *flags, desc->memoryFd, 0);
     if (desc->memoryAddress == NULL || desc->memoryAddress == (void *)(-1)) {
         AUDIO_FUNC_LOGE("AudioRenderReqMmapBuffer mmap FAIL and errno is:%{public}d !", errno);
-        return AUDIO_HAL_ERR_INTERNAL;
+        return AUDIO_ERR_INTERNAL;
     }
 
-    return AUDIO_HAL_SUCCESS;
+    return AUDIO_SUCCESS;
 }

@@ -15,37 +15,37 @@
 
 #ifndef USB_HOST_NO_SDK_SPEED_H
 #define USB_HOST_NO_SDK_SPEED_H
+#include <stdint.h>
+#define USB_ADAPTER_URB_TYPE_ISO              0
+#define USB_ADAPTER_URB_TYPE_INTERRUPT        1
+#define USB_ADAPTER_URB_TYPE_CONTROL          2
+#define USB_ADAPTER_URB_TYPE_BULK             3
+#define USB_ADAPTER_URB_SHORT_NOT_OK          0x01
+#define USB_ADAPTER_URB_ISO_ASAP              0x02
+#define USB_ADAPTER_URB_BULK_CONTINUATION     0x04
+#define USB_ADAPTER_URB_QUEUE_BULK            0x10
+#define USB_ADAPTER_URB_ZERO_PACKET           0x40
+#define USB_ADAPTER_CAP_ZERO_PACKET           0x01
+#define USB_ADAPTER_CAP_BULK_CONTINUATION     0x02
+#define USB_ADAPTER_CAP_NO_PACKET_SIZE_LIM    0x04
+#define USB_ADAPTER_CAP_BULK_SCATTER_GATHER   0x08
+#define USB_ADAPTER_CAP_REAP_AFTER_DISCONNECT 0x10
 
-#define USB_ADAPTER_URB_TYPE_ISO                0
-#define USB_ADAPTER_URB_TYPE_INTERRUPT          1
-#define USB_ADAPTER_URB_TYPE_CONTROL            2
-#define USB_ADAPTER_URB_TYPE_BULK               3
-#define USB_ADAPTER_URB_SHORT_NOT_OK            0x01
-#define USB_ADAPTER_URB_ISO_ASAP                0x02
-#define USB_ADAPTER_URB_BULK_CONTINUATION       0x04
-#define USB_ADAPTER_URB_QUEUE_BULK              0x10
-#define USB_ADAPTER_URB_ZERO_PACKET             0x40
-#define USB_ADAPTER_CAP_ZERO_PACKET             0x01
-#define USB_ADAPTER_CAP_BULK_CONTINUATION       0x02
-#define USB_ADAPTER_CAP_NO_PACKET_SIZE_LIM      0x04
-#define USB_ADAPTER_CAP_BULK_SCATTER_GATHER     0x08
-#define USB_ADAPTER_CAP_REAP_AFTER_DISCONNECT   0x10
-
-#define USBDEVFS_CLAIMINTERFACE    _IOR('U', 15, unsigned int)
-#define USBDEVFS_RELEASEINTERFACE  _IOR('U', 16, unsigned int)
-#define USBDEVFS_SETCONFIGURATION  _IOR('U', 5, unsigned int)
-#define USBDEVFS_SETINTERFACE      _IOR('U', 4, struct UsbSetInterface)
-#define USBDEVFS_ALLOC_STREAMS     _IOR('U', 28, struct UsbAdapterStreams)
-#define USBDEVFS_FREE_STREAMS      _IOR('U', 29, struct UsbAdapterStreams)
-#define USBDEVFS_GET_CAPABILITIES  _IOR('U', 26, __u32)
-#define USBDEVFS_CLEAR_HALT        _IOR('U', 21, unsigned int)
-#define USBDEVFS_RELEASEINTERFACE  _IOR('U', 16, unsigned int)
-#define USBDEVFS_RESET             _IO('U', 20)
-#define USBDEVFS_CONTROL           _IOWR('U', 0, struct UsbCtrltransfer)
-#define USBDEVFS_DISCARDURB        _IO('U', 11)
-#define USBDEVFS_REAPURB           _IOW('U', 12, void *)
-#define USBDEVFS_SUBMITURB         _IOR('U', 10, struct UsbAdapterUrb)
-#define USBDEVFS_REAPURBNDELAY     _IOW('U', 13, void *)
+#define USBDEVFS_CLAIMINTERFACE   _IOR('U', 15, unsigned int)
+#define USBDEVFS_RELEASEINTERFACE _IOR('U', 16, unsigned int)
+#define USBDEVFS_SETCONFIGURATION _IOR('U', 5, unsigned int)
+#define USBDEVFS_SETINTERFACE     _IOR('U', 4, struct UsbSetInterface)
+#define USBDEVFS_ALLOC_STREAMS    _IOR('U', 28, struct UsbAdapterStreams)
+#define USBDEVFS_FREE_STREAMS     _IOR('U', 29, struct UsbAdapterStreams)
+#define USBDEVFS_GET_CAPABILITIES _IOR('U', 26, __u32)
+#define USBDEVFS_CLEAR_HALT       _IOR('U', 21, unsigned int)
+#define USBDEVFS_RELEASEINTERFACE _IOR('U', 16, unsigned int)
+#define USBDEVFS_RESET            _IO('U', 20)
+#define USBDEVFS_CONTROL          _IOWR('U', 0, struct UsbCtrltransfer)
+#define USBDEVFS_DISCARDURB       _IO('U', 11)
+#define USBDEVFS_REAPURB          _IOW('U', 12, void *)
+#define USBDEVFS_SUBMITURB        _IOR('U', 10, struct UsbAdapterUrb)
+#define USBDEVFS_REAPURBNDELAY    _IOW('U', 13, void *)
 
 struct UsbIsoPacketDesc {
     unsigned int length;
@@ -78,4 +78,4 @@ struct UsbAdapterUrbs {
     int32_t urbNum;
 };
 
-#endif  /* USB_HOST_NO_SDK_SPEED_H */
+#endif /* USB_HOST_NO_SDK_SPEED_H */

@@ -25,7 +25,7 @@ void BindStreamOperatorCallback(const OHOS::sptr<OHOS::Camera::IStreamOperatorCa
     g_streamCallback = callback;
 }
 
-void StreamCBOnCaptureStarted(int captureId, int* streamId, int count)
+void StreamCBOnCaptureStarted(int captureId, const int* streamId, int count)
 {
     if (g_streamCallback == nullptr) {
         return;
@@ -76,7 +76,7 @@ void StreamCBOnCaptureError(int captureId, CaptureErrorInfoCIF* info, int count)
     return;
 }
 
-void StreamCBOnFrameShutter(int captureId, int* streamId, int count, uint64_t timestamp)
+void StreamCBOnFrameShutter(int captureId, const int* streamId, int count, uint64_t timestamp)
 {
     if (g_streamCallback == nullptr) {
         return;

@@ -25,12 +25,12 @@
 #include "iam_logger.h"
 #include "iam_fuzz_test.h"
 
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_FINGERPRINT_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_FINGERPRINT_AUTH_HDI
 
 #undef private
 
 using namespace std;
-using namespace OHOS::UserIAM::Common;
+using namespace OHOS::UserIam::Common;
 
 namespace OHOS {
 namespace HDI {

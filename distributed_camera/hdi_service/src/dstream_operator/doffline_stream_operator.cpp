@@ -18,19 +18,19 @@
 
 namespace OHOS {
 namespace DistributedHardware {
-CamRetCode DOfflineStreamOperator::CancelCapture(int captureId)
+int32_t DOfflineStreamOperator::CancelCapture(int32_t captureId)
 {
     (void)captureId;
     return CamRetCode::METHOD_NOT_SUPPORTED;
 }
 
-CamRetCode DOfflineStreamOperator::ReleaseStreams(const std::vector<int>& streamIds)
+int32_t DOfflineStreamOperator::ReleaseStreams(const std::vector<int32_t>& streamIds)
 {
     (void)streamIds;
     return CamRetCode::METHOD_NOT_SUPPORTED;
 }
 
-CamRetCode DOfflineStreamOperator::Release()
+int32_t DOfflineStreamOperator::Release()
 {
     return CamRetCode::METHOD_NOT_SUPPORTED;
 }

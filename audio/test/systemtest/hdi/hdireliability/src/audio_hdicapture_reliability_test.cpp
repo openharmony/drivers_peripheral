@@ -41,11 +41,6 @@ public:
     void TearDown();
     static TestAudioManager *(*GetAudioManager)();
     static void *handleSo;
-#ifdef AUDIO_MPI_SO
-    static int32_t (*SdkInit)();
-    static void (*SdkExit)();
-    static void *sdkSo;
-#endif
     static int32_t RelAudioCreateCapture(struct PrepareAudioPara& ptr);
     static int32_t RelGetAllAdapter(struct PrepareAudioPara& ptr);
     static int32_t RelLoadAdapter(struct PrepareAudioPara& ptr);
@@ -71,30 +66,9 @@ using THREAD_FUNC = void *(*)(void *);
 
 TestAudioManager *(*AudioHdiCaptureReliabilityTest::GetAudioManager)() = nullptr;
 void *AudioHdiCaptureReliabilityTest::handleSo = nullptr;
-#ifdef AUDIO_MPI_SO
-    int32_t (*AudioHdiCaptureReliabilityTest::SdkInit)() = nullptr;
-    void (*AudioHdiCaptureReliabilityTest::SdkExit)() = nullptr;
-    void *AudioHdiCaptureReliabilityTest::sdkSo = nullptr;
-#endif
 
 void AudioHdiCaptureReliabilityTest::SetUpTestCase(void)
 {
-#ifdef AUDIO_MPI_SO
-    char sdkResolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
-    sdkSo = dlopen(sdkResolvedPath, RTLD_LAZY);
-    if (sdkSo == nullptr) {
-        return;
-    }
-    SdkInit = (int32_t (*)())(dlsym(sdkSo, "MpiSdkInit"));
-    if (SdkInit == nullptr) {
-        return;
-    }
-    SdkExit = (void (*)())(dlsym(sdkSo, "MpiSdkExit"));
-    if (SdkExit == nullptr) {
-        return;
-    }
-    SdkInit();
-#endif
     char absPath[PATH_MAX] = {0};
     if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
         return;
@@ -112,19 +86,6 @@ void AudioHdiCaptureReliabilityTest::SetUpTestCase(void)
 
 void AudioHdiCaptureReliabilityTest::TearDownTestCase(void)
 {
-#ifdef AUDIO_MPI_SO
-    SdkExit();
-    if (sdkSo != nullptr) {
-        dlclose(sdkSo);
-        sdkSo = nullptr;
-    }
-    if (SdkInit != nullptr) {
-        SdkInit = nullptr;
-    }
-    if (SdkExit != nullptr) {
-        SdkExit = nullptr;
-    }
-#endif
     if (handleSo != nullptr) {
         dlclose(handleSo);
         handleSo = nullptr;
@@ -211,7 +172,7 @@ int32_t AudioHdiCaptureReliabilityTest::RelAudioCaptureStartAndCaputreFrame(stru
     g_testMutex.lock();
     ret = FrameStartCapture(ptr.capture, file, attrs);
     g_testMutex.unlock();
-    fclose(file);
+    (void)fclose(file);
     return ret;
 }
 
@@ -440,7 +401,7 @@ HWTEST_F(AudioHdiCaptureReliabilityTest, SUB_Audio_HDI_AudioCaptureSetGain_Relia
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(g_para[0].character.setgain, g_para[0].character.getgain);
     }
-    if (g_para[0].adapter != nullptr){
+    if (g_para[0].adapter != nullptr) {
         ret = StopAudio(g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
@@ -663,7 +624,7 @@ HWTEST_F(AudioHdiCaptureReliabilityTest, SUB_Audio_HDI_AudioCaptureSetMute_0001,
         }
     }
 
-    if (g_para[0].adapter != nullptr){
+    if (g_para[0].adapter != nullptr) {
         ret = StopAudio(g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
@@ -739,7 +700,7 @@ HWTEST_F(AudioHdiCaptureReliabilityTest, SUB_Audio_HDI_AudioCaptureSetVolume_Rel
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(volumeHighExpc, g_para[0].character.getvolume);
     }
-    if (g_para[0].adapter != nullptr){
+    if (g_para[0].adapter != nullptr) {
         ret = StopAudio(g_para[0]);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }

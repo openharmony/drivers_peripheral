@@ -23,7 +23,7 @@
 #include "hdf_service_status.h"
 #include "securec.h"
 #include "servmgr_hdi.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG             HDF_AUDIO_HAL_HOST
 #define AUDIO_HDI_SERVICE_NAME  "audio_hdi_usb_service"

@@ -16,9 +16,9 @@
 #include "osal_mem.h"
 #include "servmgr_hdi.h"
 #include "audio_adapter_info_common.h"
-#include "audio_hal_log.h"
 #include "audio_proxy_common.h"
 #include "audio_proxy_internal.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 
@@ -168,6 +168,9 @@ int32_t GetAudioProxyAdapterFunc(struct AudioHwAdapter *hwAdapter)
     hwAdapter->common.GetPortCapability = AudioProxyAdapterGetPortCapability;
     hwAdapter->common.SetPassthroughMode = AudioProxyAdapterSetPassthroughMode;
     hwAdapter->common.GetPassthroughMode = AudioProxyAdapterGetPassthroughMode;
+    hwAdapter->common.SetMicMute = AudioProxyAdapterSetMicMute;
+    hwAdapter->common.GetMicMute = AudioProxyAdapterGetMicMute;
+    hwAdapter->common.SetVoiceVolume = AudioProxyAdapterSetVoiceVolume;
     return HDF_SUCCESS;
 }
 int32_t AudioProxyManagerLoadAdapterDispatch(struct AudioHwAdapter *hwAdapter, struct AudioProxyManager *proxyManager,

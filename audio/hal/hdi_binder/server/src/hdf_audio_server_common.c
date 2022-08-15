@@ -14,15 +14,15 @@
  */
 
 #include "hdf_audio_server_common.h"
-#include "hdf_device_object.h"
-#include "osal_mem.h"
 #include "audio_adapter_info_common.h"
 #include "audio_events.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 #include "hdf_audio_events.h"
 #include "hdf_audio_server.h"
 #include "hdf_audio_server_capture.h"
 #include "hdf_audio_server_render.h"
+#include "hdf_device_object.h"
+#include "osal_mem.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
 
@@ -115,7 +115,6 @@ void AdaptersServerManageRelease(
 
         return;
     }
-
     num = (num > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : num;
     for (i = 0; i < num; i++) {
         if (adaptersManage[i].adapterName != NULL) {

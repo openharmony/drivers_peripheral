@@ -145,8 +145,8 @@ static int32_t SerStubDestroyComponent(struct CodecComponentManager *serviceImpl
     return ret;
 }
 
-int32_t CodecComponentManagerServiceOnRemoteRequest(struct CodecComponentManager *serviceImpl, int32_t cmdId,
-                                                    struct HdfSBuf *data, struct HdfSBuf *reply)
+static int32_t CodecComponentManagerServiceOnRemoteRequest(struct CodecComponentManager *serviceImpl, int32_t cmdId,
+                                                           struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     switch (cmdId) {
         case CMD_CODEC_GET_COMPONENT_NUM:

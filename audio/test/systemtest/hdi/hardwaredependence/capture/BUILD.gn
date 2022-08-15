@@ -62,17 +62,11 @@ if (defined(ohos_lite)) {
       "utils_base:utils",
     ]
     defines = []
-    if (enable_audio_adm_so) {
+    if (enable_audio_adm_passthrough) {
       defines += [ "AUDIO_ADM_SO" ]
-    }
-    if (enable_audio_mpi_so) {
-      defines += [ "AUDIO_MPI_SO" ]
     }
     if (enable_audio_adm_service) {
       defines += [ "AUDIO_ADM_SERVICE" ]
-    }
-    if (enable_audio_mpi_service) {
-      defines += [ "AUDIO_MPI_SERVICE" ]
     }
     if ("${product_name}" == "rk3568") {
       defines += [ "PRODUCT_RK3568" ]

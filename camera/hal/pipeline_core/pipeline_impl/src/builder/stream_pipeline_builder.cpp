@@ -16,9 +16,7 @@
 
 namespace OHOS::Camera {
 StreamPipelineBuilder::StreamPipelineBuilder(const std::shared_ptr<HostStreamMgr>& streamMgr,
-    const std::shared_ptr<Pipeline>& p) :
-    hostStreamMgr_(streamMgr),
-    pipeline_(p)
+    const std::shared_ptr<Pipeline>& p) : hostStreamMgr_(streamMgr), pipeline_(p)
 {
 }
 std::shared_ptr<Pipeline> StreamPipelineBuilder::Build(const std::shared_ptr<PipelineSpec>& pipelineSpec)

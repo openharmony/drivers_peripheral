@@ -27,7 +27,7 @@
 
 struct CodecComponentManagerSerivce *g_service = NULL;
 uint32_t g_componentId = 0;
-uint32_t GetNextComponentId()
+static uint32_t GetNextComponentId()
 {
     uint32_t tempId = 0;
     if (g_service == NULL) {
@@ -51,7 +51,7 @@ uint32_t GetNextComponentId()
     return tempId;
 }
 
-int32_t OmxManagerGetComponentNum()
+static int32_t OmxManagerGetComponentNum()
 {
     int32_t num = 0;
     if (GetComponentNum(&num) != HDF_SUCCESS) {
@@ -60,7 +60,7 @@ int32_t OmxManagerGetComponentNum()
     return num;
 }
 
-int32_t OmxManagerGetComponentCapabilityList(CodecCompCapability *capList, int32_t count)
+static int32_t OmxManagerGetComponentCapabilityList(CodecCompCapability *capList, int32_t count)
 {
     int32_t err = GetComponentCapabilityList(capList, count);
     if (err != HDF_SUCCESS) {
@@ -69,8 +69,8 @@ int32_t OmxManagerGetComponentCapabilityList(CodecCompCapability *capList, int32
     return err;
 }
 
-int32_t OmxManagerCreateComponent(struct CodecComponentType **component, uint32_t *componentId, char *compName,
-                                  int64_t appData, struct CodecCallbackType *callbacks)
+static int32_t OmxManagerCreateComponent(struct CodecComponentType **component, uint32_t *componentId, char *compName,
+                                         int64_t appData, struct CodecCallbackType *callbacks)
 {
     HDF_LOGI("%{public}s, service impl!", __func__);
     if (g_service == NULL) {
@@ -112,7 +112,7 @@ int32_t OmxManagerCreateComponent(struct CodecComponentType **component, uint32_
     return err;
 }
 
-int32_t OmxManagerDestroyComponent(uint32_t componentId)
+static int32_t OmxManagerDestroyComponent(uint32_t componentId)
 {
     HDF_LOGI("%{public}s, service impl, %{public}d!", __func__, componentId);
     if (g_service == NULL) {
@@ -146,7 +146,7 @@ int32_t OmxManagerDestroyComponent(uint32_t componentId)
     return err;
 }
 
-void CodecComponentManagerServiceConstruct(struct CodecComponentManager *manager)
+static void CodecComponentManagerServiceConstruct(struct CodecComponentManager *manager)
 {
     manager->GetComponentNum = OmxManagerGetComponentNum;
     manager->GetComponentCapabilityList = OmxManagerGetComponentCapabilityList;

@@ -155,10 +155,25 @@ enum AudioFormat {
  * A mask describes an audio channel position.
  */
 enum AudioChannelMask {
-    AUDIO_CHANNEL_FRONT_LEFT  = 0x1,  /**< Front left channel */
-    AUDIO_CHANNEL_FRONT_RIGHT = 0x2,  /**< Front right channel */
-    AUDIO_CHANNEL_MONO        = 0x1u, /**< Mono channel */
-    AUDIO_CHANNEL_STEREO      = 0x3u, /**< Stereo channel, consisting of front left and front right channels */
+    AUDIO_CHANNEL_MONO           = 1u,      /**< Mono channel */
+    AUDIO_CHANNEL_FRONT_LEFT     = 1u,      /**< Front left channel */
+    AUDIO_CHANNEL_FRONT_RIGHT    = 2u,      /**< Front right channel */
+    AUDIO_CHANNEL_FRONT_CENTER   = 4u,      /**< Front right channel */
+    AUDIO_CHANNEL_LOW_FREQUENCY  = 8u,      /**< 0x8 */
+    AUDIO_CHANNEL_BACK_LEFT      = 16u,     /**< 0x10 */
+    AUDIO_CHANNEL_BACK_RIGHT     = 32u,     /**< 0x20 */
+    AUDIO_CHANNEL_BACK_CENTER    = 256u,    /**< 0x100 */
+    AUDIO_CHANNEL_SIDE_LEFT      = 512u,    /**< 0x200 */
+    AUDIO_CHANNEL_SIDE_RIGHT     = 1024u,   /**< 0x400 */
+    AUDIO_CHANNEL_TOP_SIDE_LEFT  = 262144u, /**< 0x40000 */
+    AUDIO_CHANNEL_TOP_SIDE_RIGHT = 524288u, /**< 0x80000 */
+    AUDIO_CHANNEL_STEREO         = 3u,      /**< FRONT_LEFT | FRONT_RIGHT */
+    AUDIO_CHANNEL_2POINT1        = 11u,     /**< STEREO | LOW_FREQUENCY */
+    AUDIO_CHANNEL_QUAD           = 51u,     /**< STEREO | BACK_LEFT | BACK_RIGHT */
+    AUDIO_CHANNEL_3POINT0POINT2  = 786439u, /**< STEREO | FRONT_CENTER | TOP_SIDE_LEFT | TOP_SIDE_RIGHT */
+    AUDIO_CHANNEL_5POINT1        = 63u,     /**< QUAD | FRONT_CENTER | LOW_FREQUENCY */
+    AUDIO_CHANNEL_6POINT1        = 319u,    /**< AUDIO_CHANNEL_5POINT1 | BACK_CENTER */
+    AUDIO_CHANNEL_7POINT1        = 1599u,   /**< AUDIO_CHANNEL_5POINT1 | SIDE_LEFT | SIDE_RIGHT */
 };
 
 /**

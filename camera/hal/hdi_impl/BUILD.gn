@@ -35,12 +35,10 @@ if (defined(ohos_lite)) {
     ldflags += [ "--coverage" ]
   }
 
-  ohos_shared_library("camera_hdi_impl") {
+  ohos_shared_library("camera_host_service_1.0") {
     output_extension = "z.so"
     sources = [
-      "src/camera_device/camera_device.cpp",
       "src/camera_device/camera_device_impl.cpp",
-      "src/camera_host/camera_host.cpp",
       "src/camera_host/camera_host_config.cpp",
       "src/camera_host/camera_host_impl.cpp",
       "src/camera_host/hcs_deal.cpp",
@@ -149,20 +147,12 @@ if (defined(ohos_lite)) {
     }
   }
 
-  ohos_shared_library("camera_hdi_impl") {
+  ohos_shared_library("camera_host_service_1.0") {
     sources = [
-      "$camera_path/../interfaces/hdi_ipc/callback/device/src/camera_device_callback_proxy.cpp",
-      "$camera_path/../interfaces/hdi_ipc/callback/host/src/camera_host_callback_proxy.cpp",
-      "$camera_path/../interfaces/hdi_ipc/callback/operator/src/stream_operator_callback_proxy.cpp",
-      "$camera_path/../interfaces/hdi_ipc/server/src/camera_device_stub.cpp",
-      "$camera_path/../interfaces/hdi_ipc/server/src/camera_host_driver.cpp",
-      "$camera_path/../interfaces/hdi_ipc/server/src/camera_host_stub.cpp",
-      "$camera_path/../interfaces/hdi_ipc/server/src/offline_stream_operator_stub.cpp",
-      "$camera_path/../interfaces/hdi_ipc/server/src/stream_operator_stub.cpp",
-      "$camera_path/../interfaces/hdi_ipc/utils/src/utils_data_stub.cpp",
-      "$camera_path/hdi_impl/src/camera_device/camera_device.cpp",
+      "$camera_path/../interfaces/hdi_ipc/camera_host_driver.cpp",
+
+      #"$camera_path/../interfaces/hdi_ipc/utils/src/utils_data_stub.cpp",
       "$camera_path/hdi_impl/src/camera_device/camera_device_impl.cpp",
-      "$camera_path/hdi_impl/src/camera_host/camera_host.cpp",
       "$camera_path/hdi_impl/src/camera_host/camera_host_config.cpp",
       "$camera_path/hdi_impl/src/camera_host/camera_host_impl.cpp",
       "$camera_path/hdi_impl/src/camera_host/hcs_deal.cpp",
@@ -182,8 +172,6 @@ if (defined(ohos_lite)) {
       "$camera_path/../interfaces/include",
       "$camera_path/../interfaces/hdi_ipc",
       "$camera_path/../interfaces/hdi_ipc/utils/include",
-      "$camera_path/../interfaces/hdi_ipc/utils/include",
-      "$camera_path/../interfaces/hdi_ipc/server/include",
       "$camera_path/../interfaces/hdi_ipc/callback/host/include",
       "$camera_path/../interfaces/hdi_ipc/callback/device/include",
       "$camera_path/../interfaces/hdi_ipc/callback/operator/include",
@@ -229,6 +217,7 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "$camera_path/utils:camera_utils",
+      "//drivers/interface/camera/v1_0:libcamera_stub_1.0",
       "//drivers/peripheral/camera/interfaces/metadata:metadata",
     ]
 

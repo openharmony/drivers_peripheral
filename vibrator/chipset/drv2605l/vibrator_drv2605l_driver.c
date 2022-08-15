@@ -119,8 +119,6 @@ static int32_t DetectDrv2605lDevice(struct Drv2605lDriverData *drvData)
     uint16_t chipIdValue;
     int32_t ret;
 
-    CHECK_VIBRATOR_NULL_PTR_RETURN_VALUE(drvData, HDF_ERR_INVALID_PARAM);
-
     chipIdReg = drvData->drv2605lCfgData->vibratorAttr.chipIdReg;
     chipIdValue = drvData->drv2605lCfgData->vibratorAttr.chipIdValue;
 
@@ -151,30 +149,33 @@ static int32_t DetectDrv2605lDevice(struct Drv2605lDriverData *drvData)
 static int32_t InitDrv2605lChip(struct VibratorCfgData *drv2605lCfgData)
 {
     uint8_t value[DRV2605L_VALUE_BUTT];
-    CHECK_VIBRATOR_NULL_PTR_RETURN_VALUE(drv2605lCfgData, HDF_FAILURE);
 
     value[DRV2605L_ADDR_INDEX] = (uint8_t)DRV2605_REG_CONTROL3;
     value[DRV2605L_VALUE_INDEX] = (uint8_t)DRV2605_MODE_OPEN_LOOP;
     if (WriteDrv2605l(&drv2605lCfgData->vibratorBus.i2cCfg, value, sizeof(value)) != HDF_SUCCESS) {
         HDF_LOGE("%s: i2c addr [%0X] write failed", __func__, value[DRV2605L_ADDR_INDEX]);
+        return HDF_FAILURE;
     }
 
     value[DRV2605L_ADDR_INDEX] = (uint8_t)DRV2605_REG_FEEDBACK;
     value[DRV2605L_VALUE_INDEX] = (uint8_t)DRV2605_MODE_LRA;
     if (WriteDrv2605l(&drv2605lCfgData->vibratorBus.i2cCfg, value, sizeof(value)) != HDF_SUCCESS) {
         HDF_LOGE("%s: i2c addr [%0X] write failed", __func__, value[DRV2605L_ADDR_INDEX]);
+        return HDF_FAILURE;
     }
 
     value[DRV2605L_ADDR_INDEX] = (uint8_t)DRV2605_REG_RTPIN;
     value[DRV2605L_VALUE_INDEX] = (uint8_t)&drv2605lCfgData->vibratorAttr.defaultIntensity;
     if (WriteDrv2605l(&drv2605lCfgData->vibratorBus.i2cCfg, value, sizeof(value)) != HDF_SUCCESS) {
         HDF_LOGE("%s: i2c addr [%0X] write failed", __func__, value[DRV2605L_ADDR_INDEX]);
+        return HDF_FAILURE;
     }
 
     value[DRV2605L_ADDR_INDEX] = (uint8_t)DRV2605_REG_LRARESON;
     value[DRV2605L_VALUE_INDEX] = (uint8_t)&drv2605lCfgData->vibratorAttr.defaultFrequency;
     if (WriteDrv2605l(&drv2605lCfgData->vibratorBus.i2cCfg, value, sizeof(value)) != HDF_SUCCESS) {
         HDF_LOGE("%s: i2c addr [%0X] write failed", __func__, value[DRV2605L_ADDR_INDEX]);
+        return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;

@@ -24,8 +24,7 @@
 
 using namespace testing::ext;
 namespace OHOS::Camera {
-class TestNode
-{
+class TestNode {
 public:
     ~TestNode() {}
     TestNode() {}
@@ -40,8 +39,7 @@ public:
     }
 };
 
-class TestDevice
-{
+class TestDevice {
 public:
     TestDevice() {};
     ~TestDevice() {};
@@ -81,7 +79,7 @@ HWTEST_F(UtestMpiDeviceManager, Init_Success, TestSize.Level0)
 {
     DM = IDeviceManager::GetInstance();
     RetCode rc = RC_OK;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         rc = DM->Init();
     }
     EXPECT_EQ(RC_OK, rc);
@@ -90,7 +88,7 @@ HWTEST_F(UtestMpiDeviceManager, Init_Success, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, PowerUp_Failed, TestSize.Level0)
 {
     RetCode rc = RC_OK;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         rc = DM->PowerUp(CAMERA_THIRD);
     }
     EXPECT_EQ(RC_ERROR, rc);
@@ -99,7 +97,7 @@ HWTEST_F(UtestMpiDeviceManager, PowerUp_Failed, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, PowerUp_Success, TestSize.Level0)
 {
     RetCode rc = RC_OK;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         rc = DM->PowerUp(CAMERA_FIRST);
     }
     EXPECT_EQ(RC_OK, rc);
@@ -108,7 +106,7 @@ HWTEST_F(UtestMpiDeviceManager, PowerUp_Success, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, GetSensor_Success, TestSize.Level0)
 {
     std::shared_ptr<ISensor> sensor;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_FIRST);
     }
     CameraMetadata meta(100, 2000);
@@ -119,7 +117,7 @@ HWTEST_F(UtestMpiDeviceManager, GetSensor_Success, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, GetSensor_Success2, TestSize.Level0)
 {
     std::shared_ptr<ISensor> sensor;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_SECOND);
     }
     CameraMetadata meta(100, 2000);
@@ -131,7 +129,7 @@ HWTEST_F(UtestMpiDeviceManager, GetSensor_Success2, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, GetSensor_Failed, TestSize.Level0)
 {
     std::shared_ptr<ISensor> sensor;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         sensor = DM->GetSensor(CAMERA_THIRD);
     }
     EXPECT_EQ(true, sensor == nullptr);
@@ -140,7 +138,7 @@ HWTEST_F(UtestMpiDeviceManager, GetSensor_Failed, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, GetManager_Success, TestSize.Level0)
 {
     std::shared_ptr<IManager> manager;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         manager = DM->GetManager(DM_M_VI);
     }
     EXPECT_EQ(true, manager != nullptr);
@@ -149,7 +147,7 @@ HWTEST_F(UtestMpiDeviceManager, GetManager_Success, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, GetManager_Failed, TestSize.Level0)
 {
     std::shared_ptr<IManager> manager;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         manager = DM->GetManager(DM_M_FLASH);
     }
     EXPECT_EQ(true, manager == nullptr);
@@ -158,7 +156,7 @@ HWTEST_F(UtestMpiDeviceManager, GetManager_Failed, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, GetController_Success, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         controller = DM->GetController(DM_M_VI, DM_C_VI);
     }
     EXPECT_EQ(true, controller != nullptr);
@@ -167,7 +165,7 @@ HWTEST_F(UtestMpiDeviceManager, GetController_Success, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, GetController_Failed1, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         controller = DM->GetController(DM_M_VI, DM_C_SENSOR);
     }
     EXPECT_EQ(true, controller == nullptr);
@@ -176,7 +174,7 @@ HWTEST_F(UtestMpiDeviceManager, GetController_Failed1, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, GetController_Failed2, TestSize.Level0)
 {
     std::shared_ptr<IController> controller;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         controller = DM->GetController(DM_M_VPSS, DM_C_VO);
     }
     EXPECT_EQ(true, controller == nullptr);
@@ -185,7 +183,7 @@ HWTEST_F(UtestMpiDeviceManager, GetController_Failed2, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, GetCameraId_Success, TestSize.Level0)
 {
     std::vector<CameraId> cameraId;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         cameraId = DM->GetCameraId();
     }
     for (auto iter = cameraId.cbegin(); iter != cameraId.cend(); iter++) {
@@ -239,7 +237,7 @@ HWTEST_F(UtestMpiDeviceManager, Configure_Success, TestSize.Level0)
     EXPECT_EQ(true, controller != nullptr);
     std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(100, 2000);
     int32_t expo = 0;
-    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo , 1);
+    meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     RetCode rc = controller->Configure(meta);
@@ -286,7 +284,7 @@ HWTEST_F(UtestMpiDeviceManager, UnConnect_Success, TestSize.Level0)
 HWTEST_F(UtestMpiDeviceManager, PowerDown_Success, TestSize.Level0)
 {
     RetCode rc = RC_OK;
-    if(DM != nullptr) {
+    if (DM != nullptr) {
         rc = DM->PowerDown(CAMERA_FIRST);
     }
     EXPECT_EQ(RC_OK, rc);

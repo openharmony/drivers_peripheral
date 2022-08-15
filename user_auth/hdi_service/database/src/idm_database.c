@@ -854,7 +854,7 @@ void SetCredentialConditionExecutorMatcher(CredentialCondition *condition, uint3
     condition->conditionFactor |= CREDENTIAL_CONDITION_EXECUTOR_MATCHER;
 }
 
-void SetCredentialConditionUserId(CredentialCondition *condition, uint32_t userId)
+void SetCredentialConditionUserId(CredentialCondition *condition, int32_t userId)
 {
     if (condition == NULL) {
         LOG_ERROR("condition is null");

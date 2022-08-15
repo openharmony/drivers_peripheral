@@ -13,10 +13,12 @@
  * limitations under the License.
  */
 #include "hdf_audio_server_render.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 #include "hdf_audio_server_common.h"
+#include "osal_mutex.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
+struct OsalMutex g_renderLock;
 
 int32_t GetInitRenderParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
 {
@@ -127,7 +129,7 @@ int32_t HdiServiceCreatRender(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("GetInitRenderPara fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
+    if (AudioAdapterListGetAdapter(adapterName, &adapter) < 0) {
         AUDIO_FUNC_LOGE("fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -151,6 +153,7 @@ int32_t HdiServiceCreatRender(const struct HdfDeviceIoClient *client,
         adapter->DestroyRender(adapter, render);
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    OsalMutexInit(&g_renderLock);
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -164,6 +167,8 @@ int32_t HdiServiceRenderDestory(const struct HdfDeviceIoClient *client,
     struct AudioRender *render = NULL;
     const char *adapterName = NULL;
     uint32_t pid = 0;
+
+    OsalMutexDestroy(&g_renderLock);
     if (HdiServiceRenderCaptureReadData(data, &adapterName, &pid) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -183,7 +188,7 @@ int32_t HdiServiceRenderDestory(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("DestroyRender failed!");
         return ret;
     }
-    if (AudioDestroyRenderInfoInAdapter(adapterName)) {
+    if (AudioDestroyRenderInfoInAdapter(adapterName) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return AUDIO_HAL_SUCCESS;
@@ -626,7 +631,9 @@ int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     AudioSetRenderStatus(adapterName, true);
+    (void)OsalMutexLock(&g_renderLock);
     ret = render->RenderFrame((AudioHandle)render, (const void *)frame, (uint64_t)requestBytes, &replyBytes);
+    (void)OsalMutexUnlock(&g_renderLock);
     AudioSetRenderStatus(adapterName, false);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("HdiServiceRenderRenderFrame fail");
@@ -648,7 +655,9 @@ int32_t HdiServiceRenderGetRenderPosition(const struct HdfDeviceIoClient *client
     if (ret < 0) {
         return ret;
     }
+    (void)OsalMutexLock(&g_renderLock);
     ret = render->GetRenderPosition((AudioHandle)render, &frames, &time);
+    (void)OsalMutexUnlock(&g_renderLock);
     if (ret < 0) {
         return ret;
     }

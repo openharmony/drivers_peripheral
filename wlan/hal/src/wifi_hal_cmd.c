@@ -141,13 +141,13 @@ int32_t HalCmdGetValidFreqWithBand(const char *ifName, int32_t band, int32_t *fr
     int32_t ret;
     struct FreqInfoResult result;
 
-    result.freqs = OsalMemCalloc(size * sizeof(int32_t));
+    result.freqs = OsalMemCalloc(size * sizeof(uint32_t));
     if (result.freqs == NULL) {
         HDF_LOGE("%s: OsalMemCalloc failed", __FUNCTION__);
         return HDF_FAILURE;
     }
 
-    result.txPower = OsalMemCalloc(size * sizeof(int32_t));
+    result.txPower = OsalMemCalloc(size * sizeof(uint32_t));
     if (result.txPower == NULL) {
         HDF_LOGE("%s: OsalMemCalloc failed", __FUNCTION__);
         OsalMemFree(result.freqs);
@@ -160,7 +160,7 @@ int32_t HalCmdGetValidFreqWithBand(const char *ifName, int32_t band, int32_t *fr
             HDF_LOGE("%s: GetValidFreqByBand failed", __FUNCTION__);
             break;
         }
-        if (memcpy_s(freqs, size * sizeof(int32_t), result.freqs, result.nums * sizeof(int32_t)) != EOK) {
+        if (memcpy_s(freqs, size * sizeof(uint32_t), result.freqs, result.nums * sizeof(uint32_t)) != EOK) {
             HDF_LOGE("%s: memcpy failed, line: %d", __FUNCTION__, __LINE__);
             ret = HDF_FAILURE;
             break;

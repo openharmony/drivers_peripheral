@@ -23,7 +23,7 @@
 #include "v1_0/user_auth_interface_stub.h"
 
 using namespace OHOS::HDI::UserAuth::V1_0;
-#define LOG_LABEL OHOS::UserIAM::Common::LABEL_USER_AUTH_HDI
+#define LOG_LABEL OHOS::UserIam::Common::LABEL_USER_AUTH_HDI
 
 struct HdfUserAuthInterfaceHost {
     struct IDeviceIoService ioService;
@@ -125,10 +125,10 @@ struct HdfDriverEntry g_userAuthInterfaceDriverEntry = {
     .Release = HdfUserAuthInterfaceDriverRelease,
 };
 
-#ifndef __cplusplus
+#ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 HDF_INIT(g_userAuthInterfaceDriverEntry);
-#ifndef __cplusplus
+#ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */

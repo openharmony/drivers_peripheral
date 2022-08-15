@@ -195,7 +195,7 @@ static int32_t SerStubFillBufferDone(struct CodecCallbackType *serviceImpl,
     return ret;
 }
 
-int32_t CodecCallbackTypeServiceOnRemoteRequest(struct HdfRemoteService *service, int32_t code,
+static int32_t CodecCallbackTypeServiceOnRemoteRequest(struct HdfRemoteService *service, int32_t code,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct CodecCallbackType *serviceImpl = (struct CodecCallbackType*)service;
@@ -223,8 +223,14 @@ static void *LoadServiceHandler(void)
     char *libPath = NULL;
     void *handler = NULL;
 
+    char pathBuf[PATH_MAX] = {'\0'};
     libPath = HDF_LIBRARY_FULL_PATH(OMX_CALLBACK_IMPLEMENT);
-    handler = dlopen(libPath, RTLD_LAZY);
+    if (realpath(libPath, pathBuf) == NULL) {
+        HDF_LOGE("%{public}s: realpath failed!", __func__);
+        return NULL;
+    }
+
+    handler = dlopen(pathBuf, RTLD_LAZY);
     if (handler == NULL) {
         HDF_LOGE("%{public}s: dlopen failed %{public}s", __func__, dlerror());
         return NULL;

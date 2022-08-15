@@ -22,13 +22,13 @@
 #include "hdf_audio_pnp_server.h"
 #include "osal_time.h"
 #include "securec.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG             HDF_AUDIO_HAL_HOST
 #define INPUT_EVT_MAX_CNT       4
 #define WAIT_THREAD_END_TIME_MS 1
 static struct pollfd g_fdSets[INPUT_EVT_MAX_CNT];
-static int8_t g_inputDevCnt = 0;
+static int32_t g_inputDevCnt = 0;
 static bool g_bRunThread = false;
 
 static int32_t AudioAnalogHeadsetDeviceCheck(struct input_event evt)
@@ -89,16 +89,15 @@ static int32_t AudioPnpInputPollAndRead(void)
     int32_t n = g_inputDevCnt;
     struct input_event evt;
 
-    ret = poll(g_fdSets, n, -1);
+    ret = poll(g_fdSets, (nfds_t)n, -1);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("[poll] failed!");
         return HDF_FAILURE;
     }
 
     for (i = 0; i < n; i++) {
-        if (g_fdSets[i].revents & POLLIN) {
-            ret = read(g_fdSets[i].fd, (void *)&evt, sizeof(evt));
-            if (ret < 0) {
+        if ((uint32_t)g_fdSets[i].revents & POLLIN) {
+            if (read(g_fdSets[i].fd, (void *)&evt, sizeof(evt)) < 0) {
                 AUDIO_FUNC_LOGE("[read] failed!");
                 return HDF_FAILURE;
             }
@@ -167,7 +166,7 @@ int32_t AudioPnpInputStartThread(void)
     g_bRunThread = true;
     pthread_attr_init(&tidsAttr);
     pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
-    if (pthread_create(&thread, &tidsAttr, AudioPnpInputStart, NULL)) {
+    if (pthread_create(&thread, &tidsAttr, AudioPnpInputStart, NULL) != 0) {
         AUDIO_FUNC_LOGE("[pthread_create] failed!");
         g_bRunThread = false;
         return HDF_FAILURE;

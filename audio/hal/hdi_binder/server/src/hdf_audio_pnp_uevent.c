@@ -22,7 +22,7 @@
 #include "hdf_audio_pnp_server.h"
 #include "hdf_base.h"
 #include "securec.h"
-#include "audio_hal_log.h"
+#include "audio_uhdf_log.h"
 
 #define UEVENT_ACTION           "ACTION="
 #define UEVENT_NAME             "NAME="
@@ -209,7 +209,7 @@ static int AudioPnpUeventOpen(int *fd)
         return HDF_FAILURE;
     }
     addr.nl_family = AF_NETLINK;
-    addr.nl_pid = getpid();
+    addr.nl_pid = (sa_family_t)getpid();
     addr.nl_groups = UEVENT_SOCKET_GROUPS;
 
     socketfd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
@@ -235,7 +235,7 @@ static void *AudioPnpUeventStart(void *useless)
 {
     (void)useless;
     int ret;
-    int rcvlen;
+    ssize_t rcvlen;
     int socketfd = 0;
     fd_set fds;
     char msg[UEVENT_MSG_LEN];
@@ -267,9 +267,9 @@ static void *AudioPnpUeventStart(void *useless)
             if (rcvlen == UEVENT_MSG_LEN) {
                 continue;
             }
-            AudioPnpUeventParse(msg, rcvlen);
+            AudioPnpUeventParse(msg, (int32_t)rcvlen);
         } while (rcvlen > 0);
-    } while (1);
+    } while (true);
 }
 
 int32_t AudioPnpUeventStartThread(void)
@@ -280,7 +280,7 @@ int32_t AudioPnpUeventStartThread(void)
     AUDIO_FUNC_LOGI("create audio uevent thread.");
     pthread_attr_init(&tidsAttr);
     pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
-    if (pthread_create(&thread, &tidsAttr, AudioPnpUeventStart, NULL)) {
+    if (pthread_create(&thread, &tidsAttr, AudioPnpUeventStart, NULL) != 0) {
         AUDIO_FUNC_LOGE("create AudioPnpUeventStart thread failed!");
         return HDF_FAILURE;
     }

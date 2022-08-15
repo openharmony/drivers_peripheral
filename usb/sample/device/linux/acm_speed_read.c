@@ -74,7 +74,7 @@ static void ReadSpeedDone()
     }
 }
 
-void StopReadSpeedTest(int32_t signo)
+static void StopReadSpeedTest(int32_t signo)
 {
     ReadSpeedDone();
     g_readRuning = false;

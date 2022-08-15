@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2020-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,10 @@
 
 #include "usb_object.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Defines a session context object.
  *
@@ -56,6 +60,10 @@ struct UsbSession {
     /** Number of references to session context objects */
     OsalAtomic refCount;
 };
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* USB_SESSION_H */
 /** @} */

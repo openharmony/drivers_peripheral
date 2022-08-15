@@ -134,7 +134,6 @@ static int32_t GetComponentCapabilityList(CodecCompCapability *capList, int32_t 
 static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *componentId, char *compName,
                                int64_t appData, struct CodecCallbackType *callback)
 {
-    int32_t ret;
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL || componentId == NULL) {
@@ -163,7 +162,7 @@ static int32_t CreateComponent(struct CodecComponentType **component, uint32_t *
         ReleaseSbuf(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
+    int32_t ret = g_codecComponentManagerProxy.remoteOmx->dispatcher->Dispatch(g_codecComponentManagerProxy.remoteOmx,
                                                                        CMD_CREATE_COMPONENT, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
