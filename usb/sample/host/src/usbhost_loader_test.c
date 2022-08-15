@@ -39,6 +39,8 @@ struct HdfSBuf *g_reply;
 
 static int32_t UsbPnpTestEventReceived(void *priv, uint32_t id, struct HdfSBuf *data)
 {
+    (void)priv;
+    (void)data;
     int32_t ret;
 
     switch (id) {
@@ -46,14 +48,14 @@ static int32_t UsbPnpTestEventReceived(void *priv, uint32_t id, struct HdfSBuf *
             ret = HDF_ERR_INVALID_PARAM;
             break;
     }
-
     HDF_LOGI("%s:%d ret=%d DONE", __func__, __LINE__, ret);
-
     return ret;
 }
 
 int32_t main(int32_t argc, char *argv[])
 {
+    (void)argc;
+    (void)argv;
     HDF_LOGI("%s:%d usbhost pnp test start", __func__, __LINE__);
     int32_t ret;
     struct HdfIoService *testService = NULL;

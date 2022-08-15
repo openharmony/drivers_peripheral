@@ -83,6 +83,7 @@ static void TestRead()
 #define SLEEP_100MS 100000
 static int32_t ReadThread(void *arg)
 {
+    (void)arg;
     while (running) {
         TestRead();
         usleep(SLEEP_100MS);
@@ -135,6 +136,7 @@ static void WriteThread()
 
 static void StopAcmTest(int32_t signo)
 {
+    (void)signo;
     int32_t status;
     running = 0;
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_CLOSE, g_data, g_reply);
@@ -147,6 +149,8 @@ static void StopAcmTest(int32_t signo)
 
 int32_t acm_test(int32_t argc, const char *argv[])
 {
+    (void)argc;
+    (void)argv;
     int32_t status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
     if (servmgr == NULL) {

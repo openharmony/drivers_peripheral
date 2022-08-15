@@ -480,6 +480,7 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
 
 static int32_t EcmGetMac(struct EcmDevice *ecm, struct HdfSBuf *reply)
 {
+    (void)ecm;
     (void)reply;
     return HDF_SUCCESS;
 }
@@ -723,6 +724,7 @@ ERROR:
 
 static void EcmProcessNotification(struct EcmDevice *ecm, unsigned char *buf)
 {
+    (void)ecm;
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)buf;
     switch (dr->bNotificationType) {
         case USB_DDK_CDC_NOTIFY_NETWORK_CONNECTION:

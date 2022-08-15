@@ -1124,11 +1124,13 @@ static int32_t OsFreeRequest(const struct UsbHostRequest *request)
 
 static int32_t AdapterInit(const struct UsbSession *session)
 {
+    (void)session;
     return HDF_SUCCESS;
 }
 
 static void AdapterExit(const struct UsbSession *session)
 {
+    (void)session;
     return;
 }
 
@@ -1266,11 +1268,15 @@ static int32_t AdapterSetConfiguration(struct UsbDeviceHandle *handle, int32_t a
 
 static int32_t AdapterClaimInterface(const struct UsbDeviceHandle *handle, unsigned int interfaceNumber)
 {
+    (void)handle;
+    (void)interfaceNumber;
     return HDF_SUCCESS;
 }
 
 static int32_t AdapterReleaseInterface(const struct UsbDeviceHandle *handle, unsigned int interfaceNumber)
 {
+    (void)handle;
+    (void)interfaceNumber;
     return HDF_SUCCESS;
 }
 
@@ -1308,12 +1314,14 @@ static int32_t AdapterClearHalt(const struct UsbDeviceHandle *handle, unsigned i
 
 static int32_t AdapterResetDevice(const struct UsbDeviceHandle *handle)
 {
-     return HDF_SUCCESS;
+    (void)handle;
+    return HDF_SUCCESS;
 }
 
 static struct UsbHostRequest *AdapterAllocRequest(
     const struct UsbDeviceHandle *handle, int32_t isoPackets, size_t length)
 {
+    (void)handle;
     size_t allocSize;
     struct UsbHostRequest *request = NULL;
 

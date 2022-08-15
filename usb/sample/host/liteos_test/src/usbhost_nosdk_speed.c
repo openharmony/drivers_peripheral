@@ -104,6 +104,7 @@ static void SpeedPrint(void)
 
 static int32_t SendProcess(void *argurb)
 {
+    (void)argurb;
     int32_t i;
     int32_t r;
     while (!g_speedFlag) {
@@ -427,6 +428,7 @@ END:
 static int32_t AcmDeviceDispatch(
     struct HdfDeviceIoClient * const client, int32_t cmd, struct HdfSBuf * const data, struct HdfSBuf * const reply)
 {
+    (void)reply;
     if (client == NULL) {
         HDF_LOGE("%s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
@@ -481,10 +483,15 @@ static int32_t AcmDriverBind(struct HdfDeviceObject *device)
 
 static int32_t AcmDriverInit(struct HdfDeviceObject *device)
 {
+    (void)device;
     return 0;
 }
 
-static void AcmDriverRelease(struct HdfDeviceObject *device) {}
+static void AcmDriverRelease(struct HdfDeviceObject *device) 
+{
+    (void)device;
+    return;
+}
 
 struct HdfDriverEntry g_usbNoSdkSpeedDriverEntry = {
     .moduleVersion = 1,

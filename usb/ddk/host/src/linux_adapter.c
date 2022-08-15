@@ -867,11 +867,13 @@ COMPLETED:
 
 static int32_t AdapterInit(const struct UsbSession *session)
 {
+    (void)session;
     return HDF_SUCCESS;
 }
 
 static void AdapterExit(const struct UsbSession *session)
 {
+    (void)session;
     return;
 }
 
@@ -1343,6 +1345,7 @@ int32_t UsbAdapterRegisterSignal(void)
 
 int32_t UsbAdapterKillSignal(struct UsbDeviceHandle *devHandle, UsbRawTidType tid)
 {
+    (void)devHandle;
     if (kill(tid, SIGUSR1) == HDF_ERR_IO) {
         HDF_LOGE("%{public}s:%d kill tid=%d SIGUSR1 failed", __func__, __LINE__, tid);
         return HDF_ERR_IO;

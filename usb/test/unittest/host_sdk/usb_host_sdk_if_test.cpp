@@ -122,6 +122,7 @@ static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 
 static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
 {
+    (void)acm;
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)buf;
     switch (dr->bNotificationType) {
         case USB_DDK_CDC_NOTIFY_NETWORK_CONNECTION:

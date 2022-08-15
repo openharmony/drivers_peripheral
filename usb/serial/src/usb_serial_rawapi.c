@@ -549,7 +549,7 @@ static int32_t UsbSerialRead(struct SerialDevice *port, struct HdfSBuf *reply)
     uint32_t len;
 
     for (int32_t i = 0; i < ACM_NR; i++) {
-        if(acm->readReq[i]->status != USB_REQUEST_COMPLETED) {
+        if (acm->readReq[i]->status != USB_REQUEST_COMPLETED) {
             HDF_LOGE("%s:%d i=%d status=%d!",
                 __func__, __LINE__, i, acm->readReq[i]->status);
             return HDF_FAILURE;
@@ -1037,6 +1037,7 @@ ERROR:
 
 static void AcmProcessNotification(const struct AcmDevice *acm, const unsigned char *buf)
 {
+    (void)acm;
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)buf;
 
     switch (dr->bNotificationType) {

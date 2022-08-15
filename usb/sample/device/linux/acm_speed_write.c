@@ -84,6 +84,8 @@ static void StopWriteSpeedTest(int32_t signo)
 
 int32_t acm_speed_write(int32_t argc, const char *argv[])
 {
+    (void)argc;
+    (void)argv;
     int32_t status;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
     if (servmgr == NULL) {

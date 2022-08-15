@@ -37,7 +37,7 @@
 struct HdfSBuf *g_data;
 struct HdfSBuf *g_reply;
 
-static void TestPnpWriteLog(char *string)
+static void TestPnpWriteLog(char *strTmp)
 {
     char str[STR_LEN] = {0};
     FILE *fp = NULL;
@@ -48,7 +48,7 @@ static void TestPnpWriteLog(char *string)
     fp = fopen("/data/usbhost_pnp_xts", "a+");
 
     int32_t ret = snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, %s\n",
-        time.tv_sec, time.tv_usec, string);
+        time.tv_sec, time.tv_usec, strTmp);
     if (ret < 0) {
         HDF_LOGE("%s: sbuf write failed", __func__);
         (void)fclose(fp);
