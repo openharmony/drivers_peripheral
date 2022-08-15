@@ -40,7 +40,7 @@ namespace OHOS::Camera {
     int _ms = _tv.tv_usec / 1000;                                                                           \
     char now[25] = {0};                                                                                     \
     sprintf_s(now, sizeof(now), "%02d-%02d %02d:%02d:%02d.%03d", _tm->tm_mon + 1, _tm->tm_mday, _tm->tm_hour,        \
-        _tm->tm_min, _tm->tm_sec, _ms);
+        _tm->tm_min, _tm->tm_sec, _ms)
 
 #define CAMERA_LOGE(fmt, ...)                                           \
     do {                                                                \
@@ -49,7 +49,7 @@ namespace OHOS::Camera {
         pid_t tid = gettid();                                        \
         printf("%s %4u %4u E " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
         fflush(stdout);                                                 \
-    } while (0);
+    } while (0)
 
 #define CAMERA_LOGW(fmt, ...)                                           \
     do {                                                                \
@@ -58,7 +58,7 @@ namespace OHOS::Camera {
         pid_t tid = gettid();                                        \
         printf("%s %4u %4u W " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
         fflush(stdout);                                                 \
-    } while (0);
+    } while (0)
 
 #define CAMERA_LOGI(fmt, ...)                                           \
     do {                                                                \
@@ -67,7 +67,7 @@ namespace OHOS::Camera {
         pid_t tid = gettid();                                        \
         printf("%s %4u %4u I " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
         fflush(stdout);                                                 \
-    } while (0);
+    } while (0)
 
 #define CAMERA_LOGV(fmt, ...)                                           \
     do {                                                                \
@@ -76,7 +76,7 @@ namespace OHOS::Camera {
         pid_t tid = gettid();                                        \
         printf("%s %4u %4u V " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
         fflush(stdout);                                                 \
-    } while (0);
+    } while (0)
 
 #define CAMERA_LOGD(fmt, ...)                                           \
     do {                                                                \
@@ -85,7 +85,7 @@ namespace OHOS::Camera {
         pid_t tid = gettid();                                        \
         printf("%s %4u %4u D " fmt "\n", now, (uint32_t)pid, (uint32_t)tid, ##__VA_ARGS__); \
         fflush(stdout);                                                 \
-    } while (0);
+    } while (0)
 
 constexpr uint32_t WATCHDOG_TIMEOUT = 20000;
 

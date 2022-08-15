@@ -25,7 +25,7 @@
 
 namespace OHOS::Camera {
 #define REGISTER_BUFFER_ALLOCATOR(C, type, ...) \
-    static BufferAllocatorFactory::BufferAllocatorRegister<C> g_reg##C(type, ##__VA_ARGS__);
+    static BufferAllocatorFactory::BufferAllocatorRegister<C> g_reg##C(type, ##__VA_ARGS__)
 
 class BufferAllocatorFactory {
 public:

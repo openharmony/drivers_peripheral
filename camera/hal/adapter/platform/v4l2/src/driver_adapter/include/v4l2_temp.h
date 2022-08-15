@@ -117,13 +117,13 @@ enum AdapterCmd : uint32_t {
 #define CAMERA_LOGD(fmt, ...)                    \
     do {                                         \
         printf("INFO:" fmt "\n", ##__VA_ARGS__); \
-    } while (0);
+    } while (0)
 #endif
 
 #define CAMERA_LOGE(fmt, ...)                     \
     do {                                          \
         printf("ERROR:" fmt "\n", ##__VA_ARGS__); \
-    } while (0);
+    } while (0)
 
 enum RetCode {
     RC_OK = 0,
