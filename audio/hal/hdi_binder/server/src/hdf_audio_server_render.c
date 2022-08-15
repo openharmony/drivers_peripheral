@@ -719,6 +719,7 @@ int32_t HdiServiceRenderSetChannelMode(const struct HdfDeviceIoClient *client,
     struct AudioRender *render = NULL;
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioAdapterListCheckAndGetRender failed.");
         return ret;
     }
     uint32_t tempMode = 0;
@@ -739,6 +740,7 @@ int32_t HdiServiceRenderGetChannelMode(const struct HdfDeviceIoClient *client,
     struct AudioRender *render = NULL;
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("CheckAndGetRender failed.");
         return ret;
     }
     ret = render->GetChannelMode((AudioHandle)render, &mode);
@@ -853,19 +855,19 @@ int32_t HdiServiceRenderAddEffect(const struct HdfDeviceIoClient *client,
     (void)client;
     (void)reply;
     uint64_t effectid = 0;
+    struct AudioRender *render = NULL;
     if (data == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
-    struct AudioRender *render = NULL;
     int32_t ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0 || render == NULL) {
-        AUDIO_FUNC_LOGE("render is NULL or ret = %{public}d", ret);
+        AUDIO_FUNC_LOGE("render is null or ret = %{public}d", ret);
         return ret;
     }
 
     if (!HdfSbufReadUint64(data, &effectid)) {
-        AUDIO_FUNC_LOGE("read buf fail ");
+        AUDIO_FUNC_LOGE("HdfSbufReadUint64 failed.");
         return HDF_FAILURE;
     }
 
