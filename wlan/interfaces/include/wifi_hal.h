@@ -332,6 +332,21 @@ struct IWiFi {
      * @version 1.0
      */
     int32_t (*unregisterHid2dCallback)(Hid2dCallback func, const char *ifName);
+
+    /**
+     * @brief Get station information.
+     *
+     * @param ifName Indicates the pointer to the network interface name.
+     * @param info Indicates the Station information.
+     * @param mac Indicates the mac address of station.
+     * @param param Indicates the length of mac address.
+     *
+     * @return Returns <b>0</b> if get station information successful; returns a negative value otherwise.
+     *
+     * @since 3.2
+     * @version 1.0
+     */
+    int32_t (*getStationInfo)(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen);
 };
 
 /**

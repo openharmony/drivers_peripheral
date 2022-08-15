@@ -234,7 +234,7 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
             WifiEventScanResultProcess(ifName);
             break;
         default:
-            HILOG_INFO(LOG_CORE, "%s: not supported cmd, cmd = %d\n", __FUNCTION__, cmd);
+            HILOG_INFO(LOG_CORE, "%s: not supported cmd, cmd = %d", __FUNCTION__, cmd);
             break;
     }
 }

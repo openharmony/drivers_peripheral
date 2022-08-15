@@ -770,7 +770,7 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode)
             break;
         }
         if (!HdfSbufReadUint8(reply, mode)) {
-            HDF_LOGE("%s: HdfSbufReadBuffer failed", __FUNCTION__);
+            HDF_LOGE("%s: HdfSbufReadUint8 failed", __FUNCTION__);
             ret = RET_CODE_FAILURE;
             break;
         }
@@ -938,6 +938,48 @@ int32_t SendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t *paramBuf, 
     } while (0);
 
     HdfSbufRecycle(req);
+    return ret;
+}
+
+int32_t GetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    const uint8_t *replayData = NULL;
+    uint32_t size;
+
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+        return RET_CODE_FAILURE;
+    }
+
+    do {
+        if (!HdfSbufWriteString(data, ifName)) {
+            HDF_LOGE("%{public}s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (!HdfSbufWriteBuffer(data, mac, macLen)) {
+            HDF_LOGE("%{public}s: write mac address fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_GET_STATION_INFO, data, reply);
+        if (ret != RET_CODE_SUCCESS) {
+            HDF_LOGE("%{public}s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
+            break;
+        }
+        if (!HdfSbufReadBuffer(reply, (const void **)(&replayData), &size)) {
+            HDF_LOGE("%{public}s: read station information fail!", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        if (memcpy_s(info, sizeof(StationInfo), replayData, size) != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s fail", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+        }
+    } while (0);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
     return ret;
 }
 #ifdef __cplusplus

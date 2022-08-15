@@ -59,13 +59,13 @@ int32_t HalMutexDestroy(void)
 void HalMutexLock(void)
 {
     if (OsalMutexLock(&g_mutex) != HDF_SUCCESS) {
-        HDF_LOGE("%s: OsalMutexLock failed, line: %d\n", __FUNCTION__, __LINE__);
+        HDF_LOGE("%s: OsalMutexLock failed, line: %d", __FUNCTION__, __LINE__);
     }
 }
 
 void HalMutexUnlock(void)
 {
     if (OsalMutexUnlock(&g_mutex) != HDF_SUCCESS) {
-        HDF_LOGE("%s: OsalMutexUnlock failed, line: %d\n", __FUNCTION__, __LINE__);
+        HDF_LOGE("%s: OsalMutexUnlock failed, line: %d", __FUNCTION__, __LINE__);
     }
 }
