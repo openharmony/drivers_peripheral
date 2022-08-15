@@ -199,39 +199,30 @@ int32_t ComponentNode::GetExtensionIndex(const char *parameterName, OMX_INDEXTYP
 int32_t ComponentNode::SetState(OMX_STATETYPE state)
 {
     int32_t ret = HDF_FAILURE;
+    bool stateFlag = false;
     switch (state) {
         case OMX_StateInvalid:
-            ret = HDF_SUCCESS;
+            stateFlag = true;
             break;
         case OMX_StateLoaded: {
-            if (state_ == OMX_StateIdle || state_ == OMX_StateWaitForResources || state_ == OMX_StateMax) {
-                ret = HDF_SUCCESS;
-            }
+            stateFlag = (state_ == OMX_StateIdle || state_ == OMX_StateWaitForResources || state_ == OMX_StateMax);
             break;
         }
         case OMX_StateIdle: {
-            if (state_ == OMX_StateWaitForResources || state_ == OMX_StateLoaded ||
-                    state_ == OMX_StatePause ||state_ == OMX_StateExecuting) {
-                ret = HDF_SUCCESS;
-            }
+            stateFlag = (state_ == OMX_StateWaitForResources || state_ == OMX_StateLoaded ||
+                state_ == OMX_StatePause || state_ == OMX_StateExecuting);
             break;
         }
         case OMX_StateExecuting: {
-            if (state_ == OMX_StateIdle || state_ == OMX_StatePause) {
-                ret = HDF_SUCCESS;
-            }
+            stateFlag = (state_ == OMX_StateIdle || state_ == OMX_StatePause);
             break;
         }
         case OMX_StatePause: {
-            if (state_ == OMX_StateIdle || state_ == OMX_StateExecuting) {
-                ret = HDF_SUCCESS;
-            }
+            stateFlag = (state_ == OMX_StateIdle || state_ == OMX_StateExecuting);
             break;
         }
         case OMX_StateWaitForResources: {
-            if (state_ == OMX_StateLoaded) {
-                ret = HDF_SUCCESS;
-            }
+            stateFlag = (state_ == OMX_StateLoaded);
             break;
         }
 
@@ -239,8 +230,8 @@ int32_t ComponentNode::SetState(OMX_STATETYPE state)
             HDF_LOGW("%{public}s warn, unsupport state[%{public}d]", __func__, state);
             break;
     }
-
-    if (ret == HDF_SUCCESS) {
+    if (stateFlag) {
+        ret = HDF_SUCCESS;
         state_ = state;
     }
     HDF_LOGI("%{public}s set state[%{public}d] , current state is [%{public}d]", __func__, state, state_);

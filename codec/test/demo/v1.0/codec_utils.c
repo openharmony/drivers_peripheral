@@ -55,7 +55,7 @@ static int32_t ParseCmdOption(CodecCmd* cmd, const char *opt, const char *next)
         case 'i': {
             int32_t len = strnlen(next, MAX_FILE_NAME_LENGTH);
             if (len) {
-                strcpy_s(cmd->file_input, MAX_FILE_NAME_LENGTH, next);
+                strcpy_s(cmd->fileInput, MAX_FILE_NAME_LENGTH, next);
             } else {
                 ret = HDF_FAILURE;
             }
@@ -63,7 +63,7 @@ static int32_t ParseCmdOption(CodecCmd* cmd, const char *opt, const char *next)
         case 'o': {
             int32_t len = strnlen(next, MAX_FILE_NAME_LENGTH);
             if (len) {
-                strcpy_s(cmd->file_output, MAX_FILE_NAME_LENGTH, next);
+                strcpy_s(cmd->fileOutput, MAX_FILE_NAME_LENGTH, next);
             } else {
                 ret = HDF_FAILURE;
             }

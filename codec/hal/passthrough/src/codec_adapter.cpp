@@ -341,8 +341,7 @@ bool CheckParamStructLen(int32_t paramIndex, uint32_t paramLen)
             break;
 
         default:
-            paramStructLen = paramLen;
-            break;
+            return false;
     }
     return (paramStructLen == paramLen);
 }

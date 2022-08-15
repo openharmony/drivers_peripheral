@@ -40,11 +40,10 @@
 typedef struct {
     char            *codecName;
     /* end of stream flag when set quit the loop */
-    unsigned int    loop_end;
+    unsigned int    loopEnd;
     /* input and output */
     FILE            *fpInput;
-    FILE            *fp_output;
-    int32_t         frameCount;
+    FILE            *fpOutput;
     int32_t         frameNum;
     CodecCallback   cb;
 } MpiDecLoopData;
@@ -55,7 +54,6 @@ ShareMemory *g_inputBuffers = NULL;
 ShareMemory *g_outputBuffers = NULL;
 CodecBuffer **g_inputInfosData = NULL;
 CodecBuffer **g_outputInfosData = NULL;
-struct ICodecCallback *g_callback = NULL;
 
 CodecCmd g_cmd = {0};
 MpiDecLoopData g_data = {0};
@@ -308,7 +306,7 @@ static int32_t SetDecParameter(void)
     return HDF_SUCCESS;
 }
 
-static void DecodeLoopHandleInput(const MpiDecLoopData *g_data)
+static void DecodeLoopHandleInput(const MpiDecLoopData *decData)
 {
     int32_t ret = 0;
     uint8_t readData[STREAM_PACKET_BUFFER_SIZE];
@@ -323,7 +321,7 @@ static void DecodeLoopHandleInput(const MpiDecLoopData *g_data)
         &acquireFd, inputData);
     if (ret == HDF_SUCCESS) {
         // when packet size is valid read the input binary file
-        readSize = ReadInputFromFile(g_data->fpInput, readData);
+        readSize = ReadInputFromFile(decData->fpInput, readData);
         g_totalSrcSize += readSize;
         g_pktEos = (readSize <= 0);
         if (g_pktEos) {
@@ -339,12 +337,12 @@ static void DecodeLoopHandleInput(const MpiDecLoopData *g_data)
     OsalMemFree(inputData);
 }
 
-static int32_t DecodeLoop(MpiDecLoopData *g_data)
+static int32_t DecodeLoop(MpiDecLoopData *decData)
 {
     int32_t ret = 0;
 
     if (!g_pktEos) {
-        DecodeLoopHandleInput(g_data);
+        DecodeLoopHandleInput(decData);
     }
 
     CodecBuffer *outputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
@@ -359,7 +357,7 @@ static int32_t DecodeLoop(MpiDecLoopData *g_data)
         g_totalFrames++;
         ShareMemory *sm = GetShareMemoryById(outputData->bufferId);
         HDF_LOGD("%{public}s: get output, g_currentFrames:%{public}d", __func__, g_totalFrames);
-        DumpOutputToFile(g_data->fp_output, sm->virAddr);
+        DumpOutputToFile(decData->fpOutput, sm->virAddr);
 
         CodecBuffer *queOutputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
         queOutputData->buffer[0].type = BUFFER_TYPE_FD;
@@ -369,8 +367,8 @@ static int32_t DecodeLoop(MpiDecLoopData *g_data)
         queOutputData->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
         g_codecProxy->CodecQueueOutput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, queOutputData, QUEUE_TIME_OUT, -1);
         if (outputData->flag & STREAM_FLAG_EOS) {
-            HDF_LOGI("%{public}s: reach STREAM_FLAG_EOS, loop_end, g_totalFrames:%{public}d", __func__, g_totalFrames);
-            g_data->loop_end = 1;
+            HDF_LOGI("%{public}s: reach STREAM_FLAG_EOS, loopEnd, g_totalFrames:%{public}d", __func__, g_totalFrames);
+            decData->loopEnd = 1;
         }
         OsalMemFree(queOutputData);
     }
@@ -381,13 +379,13 @@ static int32_t DecodeLoop(MpiDecLoopData *g_data)
 
 static void *DecodeThread(void *arg)
 {
-    MpiDecLoopData *g_data = (MpiDecLoopData *)arg;
+    MpiDecLoopData *decData = (MpiDecLoopData *)arg;
 
-    while (!g_data->loop_end) {
-        DecodeLoop(g_data);
+    while (!decData->loopEnd) {
+        DecodeLoop(decData);
     }
 
-    HDF_LOGD("%{public}s: client loop_end", __func__);
+    HDF_LOGD("%{public}s: client loopEnd", __func__);
     return NULL;
 }
 
@@ -397,9 +395,9 @@ static void RevertDecodeStep1(void)
         fclose(g_data.fpInput);
         g_data.fpInput = NULL;
     }
-    if (g_data.fp_output) {
-        fclose(g_data.fp_output);
-        g_data.fp_output = NULL;
+    if (g_data.fpOutput) {
+        fclose(g_data.fpOutput);
+        g_data.fpOutput = NULL;
     }
 }
 
@@ -439,19 +437,19 @@ static void RevertDecodeStep3(void)
 static int32_t OpenFile(void)
 {
     struct stat fileStat = {0};
-    stat(g_cmd.file_input, &fileStat);
+    stat(g_cmd.fileInput, &fileStat);
     g_SrcFileSize = fileStat.st_size;
     HDF_LOGI("%{public}s: input file size %{public}d", __func__, g_SrcFileSize);
 
-    g_data.fpInput = fopen(g_cmd.file_input, "rb");
+    g_data.fpInput = fopen(g_cmd.fileInput, "rb");
     if (g_data.fpInput == NULL) {
-        HDF_LOGE("%{public}s: failed to open input file %{public}s", __func__, g_cmd.file_input);
+        HDF_LOGE("%{public}s: failed to open input file %{public}s", __func__, g_cmd.fileInput);
         RevertDecodeStep1();
         return HDF_FAILURE;
     }
-    g_data.fp_output = fopen(g_cmd.file_output, "w+b");
-    if (g_data.fp_output == NULL) {
-        HDF_LOGE("%{public}s: failed to open output file %{public}s", __func__, g_cmd.file_output);
+    g_data.fpOutput = fopen(g_cmd.fileOutput, "w+b");
+    if (g_data.fpOutput == NULL) {
+        HDF_LOGE("%{public}s: failed to open output file %{public}s", __func__, g_cmd.fileOutput);
         RevertDecodeStep1();
         return HDF_FAILURE;
     }
@@ -472,9 +470,6 @@ static void DecodeEnd(void)
     }
 
     RevertDecodeStep3();
-    if (g_callback != NULL) {
-        CodecCallbackStubRelease(g_callback);
-    }
 }
 
 static int32_t Decode(void)
@@ -540,8 +535,8 @@ int32_t main(int32_t argc, char **argv)
     HDF_LOGI("%{public}s: ParseArguments width:%{public}d", __func__, g_cmd.width);
     HDF_LOGI("%{public}s: ParseArguments height:%{public}d", __func__, g_cmd.height);
     HDF_LOGI("%{public}s: ParseArguments codecName:%{public}s", __func__, g_cmd.codecName);
-    HDF_LOGI("%{public}s: ParseArguments input:%{public}s", __func__, g_cmd.file_input);
-    HDF_LOGI("%{public}s: ParseArguments output:%{public}s", __func__, g_cmd.file_output);
+    HDF_LOGI("%{public}s: ParseArguments input:%{public}s", __func__, g_cmd.fileInput);
+    HDF_LOGI("%{public}s: ParseArguments output:%{public}s", __func__, g_cmd.fileOutput);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("ParseArguments failed!");
         return ret;

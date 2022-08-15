@@ -116,7 +116,7 @@ int32_t CodecInit()
         HDF_LOGE("%{public}s: oemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
-    return g_codecInstance->codecOemIface->CodecInit();
+    return g_codecInstance->codecOemIface->codecInit();
 }
 
 int32_t CodecDeinit()
@@ -125,7 +125,7 @@ int32_t CodecDeinit()
         HDF_LOGE("%{public}s: g_codecInstance or oemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
-    g_codecInstance->codecOemIface->CodecDeinit();
+    g_codecInstance->codecOemIface->codecDeinit();
     int32_t ret = DestroyCodecInstance(g_codecInstance);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: CodecDeinit failed!", __func__);
@@ -199,7 +199,7 @@ int32_t CodecCreate(const char* name, CODEC_HANDLETYPE *handle)
         HDF_LOGE("%{public}s: g_codecInstance or oemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret = g_codecInstance->codecOemIface->CodecCreate(name, handle);
+    int32_t ret = g_codecInstance->codecOemIface->codecCreate(name, handle);
     if (ret != HDF_SUCCESS) {
         return ret;
     }
@@ -214,7 +214,7 @@ int32_t CodecDestroy(CODEC_HANDLETYPE handle)
         HDF_LOGE("%{public}s: g_codecInstance or oemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
-    return g_codecInstance->codecOemIface->CodecDestroy(handle);
+    return g_codecInstance->codecOemIface->codecDestroy(handle);
 }
 
 int32_t CodecSetPortMode(CODEC_HANDLETYPE handle, DirectionType direct, AllocateBufferMode mode, BufferType type)
@@ -244,7 +244,7 @@ int32_t CodecSetParameter(CODEC_HANDLETYPE handle, const Param *params, int32_t 
             g_codecInstance->codecType = codecType;
         }
     }
-    return g_codecInstance->codecOemIface->CodecSetParameter(handle, params, paramCnt);
+    return g_codecInstance->codecOemIface->codecSetParameter(handle, params, paramCnt);
 }
 
 int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramCnt)
@@ -257,7 +257,7 @@ int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
         HDF_LOGE("%{public}s: params empty!", __func__);
         return HDF_FAILURE;
     }
-    return g_codecInstance->codecOemIface->CodecGetParameter(handle, params, paramCnt);
+    return g_codecInstance->codecOemIface->codecGetParameter(handle, params, paramCnt);
 }
 
 int32_t CodecStart(CODEC_HANDLETYPE handle)
@@ -270,7 +270,7 @@ int32_t CodecStart(CODEC_HANDLETYPE handle)
         g_codecInstance->defaultCb.OnEvent = DefaultCbOnEvent;
         g_codecInstance->defaultCb.InputBufferAvailable = DefaultCbInputBufferAvailable;
         g_codecInstance->defaultCb.OutputBufferAvailable = DefaultCbOutputBufferAvailable;
-        g_codecInstance->codecOemIface->CodecSetCallback(handle, &(g_codecInstance->defaultCb), 0);
+        g_codecInstance->codecOemIface->codecSetCallback(handle, &(g_codecInstance->defaultCb), 0);
     }
     return RunCodecInstance(g_codecInstance);
 }
@@ -290,7 +290,7 @@ int32_t CodecFlush(CODEC_HANDLETYPE handle, DirectionType directType)
         HDF_LOGE("%{public}s: g_codecInstance or oemIface is NULL!", __func__);
         return HDF_FAILURE;
     }
-    return g_codecInstance->codecOemIface->CodecFlush(handle, directType);
+    return g_codecInstance->codecOemIface->codecFlush(handle, directType);
 }
 
 int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const CodecBuffer *inputData, uint32_t timeoutMs, int releaseFenceFd)
@@ -404,12 +404,12 @@ int32_t CodecSetCallback(CODEC_HANDLETYPE handle, const CodecCallback *cb, UINTP
         return HDF_FAILURE;
     }
 #ifndef CODEC_HAL_PASSTHROUGH
-    int32_t ret = g_codecInstance->codecOemIface->CodecSetCallback(handle, cb, instance);
+    int32_t ret = g_codecInstance->codecOemIface->codecSetCallback(handle, cb, instance);
 #else
     g_codecInstance->defaultCb.OnEvent = DefaultCbOnEvent;
     g_codecInstance->defaultCb.InputBufferAvailable = DefaultCbInputBufferAvailable;
     g_codecInstance->defaultCb.OutputBufferAvailable = DefaultCbOutputBufferAvailable;
-    int32_t ret = g_codecInstance->codecOemIface->CodecSetCallback(handle, &(g_codecInstance->defaultCb), 0);
+    int32_t ret = g_codecInstance->codecOemIface->codecSetCallback(handle, &(g_codecInstance->defaultCb), 0);
     g_codecCallback = cb;
     g_userData = instance;
 #endif
