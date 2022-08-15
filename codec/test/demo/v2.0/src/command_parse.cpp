@@ -15,16 +15,19 @@
 #include "command_parse.h"
 #include <getopt.h>
 
-enum class MyOptIndex {
-    OPT_INDEX_UNKONWN = 0,
-    OPT_INDEX_BUFFER_HANDLE,
-    OPT_INDEX_HEVC,
-    OPT_INDEX_HELP,
-    OPT_INDEX_HEIGHT = 'h',
-    OPT_INDEX_INPUT = 'i',
-    OPT_INDEX_OUTPUT = 'o',
-    OPT_INDEX_WIDTH = 'w'
-};
+namespace {
+    enum class MyOptIndex {
+        OPT_INDEX_UNKONWN = 0,
+        OPT_INDEX_BUFFER_HANDLE,
+        OPT_INDEX_HEVC,
+        OPT_INDEX_HELP,
+        OPT_INDEX_HEIGHT = 'h',
+        OPT_INDEX_INPUT = 'i',
+        OPT_INDEX_OUTPUT = 'o',
+        OPT_INDEX_WIDTH = 'w'
+    };
+}
+
 bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
 {
     int c = 0;

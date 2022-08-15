@@ -18,12 +18,14 @@
 
 #include <securec.h>
 
-struct AllParameters {
-    enum OMX_COMMANDTYPE cmd;
-    uint32_t param;
-    int8_t *cmdData;
-    uint32_t cmdDataLen;
-};
+namespace {
+    struct AllParameters {
+        enum OMX_COMMANDTYPE cmd;
+        uint32_t param;
+        int8_t *cmdData;
+        uint32_t cmdDataLen;
+    };
+}
 
 namespace OHOS {
 namespace Codec {

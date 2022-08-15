@@ -18,11 +18,13 @@
 
 #include <securec.h>
 
-struct AllParameters {
-    uint32_t portIndex;
-    int8_t *eglImage;
-    uint32_t eglImageLen;
-};
+namespace {
+    struct AllParameters {
+        uint32_t portIndex;
+        int8_t *eglImage;
+        uint32_t eglImageLen;
+    };
+}
 
 namespace OHOS {
 namespace Codec {

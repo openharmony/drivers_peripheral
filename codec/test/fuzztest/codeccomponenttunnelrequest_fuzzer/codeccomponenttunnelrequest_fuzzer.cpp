@@ -18,12 +18,14 @@
 
 #include <securec.h>
 
-struct AllParameters {
-    uint32_t port;
-    int32_t tunneledComp;
-    uint32_t tunneledPort;
-    struct OMX_TUNNELSETUPTYPE *tunnelSetup;
-};
+namespace {
+    struct AllParameters {
+        uint32_t port;
+        int32_t tunneledComp;
+        uint32_t tunneledPort;
+        struct OMX_TUNNELSETUPTYPE *tunnelSetup;
+    };
+}
 
 namespace OHOS {
 namespace Codec {

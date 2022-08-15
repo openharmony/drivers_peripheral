@@ -23,8 +23,12 @@
 
 using OHOS::HDI::Codec::V1_0::EventInfo;
 #define FD_SIZE sizeof(int)
-constexpr int NAME_LENGTH = 32;
-constexpr int ROLE_MAX_LEN = 256;
+
+namespace {
+    constexpr int NAME_LENGTH = 32;
+    constexpr int ROLE_MAX_LEN = 256;
+}
+
 namespace OHOS {
 namespace Codec {
 namespace Omx {

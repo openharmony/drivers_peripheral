@@ -18,11 +18,13 @@
 
 #include <securec.h>
 
-struct AllParameters {
-    uint32_t paramIndex;
-    int8_t *paramStruct;
-    uint32_t paramStructLen;
-};
+namespace {
+    struct AllParameters {
+        uint32_t paramIndex;
+        int8_t *paramStruct;
+        uint32_t paramStructLen;
+    };
+}
 
 namespace OHOS {
 namespace Codec {
