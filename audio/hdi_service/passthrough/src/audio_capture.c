@@ -680,7 +680,7 @@ static int32_t LogErrorGetRensonAndTime(struct AudioHwCapture *hwCapture, int er
     return AUDIO_SUCCESS;
 }
 
-void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
+static void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
@@ -772,7 +772,7 @@ int32_t AudioCaptureGetCapturePosition(struct AudioCapture *capture, uint64_t *f
     return AUDIO_SUCCESS;
 }
 
-int32_t SetValueCapture(struct ExtraParams mExtraParams, struct AudioHwCapture *capture)
+static int32_t SetValueCapture(struct ExtraParams mExtraParams, struct AudioHwCapture *capture)
 {
     if (capture == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -873,7 +873,7 @@ int32_t AudioCaptureGetExtraParams(struct AudioCapture *handle, char *keyValueLi
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureReqMmapBufferInit(
+static int32_t AudioCaptureReqMmapBufferInit(
     struct AudioHwCapture *capture, int32_t reqSize, const struct AudioMmapBufferDescripter *tempDesc)
 {
     if (capture == NULL || capture->devDataHandle == NULL || tempDesc == NULL) {
@@ -892,7 +892,11 @@ int32_t AudioCaptureReqMmapBufferInit(
         return ret;
     }
 
-    FILE *fp = fopen(desc.filePath, "rb+");
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(desc.filePath, pathBuf) == NULL) {
+        return HDF_FAILURE;
+    }
+    FILE *fp = fopen(pathBuf, "rb+");
     if (fp == NULL) {
         AUDIO_FUNC_LOGE("Open file failed!");
         return AUDIO_ERR_INTERNAL;

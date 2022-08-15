@@ -95,7 +95,7 @@ int32_t AudioProxyCaptureFlush(const AudioHandle handle)
     return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioProxyCaptureGetFrameParameter(int cmId, const AudioHandle handle, uint64_t *param)
+static int32_t AudioProxyCaptureGetFrameParameter(int cmId, const AudioHandle handle, uint64_t *param)
 {
     if (param == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -474,7 +474,7 @@ int32_t AudioProxyCaptureSetGain(const AudioHandle handle, float gain)
     return AudioProxyCommonSetCaptureCtrlParam(AUDIO_HDI_CAPTURE_SET_GAIN, handle, gain);
 }
 
-int32_t AudioProxyCaptureCaptureFrameSplit(struct AudioCapture *capture,
+static int32_t AudioProxyCaptureCaptureFrameSplit(struct AudioCapture *capture,
     uint64_t requestBytes, struct HdfSBuf **data, struct HdfSBuf **reply)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;

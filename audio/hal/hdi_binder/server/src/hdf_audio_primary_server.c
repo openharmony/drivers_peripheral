@@ -23,7 +23,7 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_HOST
 
-void AudioHdiPrimaryServerRelease(struct HdfDeviceObject *deviceObject)
+static void AudioHdiPrimaryServerRelease(struct HdfDeviceObject *deviceObject)
 {
     AUDIO_FUNC_LOGI("enter!");
     /* g_renderAndCaptureManage release */
@@ -39,7 +39,7 @@ void AudioHdiPrimaryServerRelease(struct HdfDeviceObject *deviceObject)
     return;
 }
 
-int AudioHdiPrimaryServerBind(struct HdfDeviceObject *deviceObject)
+static int AudioHdiPrimaryServerBind(struct HdfDeviceObject *deviceObject)
 {
     AUDIO_FUNC_LOGI("enter!");
     if (deviceObject == NULL) {
@@ -66,7 +66,7 @@ int AudioHdiPrimaryServerBind(struct HdfDeviceObject *deviceObject)
     return AUDIO_HAL_SUCCESS;
 }
 
-int AudioHdiPrimaryServerInit(struct HdfDeviceObject *deviceObject)
+static int AudioHdiPrimaryServerInit(struct HdfDeviceObject *deviceObject)
 {
     AUDIO_FUNC_LOGI("enter!");
     if (deviceObject == NULL) {

@@ -21,7 +21,7 @@
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_HOST
 
-void AudioHdiA2dpServerRelease(struct HdfDeviceObject *deviceObject)
+static void AudioHdiA2dpServerRelease(struct HdfDeviceObject *deviceObject)
 {
     AUDIO_FUNC_LOGI("enter!");
     /* g_renderAndCaptureManage release */
@@ -36,7 +36,7 @@ void AudioHdiA2dpServerRelease(struct HdfDeviceObject *deviceObject)
     return;
 }
 
-int AudioHdiA2dpServerBind(struct HdfDeviceObject *deviceObject)
+static int AudioHdiA2dpServerBind(struct HdfDeviceObject *deviceObject)
 {
     AUDIO_FUNC_LOGI("enter!");
     if (deviceObject == NULL) {
@@ -63,7 +63,7 @@ int AudioHdiA2dpServerBind(struct HdfDeviceObject *deviceObject)
     return AUDIO_HAL_SUCCESS;
 }
 
-int AudioHdiA2dpServerInit(struct HdfDeviceObject *deviceObject)
+static int AudioHdiA2dpServerInit(struct HdfDeviceObject *deviceObject)
 {
     AUDIO_FUNC_LOGI("enter!");
     if (deviceObject == NULL) {
