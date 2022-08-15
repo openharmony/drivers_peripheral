@@ -22,11 +22,11 @@ namespace Audio {
     bool AudioGetSampleAttributesCaptureFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
+        TestAudioManager *attributesManager = nullptr;
+        struct AudioAdapter *attributesadapter = nullptr;
         struct AudioCapture *capture = nullptr;
-        int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-        if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+        int32_t ret = AudioGetManagerCreateCapture(attributesManager, &attributesadapter, &capture);
+        if (ret < 0 || attributesadapter == nullptr || capture == nullptr || attributesManager == nullptr) {
             return false;
         }
         struct AudioSampleAttributes attrs = {};
@@ -36,8 +36,8 @@ namespace Audio {
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        attributesadapter->DestroyCapture(attributesadapter, capture);
+        attributesManager->UnloadAdapter(attributesManager, attributesadapter);
         return result;
     }
 }

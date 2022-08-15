@@ -23,22 +23,24 @@ namespace Audio {
     {
         bool result = false;
         uint32_t channelId = 0;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
-        struct AudioCapture *capture = nullptr;
-        int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-        if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+        TestAudioManager *getCurrentFuzzManager = nullptr;
+        struct AudioAdapter *getCurrentFuzzAdapter = nullptr;
+        struct AudioCapture *getCurrentFuzzCapture = nullptr;
+        int32_t ret = AudioGetManagerCreateCapture(getCurrentFuzzManager,
+            &getCurrentFuzzAdapter, &getCurrentFuzzCapture);
+        if (ret < 0 || getCurrentFuzzAdapter == nullptr ||
+            getCurrentFuzzCapture == nullptr || getCurrentFuzzManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
             return false;
         }
 
         struct AudioCapture *handle = (struct AudioCapture *)data;
-        ret = capture->attr.GetCurrentChannelId(handle, &channelId);
+        ret = getCurrentFuzzCapture->attr.GetCurrentChannelId(handle, &channelId);
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        getCurrentFuzzAdapter->DestroyCapture(getCurrentFuzzAdapter, getCurrentFuzzCapture);
+        getCurrentFuzzManager->UnloadAdapter(getCurrentFuzzManager, getCurrentFuzzAdapter);
         return result;
     }
 }

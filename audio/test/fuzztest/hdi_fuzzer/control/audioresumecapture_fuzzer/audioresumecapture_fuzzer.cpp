@@ -22,32 +22,32 @@ namespace Audio {
 bool AudioResumeCaptureFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *resumeFuzzManager = nullptr;
+    struct AudioAdapter *resumeFuzzAdapter = nullptr;
+    struct AudioCapture *resumeFuzzCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateStartCapture(resumeFuzzManager, &resumeFuzzAdapter, &resumeFuzzCapture);
+    if (ret < 0 || resumeFuzzAdapter == nullptr || resumeFuzzCapture == nullptr || resumeFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
-    ret = capture->control.Pause((AudioHandle)capture);
+    ret = resumeFuzzCapture->control.Pause((AudioHandle)resumeFuzzCapture);
     if (ret < 0) {
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
-        capture = nullptr;
+        resumeFuzzAdapter->DestroyCapture(resumeFuzzAdapter, resumeFuzzCapture);
+        resumeFuzzManager->UnloadAdapter(resumeFuzzManager, resumeFuzzAdapter);
+        resumeFuzzCapture = nullptr;
         HDF_LOGE("%{public}s: Pause failed \n", __func__);
         return false;
     }
 
     struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
-    ret = capture->control.Resume((AudioHandle)captureFuzz);
+    ret = resumeFuzzCapture->control.Resume((AudioHandle)captureFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    capture->control.Stop((AudioHandle)capture);
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
-    capture = nullptr;
+    resumeFuzzCapture->control.Stop((AudioHandle)resumeFuzzCapture);
+    resumeFuzzAdapter->DestroyCapture(resumeFuzzAdapter, resumeFuzzCapture);
+    resumeFuzzManager->UnloadAdapter(resumeFuzzManager, resumeFuzzAdapter);
+    resumeFuzzCapture = nullptr;
     return result;
 }
 }

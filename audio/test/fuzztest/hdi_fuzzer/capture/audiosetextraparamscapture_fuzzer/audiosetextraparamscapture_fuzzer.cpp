@@ -22,24 +22,24 @@ namespace Audio {
 bool AudioSetextraparamsCaptureFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *setExtFuzzManager = nullptr;
+    struct AudioAdapter *setExtFuzzAdapter = nullptr;
+    struct AudioCapture *setExtFuzzCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateStartCapture(setExtFuzzManager, &setExtFuzzAdapter, &setExtFuzzCapture);
+    if (ret < 0 || setExtFuzzAdapter == nullptr || setExtFuzzCapture == nullptr || setExtFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
     struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
-    ret = capture->attr.SetExtraParams(captureFuzz, keyValueList);
+    ret = setExtFuzzCapture->attr.SetExtraParams(captureFuzz, keyValueList);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    capture->control.Stop((AudioHandle)capture);
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
-    capture = nullptr;
+    setExtFuzzCapture->control.Stop((AudioHandle)setExtFuzzCapture);
+    setExtFuzzAdapter->DestroyCapture(setExtFuzzAdapter, setExtFuzzCapture);
+    setExtFuzzManager->UnloadAdapter(setExtFuzzManager, setExtFuzzAdapter);
+    setExtFuzzCapture = nullptr;
     return result;
 }
 }

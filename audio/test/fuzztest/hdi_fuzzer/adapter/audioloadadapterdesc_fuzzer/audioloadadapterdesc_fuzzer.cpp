@@ -23,25 +23,27 @@ namespace Audio {
 bool AudioLoadadapterDescFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    int32_t ret = GetManager(manager);
-    if (ret < 0 || manager == nullptr) {
+    TestAudioManager *loadAdapterFuzzManager = nullptr;
+    int32_t ret = GetManager(loadAdapterFuzzManager);
+    if (ret < 0 || loadAdapterFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
 
     struct AudioPort port = {};
-    if (memcpy_s((void *)&port, sizeof(port), data, sizeof(port)) != 0) {
+    int32_t portCopySize = sizeof(port) > size ? size : sizeof(port);
+    if (memcpy_s((void *)&port, sizeof(port), data, portCopySize) != 0) {
         return false;
     }
-    port.portName = (char *)data;
 
     struct AudioAdapterDescriptor descFuzz = {};
-    descFuzz.adapterName = (char *)data;
-    descFuzz.portNum = *(uint32_t *)data;
+    int32_t copySize = sizeof(descFuzz) > size ? size : sizeof(descFuzz);
+    if (memcpy_s((void *)&descFuzz, sizeof(descFuzz), data, copySize) != 0) {
+        return false;
+    }
     descFuzz.ports = &port;
     struct AudioAdapter *adapter = nullptr;
-    ret = manager->LoadAdapter(manager, &descFuzz, &adapter);
+    ret = loadAdapterFuzzManager->LoadAdapter(loadAdapterFuzzManager, &descFuzz, &adapter);
     if (ret == HDF_SUCCESS) {
         result = true;
     }

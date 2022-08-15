@@ -22,23 +22,23 @@ namespace Audio {
 bool AudioStopCaptureFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *stopFuzzManager = nullptr;
+    struct AudioAdapter *stopFuzzAdapter = nullptr;
+    struct AudioCapture *stopFuzzCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateStartCapture(stopFuzzManager, &stopFuzzAdapter, &stopFuzzCapture);
+    if (ret < 0 || stopFuzzAdapter == nullptr || stopFuzzCapture == nullptr || stopFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
 
     struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
-    ret = capture->control.Stop((AudioHandle)captureFuzz);
+    ret = stopFuzzCapture->control.Stop((AudioHandle)captureFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
-    capture = nullptr;
+    stopFuzzAdapter->DestroyCapture(stopFuzzAdapter, stopFuzzCapture);
+    stopFuzzManager->UnloadAdapter(stopFuzzManager, stopFuzzAdapter);
+    stopFuzzCapture = nullptr;
     return result;
 }
 }

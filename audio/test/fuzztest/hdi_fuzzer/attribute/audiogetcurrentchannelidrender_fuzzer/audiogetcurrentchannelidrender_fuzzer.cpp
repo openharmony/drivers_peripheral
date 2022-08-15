@@ -23,22 +23,22 @@ namespace Audio {
     {
         bool result = false;
         uint32_t channelId = 0;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
-        struct AudioRender *render = nullptr;
-        int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-        if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        TestAudioManager *getCurrentManager = nullptr;
+        struct AudioAdapter *getCurrentAdapter = nullptr;
+        struct AudioRender *getCurrentRender = nullptr;
+        int32_t ret = AudioGetManagerCreateRender(getCurrentManager, &getCurrentAdapter, &getCurrentRender);
+        if (ret < 0 || getCurrentAdapter == nullptr || getCurrentRender == nullptr || getCurrentManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
             return false;
         }
 
         struct AudioRender *handle = (struct AudioRender *)data;
-        ret = render->attr.GetCurrentChannelId(handle, &channelId);
+        ret = getCurrentRender->attr.GetCurrentChannelId(handle, &channelId);
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
+        getCurrentAdapter->DestroyRender(getCurrentAdapter, getCurrentRender);
+        getCurrentManager->UnloadAdapter(getCurrentManager, getCurrentAdapter);
         return result;
     }
 }

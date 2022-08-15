@@ -28,27 +28,27 @@ bool AudioCreateCaptureAttrsFuzzTest(const uint8_t *data, size_t size)
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioPort *capturePort = nullptr;
-    ret = GetLoadAdapter(manager, &adapter, capturePort);
-    if (ret < 0 || adapter == nullptr || capturePort == nullptr) {
+    struct AudioAdapter *attrsFuzzAdapter = nullptr;
+    struct AudioPort *attrsFuzzCapturePort = nullptr;
+    ret = GetLoadAdapter(manager, &attrsFuzzAdapter, attrsFuzzCapturePort);
+    if (ret < 0 || attrsFuzzAdapter == nullptr || attrsFuzzCapturePort == nullptr) {
         HDF_LOGE("%{public}s: GetLoadAdapter failed \n", __func__);
         return false;
     }
     struct AudioDeviceDescriptor devDesc = {};
-    InitDevDesc(devDesc, capturePort->portId, PIN_IN_MIC);
+    InitDevDesc(devDesc, attrsFuzzCapturePort->portId, PIN_IN_MIC);
     struct AudioCapture *capture = nullptr;
     struct AudioSampleAttributes attrsFuzz = {};
     int32_t copySize = sizeof(attrsFuzz) > size ? size : sizeof(attrsFuzz);
     if (memcpy_s((void *)&attrsFuzz, sizeof(attrsFuzz), data, copySize) != 0) {
         return false;
     }
-    ret = adapter->CreateCapture(adapter, &devDesc, &attrsFuzz, &capture);
+    ret = attrsFuzzAdapter->CreateCapture(attrsFuzzAdapter, &devDesc, &attrsFuzz, &capture);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
+    attrsFuzzAdapter->DestroyCapture(attrsFuzzAdapter, capture);
+    manager->UnloadAdapter(manager, attrsFuzzAdapter);
     return result;
 }
 }

@@ -22,11 +22,11 @@ namespace Audio {
     bool AudioSetSampleAttributesCaptureAttrsFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
+        TestAudioManager *setSampleCapManager = nullptr;
+        struct AudioAdapter *setSampleCapAdapter = nullptr;
         struct AudioCapture *capture = nullptr;
-        int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-        if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+        int32_t ret = AudioGetManagerCreateCapture(setSampleCapManager, &setSampleCapAdapter, &capture);
+        if (ret < 0 || setSampleCapAdapter == nullptr || capture == nullptr || setSampleCapManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
             return false;
         }
@@ -40,8 +40,8 @@ namespace Audio {
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        setSampleCapAdapter->DestroyCapture(setSampleCapAdapter, capture);
+        setSampleCapManager->UnloadAdapter(setSampleCapManager, setSampleCapAdapter);
         return result;
     }
 }
