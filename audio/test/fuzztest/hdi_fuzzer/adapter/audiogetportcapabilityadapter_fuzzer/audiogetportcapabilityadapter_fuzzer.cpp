@@ -21,26 +21,26 @@ namespace Audio {
 bool AudioGetportcapabilityAdapterFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    int32_t ret = GetManager(manager);
-    if (ret < 0 || manager == nullptr) {
+    TestAudioManager *getPortcapabilityFuzzManager = nullptr;
+    int32_t ret = GetManager(getPortcapabilityFuzzManager);
+    if (ret < 0 || getPortcapabilityFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
-    struct AudioAdapter *adapter = nullptr;
+    struct AudioAdapter *getPortcapabilityFuzzAdapter = nullptr;
     struct AudioPort *audioPort = nullptr;
-    ret = GetLoadAdapter(manager, &adapter, audioPort);
-    if (ret < 0 || adapter == nullptr || audioPort == nullptr) {
+    ret = GetLoadAdapter(getPortcapabilityFuzzManager, &getPortcapabilityFuzzAdapter, audioPort);
+    if (ret < 0 || getPortcapabilityFuzzAdapter == nullptr || audioPort == nullptr) {
         HDF_LOGE("%{public}s: GetLoadAdapter failed \n", __func__);
         return false;
     }
     struct AudioPortCapability capability = {};
     struct AudioAdapter *adapterFuzz = (struct AudioAdapter *)data;
-    ret = adapter->GetPortCapability(adapterFuzz, audioPort, &capability);
+    ret = getPortcapabilityFuzzAdapter->GetPortCapability(adapterFuzz, audioPort, &capability);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    manager->UnloadAdapter(manager, adapter);
+    getPortcapabilityFuzzManager->UnloadAdapter(getPortcapabilityFuzzManager, getPortcapabilityFuzzAdapter);
     return result;
 }
 }

@@ -22,23 +22,23 @@ namespace Audio {
     bool AudioSetSampleAttributesCaptureFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
-        struct AudioCapture *capture = nullptr;
-        int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-        if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+        TestAudioManager *setAttrCapManager = nullptr;
+        struct AudioAdapter *setAttrCapAdapter = nullptr;
+        struct AudioCapture *setAttrCapCapture = nullptr;
+        int32_t ret = AudioGetManagerCreateCapture(setAttrCapManager, &setAttrCapAdapter, &setAttrCapCapture);
+        if (ret < 0 || setAttrCapAdapter == nullptr || setAttrCapCapture == nullptr || setAttrCapManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
             return false;
         }
         struct AudioSampleAttributes attrs = {};
         InitAttrs(attrs);
         struct AudioCapture *handle = (struct AudioCapture *)data;
-        ret = capture->attr.SetSampleAttributes(handle, &attrs);
+        ret = setAttrCapCapture->attr.SetSampleAttributes(handle, &attrs);
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        setAttrCapAdapter->DestroyCapture(setAttrCapAdapter, setAttrCapCapture);
+        setAttrCapManager->UnloadAdapter(setAttrCapManager, setAttrCapAdapter);
         return result;
     }
 }

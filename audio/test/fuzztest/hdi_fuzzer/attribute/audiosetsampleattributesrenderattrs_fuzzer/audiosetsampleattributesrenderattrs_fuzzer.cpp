@@ -22,11 +22,11 @@ namespace Audio {
     bool AudioSetSampleAttributesRenderAttrsFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
+        TestAudioManager *setSampleRenManager = nullptr;
+        struct AudioAdapter *setSampleRenAdapter = nullptr;
         struct AudioRender *render = nullptr;
-        int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-        if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        int32_t ret = AudioGetManagerCreateRender(setSampleRenManager, &setSampleRenAdapter, &render);
+        if (ret < 0 || setSampleRenAdapter == nullptr || render == nullptr || setSampleRenManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
             return false;
         }
@@ -39,8 +39,8 @@ namespace Audio {
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
+        setSampleRenAdapter->DestroyRender(setSampleRenAdapter, render);
+        setSampleRenManager->UnloadAdapter(setSampleRenManager, setSampleRenAdapter);
         return result;
     }
 }

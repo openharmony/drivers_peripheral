@@ -22,11 +22,12 @@ namespace Audio {
 bool AudioGetrenderpositionRenderFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *getRenPosFuzzManager = nullptr;
+    struct AudioAdapter *getRenPosFuzzAdapter = nullptr;
+    struct AudioRender *getRenPosFuzzRender = nullptr;
+    int32_t ret = AudioGetManagerCreateStartRender(getRenPosFuzzManager, &getRenPosFuzzAdapter, &getRenPosFuzzRender);
+    if (ret < 0 || getRenPosFuzzAdapter == nullptr ||
+        getRenPosFuzzRender == nullptr || getRenPosFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
@@ -34,14 +35,14 @@ bool AudioGetrenderpositionRenderFuzzTest(const uint8_t *data, size_t size)
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
 
     struct AudioRender *renderFuzz = (struct AudioRender *)data;
-    ret = render->GetRenderPosition(renderFuzz, &frames, &time);
+    ret = getRenPosFuzzRender->GetRenderPosition(renderFuzz, &frames, &time);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    render->control.Stop((AudioHandle)render);
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
-    render = nullptr;
+    getRenPosFuzzRender->control.Stop((AudioHandle)getRenPosFuzzRender);
+    getRenPosFuzzAdapter->DestroyRender(getRenPosFuzzAdapter, getRenPosFuzzRender);
+    getRenPosFuzzManager->UnloadAdapter(getRenPosFuzzManager, getRenPosFuzzAdapter);
+    getRenPosFuzzRender = nullptr;
     return result;
 }
 }

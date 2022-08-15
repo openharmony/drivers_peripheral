@@ -22,11 +22,12 @@ namespace Audio {
 bool AudioCaptureframeCaptureFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *capFrameFuzzManager = nullptr;
+    struct AudioAdapter *capFrameFuzzAdapter = nullptr;
+    struct AudioCapture *capFrameFuzzCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateStartCapture(capFrameFuzzManager, &capFrameFuzzAdapter, &capFrameFuzzCapture);
+    if (ret < 0 || capFrameFuzzAdapter == nullptr ||
+        capFrameFuzzCapture == nullptr || capFrameFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
@@ -34,21 +35,21 @@ bool AudioCaptureframeCaptureFuzzTest(const uint8_t *data, size_t size)
     uint64_t requestBytes = BUFFER_LENTH;
     char *frame = (char *)calloc(1, BUFFER_LENTH);
     if (frame == nullptr) {
-        capture->control.Stop((AudioHandle)capture);
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        capFrameFuzzCapture->control.Stop((AudioHandle)capFrameFuzzCapture);
+        capFrameFuzzAdapter->DestroyCapture(capFrameFuzzAdapter, capFrameFuzzCapture);
+        capFrameFuzzManager->UnloadAdapter(capFrameFuzzManager, capFrameFuzzAdapter);
         return false;
     }
     struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
-    ret = capture->CaptureFrame(captureFuzz, frame, requestBytes, &replyBytes);
+    ret = capFrameFuzzCapture->CaptureFrame(captureFuzz, frame, requestBytes, &replyBytes);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
 
-    capture->control.Stop((AudioHandle)capture);
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
-    capture = nullptr;
+    capFrameFuzzCapture->control.Stop((AudioHandle)capFrameFuzzCapture);
+    capFrameFuzzAdapter->DestroyCapture(capFrameFuzzAdapter, capFrameFuzzCapture);
+    capFrameFuzzManager->UnloadAdapter(capFrameFuzzManager, capFrameFuzzAdapter);
+    capFrameFuzzCapture = nullptr;
     free(frame);
     frame = nullptr;
     return result;

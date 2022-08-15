@@ -20,15 +20,15 @@ namespace OHOS {
 namespace Audio {
 bool AudioUnloadadapterAdapterFuzzTest(const uint8_t *data, size_t size)
 {
-    TestAudioManager *manager = nullptr;
-    int32_t ret = GetManager(manager);
-    if (ret < 0 || manager == nullptr) {
+    TestAudioManager *unloadAdapterFuzzManager = nullptr;
+    int32_t ret = GetManager(unloadAdapterFuzzManager);
+    if (ret < 0 || unloadAdapterFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
 
     struct AudioAdapter *adapterFuzz = (struct AudioAdapter *)data;
-    manager->UnloadAdapter(manager, adapterFuzz);
+    unloadAdapterFuzzManager->UnloadAdapter(unloadAdapterFuzzManager, adapterFuzz);
     return true;
 }
 }

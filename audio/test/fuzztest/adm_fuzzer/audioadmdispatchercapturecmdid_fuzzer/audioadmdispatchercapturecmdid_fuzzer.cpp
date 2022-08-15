@@ -23,7 +23,7 @@ namespace Audio {
     bool AudioAdmDispatcherCaptureCmdidFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        struct HdfIoService *service = nullptr;
+        struct HdfIoService *admDisCapFuzzService = nullptr;
         struct HdfSBuf *sBuf = nullptr;
         struct HdfSBuf *reply = nullptr;
         struct AudioPcmHwParams hwParams {
@@ -32,8 +32,8 @@ namespace Audio {
             .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
         };
 
-        service = HdfIoServiceBind(HDF_CAPTURE_SERVICE.c_str());
-        if (service == nullptr || service->dispatcher == nullptr) {
+        admDisCapFuzzService = HdfIoServiceBind(HDF_CAPTURE_SERVICE.c_str());
+        if (admDisCapFuzzService == nullptr || admDisCapFuzzService->dispatcher == nullptr) {
             HDF_LOGE("%{public}s: HdfIoServiceBind failed\n", __func__);
             return false;
         }
@@ -48,13 +48,13 @@ namespace Audio {
             return false;
         }
         int32_t cmdId = *(int32_t *)(data);
-        ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, reply);
+        ret = admDisCapFuzzService->dispatcher->Dispatch(&admDisCapFuzzService->object, cmdId, sBuf, reply);
         if (ret == HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Dispatch success\n", __func__);
             result = true;
         }
         HdfSbufRecycle(sBuf);
-        HdfIoServiceRecycle(service);
+        HdfIoServiceRecycle(admDisCapFuzzService);
         return result;
     }
 }

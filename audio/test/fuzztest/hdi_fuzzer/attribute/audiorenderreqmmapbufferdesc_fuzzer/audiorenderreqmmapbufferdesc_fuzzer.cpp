@@ -23,18 +23,18 @@ namespace Audio {
     bool AudioRenderReqmmapbufferDescFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        TestAudioManager *manager = nullptr;
+        TestAudioManager *renderReqManager = nullptr;
         struct AudioAdapter *adapter = nullptr;
         struct AudioRender *render = nullptr;
-        int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-        if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        int32_t ret = AudioGetManagerCreateStartRender(renderReqManager, &adapter, &render);
+        if (ret < 0 || adapter == nullptr || render == nullptr || renderReqManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
             return false;
         }
         struct AudioMmapBufferDescripter descFuzz {
             .memoryAddress = (void *)data,
             .memoryFd = *(int32_t *)data,
-            .totalBufferFrames = size,
+            .totalBufferFrames = *(int32_t *)data,
             .transferFrameSize = *(int32_t *)data,
             .isShareable = *(int32_t *)data,
             .offset = *(uint32_t *)data,
@@ -46,7 +46,7 @@ namespace Audio {
             result = true;
         }
         adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
+        renderReqManager->UnloadAdapter(renderReqManager, adapter);
         return result;
     }
 }

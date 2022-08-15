@@ -23,22 +23,22 @@ bool AudioGetmuteCaptureFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
     bool mute = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *geMuteCapManager = nullptr;
+    struct AudioAdapter *geMuteCapAdapter = nullptr;
+    struct AudioCapture *geMuteCapCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateCapture(geMuteCapManager, &geMuteCapAdapter, &geMuteCapCapture);
+    if (ret < 0 || geMuteCapAdapter == nullptr || geMuteCapCapture == nullptr || geMuteCapManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
         return false;
     }
 
     struct AudioCapture *handle = (struct AudioCapture *)data;
-    ret = capture->volume.GetMute(handle, &mute);
+    ret = geMuteCapCapture->volume.GetMute(handle, &mute);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
+    geMuteCapAdapter->DestroyCapture(geMuteCapAdapter, geMuteCapCapture);
+    geMuteCapManager->UnloadAdapter(geMuteCapManager, geMuteCapAdapter);
     return result;
 }
 }

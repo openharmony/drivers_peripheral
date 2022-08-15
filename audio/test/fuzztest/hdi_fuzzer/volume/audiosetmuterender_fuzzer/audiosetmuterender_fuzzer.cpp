@@ -23,22 +23,22 @@ bool AudioSetmuteRenderFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
     bool mute = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *setMuteRenManager = nullptr;
+    struct AudioAdapter *setMuteRenAdapter = nullptr;
+    struct AudioRender *setMuteRenRender = nullptr;
+    int32_t ret = AudioGetManagerCreateRender(setMuteRenManager, &setMuteRenAdapter, &setMuteRenRender);
+    if (ret < 0 || setMuteRenAdapter == nullptr || setMuteRenRender == nullptr || setMuteRenManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
         return false;
     }
 
     struct AudioRender *handle = (struct AudioRender *)data;
-    ret = render->volume.SetMute(handle, mute);
+    ret = setMuteRenRender->volume.SetMute(handle, mute);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
+    setMuteRenAdapter->DestroyRender(setMuteRenAdapter, setMuteRenRender);
+    setMuteRenManager->UnloadAdapter(setMuteRenManager, setMuteRenAdapter);
     return result;
 }
 }

@@ -22,24 +22,24 @@ namespace Audio {
 bool AudioRenderframeRequestbytesFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *renReqFuzzManager = nullptr;
+    struct AudioAdapter *renFrameFuzzAdapter = nullptr;
+    struct AudioRender *renFrameFuzzRender = nullptr;
+    int32_t ret = AudioGetManagerCreateStartRender(renReqFuzzManager, &renFrameFuzzAdapter, &renFrameFuzzRender);
+    if (ret < 0 || renFrameFuzzAdapter == nullptr || renFrameFuzzRender == nullptr || renReqFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
     uint64_t replyBytes = 0;
     char *frame = (char *)data;
-    ret = render->RenderFrame(render, frame, size, &replyBytes);
+    ret = renFrameFuzzRender->RenderFrame(renFrameFuzzRender, frame, size, &replyBytes);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    render->control.Stop((AudioHandle)render);
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
-    render = nullptr;
+    renFrameFuzzRender->control.Stop((AudioHandle)renFrameFuzzRender);
+    renFrameFuzzAdapter->DestroyRender(renFrameFuzzAdapter, renFrameFuzzRender);
+    renReqFuzzManager->UnloadAdapter(renReqFuzzManager, renFrameFuzzAdapter);
+    renFrameFuzzRender = nullptr;
     return result;
 }
 }

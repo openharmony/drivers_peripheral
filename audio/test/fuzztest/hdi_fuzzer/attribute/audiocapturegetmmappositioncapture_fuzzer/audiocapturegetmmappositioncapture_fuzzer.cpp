@@ -22,23 +22,24 @@ namespace Audio {
     bool AudioCaptureGetmmappositionCaptureFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
-        struct AudioCapture *capture = nullptr;
-        int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-        if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+        TestAudioManager *positionFuzzManager = nullptr;
+        struct AudioAdapter *positionFuzzAdapter = nullptr;
+        struct AudioCapture *positionFuzzCapture = nullptr;
+        int32_t ret = AudioGetManagerCreateCapture(positionFuzzManager, &positionFuzzAdapter, &positionFuzzCapture);
+        if (ret < 0 || positionFuzzAdapter == nullptr ||
+            positionFuzzCapture == nullptr || positionFuzzManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
             return false;
         }
         uint64_t frames = 0;
         struct AudioTimeStamp time = {};
         struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
-        ret = capture->attr.GetMmapPosition(captureFuzz, &frames, &time);
+        ret = positionFuzzCapture->attr.GetMmapPosition(captureFuzz, &frames, &time);
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        positionFuzzAdapter->DestroyCapture(positionFuzzAdapter, positionFuzzCapture);
+        positionFuzzManager->UnloadAdapter(positionFuzzManager, positionFuzzAdapter);
         return result;
     }
 }

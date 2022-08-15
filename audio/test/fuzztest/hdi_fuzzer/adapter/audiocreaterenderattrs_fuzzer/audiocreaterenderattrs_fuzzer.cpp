@@ -22,34 +22,34 @@ namespace Audio {
 bool AudioCreaterenderAttrsFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    int32_t ret = GetManager(manager);
-    if (ret < 0 || manager == nullptr) {
+    TestAudioManager *attrsFuzzManager = nullptr;
+    int32_t ret = GetManager(attrsFuzzManager);
+    if (ret < 0 || attrsFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
-    struct AudioAdapter *adapter = nullptr;
+    struct AudioAdapter *attrsFuzzAdapter = nullptr;
     struct AudioPort *renderPort = nullptr;
-    ret = GetLoadAdapter(manager, &adapter, renderPort);
-    if (ret < 0 || adapter == nullptr || renderPort == nullptr) {
+    ret = GetLoadAdapter(attrsFuzzManager, &attrsFuzzAdapter, renderPort);
+    if (ret < 0 || attrsFuzzAdapter == nullptr || renderPort == nullptr) {
         HDF_LOGE("%{public}s: GetLoadAdapter failed \n", __func__);
         return false;
     }
     struct AudioDeviceDescriptor devDesc = {};
     InitDevDesc(devDesc, renderPort->portId, PIN_OUT_SPEAKER);
 
-    struct AudioRender *render = nullptr;
+    struct AudioRender *attrsFuzzRender = nullptr;
     struct AudioSampleAttributes attrsFuzz = {};
     int32_t copySize = sizeof(attrsFuzz) > size ? size : sizeof(attrsFuzz);
     if (memcpy_s((void *)&attrsFuzz, sizeof(attrsFuzz), data, copySize) != 0) {
         return false;
     }
-    ret = adapter->CreateRender(adapter, &devDesc, &attrsFuzz, &render);
+    ret = attrsFuzzAdapter->CreateRender(attrsFuzzAdapter, &devDesc, &attrsFuzz, &attrsFuzzRender);
     if (ret == HDF_SUCCESS) {
-        adapter->DestroyRender(adapter, render);
+        attrsFuzzAdapter->DestroyRender(attrsFuzzAdapter, attrsFuzzRender);
         result = true;
     }
-    manager->UnloadAdapter(manager, adapter);
+    attrsFuzzManager->UnloadAdapter(attrsFuzzManager, attrsFuzzAdapter);
     return result;
 }
 }

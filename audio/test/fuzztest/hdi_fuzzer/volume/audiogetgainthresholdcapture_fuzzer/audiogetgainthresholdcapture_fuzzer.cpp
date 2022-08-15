@@ -24,21 +24,21 @@ bool AudioGetgainthresholdCaptureFuzzTest(const uint8_t *data, size_t size)
     bool result = false;
     float min = 0;
     float max = 0;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *getGainThreManager = nullptr;
+    struct AudioAdapter *getGainThreAdapter = nullptr;
+    struct AudioCapture *getGainThreCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateCapture(getGainThreManager, &getGainThreAdapter, &getGainThreCapture);
+    if (ret < 0 || getGainThreAdapter == nullptr || getGainThreCapture == nullptr || getGainThreManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
         return false;
     }
     struct AudioCapture *handle = (struct AudioCapture *)data;
-    ret = capture->volume.GetGainThreshold(handle, &min, &max);
+    ret = getGainThreCapture->volume.GetGainThreshold(handle, &min, &max);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
+    getGainThreAdapter->DestroyCapture(getGainThreAdapter, getGainThreCapture);
+    getGainThreManager->UnloadAdapter(getGainThreManager, getGainThreAdapter);
     return result;
 }
 }

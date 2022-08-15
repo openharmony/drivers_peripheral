@@ -22,31 +22,31 @@ namespace Audio {
 bool AudioFlushCaptureFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *flushFuzzManager = nullptr;
+    struct AudioAdapter *flushFuzzAdapter = nullptr;
+    struct AudioCapture *flushFuzzCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateStartCapture(flushFuzzManager, &flushFuzzAdapter, &flushFuzzCapture);
+    if (ret < 0 || flushFuzzAdapter == nullptr || flushFuzzCapture == nullptr || flushFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
-    ret = capture->control.Stop((AudioHandle)capture);
+    ret = flushFuzzCapture->control.Stop((AudioHandle)flushFuzzCapture);
     if (ret < 0) {
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
-        capture = nullptr;
+        flushFuzzAdapter->DestroyCapture(flushFuzzAdapter, flushFuzzCapture);
+        flushFuzzManager->UnloadAdapter(flushFuzzManager, flushFuzzAdapter);
+        flushFuzzCapture = nullptr;
         HDF_LOGE("%{public}s: Stop failed \n", __func__);
         return false;
     }
 
     struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
-    ret = capture->control.Flush((AudioHandle)captureFuzz);
+    ret = flushFuzzCapture->control.Flush((AudioHandle)captureFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
-    capture = nullptr;
+    flushFuzzAdapter->DestroyCapture(flushFuzzAdapter, flushFuzzCapture);
+    flushFuzzManager->UnloadAdapter(flushFuzzManager, flushFuzzAdapter);
+    flushFuzzCapture = nullptr;
     return result;
 }
 }

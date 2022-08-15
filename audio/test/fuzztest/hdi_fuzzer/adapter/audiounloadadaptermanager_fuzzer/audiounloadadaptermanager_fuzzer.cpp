@@ -21,23 +21,23 @@ namespace OHOS {
 namespace Audio {
 bool AudioUnloadadapterManagerFuzzTest(const uint8_t *data, size_t size)
 {
-    TestAudioManager *manager = nullptr;
-    int32_t ret = GetManager(manager);
-    if (ret < 0 || manager == nullptr) {
+    TestAudioManager *unloadAdapterFuzzManager = nullptr;
+    int32_t ret = GetManager(unloadAdapterFuzzManager);
+    if (ret < 0 || unloadAdapterFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
-    struct AudioAdapter *adapter = nullptr;
+    struct AudioAdapter *unloadAdapterFuzzAdapter = nullptr;
     struct AudioPort *capturePort = nullptr;
-    ret = GetLoadAdapter(manager, &adapter, capturePort);
-    if (ret < 0 || adapter == nullptr) {
+    ret = GetLoadAdapter(unloadAdapterFuzzManager, &unloadAdapterFuzzAdapter, capturePort);
+    if (ret < 0 || unloadAdapterFuzzAdapter == nullptr) {
         HDF_LOGE("%{public}s: GetLoadAdapter failed \n", __func__);
         return false;
     }
 
     TestAudioManager *managerFuzz = (TestAudioManager *)data;
-    manager->UnloadAdapter(managerFuzz, adapter);
-    manager->UnloadAdapter(manager, adapter);
+    unloadAdapterFuzzManager->UnloadAdapter(managerFuzz, unloadAdapterFuzzAdapter);
+    unloadAdapterFuzzManager->UnloadAdapter(unloadAdapterFuzzManager, unloadAdapterFuzzAdapter);
     return true;
 }
 }

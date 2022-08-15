@@ -21,26 +21,26 @@ namespace Audio {
 bool AudioDestroyrenderRenderFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    int32_t ret = GetManager(manager);
-    if (ret < 0 || manager == nullptr) {
+    TestAudioManager *destroyFuzzManager = nullptr;
+    int32_t ret = GetManager(destroyFuzzManager);
+    if (ret < 0 || destroyFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
-    struct AudioAdapter *adapter = nullptr;
+    struct AudioAdapter *destroyFuzzAdapter = nullptr;
     struct AudioPort *renderPort = nullptr;
-    ret = GetLoadAdapter(manager, &adapter, renderPort);
-    if (ret < 0 || adapter == nullptr) {
+    ret = GetLoadAdapter(destroyFuzzManager, &destroyFuzzAdapter, renderPort);
+    if (ret < 0 || destroyFuzzAdapter == nullptr) {
         HDF_LOGE("%{public}s: GetLoadAdapter failed \n", __func__);
         return false;
     }
 
     struct AudioRender *renderFuzz = (struct AudioRender *)data;
-    ret = adapter->DestroyRender(adapter, renderFuzz);
+    ret = destroyFuzzAdapter->DestroyRender(destroyFuzzAdapter, renderFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    manager->UnloadAdapter(manager, adapter);
+    destroyFuzzManager->UnloadAdapter(destroyFuzzManager, destroyFuzzAdapter);
     return result;
 }
 }

@@ -24,11 +24,11 @@ namespace Audio {
         bool result = false;
         struct AudioSceneDescriptor scenes = {};
         scenes.scene.id = 0;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
+        TestAudioManager *selSceneManager = nullptr;
+        struct AudioAdapter *selSceneAdapter = nullptr;
         struct AudioCapture *capture = nullptr;
-        int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-        if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+        int32_t ret = AudioGetManagerCreateCapture(selSceneManager, &selSceneAdapter, &capture);
+        if (ret < 0 || selSceneAdapter == nullptr || capture == nullptr || selSceneManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
             return false;
         }
@@ -38,8 +38,8 @@ namespace Audio {
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        selSceneAdapter->DestroyCapture(selSceneAdapter, capture);
+        selSceneManager->UnloadAdapter(selSceneManager, selSceneAdapter);
         return result;
     }
 }

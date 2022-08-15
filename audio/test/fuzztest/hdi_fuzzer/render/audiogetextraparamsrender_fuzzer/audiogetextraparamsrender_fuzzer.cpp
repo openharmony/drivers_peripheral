@@ -22,34 +22,35 @@ namespace Audio {
 bool AudioGetextraparamsRenderFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *getExtRenFuzzManager = nullptr;
+    struct AudioAdapter *getExtRenFuzzAdapter = nullptr;
+    struct AudioRender *getExtRenFuzzRender = nullptr;
+    int32_t ret = AudioGetManagerCreateStartRender(getExtRenFuzzManager, &getExtRenFuzzAdapter, &getExtRenFuzzRender);
+    if (ret < 0 || getExtRenFuzzAdapter == nullptr ||
+        getExtRenFuzzRender == nullptr || getExtRenFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
     char keyValueListValue[256] = {};
     int32_t listLenth = 256;
-    ret = render->attr.SetExtraParams(render, keyValueList);
+    ret = getExtRenFuzzRender->attr.SetExtraParams(getExtRenFuzzRender, keyValueList);
     if (ret < 0) {
-        adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
+        getExtRenFuzzAdapter->DestroyRender(getExtRenFuzzAdapter, getExtRenFuzzRender);
+        getExtRenFuzzManager->UnloadAdapter(getExtRenFuzzManager, getExtRenFuzzAdapter);
         HDF_LOGE("%{public}s: SetExtraParams failed \n", __func__);
         return false;
     }
 
     struct AudioRender *renderFuzz = (struct AudioRender *)data;
-    ret = render->attr.GetExtraParams(renderFuzz, keyValueListValue, listLenth);
+    ret = getExtRenFuzzRender->attr.GetExtraParams(renderFuzz, keyValueListValue, listLenth);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    render->control.Stop((AudioHandle)render);
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
-    render = nullptr;
+    getExtRenFuzzRender->control.Stop((AudioHandle)getExtRenFuzzRender);
+    getExtRenFuzzAdapter->DestroyRender(getExtRenFuzzAdapter, getExtRenFuzzRender);
+    getExtRenFuzzManager->UnloadAdapter(getExtRenFuzzManager, getExtRenFuzzAdapter);
+    getExtRenFuzzRender = nullptr;
     return result;
 }
 }
