@@ -172,6 +172,7 @@ int32_t AudioRenderGetFrameCount(AudioHandle handle, uint64_t *count)
 
 int32_t AudioRenderSetSampleAttributes(AudioHandle handle, const struct AudioSampleAttributes *attrs)
 {
+    (void)attrs;
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -210,49 +211,60 @@ int32_t AudioRenderGetCurrentChannelId(AudioHandle handle, uint32_t *channelId)
 int32_t AudioRenderCheckSceneCapability(AudioHandle handle, const struct AudioSceneDescriptor *scene,
                                         bool *supported)
 {
+    (void)scene;
+    (void)supported;
     HDF_LOGI("AudioRenderCheckSceneCapability");
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderSelectScene(AudioHandle handle, const struct AudioSceneDescriptor *scene)
 {
+    (void)scene;
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderSetMute(AudioHandle handle, bool mute)
 {
+    (void)mute;
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderGetMute(AudioHandle handle, bool *mute)
 {
+    (void)mute;
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderSetVolume(AudioHandle handle, float volume)
 {
+    (void)volume;
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderGetVolume(AudioHandle handle, float *volume)
 {
+    (void)volume;
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderGetGainThreshold(AudioHandle handle, float *min, float *max)
 {
+    (void)min;
+    (void)max;
     HDF_LOGI("AudioRenderGetGainThreshold");
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderGetGain(AudioHandle handle, float *gain)
 {
+    (void)gain;
     HDF_LOGI("AudioRenderGetGain");
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderSetGain(AudioHandle handle, float gain)
 {
+    (void)gain;
     HDF_LOGI("AudioRenderSetGain");
     return AUDIO_HAL_SUCCESS;
 }
@@ -338,6 +350,7 @@ int32_t AudioRenderGetRenderPosition(struct AudioRender *render, uint64_t *frame
 
 int32_t AudioRenderSetRenderSpeed(struct AudioRender *render, float speed)
 {
+    (void)speed;
     HDF_LOGI("AudioRenderSetRenderSpeed");
     struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(render);
     if (hwRender == NULL) {
@@ -358,12 +371,14 @@ int32_t AudioRenderGetRenderSpeed(struct AudioRender *render, float *speed)
 
 int32_t AudioRenderSetChannelMode(struct AudioRender *render, AudioChannelMode mode)
 {
+    (void)render;
     HDF_LOGI("AudioRenderSetChannelMode");
     return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioRenderGetChannelMode(struct AudioRender *render, AudioChannelMode *mode)
 {
+    (void)render;
     HDF_LOGI("AudioRenderGetChannelMode");
     return AUDIO_HAL_SUCCESS;
 }
@@ -452,6 +467,7 @@ int32_t AudioRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_
 
 int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc)
 {
+    (void)desc;
     HDF_LOGI("AudioRenderReqMmapBuffer Success!");
     return AUDIO_HAL_SUCCESS;
 }

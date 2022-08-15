@@ -81,7 +81,7 @@ bool HciWatcher::Start()
 
     int policy = BT_THREAD_POLICY;
     sched_param params = {.sched_priority = BT_THREAD_PRIORITY};
-    if (pthread_setschedparam(thread_.native_handle(), policy, &params)) {
+    if (pthread_setschedparam(thread_.native_handle(), policy, &params) != 0) {
         HDF_LOGW("pthread_setschedparam failed tid[%lu] policy[%d]", thread_.native_handle(), policy);
     }
 
