@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
+#include "audio_internal.h"
+#include "audio_internal_manager.h"
+#include "audio_uhdf_log.h"
 #include "hdf_base.h"
 #include "hdf_device_object.h"
 #include "hdf_dlist.h"
 #include "osal_mem.h"
-#include "audio_uhdf_log.h"
-#include "audio_internal.h"
-#include "audio_internal_manager.h"
 #include "v1_0/audio_adapter_stub.h"
 #include "v1_0/audio_capture_stub.h"
 #include "v1_0/audio_manager_stub.h"
@@ -37,8 +37,8 @@ struct HdfAudioManagerHost {
     struct AudioManagerService *service;
 };
 
-static int32_t IDLAudioAdapterCreateCapture(struct AudioAdapter *self, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
+static int32_t IDLAudioAdapterCreateCapture(struct IAudioAdapter *self, const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture)
 {
     if (self == NULL || desc == NULL || attrs == NULL || capture == NULL) {
         AUDIO_FUNC_LOGE("Param is NULL!");
@@ -60,8 +60,8 @@ static int32_t IDLAudioAdapterCreateCapture(struct AudioAdapter *self, const str
     return HDF_SUCCESS;
 }
 
-static int32_t IDLAudioAdapterCreateRender(struct AudioAdapter *self, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct AudioRender **render)
+static int32_t IDLAudioAdapterCreateRender(struct IAudioAdapter *self, const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs, struct IAudioRender **render)
 {
     if (self == NULL || desc == NULL || attrs == NULL || render == NULL) {
         AUDIO_FUNC_LOGE("Param is NULL!");
@@ -83,7 +83,7 @@ static int32_t IDLAudioAdapterCreateRender(struct AudioAdapter *self, const stru
     return HDF_SUCCESS;
 }
 
-static int32_t AudioAdapterServiceOverwrite(struct AudioAdapter *adapter)
+static int32_t AudioAdapterServiceOverwrite(struct IAudioAdapter *adapter)
 {
     if (adapter == NULL) {
         AUDIO_FUNC_LOGE("Param is NULL!");
@@ -97,7 +97,7 @@ static int32_t AudioAdapterServiceOverwrite(struct AudioAdapter *adapter)
 }
 
 static int32_t AudioManagerServiceLoadAdapter(
-    struct AudioManager *manager, const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+    struct IAudioManager *manager, const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     AUDIO_FUNC_LOGI("enter!");
     int32_t ret;
@@ -131,18 +131,18 @@ static int32_t AudioManagerServiceLoadAdapter(
     return HDF_SUCCESS;
 }
 
-static int32_t AudioManagerServiceUnloadAdapter(struct AudioManager *manager, const char *adapterName)
+static int32_t AudioManagerServiceUnloadAdapter(struct IAudioManager *manager, const char *adapterName)
 {
     return AudioManagerUnloadAdapter(manager, adapterName);
 }
 
 static int32_t AudioManagerServiceGetAllAdapters(
-    struct AudioManager *manager, struct AudioAdapterDescriptor *descs, uint32_t *size)
+    struct IAudioManager *manager, struct AudioAdapterDescriptor *descs, uint32_t *size)
 {
     return AudioManagerGetAllAdapters(manager, descs, size);
 }
 
-static int32_t ReleaseAudioManagerServiceObject(struct AudioManager *object)
+static int32_t ReleaseAudioManagerServiceObject(struct IAudioManager *object)
 {
     return ReleaseAudioManagerObject(object);
 }
@@ -220,7 +220,7 @@ static int32_t HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    int32_t ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, AUDIOMANAGER_INTERFACE_DESC);
+    int32_t ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, IAUDIOMANAGER_INTERFACE_DESC);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGI("failed to set interface descriptor object! ret = %{public}d", ret);
         return HDF_FAILURE;

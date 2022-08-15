@@ -334,7 +334,7 @@ void AudioAdapterReleaseCapSubPorts(const struct AudioPortAndCapability *portCap
     }
 }
 
-int32_t AudioAdapterInitAllPorts(struct AudioAdapter *adapter)
+int32_t AudioAdapterInitAllPorts(struct IAudioAdapter *adapter)
 {
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL) {
@@ -466,7 +466,7 @@ static int32_t BindServiceRenderOpen(struct AudioHwRender *hwRender,
     int32_t ret =
         (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTRL_RENDER_OPEN);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioRender render open FAIL");
+        AUDIO_FUNC_LOGE("IAudioRender render open FAIL");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -523,7 +523,7 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
     /* set Attr Para */
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTL_HW_PARAMS);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioRender SetParams FAIL");
+        AUDIO_FUNC_LOGE("IAudioRender SetParams FAIL");
         (void)AudioCtrlRenderClose(hwRender, pInterfaceLibModeRender);
         return HDF_FAILURE;
     }
@@ -539,7 +539,7 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
 
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam, AUDIO_DRV_PCM_IOCTL_PREPARE);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioRender perpare FAIL");
+        AUDIO_FUNC_LOGE("IAudioRender perpare FAIL");
         (void)AudioCtrlRenderClose(hwRender, pInterfaceLibModeRender);
         return HDF_FAILURE;
     }
@@ -573,8 +573,8 @@ static int32_t AudioRenderBindService(struct AudioHwRender *hwRender, BindServic
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct AudioRender **render)
+int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs, struct IAudioRender **render)
 {
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || desc == NULL || attrs == NULL || render == NULL) {
@@ -617,7 +617,7 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter)
+int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter)
 {
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
@@ -626,7 +626,7 @@ int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter)
         return AUDIO_ERR_INVALID_PARAM;
     }
 
-    struct AudioRender *render = (struct AudioRender *)hwAdapter->infos.renderServicePtr;
+    struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is NULL!");
@@ -912,8 +912,8 @@ int32_t AudioCaptureBindService(struct AudioHwCapture *hwCapture, BindServiceCap
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
+int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture)
 {
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL) {
@@ -951,7 +951,7 @@ int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct Aud
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter)
+int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter)
 {
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
@@ -959,7 +959,7 @@ int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter)
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    struct AudioCapture *capture = (struct AudioCapture *)hwAdapter->infos.captureServicePtr;
+    struct IAudioCapture *capture = (struct IAudioCapture *)hwAdapter->infos.captureServicePtr;
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is NULL!");
@@ -1110,7 +1110,7 @@ static int32_t AudioDeepCopyCapability(struct AudioPortCapability *destCap, stru
 }
 
 int32_t AudioAdapterGetPortCapability(
-    struct AudioAdapter *adapter, const struct AudioPort *port, struct AudioPortCapability *capability)
+    struct IAudioAdapter *adapter, const struct AudioPort *port, struct AudioPortCapability *capability)
 {
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || port == NULL || port->portName == NULL || capability == NULL) {
@@ -1137,7 +1137,7 @@ int32_t AudioAdapterGetPortCapability(
 }
 
 int32_t AudioAdapterSetPassthroughMode(
-    struct AudioAdapter *adapter, const struct AudioPort *port, enum AudioPortPassthroughMode mode)
+    struct IAudioAdapter *adapter, const struct AudioPort *port, enum AudioPortPassthroughMode mode)
 {
     if (adapter == NULL || port == NULL || port->portName == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -1189,7 +1189,7 @@ int32_t AudioAdapterSetPassthroughMode(
 }
 
 int32_t AudioAdapterGetPassthroughMode(
-    struct AudioAdapter *adapter, const struct AudioPort *port, enum AudioPortPassthroughMode *mode)
+    struct IAudioAdapter *adapter, const struct AudioPort *port, enum AudioPortPassthroughMode *mode)
 {
     if (adapter == NULL || port == NULL || port->portName == NULL || mode == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -1217,7 +1217,7 @@ int32_t AudioAdapterGetPassthroughMode(
     return AUDIO_ERR_INTERNAL;
 }
 
-void AudioAdapterRelease(struct AudioAdapter *instance)
+void AudioAdapterRelease(struct IAudioAdapter *instance)
 {
     (void)instance;
 }

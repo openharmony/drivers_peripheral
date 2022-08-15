@@ -77,7 +77,7 @@ if (!defined(ohos_lite)) {
 
 group("idl_audio_sample") {
   if (!defined(ohos_lite)) {
-    if (!defined(enable_hdf_proxy_stub) || enable_hdf_proxy_stub == true) {
+    if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       deps = [
         ":idl_capture",
         ":idl_render",

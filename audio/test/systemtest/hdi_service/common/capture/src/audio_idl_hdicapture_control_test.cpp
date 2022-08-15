@@ -27,14 +27,14 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture *capture = nullptr;
     static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
     static void *handleSo;
-    static void (*AudioManagerRelease)(struct AudioManager *);
-    static void (*AudioAdapterRelease)(struct AudioAdapter *);
-    static void (*AudioCaptureRelease)(struct AudioCapture *);
+    static void (*AudioManagerRelease)(struct IAudioManager *);
+    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
+    static void (*AudioCaptureRelease)(struct IAudioCapture *);
     void ReleaseCaptureSource(void);
 };
 
@@ -43,9 +43,9 @@ using THREAD_FUNC = void *(*)(void *);
 TestAudioManager *(*AudioIdlHdiCaptureControlTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiCaptureControlTest::manager = nullptr;
 void *AudioIdlHdiCaptureControlTest::handleSo = nullptr;
-void (*AudioIdlHdiCaptureControlTest::AudioManagerRelease)(struct AudioManager *) = nullptr;
-void (*AudioIdlHdiCaptureControlTest::AudioAdapterRelease)(struct AudioAdapter *) = nullptr;
-void (*AudioIdlHdiCaptureControlTest::AudioCaptureRelease)(struct AudioCapture *) = nullptr;
+void (*AudioIdlHdiCaptureControlTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
+void (*AudioIdlHdiCaptureControlTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
+void (*AudioIdlHdiCaptureControlTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
 
 void AudioIdlHdiCaptureControlTest::SetUpTestCase(void)
 {
@@ -59,11 +59,11 @@ void AudioIdlHdiCaptureControlTest::SetUpTestCase(void)
     (void)HdfRemoteGetCallingPid();
     manager = GetAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
+    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
     ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
+    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
     ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct AudioCapture *))(dlsym(handleSo, "AudioCaptureRelease"));
+    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handleSo, "AudioCaptureRelease"));
     ASSERT_NE(nullptr, AudioCaptureRelease);
 }
 
@@ -131,7 +131,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStart_001, TestSize
 HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStart_Null_002, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = capture->Start(captureNull);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
@@ -225,7 +225,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_004, TestSize.
 HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_Null_005, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = AudioCaptureStartAndOneFrame(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -277,7 +277,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_002, TestSize
 HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_Null_003, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = AudioCaptureStartAndOneFrame(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -383,7 +383,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_003, TestSiz
 HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_Null_004, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = AudioCaptureStartAndOneFrame(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -458,7 +458,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureFlush_001, TestSize
 HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureFlush_Null_002, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = AudioCaptureStartAndOneFrame(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -493,7 +493,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureTurnStandbyMode_001
 HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureTurnStandbyMode_Null_002, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
 
     ASSERT_NE(nullptr, capture);
     ret = AudioCaptureStartAndOneFrame(capture);
@@ -616,7 +616,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_003, T
 HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_Null_004, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     char pathBuf[] = "./DevDump.log";
     ASSERT_NE(nullptr, capture);
     FILE *fp = fopen(pathBuf, "wb+");
