@@ -39,8 +39,8 @@ enum RetCode : int32_t {
 };
 
 enum LatOrLong : int32_t {
-    Latitude = 0,
-    Longitude,
+    LATITUDE_TYPE = 0,
+    LONGITUDE_TYPE,
 };
 
 using exif_rational = struct {
@@ -56,7 +56,7 @@ public:
 private:
     static void ConvertGpsDataToDms(double number, int32_t *degrees, int32_t *minutes, int32_t *seconds);
     static void ConvertAltitudeToRational(double altitude, exif_rational &outPutAltitude);
-    static uint32_t AddLatOrLongInfo(ExifData *exif, double number, int32_t LatOrLong);
+    static uint32_t AddLatOrLongInfo(ExifData *exif, double number, LatOrLong latOrLongType);
     static uint32_t AddAltitudeInfo(ExifData *exif, double altitude);
     static uint32_t IsJpegPicture(unsigned char *dataBuffer, int32_t dataBufferSize, void *address);
     static uint32_t PackageJpeg(unsigned char *tempBuffer, int32_t totalTempBufferSize, unsigned char *exifData,

@@ -25,7 +25,7 @@ public:
 
     void SetUp(void) const;
     void TearDown(void) const;
-    class TestBufferConsumerListener: public IBufferConsumerListener {
+    class TestBufferConsumerListener : public IBufferConsumerListener {
     public:
         void OnBufferAvailable() const
         {
