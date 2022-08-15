@@ -22,24 +22,26 @@ namespace Audio {
 bool AudioSetextraparamsCaptureKeyvaluelistFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *capKeyValueFuzzManager = nullptr;
+    struct AudioAdapter *capKeyValueFuzzAdapter = nullptr;
+    struct AudioCapture *capKeyValueFuzzCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateStartCapture(capKeyValueFuzzManager,
+        &capKeyValueFuzzAdapter, &capKeyValueFuzzCapture);
+    if (ret < 0 || capKeyValueFuzzAdapter == nullptr ||
+        capKeyValueFuzzCapture == nullptr || capKeyValueFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
     char *keyValueListFuzz = (char *)data;
-    ret = capture->attr.SetExtraParams(capture, keyValueListFuzz);
+    ret = capKeyValueFuzzCapture->attr.SetExtraParams(capKeyValueFuzzCapture, keyValueListFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
 
-    capture->control.Stop((AudioHandle)capture);
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
-    capture = nullptr;
+    capKeyValueFuzzCapture->control.Stop((AudioHandle)capKeyValueFuzzCapture);
+    capKeyValueFuzzAdapter->DestroyCapture(capKeyValueFuzzAdapter, capKeyValueFuzzCapture);
+    capKeyValueFuzzManager->UnloadAdapter(capKeyValueFuzzManager, capKeyValueFuzzAdapter);
+    capKeyValueFuzzCapture = nullptr;
     return result;
 }
 }

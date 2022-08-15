@@ -22,7 +22,7 @@ namespace Audio {
     bool AudioRenderReqmmapbufferRenderFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        TestAudioManager *manager = nullptr;
+        TestAudioManager *reqMmapBufManager = nullptr;
         FILE *fp = fopen(AUDIO_LOW_LATENCY_RENDER_FILE.c_str(), "wb+");
         if (fp == nullptr) {
             HDF_LOGE("%{public}s: fopen failed \n", __func__);
@@ -30,8 +30,8 @@ namespace Audio {
         }
         struct AudioAdapter *adapter = nullptr;
         struct AudioRender *render = nullptr;
-        int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-        if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        int32_t ret = AudioGetManagerCreateStartRender(reqMmapBufManager, &adapter, &render);
+        if (ret < 0 || adapter == nullptr || render == nullptr || reqMmapBufManager == nullptr) {
             fclose(fp);
             HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
             return false;
@@ -42,7 +42,7 @@ namespace Audio {
         ret = InitMmapDesc(fp, desc, reqSize, isRender);
         if (ret < 0) {
             adapter->DestroyRender(adapter, render);
-            manager->UnloadAdapter(manager, adapter);
+            reqMmapBufManager->UnloadAdapter(reqMmapBufManager, adapter);
             fclose(fp);
             HDF_LOGE("%{public}s: InitMmapDesc failed \n", __func__);
             return false;
@@ -55,7 +55,7 @@ namespace Audio {
             result = true;
         }
         adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
+        reqMmapBufManager->UnloadAdapter(reqMmapBufManager, adapter);
         ret = fclose(fp);
         if (ret != 0) {
             return false;

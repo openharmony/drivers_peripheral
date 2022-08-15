@@ -22,21 +22,21 @@ namespace Audio {
 bool AudioSetgainCaptureGainFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *gainCapFuzzManager = nullptr;
+    struct AudioAdapter *gainCapFuzzAdapter = nullptr;
+    struct AudioCapture *gainCapFuzzCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateCapture(gainCapFuzzManager, &gainCapFuzzAdapter, &gainCapFuzzCapture);
+    if (ret < 0 || gainCapFuzzAdapter == nullptr || gainCapFuzzCapture == nullptr || gainCapFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
         return false;
     }
     int32_t gain = *(float *)data;
-    ret = capture->volume.SetGain(capture, gain);
+    ret = gainCapFuzzCapture->volume.SetGain(gainCapFuzzCapture, gain);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
+    gainCapFuzzAdapter->DestroyCapture(gainCapFuzzAdapter, gainCapFuzzCapture);
+    gainCapFuzzManager->UnloadAdapter(gainCapFuzzManager, gainCapFuzzAdapter);
     return result;
 }
 }

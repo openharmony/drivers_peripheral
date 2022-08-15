@@ -22,25 +22,26 @@ namespace Audio {
 bool AudioGetlatencyRenderFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *getLatRenFuzzManager = nullptr;
+    struct AudioAdapter *getLatRenFuzzAdapter = nullptr;
+    struct AudioRender *getLatRenFuzzRender = nullptr;
+    int32_t ret = AudioGetManagerCreateStartRender(getLatRenFuzzManager, &getLatRenFuzzAdapter, &getLatRenFuzzRender);
+    if (ret < 0 || getLatRenFuzzAdapter == nullptr ||
+        getLatRenFuzzRender == nullptr || getLatRenFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
     uint32_t latencyTime = 0;
 
     struct AudioRender *renderFuzz = (struct AudioRender *)data;
-    ret = render->GetLatency(renderFuzz, &latencyTime);
+    ret = getLatRenFuzzRender->GetLatency(renderFuzz, &latencyTime);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    render->control.Stop((AudioHandle)render);
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
-    render = nullptr;
+    getLatRenFuzzRender->control.Stop((AudioHandle)getLatRenFuzzRender);
+    getLatRenFuzzAdapter->DestroyRender(getLatRenFuzzAdapter, getLatRenFuzzRender);
+    getLatRenFuzzManager->UnloadAdapter(getLatRenFuzzManager, getLatRenFuzzAdapter);
+    getLatRenFuzzRender = nullptr;
     return result;
 }
 }

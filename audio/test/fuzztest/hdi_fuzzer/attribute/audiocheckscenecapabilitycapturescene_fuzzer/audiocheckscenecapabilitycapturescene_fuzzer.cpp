@@ -25,26 +25,26 @@ namespace Audio {
         bool supported = false;
         struct AudioSceneDescriptor scenes = {};
         scenes.scene.id = 0;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
-        struct AudioCapture *capture = nullptr;
-        int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-        if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+        TestAudioManager *sceneFuzzManager = nullptr;
+        struct AudioAdapter *sceneFuzzAdapter = nullptr;
+        struct AudioCapture *sceneFuzzCapture = nullptr;
+        int32_t ret = AudioGetManagerCreateCapture(sceneFuzzManager, &sceneFuzzAdapter, &sceneFuzzCapture);
+        if (ret < 0 || sceneFuzzAdapter == nullptr || sceneFuzzCapture == nullptr || sceneFuzzManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
             return false;
         }
 
-        struct AudioSceneDescriptor sceneFuzz = {};
-        int32_t copySize = sizeof(sceneFuzz) > size ? size : sizeof(sceneFuzz);
-        if (memcpy_s((void *)&sceneFuzz, sizeof(sceneFuzz), data, copySize) != 0) {
+        struct AudioSceneDescriptor sceneDesc = {};
+        int32_t copySize = sizeof(sceneDesc) > size ? size : sizeof(sceneDesc);
+        if (memcpy_s((void *)&sceneDesc, sizeof(sceneDesc), data, copySize) != 0) {
             return false;
         }
-        ret = capture->scene.CheckSceneCapability(capture, &sceneFuzz, &supported);
+        ret = sceneFuzzCapture->scene.CheckSceneCapability(sceneFuzzCapture, &sceneDesc, &supported);
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        sceneFuzzAdapter->DestroyCapture(sceneFuzzAdapter, sceneFuzzCapture);
+        sceneFuzzManager->UnloadAdapter(sceneFuzzManager, sceneFuzzAdapter);
         return result;
     }
 }

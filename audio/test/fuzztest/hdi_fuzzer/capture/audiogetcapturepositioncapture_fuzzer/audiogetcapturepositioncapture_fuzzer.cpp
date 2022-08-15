@@ -22,11 +22,12 @@ namespace Audio {
 bool AudioGetcapturepositionCaptureFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *getCapPosFuzzManager = nullptr;
+    struct AudioAdapter *getCapPosFuzzAdapter = nullptr;
+    struct AudioCapture *getCapPosFuzzCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateStartCapture(getCapPosFuzzManager, &getCapPosFuzzAdapter, &getCapPosFuzzCapture);
+    if (ret < 0 || getCapPosFuzzAdapter == nullptr ||
+        getCapPosFuzzCapture == nullptr || getCapPosFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
@@ -35,29 +36,29 @@ bool AudioGetcapturepositionCaptureFuzzTest(const uint8_t *data, size_t size)
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
     char *frame = (char *)calloc(1, BUFFER_LENTH);
     if (frame == nullptr) {
-        capture->control.Stop((AudioHandle)capture);
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        getCapPosFuzzCapture->control.Stop((AudioHandle)getCapPosFuzzCapture);
+        getCapPosFuzzAdapter->DestroyCapture(getCapPosFuzzAdapter, getCapPosFuzzCapture);
+        getCapPosFuzzManager->UnloadAdapter(getCapPosFuzzManager, getCapPosFuzzAdapter);
         return false;
     }
-    ret = capture->CaptureFrame(capture, frame, requestBytes, &replyBytes);
+    ret = getCapPosFuzzCapture->CaptureFrame(getCapPosFuzzCapture, frame, requestBytes, &replyBytes);
     if (ret < 0) {
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
-        capture = nullptr;
+        getCapPosFuzzAdapter->DestroyCapture(getCapPosFuzzAdapter, getCapPosFuzzCapture);
+        getCapPosFuzzManager->UnloadAdapter(getCapPosFuzzManager, getCapPosFuzzAdapter);
+        getCapPosFuzzCapture = nullptr;
         return false;
     }
 
     replyBytes = 0;
     struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
-    ret = capture->GetCapturePosition(captureFuzz, &replyBytes, &time);
+    ret = getCapPosFuzzCapture->GetCapturePosition(captureFuzz, &replyBytes, &time);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    capture->control.Stop((AudioHandle)capture);
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
-    capture = nullptr;
+    getCapPosFuzzCapture->control.Stop((AudioHandle)getCapPosFuzzCapture);
+    getCapPosFuzzAdapter->DestroyCapture(getCapPosFuzzAdapter, getCapPosFuzzCapture);
+    getCapPosFuzzManager->UnloadAdapter(getCapPosFuzzManager, getCapPosFuzzAdapter);
+    getCapPosFuzzCapture = nullptr;
     return result;
 }
 }

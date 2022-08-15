@@ -21,9 +21,9 @@ namespace Audio {
 bool AudioGetalladaptersFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    int32_t ret = GetManager(manager);
-    if (ret < 0 || manager == nullptr) {
+    TestAudioManager *getAllFuzzManager = nullptr;
+    int32_t ret = GetManager(getAllFuzzManager);
+    if (ret < 0 || getAllFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
@@ -31,7 +31,7 @@ bool AudioGetalladaptersFuzzTest(const uint8_t *data, size_t size)
     int sizeone = 0;
 
     TestAudioManager *managerFuzz = (TestAudioManager *)data;
-    ret = manager->GetAllAdapters(managerFuzz, &descs, &sizeone);
+    ret = getAllFuzzManager->GetAllAdapters(managerFuzz, &descs, &sizeone);
     if (ret == HDF_SUCCESS) {
         result = true;
     }

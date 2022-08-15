@@ -22,26 +22,26 @@ namespace Audio {
 bool AudioSetpassthroughmodeAdapterFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    int32_t ret = GetManager(manager);
-    if (ret < 0 || manager == nullptr) {
+    TestAudioManager *setPassthroughFuzzManager = nullptr;
+    int32_t ret = GetManager(setPassthroughFuzzManager);
+    if (ret < 0 || setPassthroughFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
-    struct AudioAdapter *adapter = nullptr;
+    struct AudioAdapter *setPassthroughFuzzAdapter = nullptr;
     struct AudioPort *audioPort = nullptr;
-    ret = GetLoadAdapter(manager, &adapter, audioPort);
-    if (ret < 0 || adapter == nullptr) {
+    ret = GetLoadAdapter(setPassthroughFuzzManager, &setPassthroughFuzzAdapter, audioPort);
+    if (ret < 0 || setPassthroughFuzzAdapter == nullptr) {
         HDF_LOGE("%{public}s: GetLoadAdapter failed \n", __func__);
         return false;
     }
     AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
     struct AudioAdapter *adapterFuzz = (struct AudioAdapter *)data;
-    ret = adapter->SetPassthroughMode(adapterFuzz, audioPort, mode);
+    ret = setPassthroughFuzzAdapter->SetPassthroughMode(adapterFuzz, audioPort, mode);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    manager->UnloadAdapter(manager, adapter);
+    setPassthroughFuzzManager->UnloadAdapter(setPassthroughFuzzManager, setPassthroughFuzzAdapter);
     return result;
 }
 }

@@ -21,26 +21,26 @@ namespace Audio {
 bool AudioDestroycaptureCaptureFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    int32_t ret = GetManager(manager);
-    if (ret < 0 || manager == nullptr) {
+    TestAudioManager *destroyCapFuzzManager = nullptr;
+    int32_t ret = GetManager(destroyCapFuzzManager);
+    if (ret < 0 || destroyCapFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
-    struct AudioAdapter *adapter = nullptr;
+    struct AudioAdapter *destroyFuzzAdapter = nullptr;
     struct AudioPort *capturePort = nullptr;
-    ret = GetLoadAdapter(manager, &adapter, capturePort);
-    if (ret < 0 || adapter == nullptr) {
+    ret = GetLoadAdapter(destroyCapFuzzManager, &destroyFuzzAdapter, capturePort);
+    if (ret < 0 || destroyFuzzAdapter == nullptr) {
         HDF_LOGE("%{public}s: GetLoadAdapter failed \n", __func__);
         return false;
     }
 
     struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
-    ret = adapter->DestroyCapture(adapter, captureFuzz);
+    ret = destroyFuzzAdapter->DestroyCapture(destroyFuzzAdapter, captureFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    manager->UnloadAdapter(manager, adapter);
+    destroyCapFuzzManager->UnloadAdapter(destroyCapFuzzManager, destroyFuzzAdapter);
     return result;
 }
 }

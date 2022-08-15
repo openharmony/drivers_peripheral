@@ -22,21 +22,21 @@ namespace Audio {
 bool AudioSetvolumeCaptureVolumeFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *volCapManager = nullptr;
+    struct AudioAdapter *volCapAdapter = nullptr;
+    struct AudioCapture *volCapCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateCapture(volCapManager, &volCapAdapter, &volCapCapture);
+    if (ret < 0 || volCapAdapter == nullptr || volCapCapture == nullptr || volCapManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
         return false;
     }
     int32_t volume = *(float *)data;
-    ret = capture->volume.SetVolume(capture, volume);
+    ret = volCapCapture->volume.SetVolume(volCapCapture, volume);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
+    volCapAdapter->DestroyCapture(volCapAdapter, volCapCapture);
+    volCapManager->UnloadAdapter(volCapManager, volCapAdapter);
     return result;
 }
 }

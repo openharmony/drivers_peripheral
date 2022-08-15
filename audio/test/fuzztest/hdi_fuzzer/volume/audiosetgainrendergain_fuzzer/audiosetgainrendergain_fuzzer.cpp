@@ -22,21 +22,21 @@ namespace Audio {
 bool AudioSetgainRenderGainFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *gainRenManager = nullptr;
+    struct AudioAdapter *gainRenAdapter = nullptr;
+    struct AudioRender *gainRenRender = nullptr;
+    int32_t ret = AudioGetManagerCreateRender(gainRenManager, &gainRenAdapter, &gainRenRender);
+    if (ret < 0 || gainRenAdapter == nullptr || gainRenRender == nullptr || gainRenManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
         return false;
     }
     int32_t gain = *(float *)data;
-    ret = render->volume.SetGain(render, gain);
+    ret = gainRenRender->volume.SetGain(gainRenRender, gain);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
+    gainRenAdapter->DestroyRender(gainRenAdapter, gainRenRender);
+    gainRenManager->UnloadAdapter(gainRenManager, gainRenAdapter);
     return result;
 }
 }

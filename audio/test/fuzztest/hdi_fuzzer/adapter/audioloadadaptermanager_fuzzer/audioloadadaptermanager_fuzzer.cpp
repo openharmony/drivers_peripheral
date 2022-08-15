@@ -22,23 +22,23 @@ namespace Audio {
 bool AudioLoadadapterManagerFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    int32_t ret = GetManager(manager);
-    if (ret < 0 || manager == nullptr) {
+    TestAudioManager *loadAdapterFuzzManager = nullptr;
+    int32_t ret = GetManager(loadAdapterFuzzManager);
+    if (ret < 0 || loadAdapterFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
     struct AudioAdapterDescriptor *descs = nullptr;
     int sizeone = 0;
-    ret = manager->GetAllAdapters(manager, &descs, &sizeone);
-    if (ret < 0 || manager == nullptr) {
+    ret = loadAdapterFuzzManager->GetAllAdapters(loadAdapterFuzzManager, &descs, &sizeone);
+    if (ret < 0 || loadAdapterFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: GetAllAdapters failed \n", __func__);
         return false;
     }
     struct AudioAdapterDescriptor *desc = &descs[0];
     struct AudioAdapter *adapter = nullptr;
     TestAudioManager *managerFuzz = (TestAudioManager *)data;
-    ret = manager->LoadAdapter(managerFuzz, desc, &adapter);
+    ret = loadAdapterFuzzManager->LoadAdapter(managerFuzz, desc, &adapter);
     if (ret == HDF_SUCCESS) {
         result = true;
     }

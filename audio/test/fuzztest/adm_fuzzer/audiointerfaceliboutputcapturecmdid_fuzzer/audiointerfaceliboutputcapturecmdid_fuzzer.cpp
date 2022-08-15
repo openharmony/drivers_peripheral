@@ -23,30 +23,30 @@ namespace Audio {
     {
         bool result = false;
         char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
-        void *ptrHandle = dlopen(resolvedPath, RTLD_LAZY);
-        if (ptrHandle == nullptr) {
+        void *outputCapPtrHandle = dlopen(resolvedPath, RTLD_LAZY);
+        if (outputCapPtrHandle == nullptr) {
             HDF_LOGE("%{public}s: dlopen failed \n", __func__);
             return false;
         }
         struct DevHandle *(*BindServiceCapture)(const char *) = nullptr;
         int32_t (*InterfaceLibOutputCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *) = nullptr;
-        BindServiceCapture = (struct DevHandle* (*)(const char *))dlsym(ptrHandle, "AudioBindServiceCapture");
+        BindServiceCapture = (struct DevHandle* (*)(const char *))dlsym(outputCapPtrHandle, "AudioBindServiceCapture");
         if (BindServiceCapture == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioBindServiceCapture failed \n", __func__);
-            dlclose(ptrHandle);
+            dlclose(outputCapPtrHandle);
             return false;
         }
         struct DevHandle *handle = BindServiceCapture(BIND_CONTROL.c_str());
         if (handle == nullptr) {
             HDF_LOGE("%{public}s: BindServiceCapture failed \n", __func__);
-            dlclose(ptrHandle);
+            dlclose(outputCapPtrHandle);
             return false;
         }
         InterfaceLibOutputCapture = (int32_t (*)(struct DevHandle *, int,
-            struct AudioHwCaptureParam *))dlsym(ptrHandle, "AudioInterfaceLibOutputCapture");
+            struct AudioHwCaptureParam *))dlsym(outputCapPtrHandle, "AudioInterfaceLibOutputCapture");
         if (InterfaceLibOutputCapture == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioInterfaceLibOutputCapture failed \n", __func__);
-            dlclose(ptrHandle);
+            dlclose(outputCapPtrHandle);
             return false;
         }
         struct AudioHwCapture *hwCapture = nullptr;
@@ -58,14 +58,14 @@ namespace Audio {
         }
         free(hwCapture);
         void (*CloseService)(const struct DevHandle *) = nullptr;
-        CloseService = (void (*)(const struct DevHandle *))dlsym(ptrHandle, "AudioCloseServiceCapture");
+        CloseService = (void (*)(const struct DevHandle *))dlsym(outputCapPtrHandle, "AudioCloseServiceCapture");
         if (CloseService == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioCloseServiceCapture failed \n", __func__);
-            dlclose(ptrHandle);
+            dlclose(outputCapPtrHandle);
             return false;
         }
         CloseService(handle);
-        dlclose(ptrHandle);
+        dlclose(outputCapPtrHandle);
         return result;
     }
 }

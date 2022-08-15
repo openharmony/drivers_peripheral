@@ -23,22 +23,22 @@ bool AudioSetvolumeRenderFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
     float volume = 0;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *volRenManager = nullptr;
+    struct AudioAdapter *volRenAdapter = nullptr;
+    struct AudioRender *volRenRender = nullptr;
+    int32_t ret = AudioGetManagerCreateRender(volRenManager, &volRenAdapter, &volRenRender);
+    if (ret < 0 || volRenAdapter == nullptr || volRenRender == nullptr || volRenManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
         return false;
     }
 
     struct AudioRender *handle = (struct AudioRender *)data;
-    ret = render->volume.SetVolume(handle, volume);
+    ret = volRenRender->volume.SetVolume(handle, volume);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
+    volRenAdapter->DestroyRender(volRenAdapter, volRenRender);
+    volRenManager->UnloadAdapter(volRenManager, volRenAdapter);
     return result;
 }
 }

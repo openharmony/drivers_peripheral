@@ -22,11 +22,11 @@ namespace Audio {
     bool AudioRenderGetmmappositionRenderFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        TestAudioManager *manager = nullptr;
+        TestAudioManager *getMmapPosManager = nullptr;
         struct AudioAdapter *adapter = nullptr;
         struct AudioRender *render = nullptr;
-        int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-        if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        int32_t ret = AudioGetManagerCreateRender(getMmapPosManager, &adapter, &render);
+        if (ret < 0 || adapter == nullptr || render == nullptr || getMmapPosManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
             return false;
         }
@@ -38,7 +38,7 @@ namespace Audio {
             result = true;
         }
         adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
+        getMmapPosManager->UnloadAdapter(getMmapPosManager, adapter);
         return result;
     }
 }

@@ -23,11 +23,11 @@ namespace Audio {
     {
         bool result = false;
         uint64_t fsize = 0;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
+        TestAudioManager *sizeRenderManager = nullptr;
+        struct AudioAdapter *sizeRenderAdapter = nullptr;
         struct AudioRender *render = nullptr;
-        int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-        if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        int32_t ret = AudioGetManagerCreateRender(sizeRenderManager, &sizeRenderAdapter, &render);
+        if (ret < 0 || sizeRenderAdapter == nullptr || render == nullptr || sizeRenderManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
             return false;
         }
@@ -37,8 +37,8 @@ namespace Audio {
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
+        sizeRenderAdapter->DestroyRender(sizeRenderAdapter, render);
+        sizeRenderManager->UnloadAdapter(sizeRenderManager, sizeRenderAdapter);
         return result;
     }
 }

@@ -22,24 +22,24 @@ namespace Audio {
 bool AudioPauseCaptureFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
-    int32_t ret = AudioGetManagerCreateStartCapture(manager, &adapter, &capture);
-    if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+    TestAudioManager *pauseFuzzManager = nullptr;
+    struct AudioAdapter *pauseFuzzAdapter = nullptr;
+    struct AudioCapture *pauseFuzzCapture = nullptr;
+    int32_t ret = AudioGetManagerCreateStartCapture(pauseFuzzManager, &pauseFuzzAdapter, &pauseFuzzCapture);
+    if (ret < 0 || pauseFuzzAdapter == nullptr || pauseFuzzCapture == nullptr || pauseFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
 
     struct AudioCapture *captureFuzz = (struct AudioCapture *)(data);
-    ret = capture->control.Pause((AudioHandle)captureFuzz);
+    ret = pauseFuzzCapture->control.Pause((AudioHandle)captureFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    capture->control.Stop((AudioHandle)capture);
-    adapter->DestroyCapture(adapter, capture);
-    manager->UnloadAdapter(manager, adapter);
-    capture = nullptr;
+    pauseFuzzCapture->control.Stop((AudioHandle)pauseFuzzCapture);
+    pauseFuzzAdapter->DestroyCapture(pauseFuzzAdapter, pauseFuzzCapture);
+    pauseFuzzManager->UnloadAdapter(pauseFuzzManager, pauseFuzzAdapter);
+    pauseFuzzCapture = nullptr;
     return result;
 }
 }

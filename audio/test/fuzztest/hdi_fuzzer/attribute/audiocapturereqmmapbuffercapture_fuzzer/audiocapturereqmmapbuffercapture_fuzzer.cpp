@@ -22,25 +22,27 @@ namespace Audio {
     bool AudioCaptureReqmmapbufferCaptureFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        TestAudioManager *manager = nullptr;
-        struct AudioAdapter *adapter = nullptr;
-        struct AudioCapture *capture = nullptr;
-        int32_t ret = AudioGetManagerCreateCapture(manager, &adapter, &capture);
-        if (ret < 0 || adapter == nullptr || capture == nullptr || manager == nullptr) {
+        TestAudioManager *mmapBufferFuzzManager = nullptr;
+        struct AudioAdapter *mmapBufferFuzzAdapter = nullptr;
+        struct AudioCapture *mmapBufferFuzzCapture = nullptr;
+        int32_t ret = AudioGetManagerCreateCapture(mmapBufferFuzzManager,
+            &mmapBufferFuzzAdapter, &mmapBufferFuzzCapture);
+        if (ret < 0 || mmapBufferFuzzAdapter == nullptr ||
+            mmapBufferFuzzCapture == nullptr || mmapBufferFuzzManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
             return false;
         }
         FILE *fp = fopen(AUDIO_LOW_LATENCY_CAPTURE_FILE.c_str(), "wb+");
         if (fp == nullptr) {
-            adapter->DestroyCapture(adapter, capture);
-            manager->UnloadAdapter(manager, adapter);
+            mmapBufferFuzzAdapter->DestroyCapture(mmapBufferFuzzAdapter, mmapBufferFuzzCapture);
+            mmapBufferFuzzManager->UnloadAdapter(mmapBufferFuzzManager, mmapBufferFuzzAdapter);
             HDF_LOGE("%{public}s: fopen failed \n", __func__);
             return false;
         }
-        ret = capture->control.Start((AudioHandle)capture);
-        if (ret < 0 || manager == nullptr) {
-            adapter->DestroyCapture(adapter, capture);
-            manager->UnloadAdapter(manager, adapter);
+        ret = mmapBufferFuzzCapture->control.Start((AudioHandle)mmapBufferFuzzCapture);
+        if (ret < 0 || mmapBufferFuzzManager == nullptr) {
+            mmapBufferFuzzAdapter->DestroyCapture(mmapBufferFuzzAdapter, mmapBufferFuzzCapture);
+            mmapBufferFuzzManager->UnloadAdapter(mmapBufferFuzzManager, mmapBufferFuzzAdapter);
             fclose(fp);
             HDF_LOGE("%{public}s: Start failed \n", __func__);
             return false;
@@ -49,22 +51,22 @@ namespace Audio {
         int32_t reqSize = 0;
         struct AudioMmapBufferDescripter desc = {};
         ret = InitMmapDesc(fp, desc, reqSize, isRender);
-        if (ret < 0 || manager == nullptr) {
-            adapter->DestroyCapture(adapter, capture);
-            manager->UnloadAdapter(manager, adapter);
+        if (ret < 0 || mmapBufferFuzzManager == nullptr) {
+            mmapBufferFuzzAdapter->DestroyCapture(mmapBufferFuzzAdapter, mmapBufferFuzzCapture);
+            mmapBufferFuzzManager->UnloadAdapter(mmapBufferFuzzManager, mmapBufferFuzzAdapter);
             (void)fclose(fp);
             HDF_LOGE("%{public}s: InitMmapDesc failed \n", __func__);
             return false;
         }
 
         struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
-        ret = capture->attr.ReqMmapBuffer((AudioHandle)captureFuzz, reqSize, &desc);
+        ret = mmapBufferFuzzCapture->attr.ReqMmapBuffer((AudioHandle)captureFuzz, reqSize, &desc);
         if (ret == HDF_SUCCESS) {
             (void)munmap(desc.memoryAddress, reqSize);
             result = true;
         }
-        adapter->DestroyCapture(adapter, capture);
-        manager->UnloadAdapter(manager, adapter);
+        mmapBufferFuzzAdapter->DestroyCapture(mmapBufferFuzzAdapter, mmapBufferFuzzCapture);
+        mmapBufferFuzzManager->UnloadAdapter(mmapBufferFuzzManager, mmapBufferFuzzAdapter);
         (void)fclose(fp);
         return result;
     }

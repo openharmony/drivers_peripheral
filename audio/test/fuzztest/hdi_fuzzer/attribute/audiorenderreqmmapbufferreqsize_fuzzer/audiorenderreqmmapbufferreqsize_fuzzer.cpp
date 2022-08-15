@@ -22,16 +22,16 @@ namespace Audio {
     bool AudioRenderReqmmapbufferReqsizeFuzzTest(const uint8_t *data, size_t size)
     {
         bool result = false;
-        TestAudioManager *manager = nullptr;
+        TestAudioManager *reqMmapReqManager = nullptr;
         FILE *fp = fopen(AUDIO_LOW_LATENCY_RENDER_FILE.c_str(), "wb+");
         if (fp == nullptr) {
             HDF_LOGE("%{public}s: fopen failed \n", __func__);
             return false;
         }
-        struct AudioAdapter *adapter = nullptr;
-        struct AudioRender *render = nullptr;
-        int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-        if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+        struct AudioAdapter *reqMmapReqAdapter = nullptr;
+        struct AudioRender *reqMmapReqRender = nullptr;
+        int32_t ret = AudioGetManagerCreateStartRender(reqMmapReqManager, &reqMmapReqAdapter, &reqMmapReqRender);
+        if (ret < 0 || reqMmapReqAdapter == nullptr || reqMmapReqRender == nullptr || reqMmapReqManager == nullptr) {
             fclose(fp);
             HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
             return false;
@@ -41,20 +41,20 @@ namespace Audio {
         struct AudioMmapBufferDescripter desc = {};
         ret = InitMmapDesc(fp, desc, reqSize, isRender);
         if (ret < 0) {
-            adapter->DestroyRender(adapter, render);
-            manager->UnloadAdapter(manager, adapter);
+            reqMmapReqAdapter->DestroyRender(reqMmapReqAdapter, reqMmapReqRender);
+            reqMmapReqManager->UnloadAdapter(reqMmapReqManager, reqMmapReqAdapter);
             fclose(fp);
             HDF_LOGE("%{public}s: InitMmapDesc failed \n", __func__);
             return false;
         }
         reqSize = *(int32_t *)data;
-        ret = render->attr.ReqMmapBuffer((AudioHandle)render, reqSize, &desc);
+        ret = reqMmapReqRender->attr.ReqMmapBuffer((AudioHandle)reqMmapReqRender, reqSize, &desc);
         if (ret == HDF_SUCCESS) {
             (void)munmap(desc.memoryAddress, reqSize);
             result = true;
         }
-        adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
+        reqMmapReqAdapter->DestroyRender(reqMmapReqAdapter, reqMmapReqRender);
+        reqMmapReqManager->UnloadAdapter(reqMmapReqManager, reqMmapReqAdapter);
         (void)fclose(fp);
         return result;
     }

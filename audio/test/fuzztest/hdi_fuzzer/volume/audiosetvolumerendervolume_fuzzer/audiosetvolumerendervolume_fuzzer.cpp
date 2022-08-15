@@ -22,22 +22,22 @@ namespace Audio {
 bool AudioSetvolumeRenderVolumeFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *volumeFuzzManager = nullptr;
+    struct AudioAdapter *volumeFuzzAdapter = nullptr;
+    struct AudioRender *volumeFuzzRender = nullptr;
+    int32_t ret = AudioGetManagerCreateRender(volumeFuzzManager, &volumeFuzzAdapter, &volumeFuzzRender);
+    if (ret < 0 || volumeFuzzAdapter == nullptr || volumeFuzzRender == nullptr || volumeFuzzManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
         return false;
     }
 
     int32_t volume = *(float *)data;
-    ret = render->volume.SetVolume(render, volume);
+    ret = volumeFuzzRender->volume.SetVolume(volumeFuzzRender, volume);
     if (ret == HDF_SUCCESS) {
         result = true;
     }
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
+    volumeFuzzAdapter->DestroyRender(volumeFuzzAdapter, volumeFuzzRender);
+    volumeFuzzManager->UnloadAdapter(volumeFuzzManager, volumeFuzzAdapter);
     return result;
 }
 }

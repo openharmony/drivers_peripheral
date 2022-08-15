@@ -22,24 +22,24 @@ namespace Audio {
 bool AudioSetrenderspeedSpeedFuzzTest(const uint8_t *data, size_t size)
 {
     bool result = false;
-    TestAudioManager *manager = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    int32_t ret = AudioGetManagerCreateStartRender(manager, &adapter, &render);
-    if (ret < 0 || adapter == nullptr || render == nullptr || manager == nullptr) {
+    TestAudioManager *setSpeedManager = nullptr;
+    struct AudioAdapter *setSpeedAdapter = nullptr;
+    struct AudioRender *setSpeedRender = nullptr;
+    int32_t ret = AudioGetManagerCreateStartRender(setSpeedManager, &setSpeedAdapter, &setSpeedRender);
+    if (ret < 0 || setSpeedAdapter == nullptr || setSpeedRender == nullptr || setSpeedManager == nullptr) {
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
 
     float speedFuzz = *(float *)data;
-    ret = render->SetRenderSpeed(render, speedFuzz);
+    ret = setSpeedRender->SetRenderSpeed(setSpeedRender, speedFuzz);
     if (ret == HDF_ERR_NOT_SUPPORT) {
         result = true;
     }
-    render->control.Stop((AudioHandle)render);
-    adapter->DestroyRender(adapter, render);
-    manager->UnloadAdapter(manager, adapter);
-    render = nullptr;
+    setSpeedRender->control.Stop((AudioHandle)setSpeedRender);
+    setSpeedAdapter->DestroyRender(setSpeedAdapter, setSpeedRender);
+    setSpeedManager->UnloadAdapter(setSpeedManager, setSpeedAdapter);
+    setSpeedRender = nullptr;
     return result;
 }
 }
