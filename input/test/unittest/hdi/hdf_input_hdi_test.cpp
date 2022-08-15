@@ -408,7 +408,7 @@ HWTEST_F(HdfInputHdiTest, RegisterCallback001, TestSize.Level1)
 
     /* Device "5" is used for testing nonexistent device node */
     int32_t ret  = g_inputInterfaces->RegisterReportCallback(INVALID_INDEX, g_callback);
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: device %d dose not exist, can't register callback to it, ret %d", __func__, INVALID_INDEX, ret);
     }
     EXPECT_NE(ret, INPUT_SUCCESS);
@@ -789,7 +789,7 @@ HWTEST_F(HdfInputHdiTest, HotPlugCallback001, TestSize.Level1)
     CloseOnlineDev(sta);
 
     ret = g_inputInterfaces->UnregisterHotPlugCallback();
-    if (ret) {
+    if (ret != INPUT_SUCCESS) {
         HDF_LOGE("%s: unregister hotplug callback failed for device manager, ret %d", __func__, ret);
     }
     EXPECT_EQ(ret, INPUT_SUCCESS);
