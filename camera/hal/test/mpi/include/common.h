@@ -128,7 +128,7 @@ public:
     public:
         TestBufferConsumerListener() {}
         ~TestBufferConsumerListener() {}
-        void OnBufferAvailable() {}
+        void OnBufferAvailable() const {}
     };
 
     class StreamConsumer {
