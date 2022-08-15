@@ -21,7 +21,7 @@
 
 static struct Apds9960DrvData *g_apds9960DrvData = NULL;
 
-struct Apds9960DrvData *Apds9960GetDrvData(void)
+static struct Apds9960DrvData *Apds9960GetDrvData(void)
 {
     return g_apds9960DrvData;
 }

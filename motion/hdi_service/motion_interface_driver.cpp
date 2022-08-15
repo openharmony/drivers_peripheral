@@ -47,13 +47,14 @@ static int32_t MotionInterfaceDriverDispatch(struct HdfDeviceIoClient *client, i
     return hdfMotionInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-int HdfMotionInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+static int32_t HdfMotionInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
     HDF_LOGI("HdfMotionInterfaceDriverInit enter");
     return HDF_SUCCESS;
 }
 
-int HdfMotionInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+static int32_t HdfMotionInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfMotionInterfaceDriverBind enter");
 
@@ -84,7 +85,7 @@ int HdfMotionInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-void HdfMotionInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfMotionInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfMotionInterfaceDriverRelease enter");
     auto *hdfMotionInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfMotionInterfaceHost, ioService);

@@ -18,7 +18,7 @@
 
 static struct Bmi160DrvData *g_bmi160DrvData = NULL;
 
-struct Bmi160DrvData *Bmi160GetDrvData(void)
+static struct Bmi160DrvData *Bmi160GetDrvData(void)
 {
     return g_bmi160DrvData;
 }

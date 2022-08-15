@@ -51,13 +51,14 @@ static int32_t SensorInterfaceDriverDispatch(struct HdfDeviceIoClient *client, i
     return hdfSensorInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int HdfSensorInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+static int32_t HdfSensorInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
     HDF_LOGI("HdfSensorInterfaceDriverInit enter");
     return HDF_SUCCESS;
 }
 
-static int HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+static int32_t HdfSensorInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     auto *hdfSensorInterfaceHost = new (std::nothrow) HdfSensorInterfaceHost;
     if (hdfSensorInterfaceHost == nullptr) {
