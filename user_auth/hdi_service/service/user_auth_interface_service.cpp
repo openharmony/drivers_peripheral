@@ -41,7 +41,7 @@ namespace HDI {
 namespace UserAuth {
 namespace V1_0 {
 namespace {
-static std::mutex mutex_;
+static std::mutex g_mutex;
 }
 
 extern "C" IUserAuthInterface *UserAuthInterfaceImplGetInstance(void)
@@ -51,7 +51,7 @@ extern "C" IUserAuthInterface *UserAuthInterfaceImplGetInstance(void)
         IAM_LOGE("userAuthInterfaceService is nullptr");
         return nullptr;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     OHOS::UserIam::Common::Init();
     return userAuthInterfaceService;
 }
@@ -59,7 +59,7 @@ extern "C" IUserAuthInterface *UserAuthInterfaceImplGetInstance(void)
 int32_t UserAuthInterfaceService::Init()
 {
     IAM_LOGI("start");
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     OHOS::UserIam::Common::Close();
     return OHOS::UserIam::Common::Init();
 }
@@ -116,7 +116,7 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *schedulesGet = nullptr;
     int32_t ret = GenerateSolutionFunc(solutionIn, &schedulesGet);
     if (ret != RESULT_SUCCESS || schedulesGet == nullptr) {
@@ -207,7 +207,7 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
         DestoryContextbyId(contextId);
         return RESULT_NO_MEMORY;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     UserAuthTokenHal authTokenHal = {};
     AuthResult authResult = {};
     int32_t ret = RequestAuthResultFunc(contextId, scheduleResultBuffer, &authTokenHal, &authResult);
@@ -244,7 +244,7 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
 int32_t UserAuthInterfaceService::CancelAuthentication(uint64_t contextId)
 {
     IAM_LOGI("start");
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     return DestoryContextbyId(contextId);
 }
 
@@ -264,7 +264,7 @@ int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, AuthTy
         IAM_LOGE("challenge copy failed");
         return RESULT_BAD_COPY;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *scheduleGet = nullptr;
     int32_t ret = DoIdentify(param, &scheduleGet);
     if (ret != RESULT_SUCCESS || scheduleGet == nullptr) {
@@ -298,7 +298,7 @@ int32_t UserAuthInterfaceService::UpdateIdentificationResult(uint64_t contextId,
         IAM_LOGE("scheduleTokenBuffer is invalid");
         return RESULT_NO_MEMORY;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     UserAuthTokenHal token = {};
     int32_t ret = DoUpdateIdentify(contextId, scheduleResultBuffer, &info.userId, &token, &info.result);
     DestoryBuffer(scheduleResultBuffer);
@@ -320,14 +320,14 @@ int32_t UserAuthInterfaceService::UpdateIdentificationResult(uint64_t contextId,
 int32_t UserAuthInterfaceService::CancelIdentification(uint64_t contextId)
 {
     IAM_LOGI("start");
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     return DestoryContextbyId(contextId);
 }
 
 int32_t UserAuthInterfaceService::GetAuthTrustLevel(int32_t userId, AuthType authType, uint32_t &authTrustLevel)
 {
     IAM_LOGI("start");
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     int32_t ret = SingleAuthTrustLevel(userId, authType, &authTrustLevel);
     return ret;
 }
@@ -342,7 +342,7 @@ int32_t UserAuthInterfaceService::GetValidSolution(int32_t userId, const std::ve
 int32_t UserAuthInterfaceService::OpenSession(int32_t userId, std::vector<uint8_t> &challenge)
 {
     IAM_LOGI("start");
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     challenge.resize(CHALLENGE_LEN);
     int32_t ret = OpenEditSession(userId, challenge.data(), challenge.size());
     if (ret != RESULT_SUCCESS) {
@@ -355,7 +355,7 @@ int32_t UserAuthInterfaceService::OpenSession(int32_t userId, std::vector<uint8_
 int32_t UserAuthInterfaceService::CloseSession(int32_t userId)
 {
     IAM_LOGI("start");
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     return CloseEditSession();
 }
 
@@ -375,7 +375,7 @@ int32_t UserAuthInterfaceService::BeginEnrollment(int32_t userId, const std::vec
     checkParam.authType = param.authType;
     checkParam.userId = userId;
     checkParam.executorSensorHint = param.executorSensorHint;
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     uint64_t scheduleId;
     int32_t ret;
     if (authToken.size() == sizeof(UserAuthTokenHal) && param.authType == PIN) {
@@ -406,7 +406,7 @@ int32_t UserAuthInterfaceService::BeginEnrollment(int32_t userId, const std::vec
 int32_t UserAuthInterfaceService::CancelEnrollment(int32_t userId)
 {
     IAM_LOGI("start");
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     BreakOffCoauthSchedule();
     return RESULT_SUCCESS;
 }
@@ -434,7 +434,7 @@ int32_t UserAuthInterfaceService::UpdateEnrollmentResult(int32_t userId, const s
         IAM_LOGE("scheduleTokenBuffer is null");
         return RESULT_NO_MEMORY;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     bool isUpdate;
     int32_t ret = GetIsUpdate(&isUpdate);
     if (ret != RESULT_SUCCESS) {
@@ -471,7 +471,7 @@ int32_t UserAuthInterfaceService::DeleteCredential(int32_t userId, uint64_t cred
         IAM_LOGE("authToken len is invalid");
         return RESULT_BAD_PARAM;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     CredentialDeleteParam param = {};
     if (memcpy_s(param.token, AUTH_TOKEN_LEN, &authToken[0], authToken.size()) != EOK) {
         IAM_LOGE("param token copy failed");
@@ -492,7 +492,7 @@ int32_t UserAuthInterfaceService::DeleteCredential(int32_t userId, uint64_t cred
 int32_t UserAuthInterfaceService::GetCredential(int32_t userId, AuthType authType, std::vector<CredentialInfo> &infos)
 {
     IAM_LOGI("start");
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *credList = nullptr;
     int32_t ret = QueryCredentialFunc(userId, authType, &credList);
     if (ret != RESULT_SUCCESS) {
@@ -521,7 +521,7 @@ int32_t UserAuthInterfaceService::GetUserInfo(int32_t userId, uint64_t &secureUi
     std::vector<EnrolledInfo> &infos)
 {
     IAM_LOGI("start");
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     EnrolledInfoHal *enrolledInfoHals = nullptr;
     uint32_t num = 0;
     uint64_t pinSubTypeGet;
@@ -565,7 +565,7 @@ int32_t UserAuthInterfaceService::DeleteUser(int32_t userId, const std::vector<u
 int32_t UserAuthInterfaceService::EnforceDeleteUser(int32_t userId, std::vector<CredentialInfo> &deletedInfos)
 {
     IAM_LOGI("start");
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *credList = nullptr;
     int32_t ret = DeleteUserInfo(userId, &credList);
     if (ret != RESULT_SUCCESS) {
@@ -649,7 +649,7 @@ int32_t UserAuthInterfaceService::AddExecutor(const ExecutorRegisterInfo &info, 
         publicKey.clear();
         return RESULT_UNKNOWN;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     ExecutorInfoHal executorInfoHal = {};
     CopyExecutorInfo(info, executorInfoHal);
     int32_t ret = RegisterExecutor(&executorInfoHal, &index);
@@ -666,7 +666,7 @@ int32_t UserAuthInterfaceService::AddExecutor(const ExecutorRegisterInfo &info, 
 int32_t UserAuthInterfaceService::DeleteExecutor(uint64_t index)
 {
     IAM_LOGI("start");
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     return UnRegisterExecutor(index);
 }
 } // V1_0
