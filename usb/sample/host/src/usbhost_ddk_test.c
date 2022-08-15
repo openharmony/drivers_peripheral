@@ -65,7 +65,7 @@ struct HdfRemoteService *g_acmService = NULL;
 #endif
 static bool g_exitFlag = false;
 
-int32_t UsbObtainSbuf()
+int32_t UsbObtainSbuf(void)
 {
     if (g_acmService == NULL) {
         HDF_LOGE("%s:%d GetService err", __func__, __LINE__);

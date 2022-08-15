@@ -437,10 +437,10 @@ int32_t UsbImpl::UsbdBulkWriteSyncBase(
     uint32_t initTimeout = timeout < 0 ? 0 : (uint32_t)timeout;
     requestSync->params.timeout = initTimeout;
     requestSync->params.userData = port;
-    uint16_t tcur = 0;
-    uint16_t msize = requestSync->pipe.maxPacketSize;
+    uint32_t tcur = 0;
+    uint32_t msize = (uint32_t)requestSync->pipe.maxPacketSize;
     while (tcur < length) {
-        uint16_t tsize = (length - tcur) < msize ? (length - tcur) : msize;
+        uint32_t tsize = (length - tcur) < msize ? (length - tcur) : msize;
         requestSync->params.dataReq.buffer = (unsigned char *)(buffer + tcur);
         requestSync->params.dataReq.length = tsize;
         tcur += tsize;
@@ -675,7 +675,7 @@ int32_t UsbImpl::InitAsmBufferHandle(UsbdBufferHandle *handle, int32_t fd, int32
         return HDF_ERR_INVALID_PARAM;
     }
     handle->fd = fd;
-    handle->size = size;
+    handle->size = (uint32_t)size;
     handle->cur = 0;
     handle->rcur = 0;
     handle->cbflg = 0;

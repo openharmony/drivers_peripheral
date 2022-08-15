@@ -54,7 +54,7 @@ static int32_t check_service()
     return HDF_SUCCESS;
 }
 
-void acm_open()
+void acm_open(void)
 {
     int32_t status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
@@ -73,7 +73,7 @@ void acm_open()
     }
 }
 
-void acm_close()
+void acm_close(void)
 {
     int32_t status;
     if (check_service()) {

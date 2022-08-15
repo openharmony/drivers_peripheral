@@ -62,7 +62,7 @@ static bool g_printData = false;
 static unsigned int ifaceNum;
 static unsigned char endNum;
 
-static void CloseDevice()
+static void CloseDevice(void)
 {
     if (fd > 0) {
         close(fd);
@@ -71,7 +71,7 @@ static void CloseDevice()
     return;
 }
 
-static int32_t OpenDevice()
+static int32_t OpenDevice(void)
 {
     char path[PATH_MAX_LENGTH];
     int32_t ret;
@@ -270,8 +270,8 @@ static int32_t BeginProcess(unsigned char endPoint)
     }
 
     gettimeofday(&time, NULL);
-    signal(SIGINT, SignalHandler);
-    signal(SIGALRM, SignalHandler);
+    (void)signal(SIGINT, SignalHandler);
+    (void)signal(SIGALRM, SignalHandler);
 
     printf("test NO SDK endpoint:%hhu\n", endPoint);
 
