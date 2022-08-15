@@ -731,6 +731,7 @@ END:
 static int32_t AcmDeviceDispatch(
     struct HdfDeviceIoClient * const client, int32_t cmd, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    (void)reply;
     if (client == NULL) {
         HDF_LOGE("%s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;

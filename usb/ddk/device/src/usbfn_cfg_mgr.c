@@ -1040,6 +1040,7 @@ static const char *UsbFnCfgGetPropValueFromPropList(const struct UsbFnDeviceMgr 
     const char *propValue = NULL;
     const char *propName = NULL;
     const struct DeviceResourceNode *propNode = NULL;
+    (void)fnDevMgr;
 
     if (drsOps->GetUint8(propListNode, "configNum", &configNum, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read length fail!", __func__);

@@ -243,7 +243,7 @@ static int32_t TestCmdLoop(int32_t cmdType, const char *param)
             case HOST_ACM_ASYNC_READ:
                 if (UsbHostDdkTestAsyncRead(NULL) != HDF_SUCCESS) {
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
-                    if(cnt++ > 10){
+                    if (cnt++ > 10) {
                         asyncFlag = false;
                         return HDF_DEV_ERR_NO_DEVICE_SERVICE;
                     }
@@ -356,7 +356,7 @@ int32_t main(int32_t argc, char *argv[])
     signal(SIGINT, SigHandle);
 #endif
     status = TestCmdLoop(cmdType, argv[ARGV_CMD_PARAM]);
-    if(status == HDF_DEV_ERR_NO_DEVICE_SERVICE){
+    if (status == HDF_DEV_ERR_NO_DEVICE_SERVICE) {
         goto OUT;
     }
 

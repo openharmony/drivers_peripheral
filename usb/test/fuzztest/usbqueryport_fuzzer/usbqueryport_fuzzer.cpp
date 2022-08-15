@@ -22,6 +22,7 @@ namespace OHOS {
 namespace USB {
     bool UsbQueryPortFuzzTest(const uint8_t* data, size_t size)
     {
+        (void)size;
         bool result = false;
         int32_t ret = UsbdClient::GetInstance().QueryPort(reinterpret_cast<int32_t &>(data),
             reinterpret_cast<int32_t &>(data), reinterpret_cast<int32_t &>(data), reinterpret_cast<int32_t &>(data));

@@ -74,6 +74,7 @@ static bool g_readRuning = false;
 #define SLEEP_READ 100
 static void ReadThread(void *arg)
 {
+    (void)arg;
     while (g_readRuning) {
         OsalMutexLock(&g_lock);
         TestRead();
@@ -129,6 +130,8 @@ static void Test02()
 
 int32_t acm_test(int32_t argc, const char *argv[])
 {
+    (void)argc;
+    (void)argv;
     int32_t status;
     g_acmService = HdfIoServiceBind("usbfn_cdcacm");
     if (g_acmService == NULL || g_acmService->dispatcher == NULL || g_acmService->dispatcher->Dispatch == NULL) {

@@ -17,7 +17,7 @@
  * @addtogroup USB
  * @{
  *
- * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors, 
+ * @brief Declares USB-related APIs, including the custom data types and functions used to obtain descriptors,
  * interface objects, and request objects, and to submit requests.
  *
  * @since 1.0
@@ -66,4 +66,4 @@ struct UsbSession {
 #endif
 
 #endif /* USB_SESSION_H */
-/** @} */
+       /** @} */

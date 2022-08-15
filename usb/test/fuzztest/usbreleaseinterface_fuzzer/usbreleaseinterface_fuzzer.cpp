@@ -30,6 +30,7 @@ namespace USB {
 
     bool UsbReleaseInterfaceFuzzTest(const uint8_t* data, size_t size)
     {
+        (void)size;
         bool result = false;
         int32_t ret = UsbdClient::GetInstance().SetPortRole(DEFAULT_PORT_ID, DEFAULT_ROLE_HOST, DEFAULT_ROLE_HOST);
         sleep(SLEEP_TIME);

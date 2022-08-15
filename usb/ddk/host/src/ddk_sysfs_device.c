@@ -52,7 +52,7 @@ static int32_t DdkSysfsReadProperty(const char *deviceDir, const char *propName,
     }
 
     // read string  from file
-    char path[SYSFS_PATH_LEN];
+    char path[PATH_MAX] = {'\0'};
     if (realpath(pathTmp, path) == NULL) {
         HDF_LOGE("file %{public}s is invalid", pathTmp);
         return HDF_FAILURE;

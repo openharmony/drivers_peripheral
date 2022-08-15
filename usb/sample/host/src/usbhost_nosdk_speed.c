@@ -157,6 +157,7 @@ static void SignalHandler(int32_t signo)
 
 static int32_t SendProcess(void *argurb)
 {
+    (void)argurb;
     int32_t i;
     int32_t r;
     while (!g_speedFlag) {
