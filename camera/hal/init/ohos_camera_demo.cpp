@@ -1172,6 +1172,7 @@ int32_t DemoCameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector
 
 int32_t DemoCameraHostCallback::OnCameraStatus(const std::string& cameraId, CameraStatus status)
 {
+    (void)cameraId;
     CAMERA_LOGI("%{public}s, enter.", __func__);
     return RC_OK;
 }
@@ -1192,18 +1193,21 @@ int32_t DemoCameraHostCallback::OnCameraEvent(const std::string& cameraId, Camer
 
 int32_t DemoStreamOperatorCallback::OnCaptureStarted(int32_t captureId, const std::vector<int32_t>& streamIds)
 {
+    (void)captureId;
     CAMERA_LOGI("%{public}s, enter.", __func__);
     return RC_OK;
 }
 
 int32_t DemoStreamOperatorCallback::OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos)
 {
+    (void)captureId;
     CAMERA_LOGI("%{public}s, enter.", __func__);
     return RC_OK;
 }
 
 int32_t DemoStreamOperatorCallback::OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos)
 {
+    (void)captureId;
     CAMERA_LOGI("%{public}s, enter.", __func__);
     return RC_OK;
 }
@@ -1211,6 +1215,8 @@ int32_t DemoStreamOperatorCallback::OnCaptureError(int32_t captureId, const std:
 int32_t DemoStreamOperatorCallback::OnFrameShutter(int32_t captureId,
     const std::vector<int32_t>& streamIds, uint64_t timestamp)
 {
+    (void)captureId;
+    (void)timestamp;
     CAMERA_LOGI("%{public}s, enter.", __func__);
     return RC_OK;
 }

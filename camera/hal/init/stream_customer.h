@@ -48,7 +48,7 @@ public:
     void ReceiveFrameOff();
 
 #ifndef CAMERA_BUILT_ON_OHOS_LITE
-    class TestBuffersConsumerListener: public IBufferConsumerListener {
+    class TestBuffersConsumerListener : public IBufferConsumerListener {
     public:
         TestBuffersConsumerListener()
         {
