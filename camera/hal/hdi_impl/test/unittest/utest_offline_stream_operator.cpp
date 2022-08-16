@@ -81,7 +81,7 @@ void OffileStreamOperatorImplTest::TearDownTestCase(void)
     std::cout << "Camera::StreamOperatorImp TearDownTestCase" << std::endl;
 }
 
-void OffileStreamOperatorImplTest::SetUp(void) const
+void OffileStreamOperatorImplTest::SetUp(void)
 {
     bool ret = InitCameraHost();
     if (!ret) {
@@ -108,7 +108,7 @@ void OffileStreamOperatorImplTest::SetUp(void) const
     }
 }
 
-void OffileStreamOperatorImplTest::TearDown(void) const
+void OffileStreamOperatorImplTest::TearDown(void)
 {
     std::cout << "Camera::StreamOperatorImp TearDown.." << std::endl;
 }
