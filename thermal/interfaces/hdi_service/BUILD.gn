@@ -40,12 +40,12 @@ ohos_shared_library("libthermal_interface_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_interface_thermal:thermal_idl_headers",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "init:libbegetutil",
       "ipc:ipc_single",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [
@@ -70,12 +70,12 @@ ohos_shared_library("libthermal_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [

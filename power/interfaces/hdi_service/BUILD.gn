@@ -20,13 +20,11 @@ ohos_shared_library("libpower_interface_service_1.0") {
   ]
   sources = [ "src/power_interface_impl.cpp" ]
 
-  deps = [
-    "//third_party/libxml2:xml2",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//third_party/libxml2:xml2" ]
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_interface_power:power_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -58,13 +56,11 @@ ohos_shared_library("libpower_driver") {
   include_dirs = [ "../include" ]
   sources = [ "src/power_interface_driver.cpp" ]
 
-  deps = [
-    "//drivers/interface/power/v1_0:libpower_stub_1.0",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//drivers/interface/power/v1_0:libpower_stub_1.0" ]
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
