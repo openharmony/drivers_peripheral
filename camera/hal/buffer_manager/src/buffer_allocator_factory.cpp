@@ -22,8 +22,7 @@ BufferAllocatorFactory *BufferAllocatorFactory::GetInstance()
     return &factory;
 }
 
-std::shared_ptr<IBufferAllocator>
-    BufferAllocatorFactory::GetBufferAllocator(const int32_t type)
+std::shared_ptr<IBufferAllocator> BufferAllocatorFactory::GetBufferAllocator(const int32_t type)
 {
     std::lock_guard<std::mutex> l(lock_);
 
