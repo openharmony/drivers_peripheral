@@ -25,7 +25,7 @@ void BindCameraDeviceCallback(const OHOS::sptr<OHOS::Camera::ICameraDeviceCallba
     g_deviceCallback = callback;
 }
 
-void DeviceCBOnError(int /*ErrorTypeCIF*/ type, int errorMsg)
+void DeviceCBOnError(int type, int errorMsg)
 {
     if (g_deviceCallback == nullptr) {
         return;

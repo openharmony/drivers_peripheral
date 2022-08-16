@@ -37,14 +37,14 @@ typedef struct OfflineStreamOperatorCIF {
 } OfflineStreamOperatorCIF;
 
 typedef struct StreamOperatorCIF {
-    int (*IsStreamSupported)(int /*OperationModeCIF*/ mode,
+    int (*IsStreamSupported)(int mode,
                              CameraMetadataCIF* meta,
                              StreamInfoCIF info,
-                             int* /*StreamSupportTypeCIF*/ support);
+                             int* support);
 
     int (*CreateStreams)(StreamInfoCIF* info, int count);
     int (*ReleaseStreams)(int* streamIds, int count);
-    int (*CommitStreams)(int /*OperationModeCIF*/ mode, CameraMetadataCIF* meta);
+    int (*CommitStreams)(int mode, CameraMetadataCIF* meta);
     int (*GetStreamAttributes)(StreamAttributeCIF** attributes, int* count);
     int (*AttachBufferQueue)(int streamId, BufferProducerCIF producer);
     int (*DetachBufferQueue)(int streamId);
