@@ -209,7 +209,7 @@ static int32_t AllocMem(const AllocInfo* info, BufferHandle **buffer)
 
     DISPLAY_CHK_RETURN((buffer == NULL), DISPLAY_NULL_PTR, HDF_LOGE("%s: in buffer is null", __func__));
     DISPLAY_CHK_RETURN((info == NULL), DISPLAY_NULL_PTR, HDF_LOGE("%s: in info is null", __func__));
-    PriBufferHandle* priBuffer = (PriBufferHandle*) calloc(1, sizeof(PriBufferHandle));
+    PriBufferHandle* priBuffer = (PriBufferHandle*)calloc(1, sizeof(PriBufferHandle));
     DISPLAY_CHK_RETURN((priBuffer == NULL), DISPLAY_NULL_PTR, HDF_LOGE("%s: can not calloc errno : %d",
         __func__, errno));
     ret = InitBufferHandle(priBuffer, info);
