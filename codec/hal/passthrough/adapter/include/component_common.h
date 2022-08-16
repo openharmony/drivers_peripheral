@@ -24,9 +24,16 @@ const int32_t PARAM_MAX_NUM = 30;
 const int32_t INPUT_PORTINDEX = 0;
 const int32_t OUTPUT_PORTINDEX = 1;
 
-int32_t SplitParam(int32_t paramIndex, int8_t *paramIn, Param *paramOut, int32_t &paramCnt, CodecType type);
-int32_t ParseParam(int32_t paramIndex, Param *paramIn, int32_t paramCnt, int8_t *paramOut, CodecExInfo info);
-int32_t ConvertOmxBufferTypeToBufferType(int32_t type, BufferType &bufferType);
-void ConvertOmxCodecBufferToCodecBuffer(const OmxCodecBuffer &omxBuffer, CodecBuffer &codecBuffer);
-void ConvertCodecBufferToOmxCodecBuffer(OmxCodecBuffer &omxBuffer, CodecBuffer &codecBuffer);
+namespace OHOS {
+namespace Codec {
+namespace Common {
+    int32_t SplitParam(int32_t paramIndex, int8_t *paramIn, Param *paramOut, int32_t &paramCnt, CodecType type);
+    int32_t ParseParam(int32_t paramIndex, Param *paramIn, int32_t paramCnt, int8_t *paramOut, CodecExInfo info);
+    int32_t ConvertOmxBufferTypeToBufferType(int32_t type, BufferType &bufferType);
+    void ConvertOmxCodecBufferToCodecBuffer(const OmxCodecBuffer &omxBuffer, CodecBuffer &codecBuffer);
+    void ConvertCodecBufferToOmxCodecBuffer(OmxCodecBuffer &omxBuffer, CodecBuffer &codecBuffer);
+}  // namespace Common
+}  // namespace Codec
+}  // namespace OHOS
+
 #endif  // COMPONENT_COMMON_H
