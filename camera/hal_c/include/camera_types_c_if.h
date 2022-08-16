@@ -223,7 +223,7 @@ typedef struct StreamInfoCIF {
     int height;
     int format;
     int dataspace;
-    int /*StreamIntentCIF*/ intent;
+    int intent; /*StreamIntentCIF*/
     int tunneledMode;
     BufferProducerCIF producer;
     int minFrameDuration;
