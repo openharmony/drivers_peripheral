@@ -31,8 +31,8 @@ namespace {
     constexpr int32_t FD_SIZE = sizeof(int);
     constexpr int32_t FRAME = (30 << 16);
     constexpr int32_t HEIGHT_OPERATOR = 2;
-    constexpr const char *decoder_avc = "rk.video_decoder.avc";
-    constexpr const char *decoder_hevc = "rk.video_decoder.hevc";
+    constexpr const char *DECODER_AVC = "rk.video_decoder.avc";
+    constexpr const char *DECODER_HEVC = "rk.video_decoder.hevc";
 }
 
 #define HDF_LOG_TAG codec_omx_hdi_dec
@@ -149,10 +149,10 @@ bool CodecHdiAdapterDecode::Init(CommandOpt &opt)
     callback_->FillBufferDone = &CodecHdiAdapterDecode::OnFillBufferDone;
     int32_t ret = HDF_SUCCESS;
     if (codecMime_ == codecMime::AVC) {
-        ret = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(decoder_avc), (int64_t)this,
+        ret = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(DECODER_AVC), (int64_t)this,
                                        callback_);
     } else {
-        ret = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(decoder_hevc), (int64_t)this,
+        ret = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(DECODER_HEVC), (int64_t)this,
                                        callback_);
     }
 

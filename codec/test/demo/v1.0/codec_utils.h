@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef __CODEC_UTILS_H
-#define __CODEC_UTILS_H
+#ifndef CODEC_UTILS_H
+#define CODEC_UTILS_H
 
 #include "hdf_types.h"
 #include "codec_type.h"
@@ -25,8 +25,8 @@
 /* For overall configure setup */
 typedef struct {
     CodecType   type;
-    char        file_input[MAX_FILE_NAME_LENGTH];
-    char        file_output[MAX_FILE_NAME_LENGTH];
+    char        fileInput[MAX_FILE_NAME_LENGTH];
+    char        fileOutput[MAX_FILE_NAME_LENGTH];
     char        codecName[TYPE_NAME_LENGTH];
     int32_t     width;
     int32_t     height;
@@ -34,4 +34,4 @@ typedef struct {
 
 int32_t ParseArguments(CodecCmd* cmd, int argc, char **argv);
 
-#endif  // __CODEC_UTILS_H
+#endif  // CODEC_UTILS_H

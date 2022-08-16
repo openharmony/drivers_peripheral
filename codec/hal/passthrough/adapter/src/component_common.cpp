@@ -622,7 +622,6 @@ int32_t SplitParam(int32_t paramIndex, int8_t *paramIn, Param *paramOut, int32_t
         HDF_LOGE("%{public}s error, paramIn or paramOut is null", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret = HDF_SUCCESS;
     bool setMark = (paramCnt == 1);
     switch (paramIndex) {
         case OMX_IndexParamPortDefinition:
@@ -663,10 +662,9 @@ int32_t SplitParam(int32_t paramIndex, int8_t *paramIn, Param *paramOut, int32_t
             break;
         default:
             HDF_LOGE("%{public}s error,paramIndex[%{public}d] is not support!", __func__, paramIndex);
-            ret = HDF_ERR_NOT_SUPPORT;
-            break;
+            return HDF_ERR_NOT_SUPPORT;
     }
-    return ret;
+    return HDF_SUCCESS;
 }
 
 static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, int32_t paramCnt, CodecExInfo info)
@@ -762,7 +760,7 @@ static int32_t ParseParamPortDefinition(Param *paramIn, int8_t *paramOut, int32_
     if (info.type == VIDEO_DECODER || info.type == VIDEO_ENCODER) {
         ret = ParseParamPortDefinitionVideo(paramIn, paramOut, paramCnt, info);
     } else if (info.type == AUDIO_DECODER || info.type == AUDIO_ENCODER) {
-        ret =ParseParamPortDefinitionAudio(paramIn, paramOut, paramCnt, info);
+        ret = ParseParamPortDefinitionAudio(paramIn, paramOut, paramCnt, info);
     }
     return ret;
 }

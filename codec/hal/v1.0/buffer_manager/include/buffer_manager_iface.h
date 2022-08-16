@@ -29,8 +29,8 @@ typedef struct BufferManagerWrapper* (*GetBufferManagerType)(void);
 typedef void (*DeleteBufferManagerType)(struct BufferManagerWrapper **ppBufferManager);
 
 struct BufferManagerIf {
-    GetBufferManagerType GetBufferManager;
-    DeleteBufferManagerType DeleteBufferManager;
+    GetBufferManagerType getBufferManager;
+    DeleteBufferManagerType deleteBufferManager;
 };
 
 #ifdef __cplusplus

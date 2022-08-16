@@ -40,19 +40,19 @@ static int32_t InitCodecOemIf(struct CodecInstance *instance)
     }
 
     struct CodecOemIf *iface = instance->codecOemIface;
-    iface->CodecInit = (CodecInitType)dlsym(libHandle, "CodecInit");
-    iface->CodecDeinit = (CodecDeinitType)dlsym(libHandle, "CodecDeinit");
-    iface->CodecCreate = (CodecCreateType)dlsym(libHandle, "CodecCreate");
-    iface->CodecDestroy = (CodecDestroyType)dlsym(libHandle, "CodecDestroy");
-    iface->CodecSetParameter = (CodecSetParameterType)dlsym(libHandle, "CodecSetParameter");
-    iface->CodecGetParameter = (CodecGetParameterType)dlsym(libHandle, "CodecGetParameter");
-    iface->CodecStart = (CodecStartType)dlsym(libHandle, "CodecStart");
-    iface->CodecStop = (CodecStopType)dlsym(libHandle, "CodecStop");
-    iface->CodecFlush = (CodecFlushType)dlsym(libHandle, "CodecFlush");
-    iface->CodecSetCallback = (CodecSetCallbackType)dlsym(libHandle, "CodecSetCallback");
-    iface->CodecDecode = (CodecDecodeType)dlsym(libHandle, "CodecDecode");
-    iface->CodecEncode = (CodecEncodeType)dlsym(libHandle, "CodecEncode");
-    iface->CodecEncodeHeader = (CodecEncodeHeaderType)dlsym(libHandle, "CodecEncodeHeader");
+    iface->codecInit = (CodecInitType)dlsym(libHandle, "CodecInit");
+    iface->codecDeinit = (CodecDeinitType)dlsym(libHandle, "CodecDeinit");
+    iface->codecCreate = (CodecCreateType)dlsym(libHandle, "CodecCreate");
+    iface->codecDestroy = (CodecDestroyType)dlsym(libHandle, "CodecDestroy");
+    iface->codecSetParameter = (CodecSetParameterType)dlsym(libHandle, "CodecSetParameter");
+    iface->codecGetParameter = (CodecGetParameterType)dlsym(libHandle, "CodecGetParameter");
+    iface->codecStart = (CodecStartType)dlsym(libHandle, "CodecStart");
+    iface->codecStop = (CodecStopType)dlsym(libHandle, "CodecStop");
+    iface->codecFlush = (CodecFlushType)dlsym(libHandle, "CodecFlush");
+    iface->codecSetCallback = (CodecSetCallbackType)dlsym(libHandle, "CodecSetCallback");
+    iface->codecDecode = (CodecDecodeType)dlsym(libHandle, "CodecDecode");
+    iface->codecEncode = (CodecEncodeType)dlsym(libHandle, "CodecEncode");
+    iface->codecEncodeHeader = (CodecEncodeHeaderType)dlsym(libHandle, "CodecEncodeHeader");
 
     instance->oemLibHandle = libHandle;
     return HDF_SUCCESS;
@@ -73,11 +73,11 @@ static int32_t InitBufferManagerIf(struct CodecInstance *instance)
     }
 
     struct BufferManagerIf *iface = instance->bufferManagerIface;
-    iface->GetBufferManager = (GetBufferManagerType)dlsym(libHandle, "GetBufferManager");
-    iface->DeleteBufferManager = (DeleteBufferManagerType)dlsym(libHandle, "DeleteBufferManager");
-    if (iface->GetBufferManager != NULL) {
+    iface->getBufferManager = (GetBufferManagerType)dlsym(libHandle, "GetBufferManager");
+    iface->deleteBufferManager = (DeleteBufferManagerType)dlsym(libHandle, "DeleteBufferManager");
+    if (iface->getBufferManager != NULL) {
         HDF_LOGI("%{public}s:  dlsym ok", __func__);
-        instance->bufferManagerWrapper = iface->GetBufferManager();
+        instance->bufferManagerWrapper = iface->getBufferManager();
     } else {
         HDF_LOGE("%{public}s: lib %{public}s dlsym failed, error code[%{public}s]",
             __func__, CODEC_BUFFER_MANAGER_LIB_NAME, dlerror());
@@ -147,9 +147,9 @@ static void *CodecTaskThread(void *arg)
         inputData->buffer[0].type = BUFFER_TYPE_VIRTUAL;
         inputData->buffer[0].buf = (intptr_t)GetInputShm(instance, input->bufferId)->virAddr;
         if (instance->codecType == VIDEO_DECODER) {
-            ret = instance->codecOemIface->CodecDecode(instance->handle, inputData, outputData, QUEUE_TIME_OUT);
+            ret = instance->codecOemIface->codecDecode(instance->handle, inputData, outputData, QUEUE_TIME_OUT);
         } else if (instance->codecType == VIDEO_ENCODER) {
-            ret = instance->codecOemIface->CodecEncode(instance->handle, inputData, outputData, QUEUE_TIME_OUT);
+            ret = instance->codecOemIface->codecEncode(instance->handle, inputData, outputData, QUEUE_TIME_OUT);
         }
         if (ret == HDF_SUCCESS || (outputData->flag & STREAM_FLAG_EOS)) {
             HDF_LOGI("%{public}s: output reach STREAM_FLAG_EOS!", __func__);
@@ -250,7 +250,7 @@ int32_t DestroyCodecInstance(struct CodecInstance *instance)
     if (instance->codecOemIface != NULL) {
         OsalMemFree(instance->codecOemIface);
     }
-    instance->bufferManagerIface->DeleteBufferManager(&(instance->bufferManagerWrapper));
+    instance->bufferManagerIface->deleteBufferManager(&(instance->bufferManagerWrapper));
     dlclose(instance->bufferManagerLibHandle);
     if (instance->bufferManagerIface != NULL) {
         OsalMemFree(instance->bufferManagerIface);

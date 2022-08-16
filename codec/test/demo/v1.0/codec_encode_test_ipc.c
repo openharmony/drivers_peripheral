@@ -68,11 +68,10 @@
 typedef struct {
     char            *codecName;
     /* end of stream flag when set quit the loop */
-    unsigned int    loop_end;
+    unsigned int    loopEnd;
     /* input and output */
     FILE            *fpInput;
     FILE            *fpOutput;
-    int32_t         g_frameCount;
     int32_t         frameNum;
     CodecCallback   cb;
 } CodecEnvData;
@@ -83,7 +82,6 @@ ShareMemory *g_inputBuffers = NULL;
 ShareMemory *g_outputBuffers = NULL;
 CodecBuffer **g_inputInfosData = NULL;
 CodecBuffer **g_outputInfosData = NULL;
-struct ICodecCallback *g_callback = NULL;
 
 CodecCmd g_cmd = {0};
 CodecEnvData g_data = {0};
@@ -506,7 +504,7 @@ static int32_t SetupEncParams(RKHdiEncodeSetup *encSetup)
     return HDF_SUCCESS;
 }
 
-static void EncodeLoopHandleInput(const CodecEnvData *p_data, uint8_t *readData)
+static void EncodeLoopHandleInput(const CodecEnvData *envData, uint8_t *readData)
 {
     int32_t ret = 0;
     int32_t readSize = 0;
@@ -521,7 +519,7 @@ static void EncodeLoopHandleInput(const CodecEnvData *p_data, uint8_t *readData)
     if (ret == HDF_SUCCESS) {
         // when packet size is valid read the input binary file
         g_frameCount++;
-        readSize = ReadInputFromFile(p_data->fpInput, readData);
+        readSize = ReadInputFromFile(envData->fpInput, readData);
         g_totalSrcSize += readSize;
         g_pktEos = (g_totalSrcSize >= g_SrcFileSize);
         if (g_pktEos) {
@@ -538,12 +536,12 @@ static void EncodeLoopHandleInput(const CodecEnvData *p_data, uint8_t *readData)
     OsalMemFree(inputData);
 }
 
-static int32_t EncodeLoop(CodecEnvData *p_data, uint8_t *readData)
+static int32_t EncodeLoop(CodecEnvData *envData, uint8_t *readData)
 {
     int32_t ret = 0;
 
     if (!g_pktEos) {
-        EncodeLoopHandleInput(p_data, readData);
+        EncodeLoopHandleInput(envData, readData);
     }
 
     CodecBuffer *outputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
@@ -557,7 +555,7 @@ static int32_t EncodeLoop(CodecEnvData *p_data, uint8_t *readData)
     if (ret == HDF_SUCCESS) {
         g_totalDstSize += outputData->buffer[0].length;
         ShareMemory *sm = GetShareMemoryById(outputData->bufferId);
-        DumpOutputToFile(p_data->fpOutput, sm->virAddr, outputData->buffer[0].length);
+        DumpOutputToFile(envData->fpOutput, sm->virAddr, outputData->buffer[0].length);
 
         CodecBuffer *queOutputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
         queOutputData->buffer[0].type = BUFFER_TYPE_FD;
@@ -567,8 +565,8 @@ static int32_t EncodeLoop(CodecEnvData *p_data, uint8_t *readData)
         queOutputData->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
         g_codecProxy->CodecQueueOutput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, queOutputData, QUEUE_TIME_OUT, -1);
         if (outputData->flag & STREAM_FLAG_EOS) {
-            HDF_LOGI("%{public}s: client reach STREAM_FLAG_EOS, CodecEncode loop_end", __func__);
-            p_data->loop_end = 1;
+            HDF_LOGI("%{public}s: client reach STREAM_FLAG_EOS, CodecEncode loopEnd", __func__);
+            envData->loopEnd = 1;
         }
         OsalMemFree(queOutputData);
     }
@@ -579,7 +577,7 @@ static int32_t EncodeLoop(CodecEnvData *p_data, uint8_t *readData)
 
 static void *EncodeThread(void *arg)
 {
-    CodecEnvData *p_data = (CodecEnvData *)arg;
+    CodecEnvData *envData = (CodecEnvData *)arg;
     uint8_t *readData = (uint8_t*)OsalMemCalloc(g_cmd.width * g_cmd.height * 2);
     if (readData == NULL) {
         HDF_LOGE("%{public}s: input readData buffer mem alloc failed", __func__);
@@ -587,11 +585,11 @@ static void *EncodeThread(void *arg)
     }
 
     HDF_LOGI("%{public}s: client EncodeThread start", __func__);
-    while (p_data->loop_end != 1) {
-        EncodeLoop(p_data, readData);
+    while (envData->loopEnd != 1) {
+        EncodeLoop(envData, readData);
     }
     OsalMemFree(readData);
-    HDF_LOGI("%{public}s: client loop_end, g_totalSrcSize:%{public}d, g_totalDstSize: %{public}d",
+    HDF_LOGI("%{public}s: client loopEnd, g_totalSrcSize:%{public}d, g_totalDstSize: %{public}d",
         __func__, g_totalSrcSize, g_totalDstSize);
     return NULL;
 }
@@ -644,20 +642,20 @@ static void RevertEncodeStep3(void)
 static int32_t OpenFile(void)
 {
     struct stat fileStat = {0};
-    stat(g_cmd.file_input, &fileStat);
+    stat(g_cmd.fileInput, &fileStat);
     g_SrcFileSize = fileStat.st_size;
     HDF_LOGI("%{public}s: input file size %{public}d", __func__, g_SrcFileSize);
 
-    g_data.fpInput = fopen(g_cmd.file_input, "rb");
+    g_data.fpInput = fopen(g_cmd.fileInput, "rb");
     if (g_data.fpInput == NULL) {
-        HDF_LOGE("%{public}s: failed to open input file %{public}s", __func__, g_cmd.file_input);
+        HDF_LOGE("%{public}s: failed to open input file %{public}s", __func__, g_cmd.fileInput);
         RevertEncodeStep1();
         return HDF_FAILURE;
     }
 
-    g_data.fpOutput = fopen(g_cmd.file_output, "w+b");
+    g_data.fpOutput = fopen(g_cmd.fileOutput, "w+b");
     if (g_data.fpOutput == NULL) {
-        HDF_LOGE("%{public}s: failed to open output file %{public}s", __func__, g_cmd.file_output);
+        HDF_LOGE("%{public}s: failed to open output file %{public}s", __func__, g_cmd.fileOutput);
         RevertEncodeStep1();
         return HDF_FAILURE;
     }
@@ -679,10 +677,6 @@ static void EncodeEnd(void)
     }
 
     RevertEncodeStep3();
-
-    if (g_callback != NULL) {
-        CodecCallbackStubRelease(g_callback);
-    }
 }
 
 static int32_t Encode(void)
@@ -746,8 +740,8 @@ int32_t main(int32_t argc, char **argv)
     HDF_LOGI("%{public}s: ParseArguments width:%{public}d", __func__, g_cmd.width);
     HDF_LOGI("%{public}s: ParseArguments height:%{public}d", __func__, g_cmd.height);
     HDF_LOGI("%{public}s: ParseArguments codecName:%{public}s", __func__, g_cmd.codecName);
-    HDF_LOGI("%{public}s: ParseArguments input:%{public}s", __func__, g_cmd.file_input);
-    HDF_LOGI("%{public}s: ParseArguments output:%{public}s", __func__, g_cmd.file_output);
+    HDF_LOGI("%{public}s: ParseArguments input:%{public}s", __func__, g_cmd.fileInput);
+    HDF_LOGI("%{public}s: ParseArguments output:%{public}s", __func__, g_cmd.fileOutput);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: ParseArguments failed");
         return ret;

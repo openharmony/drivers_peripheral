@@ -29,16 +29,16 @@ using namespace OHOS;
 namespace {
     constexpr int32_t FD_SIZE = sizeof(int);
     constexpr int32_t FRAME = 30 << 16;
-    constexpr int32_t denominator = 2;
-    constexpr int32_t numerator = 3;
+    constexpr int32_t DENOMINATOR = 2;
+    constexpr int32_t NUMERATOR = 3;
     constexpr int32_t START_CODE_OFFSET_ONE = -1;
     constexpr int32_t START_CODE_OFFSET_SEC = -2;
     constexpr int32_t START_CODE_OFFSET_THIRD = -3;
     constexpr int32_t START_CODE_SIZE_FRAME = 4;
     constexpr int32_t START_CODE_SIZE_SLICE = 3;
     constexpr char START_CODE = 0x1;
-    constexpr const char *decoder_avc = "OMX.rk.video_decoder.avc";
-    constexpr const char *decoder_hevc = "OMX.rk.video_decoder.avc";
+    constexpr const char *DECODER_AVC = "OMX.rk.video_decoder.avc";
+    constexpr const char *DECODER_HEVC = "OMX.rk.video_decoder.avc";
 }
 
 #define HDF_LOG_TAG codec_omx_hdi_dec
@@ -86,7 +86,7 @@ void CodecHdiDecode::OnStatusChanged()
 
 int CodecHdiDecode::GetYuvSize()
 {
-    return width_ * height_ * numerator / denominator;
+    return width_ * height_ * NUMERATOR / DENOMINATOR;
 }
 
 bool CodecHdiDecode::ReadOnePacket(FILE *fp, char *buf, uint32_t &filledCount)
@@ -155,10 +155,10 @@ bool CodecHdiDecode::Init(CommandOpt &opt)
     callback_->FillBufferDone = &CodecHdiDecode::OnFillBufferDone;
     int32_t err = HDF_SUCCESS;
     if (codecMime_ == codecMime::AVC) {
-        err = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(decoder_avc), (int64_t)this,
+        err = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(DECODER_AVC), (int64_t)this,
                                        callback_);
     } else {
-        err = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(decoder_hevc), (int64_t)this,
+        err = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(DECODER_HEVC), (int64_t)this,
                                        callback_);
     }
 
@@ -688,7 +688,7 @@ int32_t CodecHdiDecode::OnFillBufferDone(const struct OmxCodecBuffer &buffer)
     } else if (bufferInfo->bufferHandle != nullptr && gralloc_ != nullptr) {
         gralloc_->Mmap(*bufferInfo->bufferHandle);
         (void)fwrite(bufferInfo->bufferHandle->virAddr, 1,
-                     bufferInfo->bufferHandle->width * bufferInfo->bufferHandle->height * numerator / denominator,
+                     bufferInfo->bufferHandle->width * bufferInfo->bufferHandle->height * NUMERATOR / DENOMINATOR,
                      fpOut_);
         gralloc_->Unmap(*bufferInfo->bufferHandle);
     }

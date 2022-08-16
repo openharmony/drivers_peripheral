@@ -46,20 +46,20 @@ typedef int32_t (*CodecEncodeType)(CODEC_HANDLETYPE handle, CodecBuffer *inputDa
 typedef int32_t (*CodecEncodeHeaderType)(CODEC_HANDLETYPE handle, CodecBuffer outInfo, uint32_t timeoutMs);
 
 struct CodecOemIf {
-    CodecInitType CodecInit;
-    CodecDeinitType CodecDeinit;
-    CodecCreateType CodecCreate;
-    CodecDestroyType CodecDestroy;
-    CodecSetPortModeType CodecSetPortMode;
-    CodecSetParameterType CodecSetParameter;
-    CodecGetParameterType CodecGetParameter;
-    CodecStartType CodecStart;
-    CodecStopType CodecStop;
-    CodecFlushType CodecFlush;
-    CodecSetCallbackType CodecSetCallback;
-    CodecDecodeType CodecDecode;
-    CodecEncodeType CodecEncode;
-    CodecEncodeHeaderType CodecEncodeHeader;
+    CodecInitType codecInit;
+    CodecDeinitType codecDeinit;
+    CodecCreateType codecCreate;
+    CodecDestroyType codecDestroy;
+    CodecSetPortModeType codecSetPortMode;
+    CodecSetParameterType codecSetParameter;
+    CodecGetParameterType codecGetParameter;
+    CodecStartType codecStart;
+    CodecStopType codecStop;
+    CodecFlushType codecFlush;
+    CodecSetCallbackType codecSetCallback;
+    CodecDecodeType codecDecode;
+    CodecEncodeType codecEncode;
+    CodecEncodeHeaderType codecEncodeHeader;
 };
 
 #ifdef __cplusplus
