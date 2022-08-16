@@ -35,7 +35,6 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    // static sptr<IDisplayGralloc> Get();
     static IDisplayGralloc* Get();
 
     /**
