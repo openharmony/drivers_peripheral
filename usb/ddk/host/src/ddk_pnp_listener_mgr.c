@@ -78,13 +78,17 @@ static int32_t DdkListenerMgrNotifyOne(const struct UsbPnpNotifyMatchInfoTable *
 
     int32_t ret = HDF_SUCCESS;
     do {
-        if (!HdfSbufWriteBuffer(data, device, sizeof(struct UsbPnpNotifyMatchInfoTable))) {
-            HDF_LOGE("%{public}s: write buf failed", __func__);
-            ret = HDF_FAILURE;
-            break;
+        struct HdfSBuf *dataTmp = NULL;
+        if (device != NULL) {
+            if (!HdfSbufWriteBuffer(data, device, sizeof(struct UsbPnpNotifyMatchInfoTable))) {
+                HDF_LOGE("%{public}s: write buf failed", __func__);
+                ret = HDF_FAILURE;
+                break;
+            }
+            dataTmp = data;
         }
 
-        if (listener->callBack(listener->priv, handlePriv->cmd, data) != HDF_SUCCESS) {
+        if (listener->callBack(listener->priv, handlePriv->cmd, dataTmp) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:callback failed", __func__);
             ret = HDF_FAILURE;
         }
@@ -109,8 +113,7 @@ void DdkListenerMgrNotifyAll(const struct UsbPnpNotifyMatchInfoTable *device, en
     DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_ddkListenerList.listenerList, struct HdfDevEventlistener, listNode) {
         handlePriv.listener = pos;
         if (DdkListenerMgrNotifyOne(device, &handlePriv) != HDF_SUCCESS) {
-            HDF_LOGW("%{public}s: notify failed busNum:%{public}d, devNum:%{public}d.", __func__, device->busNum,
-                device->devNum);
+            HDF_LOGW("%{public}s: notify failed cmd:%{public}d", __func__, cmd);
         }
     }
 

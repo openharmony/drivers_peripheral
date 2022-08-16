@@ -134,6 +134,27 @@ int32_t UsbdPort::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRo
     mode = currentPortInfo_.mode;
     return HDF_SUCCESS;
 }
+
+int32_t UsbdPort::UpdatePort(int32_t mode, const sptr<IUsbdSubscriber> &subscriber)
+{
+    switch (mode) {
+        case PORT_MODE_HOST:
+            currentPortInfo_.powerRole = POWER_ROLE_SOURCE;
+            currentPortInfo_.dataRole = DATA_ROLE_HOST;
+            currentPortInfo_.mode = PORT_MODE_HOST;
+            break;
+        case PORT_MODE_DEVICE:
+            currentPortInfo_.powerRole = POWER_ROLE_SINK;
+            currentPortInfo_.dataRole = DATA_ROLE_DEVICE;
+            currentPortInfo_.mode = PORT_MODE_DEVICE;
+            break;
+        default:
+            HDF_LOGE("%{public}s invalid mode:%{public}d", __func__, mode);
+            return HDF_FAILURE;
+    }
+    subscriber->PortChangedEvent(currentPortInfo_);
+    return HDF_SUCCESS;
+}
 } // namespace V1_0
 } // namespace Usb
 } // namespace HDI
