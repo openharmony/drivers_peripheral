@@ -126,14 +126,14 @@ void TextLabel::InitFont()
     switch (fontType_) {
         case FontType::DEFAULT_FONT:
             if (snprintf_s(resPath, sizeof(resPath), sizeof(resPath) - 1,
-                "/system/etc/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
+                "/vendor/etc/charger/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
                 BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s font failed.");
                 return;
             }
             break;
         default:
             if (snprintf_s(resPath, sizeof(resPath), sizeof(resPath) - 1,
-                "/system/etc/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
+                "/vendor/etc/charger/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
                 BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s font failed.");
                 return;
             }
@@ -196,14 +196,14 @@ FILE* TextLabel::InitFontType()
     switch (fontType_) {
         case FontType::DEFAULT_FONT:
             if (snprintf_s(resPath, sizeof(resPath), sizeof(resPath) - 1,
-                "/system/etc/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
+                "/vendor/etc/charger/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
                 BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s font fail.");
                 return nullptr;
             }
             break;
         default:
             if (snprintf_s(resPath, sizeof(resPath), sizeof(resPath) - 1,
-                "/system/etc/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
+                "/vendor/etc/charger/resources/%s.png", DEFAULT_FONT_NAME.c_str()) == -1) {
                 BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s font fail.");
                 return nullptr;
             }

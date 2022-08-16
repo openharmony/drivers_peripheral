@@ -22,7 +22,7 @@ namespace HDI {
 namespace Battery {
 namespace V1_1 {
 namespace {
-const std::string CONFIG_FILE = "/system/etc/ledconfig/led_config.json";
+const std::string CONFIG_FILE = "/vendor/etc/ledconfig/led_config.json";
 constexpr int32_t DEFAULT_CAPACITY_CONF = 3;
 constexpr int32_t DEFAULT_UPPER_TEMP_CONF = 600;
 constexpr int32_t DEFAULT_LOWER_TEMP_CONF = -100;
