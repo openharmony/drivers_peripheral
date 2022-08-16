@@ -74,7 +74,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/display/interfaces/include",
       "//foundation/graphic/surface/interfaces/kits",
       "//foundation/graphic/surface/interfaces/innerkits",
-      "//base/startup/syspara_lite/interfaces/kits",
+      "//base/startup/init/interfaces/innerkits/include/syspara",
 
       #producer
       "$camera_path/pipeline_core/utils",
@@ -107,7 +107,7 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core:camera_pipeline_core",
       "$hdf_uhdf_path/utils:libhdf_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//base/startup/syspara_lite/frameworks/parameter/src:sysparam",
+      "//base/startup/init/interfaces/innerkits:libbegetutil",
       "//drivers/peripheral/camera/interfaces/metadata:metadata",
     ]
   }
