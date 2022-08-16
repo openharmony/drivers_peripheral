@@ -45,18 +45,18 @@ typedef struct IppAlgoBuffer {
 
 typedef struct IppAlgoFunc {
     int (*Init)(IppAlgoMeta* meta);
-    int (*Start)();
-    int (*Flush)();
+    int (*Start)(void);
+    int (*Flush)(void);
     int (*Process)(IppAlgoBuffer* inBuffer[], int inBufferCount, IppAlgoBuffer* outBuffer, IppAlgoMeta* meta);
-    int (*Stop)();
+    int (*Stop)(void);
 } IppAlgoFunc;
 
 typedef int (*AlgoFuncInit)(IppAlgoMeta *);
-typedef int (*AlgoFuncStart)();
-typedef int (*AlgoFuncFlush)();
+typedef int (*AlgoFuncStart)(void);
+typedef int (*AlgoFuncFlush)(void);
 typedef int (*AlgoFuncProcess)(IppAlgoBuffer* inBuffer[],
     int inBufferCount, IppAlgoBuffer* outBuffer, IppAlgoMeta* meta);
-typedef int (*AlgoFuncStop)();
+typedef int (*AlgoFuncStop)(void);
 
 #ifdef __cplusplus
 }

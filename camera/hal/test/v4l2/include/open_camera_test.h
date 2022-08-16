@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef OPEN_CAMERA_TEST_H
+#define OPEN_CAMERA_TEST_H
+
 #include "test_display.h"
 #include "stream_customer.h"
 
@@ -24,3 +27,4 @@ public:
     void TearDown(void);
     std::shared_ptr<TestDisplay> display_ = nullptr;
 };
+#endif

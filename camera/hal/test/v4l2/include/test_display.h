@@ -68,7 +68,7 @@
 #define PATH_MAX 128
 #define BUFFERSCOUNT 8
 #define CAMERA_BUFFER_QUEUE_IPC 654320
-#define RANGE_LIMIT(x) (x > 255 ? 255 : (x < 0 ? 0 : x))
+#define RANGE_LIMIT(x) ((x) > 255 ? 255 : ((x) < 0 ? 0 : (x)))
 #define PREVIEW_WIDTH 640
 #define PREVIEW_HEIGHT 480
 #define CAPTURE_WIDTH 1280

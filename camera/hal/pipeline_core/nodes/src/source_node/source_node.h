@@ -42,7 +42,7 @@ protected:
     public:
         PortHandler() = default;
         virtual ~PortHandler() = default;
-        PortHandler(std::shared_ptr<IPort>& p);
+        explicit PortHandler(std::shared_ptr<IPort>& p);
         RetCode StartCollectBuffers();
         RetCode StopCollectBuffers();
         RetCode StartDistributeBuffers();
