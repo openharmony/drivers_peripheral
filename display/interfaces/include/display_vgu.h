@@ -515,7 +515,7 @@ typedef struct {
     /* *
      * @brief Blits multiple images to the target surface.
      *
-     * During bit blit, color space conversion (CSC) and transformation can be implemented. You can use this 
+     * During bit blit, color space conversion (CSC) and transformation can be implemented. You can use this
      * function to combine multiple source images to the target surface.
      * To query the maximum number of source images allowed, call the <b>QueryCapability<b/> function.
      *
