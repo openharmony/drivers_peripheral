@@ -19,11 +19,15 @@ if (defined(ohos_lite)) {
   ohos_executable("audio_sample_render") {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/sample",
       "//utils/native/base/include",
       "//third_party/bounds_checking_function/include",
     ]
 
-    sources = [ "framework_render.c" ]
+    sources = [
+      "framework_common.c",
+      "framework_render.c",
+    ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [ "hdf_core:libhdf_utils" ]
@@ -36,12 +40,16 @@ if (defined(ohos_lite)) {
   ohos_executable("audio_sample_capture") {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/sample",
       "//utils/native/base/include",
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
     ]
 
-    sources = [ "framework_capture.c" ]
+    sources = [
+      "framework_capture.c",
+      "framework_common.c",
+    ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
     external_deps = [ "hdf_core:libhdf_utils" ]
@@ -52,9 +60,15 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_executable("audio_sample_render") {
-    include_dirs = [ "//drivers/peripheral/audio/interfaces/include" ]
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/sample",
+    ]
 
-    sources = [ "framework_render.c" ]
+    sources = [
+      "framework_common.c",
+      "framework_render.c",
+    ]
 
     defines = []
 
@@ -81,9 +95,13 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+      "//drivers/peripheral/audio/sample",
     ]
 
-    sources = [ "framework_capture.c" ]
+    sources = [
+      "framework_capture.c",
+      "framework_common.c",
+    ]
 
     defines = []
 

@@ -781,11 +781,11 @@ static char *AudioAdaptersGetConfig(const char *fpath)
     char pathBuf[PATH_MAX] = {0};
 
     if (fpath == NULL) {
-        AUDIO_FUNC_LOGE("Parameter error!");
+        AUDIO_FUNC_LOGE("Parameter is null!!!");
         return NULL;
     }
     if (realpath(fpath, pathBuf) == NULL) {
-        AUDIO_FUNC_LOGE("file name invalid!");
+        AUDIO_FUNC_LOGE("File path invalid!");
         return NULL;
     }
 
@@ -801,7 +801,7 @@ static char *AudioAdaptersGetConfig(const char *fpath)
     }
     jsonStrSize = ftell(fp);
     if (jsonStrSize <= 0) {
-        AUDIO_FUNC_LOGE("The configuration file size error!");
+        AUDIO_FUNC_LOGE("The configuration file size <= 0!");
         (void)fclose(fp);
         return NULL;
     }
@@ -813,12 +813,12 @@ static char *AudioAdaptersGetConfig(const char *fpath)
     }
     pJsonStr = (char *)OsalMemCalloc((uint32_t)jsonStrSize + 1);
     if (pJsonStr == NULL) {
-        AUDIO_FUNC_LOGE("calloc pJsonStr failed!");
+        AUDIO_FUNC_LOGE("OsalMemCalloc pJsonStr failed!");
         (void)fclose(fp);
         return NULL;
     }
     if (fread(pJsonStr, jsonStrSize, 1, fp) != 1) {
-        AUDIO_FUNC_LOGE("read to file fail!");
+        AUDIO_FUNC_LOGE("Read to config file failed!!!");
         (void)fclose(fp);
         AudioMemFree((void **)&pJsonStr);
         return NULL;

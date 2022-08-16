@@ -112,13 +112,13 @@ int32_t AudioPnpUpdateInfoOnly(struct AudioEvent audioEvent)
     ret = snprintf_s(pnpInfo, AUDIO_PNP_INFO_LEN_MAX, AUDIO_PNP_INFO_LEN_MAX - 1,
                      "EVENT_TYPE=0x%x;DEVICE_TYPE=0x%x", audioEvent.eventType, audioEvent.deviceType);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("snprintf_s fail!");
+        AUDIO_FUNC_LOGE("snprintf_s failed!");
         return HDF_FAILURE;
     }
 
     ret = AudioPnpUpdateInfo(pnpInfo);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("update info fail! ret = %{public}d", ret);
+        AUDIO_FUNC_LOGE("Update info failed: ret = %{public}d", ret);
         return HDF_FAILURE;
     }
     AUDIO_FUNC_LOGD("%{public}s", pnpInfo);
