@@ -804,6 +804,11 @@ int32_t UsbImpl::BulkRequestCancel(UsbdBulkASyncList *list)
 
 int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbImpl *super, uint32_t id)
 {
+    if (data == nullptr) {
+        HDF_LOGE("%{public}s: data is null", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
     uint32_t infoSize;
     UsbPnpNotifyMatchInfoTable *infoTable = nullptr;
     bool flag = HdfSbufReadBuffer(data, (const void **)(&infoTable), &infoSize);
@@ -868,6 +873,10 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
         }
         ret = subscriber_->DeviceEvent(info);
         return ret;
+    } else if (id == USB_PNP_DRIVER_PORT_HOST) {
+        return UsbdPort::GetInstance().UpdatePort(PORT_MODE_HOST, subscriber_);
+    } else if (id == USB_PNP_DRIVER_PORT_DEVICE) {
+        return UsbdPort::GetInstance().UpdatePort(PORT_MODE_DEVICE, subscriber_);
     }
 
     ret = UsbdPnpNotifyAddAndRemoveDevice(data, super, id);
