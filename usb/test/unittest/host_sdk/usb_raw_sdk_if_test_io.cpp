@@ -40,10 +40,10 @@ public:
 #define USB_RAW_IO_SLEEP_MS_TIME    500
 #define USB_IO_THREAD_STACK_SIZE   8192
 
-static struct AcmDevice *g_acm = NULL;
+static struct AcmDevice *g_acm = nullptr;
 static struct AcmDevice g_deviceService;
-static UsbRawHandle *g_devHandle = NULL;
-static UsbRawDevice *g_dev = NULL;
+static UsbRawHandle *g_devHandle = nullptr;
+static UsbRawDevice *g_dev = nullptr;
 static int32_t g_activeConfig;
 static bool g_stopIoThreadFlag = false;
 

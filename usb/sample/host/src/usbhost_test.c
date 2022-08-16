@@ -13,24 +13,24 @@
  * limitations under the License.
  */
 
-#include "usbhost_ddk_test.h"
-#include "signal.h"
 #include "osal_thread.h"
+#include "signal.h"
+#include "usbhost_ddk_test.h"
 
-#define HDF_LOG_TAG     USB_HOST_DDK_TEST
-#define STR_LEN 256
+#define HDF_LOG_TAG USB_HOST_DDK_TEST
+#define STR_LEN     256
 
-#define PARAM_CMD_LENGTH    3
-#define PARAM_SET_CMD_LEN   3
-#define PARAM_GET_CMD_LEN   2
-#define ARGV_CMD_API_TYPE   1
-#define ARGV_CMD_TYPE       (PARAM_GET_CMD_LEN - ARGV_CMD_API_TYPE)
-#define ARGV_CMD_PARAM      (PARAM_SET_CMD_LEN - ARGV_CMD_API_TYPE)
-#define READ_SLEEP_TIME     500
+#define PARAM_CMD_LENGTH  3
+#define PARAM_SET_CMD_LEN 3
+#define PARAM_GET_CMD_LEN 2
+#define ARGV_CMD_API_TYPE 1
+#define ARGV_CMD_TYPE     (PARAM_GET_CMD_LEN - ARGV_CMD_API_TYPE)
+#define ARGV_CMD_PARAM    (PARAM_SET_CMD_LEN - ARGV_CMD_API_TYPE)
+#define READ_SLEEP_TIME   500
 int32_t run;
 
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
-static struct OsalThread      g_Getchar;
+static struct OsalThread g_Getchar;
 #endif
 
 static void TestHelp(void)
@@ -66,8 +66,7 @@ static void TestHelp(void)
 static int32_t TestParaseCommand(int32_t paramNum, const char *cmdParam, int32_t *cmdType, char *apiType)
 {
     if ((cmdParam == NULL) || (cmdType == NULL) || (apiType == NULL) || (strlen(cmdParam) < PARAM_CMD_LENGTH)) {
-        HDF_LOGE("%s:%d command or cmdType is NULL or cmdParam length is error",
-            __func__, __LINE__);
+        HDF_LOGE("%s:%d command or cmdType is NULL or cmdParam length is error", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -324,8 +323,8 @@ int32_t main(int32_t argc, char *argv[])
         return HDF_FAILURE;
     }
 
-    if ((argc == PARAM_GET_CMD_LEN) && ((!strcmp(argv[ARGV_CMD_TYPE], "-h"))
-        || (!strcmp(argv[ARGV_CMD_TYPE], "--help")))) {
+    if ((argc == PARAM_GET_CMD_LEN) &&
+        ((!strcmp(argv[ARGV_CMD_TYPE], "-h")) || (!strcmp(argv[ARGV_CMD_TYPE], "--help")))) {
         TestHelp();
         return HDF_SUCCESS;
     }
@@ -353,7 +352,7 @@ int32_t main(int32_t argc, char *argv[])
         goto OUT;
     }
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
-    signal(SIGINT, SigHandle);
+    (void)signal(SIGINT, SigHandle);
 #endif
     status = TestCmdLoop(cmdType, argv[ARGV_CMD_PARAM]);
     if (status == HDF_DEV_ERR_NO_DEVICE_SERVICE) {
@@ -372,4 +371,3 @@ OUT:
     HDF_LOGI("%s:%d moduleTest end", __func__, __LINE__);
     return HDF_SUCCESS;
 }
-

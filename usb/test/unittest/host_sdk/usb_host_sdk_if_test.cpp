@@ -41,13 +41,13 @@ public:
     void TearDown();
 };
 
-static struct UsbSession *g_session = NULL;
+static struct UsbSession *g_session = nullptr;
 static struct AcmDevice g_deviceService;
 static struct AcmDevice *g_acm = &g_deviceService;
-static struct UsbInterface *g_ecmDataIface = NULL;
-static struct UsbInterface *g_ecmIntIface = NULL;
-static UsbInterfaceHandle *g_ecmDataDevHandle = NULL;
-static UsbInterfaceHandle *g_ecmIntDevHandle = NULL;
+static struct UsbInterface *g_ecmDataIface = nullptr;
+static struct UsbInterface *g_ecmIntIface = nullptr;
+static UsbInterfaceHandle *g_ecmDataDevHandle = nullptr;
+static UsbInterfaceHandle *g_ecmIntDevHandle = nullptr;
 
 void UsbHostSdkIfTest::SetUpTestCase()
 {

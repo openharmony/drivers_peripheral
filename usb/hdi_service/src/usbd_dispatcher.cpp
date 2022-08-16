@@ -255,7 +255,7 @@ void UsbdDispatcher::UsbRequestParamsWSyncInit(UsbRequestParams *params, int32_t
     params->pipeAddress = pipe->pipeDirection | pipe->pipeAddress;
     params->pipeId = pipe->pipeId;
     params->requestType = USB_REQUEST_PARAMS_DATA_TYPE;
-    params->timeout = timeout;
+    params->timeout = (uint32_t)timeout;
     params->dataReq.numIsoPackets = 0;
     params->dataReq.directon = (UsbRequestDirection)((pipe->pipeDirection >> USB_DIR_OFFSET) & 0x1);
     params->dataReq.length = pipe->maxPacketSize;
@@ -318,7 +318,7 @@ void UsbdDispatcher::UsbRequestParamsInit(UsbRequestParams *params, int32_t time
     params->pipeAddress = 0;
     params->pipeId = 0;
     params->requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
-    params->timeout = timeout;
+    params->timeout = (uint32_t)timeout;
 }
 
 int32_t UsbdDispatcher::CtrlTranParamGetReqType(HdfSBuf *data, UsbControlParams *pCtrParams, uint32_t requestType)
@@ -1124,7 +1124,7 @@ int32_t UsbdDispatcher::UsbdBulkReadRemoteCallback(
     OsalMutexLock(&handle->lock);
     uint8_t flag = handle->cbflg;
     handle->cbflg = 1;
-    int32_t actLength = handle->rcur;
+    int32_t actLength = (int32_t)handle->rcur;
     OsalMutexUnlock(&handle->lock);
     if (flag) {
         return HDF_SUCCESS;
@@ -1147,7 +1147,7 @@ int32_t UsbdDispatcher::UsbdBulkWriteRemoteCallback(
     OsalMutexLock(&handle->lock);
     uint8_t flag = handle->cbflg;
     handle->cbflg = 1;
-    int32_t actLength = handle->cur;
+    int32_t actLength = (int32_t)handle->cur;
     OsalMutexUnlock(&handle->lock);
     if (flag) {
         return HDF_SUCCESS;
