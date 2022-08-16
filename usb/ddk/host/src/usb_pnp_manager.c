@@ -89,8 +89,17 @@ int32_t UsbPnpManagerStartUeventThread()
     }
 
     pthread_t tid;
-    pthread_create(&tid, NULL, DdkUeventMain, NULL);
-    return HDF_SUCCESS;
+    ret = pthread_create(&tid, NULL, DdkUeventMain, NULL);
+    if (ret != 0) {
+        HDF_LOGE("%{public}s: create thread failed:%{public}d", __func__, ret);
+        return ret;
+    }
+
+    ret = pthread_setname_np(tid, "usbpnpUeventThd");
+    if (ret != 0) {
+        HDF_LOGE("%{public}s: set thread name failed:%{public}d", __func__, ret);
+    }
+    return ret;
 }
 #endif
 

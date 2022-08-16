@@ -13,6 +13,7 @@
 
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("//drivers/peripheral/usb/usb.gni")
 
 USB_HAL_PATH =
     rebase_path("//vendor/${product_company}/${product_name}/hals/usb")
@@ -51,7 +52,11 @@ ohos_shared_library("libusb_ddk_host") {
   ]
 
   if (enable_linux_native_mode) {
-    defines = [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
+    if (defined(defines)) {
+      defines += [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
+    } else {
+      defines = [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
+    }
   }
 
   if (is_standard_system) {
@@ -74,9 +79,12 @@ ohos_shared_library("libusb_pnp_manager") {
   include_dirs = [
     "$hdf_framework_path/model/usb/include",
     "host/include",
+    "device/include",
+    default_config_path,
   ]
   sources = [
     "$hdf_framework_path/model/usb/src/usb_ddk_pnp_loader.c",
+    "device/src/usbfn_uevent_handle.c",
     "host/src/ddk_device_manager.c",
     "host/src/ddk_pnp_listener_mgr.c",
     "host/src/ddk_sysfs_device.c",
@@ -85,7 +93,11 @@ ohos_shared_library("libusb_pnp_manager") {
   ]
 
   if (enable_linux_native_mode) {
-    defines = [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
+    if (defined(defines)) {
+      defines += [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
+    } else {
+      defines = [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
+    }
   }
 
   if (is_standard_system) {
@@ -133,7 +145,11 @@ ohos_shared_library("libusb_ddk_device") {
   }
 
   if (enable_linux_native_mode) {
-    defines = [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
+    if (defined(defines)) {
+      defines += [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
+    } else {
+      defines = [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
+    }
   }
 
   install_images = [ chipset_base_dir ]
