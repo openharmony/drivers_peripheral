@@ -289,13 +289,14 @@ HWTEST_F(BufferManagerTest, TestExternalBufferLoop, TestSize.Level0)
     std::thread dispatchBufferTask([&running, &idleList, &busyList, &bufferPool, &lock, &realFrameCount] {
         while (running) {
             std::lock_guard<std::mutex> l(lock);
-            if (!idleList.empty()) {
-                auto it = idleList.begin();
-                if (RC_OK == bufferPool->AddBuffer(*it)) {
-                    busyList.splice(busyList.begin(), idleList, it);
-                    std::cout << "Enq buffer : " << (*it)->GetIndex() << std::endl;
-                    realFrameCount++;
-                }
+            if (idleList.empty()) {
+                continue;
+            }
+            auto it = idleList.begin();
+            if (RC_OK == bufferPool->AddBuffer(*it)) {
+                busyList.splice(busyList.begin(), idleList, it);
+                std::cout << "Enq buffer : " << (*it)->GetIndex() << std::endl;
+                realFrameCount++;
             }
         }
     });
@@ -314,16 +315,17 @@ HWTEST_F(BufferManagerTest, TestExternalBufferLoop, TestSize.Level0)
             std::this_thread::sleep_for(std::chrono::microseconds(FRAME_INTERVAL_US));
             {
                 std::lock_guard<std::mutex> l(lock);
-                if (!inuseBufferList.empty()) {
-                    auto it = inuseBufferList.begin();
-                    bufferPool->ReturnBuffer(*it);
-                    auto retBufferIt = std::find(busyList.begin(), busyList.end(), *it);
-                    if (retBufferIt != busyList.end()) {
-                        idleList.splice(idleList.end(), busyList, retBufferIt);
-                        std::cout << "Deq buffer : " << (*retBufferIt)->GetIndex() << std::endl;
-                    }
-                    inuseBufferList.erase(it);
+                if (inuseBufferList.empty()) {
+                    continue;
                 }
+                auto it = inuseBufferList.begin();
+                bufferPool->ReturnBuffer(*it);
+                auto retBufferIt = std::find(busyList.begin(), busyList.end(), *it);
+                if (retBufferIt != busyList.end()) {
+                    idleList.splice(idleList.end(), busyList, retBufferIt);
+                    std::cout << "Deq buffer : " << (*retBufferIt)->GetIndex() << std::endl;
+                }
+                inuseBufferList.erase(it);
             }
         }
     });

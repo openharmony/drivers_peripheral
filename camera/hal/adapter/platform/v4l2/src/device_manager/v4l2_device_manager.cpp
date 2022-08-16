@@ -368,30 +368,29 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
 
 CameraId V4L2DeviceManager::ReturnEnableCameraId(std::string hardwareName)
 {
-    if (hardwareName.size() == 0) {
-        bool enable = true;
-        for (CameraId id = CAMERA_FIRST; id <= CAMERA_MAX - 0; id = (CameraId)(id + 1)) {
-            for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
-                if ((*iter).cameraId == id) {
-                    enable = false;
-                    break;
-                } else {
-                    enable = true;
-                }
-            }
-            if (enable == true) {
-                return id;
-            }
-        }
-        if (enable == false) {
-            return CAMERA_MAX;
-        }
-    } else {
+    if (hardwareName.size() != 0) {
         for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
             if (hardwareName == (*iter).hardwareName) {
                 return (*iter).cameraId;
             }
         }
+        return CAMERA_MAX;
+    }
+    bool enable = true;
+    for (CameraId id = CAMERA_FIRST; id <= CAMERA_MAX - 0; id = (CameraId)(id + 1)) {
+        for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
+            if ((*iter).cameraId == id) {
+                enable = false;
+                break;
+            } else {
+                enable = true;
+            }
+        }
+        if (enable == true) {
+            return id;
+        }
+    }
+    if (enable == false) {
         return CAMERA_MAX;
     }
     return CAMERA_MAX;
