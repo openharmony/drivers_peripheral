@@ -61,7 +61,7 @@ class TestStreamConsumerListener : public IBufferConsumerListener {
         {
         }
 
-        void OnBufferAvailable() const
+        void OnBufferAvailable()
         {
         }
 };

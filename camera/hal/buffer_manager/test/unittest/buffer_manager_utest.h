@@ -102,7 +102,7 @@ public:
             {
             }
 
-            void OnBufferAvailable() const
+            void OnBufferAvailable()
             {
             }
     };
