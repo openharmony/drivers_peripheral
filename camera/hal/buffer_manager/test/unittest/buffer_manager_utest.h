@@ -132,7 +132,7 @@ public:
 
     class SinkNode : public Node {
     public:
-        SinkNode(const std::string name) : Node(name) {}
+        explicit SinkNode(const std::string name) : Node(name) {}
         ~SinkNode() override {}
         void Deliver(std::shared_ptr<IBuffer>& buffer) override;
         void BindCallback(std::function<void(std::shared_ptr<IBuffer>&)>& callback);
@@ -143,7 +143,7 @@ public:
 
     class SourceNode : public Node {
     public:
-        SourceNode(const std::string name) : Node(name) {}
+        explicit SourceNode(const std::string name) : Node(name) {}
         void Process(std::shared_ptr<IBuffer>& buffer) override;
         ~SourceNode() override {}
     private:

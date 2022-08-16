@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef PIPELINE_TEST_H
+#define PIPELINE_TEST_H
+
 #include "test_display.h"
 
 class UtestPipelineTest : public testing::Test {
@@ -23,3 +26,4 @@ public:
     void TearDown(void);
     std::shared_ptr<TestDisplay> display_ = nullptr;
 };
+#endif
