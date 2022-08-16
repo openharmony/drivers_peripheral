@@ -103,9 +103,9 @@ struct AudioSampleAttributes g_attrs;
 struct AudioPort g_audioPort;
 struct AudioHeadInfo g_wavHeadInfo;
 static struct StrPara g_str;
-void (*g_AudioManagerRelease)(struct IAudioManager *) = NULL;
-void (*g_AudioAdapterRelease)(struct IAudioAdapter *) = NULL;
-void (*g_AudioRenderRelease)(struct IAudioRender *) = NULL;
+void (*g_audioManagerRelease)(struct IAudioManager *) = NULL;
+void (*g_audioAdapterRelease)(struct IAudioAdapter *) = NULL;
+void (*g_audioRenderRelease)(struct IAudioRender *) = NULL;
 
 pthread_t g_tids;
 char *g_frame = NULL;
@@ -380,7 +380,7 @@ static int32_t StopAudioFiles(struct IAudioRender **renderS)
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Destroy Render!");
     }
-    g_AudioRenderRelease(render);
+    g_audioRenderRelease(render);
     *renderS = NULL;
     g_render = NULL;
     if (g_frame != NULL) {
@@ -620,12 +620,12 @@ static int32_t PlayingAudioInitRender(struct IAudioRender **renderTemp)
     if (render->Start((void *)render)) {
         AUDIO_FUNC_LOGE("Start Bind Fail!");
         g_adapter->DestroyRender(g_adapter);
-        g_AudioRenderRelease(render);
+        g_audioRenderRelease(render);
         return HDF_FAILURE;
     }
     if (InitPlayingAudioParam(render) < 0) {
         g_adapter->DestroyRender(g_adapter);
-        g_AudioRenderRelease(render);
+        g_audioRenderRelease(render);
         return HDF_FAILURE;
     }
     *renderTemp = render;
@@ -658,7 +658,7 @@ static int32_t PlayingAudioFiles(struct IAudioRender **renderS)
         if (g_adapter != NULL && g_adapter->DestroyRender != NULL) {
             g_adapter->DestroyRender(g_adapter);
         }
-        g_AudioRenderRelease(render);
+        g_audioRenderRelease(render);
         return HDF_FAILURE;
     }
 
@@ -672,6 +672,8 @@ static void PrintMenu0(void)
     printf(" ============= Play Render Sound Card Mode ==========\n");
     printf("| 1. Render Primary                                 |\n");
     printf("| 2. Render Primary_Ext                             |\n");
+    printf("| 3. Render Usb                                     |\n");
+    printf("| 4. Render A2dp                                    |\n");
     printf(" =================================================== \n");
 }
 
@@ -701,6 +703,12 @@ static int32_t SwitchInternalOrExternal(char *adapterNameCase, int32_t nameLen)
             break;
         case PRIMARY_EXT:
             snprintf_s(adapterNameCase, nameLen, nameLen - 1, "%s", "primary_ext");
+            break;
+        case AUDIO_USB:
+            snprintf_s(adapterNameCase, nameLen, nameLen - 1, "%s", "usb");
+            break;
+        case AUDIO_A2DP:
+            snprintf_s(adapterNameCase, nameLen, nameLen - 1, "%s", "a2dp");
             break;
         default:
             printf("Input error,Switched to Acodec in for you,");
@@ -876,7 +884,7 @@ static int32_t RenderGetAdapterAndInitEnvParams(const char *adapterNameCase)
     }
     if (InitRenderParam(adapterNameCase, renderPort.portId) < 0) {
         g_audioManager->UnloadAdapter(g_audioManager, adapterNameCase);
-        g_AudioAdapterRelease(g_adapter);
+        g_audioAdapterRelease(g_adapter);
         g_adapter = NULL;
         return HDF_FAILURE;
     }
@@ -885,18 +893,18 @@ static int32_t RenderGetAdapterAndInitEnvParams(const char *adapterNameCase)
 
 static int32_t InitReleaseFun(void)
 {
-    g_AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(g_handle, "AudioManagerRelease"));
-    if (g_AudioManagerRelease == NULL) {
+    g_audioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(g_handle, "AudioManagerRelease"));
+    if (g_audioManagerRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioManagerRelease fun ptr failed");
         return HDF_FAILURE;
     }
-    g_AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(g_handle, "AudioAdapterRelease"));
-    if (g_AudioAdapterRelease == NULL) {
+    g_audioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(g_handle, "AudioAdapterRelease"));
+    if (g_audioAdapterRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioAdapterRelease fun ptr failed");
         return HDF_FAILURE;
     }
-    g_AudioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(g_handle, "AudioRenderRelease"));
-    if (g_AudioRenderRelease == NULL) {
+    g_audioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(g_handle, "AudioRenderRelease"));
+    if (g_audioRenderRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioRenderRelease fun ptr failed");
         return HDF_FAILURE;
     }
@@ -929,7 +937,7 @@ static int32_t InitParam(void)
     if (RenderGetAdapterAndInitEnvParams(g_adapterName) < 0) {
         AUDIO_FUNC_LOGE("GetProxyManagerFunc Fail");
         if (g_audioManager != NULL) {
-            g_AudioManagerRelease(g_audioManager);
+            g_audioManagerRelease(g_audioManager);
             g_audioManager = NULL;
         }
         dlclose(g_handle);
@@ -1081,35 +1089,36 @@ static void PrintAttributesFromat(void)
     printf("| 4. Render AUDIO_FORMAT_PCM_32_BIT                           |\n");
     printf(" ============================================================= \n");
 }
-static int32_t SelectAttributesFomat(uint32_t *fomat)
+static int32_t SelectAttributesFomat(uint32_t *pcmFomat)
 {
-    if (fomat == NULL) {
+    int32_t ret;
+    int val = 0;
+    if (pcmFomat == NULL) {
         AUDIO_FUNC_LOGE("fomat is null!");
         return HDF_FAILURE;
     }
     PrintAttributesFromat();
     printf("Please select audio format,If not selected, the default is 16bit:");
-    int32_t ret;
-    int val = 0;
     ret = CheckInputName(INPUT_INT, (void *)&val);
     if (ret < 0) {
+        AUDIO_FUNC_LOGE("CheckInputName failed.");
         return HDF_FAILURE;
     }
     switch (val) {
         case AUDIO_FORMAT_PCM_8_BIT:
-            *fomat = AUDIO_FORMAT_PCM_8_BIT;
+            *pcmFomat = AUDIO_FORMAT_PCM_8_BIT;
             break;
         case AUDIO_FORMAT_PCM_16_BIT:
-            *fomat = AUDIO_FORMAT_PCM_16_BIT;
+            *pcmFomat = AUDIO_FORMAT_PCM_16_BIT;
             break;
         case AUDIO_FORMAT_PCM_24_BIT:
-            *fomat = AUDIO_FORMAT_PCM_24_BIT;
+            *pcmFomat = AUDIO_FORMAT_PCM_24_BIT;
             break;
         case AUDIO_FORMAT_PCM_32_BIT:
-            *fomat = AUDIO_FORMAT_PCM_32_BIT;
+            *pcmFomat = AUDIO_FORMAT_PCM_32_BIT;
             break;
         default:
-            *fomat = AUDIO_FORMAT_PCM_16_BIT;
+            *pcmFomat = AUDIO_FORMAT_PCM_16_BIT;
             break;
     }
     return HDF_SUCCESS;
@@ -1355,9 +1364,9 @@ int32_t main(int32_t argc, char const *argv[])
     }
     if (g_audioManager != NULL && g_audioManager->UnloadAdapter != NULL) {
         g_audioManager->UnloadAdapter(g_audioManager, g_adapterName);
-        g_AudioAdapterRelease(g_adapter);
+        g_audioAdapterRelease(g_adapter);
         g_adapter = NULL;
-        g_AudioManagerRelease(g_audioManager);
+        g_audioManagerRelease(g_audioManager);
         g_audioManager = NULL;
     }
     dlclose(g_handle);

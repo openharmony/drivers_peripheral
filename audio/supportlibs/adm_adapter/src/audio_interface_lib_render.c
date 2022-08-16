@@ -943,10 +943,8 @@ int32_t ParamsSbufWriteBuffer(struct HdfSBuf *sBuf)
     if (!HdfSbufWriteUint32(sBuf, g_hwParams.rate)) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(sBuf, g_hwParams.periodSize)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteUint32(sBuf, g_hwParams.periodCount)) {
+    if (!HdfSbufWriteUint32(sBuf, g_hwParams.periodSize) ||
+        !HdfSbufWriteUint32(sBuf, g_hwParams.periodCount)) {
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(sBuf, (uint32_t)(g_hwParams.format))) {
@@ -955,27 +953,22 @@ int32_t ParamsSbufWriteBuffer(struct HdfSBuf *sBuf)
     if (!HdfSbufWriteString(sBuf, g_hwParams.cardServiceName)) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(sBuf, g_hwParams.period)) {
+    if (!HdfSbufWriteUint32(sBuf, g_hwParams.period) ||
+        !HdfSbufWriteUint32(sBuf, g_hwParams.frameSize)) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(sBuf, g_hwParams.frameSize)) {
+    if (!HdfSbufWriteUint32(sBuf, (uint32_t)(g_hwParams.isBigEndian)) ||
+        !HdfSbufWriteUint32(sBuf, (uint32_t)(g_hwParams.isSignedData))) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufWriteUint32(sBuf, (uint32_t)(g_hwParams.isBigEndian))) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteUint32(sBuf, (uint32_t)(g_hwParams.isSignedData))) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteUint32(sBuf, g_hwParams.startThreshold)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteUint32(sBuf, g_hwParams.stopThreshold)) {
+    if (!HdfSbufWriteUint32(sBuf, g_hwParams.startThreshold) ||
+        !HdfSbufWriteUint32(sBuf, g_hwParams.stopThreshold)) {
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(sBuf, g_hwParams.silenceThreshold)) {
         return HDF_FAILURE;
     }
+
     return HDF_SUCCESS;
 }
 
@@ -1030,7 +1023,7 @@ int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Failed to send service call!");
+        AUDIO_FUNC_LOGE("failed to send service call, ret = %{public}d.", ret);
     }
     AudioBufReplyRecycle(sBuf, NULL);
     return ret;
@@ -1131,38 +1124,44 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
 int32_t AudioOutputRenderStartPrepare(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
-    if (handle == NULL || handle->object == NULL || handleData == NULL) {
-        AUDIO_FUNC_LOGE("handle or handle->object or handleData is null!");
-        return HDF_FAILURE;
-    }
     int32_t ret;
     struct HdfIoService *service = NULL;
-    service = (struct HdfIoService *)handle->object;
-    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
-        AUDIO_FUNC_LOGE("RenderStartPrepare Service is NULL!");
+
+    if (handle == NULL || handle->object == NULL || handleData == NULL) {
+        AUDIO_FUNC_LOGE("Invalid parameters!");
         return HDF_FAILURE;
     }
+
+    service = (struct HdfIoService *)handle->object;
+    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+        AUDIO_FUNC_LOGE("Failed to obtain the service.!");
+        return HDF_FAILURE;
+    }
+
     ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, NULL);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderStartPrepare Failed to send service call cmdId = %{public}d!", cmdId);
     }
+
     return ret;
 }
 
 int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData)
 {
+    int32_t ret;
+
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("handle or handle->object or handleData is null!");
         return HDF_FAILURE;
     }
-    int32_t ret;
-    struct HdfIoService *service = NULL;
-    service = (struct HdfIoService *)handle->object;
+
+    struct HdfIoService *service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         AUDIO_FUNC_LOGE("RenderStartPrepare Service is NULL!");
         return HDF_FAILURE;
     }
+
     struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
     if (sBuf == NULL) {
         AUDIO_FUNC_LOGE("AudioObtainHdfSBuf failed!");
@@ -1172,6 +1171,7 @@ int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
         AudioSbufRecycle(sBuf);
         return HDF_FAILURE;
     }
+
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     AudioSbufRecycle(sBuf);
     if (ret != HDF_SUCCESS) {
@@ -1280,13 +1280,16 @@ int32_t AudioOutputRenderReqMmapBuffer(const struct DevHandle *handle,
 int32_t AudioOutputRenderGetMmapPosition(const struct DevHandle *handle,
     int cmdId, struct AudioHwRenderParam *handleData)
 {
+    int32_t ret;
+    uint64_t frames = 0;
+    struct HdfSBuf *reply = NULL;
+    struct HdfIoService *service = NULL;
+
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("handle or handle->object or handleData is null!");
         return HDF_FAILURE;
     }
-    struct HdfIoService *service = NULL;
-    struct HdfSBuf *reply = NULL;
-    int32_t ret;
+
     service = (struct HdfIoService *)handle->object;
     if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         AUDIO_FUNC_LOGE("service or service->dispatcher or service->dispatcher->Dispatch is null!");
@@ -1299,18 +1302,19 @@ int32_t AudioOutputRenderGetMmapPosition(const struct DevHandle *handle,
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, reply);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Failed to send service call!");
+        AUDIO_FUNC_LOGE("failed to send service call!");
         AudioSbufRecycle(reply);
         return HDF_FAILURE;
     }
-    uint64_t frames = 0;
+
     if (!HdfSbufReadUint64(reply, &frames)) {
-        AUDIO_FUNC_LOGE("Failed to  Get Mmap Position sBuf!");
+        AUDIO_FUNC_LOGE("failed to get mmap position sBuf!");
         AudioSbufRecycle(reply);
         return HDF_FAILURE;
     }
     handleData->frameRenderMode.frames = frames;
     AudioSbufRecycle(reply);
+
     return HDF_SUCCESS;
 }
 

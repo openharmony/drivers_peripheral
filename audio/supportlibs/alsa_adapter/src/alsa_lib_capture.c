@@ -229,9 +229,9 @@ int32_t AudioCtlCaptureSetMuteStu(
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
+    struct AudioCardInfo *cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is empty pointer!!!");
         return HDF_FAILURE;
     }
 
@@ -255,7 +255,7 @@ int32_t AudioCtlCaptureSetMuteStu(
 int32_t AudioCtlCaptureGetMuteStu(
     const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
-    struct AudioCardInfo *cardIns;
+    struct AudioCardInfo *cardInstance;
 
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
@@ -264,9 +264,9 @@ int32_t AudioCtlCaptureGetMuteStu(
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
-    if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+    cardInstance = GetCardIns(adapterName);
+    if (cardInstance == NULL) {
+        AUDIO_FUNC_LOGE("cardInsance is null pointer!!");
         return HDF_FAILURE;
     }
 
@@ -274,7 +274,7 @@ int32_t AudioCtlCaptureGetMuteStu(
         /* The external Settings. */
         return HDF_SUCCESS;
     }
-    handleData->captureMode.ctlParam.mute = (bool)cardIns->captureMuteValue;
+    handleData->captureMode.ctlParam.mute = (bool)cardInstance->captureMuteValue;
 
     return HDF_SUCCESS;
 }
@@ -339,7 +339,6 @@ int32_t AudioCtlCaptureGetVolThreshold(
     const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
-    struct AudioCardInfo *cardIns;
     long volMax = MIN_VOLUME;
     long volMin = MIN_VOLUME;
 
@@ -350,9 +349,9 @@ int32_t AudioCtlCaptureGetVolThreshold(
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
+    struct AudioCardInfo *cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("cardIns is NULL!!!");
         return HDF_FAILURE;
     }
 
@@ -983,10 +982,10 @@ static int32_t AudioCaptureReadFrameSub(snd_pcm_t *pcm, uint64_t *frameCnt, char
         }
 
         if (frames == -EBADFD) {
-            AUDIO_FUNC_LOGE("PCM is not in the right state: %{public}s", snd_strerror(frames));
+            AUDIO_FUNC_LOGE("capture PCM is not in the right state: %{public}s", snd_strerror(frames));
             ret = snd_pcm_prepare(pcm);
             if (ret < 0) {
-                AUDIO_FUNC_LOGE("snd_pcm_prepare fail: %{public}s", snd_strerror(ret));
+                AUDIO_FUNC_LOGE("capture snd_pcm_prepare fail: %{public}s", snd_strerror(ret));
                 return HDF_FAILURE;
             }
         } else {
@@ -994,9 +993,9 @@ static int32_t AudioCaptureReadFrameSub(snd_pcm_t *pcm, uint64_t *frameCnt, char
              * stream is suspended and waiting for an application recovery.
              * -EPIPE: an underrun occurred.
              */
-            ret = snd_pcm_recover(pcm, frames, 0); // 0 for open log
+            ret = snd_pcm_recover(pcm, frames, 0); // 0 for open capture recover log.
             if (ret < 0) {
-                AUDIO_FUNC_LOGE("snd_pcm_writei failed: %{public}s", snd_strerror(ret));
+                AUDIO_FUNC_LOGE("snd_pcm_readi failed: %{public}s", snd_strerror(ret));
                 return HDF_FAILURE;
             }
         }
@@ -1064,7 +1063,6 @@ static int32_t AudioCaptureReadFrame(
 int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
-    struct AudioCardInfo *cardIns;
     snd_pcm_uframes_t bufferSize = 0;
     snd_pcm_uframes_t periodSize = 0;
 
@@ -1074,8 +1072,8 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle, int cmdId,
         return HDF_FAILURE;
     }
 
-    const char *adapterName = handleData->captureMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
+    const char *sndCardName = handleData->captureMode.hwInfo.adapterName;
+    struct AudioCardInfo *cardIns = GetCardIns(sndCardName);
     if (cardIns == NULL) {
         AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
@@ -1131,14 +1129,14 @@ int32_t AudioOutputCapturePrepare(
 
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
-        AUDIO_FUNC_LOGE("Param is NULL!");
+        AUDIO_FUNC_LOGE("Invalid parameters!!!");
         return HDF_FAILURE;
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("Get cardIns is failed!!!");
         return HDF_FAILURE;
     }
 
@@ -1210,7 +1208,7 @@ int32_t AudioOutputCaptureStop(
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("Can't find sound card instance!!!");
         return HDF_FAILURE;
     }
 
@@ -1335,10 +1333,10 @@ int32_t AudioOutputCaptureGetMmapPosition(
         return HDF_FAILURE;
     }
 
-    const char *adapterName = handleData->captureMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
+    const char *cardName = handleData->captureMode.hwInfo.adapterName;
+    cardIns = GetCardIns(cardName);
     if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+        AUDIO_FUNC_LOGE("Get cardIns is NULL!");
         return HDF_FAILURE;
     }
     handleData->frameCaptureMode.frames = cardIns->capMmapFrames;
@@ -1365,14 +1363,13 @@ static int32_t AudioBindServiceCaptureObject(struct DevHandleCapture * const han
 
     ret = snprintf_s(serviceName, NAME_LEN - 1, SERVIC_NAME_MAX_LEN + 1, "hdf_audio_%s", name);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("Failed to snprintf_s, err = %{public}d.", ret);
         AudioMemFree((void **)&serviceName);
         return HDF_FAILURE;
     }
 
     service = HdfIoServiceBindName(serviceName);
     if (service == NULL) {
-        AUDIO_FUNC_LOGE("Failed to get service!");
+        AUDIO_FUNC_LOGE("Capture: Failed to get service!");
         AudioMemFree((void **)&serviceName);
         return HDF_FAILURE;
     }
@@ -1406,10 +1403,10 @@ struct DevHandleCapture *AudioBindServiceCapture(const char *name)
         return NULL;
     }
 
-    /* Parsing primary sound card from configuration file */
+    /* Capture: Parsing primary sound card from configuration file */
     ret = CardInfoParseFromConfig();
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("CardInfoParseFromConfig failed!");
+        AUDIO_FUNC_LOGE("Capture: parse config file failed!");
         AudioMemFree((void **)&handle);
         return NULL;
     }

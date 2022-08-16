@@ -31,7 +31,7 @@ static void AudioHdiPrimaryServerRelease(struct HdfDeviceObject *deviceObject)
     ReleaseAudioManagerObjectComm(GetAudioManagerFuncs());
 
     if (deviceObject == NULL) {
-        AUDIO_FUNC_LOGE("deviceObject is null!");
+        AUDIO_FUNC_LOGE("Parameter is null!");
         return;
     }
     deviceObject->service = NULL;
@@ -46,13 +46,13 @@ static int AudioHdiPrimaryServerBind(struct HdfDeviceObject *deviceObject)
         AUDIO_FUNC_LOGE("deviceObject is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    static struct IDeviceIoService hdiService = {
+    static struct IDeviceIoService hdiPrimaryService = {
         .Dispatch = HdiServiceDispatch,
         .Open = NULL,
         .Release = NULL,
     };
     AudioHdiSetLoadServerFlag(AUDIO_SERVER_PRIMARY);
-    if (HdiServiceGetFuncs() < 0) {
+    if (HdiServiceGetFuncs()) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, "ohos.hdi.audio_service");
@@ -60,7 +60,7 @@ static int AudioHdiPrimaryServerBind(struct HdfDeviceObject *deviceObject)
         AUDIO_FUNC_LOGE("failed to set interface desc");
         return ret;
     }
-    deviceObject->service = &hdiService;
+    deviceObject->service = &hdiPrimaryService;
 
     AUDIO_FUNC_LOGD("end!");
     return AUDIO_HAL_SUCCESS;
