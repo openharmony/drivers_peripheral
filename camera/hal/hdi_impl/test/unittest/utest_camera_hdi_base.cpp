@@ -27,11 +27,11 @@ void CameraHdiBaseTest::TearDownTestCase(void)
 {
 }
 
-void CameraHdiBaseTest::SetUp(void) const
+void CameraHdiBaseTest::SetUp(void)
 {
 }
 
-void CameraHdiBaseTest::TearDown(void) const
+void CameraHdiBaseTest::TearDown(void)
 {
 }
 
