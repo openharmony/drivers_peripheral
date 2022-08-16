@@ -54,7 +54,7 @@ static void TestWrite(const char *buf)
     }
 }
 
-static void TestRead()
+static void TestRead(void)
 {
     HdfSbufFlush(g_reply);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_READ, g_data, g_reply);
@@ -84,7 +84,7 @@ static void ReadThread(void *arg)
 }
 
 pthread_t g_tid;
-static void StartPThreadRead()
+static void StartPThreadRead(void)
 {
     if ((pthread_create(&g_tid, NULL, ReadThread, NULL)) == -1) {
         printf("create error!\n");
@@ -93,7 +93,7 @@ static void StartPThreadRead()
 
 #define STR_LEN 256
 #define SLEEP_GETCHAR 100000
-static void Test02()
+static void Test02(void)
 {
     char c;
     char str[STR_LEN] = {0};

@@ -79,10 +79,11 @@ int32_t UsbdPort::WritePortFile(int32_t powerRole, int32_t dataRole, int32_t mod
 
     int32_t ret = write(fd, modeStr.c_str(), len);
     close(fd);
-    if (ret == len) {
-        return HDF_SUCCESS;
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: write  error", __func__);
+        return HDF_FAILURE;
     }
-    return HDF_FAILURE;
+    return HDF_SUCCESS;
 }
 
 int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRole)
