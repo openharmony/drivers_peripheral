@@ -31,7 +31,7 @@
 #include "ioservstat_listener.h"
 #include "osal_mem.h"
 #include "svcmgr_ioservice.h"
-#include "v1_0/audio_manager.h"
+#include "v1_0/iaudio_manager.h"
 #include "v1_0/audio_types.h"
 
 #define AUDIO_FUNC_LOGE(fmt, arg...)                                                     \
@@ -80,23 +80,23 @@ struct AudioHeadInfo {
 };
 
 struct StrParaCapture {
-    struct AudioCapture *capture;
+    struct IAudioCapture *capture;
     FILE *file;
     struct AudioSampleAttributes attrs;
     uint64_t *replyBytes;
     char *frame;
     int32_t bufferSize;
 };
-struct AudioAdapter *g_adapter = NULL;
+struct IAudioAdapter *g_adapter = NULL;
 struct AudioDeviceDescriptor g_devDesc;
 struct AudioSampleAttributes g_attrs;
-struct AudioCapture *g_capture = NULL;
-static struct AudioManager *g_audioManager = NULL;
+struct IAudioCapture *g_capture = NULL;
+static struct IAudioManager *g_audioManager = NULL;
 static struct StrParaCapture g_str;
 void *g_captureHandle;
-void (*g_AudioManagerRelease)(struct AudioManager *) = NULL;
-void (*g_AudioAdapterRelease)(struct AudioAdapter *) = NULL;
-void (*g_AudioCaptureRelease)(struct AudioCapture *) = NULL;
+void (*g_AudioManagerRelease)(struct IAudioManager *) = NULL;
+void (*g_AudioAdapterRelease)(struct IAudioAdapter *) = NULL;
+void (*g_AudioCaptureRelease)(struct IAudioCapture *) = NULL;
 
 pthread_t g_tids;
 FILE *g_file;
@@ -144,7 +144,7 @@ enum CaptureInputType {
     INPUT_UINT32,
 };
 
-typedef int32_t (*AudioCaptureOperation)(struct AudioCapture **);
+typedef int32_t (*AudioCaptureOperation)(struct IAudioCapture **);
 
 struct ProcessCaptureMenuSwitchList {
     enum CaptureMenuId cmd;
@@ -325,7 +325,7 @@ static int32_t AddWavFileHeader(struct StrParaCapture *strParam)
     return HDF_SUCCESS;
 }
 
-static int32_t StopButtonCapture(struct AudioCapture **captureS)
+static int32_t StopButtonCapture(struct IAudioCapture **captureS)
 {
     if (captureS == NULL) {
         return HDF_FAILURE;
@@ -334,7 +334,7 @@ static int32_t StopButtonCapture(struct AudioCapture **captureS)
         g_closeEnd = true;
         usleep(100000); // sleep 100000us
     }
-    struct AudioCapture *capture = *captureS;
+    struct IAudioCapture *capture = *captureS;
     if (capture == NULL) {
         return HDF_FAILURE;
     }
@@ -376,7 +376,7 @@ static int32_t FrameStartCaptureMmap(const struct StrParaCapture *param)
         return HDF_FAILURE;
     }
     const struct StrParaCapture *strParam = param;
-    struct AudioCapture *capture = strParam->capture;
+    struct IAudioCapture *capture = strParam->capture;
     struct AudioMmapBufferDescripter mmapDesc;
     // Modify file size
 
@@ -427,7 +427,7 @@ static int32_t FrameStartCapture(const struct StrParaCapture *param)
     uint32_t bufferSize = AUDIO_BUFF_SIZE;
     uint64_t requestBytes = AUDIO_BUFF_SIZE;
     const struct StrParaCapture *strParam = param;
-    struct AudioCapture *capture = strParam->capture;
+    struct IAudioCapture *capture = strParam->capture;
     uint64_t totalSize = 0;
     uint32_t failCount = 0;
     if (capture == NULL || capture->CaptureFrame == NULL) {
@@ -524,7 +524,7 @@ static int32_t StartPlayThread(int32_t palyModeFlag)
 }
 
 static int32_t CaptureChoiceModeAndRecording(
-    struct StrParaCapture *strParam, struct AudioCapture *capture, int32_t palyModeFlag)
+    struct StrParaCapture *strParam, struct IAudioCapture *capture, int32_t palyModeFlag)
 {
     if (strParam == NULL || capture == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
@@ -571,13 +571,13 @@ static int32_t PlayingAudioInitFile(void)
     return HDF_SUCCESS;
 }
 
-static int32_t PlayingAudioInitCapture(struct AudioCapture **captureTemp)
+static int32_t PlayingAudioInitCapture(struct IAudioCapture **captureTemp)
 {
     if (captureTemp == NULL) {
         AUDIO_FUNC_LOGE("captureTemp is null");
         return HDF_FAILURE;
     }
-    struct AudioCapture *capture = NULL;
+    struct IAudioCapture *capture = NULL;
     int32_t ret = g_adapter->CreateCapture(g_adapter, &g_devDesc, &g_attrs, &capture);
     if (capture == NULL || ret < 0) {
         return HDF_FAILURE;
@@ -599,7 +599,7 @@ static int32_t PlayingAudioInitCapture(struct AudioCapture **captureTemp)
     return HDF_SUCCESS;
 }
 
-static int32_t StartButtonCapture(struct AudioCapture **captureS)
+static int32_t StartButtonCapture(struct IAudioCapture **captureS)
 {
     if (captureS == NULL || g_adapter == NULL || g_adapter->CreateCapture == NULL) {
         return HDF_FAILURE;
@@ -614,7 +614,7 @@ static int32_t StartButtonCapture(struct AudioCapture **captureS)
         FileClose(&g_file);
         return HDF_FAILURE;
     }
-    struct AudioCapture *capture = NULL;
+    struct IAudioCapture *capture = NULL;
     if (PlayingAudioInitCapture(&capture) < 0) {
         AUDIO_FUNC_LOGE("PlayingAudioInitCapture Fail");
         FileClose(&g_file);
@@ -799,15 +799,15 @@ static int32_t GetManagerAndLoadAdapter(const char *adapterNameCase, struct Audi
         return HDF_FAILURE;
     }
 
-    struct AudioManager *(*getAudioManager)(const char *) = NULL;
-    getAudioManager = (struct AudioManager *(*)(const char *))(dlsym(g_captureHandle, "AudioManagerGetInstance"));
+    struct IAudioManager *(*getAudioManager)(const char *) = NULL;
+    getAudioManager = (struct IAudioManager *(*)(const char *))(dlsym(g_captureHandle, "AudioManagerGetInstance"));
     if (getAudioManager == NULL) {
         return HDF_FAILURE;
     }
 
     (void)HdfRemoteGetCallingPid();
 
-    struct AudioManager *audioManager = getAudioManager("idl_audio_service");
+    struct IAudioManager *audioManager = getAudioManager("idl_audio_service");
     if (audioManager == NULL) {
         AUDIO_FUNC_LOGE("Get audio Manager Fail");
         return HDF_FAILURE;
@@ -891,17 +891,17 @@ static int32_t CaptureGetAdapterAndInitEnvParams(const char *adapterNameCase)
 
 static int32_t InitReleaseFun(void)
 {
-    g_AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(g_captureHandle, "AudioManagerRelease"));
+    g_AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(g_captureHandle, "AudioManagerRelease"));
     if (g_AudioManagerRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioManagerRelease fun ptr failed");
         return HDF_FAILURE;
     }
-    g_AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(g_captureHandle, "AudioAdapterRelease"));
+    g_AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(g_captureHandle, "AudioAdapterRelease"));
     if (g_AudioAdapterRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioAdapterRelease fun ptr failed");
         return HDF_FAILURE;
     }
-    g_AudioCaptureRelease = (void (*)(struct AudioCapture *))(dlsym(g_captureHandle, "AudioCaptureRelease"));
+    g_AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(g_captureHandle, "AudioCaptureRelease"));
     if (g_AudioCaptureRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioCaptureRelease fun ptr failed");
         return HDF_FAILURE;
@@ -952,7 +952,7 @@ static int32_t InitParam(void)
     return HDF_SUCCESS;
 }
 
-static int32_t SetCaptureMute(struct AudioCapture **capture)
+static int32_t SetCaptureMute(struct IAudioCapture **capture)
 {
     (void)capture;
     int32_t val = 0;
@@ -986,7 +986,7 @@ static int32_t SetCaptureMute(struct AudioCapture **capture)
     return ret;
 }
 
-static int32_t SetCaptureVolume(struct AudioCapture **capture)
+static int32_t SetCaptureVolume(struct IAudioCapture **capture)
 {
     (void)capture;
     int32_t ret;
@@ -1026,7 +1026,7 @@ static int32_t SetCaptureVolume(struct AudioCapture **capture)
     return ret;
 }
 
-static int32_t SetCaptureGain(struct AudioCapture **capture)
+static int32_t SetCaptureGain(struct IAudioCapture **capture)
 {
     (void)capture;
     int32_t ret;
@@ -1067,7 +1067,7 @@ static int32_t SetCaptureGain(struct AudioCapture **capture)
     return ret;
 }
 
-static int32_t SetCaptyrePause(struct AudioCapture **capture)
+static int32_t SetCaptyrePause(struct IAudioCapture **capture)
 {
     (void)capture;
     int32_t ret;
@@ -1081,7 +1081,7 @@ static int32_t SetCaptyrePause(struct AudioCapture **capture)
     return HDF_SUCCESS;
 }
 
-static int32_t SetCaptureResume(struct AudioCapture **capture)
+static int32_t SetCaptureResume(struct IAudioCapture **capture)
 {
     (void)capture;
     int32_t ret;
@@ -1138,7 +1138,7 @@ static int32_t SelectAttributesFomat(uint32_t *fomat)
     return HDF_SUCCESS;
 }
 
-static int32_t SetCaptureAttributes(struct AudioCapture **capture)
+static int32_t SetCaptureAttributes(struct IAudioCapture **capture)
 {
     (void)capture;
     int32_t ret;
@@ -1189,7 +1189,7 @@ static int32_t SetCaptureAttributes(struct AudioCapture **capture)
     return ret;
 }
 
-static int32_t SelectCaptureScene(struct AudioCapture **capture)
+static int32_t SelectCaptureScene(struct IAudioCapture **capture)
 {
     (void)capture;
     system("clear");
@@ -1229,7 +1229,7 @@ static int32_t SelectCaptureScene(struct AudioCapture **capture)
     }
     return ret;
 }
-static int32_t GetCaptureExtParams(struct AudioCapture **capture)
+static int32_t GetCaptureExtParams(struct IAudioCapture **capture)
 {
     (void)capture;
     char keyValueList[BUFFER_LEN] = {0};
@@ -1247,7 +1247,7 @@ static int32_t GetCaptureExtParams(struct AudioCapture **capture)
     return HDF_SUCCESS;
 }
 
-static int32_t GetCaptureMmapPosition(struct AudioCapture **capture)
+static int32_t GetCaptureMmapPosition(struct IAudioCapture **capture)
 {
     (void)capture;
     int32_t ret;
