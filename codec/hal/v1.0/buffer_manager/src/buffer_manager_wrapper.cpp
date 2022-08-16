@@ -22,7 +22,7 @@ extern "C"
 {
 #endif
 
-static bool IsInputDataBufferReadyImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
+static bool IsInputDataBufferReadyImpl(const struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
 {
     if (bufferManagerWrapper == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
@@ -34,7 +34,7 @@ static bool IsInputDataBufferReadyImpl(struct BufferManagerWrapper *bufferManage
     return (buffer != nullptr);
 }
 
-static CodecBuffer* GetInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
+static CodecBuffer* GetInputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
 {
     if (bufferManagerWrapper == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
@@ -46,7 +46,8 @@ static CodecBuffer* GetInputDataBufferImpl(struct BufferManagerWrapper *bufferMa
     return buffer;
 }
 
-static CodecBuffer* GetUsedInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
+static CodecBuffer* GetUsedInputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper,
+                                               uint32_t timeoutMs)
 {
     if (bufferManagerWrapper == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
@@ -58,7 +59,7 @@ static CodecBuffer* GetUsedInputDataBufferImpl(struct BufferManagerWrapper *buff
     return buffer;
 }
 
-static void PutInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
+static void PutInputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
 {
     if (bufferManagerWrapper == nullptr || info == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
@@ -68,7 +69,7 @@ static void PutInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWra
     ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->PutBuffer(info);
 }
 
-static void PutUsedInputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
+static void PutUsedInputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
 {
     if (bufferManagerWrapper == nullptr || info == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
@@ -77,7 +78,7 @@ static void PutUsedInputDataBufferImpl(struct BufferManagerWrapper *bufferManage
     ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->PutUsedBuffer(info);
 }
 
-static bool IsUsedOutputDataBufferReadyImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
+static bool IsUsedOutputDataBufferReadyImpl(const struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
 {
     if (bufferManagerWrapper == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
@@ -89,7 +90,7 @@ static bool IsUsedOutputDataBufferReadyImpl(struct BufferManagerWrapper *bufferM
     return (buffer != nullptr);
 }
 
-static CodecBuffer* GetOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
+static CodecBuffer* GetOutputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
 {
     if (bufferManagerWrapper == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
@@ -101,7 +102,8 @@ static CodecBuffer* GetOutputDataBufferImpl(struct BufferManagerWrapper *bufferM
     return buffer;
 }
 
-static CodecBuffer* GetUsedOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
+static CodecBuffer* GetUsedOutputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper,
+                                                uint32_t timeoutMs)
 {
     if (bufferManagerWrapper == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
@@ -113,7 +115,7 @@ static CodecBuffer* GetUsedOutputDataBufferImpl(struct BufferManagerWrapper *buf
     return buffer;
 }
 
-static void PutOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
+static void PutOutputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
 {
     if (bufferManagerWrapper == nullptr || info == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
@@ -123,7 +125,7 @@ static void PutOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWr
     ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->outputBufferManager))->PutBuffer(info);
 }
 
-static void PutUsedOutputDataBufferImpl(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
+static void PutUsedOutputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
 {
     if (bufferManagerWrapper == nullptr || info == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);

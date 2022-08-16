@@ -18,6 +18,9 @@
 #include <hdf_base.h>
 #include "codec_omx_ext.h"
 
+namespace OHOS {
+namespace Codec {
+namespace Common {
 static AvCodecMime ConvertAudioCodingTypeToMimeType(OMX_AUDIO_CODINGTYPE codingType)
 {
     AvCodecMime codecMime = MEDIA_MIMETYPE_INVALID;
@@ -1135,7 +1138,7 @@ static int32_t ConvertBufferTypeToOmxBufferType(BufferType type)
     return bufferType;
 }
 
-int32_t  ConvertOmxBufferTypeToBufferType(int32_t type, BufferType &bufferType)
+int32_t ConvertOmxBufferTypeToBufferType(int32_t type, BufferType &bufferType)
 {
     int32_t ret = HDF_SUCCESS;
     switch (type) {
@@ -1159,8 +1162,7 @@ int32_t  ConvertOmxBufferTypeToBufferType(int32_t type, BufferType &bufferType)
     return ret;
 }
 
-void ConvertOmxCodecBufferToCodecBuffer(const OmxCodecBuffer &omxBuffer,
-                                        CodecBuffer &codecBuffer)
+void ConvertOmxCodecBufferToCodecBuffer(const OmxCodecBuffer &omxBuffer, CodecBuffer &codecBuffer)
 {
     codecBuffer.bufferId = omxBuffer.bufferId;
     codecBuffer.timeStamp = omxBuffer.pts;
@@ -1191,3 +1193,6 @@ void ConvertCodecBufferToOmxCodecBuffer(OmxCodecBuffer &omxBuffer, CodecBuffer &
     omxBuffer.allocLen = codecBuffer.buffer[0].capacity;
     omxBuffer.bufferLen = codecBuffer.buffer[0].capacity;
 }
+}  // namespace Common
+}  // namespace Codec
+}  // namespace OHOS
