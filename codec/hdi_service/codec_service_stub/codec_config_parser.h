@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef DRIVERS_PERIPHERAL_CODEC_CONFIG_PARSER_H_
-#define DRIVERS_PERIPHERAL_CODEC_CONFIG_PARSER_H_
+#ifndef CODEC_CONFIG_PARSER_H
+#define CODEC_CONFIG_PARSER_H
 
 #define NODE_VIDEO_HARDWARE_ENCODERS    "VideoHwEncoders"
 #define NODE_VIDEO_HARDWARE_DECODERS    "VideoHwDecoders"
@@ -93,4 +93,4 @@ CodecCapablityGroup *GetCapablityGroup(int32_t groupIndex);
 bool CodecCapablitesInited();
 int32_t ReloadCapabilities();
 
-#endif  // DRIVERS_PERIPHERAL_CODEC_CONFIG_PARSER_H_
+#endif  // CODEC_CONFIG_PARSER_H
