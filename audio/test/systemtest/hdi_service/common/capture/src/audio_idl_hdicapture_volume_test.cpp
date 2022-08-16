@@ -27,14 +27,14 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture *capture = nullptr;
     static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
     static void *handleSo;
-    static void (*AudioManagerRelease)(struct AudioManager *);
-    static void (*AudioAdapterRelease)(struct AudioAdapter *);
-    static void (*AudioCaptureRelease)(struct AudioCapture *);
+    static void (*AudioManagerRelease)(struct IAudioManager *);
+    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
+    static void (*AudioCaptureRelease)(struct IAudioCapture *);
     void ReleaseCaptureSource(void);
 };
 
@@ -43,9 +43,9 @@ using THREAD_FUNC = void *(*)(void *);
 TestAudioManager *(*AudioIdlHdiCaptureVolumeTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiCaptureVolumeTest::manager = nullptr;
 void *AudioIdlHdiCaptureVolumeTest::handleSo = nullptr;
-void (*AudioIdlHdiCaptureVolumeTest::AudioManagerRelease)(struct AudioManager *) = nullptr;
-void (*AudioIdlHdiCaptureVolumeTest::AudioAdapterRelease)(struct AudioAdapter *) = nullptr;
-void (*AudioIdlHdiCaptureVolumeTest::AudioCaptureRelease)(struct AudioCapture *) = nullptr;
+void (*AudioIdlHdiCaptureVolumeTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
+void (*AudioIdlHdiCaptureVolumeTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
+void (*AudioIdlHdiCaptureVolumeTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
 
 void AudioIdlHdiCaptureVolumeTest::SetUpTestCase(void)
 {
@@ -59,11 +59,11 @@ void AudioIdlHdiCaptureVolumeTest::SetUpTestCase(void)
     (void)HdfRemoteGetCallingPid();
     manager = GetAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
+    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
     ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
+    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
     ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct AudioCapture *))(dlsym(handleSo, "AudioCaptureRelease"));
+    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handleSo, "AudioCaptureRelease"));
     ASSERT_NE(nullptr, AudioCaptureRelease);
 }
 
@@ -147,7 +147,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetMute_Null_002, Te
     bool muteTrue = true;
     bool muteFalse = false;
     int32_t ret = -1;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = capture->SetMute(captureNull, muteTrue);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
@@ -213,7 +213,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetMute_Null_002, Te
     int32_t ret = -1;
     bool muteTrue = true;
     bool muteFalse = false;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = capture->GetMute(captureNull, &muteTrue);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
@@ -308,7 +308,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetVolume_Null_003, 
 {
     int32_t ret = -1;
     float volume = 0;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
 
     ret = capture->SetVolume(captureNull, volume);
@@ -367,7 +367,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetVolume_Null_003, 
 {
     int32_t ret = -1;
     float volume = 0.30;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
 
     ret = capture->GetVolume(captureNull, &volume);
@@ -404,7 +404,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGainThreshold_Nul
     int32_t ret = -1;
     float min = 0;
     float max = 0;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
 
     ret = capture->GetGainThreshold(captureNull, &min, &max);
@@ -516,7 +516,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetGain_Null_003, Te
 {
     int32_t ret = -1;
     float gain = 0;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
 
     ret = capture->SetGain(captureNull, gain);
@@ -555,7 +555,7 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGain_Null_002, Te
 {
     int32_t ret = -1;
     float gainValue = 0;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = capture->GetGain(captureNull, &gainValue);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);

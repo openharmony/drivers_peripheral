@@ -32,19 +32,19 @@ public:
     static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
     static void *handle;
-    static void (*AudioManagerRelease)(struct AudioManager *);
-    static void (*AudioAdapterRelease)(struct AudioAdapter *);
-    static void (*AudioRenderRelease)(struct AudioRender *);
-    static void (*AudioCaptureRelease)(struct AudioCapture *);
+    static void (*AudioManagerRelease)(struct IAudioManager *);
+    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
+    static void (*AudioRenderRelease)(struct IAudioRender *);
+    static void (*AudioCaptureRelease)(struct IAudioCapture *);
 };
 
 TestAudioManager *(*AudioIdlHdiAdapterTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiAdapterTest::manager = nullptr;
 void *AudioIdlHdiAdapterTest::handle = nullptr;
-void (*AudioIdlHdiAdapterTest::AudioManagerRelease)(struct AudioManager *) = nullptr;
-void (*AudioIdlHdiAdapterTest::AudioAdapterRelease)(struct AudioAdapter *) = nullptr;
-void (*AudioIdlHdiAdapterTest::AudioRenderRelease)(struct AudioRender *) = nullptr;
-void (*AudioIdlHdiAdapterTest::AudioCaptureRelease)(struct AudioCapture *) = nullptr;
+void (*AudioIdlHdiAdapterTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
+void (*AudioIdlHdiAdapterTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
+void (*AudioIdlHdiAdapterTest::AudioRenderRelease)(struct IAudioRender *) = nullptr;
+void (*AudioIdlHdiAdapterTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
 
 void AudioIdlHdiAdapterTest::SetUpTestCase(void)
 {
@@ -58,13 +58,13 @@ void AudioIdlHdiAdapterTest::SetUpTestCase(void)
     (void)HdfRemoteGetCallingPid();
     manager = GetAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(handle, "AudioManagerRelease"));
+    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handle, "AudioManagerRelease"));
     ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(handle, "AudioAdapterRelease"));
+    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handle, "AudioAdapterRelease"));
     ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct AudioCapture *))(dlsym(handle, "AudioCaptureRelease"));
+    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handle, "AudioCaptureRelease"));
     ASSERT_NE(nullptr, AudioCaptureRelease);
-    AudioRenderRelease = (void (*)(struct AudioRender *))(dlsym(handle, "AudioRenderRelease"));
+    AudioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(handle, "AudioRenderRelease"));
     ASSERT_NE(nullptr, AudioRenderRelease);
 }
 
@@ -102,7 +102,7 @@ void AudioIdlHdiAdapterTest::TearDown(void)
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_001, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
@@ -126,8 +126,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_002, TestSize
     int32_t ret;
     int32_t ret2 = -1;
     struct AudioPort audioPort2 = {};
-    struct AudioAdapter *adapter1 = nullptr;
-    struct AudioAdapter *adapter2 = nullptr;
+    struct IAudioAdapter *adapter1 = nullptr;
+    struct IAudioAdapter *adapter2 = nullptr;
     ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter1, audioPort);
@@ -168,8 +168,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_002, TestSize
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_Null_003, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioAdapter *adapterNull = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapterNull = nullptr;
     ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
@@ -191,7 +191,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_Null_003, Tes
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_001, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = {};
+    struct IAudioAdapter *adapter = {};
     struct AudioPortCapability *capability = nullptr;
     capability = (struct AudioPortCapability*)OsalMemCalloc(sizeof(struct AudioPortCapability));
     ASSERT_NE(nullptr, capability);
@@ -224,7 +224,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_001, Tes
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_002, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = {};
+    struct IAudioAdapter *adapter = {};
     struct AudioPortCapability *capability = nullptr;
     capability = (struct AudioPortCapability*)OsalMemCalloc(sizeof(struct AudioPortCapability));
     ASSERT_NE(nullptr, capability);
@@ -254,8 +254,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_002, Tes
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_Null_003, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioAdapter *adapterNull = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapterNull = nullptr;
     struct AudioPortCapability *capability = nullptr;
     capability = (struct AudioPortCapability*)OsalMemCalloc(sizeof(struct AudioPortCapability));
     ASSERT_NE(nullptr, capability);
@@ -287,7 +287,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_Null_004
 {
     int32_t ret;
     struct AudioPort *audioPortNull = nullptr;
-    struct AudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
     struct AudioPortCapability *capability = nullptr;
     capability = (struct AudioPortCapability*)OsalMemCalloc(sizeof(struct AudioPortCapability));
     ASSERT_NE(nullptr, capability);
@@ -320,7 +320,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_Null_004
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_Null_005, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
     struct AudioPortCapability *capabilityNull = nullptr;
     ASSERT_NE(nullptr, manager);
 
@@ -346,7 +346,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_Null_005
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_001, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
     AudioPortPassthroughMode modeLpcm = PORT_PASSTHROUGH_AUTO;
     ASSERT_NE(nullptr, manager);
 
@@ -375,7 +375,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_001, Te
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_002, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
@@ -400,8 +400,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_002, Te
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_Null_003, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioAdapter *adapterNull = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapterNull = nullptr;
     ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
@@ -428,7 +428,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_Null_00
     int32_t ret;
     struct AudioPort *audioPortNull = nullptr;
     AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
-    struct AudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
     struct AudioPort audioPortError = { .dir = PORT_OUT, .portId = 8, .portName = strdup("AIP1")};
     ASSERT_NE(nullptr, manager);
 
@@ -457,7 +457,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_Null_00
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_005, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
@@ -483,7 +483,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_001, Te
 {
     int32_t ret;
     AudioPortPassthroughMode mode = PORT_PASSTHROUGH_AUTO;
-    struct AudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
@@ -514,8 +514,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_Null_00
 {
     int32_t ret;
     AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioAdapter *adapterNull = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapterNull = nullptr;
     ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
@@ -543,7 +543,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_Null_00
     int32_t ret;
     struct AudioPort *audioPortNull = nullptr;
     AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
-    struct AudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
     struct AudioPort audioPortError = { .dir = PORT_OUT, .portId = 8, .portName = strdup("AIP")};
     ASSERT_NE(nullptr, manager);
 
@@ -573,7 +573,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_Null_00
 {
     int32_t ret;
     AudioPortPassthroughMode *modeNull = nullptr;
-    struct AudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
@@ -591,14 +591,14 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_Null_00
 /**
 * @tc.name  Test AudioCreateCapture API via legal input
 * @tc.number  SUB_Audio_HDI_CreateCapture_001
-* @tc.desc  Test AudioCreateCapture interface,Returns 0 if the AudioCapture object is created successfully
+* @tc.desc  Test AudioCreateCapture interface,Returns 0 if the IAudioCapture object is created successfully
 * @tc.author: wengyin
 */
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_001, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -612,17 +612,17 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_001, TestSize.Level
 * @tc.name  Test AudioCreateCapture API via creating a capture object when a render object was created
 * @tc.number  SUB_Audio_HDI_CreateCapture_002
 * @tc.desc  test AudioCreateCapture interface:
-     (1)service mode:Returns 0,if the AudioCapture object can be created successfully which was created
-     (2)passthrough mode: Returns -1,if the AudioCapture object can't be created which was created
+     (1)service mode:Returns 0,if the IAudioCapture object can be created successfully which was created
+     (2)passthrough mode: Returns -1,if the IAudioCapture object can't be created which was created
   @tc.author: wengyin
 */
 
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_002, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *firstCapture = nullptr;
-    struct AudioCapture *secondCapture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture *firstCapture = nullptr;
+    struct IAudioCapture *secondCapture = nullptr;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor DevDesc = {};
     ASSERT_NE(nullptr, manager);
@@ -645,16 +645,16 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_002, TestSize.Level
 /**
 * @tc.name  Test AudioCreateCapture API via creating a capture object when a render object was created
 * @tc.number  SUB_Audio_HDI_CreateCapture_003
-* @tc.desc  test AudioCreateCapture interface,Returns 0 if the AudioCapture object can be created successfully
-    when AudioRender was created
+* @tc.desc  test AudioCreateCapture interface,Returns 0 if the IAudioCapture object can be created successfully
+    when IAudioRender was created
   @tc.author: wengyin
 */
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_003, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
+    struct IAudioCapture *capture = nullptr;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor renderDevDesc = {};
     struct AudioDeviceDescriptor captureDevDesc = {};
@@ -691,9 +691,9 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_005, TestSize.
     int32_t ret;
     struct AudioDeviceDescriptor devDesc = {};
     struct AudioSampleAttributes attrs = {};
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioAdapter *adapterNull = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapterNull = nullptr;
+    struct IAudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -719,8 +719,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_006, TestSize.
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor *devDesc = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -743,8 +743,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_007, TestSize.
     int32_t ret;
     struct AudioDeviceDescriptor devDesc = {};
     struct AudioSampleAttributes *attrs = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -769,8 +769,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_008, TestSize.
     int32_t ret;
     struct AudioDeviceDescriptor devDesc = {};
     struct AudioSampleAttributes attrs = {};
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture **capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture **capture = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -796,8 +796,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_009, TestSize.Level
     int32_t ret;
     struct AudioDeviceDescriptor devDesc = {};
     struct AudioSampleAttributes attrs = {};
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_OUT, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -824,8 +824,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_010, TestSize.Level
     struct AudioDeviceDescriptor devDesc = {};
     struct AudioSampleAttributes attrs = {};
     uint32_t portId = 12;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -848,8 +848,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_010, TestSize.Level
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_001, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor renderDevDesc = {};
     ASSERT_NE(nullptr, manager);
@@ -875,8 +875,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_001, TestSize.Level1
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_003, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor devDesc = {};
     ASSERT_NE(nullptr, manager);
@@ -904,8 +904,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_003, TestSize.Level1
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_004, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor devDesc = {};
     uint32_t channelCountErr = 5;
@@ -939,9 +939,9 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_004, TestSize.Level1
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_005, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    struct AudioAdapter *adapterNull = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
+    struct IAudioAdapter *adapterNull = nullptr;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor devDesc = {};
     ASSERT_NE(nullptr, manager);
@@ -968,8 +968,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_005, TestSize.L
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_006, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioRender *render = nullptr;
-    struct AudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor *devDescNull = nullptr;
     ASSERT_NE(nullptr, manager);
@@ -994,8 +994,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_006, TestSize.L
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_007, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
     struct AudioSampleAttributes *attrsNull = nullptr;
     struct AudioDeviceDescriptor devDesc = {};
     ASSERT_NE(nullptr, manager);
@@ -1022,8 +1022,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_007, TestSize.L
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_008, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender **renderNull = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender **renderNull = nullptr;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor devDesc = {};
     ASSERT_NE(nullptr, manager);
@@ -1051,8 +1051,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_008, TestSize.L
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_009, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor devDesc = {};
     ASSERT_NE(nullptr, manager);
@@ -1087,8 +1087,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_009, TestSize.Level1
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_010, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor devDesc = {};
     uint32_t portId = 10;
@@ -1109,15 +1109,15 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_010, TestSize.Level1
 /**
 * @tc.name  Test AudioDestroyCapture API via legal input
 * @tc.number  SUB_Audio_HDI_DestroyCapture_001
-* @tc.desc  Test AudioDestroyCapture interface,Returns 0 if the AudioCapture object is destroyed
+* @tc.desc  Test AudioDestroyCapture interface,Returns 0 if the IAudioCapture object is destroyed
 * @tc.author: wengyin
 */
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyCapture_001, TestSize.Level1)
 {
     int32_t ret;
     AudioPortPin pins = PIN_IN_MIC;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, pins, ADAPTER_NAME, &adapter, &capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1137,9 +1137,9 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyCapture_001, TestSize.Leve
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyCapture_Null_002, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioAdapter *adapterNull = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioAdapter *adapterNull = nullptr;
+    struct IAudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1161,8 +1161,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyCapture_Null_002, TestSize
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyRender_001, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -1181,9 +1181,9 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyRender_001, TestSize.Level
 HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyRender_Null_002, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
-    struct AudioAdapter *adapterNull = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
+    struct IAudioAdapter *adapterNull = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     EXPECT_EQ(HDF_SUCCESS, ret);

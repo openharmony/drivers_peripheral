@@ -27,23 +27,23 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
     static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
     static void *handleSo;
-    static void (*AudioManagerRelease)(struct AudioManager *);
-    static void (*AudioAdapterRelease)(struct AudioAdapter *);
-    static void (*AudioRenderRelease)(struct AudioRender *);
+    static void (*AudioManagerRelease)(struct IAudioManager *);
+    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
+    static void (*AudioRenderRelease)(struct IAudioRender *);
     void ReleaseAudioSource(void);
 };
 
 TestAudioManager *(*AudioIdlHdiRenderSceneTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiRenderSceneTest::manager = nullptr;
 void *AudioIdlHdiRenderSceneTest::handleSo = nullptr;
-void (*AudioIdlHdiRenderSceneTest::AudioManagerRelease)(struct AudioManager *) = nullptr;
-void (*AudioIdlHdiRenderSceneTest::AudioAdapterRelease)(struct AudioAdapter *) = nullptr;
-void (*AudioIdlHdiRenderSceneTest::AudioRenderRelease)(struct AudioRender *) = nullptr;
+void (*AudioIdlHdiRenderSceneTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
+void (*AudioIdlHdiRenderSceneTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
+void (*AudioIdlHdiRenderSceneTest::AudioRenderRelease)(struct IAudioRender *) = nullptr;
 
 void AudioIdlHdiRenderSceneTest::SetUpTestCase(void)
 {
@@ -57,11 +57,11 @@ void AudioIdlHdiRenderSceneTest::SetUpTestCase(void)
     (void)HdfRemoteGetCallingPid();
     manager = GetAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
+    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
     ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
+    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
     ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioRenderRelease = (void (*)(struct AudioRender *))(dlsym(handleSo, "AudioRenderRelease"));
+    AudioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(handleSo, "AudioRenderRelease"));
     ASSERT_NE(nullptr, AudioRenderRelease);
 }
 
@@ -162,7 +162,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_Nu
     int32_t ret = -1;
     bool supported = true;
     struct AudioSceneDescriptor scenes = {};
-    struct AudioRender *renderNull = nullptr;
+    struct IAudioRender *renderNull = nullptr;
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_OUT_SPEAKER;
     scenes.desc.desc = strdup("mic");
@@ -270,7 +270,7 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderSelectScene_Null_003, T
     struct AudioSceneDescriptor scenes = {};
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_IN_MIC;
-    struct AudioRender *renderNull = nullptr;
+    struct IAudioRender *renderNull = nullptr;
     scenes.desc.desc = strdup("mic");
 
     ret = render->SelectScene(renderNull, &scenes);
