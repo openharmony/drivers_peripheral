@@ -27,17 +27,18 @@ struct BufferManagerWrapper {
     void *inputBufferManager;
     void *outputBufferManager;
 
-    bool (*IsInputDataBufferReady)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    CodecBuffer* (*GetInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    CodecBuffer* (*GetUsedInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    void (*PutInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
-    void (*PutUsedInputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
+    bool (*IsInputDataBufferReady)(const struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
+    CodecBuffer* (*GetInputDataBuffer)(const struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
+    CodecBuffer* (*GetUsedInputDataBuffer)(const struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
+    void (*PutInputDataBuffer)(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
+    void (*PutUsedInputDataBuffer)(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
 
-    bool (*IsUsedOutputDataBufferReady)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    CodecBuffer* (*GetOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    CodecBuffer* (*GetUsedOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
-    void (*PutOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
-    void (*PutUsedOutputDataBuffer)(struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
+    bool (*IsUsedOutputDataBufferReady)(const struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
+    CodecBuffer* (*GetOutputDataBuffer)(const struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs);
+    CodecBuffer* (*GetUsedOutputDataBuffer)(const struct BufferManagerWrapper *bufferManagerWrapper,
+                  uint32_t timeoutMs);
+    void (*PutOutputDataBuffer)(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
+    void (*PutUsedOutputDataBuffer)(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info);
 };
 
 struct BufferManagerWrapper* GetBufferManager(void);

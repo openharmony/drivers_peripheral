@@ -24,6 +24,8 @@
 
 #define HDF_LOG_TAG codec_hdi_passthrough
 
+using namespace OHOS::Codec::Common;
+
 namespace OHOS {
 namespace Codec {
 namespace CodecAdapter {
@@ -117,7 +119,7 @@ int32_t ComponentNode::GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uin
 
     int32_t paramCnt = 0;
     Param paramOut[PARAM_MAX_NUM] = {};
-    int32_t ret = SplitParam(paramIndex, param, paramOut, paramCnt, codecType_);
+    int32_t ret = Common::SplitParam(paramIndex, param, paramOut, paramCnt, codecType_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s error, paramIndex is not support", __func__);
         return ret;
@@ -132,7 +134,7 @@ int32_t ComponentNode::GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uin
     }
 
     if (ret == HDF_SUCCESS) {
-        ret = ParseParam(paramIndex, paramOut, paramCnt, param, exInfo_);
+        ret = Common::ParseParam(paramIndex, paramOut, paramCnt, param, exInfo_);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s ParseParam failed", __func__);
         }
@@ -149,7 +151,7 @@ int32_t ComponentNode::SetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uin
 
     int32_t paramCnt = 1;
     Param paramOut[PARAM_MAX_NUM] = {};
-    int32_t ret = SplitParam(paramIndex, param, paramOut, paramCnt, codecType_);
+    int32_t ret = Common::SplitParam(paramIndex, param, paramOut, paramCnt, codecType_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s error, paramIndex is not support", __func__);
         return ret;
@@ -368,7 +370,7 @@ int32_t ComponentNode::OnEmptyBufferDone(CodecBuffer *inBuf, int32_t *acquireFd)
     }
 
     OmxCodecBuffer omxCodecBuffer = {0};
-    ConvertCodecBufferToOmxCodecBuffer(omxCodecBuffer, *inBuf);
+    Common::ConvertCodecBufferToOmxCodecBuffer(omxCodecBuffer, *inBuf);
     omxCodecBuffer.size = sizeof(OmxCodecBuffer);
     omxCodecBuffer.fenceFd = *acquireFd;
     omxCodecBuffer.type = READ_ONLY_TYPE;
@@ -386,7 +388,7 @@ int32_t ComponentNode::OnFillBufferDone(CodecBuffer *outBuf, int32_t *acquireFd)
     }
 
     OmxCodecBuffer omxCodecBuffer = {0};
-    ConvertCodecBufferToOmxCodecBuffer(omxCodecBuffer, *outBuf);
+    Common::ConvertCodecBufferToOmxCodecBuffer(omxCodecBuffer, *outBuf);
     omxCodecBuffer.size = sizeof(OmxCodecBuffer);
     omxCodecBuffer.fenceFd = *acquireFd;
     omxCodecBuffer.type = READ_WRITE_TYPE;
@@ -423,7 +425,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
         return HDF_FAILURE;
     }
     buffer.bufferId = bufferId_++;
-    ConvertOmxCodecBufferToCodecBuffer(buffer, *codecBuffer);
+    Common::ConvertOmxCodecBufferToCodecBuffer(buffer, *codecBuffer);
     if (portIndex == INPUT_PORTINDEX) {
         ret = CodecQueueInput(comp_, codecBuffer, 0, buffer.fenceFd);
         if (ret != HDF_SUCCESS) {
@@ -439,7 +441,7 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
             return ret;
         }
     }
-    ConvertCodecBufferToOmxCodecBuffer(buffer, *codecBuffer);
+    Common::ConvertCodecBufferToOmxCodecBuffer(buffer, *codecBuffer);
     OsalMemFree(codecBuffer);
     return ret;
 }
@@ -487,7 +489,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
             return ret;
         }
     }
-    ConvertCodecBufferToOmxCodecBuffer(buffer, *codecBuffer);
+    Common::ConvertCodecBufferToOmxCodecBuffer(buffer, *codecBuffer);
     OsalMemFree(codecBuffer);
     return HDF_SUCCESS;
 }
@@ -518,7 +520,7 @@ int32_t ComponentNode::EmptyThisBuffer(const OmxCodecBuffer &buffer)
         HDF_LOGE("%{public}s error, codecBuffer is nullptr", __func__);
         return HDF_FAILURE;
     }
-    ConvertOmxCodecBufferToCodecBuffer(buffer, *codecBuffer);
+    Common::ConvertOmxCodecBufferToCodecBuffer(buffer, *codecBuffer);
     int32_t ret = CodecQueueInput(comp_, codecBuffer, 0, buffer.fenceFd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s error, CodecQueueInput failed", __func__);
@@ -544,7 +546,7 @@ int32_t ComponentNode::FillThisBuffer(const OmxCodecBuffer &buffer)
         HDF_LOGE("%{public}s error, codecBuffer is nullptr", __func__);
         return HDF_FAILURE;
     }
-    ConvertOmxCodecBufferToCodecBuffer(buffer, *codecBuffer);
+    Common::ConvertOmxCodecBufferToCodecBuffer(buffer, *codecBuffer);
     int32_t ret = CodecQueueOutput(comp_, codecBuffer, 0, buffer.fenceFd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s error, CodecQueueOutput failed", __func__);
@@ -564,7 +566,7 @@ int32_t ComponentNode::SetPortMode(uint32_t portIndex, OmxCodecBuffer &buffer, A
         outputMode_ = mode;
     }
     BufferType type;
-    int32_t ret = ConvertOmxBufferTypeToBufferType(buffer.bufferType, type);
+    int32_t ret = Common::ConvertOmxBufferTypeToBufferType(buffer.bufferType, type);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s error, ConvertOmxBufferTypeToBufferType failed", __func__);
         return ret;
