@@ -6,8 +6,8 @@
  * See the LICENSE file in the root of this repository for complete details.
  */
 
-#ifndef MODEL_SENSOR_DRIVER_CHIPSET_PPG_PPG_CS1262_H_
-#define MODEL_SENSOR_DRIVER_CHIPSET_PPG_PPG_CS1262_H_
+#ifndef MODEL_SENSOR_DRIVER_CHIPSET_PPG_PPG_CS1262_H
+#define MODEL_SENSOR_DRIVER_CHIPSET_PPG_PPG_CS1262_H
 
 #include "ppg_cs1262_spi.h"
 #include "hdf_device_desc.h"
@@ -69,4 +69,4 @@ struct PpgModeTab {
 
 int32_t Cs1262Loadfw(enum PpgMode mode, Cs1262RegConfigTab **configTab);
 
-#endif  // MODEL_SENSOR_DRIVER_CHIPSET_PPG_PPG_CS1262_H_
+#endif  // MODEL_SENSOR_DRIVER_CHIPSET_PPG_PPG_CS1262_H
