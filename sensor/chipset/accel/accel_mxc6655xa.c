@@ -23,11 +23,11 @@
 #define MXC6655_ACCEL_OUTPUT_16BIT    16
 #define MXC6655_ACCEL_OUTPUT_MSB      8
 
-static struct Mxc6655xaDrvData *g_Mxc6655xaDrvData = NULL;
+static struct Mxc6655xaDrvData *g_mxc6655xaDrvData = NULL;
 
 struct Mxc6655xaDrvData *Mxc6655xaGetDrvData(void)
 {
-    return g_Mxc6655xaDrvData;
+    return g_mxc6655xaDrvData;
 }
 
 static int SensorConvertData(char highByte, char lowByte)
@@ -177,7 +177,7 @@ int32_t Mxc6655xaBindDriver(struct HdfDeviceObject *device)
     drvData->ioService.Dispatch = DispatchMXC6655xa;
     drvData->device = device;
     device->service = &drvData->ioService;
-    g_Mxc6655xaDrvData = drvData;
+    g_mxc6655xaDrvData = drvData;
 
     return HDF_SUCCESS;
 }
