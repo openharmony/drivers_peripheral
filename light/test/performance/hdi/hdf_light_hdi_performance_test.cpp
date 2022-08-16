@@ -26,12 +26,12 @@ using namespace testing::ext;
 
 namespace {
     constexpr int32_t LIGHT_COMMON_TIME = 500;
-    constexpr int32_t g_minLightId = HDF_LIGHT_ID_BATTERY;
-    constexpr int32_t g_maxLightId = HDF_LIGHT_ID_ATTENTION;
+    constexpr int32_t MIN_LIGHT_ID = HDF_LIGHT_ID_BATTERY;
+    constexpr int32_t MAX_LIGHT_ID = HDF_LIGHT_ID_ATTENTION;
     constexpr int32_t LIGHT_USEC_TIME = 1000000;
     constexpr int32_t LIGHT_MSEC_TIME = 1000;
-    constexpr int32_t g_onTime = 500;
-    constexpr int32_t g_offTime = 500;
+    constexpr int32_t ON_TIME = 500;
+    constexpr int32_t OFF_TIME = 500;
     sptr<ILightInterface> g_lightInterface = nullptr;
 }
 
@@ -101,8 +101,8 @@ HWTEST_F(HdfLightHdiPerformanceTest, TurnOnLight001, TestSize.Level1)
 
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         int timeUsed = 0;
         struct timespec tv1 = (struct timespec) {0};
@@ -143,8 +143,8 @@ HWTEST_F(HdfLightHdiPerformanceTest, TurnOnLight002, TestSize.Level1)
 
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, g_minLightId);
-        EXPECT_LE(iter.lightId, g_maxLightId);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         int timeUsed = 0;
         struct timespec tv1 = (struct timespec) {0};
@@ -152,8 +152,8 @@ HWTEST_F(HdfLightHdiPerformanceTest, TurnOnLight002, TestSize.Level1)
         HdfLightEffect effect;
         effect.lightBrightness = 0x00800000;
         effect.flashEffect.flashMode = HDF_LIGHT_FLASH_TIMED;
-        effect.flashEffect.onTime = g_onTime;
-        effect.flashEffect.offTime = g_offTime;
+        effect.flashEffect.onTime = ON_TIME;
+        effect.flashEffect.offTime = OFF_TIME;
         clock_gettime(CLOCK_REALTIME, &tv1);
         int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
         clock_gettime(CLOCK_REALTIME, &tv2);
