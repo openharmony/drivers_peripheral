@@ -58,10 +58,10 @@ ohos_unittest("test_hdisrv") {
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
     "//third_party/libpng:libpng",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_light:liblight_proxy_1.0",
     "drivers_peripheral_input:hdi_input",
     "hdf_core:libhdf_host",
@@ -97,10 +97,10 @@ ohos_unittest("test_capacity_shutdown") {
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
     "//third_party/libpng:libpng",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_light:liblight_proxy_1.0",
     "drivers_peripheral_input:hdi_input",
     "hdf_core:libhdf_host",
@@ -120,11 +120,11 @@ ohos_unittest("hdi_unittest_battery") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_interface_battery:libbattery_proxy_1.1",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
