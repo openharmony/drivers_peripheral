@@ -27,13 +27,11 @@ ohos_shared_library("libbattery_interface_service_1.1") {
     "src/battery_thread.cpp",
     "src/power_supply_provider.cpp",
   ]
-  deps = [
-    "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//third_party/jsoncpp:jsoncpp" ]
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_interface_battery:battery_idl_headers",
       "drivers_interface_light:liblight_proxy_1.0",
       "hdf_core:libhdf_host",
@@ -69,11 +67,11 @@ ohos_shared_library("libbattery_driver") {
   deps = [
     "//drivers/interface/battery/v1_1:libbattery_stub_1.1",
     "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_interface_light:liblight_proxy_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
