@@ -23,8 +23,8 @@ public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
 
-    void SetUp(void) const;
-    void TearDown(void) const;
+    void SetUp(void);
+    void TearDown(void);
 };
 
 #endif /* UTEST_CAMERA_DEVICE_IMPL_TEST_H */

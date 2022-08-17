@@ -763,19 +763,19 @@ int32_t HdiServiceCaptureAddEffect(const struct HdfDeviceIoClient *client,
     (void)client;
     (void)reply;
     uint64_t effectid = 0;
+    struct AudioCapture *capture = NULL;
     if (data == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
-    struct AudioCapture *capture = NULL;
     int32_t ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0 || capture == NULL) {
-        AUDIO_FUNC_LOGE("capture is NULL or ret = %{public}d", ret);
+        AUDIO_FUNC_LOGE("capture is null or ret = %{public}d", ret);
         return ret;
     }
 
     if (!HdfSbufReadUint64(data, &effectid)) {
-        AUDIO_FUNC_LOGE("read buf fail ");
+        AUDIO_FUNC_LOGE("SbufReadUint64 failed ");
         return HDF_FAILURE;
     }
 
@@ -800,7 +800,7 @@ int32_t HdiServiceCaptureRemoveEffect(const struct HdfDeviceIoClient *client,
     }
 
     if (!HdfSbufReadUint64(data, &effectid)) {
-        AUDIO_FUNC_LOGE("read buf fail ");
+        AUDIO_FUNC_LOGE("HdfSbufReadUint64 failed.");
         return HDF_FAILURE;
     }
 

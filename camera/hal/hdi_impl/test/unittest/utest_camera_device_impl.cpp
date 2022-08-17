@@ -19,12 +19,12 @@ void CameraDeviceImplTest::SetUpTestCase(void)
 {
 }
 
-void CameraDeviceImplTest::TearDownTestCase(void) const
+void CameraDeviceImplTest::TearDownTestCase(void)
 {
     std::cout << "Camera::CameraDeviceImpl TearDownTestCase" << std::endl;
 }
 
-void CameraDeviceImplTest::SetUp(void) const
+void CameraDeviceImplTest::SetUp(void)
 {
     bool ret = InitCameraHost();
     if (!ret) {

@@ -894,9 +894,10 @@ int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Failed to send service call!");
+        AUDIO_FUNC_LOGE("Failed to send service call: ret = %{public}d!", ret);
     }
     AudioBufReplyRecycle(sBuf, NULL);
+
     return ret;
 }
 
@@ -1187,13 +1188,13 @@ int32_t AudioOutputCaptureGetMmapPosition(const struct DevHandleCapture *handle,
     }
     ret = service->dispatcher->Dispatch(&service->object, cmdId, NULL, reply);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Failed to send service call!");
+        AUDIO_FUNC_LOGE("Failed to send service call: ret = %{public}d.", ret);
         AudioSbufRecycle(reply);
         return HDF_FAILURE;
     }
     uint64_t frames = 0;
     if (!HdfSbufReadUint64(reply, &frames)) {
-        AUDIO_FUNC_LOGE("Failed to Get frames sBuf!");
+        AUDIO_FUNC_LOGE("Failed to Get frames sBuf:ret = %{public}d.", ret);
         AudioSbufRecycle(reply);
         return HDF_FAILURE;
     }

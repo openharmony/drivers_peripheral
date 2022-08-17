@@ -747,7 +747,7 @@ int32_t AudioAdapterListGetCapture(const char *adapterName, struct AudioCapture 
         }
         if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             if (g_renderAndCaptureManage[i].capturePid != pid) {
-                AUDIO_FUNC_LOGE("[%{public}d].capturePid:%{public}d != pid:%{public}d ", i,
+                AUDIO_FUNC_LOGE("managerList[%{public}d].capturePid:%{public}d != pid:%{public}d ", i,
                     g_renderAndCaptureManage[i].capturePid, pid);
                 return AUDIO_HAL_ERR_INVALID_OBJECT;
             }
@@ -774,7 +774,7 @@ int32_t AudioAdapterFrameGetCapture(const char *adapterName,
         }
         if (strcmp(g_renderAndCaptureManage[i].adapterName, adapterName) == 0) {
             if (g_renderAndCaptureManage[i].capturePid != pid) {
-                AUDIO_FUNC_LOGE("[%{public}d].capturePid:%{public}d != pid:%{public}d ", i,
+                AUDIO_FUNC_LOGE("[%{public}d].capturePid: %{public}d != pid: %{public}d ", i,
                     g_renderAndCaptureManage[i].capturePid, pid);
                 return AUDIO_HAL_ERR_INVALID_OBJECT;
             }

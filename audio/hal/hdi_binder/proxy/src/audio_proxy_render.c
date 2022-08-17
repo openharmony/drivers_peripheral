@@ -39,7 +39,7 @@ static int32_t AudioProxyRenderCtrl(int cmId, AudioHandle handle)
 int32_t AudioProxyRenderStart(AudioHandle handle)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -50,7 +50,7 @@ int32_t AudioProxyRenderStart(AudioHandle handle)
 int32_t AudioProxyRenderStop(AudioHandle handle)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -61,7 +61,7 @@ int32_t AudioProxyRenderStop(AudioHandle handle)
 int32_t AudioProxyRenderPause(AudioHandle handle)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -72,7 +72,7 @@ int32_t AudioProxyRenderPause(AudioHandle handle)
 int32_t AudioProxyRenderResume(AudioHandle handle)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -82,7 +82,7 @@ int32_t AudioProxyRenderResume(AudioHandle handle)
 
 int32_t AudioProxyRenderFlush(AudioHandle handle)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid, ret = %{public}d", ret);
         return ret;
@@ -125,7 +125,7 @@ static int32_t AudioProxyRenderGetFrameParameter(int cmId, const AudioHandle han
 
 int32_t AudioProxyRenderGetFrameSize(const AudioHandle handle, uint64_t *size)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -135,7 +135,7 @@ int32_t AudioProxyRenderGetFrameSize(const AudioHandle handle, uint64_t *size)
 
 int32_t AudioProxyRenderGetFrameCount(const AudioHandle handle, uint64_t *count)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -145,7 +145,7 @@ int32_t AudioProxyRenderGetFrameCount(const AudioHandle handle, uint64_t *count)
 
 int32_t AudioProxyRenderSetSampleAttributes(const AudioHandle handle, const struct AudioSampleAttributes *attrs)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -175,7 +175,7 @@ int32_t AudioProxyRenderSetSampleAttributes(const AudioHandle handle, const stru
 int32_t AudioProxyRenderGetSampleAttributes(const AudioHandle handle,
     struct AudioSampleAttributes *attrs)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -210,7 +210,7 @@ int32_t AudioProxyRenderGetSampleAttributes(const AudioHandle handle,
 
 int32_t AudioProxyRenderGetCurrentChannelId(const AudioHandle handle, uint32_t *channelId)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -246,7 +246,7 @@ int32_t AudioProxyRenderGetCurrentChannelId(const AudioHandle handle, uint32_t *
 int32_t AudioProxyRenderCheckSceneCapability(const AudioHandle handle,
     const struct AudioSceneDescriptor *scene, bool *supported)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -296,7 +296,7 @@ int32_t AudioProxyRenderCheckSceneCapability(const AudioHandle handle,
 
 int32_t AudioProxyRenderSelectScene(const AudioHandle handle, const struct AudioSceneDescriptor *scene)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -330,16 +330,16 @@ int32_t AudioProxyRenderSelectScene(const AudioHandle handle, const struct Audio
 
 int32_t AudioProxyRenderSetMute(const AudioHandle handle, bool mute)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
     }
-    struct HdfSBuf *data = NULL;
-    struct HdfSBuf *reply = NULL;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
-        AUDIO_FUNC_LOGE("The pointer is null");
+        AUDIO_FUNC_LOGE("The params is null.");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
@@ -357,7 +357,7 @@ int32_t AudioProxyRenderSetMute(const AudioHandle handle, bool mute)
 
 int32_t AudioProxyRenderGetMute(const AudioHandle handle, bool *mute)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -390,7 +390,7 @@ int32_t AudioProxyRenderGetMute(const AudioHandle handle, bool *mute)
 int32_t AudioProxyRenderSetVolume(const AudioHandle handle, float volume)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -401,7 +401,7 @@ int32_t AudioProxyRenderSetVolume(const AudioHandle handle, float volume)
 int32_t AudioProxyRenderGetVolume(const AudioHandle handle, float *volume)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -411,7 +411,7 @@ int32_t AudioProxyRenderGetVolume(const AudioHandle handle, float *volume)
 
 int32_t AudioProxyRenderGetGainThreshold(const AudioHandle handle, float *min, float *max)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -453,7 +453,7 @@ int32_t AudioProxyRenderGetGainThreshold(const AudioHandle handle, float *min, f
 
 int32_t AudioProxyRenderGetGain(const AudioHandle handle, float *gain)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -463,7 +463,7 @@ int32_t AudioProxyRenderGetGain(const AudioHandle handle, float *gain)
 
 int32_t AudioProxyRenderSetGain(const AudioHandle handle, float gain)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -473,7 +473,7 @@ int32_t AudioProxyRenderSetGain(const AudioHandle handle, float gain)
 
 int32_t AudioProxyRenderGetLatency(struct AudioRender *render, uint32_t *ms)
 {
-    int32_t ret = AudioCheckRenderAddr((AudioHandle)render); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -505,7 +505,7 @@ int32_t AudioProxyRenderGetLatency(struct AudioRender *render, uint32_t *ms)
 int32_t AudioProxyRenderRenderFrame(struct AudioRender *render, const void *frame,
                                     uint64_t requestBytes, uint64_t *replyBytes)
 {
-    int32_t ret = AudioCheckRenderAddr((AudioHandle)render); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -545,7 +545,7 @@ int32_t AudioProxyRenderRenderFrame(struct AudioRender *render, const void *fram
 
 int32_t AudioProxyRenderGetRenderPosition(struct AudioRender *render, uint64_t *frames, struct AudioTimeStamp *time)
 {
-    int32_t ret = AudioCheckRenderAddr((AudioHandle)render); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -601,7 +601,7 @@ int32_t AudioProxyRenderGetRenderSpeed(struct AudioRender *render, float *speed)
 
 int32_t AudioProxyRenderSetChannelMode(struct AudioRender *render, enum AudioChannelMode mode)
 {
-    int32_t ret = AudioCheckRenderAddr((AudioHandle)render); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -629,7 +629,7 @@ int32_t AudioProxyRenderSetChannelMode(struct AudioRender *render, enum AudioCha
 
 int32_t AudioProxyRenderGetChannelMode(struct AudioRender *render, enum AudioChannelMode *mode)
 {
-    int32_t ret = AudioCheckRenderAddr((AudioHandle)render); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -667,7 +667,7 @@ int32_t AudioProxyRenderGetChannelMode(struct AudioRender *render, enum AudioCha
 
 int32_t AudioProxyRenderSetExtraParams(AudioHandle handle, const char *keyValueList)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -697,7 +697,7 @@ int32_t AudioProxyRenderSetExtraParams(AudioHandle handle, const char *keyValueL
 int32_t AudioProxyRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLenth)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -744,7 +744,7 @@ int32_t AudioProxyRenderGetExtraParams(AudioHandle handle, char *keyValueList, i
 
 int32_t AudioProxyRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -781,7 +781,7 @@ int32_t AudioProxyRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struc
 
 int32_t AudioProxyRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -817,6 +817,9 @@ int32_t AudioProxyRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, st
 
 int32_t AudioProxyRenderAddEffect(AudioHandle handle, uint64_t effectid)
 {
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwRender *hwRender = NULL;
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
@@ -826,9 +829,7 @@ int32_t AudioProxyRenderAddEffect(AudioHandle handle, uint64_t effectid)
         AUDIO_FUNC_LOGE("handle is empty");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = NULL;
-    struct HdfSBuf *reply = NULL;
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("The pointer is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -859,7 +860,7 @@ int32_t AudioProxyRenderRemoveEffect(AudioHandle handle, uint64_t effectid)
         return ret;
     }
     if (handle == NULL) {
-        AUDIO_FUNC_LOGE("handle is empty");
+        AUDIO_FUNC_LOGE("The handle is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct HdfSBuf *reply = NULL;
@@ -870,6 +871,7 @@ int32_t AudioProxyRenderRemoveEffect(AudioHandle handle, uint64_t effectid)
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioProxyPreprocessRender(hwRender, &data, &reply) < 0) {
+        AUDIO_FUNC_LOGE("AudioProxyPreprocessRender failed");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (!HdfSbufWriteUint64(data, effectid)) {
@@ -889,17 +891,18 @@ int32_t AudioProxyRenderRemoveEffect(AudioHandle handle, uint64_t effectid)
 
 int32_t AudioProxyRenderTurnStandbyMode(AudioHandle handle)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret;
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
     }
     if (handle == NULL) {
-        AUDIO_FUNC_LOGE("handle is empty");
+        AUDIO_FUNC_LOGE("handle is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = NULL;
-    struct HdfSBuf *reply = NULL;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("parameter is empty");
@@ -921,7 +924,7 @@ int32_t AudioProxyRenderTurnStandbyMode(AudioHandle handle)
 }
 int32_t AudioProxyRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
 {
-    int32_t ret = AudioCheckRenderAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -960,7 +963,7 @@ int32_t AudioProxyRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t 
 }
 int32_t AudioProxyRenderRegCallback(struct AudioRender *render, RenderCallback callback, void *cookie)
 {
-    int32_t ret = AudioCheckRenderAddr((AudioHandle)render); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
@@ -1000,7 +1003,7 @@ int32_t AudioProxyRenderRegCallback(struct AudioRender *render, RenderCallback c
 }
 int32_t AudioProxyRenderDrainBuffer(struct AudioRender *render, enum AudioDrainNotifyType *type)
 {
-    int32_t ret = AudioCheckRenderAddr((AudioHandle)render); // Fuzz test
+    int32_t ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
         return ret;
