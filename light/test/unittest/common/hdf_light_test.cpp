@@ -31,7 +31,7 @@ namespace {
     static uint32_t g_count = 0;
     const int32_t g_onTime = 500;
     const int32_t g_offTime = 500;
-    const int32_t LIGHT_WAIT_TIME = 30;
+    const int32_t LIGHT_WAIT_TIME = 2;
     const int32_t g_minLightId = LIGHT_ID_NONE;
     const int32_t g_maxLightId = LIGHT_ID_BUTT;
 }
