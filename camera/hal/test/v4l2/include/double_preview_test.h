@@ -35,20 +35,20 @@ public:
     static void TearDownTestCase(void);
     void SetUp(void);
     void TearDown(void);
-    void CreateStream(int streamId, OHOS::Camera::StreamIntent intent);
+    void CreateStream(int streamId, StreamIntent intent);
     void CommitStream();
-    void SetStreamInfo(std::shared_ptr<OHOS::Camera::StreamInfo> &streamInfo,
+    void SetStreamInfo(StreamInfo &streamInfo,
         const std::shared_ptr<StreamCustomer> &streamCustomer,
-        const int streamId, const OHOS::Camera::StreamIntent intent);
+        const int streamId, const StreamIntent intent);
     void StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming);
     void StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds);
 
-    OHOS::Camera::CamRetCode result_;
+    CamRetCode result_;
     std::shared_ptr<TestDisplay> display_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerPreview_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerPreviewDouble_ = nullptr;
-    std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> streamInfos_;
-    std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo_ = nullptr;
+    std::vector<StreamInfo> streamInfos_;
+    CaptureInfo captureInfo_ = {};
     std::vector<int> captureIds_;
     std::vector<int> streamIds_;
 };

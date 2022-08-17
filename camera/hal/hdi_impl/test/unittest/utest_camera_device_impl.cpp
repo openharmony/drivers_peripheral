@@ -15,6 +15,8 @@
 
 #include "utest_camera_device_impl.h"
 
+using namespace OHOS::HDI::Camera::V1_0;
+
 void CameraDeviceImplTest::SetUpTestCase(void)
 {
 }
@@ -64,16 +66,16 @@ HWTEST_F(CameraDeviceImplTest, UTestUpdateSettings, TestSize.Level0)
     EXPECT_EQ(false, cameraDevice_ == nullptr);
 
     std::vector<std::string> cameraIds;
-    Camera::CamRetCode ret = cameraHost_->GetCameraIds(cameraIds);
-    EXPECT_EQ(true, ret == OHOS::Camera::NO_ERROR);
+    CamRetCode ret = (CamRetCode)cameraHost_->GetCameraIds(cameraIds);
+    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
 
-    std::shared_ptr<CameraAbility> ability = nullptr;
+    std::vector<uint8_t> ability;
     std::string cameraId = cameraIds.front();
-    ret = cameraHost_->GetCameraAbility(cameraId, ability);
-    EXPECT_EQ(true, ret == OHOS::Camera::NO_ERROR);
+    ret = (CamRetCode)cameraHost_->GetCameraAbility(cameraId, ability);
+    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
 
-    ret = cameraDevice_->UpdateSettings(ability);
-    EXPECT_EQ(true, ret == OHOS::Camera::NO_ERROR);
+    ret = (CamRetCode)cameraDevice_->UpdateSettings(ability);
+    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
     std::cout << "UTestUpdateSettings ret = " << ret << std::endl;
 }
 
@@ -83,8 +85,8 @@ HWTEST_F(CameraDeviceImplTest, UTestSetResultMode, TestSize.Level0)
     EXPECT_EQ(false, cameraDevice_ == nullptr);
 
     ResultCallbackMode mode = PER_FRAME;
-    CamRetCode rc = cameraDevice_->SetResultMode(mode);
-    EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
+    CamRetCode rc = (CamRetCode)cameraDevice_->SetResultMode(mode);
+    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
 }
 
 HWTEST_F(CameraDeviceImplTest, UTestGetEnabledResults, TestSize.Level0)
@@ -92,9 +94,9 @@ HWTEST_F(CameraDeviceImplTest, UTestGetEnabledResults, TestSize.Level0)
     EXPECT_EQ(false, cameraHost_ == nullptr);
     EXPECT_EQ(false, cameraDevice_ == nullptr);
 
-    std::vector<MetaType> results;
-    CamRetCode rc = cameraDevice_->GetEnabledResults(results);
-    EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
+    std::vector<int32_t> results;
+    CamRetCode rc = (CamRetCode)cameraDevice_->GetEnabledResults(results);
+    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
 
     for (auto &type : results) {
         std::cout << "MetaType = " << type << std::endl;
@@ -106,11 +108,11 @@ HWTEST_F(CameraDeviceImplTest, UTestEnableResult, TestSize.Level0)
     EXPECT_EQ(false, cameraHost_ == nullptr);
     EXPECT_EQ(false, cameraDevice_ == nullptr);
 
-    std::vector<MetaType> results;
+    std::vector<int32_t> results;
     results.push_back(OHOS_SENSOR_EXPOSURE_TIME);
     results.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
-    CamRetCode rc = cameraDevice_->EnableResult(results);
-    EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
+    CamRetCode rc = (CamRetCode)cameraDevice_->EnableResult(results);
+    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
 }
 
 HWTEST_F(CameraDeviceImplTest, UTestDisableResult, TestSize.Level0)
@@ -118,17 +120,17 @@ HWTEST_F(CameraDeviceImplTest, UTestDisableResult, TestSize.Level0)
     EXPECT_EQ(false, cameraHost_ == nullptr);
     EXPECT_EQ(false, cameraDevice_ == nullptr);
 
-    std::vector<MetaType> results;
+    std::vector<int32_t> results;
     results.push_back(OHOS_SENSOR_EXPOSURE_TIME);
     results.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
-    CamRetCode rc = cameraDevice_->EnableResult(results);
-    EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
-    std::vector<Camera::MetaType> disable_tag;
-    rc = cameraDevice_->GetEnabledResults(disable_tag);
-    EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
+    CamRetCode rc = (CamRetCode)cameraDevice_->EnableResult(results);
+    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
+    std::vector<int32_t> disable_tag;
+    rc = (CamRetCode)cameraDevice_->GetEnabledResults(disable_tag);
+    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
 
-    rc = cameraDevice_->DisableResult(disable_tag);
-    EXPECT_EQ(true, rc == OHOS::Camera::NO_ERROR);
+    rc = (CamRetCode)cameraDevice_->DisableResult(disable_tag);
+    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
 }
 
 HWTEST_F(CameraDeviceImplTest, UTestClose, TestSize.Level0)

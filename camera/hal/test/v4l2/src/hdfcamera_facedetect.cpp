@@ -44,7 +44,7 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::STILL_CAPTURE, OHOS::Camera::ANALYZE};
+    display_->intents = {PREVIEW, STILL_CAPTURE, ANALYZE};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
@@ -56,8 +56,8 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
     constexpr double altitude = 8848.86; // dummy data: Qomolangma altitude
     constexpr size_t entryCapacity = 100;
     constexpr size_t dataCapacity = 2000;
-    std::shared_ptr<OHOS::Camera::CameraSetting>  captureSetting =
-        std::make_shared<OHOS::Camera::CameraSetting>(entryCapacity, dataCapacity);
+    std::shared_ptr<CameraSetting>  captureSetting =
+        std::make_shared<CameraSetting>(entryCapacity, dataCapacity);
     uint8_t captureQuality = OHOS_CAMERA_JPEG_LEVEL_HIGH;
     int32_t captureOrientation = OHOS_CAMERA_JPEG_ROTATION_270;
     uint8_t mirrorSwitch = OHOS_CAMERA_MIRROR_ON;
@@ -72,14 +72,16 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
     captureSetting->addEntry(OHOS_CONTROL_CAPTURE_MIRROR, static_cast<void*>(&mirrorSwitch),
         sizeof(mirrorSwitch));
     captureSetting->addEntry(OHOS_JPEG_GPS_COORDINATES, gps.data(), gps.size());
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(captureSetting, setting);
 
-    std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = std::make_shared<OHOS::Camera::CaptureInfo>();
-    captureInfo->streamIds_ = {display_->streamId_capture};
-    captureInfo->captureSetting_ = captureSetting;
-    captureInfo->enableShutterCallback_ = false;
-    display_->rc = display_->streamOperator->Capture(display_->captureId_capture, captureInfo, true);
-    EXPECT_EQ(true, display_->rc == OHOS::Camera::NO_ERROR);
-    if (display_->rc == OHOS::Camera::NO_ERROR) {
+    CaptureInfo captureInfo = {};
+    captureInfo.streamIds_ = {display_->streamId_capture};
+    captureInfo.captureSetting_ = setting;
+    captureInfo.enableShutterCallback_ = false;
+    display_->rc = (CamRetCode)display_->streamOperator->Capture(display_->captureId_capture, captureInfo, true);
+    EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
+    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
         std::cout << "==========[test log]check Capture: Capture success, " << display_->captureId_capture << std::endl;
     } else {
         std::cout << "==========[test log]check Capture: Capture fail, rc = " << display_->rc
@@ -107,7 +109,7 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_002, TestSize.Level1)
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {OHOS::Camera::PREVIEW, OHOS::Camera::ANALYZE};
+    display_->intents = {PREVIEW, ANALYZE};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);

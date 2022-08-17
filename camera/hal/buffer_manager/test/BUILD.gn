@@ -66,10 +66,12 @@ if (defined(ohos_lite)) {
       "$camera_path/buffer_manager/include",
       "$camera_path/buffer_manager/src/buffer_adapter/standard",
       "//third_party/googletest/googletest/include",
+      "//drivers/peripheral/camera/interfaces/metadata/include",
     ]
 
     deps = [
       "$camera_path/buffer_manager:camera_buffer_manager",
+      "//drivers/interface/camera/v1_0:libcamera_stub_1.0",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest",
       "//third_party/googletest:gtest_main",

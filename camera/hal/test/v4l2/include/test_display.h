@@ -17,19 +17,19 @@
 #define TEST_DISPLAY_H
 #include <gtest/gtest.h>
 #include "camera.h"
-#include "camera_host.h"
 #include "stream_operator.h"
-#include "camera_device.h"
 #include "utils.h"
 #include <thread>
 #include <map>
 #include <stdio.h>
 #include <climits>
-#include "types.h"
+#include "v1_0/types.h"
 #include "camera_device_impl.h"
-#include "stream_operator_proxy.h"
+#include "camera_host_impl.h"
+#include "v1_0/stream_operator_proxy.h"
 #include "idevice_manager.h"
 #include "camera_metadata_info.h"
+#include "metadata_utils.h"
 #include <display_type.h>
 #include <fcntl.h>
 #include <unistd.h>
@@ -40,9 +40,9 @@
 #include "camera_host_callback.h"
 #include "camera_device_callback.h"
 #include "stream_operator_callback.h"
-#include "istream_operator_callback.h"
-#include "icamera_host.h"
-#include "camera_host_proxy.h"
+#include "v1_0/istream_operator_callback.h"
+#include "v1_0/icamera_host.h"
+#include "v1_0/camera_host_proxy.h"
 #include "ibuffer.h"
 #include <algorithm>
 #include <assert.h>
@@ -78,6 +78,8 @@
 #define ANALYZE_WIDTH 640
 #define ANALYZE_HEIGHT 480
 
+using namespace OHOS::HDI::Camera::V1_0;
+using namespace OHOS::Camera;
 class TestDisplay {
 public:
     // This should get the size setting according to the bottom layer
@@ -99,22 +101,23 @@ public:
     std::shared_ptr<StreamCustomer> streamCustomerCapture_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerVideo_ = nullptr;
     std::shared_ptr<StreamCustomer> streamCustomerAnalyze_ = nullptr;
-    OHOS::sptr<OHOS::Camera::IStreamOperator> streamOperator = nullptr;
-    std::shared_ptr<OHOS::Camera::IStreamOperatorCallback> streamOperatorCallback = nullptr;
-    std::shared_ptr<OHOS::Camera::CaptureInfo> captureInfo = nullptr;
-    std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>> streamInfos;
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfo = nullptr;
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoPre = nullptr;
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoVideo = nullptr;
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoCapture = nullptr;
-    std::shared_ptr<OHOS::Camera::StreamInfo> streamInfoAnalyze = nullptr;
-    OHOS::sptr<OHOS::Camera::ICameraHost> cameraHost = nullptr;
-    OHOS::sptr<OHOS::Camera::ICameraDevice> cameraDevice = nullptr;
-    std::shared_ptr<OHOS::Camera::CameraAbility> ability = nullptr;
+    OHOS::sptr<IStreamOperator> streamOperator = nullptr;
+    std::shared_ptr<IStreamOperatorCallback> streamOperatorCallback = nullptr;
+    CaptureInfo captureInfo = {};
+    std::vector<StreamInfo> streamInfos = {};
+    StreamInfo streamInfo = {};
+    StreamInfo streamInfoPre = {};
+    StreamInfo streamInfoVideo = {};
+    StreamInfo streamInfoCapture = {};
+    StreamInfo streamInfoAnalyze = {};
+    OHOS::sptr<ICameraHost> cameraHost = nullptr;
+    OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
+    std::shared_ptr<CameraAbility> ability = nullptr;
+    std::vector<uint8_t> ability_ = {};
     std::vector<int> captureIds;
     std::vector<std::string> cameraIds;
     std::vector<int> streamIds;
-    std::vector<OHOS::Camera::StreamIntent> intents;
+    std::vector<StreamIntent> intents;
     enum {
         streamId_preview = 1000, // 1000:preview streamID
         streamId_capture,
@@ -131,12 +134,13 @@ public:
         video_mode,
         analyze_mode,
     };
-    OHOS::Camera::CamRetCode rc;
+    CamRetCode rc;
     int init_flag = 0;
     bool status;
 
 public:
     TestDisplay();
+    sptr<ICameraHost> CameraHostImplGetInstance(void);
     uint64_t GetCurrentLocalTimeStamp();
     int32_t SaveYUV(char* type, unsigned char* buffer, int32_t size);
     int DoFbMunmap(unsigned char* addr);
@@ -151,7 +155,7 @@ public:
     void Close();
     void OpenCamera();
     void AchieveStreamOperator();
-    void StartStream(std::vector<OHOS::Camera::StreamIntent> intents);
+    void StartStream(std::vector<StreamIntent> intents);
     void StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds);
     void StartCapture(int streamId, int captureId, bool shutterCallback, bool isStreaming);
     float calTime(struct timeval start, struct timeval end);
@@ -164,15 +168,41 @@ public:
 };
 
 #ifndef CAMERA_BUILT_ON_OHOS_LITE
-class DemoCameraDeviceCallback : public OHOS::Camera::CameraDeviceCallbackStub {
+class DemoCameraDeviceCallback : public ICameraDeviceCallback {
 public:
     DemoCameraDeviceCallback() = default;
     virtual ~DemoCameraDeviceCallback() = default;
-    void OnError(OHOS::Camera::ErrorType type, int32_t errorMsg) override;
-    void OnResult(const uint64_t timestamp,
-                  const std::shared_ptr<OHOS::Camera::CameraMetadata>& result) override;
-    void PrintStabiliInfo(const std::shared_ptr<OHOS::Camera::CameraMetadata>& result);
-    void PrintFpsInfo(const std::shared_ptr<OHOS::Camera::CameraMetadata>& result);
+    int32_t OnError(ErrorType type, int32_t errorCode) override;
+    int32_t OnResult(uint64_t timestamp, const std::vector<uint8_t>& result) override;
+
+    void PrintStabiliInfo(const std::shared_ptr<CameraMetadata>& result);
+    void PrintFpsInfo(const std::shared_ptr<CameraMetadata>& result);
 };
+
+class DemoCameraHostCallback : public ICameraHostCallback {
+public:
+    DemoCameraHostCallback() = default;
+    virtual ~DemoCameraHostCallback() = default;
+
+public:
+    int32_t OnCameraStatus(const std::string& cameraId, CameraStatus status) override;
+
+    int32_t OnFlashlightStatus(const std::string& cameraId, FlashlightStatus status) override;
+
+    int32_t OnCameraEvent(const std::string& cameraId, CameraEvent event) override;
+};
+
+class DemoStreamOperatorCallback : public IStreamOperatorCallback {
+public:
+    DemoStreamOperatorCallback() = default;
+    virtual ~DemoStreamOperatorCallback() = default;
+
+public:
+    int32_t OnCaptureStarted(int32_t captureId, const std::vector<int32_t>& streamIds) override;
+    int32_t OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos) override;
+    int32_t OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos) override;
+    int32_t OnFrameShutter(int32_t captureId, const std::vector<int32_t>& streamIds, uint64_t timestamp) override;
+};
+
 #endif
 #endif
