@@ -32,7 +32,7 @@ void CameraFpsTest::TearDown(void)
     display_->Close();
 }
 
-void CameraFpsTest::GetFpsRange(std::shared_ptr<OHOS::Camera::CameraAbility> &ability)
+void CameraFpsTest::GetFpsRange(std::shared_ptr<CameraAbility> &ability)
 {
     common_metadata_header_t* data = ability->get();
     fpsRange_.clear();
@@ -77,20 +77,22 @@ static HWTEST_F(CameraFpsTest, camera_fps_001, TestSize.Level1)
     display_->cameraDevice->EnableResult(resultsList);
 
     // start stream
-    display_->intents = {OHOS::Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
 
     // updateSettings
     constexpr uint32_t ITEM_CAPACITY = 100;
     constexpr uint32_t DATA_CAPACITY = 2000;
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
         ITEM_CAPACITY, DATA_CAPACITY);
     std::vector<int32_t> fpsRange;
     fpsRange.push_back(fpsRange_[0]);
     fpsRange.push_back(fpsRange_[1]);
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
-    display_->rc = display_->cameraDevice->UpdateSettings(meta);
-    if (display_->rc == OHOS::Camera::NO_ERROR) {
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
+    if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
         std::cout << "==========[test log] UpdateSettings success." << std::endl;
     } else {
         std::cout << "==========[test log] UpdateSettings fail, rc = " << display_->rc << std::endl;

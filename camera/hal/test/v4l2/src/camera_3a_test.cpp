@@ -46,12 +46,12 @@ TEST_F(UtestCamera3ATest, camera_3a_0001)
     // Get the stream manager
     display_->AchieveStreamOperator();
     // Configure preview stream information
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     display_->cameraDevice->UpdateSettings(meta);
@@ -80,14 +80,14 @@ TEST_F(UtestCamera3ATest, camera_3a_0002)
     display_->AchieveStreamOperator();
     // Configure stream information
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
 
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_AUTO." << std::endl;
@@ -114,13 +114,13 @@ TEST_F(UtestCamera3ATest, camera_3a_0003)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
 
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_INCANDESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings,";
@@ -148,14 +148,14 @@ TEST_F(UtestCamera3ATest, camera_3a_0004) // 3A mode white balance blue scene
     // Get the stream manager
     display_->AchieveStreamOperator();
     // Configure stream information
-    display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
 
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode =  AWB_MODE_WARM_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_AUTO." << std::endl;
@@ -183,13 +183,13 @@ TEST_F(UtestCamera3ATest, camera_3a_0005)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // Create data stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
 
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings, ";
@@ -216,13 +216,13 @@ TEST_F(UtestCamera3ATest, camera_3a_0006)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // Create data stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
 
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_DAYLIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_DAYLIGHT" << std::endl;
@@ -250,13 +250,13 @@ TEST_F(UtestCamera3ATest, camera_3a_0007) // 3A mode reset
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // Create data stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
 
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_CLOUDY_DAYLIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings, ";
@@ -286,14 +286,14 @@ TEST_F(UtestCamera3ATest, camera_3a_0008)
     display_->AchieveStreamOperator();
     // Configure stream information
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
 
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_TWILIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_TWILIGHT" << std::endl;
@@ -319,13 +319,13 @@ TEST_F(UtestCamera3ATest, camera_3a_0009) // 3A mode white balance yellow scene
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // Create data stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
 
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_SHADE;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_SHADE" << std::endl;
@@ -352,14 +352,14 @@ TEST_F(UtestCamera3ATest, camera_3a_0010)
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
 
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_OFF;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_OFF" << std::endl;
@@ -385,12 +385,12 @@ TEST_F(UtestCamera3ATest, camera_3a_0030)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // Create data stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     display_->cameraDevice->UpdateSettings(meta);
@@ -409,7 +409,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0030)
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
@@ -433,13 +433,13 @@ TEST_F(UtestCamera3ATest, camera_3a_0031) // 3A mode white balance green scene
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_TWILIGHT;
@@ -467,14 +467,14 @@ TEST_F(UtestCamera3ATest, camera_3a_0040)
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
     display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
 
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     display_->cameraDevice->UpdateSettings(meta);
@@ -493,7 +493,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0041)
     std::cout << "UpdateSettings-OHOS_CAMERA_AWB_MODE, success." << std::endl;
 
     // Issue 3A parameters
-    std::shared_ptr<OHOS::Camera::CameraSetting> meta = std::make_shared<OHOS::Camera::CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->cameraDevice->UpdateSettings(meta);

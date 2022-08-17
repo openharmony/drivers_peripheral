@@ -43,7 +43,7 @@ TEST_F(UtestPipelineTest, camera_ppl_0001)
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW};
+    display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
@@ -66,7 +66,7 @@ TEST_F(UtestPipelineTest, camera_ppl_0002)
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::STILL_CAPTURE};
+    display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
@@ -90,7 +90,7 @@ TEST_F(UtestPipelineTest, camera_ppl_0003)
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
-    display_->intents = {Camera::PREVIEW, Camera::VIDEO};
+    display_->intents = {PREVIEW, VIDEO};
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
@@ -127,29 +127,29 @@ TEST_F(UtestPipelineTest, camera_ppl_0004)
         return;
     };
     producer->SetCallback(callback);
-    display_->streamInfo = std::make_shared<OHOS::Camera::StreamInfo>();
+    display_->streamInfo = std::make_shared<StreamInfo>();
     display_->streamInfo->streamId_ = display_->streamId_video;
     display_->streamInfo->width_ = 640; // 640:picture width // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
     display_->streamInfo->dataspace_ = 10; // 10:picture dataspace
-    display_->streamInfo->intent_ = Camera::VIDEO;
+    display_->streamInfo->intent_ = VIDEO;
     display_->streamInfo->tunneledMode_ = 5; // 5:tunnel mode // 5:tunnel mode
     display_->streamInfo->bufferQueue_ = producer;
-    std::vector<std::shared_ptr<OHOS::Camera::StreamInfo>>().swap(streamInfos);
+    std::vector<std::shared_ptr<StreamInfo>>().swap(streamInfos);
     streamInfos.push_back(display_->streamInfo);
     display_->rc = display_->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(false, display_->rc == Camera::METHOD_NOT_SUPPORTED);
     if (display_->rc == Camera::METHOD_NOT_SUPPORTED) {
         std::cout << "==========[test log] CreateStreams METHOD_NOT_SUPPORTED, streamId = ";
-        std::cout << display_->streamId_video <<", intent = Camera::VIDEO" << std::endl;
+        std::cout << display_->streamId_video <<", intent = VIDEO" << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }
 
     display_->rc = display_->streamOperator->CommitStreams(Camera::NORMAL, nullptr);
-    EXPECT_EQ(false, display_->rc == Camera::NO_ERROR);
-    if (display_->rc == Camera::NO_ERROR) {
+    EXPECT_EQ(false, display_->rc == NO_ERROR);
+    if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] CommitStreams success." << std::endl;
     } else {
         std::cout << "==========[test log] CommitStreams fail, rc = ." << display_->rc << std::endl;

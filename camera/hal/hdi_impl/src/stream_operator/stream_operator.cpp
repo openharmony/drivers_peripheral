@@ -304,6 +304,10 @@ int32_t StreamOperator::CommitStreams(OperationMode mode, const std::vector<uint
     CAMERA_LOGV("enter");
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamPipeline_, DEVICE_ERROR);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
+    if (modeSetting.empty()) {
+        CAMERA_LOGE("input vector is empty");
+        return INVALID_ARGUMENT;
+    }
     DFX_LOCAL_HITRACE_BEGIN;
 
     std::vector<StreamConfiguration> configs = {};
