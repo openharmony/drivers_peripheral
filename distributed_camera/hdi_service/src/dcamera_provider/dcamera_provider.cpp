@@ -66,8 +66,6 @@ int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::st
         DHLOGE("DCameraProvider::EnableDCameraDevice, dcamera host is null.");
         return DCamRetCode::DEVICE_NOT_INIT;
     }
-
-    std::lock_guard<std::mutex> autoLock(dcDeviceLock_);
     DCamRetCode ret = dCameraHost->AddDCameraDevice(dhBase, abilityInfo, callbackObj);
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("DCameraProvider::EnableDCameraDevice failed, ret = %d.", ret);
@@ -91,8 +89,6 @@ int32_t DCameraProvider::DisableDCameraDevice(const DHBase& dhBase)
         DHLOGE("DCameraProvider::DisableDCameraDevice, dcamera host is null.");
         return DCamRetCode::DEVICE_NOT_INIT;
     }
-
-    std::lock_guard<std::mutex> autoLock(dcDeviceLock_);
     DCamRetCode ret = dCameraHost->RemoveDCameraDevice(dhBase);
     if (ret != DCamRetCode::SUCCESS) {
         DHLOGE("DCameraProvider::DisableDCameraDevice failed, ret = %d.", ret);
