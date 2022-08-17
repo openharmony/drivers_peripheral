@@ -904,3 +904,19 @@ int32_t AudioProxyAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volu
     (void)volume;
     return HDF_ERR_NOT_SUPPORT;
 }
+
+int32_t AudioProxyAdapterUpdateAudioRoute(struct AudioAdapter *adapter,
+    const struct AudioRoute *route, int32_t *routeHandle)
+{
+    (void)adapter;
+    (void)route;
+    (void)routeHandle;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioProxyAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t routeHandle)
+{
+    (void)adapter;
+    (void)routeHandle;
+    return HDF_ERR_NOT_SUPPORT;
+}
