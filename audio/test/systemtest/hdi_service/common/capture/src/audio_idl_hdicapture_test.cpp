@@ -33,56 +33,40 @@ public:
     void TearDown();
     struct IAudioAdapter *adapter = nullptr;
     struct IAudioCapture *capture = nullptr;
-    static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
+    static TestGetAudioManager getAudioManager;
     static void *handle;
-    static void (*AudioManagerRelease)(struct IAudioManager *);
-    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
-    static void (*AudioCaptureRelease)(struct IAudioCapture *);
-    void ReleaseCaptureSource(void);
+    static TestAudioManagerRelease managerRelease;
+    static TestAudioAdapterRelease adapterRelease;
+    static TestAudioCaptureRelease captureRelease;
 };
 
 using THREAD_FUNC = void *(*)(void *);
-
-TestAudioManager *(*AudioIdlHdiCaptureTest::GetAudioManager)(const char *) = nullptr;
-TestAudioManager *AudioIdlHdiCaptureTest::manager = nullptr;
 void *AudioIdlHdiCaptureTest::handle = nullptr;
-void (*AudioIdlHdiCaptureTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
-void (*AudioIdlHdiCaptureTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
-void (*AudioIdlHdiCaptureTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
+TestGetAudioManager AudioIdlHdiCaptureTest::getAudioManager = nullptr;
+TestAudioManager *AudioIdlHdiCaptureTest::manager = nullptr;
+TestAudioManagerRelease AudioIdlHdiCaptureTest::managerRelease = nullptr;
+TestAudioAdapterRelease AudioIdlHdiCaptureTest::adapterRelease = nullptr;
+TestAudioCaptureRelease AudioIdlHdiCaptureTest::captureRelease = nullptr;
 
 void AudioIdlHdiCaptureTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handle = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handle);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handle, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
+    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    captureRelease = (TestAudioCaptureRelease)(dlsym(handle, "AudioCaptureRelease"));
+    ASSERT_NE(nullptr, captureRelease);
     (void)HdfRemoteGetCallingPid();
-    manager = GetAudioManager(IDL_SERVER_NAME.c_str());
+    manager = getAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handle, "AudioManagerRelease"));
-    ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handle, "AudioAdapterRelease"));
-    ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handle, "AudioCaptureRelease"));
-    ASSERT_NE(nullptr, AudioCaptureRelease);
 }
 
 void AudioIdlHdiCaptureTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease != nullptr) {
-        AudioManagerRelease(manager);
-        manager = nullptr;
-    }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (managerRelease != nullptr && manager != nullptr) {
+        (void)managerRelease(manager);
     }
     if (handle != nullptr) {
-        dlclose(handle);
-        handle = nullptr;
+        (void)dlclose(handle);
     }
 }
 
@@ -96,22 +80,10 @@ void AudioIdlHdiCaptureTest::SetUp(void)
 
 void AudioIdlHdiCaptureTest::TearDown(void)
 {
-    ReleaseCaptureSource();
+    int32_t ret = ReleaseCaptureSource(manager, adapter, capture, adapterRelease, captureRelease);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
-void AudioIdlHdiCaptureTest::ReleaseCaptureSource(void)
-{
-    if (capture != nullptr && AudioCaptureRelease != nullptr) {
-        adapter->DestroyCapture(adapter);
-        AudioCaptureRelease(capture);
-        capture = nullptr;
-    }
-    if (adapter != nullptr && AudioAdapterRelease != nullptr) {
-        manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-        AudioAdapterRelease(adapter);
-        adapter = nullptr;
-    }
-}
 /**
 * @tc.name  Test AudioCaptureCaptureFrame API via legal input
 * @tc.number  SUB_Audio_HDI_CaptureFrame_001
@@ -276,7 +248,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureGetCapturePosition_001, Te
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
     ASSERT_NE(nullptr, capture);
     struct PrepareAudioPara audiopara = {
-        .capture = capture, .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .capture = capture, .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
 
@@ -304,10 +276,10 @@ HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureGetCapturePosition_002, Te
     int32_t ret;
     int64_t timeExp = 0;
     uint64_t frames = 0;
-    struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
+    struct AudioTimeStamp timeCount = {.tvSec = 0, .tvNSec = 0};
     ASSERT_NE(nullptr, capture);
     struct PrepareAudioPara audiopara = {
-        .capture = capture, .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .capture = capture, .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
 
@@ -317,15 +289,15 @@ HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureGetCapturePosition_002, Te
     if (audiopara.capture != nullptr) {
         ret = audiopara.capture->Pause(audiopara.capture);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &time);
+        ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &timeCount);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        EXPECT_GT((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
+        EXPECT_GT((timeCount.tvSec) * SECTONSEC + (timeCount.tvNSec), timeExp);
         EXPECT_GT(frames, INITIAL_VALUE);
         ret = audiopara.capture->Resume(audiopara.capture);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &time);
+        ret = audiopara.capture->GetCapturePosition(audiopara.capture, &frames, &timeCount);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        EXPECT_GT((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
+        EXPECT_GT((timeCount.tvSec) * SECTONSEC + (timeCount.tvNSec), timeExp);
         EXPECT_GT(frames, INITIAL_VALUE);
     }
 
@@ -460,12 +432,11 @@ HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureGetCapturePosition_008, Te
 */
 HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_001, TestSize.Level1)
 {
-    int32_t ret;
     bool isRender = false;
     int32_t reqSize = 0;
     struct AudioMmapBufferDescripter desc = {};
     ASSERT_NE(nullptr, capture);
-    ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
+    int32_t ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->Start(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -559,12 +530,11 @@ HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_004, TestSiz
 */
 HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_005, TestSize.Level1)
 {
-    int32_t ret;
     bool isRender = false;
     int32_t reqSize = 0;
     struct AudioMmapBufferDescripter desc = {};
     ASSERT_NE(nullptr, capture);
-    ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
+    int32_t ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->Start(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -713,7 +683,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureGetMmapPosition_Null_005, 
     struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     struct PrepareAudioPara audiopara = {
-        .capture = capture, .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .capture = capture, .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_LOW_LATENCY_CAPTURE_FILE.c_str()
     };
 

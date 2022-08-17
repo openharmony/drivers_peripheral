@@ -600,7 +600,7 @@ void FrameStatus(int status)
 static int32_t CaptureTryOneFrame(struct IAudioCapture *capture,
     int8_t *frame, uint32_t *replyBytes, uint64_t requestBytes)
 {
-    int32_t tryNumFrame = 0;
+    int32_t tryNum = 0;
     int32_t ret;
 
     if (capture == nullptr || capture->CaptureFrame == nullptr ||
@@ -609,9 +609,9 @@ static int32_t CaptureTryOneFrame(struct IAudioCapture *capture,
     }
     do {
         ret = capture->CaptureFrame(capture, frame, replyBytes, requestBytes);
-        if (ret == -1) {
-            tryNumFrame++;
-            if (tryNumFrame <= TRY_NUM_FRAME) {
+        if (ret == HDF_FAILURE) {
+            tryNum++;
+            if (tryNum <= TRY_NUM_FRAME) {
                 continue;
             } else {
                 return ret;
@@ -917,6 +917,94 @@ void TestAudioPortCapabilityFree(struct AudioPortCapability *dataBlock, bool fre
     if (freeSelf) {
         OsalMemFree(dataBlock);
     }
+}
+
+int32_t LoadFuctionSymbol(void *&handle, TestGetAudioManager &getAudioManager, TestAudioManagerRelease &managerRelease,
+    TestAudioAdapterRelease &adapterRelease)
+{
+    char absPath[PATH_MAX] = {0};
+    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
+    if (path == nullptr) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:path is not exist\n", __func__);
+        return HDF_FAILURE;
+    }
+    handle = dlopen(absPath, RTLD_LAZY);
+    if (handle == nullptr) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:dlopen failed\n", __func__);
+        return HDF_FAILURE;
+    }
+    getAudioManager = (TestGetAudioManager)dlsym(handle, FUNCTION_NAME.c_str());
+    if (getAudioManager == nullptr) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:load getAudioManager failed\n", __func__);
+        return HDF_FAILURE;
+    }
+    managerRelease = (TestAudioManagerRelease)(dlsym(handle, "AudioManagerRelease"));
+    if (managerRelease == nullptr) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:load managerRelease failed\n", __func__);
+        return HDF_FAILURE;
+    }
+    adapterRelease = (TestAudioAdapterRelease)(dlsym(handle, "AudioAdapterRelease"));
+    if (adapterRelease == nullptr) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:load adapterRelease failed\n", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioCapture *&capture,
+    TestAudioAdapterRelease adapterRelease, TestAudioCaptureRelease captureRelease)
+{
+    if (manager == nullptr || adapter == nullptr || adapterRelease == nullptr || captureRelease == nullptr) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:param is nullptr\n", __func__);
+        return HDF_FAILURE;
+    }
+    if (manager->UnloadAdapter == nullptr || adapter->DestroyCapture == nullptr) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:fuction is nullptr\n", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t ret = adapter->DestroyCapture(adapter);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:DestroyCapture failed\n", __func__);
+        return HDF_FAILURE;
+    }
+    captureRelease(capture);
+    capture = nullptr;
+    ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:UnloadAdapter failed\n", __func__);
+        return HDF_FAILURE;
+    }
+    adapterRelease(adapter);
+    adapter = nullptr;
+    return HDF_SUCCESS;
+}
+
+int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioRender *&render,
+    TestAudioAdapterRelease adapterRelease, TestAudioRenderRelease renderRelease)
+{
+    if (manager == nullptr || adapter == nullptr || adapterRelease == nullptr || renderRelease == nullptr) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:param is nullptr\n", __func__);
+        return HDF_FAILURE;
+    }
+    if (manager->UnloadAdapter == nullptr || adapter->DestroyRender == nullptr) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:fuction is nullptr\n", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t ret = adapter->DestroyRender(adapter);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:DestroyCapture failed\n", __func__);
+        return HDF_FAILURE;
+    }
+    renderRelease(render);
+    render = nullptr;
+    ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AUDIO_TEST:UnloadAdapter failed\n", __func__);
+        return HDF_FAILURE;
+    }
+    adapterRelease(adapter);
+    adapter = nullptr;
+    return HDF_SUCCESS;
 }
 }
 }

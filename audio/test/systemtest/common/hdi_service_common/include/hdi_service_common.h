@@ -60,6 +60,11 @@ const int AUDIO_ADAPTER_MAX_NUM = 5;
 const std::string ADAPTER_NAME = "primary";
 const std::string ADAPTER_NAME_OUT = "primary_ext";
 using TestAudioManager = struct IAudioManager;
+using TestGetAudioManager = TestAudioManager *(*)(const char *);
+using TestAudioManagerRelease = void (*)(struct IAudioManager *);
+using TestAudioAdapterRelease = void (*)(struct IAudioAdapter *);
+using TestAudioCaptureRelease = void (*)(struct IAudioCapture *);
+using TestAudioRenderRelease = void (*)(struct IAudioRender *);
 
 const std::string AUDIO_RIFF = "RIFF";
 const std::string AUDIO_WAVE = "WAVE";
@@ -267,6 +272,15 @@ int32_t CheckWriteCompleteValue();
 void TestReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen);
 
 void TestAudioPortCapabilityFree(struct AudioPortCapability *dataBlock, bool freeSelf);
+
+int32_t LoadFuctionSymbol(void *&handle, TestGetAudioManager &getAudioManager, TestAudioManagerRelease &managerRelease,
+    TestAudioAdapterRelease &adapterRelease);
+
+int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioCapture *&capture,
+    TestAudioAdapterRelease adapterRelease, TestAudioCaptureRelease captureRelease);
+
+int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioRender *&render,
+    TestAudioAdapterRelease adapterRelease, TestAudioRenderRelease renderRelease);
 }
 }
 #endif // AUDIO_IDLHDI_COMMON_H
