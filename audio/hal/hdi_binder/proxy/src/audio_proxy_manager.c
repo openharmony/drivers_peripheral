@@ -171,6 +171,8 @@ static int32_t GetAudioProxyAdapterFunc(struct AudioHwAdapter *hwAdapter)
     hwAdapter->common.SetMicMute = AudioProxyAdapterSetMicMute;
     hwAdapter->common.GetMicMute = AudioProxyAdapterGetMicMute;
     hwAdapter->common.SetVoiceVolume = AudioProxyAdapterSetVoiceVolume;
+    hwAdapter->common.UpdateAudioRoute = AudioProxyAdapterUpdateAudioRoute;
+    hwAdapter->common.ReleaseAudioRoute = AudioProxyAdapterReleaseAudioRoute;
     return HDF_SUCCESS;
 }
 static int32_t AudioProxyManagerLoadAdapterDispatch(struct AudioHwAdapter *hwAdapter,
