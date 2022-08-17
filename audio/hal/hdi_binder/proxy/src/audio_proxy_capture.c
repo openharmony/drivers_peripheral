@@ -29,6 +29,7 @@ static int32_t AudioProxyCaptureCtrl(int cmId, const AudioHandle handle)
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioProxyPreprocessCapture(hwCapture, &data, &reply) < 0) {
+        AUDIO_FUNC_LOGE("AudioProxyPreprocessCapture failed.");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t ret = AudioProxyDispatchCall(hwCapture->proxyRemoteHandle, cmId, data, reply);
@@ -39,7 +40,7 @@ static int32_t AudioProxyCaptureCtrl(int cmId, const AudioHandle handle)
 int32_t AudioProxyCaptureStart(const AudioHandle handle)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -50,7 +51,7 @@ int32_t AudioProxyCaptureStart(const AudioHandle handle)
 int32_t AudioProxyCaptureStop(const AudioHandle handle)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -61,7 +62,7 @@ int32_t AudioProxyCaptureStop(const AudioHandle handle)
 int32_t AudioProxyCapturePause(const AudioHandle handle)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -72,7 +73,7 @@ int32_t AudioProxyCapturePause(const AudioHandle handle)
 int32_t AudioProxyCaptureResume(const AudioHandle handle)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -83,7 +84,7 @@ int32_t AudioProxyCaptureResume(const AudioHandle handle)
 int32_t AudioProxyCaptureFlush(const AudioHandle handle)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid, ret = %{public}d", ret);
         return ret;
@@ -126,7 +127,7 @@ static int32_t AudioProxyCaptureGetFrameParameter(int cmId, const AudioHandle ha
 
 int32_t AudioProxyCaptureGetFrameSize(const AudioHandle handle, uint64_t *size)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -136,7 +137,7 @@ int32_t AudioProxyCaptureGetFrameSize(const AudioHandle handle, uint64_t *size)
 
 int32_t AudioProxyCaptureGetFrameCount(const AudioHandle handle, uint64_t *count)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -146,7 +147,7 @@ int32_t AudioProxyCaptureGetFrameCount(const AudioHandle handle, uint64_t *count
 
 int32_t AudioProxyCaptureSetSampleAttributes(const AudioHandle handle, const struct AudioSampleAttributes *attrs)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -176,7 +177,7 @@ int32_t AudioProxyCaptureSetSampleAttributes(const AudioHandle handle, const str
 
 int32_t AudioProxyCaptureGetSampleAttributes(const AudioHandle handle, struct AudioSampleAttributes *attrs)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -210,7 +211,7 @@ int32_t AudioProxyCaptureGetSampleAttributes(const AudioHandle handle, struct Au
 
 int32_t AudioProxyCaptureGetCurrentChannelId(const AudioHandle handle, uint32_t *channelId)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -247,7 +248,7 @@ int32_t AudioProxyCaptureGetCurrentChannelId(const AudioHandle handle, uint32_t 
 int32_t AudioProxyCaptureCheckSceneCapability(const AudioHandle handle,
     const struct AudioSceneDescriptor *scene, bool *supported)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -297,7 +298,7 @@ int32_t AudioProxyCaptureCheckSceneCapability(const AudioHandle handle,
 
 int32_t AudioProxyCaptureSelectScene(const AudioHandle handle, const struct AudioSceneDescriptor *scene)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -331,7 +332,7 @@ int32_t AudioProxyCaptureSelectScene(const AudioHandle handle, const struct Audi
 
 int32_t AudioProxyCaptureSetMute(const AudioHandle handle, bool mute)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -358,7 +359,7 @@ int32_t AudioProxyCaptureSetMute(const AudioHandle handle, bool mute)
 
 int32_t AudioProxyCaptureGetMute(const AudioHandle handle, bool *mute)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -394,7 +395,7 @@ int32_t AudioProxyCaptureGetMute(const AudioHandle handle, bool *mute)
 
 int32_t AudioProxyCaptureSetVolume(const AudioHandle handle, float volume)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -404,7 +405,7 @@ int32_t AudioProxyCaptureSetVolume(const AudioHandle handle, float volume)
 
 int32_t AudioProxyCaptureGetVolume(const AudioHandle handle, float *volume)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -414,7 +415,7 @@ int32_t AudioProxyCaptureGetVolume(const AudioHandle handle, float *volume)
 
 int32_t AudioProxyCaptureGetGainThreshold(const AudioHandle handle, float *min, float *max)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -456,7 +457,7 @@ int32_t AudioProxyCaptureGetGainThreshold(const AudioHandle handle, float *min, 
 
 int32_t AudioProxyCaptureGetGain(const AudioHandle handle, float *gain)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -466,7 +467,7 @@ int32_t AudioProxyCaptureGetGain(const AudioHandle handle, float *gain)
 
 int32_t AudioProxyCaptureSetGain(const AudioHandle handle, float gain)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -501,7 +502,7 @@ static int32_t AudioProxyCaptureCaptureFrameSplit(struct AudioCapture *capture,
 int32_t AudioProxyCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
                                       uint64_t requestBytes, uint64_t *replyBytes)
 {
-    int32_t ret = AudioCheckCaptureAddr((AudioHandle)capture); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr((AudioHandle)capture);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -543,7 +544,7 @@ int32_t AudioProxyCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
 int32_t AudioProxyCaptureGetCapturePosition(struct AudioCapture *capture,
     uint64_t *frames, struct AudioTimeStamp *time)
 {
-    int32_t ret = AudioCheckCaptureAddr((AudioHandle)capture); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr((AudioHandle)capture);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -577,7 +578,7 @@ int32_t AudioProxyCaptureGetCapturePosition(struct AudioCapture *capture,
 }
 int32_t AudioProxyCaptureSetExtraParams(const AudioHandle handle, const char *keyValueList)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -605,7 +606,7 @@ int32_t AudioProxyCaptureSetExtraParams(const AudioHandle handle, const char *ke
 }
 int32_t AudioProxyCaptureGetExtraParams(const AudioHandle handle, char *keyValueList, int32_t listLenth)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -652,7 +653,7 @@ int32_t AudioProxyCaptureGetExtraParams(const AudioHandle handle, char *keyValue
 int32_t AudioProxyCaptureReqMmapBuffer(const AudioHandle handle,
     int32_t reqSize, struct AudioMmapBufferDescripter *desc)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -688,7 +689,7 @@ int32_t AudioProxyCaptureReqMmapBuffer(const AudioHandle handle,
 
 int32_t AudioProxyCaptureGetMmapPosition(const AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -725,23 +726,25 @@ int32_t AudioProxyCaptureGetMmapPosition(const AudioHandle handle, uint64_t *fra
 
 int32_t AudioProxyCaptureAddEffect(AudioHandle handle, uint64_t effectid)
 {
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    struct AudioHwCapture *hwCapture = NULL;
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
     }
     if (handle == NULL) {
-        AUDIO_FUNC_LOGE("handle is empty");
+        AUDIO_FUNC_LOGE("The handle is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    struct HdfSBuf *data = NULL;
-    struct HdfSBuf *reply = NULL;
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
+    hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("The pointer is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioProxyPreprocessCapture(hwCapture, &data, &reply) < 0) {
+        AUDIO_FUNC_LOGE("AudioProxyPreprocessCapture failed.");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (!HdfSbufWriteUint64(data, effectid)) {
@@ -763,11 +766,11 @@ int32_t AudioProxyCaptureRemoveEffect(AudioHandle handle, uint64_t effectid)
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxy render address passed in is invalid");
+        AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
     }
     if (handle == NULL) {
-        AUDIO_FUNC_LOGE("handle is empty");
+        AUDIO_FUNC_LOGE("The capture handle is empty");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct HdfSBuf *reply = NULL;
@@ -797,7 +800,7 @@ int32_t AudioProxyCaptureRemoveEffect(AudioHandle handle, uint64_t effectid)
 
 int32_t AudioProxyCaptureTurnStandbyMode(const AudioHandle handle)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;
@@ -828,7 +831,7 @@ int32_t AudioProxyCaptureTurnStandbyMode(const AudioHandle handle)
 }
 int32_t AudioProxyCaptureAudioDevDump(const AudioHandle handle, int32_t range, int32_t fd)
 {
-    int32_t ret = AudioCheckCaptureAddr(handle); // Fuzz test
+    int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
         return ret;

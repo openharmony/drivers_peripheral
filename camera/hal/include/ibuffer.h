@@ -28,7 +28,7 @@ enum CameraBufferStatus {
 
 class IBuffer {
 public:
-    virtual ~IBuffer(){}
+    virtual ~IBuffer() {}
 
     virtual int32_t GetIndex() const = 0;
     virtual uint32_t GetWidth() const = 0;

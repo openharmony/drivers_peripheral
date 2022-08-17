@@ -23,11 +23,11 @@ public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
 
-    void SetUp(void) const;
-    void TearDown(void) const;
+    void SetUp(void);
+    void TearDown(void);
     class TestBufferConsumerListener : public IBufferConsumerListener {
     public:
-        void OnBufferAvailable() const
+        void OnBufferAvailable()
         {
         }
 

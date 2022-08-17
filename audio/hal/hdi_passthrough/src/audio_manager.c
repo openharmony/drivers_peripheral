@@ -201,7 +201,7 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
         AUDIO_FUNC_LOGE("sopath is error");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (*descs != NULL && size != NULL && (*size) > 0) { // Fuzz test
+    if (*descs != NULL && size != NULL && (*size) > 0) {
         g_localAddrAudioAdapterOut  = *descs;
         g_localAdapterNum = *size;
     } else {
@@ -368,7 +368,7 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
         AUDIO_FUNC_LOGE("g_localAdapterNum is invalid!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (g_localAddrAudioAdapterOut != NULL) { // Fuzz test
+    if (g_localAddrAudioAdapterOut != NULL) {
         for (int index = 0; index < g_localAdapterNum; index++) {
             if (&g_localAddrAudioAdapterOut[index] == desc) {
                 descFlag = true;

@@ -44,7 +44,7 @@ static int AudioHdiUsbServerBind(struct HdfDeviceObject *deviceObject)
         AUDIO_FUNC_LOGE("deviceObject is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    static struct IDeviceIoService hdiService = {
+    static struct IDeviceIoService hdiUsbService = {
         .Dispatch = HdiServiceDispatch,
         .Open = NULL,
         .Release = NULL,
@@ -58,7 +58,7 @@ static int AudioHdiUsbServerBind(struct HdfDeviceObject *deviceObject)
         AUDIO_FUNC_LOGE("failed to set interface desc");
         return ret;
     }
-    deviceObject->service = &hdiService;
+    deviceObject->service = &hdiUsbService;
     AUDIO_FUNC_LOGD("end!");
     return AUDIO_HAL_SUCCESS;
 }
