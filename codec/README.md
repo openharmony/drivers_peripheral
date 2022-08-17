@@ -167,11 +167,11 @@ The codec module also provides codec HDI 2.0 APIs based on the OMX interfaces. T
 **Table  2**  HDI 2.0 APIs of the codec module
 
 <a name="table1513255710560"></a>
-<table><thead align="left"><tr id="row171321857155518"><th class="cellrowborder" align="center" valign="top" width="12.821282128212822%" id="mcps1.2.4.2.1"><p id="p6132957115521"><a name="p6132957115521"></a><a name="p6132957115521"></a>头文件</p>
+<table><thead align="left"><tr id="row171321857155518"><th class="cellrowborder" align="center" valign="top" width="12.821282128212822%" id="mcps1.2.4.2.1"><p id="p6132957115521"><a name="p6132957115521"></a><a name="p6132957115521"></a>Header File</p>
 </th>
-<th class="cellrowborder" align="center" valign="top" width="63.61636163616362%" id="mcps1.2.4.2.2"><p id="p14132125715562"><a name="p14132125715562"></a><a name="p14132125715562"></a>接口名称</p>
+<th class="cellrowborder" align="center" valign="top" width="63.61636163616362%" id="mcps1.2.4.2.2"><p id="p14132125715562"><a name="p14132125715562"></a><a name="p14132125715562"></a>API</p>
 </th>
-<th class="cellrowborder" align="center" valign="top" width="23.562356235623565%" id="mcps1.2.4.2.3"><p id="p18132205755526"><a name="p18132205755526"></a><a name="p18132205755526"></a>功能描述</p>
+<th class="cellrowborder" align="center" valign="top" width="23.562356235623565%" id="mcps1.2.4.2.3"><p id="p18132205755526"><a name="p18132205755526"></a><a name="p18132205755526"></a>Description</p>
 </th>
 </tr>
 </thead>
