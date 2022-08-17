@@ -27,56 +27,41 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct IAudioAdapter *adapter = nullptr;
     struct IAudioRender *render = nullptr;
-    static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
-    static void *handleSo;
-    static void (*AudioManagerRelease)(struct IAudioManager *);
-    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
-    static void (*AudioRenderRelease)(struct IAudioRender *);
-    void ReleaseAudioSource(void);
+    struct IAudioAdapter *adapter = nullptr;
+    static void *handle;
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManagerRelease managerRelease;
+    static TestAudioAdapterRelease adapterRelease;
+    static TestAudioRenderRelease renderRelease;
 };
 
-TestAudioManager *(*AudioIdlHdiRenderSceneTest::GetAudioManager)(const char *) = nullptr;
+TestGetAudioManager AudioIdlHdiRenderSceneTest::getAudioManager = nullptr;
 TestAudioManager *AudioIdlHdiRenderSceneTest::manager = nullptr;
-void *AudioIdlHdiRenderSceneTest::handleSo = nullptr;
-void (*AudioIdlHdiRenderSceneTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
-void (*AudioIdlHdiRenderSceneTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
-void (*AudioIdlHdiRenderSceneTest::AudioRenderRelease)(struct IAudioRender *) = nullptr;
+void *AudioIdlHdiRenderSceneTest::handle = nullptr;
+TestAudioManagerRelease AudioIdlHdiRenderSceneTest::managerRelease = nullptr;
+TestAudioAdapterRelease AudioIdlHdiRenderSceneTest::adapterRelease = nullptr;
+TestAudioRenderRelease AudioIdlHdiRenderSceneTest::renderRelease = nullptr;
 
 void AudioIdlHdiRenderSceneTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handleSo);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
+    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    renderRelease = (TestAudioRenderRelease)(dlsym(handle, "AudioRenderRelease"));
+    ASSERT_NE(nullptr, renderRelease);
     (void)HdfRemoteGetCallingPid();
-    manager = GetAudioManager(IDL_SERVER_NAME.c_str());
+    manager = getAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
-    ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
-    ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(handleSo, "AudioRenderRelease"));
-    ASSERT_NE(nullptr, AudioRenderRelease);
 }
 
 void AudioIdlHdiRenderSceneTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease != nullptr) {
-        AudioManagerRelease(manager);
-        manager = nullptr;
+    if (managerRelease != nullptr && manager != nullptr) {
+        (void)managerRelease(manager);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
-    }
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
 }
 
@@ -90,24 +75,8 @@ void AudioIdlHdiRenderSceneTest::SetUp(void)
 
 void AudioIdlHdiRenderSceneTest::TearDown(void)
 {
-    ReleaseAudioSource();
-}
-
-void AudioIdlHdiRenderSceneTest::ReleaseAudioSource(void)
-{
-    int32_t ret = -1;
-    if (render != nullptr && AudioRenderRelease != nullptr) {
-        ret = adapter->DestroyRender(adapter);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        AudioRenderRelease(render);
-        render = nullptr;
-    }
-    if (adapter != nullptr && AudioAdapterRelease != nullptr) {
-        ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        AudioAdapterRelease(adapter);
-        adapter = nullptr;
-    }
+    int32_t ret = ReleaseRenderSource(manager, adapter, render, adapterRelease, renderRelease);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 /**

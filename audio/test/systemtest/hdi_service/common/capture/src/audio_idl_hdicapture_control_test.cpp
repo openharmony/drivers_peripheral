@@ -27,58 +27,42 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct IAudioAdapter *adapter = nullptr;
     struct IAudioCapture *capture = nullptr;
-    static TestAudioManager *(*GetAudioManager)(const char *);
+    struct IAudioAdapter *adapter = nullptr;
+    static TestGetAudioManager getAudioManager;
+    static void *handle;
     static TestAudioManager *manager;
-    static void *handleSo;
-    static void (*AudioManagerRelease)(struct IAudioManager *);
-    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
-    static void (*AudioCaptureRelease)(struct IAudioCapture *);
-    void ReleaseCaptureSource(void);
+    static TestAudioManagerRelease managerRelease;
+    static TestAudioCaptureRelease captureRelease;
+    static TestAudioAdapterRelease adapterRelease;
 };
 
 using THREAD_FUNC = void *(*)(void *);
-
-TestAudioManager *(*AudioIdlHdiCaptureControlTest::GetAudioManager)(const char *) = nullptr;
+void *AudioIdlHdiCaptureControlTest::handle = nullptr;
+TestGetAudioManager AudioIdlHdiCaptureControlTest::getAudioManager = nullptr;
 TestAudioManager *AudioIdlHdiCaptureControlTest::manager = nullptr;
-void *AudioIdlHdiCaptureControlTest::handleSo = nullptr;
-void (*AudioIdlHdiCaptureControlTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
-void (*AudioIdlHdiCaptureControlTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
-void (*AudioIdlHdiCaptureControlTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
+TestAudioManagerRelease AudioIdlHdiCaptureControlTest::managerRelease = nullptr;
+TestAudioAdapterRelease AudioIdlHdiCaptureControlTest::adapterRelease = nullptr;
+TestAudioCaptureRelease AudioIdlHdiCaptureControlTest::captureRelease = nullptr;
 
 void AudioIdlHdiCaptureControlTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handleSo);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
+    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    captureRelease = (TestAudioCaptureRelease)(dlsym(handle, "AudioCaptureRelease"));
+    ASSERT_NE(nullptr, captureRelease);
     (void)HdfRemoteGetCallingPid();
-    manager = GetAudioManager(IDL_SERVER_NAME.c_str());
+    manager = getAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
-    ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
-    ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handleSo, "AudioCaptureRelease"));
-    ASSERT_NE(nullptr, AudioCaptureRelease);
 }
 
 void AudioIdlHdiCaptureControlTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease != nullptr) {
-        AudioManagerRelease(manager);
-        manager = nullptr;
+    if (managerRelease != nullptr && manager != nullptr) {
+        (void)managerRelease(manager);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
-    }
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
 }
 
@@ -92,22 +76,10 @@ void AudioIdlHdiCaptureControlTest::SetUp(void)
 
 void AudioIdlHdiCaptureControlTest::TearDown(void)
 {
-    ReleaseCaptureSource();
+    int32_t ret = ReleaseCaptureSource(manager, adapter, capture, adapterRelease, captureRelease);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
-void AudioIdlHdiCaptureControlTest::ReleaseCaptureSource(void)
-{
-    if (capture != nullptr && AudioCaptureRelease != nullptr) {
-        adapter->DestroyCapture(adapter);
-        AudioCaptureRelease(capture);
-        capture = nullptr;
-    }
-    if (adapter != nullptr && AudioAdapterRelease != nullptr) {
-        manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-        AudioAdapterRelease(adapter);
-        adapter = nullptr;
-    }
-}
 /**
 * @tc.name  Test AudioCaptureStart API via legal input
 * @tc.number  SUB_Audio_HDI_StartCapture_001
@@ -524,7 +496,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_001, T
     }
     struct PrepareAudioPara audiopara = {
         .capture = capture, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(),
-        .self = this, .pins = PIN_OUT_SPEAKER, .path = AUDIO_CAPTURE_FILE.c_str()
+        .pins = PIN_OUT_SPEAKER, .path = AUDIO_CAPTURE_FILE.c_str()
     };
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     if (ret < 0) {
@@ -554,20 +526,20 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_002, T
     int32_t ret = -1;
     char path[] = "./DevDump.log";
     ASSERT_NE(nullptr, capture);
-    FILE *fp = fopen(path, "wb+");
-    ASSERT_NE(nullptr, fp);
-    int fd = fileno(fp);
+    FILE *file = fopen(path, "wb+");
+    ASSERT_NE(nullptr, file);
+    int fd = fileno(file);
     if (fd == -1) {
-        fclose(fp);
+        fclose(file);
         ASSERT_NE(fd, -1);
     }
     struct PrepareAudioPara audiopara = {
         .capture = capture, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(),
-        .self = this, .pins = PIN_OUT_SPEAKER, .path = AUDIO_CAPTURE_FILE.c_str()
+        .pins = PIN_OUT_SPEAKER, .path = AUDIO_CAPTURE_FILE.c_str()
     };
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     if (ret < 0) {
-        fclose(fp);
+        fclose(file);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
@@ -578,7 +550,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_002, T
     sleep(1);
     ret = audiopara.capture->Resume(audiopara.capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    fclose(fp);
+    fclose(file);
     ret = ThreadRelease(audiopara);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
@@ -594,18 +566,18 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_003, T
     int32_t ret = -1;
     char pathBuf[] = "./DevDump.log";
     ASSERT_NE(nullptr, capture);
-    FILE *fp = fopen(pathBuf, "wb+");
-    ASSERT_NE(nullptr, fp);
-    int fd = fileno(fp);
+    FILE *file = fopen(pathBuf, "wb+");
+    ASSERT_NE(nullptr, file);
+    int fd = fileno(file);
     if (fd == -1) {
-        fclose(fp);
+        fclose(file);
         ASSERT_NE(fd, -1);
     }
     ret = capture->AudioDevDump(capture, RANGE-1, fd);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->AudioDevDump(capture, OUT_OF_RANGE, fd);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    fclose(fp);
+    fclose(file);
 }
 /**
 * @tc.name    Test CaptureAudioDevDump API via setting the incoming parameter self is nullptr
