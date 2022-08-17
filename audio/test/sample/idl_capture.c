@@ -282,7 +282,7 @@ static uint32_t StringToInt(const char *str)
     return temp;
 }
 
-static int32_t AddWavFileHeader(struct StrParaCapture *strParam)
+static int32_t AddWavFileHeader(const struct StrParaCapture *strParam)
 {
     if (strParam == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
