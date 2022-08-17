@@ -18,8 +18,6 @@
 
 #include "v1_0/id_camera_provider.h"
 
-#include <mutex>
-
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::HDI::DistributedCamera::V1_0;
@@ -70,7 +68,6 @@ private:
     };
     static AutoRelease autoRelease_;
     static OHOS::sptr<DCameraProvider> instance_;
-    std::mutex dcDeviceLock_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -289,10 +289,9 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
     }
     bufferConfigMap_.erase(bufCfg);
     {
-        std::lock_guard<std::mutex> lck(lock_);
         captureBufferCount_--;
+        cv_.notify_one();
     }
-    cv_.notify_one();
     return DCamRetCode::SUCCESS;
 }
 
@@ -324,8 +323,8 @@ DCamRetCode DCameraStream::FlushDCameraBuffer()
             dcStreamInfo_->streamId_, captureBufferCount_);
     }
     {
-        std::unique_lock<std::mutex> lck(lock_);
-        cv_.wait(lck, [this] { return !captureBufferCount_; });
+        std::unique_lock<std::mutex> l(lock_);
+        cv_.wait(l, [this] { return !captureBufferCount_; });
     }
 
     while (true) {
