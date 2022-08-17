@@ -117,6 +117,9 @@ int32_t AudioProxyCaptureAudioDevDump(AudioHandle capture, int32_t range, int32_
 int32_t AudioProxyAdapterSetMicMute(struct AudioAdapter *adapter, bool mute);
 int32_t AudioProxyAdapterGetMicMute(struct AudioAdapter *adapter, bool *mute);
 int32_t AudioProxyAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume);
+int32_t AudioProxyAdapterUpdateAudioRoute(struct AudioAdapter *adapter,
+    const struct AudioRoute *route, int32_t *routeHandle);
+int32_t AudioProxyAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t routeHandle);
 #ifdef __cplusplus
 }
 #endif
