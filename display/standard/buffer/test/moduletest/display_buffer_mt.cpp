@@ -101,7 +101,7 @@ static void DumpBufferHandle(const BufferHandle& handle)
 static void RunOnce(const AllocInfo& info)
 {
     static int32_t count = 0;
-    IDisplayBuffer* dispbuf = IDisplayBuffer::Get<DisplayBufferHdiImpl>();
+    IDisplayBuffer* dispbuf = IDisplayBuffer::Get();
     if (dispbuf == nullptr) {
         HDF_LOGE("Can't get IDisplayBuffer interface.");
         return;

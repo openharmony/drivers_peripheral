@@ -63,17 +63,11 @@ ohos_unittest("dispcomptest") {
   deps = [
     ":disp_dev_hdi_test_common",
     "//drivers/hdf_core/adapter/uhdf2/model/display/buffer/v1_0:libdisplay_buffer_hdi_impl",
-    "//drivers/interface/display/buffer/v1_0:libdisplay_buffer_proxy_1.0",
-    "//drivers/interface/display/composer/v1_0:libdisplay_composer_proxy_1.0",
     "//third_party/googletest:gtest_main",
   ]
   include_dirs = [
     "common",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//foundation/graphic/graphic_2d/utils/buffer_handle/export",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/command_pack",
-    "//drivers/interface/display/composer",
-    "//drivers/interface/display/buffer",
     "//drivers/hdf_core/adapter/uhdf2/model/display/composer",
     "//drivers/hdf_core/adapter/uhdf2/model/display/buffer",
     "//drivers/peripheral/display/standard/utils/include",
@@ -85,6 +79,8 @@ ohos_unittest("dispcomptest") {
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
+    "drivers_interface_display:libdisplay_buffer_proxy_1.0",
+    "drivers_interface_display:libdisplay_composer_proxy_1.0",
   ]
   cflags = [ "-Wno-unused-function" ]
   subsystem_name = "hdf"
