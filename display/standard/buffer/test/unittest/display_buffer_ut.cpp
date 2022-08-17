@@ -291,7 +291,7 @@ static bool CheckBufferHandle(AllocTestPrms &info, BufferHandle &buffer)
 
 void DisplayBufferUt::SetUp()
 {
-    displayBuffer_ = IDisplayBuffer::Get<DisplayBufferHdiImpl>();
+    displayBuffer_ = IDisplayBuffer::Get();
 
     if (displayBuffer_ == nullptr) {
         fprintf(stderr, "IDisplayBuffer get failed\n");

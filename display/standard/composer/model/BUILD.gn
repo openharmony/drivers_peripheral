@@ -23,7 +23,7 @@ group("display_composer_model") {
 
 config("display_composer_hwi_impl_config") {
     include_dirs = [
-        "//drivers/hdf_core/adapter/uhdf2/model/display/base/buffer_parcelable",
+        "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
         "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
         "//drivers/peripheral/display/standard/utils/include",
         "//drivers/peripheral/display/standard/composer/hdi_service/include",
@@ -87,7 +87,7 @@ ohos_shared_library("display_composer_vendor") {
         "include",
         "//drivers/interface/display/buffer",
         "//drivers/hdf_core/adapter/uhdf2/model/display/buffer",
-        "//drivers/hdf_core/adapter/uhdf2/model/display/base/buffer_parcelable",
+        "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
         "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
         "//drivers/peripheral/display/standard/buffer/model/include",
         "//drivers/peripheral/display/standard/buffer/hdi_service/include",

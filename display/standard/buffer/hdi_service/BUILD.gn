@@ -27,7 +27,7 @@ ohos_shared_library("liballocator_interface_service_1.0") {
   include_dirs = [
     "include",
     "//drivers/interface/display/buffer",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/buffer_parcelable",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
     "//drivers/peripheral/display/standard/utils/include",
     "//drivers/peripheral/display/standard/buffer/hdi_service/include",
   ]
@@ -36,7 +36,7 @@ ohos_shared_library("liballocator_interface_service_1.0") {
   deps = []
 
   public_deps = [
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/buffer_parcelable:libbufferhandle_parcelable",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable:libbufferhandle_parcelable",
     "//drivers/interface/display/buffer/v1_0:libdisplay_buffer_stub_1.0",
   ]
 
@@ -75,7 +75,7 @@ ohos_shared_library("libmapper_interface_service_1.0") {
   include_dirs = [
     "include",
     "//drivers/interface/display/buffer",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/buffer_parcelable",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
     "//drivers/peripheral/display/standard/utils/include",
     "//drivers/peripheral/display/standard/buffer/hdi_service/include",
   ]
@@ -84,7 +84,7 @@ ohos_shared_library("libmapper_interface_service_1.0") {
   deps = []
 
   public_deps = [
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/buffer_parcelable:libbufferhandle_parcelable",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable:libbufferhandle_parcelable",
     "//drivers/interface/display/buffer/v1_0:libdisplay_buffer_stub_1.0",
   ]
 

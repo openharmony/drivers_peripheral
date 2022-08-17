@@ -17,14 +17,16 @@
 #include <mutex>
 #include "v1_0/include/idisplay_buffer.h"
 #include "v1_0/hdi_impl/display_buffer_hdi_impl.h"
+#include "v1_0/display_composer_type.h"
 #include "v1_0/hdi_impl/display_composer_hdi_impl.h"
 #include "hdi_test_device_common.h"
 
-using namespace OHOS::HDI::Display::Buffer::V1_0;
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace TEST {
+
+using namespace OHOS::HDI::Display::Buffer::V1_0;
 HdiTestDevice &HdiTestDevice::GetInstance()
 {
     static HdiTestDevice device;
@@ -45,11 +47,11 @@ void HdiTestDevice::HotPlug(uint32_t outputId, bool connected, void *data)
 int32_t HdiTestDevice::InitDevice()
 {
     int ret = DISPLAY_SUCCESS;
-    displayDevice_ = HdiDisplayComposer::create();
+    displayDevice_.reset(HdiDisplayComposer::Create());
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("DeviceInitialize Failed"));
     DISPLAY_TEST_CHK_RETURN((displayDevice_ == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("device funcs is null"));
 
-    gralloc_.reset(IDisplayBuffer::Get<DisplayBufferHdiImpl>());
+    gralloc_.reset(IDisplayBuffer::Get());
 
     displayDevice_->RegHotPlugCallback(HotPlug, static_cast<void *>(this));
     return DISPLAY_SUCCESS;
