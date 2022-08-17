@@ -26,7 +26,7 @@ using namespace OHOS::HDI::Light::V1_0;
 using namespace testing::ext;
 
 namespace {
-    constexpr uint32_t g_sleepTime = 30;
+    constexpr uint32_t g_sleepTime = 2;
     constexpr int32_t g_minLightId = HDF_LIGHT_ID_BATTERY;
     constexpr int32_t g_maxLightId = HDF_LIGHT_ID_ATTENTION;
     constexpr int32_t g_onTime = 500;
