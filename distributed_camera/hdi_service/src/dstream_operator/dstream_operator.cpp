@@ -535,7 +535,7 @@ DCamRetCode DStreamOperator::AcquireBuffer(int streamId, DCameraBuffer &buffer)
 DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const DCameraBuffer &buffer)
 {
     DHLOGD("DStreamOperator::ShutterBuffer begin shutter buffer for streamId = %d", streamId);
-    std::unique_lock<std::mutex> lock(requestLock_);
+
     int32_t captureId = -1;
     for (auto iter = halCaptureInfoMap_.begin(); iter != halCaptureInfoMap_.end(); iter++) {
         std::shared_ptr<CaptureInfo> captureInfo = iter->second;
