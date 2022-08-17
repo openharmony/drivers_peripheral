@@ -422,7 +422,7 @@ static int32_t AudioManagerServiceRemvAdapter(struct IAudioManager *manager, uin
     }
     if (hwAdapter->portCapabilitys != NULL) {
         uint32_t portsLen = hwAdapter->adapterDescriptor.portsLen;
-        int32_t i = 0;
+        uint32_t i = 0;
         while (i < portsLen) {
             if (&hwAdapter->portCapabilitys[i] != NULL) {
                 AudioMemFree((void **)&hwAdapter->portCapabilitys[i].capability.subPorts);

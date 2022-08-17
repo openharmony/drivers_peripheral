@@ -1354,7 +1354,7 @@ int32_t main(int32_t argc, char const *argv[])
         return HDF_FAILURE;
     }
     (void)fclose(file);
-    if (InitParam()) { // init
+    if (InitParam() != HDF_SUCCESS) { // init
         AUDIO_FUNC_LOGE("InitParam Fail!");
         return HDF_FAILURE;
     }
