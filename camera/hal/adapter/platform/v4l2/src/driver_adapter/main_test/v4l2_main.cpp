@@ -255,7 +255,7 @@ void ProcessImage(const unsigned char* p, unsigned char* fbp)
             fbp[location + 1] = ((r & 0xF8) | (g >> 5)); // 5:32 bits
             yPos += 2; // 2:y position
 
-            if (j & 0x01) {
+            if ((j & 0x01) != 0) {
                 uPos += 4; // 4:u position
                 vPos += 4; // 4:v position
             }

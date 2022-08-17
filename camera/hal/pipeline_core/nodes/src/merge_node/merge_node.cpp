@@ -114,7 +114,7 @@ void MergeNode::MergeBuffers()
                             tmpVec_.clear();
                         }
                     }
-                    usleep(20);
+                    usleep(20); // sleeping for 20 ms
                 }
             }
         }
