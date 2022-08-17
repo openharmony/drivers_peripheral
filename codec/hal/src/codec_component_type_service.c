@@ -191,7 +191,7 @@ static int32_t CodecComponentTypeUseEglImage(struct CodecComponentType *self,
     return OmxAdapterUseEglImage(service->codecNode, buffer, portIndex, eglImage, eglImageLen);
 }
 
-int32_t CodecComponentTypeComponentRoleEnum(struct CodecComponentType *self,
+static int32_t CodecComponentTypeComponentRoleEnum(struct CodecComponentType *self,
     uint8_t *role, uint32_t roleLen, uint32_t index)
 {
     HDF_LOGI("%{public}s, service impl!", __func__);

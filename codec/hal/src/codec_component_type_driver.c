@@ -87,7 +87,7 @@ static int32_t HdfCodecComponentTypeDriverBind(struct HdfDeviceObject *deviceObj
     return HDF_SUCCESS;
 }
 
-void HdfCodecComponentTypeDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfCodecComponentTypeDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfCodecComponentTypeDriverRelease enter.");
     struct HdfCodecComponentTypeHost *omxcomponenttypeHost =

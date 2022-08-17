@@ -28,15 +28,19 @@ using namespace OHOS;
 
 #define HDF_LOG_TAG codec_omx_hdi_enc
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiEncode::gralloc_ = nullptr;
-constexpr int32_t FRAME = 30 << 16;
-constexpr int32_t BUFFER_COUNT = 10;
-constexpr int32_t BITRATE = 3000000;
-constexpr int32_t FD_SIZE = sizeof(int);
-constexpr const char *ENCODER_AVC = "OMX.rk.video_encoder.avc";
+
+namespace {
+    constexpr int32_t FRAME = 30 << 16;
+    constexpr int32_t BUFFER_COUNT = 10;
+    constexpr int32_t BITRATE = 3000000;
+    constexpr int32_t FD_SIZE = sizeof(int);
+    constexpr const char *ENCODER_AVC = "OMX.rk.video_encoder.avc";
+    constexpr int32_t DENOMINATOR = 2;
+    constexpr int32_t NUMERATOR = 3;
+}
+
 #define AV_COLOR_FORMAT OMX_COLOR_FormatYUV420SemiPlanar
 
-constexpr int32_t DENOMINATOR = 2;
-constexpr int32_t NUMERATOR = 3;
 static CodecHdiEncode *g_core = nullptr;
 CodecHdiEncode::CodecHdiEncode() : fpIn_(nullptr), fpOut_(nullptr)
 {
