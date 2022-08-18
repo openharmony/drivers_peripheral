@@ -473,7 +473,7 @@ static int32_t FrameStart(const struct StrPara *param)
     }
     do {
         readSize = (remainingDataSize > bufferSize) ? bufferSize : remainingDataSize;
-        numRead = (uint32_t)fread(frame, 1, readSize, g_file);
+        numRead = (uint32_t)fread(frame, 1, (size_t)readSize, g_file);
         if (numRead > 0) {
             ret = render->RenderFrame(render, (int8_t *)frame, (size_t)numRead, &replyBytes);
             if (ret == HDF_ERR_INVALID_OBJECT) {

@@ -779,7 +779,6 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
-        AUDIO_FUNC_LOGE("AudioProxyPreprocessSBuf Fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
@@ -790,18 +789,15 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
     }
 
     if (AudioProxyWriteTokenAndNameForSetPassThrough(hwAdapter, data) != AUDIO_HAL_SUCCESS) {
-        AUDIO_FUNC_LOGE("Failed to write token or adapter name");
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyAdapterSetAndGetPassthroughModeSBuf(data, reply, port) < 0) {
-        AUDIO_FUNC_LOGE("Failed to obtain data");
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
-    uint32_t tempMode = (uint32_t)mode;
-    if (!HdfSbufWriteUint32(data, tempMode)) {
+    if (!HdfSbufWriteUint32(data, (uint32_t)mode)) {
         AUDIO_FUNC_LOGE("Mode Write Fail");
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -809,7 +805,7 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
     ret = AudioProxyDispatchCall(hwAdapter->proxyRemoteHandle, AUDIO_HDI_ADT_SET_PASS_MODE, data, reply);
     if (ret < 0) {
         AudioProxyBufReplyRecycle(data, reply);
-        AUDIO_FUNC_LOGE("Failed to send server");
+        AUDIO_FUNC_LOGE("Failed to send server, ret = %{public}d", ret);
         return ret;
     }
     AudioProxyBufReplyRecycle(data, reply);

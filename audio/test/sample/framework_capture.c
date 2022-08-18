@@ -25,6 +25,9 @@
 #include "ioservstat_listener.h"
 #include "hdf_base.h"
 #include "hdf_io_service_if.h"
+#ifndef __LITEOS__
+#include "hdf_remote_adapter_if.h"
+#endif
 #include "hdf_service_status.h"
 #include "svcmgr_ioservice.h"
 #include "audio_events.h"
@@ -827,6 +830,9 @@ static int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
         AUDIO_FUNC_LOGE("The Parameter is NULL");
         return HDF_FAILURE;
     }
+#ifndef __LITEOS__
+    (void)HdfRemoteGetCallingPid();
+#endif
     struct AudioManager *proxyManager = GetAudioManagerInsForCapture("GetAudioManagerFuncs");
     if (proxyManager == NULL) {
         AUDIO_FUNC_LOGE("GetAudioManagerInsForCapture Fail");
