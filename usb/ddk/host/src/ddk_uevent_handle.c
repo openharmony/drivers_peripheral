@@ -27,6 +27,7 @@
 #include "hdf_log.h"
 #include "hdf_remote_adapter_if.h"
 #include "securec.h"
+#include "usbfn_uevent_handle.h"
 
 #define UEVENT_MSG_LEN          2048
 #define UEVENT_SOCKET_GROUPS    0xffffffff
@@ -125,7 +126,7 @@ static void DdkDispatchUevent(const struct DdkUeventInfo *info)
 
 static void DdkHandleUevent(const char msg[], int32_t rcvLen)
 {
-    (void) rcvLen;
+    (void)rcvLen;
     struct DdkUeventInfo info = {
         .action = "",
         .subSystem = "",
@@ -201,6 +202,7 @@ void *DdkUeventMain(void *param)
                 continue;
             }
             DdkHandleUevent(msg, rcvLen);
+            UsbFnHandleUevent(msg, rcvLen);
         } while (rcvLen > 0);
     } while (1);
 }
