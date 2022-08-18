@@ -42,6 +42,7 @@ public:
     void SetAbilityMetaDataTag(std::vector<int32_t> abilityMetaDataTag, std::string hardwareName);
     void SetNodeCallBack(const NodeBufferCb cb, std::string hardwareName);
     void SetMetaDataCallBack(const MetaDataCb cb, std::string hardwareName);
+    void SetMemoryType(uint8_t &memType);
 
 private:
     bool CheckCameraIdList(std::string hardwareName);

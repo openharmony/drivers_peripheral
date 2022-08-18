@@ -43,6 +43,11 @@ public:
     }
     virtual void SetMetaDataFlag(bool metaDataFlag);
     virtual RetCode Configure(std::shared_ptr<CameraMetadata> meta) = 0;
+    virtual void SetMemoryType(uint8_t &memType)
+    {
+        (void)(memType);
+        return;
+    }
 
 private:
     std::mutex powerOnStatelock_;
