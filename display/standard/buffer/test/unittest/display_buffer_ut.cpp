@@ -17,8 +17,9 @@
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "gtest/gtest.h"
+#include "v1_0/display_buffer_type.h"
 #include "v1_0/display_composer_type.h"
-#include "v1_0/hdi_impl/display_buffer_hdi_impl.h"
+#include "v1_0/include/idisplay_buffer.h"
 using namespace OHOS::HDI::Display::Composer::V1_0;
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 

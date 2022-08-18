@@ -26,25 +26,20 @@ group("hdf_display_buffer_service") {
 ohos_shared_library("liballocator_interface_service_1.0") {
   include_dirs = [
     "include",
-    "//drivers/interface/display/buffer",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
     "//drivers/peripheral/display/standard/utils/include",
-    "//drivers/peripheral/display/standard/buffer/hdi_service/include",
   ]
   sources = [ "src/allocator_interface_service.cpp" ]
 
   deps = []
 
-  public_deps = [
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable:libbufferhandle_parcelable",
-    "//drivers/interface/display/buffer/v1_0:libdisplay_buffer_stub_1.0",
-  ]
+  public_deps = [ "//drivers/interface/display/buffer/v1_0:libdisplay_buffer_stub_1.0" ]
 
   external_deps = [
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
+    "hdf_core:libbufferhandle_parcelable",
   ]
 
   install_images = [ chipset_base_dir ]
@@ -55,7 +50,8 @@ ohos_shared_library("liballocator_interface_service_1.0") {
 ohos_shared_library("liballocator_interface_driver_1.0") {
   include_dirs = []
   sources = [ "src/allocator_interface_driver.cpp" ]
-  deps = [ ":liballocator_interface_service_1.0" ]
+
+  deps = [ "//drivers/interface/display/buffer/v1_0:libdisplay_buffer_stub_1.0" ]
 
   external_deps = [
     "hdf_core:libhdf_host",
@@ -74,25 +70,20 @@ ohos_shared_library("liballocator_interface_driver_1.0") {
 ohos_shared_library("libmapper_interface_service_1.0") {
   include_dirs = [
     "include",
-    "//drivers/interface/display/buffer",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
     "//drivers/peripheral/display/standard/utils/include",
-    "//drivers/peripheral/display/standard/buffer/hdi_service/include",
   ]
   sources = [ "src/mapper_interface_service.cpp" ]
 
   deps = []
 
-  public_deps = [
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable:libbufferhandle_parcelable",
-    "//drivers/interface/display/buffer/v1_0:libdisplay_buffer_stub_1.0",
-  ]
+  deps = [ "//drivers/interface/display/buffer/v1_0:libdisplay_buffer_stub_1.0" ]
 
   external_deps = [
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
+    "hdf_core:libbufferhandle_parcelable",
   ]
 
   install_images = [ chipset_base_dir ]
@@ -103,7 +94,8 @@ ohos_shared_library("libmapper_interface_service_1.0") {
 ohos_shared_library("libmapper_interface_driver_1.0") {
   include_dirs = []
   sources = [ "src/mapper_interface_driver.cpp" ]
-  deps = [ ":libmapper_interface_service_1.0" ]
+
+  deps = [ "//drivers/interface/display/buffer/v1_0:libdisplay_buffer_stub_1.0" ]
 
   external_deps = [
     "hdf_core:libhdf_host",

@@ -18,7 +18,7 @@
 #include <unordered_map>
 #include <vector>
 #include <memory>
-#include "display_common.h"
+#include "common/include/display_common.h"
 #include "display_log.h"
 #include "v1_0/display_composer_type.h"
 #include "hdi_device_interface.h"

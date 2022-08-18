@@ -21,30 +21,17 @@ group("display_composer_model") {
     ]
 }
 
-config("display_composer_hwi_impl_config") {
-    include_dirs = [
-        "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
-        "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
-        "//drivers/peripheral/display/standard/utils/include",
-        "//drivers/peripheral/display/standard/composer/hdi_service/include",
-        "//drivers/peripheral/display/standard/composer/model/include",
-    ]
-}
-
 ohos_shared_library("libdisplay_composer_hwi_impl") {
 
     sources = [ "src/display_composer_hwi_impl.cpp" ]
 
-    public_configs = [ ":display_composer_hwi_impl_config" ]
-
-    cflags = [
-        "-Wall",
-        "-Wextra",
-        "-Werror",
-        "-fsigned-char",
-        "-fno-common",
-        "-fno-strict-aliasing",
+    include_dirs = [
+        "//drivers/peripheral/display/standard/utils/include",
+        "//drivers/hdf_core/adapter/uhdf2/model/display/composer",
+        "//drivers/peripheral/display/standard/composer/hdi_service/include",
+        "//drivers/peripheral/display/standard/composer/model/include",
     ]
+
     deps = [
         ":display_composer_vendor",
         "//foundation/graphic/graphic_2d/utils/buffer_handle:buffer_handle",
@@ -85,23 +72,20 @@ ohos_shared_library("display_composer_vendor") {
     output_name = "display_composer_vendor"
     include_dirs = [
         "include",
-        "//drivers/interface/display/buffer",
-        "//drivers/hdf_core/adapter/uhdf2/model/display/buffer",
-        "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
-        "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
         "//drivers/peripheral/display/standard/buffer/model/include",
         "//drivers/peripheral/display/standard/buffer/hdi_service/include",
         "//drivers/peripheral/display/standard/utils/include",
         "//drivers/peripheral/base",
         "//drivers/hdf_core/framework/include/utils",
         "//drivers/hdf_core/adapter/uhdf2/osal/include",
-        "//utils/native/base/include",
+        "//drivers/hdf_core/adapter/uhdf2/model/display/composer",
         "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
         "//foundation/graphic/standard/utils/include",
         "//foundation/graphic/standard/prebuilts/librarys/drm/include",
         "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
         "//device/soc/rockchip/rk3568/hardware/rga/include",
     ]
+
     deps = [
         "//third_party/libdrm:libdrm",
         "//utils/native/base:utils",

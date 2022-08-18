@@ -40,12 +40,12 @@ ohos_static_library("disp_dev_hdi_test_common") {
     "-Wno-macro-redefined",
   ]
 
-  deps = [
-    "//drivers/interface/display/composer/v1_0:libdisplay_composer_proxy_1.0",
-  ]
+  deps = []
+
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
+    "drivers_interface_display:display_composer_idl_headers",
   ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"
@@ -62,14 +62,11 @@ ohos_unittest("dispcomptest") {
   ]
   deps = [
     ":disp_dev_hdi_test_common",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/buffer/v1_0:libdisplay_buffer_hdi_impl",
     "//third_party/googletest:gtest_main",
   ]
   include_dirs = [
     "common",
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/composer",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/buffer",
     "//drivers/peripheral/display/standard/utils/include",
     "//drivers/peripheral/base",
     "utils",
@@ -79,8 +76,10 @@ ohos_unittest("dispcomptest") {
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "utils_base:utils",
-    "drivers_interface_display:libdisplay_buffer_proxy_1.0",
-    "drivers_interface_display:libdisplay_composer_proxy_1.0",
+    "hdf_core:libdisplay_buffer_hdi_impl",
+    "hdf_core:libdisplay_composer_hdi_impl",
+    "drivers_interface_display:display_buffer_idl_headers",
+    "drivers_interface_display:display_composer_idl_headers",
   ]
   cflags = [ "-Wno-unused-function" ]
   subsystem_name = "hdf"
