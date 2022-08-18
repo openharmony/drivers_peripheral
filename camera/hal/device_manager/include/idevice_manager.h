@@ -135,6 +135,11 @@ public:
         (void)flag;
         return;
     }
+    virtual void SetMemoryType(uint8_t &memType)
+    {
+        (void)(memType);
+        return;
+    }
 };
 } // namespace Camera
 } // namespace OHOS

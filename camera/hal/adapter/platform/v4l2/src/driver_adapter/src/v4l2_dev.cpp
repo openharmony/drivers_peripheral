@@ -698,4 +698,14 @@ RetCode HosV4L2Dev::Flush(const std::string& cameraID)
 
     return RC_OK;
 }
+
+void HosV4L2Dev::SetMemoryType(uint8_t &memType)
+{
+    CAMERA_LOGD("func[HosV4L2Dev::%{public}s] memType[%{public}d]", __func__, memType);
+    if (memType == V4L2_MEMORY_MMAP) {
+        memoryType_ = V4L2_MEMORY_MMAP;
+    } else if (memType == V4L2_MEMORY_DMABUF) {
+        memoryType_ = V4L2_MEMORY_DMABUF;
+    }
+}
 } // namespace OHOS::Camera
