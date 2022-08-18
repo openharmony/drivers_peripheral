@@ -45,7 +45,7 @@
 namespace OHOS {
 namespace Camera {
 #define HDF_LOG_TAG camera_host
-#define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
+#define FILENAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #ifndef OHOS_DEBUG
 #define DECORATOR_HDFLOG(op, fmt, args...)             \
@@ -55,7 +55,7 @@ namespace Camera {
 #else
 #define DECORATOR_HDFLOG(op, fmt, args...)                                     \
     do {                                                                       \
-        op("{%s()-%s:%d} " fmt, __FUNCTION__, __FILENAME__, __LINE__, ##args); \
+        op("{%s()-%s:%d} " fmt, __FUNCTION__, FILENAME, __LINE__, ##args); \
     } while (0)
 #endif
 
