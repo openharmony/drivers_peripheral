@@ -34,7 +34,7 @@ namespace {
     sptr<IInputCallback> g_hotplugCb = nullptr;
 
     constexpr int32_t INIT_DEFAULT_VALUE = 255;
-    constexpr int32_t KEEP_ALIVE_TIME_MS = 15000;
+    constexpr int32_t KEEP_ALIVE_TIME_MS = 3000;
     constexpr int32_t TOUCH_INDEX = 1;
     constexpr int32_t INVALID_INDEX = 5;
     constexpr int32_t MAX_DEVICES = 32;
