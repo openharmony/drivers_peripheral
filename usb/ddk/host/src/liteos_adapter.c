@@ -126,7 +126,7 @@ static int32_t OsSubmitUrb(
     }
 
     err = usb_setup_endpoint(adapterDevice, uhe, 1024);
-    if (err) {
+    if (err < 0) {
         DPRINTFN(0, "setup failed err:%d\n", err);
         return (err);
     }

@@ -195,7 +195,7 @@ static int32_t SerialBegin(struct AcmDevice * const acm)
     int32_t ret;
     struct AcmDb *db = NULL;
     int32_t dbn;
-    if (AcmDbIsAvail(acm)) {
+    if (AcmDbIsAvail(acm) != 0) {
         dbn = AcmDbAlloc(acm);
     } else {
         HDF_LOGE("no buf\n");

@@ -52,10 +52,6 @@ struct TestUsbDeviceDescriptor {
 #define BUFFER_MAX_LEN   1024
 #define SPEED_SLEEP_TIME 300
 
-const char *g_acmServiceName = "usbhost_acm_pnp_service";
-const char *g_acmRawServiceName = "usbhost_acm_rawapi_service";
-const char *g_ecmServiceName = "usbhost_ecm_pnp_service";
-
 struct HdfSBuf *g_data = NULL;
 struct HdfSBuf *g_reply = NULL;
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
@@ -88,6 +84,9 @@ int32_t UsbObtainSbuf(void)
 
 int32_t UsbHostDdkTestInit(const char *apiType)
 {
+    const char *acmRawServiceName = "usbhost_acm_rawapi_service";
+    const char *acmServiceName = "usbhost_acm_pnp_service";
+    const char *ecmServiceName = "usbhost_ecm_pnp_service";
 #ifndef __LITEOS_USB_HOST_DDK_TEST__
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
     if (servmgr == NULL) {
@@ -99,28 +98,28 @@ int32_t UsbHostDdkTestInit(const char *apiType)
         return HDF_FAILURE;
     }
     if (!strcmp(apiType, "-SDK")) {
-        printf("%s:%d test SDK API, service=%s\n", __func__, __LINE__, g_acmServiceName);
-        HDF_LOGI("%s:%d test SDK API, service=%s", __func__, __LINE__, g_acmServiceName);
+        printf("%s:%d test SDK API, service=%s\n", __func__, __LINE__, acmServiceName);
+        HDF_LOGI("%s:%d test SDK API, service=%s", __func__, __LINE__, acmServiceName);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
-        g_acmService = HdfIoServiceBind(g_acmServiceName);
+        g_acmService = HdfIoServiceBind(acmServiceName);
 #else
-        g_acmService = servmgr->GetService(servmgr, g_acmServiceName);
+        g_acmService = servmgr->GetService(servmgr, acmServiceName);
 #endif
     } else if (!strcmp(apiType, "-RAW")) {
-        printf("%s:%d test RAW API, service=%s\n", __func__, __LINE__, g_acmRawServiceName);
-        HDF_LOGI("%s:%d test RAW API, service=%s", __func__, __LINE__, g_acmRawServiceName);
+        printf("%s:%d test RAW API, service=%s\n", __func__, __LINE__, acmRawServiceName);
+        HDF_LOGI("%s:%d test RAW API, service=%s", __func__, __LINE__, acmRawServiceName);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
-        g_acmService = HdfIoServiceBind(g_acmRawServiceName);
+        g_acmService = HdfIoServiceBind(acmRawServiceName);
 #else
-        g_acmService = servmgr->GetService(servmgr, g_acmRawServiceName);
+        g_acmService = servmgr->GetService(servmgr, acmRawServiceName);
 #endif
     } else if (!strcmp(apiType, "-ECM")) {
-        printf("%s:%d test ECM API, service=%s\n", __func__, __LINE__, g_ecmServiceName);
-        HDF_LOGI("%s:%d test ECM API, service=%s", __func__, __LINE__, g_ecmServiceName);
+        printf("%s:%d test ECM API, service=%s\n", __func__, __LINE__, ecmServiceName);
+        HDF_LOGI("%s:%d test ECM API, service=%s", __func__, __LINE__, ecmServiceName);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
-        g_acmService = HdfIoServiceBind(g_ecmServiceName);
+        g_acmService = HdfIoServiceBind(ecmServiceName);
 #else
-        g_acmService = servmgr->GetService(servmgr, g_ecmServiceName);
+        g_acmService = servmgr->GetService(servmgr, ecmServiceName);
 #endif
     } else {
         printf("%s:%d apiType=%s is not define\n", __func__, __LINE__, apiType);
@@ -274,7 +273,7 @@ void UsbHostDdkTestSyncRead(char *readSbuf)
 #else
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, CMD_READ_DATA_SYNC, g_data, g_reply);
 #endif
-    if (status) {
+    if (status != HDF_SUCCESS) {
         g_exitFlag = true;
         printf("%s:%d Dispatch CMD_READ_DATA_SYNC failed status = %d\n", __func__, __LINE__, status);
         HDF_LOGE("%s:%d Dispatch CMD_READ_DATA_SYNC failed status = %d", __func__, __LINE__, status);
@@ -547,7 +546,7 @@ void UsbHostDdkTestGetBaudrate(char *readSbuf)
         return;
     }
 
-    if (HdfSbufReadUint32(g_reply, &value)) {
+    if (HdfSbufReadUint32(g_reply, &value) == true) {
         if (readSbuf != NULL) {
             const char tmp[] = "CMD_GET_BAUDRATE";
             errno_t err = memcpy_s(readSbuf, DATA_MAX_LEN, tmp, strlen(tmp));
@@ -629,7 +628,7 @@ int32_t UsbHostDdkTestOpen(int32_t cmdType)
 #else
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, CMD_OPEN_PARM, g_data, g_reply);
 #endif
-    if (status) {
+    if (status != HDF_SUCCESS) {
         g_exitFlag = true;
         HDF_LOGE("%s:%d Dispatch CMD_OPEN_PARM status=%d err", __func__, __LINE__, status);
     }
@@ -655,7 +654,7 @@ int32_t UsbHostDdkTestClose(int32_t cmdType)
 #else
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, CMD_CLOSE_PARM, g_data, g_reply);
 #endif
-    if (status) {
+    if (status != HDF_SUCCESS) {
         g_exitFlag = true;
         HDF_LOGE("%s:%d Dispatch CMD_CLOSE_PARM status=%d err", __func__, __LINE__, status);
     }

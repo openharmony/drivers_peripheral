@@ -445,7 +445,7 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
             wbn = EcmWbAlloc(ecm);
         } else {
             HDF_LOGE("%s:%d no write buf", __func__, __LINE__);
-            return size;
+            return (int32_t)size;
         }
         if (wbn < ECM_NW && wbn >= 0) {
             wb = &ecm->wb[wbn];
@@ -463,7 +463,7 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
         if (wb->buf) {
             ret = memcpy_s(wb->buf, ecm->writeSize, tmp, len);
             if (ret) {
-                return size;
+                return (int32_t)size;
             }
             tmp += len;
             wb->len = (int)len;
