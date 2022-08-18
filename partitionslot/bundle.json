@@ -32,15 +32,6 @@
       ],
       "test": [
         "//drivers/peripheral/partitionslot/test:partitionslot_unittest"
-      ],
-      "inner_kits": [
-        {
-          "name":  "//drivers/peripheral/partitionslot/hal:libpartition_slot_manager",
-          "header": {
-            "header_files": [ "partitionslot_manager.h" ],
-            "header_base": "//drivers/peripheral/partitionslot/interfaces/innerkits"
-          }
-        }
       ]
     }
   }

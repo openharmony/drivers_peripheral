@@ -22,7 +22,7 @@ ohos_shared_library("libpartition_slot_service_1.0") {
   sources = [ "src/partitionslot_impl.cpp" ]
   public_deps = [
     "//drivers/interface/partitionslot/v1_0:libpartitionslot_stub_1.0",
-    "//drivers/peripheral/partitionslot/hal:libpartition_slot_manager",
+    "//drivers/peripheral/partitionslot/hal:partitionslot_source",
   ]
   external_deps = [
     "hdf_core:libhdf_utils",
