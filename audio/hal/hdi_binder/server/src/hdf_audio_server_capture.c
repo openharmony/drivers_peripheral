@@ -128,7 +128,6 @@ int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct Hd
     AUDIO_FUNC_LOGD("capturePid = %{public}u", capturePid);
     int32_t ret = GetInitCapturePara(data, &devDesc, &attrs);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("read Render param failure!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioAdapterListGetAdapter(adapterName, &adapter) < 0) {
@@ -142,7 +141,6 @@ int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct Hd
     const int32_t priority = attrs.type;
     ret = AudioCreatCaptureCheck(adapterName, priority);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioCreatRenderCheck: Capture is working can not replace!");
         return ret;
     }
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);

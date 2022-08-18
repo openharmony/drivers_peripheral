@@ -123,7 +123,6 @@ struct AudioCardInfo *AudioGetCardInfo(const char *adapterName, snd_pcm_stream_t
 void CheckCardStatus(struct AudioCardInfo *cardIns);
 int32_t CheckParaFormat(struct AudioPcmHwParams hwParams, snd_pcm_format_t *alsaPcmFormat);
 int32_t DestroyCardList(void);
-void GetDeviceList(struct AudioCardInfo *cardIns, snd_pcm_stream_t stream);
 int32_t GetSelCardInfo(struct AudioCardInfo *cardIns, struct AlsaDevInfo *devInsHandle);
 int32_t MatchSelAdapter(const char *adapterName, struct AudioCardInfo *cardIns);
 int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement);

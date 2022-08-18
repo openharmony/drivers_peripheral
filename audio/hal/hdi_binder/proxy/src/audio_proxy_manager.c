@@ -249,9 +249,7 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    const char *adapterName = NULL;
     int32_t i = 0;
-    int32_t portNum;
     if (manager == NULL || adapter == NULL) {
         return;
     }
@@ -268,8 +266,7 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
         return;
     }
     if (hwAdapter->portCapabilitys != NULL) {
-        portNum = hwAdapter->adapterDescriptor.portNum;
-        while (i < portNum) {
+        while (i < hwAdapter->adapterDescriptor.portNum) {
             if (&hwAdapter->portCapabilitys[i] != NULL) {
                 AudioMemFree((void **)&hwAdapter->portCapabilitys[i].capability.subPorts);
             }
@@ -283,8 +280,7 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
             AudioProxyBufReplyRecycle(data, reply);
             return;
         }
-        adapterName = hwAdapter->adapterDescriptor.adapterName;
-        if (HdfSbufWriteString(data, adapterName)) {
+        if (HdfSbufWriteString(data, hwAdapter->adapterDescriptor.adapterName)) {
             ret = AudioProxyDispatchCall(hwAdapter->proxyRemoteHandle, AUDIO_HDI_MGR_UNLOAD_ADAPTER, data, reply);
             if (ret < 0) {
                 AUDIO_FUNC_LOGE("Send Server fail!");

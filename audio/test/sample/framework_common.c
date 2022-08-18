@@ -36,7 +36,7 @@ uint32_t StringToInt(const char *flag)
         return 0;
     }
     uint32_t temp = flag[0];
-    for (int32_t i = strlen(flag) - 1; i >= 0; i--) {
+    for (int32_t i = (int32_t)strlen(flag) - 1; i >= 0; i--) {
         temp <<= MOVE_LEFT_NUM;
         temp += flag[i];
     }
