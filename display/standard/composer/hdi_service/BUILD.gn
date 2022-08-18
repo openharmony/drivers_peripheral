@@ -22,29 +22,21 @@ group("display_composer_hdi_service") {
 
 ohos_shared_library("libdisplay_composer_service_1.0") {
   include_dirs = [
-    "//drivers/interface/display/composer",
     "//drivers/hdf_core/adapter/uhdf2/model/display/composer",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/display/standard/utils/include",
     "//drivers/peripheral/display/standard/composer/hdi_service/include",
   ]
   sources = [ "src/display_composer_service.cpp" ]
 
-  deps = [
-    "//drivers/interface/display/composer/v1_0:libdisplay_composer_stub_1.0",
-    "//foundation/graphic/graphic_2d/utils/buffer_handle:buffer_handle",
-  ]
+  deps = [ "//drivers/interface/display/composer/v1_0:libdisplay_composer_stub_1.0" ]
 
-  if (is_standard_system) {
-    external_deps = [
-      "c_utils:utils",
-      "hdf_core:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
-    ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
-  }
-  external_deps += [ "ipc:ipc_single" ]
+  external_deps = [
+    "c_utils:utils",
+    "ipc:ipc_single",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "graphic_chipsetsdk:buffer_handle",
+  ]
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
@@ -52,31 +44,19 @@ ohos_shared_library("libdisplay_composer_service_1.0") {
 }
 
 ohos_shared_library("libdisplay_composer_driver_1.0") {
-  include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/ipc/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/host",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-  ]
+  include_dirs = []
   sources = [ "src/display_composer_driver.cpp" ]
 
-  deps = [
-    "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/interface/display/composer/v1_0:libdisplay_composer_stub_1.0",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//drivers/interface/display/composer/v1_0:libdisplay_composer_stub_1.0" ]
 
-  if (is_standard_system) {
-    external_deps = [
-      "hdf_core:libhdf_utils",
-      "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_single",
-    ]
-  } else {
-    external_deps = [
-      "hilog:libhilog",
-      "ipc:ipc_single",
-    ]
-  }
+  external_deps = [
+    "hdf_core:libhdf_host",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "utils_base:utils",
+  ]
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"

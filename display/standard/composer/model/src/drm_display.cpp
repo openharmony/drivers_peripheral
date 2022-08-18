@@ -27,7 +27,6 @@
 #include "hdi_gfx_composition.h"
 #include "idisplay_buffer_hwi.h"
 #include "display_buffer_hwi_impl.h"
-#include "v1_0/hdi_impl/display_buffer_hdi_impl.h"
 
 namespace OHOS {
 namespace Model {

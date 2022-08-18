@@ -22,10 +22,8 @@
 #include "hdf_log.h"
 #include "gtest/gtest.h"
 #include "v1_0/display_composer_type.h"
-#include "v1_0/iallocator_interface.h"
-#include "v1_0/imapper_interface.h"
 #include "v1_0/display_buffer_type.h"
-#include "v1_0/hdi_impl/display_buffer_hdi_impl.h"
+#include "v1_0/include/idisplay_buffer.h"
 
 #define HDF_LOG_TAG display_buffer_module_test
 

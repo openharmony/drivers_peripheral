@@ -17,7 +17,7 @@
 #define OHOS_HDI_DISPLAY_V1_0_IDISPLAYCOMPOSERHWI_H
 
 #include <vector>
-#include "display_common.h"
+#include "common/include/display_common.h"
 #include "v1_0/display_composer_type.h"
 
 namespace OHOS {

@@ -11,23 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if (defined(ohos_lite)) {
-  import("//build/lite/config/component/lite_component.gni")
-
-  lite_component("hdf_test_display") {
-    if (ohos_build_type == "debug") {
-      if (board_name == "hi3516dv300" || board_name == "hispark_taurus") {
-        deps = [ "unittest/lite:hdf_peripheral_display_test" ]
-      }
-    }
-    features = []
-  }
-} else {
-  group("hdf_test_display_buffer") {
-    testonly = true
-    deps = [
-        "unittest:dispbuf_ut",
-        "moduletest:dispbuf_mt",
-    ]
-  }
+group("hdf_test_display_buffer") {
+  testonly = true
+  deps = [
+      "unittest:dispbuf_ut",
+      "moduletest:dispbuf_mt",
+  ]
 }
