@@ -24,8 +24,7 @@ using namespace std;
 using namespace testing::ext;
 namespace {
 static struct AcmDevice *g_acmDevice = nullptr;
-class UsbDeviceSdkIoTest : public testing::Test {
-};
+class UsbDeviceSdkIoTest : public testing::Test {};
 
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCreateDevice001, TestSize.Level1)
 {
@@ -48,8 +47,7 @@ static void ReadComplete(uint8_t pipe, struct UsbFnRequest *req)
         uint8_t *data = (uint8_t *)req->buf;
         data[req->actual] = '\0';
         printf("receive [%d] bytes data: %s\n", req->actual, data);
-        if (strcmp((const char *)data, "q") == 0 || \
-            strcmp((const char *)data, "q\n") == 0) {
+        if (strcmp((const char *)data, "q") == 0 || strcmp((const char *)data, "q\n") == 0) {
             g_acmDevice->submitExit = 1;
         }
     }
@@ -64,8 +62,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync002, TestSize.Level1)
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     printf("wait receiving data form host, please connect\n");
-    req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id,
-        g_acmDevice->dataOutPipe.maxPacketSize);
+    req = UsbFnAllocRequest(
+        g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id, g_acmDevice->dataOutPipe.maxPacketSize);
     EXPECT_NE(nullptr, req);
     req->complete = ReadComplete;
     req->context = g_acmDevice;
@@ -75,7 +73,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync002, TestSize.Level1)
         if (ret != HDF_SUCCESS) {
             continue;
         }
-        while(g_acmDevice->submit == 0) {
+        while (g_acmDevice->submit == 0) {
             OsalMSleep(waitMs);
         }
         EXPECT_TRUE(ret == HDF_SUCCESS);
@@ -98,8 +96,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync003, TestSize.Level1)
     printf("recv data until 'q' exit\n");
     g_acmDevice->submitExit = 0;
     while (g_acmDevice->submitExit == 0) {
-        req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id,
-            g_acmDevice->dataOutPipe.maxPacketSize);
+        req = UsbFnAllocRequest(
+            g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id, g_acmDevice->dataOutPipe.maxPacketSize);
         EXPECT_NE(nullptr, req);
         req->complete = ReadComplete;
         req->context = g_acmDevice;
@@ -107,7 +105,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync003, TestSize.Level1)
         ret = UsbFnSubmitRequestAsync(req);
         EXPECT_TRUE(ret == HDF_SUCCESS);
         EXPECT_EQ(0, g_acmDevice->submit);
-        while(g_acmDevice->submit == 0) {
+        while (g_acmDevice->submit == 0) {
             OsalMSleep(waitMs);
         }
         g_acmDevice->submit = 0;
@@ -126,11 +124,11 @@ static void WriteComplete(uint8_t pipe, struct UsbFnRequest *req)
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync004, TestSize.Level1)
 {
     int32_t ret;
-    struct UsbFnRequest  *req = nullptr;
+    struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
-    req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id,
-        g_acmDevice->dataInPipe.maxPacketSize);
+    req = UsbFnAllocRequest(
+        g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id, g_acmDevice->dataInPipe.maxPacketSize);
     EXPECT_NE(nullptr, req);
     req->complete = WriteComplete;
     req->context = g_acmDevice;
@@ -140,7 +138,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync004, TestSize.Level1)
     req->length = strlen("abc");
     ret = UsbFnSubmitRequestAsync(req);
     EXPECT_TRUE(ret == HDF_SUCCESS);
-    while(g_acmDevice->submit == 0) {
+    while (g_acmDevice->submit == 0) {
         OsalMSleep(1);
     }
     g_acmDevice->submit = 0;
@@ -152,13 +150,13 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync005, TestSize.Level1)
 {
     int32_t ret;
     int32_t loopTime = TEST_TIMES;
-    struct UsbFnRequest  *req = nullptr;
+    struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     printf("------send \"xyz\" 10 times to host------\n");
     while (loopTime > 0) {
-        req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id,
-            g_acmDevice->dataInPipe.maxPacketSize);
+        req = UsbFnAllocRequest(
+            g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id, g_acmDevice->dataInPipe.maxPacketSize);
         EXPECT_NE(nullptr, req);
         req->complete = WriteComplete;
         req->context = g_acmDevice;
@@ -167,7 +165,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync005, TestSize.Level1)
         req->length = strlen("xyz");
         ret = UsbFnSubmitRequestAsync(req);
         EXPECT_TRUE(ret == HDF_SUCCESS);
-        while(g_acmDevice->submit == 0) {
+        while (g_acmDevice->submit == 0) {
             OsalMSleep(1);
         }
         g_acmDevice->submit = 0;
@@ -192,8 +190,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync002, TestSize.Level1)
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     printf("wait receiving data form host:\n");
-    req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id,
-        g_acmDevice->dataOutPipe.maxPacketSize);
+    req = UsbFnAllocRequest(
+        g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id, g_acmDevice->dataOutPipe.maxPacketSize);
     EXPECT_NE(nullptr, req);
     ret = UsbFnSubmitRequestSync(req, 0);
     EXPECT_TRUE(ret == 0);
@@ -214,9 +212,9 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync003, TestSize.Level1)
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     printf("receive data until 'q' exit\n");
-    while (submitExit == 0){
-        req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id,
-        g_acmDevice->dataOutPipe.maxPacketSize);
+    while (submitExit == 0) {
+        req = UsbFnAllocRequest(
+            g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id, g_acmDevice->dataOutPipe.maxPacketSize);
         EXPECT_NE(nullptr, req);
         ret = UsbFnSubmitRequestSync(req, 0);
         EXPECT_TRUE(ret == 0);
@@ -224,8 +222,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync003, TestSize.Level1)
         EXPECT_TRUE(req->status == USB_REQUEST_COMPLETED);
         data = (uint8_t *)req->buf;
         data[req->actual] = '\0';
-        if (strcmp((const char *)data, "q") == 0 || \
-            strcmp((const char *)data, "q\n") == 0) {
+        if (strcmp((const char *)data, "q") == 0 || strcmp((const char *)data, "q\n") == 0) {
             submitExit = 1;
         }
         printf("receive data from host: %s------\n", data);
@@ -237,11 +234,11 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync003, TestSize.Level1)
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync004, TestSize.Level1)
 {
     int32_t ret;
-    struct UsbFnRequest  *req = nullptr;
+    struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
-    req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id,
-        g_acmDevice->dataInPipe.maxPacketSize);
+    req = UsbFnAllocRequest(
+        g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id, g_acmDevice->dataInPipe.maxPacketSize);
     EXPECT_NE(nullptr, req);
     printf("------send \"abc\" to host------\n");
     memcpy_s(req->buf, g_acmDevice->dataInPipe.maxPacketSize, "abc", strlen("abc"));
@@ -258,13 +255,13 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync005, TestSize.Level1)
 {
     int32_t ret;
     int32_t loopTime = TEST_TIMES;
-    struct UsbFnRequest  *req = nullptr;
+    struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     printf("------send \"abcdefg\" 10 times to host------\n");
     while (loopTime > 0) {
-        req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id,
-        g_acmDevice->dataInPipe.maxPacketSize);
+        req = UsbFnAllocRequest(
+            g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id, g_acmDevice->dataInPipe.maxPacketSize);
         EXPECT_NE(nullptr, req);
         memcpy_s(req->buf, g_acmDevice->dataInPipe.maxPacketSize, "abcdefg", strlen("abcdefg"));
         req->length = strlen("abcdefg");
@@ -285,8 +282,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync006, TestSize.Level1)
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     printf("test sync timeout 5s:\n");
-    req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id,
-        g_acmDevice->dataOutPipe.maxPacketSize);
+    req = UsbFnAllocRequest(
+        g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id, g_acmDevice->dataOutPipe.maxPacketSize);
     EXPECT_NE(nullptr, req);
     ret = UsbFnSubmitRequestSync(req, SYNC_5000MS);
     EXPECT_TRUE(ret != 0);
@@ -309,8 +306,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus001, TestSize.Level1)
     struct UsbFnRequest *notifyReq = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
-    notifyReq = UsbFnAllocRequest(g_acmDevice->ctrlIface.handle, g_acmDevice->notifyPipe.id,
-        sizeof(struct UsbCdcNotification));
+    notifyReq =
+        UsbFnAllocRequest(g_acmDevice->ctrlIface.handle, g_acmDevice->notifyPipe.id, sizeof(struct UsbCdcNotification));
     EXPECT_TRUE(notifyReq != nullptr);
     ret = UsbFnGetRequestStatus(notifyReq, &status);
     EXPECT_TRUE(ret == HDF_SUCCESS);
@@ -341,8 +338,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus003, TestSize.Level1)
     struct UsbFnRequest *notifyReq = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
-    notifyReq = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id,
-        g_acmDevice->dataOutPipe.maxPacketSize);
+    notifyReq = UsbFnAllocRequest(
+        g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id, g_acmDevice->dataOutPipe.maxPacketSize);
     EXPECT_TRUE(notifyReq != nullptr);
     ret = UsbFnGetRequestStatus(notifyReq, nullptr);
     EXPECT_TRUE(ret != HDF_SUCCESS);
@@ -357,8 +354,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfGetReqStatus004, TestSize.Level1)
     struct UsbFnRequest *notifyReq = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
-    notifyReq = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id,
-        g_acmDevice->dataOutPipe.maxPacketSize);
+    notifyReq = UsbFnAllocRequest(
+        g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id, g_acmDevice->dataOutPipe.maxPacketSize);
     EXPECT_TRUE(notifyReq != nullptr);
     ret = UsbFnSubmitRequestAsync(notifyReq);
     EXPECT_TRUE(ret == HDF_SUCCESS);
@@ -394,8 +391,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq002, TestSize.Level1)
     struct UsbFnRequest *notifyReq = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
-    notifyReq = UsbFnAllocRequest(g_acmDevice->ctrlIface.handle, g_acmDevice->notifyPipe.id,
-        sizeof(struct UsbCdcNotification));
+    notifyReq =
+        UsbFnAllocRequest(g_acmDevice->ctrlIface.handle, g_acmDevice->notifyPipe.id, sizeof(struct UsbCdcNotification));
     EXPECT_TRUE(notifyReq != nullptr);
     ret = UsbFnSubmitRequestAsync(notifyReq);
     EXPECT_TRUE(ret == HDF_SUCCESS);
@@ -408,11 +405,11 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq002, TestSize.Level1)
 HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq003, TestSize.Level1)
 {
     int32_t ret;
-    struct UsbFnRequest  *req = nullptr;
+    struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
-    req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id,
-        g_acmDevice->dataInPipe.maxPacketSize);
+    req = UsbFnAllocRequest(
+        g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id, g_acmDevice->dataInPipe.maxPacketSize);
     EXPECT_NE(nullptr, req);
     req->complete = WriteComplete;
     req->context = g_acmDevice;
@@ -422,7 +419,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq003, TestSize.Level1)
     req->length = strlen("abcdef");
     ret = UsbFnSubmitRequestAsync(req);
     EXPECT_TRUE(ret == HDF_SUCCESS);
-    while(g_acmDevice->submit == 0) {
+    while (g_acmDevice->submit == 0) {
         OsalMSleep(1);
     }
     g_acmDevice->submit = 0;
@@ -438,8 +435,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq004, TestSize.Level1)
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
-    req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id,
-        g_acmDevice->dataOutPipe.maxPacketSize);
+    req = UsbFnAllocRequest(
+        g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id, g_acmDevice->dataOutPipe.maxPacketSize);
     EXPECT_TRUE(req != nullptr);
     ret = UsbFnSubmitRequestAsync(req);
     EXPECT_TRUE(ret == HDF_SUCCESS);
@@ -455,8 +452,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq005, TestSize.Level1)
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
-    req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id,
-        g_acmDevice->dataInPipe.maxPacketSize);
+    req = UsbFnAllocRequest(
+        g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id, g_acmDevice->dataInPipe.maxPacketSize);
     EXPECT_TRUE(req != nullptr);
     ret = UsbFnCancelRequest(req);
     EXPECT_TRUE(ret != HDF_SUCCESS);
@@ -470,8 +467,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq006, TestSize.Level1)
     struct UsbFnRequest *req = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
-    req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id,
-        g_acmDevice->dataOutPipe.maxPacketSize);
+    req = UsbFnAllocRequest(
+        g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id, g_acmDevice->dataOutPipe.maxPacketSize);
     EXPECT_TRUE(req != nullptr);
     ret = UsbFnCancelRequest(req);
     EXPECT_TRUE(ret != HDF_SUCCESS);
@@ -485,8 +482,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq007, TestSize.Level1)
     struct UsbFnRequest *ctrlReq = nullptr;
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->ctrlIface.handle);
-    ctrlReq = UsbFnAllocCtrlRequest(g_acmDevice->ctrlIface.handle,
-            sizeof(struct UsbCdcLineCoding) + sizeof(struct UsbCdcLineCoding));
+    ctrlReq = UsbFnAllocCtrlRequest(
+        g_acmDevice->ctrlIface.handle, sizeof(struct UsbCdcLineCoding) + sizeof(struct UsbCdcLineCoding));
     EXPECT_TRUE(ctrlReq != nullptr);
     ret = UsbFnCancelRequest(ctrlReq);
     EXPECT_TRUE(ret != HDF_SUCCESS);
@@ -502,8 +499,8 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfCancelReq008, TestSize.Level1)
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     for (count = 0; count < TEST_TIMES; count++) {
-        req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id,
-            g_acmDevice->dataOutPipe.maxPacketSize);
+        req = UsbFnAllocRequest(
+            g_acmDevice->dataIface.handle, g_acmDevice->dataOutPipe.id, g_acmDevice->dataOutPipe.maxPacketSize);
         EXPECT_TRUE(req != nullptr);
         ret = UsbFnSubmitRequestAsync(req);
         EXPECT_TRUE(ret == HDF_SUCCESS);
@@ -525,4 +522,4 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRemoveDevice002, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     OsalMemFree(g_acmDevice);
 }
-}
+} // namespace

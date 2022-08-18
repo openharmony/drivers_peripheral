@@ -129,25 +129,23 @@ static bool IsDeviceDirExist(const char *deviceName)
 
 static int32_t UsbFnWriteFile(const char *path, const char *str)
 {
-    int32_t ret;
+    size_t ret;
     if (strlen(str) == 0) {
         return 0;
     }
+
     FILE *fp = fopen(path, "w");
     if (fp == NULL) {
         HDF_LOGE("%{public}s: UsbFnWriteFile failure!", __func__);
         return HDF_ERR_BAD_FD;
     }
+
     ret = fwrite(str, strlen(str), 1, fp);
     if (ret != 1) {
-        if (fclose(fp)) {
-            return HDF_FAILURE;
-        }
+        (void)fclose(fp);
         return HDF_FAILURE;
     }
-    if (fclose(fp)) {
-        return HDF_FAILURE;
-    }
+    (void)fclose(fp);
     return 0;
 }
 
@@ -189,7 +187,7 @@ static int32_t UsbFnWriteConfString(const char *deviceName, int32_t configVal, u
 
     if (!IsDirExist(tmp)) {
         ret = mkdir(tmp, S_IREAD | S_IWRITE);
-        if (ret) {
+        if (ret != 0) {
             HDF_LOGE("%{public}s: mkdir failure!", __func__);
             return HDF_ERR_IO;
         }
@@ -218,7 +216,7 @@ static int32_t UsbFnWriteDesString(
     }
     if (!IsDirExist(tmp)) {
         ret = mkdir(tmp, S_IREAD | S_IWRITE);
-        if (ret) {
+        if (ret != 0) {
             HDF_LOGE("%{public}s: mkdir failure!", __func__);
             return HDF_ERR_IO;
         }
@@ -239,13 +237,13 @@ static int32_t UsbFnAdapterCreateFunc(const char *configPath, const char *funcPa
     int32_t ret;
 
     ret = mkdir(funcPath, S_IREAD | S_IWRITE);
-    if (ret) {
+    if (ret != 0) {
         HDF_LOGE("%{public}s: mkdir failure!", __func__);
         return HDF_ERR_IO;
     }
 
     ret = symlink(funcPath, configPath);
-    if (ret) {
+    if (ret != 0) {
         HDF_LOGE("%{public}s: symlink failed", __func__);
         return HDF_ERR_IO;
     }
@@ -288,7 +286,7 @@ static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName,
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
         return HDF_ERR_IO;
     }
-    if (enable) {
+    if (enable != 0) {
         (void)UsbFnWriteFile(tmp, udcName);
         for (i = 0; i < OPEN_CNT; i++) {
             (void)UsbFnReadFile(tmp, udcTmp, strlen(udcName));
@@ -369,7 +367,7 @@ static int32_t UsbFnAdapterCreatInterface(const char *interfaceName, int32_t nam
         return HDF_ERR_IO;
     }
     ret = ioctl(fd, FUNCTIONFS_NEWFN, &fnnew);
-    if (ret) {
+    if (ret != 0) {
         HDF_LOGE("%{public}s: FUNCTIONFS_NEWFN failure!", __func__);
         return HDF_ERR_IO;
     }
@@ -398,7 +396,7 @@ static int32_t UsbFnAdapterDelInterface(const char *interfaceName, int32_t nameL
         return HDF_ERR_IO;
     }
     ret = ioctl(fd, FUNCTIONFS_DELFN, &fnnew);
-    if (ret) {
+    if (ret != 0) {
         HDF_LOGE("%{public}s: FUNCTIONFS_DELFN failure!", __func__);
         return HDF_ERR_IO;
     }
@@ -516,21 +514,21 @@ ERR:
 static int32_t CopyCount(uint8_t **whereDec, uint32_t fsCount, uint32_t hsCount, uint32_t ssCount)
 {
     int32_t ret;
-    if (fsCount) {
+    if (fsCount != 0) {
         ret = memcpy_s(*whereDec, sizeof(uint32_t), &fsCount, sizeof(uint32_t));
         if (ret != EOK) {
             return HDF_FAILURE;
         }
         *whereDec += sizeof(uint32_t);
     }
-    if (hsCount) {
+    if (hsCount != 0) {
         ret = memcpy_s(*whereDec, sizeof(uint32_t), &hsCount, sizeof(uint32_t));
         if (ret != EOK) {
             return HDF_FAILURE;
         }
         *whereDec += sizeof(uint32_t);
     }
-    if (ssCount) {
+    if (ssCount != 0) {
         ret = memcpy_s(*whereDec, sizeof(uint32_t), &ssCount, sizeof(uint32_t));
         if (ret != EOK) {
             return HDF_FAILURE;
@@ -580,15 +578,15 @@ static void GetCountAndHead(struct UsbFunctionfsDescsHeadV2 *header, uint32_t *f
         lenDes += func->ssDescriptors[i]->bLength;
     }
 
-    if (*fsCount) {
+    if (*fsCount != 0) {
         lenCount += sizeof(uint32_t);
         header->flags |= htole32(FUNCTIONFS_HAS_FS_DESC);
     }
-    if (*hsCount) {
+    if (*hsCount != 0) {
         lenCount += sizeof(uint32_t);
         header->flags |= htole32(FUNCTIONFS_HAS_HS_DESC);
     }
-    if (*ssCount) {
+    if (*ssCount != 0) {
         lenCount += sizeof(uint32_t);
         header->flags |= htole32(FUNCTIONFS_HAS_SS_DESC);
     }
@@ -659,35 +657,35 @@ static int32_t WriteDeviceId(const char *devName, const struct UsbDeviceDescript
 {
     int32_t ret;
     ret = UsbFnWriteProp(devName, "idVendor", desc->idVendor);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         return HDF_ERR_INVALID_PARAM;
     }
     ret = UsbFnWriteProp(devName, "idProduct", desc->idProduct);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         return HDF_ERR_INVALID_PARAM;
     }
     ret = UsbFnWriteProp(devName, "bcdUSB", desc->bcdUSB);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         return HDF_ERR_INVALID_PARAM;
     }
     ret = UsbFnWriteProp(devName, "bcdDevice", desc->bcdDevice);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         return HDF_ERR_INVALID_PARAM;
     }
     ret = UsbFnWriteProp(devName, "bDeviceClass", desc->bDeviceClass);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         return HDF_ERR_INVALID_PARAM;
     }
     ret = UsbFnWriteProp(devName, "bDeviceSubClass", desc->bDeviceSubClass);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         return HDF_ERR_INVALID_PARAM;
     }
     ret = UsbFnWriteProp(devName, "bDeviceProtocol", desc->bDeviceProtocol);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         return HDF_ERR_INVALID_PARAM;
     }
     ret = UsbFnWriteProp(devName, "bMaxPacketSize0", desc->bMaxPacketSize0);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         return HDF_ERR_INVALID_PARAM;
     }
     return 0;
@@ -698,23 +696,23 @@ static int32_t WriteDeviceDescriptor(
 {
     int32_t i, ret;
     ret = WriteDeviceId(devName, desc);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         return HDF_ERR_INVALID_PARAM;
     }
 
     for (i = 0; strings[i] != NULL; i++) {
         ret = UsbFnWriteDesString(
             devName, strings[i]->language, "manufacturer", strings[i]->strings[desc->iManufacturer].s);
-        if (ret) {
+        if (ret != HDF_SUCCESS) {
             return HDF_ERR_INVALID_PARAM;
         }
         ret = UsbFnWriteDesString(devName, strings[i]->language, "product", strings[i]->strings[desc->iProduct].s);
-        if (ret) {
+        if (ret != HDF_SUCCESS) {
             return HDF_ERR_INVALID_PARAM;
         }
         ret = UsbFnWriteDesString(
             devName, strings[i]->language, "serialnumber", strings[i]->strings[desc->iSerialNumber].s);
-        if (ret) {
+        if (ret != HDF_SUCCESS) {
             return HDF_ERR_INVALID_PARAM;
         }
     }
@@ -732,7 +730,7 @@ static int32_t CreatDeviceDir(const char *devName)
     }
     if (!IsDirExist(tmp)) {
         ret = mkdir(tmp, S_IREAD | S_IWRITE);
-        if (ret) {
+        if (ret != 0) {
             HDF_LOGE("%{public}s: mkdir failure!", __func__);
             return HDF_ERR_IO;
         }
@@ -752,7 +750,7 @@ static int32_t WriteConfPowerAttributes(const char *devName, struct UsbFnConfigu
     }
     if (!IsDirExist(configName)) {
         ret = mkdir(configName, S_IREAD | S_IWRITE);
-        if (ret) {
+        if (ret != 0) {
             return HDF_ERR_IO;
         }
     }
@@ -808,7 +806,7 @@ static int32_t CreatKernelFunc(const char *devName, const struct UsbFnFunction *
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterCreateFunc(configPath, funcPath);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbFnAdapterCreateFunc failure!", __func__);
         return HDF_ERR_IO;
     }
@@ -832,7 +830,7 @@ static int32_t CreatFunc(const char *devName, const struct UsbFnFunction *functi
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterCreatInterface(interfaceName, strlen(interfaceName));
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbFnAdapterCreatInterface failure!", __func__);
         CleanConfigFs(devName, interfaceName);
         return HDF_ERR_IO;
@@ -845,12 +843,12 @@ static int32_t CreatFunc(const char *devName, const struct UsbFnFunction *functi
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterCreatPipes(fd, functions);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbFnAdapterCreatPipes failure!", __func__);
         return HDF_ERR_IO;
     }
     ret = UsbFnAdapterClosePipe(fd);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbFnAdapterClosePipe failure!", __func__);
         return HDF_ERR_IO;
     }
@@ -914,7 +912,7 @@ static void CleanFunction(const char *devName, const char *funcName)
 {
     int32_t ret;
     ret = UsbFnAdapterDelInterface(funcName, strlen(funcName));
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbFnAdapterDelInterface failure!", __func__);
         return;
     }
@@ -970,7 +968,7 @@ static int32_t UsbFnAdapterDelDevice(const char *deviceName, const char *udcName
         }
     }
 
-    if (strcmp("g1", deviceName)) {
+    if (strcmp("g1", deviceName) != 0) {
         DelConfigDevice(deviceName);
     }
     return 0;
@@ -1013,7 +1011,7 @@ static int32_t EnableDevice(const char *udcName, const char *devName, struct Usb
     }
 #endif
     ret = UsbFnAdapterWriteUDC(devName, udcName, 1);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         (void)UsbFnAdapterDelDevice(devName, udcName, descriptor);
     }
     return ret;
@@ -1046,12 +1044,12 @@ static int32_t UsbFnAdapterCreateDevice(const char *udcName, const char *devName
     UsbFnAdapterCleanDevice(devName);
 
     ret = CreatDeviceDir(devName);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         return HDF_ERR_IO;
     }
 
     ret = WriteDeviceDescriptor(devName, descriptor->deviceDesc, descriptor->deviceStrings);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: WriteDeviceDescriptor failure!", __func__);
         return HDF_ERR_IO;
     }
@@ -1059,7 +1057,7 @@ static int32_t UsbFnAdapterCreateDevice(const char *udcName, const char *devName
     for (i = 0; descriptor->configs[i] != NULL; i++) {
         confVal = descriptor->configs[i]->configurationValue;
         ret = WriteConfPowerAttributes(devName, descriptor->configs[i], confVal);
-        if (ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: WriteConfPowerAttributes failure!", __func__);
             return HDF_ERR_IO;
         }
@@ -1098,7 +1096,7 @@ static int32_t UsbFnAdapterGetPipeInfo(int32_t ep, struct UsbFnPipeInfo * const 
 
     struct UsbEndpointDescriptor desc;
     ret = ioctl(ep, FUNCTIONFS_ENDPOINT_DESC, &desc);
-    if (ret) {
+    if (ret != 0) {
         HDF_LOGE("%{public}s: FUNCTIONFS_ENDPOINT_DESC failure!", __func__);
         return HDF_ERR_IO;
     }
