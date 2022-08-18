@@ -22,7 +22,9 @@ ohos_systemtest("hdf_audio_idlhdi_performace_test") {
   public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
   sources = [
     "../../common/hdi_service_common/src/hdi_service_common.cpp",
+    "src/audio_idlhdiadapter_performace_test.cpp",
     "src/audio_idlhdicapture_performace_test.cpp",
+    "src/audio_idlhdimanager_performace_test.cpp",
     "src/audio_idlhdirender_performace_test.cpp",
   ]
   include_dirs = [ "//drivers/peripheral/audio/test/systemtest/common/hdi_service_common/include" ]
