@@ -17,7 +17,7 @@
 #include <osal_mem.h>
 #include <unistd.h>
 #include "hdf_log.h"
-#include "partitionslot_manager.h"
+#include "v1_0/ipartition_slot.h"
 
 namespace OHOS {
 namespace PartitionSlot {
@@ -38,8 +38,9 @@ HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_001, TestSize.Level1)
     printf("begin get currentslot by service \n");
     int numOfSlots = 0;
     int currentSlot = -1;
-    currentSlot = PartitionSlotManager::GetInstance()->GetCurrentSlot(numOfSlots);
-    ASSERT_TRUE(currentSlot != -1);
+    sptr<IPartitionSlot> partitionslot = IPartitionSlot::Get();
+    ASSERT_TRUE(partitionslot != nullptr);
+    ASSERT_TRUE(partitionslot->GetCurrentSlot(currentSlot, numOfSlots) == 0);
 }
 
 HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_002, TestSize.Level1)
@@ -47,22 +48,29 @@ HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_002, TestSize.Level1)
     printf("begin get suffix by service \n");
     std::string suffix = "";
     int slot = 2;
-    ASSERT_TRUE(PartitionSlotManager::GetInstance()->GetSlotSuffix(slot, suffix) == 0);
+    sptr<IPartitionSlot> partitionslot = IPartitionSlot::Get();
+    ASSERT_TRUE(partitionslot != nullptr);
+    ASSERT_TRUE(partitionslot->GetSlotSuffix(slot, suffix) == 0);
 }
 
 HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_003, TestSize.Level1)
 {
     printf("begin set active slot by service \n");
     int numOfSlots = 0;
-    int currentSlot = PartitionSlotManager::GetInstance()->GetCurrentSlot(numOfSlots);
-    ASSERT_TRUE(PartitionSlotManager::GetInstance()->SetActiveSlot(2) == 0);
-    PartitionSlotManager::GetInstance()->SetActiveSlot(currentSlot);
+    int currentSlot = 0;
+    sptr<IPartitionSlot> partitionslot = IPartitionSlot::Get();
+    ASSERT_TRUE(partitionslot != nullptr);
+    partitionslot->GetCurrentSlot(currentSlot, numOfSlots);
+    ASSERT_TRUE(partitionslot->SetActiveSlot(2) == 0);
+    partitionslot->SetActiveSlot(currentSlot);
 }
 
 HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_004, TestSize.Level1)
 {
     printf("begin set unbootable slot by service \n");
-    ASSERT_TRUE(PartitionSlotManager::GetInstance()->SetSlotUnbootable(2) == 0);
+    sptr<IPartitionSlot> partitionslot = IPartitionSlot::Get();
+    ASSERT_TRUE(partitionslot != nullptr);
+    ASSERT_TRUE(partitionslot->SetSlotUnbootable(2) == 0);
 }
 } // PartitionSlot
 } // OHOS

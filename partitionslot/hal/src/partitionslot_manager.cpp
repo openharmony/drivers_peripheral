@@ -35,7 +35,7 @@ constexpr off_t MISC_PARTITION_ACTIVE_SLOT_SIZE = 4;
 constexpr off_t MISC_PARTITION_UNBOOT_SLOT_OFFSET = MISC_PARTITION_ACTIVE_SLOT_OFFSET + MISC_PARTITION_ACTIVE_SLOT_SIZE;
 constexpr off_t MISC_PARTITION_UNBOOT_SLOT_SIZE = 4;
 
-int32_t PartitionSlotManager::GetCurrentSlot(int32_t& numOfSlots)
+int32_t PartitionSlotManager::GetCurrentSlot(int32_t& currentSlot, int32_t& numOfSlots)
 {
     HILOG_DEBUG(LOG_CORE, "%{public}s called!", __func__);
     numOfSlots = system::GetIntParameter("ohos.boot.bootslots", 1);
@@ -50,9 +50,9 @@ int32_t PartitionSlotManager::GetCurrentSlot(int32_t& numOfSlots)
         HILOG_ERROR(LOG_CORE, "miscDevice is empty");
         return -1;
     }
-    int32_t currentSlot = ReadMisc(miscDevice, MISC_PARTITION_ACTIVE_SLOT_OFFSET, MISC_PARTITION_ACTIVE_SLOT_SIZE);
+    currentSlot = ReadMisc(miscDevice, MISC_PARTITION_ACTIVE_SLOT_OFFSET, MISC_PARTITION_ACTIVE_SLOT_SIZE);
     HILOG_INFO(LOG_CORE, "current slot is %{public}d, numOfSlots is %{public}d", currentSlot, numOfSlots);
-    return currentSlot;
+    return 0;
 }
 
 int32_t PartitionSlotManager::GetSlotSuffix(int32_t slot, std::string& suffix)
