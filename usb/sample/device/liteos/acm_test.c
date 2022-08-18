@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
+#include <pthread.h>
 #include <stdio.h>
 #include <sys/time.h>
-#include <pthread.h>
 #include <unistd.h>
 #include "hdf_io_service_if.h"
 #include "hdf_log.h"
@@ -25,7 +25,7 @@
 #include "osal_time.h"
 #include "securec.h"
 
-#define HDF_LOG_TAG   cdc_acm_test
+#define HDF_LOG_TAG cdc_acm_test
 
 enum UsbSerialCmd {
     USB_SERIAL_OPEN = 0,
@@ -42,14 +42,14 @@ enum UsbSerialCmd {
 static struct HdfSBuf *g_data;
 static struct HdfSBuf *g_reply;
 static struct HdfIoService *g_acmService;
-static struct OsalMutex       g_lock;
+static struct OsalMutex g_lock;
 
 static void TestWrite(const char *buf)
 {
     HdfSbufFlush(g_data);
     (void)HdfSbufWriteString(g_data, buf);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_WRITE, g_data, g_reply);
-    if (status <= 0) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
     }
 }
@@ -62,7 +62,7 @@ static void TestRead(void)
         printf("%s: Dispatch USB_SERIAL_READ failed status = %d", __func__, status);
         return;
     }
-    if (HdfSbufGetDataSize(g_reply)) {
+    if (HdfSbufGetDataSize(g_reply) != 0) {
         const char *tmp = HdfSbufReadString(g_reply);
         if (tmp && strlen(tmp) > 0) {
             printf("%s: read : %s \n", __func__, tmp);
@@ -91,11 +91,11 @@ static void StartPThreadRead(void)
     }
 }
 
-#define STR_LEN 256
+#define STR_LEN       256
 #define SLEEP_GETCHAR 100000
 static void Test02(void)
 {
-    char c;
+    char ch;
     char str[STR_LEN] = {0};
     char *getStr = NULL;
     if (OsalMutexInit(&g_lock) != HDF_SUCCESS) {
@@ -104,8 +104,8 @@ static void Test02(void)
     }
     while (1) {
         printf("\ninput: \nr: for read acm\nw: for write acm \nq: for exit \n");
-        c = getchar();
-        if (c == 'r') {
+        ch = (char)getchar();
+        if (ch == 'r') {
             printf("input: 'q' quit reading\n");
             g_readRuning = true;
             StartPThreadRead();
@@ -114,7 +114,7 @@ static void Test02(void)
                 usleep(SLEEP_GETCHAR);
             }
             g_readRuning = false;
-        } else if (c == 'w') {
+        } else if (ch == 'w') {
             printf("input strings and press enter to send\n");
             getchar();
             getStr = gets_s(str, STR_LEN - 1);
@@ -122,7 +122,7 @@ static void Test02(void)
                 HDF_LOGE("%s: gets_s failed", __func__);
             }
             TestWrite(str);
-        } else if (c == 'q') {
+        } else if (ch == 'q') {
             return;
         }
     }

@@ -278,7 +278,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
         AcmProcessNotification(acm, (unsigned char *)dr);
         acm->nbIndex = 0;
     }
-    if (UsbRawSubmitRequest(req))
+    if (UsbRawSubmitRequest(req) != HDF_SUCCESS)
         printf("%s - UsbRawSubmitRequest failed", __func__);
 EXIT:
     printf("%s:%d exit", __func__, __LINE__);

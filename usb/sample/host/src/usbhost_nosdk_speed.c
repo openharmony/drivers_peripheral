@@ -196,7 +196,7 @@ static int32_t ReapProcess(void * const argurb)
         printf("signal SIGUSR1 failed");
         return HDF_ERR_IO;
     }
-    tid = syscall(SYS_gettid);
+    tid = (pid_t)syscall(SYS_gettid);
 
     while (!g_speedFlag) {
         r = ioctl(fd, USBDEVFS_REAPURB, &urbrecv);
@@ -248,7 +248,7 @@ static int32_t BeginProcess(unsigned char endPoint)
         printf("parameter error\n");
         return -1;
     }
-    for (int32_t i = 0; i < TEST_CYCLE; i++) {
+    for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].urb = calloc(1, sizeof(struct UsbAdapterUrb));
         if (urb[i].urb == NULL) {
             return -1;
@@ -297,7 +297,7 @@ static int32_t BeginProcess(unsigned char endPoint)
     while (!exitOk) {
         OsalMSleep(10);
     }
-    for (int32_t i = 0; i < TEST_CYCLE; i++) {
+    for (i = 0; i < TEST_CYCLE; i++) {
         munmap(urb[i].urb->buffer, TEST_LENGTH);
         free(urb[i].urb);
     }
@@ -315,21 +315,21 @@ int32_t main(int32_t argc, char *argv[])
 {
     int32_t ret;
     if (argc == 6) {
-        g_busNum = atoi(argv[1]);
-        g_devAddr = atoi(argv[2]);
-        ifaceNum = atoi(argv[3]);
-        endNum = atoi(argv[4]);
-        if (endNum >> 7 != 0) {
+        g_busNum = (unsigned int)atoi(argv[1]);
+        g_devAddr = (unsigned int)atoi(argv[2]);
+        ifaceNum = (unsigned int)atoi(argv[3]);
+        endNum = (unsigned char)atoi(argv[4]);
+        if ((endNum >> 7) != 0) { // the offset value is 7
             g_printData = (strncmp(argv[5], "printdata", 1)) ? false : true;
         }
     } else if (argc == 5) {
-        g_busNum = atoi(argv[1]);
-        g_devAddr = atoi(argv[2]);
-        ifaceNum = atoi(argv[3]);
-        endNum = atoi(argv[4]);
+        g_busNum = (unsigned int)atoi(argv[1]);
+        g_devAddr = (unsigned int)atoi(argv[2]);
+        ifaceNum = (unsigned int)atoi(argv[3]);
+        endNum = (unsigned char)atoi(argv[4]);
     } else if (argc == 3) {
-        ifaceNum = atoi(argv[1]);
-        endNum = atoi(argv[2]);
+        ifaceNum = (unsigned int)atoi(argv[1]);
+        endNum = (unsigned char)atoi(argv[2]);
     } else {
         printf("Error: parameter error!\n\n");
         ShowHelp(argv[0]);
