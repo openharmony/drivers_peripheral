@@ -47,60 +47,35 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
-    int32_t AudioCaptureStart(const string path, struct AudioCapture *capture) const;
+    static void *handle;
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManager *manager;
 };
 
-TestAudioManager *(*AudioHdiCaptureVolumeTest::GetAudioManager)() = nullptr;
-void *AudioHdiCaptureVolumeTest::handleSo = nullptr;
+void *AudioHdiCaptureVolumeTest::handle = nullptr;
+TestGetAudioManager AudioHdiCaptureVolumeTest::getAudioManager = nullptr;
+TestAudioManager *AudioHdiCaptureVolumeTest::manager = nullptr;
 
 void AudioHdiCaptureVolumeTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return;
-    }
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
 }
 
 void AudioHdiCaptureVolumeTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
 }
 
 void AudioHdiCaptureVolumeTest::SetUp(void) {}
 void AudioHdiCaptureVolumeTest::TearDown(void) {}
-
-int32_t AudioHdiCaptureVolumeTest::AudioCaptureStart(const string path, struct AudioCapture *capture) const
-{
-    int32_t ret = -1;
-    struct AudioSampleAttributes attrs = {};
-    if (capture == nullptr) {
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    InitAttrs(attrs);
-    FILE *file = fopen(path.c_str(), "wb+");
-    if (file == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = FrameStartCapture(capture, file, attrs);
-    (void)fclose(file);
-    return ret;
-}
 
 /**
 * @tc.name  Test AudioCaptureSetMute API via legal input.
@@ -115,8 +90,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetMute_0001, Test
     bool muteFalse = false;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -151,8 +125,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetMute_0002, Test
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.SetMute(captureNull, muteTrue);
@@ -176,8 +149,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetMute_0003, Test
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -209,8 +181,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureGetMute_0001, Test
 #endif
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -242,8 +213,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureGetMute_0002, Test
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetMute(captureNull, &muteTrue);
@@ -277,8 +247,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetVolume_0001, Te
     float volumeHighExpc = 0.70;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.SetVolume(capture, volumeInit);
@@ -322,8 +291,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetVolume_0002, Te
     float volumeMaxBoundary = 1.1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -361,8 +329,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureSetVolume_0003, Te
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -385,8 +352,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureGetVolume_001, Tes
     float defaultVolume = 0.60;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -412,11 +378,10 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureGetVolume_002, Tes
     float defaultVolume = 0.60;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = AudioCaptureStart(AUDIO_CAPTURE_FILE, capture);
+    ret = AudioCaptureStartAndOneFrame(capture);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->volume.SetVolume(capture, volume);
@@ -443,8 +408,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_HDI_AudioCaptureGetVolume_0003, Te
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -467,8 +431,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGainThreshold_0001, 
     float max = 0;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -495,8 +458,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGainThreshold_0002, 
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -519,8 +481,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGainThreshold_0003, 
     float* minNull = nullptr;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -543,8 +504,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGainThreshold_0004, 
     float* maxNull = nullptr;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -567,8 +527,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureSetGain_0001, TestSize.
     float max = 0;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -615,8 +574,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureSetGain_0002, TestSize.
     float max = 0;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
@@ -647,8 +605,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureSetGain_0003, TestSize.
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -671,8 +628,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGain_0001, TestSize.
     float max = 0;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
@@ -703,8 +659,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGain_0002, TestSize.
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGain((AudioHandle)captureNull, &gainValue);
@@ -725,8 +680,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGain_0003, TestSize.
     float gainOne = GAIN_MAX-1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -751,8 +705,7 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGain_0004, TestSize.
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     float *gainNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 

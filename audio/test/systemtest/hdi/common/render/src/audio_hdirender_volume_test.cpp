@@ -47,37 +47,30 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
+    static void *handle;
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManager *manager;
 };
 
-TestAudioManager *(*AudioHdiRenderVolumeTest::GetAudioManager)() = nullptr;
-void *AudioHdiRenderVolumeTest::handleSo = nullptr;
+void *AudioHdiRenderVolumeTest::handle = nullptr;
+TestGetAudioManager AudioHdiRenderVolumeTest::getAudioManager = nullptr;
+TestAudioManager *AudioHdiRenderVolumeTest::manager = nullptr;
 
 void AudioHdiRenderVolumeTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return;
-    }
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
 }
 
 void AudioHdiRenderVolumeTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
 }
 
@@ -97,8 +90,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_0001, Te
     float max = 0;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -125,8 +117,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_0002, Te
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -149,8 +140,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_0003, Te
     float *minNull = nullptr;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -173,8 +163,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_0004, Te
     float *maxNull = nullptr;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGainThreshold(render, &min, maxNull);
@@ -195,8 +184,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0001, TestSize.Le
     float gain = 10.8;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 #ifdef ALSA_LIB_MODE
@@ -247,8 +235,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0002, TestSize.Le
     float max = 0;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
@@ -277,8 +264,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0003, TestSize.Le
     char gain = 'a';
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -302,8 +288,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0004, TestSize.Le
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -326,8 +311,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGain_0001, TestSize.Le
     float max = 0;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
@@ -358,8 +342,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGain_0002, TestSize.Le
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -381,8 +364,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGain_0003, TestSize.Le
     float gainOne = GAIN_MAX-1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -407,8 +389,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGain_0004, TestSize.Le
     float *gainNull = nullptr;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGain((AudioHandle)render, gainNull);
@@ -429,8 +410,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetMute_0001, TestSi
     bool muteTrue = true;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -467,8 +447,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetMute_0002, TestSi
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.SetMute(renderNull, mute);
@@ -488,8 +467,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetMute_0003, TestSi
     bool muteValue = 2;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -520,8 +498,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetMute_0001, TestSi
 #endif
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -552,8 +529,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetMute_0002, TestSi
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetMute(renderNull, &muteTrue);
@@ -586,8 +562,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetVolume_0001, Test
     float volumeHighExpc = 0.80;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -632,8 +607,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetVolume_0002, Test
     float volumeMaxBoundary = 1.01;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.SetVolume(render, volumeMin);
@@ -670,8 +644,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderSetVolume_0003, Test
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.SetVolume(renderNull, volume);
@@ -693,8 +666,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetVolume_001, TestS
     float volumeDefault = 0.30;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -720,8 +692,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetVolume_002, TestS
     float defaultVolume = 0.30;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -749,8 +720,7 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_AudioRenderGetVolume_0003, Test
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetVolume(renderNull, &volume);

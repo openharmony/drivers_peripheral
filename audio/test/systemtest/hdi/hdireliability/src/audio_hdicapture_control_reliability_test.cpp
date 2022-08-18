@@ -39,8 +39,9 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
+    static void *handle;
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManager *manager;
     static int32_t RelAudioCreateCapture(struct PrepareAudioPara& ptr);
     static int32_t RelAudioCaptureStart(struct PrepareAudioPara& ptr);
     static int32_t RelGetAllAdapter(struct PrepareAudioPara& ptr);
@@ -60,34 +61,25 @@ public:
 
 using THREAD_FUNC = void *(*)(void *);
 
-TestAudioManager *(*AudioHdiCaptureControlReliabilityTest::GetAudioManager)() = nullptr;
-void *AudioHdiCaptureControlReliabilityTest::handleSo = nullptr;
+void *AudioHdiCaptureControlReliabilityTest::handle = nullptr;
+TestGetAudioManager AudioHdiCaptureControlReliabilityTest::getAudioManager = nullptr;
+TestAudioManager *AudioHdiCaptureControlReliabilityTest::manager = nullptr;
 
 void AudioHdiCaptureControlReliabilityTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return;
-    }
-
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
 }
 
 void AudioHdiCaptureControlReliabilityTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
 }
 
@@ -341,8 +333,7 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioCaptureGetCapturePosition
 HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureFrame_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
+    g_para[0].manager = manager;
     ASSERT_NE(nullptr, g_para[0].manager);
     ret = RelGetAllAdapter(g_para[0]);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -379,8 +370,7 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStart_
     int32_t ret = -1;
     int32_t failcount = 0;
     int32_t succeedcount = 0;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
+    g_para[0].manager = manager;
     ASSERT_NE(nullptr, g_para[0].manager);
     ret = RelGetAllAdapter(g_para[0]);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -394,9 +384,9 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStart_
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        void *result = nullptr;
-        pthread_join(tids[i], &result);
-        ret = (intptr_t)result;
+        void *captureStartResult = nullptr;
+        pthread_join(tids[i], &captureStartResult);
+        ret = (intptr_t)captureStartResult;
         if (ret == 0) {
             EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
             succeedcount = succeedcount + 1;
@@ -425,8 +415,7 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStop_R
     int32_t ret = -1;
     int32_t failcount = 0;
     int32_t succeedcount = 0;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
+    g_para[0].manager = manager;
     ASSERT_NE(nullptr, g_para[0].manager);
     ret = RelAudioCaptureProcedure(g_para[0]);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -436,13 +425,13 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStop_R
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        void *result = nullptr;
-        pthread_join(tids[i], &result);
-        if ((int32_t)(intptr_t)result == 0) {
-            EXPECT_EQ(AUDIO_HAL_SUCCESS, (int32_t)(intptr_t)result);
+        void *captureStopResult = nullptr;
+        pthread_join(tids[i], &captureStopResult);
+        if ((int32_t)(intptr_t)captureStopResult == 0) {
+            EXPECT_EQ(AUDIO_HAL_SUCCESS, (int32_t)(intptr_t)captureStopResult);
             succeedcount = succeedcount + 1;
         } else {
-            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (int32_t)(intptr_t)result);
+            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (int32_t)(intptr_t)captureStopResult);
             failcount = failcount + 1;
         }
     }
@@ -466,8 +455,8 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCapturePause_
     int32_t ret = -1;
     int32_t failcount = 0;
     int32_t succeedcount = 0;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
+    g_para[0].manager = manager;
+    ASSERT_NE(nullptr, g_para[0].manager);
     ASSERT_NE(nullptr, g_para[0].manager);
     ret = RelAudioCaptureProcedure(g_para[0]);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -478,13 +467,13 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCapturePause_
     }
 
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        void *result = nullptr;
-        pthread_join(tids[i], &result);
-        if ((int32_t)(intptr_t)result == 0) {
-            EXPECT_EQ(AUDIO_HAL_SUCCESS, (int32_t)(intptr_t)result);
+        void *CapturePauseResult = nullptr;
+        pthread_join(tids[i], &CapturePauseResult);
+        if ((int32_t)(intptr_t)CapturePauseResult == 0) {
+            EXPECT_EQ(AUDIO_HAL_SUCCESS, (int32_t)(intptr_t)CapturePauseResult);
             succeedcount = succeedcount + 1;
         } else {
-            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (int32_t)(intptr_t)result);
+            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (int32_t)(intptr_t)CapturePauseResult);
             failcount = failcount + 1;
         }
     }
@@ -506,8 +495,7 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioInitAllPorts_
 {
     int32_t ret = -1;
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
+    g_para[0].manager = manager;
     ASSERT_NE(nullptr, g_para[0].manager);
     ret = RelGetAllAdapter(g_para[0]);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -534,8 +522,7 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioInitAllPorts_
 HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioGetPortCapability_Reliability_0002, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
+    g_para[0].manager = manager;
     ASSERT_NE(nullptr, g_para[0].manager);
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     ret = RelGetAllAdapter(g_para[0]);
@@ -568,8 +555,7 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioSetPassthroug
     g_para[0].mode = PORT_PASSTHROUGH_LPCM;
     g_para[0].portType = PORT_OUT;
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
+    g_para[0].manager = manager;
     ASSERT_NE(nullptr, g_para[0].manager);
     ret = RelGetAllAdapter(g_para[0]);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -604,8 +590,7 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioGetPassthroug
     g_para[0].portType = PORT_OUT;
     g_para[0].mode = PORT_PASSTHROUGH_LPCM;
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
+    g_para[0].manager = manager;
     ASSERT_NE(nullptr, g_para[0].manager);
     ret = RelGetAllAdapter(g_para[0]);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -638,8 +623,7 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureResume
     int32_t ret = -1;
     int32_t failcount = 0;
     int32_t succeedcount = 0;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
+    g_para[0].manager = manager;
     ASSERT_NE(nullptr, g_para[0].manager);
     ret = RelAudioCaptureProcedure(g_para[0]);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -654,13 +638,13 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureResume
     }
 
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
-        void *result = nullptr;
-        pthread_join(tids[i], &result);
-        if ((int32_t)(intptr_t)result == 0) {
-            EXPECT_EQ(AUDIO_HAL_SUCCESS, (int32_t)(intptr_t)result);
+        void *captureResumeResult = nullptr;
+        pthread_join(tids[i], &captureResumeResult);
+        if ((int32_t)(intptr_t)captureResumeResult == 0) {
+            EXPECT_EQ(AUDIO_HAL_SUCCESS, (int32_t)(intptr_t)captureResumeResult);
             succeedcount = succeedcount + 1;
         } else {
-            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (int32_t)(intptr_t)result);
+            EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, (int32_t)(intptr_t)captureResumeResult);
             failcount = failcount + 1;
         }
     }
@@ -681,8 +665,7 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioGetCapturePos
 {
     int32_t ret = -1;
     int64_t timeExp = 0;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
+    g_para[0].manager = manager;
     ASSERT_NE(nullptr, g_para[0].manager);
     ret = RelAudioCaptureProcedure(g_para[0]);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);

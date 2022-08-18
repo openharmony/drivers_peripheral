@@ -40,31 +40,26 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
+    static void *handle;
     static struct ISvcMgrIoservice *servmgr;
     static struct ServiceStatusListener *listener;
     static TestAudioManager *manager;
-    static int32_t GetManager(struct PrepareAudioPara& audiopara);
+    static TestGetAudioManager getAudioManager;
 };
 
-TestAudioManager *(*AudioThresholdReportTest::GetAudioManager)() = nullptr;
-void *AudioThresholdReportTest::handleSo = nullptr;
+TestGetAudioManager AudioThresholdReportTest::getAudioManager = nullptr;
+void *AudioThresholdReportTest::handle = nullptr;
 TestAudioManager *AudioThresholdReportTest::manager = nullptr;
 struct ISvcMgrIoservice *AudioThresholdReportTest::servmgr = nullptr;
 struct ServiceStatusListener *AudioThresholdReportTest::listener = nullptr;
 using THREAD_FUNC = void *(*)(void *);
 void AudioThresholdReportTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handleSo);
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     (void)HdfRemoteGetCallingPid();
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
-    manager = GetAudioManager();
+    ASSERT_NE(nullptr, getAudioManager);
+    manager = getAudioManager();
     ASSERT_NE(nullptr, manager);
     servmgr = SvcMgrIoserviceGet();
     ASSERT_NE(nullptr, servmgr);
@@ -82,12 +77,11 @@ void AudioThresholdReportTest::TearDownTestCase(void)
         (void)manager->ReleaseAudioManagerObject(manager);
         manager = nullptr;
     }
-    if (handleSo != nullptr) {
-        (void)dlclose(handleSo);
-        handleSo = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
     (void)servmgr->UnregisterServiceStatusListener(servmgr, listener);
     (void)HdiServiceStatusListenerFree(listener);
@@ -116,17 +110,6 @@ void AudioThresholdReportReceived(struct ServiceStatusListener *listener, struct
     }
 }
 
-int32_t AudioThresholdReportTest::GetManager(struct PrepareAudioPara& audiopara)
-{
-    auto *inst = (AudioThresholdReportTest *)audiopara.self;
-    if (inst != nullptr && inst->GetAudioManager != nullptr) {
-        audiopara.manager = inst->GetAudioManager();
-    }
-    if (audiopara.manager == nullptr) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
 /**
 * @tc.name  test Threshold Reporting
 * @tc.number  SUB_Audio_Threshold_Capture_Report_0001
@@ -170,13 +153,12 @@ HWTEST_F(AudioThresholdReportTest, SUB_Audio_Threshold_Capture_Report_0002, Test
 {
     int32_t ret = -1;
     g_reportCount =0;
+    ASSERT_NE(nullptr, manager);
     uint32_t expectReportCount = FILE_SIZE_BIT / BUFFER_SIZE_BIT + 1;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILE_SIZE_BYTE
     };
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
