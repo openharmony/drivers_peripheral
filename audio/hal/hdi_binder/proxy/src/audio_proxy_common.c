@@ -251,13 +251,9 @@ int32_t AudioProxyReadSapmleAttrbutes(struct HdfSBuf *reply, struct AudioSampleA
         return HDF_FAILURE;
     }
     attrs->isSignedData = (bool)tempInterleaved;
-    if (!HdfSbufReadUint32(reply, &attrs->startThreshold)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadUint32(reply, &attrs->stopThreshold)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadUint32(reply, &attrs->silenceThreshold)) {
+    if (!HdfSbufReadUint32(reply, &attrs->startThreshold) ||
+        !HdfSbufReadUint32(reply, &attrs->stopThreshold) ||
+        !HdfSbufReadUint32(reply, &attrs->silenceThreshold)) {
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;

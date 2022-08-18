@@ -96,10 +96,12 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/sample",
     ]
 
     sources = [
+      "//drivers/peripheral/audio/hal/hdi_binder/server/src/hdf_audio_events.c",
       "framework_capture.c",
       "framework_common.c",
     ]
@@ -111,7 +113,6 @@ if (defined(ohos_lite)) {
     }
 
     if (is_standard_system) {
-      deps = [ "//drivers/peripheral/audio/hal/hdi_binder/server:hdi_audio_primary_server" ]
       external_deps = [
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
