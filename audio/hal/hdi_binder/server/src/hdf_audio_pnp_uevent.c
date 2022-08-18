@@ -164,7 +164,7 @@ static int32_t AudioPnpUeventParse(const char *msg, const int32_t strLength)
 
     struct AudioPnpUevent audioPnpUevent = {"", "", "", "", "", "", "", ""};
     char *msgTmp = eventMsg;
-    while (*msgTmp) {
+    while (*msgTmp != 0) {
         if (strncmp(msgTmp, UEVENT_ACTION, strlen(UEVENT_ACTION)) == 0) {
             msgTmp += strlen(UEVENT_ACTION);
             audioPnpUevent.action = msgTmp;
