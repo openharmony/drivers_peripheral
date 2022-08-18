@@ -329,7 +329,7 @@ DCamRetCode DCameraStream::FlushDCameraBuffer()
 
     while (true) {
         std::shared_ptr<DImageBuffer> imageBuffer = dcStreamBufferMgr_->AcquireBuffer();
-        if (imageBuffer == nullptr) {
+        if (imageBuffer != nullptr) {
             auto bufCfg = bufferConfigMap_.find(imageBuffer);
             if (bufCfg == bufferConfigMap_.end()) {
                 DHLOGE("Buffer not in map.");
