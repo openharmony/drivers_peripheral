@@ -46,40 +46,32 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
+    static void *handle;
+    static TestGetAudioManager getAudioManager;
+    TestAudioManager *manager = nullptr;
 };
 
-TestAudioManager *(*AudioHdiManagerTest::GetAudioManager)() = nullptr;
-void *AudioHdiManagerTest::handleSo = nullptr;
+void *AudioHdiManagerTest::handle = nullptr;
+TestGetAudioManager AudioHdiManagerTest::getAudioManager = nullptr;
 
 void AudioHdiManagerTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return;
-    }
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 }
     
 void AudioHdiManagerTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
-    }
-    }
-void AudioHdiManagerTest::SetUp(void) {}
+}
+void AudioHdiManagerTest::SetUp(void)
+{
+    ASSERT_NE(nullptr, getAudioManager);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
+}
 
 void AudioHdiManagerTest::TearDown(void) {}
 
@@ -92,10 +84,6 @@ void AudioHdiManagerTest::TearDown(void) {}
 HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0001, TestSize.Level1)
 {
     bool ret;
-    TestAudioManager *manager = nullptr;
-
-    ASSERT_NE(nullptr, GetAudioManager);
-    manager = GetAudioManager();
     ASSERT_NE(nullptr, manager);
 
     ret = manager->ReleaseAudioManagerObject(manager);
@@ -115,10 +103,6 @@ HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0001, Test
 HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0002, TestSize.Level1)
 {
     bool ret;
-    TestAudioManager *manager = nullptr;
-
-    ASSERT_NE(nullptr, GetAudioManager);
-    manager = GetAudioManager();
     ASSERT_NE(nullptr, manager);
     TestAudioManager *managerNull = nullptr;
 
@@ -138,10 +122,6 @@ HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0002, Test
 HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0003, TestSize.Level1)
 {
     bool ret;
-    TestAudioManager *manager = nullptr;
-
-    ASSERT_NE(nullptr, GetAudioManager);
-    manager = GetAudioManager();
     ASSERT_NE(nullptr, manager);
     TestAudioManager errorManager = {};
 
@@ -160,16 +140,12 @@ HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0003, Test
 HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0004, TestSize.Level1)
 {
     bool ret;
-    TestAudioManager *manager = nullptr;
-
-    ASSERT_NE(nullptr, GetAudioManager);
-    manager = GetAudioManager();
     ASSERT_NE(nullptr, manager);
 
     ret = manager->ReleaseAudioManagerObject(manager);
     EXPECT_TRUE(ret);
 
-    manager = GetAudioManager();
+    manager = getAudioManager();
     ASSERT_NE(nullptr, manager);
     ASSERT_NE(nullptr, manager->GetAllAdapters);
     ASSERT_NE(nullptr, manager->LoadAdapter);

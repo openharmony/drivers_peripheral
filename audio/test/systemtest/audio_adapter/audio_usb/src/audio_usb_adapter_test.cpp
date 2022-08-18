@@ -49,37 +49,30 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
+    static void *handle;
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManager *manager;
 };
 
-TestAudioManager *(*AudioUsbAdapterTest::GetAudioManager)() = nullptr;
-void *AudioUsbAdapterTest::handleSo = nullptr;
+void *AudioUsbAdapterTest::handle = nullptr;
+TestGetAudioManager AudioUsbAdapterTest::getAudioManager = nullptr;
+TestAudioManager *AudioUsbAdapterTest::manager = nullptr;
 
 void AudioUsbAdapterTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return;
-    }
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
 }
 
 void AudioUsbAdapterTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
 }
 
@@ -98,8 +91,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0001, TestSize.L
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioPort* renderPort = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -119,8 +111,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0001, TestS
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
     struct AudioAdapter *adapter = {};
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     struct AudioPortCapability capability = {};
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
@@ -156,8 +147,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0002, TestS
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
     struct AudioAdapter *adapter = {};
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     struct AudioPortCapability capability = {};
 
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME_USB, &adapter, audioPort);
@@ -181,8 +171,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0003, TestS
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
     struct AudioAdapter *adapter = {};
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     struct AudioPortCapability capability = {};
 
     ret = GetLoadAdapter(manager, PORT_OUT_IN, ADAPTER_NAME_USB, &adapter, audioPort);
@@ -206,8 +195,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0001, Test
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
     struct AudioAdapter *adapter = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     AudioPortPassthroughMode modeLpcm = PORT_PASSTHROUGH_AUTO;
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
@@ -235,8 +223,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0002, Test
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioPort* audioPort = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -261,8 +248,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0001, Test
     struct AudioPort* audioPort = nullptr;
     AudioPortPassthroughMode mode = PORT_PASSTHROUGH_AUTO;
     struct AudioAdapter *adapter = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
 
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -292,8 +278,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AudioCreateCapture_0001, TestSize.Le
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
 
-    TestAudioManager* manager = GetAudioManager();
-    ASSERT_NE(nullptr, GetAudioManager);
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_USB, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     adapter->DestroyCapture(adapter, capture);
@@ -316,8 +301,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AudioCreateCapture_0002, TestSize.Le
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor DevDesc = {};
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_OUT_IN, ADAPTER_NAME_USB, &adapter, audioPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(attrs);
@@ -351,8 +335,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AudioDestroyCapture_0001, TestSize.L
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
 
-    TestAudioManager* manager = GetAudioManager();
-    ASSERT_NE(nullptr, GetAudioManager);
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_USB, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->DestroyCapture(adapter, capture);
@@ -370,8 +353,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_CreateRender_0001, TestSize.Level1)
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -389,8 +371,7 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_DestroyRender_0001, TestSize.Level1)
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
-    TestAudioManager* manager = GetAudioManager();
-    ASSERT_NE(nullptr, GetAudioManager);
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 

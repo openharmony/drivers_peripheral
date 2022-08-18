@@ -22,8 +22,8 @@ using namespace testing::ext;
 using namespace OHOS::Audio;
 
 namespace {
-const int PTHREAD_SAMEADA_COUNT = 10;
 const int PTHREAD_DIFFADA_COUNT = 1;
+const int PTHREAD_SAMEADA_COUNT = 10;
 mutex g_testMutex;
 static struct PrepareAudioPara g_para[PTHREAD_DIFFADA_COUNT] = {
     {
@@ -38,10 +38,11 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
-    static int32_t RelAudioCreateRender(struct PrepareAudioPara& ptr);
-    static int32_t RelAudioRenderProcedure(struct PrepareAudioPara& ptr);
+    static void *handle;
+    AudioAdapter *adapter = nullptr;
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManager *manager;
+    AudioRender *render = nullptr;
     static int32_t RelAudioRenderSetGain(struct PrepareAudioPara& ptr);
     static int32_t RelAudioRenderGetGain(struct PrepareAudioPara& ptr);
     static int32_t RelAudioRenderGetGainThreshold(struct PrepareAudioPara& ptr);
@@ -62,62 +63,39 @@ public:
 };
 
 using THREAD_FUNC = void *(*)(void *);
-
-TestAudioManager *(*AudioHdiRenderReliabilityTest::GetAudioManager)() = nullptr;
-void *AudioHdiRenderReliabilityTest::handleSo = nullptr;
+void *AudioHdiRenderReliabilityTest::handle = nullptr;
+TestGetAudioManager AudioHdiRenderReliabilityTest::getAudioManager = nullptr;
+TestAudioManager *AudioHdiRenderReliabilityTest::manager = nullptr;
 
 void AudioHdiRenderReliabilityTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return;
-    }
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
 }
 
 void AudioHdiRenderReliabilityTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
 }
 
-void AudioHdiRenderReliabilityTest::SetUp(void) {}
-
-void AudioHdiRenderReliabilityTest::TearDown(void) {}
-
-int32_t AudioHdiRenderReliabilityTest::RelAudioCreateRender(struct PrepareAudioPara& ptr)
+void AudioHdiRenderReliabilityTest::SetUp(void)
 {
-    if (ptr.manager == nullptr || ptr.adapter == nullptr) {
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    struct AudioSampleAttributes attrs = {};
-    struct AudioDeviceDescriptor devDesc = {};
-    InitAttrs(attrs);
-    InitDevDesc(devDesc, ptr.audioPort->portId, ptr.pins);
-    g_testMutex.lock();
-    int32_t ret = ptr.adapter->CreateRender(ptr.adapter, &devDesc, &attrs, &ptr.render);
-    g_testMutex.unlock();
-    if (ret < 0) {
-        ptr.manager->UnloadAdapter(ptr.manager, ptr.adapter);
-        return ret;
-    }
-    if (ptr.render == nullptr) {
-        ptr.manager->UnloadAdapter(ptr.manager, ptr.adapter);
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    return AUDIO_HAL_SUCCESS;
+    ASSERT_NE(nullptr, manager);
+    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+}
+
+void AudioHdiRenderReliabilityTest::TearDown(void)
+{
+    int32_t ret = ReleaseRenderSource(manager, adapter, render);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 
 int32_t AudioHdiRenderReliabilityTest::RelAudioRenderGetGainThreshold(struct PrepareAudioPara& ptr)
@@ -155,24 +133,6 @@ int32_t AudioHdiRenderReliabilityTest::RelAudioRenderGetGain(struct PrepareAudio
     ret = ptr.render->volume.GetGain(ptr.render, &(ptr.character.getgain));
     g_testMutex.unlock();
     return ret;
-}
-
-int32_t AudioHdiRenderReliabilityTest::RelAudioRenderProcedure(struct PrepareAudioPara& ptr)
-{
-    int32_t ret = -1;
-    ret = GetLoadAdapter(ptr.manager, ptr.portType, ptr.adapterName, &ptr.adapter, ptr.audioPort);
-    if (ret < 0) {
-        return ret;
-    }
-    ret = RelAudioCreateRender(ptr);
-    if (ret < 0) {
-        return ret;
-    }
-    ret = AudioRenderStartAndOneFrame(ptr.render);
-    if (ret < 0) {
-        return ret;
-    }
-    return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioHdiRenderReliabilityTest::RelAudioRenderSetMute(struct PrepareAudioPara& ptr)
@@ -352,14 +312,8 @@ int32_t AudioHdiRenderReliabilityTest::RelAudioRenderGetLatency(struct PrepareAu
 HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetFrameSize_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
@@ -373,9 +327,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetFrameSize_Re
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_LT(INITIAL_VALUE, g_para[0].character.getframesize);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -387,11 +338,10 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetFrameSize_Re
 HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetFrameCount_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
 
-    ret = RelAudioRenderProcedure(g_para[0]);
+    ret = AudioRenderStartAndOneFrame(g_para[0].render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
@@ -406,11 +356,8 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetFrameCount_R
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_LT(INITIAL_VALUE, g_para[0].character.getframecount);
     }
-    if (g_para[0].adapter != nullptr) {
-        ret = StopAudio(g_para[0]);
-        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        g_para[0].render = nullptr;
-    }
+    g_para[0].render->control.Stop(g_para[0].render);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 
 /**
@@ -423,16 +370,9 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetCurrentChann
 {
     int32_t ret = -1;
     uint32_t channelIdValue = 2;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         ret = memcpy_s(&arrpara[i], sizeof(PrepareAudioPara), &g_para[0], sizeof(PrepareAudioPara));
@@ -448,9 +388,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetCurrentChann
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_EQ(channelIdValue, arrpara[i].character.getcurrentchannelId);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -462,13 +399,9 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetCurrentChann
 HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudiorenderSetMute_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
-
-    ret = RelAudioRenderProcedure(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
@@ -490,11 +423,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudiorenderSetMute_Reliabi
         pthread_join(tids[i], &result);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
     }
-    if (g_para[0].adapter != nullptr) {
-        ret = StopAudio(g_para[0]);
-        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        g_para[0].render = nullptr;
-    }
 }
 
 /**
@@ -506,15 +434,9 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudiorenderSetMute_Reliabi
 HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudiorenderGetMute_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
@@ -532,9 +454,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudiorenderGetMute_Reliabi
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_FALSE(arrpara[i].character.getmute);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -547,13 +466,10 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudiorenderSetVolume_Relia
 {
     int32_t ret = -1;
     float volumeHighExpc = 0.70;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
 
-    ret = RelAudioRenderProcedure(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         ret = memcpy_s(&arrpara[i], sizeof(PrepareAudioPara), &g_para[0], sizeof(PrepareAudioPara));
@@ -571,11 +487,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudiorenderSetVolume_Relia
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(volumeHighExpc, arrpara[i].character.getvolume);
     }
-    if (g_para[0].adapter != nullptr) {
-        ret = StopAudio(g_para[0]);
-        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        g_para[0].render = nullptr;
-    }
 }
 
 /**
@@ -588,15 +499,9 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudiorenderGetVolume_Relia
 {
     int32_t ret = -1;
     float volumeHighExpc = 0.7;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
@@ -615,9 +520,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudiorenderGetVolume_Relia
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_EQ(volumeHighExpc, arrpara[i].character.getvolume);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -632,15 +534,9 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderSetSampleAttrib
     int32_t ret = -1;
     uint32_t count = 2;
     uint32_t rateExpc = 48000;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(g_para[0].attrs);
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
@@ -661,9 +557,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderSetSampleAttrib
         EXPECT_EQ(rateExpc, arrpara[i].attrsValue.sampleRate);
         EXPECT_EQ(count, arrpara[i].attrsValue.channelCount);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -678,15 +571,9 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetSampleAttrib
     int32_t ret = -1;
     uint32_t count = 2;
     uint32_t rateExpc = 48000;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(g_para[0].attrs);
     ret = g_para[0].render->attr.SetSampleAttributes(g_para[0].render, &(g_para[0].attrs));
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -707,9 +594,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetSampleAttrib
         EXPECT_EQ(rateExpc, arrpara[i].attrsValue.sampleRate);
         EXPECT_EQ(count, arrpara[i].attrsValue.channelCount);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -721,14 +605,8 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetSampleAttrib
 HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderSelectScene_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         g_para[0].scenes.scene.id = 0;
@@ -742,9 +620,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderSelectScene_Rel
         pthread_join(tids[i], &result);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -757,14 +632,8 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderSelectScene_Rel
 HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderCheckSceneCapability_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
@@ -779,9 +648,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderCheckSceneCapab
         pthread_join(tids[i], &result);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -793,14 +659,8 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderCheckSceneCapab
 HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderSetGain_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
@@ -814,9 +674,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderSetGain_Reliabi
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_LT(GAIN_MIN, g_para[0].character.setgain);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -828,15 +685,9 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderSetGain_Reliabi
 HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetGain_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
@@ -854,9 +705,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetGain_Reliabi
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_LT(GAIN_MIN, arrpara[i].character.setgain);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -868,15 +716,9 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetGain_Reliabi
 HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetGainThreshold_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
@@ -892,9 +734,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetGainThreshol
         EXPECT_EQ(0, arrpara[i].character.gainthresholdmin);
         EXPECT_EQ(15, arrpara[i].character.gainthresholdmax);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -906,15 +745,9 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetGainThreshol
 HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderSetChannelMode_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
@@ -930,9 +763,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderSetChannelMode_
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_EQ(AUDIO_CHANNEL_NORMAL, arrpara[i].character.getmode);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -944,15 +774,9 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderSetChannelMode_
 HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetChannelMode_Reliability_0001, TestSize.Level1)
 {
     int32_t ret = -1;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
@@ -970,9 +794,6 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderGetChannelMode_
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_EQ(AUDIO_CHANNEL_NORMAL, arrpara[i].character.getmode);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 
 /**
@@ -985,15 +806,9 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderRenderGetLatenc
 {
     int32_t ret = -1;
     uint32_t expectLatency = 0;
-    ASSERT_NE(nullptr, GetAudioManager);
-    g_para[0].manager = GetAudioManager();
-    ASSERT_NE(nullptr, g_para[0].manager);
+    g_para[0].render = render;
+    ASSERT_NE(nullptr, g_para[0].render);
     struct PrepareAudioPara arrpara[PTHREAD_SAMEADA_COUNT];
-    ret = GetLoadAdapter(g_para[0].manager, g_para[0].portType, g_para[0].adapterName, &g_para[0].adapter,
-                         g_para[0].audioPort);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = RelAudioCreateRender(g_para[0]);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
     for (int32_t i = 0; i < PTHREAD_SAMEADA_COUNT; ++i) {
         ret = memcpy_s(&arrpara[i], sizeof(PrepareAudioPara), &g_para[0], sizeof(PrepareAudioPara));
@@ -1007,8 +822,5 @@ HWTEST_F(AudioHdiRenderReliabilityTest, SUB_Audio_HDI_AudioRenderRenderGetLatenc
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_LT(expectLatency, arrpara[i].character.latencyTime);
     }
-    g_para[0].adapter->DestroyRender(g_para[0].adapter, g_para[0].render);
-    g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
-    g_para[0].render = nullptr;
 }
 }

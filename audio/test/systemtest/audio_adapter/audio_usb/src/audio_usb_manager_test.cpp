@@ -49,37 +49,30 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
+    static void *handle;
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManager *manager;
 };
 
-TestAudioManager *(*AudioUsbManagerTest::GetAudioManager)() = nullptr;
-void *AudioUsbManagerTest::handleSo = nullptr;
+void *AudioUsbManagerTest::handle = nullptr;
+TestGetAudioManager AudioUsbManagerTest::getAudioManager = nullptr;
+TestAudioManager *AudioUsbManagerTest::manager = nullptr;
 
 void AudioUsbManagerTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return;
-    }
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
 }
 
 void AudioUsbManagerTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
 }
 
@@ -99,8 +92,6 @@ HWTEST_F(AudioUsbManagerTest, SUB_Audio_HDI_GetAllAdapters_0001, TestSize.Level1
     int size = 0;
     struct AudioAdapterDescriptor *descs = nullptr;
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager *manager = GetAudioManager();
     ASSERT_NE(nullptr, manager);
     ret = manager->GetAllAdapters(manager, &descs, &size);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -118,8 +109,7 @@ HWTEST_F(AudioUsbManagerTest, SUB_Audio_HDI_LoadAdapter_0001, TestSize.Level1)
     int size = 0;
     struct AudioAdapterDescriptor *descs = nullptr;
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = GetAdapters(manager, &descs, size);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     struct AudioAdapterDescriptor *desc = &descs[0];

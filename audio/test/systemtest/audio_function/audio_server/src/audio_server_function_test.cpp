@@ -31,57 +31,37 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
-    static int32_t GetManager(struct PrepareAudioPara& audiopara);
+    static TestGetAudioManager getAudioManager;
+    static void *handle;
+    static TestAudioManager *manager;
 };
 
-TestAudioManager *(*AudioServerFunctionTest::GetAudioManager)() = nullptr;
-void *AudioServerFunctionTest::handleSo = nullptr;
+TestGetAudioManager AudioServerFunctionTest::getAudioManager = nullptr;
+void *AudioServerFunctionTest::handle = nullptr;
+TestAudioManager *AudioServerFunctionTest::manager = nullptr;
 using THREAD_FUNC = void *(*)(void *);
 
 void AudioServerFunctionTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return;
-    }
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
 }
 
 void AudioServerFunctionTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
 }
 
 void AudioServerFunctionTest::SetUp(void) {}
 
 void AudioServerFunctionTest::TearDown(void) {}
-
-int32_t AudioServerFunctionTest::GetManager(struct PrepareAudioPara& audiopara)
-{
-    auto *inst = (AudioServerFunctionTest *)audiopara.self;
-    if (inst != nullptr && inst->GetAudioManager != nullptr) {
-        audiopara.manager = inst->GetAudioManager();
-    }
-    if (audiopara.manager == nullptr) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
 
 /**
 * @tc.name  Playing an audio file
@@ -91,16 +71,13 @@ int32_t AudioServerFunctionTest::GetManager(struct PrepareAudioPara& audiopara)
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0001, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = ThreadRelease(audiopara);
@@ -114,9 +91,9 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0001, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0002, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float volumeMax = 1.0;
@@ -124,10 +101,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0002, TestSize.
     float volumeValue[10] = {0};
     float volume[10] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.render != nullptr) {
@@ -155,19 +129,16 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0002, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0003, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     bool muteTrue = true;
     bool muteFalse = false;
     float volume = 0.8;
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.render != nullptr) {
@@ -197,16 +168,13 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0003, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0004, TestSize.Level1)
 {
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
-    int32_t ret = -1;
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.render != nullptr) {
@@ -230,9 +198,9 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0004, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0005, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float gain = 0;
@@ -241,10 +209,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0005, TestSize.
     float gainMinValue = 1;
     float gainMaxValue = 14;
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.render != nullptr) {
@@ -274,9 +239,9 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0005, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0006, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float volumeValue = 1.0;
@@ -284,10 +249,7 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0006, TestSize.
     bool muteTrue = true;
     bool muteFalse = false;
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.render != nullptr) {
@@ -326,18 +288,16 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0006, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0007, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float volumeMax = 1.0;
     bool muteTrue = true;
     bool muteFalse = false;
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.render != nullptr) {
@@ -375,19 +335,16 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0007, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0008, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float speed = 3;
     uint32_t channelId = 0;
     uint32_t channelIdValue = CHANNELCOUNT;
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.render != nullptr) {
@@ -410,18 +367,15 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0008, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0009, TestSize.Level1)
 {
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint64_t size = 0;
     uint64_t sizeExpect = 0;
-    int32_t ret = -1;
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.render != nullptr) {
@@ -441,18 +395,15 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0009, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0010, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint64_t count = 0;
     uint64_t zero = 0;
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.render != nullptr) {
@@ -471,19 +422,16 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0010, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0011, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     uint64_t frames = 0;
     int64_t timeExp = 0;
     struct AudioTimeStamp time = {.tvSec = 0};
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(2);
     if (audiopara.render != nullptr) {
@@ -503,20 +451,17 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0011, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0012, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     bool supported = false;
     struct AudioSceneDescriptor scenes = {};
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_OUT_SPEAKER;
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.render != nullptr) {
@@ -536,19 +481,16 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0012, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0013, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint32_t samplerateValue = 48000;
     uint32_t channelcountValue = 2;
     struct AudioSampleAttributes attrsValue = {};
 
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.render != nullptr) {
@@ -581,15 +523,13 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0013, TestSize.
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0001, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = ThreadRelease(audiopara);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -602,16 +542,14 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0001, TestSize
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0002, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     FrameStatus(1);
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.capture != nullptr) {
@@ -635,17 +573,15 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0002, TestSize
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0003, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     float val = 0.9;
     float getVal = 0;
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.capture != nullptr) {
@@ -666,17 +602,15 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0003, TestSize
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0004, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     bool isMute = false;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     bool mute = true;
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.capture != nullptr) {
@@ -704,19 +638,17 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0004, TestSize
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0005, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     float gainMin = 0;
     float gainMax = 0;
     struct PrepareAudioPara para = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     float gainValue = 0;
     float gain = 0;
-    ret = GetManager(para);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    ret = pthread_create(&para.tids, NULL, (THREAD_FUNC)RecordAudio, &para);
+    int32_t ret = pthread_create(&para.tids, NULL, (THREAD_FUNC)RecordAudio, &para);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (para.capture != nullptr) {
@@ -747,21 +679,19 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0005, TestSize
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0006, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct AudioSampleAttributes attrsValue = {};
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     struct AudioSampleAttributes attrs = {};
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(attrs);
     attrs.sampleRate = SAMPLERATEEXOECT;
 
     FrameStatus(1);
 
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     sleep(1);
@@ -792,17 +722,14 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0006, TestSize
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0007, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     uint32_t channelId = 0;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     uint32_t channelIdValue = CHANNELCOUNT;
-
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.capture != nullptr) {
@@ -821,17 +748,15 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0007, TestSize
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0008, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     uint64_t size = 0;
     uint64_t sizeExpect = 0;
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(audiopara.attrs);
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.capture != nullptr) {
@@ -851,17 +776,15 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0008, TestSize
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0009, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     uint64_t count = 0;
     uint64_t zero = 0;
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.capture != nullptr) {
@@ -880,17 +803,15 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0009, TestSize
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0010, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     float min = 0;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     float max = 0;
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.capture != nullptr) {
@@ -910,19 +831,17 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0010, TestSize
 */
 HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0011, TestSize.Level1)
 {
-    int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     bool supported = false;
     struct PrepareAudioPara audiopara = {
-        .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .manager = manager, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
     struct AudioSceneDescriptor scenes = {};
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_IN_MIC;
-    ret = GetManager(audiopara);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     sleep(1);
     if (audiopara.capture != nullptr) {

@@ -31,77 +31,65 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
-    static struct DevHandle *(*BindServiceRenderSo)(const char *);
+    static struct DevHandle *(*BindServiceRender)(const char *);
     static int32_t (*InterfaceLibOutputRender)(struct DevHandle *, int32_t, struct AudioHwRenderParam *);
     static int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int32_t, struct AudioHwRenderParam *);
-    static void (*CloseServiceRenderSo)(struct DevHandle *);
+    static void (*CloseServiceRender)(struct DevHandle *);
     static void *ptrHandle;
-    static int32_t GetManager(struct PrepareAudioPara& audiopara);
+    static TestGetAudioManager getAudioManager;
+    static void *handle;
+    static TestAudioManager *manager;
     int32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender, const std::string BindName,
          const std::string adapterNameCase, struct DevHandle *&handle) const;
 };
 
-TestAudioManager *(*AudioSmartPaTest::GetAudioManager)() = nullptr;
-void *AudioSmartPaTest::handleSo = nullptr;
-struct DevHandle *(*AudioSmartPaTest::BindServiceRenderSo)(const char *) = nullptr;
+TestGetAudioManager AudioSmartPaTest::getAudioManager = nullptr;
+void *AudioSmartPaTest::handle = nullptr;
+TestAudioManager *AudioSmartPaTest::manager = nullptr;
+struct DevHandle *(*AudioSmartPaTest::BindServiceRender)(const char *) = nullptr;
 int32_t (*AudioSmartPaTest::InterfaceLibOutputRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
 int32_t (*AudioSmartPaTest::InterfaceLibCtlRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
-void (*AudioSmartPaTest::CloseServiceRenderSo)(struct DevHandle *) = nullptr;
+void (*AudioSmartPaTest::CloseServiceRender)(struct DevHandle *) = nullptr;
 void *AudioSmartPaTest::ptrHandle = nullptr;
 using THREAD_FUNC = void *(*)(void *);
 
 void AudioSmartPaTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return;
-    }
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
     string resolvedPathOne = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
     ptrHandle = dlopen(resolvedPathOne.c_str(), RTLD_LAZY);
-    if (ptrHandle == nullptr) {
-        return;
-    }
-    BindServiceRenderSo = (struct DevHandle* (*)(const char *))dlsym(ptrHandle, "AudioBindServiceRender");
+    ASSERT_NE(nullptr, ptrHandle);
+    BindServiceRender = (struct DevHandle* (*)(const char *))dlsym(ptrHandle, "AudioBindServiceRender");
     InterfaceLibOutputRender = (int32_t (*)(struct DevHandle *, int,
         struct AudioHwRenderParam *))dlsym(ptrHandle, "AudioInterfaceLibOutputRender");
     InterfaceLibCtlRender = (int32_t (*)(struct DevHandle *, int,
         struct AudioHwRenderParam *))dlsym(ptrHandle, "AudioInterfaceLibCtlRender");
-    CloseServiceRenderSo = (void (*)(struct DevHandle *))dlsym(ptrHandle, "AudioCloseServiceRender");
-    if (BindServiceRenderSo == nullptr || CloseServiceRenderSo == nullptr ||
+    CloseServiceRender = (void (*)(struct DevHandle *))dlsym(ptrHandle, "AudioCloseServiceRender");
+    if (BindServiceRender == nullptr || CloseServiceRender == nullptr ||
         InterfaceLibCtlRender == nullptr || InterfaceLibOutputRender == nullptr) {
-        dlclose(ptrHandle);
         return;
     }
 }
 
 void AudioSmartPaTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
     if (ptrHandle != nullptr) {
-        dlclose(ptrHandle);
-        ptrHandle = nullptr;
+        (void)dlclose(ptrHandle);
     }
-    if (BindServiceRenderSo != nullptr) {
-        BindServiceRenderSo = nullptr;
+    if (BindServiceRender != nullptr) {
+        BindServiceRender = nullptr;
     }
-    if (CloseServiceRenderSo != nullptr) {
-        CloseServiceRenderSo = nullptr;
+    if (CloseServiceRender != nullptr) {
+        CloseServiceRender = nullptr;
     }
     if (InterfaceLibOutputRender != nullptr) {
         InterfaceLibOutputRender = nullptr;
@@ -115,32 +103,20 @@ void AudioSmartPaTest::SetUp(void) {}
 
 void AudioSmartPaTest::TearDown(void) {}
 
-int32_t AudioSmartPaTest::GetManager(struct PrepareAudioPara& audiopara)
-{
-    auto *inst = (AudioSmartPaTest *)audiopara.self;
-    if (inst != nullptr && inst->GetAudioManager != nullptr) {
-        audiopara.manager = inst->GetAudioManager();
-    }
-    if (audiopara.manager == nullptr) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
 int32_t AudioSmartPaTest::BindServiceAndHwRender(struct AudioHwRender *&hwRender,
     const std::string BindName, const std::string adapterNameCase, struct DevHandle *&handle) const
 {
-    handle = BindServiceRenderSo(BindName.c_str());
+    handle = BindServiceRender(BindName.c_str());
     if (handle == nullptr) {
         return HDF_FAILURE;
     }
     hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
     if (hwRender == nullptr) {
-        CloseServiceRenderSo(handle);
+        CloseServiceRender(handle);
         return HDF_FAILURE;
     }
     if (InitHwRender(hwRender, adapterNameCase)) {
-        CloseServiceRenderSo(handle);
+        CloseServiceRender(handle);
         free(hwRender);
         hwRender = nullptr;
         return HDF_FAILURE;
@@ -156,15 +132,13 @@ int32_t AudioSmartPaTest::BindServiceAndHwRender(struct AudioHwRender *&hwRender
 HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0001, TestSize.Level1)
 {
     int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint32_t latencyTime = 0;
     uint32_t expectedValue = 0;
-
-    ret = GetManager(audiopara);
-    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -197,15 +171,13 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0002, TestSize.Level1
 {
     int32_t ret = -1;
     float volumeMax = 1.0;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     float volumeValue[10] = {0};
     float volumeArr[10] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0};
-
-    ret = GetManager(audiopara);
-    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -233,13 +205,11 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0002, TestSize.Level1
 HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0003, TestSize.Level1)
 {
     int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
-
-    ret = GetManager(audiopara);
-    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -271,16 +241,14 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0003, TestSize.Level1
 HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0004, TestSize.Level1)
 {
     int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint64_t frames = 0;
     int64_t timeExp = 0;
     struct AudioTimeStamp time = {.tvSec = 0};
-
-    ret = GetManager(audiopara);
-    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -303,17 +271,15 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0004, TestSize.Level1
 HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0005, TestSize.Level1)
 {
     int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     uint64_t size = 0;
     uint64_t count = 0;
     uint64_t zero = 0;
     uint64_t sizeExpect = 0;
-
-    ret = GetManager(audiopara);
-    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -339,17 +305,15 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0005, TestSize.Level1
 */
 HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0006, TestSize.Level1)
 {
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str()
     };
     int32_t ret = -1;
     uint32_t samplerateValue = 48000;
     uint32_t channelcountValue = 1;
     struct AudioSampleAttributes attrsValue = {};
-
-    ret = GetManager(audiopara);
-    ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     ASSERT_EQ(HDF_SUCCESS, ret);
@@ -424,7 +388,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0009, TestSize.Level1
     volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
     EXPECT_EQ(127, volumevalue);
 
-    CloseServiceRenderSo(handle);
+    CloseServiceRender(handle);
     free(hwRender);
 }
 /**
@@ -464,7 +428,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0010, TestSize.Level1
     volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
     EXPECT_EQ(127, volumevalue);
 
-    CloseServiceRenderSo(handle);
+    CloseServiceRender(handle);
     free(hwRender);
 }
 /**
@@ -496,7 +460,7 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0011, TestSize.Level1
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_FAILURE, ret);
 
-    CloseServiceRenderSo(handle);
+    CloseServiceRender(handle);
     free(hwRender);
 }
 /**
@@ -508,12 +472,10 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0011, TestSize.Level1
 HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0012, TestSize.Level1)
 {
     int32_t ret = -1;
+    ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str()
+        .manager = manager, .portType = PORT_OUT, .adapterName = ADAPTER_NAME_OUT.c_str()
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
-    ASSERT_NE(nullptr, audiopara.manager);
     ret = OHOS::Audio::GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                                       &audiopara.adapter, audiopara.audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
