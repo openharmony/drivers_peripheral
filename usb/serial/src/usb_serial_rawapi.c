@@ -726,7 +726,7 @@ static int32_t SerialWrite(struct SerialDevice *port, struct HdfSBuf *data)
     struct AcmDevice *acm = NULL;
     struct AcmWb *wb = NULL;
     const char *tmp = NULL;
-    uint32_t size;
+    int32_t size;
     int32_t ret;
     int32_t wbn;
 
@@ -804,7 +804,7 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     struct AcmDevice *acm = NULL;
     struct AcmWb *wb = NULL;
     const char *tmp = NULL;
-    uint32_t size;
+    int32_t size;
     int32_t ret;
     int32_t wbn;
 
@@ -1129,7 +1129,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
         acm->nbIndex = 0;
     }
 
-    if (UsbRawSubmitRequest(req)) {
+    if (UsbRawSubmitRequest(req) != HDF_SUCCESS) {
         HDF_LOGE("%s - UsbRawSubmitRequest failed", __func__);
     }
 
@@ -1146,7 +1146,7 @@ static void AcmReadBulkCallback(const void *requestArg)
     }
     struct AcmDevice *acm = (struct AcmDevice *)req->userData;
     if (acm == NULL || acm->port == NULL) {
-        HDF_LOGE("%s:%d userData(acm) is NULL!", __func__, __LINE__);
+        HDF_LOGE("%s:%d request userData is NULL!", __func__, __LINE__);
         return;
     }
     size_t size = (size_t)req->actualLength;

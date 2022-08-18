@@ -680,7 +680,7 @@ OUT:
 
 static int32_t UsbSerialWrite(struct UsbSerial *port, struct HdfSBuf *data)
 {
-    uint32_t size;
+    int32_t size;
     const char *tmp = NULL;
 
     OsalMutexLock(&port->lock);
@@ -703,7 +703,7 @@ static int32_t UsbSerialWrite(struct UsbSerial *port, struct HdfSBuf *data)
         return HDF_ERR_IO;
     }
 
-    size = DataFifoWrite(&port->writeFifo, (uint8_t *)buf, strlen(buf));
+    size = (int32_t)DataFifoWrite(&port->writeFifo, (uint8_t *)buf, strlen(buf));
 
     if (port->acm) {
         UsbSerialStartTx(port);
