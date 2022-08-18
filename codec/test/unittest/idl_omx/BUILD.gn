@@ -1,0 +1,58 @@
+# Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/test.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+
+ohos_unittest("codec_idl_omx_test") {
+  module_out_path = "hdf/codec"
+  include_dirs = [
+    "//drivers/peripheral/codec/interfaces/include",
+    "//third_party/openmax/api/1.1.2",
+  ]
+  sources = [
+    "codec_callback_service.cpp",
+    "codec_hdi_omx_test.cpp",
+  ]
+  deps = [ "//third_party/googletest:gtest_main" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_codec:codec_idl_headers",
+      "drivers_interface_codec:libcodec_proxy_1.0",
+      "drivers_peripheral_display:hdi_gralloc_client",
+      "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libbufferhandle_parcelable",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_single",
+      "utils_base:utils",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  OMX_IL_PATH = rebase_path(
+          "//device/soc/${device_company}/${product_name}/hardware/omx_il")
+  cmd = "if [ -f ${OMX_IL_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
+  HAVE_OMX_IL_PATH =
+      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+
+  if (HAVE_OMX_IL_PATH) {
+    cflags = [ "-DSUPPORT_OMX" ]
+  }
+}
