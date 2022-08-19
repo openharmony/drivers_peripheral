@@ -16,26 +16,30 @@
 #ifndef ADAPTOR_LOG_H
 #define ADAPTOR_LOG_H
 
-#include "hilog/log_c.h"
+#include "hdf_log.h"
 
 #ifdef __cplusplus
 extern "C" {
+#endif // __cplusplus
+
+#define HDF_LOG_TAG IamBase
+
+#ifndef OHOS_DEBUG
+#define DECORATOR_HDFLOG(op, fmt, args...)             \
+    do {                                               \
+        op("%{public}s() " fmt, __FUNCTION__, ##args); \
+    } while (0)
+#else
+#define DECORATOR_HDFLOG(op, fmt, args...)                                     \
+    do {                                                                       \
+        op("{%s()-%s:%d} " fmt, __FUNCTION__, __LINE__, ##args); \
+    } while (0)
 #endif
 
-#ifndef LOG_DOMAIN
-#define LOG_DOMAIN 0xD002422
-#endif
-#ifndef APP_LOG_TAG
-#define APP_LOG_TAG "IamBase"
-#endif
-
-#define LOG_INFO(format, args...) HiLogPrint(LOG_CORE, LOG_INFO, LOG_DOMAIN, APP_LOG_TAG, \
-    "%{public}s: " format "", __func__, ##args)
-#define LOG_ERROR(format, args...) HiLogPrint(LOG_CORE, LOG_ERROR, LOG_DOMAIN, APP_LOG_TAG, \
-    "%{public}s: " format "", __func__, ##args)
+#define LOG_ERROR(fmt, ...) DECORATOR_HDFLOG(HDF_LOGE, fmt, ##__VA_ARGS__)
+#define LOG_INFO(fmt, ...) DECORATOR_HDFLOG(HDF_LOGI, fmt, ##__VA_ARGS__)
 
 #ifdef __cplusplus
 }
-#endif
-
-#endif
+#endif // __cplusplus
+#endif // ADAPTOR_LOG_H
