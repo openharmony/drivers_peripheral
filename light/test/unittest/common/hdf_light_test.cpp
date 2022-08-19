@@ -29,11 +29,11 @@ namespace {
     const struct LightInterface *g_lightDev = nullptr;
     static struct LightInfo *g_lightInfo = nullptr;
     static uint32_t g_count = 0;
-    const int32_t g_onTime = 500;
-    const int32_t g_offTime = 500;
+    const int32_t ON_TIME = 500;
+    const int32_t OFF_TIME = 500;
     const int32_t LIGHT_WAIT_TIME = 2;
-    const int32_t g_minLightId = LIGHT_ID_NONE;
-    const int32_t g_maxLightId = LIGHT_ID_BUTT;
+    const int32_t MIN_LIGHT_ID = LIGHT_ID_NONE;
+    const int32_t MAX_LIGHT_ID = LIGHT_ID_BUTT;
 }
 
 class HdfLightTest : public testing::Test {
@@ -104,8 +104,8 @@ HWTEST_F(HdfLightTest, GetLightList001, TestSize.Level1)
 
     for (int i = 0; i < g_count; ++i) {
         printf("get lightId[%d]\n\r", info->lightId);
-        EXPECT_GE(info->lightId, g_minLightId);
-        EXPECT_LE(info->lightId, g_maxLightId);
+        EXPECT_GE(info->lightId, MIN_LIGHT_ID);
+        EXPECT_LE(info->lightId, MAX_LIGHT_ID);
         info++;
     }
 }
@@ -174,8 +174,8 @@ HWTEST_F(HdfLightTest, EnableLight002, TestSize.Level1)
     int32_t ret;
     struct LightEffect effect;
     effect.flashEffect.flashMode = LIGHT_FLASH_TIMED;
-    effect.flashEffect.onTime = g_onTime;
-    effect.flashEffect.offTime = g_offTime;
+    effect.flashEffect.onTime = ON_TIME;
+    effect.flashEffect.offTime = OFF_TIME;
 
     for (i = 0; i < g_count; ++i) {
         effect.lightBrightness = 0x00800000;
@@ -217,8 +217,8 @@ HWTEST_F(HdfLightTest, EnableLight003, TestSize.Level1)
     for (i = 0; i < g_count; ++i) {
         effect.lightBrightness = 0x00800000;
         effect.flashEffect.flashMode = LIGHT_FLASH_BUTT;
-        effect.flashEffect.onTime = g_onTime;
-        effect.flashEffect.offTime = g_offTime;
+        effect.flashEffect.onTime = ON_TIME;
+        effect.flashEffect.offTime = OFF_TIME;
 
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(LIGHT_NOT_FLASH, ret);
@@ -228,7 +228,7 @@ HWTEST_F(HdfLightTest, EnableLight003, TestSize.Level1)
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(LIGHT_NOT_FLASH, ret);
 
-        effect.flashEffect.onTime = g_onTime;
+        effect.flashEffect.onTime = ON_TIME;
         effect.flashEffect.offTime = 0;
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(LIGHT_NOT_FLASH, ret);
