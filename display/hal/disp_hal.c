@@ -156,7 +156,7 @@ static int32_t DispEventProcess(uint32_t devId, const uint32_t cmd, uint32_t val
         goto EXIT;
     }
     ret = DispCmdSend(cmd, data, NULL);
-    if (ret) {
+    if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("cmd:DISP_CMD_SET_%s failure\n", (cmd == DISP_CMD_SET_POWERSTATUS) ? "POWERMODE" : "BACKLIGHT");
         goto EXIT;
     }

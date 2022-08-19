@@ -38,7 +38,7 @@ OsdCompInfo g_osdCompInfo[OSD_COLOR_FMT_BUTT] = {
     {8, 8, 8, 8}    /* ARGB8888 */
 };
 
-uint16_t OsdMakeColorU16(uint8_t r, uint8_t g, uint8_t b, OsdCompInfo compinfo)
+static uint16_t OsdMakeColorU16(uint8_t r, uint8_t g, uint8_t b, OsdCompInfo compinfo)
 {
     uint8_t r1;
     uint8_t g1;
@@ -50,7 +50,7 @@ uint16_t OsdMakeColorU16(uint8_t r, uint8_t g, uint8_t b, OsdCompInfo compinfo)
     r1 = r >> (EIGHT_BITS_PER_PIXEL - compinfo.rLen);
     g1 = g >> (EIGHT_BITS_PER_PIXEL - compinfo.gLen);
     b1 = b >> (EIGHT_BITS_PER_PIXEL - compinfo.bLen);
-    while (compinfo.aLen) {
+    while (compinfo.aLen != 0) {
         pixel |= (1 << tmp);
         tmp--;
         compinfo.aLen--;
