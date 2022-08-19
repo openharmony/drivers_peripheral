@@ -23,40 +23,6 @@ extern "C" {
 
 #define HDF_LOG_TAG codec_hdi_proxy
 
-int32_t CodecProxyParseAlignment(struct HdfSBuf *reply, Alignment *alignment)
-{
-    if (reply == NULL || alignment == NULL) {
-        HDF_LOGE("%{public}s: params NULL!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadInt32(reply, &alignment->widthAlignment)) {
-        HDF_LOGE("%{public}s: read widthAlignment failed!", __func__);
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadInt32(reply, &alignment->heightAlignment)) {
-        HDF_LOGE("%{public}s: read heightAlignment failed!", __func__);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t CodecProxyParseRect(struct HdfSBuf *reply, Rect *rectangle)
-{
-    if (reply == NULL || rectangle == NULL) {
-        HDF_LOGE("%{public}s: params NULL!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!HdfSbufReadInt32(reply, &rectangle->width)) {
-        HDF_LOGE("%{public}s: read width failed!", __func__);
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufReadInt32(reply, &rectangle->height)) {
-        HDF_LOGE("%{public}s: read height failed!", __func__);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
 static bool CodecCapabilityBaseUnmarshalling(struct HdfSBuf *reply, CodecCapability *cap)
 {
     if (!HdfSbufReadUint32(reply, (uint32_t*)&cap->mime)) {
