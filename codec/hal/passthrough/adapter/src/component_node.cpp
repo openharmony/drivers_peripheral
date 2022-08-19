@@ -59,8 +59,8 @@ int32_t ComponentNode::OutputBufferAvailable(UINTPTR userData, CodecBuffer *outB
     return HDF_SUCCESS;
 }
 
-CodecCallback ComponentNode::callbacks_ = {&ComponentNode::OnEvent, &ComponentNode::InputBufferAvailable,
-                                           &ComponentNode::OutputBufferAvailable};
+CodecCallback ComponentNode::callbacks_ = {
+    &ComponentNode::OnEvent, &ComponentNode::InputBufferAvailable, &ComponentNode::OutputBufferAvailable};
 
 ComponentNode::ComponentNode(CODEC_HANDLETYPE handle, CodecExInfo info)
     : comp_(handle),
@@ -211,8 +211,8 @@ int32_t ComponentNode::SetState(OMX_STATETYPE state)
             break;
         }
         case OMX_StateIdle: {
-            stateFlag = (state_ == OMX_StateWaitForResources || state_ == OMX_StateLoaded ||
-                state_ == OMX_StatePause || state_ == OMX_StateExecuting);
+            stateFlag = (state_ == OMX_StateWaitForResources || state_ == OMX_StateLoaded || state_ == OMX_StatePause ||
+                state_ == OMX_StateExecuting);
             break;
         }
         case OMX_StateExecuting: {
@@ -236,7 +236,7 @@ int32_t ComponentNode::SetState(OMX_STATETYPE state)
         ret = HDF_SUCCESS;
         state_ = state;
     }
-    HDF_LOGI("%{public}s set state[%{public}d] , current state is [%{public}d]", __func__, state, state_);
+    HDF_LOGI("%{public}s set state[%{public}d], current state is [%{public}d]", __func__, state, state_);
 
     return ret;
 }
@@ -255,8 +255,8 @@ int32_t ComponentNode::GetState(OMX_STATETYPE *state)
     return HDF_SUCCESS;
 }
 
-int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
-                                              OMX_TUNNELSETUPTYPE *tunnelSetup)
+int32_t ComponentNode::ComponentTunnelRequest(
+    uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort, OMX_TUNNELSETUPTYPE *tunnelSetup)
 {
     if (comp_ == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null", __func__);
@@ -276,7 +276,7 @@ int32_t ComponentNode::SetCallbacks(CodecCallbackType *omxCallback, int64_t appD
         }
         ret = CodecSetCallback(comp_, &callbacks_, reinterpret_cast<UINTPTR>(this));
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s  CodecSetCallback error[0x%{public}x]", __func__, ret);
+            HDF_LOGE("%{public}s CodecSetCallback error[0x%{public}x]", __func__, ret);
             return ret;
         }
         setCallbackComplete_ = true;
@@ -287,8 +287,7 @@ int32_t ComponentNode::SetCallbacks(CodecCallbackType *omxCallback, int64_t appD
     return ret;
 }
 
-int32_t ComponentNode::UseEglImage(OmxCodecBuffer &buffer, uint32_t portIndex, int8_t *eglImage,
-                                   uint32_t eglImageLen)
+int32_t ComponentNode::UseEglImage(OmxCodecBuffer &buffer, uint32_t portIndex, int8_t *eglImage, uint32_t eglImageLen)
 {
     if (comp_ == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null", __func__);
@@ -336,13 +335,13 @@ int32_t ComponentNode::OnEvent(EventType event, uint32_t length, int32_t eventDa
         case EVENT_ERROR: {
             omxEvent = OMX_EventError;
             if (length > 0) {
-                info.data1 =  eventData[0];
+                info.data1 = eventData[0];
             }
             break;
         }
         case EVENT_FLUSH_COMPLETE: {
             omxEvent = OMX_EventCmdComplete;
-            info.data1 =  OMX_CommandFlush;
+            info.data1 = OMX_CommandFlush;
             break;
         }
         case EVENT_EOS_COMPLETE: {

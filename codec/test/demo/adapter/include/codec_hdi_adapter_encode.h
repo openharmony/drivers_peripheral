@@ -78,10 +78,10 @@ public:
     void Release();
     static int32_t OnEvent(struct CodecCallbackType *self, OMX_EVENTTYPE event, struct EventInfo *info);
 
-    static int32_t OnEmptyBufferDone(struct CodecCallbackType *self, int64_t appData,
-                                     const struct OmxCodecBuffer *buffer);
-    static int32_t OnFillBufferDone(struct CodecCallbackType *self, int64_t appData,
-                                    const struct OmxCodecBuffer *buffer);
+    static int32_t OnEmptyBufferDone(
+        struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer);
+    static int32_t OnFillBufferDone(
+        struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer);
     template <typename T>
     inline void InitParam(T &param)
     {

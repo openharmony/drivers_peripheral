@@ -20,22 +20,22 @@
 
 #define HDF_LOG_TAG codec_hdi_passthrough
 
-static int32_t CodecCallbackTypeEventHandler(struct CodecCallbackType *self, enum OMX_EVENTTYPE eEvent,
-    struct EventInfo *info)
+static int32_t CodecCallbackTypeEventHandler(
+    struct CodecCallbackType *self, enum OMX_EVENTTYPE eEvent, struct EventInfo *info)
 {
     HDF_LOGI("%{public}s, callback service impl", __func__);
     return HDF_SUCCESS;
 }
 
-static int32_t CodecCallbackTypeEmptyBufferDone(struct CodecCallbackType *self,
-    int64_t appData, const struct OmxCodecBuffer *buffer)
+static int32_t CodecCallbackTypeEmptyBufferDone(
+    struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer)
 {
     HDF_LOGI("%{public}s, callback service impl", __func__);
     return HDF_SUCCESS;
 }
 
-static int32_t CodecCallbackTypeFillBufferDone(struct CodecCallbackType *self,
-    int64_t appData, const struct OmxCodecBuffer *buffer)
+static int32_t CodecCallbackTypeFillBufferDone(
+    struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer)
 {
     HDF_LOGI("%{public}s, callback service impl", __func__);
     return HDF_SUCCESS;
@@ -50,7 +50,7 @@ static void CodecCallbackTypeConstruct(struct CodecCallbackType *instance)
 
 struct CodecCallbackType *CodecCallbackTypeGet(struct HdfRemoteService *remote)
 {
-    struct CodecCallbackType *instance = (struct CodecCallbackType*)OsalMemAlloc(sizeof(struct CodecCallbackType));
+    struct CodecCallbackType *instance = (struct CodecCallbackType *)OsalMemAlloc(sizeof(struct CodecCallbackType));
     if (instance == NULL) {
         HDF_LOGE("%{public}s: OsalMemAlloc failed!", __func__);
         return NULL;

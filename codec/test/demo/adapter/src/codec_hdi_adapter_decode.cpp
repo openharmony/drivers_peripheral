@@ -149,11 +149,11 @@ bool CodecHdiAdapterDecode::Init(CommandOpt &opt)
     callback_->FillBufferDone = &CodecHdiAdapterDecode::OnFillBufferDone;
     int32_t ret = HDF_SUCCESS;
     if (codecMime_ == codecMime::AVC) {
-        ret = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(DECODER_AVC), (int64_t)this,
-                                       callback_);
+        ret = omxMgr_->CreateComponent(
+            &client_, &componentId_, const_cast<char *>(DECODER_AVC), (int64_t)this, callback_);
     } else {
-        ret = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(DECODER_HEVC), (int64_t)this,
-                                       callback_);
+        ret = omxMgr_->CreateComponent(
+            &client_, &componentId_, const_cast<char *>(DECODER_HEVC), (int64_t)this, callback_);
     }
 
     if (ret != HDF_SUCCESS || client_ == nullptr) {
@@ -181,7 +181,7 @@ int32_t CodecHdiAdapterDecode::ConfigMppPassthrough()
         HDF_LOGE("%{public}s errNo[%{public}d] key is KEY_CODEC_TYPE", __func__, ret);
         return ret;
     }
-    
+
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
     param.key = (ParamKey)KEY_EXT_DEFAULT_CFG_RK;
     int32_t needDefault = 1;
@@ -346,8 +346,8 @@ int32_t CodecHdiAdapterDecode::UseBufferOnPort(PortIndex portIndex, int bufferCo
         }
         auto ret = client_->AllocateBuffer(client_, (uint32_t)portIndex, omxBuffer.get());
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s errNo[%{public}d] to AllocateBuffer with portIndex[%{public}d]",
-                     __func__, ret, portIndex);
+            HDF_LOGE(
+                "%{public}s errNo[%{public}d] to AllocateBuffer with portIndex[%{public}d]", __func__, ret, portIndex);
             sharedMem->UnmapAshmem();
             sharedMem->CloseAshmem();
             sharedMem = nullptr;
@@ -536,14 +536,14 @@ int32_t CodecHdiAdapterDecode::OnEvent(struct CodecCallbackType *self, OMX_EVENT
     return HDF_SUCCESS;
 }
 
-int32_t CodecHdiAdapterDecode::OnEmptyBufferDone(struct CodecCallbackType *self, int64_t appData,
-                                                 const struct OmxCodecBuffer *buffer)
+int32_t CodecHdiAdapterDecode::OnEmptyBufferDone(
+    struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer)
 {
     return g_core->OnEmptyBufferDone(*buffer);
 }
 
-int32_t CodecHdiAdapterDecode::OnFillBufferDone(struct CodecCallbackType *self, int64_t appData,
-                                                const struct OmxCodecBuffer *buffer)
+int32_t CodecHdiAdapterDecode::OnFillBufferDone(
+    struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer)
 {
     return g_core->OnFillBufferDone(*buffer);
 }
