@@ -41,8 +41,7 @@ static uint32_t GetNextComponentId()
     do {
         tempId = ++g_componentId;
         find = false;
-        DLIST_FOR_EACH_ENTRY(pos, &g_list->head, struct ComponentIdElement, node)
-        {
+        DLIST_FOR_EACH_ENTRY(pos, &g_list->head, struct ComponentIdElement, node) {
             if (pos != NULL && tempId == pos->componentId) {
                 find = true;
                 break;
@@ -131,8 +130,7 @@ static int32_t ComponentManagerDestoryComponent(uint32_t componentId)
     struct ComponentIdElement *next = NULL;
     int32_t ret = HDF_FAILURE;
     pthread_mutex_lock(&g_list->listMute);
-    DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &g_list->head, struct ComponentIdElement, node)
-    {
+    DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &g_list->head, struct ComponentIdElement, node) {
         if (pos == NULL || componentId != pos->componentId) {
             continue;
         }
@@ -197,7 +195,7 @@ static struct CodecComponentManager g_codecComponentManager = {
     .DestroyComponent = ComponentManagerDestoryComponent,
 };
 
-struct  CodecComponentManager  *GetCodecComponentManager(void)
+struct CodecComponentManager *GetCodecComponentManager(void)
 {
     if (g_list == NULL) {
         g_list = (struct ComponentManagerList *)OsalMemCalloc(sizeof(struct ComponentManagerList));
