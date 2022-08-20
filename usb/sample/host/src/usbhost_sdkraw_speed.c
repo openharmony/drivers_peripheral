@@ -204,7 +204,7 @@ static int32_t UsbGetConfigDescriptor(UsbRawHandle * const devHandle, struct Usb
     }
 
     ret = UsbRawGetConfiguration(devHandle, &activeConfig);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d UsbRawGetConfiguration failed, ret=%d", __func__, __LINE__, ret);
         return HDF_FAILURE;
     }
@@ -216,7 +216,7 @@ static int32_t UsbGetConfigDescriptor(UsbRawHandle * const devHandle, struct Usb
     }
 
     ret = UsbRawGetConfigDescriptor(dev, activeConfig, config);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("UsbRawGetConfigDescriptor failed, ret=%d\n", ret);
         return HDF_FAILURE;
     }
@@ -300,7 +300,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice * const acm, struct Usb
         const struct UsbRawInterface *interface = config->interface[interfaceIndex];
 
         ret = UsbRawClaimInterface(acm->devHandle, interfaceIndex);
-        if (ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s:%d claim interface %u failed", __func__, __LINE__, i);
             return ret;
         }
@@ -333,7 +333,7 @@ static int32_t UsbAllocDataRequests(struct AcmDevice * const acm)
         reqData.length = acm->dataSize;
 
         ret = UsbRawFillBulkRequest(snd->request, acm->devHandle, &reqData);
-        if (ret) {
+        if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: FillInterruptRequest failed, ret=%d", __func__, ret);
             return HDF_FAILURE;
         }
@@ -402,7 +402,7 @@ static int32_t AcmStartdb(struct AcmDevice *acm, struct AcmDb * const db)
     (void)acm;
     int32_t ret;
     ret = UsbRawSubmitRequest(db->request);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("UsbRawSubmitRequest failed, ret=%d", ret);
         db->use = 0;
     }
@@ -479,7 +479,7 @@ static int32_t SerialBegin(struct AcmDevice *acm)
     int32_t ret;
     struct AcmDb *db = NULL;
     int32_t dbn;
-    if (AcmDbIsAvail(acm)) {
+    if (AcmDbIsAvail(acm) != 0) {
         dbn = AcmDbAlloc(acm);
     } else {
         HDF_LOGE("no buf\n");
@@ -504,13 +504,13 @@ static int32_t SerialBegin(struct AcmDevice *acm)
     reqData.length = acm->dataSize;
 
     ret = UsbRawFillBulkRequest(db->request, acm->devHandle, &reqData);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: FillInterruptRequest failed, ret=%d", __func__, ret);
         return HDF_FAILURE;
     }
 
     ret = AcmStartdb(acm, db);
-    return size;
+    return (int32_t)size;
 }
 
 static void SignalHandler(int32_t signo)
@@ -602,7 +602,7 @@ static int32_t InitUsbDdk(void)
     UsbRawHandle *devHandle = NULL;
 
     ret = UsbRawInit(&session);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbRawInit failed", __func__);
         goto END;
     }
@@ -621,7 +621,7 @@ static int32_t InitUsbDdk(void)
     }
     g_acm->devHandle = devHandle;
     ret = UsbGetConfigDescriptor(devHandle, &g_acm->config);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbGetConfigDescriptor failed", __func__);
         goto END;
     }
@@ -666,7 +666,7 @@ int32_t main(int32_t argc, char *argv[])
     }
 
     ret = UsbStartIo(g_acm);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbAllocReadRequests failed", __func__);
         goto END;
     }

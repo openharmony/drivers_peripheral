@@ -34,9 +34,6 @@
 #endif
 #define USB_TEST_INTERFACE_NUM  2
 
-struct HdfSBuf *g_data;
-struct HdfSBuf *g_reply;
-
 static int32_t UsbPnpTestEventReceived(void *priv, uint32_t id, struct HdfSBuf *data)
 {
     (void)priv;
@@ -50,6 +47,8 @@ int32_t main(int32_t argc, char *argv[])
 {
     (void)argc;
     (void)argv;
+    struct HdfSBuf *data;
+    struct HdfSBuf *reply;
     HDF_LOGI("%s:%d usbhost pnp test start", __func__, __LINE__);
     int32_t ret;
     struct HdfIoService *testService = NULL;
@@ -71,42 +70,39 @@ int32_t main(int32_t argc, char *argv[])
         return HDF_FAILURE;
     }
 
-    g_data = HdfSbufObtainDefaultSize();
-    g_reply = HdfSbufObtainDefaultSize();
-    if (g_data == NULL || g_reply == NULL) {
+    data = HdfSbufObtainDefaultSize();
+    reply = HdfSbufObtainDefaultSize();
+    if (data == NULL || reply == NULL) {
         HdfIoServiceRecycle(serv);
         HDF_LOGE("%s:%d GetService err", __func__, __LINE__);
         return HDF_FAILURE;
     }
 
-    HdfSbufWriteString(g_data, USB_TEST_SAMPLE_MODULE_NAME);
-    HdfSbufWriteString(g_data, USB_TEST_SAMPLE_SERVICE_NAME);
+    HdfSbufWriteString(data, USB_TEST_SAMPLE_MODULE_NAME);
+    HdfSbufWriteString(data, USB_TEST_SAMPLE_SERVICE_NAME);
 
-    ret = serv->dispatcher->Dispatch(&serv->object, USB_PNP_DRIVER_REGISTER_DEVICE, g_data, NULL);
+    ret = serv->dispatcher->Dispatch(&serv->object, USB_PNP_DRIVER_REGISTER_DEVICE, data, NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d Dispatch USB_PNP_DRIVER_REGISTER_DEVICE err", __func__, __LINE__);
         goto OUT;
     }
-    HDF_LOGI("%s:%d", __func__, __LINE__);
+
     testService = HdfIoServiceBind(USB_TEST_SAMPLE_SERVICE_NAME);
     if (testService == NULL) {
         HDF_LOGE("%s:%d testService USB_PNP_DRIVER_REGISTER_DEVICE err", __func__, __LINE__);
         goto OUT;
     }
 
-    HDF_LOGI("%s:%d", __func__, __LINE__);
-    ret = serv->dispatcher->Dispatch(&serv->object, USB_PNP_DRIVER_UNREGISTER_DEVICE, g_data, NULL);
+    ret = serv->dispatcher->Dispatch(&serv->object, USB_PNP_DRIVER_UNREGISTER_DEVICE, data, NULL);
     if (ret != HDF_SUCCESS) {
         HdfIoServiceRecycle(testService);
         HDF_LOGE("%s:%d Dispatch USB_PNP_DRIVER_UNREGISTER_DEVICE err", __func__, __LINE__);
         goto OUT;
     }
 
-    HDF_LOGI("%s:%d", __func__, __LINE__);
-
 OUT:
-    HdfSbufRecycle(g_data);
-    HdfSbufRecycle(g_reply);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
 
     HdfIoServiceRecycle(serv);
 

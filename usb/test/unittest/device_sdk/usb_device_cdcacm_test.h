@@ -16,9 +16,9 @@
 #ifndef USB_CDCACM_TEST_H
 #define USB_CDCACM_TEST_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
 
 #include "osal_atomic.h"

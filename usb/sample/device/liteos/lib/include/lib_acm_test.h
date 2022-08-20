@@ -13,6 +13,9 @@
  * limitations under the License.
  */
 
+#ifndef LIB_ACM_TEST_H
+#define LIB_ACM_TEST_H
+
 extern "C" {
 void acm_open();
 void acm_close();
@@ -22,3 +25,4 @@ void acm_prop_regist(const char *propName, const char *propValue);
 void acm_prop_write(const char *propName, const char *propValue);
 void acm_prop_read(const char *propName, char *propValue);
 }
+#endif /* LIB_ACM_TEST_H */

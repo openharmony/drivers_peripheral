@@ -47,7 +47,7 @@ static void TestWrite(char *buf)
     
     (void)HdfSbufWriteString(g_data, buf);
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE, g_data, g_reply);
-    if (status <= 0) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE failed status = %d", __func__, status);
     }
 }
@@ -63,7 +63,7 @@ static void TestRead(void)
     }
 
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_READ, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         printf("%s: Dispatch USB_SERIAL_READ failed status = %d", __func__, status);
         return;
     }
@@ -84,7 +84,7 @@ static void TestRead(void)
 static int32_t ReadThread(void *arg)
 {
     (void)arg;
-    while (running) {
+    while (running != 0) {
         TestRead();
         usleep(SLEEP_100MS);
     }
@@ -126,9 +126,9 @@ static void SetTermios(void)
 static void WriteThread(void)
 {
     char str[STR_LEN] = {0};
-    while (running) {
-        str[0] = getchar();
-        if (running) {
+    while (running != 0) {
+        str[0] = (char)getchar();
+        if (running != 0) {
             TestWrite(str);
         }
     }
@@ -140,7 +140,7 @@ static void StopAcmTest(int32_t signo)
     int32_t status;
     running = 0;
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_CLOSE, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
     }
     tcsetattr(STDIN_FILENO, TCSANOW, &g_orgOpts);
@@ -182,7 +182,7 @@ int32_t acm_test(int32_t argc, const char *argv[])
     }
 
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_OPEN, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
         return HDF_FAILURE;
     }

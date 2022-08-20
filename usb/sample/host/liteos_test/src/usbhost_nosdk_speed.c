@@ -40,8 +40,8 @@
 #define USB_DEV_FS_PATH                 "/dev/bus/usb"
 #define URB_COMPLETE_PROCESS_STACK_SIZE 8196
 #define ENDPOINT_IN_OFFSET              7
-#define DEFAULT_BUSNUM 1
-#define DEFAULT_DEVADDR 2
+#define DEFAULT_BUSNUM                  1
+#define DEFAULT_DEVADDR                 2
 static int32_t g_speedFlag = 0;
 static int32_t g_busNum = DEFAULT_BUSNUM;
 static int32_t g_devAddr = DEFAULT_DEVADDR;
@@ -81,9 +81,9 @@ static int32_t OpenDevice(void)
     return 0;
 }
 
-static int32_t ClaimInterface(unsigned int iface)
+static int32_t ClaimInterface(int32_t iface)
 {
-    HDF_LOGI("%{public}s:%{public}d claim success: iface=%u\n", __func__, __LINE__, iface);
+    HDF_LOGI("%{public}s:%{public}d claim success: iface=%d\n", __func__, __LINE__, iface);
     return HDF_SUCCESS;
 }
 
@@ -106,7 +106,7 @@ static int32_t SendProcess(void *argurb)
 {
     (void)argurb;
     int32_t i;
-    int32_t r;
+    int32_t err;
     while (!g_speedFlag) {
         OsalSemWait(&sem, HDF_WAIT_FOREVER);
         for (i = 0; i < TEST_CYCLE; i++) {
@@ -120,14 +120,14 @@ static int32_t SendProcess(void *argurb)
             i = TEST_CYCLE - 1;
         }
         sendUrb = urb[i].urb;
-        r = usb_setup_endpoint(fd, uhe, TEST_BYTE_COUNT_UINT);
-        if (r) {
-            DPRINTFN(0, "setup failed ret:%d\n", r);
-            return r;
+        err = usb_setup_endpoint(fd, uhe, TEST_BYTE_COUNT_UINT);
+        if (err < 0) {
+            DPRINTFN(0, "setup failed err:%d\n", err);
+            return err;
         }
-        r = usb_submit_urb(sendUrb, 0);
-        if (r < 0) {
-            HDF_LOGI("SubmitBulkRequest: ret:%d\n", r);
+        err = usb_submit_urb(sendUrb, 0);
+        if (err < 0) {
+            HDF_LOGI("SubmitBulkRequest: err:%d\n", err);
             urb[i].inUse = 0;
             continue;
         }
@@ -209,7 +209,7 @@ static int32_t BeginProcessHandleFirst(void)
 
 static int32_t BeginProcess(unsigned char endPoint)
 {
-    int32_t r;
+    int32_t ret;
     const int32_t transNum = 0;
     int32_t i;
 
@@ -223,9 +223,9 @@ static int32_t BeginProcess(unsigned char endPoint)
         HDF_LOGE("%{public}s:%{public}d usb_find_host_endpoint error\n", __func__, __LINE__);
         return -1;
     }
-    r = BeginProcessHandleFirst();
-    if (r != HDF_SUCCESS) {
-        return r;
+    ret = BeginProcessHandleFirst();
+    if (ret != HDF_SUCCESS) {
+        return ret;
     }
 
     HDF_LOGI("%{public}s:%{public}d test NO SDK endpoint:%u\n", __func__, __LINE__, endPoint);
@@ -235,14 +235,14 @@ static int32_t BeginProcess(unsigned char endPoint)
             urb[i].inUse = 1;
             urb[i].urbNum = transNum;
             sendUrb = urb[i].urb;
-            r = usb_setup_endpoint(fd, uhe, TEST_BYTE_COUNT_UINT);
-            if (r) {
-                DPRINTFN(0, "setup failed ret:%d\n", r);
-                return r;
+            ret = usb_setup_endpoint(fd, uhe, TEST_BYTE_COUNT_UINT);
+            if (ret < 0) {
+                DPRINTFN(0, "setup failed ret:%d\n", ret);
+                return ret;
             }
-            r = usb_submit_urb(sendUrb, 0);
-            if (r < 0) {
-                HDF_LOGI("%{public}s:%{public}d SubmitBulkRequest: ret:%d\n", __func__, __LINE__, r);
+            ret = usb_submit_urb(sendUrb, 0);
+            if (ret < 0) {
+                HDF_LOGI("%{public}s:%{public}d SubmitBulkRequest: ret:%d\n", __func__, __LINE__, ret);
                 urb[i].inUse = 0;
                 continue;
             }
@@ -487,7 +487,7 @@ static int32_t AcmDriverInit(struct HdfDeviceObject *device)
     return 0;
 }
 
-static void AcmDriverRelease(struct HdfDeviceObject *device) 
+static void AcmDriverRelease(struct HdfDeviceObject *device)
 {
     (void)device;
     return;
