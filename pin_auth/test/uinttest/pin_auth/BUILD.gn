@@ -35,6 +35,7 @@ ohos_unittest("PinAuthHdiUtTest") {
   ]
 
   external_deps = [
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
     "utils_base:utils",
