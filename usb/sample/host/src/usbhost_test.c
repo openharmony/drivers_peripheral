@@ -226,7 +226,7 @@ static int32_t TestCmdLoop(int32_t cmdType, const char *param)
     bool asyncFlag = false;
     int32_t cnt = 0;
 
-    if (TestGetExitFlag()) {
+    if (TestGetExitFlag() == true) {
         HDF_LOGD("%s:%d g_exitFlag is true!", __func__, __LINE__);
         return HDF_FAILURE;
     }
@@ -280,7 +280,7 @@ static int32_t GetCharThread(void *arg)
 {
     char str[STR_LEN] = {0};
     while (run) {
-        str[0] = getchar();
+        str[0] = (char)getchar();
     }
     return 0;
 }

@@ -364,18 +364,20 @@ static int32_t ParseInterfaces(struct AcmDevice * const acmDevice)
                 acmDevice->notifyPipe.maxPacketSize = pipeInfo.maxPacketSize;
                 acmDevice->ctrlIface.fn = fnIface;
                 acmDevice->ctrlIface.handle = handle;
-            } else if (pipeInfo.type == USB_PIPE_TYPE_BULK) {
-                if (pipeInfo.dir == USB_PIPE_DIRECTION_IN) {
-                    acmDevice->dataInPipe.id = pipeInfo.id;
-                    acmDevice->dataInPipe.maxPacketSize = pipeInfo.maxPacketSize;
-                    acmDevice->dataIface.fn = fnIface;
-                    acmDevice->dataIface.handle = handle;
-                } else {
-                    acmDevice->dataOutPipe.id = pipeInfo.id;
-                    acmDevice->dataOutPipe.maxPacketSize = pipeInfo.maxPacketSize;
-                    acmDevice->dataIface.fn = fnIface;
-                    acmDevice->dataIface.handle = handle;
-                }
+                continue;
+            }
+            if (pipeInfo.type == USB_PIPE_TYPE_BULK && pipeInfo.dir == USB_PIPE_DIRECTION_IN) {
+                acmDevice->dataInPipe.id = pipeInfo.id;
+                acmDevice->dataInPipe.maxPacketSize = pipeInfo.maxPacketSize;
+                acmDevice->dataIface.fn = fnIface;
+                acmDevice->dataIface.handle = handle;
+                continue;
+            }
+            if (pipeInfo.type == USB_PIPE_TYPE_BULK) {
+                acmDevice->dataOutPipe.id = pipeInfo.id;
+                acmDevice->dataOutPipe.maxPacketSize = pipeInfo.maxPacketSize;
+                acmDevice->dataIface.fn = fnIface;
+                acmDevice->dataIface.handle = handle;
             }
         }
     }
