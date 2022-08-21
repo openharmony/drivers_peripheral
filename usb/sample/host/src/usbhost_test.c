@@ -334,16 +334,14 @@ int32_t main(int32_t argc, char *argv[])
     status = TestParaseCommand(argc, argv[ARGV_CMD_TYPE], &cmdType, apiType);
     if (status != HDF_SUCCESS) {
         run = 0;
-        printf("%s:%d TestParaseCommand status=%d err\n", __func__, __LINE__, status);
         HDF_LOGE("%s:%d TestParaseCommand status=%d err", __func__, __LINE__, status);
         TestHelp();
         return status;
     }
 
     status = UsbHostDdkTestInit(apiType);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         run = 0;
-        printf("%s:%d UsbHostDdkTestInit status=%d err\n", __func__, __LINE__, status);
         HDF_LOGE("%s:%d UsbHostDdkTestInit status=%d err", __func__, __LINE__, status);
         return status;
     }
@@ -368,6 +366,5 @@ int32_t main(int32_t argc, char *argv[])
 OUT:
     run = 0;
     TestExit();
-    HDF_LOGI("%s:%d moduleTest end", __func__, __LINE__);
     return HDF_SUCCESS;
 }

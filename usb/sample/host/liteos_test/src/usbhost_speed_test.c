@@ -52,10 +52,10 @@ static struct HdfIoService *g_service = NULL;
 static struct HdfSBuf *g_data = NULL;
 static struct HdfSBuf *g_reply = NULL;
 static struct OsalMutex g_lock;
-static enum speedServer spdserver = SDKAPI_SERVER;
+static enum speedServer g_spdServer = SDKAPI_SERVER;
 
-static sigset_t mask;
-pid_t stopHandlerTid;
+static sigset_t g_mask;
+pid_t g_stopHandlerTid;
 
 static void SpeedTest(struct UsbSpeedTest test)
 {
@@ -78,7 +78,7 @@ static void SpeedInit(void)
 {
     int32_t status;
 
-    switch (spdserver) {
+    switch (g_spdServer) {
         case SDKAPI_SERVER:
             g_service = HdfIoServiceBind(SERVER_NAME_SDKAPI);
             break;
@@ -90,7 +90,7 @@ static void SpeedInit(void)
             break;
     }
     if (g_service == NULL || g_service->dispatcher == NULL || g_service->dispatcher->Dispatch == NULL) {
-        printf("%s: GetService spdserver=%d err \n", __func__, spdserver);
+        printf("%s: GetService g_spdServer=%d err \n", __func__, g_spdServer);
         return;
     }
 
@@ -140,10 +140,10 @@ static void ShowHelp(const char *name)
 static void *StopHandler(void)
 {
     int32_t err, signo;
-    stopHandlerTid = getpid();
+    g_stopHandlerTid = getpid();
 
     while (true) {
-        err = sigwait(&mask, &signo);
+        err = sigwait(&g_mask, &signo);
         if (err != 0) {
             printf("Sigwait failed: %d\n", err);
         }
@@ -213,7 +213,7 @@ static int32_t CheckParam(int32_t argc, const char *argv[], struct UsbSpeedTest 
     switch (argc) {
         case 7:
         case 6:
-            spdserver = checkServer(argv[1]);
+            g_spdServer = checkServer(argv[1]);
             speedTest->busNum = atoi(argv[2]);
             speedTest->devAddr = atoi(argv[3]);
             speedTest->ifaceNum = atoi(argv[4]);
@@ -223,7 +223,7 @@ static int32_t CheckParam(int32_t argc, const char *argv[], struct UsbSpeedTest 
             }
             break;
         case 4:
-            spdserver = checkServer(argv[1]);
+            g_spdServer = checkServer(argv[1]);
             speedTest->busNum = 1;
             speedTest->devAddr = 2;
             speedTest->ifaceNum = atoi(argv[2]);
@@ -255,10 +255,10 @@ int32_t main(int32_t argc, char *argv[])
     }
 
     pthread_t threads;
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGINT);
-    sigaddset(&mask, SIGQUIT);
-    if (pthread_sigmask(SIG_BLOCK, &mask, NULL) != 0) {
+    sigemptyset(&g_mask);
+    sigaddset(&g_mask, SIGINT);
+    sigaddset(&g_mask, SIGQUIT);
+    if (pthread_sigmask(SIG_BLOCK, &g_mask, NULL) != 0) {
         printf("SIG_BLOCK error\n");
         ret = HDF_FAILURE;
         goto END;
@@ -271,7 +271,7 @@ int32_t main(int32_t argc, char *argv[])
 
     SpeedInit();
     SpeedTest(test);
-    kill(stopHandlerTid, SIGINT);
+    kill(g_stopHandlerTid, SIGINT);
     pthread_join(threads, NULL);
 END:
     return ret;

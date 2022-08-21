@@ -61,22 +61,22 @@ static uint32_t UsbFnCfgMgrParseDevDesc(const struct DeviceResourceNode *devDesc
         HDF_LOGE("%{public}s: read bcdUSB fail!", __func__);
         return HDF_FAILURE;
     }
-    devDesc->bcdUSB = Le16ToCpu(value);
+    devDesc->bcdUSB = LE16_TO_CPU(value);
     if (drsOps->GetUint16(devDescNode, USBDEV_VENDOR, &value, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read idVendor fail!", __func__);
         return HDF_FAILURE;
     }
-    devDesc->idVendor = Le16ToCpu(value);
+    devDesc->idVendor = LE16_TO_CPU(value);
     if (drsOps->GetUint16(devDescNode, USBDEV_IDPRODUCT, &value, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read idProduct fail!", __func__);
         return HDF_FAILURE;
     }
-    devDesc->idProduct = Le16ToCpu(value);
+    devDesc->idProduct = LE16_TO_CPU(value);
     if (drsOps->GetUint16(devDescNode, USBDEV_BCDDEVICE, &value, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read bcdDevice fail!", __func__);
         return HDF_FAILURE;
     }
-    devDesc->bcdDevice = Le16ToCpu(value);
+    devDesc->bcdDevice = LE16_TO_CPU(value);
 
     return HDF_SUCCESS;
 }
@@ -321,7 +321,7 @@ static int32_t UsbFnCfgMgrParseEndpointDesc(
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
     }
-    desc->wMaxPacketSize = Le16ToCpu(value);
+    desc->wMaxPacketSize = LE16_TO_CPU(value);
     if (USB_DDK_DT_ENDPOINT_AUDIO_SIZE == desc->bLength) {
         if (drsOps->GetUint8(node, ENDPOINT_REFRESH, &desc->bRefresh, 0) != HDF_SUCCESS ||
             drsOps->GetUint8(node, ENDPOINT_SYNCADDR, &desc->bSynchAddress, 0) != HDF_SUCCESS) {
@@ -348,7 +348,7 @@ static int32_t UsbFnCfgMgrParseStringDesc(
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
     }
-    desc->wData[0] = Le16ToCpu(value);
+    desc->wData[0] = LE16_TO_CPU(value);
 
     return HDF_SUCCESS;
 }
@@ -366,13 +366,13 @@ static int32_t UsbFnCfgMgrParseSspIsocEndpointDesc(
     desc = (struct UsbSspIsocEpCompDescriptor *)descBuff;
     if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
         drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
-        drsOps->GetUint16(node, SSP_ISOC_EPCOMP_WReseved, &sValue, 0) != HDF_SUCCESS ||
+        drsOps->GetUint16(node, SSP_ISOC_EPCOMP_WRESEVED, &sValue, 0) != HDF_SUCCESS ||
         drsOps->GetUint32(node, SSP_ISOC_EPCOMP_DWPERINTERVAL, &iValue, 0) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
     }
-    desc->wReseved = Le16ToCpu(sValue);
-    desc->dwBytesPerInterval = Le32ToCpu(iValue);
+    desc->wReseved = LE16_TO_CPU(sValue);
+    desc->dwBytesPerInterval = LE32_TO_CPU(iValue);
 
     return HDF_SUCCESS;
 }
@@ -395,7 +395,7 @@ static int32_t UsbFnCfgMgrParseSsEndpointDesc(
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
     }
-    desc->wBytesPerInterval = Le16ToCpu(sValue);
+    desc->wBytesPerInterval = LE16_TO_CPU(sValue);
 
     return HDF_SUCCESS;
 }
@@ -421,7 +421,7 @@ static int32_t UsbFnCfgMgrParseQualifierDesc(
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
     }
-    desc->bcdUSB = Le16ToCpu(sValue);
+    desc->bcdUSB = LE16_TO_CPU(sValue);
 
     return HDF_SUCCESS;
 }
@@ -449,7 +449,7 @@ static int32_t UsbFnCfgMgrParseOtgDesc(
         if (drsOps->GetUint16(node, QUALIFIER_BCD, &sValue, 0) != HDF_SUCCESS) {
             return HDF_FAILURE;
         }
-        desc2->bcdOTG = Le16ToCpu(sValue);
+        desc2->bcdOTG = LE16_TO_CPU(sValue);
     }
 
     return HDF_SUCCESS;
@@ -492,7 +492,7 @@ static int32_t UsbFnCfgMgrParseSecurityDesc(
         HDF_LOGE("%{public}s: read fail!", __func__);
         return HDF_FAILURE;
     }
-    desc->wTotalLength = Le16ToCpu(sValue);
+    desc->wTotalLength = LE16_TO_CPU(sValue);
 
     return HDF_SUCCESS;
 }
@@ -1374,7 +1374,7 @@ int32_t UsbFnCfgMgrSetProp(const struct UsbFnInterface *intf, const char *name, 
         }
         return HDF_FAILURE;
     }
-    if (isRegist) {
+    if (isRegist != 0) {
         fnCfgPropMgr = UsbfnCfgMgrFindPropMgr(intf, name);
         if (fnCfgPropMgr == NULL) {
             return HDF_FAILURE;
@@ -1384,13 +1384,11 @@ int32_t UsbFnCfgMgrSetProp(const struct UsbFnInterface *intf, const char *name, 
             return HDF_FAILURE;
         }
     }
-    if (deviceProp) {
-        if (isRegist == 0) {
-            if (UsbFnCfgMgrRegisterProp(intf, &registInfo)) {
-                return HDF_FAILURE;
-            }
+    if (deviceProp != 0) {
+        if (isRegist == 0 && UsbFnCfgMgrRegisterProp(intf, &registInfo) != HDF_SUCCESS) {
+            return HDF_FAILURE;
         }
-        if (UsbFnCfgChangeDevceDes(intf, name, value)) {
+        if (UsbFnCfgChangeDevceDes(intf, name, value) != HDF_SUCCESS) {
             return HDF_FAILURE;
         }
     }

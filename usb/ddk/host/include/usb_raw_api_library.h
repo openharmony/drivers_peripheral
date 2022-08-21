@@ -46,7 +46,7 @@ struct UsbRawControlSetup {
 #define USB_RAW_CONTROL_SETUP_SIZE (sizeof(struct UsbRawControlSetup))
 
 union UsbiConfigDescBuf {
-    struct UsbiConfigurationDescriptor desc;
+    struct USBI_CONFIGURATION_DESCRIPTOR desc;
     uint8_t buf[USB_DDK_DT_CONFIG_SIZE];
     uint16_t align;     /* Force 2-byte alignment */
 };

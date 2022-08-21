@@ -98,7 +98,6 @@ int32_t UsbHostDdkTestInit(const char *apiType)
         return HDF_FAILURE;
     }
     if (!strcmp(apiType, "-SDK")) {
-        printf("%s:%d test SDK API, service=%s\n", __func__, __LINE__, acmServiceName);
         HDF_LOGI("%s:%d test SDK API, service=%s", __func__, __LINE__, acmServiceName);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
         g_acmService = HdfIoServiceBind(acmServiceName);
@@ -106,7 +105,6 @@ int32_t UsbHostDdkTestInit(const char *apiType)
         g_acmService = servmgr->GetService(servmgr, acmServiceName);
 #endif
     } else if (!strcmp(apiType, "-RAW")) {
-        printf("%s:%d test RAW API, service=%s\n", __func__, __LINE__, acmRawServiceName);
         HDF_LOGI("%s:%d test RAW API, service=%s", __func__, __LINE__, acmRawServiceName);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
         g_acmService = HdfIoServiceBind(acmRawServiceName);
@@ -114,7 +112,6 @@ int32_t UsbHostDdkTestInit(const char *apiType)
         g_acmService = servmgr->GetService(servmgr, acmRawServiceName);
 #endif
     } else if (!strcmp(apiType, "-ECM")) {
-        printf("%s:%d test ECM API, service=%s\n", __func__, __LINE__, ecmServiceName);
         HDF_LOGI("%s:%d test ECM API, service=%s", __func__, __LINE__, ecmServiceName);
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
         g_acmService = HdfIoServiceBind(ecmServiceName);
@@ -122,7 +119,6 @@ int32_t UsbHostDdkTestInit(const char *apiType)
         g_acmService = servmgr->GetService(servmgr, ecmServiceName);
 #endif
     } else {
-        printf("%s:%d apiType=%s is not define\n", __func__, __LINE__, apiType);
         HDF_LOGE("%s:%d apiType=%s is not define", __func__, __LINE__, apiType);
         return HDF_FAILURE;
     }
@@ -150,23 +146,14 @@ static void TestModuleWriteLog(int32_t cmdType, const char *str, struct TestUsbD
         struct timeval time;
 
         gettimeofday(&time, NULL);
-
         switch (cmdType) {
             case HOST_ACM_SYNC_READ:
-                fp = fopen("/data/acm_read_xts", "a+");
-                ret = snprintf_s(buffer, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1,
-                    "[XTSCHECK] %d.%06d, recv data[%s] from device\n", time.tv_sec, time.tv_usec, str);
-                break;
-            case HOST_ACM_SYNC_WRITE:
-                fp = fopen("/data/acm_write_xts", "a+");
-                ret = snprintf_s(buffer, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1,
-                    "[XTSCHECK] %d.%06d, send data[%s] to device\n", time.tv_sec, time.tv_usec, str);
-                break;
             case HOST_ACM_ASYNC_READ:
                 fp = fopen("/data/acm_read_xts", "a+");
                 ret = snprintf_s(buffer, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1,
                     "[XTSCHECK] %d.%06d, recv data[%s] from device\n", time.tv_sec, time.tv_usec, str);
                 break;
+            case HOST_ACM_SYNC_WRITE:
             case HOST_ACM_ASYNC_WRITE:
                 fp = fopen("/data/acm_write_xts", "a+");
                 ret = snprintf_s(buffer, BUFFER_MAX_LEN, BUFFER_MAX_LEN - 1,
@@ -183,22 +170,15 @@ static void TestModuleWriteLog(int32_t cmdType, const char *str, struct TestUsbD
                     "[XTSCHECK] %d.%06d, usb serial control command[%s] done\n", time.tv_sec, time.tv_usec, str);
                 break;
             case HOST_ACM_SPEED_TEST:
-                ret = HDF_SUCCESS;
-                break;
             default:
                 ret = HDF_SUCCESS;
-                break;
         }
 
-        if (ret < HDF_SUCCESS) {
-            printf("%s:%d cmdType=%d snprintf_s failed ret=%d\n", __func__, __LINE__, cmdType, ret);
-            HDF_LOGE("%s:%d cmdType=%d snprintf_s failed", __func__, __LINE__, cmdType);
-            goto OUT;
+        if (ret != HDF_SUCCESS) {
+            (void)fclose(fp);
+            return;
         }
-
         (void)fwrite(buffer, strlen(buffer), 1, fp);
-
-    OUT:
         (void)fclose(fp);
     }
 }

@@ -232,7 +232,7 @@ static int32_t OsParseConfigDescriptors(struct UsbDevice *dev)
                 __func__, __LINE__, configDesc->bDescriptorType, configDesc->bLength);
             return HDF_ERR_IO;
         }
-        configLen = Le16ToCpu(configDesc->wTotalLength);
+        configLen = LE16_TO_CPU(configDesc->wTotalLength);
         if (configLen < USB_DDK_DT_CONFIG_SIZE) {
             HDF_LOGE("invalid wTotalLength value %u", configLen);
             return HDF_ERR_IO;

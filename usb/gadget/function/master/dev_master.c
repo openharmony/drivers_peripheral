@@ -89,7 +89,7 @@ static struct UsbCdcHeaderDesc g_ecmHeaderDesc = {
     .bDescriptorType = USB_DDK_DT_CS_INTERFACE,
     .bDescriptorSubType = USB_DDK_CDC_HEADER_TYPE,
 
-    .bcdCDC = CpuToLe16(0x0110),
+    .bcdCDC = CPU_TO_LE16(0x0110),
 };
 
 static struct UsbCdcUnionDesc g_ecmUnionDesc = {
@@ -106,9 +106,9 @@ static struct UsbCdcEtherDesc g_ecmDesc = {
     .bDescriptorType = USB_DDK_DT_CS_INTERFACE,
     .bDescriptorSubType = USB_DDK_CDC_ETHERNET_TYPE,
     .iMACAddress = MAC_ADDR,
-    .bmEthernetStatistics = CpuToLe32(0),
-    .wMaxSegmentSize = CpuToLe16(0x05ea),
-    .wNumberMCFilters = CpuToLe16(0),
+    .bmEthernetStatistics = CPU_TO_LE32(0),
+    .wMaxSegmentSize = CPU_TO_LE16(0x05ea),
+    .wNumberMCFilters = CPU_TO_LE16(0),
     .bNumberPowerFilters = 0,
 };
 
@@ -146,7 +146,7 @@ static struct UsbEndpointDescriptor g_fsEcmNotifyDesc = {
 
     .bEndpointAddress = EP_ADD_NOTIFY | USB_DDK_DIR_IN,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_INT,
-    .wMaxPacketSize = CpuToLe16(ECM_STATUS_BYTECOUNT),
+    .wMaxPacketSize = CPU_TO_LE16(ECM_STATUS_BYTECOUNT),
     .bInterval = ECM_STATUS_INTERVAL_MS,
 };
 
@@ -192,7 +192,7 @@ static struct UsbEndpointDescriptor g_hsEcmNotifyDesc = {
 
     .bEndpointAddress = EP_ADD_NOTIFY | USB_DDK_DIR_IN,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_INT,
-    .wMaxPacketSize = CpuToLe16(ECM_STATUS_BYTECOUNT),
+    .wMaxPacketSize = CPU_TO_LE16(ECM_STATUS_BYTECOUNT),
     .bInterval = ECM_HS_INTERVAL,
 };
 
@@ -202,7 +202,7 @@ static struct UsbEndpointDescriptor g_hsEcmInDesc = {
 
     .bEndpointAddress = EP_ADD_DATA_IN | USB_DDK_DIR_IN,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize = CpuToLe16(MAX_PACKET_SIZE),
+    .wMaxPacketSize = CPU_TO_LE16(MAX_PACKET_SIZE),
 };
 
 static struct UsbEndpointDescriptor g_hsEcmOutDesc = {
@@ -211,7 +211,7 @@ static struct UsbEndpointDescriptor g_hsEcmOutDesc = {
 
     .bEndpointAddress = EP_ADD_DATA_OUT | USB_DDK_DIR_OUT,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize = CpuToLe16(MAX_PACKET_SIZE),
+    .wMaxPacketSize = CPU_TO_LE16(MAX_PACKET_SIZE),
 };
 
 static struct UsbDescriptorHeader *g_ecmHsFunction[] = {
@@ -240,7 +240,7 @@ static struct UsbEndpointDescriptor g_ssEcmNotifyDesc = {
 
     .bEndpointAddress = EP_ADD_NOTIFY | USB_DDK_DIR_IN,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_INT,
-    .wMaxPacketSize = CpuToLe16(ECM_STATUS_BYTECOUNT),
+    .wMaxPacketSize = CPU_TO_LE16(ECM_STATUS_BYTECOUNT),
     .bInterval = ECM_HS_INTERVAL,
 };
 
@@ -251,7 +251,7 @@ static struct UsbSsEpCompDescriptor g_ssEcmIntrCompDesc = {
     /* the following 3 values can be tweaked if necessary */
     /* .bMaxBurst =     0, */
     /* .bmAttributes =  0, */
-    .wBytesPerInterval = CpuToLe16(ECM_STATUS_BYTECOUNT),
+    .wBytesPerInterval = CPU_TO_LE16(ECM_STATUS_BYTECOUNT),
 };
 
 static struct UsbEndpointDescriptor g_ssEcmInDesc = {
@@ -260,7 +260,7 @@ static struct UsbEndpointDescriptor g_ssEcmInDesc = {
 
     .bEndpointAddress = EP_ADD_DATA_IN | USB_DDK_DIR_IN,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize = CpuToLe16(SS_MAX_PACKET_SIZE),
+    .wMaxPacketSize = CPU_TO_LE16(SS_MAX_PACKET_SIZE),
 };
 
 static struct UsbEndpointDescriptor g_ssEcmOutDesc = {
@@ -269,7 +269,7 @@ static struct UsbEndpointDescriptor g_ssEcmOutDesc = {
 
     .bEndpointAddress = EP_ADD_DATA_OUT | USB_DDK_DIR_OUT,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize = CpuToLe16(SS_MAX_PACKET_SIZE),
+    .wMaxPacketSize = CPU_TO_LE16(SS_MAX_PACKET_SIZE),
 };
 
 static struct UsbSsEpCompDescriptor g_ssEcmBulkCompDesc = {
@@ -392,7 +392,7 @@ static struct UsbCdcHeaderDesc g_acmHeaderDesc = {
     .bLength = sizeof(g_acmHeaderDesc),
     .bDescriptorType = USB_DDK_DT_CS_INTERFACE,
     .bDescriptorSubType = USB_DDK_CDC_HEADER_TYPE,
-    .bcdCDC = CpuToLe16(0x0110),
+    .bcdCDC = CPU_TO_LE16(0x0110),
 };
 
 static struct UsbCdcCallMgmtDescriptor g_acmCallMgmtDescriptor = {
@@ -428,7 +428,7 @@ static struct UsbEndpointDescriptor g_acmFsNotifyDesc = {
     .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_NOTIFY | USB_DDK_DIR_IN,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_INT,
-    .wMaxPacketSize = CpuToLe16(ACM_NOTIFY_MAXPACKET),
+    .wMaxPacketSize = CPU_TO_LE16(ACM_NOTIFY_MAXPACKET),
     .bInterval = ACM_NOTIFY_INTERVAL,
 };
 
@@ -465,7 +465,7 @@ static struct UsbEndpointDescriptor g_acmHsNotifyDesc = {
     .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_NOTIFY | USB_DDK_DIR_IN,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_INT,
-    .wMaxPacketSize = CpuToLe16(ACM_NOTIFY_MAXPACKET),
+    .wMaxPacketSize = CPU_TO_LE16(ACM_NOTIFY_MAXPACKET),
     .bInterval = ACM_HS_NOTIFY_INTERVAL,
 };
 
@@ -474,7 +474,7 @@ static struct UsbEndpointDescriptor g_acmHsInDesc = {
     .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_DATA_IN | USB_DDK_DIR_IN,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize = CpuToLe16(MAX_PACKET_SIZE),
+    .wMaxPacketSize = CPU_TO_LE16(MAX_PACKET_SIZE),
 };
 
 static struct UsbEndpointDescriptor g_acmHsOutDesc = {
@@ -482,7 +482,7 @@ static struct UsbEndpointDescriptor g_acmHsOutDesc = {
     .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_DATA_OUT | USB_DDK_DIR_OUT,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize = CpuToLe16(MAX_PACKET_SIZE),
+    .wMaxPacketSize = CPU_TO_LE16(MAX_PACKET_SIZE),
 };
 
 static struct UsbDescriptorHeader *g_acmHsFunction[] = {
@@ -504,7 +504,7 @@ static struct UsbEndpointDescriptor g_acmSsInDesc = {
     .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_DATA_IN | USB_DDK_DIR_IN,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize = CpuToLe16(SS_MAX_PACKET_SIZE),
+    .wMaxPacketSize = CPU_TO_LE16(SS_MAX_PACKET_SIZE),
 };
 
 static struct UsbEndpointDescriptor g_acmSsOutDesc = {
@@ -512,7 +512,7 @@ static struct UsbEndpointDescriptor g_acmSsOutDesc = {
     .bDescriptorType = USB_DDK_DT_ENDPOINT,
     .bEndpointAddress = EP_ADD_DATA_OUT | USB_DDK_DIR_OUT,
     .bmAttributes = USB_DDK_ENDPOINT_XFER_BULK,
-    .wMaxPacketSize = CpuToLe16(SS_MAX_PACKET_SIZE),
+    .wMaxPacketSize = CPU_TO_LE16(SS_MAX_PACKET_SIZE),
 };
 
 static struct UsbSsEpCompDescriptor g_acmSsBulkCompDesc = {
@@ -577,14 +577,14 @@ static struct UsbFnFunction g_acmFunction = {
 static struct UsbDeviceDescriptor g_cdcMasterDeviceDesc = {
     .bLength = sizeof(g_cdcMasterDeviceDesc),
     .bDescriptorType = USB_DDK_DT_DEVICE,
-    .bcdUSB = CpuToLe16(BCD_USB),
+    .bcdUSB = CPU_TO_LE16(BCD_USB),
     .bDeviceClass = 0,
     .bDeviceSubClass = 0,
     .bDeviceProtocol = 0,
     .bMaxPacketSize0 = USB_MAX_PACKET_SIZE,
-    .idVendor = CpuToLe16(DEVICE_VENDOR_ID),
-    .idProduct = CpuToLe16(DEVICE_PRODUCT_ID),
-    .bcdDevice = CpuToLe16(DEVICE_VERSION),
+    .idVendor = CPU_TO_LE16(DEVICE_VENDOR_ID),
+    .idProduct = CPU_TO_LE16(DEVICE_PRODUCT_ID),
+    .bcdDevice = CPU_TO_LE16(DEVICE_VERSION),
     .iManufacturer = USB_FUNC_MANUFACTURER_IDX,
     .iProduct = USB_FUNC_PRODUCT_IDX,
     .iSerialNumber = USB_FUNC_SERIAL_IDX,

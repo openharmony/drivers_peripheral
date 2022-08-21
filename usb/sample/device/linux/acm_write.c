@@ -41,7 +41,7 @@ static void TestWrite(char *buf)
 
 #define STR_LEN 1024
 #define NUM_INPUT 2
-int32_t acm_write(int32_t argc, const char *argv[])
+int32_t AcmWrite(int32_t argc, const char *argv[])
 {
     char str[STR_LEN] = {0};
     int32_t status;
@@ -55,20 +55,17 @@ int32_t acm_write(int32_t argc, const char *argv[])
     g_acmService = servmgr->GetService(servmgr, "usbfn_cdcacm");
     HDIServiceManagerRelease(servmgr);
     if (g_acmService == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     g_data = HdfSbufTypedObtain(SBUF_IPC);
     g_reply = HdfSbufTypedObtain(SBUF_IPC);
     if (g_data == NULL || g_reply == NULL) {
-        HDF_LOGE("%s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_OPEN, g_data, g_reply);
-    if (status) {
-        HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
+    if (status != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
     if (argc >= NUM_INPUT) {
@@ -80,7 +77,7 @@ int32_t acm_write(int32_t argc, const char *argv[])
             return HDF_FAILURE;
         }
         fp = fopen("/data/acm_write_xts", "a+");
-        if (!fp) {
+        if (fp == NULL) {
             HDF_LOGE("%s: fopen failed", __func__);
             return HDF_FAILURE;
         }
@@ -96,6 +93,5 @@ int32_t acm_write(int32_t argc, const char *argv[])
 
     HdfSbufRecycle(g_data);
     HdfSbufRecycle(g_reply);
-
     return 0;
 }
