@@ -156,7 +156,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync005, TestSize.Level1)
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     printf("------send \"xyz\" 10 times to host------\n");
-    while (loopTime--) {
+    while (loopTime > 0) {
         req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id,
             g_acmDevice->dataInPipe.maxPacketSize);
         EXPECT_NE(nullptr, req);
@@ -173,6 +173,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync005, TestSize.Level1)
         g_acmDevice->submit = 0;
         ret = UsbFnFreeRequest(req);
         EXPECT_TRUE(ret == HDF_SUCCESS);
+        loopTime--;
     }
 }
 
@@ -261,7 +262,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync005, TestSize.Level1)
     EXPECT_NE(nullptr, g_acmDevice);
     EXPECT_NE(nullptr, g_acmDevice->dataIface.handle);
     printf("------send \"abcdefg\" 10 times to host------\n");
-    while (loopTime--) {
+    while (loopTime > 0) {
         req = UsbFnAllocRequest(g_acmDevice->dataIface.handle, g_acmDevice->dataInPipe.id,
         g_acmDevice->dataInPipe.maxPacketSize);
         EXPECT_NE(nullptr, req);
@@ -273,6 +274,7 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestSync005, TestSize.Level1)
         EXPECT_TRUE(req->status == USB_REQUEST_COMPLETED);
         ret = UsbFnFreeRequest(req);
         EXPECT_TRUE(ret == HDF_SUCCESS);
+        loopTime--;
     }
 }
 
