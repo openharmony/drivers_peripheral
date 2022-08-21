@@ -110,7 +110,7 @@ static void DeleteFile(const char *path)
             }
             closedir(dir);
             DeleteFile(filePath);
-            remove(filePath);
+            (void)remove(filePath);
         }
     }
 }
@@ -900,14 +900,14 @@ static void CleanConfigFs(const char *devName, const char *funcName)
     if (ret < 0) {
         return;
     }
-    remove(tmp);
+    (void)remove(tmp);
 
     memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/functions/%s", CONFIGFS_DIR, devName, funcName);
     if (ret < 0) {
         return;
     }
-    remove(tmp);
+    (void)remove(tmp);
 }
 
 static void CleanFunction(const char *devName, const char *funcName)

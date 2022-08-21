@@ -112,7 +112,7 @@ int32_t acm_speed_write(int32_t argc, const char *argv[])
         return HDF_FAILURE;
     }
 
-    signal(SIGINT, StopWriteSpeedTest);
+    (void)signal(SIGINT, StopWriteSpeedTest);
     TestSpeed();
     g_readRuning = true;
     while (g_readRuning) {

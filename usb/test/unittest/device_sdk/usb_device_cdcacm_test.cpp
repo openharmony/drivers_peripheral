@@ -270,9 +270,9 @@ static struct UsbDeviceDescriptor g_cdcMasterDeviceDesc = {
 
 static struct UsbString g_stringsDev[] = {
     {USB_FUNC_MANUFACTURER_IDX, "HISILICON"},
-    {USB_FUNC_PRODUCT_IDX,                         DRIVER_DESC},
-    {USB_FUNC_SERIAL_IDX,"0123456789POPLAR"},
-    {USB_FUNC_CONFIG_IDX,       CONFIG_DESC},
+    {USB_FUNC_PRODUCT_IDX, DRIVER_DESC},
+    {USB_FUNC_SERIAL_IDX, "0123456789POPLAR"},
+    {USB_FUNC_CONFIG_IDX, CONFIG_DESC},
     {       }  /* end of list */
 };
 
@@ -418,13 +418,13 @@ static int32_t AllocCtrlRequests(struct AcmDevice *acmDevice)
 
     for (i = 0; i < 2; i++) {
         ctrlInfo = (struct CtrlInfo *)OsalMemCalloc(sizeof(*ctrlInfo));
-        if (nullptr == ctrlInfo) {
+        if (ctrlInfo == nullptr) {
             return -1;
         }
         ctrlInfo->acm = acmDevice;
         req = UsbFnAllocCtrlRequest(
             acmDevice->ctrlIface.handle, sizeof(struct UsbCdcLineCoding) + sizeof(struct UsbCdcLineCoding));
-        if (nullptr == req) {
+        if (req == nullptr) {
             return -1;
         }
         req->complete = CtrlComplete;
@@ -563,7 +563,7 @@ static uint32_t Enable(struct AcmDevice *acm)
     OsalMutexLock(&port->lock);
     port->acm = acm;
     acm->lineCoding = port->lineCoding;
-    if (port->refCount) {
+    if (port->refCount > 0) {
         if (acm->notify && acm->notify->Connect) {
             acm->notify->Connect(acm);
         }

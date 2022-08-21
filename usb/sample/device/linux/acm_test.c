@@ -52,7 +52,7 @@ static void TestWrite(char *buf)
     }
 }
 
-static void TestRead()
+static void TestRead(void)
 {
     size_t i;
     HdfSbufFlush(g_reply);
@@ -91,7 +91,7 @@ static int32_t ReadThread(void *arg)
     return 0;
 }
 #define HDF_PROCESS_STACK_SIZE 100000
-static int32_t StartThreadRead()
+static int32_t StartThreadRead(void)
 {
     int32_t ret;
     struct OsalThreadParam threadCfg;
@@ -114,7 +114,7 @@ static int32_t StartThreadRead()
     return 0;
 }
 
-static void SetTermios()
+static void SetTermios(void)
 {
     tcgetattr(STDIN_FILENO, &g_orgOpts);
     tcgetattr(STDIN_FILENO, &g_newOpts);
@@ -123,7 +123,7 @@ static void SetTermios()
 }
 
 #define STR_LEN 256
-static void WriteThread()
+static void WriteThread(void)
 {
     char str[STR_LEN] = {0};
     while (running) {
@@ -189,7 +189,7 @@ int32_t acm_test(int32_t argc, const char *argv[])
     printf("Press any key to send.\n");
     printf("Press CTRL-C to exit.\n");
 
-    signal(SIGINT, StopAcmTest);
+    (void)signal(SIGINT, StopAcmTest);
     StartThreadRead();
     SetTermios();
     WriteThread();

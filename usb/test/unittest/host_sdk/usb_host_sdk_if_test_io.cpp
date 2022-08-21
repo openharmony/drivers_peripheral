@@ -324,7 +324,7 @@ static void AcmFillCtrlRequest()
 static void AcmInit()
 {
     int32_t ret;
-    struct UsbSession *session = NULL;
+    struct UsbSession *session = nullptr;
 
     ret = UsbInitHostSdk(&session);
     EXPECT_EQ(HDF_SUCCESS, ret);

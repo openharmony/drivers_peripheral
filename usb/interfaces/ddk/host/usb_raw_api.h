@@ -46,7 +46,7 @@ extern "C" {
 /**
  * @brief Defines the maximum number of USB interfaces.
  */
-#define USB_MAXINTERFACES   32
+#define USB_MAXINTERFACES 32
 
 /**
  * @brief Defines a pointer to the USB device handle in expert mode.
@@ -193,7 +193,7 @@ struct UsbRawConfigDescriptor {
     /** Standard USB configuration descriptor */
     struct UsbConfigDescriptor configDescriptor;
     /** Pointer to the interface array supported by the configuration. The maximum number of interfaces is determined
-    * by USB_MAXINTERFACES. */
+     * by USB_MAXINTERFACES. */
     const struct UsbRawInterface *interface[USB_MAXINTERFACES];
     /** Pointer to the extra descriptor */
     const unsigned char *extra;
@@ -273,8 +273,8 @@ int32_t UsbRawSendControlRequest(const struct UsbRawRequest *request, const UsbR
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int32_t UsbRawSendBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRequestData *requestData);
+int32_t UsbRawSendBulkRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRequestData *requestData);
 /**
  * @brief Performs interrupt transfer.
  *
@@ -285,8 +285,8 @@ int32_t UsbRawSendBulkRequest(const struct UsbRawRequest *request, const UsbRawH
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int32_t UsbRawSendInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRequestData *requestData);
+int32_t UsbRawSendInterruptRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRequestData *requestData);
 
 /**
  * @brief Obtains the device configuration descriptor based on a specified device ID.
@@ -431,8 +431,8 @@ int32_t UsbRawFreeRequest(const struct UsbRawRequest *request);
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int32_t UsbRawFillBulkRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRawFillRequestData *fillData);
+int32_t UsbRawFillBulkRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRawFillRequestData *fillData);
 
 /**
  * @brief Fills required information in control transfer configuration packets.
@@ -455,8 +455,8 @@ int32_t UsbRawFillControlSetup(const unsigned char *setup, const struct UsbContr
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int32_t UsbRawFillControlRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRawFillRequestData *fillData);
+int32_t UsbRawFillControlRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRawFillRequestData *fillData);
 
 /**
  * @brief Fills required information in an interrupt transfer request.
@@ -468,8 +468,8 @@ int32_t UsbRawFillControlRequest(const struct UsbRawRequest *request, const UsbR
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int32_t UsbRawFillInterruptRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRawFillRequestData *fillData);
+int32_t UsbRawFillInterruptRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRawFillRequestData *fillData);
 
 /**
  * @brief Fills required information in an isochronous transfer request.
@@ -481,8 +481,8 @@ int32_t UsbRawFillInterruptRequest(const struct UsbRawRequest *request, const Us
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int32_t UsbRawFillIsoRequest(const struct UsbRawRequest *request, const UsbRawHandle *devHandle,
-    const struct UsbRawFillRequestData *fillData);
+int32_t UsbRawFillIsoRequest(
+    const struct UsbRawRequest *request, const UsbRawHandle *devHandle, const struct UsbRawFillRequestData *fillData);
 
 /**
  * @brief Submits a transfer request.

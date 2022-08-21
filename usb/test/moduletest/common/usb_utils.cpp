@@ -121,13 +121,13 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
     char *pch;
     struct ParseProcInfo Pinfo = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0};
 
-    FILE *f = fopen(file.c_str(), "r");
-    if (!f) {
+    FILE *fp = fopen(file.c_str(), "r");
+    if (!fp) {
         printf("%s:%d file open failed.", __func__, __LINE__);
         return;
     }
     while (1) {
-        if (fgets(s, sizeof(s), f) == nullptr) {
+        if (fgets(s, sizeof(s), fp) == nullptr) {
             break;
         }
         pch = strtok(s, " \t");
@@ -135,7 +135,7 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
     }
 
     if (Pinfo.ramCount == 0 || Pinfo.cpuCount == 0) {
-        fclose(f);
+        (void)fclose(fp);
         return;
     }
     info.ramPeak = Pinfo.ramPeak;
@@ -143,10 +143,9 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
     info.cpuPeak = Pinfo.cpuPeak;
     info.cpuAvg = Pinfo.cpuTotal / Pinfo.cpuCount;
     info.threadPeak = Pinfo.threadPeak;
-
-    if (fclose(f)) {
-        return;
-    }
+    
+    (void)fclose(fp);
+    return;
 }
 
 double GetTsFromLog(const string &target, double startTs, const string &file)

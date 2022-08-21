@@ -31,7 +31,7 @@ static struct HdfSBuf *g_data;
 static struct HdfSBuf *g_reply;
 static struct HdfRemoteService *g_acmService;
 static bool g_readRuning = false;
-static void TestSpeed()
+static void TestSpeed(void)
 {
     HdfSbufFlush(g_reply);
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService,
@@ -43,7 +43,7 @@ static void TestSpeed()
     }
 }
 
-static void GetTempSpeed()
+static void GetTempSpeed(void)
 {
     float speed;
     HdfSbufFlush(g_reply);
@@ -63,7 +63,7 @@ static void GetTempSpeed()
     }
 }
 
-static void ReadSpeedDone()
+static void ReadSpeedDone(void)
 {
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService,
         USB_SERIAL_READ_SPEED_DONE, g_data, g_reply);
@@ -111,7 +111,7 @@ int32_t acm_speed_read(int32_t argc, const char *argv[])
         return HDF_FAILURE;
     }
 
-    signal(SIGINT, StopReadSpeedTest);
+    (void)signal(SIGINT, StopReadSpeedTest);
     TestSpeed();
     g_readRuning = true;
     while (g_readRuning) {
