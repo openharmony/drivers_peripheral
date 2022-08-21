@@ -18,7 +18,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void UsbFnHandleUevent(const char msg[], int32_t rcvLen);
+void UsbFnHandleUevent(const char msg[], ssize_t rcvLen);
 #ifdef __cplusplus
 }
 #endif

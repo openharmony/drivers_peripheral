@@ -79,7 +79,7 @@ static void UsbFnDispatchUevent(const struct UsbFnUeventInfo *info)
     }
 }
 
-void UsbFnHandleUevent(const char msg[], int32_t rcvLen)
+void UsbFnHandleUevent(const char msg[], ssize_t rcvLen)
 {
     struct UsbFnUeventInfo info = {
         .devPath = "",

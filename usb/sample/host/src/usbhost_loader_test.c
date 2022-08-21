@@ -13,26 +13,25 @@
  * limitations under the License.
  */
 
+#include <hdf_sbuf.h>
 #include <stdio.h>
 #include <sys/time.h>
 #include <unistd.h>
-#include <hdf_sbuf.h>
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_log.h"
 #include "hdf_usb_pnp_manage.h"
 
-#define HDF_LOG_TAG   USB_HOST_PNP_TEST
+#define HDF_LOG_TAG                    USB_HOST_PNP_TEST
+#define USB_HOST_PNP_TEST_SERVICE_NAME "hdf_usb_pnp_notify_service"
+#define USB_TEST_SAMPLE_MODULE_NAME    "usb_test_sample_driver"
+#define USB_TEST_SAMPLE_SERVICE_NAME   "usb_test_sample_service"
+#define STR_LEN                        1024
+#define USB_TEST_INTERFACE_NUM         2
 
-#define USB_HOST_PNP_TEST_SERVICE_NAME  "hdf_usb_pnp_notify_service"
-#define USB_TEST_SAMPLE_MODULE_NAME     "usb_test_sample_driver"
-#define USB_TEST_SAMPLE_SERVICE_NAME    "usb_test_sample_service"
-
-#define STR_LEN     1024
 #ifndef INT32_MAX
 #define INT32_MAX 0x7fffffff
 #endif
-#define USB_TEST_INTERFACE_NUM  2
 
 static int32_t UsbPnpTestEventReceived(void *priv, uint32_t id, struct HdfSBuf *data)
 {
@@ -49,8 +48,6 @@ int32_t main(int32_t argc, char *argv[])
     (void)argv;
     struct HdfSBuf *data;
     struct HdfSBuf *reply;
-    HDF_LOGI("%s:%d usbhost pnp test start", __func__, __LINE__);
-    int32_t ret;
     struct HdfIoService *testService = NULL;
     static struct HdfDevEventlistener usbPnpTestListener = {
         .callBack = UsbPnpTestEventReceived,
@@ -58,15 +55,13 @@ int32_t main(int32_t argc, char *argv[])
 
     struct HdfIoService *serv = HdfIoServiceBind(USB_HOST_PNP_TEST_SERVICE_NAME);
     if (serv == NULL) {
-        HDF_LOGE("%s:%d fail to get service %s", \
-            __func__, __LINE__, USB_HOST_PNP_TEST_SERVICE_NAME);
+        HDF_LOGE("%s: fail to get service %s", __func__, USB_HOST_PNP_TEST_SERVICE_NAME);
         return HDF_FAILURE;
     }
 
-    ret = HdfDeviceRegisterEventListener(serv, &usbPnpTestListener);
-    if (ret != HDF_SUCCESS) {
+    if (HdfDeviceRegisterEventListener(serv, &usbPnpTestListener) != HDF_SUCCESS) {
         HdfIoServiceRecycle(serv);
-        HDF_LOGE("HdfDeviceRegisterEventListener failed ret=%d", ret);
+        HDF_LOGE("HdfDeviceRegisterEventListener failed");
         return HDF_FAILURE;
     }
 
@@ -74,39 +69,33 @@ int32_t main(int32_t argc, char *argv[])
     reply = HdfSbufObtainDefaultSize();
     if (data == NULL || reply == NULL) {
         HdfIoServiceRecycle(serv);
-        HDF_LOGE("%s:%d GetService err", __func__, __LINE__);
+        HDF_LOGE("%s: GetService err", __func__);
         return HDF_FAILURE;
     }
 
     HdfSbufWriteString(data, USB_TEST_SAMPLE_MODULE_NAME);
     HdfSbufWriteString(data, USB_TEST_SAMPLE_SERVICE_NAME);
 
-    ret = serv->dispatcher->Dispatch(&serv->object, USB_PNP_DRIVER_REGISTER_DEVICE, data, NULL);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:%d Dispatch USB_PNP_DRIVER_REGISTER_DEVICE err", __func__, __LINE__);
+    if (serv->dispatcher->Dispatch(&serv->object, USB_PNP_DRIVER_REGISTER_DEVICE, data, NULL) != HDF_SUCCESS) {
+        HDF_LOGE("%s: Dispatch pnp register device err", __func__);
         goto OUT;
     }
 
     testService = HdfIoServiceBind(USB_TEST_SAMPLE_SERVICE_NAME);
     if (testService == NULL) {
-        HDF_LOGE("%s:%d testService USB_PNP_DRIVER_REGISTER_DEVICE err", __func__, __LINE__);
+        HDF_LOGE("%s: HdfIoServiceBind err", __func__);
         goto OUT;
     }
 
-    ret = serv->dispatcher->Dispatch(&serv->object, USB_PNP_DRIVER_UNREGISTER_DEVICE, data, NULL);
-    if (ret != HDF_SUCCESS) {
+    if (serv->dispatcher->Dispatch(&serv->object, USB_PNP_DRIVER_UNREGISTER_DEVICE, data, NULL) != HDF_SUCCESS) {
         HdfIoServiceRecycle(testService);
-        HDF_LOGE("%s:%d Dispatch USB_PNP_DRIVER_UNREGISTER_DEVICE err", __func__, __LINE__);
+        HDF_LOGE("%s: Dispatch pnp unregister device err", __func__);
         goto OUT;
     }
-
+    return HDF_SUCCESS;
 OUT:
     HdfSbufRecycle(data);
     HdfSbufRecycle(reply);
-
     HdfIoServiceRecycle(serv);
-
-    HDF_LOGI("%s:%d usbhost pnp test end", __func__, __LINE__);
-    return HDF_SUCCESS;
+    return HDF_FAILURE;
 }
-

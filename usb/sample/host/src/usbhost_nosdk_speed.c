@@ -12,7 +12,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "usbhost_nosdk_speed.h"
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -34,6 +33,7 @@
 #include "osal_mem.h"
 #include "osal_time.h"
 #include "securec.h"
+#include "usbhost_nosdk_speed.h"
 
 #define USB_DEV_FS_PATH                 "/dev/bus/usb"
 #define URB_COMPLETE_PROCESS_STACK_SIZE 8196
@@ -46,27 +46,27 @@
 #define ENDPOINT_IN_OFFSET   7
 #define PATH_MAX_LENGTH      24
 
-static pid_t tid;
-static int32_t exitOk = false;
+static pid_t g_tid;
+static int32_t g_exitOk = false;
 static int32_t g_speedFlag = 0;
 static unsigned int g_busNum = 1;
 static unsigned int g_devAddr = 2;
-static int32_t fd;
+static int32_t g_fd;
 static struct OsalSem sem;
 static uint64_t g_send_count = 0;
 static uint64_t g_recv_count = 0;
 static uint64_t g_byteTotal = 0;
 static struct UsbAdapterUrbs urb[TEST_CYCLE];
-static struct UsbAdapterUrb *sendUrb = NULL;
+static struct UsbAdapterUrb *g_sendUrb = NULL;
 static bool g_printData = false;
-static unsigned int ifaceNum;
-static unsigned char endNum;
+static unsigned int g_ifaceNum;
+static unsigned char g_endNum;
 
 static void CloseDevice(void)
 {
-    if (fd > 0) {
-        close(fd);
-        fd = 0;
+    if (g_fd > 0) {
+        close(g_fd);
+        g_fd = 0;
     }
     return;
 }
@@ -83,23 +83,23 @@ static int32_t OpenDevice(void)
     }
 
     printf("open: %s\n", path);
-    fd = open(path, O_RDWR);
+    g_fd = open(path, O_RDWR);
 
-    if (fd < 0) {
+    if (g_fd < 0) {
         printf("open device failed! errno=%2d(%s)\n", errno, strerror(errno));
     }
 
-    return fd;
+    return g_fd;
 }
 
 static int32_t ClaimInterface(unsigned int iface)
 {
-    if (fd < 0 || iface < 0) {
+    if (g_fd < 0 || iface < 0) {
         printf("parameter error\n");
         return -1;
     }
 
-    int32_t r = ioctl(fd, USBDEVFS_CLAIMINTERFACE, &iface);
+    int32_t r = ioctl(g_fd, USBDEVFS_CLAIMINTERFACE, &iface);
     if (r < 0) {
         printf("claim failed: iface=%u, errno=%2d(%s)\n", iface, errno, strerror(errno));
         return HDF_FAILURE;
@@ -117,9 +117,9 @@ static void FillUrb(struct UsbAdapterUrb *urb, int32_t len)
         urb->userContext = (void *)(urb);
         urb->type = USB_ADAPTER_URB_TYPE_BULK;
         urb->streamId = 0;
-        urb->endPoint = endNum;
+        urb->endPoint = g_endNum;
     }
-    if ((endNum >> ENDPOINT_IN_OFFSET) == 0) {
+    if ((g_endNum >> ENDPOINT_IN_OFFSET) == 0) {
         ret = memset_s(urb->buffer, len, 'c', len);
         if (ret != EOK) {
             printf("memset_s failed: ret = %d\n", ret);
@@ -173,9 +173,9 @@ static int32_t SendProcess(void *argurb)
         if (i == TEST_CYCLE) {
             i = TEST_CYCLE - 1;
         }
-        sendUrb = urb[i].urb;
-        FillUrb(sendUrb, TEST_LENGTH);
-        r = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
+        g_sendUrb = urb[i].urb;
+        FillUrb(g_sendUrb, TEST_LENGTH);
+        r = ioctl(g_fd, USBDEVFS_SUBMITURB, g_sendUrb);
         if (r < 0) {
             printf("SubmitBulkRequest: ret:%d errno=%d\n", r, errno);
             urb[i].inUse = 0;
@@ -196,10 +196,10 @@ static int32_t ReapProcess(void * const argurb)
         printf("signal SIGUSR1 failed");
         return HDF_ERR_IO;
     }
-    tid = (pid_t)syscall(SYS_gettid);
+    g_tid = (pid_t)syscall(SYS_gettid);
 
     while (!g_speedFlag) {
-        r = ioctl(fd, USBDEVFS_REAPURB, &urbrecv);
+        r = ioctl(g_fd, USBDEVFS_REAPURB, &urbrecv);
         if (r < 0) {
             continue;
         }
@@ -232,22 +232,14 @@ static int32_t ReapProcess(void * const argurb)
         urbs->inUse = 0;
         OsalSemPost(&sem);
     }
-    exitOk = true;
+    g_exitOk = true;
     return 0;
 }
 
-static int32_t BeginProcess(unsigned char endPoint)
+static int32_t FillUrbData(unsigned char endPoint)
 {
-    int32_t r;
-    char *data = NULL;
-    struct timeval time;
-    int32_t transNum = 0;
     int32_t i;
-
-    if (fd < 0 || endPoint <= 0) {
-        printf("parameter error\n");
-        return -1;
-    }
+    char *data = NULL;
     for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].urb = calloc(1, sizeof(struct UsbAdapterUrb));
         if (urb[i].urb == NULL) {
@@ -268,21 +260,37 @@ static int32_t BeginProcess(unsigned char endPoint)
         urb[i].urb->buffer = (void *)data;
         urb[i].urb->bufferLength = TEST_LENGTH;
     }
+    return HDF_SUCCESS;
+}
 
+static int32_t BeginProcess(unsigned char endPoint)
+{
+    int32_t ret;
+    struct timeval time;
+    int32_t transNum = 0;
+    int32_t i;
+
+    if (g_fd < 0 || endPoint <= 0) {
+        printf("parameter error\n");
+        return -1;
+    }
+
+    ret = FillUrbData(endPoint);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s:Fill urb data failed", __func__);
+        return ret;
+    }
     gettimeofday(&time, NULL);
     (void)signal(SIGINT, SignalHandler);
     (void)signal(SIGALRM, SignalHandler);
-
-    printf("test NO SDK endpoint:%hhu\n", endPoint);
 
     for (i = 0; i < TEST_CYCLE; i++) {
         urb[i].inUse = 1;
         urb[i].urbNum = transNum;
         urb[i].urb->userContext = (void *)(&urb[i]);
-        sendUrb = urb[i].urb;
-        r = ioctl(fd, USBDEVFS_SUBMITURB, sendUrb);
-        if (r < 0) {
-            printf("SubmitBulkRequest: ret:%d errno=%d\n", r, errno);
+        g_sendUrb = urb[i].urb;
+        ret = ioctl(g_fd, USBDEVFS_SUBMITURB, g_sendUrb);
+        if (ret < 0) {
             urb[i].inUse = 0;
             continue;
         }
@@ -293,8 +301,8 @@ static int32_t BeginProcess(unsigned char endPoint)
         OsalMSleep(10);
     }
 
-    kill(tid, SIGUSR1);
-    while (!exitOk) {
+    kill(g_tid, SIGUSR1);
+    while (!g_exitOk) {
         OsalMSleep(10);
     }
     for (i = 0; i < TEST_CYCLE; i++) {
@@ -307,7 +315,7 @@ static int32_t BeginProcess(unsigned char endPoint)
 static void ShowHelp(char *name)
 {
     printf(">> usage:\n");
-    printf(">>      %s [<busNum> <devAddr>]  <ifaceNum> <endpoint> [<printdata>]\n", name);
+    printf(">>      %s [<busNum> <devAddr>]  <g_ifaceNum> <endpoint> [<printdata>]\n", name);
     printf("\n");
 }
 
@@ -316,20 +324,20 @@ int32_t main(int32_t argc, char *argv[])
     int32_t ret;
     if (argc == 6) {
         g_busNum = (unsigned int)atoi(argv[1]);
-        g_devAddr = (unsigned int)atoi(argv[2]);
-        ifaceNum = (unsigned int)atoi(argv[3]);
-        endNum = (unsigned char)atoi(argv[4]);
-        if ((endNum >> 7) != 0) { // the offset value is 7
+        g_devAddr = (unsigned int)atoi(argv[2]); // 2 means get second char of argv
+        g_ifaceNum = (unsigned int)atoi(argv[3]);  // 3 means get third char of argv
+        g_endNum = (unsigned char)atoi(argv[4]);   // 4 means get fourth char of argv
+        if ((g_endNum >> 7) != 0) {                // the offset value is 7
             g_printData = (strncmp(argv[5], "printdata", 1)) ? false : true;
         }
     } else if (argc == 5) {
         g_busNum = (unsigned int)atoi(argv[1]);
-        g_devAddr = (unsigned int)atoi(argv[2]);
-        ifaceNum = (unsigned int)atoi(argv[3]);
-        endNum = (unsigned char)atoi(argv[4]);
+        g_devAddr = (unsigned int)atoi(argv[2]); // 2 means get second char of argv
+        g_ifaceNum = (unsigned int)atoi(argv[3]);  // 3 means get third char of argv
+        g_endNum = (unsigned char)atoi(argv[4]);   // 4 means get fourth char of argv
     } else if (argc == 3) {
-        ifaceNum = (unsigned int)atoi(argv[1]);
-        endNum = (unsigned char)atoi(argv[2]);
+        g_ifaceNum = (unsigned int)atoi(argv[1]);
+        g_endNum = (unsigned char)atoi(argv[2]); // 2 means get second char of argv
     } else {
         printf("Error: parameter error!\n\n");
         ShowHelp(argv[0]);
@@ -337,13 +345,13 @@ int32_t main(int32_t argc, char *argv[])
     }
     OsalSemInit(&sem, 0);
 
-    fd = OpenDevice();
-    if (fd < 0) {
+    g_fd = OpenDevice();
+    if (g_fd < 0) {
         ret = -1;
         goto ERR;
     }
 
-    ret = ClaimInterface(ifaceNum);
+    ret = ClaimInterface(g_ifaceNum);
     if (ret != HDF_SUCCESS) {
         goto ERR;
     }
@@ -383,7 +391,7 @@ int32_t main(int32_t argc, char *argv[])
         printf("OsalThreadStart fail, ret=%d\n", ret);
     }
 
-    ret = BeginProcess(endNum);
+    ret = BeginProcess(g_endNum);
     if (ret != HDF_SUCCESS) {
         goto ERR;
     }

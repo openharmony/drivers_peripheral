@@ -118,25 +118,25 @@ static struct UsbControlRequest UsbControlMsg(struct TestControlMsgData msgData)
     dr.reqType = (UsbControlRequestType)((msgData.requestType >> USB_TYPE_OFFSET) & REQUEST_TYPE_MASK);
     dr.directon = (UsbRequestDirection)((msgData.requestType >> USB_DIR_OFFSET) & DIRECTION_MASK);
     dr.request = msgData.request;
-    dr.value = CpuToLe16(msgData.value);
-    dr.index = CpuToLe16(msgData.index);
+    dr.value = CPU_TO_LE16(msgData.value);
+    dr.index = CPU_TO_LE16(msgData.index);
     dr.buffer = msgData.data;
-    dr.length = CpuToLe16(msgData.size);
+    dr.length = CPU_TO_LE16(msgData.size);
     return dr;
 }
+
 static void AcmGetPipe()
 {
     int32_t ret;
-    struct UsbPipeInfo p;
-    int32_t i;
+    UsbPipeInfo p;
+    UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(UsbPipeInfo));
 
-    for (i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
+    for (int32_t i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
         ret = UsbGetPipeInfo(g_acm->data_devHandle, g_acm->dataIface->info.curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_IN) && (p.pipeType == USB_PIPE_TYPE_BULK)) {
-            struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
             EXPECT_NE(nullptr,  pi);
             p.interfaceId = g_acm->dataIface->info.interfaceIndex;
             *pi = p;
@@ -144,7 +144,6 @@ static void AcmGetPipe()
         }
 
         if ((p.pipeDirection == USB_PIPE_DIRECTION_OUT) && (p.pipeType == USB_PIPE_TYPE_BULK)) {
-            struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
             EXPECT_NE(nullptr,  pi);
             p.interfaceId = g_acm->dataIface->info.interfaceIndex;
             *pi = p;
@@ -152,13 +151,12 @@ static void AcmGetPipe()
         }
     }
 
-    for (i = 0;  i <= g_acm->intIface->info.pipeNum; i++) {
+    for (int32_t i = 0;  i <= g_acm->intIface->info.pipeNum; i++) {
         ret = UsbGetPipeInfo(g_acm->int_devHandle, g_acm->intIface->info.curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_IN) && (p.pipeType == USB_PIPE_TYPE_INTERRUPT)) {
-            struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
             p.interfaceId = g_acm->intIface->info.interfaceIndex;
             *pi = p;
             g_acm->intPipe = pi;
@@ -167,13 +165,12 @@ static void AcmGetPipe()
     }
 
     g_acm->interfaceIndex = USB_CTRL_INTERFACE_ID;
-    for (i = 0;  i <= g_acm->ctrIface->info.pipeNum; i++) {
+    for (int32_t i = 0;  i <= g_acm->ctrIface->info.pipeNum; i++) {
         ret = UsbGetPipeInfo(g_acm->ctrl_devHandle, g_acm->ctrIface->info.curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
         if ((p.pipeDirection == USB_PIPE_DIRECTION_OUT) && (p.pipeType == USB_PIPE_TYPE_CONTROL)) {
-            struct UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(*pi));
             p.interfaceId = g_acm->interfaceIndex;
             *pi = p;
             g_acm->ctrPipe = pi;
@@ -305,7 +302,7 @@ static void AcmFillCtrlRequest()
     parmas.requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
     parmas.timeout = USB_CTRL_SET_TIMEOUT;
 
-    g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    g_acm->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     g_acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
     g_acm->lineCoding.bDataBits = DATA_BITS_LENGTH;

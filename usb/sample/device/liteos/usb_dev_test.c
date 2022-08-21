@@ -24,10 +24,10 @@
 static void ShowUsage(void)
 {
     printf("Usage options:\n");
-    printf("-1 : acm_test\n");
-    printf("-2 : prop_test\n");
-    printf("-3 : acm_speed_read\n");
-    printf("-4 : acm_speed_write\n");
+    printf("-1 : AcmTest\n");
+    printf("-2 : PropTest\n");
+    printf("-3 : AcmSpeedRead\n");
+    printf("-4 : AcmSpeedWrite\n");
     printf("-h : show usage\n");
 }
 
@@ -40,13 +40,13 @@ int32_t main(int32_t argc, char *argv[])
     }
     const char **arg = (const char **)&argv[1];
     if (strcmp(arg[0], "-1") == 0) {
-        acm_test(argc - 1, arg);
+        AcmTest(argc - 1, arg);
     } else if (strcmp(arg[0], "-2") == 0) {
-        prop_test(argc - 1, arg);
+        PropTest(argc - 1, arg);
     } else if (strcmp(arg[0], "-3") == 0) {
-        acm_speed_read(argc - 1, arg);
+        AcmSpeedRead(argc - 1, arg);
     } else if (strcmp(arg[0], "-4") == 0) {
-        acm_speed_write(argc - 1, arg);
+        AcmSpeedWrite(argc - 1, arg);
     } else if (strcmp(arg[0], "-h") == 0 || \
         strcmp(arg[0], "?") == 0) {
         ShowUsage();

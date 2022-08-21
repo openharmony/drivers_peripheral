@@ -59,7 +59,7 @@ static void TestSpeed(void)
 {
     HdfSbufFlush(g_reply);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_READ_SPEED, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_READ_SPEED err", __func__);
         return;
     }
@@ -72,7 +72,7 @@ static void GetTempSpeed(void)
     HdfSbufFlush(g_reply);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
         USB_SERIAL_READ_GET_TEMP_SPEED_UINT32, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_GET_TEMP_SPEED failed status = %d",
             __func__, status);
         return;
@@ -90,7 +90,7 @@ static void ReadSpeedDone(void)
 {
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
         USB_SERIAL_READ_SPEED_DONE, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_SPEED_DONE failed status = %d",
             __func__, status);
         return;
@@ -110,7 +110,7 @@ static void *StopHandler(void *arg)
         switch (signo) {
             case SIGINT:
             case SIGQUIT:
-                printf("acm_speed_read exit\n");
+                printf("AcmSpeedRead exit\n");
                 ReadSpeedDone();
                 g_readRuning = false;
                 return NULL;
@@ -136,7 +136,7 @@ static void StartStopHandler(void)
     }
 }
 
-int32_t acm_speed_read(int32_t argc, const char *argv[])
+int32_t AcmSpeedRead(int32_t argc, const char *argv[])
 {
     (void)argc;
     (void)argv;
@@ -155,7 +155,7 @@ int32_t acm_speed_read(int32_t argc, const char *argv[])
     }
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_OPEN, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
         return HDF_FAILURE;
     }
