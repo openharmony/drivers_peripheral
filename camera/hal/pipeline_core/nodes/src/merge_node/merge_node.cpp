@@ -108,7 +108,7 @@ void MergeNode::MergeBuffers()
                             bufferNum_--;
                         }
                     }
-                    } else if (tmpVec_.size() == 2) {
+                    } else if (tmpVec_.size() == 2) { // the total occupied space is 2 bytes
                         for (auto it : outPorts) {
                             it->DeliverBuffers(tmpVec_);
                             tmpVec_.clear();

@@ -25,7 +25,7 @@
 #define LOG_DOMAIN 0xD002B00
 #define LOG_TAG "METADATA"
 
-#define __FILENAME__ (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
+#define FILENAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #ifndef OHOS_DEBUG
 #define DECORATOR_HILOG(op, fmt, args...) \
@@ -35,7 +35,7 @@
 #else
 #define DECORATOR_HILOG(op, fmt, args...)                                                \
     do {                                                                                 \
-        op(LOG_CORE, "{%s()-%s:%d} " fmt, __FUNCTION__, __FILENAME__, __LINE__, ##args); \
+        op(LOG_CORE, "{%s()-%s:%d} " fmt, __FUNCTION__, FILENAME, __LINE__, ##args); \
     } while (0)
 #endif
 
