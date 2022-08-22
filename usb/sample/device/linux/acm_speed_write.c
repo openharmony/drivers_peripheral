@@ -79,10 +79,10 @@ static void StopWriteSpeedTest(int32_t signo)
     (void)signo;
     WriteSpeedDone();
     g_readRuning = false;
-    printf("acm_speed_write exit.\n");
+    printf("AcmSpeedWrite exit.\n");
 }
 
-int32_t acm_speed_write(int32_t argc, const char *argv[])
+int32_t AcmSpeedWrite(int32_t argc, const char *argv[])
 {
     (void)argc;
     (void)argv;

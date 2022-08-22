@@ -13,11 +13,11 @@
  * limitations under the License.
  */
 
+#include <csignal>
 #include <cstdio>
 #include <cstring>
-#include <csignal>
-#include <unistd.h>
 #include <gtest/gtest.h>
+#include <unistd.h>
 #include "hdf_base.h"
 #include "usb_utils.h"
 
@@ -74,7 +74,7 @@ HWTEST_F(UsbDevicePerformanceTest, CheckDeviceSdkProcInfo, TestSize.Level1)
     char *pch = nullptr;
     FILE *res = nullptr;
     struct ProcInfo info = {0, 0, 0, 0, 0};
-    ASSERT_EQ(access(script.c_str(), F_OK) , 0) << "ErrInfo: shell script not exists";
+    ASSERT_EQ(access(script.c_str(), F_OK), 0) << "ErrInfo: shell script not exists";
     if (access(script.c_str(), X_OK) == -1) {
         system(("chmod +x " + script).c_str());
     }
@@ -101,4 +101,4 @@ HWTEST_F(UsbDevicePerformanceTest, CheckDeviceSdkProcInfo, TestSize.Level1)
     EXPECT_EQ(processCount, 1) << "ErrInfo: device sdk process count is not equal to 1";
     printf("------end CheckDeviceSdkProcInfo------\n");
 }
-}
+} // namespace

@@ -78,10 +78,10 @@ static void StopReadSpeedTest(int32_t signo)
 {
     ReadSpeedDone();
     g_readRuning = false;
-    printf("acm_speed_read exit.\n");
+    printf("AcmSpeedRead exit.\n");
 }
 
-int32_t acm_speed_read(int32_t argc, const char *argv[])
+int32_t AcmSpeedRead(int32_t argc, const char *argv[])
 {
     (void)argc;
     (void)argv;

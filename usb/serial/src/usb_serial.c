@@ -229,10 +229,10 @@ static struct UsbControlRequest UsbControlSetUp(struct UsbControlParams *control
     dr.reqType = controlParams->reqType;
     dr.directon = controlParams->directon;
     dr.request = controlParams->request;
-    dr.value = CpuToLe16(controlParams->value);
-    dr.index = CpuToLe16(controlParams->index);
+    dr.value = CPU_TO_LE16(controlParams->value);
+    dr.index = CPU_TO_LE16(controlParams->index);
     dr.buffer = controlParams->data;
-    dr.length = CpuToLe16(controlParams->size);
+    dr.length = CPU_TO_LE16(controlParams->size);
     return dr;
 }
 
@@ -340,7 +340,7 @@ static int32_t UsbGetStatus(UsbInterfaceHandle *devHandle, struct UsbRequest *re
             return ret;
         }
     }
-    *status = Le16ToCpu(ss);
+    *status = LE16_TO_CPU(ss);
     return HDF_SUCCESS;
 }
 
@@ -538,7 +538,7 @@ static int32_t UsbSerialDeviceAlloc(struct AcmDevice *acm)
         HDF_LOGE("%s: init lock failed!", __func__);
         return HDF_FAILURE;
     }
-    port->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    port->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
     port->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     port->lineCoding.bParityType = USB_CDC_NO_PARITY;
     port->lineCoding.bDataBits = DATA_BITS_LENGTH;
@@ -617,7 +617,7 @@ static int32_t SerialSetBaudrate(struct SerialDevice *port, const struct HdfSBuf
         HDF_LOGE("%s: sbuf read buffer failed", __func__);
         return HDF_ERR_IO;
     }
-    port->lineCoding.dwDTERate = CpuToLe32(baudRate);
+    port->lineCoding.dwDTERate = CPU_TO_LE32(baudRate);
     if (memcmp(&acm->lineCoding, &port->lineCoding, sizeof(struct UsbCdcLineCoding))) {
         ret = memcpy_s(&acm->lineCoding, sizeof(struct UsbCdcLineCoding), &port->lineCoding, sizeof(port->lineCoding));
         if (ret != EOK) {
@@ -640,7 +640,7 @@ static int32_t UsbCtrlMsg(struct SerialDevice *port, struct HdfSBuf *data)
     int32_t ret;
     struct AcmDevice *acm = port->acm;
     struct UsbCdcLineCoding lineCoding = {
-        .dwDTERate = CpuToLe32(DATARATE),
+        .dwDTERate = CPU_TO_LE32(DATARATE),
         .bCharFormat = USB_CDC_1_STOP_BITS,
         .bParityType = USB_CDC_NO_PARITY,
         .bDataBits = DATA_BITS_LENGTH,
@@ -655,7 +655,7 @@ static int32_t UsbCtrlMsg(struct SerialDevice *port, struct HdfSBuf *data)
 
 static int32_t SerialGetBaudrate(struct SerialDevice *port, struct HdfSBuf *reply)
 {
-    uint32_t baudRate = Le32ToCpu(port->lineCoding.dwDTERate);
+    uint32_t baudRate = LE32_TO_CPU(port->lineCoding.dwDTERate);
     if (!HdfSbufWriteUint32(reply, baudRate)) {
         HDF_LOGE("%s:%d sbuf write buffer failed", __func__, __LINE__);
         return HDF_ERR_IO;
@@ -805,7 +805,7 @@ static int32_t UsbStdCtrlCmd(struct SerialDevice *port, SerialOPCmd cmd, struct 
 
 static int32_t SerialWriteSync(const struct SerialDevice *port, const struct HdfSBuf *data)
 {
-    int32_t size;
+    uint32_t size;
     int32_t ret;
     const char *tmp = NULL;
     int32_t wbn;
@@ -837,13 +837,13 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
         HDF_LOGE("%s: sbuf read buffer failed", __func__);
         return HDF_ERR_IO;
     }
-    size = strlen(tmp) + 1;
+    size = (uint32_t)strlen(tmp) + 1;
     size = (size > acm->writeSize) ? acm->writeSize : size;
-    ret = memcpy_s(wb->buf, acm->writeSize, tmp, size);
+    ret = memcpy_s(wb->buf, (size_t)acm->writeSize, tmp, (size_t)size);
     if (ret != EOK) {
         HDF_LOGE("memcpy_s failed, ret = %d", ret);
     }
-    wb->len = (int)size;
+    wb->len = size;
     if (acm->dataOutPipe == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -854,7 +854,7 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
         return HDF_FAILURE;
     }
 
-    return size;
+    return (int32_t)size;
 }
 
 static int32_t SerialOpen(const struct SerialDevice *port, struct HdfSBuf *data)
@@ -1265,7 +1265,7 @@ static int32_t AcmCtrlIrqCheckSize(struct UsbRequest * const req, struct AcmDevi
     unsigned int currentSize = req->compInfo.actualLength;
     HDF_LOGD("actualLength:%u\n", currentSize);
 
-    unsigned int expectedSize = sizeof(struct UsbCdcNotification) + Le16ToCpu(dr->wLength);
+    unsigned int expectedSize = sizeof(struct UsbCdcNotification) + LE16_TO_CPU(dr->wLength);
     if (currentSize < expectedSize) {
         if (acm->nbSize < expectedSize) {
             if (acm->nbSize) {
@@ -1715,7 +1715,7 @@ static int32_t AcmInit(struct AcmDevice *acm)
         goto ERROR_ALLOC_REQS;
     }
 
-    acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    acm->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
     acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
     acm->lineCoding.bDataBits = DATA_BITS_LENGTH;
