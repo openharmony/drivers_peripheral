@@ -25,7 +25,6 @@
 using namespace testing::ext;
 
 namespace {
-    int32_t g_sensorDataFlag = 0;
     const int32_t SENSOR_ID = 0;
     const int32_t SENSOR_INTERVAL = 1000000000;
     const int32_t SENSOR_POLL_TIME = 5;
@@ -36,6 +35,8 @@ namespace {
 
     int SensorTestDataCallback(const struct SensorEvents *event)
     {
+        static int32_t sensorDataFlag = 0;
+
         if (event == nullptr || event->data == nullptr) {
             return -1;
         }
@@ -44,7 +45,7 @@ namespace {
         if (event->sensorId == SENSOR_ID) {
             printf("time [%lld] sensor id [%d] data [%f]\n\r", event->timestamp, event->sensorId, *(data));
             if (fabs(*data) > 1e-5) {
-                g_sensorDataFlag = 1;
+                sensorDataFlag = 1;
             }
         }
 
