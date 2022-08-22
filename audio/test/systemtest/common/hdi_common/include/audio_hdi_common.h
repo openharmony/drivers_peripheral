@@ -74,6 +74,7 @@ const std::string ADAPTER_NAME = "primary";
 const std::string ADAPTER_NAME_OUT = "primary_ext";
 
 using TestAudioManager = struct AudioManager;
+using TestGetAudioManager = TestAudioManager *(*)();
 const std::string AUDIO_RIFF = "RIFF";
 const std::string AUDIO_WAVE = "WAVE";
 const std::string AUDIO_DATA = "data";
@@ -297,6 +298,13 @@ int32_t AudioRenderCallback(enum AudioCallbackType type, void *reserved, void *c
 int32_t CheckFlushValue();
 int32_t CheckRenderFullValue();
 int32_t CheckWriteCompleteValue();
+int32_t LoadFunction(void *&handle, TestGetAudioManager &getAudioManager);
+
+int32_t ReleaseCaptureSource(struct AudioManager *manager, struct AudioAdapter *&adapter,
+    struct AudioCapture *&capture);
+
+int32_t ReleaseRenderSource(struct AudioManager *manager, struct AudioAdapter *&adapter,
+    struct AudioRender *&render);
 }
 }
 #endif // AUDIO_HDI_COMMON_H

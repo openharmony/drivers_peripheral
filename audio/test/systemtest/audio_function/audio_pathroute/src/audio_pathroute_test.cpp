@@ -62,34 +62,30 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
+    static void *handle;
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManager *manager;
 };
 
-TestAudioManager *(*AudioPathRouteTest::GetAudioManager)() = nullptr;
-void *AudioPathRouteTest::handleSo = nullptr;
+void *AudioPathRouteTest::handle = nullptr;
+TestGetAudioManager AudioPathRouteTest::getAudioManager = nullptr;
+TestAudioManager *AudioPathRouteTest::manager = nullptr;
 
 void AudioPathRouteTest::SetUpTestCase(void)
 {
-    char resolvedPath[] = HDF_LIBRARY_FULL_PATH("libhdi_audio");
-    handleSo = dlopen(resolvedPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager* (*)())(dlsym(handleSo, "GetAudioManagerFuncs"));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
 }
 
 void AudioPathRouteTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
 }
 
@@ -111,8 +107,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0001, TestSize.Level1)
     struct AudioAdapter *adapter = nullptr;
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = CheckRegisterStatus(g_elemValues[0].id, g_elemValues[1].id, REGISTER_STATUS_ON, REGISTER_STATUS_ON);
@@ -136,8 +131,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0002, TestSize.Level1)
     g_elemValues[1].value[0] = 1;
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
@@ -165,8 +159,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0003, TestSize.Level1)
     struct AudioAdapter *adapter = nullptr;
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
@@ -195,8 +188,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0004, TestSize.Level1)
     g_elemValues[3].value[0] = 1;
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = CheckRegisterStatus(g_elemValues[2].id, g_elemValues[3].id, REGISTER_STATUS_ON, REGISTER_STATUS_OFF);
@@ -220,8 +212,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0005, TestSize.Level1)
     g_elemValues[3].value[0] = 1;
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
@@ -250,8 +241,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0006, TestSize.Level1)
     g_elemValues[3].value[0] = 1;
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioSceneDescriptor scene = {
@@ -284,8 +274,7 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0007, TestSize.Level1)
     ret = PowerOff(g_elemValues[0], g_elemValues[1]);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = PowerOff(g_elemValues[2], g_elemValues[3]);
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     InitAttrs(attrs);
