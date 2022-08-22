@@ -27,14 +27,6 @@ void CameraHdiBaseTest::TearDownTestCase(void)
 {
 }
 
-void CameraHdiBaseTest::SetUp(void) const
-{
-}
-
-void CameraHdiBaseTest::TearDown(void) const
-{
-}
-
 bool CameraHdiBaseTest::InitCameraHost()
 {
     if (cameraHost_ != nullptr) {
