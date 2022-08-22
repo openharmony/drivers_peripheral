@@ -126,7 +126,7 @@ private:
     RetCode GetCameraConnectionType(std::shared_ptr<CameraAbility> &ability);
     RetCode GetFaceDetectMaxNum(std::shared_ptr<CameraAbility> &ability);
 
-    int aeStatus_ = 1;
+    bool aeStatus_ = true;
     int videoFd_ = -1;
     unsigned int isPreviewOn_ = 0;
     unsigned int isCaptureOn_ = 0;
