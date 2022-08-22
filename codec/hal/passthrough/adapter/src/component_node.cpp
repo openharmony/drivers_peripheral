@@ -575,9 +575,8 @@ int32_t ComponentNode::SetPortMode(uint32_t portIndex, OmxCodecBuffer &buffer, A
     ret = CodecSetPortMode(comp_, direct, mode, type);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s error, CodecSetPortMode failed", __func__);
-        return ret;
     }
-    return ret;
+    return HDF_SUCCESS;
 }
 
 int32_t ComponentNode::ChangeComponentState(uint32_t param)
