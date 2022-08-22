@@ -22,13 +22,13 @@
 #include "callback_death_recipient.h"
 
 #define HDF_LOG_TAG uhdf_sensor
-#define MICEO_TO_NANO 1000
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_0 {
 namespace {
+    constexpr int32_t MICEO_TO_NANO = 1000;
     constexpr int32_t CALLBACK_CTOUNT_THRESHOLD = 1;
     using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<ISensorCallback>>>;
     using CallBackDeathRecipientMap = std::unordered_map<IRemoteObject *, sptr<CallBackDeathRecipient>>;
