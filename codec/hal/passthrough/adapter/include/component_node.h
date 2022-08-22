@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace Codec {
 namespace CodecAdapter {
-class ComponentNode : NoCopyable {
+class ComponentNode : public NoCopyable {
 public:
     explicit ComponentNode(CODEC_HANDLETYPE handle, CodecExInfo info);
     ~ComponentNode() {}
@@ -36,8 +36,8 @@ public:
     int32_t SetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t configLen);
     int32_t GetExtensionIndex(const char *parameterName, OMX_INDEXTYPE *indexType);
     int32_t GetState(OMX_STATETYPE *state);
-    int32_t ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
-                                   OMX_TUNNELSETUPTYPE *tunnelSetup);
+    int32_t ComponentTunnelRequest(
+        uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort, OMX_TUNNELSETUPTYPE *tunnelSetup);
     int32_t UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer);
     int32_t AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer);
     int32_t FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer);
@@ -68,8 +68,8 @@ private:
     int32_t OnFillBufferDone(CodecBuffer *outBuf, int32_t *acquireFd);
 
 private:
-    CODEC_HANDLETYPE comp_;                                         // Compnent handle
-    CodecCallbackType *omxCallback_;                       // Callbacks in HDI
+    CODEC_HANDLETYPE comp_;          // Compnent handle
+    CodecCallbackType *omxCallback_; // Callbacks in HDI
     CodecExInfo exInfo_;
     int64_t appData_;
     uint32_t bufferId_;

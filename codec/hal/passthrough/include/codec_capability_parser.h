@@ -18,10 +18,10 @@
 
 #include "codec_config_parser.h"
 
-#define CODEC_CONFIG_KEY_INPUT_BUFFER_COUNT          "inputBufferCount"
-#define CODEC_CONFIG_KEY_INPUT_BUFFER_SIZE          "inputBufferSize"
-#define CODEC_CONFIG_KEY_OUTPUT_BUFFER_COUNT          "outputBufferCount"
-#define CODEC_CONFIG_KEY_OUTPUT_BUFFER_SIZE          "outputBufferSize"
+#define CODEC_CONFIG_KEY_INPUT_BUFFER_COUNT  "inputBufferCount"
+#define CODEC_CONFIG_KEY_INPUT_BUFFER_SIZE   "inputBufferSize"
+#define CODEC_CONFIG_KEY_OUTPUT_BUFFER_COUNT "outputBufferCount"
+#define CODEC_CONFIG_KEY_OUTPUT_BUFFER_SIZE  "outputBufferSize"
 
 typedef struct {
     CodecType type;

@@ -262,7 +262,7 @@ int32_t CodecHdiAdapterEncode::UseBufferOnPort(PortIndex portIndex)
     }
 
     if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s errNo[%{public}d]UseDynaBuffer or UseBufferOnPort failed", __func__, ret);
+        HDF_LOGE("%{public}s errNo[%{public}d]UseDynaBuffer or UseBufferOnPort failed", __func__, ret);
     }
 
     return ret;
@@ -297,7 +297,7 @@ int32_t CodecHdiAdapterEncode::UseBufferOnPort(PortIndex portIndex, int bufferCo
         }
         auto ret = client_->UseBuffer(client_, (uint32_t)portIndex, omxBuffer.get());
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s errNo[%{public}d] UseBuffer with  portIndex[%{public}d]", __func__, ret, portIndex);
+            HDF_LOGE("%{public}s errNo[%{public}d] UseBuffer with portIndex[%{public}d]", __func__, ret, portIndex);
             spSharedMem->UnmapAshmem();
             spSharedMem->CloseAshmem();
             spSharedMem = nullptr;
@@ -342,7 +342,7 @@ int32_t CodecHdiAdapterEncode::UseDynaBuffer(int bufferCount, int bufferSize)
 
         auto ret = client_->UseBuffer(client_, (uint32_t)PortIndex::PORT_INDEX_INPUT, omxBuffer.get());
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s errNo[%{public}d] UseBuffer with  PORT_INDEX_INPUT", __func__, ret);
+            HDF_LOGE("%{public}s errNo[%{public}d] UseBuffer with PORT_INDEX_INPUT", __func__, ret);
             return ret;
         }
 
@@ -573,14 +573,14 @@ int32_t CodecHdiAdapterEncode::OnEvent(struct CodecCallbackType *self, OMX_EVENT
     return HDF_SUCCESS;
 }
 
-int32_t CodecHdiAdapterEncode::OnEmptyBufferDone(struct CodecCallbackType *self, int64_t appData,
-                                                 const struct OmxCodecBuffer *buffer)
+int32_t CodecHdiAdapterEncode::OnEmptyBufferDone(
+    struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer)
 {
     return g_core->OnEmptyBufferDone(*buffer);
 }
 
-int32_t CodecHdiAdapterEncode::OnFillBufferDone(struct CodecCallbackType *self, int64_t appData,
-                                                const struct OmxCodecBuffer *buffer)
+int32_t CodecHdiAdapterEncode::OnFillBufferDone(
+    struct CodecCallbackType *self, int64_t appData, const struct OmxCodecBuffer *buffer)
 {
     return g_core->OnFillBufferDone(*buffer);
 }
@@ -775,8 +775,7 @@ int32_t CodecHdiAdapterEncode::ConfigMppExtPassthrough(int32_t codecType)
     RKHdiRcSetup rc;
     param.key = KEY_VIDEO_RC_MODE;
     rc.rcMode = VID_CODEC_RC_VBR;
-    rc.bpsTarget = width_ * height_ * BPS_TARGET / BPS_BASE *
-        (fps.fpsOutNum / fps.fpsOutDen);
+    rc.bpsTarget = width_ * height_ * BPS_TARGET / BPS_BASE * (fps.fpsOutNum / fps.fpsOutDen);
     CalcBpsRange(&rc, codecType);
     param.val = &rc;
     param.size = sizeof(rc);

@@ -21,13 +21,12 @@
 
 #define HDF_LOG_TAG codec_capability_parser
 #ifdef __ARM64__
-#define MASK_NUM_LIMIT  64
+#define MASK_NUM_LIMIT 64
 #else
-#define MASK_NUM_LIMIT  32
+#define MASK_NUM_LIMIT 32
 #endif
 
-static int32_t GetGroupExInfosNumber(const struct DeviceResourceNode *node,
-    const char *nodeName, int32_t *num)
+static int32_t GetGroupExInfosNumber(const struct DeviceResourceNode *node, const char *nodeName, int32_t *num)
 {
     if (node == NULL || nodeName == NULL || num == NULL) {
         HDF_LOGE("%{public}s, failed for codec %{public}s, invalid param!", __func__, nodeName);
@@ -57,10 +56,10 @@ static int32_t GetGroupExInfosNumber(const struct DeviceResourceNode *node,
     return HDF_SUCCESS;
 }
 
-static int32_t GetBasicInfo(const struct DeviceResourceIface *iface,
-                            const struct DeviceResourceNode *childNode, CodecExInfo *info)
+static int32_t GetBasicInfo(
+    const struct DeviceResourceIface *iface, const struct DeviceResourceNode *childNode, CodecExInfo *info)
 {
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_TYPE, (uint32_t*)&info->type, INVALID_TYPE) != HDF_SUCCESS) {
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_TYPE, (uint32_t *)&info->type, INVALID_TYPE) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, failed to get type.", __func__);
         return HDF_FAILURE;
     }
@@ -84,26 +83,26 @@ static int32_t GetBasicInfo(const struct DeviceResourceIface *iface,
     return HDF_SUCCESS;
 }
 
-static int32_t GetBufferInfo(const struct DeviceResourceIface *iface,
-                             const struct DeviceResourceNode *childNode, CodecExInfo *info)
+static int32_t GetBufferInfo(
+    const struct DeviceResourceIface *iface, const struct DeviceResourceNode *childNode, CodecExInfo *info)
 {
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_INPUT_BUFFER_COUNT,
-        (uint32_t*)&info->inputBufferCount, 0) != HDF_SUCCESS) {
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_INPUT_BUFFER_COUNT, (uint32_t *)&info->inputBufferCount, 0) !=
+        HDF_SUCCESS) {
         HDF_LOGE("%{public}s, failed to get inputBufferCount.", __func__);
         return HDF_FAILURE;
     }
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_INPUT_BUFFER_SIZE,
-        (uint32_t*)&info->inputBufferSize, 0) != HDF_SUCCESS) {
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_INPUT_BUFFER_SIZE, (uint32_t *)&info->inputBufferSize, 0) !=
+        HDF_SUCCESS) {
         HDF_LOGE("%{public}s, failed to get inputBufferSize.", __func__);
         return HDF_FAILURE;
     }
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_OUTPUT_BUFFER_COUNT,
-        (uint32_t*)&info->outputBufferCount, 0) != HDF_SUCCESS) {
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_OUTPUT_BUFFER_COUNT, (uint32_t *)&info->outputBufferCount, 0) !=
+        HDF_SUCCESS) {
         HDF_LOGE("%{public}s, failed to get outputBufferCount.", __func__);
         return HDF_FAILURE;
     }
-    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_OUTPUT_BUFFER_SIZE,
-        (uint32_t*)&info->outputBufferSize, 0) != HDF_SUCCESS) {
+    if (iface->GetUint32(childNode, CODEC_CONFIG_KEY_OUTPUT_BUFFER_SIZE, (uint32_t *)&info->outputBufferSize, 0) !=
+        HDF_SUCCESS) {
         HDF_LOGE("%{public}s, failed to get outputBufferSize.", __func__);
         return HDF_FAILURE;
     }
@@ -111,8 +110,8 @@ static int32_t GetBufferInfo(const struct DeviceResourceIface *iface,
     return HDF_SUCCESS;
 }
 
-static int32_t GetOneExInfo(const struct DeviceResourceIface *iface,
-    const struct DeviceResourceNode *childNode, CodecExInfo *info)
+static int32_t GetOneExInfo(
+    const struct DeviceResourceIface *iface, const struct DeviceResourceNode *childNode, CodecExInfo *info)
 {
     if (iface == NULL || childNode == NULL || info == NULL) {
         HDF_LOGE("%{public}s, failed, invalid param!", __func__);
@@ -131,8 +130,8 @@ static int32_t GetOneExInfo(const struct DeviceResourceIface *iface,
     return HDF_SUCCESS;
 }
 
-static int32_t GetGroupExInfos(const struct DeviceResourceNode *node,
-    const char *nodeName, CodecExInfoGroup *exInfoGroup)
+static int32_t GetGroupExInfos(
+    const struct DeviceResourceNode *node, const char *nodeName, CodecExInfoGroup *exInfoGroup)
 {
     if (node == NULL || nodeName == NULL || exInfoGroup == NULL) {
         HDF_LOGE("%{public}s, failed, invalid param!", __func__);
