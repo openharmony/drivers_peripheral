@@ -28,7 +28,7 @@ int32_t ComponentManager::CreateComponentInstance(const char *componentName, COD
     HDF_LOGI("ComponentManager::CreateComponentInstance:%{public}s", componentName);
     int32_t ret = CodecCreate(componentName, &component);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s  error, CodecCreate failed errNo: %{public}x", __func__, ret);
+        HDF_LOGE("%{public}s error, CodecCreate failed errNo: %{public}x", __func__, ret);
     }
     return ret;
 }
@@ -41,7 +41,7 @@ int32_t ComponentManager::DeleteComponentInstance(CODEC_HANDLETYPE component)
     }
     int32_t ret = CodecDestroy(component);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s  error, CodecDestroy failed errNo: %{public}x", __func__, ret);
+        HDF_LOGE("%{public}s error, CodecDestroy failed errNo: %{public}x", __func__, ret);
     }
     return ret;
 }
@@ -50,7 +50,7 @@ int32_t ComponentManager::Init()
 {
     int32_t ret = CodecInit();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s  error,CodecInit failed errNo: %{public}x", __func__, ret);
+        HDF_LOGE("%{public}s error, CodecInit failed errNo: %{public}x", __func__, ret);
     }
     return ret;
 }
@@ -59,7 +59,7 @@ int32_t ComponentManager::Deinit()
 {
     int32_t ret = CodecDeinit();
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s  error,CodecDeinit failed errNo: %{public}x", __func__, ret);
+        HDF_LOGE("%{public}s error, CodecDeinit failed errNo: %{public}x", __func__, ret);
     }
     return ret;
 }

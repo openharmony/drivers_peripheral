@@ -21,7 +21,7 @@ namespace Codec {
 namespace CodecAdapter {
 class ComponentManager {
 public:
-    ComponentManager()  {}
+    ComponentManager() {}
     ~ComponentManager() {}
     ComponentManager(const ComponentManager &) = delete;
     ComponentManager &operator=(const ComponentManager &) = delete;

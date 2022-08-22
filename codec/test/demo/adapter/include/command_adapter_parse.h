@@ -29,11 +29,10 @@ using CommandOpt = struct CommandOpt {
 
 class CommandAdapterParse {
 public:
-    CommandAdapterParse()
-    {}
-    ~CommandAdapterParse()
-    {}
+    CommandAdapterParse() {}
+    ~CommandAdapterParse() {}
     bool Parse(int argc, char *argv[], CommandOpt &opt);
+
 private:
     void ShowUsage();
 };

@@ -85,8 +85,8 @@ struct BufferInfo {
 };
 std::map<int32_t, std::shared_ptr<BufferInfo>> inputBuffers;
 std::map<int32_t, std::shared_ptr<BufferInfo>> outputBuffers;
-static void InitCodecBufferWithAshMem(enum PortIndex portIndex, int bufferSize, shared_ptr<OmxCodecBuffer> omxBuffer,
-                                      shared_ptr<OHOS::Ashmem> sharedMem)
+static void InitCodecBufferWithAshMem(
+    enum PortIndex portIndex, int bufferSize, shared_ptr<OmxCodecBuffer> omxBuffer, shared_ptr<OHOS::Ashmem> sharedMem)
 {
     omxBuffer->size = sizeof(OmxCodecBuffer);
     omxBuffer->version = g_version;
@@ -128,7 +128,7 @@ static bool UseBufferOnPort(enum PortIndex portIndex, int bufferCount, int buffe
         InitCodecBufferWithAshMem(portIndex, bufferSize, omxBuffer, sharedMem);
         auto err = g_component->UseBuffer(g_component, (uint32_t)portIndex, omxBuffer.get());
         if (err != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s failed to UseBuffer with  portIndex[%{public}d]", __func__, portIndex);
+            HDF_LOGE("%{public}s failed to UseBuffer with portIndex[%{public}d]", __func__, portIndex);
             sharedMem->UnmapAshmem();
             sharedMem->CloseAshmem();
             sharedMem = nullptr;
@@ -151,14 +151,10 @@ static bool UseBufferOnPort(enum PortIndex portIndex, int bufferCount, int buffe
 
 class CodecHdiAdapterTest : public testing::Test {
 public:
-    static void SetUpTestCase()
-    {}
-    static void TearDownTestCase()
-    {}
-    void SetUp()
-    {}
-    void TearDown()
-    {}
+    static void SetUpTestCase() {}
+    static void TearDownTestCase() {}
+    void SetUp() {}
+    void TearDown() {}
 };
 
 static char g_arrayStr[ARRAY_TO_STR_LEN];
@@ -290,8 +286,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiCreateComponentAppdataMaxTest_003, Test
     ASSERT_TRUE(callback != nullptr);
     struct CodecComponentType *component = nullptr;
     uint32_t componentId = 0;
-    int32_t ret = g_manager->CreateComponent(&component, &componentId, const_cast<char *>(DECODER_AVC),
-                                             APP_DATA_MAX, callback);
+    int32_t ret =
+        g_manager->CreateComponent(&component, &componentId, const_cast<char *>(DECODER_AVC), APP_DATA_MAX, callback);
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(component != nullptr);
     ret = g_manager->DestroyComponent(componentId);
@@ -307,8 +303,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiCreateComponentAppdataMinTest_004, Test
     ASSERT_TRUE(callback != nullptr);
     struct CodecComponentType *component = nullptr;
     uint32_t componentId = 0;
-    int32_t ret = g_manager->CreateComponent(&component, &componentId, const_cast<char *>(DECODER_AVC),
-                                             APP_DATA_MIN, callback);
+    int32_t ret =
+        g_manager->CreateComponent(&component, &componentId, const_cast<char *>(DECODER_AVC), APP_DATA_MIN, callback);
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(component != nullptr);
     ret = g_manager->DestroyComponent(componentId);
@@ -316,15 +312,15 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiCreateComponentAppdataMinTest_004, Test
     CodecCallbackTypeRelease(callback);
     callback = nullptr;
 }
-  
+
 HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiCreateComponentCallbackIsNullptrTest_005, TestSize.Level1)
 {
     ASSERT_TRUE(g_manager != nullptr);
     struct CodecCallbackType *callback = nullptr;
     struct CodecComponentType *component = nullptr;
     uint32_t componentId = 0;
-    int32_t ret = g_manager->CreateComponent(&component, &componentId, const_cast<char *>(DECODER_AVC),
-                                             APP_DATA, callback);
+    int32_t ret =
+        g_manager->CreateComponent(&component, &componentId, const_cast<char *>(DECODER_AVC), APP_DATA, callback);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -332,8 +328,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiCreateComponentSuccessTest_006, TestSiz
 {
     ASSERT_TRUE(g_manager != nullptr);
     ASSERT_TRUE(g_callback != nullptr);
-    int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId, const_cast<char *>(ENCODER_AVC), APP_DATA,
-                                             g_callback);
+    int32_t ret =
+        g_manager->CreateComponent(&g_component, &g_componentId, const_cast<char *>(ENCODER_AVC), APP_DATA, g_callback);
     ASSERT_EQ(ret, HDF_SUCCESS);
     ASSERT_TRUE(g_component != nullptr);
 }
@@ -363,8 +359,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetParameterSuccessTest_002, TestSize.L
     InitParam(param);
     param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
     param.eCompressionFormat = OMX_VIDEO_CodingAVC;
-    auto ret = g_component->GetParameter(g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param),
-                                         sizeof(param));
+    auto ret = g_component->GetParameter(
+        g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
@@ -374,8 +370,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetParameterParamIndexNotMatchParamStru
     OMX_VIDEO_CONFIG_BITRATETYPE param;
     InitParam(param);
     param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    auto ret = g_component->GetParameter(g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param),
-                                         sizeof(param));
+    auto ret = g_component->GetParameter(
+        g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -385,8 +381,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetParameterParamIndexUnusedTest_004, T
     OMX_VIDEO_CONFIG_BITRATETYPE param;
     InitParam(param);
     param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    auto ret = g_component->GetParameter(g_component, OMX_IndexVideoStartUnused, reinterpret_cast<int8_t *>(&param),
-                                         sizeof(param));
+    auto ret = g_component->GetParameter(
+        g_component, OMX_IndexVideoStartUnused, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -396,8 +392,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetParameterSuccessTest_001, TestSize.L
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
     param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    int32_t ret = g_component->SetParameter(g_component, OMX_IndexParamVideoPortFormat,
-                                            reinterpret_cast<int8_t *>(&param), sizeof(param));
+    int32_t ret = g_component->SetParameter(
+        g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
@@ -414,8 +410,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetParameterParamIndexNotMatchParamStru
     OMX_VIDEO_CONFIG_BITRATETYPE param;
     InitParam(param);
     param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    int32_t ret = g_component->SetParameter(g_component, OMX_IndexParamVideoPortFormat,
-                                            reinterpret_cast<int8_t *>(&param), sizeof(param));
+    int32_t ret = g_component->SetParameter(
+        g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -425,8 +421,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetParameterParamIndexUnusedTest_004, T
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
     param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    int32_t ret = g_component->SetParameter(g_component, OMX_IndexVideoStartUnused, reinterpret_cast<int8_t *>(&param),
-                                            sizeof(param));
+    int32_t ret = g_component->SetParameter(
+        g_component, OMX_IndexVideoStartUnused, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -436,8 +432,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetParameterCodecComponentTypeNullptrTe
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
     param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    int32_t ret = g_component->SetParameter(nullptr, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param),
-                                            sizeof(param));
+    int32_t ret = g_component->SetParameter(
+        nullptr, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -447,8 +443,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetParameterParamStructLenNotMatchTest_
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
     param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
-    int32_t ret = g_component->SetParameter(g_component, OMX_IndexParamVideoPortFormat,
-                                 reinterpret_cast<int8_t *>(&param), 0);
+    int32_t ret =
+        g_component->SetParameter(g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), 0);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -459,8 +455,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetConfigUnsupportedTest_001, TestSize.
     OMX_VIDEO_CONFIG_BITRATETYPE param;
     InitParam(param);
     param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
-    int32_t ret = g_component->GetConfig(g_component, OMX_IndexConfigVideoBitrate, reinterpret_cast<int8_t *>(&param),
-                                         sizeof(param));
+    int32_t ret = g_component->GetConfig(
+        g_component, OMX_IndexConfigVideoBitrate, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -472,8 +468,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetConfigUnsupportedTest_001, TestSize.
     InitParam(param);
     param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
     param.nEncodeBitrate = FRAMERATE;
-    int32_t ret = g_component->SetConfig(g_component, OMX_IndexConfigVideoBitrate, reinterpret_cast<int8_t *>(&param),
-                                         sizeof(param));
+    int32_t ret = g_component->SetConfig(
+        g_component, OMX_IndexConfigVideoBitrate, reinterpret_cast<int8_t *>(&param), sizeof(param));
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -513,8 +509,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiTunnelRequestUnsupportedTest_001, TestS
     OMX_TUNNELSETUPTYPE tunnelSetup;
     tunnelSetup.eSupplier = OMX_BufferSupplyInput;
 
-    int32_t ret = g_component->ComponentTunnelRequest(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, tunneledComp,
-                                                      tunneledPort, &tunnelSetup);
+    int32_t ret = g_component->ComponentTunnelRequest(
+        g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, tunneledComp, tunneledPort, &tunnelSetup);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
@@ -702,7 +698,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiUseBufferDynamicHandleOutputTest_007, T
 
     auto err = g_component->UseBuffer(g_component, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, omxBuffer.get());
     if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s failed to UseBuffer with  input port", __func__);
+        HDF_LOGE("%{public}s failed to UseBuffer with input port", __func__);
         omxBuffer = nullptr;
     }
     ASSERT_NE(err, HDF_SUCCESS);
@@ -792,8 +788,8 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiUseEglImageUnsupportedTest_001, TestSiz
     buffer.type = READ_ONLY_TYPE;
     auto eglImage = std::make_unique<int8_t[]>(BUFFER_SIZE);
     ASSERT_TRUE(eglImage != nullptr);
-    int32_t ret = g_component->UseEglImage(g_component, &buffer, (uint32_t)PortIndex::PORT_INDEX_INPUT, eglImage.get(),
-                                           BUFFER_SIZE);
+    int32_t ret = g_component->UseEglImage(
+        g_component, &buffer, (uint32_t)PortIndex::PORT_INDEX_INPUT, eglImage.get(), BUFFER_SIZE);
     ASSERT_NE(ret, HDF_SUCCESS);
     eglImage = nullptr;
 }
@@ -877,7 +873,7 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetCallbackAppDataLenMaxTest_002, TestS
         CodecCallbackTypeRelease(g_callback);
     }
     g_callback = CodecCallbackTypeGet(nullptr);
-    ASSERT_TRUE(g_callback != nullptr);    ASSERT_TRUE(g_callback != nullptr);
+    ASSERT_TRUE(g_callback != nullptr);
     int32_t ret = g_component->SetCallbacks(g_component, g_callback, APP_DATA_MAX);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
