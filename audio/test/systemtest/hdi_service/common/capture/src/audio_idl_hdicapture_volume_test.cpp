@@ -27,58 +27,42 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct IAudioAdapter *adapter = nullptr;
-    struct IAudioCapture *capture = nullptr;
-    static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
-    static void *handleSo;
-    static void (*AudioManagerRelease)(struct IAudioManager *);
-    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
-    static void (*AudioCaptureRelease)(struct IAudioCapture *);
-    void ReleaseCaptureSource(void);
+    static void *handle;
+    struct IAudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManagerRelease managerRelease;
+    static TestAudioAdapterRelease adapterRelease;
+    static TestAudioCaptureRelease captureRelease;
 };
 
 using THREAD_FUNC = void *(*)(void *);
-
-TestAudioManager *(*AudioIdlHdiCaptureVolumeTest::GetAudioManager)(const char *) = nullptr;
+void *AudioIdlHdiCaptureVolumeTest::handle = nullptr;
+TestGetAudioManager AudioIdlHdiCaptureVolumeTest::getAudioManager = nullptr;
 TestAudioManager *AudioIdlHdiCaptureVolumeTest::manager = nullptr;
-void *AudioIdlHdiCaptureVolumeTest::handleSo = nullptr;
-void (*AudioIdlHdiCaptureVolumeTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
-void (*AudioIdlHdiCaptureVolumeTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
-void (*AudioIdlHdiCaptureVolumeTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
+TestAudioManagerRelease AudioIdlHdiCaptureVolumeTest::managerRelease = nullptr;
+TestAudioAdapterRelease AudioIdlHdiCaptureVolumeTest::adapterRelease = nullptr;
+TestAudioCaptureRelease AudioIdlHdiCaptureVolumeTest::captureRelease = nullptr;
 
 void AudioIdlHdiCaptureVolumeTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handleSo);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
+    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    captureRelease = (TestAudioCaptureRelease)(dlsym(handle, "AudioCaptureRelease"));
+    ASSERT_NE(nullptr, captureRelease);
     (void)HdfRemoteGetCallingPid();
-    manager = GetAudioManager(IDL_SERVER_NAME.c_str());
+    manager = getAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
-    ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
-    ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handleSo, "AudioCaptureRelease"));
-    ASSERT_NE(nullptr, AudioCaptureRelease);
 }
 
 void AudioIdlHdiCaptureVolumeTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease != nullptr) {
-        AudioManagerRelease(manager);
-        manager = nullptr;
+    if (managerRelease != nullptr && manager != nullptr) {
+        (void)managerRelease(manager);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
-    }
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
 }
 
@@ -92,21 +76,8 @@ void AudioIdlHdiCaptureVolumeTest::SetUp(void)
 
 void AudioIdlHdiCaptureVolumeTest::TearDown(void)
 {
-    ReleaseCaptureSource();
-}
-
-void AudioIdlHdiCaptureVolumeTest::ReleaseCaptureSource(void)
-{
-    if (capture != nullptr && AudioCaptureRelease != nullptr) {
-        adapter->DestroyCapture(adapter);
-        AudioCaptureRelease(capture);
-        capture = nullptr;
-    }
-    if (adapter != nullptr && AudioAdapterRelease != nullptr) {
-        manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-        AudioAdapterRelease(adapter);
-        adapter = nullptr;
-    }
+    int32_t ret = ReleaseCaptureSource(manager, adapter, capture, adapterRelease, captureRelease);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 /**

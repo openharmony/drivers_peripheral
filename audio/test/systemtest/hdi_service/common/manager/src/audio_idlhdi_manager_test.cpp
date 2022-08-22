@@ -28,49 +28,35 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)(const char *);
+    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
-    static void *handleSo;
-    static void (*AudioManagerRelease)(struct IAudioManager *);
-    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
+    static void *handle;
+    static TestAudioManagerRelease managerRelease;
+    static TestAudioAdapterRelease adapterRelease;
 };
 
-TestAudioManager *(*AudioIdlHdiManagerTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiManagerTest::manager = nullptr;
-void *AudioIdlHdiManagerTest::handleSo = nullptr;
-void (*AudioIdlHdiManagerTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
-void (*AudioIdlHdiManagerTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
+void *AudioIdlHdiManagerTest::handle = nullptr;
+TestGetAudioManager AudioIdlHdiManagerTest::getAudioManager = nullptr;
+TestAudioManagerRelease AudioIdlHdiManagerTest::managerRelease = nullptr;
+TestAudioAdapterRelease AudioIdlHdiManagerTest::adapterRelease = nullptr;
 
 void AudioIdlHdiManagerTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handleSo);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
+    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
+    ASSERT_EQ(HDF_SUCCESS, ret);
     (void)HdfRemoteGetCallingPid();
-    manager = GetAudioManager(IDL_SERVER_NAME.c_str());
+    manager = getAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
-    ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
-    ASSERT_NE(nullptr, AudioAdapterRelease);
 }
 
 void AudioIdlHdiManagerTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease != nullptr) {
-        AudioManagerRelease(manager);
-        manager = nullptr;
+    if (managerRelease != nullptr && manager != nullptr) {
+        (void)managerRelease(manager);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
-    }
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
 }
 
@@ -193,13 +179,12 @@ HWTEST_F(AudioIdlHdiManagerTest, SUB_Audio_HDI_GetAllAdapters_005, TestSize.Leve
 */
 HWTEST_F(AudioIdlHdiManagerTest, SUB_Audio_HDI_LoadAdapter_001, TestSize.Level1)
 {
-    int32_t ret = -1;
     uint32_t descsLen = AUDIO_ADAPTER_MAX_NUM;
     struct AudioAdapterDescriptor *descs = nullptr;
     struct IAudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
 
-    ret = GetAdapters(manager, descs, descsLen);
+    int32_t ret = GetAdapters(manager, descs, descsLen);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioAdapterDescriptor *desc = &descs[0];
     ASSERT_TRUE(desc != nullptr);
@@ -218,7 +203,7 @@ HWTEST_F(AudioIdlHdiManagerTest, SUB_Audio_HDI_LoadAdapter_001, TestSize.Level1)
     ret = manager->UnloadAdapter(manager, desc->adapterName);
     EXPECT_EQ(HDF_SUCCESS, ret);
     TestReleaseAdapterDescs(&descs, descsLen);
-    AudioAdapterRelease(adapter);
+    adapterRelease(adapter);
 }
 
 /**
@@ -300,13 +285,12 @@ HWTEST_F(AudioIdlHdiManagerTest, SUB_Audio_HDI_LoadAdapter_Null_004, TestSize.Le
 
 HWTEST_F(AudioIdlHdiManagerTest, SUB_Audio_HDI_LoadAdapter_005, TestSize.Level1)
 {
-    int32_t ret = -1;
     uint32_t descsLen = AUDIO_ADAPTER_MAX_NUM;
     struct AudioAdapterDescriptor *descs = nullptr;
     struct IAudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
 
-    ret = GetAdapters(manager, descs, descsLen);
+    int32_t ret = GetAdapters(manager, descs, descsLen);
     ASSERT_EQ(HDF_SUCCESS, ret);
     struct AudioAdapterDescriptor *desc = &descs[0];
     ASSERT_TRUE(desc != nullptr);
@@ -362,8 +346,8 @@ HWTEST_F(AudioIdlHdiManagerTest, SUB_Audio_HDI_LoadAdapter_007, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME_OUT.c_str());
     EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioAdapterRelease(adapter1);
-    AudioAdapterRelease(adapter2);
+    adapterRelease(adapter1);
+    adapterRelease(adapter2);
     if (audioPort.portName != nullptr) {
         free(audioPort.portName);
     }
@@ -393,7 +377,7 @@ HWTEST_F(AudioIdlHdiManagerTest, SUB_Audio_HDI_LoadAdapter_008, TestSize.Level1)
 
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioAdapterRelease(adapter1);
+    adapterRelease(adapter1);
     if (audioPort.portName != nullptr) {
         free(audioPort.portName);
     }
@@ -418,7 +402,7 @@ HWTEST_F(AudioIdlHdiManagerTest, SUB_Audio_HDI_UnloadAdapter_001, TestSize.Level
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioAdapterRelease(adapter);
+    adapterRelease(adapter);
     if (audioPort.portName != nullptr) {
         free(audioPort.portName);
     }
@@ -443,7 +427,7 @@ HWTEST_F(AudioIdlHdiManagerTest, SUB_Audio_HDI_UnloadAdapter_Null_002, TestSize.
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioAdapterRelease(adapter);
+    adapterRelease(adapter);
     if (audioPort.portName != nullptr) {
         free(audioPort.portName);
     }
@@ -469,7 +453,7 @@ HWTEST_F(AudioIdlHdiManagerTest, SUB_Audio_HDI_UnloadAdapter_Null_003, TestSize.
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioAdapterRelease(adapter);
+    adapterRelease(adapter);
     if (audioPort.portName != nullptr) {
         free(audioPort.portName);
     }
@@ -494,7 +478,7 @@ HWTEST_F(AudioIdlHdiManagerTest, SUB_Audio_HDI_UnloadAdapter_004, TestSize.Level
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioAdapterRelease(adapter);
+    adapterRelease(adapter);
     if (audioPort.portName != nullptr) {
         free(audioPort.portName);
     }
