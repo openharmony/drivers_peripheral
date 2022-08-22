@@ -58,7 +58,7 @@ static void TestRead(FILE *fp)
     usleep(SLEEP_READ);
 }
 
-int32_t acm_read(int32_t argc, const char *argv[])
+int32_t AcmRead(int32_t argc, const char *argv[])
 {
     (void)argc;
     (void)argv;
