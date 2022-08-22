@@ -22,6 +22,7 @@
 #include "callback_death_recipient.h"
 
 #define HDF_LOG_TAG uhdf_sensor
+#define MICEO_TO_NANO 1000
 
 namespace OHOS {
 namespace HDI {
