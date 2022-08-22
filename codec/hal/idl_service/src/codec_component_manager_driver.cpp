@@ -21,10 +21,12 @@
 #include "v1_0/codec_component_manager_stub.h"
 using namespace OHOS::HDI::Codec::V1_0;
 
-struct HdfCodecComponentManagerHost {
-    struct IDeviceIoService ioService;
-    OHOS::sptr<OHOS::IRemoteObject> stub;
-};
+namespace {
+    struct HdfCodecComponentManagerHost {
+        struct IDeviceIoService ioService;
+        OHOS::sptr<OHOS::IRemoteObject> stub;
+    };
+}
 
 static int32_t CodecComponentManagerDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
                                                    struct HdfSBuf *reply)

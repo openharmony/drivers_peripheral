@@ -56,12 +56,12 @@ namespace {
     constexpr int32_t BUFFER_COUNT = 10;
     constexpr int32_t FD_SIZE = sizeof(int);
     constexpr const char *ENCODER_AVC = "rk.video_encoder.avc";
+    constexpr int32_t DENOMINATOR = 2;
+    constexpr int32_t NUMERATOR = 3;
 }
 
 #define AV_COLOR_FORMAT OMX_COLOR_FormatYUV420SemiPlanar
 
-constexpr int32_t DENOMINATOR = 2;
-constexpr int32_t NUMERATOR = 3;
 static CodecHdiAdapterEncode *g_core = nullptr;
 
 CodecHdiAdapterEncode::CodecHdiAdapterEncode() : fpIn_(nullptr), fpOut_(nullptr)
