@@ -47,65 +47,38 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
-    int32_t AudioCaptureStart(const string path, struct AudioCapture *capture) const;
+    static void *handle;
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManager *manager;
 };
 
 using THREAD_FUNC = void *(*)(void *);
 
-TestAudioManager *(*AudioHdiCaptureAttrTest::GetAudioManager)() = nullptr;
-void *AudioHdiCaptureAttrTest::handleSo = nullptr;
+void *AudioHdiCaptureAttrTest::handle = nullptr;
+TestGetAudioManager AudioHdiCaptureAttrTest::getAudioManager = nullptr;
+TestAudioManager *AudioHdiCaptureAttrTest::manager = nullptr;
 
 void AudioHdiCaptureAttrTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return;
-    }
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
 }
 
 void AudioHdiCaptureAttrTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
 }
 
 void AudioHdiCaptureAttrTest::SetUp(void) {}
 void AudioHdiCaptureAttrTest::TearDown(void) {}
 
-int32_t AudioHdiCaptureAttrTest::AudioCaptureStart(const string path, struct AudioCapture *capture) const
-{
-    int32_t ret = -1;
-    struct AudioSampleAttributes attrs = {};
-    if (capture == nullptr) {
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    ret = InitAttrs(attrs);
-    if (ret < 0) {
-        return ret;
-    }
-    FILE *file = fopen(path.c_str(), "wb+");
-    if (file == nullptr) {
-        return HDF_FAILURE;
-    }
-    ret = FrameStartCapture(capture, file, attrs);
-    (void)fclose(file);
-    return ret;
-}
 /**
 * @tc.name  Test AudioCaptureGetFrameSize API via legal input
 * @tc.number  SUB_Audio_hdi_CaptureGetFrameSize_0001
@@ -118,8 +91,8 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_hdi_CaptureGetFrameSize_0001, TestSi
     uint64_t size = 0;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.GetFrameSize(capture, &size);
@@ -142,8 +115,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_hdi_CaptureGetFrameSize_0002, TestSi
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -165,8 +137,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_hdi_CaptureGetFrameSize_0003, TestSi
     uint64_t *sizeNull = nullptr;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -188,8 +159,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_hdi_CaptureGetFrameCount_0001, TestS
     uint64_t count = 0;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -212,12 +182,11 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_hdi_CaptureGetFrameCount_0002, TestS
     uint64_t count = 0;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    ret = AudioCaptureStart(AUDIO_CAPTURE_FILE, capture);
+    ret = AudioCaptureStartAndOneFrame(capture);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->attr.GetFrameCount(capture, &count);
@@ -241,8 +210,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_hdi_CaptureGetFrameCount_0003, TestS
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -265,8 +233,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_hdi_CaptureGetFrameCount_0004, TestS
     uint64_t *countNull = nullptr;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -289,8 +256,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_0001,
     uint32_t channelIdValue = CHANNELCOUNT;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -314,11 +280,10 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_0003,
     uint32_t channelIdExp = 2;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = AudioCaptureStart(AUDIO_CAPTURE_FILE, capture);
+    ret = AudioCaptureStartAndOneFrame(capture);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     ret = capture->attr.GetCurrentChannelId(capture, &channelId);
@@ -342,8 +307,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_0004,
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -365,8 +329,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_0005,
     uint32_t *channelIdNull = nullptr;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -392,11 +355,10 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_0001, Test
     int32_t listLenth = 256;
     uint64_t FILESIZE = 1024;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
 
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
@@ -447,8 +409,7 @@ attr-sampling-rate=48000";
     char keyValueListValueThr[256] = {};
     char keyValueListValueFour[256] = {};
     int32_t listLenth = 256;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
@@ -491,8 +452,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_0003, Test
     struct AudioCapture *capture = nullptr;
     char keyValueList[] = "attr-para=abc;";
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = ret = capture->attr.SetExtraParams((AudioHandle)capture, keyValueList);
@@ -515,8 +475,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_0004, Test
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;\
 attr-frame-count=82;attr-sampling-rate=48000;attr-para=abc";
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.SetExtraParams((AudioHandle)capture, keyValueList);
@@ -544,8 +503,7 @@ attr-sampling-rate=48000";
     char keyValueListValue[256] = {};
     int32_t listLenth = 256;
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.SetExtraParams((AudioHandle)capture, keyValueList);
@@ -576,8 +534,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_0006, Test
     char attrRouteError[] = "attr-route=5;";
     char attrFormateError[] = "attr-formate=12;";
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.SetExtraParams((AudioHandle)capture, attrSamplingRateError);
@@ -608,8 +565,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_0007, Test
     struct AudioCapture *captureNull = nullptr;
     char keyValueList[] = "attr-format=2;";
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.SetExtraParams((AudioHandle)captureNull, keyValueList);
@@ -631,8 +587,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_0008, Test
     struct AudioCapture *capture = nullptr;
     char keyValueListNull[] = "attr-format=;";
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.SetExtraParams((AudioHandle)capture, keyValueListNull);
@@ -664,8 +619,7 @@ attr-sampling-rate=48000";
     uint32_t channelCountExp = 2;
     uint32_t frameCountExp = 4096;
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.SetExtraParams((AudioHandle)capture, keyValueList);
@@ -704,8 +658,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetExtraParams_0002, Test
     char keyValueListValue[256] = {};
     int32_t listLenth = 256;
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.SetExtraParams((AudioHandle)capture, keyValueList);
@@ -732,8 +685,7 @@ attr-frame-count=82;attr-sampling-rate=48000;";
     char keyValueListValue[256] = {};
     int32_t listLenth = 8;
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.SetExtraParams((AudioHandle)capture, keyValueList);
@@ -760,8 +712,7 @@ attr-sampling-rate=48000";
     char keyValueListValue[256] = {};
     int32_t listLenth = 107;
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateStartCapture(manager, &capture, &adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.SetExtraParams((AudioHandle)capture, keyValueList);
@@ -787,8 +738,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureAddAudioEffect_0001, Test
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     uint64_t effectid = 14;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.AddAudioEffect((AudioHandle)capture, effectid);
@@ -810,8 +760,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureAddAudioEffect_0002, Test
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
     uint64_t effectid = 14;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.AddAudioEffect((AudioHandle)captureNull, effectid);
@@ -836,8 +785,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureRemoveAudioEffect_0001, T
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     uint64_t effectid = 14;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.AddAudioEffect((AudioHandle)capture, effectid);
@@ -861,8 +809,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, SUB_Audio_HDI_CaptureRemoveAudioEffect_0002, T
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
     uint64_t effectid = 14;
-    ASSERT_NE(nullptr, GetAudioManager);
-    TestAudioManager* manager = GetAudioManager();
+    ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.RemoveAudioEffect((AudioHandle)captureNull, effectid);

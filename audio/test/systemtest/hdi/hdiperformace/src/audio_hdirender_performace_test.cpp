@@ -51,37 +51,30 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)();
-    static void *handleSo;
+    static void *handle;
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManager *manager;
 };
 
-TestAudioManager *(*AudioHdiRenderPerformaceTest::GetAudioManager)() = nullptr;
-void *AudioHdiRenderPerformaceTest::handleSo = nullptr;
+void *AudioHdiRenderPerformaceTest::handle = nullptr;
+TestGetAudioManager AudioHdiRenderPerformaceTest::getAudioManager = nullptr;
+TestAudioManager *AudioHdiRenderPerformaceTest::manager = nullptr;
 
 void AudioHdiRenderPerformaceTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return;
-    }
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    if (handleSo == nullptr) {
-        return;
-    }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    if (GetAudioManager == nullptr) {
-        return;
-    }
+    int32_t ret = LoadFunction(handle, getAudioManager);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    manager = getAudioManager();
+    ASSERT_NE(nullptr, manager);
 }
 
 void AudioHdiRenderPerformaceTest::TearDownTestCase(void)
 {
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (getAudioManager != nullptr) {
+        getAudioManager = nullptr;
     }
 }
 
@@ -102,8 +95,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerGetAllAdapters_
     int size = 0;
     struct PrepareAudioPara audiopara = { .totalTime = 0 };
 
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
 
     for (int i = 0; i < COUNT; ++i) {
@@ -131,8 +123,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerLoadAdapter_Per
     int32_t ret = -1;
     int size = 0;
     struct PrepareAudioPara audiopara = { .totalTime = 0 };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = audiopara.manager->GetAllAdapters(audiopara.manager, &audiopara.descs, &size);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -166,8 +157,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerUnLoadAdapter_P
     int32_t ret = -1;
     int size = 0;
     struct PrepareAudioPara audiopara = { .totalTime = 0 };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = audiopara.manager->GetAllAdapters(audiopara.manager, &audiopara.descs, &size);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -202,8 +192,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioManagerInitAllPorts_Pe
     struct PrepareAudioPara audiopara = {
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
@@ -236,8 +225,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPortCapability_Perf
     struct PrepareAudioPara audiopara = {
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
@@ -273,8 +261,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioSetPassthroughMode_Per
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .mode = PORT_PASSTHROUGH_LPCM,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
@@ -313,8 +300,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioGetPassthroughMode_Per
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .mode = PORT_PASSTHROUGH_LPCM,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
@@ -355,8 +341,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetLatency_Perfo
     };
     uint32_t latencyTimeExpc = 0;
     uint32_t latencyTime = 0;
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = PlayAudioFile(audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -392,8 +377,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioCreateRender_Performan
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
@@ -436,8 +420,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioDestroyRender_Performa
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
                          &audiopara.adapter, audiopara.audioPort);
@@ -479,8 +462,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderPositio
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str(), .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = PlayAudioFile(audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -517,8 +499,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetRenderSpeed_P
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -558,8 +539,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderSpeed_P
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -597,8 +577,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetChannelMode_P
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -638,8 +617,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetChannelMode_P
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -679,8 +657,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameCount_Pe
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -717,8 +694,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetCurrentChanne
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -755,8 +731,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderFlush_Performanc
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
 
     for (int i = 0; i < COUNT; ++i) {
@@ -794,8 +769,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetFrameSize_Per
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -839,8 +813,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderCheckSceneCapabi
         .totalTime = 0
     };
     struct AudioSceneDescriptor scenes = {.scene.id = 0, .desc.pins = PIN_OUT_SPEAKER};
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -878,8 +851,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSelectScene_Perf
         .totalTime = 0
     };
     struct AudioSceneDescriptor scenes = {.scene.id = 0, .desc.pins = PIN_OUT_SPEAKER};
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -916,8 +888,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetMute_Performa
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -956,8 +927,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetMute_Performa
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -996,8 +966,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetVolume_Perfor
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .character.setvolume = 0.8, .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -1037,8 +1006,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetVolume_Perfor
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -1075,8 +1043,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGainThreshold
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -1114,8 +1081,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderGetGain_Performa
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -1151,8 +1117,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudiorenderSetGain_Performa
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .character.setgain = 7, .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -1192,8 +1157,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderFrame_Performanc
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = AUDIO_FILE.c_str(), .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -1248,8 +1212,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderStart_Performanc
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
 
     for (int i = 0; i < COUNT; ++i) {
@@ -1282,8 +1245,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderStop_Performance
     struct PrepareAudioPara audiopara = {
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
 
     for (int i = 0; i < COUNT; ++i) {
@@ -1320,8 +1282,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetSampleAttribu
     struct PrepareAudioPara audiopara = {
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -1357,8 +1318,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderPause_Performanc
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -1396,8 +1356,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderResume_Performan
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -1434,8 +1393,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetSampleAttribu
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -1474,8 +1432,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderReqMmapBuffer_Pe
     struct PrepareAudioPara audiopara = {
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER, .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
 
     for (int i = 0; i < COUNT; ++i) {
@@ -1533,8 +1490,7 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetMmapPosition_
         .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
         .path = LOW_LATENCY_AUDIO_FILE.c_str(), .totalTime = 0
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                             &audiopara.render);
@@ -1579,10 +1535,9 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderSetExtraParams_P
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_OUT_SPEAKER,
+        .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_OUT_SPEAKER,
     };
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
     ret = AudioCreateStartRender(audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -1613,14 +1568,13 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetExtraParams_P
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
-        .portType = PORT_OUT, .self = this, .pins = PIN_OUT_SPEAKER, .path = AUDIO_FILE.c_str()
+        .portType = PORT_OUT, .pins = PIN_OUT_SPEAKER, .path = AUDIO_FILE.c_str()
     };
     char keyValueList[] = "attr-format=24;attr-frame-count=4096;";
     char keyValueListExp[] = "attr-route=0;attr-format=24;attr-channels=2;attr-frame-count=4096;\
 attr-sampling-rate=48000";
     int32_t listLenth = 256;
-    ASSERT_NE(nullptr, GetAudioManager);
-    audiopara.manager = GetAudioManager();
+    audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
 
     ret = AudioCreateStartRender(audiopara.manager, &audiopara.render, &audiopara.adapter, ADAPTER_NAME);
