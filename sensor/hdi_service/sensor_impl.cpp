@@ -28,7 +28,6 @@ namespace HDI {
 namespace Sensor {
 namespace V1_0 {
 namespace {
-    constexpr int32_t MICEO_TO_NANO = 1000;
     constexpr int32_t CALLBACK_CTOUNT_THRESHOLD = 1;
     using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<ISensorCallback>>>;
     using CallBackDeathRecipientMap = std::unordered_map<IRemoteObject *, sptr<CallBackDeathRecipient>>;
@@ -176,8 +175,8 @@ int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
         hdfSensorInfo.maxRange = tmp->maxRange;
         hdfSensorInfo.accuracy = tmp->accuracy;
         hdfSensorInfo.power = tmp->power;
-        hdfSensorInfo.minDelay = tmp->minDelay * MICEO_TO_NANO;
-        hdfSensorInfo.maxDelay = tmp->maxDelay * MICEO_TO_NANO;
+        hdfSensorInfo.minDelay = tmp->minDelay;
+        hdfSensorInfo.maxDelay = tmp->maxDelay;
         info.push_back(std::move(hdfSensorInfo));
         tmp++;
     }
