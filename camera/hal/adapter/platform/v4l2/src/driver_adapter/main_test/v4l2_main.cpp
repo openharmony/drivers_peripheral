@@ -30,11 +30,11 @@
 
 namespace OHOS::Camera {
 unsigned int g_isPreviewOn;
-unsigned int g_isCaptureOn;
-unsigned int g_isVideoOn;
+static unsigned int g_isCaptureOn;
+static unsigned int g_isVideoOn;
 unsigned int g_isPreviewOnUvc;
-unsigned int g_isCaptureOnUvc;
-unsigned int g_isVideoOnUvc;
+static unsigned int g_isCaptureOnUvc;
+static unsigned int g_isVideoOnUvc;
 
 unsigned int g_camFrameV4l2Exit = 1;
 unsigned int g_camFrameV4l2Exit2 = 1;
