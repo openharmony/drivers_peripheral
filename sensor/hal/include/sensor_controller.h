@@ -48,6 +48,8 @@ struct SensorBasicInformation {
     int32_t maxRange;       /* Maximum measurement range of the sensor */
     int32_t accuracy;       /* Sensor accuracy */
     int32_t power;          /* Sensor power */
+    int64_t minDelay;       /* Minimum sample period allowed in nanoseconds */
+    int64_t maxDelay;       /* Maxmum sample period allowed in nanoseconds */
 };
 
 void GetSensorDeviceMethods(struct SensorInterface *device);

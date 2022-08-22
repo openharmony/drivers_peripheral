@@ -175,6 +175,8 @@ int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
         hdfSensorInfo.maxRange = tmp->maxRange;
         hdfSensorInfo.accuracy = tmp->accuracy;
         hdfSensorInfo.power = tmp->power;
+        hdfSensorInfo.minDelay = tmp->minDelay;
+        hdfSensorInfo.maxDelay = tmp->maxDelay;
         info.push_back(std::move(hdfSensorInfo));
         tmp++;
     }
