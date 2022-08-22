@@ -45,7 +45,6 @@ CODEC_HANDLETYPE g_handle = NULL;
 
 class CodecProxyTest : public testing::Test {
 public:
-    ICodecCallback *g_callback = nullptr;
     static void SetUpTestCase() {}
     static void TearDownTestCase() {}
     void SetUp() {}
@@ -140,7 +139,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetCodecObjTest_001, TestSize.Level1)
     ASSERT_TRUE(g_codecObj != nullptr);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1EnumerateCapabilityTest_002, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1EnumerateCapabilityTest_001, TestSize.Level1)
 {
     int32_t ret = HDF_SUCCESS;
     for (int index = 0; index < CAPABILITY_COUNT; index++) {
@@ -151,7 +150,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1EnumerateCapabilityTest_002, TestSize.Leve
     }
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetCapabilityTest_003, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetCapabilityTest_001, TestSize.Level1)
 {
     CodecCapability cap;
     int32_t ret = g_codecObj->CodecGetCapability(g_codecObj, MEDIA_MIMETYPE_IMAGE_JPEG, VIDEO_DECODER, 0, &cap);
@@ -159,32 +158,48 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetCapabilityTest_003, TestSize.Level1)
     PrintCapability(&cap, 0);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1InitCodecTest_004, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1InitCodecTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_codecObj != nullptr);
     int32_t errorCode = g_codecObj->CodecInit(g_codecObj);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1CreateCodecTest_005, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1CreateCodecTest_001, TestSize.Level1)
 {
     const char* name = "codec.avc.hardware.decoder";
     int32_t errorCode = g_codecObj->CodecCreate(g_codecObj, name, &g_handle);
-
     ASSERT_EQ(errorCode, HDF_SUCCESS);
     ASSERT_TRUE(g_handle != nullptr);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetPortModeTest_006, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1CreateCodecByTypeTest_001, TestSize.Level1)
+{
+    CodecType type = VIDEO_DECODER;
+    AvCodecMime mime = MEDIA_MIMETYPE_VIDEO_AVC;
+    int32_t errorCode = g_codecObj->CodecCreateByType(g_codecObj, type, mime, &g_handle);
+    ASSERT_EQ(errorCode, HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetPortModeTest_001, TestSize.Level1)
 {
     DirectionType direct = OUTPUT_TYPE;
     AllocateBufferMode mode = ALLOCATE_INPUT_BUFFER_CODEC_PRESET;
     BufferType type = BUFFER_TYPE_FD;
     int32_t errorCode = g_codecObj->CodecSetPortMode(g_codecObj, g_handle, direct, mode, type);
-    ASSERT_EQ(errorCode, HDF_SUCCESS);
+    ASSERT_EQ(errorCode, HDF_ERR_NOT_SUPPORT);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetCodecTypeTest_007, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetPortModeTest_001, TestSize.Level1)
+{
+    DirectionType direct = OUTPUT_TYPE;
+    AllocateBufferMode mode;
+    BufferType type;
+    int32_t errorCode = g_codecObj->CodecGetPortMode(g_codecObj, g_handle, direct, &mode, &type);
+    ASSERT_EQ(errorCode, HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetCodecTypeTest_001, TestSize.Level1)
 {
     Param *params;
     int paramCnt = 1;
@@ -200,7 +215,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetCodecTypeTest_007, TestSize.Level1)
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetDefaultCfgTest_008, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetDefaultCfgTest_001, TestSize.Level1)
 {
     Param *params;
     int paramCnt = 1;
@@ -215,7 +230,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetDefaultCfgTest_008, TestSize.Level1)
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetSplitModeTest_009, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetSplitModeTest_001, TestSize.Level1)
 {
     Param *params;
     int paramCnt = 1;
@@ -231,7 +246,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetSplitModeTest_009, TestSize.Level1)
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueInputTest_010, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueInputTest_001, TestSize.Level1)
 {
     g_inputBuffer.id = 0;
     g_inputBuffer.size = TEST_PACKET_BUFFER_SIZE;
@@ -254,7 +269,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueInputTest_010, TestSize.Level1)
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1DequeInputTest_011, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1DequeInputTest_001, TestSize.Level1)
 {
     int32_t acquireFd;
     CodecBuffer *inputInfo = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * 1);
@@ -272,19 +287,25 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1DequeInputTest_011, TestSize.Level1)
     OsalMemFree(g_inputInfoData);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1StartCodecTest_012, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1StartCodecTest_001, TestSize.Level1)
 {
     int32_t  errorCode = g_codecObj->CodecStart(g_codecObj, g_handle);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1StopCodecTest_013, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1StopCodecTest_001, TestSize.Level1)
 {
     int32_t errorCode = g_codecObj->CodecStop(g_codecObj, g_handle);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueOutputTest_014, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1ResetCodecTest_001, TestSize.Level1)
+{
+    int32_t errorCode = g_codecObj->CodecReset(g_codecObj, g_handle);
+    ASSERT_EQ(errorCode, HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueOutputTest_001, TestSize.Level1)
 {
     g_outputBuffer.id = 1;
     g_outputBuffer.size = TEST_FRAME_BUFFER_SIZE;
@@ -306,7 +327,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueOutputTest_014, TestSize.Level1)
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1DequeueOutputTest_015, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1DequeueOutputTest_001, TestSize.Level1)
 {
     int32_t errorCode = 0;
     int32_t acquireFd;
@@ -325,7 +346,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1DequeueOutputTest_015, TestSize.Level1)
     OsalMemFree(g_outputInfoData);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1FlushTest_016, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1FlushTest_001, TestSize.Level1)
 {
     DirectionType directType = OUTPUT_TYPE;
 
@@ -334,23 +355,23 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1FlushTest_016, TestSize.Level1)
     ASSERT_EQ(directType, OUTPUT_TYPE);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetCallbackTest_017, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetCallbackTest_001, TestSize.Level1)
 {
     UINTPTR instance = 0;
-    g_callback = CodecCallbackStubObtain();
-    ASSERT_TRUE(g_callback != nullptr);
+    ICodecCallback *callback = CodecCallbackStubObtain();
+    ASSERT_TRUE(callback != nullptr);
 
-    int32_t errorCode = g_codecObj->CodecSetCallback(g_codecObj, g_handle, g_callback, instance);
+    int32_t errorCode = g_codecObj->CodecSetCallback(g_codecObj, g_handle, callback, instance);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1DestroyCodecTest_018, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1DestroyCodecTest_001, TestSize.Level1)
 {
     int32_t errorCode = g_codecObj->CodecDestroy(g_codecObj, g_handle);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1DeinitTest_019, TestSize.Level1)
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1DeinitTest_001, TestSize.Level1)
 {
     int32_t errorCode = g_codecObj->CodecDeinit(g_codecObj);
     ASSERT_EQ(errorCode, HDF_SUCCESS);

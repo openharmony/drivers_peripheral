@@ -124,13 +124,36 @@ static int32_t SerCodecCreate(struct HdfDeviceIoClient *client, struct HdfSBuf *
         HDF_LOGE("%{public}s: Read name failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfSbufReadUint64(data, &handle)) {
-        HDF_LOGE("%{public}s: Read handle failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
     errNum = CodecCreate(name, (CODEC_HANDLETYPE *)&handle);
     if (errNum != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call CodecCreate fuc failed!", __func__);
+        HDF_LOGE("%{public}s: call CodecCreate fuc failed! errNum:%{public}d", __func__, errNum);
+        return errNum;
+    }
+    if (!HdfSbufWriteUint64(reply, handle)) {
+        HDF_LOGE("%{public}s: write handle failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return errNum;
+}
+
+static int32_t SerCodecCreateByType(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    int32_t errNum;
+    CodecType type;
+    AvCodecMime mime;
+    uint64_t handle = 0;
+
+    if (!HdfSbufReadUint32(data, (uint32_t*)&type)) {
+        HDF_LOGE("%{public}s: read input type failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfSbufReadUint32(data, (uint32_t*)&mime)) {
+        HDF_LOGE("%{public}s: read input mime failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    errNum = CodecCreateByType(type, mime, (CODEC_HANDLETYPE *)&handle);
+    if (errNum != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call CodecCreateByType fuc failed! errNum:%{public}d", __func__, errNum);
         return errNum;
     }
     if (!HdfSbufWriteUint64(reply, handle)) {
@@ -349,6 +372,21 @@ static int32_t SerCodecStop(struct HdfDeviceIoClient *client, struct HdfSBuf *da
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t errNum = CodecStop((CODEC_HANDLETYPE)(uintptr_t)handle);
+    if (errNum != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call CodecStop fuc failed!", __func__);
+        return errNum;
+    }
+    return errNum;
+}
+
+static int32_t SerCodecReset(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    uint64_t handle = 0;
+    if (!HdfSbufReadUint64(data, &handle)) {
+        HDF_LOGE("%{public}s: read handle data failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    int32_t errNum = CodecReset((CODEC_HANDLETYPE)(uintptr_t)handle);
     if (errNum != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call CodecStop fuc failed!", __func__);
         return errNum;
@@ -608,7 +646,28 @@ static int32_t SerCodecSetCallback(struct HdfDeviceIoClient *client, struct HdfS
     return errNum;
 }
 
-static int32_t HandleRequestCmd(struct HdfDeviceIoClient *client, int cmdId,
+static int32_t HandleRequestCmdExt(struct HdfDeviceIoClient *client, int cmdId,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    switch (cmdId) {
+        case CMD_CODEC_QUEQUE_INPUT:
+            return SerCodecQueueInput(client, data, reply);
+        case CMD_CODEC_DEQUEQUE_INPUT:
+            return SerCodecDequeueInput(client, data, reply);
+        case CMD_CODEC_QUEQUE_OUTPUT:
+            return SerCodecQueueOutput(client, data, reply);
+        case CMD_CODEC_DEQUEQUE_OUTPUT:
+            return SerCodecDequeueOutput(client, data, reply);
+        case CMD_CODEC_SET_CBK:
+            return SerCodecSetCallback(client, data, reply);
+        default: {
+            HDF_LOGE("%{public}s: not support cmd %{public}d", __func__, cmdId);
+            return HDF_ERR_INVALID_PARAM;
+        }
+    }
+}
+
+int32_t HandleRequestCmd(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     switch (cmdId) {
@@ -622,6 +681,8 @@ static int32_t HandleRequestCmd(struct HdfDeviceIoClient *client, int cmdId,
             return SerCodecGetCapability(client, data, reply);
         case CMD_CODEC_CREATE:
             return SerCodecCreate(client, data, reply);
+        case CMD_CODEC_CREATE_BY_TYPE:
+            return SerCodecCreateByType(client, data, reply);
         case CMD_CODEC_DESTROY:
             return SerCodecDestroy(client, data, reply);
         case CMD_CODEC_SET_MODE:
@@ -636,21 +697,12 @@ static int32_t HandleRequestCmd(struct HdfDeviceIoClient *client, int cmdId,
             return SerCodecStart(client, data, reply);
         case CMD_CODEC_STOP:
             return SerCodecStop(client, data, reply);
+        case CMD_CODEC_RESET:
+            return SerCodecReset(client, data, reply);
         case CMD_CODEC_FLUSH:
             return SerCodecFlush(client, data, reply);
-        case CMD_CODEC_QUEQUE_INPUT:
-            return SerCodecQueueInput(client, data, reply);
-        case CMD_CODEC_DEQUEQUE_INPUT:
-            return SerCodecDequeueInput(client, data, reply);
-        case CMD_CODEC_QUEQUE_OUTPUT:
-            return SerCodecQueueOutput(client, data, reply);
-        case CMD_CODEC_DEQUEQUE_OUTPUT:
-            return SerCodecDequeueOutput(client, data, reply);
-        case CMD_CODEC_SET_CBK:
-            return SerCodecSetCallback(client, data, reply);
         default: {
-            HDF_LOGE("%{public}s: not support cmd %{public}d", __func__, cmdId);
-            return HDF_ERR_INVALID_PARAM;
+            return HandleRequestCmdExt(client, cmdId, data, reply);
         }
     }
 }
