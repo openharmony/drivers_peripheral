@@ -115,6 +115,8 @@ static int32_t GetSensorInfoFromReply(struct HdfSBuf *reply)
         pos->maxRange = (float)(buf->maxRange);
         pos->accuracy = (float)(buf->accuracy);
         pos->power = (float)(buf->power);
+        pos->minDelay = (int64_t)(buf->minDelay);
+        pos->maxDelay = (int64_t)(buf->maxDelay);
         pos++;
     }
 
