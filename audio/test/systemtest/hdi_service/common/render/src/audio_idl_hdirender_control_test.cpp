@@ -27,56 +27,41 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct IAudioAdapter *adapter = nullptr;
+    static void *handle;
     struct IAudioRender *render = nullptr;
-    static TestAudioManager *(*GetAudioManager)(const char *);
+    struct IAudioAdapter *adapter = nullptr;
     static TestAudioManager *manager;
-    static void *handleSo;
-    static void (*AudioManagerRelease)(struct IAudioManager *);
-    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
-    static void (*AudioRenderRelease)(struct IAudioRender *);
-    void ReleaseAudioSource();
+    static TestGetAudioManager getAudioManager;
+    static TestAudioManagerRelease managerRelease;
+    static TestAudioAdapterRelease adapterRelease;
+    static TestAudioRenderRelease renderRelease;
 };
 using THREAD_FUNC = void *(*)(void *);
-TestAudioManager *(*AudioIdlHdiRenderControlTest::GetAudioManager)(const char *) = nullptr;
+void *AudioIdlHdiRenderControlTest::handle = nullptr;
+TestGetAudioManager AudioIdlHdiRenderControlTest::getAudioManager = nullptr;
 TestAudioManager *AudioIdlHdiRenderControlTest::manager = nullptr;
-void *AudioIdlHdiRenderControlTest::handleSo = nullptr;
-void (*AudioIdlHdiRenderControlTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
-void (*AudioIdlHdiRenderControlTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
-void (*AudioIdlHdiRenderControlTest::AudioRenderRelease)(struct IAudioRender *) = nullptr;
+TestAudioManagerRelease AudioIdlHdiRenderControlTest::managerRelease = nullptr;
+TestAudioAdapterRelease AudioIdlHdiRenderControlTest::adapterRelease = nullptr;
+TestAudioRenderRelease AudioIdlHdiRenderControlTest::renderRelease = nullptr;
 
 void AudioIdlHdiRenderControlTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handleSo);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
+    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+    renderRelease = (TestAudioRenderRelease)(dlsym(handle, "AudioRenderRelease"));
+    ASSERT_NE(nullptr, renderRelease);
     (void)HdfRemoteGetCallingPid();
-    manager = GetAudioManager(IDL_SERVER_NAME.c_str());
+    manager = getAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
-    ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
-    ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(handleSo, "AudioRenderRelease"));
-    ASSERT_NE(nullptr, AudioRenderRelease);
 }
 
 void AudioIdlHdiRenderControlTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease != nullptr) {
-        AudioManagerRelease(manager);
-        manager = nullptr;
+    if (managerRelease != nullptr && manager != nullptr) {
+        (void)managerRelease(manager);
     }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
-    }
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (handle != nullptr) {
+        (void)dlclose(handle);
     }
 }
 
@@ -90,24 +75,8 @@ void AudioIdlHdiRenderControlTest::SetUp(void)
 
 void AudioIdlHdiRenderControlTest::TearDown(void)
 {
-    ReleaseAudioSource();
-}
-
-void AudioIdlHdiRenderControlTest::ReleaseAudioSource(void)
-{
-    int32_t ret = -1;
-    if (render != nullptr && AudioRenderRelease != nullptr) {
-        ret = adapter->DestroyRender(adapter);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        AudioRenderRelease(render);
-        render = nullptr;
-    }
-    if (adapter != nullptr && AudioAdapterRelease != nullptr) {
-        ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        AudioAdapterRelease(adapter);
-        adapter = nullptr;
-    }
+    int32_t ret = ReleaseRenderSource(manager, adapter, render, adapterRelease, renderRelease);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
@@ -567,22 +536,21 @@ HWTEST_F(AudioIdlHdiRenderControlTest, SUB_Audio_HDI_RenderTurnStandbyMode_Null_
 */
 HWTEST_F(AudioIdlHdiRenderControlTest, SUB_Audio_HDI_RenderAudioDevDump_001, TestSize.Level1)
 {
-    int32_t ret = -1;
     char pathBuf[] = "./DevDump.log";
     ASSERT_NE(nullptr, render);
-    FILE *fp = fopen(pathBuf, "wb+");
-    ASSERT_NE(nullptr, fp);
-    int fd = fileno(fp);
+    FILE *file = fopen(pathBuf, "wb+");
+    ASSERT_NE(nullptr, file);
+    int fd = fileno(file);
     if (fd == -1) {
-        fclose(fp);
+        fclose(file);
         ASSERT_NE(fd, -1);
     }
     struct PrepareAudioPara audiopara = {
         .render = render, .path = AUDIO_FILE.c_str()
     };
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
+    int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)PlayAudioFile, &audiopara);
     if (ret < 0) {
-        fclose(fp);
+        fclose(file);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
@@ -595,7 +563,7 @@ HWTEST_F(AudioIdlHdiRenderControlTest, SUB_Audio_HDI_RenderAudioDevDump_001, Tes
     FrameStatus(1);
     ret = audiopara.render->Resume(audiopara.render);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    fclose(fp);
+    fclose(file);
     ret = ThreadRelease(audiopara);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
@@ -648,7 +616,6 @@ HWTEST_F(AudioIdlHdiRenderControlTest, SUB_Audio_HDI_RenderAudioDevDump_002, Tes
 */
 HWTEST_F(AudioIdlHdiRenderControlTest, SUB_Audio_HDI_RenderAudioDevDump_003, TestSize.Level1)
 {
-    int32_t ret = -1;
     char pathBuf[] = "./DevDump.log";
     ASSERT_NE(nullptr, render);
     FILE *fp = fopen(pathBuf, "wb+");
@@ -658,7 +625,7 @@ HWTEST_F(AudioIdlHdiRenderControlTest, SUB_Audio_HDI_RenderAudioDevDump_003, Tes
         fclose(fp);
         ASSERT_NE(fd, -1);
     }
-    ret = render->AudioDevDump(render, RANGE-1, fd);
+    int32_t ret = render->AudioDevDump(render, RANGE-1, fd);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = render->AudioDevDump(render, OUT_OF_RANGE, fd);
     EXPECT_EQ(HDF_SUCCESS, ret);
