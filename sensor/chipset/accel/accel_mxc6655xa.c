@@ -49,8 +49,8 @@ static int SensorConvertData(char highByte, char lowByte)
 
 static int32_t ReadMxc6655xaRawData(struct SensorCfgData *data, struct AccelData *rawData, uint64_t *timestamp)
 {
-    int32_t status = 0;
-    int32_t reg[ACCEL_AXIS_BUTT];
+    uint8_t status = 0;
+    uint8_t reg[ACCEL_AXIS_BUTT];
     OsalTimespec time;
     int32_t x;
     int32_t y;
@@ -67,28 +67,28 @@ static int32_t ReadMxc6655xaRawData(struct SensorCfgData *data, struct AccelData
     }
     *timestamp = time.sec * SENSOR_SECOND_CONVERT_NANOSECOND + time.usec * SENSOR_CONVERT_UNIT; /* unit nanosecond */
 
-    int32_t ret = ReadSensor(&data->busCfg, MXC6655XA_STATUS_ADDR, &status, sizeof(int32_t));
+    int32_t ret = ReadSensor(&data->busCfg, MXC6655XA_STATUS_ADDR, &status, sizeof(uint8_t));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: data status [%u] ret [%d]", __func__, status, ret);
         return HDF_FAILURE;
     }
 
-    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_X_LSB_ADDR, &reg[ACCEL_X_AXIS_LSB], sizeof(int32_t));
+    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_X_LSB_ADDR, &reg[ACCEL_X_AXIS_LSB], sizeof(uint8_t));
     CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
 
-    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_X_MSB_ADDR, &reg[ACCEL_X_AXIS_MSB], sizeof(int32_t));
+    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_X_MSB_ADDR, &reg[ACCEL_X_AXIS_MSB], sizeof(uint8_t));
     CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
 
-    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_Y_LSB_ADDR, &reg[ACCEL_Y_AXIS_LSB], sizeof(int32_t));
+    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_Y_LSB_ADDR, &reg[ACCEL_Y_AXIS_LSB], sizeof(uint8_t));
     CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
 
-    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_Y_MSB_ADDR, &reg[ACCEL_Y_AXIS_MSB], sizeof(int32_t));
+    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_Y_MSB_ADDR, &reg[ACCEL_Y_AXIS_MSB], sizeof(uint8_t));
     CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
 
-    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_Z_LSB_ADDR, &reg[ACCEL_Z_AXIS_LSB], sizeof(int32_t));
+    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_Z_LSB_ADDR, &reg[ACCEL_Z_AXIS_LSB], sizeof(uint8_t));
     CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
 
-    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_Z_MSB_ADDR, &reg[ACCEL_Z_AXIS_MSB], sizeof(int32_t));
+    ret = ReadSensor(&data->busCfg, MXC6655XA_ACCEL_Z_MSB_ADDR, &reg[ACCEL_Z_AXIS_MSB], sizeof(uint8_t));
     CHECK_PARSER_RESULT_RETURN_VALUE(ret, "read data");
 
     x = SensorConvertData(reg[ACCEL_X_AXIS_MSB], reg[ACCEL_X_AXIS_LSB]);
