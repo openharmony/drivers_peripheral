@@ -15,22 +15,23 @@ import("//build/ohos.gni")
 
 config("exported_header_files") {
   visibility = [ ":*" ]
-  include_dirs = [ "//drivers/peripheral/partitionslot/interfaces/innerkits" ]
+  include_dirs = [ "//drivers/peripheral/partitionslot/hal/include" ]
 }
 
-ohos_shared_library("libpartition_slot_manager") {
-  include_dirs = [
-    "//drivers/peripheral/partitionslot/interfaces/innerkits",
-    "//drivers/peripheral/partitionslot/hdi_service/include",
-  ]
+ohos_source_set("partitionslot_source") {
   sources = [ "src/partitionslot_manager.cpp" ]
+  public_configs = [ ":exported_header_files" ]
   external_deps = [
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
     "utils_base:utils",
   ]
+}
 
-  public_configs = [ ":exported_header_files" ]
+ohos_shared_library("libpartition_slot_manager") {
+  deps = [ ":partitionslot_source" ]
+
+  install_images = [ "updater" ]
 
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_partitionslot"
