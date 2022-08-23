@@ -257,6 +257,14 @@ struct AudioAdapter {
      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      */
     int32_t (*RegExtraParamObserver)(struct AudioAdapter *adapter, ParamCallback callback, void* cookie);
+    /**
+     * @brief Get the device status of an adapter.
+     *
+     * @param adapter Indicates the audio adapter.
+     * @param status Indicates the status of device .
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*GetStatus)(struct AudioAdapter *adapter, struct AudioStatus *status);
 };
 #endif /* AUDIO_ADAPTER_H */
 /** @} */

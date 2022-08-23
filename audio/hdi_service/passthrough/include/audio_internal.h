@@ -460,6 +460,7 @@ int32_t AudioAdapterSetPassthroughMode(
     struct IAudioAdapter *self, const struct AudioPort *port, enum AudioPortPassthroughMode mode);
 int32_t AudioAdapterGetPassthroughMode(
     struct IAudioAdapter *adapter, const struct AudioPort *port, enum AudioPortPassthroughMode *mode);
+int32_t AudioAdapterGetStatus(struct IAudioAdapter *adapter, struct AudioStatus *status);
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
 int32_t AudioRenderStart(struct IAudioRender *self);
 int32_t AudioRenderStop(struct IAudioRender *self);
