@@ -593,6 +593,21 @@ static int32_t CodecPorxyQueueInput(struct ICodec *self, CODEC_HANDLETYPE handle
     return ret;
 }
 
+static int32_t CodecProxyDequeueInputParseReply(struct HdfSBuf *reply, int32_t *acquireFd, CodecBuffer *inputData)
+{
+    if (CodecProxyParseFenceFd(reply, acquireFd) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: read acquireFd failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (CodecProxyParseCodecBuffer(reply, inputData)) {
+        HDF_LOGE("%{public}s: read input CodecBuffer failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    return HDF_SUCCESS;
+}
+
 static int32_t CodecProxyDequeueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
     uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *inputData)
 {
@@ -622,24 +637,21 @@ static int32_t CodecProxyDequeueInput(struct ICodec *self, CODEC_HANDLETYPE hand
         return HDF_ERR_INVALID_PARAM;
     }
     if (!HdfSbufWriteUint32(data, inputData->bufferCnt)) {
-        HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
+        HDF_LOGE("%{public}s: write bufferCnt failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
     int32_t ret = CodecProxyCall(self, CMD_CODEC_DEQUEQUE_INPUT, data, reply);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
+        if (ret != HDF_ERR_TIMEOUT) {
+            HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
+        }
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
-    if (CodecProxyParseFenceFd(reply, acquireFd) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read acquireFd failed!", __func__);
-        CodecProxySBufRecycle(data, reply);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (CodecProxyParseCodecBuffer(reply, inputData)) {
-        HDF_LOGE("%{public}s: read input CodecBuffer failed!", __func__);
-        ret = HDF_ERR_INVALID_PARAM;
+    ret = CodecProxyDequeueInputParseReply(reply, acquireFd, inputData);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: read data failed!", __func__);
     }
     CodecProxySBufRecycle(data, reply);
     return ret;
