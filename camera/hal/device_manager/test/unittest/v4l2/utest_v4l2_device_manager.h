@@ -16,7 +16,7 @@
 #ifndef HOS_CAMERA_UTEST_V4L2_DEVICE_MANAGER_H
 #define HOS_CAMERA_UTEST_V4L2_DEVICE_MANAGER_H
 
-#include"stdio.h"
+#include "cstdio"
 #include <gtest/gtest.h>
 #include "device_manager_adapter.h"
 
