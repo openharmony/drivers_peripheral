@@ -36,6 +36,12 @@
 #define PACKET_BUFFER_NUM           4
 #define FRAME_BUFFER_NUM            10
 #define FRAME_SIZE_OPERATOR         2
+#define START_CODE_OFFSET_ONE       (-1)
+#define START_CODE_OFFSET_SEC       (-2)
+#define START_CODE_OFFSET_THIRD     (-3)
+#define START_CODE_SIZE_FRAME       4
+#define START_CODE_SIZE_SLICE       3
+#define START_CODE                  0x1
 
 typedef struct {
     char            *codecName;
@@ -57,13 +63,14 @@ CodecBuffer **g_outputInfosData = NULL;
 
 CodecCmd g_cmd = {0};
 MpiDecLoopData g_data = {0};
-
+uint32_t g_autoSplit = 0;
 bool g_pktEos = false;
-int32_t g_SrcFileSize = 0;
+uint8_t *g_readFileBuf;
+int32_t g_srcFileSize = 0;
 int32_t g_totalSrcSize = 0;
 int32_t g_totalFrames = 0;
 
-void DumpOutputToFile(FILE *fp, uint8_t *addr)
+static void DumpOutputToFile(FILE *fp, uint8_t *addr)
 {
     uint32_t width = g_cmd.width;
     uint32_t height = g_cmd.height;
@@ -93,9 +100,40 @@ void DumpOutputToFile(FILE *fp, uint8_t *addr)
     }
 }
 
-static int32_t ReadInputFromFile(FILE *fp, uint8_t *addr)
+static int32_t ReadInputFromFile(FILE *fp, uint8_t *buf)
 {
-    return fread(addr, 1, STREAM_PACKET_BUFFER_SIZE, fp);
+    return fread(buf, 1, STREAM_PACKET_BUFFER_SIZE, fp);
+}
+
+static int32_t ReadOneFrameFromFile(FILE *fp, uint8_t *buf)
+{
+    int32_t readSize = 0;
+    // read start code first
+    size_t t = fread(buf, 1, START_CODE_SIZE_FRAME, fp);
+    if (t < START_CODE_SIZE_FRAME) {
+        return true;
+    }
+    uint8_t *temp = buf;
+    temp += START_CODE_SIZE_FRAME;
+    while (!feof(fp)) {
+        t = fread(temp, 1, 1, fp);
+        if (*temp == START_CODE) {
+            // check start code
+            if ((temp[START_CODE_OFFSET_ONE] == 0) && (temp[START_CODE_OFFSET_SEC] == 0) &&
+                (temp[START_CODE_OFFSET_THIRD] == 0)) {
+                fseek(fp, -START_CODE_SIZE_FRAME, SEEK_CUR);
+                temp -= (START_CODE_SIZE_FRAME - 1);
+                break;
+            } else if ((temp[START_CODE_OFFSET_ONE] == 0) && (temp[START_CODE_OFFSET_SEC] == 0)) {
+                fseek(fp, -START_CODE_SIZE_SLICE, SEEK_CUR);
+                temp -= (START_CODE_SIZE_SLICE - 1);
+                break;
+            }
+        }
+        temp++;
+    }
+    readSize = (temp - buf);
+    return readSize;
 }
 
 static ShareMemory* GetShareMemoryById(int32_t id)
@@ -230,8 +268,7 @@ static int32_t SetExtDecParameter(void)
     paramCnt = 1;
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
     param.key = (ParamKey)KEY_EXT_SPLIT_PARSE_RK;
-    uint32_t needSplit = 1;
-    param.val = &needSplit;
+    param.val = &g_autoSplit;
     param.size = sizeof(uint32_t);
     ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
     if (ret != HDF_SUCCESS) {
@@ -309,7 +346,6 @@ static int32_t SetDecParameter(void)
 static void DecodeLoopHandleInput(const MpiDecLoopData *decData)
 {
     int32_t ret = 0;
-    uint8_t readData[STREAM_PACKET_BUFFER_SIZE];
     int32_t readSize = 0;
     int32_t acquireFd = 0;
 
@@ -320,17 +356,22 @@ static void DecodeLoopHandleInput(const MpiDecLoopData *decData)
     ret = g_codecProxy->CodecDequeueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, QUEUE_TIME_OUT,
         &acquireFd, inputData);
     if (ret == HDF_SUCCESS) {
-        // when packet size is valid read the input binary file
-        readSize = ReadInputFromFile(decData->fpInput, readData);
-        g_totalSrcSize += readSize;
-        g_pktEos = (readSize <= 0);
+        if (g_autoSplit == 1) {
+            readSize = ReadInputFromFile(decData->fpInput, g_readFileBuf);
+            g_totalSrcSize += readSize;
+            g_pktEos = (readSize <= 0);
+        } else {
+            readSize = ReadOneFrameFromFile(decData->fpInput, g_readFileBuf);
+            g_totalSrcSize += readSize;
+            g_pktEos = (g_totalSrcSize >= g_srcFileSize);
+        }
         if (g_pktEos) {
             HDF_LOGI("%{public}s: client inputData reach STREAM_FLAG_EOS", __func__);
             inputData->flag = STREAM_FLAG_EOS;
         }
     
         ShareMemory *sm = GetShareMemoryById(inputData->bufferId);
-        memcpy_s(sm->virAddr, readSize, (uint8_t*)readData, readSize);
+        memcpy_s(sm->virAddr, readSize, (uint8_t*)g_readFileBuf, readSize);
         inputData->buffer[0].length = readSize;
         g_codecProxy->CodecQueueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, inputData, QUEUE_TIME_OUT, -1);
     }
@@ -438,8 +479,8 @@ static int32_t OpenFile(void)
 {
     struct stat fileStat = {0};
     stat(g_cmd.fileInput, &fileStat);
-    g_SrcFileSize = fileStat.st_size;
-    HDF_LOGI("%{public}s: input file size %{public}d", __func__, g_SrcFileSize);
+    g_srcFileSize = fileStat.st_size;
+    HDF_LOGI("%{public}s: input file size %{public}d", __func__, g_srcFileSize);
 
     g_data.fpInput = fopen(g_cmd.fileInput, "rb");
     if (g_data.fpInput == NULL) {
@@ -470,6 +511,9 @@ static void DecodeEnd(void)
     }
 
     RevertDecodeStep3();
+    if (g_readFileBuf != NULL) {
+        OsalMemFree(g_readFileBuf);
+    }
 }
 
 static int32_t Decode(void)
@@ -502,9 +546,15 @@ static int32_t Decode(void)
         return HDF_FAILURE;
     }
 
-    if (!InitBuffer(PACKET_BUFFER_NUM, STREAM_PACKET_BUFFER_SIZE, FRAME_BUFFER_NUM,
+    if (!InitBuffer(PACKET_BUFFER_NUM, g_cmd.width * g_cmd.height * FRAME_SIZE_OPERATOR, FRAME_BUFFER_NUM,
         g_cmd.width * g_cmd.height * FRAME_SIZE_OPERATOR)) {
         HDF_LOGE("%{public}s: InitBuffer failed", __func__);
+        RevertDecodeStep3();
+        return HDF_FAILURE;
+    }
+    g_readFileBuf = (uint8_t *)OsalMemAlloc(g_cmd.width * g_cmd.height * FRAME_SIZE_OPERATOR);
+    if (g_readFileBuf == NULL) {
+        HDF_LOGE("%{public}s: g_readFileBuf malloc failed", __func__);
         RevertDecodeStep3();
         return HDF_FAILURE;
     }
