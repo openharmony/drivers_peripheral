@@ -144,13 +144,13 @@ int32_t ThermalZoneManager::ReadSysfsFile(const char* path, char* buf, size_t si
     int32_t readSize;
     int32_t fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
-        THERMAL_HILOGE(COMP_HDI, "failed to open %{private}s", path);
+        THERMAL_HILOGW(COMP_HDI, "failed to open %{private}s", path);
         return HDF_ERR_IO;
     }
 
     readSize = read(fd, buf, size - 1);
     if (readSize < NUM_ZERO) {
-        THERMAL_HILOGE(COMP_HDI, "failed to read %{private}s", path);
+        THERMAL_HILOGW(COMP_HDI, "failed to read %{private}s", path);
         close(fd);
         return HDF_ERR_IO;
     }
@@ -302,7 +302,7 @@ void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<i
 {
     char tempBuf[MAX_BUFF_SIZE] = {0};
     if (sensorTypeMap_.empty()) {
-        THERMAL_HILOGI(COMP_HDI, "sensorTypeMap is empty"); {
+        THERMAL_HILOGD(COMP_HDI, "sensorTypeMap is empty"); {
             return;
         }
     }
@@ -315,11 +315,11 @@ void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<i
         if (sensorIter.second->multiple_ == NUM_ZERO) {
             return;
         }
-        THERMAL_HILOGI(COMP_HDI, "multiple %{public}d", sensorIter.second->multiple_);
+        THERMAL_HILOGD(COMP_HDI, "multiple %{public}d", sensorIter.second->multiple_);
         if (reportTime % (sensorIter.second->multiple_) == NUM_ZERO) {
             for (auto iter : sensorIter.second->thermalDataList_) {
-                THERMAL_HILOGI(COMP_HDI, "data type %{public}s", iter.type.c_str());
-                THERMAL_HILOGI(COMP_HDI, "data temp path %{private}s", iter.tempPath.c_str());
+                THERMAL_HILOGD(COMP_HDI, "data type %{public}s", iter.type.c_str());
+                THERMAL_HILOGD(COMP_HDI, "data temp path %{private}s", iter.tempPath.c_str());
                 ThermalZoneInfo info;
                 info.type = iter.type;
                 ret = ReadThermalSysfsToBuff(iter.tempPath.c_str(), tempBuf, sizeof(tempBuf));
@@ -328,7 +328,7 @@ void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<i
                     continue;
                 }
                 info.temp = ConvertInt(tempBuf);
-                THERMAL_HILOGI(COMP_HDI, "temp=%{public}d", info.temp);
+                THERMAL_HILOGD(COMP_HDI, "temp=%{public}d", info.temp);
                 tzInfoAcaualEvent_.info.push_back(info);
             }
         }
