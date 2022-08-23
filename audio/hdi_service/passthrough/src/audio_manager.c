@@ -322,6 +322,7 @@ static int32_t loadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct
     hwAdapter->common.GetPortCapability = AudioAdapterGetPortCapability;
     hwAdapter->common.SetPassthroughMode = AudioAdapterSetPassthroughMode;
     hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
+    hwAdapter->common.GetStatus = AudioAdapterGetStatus;
     hwAdapter->adapterDescriptor = *desc;
 
     *adapter = &(hwAdapter->common);

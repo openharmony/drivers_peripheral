@@ -40,6 +40,7 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
     const struct AudioPort *port, enum AudioPortPassthroughMode mode);
 int32_t AudioProxyAdapterGetPassthroughMode(struct AudioAdapter *adapter,
     const struct AudioPort *port, enum AudioPortPassthroughMode *mode);
+int32_t AudioProxyAdapterGetStatus(struct AudioAdapter *adapter, struct AudioStatus *status);
 int32_t AudioProxyRenderStart(AudioHandle handle);
 int32_t AudioProxyRenderStop(AudioHandle handle);
 int32_t AudioProxyRenderPause(AudioHandle handle);
