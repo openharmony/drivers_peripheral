@@ -29,12 +29,12 @@
 #include "project_v4l2_main.h"
 
 namespace OHOS::Camera {
-unsigned int g_isPreviewOn;
-static unsigned int g_isCaptureOn;
-static unsigned int g_isVideoOn;
-unsigned int g_isPreviewOnUvc;
-static unsigned int g_isCaptureOnUvc;
-static unsigned int g_isVideoOnUvc;
+bool g_isPreviewOn;
+static bool g_isCaptureOn;
+static bool g_isVideoOn;
+bool g_isPreviewOnUvc;
+static bool g_isCaptureOnUvc;
+static bool g_isVideoOnUvc;
 
 unsigned int g_camFrameV4l2Exit = 1;
 unsigned int g_camFrameV4l2Exit2 = 1;
@@ -53,7 +53,7 @@ struct fb_var_screeninfo g_vInfo;
 struct fb_fix_screeninfo g_fInfo;
 
 std::string g_devNameUvc = {};
-static int g_uvcOnlineStatus;
+static bool g_isUvcOnlineStatus;
 int g_videoFd;
 int g_videoFdUvc;
 std::shared_ptr<HosV4L2UVC> g_myV4L2UVC;
@@ -283,7 +283,7 @@ void V4L2UvcCallback(const std::string& cameraId, const std::vector<DeviceContro
         return;
     }
     if (inOut) {
-        g_uvcOnlineStatus = 1;
+        g_isUvcOnlineStatus = true;
         for (auto iter = fromat.cbegin(); iter != fromat.cend(); iter++) {
             CAMERA_LOGD("main test: %s width %d height %d fps numerator %d denominator %d\n",
                 iter->fmtdesc.description.c_str(), iter->fmtdesc.width, iter->fmtdesc.height,
@@ -302,7 +302,7 @@ void V4L2UvcCallback(const std::string& cameraId, const std::vector<DeviceContro
 
         g_devNameUvc = cameraId;
     } else {
-        g_uvcOnlineStatus = 0;
+        g_isUvcOnlineStatus = false;
         g_devNameUvc = {};
         CAMERA_LOGD("main test:V4L2UvcCallback inOut = %d, control empty = %d fromat empty = %d\n",
             inOut, control.empty(), fromat.empty());
@@ -639,7 +639,7 @@ void StartFrame()
 
     devName = TEST_SENSOR_NAME;
     g_camFrameV4l2Exit = 0;
-    g_isPreviewOn = 1;
+    g_isPreviewOn = true;
     pthread_create(&g_previewThreadId, nullptr, V4L2FrameThread, (void*)devName.c_str());
 
     sleep(1);
@@ -647,14 +647,14 @@ void StartFrame()
 
 void StartUvcFrame()
 {
-    if (g_uvcOnlineStatus) {
+    if (g_isUvcOnlineStatus) {
         FBInit();
 
         g_camFrameV4l2Exit2 = 0;
-        g_isPreviewOnUvc = 1;
+        g_isPreviewOnUvc = true;
         pthread_create(&g_previewThreadId2, nullptr, V4L2FrameThread, (void*)g_devNameUvc.c_str());
     } else {
-        CAMERA_LOGD("main test:uvcOnlineStatus = % d, please inset UVC Camera\n", g_uvcOnlineStatus);
+        CAMERA_LOGD("main test:uvcOnlineStatus = % d, please inset UVC Camera\n", g_isUvcOnlineStatus);
     }
 
     sleep(1);
@@ -667,16 +667,16 @@ void StartCapture()
     StopAllFrame(0);
     if (g_isPreviewOn || g_isPreviewOnUvc) {
         if (g_isPreviewOn) {
-            g_isPreviewOn = 0;
-            g_isCaptureOn = 1;
+            g_isPreviewOn = false;
+            g_isCaptureOn = true;
             devName = TEST_SENSOR_NAME;
             g_camFrameV4l2Exit = 0;
             pthread_create(&g_previewThreadId, nullptr, V4L2FrameThread, (void*)devName.c_str());
         }
 
         if (g_isPreviewOnUvc) {
-            g_isPreviewOnUvc = 0;
-            g_isCaptureOnUvc = 1;
+            g_isPreviewOnUvc = false;
+            g_isCaptureOnUvc = true;
             g_camFrameV4l2Exit2 = 0;
             pthread_create(&g_previewThreadId2, nullptr, V4L2FrameThread, (void*)g_devNameUvc.c_str());
         }
@@ -685,14 +685,14 @@ void StartCapture()
         StopAllFrame(0);
 
         if (g_isCaptureOnUvc) {
-            g_isPreviewOnUvc = 1;
-            g_isCaptureOnUvc = 0;
+            g_isPreviewOnUvc = true;
+            g_isCaptureOnUvc = false;
             g_camFrameV4l2Exit2 = 0;
             pthread_create(&g_previewThreadId2, nullptr, V4L2FrameThread, (void*)g_devNameUvc.c_str());
         }
         if (g_isCaptureOn) {
-            g_isPreviewOn = 1;
-            g_isCaptureOn = 0;
+            g_isPreviewOn = true;
+            g_isCaptureOn = false;
             devName = TEST_SENSOR_NAME;
             g_camFrameV4l2Exit = 0;
             pthread_create(&g_previewThreadId, nullptr, V4L2FrameThread, (void*)devName.c_str());
@@ -801,8 +801,8 @@ void StartVideo()
     StopAllFrame(0);
     if (g_isPreviewOn || g_isPreviewOnUvc) {
         if (g_isPreviewOn) {
-            g_isPreviewOn = 0;
-            g_isVideoOn = 1;
+            g_isPreviewOn = false;
+            g_isVideoOn = true;
             devName = TEST_SENSOR_NAME;
             g_camFrameV4l2Exit = 0;
             g_videoFd = open("video.h264", O_RDWR | O_CREAT, 00766); // 00766:file operate permission
@@ -810,8 +810,8 @@ void StartVideo()
         }
 
         if (g_isPreviewOnUvc) {
-            g_isPreviewOnUvc = 0;
-            g_isVideoOnUvc = 1;
+            g_isPreviewOnUvc = false;
+            g_isVideoOnUvc = true;
             g_camFrameV4l2Exit2 = 0;
             g_videoFdUvc = open("uvc.h264", O_RDWR | O_CREAT, 00766); // 00766:file operate permission
             pthread_create(&g_previewThreadId2, nullptr, V4L2FrameThread, (void*)g_devNameUvc.c_str());
@@ -821,14 +821,14 @@ void StartVideo()
         StopAllFrame(0);
 
         if (g_isVideoOnUvc) {
-            g_isPreviewOnUvc = 1;
-            g_isVideoOnUvc = 0;
+            g_isPreviewOnUvc = true;
+            g_isVideoOnUvc = false;
             g_camFrameV4l2Exit2 = 0;
             pthread_create(&g_previewThreadId2, nullptr, V4L2FrameThread, (void*)g_devNameUvc.c_str());
         }
         if (g_isVideoOn) {
-            g_isPreviewOn = 1;
-            g_isVideoOn = 0;
+            g_isPreviewOn = true;
+            g_isVideoOn = false;
             devName = TEST_SENSOR_NAME;
             g_camFrameV4l2Exit = 0;
             pthread_create(&g_previewThreadId, nullptr, V4L2FrameThread, (void*)devName.c_str());
@@ -843,8 +843,8 @@ void StartVideo()
 void QuitMain()
 {
     StopAllFrame(1);
-    g_isPreviewOn = 0;
-    g_isPreviewOnUvc = 0;
+    g_isPreviewOn = false;
+    g_isPreviewOnUvc = false;
     CAMERA_LOGD("main test:StopAllFrame(1) done\n");
 
     sleep(1);

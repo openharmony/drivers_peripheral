@@ -22,7 +22,7 @@
 namespace OHOS::Camera {
 class SourceNode : virtual public NodeBase {
 public:
-    SourceNode(const std::string& name, const std::string& type);
+    explicit SourceNode(const std::string& name, const std::string& type);
     ~SourceNode() override;
     RetCode Init(const int32_t streamId) override;
     RetCode Start(const int32_t streamId) override;
