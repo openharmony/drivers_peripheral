@@ -30,11 +30,10 @@ extern "C" IPartitionSlot *PartitionSlotImplGetInstance(void)
     return new (std::nothrow) PartitionSlotImpl();
 }
 
-int32_t PartitionSlotImpl::GetCurrentSlot(int32_t& numOfSlots)
+int32_t PartitionSlotImpl::GetCurrentSlot(int32_t& currentSlot, int32_t& numOfSlots)
 {
     HDF_LOGD("%{public}s called!", __func__);
-    int currentSlot = PartitionSlotManager::GetInstance()->GetCurrentSlot(numOfSlots);
-    return currentSlot;
+    return PartitionSlotManager::GetInstance()->GetCurrentSlot(currentSlot, numOfSlots);
 }
 
 int32_t PartitionSlotImpl::GetSlotSuffix(int32_t slot, std::string& suffix)

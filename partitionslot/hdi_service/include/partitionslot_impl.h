@@ -25,7 +25,7 @@ namespace V1_0 {
 class PartitionSlotImpl : public IPartitionSlot {
 public:
     virtual ~PartitionSlotImpl() {}
-    int32_t GetCurrentSlot(int32_t& numOfSlots) override;
+    int32_t GetCurrentSlot(int32_t& currentSlot, int32_t& numOfSlots) override;
     int32_t GetSlotSuffix(int32_t slot, std::string& suffix) override;
     int32_t SetActiveSlot(int32_t slot) override;
     int32_t SetSlotUnbootable(int32_t slot) override;

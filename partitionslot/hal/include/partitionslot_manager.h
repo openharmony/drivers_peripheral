@@ -27,7 +27,7 @@ namespace Partitionslot {
 namespace V1_0 {
 class PartitionSlotManager : public DelayedSingleton<PartitionSlotManager> {
 public:
-    int32_t GetCurrentSlot(int32_t& numOfSlots);
+    int32_t GetCurrentSlot(int32_t& currentSlot, int32_t& numOfSlots);
     int32_t GetSlotSuffix(int32_t slot, std::string& suffix);
     int32_t SetActiveSlot(int32_t slot);
     int32_t SetSlotUnbootable(int32_t slot);

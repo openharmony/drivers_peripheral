@@ -12,5 +12,8 @@
 # limitations under the License.
 
 group("partitionslot_entry") {
-  deps = [ "./hdi_service:hdf_partitionslot_service" ]
+  deps = [
+    "./hal:libpartition_slot_manager",
+    "./hdi_service:hdf_partitionslot_service",
+  ]
 }
