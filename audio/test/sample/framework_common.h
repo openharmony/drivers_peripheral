@@ -58,5 +58,5 @@ int32_t CheckPcmFormat(int32_t val, uint32_t *audioPcmFormat);
 uint32_t PcmFormatToBits(enum AudioFormat formatBit);
 void CleanStdin(void);
 void FileClose(FILE **file);
-int32_t FormatLoadLibPath(char *resolvedPath, int32_t pathLen, char *func, int32_t funcpathLen, int choice);
+int32_t FormatLoadLibPath(char *resolvedPath, int32_t pathLen, int choice);
 #endif

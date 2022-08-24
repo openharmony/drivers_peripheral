@@ -413,7 +413,7 @@ static int32_t AudioAdapterGetDir(const char *dir)
     }
 }
 
-static int32_t AudioAdaptersGetArraySize(const cJSON *cJsonObj, int *size)
+static int32_t AudioAdaptersGetArraySize(const cJSON *cJsonObj, uint32_t *size)
 {
     int adapterArraySize;
 
@@ -430,7 +430,7 @@ static int32_t AudioAdaptersGetArraySize(const cJSON *cJsonObj, int *size)
 
         return HDF_FAILURE;
     }
-    *size = adapterArraySize;
+    *size = (uint32_t)adapterArraySize;
 
     return HDF_SUCCESS;
 }
@@ -608,7 +608,7 @@ static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const
     uint32_t i;
     int32_t ret, tmpNum;
     cJSON *adapterPort = NULL;
-    int32_t realSize = 0;
+    uint32_t realSize = 0;
     if (desc == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("Invalid parameter!\n");
 
@@ -632,10 +632,8 @@ static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const
         return HDF_FAILURE;
     }
     ret = AudioAdaptersGetArraySize(adapterPorts, &realSize);
-    if (ret != HDF_SUCCESS || realSize != (int32_t)desc->portNum) {
-        AUDIO_FUNC_LOGE("realSize = %{public}d, portNum = %{public}u.\n", realSize, desc->portNum);
-        AUDIO_FUNC_LOGE("The defined portnum does not match the actual portnum!\n");
-
+    if (ret != HDF_SUCCESS || realSize != desc->portNum) {
+        AUDIO_FUNC_LOGE("realSize = %{public}u, portNum = %{public}u.\n", realSize, desc->portNum);
         return HDF_FAILURE;
     }
 
@@ -937,7 +935,7 @@ int32_t AudioAdaptersSetAdapterVar(cJSON *adaptersObj)
 
 int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
 {
-    int32_t realSize;
+    uint32_t realSize = 0;
     if (descs == NULL || size == NULL) {
         AUDIO_FUNC_LOGE("param descs or size is null!");
         return HDF_ERR_INVALID_PARAM;
