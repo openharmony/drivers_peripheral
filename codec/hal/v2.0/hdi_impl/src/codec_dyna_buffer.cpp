@@ -16,9 +16,8 @@
 #include <buffer_handle_utils.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
-#include <libsync.h>
 #include <securec.h>
-
+#include <unistd.h>
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -63,7 +62,10 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
 
     int fence = codecBuffer.fenceFd;
     if (fence >= 0) {
-        sync_wait(fence, TIME_WAIT_MS);
+        auto ret = SyncWait(fence, TIME_WAIT_MS);
+        if (ret < 0) {
+            HDF_LOGW("%{public}s : SyncWait ret err", __func__);
+        }
         close(codecBuffer.fenceFd);
         codecBuffer.fenceFd = -1;
     }
