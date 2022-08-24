@@ -461,7 +461,7 @@ static int32_t FrameStart(const struct StrPara *param)
     int32_t bufferSize = strParam->bufferSize;
     int32_t ret;
     size_t readSize;
-    int32_t remainingDataSize = (int32_t)g_wavHeadInfo.testFileRiffSize;
+    size_t remainingDataSize = g_wavHeadInfo.testFileRiffSize;
     size_t numRead;
     (void)signal(SIGINT, StreamClose);
     uint64_t replyBytes;
@@ -472,7 +472,7 @@ static int32_t FrameStart(const struct StrPara *param)
         return HDF_FAILURE;
     }
     do {
-        readSize = (remainingDataSize > bufferSize) ? bufferSize : remainingDataSize;
+        readSize = (remainingDataSize > bufferSize) ? (size_t)bufferSize : remainingDataSize;
         numRead = fread(frame, 1, readSize, g_file);
         if (numRead > 0) {
             ret = render->RenderFrame(render, (int8_t *)frame, numRead, &replyBytes);
