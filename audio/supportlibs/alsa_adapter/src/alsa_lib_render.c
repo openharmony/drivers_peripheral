@@ -614,12 +614,10 @@ static int32_t SetHWParams(
 {
     int ret;
     int dir = 0; /* dir Value range (-1,0,1) */
-
     if (handle == NULL || params == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return HDF_FAILURE;
     }
-
     snd_pcm_uframes_t size;
     ret = snd_pcm_hw_params_any(handle, params); // choose all parameters
     if (ret < 0) {
@@ -636,8 +634,7 @@ static int32_t SetHWParams(
     }
     ret = snd_pcm_hw_params_set_buffer_time_near(handle, params, &g_bufferTime, &dir);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE(
-            "Unable to set buffer time %{public}u for playback: %{public}s", g_bufferTime, snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Set buffer time %{public}u failed: %{public}s", g_bufferTime, snd_strerror(ret));
         return HDF_FAILURE;
     }
     ret = snd_pcm_hw_params_get_buffer_size(params, &size);
@@ -648,8 +645,7 @@ static int32_t SetHWParams(
     g_bufferSize = size;
     ret = snd_pcm_hw_params_set_period_time_near(handle, params, &g_periodTime, &dir);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE(
-            "Unable to set period time %{public}u for playback: %{public}s", g_bufferTime, snd_strerror(ret));
+        AUDIO_FUNC_LOGE("Set period time %{public}u failed: %{public}s", g_bufferTime, snd_strerror(ret));
         return HDF_FAILURE;
     }
     ret = snd_pcm_hw_params_get_period_size(params, &size, &dir);
@@ -663,7 +659,6 @@ static int32_t SetHWParams(
         AUDIO_FUNC_LOGE("Unable to set hw params for playback: %{public}s", snd_strerror(ret));
         return HDF_FAILURE;
     }
-
     return HDF_SUCCESS;
 }
 
