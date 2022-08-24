@@ -16,7 +16,7 @@
 #ifndef HOS_CAMERA_UTEST_MPI_DEVICE_MANAGER_H
 #define HOS_CAMERA_UTEST_MPI_DEVICE_MANAGER_H
 
-#include"cstdio"
+#include "cstdio"
 #include <gtest/gtest.h>
 #include "device_manager_adapter.h"
 
