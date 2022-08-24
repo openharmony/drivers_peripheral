@@ -138,6 +138,7 @@ static int32_t SerCodecCreate(struct HdfDeviceIoClient *client, struct HdfSBuf *
 
 static int32_t SerCodecCreateByType(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    (void)client;
     int32_t errNum;
     CodecType type;
     AvCodecMime mime;
@@ -381,6 +382,8 @@ static int32_t SerCodecStop(struct HdfDeviceIoClient *client, struct HdfSBuf *da
 
 static int32_t SerCodecReset(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    (void)client;
+    (void)reply;
     uint64_t handle = 0;
     if (!HdfSbufReadUint64(data, &handle)) {
         HDF_LOGE("%{public}s: read handle data failed!", __func__);
@@ -667,7 +670,7 @@ static int32_t HandleRequestCmdExt(struct HdfDeviceIoClient *client, int cmdId,
     }
 }
 
-int32_t HandleRequestCmd(struct HdfDeviceIoClient *client, int cmdId,
+static int32_t HandleRequestCmd(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     switch (cmdId) {
