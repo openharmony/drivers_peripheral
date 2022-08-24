@@ -13,17 +13,18 @@
  * limitations under the License.
  */
 
-#include <unistd.h>
-#include <sys/time.h>
-#include <stdio.h>
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
 #include <servmgr_hdi.h>
+#include <stdio.h>
+#include <sys/time.h>
+#include <unistd.h>
+
 #include "cdcacm.h"
 #include "usb_dev_test.h"
 
-#define HDF_LOG_TAG hcs_prop
+#define HDF_LOG_TAG      hcs_prop
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
 
 static struct HdfSBuf *g_data;
@@ -77,7 +78,7 @@ static int32_t TestPropGet(const char *propName)
         goto FAIL;
     }
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_GET_PROP, g_data, g_reply);
-    if (status !=  HDF_SUCCESS) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_GET_PROP failed status = %d", __func__, status);
         goto FAIL;
     }
@@ -104,10 +105,10 @@ static int32_t TestPropSet(const char *propName, const char *propValue)
         goto FAIL;
     }
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_SET_PROP, g_data, g_reply);
-    if (status !=  HDF_SUCCESS) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_SET_PROP failed", __func__);
     }
- FAIL:
+FAIL:
     return status;
 }
 
@@ -121,18 +122,18 @@ static int32_t TestPropRegist(const char *propName, const char *propValue)
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteString(g_data, propName)) {
-    HDF_LOGE("%s:failed to write propName : %s", __func__, propName);
-    goto FAIL;
+        HDF_LOGE("%s:failed to write propName : %s", __func__, propName);
+        goto FAIL;
     }
     if (!HdfSbufWriteString(g_data, propValue)) {
-    HDF_LOGE("%s:failed to write propValue : %s", __func__, propValue);
-    goto FAIL;
+        HDF_LOGE("%s:failed to write propValue : %s", __func__, propValue);
+        goto FAIL;
     }
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_REGIST_PROP, g_data, g_reply);
-    if (status !=  HDF_SUCCESS) {
-    HDF_LOGE("%s: Dispatch USB_SERIAL_SET_PROP failed status = %d", __func__, status);
+    if (status != HDF_SUCCESS) {
+        HDF_LOGE("%s: Dispatch USB_SERIAL_SET_PROP failed status = %d", __func__, status);
     }
- FAIL:
+FAIL:
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
@@ -141,7 +142,6 @@ static int32_t TestPropRegist(const char *propName, const char *propValue)
 
     return status;
 }
-
 
 int32_t PropTest(int32_t argc, const char *argv[])
 {
@@ -192,4 +192,3 @@ int32_t PropTest(int32_t argc, const char *argv[])
 
     return 0;
 }
-
