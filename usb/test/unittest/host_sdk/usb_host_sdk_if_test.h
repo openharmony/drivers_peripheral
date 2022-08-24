@@ -41,27 +41,27 @@ typedef enum {
     CMD_STD_CTRL_GET_DESCRIPTOR_ASYNC,
 } SerialOPCmd;
 
-#define DATARATE                9600
-#define DATA_BITS_LENGTH        8
-#define ACM_NW                  16
-#define ACM_NR                  16
-#define TARGET_MASK             0x3
-#define REQUEST_TYPE_MASK       0x3
-#define DIRECTION_MASK          0x1
-#define USB_CTRL_SET_TIMEOUT    0
+#define DATARATE             9600
+#define DATA_BITS_LENGTH     8
+#define ACM_NW               16
+#define ACM_NR               16
+#define TARGET_MASK          0x3
+#define REQUEST_TYPE_MASK    0x3
+#define DIRECTION_MASK       0x1
+#define USB_CTRL_SET_TIMEOUT 0
 
 struct AcmDevice;
 
 struct AcmWb {
-    struct UsbRequest    *request;
-    struct AcmDevice       *instance;
+    struct UsbRequest *request;
+    struct AcmDevice *instance;
     uint8_t *buf;
     uint32_t len;
     int32_t use;
 };
 
 struct AcmRb {
-    uint8_t  *base;
+    uint8_t *base;
     int32_t size;
     int32_t index;
     int32_t use;
@@ -70,8 +70,8 @@ struct AcmRb {
 
 struct SerialDevice {
     struct AcmDevice *acm;
-    struct UsbCdcLineCoding     lineCoding;
-    struct OsalMutex            lock;
+    struct UsbCdcLineCoding lineCoding;
+    struct OsalMutex lock;
 };
 
 struct AcmDevice {
@@ -80,28 +80,28 @@ struct AcmDevice {
     struct UsbInterface *ctrIface;
     struct UsbInterface *intIface;
     struct UsbInterface *dataIface;
-    struct UsbPipeInfo  *ctrPipe;
-    struct UsbPipeInfo  *intPipe;
-    struct UsbPipeInfo  *dataInPipe;
-    struct UsbPipeInfo  *dataOutPipe;
+    struct UsbPipeInfo *ctrPipe;
+    struct UsbPipeInfo *intPipe;
+    struct UsbPipeInfo *dataInPipe;
+    struct UsbPipeInfo *dataOutPipe;
     struct AcmWb wb[ACM_NW];
-    struct AcmRb  rb[ACM_NR];
-    struct UsbPipeInfo  wPipeInfo;
-    struct OsalMutex      writeLock;
-    struct OsalMutex      readLock;
+    struct AcmRb rb[ACM_NR];
+    struct UsbPipeInfo wPipeInfo;
+    struct OsalMutex writeLock;
+    struct OsalMutex readLock;
     uint8_t *notificationBuffer;
-    struct UsbRequest    *notifyReq;
-    struct UsbRequest    *readReq[ACM_NR];
-    struct UsbRequest    *writeReq;
-    struct UsbRequest    *ctrlReq;
-    struct OsalMutex       lock;
+    struct UsbRequest *notifyReq;
+    struct UsbRequest *readReq[ACM_NR];
+    struct UsbRequest *writeReq;
+    struct UsbRequest *ctrlReq;
+    struct OsalMutex lock;
     struct UsbInterface *itface;
     UsbInterfaceHandle *devHandle;
     UsbInterfaceHandle *data_devHandle;
     UsbInterfaceHandle *ctrl_devHandle;
     UsbInterfaceHandle *int_devHandle;
     struct UsbSession *session;
-    struct SerialDevice  *port;
+    struct SerialDevice *port;
     uint32_t nbIndex;
     uint32_t nbSize;
     int32_t transmitting;
@@ -113,7 +113,7 @@ struct AcmDevice {
     uint32_t intSize;
     uint32_t writeSize;
     uint32_t readSize;
-    struct UsbCdcLineCoding   lineCoding;
+    struct UsbCdcLineCoding lineCoding;
 };
 
 struct TestControlMsgData {
