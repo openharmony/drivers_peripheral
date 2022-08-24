@@ -665,8 +665,8 @@ int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRend
         AUDIO_FUNC_LOGE("hwRenders is null!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
-        int ret = render->control.Stop((AudioHandle)render);
+    if (!(hwRender->renderParam.renderMode.ctlParam.stop)) {
+        ret = render->control.Stop((AudioHandle)render);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("render Stop failed ret = %{public}d", ret);
         }

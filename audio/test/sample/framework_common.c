@@ -99,9 +99,9 @@ void FileClose(FILE **file)
     return;
 }
 
-int32_t FormatLoadLibPath(char *resolvedPath, int32_t pathLen, char *func, int32_t funcpathLen, int choice)
+int32_t FormatLoadLibPath(char *resolvedPath, int32_t pathLen, int choice)
 {
-    if (resolvedPath == NULL || func == NULL) {
+    if (resolvedPath == NULL) {
         AUDIO_FUNC_LOGE("The Parameter is NULL.");
         return HDF_FAILURE;
     }
@@ -113,18 +113,11 @@ int32_t FormatLoadLibPath(char *resolvedPath, int32_t pathLen, char *func, int32
                 AUDIO_FUNC_LOGE("snprintf_s failed!");
                 return HDF_FAILURE;
             }
-            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
-                AUDIO_FUNC_LOGE("snprintf_s failed!");
-                return HDF_FAILURE;
-            }
             break;
         case SERVICE: // IPC Loading
             uhdfLibPath = HDF_LIBRARY_FULL_PATH(UHDF_CLIENT_LIB);
             if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", uhdfLibPath) < 0) {
                 AUDIO_FUNC_LOGE("snprintf_s failed!");
-                return HDF_FAILURE;
-            }
-            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
                 return HDF_FAILURE;
             }
             break;
@@ -133,9 +126,6 @@ int32_t FormatLoadLibPath(char *resolvedPath, int32_t pathLen, char *func, int32
             printf("Input error,Switched to direct loading in for you,");
             SystemInputFail();
             if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", uhdfLibPath) < 0) {
-                return HDF_FAILURE;
-            }
-            if (snprintf_s(func, funcpathLen, funcpathLen - 1, "%s", "GetAudioManagerFuncs") < 0) {
                 return HDF_FAILURE;
             }
             break;

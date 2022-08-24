@@ -59,7 +59,7 @@ int32_t AudioCaptureStart(AudioHandle handle)
         AUDIO_FUNC_LOGE("AudioCaptureStart SetParams FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    char *tbuffer = (char *)OsalMemCalloc(CAPTURE_FRAME_DATA);
+    char *tbuffer = (char *)OsalMemCalloc(FRAME_DATA);
     if (tbuffer == NULL) {
         AUDIO_FUNC_LOGE("alloc Capture tbuffer Fail!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;

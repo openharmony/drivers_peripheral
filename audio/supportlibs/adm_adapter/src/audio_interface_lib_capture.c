@@ -17,11 +17,6 @@
 #include "osal_mem.h"
 #include "audio_common.h"
 #include "audio_uhdf_log.h"
-#ifdef ALSA_MODE
-#include "alsa_audio.h"
-struct pcm *pcm;
-struct DevInfo g_inDevInfo;
-#endif
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 

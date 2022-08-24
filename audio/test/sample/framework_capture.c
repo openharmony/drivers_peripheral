@@ -46,7 +46,7 @@
 #define DEEP_BUFFER_RENDER_PERIOD_SIZE 4096
 #define DEEP_BUFFER_RENDER_PERIOD_COUNT 8
 #define INT_32_MAX 0x7fffffff
-#define PERIOD_SIZE 1024
+#define BUFFER_SIZE_BASE 1024
 #define AUDIO_BUFF_SIZE (1024 * 16)
 #define AUDIO_TOTALSIZE_15M (1024 * 15)
 #define AUDIO_RECORD_INTERVAL_512KB 512
@@ -69,7 +69,6 @@ struct AudioDeviceDescriptor g_devDesc;
 struct AudioSampleAttributes g_attrs;
 struct AudioCapture *g_capture = NULL;
 struct AudioManager *g_manager = NULL;
-static struct AudioManager *g_proxyManager = NULL;
 static struct StrParaCapture g_str;
 void *g_captureHandle;
 
@@ -270,7 +269,7 @@ static void AudioPnpSvcEvenReceived(struct ServiceStatusListener *listener, stru
         } else {
             fwrite(frame, (size_t)replyBytes, 1, strParam->file);
             g_receiveFrameCount--;
-            g_totalSize += (replyBytes / PERIOD_SIZE); // 1024 = 1Kb
+            g_totalSize += (replyBytes / BUFFER_SIZE_BASE); // 1024 = 1Kb
             if (g_totalSize % AUDIO_RECORD_INTERVAL_512KB == 0) { // 512KB
                 printf("\nRecording,the audio file size is %"PRIu64"Kb\n", g_totalSize);
             }
@@ -457,7 +456,7 @@ static int32_t WriteDataToFile(FILE *file, char *buffer, uint64_t replyBytes, ui
     }
     *failCount = 0;
     (void)fwrite(buffer, (size_t)replyBytes, 1, file);
-    *totalSize += (replyBytes / PERIOD_SIZE); // 1024 = 1Kb
+    *totalSize += (replyBytes / BUFFER_SIZE_BASE); // 1024 = 1Kb
     if (*totalSize % AUDIO_RECORD_INTERVAL_512KB == 0) { // 512KB
         printf("\nRecording,the audio file size is %"PRIu64"Kb\n", *totalSize);
     }
@@ -733,7 +732,7 @@ static void PrintMenu1(void)
     printf(" =================================================== \n");
 }
 
-static int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen, char *func, int32_t funcpathLen)
+static int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen)
 {
     system("clear");
     int choice = 0;
@@ -745,7 +744,7 @@ static int32_t SelectLoadingMode(char *resolvedPath, int32_t pathLen, char *func
         AUDIO_FUNC_LOGE("capture CheckInputName failed!");
         return HDF_FAILURE;
     }
-    ret = FormatLoadLibPath(resolvedPath, pathLen, func, funcpathLen, choice);
+    ret = FormatLoadLibPath(resolvedPath, pathLen, choice);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("capture FormatLoadLibPath failed!");
         return HDF_FAILURE;
@@ -772,7 +771,7 @@ static struct AudioManager *GetAudioManagerInsForCapture(const char *funcString)
     return getAudioManager();
 }
 
-static int32_t GetCapturePassthroughManagerFunc(const char *adapterNameCase)
+static int32_t GetCaptureManagerFunc(const char *adapterNameCase)
 {
     struct AudioAdapterDescriptor *descs = NULL;
     enum AudioPortDirection port = PORT_OUT; // Set port information
@@ -782,6 +781,9 @@ static int32_t GetCapturePassthroughManagerFunc(const char *adapterNameCase)
         AUDIO_FUNC_LOGE("The Parameter is NULL");
         return HDF_FAILURE;
     }
+#ifndef __LITEOS__
+    (void)HdfRemoteGetCallingPid();
+#endif
     struct AudioManager *manager = GetAudioManagerInsForCapture("GetAudioManagerFuncs");
     if (manager == NULL) {
         AUDIO_FUNC_LOGE("GetAudioManagerInsForCapture Fail");
@@ -820,61 +822,10 @@ static int32_t GetCapturePassthroughManagerFunc(const char *adapterNameCase)
     return HDF_SUCCESS;
 }
 
-static int32_t GetCaptureProxyManagerFunc(const char *adapterNameCase)
-{
-    struct AudioAdapterDescriptor *descs = NULL;
-    enum AudioPortDirection port = PORT_OUT; // Set port information
-    struct AudioPort capturePort;
-    int32_t size = 0;
-    if (adapterNameCase == NULL) {
-        AUDIO_FUNC_LOGE("The Parameter is NULL");
-        return HDF_FAILURE;
-    }
-#ifndef __LITEOS__
-    (void)HdfRemoteGetCallingPid();
-#endif
-    struct AudioManager *proxyManager = GetAudioManagerInsForCapture("GetAudioManagerFuncs");
-    if (proxyManager == NULL) {
-        AUDIO_FUNC_LOGE("GetAudioManagerInsForCapture Fail");
-        return HDF_FAILURE;
-    }
-    int32_t ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
-    if ((size == 0) || (descs == NULL) || (ret < 0)) {
-        AUDIO_FUNC_LOGE("Get All Adapters Fail");
-        return HDF_ERR_NOT_SUPPORT;
-    }
-    int32_t index = SwitchAdapterCapture(descs, adapterNameCase, port, &capturePort, size);
-    if (index < 0) {
-        AUDIO_FUNC_LOGE("Not Switch Adapter Fail");
-        return HDF_ERR_NOT_SUPPORT;
-    }
-    struct AudioAdapterDescriptor *desc = &descs[index];
-    if (proxyManager->LoadAdapter(proxyManager, desc, &g_adapter) != 0) {
-        AUDIO_FUNC_LOGE("Load Adapter Fail");
-        return HDF_ERR_NOT_SUPPORT;
-    }
-    g_proxyManager = proxyManager;
-    if (g_adapter == NULL) {
-        AUDIO_FUNC_LOGE("load audio device failed");
-        return HDF_FAILURE;
-    }
-    (void)g_adapter->InitAllPorts(g_adapter);
-    if (InitAttrsCapture(&g_attrs) < 0) {
-        g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
-        return HDF_FAILURE;
-    }
-    if (InitDevDescCapture(&g_devDesc, capturePort.portId) < 0) {
-        g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
 static int32_t InitParam(void)
 {
     char resolvedPath[PATH_LEN] = {0};
-    char func[PATH_LEN] = {0};
-    if (SelectLoadingMode(resolvedPath, PATH_LEN, func, PATH_LEN) < 0) {
+    if (SelectLoadingMode(resolvedPath, PATH_LEN) < 0) {
         return HDF_FAILURE;
     }
     char pathBuf[PATH_MAX] = {'\0'};
@@ -891,17 +842,12 @@ static int32_t InitParam(void)
     audioPort.portId = 0;
     audioPort.portName = "AOP";
     char adapterNameCase[PATH_LEN] = "primary";
-    if (strcmp(func, "GetAudioManagerFuncs") == 0) {
-        if (GetCapturePassthroughManagerFunc(adapterNameCase) < 0) {
-            AUDIO_FUNC_LOGE("GetCapturePassthroughManagerFunc Fail");
-            return HDF_FAILURE;
-        }
-    } else {
-        if (GetCaptureProxyManagerFunc(adapterNameCase) < 0) {
-            AUDIO_FUNC_LOGE("GetCaptureProxyManagerFunc Fail");
-            return HDF_FAILURE;
-        }
+
+    if (GetCaptureManagerFunc(adapterNameCase) < 0) {
+        AUDIO_FUNC_LOGE("GetCaptureManagerFunc Failed.");
+        return HDF_FAILURE;
     }
+
     return HDF_SUCCESS;
 }
 
@@ -1365,10 +1311,6 @@ int32_t main(int32_t argc, char const *argv[])
             g_manager->UnloadAdapter(g_manager, g_adapter);
         }
         soMode = true;
-    } else {
-        if (g_proxyManager != NULL && g_proxyManager->UnloadAdapter != NULL) {
-            g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
-        }
     }
     dlclose(g_handle);
     printf("Record file path:%s\n", g_path);
