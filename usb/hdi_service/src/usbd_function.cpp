@@ -31,8 +31,7 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace V1_0 {
-uint8_t UsbdFunction::currentFuncs_ = USB_FUNCTION_HDC;
-uint8_t UsbdFunction::waitSleepTime_ = 10;
+uint32_t UsbdFunction::currentFuncs_ = USB_FUNCTION_HDC;
 
 using OHOS::HDI::ServiceManager::V1_0::IServiceManager;
 
@@ -40,13 +39,13 @@ int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned c
 {
     auto servMgr = IServiceManager::Get();
     if (servMgr == nullptr) {
-        HDF_LOGE("%{public}s:get IServiceManager failed!", __func__);
+        HDF_LOGE("%{public}s:get IServiceManager failed", __func__);
         return HDF_FAILURE;
     }
 
     sptr<IRemoteObject> remote = servMgr->GetService(name);
     if (remote == nullptr) {
-        HDF_LOGE("%{public}s:get remote object failed!", __func__);
+        HDF_LOGE("%{public}s:get remote object failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -55,12 +54,12 @@ int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned c
     OHOS::MessageOption option;
 
     if (!data.WriteInterfaceToken(Str8ToStr16(HDF_USB_USBFN_DESC))) {
-        HDF_LOGE("%{public}s: WriteInterfaceToken failed!", __func__);
+        HDF_LOGE("%{public}s: WriteInterfaceToken failed", __func__);
         return HDF_FAILURE;
     }
 
     if (!data.WriteUint8(funcMask)) {
-        HDF_LOGE("%{public}s: WriteInt8 failed!", __func__);
+        HDF_LOGE("%{public}s: WriteInt8 failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -75,13 +74,8 @@ int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned c
 int32_t UsbdFunction::RemoveHdc()
 {
     int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_OFF);
-    if (status) {
+    if (status != 0) {
         HDF_LOGE("%{public}s:remove hdc config error = %{public}d", __func__, status);
-        return HDF_FAILURE;
-    }
-    status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_OFF);
-    if (status) {
-        HDF_LOGE("%{public}s:remove hdc configfs error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -89,14 +83,49 @@ int32_t UsbdFunction::RemoveHdc()
 
 int32_t UsbdFunction::AddHdc()
 {
-    int32_t status = SetParameter(SYS_USB_CONFIGFS, HDC_CONFIGFS_ON);
-    if (status) {
-        HDF_LOGE("%{public}s:add hdc configfs error = %{public}d", __func__, status);
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_ON);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add hdc config error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
-    status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_ON);
-    if (status) {
-        HDF_LOGE("%{public}s:add hdc config error = %{public}d", __func__, status);
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::SetFunctionToRndis()
+{
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_RNDIS);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add rndis config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::SetFunctionToStorage()
+{
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_STORAGE);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add storage config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::SetFunctionToRndisHdc()
+{
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_RNDIS_HDC);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add rndis hdc config error = %{public}d", __func__, status);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::SetFunctionToStorageHdc()
+{
+    int32_t status = SetParameter(SYS_USB_CONFIG, HDC_CONFIG_STORAGE_HDC);
+    if (status != 0) {
+        HDF_LOGE("%{public}s:add storage hdc config error = %{public}d", __func__, status);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -163,25 +192,9 @@ int32_t UsbdFunction::SetFunctionToACMECM()
     return HDF_SUCCESS;
 }
 
-int32_t UsbdFunction::UsbdSetFunction(int funcs)
+int32_t UsbdFunction::SetDDKFunction(uint32_t funcs)
 {
     uint32_t acmEcm = (uint32_t)funcs & USB_FUNCTION_ACM_ECM;
-    if (funcs < USB_FUNCTION_NONE || funcs >= FUNCTIONS_MAX) {
-        HDF_LOGI("%{public}s:funcs invalid", __func__);
-        return HDF_FAILURE;
-    }
-
-    if (UsbdFunction::SetFunctionToNone()) {
-        HDF_LOGI("%{public}s:setFunctionToNone error", __func__);
-    }
-
-    if ((uint32_t)funcs & USB_FUNCTION_HDC) {
-        if (UsbdFunction::AddHdc()) {
-            HDF_LOGE("%{public}s:AddHdc error", __func__);
-            return HDF_FAILURE;
-        }
-    }
-
     if (acmEcm == USB_FUNCTION_ACM) {
         if (SetFunctionToACM()) {
             HDF_LOGE("%{public}s:set function to acm error", __func__);
@@ -198,7 +211,59 @@ int32_t UsbdFunction::UsbdSetFunction(int funcs)
             return HDF_FAILURE;
         }
     }
-    OsalMSleep(waitSleepTime_);
+    return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
+{
+    uint32_t kfuns = funcs & (~USB_FUNCTION_ACM_ECM);
+    if (funcs < USB_FUNCTION_NONE) {
+        HDF_LOGE("%{public}s:funcs invalid", __func__);
+        return HDF_FAILURE;
+    }
+    if (UsbdFunction::SetFunctionToNone()) {
+        HDF_LOGW("%{public}s:setFunctionToNone error", __func__);
+    }
+
+    switch (kfuns) {
+        case USB_FUNCTION_HDC:
+            if (UsbdFunction::AddHdc()) {
+                HDF_LOGE("%{public}s:AddHdc error", __func__);
+                return HDF_FAILURE;
+            }
+            OsalMSleep(HDC_READY_TIME);
+            break;
+        case USB_FUNCTION_RNDIS:
+            if (UsbdFunction::SetFunctionToRndis()) {
+                HDF_LOGE("%{public}s:SetFunctionToRndis error", __func__);
+                return HDF_FAILURE;
+            }
+            break;
+        case USB_FUNCTION_STORAGE:
+            if (UsbdFunction::SetFunctionToStorage()) {
+                HDF_LOGE("%{public}s:SetFunctionToStorage error", __func__);
+                return HDF_FAILURE;
+            }
+            break;
+        case USB_FUNCTION_RNDIS | USB_FUNCTION_HDC:
+            if (UsbdFunction::SetFunctionToRndisHdc()) {
+                HDF_LOGE("%{public}s:SetFunctionToRndisHdc error", __func__);
+                return HDF_FAILURE;
+            }
+            break;
+        case USB_FUNCTION_STORAGE | USB_FUNCTION_HDC:
+            if (UsbdFunction::SetFunctionToStorageHdc()) {
+                HDF_LOGE("%{public}s:SetFunctionToStorageHdc error", __func__);
+                return HDF_FAILURE;
+            }
+            break;
+        default:
+            break;
+    }
+    if (UsbdFunction::SetDDKFunction(funcs)) {
+        HDF_LOGE("%{public}s:SetDDKFunction error", __func__);
+        return HDF_FAILURE;
+    }
     currentFuncs_ = funcs;
     return HDF_SUCCESS;
 }

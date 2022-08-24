@@ -23,7 +23,7 @@
 #include "usbfn_io_mgr.h"
 
 #define HDF_LOG_TAG usbfn_dev_mgr
-#define SLEEP_100MS 100
+#define SLEEP_TIME_OUT 100
 #define SLEEP_TIMES 20
 
 static struct DListHead g_devEntry = {0};
@@ -117,7 +117,7 @@ static int32_t FindEmptyId(void)
             }
         }
         if (i == MAX_LIST) {
-            HDF_LOGE("%{public}s:%d too much device created!", __func__, __LINE__);
+            HDF_LOGE("%{public}s:%d too much device created", __func__, __LINE__);
             return -1;
         }
         devCnt = i;
@@ -182,19 +182,19 @@ static int32_t AllocInterfaceAndFuncMgr(struct UsbFnDeviceMgr *fnDevMgr, struct 
         }
     }
     if (fnDevMgr->fnDev.numInterfaces == 0) {
-        HDF_LOGE("%{public}s:%d functions is null!", __func__, __LINE__);
-        return HDF_ERR_IO;
+        HDF_LOGE("%s functions is null", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
     }
 
     fnDevMgr->interfaceMgr = UsbFnMemCalloc(fnDevMgr->fnDev.numInterfaces * sizeof(struct UsbFnInterfaceMgr));
     if (fnDevMgr->interfaceMgr == NULL) {
-        HDF_LOGE("%{public}s:%d UsbFnMemCalloc failed!", __func__, __LINE__);
+        HDF_LOGE("%s UsbFnMemCalloc failed", __func__);
         return HDF_ERR_IO;
     }
 
     fnDevMgr->funcMgr = UsbFnMemCalloc(fnDevMgr->numFunc * sizeof(struct UsbFnFuncMgr));
     if (fnDevMgr->funcMgr == NULL) {
-        HDF_LOGE("%{public}s:%d UsbFnMemCalloc failed!", __func__, __LINE__);
+        HDF_LOGE("%s UsbFnMemCalloc failed", __func__);
         UsbFnMemFree(fnDevMgr->interfaceMgr);
         return HDF_ERR_IO;
     }
@@ -215,29 +215,31 @@ const struct UsbFnDeviceMgr *UsbFnMgrDeviceCreate(
 
     fnDevMgr = UsbFnMemCalloc(sizeof(struct UsbFnDeviceMgr));
     if (fnDevMgr == NULL) {
-        HDF_LOGE("%{public}s UsbFnMemCalloc failed!", __func__);
+        HDF_LOGE("%{public}s UsbFnMemCalloc failed", __func__);
         return NULL;
     }
 
     ret = CreatDev(udcName, des, fnDevMgr);
     if (ret) {
-        HDF_LOGE("%{public}s CreatDev failed!", __func__);
+        HDF_LOGE("%{public}s CreatDev failed", __func__);
         goto FREE_DEVMGR;
     }
-
-    ret = AllocInterfaceAndFuncMgr(fnDevMgr, des);
-    if (ret) {
-        HDF_LOGE("%{public}s AllocInterfaceAndFuncMgr failed!", __func__);
-        goto FREE_DEVMGR;
-    }
-
-    CreateInterface(des, fnDevMgr);
     if (g_devEntry.next == 0) {
         DListHeadInit(&g_devEntry);
     }
     DListInsertTail(&fnDevMgr->fnDev.object.entry, &g_devEntry);
     fnDevMgr->node = node;
     fnDevMgr->des = des;
+
+    ret = AllocInterfaceAndFuncMgr(fnDevMgr, des);
+    if (ret == HDF_DEV_ERR_NO_DEVICE) {
+        return fnDevMgr;
+    } else if (ret != 0) {
+        HDF_LOGE("%{public}s AllocInterfaceAndFuncMgr failed", __func__);
+        goto FREE_DEVMGR;
+    }
+
+    CreateInterface(des, fnDevMgr);
     fnDevMgr->running = true;
     ret = StartThreadIo(fnDevMgr);
     if (ret) {
@@ -267,7 +269,7 @@ int32_t UsbFnMgrDeviceRemove(struct UsbFnDevice *fnDevice)
     fnDevMgr->running = false;
     while (!fnDevMgr->running) {
         i++;
-        OsalMSleep(SLEEP_100MS);
+        OsalMSleep(SLEEP_TIME_OUT);
         if (i > SLEEP_TIMES) {
             HDF_LOGE("%{public}s: wait thread exit timeout", __func__);
             break;
@@ -514,7 +516,7 @@ static int32_t UsbFnEventProcess(void *arg)
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     struct UsbFnEventAll event;
     struct UsbHandleMgr *handle = NULL;
-    int32_t timeout = SLEEP_100MS;
+    int32_t timeout = SLEEP_TIME_OUT;
 
     while (true) {
         if (devMgr == NULL || !devMgr->running) {
@@ -574,7 +576,7 @@ static int32_t StartThreadIo(struct UsbFnDeviceMgr *fnDevMgr)
         HDF_LOGE("%{public}s:%d OsalThreadCreate failed, ret = %d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
-    HDF_LOGD("%{public}s: Usb device OsalThreadCreate!", __func__);
+    HDF_LOGD("%{public}s: Usb device OsalThreadCreate", __func__);
     ret = OsalThreadStart(&fnDevMgr->thread, &threadCfg);
     if (HDF_SUCCESS != ret) {
         HDF_LOGE("%{public}s:%d OsalThreadStart failed, ret = %d ", __func__, __LINE__, ret);
