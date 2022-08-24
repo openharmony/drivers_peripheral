@@ -99,8 +99,8 @@ RetCode OfflinePipelineManager::DestoryOfflinePipelines()
     return RC_OK;
 }
 
-std::shared_ptr<OfflinePipeline>
-    OfflinePipelineManager::GetOfflinePipeline(int32_t streamId, const std::shared_ptr<IStreamPipelineCore>& pipeline)
+std::shared_ptr<OfflinePipeline> OfflinePipelineManager::GetOfflinePipeline(int32_t streamId,
+    const std::shared_ptr<IStreamPipelineCore>& pipeline)
 {
     if (pipeline == nullptr) {
         CAMERA_LOGE("online pipeline is nullptr.");
