@@ -890,11 +890,8 @@ static int32_t AudioCaptureReqMmapBufferInit(
         AUDIO_FUNC_LOGE("FormatToBits failed!");
         return ret;
     }
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(desc.filePath, pathBuf) == NULL) {
-        return HDF_FAILURE;
-    }
-    FILE *fp = fopen(pathBuf, "rb+");
+
+    FILE *fp = fopen(desc.filePath, "rb+");
     if (fp == NULL) {
         AUDIO_FUNC_LOGE("Open file failed!");
         return AUDIO_ERR_INTERNAL;

@@ -61,7 +61,6 @@ struct StrPara {
 struct AudioRender *g_render = NULL;
 struct AudioAdapter *g_adapter = NULL;
 struct AudioManager *g_manager = NULL;
-static struct AudioManager *g_proxyManager = NULL;
 struct AudioDeviceDescriptor g_devDesc;
 struct AudioSampleAttributes g_attrs;
 struct AudioPort g_audioPort;
@@ -319,10 +318,6 @@ static bool PrepareStopAndUloadAdapter(void)
         soMode = true;
         if (g_manager->UnloadAdapter != NULL) {
             g_manager->UnloadAdapter(g_manager, g_adapter);
-        }
-    } else {
-        if (g_proxyManager != NULL && g_proxyManager->UnloadAdapter != NULL) {
-            g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
         }
     }
 
@@ -660,7 +655,7 @@ static int32_t SwitchInternalOrExternal(char *adapterNameCase, int32_t nameLen)
     return HDF_SUCCESS;
 }
 
-static int32_t SelectLoadingMode(char *renderResolvedPath, int32_t pathLen, char *func, int32_t funcpathLen)
+static int32_t SelectLoadingMode(char *renderResolvedPath, int32_t pathLen)
 {
     system("clear");
     int choice = 0;
@@ -672,7 +667,7 @@ static int32_t SelectLoadingMode(char *renderResolvedPath, int32_t pathLen, char
         AUDIO_FUNC_LOGE("render CheckInputName failed!");
         return HDF_FAILURE;
     }
-    ret = FormatLoadLibPath(renderResolvedPath, pathLen, func, funcpathLen, choice);
+    ret = FormatLoadLibPath(renderResolvedPath, pathLen, choice);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("render FormatLoadLibPath failed!");
         return HDF_FAILURE;
@@ -699,7 +694,7 @@ static struct AudioManager *GetAudioManagerInsForRender(const char *funcString)
     return getAudioManager();
 }
 
-static int32_t GetRenderPassthroughManagerFunc(const char *adapterNameCase)
+static int32_t GetRenderManagerFunc(const char *adapterNameCase)
 {
     struct AudioAdapterDescriptor *descs = NULL;
     enum AudioPortDirection port = PORT_OUT; // Set port information
@@ -747,57 +742,6 @@ static int32_t GetRenderPassthroughManagerFunc(const char *adapterNameCase)
     return HDF_SUCCESS;
 }
 
-static int32_t GetRenderProxyManagerFunc(const char *adapterNameCase)
-{
-    struct AudioAdapterDescriptor *descs = NULL;
-    enum AudioPortDirection port = PORT_OUT; // Set port information
-    struct AudioPort renderPort;
-    int32_t size = 0;
-    if (adapterNameCase == NULL) {
-        AUDIO_FUNC_LOGE("The Parameter is NULL");
-        return HDF_FAILURE;
-    }
-    struct AudioManager *proxyManager = GetAudioManagerInsForRender("GetAudioManagerFuncs");
-    if (proxyManager == NULL) {
-        AUDIO_FUNC_LOGE("GetAudioManagerInsForRender Fail");
-        return HDF_FAILURE;
-    }
-    int32_t ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
-    if ((size == 0) || (descs == NULL) || (ret < 0)) {
-        AUDIO_FUNC_LOGE("Get All Adapters Fail");
-        return HDF_ERR_NOT_SUPPORT;
-    }
-    // Get qualified sound card and port
-    int32_t index = SwitchAdapter(descs, adapterNameCase, port, &renderPort, size);
-    if (index < 0) {
-        AUDIO_FUNC_LOGE("Not Switch Adapter Fail");
-        return HDF_ERR_NOT_SUPPORT;
-    }
-    struct AudioAdapterDescriptor *desc = &descs[index];
-    if (proxyManager->LoadAdapter(proxyManager, desc, &g_adapter)) {
-        AUDIO_FUNC_LOGE("Load Adapter Fail");
-        return HDF_ERR_NOT_SUPPORT;
-    }
-    g_proxyManager = proxyManager;
-    if (g_adapter == NULL) {
-        AUDIO_FUNC_LOGE("load audio device failed");
-        return HDF_FAILURE;
-    }
-    // Initialization port information, can fill through mode and other parameters
-    (void)g_adapter->InitAllPorts(g_adapter);
-    // User needs to set
-    if (InitAttrs(&g_attrs) < 0) {
-        g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
-        return HDF_FAILURE;
-    }
-    // Specify a hardware device
-    if (InitDevDesc(&g_devDesc, renderPort.portId) < 0) {
-        g_proxyManager->UnloadAdapter(g_proxyManager, g_adapter);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
 static int32_t InitParam(void)
 {
     /* Internal and external switch,begin */
@@ -806,8 +750,7 @@ static int32_t InitParam(void)
         return HDF_FAILURE;
     }
     char resolvedPath[PATH_LEN] = {0}; // Select loading mode,begin
-    char func[PATH_LEN] = {0};
-    if (SelectLoadingMode(resolvedPath, PATH_LEN, func, PATH_LEN) < 0) {
+    if (SelectLoadingMode(resolvedPath, PATH_LEN) < 0) {
         return HDF_FAILURE;
     }
     /* Select loading mode,end */
@@ -819,16 +762,9 @@ static int32_t InitParam(void)
         AUDIO_FUNC_LOGE("Open so Fail, reason:%s", dlerror());
         return HDF_FAILURE;
     }
-    if (strcmp(func, "GetAudioManagerFuncs") == 0) {
-        if (GetRenderPassthroughManagerFunc(adapterNameCase) < 0) {
-            AUDIO_FUNC_LOGE("GetPassthroughManagerFunc Fail");
-            return HDF_FAILURE;
-        }
-    } else {
-        if (GetRenderProxyManagerFunc(adapterNameCase) < 0) {
-            AUDIO_FUNC_LOGE("GetProxyManagerFunc Fail");
-            return HDF_FAILURE;
-        }
+    if (GetRenderManagerFunc(adapterNameCase) < 0) {
+        AUDIO_FUNC_LOGE("GetManagerFunc Failed.");
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }

@@ -38,15 +38,6 @@ void AudioMemFree(void **ppMem)
     return;
 }
 
-void AudioMemFreeOsalMem(void **ppMem)
-{
-    if ((ppMem != NULL) && ((*ppMem) != NULL)) {
-        OsalMemFree(*ppMem);
-        *ppMem = NULL;
-    }
-    return;
-}
-
 int32_t AudioGetSysTime(char *s, int32_t len)
 {
     OsalTimespec time;

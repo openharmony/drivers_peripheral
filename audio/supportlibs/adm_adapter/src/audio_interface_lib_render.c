@@ -17,7 +17,6 @@
 #include "audio_common.h"
 #include "audio_uhdf_log.h"
 #include "osal_mem.h"
-#include "osal_mem.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_LIB
 #define AUDIO_SBUF_EXTEND 64

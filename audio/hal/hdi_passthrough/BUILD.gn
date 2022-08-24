@@ -81,7 +81,9 @@ if (defined(ohos_lite)) {
       if (drivers_peripheral_audio_hal_notsupport_pathselect) {
         defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
       }
-
+      if (enable_audio_hal_hdf_log) {
+        defines += [ "AUDIO_HDF_LOG" ]
+      }
       if (is_standard_system) {
         external_deps = [
           "hdf_core:libhdf_host",
