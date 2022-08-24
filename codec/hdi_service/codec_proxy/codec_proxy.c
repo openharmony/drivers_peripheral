@@ -216,12 +216,14 @@ static int32_t CodecProxyCreate(struct ICodec *self, const char* name, CODEC_HAN
     }
     int32_t ret = CodecProxyCall(self, CMD_CODEC_CREATE, data, reply);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: call create failed! error code is %{public}d", __func__, ret);
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
     if (!HdfSbufReadUint64(reply, (uint64_t *)handle)) {
-        ret = HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s: read handle failed!", __func__);
+        CodecProxySBufRecycle(data, reply);
+        return HDF_ERR_INVALID_PARAM;
     }
     CodecProxySBufRecycle(data, reply);
     return ret;
@@ -257,12 +259,14 @@ static int32_t CodecCreateByType(struct ICodec *self, CodecType type, AvCodecMim
     }
     ret = CodecProxyCall(self, CMD_CODEC_CREATE_BY_TYPE, data, reply);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: call CreateByType failed! error code is %{public}d", __func__, ret);
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
     if (!HdfSbufReadUint64(reply, (uint64_t *)handle)) {
-        ret = HDF_ERR_INVALID_PARAM;
+        HDF_LOGE("%{public}s: failed to read handle!", __func__);
+        CodecProxySBufRecycle(data, reply);
+        return HDF_ERR_INVALID_PARAM;
     }
     CodecProxySBufRecycle(data, reply);
     return ret;
@@ -676,7 +680,7 @@ static int32_t CodecProxyDequeueInputParseReply(struct HdfSBuf *reply, int32_t *
     return HDF_SUCCESS;
 }
 
-int32_t CodecProxyDequeueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
+static int32_t CodecProxyDequeueInput(struct ICodec *self, CODEC_HANDLETYPE handle,
     uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *inputData)
 {
     struct HdfSBuf *data = NULL;
