@@ -33,19 +33,7 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
     "src/icodec_buffer.cpp",
   ]
 
-  cflags_cc = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-Wno-#warnings",
-    "-Wno-missing-braces",
-    "-Wno-missing-field-initializers",
-  ]
-
-  deps = [
-    "//drivers/peripheral/codec/hal/buffersequence:libbufferhandle_parcelable",
-    "//third_party/libdrm:libdrm",
-  ]
+  deps = [ "//drivers/peripheral/codec/hal/buffersequence:libbufferhandle_parcelable" ]
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_codec:codec_idl_headers",
