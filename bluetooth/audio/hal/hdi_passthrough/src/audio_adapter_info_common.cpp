@@ -161,71 +161,6 @@ int32_t AudioAdapterExist(const char *adapterName)
     return HDF_FAILURE;
 }
 
-static int32_t AudioAdapterPortSync(struct AudioPort *outPorts,
-    const struct AudioPort *desPorts, uint32_t portNum)
-{
-    uint32_t index;
-    int32_t ret;
-
-    if (outPorts == NULL || desPorts == NULL ||
-        portNum == 0 || portNum > SUPPORT_PORT_NUM_MAX) {
-        HDF_LOGE("Invalid parameter!\n");
-
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    for (index = 0; index < portNum; index++) {
-        if (outPorts[index].portName && desPorts[index].portName) {
-            ret = memcpy_s((void *)outPorts[index].portName, PORT_NAME_LEN,
-                desPorts[index].portName, strlen(desPorts[index].portName));
-            if (ret != EOK) {
-                HDF_LOGE("memcpy_s port name fail!\n");
-
-                return HDF_FAILURE;
-            }
-            outPorts[index].dir = desPorts[index].dir;
-            outPorts[index].portId = desPorts[index].portId;
-        }
-    }
-
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioAdaptersSync(void)
-{
-    int32_t i, ret;
-
-    if (g_audioAdapterDescs == NULL || g_audioAdapterOut == NULL ||
-        g_adapterNum <= 0 || g_adapterNum > SUPPORT_ADAPTER_NUM_MAX) {
-        return HDF_FAILURE;
-    }
-
-    for (i = 0; i < g_adapterNum; i++) {
-        if (g_audioAdapterDescs[i].adapterName &&
-            g_audioAdapterOut[i].adapterName) {
-            ret = memcpy_s((void *)g_audioAdapterOut[i].adapterName, ADAPTER_NAME_LEN,
-                g_audioAdapterDescs[i].adapterName,
-                strlen(g_audioAdapterDescs[i].adapterName));
-            if (ret != EOK) {
-                HDF_LOGE("memcpy_s adapter name fail!\n");
-
-                return HDF_FAILURE;
-            }
-
-            g_audioAdapterOut[i].portNum = g_audioAdapterDescs[i].portNum;
-            ret = AudioAdapterPortSync(g_audioAdapterOut[i].ports,
-                g_audioAdapterDescs[i].ports, g_audioAdapterOut[i].portNum);
-            if (ret != HDF_SUCCESS) {
-                HDF_LOGE("port sync fail!\n");
-
-                return HDF_FAILURE;
-            }
-        }
-    }
-
-    return HDF_SUCCESS;
-}
-
 static void AudioAdapterJudegReleaseDescs(const struct AudioAdapterDescriptor *desc)
 {
     uint32_t portIdx;
@@ -408,7 +343,7 @@ static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const
         return HDF_FAILURE;
     }
     ret = AudioAdaptersGetArraySize(adapterPorts, &realSize);
-    if (ret != HDF_SUCCESS || realSize != desc->portNum) {
+    if (ret != HDF_SUCCESS || realSize != (int)(desc->portNum)) {
         HDF_LOGE("realSize = %d, portNum = %d.\n", realSize, desc->portNum);
         HDF_LOGE("The defined portnum does not match the actual portnum!\n");
 
