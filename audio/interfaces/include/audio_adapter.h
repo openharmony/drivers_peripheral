@@ -264,7 +264,7 @@ struct AudioAdapter {
      * @param status Indicates the status of device .
      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      */
-    int32_t (*GetStatus)(struct AudioAdapter *adapter, struct AudioStatus *status);
+    int32_t (*GetDeviceStatus)(struct AudioAdapter *adapter, struct AudioDeviceStatus *status);
 };
 #endif /* AUDIO_ADAPTER_H */
 /** @} */
