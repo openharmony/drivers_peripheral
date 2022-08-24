@@ -93,6 +93,10 @@ int32_t ConnectedTagServerStub::StubWriteNdef(MessageParcel& data, MessageParcel
 int32_t ConnectedTagServerStub::OnRemoteRequest(uint32_t code, MessageParcel& data, MessageParcel& reply,
     MessageOption& option)
 {
+    (void)code;
+    (void)data;
+    (void)reply;
+    (void)option;
     return HDF_SUCCESS;
 }
 int32_t ConnectedTagServerStub::Init()
