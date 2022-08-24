@@ -580,8 +580,8 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureSetGain_0002, TestSize.
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    float gainOne = max+1;
-    float gainSec = min-1;
+    float gainOne = max + 1;
+    float gainSec = min - 1;
     ret = capture->volume.SetGain((AudioHandle)capture, gainOne);
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
@@ -634,8 +634,8 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGain_0001, TestSize.
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    float gain = min+1;
-    float gainValue = min+1;
+    float gain = min + 1;
+    float gainValue = min + 1;
     ret = capture->volume.SetGain((AudioHandle)capture, gain);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->volume.GetGain((AudioHandle)capture, &gain);
@@ -676,8 +676,8 @@ HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGain_0002, TestSize.
 HWTEST_F(AudioHdiCaptureVolumeTest, SUB_Audio_hdi_CaptureGetGain_0003, TestSize.Level1)
 {
     int32_t ret = -1;
-    float gain = GAIN_MAX-1;
-    float gainOne = GAIN_MAX-1;
+    float gain = GAIN_MAX - 1;
+    float gainOne = GAIN_MAX - 1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, manager);

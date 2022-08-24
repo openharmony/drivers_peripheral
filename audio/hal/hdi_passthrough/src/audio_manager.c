@@ -184,8 +184,7 @@ static int32_t InitPathSelectSoHandle(const char *pathSelectSoPath)
 #endif
 
 int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
-                                   struct AudioAdapterDescriptor **descs,
-                                   int *size)
+    struct AudioAdapterDescriptor **descs, int *size)
 {
     AUDIO_FUNC_LOGI();
     if (manager == NULL || descs == NULL || size == NULL) {
