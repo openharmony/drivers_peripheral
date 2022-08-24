@@ -460,9 +460,9 @@ static int32_t FrameStart(const struct StrPara *param)
     char *frame = strParam->frame;
     int32_t bufferSize = strParam->bufferSize;
     int32_t ret;
-    int32_t readSize;
+    size_t readSize;
     int32_t remainingDataSize = (int32_t)g_wavHeadInfo.testFileRiffSize;
-    uint32_t numRead;
+    size_t numRead;
     (void)signal(SIGINT, StreamClose);
     uint64_t replyBytes;
     if (g_file == NULL) {
@@ -473,9 +473,9 @@ static int32_t FrameStart(const struct StrPara *param)
     }
     do {
         readSize = (remainingDataSize > bufferSize) ? bufferSize : remainingDataSize;
-        numRead = (uint32_t)fread(frame, 1, (size_t)readSize, g_file);
+        numRead = fread(frame, 1, readSize, g_file);
         if (numRead > 0) {
-            ret = render->RenderFrame(render, (int8_t *)frame, (size_t)numRead, &replyBytes);
+            ret = render->RenderFrame(render, (int8_t *)frame, numRead, &replyBytes);
             if (ret == HDF_ERR_INVALID_OBJECT) {
                 AUDIO_FUNC_LOGE("Render already stop!");
                 break;

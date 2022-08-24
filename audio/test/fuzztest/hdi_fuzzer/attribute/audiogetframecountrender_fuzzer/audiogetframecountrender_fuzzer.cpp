@@ -23,22 +23,22 @@ namespace Audio {
     {
         bool result = false;
         uint64_t count = 0;
-        TestAudioManager *FreamRenderManager = nullptr;
-        struct AudioAdapter *FreamRenderAdapter = nullptr;
-        struct AudioRender *FreamRender = nullptr;
-        int32_t ret = AudioGetManagerCreateRender(FreamRenderManager, &FreamRenderAdapter, &FreamRender);
-        if (ret < 0 || FreamRenderAdapter == nullptr || FreamRender == nullptr || FreamRenderManager == nullptr) {
+        TestAudioManager *frameRenderManager = nullptr;
+        struct AudioAdapter *frameRenderAdapter = nullptr;
+        struct AudioRender *frameRender = nullptr;
+        int32_t ret = AudioGetManagerCreateRender(frameRenderManager, &frameRenderAdapter, &frameRender);
+        if (ret < 0 || frameRenderAdapter == nullptr || frameRender == nullptr || frameRenderManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
             return false;
         }
 
         struct AudioRender *handle = (struct AudioRender *)data;
-        ret = FreamRender->attr.GetFrameCount(handle, &count);
+        ret = frameRender->attr.GetFrameCount(handle, &count);
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        FreamRenderAdapter->DestroyRender(FreamRenderAdapter, FreamRender);
-        FreamRenderManager->UnloadAdapter(FreamRenderManager, FreamRenderAdapter);
+        frameRenderAdapter->DestroyRender(frameRenderAdapter, frameRender);
+        frameRenderManager->UnloadAdapter(frameRenderManager, frameRenderAdapter);
         return result;
     }
 }
