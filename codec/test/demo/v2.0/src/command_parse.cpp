@@ -14,7 +14,7 @@
  */
 #include "command_parse.h"
 #include <getopt.h>
-
+#include <iostream>
 namespace {
     enum class MyOptIndex {
         OPT_INDEX_UNKONWN = 0,

@@ -14,13 +14,8 @@
  */
 
 #include "codec_hdi_decode.h"
-#include <chrono>
-#include <dlfcn.h>
 #include <hdf_log.h>
-#include <osal_time.h>
 #include <securec.h>
-#include <sys/mman.h>
-#include <unistd.h>
 #include "codec_omx_ext.h"
 
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiDecode::gralloc_ = nullptr;

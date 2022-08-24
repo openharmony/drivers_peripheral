@@ -18,6 +18,7 @@
 #include <dlfcn.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <memory.h>
 #include <securec.h>
 namespace OHOS {
 namespace Codec {
