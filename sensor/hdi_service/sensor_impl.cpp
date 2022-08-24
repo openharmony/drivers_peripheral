@@ -175,6 +175,8 @@ int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
         hdfSensorInfo.maxRange = tmp->maxRange;
         hdfSensorInfo.accuracy = tmp->accuracy;
         hdfSensorInfo.power = tmp->power;
+        hdfSensorInfo.minDelay = tmp->minDelay;
+        hdfSensorInfo.maxDelay = tmp->maxDelay;
         info.push_back(std::move(hdfSensorInfo));
         tmp++;
     }
@@ -283,7 +285,6 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallback> &callb
         if (callBackIter == g_groupIdCallBackMap[groupId].end()) {
             int32_t addResult = AddSensorDeathRecipient(callbackObj);
             if (addResult != SENSOR_SUCCESS) {
-                HDF_LOGE("%{public}s: callback AddSensorDeathRecipient fail, groupId[%{public}d]", __func__, groupId);
                 return HDF_FAILURE;
             }
             g_groupIdCallBackMap[groupId].push_back(callbackObj);
@@ -293,7 +294,6 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallback> &callb
 
     int32_t addResult = AddSensorDeathRecipient(callbackObj);
     if (addResult != SENSOR_SUCCESS) {
-        HDF_LOGE("%{public}s: first callback AddDeathRecipient fail, groupId is[%{public}d]", __func__, groupId);
         return HDF_FAILURE;
     }
     int32_t ret = HDF_FAILURE;
