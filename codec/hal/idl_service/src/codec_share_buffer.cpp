@@ -15,9 +15,9 @@
 
 #include "codec_share_buffer.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
 #include <securec.h>
 #include <unistd.h>
+#include "codec_log_wrapper.h"
 using namespace OHOS::HDI::Codec::V1_0;
 namespace OHOS {
 namespace Codec {
@@ -42,7 +42,7 @@ void CodecShareBuffer::SetAshMem(std::shared_ptr<OHOS::Ashmem> shMem)
 OHOS::sptr<ICodecBuffer> CodecShareBuffer::Create(struct OmxCodecBuffer &codecBuffer)
 {
     if (codecBuffer.fd < 0) {
-        HDF_LOGE("%{public}s error, codecBuffer.fd < 0", __func__);
+        CODEC_LOGE("codecBuffer.fd is invalid");
         return nullptr;
     }
     int size = OHOS::AshmemGetSize(codecBuffer.fd);
@@ -54,7 +54,7 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Create(struct OmxCodecBuffer &codecBu
         mapd = sharedMem->MapReadOnlyAshmem();
     }
     if (!mapd) {
-        HDF_LOGE("%{public}s error, MapReadAndWriteAshmem or MapReadOnlyAshmem return false", __func__);
+        CODEC_LOGE("MapReadAndWriteAshmem or MapReadOnlyAshmem return false");
         return nullptr;
     }
     codecBuffer.fd = -1;
@@ -78,7 +78,7 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Allocate(struct OmxCodecBuffer &codec
         mapd = sharedMemory->MapReadOnlyAshmem();
     }
     if (!mapd) {
-        HDF_LOGE("%{public}s error, MapReadAndWriteAshmem or MapReadOnlyAshmem return false", __func__);
+        CODEC_LOGE("MapReadAndWriteAshmem or MapReadOnlyAshmem return false");
         return nullptr;
     }
     codecBuffer.offset = 0;
@@ -92,7 +92,7 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Allocate(struct OmxCodecBuffer &codec
 int32_t CodecShareBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
 {
     if (!CheckInvalid(codecBuffer) || codecBuffer_.type != READ_WRITE_TYPE) {
-        HDF_LOGE("%{public}s :CheckInvalid return false or mem has no right to write ", __func__);
+        CODEC_LOGE("CheckInvalid return false or mem has no right to write ");
         return HDF_ERR_INVALID_PARAM;
     }
     ReleaseFd(codecBuffer);
@@ -102,7 +102,7 @@ int32_t CodecShareBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
 int32_t CodecShareBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
 {
     if (!CheckInvalid(codecBuffer)) {
-        HDF_LOGE("%{public}s :shMem_ is null or CheckInvalid return false", __func__);
+        CODEC_LOGE("shMem_ is null or CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -110,14 +110,14 @@ int32_t CodecShareBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX
 
     void *sharedPtr = const_cast<void *>(shMem_->ReadFromAshmem(codecBuffer.filledLen, codecBuffer.offset));
     if (!sharedPtr) {
-        HDF_LOGE("%{public}s error, omxBuffer.length [%{public}d omxBuffer.offset[%{public}d]", __func__,
-                 codecBuffer.filledLen, codecBuffer.offset);
+        CODEC_LOGE("omxBuffer.length [%{public}d omxBuffer.offset[%{public}d]", codecBuffer.filledLen,
+                   codecBuffer.offset);
         return HDF_ERR_INVALID_PARAM;
     }
     auto ret = memcpy_s(omxBuffer.pBuffer + codecBuffer.offset, codecBuffer.allocLen - codecBuffer.offset, sharedPtr,
                         codecBuffer.filledLen);
     if (ret != EOK) {
-        HDF_LOGE("%{public}s error, memcpy_s ret [%{public}d", __func__, ret);
+        CODEC_LOGE("memcpy_s ret [%{public}d]", ret);
         return HDF_ERR_INVALID_PARAM;
     }
     return ICodecBuffer::EmptyOmxBuffer(codecBuffer, omxBuffer);
@@ -126,7 +126,7 @@ int32_t CodecShareBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX
 int32_t CodecShareBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
 {
     if (!CheckInvalid(codecBuffer)) {
-        HDF_LOGE("%{public}s :shMem_ is null or CheckInvalid return false", __func__);
+        CODEC_LOGE("shMem_ is null or CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -151,7 +151,7 @@ int32_t CodecShareBuffer::EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
 int32_t CodecShareBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
 {
     if (shMem_ == nullptr || !shMem_->WriteToAshmem(omxBuffer.pBuffer, omxBuffer.nFilledLen, omxBuffer.nOffset)) {
-        HDF_LOGE("%{public}s write to ashmem[%{public}p] fail", __func__, shMem_.get());
+        CODEC_LOGE("write to ashmem[%{public}p] fail", shMem_.get());
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -161,7 +161,7 @@ int32_t CodecShareBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
 bool CodecShareBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
 {
     if (!ICodecBuffer::CheckInvalid(codecBuffer) || shMem_ == nullptr) {
-        HDF_LOGE("%{public}s :shMem_ is null or CheckInvalid return false", __func__);
+        CODEC_LOGE("shMem_ is null or CheckInvalid return false");
         return false;
     }
     return true;
