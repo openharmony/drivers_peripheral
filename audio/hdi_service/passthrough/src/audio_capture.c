@@ -881,18 +881,15 @@ static int32_t AudioCaptureReqMmapBufferInit(
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-
     int32_t flags = 0;
     int64_t fileSize = 0;
     struct AudioMmapBufferDescripter desc = *tempDesc;
     uint32_t formatBits = 0;
-
     int32_t ret = FormatToBits(capture->captureParam.frameCaptureMode.attrs.format, &formatBits);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("FormatToBits failed!");
         return ret;
     }
-
     char pathBuf[PATH_MAX] = {'\0'};
     if (realpath(desc.filePath, pathBuf) == NULL) {
         return HDF_FAILURE;
@@ -902,17 +899,14 @@ static int32_t AudioCaptureReqMmapBufferInit(
         AUDIO_FUNC_LOGE("Open file failed!");
         return AUDIO_ERR_INTERNAL;
     }
-
     ret = SetDescParam(&desc, fp, reqSize, &fileSize, &flags);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("SetDescParam failed!");
         fclose(fp);
         return AUDIO_ERR_INTERNAL;
     }
-
     // formatBits Move right 3
     desc.totalBufferFrames = reqSize / (capture->captureParam.frameCaptureMode.attrs.channelCount * (formatBits >> 3));
-
     InterfaceLibModeCapturePassthrough *pInterfaceLibModeCapture = AudioPassthroughGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
         AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Is NULL");
@@ -920,29 +914,18 @@ static int32_t AudioCaptureReqMmapBufferInit(
         fclose(fp);
         return AUDIO_ERR_INTERNAL;
     }
-
-    capture->captureParam.frameCaptureMode.mmapBufDesc.memoryAddress = desc.memoryAddress;
-    capture->captureParam.frameCaptureMode.mmapBufDesc.memoryFd = desc.memoryFd;
-    capture->captureParam.frameCaptureMode.mmapBufDesc.totalBufferFrames = desc.totalBufferFrames;
-    capture->captureParam.frameCaptureMode.mmapBufDesc.transferFrameSize = desc.transferFrameSize;
-    capture->captureParam.frameCaptureMode.mmapBufDesc.isShareable = desc.isShareable;
-    capture->captureParam.frameCaptureMode.mmapBufDesc.offset = desc.offset;
-
+    capture->captureParam.frameCaptureMode.mmapBufDesc = desc;
     ret = (*pInterfaceLibModeCapture)(
         capture->devDataHandle, &capture->captureParam, AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER_CAPTURE);
-
     if (msync(desc.memoryAddress, fileSize, MS_ASYNC) < 0) {
         AUDIO_FUNC_LOGE("sync fail!");
     }
-
     munmap(desc.memoryAddress, reqSize);
     (void)fclose(fp);
-
     if (ret < 0) {
         AUDIO_FUNC_LOGE("AudioCaptureReqMmapBuffer FAIL!");
-        return AUDIO_ERR_INTERNAL;
     }
-    return AUDIO_SUCCESS;
+    return ret;
 }
 
 int32_t AudioCaptureReqMmapBuffer(
