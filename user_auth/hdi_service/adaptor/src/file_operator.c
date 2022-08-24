@@ -15,6 +15,8 @@
 
 #include "file_operator.h"
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include "securec.h"
 #include "adaptor_log.h"
@@ -66,6 +68,13 @@ static int32_t WriteFile(const char *fileName, const uint8_t *buf, uint32_t len)
     if (fileOperator == NULL) {
         LOG_ERROR("open file failed");
         return RESULT_BAD_PARAM;
+    }
+
+    /* Set the file permission to 640 */
+    if (chmod(fileName, S_IRUSR | S_IWUSR | S_IRGRP) != 0) {
+        LOG_ERROR("chmod file fail, and file name is : %{public}s", fileName);
+        (void)fclose(fileOperator);
+        return RESULT_GENERAL_ERROR;
     }
     size_t writeLen = fwrite(buf, sizeof(uint8_t), len, fileOperator);
     if (writeLen != len) {
