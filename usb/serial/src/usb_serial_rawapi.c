@@ -14,6 +14,7 @@
  */
 
 #include <unistd.h>
+
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "hdf_usb_pnp_manage.h"
@@ -719,26 +720,25 @@ static int32_t SerialWrite(struct SerialDevice *port, struct HdfSBuf *data)
     struct AcmWb *wb = NULL;
     const char *tmp = NULL;
     int32_t size;
-    int32_t ret;
     int32_t wbn;
 
     if (port == NULL) {
-        HDF_LOGE("%d: invalid parma", __LINE__);
+        HDF_LOGE("%{public}s: port is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     acm = port->acm;
     if (acm == NULL) {
-        HDF_LOGE("%d: invalid parma", __LINE__);
+        HDF_LOGE("%{public}s: acm is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (AcmWbIsAvail(acm)) {
         wbn = AcmWbAlloc(acm);
     } else {
-        HDF_LOGE("no write buf\n");
+        HDF_LOGE("%{public}s: no write buf", __func__);
         return HDF_SUCCESS;
     }
     if (wbn < 0 || wbn >= ACM_NW) {
-        HDF_LOGE("AcmWbAlloc failed\n");
+        HDF_LOGE("%{public}s: AcmWbAlloc failed", __func__);
         return HDF_FAILURE;
     }
     wb = &acm->wb[wbn];
@@ -747,22 +747,20 @@ static int32_t SerialWrite(struct SerialDevice *port, struct HdfSBuf *data)
     }
     tmp = HdfSbufReadString(data);
     if (tmp == NULL) {
-        HDF_LOGE("%s: sbuf read buffer failed", __func__);
+        HDF_LOGE("%{public}s: sbuf read buffer failed", __func__);
         return HDF_ERR_IO;
     }
-    size = strlen(tmp) + 1;
+    size = (int32_t)strlen(tmp) + 1;
     if (acm->dataOutEp != NULL) {
         size = (size > acm->dataOutEp->maxPacketSize) ? acm->dataOutEp->maxPacketSize : size;
-        ret = memcpy_s(wb->buf, acm->dataOutEp->maxPacketSize, tmp, size);
-        if (ret != EOK) {
-            HDF_LOGE("%s: memcpy_s fail", __func__);
+        if (memcpy_s(wb->buf, acm->dataOutEp->maxPacketSize, tmp, size) != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s fail", __func__);
         }
     }
     wb->len = (int)size;
 
-    ret = AcmStartWb(acm, wb);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: AcmStartWb failed, ret=%{public}d", __func__, ret);
+    if (AcmStartWb(acm, wb) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AcmStartWb failed", __func__);
         return HDF_FAILURE;
     }
     return size;
@@ -797,23 +795,22 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     struct AcmWb *wb = NULL;
     const char *tmp = NULL;
     int32_t size;
-    int32_t ret;
     int32_t wbn;
 
     if (port == NULL) {
-        HDF_LOGE("%d: invalid parma", __LINE__);
+        HDF_LOGE("%{public}s: invalid parma", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     acm = port->acm;
     if (acm == NULL) {
-        HDF_LOGE("%d: invalid parma", __LINE__);
+        HDF_LOGE("%{public}s: invalid parma", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (AcmWbIsAvail(acm)) {
         wbn = AcmWbAlloc(acm);
     } else {
-        HDF_LOGE("no write buf\n");
+        HDF_LOGE("%{public}s: no write buf", __func__);
         return HDF_SUCCESS;
     }
 
@@ -826,23 +823,21 @@ static int32_t SerialWriteSync(const struct SerialDevice *port, const struct Hdf
     }
     tmp = HdfSbufReadString((struct HdfSBuf *)data);
     if (tmp == NULL) {
-        HDF_LOGE("%s: sbuf read buffer failed", __func__);
+        HDF_LOGE("%{public}s: sbuf read buffer failed", __func__);
         return HDF_ERR_IO;
     }
-    size = strlen(tmp) + 1;
+    size = (int32_t)strlen(tmp) + 1;
     if (acm->dataOutEp == NULL) {
         return HDF_ERR_IO;
     }
     size = (size > acm->dataOutEp->maxPacketSize) ? acm->dataOutEp->maxPacketSize : size;
-    ret = memcpy_s(wb->buf, acm->dataOutEp->maxPacketSize, tmp, size);
-    if (ret != EOK) {
-        HDF_LOGE("%s: memcpy_s fail, ret=%d", __func__, ret);
+    if (memcpy_s(wb->buf, acm->dataOutEp->maxPacketSize, tmp, size) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed", __func__);
     }
     wb->len = (int)size;
 
-    ret = AcmStartWbSync(acm, wb);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: AcmStartWbSync failed, ret=%d", __func__, ret);
+    if (AcmStartWbSync(acm, wb) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AcmStartWbSync failed", __func__);
         return HDF_FAILURE;
     }
 
@@ -921,21 +916,18 @@ static int32_t UsbSerialDeviceDispatch(
     struct AcmDevice *acm = NULL;
     struct SerialDevice *port = NULL;
 
-    if (client == NULL) {
-        HDF_LOGE("%s:%d client is NULL", __func__, __LINE__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-    if (client->device == NULL) {
-        HDF_LOGE("%s:%d client->device is NULL", __func__, __LINE__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-    if (client->device->service == NULL) {
-        HDF_LOGE("%s:%d client->device->service is NULL", __func__, __LINE__);
+    if ((client == NULL) || (client->device == NULL)) {
+        HDF_LOGE("%{public}s: client or client->device is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    if (g_rawAcmReleaseFlag) {
-        HDF_LOGE("%s:%d g_rawAcmReleaseFlag is true", __func__, __LINE__);
+    if (client->device->service == NULL) {
+        HDF_LOGE("%{public}s: client->device->service is NULL", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+
+    if (g_rawAcmReleaseFlag == true) {
+        HDF_LOGE("%{public}s: g_rawAcmReleaseFlag is true", __func__);
         return HDF_FAILURE;
     }
 

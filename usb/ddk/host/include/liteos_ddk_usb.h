@@ -42,4 +42,4 @@
 #define UsbAdapterUrb                   urb
 #define UsbAdapterSpinLock              SPIN_LOCK_S
 
-#endif  /* USB_LITEOS_DDK_USB_H */
+#endif /* USB_LITEOS_DDK_USB_H */
