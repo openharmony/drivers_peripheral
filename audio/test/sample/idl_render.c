@@ -103,9 +103,9 @@ struct AudioSampleAttributes g_attrs;
 struct AudioPort g_audioPort;
 struct AudioHeadInfo g_wavHeadInfo;
 static struct StrPara g_str;
-void (*g_AudioManagerRelease)(struct IAudioManager *) = NULL;
-void (*g_AudioAdapterRelease)(struct IAudioAdapter *) = NULL;
-void (*g_AudioRenderRelease)(struct IAudioRender *) = NULL;
+void (*g_audioManagerRelease)(struct IAudioManager *) = NULL;
+void (*g_audioAdapterRelease)(struct IAudioAdapter *) = NULL;
+void (*g_audioRenderRelease)(struct IAudioRender *) = NULL;
 
 pthread_t g_tids;
 char *g_frame = NULL;
@@ -380,7 +380,7 @@ static int32_t StopAudioFiles(struct IAudioRender **renderS)
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Destroy Render!");
     }
-    g_AudioRenderRelease(render);
+    g_audioRenderRelease(render);
     *renderS = NULL;
     g_render = NULL;
     if (g_frame != NULL) {
@@ -460,9 +460,9 @@ static int32_t FrameStart(const struct StrPara *param)
     char *frame = strParam->frame;
     int32_t bufferSize = strParam->bufferSize;
     int32_t ret;
-    int32_t readSize;
+    size_t readSize;
     int32_t remainingDataSize = (int32_t)g_wavHeadInfo.testFileRiffSize;
-    uint32_t numRead;
+    size_t numRead;
     (void)signal(SIGINT, StreamClose);
     uint64_t replyBytes;
     if (g_file == NULL) {
@@ -473,9 +473,9 @@ static int32_t FrameStart(const struct StrPara *param)
     }
     do {
         readSize = (remainingDataSize > bufferSize) ? bufferSize : remainingDataSize;
-        numRead = (uint32_t)fread(frame, 1, readSize, g_file);
+        numRead = fread(frame, 1, readSize, g_file);
         if (numRead > 0) {
-            ret = render->RenderFrame(render, (int8_t *)frame, (size_t)numRead, &replyBytes);
+            ret = render->RenderFrame(render, (int8_t *)frame, numRead, &replyBytes);
             if (ret == HDF_ERR_INVALID_OBJECT) {
                 AUDIO_FUNC_LOGE("Render already stop!");
                 break;
@@ -620,12 +620,12 @@ static int32_t PlayingAudioInitRender(struct IAudioRender **renderTemp)
     if (render->Start((void *)render)) {
         AUDIO_FUNC_LOGE("Start Bind Fail!");
         g_adapter->DestroyRender(g_adapter);
-        g_AudioRenderRelease(render);
+        g_audioRenderRelease(render);
         return HDF_FAILURE;
     }
     if (InitPlayingAudioParam(render) < 0) {
         g_adapter->DestroyRender(g_adapter);
-        g_AudioRenderRelease(render);
+        g_audioRenderRelease(render);
         return HDF_FAILURE;
     }
     *renderTemp = render;
@@ -658,7 +658,7 @@ static int32_t PlayingAudioFiles(struct IAudioRender **renderS)
         if (g_adapter != NULL && g_adapter->DestroyRender != NULL) {
             g_adapter->DestroyRender(g_adapter);
         }
-        g_AudioRenderRelease(render);
+        g_audioRenderRelease(render);
         return HDF_FAILURE;
     }
 
@@ -876,7 +876,7 @@ static int32_t RenderGetAdapterAndInitEnvParams(const char *adapterNameCase)
     }
     if (InitRenderParam(adapterNameCase, renderPort.portId) < 0) {
         g_audioManager->UnloadAdapter(g_audioManager, adapterNameCase);
-        g_AudioAdapterRelease(g_adapter);
+        g_audioAdapterRelease(g_adapter);
         g_adapter = NULL;
         return HDF_FAILURE;
     }
@@ -885,18 +885,18 @@ static int32_t RenderGetAdapterAndInitEnvParams(const char *adapterNameCase)
 
 static int32_t InitReleaseFun(void)
 {
-    g_AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(g_handle, "AudioManagerRelease"));
-    if (g_AudioManagerRelease == NULL) {
+    g_audioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(g_handle, "AudioManagerRelease"));
+    if (g_audioManagerRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioManagerRelease fun ptr failed");
         return HDF_FAILURE;
     }
-    g_AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(g_handle, "AudioAdapterRelease"));
-    if (g_AudioAdapterRelease == NULL) {
+    g_audioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(g_handle, "AudioAdapterRelease"));
+    if (g_audioAdapterRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioAdapterRelease fun ptr failed");
         return HDF_FAILURE;
     }
-    g_AudioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(g_handle, "AudioRenderRelease"));
-    if (g_AudioRenderRelease == NULL) {
+    g_audioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(g_handle, "AudioRenderRelease"));
+    if (g_audioRenderRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioRenderRelease fun ptr failed");
         return HDF_FAILURE;
     }
@@ -929,7 +929,7 @@ static int32_t InitParam(void)
     if (RenderGetAdapterAndInitEnvParams(g_adapterName) < 0) {
         AUDIO_FUNC_LOGE("GetProxyManagerFunc Fail");
         if (g_audioManager != NULL) {
-            g_AudioManagerRelease(g_audioManager);
+            g_audioManagerRelease(g_audioManager);
             g_audioManager = NULL;
         }
         dlclose(g_handle);
@@ -1345,7 +1345,7 @@ int32_t main(int32_t argc, char const *argv[])
         return HDF_FAILURE;
     }
     (void)fclose(file);
-    if (InitParam()) { // init
+    if (InitParam() != HDF_SUCCESS) { // init
         AUDIO_FUNC_LOGE("InitParam Fail!");
         return HDF_FAILURE;
     }
@@ -1355,9 +1355,9 @@ int32_t main(int32_t argc, char const *argv[])
     }
     if (g_audioManager != NULL && g_audioManager->UnloadAdapter != NULL) {
         g_audioManager->UnloadAdapter(g_audioManager, g_adapterName);
-        g_AudioAdapterRelease(g_adapter);
+        g_audioAdapterRelease(g_adapter);
         g_adapter = NULL;
-        g_AudioManagerRelease(g_audioManager);
+        g_audioManagerRelease(g_audioManager);
         g_audioManager = NULL;
     }
     dlclose(g_handle);

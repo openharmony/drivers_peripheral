@@ -824,8 +824,7 @@ static int32_t GetRenderPassthroughManagerFunc(const char *adapterNameCase)
         return HDF_FAILURE;
     }
     int32_t ret = manager->GetAllAdapters(manager, &descs, &size);
-    int32_t check = size == 0 || descs == NULL || ret < 0;
-    if (check) {
+    if ((size == 0) || (descs == NULL) || (ret < 0)) {
         AUDIO_FUNC_LOGE("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
     }
@@ -873,8 +872,7 @@ static int32_t GetRenderProxyManagerFunc(const char *adapterNameCase)
         return HDF_FAILURE;
     }
     int32_t ret = proxyManager->GetAllAdapters(proxyManager, &descs, &size);
-    int32_t temp = size == 0 || descs == NULL || ret < 0;
-    if (temp) {
+    if ((size == 0) || (descs == NULL) || (ret < 0)) {
         AUDIO_FUNC_LOGE("Get All Adapters Fail");
         return HDF_ERR_NOT_SUPPORT;
     }
@@ -1349,7 +1347,7 @@ int32_t main(int32_t argc, char const *argv[])
     }
     (void)fclose(file);
     bool soMode = false;
-    if (InitParam()) { // init
+    if (InitParam() != HDF_SUCCESS) { // init
         AUDIO_FUNC_LOGE("InitParam Fail!");
         return HDF_FAILURE;
     }

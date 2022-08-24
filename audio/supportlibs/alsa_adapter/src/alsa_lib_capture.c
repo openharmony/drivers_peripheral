@@ -220,7 +220,6 @@ int32_t AudioCtlCaptureSetMuteStu(
 {
     int32_t ret;
     bool muteState;
-    struct AudioCardInfo *cardIns;
 
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {

@@ -23,11 +23,11 @@ namespace Audio {
     {
         bool result = false;
         uint64_t fsize = 0;
-        TestAudioManager *FreamCaptureManager = nullptr;
-        struct AudioAdapter *FreamCaptureAdapter = nullptr;
+        TestAudioManager *frameCaptureManager = nullptr;
+        struct AudioAdapter *frameCaptureAdapter = nullptr;
         struct AudioCapture *capture = nullptr;
-        int32_t ret = AudioGetManagerCreateCapture(FreamCaptureManager, &FreamCaptureAdapter, &capture);
-        if (ret < 0 || FreamCaptureAdapter == nullptr || capture == nullptr || FreamCaptureManager == nullptr) {
+        int32_t ret = AudioGetManagerCreateCapture(frameCaptureManager, &frameCaptureAdapter, &capture);
+        if (ret < 0 || frameCaptureAdapter == nullptr || capture == nullptr || frameCaptureManager == nullptr) {
             HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
             return false;
         }
@@ -37,8 +37,8 @@ namespace Audio {
         if (ret == HDF_SUCCESS) {
             result = true;
         }
-        FreamCaptureAdapter->DestroyCapture(FreamCaptureAdapter, capture);
-        FreamCaptureManager->UnloadAdapter(FreamCaptureManager, FreamCaptureAdapter);
+        frameCaptureAdapter->DestroyCapture(frameCaptureAdapter, capture);
+        frameCaptureManager->UnloadAdapter(frameCaptureManager, frameCaptureAdapter);
         return result;
     }
 }
