@@ -332,7 +332,7 @@ static void AudioPnpSvcEvenReceived(struct ServiceStatusListener *listener, stru
     return;
 }
 
-static int RegisterListen(struct StrParaCapture *capture)
+static int RegisterListen(const struct StrParaCapture *capture)
 {
     int status;
     if (capture == NULL) {
@@ -400,7 +400,7 @@ static uint32_t StringToInt(const char *flag)
     return temp;
 }
 
-static int32_t AddWavFileHeader(struct StrParaCapture *strParam)
+static int32_t AddWavFileHeader(const struct StrParaCapture *strParam)
 {
     if (strParam == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");

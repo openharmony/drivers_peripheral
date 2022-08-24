@@ -311,6 +311,7 @@ static void ReportHandleInputEvent(const EventPackage *pkg)
 static void ReportEventPkgCallback(const EventPackage **pkgs, uint32_t count, uint32_t devIndex)
 {
     int32_t i;
+    (void)devIndex;
 
     if (pkgs == NULL) {
         HDF_LOGE("%s: pkgs is NULL.", __func__);

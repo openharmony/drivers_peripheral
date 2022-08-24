@@ -361,7 +361,7 @@ static void GetDevCardsInfo(snd_ctl_t *handle, snd_ctl_card_info_t *info, snd_pc
     }
 }
 
-void GetDeviceList(struct AudioCardInfo *cardIns, snd_pcm_stream_t stream)
+void GetDeviceList(const struct AudioCardInfo *cardIns, snd_pcm_stream_t stream)
 {
     int32_t ret;
     snd_ctl_t *handle;

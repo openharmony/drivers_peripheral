@@ -94,9 +94,9 @@ struct IAudioCapture *g_capture = NULL;
 static struct IAudioManager *g_audioManager = NULL;
 static struct StrParaCapture g_str;
 void *g_captureHandle;
-void (*g_AudioManagerRelease)(struct IAudioManager *) = NULL;
-void (*g_AudioAdapterRelease)(struct IAudioAdapter *) = NULL;
-void (*g_AudioCaptureRelease)(struct IAudioCapture *) = NULL;
+void (*g_audioManagerRelease)(struct IAudioManager *) = NULL;
+void (*g_audioAdapterRelease)(struct IAudioAdapter *) = NULL;
+void (*g_audioCaptureRelease)(struct IAudioCapture *) = NULL;
 
 pthread_t g_tids;
 FILE *g_file;
@@ -289,7 +289,7 @@ static uint32_t StringToInt(const char *flag)
     return temp;
 }
 
-static int32_t AddWavFileHeader(struct StrParaCapture *strParam)
+static int32_t AddWavFileHeader(const struct StrParaCapture *strParam)
 {
     if (strParam == NULL) {
         AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
@@ -349,7 +349,7 @@ static int32_t StopButtonCapture(struct IAudioCapture **captureS)
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Capture already destroy!");
     }
-    g_AudioCaptureRelease(capture);
+    g_audioCaptureRelease(capture);
     *captureS = NULL;
     g_capture = NULL;
     if (g_frame != NULL) {
@@ -585,14 +585,14 @@ static int32_t PlayingAudioInitCapture(struct IAudioCapture **captureTemp)
     ret = capture->Start((void *)capture);
     if (ret < 0) {
         g_adapter->DestroyCapture(g_adapter);
-        g_AudioCaptureRelease(capture);
+        g_audioCaptureRelease(capture);
         return HDF_FAILURE;
     }
     uint32_t bufferSize = PcmFramesToBytes(g_attrs);
     g_frame = (char *)OsalMemCalloc(bufferSize);
     if (g_frame == NULL) {
         g_adapter->DestroyCapture(g_adapter);
-        g_AudioCaptureRelease(capture);
+        g_audioCaptureRelease(capture);
         return HDF_FAILURE;
     }
     *captureTemp = capture;
@@ -626,7 +626,7 @@ static int32_t StartButtonCapture(struct IAudioCapture **captureS)
         if (g_adapter != NULL && g_adapter->DestroyCapture != NULL) {
             g_adapter->DestroyCapture(g_adapter);
         }
-        g_AudioCaptureRelease(capture);
+        g_audioCaptureRelease(capture);
         return HDF_FAILURE;
     }
     *captureS = capture;
@@ -882,7 +882,7 @@ static int32_t CaptureGetAdapterAndInitEnvParams(const char *adapterNameCase)
     }
     if (InitCaptureParam(adapterNameCase, capturePort.portId) < 0) {
         g_audioManager->UnloadAdapter(g_audioManager, adapterNameCase);
-        g_AudioAdapterRelease(g_adapter);
+        g_audioAdapterRelease(g_adapter);
         g_adapter = NULL;
         return HDF_FAILURE;
     }
@@ -891,18 +891,18 @@ static int32_t CaptureGetAdapterAndInitEnvParams(const char *adapterNameCase)
 
 static int32_t InitReleaseFun(void)
 {
-    g_AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(g_captureHandle, "AudioManagerRelease"));
-    if (g_AudioManagerRelease == NULL) {
+    g_audioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(g_captureHandle, "AudioManagerRelease"));
+    if (g_audioManagerRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioManagerRelease fun ptr failed");
         return HDF_FAILURE;
     }
-    g_AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(g_captureHandle, "AudioAdapterRelease"));
-    if (g_AudioAdapterRelease == NULL) {
+    g_audioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(g_captureHandle, "AudioAdapterRelease"));
+    if (g_audioAdapterRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioAdapterRelease fun ptr failed");
         return HDF_FAILURE;
     }
-    g_AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(g_captureHandle, "AudioCaptureRelease"));
-    if (g_AudioCaptureRelease == NULL) {
+    g_audioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(g_captureHandle, "AudioCaptureRelease"));
+    if (g_audioCaptureRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioCaptureRelease fun ptr failed");
         return HDF_FAILURE;
     }
@@ -943,7 +943,7 @@ static int32_t InitParam(void)
     if (CaptureGetAdapterAndInitEnvParams(g_adapterName) < 0) {
         AUDIO_FUNC_LOGE("GetCaptureProxyManagerFunc Fail");
         if (g_audioManager != NULL) {
-            g_AudioManagerRelease(g_audioManager);
+            g_audioManagerRelease(g_audioManager);
             g_audioManager = NULL;
         }
         dlclose(g_captureHandle);
@@ -1421,9 +1421,9 @@ int32_t main(int32_t argc, char const *argv[])
     }
     if (g_audioManager != NULL && g_audioManager->UnloadAdapter != NULL) {
         g_audioManager->UnloadAdapter(g_audioManager, g_adapterName);
-        g_AudioAdapterRelease(g_adapter);
+        g_audioAdapterRelease(g_adapter);
         g_adapter = NULL;
-        g_AudioManagerRelease(g_audioManager);
+        g_audioManagerRelease(g_audioManager);
         g_audioManager = NULL;
     }
     dlclose(g_captureHandle);
