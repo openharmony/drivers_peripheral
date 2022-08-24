@@ -46,8 +46,7 @@ protected:
 
 class NodeBase : public INode, public std::enable_shared_from_this<NodeBase> {
 public:
-    NodeBase(const std::string& name, const std::string& type)
-        : name_(name), type_(type)
+    NodeBase(const std::string& name, const std::string& type) : name_(name), type_(type)
     {
     }
     ~NodeBase() override
