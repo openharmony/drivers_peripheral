@@ -1216,7 +1216,7 @@ int32_t AudioAdapterGetPassthroughMode(
     }
     return AUDIO_ERR_INTERNAL;
 }
-int32_t AudioAdapterGetStatus(struct IAudioAdapter *adapter, struct AudioStatus *status)
+int32_t AudioAdapterGetDeviceStatus(struct IAudioAdapter *adapter, struct AudioDeviceStatus *status)
 {
     (void)adapter;
     (void)status;
