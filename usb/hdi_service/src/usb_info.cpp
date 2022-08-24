@@ -28,17 +28,17 @@ public:
 
     explicit UsbInfo(const USBDeviceInfo &info) : devInfo_(info) {}
 
-    void SetDevInfoStatus(int32_t status)
+    void SetDevInfoStatus(const int32_t status)
     {
         devInfo_.status = status;
     }
 
-    void SetDevInfoBusNum(int32_t busNum)
+    void SetDevInfoBusNum(const int32_t busNum)
     {
         devInfo_.busNum = busNum;
     }
 
-    void SetDevInfoDevNum(int32_t devNum)
+    void SetDevInfoDevNum(const int32_t devNum)
     {
         devInfo_.devNum = devNum;
     }

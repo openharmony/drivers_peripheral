@@ -210,7 +210,7 @@ static int32_t UsbGetConfigDescriptor(UsbRawHandle *devHandle, struct UsbRawConf
     }
 
     ret = UsbRawGetConfiguration(devHandle, &activeConfig);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         printf("%s:%d UsbRawGetConfiguration failed, ret=%d", __func__, __LINE__, ret);
         return HDF_FAILURE;
     }
@@ -222,7 +222,7 @@ static int32_t UsbGetConfigDescriptor(UsbRawHandle *devHandle, struct UsbRawConf
     }
 
     ret = UsbRawGetConfigDescriptor(dev, activeConfig, config);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         printf("UsbRawGetConfigDescriptor failed, ret=%d\n", ret);
         return HDF_FAILURE;
     }
@@ -309,7 +309,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice * const acm, struct Usb
 
         if (acm->devHandle) {
             ret = UsbRawClaimInterface(acm->devHandle, interfaceIndex);
-            if (ret) {
+            if (ret != HDF_SUCCESS) {
                 printf("%s:%d claim interface %d failed", __func__, __LINE__, i);
                 return ret;
             }
@@ -343,7 +343,7 @@ static int32_t UsbAllocDataRequests(struct AcmDevice * const acm)
         reqData.length = acm->dataSize;
 
         ret = UsbRawFillBulkRequest(snd->request, acm->devHandle, &reqData);
-        if (ret) {
+        if (ret != HDF_SUCCESS) {
             printf("%s: FillInterruptRequest failed, ret=%d", __func__, ret);
             return HDF_FAILURE;
         }
@@ -478,7 +478,7 @@ static int32_t SerialBegin(struct AcmDevice *acm)
     int32_t ret;
     struct AcmDb *db = NULL;
     int32_t dbn;
-    if (AcmDbIsAvail(acm)) {
+    if (AcmDbIsAvail(acm) != 0) {
         dbn = AcmDbAlloc(acm);
     } else {
         printf("no buf\n");
@@ -603,7 +603,7 @@ static int32_t UsbSpeedDdkInit(const struct UsbSession *session)
     UsbRawHandle *devHandle = NULL;
 
     ret = UsbRawInit((struct UsbSession **)&session);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbRawInit failed\n", __func__);
         return HDF_FAILURE;
     }
@@ -615,7 +615,7 @@ static int32_t UsbSpeedDdkInit(const struct UsbSession *session)
     }
     g_acm->devHandle = devHandle;
     ret = UsbGetConfigDescriptor(devHandle, &g_acm->config);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbGetConfigDescriptor failed\n", __func__);
         return HDF_FAILURE;
     }
@@ -641,7 +641,7 @@ static int32_t UsbSpeedDdkInit(const struct UsbSession *session)
     }
 
     ret = UsbStartIo(g_acm);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbAllocReadRequests failed\n", __func__);
         return HDF_FAILURE;
     }

@@ -34,12 +34,14 @@ bool HasLog(const string &target, double startTs, const string &file)
     while (getline(logFile, lineStr)) {
         double logTs;
         pos = lineStr.find(flagStr);
-        if (pos != string::npos) {
-            logTs = stod(lineStr.substr(pos + tsStartPos, tsLength));
-            if ((logTs - startTs) >= 0) {
-                if (lineStr.find(target) != string::npos) {
-                    ret = true;
-                }
+        if (pos == string::npos) {
+            lineStr.clear();
+            continue;
+        }
+        logTs = stod(lineStr.substr(pos + tsStartPos, tsLength));
+        if ((logTs - startTs) >= 0) {
+            if (lineStr.find(target) != string::npos) {
+                ret = true;
             }
         }
         lineStr.clear();

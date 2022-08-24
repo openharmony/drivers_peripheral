@@ -805,7 +805,7 @@ static int32_t UsbStdCtrlCmd(struct SerialDevice *port, SerialOPCmd cmd, struct 
 
 static int32_t SerialWriteSync(const struct SerialDevice *port, const struct HdfSBuf *data)
 {
-    uint32_t size;
+    int32_t size;
     int32_t ret;
     const char *tmp = NULL;
     int32_t wbn;
@@ -954,7 +954,7 @@ static int32_t SerialClose(const struct SerialDevice *port, struct HdfSBuf *data
 
 static int32_t SerialWrite(const struct SerialDevice *port, struct HdfSBuf *data)
 {
-    uint32_t size;
+    int32_t size;
     int32_t ret;
     const char *tmp = NULL;
 
@@ -999,7 +999,7 @@ static int32_t SerialWrite(const struct SerialDevice *port, struct HdfSBuf *data
         HDF_LOGE("%{public}s: AcmStartWb failed, ret=%d", __func__, ret);
         return HDF_FAILURE;
     }
-    return (int32_t)size;
+    return size;
 }
 
 static int32_t SerialAddOrRemoveInterface(int32_t cmd, const struct SerialDevice *port, const struct HdfSBuf *data)
