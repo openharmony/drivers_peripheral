@@ -58,7 +58,7 @@ inline void DataFifoReset(struct DataFifo * const fifo)
     fifo->rdIdx = fifo->wrIdx = 0;
 }
 
-inline uint32_t DataFifoLen(struct DataFifo *fifo)
+inline uint32_t DataFifoLen(struct DataFifo * const fifo)
 {
     return fifo->wrIdx - fifo->rdIdx;
 }
@@ -73,7 +73,7 @@ inline bool DataFifoIsFull(struct DataFifo * const fifo)
     return DataFifoLen(fifo) > (fifo->size - 1);
 }
 
-inline uint32_t DataFifoAvailSize(struct DataFifo *fifo)
+inline uint32_t DataFifoAvailSize(struct DataFifo * const fifo)
 {
     return fifo->size - DataFifoLen(fifo);
 }
