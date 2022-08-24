@@ -72,12 +72,12 @@ int32_t CodecComponentManagerService::DestoryComponent(uint32_t componentId)
     CODEC_LOGD("componentId[%{public}d]", componentId);
     auto iter = componentMap_.find(componentId);
     if (iter == componentMap_.end() || iter->second == nullptr) {
-        CODEC_LOGE(" can not find component service by componentId[%{public}d]", componentId);
+        CODEC_LOGE("can not find component service by componentId[%{public}d]", componentId);
         return HDF_ERR_INVALID_PARAM;
     }
-
     std::unique_lock<std::mutex> autoLock(mutex_);
     componentMap_.erase(iter);
+    iter->second = nullptr;
     return HDF_SUCCESS;
 }
 
