@@ -58,7 +58,7 @@ static void TestRead(void)
 {
     HdfSbufFlush(g_reply);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_READ, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         printf("%s: Dispatch USB_SERIAL_READ failed status = %d", __func__, status);
         return;
     }
@@ -83,10 +83,10 @@ static void ReadThread(void *arg)
     }
 }
 
-pthread_t g_tid;
 static void StartPThreadRead(void)
 {
-    if ((pthread_create(&g_tid, NULL, ReadThread, NULL)) == -1) {
+    pthread_t tid;
+    if ((pthread_create(&tid, NULL, ReadThread, NULL)) == -1) {
         printf("create error!\n");
     }
 }
@@ -128,7 +128,7 @@ static void Test02(void)
     }
 }
 
-int32_t acm_test(int32_t argc, const char *argv[])
+int32_t AcmTest(int32_t argc, const char *argv[])
 {
     (void)argc;
     (void)argv;
@@ -147,7 +147,7 @@ int32_t acm_test(int32_t argc, const char *argv[])
     }
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_OPEN, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_OPEN err", __func__);
         return HDF_FAILURE;
     }
@@ -155,7 +155,7 @@ int32_t acm_test(int32_t argc, const char *argv[])
     Test02();
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_CLOSE, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
         return HDF_FAILURE;
     }

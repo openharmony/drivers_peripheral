@@ -250,10 +250,6 @@ static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 
 static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDescriptor *config)
 {
-    uint8_t i;
-    uint8_t j;
-    int32_t ret;
-
     if ((acm == nullptr) || (config == nullptr)) {
         HDF_LOGE("%{public}s:%{public}d acm or config is nullptr", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -262,16 +258,15 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConf
     acm->interfaceIndex[0] = 2;
     acm->interfaceIndex[1] = 3;
 
-    for (i = 0; i < acm->interfaceCnt; i++) {
+    for (uint8_t i = 0; i < acm->interfaceCnt; i++) {
         uint8_t interfaceIndex = acm->interfaceIndex[i];
         const struct UsbRawInterface *interface = config->interface[interfaceIndex];
         uint8_t ifaceClass = interface->altsetting->interfaceDescriptor.bInterfaceClass;
         uint8_t numEndpoints = interface->altsetting->interfaceDescriptor.bNumEndpoints;
 
-        ret = UsbRawClaimInterface(acm->devHandle, interfaceIndex);
-        if (ret) {
+        if (UsbRawClaimInterface(acm->devHandle, interfaceIndex) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d claim interface %{public}u failed", __func__, __LINE__, i);
-            return ret;
+            return HDF_FAILURE;
         }
 
         switch (ifaceClass) {
@@ -289,7 +284,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConf
                 break;
             case USB_DDK_CLASS_CDC_DATA:
                 acm->dataIface = interfaceIndex;
-                for (j = 0; j < numEndpoints; j++) {
+                for (uint8_t j = 0; j < numEndpoints; j++) {
                     const struct UsbRawEndpointDescriptor *endPoint = &interface->altsetting->endPoint[j];
 
                     /* get bulk in endpoint */
@@ -427,14 +422,14 @@ static void AcmRawFillCtrlReq()
     unsigned char setup[100] = {0};
     int32_t ret;
 
-    g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    g_acm->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     g_acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
     g_acm->lineCoding.bDataBits = DATA_BITS_LENGTH;
 
     ctrlReq.requestType = USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     ctrlReq.requestCmd  = USB_DDK_CDC_REQ_SET_LINE_CODING;
-    ctrlReq.value       = CpuToLe16(0);
+    ctrlReq.value       = CPU_TO_LE16(0);
     ctrlReq.index       = 2;
     ctrlReq.data        = (unsigned char *)&g_acm->lineCoding;
     ctrlReq.length      = sizeof(struct UsbCdcLineCoding);
@@ -496,14 +491,14 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest001, TestSize.Level1)
     struct UsbControlRequestData ctrlReq;
     int32_t ret;
 
-    g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    g_acm->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     g_acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
     g_acm->lineCoding.bDataBits = DATA_BITS_LENGTH;
 
     ctrlReq.requestType = USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     ctrlReq.requestCmd  = USB_DDK_CDC_REQ_SET_LINE_CODING;
-    ctrlReq.value       = CpuToLe16(0);
+    ctrlReq.value       = CPU_TO_LE16(0);
     ctrlReq.index       = 0;
     ctrlReq.data        = (unsigned char *)&g_acm->lineCoding;
     ctrlReq.length      = sizeof(struct UsbCdcLineCoding);
@@ -524,14 +519,14 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest002, TestSize.Level1)
     struct UsbControlRequestData ctrlReq;
     int32_t ret;
 
-    g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    g_acm->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     g_acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
     g_acm->lineCoding.bDataBits = DATA_BITS_LENGTH;
 
     ctrlReq.requestType = USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     ctrlReq.requestCmd  = USB_DDK_CDC_REQ_SET_LINE_CODING;
-    ctrlReq.value       = CpuToLe16(0);
+    ctrlReq.value       = CPU_TO_LE16(0);
     ctrlReq.index       = 0;
     ctrlReq.data        = (unsigned char *)&g_acm->lineCoding;
     ctrlReq.length      = sizeof(struct UsbCdcLineCoding);
@@ -566,14 +561,14 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest004, TestSize.Level1)
     struct UsbControlRequestData ctrlReq;
     int32_t ret;
 
-    g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    g_acm->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     g_acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
     g_acm->lineCoding.bDataBits = DATA_BITS_LENGTH;
 
     ctrlReq.requestType = USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     ctrlReq.requestCmd  = USB_DDK_CDC_REQ_SET_LINE_CODING;
-    ctrlReq.value       = CpuToLe16(0);
+    ctrlReq.value       = CPU_TO_LE16(0);
     ctrlReq.index       = 2;
     ctrlReq.data        = (unsigned char *)&g_acm->lineCoding;
     ctrlReq.length      = sizeof(struct UsbCdcLineCoding);
@@ -594,14 +589,14 @@ HWTEST_F(UsbRawSdkIfTestIo, CheckRawSdkIfSendControlRequest005, TestSize.Level1)
     struct UsbControlRequestData ctrlReq;
     int32_t ret;
 
-    g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    g_acm->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     g_acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
     g_acm->lineCoding.bDataBits = DATA_BITS_LENGTH;
 
     ctrlReq.requestType = USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     ctrlReq.requestCmd  = USB_DDK_CDC_REQ_SET_LINE_CODING;
-    ctrlReq.value       = CpuToLe16(0);
+    ctrlReq.value       = CPU_TO_LE16(0);
     ctrlReq.index       = 0;
     ctrlReq.data        = (unsigned char *)&g_acm->lineCoding;
     ctrlReq.length      = sizeof(struct UsbCdcLineCoding);

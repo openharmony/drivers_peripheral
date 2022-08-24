@@ -32,12 +32,12 @@ public:
 
 void UsbDeviceSerialLoopback::SetUpTestCase()
 {
-    acm_open();
+    AcmOpen();
 }
 
 void UsbDeviceSerialLoopback::TearDownTestCase()
 {
-    acm_close();
+    AcmClose();
 }
 
 HWTEST_F(UsbDeviceSerialLoopback, DeviceSerialLoopback, TestSize.Level1)
@@ -45,12 +45,12 @@ HWTEST_F(UsbDeviceSerialLoopback, DeviceSerialLoopback, TestSize.Level1)
     printf("------start DeviceSerialLoopback------\n");
     char data[256] = {0};
     while (1) {
-        acm_read(data);
+        AcmRead(data);
         if (strlen(data) > 0) {
             if (strcmp(data, "q") == 0) {
                 break;
             }
-            acm_write(data);
+            AcmWrite(data);
             memset_s(data, sizeof(data), 0, sizeof(data));
         }
     }

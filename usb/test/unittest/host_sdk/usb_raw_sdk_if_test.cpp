@@ -252,7 +252,7 @@ static void AcmNotifyReqCallback(const void *requestArg)
         goto EXIT;
     if (acm->nbIndex)
         dr = (struct UsbCdcNotification *)acm->notificationBuffer;
-    expectedSize = sizeof(struct UsbCdcNotification) + Le16ToCpu(dr->wLength);
+    expectedSize = sizeof(struct UsbCdcNotification) + LE16_TO_CPU(dr->wLength);
     if (currentSize < expectedSize) {
         if (acm->nbSize < expectedSize) {
             if (acm->nbSize) {
@@ -312,27 +312,16 @@ static void AcmCtrlReqCallback(const void *requestArg)
 
 static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConfigDescriptor *config)
 {
-    uint8_t numInterfaces;
-    uint8_t i;
-    uint8_t j;
-    int32_t ret;
-    uint8_t ifaceClass;
-    uint8_t numEndpoints;
     const struct UsbRawInterface *interface = NULL;
-
-    numInterfaces = config->configDescriptor.bNumInterfaces;
-    printf("------numInterfaces = [%d]------\n", numInterfaces);
-    for (i = 0; i < numInterfaces; i++) {
+    uint8_t numInterfaces = config->configDescriptor.bNumInterfaces;
+    for (uint8_t i = 0; i < numInterfaces; i++) {
         interface = config->interface[i];
-        ifaceClass = interface->altsetting->interfaceDescriptor.bInterfaceClass;
-        numEndpoints = interface->altsetting->interfaceDescriptor.bNumEndpoints;
-
-        ret = UsbRawClaimInterface(acm->devHandle, i);
-        if (ret) {
+        uint8_t ifaceClass = interface->altsetting->interfaceDescriptor.bInterfaceClass;
+        uint8_t numEndpoints = interface->altsetting->interfaceDescriptor.bNumEndpoints;
+        if (UsbRawClaimInterface(acm->devHandle, i) != HDF_SUCCESS) {
             printf("%s:%d claim interface %u failed\n", __func__, __LINE__, i);
             continue;
         }
-
         switch (ifaceClass) {
             case USB_DDK_CLASS_COMM:
                 acm->ctrlIface = i;
@@ -348,7 +337,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConf
                 break;
             case USB_DDK_CLASS_CDC_DATA:
                 acm->dataIface = i;
-                for (j = 0; j < numEndpoints; j++) {
+                for (uint8_t j = 0; j < numEndpoints; j++) {
                     const struct UsbRawEndpointDescriptor *endPoint = &interface->altsetting->endPoint[j];
 
                     /* get bulk in endpoint */
@@ -376,7 +365,6 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice *acm, struct UsbRawConf
                 break;
             default:
                 printf("%s:%d wrong descriptor type\n", __func__, __LINE__);
-                break;
         }
     }
 
@@ -1990,14 +1978,14 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlSetup001, TestSize.Level1)
     struct UsbControlRequestData ctrlReq;
     int32_t ret;
 
-    g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    g_acm->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     g_acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
     g_acm->lineCoding.bDataBits = DATA_BITS_LENGTH;
 
     ctrlReq.requestType = USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     ctrlReq.requestCmd  = USB_DDK_CDC_REQ_SET_LINE_CODING;
-    ctrlReq.value       = CpuToLe16(0);
+    ctrlReq.value       = CPU_TO_LE16(0);
     ctrlReq.index       = 0;
     ctrlReq.data        = (unsigned char *)&g_acm->lineCoding;
     ctrlReq.length      = sizeof(struct UsbCdcLineCoding);
@@ -2048,14 +2036,14 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillControlSetup004, TestSize.Level1)
     unsigned char setup[100] = {0};
     int32_t ret;
 
-    g_acm->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    g_acm->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
     g_acm->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     g_acm->lineCoding.bParityType = USB_CDC_NO_PARITY;
     g_acm->lineCoding.bDataBits = DATA_BITS_LENGTH;
 
     ctrlReq.requestType = USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     ctrlReq.requestCmd  = USB_DDK_CDC_REQ_SET_LINE_CODING;
-    ctrlReq.value       = CpuToLe16(0);
+    ctrlReq.value       = CPU_TO_LE16(0);
     ctrlReq.index       = 0;
     ctrlReq.data        = (unsigned char *)&g_acm->lineCoding;
     ctrlReq.length      = sizeof(struct UsbCdcLineCoding);

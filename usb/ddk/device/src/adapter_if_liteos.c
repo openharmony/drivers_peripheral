@@ -474,30 +474,27 @@ static int32_t UsbFnAdapterWriteFunctions(int32_t fd, struct UsbFnConfiguration 
     int32_t iCount;
     char tmp[MAX_PATHLEN];
     struct FconfigFuncInfo funcInfo;
-
     if (usbFnConfig == NULL || gadgetName == NULL || configName == NULL) {
         HDF_LOGE("%{public}s: usbFnConfig is NULL", __func__);
         return HDF_ERR_IO;
     }
+    
     funcInfo.gadgetName.len = gadgetName->len;
     funcInfo.gadgetName.s = gadgetName->s;
     funcInfo.configName.len = configName->len;
     funcInfo.configName.s = configName->s;
     for (iCount = 0; usbFnConfig->functions[iCount] != NULL; iCount++) {
         (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
-
         ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "generic.%s", usbFnConfig->functions[iCount]->funcName);
         if (ret < 0) {
             return HDF_ERR_IO;
         }
         ret = UsbFnAdapterCreateFconfigString(&funcInfo.funcName, tmp);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: create config name failed!", __func__);
             return HDF_ERR_MALLOC_FAIL;
         }
         ret = handle_ioctl(fd, cmd, &funcInfo);
         if (ret != 0) {
-            HDF_LOGE("%{public}s: ioctl failed!", __func__);
             goto FAIL;
         }
         UsbFnMemFree(funcInfo.funcName.s);

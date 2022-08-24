@@ -67,7 +67,7 @@
 #define STRING_DATA "wData"
 
 /* USB_DT_SSP_ISOC_ENDPOINT_COMP */
-#define SSP_ISOC_EPCOMP_WReseved "wReseved"
+#define SSP_ISOC_EPCOMP_WRESEVED "wReseved"
 #define SSP_ISOC_EPCOMP_DWPERINTERVAL "dwBytesPerInterval"
 
 /* USB_DT_SS_ENDPOINT_COMP */

@@ -33,18 +33,18 @@ int32_t UsbProtocalFillControlSetup(const unsigned char *setup, const struct Usb
                 ((uint8_t)ctrlReq->reqType << USB_TYPE_OFFSET) |
                 ((uint8_t)ctrlReq->target << USB_RECIP_OFFSET);
             setupData->request     = ctrlReq->request;
-            setupData->value       = CpuToLe16(ctrlReq->value);
-            setupData->index       = CpuToLe16(ctrlReq->index);
-            setupData->length      = CpuToLe16(ctrlReq->length);
+            setupData->value       = CPU_TO_LE16(ctrlReq->value);
+            setupData->index       = CPU_TO_LE16(ctrlReq->index);
+            setupData->length      = CPU_TO_LE16(ctrlReq->length);
             break;
         case USB_REQUEST_TYPE_VENDOR:
             setupData->requestType = ((uint8_t)ctrlReq->directon << USB_DIR_OFFSET) |
                 ((uint8_t)ctrlReq->reqType << USB_TYPE_OFFSET) |
                 ((uint8_t)ctrlReq->target << USB_RECIP_OFFSET);
             setupData->request     = ctrlReq->request;
-            setupData->value       = CpuToLe16(ctrlReq->value);
-            setupData->index       = CpuToLe16(ctrlReq->index);
-            setupData->length      = CpuToLe16(ctrlReq->length);
+            setupData->value       = CPU_TO_LE16(ctrlReq->value);
+            setupData->index       = CPU_TO_LE16(ctrlReq->index);
+            setupData->length      = CPU_TO_LE16(ctrlReq->length);
             break;
         default:
             ret = HDF_ERR_INVALID_PARAM;

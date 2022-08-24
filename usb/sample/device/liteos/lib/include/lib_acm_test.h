@@ -17,10 +17,10 @@
 #define LIB_ACM_TEST_H
 
 extern "C" {
-void acm_open();
-void acm_close();
-void acm_write(char *data);
-void acm_read(char *str, int32_t timeout = 5);
+void AcmOpen();
+void AcmClose();
+void AcmWrite(char *data);
+void AcmRead(char *str, int32_t timeout = 5);
 void acm_prop_regist(const char *propName, const char *propValue);
 void acm_prop_write(const char *propName, const char *propValue);
 void acm_prop_read(const char *propName, char *propValue);

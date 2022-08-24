@@ -87,10 +87,10 @@ int32_t UsbdDispatcher::UsbControlSetUp(UsbControlParams *controlParams, UsbCont
     controlReq->reqType = controlParams->reqType;
     controlReq->directon = controlParams->directon;
     controlReq->request = controlParams->request;
-    controlReq->value = (uint16_t)(CpuToLe16(controlParams->value));
-    controlReq->index = *(uint16_t *)(CpuToLe16(controlParams->data));
+    controlReq->value = (uint16_t)(CPU_TO_LE16(controlParams->value));
+    controlReq->index = *(uint16_t *)(CPU_TO_LE16(controlParams->data));
     controlReq->buffer = controlParams->data;
-    controlReq->length = (uint32_t)(CpuToLe16(controlParams->size));
+    controlReq->length = (uint32_t)(CPU_TO_LE16(controlParams->size));
     return HDF_SUCCESS;
 }
 

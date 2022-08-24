@@ -394,7 +394,7 @@ static int32_t AcmStartdb(struct AcmDevice *acm, struct AcmDb * const db)
 {
     (void)acm;
     int32_t ret = UsbRawSubmitRequest(db->request);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         printf("UsbRawSubmitRequest failed, ret=%d", ret);
         db->use = 0;
     }
