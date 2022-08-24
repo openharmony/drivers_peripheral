@@ -322,8 +322,8 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGain_Null_002, Test
 HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGain_003, TestSize.Level1)
 {
     int32_t ret = -1;
-    float gain = GAIN_MAX-1;
-    float gainOne = GAIN_MAX-1;
+    float gain = GAIN_MAX - 1;
+    float gainOne = GAIN_MAX - 1;
 
     ASSERT_NE(nullptr, render);
     ret = render->SetGain(render, gain);

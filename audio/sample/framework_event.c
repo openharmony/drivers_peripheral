@@ -79,7 +79,7 @@ static int32_t AudioServiceMsgParse(struct AudioEvent *svcMsg)
     }
 }
 
-static int AudioGetServiceStatus(struct ServiceStatus *svcStatus)
+static int AudioGetServiceStatus(const struct ServiceStatus *svcStatus)
 {
     if (svcStatus == NULL) {
         return HDF_FAILURE;

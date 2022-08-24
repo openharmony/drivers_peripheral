@@ -184,8 +184,7 @@ static int32_t InitPathSelectSoHandle(const char *pathSelectSoPath)
 #endif
 
 int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
-                                   struct AudioAdapterDescriptor **descs,
-                                   int *size)
+    struct AudioAdapterDescriptor **descs, int *size)
 {
     AUDIO_FUNC_LOGI();
     if (manager == NULL || descs == NULL || size == NULL) {
@@ -201,7 +200,7 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
         AUDIO_FUNC_LOGE("sopath is error");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (*descs != NULL && size != NULL && (*size) > 0) { // Fuzz test
+    if (*descs != NULL && size != NULL && (*size) > 0) {
         g_localAddrAudioAdapterOut  = *descs;
         g_localAdapterNum = *size;
     } else {

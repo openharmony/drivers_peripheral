@@ -254,8 +254,8 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderSetGain_0002, TestSize.Le
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    float gainOne = max+1;
-    float gainSec = min-1;
+    float gainOne = max + 1;
+    float gainSec = min - 1;
     ret = render->volume.SetGain(render, gainOne);
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
@@ -333,8 +333,8 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGain_0001, TestSize.Le
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    float gain = min+1;
-    float gainValue = min+1;
+    float gain = min + 1;
+    float gainValue = min + 1;
     ret = render->volume.SetGain(render, gain);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = render->volume.GetGain(render, &gain);
@@ -377,8 +377,8 @@ HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGain_0002, TestSize.Le
 HWTEST_F(AudioHdiRenderVolumeTest, SUB_Audio_HDI_RenderGetGain_0003, TestSize.Level1)
 {
     int32_t ret = -1;
-    float gain = GAIN_MAX-1;
-    float gainOne = GAIN_MAX-1;
+    float gain = GAIN_MAX - 1;
+    float gainOne = GAIN_MAX - 1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(nullptr, GetAudioManager);

@@ -569,8 +569,8 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGain_Null_002, Te
 HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGain_003, TestSize.Level1)
 {
     int32_t ret = -1;
-    float gain = GAIN_MAX-1;
-    float gainOne = GAIN_MAX-1;
+    float gain = GAIN_MAX - 1;
+    float gainOne = GAIN_MAX - 1;
     ASSERT_NE(nullptr, capture);
 
     ret = capture->SetGain(capture, gain);
