@@ -445,8 +445,8 @@ enum AudioExtParamKey {
 /**
  * @brief Describes status of audio deivce.@link enum AudioDeviceType
  */
-struct AudioStatus {
-    uint32_t deviceStatus;
+struct AudioDeviceStatus {
+    uint32_t pnpStatus;
 };
 /**
  * @brief Called when an event defined in {@link AudioCallbackType} occurs.

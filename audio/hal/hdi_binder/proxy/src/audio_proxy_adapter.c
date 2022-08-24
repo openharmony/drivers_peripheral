@@ -916,7 +916,7 @@ int32_t AudioProxyAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t
     (void)routeHandle;
     return HDF_ERR_NOT_SUPPORT;
 }
-int32_t AudioProxyAdapterGetStatus(struct AudioAdapter *adapter, struct AudioStatus *status)
+int32_t AudioProxyAdapterGetDeviceStatus(struct AudioAdapter *adapter, struct AudioDeviceStatus *status)
 {
     (void)adapter;
     (void)status;
