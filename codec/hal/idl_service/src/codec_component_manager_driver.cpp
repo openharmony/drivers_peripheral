@@ -15,9 +15,9 @@
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
+#include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include "codec_component_config.h"
-#include "codec_log_wrapper.h"
 #include "v1_0/codec_component_manager_stub.h"
 using namespace OHOS::HDI::Codec::V1_0;
 namespace {
@@ -38,11 +38,11 @@ static int32_t CodecComponentManagerDriverDispatch(struct HdfDeviceIoClient *cli
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        CODEC_LOGE("invalid data sbuf object to dispatch");
+        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
-        CODEC_LOGE("invalid reply sbuf object to dispatch");
+        HDF_LOGE("%{public}s:invalid reply sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -51,18 +51,18 @@ static int32_t CodecComponentManagerDriverDispatch(struct HdfDeviceIoClient *cli
 
 static int HdfCodecComponentManagerDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    CODEC_LOGI("HdfCodecComponentManagerDriverInit enter");
+    HDF_LOGI("HdfCodecComponentManagerDriverInit enter");
     OHOS::Codec::Omx::CodecComponentConfig::GetInstance()->Init(*deviceObject->property);
     return HDF_SUCCESS;
 }
 
 static int HdfCodecComponentManagerDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    CODEC_LOGI("HdfCodecComponentManagerDriverBind enter");
+    HDF_LOGI("HdfCodecComponentManagerDriverBind enter");
 
     auto *hdfCodecComponentManagerHost = new (std::nothrow) HdfCodecComponentManagerHost;
     if (hdfCodecComponentManagerHost == nullptr) {
-        CODEC_LOGE("failed to create create HdfCodecComponentManagerHost object");
+        HDF_LOGE("%{public}s: failed to create create HdfCodecComponentManagerHost object", __func__);
         return HDF_FAILURE;
     }
 
@@ -72,7 +72,7 @@ static int HdfCodecComponentManagerDriverBind(struct HdfDeviceObject *deviceObje
 
     auto serviceImpl = ICodecComponentManager::Get(true);
     if (serviceImpl == nullptr) {
-        CODEC_LOGE("failed to get of implement service");
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
         delete hdfCodecComponentManagerHost;
         return HDF_FAILURE;
     }
@@ -80,7 +80,7 @@ static int HdfCodecComponentManagerDriverBind(struct HdfDeviceObject *deviceObje
     hdfCodecComponentManagerHost->stub =
         OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, ICodecComponentManager::GetDescriptor());
     if (hdfCodecComponentManagerHost->stub == nullptr) {
-        CODEC_LOGE("failed to get stub object");
+        HDF_LOGE("%{public}s: failed to get stub object", __func__);
         delete hdfCodecComponentManagerHost;
         return HDF_FAILURE;
     }
@@ -91,9 +91,9 @@ static int HdfCodecComponentManagerDriverBind(struct HdfDeviceObject *deviceObje
 
 static void HdfCodecComponentManagerDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    CODEC_LOGI("HdfCodecComponentManagerDriverRelease enter");
+    HDF_LOGI("HdfCodecComponentManagerDriverRelease enter");
     if (deviceObject->service == nullptr) {
-        CODEC_LOGE("HdfCodecComponentManagerDriverRelease not initted");
+        HDF_LOGE("HdfCodecComponentManagerDriverRelease not initted");
         return;
     }
 

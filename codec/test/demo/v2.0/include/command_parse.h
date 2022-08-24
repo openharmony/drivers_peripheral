@@ -14,8 +14,8 @@
  */
 #ifndef PARSE_COMMAND_H
 #define PARSE_COMMAND_H
-#include <iostream>
-
+#include <cinttypes>
+#include <string>
 enum class codecMime { AVC, HEVC };
 
 using CommandOpt = struct CommandOpt {

@@ -64,7 +64,7 @@ protected:
     ICodecBuffer()
     {}
     virtual bool CheckInvalid(struct OmxCodecBuffer &codecBuffer);
-    int32_t SyncWait(int fd, uint32_t timeout);
+
 protected:
     struct OmxCodecBuffer codecBuffer_;
 };

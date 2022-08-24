@@ -15,9 +15,9 @@
 #include "codec_dyna_buffer.h"
 #include <buffer_handle_utils.h>
 #include <hdf_base.h>
+#include <hdf_log.h>
+#include <libsync.h>
 #include <securec.h>
-#include <unistd.h>
-#include "codec_log_wrapper.h"
 #include "v1_0/codec_types.h"
 using namespace OHOS::HDI::Codec::V1_0;
 namespace OHOS {
@@ -48,7 +48,7 @@ sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
 
 int32_t CodecDynaBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
 {
-    CODEC_LOGE("dyna buffer handle is not supported in FillThisBuffer");
+    HDF_LOGE("%{public}s :dyna buffer handle is not supported in FillThisBuffer ", __func__);
     (void)codecBuffer;
     (void)omxBuffer;
     return HDF_ERR_INVALID_PARAM;
@@ -57,17 +57,14 @@ int32_t CodecDynaBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_B
 int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
 {
     if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("CheckInvalid return false");
+        HDF_LOGE("%{public}s : CheckInvalid return false", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     ResetBuffer(codecBuffer, omxBuffer);
 
     int fence = codecBuffer.fenceFd;
     if (fence >= 0) {
-        auto ret = SyncWait(fence, TIME_WAIT_MS);
-        if (ret < 0) {
-            CODEC_LOGW("SyncWait ret err");
-        }
+        sync_wait(fence, TIME_WAIT_MS);
         close(codecBuffer.fenceFd);
         codecBuffer.fenceFd = -1;
     }
@@ -78,7 +75,7 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
 int32_t CodecDynaBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
 {
     if (!CheckInvalid(codecBuffer)) {
-        CODEC_LOGE("shMem_ is null or CheckInvalid return false");
+        HDF_LOGE("%{public}s :shMem_ is null or CheckInvalid return false", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (codecBuffer.bufferhandle != nullptr) {
@@ -98,7 +95,7 @@ int32_t CodecDynaBuffer::EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
 
 int32_t CodecDynaBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
 {
-    CODEC_LOGE("dyna buffer handle is not supported in FillThisBuffer");
+    HDF_LOGE("%{public}s :dyna buffer handle is not supported in FillThisBuffer ", __func__);
     (void)omxBuffer;
     return HDF_ERR_INVALID_PARAM;
 }
@@ -111,7 +108,7 @@ uint8_t *CodecDynaBuffer::GetBuffer()
 bool CodecDynaBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
 {
     if (!ICodecBuffer::CheckInvalid(codecBuffer) || dynaBuffer_ == nullptr) {
-        CODEC_LOGE("dynaBuffer_ is null or CheckInvalid return false");
+        HDF_LOGE("%{public}s :dynaBuffer_ is null or CheckInvalid return false", __func__);
         return false;
     }
     return true;

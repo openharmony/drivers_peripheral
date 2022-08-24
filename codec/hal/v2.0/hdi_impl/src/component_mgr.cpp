@@ -14,8 +14,12 @@
  */
 
 #include "component_mgr.h"
+#include <cstring>
+#include <dlfcn.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <memory.h>
+#include <securec.h>
 #define HDF_LOG_TAG codec_hdi_server
 
 namespace OHOS {
