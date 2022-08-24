@@ -31,9 +31,9 @@ public:
     int32_t GetComponentVersion(CompVerInfo &verInfo);
     int32_t SendCommand(OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData, uint32_t cmdDataLen);
     int32_t GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen);
-    int32_t SetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen);
+    int32_t SetParameter(OMX_INDEXTYPE paramIndex, const int8_t *param, uint32_t paramLen);
     int32_t GetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t configLen);
-    int32_t SetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t configLen);
+    int32_t SetConfig(OMX_INDEXTYPE index, const int8_t *config, uint32_t configLen);
     int32_t GetExtensionIndex(const char *parameterName, OMX_INDEXTYPE *indexType);
     int32_t GetState(OMX_STATETYPE *state);
     int32_t ComponentTunnelRequest(
@@ -43,7 +43,7 @@ public:
     int32_t FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer);
     int32_t EmptyThisBuffer(const OmxCodecBuffer &buffer);
     int32_t FillThisBuffer(const OmxCodecBuffer &buffer);
-    int32_t SetCallbacks(CodecCallbackType *omxCallback, int64_t appData);
+    int32_t SetCallbacks(const CodecCallbackType *omxCallback, int64_t appData);
     int32_t UseEglImage(OmxCodecBuffer &buffer, uint32_t portIndex, int8_t *eglImage, uint32_t eglImageLen);
     int32_t ComponentRoleEnum(uint8_t *role, uint32_t roleLen, uint32_t index);
     int32_t ComponentDeInit();
