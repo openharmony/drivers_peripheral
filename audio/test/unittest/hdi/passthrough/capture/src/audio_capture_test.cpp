@@ -1194,22 +1194,6 @@ HWTEST_F(AudioCaptureTest, AudioCaptureReqMmapBufferWhenDevDataHandleIsNull, Tes
     hwCapture->devDataHandle = devDataHandle;
 }
 
-HWTEST_F(AudioCaptureTest, AudioCaptureReqMmapBufferWhenDevDataHandleIsError, TestSize.Level1)
-{
-    struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    AudioHandle handle = (AudioHandle)hwCapture;
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
-    struct HdfIoService *service = new HdfIoService;
-    (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devDataHandle = (struct DevHandleCapture *)service;
-    int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc;
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioCaptureReqMmapBuffer(handle, reqSize, &desc));
-    hwCapture->devDataHandle = devDataHandle;
-    delete(service);
-    service = nullptr;
-}
-
 HWTEST_F(AudioCaptureTest, AudioCaptureReqMmapBufferWhenFormatIsError, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
