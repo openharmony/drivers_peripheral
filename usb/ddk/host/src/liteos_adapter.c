@@ -357,7 +357,7 @@ static int32_t OsParseConfigDescriptors(struct UsbDevice *dev)
                 __func__, __LINE__, configDesc->bDescriptorType, configDesc->bLength);
             return HDF_ERR_IO;
         }
-        configLen = Le16ToCpu(configDesc->wTotalLength);
+        configLen = LE16_TO_CPU(configDesc->wTotalLength);
         if (configLen < USB_DDK_DT_CONFIG_SIZE) {
             DPRINTFN(0, "invalid wTotalLength value %u\n", configLen);
             return HDF_ERR_IO;
@@ -953,7 +953,6 @@ static int32_t OsIsoCompletion(struct UsbHostRequest *request, struct Async *as)
     OsIsoRequestDesStatus(request, urb);
     request->numRetired++;
     if  (request->reqStatus != USB_REQUEST_COMPLETED) {
-        DPRINTFN(0, "%s:%d urb status=%d\n", __func__, __LINE__, urb->status);
         if (request->numRetired == numUrbs) {
             OsFreeIsoUrbs(request);
             OsalMutexUnlock(&request->lock);
@@ -962,14 +961,11 @@ static int32_t OsIsoCompletion(struct UsbHostRequest *request, struct Async *as)
         goto OUT;
     }
 
-    DPRINTFN(0, "%s:%d urb status is %d\n", __func__, __LINE__, urb->status);
+    status = USB_REQUEST_COMPLETED;
     if (urb->status == -ESHUTDOWN) {
         status = USB_REQUEST_NO_DEVICE;
-    } else if (!((urb->status == HDF_SUCCESS) || (urb->status == -ENOENT) ||
-        (urb->status == -ECONNRESET))) {
+    } else if (!((urb->status == HDF_SUCCESS) || (urb->status == -ENOENT) || (urb->status == -ECONNRESET))) {
         status = USB_REQUEST_ERROR;
-    } else {
-        status = USB_REQUEST_COMPLETED;
     }
 
     if (request->numRetired == numUrbs) {

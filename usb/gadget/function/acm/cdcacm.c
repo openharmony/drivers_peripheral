@@ -715,7 +715,7 @@ static int32_t UsbSerialWrite(struct UsbSerial *port, struct HdfSBuf *data)
 
 static int32_t UsbSerialGetBaudrate(struct UsbSerial *port, struct HdfSBuf *reply)
 {
-    uint32_t baudRate = Le32ToCpu(port->lineCoding.dwDTERate);
+    uint32_t baudRate = LE32_TO_CPU(port->lineCoding.dwDTERate);
     if (!HdfSbufWriteBuffer(reply, &baudRate, sizeof(baudRate))) {
         HDF_LOGE("%s: sbuf write buffer failed", __func__);
         return HDF_ERR_IO;
@@ -732,9 +732,9 @@ static int32_t UsbSerialSetBaudrate(struct UsbSerial *port, struct HdfSBuf *data
         HDF_LOGE("%s: sbuf read buffer failed", __func__);
         return HDF_ERR_IO;
     }
-    port->lineCoding.dwDTERate = CpuToLe32(*baudRate);
+    port->lineCoding.dwDTERate = CPU_TO_LE32(*baudRate);
     if (port->acm) {
-        port->acm->lineCoding.dwDTERate = CpuToLe32(*baudRate);
+        port->acm->lineCoding.dwDTERate = CPU_TO_LE32(*baudRate);
     }
     return HDF_SUCCESS;
 }
@@ -1129,8 +1129,8 @@ static void AcmSetup(struct UsbAcmDevice *acm, struct UsbFnCtrlRequest *setup)
     }
     struct UsbFnRequest *req = NULL;
     struct CtrlInfo *ctrlInfo = NULL;
-    uint16_t value  = Le16ToCpu(setup->value);
-    uint16_t length = Le16ToCpu(setup->length);
+    uint16_t value  = LE16_TO_CPU(setup->value);
+    uint16_t length = LE16_TO_CPU(setup->length);
     int32_t ret = 0;
 
     req = AcmGetCtrlReq(acm);
@@ -1278,9 +1278,9 @@ static int32_t AcmSendNotifyRequest(struct UsbAcmDevice *acm, uint8_t type,
     notify = (struct UsbCdcNotification *)req->buf;
     notify->bmRequestType = USB_DDK_DIR_IN | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     notify->bNotificationType = type;
-    notify->wValue = CpuToLe16(value);
-    notify->wIndex = CpuToLe16(acm->ctrlIface.fn->info.index);
-    notify->wLength = CpuToLe16(length);
+    notify->wValue = CPU_TO_LE16(value);
+    notify->wIndex = CPU_TO_LE16(acm->ctrlIface.fn->info.index);
+    notify->wLength = CPU_TO_LE16(length);
     ret = memcpy_s((void *)(notify + 1), length, data, length);
     if (ret != EOK) {
         HDF_LOGE("%s: memcpy_s failed", __func__);
@@ -1304,7 +1304,7 @@ static int32_t AcmNotifySerialState(struct UsbAcmDevice *acm)
     OsalMutexLock(&acm->lock);
     if (acm->notifyReq) {
         HDF_LOGI("acm serial state %{public}04x\n", acm->serialState);
-        serialState = CpuToLe16(acm->serialState);
+        serialState = CPU_TO_LE16(acm->serialState);
         ret = AcmSendNotifyRequest(acm, USB_DDK_CDC_NOTIFY_SERIAL_STATE,
             0, &serialState, sizeof(acm->serialState));
     } else {
@@ -1507,7 +1507,7 @@ static int32_t UsbSerialAlloc(struct UsbAcmDevice *acm)
     DListHeadInit(&port->readQueue);
     DListHeadInit(&port->writePool);
 
-    port->lineCoding.dwDTERate = CpuToLe32(PORT_RATE);
+    port->lineCoding.dwDTERate = CPU_TO_LE32(PORT_RATE);
     port->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     port->lineCoding.bParityType = USB_CDC_NO_PARITY;
     port->lineCoding.bDataBits = DATA_BIT;

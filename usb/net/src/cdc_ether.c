@@ -209,10 +209,10 @@ static struct UsbControlRequest EcmUsbControlMsg(const struct EcmControlParams *
     dr.reqType = (controlParams->requestType >> USB_TYPE_OFFSET) & REQUEST_TYPE_MASK;
     dr.directon = (controlParams->requestType >> USB_DIR_OFFSET) & DIRECTION_MASK;
     dr.request = controlParams->request;
-    dr.value = CpuToLe16(controlParams->value);
-    dr.index = CpuToLe16(controlParams->index);
+    dr.value = CPU_TO_LE16(controlParams->value);
+    dr.index = CPU_TO_LE16(controlParams->index);
     dr.buffer = controlParams->data;
-    dr.length = CpuToLe16(controlParams->size);
+    dr.length = CPU_TO_LE16(controlParams->size);
     return dr;
 }
 
@@ -444,7 +444,6 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
         if (EcmWbIsAvail(ecm)) {
             wbn = EcmWbAlloc(ecm);
         } else {
-            HDF_LOGE("%s:%d no write buf", __func__, __LINE__);
             return (int32_t)size;
         }
         if (wbn < ECM_NW && wbn >= 0) {
@@ -462,7 +461,7 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
         }
         if (wb->buf) {
             ret = memcpy_s(wb->buf, ecm->writeSize, tmp, len);
-            if (ret) {
+            if (ret != EOK) {
                 return (int32_t)size;
             }
             tmp += len;
@@ -470,7 +469,6 @@ static int32_t EcmWrite(struct EcmDevice *ecm, struct HdfSBuf *data)
             wb->ecm = ecm;
             ret = EcmStartWb(ecm, wb);
             if (ret != HDF_SUCCESS) {
-                HDF_LOGE("%{public}s: EcmStartWb failed, ret=%{public}d", __func__, ret);
                 return HDF_FAILURE;
             }
         }
@@ -761,7 +759,7 @@ static void EcmCtrlIrq(struct UsbRequest *req)
     if (ecm->nbIndex) {
         dr = (struct UsbCdcNotification *)ecm->notificationBuffer;
     }
-    expectedSize = sizeof(struct UsbCdcNotification) + Le16ToCpu(dr->wLength);
+    expectedSize = sizeof(struct UsbCdcNotification) + LE16_TO_CPU(dr->wLength);
     if (currentSize < expectedSize) {
         if (ecm->nbSize < expectedSize) {
             if (ecm->nbSize) {
@@ -1078,7 +1076,7 @@ static int32_t EcmInit(struct EcmDevice *ecm)
     /* set altsetting */
     ret = UsbSelectInterfaceSetting(
         ecm->devHandle[ecm->interfaceCnt - 1], altsetting, &ecm->iface[ecm->interfaceCnt - 1]);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("UsbSelectInterfaceSetting fail\n");
         goto ERROR_SELECT_SETTING;
     }

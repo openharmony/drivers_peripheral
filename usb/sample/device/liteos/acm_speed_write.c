@@ -57,7 +57,7 @@ static void TestSpeed(void)
     HdfSbufFlush(g_reply);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
         USB_SERIAL_WRITE_SPEED, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_SPEED failed status = %d",
             __func__, status);
         return;
@@ -71,7 +71,7 @@ static void GetTempSpeed(void)
     HdfSbufFlush(g_reply);
     int32_t status = g_acmService->dispatcher->Dispatch(&g_acmService->object,
         USB_SERIAL_WRITE_GET_TEMP_SPEED_UINT32, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_GET_TEMP_SPEED failed status = %d",
             __func__, status);
         return;
@@ -89,7 +89,7 @@ static void WriteSpeedDone(void)
 {
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService,
         USB_SERIAL_WRITE_SPEED_DONE, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_WRITE_SPEED_DONE failed status = %d",
             __func__, status);
         return;
@@ -109,7 +109,7 @@ static void *StopHandler(void *arg)
         switch (signo) {
             case SIGINT:
             case SIGQUIT:
-                printf("acm_speed_write exit\n");
+                printf("AcmSpeedWrite exit\n");
                 WriteSpeedDone();
                 g_readRuning = false;
                 return NULL;
@@ -135,7 +135,7 @@ static void StartStopHandler(void)
     }
 }
 
-int32_t acm_speed_write(int32_t argc, const char *argv[])
+int32_t AcmSpeedWrite(int32_t argc, const char *argv[])
 {
     (void)argc;
     (void)argv;
@@ -170,7 +170,7 @@ int32_t acm_speed_write(int32_t argc, const char *argv[])
     }
 
     status = g_acmService->dispatcher->Dispatch(&g_acmService->object, USB_SERIAL_CLOSE, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
         return HDF_FAILURE;
     }

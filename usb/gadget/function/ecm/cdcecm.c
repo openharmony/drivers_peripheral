@@ -455,9 +455,9 @@ static void EcmDoNotify(struct UsbEcmDevice *ecm)
         case ECM_NOTIFY_CONNECT:
             event->bNotificationType = USB_DDK_CDC_NOTIFY_NETWORK_CONNECTION;
             if (ecm->isOpen)
-                event->wValue = CpuToLe16(1);
+                event->wValue = CPU_TO_LE16(1);
             else
-                event->wValue = CpuToLe16(0);
+                event->wValue = CPU_TO_LE16(0);
             event->wLength = 0;
             req->length = sizeof(*event);
 
@@ -467,13 +467,13 @@ static void EcmDoNotify(struct UsbEcmDevice *ecm)
 
         case ECM_NOTIFY_SPEED:
             event->bNotificationType = USB_DDK_CDC_NOTIFY_SPEED_CHANGE;
-            event->wValue = CpuToLe16(0);
-            event->wLength = CpuToLe16(0x08);
+            event->wValue = CPU_TO_LE16(0);
+            event->wLength = CPU_TO_LE16(0x08);
             req->length = ECM_STATUS_BYTECOUNT;
 
             /* SPEED_CHANGE data is up/down speeds in bits/sec */
             data = (uint32_t *)((char *)req->buf + sizeof(*event));
-            data[0] = CpuToLe32(EcmBitrate());
+            data[0] = CPU_TO_LE32(EcmBitrate());
             data[1] = data[0];
 
             HDF_LOGD("notify speed %d\n", EcmBitrate());
@@ -484,7 +484,7 @@ static void EcmDoNotify(struct UsbEcmDevice *ecm)
             break;
     }
     event->bmRequestType = 0xA1;
-    event->wIndex = CpuToLe16(ecm->ctrlId);
+    event->wIndex = CPU_TO_LE16(ecm->ctrlId);
 
     ecm->notifyReq = NULL;
     status = UsbFnSubmitRequestAsync(req);
@@ -520,9 +520,9 @@ static int32_t EcmSetup(const struct UsbEcmDevice *ecm, const struct UsbFnCtrlRe
 {
     struct UsbFnRequest *req = ecm->ep0Req;
     int32_t ret = -1;
-    uint16_t index = Le16ToCpu(ctrl->index);
-    uint16_t value = Le16ToCpu(ctrl->value);
-    uint16_t length = Le16ToCpu(ctrl->length);
+    uint16_t index = LE16_TO_CPU(ctrl->index);
+    uint16_t value = LE16_TO_CPU(ctrl->value);
+    uint16_t length = LE16_TO_CPU(ctrl->length);
 
     switch ((ctrl->reqType << 0x08) | ctrl->request) {
         case ((USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE) << 0x08)

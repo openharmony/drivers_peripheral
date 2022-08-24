@@ -66,7 +66,7 @@ struct UsbAdapterUrb {
         int32_t numberOfPackets;
         unsigned int streamId;
     };
-    int32_t error_count;
+    int32_t errorCount
     unsigned int signr;
     void *userContext;
     struct UsbIsoPacketDesc isoFrameDesc[0];

@@ -253,22 +253,17 @@ static int32_t UsbFnAdapterCreateFunc(const char *configPath, const char *funcPa
 
 static int32_t UsbFnReadFile(const char *path, char *str, uint16_t len)
 {
-    int32_t ret;
     FILE *fp = fopen(path, "r");
     if (fp == NULL) {
         HDF_LOGE("%{public}s: fopen failure!", __func__);
         return HDF_ERR_BAD_FD;
     }
-    ret = fread(str, len, 1, fp);
-    if (ret < 0) {
-        if (fclose(fp)) {
-            return HDF_FAILURE;
-        }
+    if (fread(str, len, 1, fp) != 1) {
+        HDF_LOGE("%{public}s: fread failure!", __func__);
+        (void)fclose(fp);
         return HDF_ERR_IO;
     }
-    if (fclose(fp)) {
-        return HDF_FAILURE;
-    }
+    (void)fclose(fp);
     return 0;
 }
 
@@ -911,7 +906,8 @@ static void CleanConfigFs(const char *devName, const char *funcName)
 static void CleanFunction(const char *devName, const char *funcName)
 {
     int32_t ret;
-    ret = UsbFnAdapterDelInterface(funcName, strlen(funcName));
+    int32_t nameLength = (int32_t)strlen(funcName);
+    ret = UsbFnAdapterDelInterface(funcName, nameLength);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: UsbFnAdapterDelInterface failure!", __func__);
         return;
