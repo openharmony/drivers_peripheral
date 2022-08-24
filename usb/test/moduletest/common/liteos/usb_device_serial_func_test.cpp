@@ -32,12 +32,12 @@ public:
 
 void UsbDeviceSerialFuncTest::SetUpTestCase()
 {
-    acm_open();
+    AcmOpen();
 }
 
 void UsbDeviceSerialFuncTest::TearDownTestCase()
 {
-    acm_close();
+    AcmClose();
 }
 
 /**
@@ -51,8 +51,8 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_001, TestSize.Level1)
     printf("------start DeviceIOTest_001------\n");
     char writeBuf[] = "abc123";
     char readBuf[256] = {0};
-    acm_write(writeBuf);
-    acm_read(readBuf);
+    AcmWrite(writeBuf);
+    AcmRead(readBuf);
     EXPECT_EQ(strcmp(writeBuf, readBuf), 0);
     printf("------end DeviceIOTest_001------\n");
 }
@@ -75,8 +75,8 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_002, TestSize.Level1)
     char readBuf[256] = {0};
     for (int32_t i = 0; strlen(data[i]) > 0; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
-        acm_write(const_cast<char *>(data[i]));
-        acm_read(readBuf);
+        AcmWrite(const_cast<char *>(data[i]));
+        AcmRead(readBuf);
         EXPECT_EQ(strcmp(const_cast<char *>(data[i]), readBuf), 0);
     }
     printf("------end DeviceIOTest_002------\n");
@@ -94,14 +94,14 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_003, TestSize.Level2)
     char wdata[256] = "AAA1234567890";
     char rdata[256] = {0};
     for (int32_t i = 0; i < 30; i++) {
-        acm_write(wdata);
-        acm_read(rdata);
+        AcmWrite(wdata);
+        AcmRead(rdata);
         memset_s(rdata, sizeof(rdata), 0, sizeof(rdata));
     }
     char writeBuf[] = "aaa111";
     char readBuf[256] = {0};
-    acm_write(writeBuf);
-    acm_read(readBuf);
+    AcmWrite(writeBuf);
+    AcmRead(readBuf);
     EXPECT_EQ(strcmp(writeBuf, readBuf), 0);
     printf("------end DeviceIOTest_003------\n");
 }
@@ -129,12 +129,12 @@ HWTEST_F(UsbDeviceSerialFuncTest, DeviceIOTest_004, TestSize.Level2)
     strcpy_s(writeBuf, sizeof(writeBuf), data.c_str());
     for (int32_t i = 0; i < writeCnt; i++) {
         memset_s(readBuf, sizeof(readBuf), 0, sizeof(readBuf));
-        acm_write(writeBuf);
-        acm_read(readBuf);
+        AcmWrite(writeBuf);
+        AcmRead(readBuf);
         EXPECT_EQ(strcmp(writeBuf, readBuf), 0);
     }
     char exitBuf[] = "q";
-    acm_write(exitBuf);
+    AcmWrite(exitBuf);
     printf("------end DeviceIOTest_004------\n");
 }
 

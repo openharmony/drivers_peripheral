@@ -45,22 +45,20 @@
 static int32_t g_speedFlag = 0;
 static int32_t g_busNum = DEFAULT_BUSNUM;
 static int32_t g_devAddr = DEFAULT_DEVADDR;
-static struct OsalSem sem;
-static struct OsalSem timeSem;
-
+static struct OsalSem g_sem;
 static uint64_t g_send_count = 0;
 static uint64_t g_recv_count = 0;
 static uint64_t g_byteTotal = 0;
 static struct UsbAdapterUrbs urb[TEST_CYCLE];
-static struct urb *sendUrb = NULL;
+static struct urb *g_sendUrb = NULL;
 static bool g_printData = false;
-static uint8_t endNum;
-static struct OsalSem timeSem;
-static struct usb_device *fd = NULL;
-static uint32_t sigCnt = 0;
-static struct UsbAdapterHostEndpoint *uhe = NULL;
+static uint8_t g_endNum;
+static struct OsalSem g_timeSem;
+static struct usb_device *g_fd = NULL;
+static uint32_t g_sigCnt = 0;
+static struct UsbAdapterHostEndpoint *g_uhe = NULL;
 static bool g_writeOrRead = TEST_WRITE;
-static struct AcmDevice *acm = NULL;
+static struct AcmDevice *g_acm = NULL;
 
 static void CloseDevice(void)
 {
@@ -73,9 +71,9 @@ static int32_t OpenDevice(void)
     paraData.type = USB_PNP_DEVICE_ADDRESS_TYPE;
     paraData.busNum = (uint8_t)g_busNum;
     paraData.devNum = (uint8_t)g_devAddr;
-    fd = UsbPnpNotifyGetUsbDevice(paraData);
-    if (fd == NULL) {
-        HDF_LOGE("%{public}s:%{public}d err fd\n", __func__, __LINE__);
+    g_fd = UsbPnpNotifyGetUsbDevice(paraData);
+    if (g_fd == NULL) {
+        HDF_LOGE("%{public}s: UsbPnpNotifyGetUsbDevice err", __func__);
         return -1;
     }
     return 0;
@@ -83,7 +81,7 @@ static int32_t OpenDevice(void)
 
 static int32_t ClaimInterface(int32_t iface)
 {
-    HDF_LOGI("%{public}s:%{public}d claim success: iface=%d\n", __func__, __LINE__, iface);
+    HDF_LOGI("%{public}s: claim success: iface=%d\n", __func__, iface);
     return HDF_SUCCESS;
 }
 
@@ -92,13 +90,13 @@ static void SpeedPrint(void)
     double speed;
     uint64_t count;
 
-    sigCnt++;
-    count = sigCnt * TEST_PRINT_TIME;
+    g_sigCnt++;
+    count = g_sigCnt * TEST_PRINT_TIME;
     if (count >= TEST_TIME) {
         g_speedFlag = true;
     }
     speed =
-        (g_byteTotal * TEST_DOUBLE_COUNT) / (sigCnt * TEST_PRINT_TIME * TEST_BYTE_COUNT_UINT * TEST_BYTE_COUNT_UINT);
+        (g_byteTotal * TEST_DOUBLE_COUNT) / (g_sigCnt * TEST_PRINT_TIME * TEST_BYTE_COUNT_UINT * TEST_BYTE_COUNT_UINT);
     printf("\nSpeed:%f MB/s\n", speed);
 }
 
@@ -108,7 +106,7 @@ static int32_t SendProcess(void *argurb)
     int32_t i;
     int32_t err;
     while (!g_speedFlag) {
-        OsalSemWait(&sem, HDF_WAIT_FOREVER);
+        OsalSemWait(&g_sem, HDF_WAIT_FOREVER);
         for (i = 0; i < TEST_CYCLE; i++) {
             if (urb[i].inUse == 0) {
                 urb[i].inUse = 1;
@@ -119,13 +117,13 @@ static int32_t SendProcess(void *argurb)
         if (i == TEST_CYCLE) {
             i = TEST_CYCLE - 1;
         }
-        sendUrb = urb[i].urb;
-        err = usb_setup_endpoint(fd, uhe, TEST_BYTE_COUNT_UINT);
+        g_sendUrb = urb[i].urb;
+        err = usb_setup_endpoint(g_fd, g_uhe, TEST_BYTE_COUNT_UINT);
         if (err < 0) {
             DPRINTFN(0, "setup failed err:%d\n", err);
             return err;
         }
-        err = usb_submit_urb(sendUrb, 0);
+        err = usb_submit_urb(g_sendUrb, 0);
         if (err < 0) {
             HDF_LOGI("SubmitBulkRequest: err:%d\n", err);
             urb[i].inUse = 0;
@@ -155,13 +153,13 @@ static void UrbComplete(struct urb *curUrb)
     for (i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].urb == curUrb) {
             if (g_byteTotal == 0) {
-                OsalSemPost(&timeSem);
+                OsalSemPost(&g_timeSem);
             }
             g_recv_count++;
             g_byteTotal += curUrb->actual_length;
             UrbCompleteHandle(curUrb);
             urb[i].inUse = 0;
-            OsalSemPost(&sem);
+            OsalSemPost(&g_sem);
             break;
         }
     }
@@ -182,8 +180,8 @@ static int32_t BeginProcessHandleFirst(void)
             }
         }
         urb[i].inUse = 0;
-        urb[i].urb->dev = fd;
-        urb[i].urb->endpoint = uhe;
+        urb[i].urb->dev = g_fd;
+        urb[i].urb->endpoint = g_uhe;
         urb[i].urb->complete = UrbComplete;
 
         if (data == NULL) {
@@ -218,8 +216,8 @@ static int32_t BeginProcess(unsigned char endPoint)
         return -1;
     }
 
-    uhe = usb_find_host_endpoint(fd, USB_REQUEST_TYPE_BULK, endPoint);
-    if (uhe == NULL) {
+    g_uhe = usb_find_host_endpoint(g_fd, USB_REQUEST_TYPE_BULK, endPoint);
+    if (g_uhe == NULL) {
         HDF_LOGE("%{public}s:%{public}d usb_find_host_endpoint error\n", __func__, __LINE__);
         return -1;
     }
@@ -234,13 +232,13 @@ static int32_t BeginProcess(unsigned char endPoint)
         if (urb[i].inUse == 0) {
             urb[i].inUse = 1;
             urb[i].urbNum = transNum;
-            sendUrb = urb[i].urb;
-            ret = usb_setup_endpoint(fd, uhe, TEST_BYTE_COUNT_UINT);
+            g_sendUrb = urb[i].urb;
+            ret = usb_setup_endpoint(g_fd, g_uhe, TEST_BYTE_COUNT_UINT);
             if (ret < 0) {
                 DPRINTFN(0, "setup failed ret:%d\n", ret);
                 return ret;
             }
-            ret = usb_submit_urb(sendUrb, 0);
+            ret = usb_submit_urb(g_sendUrb, 0);
             if (ret < 0) {
                 HDF_LOGI("%{public}s:%{public}d SubmitBulkRequest: ret:%d\n", __func__, __LINE__, ret);
                 urb[i].inUse = 0;
@@ -250,9 +248,9 @@ static int32_t BeginProcess(unsigned char endPoint)
         }
     }
 
-    OsalSemWait(&timeSem, TEST_TIME);
+    OsalSemWait(&g_timeSem, TEST_TIME);
     while (!g_speedFlag) {
-        OsalSemWait(&timeSem, TEST_PRINT_TIME * TEST_PRINT_TIME_UINT);
+        OsalSemWait(&g_timeSem, TEST_PRINT_TIME * TEST_PRINT_TIME_UINT);
         SpeedPrint();
     }
 
@@ -313,7 +311,7 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest * const input, int32
     g_byteTotal = 0;
     g_printData = false;
     g_writeOrRead = TEST_WRITE;
-    sigCnt = 0;
+    g_sigCnt = 0;
     g_busNum = DEFAULT_BUSNUM;
     g_devAddr = DEFAULT_DEVADDR;
 
@@ -322,8 +320,8 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest * const input, int32
         g_busNum = input->busNum;
         g_devAddr = input->devAddr;
         *ifaceNum = input->ifaceNum;
-        endNum = input->writeOrRead;
-        g_writeOrRead = ((endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
+        g_endNum = input->writeOrRead;
+        g_writeOrRead = ((g_endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
         if (g_writeOrRead == TEST_READ) {
             g_printData = input->printData;
         }
@@ -331,19 +329,19 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest * const input, int32
         g_busNum = input->busNum;
         g_devAddr = input->devAddr;
         *ifaceNum = input->ifaceNum;
-        endNum = input->writeOrRead;
-        g_writeOrRead = ((endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
+        g_endNum = input->writeOrRead;
+        g_writeOrRead = ((g_endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
     } else if (input->paramNum == INPUT_COMPARE_NUMONE) {
         *ifaceNum = input->ifaceNum;
-        endNum = input->writeOrRead;
-        g_writeOrRead = ((endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
+        g_endNum = input->writeOrRead;
+        g_writeOrRead = ((g_endNum >> ENDPOINT_IN_OFFSET) == 0) ? TEST_WRITE : TEST_READ;
     } else {
         printf("Error: parameter error! \n\n");
         ShowHelp("speedtest");
         return HDF_FAILURE;
     }
-    OsalSemInit(&sem, 0);
-    OsalSemInit(&timeSem, 0);
+    OsalSemInit(&g_sem, 0);
+    OsalSemInit(&g_timeSem, 0);
 
     return ret;
 }
@@ -379,12 +377,12 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
     int32_t ret;
     struct UsbSpeedTest *input = NULL;
     uint32_t size = 0;
-    if (acm->busy) {
+    if (g_acm->busy) {
         HDF_LOGE("%{public}s: %{public}d speed test busy\n", __func__, __LINE__);
         ret = HDF_ERR_IO;
         goto END;
     } else {
-        acm->busy = true;
+        g_acm->busy = true;
     }
 
     (void)HdfSbufReadBuffer(data, (const void **)&input, &size);
@@ -411,15 +409,15 @@ static int32_t UsbSerialSpeed(struct HdfSBuf *data)
         goto END;
     }
 
-    ret = BeginProcess(endNum);
+    ret = BeginProcess(g_endNum);
     if (ret != HDF_SUCCESS) {
         goto END;
     }
 
 END:
-    acm->busy = false;
+    g_acm->busy = false;
     if (ret != HDF_SUCCESS) {
-        printf("please check whether usb drv so is existing or not,like acm, ecm,if not,remove it and test again!\n");
+        printf("please check whether usb drv so is existing or not,like g_acm, ecm,if not,remove it and test again!\n");
     }
     CloseDevice();
     return ret;
@@ -444,7 +442,7 @@ static int32_t AcmDeviceDispatch(
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    acm = (struct AcmDevice *)client->device->service;
+    g_acm = (struct AcmDevice *)client->device->service;
 
     switch (cmd) {
         case USB_SERIAL_OPEN:
@@ -467,16 +465,16 @@ static int32_t AcmDriverBind(struct HdfDeviceObject *device)
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*acm));
-    if (acm == NULL) {
-        HDF_LOGE("%s: Alloc usb acm device failed", __func__);
+    g_acm = (struct AcmDevice *)OsalMemCalloc(sizeof(*g_acm));
+    if (g_acm == NULL) {
+        HDF_LOGE("%s: Alloc usb g_acm device failed", __func__);
         return HDF_FAILURE;
     }
 
-    acm->device = device;
-    device->service = &(acm->service);
-    if (acm->device && acm->device->service) {
-        acm->device->service->Dispatch = AcmDeviceDispatch;
+    g_acm->device = device;
+    device->service = &(g_acm->service);
+    if (g_acm->device && g_acm->device->service) {
+        g_acm->device->service->Dispatch = AcmDeviceDispatch;
     }
     return HDF_SUCCESS;
 }

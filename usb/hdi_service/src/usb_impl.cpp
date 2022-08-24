@@ -132,7 +132,6 @@ int32_t UsbImpl::UsbControlTransferEx(HostDevice *dev, UsbControlParams *ctrPara
     if (dev->ctrlReq == nullptr) {
         request = UsbAllocRequest(dev->ctrDevHandle, 0, MAX_CONTROL_BUFF_SIZE);
         if (request == nullptr) {
-            HDF_LOGE("%{public}s:UsbAllocRequest alloc request failed\n", __func__);
             return HDF_ERR_MALLOC_FAIL;
         }
         dev->ctrlReq = request;
@@ -143,7 +142,6 @@ int32_t UsbImpl::UsbControlTransferEx(HostDevice *dev, UsbControlParams *ctrPara
     UsbdDispatcher::UsbRequestParamsInit(&params, timeout);
     int32_t ret = UsbdDispatcher::UsbControlSetUp(ctrParams, &params.ctrlReq);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:UsbControlSetUp failed, ret = %{public}d", __func__, ret);
         return ret;
     }
     OsalMutexLock(&dev->lock);
@@ -377,14 +375,11 @@ int32_t UsbImpl::UsbdBulkReadSyncBase(
 
     int32_t ret = HDF_FAILURE;
     uint64_t intTimeout = timeout < 0 ? 0 : (uint64_t)timeout;
-    uint32_t timeonce = 500;
     uint64_t stime = OsalGetSysTimeMs();
-    uint64_t ntime = 0;
     uint32_t tcur = 0;
-    uint32_t msize = 0;
     OsalMutexLock(&requestSync->lock);
-    requestSync->params.timeout = timeonce;
-    msize = requestSync->pipe.maxPacketSize;
+    requestSync->params.timeout = 500; // 500 is timeout
+    uint32_t msize = requestSync->pipe.maxPacketSize;
     while (tcur + msize < size) {
         ret = UsbFillRequest(requestSync->request, requestSync->ifHandle, &requestSync->params);
         if (ret != HDF_SUCCESS) {
@@ -406,7 +401,7 @@ int32_t UsbImpl::UsbdBulkReadSyncBase(
                 ret = HDF_SUCCESS;
                 break;
             }
-            ntime = OsalGetSysTimeMs();
+            uint64_t ntime = OsalGetSysTimeMs();
             if (intTimeout == 0 || (ntime < stime + intTimeout)) {
                 continue;
             } else {
@@ -964,15 +959,13 @@ int32_t UsbImpl::HdfReadDevice(int32_t *count, int32_t *size, HdfSBuf *reply)
         HDF_LOGE("%{public}s: failed to read status from reply", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
-    HDF_LOGI("%{public}s:%{public}d OnStart get "
-             "device[%{public}d]:%{public}d:%{public}d status:%{public}d "
-             "class:%{public}d subClass:%{public}d protocol:%{public}d",
-        __func__, __LINE__, *count, busNum, devNum, status, devClass, subClass, protocol);
+
+    HDF_LOGI("%{public}s:busNum:%{public}d devNum:%{public}d class:%{public}d", __func__, busNum, devNum, devClass);
     if (devClass != BASE_CLASS_HUB) {
         UsbdDispatcher::UsbdDeviceCreateAndAttach(this, busNum, devNum);
         USBDeviceInfo info = {ACT_DEVUP, busNum, devNum};
         if (subscriber_ == nullptr) {
-            HDF_LOGE("%{public}s: subscriber_ is nullptr, %{public}d", __func__, __LINE__);
+            HDF_LOGE("%{public}s: subscriber_ is nullptr", __func__);
             return HDF_FAILURE;
         }
         (void)subscriber_->DeviceEvent(info);

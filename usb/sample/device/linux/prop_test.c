@@ -143,7 +143,7 @@ static int32_t TestPropRegist(const char *propName, const char *propValue)
 }
 
 
-int32_t prop_test(int32_t argc, const char *argv[])
+int32_t PropTest(int32_t argc, const char *argv[])
 {
     int32_t ch;
     int32_t ret;

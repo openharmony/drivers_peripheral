@@ -29,7 +29,7 @@
 
 #define HDF_LOG_TAG   cdc_acm_test
 
-static int32_t running = 1;
+static int32_t g_running = 1;
 static struct termios g_orgOpts, g_newOpts;
 static struct HdfSBuf *g_data;
 static struct HdfSBuf *g_reply;
@@ -84,7 +84,7 @@ static void TestRead(void)
 static int32_t ReadThread(void *arg)
 {
     (void)arg;
-    while (running != 0) {
+    while (g_running != 0) {
         TestRead();
         usleep(SLEEP_100MS);
     }
@@ -126,9 +126,9 @@ static void SetTermios(void)
 static void WriteThread(void)
 {
     char str[STR_LEN] = {0};
-    while (running != 0) {
+    while (g_running != 0) {
         str[0] = (char)getchar();
-        if (running != 0) {
+        if (g_running != 0) {
             TestWrite(str);
         }
     }
@@ -138,16 +138,16 @@ static void StopAcmTest(int32_t signo)
 {
     (void)signo;
     int32_t status;
-    running = 0;
+    g_running = 0;
     status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_SERIAL_CLOSE err", __func__);
     }
     tcsetattr(STDIN_FILENO, TCSANOW, &g_orgOpts);
-    printf("acm_test exit.\n");
+    printf("AcmTest exit.\n");
 }
 
-int32_t acm_test(int32_t argc, const char *argv[])
+int32_t AcmTest(int32_t argc, const char *argv[])
 {
     (void)argc;
     (void)argv;

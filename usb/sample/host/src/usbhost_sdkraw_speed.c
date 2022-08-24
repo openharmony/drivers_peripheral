@@ -359,7 +359,7 @@ static int32_t UsbSerialDeviceAlloc(struct AcmDevice *acm)
         HDF_LOGE("%s: init lock fail!", __func__);
         return HDF_FAILURE;
     }
-    port->lineCoding.dwDTERate = CpuToLe32(DATARATE);
+    port->lineCoding.dwDTERate = CPU_TO_LE32(DATARATE);
     port->lineCoding.bCharFormat = USB_CDC_1_STOP_BITS;
     port->lineCoding.bParityType = USB_CDC_NO_PARITY;
     port->lineCoding.bDataBits = DATA_BITS_LENGTH;
