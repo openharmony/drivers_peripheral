@@ -43,31 +43,31 @@
 /**
  * @brief Implements 16-bit little-endian conversion.
  */
-#define CpuToLe16(x) (x)
+#define CPU_TO_LE16(x) (x)
 /**
  * @brief Implements 32-bit little-endian conversion.
  */
-#define CpuToLe32(x) (x)
+#define CPU_TO_LE32(x) (x)
 #else
 /**
  * @brief Implements 16-bit little-endian conversion.
  */
-#define CpuToLe16(x) ((((x) >> 8) & 0xffu) | (((x)&0xffu) << 8))
+#define CPU_TO_LE16(x) ((((x) >> 8) & 0xffu) | (((x)&0xffu) << 8))
 /**
  * @brief Implements 32-bit little-endian conversion.
  */
-#define CpuToLe32(x) \
+#define CPU_TO_LE32(x) \
     ((((x)&0xff000000u) >> 24) | (((x)&0x00ff0000u) >> 8) | (((x)&0x0000ff00u) << 8) | (((x)&0x000000ffu) << 24))
 #endif
 
 /**
  * @brief Implements 16-bit little-endian conversion.
  */
-#define Le16ToCpu CpuToLe16
+#define LE16_TO_CPU CPU_TO_LE16
 /**
  * @brief Implements 16-bit little-endian conversion.
  */
-#define Le32ToCpu CpuToLe32
+#define LE32_TO_CPU CPU_TO_LE32
 
 /**
  * @brief Configures the bus power-on feature.
@@ -122,7 +122,7 @@ enum {
     FUNCTIONFS_DESCRIPTORS_MAGIC_V2 = 3,
 };
 
-enum functionfs_flags {
+enum FunctionfsFlags {
     FUNCTIONFS_HAS_FS_DESC = 1,
     FUNCTIONFS_HAS_HS_DESC = 2,
     FUNCTIONFS_HAS_SS_DESC = 4,
@@ -535,9 +535,9 @@ struct UsbCdcEtherDesc {
 #define USB_DDK_REQ_SET_SEL           0x30
 #define USB_DDK_REQ_SET_ISOCH_DELAY   0x31
 
-#define UsbiDescriptorHeader        UsbDescriptorHeader
-#define UsbiConfigurationDescriptor UsbConfigDescriptor
-#define UsbiInterfaceDescriptor     UsbInterfaceDescriptor
+#define USBI_DESCRIPTOR_HEADER        UsbDescriptorHeader
+#define USBI_CONFIGURATION_DESCRIPTOR UsbConfigDescriptor
+#define USBI_INTERFACE_DESCRIPTOR    UsbInterfaceDescriptor
 
 /**
  * @brief Checks whether the specified endpoint is in the input direction (the direction in

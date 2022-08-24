@@ -123,7 +123,7 @@ static void DdkDispatchUevent(const struct DdkUeventInfo *info)
     }
 }
 
-static void DdkHandleUevent(const char msg[], int32_t rcvLen)
+static void DdkHandleUevent(const char msg[], ssize_t rcvLen)
 {
     (void) rcvLen;
     struct DdkUeventInfo info = {
@@ -136,7 +136,7 @@ static void DdkHandleUevent(const char msg[], int32_t rcvLen)
     };
 
     const char *msgTmp = msg;
-    while (*msgTmp) {
+    while (*msgTmp != '\0') {
         if (strncmp(msgTmp, "ACTION=", strlen("ACTION=")) == 0) {
             msgTmp += strlen("ACTION=");
             info.action = msgTmp;
@@ -174,7 +174,7 @@ void *DdkUeventMain(void *param)
     }
 
     int32_t ret;
-    int32_t rcvLen = 0;
+    ssize_t rcvLen = 0;
     fd_set fds;
     char msg[UEVENT_MSG_LEN];
     struct timeval tv;
@@ -197,10 +197,10 @@ void *DdkUeventMain(void *param)
                 HDF_LOGE("recv failed");
                 return NULL;
             }
-            if (rcvLen == UEVENT_MSG_LEN) {
+            if (rcvLen == (ssize_t)UEVENT_MSG_LEN) {
                 continue;
             }
             DdkHandleUevent(msg, rcvLen);
         } while (rcvLen > 0);
-    } while (1);
+    } while (true);
 }

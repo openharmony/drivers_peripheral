@@ -167,7 +167,7 @@ const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName, struct UsbFnDes
         HDF_LOGE("%{public}s: INVALID PARAM", __func__);
         return NULL;
     }
-    if (UsbFnMgrDeviceGet(udcName)) {
+    if (UsbFnMgrDeviceGet(udcName) != NULL) {
         HDF_LOGE("%{public}s:%{public}s haved create!", __func__, udcName);
         return NULL;
     }

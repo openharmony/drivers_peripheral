@@ -157,15 +157,15 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsConfigTest_002, TestSize.Level2)
     const char *idProduct = "4ee8";
     const char *bDeviceProtocol = "01";
 
-    ASSERT_EQ(system(("prop_test -s idVendor " + string(idVendor)).c_str()), 0);
-    ASSERT_EQ(system(("prop_test -s idProduct " + string(idProduct)).c_str()), 0);
-    ASSERT_EQ(system(("prop_test -s bDeviceProtocol " + string(bDeviceProtocol)).c_str()), 0);
-    ASSERT_EQ(system("prop_test -g idVendor"), 0);
-    ASSERT_EQ(system("prop_test -g idProduct"), 0);
-    ASSERT_EQ(system("prop_test -g bDeviceProtocol"), 0);
-    ASSERT_EQ(system("prop_test -s idVendor 12d1"), 0);
-    ASSERT_EQ(system("prop_test -s idProduct 5000"), 0);
-    ASSERT_EQ(system("prop_test -s bDeviceProtocol 00"), 0);
+    ASSERT_EQ(system(("PropTest -s idVendor " + string(idVendor)).c_str()), 0);
+    ASSERT_EQ(system(("PropTest -s idProduct " + string(idProduct)).c_str()), 0);
+    ASSERT_EQ(system(("PropTest -s bDeviceProtocol " + string(bDeviceProtocol)).c_str()), 0);
+    ASSERT_EQ(system("PropTest -g idVendor"), 0);
+    ASSERT_EQ(system("PropTest -g idProduct"), 0);
+    ASSERT_EQ(system("PropTest -g bDeviceProtocol"), 0);
+    ASSERT_EQ(system("PropTest -s idVendor 12d1"), 0);
+    ASSERT_EQ(system("PropTest -s idProduct 5000"), 0);
+    ASSERT_EQ(system("PropTest -s bDeviceProtocol 00"), 0);
     printf("------end HcsConfigTest_002------\n");
 }
 }

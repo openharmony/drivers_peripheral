@@ -21,7 +21,6 @@
 #define HDF_LOG_TAG USB_INTERFACE_POOL
 
 static int32_t g_usbRequestObjectId = 0;
-
 static HDF_STATUS IfFreePipeObj(struct UsbPipe *pipeObj)
 {
     HDF_STATUS ret = HDF_SUCCESS;
@@ -344,7 +343,7 @@ static struct UsbInterfacePool *IfFindInterfacePool(
 
     OsalMutexLock((struct OsalMutex *)&session->lock);
     ifacePoolList = (struct DListHead *)&session->ifacePoolList;
-    if (DListIsEmpty(ifacePoolList)) {
+    if (DListIsEmpty(ifacePoolList) == true) {
         OsalMutexUnlock((struct OsalMutex *)&session->lock);
         HDF_LOGE("%{public}s:%{public}d interface pool list is empty", __func__, __LINE__);
         return NULL;
@@ -1248,18 +1247,19 @@ struct UsbRequest *UsbAllocRequest(const UsbInterfaceHandle *interfaceHandle, in
     struct UsbHostRequest *hostRequest = NULL;
 
     if (ifaceHdl == NULL || ifaceHdl->devHandle == NULL) {
-        HDF_LOGE("%{public}s:%{public}d handle is null", __func__, __LINE__);
+        HDF_LOGE("%{public}s: handle is null", __func__);
         return NULL;
     }
 
     requestObj = (struct UsbIfRequest *)RawUsbMemCalloc(sizeof(struct UsbIfRequest));
     if (requestObj == NULL) {
-        HDF_LOGE("%{public}s:%{public}d RawUsbMemCalloc UsbRequest error", __func__, __LINE__);
+        HDF_LOGE("%{public}s: RawUsbMemCalloc UsbRequest error", __func__);
         return NULL;
     }
 
     hostRequest = RawAllocRequest(ifaceHdl->devHandle, isoPackets, length);
     if (hostRequest == NULL) {
+        HDF_LOGE("%{public}s: RawAllocRequest error", __func__);
         RawUsbMemFree(requestObj);
         return NULL;
     }
