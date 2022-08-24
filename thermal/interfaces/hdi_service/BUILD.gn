@@ -44,6 +44,7 @@ ohos_shared_library("libthermal_interface_service_1.0") {
       "drivers_interface_thermal:thermal_idl_headers",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
+      "init:libbeget_proxy",
       "init:libbegetutil",
       "ipc:ipc_single",
     ]

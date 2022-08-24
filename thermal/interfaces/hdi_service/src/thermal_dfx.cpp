@@ -26,7 +26,7 @@
 #include <hdf_base.h>
 
 #include "directory_ex.h"
-#include "parameters.h"
+#include "parameter.h"
 #include "securec.h"
 #include "thermal_log.h"
 #include "thermal_zone_manager.h"
@@ -41,19 +41,26 @@ constexpr uint8_t LOG_INDEX_LEN = 4;
 constexpr int32_t MSEC_TO_SEC = 1000;
 constexpr int32_t MAX_FILE_NUM = 10;
 constexpr int32_t MAX_FILE_SIZE = 10 * 1024 *1024;
-constexpr int32_t DEFAULT_INTERVAL_MS = 5000;
 constexpr int32_t MAX_TIME_LEN = 20;
 constexpr int32_t MAX_BUFF_SIZE = 128;
 constexpr int32_t TIME_FORMAT_1 = 1;
 constexpr int32_t TIME_FORMAT_2 = 2;
 constexpr int32_t COMPRESS_READ_BUF_SIZE = 4096;
 const std::string TIMESTAMP_TITLE = "timestamp";
+const std::string DEFAULT_WIDTH = "20";
+const std::string DEFAULT_INTERVAL = "5000";
+const std::string DEFAULT_ENABLE = "true";
+const std::string THERMAL_LOG_WIDTH = "persist.thermal.log.width";
+const std::string THERMAL_LOG_INTERVAL = "persist.thermal.log.interval";
+const std::string THERMAL_LOG_ENABLE = "persist.thermal.log.enable";
 uint32_t g_currentLogIndex = 0;
-int32_t g_timerInterval = -1;
 bool g_firstCreate = true;
 std::deque<std::string> g_saveLogFile;
-std::string g_logTime = "";
 XMLTracingInfo g_xmlTraceInfo;
+std::string g_logTime = "";
+std::string g_width = DEFAULT_WIDTH;
+std::string g_interval = DEFAULT_INTERVAL;
+std::string g_enable = DEFAULT_ENABLE;
 }
 
 static std::string GetCurrentTime(const int32_t format)
@@ -90,22 +97,6 @@ std::string ThermalDfx::GetFileNameIndex(const uint32_t index)
     (void)snprintf_s(res, sizeof(res), sizeof(res) - 1, "%03d", index % MAX_FILE_NUM);
     std::string fileNameIndex(res);
     return fileNameIndex;
-}
-
-void ThermalDfx::UpdateInterval()
-{
-    std::string paramInterval = OHOS::system::GetParameter("persist.thermal.log.interval", "5000");
-    int32_t interval = std::stoi(paramInterval.c_str());
-    THERMAL_HILOGD(COMP_HDI, "interval = %{public}d", interval);
-    if (interval == 0) {
-        interval = std::stoi(g_xmlTraceInfo.interval.c_str());
-    }
-
-    if (interval == 0) {
-        interval = DEFAULT_INTERVAL_MS;
-    }
-
-    g_timerInterval = interval;
 }
 
 std::string ThermalDfx::CanonicalizeSpecPath(const char* src)
@@ -251,9 +242,7 @@ bool ThermalDfx::PrepareWriteDfxLog()
         THERMAL_HILOGW(COMP_HDI, "parse thermal_hdi_config.xml outpath fail");
         return false;
     }
-
-    std::string paramEnable = OHOS::system::GetParameter("persist.thermal.log.enable", "true");
-    if (paramEnable == "false") {
+    if (g_enable == "false") {
         THERMAL_HILOGD(COMP_HDI, "param does not start recording");
         return false;
     }
@@ -298,9 +287,7 @@ void ThermalDfx::CreateLogFile()
 
 void ThermalDfx::ProcessLogInfo(std::string& logFile, bool isEmpty)
 {
-    std::string width = OHOS::system::GetParameter("persist.thermal.log.width", "20");
-    std::string interval = OHOS::system::GetParameter("persist.thermal.log.interval", "5000");
-    uint32_t paramWidth = std::stoi(width.c_str());
+    uint32_t paramWidth = std::stoi(g_width.c_str());
 
     std::string currentTime = GetCurrentTime(TIME_FORMAT_2);
     std::ofstream wStream(logFile, std::ios::app);
@@ -368,8 +355,6 @@ void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime, u
 void ThermalDfx::GetTraceInfo()
 {
     XMLTracingInfo info = ThermalHdfConfig::GetInsance().GetXmlTraceInfo();
-    THERMAL_HILOGD(COMP_HDI, "info.interval = %{public}s, info.outpath = %{private}s",
-        info.interval.c_str(), info.outpath.c_str());
 
     g_xmlTraceInfo.interval = info.interval;
     g_xmlTraceInfo.outpath = info.outpath;
@@ -383,13 +368,44 @@ void ThermalDfx::GetTraceInfo()
     CreateLogFile();
 }
 
+void ThermalDfx::InfoChangedCallback(const char* key, const char* value, void* context)
+{
+    if (key == nullptr) {
+        return;
+    }
+
+    if (strcmp(key, THERMAL_LOG_WIDTH.c_str()) == 0) {
+        if (value == nullptr) {
+            return;
+        }
+        g_width = value;
+        return;
+    }
+    if (strcmp(key, THERMAL_LOG_INTERVAL.c_str()) == 0) {
+        if (value == nullptr) {
+            return;
+        }
+        g_interval = value;
+        return;
+    }
+    if (strcmp(key, THERMAL_LOG_ENABLE.c_str()) == 0) {
+        if (value == nullptr) {
+            return;
+        }
+        g_enable = value;
+        return;
+    }
+    return;
+}
+
 int32_t ThermalDfx::LoopingThreadEntry()
 {
+    WatchParameter(THERMAL_LOG_WIDTH.c_str(), InfoChangedCallback, nullptr);
+    WatchParameter(THERMAL_LOG_INTERVAL.c_str(), InfoChangedCallback, nullptr);
+    WatchParameter(THERMAL_LOG_ENABLE.c_str(), InfoChangedCallback, nullptr);
     while (true) {
-        UpdateInterval();
-        int32_t timeout = g_timerInterval;
-        THERMAL_HILOGD(COMP_HDI, "timeout = %{public}d", timeout);
-        std::this_thread::sleep_for(std::chrono::seconds(timeout / MSEC_TO_SEC));
+        THERMAL_HILOGD(COMP_HDI, "interval = %{public}s", g_interval.c_str());
+        std::this_thread::sleep_for(std::chrono::seconds(std::stoi(g_interval.c_str()) / MSEC_TO_SEC));
         GetTraceInfo();
         CompressFile();
     }
