@@ -138,6 +138,9 @@ private:
     int32_t ParsePluggedMaxVoltage(int32_t* maxVoltage) const;
     void CopyBatteryInfo(const struct BatterydInfo* info) const;
     void CreateFile(const std::string& path, const std::string& content);
+    void CreateMockTechPath(std::string& mockTechPath);
+    void CreateMockChargerPath(std::string& mockChargerPath);
+    void CreateMockBatteryPath(std::string& mockBatteryPath);
     int32_t ReadFileToMap(std::map<std::string, std::string>& chargingLimitMap, std::string chargingLimitPath);
     int32_t WriteChargingLimit(std::string chargingLimitPath, std::string& configStr);
     std::vector<std::string> nodeNames_;

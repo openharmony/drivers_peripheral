@@ -74,6 +74,10 @@ static std::string GetCurrentTime(const int32_t format)
     }
 
     pTime = localtime(&t);
+    if (pTime == nullptr) {
+        THERMAL_HILOGW(COMP_HDI, "pTime Get localtime failed");
+        return "";
+    }
     if (format == TIME_FORMAT_1) {
         if (strftime(strTime, sizeof(strTime), "%Y%m%d-%H%M%S", pTime) == 0U) {
             THERMAL_HILOGW(COMP_HDI, "call strfime failed");
@@ -287,7 +291,7 @@ void ThermalDfx::CreateLogFile()
 
 void ThermalDfx::ProcessLogInfo(std::string& logFile, bool isEmpty)
 {
-    uint32_t paramWidth = std::stoi(g_width.c_str());
+    uint32_t paramWidth = static_cast<uint32_t>(std::stoi(g_width.c_str()));
 
     std::string currentTime = GetCurrentTime(TIME_FORMAT_2);
     std::ofstream wStream(logFile, std::ios::app);

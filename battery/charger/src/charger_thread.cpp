@@ -41,8 +41,8 @@ constexpr int32_t VIBRATE_TIME_MS = 75;
 constexpr int32_t MAX_IMG_COUNT = 62;
 constexpr int32_t MAX_IMG_NAME_SIZE = 255;
 constexpr int32_t LOOP_TOP_PICTURES = 10;
-const char* REBOOT_CMD = "";
-const char* SHUTDOWN_CMD = "shutdown";
+const std::string REBOOT_CMD = "";
+const std::string SHUTDOWN_CMD = "shutdown";
 }
 
 struct KeyState {
@@ -205,7 +205,7 @@ void ChargerThread::HandleCapacity(const int32_t& capacity)
         ((chargeState_ == PowerSupplyProvider::CHARGE_STATE_NONE) ||
         (chargeState_ == PowerSupplyProvider::CHARGE_STATE_RESERVED))) {
         BATTERY_HILOGW(FEATURE_CHARGING, "low capacity, shutdown device");
-        DoReboot(SHUTDOWN_CMD);
+        DoReboot(SHUTDOWN_CMD.c_str());
     }
 }
 
@@ -218,7 +218,7 @@ void ChargerThread::HandleTemperature(const int32_t& temperature)
     if (((temperature <= tempConf.lower) || (temperature >= tempConf.upper)) &&
         (tempConf.lower != tempConf.upper)) {
         BATTERY_HILOGW(FEATURE_CHARGING, "temperature out of range, shutdown device");
-        DoReboot(SHUTDOWN_CMD);
+        DoReboot(SHUTDOWN_CMD.c_str());
     }
 }
 
@@ -246,7 +246,7 @@ void ChargerThread::HandleChargingState()
         } else if (now >= pluginWait_) {
             BATTERY_HILOGI(FEATURE_CHARGING, "shutdown device, charger unplugged, pluginWait_=%{public}" PRId64 "",
                 pluginWait_);
-            DoReboot(SHUTDOWN_CMD);
+            DoReboot(SHUTDOWN_CMD.c_str());
         } else {
             BATTERY_HILOGD(FEATURE_CHARGING, "ShutDownDevice timer already in scheduled.");
         }
@@ -323,7 +323,7 @@ void ChargerThread::HandlePowerKey(int32_t keycode, int64_t now)
                 backlight_->TurnOffScreen();
                 AnimationLabel::needStop_ = true;
                 vibrate_->HandleVibration(VIBRATE_TIME_MS);
-                DoReboot(REBOOT_CMD);
+                DoReboot(REBOOT_CMD.c_str());
             } else {
                 SetKeyWait(key, REBOOT_TIME);
                 backlight_->TurnOnScreen();

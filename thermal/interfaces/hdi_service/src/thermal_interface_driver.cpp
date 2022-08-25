@@ -23,10 +23,12 @@
 
 using namespace OHOS::HDI::Thermal::V1_0;
 
+namespace {
 struct HdfThermalInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
+}
 
 static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
@@ -49,13 +51,13 @@ static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
     return hdfThermalInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-int HdfThermalInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+static int32_t HdfThermalInterfaceDriverInit([[maybe_unused]] struct HdfDeviceObject *deviceObject)
 {
     THERMAL_HILOGD(COMP_HDI, "enter");
     return HDF_SUCCESS;
 }
 
-int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+static int32_t HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     THERMAL_HILOGD(COMP_HDI, "enter");
 
@@ -88,7 +90,7 @@ int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-void HdfThermalInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfThermalInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     THERMAL_HILOGD(COMP_HDI, "enter");
     if (deviceObject->service == nullptr) {
@@ -100,7 +102,7 @@ void HdfThermalInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     delete hdfThermalInterfaceHost;
 }
 
-struct HdfDriverEntry g_thermalinterfaceDriverEntry = {
+static struct HdfDriverEntry g_thermalinterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "thermal_interface_service",
     .Bind = HdfThermalInterfaceDriverBind,
