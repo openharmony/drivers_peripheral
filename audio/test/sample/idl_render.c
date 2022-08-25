@@ -480,7 +480,7 @@ static int32_t FrameStart(const struct StrPara *param)
                 AUDIO_FUNC_LOGE("Render already stop!");
                 break;
             }
-            remainingDataSize -= (int32_t)numRead;
+            remainingDataSize -= numRead;
         }
         while (g_waitSleep) {
             printf("music pause now.\n");
