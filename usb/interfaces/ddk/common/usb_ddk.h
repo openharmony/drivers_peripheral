@@ -535,10 +535,6 @@ struct UsbCdcEtherDesc {
 #define USB_DDK_REQ_SET_SEL           0x30
 #define USB_DDK_REQ_SET_ISOCH_DELAY   0x31
 
-#define USBI_DESCRIPTOR_HEADER        UsbDescriptorHeader
-#define USBI_CONFIGURATION_DESCRIPTOR UsbConfigDescriptor
-#define USBI_INTERFACE_DESCRIPTOR    UsbInterfaceDescriptor
-
 /**
  * @brief Checks whether the specified endpoint is in the input direction (the direction in
  * which data is transferred from the device to the host). For details, see {@link UsbRequestDirection}.
