@@ -1224,7 +1224,7 @@ static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev,
         DPRINTFN(0, "memcpy_s fail");
         return HDF_ERR_IO;
     }
-    return len;
+    return (int32_t)len;
 }
 
 static int32_t AdapterGetConfiguration(const struct UsbDeviceHandle *handle, uint8_t *activeConfig)

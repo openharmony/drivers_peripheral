@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "cdc_ether.h"
 #include <unistd.h>
 
 #include "hdf_base.h"
@@ -24,6 +23,7 @@
 #include "osal_time.h"
 #include "securec.h"
 #include "usb_ddk_interface.h"
+#include "cdc_ether.h"
 
 #define HDF_LOG_TAG USB_HOST_ECM
 
@@ -739,8 +739,6 @@ static void EcmProcessNotification(struct EcmDevice *ecm, unsigned char *buf)
 
 static void EcmCtrlIrq(struct UsbRequest *req)
 {
-    int32_t retval;
-    int32_t ret;
     struct EcmDevice *ecm = (struct EcmDevice *)req->compInfo.userData;
     unsigned int expectedSize, copySize, allocSize;
     int32_t status = req->compInfo.status;
@@ -774,11 +772,8 @@ static void EcmCtrlIrq(struct UsbRequest *req)
             ecm->nbSize = allocSize;
         }
         copySize = MIN(currentSize, expectedSize - ecm->nbIndex);
-        ret = memcpy_s(
+        (void)memcpy_s(
             &ecm->notificationBuffer[ecm->nbIndex], ecm->nbSize - ecm->nbIndex, req->compInfo.buffer, copySize);
-        if (ret != EOK) {
-            HDF_LOGE("memcpy_s fail, ret=%d", ret);
-        }
         ecm->nbIndex += copySize;
         currentSize = ecm->nbIndex;
     }
@@ -787,13 +782,12 @@ static void EcmCtrlIrq(struct UsbRequest *req)
         ecm->nbIndex = 0;
     }
 
-    retval = UsbSubmitRequestAsync(req);
-    if (retval && retval != -EPERM) {
-        HDF_LOGE("%s - usb_submit_urb failed: %d\n", __func__, retval);
+    if ((UsbSubmitRequestAsync(req) != HDF_SUCCESS) && (UsbSubmitRequestAsync(req) != -EPERM)) {
+        HDF_LOGE("%{public}s: usb_submit_urb failed", __func__);
     }
 
 EXIT:
-    HDF_LOGE("%s:%d exit", __func__, __LINE__);
+    HDF_LOGE("%{public}s: exit", __func__);
 }
 
 static void EcmReadBulk(struct UsbRequest *req)
@@ -1042,29 +1036,27 @@ static int32_t EcmInit(struct EcmDevice *ecm)
 {
     int32_t ret;
     const uint8_t altsetting = 1;
-    struct UsbSession *session = NULL;
 
-    if (ecm->initFlag) {
-        HDF_LOGE("%s:%d: initFlag is true", __func__, __LINE__);
+    if (ecm->initFlag == true) {
+        HDF_LOGE("%{public}s: initFlag is true", __func__);
         return HDF_SUCCESS;
     }
 
-    ret = UsbInitHostSdk(NULL);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: UsbInitHostSdk failed", __func__);
+    if (UsbInitHostSdk(NULL) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: UsbInitHostSdk failed", __func__);
         return HDF_ERR_IO;
     }
-    ecm->session = session;
+    ecm->session = NULL;
 
     ret = EcmClaimInterfaces(ecm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: EcmClaimInterfaces failed", __func__);
+        HDF_LOGE("%{public}s: EcmClaimInterfaces failed", __func__);
         goto ERR_CLAIM_INTERFACES;
     }
 
     ret = EcmOpenInterfaces(ecm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: EcmOpenInterfaces failed", __func__);
+        HDF_LOGE("%{public}s: EcmOpenInterfaces failed", __func__);
         goto ERROR_OPEN_INTERFACES;
     }
 
@@ -1073,9 +1065,8 @@ static int32_t EcmInit(struct EcmDevice *ecm)
         goto ERROR_OPEN_INTERFACES;
     }
 
-    /* set altsetting */
     ret = UsbSelectInterfaceSetting(
-        ecm->devHandle[ecm->interfaceCnt - 1], altsetting, &ecm->iface[ecm->interfaceCnt - 1]);
+        ecm->devHandle[ecm->interfaceCnt - 1], altsetting, &ecm->iface[ecm->interfaceCnt - 1]); // set altsetting
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("UsbSelectInterfaceSetting fail\n");
         goto ERROR_SELECT_SETTING;
@@ -1083,16 +1074,16 @@ static int32_t EcmInit(struct EcmDevice *ecm)
 
     ret = EcmGetPipes(ecm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: EcmGetPipes failed", __func__);
+        HDF_LOGE("%{public}s: EcmGetPipes failed", __func__);
         goto ERROR_GET_PIPES;
     }
 
     ret = EcmAllocIntReq(ecm);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: EcmAllocIntReq failed", __func__);
+        HDF_LOGE("%{public}s: EcmAllocIntReq failed", __func__);
         goto ERROR_ALLOC_REQ;
     }
-    if (0) {
+    if (false) {
         EcmCtrlMsg(ecm, USB_DDK_CDC_SET_ETHERNET_PACKET_FILTER,
             USB_DDK_CDC_PACKET_TYPE_DIRECTED | USB_DDK_CDC_PACKET_TYPE_BROADCAST, NULL, 0);
         ret = UsbSubmitRequestAsync(ecm->notifyReq);

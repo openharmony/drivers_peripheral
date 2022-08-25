@@ -28,6 +28,8 @@
 #include <sys/time.h>
 #include <unistd.h>
 
+#include "usb_dev_test.h"
+
 #define HDF_LOG_TAG   cdc_acm_speed
 
 enum UsbSerialCmd {
