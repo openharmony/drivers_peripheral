@@ -17,13 +17,14 @@
 #include <hdf_remote_service.h>
 #include <hdf_sbuf.h>
 #include <servmgr_hdi.h>
-#include <unistd.h>
-#include <sys/time.h>
 #include <stdio.h>
+#include <sys/time.h>
+#include <unistd.h>
+
 #include "cdcacm.h"
 #include "usb_dev_test.h"
 
-#define HDF_LOG_TAG   cdc_acm_write
+#define HDF_LOG_TAG cdc_acm_write
 
 static struct HdfSBuf *g_data;
 static struct HdfSBuf *g_reply;
@@ -39,7 +40,7 @@ static void TestWrite(char *buf)
     }
 }
 
-#define STR_LEN 1024
+#define STR_LEN   1024
 #define NUM_INPUT 2
 int32_t AcmWrite(int32_t argc, const char *argv[])
 {
@@ -70,8 +71,8 @@ int32_t AcmWrite(int32_t argc, const char *argv[])
     }
     if (argc >= NUM_INPUT) {
         gettimeofday(&time, NULL);
-        status = snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, send data[%s] to host\n",
-            time.tv_sec, time.tv_usec, argv[1]);
+        status = snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, send data[%s] to host\n", time.tv_sec,
+            time.tv_usec, argv[1]);
         if (status < 0) {
             HDF_LOGE("%s: snprintf_s failed", __func__);
             return HDF_FAILURE;

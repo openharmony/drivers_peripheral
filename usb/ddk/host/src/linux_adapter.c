@@ -954,7 +954,6 @@ static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev,
 {
     struct UsbDeviceConfigDescriptor *config = NULL;
     uint8_t i;
-    int32_t ret;
 
     if (dev == NULL || buffer == NULL || (dev != NULL && configIndex > dev->deviceDescriptor.bNumConfigurations)) {
         HDF_LOGE("%{public}s:%{public}d Invalid param", __func__, __LINE__);
@@ -969,18 +968,17 @@ static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev,
     }
 
     if (config == NULL) {
-        HDF_LOGE("%{public}s:%d config is null", __func__, __LINE__);
+        HDF_LOGE("%{public}s: config is null", __func__);
         return HDF_ERR_BAD_FD;
     }
 
     len = MIN(len, config->actualLen);
-    ret = memcpy_s(buffer, len, config->desc, len);
-    if (ret != EOK) {
-        HDF_LOGE("%{public}s:%d memcpy_s failed", __func__, __LINE__);
+    if (memcpy_s(buffer, len, config->desc, len) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed", __func__);
         return HDF_ERR_IO;
     }
 
-    return len;
+    return (int32_t)len;
 }
 
 static int32_t AdapterGetConfiguration(const struct UsbDeviceHandle *handle, uint8_t *activeConfig)
