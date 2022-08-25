@@ -58,9 +58,8 @@ static int32_t DefaultCbInputBufferAvailable(UINTPTR userData, CodecBuffer *inBu
         HDF_LOGE("%{public}s: inputInfo Nullpoint or buf not assigned", __func__);
         return HDF_FAILURE;
     }
-    inputInfo->buffer[0].buf = (intptr_t)GetFdById(g_codecInstance, inBuf->bufferId);
-    inputInfo->buffer[0].type = BUFFER_TYPE_FD;
-    inputInfo->buffer[0].length = 0;
+    CopyCodecBufferWithTypeSwitch(g_codecInstance, inputInfo, inBuf, true);
+    EmptyCodecBuffer(inputInfo);
     g_codecInstance->bufferManagerWrapper->PutUsedInputDataBuffer(g_codecInstance->bufferManagerWrapper, inputInfo);
 #ifdef CODEC_HAL_PASSTHROUGH
     g_codecCallback->InputBufferAvailable(g_userData, inBuf, acquireFd);
@@ -80,9 +79,7 @@ static int32_t DefaultCbOutputBufferAvailable(UINTPTR userData, CodecBuffer *out
         HDF_LOGE("%{public}s: outputInfo Nullpoint or buf not assigned", __func__);
         return HDF_FAILURE;
     }
-    CopyCodecBuffer(outputInfo, outBuf);
-    outputInfo->buffer[0].buf = (intptr_t)GetFdById(g_codecInstance, outBuf->bufferId);
-    outputInfo->buffer[0].type = BUFFER_TYPE_FD;
+    CopyCodecBufferWithTypeSwitch(g_codecInstance, outputInfo, outBuf, true);
     bmWrapper->PutOutputDataBuffer(bmWrapper, outputInfo);
 #ifdef CODEC_HAL_PASSTHROUGH
     g_codecCallback->OutputBufferAvailable(g_userData, outputInfo, acquireFd);
@@ -92,13 +89,12 @@ static int32_t DefaultCbOutputBufferAvailable(UINTPTR userData, CodecBuffer *out
     while (output == NULL && g_codecInstance->codecStatus == CODEC_STATUS_STARTED) {
         output = bmWrapper->GetUsedOutputDataBuffer(bmWrapper, QUEUE_TIME_OUT);
     }
-    outBuf->buffer[0].type = BUFFER_TYPE_VIRTUAL;
     if (output == NULL) {
         HDF_LOGE("%{public}s: output is NULL", __func__);
         return HDF_FAILURE;
     }
-    outBuf->bufferId = output->bufferId;
-    outBuf->buffer[0].buf = (intptr_t)GetOutputShm(g_codecInstance, output->bufferId)->virAddr;
+    SetOemCodecBufferType(outBuf, output);
+    CopyCodecBufferWithTypeSwitch(g_codecInstance, outBuf, output, false);
 
     return HDF_SUCCESS;
 }
@@ -327,22 +323,27 @@ int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const CodecBuffer *inputData, u
     }
 
     if (g_codecInstance->codecStatus == CODEC_STATUS_IDLE) {
-        if (g_codecInstance->codecType == VIDEO_DECODER || g_codecInstance->codecType == AUDIO_DECODER ||
-            g_codecInstance->codecType == VIDEO_ENCODER || g_codecInstance->codecType == AUDIO_ENCODER) {
-            for (uint32_t i = 0; i < inputData->bufferCnt; i++) {
-                AddInputShm(g_codecInstance, &inputData->buffer[i], inputData->bufferId);
-            }
-        } else {
+        if (g_codecInstance->codecType != VIDEO_DECODER && g_codecInstance->codecType != AUDIO_DECODER &&
+            g_codecInstance->codecType != VIDEO_ENCODER && g_codecInstance->codecType != AUDIO_ENCODER) {
             HDF_LOGE("%{public}s: codecType invalid, queue input buffer failed!", __func__);
             return HDF_FAILURE;
         }
+        for (uint32_t i = 0; i < inputData->bufferCnt; i++) {
+            if (AddInputShm(g_codecInstance, &inputData->buffer[i], inputData->bufferId) != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s: AddInputShm failed, queue input buffer failed!", __func__);
+                return HDF_FAILURE;
+            }
+        }
         CodecBuffer *dup = DupCodecBuffer(inputData);
-        AddInputInfo(g_codecInstance, dup);
+        if (AddInputInfo(g_codecInstance, dup) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: AddInputInfo failed, queue input buffer failed!", __func__);
+            return HDF_FAILURE;
+        }
         g_codecInstance->bufferManagerWrapper->PutUsedInputDataBuffer(g_codecInstance->bufferManagerWrapper, dup);
         return HDF_SUCCESS;
     } else if (g_codecInstance->codecStatus == CODEC_STATUS_STARTED) {
         CodecBuffer *info = GetInputInfo(g_codecInstance, inputData->bufferId);
-        CopyCodecBuffer(info, inputData);
+        CopyCodecBufferWithTypeSwitch(g_codecInstance, info, inputData, true);
         g_codecInstance->bufferManagerWrapper->PutInputDataBuffer(g_codecInstance->bufferManagerWrapper, info);
         return HDF_SUCCESS;
     }
@@ -357,10 +358,11 @@ int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int32_t *
     }
 
     CodecBuffer *info = g_codecInstance->bufferManagerWrapper->GetUsedInputDataBuffer(
-        g_codecInstance->bufferManagerWrapper, QUEUE_TIME_OUT);
+        g_codecInstance->bufferManagerWrapper, timeoutMs);
     if (info != NULL) {
         *acquireFd = -1;
-        CopyCodecBuffer(inputData, info);
+        inputData->buffer[0].type = info->buffer[0].type;
+        CopyCodecBufferWithTypeSwitch(g_codecInstance, inputData, info, false);
     } else {
         return HDF_ERR_TIMEOUT;
     }
@@ -376,23 +378,27 @@ int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, CodecBuffer *outInfo, uint32_t
     }
 
     if (g_codecInstance->codecStatus == CODEC_STATUS_IDLE) {
-        if (g_codecInstance->codecType == VIDEO_DECODER || g_codecInstance->codecType == AUDIO_DECODER ||
-            g_codecInstance->codecType == VIDEO_ENCODER || g_codecInstance->codecType == AUDIO_ENCODER) {
-            for (uint32_t i = 0; i < outInfo->bufferCnt; i++) {
-                AddOutputShm(g_codecInstance, &outInfo->buffer[i], outInfo->bufferId);
-            }
-        } else {
+        if (g_codecInstance->codecType != VIDEO_DECODER && g_codecInstance->codecType != AUDIO_DECODER &&
+            g_codecInstance->codecType != VIDEO_ENCODER && g_codecInstance->codecType != AUDIO_ENCODER) {
             HDF_LOGE("%{public}s: codecType invalid, queue output buffer failed!", __func__);
             return HDF_FAILURE;
         }
+        for (uint32_t i = 0; i < outInfo->bufferCnt; i++) {
+            if (AddOutputShm(g_codecInstance, &outInfo->buffer[i], outInfo->bufferId) != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s: AddOutputShm failed, queue output buffer failed!", __func__);
+            }
+        }
         CodecBuffer *dup = DupCodecBuffer(outInfo);
-        AddOutputInfo(g_codecInstance, dup);
+        if (AddOutputInfo(g_codecInstance, dup) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: AddOutputInfo failed, queue output buffer failed!", __func__);
+            return HDF_FAILURE;
+        }
         g_codecInstance->bufferManagerWrapper->PutUsedOutputDataBuffer(g_codecInstance->bufferManagerWrapper, dup);
         return HDF_SUCCESS;
     } else if (g_codecInstance->codecStatus == CODEC_STATUS_STARTED) {
         CodecBuffer *info = GetOutputInfo(g_codecInstance, outInfo->bufferId);
-        CopyCodecBuffer(info, outInfo);
-        info->buffer[0].length = 0;
+        CopyCodecBufferWithTypeSwitch(g_codecInstance, info, outInfo, true);
+        EmptyCodecBuffer(info);
         g_codecInstance->bufferManagerWrapper->PutUsedOutputDataBuffer(g_codecInstance->bufferManagerWrapper, info);
         return HDF_SUCCESS;
     } else if (g_codecInstance->codecStatus == CODEC_STATUS_STOPED) {
@@ -410,10 +416,11 @@ int32_t CodecDequeueOutput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int32_t 
     }
     
     CodecBuffer *info = g_codecInstance->bufferManagerWrapper->GetOutputDataBuffer(
-        g_codecInstance->bufferManagerWrapper, QUEUE_TIME_OUT);
+        g_codecInstance->bufferManagerWrapper, timeoutMs);
     if (info != NULL) {
         *acquireFd = -1;
-        CopyCodecBuffer(outInfo, info);
+        outInfo->buffer[0].type = info->buffer[0].type;
+        CopyCodecBufferWithTypeSwitch(g_codecInstance, outInfo, info, false);
     } else {
         return HDF_ERR_TIMEOUT;
     }

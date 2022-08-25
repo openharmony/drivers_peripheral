@@ -21,6 +21,7 @@
 #include "codec_callback_stub.h"
 #include "codec_type.h"
 #include "codec_utils.h"
+#include "codec_gralloc_wrapper.h"
 #include "hdf_log.h"
 #include "hdi_mpp.h"
 #include "hdi_mpp_config.h"
@@ -88,7 +89,7 @@ CodecEnvData g_data = {0};
 RKHdiEncodeSetup g_encodeSetup = {0};
 
 bool g_pktEos = false;
-int32_t g_SrcFileSize = 0;
+int32_t g_srcFileSize = 0;
 int32_t g_totalSrcSize = 0;
 int32_t g_totalDstSize = 0;
 int32_t g_frameCount = 0;
@@ -136,60 +137,107 @@ static void ReleaseShm(void)
     int32_t i;
     if (g_inputBuffers != NULL) {
         for (i = 0; i < INPUT_BUFFER_NUM; i++) {
-            ReleaseShareMemory(&g_inputBuffers[i]);
+            CodecBuffer *info = g_inputInfosData[i];
+            ReleaseGrShareMemory((BufferHandle *)info->buffer[0].buf, &g_inputBuffers[i]);
         }
     }
     if (g_outputBuffers != NULL) {
         for (i = 0; i < OUTPUT_BUFFER_NUM; i++) {
-            ReleaseShareMemory(&g_outputBuffers[i]);
+            ReleaseFdShareMemory(&g_outputBuffers[i]);
         }
     }
 }
 
-static void ReleaseCodecBuffer(void)
+void ReleaseCodecBuffer(CodecBuffer *info)
+{
+    if (info == NULL) {
+        HDF_LOGE("%{public}s: Invalid param!", __func__);
+        return;
+    }
+    for (uint32_t i = 0; i < info->bufferCnt; i++) {
+        if (info->buffer[i].type == BUFFER_TYPE_HANDLE) {
+            DestroyGrShareMemory((BufferHandle *)info->buffer[i].buf);
+        }
+    }
+    OsalMemFree(info);
+}
+
+static void ReleaseCodecBuffers(void)
 {
     int32_t i;
     if (g_inputInfosData != NULL) {
         for (i = 0; i < INPUT_BUFFER_NUM; i++) {
-            if (g_inputInfosData[i] != NULL) {
-                OsalMemFree(g_inputInfosData[i]);
-            }
+            ReleaseCodecBuffer(g_inputInfosData[i]);
+            g_inputInfosData[i] = NULL;
         }
     }
     if (g_outputInfosData != NULL) {
         for (i = 0; i < OUTPUT_BUFFER_NUM; i++) {
-            if (g_outputInfosData[i] != NULL) {
-                OsalMemFree(g_outputInfosData[i]);
-            }
+            ReleaseCodecBuffer(g_outputInfosData[i]);
+            g_outputInfosData[i] = NULL;
         }
     }
+}
+
+static bool AllocateBuffer(int32_t inputBufferNum, int32_t inputBufferSize,
+    int32_t outputBufferNum, int32_t outputBufferSize)
+{
+    g_inputBuffers = (ShareMemory *)OsalMemCalloc(sizeof(ShareMemory) * inputBufferNum);
+    g_outputBuffers = (ShareMemory *)OsalMemCalloc(sizeof(ShareMemory) * outputBufferNum);
+    g_inputInfosData = (CodecBuffer **)OsalMemCalloc(sizeof(CodecBuffer*) * inputBufferNum);
+    g_outputInfosData = (CodecBuffer **)OsalMemCalloc(sizeof(CodecBuffer*) * outputBufferNum);
+    if (g_inputBuffers != NULL && g_outputBuffers != NULL && g_inputInfosData != NULL && g_outputInfosData != NULL) {
+        return true;
+    }
+
+    HDF_LOGE("%{public}s: alloc buffers failed!", __func__);
+    OsalMemFree(g_inputBuffers);
+    OsalMemFree(g_outputBuffers);
+    OsalMemFree(g_inputInfosData);
+    OsalMemFree(g_outputInfosData);
+    g_inputBuffers = NULL;
+    g_outputBuffers = NULL;
+    g_inputInfosData = NULL;
+    g_outputInfosData = NULL;
+
+    return false;
+}
+
+static void InitAllocInfo(AllocInfo *alloc)
+{
+    if (alloc == NULL) {
+        HDF_LOGI("%{public}s: ignore null alloc!", __func__);
+        return;
+    }
+    alloc->width = g_cmd.width;
+    alloc->height = g_cmd.height;
+    alloc->usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA;
+    alloc->format = PIXEL_FMT_YCBCR_420_SP;
 }
 
 static bool InitBuffer(int32_t inputBufferNum, int32_t inputBufferSize,
     int32_t outputBufferNum, int32_t outputBufferSize)
 {
     int32_t queueRet = 0;
-    g_inputBuffers = (ShareMemory *)OsalMemCalloc(sizeof(ShareMemory) * inputBufferNum);
-    g_outputBuffers = (ShareMemory *)OsalMemCalloc(sizeof(ShareMemory) * outputBufferNum);
-    g_inputInfosData = (CodecBuffer **)OsalMemCalloc(sizeof(CodecBuffer*) * inputBufferNum);
-    g_outputInfosData = (CodecBuffer **)OsalMemCalloc(sizeof(CodecBuffer*) * outputBufferNum);
-    if (g_inputBuffers == NULL || g_outputBuffers == NULL || g_inputInfosData == NULL || g_outputInfosData == NULL) {
-        HDF_LOGE("%{public}s: buffer and info mem alloc failed!", __func__);
+    int32_t bufCount = 1;
+    if (!AllocateBuffer(inputBufferNum, inputBufferSize, outputBufferNum, outputBufferSize)) {
         return false;
     }
 
-    int32_t bufCount = 1;
+    AllocInfo alloc;
+    InitAllocInfo(&alloc);
     for (int32_t i = 0; i < inputBufferNum; i++) {
         g_inputBuffers[i].id = i;
-        g_inputBuffers[i].size = inputBufferSize;
-        CreateShareMemory(&g_inputBuffers[i]);
+        g_inputBuffers[i].type = BUFFER_TYPE_HANDLE;
+        BufferHandle *bufferHandle;
+        CreateGrShareMemory(&bufferHandle, &alloc, &g_inputBuffers[i]);
         g_inputInfosData[i] = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * bufCount);
         g_inputInfosData[i]->bufferCnt = 1;
         g_inputInfosData[i]->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
         g_inputInfosData[i]->bufferId = g_inputBuffers[i].id;
-        g_inputInfosData[i]->buffer[0].type = BUFFER_TYPE_FD;
-        g_inputInfosData[i]->buffer[0].buf = (intptr_t)g_inputBuffers[i].fd;
-        g_inputInfosData[i]->buffer[0].capacity = inputBufferSize;
+        g_inputInfosData[i]->buffer[0].type = BUFFER_TYPE_HANDLE;
+        g_inputInfosData[i]->buffer[0].buf = (intptr_t)bufferHandle;
+        g_inputInfosData[i]->buffer[0].capacity = bufferHandle->size;
         queueRet = g_codecProxy->CodecQueueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle,
             g_inputInfosData[i], (uint32_t)0, -1);
         if (queueRet != HDF_SUCCESS) {
@@ -199,9 +247,9 @@ static bool InitBuffer(int32_t inputBufferNum, int32_t inputBufferSize,
     }
 
     for (int32_t j = 0; j < outputBufferNum; j++) {
-        g_outputBuffers[j].id = INPUT_BUFFER_NUM + j;
+        g_outputBuffers[j].id = inputBufferNum + j;
         g_outputBuffers[j].size = outputBufferSize;
-        CreateShareMemory(&g_outputBuffers[j]);
+        CreateFdShareMemory(&g_outputBuffers[j]);
         g_outputInfosData[j] = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * bufCount);
         g_outputInfosData[j]->bufferCnt = 1;
         g_outputInfosData[j]->bufferId = g_outputBuffers[j].id;
@@ -509,7 +557,7 @@ static void EncodeLoopHandleInput(const CodecEnvData *envData, uint8_t *readData
     int32_t acquireFd = 0;
 
     CodecBuffer *inputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
-    inputData->buffer[0].type = BUFFER_TYPE_FD;
+    inputData->buffer[0].type = BUFFER_TYPE_HANDLE;
     inputData->bufferCnt = 1;
     inputData->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
     ret = g_codecProxy->CodecDequeueInput(g_codecProxy, (CODEC_HANDLETYPE)g_handle, QUEUE_TIME_OUT,
@@ -519,7 +567,7 @@ static void EncodeLoopHandleInput(const CodecEnvData *envData, uint8_t *readData
         g_frameCount++;
         int32_t readSize = ReadInputFromFile(envData->fpInput, readData);
         g_totalSrcSize += readSize;
-        g_pktEos = (g_totalSrcSize >= g_SrcFileSize);
+        g_pktEos = (g_totalSrcSize >= g_srcFileSize);
         if (g_pktEos) {
             HDF_LOGI("%{public}s: client inputData reach STREAM_FLAG_EOS, g_frameCount:%{public}d",
                 __func__, g_frameCount);
@@ -558,6 +606,7 @@ static int32_t EncodeLoop(CodecEnvData *envData, uint8_t *readData)
         CodecBuffer *queOutputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
         queOutputData->buffer[0].type = BUFFER_TYPE_FD;
         queOutputData->buffer[0].buf = outputData->buffer[0].buf;
+        queOutputData->buffer[0].capacity = outputData->buffer[0].capacity;
         queOutputData->bufferId = outputData->bufferId;
         queOutputData->bufferCnt = 1;
         queOutputData->flag = STREAM_FLAG_CODEC_SPECIFIC_INF;
@@ -616,7 +665,7 @@ static void RevertEncodeStep2(void)
 static void RevertEncodeStep3(void)
 {
     ReleaseShm();
-    ReleaseCodecBuffer();
+    ReleaseCodecBuffers();
 
     if (g_inputBuffers != NULL) {
         OsalMemFree(g_inputBuffers);
@@ -641,8 +690,8 @@ static int32_t OpenFile(void)
 {
     struct stat fileStat = {0};
     stat(g_cmd.fileInput, &fileStat);
-    g_SrcFileSize = fileStat.st_size;
-    HDF_LOGI("%{public}s: input file size %{public}d", __func__, g_SrcFileSize);
+    g_srcFileSize = fileStat.st_size;
+    HDF_LOGI("%{public}s: input file size %{public}d", __func__, g_srcFileSize);
 
     g_data.fpInput = fopen(g_cmd.fileInput, "rb");
     if (g_data.fpInput == NULL) {
@@ -733,6 +782,11 @@ static int32_t Encode(void)
 
 int32_t main(int32_t argc, char **argv)
 {
+    if (GrAllocatorInit() != HDF_SUCCESS) {
+        HDF_LOGE("GrAllocatorInit failed!");
+        return HDF_FAILURE;
+    }
+
     g_cmd.type = VIDEO_ENCODER;
     int32_t ret = ParseArguments(&g_cmd, argc, argv);
     HDF_LOGI("%{public}s: ParseArguments width:%{public}d", __func__, g_cmd.width);

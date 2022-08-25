@@ -52,7 +52,7 @@ uint8_t* MapAshmemFd(int32_t fd, int32_t size)
         HDF_LOGE("%{public}s: Failed to map invalid size: %{public}d", __func__, size);
         return nullptr;
     }
-    uint8_t *addr = (uint8_t *)mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    uint8_t *addr = static_cast<uint8_t *>(mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
     return addr;
 }
 
@@ -62,7 +62,7 @@ void UnmapAshmemFd(uint8_t *addr, int32_t size)
         HDF_LOGE("%{public}s: invalid nullptr addr!", __func__);
         return;
     }
-    munmap((void *)addr, size);
+    munmap(static_cast<void *>(addr), size);
 }
 
 int32_t CloseAshmemFd(int32_t fd)

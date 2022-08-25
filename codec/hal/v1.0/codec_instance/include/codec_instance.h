@@ -67,21 +67,22 @@ int32_t InitCodecInstance(struct CodecInstance *instance);
 int32_t RunCodecInstance(struct CodecInstance *instance);
 int32_t StopCodecInstance(struct CodecInstance *instance);
 int32_t DestroyCodecInstance(struct CodecInstance *instance);
-void AddInputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId);
-void AddOutputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId);
-ShareMemory* GetInputShm(struct CodecInstance *instance, int32_t id);
-ShareMemory* GetOutputShm(struct CodecInstance *instance, int32_t id);
+bool SetOemCodecBufferType(CodecBuffer *bufferToOemCodec, CodecBuffer *bufferInQueue);
+int32_t AddInputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId);
+int32_t AddOutputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId);
 int32_t GetFdById(struct CodecInstance *instance, int32_t id);
 void ReleaseInputShm(struct CodecInstance *instance);
 void ReleaseOutputShm(struct CodecInstance *instance);
-void AddInputInfo(struct CodecInstance *instance, CodecBuffer *info);
-void AddOutputInfo(struct CodecInstance *instance, CodecBuffer *info);
+int32_t AddInputInfo(struct CodecInstance *instance, CodecBuffer *info);
+int32_t AddOutputInfo(struct CodecInstance *instance, CodecBuffer *info);
 CodecBuffer* GetInputInfo(struct CodecInstance *instance, uint32_t id);
 CodecBuffer* GetOutputInfo(struct CodecInstance *instance, uint32_t id);
 void ReleaseInputInfo(struct CodecInstance *instance);
 void ReleaseOutputInfo(struct CodecInstance *instance);
 void ResetBuffers(struct CodecInstance *instance);
-bool CopyCodecBuffer(CodecBuffer *dst, const CodecBuffer *src);
+void EmptyCodecBuffer(CodecBuffer *buf);
+bool CopyCodecBufferWithTypeSwitch(struct CodecInstance *instance, CodecBuffer *dst,
+    const CodecBuffer *src, bool ignoreBuf);
 CodecBuffer* DupCodecBuffer(const CodecBuffer *src);
 
 #ifdef __cplusplus

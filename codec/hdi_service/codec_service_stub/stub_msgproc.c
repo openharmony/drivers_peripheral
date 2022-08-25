@@ -15,6 +15,7 @@
 #include "stub_msgproc.h"
 #include <hdf_log.h>
 #include <osal_mem.h>
+#include "common_msgproc.h"
 
 #define HDF_LOG_TAG codec_hdi_stub
 
@@ -248,7 +249,9 @@ static int32_t CodecSerPackBufferInfo(struct HdfSBuf *reply, const CodecBufferIn
             return HDF_FAILURE;
         }
     } else if (buffer->type == BUFFER_TYPE_HANDLE) {
-        return HDF_FAILURE;
+        if (!PackBufferHandle(reply, (BufferHandle *)buffer->buf)) {
+            return HDF_FAILURE;
+        }
     }
     if (!HdfSbufWriteUint32(reply, buffer->offset)) {
         HDF_LOGE("%{public}s: Write offset failed!", __func__);
@@ -289,7 +292,9 @@ static int32_t CodecSerParseBufferInfo(struct HdfSBuf *data, CodecBufferInfo *bu
             return HDF_FAILURE;
         }
     } else if (buffer->type == BUFFER_TYPE_HANDLE) {
-        return HDF_FAILURE;
+        if (!ParseBufferHandle(data, (BufferHandle **)&buffer->buf)) {
+            return HDF_FAILURE;
+        }
     }
     if (!HdfSbufReadUint32(data, &buffer->offset)) {
         HDF_LOGE("%{public}s: read offset failed!", __func__);
