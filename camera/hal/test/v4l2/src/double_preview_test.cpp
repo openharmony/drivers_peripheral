@@ -45,9 +45,9 @@ void DoublePreviewTest::SetStreamInfo(StreamInfo &streamInfo,
         streamInfo.height_ = PREVIEW_HEIGHT;
         streamInfo.format_ = PIXEL_FMT_RGBA_8888;
         if (streamId == display_->streamId_preview) {
-            streamInfo->streamId_ = streamId;
+            streamInfo.streamId_ = streamId;
         } else if (streamId == STREAMID_PREVIEW_DOUBLE) {
-            streamInfo->streamId_ = streamId;
+            streamInfo.streamId_ = streamId;
         }
     }
     streamInfo.dataspace_ = DATA_SPACE;

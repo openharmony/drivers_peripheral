@@ -135,7 +135,7 @@ public:
         explicit SinkNode(const std::string name) : Node(name) {}
         ~SinkNode() override {}
         void Deliver(std::shared_ptr<IBuffer>& buffer) override;
-        void BindCallback(std::function<void(std::shared_ptr<IBuffer>&)>& callback);
+        void BindCallback(const std::function<void(std::shared_ptr<IBuffer>&)>& callback);
 
     private:
         std::function<void(std::shared_ptr<IBuffer>&)> callback_ = nullptr;

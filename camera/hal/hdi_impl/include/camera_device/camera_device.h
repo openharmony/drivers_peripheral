@@ -16,9 +16,9 @@
 #ifndef CAMERA_DEVICE_CAMERA_DEVICE_H
 #define CAMERA_DEVICE_CAMERA_DEVICE_H
 
-#include "icamera_device.h"
+#include "v1_0/icamera_device.h"
+#include "v1_0/camera_device_stub.h"
 #include "idevice_manager.h"
-#include "camera_device_stub.h"
 #include "camera.h"
 
 namespace OHOS::Camera {
