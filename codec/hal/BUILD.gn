@@ -41,18 +41,7 @@ ohos_shared_library("libcodec_hdi_omx_server") {
     "v2.0/hdi_impl/src/component_node.cpp",
     "v2.0/hdi_impl/src/icodec_buffer.cpp",
   ]
-
-  cflags_cc = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-Wno-#warnings",
-    "-Wno-missing-braces",
-    "-Wno-missing-field-initializers",
-  ]
-
   if (is_standard_system) {
-    deps = [ "//third_party/libdrm:libdrm" ]
     external_deps = [
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
@@ -87,8 +76,6 @@ ohos_shared_library("libcodec_hdi_omx_client") {
   ]
 
   if (is_standard_system) {
-    deps = [ "//third_party/libdrm:libdrm" ]
-
     external_deps = [
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",

@@ -14,7 +14,8 @@
  */
 #include "icodec_buffer.h"
 #include <hdf_base.h>
-#include <hdf_log.h>
+#include <poll.h>
+#include <securec.h>
 #include "codec_dyna_buffer.h"
 #include "codec_handle_buffer.h"
 #include "codec_share_buffer.h"
@@ -114,6 +115,34 @@ int32_t ICodecBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
     codecBuffer_.flag = omxBuffer.nFlags;
     codecBuffer_.pts = omxBuffer.nTimeStamp;
     return HDF_SUCCESS;
+}
+int32_t ICodecBuffer::SyncWait(int fd, uint32_t timeout)
+{
+    int retCode = -EPERM;
+    if (fd < 0) {
+        HDF_LOGE("{public}s:The fence id is invalid.", __func__);
+        return retCode;
+    }
+
+    struct pollfd pollfds = {0};
+    pollfds.fd = fd;
+    pollfds.events = POLLIN;
+
+    do {
+        retCode = poll(&pollfds, 1, timeout);
+    } while (retCode == -EPERM && (errno == EINTR || errno == EAGAIN));
+
+    if (retCode == 0) {
+        retCode = -EPERM;
+        errno = ETIME;
+    } else if (retCode > 0) {
+        if (pollfds.revents & (POLLERR | POLLNVAL)) {
+            retCode = -EPERM;
+            errno = EINVAL;
+        }
+        retCode = 0;
+    }
+    return retCode < 0 ? -errno : EOK;
 }
 }  // namespace Omx
 }  // namespace Codec
