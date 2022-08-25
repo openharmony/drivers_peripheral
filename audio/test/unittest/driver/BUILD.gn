@@ -42,9 +42,9 @@ ohos_unittest("khdf_audio_driver_test") {
   deps = [ "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common" ]
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

@@ -29,15 +29,13 @@ ohos_fuzztest("VibratorStartFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "vibratorstart_fuzzer.cpp" ]
-  deps = [
-    "//drivers/peripheral/vibrator/hal:hdi_vibrator",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//drivers/peripheral/vibrator/hal:hdi_vibrator" ]
   external_deps = [
+    "c_utils:utils",
+    "c_utils:utils",
     "drivers_interface_vibrator:libvibrator_proxy_1.1",
     "hdf_core:libhdf_utils",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 }
 

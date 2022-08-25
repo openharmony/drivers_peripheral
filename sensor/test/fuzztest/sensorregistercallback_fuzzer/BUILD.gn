@@ -42,9 +42,9 @@ ohos_fuzztest("SensorRegisterCallbackFuzzTest") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_utils",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 }
 

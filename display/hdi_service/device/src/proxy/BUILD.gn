@@ -28,7 +28,6 @@ config("libdisplay_device_proxy_config") {
 }
 
 ohos_shared_library("libdisplay_device_proxy") {
-  include_dirs = [ "//utils/native/base/include" ]
   public_configs = [ ":libdisplay_device_proxy_config" ]
 
   sources = [
@@ -38,9 +37,8 @@ ohos_shared_library("libdisplay_device_proxy") {
     "display_device_proxy/display_device_proxy.cpp",
   ]
 
-  deps = [ "//utils/native/base:utils" ]
-
   external_deps = [
+    "c_utils:utils",
     "graphic_chipsetsdk:surface",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",

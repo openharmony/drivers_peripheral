@@ -20,7 +20,6 @@ ohos_executable("codec_hdi_omx_decode") {
     "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/omx/include",
     "//drivers/peripheral/codec/interfaces/include",
-    "//utils/native/base/include",
     "//third_party/openmax/api/1.1.2",
     "//drivers/peripheral/display/hdi_service/gralloc/include",
   ]
@@ -38,11 +37,11 @@ ohos_executable("codec_hdi_omx_decode") {
     "//drivers/peripheral/codec/hal:libcodec_hdi_omx_callback_type_service_impl",
     "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
     "//third_party/bounds_checking_function:libsec_shared",
-    "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hiviewdfx_hilog_native:libhilog",
@@ -63,7 +62,6 @@ ohos_executable("codec_hdi_omx_encode") {
     "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/omx/include",
     "//drivers/peripheral/codec/interfaces/include",
-    "//utils/native/base/include",
     "//third_party/openmax/api/1.1.2",
     "//drivers/peripheral/display/hdi_service/gralloc/include",
   ]
@@ -81,11 +79,11 @@ ohos_executable("codec_hdi_omx_encode") {
     "//drivers/peripheral/codec/hal:libcodec_hdi_omx_callback_type_service_impl",
     "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
     "//third_party/bounds_checking_function:libsec_shared",
-    "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hiviewdfx_hilog_native:libhilog",

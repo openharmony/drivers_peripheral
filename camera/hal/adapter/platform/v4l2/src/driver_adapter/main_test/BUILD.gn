@@ -51,9 +51,9 @@ ohos_executable("v4l2_main") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
   defines += [ "V4L2_MAIN_TEST" ]
 

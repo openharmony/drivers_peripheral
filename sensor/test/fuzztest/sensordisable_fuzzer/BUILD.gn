@@ -39,10 +39,10 @@ ohos_fuzztest("SensorDisableFuzzTest") {
   deps = [ "//drivers/peripheral/sensor/hal:hdi_sensor" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_sensor:libsensor_proxy_1.0",
     "hdf_core:libhdf_utils",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 }
 

@@ -46,12 +46,12 @@ ohos_fuzztest("AudioAdmDispatcherRenderCmdidFuzzTest") {
     "//third_party/googletest/googletest/include",
   ]
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
   defines = []
   if (enable_audio_adm_passthrough) {
