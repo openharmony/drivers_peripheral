@@ -8,25 +8,8 @@ config("hdi_cif_config") {
   visibility = [ ":*" ]
 
   cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
     "-DGST_DISABLE_DEPRECATED",
     "-DHAVE_CONFIG_H",
-    "-fno-strict-aliasing",
-    "-Wno-sign-compare",
-    "-Wno-builtin-requires-header",
-    "-Wno-implicit-function-declaration",
-    "-Wno-format",
-    "-Wno-int-conversion",
-    "-Wno-unused-function",
-    "-Wno-thread-safety-attributes",
-    "-Wno-inconsistent-missing-override",
-    "-fno-rtti",
-    "-fno-exceptions",
-    "-ffunction-sections",
-    "-fdata-sections",
-    "-Wno-unused-parameter",
   ]
 
   ldflags = [ "-Wl" ]
