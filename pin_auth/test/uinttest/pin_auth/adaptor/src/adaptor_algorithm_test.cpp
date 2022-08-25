@@ -41,6 +41,12 @@ void AdaptorAlgorithmTest::TearDown()
 {
 }
 
+/**
+ * @tc.name: ase_encode_null
+ * @tc.desc: verify Aes256GcmEncryptNoPadding
+ * @tc.type: FUNC
+ * @tc.require: issueI5NYCT
+ */
 HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmAesEnCode1, TestSize.Level1)
 {
     Buffer *cipherInfo = Aes256GcmEncryptNoPadding(nullptr, nullptr);
@@ -48,6 +54,12 @@ HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmAesEnCode1, TestSize.Level1)
     DestoryBuffer(cipherInfo);
 }
 
+/**
+ * @tc.name: ase_encode_failed
+ * @tc.desc: verify Aes256GcmEncryptNoPadding
+ * @tc.type: FUNC
+ * @tc.require: issueI5NYCT
+ */
 HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmAesEnCode2, TestSize.Level1)
 {
     Buffer *plaintext = CreateBufferBySize(20);
@@ -61,6 +73,12 @@ HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmAesEnCode2, TestSize.Level1)
     DestoryBuffer(cipherInfo);
 }
 
+/**
+ * @tc.name: ase_encode_success
+ * @tc.desc: verify Aes256GcmEncryptNoPadding
+ * @tc.type: FUNC
+ * @tc.require: issueI5NYCT
+ */
 HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmAesValid, TestSize.Level1)
 {
     Buffer *plaintext1 = CreateBufferBySize(64);
@@ -83,6 +101,12 @@ HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmAesValid, TestSize.Level1)
     DestoryBuffer(cipherInfo);
 }
 
+/**
+ * @tc.name: device_key
+ * @tc.desc: verify DeriveDeviceKey
+ * @tc.type: FUNC
+ * @tc.require: issueI5NYDJ
+ */
 HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmDeriveDeviceKey, TestSize.Level1)
 {
     Buffer *secret = CreateBufferBySize(SECRET_SIZE);
@@ -96,6 +120,12 @@ HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmDeriveDeviceKey, TestSize.Level1)
     DestoryBuffer(key);
 }
 
+/**
+ * @tc.name: hkdf
+ * @tc.desc: verify Hkdf
+ * @tc.type: FUNC
+ * @tc.require: issueI5NYDJ
+ */
 HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmHkdf, TestSize.Level1)
 {
     Buffer *salt = CreateBufferBySize(HKDF_SALT_SIZE);
@@ -114,6 +144,12 @@ HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmHkdf, TestSize.Level1)
     DestoryBuffer(key);
 }
 
+/**
+ * @tc.name: sha256
+ * @tc.desc: verify Sha256Adaptor
+ * @tc.type: FUNC
+ * @tc.require: issueI5NYDJ
+ */
 HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmSha256, TestSize.Level1)
 {
     Buffer *data = CreateBufferBySize(64);
