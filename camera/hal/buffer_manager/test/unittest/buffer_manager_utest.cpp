@@ -800,7 +800,7 @@ void BufferManagerTest::Node::Process(std::shared_ptr<IBuffer>& buffer)
     return;
 }
 
-void BufferManagerTest::SinkNode::BindCallback(std::function<void(std::shared_ptr<IBuffer>&)>& func)
+void BufferManagerTest::SinkNode::BindCallback(const std::function<void(std::shared_ptr<IBuffer>&)>& func)
 {
     callback_ = func;
     return;

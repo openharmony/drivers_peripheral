@@ -224,7 +224,7 @@ HWTEST_F(PipelineCoreTest, PipelineCore_AbNormalPreviewTest, TestSize.Level0)
     EXPECT_TRUE(s != nullptr);
     re = s->Init();
     EXPECT_TRUE(re == RC_OK);
-    re = s->CreatePipeline(1);
+    re = s->CreatePipeline(2); // unsupportted mode
     EXPECT_TRUE(re != RC_OK);
 }
 

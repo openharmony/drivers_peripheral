@@ -77,8 +77,10 @@ RetCode V4L2SourceNode::Flush(const int32_t streamId)
 {
     RetCode rc;
 
-    rc = sensorController_->Flush(streamId);
-    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+    if (sensorController_ != nullptr) {
+        rc = sensorController_->Flush(streamId);
+        CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+    }
     rc = SourceNode::Flush(streamId);
 
     return rc;
@@ -88,8 +90,10 @@ RetCode V4L2SourceNode::Stop(const int32_t streamId)
 {
     RetCode rc;
 
-    rc = sensorController_->Stop();
-    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+    if (sensorController_ != nullptr) {
+        rc = sensorController_->Stop();
+        CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+    }
 
     return SourceNode::Stop(streamId);
 }
