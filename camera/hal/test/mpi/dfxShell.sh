@@ -1,5 +1,4 @@
 #!/bin/bash
-#set -e
 
 # Copyright (c) 2021 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -e
 script_path=$(cd $(dirname $0);pwd)
 cd ${script_path}
 cd ../../../../../../out/ohos-arm-release/packages/phone/system/lib;
