@@ -130,13 +130,13 @@ static int32_t HandleSyncRequest(struct UsbHostRequest *request, const struct Us
 }
 
 static void GetInterfaceNumberDes(
-    const struct USBI_DESCRIPTOR_HEADER *header, uint8_t nIntf[], uint8_t nAlts[], int32_t *num)
+    const struct UsbDescriptorHeader *header, uint8_t nIntf[], uint8_t nAlts[], int32_t *num)
 {
     uint8_t inum;
     int32_t i;
-    struct USBI_INTERFACE_DESCRIPTOR *desc = NULL;
+    struct UsbInterfaceDescriptor *desc = NULL;
 
-    desc = (struct USBI_INTERFACE_DESCRIPTOR *)header;
+    desc = (struct UsbInterfaceDescriptor *)header;
     if (desc->bLength < USB_DDK_DT_INTERFACE_SIZE) {
         HDF_LOGW("%{public}s: invalid interface descriptor length %d, skipping", __func__, desc->bLength);
         return;
@@ -161,17 +161,17 @@ static void GetInterfaceNumberDes(
 
 static int32_t GetInterfaceNumber(const uint8_t *buffer, size_t size, uint8_t nIntf[], uint8_t nAlts[])
 {
-    struct USBI_DESCRIPTOR_HEADER *header = NULL;
+    struct UsbDescriptorHeader *header = NULL;
     const uint8_t *buffer2;
     size_t size2;
     int32_t num = 0;
 
     for ((buffer2 = buffer, size2 = size); size2 > 0; (buffer2 += header->bLength, size2 -= header->bLength)) {
-        if (size2 < sizeof(struct USBI_DESCRIPTOR_HEADER)) {
+        if (size2 < sizeof(struct UsbDescriptorHeader)) {
             HDF_LOGW("%{public}s: descriptor has %zu excess bytes", __func__, size2);
             break;
         }
-        header = (struct USBI_DESCRIPTOR_HEADER *)buffer2;
+        header = (struct UsbDescriptorHeader *)buffer2;
         if ((header->bLength > size2) || (header->bLength < sizeof(struct UsbDescriptorHeader))) {
             HDF_LOGW("%{public}s: invalid descriptor length %hhu, skipping remainder", __func__, header->bLength);
             break;
@@ -296,7 +296,7 @@ static void ClearEndpoint(struct UsbRawEndpointDescriptor *endPoint)
 static int32_t ParseEndpoint(struct UsbRawEndpointDescriptor *endPoint, const uint8_t *buffer, int32_t size)
 {
     const uint8_t *buffer0 = buffer;
-    const struct USBI_DESCRIPTOR_HEADER *header = NULL;
+    const struct UsbDescriptorHeader *header = NULL;
     void *extra = NULL;
     int32_t len;
     int32_t ret;
@@ -306,7 +306,7 @@ static int32_t ParseEndpoint(struct UsbRawEndpointDescriptor *endPoint, const ui
         return HDF_ERR_IO;
     }
 
-    header = (const struct USBI_DESCRIPTOR_HEADER *)buffer;
+    header = (const struct UsbDescriptorHeader *)buffer;
     if ((header->bDescriptorType != USB_DDK_DT_ENDPOINT) || (header->bLength > size)) {
         HDF_LOGE("%{public}s:%d unexpected descriptor, type = 0x%x, length = %hhu", __func__, __LINE__,
             header->bDescriptorType, header->bLength);
@@ -462,24 +462,19 @@ static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_
     int32_t len;
     int32_t ret;
     const uint8_t *buffer0 = buffer;
-    int32_t interfaceNumber = -1;
-    const struct USBI_INTERFACE_DESCRIPTOR *ifDesc = NULL;
+    int32_t interfaceNumber = -1; // initial value of interfaceNumber is -1
+    const struct UsbInterfaceDescriptor *ifDesc = NULL;
     struct UsbRawInterfaceDescriptor *ifp = NULL;
     bool tempFlag = false;
 
-    if (usbInterface == NULL) {
-        HDF_LOGE("%{public}s: usbInterface is null", __func__);
-        return HDF_DEV_ERR_NORANGE;
-    }
-    if (usbInterface->numAltsetting > USB_MAXALTSETTING) {
-        HDF_LOGE("%{public}s: numAltsetting = %hhu is error", __func__, usbInterface->numAltsetting);
+    if (usbInterface == NULL || usbInterface->numAltsetting > USB_MAXALTSETTING) {
+        HDF_LOGE("%{public}s: usbInterface is null or numAltsetting is invalid", __func__);
         return HDF_DEV_ERR_NORANGE;
     }
 
     while (size >= USB_DDK_DT_INTERFACE_SIZE) {
         ifp = (struct UsbRawInterfaceDescriptor *)(usbInterface->altsetting + usbInterface->numAltsetting);
-        ret = RawParseDescriptor(size, buffer, USB_RAW_INTERFACE_DESCRIPTOR_TYPE, ifp);
-        if (ret == HDF_FAILURE) {
+        if (RawParseDescriptor(size, buffer, USB_RAW_INTERFACE_DESCRIPTOR_TYPE, ifp) == HDF_FAILURE) {
             return buffer - buffer0;
         } else if (ret == HDF_ERR_IO) {
             HDF_LOGE("%{public}s: RawParseDescriptor failed", __func__);
@@ -512,7 +507,7 @@ static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_
             return ret;
         }
 
-        ifDesc = (const struct USBI_INTERFACE_DESCRIPTOR *)buffer;
+        ifDesc = (const struct UsbInterfaceDescriptor *)buffer;
         tempFlag = (size < USB_DDK_DT_INTERFACE_SIZE) || (ifDesc->bDescriptorType != USB_DDK_DT_INTERFACE) ||
             (ifDesc->bInterfaceNumber != interfaceNumber);
         if (tempFlag == true) {
@@ -550,7 +545,7 @@ static int32_t ParseConfigurationDes(struct UsbRawConfigDescriptor *config, cons
     }
 
     while (size > 0) {
-        struct USBI_INTERFACE_DESCRIPTOR *ifDesc = (struct USBI_INTERFACE_DESCRIPTOR *)buffer;
+        struct UsbInterfaceDescriptor *ifDesc = (struct UsbInterfaceDescriptor *)buffer;
         for (i = 0; i < config->configDescriptor.bNumInterfaces; ++i) {
             if (nIntf[i] == ifDesc->bInterfaceNumber) {
                 usbInterface = (struct UsbRawInterface *)config->interface[i];

@@ -270,14 +270,14 @@ static int32_t BeginProcess(unsigned char endPoint)
     int32_t transNum = 0;
     int32_t i;
 
-    if (g_fd < 0 || endPoint <= 0) {
-        printf("parameter error\n");
+    if ((g_fd < 0) || (endPoint <= 0)) {
+        HDF_LOGE("%s: g_fd or endPoint is invalied", __func__);
         return -1;
     }
 
     ret = FillUrbData(endPoint);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s:Fill urb data failed", __func__);
+        HDF_LOGE("%s: Fill urb data failed", __func__);
         return ret;
     }
     gettimeofday(&time, NULL);

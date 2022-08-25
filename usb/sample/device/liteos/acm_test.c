@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <sys/time.h>
 #include <unistd.h>
+
 #include "hdf_io_service_if.h"
 #include "hdf_log.h"
 #include "osal_mem.h"
@@ -24,6 +25,7 @@
 #include "osal_thread.h"
 #include "osal_time.h"
 #include "securec.h"
+#include "usb_dev_test.h"
 
 #define HDF_LOG_TAG cdc_acm_test
 

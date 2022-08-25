@@ -1309,8 +1309,6 @@ int32_t UsbFreeRequest(const struct UsbRequest *request)
 
 int32_t UsbSubmitRequestAsync(const struct UsbRequest * const request)
 {
-    int32_t ret;
-
     if (request == NULL) {
         HDF_LOGE("%{public}s:%{public}d request is null", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -1318,8 +1316,7 @@ int32_t UsbSubmitRequestAsync(const struct UsbRequest * const request)
 
     struct UsbIfRequest *requestObj = (struct UsbIfRequest *)request;
     requestObj->isSyncReq = false;
-    ret = memset_s((void *)&request->compInfo, sizeof(request->compInfo), 0, sizeof(request->compInfo));
-    if (ret != EOK) {
+    if (memset_s((void *)&request->compInfo, sizeof(request->compInfo), 0, sizeof(request->compInfo)) != EOK) {
         HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
         return HDF_FAILURE;
     }
