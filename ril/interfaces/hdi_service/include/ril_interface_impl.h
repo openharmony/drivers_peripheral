@@ -33,10 +33,47 @@ public:
     RilInterfaceImpl() = default;
     virtual ~RilInterfaceImpl() = default;
 
+    // Call
     int32_t SetEmergencyCallList(
         int32_t slotId, int32_t serialId, const IEmergencyInfoList &emergencyInfoList) override;
     int32_t GetEmergencyCallList(int32_t slotId, int32_t serialId) override;
+    int32_t GetCallList(int32_t slotId, int32_t serialId) override;
+    int32_t Dial(int32_t slotId, int32_t serialId, const IDialInfo &dialInfo) override;
+    int32_t Reject(int32_t slotId, int32_t serialId) override;
+    int32_t Hangup(int32_t slotId, int32_t serialId, int32_t gsmIndex) override;
+    int32_t Answer(int32_t slotId, int32_t serialId) override;
+    int32_t HoldCall(int32_t slotId, int32_t serialId) override;
+    int32_t UnHoldCall(int32_t slotId, int32_t serialId) override;
+    int32_t SwitchCall(int32_t slotId, int32_t serialId) override;
+    int32_t CombineConference(int32_t slotId, int32_t serialId, int32_t callType) override;
+    int32_t SeparateConference(int32_t slotId, int32_t serialId, int32_t callIndex,
+        int32_t callType) override;
+    int32_t GetCallWaiting(int32_t slotId, int32_t serialId) override;
+    int32_t SetCallWaiting(int32_t slotId, int32_t serialId, int32_t activate) override;
+    int32_t GetCallTransferInfo(int32_t slotId, int32_t serialId, int32_t reason) override;
+    int32_t SetCallTransferInfo(int32_t slotId, int32_t serialId,
+        const ICallForwardSetInfo &callForwardSetInfo) override;
+    int32_t GetCallRestriction(int32_t slotId, int32_t serialId, const std::string &fac) override;
+    int32_t SetCallRestriction(int32_t slotId, int32_t serialId,
+        const ICallRestrictionInfo &callRestrictionInfo) override;
+    int32_t GetClip(int32_t slotId, int32_t serialId) override;
+    int32_t SetClip(int32_t slotId, int32_t serialId, int32_t action) override;
+    int32_t GetClir(int32_t slotId, int32_t serialId) override;
+    int32_t SetClir(int32_t slotId, int32_t serialId, int32_t action) override;
+    int32_t SetCallPreferenceMode(int32_t slotId, int32_t serialId, int32_t mode) override;
+    int32_t GetCallPreferenceMode(int32_t slotId, int32_t serialId) override;
+    int32_t SetUssd(int32_t slotId, int32_t serialId, const std::string &str) override;
+    int32_t GetUssd(int32_t slotId, int32_t serialId) override;
+    int32_t SetMute(int32_t slotId, int32_t serialId, int32_t mute) override;
+    int32_t GetMute(int32_t slotId, int32_t serialId) override;
+    int32_t GetCallFailReason(int32_t slotId, int32_t serialId) override;
+    int32_t CallSupplement(int32_t slotId, int32_t serialId, int32_t type) override;
+    int32_t SendDtmf(int32_t slotId, int32_t serialId, const IDtmfInfo &dtmfInfo) override;
+    int32_t StartDtmf(int32_t slotId, int32_t serialId, const IDtmfInfo &dtmfInfo) override;
+    int32_t StopDtmf(int32_t slotId, int32_t serialId, const IDtmfInfo &dtmfInfo) override;
+    int32_t SetBarringPassword(int32_t slotId, int32_t serialId, const ISetBarringInfo &setBarringInfo) override;
 
+    // Data
     int32_t ActivatePdpContext(int32_t slotId, int32_t serialId, const IDataCallInfo &dataCallInfo) override;
     int32_t DeactivatePdpContext(int32_t slotId, int32_t serialId, const IUniInfo &uniInfo) override;
     int32_t GetPdpContextList(int32_t slotId, int32_t serialId, const IUniInfo &uniInfo) override;
@@ -46,6 +83,40 @@ public:
         const IDataLinkBandwidthReportingRule &dataLinkBandwidthReportingRule) override;
     int32_t SetDataPermitted(int32_t slotId, int32_t serialId, int32_t dataPermitted) override;
     int32_t SetDataProfileInfo(int32_t slotId, int32_t serialId, const IDataProfilesInfo &dataProfilesInfo) override;
+
+    int32_t SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst) override;
+    int32_t GetRadioState(int32_t slotId, int32_t serialId) override;
+    int32_t GetImei(int32_t slotId, int32_t serialId) override;
+    int32_t GetMeid(int32_t slotId, int32_t serialId) override;
+    int32_t GetVoiceRadioTechnology(int32_t slotId, int32_t serialId) override;
+    int32_t GetBasebandVersion(int32_t slotId, int32_t serialId) override;
+    int32_t ShutDown(int32_t slotId, int32_t serialId) override;
+
+    int32_t GetSimIO(int32_t slotId, int32_t serialId, const ISimIoRequestInfo &simIO) override;
+    int32_t GetSimStatus(int32_t slotId, int32_t serialId) override;
+    int32_t GetImsi(int32_t slotId, int32_t serialId) override;
+    int32_t GetSimLockStatus(int32_t slotId, int32_t serialId, const ISimLockInfo &simLockInfo) override;
+    int32_t SetSimLock(int32_t slotId, int32_t serialId, const ISimLockInfo &simLockInfo) override;
+    int32_t ChangeSimPassword(int32_t slotId, int32_t serialId, const ISimPasswordInfo &simPassword) override;
+    int32_t UnlockPin(int32_t slotId, int32_t serialId, const std::string &pin) override;
+    int32_t UnlockPuk(int32_t slotId, int32_t serialId, const std::string &puk, const std::string &pin) override;
+    int32_t UnlockPin2(int32_t slotId, int32_t serialId, const std::string &pin2) override;
+    int32_t UnlockPuk2(int32_t slotId, int32_t serialId, const std::string &puk2, const std::string &pin2) override;
+    int32_t SetActiveSim(int32_t slotId, int32_t serialId, int32_t index, int32_t enable) override;
+    int32_t SimStkSendTerminalResponse(int32_t slotId, int32_t serialId, const std::string &strCmd) override;
+    int32_t SimStkSendEnvelope(int32_t slotId, int32_t serialId, const std::string &strCmd) override;
+    int32_t SimStkSendCallSetupRequestResult(int32_t slotId, int32_t serialId, int32_t accept) override;
+    int32_t SimStkIsReady(int32_t slotId, int32_t serialId) override;
+    int32_t SetRadioProtocol(int32_t slotId, int32_t serialId, const ISimProtocolRequest &protocol) override;
+    int32_t SimOpenLogicalChannel(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2) override;
+    int32_t SimCloseLogicalChannel(int32_t slotId, int32_t serialId, int32_t channelId) override;
+    int32_t SimTransmitApduLogicalChannel(
+        int32_t slotId, int32_t serialId, const IApduSimIORequestInfo &apduSimIO) override;
+    int32_t SimTransmitApduBasicChannel(
+        int32_t slotId, int32_t serialId, const IApduSimIORequestInfo &apduSimIO) override;
+    int32_t SimAuthentication(
+        int32_t slotId, int32_t serialId, const ISimAuthenticationRequestInfo &simAuthInfo) override;
+    int32_t UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key) override;
 
     int32_t SetCallback(const sptr<IRilCallback> &rilCallback) override;
     int32_t Init();
