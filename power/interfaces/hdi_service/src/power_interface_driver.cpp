@@ -24,10 +24,12 @@
 
 using namespace OHOS::HDI::Power::V1_0;
 
+namespace {
 struct HdfPowerInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
+}
 
 static int32_t PowerInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
@@ -50,7 +52,7 @@ static int32_t PowerInterfaceDriverDispatch(struct HdfDeviceIoClient *client, in
     return hdfPowerInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int HdfPowerInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+static int HdfPowerInterfaceDriverInit([[maybe_unused]] struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("HdfPowerInterfaceDriverInit enter");
     return HDF_SUCCESS;
@@ -101,7 +103,7 @@ static void HdfPowerInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     delete hdfPowerInterfaceHost;
 }
 
-struct HdfDriverEntry g_powerinterfaceDriverEntry = {
+static struct HdfDriverEntry g_powerinterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "power_interface_service",
     .Bind = HdfPowerInterfaceDriverBind,

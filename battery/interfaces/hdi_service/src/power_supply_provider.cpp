@@ -847,6 +847,53 @@ BatterydInfo PowerSupplyProvider::GetBatteryInfo() const
     return g_batteryInfo;
 }
 
+void PowerSupplyProvider::CreateMockTechPath(std::string& mockTechPath)
+{
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "create mockFilePath path");
+    CreateFile(mockTechPath + "/capacity", "1000");
+    CreateFile(mockTechPath + "/current_avg", "1000");
+    CreateFile(mockTechPath + "/current_now", "1000");
+    CreateFile(mockTechPath + "/health", "Over voltage");
+    CreateFile(mockTechPath + "/present", "0");
+    CreateFile(mockTechPath + "/status", "Not charging");
+    CreateFile(mockTechPath + "/type", "Unknown");
+    CreateFile(mockTechPath + "/temp", "345");
+    CreateFile(mockTechPath + "/technology", "Li-ion");
+}
+
+void PowerSupplyProvider::CreateMockChargerPath(std::string& mockChargerPath)
+{
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "create mockFilePath path");
+    CreateFile(mockChargerPath + "/type", "USB");
+    CreateFile(mockChargerPath + "/constant_charge_current", "0");
+    CreateFile(mockChargerPath + "/health", "Good");
+    CreateFile(mockChargerPath + "/online", "1");
+    CreateFile(mockChargerPath + "/status", "Charging");
+    CreateFile(mockChargerPath + "/type", "USB");
+}
+
+void PowerSupplyProvider::CreateMockBatteryPath(std::string& mockBatteryPath)
+{
+    BATTERY_HILOGI(FEATURE_BATT_INFO, "create mockFilePath path");
+    CreateFile(mockBatteryPath + "/capacity", "11");
+    CreateFile(mockBatteryPath + "/charge_control_limit", "0");
+    CreateFile(mockBatteryPath + "/charge_counter", "4000000");
+    CreateFile(mockBatteryPath + "/charge_full", "4000000");
+    CreateFile(mockBatteryPath + "/charge_now", "4000000");
+    CreateFile(mockBatteryPath + "/constant_charge_current", "0");
+    CreateFile(mockBatteryPath + "/current_avg", "1000");
+    CreateFile(mockBatteryPath + "/current_now", "1000");
+    CreateFile(mockBatteryPath + "/health", "Good");
+    CreateFile(mockBatteryPath + "/input_current_limit", "0");
+    CreateFile(mockBatteryPath + "/online", "1");
+    CreateFile(mockBatteryPath + "/present", "0");
+    CreateFile(mockBatteryPath + "/status", "Full");
+    CreateFile(mockBatteryPath + "/temp", "222");
+    CreateFile(mockBatteryPath + "/voltage_avg", "4123456");
+    CreateFile(mockBatteryPath + "/voltage_now", "4123456");
+    CreateFile(mockBatteryPath + "/type", "Battery");
+}
+
 void PowerSupplyProvider::InitDefaultSysfs()
 {
     std::string mockBatteryPath = MOCK_POWER_SUPPLY_BASE_PATH + "/battery";
@@ -867,39 +914,9 @@ void PowerSupplyProvider::InitDefaultSysfs()
         sleep(MKDIR_WAIT_TIME);
     }
 
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "create mock path");
-    CreateFile(mockTechPath + "/capacity", "1000");
-    CreateFile(mockTechPath + "/current_avg", "1000");
-    CreateFile(mockTechPath + "/current_now", "1000");
-    CreateFile(mockTechPath + "/health", "Over voltage");
-    CreateFile(mockTechPath + "/present", "0");
-    CreateFile(mockTechPath + "/status", "Not charging");
-    CreateFile(mockTechPath + "/type", "Unknown");
-    CreateFile(mockTechPath + "/temp", "345");
-    CreateFile(mockTechPath + "/technology", "Li-ion");
-    CreateFile(mockChargerPath + "/type", "USB");
-    CreateFile(mockChargerPath + "/constant_charge_current", "0");
-    CreateFile(mockChargerPath + "/health", "Good");
-    CreateFile(mockChargerPath + "/online", "1");
-    CreateFile(mockChargerPath + "/status", "Charging");
-    CreateFile(mockChargerPath + "/type", "USB");
-    CreateFile(mockBatteryPath + "/capacity", "11");
-    CreateFile(mockBatteryPath + "/charge_control_limit", "0");
-    CreateFile(mockBatteryPath + "/charge_counter", "4000000");
-    CreateFile(mockBatteryPath + "/charge_full", "4000000");
-    CreateFile(mockBatteryPath + "/charge_now", "4000000");
-    CreateFile(mockBatteryPath + "/constant_charge_current", "0");
-    CreateFile(mockBatteryPath + "/current_avg", "1000");
-    CreateFile(mockBatteryPath + "/current_now", "1000");
-    CreateFile(mockBatteryPath + "/health", "Good");
-    CreateFile(mockBatteryPath + "/input_current_limit", "0");
-    CreateFile(mockBatteryPath + "/online", "1");
-    CreateFile(mockBatteryPath + "/present", "0");
-    CreateFile(mockBatteryPath + "/status", "Full");
-    CreateFile(mockBatteryPath + "/temp", "222");
-    CreateFile(mockBatteryPath + "/voltage_avg", "4123456");
-    CreateFile(mockBatteryPath + "/voltage_now", "4123456");
-    CreateFile(mockBatteryPath + "/type", "Battery");
+    CreateMockTechPath(mockTechPath);
+    CreateMockChargerPath(mockChargerPath);
+    CreateMockBatteryPath(mockBatteryPath);
     path_ = MOCK_POWER_SUPPLY_BASE_PATH;
 }
 
