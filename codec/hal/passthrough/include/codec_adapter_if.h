@@ -46,8 +46,8 @@ struct ComponentManagerList {
 
 int32_t CodecAdapterCodecInit();
 int32_t CodecAdapterCodecDeinit();
-int32_t CodecAdapterCreateComponent(
-    struct CodecComponentNode **codecNode, char *compName, int64_t appData, struct CodecCallbackType *callbacks);
+int32_t CodecAdapterCreateComponent(struct CodecComponentNode **codecNode, const char *compName, int64_t appData,
+    const struct CodecCallbackType *callbacks);
 int32_t CodecAdapterDestroyComponent(struct CodecComponentNode *codecNode);
 int32_t CodecAdapterGetComponentVersion(const struct CodecComponentNode *codecNode, struct CompVerInfo *verInfo);
 int32_t CodecAdapterSendCommand(const struct CodecComponentNode *codecNode, OMX_COMMANDTYPE cmd, uint32_t param,
@@ -55,11 +55,11 @@ int32_t CodecAdapterSendCommand(const struct CodecComponentNode *codecNode, OMX_
 int32_t CodecAdapterGetParameter(
     const struct CodecComponentNode *codecNode, OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen);
 int32_t CodecAdapterSetParameter(
-    const struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *param, uint32_t paramLen);
+    const struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, const int8_t *param, uint32_t paramLen);
 int32_t CodecAdapterGetConfig(
     const struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *config, uint32_t configLen);
 int32_t CodecAdapterSetConfig(
-    const struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, int8_t *config, uint32_t configLen);
+    const struct CodecComponentNode *codecNode, OMX_INDEXTYPE index, const int8_t *config, uint32_t configLen);
 int32_t CodecAdapterGetExtensionIndex(
     const struct CodecComponentNode *codecNode, const char *parameterName, OMX_INDEXTYPE *indexType);
 int32_t CodecAdapterGetState(const struct CodecComponentNode *codecNode, OMX_STATETYPE *state);
