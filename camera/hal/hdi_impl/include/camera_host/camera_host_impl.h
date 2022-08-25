@@ -17,9 +17,9 @@
 #define CAMERA_HOST_CAMERA_HOST_IMPL_H
 
 #include <map>
+#include "v1_0/icamera_device.h"
 #include "v1_0/icamera_host.h"
 #include "utils.h"
-#include "v1_0/icamera_device.h"
 #include "camera_device_impl.h"
 
 namespace OHOS::Camera {

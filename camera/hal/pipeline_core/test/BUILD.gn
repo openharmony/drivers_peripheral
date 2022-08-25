@@ -223,6 +223,7 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "drivers_interface_camera:libcamera_proxy_1.0",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "utils_base:utils",

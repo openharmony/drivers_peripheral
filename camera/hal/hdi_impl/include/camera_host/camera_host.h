@@ -16,12 +16,13 @@
 #ifndef CAMERA_HOST_CAMERA_HOST_H
 #define CAMERA_HOST_CAMERA_HOST_H
 
-#include "icamera_host_callback.h"
-#include "icamera_device_callback.h"
 #include "camera.h"
+#include "v1_0/icamera_device_callback.h"
+#include "v1_0/icamera_host_callback.h"
 #include "v1_0/types.h"
 
 namespace OHOS::Camera {
+using namespace OHOS::HDI::Camera::V1_0;
 class ICameraDevice;
 class ICameraHostCallback;
 class ICameraDeviceCallback;
