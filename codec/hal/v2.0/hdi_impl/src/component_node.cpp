@@ -15,12 +15,8 @@
 
 #include "component_node.h"
 #include <ashmem.h>
-#include <cstring>
 #include <hdf_log.h>
-#include <libsync.h>
-#include <memory.h>
 #include <securec.h>
-#include <sys/mman.h>
 #include <unistd.h>
 #include "icodec_buffer.h"
 

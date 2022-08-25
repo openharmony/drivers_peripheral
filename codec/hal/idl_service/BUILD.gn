@@ -15,7 +15,7 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libcodec_component_manager_service_1.0") {
   include_dirs = [
-    "//drivers/peripheral/codec/hal/buffersequence/",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/buffer_parcelable",
     "//drivers/peripheral/codec/interfaces/include/",
     "//third_party/openmax/api/1.1.2",
     "include",
@@ -33,19 +33,7 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
     "src/icodec_buffer.cpp",
   ]
 
-  cflags_cc = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-Wno-#warnings",
-    "-Wno-missing-braces",
-    "-Wno-missing-field-initializers",
-  ]
-
-  deps = [
-    "//drivers/peripheral/codec/hal/buffersequence:libbufferhandle_parcelable",
-    "//third_party/libdrm:libdrm",
-  ]
+  deps = [ "//drivers/hdf_core/adapter/uhdf2/model/display/base/buffer_parcelable:libbufferhandle_parcelable" ]
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_codec:codec_idl_headers",
@@ -71,7 +59,7 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
 ohos_shared_library("libcodec_driver") {
   include_dirs = [
     "//drivers/peripheral/codec/interfaces/include/",
-    "//drivers/peripheral/codec/hal/buffersequence",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/buffer_parcelable",
     "include",
   ]
 

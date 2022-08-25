@@ -15,8 +15,8 @@
 
 #include "component_node.h"
 #include <ashmem.h>
-#include <libsync.h>
 #include <securec.h>
+#include <unistd.h>
 #include "codec_log_wrapper.h"
 #include "component_mgr.h"
 #include "icodec_buffer.h"

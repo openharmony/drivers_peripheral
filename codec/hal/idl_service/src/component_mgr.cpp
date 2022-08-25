@@ -14,14 +14,8 @@
  */
 
 #include "component_mgr.h"
-#include <cstring>
-#include <dlfcn.h>
 #include <hdf_base.h>
-#include <hdf_log.h>
-#include <memory.h>
-#include <securec.h>
-#define HDF_LOG_TAG codec_hdi_server
-
+#include "codec_log_wrapper.h"
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -44,7 +38,7 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
 
     auto iter = compoentsCore_.find(componentName);
     if (iter == compoentsCore_.end() || iter->second == nullptr) {
-        HDF_LOGE("%{public}s: can not find component[%{public}s] in core", __func__, componentName);
+        CODEC_LOGE("can not find component[%{public}s] in core", componentName);
         return err;
     }
     auto core = iter->second;
