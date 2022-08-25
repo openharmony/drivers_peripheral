@@ -36,9 +36,9 @@ ohos_fuzztest("InputGetChipnameFuzzTest") {
     "//drivers/peripheral/input/hal:hdi_input",
   ]
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
 }
 

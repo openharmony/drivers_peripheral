@@ -23,7 +23,6 @@ group("display_device_server") {
 ohos_shared_library("libdisplay_device_server") {
   include_dirs = [
     "//drivers/peripheral/display/interfaces/include",
-    "//utils/native/base/include",
     "$hdi_hisplay_device_base/include/util",
     "$hdi_hisplay_device_base/include/interfaces",
     "$hdi_hisplay_device_base/include/server",
@@ -36,10 +35,7 @@ ohos_shared_library("libdisplay_device_server") {
     "display_device_host_driver.cpp",
     "display_device_service.cpp",
   ]
-  deps = [
-    "//drivers/peripheral/display/hal:hdi_display_device",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//drivers/peripheral/display/hal:hdi_display_device" ]
 
   cflags = [
     "-Wall",
@@ -49,6 +45,7 @@ ohos_shared_library("libdisplay_device_server") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "graphic_chipsetsdk:surface",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",

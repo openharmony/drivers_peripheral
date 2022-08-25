@@ -35,6 +35,7 @@ ohos_fuzztest("DisplayMmapFuzzTest") {
   deps = [ "//drivers/peripheral/display/hdi_service/gralloc/client:libhdi_display_gralloc_client" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_peripheral_display:hdi_gralloc_client",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
@@ -42,7 +43,6 @@ ohos_fuzztest("DisplayMmapFuzzTest") {
     "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 }
 

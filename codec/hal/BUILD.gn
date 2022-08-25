@@ -43,13 +43,13 @@ ohos_shared_library("libcodec_hdi_omx_server") {
   ]
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -77,13 +77,13 @@ ohos_shared_library("libcodec_hdi_omx_client") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -104,12 +104,12 @@ ohos_shared_library("libcodec_hdi_omx_callback_type_service_impl") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

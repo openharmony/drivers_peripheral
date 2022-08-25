@@ -71,9 +71,9 @@ if (defined(ohos_lite)) {
     deps = [ "//drivers/peripheral/vibrator/hal:hdi_vibrator" ]
     if (is_standard_system) {
       external_deps = [
+        "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
-        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

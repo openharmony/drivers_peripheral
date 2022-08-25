@@ -34,11 +34,11 @@ ohos_unittest("hdf_light_hdi_test_performance") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_interface_light:liblight_proxy_1.0",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

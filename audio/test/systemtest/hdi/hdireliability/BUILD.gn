@@ -165,8 +165,8 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gtest_main",
     ]
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_utils",
-      "utils_base:utils",
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
@@ -197,8 +197,8 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gtest_main",
     ]
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_utils",
-      "utils_base:utils",
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
@@ -229,8 +229,8 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gtest_main",
     ]
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_utils",
-      "utils_base:utils",
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
@@ -261,8 +261,8 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gtest_main",
     ]
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_utils",
-      "utils_base:utils",
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
