@@ -49,13 +49,13 @@ static constexpr const char * const LOCK_PATH = "/sys/power/wake_lock";
 static constexpr const char * const UNLOCK_PATH = "/sys/power/wake_unlock";
 static constexpr const char * const WAKEUP_COUNT_PATH = "/sys/power/wakeup_count";
 static std::chrono::milliseconds waitTime_(100); // {100ms};
-static std::mutex mutex_;
-static std::mutex suspendMutex_;
-static std::condition_variable suspendCv_;
-static std::unique_ptr<std::thread> daemon_;
-static std::atomic_bool suspending_;
-static std::atomic_bool suspendRetry_;
-static sptr<IPowerHdiCallback> callback_;
+static std::mutex g_mutex;
+static std::mutex g_suspendMutex;
+static std::condition_variable g_suspendCv;
+static std::unique_ptr<std::thread> g_daemon;
+static std::atomic_bool g_suspending;
+static std::atomic_bool g_suspendRetry;
+static sptr<IPowerHdiCallback> g_callback;
 static UniqueFd wakeupCountFd;
 static void AutoSuspendLoop();
 static int32_t DoSuspend();
@@ -74,9 +74,9 @@ extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
 
 int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback>& ipowerHdiCallback)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    callback_ = ipowerHdiCallback;
-    if (callback_ == nullptr) {
+    std::lock_guard<std::mutex> lock(g_mutex);
+    g_callback = ipowerHdiCallback;
+    if (g_callback == nullptr) {
         UnRegister();
         return HDF_SUCCESS;
     }
@@ -84,35 +84,35 @@ int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback>& ipow
     if (g_deathRecipient == nullptr) {
         return HDF_FAILURE;
     }
-    AddPowerDeathRecipient(callback_);
+    AddPowerDeathRecipient(g_callback);
     return HDF_SUCCESS;
 }
 
 int32_t PowerInterfaceImpl::UnRegister()
 {
     HDF_LOGI("UnRegister");
-    RemovePowerDeathRecipient(callback_);
-    callback_ = nullptr;
+    RemovePowerDeathRecipient(g_callback);
+    g_callback = nullptr;
     return HDF_SUCCESS;
 }
 
 int32_t PowerInterfaceImpl::StartSuspend()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
-    suspendRetry_ = true;
-    if (suspending_) {
-        suspendCv_.notify_one();
+    std::lock_guard<std::mutex> lock(g_mutex);
+    g_suspendRetry = true;
+    if (g_suspending) {
+        g_suspendCv.notify_one();
         return HDF_SUCCESS;
     }
-    suspending_ = true;
-    daemon_ = std::make_unique<std::thread>(&AutoSuspendLoop);
-    daemon_->detach();
+    g_suspending = true;
+    g_daemon = std::make_unique<std::thread>(&AutoSuspendLoop);
+    g_daemon->detach();
     return HDF_SUCCESS;
 }
 
 void AutoSuspendLoop()
 {
-    auto suspendLock = std::unique_lock(suspendMutex_);
+    auto suspendLock = std::unique_lock(g_suspendMutex);
     while (true) {
         std::this_thread::sleep_for(waitTime_);
 
@@ -120,8 +120,8 @@ void AutoSuspendLoop()
         if (wakeupCount.empty()) {
             continue;
         }
-        if (!suspendRetry_) {
-            suspendCv_.wait(suspendLock);
+        if (!g_suspendRetry) {
+            g_suspendCv.wait(suspendLock);
         }
         if (!WriteWakeCount(wakeupCount)) {
             continue;
@@ -131,13 +131,13 @@ void AutoSuspendLoop()
         DoSuspend();
         NotifyCallback(CMD_ON_WAKEUP);
     }
-    suspending_ = false;
-    suspendRetry_ = false;
+    g_suspending = false;
+    g_suspendRetry = false;
 }
 
 int32_t DoSuspend()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     UniqueFd suspendStateFd(TEMP_FAILURE_RETRY(open(SUSPEND_STATE_PATH, O_RDWR | O_CLOEXEC)));
     if (suspendStateFd < 0) {
         return HDF_FAILURE;
@@ -155,31 +155,29 @@ int32_t DoSuspend()
 
 void NotifyCallback(int code)
 {
-    if (callback_ == nullptr) {
+    if (g_callback == nullptr) {
         return;
     }
     switch (code) {
         case CMD_ON_SUSPEND:
-            callback_->OnSuspend();
+            g_callback->OnSuspend();
             break;
         case CMD_ON_WAKEUP:
-            callback_->OnWakeup();
-            break;
-        default:
+            g_callback->OnWakeup();
             break;
     }
 }
 
 int32_t PowerInterfaceImpl::StopSuspend()
 {
-    suspendRetry_ = false;
+    g_suspendRetry = false;
 
     return HDF_SUCCESS;
 }
 
 int32_t PowerInterfaceImpl::ForceSuspend()
 {
-    suspendRetry_ = false;
+    g_suspendRetry = false;
 
     NotifyCallback(CMD_ON_SUSPEND);
     DoSuspend();
@@ -189,7 +187,7 @@ int32_t PowerInterfaceImpl::ForceSuspend()
 
 int32_t PowerInterfaceImpl::SuspendBlock(const std::string& name)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     if (name.empty()) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -203,7 +201,7 @@ int32_t PowerInterfaceImpl::SuspendBlock(const std::string& name)
 
 int32_t PowerInterfaceImpl::SuspendUnblock(const std::string& name)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(g_mutex);
     if (name.empty()) {
         return HDF_ERR_INVALID_PARAM;
     }
