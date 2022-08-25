@@ -27,7 +27,7 @@ using namespace testing::ext;
 
 namespace {
     constexpr uint32_t g_sleepTime = 30;
-    constexpr int32_t MIN_lIGHT_ID = HDF_LIGHT_ID_BATTERY;
+    constexpr int32_t MIN_LIGHT_ID = HDF_LIGHT_ID_BATTERY;
     constexpr int32_t MAX_LIGHT_ID = HDF_LIGHT_ID_ATTENTION;
     constexpr int32_t ON_TIME = 500;
     constexpr int32_t OFF_TIME = 500;
@@ -87,7 +87,7 @@ HWTEST_F(HdfLightHdiTest, GetLightInfo001, TestSize.Level1)
 
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, MIN_lIGHT_ID);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
         EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
     }
 }
@@ -109,7 +109,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight001, TestSize.Level1)
 
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, MIN_lIGHT_ID);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
         EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
@@ -140,7 +140,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight002, TestSize.Level1)
 
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, MIN_lIGHT_ID);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
         EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
@@ -168,7 +168,7 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight003, TestSize.Level1)
 
     for (auto iter : info)
     {
-        EXPECT_GE(iter.lightId, MIN_lIGHT_ID);
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
         EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
