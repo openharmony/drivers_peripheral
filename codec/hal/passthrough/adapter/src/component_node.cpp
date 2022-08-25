@@ -142,7 +142,7 @@ int32_t ComponentNode::GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uin
     return ret;
 }
 
-int32_t ComponentNode::SetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uint32_t paramLen)
+int32_t ComponentNode::SetParameter(OMX_INDEXTYPE paramIndex, const int8_t *param, uint32_t paramLen)
 {
     if (comp_ == nullptr || param == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null or param is null", __func__);
@@ -151,7 +151,7 @@ int32_t ComponentNode::SetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uin
 
     int32_t paramCnt = 1;
     Param paramOut[PARAM_MAX_NUM] = {};
-    int32_t ret = Common::SplitParam(paramIndex, param, paramOut, paramCnt, codecType_);
+    int32_t ret = Common::SplitParam(paramIndex, (int8_t *)param, paramOut, paramCnt, codecType_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s error, paramIndex is not support", __func__);
         return ret;
@@ -178,7 +178,7 @@ int32_t ComponentNode::GetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t c
     return HDF_ERR_NOT_SUPPORT;
 }
 
-int32_t ComponentNode::SetConfig(OMX_INDEXTYPE index, int8_t *config, uint32_t configLen)
+int32_t ComponentNode::SetConfig(OMX_INDEXTYPE index, const int8_t *config, uint32_t configLen)
 {
     if (comp_ == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null", __func__);
@@ -266,7 +266,7 @@ int32_t ComponentNode::ComponentTunnelRequest(
     return HDF_ERR_NOT_SUPPORT;
 }
 
-int32_t ComponentNode::SetCallbacks(CodecCallbackType *omxCallback, int64_t appData)
+int32_t ComponentNode::SetCallbacks(const CodecCallbackType *omxCallback, int64_t appData)
 {
     int32_t ret = HDF_SUCCESS;
     if (!setCallbackComplete_) {
@@ -281,7 +281,7 @@ int32_t ComponentNode::SetCallbacks(CodecCallbackType *omxCallback, int64_t appD
         }
         setCallbackComplete_ = true;
     }
-    this->omxCallback_ = omxCallback;
+    this->omxCallback_ = (CodecCallbackType *)omxCallback;
     this->appData_ = appData;
 
     return ret;
