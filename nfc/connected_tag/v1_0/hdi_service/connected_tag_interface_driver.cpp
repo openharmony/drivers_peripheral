@@ -36,6 +36,7 @@ static int32_t NfcHdiDispatch(struct HdfDeviceIoClient *client, int cmdId,
 
 static int HdfNfcHdiDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    (void)deviceObject;
     HDF_LOGI("HdfNfcHdiDriverInit enter, new hdi impl.");
     return HDF_SUCCESS;
 }
