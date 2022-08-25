@@ -22,10 +22,12 @@
 using namespace OHOS::HDI::Battery::V1_1;
 using namespace OHOS::HDI::Battery;
 
+namespace {
 struct HdfBatteryInterfaceHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
+}
 
 static int32_t BatteryInterfaceDriverDispatch(struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data,
     struct HdfSBuf *reply)
@@ -48,7 +50,7 @@ static int32_t BatteryInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
     return hdfBatteryInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int32_t HdfBatteryInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+static int32_t HdfBatteryInterfaceDriverInit([[maybe_unused]] struct HdfDeviceObject *deviceObject)
 {
     return HDF_SUCCESS;
 }
