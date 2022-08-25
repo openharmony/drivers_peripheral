@@ -22,15 +22,21 @@
 #define USB_FUNCTION_ACM  1
 #define USB_FUNCTION_ECM  2
 #define USB_FUNCTION_HDC  4
+#define USB_FUNCTION_RNDIS  32
+#define USB_FUNCTION_STORAGE  512
 
 #define DEV_SERVICE_NAME "usbfn_master"
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
 #define ECM_SERVICE_NAME "usbfn_cdcecm"
 
-#define SYS_USB_CONFIGFS "sys.usb.configfs"
-#define SYS_USB_CONFIG   "sys.usb.config"
-#define HDC_CONFIG_OFF   "none"
-#define HDC_CONFIG_ON    "hdc"
+#define SYS_USB_CONFIGFS         "sys.usb.configfs"
+#define SYS_USB_CONFIG           "sys.usb.config"
+#define HDC_CONFIG_OFF           "none"
+#define HDC_CONFIG_ON            "hdc"
+#define HDC_CONFIG_RNDIS         "rndis"
+#define HDC_CONFIG_STORAGE       "storage"
+#define HDC_CONFIG_RNDIS_HDC     "rndis_hdc"
+#define HDC_CONFIG_STORAGE_HDC   "storage_hdc"
 #define HDC_CONFIGFS_OFF "0"
 #define HDC_CONFIGFS_ON  "1"
 
@@ -43,8 +49,7 @@
 #define ECM_RELEASE 101
 
 #define USB_FUNCTION_ACM_ECM 3
-#define FUNCTIONS_MAX        7
-
+#define HDC_READY_TIME 2000
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -53,7 +58,7 @@ class UsbdFunction {
 public:
     UsbdFunction() = default;
     ~UsbdFunction() = default;
-    static int32_t UsbdSetFunction(int32_t funcs);
+    static int32_t UsbdSetFunction(uint32_t funcs);
     static int32_t UsbdGetFunction();
 
 private:
@@ -64,8 +69,12 @@ private:
     static int32_t SetFunctionToACM();
     static int32_t SetFunctionToECM();
     static int32_t SetFunctionToACMECM();
-    static uint8_t currentFuncs_;
-    static uint8_t waitSleepTime_;
+    static int32_t SetFunctionToRndis();
+    static int32_t SetFunctionToStorage();
+    static int32_t SetFunctionToRndisHdc();
+    static int32_t SetFunctionToStorageHdc();
+    static int32_t SetDDKFunction(uint32_t funcs);
+    static uint32_t currentFuncs_;
 };
 } // namespace V1_0
 } // namespace Usb
