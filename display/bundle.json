@@ -11,19 +11,8 @@
     "rom": "1260KB",
     "ram": "7700KB",
     "deps": {
-      "components": [
-        "graphic_standard",
-        "hdf_core",
-        "hiviewdfx_hilog_native",
-        "utils_base"
-      ],
-      "third_part": [
-        "bounds_checking_function",
-        "libdrm",
-        "wayland_standard",
-        "weston",
-        "googletest"
-      ]
+      "components": [],
+      "third_part": []
     },
     "build": {
       "sub_component": [
