@@ -20,18 +20,24 @@
 namespace OHOS::Camera {
 int32_t StreamOperatorCallback::OnCaptureStarted(int32_t captureId, const std::vector<int32_t>& streamIds)
 {
+    (void)captureId;
+    (void)streamIds;
     HDF_LOGV("%{public}s, enter.", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t StreamOperatorCallback::OnCaptureEnded(int32_t captureId, const std::vector<CaptureEndedInfo>& infos)
 {
+    (void)captureId;
+    (void)infos;
     HDF_LOGV("%{public}s, enter.", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t StreamOperatorCallback::OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos)
 {
+    (void)captureId;
+    (void)infos;
     HDF_LOGV("%{public}s, enter.", __func__);
     return HDF_SUCCESS;
 }
@@ -39,6 +45,9 @@ int32_t StreamOperatorCallback::OnCaptureError(int32_t captureId, const std::vec
 int32_t StreamOperatorCallback::OnFrameShutter(int32_t captureId,
     const std::vector<int32_t>& streamIds, uint64_t timestamp)
 {
+    (void)captureId;
+    (void)streamIds;
+    (void)timestamp;
     HDF_LOGV("%{public}s, enter.", __func__);
     return HDF_SUCCESS;
 }
