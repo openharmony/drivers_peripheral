@@ -230,6 +230,12 @@ static void PrintCapability(CodecCompCapability *cap, int32_t index)
     HDF_LOGI("-------------------------------------------------------------------");
 }
 
+/**
+  * @tc.name: HdfCodecHdiGetCodecComponentManagerTest_001
+  * @tc.desc: Get codec component manager test.
+  * @tc.type: FUNC
+  * @tc.require: issueI5HAII
+  */
 HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetCodecComponentManagerTest_001, TestSize.Level1)
 {
     g_manager = GetCodecComponentManager();
@@ -238,6 +244,12 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetCodecComponentManagerTest_001, TestS
     ASSERT_TRUE(g_callback != nullptr);
 }
 
+/**
+  * @tc.name: HdfCodecHdiGetComponentNumTest_001
+  * @tc.desc: Get codec component num test.
+  * @tc.type: FUNC
+  * @tc.require: issueI5HAII
+  */
 HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetComponentNumTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_manager != nullptr);
@@ -245,6 +257,12 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetComponentNumTest_001, TestSize.Level
     ASSERT_GT(g_count, 0);
 }
 
+/**
+  * @tc.name: HdfCodecHdiGetComponentCapabilityListTest_001
+  * @tc.desc: Get codec component capability list test.
+  * @tc.type: FUNC
+  * @tc.require: issueI5HAII
+  */
 HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetComponentCapabilityListTest_001, TestSize.Level1)
 {
     ASSERT_GT(g_count, 0);
