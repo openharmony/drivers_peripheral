@@ -95,6 +95,8 @@ typedef enum camera_device_metadata_tag {
     OHOS_SENSOR_EXPOSURE_TIME = OHOS_CAMERA_SENSOR_START,
     OHOS_SENSOR_COLOR_CORRECTION_GAINS,
     OHOS_SENSOR_ORIENTATION,
+    OHOS_ABILITY_MUTE_MODES,
+    OHOS_CONTROL_MUTE_MODE,
     OHOS_CAMERA_SENSOR_END,
 
     OHOS_SENSOR_INFO_ACTIVE_ARRAY_SIZE = OHOS_CAMERA_SENSOR_INFO_START,
@@ -413,4 +415,9 @@ typedef enum camera_memory_type_enum {
     OHOS_CAMERA_MEMORY_DMABUF,
 } camera_memory_type_enum_t;
 
+// OHOS_ABILITY_MUTE_MODES and OHOS_CONTROL_MUTE_MODE enumeration values
+typedef enum camera_mute_mode {
+    OHOS_CAMERA_MUTE_MODE_OFF,
+    OHOS_CAMERA_MUTE_MODE_SOLID_COLOR_BLACK,
+} camera_mute_mode_t;
 #endif
