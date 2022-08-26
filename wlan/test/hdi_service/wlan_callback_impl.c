@@ -48,7 +48,7 @@ static int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event
 
 static int32_t WlanCallbackNetlinkMessage(struct IWlanCallback *self, const uint8_t *msg, uint32_t msgLen)
 {
-    int32_t i;
+    uint32_t i;
     (void)self;
     if (msg == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
