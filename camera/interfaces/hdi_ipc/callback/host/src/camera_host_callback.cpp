@@ -20,6 +20,8 @@
 namespace OHOS::Camera {
 int32_t CameraHostCallback::OnCameraStatus(const std::string& cameraId, CameraStatus status)
 {
+    (void)cameraId;
+    (void)status;
     HDF_LOGV("%{public}s, enter.", __func__);
     return HDF_SUCCESS;
 }
