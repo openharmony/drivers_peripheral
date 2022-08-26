@@ -20,17 +20,12 @@
 #include <OMX_VideoExt.h>
 #include <ashmem.h>
 #include <buffer_handle.h>
-#include <buffer_handle_utils.h>
 #include <condition_variable>
-#include <deque>
 #include <idisplay_gralloc.h>
 #include <list>
 #include <map>
 #include <memory>
 #include <mutex>
-#include <queue>
-#include <thread>
-#include <vector>
 #include "codec_callback_type_service.h"
 #include "codec_callback_type_stub.h"
 #include "codec_component_manager.h"

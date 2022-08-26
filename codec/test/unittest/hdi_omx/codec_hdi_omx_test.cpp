@@ -19,7 +19,6 @@
 #include <OMX_VideoExt.h>
 #include <ashmem.h>
 #include <buffer_handle.h>
-#include <buffer_handle_utils.h>
 #include <gtest/gtest.h>
 #include <hdf_log.h>
 #include <idisplay_gralloc.h>

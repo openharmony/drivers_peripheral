@@ -14,12 +14,8 @@
  */
 
 #include "codec_hdi_encode.h"
-#include <chrono>
-#include <dlfcn.h>
 #include <hdf_log.h>
-#include <osal_time.h>
 #include <securec.h>
-#include <sys/mman.h>
 #include <unistd.h>
 #include "codec_omx_ext.h"
 
