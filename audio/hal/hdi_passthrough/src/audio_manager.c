@@ -408,7 +408,7 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
     }
     if (hwAdapter->portCapabilitys != NULL) {
         uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
-        int32_t i = 0;
+        uint32_t i = 0;
         while (i < portNum) {
             if (&hwAdapter->portCapabilitys[i] != NULL) {
                 AudioMemFree((void **)&hwAdapter->portCapabilitys[i].capability.subPorts);
