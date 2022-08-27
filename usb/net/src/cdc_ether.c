@@ -740,8 +740,7 @@ static void EcmProcessNotification(struct EcmDevice *ecm, unsigned char *buf)
 static void EcmCtrlIrq(struct UsbRequest *req)
 {
     struct EcmDevice *ecm = (struct EcmDevice *)req->compInfo.userData;
-    unsigned int expectedSize, copySize, allocSize;
-    int32_t status = req->compInfo.status;
+    int32_t status = (int32_t)req->compInfo.status;
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)req->compInfo.buffer;
     unsigned int currentSize = req->compInfo.actualLength;
     switch (status) {
@@ -757,23 +756,27 @@ static void EcmCtrlIrq(struct UsbRequest *req)
     if (ecm->nbIndex) {
         dr = (struct UsbCdcNotification *)ecm->notificationBuffer;
     }
-    expectedSize = sizeof(struct UsbCdcNotification) + LE16_TO_CPU(dr->wLength);
+    uint32_t expectedSize = sizeof(struct UsbCdcNotification) + LE16_TO_CPU(dr->wLength);
     if (currentSize < expectedSize) {
         if (ecm->nbSize < expectedSize) {
             if (ecm->nbSize) {
                 OsalMemFree(ecm->notificationBuffer);
                 ecm->nbSize = 0;
             }
-            allocSize = expectedSize;
+            uint32_t allocSize = expectedSize;
             ecm->notificationBuffer = OsalMemCalloc(allocSize);
             if (!ecm->notificationBuffer) {
                 goto EXIT;
             }
             ecm->nbSize = allocSize;
         }
-        copySize = MIN(currentSize, expectedSize - ecm->nbIndex);
-        (void)memcpy_s(
+        uint32_t copySize = MIN(currentSize, expectedSize - ecm->nbIndex);
+        int32_t ret = memcpy_s(
             &ecm->notificationBuffer[ecm->nbIndex], ecm->nbSize - ecm->nbIndex, req->compInfo.buffer, copySize);
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+            return;
+        }
         ecm->nbIndex += copySize;
         currentSize = ecm->nbIndex;
     }
