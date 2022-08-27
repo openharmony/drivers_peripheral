@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "sensorunregistercallback_fuzzer.h"
+#include "sensorregisterandunregistercallback_fuzzer.h"
 #include "hdf_base.h"
 #include "sensor_impl.h"
 #include "v1_0/isensor_interface.h"
@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_0 {
-int32_t SensorUnregisterCallbackFuzzer::OnDataEvent(const HdfSensorEvents& event)
+int32_t SensorRegisterAndUnregisterCallbackFuzzer::OnDataEvent(const HdfSensorEvents& event)
 {
     (void)event;
     return HDF_SUCCESS;
@@ -35,20 +35,19 @@ int32_t SensorUnregisterCallbackFuzzer::OnDataEvent(const HdfSensorEvents& event
 } // OHOS
 
 namespace OHOS {
-    bool SensorUnregisterCallbackFuzzTest(const uint8_t* data, size_t size)
+    bool SensorRegisterAndUnregisterCallbackFuzzTest(const uint8_t* data, size_t size)
     {
         bool result = false;
         int32_t ret;
         sptr<ISensorInterface> sensorInterface = ISensorInterface::Get();
-        sptr<ISensorCallback> registerCallback = new SensorUnregisterCallbackFuzzer();
-        sptr<ISensorCallback> unRegisterCallback = registerCallback;
+        sptr<ISensorCallback> registerCallback = new SensorRegisterAndUnregisterCallbackFuzzer();
         ret = sensorInterface->Register(*(int32_t *)data, registerCallback);
         if (ret != HDF_SUCCESS) {
-            unRegisterCallback = new SensorUnregisterCallbackFuzzer();
+            registerCallback = new SensorRegisterAndUnregisterCallbackFuzzer();
         }
 
-        sensorInterface->Unregister(*(int32_t *)data, unRegisterCallback);
-        if (ret != HDF_SUCCESS) {
+        ret = sensorInterface->Unregister(*(int32_t *)data, registerCallback);
+        if (ret == HDF_SUCCESS) {
             return true;
         }
         return result;
@@ -57,7 +56,14 @@ namespace OHOS {
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    OHOS::SensorUnregisterCallbackFuzzTest(data, size);
+    if (data == nullptr) {
+        return 0;
+    }
+
+    if (size < sizeof(int32_t)) {
+        return 0;
+    }
+    OHOS::SensorRegisterAndUnregisterCallbackFuzzTest(data, size);
     return 0;
 }
 
