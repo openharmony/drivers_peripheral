@@ -71,6 +71,7 @@ static int32_t DdkDevMgrAddDevice(struct UsbDdkDeviceInfo *device)
         return HDF_ERR_INVALID_PARAM;
     }
 
+    HDF_LOGI("%{public}s: make device address and whether the device exists", __func__);
     if (DdkDevMgrIsDevExists(DdkSysfsMakeDevAddr(device->info.busNum, device->info.devNum)) != NULL) {
         HDF_LOGW("%{public}s: add device repeatedly busNum:%{public}d, devNum:%{public}d", __func__,
             device->info.busNum, device->info.devNum);
@@ -80,6 +81,7 @@ static int32_t DdkDevMgrAddDevice(struct UsbDdkDeviceInfo *device)
     OsalMutexLock(&g_ddkDevList.listMutex);
     DListInsertTail(&device->list, &g_ddkDevList.devList);
     OsalMutexUnlock(&g_ddkDevList.listMutex);
+    HDF_LOGI("%{public}s: add device successed", __func__);
     return HDF_SUCCESS;
 }
 
