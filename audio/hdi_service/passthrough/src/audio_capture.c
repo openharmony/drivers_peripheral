@@ -1015,7 +1015,7 @@ int32_t AudioCaptureAudioDevDump(struct IAudioCapture *handle, int32_t range, in
     dprintf(fd, "%s%d\n", "Number of errors: ", capture->errorLog.totalErrors);
 
     if (range < RANGE_MIN - 1 || range > RANGE_MAX) {
-        dprintf(fd, "%s%d\n", "Out of range, invalid output");
+        dprintf(fd, "%s\n", "Out of range, invalid output");
         return AUDIO_SUCCESS;
     }
 

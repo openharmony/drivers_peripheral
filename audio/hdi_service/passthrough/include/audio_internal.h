@@ -46,7 +46,7 @@ extern "C" {
 #define VOLUME_CHANGE         100
 #define SEC_TO_NSEC           1000000000
 #define MAP_MAX               100
-#define FORMAT_ONE            "%-5d  %-10d  %-20llu  %-15s  %s\n"
+#define FORMAT_ONE            "%-5d  %-10d  %-20PRIu64  %-15s  %s\n"
 #define FORMAT_TWO            "%-5d  %-10d  %s\n"
 #define ERROR_LOG_MAX_NUM     8
 #define ERROR_REASON_DESC_LEN 64
