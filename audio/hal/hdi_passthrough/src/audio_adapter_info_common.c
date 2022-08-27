@@ -852,7 +852,7 @@ static void AudioAdaptersNamesRepair(void)
 static void AudioPortsNamesRepair(void)
 {
     int32_t i;
-    int32_t j;
+    uint32_t j;
     int32_t adapterNum;
     uint32_t portNum;
 
@@ -896,7 +896,7 @@ static void AudioAdaptersNamesRecord(void)
 static void AudioPortsNamesRecord(void)
 {
     int32_t i;
-    int32_t j;
+    uint32_t j;
     int32_t adapterCurNum;
     uint32_t portCurNum;
 
