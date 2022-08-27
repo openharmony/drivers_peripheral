@@ -30,7 +30,7 @@ const uint32_t RESET_TIME = 20;
 const uint32_t MEAS_CHANNEL_TIME = 10;
 const uint32_t TEST_BUF_SIZE = 64;
 
-const char *WLAN_SERVICE_NAME = "wlan_hal_c_service";
+const char *WLAN_SERVICE_NAME = "wlan_interface_service";
 
 class HdfWifiServiceCTest : public testing::Test {
 public:
@@ -44,7 +44,7 @@ static struct IWlanInterface *g_wlanObj = nullptr;
 struct IWlanCallback *g_wlanCallbackObj = nullptr;
 void HdfWifiServiceCTest::SetUpTestCase()
 {
-    g_wlanObj = WlanInterfaceGetInstance(WLAN_SERVICE_NAME);
+    g_wlanObj = IWlanInterfaceGetInstance(WLAN_SERVICE_NAME, false);
     g_wlanCallbackObj = WlanCallbackServiceGet();
     ASSERT_TRUE(g_wlanObj != nullptr);
     ASSERT_TRUE(g_wlanCallbackObj != nullptr);
@@ -52,7 +52,7 @@ void HdfWifiServiceCTest::SetUpTestCase()
 
 void HdfWifiServiceCTest::TearDownTestCase()
 {
-    WlanInterfaceRelease(g_wlanObj);
+    IWlanInterfaceReleaseInstance(WLAN_SERVICE_NAME, g_wlanObj, false);
     WlanCallbackServiceRelease(g_wlanCallbackObj);
 }
 
