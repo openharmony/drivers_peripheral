@@ -20,12 +20,16 @@
 namespace OHOS::Camera {
 int32_t CameraDeviceCallback::OnError(ErrorType type, int32_t errorCode)
 {
+    (void)type;
+    (void)errorCode;
     HDF_LOGV("%{public}s, enter.", __func__);
     return HDF_SUCCESS;
 }
 
 int32_t CameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector<uint8_t>& result)
 {
+    (void)timestamp;
+    (void)result;
     HDF_LOGV("%{public}s, enter.", __func__);
     return HDF_SUCCESS;
 }
