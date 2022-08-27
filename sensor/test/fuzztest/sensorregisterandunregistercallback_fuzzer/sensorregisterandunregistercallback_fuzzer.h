@@ -13,10 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef SENSOR_REGISTER_CALLBACK_FUZZER_H
-#define SENSOR_REGISTER_CALLBACK_FUZZER_H
+#ifndef SENSOR_UNREGISTER_CALLBACK_FUZZER_H
+#define SENSOR_UNREGISTER_CALLBACK_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "sensorregistercallback_fuzzer"
+#define FUZZ_PROJECT_NAME "sensorregisterandunregistercallback_fuzzer"
 
 #include <hdf_base.h>
 #include "v1_0/isensor_callback.h"
@@ -25,9 +25,9 @@ namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_0 {
-class SensorRegisterCallbackFuzzer : public ISensorCallback {
+class SensorRegisterAndUnregisterCallbackFuzzer : public ISensorCallback {
 public:
-    virtual ~SensorRegisterCallbackFuzzer() {}
+    virtual ~SensorRegisterAndUnregisterCallbackFuzzer() {}
 
     int32_t OnDataEvent(const HdfSensorEvents& event) override;
     static uint32_t sensorDataFlag;
@@ -38,3 +38,4 @@ public:
 } // OHOS
 
 #endif
+
