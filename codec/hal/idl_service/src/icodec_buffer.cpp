@@ -136,7 +136,7 @@ int32_t ICodecBuffer::SyncWait(int fd, uint32_t timeout)
         retCode = -EPERM;
         errno = ETIME;
     } else if (retCode > 0) {
-        if (pollfds.revents & (POLLERR | POLLNVAL)) {
+        if (static_cast<uint32_t>(pollfds.revents) & (POLLERR | POLLNVAL)) {
             retCode = -EPERM;
             errno = EINVAL;
         }
