@@ -16,14 +16,13 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "hdf/sensor"
 
-ohos_fuzztest("SensorRegisterCallbackFuzzTest") {
+ohos_fuzztest("SensorRegisterAndUnregisterCallbackFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file =
-      "//drivers/peripheral/sensor/test/fuzztest/sensorregistercallback_fuzzer"
+  fuzz_config_file = "//drivers/peripheral/sensor/test/fuzztest/sensorregisterandunregistercallback_fuzzer"
 
   include_dirs = [
-    "//drivers/peripheral/sensor/test/fuzztest/sensorregistercallback_fuzzer",
+    "//drivers/peripheral/sensor/test/fuzztest/sensorregisterandunregistercallback_fuzzer",
     "//drivers/peripheral/sensor/hdi_service",
   ]
 
@@ -34,14 +33,12 @@ ohos_fuzztest("SensorRegisterCallbackFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "sensorregistercallback_fuzzer.cpp" ]
+  sources = [ "sensorregisterandunregistercallback_fuzzer.cpp" ]
 
-  deps = [
-    "//drivers/interface/sensor/v1_0:libsensor_proxy_1.0",
-    "//drivers/peripheral/sensor/hal:hdi_sensor",
-  ]
+  deps = [ "//drivers/peripheral/sensor/hal:hdi_sensor" ]
 
   external_deps = [
+    "drivers_interface_sensor:libsensor_proxy_1.0",
     "hdf_core:libhdf_utils",
     "ipc:ipc_single",
     "utils_base:utils",
@@ -53,6 +50,6 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":SensorRegisterCallbackFuzzTest",
+    ":SensorRegisterAndUnregisterCallbackFuzzTest",
   ]
 }
