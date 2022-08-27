@@ -36,13 +36,13 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
   deps = [ "//drivers/hdf_core/adapter/uhdf2/model/display/base/buffer_parcelable:libbufferhandle_parcelable" ]
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_interface_codec:codec_idl_headers",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [
@@ -69,6 +69,7 @@ ohos_shared_library("libcodec_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_interface_codec:codec_idl_headers",
       "drivers_interface_codec:libcodec_stub_1.0",
       "graphic_chipsetsdk:buffer_handle",
@@ -78,7 +79,6 @@ ohos_shared_library("libcodec_driver") {
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [

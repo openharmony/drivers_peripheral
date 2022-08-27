@@ -23,7 +23,6 @@ ohos_fuzztest("TurnOffLightFuzzTest") {
   include_dirs = [
     "//drivers/peripheral/light/test/fuzztest/turnofflight_fuzzer",
     "//drivers/peripheral/light/hdi_service",
-    "//utils/native/base:utils",
   ]
   cflags = [
     "-g",
@@ -34,10 +33,11 @@ ohos_fuzztest("TurnOffLightFuzzTest") {
   sources = [ "turnofflight_fuzzer.cpp" ]
   deps = [ "//drivers/peripheral/light/hal:hdi_light" ]
   external_deps = [
+    "c_utils:utils",
+    "c_utils:utils",
     "drivers_interface_light:liblight_proxy_1.0",
     "hdf_core:libhdf_utils",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 }
 

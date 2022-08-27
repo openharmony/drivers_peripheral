@@ -80,8 +80,8 @@ if (defined(ohos_lite)) {
     if (!drivers_peripheral_audio_user_mode) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       external_deps = [
+        "c_utils:utils",
         "hdf_core:libhdf_utils",
-        "utils_base:utils",
       ]
     } else {
       deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]

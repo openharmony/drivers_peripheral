@@ -90,9 +90,9 @@ if (defined(ohos_lite)) {
     deps = [ "//third_party/libexif:libexif" ]
 
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
     ]
     if (enable_camera_device_utest) {
       defines += [ "CAMERA_DEVICE_UTEST" ]

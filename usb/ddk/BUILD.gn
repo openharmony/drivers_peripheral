@@ -61,10 +61,10 @@ ohos_shared_library("libusb_ddk_host") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -102,11 +102,11 @@ ohos_shared_library("libusb_pnp_manager") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -135,10 +135,10 @@ ohos_shared_library("libusb_ddk_device") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

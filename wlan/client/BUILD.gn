@@ -85,9 +85,9 @@ if (defined(ohos_lite)) {
       ]
 
       external_deps = [
+        "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
-        "utils_base:utils",
       ]
       defines = [ "__OHOS__USER__" ]
 
@@ -124,9 +124,9 @@ if (defined(ohos_lite)) {
 
       deps = [ "//third_party/libnl:libnl_share" ]
       external_deps = [
+        "c_utils:utils",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
-        "utils_base:utils",
       ]
 
       defines = [ "__OHOS__USER__" ]

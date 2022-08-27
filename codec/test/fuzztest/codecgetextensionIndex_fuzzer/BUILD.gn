@@ -33,12 +33,12 @@ ohos_fuzztest("CodecGetExtensionIndexFuzzTest") {
   deps = [ "//drivers/peripheral/codec/hal:codec_hdi_omx" ]
 
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
 
   cflags = [
