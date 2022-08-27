@@ -46,7 +46,6 @@ if (defined(ohos_lite)) {
 
   ohos_executable("usbhost_ddk_test") {
     include_dirs = [
-      "//utils/native/base/include",
       "include",
       "//drivers/peripheral/usb/ddk/common/include",
       "//drivers/peripheral/usb/ddk/device/include",
@@ -64,12 +63,12 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
-        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -101,11 +100,11 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
-        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -118,7 +117,6 @@ if (defined(ohos_lite)) {
 
   ohos_executable("usbhost_pnp_test") {
     include_dirs = [
-      "//utils/native/base/include",
       "include",
       "//drivers/peripheral/usb/serial/include",
     ]
@@ -127,12 +125,12 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
-        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -161,11 +159,11 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
-        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -194,11 +192,11 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
-        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -212,7 +210,6 @@ if (defined(ohos_lite)) {
 
   ohos_executable("usbhost_nosdk_speed_test") {
     include_dirs = [
-      "//utils/native/base/include",
       "include",
       "//drivers/peripheral/usb/ddk/common/include",
       "//drivers/peripheral/usb/ddk/device/include",
@@ -227,12 +224,12 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "c_utils:utils",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
-        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]

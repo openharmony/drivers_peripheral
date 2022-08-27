@@ -54,6 +54,7 @@ ohos_executable("codec_decode_test_ipc") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
@@ -61,7 +62,6 @@ ohos_executable("codec_decode_test_ipc") {
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
@@ -110,6 +110,7 @@ ohos_executable("codec_encode_test_ipc") {
   ]
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
@@ -117,7 +118,6 @@ ohos_executable("codec_encode_test_ipc") {
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

@@ -27,7 +27,6 @@ ohos_executable("codec_hdi_adapter_decode") {
       "${CODEC_OEM_PATH}/../mpp/include",
       "//drivers/peripheral/codec/hal/include",
       "//drivers/peripheral/codec/interfaces/include",
-      "//utils/native/base/include",
       "//third_party/openmax/api/1.1.2",
       "//drivers/peripheral/display/hdi_service/gralloc/include",
     ]
@@ -42,12 +41,12 @@ ohos_executable("codec_hdi_adapter_decode") {
       "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/codec/hal/passthrough:libcodec_hdi_passthrough_impl",
       "//third_party/bounds_checking_function:libsec_shared",
-      "//utils/native/base:utils",
     ]
   }
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hiviewdfx_hilog_native:libhilog",
@@ -70,7 +69,6 @@ ohos_executable("codec_hdi_adapter_encode") {
       "//drivers/peripheral/codec/hal/include",
       "//drivers/hdf_core/adapter/uhdf2/include/hdi",
       "//drivers/peripheral/codec/interfaces/include",
-      "//utils/native/base/include",
       "//third_party/openmax/api/1.1.2",
       "//drivers/peripheral/display/hdi_service/gralloc/include",
     ]
@@ -85,12 +83,12 @@ ohos_executable("codec_hdi_adapter_encode") {
       "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
       "//drivers/peripheral/codec/hal/passthrough:libcodec_hdi_passthrough_impl",
       "//third_party/bounds_checking_function:libsec_shared",
-      "//utils/native/base:utils",
     ]
   }
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hiviewdfx_hilog_native:libhilog",

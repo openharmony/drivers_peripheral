@@ -38,10 +38,10 @@ ohos_unittest("hdf_audio_proxy_common_test") {
     "//third_party/googletest:gtest_main",
   ]
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
-    "utils_base:utils",
   ]
 }

@@ -16,7 +16,6 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_executable("usb_dev_test") {
   include_dirs = [
-    "//utils/native/base/include",
     "//drivers/peripheral/usb/interfaces/ddk/device",
     "//drivers/peripheral/usb/interfaces/ddk/common",
     "//drivers/peripheral/usb/gadget/function/include",
@@ -34,12 +33,12 @@ ohos_executable("usb_dev_test") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

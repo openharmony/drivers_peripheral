@@ -19,10 +19,7 @@ ohos_shared_library("liblight_interface_service_1.0") {
     "//drivers/peripheral/light/interfaces/include/",
   ]
   sources = [ "light_interface_impl.cpp" ]
-  deps = [
-    "//drivers/peripheral/light/hal:hdi_light",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//drivers/peripheral/light/hal:hdi_light" ]
   cflags = [
     "-Wall",
     "-Wextra",
@@ -34,6 +31,7 @@ ohos_shared_library("liblight_interface_service_1.0") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_interface_light:light_idl_headers",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
@@ -61,7 +59,6 @@ ohos_shared_library("liblight_driver") {
     "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/interface/light/v1_0:liblight_stub_1.0",
     "//drivers/peripheral/light/hal:hdi_light",
-    "//utils/native/base:utils",
   ]
 
   cflags = [
@@ -75,6 +72,7 @@ ohos_shared_library("liblight_driver") {
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",

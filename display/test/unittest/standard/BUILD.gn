@@ -41,8 +41,8 @@ ohos_static_library("disp_hdi_test_common") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"
@@ -65,8 +65,8 @@ ohos_unittest("gralloctest") {
     "//foundation/graphic/standard/utils/include",
   ]
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_utils",
-    "utils_base:utils",
   ]
 }
 
@@ -88,8 +88,8 @@ ohos_unittest("gfxtest") {
     "//drivers/peripheral/base",
   ]
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_utils",
-    "utils_base:utils",
   ]
 }
 
@@ -115,9 +115,9 @@ ohos_unittest("devicetest") {
     ".",
   ]
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
-    "utils_base:utils",
   ]
   cflags = [ "-Wno-unused-function" ]
 }
