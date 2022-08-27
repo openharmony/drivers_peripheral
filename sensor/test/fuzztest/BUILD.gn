@@ -19,10 +19,9 @@ group("hdf_sensor_fuzztest") {
   deps = [
     "sensordisable_fuzzer:fuzztest",
     "sensorenable_fuzzer:fuzztest",
-    "sensorregistercallback_fuzzer:fuzztest",
+    "sensorregisterandunregistercallback_fuzzer:fuzztest",
     "sensorsetbatch_fuzzer:fuzztest",
     "sensorsetmode_fuzzer:fuzztest",
     "sensorsetoption_fuzzer:fuzztest",
-    "sensorunregistercallback_fuzzer:fuzztest",
   ]
 }
