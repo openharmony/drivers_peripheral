@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,7 +60,7 @@ typedef struct {
      * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param callback Indicates the pointer to the callback to register.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
      * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -72,7 +72,7 @@ typedef struct {
      *
      * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
      * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -85,7 +85,7 @@ typedef struct {
      * All input devices can use this callback to report hot plug events.
      *
      * @param callback Indicates the pointer to the callback to register.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
      * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -95,7 +95,7 @@ typedef struct {
     /**
      * @brief Unregisters the hot plug callback of input devices.
      *
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
      * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0

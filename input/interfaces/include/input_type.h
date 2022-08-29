@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,20 +50,32 @@
 extern "C" {
 #endif
 
+/** Maximum number of input devices */
 #define MAX_INPUT_DEV_NUM 32
+/** Length of chip information */
 #define CHIP_INFO_LEN 10
+/** Length of the chip name */
 #define CHIP_NAME_LEN 10
+/** Length of the vendor name */
 #define VENDOR_NAME_LEN 10
+/** Length of the input device name */
 #define DEV_NAME_LEN 64
+/** Length of the self-test result name */
 #define SELF_TEST_RESULT_LEN 20
+/** Name of the input device manager service */
 #define DEV_MANAGER_SERVICE_NAME "hdf_input_host"
 #ifdef DIV_ROUND_UP
 #undef DIV_ROUND_UP
 #endif
+/** Formula for round-up calculation */
 #define DIV_ROUND_UP(nr, d) (((nr) + (d) - 1) / (d))
+/** Number of bits contained in a byte */
 #define BYTE_HAS_BITS 8
+/** Formula for conversion between bits and 64-bit unsigned integers */
 #define BITS_TO_UINT64(count)    DIV_ROUND_UP(count, BYTE_HAS_BITS * sizeof(uint64_t))
+/** Formula for calculating the maximum number of force feedback commands sent by the input device */
 #define HDF_FF_CNT    (0x7f + 1)
+
 /**
  * @brief Enumerates return values.
  */
@@ -125,85 +137,109 @@ typedef struct {
     uint64_t timestamp;     /**< Timestamp of the input event */
 } InputEventPackage;
 
+/**
+ * @brief Defines the data packet structure for hot plug events.
+ */
 typedef struct {
-    uint32_t devIndex;
-    uint32_t devType;
-    uint32_t status;
+    uint32_t devIndex;      /**< Device index */
+    uint32_t devType;       /**< Device type */
+    uint32_t status;        /**< Device status 1: offline 0: online*/
 } InputHotPlugEvent;
 
+/**
+ * @brief Defines the input device.
+ */
 typedef struct {
-    uint32_t devIndex;
-    uint32_t devType;
+    uint32_t devIndex;      /**< Device index */
+    uint32_t devType;       /**< Device type */
 } InputDevDesc;
 
 /**
- * @brief Describes the input event callback registered by the input service.
+ * @brief Defines the input event callback for the input service.
  */
 typedef struct {
     /**
      * @brief Reports input event data by the registered callback.
      *
-     * @param pkgs describes the input event data package.
-     * @param count Indicates the number of input event data packets.
-     * @param devIndex Indicates the index of an input device.
+     * @param pkgs Input event data package.
+     * @param count Number of input event data packets.
+     * @param devIndex Index of an input device.
      * @since 1.0
      * @version 1.0
      */
     void (*EventPkgCallback)(const InputEventPackage **pkgs, uint32_t count, uint32_t devIndex);
 } InputEventCb;
 
+/**
+ * @brief Defines the hot plug event callback for the input service.
+ */
 typedef struct {
     /**
      * @brief Reports hot plug event data by the registered callback.
      *
-     * @param event Indicates the pointer to the hot plug event data reported by the input driver.
+     * @param event Pointer to the hot plug event data reported by the input driver.
      * @since 1.0
      * @version 1.0
      */
     void (*HotPlugCallback)(const InputHotPlugEvent *event);
 } InputHostCb;
 
+/**
+  * @brief Defines the input device ability for storing bitmaps that record supported event types.
+ *
+ * A bit is used to indicate the type of events that can be reported by the input device.
+ *
+ */
 typedef struct {
-    uint64_t devProp[BITS_TO_UINT64(INPUT_PROP_CNT)];
-    uint64_t eventType[BITS_TO_UINT64(EV_CNT)];
-    uint64_t absCode[BITS_TO_UINT64(ABS_CNT)];
-    uint64_t relCode[BITS_TO_UINT64(REL_CNT)];
-    uint64_t keyCode[BITS_TO_UINT64(KEY_CNT)];
-    uint64_t ledCode[BITS_TO_UINT64(LED_CNT)];
-    uint64_t miscCode[BITS_TO_UINT64(MSC_CNT)];
-    uint64_t soundCode[BITS_TO_UINT64(SND_CNT)];
-    uint64_t forceCode[BITS_TO_UINT64(HDF_FF_CNT)];
-    uint64_t switchCode[BITS_TO_UINT64(SW_CNT)];
-    uint64_t keyType[BITS_TO_UINT64(KEY_CNT)];
-    uint64_t ledType[BITS_TO_UINT64(LED_CNT)];
-    uint64_t soundType[BITS_TO_UINT64(SND_CNT)];
-    uint64_t switchType[BITS_TO_UINT64(SW_CNT)];
+    uint64_t devProp[BITS_TO_UINT64(INPUT_PROP_CNT)];    /**< Device properties */
+    uint64_t eventType[BITS_TO_UINT64(EV_CNT)];          /**< Bitmap for recording the supported event types */
+    uint64_t absCode[BITS_TO_UINT64(ABS_CNT)];           /**< Bitmap for recording the supported absolute coordinates */
+    uint64_t relCode[BITS_TO_UINT64(REL_CNT)];           /**< Bitmap for recording the supported relative coordinates */
+    uint64_t keyCode[BITS_TO_UINT64(KEY_CNT)];           /**< Bitmap for recording the supported keycodes */
+    uint64_t ledCode[BITS_TO_UINT64(LED_CNT)];           /**< Bitmap for recording the supported indicators */
+    uint64_t miscCode[BITS_TO_UINT64(MSC_CNT)];          /**< Bitmap for recording other supported functions */
+    uint64_t soundCode[BITS_TO_UINT64(SND_CNT)];         /**< Bitmap for recording supported sounds or alerts */
+    uint64_t forceCode[BITS_TO_UINT64(HDF_FF_CNT)];      /**< Bitmap for recording the supported force functions */
+    uint64_t switchCode[BITS_TO_UINT64(SW_CNT)];         /**< Bitmap for recording the supported switch functions */
+    uint64_t keyType[BITS_TO_UINT64(KEY_CNT)];           /**< Bitmap for recording the key status */
+    uint64_t ledType[BITS_TO_UINT64(LED_CNT)];           /**< Bitmap for recording the LED status */
+    uint64_t soundType[BITS_TO_UINT64(SND_CNT)];         /**< Bitmap for recording the sound status */
+    uint64_t switchType[BITS_TO_UINT64(SW_CNT)];         /**< Bitmap for recording the switch status */
 } InputDevAbility;
 
+/**
+ * @brief Defines dimension information of the input device.
+ */
 typedef struct {
-    int32_t axis;
-    int32_t min;
-    int32_t max;
-    int32_t fuzz;
-    int32_t flat;
-    int32_t range;
+    int32_t axis;        /**< Axis */
+    int32_t min;         /**< Minimum value of each coordinate */
+    int32_t max;         /**< Maximum value of each coordinate */
+    int32_t fuzz;        /**< Resolution of each coordinate */
+    int32_t flat;        /**< Reference value of each coordinate */
+    int32_t range;       /**< Range */
 } InputDimensionInfo;
 
+/**
+ * @brief Defines identification information of the input device.
+ */
 typedef struct {
-    uint16_t busType;
-    uint16_t vendor;
-    uint16_t product;
-    uint16_t version;
+    uint16_t busType;    /**< Bus type */
+    uint16_t vendor;     /**< Vendor ID */
+    uint16_t product;    /**< Product ID */
+    uint16_t version;    /**< Version */
 } InputDevIdentify;
 
+/**
+ * @brief Defines input device attributes.
+ */
 typedef struct {
-    char devName[DEV_NAME_LEN];
-    InputDevIdentify id;
-    InputDimensionInfo axisInfo[ABS_CNT];
+    char devName[DEV_NAME_LEN];               /**< Device name */
+    InputDevIdentify id;                      /**< Device identification information */
+    InputDimensionInfo axisInfo[ABS_CNT];     /**< Device dimension information */
 } InputDevAttr;
 
 /**
- * @brief Describes basic device information of the input device.
+ * @brief Defines basic device information of the input device.
  */
 typedef struct {
     uint32_t devIndex;                   /**< Device index */
@@ -211,12 +247,12 @@ typedef struct {
     char chipInfo[CHIP_INFO_LEN];        /**< Driver chip information */
     char vendorName[VENDOR_NAME_LEN];    /**< Module vendor name */
     char chipName[CHIP_NAME_LEN];        /**< Driver chip name */
-    InputDevAttr attrSet;
-    InputDevAbility abilitySet;
+    InputDevAttr attrSet;                /**< Device attributes */
+    InputDevAbility abilitySet;          /**< Device abilities */
 } InputDeviceInfo;
 
 /**
- * @brief Describes the extra commands.
+ * @brief Defines the extra commands.
  */
 typedef struct {
     const char *cmdCode;     /**< Command code */

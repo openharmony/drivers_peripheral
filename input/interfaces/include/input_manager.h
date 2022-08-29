@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,7 +60,7 @@ typedef struct {
      * @param staArr Indicates the pointer to the array storing information about the scanned input devices,
      * including the device index and device type.
      * @param arrLen Indicates the length of the array.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
      * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -72,7 +72,7 @@ typedef struct {
      *
      * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
      * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -84,7 +84,7 @@ typedef struct {
      *
      * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
      * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -98,7 +98,7 @@ typedef struct {
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param devInfo Indicates the double pointer to information about the specified device.
      * For details, see {@link DeviceInfo}.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
      * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -112,7 +112,7 @@ typedef struct {
      * @param devList Indicates the double pointer to information about all devices in the device list.
      * For details, see {@link DeviceInfo}.
      * @param size Indicates the number of elements in the <b>devList</b> array.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
      * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -133,7 +133,7 @@ typedef struct {
  * @brief Gets all interfaces for performing operations on input devices.
  *
  * @param interface Indicates the double pointer to the interfaces for performing operations on input devices.
- * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+ * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
  * {@link RetStatus} otherwise.
  * @since 1.0
  * @version 1.0
@@ -144,7 +144,7 @@ int32_t GetInputInterface(IInputInterface **interface);
  * @brief Releases all interfaces for performing operations on input devices.
  *
  * @param inputInterface Indicates the pointer to the interfaces for performing operations on input devices.
- * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+ * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
  * {@link RetStatus} otherwise.
  * @since 1.0
  * @version 1.0
