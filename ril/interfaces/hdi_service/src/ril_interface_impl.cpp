@@ -299,6 +299,90 @@ int32_t RilInterfaceImpl::ShutDown(int32_t slotId, int32_t serialId)
     return TaskSchedule(&Telephony::HRilManager::ShutDown, slotId, serialId);
 }
 
+// Network
+int32_t RilInterfaceImpl::GetSignalStrength(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetSignalStrength, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::GetCsRegStatus(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetCsRegStatus, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::GetPsRegStatus(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetPsRegStatus, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::GetOperatorInfo(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetOperatorInfo, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::GetNetworkSearchInformation(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetNetworkSearchInformation, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::GetNetworkSelectionMode(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetNetworkSelectionMode, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::SetNetworkSelectionMode(
+    int32_t slotId, int32_t serialId, const ISetNetworkModeInfo &networkModeInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::SetNetworkSelectionMode, slotId, serialId, networkModeInfo);
+}
+
+int32_t RilInterfaceImpl::GetNeighboringCellInfoList(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetNeighboringCellInfoList, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::GetCurrentCellInfo(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetCurrentCellInfo, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::SetPreferredNetwork(int32_t slotId, int32_t serialId, int32_t preferredNetworkType)
+{
+    return TaskSchedule(&Telephony::HRilManager::SetPreferredNetwork, slotId, serialId, preferredNetworkType);
+}
+
+int32_t RilInterfaceImpl::GetPreferredNetwork(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetPreferredNetwork, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::GetRadioCapability(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetRadioCapability, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::GetPhysicalChannelConfig(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetPhysicalChannelConfig, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::SetLocateUpdates(int32_t slotId, int32_t serialId, const IHRilRegNotifyMode mode)
+{
+    return TaskSchedule(&Telephony::HRilManager::SetLocateUpdates, slotId, serialId, mode);
+}
+
+int32_t RilInterfaceImpl::SetNotificationFilter(int32_t slotId, int32_t serialId, int32_t newFilter)
+{
+    return TaskSchedule(&Telephony::HRilManager::SetNotificationFilter, slotId, serialId, newFilter);
+}
+
+int32_t RilInterfaceImpl::SetDeviceState(
+    int32_t slotId, int32_t serialId, int32_t deviceStateType, int32_t deviceStateOn)
+{
+    return TaskSchedule(
+        &Telephony::HRilManager::SetDeviceState, slotId, serialId, deviceStateType, deviceStateOn);
+}
+
 int32_t RilInterfaceImpl::SetCallback(const sptr<IRilCallback> &rilCallback)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -432,6 +516,91 @@ int32_t RilInterfaceImpl::SimAuthentication(
 int32_t RilInterfaceImpl::UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key)
 {
     return TaskSchedule(&Telephony::HRilManager::UnlockSimLock, slotId, serialId, lockType, key);
+}
+
+// Sms
+int32_t RilInterfaceImpl::SendGsmSms(int32_t slotId, int32_t serialId, const IGsmSmsMessageInfo &gsmSmsMessageInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::SendGsmSms, slotId, serialId, gsmSmsMessageInfo);
+}
+
+int32_t RilInterfaceImpl::SendCdmaSms(
+    int32_t slotId, int32_t serialId, const ISendCdmaSmsMessageInfo &cdmaSmsMessageInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::SendCdmaSms, slotId, serialId, cdmaSmsMessageInfo);
+}
+
+int32_t RilInterfaceImpl::AddSimMessage(int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::AddSimMessage, slotId, serialId, smsMessageIOInfo);
+}
+
+int32_t RilInterfaceImpl::DelSimMessage(int32_t slotId, int32_t serialId, int32_t index)
+{
+    return TaskSchedule(&Telephony::HRilManager::DelSimMessage, slotId, serialId, index);
+}
+
+int32_t RilInterfaceImpl::UpdateSimMessage(int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::UpdateSimMessage, slotId, serialId, smsMessageIOInfo);
+}
+
+int32_t RilInterfaceImpl::AddCdmaSimMessage(int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::AddCdmaSimMessage, slotId, serialId, smsMessageIOInfo);
+}
+
+int32_t RilInterfaceImpl::DelCdmaSimMessage(int32_t slotId, int32_t serialId, int32_t index)
+{
+    return TaskSchedule(&Telephony::HRilManager::DelCdmaSimMessage, slotId, serialId, index);
+}
+
+int32_t RilInterfaceImpl::UpdateCdmaSimMessage(
+    int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::UpdateCdmaSimMessage, slotId, serialId, smsMessageIOInfo);
+}
+
+int32_t RilInterfaceImpl::SetSmscAddr(
+    int32_t slotId, int32_t serialId, const IServiceCenterAddress &serviceCenterAddress)
+{
+    return TaskSchedule(&Telephony::HRilManager::SetSmscAddr, slotId, serialId, serviceCenterAddress);
+}
+
+int32_t RilInterfaceImpl::GetSmscAddr(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetSmscAddr, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::SetCBConfig(int32_t slotId, int32_t serialId, const ICBConfigInfo &cellBroadcastInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::SetCBConfig, slotId, serialId, cellBroadcastInfo);
+}
+
+int32_t RilInterfaceImpl::GetCBConfig(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetCBConfig, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::SetCdmaCBConfig(
+    int32_t slotId, int32_t serialId, const ICdmaCBConfigInfoList &cdmaCBConfigInfoList)
+{
+    return TaskSchedule(&Telephony::HRilManager::SetCdmaCBConfig, slotId, serialId, cdmaCBConfigInfoList);
+}
+
+int32_t RilInterfaceImpl::GetCdmaCBConfig(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::GetCdmaCBConfig, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::SendSmsMoreMode(int32_t slotId, int32_t serialId, const IGsmSmsMessageInfo &gsmSmsMessageInfo)
+{
+    return TaskSchedule(&Telephony::HRilManager::SendSmsMoreMode, slotId, serialId, gsmSmsMessageInfo);
+}
+
+int32_t RilInterfaceImpl::SendSmsAck(int32_t slotId, int32_t serialId, const IModeData &modeData)
+{
+    return TaskSchedule(&Telephony::HRilManager::SendSmsAck, slotId, serialId, modeData);
 }
 
 int32_t RilInterfaceImpl::AddRilDeathRecipient(const sptr<IRilCallback> &callback)
