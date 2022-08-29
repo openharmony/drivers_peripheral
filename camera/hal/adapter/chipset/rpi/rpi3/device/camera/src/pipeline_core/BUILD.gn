@@ -6,28 +6,9 @@ config("pipe_config") {
   visibility = [ ":*" ]
 
   cflags_cc = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-Wno-error",
     "-DGST_DISABLE_DEPRECATED",
     "-DHAVE_CONFIG_H",
     "-DCOLORSPACE=\"videoconvert\"",
-    "-fno-strict-aliasing",
-    "-Wno-sign-compare",
-    "-Wno-builtin-requires-header",
-    "-Wno-unused-variable",
-    "-Wno-unused-label",
-    "-Wno-implicit-function-declaration",
-    "-Wno-format",
-    "-Wno-int-conversion",
-    "-Wno-unused-function",
-    "-Wno-thread-safety-attributes",
-    "-Wno-inconsistent-missing-override",
-    "-fno-rtti",
-    "-fno-exceptions",
-    "-ffunction-sections",
-    "-fdata-sections",
   ]
 }
 
@@ -131,11 +112,7 @@ ohos_shared_library("camera_pipeline_core") {
 config("example_config") {
   visibility = [ ":*" ]
 
-  cflags = [
-    "-Wno-error",
-    "-Wno-unused-function",
-    "-Wno-unused-parameter",
-  ]
+  cflags = []
 }
 
 ohos_shared_library("camera_ipp_algo_example") {
