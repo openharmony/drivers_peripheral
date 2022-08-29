@@ -111,7 +111,7 @@ static ResultCode GetAsl(uint32_t authType, uint32_t *asl)
     if (executorList->getSize(executorList) == 0) {
         LOG_ERROR("executor is unregistered");
         DestroyLinkedList(executorList);
-        return RESULT_NEED_INIT;
+        return RESULT_NOT_FOUND;
     }
     LinkedListNode *temp = executorList->head;
     while (temp != NULL) {
