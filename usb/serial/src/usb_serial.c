@@ -953,7 +953,7 @@ static int32_t SerialClose(const struct SerialDevice *port, struct HdfSBuf *data
 
 static int32_t SerialWrite(const struct SerialDevice *port, struct HdfSBuf *data)
 {
-    int32_t size;
+    uint32_t size;
     int32_t ret;
     const char *tmp = NULL;
 
@@ -985,9 +985,9 @@ static int32_t SerialWrite(const struct SerialDevice *port, struct HdfSBuf *data
         HDF_LOGE("%s: sbuf read buffer failed", __func__);
         return HDF_ERR_IO;
     }
-    size = strlen(tmp) + 1;
+    size = (uint32_t)strlen(tmp) + 1;
     size = (size > acm->writeSize) ? acm->writeSize : size;
-    ret = memcpy_s(wb->buf, acm->writeSize, tmp, size);
+    ret = memcpy_s(wb->buf, (size_t)acm->writeSize, tmp, (size_t)size);
     if (ret != EOK) {
         HDF_LOGE("memcpy_s failed, ret = %d", ret);
     }
@@ -998,7 +998,7 @@ static int32_t SerialWrite(const struct SerialDevice *port, struct HdfSBuf *data
         HDF_LOGE("%{public}s: AcmStartWb failed, ret=%d", __func__, ret);
         return HDF_FAILURE;
     }
-    return size;
+    return (int32_t)size;
 }
 
 static int32_t SerialAddOrRemoveInterface(int32_t cmd, const struct SerialDevice *port, const struct HdfSBuf *data)
