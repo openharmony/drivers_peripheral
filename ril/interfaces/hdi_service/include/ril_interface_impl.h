@@ -118,6 +118,44 @@ public:
         int32_t slotId, int32_t serialId, const ISimAuthenticationRequestInfo &simAuthInfo) override;
     int32_t UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key) override;
 
+    // Network
+    int32_t GetSignalStrength(int32_t slotId, int32_t serialId) override;
+    int32_t GetCsRegStatus(int32_t slotId, int32_t serialId) override;
+    int32_t GetPsRegStatus(int32_t slotId, int32_t serialId) override;
+    int32_t GetOperatorInfo(int32_t slotId, int32_t serialId) override;
+    int32_t GetNetworkSearchInformation(int32_t slotId, int32_t serialId) override;
+    int32_t GetNetworkSelectionMode(int32_t slotId, int32_t serialId) override;
+    int32_t SetNetworkSelectionMode(
+        int32_t slotId, int32_t serialId, const ISetNetworkModeInfo &networkModeInfo) override;
+    int32_t GetNeighboringCellInfoList(int32_t slotId, int32_t serialId) override;
+    int32_t GetCurrentCellInfo(int32_t slotId, int32_t serialId) override;
+    int32_t SetPreferredNetwork(int32_t slotId, int32_t serialId, int32_t preferredNetworkType) override;
+    int32_t GetPreferredNetwork(int32_t slotId, int32_t serialId) override;
+    int32_t GetRadioCapability(int32_t slotId, int32_t serialId) override;
+    int32_t GetPhysicalChannelConfig(int32_t slotId, int32_t serialId) override;
+    int32_t SetLocateUpdates(int32_t slotId, int32_t serialId, const IHRilRegNotifyMode mode) override;
+    int32_t SetNotificationFilter(int32_t slotId, int32_t serialId, int32_t newFilter) override;
+    int32_t SetDeviceState(int32_t slotId, int32_t serialId, int32_t deviceStateType, int32_t deviceStateOn) override;
+
+    // Sms
+    int32_t SendGsmSms(int32_t slotId, int32_t serialId, const IGsmSmsMessageInfo &gsmSmsMessageInfo) override;
+    int32_t SendCdmaSms(int32_t slotId, int32_t serialId, const ISendCdmaSmsMessageInfo &cdmaSmsMessageInfo) override;
+    int32_t AddSimMessage(int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo) override;
+    int32_t DelSimMessage(int32_t slotId, int32_t serialId, int32_t index) override;
+    int32_t UpdateSimMessage(int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo) override;
+    int32_t AddCdmaSimMessage(int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo) override;
+    int32_t DelCdmaSimMessage(int32_t slotId, int32_t serialId, int32_t index) override;
+    int32_t UpdateCdmaSimMessage(int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo) override;
+    int32_t SetSmscAddr(int32_t slotId, int32_t serialId, const IServiceCenterAddress &serviceCenterAddress) override;
+    int32_t GetSmscAddr(int32_t slotId, int32_t serialId) override;
+    int32_t SetCBConfig(int32_t slotId, int32_t serialId, const ICBConfigInfo &cellBroadcastInfo) override;
+    int32_t GetCBConfig(int32_t slotId, int32_t serialId) override;
+    int32_t SetCdmaCBConfig(
+        int32_t slotId, int32_t serialId, const ICdmaCBConfigInfoList &cdmaCBConfigInfoList) override;
+    int32_t GetCdmaCBConfig(int32_t slotId, int32_t serialId) override;
+    int32_t SendSmsMoreMode(int32_t slotId, int32_t serialId, const IGsmSmsMessageInfo &gsmSmsMessageInfo) override;
+    int32_t SendSmsAck(int32_t slotId, int32_t serialId, const IModeData &modeData) override;
+
     int32_t SetCallback(const sptr<IRilCallback> &rilCallback) override;
     int32_t Init();
     class RilDeathRecipient : public IRemoteObject::DeathRecipient {
