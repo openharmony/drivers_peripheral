@@ -83,11 +83,7 @@ ohos_prebuilt_etc("ipp_algo_config.hcb") {
 config("example_config") {
   visibility = [ ":*" ]
 
-  cflags = [
-    "-Wno-error",
-    "-Wno-unused-function",
-    "-Wno-unused-parameter",
-  ]
+  cflags = []
 }
 
 group("chipset_build") {
