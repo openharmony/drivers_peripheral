@@ -33,11 +33,8 @@ public:
     RetCode CancelCapture(const int32_t streamId) override;
     RetCode Flush(const int32_t streamId);
 private:
-    void RunForkThread();
-    void StopForkThread();
     void DrainForkBufferPool();
     std::mutex                            mtx_;
-    std::condition_variable               cv_;
     std::shared_ptr<std::thread>          forkThread_ = nullptr;
     std::vector<std::shared_ptr<IPort>>   inPutPorts_;
     std::vector<std::shared_ptr<IPort>>   outPutPorts_;
