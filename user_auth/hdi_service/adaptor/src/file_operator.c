@@ -70,8 +70,8 @@ static int32_t WriteFile(const char *fileName, const uint8_t *buf, uint32_t len)
         return RESULT_BAD_PARAM;
     }
 
-    /* Set the file permission to 640 */
-    if (chmod(fileName, S_IRUSR | S_IWUSR | S_IRGRP) != 0) {
+    /* Set the file permission to 600 */
+    if (chmod(fileName, S_IRUSR | S_IWUSR) != 0) {
         LOG_ERROR("chmod file fail, and file name is : %{public}s", fileName);
         (void)fclose(fileOperator);
         return RESULT_GENERAL_ERROR;
