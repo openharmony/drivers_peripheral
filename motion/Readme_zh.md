@@ -33,8 +33,8 @@ Motion驱动模块为上层服务提供可直接调用的能力接口，涉及�
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | int32_t EnableMotion(int32_t motionType)                     | 使能一种手势识别类型，只有数据订阅者使能手势识别后，才能获取订阅的手势识别数据。 |
 | int32_t DisableMotion(int32_t motionType)                    | 去使能一种手势识别类型。                                     |
-| int32_t Register(const sptr<IMotionCallback> &callbackObj)   | 订阅者成功注册手势识别数据回调函数，系统会将获取到的手势识别数据上报给订阅者。 |
-| int32_t Unregister(const sptr<IMotionCallback> &callbackObj) | 订阅者去注册手势识别数据回调函数。                           |
+| int32_t Register(const sptr\<IMotionCallback\> &callbackObj)   | 订阅者成功注册手势识别数据回调函数，系统会将获取到的手势识别数据上报给订阅者。 |
+| int32_t Unregister(const sptr\<IMotionCallback\> &callbackObj) | 订阅者去注册手势识别数据回调函数。                           |
 
 ### 使用说明
 
