@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -64,7 +64,7 @@ typedef struct {
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param status Indicates the power status to set. The input service will notify the input device of entering the
      * Resume or Suspend state specified by {@link PowerStatus}.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
      * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -81,7 +81,7 @@ typedef struct {
      * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param status Indicates the pointer to the power status of the device. For details, see {@link PowerStatus}.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined in
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined in
      * {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -94,7 +94,7 @@ typedef struct {
      * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param deviceType Indicates the pointer to the device type. For details, see {@link InputDevType}.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined
      * in {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -111,7 +111,7 @@ typedef struct {
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param chipInfo Indicates the pointer to the chip information.
      * @param length Indicates the length of the chip information. The minimum value of length is 10.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined
      * in {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -125,7 +125,7 @@ typedef struct {
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param vendorName Indicates the pointer to the module vendor name.
      * @param length Indicates the length of the module vendor name. The minimum value of length is 10.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined
      * in {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -139,7 +139,7 @@ typedef struct {
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param chipName Indicates the pointer to the driver chip name.
      * @param length Indicates the length of the driver chip name. The minimum value of length is 10.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined
      * in {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -155,7 +155,7 @@ typedef struct {
      * @param devIndex Indicates the index of an input device. A maximum of 32 input devices are supported.
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param gestureMode Indicates the gesture mode to set.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined
      * in {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -174,7 +174,7 @@ typedef struct {
      * @param result Indicates the pointer to the capacitance test result. The value is <b>SUCC</b> for a successful
      * operation and is an error code for a failed operation.
      * @param length Indicates the length of the test result. The minimum value of length is 20.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined
      * in {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
@@ -188,7 +188,7 @@ typedef struct {
      * The value ranges from 0 to 31, and value <b>0</b> represents the first input device.
      * @param cmd Indicates the pointer to the extra command data packet, including the command codes and parameters.
      * For details, see {@link InputExtraCmd}.
-     * @return Returns <b>0</b> if the operation is successful; returns an error code defined
+     * @return Returns <b>INPUT SUCCESS</b> if the operation is successful; returns an error code defined
      * in {@link RetStatus} otherwise.
      * @since 1.0
      * @version 1.0
