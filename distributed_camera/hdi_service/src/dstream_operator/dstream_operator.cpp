@@ -356,10 +356,6 @@ int32_t DStreamOperator::CancelCapture(int32_t captureId)
 
     std::vector<CaptureEndedInfo> info;
     for (auto id : halCaptureInfoMap_[captureId]->streamIds_) {
-        auto iter = halStreamMap_.find(id);
-        if (iter != halStreamMap_.end()) {
-            iter->second->FlushDCameraBuffer();
-        }
         CaptureEndedInfo tmp;
         tmp.frameCount_ = acceptedBufferNum_[std::make_pair(captureId, id)];
         tmp.streamId_ = id;
