@@ -1,8 +1,14 @@
 {
-    "name": "drivers_peripheral_nfc",
+    "name": "@ohos/drivers_peripheral_nfc",
     "description": "nfc hdf",
     "version": "1.0",
     "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+      "destPath": "drivers/peripheral/nfc/nfc_core"
+    },
+    "dirs": {},
+    "scripts": {},
     "component": {
       "name": "drivers_peripheral_nfc",
       "subsystem": "hdf",
@@ -17,7 +23,7 @@
           "hiviewdfx_hilog_native",
           "utils_base"
         ],
-        "third_part": [
+        "third_party": [
           "nfc_hdiimpl"
         ]
       },

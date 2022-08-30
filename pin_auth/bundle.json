@@ -1,8 +1,14 @@
 {
-  "name": "drivers_peripheral_pin_auth",
+  "name": "@ohos/drivers_peripheral_pin_auth",
   "description": "pin auth device driver",
   "version": "3.2",
   "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/pin_auth"
+  },
+  "dirs": {},
+  "scripts": {},
   "component": {
     "name": "drivers_peripheral_pin_auth",
     "subsystem": "hdf",
@@ -17,7 +23,7 @@
         "hiviewdfx_hilog_native",
         "utils_base"
       ],
-      "third_part": [
+      "third_party": [
         "openssl"
       ]
     },

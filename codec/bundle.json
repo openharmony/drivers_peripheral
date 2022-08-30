@@ -1,8 +1,14 @@
 {
-  "name": "drivers_peripheral_codec",
+  "name": "@ohos/drivers_peripheral_codec",
   "description": "codec device driver",
   "version": "3.1",
   "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/codec"
+  },
+  "dirs": {},
+  "scripts": {},
   "component": {
     "name": "drivers_peripheral_codec",
     "subsystem": "hdf",
@@ -16,7 +22,7 @@
         "hiviewdfx_hilog_native",
         "display"
       ],
-      "third_part": [
+      "third_party": [
         "googletest",
         "libdrm"
       ]

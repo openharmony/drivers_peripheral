@@ -1,8 +1,14 @@
 {
-  "name": "drivers_peripheral_ril",
+  "name": "@ohos/drivers_peripheral_ril",
   "description": "ril_hdf",
   "version": "3.2",
   "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/ril"
+  },
+  "dirs": {},
+  "scripts": {},
   "component": {
     "name": "drivers_peripheral_ril",
     "subsystem": "hdf",
@@ -16,7 +22,7 @@
         "hiviewdfx_hilog_native",
         "ipc"
       ],
-      "third_part": [
+      "third_party": [
         "xml2"
       ]
     },
