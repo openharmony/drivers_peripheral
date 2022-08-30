@@ -20,8 +20,6 @@
       "third_part": [
         "bounds_checking_function",
         "libdrm",
-        "wayland_standard",
-        "weston",
         "googletest"
       ]
     },
