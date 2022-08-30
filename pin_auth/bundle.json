@@ -15,7 +15,7 @@
         "ipc",
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "utils_base"
+        "c_utils"
       ],
       "third_part": [
         "openssl"
