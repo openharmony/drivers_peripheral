@@ -191,7 +191,7 @@ HWTEST_F(BufferManagerTest, TestGrallocBuffer, TestSize.Level0)
     Camera::BufferManager* manager = Camera::BufferManager::GetInstance();
     EXPECT_EQ(true, manager != nullptr);
 
-    uint32_t formatTest[] = {CAMERA_FORMAT_RGBA_8888, CAMERA_FORMAT_YCBCR_420_SP, CAMERA_FORMAT_YCRCB_420_SP,
+    uint32_t formatTest[] = {CAMERA_FORMAT_YCBCR_420_SP, CAMERA_FORMAT_YCRCB_420_SP,
                              CAMERA_FORMAT_YCBCR_420_P, CAMERA_FORMAT_YCRCB_420_P};
     for (auto f : formatTest) {
         int64_t bufferPoolId = manager->GenerateBufferPoolId();
