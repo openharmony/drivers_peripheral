@@ -10,7 +10,7 @@
 
 ## 简介
 
-Vibrator驱动模型主要包含Vibrator（传感器）相关的HDI接口与实现，提供Vibrator HDI（ Hardware Device Interface ）能力接口，支持静态HCS配置的时间序列和动态配置持续时间两种振动效果。调用StartOnce接口动态配置持续振动时间；调用StartEffect接口启动静态配置的振动效果。
+Vibrator驱动模型主要包含Vibrator（马达）相关的HDI接口与实现，提供Vibrator HDI（ Hardware Device Interface ）能力接口，支持三种振动效果：静态HCS配置的时间序列，动态配置持续时间，动态配置持续时间、振动强度、振动频率。调用StartOnce接口动态配置持续振动时间；调用StartEffect接口启动静态配置的振动效果；调用EnableVibratorModulation接口启动动态配置的振动效果。
 
 **图 1** Vibrator驱动模型图
 
@@ -36,15 +36,15 @@ Vibraor驱动下源代码目录结构如下所示：
 
 ### 接口说明
 
-马达主要提供的功能：触发震动，停止震动。开发能力如下表1：
+马达主要提供的功能：触发振动，停止振动。开发能力如下表1：
 
 **表 1**马达的主要接口
 
 | 接口名                                                       | 功能描述                                                     |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| int32_t  StartOnce(uint32_t duration)                        | 按照指定持续时间触发震动，duration为振动持续时长。           |
+| int32_t  StartOnce(uint32_t duration)                        | 按照指定持续时间触发振动，duration为振动持续时长。           |
 | int32_t  Start(const char *effectType)                       | 按照指定预置效果启动马达，effectType表示预置的振动效果串。   |
-| int32_t  Stop(enum VibratorMode mode)                        | 按照指定的振动模式停止震动。                                 |
+| int32_t  Stop(enum VibratorMode mode)                        | 按照指定的振动模式停止振动。                                 |
 | int32_t EnableVibratorModulation(uint32_t duration, int32_t intensity, int32_t frequency) | 按照指定振幅，频率、持续时间触发振动马达，duration为振动持续时长，intensity为振动强度，frequency为振动频率。 |
 | int32_t GetVibratorInfo(struct VibratorInfo **vibratorInfo); | 获取马达信息，包括是否支持振幅和频率的设置及振幅和频率的设置范围 。 |
 
@@ -71,7 +71,7 @@ void VibratorSample(void)
     int32_t g_frequency1 = 200;
     const char *g_timeSequence = "haptic.clock.timer";
     struct VibratorInfo *g_vibratorInfo = nullptr;
-    /* 创建传感器接口实例 */
+    /* 创建马达接口实例 */
     struct VibratorInterface *g_vibratorDev = NewVibratorInterfaceInstance();
     if (g_vibratorDev == NULL) {
         return;
@@ -81,13 +81,13 @@ void VibratorSample(void)
     if (startRet != 0) {
         return;
     }
-    /* 按照指定持续时间触发震动*/
+    /* 按照指定持续时间触发振动*/
     startRet = g_vibratorDev->StartOnce(g_duration);
     if (startRet != 0) {
         return;
     }
     OsalMSleep(g_sleepTime1);
-    /* 按照指定的振动模式停止震动 */
+    /* 按照指定的振动模式停止振动 */
     endRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
     if (endRet != 0) {
         return;
@@ -98,7 +98,7 @@ void VibratorSample(void)
         return;
     }
     OsalMSleep(g_sleepTime2);
-    /* 按照指定的振动模式停止震动 */
+    /* 按照指定的振动模式停止振动 */
     endRet = g_vibratorDev->Stop(VIBRATOR_MODE_PRESET);
     if (endRet != 0) {
         return;
@@ -109,7 +109,7 @@ void VibratorSample(void)
         return;
     }
     OsalMSleep(g_sleepTime1);
-    /* 按照指定的振动模式停止震动 */
+    /* 按照指定的振动模式停止振动 */
     startRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
     if (endRet != 0) {
         return;
