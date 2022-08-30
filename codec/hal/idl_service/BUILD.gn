@@ -15,7 +15,6 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libcodec_component_manager_service_1.0") {
   include_dirs = [
-    "//drivers/peripheral/codec/hal/buffersequence/",
     "//drivers/peripheral/codec/interfaces/include/",
     "//third_party/openmax/api/1.1.2",
     "include",
@@ -42,14 +41,12 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
     "-Wno-missing-field-initializers",
   ]
 
-  deps = [
-    "//drivers/peripheral/codec/hal/buffersequence:libbufferhandle_parcelable",
-    "//third_party/libdrm:libdrm",
-  ]
+  deps = [ "//third_party/libdrm:libdrm" ]
   if (is_standard_system) {
     external_deps = [
       "drivers_interface_codec:codec_idl_headers",
       "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libbufferhandle_parcelable",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
@@ -71,7 +68,6 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
 ohos_shared_library("libcodec_driver") {
   include_dirs = [
     "//drivers/peripheral/codec/interfaces/include/",
-    "//drivers/peripheral/codec/hal/buffersequence",
     "include",
   ]
 
