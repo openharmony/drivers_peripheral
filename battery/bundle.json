@@ -1,8 +1,14 @@
 {
-  "name": "drivers_peripheral_battery",
+  "name": "@ohos/drivers_peripheral_battery",
   "description": "battery hdf",
   "version": "3.1",
   "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/battery"
+  },
+  "dirs": {},
+  "scripts": {},
   "component": {
     "name": "drivers_peripheral_battery",
     "subsystem": "hdf",
@@ -17,7 +23,7 @@
         "libhilog",
         "ipc_single"
       ],
-      "third_part": [
+      "third_party": [
         "gmock_main",
         "gtest_main",
         "jsoncpp"
