@@ -1204,7 +1204,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureReqMmapBufferWhenDevDataHandleIsError, Te
     hwCapture->devDataHandle = (struct DevHandleCapture *)service;
     int32_t reqSize = 0;
     struct AudioMmapBufferDescripter desc;
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioCaptureReqMmapBuffer(handle, reqSize, &desc));
+    EXPECT_EQ(-1, AudioCaptureReqMmapBuffer(handle, reqSize, &desc));
     hwCapture->devDataHandle = devDataHandle;
     delete(service);
     service = nullptr;

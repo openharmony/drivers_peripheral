@@ -25,7 +25,6 @@ if (defined(ohos_lite)) {
       testonly = true
       deps = [
         "fuzztest:fuzztest",
-        "systemtest:systemtest",
         "unittest:audiotest",
       ]
     }
