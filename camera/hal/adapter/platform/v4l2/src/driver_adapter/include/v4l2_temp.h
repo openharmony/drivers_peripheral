@@ -23,6 +23,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <hdf_log.h>
 
 namespace OHOS::Camera {
 enum CameraBufferStatus {
@@ -116,13 +117,13 @@ enum AdapterCmd : uint32_t {
 #else
 #define CAMERA_LOGD(fmt, ...)                    \
     do {                                         \
-        printf("INFO:" fmt "\n", ##__VA_ARGS__); \
+        HDF_LOGD("INFO:" fmt "\n", ##__VA_ARGS__); \
     } while (0)
 #endif
 
 #define CAMERA_LOGE(fmt, ...)                     \
     do {                                          \
-        printf("ERROR:" fmt "\n", ##__VA_ARGS__); \
+        HDF_LOGD("ERROR:" fmt "\n", ##__VA_ARGS__); \
     } while (0)
 
 enum RetCode {

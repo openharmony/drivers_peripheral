@@ -26,8 +26,6 @@ ohos_fuzztest("CameraIpcCameraDeviceRemoteFuzzTest") {
   cflags = [
     "-g",
     "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
   ]
   sources = [
     "$camera_path/../interfaces/hdi_ipc/server/src/camera_device_stub.cpp",
@@ -110,8 +108,6 @@ ohos_fuzztest("CameraIpcCameraHostServiceFuzzTest") {
   cflags = [
     "-g",
     "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
   ]
   sources = [ "./ipccamerahostservice_fuzzer/ipccamerahostservice_fuzzer.cpp" ]
 
@@ -190,8 +186,6 @@ ohos_fuzztest("CameraIpcOfflineFuzzTest") {
   cflags = [
     "-g",
     "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
   ]
   sources = [ "./ipcoffline_fuzzer/ipcoffline_fuzzer.cpp" ]
 
@@ -269,8 +263,6 @@ ohos_fuzztest("CameraIpcStreamOperatorFuzzTest") {
   cflags = [
     "-g",
     "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
   ]
   sources = [ "./ipcstreamoperator_fuzzer/ipcstreamoperator_fuzzer.cpp" ]
 
@@ -348,8 +340,6 @@ ohos_fuzztest("CameraIpcCameraDeviceCallbackFuzzTest") {
   cflags = [
     "-g",
     "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
   ]
   sources =
       [ "./ipccameradevicecallback_fuzzer/ipccameradevicecallback_fuzzer.cpp" ]
@@ -430,8 +420,6 @@ ohos_fuzztest("CameraIpcCameraHostCallbackFuzzTest") {
   cflags = [
     "-g",
     "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
   ]
   sources =
       [ "./ipccamerahostcallback_fuzzer/ipccamerahostcallback_fuzzer.cpp" ]
@@ -509,8 +497,6 @@ ohos_fuzztest("CameraIpcStreamOperatorCallbackFuzzTest") {
   cflags = [
     "-g",
     "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
   ]
   sources = [
     "./ipcstreamoperatorcallback_fuzzer/ipcstreamoperatorcallback_fuzzer.cpp",
