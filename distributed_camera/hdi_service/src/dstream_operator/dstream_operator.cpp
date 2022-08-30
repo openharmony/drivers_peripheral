@@ -483,7 +483,7 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
                 uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
                 uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
                 if (height == 0 || width == 0 ||
-                    (isPhotoFormat && (width > MAX_SUPPORT_PHOTO_WIDTH || height > MAX_SUPPORT_PHOTO_HEIGHT)) ||
+                    (isPhotoFormat && ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
                     (!isPhotoFormat &&
                     (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
                     continue;
