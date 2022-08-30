@@ -239,7 +239,7 @@ void HosV4L2Dev::loopBuffers()
 
     while (streamNumber_ > 0) {
         nfds = epoll_wait(epollFd_, events, MAXSTREAMCOUNT, -1);
-        CAMERA_LOGD("loopBuffers: epoll_wait rc = %{public}d streamNumber_ == %%{public}d\n", nfds, streamNumber_);
+        CAMERA_LOGD("loopBuffers: epoll_wait rc = %{public}d streamNumber_ == %{public}d\n", nfds, streamNumber_);
 
         for (int n = 0; nfds > 0; ++n, --nfds) {
             if ((events[n].events & EPOLLIN) && (events[n].data.fd != eventFd_)) {

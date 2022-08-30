@@ -235,7 +235,6 @@ uint32_t ExifUtils::AddCustomExifInfo(exif_data info,
     int32_t dataBufferSize = info.frame_size;
     double latitudeNumber = info.latitude;
     double longitudeNumber = info.longitude;
-    double altitude = info.altitude;
     constexpr uint32_t exifBlockLength = 2;
 
     exif = exif_data_new();
@@ -345,10 +344,10 @@ void ExifUtils::ConvertAltitudeToRational(double altitude, exif_rational &outPut
             isSeparator = true;
         } else {
             numerator = numerator * digitPosition + (character  - '0');
-            CAMERA_LOGI("%{public}s numerator =  %{public}ld", __FUNCTION__, numerator);
+            CAMERA_LOGI("%{public}s numerator =  %{public}lld", __FUNCTION__, numerator);
             if (isSeparator) {
                 denominator *= digitPosition;
-                CAMERA_LOGI("%{public}s denominator =  %{public}ld", __FUNCTION__, denominator);
+                CAMERA_LOGI("%{public}s denominator =  %{public}lld", __FUNCTION__, denominator);
             }
         }
     }
@@ -364,7 +363,7 @@ void ExifUtils::ConvertAltitudeToRational(double altitude, exif_rational &outPut
 
     outPutAltitude.numerator = numerator;
     outPutAltitude.denominator = denominator;
-    CAMERA_LOGI("%{public}s outPutAltitude.numerator =  %{public}ld and outPutAltitude.denominator =  %{public}ld",
+    CAMERA_LOGI("%{public}s outPutAltitude.numerator =  %{public}d and outPutAltitude.denominator =  %{public}d",
         __FUNCTION__, outPutAltitude.numerator, outPutAltitude.denominator);
 }
 }  // namespace OHOS::Camera
