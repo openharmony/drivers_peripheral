@@ -504,7 +504,7 @@ void* V4L2FrameThread(void* data)
         V4L2SetBuffers(i, buffptr, bufSize, devname);
 
         addr[i] = (unsigned char*)malloc(bufSize);
-        if (addr == nullptr) {
+        if (addr[i] == nullptr) {
             CAMERA_LOGE("main test:V4L2PreviewThread malloc buffers fail \n");
             goto done;
         }
@@ -795,7 +795,6 @@ void SetAeExpo()
 void StartVideo()
 {
     std::string devName;
-    int value;
     constexpr uint32_t videoTime = 10;
 
     StopAllFrame(0);
