@@ -41,16 +41,15 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
   deps = [
     "//base/useriam/user_auth_framework/common:iam_utils",
     "//third_party/openssl:libcrypto_shared",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_pin_auth:pin_auth_idl_headers",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 
   install_images = [ chipset_base_dir ]
@@ -73,12 +72,12 @@ ohos_shared_library("libpin_auth_driver") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 
   install_images = [ chipset_base_dir ]

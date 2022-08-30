@@ -59,11 +59,11 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
     "user_auth/src/user_sign_centre.c",
   ]
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_user_auth:user_auth_idl_headers",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
   deps = [
     "//base/useriam/user_auth_framework/common:iam_utils",
@@ -88,12 +88,12 @@ ohos_shared_library("libuser_auth_driver") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]

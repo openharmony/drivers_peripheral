@@ -36,9 +36,9 @@ ohos_fuzztest("FaceAuthHdiFuzzTest") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_face_auth:face_auth_idl_headers",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "utils_base:utils",
   ]
 }
