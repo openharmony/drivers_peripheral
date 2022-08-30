@@ -20,7 +20,7 @@ if (defined(ohos_lite)) {
   config("buffer_manager_utest_config") {
     visibility = [ ":*" ]
 
-    cflags_cc = [ "-Wno-unused-parameter" ]
+    cflags_cc = []
     cflags_cc += [ "-std=c++17" ]
   }
 
@@ -52,7 +52,7 @@ if (defined(ohos_lite)) {
   config("buffer_manager_utest_config") {
     visibility = [ ":*" ]
 
-    cflags_cc = [ "-Wno-unused-parameter" ]
+    cflags_cc = []
 
     ldflags = [ "--coverage" ]
   }
