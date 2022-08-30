@@ -11,8 +11,17 @@
     "rom": "1260KB",
     "ram": "7700KB",
     "deps": {
-      "components": [],
-      "third_part": []
+      "components": [
+        "graphic_standard",
+        "hdf_core",
+        "hiviewdfx_hilog_native",
+        "utils_base"
+      ],
+      "third_part": [
+        "bounds_checking_function",
+        "libdrm",
+        "googletest"
+      ]
     },
     "build": {
       "sub_component": [
