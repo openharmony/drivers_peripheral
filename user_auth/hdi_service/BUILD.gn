@@ -26,7 +26,6 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
     "user_auth/inc",
     "service",
     "//third_party/openssl/include",
-    "//base/useriam/user_auth_framework/common/logs",
   ]
   sources = [
     "adaptor/src/adaptor_algorithm.c",
@@ -60,7 +59,6 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
   ]
   external_deps = [
     "drivers_interface_user_auth:user_auth_idl_headers",
-    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
@@ -69,6 +67,8 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
     "//base/useriam/user_auth_framework/common:iam_utils",
     "//third_party/openssl:libcrypto_shared",
   ]
+
+  configs = [ "//base/useriam/user_auth_framework/common:iam_log_config" ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
   install_images = [ chipset_base_dir ]
@@ -77,10 +77,7 @@ ohos_shared_library("libuser_auth_interface_service_1.0") {
 }
 
 ohos_shared_library("libuser_auth_driver") {
-  include_dirs = [
-    "interface",
-    "//base/useriam/user_auth_framework/common/logs",
-  ]
+  include_dirs = [ "interface" ]
   sources = [ "service/user_auth_interface_driver.cpp" ]
   deps = [
     "//base/useriam/user_auth_framework/common:iam_utils",
@@ -88,14 +85,16 @@ ohos_shared_library("libuser_auth_driver") {
   ]
 
   external_deps = [
-    "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
-    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
   ]
 
+  configs = [
+    "//base/useriam/user_auth_framework/common:iam_log_config",
+    "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host_all_dependent_config",
+  ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
   install_images = [ chipset_base_dir ]
