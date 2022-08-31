@@ -15,10 +15,7 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libface_auth_interface_service_1.0") {
-  include_dirs = [
-    "include",
-    "//base/useriam/user_auth_framework/common/logs",
-  ]
+  include_dirs = [ "include" ]
   sources = [
     "src/executor_impl.cpp",
     "src/face_auth_interface_service.cpp",
@@ -26,11 +23,12 @@ ohos_shared_library("libface_auth_interface_service_1.0") {
 
   external_deps = [
     "drivers_interface_face_auth:face_auth_idl_headers",
-    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
   ]
+
+  configs = [ "//base/useriam/user_auth_framework/common:iam_log_config" ]
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
@@ -38,20 +36,19 @@ ohos_shared_library("libface_auth_interface_service_1.0") {
 }
 
 ohos_shared_library("libface_auth_driver") {
-  include_dirs = [
-    "include",
-    "//base/useriam/user_auth_framework/common/logs",
-  ]
+  include_dirs = [ "include" ]
   sources = [ "src/face_auth_interface_driver.cpp" ]
   deps = [ "//drivers/interface/face_auth/v1_0:libface_auth_stub_1.0" ]
 
   external_deps = [
-    "hdf_core:libhdf_host",
-    "hdf_core:libhdf_ipc_adapter",
-    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
+  ]
+
+  configs = [
+    "//base/useriam/user_auth_framework/common:iam_log_config",
+    "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host_all_dependent_config",
   ]
 
   install_images = [ chipset_base_dir ]
