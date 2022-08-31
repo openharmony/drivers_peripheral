@@ -20,7 +20,6 @@
 namespace OHOS {
 namespace HDI {
 namespace Nfc {
-namespace NfcCore {
 NfcVendorAdaptions::NfcVendorAdaptions() {}
 
 NfcVendorAdaptions::~NfcVendorAdaptions() {}
@@ -66,7 +65,6 @@ int NfcVendorAdaptions::VendorIoctl(long arg, void *p_data)
 {
     return phNxpNciHal_ioctl(arg, p_data);
 }
-} // NfcCore
 } // Nfc
 } // HDI
 } // OHOS

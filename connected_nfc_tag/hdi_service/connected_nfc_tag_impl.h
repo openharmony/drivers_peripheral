@@ -12,37 +12,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef OHOS_HARDWARE_NFC_V1_0_ICONNECTED_TAG_HDI_H
-#define OHOS_HARDWARE_NFC_V1_0_ICONNECTED_TAG_HDI_H
+
+#ifndef OHOS_HDI_CONNECTEDNFCTAG_V1_0_CONNECTEDNFCTAGIMPL_H
+#define OHOS_HDI_CONNECTEDNFCTAG_V1_0_CONNECTEDNFCTAGIMPL_H
+
 #include <cstdint>
-#include <hdf_log.h>
-#include <iservmgr_hdi.h>
 #include <string>
+
+#include "v1_0/iconnected_nfc_tag.h"
 
 namespace OHOS {
 namespace HDI {
-namespace NFC {
+namespace ConnectedNfcTag {
 namespace V1_0 {
-using namespace OHOS;
-class IConnectedTagHdi : public IRemoteBroker {
+class ConnectedNfcTagImpl {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"ohos.hdi.nfc.v1_0.IConnectedTagHdi");
-
-    virtual ~IConnectedTagHdi() = default;
-
-    static sptr<IConnectedTagHdi> Get();
-
-    virtual int32_t Init() = 0;
-
-    virtual int32_t Uninit() = 0;
-
-    virtual std::string ReadNdefTag() = 0;
-
-    virtual int32_t WriteNdefTag(std::string data) = 0;
+    ~ConnectedNfcTagImpl() = default;
+    int32_t Init();
+    int32_t Uninit();
+    int32_t ReadNdefTag(std::string &ndefData);
+    int32_t WriteNdefTag(std::string ndefData);
 };
 }  // namespace V1_0
-}  // namespace NFC
+}  // namespace ConnectedNfcTag
 }  // namespace HDI
 }  // namespace OHOS
 
-#endif  // OHOS_HARDWARE_NFC_V1_0_ICONNECTED_TAG_HDI_H
+#endif // OHOS_HDI_CONNECTEDNFCTAG_V1_0_CONNECTEDNFCTAGIMPL_H
+

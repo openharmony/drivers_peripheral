@@ -15,13 +15,13 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libnfc_interface_service_1.0") {
   include_dirs = [
-    "//drivers/peripheral/nfc/nfc_core/hdi_service",
-    "//drivers/peripheral/nfc/nfc_core/vendor_adaptor",
+    "//drivers/peripheral/nfc/hdi_service",
+    "//drivers/peripheral/nfc/vendor_adaptor",
     "//third_party/nfc_hdiimpl/SN100x/halimpl/inc",
   ]
   sources = [ "nfc_impl.cpp" ]
   public_deps = [
-    "//drivers/peripheral/nfc/nfc_core/vendor_adaptor:nfc_vendor_adaptor",
+    "//drivers/peripheral/nfc/vendor_adaptor:nfc_vendor_adaptor",
     "//third_party/nfc_hdiimpl/SN100x:nfc_hdiimpl",
   ]
 
@@ -43,14 +43,14 @@ ohos_shared_library("libnfc_interface_service_1.0") {
 
 ohos_shared_library("nfc_hdi_driver") {
   include_dirs = [
-    "//drivers/peripheral/nfc/nfc_core/hdi_service",
-    "//drivers/peripheral/nfc/nfc_core/vendor_adaptor",
+    "//drivers/peripheral/nfc/hdi_service",
+    "//drivers/peripheral/nfc/vendor_adaptor",
     "//third_party/nfc_hdiimpl/SN100x/halimpl/inc",
   ]
 
   sources = [ "nfc_interface_driver.cpp" ]
 
-  deps = [ "//drivers/interface/nfc/nfc_core/v1_0:libnfc_stub_1.0" ]
+  deps = [ "//drivers/interface/nfc/v1_0:libnfc_stub_1.0" ]
 
   cflags = []
 

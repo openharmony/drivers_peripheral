@@ -14,30 +14,38 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-root_path = "//drivers/peripheral/nfc/connected_tag/v1_0"
+ohos_shared_library("libconnected_nfc_tag_service_1.0") {
+  include_dirs = [ "//drivers/peripheral/connected_nfc_tag/hdi_service" ]
 
-group("connected_tag_hdi") {
+  sources = [ "connected_nfc_tag_impl.cpp" ]
+
+  external_deps = [
+    "drivers_interface_connected_nfc_tag:connected_nfc_tag_idl_headers",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "utils_base:utils",
+  ]
+
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_connected_nfc_tag"
+}
+
+ohos_shared_library("connected_nfc_tag_hdi_driver") {
+  include_dirs = [ "//drivers/peripheral/connected_nfc_tag/hdi_service" ]
+
+  sources = [ "connected_nfc_tag_driver.cpp" ]
+
   deps = [
-    ":connected_tag_client",
-    ":connected_tag_server",
+    "//drivers/interface/connected_nfc_tag/v1_0:libconnected_nfc_tag_stub_1.0",
   ]
-}
-
-ohos_shared_library("connected_tag_client") {
-  include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-    "$root_path",
-  ]
-
-  sources = [ "$root_path/client/connected_tag_proxy.cpp" ]
-
-  deps = [ "//drivers/peripheral/nfc/connected_tag:connected_tag_server" ]
 
   external_deps = [
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
-    "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
@@ -45,32 +53,12 @@ ohos_shared_library("connected_tag_client") {
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
-  part_name = "drivers_peripheral_connected_tag"
+  part_name = "drivers_peripheral_connected_nfc_tag"
 }
 
-ohos_shared_library("connected_tag_server") {
-  include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-    "$root_path/client",
+group("connected_nfc_tag_entry") {
+  deps = [
+    ":connected_nfc_tag_hdi_driver",
+    ":libconnected_nfc_tag_service_1.0",
   ]
-
-  sources = [
-    "$root_path/hdi_service/connected_tag_interface_driver.cpp",
-    "$root_path/hdi_service/connected_tag_server_stub.cpp",
-    "$root_path/hdi_service/connected_tag_service.cpp",
-  ]
-
-  external_deps = [
-    "hdf_core:libhdf_host",
-    "hdf_core:libhdf_ipc_adapter",
-    "hdf_core:libhdf_utils",
-    "hdf_core:libhdi",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_single",
-    "utils_base:utils",
-  ]
-
-  install_images = [ chipset_base_dir ]
-  subsystem_name = "hdf"
-  part_name = "drivers_peripheral_connected_tag"
 }
