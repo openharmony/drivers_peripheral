@@ -324,6 +324,15 @@ static int32_t loadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct
     hwAdapter->common.GetPortCapability = AudioAdapterGetPortCapability;
     hwAdapter->common.SetPassthroughMode = AudioAdapterSetPassthroughMode;
     hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
+    hwAdapter->common.GetDeviceStatus = AudioAdapterGetDeviceStatus;
+    hwAdapter->common.UpdateAudioRoute = AudioAdapterUpdateAudioRoute;
+    hwAdapter->common.ReleaseAudioRoute = AudioAdapterReleaseAudioRoute;
+    hwAdapter->common.SetMicMute = AudioAdapterSetMicMute;
+    hwAdapter->common.GetMicMute = AudioAdapterGetMicMute;
+    hwAdapter->common.SetVoiceVolume = AudioAdapterSetVoiceVolume;
+    hwAdapter->common.SetExtraParams = AudioAdapterSetExtraParams;
+    hwAdapter->common.GetExtraParams = AudioAdapterGetExtraParams;
+    hwAdapter->common.RegExtraParamObserver = AudioAdapterRegExtraParamObserver;
     hwAdapter->adapterDescriptor = *desc;
 
     *adapter = &(hwAdapter->common);
