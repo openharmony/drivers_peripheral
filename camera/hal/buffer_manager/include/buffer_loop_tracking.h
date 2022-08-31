@@ -26,6 +26,7 @@
 #include <string>
 #include <thread>
 #include <algorithm>
+#include <cinttypes>
 
 namespace OHOS::Camera {
 class TrackingNode {
