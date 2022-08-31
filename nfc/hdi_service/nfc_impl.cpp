@@ -24,7 +24,6 @@
 namespace OHOS {
 namespace HDI {
 namespace Nfc {
-namespace NfcCore {
 namespace V1_0 {
 static sptr<V1_0::INfcCallback> g_callbackV1_0 = nullptr;
 
@@ -45,7 +44,7 @@ static void DataCallback(uint16_t len, uint8_t *data)
 
 extern "C" INfcInterface *NfcInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Nfc::NfcCore::V1_0::NfcImpl;
+    using OHOS::HDI::Nfc::V1_0::NfcImpl;
     NfcImpl *service = new (std::nothrow) NfcImpl();
     if (service == nullptr) {
         return nullptr;
@@ -160,7 +159,6 @@ int32_t NfcImpl::Ioctl(NfcCommand cmd, const std::vector<uint8_t> &data, NfcStat
     return HDF_FAILURE;
 }
 } // V1_0
-} // NfcCore
 } // Nfc
 } // HDI
 } // OHOS

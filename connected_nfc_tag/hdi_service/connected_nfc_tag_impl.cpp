@@ -13,32 +13,37 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HARDWARE_NFC_V1_0_CONNECTED_TAG_SERVICE_H
-#define OHOS_HARDWARE_NFC_V1_0_CONNECTED_TAG_SERVICE_H
-#include <cstdint>
-#include <hdf_base.h>
-#include <string>
+#include "connected_nfc_tag_impl.h"
+#include <hdf_log.h>
 
 namespace OHOS {
 namespace HDI {
-namespace NFC {
+namespace ConnectedNfcTag {
 namespace V1_0 {
-class ConnectedTagService {
-public:
-    ~ConnectedTagService() = default;
+int32_t ConnectedNfcTagImpl::Init()
+{
+    HDF_LOGI("%{public}s, no vendor impl", __func__);
+    return HDF_SUCCESS;
+}
 
-    int32_t Init();
+int32_t ConnectedNfcTagImpl::Uninit()
+{
+    HDF_LOGI("%{public}s, no vendor impl", __func__);
+    return HDF_SUCCESS;
+}
+int32_t ConnectedNfcTagImpl::ReadNdefTag(std::string &ndefData)
+{
+    HDF_LOGI("%{public}s, no vendor impl", __func__);
+    ndefData = "no-vendor-impl-for-read";
+    return HDF_SUCCESS;
+}
 
-    int32_t Uninit();
-
-    std::string ReadNdefTag();
-
-    int32_t WriteNdefTag(std::string ndefData);
-};
+int32_t ConnectedNfcTagImpl::WriteNdefTag(std::string ndefData)
+{
+    HDF_LOGI("%{public}s, no vendor impl, ndefData = %{public}s", __func__, ndefData.c_str());
+    return HDF_SUCCESS;
+}
 }  // namespace V1_0
 }  // namespace NFC
 }  // namespace HDI
 }  // namespace OHOS
-
-#endif // OHOS_HARDWARE_NFC_V1_0_CONNECTED_TAG_SERVICE_H
-

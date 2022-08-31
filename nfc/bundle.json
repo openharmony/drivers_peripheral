@@ -5,7 +5,7 @@
     "license": "Apache License 2.0",
     "publishAs": "code-segment",
     "segment": {
-      "destPath": "drivers/peripheral/nfc/nfc_core"
+      "destPath": "drivers/peripheral/nfc"
     },
     "dirs": {},
     "scripts": {},
@@ -29,7 +29,7 @@
       },
       "build": {
         "sub_component": [
-          "//drivers/peripheral/nfc/nfc_core:nfc_entry",
+          "//drivers/peripheral/nfc:nfc_entry",
           "//third_party/nfc_hdiimpl/SN100x:nfc_hdiimpl"
         ]
       }

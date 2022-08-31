@@ -20,7 +20,6 @@
 namespace OHOS {
 namespace HDI {
 namespace Nfc {
-namespace NfcCore {
 class INfcVendor {
 public:
     virtual ~INfcVendor() {}
@@ -35,7 +34,6 @@ public:
     virtual int VendorPowerCycle(void);
     virtual int VendorIoctl(long arg, void *p_data);
 };
-} // NfcCore
 } // Nfc
 } // HDI
 } // OHOS
