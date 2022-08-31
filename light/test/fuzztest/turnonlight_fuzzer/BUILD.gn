@@ -34,7 +34,6 @@ ohos_fuzztest("TurnOnLightFuzzTest") {
   deps = [ "//drivers/peripheral/light/hal:hdi_light" ]
   external_deps = [
     "c_utils:utils",
-    "c_utils:utils",
     "drivers_interface_light:liblight_proxy_1.0",
     "hdf_core:libhdf_utils",
     "ipc:ipc_single",
