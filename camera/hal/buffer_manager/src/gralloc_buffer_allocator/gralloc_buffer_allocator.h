@@ -17,7 +17,9 @@
 #define HOS_GRALLOC_BUFFER_ALLOCATOR_H
 
 #include <display_gralloc.h>
+#include <cinttypes>
 #include "buffer_allocator.h"
+
 
 namespace OHOS::Camera {
 class GrallocBufferAllocator : public BufferAllocator {

@@ -58,7 +58,7 @@ std::shared_ptr<IBuffer> GrallocBufferAllocator::AllocBuffer(const uint32_t widt
 
     PixelFormat format = BufferAdapter::CameraFormatToPixelFormat(cameraFormat);
     uint64_t usage = BufferAdapter::CameraUsageToGrallocUsage(cameraUsage);
-    CAMERA_LOGI("buffer info : w[%{public}u], h[%{public}u], u[%{public}llu], f[%{public}u]",
+    CAMERA_LOGI("buffer info : w[%{public}u], h[%{public}u], u[%{public}" PRIu64 "], f[%{public}u]",
         width, height, usage, format);
 
     BufferHandle* handle = nullptr;
