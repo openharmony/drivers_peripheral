@@ -75,6 +75,11 @@ static int32_t AudioHwRenderInit(struct AudioHwRender *hwRender)
     hwRender->common.GetChannelMode = AudioRenderGetChannelMode;
     hwRender->common.RegCallback = AudioRenderRegCallback;
     hwRender->common.DrainBuffer = AudioRenderDrainBuffer;
+    hwRender->common.IsSupportsDrain = AudioRenderIsSupportsDrain;
+    hwRender->common.AddAudioEffect = AudioRenderAddAudioEffect;
+    hwRender->common.RemoveAudioEffect = AudioRenderRemoveAudioEffect;
+    hwRender->common.GetFrameBufferSize = AudioRenderGetFrameBufferSize;
+    hwRender->common.IsSupportsPauseAndResume = AudioRenderIsSupportsPauseAndResume;
     hwRender->renderParam.frameRenderMode.callbackProcess = CallbackProcessing;
     return HDF_SUCCESS;
 }
@@ -1217,6 +1222,88 @@ int32_t AudioAdapterGetPassthroughMode(
     return AUDIO_ERR_INTERNAL;
 }
 
+int32_t AudioAdapterGetDeviceStatus(struct AudioAdapter *adapter, struct AudioDeviceStatus *status)
+{
+    (void)adapter;
+    (void)status;
+    return AUDIO_SUCCESS;
+}
+
+int32_t AudioAdapterUpdateAudioRoute(
+    struct AudioAdapter *adapter, const struct AudioRoute *route, int32_t *routeHandle)
+{
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t routeHandle)
+{
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterSetMicMute(struct AudioAdapter *adapter, bool mute)
+{
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterGetMicMute(struct AudioAdapter *adapter, bool* mute)
+{
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume)
+{
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter,
+    enum AudioExtParamKey key, const char *condition, const char *value)
+{
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterGetExtraParams(struct AudioAdapter *adapter,
+    enum AudioExtParamKey key, const char *condition, char *value, uint32_t lenth)
+{
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterRegExtraParamObserver(struct AudioAdapter *adapter,
+    struct AudioCallback *audioCallback, int8_t cookie)
+{
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
 void AudioAdapterRelease(struct AudioAdapter *instance)
 {
     (void)instance;
