@@ -30,7 +30,7 @@ group("function") {
       "audio_smartpa:hdf_audio_smartpa_test",
     ]
   } else {
-    deps += [ "audio_threshold_report:hdf_audio_threshold_report_test" ]
+    #deps += [ "audio_threshold_report:hdf_audio_threshold_report_test" ]
     if ("${product_name}" == "hispark_taurus_standard") {
       if (enable_audio_adm_passthrough) {
         deps += [
