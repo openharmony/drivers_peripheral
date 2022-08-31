@@ -1234,6 +1234,51 @@ int32_t AudioRenderDrainBuffer(struct AudioRender *render, enum AudioDrainNotify
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
+int32_t AudioRenderIsSupportsDrain(struct AudioRender *render, bool* support)
+{
+    struct AudioHwRender *pRender = (struct AudioHwRender *)render;
+    if (pRender == NULL) {
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioRenderAddAudioEffect(struct AudioRender *render, uint64_t effectid)
+{
+    struct AudioHwRender *pRender = (struct AudioHwRender *)render;
+    if (pRender == NULL) {
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioRenderRemoveAudioEffect(struct AudioRender *render, uint64_t effectid)
+{
+    struct AudioHwRender *pRender = (struct AudioHwRender *)render;
+    if (pRender == NULL) {
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioRenderGetFrameBufferSize(struct AudioRender *render, uint64_t* bufferSize)
+{
+    struct AudioHwRender *pRender = (struct AudioHwRender *)render;
+    if (pRender == NULL) {
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioRenderIsSupportsPauseAndResume(struct AudioRender *render, bool* supportPause, bool* supportResume)
+{
+    struct AudioHwRender *pRender = (struct AudioHwRender *)render;
+    if (pRender == NULL) {
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
 void AudioRenderRelease(struct AudioRender *instance)
 {
     (void)instance;

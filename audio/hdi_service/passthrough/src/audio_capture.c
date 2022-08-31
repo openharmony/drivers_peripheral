@@ -1049,6 +1049,40 @@ int32_t AudioCaptureAudioDevDump(struct AudioCapture *handle, int32_t range, int
     return AUDIO_SUCCESS;
 }
 
+int32_t AudioCaptureAddAudioEffect(struct AudioCapture *handle, uint64_t effectid)
+{
+    struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
+    if (capture == NULL) {
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioCaptureRemoveAudioEffect(struct AudioCapture *handle, uint64_t effectid)
+{
+    struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
+    if (capture == NULL) {
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioCaptureGetFrameBufferSize(struct AudioCapture *handle, uint64_t* bufferSize)
+{
+    struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
+    if (capture == NULL) {
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
+int32_t AudioCaptureIsSupportsPauseAndResume(struct AudioCapture *handle, bool* supportPause, bool* supportResume)
+{
+    struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
+    if (capture == NULL) {
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+    return AUDIO_ERR_NOT_SUPPORT;
+}
 void AudioCaptureRelease(struct AudioCapture *instance)
 {
     (void)instance;
