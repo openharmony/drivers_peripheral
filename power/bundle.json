@@ -1,8 +1,14 @@
 {
-    "name": "drivers_peripheral_power",
+    "name": "@ohos/drivers_peripheral_power",
     "description": "power_hdf",
     "version": "3.1",
     "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+      "destPath": "drivers/peripheral/power"
+    },
+    "dirs": {},
+    "scripts": {},
     "component": {
       "name": "drivers_peripheral_power",
       "subsystem": "hdf",
@@ -16,7 +22,7 @@
           "hiviewdfx_hilog_native",
           "ipc"
         ],
-        "third_part": [
+        "third_party": [
           "xml2"
         ]
       },
