@@ -2,9 +2,11 @@
   - [1. 简介](#1-简介)
     - [1.1 目录结构](#11-目录结构)
     - [1.2 特殊用例说明](#12-特殊用例说明)
-      - [1.2.1 UHDF层非通用（硬件耦合）测试用例](#121-uhdf层非通用硬件耦合测试用例)
-      - [1.2.2 LIB层非通用（硬件耦合）测试用例](#122-lib层非通用硬件耦合测试用例)
-      - [1.2.3 ALSA模式测试用例](#123-alsa模式测试用例)
+      - [1.2.1 硬件耦合相关测试用例](#121-硬件耦合相关测试用例)
+      - [1.2.1.1 UHDF层非通用（硬件耦合）测试用例](#1211-uhdf层非通用硬件耦合测试用例)
+      - [1.2.1.2 LIB层非通用（硬件耦合）测试用例](#1212-lib层非通用硬件耦合测试用例)
+      - [1.2.2 ALSA模式测试用例](#122-alsa模式测试用例)
+      - [1.2.3 录音阈值上报测试用例](#123-录音阈值上报测试用例)
   - [2. 适用版本](#2-适用版本)
   - [3. 适用平台（已适配的SOC）](#3-适用平台已适配的soc)
   - [4. 使用方法](#4-使用方法)
@@ -77,10 +79,10 @@
 ```
 
 #### 1.2 特殊用例说明
-
+##### 1.2.1 硬件耦合相关测试用例
 由于音频驱动模型对外接口的部分接口参数与硬件能力有耦合，此类用例与硬件耦合，导致无法作为通用用例。在移植过程中及门禁用例提取过程中，需要特别关注。
 
-##### 1.2.1 UHDF层非通用（硬件耦合）测试用例
+###### 1.2.1.1 UHDF层非通用（硬件耦合）测试用例
 UHDF层存在硬件耦合接口，如：SetSampleAttributes、SetChannelMode等。
 1. SetSampleAttributes接口测试用例中设置参数时会设置不同的“位宽、采样率、声道数”等与硬件相关的参数。
 2. SetChannelMode 接口测试用例中设置声道模式时会设置不同的模式，声道模式的支持与硬件相关。
@@ -162,7 +164,7 @@ UHDF层存在硬件耦合接口，如：SetSampleAttributes、SetChannelMode等�
     </tr>
 <table>
 
-##### 1.2.2 LIB层非通用（硬件耦合）测试用例
+###### 1.2.1.2 LIB层非通用（硬件耦合）测试用例
 LIB层存在硬件耦合接口：为音量，增益，场景切换相关接口。
 1. 调用lib接口获取硬件的音量范围、增益范围，并校验。
 2. 调用lib接口设置不同的音量或增益，超出范围便会失败。
@@ -236,7 +238,7 @@ LIB层存在硬件耦合接口：为音量，增益，场景切换相关接口�
     </tr>
 <table>
 
-##### 1.2.3 ALSA模式测试用例
+##### 1.2.2 ALSA模式测试用例
 音频驱动模型为支持南向生态厂商快速接入鸿蒙、支持快速产品化而提供的“ALSA兼容方案”，采用插件化的适配器模式通过alsa-lib对接ALSA。当采用“ALSA兼容方案”时，需编译ALSA模式测试用例。测试用例分为两部分：
 
 1.	LIB层接口测试用例
@@ -254,7 +256,7 @@ LIB层存在硬件耦合接口：为音量，增益，场景切换相关接口�
     }else {
       sources += ["src/audio_libcapture_test.cpp"]
     }
-````
+  ````
 2.	UHDF层接口测试用例
 </br>ALSA模式UHDF层测试用例与ADM模式共用一套测试用例，ALSA模式部分hdi接口未适配，在测试代码中使用宏区分。
 <table width="100%" border="0">
@@ -340,9 +342,26 @@ LIB层存在硬件耦合接口：为音量，增益，场景切换相关接口�
 #else
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 #endif
- ````
+  ````
 <b>注：编译ALSA测试用例是需要设置ALSA编译选项，由drivers_peripheral_audio_alsa_lib编译选项控制，当"drivers_peripheral_audio_alsa_lib = true"表示编译ALSA模式测试用例，编译配置文件路径为./drivers/peripheral/audio/audio.gni文件内。</b>
+##### 1.2.3 录音阈值上报测试用例
 
+  码云上音频驱动模型默认不编译录音阈值上报功能代码，因此该功能对应的测试套（hdf_audio_threshold_report_test）默认不编译，如需编译需要手动修改gn文件，去掉“#”字符注释。gn文件路径为./audio_function/BUILD.gn
+```bash
+group("function") {
+  if (!defined(ohos_lite)) {
+    testonly = true
+  }
+  deps = [ "audio_server:hdf_audio_hdi_server_function_test" ]
+  if (defined(ohos_lite)) {
+    deps += [
+      "audio_pathroute:hdf_audio_hdi_path_route_test",
+      "audio_smartpa:hdf_audio_smartpa_test",
+    ]
+  } else {
+    #deps += [ "audio_threshold_report:hdf_audio_threshold_report_test" ] #录音阈值上报测试套
+  ....
+```
 ### 2. 适用版本
 当前测试用例适用码云mater主仓音频驱动模型版本。
 
@@ -397,7 +416,7 @@ LIB层存在硬件耦合接口：为音量，增益，场景切换相关接口�
 ```
 #### 4.2 测试套及资源文件推送
 1. 测试用例执行依赖文件推送
-</br>Render相关测试用例执行需要推送audiorendertest.wav和lowlatencyrendertest.wav两个音频文件。推动至开发板”/data”目录下，在cmd窗口输入命令:
+</br>Render相关测试用例执行需要推送audiorendertest.wav和lowlatencyrendertest.wav两个音频文件，音频文件路径为hdf_core/adapter/uhdf2/test/resource/audio/audiofile。推动至开发板”/data”目录下，在cmd窗口输入命令:
 ```bash
 hdc file send XXX[本地路径]/audiorendertest.wav  /data
 ```

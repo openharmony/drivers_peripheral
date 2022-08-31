@@ -1434,21 +1434,16 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderReqMmapBuffer_Pe
     };
     audiopara.manager = manager;
     ASSERT_NE(nullptr, audiopara.manager);
-
-    for (int i = 0; i < COUNT; ++i) {
-        audiopara.render = nullptr;
-        FILE *fp = fopen(LOW_LATENCY_AUDIO_FILE.c_str(), "rb+");
-        ASSERT_NE(nullptr, fp);
-        ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
+    ret = AudioCreateRender(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
                                 &audiopara.render);
-        if (ret < 0 || audiopara.render == nullptr) {
-            fclose(fp);
-            ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-            ASSERT_EQ(nullptr, audiopara.render);
+    ASSERT_NE(nullptr, audiopara.render);
+    for (int i = 0; i < COUNT; ++i) {
+        FILE *fp = fopen(LOW_LATENCY_AUDIO_FILE.c_str(), "rb+");
+        if (fp == nullptr) {
+            audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+            audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+            ASSERT_NE(nullptr, fp);
         }
-        InitAttrs(audiopara.attrs);
-        audiopara.attrs.startThreshold = 0;
-        ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
         ret = InitMmapDesc(fp, desc, reqSize, isRender);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         ret = audiopara.render->control.Start((AudioHandle)audiopara.render);
@@ -1463,13 +1458,12 @@ HWTEST_F(AudioHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderReqMmapBuffer_Pe
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
         audiopara.render->control.Stop((AudioHandle)audiopara.render);
-        audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-        audiopara.render = nullptr;
-        audiopara.adapter = nullptr;
         fclose(fp);
         usleep(500);
     }
+
+    audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
+    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
