@@ -23,19 +23,17 @@ ohos_fuzztest("UsbSetCurrentFunctionsFuzzTest") {
       "//drivers/peripheral/usb/test/fuzztest/usbsetcurrentfunctions_fuzzer"
 
   include_dirs = [
-    "//drivers/peripheral/usb/hal/client/include",
     "//drivers/peripheral/usb/test/fuzztest/usbsetcurrentfunctions_fuzzer",
+    "//drivers/peripheral/usb/test/fuzztest/usbcommonfunction_fuzzer",
     "//drivers/hdf_core/framework/include/utils",
+    "//base/usb/usb_manager/utils/native/include",
   ]
 
-  deps = [
-    "//drivers/peripheral/usb/ddk:libusb_core",
-    "//drivers/peripheral/usb/hal/client:usbd_client",
-  ]
+  deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
 
   external_deps = [
     "c_utils:utils",
-    "hdf_core:libhdf_utils",
+    "drivers_interface_usb:libusb_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",

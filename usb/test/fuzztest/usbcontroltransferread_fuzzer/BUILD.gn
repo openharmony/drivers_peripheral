@@ -16,27 +16,25 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 module_output_path = "hdf/usb"
 
-ohos_fuzztest("UsbGetFileDescriptorFuzzTest") {
+ohos_fuzztest("UsbControlTransferReadFuzzTest") {
   module_out_path = module_output_path
 
   fuzz_config_file =
-      "//drivers/peripheral/usb/test/fuzztest/usbgetfiledescriptor_fuzzer"
+      "//drivers/peripheral/usb/test/fuzztest/usbcontroltransferread_fuzzer"
 
   include_dirs = [
-    "//drivers/peripheral/usb/hal/client/include",
-    "//drivers/peripheral/usb/test/fuzztest/usbgetfiledescriptor_fuzzer",
+    "//drivers/peripheral/usb/test/fuzztest/usbcontroltransferread_fuzzer",
     "//drivers/peripheral/usb/test/UsbSubscriberTest",
+    "//drivers/peripheral/usb/test/fuzztest/usbcommonfunction_fuzzer",
     "//drivers/hdf_core/framework/include/utils",
+    "//base/usb/usb_manager/utils/native/include",
   ]
 
-  deps = [
-    "//drivers/peripheral/usb/ddk:libusb_core",
-    "//drivers/peripheral/usb/hal/client:usbd_client",
-  ]
+  deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
 
   external_deps = [
     "c_utils:utils",
-    "hdf_core:libhdf_utils",
+    "drivers_interface_usb:libusb_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
@@ -51,12 +49,13 @@ ohos_fuzztest("UsbGetFileDescriptorFuzzTest") {
 
   sources = [
     "//drivers/peripheral/usb/test/UsbSubscriberTest/UsbSubscriberTest.cpp",
-    "usbgetfiledescriptor_fuzzer.cpp",
+    "//drivers/peripheral/usb/test/fuzztest/usbcommonfunction_fuzzer/usbcommonfunction_fuzzer.cpp",
+    "usbcontroltransferread_fuzzer.cpp",
   ]
 }
 
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":UsbGetFileDescriptorFuzzTest" ]
+  deps += [ ":UsbControlTransferReadFuzzTest" ]
 }
