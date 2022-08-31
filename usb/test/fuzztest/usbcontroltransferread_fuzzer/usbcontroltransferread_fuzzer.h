@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef USBCONTROLTRANSFER_FUZZER_H
-#define USBCONTROLTRANSFER_FUZZER_H
+#ifndef USBCONTROLTRANSFERREAD_FUZZER_H
+#define USBCONTROLTRANSFERREAD_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "usbcontroltransfer_fuzzer"
+#define FUZZ_PROJECT_NAME "usbcontroltransferread_fuzzer"
 
 #endif

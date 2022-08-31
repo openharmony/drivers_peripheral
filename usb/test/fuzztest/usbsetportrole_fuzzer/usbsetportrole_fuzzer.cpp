@@ -14,28 +14,39 @@
  */
 
 #include "usbsetportrole_fuzzer.h"
-#include "usbd_client.h"
 #include "hdf_log.h"
-#include "usb_errors.h"
+#include "securec.h"
+#include "v1_0/iusb_interface.h"
+
+using namespace OHOS::HDI::Usb::V1_0;
+
+struct Parameters {
+    int32_t portId;
+    int32_t powerRole;
+    int32_t dataRole;
+};
 
 namespace OHOS {
 namespace USB {
-    bool UsbSetPortRoleFuzzTest(const uint8_t* data, size_t size)
-    {
-        (void)size;
-        bool result = false;
-        int32_t ret = UsbdClient::GetInstance().SetPortRole(*(int32_t *)data,
-            *(int32_t *)data, *(int32_t *)data);
-        if (ret == UEC_OK) {
-            HDF_LOGI("%{public}s: set interface succeed\n", __func__);
-            result = true;
-        }
-        return result;
+bool UsbSetPortRoleFuzzTest(const uint8_t *data, size_t size)
+{
+    (void)size;
+    Parameters param;
+    if (memcpy_s((void *)&param, sizeof(param), data, sizeof(param)) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+        return false;
     }
+    sptr<IUsbInterface> usbInterface = IUsbInterface::Get();
+    int32_t ret = usbInterface->SetPortRole(param.portId, param.powerRole, param.dataRole);
+    if (ret == HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: set interface succeed", __func__);
+    }
+    return true;
+}
 } // namespace USB
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::USB::UsbSetPortRoleFuzzTest(data, size);
     return 0;

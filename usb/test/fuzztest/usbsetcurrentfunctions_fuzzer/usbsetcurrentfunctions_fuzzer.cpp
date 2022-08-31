@@ -14,27 +14,36 @@
  */
 
 #include "usbsetcurrentfunctions_fuzzer.h"
-#include "usbd_client.h"
 #include "hdf_log.h"
-#include "usb_errors.h"
+#include "usbcommonfunction_fuzzer.h"
+#include "v1_0/iusb_interface.h"
+
+using namespace OHOS::HDI::Usb::V1_0;
 
 namespace OHOS {
 namespace USB {
-    bool UsbSetCurrentFunctionsFuzzTest(const uint8_t* data, size_t size)
-    {
-        (void)size;
-        bool result = false;
-        int32_t ret = UsbdClient::GetInstance().SetCurrentFunctions(*(int32_t *)data);
-        if (ret == UEC_OK) {
-            HDF_LOGI("%{public}s: set interface succeed\n", __func__);
-            result = true;
-        }
-        return result;
+bool UsbSetCurrentFunctionsFuzzTest(const uint8_t *data, size_t size)
+{
+    (void)size;
+    sptr<IUsbInterface> usbInterface = IUsbInterface::Get();
+    int32_t ret = usbInterface->SetPortRole(DEFAULT_PORT_ID, DEFAULT_ROLE_DEVICE, DEFAULT_ROLE_DEVICE);
+    sleep(SLEEP_TIME);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: set port role as host failed", __func__);
+        return ret;
     }
+
+    int32_t func = *(int32_t *)data;
+    ret = usbInterface->SetCurrentFunctions(func);
+    if (ret == HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: set interface succeed", __func__);
+    }
+    return true;
+}
 } // namespace USB
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::USB::UsbSetCurrentFunctionsFuzzTest(data, size);
     return 0;
