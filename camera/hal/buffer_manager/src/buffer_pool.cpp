@@ -133,7 +133,7 @@ RetCode BufferPool::DestroyBuffer()
         idleList_.clear();
 
         if (busyList_.size() > 0) {
-            CAMERA_LOGE("%{public}u buffer(s) is/are in use.", busyList_.size());
+            CAMERA_LOGE("%{public}zu buffer(s) is/are in use.", busyList_.size());
         }
         for (auto it : busyList_) {
             RetCode ret = bufferAllocator_->UnmapBuffer(it);

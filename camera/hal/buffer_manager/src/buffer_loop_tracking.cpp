@@ -303,7 +303,7 @@ void BufferLoopTracking::AddTrackingStreamBegin(const int32_t trackingId, const 
 
     auto pool = manager->GetBufferPool(poolId);
     if (pool == nullptr) {
-        CAMERA_LOGE("can't get buffer pool, id = %{public}lld", poolId);
+        CAMERA_LOGE("can't get buffer pool, id = %{public}" PRId64 "", poolId);
         return;
     }
     pool->EnableTracking(trackingId);
@@ -406,7 +406,7 @@ void BufferLoopTracking::HandleMessage()
     auto buffer = std::make_shared<TrackingBuffer>(message->frameNumber);
     if (message->isReturnBack) {
         stream->RemoveBuffer(buffer);
-        CAMERA_LOGI("buffer %{public}llu return back to pool.", message->frameNumber);
+        CAMERA_LOGI("buffer %{public}" PRIu64 " return back to pool.", message->frameNumber);
         return;
     }
 
