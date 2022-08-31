@@ -121,7 +121,10 @@ DCamRetCode DCameraStream::ReleaseDCameraBufferQueue()
         dcStreamInfo_->bufferQueue_->producer_ = nullptr;
     }
     dcStreamInfo_->bufferQueue_ = nullptr;
-    dcStreamProducer_ = nullptr;
+    if (dcStreamProducer_ != nullptr) {
+        dcStreamProducer_->CleanCache();
+        dcStreamProducer_ = nullptr;
+    }
     dcStreamBufferMgr_ = nullptr;
 
     return DCamRetCode::SUCCESS;
@@ -336,17 +339,8 @@ DCamRetCode DCameraStream::FlushDCameraBuffer()
                 return DCamRetCode::INVALID_ARGUMENT;
             }
             auto surfaceBuffer = std::get<0>(bufCfg->second);
-            int32_t fence = std::get<1>(bufCfg->second);
-            OHOS::BufferFlushConfig flushConf = {
-                .damage = {
-                    .x = 0,
-                    .y = 0,
-                    .w = dcStreamInfo_->width_,
-                    .h = dcStreamInfo_->height_ },
-                .timestamp = 0
-            };
             if (dcStreamProducer_ != nullptr) {
-                dcStreamProducer_->FlushBuffer(surfaceBuffer, fence, flushConf);
+                dcStreamProducer_->CancelBuffer(surfaceBuffer);
             }
             bufferConfigMap_.erase(bufCfg);
         } else {

@@ -1,8 +1,14 @@
 {
-  "name": "drivers_peripheral_input",
+  "name": "@ohos/drivers_peripheral_input",
   "description": "input device driver",
   "version": "3.1",
   "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/input"
+  },
+  "dirs": {},
+  "scripts": {},
   "component": {
     "name": "drivers_peripheral_input",
     "subsystem": "hdf",
@@ -18,7 +24,7 @@
         "graphic_standard",
         "utils_base"
       ],
-      "third_part": [
+      "third_party": [
         "bounds_checking_function",
         "googletest"
       ]

@@ -21,7 +21,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/sample",
-      "//utils/native/base/include",
+      "//commonlibrary/utils_lite/include",
       "//third_party/bounds_checking_function/include",
     ]
 
@@ -42,7 +42,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/sample",
-      "//utils/native/base/include",
+      "//commonlibrary/utils_lite/include",
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
     ]

@@ -1,8 +1,14 @@
 {
-  "name": "drivers_peripheral_display",
+  "name": "@ohos/drivers_peripheral_display",
   "description": "display device driver",
   "version": "3.1",
   "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/display"
+  },
+  "dirs": {},
+  "scripts": {},
   "component": {
     "name": "drivers_peripheral_display",
     "subsystem": "hdf",
@@ -17,11 +23,9 @@
         "hiviewdfx_hilog_native",
         "utils_base"
       ],
-      "third_part": [
+      "third_party": [
         "bounds_checking_function",
         "libdrm",
-        "wayland_standard",
-        "weston",
         "googletest"
       ]
     },

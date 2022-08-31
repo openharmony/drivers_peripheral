@@ -22,7 +22,6 @@ ForkNode::ForkNode(const std::string& name, const std::string& type) : NodeBase(
 
 ForkNode::~ForkNode()
 {
-    StopForkThread();
 }
 
 RetCode ForkNode::Start(const int32_t streamId)
@@ -62,7 +61,6 @@ RetCode ForkNode::Start(const int32_t streamId)
     }
 
     streamId_ = id;
-    RunForkThread();
     streamRunning_ = true;
 
     return RC_OK;
@@ -76,7 +74,6 @@ RetCode ForkNode::Stop(const int32_t streamId)
         return RC_OK;
     }
 
-    StopForkThread();
     DrainForkBufferPool();
 
     streamRunning_ = false;
@@ -87,7 +84,6 @@ RetCode ForkNode::Stop(const int32_t streamId)
 RetCode ForkNode::Flush(const int32_t streamId)
 {
     if (streamId_ == streamId) {
-        StopForkThread();
         DrainForkBufferPool();
     }
 
@@ -102,24 +98,38 @@ void ForkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
     }
 
     if (buffer->GetBufferStatus() == CAMERA_BUFFER_STATUS_OK && bufferPool_ != nullptr) {
-        std::unique_lock <std::mutex> lck(mtx_);
-        // If previous pending buffer was not handled, do not replace it.
-        if (pendingBuffer_ == nullptr) {
-            pendingBuffer_ = bufferPool_->AcquireBuffer(0);
-            if (pendingBuffer_ != nullptr) {
-                if (memcpy_s(pendingBuffer_->GetVirAddress(), pendingBuffer_->GetSize(),
-                    buffer->GetVirAddress(), buffer->GetSize()) != 0) {
-                    pendingBuffer_->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
-                    CAMERA_LOGE("memcpy_s failed.");
+        std::shared_ptr<IBuffer> forkBuffer = bufferPool_->AcquireBuffer(0);
+        if (forkBuffer != nullptr) {
+            if (memcpy_s(forkBuffer->GetVirAddress(), forkBuffer->GetSize(),
+                buffer->GetVirAddress(), buffer->GetSize()) != 0) {
+                forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
+                CAMERA_LOGW("memcpy_s failed.");
+            }
+            for (auto& it : outPutPorts_) {
+                if (it->format_.streamId_ != streamId_) {
+                    continue;
                 }
-                cv_.notify_all();
+                CAMERA_LOGI("deliver fork buffer for streamid = %{public}d", it->format_.streamId_);
+                int32_t id = forkBuffer->GetStreamId();
+                {
+                    std::lock_guard<std::mutex> l(requestLock_);
+                    CAMERA_LOGV("deliver a fork buffer of stream id:%{public}d, queue size:%{public}u",
+                        id, captureRequests_[id].size());
+                    if (captureRequests_.count(id) == 0 || captureRequests_[id].empty()) {
+                        forkBuffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
+                    } else {
+                        forkBuffer->SetCaptureId(captureRequests_[id].front());
+                        captureRequests_[id].pop_front();
+                    }
+                }
+                it->DeliverBuffer(forkBuffer);
+                break;
             }
         }
     }
 
-    int32_t id = buffer->GetStreamId();
     for (auto& it : outPutPorts_) {
-        if (it->format_.streamId_ == id) {
+        if (it->format_.streamId_ == buffer->GetStreamId()) {
             it->DeliverBuffer(buffer);
             CAMERA_LOGI("fork node deliver buffer streamid = %{public}d", it->format_.streamId_);
             return;
@@ -152,80 +162,8 @@ RetCode ForkNode::Capture(const int32_t streamId, const int32_t captureId)
 RetCode ForkNode::CancelCapture(const int32_t streamId)
 {
     CAMERA_LOGI("ForkNode::CancelCapture streamid = %{public}d", streamId);
-    cv_.notify_all();
 
     return RC_OK;
-}
-
-void ForkNode::RunForkThread()
-{
-    if (forkThread_ != nullptr) {
-        CAMERA_LOGI("Fork thread is running.");
-        return;
-    }
-
-    forkThreadRunFlag_ = true;
-
-    forkThread_ = std::make_shared<std::thread>([this] {
-        prctl(PR_SET_NAME, "deliver_fork_buffers");
-        std::shared_ptr<IBuffer> buffer = nullptr;
-        int32_t id = streamId_;
-
-        while (true) {
-            {
-                std::unique_lock <std::mutex> lck(mtx_);
-                // Break the loop when stream was stopped and there was no pending buffer.
-                if (!forkThreadRunFlag_ && (pendingBuffer_ == nullptr)) {
-                    break;
-                }
-
-                if (pendingBuffer_ == nullptr) {
-                    cv_.wait(lck);
-                    continue; // rewind to the front of loop to check breaking condition.
-                }
-                // go ahead to deliver buffer.
-                buffer = pendingBuffer_;
-                pendingBuffer_ = nullptr;
-            }
-
-            for (auto& it : outPutPorts_) {
-                if (it->format_.streamId_ == id) {
-                    CAMERA_LOGI("fork node deliver buffer streamid = %{public}d begin", it->format_.streamId_);
-
-                    int32_t id = buffer->GetStreamId();
-                    {
-                        std::lock_guard<std::mutex> l(requestLock_);
-                        CAMERA_LOGV("ForkNode::deliver a buffer to stream id:%{public}d, queue size:%{public}u",
-                            id, captureRequests_[id].size());
-                        if (captureRequests_.count(id) == 0 || captureRequests_[id].empty()) {
-                            buffer->SetBufferStatus(CAMERA_BUFFER_STATUS_INVALID);
-                        } else {
-                            buffer->SetCaptureId(captureRequests_[id].front());
-                            captureRequests_[id].pop_front();
-                        }
-                    }
-                    it->DeliverBuffer(buffer);
-                    break;
-                }
-            }
-        }
-	CAMERA_LOGI("ForkNode RunForkThread closed");
-        return RC_OK;
-    });
-    return;
-}
-
-void ForkNode::StopForkThread()
-{
-    if (forkThread_ != nullptr) {
-        {
-            std::unique_lock <std::mutex> lck(mtx_);
-            forkThreadRunFlag_ = false;
-            cv_.notify_all();
-        }
-        forkThread_->join();
-        forkThread_ = nullptr;
-    }
 }
 
 void ForkNode::DrainForkBufferPool()

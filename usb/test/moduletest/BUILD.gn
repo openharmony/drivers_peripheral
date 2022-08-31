@@ -55,9 +55,9 @@ if (defined(ohos_lite)) {
     ]
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//commonlibrary/utils_lite:utils",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//utils/native/lite:utils",
     ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
   }
@@ -96,9 +96,9 @@ if (defined(ohos_lite)) {
     ]
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//commonlibrary/utils_lite:utils",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//utils/native/lite:utils",
     ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
   }
@@ -137,9 +137,9 @@ if (defined(ohos_lite)) {
     ]
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//commonlibrary/utils_lite:utils",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//utils/native/lite:utils",
     ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
   }
@@ -168,9 +168,9 @@ if (defined(ohos_lite)) {
     ]
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//commonlibrary/utils_lite:utils",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//utils/native/lite:utils",
     ]
   }
 
@@ -198,9 +198,9 @@ if (defined(ohos_lite)) {
     ]
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//commonlibrary/utils_lite:utils",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//utils/native/lite:utils",
     ]
   }
 

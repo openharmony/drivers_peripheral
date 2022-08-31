@@ -31,13 +31,12 @@ ohos_unittest("PinAuthHdiUtTest") {
   deps = [
     "//base/useriam/user_auth_framework/common:iam_test",
     "//drivers/peripheral/pin_auth/hdi_service:libpin_auth_interface_service_1.0",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "utils_base:utils",
   ]
 }

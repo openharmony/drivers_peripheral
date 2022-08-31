@@ -1,8 +1,14 @@
 {
-  "name": "drivers_peripheral_audio",
+  "name": "@ohos/drivers_peripheral_audio",
   "description": "audio device driver",
   "version": "3.1",
   "license": "Apache License 2.0",
+  "publishAs": "code-segment",
+  "segment": {
+    "destPath": "drivers/peripheral/audio"
+  },
+  "dirs": {},
+  "scripts": {},
   "component": {
     "name": "drivers_peripheral_audio",
     "subsystem": "hdf",
@@ -25,7 +31,7 @@
         "hdf_core",
         "utils_base"
       ],
-      "third_part": [
+      "third_party": [
         "bounds_checking_function",
         "googletest"
       ]
