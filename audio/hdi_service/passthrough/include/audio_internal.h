@@ -459,6 +459,19 @@ int32_t AudioAdapterSetPassthroughMode(
     struct AudioAdapter *self, const struct AudioPort *port, enum AudioPortPassthroughMode mode);
 int32_t AudioAdapterGetPassthroughMode(
     struct AudioAdapter *adapter, const struct AudioPort *port, enum AudioPortPassthroughMode *mode);
+int32_t AudioAdapterGetDeviceStatus(struct AudioAdapter *adapter, struct AudioDeviceStatus *status);
+int32_t AudioAdapterUpdateAudioRoute(struct AudioAdapter *adapter, const struct AudioRoute *route,
+                                     int32_t *routeHandle);
+int32_t AudioAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t routeHandle);
+int32_t AudioAdapterSetMicMute(struct AudioAdapter *adapter, bool mute);
+int32_t AudioAdapterGetMicMute(struct AudioAdapter *adapter, bool* mute);
+int32_t AudioAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume);
+int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                   const char *condition, const char *value);
+int32_t AudioAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                   const char *condition, char *value, uint32_t lenth);
+int32_t AudioAdapterRegExtraParamObserver(struct AudioAdapter *adapter, struct AudioCallback *audioCallback,
+                                          int8_t cookie);
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
 int32_t AudioRenderStart(struct AudioRender *self);
 int32_t AudioRenderStop(struct AudioRender *self);
@@ -495,7 +508,12 @@ int32_t AudioRenderGetMmapPosition(struct AudioRender *self, uint64_t *frames, s
 int32_t AudioRenderTurnStandbyMode(struct AudioRender *self);
 int32_t AudioRenderAudioDevDump(struct AudioRender *self, int32_t range, int32_t fd);
 int32_t AudioRenderRegCallback(struct AudioRender *self, struct AudioCallback *audioCallback, int8_t cookie);
+int32_t AudioRenderIsSupportsDrain(struct AudioRender *render, bool *support);
 int32_t AudioRenderDrainBuffer(struct AudioRender *self, enum AudioDrainNotifyType *type);
+int32_t AudioRenderAddAudioEffect(struct AudioRender *render, uint64_t effectid);
+int32_t AudioRenderRemoveAudioEffect(struct AudioRender *render, uint64_t effectid);
+int32_t AudioRenderGetFrameBufferSize(struct AudioRender *render, uint64_t *bufferSize);
+int32_t AudioRenderIsSupportsPauseAndResume(struct AudioRender *render, bool *supportPause, bool *supportResume);
 int32_t AudioCaptureStart(struct AudioCapture *self);
 int32_t AudioCaptureStop(struct AudioCapture *self);
 int32_t AudioCapturePause(struct AudioCapture *self);
@@ -525,6 +543,10 @@ int32_t AudioCaptureReqMmapBuffer(
 int32_t AudioCaptureGetMmapPosition(struct AudioCapture *self, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioCaptureTurnStandbyMode(struct AudioCapture *self);
 int32_t AudioCaptureAudioDevDump(struct AudioCapture *self, int32_t range, int32_t fd);
+int32_t AudioCaptureAddAudioEffect(struct AudioCapture *handle, uint64_t effectid);
+int32_t AudioCaptureRemoveAudioEffect(struct AudioCapture *handle, uint64_t effectid);
+int32_t AudioCaptureGetFrameBufferSize(struct AudioCapture *handle, uint64_t* bufferSize);
+int32_t AudioCaptureIsSupportsPauseAndResume(struct AudioCapture *handle, bool* supportPause, bool* supportResume);
 int32_t CallbackProcessing(AudioHandle handle, enum AudioCallbackType callBackType);
 
 #ifdef __cplusplus
