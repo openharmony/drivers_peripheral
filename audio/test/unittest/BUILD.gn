@@ -33,9 +33,4 @@ group("audiotest") {
       "supportlibs:interface_lib",
     ]
   }
-
-  if (drivers_peripheral_audio_full_test_suite &&
-      !drivers_peripheral_audio_alsa_lib) {
-    deps += [ "adm:khdf_audio_adm_test" ]
-  }
 }

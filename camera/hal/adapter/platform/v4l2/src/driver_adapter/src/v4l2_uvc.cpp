@@ -153,7 +153,6 @@ RetCode HosV4L2UVC::V4L2UvcGetCap(const std::string v4l2Device, struct v4l2_capa
 RetCode HosV4L2UVC::V4L2UVCGetCapability(int fd, const std::string devName, std::string& cameraId)
 {
     struct v4l2_capability capability = {};
-    constexpr uint32_t removeCount = 5;
 
     int rc = ioctl(fd, VIDIOC_QUERYCAP, &capability);
     if (rc < 0) {

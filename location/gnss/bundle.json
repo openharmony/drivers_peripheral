@@ -1,8 +1,14 @@
 {
-    "name": "drivers_peripheral_location_gnss",
+    "name": "@ohos/drivers_peripheral_location_gnss",
     "description": "location gnss hdf",
     "version": "1.0",
     "license": "Apache License 2.0",
+    "publishAs": "code-segment",
+    "segment": {
+      "destPath": "drivers/peripheral/location/gnss"
+    },
+    "dirs": {},
+    "scripts": {},
     "component": {
       "name": "drivers_peripheral_location_gnss",
       "subsystem": "hdf",
@@ -17,7 +23,7 @@
           "hiviewdfx_hilog_native",
           "utils_base"
         ],
-        "third_part": []
+        "third_party": []
       },
       "build": {
         "sub_component": [
