@@ -273,7 +273,9 @@ static int32_t TestCmdLoop(int32_t cmdType, const char *param)
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
 static void *SigHandle(void *arg)
 {
+    (void)arg;
     run = 0;
+    return NULL;
 }
 
 static int32_t GetCharThread(void *arg)
