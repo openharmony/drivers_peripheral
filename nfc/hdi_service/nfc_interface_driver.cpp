@@ -21,8 +21,8 @@
 
 #define HDF_LOG_TAG hdf_nfc_dal
 
-using namespace OHOS::HDI::Nfc::NfcCore::V1_0;
-using namespace OHOS::HDI::Nfc::NfcCore;
+using namespace OHOS::HDI::Nfc::V1_0;
+using namespace OHOS::HDI::Nfc;
 
 struct HdfNfcInterfaceHost {
     struct IDeviceIoService ioservice;
@@ -105,7 +105,7 @@ static void HdfNfcInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
     HDF_LOGI("HdfNfcInterfaceDriverRelease Success");
 }
 
-struct HdfDriverEntry g_nfcinterfaceDriverEntry = {
+static struct HdfDriverEntry g_nfcinterfaceDriverEntry = {
     .moduleVersion = 1,
     .moduleName = "nfc_service",
     .Bind = HdfNfcInterfaceDriverBind,

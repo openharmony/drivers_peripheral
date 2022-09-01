@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_NFC_NFC_CORE_V1_0_NFCIMPL_H
-#define OHOS_HDI_NFC_NFC_CORE_V1_0_NFCIMPL_H
+#ifndef OHOS_HDI_NFC_V1_0_NFCIMPL_H
+#define OHOS_HDI_NFC_V1_0_NFCIMPL_H
 
 #include "nfc_vendor_adaptions.h"
 #include "v1_0/infc_interface.h"
@@ -22,7 +22,6 @@
 namespace OHOS {
 namespace HDI {
 namespace Nfc {
-namespace NfcCore {
 namespace V1_0 {
 class NfcImpl : public INfcInterface {
 public:
@@ -39,9 +38,8 @@ private:
     NfcVendorAdaptions adaptor_;
 };
 } // V1_0
-} // NfcCore
 } // Nfc
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_NFC_NFC_CORE_V1_0_NFCIMPL_H
+#endif // OHOS_HDI_NFC_V1_0_NFCIMPL_H
