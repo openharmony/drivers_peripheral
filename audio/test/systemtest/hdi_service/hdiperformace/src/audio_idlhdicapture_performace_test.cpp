@@ -36,19 +36,19 @@ public:
     static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
     static void *handle;
-    static void (*AudioManagerRelease)(struct AudioManager *);
-    static void (*AudioAdapterRelease)(struct AudioAdapter *);
-    static void (*AudioCaptureRelease)(struct AudioCapture *);
+    static void (*AudioManagerRelease)(struct IAudioManager *);
+    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
+    static void (*AudioCaptureRelease)(struct IAudioCapture *);
     static int32_t CreateCapture(TestAudioManager *manager, int pins, const std::string &adapterName,
-        struct AudioAdapter **adapter, struct AudioCapture **capture);
+        struct IAudioAdapter **adapter, struct IAudioCapture **capture);
 };
 
 TestAudioManager *(*AudioIdlHdiCapturePerformaceTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiCapturePerformaceTest::manager = nullptr;
 void *AudioIdlHdiCapturePerformaceTest::handle = nullptr;
-void (*AudioIdlHdiCapturePerformaceTest::AudioManagerRelease)(struct AudioManager *) = nullptr;
-void (*AudioIdlHdiCapturePerformaceTest::AudioAdapterRelease)(struct AudioAdapter *) = nullptr;
-void (*AudioIdlHdiCapturePerformaceTest::AudioCaptureRelease)(struct AudioCapture *) = nullptr;
+void (*AudioIdlHdiCapturePerformaceTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
+void (*AudioIdlHdiCapturePerformaceTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
+void (*AudioIdlHdiCapturePerformaceTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
 void AudioIdlHdiCapturePerformaceTest::SetUpTestCase(void)
 {
     char absPath[PATH_MAX] = {0};
@@ -61,11 +61,11 @@ void AudioIdlHdiCapturePerformaceTest::SetUpTestCase(void)
     (void)HdfRemoteGetCallingPid();
     manager = GetAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(handle, "AudioManagerRelease"));
+    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handle, "AudioManagerRelease"));
     ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(handle, "AudioAdapterRelease"));
+    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handle, "AudioAdapterRelease"));
     ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct AudioCapture *))(dlsym(handle, "AudioCaptureRelease"));
+    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handle, "AudioCaptureRelease"));
     ASSERT_NE(nullptr, AudioCaptureRelease);
 }
 
@@ -88,7 +88,7 @@ void AudioIdlHdiCapturePerformaceTest::SetUp(void) {}
 
 void AudioIdlHdiCapturePerformaceTest::TearDown(void) {}
 int32_t AudioIdlHdiCapturePerformaceTest::CreateCapture(TestAudioManager *manager, int pins,
-    const std::string &adapterName, struct AudioAdapter **adapter, struct AudioCapture **capture)
+    const std::string &adapterName, struct IAudioAdapter **adapter, struct IAudioCapture **capture)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};

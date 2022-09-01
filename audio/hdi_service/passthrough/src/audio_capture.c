@@ -22,7 +22,7 @@
 #include "audio_interface_lib_capture.h"
 #include "audio_internal.h"
 #include "audio_uhdf_log.h"
-#include "v1_0/audio_capture.h"
+#include "v1_0/iaudio_capture.h"
 
 #define HDF_LOG_TAG AUDIO_HDI_IMPL
 
@@ -32,7 +32,7 @@
 #define CONFIG_FRAME_COUNT ((8000 * 2 + ((CONFIG_FRAME_SIZE) - 1)) / (CONFIG_FRAME_SIZE))
 
 /* add For Capture Bytes To Frames */
-int32_t AudioCaptureStart(struct AudioCapture *handle)
+int32_t AudioCaptureStart(struct IAudioCapture *handle)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
@@ -46,7 +46,7 @@ int32_t AudioCaptureStart(struct AudioCapture *handle)
         return AUDIO_ERR_INTERNAL;
     }
     if (hwCapture->captureParam.frameCaptureMode.buffer != NULL) {
-        AUDIO_FUNC_LOGE("AudioCapture already start!");
+        AUDIO_FUNC_LOGE("IAudioCapture already start!");
         return AUDIO_ERR_AI_BUSY; // capture is busy now
     }
     if (hwCapture->devDataHandle == NULL) {
@@ -73,7 +73,7 @@ int32_t AudioCaptureStart(struct AudioCapture *handle)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureStop(struct AudioCapture *handle)
+int32_t AudioCaptureStop(struct IAudioCapture *handle)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
@@ -108,7 +108,7 @@ int32_t AudioCaptureStop(struct AudioCapture *handle)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCapturePause(struct AudioCapture *handle)
+int32_t AudioCapturePause(struct IAudioCapture *handle)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
@@ -116,7 +116,7 @@ int32_t AudioCapturePause(struct AudioCapture *handle)
         return AUDIO_ERR_INVALID_PARAM;
     }
     if (hwCapture->captureParam.frameCaptureMode.buffer == NULL) {
-        AUDIO_FUNC_LOGE("AudioCapture already stop!");
+        AUDIO_FUNC_LOGE("IAudioCapture already stop!");
         return AUDIO_ERR_INTERNAL;
     }
     if (hwCapture->captureParam.captureMode.ctlParam.pause) {
@@ -149,7 +149,7 @@ int32_t AudioCapturePause(struct AudioCapture *handle)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureResume(struct AudioCapture *handle)
+int32_t AudioCaptureResume(struct IAudioCapture *handle)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
@@ -186,7 +186,7 @@ int32_t AudioCaptureResume(struct AudioCapture *handle)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureFlush(struct AudioCapture *handle)
+int32_t AudioCaptureFlush(struct IAudioCapture *handle)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
@@ -196,7 +196,7 @@ int32_t AudioCaptureFlush(struct AudioCapture *handle)
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioCaptureGetFrameSize(struct AudioCapture *handle, uint64_t *size)
+int32_t AudioCaptureGetFrameSize(struct IAudioCapture *handle, uint64_t *size)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || size == NULL) {
@@ -217,7 +217,7 @@ int32_t AudioCaptureGetFrameSize(struct AudioCapture *handle, uint64_t *size)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureGetFrameCount(struct AudioCapture *handle, uint64_t *count)
+int32_t AudioCaptureGetFrameCount(struct IAudioCapture *handle, uint64_t *count)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || count == NULL) {
@@ -229,7 +229,7 @@ int32_t AudioCaptureGetFrameCount(struct AudioCapture *handle, uint64_t *count)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureSetSampleAttributes(struct AudioCapture *handle, const struct AudioSampleAttributes *attrs)
+int32_t AudioCaptureSetSampleAttributes(struct IAudioCapture *handle, const struct AudioSampleAttributes *attrs)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || attrs == NULL) {
@@ -267,7 +267,7 @@ int32_t AudioCaptureSetSampleAttributes(struct AudioCapture *handle, const struc
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureGetSampleAttributes(struct AudioCapture *handle, struct AudioSampleAttributes *attrs)
+int32_t AudioCaptureGetSampleAttributes(struct IAudioCapture *handle, struct AudioSampleAttributes *attrs)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || attrs == NULL) {
@@ -289,7 +289,7 @@ int32_t AudioCaptureGetSampleAttributes(struct AudioCapture *handle, struct Audi
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureGetCurrentChannelId(struct AudioCapture *handle, uint32_t *channelId)
+int32_t AudioCaptureGetCurrentChannelId(struct IAudioCapture *handle, uint32_t *channelId)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || channelId == NULL) {
@@ -302,7 +302,7 @@ int32_t AudioCaptureGetCurrentChannelId(struct AudioCapture *handle, uint32_t *c
 }
 
 int32_t AudioCaptureCheckSceneCapability(
-    struct AudioCapture *handle, const struct AudioSceneDescriptor *scene, bool *supported)
+    struct IAudioCapture *handle, const struct AudioSceneDescriptor *scene, bool *supported)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || scene == NULL || supported == NULL) {
@@ -339,7 +339,7 @@ int32_t AudioCaptureCheckSceneCapability(
 #endif
 }
 
-int32_t AudioCaptureSelectScene(struct AudioCapture *handle, const struct AudioSceneDescriptor *scene)
+int32_t AudioCaptureSelectScene(struct IAudioCapture *handle, const struct AudioSceneDescriptor *scene)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || scene == NULL) {
@@ -391,7 +391,7 @@ int32_t AudioCaptureSelectScene(struct AudioCapture *handle, const struct AudioS
 #endif
 }
 
-int32_t AudioCaptureSetMute(struct AudioCapture *handle, bool mute)
+int32_t AudioCaptureSetMute(struct IAudioCapture *handle, bool mute)
 {
     struct AudioHwCapture *impl = (struct AudioHwCapture *)handle;
     if (impl == NULL) {
@@ -424,7 +424,7 @@ int32_t AudioCaptureSetMute(struct AudioCapture *handle, bool mute)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureGetMute(struct AudioCapture *handle, bool *mute)
+int32_t AudioCaptureGetMute(struct IAudioCapture *handle, bool *mute)
 {
     struct AudioHwCapture *impl = (struct AudioHwCapture *)handle;
     if (impl == NULL || mute == NULL) {
@@ -455,7 +455,7 @@ int32_t AudioCaptureGetMute(struct AudioCapture *handle, bool *mute)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureSetVolume(struct AudioCapture *handle, float volume)
+int32_t AudioCaptureSetVolume(struct IAudioCapture *handle, float volume)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL) {
@@ -502,7 +502,7 @@ int32_t AudioCaptureSetVolume(struct AudioCapture *handle, float volume)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureGetVolume(struct AudioCapture *handle, float *volume)
+int32_t AudioCaptureGetVolume(struct IAudioCapture *handle, float *volume)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || volume == NULL) {
@@ -543,7 +543,7 @@ int32_t AudioCaptureGetVolume(struct AudioCapture *handle, float *volume)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureGetGainThreshold(struct AudioCapture *handle, float *min, float *max)
+int32_t AudioCaptureGetGainThreshold(struct IAudioCapture *handle, float *min, float *max)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
     if (hwCapture == NULL || min == NULL || max == NULL) {
@@ -573,7 +573,7 @@ int32_t AudioCaptureGetGainThreshold(struct AudioCapture *handle, float *min, fl
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureGetGain(struct AudioCapture *handle, float *gain)
+int32_t AudioCaptureGetGain(struct IAudioCapture *handle, float *gain)
 {
     struct AudioHwCapture *impl = (struct AudioHwCapture *)handle;
     if (impl == NULL || gain == NULL) {
@@ -602,7 +602,7 @@ int32_t AudioCaptureGetGain(struct AudioCapture *handle, float *gain)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureSetGain(struct AudioCapture *handle, float gain)
+int32_t AudioCaptureSetGain(struct IAudioCapture *handle, float gain)
 {
     struct AudioHwCapture *impl = (struct AudioHwCapture *)handle;
     if (impl == NULL || gain < 0) {
@@ -706,7 +706,8 @@ void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
     }
 }
 
-int32_t AudioCaptureCaptureFrame(struct AudioCapture *capture, int8_t *frame, uint32_t *frameLen, uint64_t requestBytes)
+int32_t AudioCaptureCaptureFrame(
+    struct IAudioCapture *capture, int8_t *frame, uint32_t *frameLen, uint64_t requestBytes)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     if (hwCapture == NULL || frame == NULL || frameLen == NULL ||
@@ -759,7 +760,7 @@ int32_t AudioCaptureCaptureFrame(struct AudioCapture *capture, int8_t *frame, ui
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureGetCapturePosition(struct AudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time)
+int32_t AudioCaptureGetCapturePosition(struct IAudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time)
 {
     struct AudioHwCapture *impl = (struct AudioHwCapture *)capture;
     if (impl == NULL || frames == NULL || time == NULL) {
@@ -796,7 +797,7 @@ int32_t SetValueCapture(struct ExtraParams mExtraParams, struct AudioHwCapture *
     return HDF_SUCCESS;
 }
 
-int32_t AudioCaptureSetExtraParams(struct AudioCapture *handle, const char *keyValueList)
+int32_t AudioCaptureSetExtraParams(struct IAudioCapture *handle, const char *keyValueList)
 {
     int32_t check = 0;
     int32_t count = 0;
@@ -820,7 +821,7 @@ int32_t AudioCaptureSetExtraParams(struct AudioCapture *handle, const char *keyV
     }
 }
 
-int32_t AudioCaptureGetExtraParams(struct AudioCapture *handle, char *keyValueList, uint32_t listLenth)
+int32_t AudioCaptureGetExtraParams(struct IAudioCapture *handle, char *keyValueList, uint32_t listLenth)
 {
     int32_t ret;
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
@@ -941,7 +942,7 @@ int32_t AudioCaptureReqMmapBufferInit(
 }
 
 int32_t AudioCaptureReqMmapBuffer(
-    struct AudioCapture *handle, int32_t reqSize, const struct AudioMmapBufferDescripter *desc)
+    struct IAudioCapture *handle, int32_t reqSize, const struct AudioMmapBufferDescripter *desc)
 {
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL || capture->devDataHandle == NULL || desc == NULL) {
@@ -959,7 +960,7 @@ int32_t AudioCaptureReqMmapBuffer(
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureGetMmapPosition(struct AudioCapture *handle, uint64_t *frames, struct AudioTimeStamp *time)
+int32_t AudioCaptureGetMmapPosition(struct IAudioCapture *handle, uint64_t *frames, struct AudioTimeStamp *time)
 {
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL || frames == NULL || time == NULL) {
@@ -999,7 +1000,7 @@ int32_t AudioCaptureGetMmapPosition(struct AudioCapture *handle, uint64_t *frame
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureTurnStandbyMode(struct AudioCapture *handle)
+int32_t AudioCaptureTurnStandbyMode(struct IAudioCapture *handle)
 {
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL) {
@@ -1016,7 +1017,7 @@ int32_t AudioCaptureTurnStandbyMode(struct AudioCapture *handle)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureAudioDevDump(struct AudioCapture *handle, int32_t range, int32_t fd)
+int32_t AudioCaptureAudioDevDump(struct IAudioCapture *handle, int32_t range, int32_t fd)
 {
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL) {
@@ -1049,7 +1050,7 @@ int32_t AudioCaptureAudioDevDump(struct AudioCapture *handle, int32_t range, int
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioCaptureAddAudioEffect(struct AudioCapture *handle, uint64_t effectid)
+int32_t AudioCaptureAddAudioEffect(struct IAudioCapture *handle, uint64_t effectid)
 {
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL) {
@@ -1058,7 +1059,7 @@ int32_t AudioCaptureAddAudioEffect(struct AudioCapture *handle, uint64_t effecti
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioCaptureRemoveAudioEffect(struct AudioCapture *handle, uint64_t effectid)
+int32_t AudioCaptureRemoveAudioEffect(struct IAudioCapture *handle, uint64_t effectid)
 {
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL) {
@@ -1067,7 +1068,7 @@ int32_t AudioCaptureRemoveAudioEffect(struct AudioCapture *handle, uint64_t effe
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioCaptureGetFrameBufferSize(struct AudioCapture *handle, uint64_t* bufferSize)
+int32_t AudioCaptureGetFrameBufferSize(struct IAudioCapture *handle, uint64_t* bufferSize)
 {
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL) {
@@ -1075,7 +1076,7 @@ int32_t AudioCaptureGetFrameBufferSize(struct AudioCapture *handle, uint64_t* bu
     }
     return AUDIO_ERR_NOT_SUPPORT;
 }
-int32_t AudioCaptureIsSupportsPauseAndResume(struct AudioCapture *handle, bool* supportPause, bool* supportResume)
+int32_t AudioCaptureIsSupportsPauseAndResume(struct IAudioCapture *handle, bool* supportPause, bool* supportResume)
 {
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL) {
@@ -1083,7 +1084,7 @@ int32_t AudioCaptureIsSupportsPauseAndResume(struct AudioCapture *handle, bool* 
     }
     return AUDIO_ERR_NOT_SUPPORT;
 }
-void AudioCaptureRelease(struct AudioCapture *instance)
+void AudioCaptureRelease(struct IAudioCapture *instance)
 {
     (void)instance;
 }
