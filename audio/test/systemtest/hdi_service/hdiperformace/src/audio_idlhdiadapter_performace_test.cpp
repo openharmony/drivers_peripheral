@@ -88,12 +88,12 @@ void AudioIdlHdiAdapterPerformaceTest::SetUp(void) {}
 
 void AudioIdlHdiAdapterPerformaceTest::TearDown(void) {}
 /**
-* @tc.name  Audio_HDI_ManagerInitAllPorts_Performance_001
+* @tc.name  AudioManagerInitAllPortsPerformance_001
 * @tc.desc  tests the performace of InitAllPorts interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_ManagerInitAllPorts_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioManagerInitAllPortsPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -115,12 +115,12 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_ManagerInitAllPorts_Perform
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  Audio_HDI_GetPortCapability_Performance_001
+* @tc.name  AudioGetPortCapabilityPerformance_001
 * @tc.desc  tests the performace of GetPortCapability interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_GetPortCapability_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioGetPortCapabilityPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -151,12 +151,12 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_GetPortCapability_Performan
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  Audio_HDI_SetPassthroughMode_Performance_001
+* @tc.name  AudioSetPassthroughModePerformance_001
 * @tc.desc  tests the performace of SetPassthroughMode interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_SetPassthroughMode_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioSetPassthroughModePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -182,12 +182,12 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_SetPassthroughMode_Performa
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  Audio_HDI_GetPassthroughMode_Performance_001
+* @tc.name  AudioGetPassthroughModePerformance_001
 * @tc.desc  tests the performace of GetPassthroughMode interface by executing 1000 times,
 * and calculates the delay time and average of Delay Time.
 * @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_GetPassthroughMode_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioGetPassthroughModePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -214,12 +214,12 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_GetPassthroughMode_Performa
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  Audio_HDI_CreateRender_Performance_001
+* @tc.name  AudioCreateRenderPerformance_001
 * @tc.desc  tests the performace of CreateRender interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_CreateRender_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioCreateRenderPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -248,12 +248,12 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_CreateRender_Performance_00
     EXPECT_GT(HIGHLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  Audio_HDI_DestroyRender_Performance_001
+* @tc.name  AudioDestroyRenderPerformance_001
 * @tc.desc  tests the performace of DestroyRender interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_DestroyRender_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioDestroyRenderPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -279,12 +279,12 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_DestroyRender_Performance_0
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  Audio_HDI_CreateCapture_Performance_001
+* @tc.name  AudioCreateCapturePerformance_001
 * @tc.desc  tests the performace of AudioCreateCapture interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_CreateCapture_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioCreateCapturePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -311,12 +311,12 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_CreateCapture_Performance_0
     EXPECT_GT(HIGHLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  Audio_HDI_DestroyCapture_Performance_001
+* @tc.name  AudioDestroyCapturePerformance_001
 * @tc.desc  tests the performace of AudioDestroyCapture interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
 * @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiAdapterPerformaceTest, Audio_HDI_DestroyCapture_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioDestroyCapturePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
