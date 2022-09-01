@@ -720,7 +720,7 @@ static int32_t WriteConfPowerAttributes(const char *devName, struct UsbFnConfigu
     int32_t ret;
     char configName[MAX_PATHLEN];
     char tmp[MAX_PATHLEN], val[MAX_NAMELEN];
-    memset_s(configName, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(configName, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(configName, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/configs/b.%u", CONFIGFS_DIR, devName, confVal);
     if (ret < 0) {
         return HDF_ERR_IO;
@@ -731,12 +731,12 @@ static int32_t WriteConfPowerAttributes(const char *devName, struct UsbFnConfigu
             return HDF_ERR_IO;
         }
     }
-    memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/MaxPower", configName);
     if (ret < 0) {
         return HDF_ERR_IO;
     }
-    memset_s(val, MAX_NAMELEN, 0, MAX_NAMELEN);
+    (void)memset_s(val, MAX_NAMELEN, 0, MAX_NAMELEN);
     ret = snprintf_s(val, MAX_NAMELEN, MAX_NAMELEN - 1, "%u", config->maxPower);
     if (ret < 0) {
         return HDF_ERR_IO;
@@ -746,12 +746,12 @@ static int32_t WriteConfPowerAttributes(const char *devName, struct UsbFnConfigu
         return HDF_ERR_INVALID_PARAM;
     }
 
-    memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/bmAttributes", configName);
     if (ret < 0) {
         return HDF_ERR_IO;
     }
-    memset_s(val, MAX_NAMELEN, 0, MAX_NAMELEN);
+    (void)memset_s(val, MAX_NAMELEN, 0, MAX_NAMELEN);
     ret = snprintf_s(val, MAX_NAMELEN, MAX_NAMELEN - 1, "0x%x", config->attributes);
     if (ret < 0) {
         return HDF_ERR_IO;
@@ -769,14 +769,14 @@ static int32_t CreatKernelFunc(const char *devName, const struct UsbFnFunction *
     char configPath[MAX_PATHLEN];
     char funcPath[MAX_PATHLEN];
 
-    memset_s(funcPath, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(funcPath, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(
         funcPath, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/functions/%s", CONFIGFS_DIR, devName, functions->funcName);
     if (ret < 0) {
         return HDF_ERR_IO;
     }
 
-    memset_s(configPath, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(configPath, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(configPath, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/configs/b.%u/%s", CONFIGFS_DIR, devName, confVal,
         functions->funcName);
     if (ret < 0) {
@@ -801,7 +801,7 @@ static int32_t CreatFunc(const char *devName, const struct UsbFnFunction *functi
         return HDF_ERR_IO;
     }
 
-    memset_s(interfaceName, MAX_NAMELEN, 0, MAX_NAMELEN);
+    (void)memset_s(interfaceName, MAX_NAMELEN, 0, MAX_NAMELEN);
     ret = snprintf_s(interfaceName, MAX_NAMELEN, MAX_NAMELEN - 1, "%s", functions->funcName);
     if (ret < 0) {
         return HDF_ERR_IO;
@@ -836,28 +836,28 @@ static void DelConfigDevice(const char *deviceName)
 {
     int32_t ret;
     char tmp[MAX_PATHLEN];
-    memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/configs", CONFIGFS_DIR, deviceName);
     if (ret < 0) {
         return;
     }
     DeleteFile(tmp);
 
-    memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/functions", CONFIGFS_DIR, deviceName);
     if (ret < 0) {
         return;
     }
     DeleteFile(tmp);
 
-    memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/strings", CONFIGFS_DIR, deviceName);
     if (ret < 0) {
         return;
     }
     DeleteFile(tmp);
 
-    memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s", CONFIGFS_DIR, deviceName);
     if (ret < 0) {
         return;
@@ -870,14 +870,14 @@ static void CleanConfigFs(const char *devName, const char *funcName)
     int32_t ret;
     char tmp[MAX_PATHLEN];
 
-    memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/configs/b.1/%s", CONFIGFS_DIR, devName, funcName);
     if (ret < 0) {
         return;
     }
     (void)remove(tmp);
 
-    memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/functions/%s", CONFIGFS_DIR, devName, funcName);
     if (ret < 0) {
         return;
@@ -904,7 +904,7 @@ static void UsbFnAdapterCleanDevice(const char *devName)
     DIR *dir = NULL;
     struct dirent *ptr = NULL;
 
-    memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
+    (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
     ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/functions/", CONFIGFS_DIR, devName);
     if (ret < 0) {
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
