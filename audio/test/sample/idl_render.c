@@ -27,7 +27,7 @@
 #include "hdf_remote_adapter_if.h"
 #include "inttypes.h"
 #include "osal_mem.h"
-#include "v1_0/audio_manager.h"
+#include "v1_0/iaudio_manager.h"
 
 #define AUDIO_FUNC_LOGE(fmt, arg...)                                                     \
     do {                                                                                 \
@@ -87,7 +87,7 @@ struct AudioHeadInfo {
 };
 
 struct StrPara {
-    struct AudioRender *render;
+    struct IAudioRender *render;
     FILE *file;
     struct AudioSampleAttributes attrs;
     uint64_t *replyBytes;
@@ -95,17 +95,17 @@ struct StrPara {
     int32_t bufferSize;
 };
 
-struct AudioRender *g_render = NULL;
-struct AudioAdapter *g_adapter = NULL;
-static struct AudioManager *g_audioManager = NULL;
+struct IAudioRender *g_render = NULL;
+struct IAudioAdapter *g_adapter = NULL;
+static struct IAudioManager *g_audioManager = NULL;
 struct AudioDeviceDescriptor g_devDesc;
 struct AudioSampleAttributes g_attrs;
 struct AudioPort g_audioPort;
 struct AudioHeadInfo g_wavHeadInfo;
 static struct StrPara g_str;
-void (*g_AudioManagerRelease)(struct AudioManager *) = NULL;
-void (*g_AudioAdapterRelease)(struct AudioAdapter *) = NULL;
-void (*g_AudioRenderRelease)(struct AudioRender *) = NULL;
+void (*g_AudioManagerRelease)(struct IAudioManager *) = NULL;
+void (*g_AudioAdapterRelease)(struct IAudioAdapter *) = NULL;
+void (*g_AudioRenderRelease)(struct IAudioRender *) = NULL;
 
 pthread_t g_tids;
 char *g_frame = NULL;
@@ -139,7 +139,7 @@ enum RenderInputType {
     INPUT_UINT32,
 };
 
-typedef int32_t (*AudioRenderOperation)(struct AudioRender **);
+typedef int32_t (*AudioRenderOperation)(struct IAudioRender **);
 
 struct ProcessRenderMenuSwitchList {
     enum RenderMenuId cmd;
@@ -349,7 +349,7 @@ uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
     return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> 3);
 }
 
-int32_t StopAudioFiles(struct AudioRender **renderS)
+int32_t StopAudioFiles(struct IAudioRender **renderS)
 {
     if (renderS == NULL) {
         return HDF_FAILURE;
@@ -364,7 +364,7 @@ int32_t StopAudioFiles(struct AudioRender **renderS)
         g_closeEnd = true;
         usleep(100000); // sleep 100000us
     }
-    struct AudioRender *render = *renderS;
+    struct IAudioRender *render = *renderS;
     if (render == NULL) {
         AUDIO_FUNC_LOGE("render is null");
         return HDF_FAILURE;
@@ -401,7 +401,7 @@ int32_t FrameStartMmap(const struct StrPara *param)
         return HDF_FAILURE;
     }
     const struct StrPara *strParam = param;
-    struct AudioRender *render = strParam->render;
+    struct IAudioRender *render = strParam->render;
     struct AudioMmapBufferDescripter mmapDesc;
     (void)signal(SIGINT, StreamClose);
     // get file length
@@ -456,7 +456,7 @@ int32_t FrameStart(const struct StrPara *param)
         return HDF_FAILURE;
     }
     const struct StrPara *strParam = param;
-    struct AudioRender *render = strParam->render;
+    struct IAudioRender *render = strParam->render;
     char *frame = strParam->frame;
     int32_t bufferSize = strParam->bufferSize;
     int32_t ret;
@@ -504,7 +504,7 @@ void FileClose(FILE **file)
     return;
 }
 
-int32_t InitPlayingAudioParam(struct AudioRender *render)
+int32_t InitPlayingAudioParam(struct IAudioRender *render)
 {
     if (render == NULL) {
         return HDF_FAILURE;
@@ -604,13 +604,13 @@ int32_t PlayingAudioInitFile(void)
     return HDF_SUCCESS;
 }
 
-int32_t PlayingAudioInitRender(struct AudioRender **renderTemp)
+int32_t PlayingAudioInitRender(struct IAudioRender **renderTemp)
 {
     if (renderTemp == NULL) {
         AUDIO_FUNC_LOGE("render is null");
         return HDF_FAILURE;
     }
-    struct AudioRender *render = NULL;
+    struct IAudioRender *render = NULL;
     int32_t ret = g_adapter->CreateRender(g_adapter, &g_devDesc, &g_attrs, &render);
     if (render == NULL || ret < 0 || render->RenderFrame == NULL) {
         AUDIO_FUNC_LOGE("AudioDeviceCreateRender failed or RenderFrame is null");
@@ -632,7 +632,7 @@ int32_t PlayingAudioInitRender(struct AudioRender **renderTemp)
     return HDF_SUCCESS;
 }
 
-int32_t PlayingAudioFiles(struct AudioRender **renderS)
+int32_t PlayingAudioFiles(struct IAudioRender **renderS)
 {
     if (renderS == NULL || g_adapter == NULL || g_adapter->CreateRender == NULL) {
         return HDF_FAILURE;
@@ -647,7 +647,7 @@ int32_t PlayingAudioFiles(struct AudioRender **renderS)
         FileClose(&g_file);
         return HDF_FAILURE;
     }
-    struct AudioRender *render = NULL;
+    struct IAudioRender *render = NULL;
     if (PlayingAudioInitRender(&render) < 0) {
         AUDIO_FUNC_LOGE("PlayingAudioInitRender fail");
         FileClose(&g_file);
@@ -792,15 +792,15 @@ int32_t GetManagerAndLoadAdapter(const char *adapterNameCase, struct AudioPort *
         return HDF_FAILURE;
     }
 
-    struct AudioManager *(*getAudioManager)(const char *) = NULL;
-    getAudioManager = (struct AudioManager *(*)(const char *))(dlsym(g_handle, "AudioManagerGetInstance"));
+    struct IAudioManager *(*getAudioManager)(const char *) = NULL;
+    getAudioManager = (struct IAudioManager *(*)(const char *))(dlsym(g_handle, "AudioManagerGetInstance"));
     if (getAudioManager == NULL) {
         return HDF_FAILURE;
     }
 
     (void)HdfRemoteGetCallingPid();
 
-    struct AudioManager *audioManagerIns = getAudioManager(SERVICE_NAME);
+    struct IAudioManager *audioManagerIns = getAudioManager(SERVICE_NAME);
     if (audioManagerIns == NULL) {
         AUDIO_FUNC_LOGE("Get audio Manager Fail");
         return HDF_FAILURE;
@@ -885,17 +885,17 @@ int32_t RenderGetAdapterAndInitEnvParams(const char *adapterNameCase)
 
 int32_t InitReleaseFun(void)
 {
-    g_AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(g_handle, "AudioManagerRelease"));
+    g_AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(g_handle, "AudioManagerRelease"));
     if (g_AudioManagerRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioManagerRelease fun ptr failed");
         return HDF_FAILURE;
     }
-    g_AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(g_handle, "AudioAdapterRelease"));
+    g_AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(g_handle, "AudioAdapterRelease"));
     if (g_AudioAdapterRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioAdapterRelease fun ptr failed");
         return HDF_FAILURE;
     }
-    g_AudioRenderRelease = (void (*)(struct AudioRender *))(dlsym(g_handle, "AudioRenderRelease"));
+    g_AudioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(g_handle, "AudioRenderRelease"));
     if (g_AudioRenderRelease == NULL) {
         AUDIO_FUNC_LOGE("get AudioRenderRelease fun ptr failed");
         return HDF_FAILURE;
@@ -938,7 +938,7 @@ int32_t InitParam(void)
     return HDF_SUCCESS;
 }
 
-int32_t SetRenderMute(struct AudioRender **render)
+int32_t SetRenderMute(struct IAudioRender **render)
 {
     (void)render;
     int32_t val;
@@ -972,7 +972,7 @@ int32_t SetRenderMute(struct AudioRender **render)
     return ret;
 }
 
-int32_t SetRenderVolume(struct AudioRender **render)
+int32_t SetRenderVolume(struct IAudioRender **render)
 {
     (void)render;
     int32_t ret;
@@ -1009,7 +1009,7 @@ int32_t SetRenderVolume(struct AudioRender **render)
     return ret;
 }
 
-int32_t GetRenderGain(struct AudioRender **render)
+int32_t GetRenderGain(struct IAudioRender **render)
 {
     (void)render;
     int32_t ret;
@@ -1028,7 +1028,7 @@ int32_t GetRenderGain(struct AudioRender **render)
     return HDF_SUCCESS;
 }
 
-int32_t SetRenderPause(struct AudioRender **render)
+int32_t SetRenderPause(struct IAudioRender **render)
 {
     (void)render;
     if (g_waitSleep) {
@@ -1049,7 +1049,7 @@ int32_t SetRenderPause(struct AudioRender **render)
     return HDF_SUCCESS;
 }
 
-int32_t SetRenderResume(struct AudioRender **render)
+int32_t SetRenderResume(struct IAudioRender **render)
 {
     (void)render;
     if (!g_waitSleep) {
@@ -1115,7 +1115,7 @@ int32_t SelectAttributesFomat(uint32_t *fomat)
     return HDF_SUCCESS;
 }
 
-int32_t SetRenderAttributes(struct AudioRender **render)
+int32_t SetRenderAttributes(struct IAudioRender **render)
 {
     (void)render;
     struct AudioSampleAttributes attrs;
@@ -1165,7 +1165,7 @@ int32_t SetRenderAttributes(struct AudioRender **render)
     return ret;
 }
 
-int32_t SelectRenderScene(struct AudioRender **render)
+int32_t SelectRenderScene(struct IAudioRender **render)
 {
     (void)render;
     system("clear");
@@ -1206,7 +1206,7 @@ int32_t SelectRenderScene(struct AudioRender **render)
     return ret;
 }
 
-int32_t GetExtParams(struct AudioRender **render)
+int32_t GetExtParams(struct IAudioRender **render)
 {
     (void)render;
     char keyValueList[BUFFER_LEN] = {0};
@@ -1224,7 +1224,7 @@ int32_t GetExtParams(struct AudioRender **render)
     return HDF_SUCCESS;
 }
 
-int32_t GetRenderMmapPosition(struct AudioRender **render)
+int32_t GetRenderMmapPosition(struct IAudioRender **render)
 {
     (void)render;
     int32_t ret;
