@@ -68,7 +68,7 @@ int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode,
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderStart(struct AudioRender *handle)
+int32_t AudioRenderStart(struct IAudioRender *handle)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
@@ -82,7 +82,7 @@ int32_t AudioRenderStart(struct AudioRender *handle)
         return AUDIO_ERR_INTERNAL;
     }
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
-        AUDIO_FUNC_LOGE("AudioRender already start!");
+        AUDIO_FUNC_LOGE("IAudioRender already start!");
         return AUDIO_ERR_AO_BUSY; // render is busy now
     }
     if (hwRender->devDataHandle == NULL) {
@@ -108,7 +108,7 @@ int32_t AudioRenderStart(struct AudioRender *handle)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderStop(struct AudioRender *handle)
+int32_t AudioRenderStop(struct IAudioRender *handle)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
@@ -144,7 +144,7 @@ int32_t AudioRenderStop(struct AudioRender *handle)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderPause(struct AudioRender *handle)
+int32_t AudioRenderPause(struct IAudioRender *handle)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
@@ -152,7 +152,7 @@ int32_t AudioRenderPause(struct AudioRender *handle)
         return AUDIO_ERR_INVALID_PARAM;
     }
     if (hwRender->renderParam.frameRenderMode.buffer == NULL) {
-        AUDIO_FUNC_LOGE("AudioRender already stop!");
+        AUDIO_FUNC_LOGE("IAudioRender already stop!");
         return AUDIO_ERR_INTERNAL;
     }
     if (hwRender->renderParam.renderMode.ctlParam.pause) {
@@ -185,7 +185,7 @@ int32_t AudioRenderPause(struct AudioRender *handle)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderResume(struct AudioRender *handle)
+int32_t AudioRenderResume(struct IAudioRender *handle)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
@@ -222,7 +222,7 @@ int32_t AudioRenderResume(struct AudioRender *handle)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderFlush(struct AudioRender *handle)
+int32_t AudioRenderFlush(struct IAudioRender *handle)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
@@ -237,7 +237,7 @@ int32_t AudioRenderFlush(struct AudioRender *handle)
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioRenderGetFrameSize(struct AudioRender *handle, uint64_t *size)
+int32_t AudioRenderGetFrameSize(struct IAudioRender *handle, uint64_t *size)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || size == NULL) {
@@ -257,7 +257,7 @@ int32_t AudioRenderGetFrameSize(struct AudioRender *handle, uint64_t *size)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderGetFrameCount(struct AudioRender *handle, uint64_t *count)
+int32_t AudioRenderGetFrameCount(struct IAudioRender *handle, uint64_t *count)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || count == NULL) {
@@ -268,7 +268,7 @@ int32_t AudioRenderGetFrameCount(struct AudioRender *handle, uint64_t *count)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderSetSampleAttributes(struct AudioRender *handle, const struct AudioSampleAttributes *attrs)
+int32_t AudioRenderSetSampleAttributes(struct IAudioRender *handle, const struct AudioSampleAttributes *attrs)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || attrs == NULL || hwRender->devDataHandle == NULL) {
@@ -301,7 +301,7 @@ int32_t AudioRenderSetSampleAttributes(struct AudioRender *handle, const struct 
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderGetSampleAttributes(struct AudioRender *handle, struct AudioSampleAttributes *attrs)
+int32_t AudioRenderGetSampleAttributes(struct IAudioRender *handle, struct AudioSampleAttributes *attrs)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || attrs == NULL) {
@@ -324,7 +324,7 @@ int32_t AudioRenderGetSampleAttributes(struct AudioRender *handle, struct AudioS
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderGetCurrentChannelId(struct AudioRender *handle, uint32_t *channelId)
+int32_t AudioRenderGetCurrentChannelId(struct IAudioRender *handle, uint32_t *channelId)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || channelId == NULL) {
@@ -336,7 +336,7 @@ int32_t AudioRenderGetCurrentChannelId(struct AudioRender *handle, uint32_t *cha
 }
 
 int32_t AudioRenderCheckSceneCapability(
-    struct AudioRender *handle, const struct AudioSceneDescriptor *scene, bool *supported)
+    struct IAudioRender *handle, const struct AudioSceneDescriptor *scene, bool *supported)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || scene == NULL || supported == NULL) {
@@ -373,7 +373,7 @@ int32_t AudioRenderCheckSceneCapability(
 #endif
 }
 
-int32_t AudioRenderSelectScene(struct AudioRender *handle, const struct AudioSceneDescriptor *scene)
+int32_t AudioRenderSelectScene(struct IAudioRender *handle, const struct AudioSceneDescriptor *scene)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || scene == NULL) {
@@ -424,7 +424,7 @@ int32_t AudioRenderSelectScene(struct AudioRender *handle, const struct AudioSce
 #endif
 }
 
-int32_t AudioRenderSetMute(struct AudioRender *handle, bool mute)
+int32_t AudioRenderSetMute(struct IAudioRender *handle, bool mute)
 {
     struct AudioHwRender *impl = (struct AudioHwRender *)handle;
     if (impl == NULL) {
@@ -455,7 +455,7 @@ int32_t AudioRenderSetMute(struct AudioRender *handle, bool mute)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderGetMute(struct AudioRender *handle, bool *mute)
+int32_t AudioRenderGetMute(struct IAudioRender *handle, bool *mute)
 {
     struct AudioHwRender *impl = (struct AudioHwRender *)handle;
     if (impl == NULL || mute == NULL) {
@@ -485,7 +485,7 @@ int32_t AudioRenderGetMute(struct AudioRender *handle, bool *mute)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderSetVolume(struct AudioRender *handle, float volume)
+int32_t AudioRenderSetVolume(struct IAudioRender *handle, float volume)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL) {
@@ -530,7 +530,7 @@ int32_t AudioRenderSetVolume(struct AudioRender *handle, float volume)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderGetVolume(struct AudioRender *handle, float *volume)
+int32_t AudioRenderGetVolume(struct IAudioRender *handle, float *volume)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || volume == NULL) {
@@ -571,7 +571,7 @@ int32_t AudioRenderGetVolume(struct AudioRender *handle, float *volume)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderGetGainThreshold(struct AudioRender *handle, float *min, float *max)
+int32_t AudioRenderGetGainThreshold(struct IAudioRender *handle, float *min, float *max)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
     if (hwRender == NULL || min == NULL || max == NULL) {
@@ -600,7 +600,7 @@ int32_t AudioRenderGetGainThreshold(struct AudioRender *handle, float *min, floa
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderGetGain(struct AudioRender *handle, float *gain)
+int32_t AudioRenderGetGain(struct IAudioRender *handle, float *gain)
 {
     struct AudioHwRender *impl = (struct AudioHwRender *)handle;
     if (impl == NULL || gain == NULL) {
@@ -629,7 +629,7 @@ int32_t AudioRenderGetGain(struct AudioRender *handle, float *gain)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderSetGain(struct AudioRender *handle, float gain)
+int32_t AudioRenderSetGain(struct IAudioRender *handle, float gain)
 {
     int32_t ret = 0;
     struct AudioHwRender *impl = (struct AudioHwRender *)handle;
@@ -662,7 +662,7 @@ int32_t AudioRenderSetGain(struct AudioRender *handle, float gain)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderGetLatency(struct AudioRender *render, uint32_t *ms)
+int32_t AudioRenderGetLatency(struct IAudioRender *render, uint32_t *ms)
 {
     struct AudioHwRender *impl = (struct AudioHwRender *)render;
     if (impl == NULL || ms == NULL) {
@@ -785,7 +785,8 @@ int32_t AudioRenderRenderFramSplit(struct AudioHwRender *hwRender)
     return HDF_SUCCESS;
 }
 
-int32_t AudioRenderRenderFrame(struct AudioRender *render, const int8_t *frame, uint32_t frameLen, uint64_t *replyBytes)
+int32_t AudioRenderRenderFrame(
+    struct IAudioRender *render, const int8_t *frame, uint32_t frameLen, uint64_t *replyBytes)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL || frame == NULL || replyBytes == NULL ||
@@ -835,7 +836,7 @@ int32_t AudioRenderRenderFrame(struct AudioRender *render, const int8_t *frame, 
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderGetRenderPosition(struct AudioRender *render, uint64_t *frames, struct AudioTimeStamp *time)
+int32_t AudioRenderGetRenderPosition(struct IAudioRender *render, uint64_t *frames, struct AudioTimeStamp *time)
 {
     struct AudioHwRender *impl = (struct AudioHwRender *)render;
     if (impl == NULL || frames == NULL || time == NULL) {
@@ -847,7 +848,7 @@ int32_t AudioRenderGetRenderPosition(struct AudioRender *render, uint64_t *frame
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderSetRenderSpeed(struct AudioRender *render, float speed)
+int32_t AudioRenderSetRenderSpeed(struct IAudioRender *render, float speed)
 {
     (void)speed;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
@@ -858,7 +859,7 @@ int32_t AudioRenderSetRenderSpeed(struct AudioRender *render, float speed)
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioRenderGetRenderSpeed(struct AudioRender *render, float *speed)
+int32_t AudioRenderGetRenderSpeed(struct IAudioRender *render, float *speed)
 {
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL || speed == NULL) {
@@ -868,7 +869,7 @@ int32_t AudioRenderGetRenderSpeed(struct AudioRender *render, float *speed)
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioRenderSetChannelMode(struct AudioRender *render, enum AudioChannelMode mode)
+int32_t AudioRenderSetChannelMode(struct IAudioRender *render, enum AudioChannelMode mode)
 {
     struct AudioHwRender *impl = (struct AudioHwRender *)render;
     if (impl == NULL) {
@@ -901,7 +902,7 @@ int32_t AudioRenderSetChannelMode(struct AudioRender *render, enum AudioChannelM
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderGetChannelMode(struct AudioRender *render, enum AudioChannelMode *mode)
+int32_t AudioRenderGetChannelMode(struct IAudioRender *render, enum AudioChannelMode *mode)
 {
     struct AudioHwRender *impl = (struct AudioHwRender *)render;
     if (impl == NULL || mode == NULL || impl->devCtlHandle == NULL) {
@@ -949,7 +950,7 @@ int32_t SetValue(struct ExtraParams mExtraParams, struct AudioHwRender *render)
     return HDF_SUCCESS;
 }
 
-int32_t AudioRenderSetExtraParams(struct AudioRender *handle, const char *keyValueList)
+int32_t AudioRenderSetExtraParams(struct IAudioRender *handle, const char *keyValueList)
 {
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL || keyValueList == NULL) {
@@ -969,7 +970,7 @@ int32_t AudioRenderSetExtraParams(struct AudioRender *handle, const char *keyVal
     }
 }
 
-int32_t AudioRenderGetExtraParams(struct AudioRender *handle, char *keyValueList, uint32_t listLenth)
+int32_t AudioRenderGetExtraParams(struct IAudioRender *handle, char *keyValueList, uint32_t listLenth)
 {
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL || keyValueList == NULL || listLenth <= 0) {
@@ -1073,7 +1074,7 @@ int32_t AudioRenderReqMmapBufferInit(
 }
 
 int32_t AudioRenderReqMmapBuffer(
-    struct AudioRender *handle, int32_t reqSize, const struct AudioMmapBufferDescripter *desc)
+    struct IAudioRender *handle, int32_t reqSize, const struct AudioMmapBufferDescripter *desc)
 {
     int32_t ret = 0;
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
@@ -1090,7 +1091,7 @@ int32_t AudioRenderReqMmapBuffer(
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderGetMmapPosition(struct AudioRender *handle, uint64_t *frames, struct AudioTimeStamp *time)
+int32_t AudioRenderGetMmapPosition(struct IAudioRender *handle, uint64_t *frames, struct AudioTimeStamp *time)
 {
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL || frames == NULL || time == NULL) {
@@ -1128,7 +1129,7 @@ int32_t AudioRenderGetMmapPosition(struct AudioRender *handle, uint64_t *frames,
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderTurnStandbyMode(struct AudioRender *handle)
+int32_t AudioRenderTurnStandbyMode(struct IAudioRender *handle)
 {
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL) {
@@ -1144,7 +1145,7 @@ int32_t AudioRenderTurnStandbyMode(struct AudioRender *handle)
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderAudioDevDump(struct AudioRender *handle, int32_t range, int32_t fd)
+int32_t AudioRenderAudioDevDump(struct IAudioRender *handle, int32_t range, int32_t fd)
 {
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
     if (render == NULL) {
@@ -1208,7 +1209,7 @@ int32_t CallbackProcessing(AudioHandle handle, enum AudioCallbackType callBackTy
     return HDF_SUCCESS;
 }
 
-int32_t AudioRenderRegCallback(struct AudioRender *render, struct AudioCallback *audioCallback, int8_t cookie)
+int32_t AudioRenderRegCallback(struct IAudioRender *render, struct IAudioCallback *audioCallback, int8_t cookie)
 {
     if (audioCallback == NULL || audioCallback->RenderCallback == NULL) {
         return AUDIO_ERR_INVALID_PARAM;
@@ -1225,7 +1226,7 @@ int32_t AudioRenderRegCallback(struct AudioRender *render, struct AudioCallback 
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioRenderDrainBuffer(struct AudioRender *render, enum AudioDrainNotifyType *type)
+int32_t AudioRenderDrainBuffer(struct IAudioRender *render, enum AudioDrainNotifyType *type)
 {
     struct AudioHwRender *pRender = (struct AudioHwRender *)render;
     if (pRender == NULL || type == NULL) {
@@ -1234,7 +1235,7 @@ int32_t AudioRenderDrainBuffer(struct AudioRender *render, enum AudioDrainNotify
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioRenderIsSupportsDrain(struct AudioRender *render, bool* support)
+int32_t AudioRenderIsSupportsDrain(struct IAudioRender *render, bool* support)
 {
     struct AudioHwRender *pRender = (struct AudioHwRender *)render;
     if (pRender == NULL) {
@@ -1243,7 +1244,7 @@ int32_t AudioRenderIsSupportsDrain(struct AudioRender *render, bool* support)
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioRenderAddAudioEffect(struct AudioRender *render, uint64_t effectid)
+int32_t AudioRenderAddAudioEffect(struct IAudioRender *render, uint64_t effectid)
 {
     struct AudioHwRender *pRender = (struct AudioHwRender *)render;
     if (pRender == NULL) {
@@ -1252,7 +1253,7 @@ int32_t AudioRenderAddAudioEffect(struct AudioRender *render, uint64_t effectid)
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioRenderRemoveAudioEffect(struct AudioRender *render, uint64_t effectid)
+int32_t AudioRenderRemoveAudioEffect(struct IAudioRender *render, uint64_t effectid)
 {
     struct AudioHwRender *pRender = (struct AudioHwRender *)render;
     if (pRender == NULL) {
@@ -1261,7 +1262,7 @@ int32_t AudioRenderRemoveAudioEffect(struct AudioRender *render, uint64_t effect
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioRenderGetFrameBufferSize(struct AudioRender *render, uint64_t* bufferSize)
+int32_t AudioRenderGetFrameBufferSize(struct IAudioRender *render, uint64_t* bufferSize)
 {
     struct AudioHwRender *pRender = (struct AudioHwRender *)render;
     if (pRender == NULL) {
@@ -1270,7 +1271,7 @@ int32_t AudioRenderGetFrameBufferSize(struct AudioRender *render, uint64_t* buff
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-int32_t AudioRenderIsSupportsPauseAndResume(struct AudioRender *render, bool* supportPause, bool* supportResume)
+int32_t AudioRenderIsSupportsPauseAndResume(struct IAudioRender *render, bool* supportPause, bool* supportResume)
 {
     struct AudioHwRender *pRender = (struct AudioHwRender *)render;
     if (pRender == NULL) {
@@ -1279,7 +1280,7 @@ int32_t AudioRenderIsSupportsPauseAndResume(struct AudioRender *render, bool* su
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-void AudioRenderRelease(struct AudioRender *instance)
+void AudioRenderRelease(struct IAudioRender *instance)
 {
     (void)instance;
 }

@@ -16,20 +16,20 @@
 #ifndef AUDIO_INTERNAL_MANAGER_H
 #define AUDIO_INTERNAL_MANAGER_H
 
-#include "v1_0/audio_manager.h"
+#include "v1_0/iaudio_manager.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-int32_t AudioManagerGetAllAdapters(struct AudioManager *manager, struct AudioAdapterDescriptor *descs, uint32_t *size);
+int32_t AudioManagerGetAllAdapters(struct IAudioManager *manager, struct AudioAdapterDescriptor *descs, uint32_t *size);
 
 int32_t AudioManagerLoadAdapter(
-    struct AudioManager *manager, const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter);
+    struct IAudioManager *manager, const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter);
 
-int32_t AudioManagerUnloadAdapter(struct AudioManager *manager, const char *adapterName);
+int32_t AudioManagerUnloadAdapter(struct IAudioManager *manager, const char *adapterName);
 
-int32_t ReleaseAudioManagerObject(struct AudioManager *object);
+int32_t ReleaseAudioManagerObject(struct IAudioManager *object);
 
 #ifdef __cplusplus
 }

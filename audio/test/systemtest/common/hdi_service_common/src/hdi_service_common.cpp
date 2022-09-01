@@ -51,7 +51,7 @@ int32_t InitAttrsUpdate(struct AudioSampleAttributes &attrs, int format, uint32_
     return HDF_SUCCESS;
 }
 int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
-    struct AudioRender *render)
+    struct IAudioRender *render)
 {
     int32_t ret = -1;
     if (render == nullptr) {
@@ -70,7 +70,7 @@ int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, st
     return HDF_SUCCESS;
 }
 int32_t AudioCaptureSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
-    struct AudioCapture *capture)
+    struct IAudioCapture *capture)
 {
     int32_t ret = -1;
     if (capture == nullptr) {
@@ -263,7 +263,7 @@ int32_t GetAdapters(TestAudioManager *manager, struct AudioAdapterDescriptor *&d
 }
 
 int32_t GetLoadAdapter(TestAudioManager *manager, int portType,
-    const std::string &adapterName, struct AudioAdapter **adapter, struct AudioPort &audioPort)
+    const std::string &adapterName, struct IAudioAdapter **adapter, struct AudioPort &audioPort)
 {
     int32_t ret = -1;
     uint32_t descsLen = AUDIO_ADAPTER_MAX_NUM;
@@ -305,7 +305,7 @@ int32_t GetLoadAdapter(TestAudioManager *manager, int portType,
 }
 
 int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string &adapterName,
-    struct AudioAdapter **adapter, struct AudioRender **render)
+    struct IAudioAdapter **adapter, struct IAudioRender **render)
 {
     int32_t ret = -1;
     struct AudioSampleAttributes attrs = {};
@@ -344,7 +344,7 @@ int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string
     return HDF_SUCCESS;
 }
 
-int32_t AudioRenderStartAndOneFrame(struct AudioRender *render)
+int32_t AudioRenderStartAndOneFrame(struct IAudioRender *render)
 {
     int32_t ret = -1;
     char *frame = nullptr;
@@ -381,7 +381,7 @@ int32_t AudioRenderStartAndOneFrame(struct AudioRender *render)
 }
 
 int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::string &adapterName,
-    struct AudioAdapter **adapter, struct AudioCapture **capture)
+    struct IAudioAdapter **adapter, struct IAudioCapture **capture)
 {
     int32_t ret = -1;
     struct AudioSampleAttributes attrs = {};
@@ -419,7 +419,7 @@ int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::strin
     return HDF_SUCCESS;
 }
 
-int32_t AudioCaptureStartAndOneFrame(struct AudioCapture *capture)
+int32_t AudioCaptureStartAndOneFrame(struct IAudioCapture *capture)
 {
     int32_t ret = -1;
     struct AudioSampleAttributes attrs = {};
@@ -437,7 +437,7 @@ int32_t AudioCaptureStartAndOneFrame(struct AudioCapture *capture)
     (void) fclose(file);
     return HDF_SUCCESS;
 }
-static int32_t RenderTryOneFrame(struct AudioRender *render,
+static int32_t RenderTryOneFrame(struct IAudioRender *render,
     int8_t *frame,  uint32_t requestBytes, uint64_t *replyBytes)
 {
     int32_t tryNumFrame = 0;
@@ -461,7 +461,7 @@ static int32_t RenderTryOneFrame(struct AudioRender *render,
         return ret;
     } while (true);
 }
-int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render, FILE *file,
+int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct IAudioRender *render, FILE *file,
     struct AudioSampleAttributes attrs)
 {
     uint32_t readSize = 0;
@@ -506,7 +506,7 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
     return HDF_SUCCESS;
 }
 
-int32_t FrameStartCapture(struct AudioCapture *capture, FILE *file, const struct AudioSampleAttributes attrs)
+int32_t FrameStartCapture(struct IAudioCapture *capture, FILE *file, const struct AudioSampleAttributes attrs)
 {
     int32_t ret = 0;
     uint32_t bufferSize = 0;
@@ -597,7 +597,7 @@ void FrameStatus(int status)
     return;
 }
 
-static int32_t CaptureTryOneFrame(struct AudioCapture *capture,
+static int32_t CaptureTryOneFrame(struct IAudioCapture *capture,
     int8_t *frame, uint32_t *replyBytes, uint64_t requestBytes)
 {
     int32_t tryNumFrame = 0;
@@ -621,7 +621,7 @@ static int32_t CaptureTryOneFrame(struct AudioCapture *capture,
     } while (true);
 }
 
-int32_t StartRecord(struct AudioCapture *capture, FILE *file, uint64_t filesize)
+int32_t StartRecord(struct IAudioCapture *capture, FILE *file, uint64_t filesize)
 {
     uint32_t replyBytes = BUFFER_LENTH;
     uint64_t requestBytes = BUFFER_LENTH;
@@ -831,7 +831,7 @@ int32_t RecordMapAudio(struct PrepareAudioPara &audiopara)
     }
     return ret;
 }
-int32_t AudioRenderCallback(struct AudioCallback *self, AudioCallbackType type, int8_t* reserved,
+int32_t AudioRenderCallback(struct IAudioCallback *self, AudioCallbackType type, int8_t* reserved,
     int8_t* cookie)
 {
     switch (type) {
