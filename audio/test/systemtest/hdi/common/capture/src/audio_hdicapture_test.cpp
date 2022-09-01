@@ -85,12 +85,11 @@ void AudioHdiCaptureTest::SetUp(void) {}
 void AudioHdiCaptureTest::TearDown(void) {}
 
 /**
-* @tc.name  Test AudioCaptureCaptureFrame API via legal input
-* @tc.number  SUB_Audio_HDI_AudioCaptureFrame_0001
+* @tc.name  AudioCaptureFrame_001
 * @tc.desc  test AudioCaptureCaptureFrame interface,Returns 0 if the input data is read successfully
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureFrame_001, TestSize.Level1)
 {
     uint64_t replyBytes = 0;
     uint64_t requestBytes = BUFFER_SIZE;
@@ -116,12 +115,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0001, TestSize.Lev
     }
 }
 /**
-* @tc.name  Test AudioCaptureCaptureFrame API via setting the incoming parameter frame is nullptr
-* @tc.number  SUB_Audio_HDI_AudioCaptureFrame_0002
+* @tc.name  AudioCaptureFrame_002
 * @tc.desc  test AudioCaptureCaptureFrame interface,Returns -1 if the incoming parameter frame is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0002, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureFrame_002, TestSize.Level1)
 {
     uint64_t replyBytes = 0;
     uint64_t requestBytes = BUFFER_SIZE;
@@ -142,12 +140,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0002, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureCaptureFrame API via setting the incoming parameter replyBytes is nullptr
-* @tc.number  SUB_Audio_HDI_AudioCaptureFrame_0003
+* @tc.name  AudioCaptureFrame_003
 * @tc.desc  test AudioCaptureCaptureFrame interface,Returns -1 if the incoming parameter replyBytes is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0003, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureFrame_003, TestSize.Level1)
 {
     uint64_t requestBytes = BUFFER_SIZE;
     struct AudioAdapter *adapter = nullptr;
@@ -173,12 +170,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0003, TestSize.Lev
     }
 }
 /**
-* @tc.name  Test AudioCaptureCaptureFrame API via setting the incoming parameter capture is nullptr
-* @tc.number  SUB_Audio_HDI_AudioCaptureFrame_0004
+* @tc.name  AudioCaptureFrame_004
 * @tc.desc  test AudioCaptureCaptureFrame interface,Returns -1 if the incoming parameter capture is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0004, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureFrame_004, TestSize.Level1)
 {
     uint64_t requestBytes = BUFFER_SIZE;
     uint64_t replyBytes = 0;
@@ -205,12 +201,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0004, TestSize.Lev
     }
 }
 /**
-* @tc.name  Test AudioCaptureFrame API without calling interface capturestart
-* @tc.number  SUB_Audio_HDI_AudioCaptureFrame_0005
+* @tc.name  AudioCaptureFrame_005
 * @tc.desc  Test AudioCaptureFrame interface,Returns -1 if without calling interface capturestart
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0005, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureFrame_005, TestSize.Level1)
 {
     uint64_t requestBytes = BUFFER_SIZE;
     struct AudioAdapter *adapter = nullptr;
@@ -233,14 +228,13 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0005, TestSize.Lev
     }
 }
 /**
-* @tc.name  Test AudioCaptureCaptureFrame API via setting the incoming parameter requestBytes
 less than interface requirements
-* @tc.number  SUB_Audio_HDI_AudioCaptureFrame_0006
+* @tc.name  AudioCaptureFrame_006
 * @tc.desc  test AudioCaptureCaptureFrame interface,Returns -1 if the incoming parameter
 requestBytes less than interface requirements
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0006, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureFrame_006, TestSize.Level1)
 {
     uint64_t requestBytes = BUFFER_SIZE_LITTLE;
     uint64_t replyBytes = 0;
@@ -266,12 +260,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureFrame_0006, TestSize.Lev
     }
 }
 /**
-* @tc.name  Test AudioCaptureGetCapturePosition API via legal input
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetCapturePosition_0001
+* @tc.name  AudioCaptureGetCapturePosition_001
 * @tc.desc  Test AudioCaptureGetCapturePosition interface,Returns 0 if get CapturePosition during playing.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetCapturePosition_001, TestSize.Level1)
 {
     uint64_t frames = 0;
     int64_t timeExp = 0;
@@ -297,12 +290,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0001,
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Test GetCapturePosition API via get CapturePosition after the audiois Paused and resumed
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetCapturePosition_0002
+* @tc.name  AudioCaptureGetCapturePosition_002
 * @tc.desc   Test GetCapturePosition interface,Returns 0 if get Position after Pause and resume during playing
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0002, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetCapturePosition_002, TestSize.Level1)
 {
     int64_t timeExp = 0;
     uint64_t frames = 0;
@@ -336,12 +328,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0002,
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Test GetCapturePosition API via get CapturePosition after the audio file is stopped
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetCapturePosition_0003
+* @tc.name  AudioCaptureGetCapturePosition_003
 * @tc.desc  Test GetCapturePosition interface,Returns 0 if get CapturePosition after stop during playing
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0003, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetCapturePosition_003, TestSize.Level1)
 {
     struct AudioAdapter *adapter = {};
     struct AudioCapture *capture = nullptr;
@@ -363,12 +354,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0003,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test GetCapturePosition API via get CapturePosition after the object is created
-    * @tc.number  SUB_Audio_HDI_AudioCaptureGetCapturePosition_0004
+    * @tc.name  AudioCaptureGetCapturePosition_004
     * @tc.desc  Test GetCapturePosition interface, return 0 if get CapturePosition after the object is created
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0004, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetCapturePosition_004, TestSize.Level1)
 {
     struct AudioAdapter *adapter = {};
     struct AudioCapture *capture = nullptr;
@@ -387,12 +377,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0004,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test GetCapturePosition API via setting the parameter Capture is nullptr
-    * @tc.number  SUB_Audio_HDI_AudioCaptureGetCapturePosition_0005
+    * @tc.name  AudioCaptureGetCapturePosition_005
     * @tc.desc  Test GetCapturePosition interface, return -1 if setting the parameter Capture is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0005, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetCapturePosition_005, TestSize.Level1)
 {
     struct AudioAdapter *adapter = {};
     struct AudioCapture *capture = nullptr;
@@ -411,12 +400,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0005,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test GetCapturePosition API via setting the parameter frames is nullptr
-    * @tc.number  SUB_Audio_HDI_AudioCaptureGetCapturePosition_0006
+    * @tc.name  AudioCaptureGetCapturePosition_006
     * @tc.desc  Test GetCapturePosition interface, return -1 if setting the parameter frames is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0006, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetCapturePosition_006, TestSize.Level1)
 {
     struct AudioAdapter *adapter = {};
     struct AudioCapture *capture = nullptr;
@@ -434,12 +422,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0006,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test GetCapturePosition API via setting the parameter time is nullptr
-    * @tc.number  SUB_Audio_HDI_AudioCaptureGetCapturePosition_0007
+    * @tc.name  AudioCaptureGetCapturePosition_007
     * @tc.desc  Test GetCapturePosition interface, return -1 if setting the parameter time is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0007, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetCapturePosition_007, TestSize.Level1)
 {
     struct AudioAdapter *adapter = {};
     struct AudioCapture *capture = nullptr;
@@ -457,12 +444,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0007,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test GetCapturePosition API via get CapturePosition continuously
-    * @tc.number  SUB_Audio_HDI_AudioCaptureGetCapturePosition_0008
+    * @tc.name  AudioCaptureGetCapturePosition_008
     * @tc.desc  Test GetCapturePosition interface, return 0 if the GetCapturePosition was called twice
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0008, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetCapturePosition_008, TestSize.Level1)
 {
     struct AudioAdapter *adapter = {};
     struct AudioCapture *capture = nullptr;
@@ -488,12 +474,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0008,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test ReqMmapBuffer API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureReqMmapBuffer_0001
+* @tc.name  AudioCaptureReqMmapBuffer_001
 * @tc.desc  Test ReqMmapBuffer interface,return 0 if call ReqMmapBuffer interface successfully
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_001, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
@@ -524,14 +509,12 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0001, TestSize.
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test ReqMmapBuffer API via setting the incoming parameter reqSize is bigger than
-            the size of actual audio file
-* @tc.number  SUB_Audio_HDI_RenderReqMmapBuffer_0002
+* @tc.name  AudioRenderReqMmapBuffer_002
 * @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsuccessful when setting the
             incoming parameter reqSize is bigger than the size of actual audio file
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0002, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_002, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
@@ -560,14 +543,12 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0002, TestSize.
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test ReqMmapBuffer API via setting the incoming parameter reqSize is smaller than
-            the size of actual audio file
-* @tc.number  SUB_Audio_HDI_CaptureReqMmapBuffer_0003
+* @tc.name  AudioCaptureReqMmapBuffer_003
 * @tc.desc  Test ReqMmapBuffer interface,return 0 if call ReqMmapBuffer interface successfully when setting the
             incoming parameter reqSize is smaller than the size of actual audio file
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0003, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_003, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
@@ -599,13 +580,12 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0003, TestSize.
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test ReqMmapBuffer API via setting the incoming parameter reqSize is zero
-* @tc.number  SUB_Audio_HDI_CaptureReqMmapBuffer_0004
+* @tc.name  AudioCaptureReqMmapBuffer_004
 * @tc.desc  Test ReqMmapBuffer interface,return -1 if call ReqMmapBuffer interface unsuccessful when setting the
             incoming parameter reqSize is zero
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0004, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_004, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
@@ -634,13 +614,12 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0004, TestSize.
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test ReqMmapBuffer API via setting the incoming parameter memoryFd  of desc is illegal
-* @tc.number  SUB_Audio_HDI_CaptureReqMmapBuffer_0005
+* @tc.name  AudioCaptureReqMmapBuffer_005
 * @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsuccessful when setting the
             incoming parameter memoryFd  of desc is illegal
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0005, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_005, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
@@ -669,13 +648,12 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0005, TestSize.
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test ReqMmapBuffer API via the incoming parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureReqMmapBuffer_0006
+* @tc.name  AudioCaptureReqMmapBuffer_006
 * @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsuccessful when setting the
             incoming parameter handle is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0006, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_006, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
@@ -704,13 +682,12 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0006, TestSize.
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test ReqMmapBuffer API via the incoming parameter desc is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureReqMmapBuffer_0007
+* @tc.name  AudioCaptureReqMmapBuffer_007
 * @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsuccessful when setting the
             incoming parameter desc is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0007, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_007, TestSize.Level1)
 {
     uint32_t reqSize = 0;
     struct AudioMmapBufferDescripter *descNull = nullptr;
@@ -733,12 +710,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0007, TestSize.
 }
 
 /**
-* @tc.name  Test GetMmapPosition API via Getting position is normal in Before recording , recording and after recording
-* @tc.number  SUB_Audio_HDI_CaptureGetMmapPosition_0001
+* @tc.name  AudioCaptureGetMmapPosition_001
 * @tc.desc  Test GetMmapPosition interface,return 0 if Getting position successfully.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureGetMmapPosition_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetMmapPosition_001, TestSize.Level1)
 {
     uint64_t frames = 0;
     uint64_t framesCapturing = 0;
@@ -786,12 +762,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureGetMmapPosition_0001, TestSiz
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
 }
 /**
-* @tc.name  Test ReqMmapBuffer API via inputtint frames is nullptr.
-* @tc.number  SUB_Audio_HDI_CaptureGetMmapPosition_0003
+* @tc.name  AudioCaptureGetMmapPosition_003
 * @tc.desc  Test GetMmapPosition interface,return -3 if Error in incoming parameter.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureGetMmapPosition_0003, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetMmapPosition_003, TestSize.Level1)
 {
     uint64_t *frames = nullptr;
     struct PrepareAudioPara audiopara = {
@@ -814,12 +789,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureGetMmapPosition_0003, TestSiz
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
 }
 /**
-* @tc.name  Test ReqMmapBuffer API via inputtint time is nullptr.
-* @tc.number  SUB_Audio_HDI_CaptureGetMmapPosition_0004
+* @tc.name  AudioCaptureGetMmapPosition_004
 * @tc.desc  Test GetMmapPosition interface,return -3 if Error in incoming parameter.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureGetMmapPosition_0004, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetMmapPosition_004, TestSize.Level1)
 {
     uint64_t frames = 0;
     struct AudioTimeStamp *time = nullptr;
@@ -843,12 +817,11 @@ HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureGetMmapPosition_0004, TestSiz
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
 }
 /**
-* @tc.name  Test ReqMmapBuffer API via inputtint capture is nullptr.
-* @tc.number  SUB_Audio_HDI_RenderReqMmapBuffer_0005
+* @tc.name  AudioRenderReqMmapBuffer_005
 * @tc.desc  Test GetMmapPosition interface,return -3 if Error in incoming parameter.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureTest, SUB_Audio_HDI_CaptureGetMmapPosition_0005, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureTest, AudioCaptureGetMmapPosition_005, TestSize.Level1)
 {
     uint64_t frames = 0;
     struct AudioCapture *captureNull = nullptr;
