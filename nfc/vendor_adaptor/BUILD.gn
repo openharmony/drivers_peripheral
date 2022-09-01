@@ -15,7 +15,7 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("nfc_vendor_adaptor") {
   include_dirs = [
-    "//drivers/peripheral/nfc/nfc_core/vendor_adaptor",
+    "//drivers/peripheral/nfc/vendor_adaptor",
     "//third_party/nfc_hdiimpl/SN100x/halimpl/inc",
   ]
   sources = [ "nfc_vendor_adaptions.cpp" ]
