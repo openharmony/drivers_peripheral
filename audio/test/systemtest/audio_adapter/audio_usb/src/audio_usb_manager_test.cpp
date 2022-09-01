@@ -81,12 +81,11 @@ void AudioUsbManagerTest::SetUp(void) {}
 void AudioUsbManagerTest::TearDown(void) {}
 
 /**
-* @tc.name  Test GetAllAdapters API via legal input
-* @tc.number  SUB_Audio_HDI_GetAllAdapters_0001
+* @tc.name  AudioGetAllAdapters_001
 * @tc.desc  test GetAllAdapters interface，Returns 0 if the list is obtained successfully
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbManagerTest, SUB_Audio_HDI_GetAllAdapters_0001, TestSize.Level1)
+HWTEST_F(AudioUsbManagerTest, AudioGetAllAdapters_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int size = 0;
@@ -98,12 +97,11 @@ HWTEST_F(AudioUsbManagerTest, SUB_Audio_HDI_GetAllAdapters_0001, TestSize.Level1
     EXPECT_EQ(AUDIO_ADAPTER_MAX_NUM, size);
 }
 /**
-* @tc.name  Test LoadAdapter API via legal input
-* @tc.number  SUB_Audio_HDI_LoadAdapter_0001
+* @tc.name  AudioLoadAdapter_001
 * @tc.desc  test LoadAdapter interface，Returns 0 if the driver is loaded successfully
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbManagerTest, SUB_Audio_HDI_LoadAdapter_0001, TestSize.Level1)
+HWTEST_F(AudioUsbManagerTest, AudioLoadAdapter_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int size = 0;

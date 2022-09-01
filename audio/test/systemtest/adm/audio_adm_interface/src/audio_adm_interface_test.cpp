@@ -68,12 +68,11 @@ void AudioAdmInterfaceTest::SetUp(void) {}
 void AudioAdmInterfaceTest::TearDown(void) {}
 
 /**
-* @tc.name  Test the ADM ctrl data analysis function via setting the incoming parameter cmdid is illegal
-* @tc.number  SUB_Audio_ControlDispatch_0001
+* @tc.name  AudioControlDispatch_001
 * @tc.desc  Test the ADM ctrl data analysis function,return -1 when setting the incoming parameter cmdid is illegal
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlDispatch_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlDispatch_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -105,12 +104,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlDispatch_0001, TestSize.Level1)
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl data analysis function via setting the incoming parameter object is nullptr
-* @tc.number  SUB_Audio_ControlDispatch_0002
+* @tc.name  AudioControlDispatch_002
 * @tc.desc  Test the ADM ctrl data analysis function,return -1 when setting the incoming parameter object is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlDispatch_0002, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlDispatch_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -143,12 +141,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlDispatch_0002, TestSize.Level1)
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM stream data analysis function via setting the incoming parameter cmdid is illegal
-* @tc.number  SUB_Audio_StreamDispatch_0001
+* @tc.name  AudioStreamDispatch_001
 * @tc.desc  Test the ADM stream data analysis function,return -1 when setting the incoming parameter cmdid is illegal
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamDispatch_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamDispatch_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -178,12 +175,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamDispatch_0001, TestSize.Level1)
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM stream data analysis function via setting the incoming parameter object is nullptr
-* @tc.number  SUB_Audio_StreamDispatch_0002
+* @tc.name  AudioStreamDispatch_002
 * @tc.desc  Test the ADM stream data analysis function,return -1 when setting the incoming parameter object is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamDispatch_0002, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamDispatch_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -214,12 +210,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamDispatch_0002, TestSize.Level1)
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting gain is in the range
-* @tc.number  SUB_Audio_ControlHostElemWrite_Read_0001
+* @tc.name  AudioControlHostElemWriteRead001
 * @tc.desc  Test the ADM ctrl function,return 0 when setting gain's value is in the range(value=5)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteRead001, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t expectValue = 5;
@@ -240,12 +235,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0001, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting gain is min value
-* @tc.number  SUB_Audio_ControlHostElemWrite_Read_0002
+* @tc.name  AudioControlHostElemWriteRead002
 * @tc.desc  Test the ADM ctrl function,return 0 when setting gain's value is min value
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0002, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteRead002, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t expectValue = MIN_GAIN_VALUE;
@@ -266,12 +260,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0002, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting gain is max value
-* @tc.number  SUB_Audio_ControlHostElemWrite_Read_0003
+* @tc.name  AudioControlHostElemWriteRead003
 * @tc.desc  Test the ADM ctrl function,return 0 when setting gain's value is max value
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0003, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteRead003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -292,12 +285,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0003, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting gain is out of the range
-* @tc.number  SUB_Audio_ControlHostElemWrite_Read_0004
+* @tc.name  AudioControlHostElemWriteRead004
 * @tc.desc  Test the ADM ctrl function,return -1 when setting gain's value is out of the range(value=16)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0004, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteRead004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -315,12 +307,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0004, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting channelmode is "AUDIO_CHANNEL_NORMAL"
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0005
+* @tc.name  AudioControlHostElemWriteread005
 * @tc.desc  Test the ADM ctrl function,return 0 when setting channelmode is "AUDIO_CHANNEL_NORMAL"
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0005, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread005, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t expectValue = AUDIO_CHANNEL_NORMAL;
@@ -341,12 +332,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0005, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting channelmode is "AUDIO_CHANNEL_BOTH_LEFT"
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0006
+* @tc.name  AudioControlHostElemWriteread006
 * @tc.desc  Test the ADM ctrl function,return 0 when setting channelmode is "AUDIO_CHANNEL_BOTH_LEFT"
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0006, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread006, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t expectValue = AUDIO_CHANNEL_BOTH_LEFT;
@@ -367,12 +357,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0006, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting channelmode is "AUDIO_CHANNEL_BOTH_RIGHT"
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0007
+* @tc.name  AudioControlHostElemWriteread007
 * @tc.desc  Test the ADM ctrl function,return 0 when setting channelmode is "AUDIO_CHANNEL_BOTH_RIGHT"
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0007, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread007, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t expectValue = AUDIO_CHANNEL_BOTH_RIGHT;
@@ -393,12 +382,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0007, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting channelmode is "AUDIO_CHANNEL_EXCHANGE"
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0008
+* @tc.name  AudioControlHostElemWriteread008
 * @tc.desc  Test the ADM ctrl function,return 0 when setting channelmode is "AUDIO_CHANNEL_EXCHANGE"
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0008, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread008, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -422,12 +410,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0008, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting channelmode is "AUDIO_CHANNEL_MIX"
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0009
+* @tc.name  AudioControlHostElemWriteread009
 * @tc.desc  Test the ADM ctrl function,return 0 when setting channelmode is "AUDIO_CHANNEL_MIX"
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0009, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread009, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -451,12 +438,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0009, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting channelmode is "AUDIO_CHANNEL_LEFT_MUTE"
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0010
+* @tc.name  AudioControlHostElemWriteread010
 * @tc.desc  Test the ADM ctrl function,return 0 when setting channelmode is "AUDIO_CHANNEL_LEFT_MUTE"
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0010, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread010, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -480,12 +466,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0010, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting channelmode is "AUDIO_CHANNEL_RIGHT_MUTE"
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_00011
+* @tc.name  AudioControlHostElemWriteread011
 * @tc.desc  Test the ADM ctrl function,return 0 when setting channelmode is "AUDIO_CHANNEL_RIGHT_MUTE"
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0011, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread011, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -509,12 +494,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0011, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting channelmode is "AUDIO_CHANNEL_BOTH_MUTE"
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_00012
+* @tc.name  AudioControlHostElemWriteread012
 * @tc.desc  Test the ADM ctrl function,return 0 when setting channelmode is "AUDIO_CHANNEL_BOTH_MUTE"
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0012, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread012, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -538,12 +522,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0012, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via setting channelmode is "CHANEL_MODE_ILLEGAL"
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_00013
+* @tc.name  AudioControlHostElemWriteread013
 * @tc.desc  Test the ADM ctrl function,return 0 when setting channelmode is "CHANEL_MODE_ILLEGAL"
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0013, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread013, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -561,12 +544,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0013, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via getting gainthreshold
-* @tc.number  SUB_Audio_ControlHostElemWrite_Read_00014
+* @tc.name  AudioControlHostElemWriteRead014
 * @tc.desc  Test the ADM ctrl function,return 0 when getting gainthreshold
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0014, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteRead014, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t expectMinValue = MIN_GAIN_VALUE;
@@ -610,12 +592,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_Read_0014, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM control data which is writing normal value of volume and reading volume.
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0015
+* @tc.name  AudioControlHostElemWriteread_015
 * @tc.desc  Test the ADM control data,cmdid is AUDIODRV_CTRL_IOCTRL_ELEM_WRITE and AUDIODRV_CTRL_IOCTRL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0015, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread_015, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t expectValue = MIDDLE_VOLUME;
@@ -637,12 +618,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0015, TestSi
 }
 
 /**
-* @tc.name  Test the ADM control data which is writing mix value of volume and reading volume.
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0016
+* @tc.name  AudioControlHostElemWriteread_016
 * @tc.desc  Test the ADM control data,cmdid is AUDIODRV_CTRL_IOCTRL_ELEM_WRITE and AUDIODRV_CTRL_IOCTRL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0016, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread_016, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t expectValue = MIN_VOLUME;
@@ -663,12 +643,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0016, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM control data which is writing max value of volume and reading volume.
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0017
+* @tc.name  AudioControlHostElemWriteread_017
 * @tc.desc  Test the ADM control data,cmdid is AUDIODRV_CTRL_IOCTRL_ELEM_WRITE and AUDIODRV_CTRL_IOCTRL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0017, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread_017, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t expectValue = MAX_VOLUME;
@@ -689,12 +668,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0017, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM control data which is writing invlaid value of volume.
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0018
+* @tc.name  AudioControlHostElemWriteread_018
 * @tc.desc  Test the ADM control data,cmdid is AUDIODRV_CTRL_IOCTRL_ELEM_WRITE and AUDIODRV_CTRL_IOCTRL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0018, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread_018, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -712,12 +690,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0018, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM control data which is writing invlaid value of volume.
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0019
+* @tc.name  AudioControlHostElemWriteread_019
 * @tc.desc  Test the ADM control data,cmdid is AUDIODRV_CTRL_IOCTRL_ELEM_WRITE and AUDIODRV_CTRL_IOCTRL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0019, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread_019, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -735,12 +712,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0019, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM control data which is writing normal value of mute and reading mute.
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0020
+* @tc.name  AudioControlHostElemWriteread_020
 * @tc.desc  Test the ADM control data,cmdid is AUDIODRV_CTRL_IOCTRL_ELEM_WRITE and AUDIODRV_CTRL_IOCTRL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0020, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread_020, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t expectValue = 0;
@@ -761,12 +737,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0020, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM control data which is writing invalid value of mute,so return -1.
-* @tc.number  SUB_Audio_ControlHostElemWrite_read_0021
+* @tc.name  AudioControlHostElemWriteread_021
 * @tc.desc  Test the ADM control data,cmdid is AUDIODRV_CTRL_IOCTRL_ELEM_WRITE and AUDIODRV_CTRL_IOCTRL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0021, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioControlHostElemWriteread_021, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -784,14 +759,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_ControlHostElemWrite_read_0021, TestSi
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS
-*    that format is AUDIO_FORMAT_PCM_8_BIT.
-* @tc.number  SUB_Audio_StreamHostHwParams_0001
+* @tc.name  AudioStreamHostHwParams_001
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_8_BIT、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -805,14 +778,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0001, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that
-*    format is AUDIO_FORMAT_PCM_16_BIT.
-* @tc.number  SUB_Audio_StreamHostHwParams_0002
+* @tc.name  AudioStreamHostHwParams_002
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_16_BIT、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0002, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -826,14 +797,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0002, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that
-*    format is AUDIO_FORMAT_PCM_24_BIT.
-* @tc.number  SUB_Audio_StreamHostHwParams_0003
+* @tc.name  AudioStreamHostHwParams_003
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_24_BIT、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0003, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -847,14 +816,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0003, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that
-*    format is AUDIO_FORMAT_PCM_32_BIT.
-* @tc.number  SUB_Audio_StreamHostHwParams_0004
+* @tc.name  AudioStreamHostHwParams_004
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_32_BIT 、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0004, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -868,14 +835,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0004, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that
-*    format is AUDIO_FORMAT_AAC_MAIN.
-* @tc.number  SUB_Audio_StreamHostHwParams_0005
+* @tc.name  AudioStreamHostHwParams_005
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_AAC_MAIN 、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0005, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -889,14 +854,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0005, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that
-*    format is AUDIO_FORMAT_AAC_LC.
-* @tc.number  SUB_Audio_StreamHostHwParams_0006
+* @tc.name  AudioStreamHostHwParams_006
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_AAC_LC 、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0006, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_006, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -910,14 +873,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0006, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that
-*    format is AUDIO_FORMAT_AAC_LD.
-* @tc.number  SUB_Audio_StreamHostHwParams_0007
+* @tc.name  AudioStreamHostHwParams_007
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_AAC_LD 、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0007, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_007, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -931,14 +892,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0007, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that
-*    format is AUDIO_FORMAT_AAC_ELD.
-* @tc.number  SUB_Audio_StreamHostHwParams_0008
+* @tc.name  AudioStreamHostHwParams_008
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_AAC_ELD 、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0008, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_008, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -952,14 +911,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0008, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS
-*    that format is AUDIO_FORMAT_AAC_HE_V1.
-* @tc.number  SUB_Audio_StreamHostHwParams_0009
+* @tc.name  AudioStreamHostHwParams_009
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_AAC_HE_V1 、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0009, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_009, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -973,14 +930,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0009, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that
-*    format is AUDIO_FORMAT_AAC_HE_V2.
-* @tc.number  SUB_Audio_StreamHostHwParams_0010
+* @tc.name  AudioStreamHostHwParams_010
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_AAC_HE_V2 、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0010, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_010, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -994,14 +949,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0010, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM capture stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that
-*    format is AUDIO_FORMAT_PCM_24_BIT.
-* @tc.number  SUB_Audio_StreamHostHwParams_0011
+* @tc.name  AudioStreamHostHwParams_011
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_24_BIT 、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0011, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_011, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1015,14 +968,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0011, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS
-*    that format is channels is 1.
-* @tc.number  SUB_Audio_StreamHostHwParams_0012
+* @tc.name  AudioStreamHostHwParams_012
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
-*           format is AUDIO_FORMAT_PCM_24_BIT 、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+*           format is AUDIO_FORMAT_PCM_24_BIT 、channels is 1、cardServiceName is hdf_audio_codec_dev0.
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0012, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_012, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1040,13 +991,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0012, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that format is channels is 8.
-* @tc.number  SUB_Audio_StreamHostHwParams_0013
+* @tc.name  AudioStreamHostHwParams_013
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_8_BIT 、channels is 8、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0013, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_013, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1060,13 +1010,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0013, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that format is periodSize is 4095.
-* @tc.number  SUB_Audio_StreamHostHwParams_0014
+* @tc.name  AudioStreamHostHwParams_014
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_8_BIT 、channels is 8、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0014, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_014, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1080,14 +1029,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0014, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS
-            that format is periodSize is 16385(16 * 1024)
-* @tc.number  SUB_Audio_StreamHostHwParams_0015
+* @tc.name  AudioStreamHostHwParams_015
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_8_BIT 、channels is 8、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0015, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_015, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1101,13 +1048,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0015, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that format is periodCount is 7.
-* @tc.number  SUB_Audio_StreamHostHwParams_0016
+* @tc.name  AudioStreamHostHwParams_016
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_8_BIT 、channels is 8、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0016, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_016, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1121,13 +1067,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0016, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that periodCount is 33.
-* @tc.number  SUB_Audio_StreamHostHwParams_0017
+* @tc.name  AudioStreamHostHwParams_017
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_8_BIT 、channels is 8、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0017, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_017, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1141,13 +1086,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0017, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that startThreshold is Over value.
-* @tc.number  SUB_Audio_StreamHostHwParams_0018
+* @tc.name  AudioStreamHostHwParams_018
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_8_BIT 、channels is 8、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0018, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_018, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1161,13 +1105,12 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0018, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM render stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that startThreshold is 0.
-* @tc.number  SUB_Audio_StreamHostHwParams_0019
+* @tc.name  AudioStreamHostHwParams_019
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_8_BIT 、channels is 8、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0019, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_019, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1181,14 +1124,13 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0019, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM capture stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that
-*    silenceThreshold is Less than minimum.
-* @tc.number  SUB_Audio_StreamHostHwParams_0020
+* @tc.name  AudioStreamHostHwParams_020
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_24_BIT 、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+*           silenceThreshold is Less than minimum.
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0020, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_020, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1202,14 +1144,13 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0020, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM capture stream data,cmdid is AUDIO_DRV_PCM_IOCTRL_HW_PARAMS that
-*    silenceThreshold is Greater than maximum.
-* @tc.number  SUB_Audio_StreamHostHwParams_0021
+* @tc.name  AudioStreamHostHwParams_021
 * @tc.desc  Test the ADM render stream data which is issuing hardware parameters that
 *           format is AUDIO_FORMAT_PCM_24_BIT 、channels is 2、cardServiceName is hdf_audio_codec_dev0.
-* @tc.author: zhouyongxiao
+*           silenceThreshold is Greater than maximum.
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0021, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostHwParams_021, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1223,12 +1164,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostHwParams_0021, TestSize.Leve
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM stream data which is sending play data stream.
-* @tc.number  SUB_Audio_StreamHostWrite_0001
+* @tc.name  AudioStreamHostWrite_001
 * @tc.desc  Test the ADM control data,cmdid is AUDIO_DRV_PCM_IOCTRL_WRITE.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostWrite_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostWrite_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1266,12 +1206,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostWrite_0001, TestSize.Level1)
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM stream data which is recording data stream.
-* @tc.number  SUB_Audio_StreamHostRead_0001
+* @tc.name  AudioStreamHostRead_001
 * @tc.desc  Test the ADM control data,cmdid is AUDIO_DRV_PCM_IOCTRL_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRead_001, TestSize.Level1)
 {
     int32_t tryNumReply = 100;
     uint32_t buffStatus = 0;
@@ -1324,12 +1263,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRead_0001, TestSize.Level1)
 }
 
 /**
-* @tc.name  Test the ADM stream function via calling prepare function(render service)
-* @tc.number  SUB_Audio_StreamHostRenderPrepare_0001
+* @tc.name  AudioStreamHostRenderPrepare_001
 * @tc.desc  Test the ADM stream function,return 0 when calling prepare function(render service)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderPrepare_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderPrepare_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1357,12 +1295,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderPrepare_0001, TestSize
 }
 
 /**
-* @tc.name  Test the ADM stream function via calling prepare function(capture service)
-* @tc.number  SUB_Audio_StreamHostCapturePrepare_0001
+* @tc.name  AudioStreamHostCapturePrepare_001
 * @tc.desc  Test the ADM stream function,return 0 when calling prepare function(capture service)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCapturePrepare_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCapturePrepare_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1390,12 +1327,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCapturePrepare_0001, TestSiz
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM stream function via calling start function(render service)
-* @tc.number  SUB_StreamHostRenderStart_0001
+* @tc.name  StreamHostRenderStart_001
 * @tc.desc  Test the ADM stream function,return 0 when calling start function(render service)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_StreamHostRenderStart_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, StreamHostRenderStart_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1424,12 +1360,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_StreamHostRenderStart_0001, TestSize.Level1)
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM stream function via calling start function(capture service)
-* @tc.number  SUB_StreamHostCaptureStart_0001
+* @tc.name  StreamHostCaptureStart_001
 * @tc.desc  Test the ADM stream function,return 0 when calling start function(capture service)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_StreamHostCaptureStart_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, StreamHostCaptureStart_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1458,12 +1393,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_StreamHostCaptureStart_0001, TestSize.Level1
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via calling stop function(render service)
-* @tc.number  SUB_Audio_StreamHostRenderStop_0001
+* @tc.name  AudioStreamHostRenderStop_001
 * @tc.desc  Test the ADM ctrl function,return 0 when calling stop function(render service)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderStop_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderStop_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1490,12 +1424,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderStop_0001, TestSize.Le
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via calling stop function(capture service)
-* @tc.number  SUB_Audio_StreamHostCaptureStop_0001
+* @tc.name  AudioStreamHostCaptureStop_001
 * @tc.desc  Test the ADM ctrl function,return 0 when calling stop function(capture service)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCaptureStop_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCaptureStop_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1520,12 +1453,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCaptureStop_0001, TestSize.L
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via calling pause function(render service)
-* @tc.number  SUB_Audio_StreamHostRenderPause_0001
+* @tc.name  AudioStreamHostRenderPause_001
 * @tc.desc  Test the ADM ctrl function,return 0 when calling pause function(render service)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderPause_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderPause_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1554,12 +1486,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderPause_0001, TestSize.L
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via calling pause function(capture service)
-* @tc.number  SUB_Audio_StreamHostCapturePause_0001
+* @tc.name  AudioStreamHostCapturePause_001
 * @tc.desc  Test the ADM ctrl function,return 0 when calling pause function(capture service)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCapturePause_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCapturePause_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1588,12 +1519,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCapturePause_0001, TestSize.
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via calling resume function(render service)
-* @tc.number  SUB_Audio_StreamHostRenderResume_0001
+* @tc.name  AudioStreamHostRenderResume_001
 * @tc.desc  Test the ADM ctrl function,return 0 when calling resume function(render service)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderResume_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderResume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
@@ -1624,12 +1554,11 @@ HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostRenderResume_0001, TestSize.
     HdfIoServiceRecycle(service);
 }
 /**
-* @tc.name  Test the ADM ctrl function via calling resume function(capture service)
-* @tc.number  SUB_Audio_StreamHostCaptureResume_0001
+* @tc.name  AudioStreamHostCaptureResume_001
 * @tc.desc  Test the ADM ctrl function,return 0 when calling resume function(capture service)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAdmInterfaceTest, SUB_Audio_StreamHostCaptureResume_0001, TestSize.Level1)
+HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCaptureResume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;

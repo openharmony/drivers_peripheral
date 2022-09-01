@@ -64,12 +64,11 @@ void AudioServerFunctionTest::SetUp(void) {}
 void AudioServerFunctionTest::TearDown(void) {}
 
 /**
-* @tc.name  Playing an audio file
-* @tc.number  SUB_Audio_Function_Render_Test_0001
+* @tc.name  AudioFunctionRenderTest_001
 * @tc.desc  test StartRender interface,The audio file is played successfully.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0001, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -84,12 +83,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0001, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Set audio file volume
-* @tc.number  SUB_Audio_Function_Render_Test_0002
+* @tc.name  AudioFunctionRenderTest_002
 * @tc.desc  test Render function,set volume when the audio file is playing.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0002, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_002, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -122,12 +120,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0002, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Mute audio files
-* @tc.number  SUB_Audio_Function_Render_Test_0003
+* @tc.name  AudioFunctionRenderTest_003
 * @tc.desc  test Render function,set mute when the audio file is playing.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0003, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_003, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -161,12 +158,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0003, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Pause Resume and Stop audio file
-* @tc.number  SUB_Audio_Function_Render_Test_0004
+* @tc.name  AudioFunctionRenderTest_004
 * @tc.desc  test Render function,call pause,resume and stop interface when the audio file is playing.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0004, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_004, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -191,12 +187,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0004, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Get audio gainthreshold and set gain value
-* @tc.number  SUB_Audio_Function_Render_Test_0005
+* @tc.name  AudioFunctionRenderTest_005
 * @tc.desc  test Render function,Call interface GetGainThreshold,SetGain and GetGain when playing.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0005, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_005, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -232,12 +227,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0005, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  set volume after the audio file is Paused and set mute after the audio file is resumed
-* @tc.number  SUB_Audio_Function_Render_Test_0006
+* @tc.name  AudioFunctionRenderTest_006
 * @tc.desc  test Render function,set volume after pause and set mute after resume during playing.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0006, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_006, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -281,12 +275,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0006, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  set mute after the audio file is Paused and set volume after the audio file is resumed
-* @tc.number  SUB_Audio_Function_Render_Test_0007
+* @tc.name  AudioFunctionRenderTest_007
 * @tc.desc  test Render function,set mute after pause and set volume after resume during playing.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0007, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_007, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -328,12 +321,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0007, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Get Current ChannelId during playing.
-* @tc.number  SUB_Audio_Function_Render_Test_0008
+* @tc.name  AudioFunctionRenderTest_008
 * @tc.desc  test StartRender interface,The audio file is played out normally and Get Current ChannelId as expected.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0008, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_008, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -360,12 +352,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0008, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Get Frame Size during playing
-* @tc.number  SUB_Audio_Function_Render_Test_0009
+* @tc.name  AudioFunctionRenderTest_009
 * @tc.desc  test StartRender interface,The audio file is played out normally and Get Frame Sizeas expected.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0009, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_009, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -388,12 +379,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0009, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Get Frame Count during playing
-* @tc.number  SUB_Audio_Function_Render_Test_0010
+* @tc.name  AudioFunctionRenderTest_010
 * @tc.desc  test StartRender interface,The audio file is played out normally and Get Frame Count as expected.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0010, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_010, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -415,12 +405,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0010, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Get render position when playing audio file
-* @tc.number  SUB_Audio_Function_Render_Test_0011
+* @tc.name  AudioFunctionRenderTest_011
 * @tc.desc  test render functio by Get render position when playing audio file.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0011, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_011, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     uint64_t frames = 0;
@@ -444,12 +433,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0011, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Check Scene Capability during playing
-* @tc.number  SUB_Audio_Function_Render_Test_0012
+* @tc.name  AudioFunctionRenderTest_012
 * @tc.desc  test StartRender interface,The audio file is played out normally and Check Scene Capability as expected.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0012, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_012, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     bool supported = false;
@@ -473,13 +461,12 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0012, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  when audio file playing SetSampleAttributes
-* @tc.number  SUB_Audio_Function_Render_Test_0013
+* @tc.name  AudioFunctionRenderTest_013
 * @tc.desc  test StartRender interface,After setting SetSampleAttributes,
 *           the playback will reset SetSampleAttributes.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0013, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_013, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -516,12 +503,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Render_Test_0013, TestSize.
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Record audio file
-* @tc.number  SUB_Audio_Function_Capture_Test_0001
+* @tc.name  AudioFunctionCaptureTest_001
 * @tc.desc  test capture function, The audio file is recorded successfully.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0001, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_001, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -535,12 +521,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0001, TestSize
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Pause,resume and stop when recording.
-* @tc.number  SUB_Audio_Function_Capture_Test_0002
+* @tc.name  AudioFunctionCaptureTest_002
 * @tc.desc  test capture function,Pause,resume and stop when recording.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0002, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_002, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -566,12 +551,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0002, TestSize
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Set volume when recording audio file
-* @tc.number  SUB_Audio_Function_Capture_Test_0003
+* @tc.name  AudioFunctionCaptureTest_003
 * @tc.desc  Test capture function,set volume when recording audio file.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0003, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_003, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -595,12 +579,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0003, TestSize
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Set Mute when recording audio file
-* @tc.number  SUB_Audio_Function_Capture_Test_0004
+* @tc.name  AudioFunctionCaptureTest_004
 * @tc.desc  Test capture function, Set mute when recording audio file.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0004, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_004, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     bool isMute = false;
@@ -631,12 +614,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0004, TestSize
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Set Gain when recording audio file
-* @tc.number  SUB_Audio_Function_Capture_Test_0005
+* @tc.name  AudioFunctionCaptureTest_005
 * @tc.desc  Test capture function, Set gain when recording audio file.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0005, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_005, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     float gainMin = 0;
@@ -672,12 +654,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0005, TestSize
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Set SampleAttributes during recording.
-* @tc.number  SUB_Audio_Function_Capture_Test_0006
+* @tc.name  AudioFunctionCaptureTest_006
 * @tc.desc  test capture function,the sampleattributes were set success,and the audio file is recorded successfully.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0006, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_006, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct AudioSampleAttributes attrsValue = {};
@@ -715,12 +696,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0006, TestSize
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Get CurrentChannel Id during recording.
-* @tc.number  SUB_Audio_Function_Capture_Test_0007
+* @tc.name  AudioFunctionCaptureTest_007
 * @tc.desc  test capture function,the CurrentChannel Id were get success,and the audio file is recorded successfully.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0007, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_007, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     uint32_t channelId = 0;
@@ -741,12 +721,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0007, TestSize
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Get Frame Size during recording.
-* @tc.number  SUB_Audio_Function_Capture_Test_0008
+* @tc.name  AudioFunctionCaptureTest_008
 * @tc.desc  test capture function, the Frame Size were get success,and the audio file is recorded successfully.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0008, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_008, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -769,12 +748,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0008, TestSize
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Get Frame Count during recording.
-* @tc.number  SUB_Audio_Function_Capture_Test_0009
+* @tc.name  AudioFunctionCaptureTest_009
 * @tc.desc  test capture function, the Frame Count were get success,and the audio file is recorded successfully.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0009, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_009, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -796,12 +774,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0009, TestSize
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Get Gain during recording.
-* @tc.number  SUB_Audio_Function_Capture_Test_0010
+* @tc.name  AudioFunctionCaptureTest_010
 * @tc.desc  test capture function, the Gain were get success,and the audio file is recorded successfully.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0010, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_010, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     float min = 0;
@@ -824,12 +801,11 @@ HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0010, TestSize
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Check Scene Capability during recording.
-* @tc.number  SUB_Audio_Function_Capture_Test_0011
+* @tc.name  AudioFunctionCaptureTest_011
 * @tc.desc  test capture function, the Check Scene Capability success,and the audio file is recorded successfully.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioServerFunctionTest, SUB_Audio_Function_Capture_Test_0011, TestSize.Level1)
+HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_011, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     bool supported = false;

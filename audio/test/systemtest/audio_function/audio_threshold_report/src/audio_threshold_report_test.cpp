@@ -111,12 +111,11 @@ void AudioThresholdReportReceived(struct ServiceStatusListener *listener, struct
 }
 
 /**
-* @tc.name  test Threshold Reporting
-* @tc.number  SUB_Audio_Threshold_Capture_Report_0001
+* @tc.name  AudioThresholdCaptureReport_001
 * @tc.desc  test Threshold Reporting function ,Start recording can be reported.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioThresholdReportTest, SUB_Audio_Threshold_Capture_Report_0001, TestSize.Level1)
+HWTEST_F(AudioThresholdReportTest, AudioThresholdCaptureReport_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t replyBytes = 0;
@@ -144,12 +143,11 @@ HWTEST_F(AudioThresholdReportTest, SUB_Audio_Threshold_Capture_Report_0001, Test
     }
 }
 /**
-* @tc.name  test Threshold Reporting
-* @tc.number  SUB_Audio_Threshold_Capture_Report_0002
+* @tc.name  AudioThresholdCaptureReport_002
 * @tc.desc  test Threshold Reporting function is normal,when Recording.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioThresholdReportTest, SUB_Audio_Threshold_Capture_Report_0002, TestSize.Level1)
+HWTEST_F(AudioThresholdReportTest, AudioThresholdCaptureReport_002, TestSize.Level1)
 {
     int32_t ret = -1;
     g_reportCount =0;
@@ -167,12 +165,11 @@ HWTEST_F(AudioThresholdReportTest, SUB_Audio_Threshold_Capture_Report_0002, Test
     EXPECT_EQ(expectReportCount, g_reportCount);
 }
 /**
-* @tc.name  test Threshold Reporting
-* @tc.number  SUB_Audio_Threshold_Capture_Report_0003
+* @tc.name  AudioThresholdCaptureReport_003
 * @tc.desc  test Threshold Reporting function,No threshold reporting when no recording.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioThresholdReportTest, SUB_Audio_Threshold_Capture_Report_0003, TestSize.Level1)
+HWTEST_F(AudioThresholdReportTest, AudioThresholdCaptureReport_003, TestSize.Level1)
 {
     g_reportCount = 0;
     int32_t ret = -1;

@@ -128,13 +128,12 @@ int32_t AudioLibCaptureHardwareDependenceTest::BindServiceAndHwCapture(struct Au
     return HDF_SUCCESS;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing volume value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_001
+* @tc.name  AudioInterfaceLibCtlCaptureVolumeWriteRead_001
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE and
 *    AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureVolumeWriteRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     float volumeValue;
@@ -171,13 +170,12 @@ HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture
     CloseServiceCaptureSo(handle);
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing volume value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_002
+* @tc.name  AudioInterfaceLibCtlCaptureVolumeWriteRead_002
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE and
 *    AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_002, TestSize.Level1)
+HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureVolumeWriteRead_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -214,13 +212,12 @@ HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture
     CloseServiceCaptureSo(handle);
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing volume value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_003
+* @tc.name  AudioInterfaceLibCtlCaptureVolumeWriteRead_003
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE and
 *    AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture_VolumeWrite_Read_003, TestSize.Level1)
+HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureVolumeWriteRead_003, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     float volumeThresholdValueMax = 0;
@@ -246,12 +243,11 @@ HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture
     CloseServiceCaptureSo(handle);
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing GetGainthreshold value of Hardware equipment.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_GetVolthresholdRead_001
+* @tc.name  AudioInterfaceLibCtlCaptureGetVolthresholdRead_001
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture_GetVolthresholdRead_001,
+HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureGetVolthresholdRead_001,
          TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
@@ -273,12 +269,11 @@ HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via selecting scene.
-* @tc.number  SUB_Audio_InterfaceLib_CtlCapture_SelectScene_001
+* @tc.name  AudioInterfaceLibCtlCaptureSelectScene_001
 * @tc.desc  test InterfaceLibCtlCapture,cmdId is AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture_SelectScene_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureSelectScene_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle* handle = nullptr;
@@ -305,13 +300,12 @@ HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing normal value of gain and reading gain value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_001
+* @tc.name  AudioInterfaceLibCtlCaptureGainWriteRead_001
 * @tc.desc  test InterfaceLibCtlCapture,cmdId is AUDIODRV_CTL_IOCTL_GAIN_WRITE_CAPTURE and
 *    AUDIODRV_CTL_IOCTL_GAIN_READ_CAPTURE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureGainWriteRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     float gainValue = 0;
@@ -355,13 +349,12 @@ HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing boundary value of gain and reading gain value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_002
+* @tc.name  AudioInterfaceLibCtlCaptureGainWriteRead_002
 * @tc.desc  test InterfaceLibCtlCapture,cmdId is AUDIODRV_CTL_IOCTL_GAIN_WRITE_CAPTURE and
 *    AUDIODRV_CTL_IOCTL_GAIN_READ_CAPTURE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_002, TestSize.Level1)
+HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureGainWriteRead_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -398,12 +391,11 @@ HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing invalid value of gain.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_003
+* @tc.name  AudioInterfaceLibCtlCaptureGainWriteRead_003
 * @tc.desc  test InterfaceLibCtlCapture ,return -1,If the threshold is invalid.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_003, TestSize.Level1)
+HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureGainWriteRead_003, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     float gainThresholdValueMax = 0;
@@ -430,12 +422,11 @@ HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing GetGainthreshold value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_GetGainthresholdRead_001
+* @tc.name  AudioInterfaceLibCtlCaptureGetGainthresholdRead_001
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_CAPTURE(23).
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureHardwareDependenceTest, SUB_Audio_InterfaceLibCtlCapture_GetGainthresholdRead_001,
+HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureGetGainthresholdRead_001,
          TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
