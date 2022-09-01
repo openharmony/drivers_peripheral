@@ -119,13 +119,11 @@ int32_t AudioAlsaLibCaptureTest::LibCaptureStart(struct AudioHwCapture *hwCaptur
     return HDF_SUCCESS;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_Capture_OPEN/
-            AUDIO_DRV_PCM_IOCTL_Capture_CLOSE.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Open_0001
+* @tc.name  AudioInterfaceLibOutputCaptureOpen_001
 * @tc.desc  test Audio lib Interface OutputCapture.return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Open_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureOpen_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture= nullptr;
@@ -140,12 +138,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Open_0001,
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_Capture_OPEN twins.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Open_0002
+* @tc.name  AudioInterfaceLibOutputCaptureOpen_002
 * @tc.desc  test Audio lib Interface OutputCapture.return -1 if seting cmdid is AUDIO_DRV_PCM_IOCTL_Capture_OPEN twins.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Open_0002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureOpen_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -162,12 +159,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Open_0002,
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_Capture_CLOSE without opening.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Close_0001
+* @tc.name  AudioInterfaceLibOutputCaptureClose_001
 * @tc.desc  test Audio lib Interface OutputCapture.return -1 if without opening.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Close_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureClose_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -180,12 +176,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Close_0001
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_Capture_CLOSE twins.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Close_0002
+* @tc.name  AudioInterfaceLibOutputCaptureClose_002
 * @tc.desc  test Audio lib Interface OutputCapture.return -1 if seting cmdid is AUDIO_DRV_PCM_IOCTL_Capture_CLOSE twins.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Close_0002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureClose_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -204,12 +199,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Close_0002
 }
 
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_HW_PARAMS.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_HwParams_0001
+* @tc.name  AudioInterfaceLibOutputCaptureHwParams_001
 * @tc.desc  test Audio lib Interface OutputCapture.return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_HwParams_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureHwParams_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -227,12 +221,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_HwParams_0
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_HW_PARAMS but without opening.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_HwParams_0002
+* @tc.name  AudioInterfaceLibOutputCaptureHwParams_002
 * @tc.desc  test Audio lib Interface OutputCapture.return -1 if without opening.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_HwParams_0002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureHwParams_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -246,12 +239,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_HwParams_0
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via sstting cmdid is AUDIO_DRV_PCM_IOCTL_HW_PARAMS twins.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_HwParams_0003
+* @tc.name  AudioInterfaceLibOutputCaptureHwParams_003
 * @tc.desc  test Audio lib Interface OutputCapture.return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_HwParams_0003, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureHwParams_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -271,12 +263,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_HwParams_0
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_PREPARE.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Prepare_0001
+* @tc.name  AudioInterfaceLibOutputCapturePrepare_001
 * @tc.desc  test Audio lib Interface OutputCapture.return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Prepare_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCapturePrepare_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -296,12 +287,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Prepare_00
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_PREPARE but without setting params.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Prepare_0002
+* @tc.name  AudioInterfaceLibOutputCapturePrepare_002
 * @tc.desc  test Audio lib Interface OutputCapture.return -1 if without setting params.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Prepare_0002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCapturePrepare_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -319,12 +309,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Prepare_00
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_PREPARE twice.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Prepare_0003
+* @tc.name  AudioInterfaceLibOutputCapturePrepare_003
 * @tc.desc  test Audio lib Interface OutputCapture.return -1 if the Interface call twice.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Prepare_0003, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCapturePrepare_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -347,12 +336,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Prepare_00
 }
 
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTRL_START.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Start_Start_0001
+* @tc.name  AudioInterfaceLibOutputCaptureStart_001
 * @tc.desc  test Audio lib Interface OutputCapture.return -1 if the Interface call unsuccessful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Start_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureStart_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -367,12 +355,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Start_0001
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTRL_START/AUDIO_DRV_PCM_IOCTRL_STOP.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Start_Stop_0001
+* @tc.name  AudioInterfaceLibOutputCaptureStop_001
 * @tc.desc  test Audio lib Interface OutputCapture.return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Stop_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureStop_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -397,12 +384,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Stop_0001,
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTRL_STOP.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Stop_0002
+* @tc.name  AudioInterfaceLibOutputCaptureStop_002
 * @tc.desc  test Audio lib Interface OutputCapture.return -1 if the Interface call unsuccessful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Stop_0002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureStop_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -417,12 +403,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Stop_0002,
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTRL_STOP twice.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Start_Stop_0003
+* @tc.name  AudioInterfaceLibOutputCaptureStop_003
 * @tc.desc  test Audio lib Interface OutputCapture.return -1 if the Interface call twice.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Stop_0003, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureStop_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -451,12 +436,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Stop_0003,
 }
 
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_READ.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Read_0001
+* @tc.name  AudioInterfaceLibOutputCaptureRead_001
 * @tc.desc  test Audio lib Interface OutputCapture and Normal data flow distribution.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Read_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureRead_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -484,12 +468,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Read_0001,
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_READ without starting.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Read_0002
+* @tc.name  AudioInterfaceLibOutputCaptureRead_002
 * @tc.desc  test Audio lib Interface OutputCapture,return -1 if without starting.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Read_0002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureRead_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -511,12 +494,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Read_0002,
 }
 
 /**
-* @tc.name  Test InterfaceLibOutputCapture API via setting the cmdId(30) is invalid
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Abnormal_0001
+* @tc.name  AudioInterfaceLibOutputCaptureAbnormal_001
 * @tc.desc  test OutputCapture interface, return -1 if the cmdId is invalid.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Abnormal_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureAbnormal_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -530,12 +512,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Abnormal_0
     hwCapture = nullptr;
 }
 /**
-* @tc.name  Test Outputcapture API via setting the incoming parameter handleData is empty
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Abnormal_0002
+* @tc.name  AudioInterfaceLibOutputCaptureAbnormal_002
 * @tc.desc   Test Outputcapture interface, return -1 if the incoming parameter handleData is empty.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Abnormal_0002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureAbnormal_002, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, handle);
@@ -544,12 +525,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Abnormal_0
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing GetVolthreshold value
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_GetVolthresholdRead_0001
+* @tc.name  AudioInterfaceLibCtlCaptureGetVolthresholdRead_001
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GetVolthresholdRead_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibCtlCaptureGetVolthresholdRead_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float volumeThresholdValueMax = 0;
@@ -576,13 +556,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GetVolthresho
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing volume value is normal value and reading
-*    this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_Volume_AcodecIn_Write_Read_0001
+* @tc.name  AudioInterfaceLibCtlCaptureVolumeWriteRead_001
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Volume_Write_Read_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibCtlCaptureVolumeWriteRead_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float volumeValue = 0;
@@ -632,13 +610,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Volume_Write_
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing volume value is boundary value and reading
-*    this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_Volume_AcodecIn_Write_Read_0002
+* @tc.name  AudioInterfaceLibCtlCaptureVolumeWriteRead_002
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Volume_Write_Read_0002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibCtlCaptureVolumeWriteRead_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -679,12 +655,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Volume_Write_
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing volume value is invalid value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_Volume_AcodecIn_Write_Read_0003
+* @tc.name  AudioInterfaceLibCtlCaptureVolume_AcodecIn_Write_Read_003
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Volume_Write_Read_0003, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibCtlCaptureVolumeWriteRead_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -719,12 +694,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Volume_Write_
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing mute value that include 1 and 0 and reading mute value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_0001
+* @tc.name  AudioInterfaceLibCtlCaptureMuteWriteRead_001
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_MUTE_WRITE and AUDIODRV_CTL_IOCTL_MUTE_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibCtlCaptureMuteWriteRead_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool muteValue = 1;
@@ -760,12 +734,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Rea
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via pause.
-* @tc.number  SUB_Audio_InterfaceLibctlcapture_Pause_0001
+* @tc.name  AudioInterfaceLibOutputCapturePause_001
 * @tc.desc  test InterfaceLibOutputCapture,cmdId is AUDIODRV_CTL_IOCTL_PAUSE_WRITE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Pause_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCapturePause_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, handle);
@@ -787,12 +760,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Pause_0001
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via resume.
-* @tc.number  SUB_Audio_InterfaceLibctlcapture_Resume_0001
+* @tc.name  AudioInterfaceLibOutputCaptureResume_001
 * @tc.desc  test InterfaceLibOutputCapture,cmdId is AUDIODRV_CTL_IOCTL_PAUSE_WRITE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Resume_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureResume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, handle);
@@ -813,12 +785,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Resume_000
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing GetGainthreshold value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_GetGainthresholdRead_0001
+* @tc.name  AudioInterfaceLibCtlCaptureGetGainthresholdRead_001
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_CAPTURE(23).
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GetGainthresholdRead_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibCtlCaptureGetGainthresholdRead_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, handle);
@@ -832,13 +803,12 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GetGainthresh
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing normal value of gain and reading gain value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_0001
+* @tc.name  AudioInterfaceLibCtlCaptureGainWriteRead_001
 * @tc.desc  test InterfaceLibCtlCapture,cmdId is AUDIODRV_CTL_IOCTL_GAIN_WRITE_CAPTURE and
 *    AUDIODRV_CTL_IOCTL_GAIN_READ_CAPTURE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Read_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibCtlCaptureGainWriteRead_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, handle);
@@ -855,12 +825,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_GainWrite_Rea
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via selecting scene.
-* @tc.number  SUB_Audio_InterfaceLib_CtlCapture_SelectScene_0001
+* @tc.name  AudioInterfaceLibCtlCaptureSelectScene_001
 * @tc.desc  test InterfaceLibCtlCapture,cmdId is AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_SelectScene_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibCtlCaptureSelectScene_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, handle);
@@ -887,12 +856,11 @@ HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_SelectScene_0
 }
 
 /**
-* @tc.name  test InterfaceLibCtlCapture API via cmdId is AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_0001
+* @tc.name  AudioInterfaceLibCtlCaptureReqMmpbuffer_001
 * @tc.desc  test InterfaceLibCtlCapture ,return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_ReqMmpbuffer_0001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibCtlCaptureReqMmpbuffer_001, TestSize.Level1)
 {
     int32_t ret = -1;
 

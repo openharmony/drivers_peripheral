@@ -121,12 +121,11 @@ int32_t AudioLibCaptureTest::BindServiceAndHwCapture(struct AudioHwCapture *&hwC
 }
 
 /**
-* @tc.name  Test AudioBindServiceCapture API via legal input
-* @tc.number   SUB_Audio_InterfaceLibBindServiceCapture_001
+* @tc.name   Audio_InterfaceLibBindServiceCapture_001
 * @tc.desc  Test AudioBindServiceCapture interface,return 0 is call successfully
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibBindServiceCapture_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, Audio_InterfaceLibBindServiceCapture_001, TestSize.Level1)
 {
     struct DevHandle *handle = nullptr;
     ASSERT_TRUE((BindServiceCaptureSo != nullptr && CloseServiceCaptureSo != nullptr));
@@ -135,12 +134,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibBindServiceCapture_001, Test
     CloseServiceCaptureSo(handle);
 }
 /**
-* @tc.name  Test AudioBindServiceCapture API via invalid input.
-* @tc.number  SUB_Audio_InterfaceLibBindServiceCapture_002
+* @tc.name  Audio_InterfaceLibBindServiceCapture_002
 * @tc.desc  test Binding failed Service which invalid service Name is rendeo.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibBindServicecapture_002, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, Audio_InterfaceLibBindServicecapture_002, TestSize.Level1)
 {
     struct DevHandle *handle = nullptr;
     ASSERT_TRUE((BindServiceCaptureSo != nullptr && CloseServiceCaptureSo != nullptr));
@@ -152,12 +150,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibBindServicecapture_002, Test
     EXPECT_EQ(nullptr, handle);
 }
 /**
-* @tc.name  Test AudioBindServiceCapture API via setting the incoming parameter handle is empty.
-* @tc.number   SUB_Audio_InterfaceLibBindServiceCapture_003
+* @tc.name   Audio_InterfaceLibBindServiceCapture_003
 * @tc.desc  test Binding failed Service, nullptr pointer passed in.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibBindServiceCapture_003, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, Audio_InterfaceLibBindServiceCapture_003, TestSize.Level1)
 {
     struct DevHandle *handle = {};
     char *bindNameNull = nullptr;
@@ -170,12 +167,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibBindServiceCapture_003, Test
     EXPECT_EQ(nullptr, handle);
 }
 /**
-* @tc.name  test BindServiceCaptureSo API via name lens is 25.
-* @tc.number  SUB_Audio_InterfaceLibBindServiceCapture_004
+* @tc.name  Audio_InterfaceLibBindServiceCapture_004
 * @tc.desc  test Binding failed Service, Log printing 'service name not support!' and 'Failed to get service!'.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibBindServiceCapture_004, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, Audio_InterfaceLibBindServiceCapture_004, TestSize.Level1)
 {
     struct DevHandle *handle = nullptr;
     ASSERT_TRUE((BindServiceCaptureSo != nullptr && CloseServiceCaptureSo != nullptr));
@@ -188,12 +184,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibBindServiceCapture_004, Test
     EXPECT_EQ(nullptr, handle);
 }
 /**
-* @tc.name  test BindServiceCaptureSo API via name lens is 26.
-* @tc.number  SUB_Audio_InterfaceLibBindServiceCapture_005
+* @tc.name  Audio_InterfaceLibBindServiceCapture_005
 * @tc.desc  test Binding failed Service, Log printing 'Failed to snprintf_s'.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibBindServiceCapture_005, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, Audio_InterfaceLibBindServiceCapture_005, TestSize.Level1)
 {
     struct DevHandle *handle = nullptr;
     string bindNameOverLen = "capturecaptureedededededer";
@@ -206,13 +201,12 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibBindServiceCapture_005, Test
     EXPECT_EQ(nullptr, handle);
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing mute value that include 1 and 0 and reading mute value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_001
+* @tc.name  AudioInterfaceLibCtlCaptureMuteWriteRead_001
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_MUTE_WRITE_CAPTURE and
 *    AUDIODRV_CTL_IOCTL_MUTE_READ_CAPTURE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibCtlCaptureMuteWriteRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     bool muteValue = 1;
@@ -244,13 +238,12 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_00
     CloseServiceCaptureSo(handle);
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via writing mute value that is 2 and read mute value.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_002
+* @tc.name  AudioInterfaceLibCtlCaptureMuteWriteRead_002
 * @tc.desc  test InterfaceLibCtlCapture ,cmdId is AUDIODRV_CTL_IOCTL_MUTE_WRITE_CAPTURE and
 *    AUDIODRV_CTL_IOCTL_MUTE_READ_CAPTURE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_002, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibCtlCaptureMuteWriteRead_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     bool muteValue = 0;
@@ -281,12 +274,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_MuteWrite_Read_00
     CloseServiceCaptureSo(handle);
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via inputting cmdid invalid.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_Abnormal_001
+* @tc.name  AudioInterfaceLibCtlCaptureAbnormal_001
 * @tc.desc  test InterfaceLibCtlCapture, cmdId is invalid eg 30,so return -1.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Abnormal_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibCtlCaptureAbnormal_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -308,12 +300,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Abnormal_001, Tes
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlCapture API via inputting handleData invalid.
-* @tc.number  SUB_Audio_InterfaceLibCtlCapture_Abnormal_002
+* @tc.name  AudioInterfaceLibCtlCaptureAbnormal_002
 * @tc.desc  test InterfaceLibCtlCapture, handleData is invalid,so return -1.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Abnormal_002, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibCtlCaptureAbnormal_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -327,12 +318,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibCtlCapture_Abnormal_002, Tes
     CloseServiceCaptureSo(handle);
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_HW_PARAMS.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_HwParams_001
+* @tc.name  AudioInterfaceLibOutputCaptureHwParams_001
 * @tc.desc  Test AudioOutputcapture interface,return 0 is call successfully.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_HwParams_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest,  AudioInterfaceLibOutputCaptureHwParams_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -352,12 +342,11 @@ HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_HwParams_001,
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE.
-* @tc.number  SUB_Audio_InterfaceLib_OutputCapture_Prepare_001
+* @tc.name  AudioInterfaceLibOutputCapturePrepare_001
 * @tc.desc  test InterfaceLibOutputCapture,cmdId is AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_Prepare_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest,  AudioInterfaceLibOutputCapturePrepare_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -379,12 +368,11 @@ HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_Prepare_001, 
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTRL_START_CAPTURE.
-* @tc.number   SUB_Audio_InterfaceLib_OutputCapture_Start_001
+* @tc.name   AudioInterfaceLibOutputCaptureStart_001
 * @tc.desc  test InterfaceLibOutputCapture,cmdId is AUDIO_DRV_PCM_IOCTRL_START_CAPTURE.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_Start_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest,  AudioInterfaceLibOutputCaptureStart_001, TestSize.Level1)
 {
     struct DevHandle *handle = nullptr;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -410,13 +398,11 @@ HWTEST_F(AudioLibCaptureTest,  SUB_Audio_InterfaceLibOutputCapture_Start_001, Te
     hwCapture = nullptr;
 }
 /**
-* @tc.name  Test AudioOutputcapture API via cmdid is AUDIO_DRV_PCM_IOCTL_READ.
-            and AUDIO_DRV_PCM_IOCTRL_STOP_CAPTURE.
-* @tc.number   SUB_Audio_InterfaceLibOutputCapture_Read_Stop_001
+* @tc.name   AudioInterfaceLibOutputCaptureReadStop_001
 * @tc.desc  test InterfaceLibOutputCapture,cmdId is AUDIO_DRV_PCM_IOCTL_READ and AUDIO_DRV_PCM_IOCTRL_STOP_CAPTURE.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Read_Stop_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibOutputCaptureReadStop_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -453,12 +439,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Read_Stop_001,
     hwCapture = nullptr;
 }
 /**
-* @tc.name  Test AudioOutputcapture API data flow and control flow are serial.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_001
+* @tc.name  AudioInterfaceLibOutputCapture_001
 * @tc.desc  test Audio lib Interface CtlCapture and OutputCapture,Data stream and control stream send successful.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibOutputCapture_001, TestSize.Level1)
 {
     struct DevHandle *handle1 = nullptr;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -509,12 +494,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_001, TestSize.
     CloseServiceCaptureSo(handle2);
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via pause.
-* @tc.number  SUB_Audio_InterfaceLibctlcapture_Pause_001
+* @tc.name  AudioInterfaceLibOutputCapturePause_001
 * @tc.desc  test InterfaceLibOutputCapture,cmdId is AUDIODRV_CTL_IOCTL_PAUSE_WRITE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Pause_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibOutputCapturePause_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = {};
@@ -542,12 +526,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Pause_001, Tes
     hwCapture = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via resume.
-* @tc.number  SUB_Audio_InterfaceLibctlcapture_Resume_001
+* @tc.name  AudioInterfaceLibOutputCaptureResume_001
 * @tc.desc  test InterfaceLibOutputCapture,cmdId is AUDIODRV_CTL_IOCTL_PAUSE_WRITE.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Resume_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibOutputCaptureResume_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwCapture *hwCapture = nullptr;
@@ -575,12 +558,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Resume_001, Te
     hwCapture = nullptr;
 }
 /**
-* @tc.name  Test InterfaceLibOutputCapture API via setting the cmdId(30) is invalid
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Abnormal_001
+* @tc.name  AudioInterfaceLibOutputCaptureAbnormal_001
 * @tc.desc  test OutputCapture interface, return -1 if the cmdId is invalid.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Abnormal_001, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibOutputCaptureAbnormal_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -596,12 +578,11 @@ HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Abnormal_001, 
     hwCapture = nullptr;
 }
 /**
-* @tc.name  Test Outputcapture API via setting the incoming parameter handleData is empty
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Abnormal_002
+* @tc.name  AudioInterfaceLibOutputCaptureAbnormal_002
 * @tc.desc   Test Outputcapture interface, return -1 if the incoming parameter handleData is empty.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibCaptureTest, SUB_Audio_InterfaceLibOutputCapture_Abnormal_002, TestSize.Level1)
+HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibOutputCaptureAbnormal_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;

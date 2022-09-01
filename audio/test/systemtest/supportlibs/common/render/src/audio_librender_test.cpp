@@ -229,12 +229,11 @@ int32_t AudioLibRenderTest::BindServiceAndHwRender(struct AudioHwRender *&hwRend
     return HDF_SUCCESS;
 }
 /**
-* @tc.name  test BindServiceRenderSo API via legal input.
-* @tc.number  SUB_Audio_InterfaceLib_BindServiceRender_0001
+* @tc.name  AudioInterfaceLibBindServiceRender_001
 * @tc.desc  test Binding succeeded Service which service Name is control_service and close Service.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibBindServiceRender_001, TestSize.Level1)
 {
     struct DevHandle *handle = nullptr;
     ASSERT_TRUE((BindServiceRenderSo != nullptr && CloseServiceRenderSo != nullptr));
@@ -243,12 +242,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0001, Test
     CloseServiceRenderSo(handle);
 }
 /**
-* @tc.name  test BindServiceRenderSo API via invalid input.
-* @tc.number  SUB_Audio_InterfaceLib_BindServiceRender_0002
+* @tc.name  AudioInterfaceLibBindServiceRender_002
 * @tc.desc  test Binding failed service, where the service name is wrong.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0002, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibBindServiceRender_002, TestSize.Level1)
 {
     struct DevHandle *handle = nullptr;
     ASSERT_TRUE((BindServiceRenderSo != nullptr && CloseServiceRenderSo != nullptr));
@@ -260,12 +258,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0002, Test
     EXPECT_EQ(nullptr, handle);
 }
 /**
-* @tc.name  test BindServiceRenderSo API via nullptr input.
-* @tc.number  SUB_Audio_InterfaceLib_BindServiceRender_0003
+* @tc.name  AudioInterfaceLibBindServiceRender_003
 * @tc.desc  test Binding failed Service, nullptr pointer passed in.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0003, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibBindServiceRender_003, TestSize.Level1)
 {
     struct DevHandle *handle = nullptr;
     char *bindNameNull = nullptr;
@@ -278,12 +275,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0003, Test
     EXPECT_EQ(nullptr, handle);
 }
 /**
-* @tc.name  test BindServiceRenderSo API via binding service name lens is 25.
-* @tc.number  SUB_Audio_InterfaceLib_BindServiceRender_0004
+* @tc.name  AudioInterfaceLibBindServiceRender_004
 * @tc.desc  test Binding failed Service, Log printing 'service name not support!' and 'Failed to get service!'.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0004, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibBindServiceRender_004, TestSize.Level1)
 {
     struct DevHandle *handle = nullptr;
     string bindNameOverLen = "renderrenderedededededede";
@@ -296,12 +292,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0004, Test
     EXPECT_EQ(nullptr, handle);
 }
 /**
-* @tc.name  test BindServiceRenderSo API via binding service name lens is 26.
-* @tc.number  SUB_Audio_InterfaceLib_BindServiceRender_0005
+* @tc.name  AudioInterfaceLibBindServiceRender_005
 * @tc.desc  test Binding failed Service, Log printing 'Failed to snprintf_s'.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0005, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibBindServiceRender_005, TestSize.Level1)
 {
     struct DevHandle *handle = nullptr;
     string bindNameOverLen = "renderrenderededededededer";
@@ -314,12 +309,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLib_BindServiceRender_0005, Test
     EXPECT_EQ(nullptr, handle);
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing mute value that include 1 and 0 and reading mute value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_0001
+* @tc.name  AudioInterfaceLibCtlRenderMuteWriteRead_001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_MUTE_WRITE and AUDIODRV_CTL_IOCTL_MUTE_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibCtlRenderMuteWriteRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     bool muteValue = 1;
@@ -350,12 +344,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_0001
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing mute value that include 2 and reading mute value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_0002
+* @tc.name  AudioInterfaceLibCtlRenderMuteWriteRead_002
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_MUTE_WRITE and AUDIODRV_CTL_IOCTL_MUTE_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_0002, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibCtlRenderMuteWriteRead_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     bool muteValue = 0;
@@ -386,12 +379,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_0002
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via inputting invalid cmdid.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Abnormal_0001
+* @tc.name  AudioInterfaceLibCtlRenderAbnormal_001
 * @tc.desc  test InterfaceLibCtlRender, cmdId is invalid eg 50,so return -1.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Abnormal_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibCtlRenderAbnormal_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -412,12 +404,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Abnormal_0001, Test
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via inputting handleData invalid.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Abnormal_0002
+* @tc.name  AudioInterfaceLibCtlRenderAbnormal_002
 * @tc.desc  test InterfaceLibCtlRender, handleData is nullptr,so return -1.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Abnormal_0002, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibCtlRenderAbnormal_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -436,12 +427,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Abnormal_0002, Test
 }
 
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_HW_PARAMS.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_HwParams_0001
+* @tc.name  AudioInterfaceLibOutputRenderHwParams_001
 * @tc.desc  test Audio lib Interface OutputRender.return 0 if the Interface call successful.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_HwParams_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibOutputRenderHwParams_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -460,12 +450,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_HwParams_0001, T
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_PREPARE.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Prepare_0001
+* @tc.name  AudioInterfaceLibOutputRenderPrepare_001
 * @tc.desc  test Audio lib Interface OutputRender.return 0 if the Interface call successful.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Prepare_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibOutputRenderPrepare_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -486,12 +475,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Prepare_0001, Te
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTRL_START.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Start_0001
+* @tc.name  AudioInterfaceLibOutputRenderStart_001
 * @tc.desc  test Audio lib Interface OutputRender.return 0 if the Interface call successful.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Start_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibOutputRenderStart_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -516,12 +504,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Start_0001, Test
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_WRITE and AUDIO_DRV_PCM_IOCTRL_STOP.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001
+* @tc.name  AudioInterfaceLibOutputRenderWriteStop_001
 * @tc.desc  test Audio lib Interface OutputRender and Normal data flow distribution.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibOutputRenderWriteStop_001, TestSize.Level1)
 {
     struct DevHandle *handle = nullptr;
     struct AudioHeadInfo wavHeadInfo = {};
@@ -568,13 +555,12 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_Stop_0001,
     fclose(file);
 }
 /**
-* @tc.name  test InterfaceLibCtlRender and InterfaceLibOutputRender API via Serial
     transmission of data flow and control flow.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Write_0001
+* @tc.name  AudioInterfaceLibOutputRenderWrite_001
 * @tc.desc  test Audio lib Interface CtlRender and OutputRender, Data stream and control stream send successful.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibOutputRenderWrite_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     float muteValue = 0;
@@ -622,12 +608,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_0001, Test
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via pause.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Pause_0001
+* @tc.name  AudioInterfaceLibCtlRenderPause_001
 * @tc.desc  test InterfaceLibOutputRender,cmdId is AUDIODRV_CTL_IOCTL_PAUSE_WRITE.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Pause_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibOutputRenderPause_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -649,12 +634,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Pause_0001, Test
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via resuming.
-* @tc.number  SUB_Audio_InterfaceLib_CtlRender_Resume_0001
+* @tc.name  Audio_InterfaceLib_CtlRender_Resume_001
 * @tc.desc  test InterfaceLibOutputRender,cmdId is AUDIODRV_CTL_IOCTL_PAUSE_WRITE.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Resume_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibOutputRenderResume_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -676,12 +660,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Resume_0001, Tes
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via setting the cmdId is invalid.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender__Abnormal_0001
+* @tc.name  AudioInterfaceLibOutputRender_Abnormal_001
 * @tc.desc  test Audio lib Interface OutputRender via cmdid is invalid and cmdid is 30,so Interface return -1.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Abnormal_0001, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibOutputRenderAbnormal_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -697,12 +680,11 @@ HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Abnormal_0001, T
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via inputting handleData is nullptr.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Abnormal_0002
+* @tc.name  AudioInterfaceLibOutputRenderAbnormal_002
 * @tc.desc  test Audio lib Interface OutputRender, handleData is nullptr.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Abnormal_0002, TestSize.Level1)
+HWTEST_F(AudioLibRenderTest, AudioInterfaceLibOutputRenderAbnormal_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;

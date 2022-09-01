@@ -145,13 +145,11 @@ int32_t AudioLibRenderHardwareDependenceTest::BindServiceAndHwRender(struct Audi
     return HDF_SUCCESS;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value of AcodecIn is normal value and reading
-*    this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volume_Write_Read_001
+* @tc.name  AudioInterfaceLibCtlRenderVolumeWriteRead_001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_Volume_Write_Read_001, TestSize.Level1)
+HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderVolumeWriteRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     float volumeValue = 0;
@@ -195,13 +193,11 @@ HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_V
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value of AcodecIn is boundary value and reading
-*    this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volume_Write_Read_002
+* @tc.name  AudioInterfaceLibCtlRenderVolumeWriteRead_002
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_Volume_Write_Read_002, TestSize.Level1)
+HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderVolumeWriteRead_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -238,12 +234,11 @@ HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_V
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value is invalid value of AcodecIn.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volume_Write_Read_003
+* @tc.name  AudioInterfaceLibCtlRenderVolumeWriteRead_003
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_Volume_Write_Read_003, TestSize.Level1)
+HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderVolumeWriteRead_003, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -273,13 +268,11 @@ HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_V
 }
 
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing GetVolthreshold value that
-*    Hardware equipment of Acodec_ChangeIn.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_GetVolthresholdRead_002
+* @tc.name  AudioInterfaceLibCtlRenderGetVolthresholdRead_002
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_GetVolthresholdRead_002, TestSize.Level1)
+HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderGetVolthresholdRead_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     float volumeThresholdValueMaxIn = 0;
@@ -300,13 +293,12 @@ HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_G
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing ChannelMode value is normal value and reading this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_Read_001
+* @tc.name  AudioInterfaceLibCtlRenderChannelModeWriteRead_001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE
 *    and AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_Read_001,
+HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderChannelModeWriteRead_001,
          TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
@@ -352,13 +344,12 @@ HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_C
     impl = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing ChannelMode value is boundary value and reading this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_Read_002
+* @tc.name  AudioInterfaceLibCtlRenderChannelModeWriteRead_002
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE
 *    and AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_Read_002,
+HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderChannelModeWriteRead_002,
          TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
@@ -403,12 +394,11 @@ HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_C
     impl = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via selecting scene.
-* @tc.number  SUB_Audio_InterfaceLib_CtlRender_SelectScene_001
+* @tc.name  AudioInterfaceLibCtlRenderSelectScene_001
 * @tc.desc  test InterfaceLibCtlRender,cmdId is AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLib_CtlRender_SelectScene_001, TestSize.Level1)
+HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderSelectScene_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct DevHandle *handle = nullptr;
@@ -435,12 +425,11 @@ HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLib_CtlRender_
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing normal gain value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_001
+* @tc.name  AudioInterfaceLibCtlRenderGainWriteRead_001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_GAIN_WRITE and AUDIODRV_CTL_IOCTL_GAIN_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_001, TestSize.Level1)
+HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderGainWriteRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -483,12 +472,11 @@ HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_G
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing boundary value of gain and reading gain value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_002
+* @tc.name  AudioInterfaceLibCtlRenderGainWriteRead_002
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_GAIN_WRITE and AUDIODRV_CTL_IOCTL_GAIN_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_002, TestSize.Level1)
+HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderGainWriteRead_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     float gainValue = 0;
@@ -523,12 +511,11 @@ HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_G
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing gain invalid value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_003
+* @tc.name  AudioInterfaceLibCtlRenderGainWriteRead_003
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_GAIN_WRITE and AUDIODRV_CTL_IOCTL_GAIN_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_003, TestSize.Level1)
+HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderGainWriteRead_003, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     float gainThresholdValueMax, gainThresholdValueMin;
@@ -554,12 +541,11 @@ HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_G
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via getting gainthreshold value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_GetGainthresholdRead_001
+* @tc.name  AudioInterfaceLibCtlRenderGetGainthresholdRead_001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_GAINTHRESHOLD_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioLibRenderHardwareDependenceTest, SUB_Audio_InterfaceLibCtlRender_GetGainthresholdRead_001,
+HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderGetGainthresholdRead_001,
          TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
