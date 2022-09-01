@@ -77,12 +77,11 @@ void AudioHdiRenderAttrTest::TearDownTestCase(void)
 void AudioHdiRenderAttrTest::SetUp(void) {}
 void AudioHdiRenderAttrTest::TearDown(void) {}
 /**
-    * @tc.name  Test RenderGetFrameSize API via legal input
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameSize_0001
+    * @tc.name  AudioRenderGetFrameSize_001
     * @tc.desc  Test RenderGetFrameSize interface,return 0 if the FrameSize was obtained successfully
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameSize_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetFrameSize_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t size = 0;
@@ -101,12 +100,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameSize_0001, TestSize
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioCaptureGetFrameSize API via setting the incoming parameter handle is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameSize_0002
+    * @tc.name  AudioRenderGetFrameSize_002
     * @tc.desc  Test RenderGetFrameSize interface,return -1 if failed to get the FrameSize when handle is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameSize_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetFrameSize_002, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t size = 0;
@@ -124,12 +122,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameSize_0002, TestSize
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderGetFrameSize API setting the incoming parameter FrameSize is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameSize_0003
+    * @tc.name  AudioRenderGetFrameSize_003
     * @tc.desc  Test RenderGetFrameSize interface,return -1 if failed to get the FrameSize when size is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameSize_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetFrameSize_003, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t *sizeNull = nullptr;
@@ -146,12 +143,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameSize_0003, TestSize
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderGetFrameCount API via legal
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameCount_0001
+    * @tc.name  AudioRenderGetFrameCount_001
     * @tc.desc  Test RenderGetFrameCount interface, return 0 if the FrameSize was obtained successfully
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameCount_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetFrameCount_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -171,12 +167,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameCount_0001, TestSiz
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderGetFrameCount API via setting the incoming parameter handle is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameCount_0002
+    * @tc.name  AudioRenderGetFrameCount_002
     * @tc.desc  Test RenderGetFrameCount interface,return -1 if the incoming parameter handle is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameCount_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetFrameCount_002, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -195,12 +190,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameCount_0002, TestSiz
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderGetFrameCount API setting the incoming parameter count is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameCount_0003
+    * @tc.name  AudioRenderGetFrameCount_003
     * @tc.desc  Test RenderGetFrameCount interface,return -1 if the incoming parameter count is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameCount_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetFrameCount_003, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t *countNull = nullptr;
@@ -218,12 +212,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetFrameCount_0003, TestSiz
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderGetCurrentChannelId API via legal input
-    * @tc.number  SUB_Audio_HDI_RenderGetCurrentChannelId_0001
+    * @tc.name  AudioRenderGetCurrentChannelId_001
     * @tc.desc  Test RenderGetCurrentChannelId, return 0 if the default CurrentChannelId is obtained successfully
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetCurrentChannelId_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetCurrentChannelId_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t channelId = 0;
@@ -242,12 +235,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetCurrentChannelId_0001, T
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderGetCurrentChannelId API via CurrentChannelId is obtained after created
-    * @tc.number  SUB_Audio_HDI_RenderGetCurrentChannelId_0003
+    * @tc.name  AudioRenderGetCurrentChannelId_003
     * @tc.desc  Test RenderGetCurrentChannelId interface, return 0 if CurrentChannelId is obtained after created
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetCurrentChannelId_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetCurrentChannelId_003, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t channelId = 0;
@@ -266,12 +258,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetCurrentChannelId_0003, T
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test GetCurrentChannelId API via setting the parameter render is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetCurrentChannelId_0004
+    * @tc.name  AudioRenderGetCurrentChannelId_004
     * @tc.desc  Test GetCurrentChannelId interface,return -1 if set the parameter render is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetCurrentChannelId_0004, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetCurrentChannelId_004, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t channelId = 0;
@@ -289,12 +280,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetCurrentChannelId_0004, T
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderGetCurrentChannelId API via setting the parameter channelId is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetCurrentChannelId_0005
+    * @tc.name  AudioRenderGetCurrentChannelId_005
     * @tc.desc  Test RenderGetCurrentChannelId interface, return -1 if setting the parameter channelId is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetCurrentChannelId_0005, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetCurrentChannelId_005, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t *channelIdNull = nullptr;
@@ -311,12 +301,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetCurrentChannelId_0005, T
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderSetExtraParams API via setting ExtraParams during playback
-    * @tc.number  SUB_Audio_HDI_RenderSetExtraParams_0001
+    * @tc.name  AudioRenderSetExtraParams_001
     * @tc.desc  Test RenderSetExtraParams interface,return 0 if the ExtraParams is set during playback
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderSetExtraParams_001, TestSize.Level1)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
@@ -352,12 +341,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0001, TestSi
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-    * @tc.name  Test RenderSetExtraParams API via setting some parameters after playing
-    * @tc.number  SUB_Audio_HDI_RenderSetExtraParams_0002
+    * @tc.name  AudioRenderSetExtraParams_002
     * @tc.desc  Test RenderSetExtraParams interface,return 0 if some parameters is set after playing
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderSetExtraParams_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
@@ -408,12 +396,11 @@ attr-sampling-rate=48000";
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderSetExtraParams API via setting keyvaluelist to a value outside the range
-    * @tc.number  SUB_Audio_HDI_RenderSetExtraParams_0003
+    * @tc.name  AudioRenderSetExtraParams_003
     * @tc.desc  Test RenderSetExtraParams interface,return -1 if the Keyvaluelist is a value out of range
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderSetExtraParams_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
@@ -430,12 +417,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0003, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderSetExtraParams API via adding parameters to keyvaluelist
-    * @tc.number  SUB_Audio_HDI_RenderSetExtraParams_0004
+    * @tc.name  AudioRenderSetExtraParams_004
     * @tc.desc  Test RenderSetExtraParams interface,return -1 if adding parameters to keyvaluelist
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0004, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderSetExtraParams_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
@@ -453,14 +439,12 @@ attr-frame-count=82;attr-sampling-rate=48000;attr-para=123";
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderSetExtraParams API via setting ExtraParams When the key is the same and the value is
-    different
-    * @tc.number  SUB_Audio_HDI_RenderSetExtraParams_0005
+    * @tc.name  AudioRenderSetExtraParams_005
     * @tc.desc  Test RenderSetExtraParams interface,return 0 if set ExtraParams When the key is the same and the value
     is different
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0005, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderSetExtraParams_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
@@ -486,12 +470,11 @@ attr-sampling-rate=96000";
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderSetExtraParams API via setting the parameter in keyvaluelist as an abnormal value
-    * @tc.number  SUB_Audio_HDI_RenderSetExtraParams_0006
+    * @tc.name  AudioRenderSetExtraParams_006
     * @tc.desc  Test RenderSetExtraParams interface,return -1 if Set the parameter in keyvaluelist as an abnormal value
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0006, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderSetExtraParams_006, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
@@ -520,12 +503,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0006, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderSetExtraParams API via setting the parameter render is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderSetExtraParams_0007
+    * @tc.name  AudioRenderSetExtraParams_007
     * @tc.desc  Test RenderSetExtraParams interface,return -1 if set the parameter render is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0007, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderSetExtraParams_007, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
@@ -543,12 +525,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0007, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderSetExtraParams API via setting the format of ExtraParams is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderSetExtraParams_0008
+    * @tc.name  AudioRenderSetExtraParams_008
     * @tc.desc  Test RenderSetExtraParams interface,return -1 if set the format of ExtraParams is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0008, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderSetExtraParams_008, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
@@ -565,12 +546,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderSetExtraParams_0008, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderGetExtraParams API via legal input
-    * @tc.number  SUB_Audio_HDI_RenderGetExtraParams_0001
+    * @tc.name  AudioRenderGetExtraParams_001
     * @tc.desc  Test RenderGetExtraParams interface,return 0 if the RenderGetExtraParams was obtained successfully
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetExtraParams_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetExtraParams_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -611,12 +591,11 @@ attr-sampling-rate=48000";
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderGetExtraParams API via setting the parameter render is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetExtraParams_0002
+    * @tc.name  AudioRenderGetExtraParams_002
     * @tc.desc  Test RenderGetExtraParams interface,return -1 if set the parameter render is nullptr
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetExtraParams_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetExtraParams_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
@@ -638,12 +617,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetExtraParams_0002, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderGetExtraParams API via setting listlength to be less than the actual length
-    * @tc.number  SUB_Audio_HDI_RenderGetExtraParams_0003
+    * @tc.name  AudioRenderGetExtraParams_003
     * @tc.desc  Test RenderGetExtraParams interface,return -1 if set listlength to be less than the actual length
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetExtraParams_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetExtraParams_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
@@ -664,12 +642,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetExtraParams_0003, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderGetExtraParams API via setting listlenth equal to the actual length
-    * @tc.number  SUB_Audio_HDI_RenderGetExtraParams_0004
+    * @tc.name  AudioRenderGetExtraParams_004
     * @tc.desc  Test RenderGetExtraParams interface,return 0 if set listlenth equal to the actual length
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderGetExtraParams_0004, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderGetExtraParams_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
@@ -695,12 +672,11 @@ attr-sampling-rate=48000";
 }
 
 /**
-    * @tc.name  Test RenderAddAudioEffect API via legal input
-    * @tc.number  SUB_Audio_HDI_RenderAddAudioEffect_0001
+    * @tc.name  AudioRenderAddAudioEffect_001
     * @tc.desc  Test RenderAddAudioEffect interface,return 0 if set the legal parameter
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderAddAudioEffect_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderAddAudioEffect_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -716,12 +692,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderAddAudioEffect_0001, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderAddAudioEffect API via setting the parameter render is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderAddAudioEffect_0001
+    * @tc.name  AudioRenderAddAudioEffect_001
     * @tc.desc  Test RenderAddAudioEffect interface,return -3 if set the parameter render is nullptr
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderAddAudioEffect_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderAddAudioEffect_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -741,12 +716,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderAddAudioEffect_0002, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderAddAudioEffect API via legal input
-    * @tc.number  SUB_Audio_HDI_RenderRemoveAudioEffect_0001
+    * @tc.name  AudioRenderRemoveAudioEffect_001
     * @tc.desc  Test RenderAddAudioEffect interface,return -3 if set the legal parameter
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderRemoveAudioEffect_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderRemoveAudioEffect_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -764,12 +738,11 @@ HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderRemoveAudioEffect_0001, Tes
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderAddAudioEffect API via setting the parameter render is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderAddAudioEffect_0002
+    * @tc.name  AudioRenderAddAudioEffect_002
     * @tc.desc  Test RenderAddAudioEffect interface,return -3 if setting the parameter render is nullptr
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderAttrTest, SUB_Audio_HDI_RenderRemoveAudioEffect_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderAttrTest, AudioRenderRemoveAudioEffect_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;

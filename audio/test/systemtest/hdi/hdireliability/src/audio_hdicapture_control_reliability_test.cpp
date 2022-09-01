@@ -325,12 +325,11 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioCaptureGetCapturePosition
 }
 
 /**
-* @tc.name  test AudioCaptureFrame API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioCaptureFrame_Reliability_0001
+* @tc.name  AudioCaptureFrameReliability_001
 * @tc.desc  test AudioCaptureFrame interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureFrame_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureControlReliabilityTest, AudioCaptureFrameReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     g_para[0].manager = manager;
@@ -360,12 +359,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureFrame_
 }
 
 /**
-* @tc.name  test AudioCaptureStart API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioCaptureStart_Reliability_0001
+* @tc.name  AudioCaptureStartReliability_001
 * @tc.desc  test AudioCaptureStart interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStart_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureControlReliabilityTest, AudioCaptureStartReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t failcount = 0;
@@ -405,12 +403,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStart_
 
 
 /**
-* @tc.name  test AudioCaptureStop API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioCaptureStop_Reliability_0001
+* @tc.name  AudioCaptureStopReliability_001
 * @tc.desc  test AudioCaptureStop interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStop_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureControlReliabilityTest, AudioCaptureStopReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t failcount = 0;
@@ -445,12 +442,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureStop_R
 
 
 /**
-* @tc.name  test AudioCapturePause API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioCapturePause_Reliability_0001
+* @tc.name  AudioCapturePauseReliability_001
 * @tc.desc  test AudioCapturePause interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCapturePause_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureControlReliabilityTest, AudioCapturePauseReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t failcount = 0;
@@ -486,12 +482,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCapturePause_
 }
 
 /**
-* @tc.name  test RelAudioAdapterInitAllPorts API via Multi thread calling mono card
-* @tc.number  SUB_Audio_HDI_AudioInitAllPorts_Reliability_0002
+* @tc.name  AudioInitAllPortsReliability_002
 * @tc.desc  test InitAllPorts interface, return 0 if the ports is initialize successfully.
-* @tc.author: liutian
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioInitAllPorts_Reliability_0002, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureControlReliabilityTest, AudioInitAllPortsReliability_002, TestSize.Level1)
 {
     int32_t ret = -1;
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
@@ -514,12 +509,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioInitAllPorts_
 }
 
 /**
-* @tc.name  test RelAudioAdapterGetPortCapability API via Multi thread calling mono card
-* @tc.number  SUB_Audio_HDI_AudioGetPortCapability_Reliability_0002
+* @tc.name  AudioGetPortCapabilityReliability_002
 * @tc.desc  test GetPortCapability interface,return 0 if the Get Port capability successfully.
-* @tc.author: liutian
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioGetPortCapability_Reliability_0002, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureControlReliabilityTest, AudioGetPortCapabilityReliability_002, TestSize.Level1)
 {
     int32_t ret = -1;
     g_para[0].manager = manager;
@@ -544,12 +538,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioGetPortCapabi
 }
 
 /**
-* @tc.name  test RelAudioAdapterSetPassthroughMode API via Multi thread calling mono card
-* @tc.number  SUB_Audio_HDI_AudioSetPassthroughMode_Reliability_0002
+* @tc.name  AudioSetPassthroughModeReliability_002
 * @tc.desc  test SetPassthroughMode interface,return 0 if the Set Passthrough Mode successfully.
-* @tc.author: liutian
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioSetPassthroughMode_Reliability_0002, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureControlReliabilityTest, AudioSetPassthroughModeReliability_002, TestSize.Level1)
 {
     int32_t ret = -1;
     g_para[0].mode = PORT_PASSTHROUGH_LPCM;
@@ -579,12 +572,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioSetPassthroug
 }
 
 /**
-* @tc.name  test RelAudioAdapterGetPassthroughMode API via Multi thread calling mono card
-* @tc.number  SUB_Audio_HDI_AudioGetPassthroughMode_Reliability_0002
+* @tc.name  AudioGetPassthroughModeReliability_002
 * @tc.desc  test GetPassthroughMode interface,return 0 if the Get Passthrough Mode successfully.
-* @tc.author: liutian
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioGetPassthroughMode_Reliability_0002, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureControlReliabilityTest, AudioGetPassthroughModeReliability_002, TestSize.Level1)
 {
     int32_t ret = -1;
     g_para[0].portType = PORT_OUT;
@@ -613,12 +605,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioGetPassthroug
     g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
 }
 /**
-* @tc.name  test AudioCaptureResume API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioCaptureResume_Reliability_0001
+* @tc.name  AudioCaptureResumeReliability_001
 * @tc.desc  test RelAudioCaptureResume interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureResume_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureControlReliabilityTest, AudioCaptureResumeReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t failcount = 0;
@@ -656,12 +647,11 @@ HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioCaptureResume
     }
 }
 /**
-* @tc.name  test AudioGetCapturePosition API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioGetCapturePosition_Reliability_0001
+* @tc.name  AudioGetCapturePositionReliability_001
 * @tc.desc  test AudioGetCapturePosition interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiCaptureControlReliabilityTest, SUB_Audio_HDI_AudioGetCapturePosition_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureControlReliabilityTest, AudioGetCapturePositionReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int64_t timeExp = 0;

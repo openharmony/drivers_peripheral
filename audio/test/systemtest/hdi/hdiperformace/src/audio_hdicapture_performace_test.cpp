@@ -84,13 +84,12 @@ void AudioHdiCapturePerformaceTest::SetUp(void) {}
 void AudioHdiCapturePerformaceTest::TearDown(void) {}
 
 /**
-* @tc.name  the performance of AudioCreateCapture
-* @tc.number  SUB_Audio_HDI_AudioCreateCapture_Performance_0001
+* @tc.name  AudioCreateCapturePerformance_001
 * @tc.devDesc  tests the performance of AudioCreateCapture interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCreateCapture_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCreateCapturePerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -127,13 +126,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCreateCapture_Perform
 }
 
 /**
-* @tc.name  the performance of AudioDestroyCapture
-* @tc.number  SUB_Audio_HDI_AudioDestroyCapture_Performance_0001
+* @tc.name  AudioDestroyCapturePerformance_001
 * @tc.devDesc  tests the performance of AudioDestroyCapture interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioDestroyCapture_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioDestroyCapturePerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -161,13 +159,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioDestroyCapture_Perfor
 }
 
 /**
-* @tc.name  the performance of AudioCaptureStart
-* @tc.number  SUB_Audio_HDI_AudioCaptureStart_Performance_0001
+* @tc.name  AudioCaptureStartPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureStart interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureStart_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureStartPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -193,13 +190,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureStart_Performa
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performance of AudioCapturePause
-* @tc.number  SUB_Audio_HDI_AudioCapturePause_Performance_0001
+* @tc.name  AudioCapturePausePerformance_001
 * @tc.devDesc  tests the performance of AudioCapturePause interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCapturePause_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCapturePausePerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -230,13 +226,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCapturePause_Performa
 }
 
 /**
-* @tc.name  the performance of AudioCaptureResume
-* @tc.number  SUB_Audio_HDI_AudioCaptureResume_Performance_0001
+* @tc.name  AudioCaptureResumePerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureResume interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureResume_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureResumePerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -266,13 +261,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureResume_Perform
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  the performance of AudioCaptureStop
-* @tc.number  SUB_Audio_HDI_AudioCaptureStop_Performance_0001
+* @tc.name  AudioCaptureStopPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureStop interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureStop_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureStopPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -304,13 +298,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureStop_Performan
 }
 
 /**
-* @tc.name  the performance of AudioCaptureSetSampleAttributes
-* @tc.number  SUB_Audio_HDI_AudioCaptureSetSampleAttributes_Performance_0001
+* @tc.name  AudioCaptureSetSampleAttributesPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureSetSampleAttributes interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetSampleAttributes_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureSetSampleAttributesPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -340,13 +333,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetSampleAttri
     audiopara.adapter = nullptr;
 }
 /**
-* @tc.name  the performance of AudioCaptureCaptureFrame
-* @tc.number  SUB_Audio_HDI_AudioCaptureCaptureFrame_Performance_0001
+* @tc.name  AudioCaptureCaptureFramePerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureCaptureFrame interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureCaptureFrame_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureCaptureFramePerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -395,13 +387,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureCaptureFrame_P
     audiopara.frame = nullptr;
 }
 /**
-* @tc.name  the performance of AudioCaptureGetSampleAttributes
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetSampleAttributes_Performance_0001
+* @tc.name  AudioCaptureGetSampleAttributesPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureGetSampleAttributes interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetSampleAttributes_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureGetSampleAttributesPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -434,13 +425,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetSampleAttri
 }
 
 /**
-* @tc.name  the performance of AudioCaptureSetMute
-* @tc.number  SUB_Audio_HDI_AudioCaptureSetMute_Performance_0001
+* @tc.name  AudioCaptureSetMutePerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureSetMute interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetMute_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureSetMutePerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -473,13 +463,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetMute_Perfor
 }
 
 /**
-* @tc.name  the performance of AudioCaptureGetMute
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetMute_Performance_0001
+* @tc.name  AudioCaptureGetMutePerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureGetMute interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetMute_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureGetMutePerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -512,13 +501,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetMute_Perfor
 }
 
 /**
-* @tc.name  the performance of AudioCaptureSetVolume
-* @tc.number  SUB_Audio_HDI_AudioCaptureSetVolume_Performance_0001
+* @tc.name  AudioCaptureSetVolumePerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureSetVolume interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetVolume_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureSetVolumePerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -552,13 +540,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetVolume_Perf
 }
 
 /**
-* @tc.name  the performance of AudioCaptureGetVolume
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetVolume_Performance_0001
+* @tc.name  AudioCaptureGetVolumePerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureGetVolume interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetVolume_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureGetVolumePerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -592,13 +579,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetVolume_Perf
 }
 
 /**
-* @tc.name  the performance of AudioCaptureGetGain
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetGain_Performance_0001
+* @tc.name  AudioCaptureGetGainPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureGetGain interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetGain_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureGetGainPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -632,13 +618,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetGain_Perfor
 }
 
 /**
-* @tc.name  the performance of AudioCaptureSetGain
-* @tc.number  SUB_Audio_HDI_AudioCaptureSetGain_Performance_0001
+* @tc.name  AudioCaptureSetGainPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureSetGain interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetGain_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureSetGainPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -672,13 +657,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetGain_Perfor
 }
 
 /**
-* @tc.name  the performance of AudioCaptureGetCurrentChannelId
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetCurrentChannelId_Performance_0001
+* @tc.name  AudioCaptureGetCurrentChannelIdPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureGetCurrentChannelId interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetCurrentChannelId_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureGetCurrentChannelIdPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -708,13 +692,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetCurrentChan
 }
 
 /**
-* @tc.name  the performance of AudioCaptureGetFrameCount
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetFrameCount_Performance_0001
+* @tc.name  AudioCaptureGetFrameCountPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureGetFrameCount interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetFrameCount_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureGetFrameCountPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -745,13 +728,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetFrameCount_
 }
 
 /**
-* @tc.name  the performance of AudioCaptureGetFrameSize
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetFrameSize_Performance_0001
+* @tc.name  AudioCaptureGetFrameSizePerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureGetFrameSize interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetFrameSize_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureGetFrameSizePerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -782,13 +764,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetFrameSize_P
 }
 
 /**
-* @tc.name  the performance of AudioCaptureFlush
-* @tc.number  SUB_Audio_HDI_AudioCaptureFlush_Performance_0001
+* @tc.name  AudioCaptureFlushPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureFlush interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureFlush_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureFlushPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -817,13 +798,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureFlush_Performa
 }
 
 /**
-* @tc.name  the performance of AudioCaptureGetGainThreshold
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetGainThreshold_Performance_0001
+* @tc.name  AudioCaptureGetGainThresholdPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureGetGainThreshold interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetGainThreshold_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureGetGainThresholdPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -856,13 +836,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetGainThresho
 }
 
 /**
-* @tc.name  the performance of AudioCaptureCheckSceneCapability
-* @tc.number  SUB_Audio_HDI_AudioCaptureCheckSceneCapability_Performance_0001
+* @tc.name  AudioCaptureCheckSceneCapabilityPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureCheckSceneCapability interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureCheckSceneCapability_Performance_0001,
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureCheckSceneCapabilityPerformance_001,
          TestSize.Level1)
 {
     int32_t ret = -1;
@@ -895,13 +874,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureCheckSceneCapa
 }
 
 /**
-* @tc.name  the performance of AudioCaptureSelectScene
-* @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_Performance_0001
+* @tc.name  AudioCaptureSelectScenePerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureSelectScene interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSelectScene_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureSelectScenePerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -932,13 +910,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSelectScene_Pe
 }
 
 /**
-* @tc.name  the performance of AudioGetCapturePosition
-* @tc.number  SUB_Audio_HDI_AudioGetCapturePosition_Performance_0001
+* @tc.name  AudioGetCapturePositionPerformance_001
 * @tc.devDesc  tests the performance of AudioCaptureGetCapturePosition interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioGetCapturePosition_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioGetCapturePositionPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -967,13 +944,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioGetCapturePosition_Pe
 }
 
 /**
-* @tc.name  the performance of AudioCaptureSetExtraParams
-* @tc.number  SUB_Audio_HDI_AudioCaptureSetExtraParams_Performance_0001
+* @tc.name  AudioCaptureSetExtraParamsPerformance_001
 * @tc.desc  tests the performance of AudioCaptureSetExtraParams interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetExtraParams_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureSetExtraParamsPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
@@ -1001,13 +977,12 @@ HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureSetExtraParams
 }
 
 /**
-* @tc.name  the performance of AudioCaptureGetExtraParams
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetExtraParams_Performance_0001
+* @tc.name  AudioCaptureGetExtraParamsPerformance_001
 * @tc.desc  tests the performance of AudioCaptureGetExtraParams interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetExtraParams_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureGetExtraParamsPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct PrepareAudioPara audiopara = {
@@ -1043,13 +1018,12 @@ attr-sampling-rate=48000";
 }
 
 /**
-* @tc.name  the performance of AudioCaptureGetMmapPosition
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetMmapPosition_Performance_0001
+* @tc.name  AudioCaptureGetMmapPositionPerformance_001
 * @tc.desc  tests the performance of AudioCaptureGetMmapPosition interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioHdiCapturePerformaceTest, SUB_Audio_HDI_AudioCaptureGetMmapPosition_Performance_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCapturePerformaceTest, AudioCaptureGetMmapPositionPerformance_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t frames = 0;

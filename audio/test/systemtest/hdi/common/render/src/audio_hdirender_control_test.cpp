@@ -79,12 +79,11 @@ void AudioHdiRenderControlTest::SetUp(void) {}
 void AudioHdiRenderControlTest::TearDown(void) {}
 
 /**
-    * @tc.name  Test AudioRenderStart API via  legal input
-    * @tc.number  SUB_Audio_HDI_RenderStart_0001
+    * @tc.name  AudioRenderStart_001
     * @tc.desc  Test AudioRenderStart interface,return 0 if the audiorender object is created successfully.
-    * @tc.author: wangqian
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStart_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderStart_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -102,12 +101,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStart_0001, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioRenderStart API via setting the incoming parameter handle is nullptr
-    * @tc.number  SUB_Audio_HDI_RenderStart_0002
+    * @tc.name  AudioRenderStart_002
     * @tc.desc  Test AudioRenderStart interface, return -1 if the  incoming parameter handle is nullptr
-    * @tc.author: wangqian
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStart_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderStart_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -124,12 +122,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStart_0002, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test AudioRenderStart API via the interface is called twice in a row
-* @tc.number  SUB_Audio_HDI_RenderStart_0003
+* @tc.name  AudioRenderStart_003
 * @tc.desc  Test AudioRenderStart interface,return -1 the second time if the RenderStart is called twice
-* @tc.author: Xuhuandi
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStart_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderStart_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -149,12 +146,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStart_0003, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test AudioRenderStop API via legal input
-* @tc.number  SUB_Audio_HDI_RenderStop_0001
+* @tc.name  AudioRenderStop_001
 * @tc.desc  test AudioRenderStop interface. return 0 if the rendering is successfully stopped.
-* @tc.author: Xuhuandi
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderStop_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -172,12 +168,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0001, TestSize.Leve
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test AudioRenderStop API via the render does not start and stop only
-* @tc.number  SUB_Audio_HDI_RenderStop_0002
+* @tc.name  AudioRenderStop_002
 * @tc.desc  test AudioRenderStop interface. return -4 if the render does not start and stop only
-* @tc.author: Xuhuandi
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderStop_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -193,12 +188,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0002, TestSize.Leve
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test RenderStop API via the interface is called twice in a row
-* @tc.number  SUB_Audio_HDI_RenderStop_0003
+* @tc.name  AudioRenderStop_003
 * @tc.desc  Test RenderStop interface,return -4 the second time if the RenderStop is called twice
-* @tc.author: Xuhuandi
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderStop_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -218,12 +212,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0003, TestSize.Leve
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test RenderStop API via setting the incoming parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_RenderStop_0004
+* @tc.name  AudioRenderStop_004
 * @tc.desc  Test RenderStop interface, return -1 if the incoming parameter handle is nullptr
-* @tc.author: Xuhuandi
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0004, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderStop_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -244,12 +237,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderStop_0004, TestSize.Leve
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderPause API via legal input
-    * @tc.number  SUB_Audio_HDI_RenderPause_001
+    * @tc.name  AudioRenderPause_001
     * @tc.desc  test HDI RenderPause interface，return 0 if the render is paused after start
-    * @tc.author: Xuhuandi
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderPause_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -267,12 +259,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0001, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test AudioRenderPause API via the interface is called twice in a row
-* @tc.number  SUB_Audio_HDI_RenderPause_0002
+* @tc.name  AudioRenderPause_002
 * @tc.desc  Test AudioRenderPause interface, return -1 the second time if RenderPause is called twice
-* @tc.author: Xuhuandi
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderPause_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -291,12 +282,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0002, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test AudioRenderPause API via the render is paused after created.
-* @tc.number  SUB_Audio_HDI_RenderPause_0003
+* @tc.name  AudioRenderPause_003
 * @tc.desc  Test AudioRenderPause interface,return -1 if the render is paused after created.
-* @tc.author: Xuhuandi
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderPause_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -311,12 +301,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0003, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test AudioRenderPause API via the render is paused after resumed.
-* @tc.number  SUB_Audio_HDI_RenderPause_0004
+* @tc.name  AudioRenderPause_004
 * @tc.desc  Test AudioRenderPause interface,return 0 if the render is paused after resumed.
-* @tc.author: Xuhuandi
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0004, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderPause_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -338,12 +327,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0004, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test AudioRenderPause API via the render is paused after stopped.
-* @tc.number  SUB_Audio_HDI_RenderPause_0005
+* @tc.name  AudioRenderPause_005
 * @tc.desc  Test AudioRenderPause interface, return -1 the render is paused after stopped.
-* @tc.author: Xuhuandi
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0005, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderPause_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -361,12 +349,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0005, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test RenderPause API via setting the incoming parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_RenderPause_0006
+* @tc.name  AudioRenderPause_006
 * @tc.desc  Test RenderPause interface, return -1 if the incoming parameter handle is nullptr
-* @tc.author: Xuhuandi
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0006, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderPause_006, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -385,12 +372,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderPause_0006, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderResume API via the render is resumed after started
-    * @tc.number  SUB_Audio_HDI_RenderResume_0001
+    * @tc.name  AudioRenderResume_001
     * @tc.desc  test HDI RenderResume interface,return -1 if the render is resumed after started
-    * @tc.author: Xuhuandi
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderResume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -408,12 +394,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0001, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderResume API via the render is resumed after stopped
-    * @tc.number  SUB_Audio_HDI_RenderResume_0002
+    * @tc.name  AudioRenderResume_002
     * @tc.desc  test HDI RenderResume interface,return -1 if the render is resumed after stopped
-    * @tc.author: Xuhuandi
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderResume_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -431,12 +416,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0002, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderResume API via legal input
-    * @tc.number  SUB_Audio_HDI_RenderResume_0003
+    * @tc.name  AudioRenderResume_003
     * @tc.desc  Test AudioRenderResume interface,return 0 if the render is resumed after paused
-    * @tc.author: Xuhuandi
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderResume_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -456,12 +440,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0003, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderResume API via the interface is called twice in a row
-    * @tc.number  SUB_Audio_HDI_RenderResume_0004
+    * @tc.name  AudioRenderResume_004
     * @tc.desc  Test RenderResume interface,return -1 the second time if the RenderResume is called twice
-    * @tc.author: Xuhuandi
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0004, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderResume_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -483,12 +466,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0004, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderResume API via the render Continue to start after resume
-    * @tc.number  SUB_Audio_HDI_RenderResume_0005
+    * @tc.name  AudioRenderResume_005
     * @tc.desc  test HDI RenderResume interface,return -1 if the render Continue to start after resume
-    * @tc.author: Xuhuandi
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0005, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderResume_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -510,12 +492,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0005, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name Test RenderResume API via setting the incoming parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_RenderResume_0007
+* @tc.name  AudioRenderResume_007
 * @tc.desc  Test RenderResume interface, return -1 if the incoming parameter handle is nullptr
-* @tc.author: Xuhuandi
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0006, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderResume_006, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -536,12 +517,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderResume_0006, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioCreateRender API via legal input.
-    * @tc.number  SUB_Audio_HDI_CreateRender_0001
+    * @tc.name  AudioCreateRender_001
     * @tc.desc  test AudioCreateRender interface,return 0 if render is created successful.
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -554,12 +534,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0001, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioCreateRender API via setting the incoming parameter pins is PIN_IN_MIC.
-    * @tc.number  SUB_Audio_HDI_CreateRender_0003
+    * @tc.name  AudioCreateRender_003
     * @tc.desc  test AudioCreateRender interface,return -1 if the incoming parameter pins is PIN_IN_MIC.
-    * @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -580,12 +559,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0003, TestSize.Le
 }
 
 /**
-    * @tc.name  Test AudioCreateRender API via setting the incoming parameter attr is error.
-    * @tc.number  SUB_Audio_HDI_CreateRender_0004
+    * @tc.name  AudioCreateRender_004
     * @tc.desc  test AudioCreateRender interface,return -1 if the incoming parameter attr is error.
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0004, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -613,12 +591,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0004, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioCreateRender API via setting the incoming parameter adapter is nullptr
-    * @tc.number  SUB_Audio_HDI_CreateRender_0005
+    * @tc.name  AudioCreateRender_005
     * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming parameter adapter is nullptr.
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0005, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -641,12 +618,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0005, TestSize.Le
 }
 
 /**
-    * @tc.name  Test AudioCreateRender API via setting the incoming parameter devDesc is nullptr
-    * @tc.number  SUB_Audio_HDI_CreateRender_0006
+    * @tc.name  AudioCreateRender_006
     * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming parameter devDesc is nullptr.
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0006, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_006, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioRender *render = nullptr;
@@ -667,12 +643,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0006, TestSize.Le
 }
 
 /**
-    * @tc.name  Test AudioCreateRender API via setting the incoming parameter attrs is nullptr
-    * @tc.number  SUB_Audio_HDI_CreateRender_0007
+    * @tc.name  AudioCreateRender_007
     * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming parameter attrs is nullptr.
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0007, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_007, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* renderPort = nullptr;
@@ -693,12 +668,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0007, TestSize.Le
 }
 
 /**
-    * @tc.name  Test AudioCreateRender API via setting the incoming parameter render is nullptr
-    * @tc.number  SUB_Audio_HDI_CreateRender_0008
+    * @tc.name  AudioCreateRender_008
     * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming parameter render is nullptr.
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0008, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_008, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -720,12 +694,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0008, TestSize.Le
 }
 
 /**
-    * @tc.name  Test AudioCreateRender API via setting the incoming parameter devDesc is error
-    * @tc.number  SUB_Audio_HDI_CreateRender_0009
+    * @tc.name  AudioCreateRender_009
     * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming parameter devDesc is error.
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0009, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_009, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -753,12 +726,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0009, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioCreateRender API via setting the incoming parameter desc which portID is not configured
-    * @tc.number  SUB_Audio_HDI_CreateRender_0010
+    * @tc.name  AudioCreateRender_010
     * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming desc which portID is not configured
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0010, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_010, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -780,12 +752,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_CreateRender_0010, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioDestroyRender API via legal input.
-    * @tc.number  SUB_Audio_HDI_DestroyRender_0001
+    * @tc.name  AudioDestroyRender_001
     * @tc.desc  Test AudioDestroyRender interface, return 0 if render is destroyed successful.
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_DestroyRender_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioDestroyRender_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -799,12 +770,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_DestroyRender_0001, TestSize.L
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioDestroyRender API,where the parameter render is empty.
-    * @tc.number  SUB_Audio_HDI_DestroyRender_0002
+    * @tc.name  AudioDestroyRender_002
     * @tc.desc  Test AudioDestroyRender interface, return -1 if the parameter render is empty.
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_DestroyRender_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioDestroyRender_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -822,12 +792,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_DestroyRender_0002, TestSize.L
 }
 
 /**
-    * @tc.name  Test RenderFlush API via legal input Verify that the data in the buffer is flushed after stop
-    * @tc.number  SUB_Audio_HDI_RenderFlush_0001
+    * @tc.name  AudioRenderFlush_001
     * @tc.desc  Test RenderFlush interface,return -2 if the data in the buffer is flushed successfully after stop
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderFlush_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderFlush_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -845,12 +814,11 @@ HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderFlush_0001, TestSize.Lev
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test RenderFlush that the data in the buffer is flushed when handle is nullptr after paused
-    * @tc.number  SUB_Audio_HDI_RenderFlush_0002
+    * @tc.name  AudioRenderFlush_002
     * @tc.desc  Test RenderFlush, return -1 if the data in the buffer is flushed when handle is nullptr after paused
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderControlTest, SUB_Audio_HDI_RenderFlush_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlTest, AudioRenderFlush_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
