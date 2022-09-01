@@ -26,23 +26,23 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioRender *render = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioRender *render = nullptr;
     static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
     static void *handleSo;
-    static void (*AudioManagerRelease)(struct AudioManager *);
-    static void (*AudioAdapterRelease)(struct AudioAdapter *);
-    static void (*AudioRenderRelease)(struct AudioRender *);
+    static void (*AudioManagerRelease)(struct IAudioManager *);
+    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
+    static void (*AudioRenderRelease)(struct IAudioRender *);
     void ReleaseAudioSource(void);
 };
 
 TestAudioManager *(*AudioIdlHdiRendervolumeTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiRendervolumeTest::manager = nullptr;
 void *AudioIdlHdiRendervolumeTest::handleSo = nullptr;
-void (*AudioIdlHdiRendervolumeTest::AudioManagerRelease)(struct AudioManager *) = nullptr;
-void (*AudioIdlHdiRendervolumeTest::AudioAdapterRelease)(struct AudioAdapter *) = nullptr;
-void (*AudioIdlHdiRendervolumeTest::AudioRenderRelease)(struct AudioRender *) = nullptr;
+void (*AudioIdlHdiRendervolumeTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
+void (*AudioIdlHdiRendervolumeTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
+void (*AudioIdlHdiRendervolumeTest::AudioRenderRelease)(struct IAudioRender *) = nullptr;
 
 void AudioIdlHdiRendervolumeTest::SetUpTestCase(void)
 {
@@ -56,11 +56,11 @@ void AudioIdlHdiRendervolumeTest::SetUpTestCase(void)
     (void)HdfRemoteGetCallingPid();
     manager = GetAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
+    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
     ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
+    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
     ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioRenderRelease = (void (*)(struct AudioRender *))(dlsym(handleSo, "AudioRenderRelease"));
+    AudioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(handleSo, "AudioRenderRelease"));
     ASSERT_NE(nullptr, AudioRenderRelease);
 }
 
@@ -139,7 +139,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_Null_
     int32_t ret = -1;
     float min = 0;
     float max = 0;
-    struct AudioRender *renderNull = nullptr;
+    struct IAudioRender *renderNull = nullptr;
 
     ASSERT_NE(nullptr, render);
     ret = render->GetGainThreshold(renderNull, &min, &max);
@@ -267,7 +267,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetGain_Null_004, Test
 {
     int32_t ret = -1;
     float gain = 1;
-    struct AudioRender *renderNull = nullptr;
+    struct IAudioRender *renderNull = nullptr;
 
     ASSERT_NE(nullptr, render);
     ret = render->SetGain(renderNull, gain);
@@ -307,7 +307,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGain_Null_002, Test
 {
     int32_t ret = -1;
     float gain = 0;
-    struct AudioRender *renderNull = nullptr;
+    struct IAudioRender *renderNull = nullptr;
 
     ASSERT_NE(nullptr, render);
     ret = render->GetGain(renderNull, &gain);
@@ -387,7 +387,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetMute_Null_002, Test
 {
     int32_t ret = -1;
     bool mute = true;
-    struct AudioRender *renderNull = nullptr;
+    struct IAudioRender *renderNull = nullptr;
 
     ASSERT_NE(nullptr, render);
     ret = render->SetMute(renderNull, mute);
@@ -450,7 +450,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetMute_Null_002, Test
     int32_t ret = -1;
     bool muteTrue = true;
     bool muteFalse = false;
-    struct AudioRender *renderNull = nullptr;
+    struct IAudioRender *renderNull = nullptr;
 
     ASSERT_NE(nullptr, render);
     ret = render->GetMute(renderNull, &muteTrue);
@@ -559,7 +559,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetVolume_Null_003, Te
 {
     int32_t ret = -1;
     float volume = 0;
-    struct AudioRender *renderNull = nullptr;
+    struct IAudioRender *renderNull = nullptr;
 
     ASSERT_NE(nullptr, render);
     ret = render->SetVolume(renderNull, volume);
@@ -619,7 +619,7 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetVolume_Null_003, Te
 {
     int32_t ret = -1;
     float volume = 0.3;
-    struct AudioRender *renderNull = nullptr;
+    struct IAudioRender *renderNull = nullptr;
 
     ASSERT_NE(nullptr, render);
     ret = render->GetVolume(renderNull, &volume);

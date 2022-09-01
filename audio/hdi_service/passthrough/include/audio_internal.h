@@ -20,11 +20,11 @@
 #include "hdf_base.h"
 #include "hdf_remote_service.h"
 #include "hdf_sbuf.h"
-#include "v1_0/audio_adapter.h"
-#include "v1_0/audio_callback.h"
-#include "v1_0/audio_capture.h"
-#include "v1_0/audio_manager.h"
-#include "v1_0/audio_render.h"
+#include "v1_0/iaudio_adapter.h"
+#include "v1_0/iaudio_callback.h"
+#include "v1_0/iaudio_capture.h"
+#include "v1_0/iaudio_manager.h"
+#include "v1_0/iaudio_render.h"
 #include "v1_0/audio_types.h"
 
 #ifdef __cplusplus
@@ -155,7 +155,7 @@ struct AudioFrameRenderMode {
     char *buffer;
     uint64_t bufferFrameSize;
     uint64_t bufferSize;
-    struct AudioCallback callback;
+    struct IAudioCallback callback;
     void *cookie;
     CallbackProcessFunc callbackProcess;
     AudioHandle renderhandle;
@@ -255,7 +255,7 @@ struct ErrorLog {
 };
 
 struct AudioHwRender {
-    struct AudioRender common;
+    struct IAudioRender common;
     struct HdfRemoteService *remote;
     struct HdfRemoteDispatcher dispatcher;
     struct AudioHwRenderParam renderParam;
@@ -294,7 +294,7 @@ struct AudioHwCaptureParam {
 };
 
 struct AudioHwCapture {
-    struct AudioCapture common;
+    struct IAudioCapture common;
     struct HdfRemoteService *proxyRemoteHandle;
     struct HdfRemoteDispatcher dispatcher;
     struct AudioHwCaptureParam captureParam;
@@ -309,7 +309,7 @@ struct AudioRenderAndCaptureInfo {
 };
 
 struct AudioHwAdapter {
-    struct AudioAdapter common;
+    struct IAudioAdapter common;
     struct HdfRemoteService *proxyRemoteHandle;
     struct HdfRemoteDispatcher dispatcher;
     struct AudioAdapterDescriptor adapterDescriptor;
@@ -323,8 +323,9 @@ struct AudioAdapterInfo {
 };
 
 struct AudioHwManager {
-    struct AudioManager interface;
-    int32_t (*OnRemoteRequest)(struct AudioManager *serviceImpl, int code, struct HdfSBuf *data, struct HdfSBuf *reply);
+    struct IAudioManager interface;
+    int32_t (*OnRemoteRequest)(
+        struct IAudioManager *serviceImpl, int code, struct HdfSBuf *data, struct HdfSBuf *reply);
     struct AudioAdapterInfo adapterInfos[SUPPORT_ADAPTER_NUM_MAX];
 };
 
@@ -435,14 +436,14 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     const struct AudioSampleAttributes *attrs);
 int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex);
 void AudioAdapterReleaseCapSubPorts(const struct AudioPortAndCapability *portCapabilitys, int32_t num);
-int32_t AudioAdapterInitAllPorts(struct AudioAdapter *adapter);
+int32_t AudioAdapterInitAllPorts(struct IAudioAdapter *adapter);
 void AudioReleaseRenderHandle(struct AudioHwRender *hwRender);
 int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, const struct AudioHwAdapter *hwAdapter);
 int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender);
-int32_t AudioAdapterCreateRender(struct AudioAdapter *self, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct AudioRender **render);
-int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter);
+int32_t AudioAdapterCreateRender(struct IAudioAdapter *self, const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs, struct IAudioRender **render);
+int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter);
 int32_t GetAudioCaptureFunc(struct AudioHwCapture *hwCapture);
 int32_t InitHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs);
@@ -450,103 +451,103 @@ void AudioReleaseCaptureHandle(struct AudioHwCapture *hwCapture);
 int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct AudioHwAdapter *hwAdapter);
 int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture);
-int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct AudioCapture **capture);
-int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter);
+int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
+    const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture);
+int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter);
 int32_t AudioAdapterGetPortCapability(
-    struct AudioAdapter *self, const struct AudioPort *port, struct AudioPortCapability *capability);
+    struct IAudioAdapter *self, const struct AudioPort *port, struct AudioPortCapability *capability);
 int32_t AudioAdapterSetPassthroughMode(
-    struct AudioAdapter *self, const struct AudioPort *port, enum AudioPortPassthroughMode mode);
+    struct IAudioAdapter *self, const struct AudioPort *port, enum AudioPortPassthroughMode mode);
 int32_t AudioAdapterGetPassthroughMode(
-    struct AudioAdapter *adapter, const struct AudioPort *port, enum AudioPortPassthroughMode *mode);
-int32_t AudioAdapterGetDeviceStatus(struct AudioAdapter *adapter, struct AudioDeviceStatus *status);
-int32_t AudioAdapterUpdateAudioRoute(struct AudioAdapter *adapter, const struct AudioRoute *route,
+    struct IAudioAdapter *adapter, const struct AudioPort *port, enum AudioPortPassthroughMode *mode);
+int32_t AudioAdapterGetDeviceStatus(struct IAudioAdapter *adapter, struct AudioDeviceStatus *status);
+int32_t AudioAdapterUpdateAudioRoute(struct IAudioAdapter *adapter, const struct AudioRoute *route,
                                      int32_t *routeHandle);
-int32_t AudioAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t routeHandle);
-int32_t AudioAdapterSetMicMute(struct AudioAdapter *adapter, bool mute);
-int32_t AudioAdapterGetMicMute(struct AudioAdapter *adapter, bool* mute);
-int32_t AudioAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume);
-int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+int32_t AudioAdapterReleaseAudioRoute(struct IAudioAdapter *adapter, int32_t routeHandle);
+int32_t AudioAdapterSetMicMute(struct IAudioAdapter *adapter, bool mute);
+int32_t AudioAdapterGetMicMute(struct IAudioAdapter *adapter, bool* mute);
+int32_t AudioAdapterSetVoiceVolume(struct IAudioAdapter *adapter, float volume);
+int32_t AudioAdapterSetExtraParams(struct IAudioAdapter *adapter, enum AudioExtParamKey key,
                                    const char *condition, const char *value);
-int32_t AudioAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+int32_t AudioAdapterGetExtraParams(struct IAudioAdapter *adapter, enum AudioExtParamKey key,
                                    const char *condition, char *value, uint32_t lenth);
-int32_t AudioAdapterRegExtraParamObserver(struct AudioAdapter *adapter, struct AudioCallback *audioCallback,
+int32_t AudioAdapterRegExtraParamObserver(struct IAudioAdapter *adapter, struct IAudioCallback *audioCallback,
                                           int8_t cookie);
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
-int32_t AudioRenderStart(struct AudioRender *self);
-int32_t AudioRenderStop(struct AudioRender *self);
-int32_t AudioRenderPause(struct AudioRender *self);
-int32_t AudioRenderResume(struct AudioRender *self);
-int32_t AudioRenderFlush(struct AudioRender *self);
-int32_t AudioRenderGetFrameSize(struct AudioRender *self, uint64_t *size);
-int32_t AudioRenderGetFrameCount(struct AudioRender *self, uint64_t *count);
-int32_t AudioRenderSetSampleAttributes(struct AudioRender *self, const struct AudioSampleAttributes *attrs);
-int32_t AudioRenderGetSampleAttributes(struct AudioRender *self, struct AudioSampleAttributes *attrs);
-int32_t AudioRenderGetCurrentChannelId(struct AudioRender *self, uint32_t *channelId);
+int32_t AudioRenderStart(struct IAudioRender *self);
+int32_t AudioRenderStop(struct IAudioRender *self);
+int32_t AudioRenderPause(struct IAudioRender *self);
+int32_t AudioRenderResume(struct IAudioRender *self);
+int32_t AudioRenderFlush(struct IAudioRender *self);
+int32_t AudioRenderGetFrameSize(struct IAudioRender *self, uint64_t *size);
+int32_t AudioRenderGetFrameCount(struct IAudioRender *self, uint64_t *count);
+int32_t AudioRenderSetSampleAttributes(struct IAudioRender *self, const struct AudioSampleAttributes *attrs);
+int32_t AudioRenderGetSampleAttributes(struct IAudioRender *self, struct AudioSampleAttributes *attrs);
+int32_t AudioRenderGetCurrentChannelId(struct IAudioRender *self, uint32_t *channelId);
 int32_t AudioRenderCheckSceneCapability(
-    struct AudioRender *self, const struct AudioSceneDescriptor *scene, bool *supported);
-int32_t AudioRenderSelectScene(struct AudioRender *self, const struct AudioSceneDescriptor *scene);
-int32_t AudioRenderSetMute(struct AudioRender *self, bool mute);
-int32_t AudioRenderGetMute(struct AudioRender *self, bool *mute);
-int32_t AudioRenderSetVolume(struct AudioRender *self, float volume);
-int32_t AudioRenderGetVolume(struct AudioRender *self, float *volume);
-int32_t AudioRenderGetGainThreshold(struct AudioRender *self, float *min, float *max);
-int32_t AudioRenderGetGain(struct AudioRender *self, float *gain);
-int32_t AudioRenderSetGain(struct AudioRender *self, float gain);
-int32_t AudioRenderGetLatency(struct AudioRender *self, uint32_t *ms);
-int32_t AudioRenderRenderFrame(struct AudioRender *self, const int8_t *frame, uint32_t frameLen, uint64_t *replyBytes);
-int32_t AudioRenderGetRenderPosition(struct AudioRender *self, uint64_t *frames, struct AudioTimeStamp *time);
-int32_t AudioRenderSetRenderSpeed(struct AudioRender *self, float speed);
-int32_t AudioRenderGetRenderSpeed(struct AudioRender *self, float *speed);
-int32_t AudioRenderSetChannelMode(struct AudioRender *self, enum AudioChannelMode mode);
-int32_t AudioRenderGetChannelMode(struct AudioRender *self, enum AudioChannelMode *mode);
-int32_t AudioRenderSetExtraParams(struct AudioRender *self, const char *keyValueList);
-int32_t AudioRenderGetExtraParams(struct AudioRender *self, char *keyValueList, uint32_t keyValueListLen);
+    struct IAudioRender *self, const struct AudioSceneDescriptor *scene, bool *supported);
+int32_t AudioRenderSelectScene(struct IAudioRender *self, const struct AudioSceneDescriptor *scene);
+int32_t AudioRenderSetMute(struct IAudioRender *self, bool mute);
+int32_t AudioRenderGetMute(struct IAudioRender *self, bool *mute);
+int32_t AudioRenderSetVolume(struct IAudioRender *self, float volume);
+int32_t AudioRenderGetVolume(struct IAudioRender *self, float *volume);
+int32_t AudioRenderGetGainThreshold(struct IAudioRender *self, float *min, float *max);
+int32_t AudioRenderGetGain(struct IAudioRender *self, float *gain);
+int32_t AudioRenderSetGain(struct IAudioRender *self, float gain);
+int32_t AudioRenderGetLatency(struct IAudioRender *self, uint32_t *ms);
+int32_t AudioRenderRenderFrame(struct IAudioRender *self, const int8_t *frame, uint32_t frameLen, uint64_t *replyBytes);
+int32_t AudioRenderGetRenderPosition(struct IAudioRender *self, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioRenderSetRenderSpeed(struct IAudioRender *self, float speed);
+int32_t AudioRenderGetRenderSpeed(struct IAudioRender *self, float *speed);
+int32_t AudioRenderSetChannelMode(struct IAudioRender *self, enum AudioChannelMode mode);
+int32_t AudioRenderGetChannelMode(struct IAudioRender *self, enum AudioChannelMode *mode);
+int32_t AudioRenderSetExtraParams(struct IAudioRender *self, const char *keyValueList);
+int32_t AudioRenderGetExtraParams(struct IAudioRender *self, char *keyValueList, uint32_t keyValueListLen);
 int32_t AudioRenderReqMmapBuffer(
-    struct AudioRender *self, int32_t reqSize, const struct AudioMmapBufferDescripter *desc);
-int32_t AudioRenderGetMmapPosition(struct AudioRender *self, uint64_t *frames, struct AudioTimeStamp *time);
-int32_t AudioRenderTurnStandbyMode(struct AudioRender *self);
-int32_t AudioRenderAudioDevDump(struct AudioRender *self, int32_t range, int32_t fd);
-int32_t AudioRenderRegCallback(struct AudioRender *self, struct AudioCallback *audioCallback, int8_t cookie);
-int32_t AudioRenderIsSupportsDrain(struct AudioRender *render, bool *support);
-int32_t AudioRenderDrainBuffer(struct AudioRender *self, enum AudioDrainNotifyType *type);
-int32_t AudioRenderAddAudioEffect(struct AudioRender *render, uint64_t effectid);
-int32_t AudioRenderRemoveAudioEffect(struct AudioRender *render, uint64_t effectid);
-int32_t AudioRenderGetFrameBufferSize(struct AudioRender *render, uint64_t *bufferSize);
-int32_t AudioRenderIsSupportsPauseAndResume(struct AudioRender *render, bool *supportPause, bool *supportResume);
-int32_t AudioCaptureStart(struct AudioCapture *self);
-int32_t AudioCaptureStop(struct AudioCapture *self);
-int32_t AudioCapturePause(struct AudioCapture *self);
-int32_t AudioCaptureResume(struct AudioCapture *self);
-int32_t AudioCaptureFlush(struct AudioCapture *self);
-int32_t AudioCaptureGetFrameSize(struct AudioCapture *self, uint64_t *size);
-int32_t AudioCaptureGetFrameCount(struct AudioCapture *self, uint64_t *count);
-int32_t AudioCaptureSetSampleAttributes(struct AudioCapture *self, const struct AudioSampleAttributes *attrs);
-int32_t AudioCaptureGetSampleAttributes(struct AudioCapture *self, struct AudioSampleAttributes *attrs);
-int32_t AudioCaptureGetCurrentChannelId(struct AudioCapture *self, uint32_t *channelId);
+    struct IAudioRender *self, int32_t reqSize, const struct AudioMmapBufferDescripter *desc);
+int32_t AudioRenderGetMmapPosition(struct IAudioRender *self, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioRenderTurnStandbyMode(struct IAudioRender *self);
+int32_t AudioRenderAudioDevDump(struct IAudioRender *self, int32_t range, int32_t fd);
+int32_t AudioRenderRegCallback(struct IAudioRender *self, struct IAudioCallback *audioCallback, int8_t cookie);
+int32_t AudioRenderIsSupportsDrain(struct IAudioRender *render, bool *support);
+int32_t AudioRenderDrainBuffer(struct IAudioRender *self, enum AudioDrainNotifyType *type);
+int32_t AudioRenderAddAudioEffect(struct IAudioRender *render, uint64_t effectid);
+int32_t AudioRenderRemoveAudioEffect(struct IAudioRender *render, uint64_t effectid);
+int32_t AudioRenderGetFrameBufferSize(struct IAudioRender *render, uint64_t *bufferSize);
+int32_t AudioRenderIsSupportsPauseAndResume(struct IAudioRender *render, bool *supportPause, bool *supportResume);
+int32_t AudioCaptureStart(struct IAudioCapture *self);
+int32_t AudioCaptureStop(struct IAudioCapture *self);
+int32_t AudioCapturePause(struct IAudioCapture *self);
+int32_t AudioCaptureResume(struct IAudioCapture *self);
+int32_t AudioCaptureFlush(struct IAudioCapture *self);
+int32_t AudioCaptureGetFrameSize(struct IAudioCapture *self, uint64_t *size);
+int32_t AudioCaptureGetFrameCount(struct IAudioCapture *self, uint64_t *count);
+int32_t AudioCaptureSetSampleAttributes(struct IAudioCapture *self, const struct AudioSampleAttributes *attrs);
+int32_t AudioCaptureGetSampleAttributes(struct IAudioCapture *self, struct AudioSampleAttributes *attrs);
+int32_t AudioCaptureGetCurrentChannelId(struct IAudioCapture *self, uint32_t *channelId);
 int32_t AudioCaptureCheckSceneCapability(
-    struct AudioCapture *self, const struct AudioSceneDescriptor *scene, bool *supported);
-int32_t AudioCaptureSelectScene(struct AudioCapture *self, const struct AudioSceneDescriptor *scene);
-int32_t AudioCaptureSetMute(struct AudioCapture *self, bool mute);
-int32_t AudioCaptureGetMute(struct AudioCapture *self, bool *mute);
-int32_t AudioCaptureSetVolume(struct AudioCapture *self, float volume);
-int32_t AudioCaptureGetVolume(struct AudioCapture *self, float *volume);
-int32_t AudioCaptureGetGainThreshold(struct AudioCapture *self, float *min, float *max);
-int32_t AudioCaptureGetGain(struct AudioCapture *self, float *gain);
-int32_t AudioCaptureSetGain(struct AudioCapture *self, float gain);
-int32_t AudioCaptureCaptureFrame(struct AudioCapture *self, int8_t *frame, uint32_t *frameLen, uint64_t requestBytes);
-int32_t AudioCaptureGetCapturePosition(struct AudioCapture *self, uint64_t *frames, struct AudioTimeStamp *time);
-int32_t AudioCaptureSetExtraParams(struct AudioCapture *self, const char *keyValueList);
-int32_t AudioCaptureGetExtraParams(struct AudioCapture *self, char *keyValueList, uint32_t keyValueListLen);
+    struct IAudioCapture *self, const struct AudioSceneDescriptor *scene, bool *supported);
+int32_t AudioCaptureSelectScene(struct IAudioCapture *self, const struct AudioSceneDescriptor *scene);
+int32_t AudioCaptureSetMute(struct IAudioCapture *self, bool mute);
+int32_t AudioCaptureGetMute(struct IAudioCapture *self, bool *mute);
+int32_t AudioCaptureSetVolume(struct IAudioCapture *self, float volume);
+int32_t AudioCaptureGetVolume(struct IAudioCapture *self, float *volume);
+int32_t AudioCaptureGetGainThreshold(struct IAudioCapture *self, float *min, float *max);
+int32_t AudioCaptureGetGain(struct IAudioCapture *self, float *gain);
+int32_t AudioCaptureSetGain(struct IAudioCapture *self, float gain);
+int32_t AudioCaptureCaptureFrame(struct IAudioCapture *self, int8_t *frame, uint32_t *frameLen, uint64_t requestBytes);
+int32_t AudioCaptureGetCapturePosition(struct IAudioCapture *self, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioCaptureSetExtraParams(struct IAudioCapture *self, const char *keyValueList);
+int32_t AudioCaptureGetExtraParams(struct IAudioCapture *self, char *keyValueList, uint32_t keyValueListLen);
 int32_t AudioCaptureReqMmapBuffer(
-    struct AudioCapture *self, int32_t reqSize, const struct AudioMmapBufferDescripter *desc);
-int32_t AudioCaptureGetMmapPosition(struct AudioCapture *self, uint64_t *frames, struct AudioTimeStamp *time);
-int32_t AudioCaptureTurnStandbyMode(struct AudioCapture *self);
-int32_t AudioCaptureAudioDevDump(struct AudioCapture *self, int32_t range, int32_t fd);
-int32_t AudioCaptureAddAudioEffect(struct AudioCapture *handle, uint64_t effectid);
-int32_t AudioCaptureRemoveAudioEffect(struct AudioCapture *handle, uint64_t effectid);
-int32_t AudioCaptureGetFrameBufferSize(struct AudioCapture *handle, uint64_t* bufferSize);
-int32_t AudioCaptureIsSupportsPauseAndResume(struct AudioCapture *handle, bool* supportPause, bool* supportResume);
+    struct IAudioCapture *self, int32_t reqSize, const struct AudioMmapBufferDescripter *desc);
+int32_t AudioCaptureGetMmapPosition(struct IAudioCapture *self, uint64_t *frames, struct AudioTimeStamp *time);
+int32_t AudioCaptureTurnStandbyMode(struct IAudioCapture *self);
+int32_t AudioCaptureAudioDevDump(struct IAudioCapture *self, int32_t range, int32_t fd);
+int32_t AudioCaptureAddAudioEffect(struct IAudioCapture *handle, uint64_t effectid);
+int32_t AudioCaptureRemoveAudioEffect(struct IAudioCapture *handle, uint64_t effectid);
+int32_t AudioCaptureGetFrameBufferSize(struct IAudioCapture *handle, uint64_t* bufferSize);
+int32_t AudioCaptureIsSupportsPauseAndResume(struct IAudioCapture *handle, bool* supportPause, bool* supportResume);
 int32_t CallbackProcessing(AudioHandle handle, enum AudioCallbackType callBackType);
 
 #ifdef __cplusplus

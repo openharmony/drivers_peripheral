@@ -32,7 +32,7 @@
 #include "hdf_service_status.h"
 #include "ioservstat_listener.h"
 #include "svcmgr_ioservice.h"
-#include "v1_0/audio_manager.h"
+#include "v1_0/iaudio_manager.h"
 #include "v1_0/audio_types.h"
 
 namespace OHOS {
@@ -59,7 +59,7 @@ const std::string AUDIO_LOW_LATENCY_CAPTURE_FILE = "/data/lowlatencycapturetest.
 const int AUDIO_ADAPTER_MAX_NUM = 5;
 const std::string ADAPTER_NAME = "primary";
 const std::string ADAPTER_NAME_OUT = "primary_ext";
-using TestAudioManager = struct AudioManager;
+using TestAudioManager = struct IAudioManager;
 
 const std::string AUDIO_RIFF = "RIFF";
 const std::string AUDIO_WAVE = "WAVE";
@@ -162,15 +162,15 @@ struct PrepareAudioPara {
     TestAudioManager *manager;
     AudioPortDirection portType;
     const char *adapterName;
-    struct AudioAdapter *adapter;
+    struct IAudioAdapter *adapter;
     struct AudioPort audioPort;
     void *self;
     void *result;
     pthread_t tids;
     AudioPortPin pins;
     const char *path;
-    struct AudioRender *render;
-    struct AudioCapture *capture;
+    struct IAudioRender *render;
+    struct IAudioCapture *capture;
     struct AudioHeadInfo headInfo;
     struct AudioAdapterDescriptor *desc;
     struct AudioAdapterDescriptor *descs;
@@ -209,32 +209,32 @@ int32_t WavHeadAnalysis(struct AudioHeadInfo &wavHeadInfo, FILE *file, struct Au
 int32_t GetAdapters(TestAudioManager *manager, struct AudioAdapterDescriptor *&descs, uint32_t &size);
 
 int32_t GetLoadAdapter(TestAudioManager *manager, int portType,
-    const std::string &adapterName, struct AudioAdapter **adapter, struct AudioPort &audioPort);
+    const std::string &adapterName, struct IAudioAdapter **adapter, struct AudioPort &audioPort);
 
 int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string &adapterName,
-    struct AudioAdapter **adapter, struct AudioRender **render);
+    struct IAudioAdapter **adapter, struct IAudioRender **render);
 
 int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::string &adapterName,
-    struct AudioAdapter **adapter, struct AudioCapture **capture);
+    struct IAudioAdapter **adapter, struct IAudioCapture **capture);
 
-int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render, FILE *file,
+int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct IAudioRender *render, FILE *file,
     struct AudioSampleAttributes attrs);
 
-int32_t FrameStartCapture(struct AudioCapture *capture, FILE *file, const struct AudioSampleAttributes attrs);
+int32_t FrameStartCapture(struct IAudioCapture *capture, FILE *file, const struct AudioSampleAttributes attrs);
 
 int32_t RenderFramePrepare(const std::string &path, char *&frame, uint64_t &numRead);
 
 void FrameStatus(int status);
 
-int32_t StartRecord(struct AudioCapture *capture, FILE *file, uint64_t filesize);
+int32_t StartRecord(struct IAudioCapture *capture, FILE *file, uint64_t filesize);
 
-int32_t AudioRenderStartAndOneFrame(struct AudioRender *render);
+int32_t AudioRenderStartAndOneFrame(struct IAudioRender *render);
 
 int32_t StopAudio(struct PrepareAudioPara &audiopara);
 
 int32_t ThreadRelease(struct PrepareAudioPara &audiopara);
 
-int32_t AudioCaptureStartAndOneFrame(struct AudioCapture *capture);
+int32_t AudioCaptureStartAndOneFrame(struct IAudioCapture *capture);
 
 int32_t PlayAudioFile(struct PrepareAudioPara &audiopara);
 
@@ -244,10 +244,10 @@ int32_t InitAttrsUpdate(struct AudioSampleAttributes &attrs, int format, uint32_
     uint32_t sampleRate, uint32_t silenceThreshold = BUFFER_LENTH);
 
 int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
-    struct AudioRender *render);
+    struct IAudioRender *render);
 
 int32_t AudioCaptureSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
-    struct AudioCapture *capture);
+    struct IAudioCapture *capture);
 
 int32_t InitMmapDesc(const std::string &path, struct AudioMmapBufferDescripter &desc, int32_t &reqSize, bool flag);
 
@@ -255,7 +255,7 @@ int32_t PlayMapAudioFile(struct PrepareAudioPara &audiopara);
 
 int32_t RecordMapAudio(struct PrepareAudioPara &audiopara);
 
-int32_t AudioRenderCallback(struct AudioCallback *self, enum AudioCallbackType type, int8_t* reserved,
+int32_t AudioRenderCallback(struct IAudioCallback *self, enum AudioCallbackType type, int8_t* reserved,
     int8_t* cookie);
 
 int32_t CheckFlushValue();

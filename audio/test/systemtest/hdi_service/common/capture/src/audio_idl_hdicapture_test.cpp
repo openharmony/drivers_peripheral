@@ -31,14 +31,14 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioCapture *capture = nullptr;
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture *capture = nullptr;
     static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
     static void *handle;
-    static void (*AudioManagerRelease)(struct AudioManager *);
-    static void (*AudioAdapterRelease)(struct AudioAdapter *);
-    static void (*AudioCaptureRelease)(struct AudioCapture *);
+    static void (*AudioManagerRelease)(struct IAudioManager *);
+    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
+    static void (*AudioCaptureRelease)(struct IAudioCapture *);
     void ReleaseCaptureSource(void);
 };
 
@@ -47,9 +47,9 @@ using THREAD_FUNC = void *(*)(void *);
 TestAudioManager *(*AudioIdlHdiCaptureTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiCaptureTest::manager = nullptr;
 void *AudioIdlHdiCaptureTest::handle = nullptr;
-void (*AudioIdlHdiCaptureTest::AudioManagerRelease)(struct AudioManager *) = nullptr;
-void (*AudioIdlHdiCaptureTest::AudioAdapterRelease)(struct AudioAdapter *) = nullptr;
-void (*AudioIdlHdiCaptureTest::AudioCaptureRelease)(struct AudioCapture *) = nullptr;
+void (*AudioIdlHdiCaptureTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
+void (*AudioIdlHdiCaptureTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
+void (*AudioIdlHdiCaptureTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
 
 void AudioIdlHdiCaptureTest::SetUpTestCase(void)
 {
@@ -63,11 +63,11 @@ void AudioIdlHdiCaptureTest::SetUpTestCase(void)
     (void)HdfRemoteGetCallingPid();
     manager = GetAudioManager(IDL_SERVER_NAME.c_str());
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct AudioManager *))(dlsym(handle, "AudioManagerRelease"));
+    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handle, "AudioManagerRelease"));
     ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct AudioAdapter *))(dlsym(handle, "AudioAdapterRelease"));
+    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handle, "AudioAdapterRelease"));
     ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct AudioCapture *))(dlsym(handle, "AudioCaptureRelease"));
+    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handle, "AudioCaptureRelease"));
     ASSERT_NE(nullptr, AudioCaptureRelease);
 }
 
@@ -195,7 +195,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureFrame_Null_004, TestSize.L
     int32_t ret;
     uint64_t requestBytes = BUFFER_SIZE;
     uint32_t replyBytes = BUFFER_SIZE;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = capture->Start(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -380,7 +380,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureGetCapturePosition_004, Te
 HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureGetCapturePosition_Null_005, TestSize.Level1)
 {
     int32_t ret;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     uint64_t frames = 0;
     struct AudioTimeStamp time = {};
     ASSERT_NE(nullptr, capture);
@@ -587,7 +587,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureReqMmapBuffer_Null_006, Te
     bool isRender = false;
     int32_t reqSize = 0;
     struct AudioMmapBufferDescripter desc = {};
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -710,7 +710,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, SUB_Audio_HDI_CaptureGetMmapPosition_Null_005, 
 {
     int32_t ret;
     uint64_t frames = 0;
-    struct AudioCapture *captureNull = nullptr;
+    struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     struct PrepareAudioPara audiopara = {
         .capture = capture, .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,

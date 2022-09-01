@@ -53,6 +53,6 @@ int32_t FormatToBits(enum AudioFormat format, uint32_t *formatBits);
 int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count, struct ExtraParams *mExtraParams, int32_t *sumOk);
 int32_t SetDescParam(
     struct AudioMmapBufferDescripter *desc, FILE *fp, int32_t reqSize, int64_t *fileSize, int32_t *flags);
-bool ReleaseAudioManagerObjectComm(struct AudioManager *object);
+bool ReleaseAudioManagerObjectComm(struct IAudioManager *object);
 
 #endif
