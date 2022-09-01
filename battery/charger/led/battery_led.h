@@ -16,7 +16,10 @@
 #ifndef BATTERY_LED_H
 #define BATTERY_LED_H
 
+#include "v1_0/ilight_interface.h"
+#include "v1_0/light_types.h"
 #include "battery_config.h"
+#include "power_supply_provider.h"
 
 namespace OHOS {
 namespace HDI {
@@ -24,10 +27,20 @@ namespace Battery {
 namespace V1_1 {
 class BatteryLed {
 public:
-    void InitLightInfo();
-    static void TurnOffLed();
-    static void WriteLedInfo(int32_t redBrightness, int32_t greenBrightness, int32_t blueBrightness);
-    void UpdateLedColor(int32_t chargeState, int32_t capacity);
+    BatteryLed() = default;
+    ~BatteryLed() = default;
+
+    void InitLight();
+    void TurnOff();
+    void TurnOn(uint32_t color = 0, int32_t brightness = 255);
+    bool UpdateColor(int32_t chargeState, int32_t capacity);
+    bool isAvailable() const;
+    uint32_t GetLightColor() const;
+
+private:
+    sptr<OHOS::HDI::Light::V1_0::ILightInterface> batteryLight_ {nullptr};
+    bool available_ {false};
+    uint32_t lightColor_ {0};
 };
 }  // namespace V1_1
 }  // namespace Battery
