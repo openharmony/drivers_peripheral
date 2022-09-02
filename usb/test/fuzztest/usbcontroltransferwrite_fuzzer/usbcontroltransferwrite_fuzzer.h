@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef USBQUERYPORT_FUZZER_H
-#define USBQUERYPORT_FUZZER_H
+#ifndef USBCONTROLTRANSFERWRITE_FUZZER_H
+#define USBCONTROLTRANSFERWRITE_FUZZER_H
 
-#define FUZZ_PROJECT_NAME "usbqueryport_fuzzer"
+#define FUZZ_PROJECT_NAME "usbcontroltransferwrite_fuzzer"
 
 #endif

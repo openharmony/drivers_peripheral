@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "usbunregbulkcallback_fuzzer.h"
+#include "usbcontroltransferread_fuzzer.h"
 #include "UsbSubscriberTest.h"
 #include "hdf_log.h"
 #include "securec.h"
@@ -24,7 +24,7 @@ using namespace OHOS::HDI::Usb::V1_0;
 
 namespace OHOS {
 namespace USB {
-bool UsbUnRegBulkCallbackFuzzTest(const uint8_t *data, size_t size)
+bool UsbControlTransferReadFuzzTest(const uint8_t *data, size_t size)
 {
     (void)size;
     UsbDev dev;
@@ -35,15 +35,15 @@ bool UsbUnRegBulkCallbackFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    UsbPipe pipe;
-    if (memcpy_s((void *)&pipe, sizeof(pipe), data, sizeof(pipe)) != EOK) {
+    UsbCtrlTransfer ctrl;
+    if (memcpy_s((void *)&ctrl, sizeof(ctrl), data, sizeof(ctrl)) != EOK) {
         HDF_LOGE("%{public}s: memcpy_s failed", __func__);
         return false;
     }
 
-    ret = usbInterface->UnRegBulkCallback(dev, pipe);
+    ret = usbInterface->ControlTransferRead(dev, ctrl, reinterpret_cast<std::vector<uint8_t> &>(data));
     if (ret == HDF_SUCCESS) {
-        HDF_LOGI("%{public}s: unreg bulk callback succeed", __func__);
+        HDF_LOGI("%{public}s: control transfer read succeed", __func__);
     }
 
     ret = usbInterface->CloseDevice(dev);
@@ -58,6 +58,6 @@ bool UsbUnRegBulkCallbackFuzzTest(const uint8_t *data, size_t size)
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    OHOS::USB::UsbUnRegBulkCallbackFuzzTest(data, size);
+    OHOS::USB::UsbControlTransferReadFuzzTest(data, size);
     return 0;
 }
