@@ -80,7 +80,8 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
-    install_images = [ chipset_base_dir ]
+    install_images = [ system_base_dir ]
+    relative_install_dir = "chipset-pub-sdk"
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_wlan"
     if (is_standard_system) {
