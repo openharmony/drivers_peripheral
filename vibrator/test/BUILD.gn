@@ -11,6 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+declare_args() {
+  drivers_peripheral_vibrator_feature_model = false
+}
+
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
@@ -28,12 +32,17 @@ if (defined(ohos_lite)) {
     features = []
   }
 } else {
+  import("//build/ohos.gni")
+
   group("hdf_test_vibrator") {
-    testonly = true
-    deps = [
-      "fuzztest:hdf_vibrator_fuzztest",
-      "unittest:hdf_unittest_vibrator",
-      "unittest/hdi:hdf_unittest_hdi_vibrator",
-    ]
+    deps = []
+    if (drivers_peripheral_vibrator_feature_model) {
+      testonly = true
+      deps += [
+        "fuzztest:hdf_vibrator_fuzztest",
+        "unittest:hdf_unittest_vibrator",
+        "unittest/hdi:hdf_unittest_hdi_vibrator",
+      ]
+    }
   }
 }

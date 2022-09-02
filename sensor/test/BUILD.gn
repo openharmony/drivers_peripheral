@@ -11,6 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+declare_args() {
+  drivers_peripheral_sensor_feature_model = false
+}
+
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
@@ -25,11 +29,16 @@ if (defined(ohos_lite)) {
     features = []
   }
 } else {
+  import("//build/ohos.gni")
+
   group("hdf_test_sensor") {
-    testonly = true
-    deps = [
-      "fuzztest:hdf_sensor_fuzztest",
-      "unittest/hdi:hdi_unittest_sensor",
-    ]
+    deps = []
+    if (drivers_peripheral_sensor_feature_model) {
+      testonly = true
+      deps += [
+        "fuzztest:hdf_sensor_fuzztest",
+        "unittest/hdi:hdi_unittest_sensor",
+      ]
+    }
   }
 }
