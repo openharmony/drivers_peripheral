@@ -14,49 +14,47 @@
  */
 
 #include "usbopendevice_fuzzer.h"
-#include "usbd_client.h"
 #include "hdf_log.h"
-#include "usb_errors.h"
+#include "securec.h"
+#include "usbcommonfunction_fuzzer.h"
+#include "v1_0/iusb_interface.h"
 
-#include <unistd.h>
+using namespace OHOS::HDI::Usb::V1_0;
 
 namespace OHOS {
 namespace USB {
-    static const int32_t SLEEP_TIME = 3;
-    static const int32_t DEFAULT_PORT_ID = 1;
-    static const int32_t DEFAULT_ROLE_HOST = 1;
-    static const int32_t DEFAULT_ROLE_DEVICE = 2;
-    
-    bool UsbOpenDeviceFuzzTest(const uint8_t* data, size_t size)
-    {
-        (void)size;
-        bool result = false;
-        int32_t ret = UsbdClient::GetInstance().SetPortRole(DEFAULT_PORT_ID, DEFAULT_ROLE_HOST, DEFAULT_ROLE_HOST);
-        sleep(SLEEP_TIME);
-        if (ret != UEC_OK) {
-            HDF_LOGE("%{public}s: set port role as host failed\n", __func__);
-            return false;
-        }
-
-        ret = UsbdClient::GetInstance().OpenDevice(reinterpret_cast<const UsbDev &>(data));
-        if (ret == UEC_OK) {
-            HDF_LOGI("%{public}s: open device succeed\n", __func__);
-            result = true;
-        }
-
-        ret = UsbdClient::GetInstance().SetPortRole(DEFAULT_PORT_ID, DEFAULT_ROLE_DEVICE, DEFAULT_ROLE_DEVICE);
-        sleep(SLEEP_TIME);
-        if (ret != UEC_OK) {
-            HDF_LOGE("%{public}s: set port role as device failed\n", __func__);
-            return false;
-        }
-
-        return result;
+bool UsbOpenDeviceFuzzTest(const uint8_t *data, size_t size)
+{
+    (void)size;
+    sptr<IUsbInterface> usbInterface = IUsbInterface::Get();
+    int32_t ret = usbInterface->SetPortRole(DEFAULT_PORT_ID, DEFAULT_ROLE_HOST, DEFAULT_ROLE_HOST);
+    sleep(SLEEP_TIME);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: set port role as host failed", __func__);
+        return false;
     }
+
+    UsbDev dev;
+    if (memcpy_s((void *)&dev, sizeof(dev), data, sizeof(dev)) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s failed", __func__);
+        return false;
+    }
+
+    ret = usbInterface->OpenDevice(dev);
+    if (ret == HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: open device succeed", __func__);
+        ret = usbInterface->CloseDevice(dev);
+        if (ret == HDF_SUCCESS) {
+            HDF_LOGI("%{public}s: close device succeed", __func__);
+        }
+    }
+
+    return true;
+}
 } // namespace USB
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::USB::UsbOpenDeviceFuzzTest(data, size);
     return 0;
