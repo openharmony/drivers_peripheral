@@ -70,19 +70,7 @@ ohos_shared_library("libcodec_server") {
     "codec_service_stub/stub_msgproc.c",
   ]
 
-  if (product_name == "Hi3516DV300") {
-    CODEC_LIB_PATH = "//device/soc/hisilicon/common/hal/media/codec/hi3516dv300/linux_standard/libs"
-    CODEC_LIB_REAL_PATH = rebase_path("$CODEC_LIB_PATH")
-    ldflags = [ "-L$CODEC_LIB_REAL_PATH" ]
-    ldflags += [ "-lcodec" ]
-  }
-
   deps = [ "//drivers/peripheral/codec/hdi_service:codec_client" ]
-
-  if (product_name == "rk3568") {
-    deps +=
-        [ "//device/soc/rockchip/rk3568/hardware/codec:codec_oem_interface" ]
-  }
 
   if (is_standard_system) {
     external_deps = [
@@ -105,8 +93,13 @@ ohos_shared_library("libcodec_server") {
 }
 
 group("codec_service") {
-  if ((target_cpu == "arm" && product_name == "Hi3516DV300") ||
-      product_name == "rk3568") {
+  CODEC_OEM_PATH = rebase_path(
+          "//device/soc/${device_company}/${product_name}/hardware/codec")
+  cmd = "if [ -f ${CODEC_OEM_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
+  HAVE_CODEC_OEM_PATH =
+      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+
+  if (HAVE_CODEC_OEM_PATH) {
     deps = [ ":libcodec_server" ]
   }
 }

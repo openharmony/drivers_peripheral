@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Shenzhen Kaihong DID Co., Ltd.
+# Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("hdf_unittest_codec") {
+group("hdf_demo_codec") {
   CODEC_OEM_PATH = rebase_path(
           "//device/soc/${device_company}/${product_name}/hardware/codec")
   cmd = "if [ -f ${CODEC_OEM_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
@@ -28,11 +28,11 @@ group("hdf_unittest_codec") {
   deps = []
   if (HAVE_CODEC_OEM_PATH) {
     deps += [
-      "hdi_adapter:codec_hdi_adapter_test",
-      "hdi_v1.0:codec_client_test",
+      "adapter:codec_hdi_adapter_demo",
+      "v1.0:codec_hdi_demo",
     ]
   }
   if (HAVE_OMX_IL_PATH) {
-    deps += [ "hdi_omx:codec_hdi_omx_test" ]
+    deps += [ "v2.0:codec_hdi_omx_demo" ]
   }
 }
