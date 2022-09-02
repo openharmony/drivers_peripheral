@@ -34,7 +34,7 @@ if (defined(ohos_lite)) {
       "include",
       "$camera_path/include",
       "src/buffer_adapter/lite",
-      "//utils/native/base/include",
+      "//commonlibrary/utils_lite/include",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "//drivers/peripheral/display/interfaces/include",
       "//drivers/peripheral/base",

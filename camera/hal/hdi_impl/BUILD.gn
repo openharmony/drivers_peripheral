@@ -60,7 +60,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/base",
 
       #producer
-      "//utils/native/base/include",
+      "//commonlibrary/utils_lite/include",
       "$camera_path/pipeline_core/utils",
       "$camera_path/pipeline_core/include",
       "$camera_path/pipeline_core/host_stream/include",
