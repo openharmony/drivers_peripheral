@@ -37,7 +37,8 @@
         "//drivers/peripheral/battery/charger:resources_service"
       ],
       "test": [
-        "//drivers/peripheral/battery/interfaces/hdi_service/test:unittest"
+        "//drivers/peripheral/battery/interfaces/hdi_service/test:unittest",
+        "//drivers/peripheral/battery/interfaces/hdi_service/test:systemtest"
       ],
       "inner_kits": []
     }
