@@ -51,7 +51,8 @@ ohos_shared_library("def_display_gralloc") {
   ]
 
   install_enable = true
-  install_images = [ chipset_base_dir ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "chipset-sdk"
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"
 }
@@ -123,7 +124,8 @@ ohos_shared_library("def_display_device") {
   ]
 
   install_enable = true
-  install_images = [ chipset_base_dir ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "chipset-sdk"
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"
 }
@@ -153,7 +155,8 @@ ohos_shared_library("def_display_layer_video") {
   public_deps = [ "//drivers/peripheral/display/hdi_service/video_layer/client:video_layer_client" ]
 
   install_enable = true
-  install_images = [ chipset_base_dir ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "chipset-sdk"
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"
 }

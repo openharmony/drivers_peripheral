@@ -52,7 +52,8 @@ if (is_standard_system) {
     }
     external_deps += [ "graphic_chipsetsdk:surface" ]
 
-    install_images = [ chipset_base_dir ]
+    install_images = [ system_base_dir ]
+    relative_install_dir = "platformsdk"
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_display"
   }
