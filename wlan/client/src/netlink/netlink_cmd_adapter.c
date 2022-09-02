@@ -86,6 +86,9 @@ static inline uint32_t BIT(uint8_t x)
 #define STA_DRV_DATA_RX_SHORT_GI BIT(7)
 #define STA_DRV_DATA_LAST_ACK_RSSI BIT(8)
 
+#define WLAN_IFACE_LENGTH 4
+#define P2P_IFACE_LENGTH 3
+
 // vendor attr
 enum AndrWifiAttr {
     ANDR_WIFI_ATTRIBUTE_NUM_FEATURE_SET,
@@ -728,7 +731,7 @@ static int32_t ParserValidFreq(struct nl_msg *msg, void *arg)
 
 static bool IsWifiIface(const char *name)
 {
-    if (strncmp(name, "wlan", 4) != 0 && strncmp(name, "p2p", 3) != 0) {
+    if (strncmp(name, "wlan", WLAN_IFACE_LENGTH) != 0 && strncmp(name, "p2p", P2P_IFACE_LENGTH) != 0) {
         /* not a wifi interface; ignore it */
         return false;
     } else {
