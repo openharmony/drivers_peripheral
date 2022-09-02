@@ -109,7 +109,7 @@ namespace {
 
         for (int32_t i = 0; i < g_listNum; ++i) {
             if (event->sensorId == g_sensorList[i].sensorTypeId) {
-                float *data = (float*)event->data;
+                float *data = reinterpret_cast<float*>(event->data);
                 SensorDataVerification(*data, g_sensorList[i]);
             }
         }
