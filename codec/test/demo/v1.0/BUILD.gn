@@ -24,8 +24,8 @@ ohos_executable("codec_decode_test_ipc") {
   ]
 
   include_dirs = [
-    "//device/soc/rockchip/rk3568/hardware/codec/include",
-    "//device/soc/rockchip/rk3568/hardware/mpp/include",
+    "//device/soc/${device_company}/${product_name}/hardware/codec/include",
+    "//device/soc/${device_company}/${product_name}/hardware/mpp/include",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
     "//drivers/peripheral/codec/hdi_service/codec_proxy",
@@ -47,8 +47,8 @@ ohos_executable("codec_decode_test_ipc") {
   ]
 
   deps = [
-    "//device/soc/rockchip/rk3568/hardware/codec:codec_oem_interface",
-    "//device/soc/rockchip/rk3568/hardware/mpp:mpp",
+    "//device/soc/${device_company}/${product_name}/hardware/codec:codec_oem_interface",
+    "//device/soc/${device_company}/${product_name}/hardware/mpp:mpp",
     "//drivers/peripheral/codec/hdi_service:codec_client",
   ]
 
@@ -81,8 +81,8 @@ ohos_executable("codec_encode_test_ipc") {
   ]
 
   include_dirs = [
-    "//device/soc/rockchip/rk3568/hardware/codec/include",
-    "//device/soc/rockchip/rk3568/hardware/mpp/include",
+    "//device/soc/${device_company}/${product_name}/hardware/codec/include",
+    "//device/soc/${device_company}/${product_name}/hardware/mpp/include",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
     "//drivers/peripheral/codec/hdi_service/codec_proxy",
@@ -104,8 +104,8 @@ ohos_executable("codec_encode_test_ipc") {
   ]
 
   deps = [
-    "//device/soc/rockchip/rk3568/hardware/codec:codec_oem_interface",
-    "//device/soc/rockchip/rk3568/hardware/mpp:mpp",
+    "//device/soc/${device_company}/${product_name}/hardware/codec:codec_oem_interface",
+    "//device/soc/${device_company}/${product_name}/hardware/mpp:mpp",
     "//drivers/peripheral/codec/hdi_service:codec_client",
   ]
   if (is_standard_system) {
