@@ -40,7 +40,7 @@ namespace {
         if (event == nullptr || event->data == nullptr) {
             return -1;
         }
-        float *data = (float*)event->data;
+        float *data = reinterpret_cast<float*>(event->data);
 
         if (event->sensorId == SENSOR_ID) {
             printf("time [%lld] sensor id [%d] data [%f]\n\r", event->timestamp, event->sensorId, *(data));
