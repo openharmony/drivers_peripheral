@@ -85,7 +85,7 @@ private:
         std::vector<std::shared_ptr<DCStreamInfo>> &srcStreamInfo);
     void SnapShotStreamOnCaptureEnded(int32_t captureId, int streamId);
     bool HasContinuousCaptureInfo(int captureId);
-    void ExtractStreamInfo(DCStreamInfo &dstStreamInfo, const std::shared_ptr<DCStreamInfo> &srcStreamInfo);
+    int32_t ExtractStreamInfo(std::vector<DCStreamInfo>& dCameraStreams);
     void ExtractCaptureInfo(std::vector<DCCaptureInfo> &captureInfos);
     void ExtractCameraAttr(Json::Value &rootValue, std::set<int> &allFormats, std::vector<int> &photoFormats);
     DCamRetCode GetInputCaptureInfo(const CaptureInfo& srcCaptureInfo, bool isStreaming,
@@ -93,6 +93,28 @@ private:
     void AppendCaptureInfo(std::shared_ptr<DCCaptureInfo> &appendCaptureInfo, bool isStreaming,
         std::shared_ptr<DCCaptureInfo> &inputCaptureInfo, const CaptureInfo& srcCaptureInfo);
     int32_t HalStreamCommit(const DCStreamInfo &streamInfo);
+
+    std::shared_ptr<DCameraStream> FindHalStreamById(int32_t streamId);
+    void InsertHalStream(int32_t streamId, std::shared_ptr<DCameraStream>& dcStream);
+    void EraseHalStream(int32_t streamId);
+
+    std::shared_ptr<CaptureInfo> FindCaptureInfoById(int32_t captureId);
+    void InsertCaptureInfo(int captureId, std::shared_ptr<CaptureInfo>& captureInfo);
+    void EraseCaptureInfo(int32_t captureId);
+    int32_t FindCaptureIdByStreamId(int32_t streamId);
+
+    std::shared_ptr<DCStreamInfo> FindDCStreamById(int32_t streamId);
+    void InsertDCStream(int32_t streamId, std::shared_ptr<DCStreamInfo>& dcStreamInfo);
+    void EraseDCStream(int32_t streamId);
+    void ExtractNotCaptureStream(bool isStreaming, std::vector<std::shared_ptr<DCStreamInfo>>& appendStreamInfo);
+
+    bool FindEnableShutter(int32_t streamId);
+    void InsertEnableShutter(int32_t streamId, bool enableShutterCallback);
+    void EraseEnableShutter(int32_t streamId);
+
+    int32_t FindStreamCaptureBufferNum(const pair<int, int>& streamPair);
+    void AddStreamCaptureBufferNum(const pair<int, int>& streamPair);
+    void EraseStreamCaptureBufferNum(const pair<int, int>& streamPair);
 
 private:
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor_;
@@ -111,7 +133,8 @@ private:
     std::map<int, bool> enableShutterCbkMap_;
     std::map<pair<int, int>, int> acceptedBufferNum_;
 
-    std::mutex requestLock_;
+    std::mutex streamAttrLock_;
+    std::mutex halStreamLock_;
     bool isCapturing_ = false;
     std::mutex isCapturingLock_;
     OperationMode currentOperMode_ = OperationMode::NORMAL;
