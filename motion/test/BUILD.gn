@@ -10,8 +10,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build/ohos.gni")
+
+declare_args() {
+  drivers_peripheral_motion_feature_model = false
+}
 
 group("hdf_test_motion") {
-  testonly = true
-  deps = [ "unittest/hdi:hdi_unittest_motion" ]
+  deps = []
+  if (drivers_peripheral_motion_feature_model) {
+    testonly = true
+    deps += [ "unittest/hdi:hdi_unittest_motion" ]
+  }
 }

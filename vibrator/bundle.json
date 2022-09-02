@@ -12,6 +12,9 @@
   "component": {
     "name": "drivers_peripheral_vibrator",
     "subsystem": "hdf",
+    "features": [
+      "drivers_peripheral_vibrator_feature_model"
+    ],
     "syscap": [""],
     "adapter_system_type": ["standard"],
     "rom": "675KB",
