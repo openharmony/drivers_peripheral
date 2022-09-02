@@ -38,7 +38,7 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
-      "//utils/native/base/include",
+      "//commonlibrary/utils_lite/include",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/../interfaces/include",
       "$camera_path/../interfaces/hdi_passthrough",
