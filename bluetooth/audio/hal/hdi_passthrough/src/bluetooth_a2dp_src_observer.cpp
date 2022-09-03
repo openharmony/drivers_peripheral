@@ -16,7 +16,7 @@
 #include "bluetooth_a2dp_src_observer.h"
 #include <hdf_log.h>
 
-void BluetoothA2dpSrcObserver::OnConnectionStateChanged(const bluetooth::RawAddress &device, int state)
+void BluetoothA2dpSrcObserver::OnConnectionStateChanged(const OHOS::bluetooth::RawAddress &device, int state)
 {
     HDF_LOGI("BluetoothA2dpSrcObserver::OnConnectionStateChanged");
     if ((callbacks_ != nullptr) && (callbacks_->OnConnectionStateChanged)) {
@@ -24,7 +24,8 @@ void BluetoothA2dpSrcObserver::OnConnectionStateChanged(const bluetooth::RawAddr
     }
 }
 
-void BluetoothA2dpSrcObserver::OnPlayingStatusChanged(const bluetooth::RawAddress &device, int playingState, int error)
+void BluetoothA2dpSrcObserver::OnPlayingStatusChanged(
+    const OHOS::bluetooth::RawAddress &device, int playingState, int error)
 {
     HDF_LOGI("BluetoothA2dpSrcObserver::OnPlayingStatusChanged");
     if ((callbacks_ != nullptr) && (callbacks_->OnPlayingStatusChanged)) {
@@ -33,7 +34,7 @@ void BluetoothA2dpSrcObserver::OnPlayingStatusChanged(const bluetooth::RawAddres
 }
 
 void BluetoothA2dpSrcObserver::OnConfigurationChanged
-    (const bluetooth::RawAddress &device, const OHOS::Bluetooth::BluetoothA2dpCodecInfo &info, int error)
+    (const OHOS::bluetooth::RawAddress &device, const OHOS::Bluetooth::BluetoothA2dpCodecInfo &info, int error)
 {
     HDF_LOGI("BluetoothA2dpSrcObserver::OnConfigurationChanged");
     if ((callbacks_ != nullptr) && (callbacks_->OnConfigurationChanged)) {

@@ -24,10 +24,10 @@ public:
     BluetoothA2dpSrcObserver(OHOS::Bluetooth::BtA2dpAudioCallback *callbacks) : callbacks_(callbacks) {};
     ~BluetoothA2dpSrcObserver() {};
 
-    void OnConnectionStateChanged(const bluetooth::RawAddress &device, int state);
-    void OnPlayingStatusChanged(const bluetooth::RawAddress &device, int playingState, int error);
+    void OnConnectionStateChanged(const OHOS::bluetooth::RawAddress &device, int state);
+    void OnPlayingStatusChanged(const OHOS::bluetooth::RawAddress &device, int playingState, int error);
     void OnConfigurationChanged
-        (const bluetooth::RawAddress &device, const OHOS::Bluetooth::BluetoothA2dpCodecInfo &info, int error);
+        (const OHOS::bluetooth::RawAddress &device, const OHOS::Bluetooth::BluetoothA2dpCodecInfo &info, int error);
 
 private:
     OHOS::Bluetooth::BtA2dpAudioCallback *callbacks_;
