@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Bluetooth {
-using namespace bluetooth;
+using namespace OHOS::bluetooth;
 
 typedef struct BtA2dpAudioCallback {
     void (*OnConnectionStateChanged)(const RawAddress &device, int state);
