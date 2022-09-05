@@ -27,6 +27,7 @@
 #include "usb_interface_pool.h"
 #include "usbd_dispatcher.h"
 #include "usbd_function.h"
+#include "usbd_load_usb_service.h"
 #include "usbd_port.h"
 #include "ddk_pnp_listener_mgr.h"
 
@@ -824,6 +825,10 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbImpl *super, 
 
     int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_NOTIFY_ADD_DEVICE) {
+        if (UsbdLoadUsbService::LoadUsbService() != 0) {
+            HDF_LOGE("usbhost LoadUsbServer error");
+            return HDF_FAILURE;
+        }
         UsbdDispatcher::UsbdDeviceCreateAndAttach(super, infoTable->busNum, infoTable->devNum);
         USBDeviceInfo info = {ACT_DEVUP, infoTable->busNum, infoTable->devNum};
         if (subscriber_ == nullptr) {
@@ -836,6 +841,10 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbImpl *super, 
         USBDeviceInfo info = {ACT_DEVDOWN, infoTable->busNum, infoTable->devNum};
         if (subscriber_ == nullptr) {
             HDF_LOGE("%{public}s: subscriber_ is nullptr, %{public}d", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+        if (UsbdLoadUsbService::RemoveUsbService() != 0) {
+            HDF_LOGE("usbhost RemoveUsbServer error");
             return HDF_FAILURE;
         }
         ret = subscriber_->DeviceEvent(info);
@@ -853,6 +862,10 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
 
     int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_DRIVER_GADGET_ADD) {
+        if (UsbdLoadUsbService::LoadUsbService() != 0) {
+            HDF_LOGE("usbdev LoadUsbServer error");
+            return HDF_FAILURE;
+        }
         USBDeviceInfo info = {ACT_UPDEVICE, 0, 0};
         if (subscriber_ == nullptr) {
             HDF_LOGE("%{public}s: subscriber_ is nullptr, %{public}d", __func__, __LINE__);
@@ -864,6 +877,10 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
         USBDeviceInfo info = {ACT_DOWNDEVICE, 0, 0};
         if (subscriber_ == nullptr) {
             HDF_LOGE("%{public}s: subscriber_ is nullptr, %{public}d", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+        if (UsbdLoadUsbService::RemoveUsbService() != 0) {
+            HDF_LOGE("usbdev RemoveUsbServer error");
             return HDF_FAILURE;
         }
         ret = subscriber_->DeviceEvent(info);
