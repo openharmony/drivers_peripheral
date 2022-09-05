@@ -12,6 +12,9 @@
   "component": {
     "name": "drivers_peripheral_sensor",
     "subsystem": "hdf",
+    "features": [
+      "drivers_peripheral_sensor_feature_model"
+    ],
     "syscap": [ "" ],
     "adapter_system_type": ["standard", "small"],
     "rom": "650KB",
