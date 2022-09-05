@@ -23,7 +23,6 @@ ohos_shared_library("libril_interface_service_1.0") {
     "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
     "//base/telephony/ril_adapter/services/hril:hril",
     "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   defines = [
@@ -32,6 +31,7 @@ ohos_shared_library("libril_interface_service_1.0") {
   ]
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "drivers_interface_power:libpower_proxy_1.0",
       "drivers_interface_ril:ril_idl_headers",
       "hdf_core:libhdf_host",
@@ -67,11 +67,11 @@ ohos_shared_library("libril_driver") {
     "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
     "//drivers/interface/ril/v1_0:libril_stub_1.0",
     "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
     external_deps = [
+      "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
