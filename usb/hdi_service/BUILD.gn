@@ -64,14 +64,12 @@ ohos_shared_library("libusb_interface_service_1.0") {
 
   public_configs = [ ":usbd_public_config" ]
 
-  deps = [ "${usb_driver_path}/ddk:libusb_core" ]
+  deps = [ "${usb_driver_path}/ddk:libusb_ddk_host" ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_usb:usb_idl_headers",
-      "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
@@ -105,9 +103,7 @@ ohos_shared_library("libusb_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
-      "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
