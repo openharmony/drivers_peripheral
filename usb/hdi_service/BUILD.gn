@@ -57,6 +57,7 @@ ohos_shared_library("libusb_interface_service_1.0") {
     "src/usb_impl.cpp",
     "src/usbd_dispatcher.cpp",
     "src/usbd_function.cpp",
+    "src/usbd_load_usb_service.cpp",
     "src/usbd_port.cpp",
   ]
 
@@ -78,6 +79,8 @@ ohos_shared_library("libusb_interface_service_1.0") {
       "hiviewdfx_hilog_native:libhilog",
       "init:libbegetutil",
       "ipc:ipc_single",
+      "safwk:system_ability_fwk",
+      "samgr:samgr_proxy",
     ]
   } else {
     external_deps = [
