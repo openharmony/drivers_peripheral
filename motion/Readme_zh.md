@@ -4,7 +4,7 @@
 
 基于HDF（Hardware Driver Foundation）驱动框架开发的Motion驱动，能够屏蔽硬件器件差异，为上层服务提供稳定的手势识别基础能力接口，包括Motion使能/去使能、Motion订阅/去订阅等稳定的接口。
 
-Motion驱动模块如图1所示，上层为Framework层的综合传感信息处理平台（MSDP）服务，通过DAL层的Motion HDI客户端与Motion HDI 服务端进行交互。Motion HDI服务通过调用Motion HDI实现类接口，从而实现上层服务的Motion使能/去使能、Motion订阅/去订阅等能力。
+Motion驱动模块如图1所示，上层为Framework层，提供MSDP服务，通过UHDF（User Hardware Driver Foundation）层的Motion Proxy与Motion Stub进行交互；而Motion Stub可调用Motion HDI实现类接口，从而实现上层服务的手势识别使能/去使能、手势识别订阅/去订阅等能力。。
 
 **图 1** Motion驱动模块架构图
 
