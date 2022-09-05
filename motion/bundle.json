@@ -12,6 +12,9 @@
   "component": {
     "name": "drivers_peripheral_motion",
     "subsystem": "hdf",
+    "features": [
+      "drivers_peripheral_motion_feature_model"
+    ],
     "syscap": [ "" ],
     "adapter_system_type": ["standard"],
     "rom": "650KB",
