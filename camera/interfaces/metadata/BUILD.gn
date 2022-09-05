@@ -40,7 +40,8 @@ ohos_shared_library("metadata") {
     ]
   }
 
-  install_images = [ chipset_base_dir ]
+  install_images = [ system_base_dir ]
+  relative_install_dir = "chipset-pub-sdk"
   part_name = "drivers_peripheral_camera"
   subsystem_name = "hdf"
 }

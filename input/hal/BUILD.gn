@@ -54,9 +54,10 @@ if (defined(ohos_lite)) {
     subsystem_name = "hdf"
 
     install_images = [
-      chipset_base_dir,
+      system_base_dir,
       "updater",
     ]
+    relative_install_dir = "chipset-sdk"
     part_name = "drivers_peripheral_input"
   }
 } else {
