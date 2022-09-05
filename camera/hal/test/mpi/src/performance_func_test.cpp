@@ -17,7 +17,7 @@
 namespace {
     static const int TIME_TRANSFORMATION_US = 1000000; // 1000000:1000000 microseconds
     static const int CYCLE_TIMES = 1000; // 1000:Cycle 1000 times
-    std::ofstream writeIntoFile;
+    std::ofstream g_writeIntoFile;
 }
 
 using namespace OHOS;
@@ -51,7 +51,7 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0001, TestSize.Level3)
     struct timeval end;
     float time_use;
     float totle_time_use = 0;
-    writeIntoFile.open("TimeConsuming.txt", ios::app);
+    g_writeIntoFile.open("TimeConsuming.txt", ios::app);
     for (int i= 0; i < CYCLE_TIMES; i++) {
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
@@ -68,8 +68,8 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0001, TestSize.Level3)
     EXPECT_LT(avrg_time, 80000);
     std::cout << "==========[test log] Performance: Open camera's average time consuming: ";
     std::cout << avrg_time << "us." << std::endl;
-    writeIntoFile << "==========[test log] Performance: Open camera's average time consuming: ";
-    writeIntoFile << avrg_time << "us." << std::endl;
+    g_writeIntoFile << "==========[test log] Performance: Open camera's average time consuming: ";
+    g_writeIntoFile << avrg_time << "us." << std::endl;
 }
 
 /**
@@ -85,7 +85,7 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0002, TestSize.Level3)
     struct timeval end;
     float time_use;
     float totle_time_use = 0;
-    writeIntoFile.open("TimeConsuming.txt", ios::app);
+    g_writeIntoFile.open("TimeConsuming.txt", ios::app);
     Test_ = std::make_shared<OHOS::Camera::Test>();
     Test_->Init();
     Test_->Open();
@@ -136,8 +136,8 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0002, TestSize.Level3)
     EXPECT_LT(avrg_time, 100000);
     std::cout << "==========[test log] Performance: Start Streams's average time consuming: ";
     std::cout << avrg_time << "us." << std::endl;
-    writeIntoFile << "==========[test log] Performance: Start Streams's average time consuming: ";
-    writeIntoFile << avrg_time << "us. " << std::endl;
+    g_writeIntoFile << "==========[test log] Performance: Start Streams's average time consuming: ";
+    g_writeIntoFile << avrg_time << "us. " << std::endl;
 }
 
 /**
@@ -153,7 +153,7 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0003, TestSize.Level3)
     struct timeval end;
     float time_use;
     float totle_time_use = 0;
-    writeIntoFile.open("TimeConsuming.txt", ios::app);
+    g_writeIntoFile.open("TimeConsuming.txt", ios::app);
     Test_ = std::make_shared<OHOS::Camera::Test>();
     Test_->Init();
     for (int i= 0; i < CYCLE_TIMES; i++) {
@@ -169,8 +169,8 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0003, TestSize.Level3)
     EXPECT_LT(avrg_time, 100000);
     std::cout << "==========[test log] Performance: Close camera's average time consuming: ";
     std::cout << avrg_time << "us." << std::endl;
-    writeIntoFile << "==========[test log] Performance: Close camera's average time consuming: ";
-    writeIntoFile << avrg_time << "us." << std::endl;
+    g_writeIntoFile << "==========[test log] Performance: Close camera's average time consuming: ";
+    g_writeIntoFile << avrg_time << "us." << std::endl;
 }
 
 /**

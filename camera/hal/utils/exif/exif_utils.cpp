@@ -24,14 +24,14 @@
 #include "securec.h"
 
 namespace OHOS::Camera {
-static const unsigned int imageDataOffset = 20;
+static const unsigned int IMAGE_DATA_OFFSET = 20; 
 
-// Raw exif header data
-static const unsigned char exifHeader[] = {
+// Raw exif header data 
+static const unsigned char EXIF_HEADER[] = { 
     0xff, 0xd8, 0xff, 0xe1
 };
 
-static const unsigned int exifHeaderLength = sizeof(exifHeader);
+static const unsigned int EXIF_HEADER_LENGTH = sizeof(EXIF_HEADER);
 
 #define FILE_BYTE_ORDER EXIF_BYTE_ORDER_INTEL
 
@@ -193,29 +193,29 @@ uint32_t ExifUtils::PackageJpeg(unsigned char *tempBuffer, int32_t totalTempBuff
     constexpr uint32_t exifBlockLength = 2;
     orderValue = (exifDataLength + exifBlockLength) >> 8; // 8bit
     value = (exifDataLength + exifBlockLength) & 0xff;
-    if (memcpy_s(tempBuffer, totalTempBufferSize, exifHeader, exifHeaderLength) != 0) {
+    if (memcpy_s(tempBuffer, totalTempBufferSize, EXIF_HEADER, EXIF_HEADER_LENGTH) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
         return RC_ERROR;
     }
-    if (memcpy_s(tempBuffer + exifHeaderLength, totalTempBufferSize, &orderValue,
+    if (memcpy_s(tempBuffer + EXIF_HEADER_LENGTH, totalTempBufferSize, &orderValue,
         sizeof(orderValue)) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
         return RC_ERROR;
     }
-    if (memcpy_s(tempBuffer + exifHeaderLength + sizeof(orderValue), totalTempBufferSize, &value,
+    if (memcpy_s(tempBuffer + EXIF_HEADER_LENGTH + sizeof(orderValue), totalTempBufferSize, &value,
         sizeof(value)) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
         return RC_ERROR;
     }
-    if (memcpy_s(tempBuffer + exifHeaderLength + sizeof(orderValue) + sizeof(value), totalTempBufferSize,
+    if (memcpy_s(tempBuffer + EXIF_HEADER_LENGTH + sizeof(orderValue) + sizeof(value), totalTempBufferSize,
         exifData, exifDataLength) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
         return RC_ERROR;
     }
-    if (memcpy_s(tempBuffer + exifHeaderLength + sizeof(orderValue) + sizeof(value) + exifDataLength,
+    if (memcpy_s(tempBuffer + EXIF_HEADER_LENGTH + sizeof(orderValue) + sizeof(value) + exifDataLength,
         totalTempBufferSize,
-        sourceData.dataBuffer + imageDataOffset,
-        sourceData.dataBufferSize - imageDataOffset) != 0) {
+        sourceData.dataBuffer + IMAGE_DATA_OFFSET,
+        sourceData.dataBufferSize - IMAGE_DATA_OFFSET) != 0) {
         CAMERA_LOGE("%{public}s exif memcpy_s failed.", __FUNCTION__);
         return RC_ERROR;
     }
@@ -269,7 +269,7 @@ uint32_t ExifUtils::AddCustomExifInfo(exif_data info,
     if (IsJpegPicture(dataBuffer, dataBufferSize, address) == RC_ERROR) {
         goto error;
     }
-    totalTempBufferSize = exifHeaderLength + exifBlockLength +  exifDataLength + (dataBufferSize - imageDataOffset);
+    totalTempBufferSize = EXIF_HEADER_LENGTH + exifBlockLength +  exifDataLength + (dataBufferSize - IMAGE_DATA_OFFSET);
     tempBuffer = static_cast<unsigned char *>(malloc(totalTempBufferSize));
     if (!tempBuffer) {
         CAMERA_LOGE("%{public}s Allocate temp buf failed.", __FUNCTION__);
@@ -307,7 +307,7 @@ void ExifUtils::ConvertGpsDataToDms(double number, int32_t *degrees, int32_t *mi
 
     approximateNumber = ((number - hour) * timePeriod - minute) * timePeriod - second;
     if (static_cast<int32_t>(approximateNumber * precision) >= roundingValue) {
-        second = second +1;
+        second = second + 1;
     }
     if (second == timePeriod) {
         second = 0;

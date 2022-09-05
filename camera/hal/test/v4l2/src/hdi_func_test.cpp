@@ -76,13 +76,12 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0191)
     captureInfo->enableShutterCallback_ = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, true);
     EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
-    if (display_->rc == INVALID_ARGUMENT)
-    {
+    if (display_->rc == INVALID_ARGUMENT) {
         std::cout << "==========[test log] Capture fail." << std::endl;
     } else {
         std::cout << "==========[test log] Capture success." << std::endl;
     }
-    sleep(3);
+    sleep(3); // waiting resource release for 3s.
 }
 
 /**
@@ -114,7 +113,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0192)
     } else {
         std::cout << "==========[test log] Capture fail, rc = " << display_->rc << std::endl;
     }
-    sleep(5);
+    sleep(5); // waiting function Capture execute for 5s.
     display_->rc = display_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, display_->rc == NO_ERROR);
     if (display_->rc == NO_ERROR) {
@@ -173,7 +172,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0194)
     captureInfo->enableShutterCallback_ = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, false);
     EXPECT_EQ(true, display_->rc == NO_ERROR);
-    sleep(5);
+    sleep(5); // waiting 5s, prepare for execute function CancelCapture
     display_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, display_->rc == NO_ERROR);
     if (display_->rc == NO_ERROR) {
@@ -220,7 +219,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0195)
     } else {
         std::cout << "==========[test log] Capture fail, rc = " << display_->rc << std::endl;
     }
-    sleep(3);
+    sleep(3); // waiting resource release for 3s.
 }
 
 /**
@@ -293,7 +292,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0201)
     bool isStreaming = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, isStreaming);
     EXPECT_EQ(true, display_->rc == NO_ERROR);
-    sleep(5);
+    sleep(5); // waiting 5s, prepare for execute function CancelCapture
     display_->rc = display_->streamOperator->CancelCapture(-1);
     EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
     display_->rc = display_->streamOperator->CancelCapture(captureId);
@@ -337,7 +336,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0210)
     producer->SetCallback(callback);
 
     display_->streamInfo = std::make_shared<StreamInfo>();
-    display_->streamInfo->streamId_ = 1001;
+    display_->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
@@ -360,9 +359,9 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0210)
     } else {
         std::cout << "==========[test log] AttachBufferQueue fail, rc = " << display_->rc << std::endl;
     }
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for release stream.
     // release stream
-    display_->streamIds = {1001};
+    display_->streamIds = {DEFAULT_STREAM_ID};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -389,7 +388,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0211)
         return;
     };
     producer->SetCallback(callback);
-    display_->streamInfo->streamId_ = 1001;
+    display_->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
@@ -412,9 +411,9 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0211)
     } else {
         std::cout << "==========[test log] AttachBufferQueue fail, rc = " << display_->rc << std::endl;
     }
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for release stream.
     // Release the stream
-    display_->streamIds = {1001};
+    display_->streamIds = {DEFAULT_STREAM_ID};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -437,7 +436,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0212)
     std::shared_ptr<IBufferProducer> producer = nullptr;
     // Create data stream
     display_->streamInfo = std::make_shared<StreamInfo>();
-    display_->streamInfo->streamId_ = 1001;
+    display_->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
@@ -461,9 +460,9 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0212)
     } else {
         std::cout << "==========[test log] AttachBufferQueue fail, rc = " << display_->rc << std::endl;
     }
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for release stream.
     // release stream
-    display_->streamIds = {1001};
+    display_->streamIds = {DEFAULT_STREAM_ID};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -490,7 +489,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0220)
     };
     producer->SetCallback(callback);
     display_->streamInfo = std::make_shared<StreamInfo>();
-    display_->streamInfo->streamId_ = 1001;
+    display_->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
@@ -507,7 +506,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0220)
     std::cout << "==========[test log] streamOperator->AttachBufferQueue's RetCode = ";
     std::cout << display_->rc << std::endl;
     EXPECT_EQ(true, display_->rc == NO_ERROR);
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for attach bufferQueue.
     std::cout << "==========[test log] AttachBufferQueue success. " << std::endl;
     display_->rc = display_->streamOperator->DetachBufferQueue(display_->streamInfo->streamId_);
     std::cout << "==========[test log] streamOperator->DetachBufferQueue's RetCode = ";
@@ -519,7 +518,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0220)
         std::cout << "==========[test log] DetachBufferQueue fail, rc = " << display_->rc << std::endl;
     }
     // release stream
-    display_->streamIds = {1001};
+    display_->streamIds = {DEFAULT_STREAM_ID};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -546,7 +545,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0221)
     };
     producer->SetCallback(callback);
     display_->streamInfo = std::make_shared<StreamInfo>();
-    display_->streamInfo->streamId_ = 1001;
+    display_->streamInfo->streamId_ = DEFAULT_STREAM_ID;
     display_->streamInfo->width_ = 640; // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
@@ -563,7 +562,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0221)
     std::cout << "==========[test log] streamOperator->AttachBufferQueue's RetCode = " << display_->rc << std::endl;
     EXPECT_EQ(true, display_->rc == NO_ERROR);
     std::cout << "==========[test log] AttachBufferQueue success. " << std::endl;
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for detach bufferQueue.
 
     display_->rc = display_->streamOperator->DetachBufferQueue(0);
     std::cout << "==========[test log] streamOperator->DetachBufferQueue's RetCode = " << display_->rc << std::endl;
@@ -574,6 +573,6 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0221)
         std::cout << "==========[test log] DetachBufferQueue fail, rc = " << display_->rc << std::endl;
     }
     // release stream
-    display_->streamIds = {1001};
+    display_->streamIds = {DEFAULT_STREAM_ID};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
