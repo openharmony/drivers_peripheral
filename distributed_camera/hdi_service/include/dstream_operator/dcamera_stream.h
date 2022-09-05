@@ -45,15 +45,17 @@ public:
     DCamRetCode GetDCameraStreamAttribute(StreamAttribute &attribute);
     DCamRetCode GetDCameraBuffer(DCameraBuffer &buffer);
     DCamRetCode ReturnDCameraBuffer(const DCameraBuffer &buffer);
-    DCamRetCode FlushDCameraBuffer();
     DCamRetCode FinishCommitStream();
     bool HasBufferQueue();
+    void CancelCaptureWait();
 
 private:
     DCamRetCode InitDCameraBufferManager();
     DCamRetCode GetNextRequest();
     DCamRetCode CheckRequestParam();
     void SetSurfaceBuffer(OHOS::sptr<OHOS::SurfaceBuffer>& surfaceBuffer, const DCameraBuffer &buffer);
+    DCamRetCode CancelDCameraBuffer();
+    DCamRetCode FlushDCameraBuffer(const DCameraBuffer &buffer);
 
 private:
     int32_t index_ = -1;
@@ -63,10 +65,14 @@ private:
     shared_ptr<DBufferManager> dcStreamBufferMgr_ = nullptr;
     OHOS::sptr<OHOS::Surface> dcStreamProducer_ = nullptr;
     map<shared_ptr<DImageBuffer>, tuple<OHOS::sptr<OHOS::SurfaceBuffer>, int, int>> bufferConfigMap_;
-    mutex lock_;
     condition_variable cv_;
     int captureBufferCount_ = 0;
     bool isBufferMgrInited_ = false;
+    bool isCancelBuffer_ = false;
+    bool isCancelCapture_ = false;
+    mutex requestMutex_;
+    mutex bufferQueueMutex_;
+    mutex lockSync_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
