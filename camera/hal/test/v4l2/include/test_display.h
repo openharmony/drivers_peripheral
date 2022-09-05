@@ -78,6 +78,9 @@
 #define ANALYZE_WIDTH 640
 #define ANALYZE_HEIGHT 480
 
+constexpr int DEFAULT_STREAM_ID = 1001;
+constexpr int INVALID_VALUE_TEST = 2147483647;
+
 using namespace OHOS::HDI::Camera::V1_0;
 using namespace OHOS::Camera;
 class TestDisplay {

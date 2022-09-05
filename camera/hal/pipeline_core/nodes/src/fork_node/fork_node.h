@@ -46,5 +46,5 @@ private:
     std::mutex requestLock_;
     std::unordered_map<int32_t, std::list<int32_t>> captureRequests_ = {};
 };
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera
 #endif
