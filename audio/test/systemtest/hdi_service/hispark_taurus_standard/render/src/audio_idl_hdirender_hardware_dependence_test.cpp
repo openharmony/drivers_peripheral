@@ -81,12 +81,11 @@ void AudioIdlHdiRenderHardwareDependenceTest::TearDown(void)
 }
 
 /**
-    * @tc.name  Test RenderGetFrameSize API via define format to different values
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameSize_004
+    * @tc.name  AudioRenderGetFrameSize_004
     * @tc.desc  Test RenderGetFrameSize interface,return 0 if get framesize define format as different values
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameSize_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameSize_004, TestSize.Level1)
 {
     int32_t ret;
     uint64_t size = 0;
@@ -107,12 +106,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameSi
     EXPECT_GT(size, INITIAL_VALUE);
 }
 /**
-    * @tc.name  Test RenderGetFrameSize API via define sampleRate to different values
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameSize_005
+    * @tc.name  AudioRenderGetFrameSize_005
     * @tc.desc  Test RenderGetFrameSize interface,return 0 if get framesize define sampleRate as different values
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameSize_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameSize_005, TestSize.Level1)
 {
     int32_t ret;
     uint64_t size = 0;
@@ -133,12 +131,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameSi
     EXPECT_GT(size, INITIAL_VALUE);
 }
 /**
-    * @tc.name  Test RenderGetFrameSize API via define channelCount to different values
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameSize_006
+    * @tc.name  AudioRenderGetFrameSize_006
     * @tc.desc  Test RenderGetFrameSize interface,return 0 if get framesize define channelCount as different values
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameSize_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameSize_006, TestSize.Level1)
 {
     int32_t ret;
     uint64_t size = 0;
@@ -158,12 +155,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameSi
     EXPECT_GT(size, INITIAL_VALUE);
 }
 /**
-    * @tc.name  Test RenderGetFrameSize API via define sampleRate to different value
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameSize_007
+    * @tc.name  AudioRenderGetFrameSize_007
     * @tc.desc  Test RenderGetFrameSize interface,return 0 if get framesize define sampleRate as different values
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameSize_007, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameSize_007, TestSize.Level1)
 {
     int32_t ret;
     uint64_t size = 0;
@@ -183,12 +179,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameSi
     EXPECT_GT(size, INITIAL_VALUE);
 }
 /**
-    * @tc.name  Test RenderGetFrameCount API via define channelCount to different value
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameCount_004
+    * @tc.name  AudioRenderGetFrameCount_004
     * @tc.desc  Test RenderGetFrameCount interface,return 0 if get framesize define channelCount as different values
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameCount_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_004, TestSize.Level1)
 {
     int32_t ret;
     uint64_t count = 0;
@@ -213,12 +208,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameCo
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-    * @tc.name  Test RenderGetFrameCount API via define format to different value
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameCount_005
+    * @tc.name  AudioRenderGetFrameCount_005
     * @tc.desc  Test RenderGetFrameCount interface,return 0 if get framesize define format as different values
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameCount_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_005, TestSize.Level1)
 {
     int32_t ret;
     uint64_t count = 0;
@@ -243,12 +237,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameCo
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-    * @tc.name  Test RenderGetFrameCount API via define channelCount to different value
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameCount_006
+    * @tc.name  AudioRenderGetFrameCount_006
     * @tc.desc  Test RenderGetFrameCount interface,return 0 if get framesize define channelCount to different values
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameCount_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_006, TestSize.Level1)
 {
     int32_t ret;
     uint64_t count = 0;
@@ -271,12 +264,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameCo
     render->Stop(render);
 }
 /**
-    * @tc.name  Test RenderGetFrameCount API via define format to different value
-    * @tc.number  SUB_Audio_HDI_RenderGetFrameCount_007
+    * @tc.name  AudioRenderGetFrameCount_007
     * @tc.desc  Test RenderGetFrameCount interface,return 0 if get framesize define format as different values
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameCount_007, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_007, TestSize.Level1)
 {
     int32_t ret;
     uint64_t count = 0;
@@ -299,16 +291,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetFrameCo
     render->Stop(render);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_001
+* @tc.name  AudioRenderSetSampleAttributes_001
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
 *     attrs.sampleRate = AUDIO_SAMPLE_RATE_MASK_8000;
 *     attrs.channelCount = 1;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_001, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -326,16 +317,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_002
+* @tc.name  AudioRenderSetSampleAttributes_002
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_24_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_11025;
 *     attrs.channelCount = 2;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_002, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -352,16 +342,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_003
+* @tc.name  AudioRenderSetSampleAttributes_003
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_22050;
 *     attrs.channelCount = 1;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_003, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -377,16 +366,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_004
+* @tc.name  AudioRenderSetSampleAttributes_004
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_24_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_32000;
 *     attrs.channelCount = 2;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_004, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -403,16 +391,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_005
+* @tc.name  AudioRenderSetSampleAttributes_005
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_44100;
 *     attrs.channelCount = 1;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_005, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -428,15 +415,14 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via legal input.
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_COMMUNICATION;
 *     attrs.format = AUDIO_FORMAT_PCM_24_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_48000;
 *     attrs.channelCount = 2;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_006, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -452,16 +438,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_008
+* @tc.name  AudioRenderSetSampleAttributes_008
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_12000;
 *     attrs.channelCount = 1;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_008, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_008, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -477,16 +462,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_009
+* @tc.name  AudioRenderSetSampleAttributes_009
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_24_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_16000;
 *     attrs.channelCount = 1;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_009, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_009, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -501,16 +485,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_010
+* @tc.name  AudioRenderSetSampleAttributes_010
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_24000;
 *     attrs.channelCount = 2;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_010, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_010, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -527,16 +510,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_011
+* @tc.name  AudioRenderSetSampleAttributes_011
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_64000;
 *     attrs.channelCount = 2;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_011, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_011, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -553,16 +535,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_012
+* @tc.name  AudioRenderSetSampleAttributes_012
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_24_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_96000;
 *     attrs.channelCount = 1;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_012, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_012, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -577,16 +558,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via illegal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_013
+* @tc.name  AudioRenderSetSampleAttributes_013
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
 *     attrs.sampleRate = 0xFFFFFFFFu;
 *     attrs.channelCount = 2;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_013, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_013, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -597,16 +577,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via illegal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_014
+* @tc.name  AudioRenderSetSampleAttributes_014
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_8/32_BIT/AAC_MAIN;
 *     attrs.sampleRate = SAMPLE_RATE_8000/SAMPLE_RATE_11025/SAMPLE_RATE_22050;
 *     attrs.channelCount = 1/2;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_014, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_014, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs1 = {};
@@ -630,16 +609,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via illegal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_015
+* @tc.name  AudioRenderSetSampleAttributes_015
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_AAC_LC/LD/ELD;
 *     attrs.sampleRate = SAMPLE_RATE_32000/SAMPLE_RATE_44100/SAMPLE_RATE_48000;
 *     attrs.channelCount = 1/2;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_015, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_015, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs1 = {};
@@ -660,16 +638,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via illegal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_016
+* @tc.name  AudioRenderSetSampleAttributes_016
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_AAC_HE_V1/V2
 *     attrs.sampleRate = SAMPLE_RATE_8000/SAMPLE_RATE_44100;
 *     attrs.channelCount = 1/2;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_016, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_016, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs1 = {};
@@ -685,16 +662,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name    Test RenderSetSampleAttributes API via illegal input.
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_017
+* @tc.name  AudioRenderSetSampleAttributes_017
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_16_BIT
 *     attrs.sampleRate = SAMPLE_RATE_8000;
 *     attrs.channelCount = 5;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleAttributes_017, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes_017, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -705,16 +681,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetSampleA
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name    Test RenderGetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderGetSampleAttributes_001
+* @tc.name  AudioRenderGetSampleAttributes_001
 * @tc.desc    Test RenderGetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
 *     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_8000;
 *     attrs.channelCount = 1;
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetSampleAttributes_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetSampleAttributes_001, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -730,12 +705,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetSampleA
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
-    * @tc.name    Test GetCurrentChannelId API via get channelId to 1 and set channelCount to 1
-    * @tc.number  SUB_Audio_HDI_RenderGetCurrentChannelId_003
+    * @tc.name  AudioRenderGetCurrentChannelId_003
     * @tc.desc    Test GetCurrentChannelId interface,return 0 if get channelId to 1 and set channelCount to 1
-    * @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetCurrentChannelId_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetCurrentChannelId_002, TestSize.Level1)
 {
     int32_t ret;
     uint32_t channelId = 0;
@@ -756,12 +730,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetCurrent
     EXPECT_EQ(channelIdExp, channelId);
 }
 /**
-    * @tc.name    Test AudioRenderGetRenderPosition API via define format to AUDIO_FORMAT_PCM_16_BIT
-    * @tc.number  SUB_Audio_HDI_RenderGetRenderPosition_009
+    * @tc.name  AudioRenderGetRenderPosition_009
     * @tc.desc    Test GetRenderPosition interface,return 0 if get framesize define format to AUDIO_FORMAT_PCM_16_BIT
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetRenderPosition_009, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_009, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -793,12 +766,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetRenderP
     render->Stop(render);
 }
 /**
-    * @tc.name    Test AudioRenderGetRenderPosition API via define format to AUDIO_FORMAT_PCM_24_BIT
-    * @tc.number  SUB_Audio_HDI_RenderGetRenderPosition_010
+    * @tc.name  AudioRenderGetRenderPosition_010
     * @tc.desc    Test GetRenderPosition interface,return 0 if get framesize define format to AUDIO_FORMAT_PCM_24_BIT
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetRenderPosition_010, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_010, TestSize.Level1)
 {
     int32_t ret;
     uint64_t frames = 0;
@@ -830,12 +802,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetRenderP
     render->Stop(render);
 }
 /**
-    * @tc.name    Test AudioRenderGetRenderPosition API via define sampleRate and channelCount to different value
-    * @tc.number  SUB_Audio_HDI_RenderGetRenderPosition_011
+    * @tc.name  AudioRenderGetRenderPosition_011
     * @tc.desc    Test GetRenderPosition interface,return 0 if get framesize define channelCount as different values
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetRenderPosition_011, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_011, TestSize.Level1)
 {
     int32_t ret;
     uint64_t frames = 0;
@@ -867,12 +838,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetRenderP
     render->Stop(render);
 }
 /**
-    * @tc.name    Test AudioRenderGetRenderPosition API via define sampleRate and channelCount to 1
-    * @tc.number  SUB_Audio_HDI_RenderGetRenderPosition_012
+    * @tc.name  AudioRenderGetRenderPosition_012
     * @tc.desc    Test GetRenderPosition interface,return 0 if get framesize define channelCount to 1
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetRenderPosition_012, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_012, TestSize.Level1)
 {
     int32_t ret;
     uint64_t frames = 0;
@@ -904,12 +874,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetRenderP
     render->Stop(render);
 }
 /**
-* @tc.name    Test GetMmapPosition API via SetSampleAttributes and Getting position is normal.
-* @tc.number  SUB_Audio_HDI_RenderGetMmapPosition_002
+* @tc.name  AudioRenderGetMmapPosition_002
 * @tc.desc    Test GetMmapPosition interface,return 0 if Getting position successfully.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetMmapPosition_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetMmapPosition_002, TestSize.Level1)
 {
     int32_t ret;
     uint64_t frames = 0;
@@ -937,12 +906,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderGetMmapPos
     audiopara.render->Stop(audiopara.render);
 }
 /**
-    * @tc.name    Test SetChannelMode API via setting channel mode to different enumeration values
-    * @tc.number  SUB_Audio_HDI_RenderSetChannelMode_001
+    * @tc.name  AudioRenderSetChannelMode_001
     * @tc.desc    Test SetChannelMode interface,return 0 if set channel mode to different enumeration values
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetChannelMode_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetChannelMode_001, TestSize.Level1)
 {
     int32_t ret;
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
@@ -978,12 +946,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetChannel
 }
 #ifndef ALSA_LIB_MODE
 /**
-    * @tc.name    Test SetChannelMode API via setting channel mode to different values
-    * @tc.number  SUB_Audio_HDI_RenderSetChannelMode_002
+    * @tc.name  AudioRenderSetChannelMode_002
     * @tc.desc    Test SetChannelMode interface,return 0 if set channel mode to different values
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, SUB_Audio_HDI_RenderSetChannelMode_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetChannelMode_002, TestSize.Level1)
 {
     int32_t ret;
     AudioChannelMode mode = AUDIO_CHANNEL_MIX;

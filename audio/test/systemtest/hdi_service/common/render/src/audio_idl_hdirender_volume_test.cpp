@@ -78,12 +78,11 @@ void AudioIdlHdiRendervolumeTest::TearDown(void)
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 /**
-    * @tc.name    Test RenderGetGainThreshold API via legal input
-    * @tc.number  SUB_Audio_HDI_RenderGetGainThreshold_001
+    * @tc.name  AudioRenderGetGainThreshold_001
     * @tc.desc    Test RenderGetGainThreshold interface,return 0 if the GetGainThreshold is obtained successfully
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGainThreshold_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -98,12 +97,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_001, 
 #endif
 }
 /**
-    * @tc.name    Test RenderGetGainThreshold API via set the parameter render to nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetGainThreshold_Null_002
+    * @tc.name  AudioRenderGetGainThresholdNull_002
     * @tc.desc    Test RenderGetGainThreshold interface, return -3/-4 if set render to nullptr
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGainThresholdNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -115,12 +113,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_Null_
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-    * @tc.name    Test RenderGetGainThreshold API via set the parameter min to nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetGainThreshold_Null_003
+    * @tc.name  AudioRenderGetGainThresholdNull_003
     * @tc.desc    Test RenderGetGainThreshold interface, return -3 if set min to nullptr
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGainThresholdNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     float max = 0;
@@ -131,12 +128,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_Null_
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-    * @tc.name    Test RenderGetGainThreshold API via set the parameter max to nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetGainThreshold_Null_004
+    * @tc.name  AudioRenderGetGainThresholdNull_004
     * @tc.desc    Test RenderGetGainThreshold interface, return -3 if set max to nullptr
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGainThresholdNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -147,12 +143,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGainThreshold_Null_
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-    * @tc.name    Test RenderSetGain API via legal input
-    * @tc.number  SUB_Audio_HDI_RenderSetGain_001
+    * @tc.name  AudioRenderSetGain_001
     * @tc.desc    Test RenderSetGain interface,return 0 if Set gain to normal value, maximum or minimum and get success
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetGain_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGain_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, render);
@@ -187,12 +182,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetGain_001, TestSize.
 }
 #ifndef ALSA_LIB_MODE
 /**
-    * @tc.name    Test RenderSetGain API via set gain to the boundary value
-    * @tc.number  SUB_Audio_HDI_RenderSetGain_002
+    * @tc.name  AudioRenderSetGain_002
     * @tc.desc    Test RenderSetGain interface,return -3 if Set gain to exceed the boundary value
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetGain_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGain_002, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -211,12 +205,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetGain_002, TestSize.
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-    * @tc.name    Test RenderSetGain API via set gain to exception type
-    * @tc.number  SUB_Audio_HDI_RenderSetGain_003
+    * @tc.name  AudioRenderSetGain_003
     * @tc.desc    Test RenderSetGain interface,return -1 if set gain to exception type
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetGain_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGain_003, TestSize.Level1)
 {
     int32_t ret = -1;
     char gain = 'a';
@@ -227,12 +220,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetGain_003, TestSize.
 }
 #endif
 /**
-    * @tc.name    Test RenderSetGain API via set the parameter render to nullptr
-    * @tc.number  SUB_Audio_HDI_RenderSetGain_Null_004
+    * @tc.name  AudioRenderSetGainNull_004
     * @tc.desc    Test RenderSetGain interface, return -3/-4 if set render to nullptr
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetGain_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetGainNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     float gain = 1;
@@ -243,12 +235,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetGain_Null_004, Test
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-    * @tc.name    Test RenderGetGain API via legal input
-    * @tc.number  SUB_Audio_HDI_RenderGetGain_001
+    * @tc.name  AudioRenderGetGain_001
     * @tc.desc    Test RenderGetGain interface,return 0 if the RenderGetGain was obtained successfully
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGain_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGain_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -267,12 +258,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGain_001, TestSize.
     EXPECT_EQ(gainValue, gain);
 }
 /**
-    * @tc.name    Test RenderGetGain API via set the parameter render to nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetGain_Null_002
+    * @tc.name  AudioRenderGetGainNull_002
     * @tc.desc    Test RenderGetGain interface, return -3/-4 if get gain set render to nullptr
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGain_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGainNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     float gain = 0;
@@ -283,12 +273,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGain_Null_002, Test
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-    * @tc.name    Test RenderGetGain API via legal input in difference scenes
-    * @tc.number  SUB_Audio_HDI_RenderGetGain_003
+    * @tc.name  AudioRenderGetGain_003
     * @tc.desc    Test RenderGetGainThreshold interface, return 0 if get gain before start successfully
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGain_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGain_003, TestSize.Level1)
 {
     int32_t ret = -1;
     float gain = GAIN_MAX - 1;
@@ -302,12 +291,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGain_003, TestSize.
     EXPECT_EQ(gain, gainOne);
 }
 /**
-    * @tc.name    Test RenderGetGain API via set the parameter gain to nullptr
-    * @tc.number  SUB_Audio_HDI_RenderGetGain_Null_004
+    * @tc.name  AudioRenderGetGainNull_004
     * @tc.desc    Test RenderGetGain interface, return -3 if get gain set gain to nullptr
-    * @tc.author: liweiming
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGain_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetGainNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     float *gainNull = nullptr;
@@ -317,12 +305,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetGain_Null_004, Test
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-* @tc.name    Test AudioRenderSetMute API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetMute_001
+* @tc.name  AudioRenderSetMute_001
 * @tc.desc    Test AudioRenderSetMute interface , return 0 if the audiorender object sets mute successfully.
-* @tc.author:liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetMute_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetMute_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool muteFalse = false;
@@ -347,12 +334,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetMute_001, TestSize.
     EXPECT_FALSE(muteTrue);
 }
 /**
-* @tc.name    Test AudioRenderSetMute API via setting the incoming parameter render is empty .
-* @tc.number  SUB_Audio_HDI_RenderSetMute_Null_002
+* @tc.name  AudioRenderSetMuteNull_002
 * @tc.desc    Test AudioRenderSetMute interface, return -3/-4 if the incoming parameter render is empty.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetMute_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetMuteNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     bool mute = true;
@@ -363,12 +349,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetMute_Null_002, Test
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name    Test AudioRenderSetMute API,when the parameter mutevalue equals 2.
-* @tc.number  SUB_Audio_HDI_RenderSetMute_003
+* @tc.name  AudioRenderSetMute_003
 * @tc.desc    Test AudioRenderSetMute interface and set the parameter mutevalue with 2.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetMute_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetMute_003, TestSize.Level1)
 {
     int32_t ret = -1;
     bool muteValue = 2;
@@ -381,12 +366,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetMute_003, TestSize.
     EXPECT_EQ(true, muteValue);
 }
 /**
-* @tc.name    Test AudioRenderGetMute API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderGetMute_001
+* @tc.name  AudioRenderGetMute_001
 * @tc.desc    Test AudioRenderGetMute interface , return 0 if the audiocapture gets mute successfully.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetMute_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetMute_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool muteTrue = true;
@@ -409,12 +393,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetMute_001, TestSize.
     EXPECT_FALSE(muteFalse);
 }
 /**
-* @tc.name    Test interface AudioRenderGetMute when incoming parameter render is empty.
-* @tc.number  SUB_Audio_HDI_RenderGetMute_Null_002
+* @tc.name  AudioRenderGetMuteNull_002
 * @tc.desc    Test AudioRenderGetMute interface, return -3/-4 if the incoming parameter render is empty.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetMute_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetMuteNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     bool muteTrue = true;
@@ -429,12 +412,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetMute_Null_002, Test
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name    Test interface AudioRenderGetMute when incoming parameter mute is empty.
-* @tc.number  SUB_Audio_HDI_RenderGetMute_Null_003
+* @tc.name  AudioRenderGetMuteNull_003
 * @tc.desc    Test AudioRenderGetMute interface, return -3 if the incoming parameter mute is empty.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetMute_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetMuteNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
 
@@ -444,12 +426,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetMute_Null_003, Test
 }
 
 /**
-* @tc.name    Test AudioRenderSetVolume API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderSetVolume_001
+* @tc.name  AudioRenderSetVolume_001
 * @tc.desc    Test AudioRenderSetVolume interface , return 0 if the audiocapture sets volume successfully.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetVolume_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetVolume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float volumeInit = 0.20;
@@ -484,12 +465,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetVolume_001, TestSiz
     EXPECT_EQ(volumeHighExpc, volumeHigh);
 }
 /**
-* @tc.name    Test AudioRenderSetVolume,when volume is set maximum value or minimum value.
-* @tc.number  SUB_Audio_HDI_RenderSetVolume_002
+* @tc.name  AudioRenderSetVolume_002
 * @tc.desc    Test AudioRenderSetVolume,return 0 if volume is set maximum value or minimum value.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetVolume_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetVolume_002, TestSize.Level1)
 {
     int32_t ret = -1;
     float volumeMin = 0;
@@ -519,12 +499,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetVolume_002, TestSiz
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-* @tc.name    Test AudioRenderSetVolume,when incoming parameter render is empty.
-* @tc.number  SUB_Audio_HDI_RenderSetVolume_Null_003
+* @tc.name  AudioRenderSetVolumeNull_003
 * @tc.desc    Test AudioRenderSetVolume,return -3/-4 when incoming parameter render is empty.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetVolume_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderSetVolumeNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     float volume = 0;
@@ -535,12 +514,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderSetVolume_Null_003, Te
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name    Test AudioRenderGetVolume API via legal input.
-* @tc.number  SUB_Audio_HDI_RenderGetVolume_001
+* @tc.name  AudioRenderGetVolume_001
 * @tc.desc    Test AudioRenderGetVolume interface , return 0 if the audiocapture is get successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetVolume_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetVolume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float volume = 0.30;
@@ -554,12 +532,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetVolume_001, TestSiz
     EXPECT_EQ(volumeDefault, volume);
 }
 /**
-* @tc.name    Test AudioRenderGetVolume when when rendering is in progress.
-* @tc.number  SUB_Audio_HDI_RenderGetVolume_002.
+* @tc.name  AudioRenderGetVolume_002.
 * @tc.desc    Test AudioRenderGetVolume,return 0 when when rendering is in progress.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetVolume_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetVolume_002, TestSize.Level1)
 {
     int32_t ret = -1;
     float volume = 0.30;
@@ -579,12 +556,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetVolume_002, TestSiz
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name    Test AudioRenderGetVolume,when incoming parameter render is empty.
-* @tc.number  SUB_Audio_HDI_RenderGetVolume_Null_003
+* @tc.name  AudioRenderGetVolumeNull_003
 * @tc.desc    Test AudioRenderGetVolume,return -3/-4 when incoming parameter render is empty.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetVolume_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetVolumeNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     float volume = 0.3;
@@ -595,12 +571,11 @@ HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetVolume_Null_003, Te
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name    Test AudioRenderGetVolume,when incoming parameter render is empty.
-* @tc.number  SUB_Audio_HDI_RenderGetVolume_Null_004
+* @tc.name  AudioRenderGetVolumeNull_004
 * @tc.desc    Test AudioRenderGetVolume,return -3 when incoming parameter render is empty.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRendervolumeTest, SUB_Audio_HDI_RenderGetVolume_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRendervolumeTest, AudioRenderGetVolumeNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     float *volumeNull = nullptr;

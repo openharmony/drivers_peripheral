@@ -79,13 +79,12 @@ void AudioIdlHdiAdapterTest::TearDown(void)
 }
 
 /**
-* @tc.name  Test AudioAdapterInitAllPorts API via legal input.
-* @tc.number  SUB_Audio_HDI_AdapterInitAllPorts_001
+* @tc.name  AudioAdapterInitAllPorts_001
 * @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if the ports is initialize successfully.
-* @tc.author shijie
+* @tc.type: FUNC
 */
 
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterInitAllPorts_001, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -102,12 +101,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_001, TestSize
 }
 
 /**
-* @tc.name  Test AudioAdapterInitAllPorts API when loads two adapters.
-* @tc.number  SUB_Audio_HDI_AdapterInitAllPorts_002
+* @tc.name  AudioAdapterInitAllPorts_002
 * @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if loads two adapters successfully.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterInitAllPorts_002, TestSize.Level1)
 {
     int32_t ret;
     int32_t ret2 = -1;
@@ -145,13 +143,12 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_002, TestSize
 }
 
 /**
-* @tc.name  Test AudioAdapterInitAllPorts API when the parameter adapter is nullptr.
-* @tc.number  SUB_Audio_HDI_AdapterInitAllPorts_Null_003
+* @tc.name  AudioAdapterInitAllPortsNull_003
 * @tc.desc  Test AudioAdapterInitAllPorts API, return -3/-4 if the parameter adapter is nullptr.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
 
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterInitAllPortsNull_003, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -169,12 +166,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_Null_003, Tes
 }
 
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API when the PortType is PORT_OUT.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_001
+* @tc.name  AudioAdapterGetPortCapability_001
 * @tc.desc  Test AudioAdapterGetPortCapability,return 0 if PortType is PORT_OUT.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapability_001, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = {};
@@ -202,12 +198,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_001, Tes
 }
 
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API when the PortType is PORT_IN.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_002
+* @tc.name  AudioAdapterGetPortCapability_002
 * @tc.desc  Test AudioAdapterGetPortCapability,return 0 if PortType is PORT_IN.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapability_002, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = {};
@@ -231,13 +226,12 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_002, Tes
 }
 
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API, when the parameter adapter is nullptr.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_Null_003
+* @tc.name  AudioAdapterGetPortCapabilityNull_003
 * @tc.desc  Test AudioAdapterGetPortCapability, return -3/-4 if the parameter adapter is nullptr.
-* @tc.author: shjie
+* @tc.type: FUNC
 */
 
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapabilityNull_003, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -262,14 +256,13 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_Null_003
 }
 
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API when the audioPort is nullptr or not supported.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_Null_004
+* @tc.name  AudioAdapterGetPortCapabilityNull_004
 * @tc.desc  Test AudioAdapterGetPortCapability, return -3 if the audioPort is nullptr,
             return -1 if the audioPort is not supported.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
 
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapabilityNull_004, TestSize.Level1)
 {
     int32_t ret;
     struct AudioPort *audioPortNull = nullptr;
@@ -298,12 +291,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_Null_004
 }
 #ifdef AUDIO_ADM_PASSTHROUGH
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API when the capability is nullptr.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_Null_005
+* @tc.name  AudioAdapterGetPortCapabilityNull_005
 * @tc.desc  Test AudioAdapterGetPortCapability, return -3 if capability is nullptr.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_Null_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapabilityNull_005, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -324,12 +316,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_Null_005
 }
 #endif
 /**
-* @tc.name  Test AdapterSetPassthroughMode API when the PortType is PORT_OUT.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_001
+* @tc.name  AudioAdapterSetPassthroughMode_001
 * @tc.desc  test AdapterSetPassthroughMode interface, return 0 if PortType is PORT_OUT.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterSetPassthroughMode_001, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -353,12 +344,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_001, Te
 }
 
 /**
-* @tc.name Test AdapterSetPassthroughMode API when the PortType is PORT_IN.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_002
+* @tc.name  AudioAdapterSetPassthroughMode_002
 * @tc.desc  test AdapterSetPassthroughMode interface, return -1 if PortType is PORT_IN.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterSetPassthroughMode_002, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -378,12 +368,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_002, Te
 }
 
 /**
-* @tc.name  Test AdapterSetPassthroughMode API when the parameter adapter is nullptr.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_Null_003
+* @tc.name  AudioAdapterSetPassthroughModeNull_003
 * @tc.desc  test AdapterSetPassthroughMode interface, return -3/-4 the parameter adapter is nullptr.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterSetPassthroughModeNull_003, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -403,13 +392,12 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_Null_00
 }
 
 /**
-* @tc.name  Test AdapterSetPassthroughMode API when the parameter audioPort is nullptr or not supported.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_Null_004
+* @tc.name  AudioAdapterSetPassthroughModeNull_004
 * @tc.desc  test AdapterSetPassthroughMode interface, return -3 if the audioPort is nullptr,
             return -1 if the audioPort is not supported.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterSetPassthroughModeNull_004, TestSize.Level1)
 {
     int32_t ret;
     struct AudioPort *audioPortNull = nullptr;
@@ -435,12 +423,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_Null_00
 }
 
 /**
-* @tc.name  Test AdapterSetPassthroughMode API when the not supported mode.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_005
+* @tc.name  AudioAdapterSetPassthroughMode_005
 * @tc.desc  test AdapterSetPassthroughMode interface, return -1 if the not supported mode.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterSetPassthroughMode_005, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -460,12 +447,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_005, Te
 }
 
 /**
-* @tc.name  Test AdapterGetPassthroughMode API via legal input
-* @tc.number  SUB_Audio_HDI_AdapterGetPassthroughMode_001
+* @tc.name  AudioAdapterGetPassthroughMode_001
 * @tc.desc  test AdapterGetPassthroughMode interface, return 0 if is get successfully.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPassthroughMode_001, TestSize.Level1)
 {
     int32_t ret;
     AudioPortPassthroughMode mode = PORT_PASSTHROUGH_AUTO;
@@ -491,12 +477,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_001, Te
 }
 
 /**
-* @tc.name  Test AdapterGetPassthroughMode API  when the parameter adapter is nullptr.
-* @tc.number  SUB_Audio_HDI_AdapterGetPassthroughMode_Null_002
+* @tc.name  AudioAdapterGetPassthroughModeNull_002
 * @tc.desc  test AdapterGetPassthroughMode interface, return -3/-4 if the parameter adapter is nullptr..
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPassthroughModeNull_002, TestSize.Level1)
 {
     int32_t ret;
     AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
@@ -518,13 +503,12 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_Null_00
 }
 
 /**
-* @tc.name   Test AdapterGetPassthroughMode API when the parameter audioPort is nullptr or not supported.
-* @tc.number  SUB_Audio_HDI_AdapterGetPassthroughMode_Null_003
+* @tc.name  AudioAdapterGetPassthroughModeNull_003
 * @tc.desc  test AdapterGetPassthroughMode interface, return -3 if the audioPort is nullptr,
             return -1 if the audioPort is not supported.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPassthroughModeNull_003, TestSize.Level1)
 {
     int32_t ret;
     struct AudioPort *audioPortNull = nullptr;
@@ -550,12 +534,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_Null_00
 }
 
 /**
-* @tc.name  Test AdapterGetPassthroughMode API  when the parameter mode is nullptr.
-* @tc.number  SUB_Audio_HDI_AdapterGetPassthroughMode_Null_004
+* @tc.name  AudioAdapterGetPassthroughModeNull_004
 * @tc.desc  test AdapterGetPassthroughMode interface, return -3 if the parameter mode is nullptr.
-* @tc.author: shijie
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPassthroughModeNull_004, TestSize.Level1)
 {
     int32_t ret;
     AudioPortPassthroughMode *modeNull = nullptr;
@@ -575,12 +558,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_Null_00
     adapterRelease(adapter);
 }
 /**
-* @tc.name  Test AudioCreateCapture API via legal input
-* @tc.number  SUB_Audio_HDI_CreateCapture_001
+* @tc.name  AudioCreateCapture_001
 * @tc.desc  Test AudioCreateCapture interface,Returns 0 if the IAudioCapture object is created successfully
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_001, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -595,15 +577,14 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_001, TestSize.Level
 }
 
 /**
-* @tc.name  Test AudioCreateCapture API via creating a capture object when a render object was created
-* @tc.number  SUB_Audio_HDI_CreateCapture_002
+* @tc.name  AudioCreateCapture_002
 * @tc.desc  test AudioCreateCapture interface:
      (1)service mode:Returns 0,if the IAudioCapture object can be created successfully which was created
      (2)passthrough mode: Returns -1,if the IAudioCapture object can't be created which was created
-  @tc.author: wengyin
+* @tc.type: FUNC
 */
 
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_002, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -629,13 +610,12 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_002, TestSize.Level
 }
 
 /**
-* @tc.name  Test AudioCreateCapture API via creating a capture object when a render object was created
-* @tc.number  SUB_Audio_HDI_CreateCapture_003
+* @tc.name  AudioCreateCapture_003
 * @tc.desc  test AudioCreateCapture interface,Returns 0 if the IAudioCapture object can be created successfully
     when IAudioRender was created
-  @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_003, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -667,12 +647,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_003, TestSize.Level
 }
 
 /**
-* @tc.name  Test AudioCreateCapture API via setting the incoming parameter adapter is nullptr
-* @tc.number  SUB_Audio_HDI_CreateCapture_Null_005
+* @tc.name  AudioCreateCaptureNull_005
 * @tc.desc  Test AudioCreateCapture interface,Returns -3/-4 if the incoming parameter adapter is nullptr
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCaptureNull_005, TestSize.Level1)
 {
     int32_t ret;
     struct AudioDeviceDescriptor devDesc = {};
@@ -695,12 +674,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_005, TestSize.
 }
 
 /**
-* @tc.name  Test AudioCreateCapture API via setting the incoming parameter desc is nullptr
-* @tc.number  SUB_Audio_HDI_CreateCapture_Null_006
+* @tc.name  AudioCreateCaptureNull_006
 * @tc.desc  Test AudioCreateCapture interface,Returns -3 if the incoming parameter desc is nullptr
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCaptureNull_006, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -719,12 +697,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_006, TestSize.
 }
 
 /**
-* @tc.name  Test AudioCreateCapture API via setting the incoming parameter attrs is nullptr
-* @tc.number  SUB_Audio_HDI_CreateCapture_Null_007
+* @tc.name  AudioCreateCaptureNull_007
 * @tc.desc  Test AudioCreateCapture interface,Returns -3 if the incoming parameter attrs is nullptr
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_007, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCaptureNull_007, TestSize.Level1)
 {
     int32_t ret;
     struct AudioDeviceDescriptor devDesc = {};
@@ -745,12 +722,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_007, TestSize.
 
 #ifdef AUDIO_ADM_PASSTHROUGH
 /**
-* @tc.name  Test AudioCreateCapture API via setting the incoming parameter capture is nullptr
-* @tc.number  SUB_Audio_HDI_CreateCapture_Null_008
+* @tc.name  AudioCreateCaptureNull_008
 * @tc.desc  Test AudioCreateCapture interface,Returns -3/-4 if the incoming parameter capture is nullptr
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_008, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCaptureNull_008, TestSize.Level1)
 {
     int32_t ret;
     struct AudioDeviceDescriptor devDesc = {};
@@ -772,12 +748,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_Null_008, TestSize.
 }
 #endif
 /**
-* @tc.name  Test AudioCreateCapture API via setting the incoming parameter adapter which port type is PORT_OUT
-* @tc.number  SUB_Audio_HDI_CreateCapture_009
+* @tc.name  AudioCreateCapture_009
 * @tc.desc  Test AudioCreateCapture interface,Returns -1 if the incoming parameter adapter which port type is PORT_OUT
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_009, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_009, TestSize.Level1)
 {
     int32_t ret;
     struct AudioDeviceDescriptor devDesc = {};
@@ -799,12 +774,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_009, TestSize.Level
 }
 
 /**
-* @tc.name  Test AudioCreateCapture API via setting the incoming parameter desc which portID is not configed
-* @tc.number  SUB_Audio_HDI_CreateCapture_010
+* @tc.name  AudioCreateCapture_010
 * @tc.desc  Test AudioCreateCapture interface,Returns -1 if the incoming parameter desc which portID is not configed
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_010, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_010, TestSize.Level1)
 {
     int32_t ret;
     struct AudioDeviceDescriptor devDesc = {};
@@ -826,12 +800,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateCapture_010, TestSize.Level
     free(devDesc.desc);
 }
 /**
-* @tc.name  Test AudioCreateRender API via legal input.
-* @tc.number  SUB_Audio_HDI_CreateRender_001
+* @tc.name  AudioCreateRender_001
 * @tc.desc  test AudioCreateRender interface,return 0 if render is created successful.
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_001, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -853,12 +826,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_001, TestSize.Level1
 }
 
 /**
-    * @tc.name  Test AudioCreateRender API via setting the incoming parameter pins is PIN_IN_MIC.
-    * @tc.number  SUB_Audio_HDI_CreateRender_003
+    * @tc.name  AudioCreateRender_003
     * @tc.desc  test AudioCreateRender interface,return -1 if the incoming parameter pins is PIN_IN_MIC.
-    * @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_003, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -880,14 +852,12 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_003, TestSize.Level1
     free(devDesc.desc);
 }
 
-
 /**
-* @tc.name  Test AudioCreateRender API via setting the incoming parameter attr is error.
-* @tc.number  SUB_Audio_HDI_CreateRender_004
+* @tc.name  AudioCreateRender_004
 * @tc.desc  test AudioCreateRender interface,return -1 if the incoming parameter attr is error.
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_004, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -917,12 +887,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_004, TestSize.Level1
 }
 
 /**
-* @tc.name  Test AudioCreateRender API via setting the incoming parameter adapter is nullptr
-* @tc.number  SUB_Audio_HDI_CreateRender_Null_005
+* @tc.name  AudioCreateRenderNull_005
 * @tc.desc  test AudioCreateRender interface,Returns -3/-4 if the incoming parameter adapter is nullptr.
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRenderNull_005, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -946,12 +915,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_005, TestSize.L
 }
 
 /**
-* @tc.name  Test AudioCreateRender API via setting the incoming parameter devDesc is nullptr
-* @tc.number  SUB_Audio_HDI_CreateRender_Null_006
+* @tc.name  AudioCreateRenderNull_006
 * @tc.desc  test AudioCreateRender interface,Returns -3 if the incoming parameter devDesc is nullptr.
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRenderNull_006, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioRender *render = nullptr;
@@ -972,12 +940,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_006, TestSize.L
 }
 
 /**
-* @tc.name  Test AudioCreateRender API via setting the incoming parameter attrs is nullptr
-* @tc.number  SUB_Audio_HDI_CreateRender_Null_007
+* @tc.name  AudioCreateRenderNull_007
 * @tc.desc  test AudioCreateRender interface,Returns -3 if the incoming parameter attrs is nullptr.
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_007, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRenderNull_007, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -1000,12 +967,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_007, TestSize.L
 
 #ifdef AUDIO_ADM_PASSTHROUGH
 /**
-* @tc.name  Test AudioCreateRender API via setting the incoming parameter render is nullptr
-* @tc.number  SUB_Audio_HDI_CreateRender_Null_008
+* @tc.name  AudioCreateRenderNull_008
 * @tc.desc  test AudioCreateRender interface,Returns -3/-4 if the incoming parameter render is nullptr.
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_008, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRenderNull_008, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -1029,12 +995,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_Null_008, TestSize.L
 #endif
 
 /**
-* @tc.name  Test AudioCreateRender API via setting the incoming parameter devDesc is error
-* @tc.number  SUB_Audio_HDI_CreateRender_009
+* @tc.name  AudioCreateRender_009
 * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming parameter devDesc is error.
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_009, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_009, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -1065,12 +1030,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_009, TestSize.Level1
 }
 
 /**
-* @tc.name  Test AudioCreateRender API via setting the incoming parameter desc which portID is not configed
-* @tc.number  SUB_Audio_HDI_CreateRender_010
+* @tc.name  AudioCreateRender_010
 * @tc.desc  test AudioCreateRender interface,Returns -1 if the incoming desc which portID is not configed
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_010, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_010, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -1093,12 +1057,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_CreateRender_010, TestSize.Level1
 }
 
 /**
-* @tc.name  Test AudioDestroyCapture API via legal input
-* @tc.number  SUB_Audio_HDI_DestroyCapture_001
+* @tc.name  AudioDestroyCapture_001
 * @tc.desc  Test AudioDestroyCapture interface,Returns 0 if the IAudioCapture object is destroyed
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyCapture_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioDestroyCapture_001, TestSize.Level1)
 {
     int32_t ret;
     AudioPortPin pins = PIN_IN_MIC;
@@ -1115,12 +1078,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyCapture_001, TestSize.Leve
 }
 
 /**
-* @tc.name  Test AudioDestroyCapture API via setting the incoming parameter adapter is nullptr
-* @tc.number  SUB_Audio_HDI_DestroyCapture_Null_002
+* @tc.name  AudioDestroyCaptureNull_002
 * @tc.desc  Test AudioDestroyCapture interface,Returns -3/-4 if the incoming parameter adapter is nullptr
-* @tc.author: wengyin
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyCapture_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioDestroyCaptureNull_002, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -1139,12 +1101,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyCapture_Null_002, TestSize
 }
 
 /**
-    * @tc.name  Test AudioDestroyRender API via legal input.
-    * @tc.number  SUB_Audio_HDI_DestroyRender_001
+    * @tc.name  AudioDestroyRender_001
     * @tc.desc  Test AudioDestroyRender interface, return 0 if render is destroyed successful.
-    * @tc.author: wengyin
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyRender_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioDestroyRender_001, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;
@@ -1159,12 +1120,11 @@ HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyRender_001, TestSize.Level
     adapterRelease(adapter);
 }
 /**
-    * @tc.name  Test AudioDestroyRender API,where the parameter render is nullptr.
-    * @tc.number  SUB_Audio_HDI_DestroyRender_Null_002
+    * @tc.name  AudioDestroyRenderNull_002
     * @tc.desc  Test AudioDestroyRender interface, return -3/-4 if the parameter render is nullptr.
-    * @tc.author: wengyin
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiAdapterTest, SUB_Audio_HDI_DestroyRender_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiAdapterTest, AudioDestroyRenderNull_002, TestSize.Level1)
 {
     int32_t ret;
     struct IAudioAdapter *adapter = nullptr;

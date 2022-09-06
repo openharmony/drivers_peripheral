@@ -81,12 +81,11 @@ void AudioIdlHdiCaptureVolumeTest::TearDown(void)
 }
 
 /**
-* @tc.name  Test AudioCaptureSetMute API via legal input.
-* @tc.number  SUB_Audio_HDI_CaptureSetMute_001
+* @tc.name  AudioCaptureSetMute_001
 * @tc.desc  Test AudioCaptureSetMute interface , return 0 if the audiocapture object sets mute successfully.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetMute_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMute_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool muteTrue = true;
@@ -108,12 +107,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetMute_001, TestSiz
     EXPECT_FALSE(muteFalse);
 }
 /**
-* @tc.name  Test AudioCaptureSetMute API via setting the capture is nullptr .
-* @tc.number  SUB_Audio_HDI_CaptureSetMute_Null_002
+* @tc.name  AudioCaptureSetMuteNull_002
 * @tc.desc  Test AudioCaptureSetMute interface, return -3/-4 if the capture is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetMute_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMuteNull_002, TestSize.Level1)
 {
     bool muteTrue = true;
     bool muteFalse = false;
@@ -127,12 +125,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetMute_Null_002, Te
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test AudioCaptureSetMute API,when the parameter mutevalue equals 2.
-* @tc.number  SUB_Audio_HDI_CaptureSetMute_003
+* @tc.name  AudioCaptureSetMute_003
 * @tc.desc  Test AudioCaptureSetMute interface and set the parameter mutevalue with 2.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetMute_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetMute_003, TestSize.Level1)
 {
     bool muteValue = 2;
     int32_t ret = -1;
@@ -146,12 +143,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetMute_003, TestSiz
     EXPECT_TRUE(muteValue);
 }
 /**
-* @tc.name  Test AudioCaptureGetMute API via legal input.
-* @tc.number  SUB_Audio_HDI_CaptureGetMute_001
+* @tc.name  AudioCaptureGetMute_001
 * @tc.desc  Test AudioCaptureGetMute interface , return 0 if the audiocapture gets mute successfully.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetMute_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetMute_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool muteTrue = true;
@@ -174,12 +170,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetMute_001, TestSiz
     EXPECT_FALSE(muteFalse);
 }
 /**
-* @tc.name  Test interface AudioCaptureGetMute when capture is nullptr.
-* @tc.number  SUB_Audio_HDI_CaptureGetMute_Null_002
+* @tc.name  AudioCaptureGetMuteNull_002
 * @tc.desc  Test AudioCreateCapture interface, return -3/-4 if the capture is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetMute_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetMuteNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     bool muteTrue = true;
@@ -196,12 +191,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetMute_Null_002, Te
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test AudioCaptureSetVolume API via legal input.
-* @tc.number  SUB_Audio_HDI_CaptureSetVolume_001
+* @tc.name  AudioCaptureSetVolume_001
 * @tc.desc  Test AudioCaptureSetVolume interface , return 0 if the audiocapture sets volume successfully.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetVolume_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float volumeInit = 0.30;
@@ -235,12 +229,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetVolume_001, TestS
     EXPECT_EQ(volumeHighExpc, volumeHigh);
 }
 /**
-* @tc.name  Test AudioCaptureSetVolume,when volume is set maximum value or minimum value.
-* @tc.number  SUB_Audio_HDI_CaptureSetVolume_002
+* @tc.name  AudioCaptureSetVolume_002
 * @tc.desc  Test AudioCaptureSetVolume,return -3 if volume is set maximum value or minimum value.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetVolume_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolume_002, TestSize.Level1)
 {
     int32_t ret = -1;
     float volumeMin = 0;
@@ -270,12 +263,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetVolume_002, TestS
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-* @tc.name  Test AudioCaptureSetVolume,when capture is nullptr.
-* @tc.number  SUB_Audio_HDI_CaptureSetVolume_Null_003
+* @tc.name  AudioCaptureSetVolumeNull_003
 * @tc.desc  Test AudioCaptureSetVolume,return -3/-4 when capture is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetVolume_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetVolumeNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     float volume = 0;
@@ -286,12 +278,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetVolume_Null_003, 
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test AudioCaptureGetVolume API via legal input.
-* @tc.number  SUB_Audio_HDI_CaptureGetVolume_001
+* @tc.name  AudioCaptureGetVolume_001
 * @tc.desc  Test AudioCaptureGetVolume interface , return 0 if the audiocapture is get successful.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetVolume_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float volume = 0.60;
@@ -305,12 +296,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetVolume_001, TestS
     EXPECT_EQ(defaultVolume, volume);
 }
 /**
-* @tc.name  Test AudioCaptureGetVolume when when capturing is in progress.
-* @tc.number  SUB_Audio_HDI_CaptureGetVolume_002.
+* @tc.name  AudioCaptureGetVolume_002.
 * @tc.desc  Test AudioCaptureGetVolume,return 0 when when capturing is in progress.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetVolume_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolume_002, TestSize.Level1)
 {
     int32_t ret = -1;
     float volume = 0.60;
@@ -329,12 +319,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetVolume_002, TestS
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test AudioCaptureGetVolume,when capture is nullptr.
-* @tc.number  SUB_Audio_HDI_CaptureGetVolume_Null_003
+* @tc.name  AudioCaptureGetVolumeNull_003
 * @tc.desc  Test AudioCaptureGetVolume,return -3/-4 when capture is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetVolume_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetVolumeNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     float volume = 0.30;
@@ -345,12 +334,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetVolume_Null_003, 
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test AudioCaptureGetGainThreshold API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureGetGainThreshold_001
+* @tc.name  AudioCaptureGetGainThreshold_001
 * @tc.desc  test AudioCaptureGetGainThreshold interface, return 0 is call successfully.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGainThreshold_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainThreshold_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -365,12 +353,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGainThreshold_001
 #endif
 }
 /**
-* @tc.name  Test AudioCaptureGetGainThreshold API via setting the incoming parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetGainThreshold_Null_002
+* @tc.name  AudioCaptureGetGainThresholdNull_002
 * @tc.desc  test AudioCaptureGetGainThreshold interface, return -3/-4 if the incoming parameter handle is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGainThreshold_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainThresholdNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -382,12 +369,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGainThreshold_Nul
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test AudioCaptureGetGainThreshold API via setting the incoming parameter min is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetGainThreshold_Null_003
+* @tc.name  AudioCaptureGetGainThresholdNull_003
 * @tc.desc  test AudioCaptureGetGainThreshold interface, return -3 if the incoming parameter min is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGainThreshold_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainThresholdNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     float max = 0;
@@ -398,12 +384,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGainThreshold_Nul
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-* @tc.name  Test AudioCaptureGetGainThreshold API via setting the incoming parameter max is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetGainThreshold_Null_004
+* @tc.name  AudioCaptureGetGainThresholdNull_004
 * @tc.desc  test AudioCaptureGetGainThreshold interface, return -3 if the incoming parameter max is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGainThreshold_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainThresholdNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -414,12 +399,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGainThreshold_Nul
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-* @tc.name  Test AudioCaptureSetGain API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureSetGain_001
+* @tc.name  AudioCaptureSetGain_001
 * @tc.desc  test AudioCaptureSetGain interface, return 0 is call successfully.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetGain_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGain_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -454,12 +438,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetGain_001, TestSiz
 }
 #ifndef ALSA_LIB_MODE
 /**
-* @tc.name  Test AudioCaptureSetGain API via setting gain greater than the maximum and less than the minimum
-* @tc.number  SUB_Audio_HDI_CaptureSetGain_002
+* @tc.name  AudioCaptureSetGain_002
 * @tc.desc  test AudioCaptureSetGain interface, return -3 if gain greater than the maximum and less than the minimum
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetGain_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGain_002, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -478,12 +461,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetGain_002, TestSiz
 }
 #endif
 /**
-* @tc.name  Test AudioCaptureSetGain API via setting the incoming parameter handle is nullptr.
-* @tc.number  SUB_Audio_HDI_CaptureSetGain_Null_003
+* @tc.name  AudioCaptureSetGainNull_003
 * @tc.desc  test AudioCaptureSetGain interface, return -3/-4 if the incoming parameter handle is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetGain_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureSetGainNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     float gain = 0;
@@ -494,12 +476,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureSetGain_Null_003, Te
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test AudioCaptureGetGain API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureGetGain_001
+* @tc.name  AudioCaptureGetGain_001
 * @tc.desc  test AudioCaptureGetGain interface, return 0 if CaptureGetGain is call successfully.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGain_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGain_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -517,12 +498,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGain_001, TestSiz
     EXPECT_EQ(gainValue, gain);
 }
 /**
-* @tc.name  Test AudioCaptureGetGain API via setting the incoming parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetGain_Null_002
+* @tc.name  AudioCaptureGetGainNull_002
 * @tc.desc  test AudioCaptureGetGain interface, return -3 if the incoming parameter handle is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGain_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     float gainValue = 0;
@@ -532,12 +512,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGain_Null_002, Te
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test AudioCaptureGetGain API via legal input in difference scenes
-* @tc.number  SUB_Audio_HDI_CaptureGetGain_003
+* @tc.name  AudioCaptureGetGain_003
 * @tc.desc  test AudioCaptureGetGain interface, return 0 if get gain after creating the capture object.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGain_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGain_003, TestSize.Level1)
 {
     int32_t ret = -1;
     float gain = GAIN_MAX - 1;
@@ -551,12 +530,11 @@ HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGain_003, TestSiz
     EXPECT_EQ(gainOne, gain);
 }
 /**
-* @tc.name  Test AudioCaptureGetGain API via setting the parameter gain is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetGain_Null_004
+* @tc.name  AudioCaptureGetGainNull_004
 * @tc.desc  test AudioCaptureGetGain interface, return -3 if the parameter gain is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureVolumeTest, SUB_Audio_HDI_CaptureGetGain_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureVolumeTest, AudioCaptureGetGainNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     float *gainNull = nullptr;

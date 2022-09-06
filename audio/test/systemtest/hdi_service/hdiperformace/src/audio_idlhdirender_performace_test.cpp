@@ -84,13 +84,12 @@ void AudioIdlHdiRenderPerformaceTest::TearDown(void)
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  the performace of RenderGetLatency
-* @tc.number  SUB_Audio_HDI_RenderGetLatency_Performance_001
+* @tc.name  AudioRenderGetLatencyPerformance_001
 * @tc.desc  tests the performace of RenderGetLatency interface by executing 1000 times,
 * and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetLatency_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetLatencyPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     uint32_t latencyTime = 0;
@@ -120,13 +119,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetLatency_Perform
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  the performace of RenderGetRenderPosition
-* @tc.number  SUB_Audio_HDI_RenderGetRenderPosition_Performance_001
+* @tc.name  AudioRenderGetRenderPositionPerformance_001
 * @tc.desc  tests the performace of RenderGetRenderPosition interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetRenderPosition_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetRenderPositionPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     uint64_t frames = 0;
@@ -155,13 +153,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetRenderPosition_
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  the performace of RenderSetRenderSpeed
-* @tc.number  SUB_Audio_HDI_RenderSetRenderSpeed_Performance_001
+* @tc.name  AudioRenderSetRenderSpeedPerformance_001
 * @tc.desc  tests the performace of RenderSetRenderSpeed interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderSetRenderSpeed_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderSetRenderSpeedPerformance_001, TestSize.Level1)
 {
     struct PrepareAudioPara audiopara = {
         .render = render, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
@@ -188,13 +185,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderSetRenderSpeed_Per
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  the performace of RenderGetRenderSpeed
-* @tc.number  SUB_Audio_HDI_RenderGetRenderSpeed_Performance_001
+* @tc.name  AudioRenderGetRenderSpeedPerformance_001
 * @tc.desc  tests the performace of RenderGetRenderSpeed interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderSpeed_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioAudioRenderGetRenderSpeedPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -219,13 +215,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderGetRenderSpee
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  the performace of RenderSetChannelMode
-* @tc.number  SUB_Audio_HDI_RenderSetChannelMode_Performance_001
+* @tc.name  AudioRenderSetChannelModePerformance_001
 * @tc.desc  tests the performace of RenderSetChannelMode interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderSetChannelMode_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderSetChannelModePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
@@ -250,13 +245,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderSetChannelMode_Per
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderGetChannelMode
-* @tc.number  SUB_Audio_HDI_RenderGetChannelMode_Performance_001
+* @tc.name  AudioRenderGetChannelModePerformance_001
 * @tc.desc  tests the performace of RenderGetChannelMode interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetChannelMode_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetChannelModePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
@@ -281,13 +275,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetChannelMode_Per
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderGetFrameCount
-* @tc.number  SUB_Audio_HDI_RenderGetFrameCount_Performance_001
+* @tc.name  AudioRenderGetFrameCountPerformance_001
 * @tc.desc  tests the performace of RenderGetFrameCount interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetFrameCount_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetFrameCountPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     uint64_t count = 0;
@@ -315,13 +308,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetFrameCount_Perf
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  the performace of RenderGetCurrentChannelId
-* @tc.number  SUB_Audio_HDI_RenderGetCurrentChannelId_Performance_001
+* @tc.name  AudioRenderGetCurrentChannelIdPerformance_001
 * @tc.desc  tests the performace of RenderGetCurrentChannelId interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetCurrentChannelId_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetCurrentChannelIdPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     uint32_t channelId = 0;
@@ -344,13 +336,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetCurrentChannelI
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderFlush
-* @tc.number  SUB_Audio_HDI_RenderFlush_Performance_001
+* @tc.name  AudioRenderFlushPerformance_001
 * @tc.desc  tests the performace of RenderFlush interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderFlush_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderFlushPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -375,13 +366,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderFlush_Performance_
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderGetFrameSize
-* @tc.number  SUB_Audio_HDI_RenderGetFrameSize_Performance_001
+* @tc.name  AudioRenderGetFrameSizePerformance_001
 * @tc.desc  tests the performace of RenderGetFrameSize interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetFrameSize_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetFrameSizePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     uint64_t size = 0;
@@ -410,13 +400,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetFrameSize_Perfo
 }
 
 /**
-* @tc.name  the performace of RenderCheckSceneCapability
-* @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_Performance_001
+* @tc.name  AudioRenderCheckSceneCapabilityPerformance_001
 * @tc.desc  tests the performace of RenderCheckSceneCapability interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderCheckSceneCapability_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderCheckSceneCapabilityPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     bool supported = false;
@@ -439,13 +428,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderCheckSceneCapabili
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderSelectScene
-* @tc.number  SUB_Audio_HDI_RenderSelectScene_Performance_001
+* @tc.name  AudioRenderSelectScenePerformance_001
 * @tc.desc  tests the performace of RenderSelectScene interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderSelectScene_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderSelectScenePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -471,13 +459,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderSelectScene_Perfor
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of renderSetMute
-* @tc.number  SUB_Audio_HDI_renderSetMute_Performance_001
+* @tc.name  AudiorenderSetMutePerformance_001
 * @tc.desc  tests the performace of renderSetMute interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderSetMute_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudiorenderSetMutePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     bool muteFalse = false;
@@ -502,13 +489,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderSetMute_Performanc
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of renderGetMute
-* @tc.number  SUB_Audio_HDI_enderGetMute_Performance_001
+* @tc.name  AudioenderGetMutePerformance_001
 * @tc.desc  tests the performace of renderGetMute interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderGetMute_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudiorenderGetMutePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     bool muteFalse = false;
@@ -532,13 +518,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderGetMute_Performanc
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of renderSetVolume
-* @tc.number  SUB_Audio_HDI_renderSetVolume_Performance_001
+* @tc.name  AudiorenderSetVolumePerformance_001
 * @tc.desc  tests the performace of renderSetVolume interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderSetVolume_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudiorenderSetVolumePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     float volume = 0.80;
@@ -564,13 +549,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderSetVolume_Performa
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of renderGetVolume
-* @tc.number  SUB_Audio_HDI_renderGetVolume_Performance_001
+* @tc.name  AudiorenderGetVolumePerformance_001
 * @tc.desc  tests the performace of renderGetVolume interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderGetVolume_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudiorenderGetVolumePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     float volume = 0.30;
@@ -596,13 +580,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderGetVolume_Performa
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of renderGetGainThreshold
-* @tc.number  SUB_Audio_HDI_renderGetGainThreshold_Performance_001
+* @tc.name  AudiorenderGetGainThresholdPerformance_001
 * @tc.desc  tests the performace of renderGetGainThreshold interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderGetGainThreshold_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudiorenderGetGainThresholdPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     float min = 0;
@@ -627,13 +610,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderGetGainThreshold_P
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of renderSetGain
-* @tc.number  SUB_Audio_HDI_renderSetGain_Performance_001
+* @tc.name  AudiorenderSetGainPerformance_001
 * @tc.desc  tests the performace of renderSetGain interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderSetGain_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudiorenderSetGainPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     float gain = 10;
@@ -659,13 +641,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderSetGain_Performanc
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of renderGetGain
-* @tc.number  SUB_Audio_HDI_renderGetGain_Performance_001
+* @tc.name  AudiorenderGetGainPerformance_001
 * @tc.desc  tests the performace of renderGetGain interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: liutian
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderGetGain_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudiorenderGetGainPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     float min = 0;
@@ -695,13 +676,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_renderGetGain_Performanc
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderFrame
-* @tc.number  SUB_Audio_HDI_RenderFrame_Performance_001
+* @tc.name  AudioRenderFramePerformance_001
 * @tc.desc  tests the performace of RenderFrame interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderFrame_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderFramePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     uint64_t requestBytes = 0;
@@ -735,13 +715,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderFrame_Performance_
     EXPECT_GT(NORMALLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderStart
-* @tc.number  SUB_Audio_HDI_RenderStart_Performance_001
+* @tc.name  AudioRenderStartPerformance_001
 * @tc.desc  tests the performace of RenderStart interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderStart_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderStartPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -764,13 +743,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderStart_Performance_
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderStop
-* @tc.number  SUB_Audio_HDI_RenderStop_Performance_001
+* @tc.name  AudioRenderStopPerformance_001
 * @tc.desc  tests the performace of RenderStop interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderStop_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderStopPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -793,13 +771,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderStop_Performance_0
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderPause
-* @tc.number  SUB_Audio_HDI_RenderPause_Performance_001
+* @tc.name  AudioRenderPausePerformance_001
 * @tc.desc  tests the performace of RenderPause interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderPause_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderPausePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -826,13 +803,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderPause_Performance_
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  the performace of AudioRenderResume
-* @tc.number  SUB_Audio_HDI_AudioRenderResume_Performance_001
+* @tc.name  AudioAudioRenderResumePerformance_001
 * @tc.desc  tests the performace of AudioRenderResume interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderResume_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioAudioRenderResumePerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
@@ -859,13 +835,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_AudioRenderResume_Perfor
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderSetSampleAttributes
-* @tc.number  SUB_Audio_HDI_RenderSetSampleAttributes_Performance_001
+* @tc.name  AudioRenderSetSampleAttributesPerformance_001
 * @tc.desc  tests the performace of RenderSetSampleAttributes interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderSetSampleAttributes_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderSetSampleAttributesPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     uint32_t expChannelCount = 2;
@@ -895,13 +870,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderSetSampleAttribute
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderGetSampleAttributes
-* @tc.number  SUB_Audio_HDI_RenderGetSampleAttributes_Performance_001
+* @tc.name  AudioRenderGetSampleAttributesPerformance_001
 * @tc.desc  tests the performace of RenderGetSampleAttributes interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetSampleAttributes_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetSampleAttributesPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     uint32_t expChannelCount = 2;
@@ -931,13 +905,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetSampleAttribute
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderReqMmapBuffer
-* @tc.number  SUB_Audio_HDI_RenderReqMmapBuffer_Performance_001
+* @tc.name  AudioRenderReqMmapBufferPerformance_001
 * @tc.desc  tests the performace of RenderReqMmapBuffer interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderReqMmapBuffer_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderReqMmapBufferPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     bool isRender = true;
@@ -972,13 +945,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderReqMmapBuffer_Perf
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderGetMmapPosition
-* @tc.number  SUB_Audio_HDI_RenderGetMmapPosition_Performance_001
+* @tc.name  AudioRenderGetMmapPositionPerformance_001
 * @tc.desc  tests the performace of RenderRenderGetMmapPosition interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetMmapPosition_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetMmapPositionPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     uint64_t framesRendering = 0;
@@ -1008,13 +980,12 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetMmapPosition_Pe
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  the performace of RenderSetExtraParams
-* @tc.number  SUB_Audio_HDI_RenderSetExtraParams_Performance_001
+* @tc.name  AudioRenderSetExtraParamsPerformance_001
 * @tc.desc  tests the performace of RenderSetExtraParams interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderSetExtraParams_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderSetExtraParamsPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     const char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;\
@@ -1050,13 +1021,12 @@ attr-sampling-rate=48000";
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of RenderGetExtraParams
-* @tc.number  SUB_Audio_HDI_RenderGetExtraParams_Performance_001
+* @tc.name  AudioRenderGetExtraParamsPerformance_001
 * @tc.desc  tests the performace of RenderGetExtraParams interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: shijie
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, SUB_Audio_HDI_RenderGetExtraParams_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetExtraParamsPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     char keyValueList[] = "attr-format=24;attr-frame-count=4096;";
