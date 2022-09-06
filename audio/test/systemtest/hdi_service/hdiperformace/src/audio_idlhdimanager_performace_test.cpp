@@ -68,12 +68,12 @@ void AudioIdlHdiManagerPerformaceTest::SetUp(void) {}
 void AudioIdlHdiManagerPerformaceTest::TearDown(void) {}
 
 /**
-* @tc.name  Audio_HDI_ManagerGetAllAdapter_Performance_001
+* @tc.name  AudioManagerGetAllAdapterPerformance_001
 * @tc.desc  tests the performace of ManagerGetAllAdapters interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiManagerPerformaceTest, Audio_HDI_ManagerGetAllAdapters_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiManagerPerformaceTest, AudioManagerGetAllAdaptersPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     uint32_t descsLen = AUDIO_ADAPTER_MAX_NUM;
@@ -99,12 +99,12 @@ HWTEST_F(AudioIdlHdiManagerPerformaceTest, Audio_HDI_ManagerGetAllAdapters_Perfo
 }
 
 /**
-* @tc.name  Audio_HDI_ManagerLoadAdapter_Performance_001
+* @tc.name  AudioManagerLoadAdapterPerformance_001
 * @tc.desc  tests the performace of ManagerLoadAdapter interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiManagerPerformaceTest, Audio_HDI_ManagerLoadAdapter_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiManagerPerformaceTest, AudioManagerLoadAdapterPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     uint32_t descsLen = AUDIO_ADAPTER_MAX_NUM;
@@ -135,12 +135,12 @@ HWTEST_F(AudioIdlHdiManagerPerformaceTest, Audio_HDI_ManagerLoadAdapter_Performa
 }
 
 /**
-* @tc.name  Audio_HDI_ManagerUnLoadAdapter_Performance_001
+* @tc.name  AudioManagerUnLoadAdapterPerformance_001
 * @tc.desc  tests the performace of ManagerLoadAdapter interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
 * @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiManagerPerformaceTest, Audio_HDI_ManagerUnLoadAdapter_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiManagerPerformaceTest, AudioManagerUnLoadAdapterPerformance_001, TestSize.Level1)
 {
     int32_t ret;
     struct PrepareAudioPara audiopara = {
