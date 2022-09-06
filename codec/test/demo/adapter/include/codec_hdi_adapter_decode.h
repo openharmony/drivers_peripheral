@@ -93,7 +93,8 @@ public:
     }
     void WaitForStatusChanged();
     void OnStatusChanged();
-    bool ReadOnePacket(FILE *fp, char *buf, uint32_t &filledCount);
+    bool ReadOnePacket(FILE *fp, uint8_t *buf, uint32_t &filledCount);
+    bool ReadOneFrameFromFile(FILE *fp, uint8_t *buf, uint32_t &filledCount);
     void DumpOutputToFile(FILE *fp, uint8_t *addr);
 
 private:
@@ -118,6 +119,9 @@ private:
     uint32_t height_;
     uint32_t stride_;
     uint32_t inputBufferSize_;
+    uint32_t needSplit_;
+    uint32_t srcFileSize_;
+    uint32_t totalSrcSize_;
     struct CodecComponentType *client_;
     struct CodecCallbackType *callback_;
     struct CodecComponentManager *omxMgr_;
