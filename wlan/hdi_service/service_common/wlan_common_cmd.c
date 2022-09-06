@@ -21,7 +21,6 @@
 #include "wlan_extend_cmd.h"
 #include "v1_0/iwlan_callback.h"
 #include "v1_0/iwlan_interface.h"
-#include "v1_0/wlan_interface_service.h"
 
 struct IWiFi *g_wifi = NULL;
 struct IWiFiAp *g_apFeature = NULL;
@@ -610,12 +609,12 @@ static void HdfWlanDelRemoteObj(struct IWlanCallback *self)
     DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, head, struct HdfWlanRemoteNode, node) {
         if (pos->service->index == self->AsObject(self)->index) {
             DListRemove(&(pos->node));
-            WlanCallbackRelease(pos->callbackObj);
+            IWlanCallbackRelease(pos->callbackObj);
             OsalMemFree(pos);
             break;
         }
     }
-    WlanCallbackRelease(self);
+    IWlanCallbackRelease(self);
 }
 
 int32_t WlanInterfaceRegisterEventCallback(struct IWlanInterface *self, struct IWlanCallback *cbFunc,
