@@ -48,7 +48,6 @@ ohos_shared_library("libcodec_hdi_omx_server") {
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
@@ -62,11 +61,9 @@ ohos_shared_library("libcodec_hdi_omx_server") {
 
 ohos_shared_library("libcodec_hdi_omx_client") {
   include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
-    "//drivers/peripheral/base",
   ]
   sources = [
     "src/codec_callback_type_stub.c",
@@ -105,10 +102,7 @@ ohos_shared_library("libcodec_hdi_omx_callback_type_service_impl") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {

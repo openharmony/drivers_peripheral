@@ -15,7 +15,7 @@
 
 #include <hdf_log.h>
 #include <osal_mem.h>
-#include <servmgr_hdi.h>
+#include "hdf_remote_service.h"
 #include "codec_callback_service.h"
 #include "stub_msgproc.h"
 

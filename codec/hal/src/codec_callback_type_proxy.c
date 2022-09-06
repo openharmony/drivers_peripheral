@@ -16,7 +16,6 @@
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <osal_mem.h>
-#include <servmgr_hdi.h>
 #include "codec_callback_if.h"
 #include "codec_internal.h"
 #include "codec_types.h"
