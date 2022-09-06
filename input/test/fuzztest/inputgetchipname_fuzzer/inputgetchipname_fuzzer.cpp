@@ -52,7 +52,7 @@ namespace OHOS {
         }
 
         ret = g_inputInterface->iInputController->GetChipName(*(uint32_t *)data, chipName, length);
-        if (!ret) {
+        if (ret == INPUT_SUCCESS) {
             result = true;
         }
 
@@ -75,7 +75,12 @@ namespace OHOS {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
+    if (data == nullptr) {
+        return 0;
+    }
+    if (size < sizeof(uint32_t)) {
+        return 0;
+    }
     OHOS::InputGetChipnameFuzzTest(data, size);
     return 0;
 }

@@ -53,7 +53,7 @@ namespace OHOS {
         }
 
         ret = g_inputInterface->iInputController->GetVendorName(*(uint32_t *)data, vendorName, length);
-        if (!ret) {
+        if (ret == INPUT_SUCCESS) {
             result = true;
         }
 
@@ -76,7 +76,12 @@ namespace OHOS {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
+    if (data == nullptr) {
+        return 0;
+    }
+    if (size < sizeof(uint32_t)) {
+        return 0;
+    }
     OHOS::InputGetVendorNameFuzzTest(data, size);
     return 0;
 }

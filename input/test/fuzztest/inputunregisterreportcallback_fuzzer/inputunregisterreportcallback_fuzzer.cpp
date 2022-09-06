@@ -52,12 +52,12 @@ namespace OHOS {
         }
 
         ret = g_inputInterface->iInputReporter->RegisterReportCallback(TOUCH_INDEX, &g_callback);
-        if (!ret) {
+        if (ret == INPUT_SUCCESS) {
             result = true;
         }
 
         ret  = g_inputInterface->iInputReporter->UnregisterReportCallback(*(uint32_t *)data);
-        if (!ret) {
+        if (ret == INPUT_SUCCESS) {
             result = true;
         }
 
@@ -80,7 +80,12 @@ namespace OHOS {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
+    if (data == nullptr) {
+        return 0;
+    }
+    if (size < sizeof(uint32_t)) {
+        return 0;
+    }
     OHOS::InputUnregisterReportCallbackFuzzTest(data, size);
     return 0;
 }
