@@ -20,15 +20,12 @@ ohos_shared_library("libpartition_slot_service_1.0") {
     "//base/user_iam/user_auth/common/logs",
   ]
   sources = [ "src/partitionslot_impl.cpp" ]
-  public_deps = [
-    "//drivers/interface/partitionslot/v1_0:libpartitionslot_stub_1.0",
-    "//drivers/peripheral/partitionslot/hal:partitionslot_source",
-  ]
+  public_deps =
+      [ "//drivers/peripheral/partitionslot/hal:partitionslot_source" ]
   external_deps = [
-    "hdf_core:libhdf_utils",
+    "drivers_interface_partitionslot:partitionslot_idl_headers",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
-    "ipc:ipc_single",
     "utils_base:utils",
   ]
 
@@ -40,20 +37,14 @@ ohos_shared_library("libpartition_slot_service_1.0") {
 ohos_shared_library("libpartitionslot_driver") {
   include_dirs = [
     "include",
-    "//drivers/adapter/uhdf2/shared/include",
-    "//drivers/adapter/uhdf2/include/hdi/",
+    "//drivers/hdf_core/adapter/uhdf2/include/host",
     "//base/user_iam/user_auth/common/logs",
   ]
   sources = [ "src/partition_slot_driver.cpp" ]
-  deps = [
-    ":libpartition_slot_service_1.0",
-    "//drivers/interface/partitionslot/v1_0:libpartitionslot_stub_1.0",
-  ]
+  deps = [ "//drivers/interface/partitionslot/v1_0:libpartitionslot_stub_1.0" ]
 
   external_deps = [
-    "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
-    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
