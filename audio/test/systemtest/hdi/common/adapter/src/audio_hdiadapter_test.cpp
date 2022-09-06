@@ -78,12 +78,11 @@ void AudioHdiAdapterTest::SetUp(void) {}
 void AudioHdiAdapterTest::TearDown(void) {}
 
 /**
-* @tc.name  Test GetAllAdapters API via legal input
-* @tc.number  SUB_Audio_HDI_GetAllAdapters_0001
+* @tc.name  AudioGetAllAdapters_001
 * @tc.desc  test GetAllAdapters interface，Returns 0 if the list is obtained successfully
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0001, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioGetAllAdapters_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int size = 0;
@@ -96,12 +95,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0001, TestSize.Level1
 }
 
 /**
-* @tc.name  Test GetAllAdapters API via setting the incoming parameter manager is nullptr
-* @tc.number  SUB_Audio_HDI_GetAllAdapters_0002
+* @tc.name  AudioGetAllAdapters_002
 * @tc.desc  test GetAllAdapters interface，Returns -1 if the incoming parameter manager is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0002, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioGetAllAdapters_002, TestSize.Level1)
 {
     int32_t ret = -1;
     int size = 0;
@@ -114,12 +112,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0002, TestSize.Level1
 }
 
 /**
-* @tc.name  Test GetAllAdapters API via setting the incoming parameter descs is nullptr
-* @tc.number  SUB_Audio_HDI_GetAllAdapters_0003
+* @tc.name  AudioGetAllAdapters_003
 * @tc.desc  test GetAllAdapters interface，Returns -1 if the incoming parameter descs is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0003, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioGetAllAdapters_003, TestSize.Level1)
 {
     int32_t ret = -1;
     int size = 0;
@@ -131,12 +128,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0003, TestSize.Level1
 }
 
 /**
-* @tc.name  Test GetAllAdapters API via setting the incoming parameter size is nullptr
-* @tc.number  SUB_Audio_HDI_GetAllAdapters_0004
+* @tc.name  AudioGetAllAdapters_004
 * @tc.desc  test GetAllAdapters interface，Returns -1 if the incoming parameter size is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0004, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioGetAllAdapters_004, TestSize.Level1)
 {
     int32_t ret = -1;
     int *size = nullptr;
@@ -147,13 +143,12 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0004, TestSize.Level1
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 }
 /**
-* @tc.name  Test GetAllAdapters API in server module via setting the incoming manager is illagal
-* @tc.number  SUB_Audio_HDI_GetAllAdapters_0005
+* @tc.name  AudioGetAllAdapters_005
 * @tc.desc  test GetAllAdapters interface，Returns -3 if the incoming parameter manager is illagal
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
 #ifdef AUDIO_ADM_SERVICE
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0005, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioGetAllAdapters_005, TestSize.Level1)
 {
     int32_t ret = -1;
     int *size = nullptr;
@@ -166,12 +161,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_GetAllAdapters_0005, TestSize.Level1
 }
 #endif
 /**
-* @tc.name  Test LoadAdapter API via legal input
-* @tc.number  SUB_Audio_HDI_LoadAdapter_0001
+* @tc.name  AudioLoadAdapter_001
 * @tc.desc  test LoadAdapter interface，Returns 0 if the driver is loaded successfully
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0001, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioLoadAdapter_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int size = 0;
@@ -199,12 +193,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0001, TestSize.Level1)
 }
 
 /**
-* @tc.name  Test LoadAdapter API via changing the adapterName of incoming parameter desc
-* @tc.number  SUB_Audio_HDI_LoadAdapter_0002
+* @tc.name  AudioLoadAdapter_002
 * @tc.desc  test LoadAdapter interface，Returns -1 if the adapterName of incoming parameter desc is not support
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0002, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioLoadAdapter_002, TestSize.Level1)
 {
     int32_t ret = -1;
     int size = 0;
@@ -226,12 +219,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0002, TestSize.Level1)
 }
 
 /**
-* @tc.name  Test LoadAdapter API via setting the adapterName of incoming parameter desc  is illegal
-* @tc.number  SUB_Audio_HDI_LoadAdapter_0003
+* @tc.name  AudioLoadAdapter_003
 * @tc.desc  test LoadAdapter interface，Returns -1 if the adapterName of incoming parameter desc is illegal
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0003, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioLoadAdapter_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -248,12 +240,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0003, TestSize.Level1)
 }
 
 /**
-* @tc.name  Test LoadAdapter API via setting the adapterName of incoming parameter manager is nullptr
-* @tc.number  SUB_Audio_HDI_LoadAdapter_0004
+* @tc.name  AudioLoadAdapter_004
 * @tc.desc  test LoadAdapter interface，Returns -1 if the incoming parameter manager is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0004, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioLoadAdapter_004, TestSize.Level1)
 {
     int32_t ret = -1;
     int size = 0;
@@ -273,12 +264,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0004, TestSize.Level1)
 }
 
 /**
-* @tc.name  Test LoadAdapter API via setting the adapterName of incoming parameter desc is nullptr
-* @tc.number  SUB_Audio_HDI_LoadAdapter_0005
+* @tc.name  AudioLoadAdapter_005
 * @tc.desc  test LoadAdapter interface，Returns -1 if the incoming parameter desc is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0005, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioLoadAdapter_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapterDescriptor *desc = nullptr;
@@ -291,12 +281,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0005, TestSize.Level1)
 }
 
 /**
-* @tc.name  Test LoadAdapter API via setting the adapterName of incoming parameter adapter is nullptr
-* @tc.number  SUB_Audio_HDI_LoadAdapter_0006
+* @tc.name  AudioLoadAdapter_006
 * @tc.desc  test LoadAdapter interface，Returns -1 if the incoming parameter adapter is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0006, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioLoadAdapter_006, TestSize.Level1)
 {
     int32_t ret = -1;
     int size = 0;
@@ -313,12 +302,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0006, TestSize.Level1)
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 }
 /**
-* @tc.name  Test LoadAdapter API in server model via setting the adapterName of incoming parameter manager is illagal
-* @tc.number  SUB_Audio_HDI_LoadAdapter_0007
+* @tc.name  AudioLoadAdapter_007
 * @tc.desc  test LoadAdapter interface，Returns -3 if setting the adapterName of incoming parameter manager is illagal
 */
 #ifdef AUDIO_ADM_SERVICE
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0007, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioLoadAdapter_007, TestSize.Level1)
 {
     int32_t ret = -1;
     int size = 0;
@@ -338,12 +326,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_LoadAdapter_0007, TestSize.Level1)
 }
 #endif
 /**
-* @tc.name  Test AudioAdapterInitAllPorts API via legal input.
-* @tc.number  SUB_Audio_HDI_AdapterInitAllPorts_0001
+* @tc.name  AudioAdapterInitAllPorts_001
 * @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if the ports is initialize successfully.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0001, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterInitAllPorts_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -359,12 +346,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0001, TestSize.L
 }
 
 /**
-* @tc.name  Test AudioAdapterInitAllPorts API when loads two adapters.
-* @tc.number  SUB_Audio_HDI_AdapterInitAllPorts_0002
+* @tc.name  AudioAdapterInitAllPorts_002
 * @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if loads two adapters successfully.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0002, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterInitAllPorts_002, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t ret2 = -1;
@@ -393,12 +379,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0002, TestSize.L
 }
 
 /**
-* @tc.name  Test AudioAdapterInitAllPorts API when the parameter adapter is empty.
-* @tc.number  SUB_Audio_HDI_AdapterInitAllPorts_0003
+* @tc.name  AudioAdapterInitAllPorts_003
 * @tc.desc  Test AudioAdapterInitAllPorts API, return -1 if the parameter adapter is empty.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0003, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterInitAllPorts_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -415,12 +400,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0003, TestSize.L
 }
 
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API when the PortType is PORT_OUT.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_0001
+* @tc.name  AudioAdapterGetPortCapability_001
 * @tc.desc  Test AudioAdapterGetPortCapability,return 0 if PortType is PORT_OUT.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPortCapability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -449,12 +433,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0001, TestS
 }
 
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API when the PortType is PORT_IN.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_0002
+* @tc.name  AudioAdapterGetPortCapability_002
 * @tc.desc  Test AudioAdapterGetPortCapability,return 0 if PortType is PORT_IN.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0002, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPortCapability_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -473,12 +456,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0002, TestS
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API, when the parameter adapter is empty.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_0004
+* @tc.name  AudioAdapterGetPortCapability_004
 * @tc.desc  Test AudioAdapterGetPortCapability, return -1 if the parameter adapter is empty.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0004, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPortCapability_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -498,12 +480,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0004, TestS
 }
 
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API when the audioPort is nullptr or not supported.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_0005
+* @tc.name  AudioAdapterGetPortCapability_005
 * @tc.desc  Test AudioAdapterGetPortCapability, return -1 if the audioPort is nullptr or not supported.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0005, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPortCapability_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort *audioPortNull = nullptr;
@@ -528,12 +509,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0005, TestS
 }
 
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API when the capability is nullptr.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_0006
+* @tc.name  AudioAdapterGetPortCapability_006
 * @tc.desc  Test AudioAdapterGetPortCapability, return -1 if capability is nullptr.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0006, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPortCapability_006, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -553,12 +533,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0006, TestS
 }
 
 /**
-* @tc.name  Test AdapterSetPassthroughMode API when the PortType is PORT_OUT.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_0001
+* @tc.name  AudioAdapterSetPassthroughMode_001
 * @tc.desc  test AdapterSetPassthroughMode interface, return 0 if PortType is PORT_OUT.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0001, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterSetPassthroughMode_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -581,12 +560,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0001, Test
 }
 
 /**
-* @tc.name Test AdapterSetPassthroughMode API when the PortType is PORT_IN.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_0002
+* @tc.name  AudioAdapterSetPassthroughMode_002
 * @tc.desc  test AdapterSetPassthroughMode interface, return -1 if PortType is PORT_IN.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0002, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterSetPassthroughMode_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -605,12 +583,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0002, Test
 }
 
 /**
-* @tc.name  Test AdapterSetPassthroughMode API when the parameter adapter is nullptr.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_0003
+* @tc.name  AudioAdapterSetPassthroughMode_003
 * @tc.desc  test AdapterSetPassthroughMode interface, return -1 the parameter adapter is empty.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0003, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterSetPassthroughMode_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -627,12 +604,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0003, Test
 }
 
 /**
-* @tc.name  Test AdapterSetPassthroughMode API when the parameter audioPort is nullptr or not supported.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_0004
+* @tc.name  AudioAdapterSetPassthroughMode_004
 * @tc.desc  test AdapterSetPassthroughMode interface, return -1 if the audioPort is nullptr or not supported.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0004, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterSetPassthroughMode_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -656,12 +632,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0004, Test
 }
 
 /**
-* @tc.name  Test AdapterSetPassthroughMode API when the not supported mode.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_0005
+* @tc.name  AudioAdapterSetPassthroughMode_005
 * @tc.desc  test AdapterSetPassthroughMode interface, return -1 if the not supported mode.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0005, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterSetPassthroughMode_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -680,12 +655,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0005, Test
 }
 
 /**
-* @tc.name  Test AdapterGetPassthroughMode API via legal input
-* @tc.number  SUB_Audio_HDI_AdapterGetPassthroughMode_0001
+* @tc.name  AudioAdapterGetPassthroughMode_001
 * @tc.desc  test AdapterGetPassthroughMode interface, return 0 if is get successfully.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0001, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPassthroughMode_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -710,12 +684,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0001, Test
 }
 
 /**
-* @tc.name  Test AdapterGetPassthroughMode API  when the parameter adapter is nullptr.
-* @tc.number  SUB_Audio_HDI_AdapterGetPassthroughMode_0002
+* @tc.name  AudioAdapterGetPassthroughMode_002
 * @tc.desc  test AdapterGetPassthroughMode interface, return -1 if the parameter adapter is empty..
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0002, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPassthroughMode_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -736,12 +709,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0002, Test
 }
 
 /**
-* @tc.name   Test AdapterGetPassthroughMode API when the parameter audioPort is nullptr or not supported.
-* @tc.number  SUB_Audio_HDI_AdapterGetPassthroughMode_0003
+* @tc.name  AudioAdapterGetPassthroughMode_003
 * @tc.desc  test AdapterGetPassthroughMode interface, return -1 if the audioPort is nullptr or not supported.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0003, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPassthroughMode_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -765,12 +737,11 @@ HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0003, Test
 }
 
 /**
-* @tc.name  Test AdapterGetPassthroughMode API  when the parameter mode is nullptr.
-* @tc.number  SUB_Audio_HDI_AdapterGetPassthroughMode_0004
+* @tc.name  AudioAdapterGetPassthroughMode_004
 * @tc.desc  test AdapterGetPassthroughMode interface, return -1 if the parameter mode is empty.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0004, TestSize.Level1)
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPassthroughMode_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;

@@ -77,12 +77,11 @@ void AudioHdiCaptureSceneTest::SetUp(void) {}
 void AudioHdiCaptureSceneTest::TearDown(void) {}
 
 /**
-* @tc.name   Test AudioCaptureCheckSceneCapability API and check scene's capability
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_0001
+* @tc.name  AudioCaptureCheckSceneCapability_001
 * @tc.desc  Test AudioCaptureCheckSceneCapability interface,return 0 if check scene's capability successful.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = false;
@@ -103,12 +102,11 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
 }
 #ifndef ALSA_LIB_MODE
 /**
-* @tc.name   Test checking scene's capability where the scene is not configured in the json.
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_0002
+* @tc.name  AudioCaptureCheckSceneCapability_002
 * @tc.desc  Test AudioCreateCapture interface,return -1 if the scene is not configured in the json.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_0002, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_002, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -128,12 +126,11 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
 }
 #endif
 /**
-* @tc.name   Test checking scene's capability where the capture is empty
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_0003
+* @tc.name  AudioCaptureCheckSceneCapability_003
 * @tc.desc  Test AudioCreateCapture interface,return -1 if the capture is empty.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_0003, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_003, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -157,12 +154,11 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name   Test checking scene's capability where the scene is empty
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_0004
+* @tc.name  AudioCaptureCheckSceneCapability_004
 * @tc.desc  Test AudioCreateCapture interface,return -1 if the scene is empty.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_0004, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_004, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -184,12 +180,11 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name   Test checking scene's capability where the parameter supported is empty.
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_0005
+* @tc.name  AudioCaptureCheckSceneCapability_005
 * @tc.desc  Test AudioCreateCapture interface,return -1 if the parameter supported is empty.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_0005, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -208,12 +203,11 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_000
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureSelectScene API via legal input
-* @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_0001
+* @tc.name  AudioCaptureSelectScene_001
 * @tc.desc  Test AudioCaptureSelectScene interface,return 0 if select capture's scene successful.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0001, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureSelectScene_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -231,12 +225,11 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0001, T
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureSelectScene API after capture start.
-* @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_0002
+* @tc.name  AudioCaptureSelectScene_002
 * @tc.desc  Test AudioCaptureSelectScene, return 0 if select capture's scene successful after capture start.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0002, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureSelectScene_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -259,12 +252,11 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0002, T
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureSelectScene API where the parameter handle is empty.
-* @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_0003
+* @tc.name  AudioCaptureSelectScene_003
 * @tc.desc  Test AudioCaptureSelectScene, return -1 if the parameter handle is empty.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0003, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureSelectScene_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -284,12 +276,11 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0003, T
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureSelectScene API where the parameter scene is empty.
-* @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_0004
+* @tc.name  AudioCaptureSelectScene_004
 * @tc.desc  Test AudioCaptureSelectScene, return -1 if the parameter scene is empty.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0004, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureSelectScene_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor *scenes = nullptr;
@@ -307,12 +298,11 @@ HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0004, T
 }
 #ifndef ALSA_LIB_MODE
 /**
-* @tc.name  Test AudioCaptureSelectScene API where the scene is not configured in the json.
-* @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_0005
+* @tc.name  AudioCaptureSelectScene_005
 * @tc.desc  Test AudioCaptureSelectScene, return -1 if the scene is not configured in the json.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiCaptureSceneTest, SUB_Audio_HDI_AudioCaptureSelectScene_0005, TestSize.Level1)
+HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureSelectScene_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
