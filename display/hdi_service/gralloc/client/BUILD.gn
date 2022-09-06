@@ -63,8 +63,6 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
     external_deps += [ "graphic_chipsetsdk:buffer_handle" ]
-    install_images = [ system_base_dir ]
-    relative_install_dir = "chipset-sdk"
     subsystem_name = "hdf"
     part_name = "drivers_interface_display"
   }
