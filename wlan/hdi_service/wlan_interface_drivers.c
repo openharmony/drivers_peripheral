@@ -20,31 +20,32 @@
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <osal_mem.h>
-#include "v1_0/wlan_interface_service.h"
+#include <stub_collector.h>
+#include "v1_0/iwlan_interface.h"
 #include "wlan_impl.h"
 
 struct HdfWlanInterfaceHost {
-    struct IDeviceIoService ioservice;
-    struct WlanInterfaceService *service;
+    struct IDeviceIoService ioService;
+    struct IWlanInterface *service;
+    struct HdfRemoteService **stubObject;
 };
 
 static int32_t WlanInterfaceDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    struct HdfWlanInterfaceHost *wlaninterfaceHost =
-        CONTAINER_OF(client->device->service, struct HdfWlanInterfaceHost, ioservice);
-    if (wlaninterfaceHost->service == NULL || wlaninterfaceHost->service->stub.OnRemoteRequest == NULL) {
+    struct HdfWlanInterfaceHost *wlaninterfaceHost = CONTAINER_OF(
+        client->device->service, struct HdfWlanInterfaceHost, ioService);
+    if (wlaninterfaceHost->service == NULL || wlaninterfaceHost->stubObject == NULL) {
         HDF_LOGE("%{public}s: invalid service obj", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
-        HDF_LOGE("%{public}s: check interface desc failed!", __func__);
-        return HDF_ERR_INVALID_PARAM;
+    struct HdfRemoteService *stubObj = *wlaninterfaceHost->stubObject;
+    if (stubObj == NULL || stubObj->dispatcher == NULL || stubObj->dispatcher->Dispatch == NULL) {
+        return HDF_ERR_INVALID_OBJECT;
     }
 
-    return wlaninterfaceHost->service->stub.OnRemoteRequest(
-        &wlaninterfaceHost->service->stub.interface, cmdId, data, reply);
+    return stubObj->dispatcher->Dispatch((struct HdfRemoteService *)stubObj->target, cmdId, data, reply);
 }
 
 static int HdfWlanInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
@@ -83,16 +84,20 @@ static int HdfWlanInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
         return HDF_FAILURE;
     }
 
-    wlaninterfaceHost->ioservice.Dispatch = WlanInterfaceDriverDispatch;
-    wlaninterfaceHost->ioservice.Open = NULL;
-    wlaninterfaceHost->ioservice.Release = NULL;
-    wlaninterfaceHost->service = WlanInterfaceServiceGet();
-    if (wlaninterfaceHost->service == NULL) {
+    struct IWlanInterface *serviceImpl = IWlanInterfaceGet(true);
+    struct HdfRemoteService **stubObj = StubCollectorGetOrNewObject(IWLANINTERFACE_INTERFACE_DESC, serviceImpl);
+    if (stubObj == NULL) {
         OsalMemFree(wlaninterfaceHost);
+        IWlanInterfaceRelease(serviceImpl, true);
         return HDF_FAILURE;
     }
 
-    deviceObject->service = &wlaninterfaceHost->ioservice;
+    wlaninterfaceHost->ioService.Dispatch = WlanInterfaceDriverDispatch;
+    wlaninterfaceHost->ioService.Open = NULL;
+    wlaninterfaceHost->ioService.Release = NULL;
+    wlaninterfaceHost->service = serviceImpl;
+    wlaninterfaceHost->stubObject = stubObj;
+    deviceObject->service = &wlaninterfaceHost->ioService;
     return HDF_SUCCESS;
 }
 
@@ -112,9 +117,10 @@ static void HdfWlanInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
         OsalMemFree(pos);
     }
     OsalMutexDestroy(&stubData->mutex);
-    struct HdfWlanInterfaceHost *wlaninterfaceHost =
-        CONTAINER_OF(deviceObject->service, struct HdfWlanInterfaceHost, ioservice);
-    WlanInterfaceServiceRelease(wlaninterfaceHost->service);
+    struct HdfWlanInterfaceHost *wlaninterfaceHost = CONTAINER_OF(
+        deviceObject->service, struct HdfWlanInterfaceHost, ioService);
+    StubCollectorRemoveObject(IWLANINTERFACE_INTERFACE_DESC, wlaninterfaceHost->service);
+    IWlanInterfaceRelease(wlaninterfaceHost->service, true);
     OsalMemFree(wlaninterfaceHost);
 }
 
