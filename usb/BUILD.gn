@@ -21,6 +21,7 @@ if (defined(ohos_lite)) {
 
   group("usb_entry") {
     deps = [
+      "//drivers/peripheral/usb/cfg:usb_etc_files",
       "//drivers/peripheral/usb/ddk:libusb_core",
       "//drivers/peripheral/usb/gadget/function/acm:libusbfn_cdcacm",
       "//drivers/peripheral/usb/gadget/function/ecm:libusbfn_cdcecm",
