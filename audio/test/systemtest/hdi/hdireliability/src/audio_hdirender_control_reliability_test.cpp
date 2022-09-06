@@ -222,12 +222,11 @@ int32_t AudioHdiRenderControlReliabilityTest::RelAudioRenderGetRenderPosition(st
 }
 
 /**
-* @tc.name  test GetAllAdapter API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioGetAllAdapter_Reliability_0001
+* @tc.name  AudioGetAllAdapterReliability_001
 * @tc.desc  test Reliability GetAllAdapters interface.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioGetAllAdapter_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlReliabilityTest, AudioGetAllAdapterReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     g_para[0].manager = manager;
@@ -245,12 +244,11 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioGetAllAdapter_
 }
 
 /**
-* @tc.name  test LoadAdapter API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioLoadlAdapter_Reliability_0001
+* @tc.name  AudioLoadlAdapterReliability_001
 * @tc.desc  test LoadAdapter interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioLoadlAdapter_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlReliabilityTest, AudioLoadlAdapterReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t failcount = 0;
@@ -283,12 +281,11 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioLoadlAdapter_R
 }
 
 /**
-* @tc.name  test AudioRenderStart API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioRenderStart_Reliability_0001
+* @tc.name  AudioRenderStartReliability_001
 * @tc.desc  test AudioRenderStart interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStart_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlReliabilityTest, AudioRenderStartReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t failcount = 0;
@@ -326,12 +323,11 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStart_Re
 }
 
 /**
-* @tc.name  test AudioRenderFrame API via Multithread call.
-* @tc.number  SUB_Audio_HDI_RelAudioRenderFrame_Reliability_0001
+* @tc.name  AudioRelAudioRenderFrameReliability_001
 * @tc.desc  test AudioRenderFrame iinterface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderFrame_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlReliabilityTest, AudioRenderFrameReliability_001, TestSize.Level1)
 {
     g_para[0].manager = manager;
     ASSERT_NE(nullptr, g_para[0].manager);
@@ -357,12 +353,11 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderFrame_Re
 }
 
 /**
-* @tc.name  test AudioRenderStop API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioRenderStop_Reliability_0001
+* @tc.name  AudioRenderStopReliability_001
 * @tc.desc  test AudioRenderStop interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStop_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlReliabilityTest, AudioRenderStopReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t failcount = 0;
@@ -398,12 +393,11 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderStop_Rel
 }
 
 /**
-* @tc.name  test AudioRenderPause API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioRenderPause_Reliability_0001
+* @tc.name  AudioRenderPauseReliability_001
 * @tc.desc  test AudioRenderPause interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderPause_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlReliabilityTest, AudioRenderPauseReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t failcount = 0;
@@ -442,12 +436,11 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderPause_Re
 }
 
 /**
-* @tc.name  test AudioRenderResume API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudioRenderResume_Reliability_0001
+* @tc.name  AudioRenderResumeReliability_001
 * @tc.desc  test RelAudioRenderResume interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderResume_Reliability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderControlReliabilityTest, AudioRenderResumeReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     int32_t failcount = 0;
@@ -485,12 +478,11 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderResume_R
 }
 
 /**
-* @tc.name  test AudioRenderGetRenderPosition API via Multithread call.
-* @tc.number  SUB_Audio_HDI_AudiorenderGetVolume_Reliability_0001
+* @tc.name  AudiorenderGetVolumeReliability_001
 * @tc.desc  test GetRenderPosition interface Reliability pass through pthread_create fun and adapterName is same.
-* @tc.author: zhouyongxiao
+* @tc.type: RELI
 */
-HWTEST_F(AudioHdiRenderControlReliabilityTest, SUB_Audio_HDI_AudioRenderGetRenderPosition_Reliability_0001,
+HWTEST_F(AudioHdiRenderControlReliabilityTest, AudioRenderGetRenderPositionReliability_001,
          TestSize.Level1)
 {
     int32_t ret = -1;

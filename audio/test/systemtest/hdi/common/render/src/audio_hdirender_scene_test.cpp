@@ -80,12 +80,11 @@ void AudioHdiRenderSceneTest::SetUp(void) {}
 void AudioHdiRenderSceneTest::TearDown(void) {}
 
 /**
-* @tc.name   Test AudioRenderCheckSceneCapability API and check scene's capability
-* @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_0001
+* @tc.name  AudioRenderCheckSceneCapability_001
 * @tc.desc  Test AudioRenderCheckSceneCapability interface,return 0 if check scene's capability successful.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderCheckSceneCapability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = false;
@@ -106,12 +105,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0001,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name   Test checking scene's capability where the scene is not configured in the josn.
-* @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_0002
+* @tc.name  AudioRenderCheckSceneCapability_002
 * @tc.desc  Test RenderCheckSceneCapability interface,return -1 if the scene is not configured in the josn.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderCheckSceneCapability_002, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -131,12 +129,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0002,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name   Test checking scene's capability where the render is empty
-* @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_0003
+* @tc.name  AudioRenderCheckSceneCapability_003
 * @tc.desc  Test AudioRenderCheckSceneCapability,return -1 if the render is empty.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderCheckSceneCapability_003, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -157,12 +154,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0003,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name   Test AudioRenderCheckSceneCapability API and check scene's capability
-* @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_0004
+* @tc.name  AudioRenderCheckSceneCapability_004
 * @tc.desc  Test AudioRenderCheckSceneCapability interface,return -1 if the scene is empty.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0004, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderCheckSceneCapability_004, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -180,12 +176,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0004,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name   Test AudioRenderCheckSceneCapability API and check scene's capability
-* @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_0005
+* @tc.name  AudioRenderCheckSceneCapability_005
 * @tc.desc  Test AudioRenderCheckSceneCapability interface,return -1 if the supported is empty.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0005, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderCheckSceneCapability_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -204,12 +199,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_0005,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioRenderSelectScene API via legal input
-* @tc.number  SUB_Audio_HDI_AudioRenderSelectScene_0001
+* @tc.name  AudioRenderSelectScene_001
 * @tc.desc  Test AudioRenderSelectScene interface,return 0 if select Render's scene successful.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderSelectScene_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -233,12 +227,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0001, Tes
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioRenderSelectScene API after Render start.
-* @tc.number  SUB_Audio_HDI_AudioRenderSelectScene_0002
+* @tc.name  AudioRenderSelectScene_002
 * @tc.desc  Test AudioRenderSelectScene, return 0 if select Render's scene successful after Render start.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderSelectScene_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -258,12 +251,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0002, Tes
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioRenderSelectScene API where the parameter handle is empty.
-* @tc.number  SUB_Audio_HDI_AudioRenderSelectScene_0003
+* @tc.name  AudioRenderSelectScene_003
 * @tc.desc  Test AudioRenderSelectScene, return -1 if the parameter handle is empty.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0003, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderSelectScene_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -283,12 +275,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0003, Tes
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioRenderSelectScene API where the parameter scene is empty.
-* @tc.number  SUB_Audio_HDI_AudioRenderSelectScene_0004
+* @tc.name  AudioRenderSelectScene_004
 * @tc.desc  Test AudioRenderSelectScene, return -1 if the parameter scene is empty.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0004, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderSelectScene_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor *scenes = nullptr;
@@ -305,12 +296,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0004, Tes
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioRenderSelectScene API where the scene is not configured in the josn.
-* @tc.number  SUB_Audio_HDI_AudioRenderSelectScene_0005
+* @tc.name  AudioRenderSelectScene_005
 * @tc.desc  Test AudioRenderSelectScene, return -1 if the scene is not configured in the josn.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0005, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderSelectScene_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -330,12 +320,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_0005, Tes
 }
 #ifdef AUDIO_ADM_SO
 /**
-* @tc.name  Test AudioRenderTurnStandbyMode API via input "AUDIO_FLUSH_COMPLETED"
-* @tc.number  SUB_Audio_HDI_AudioRenderRegCallback_0001
+* @tc.name  AudioRenderRegCallback_001
 * @tc.desc  Test AudioRenderTurnStandbyMode interface,return 0 if the interface use correctly.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderRegCallback_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderRegCallback_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -359,12 +348,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderRegCallback_0001, Tes
 }
 #ifndef ALSA_LIB_MODE
 /**
-* @tc.name  Test AudioRenderRegCallback API via input "AUDIO_NONBLOCK_WRITE_COMPELETED"
-* @tc.number  SUB_Audio_HDI_AudioRenderRegCallback_0002
+* @tc.name  AudioRenderRegCallback_002
 * @tc.desc  Test AudioRenderRegCallback interface,return 0 if the interface use correctly.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderRegCallback_0002, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderRegCallback_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -408,12 +396,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderRegCallback_0002, Tes
 }
 #endif
 /**
-* @tc.name  Test AudioRenderTurnStandbyMode API via
-* @tc.number  SUB_Audio_HDI_AudioRenderTurnStandbyMode_0001
+* @tc.name  AudioRenderTurnStandbyMode_001
 * @tc.desc  Test AudioRenderTurnStandbyMode interface,return 0 if the interface use correctly.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderTurnStandbyMode_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderTurnStandbyMode_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -432,12 +419,11 @@ HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderTurnStandbyMode_0001,
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioRenderAudioDevDump API via
-* @tc.number  SUB_Audio_HDI_AudioRenderAudioDevDump_0001
+* @tc.name  AudioRenderAudioDevDump_001
 * @tc.desc  Test AudioRenderAudioDevDump interface,return 0 if the interface use correctly.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderAudioDevDump_0001, TestSize.Level1)
+HWTEST_F(AudioHdiRenderSceneTest, AudioRenderAudioDevDump_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, manager);

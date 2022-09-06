@@ -76,12 +76,11 @@ void AudioHdiManagerTest::SetUp(void)
 void AudioHdiManagerTest::TearDown(void) {}
 
 /**
-* @tc.name  Test ReleaseAudioManagerObject API via legal input
-* @tc.number  SUB_Audio_HDI_ReleaseAudioManagerObject_0001
+* @tc.name  AudioReleaseAudioManagerObject_001
 * @tc.desc  test ReleaseAudioManagerObject interface，Returns true if audiomanager is relaaseed successfully
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0001, TestSize.Level1)
+HWTEST_F(AudioHdiManagerTest, AudioReleaseAudioManagerObject_001, TestSize.Level1)
 {
     bool ret;
     ASSERT_NE(nullptr, manager);
@@ -93,14 +92,13 @@ HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0001, Test
     ASSERT_EQ(nullptr, manager->UnloadAdapter);
 }
 /**
-* @tc.name  Test ReleaseAudioManagerObject API via setting the incoming parameter manager is nullptr
-* @tc.number  SUB_Audio_HDI_ReleaseAudioManagerObject_0002
+* @tc.name  AudioReleaseAudioManagerObject_002
 * @tc.desc  test ReleaseAudioManagerObject interface，Returns false if setting the incoming
             parameter manager is nullptr
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
 
-HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0002, TestSize.Level1)
+HWTEST_F(AudioHdiManagerTest, AudioReleaseAudioManagerObject_002, TestSize.Level1)
 {
     bool ret;
     ASSERT_NE(nullptr, manager);
@@ -113,13 +111,12 @@ HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0002, Test
     EXPECT_TRUE(ret);
 }
 /**
-* @tc.name  Test ReleaseAudioManagerObject API via setting the incoming parameter manager is illlegal
-* @tc.number  SUB_Audio_HDI_ReleaseAudioManagerObject_0003
+* @tc.name  AudioReleaseAudioManagerObject_003
 * @tc.desc  test ReleaseAudioManagerObject interface，Returns false if setting the incoming
             parameter manager is illlegal
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0003, TestSize.Level1)
+HWTEST_F(AudioHdiManagerTest, AudioReleaseAudioManagerObject_003, TestSize.Level1)
 {
     bool ret;
     ASSERT_NE(nullptr, manager);
@@ -132,12 +129,11 @@ HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0003, Test
     EXPECT_TRUE(ret);
 }
 /**
-* @tc.name  Test ReleaseAudioManagerObject API via getting audiomanager one more time after Releasing
-* @tc.number  SUB_Audio_HDI_ReleaseAudioManagerObject_0004
+* @tc.name  AudioReleaseAudioManagerObject_004
 * @tc.desc  test ReleaseAudioManagerObject interface，audiomanager can be getted after Releasing
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioHdiManagerTest, SUB_Audio_HDI_ReleaseAudioManagerObject_0004, TestSize.Level1)
+HWTEST_F(AudioHdiManagerTest, AudioReleaseAudioManagerObject_004, TestSize.Level1)
 {
     bool ret;
     ASSERT_NE(nullptr, manager);
