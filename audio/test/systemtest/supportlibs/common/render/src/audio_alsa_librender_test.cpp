@@ -179,13 +179,11 @@ int32_t AudioAlsaLibRenderTest::CreatHwRender(struct AudioHwRender *&hwRender, c
     return HDF_SUCCESS;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_RENDER_OPEN/
-            AUDIO_DRV_PCM_IOCTL_RENDER_CLOSE.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Open_001
+* @tc.name  AudioInterfaceLibOutputRenderOpen_001
 * @tc.desc  test Audio Alsalib Interface OutputRender.return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Open_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderOpen_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -200,12 +198,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Open_001, Te
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via stting cmdid is AUDIO_DRV_PCM_IOCTL_RENDER_OPEN twins.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Open_002
+* @tc.name  AudioInterfaceLibOutputRenderOpen_002
 * @tc.desc  test Audio lib Interface OutputRender.return -1 if stting cmdid is AUDIO_DRV_PCM_IOCTL_RENDER_OPEN twins.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Open_002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderOpen_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -222,12 +219,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Open_002, Te
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_RENDER_CLOSE without opning.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Close_001
+* @tc.name  AudioInterfaceLibOutputRenderClose_001
 * @tc.desc  test Audio lib Interface OutputRender.return -1 if without opning.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Close_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderClose_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -240,12 +236,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Close_001, T
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via stting cmdid is AUDIO_DRV_PCM_IOCTL_RENDER_CLOSE twins.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Close_002
+* @tc.name  AudioInterfaceLibOutputRenderClose_002
 * @tc.desc  test Audio lib Interface OutputRender.return -1 if stting cmdid is AUDIO_DRV_PCM_IOCTL_RENDER_CLOSE twins.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Close_002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderClose_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -264,12 +259,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Close_002, T
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_HW_PARAMS.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_HwParams_001
+* @tc.name  AudioInterfaceLibOutputRenderHwParams_001
 * @tc.desc  test Audio lib Interface OutputRender.return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_HwParams_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderHwParams_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -287,12 +281,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_HwParams_001
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_HW_PARAMS but without opening.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_HwParams_002
+* @tc.name  AudioInterfaceLibOutputRenderHwParams_002
 * @tc.desc  test Audio lib Interface OutputRender.return -1 if without opening.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_HwParams_002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderHwParams_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -306,12 +299,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_HwParams_002
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via stting cmdid is AUDIO_DRV_PCM_IOCTL_HW_PARAMS twins.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_HwParams_003
+* @tc.name  AudioInterfaceLibOutputRenderHwParams_003
 * @tc.desc  test Audio lib Interface OutputRender.return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_HwParams_003, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderHwParams_003, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -331,12 +323,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_HwParams_003
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_PREPARE.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Prepare_001
+* @tc.name  AudioInterfaceLibOutputRenderPrepare_001
 * @tc.desc  test Audio lib Interface OutputRender.return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Prepare_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderPrepare_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -356,12 +347,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Prepare_001,
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_PREPARE but without setting params.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Prepare_002
+* @tc.name  AudioInterfaceLibOutputRenderPrepare_002
 * @tc.desc  test Audio lib Interface OutputRender.return -1 if without setting params.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Prepare_002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderPrepare_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -379,12 +369,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Prepare_002,
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_PREPARE twice.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Prepare_003
+* @tc.name  AudioInterfaceLibOutputRenderPrepare_003
 * @tc.desc  test Audio lib Interface OutputRender.return -1 if the Interface call twice.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Prepare_003, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderPrepare_003, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -408,12 +397,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Prepare_003,
 }
 
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTRL_START/AUDIO_DRV_PCM_IOCTRL_STOP.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Start_Stop_001
+* @tc.name  AudioInterfaceLibOutputRenderStart_Stop_001
 * @tc.desc  test Audio lib Interface OutputRender.return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Start_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderStart_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -429,12 +417,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Start_001, T
 }
 
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTRL_START/AUDIO_DRV_PCM_IOCTRL_STOP
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Start_Stop_001
+* @tc.name  AudioInterfaceLibOutputRenderStart_Stop_001
 * @tc.desc  test Audio lib Interface OutputRender.return 0 if without opening.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Stop_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderStop_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -460,12 +447,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Stop_001, Te
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputCapture API via cmdid is AUDIO_DRV_PCM_IOCTRL_STOP.
-* @tc.number  SUB_Audio_InterfaceLibOutputCapture_Stop_002
+* @tc.name  AudioInterfaceLibOutputCaptureStop_002
 * @tc.desc  test Audio lib Interface OutputCapture.return -1 if the Interface call unsuccessful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Stop_002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderStop_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -480,12 +466,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Stop_002, Te
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTRL_STOP twice
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Start_Stop_001
+* @tc.name  AudioInterfaceLibOutputRenderStart_Stop_001
 * @tc.desc  test Audio lib Interface OutputRender.return -1 if the Interface call twice.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Stop_003, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderStop_003, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -515,12 +500,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Stop_003, Te
 }
 
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_WRITE.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Write_001
+* @tc.name  AudioInterfaceLibOutputRenderWrite_001
 * @tc.desc  test Audio lib Interface OutputRender and Normal data flow distribution.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderWrite_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHeadInfo wavHeadInfo = {};
@@ -557,12 +541,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_001, T
     fclose(file);
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via cmdid is AUDIO_DRV_PCM_IOCTL_WRITE without starting.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Write_002
+* @tc.name  AudioInterfaceLibOutputRenderWrite_002
 * @tc.desc  test Audio lib Interface OutputRender ，return -1 if without starting.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderWrite_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHeadInfo wavHeadInfo = {};
@@ -594,12 +577,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Write_002, T
 }
 
 /**
-* @tc.name  test InterfaceLibOutputRender API via setting the cmdId is invalid.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender__Abnormal_001
+* @tc.name  AudioInterfaceLibOutputRender_Abnormal_001
 * @tc.desc  test Audio lib Interface OutputRender via cmdid is invalid and cmdid is 30,so Interface return -1.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Abnormal_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderAbnormal_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -613,12 +595,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Abnormal_001
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via inputting handleData is nullptr.
-* @tc.number  SUB_Audio_InterfaceLibOutputRender_Abnormal_002
+* @tc.name  AudioInterfaceLibOutputRenderAbnormal_002
 * @tc.desc  test Audio lib Interface OutputRender, handleData is nullptr.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Abnormal_002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderAbnormal_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     ASSERT_NE(nullptr, handle);
@@ -627,12 +608,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Abnormal_002
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing GetVolthreshold value
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_GetVolthresholdRead_001
+* @tc.name  AudioInterfaceLibCtlRenderGetVolthresholdRead_001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GetVolthresholdRead_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibCtlRenderGetVolthresholdRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     float volumeThresholdValueMax = 0;
@@ -661,13 +641,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GetVolthreshold
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value is normal value and reading
-*    this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Write_Read_001
+* @tc.name  AudioInterfaceLibCtlRenderVolumeWriteRead_001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_Write_Read_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibCtlRenderVolumeWriteRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     float volumeValue = 0;
@@ -715,13 +693,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_Write_Re
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value is boundary value and reading
-*    this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Write_Read_002
+* @tc.name  AudioInterfaceLibCtlRenderVolumeWriteRead_002
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_Write_Read_002, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibCtlRenderVolumeWriteRead_002, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -762,12 +738,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_Write_Re
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value is invalid value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Volume_AcodecIn_Write_Read_003
+* @tc.name  AudioInterfaceLibCtlRenderVolumeWriteRead_003
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_Write_Read_003, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibCtlRenderVolumeWriteRead_003, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -799,12 +774,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_Volume_Write_Re
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing mute value that include 1 and 0 and reading mute value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_001
+* @tc.name  AudioInterfaceLibCtlRenderMuteWriteRead_001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_MUTE_WRITE and AUDIODRV_CTL_IOCTL_MUTE_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibCtlRenderMuteWriteRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     bool muteValue = 1;
@@ -840,12 +814,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibOutputRender API via pause.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_Pause_001
+* @tc.name  AudioInterfaceLibCtlRenderPause_001
 * @tc.desc  test InterfaceLibOutputRender,cmdId is AUDIODRV_CTL_IOCTL_PAUSE_WRITE.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Pause_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderPause_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
 
@@ -869,12 +842,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Pause_001, T
 }
 
 /**
-* @tc.name  test InterfaceLibOutputRender API via resuming.
-* @tc.number  SUB_Audio_InterfaceLib_CtlRender_Resume_001
+* @tc.name  AudioInterfaceLibOutputRenderResume_001
 * @tc.desc  test InterfaceLibOutputRender,cmdId is AUDIODRV_CTL_IOCTL_PAUSE_WRITE.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Resume_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibOutputRenderResume_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     ASSERT_NE(nullptr, handle);
@@ -896,12 +868,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibOutputRender_Resume_001, 
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via reading  gain threshold.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_001
+* @tc.name  AudioInterfaceLibCtlRenderGainThresholdRead_001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_GAIN_WRITE and AUDIODRV_CTL_IOCTL_GAIN_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainThreshold_Read_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibCtlRenderGainThresholdRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     struct AudioHwRender *hwRender = nullptr;
@@ -916,12 +887,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainThreshold_R
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writting and reading  gain value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_001
+* @tc.name  AudioInterfaceLibCtlRenderGainWriteRead_001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_GAIN_WRITE and AUDIODRV_CTL_IOCTL_GAIN_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibCtlRenderGainWriteRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     ASSERT_NE(nullptr, handle);
@@ -938,13 +908,12 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_GainWrite_Read_
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing ChannelMode value is normal value and reading this value.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_Read_001
+* @tc.name  AudioInterfaceLibCtlRenderChannelModeWriteRead_001
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_CHANNEL_MODE_WRITE
 *    and AUDIODRV_CTL_IOCTL_CHANNEL_MODE_READ.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_ChannelMode_Write_Read_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibCtlRenderChannelModeWriteRead_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     ASSERT_NE(nullptr, handle);
@@ -962,12 +931,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_ChannelMode_Wri
     hwRender = nullptr;
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via selecting scene.
-* @tc.number  SUB_Audio_InterfaceLib_CtlRender_SelectScene_001
+* @tc.name  AudioInterfaceLibCtlRenderSelectScene_001
 * @tc.desc  test InterfaceLibCtlRender,cmdId is AUDIODRV_CTL_IOCTL_SCENESELECT_WRITE.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLib_CtlRender_SelectScene_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibCtlRenderSelectScene_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     ASSERT_NE(nullptr, handle);
@@ -1000,12 +968,11 @@ HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLib_CtlRender_SelectScene_00
 }
 
 /**
-* @tc.name  test InterfaceLibCtlRender API via cmdId is AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER.
-* @tc.number  SUB_Audio_InterfaceLibCtlRender_MuteWrite_Read_001
+* @tc.name  AudioInterfaceLibCtlRenderReqMmpbuffer_001
 * @tc.desc  test InterfaceLibCtlRender ,return 0 if the Interface call successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioAlsaLibRenderTest, SUB_Audio_InterfaceLibCtlRender_ReqMmpbuffer_001, TestSize.Level1)
+HWTEST_F(AudioAlsaLibRenderTest, AudioInterfaceLibCtlRenderReqMmpbuffer_001, TestSize.Level1)
 {
     int32_t ret = HDF_FAILURE;
     int64_t fileSize = 0;

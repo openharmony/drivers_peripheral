@@ -94,13 +94,12 @@ void AudioPathRouteTest::SetUp(void) {}
 void AudioPathRouteTest::TearDown(void) {}
 
 /**
-* @tc.name  Test the audio path route selection function of palyback scene
-* @tc.number  SUB_Audio_AudioPathRoute_0001
+* @tc.name  AudioPathRoute_001
 * @tc.desc  The audio path route can be opened successfully,When it is set to
             palyback scene(attrs.type = AUDIO_IN_MEDIA,pins = PIN_OUT_SPEAKER)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0001, TestSize.Level1)
+HWTEST_F(AudioPathRouteTest, AudioPathRoute_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioRender *render = nullptr;
@@ -116,13 +115,12 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0001, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection function via switching device SPEAKER to HEADSET
-* @tc.number  SUB_Audio_AudioPathRoute_0002
+* @tc.name  AudioPathRoute_002
 * @tc.desc  The audio path route can be opened successfully,When switching
             device(attrs.type = AUDIO_IN_MEDIA,pins = PIN_OUT_HEADSET)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0002, TestSize.Level1)
+HWTEST_F(AudioPathRouteTest, AudioPathRoute_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioRender *render = nullptr;
@@ -145,14 +143,12 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0002, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection function of playback sence
-            when the audio path route has been opened
-* @tc.number  SUB_Audio_AudioPathRoute_0003
+* @tc.name  AudioPathRoute_003
 * @tc.desc  The audio path route of playback scene can be opened successfully,When The current
             audio path route has been opened
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0003, TestSize.Level1)
+HWTEST_F(AudioPathRouteTest, AudioPathRoute_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioRender *render = nullptr;
@@ -174,13 +170,12 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0003, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection function of recording scene
-* @tc.number  SUB_Audio_AudioPathRoute_0004
+* @tc.name  AudioPathRoute_004
 * @tc.desc  The audio path route can be opened successfully,When it is set to
             recording scene(attrs.type = AUDIO_IN_MEDIA,pins = PIN_IN_MIC)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0004, TestSize.Level1)
+HWTEST_F(AudioPathRouteTest, AudioPathRoute_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -197,13 +192,12 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0004, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection function via switching device MIC to HS_MIC
-* @tc.number  SUB_Audio_AudioPathRoute_0005
+* @tc.name  AudioPathRoute_005
 * @tc.desc  The audio path route can be opened successfully,When it is set to
             recording scene(attrs.type = AUDIO_IN_MEDIA,pins = PIN_IN_HS_MIC)
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0005, TestSize.Level1)
+HWTEST_F(AudioPathRouteTest, AudioPathRoute_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -226,14 +220,12 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0005, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection function of recording sence
-            when the audio path route has been opened
-* @tc.number  SUB_Audio_AudioPathRoute_0006
+* @tc.name  AudioPathRoute_006
 * @tc.desc  The audio path route of recording scene can be opened successfully,When The current
             audio path route has been opened
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0006, TestSize.Level1)
+HWTEST_F(AudioPathRouteTest, AudioPathRoute_006, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -256,12 +248,11 @@ HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0006, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test the audio path route selection function via running multi service scenarios
-* @tc.number  SUB_Audio_AudioPathRoute_0007
+* @tc.name  AudioPathRoute_007
 * @tc.desc  The audio path route can be opened successfully,When running multi service scenarios
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioPathRouteTest, SUB_Audio_AudioPathRoute_0007, TestSize.Level1)
+HWTEST_F(AudioPathRouteTest, AudioPathRoute_007, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;

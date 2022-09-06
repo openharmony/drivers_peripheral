@@ -84,12 +84,11 @@ void AudioUsbCaputerTest::SetUp(void) {}
 void AudioUsbCaputerTest::TearDown(void) {}
 
 /**
-* @tc.name  Test AudioCaptureStart API via legal input
-* @tc.number  SUB_Audio_HDI_StartCapture_0001
+* @tc.name  AudioStartCapture_001
 * @tc.desc  Test AudioCaptureStart interface,return 0 if the audiocapture object is started successfully
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStart_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureStart_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -111,12 +110,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStart_0001, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureStart API via start two capture object continuously
-* @tc.number  SUB_Audio_HDI_CaptureStart_0003
+* @tc.name  AudioCaptureStart_003
 * @tc.desc  Test AudioCaptureStart interface,return 0 if the Audiocapturestart was successfully called twice
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStart_0003, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureStart_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -135,12 +133,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStart_0003, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioCaptureStop API via legal input
-    * @tc.number  SUB_Audio_HDI_CaptureStop_0001
+    * @tc.name  AudioCaptureStop_001
     * @tc.desc  Test AudioCaptureStop interface,return 0 if the audiocapture object is stopped successfully
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStop_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureStop_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -156,12 +153,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStop_0001, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioCaptureStop API via stop two capture object continuously
-    * @tc.number  SUB_Audio_HDI_CaptureStop_0002
+    * @tc.name  AudioCaptureStop_002
     * @tc.desc  Test AudioCaptureStop interface,return -4 if Audiocapturestop was successfully called twice
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStop_0002, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureStop_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -179,12 +175,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStop_0002, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioCaptureStop API via start an audio capture after stopping
-    * @tc.number  SUB_Audio_HDI_CaptureStop_0003
+    * @tc.name  AudioCaptureStop_003
     * @tc.desc  Test AudioCaptureStop interface,return 0 if stop and start an audio capture successfully
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStop_0003, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureStop_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -203,12 +198,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStop_0003, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioCaptureStop API via the capture does not start and stop only
-    * @tc.number  SUB_Audio_HDI_CaptureStop_0004
+    * @tc.name  AudioCaptureStop_004
     * @tc.desc  Test AudioCaptureStop interface,return -4 if the capture does not start and stop only
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStop_0004, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureStop_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -224,12 +218,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureStop_0004, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test CapturePause API via legal input
-    * @tc.number  SUB_Audio_HDI_CapturePause_0001
+    * @tc.name  AudioCapturePause_001
     * @tc.desc  test HDI CapturePause interface，return 0 if the capture is paused after start
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CapturePause_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCapturePause_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -247,12 +240,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CapturePause_0001, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test CapturePause API via the interface is called twice in a row
-    * @tc.number  SUB_Audio_HDI_CapturePause_0002
+    * @tc.name  AudioCapturePause_002
     * @tc.desc  Test CapturePause interface, return -1 the second time if CapturePause is called twice
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CapturePause_0002, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCapturePause_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -272,12 +264,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CapturePause_0002, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test CapturePause API via the capture is not Started and paused only.
-    * @tc.number  SUB_Audio_HDI_CapturePause_0004
+    * @tc.name  AudioCapturePause_004
     * @tc.desc  Test AudioRenderPause interface,return -1 if the capture is not Started and paused only.
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CapturePause_0004, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCapturePause_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -293,12 +284,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CapturePause_0004, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test CapturePause API via the capture is paused after stopped.
-    * @tc.number  SUB_Audio_HDI_CapturePause_0005
+    * @tc.name  AudioCapturePause_005
     * @tc.desc  Test CapturePause interface, return -1 the capture is paused after stopped.
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CapturePause_0005, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCapturePause_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -316,12 +306,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CapturePause_0005, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test CaptureResume API via legal input
-    * @tc.number  SUB_Audio_HDI_CaptureResume_0001
+    * @tc.name  AudioCaptureResume_001
     * @tc.desc  Test CaptureResume interface,return 0 if the capture is resumed after paused
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureResume_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureResume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -340,12 +329,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureResume_0001, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test CaptureResume API via the interface is called twice in a row
-    * @tc.number  SUB_Audio_HDI_CaptureResume_0002
+    * @tc.name  AudioCaptureResume_002
     * @tc.desc  Test CaptureResume interface,return -1 the second time if the CaptureResume is called twice
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureResume_0002, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureResume_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -367,12 +355,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureResume_0002, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test CaptureResume API via the capture is resumed after started
-    * @tc.number  SUB_Audio_HDI_CaptureResume_0003
+    * @tc.name  AudioCaptureResume_003
     * @tc.desc  test HDI CaptureResume interface,return -1 if the capture is resumed after started
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureResume_0003, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureResume_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -390,12 +377,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureResume_0003, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test CaptureResume API via the capture is resumed after stopped
-* @tc.number  SUB_Audio_HDI_CaptureResume_0005
+* @tc.name  AudioCaptureResume_005
 * @tc.desc  test HDI CaptureResume interface,return -1 if the capture is resumed after stopped
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureResume_0005, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureResume_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -413,12 +399,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureResume_0005, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test CaptureResume API via the capture Continue to start after resume
-* @tc.number  SUB_Audio_HDI_CaptureResume_0006
+* @tc.name  AudioCaptureResume_006
 * @tc.desc  test HDI CaptureResume interface,return -1 if the capture Continue to start after resume
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureResume_0006, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureResume_006, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -439,12 +424,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureResume_0006, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test CaptureFlush API via legal input Verify that the data in the buffer is flushed after stop
-    * @tc.number  SUB_Audio_HDI_CaptureFlush_0001
+    * @tc.name  AudioCaptureFlush_001
     * @tc.desc  Test CaptureFlush interface,return -2 if the data in the buffer is flushed successfully after stop
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureFlush_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureFlush_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -462,16 +446,15 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureFlush_0001, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureSetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_AudioCaptureSetSampleAttributes_0001
+* @tc.name  AudioCaptureSetSampleAttributes_001
 * @tc.desc  Test AudioCaptureSetSampleAttributes ,the setting parameters are as follows.
 *    attrs.type = AUDIO_IN_MEDIA;
 *    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
 *    attrs.sampleRate = 8000;
 *    attrs.channelCount = 1;
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSetSampleAttributes_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureSetSampleAttributes_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t ret1 = 1;
@@ -496,16 +479,15 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSetSampleAttributes_0001
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureGetSampleAttributes API via legal input.
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetSampleAttributes_0001
+* @tc.name  AudioCaptureGetSampleAttributes_001
 * @tc.desc  Test AudioCaptureGetSampleAttributes ,the setting parameters are as follows.
 *    attrs.type = AUDIO_IN_MEDIA;
 *    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
 *    attrs.sampleRate = 8000;
 *    attrs.channelCount = 1;
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureGetSampleAttributes_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetSampleAttributes_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t ret1 = 32000;
@@ -532,12 +514,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureGetSampleAttributes_0001
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureGetFrameSize API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameSize_0001
+* @tc.name  AudioCaptureGetFrameSize_001
 * @tc.desc  test AudioCaptureGetFrameSize interface, return 0 is call successfully.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetFrameSize_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetFrameSize_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t size = 0;
@@ -554,12 +535,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetFrameSize_0001, TestSize.L
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureGetFrameCount API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameCount_0001
+* @tc.name  AudioCaptureGetFrameCount_001
 * @tc.desc  test AudioCaptureGetFrameCount interface, return 0 if the FrameCount is called after creating the object.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetFrameCount_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetFrameCount_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -577,12 +557,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetFrameCount_0001, TestSize.
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureGetFrameCount API via legal input in the difference scene
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameCount_0002
+* @tc.name  AudioCaptureGetFrameCount_002
 * @tc.desc  test AudioCaptureGetFrameCount interface, return 0 if the GetFrameCount is called after started.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetFrameCount_0002, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetFrameCount_002, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -605,12 +584,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetFrameCount_0002, TestSize.
 }
 
 /**
-    * @tc.name  Test CaptureGetCurrentChannelId API via legal input
-    * @tc.number  SUB_Audio_HDI_RenderGetCurrentChannelId_0001
+    * @tc.name  AudioRenderGetCurrentChannelId_001
     * @tc.desc  Test GetCurrentChannelId, return 0 if the default CurrentChannelId is obtained successfully
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetCurrentChannelId_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t channelId = 0;
@@ -629,12 +607,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_0001, Tes
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test GetCurrentChannelId API via getting channelId to 1 and set channelCount to 1
-    * @tc.number  SUB_Audio_HDI_CaptureGetCurrentChannelId_0002
+    * @tc.name  AudioCaptureGetCurrentChannelId_002
     * @tc.desc  Test GetCurrentChannelId interface,return 0 if get channelId to 1 and set channelCount to 1
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_0002, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetCurrentChannelId_002, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t channelId = 0;
@@ -662,12 +639,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_0002, Tes
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test GetCurrentChannelId API via CurrentChannelId is obtained after started
-    * @tc.number  SUB_Audio_HDI_CaptureGetCurrentChannelId_0003
+    * @tc.name  AudioCaptureGetCurrentChannelId_003
     * @tc.desc  Test GetCurrentChannelId interface, return 0 if CurrentChannelId is obtained after started
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_0003, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetCurrentChannelId_003, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t channelId = 0;
@@ -689,12 +665,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_0003, Tes
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test CaptureSetExtraParams API via setting ExtraParams during playback
-    * @tc.number  SUB_Audio_HDI_CaptureSetExtraParams_0001
+    * @tc.name  AudioCaptureSetExtraParams_001
     * @tc.desc  Test CaptureSetExtraParams interface,return 0 if the ExtraParams is set during playback
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureSetExtraParams_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureSetExtraParams_001, TestSize.Level1)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
@@ -731,12 +706,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureSetExtraParams_0001, TestSize
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-    * @tc.name  Test CaptureSetExtraParams API via setting some parameters after playing
-    * @tc.number  SUB_Audio_HDI_CaptureSetExtraParams_0002
+    * @tc.name  AudioCaptureSetExtraParams_002
     * @tc.desc  Test CaptureSetExtraParams interface,return 0 if some parameters is set after playing
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureSetExtraParams_0002, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureSetExtraParams_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = {};
@@ -789,12 +763,11 @@ attr-sampling-rate=48000";
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test CaptureGetExtraParams API via legal input
-    * @tc.number  SUB_Audio_HDI_CaptureGetExtraParams_0001
+    * @tc.name  AudioCaptureGetExtraParams_001
     * @tc.desc  Test CaptureGetExtraParams interface,return 0 if the RenderGetExtraParams was obtained successfully
-    * @tc.author: tiansuli
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetExtraParams_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetExtraParams_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -835,12 +808,11 @@ attr-sampling-rate=48000";
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name   Test AudioCaptureCheckSceneCapability API and check scene's capability
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_0001
+* @tc.name  AudioCaptureCheckSceneCapability_001
 * @tc.desc  Test AudioCaptureCheckSceneCapability interface,return 0 if check scene's capability successful.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureCheckSceneCapability_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureCheckSceneCapability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = false;
@@ -860,12 +832,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureCheckSceneCapability_0001, Te
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name   Test checking scene's capability where the scene is not configured in the json.
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_0002
+* @tc.name  AudioCaptureCheckSceneCapability_002
 * @tc.desc  Test AudioCreateCapture interface,return -1 if the scene is not configured in the json.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureCheckSceneCapability_0002, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureCheckSceneCapability_002, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -885,12 +856,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureCheckSceneCapability_0002, Te
 }
 
 /**
-* @tc.name  Test AudioCaptureSelectScene API via legal input
-* @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_0001
+* @tc.name  AudioCaptureSelectScene_001
 * @tc.desc  Test AudioCaptureSelectScene interface,return 0 if select capture's scene successful.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSelectScene_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureSelectScene_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -908,12 +878,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSelectScene_0001, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureSelectScene API after capture start.
-* @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_0002
+* @tc.name  AudioCaptureSelectScene_002
 * @tc.desc  Test AudioCaptureSelectScene, return 0 if select capture's scene successful after capture start.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSelectScene_0002, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureSelectScene_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -936,12 +905,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSelectScene_0002, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureSelectScene API where the scene is not configured in the json.
-* @tc.number  SUB_Audio_HDI_AudioCaptureSelectScene_0005
+* @tc.name  AudioCaptureSelectScene_005
 * @tc.desc  Test AudioCaptureSelectScene, return -1 if the scene is not configured in the json.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSelectScene_0005, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureSelectScene_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -960,12 +928,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSelectScene_0005, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureCaptureFrame API via legal input
-* @tc.number  SUB_Audio_HDI_AudioCaptureFrame_0001
+* @tc.name  AudioCaptureFrame_001
 * @tc.desc  test AudioCaptureCaptureFrame interface,Returns 0 if the input data is read successfully
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureFrame_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureFrame_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t replyBytes = 0;
@@ -992,12 +959,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureFrame_0001, TestSize.Lev
     }
 }
 /**
-* @tc.name  Test AudioCaptureFrame API without calling interface capturestart
-* @tc.number  SUB_Audio_HDI_AudioCaptureFrame_0005
+* @tc.name  AudioCaptureFrame_005
 * @tc.desc  Test AudioCaptureFrame interface,Returns -1 if without calling interface capturestart
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureFrame_0005, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureFrame_005, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t requestBytes = BUFFER_SIZE;
@@ -1021,12 +987,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureFrame_0005, TestSize.Lev
     }
 }
 /**
-* @tc.name  Test AudioCaptureGetCapturePosition API via legal input
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetCapturePosition_0001
+* @tc.name  AudioCaptureGetCapturePosition_001
 * @tc.desc  Test AudioCaptureGetCapturePosition interface,Returns 0 if get CapturePosition during playing.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetCapturePosition_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t frames = 0;
@@ -1053,12 +1018,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureGetCapturePosition_0001,
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Test ReqMmapBuffer API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureReqMmapBuffer_0001
+* @tc.name  AudioCaptureReqMmapBuffer_001
 * @tc.desc  Test ReqMmapBuffer interface,return 0 if call ReqMmapBuffer interface successfully
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureReqMmapBuffer_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool isRender = false;
@@ -1091,12 +1055,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureReqMmapBuffer_0001, TestSize.
 }
 
 /**
-* @tc.name  Test GetMmapPosition API via Getting position is normal in Before recording , recording and after recording
-* @tc.number  SUB_Audio_HDI_CaptureGetMmapPosition_0001
+* @tc.name  AudioCaptureGetMmapPosition_001
 * @tc.desc  Test GetMmapPosition interface,return 0 if Getting position successfully.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetMmapPosition_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetMmapPosition_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t frames = 0;
@@ -1145,12 +1108,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetMmapPosition_0001, TestSiz
     audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
 }
 /**
-* @tc.name  Test GetMmapPosition API via SetSampleAttributes and Getting position is normal.
-* @tc.number  SUB_Audio_HDI_CaptureGetMmapPosition_0002
+* @tc.name  AudioCaptureGetMmapPosition_002
 * @tc.desc  Test GetMmapPosition interface,return 0 if Getting position successfully.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetMmapPosition_0002, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetMmapPosition_002, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t frames = 0;
@@ -1195,12 +1157,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetMmapPosition_0002, TestSiz
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }
 /**
-* @tc.name  Test AudioCaptureGetMute API via legal input.
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetMute_0001
+* @tc.name  AudioCaptureGetMute_001
 * @tc.desc  Test AudioCaptureGetMute interface , return 0 if the audiocapture gets mute successfully.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureGetMute_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetMute_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool muteTrue = true;
@@ -1228,12 +1189,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureGetMute_0001, TestSize.L
 }
 
 /**
-* @tc.name  Test AudioCaptureSetMute API via legal input.
-* @tc.number  SUB_Audio_HDI_AudioCaptureSetMute_0001
+* @tc.name  AudioCaptureSetMute_001
 * @tc.desc  Test AudioCaptureSetMute interface , return 0 if the audiocapture object sets mute successfully.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSetMute_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureSetMute_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool muteTrue = true;
@@ -1262,12 +1222,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSetMute_0001, TestSize.L
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureSetVolume API via legal input.
-* @tc.number  SUB_Audio_HDI_AudioCaptureSetVolume_0001
+* @tc.name  AudioCaptureSetVolume_001
 * @tc.desc  Test AudioCaptureSetVolume interface , return 0 if the audiocapture sets volume successfully.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSetVolume_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureSetVolume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float volumeInit = 0.30;
@@ -1308,12 +1267,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureSetVolume_0001, TestSize
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureGetVolume API via legal input.
-* @tc.number  SUB_Audio_HDI_AudioCaptureGetVolume_0001
+* @tc.name  AudioCaptureGetVolume_001
 * @tc.desc  Test AudioCaptureGetVolume interface , return 0 if the audiocapture is get successful.
-* @tc.author: ZHANGHAILIN
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureGetVolume_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetVolume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float volume = 0.60;
@@ -1334,12 +1292,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureGetVolume_0001, TestSize
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureGetGainThreshold API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureGetGainThreshold_0001
+* @tc.name  AudioCaptureGetGainThreshold_001
 * @tc.desc  test AudioCaptureGetGainThreshold interface, return 0 is call successfully.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetGainThreshold_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetGainThreshold_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -1359,12 +1316,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetGainThreshold_0001, TestSi
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureSetGain API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureSetGain_0001
+* @tc.name  AudioCaptureSetGain_001
 * @tc.desc  test AudioCaptureSetGain interface, return 0 is call successfully.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureSetGain_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureSetGain_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -1405,12 +1361,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureSetGain_0001, TestSize.Level1
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureGetGain API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureGetGain_0001
+* @tc.name  AudioCaptureGetGain_001
 * @tc.desc  test AudioCaptureGetGain interface, return 0 if CaptureGetGain is call successfully.
-* @tc.author: tiansuli
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetGain_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetGain_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float min = 0;
@@ -1436,12 +1391,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_CaptureGetGain_0001, TestSize.Level1
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCaptureTurnStandbyMode API via
-* @tc.number  SUB_Audio_HDI_AudioCaptureTurnStandbyMode_0001
+* @tc.name  AudioCaptureTurnStandbyMode_001
 * @tc.desc  Test AudioCaptureTurnStandbyMode interface,return 0 if the interface use correctly.
-* @tc.author: ZENG LIFENG
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureTurnStandbyMode_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureTurnStandbyMode_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -1461,12 +1415,11 @@ HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureTurnStandbyMode_0001, Te
 }
 
 /**
-* @tc.name  Test AudioCaptureAudioDevDump API via
-* @tc.number  SUB_Audio_HDI_AudioCaptureAudioDevDump_0001
+* @tc.name  AudioCaptureAudioDevDump_001
 * @tc.desc  Test AudioCaptureAudioDevDump interface,return 0 if the interface use correctly.
-* @tc.author: ZENG LIFENG
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbCaputerTest, SUB_Audio_HDI_AudioCaptureAudioDevDump_0001, TestSize.Level1)
+HWTEST_F(AudioUsbCaputerTest, AudioCaptureAudioDevDump_001, TestSize.Level1)
 {
     int32_t ret = -1;
     char pathBuf[] = "./DevDump.log";
