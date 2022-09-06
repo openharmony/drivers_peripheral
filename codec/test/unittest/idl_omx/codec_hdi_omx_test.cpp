@@ -38,7 +38,7 @@ using OHOS::HDI::Codec::V1_0::ICodecCallback;
 using OHOS::HDI::Codec::V1_0::ICodecComponent;
 using OHOS::HDI::Codec::V1_0::ICodecComponentManager;
 using OHOS::HDI::Codec::V1_0::OmxCodecBuffer;
-using OHOS::HDI::Display::BufferHandleParcelable;
+using OHOS::HDI::Base::HdiBufferHandle;
 namespace {
     constexpr uint32_t WIDTH = 640;
     constexpr uint32_t HEIGHT = 480;
@@ -826,15 +826,13 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_008, TestSize.Level1)
     BufferHandle *bufferHandle = nullptr;
     auto err = g_gralloc->AllocMem(alloc, bufferHandle);
     ASSERT_EQ(err, DISPLAY_SUCCESS);
-    sptr<BufferHandleParcelable> bufferParcel = new BufferHandleParcelable();
-    bufferParcel->Init(*bufferHandle);
     std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
     size_t handleSize =
         sizeof(BufferHandle) + (sizeof(int32_t) * (bufferHandle->reserveFds + bufferHandle->reserveInts));
     omxBuffer->size = sizeof(OmxCodecBuffer);
     omxBuffer->version = g_version;
     omxBuffer->bufferType = CODEC_BUFFER_TYPE_HANDLE;
-    omxBuffer->bufferhandle = bufferParcel;
+    omxBuffer->bufferhandle = new HdiBufferHandle(*bufferHandle);
     omxBuffer->allocLen = handleSize;
     omxBuffer->fenceFd = FD_DEFAULT;
     omxBuffer->fd = FD_DEFAULT;
@@ -884,8 +882,6 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_010, TestSize.Level1)
     BufferHandle *bufferHandle = nullptr;
     auto err = g_gralloc->AllocMem(alloc, bufferHandle);
     ASSERT_EQ(err, DISPLAY_SUCCESS);
-    sptr<BufferHandleParcelable> bufferParcel = new BufferHandleParcelable();
-    bufferParcel->Init(*bufferHandle);
     std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
     size_t handleSize =
         sizeof(BufferHandle) + (sizeof(int32_t) * (bufferHandle->reserveFds + bufferHandle->reserveInts));
@@ -893,7 +889,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_010, TestSize.Level1)
     omxBuffer->version = g_version;
     omxBuffer->bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
 
-    omxBuffer->bufferhandle = bufferParcel;
+    omxBuffer->bufferhandle = new HdiBufferHandle(*bufferHandle);
     omxBuffer->allocLen = handleSize;
     omxBuffer->fenceFd = FD_DEFAULT;
     omxBuffer->fd = FD_DEFAULT;
@@ -1183,13 +1179,13 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDestoryComponentTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     ASSERT_TRUE(mgr_ != nullptr);
-    int ret = mgr_->DestoryComponent(g_componentId);
+    int ret = mgr_->DestroyComponent(g_componentId);
     ASSERT_EQ(ret, HDF_SUCCESS);
     g_component = nullptr;
 
     ASSERT_TRUE(g_componentHevc != nullptr);
     ASSERT_TRUE(mgr_ != nullptr);
-    ret = mgr_->DestoryComponent(g_componentIdHevc);
+    ret = mgr_->DestroyComponent(g_componentIdHevc);
     ASSERT_EQ(ret, HDF_SUCCESS);
     g_componentHevc = nullptr;
 }
