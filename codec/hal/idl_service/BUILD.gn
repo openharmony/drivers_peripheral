@@ -46,9 +46,8 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
     external_deps = [
       "drivers_interface_codec:codec_idl_headers",
       "graphic_chipsetsdk:buffer_handle",
-      "hdf_core:libbufferhandle_parcelable",
-      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
       "utils_base:utils",
@@ -82,11 +81,8 @@ ohos_shared_library("libcodec_driver") {
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
-      "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
-      "utils_base:utils",
     ]
   } else {
     external_deps = [

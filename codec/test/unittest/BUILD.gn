@@ -17,5 +17,6 @@ group("hdf_unittest_codec") {
     "hdi_adapter:codec_hdi_adapter_test",
     "hdi_omx:codec_hdi_omx_test",
     "hdi_v1.0:codec_client_test",
+    "idl_omx:codec_idl_omx_test",
   ]
 }
