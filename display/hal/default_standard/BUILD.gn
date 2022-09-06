@@ -123,6 +123,8 @@ ohos_shared_library("def_display_device") {
     "hiviewdfx_hilog_native:libhilog",
   ]
 
+  symlink_target_name = [ "libdisplay_layer.z.so" ]
+
   install_enable = true
   install_images = [ system_base_dir ]
   relative_install_dir = "chipset-sdk"
