@@ -52,9 +52,12 @@ namespace {
     constexpr int16_t AVC_SETUP_CABAC_IDC_DEFAULT = 0;
     constexpr int16_t AVC_SETUP_TRANS_DEFAULT = 1;
     constexpr int16_t AVC_SETUP_PROFILE_DEFAULT = 100;
+    constexpr int16_t ENC_SETUP_FPS_IN_NUM = 24;
+    constexpr int16_t ENC_SETUP_FPS_OUT_NUM = 24;
     constexpr int32_t FRAME = (30 << 16);
     constexpr int32_t BUFFER_COUNT = 10;
     constexpr int32_t FD_SIZE = sizeof(int);
+    constexpr int32_t USLEEP_TIME = 10000;
     constexpr const char *ENCODER_AVC = "rk.video_encoder.avc";
     constexpr int32_t DENOMINATOR = 2;
     constexpr int32_t NUMERATOR = 3;
@@ -449,7 +452,7 @@ void CodecHdiAdapterEncode::Run()
             break;
         }
         if (bufferID < 0) {
-            usleep(10000);
+            usleep(USLEEP_TIME);
             continue;
         }
         auto iter = omxBuffers_.find(bufferID);
@@ -468,7 +471,7 @@ void CodecHdiAdapterEncode::Run()
         }
     }
     while (!this->exit_) {
-        usleep(10000);
+        usleep(USLEEP_TIME);
         continue;
     }
     ret = client_->SendCommand(client_, OMX_CommandStateSet, OMX_StateIdle, NULL, 0);
@@ -757,8 +760,8 @@ int32_t CodecHdiAdapterEncode::ConfigMppExtPassthrough(int32_t codecType)
     RKHdiFpsSetup fps;
     param.key = KEY_VIDEO_FRAME_RATE;
     fps.fpsInFlex = 0;
-    fps.fpsInNum = 24;
-    fps.fpsOutNum = 24;
+    fps.fpsInNum = ENC_SETUP_FPS_IN_NUM;
+    fps.fpsOutNum = ENC_SETUP_FPS_OUT_NUM;
     fps.fpsInDen = 1;
     fps.fpsOutDen = 1;
     fps.fpsOutFlex = 0;

@@ -21,6 +21,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <chrono>
+#include <sys/stat.h>
 #include "hdi_mpp.h"
 #include "codec_type.h"
 #include "codec_omx_ext.h"
@@ -33,6 +34,13 @@ namespace {
     constexpr int32_t HEIGHT_OPERATOR = 2;
     constexpr const char *DECODER_AVC = "rk.video_decoder.avc";
     constexpr const char *DECODER_HEVC = "rk.video_decoder.hevc";
+    constexpr int32_t START_CODE_OFFSET_ONE = -1;
+    constexpr int32_t START_CODE_OFFSET_SEC = -2;
+    constexpr int32_t START_CODE_OFFSET_THIRD = -3;
+    constexpr int32_t START_CODE_SIZE_FRAME = 4;
+    constexpr int32_t START_CODE_SIZE_SLICE = 3;
+    constexpr int32_t START_CODE = 1;
+    constexpr int32_t USLEEP_TIME = 10000;
 }
 
 #define HDF_LOG_TAG codec_omx_hdi_dec
@@ -53,6 +61,9 @@ CodecHdiAdapterDecode::CodecHdiAdapterDecode() : fpIn_(nullptr), fpOut_(nullptr)
     useBufferHandle_ = false;
     componentId_ = 0;
     inputBufferSize_ = 0;
+    needSplit_ = 0;
+    srcFileSize_ = 0;
+    totalSrcSize_ = 0;
 }
 
 CodecHdiAdapterDecode::~CodecHdiAdapterDecode()
@@ -109,13 +120,46 @@ void CodecHdiAdapterDecode::DumpOutputToFile(FILE *fp, uint8_t *addr)
     }
 }
 
-bool CodecHdiAdapterDecode::ReadOnePacket(FILE *fp, char *buf, uint32_t &filledCount)
+bool CodecHdiAdapterDecode::ReadOnePacket(FILE *fp, uint8_t *buf, uint32_t &filledCount)
 {
     filledCount = fread(buf, 1, inputBufferSize_, fp);
     if (filledCount <= 0) {
         return true;
     }
     return false;
+}
+
+bool CodecHdiAdapterDecode::ReadOneFrameFromFile(FILE *fp, uint8_t *buf, uint32_t &filledCount)
+{
+    int32_t readSize = 0;
+    // read start code first
+    size_t t = fread(buf, 1, START_CODE_SIZE_FRAME, fp);
+    if (t < START_CODE_SIZE_FRAME) {
+        return true;
+    }
+    uint8_t *temp = buf;
+    temp += START_CODE_SIZE_FRAME;
+    while (!feof(fp)) {
+        t = fread(temp, 1, 1, fp);
+        if (*temp == START_CODE) {
+            // check start code
+            if ((temp[START_CODE_OFFSET_ONE] == 0) && (temp[START_CODE_OFFSET_SEC] == 0) &&
+                (temp[START_CODE_OFFSET_THIRD] == 0)) {
+                fseek(fp, -START_CODE_SIZE_FRAME, SEEK_CUR);
+                temp -= (START_CODE_SIZE_FRAME - 1);
+                break;
+            } else if ((temp[START_CODE_OFFSET_ONE] == 0) && (temp[START_CODE_OFFSET_SEC] == 0)) {
+                fseek(fp, -START_CODE_SIZE_SLICE, SEEK_CUR);
+                temp -= (START_CODE_SIZE_SLICE - 1);
+                break;
+            }
+        }
+        temp++;
+    }
+    readSize = (temp - buf);
+    filledCount = readSize;
+    totalSrcSize_ += readSize;
+    return (totalSrcSize_ >= srcFileSize_);
 }
 
 bool CodecHdiAdapterDecode::Init(CommandOpt &opt)
@@ -128,6 +172,9 @@ bool CodecHdiAdapterDecode::Init(CommandOpt &opt)
     HDF_LOGI("width[%{public}d], height[%{public}d],stride_[%{public}d],infile[%{public}s],outfile[%{public}s]",
              width_, height_, stride_, opt.fileInput.c_str(), opt.fileOutput.c_str());
 
+    struct stat fileStat = {0};
+    stat(opt.fileInput.c_str(), &fileStat);
+    srcFileSize_ = fileStat.st_size;
     fpIn_ = fopen(opt.fileInput.c_str(), "rb");
     fpOut_ = fopen(opt.fileOutput.c_str(), "wb+");
     if ((fpIn_ == nullptr) || (fpOut_ == nullptr)) {
@@ -194,8 +241,9 @@ int32_t CodecHdiAdapterDecode::ConfigMppPassthrough()
     }
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
     param.key = (ParamKey)KEY_EXT_SPLIT_PARSE_RK;
-    uint32_t needSplit = 1;
-    param.val = &needSplit;
+
+    needSplit_ = 0;
+    param.val = &needSplit_;
     param.size = sizeof(uint32_t);
     ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
     if (ret != HDF_SUCCESS) {
@@ -484,7 +532,7 @@ void CodecHdiAdapterDecode::Run()
             break;
         }
         if (bufferID < 0) {
-            usleep(10000);
+            usleep(USLEEP_TIME);
             continue;
         }
         auto iter = omxBuffers_.find(bufferID);
@@ -493,7 +541,11 @@ void CodecHdiAdapterDecode::Run()
         }
         auto bufferInfo = iter->second;
         void *sharedAddr = (void *)bufferInfo->avSharedPtr->ReadFromAshmem(0, 0);
-        eosFlag = this->ReadOnePacket(fpIn_, (char *)sharedAddr, bufferInfo->omxBuffer->filledLen);
+        if (needSplit_ == 1) {
+            eosFlag = this->ReadOnePacket(fpIn_, (uint8_t *)sharedAddr, bufferInfo->omxBuffer->filledLen);
+        } else {
+            eosFlag = this->ReadOneFrameFromFile(fpIn_, (uint8_t *)sharedAddr, bufferInfo->omxBuffer->filledLen);
+        }
         bufferInfo->omxBuffer->offset = 0;
         if (eosFlag) {
             bufferInfo->omxBuffer->flag = OMX_BUFFERFLAG_EOS;
@@ -506,7 +558,7 @@ void CodecHdiAdapterDecode::Run()
     }
     // wait
     while (!this->exit_) {
-        usleep(10000);
+        usleep(USLEEP_TIME);
         continue;
     }
     auto t2 = std::chrono::system_clock::now();
