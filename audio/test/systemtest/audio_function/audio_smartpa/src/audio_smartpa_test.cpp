@@ -124,12 +124,11 @@ int32_t AudioSmartPaTest::BindServiceAndHwRender(struct AudioHwRender *&hwRender
     return HDF_SUCCESS;
 }
 /**
-* @tc.name  Pause,Flush,Resume and Stop when playing audio file based smartPA
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0001
+* @tc.name  AudioFunctionSmartpaTest_001
 * @tc.desc  test Render interface by playing an audio file based smartPA successfully.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0001, TestSize.Level1)
+HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, manager);
@@ -162,12 +161,11 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0001, TestSize.Level1
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Setting audio file volume based smartPA
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0002
+* @tc.name  AudioFunctionSmartpaTest_002
 * @tc.desc  test Render function,set volume when playing audio file based smartPA.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0002, TestSize.Level1)
+HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_002, TestSize.Level1)
 {
     int32_t ret = -1;
     float volumeMax = 1.0;
@@ -197,12 +195,11 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0002, TestSize.Level1
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  SetMute audio files when playing audio file based smartPA
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0003
+* @tc.name  AudioFunctionSmartpaTest_003
 * @tc.desc  test render function by SetMute and GetMute when playing audio file based smartPA.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0003, TestSize.Level1)
+HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_003, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, manager);
@@ -233,12 +230,11 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0003, TestSize.Level1
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Get render position when playing audio file based smartPA
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0004
+* @tc.name  AudioFunctionSmartpaTest_004
 * @tc.desc  test render function by Get render position when playing audio file based smartPA.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0004, TestSize.Level1)
+HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_004, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, manager);
@@ -263,12 +259,11 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0004, TestSize.Level1
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Get frame count and size when playing audio file based smartPA
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0005
+* @tc.name  AudioFunctionSmartpaTest_005
 * @tc.desc  test render function by Get frame count and size when playing audio file based smartPA.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0005, TestSize.Level1)
+HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_005, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, manager);
@@ -298,12 +293,11 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0005, TestSize.Level1
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  SetSampleAttributes when playing audio file based smartPA
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0006
+* @tc.name  AudioFunctionSmartpaTest_006
 * @tc.desc  test render function by SetSampleAttributes when playing audio file based smartPA.
-* @tc.author: wangkang
+* @tc.type: FUNC
 */
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0006, TestSize.Level1)
+HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_006, TestSize.Level1)
 {
     ASSERT_NE(nullptr, manager);
     struct PrepareAudioPara audiopara = {
@@ -342,13 +336,12 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0006, TestSize.Level1
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value of smartpa is normal value and reading
 *    this value.
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0009
+* @tc.name  AudioFunctionSmartpaTest_009
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0009, TestSize.Level1)
+HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_009, TestSize.Level1)
 {
     int32_t ret = -1;
     float volumevalue = 0;
@@ -392,13 +385,12 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0009, TestSize.Level1
     free(hwRender);
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value of smartpa is boundary value and reading
 *    this value.
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0010
+* @tc.name  AudioFunctionSmartpaTest_010
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0010, TestSize.Level1)
+HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_010, TestSize.Level1)
 {
     int32_t ret = -1;
     float thresholdValueMin = 0;
@@ -432,12 +424,11 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0010, TestSize.Level1
     free(hwRender);
 }
 /**
-* @tc.name  test InterfaceLibCtlRender API via writing volume value of smartpa is invalid value.
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0011
+* @tc.name  AudioFunctionSmartpaTest_011
 * @tc.desc  test InterfaceLibCtlRender ,cmdId is AUDIODRV_CTL_IOCTL_ELEM_WRITE and AUDIODRV_CTL_IOCTL_ELEM_READ.
-* @tc.author: zhouyongxiao
+* @tc.type: FUNC
 */
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0011, TestSize.Level1)
+HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_011, TestSize.Level1)
 {
     int32_t ret = -1;
     float volumeThresholdValueMax = 0;
@@ -464,12 +455,11 @@ HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0011, TestSize.Level1
     free(hwRender);
 }
 /**
-* @tc.name  Test AudioAdapterInitAllPorts API when the adapter is smartpa.
-* @tc.number  SUB_Audio_Function_Smartpa_Test_0012
+* @tc.name  AudioFunctionSmartpaTest_012
 * @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if the ports are initialized successfully.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioSmartPaTest, SUB_Audio_Function_Smartpa_Test_0012, TestSize.Level1)
+HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_012, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, manager);

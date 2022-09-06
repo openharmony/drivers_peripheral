@@ -81,12 +81,11 @@ void AudioUsbAdapterTest::SetUp(void) {}
 void AudioUsbAdapterTest::TearDown(void) {}
 
 /**
-* @tc.name  Test AudioAdapterInitAllPorts API via legal input.
-* @tc.number  SUB_Audio_HDI_AdapterInitAllPorts_0001
+* @tc.name  AudioAdapterInitAllPorts_001
 * @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if the ports is initialize successfully.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0001, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioAdapterInitAllPorts_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -101,12 +100,11 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterInitAllPorts_0001, TestSize.L
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API when the PortType is PORT_OUT.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_0001
+* @tc.name  AudioAdapterGetPortCapability_001
 * @tc.desc  Test AudioAdapterGetPortCapability,return 0 if PortType is PORT_OUT.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0001, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioAdapterGetPortCapability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -137,12 +135,11 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0001, TestS
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API when the PortType is PORT_IN.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_0002
+* @tc.name  AudioAdapterGetPortCapability_002
 * @tc.desc  Test AudioAdapterGetPortCapability,return 0 if PortType is PORT_IN.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0002, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioAdapterGetPortCapability_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -161,12 +158,11 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0002, TestS
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioAdapterGetPortCapability API when the PortType is PORT_OUT_IN.
-* @tc.number  SUB_Audio_HDI_AdapterGetPortCapability_0003
+* @tc.name  AudioAdapterGetPortCapability_003
 * @tc.desc  Test AudioAdapterGetPortCapability,return 0 if PortType is PORT_OUT_IN.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0003, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioAdapterGetPortCapability_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -185,12 +181,11 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPortCapability_0003, TestS
 }
 
 /**
-* @tc.name  Test AdapterSetPassthroughMode API when the PortType is PORT_OUT.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_0001
+* @tc.name  AudioAdapterSetPassthroughMode_001
 * @tc.desc  test AdapterSetPassthroughMode interface, return 0 if PortType is PORT_OUT.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0001, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioAdapterSetPassthroughMode_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -213,12 +208,11 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0001, Test
 }
 
 /**
-* @tc.name Test AdapterSetPassthroughMode API when the PortType is PORT_IN.
-* @tc.number  SUB_Audio_HDI_AdapterSetPassthroughMode_0002
+* @tc.name  AudioAdapterSetPassthroughMode_002
 * @tc.desc  test AdapterSetPassthroughMode interface, return -1 if PortType is PORT_IN.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0002, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioAdapterSetPassthroughMode_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -237,12 +231,11 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterSetPassthroughMode_0002, Test
 }
 
 /**
-* @tc.name  Test AdapterGetPassthroughMode API via legal input
-* @tc.number  SUB_Audio_HDI_AdapterGetPassthroughMode_0001
+* @tc.name  AudioAdapterGetPassthroughMode_001
 * @tc.desc  test AdapterGetPassthroughMode interface, return 0 if is get successfully.
-* @tc.author: liutian
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0001, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioAdapterGetPassthroughMode_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioPort* audioPort = nullptr;
@@ -267,12 +260,11 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AdapterGetPassthroughMode_0001, Test
 }
 
 /**
-* @tc.name  Test AudioCreateCapture API via legal input
-* @tc.number  SUB_Audio_HDI_AudioCreateCapture_0001
+* @tc.name  AudioCreateCapture_001
 * @tc.desc  Test AudioCreateCapture interface,Returns 0 if the AudioCapture object is created successfully
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AudioCreateCapture_0001, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioCreateCapture_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -285,13 +277,13 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AudioCreateCapture_0001, TestSize.Le
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-* @tc.name  Test AudioCreateCapture API via creating a capture object when a render object was created
-* @tc.number  SUB_Audio_HDI_AudioCreateCapture_0002
+* @tc.name  AudioCreateCapture_002
 * @tc.desc  test AudioCreateCapture interface:
      (1)service mode:Returns 0,if the AudioCapture object can be created successfully which was created
      (2)passthrough mode: Returns -1,if the AudioCapture object can't be created which was created
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AudioCreateCapture_0002, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioCreateCapture_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -324,12 +316,11 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AudioCreateCapture_0002, TestSize.Le
 }
 
 /**
-* @tc.name  Test AudioDestroyCapture API via legal input
-* @tc.number  SUB_Audio_HDI_AudioDestroyCapture_0001
+* @tc.name  AudioDestroyCapture_001
 * @tc.desc  Test AudioDestroyCapture interface,Returns 0 if the AudioCapture object is destroyed
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AudioDestroyCapture_0001, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioDestroyCapture_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -343,12 +334,11 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_AudioDestroyCapture_0001, TestSize.L
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioCreateRender API via legal input.
-    * @tc.number  SUB_Audio_HDI_CreateRender_0001
+    * @tc.name  AudioCreateRender_001
     * @tc.desc  test AudioCreateRender interface,return 0 if render is created successful.
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_CreateRender_0001, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioCreateRender_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
@@ -361,12 +351,11 @@ HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_CreateRender_0001, TestSize.Level1)
     manager->UnloadAdapter(manager, adapter);
 }
 /**
-    * @tc.name  Test AudioDestroyRender API via legal input.
-    * @tc.number  SUB_Audio_HDI_DestroyRender_0001
+    * @tc.name  AudioDestroyRender_001
     * @tc.desc  Test AudioDestroyRender interface, return 0 if render is destroyed successful.
-    * @tc.author: ZHANGHAILIN
+    * @tc.type: FUNC
 */
-HWTEST_F(AudioUsbAdapterTest, SUB_Audio_HDI_DestroyRender_0001, TestSize.Level1)
+HWTEST_F(AudioUsbAdapterTest, AudioDestroyRender_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
