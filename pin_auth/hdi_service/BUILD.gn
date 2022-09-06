@@ -51,8 +51,7 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
     "ipc:ipc_single",
   ]
 
-  install_images = [ system_base_dir ]
-  relative_install_dir = "chipset-pub-sdk"
+  install_images = [ chipset_base_dir ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_pin_auth"
@@ -79,8 +78,7 @@ ohos_shared_library("libpin_auth_driver") {
     "ipc:ipc_single",
   ]
 
-  install_images = [ system_base_dir ]
-  relative_install_dir = "chipset-pub-sdk"
+  install_images = [ chipset_base_dir ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_pin_auth"
