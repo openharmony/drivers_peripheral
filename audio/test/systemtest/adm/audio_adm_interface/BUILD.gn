@@ -82,10 +82,7 @@ if (defined(ohos_lite)) {
     ]
     external_deps = [
       "c_utils:utils",
-      "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
     ]
     defines = []
     if (enable_audio_adm_passthrough) {

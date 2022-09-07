@@ -64,7 +64,6 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
     if (enable_audio_hal_hdf_log) {
       defines = [ "AUDIO_HDF_LOG" ]
     }
@@ -116,9 +115,7 @@ if (defined(ohos_lite)) {
       external_deps = [
         "c_utils:utils",
         "hdf_core:libhdf_host",
-        "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
-        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
       ]
     } else {
@@ -175,9 +172,7 @@ if (defined(ohos_lite)) {
       external_deps = [
         "c_utils:utils",
         "hdf_core:libhdf_host",
-        "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
-        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
       ]
     } else {

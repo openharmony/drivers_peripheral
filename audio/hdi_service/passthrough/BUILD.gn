@@ -49,9 +49,7 @@ ohos_shared_library("hdi_audio_passthrough") {
     external_deps = [
       "c_utils:utils",
       "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
