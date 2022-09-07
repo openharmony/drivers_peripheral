@@ -20,6 +20,8 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+#include "ddk_pnp_listener_mgr.h"
 #include "hdf_slist.h"
 #include "osal_mutex.h"
 #include "usb_ddk_interface.h"
@@ -29,7 +31,7 @@
 #include "usbd_function.h"
 #include "usbd_load_usb_service.h"
 #include "usbd_port.h"
-#include "ddk_pnp_listener_mgr.h"
+
 
 namespace OHOS {
 namespace HDI {
@@ -356,8 +358,7 @@ int32_t UsbImpl::UsbdFindRequestSyncAndCreat(
         int32_t tRet = UsbdDispatcher::UsbdRequestSyncRelease(requestSync);
         requestSync = nullptr;
         if (tRet != HDF_SUCCESS) {
-            HDF_LOGE(
-                "%{public}s:Release failed ifId:%{public}u pipeId:%{public}u", __func__, interfaceId, pipeAddr);
+            HDF_LOGE("%{public}s:Release failed ifId:%{public}u pipeId:%{public}u", __func__, interfaceId, pipeAddr);
         }
         return ret;
     }
@@ -368,8 +369,8 @@ int32_t UsbImpl::UsbdFindRequestSyncAndCreat(
 int32_t UsbImpl::UsbdBulkReadSyncBase(
     int32_t timeout, uint8_t *buffer, uint32_t size, uint32_t *actlength, UsbdRequestSync *requestSync)
 {
-    if (requestSync == nullptr || requestSync->request == nullptr ||
-        buffer == nullptr || actlength == nullptr || size < 1) {
+    if (requestSync == nullptr || requestSync->request == nullptr || buffer == nullptr || actlength == nullptr ||
+        size < 1) {
         HDF_LOGE("%{public}s:invalid params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -390,8 +391,8 @@ int32_t UsbImpl::UsbdBulkReadSyncBase(
 
         ret = UsbSubmitRequestSync(requestSync->request);
         if (ret == HDF_SUCCESS) {
-            ret = memcpy_s(buffer + tcur, size - tcur,
-                requestSync->request->compInfo.buffer, requestSync->request->compInfo.actualLength);
+            ret = memcpy_s(buffer + tcur, size - tcur, requestSync->request->compInfo.buffer,
+                requestSync->request->compInfo.actualLength);
             if (ret != EOK) {
                 HDF_LOGE("%{public}s: memcpy_s failed, ret = %{public}d", __func__, ret);
                 break;
@@ -809,8 +810,8 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbImpl *super, 
     UsbPnpNotifyMatchInfoTable *infoTable = nullptr;
     bool flag = HdfSbufReadBuffer(data, (const void **)(&infoTable), &infoSize);
     if (!flag || infoTable == nullptr) {
-        HDF_LOGE("%{public}s: HdfSbufReadBuffer failed, flag=%{public}d, infoTable=%{public}p",
-            __func__, flag, infoTable);
+        HDF_LOGE(
+            "%{public}s: HdfSbufReadBuffer failed, flag=%{public}d, infoTable=%{public}p", __func__, flag, infoTable);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -910,6 +911,11 @@ int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
     if (status != HDF_SUCCESS) {
         HDF_LOGE("HdfDeviceRegisterEventListener failed status=%{public}d", status);
         return status;
+    }
+#else
+    if (DdkListenerMgrAdd(&usbPnpListener_) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: register listerer failed", __func__);
+        return HDF_FAILURE;
     }
 #endif
     return HDF_SUCCESS;
@@ -1188,8 +1194,8 @@ int32_t UsbImpl::SetConfig(const UsbDev &dev, uint8_t configIndex)
         return HDF_ERR_INVALID_PARAM;
     }
     if (configIndex == configIdOld) {
-        HDF_LOGE("%{public}s:setConfiguration success, configIndex:%{public}d configIdOld:%{public}d",
-            __func__, configIndex, configIdOld);
+        HDF_LOGE("%{public}s:setConfiguration success, configIndex:%{public}d configIdOld:%{public}d", __func__,
+            configIndex, configIdOld);
         return HDF_SUCCESS;
     }
 
@@ -1395,8 +1401,8 @@ int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &c
     controlParams.value = ctrl.value;
     controlParams.index = ctrl.index;
     controlParams.target = (UsbRequestTargetType)((uint32_t)ctrl.requestType & USB_RECIP_MASK);
-    controlParams.directon = (UsbRequestDirection)
-                            (((uint32_t)ctrl.requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
+    controlParams.directon =
+        (UsbRequestDirection)(((uint32_t)ctrl.requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
     controlParams.reqType = (UsbControlRequestType)(((uint32_t)ctrl.requestType >> CMD_OFFSET_5) & CMD_TYPE_MASK);
     controlParams.size = MAX_CONTROL_BUFF_SIZE;
     controlParams.data = (void *)OsalMemAlloc(controlParams.size);
@@ -1441,8 +1447,8 @@ int32_t UsbImpl::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &
     controlParams.value = ctrl.value;
     controlParams.index = ctrl.index;
     controlParams.target = (UsbRequestTargetType)((uint32_t)ctrl.requestType & USB_RECIP_MASK);
-    controlParams.directon = (UsbRequestDirection)
-                            (((uint32_t)ctrl.requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
+    controlParams.directon =
+        (UsbRequestDirection)(((uint32_t)ctrl.requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
     controlParams.reqType = (UsbControlRequestType)(((uint32_t)ctrl.requestType >> CMD_OFFSET_5) & CMD_TYPE_MASK);
     controlParams.size = data.size();
     controlParams.data = (void *)data.data();
@@ -1591,7 +1597,7 @@ int32_t UsbImpl::RequestQueue(
         HDF_LOGE("%{public}s:clientDataAddr UsbdMallocAndFill failed", __func__);
         return HDF_FAILURE;
     }
-    
+
     uint8_t *bufferAddr = nullptr;
     ret = UsbdDispatcher::UsbdMallocAndFill(bufferAddr, buffer);
     if (ret != HDF_SUCCESS) {
@@ -1600,7 +1606,7 @@ int32_t UsbImpl::RequestQueue(
         HDF_LOGE("%{public}s:bufferAddr UsbdMallocAndFill failed", __func__);
         return HDF_FAILURE;
     }
-    
+
     reqAsync->reqMsg.clientData = (void *)clientDataAddr;
     reqAsync->reqMsg.clientLength = sizeof(uint8_t) * clientData.size();
     ret = FunRequestQueueFillAndSubmit(port, reqAsync, bufferAddr, sizeof(uint8_t) * buffer.size());
@@ -1609,7 +1615,7 @@ int32_t UsbImpl::RequestQueue(
         OsalMemFree(clientDataAddr);
         clientDataAddr = nullptr;
     }
-    
+
     OsalMemFree(bufferAddr);
     bufferAddr = nullptr;
     return ret;
@@ -1864,12 +1870,6 @@ int32_t UsbImpl::BindUsbSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
     subscriber_ = subscriber;
     UsbdAddDevicesOnStart();
-#ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-    if (DdkListenerMgrAdd(&usbPnpListener_) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: register listerer failed", __func__);
-        return HDF_FAILURE;
-    }
-#endif
     return HDF_SUCCESS;
 }
 } // namespace V1_0
