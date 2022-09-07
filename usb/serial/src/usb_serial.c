@@ -190,7 +190,7 @@ static void AcmWriteBufFree(struct AcmDevice *acm)
     int32_t i;
     struct AcmWb *wb;
     for (wb = &acm->wb[0], i = 0; i < ACM_NW; i++, wb++) {
-        if (wb->buf) {
+        if (wb->buf != NULL) {
             OsalMemFree(wb->buf);
             wb->buf = NULL;
         }
@@ -208,8 +208,9 @@ static void AcmWriteBulk(struct UsbRequest * const req)
     struct AcmWb *wb = (struct AcmWb *)req->compInfo.userData;
     switch (status) {
         case 0:
-            if (wb)
+            if (wb != NULL) {
                 wb->use = 0;
+            }
             break;
         case -ECONNRESET:
         case -ENOENT:

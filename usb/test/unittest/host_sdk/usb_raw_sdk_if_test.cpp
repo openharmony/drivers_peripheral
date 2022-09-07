@@ -147,14 +147,14 @@ void UsbRawSdkIfTest::TearDownTestCase()
 
 static void AcmWriteBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
+    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
 
     printf("%s:%d entry!", __func__, __LINE__);
     if (req == nullptr) {
         printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
-    struct AcmWb *wb = (struct AcmWb *)req->userData;
+    struct AcmWb *wb = static_cast<struct AcmWb *>(req->userData);
     if (wb == nullptr) {
         printf("%s:%d userData(wb) is nullptr!", __func__, __LINE__);
         return;
@@ -169,14 +169,14 @@ static void AcmWriteBulkCallback(const void *requestArg)
 
 static void AcmReadBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
+    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
 
     printf("%s:%d entry!", __func__, __LINE__);
     if (req == nullptr) {
         printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
-    struct AcmDevice *acm = (struct AcmDevice *)req->userData;
+    struct AcmDevice *acm = static_cast<struct AcmDevice *>(req->userData);
     if (acm == nullptr) {
         printf("%s:%d userData(acm) is nullptr!", __func__, __LINE__);
         return;
@@ -210,11 +210,9 @@ static void AcmReadBulkCallback(const void *requestArg)
     }
 }
 
-static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
+static void AcmProcessNotification(struct AcmDevice *acm, struct UsbCdcNotification *dr)
 {
     (void)acm;
-    struct UsbCdcNotification *dr = (struct UsbCdcNotification *)buf;
-
     printf("%s:%d entry!", __func__, __LINE__);
 
     switch (dr->bNotificationType) {
@@ -231,24 +229,26 @@ static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
 
 static void AcmNotifyReqCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
+    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
     if (req == nullptr) {
         return;
     }
-    struct AcmDevice *acm = (struct AcmDevice *)req->userData;
+    struct AcmDevice *acm = static_cast<struct AcmDevice *>(req->userData);
     if (acm == nullptr) {
         return;
     }
-    struct UsbCdcNotification *dr = (struct UsbCdcNotification *)req->buffer;
+    struct UsbCdcNotification *dr = reinterpret_cast<struct UsbCdcNotification *>(req->buffer);
     if (dr == nullptr) {
         return;
     }
     unsigned int currentSize = req->actualLength;
     unsigned int expectedSize, copySize, allocSize;
-    if (req->status != USB_REQUEST_COMPLETED)
+    if (req->status != USB_REQUEST_COMPLETED) {
         goto EXIT;
-    if (acm->nbIndex)
-        dr = (struct UsbCdcNotification *)acm->notificationBuffer;
+    }
+    if (acm->nbIndex) {
+        dr = reinterpret_cast<struct UsbCdcNotification *>(acm->notificationBuffer);
+    }
     expectedSize = sizeof(struct UsbCdcNotification) + LE16_TO_CPU(dr->wLength);
     if (currentSize < expectedSize) {
         if (acm->nbSize < expectedSize) {
@@ -258,8 +258,9 @@ static void AcmNotifyReqCallback(const void *requestArg)
             }
             allocSize = expectedSize;
             acm->notificationBuffer = (uint8_t *)OsalMemCalloc(allocSize);
-            if (!acm->notificationBuffer)
+            if (!acm->notificationBuffer) {
                 goto EXIT;
+            }
             acm->nbSize = allocSize;
         }
         copySize = MIN(currentSize, expectedSize - acm->nbIndex);
@@ -271,11 +272,12 @@ static void AcmNotifyReqCallback(const void *requestArg)
         currentSize = acm->nbIndex;
     }
     if (currentSize >= expectedSize) {
-        AcmProcessNotification(acm, (unsigned char *)dr);
+        AcmProcessNotification(acm, dr);
         acm->nbIndex = 0;
     }
-    if (UsbRawSubmitRequest(req) != HDF_SUCCESS)
+    if (UsbRawSubmitRequest(req) != HDF_SUCCESS) {
         printf("%s - UsbRawSubmitRequest failed", __func__);
+    }
 EXIT:
     printf("%s:%d exit", __func__, __LINE__);
 }
@@ -1233,7 +1235,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest005, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest006, TestSize.Level1)
 {
     g_acm->ctrlReq = UsbRawAllocRequest(g_acm->devHandle, 0, USB_CTRL_REQ_SIZE);
-    ((struct UsbHostRequest *)(g_acm->ctrlReq))->devHandle = (struct UsbDeviceHandle *)g_acm->devHandle;
+    struct UsbHostRequest *tmp = reinterpret_cast<struct UsbHostRequest *>(g_acm->ctrlReq);
+    tmp->devHandle = reinterpret_cast<struct UsbDeviceHandle *>(g_acm->devHandle);
     EXPECT_NE(nullptr, g_acm->ctrlReq);
 }
 
@@ -1258,7 +1261,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest007, TestSize.Level1)
 HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfAllocRequest008, TestSize.Level1)
 {
     g_acm->notifyReq = UsbRawAllocRequest(g_acm->devHandle, 0, g_acm->notifyEp->maxPacketSize);
-    ((struct UsbHostRequest *)(g_acm->notifyReq))->devHandle = (struct UsbDeviceHandle *)g_acm->devHandle;
+    struct UsbHostRequest *tmp = reinterpret_cast<struct UsbHostRequest *>(g_acm->notifyReq);
+    tmp->devHandle = reinterpret_cast<struct UsbDeviceHandle *>(g_acm->devHandle);
     EXPECT_NE(nullptr, g_acm->notifyReq);
 }
 

@@ -207,17 +207,17 @@ enum PortMode { HOST, DEVICE, OTG };
 
 // Keep it same as the inner kit usb_info.h
 struct UsbdInfo {
-    int32_t capacity_;
-    int32_t voltage_;
-    int32_t temperature_;
-    int32_t healthState_;
-    int32_t pluggedType_;
-    int32_t pluggedMaxCurrent_;
-    int32_t pluggedMaxVoltage_;
-    int32_t chargeState_;
-    int32_t chargeCounter_;
-    int8_t present_;
-    const char *technology_;
+    int32_t capacity;
+    int32_t voltage;
+    int32_t temperature;
+    int32_t healthState;
+    int32_t pluggedType;
+    int32_t pluggedMaxCurrent;
+    int32_t pluggedMaxVoltage;
+    int32_t chargeState;
+    int32_t chargeCounter;
+    int8_t present;
+    const char *technology;
 };
 
 #endif // USBD_TYPE_H

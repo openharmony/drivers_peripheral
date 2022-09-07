@@ -461,8 +461,9 @@ static void AcmTestBulkCallback(const void *requestArg)
     }
 
     if (g_printData) {
-        for (int32_t i = 0; i < req->actualLength; i++)
+        for (int32_t i = 0; i < req->actualLength; i++) {
             printf("%c", req->buffer[i]);
+        }
         fflush(stdout);
     } else if (g_recv_count % TEST_RECV_COUNT == 0) {
         printf("#");

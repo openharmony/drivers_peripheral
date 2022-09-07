@@ -63,8 +63,9 @@ static int32_t AcmDbAlloc(struct AcmDevice * const acm)
             return dbn;
         }
         dbn = (dbn + 1) % TEST_CYCLE;
-        if (++i >= TEST_CYCLE)
+        if (++i >= TEST_CYCLE) {
             return -1;
+        }
     }
 }
 

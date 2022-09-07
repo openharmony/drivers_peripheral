@@ -133,8 +133,7 @@ HWTEST_F(UsbDeviceSerialFuncTest, HcsConfigTest_001, TestSize.Level1)
     const int32_t logMaxLen = 100;
     char targetLog[logMaxLen] = {0};
     const char *fmt = "recv data[%s %s %s %s] from host";
-    snprintf_s(targetLog, logMaxLen, logMaxLen -1, fmt, idVendor, \
-             idPorduct, bcdDevice, configurationValue);
+    snprintf_s(targetLog, logMaxLen, logMaxLen - 1, fmt, idVendor, idPorduct, bcdDevice, configurationValue);
     const char *cmd = "usb_dev_test -2 GET_DESCRIPTOR";
     double startTs = GetNowTs();
     ASSERT_EQ(system(cmd), 0);

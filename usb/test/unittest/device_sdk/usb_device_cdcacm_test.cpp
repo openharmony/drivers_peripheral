@@ -321,7 +321,7 @@ enum DevMasterCmd {
 static struct Serial *SerialAlloc(void)
 {
     struct Serial *port = nullptr;
-    port = (struct Serial *)OsalMemCalloc(sizeof(*port));
+    port = static_cast<struct Serial *>(OsalMemCalloc(sizeof(*port)));
     if (port == nullptr) {
         return nullptr;
     }
@@ -391,7 +391,7 @@ static void CtrlComplete(uint8_t pipe, struct UsbFnRequest *req)
         return;
     }
 
-    struct CtrlInfo *ctrlInfo = (struct CtrlInfo *)req->context;
+    struct CtrlInfo *ctrlInfo = static_cast<struct CtrlInfo *>(req->context);
     struct AcmDevice *acm = ctrlInfo->acm;
 
     if (USB_REQUEST_COMPLETED != req->status) {
@@ -399,7 +399,7 @@ static void CtrlComplete(uint8_t pipe, struct UsbFnRequest *req)
     }
 
     if (ctrlInfo->request == USB_DDK_CDC_REQ_SET_LINE_CODING) {
-        struct UsbCdcLineCoding *value = (struct UsbCdcLineCoding *)req->buf;
+        struct UsbCdcLineCoding *value = static_cast<struct UsbCdcLineCoding *>(req->buf);
         if (req->actual == sizeof(*value)) {
             acm->lineCoding = *value;
         }
@@ -419,7 +419,7 @@ static int32_t AllocCtrlRequests(struct AcmDevice *acmDevice)
     acmDevice->ctrlReqNum = 0;
 
     for (i = 0; i < 2; i++) {
-        ctrlInfo = (struct CtrlInfo *)OsalMemCalloc(sizeof(*ctrlInfo));
+        ctrlInfo = static_cast<struct CtrlInfo *>(OsalMemCalloc(sizeof(*ctrlInfo)));
         if (ctrlInfo == nullptr) {
             return -1;
         }
@@ -457,7 +457,7 @@ static int32_t SendNotifyRequest(struct AcmDevice *acm, uint8_t type, uint16_t v
     acm->pending = false;
     req->length = sizeof(*notify) + length;
 
-    notify = (struct UsbCdcNotification *)req->buf;
+    notify = static_cast<struct UsbCdcNotification *>(req->buf);
     notify->bmRequestType = USB_DDK_DIR_IN | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE;
     notify->bNotificationType = type;
     notify->wValue = CPU_TO_LE16(value);
@@ -488,7 +488,7 @@ static int32_t NotifySerialState(struct AcmDevice *acm)
 
 static void NotifyComplete(uint8_t pipe, struct UsbFnRequest *req)
 {
-    struct AcmDevice *acm = (struct AcmDevice *)req->context;
+    struct AcmDevice *acm = static_cast<struct AcmDevice *>(req->context);
     bool pending = false;
 
     if (acm == nullptr) {
@@ -630,7 +630,7 @@ static void Setup(struct AcmDevice *acm, struct UsbFnCtrlRequest *setup)
     }
 
 OUT:
-    ctrlInfo = (struct CtrlInfo *)req->context;
+    ctrlInfo = static_cast<struct CtrlInfo *>(req->context);
     ctrlInfo->request = setup->request;
     req->length = ret;
     ret = UsbFnSubmitRequestAsync(req);
@@ -662,9 +662,10 @@ void AcmEventCallback(struct UsbFnEvent * const event)
 {
     struct AcmDevice *acm = nullptr;
 
-    if (event == nullptr || event->context == nullptr)
+    if (event == nullptr || event->context == nullptr) {
         return;
-    acm = (struct AcmDevice *)event->context;
+    }
+    acm = static_cast<struct AcmDevice *>(event->context);
     switch (event->type) {
         case USBFN_STATE_BIND:
             break;
@@ -699,7 +700,7 @@ struct AcmDevice *SetUpAcmDevice(void)
     struct UsbFnDescriptorData descData;
     descData.type = USBFN_DESC_DATA_TYPE_DESC;
     descData.descriptor = &g_acmFnDevice;
-    acmDevice = (struct AcmDevice *)OsalMemCalloc(sizeof(*acmDevice));
+    acmDevice = static_cast<struct AcmDevice *>(OsalMemCalloc(sizeof(*acmDevice)));
     if (acmDevice == nullptr) {
         return nullptr;
     }
@@ -707,7 +708,7 @@ struct AcmDevice *SetUpAcmDevice(void)
     if (acmDevice->fnDev == nullptr) {
         return nullptr;
     }
-    acmDevice->port = (struct Serial *)SerialAlloc();
+    acmDevice->port = SerialAlloc();
     if (acmDevice->port == nullptr) {
         return nullptr;
     }
