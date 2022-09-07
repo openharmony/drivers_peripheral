@@ -134,7 +134,9 @@ void BatteryLed::WriteLedInfo(int32_t redBrightness, int32_t greenBrightness, in
     }
 
     struct HdfLightEffect effect = {
-        .lightBrightness = (redBrightness << 16) | (greenBrightness << 8) | blueBrightness,
+        .lightColor.colorValue.rgbColor.r = redBrightness,
+        .lightColor.colorValue.rgbColor.g = greenBrightness,
+        .lightColor.colorValue.rgbColor.b = blueBrightness,
     };
 
     for (auto iter: g_info) {

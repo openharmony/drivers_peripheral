@@ -30,6 +30,8 @@ public:
 
     int32_t TurnOnLight(int32_t lightId, const HdfLightEffect& effect) override;
 
+    int32_t TurnOnMultiLights(int32_t lightId, const std::vector<HdfLightColor>& colors) override;
+
     int32_t TurnOffLight(int32_t LightId) override;
 };
 } // V1_0

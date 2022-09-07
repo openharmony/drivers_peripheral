@@ -30,8 +30,9 @@ enum LightIoCmd {
 };
 
 enum LightOpsCmd {
-    LIGHT_OPS_IO_CMD_ENABLE    = 0,
-    LIGHT_OPS_IO_CMD_DISABLE   = 1,
+    LIGHT_OPS_IO_CMD_ENABLE              = 0,
+    LIGHT_OPS_IO_CMD_DISABLE             = 1,
+    LIGHT_OPS_IO_CMD_ENABLE_MULTI_LIGHTS = 2,
     LIGHT_OPS_IO_CMD_END,
 };
 
