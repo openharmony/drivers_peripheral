@@ -49,6 +49,7 @@
 #define DEEP_BUFFER_RENDER_PERIOD_COUNT 8
 #define INT_32_MAX                      0x7fffffff
 #define EXT_PARAMS_MAXLEN               107
+#define BITS_TO_FROMAT                  3
 #define SERVICE_NAME                    "idl_audio_service"
 
 enum AudioPCMBit {
@@ -341,12 +342,12 @@ static uint32_t PcmFormatToBits(enum AudioFormat formatBit)
             return PCM_8_BIT;
         default:
             return PCM_16_BIT;
-    };
+    }
 }
 
 static uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
 {
-    return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> 3);
+    return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> BITS_TO_FROMAT);
 }
 
 static int32_t StopAudioFiles(struct IAudioRender **renderS)

@@ -52,7 +52,7 @@ namespace Audio {
         }
         struct AudioHwCapture *hwCapture = nullptr;
         int32_t ret = BindServiceAndHwCapture(hwCapture);
-        int32_t cmdId = *(int32_t *)(data);
+        int32_t cmdId = *(reinterpret_cast<int32_t *>(*data));
         ret = InterfaceLibCtlCapture(handle, cmdId, &hwCapture->captureParam);
         if (ret == HDF_SUCCESS) {
             result = true;

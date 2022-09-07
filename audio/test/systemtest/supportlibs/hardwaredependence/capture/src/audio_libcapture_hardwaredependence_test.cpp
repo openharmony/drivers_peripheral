@@ -113,7 +113,7 @@ int32_t AudioLibCaptureHardwareDependenceTest::BindServiceAndHwCapture(struct Au
     if (handle == nullptr) {
         return HDF_FAILURE;
     }
-    hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
+    hwCapture = static_cast<struct AudioHwCapture *>(calloc(1, sizeof(*hwCapture)));
     if (hwCapture == nullptr) {
         CloseServiceCaptureSo(handle);
         return HDF_FAILURE;
@@ -149,7 +149,7 @@ HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureVolum
     volumeThresholdValueMax = hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMax;
     volumeThresholdValueMin = hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMin;
 
-    hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMax-1;
+    hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMax - 1;
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE, &hwCapture->captureParam);
@@ -157,7 +157,7 @@ HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureVolum
     volumeValue = hwCapture->captureParam.captureMode.ctlParam.volume;
     EXPECT_EQ(BELOW_MAX_VOLUME, volumeValue);
 
-    hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMin+1;
+    hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMin + 1;
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_READ_CAPTURE, &hwCapture->captureParam);
@@ -232,10 +232,10 @@ HWTEST_F(AudioLibCaptureHardwareDependenceTest, AudioInterfaceLibCtlCaptureVolum
     volumeThresholdValueMax = hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMax;
     volumeThresholdValueMin = hwCapture->captureParam.captureMode.ctlParam.volThreshold.volMin;
 
-    hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMax+1;
+    hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMax + 1;
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_FAILURE, ret);
-    hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMin-1;
+    hwCapture->captureParam.captureMode.ctlParam.volume = volumeThresholdValueMin - 1;
     ret = InterfaceLibCtlCapture(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_FAILURE, ret);
     free(hwCapture);

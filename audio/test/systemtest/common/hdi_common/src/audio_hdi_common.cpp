@@ -35,6 +35,9 @@
 
 #include "audio_hdi_common.h"
 
+#define SREREO_CHANNEL 2
+#define MONO_CHANNEL   1
+
 using namespace std;
 
 static int g_frameStatus = 1;
@@ -164,7 +167,7 @@ uint32_t PcmFormatToBits(int format)
 
 uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
 {
-    if (attrs.channelCount < 1 || attrs.channelCount > 2) {
+    if (attrs.channelCount < MONO_CHANNEL || attrs.channelCount > SREREO_CHANNEL) {
         return 0;
     }
     uint32_t formatBits = PcmFormatToBits(attrs.format);

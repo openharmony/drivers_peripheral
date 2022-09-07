@@ -130,7 +130,7 @@ int32_t AudioLibRenderHardwareDependenceTest::BindServiceAndHwRender(struct Audi
     if (handle == nullptr) {
         return HDF_FAILURE;
     }
-    hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    hwRender = static_cast<struct AudioHwRender *>(calloc(1, sizeof(*hwRender)));
     if (hwRender == nullptr) {
         CloseServiceRenderSo(handle);
         return HDF_FAILURE;
@@ -187,7 +187,7 @@ HWTEST_F(AudioLibRenderHardwareDependenceTest, AudioInterfaceLibCtlRenderVolumeW
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     volumeValue = hwRender->renderParam.renderMode.ctlParam.volume;
-    EXPECT_EQ((int)volumeBoundaryValueIn, volumeValue);
+    EXPECT_EQ(static_cast<int>(volumeBoundaryValueIn), volumeValue);
     CloseServiceRenderSo(handle);
     free(hwRender);
     hwRender = nullptr;

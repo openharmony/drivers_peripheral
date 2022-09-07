@@ -30,6 +30,9 @@
 #define CONFIG_FRAME_SIZE ((FRAME_SIZE) * 2)
 
 #define CONFIG_FRAME_COUNT ((8000 * 2 + ((CONFIG_FRAME_SIZE) - 1)) / (CONFIG_FRAME_SIZE))
+#define BITS_TO_FROMAT    3
+#define VOLUME_AVERAGE    2
+#define INTEGER_TO_DEC    10
 
 /* add For Capture Bytes To Frames */
 int32_t AudioCaptureStart(struct IAudioCapture *handle)
@@ -213,7 +216,7 @@ int32_t AudioCaptureGetFrameSize(struct IAudioCapture *handle, uint64_t *size)
         return ret;
     }
 
-    *size = FRAME_SIZE * channelCount * (formatBitsCapture >> 3);
+    *size = FRAME_SIZE * channelCount * (formatBitsCapture >> BITS_TO_FROMAT);
     return AUDIO_SUCCESS;
 }
 
@@ -535,11 +538,11 @@ int32_t AudioCaptureGetVolume(struct IAudioCapture *handle, float *volume)
         AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_ERR_INTERNAL;
     }
-    volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / 2);
+    volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / VOLUME_AVERAGE);
 
-    int volumeT = (int)((pow(10, volumeTemp) + 5) / 10); // delet 0.X num
+    int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + 5) / INTEGER_TO_DEC); // delet 0.X num
 
-    *volume = (float)volumeT / 10;                       // get volume (0-1)
+    *volume = (float)volumeT / INTEGER_TO_DEC;                                    // get volume (0-1)
     return AUDIO_SUCCESS;
 }
 

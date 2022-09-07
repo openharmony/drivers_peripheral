@@ -677,7 +677,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderFrame_005, TestSize.Level1)
 HWTEST_F(AudioUsbRenderTest, AudioRenderSetChannelMode_001, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
     AudioChannelMode modeOne = AUDIO_CHANNEL_BOTH_LEFT;
@@ -718,7 +718,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderSetChannelMode_001, TestSize.Level1)
 HWTEST_F(AudioUsbRenderTest, AudioRenderSetChannelMode_002, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     AudioChannelMode mode = AUDIO_CHANNEL_MIX;
     AudioChannelMode modeOne = AUDIO_CHANNEL_LEFT_MUTE;
@@ -759,7 +759,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderSetChannelMode_002, TestSize.Level1)
 HWTEST_F(AudioUsbRenderTest, AudioRenderSetChannelMode_003, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
     ASSERT_NE(nullptr, manager);
@@ -782,7 +782,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderSetChannelMode_003, TestSize.Level1)
 HWTEST_F(AudioUsbRenderTest, AudioRenderGetChannelMode_001, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
     ASSERT_NE(nullptr, manager);
@@ -831,7 +831,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderSetRenderSpeed_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float speed = 100;
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
@@ -853,7 +853,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderGetRenderSpeed_001, TestSize.Level1)
 {
     int32_t ret = -1;
     float speed = 0;
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
@@ -977,7 +977,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderGetFrameCount_001, TestSize.Level1)
     int32_t ret = -1;
     uint64_t count = 0;
     uint64_t zero = 0;
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
@@ -1191,7 +1191,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderSelectScene_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateStartRender(manager, &render, &adapter, ADAPTER_NAME_USB);
@@ -1435,7 +1435,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderGetRenderPosition_003, TestSize.Level1)
     int32_t ret = -1;
     int64_t timeExp = 0;
     uint64_t frames = 0;
-    struct AudioAdapter *adapter =nullptr;
+    struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
     ASSERT_NE(nullptr, manager);
