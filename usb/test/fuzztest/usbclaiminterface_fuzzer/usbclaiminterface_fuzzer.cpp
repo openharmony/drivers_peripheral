@@ -22,13 +22,13 @@
 
 using namespace OHOS::HDI::Usb::V1_0;
 
+namespace OHOS {
+namespace USB {
 struct Parameters {
     uint8_t interfaceId;
     uint8_t force;
 };
 
-namespace OHOS {
-namespace USB {
 bool UsbClaimInterfaceFuzzTest(const uint8_t *data, size_t size)
 {
     (void)size;

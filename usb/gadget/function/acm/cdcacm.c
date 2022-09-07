@@ -470,7 +470,7 @@ static int32_t UsbSerialClose(struct UsbSerial *port)
     acm = port->acm;
     if (acm && !port->suspended) {
         if (acm->notify && acm->notify->Disconnect) {
-                acm->notify->Disconnect(acm);
+            acm->notify->Disconnect(acm);
         }
     }
     DataFifoReset(&port->writeFifo);

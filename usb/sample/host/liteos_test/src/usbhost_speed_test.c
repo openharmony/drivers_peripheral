@@ -213,25 +213,25 @@ static int32_t CheckParam(int32_t argc, const char *argv[], struct UsbSpeedTest 
     switch (argc) {
         case 7:
         case 6:
-            g_spdServer = checkServer(argv[1]);
-            speedTest->busNum = atoi(argv[2]);
-            speedTest->devAddr = atoi(argv[3]);
-            speedTest->ifaceNum = atoi(argv[4]);
-            speedTest->writeOrRead = GetWriteOrReadFlag(argv[5]);
+            g_spdServer = checkServer(argv[1]);  // 1 is argv second element
+            speedTest->busNum = atoi(argv[2]);   // 2 is argv third element
+            speedTest->devAddr = atoi(argv[3]);  // 3 is argv fourth element
+            speedTest->ifaceNum = atoi(argv[4]); // 4 is argv fifth element
+            speedTest->writeOrRead = GetWriteOrReadFlag(argv[5]); // 5 is argv sixth element
             if ((argc == 7) && (speedTest->writeOrRead == TEST_READ)) {
-                printData = (strncmp(argv[6], "printdata", 1)) ? false : true;
+                printData = (strncmp(argv[6], "printdata", 1)) ? false : true; // 6 is argv seventh element
             }
             break;
         case 4:
-            g_spdServer = checkServer(argv[1]);
+            g_spdServer = checkServer(argv[1]); // 1 is argv second element
             speedTest->busNum = 1;
             speedTest->devAddr = 2;
-            speedTest->ifaceNum = atoi(argv[2]);
-            speedTest->writeOrRead = GetWriteOrReadFlag(argv[3]);
+            speedTest->ifaceNum = atoi(argv[2]); // 2 is argv third element
+            speedTest->writeOrRead = GetWriteOrReadFlag(argv[3]); // 3 is argv fourth element
             break;
         default:
-            printf("Error: parameter error!\n\n");
-            ShowHelp(argv[0]);
+            printf("Error: parameter error!\n");
+            ShowHelp(argv[0]); // 0 is argv first element
             ret = HDF_FAILURE;
             break;
     }

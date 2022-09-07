@@ -58,7 +58,7 @@ static void AcmWriteBulk(struct UsbRequest *req)
 
     status = req->compInfo.status;
     printf("Bulk Write status:%d\n", status);
-    struct AcmWb *wb  = (struct AcmWb *)req->compInfo.userData;
+    struct AcmWb *wb  = static_cast<struct AcmWb *>(req->compInfo.userData);
     switch (status) {
         case 0:
             wb->use = 0;

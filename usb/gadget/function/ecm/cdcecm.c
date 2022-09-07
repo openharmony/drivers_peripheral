@@ -454,10 +454,11 @@ static void EcmDoNotify(struct UsbEcmDevice *ecm)
 
         case ECM_NOTIFY_CONNECT:
             event->bNotificationType = USB_DDK_CDC_NOTIFY_NETWORK_CONNECTION;
-            if (ecm->isOpen)
+            if (ecm->isOpen) {
                 event->wValue = CPU_TO_LE16(1);
-            else
+            } else {
                 event->wValue = CPU_TO_LE16(0);
+            }
             event->wLength = 0;
             req->length = sizeof(*event);
 
@@ -527,8 +528,9 @@ static int32_t EcmSetup(const struct UsbEcmDevice *ecm, const struct UsbFnCtrlRe
     switch ((ctrl->reqType << 0x08) | ctrl->request) {
         case ((USB_DDK_DIR_OUT | USB_DDK_TYPE_CLASS | USB_DDK_RECIP_INTERFACE) << 0x08)
                 | USB_DDK_CDC_SET_ETHERNET_PACKET_FILTER:
-            if (length != 0 || index != ecm->ctrlId)
+            if (length != 0 || index != ecm->ctrlId) {
                 goto INVALID;
+            }
             HDF_LOGD("packet filter %02x\n", value);
             ret = 0;
             break;
