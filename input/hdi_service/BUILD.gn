@@ -34,8 +34,6 @@ ohos_shared_library("libinput_interfaces_service_1.0") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_input:input_idl_headers",
-      "hdf_core:libhdf_ipc_adapter",
-      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
     ]
@@ -55,6 +53,7 @@ ohos_shared_library("libinput_driver") {
   include_dirs = [
     "//drivers/peripheral/input/interfaces/include/",
     "//drivers/peripheral/input/hal/include/",
+    "//drivers/hdf_core/adapter/uhdf2/include/host/",
   ]
 
   sources = [ "input_interfaces_driver.cpp" ]
@@ -73,9 +72,7 @@ ohos_shared_library("libinput_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
-      "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
