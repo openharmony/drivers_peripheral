@@ -23,6 +23,9 @@
 
 #define CONFIG_FRAME_SIZE      (1024 * 2 * 1)
 #define FRAME_SIZE              1024
+#define BITS_TO_FROMAT          3
+#define VOLUME_AVERAGE          2
+#define INTEGER_TO_DEC          10
 
 #define CONFIG_FRAME_COUNT     ((8000 * 2 * 1 + (CONFIG_FRAME_SIZE - 1)) / CONFIG_FRAME_SIZE)
 
@@ -228,7 +231,7 @@ int32_t AudioCaptureGetFrameSize(AudioHandle handle, uint64_t *size)
         AUDIO_FUNC_LOGE("FormatToBits failed! ret = %{public}d", ret);
         return ret;
     }
-    *size = FRAME_SIZE * channelCount * (formatBitsCapture >> 3);
+    *size = FRAME_SIZE * channelCount * (formatBitsCapture >> BITS_TO_FROMAT);
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -588,9 +591,9 @@ int32_t AudioCaptureGetVolume(AudioHandle handle, float *volume)
         AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / 2);
-    int volumeT = (int)((pow(10, volumeTemp) + 5) / 10); // delete 0.X num
-    *volume = (float)volumeT / 10;  // get volume (0-1)
+    volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / VOLUME_AVERAGE);
+    int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + 5) / INTEGER_TO_DEC); // delete 0.X num
+    *volume = (float)volumeT / INTEGER_TO_DEC;                                    // get volume (0-1)
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -957,7 +960,7 @@ static int32_t AudioCaptureReqMmapBufferInit(struct AudioHwCapture *capture, int
     }
     // formatBits Move right 3
     desc->totalBufferFrames =
-        reqSize / (int32_t)(capture->captureParam.frameCaptureMode.attrs.channelCount * (formatBits >> 3));
+        reqSize / (int32_t)(capture->captureParam.frameCaptureMode.attrs.channelCount * (formatBits >> BITS_TO_FROMAT));
     InterfaceLibModeCaptureSo *pInterfaceLibModeCapture = AudioSoGetInterfaceLibModeCapture();
     if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
         AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Is NULL");

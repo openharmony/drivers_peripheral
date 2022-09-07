@@ -61,6 +61,7 @@
 #define BUFFER_LEN                      256
 #define EXT_PARAMS_MAXLEN               107
 #define ONE_MS                          1000
+#define BITS_TO_FROMAT                  3
 
 struct AudioHeadInfo {
     uint32_t riffId;
@@ -245,7 +246,7 @@ static uint32_t PcmFormatToBits(enum AudioFormat format)
             return PCM_8_BIT;
         default:
             return PCM_16_BIT;
-    };
+    }
 }
 
 void StreamClose(int32_t sig)
@@ -257,7 +258,7 @@ void StreamClose(int32_t sig)
 
 static uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
 {
-    return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> 3);
+    return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> BITS_TO_FROMAT);
 }
 
 static inline void FileClose(FILE **file)

@@ -30,6 +30,10 @@
 
 #define DEEP_BUFFER_PLATFORM_DELAY (29*1000LL)
 #define LOW_LATENCY_PLATFORM_DELAY (13*1000LL)
+#define BITS_TO_FROMAT              3
+#define VOLUME_AVERAGE              2
+#define INTEGER_TO_DEC              10
+#define SEC_TO_MILLSEC              1000
 
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount)
 {
@@ -601,9 +605,9 @@ int32_t AudioRenderGetVolume(AudioHandle handle, float *volume)
         AUDIO_FUNC_LOGE("Divisor cannot be zero!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / 2);
-    int volumeT = (int)((pow(10, volumeTemp) + 5) / 10); // delete 0.X num
-    *volume = (float)volumeT / 10;  // get volume (0-1)
+    volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / VOLUME_AVERAGE);
+    int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + 5) / INTEGER_TO_DEC); // delete 0.X num
+    *volume = (float)volumeT / INTEGER_TO_DEC;                                    // get volume (0-1)
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -727,7 +731,7 @@ int32_t AudioRenderGetLatency(struct AudioRender *render, uint32_t *ms)
         AUDIO_FUNC_LOGE("divisor byteRate is zero!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint32_t period_ms = (periodCount * periodSize * 1000) / byteRate;
+    uint32_t period_ms = (periodCount * periodSize * SEC_TO_MILLSEC) / byteRate;
     *ms = period_ms;
     return AUDIO_HAL_SUCCESS;
 }
@@ -1100,7 +1104,7 @@ static int32_t AudioRenderReqMmapBufferInit(struct AudioHwRender *render,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     desc->totalBufferFrames = reqSize / (int32_t)(render->renderParam.frameRenderMode.attrs
-        .channelCount * (formatBits >> 3));
+        .channelCount * (formatBits >> BITS_TO_FROMAT));
     InterfaceLibModeRenderSo *pInterfaceLibModeRender = AudioSoGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
         AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
