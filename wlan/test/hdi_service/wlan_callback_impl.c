@@ -19,10 +19,6 @@
 #include <hdf_log.h>
 #include <osal_mem.h>
 
-struct WlanCallbackService {
-    struct WlanCallbackStub stub;
-};
-
 static int32_t WlanCallbackResetDriver(struct IWlanCallback *self, uint32_t event, int32_t code, const char *ifName)
 {
     (void)self;
@@ -71,16 +67,10 @@ struct IWlanCallback *WlanCallbackServiceGet(void)
         return NULL;
     }
 
-    if (!WlanCallbackStubConstruct(&service->stub)) {
-        HDF_LOGE("%{public}s: construct WlanCallbackStub obj failed!", __func__);
-        OsalMemFree(service);
-        return NULL;
-    }
-
-    service->stub.interface.ResetDriverResult = WlanCallbackResetDriver;
-    service->stub.interface.ScanResult = WlanCallbackScanResult;
-    service->stub.interface.WifiNetlinkMessage = WlanCallbackNetlinkMessage;
-    return &service->stub.interface;
+    service->interface.ResetDriverResult = WlanCallbackResetDriver;
+    service->interface.ScanResult = WlanCallbackScanResult;
+    service->interface.WifiNetlinkMessage = WlanCallbackNetlinkMessage;
+    return &service->interface;
 }
 
 void WlanCallbackServiceRelease(struct IWlanCallback *instance)
@@ -90,6 +80,5 @@ void WlanCallbackServiceRelease(struct IWlanCallback *instance)
         return;
     }
 
-    WlanCallbackStubRelease(&service->stub);
     OsalMemFree(service);
 }

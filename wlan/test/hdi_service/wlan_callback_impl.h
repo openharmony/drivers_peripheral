@@ -16,11 +16,15 @@
 #ifndef OHOS_HDI_WLAN_V1_0_WLANCALLBACKSERVICE_H
 #define OHOS_HDI_WLAN_V1_0_WLANCALLBACKSERVICE_H
 
-#include "v1_0/wlan_callback_stub.h"
+#include "v1_0/iwlan_callback.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
+struct WlanCallbackService {
+    struct IWlanCallback interface;
+};
 
 struct IWlanCallback *WlanCallbackServiceGet(void);
 void WlanCallbackServiceRelease(struct IWlanCallback *instance);
