@@ -44,6 +44,8 @@ extern "C" {
 #endif
 #endif /* __cplusplus */
 
+#define NAME_MAX_LEN    16
+
 /**
  * @brief Enumerates the return values of the light module.
  *
@@ -87,9 +89,11 @@ enum LightFlashMode {
     /** Steady on */
     LIGHT_FLASH_NONE     = 0,
     /** Blinking */
-    LIGHT_FLASH_TIMED    = 1,
+    LIGHT_FLASH_BLINK    = 1,
+    /** Gradient */
+    HDF_LIGHT_FLASH_GRADIENT = 2,
     /** Invalid mode */
-    LIGHT_FLASH_BUTT     = 2,
+    LIGHT_FLASH_BUTT     = 3,
 };
 
 /**
@@ -106,6 +110,58 @@ struct LightFlashEffect {
 };
 
 /**
+ * @brief Defines the color and brightness of the light.
+ *
+ * The parameters include the These parameters include red, green, blue values and brightness values.
+ *
+ * @since 3.2
+ */
+struct RGBColor {
+    int brightness;    /** Brightness value 0-255. */
+    int r;    /** Red value range 0-255. */
+    int g;    /** Green value range 0-255. */
+    int b;    /** Blue value range 0-255. */
+};
+
+/**
+ * @brief Defines the color of the light.
+ *
+ * The parameters include the These parameters include red, green, blue and white values.
+ *
+ * @since 3.2
+ */
+struct WRGBColor {
+    int w;    /** White value range 0-255. */
+    int r;    /** Red value range 0-255. */
+    int g;    /** Green value range 0-255. */
+    int b;    /** Blue value range 0-255. */
+};
+
+/**
+ * @brief Defines two modes for setting the light.
+ *
+ * The parameters include RGB mode and WRGB mode.
+ *
+ * @since 3.2
+ */
+union ColorValue {
+    struct WRGBColor wrgbColor;    /** WRGB mode, see {@link WRGBColor}. */
+    struct RGBColor rgbColor;    /** RGB mode, see {@link RGBColor}. */
+};
+
+/**
+ * @brief Defines two modes for setting the light.
+ *
+ * The parameters include RGB mode and WRGB mode.
+ *
+ * @since 3.2
+ */
+
+struct LightColor {
+    union ColorValue colorValue;
+};
+
+/**
  * @brief Defines the lighting effect parameters.
  *
  * The parameters include the brightness and blinking mode.
@@ -113,9 +169,7 @@ struct LightFlashEffect {
  * @since 3.1
  */
 struct LightEffect {
-    int32_t lightBrightness;    /** Brightness value. Bits 24–31 for extended bit, Bits 16–23 for red,
-                                    bits 8–15 for green, and bits 0–7 for blue. if the byte segment is not equal to 0,
-                                    indicates turn on light of the corresponding color. */
+    struct LightColor lightColor;    /** Color and brightness corresponding to light, see {@link HdfLightColor}. */
     struct LightFlashEffect flashEffect;    /** Blinking mode. For details, see {@link LightFlashEffect}. */
 };
 
@@ -128,6 +182,8 @@ struct LightEffect {
  */
 struct LightInfo {
     uint32_t lightId;    /** Light id. For details, see {@link LightId}. */
+    uint32_t lightNumber;    /** Number of physical lights in the logic controller. */
+    char lightName[NAME_MAX_LEN];    /** Logic light name. */
     int32_t reserved;    /** Custom extended information. */
 };
 

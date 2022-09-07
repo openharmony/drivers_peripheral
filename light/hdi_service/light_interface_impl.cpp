@@ -41,7 +41,7 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
     uint32_t count = 0;
     int32_t ret = lightInterface->GetLightInfo(&lightInfo, &count);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
         return ret;
     }
 
@@ -64,13 +64,50 @@ int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffect& e
     }
 
     LightEffect lightEffect;
-    lightEffect.lightBrightness = effect.lightBrightness;
+    lightEffect.lightColor.colorValue.rgbColor.b = effect.lightColor.colorValue.rgbColor.b;
+    lightEffect.lightColor.colorValue.rgbColor.brightness = effect.lightColor.colorValue.rgbColor.brightness;
+    lightEffect.lightColor.colorValue.rgbColor.g = effect.lightColor.colorValue.rgbColor.g;
+    lightEffect.lightColor.colorValue.rgbColor.r = effect.lightColor.colorValue.rgbColor.r;
+    lightEffect.lightColor.colorValue.wrgbColor.b = effect.lightColor.colorValue.wrgbColor.b;
+    lightEffect.lightColor.colorValue.wrgbColor.g = effect.lightColor.colorValue.wrgbColor.g;
+    lightEffect.lightColor.colorValue.wrgbColor.r = effect.lightColor.colorValue.wrgbColor.r;
+    lightEffect.lightColor.colorValue.wrgbColor.w = effect.lightColor.colorValue.wrgbColor.w;
     lightEffect.flashEffect.flashMode = effect.flashEffect.flashMode;
     lightEffect.flashEffect.onTime = effect.flashEffect.onTime;
     lightEffect.flashEffect.offTime = effect.flashEffect.offTime;
     int32_t ret = lightInterface->TurnOnLight(lightId, &lightEffect);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+    }
+
+    return ret;
+}
+
+int32_t LightInterfaceImpl::TurnOnMultiLights(int32_t lightId, const std::vector<HdfLightColor>& colors)
+{
+    const struct LightInterface *lightInterface = NewLightInterfaceInstance();
+    if (lightInterface == nullptr || lightInterface->TurnOnMultiLights == nullptr) {
+        HDF_LOGE("%{public}s: get light module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    uint32_t num = colors.size();
+    LightColor lightColor[num];
+    int32_t i = 0;
+    for (auto iter : colors) {
+        lightColor[i].colorValue.rgbColor.b = iter.colorValue.rgbColor.b;
+        lightColor[i].colorValue.rgbColor.brightness = iter.colorValue.rgbColor.brightness;
+        lightColor[i].colorValue.rgbColor.g = iter.colorValue.rgbColor.g;
+        lightColor[i].colorValue.rgbColor.r = iter.colorValue.rgbColor.r;
+        lightColor[i].colorValue.wrgbColor.b = iter.colorValue.wrgbColor.b;
+        lightColor[i].colorValue.wrgbColor.g = iter.colorValue.wrgbColor.g;
+        lightColor[i].colorValue.wrgbColor.r = iter.colorValue.wrgbColor.r;
+        lightColor[i++].colorValue.wrgbColor.w = iter.colorValue.wrgbColor.w;
+    }
+
+    int32_t ret = lightInterface->TurnOnMultiLights(lightId, lightColor, num);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
 
     return ret;
@@ -85,7 +122,7 @@ int32_t LightInterfaceImpl::TurnOffLight(int32_t lightId)
     }
     int32_t ret = lightInterface->TurnOffLight(lightId);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s failed, error code is %d", __func__, ret);
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
 
     return ret;

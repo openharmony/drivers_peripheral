@@ -142,7 +142,9 @@ HWTEST_F(HdfLightTest, EnableLight001, TestSize.Level1)
     effect.flashEffect.offTime = 0;
 
     for (i = 0; i < g_count; ++i) {
-        effect.lightBrightness = 0x00800000;
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 0;
+        effect.lightColor.colorValue.rgbColor.b = 0;
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(0, ret);
 
@@ -151,7 +153,9 @@ HWTEST_F(HdfLightTest, EnableLight001, TestSize.Level1)
         ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
         EXPECT_EQ(0, ret);
 
-        effect.lightBrightness = 0x00008080;
+        effect.lightColor.colorValue.rgbColor.r = 0;
+        effect.lightColor.colorValue.rgbColor.g = 255;
+        effect.lightColor.colorValue.rgbColor.b = 0;
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(0, ret);
 
@@ -173,12 +177,14 @@ HWTEST_F(HdfLightTest, EnableLight002, TestSize.Level1)
     int32_t i;
     int32_t ret;
     struct LightEffect effect;
-    effect.flashEffect.flashMode = LIGHT_FLASH_TIMED;
+    effect.flashEffect.flashMode = LIGHT_FLASH_BLINK;
     effect.flashEffect.onTime = ON_TIME;
     effect.flashEffect.offTime = OFF_TIME;
 
     for (i = 0; i < g_count; ++i) {
-        effect.lightBrightness = 0x00800000;
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 0;
+        effect.lightColor.colorValue.rgbColor.b = 0;
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(0, ret);
 
@@ -187,7 +193,20 @@ HWTEST_F(HdfLightTest, EnableLight002, TestSize.Level1)
         ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
         EXPECT_EQ(0, ret);
 
-        effect.lightBrightness = 0x00008080;
+        effect.lightColor.colorValue.rgbColor.r = 0;
+        effect.lightColor.colorValue.rgbColor.g = 255;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        EXPECT_EQ(0, ret);
+
+        OsalSleep(LIGHT_WAIT_TIME);
+
+        ret = g_lightDev->TurnOffLight(g_lightInfo[i].lightId);
+        EXPECT_EQ(0, ret);
+
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 255;
+        effect.lightColor.colorValue.rgbColor.b = 0;
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(0, ret);
 
@@ -215,7 +234,9 @@ HWTEST_F(HdfLightTest, EnableLight003, TestSize.Level1)
     EXPECT_EQ(LIGHT_NOT_SUPPORT, ret);
 
     for (i = 0; i < g_count; ++i) {
-        effect.lightBrightness = 0x00800000;
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 0;
+        effect.lightColor.colorValue.rgbColor.b = 0;
         effect.flashEffect.flashMode = LIGHT_FLASH_BUTT;
         effect.flashEffect.onTime = ON_TIME;
         effect.flashEffect.offTime = OFF_TIME;
@@ -223,7 +244,7 @@ HWTEST_F(HdfLightTest, EnableLight003, TestSize.Level1)
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(LIGHT_NOT_FLASH, ret);
 
-        effect.flashEffect.flashMode = LIGHT_FLASH_TIMED;
+        effect.flashEffect.flashMode = HDF_LIGHT_FLASH_GRADIENT;
         effect.flashEffect.onTime = 0;
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(LIGHT_NOT_FLASH, ret);
