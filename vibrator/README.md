@@ -2,7 +2,11 @@
 
 ## Introduction
 
-The vibrator driver model provides and implements vibrator-related Hardware Device Interfaces (HDIs). It supports the time sequence configuration in the static HDF Configuration Source (HCS) and the duration configuration through dynamic parameters. The vibrator hardware service calls **StartOnce** to start one-shot vibration with a given duration and calls **StartEffect** to start vibration with a specified effect.
+The vibrator driver model provides and implements vibrator-related Hardware Device Interfaces (HDIs). It supports vibration of the following types: 
+
+- One-shot vibration for a specified duration (**StartOnce**). 
+- Vibration with the specified effect (**StartEffect**). The effect is configured in the HDF Configuration Source (HCS). 
+- Vibration with the specified duration, intensity, and frequency (**EnableVibratorModulation**).
 
 **Figure 1** Vibrator driver model
 
@@ -13,11 +17,12 @@ The vibrator driver model provides and implements vibrator-related Hardware Devi
 The directory structure of the vibrator module is as follows:
 
 ```
-/drivers/peripheral/misc/vibrator
+/drivers/peripheral/vibrator
+├── chipset          # Driver code of the vibrator module
 ├── hal              # HAL code
 │   ├── include      # HAL header files
 │   └── src          # HAL code implementation
-├── interfaces       # Driver capability APIs provided for upper-layer services
+├── interfaces       # Driver APIs provided for upper-layer services
 │   └── include      # APIs exposed externally
 └── test             # Test code
     └── unittest     # Unit test code
@@ -27,43 +32,53 @@ The directory structure of the vibrator module is as follows:
 
 ### Available APIs
 
-The APIs provided for the vibrator are used to trigger and stop vibration. The following table describes these APIs.
+The APIs provided for the vibrator are used to start and stop vibration. The following table describes these APIs.
 
 **Table 1** Main APIs of the vibrator module
 
-| API                                | Description                                                  |
-| -------------------------------------- | ---------------------------------------------------------- |
-| int32_t  StartOnce(uint32_t duration)  | Triggers vibration with a given **duration**.        |
-| int32_t  Start(const char *effectType) | Triggers vibration with a given effect, which is specified by **effectType**.|
-| int32_t  Stop(enum VibratorMode mode)  | Stops vibration.                              |
+| API                                                      | Description                                                    |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| int32_t  StartOnce(uint32_t duration)                        | Starts vibration for a given **duration**.          |
+| int32_t  Start(const char *effectType)                       | Starts vibration with a given effect, which is specified by **effectType**.  |
+| int32_t  Stop(enum VibratorMode mode)                        | Stops vibration based on the specified vibration mode.                                |
+| int32_t EnableVibratorModulation(uint32_t duration, int32_t intensity, int32_t frequency) | Starts vibration with a given **duration**, **intensity**, and **frequency**.|
+| int32_t GetVibratorInfo(struct VibratorInfo **vibratorInfo); | Obtains vibrator information, including whether the intensity and frequency can be set and the intensity and frequency range.|
 
 ### How to Use
 
 The sample code is as follows:
 
-```
+```c++
 #include "vibrator_if.h"
 
 enum VibratorMode {
-    VIBRATOR_MODE_ONCE   = 0,    // Trigger vibration with a specified period.
-    VIBRATOR_MODE_PRESET = 1,    // Trigger periodic vibration with the preset effect.
+    VIBRATOR_MODE_ONCE   = 0,    // Start one-shot vibration for a specified period.
+    VIBRATOR_MODE_PRESET = 1,    // Start periodic vibration with the preset effect.
 };
 
 void VibratorSample(void)
 {
-	int32_t startRet;
-	int32_t endRet;
-	uint32_t g_duration = 1000;
-	uint32_t g_sleepTime1 = 2000;
-	uint32_t g_sleepTime2 = 5000;
-	const char *g_timeSequence = "haptic.clock.timer";
-	/* Create a VibratorInterface instance. */
+    int32_t startRet;
+    int32_t endRet;
+    uint32_t g_duration = 1000;
+    uint32_t g_sleepTime1 = 2000;
+    uint32_t g_sleepTime2 = 5000;
+    int32_t g_intensity1 = 30;
+    int32_t g_frequency1 = 200;
+    const char *g_timeSequence = "haptic.clock.timer";
+    struct VibratorInfo *g_vibratorInfo = nullptr;
+    /* Create a VibratorInterface instance. */
     struct VibratorInterface *g_vibratorDev = NewVibratorInterfaceInstance();
     if (g_vibratorDev == NULL) {
         return;
     }
-	/* Trigger vibration with the specified duration.*/
-	startRet = g_vibratorDev->StartOnce(g_duration);
+    /* Obtain vibrator information, including whether the intensity and frequency can be set and the intensity and frequency range. */
+    startRet = g_vibratorDev->GetVibratorInfo(&g_vibratorInfo);
+    if (startRet != 0) {
+        return;
+    }
+    /* Start vibration with the specified duration. */
+    startRet = g_vibratorDev->StartOnce(g_duration);
     if (startRet != 0) {
         return;
     }
@@ -73,24 +88,25 @@ void VibratorSample(void)
     if (endRet != 0) {
         return;
     }
-    /* Release the VibratorInterface instance. */
-    ret = FreeVibratorInterfaceInstance();
-    if (ret != 0) {
-        return;
-    }
-    /* Create a VibratorInterface instance. */
-    struct VibratorInterface *g_vibratorDev = NewVibratorInterfaceInstance();
-    if (g_vibratorDev == NULL) {
-        return;
-    }
-    /* Trigger vibration with the preset effect. */
+    /* Start vibration with the preset effect. */
     startRet = g_vibratorDev->Start(g_timeSequence);
     if (endRet != 0) {
         return;
     }
     OsalMSleep(g_sleepTime2);
-	/* Stop vibration based on the specified vibration mode. */
+    /* Stop vibration based on the specified vibration mode. */
     endRet = g_vibratorDev->Stop(VIBRATOR_MODE_PRESET);
+    if (endRet != 0) {
+        return;
+    }
+    /* Start vibration based on the specified duration, intensity, and frequency. */
+    startRet = g_vibratorDev->EnableVibratorModulation(g_duration, g_intensity1, g_frequency1);
+    if (endRet != 0) {
+        return;
+    }
+    OsalMSleep(g_sleepTime1);
+    /* Stop vibration based on the specified vibration mode. */
+    startRet = g_vibratorDev->Stop(VIBRATOR_MODE_ONCE);
     if (endRet != 0) {
         return;
     }
@@ -106,10 +122,6 @@ void VibratorSample(void)
 
 [Drive Subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/driver-subsystem.md)
 
-[drivers_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README.md)
-
-[drivers_adapter](https://gitee.com/openharmony/drivers_adapter/blob/master/README.md)
-
-[drivers_adapter_khdf_linuk](https://gitee.com/openharmony/drivers_adapter_khdf_linux/blob/master/README.md)
+[drivers_hdf_core](https://gitee.com/openharmony/drivers_hdf_core/blob/master/README_zh.md)
 
 [drivers_peripheral](https://gitee.com/openharmony/drivers_peripheral)
