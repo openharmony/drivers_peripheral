@@ -32,17 +32,7 @@ namespace OHOS {
         const int MAX_DEVICES = 32;
         InputDevDesc sta[MAX_DEVICES];
         IInputInterface *g_inputInterface;
-        struct AllParameters params;
-
-        if (data == nullptr) {
-            HDF_LOGE("%{public}s:data is null", __func__);
-            return false;
-        }
-
-        if (memcpy_s((void *)&params, sizeof(params), data, sizeof(params)) != INPUT_SUCCESS) {
-            HDF_LOGE("%{public}s:memcpy data failed", __func__);
-            return false;
-        }
+        const struct AllParameters *params = reinterpret_cast<const struct AllParameters *>(data);
 
         (void)memset_s(sta, MAX_DEVICES * sizeof(InputDevDesc), 0, MAX_DEVICES * sizeof(InputDevDesc));
         ret = GetInputInterface(&g_inputInterface);
@@ -65,8 +55,8 @@ namespace OHOS {
             }
         }
 
-        ret = g_inputInterface->iInputController->SetPowerStatus(params.devIndex, params.status);
-        if (!ret) {
+        ret = g_inputInterface->iInputController->SetPowerStatus(params->devIndex, params->status);
+        if (ret == INPUT_SUCCESS) {
             result = true;
         }
 
@@ -89,7 +79,13 @@ namespace OHOS {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
+    if (data == nullptr) {
+        return 0;
+    }
+
+    if (size < sizeof(struct AllParameters)) {
+        return 0;
+    }
     OHOS::InputSetPowerStatusFuzzTest(data, size);
     return 0;
 }

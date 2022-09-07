@@ -31,14 +31,12 @@ ohos_fuzztest("RunExtraCommandFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "runextracommand_fuzzer.cpp" ]
-  deps = [
-    "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
-    "//drivers/peripheral/input/hal:hdi_input",
-  ]
+  deps = [ "//drivers/peripheral/input/hal:hdi_input" ]
   external_deps = [
-    "c_utils:utils",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "utils_base:utils",
   ]
 }
 
