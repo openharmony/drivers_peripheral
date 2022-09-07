@@ -53,10 +53,8 @@ namespace OHOS {
         }
 
         ret = g_inputInterface->iInputController->GetDeviceType(*(uint32_t *)data, &devType);
-        if (!ret) {
-            if (ret != INPUT_SUCCESS) {
-                HDF_LOGE("%s: open input device failed, ret %d", __func__, ret);
-            }
+        if (ret == INPUT_SUCCESS) {
+            result = true;
         }
 
         for (int32_t i = 0; i < MAX_DEVICES; i++) {
@@ -78,7 +76,12 @@ namespace OHOS {
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
-    /* Run your code on data */
+    if (data == nullptr) {
+        return 0;
+    }
+    if (size < sizeof(uint32_t)) {
+        return 0;
+    }
     OHOS::InputGetDeviceTypeFuzzTest(data, size);
     return 0;
 }
