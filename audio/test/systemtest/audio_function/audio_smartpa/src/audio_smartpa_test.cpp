@@ -110,7 +110,7 @@ int32_t AudioSmartPaTest::BindServiceAndHwRender(struct AudioHwRender *&hwRender
     if (handle == nullptr) {
         return HDF_FAILURE;
     }
-    hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    hwRender = static_cast<struct AudioHwRender *>(calloc(1, sizeof(*hwRender)));
     if (hwRender == nullptr) {
         CloseServiceRender(handle);
         return HDF_FAILURE;
@@ -357,7 +357,7 @@ HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_009, TestSize.Level1)
     thresholdValueMaxOut = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMax;
     thresholdValueMinOut = hwRender->renderParam.renderMode.ctlParam.volThreshold.volMin;
 
-    hwRender->renderParam.renderMode.ctlParam.volume = thresholdValueMinOut+1;
+    hwRender->renderParam.renderMode.ctlParam.volume = thresholdValueMinOut + 1;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);
@@ -365,7 +365,7 @@ HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_009, TestSize.Level1)
     volumevalue = hwRender->renderParam.renderMode.ctlParam.volume;
     EXPECT_EQ(41, volumevalue);
 
-    hwRender->renderParam.renderMode.ctlParam.volume = thresholdValueMaxOut-1;
+    hwRender->renderParam.renderMode.ctlParam.volume = thresholdValueMaxOut - 1;
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_WRITE, &hwRender->renderParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibCtlRender(handle, AUDIODRV_CTL_IOCTL_ELEM_READ, &hwRender->renderParam);

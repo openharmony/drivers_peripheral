@@ -34,6 +34,8 @@
 
 #include "audio_hdi_fuzzer_common.h"
 
+#define OFFSET_SIZE 134
+
 namespace OHOS {
 namespace Audio {
 int32_t GetManager(TestAudioManager *&manager)
@@ -278,7 +280,7 @@ int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescripter &desc, int32_t &
     if (flag) {
         fseek(fp, 0, SEEK_END);
         reqSize = ftell(fp);
-        desc.offset = 134;
+        desc.offset = OFFSET_SIZE;
     } else {
         reqSize = FILE_CAPTURE_SIZE;
         ftruncate(fd, FILE_CAPTURE_SIZE);

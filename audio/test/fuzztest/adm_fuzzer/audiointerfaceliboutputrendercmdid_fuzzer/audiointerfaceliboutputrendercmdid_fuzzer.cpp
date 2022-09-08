@@ -52,7 +52,7 @@ namespace Audio {
         }
         struct AudioHwRender *hwRender = nullptr;
         int32_t ret = BindServiceAndHwRender(hwRender);
-        int32_t cmdId = *(int32_t *)(data);
+        int32_t cmdId = *(reinterpret_cast<int32_t *>(*data));
         InterfaceLibOutputRender(handle, cmdId, &hwRender->renderParam);
         if (ret == HDF_SUCCESS) {
             result = true;

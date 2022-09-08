@@ -142,7 +142,7 @@ HWTEST_F(AudioRenderTest, AudioRenderStartWhenDevDataHandleIsError, TestSize.Lev
     struct DevHandle *devDataHandle = hwRender->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwRender->devDataHandle = (struct DevHandle *)service;
+    hwRender->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioHandle handle = (AudioHandle)hwRender;
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderStart(handle));
     hwRender->devDataHandle = devDataHandle;
@@ -191,7 +191,7 @@ HWTEST_F(AudioRenderTest, AudioRenderStopWhenDevDataHandleIsError, TestSize.Leve
     struct DevHandle *devDataHandle = hwRender->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwRender->devDataHandle = (struct DevHandle *)service;
+    hwRender->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderStop(handle));
     hwRender->devDataHandle = devDataHandle;
     delete(service);
@@ -248,7 +248,7 @@ HWTEST_F(AudioRenderTest, AudioRenderPauseWhenDevDataHandleIsError, TestSize.Lev
     struct DevHandle *devDataHandle = hwRender->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwRender->devDataHandle = (struct DevHandle *)service;
+    hwRender->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderPause(handle));
     hwRender->devDataHandle = devDataHandle;
     delete(service);
@@ -300,7 +300,7 @@ HWTEST_F(AudioRenderTest, AudioRenderResumeWhenDevDataHandleIsError, TestSize.Le
     struct DevHandle *devDataHandle = hwRender->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwRender->devDataHandle = (struct DevHandle *)service;
+    hwRender->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderResume(handle));
     hwRender->devDataHandle = devDataHandle;
     delete(service);
@@ -419,7 +419,7 @@ HWTEST_F(AudioRenderTest, AudioRenderSetSampleAttributesWhenDevDataHandleIsError
     struct DevHandle *devDataHandle = hwRender->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwRender->devDataHandle = (struct DevHandle *)service;
+    hwRender->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioHandle handle = (AudioHandle)hwRender;
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioRenderSetSampleAttributes(handle, &attrs));
     hwRender->devDataHandle = devDataHandle;
@@ -569,7 +569,7 @@ HWTEST_F(AudioRenderTest, AudioRenderSelectSceneWhenDevCtlHandleIsError, TestSiz
     struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwRender->devCtlHandle = (struct DevHandle *)service;
+    hwRender->devCtlHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioHandle handle = (AudioHandle)hwRender;
     struct AudioSceneDescriptor scene;
     scene.scene.id = AUDIO_IN_MEDIA;
@@ -917,7 +917,7 @@ HWTEST_F(AudioRenderTest, AudioRenderGetGainWhenDevCtlHandleIsError, TestSize.Le
     struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwRender->devCtlHandle = (struct DevHandle *)service;
+    hwRender->devCtlHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioHandle handle = (AudioHandle)hwRender;
     float gain = 0;
 #ifdef ALSA_LIB_MODE
@@ -969,7 +969,7 @@ HWTEST_F(AudioRenderTest, AudioRenderSetGainWhenDevCtlHandleIsError, TestSize.Le
     struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwRender->devCtlHandle = (struct DevHandle *)service;
+    hwRender->devCtlHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioHandle handle = (AudioHandle)hwRender;
     float gain = 0;
 #ifdef ALSA_LIB_MODE
@@ -1211,7 +1211,7 @@ HWTEST_F(AudioRenderTest, AudioRenderSetChannelModeWhenDevCtlHandleIsError, Test
     struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwRender->devCtlHandle = (struct DevHandle *)service;
+    hwRender->devCtlHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
 #ifdef ALSA_LIB_MODE
     EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderSetChannelMode((struct AudioRender *)hwRender, mode));
@@ -1258,7 +1258,7 @@ HWTEST_F(AudioRenderTest, AudioRenderGetChannelModeWhenDevCtlHandleIsError, Test
     struct DevHandle *devCtlHandle = hwRender->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwRender->devCtlHandle = (struct DevHandle *)service;
+    hwRender->devCtlHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
 #ifdef ALSA_LIB_MODE
     EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioRenderGetChannelMode((struct AudioRender *)hwRender, &mode));
@@ -1449,7 +1449,7 @@ HWTEST_F(AudioRenderTest, AudioRenderReqMmapBufferWhenDevCtlHandleIsError, TestS
     struct DevHandle *devDataHandle = hwRender->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwRender->devDataHandle = (struct DevHandle *)service;
+    hwRender->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
     struct AudioMmapBufferDescripter desc;
     int32_t reqSize = REQ_SIZE;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderReqMmapBuffer((struct AudioRender *)hwRender, reqSize, &desc));

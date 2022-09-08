@@ -105,7 +105,7 @@ int32_t AudioLibCaptureTest::BindServiceAndHwCapture(struct AudioHwCapture *&hwC
     if (handle == nullptr) {
         return HDF_FAILURE;
     }
-    hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
+    hwCapture = static_cast<struct AudioHwCapture *>(calloc(1, sizeof(*hwCapture)));
     if (hwCapture == nullptr) {
         CloseServiceCaptureSo(handle);
         return HDF_FAILURE;
@@ -419,7 +419,7 @@ HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibOutputCaptureReadStop_001, TestSi
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = InterfaceLibOutputCapture(handle, AUDIO_DRV_PCM_IOCTRL_START_CAPTURE, &hwCapture->captureParam);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    hwCapture->captureParam.frameCaptureMode.buffer = (char *)calloc(1, 16384);
+    hwCapture->captureParam.frameCaptureMode.buffer = static_cast<char *>(calloc(1, 16384));
     if (hwCapture->captureParam.frameCaptureMode.buffer == nullptr) {
         CloseServiceCaptureSo(handle);
         free(hwCapture);
@@ -471,7 +471,7 @@ HWTEST_F(AudioLibCaptureTest, AudioInterfaceLibOutputCapture_001, TestSize.Level
         EXPECT_EQ(HDF_SUCCESS, ret);
         ret = InterfaceLibOutputCapture(handle2, AUDIO_DRV_PCM_IOCTRL_START_CAPTURE, &hwCapture->captureParam);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        hwCapture->captureParam.frameCaptureMode.buffer = (char *)calloc(1, 16384);
+        hwCapture->captureParam.frameCaptureMode.buffer = static_cast<char *>(calloc(1, 16384));
         if (hwCapture->captureParam.frameCaptureMode.buffer == nullptr) {
             CloseServiceCaptureSo(handle1);
             CloseServiceCaptureSo(handle2);

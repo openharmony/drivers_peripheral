@@ -128,7 +128,7 @@ int32_t AudioLibRenderTest::FrameLibStart(FILE *file, struct AudioSampleAttribut
     if (bufferSize <= 0) {
         return HDF_FAILURE;
     }
-    hwRender->renderParam.frameRenderMode.buffer = (char *)calloc(1, bufferSize);
+    hwRender->renderParam.frameRenderMode.buffer = static_cast<char *>(calloc(1, bufferSize));
     if (hwRender->renderParam.frameRenderMode.buffer == nullptr) {
         return HDF_FAILURE;
     }
@@ -214,7 +214,7 @@ int32_t AudioLibRenderTest::BindServiceAndHwRender(struct AudioHwRender *&hwRend
     if (handle == nullptr) {
         return HDF_FAILURE;
     }
-    hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    hwRender = static_cast<struct AudioHwRender *>(calloc(1, sizeof(*hwRender)));
     if (hwRender == nullptr) {
         CloseServiceRenderSo(handle);
         return HDF_FAILURE;

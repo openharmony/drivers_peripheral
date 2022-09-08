@@ -41,6 +41,7 @@
 #define PERIOD_SIZE 1024
 #define ATTR_PERIOD_MIN 2048
 #define EXT_PARAMS_MAXLEN 107
+#define BITS_TO_FROMAT 3
 
 enum RenderSoundCardMode {
     PRIMARY = 1,
@@ -261,7 +262,7 @@ static int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs,
 
 static uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
 {
-    return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> 3);
+    return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> BITS_TO_FROMAT);
 }
 
 static int32_t StopAudioFiles(struct AudioRender **renderS)

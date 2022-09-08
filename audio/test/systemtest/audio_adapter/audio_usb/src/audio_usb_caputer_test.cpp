@@ -945,7 +945,7 @@ HWTEST_F(AudioUsbCaputerTest, AudioCaptureFrame_001, TestSize.Level1)
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Start((AudioHandle)capture);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    char *frame = (char *)calloc(1, BUFFER_SIZE);
+    char *frame = static_cast<char *>calloc(1, BUFFER_SIZE);
     EXPECT_NE(nullptr, frame);
     ret = capture->CaptureFrame(capture, frame, requestBytes, &replyBytes);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -974,7 +974,7 @@ HWTEST_F(AudioUsbCaputerTest, AudioCaptureFrame_005, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_USB, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    char *frame = (char *)calloc(1, BUFFER_SIZE);
+    char *frame = static_cast<char *>calloc(1, BUFFER_SIZE);
     EXPECT_NE(nullptr, frame);
     ret = capture->CaptureFrame(capture, frame, requestBytes, &replyBytes);
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);

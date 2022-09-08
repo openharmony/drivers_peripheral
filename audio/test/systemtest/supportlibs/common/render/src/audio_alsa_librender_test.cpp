@@ -64,7 +64,7 @@ void AudioAlsaLibRenderTest::SetUpTestCase(void)
     ASSERT_NE(nullptr, InterfaceLibCtlRender);
     BindServiceRender = (struct DevHandle* (*)(const char *))dlsym(ptrHandle, "AudioBindServiceRender");
     ASSERT_NE(nullptr, BindServiceRender);
-    CloseServiceRender = (void (*)(struct DevHandle *))dlsym(ptrHandle, "AudioCloseServiceRender");
+    CloseServiceRender = (void (*)(static_cast<struct DevHandle *>))dlsym(ptrHandle, "AudioCloseServiceRender");
     ASSERT_NE(nullptr, CloseServiceRender);
 }
 
@@ -127,7 +127,7 @@ int32_t AudioAlsaLibRenderTest::FrameLibStart(FILE *file, struct AudioSampleAttr
     if (bufferSize <= 0) {
         return HDF_FAILURE;
     }
-    hwRender->renderParam.frameRenderMode.buffer = (char *)calloc(1, bufferSize);
+    hwRender->renderParam.frameRenderMode.buffer = static_cast<char *>(calloc(1, bufferSize));
     if (hwRender->renderParam.frameRenderMode.buffer == nullptr) {
         return HDF_FAILURE;
     }
@@ -166,7 +166,7 @@ int32_t AudioAlsaLibRenderTest::LibRenderStart(struct AudioHwRender *hwRender, s
 int32_t AudioAlsaLibRenderTest::CreatHwRender(struct AudioHwRender *&hwRender, const std::string adapterNameCase) const
 {
     int32_t ret = HDF_FAILURE;
-    hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    hwRender = static_cast<struct AudioHwRender *>(calloc(1, sizeof(*hwRender)));
     if (hwRender == nullptr) {
         return HDF_FAILURE;
     }
