@@ -220,8 +220,9 @@ static int32_t ReapProcess(void * const argurb)
         unsigned char *recvBuf = (unsigned char *)urbrecv->buffer;
 
         if (g_printData) {
-            for (int32_t i = 0; i < urbrecv->actualLength; i++)
+            for (int32_t i = 0; i < urbrecv->actualLength; i++) {
                 printf("%c", recvBuf[i]);
+            }
             fflush(stdout);
         } else if (g_recv_count % 10000 == 0) {
             printf("#");

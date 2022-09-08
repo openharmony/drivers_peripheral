@@ -197,7 +197,6 @@ int32_t PropTest(int32_t argc, const char *argv[])
         case '?':
             ShowUsage();
             return 0;
-            break;
         default:
             break;
     }

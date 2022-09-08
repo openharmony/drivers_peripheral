@@ -20,14 +20,14 @@
 
 using namespace OHOS::HDI::Usb::V1_0;
 
-struct Parameters {
+namespace OHOS {
+namespace USB {
+    struct Parameters {
     int32_t portId;
     int32_t powerRole;
     int32_t dataRole;
 };
 
-namespace OHOS {
-namespace USB {
 bool UsbSetPortRoleFuzzTest(const uint8_t *data, size_t size)
 {
     (void)size;
