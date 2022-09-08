@@ -107,7 +107,8 @@ public:
     int32_t SimStkSendEnvelope(int32_t slotId, int32_t serialId, const std::string &strCmd) override;
     int32_t SimStkSendCallSetupRequestResult(int32_t slotId, int32_t serialId, int32_t accept) override;
     int32_t SimStkIsReady(int32_t slotId, int32_t serialId) override;
-    int32_t SetRadioProtocol(int32_t slotId, int32_t serialId, const ISimProtocolRequest &protocol) override;
+    int32_t GetRadioProtocol(int32_t slotId, int32_t serialId) override;
+    int32_t SetRadioProtocol(int32_t slotId, int32_t serialId, const IRadioProtocol &radioProtocol) override;
     int32_t SimOpenLogicalChannel(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2) override;
     int32_t SimCloseLogicalChannel(int32_t slotId, int32_t serialId, int32_t channelId) override;
     int32_t SimTransmitApduLogicalChannel(
@@ -131,7 +132,6 @@ public:
     int32_t GetCurrentCellInfo(int32_t slotId, int32_t serialId) override;
     int32_t SetPreferredNetwork(int32_t slotId, int32_t serialId, int32_t preferredNetworkType) override;
     int32_t GetPreferredNetwork(int32_t slotId, int32_t serialId) override;
-    int32_t GetRadioCapability(int32_t slotId, int32_t serialId) override;
     int32_t GetPhysicalChannelConfig(int32_t slotId, int32_t serialId) override;
     int32_t SetLocateUpdates(int32_t slotId, int32_t serialId, const IHRilRegNotifyMode mode) override;
     int32_t SetNotificationFilter(int32_t slotId, int32_t serialId, int32_t newFilter) override;
