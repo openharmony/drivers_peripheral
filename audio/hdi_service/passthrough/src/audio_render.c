@@ -36,6 +36,11 @@
 
 #define DEEP_BUFFER_PLATFORM_DELAY (29 * 1000LL)
 #define LOW_LATENCY_PLATFORM_DELAY (13 * 1000LL)
+#define BITS_TO_FROMAT 3
+#define VOLUME_AVERAGE 2
+#define SEC_TO_MILLSEC 1000
+#define INTEGER_TO_DEC 10
+#define DECIMAL_PART   5
 
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode,
     uint64_t bytes, uint32_t *frameCount)
@@ -253,7 +258,7 @@ int32_t AudioRenderGetFrameSize(struct IAudioRender *handle, uint64_t *size)
     if (ret != AUDIO_SUCCESS) {
         return ret;
     }
-    *size = FRAME_SIZE * channelCount * (formatBits >> 3);
+    *size = FRAME_SIZE * channelCount * (formatBits >> BITS_TO_FROMAT);
     return AUDIO_SUCCESS;
 }
 
@@ -563,11 +568,11 @@ int32_t AudioRenderGetVolume(struct IAudioRender *handle, float *volume)
         return AUDIO_ERR_INTERNAL;
     }
 
-    volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / 2);
+    volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / VOLUME_AVERAGE);
 
-    int volumeT = (int)((pow(10, volumeTemp) + 5) / 10); // delet 0.X num
+    int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + DECIMAL_PART) / INTEGER_TO_DEC); // delet 0.X num
 
-    *volume = (float)volumeT / 10;                       // get volume (0-1)
+    *volume = (float)volumeT / INTEGER_TO_DEC;                                               // get volume (0-1)
     return AUDIO_SUCCESS;
 }
 
@@ -679,7 +684,7 @@ int32_t AudioRenderGetLatency(struct IAudioRender *render, uint32_t *ms)
         return AUDIO_ERR_INTERNAL;
     }
 
-    *ms = (periodCount * periodSize * 1000) / byteRate;
+    *ms = (periodCount * periodSize * SEC_TO_MILLSEC) / byteRate;
     return AUDIO_SUCCESS;
 }
 
@@ -1046,7 +1051,7 @@ static int32_t AudioRenderReqMmapBufferInit(
         return AUDIO_ERR_INTERNAL;
     }
 
-    desc.totalBufferFrames = reqSize / (render->renderParam.frameRenderMode.attrs.channelCount * (formatBits >> 3));
+    desc.totalBufferFrames = reqSize / (render->renderParam.frameRenderMode.attrs.channelCount * (formatBits >> BITS_TO_FROMAT));
 
     InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {

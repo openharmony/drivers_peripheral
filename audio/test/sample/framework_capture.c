@@ -54,6 +54,7 @@
 #define BUFFER_LEN 256
 #define EXT_PARAMS_MAXLEN 107
 #define ONE_MS 1000
+#define BITS_TO_FROMAT 3
 
 struct StrParaCapture {
     struct AudioCapture *capture;
@@ -206,7 +207,7 @@ void StreamClose(int32_t sig)
 
 static uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
 {
-    return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> 3);
+    return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> BITS_TO_FROMAT);
 }
 
 #ifndef __LITEOS__

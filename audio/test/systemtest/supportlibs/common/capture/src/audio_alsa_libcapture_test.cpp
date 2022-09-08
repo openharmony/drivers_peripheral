@@ -92,7 +92,7 @@ void AudioAlsaLibCaptureTest::TearDown(void)
 int32_t AudioAlsaLibCaptureTest::CreatHwCapture(struct AudioHwCapture *&hwCapture,
     const std::string adapterNameCase) const
 {
-    hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
+    hwCapture = static_cast<struct AudioHwCapture *>(calloc(1, sizeof(*hwCapture)));
     if (hwCapture == nullptr) {
         return HDF_FAILURE;
     }
@@ -126,7 +126,7 @@ int32_t AudioAlsaLibCaptureTest::LibCaptureStart(struct AudioHwCapture *hwCaptur
 HWTEST_F(AudioAlsaLibCaptureTest, AudioInterfaceLibOutputCaptureOpen_001, TestSize.Level1)
 {
     int32_t ret = -1;
-    struct AudioHwCapture *hwCapture= nullptr;
+    struct AudioHwCapture *hwCapture = nullptr;
     ASSERT_NE(nullptr, handle);
     ret = CreatHwCapture(hwCapture, ADAPTER_NAME);
     ASSERT_EQ(HDF_SUCCESS, ret);
