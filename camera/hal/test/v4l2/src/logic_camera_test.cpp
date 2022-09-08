@@ -15,6 +15,10 @@
 
 #include "logic_camera_test.h"
 
+constexpr int QUEUE_SIZE = 8;
+constexpr int DEFAULT_TEST_DATASPACE_VALUE = 8;
+constexpr int DEFAULT_TEST_TUNNELEDMODE_VALUE = 5;
+
 void UtestLogicCameraTest::SetUpTestCase(void)
 {}
 void UtestLogicCameraTest::TearDownTestCase(void)
@@ -45,8 +49,8 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
     display_->AchieveStreamOperator();
     // Configure preview stream information
     std::shared_ptr<IBufferProducer> producer = IBufferProducer::CreateBufferQueue();
-    producer->SetQueueSize(8);
-    if (producer->GetQueueSize() != 8) {
+    producer->SetQueueSize(QUEUE_SIZE);
+    if (producer->GetQueueSize() != QUEUE_SIZE) {
         std::cout << "~~~~~~~" << std::endl;
     }
     auto callback = [this](std::shared_ptr<SurfaceBuffer> b) {
@@ -56,12 +60,12 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
     producer->SetCallback(callback);
     std::shared_ptr<StreamInfo> streamInfoPre = std::make_shared<StreamInfo>();
     streamInfoPre->streamId_ = display_->streamId_preview;
-    streamInfoPre->width_ = 640;
-    streamInfoPre->height_ = 480;
+    streamInfoPre->width_ = DEFAULT_TEST_WIDTH_VALUE;
+    streamInfoPre->height_ = DEFAULT_TEST_HEIGHT_VALUE;
     streamInfoPre->format_ = CAMERA_FORMAT_YUYV_422_PKG;
-    streamInfoPre->dataspace_ = 8;
+    streamInfoPre->dataspace_ = DEFAULT_TEST_DATASPACE_VALUE;
     streamInfoPre->intent_ = PREVIEW;
-    streamInfoPre->tunneledMode_ = 5;
+    streamInfoPre->tunneledMode_ = DEFAULT_TEST_TUNNELEDMODE_VALUE;
     streamInfoPre->bufferQueue_ = producer;
     display_->streamInfos.push_back(streamInfoPre);
     display_->rc = display_->streamOperator->CreateStreams(display_->streamInfos);

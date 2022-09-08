@@ -29,5 +29,5 @@ public:
     void SetUp(void);
     void TearDown(void);
 };
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera
 #endif

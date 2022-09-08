@@ -23,7 +23,7 @@
 namespace {
     static const int TIME_TRANSFORMATION_US = 1000000; // 1000000:1000000 microseconds
     static const int CYCLE_TIMES = 1000; // 1000:Cycle 1000 times
-    std::ofstream writeIntoFile;
+    std::ofstream g_writeIntoFile;
 }
 
 using namespace OHOS;

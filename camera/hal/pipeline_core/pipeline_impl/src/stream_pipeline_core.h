@@ -25,7 +25,7 @@ namespace OHOS::Camera {
 class StreamPipelineCore : public IStreamPipelineCore {
 public:
     explicit StreamPipelineCore(const std::shared_ptr<NodeContext>& c) : context_(c) {}
-    virtual ~StreamPipelineCore() override = default;
+    ~StreamPipelineCore() override = default;
     RetCode Init() override;
     RetCode PreConfig(const ModeMeta& meta) override;
     RetCode CreatePipeline(const int32_t& mode) override;

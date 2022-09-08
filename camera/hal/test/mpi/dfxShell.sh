@@ -12,8 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 set -e
+
 script_path=$(cd $(dirname $0);pwd)
 cd ${script_path}
 cd ../../../../../../out/ohos-arm-release/packages/phone/system/lib;

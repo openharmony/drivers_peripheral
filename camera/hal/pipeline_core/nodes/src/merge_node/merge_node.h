@@ -40,5 +40,5 @@ private:
     uint64_t bufferNum_ = 0;
     std::atomic_bool                           streamRunning_ = false;
 };
-}// namespace OHOS::Camera
+} // namespace OHOS::Camera
 #endif
