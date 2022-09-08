@@ -15,8 +15,9 @@
 
 #include <cstdio>
 #include <cstring>
-#include <unistd.h>
 #include <gtest/gtest.h>
+#include <unistd.h>
+
 #include "securec.h"
 #include "usb_utils.h"
 
@@ -163,12 +164,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteSync_001, TestSize.Level1)
 HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteSync_002, TestSize.Level1)
 {
     printf("------start CheckUsbSerialIoWriteSync_002------\n");
-    const string data[] = {
-        "0123456789",
-        "Z",
-        "0!a@1#b$2%c^3&D*4(E)5-F_",
-        ""
-    };
+    const string data[] = {"0123456789", "Z", "0!a@1#b$2%c^3&D*4(E)5-F_", ""};
     double startTs = GetNowTs();
     string wlog, rlog;
     for (int32_t i = 0; data[i].size() > 0; i++) {
@@ -226,8 +222,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteSync_003, TestSize.Level2)
 HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteAsync_001, TestSize.Level1)
 {
     printf("------start CheckUsbSerialIoWriteAsync_001------\n");
-    ASSERT_EQ(system("usbhost_ddk_test -Ar &"), 0) << \
-    "ErrInfo:  failed to start async read";
+    ASSERT_EQ(system("usbhost_ddk_test -Ar &"), 0) << "ErrInfo:  failed to start async read";
     sleep(3);
     const string data = "abc";
     double startTs = GetNowTs();
@@ -251,12 +246,7 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteAsync_001, TestSize.Level1)
 HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialIoWriteAsync_002, TestSize.Level1)
 {
     printf("------start CheckUsbSerialIoWriteAsync_002------\n");
-    const string data[] = {
-        "0123456789",
-        "Z",
-        "0!a@1#b$2%c^3&D*4(E)5-F_",
-        ""
-    };
+    const string data[] = {"0123456789", "Z", "0!a@1#b$2%c^3&D*4(E)5-F_", ""};
     double startTs = GetNowTs();
     string wlog, rlog;
     for (int32_t i = 0; data[i].size() > 0; i++) {
@@ -402,8 +392,8 @@ HWTEST_F(UsbHostSerialFuncTest, CheckUsbSerialDeviceInfo, TestSize.Level1)
     const int32_t logMaxLen = 1000;
     char targetLog[logMaxLen] = {0};
     const char *fmt = "device descriptor info:[%s %s %s %s %s]";
-    snprintf_s(targetLog, logMaxLen, logMaxLen -1, fmt, \
-    idVendor, idProduct, bDeviceClass, bDeviceSubClass, bDeviceProtocol);
+    snprintf_s(
+        targetLog, logMaxLen, logMaxLen - 1, fmt, idVendor, idProduct, bDeviceClass, bDeviceSubClass, bDeviceProtocol);
     printf("targetLog==>%s\n", targetLog);
     double startTs = GetNowTs();
     ASSERT_EQ(system("usbhost_ddk_test -AC"), 0);
@@ -424,8 +414,7 @@ HWTEST_F(UsbHostSerialFuncTest, KillHostSdkProcess, TestSize.Level1)
     system("kill $(pidof pnp_host)");
     printf("Please waiting for restarting sdk process...\n");
     sleep(5);
-    ASSERT_EQ(system("usbhost_ddk_test -Ar &"), 0) << \
-    "ErrInfo:  failed to start async read";
+    ASSERT_EQ(system("usbhost_ddk_test -Ar &"), 0) << "ErrInfo:  failed to start async read";
     sleep(3);
     const string data = "abc";
     double startTs = GetNowTs();
@@ -439,4 +428,4 @@ HWTEST_F(UsbHostSerialFuncTest, KillHostSdkProcess, TestSize.Level1)
     system("killall usbhost_ddk_test");
     printf("------end KillHostSdkProcess------\n");
 }
-}
+} // namespace

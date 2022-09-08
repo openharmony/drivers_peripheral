@@ -142,14 +142,13 @@ void UsbRawSdkIfTestIo::TearDownTestCase()
 extern "C" {
 static void AcmWriteBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
-
+    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
     printf("%s:%d entry!", __func__, __LINE__);
     if (req == nullptr) {
         printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
-    struct AcmWb *wb  = (struct AcmWb *)req->userData;
+    struct AcmWb *wb  = static_cast<struct AcmWb *>(req->userData);
     if (wb == nullptr) {
         printf("%s:%d userData(wb) is nullptr!", __func__, __LINE__);
         return;
@@ -164,14 +163,13 @@ static void AcmWriteBulkCallback(const void *requestArg)
 
 static void AcmReadBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
-
+    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
     printf("%s:%d entry!", __func__, __LINE__);
     if (req == nullptr) {
         printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
-    struct AcmDevice *acm = (struct AcmDevice *)req->userData;
+    struct AcmDevice *acm = static_cast<struct AcmDevice *>(req->userData);
     if (acm == nullptr) {
         printf("%s:%d userData(acm) is nullptr!", __func__, __LINE__);
         return;
@@ -207,19 +205,18 @@ static void AcmReadBulkCallback(const void *requestArg)
 
 static void AcmNotifyReqCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = (struct UsbRawRequest *)requestArg;
-
+    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
     printf("%s:%d entry!", __func__, __LINE__);
     if (req == nullptr) {
         printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
-    struct AcmDevice *acm = (struct AcmDevice *)req->userData;
+    struct AcmDevice *acm = static_cast<struct AcmDevice *>(req->userData);
     if (acm == nullptr) {
         printf("%s:%d userData(acm) is nullptr!", __func__, __LINE__);
         return;
     }
-    struct UsbCdcNotification *dr = (struct UsbCdcNotification *)req->buffer;
+    struct UsbCdcNotification *dr = reinterpret_cast<struct UsbCdcNotification *>(req->buffer);
     if (dr == nullptr) {
         printf("%s:%d req->buffer(dr) is nullptr!", __func__, __LINE__);
         return;

@@ -79,8 +79,9 @@ HWTEST_F(UsbDeviceSdkIoTest, CheckDeviceSdkIfRequestAsync002, TestSize.Level1)
         EXPECT_TRUE(ret == HDF_SUCCESS);
         EXPECT_EQ(1, g_acmDevice->submit);
         g_acmDevice->submit = 0;
-        if (req->actual > 0)
+        if (req->actual > 0) {
             break;
+        }
     }
     ret = UsbFnFreeRequest(req);
     EXPECT_TRUE(ret == HDF_SUCCESS);

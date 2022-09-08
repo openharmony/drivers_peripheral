@@ -189,8 +189,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetDevice002, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetDevice003, TestSize.Level1)
 {
-    struct UsbFnDevice *device = nullptr;
-    device = (struct UsbFnDevice *)UsbFnGetDevice(nullptr);
+    struct UsbFnDevice *device = UsbFnGetDevice(nullptr);
     EXPECT_EQ(nullptr, device);
 }
 
@@ -258,8 +257,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetInterface004, TestSize.Level1)
 
 HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfGetInterface005, TestSize.Level1)
 {
-    struct UsbFnInterface *fnInterface = nullptr;
-    fnInterface = (struct UsbFnInterface *)UsbFnGetInterface(nullptr, 0);
+    struct UsbFnInterface *fnInterface = UsbFnGetInterface(nullptr, 0);
     EXPECT_EQ(nullptr, fnInterface);
 }
 
@@ -692,7 +690,7 @@ HWTEST_F(UsbDeviceSdkIfTest, CheckDeviceSdkIfAllocCtrlRequest009, TestSize.Level
     struct UsbFnRequest *req = nullptr;
     UsbFnInterfaceHandle handle = NULL;
     req = UsbFnAllocCtrlRequest(handle, 0);
-    EXPECT_TRUE(nullptr == req);
+    EXPECT_TRUE(req == nullptr);
 }
 
 #ifdef AUTO_NO_SKIP

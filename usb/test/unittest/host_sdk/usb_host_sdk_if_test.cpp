@@ -77,7 +77,7 @@ static void AcmWriteBulk(struct UsbRequest *req)
 
     status = req->compInfo.status;
     printf("Bulk Write status:%d\n", status);
-    struct AcmWb *wb = (struct AcmWb *)req->compInfo.userData;
+    struct AcmWb *wb = static_cast<struct AcmWb *>(req->compInfo.userData);
     switch (status) {
         case 0:
             wb->use = 0;
@@ -112,10 +112,9 @@ static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
     return 0;
 }
 
-static void AcmProcessNotification(struct AcmDevice *acm, unsigned char *buf)
+static void AcmProcessNotification(struct AcmDevice *acm, struct UsbCdcNotification *dr)
 {
     (void)acm;
-    struct UsbCdcNotification *dr = (struct UsbCdcNotification *)buf;
     switch (dr->bNotificationType) {
         case USB_DDK_CDC_NOTIFY_NETWORK_CONNECTION:
             printf("%s - network connection: %d\n", __func__, dr->wValue);
@@ -135,16 +134,16 @@ static void AcmCtrlIrq(struct UsbRequest *req)
         printf("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
-    struct AcmDevice *acm = (struct AcmDevice *)req->compInfo.userData;
+    struct AcmDevice *acm = static_cast<struct AcmDevice *>(req->compInfo.userData);
     int32_t status = req->compInfo.status;
-    struct UsbCdcNotification *dr = (struct UsbCdcNotification *)req->compInfo.buffer;
+    struct UsbCdcNotification *dr = static_cast<struct UsbCdcNotification *>(req->compInfo.buffer);
     uint32_t currentSize = req->compInfo.actualLength;
     if (status != 0) {
         return;
     }
 
     if (acm->nbIndex) {
-        dr = (struct UsbCdcNotification *)acm->notificationBuffer;
+        dr = reinterpret_cast<struct UsbCdcNotification *>(acm->notificationBuffer);
     }
     if (dr == nullptr) {
         printf("%s:%d dr is nullptr!", __func__, __LINE__);
@@ -173,7 +172,7 @@ static void AcmCtrlIrq(struct UsbRequest *req)
         currentSize = acm->nbIndex;
     }
     if (currentSize >= expectedSize) {
-        AcmProcessNotification(acm, (unsigned char *)dr);
+        AcmProcessNotification(acm, dr);
         acm->nbIndex = 0;
     }
 
