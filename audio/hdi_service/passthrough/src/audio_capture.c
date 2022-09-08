@@ -33,6 +33,7 @@
 #define BITS_TO_FROMAT    3
 #define VOLUME_AVERAGE    2
 #define INTEGER_TO_DEC    10
+#define DECIMAL_PART      5
 
 /* add For Capture Bytes To Frames */
 int32_t AudioCaptureStart(struct IAudioCapture *handle)
@@ -540,9 +541,9 @@ int32_t AudioCaptureGetVolume(struct IAudioCapture *handle, float *volume)
     }
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / VOLUME_AVERAGE);
 
-    int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + 5) / INTEGER_TO_DEC); // delet 0.X num
+    int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + DECIMAL_PART) / INTEGER_TO_DEC); // delet 0.X num
 
-    *volume = (float)volumeT / INTEGER_TO_DEC;                                    // get volume (0-1)
+    *volume = (float)volumeT / INTEGER_TO_DEC;                                               // get volume (0-1)
     return AUDIO_SUCCESS;
 }
 
