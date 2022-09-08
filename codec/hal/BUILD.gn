@@ -76,7 +76,6 @@ ohos_shared_library("libcodec_hdi_omx_client") {
     external_deps = [
       "c_utils:utils",
       "graphic_chipsetsdk:buffer_handle",
-      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
