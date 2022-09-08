@@ -34,10 +34,10 @@ if (defined(ohos_lite)) {
       "$camera_path/../interfaces/hdi_passthrough/callback/src/camera_device_callback.cpp",
       "$camera_path/../interfaces/hdi_passthrough/callback/src/camera_host_callback.cpp",
       "$camera_path/../interfaces/hdi_passthrough/callback/src/stream_operator_callback.cpp",
-      "unittest/utest_camera_device_impl.cpp",
-      "unittest/utest_camera_hdi_base.cpp",
-      "unittest/utest_camera_host_impl.cpp",
-      "unittest/utest_stream_operator_impl.cpp",
+      "utest_camera_device_impl.cpp",
+      "utest_camera_hdi_base.cpp",
+      "utest_camera_host_impl.cpp",
+      "utest_stream_operator_impl.cpp",
     ]
 
     include_dirs = [
@@ -130,10 +130,10 @@ if (defined(ohos_lite)) {
     testonly = true
     module_out_path = module_output_path
     sources = [
-      "unittest/utest_camera_device_impl.cpp",
-      "unittest/utest_camera_hdi_base.cpp",
-      "unittest/utest_camera_host_impl.cpp",
-      "unittest/utest_stream_operator_impl.cpp",
+      "utest_camera_device_impl.cpp",
+      "utest_camera_hdi_base.cpp",
+      "utest_camera_host_impl.cpp",
+      "utest_stream_operator_impl.cpp",
     ]
 
     include_dirs = [
