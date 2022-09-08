@@ -137,6 +137,12 @@ uint64_t CameraHdiBaseTest::GetCurrentLocalTimeStamp() const
     return tmp.count();
 }
 
+#ifdef CAMERA_BUILT_ON_OHOS_LITE
+#define YUV_SAVE_PATH "/userdata/camera"
+#else
+#define YUV_SAVE_PATH "/data/log/camera"
+#endif
+
 int32_t CameraHdiBaseTest::SaveYUV(const char* type, const void* buffer, int32_t size)
 {
     if (strncmp(type, "preview", strlen(type)) == 0) {
@@ -147,48 +153,30 @@ int32_t CameraHdiBaseTest::SaveYUV(const char* type, const void* buffer, int32_t
         }
     }
 
+    if (access(YUV_SAVE_PATH, F_OK) != 0) {
+        std::cout << "save path: " << YUV_SAVE_PATH << " not exist" << std::endl;
+        return 0;
+    }
+
     char path[PATH_MAX] = {0};
-#ifdef CAMERA_BUILT_ON_OHOS_LITE
+    int ret;
     if (strncmp(type, "preview", strlen(type)) == 0) {
-        system("mkdir -p /userdata/camera");
-        char prefix[] = "/userdata/camera/";
-
-        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "%s%s_%lld.yuv",
-            prefix, type, GetCurrentLocalTimeStamp()) < 0) {
-            CAMERA_LOGE("%s: sprintf path failed", __func__);
-            return 0;
-        }
+        system("mkdir -p " YUV_SAVE_PATH "/preview/");
+        char prefix[] = YUV_SAVE_PATH "/preview/";
+        ret = sprintf_s(path, sizeof(path) / sizeof(path[0]), "%s%s_%lld.yuv",
+            prefix, type, GetCurrentLocalTimeStamp());
     } else {
-        system("mkdir -p /userdata/camera");
-        char prefix[] = "/userdata/camera/";
-
-        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "%s%s_%lld.jpg",
-            prefix, type, GetCurrentLocalTimeStamp()) < 0) {
-            CAMERA_LOGE("%s: sprintf path failed", __func__);
-            return 0;
-        }
+        system("mkdir -p " YUV_SAVE_PATH "/capture/");
+        char prefix[] = YUV_SAVE_PATH "/capture/";
+        ret = sprintf_s(path, sizeof(path) / sizeof(path[0]), "%s%s_%lld.jpg",
+            prefix, type, GetCurrentLocalTimeStamp());
     }
-#else
-    if (strncmp(type, "preview", strlen(type)) == 0) {
-        system("mkdir -p /data/camera/preview");
-        char prefix[] = "/data/camera/preview/";
-
-        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "%s%s_%lld.yuv",
-            prefix, type, GetCurrentLocalTimeStamp()) < 0) {
-            CAMERA_LOGE("%s: sprintf path failed", __func__);
-            return 0;
-        }
-    } else {
-        system("mkdir -p /data/camera/capture");
-        char prefix[] = "/data/camera/capture/";
-
-        if (sprintf_s(path, sizeof(path) / sizeof(path[0]), "%s%s_%lld.jpg",
-            prefix, type, GetCurrentLocalTimeStamp()) < 0) {
-            CAMERA_LOGE("%s: sprintf path failed", __func__);
-            return 0;
-        }
+    if (ret < 0) {
+        std::cout << "sprintf path failed: " << path << std::endl;
+        CAMERA_LOGE("%s: sprintf path failed", __func__);
+        return -1;
     }
-#endif
+
     std::cout << "save yuv to file:" << path << std::endl;
     int imgFd = open(path, O_RDWR | O_CREAT | O_APPEND, 00766); // 00766:file jurisdiction
     if (imgFd == -1) {
@@ -196,7 +184,7 @@ int32_t CameraHdiBaseTest::SaveYUV(const char* type, const void* buffer, int32_t
         return -1;
     }
 
-    int32_t ret = write(imgFd, buffer, size);
+    ret = write(imgFd, buffer, size);
     if (ret == -1) {
         std::cout << "write file failed, error = " << strerror(errno) << std::endl;
         close(imgFd);
