@@ -356,11 +356,6 @@ int32_t RilInterfaceImpl::GetPreferredNetwork(int32_t slotId, int32_t serialId)
     return TaskSchedule(&Telephony::HRilManager::GetPreferredNetwork, slotId, serialId);
 }
 
-int32_t RilInterfaceImpl::GetRadioCapability(int32_t slotId, int32_t serialId)
-{
-    return TaskSchedule(&Telephony::HRilManager::GetRadioCapability, slotId, serialId);
-}
-
 int32_t RilInterfaceImpl::GetPhysicalChannelConfig(int32_t slotId, int32_t serialId)
 {
     return TaskSchedule(&Telephony::HRilManager::GetPhysicalChannelConfig, slotId, serialId);
@@ -480,9 +475,14 @@ int32_t RilInterfaceImpl::SimStkIsReady(int32_t slotId, int32_t serialId)
     return TaskSchedule(&Telephony::HRilManager::SimStkIsReady, slotId, serialId);
 }
 
-int32_t RilInterfaceImpl::SetRadioProtocol(int32_t slotId, int32_t serialId, const ISimProtocolRequest &protocol)
+int32_t RilInterfaceImpl::GetRadioProtocol(int32_t slotId, int32_t serialId)
 {
-    return TaskSchedule(&Telephony::HRilManager::SetRadioProtocol, slotId, serialId, protocol);
+    return TaskSchedule(&Telephony::HRilManager::GetRadioProtocol, slotId, serialId);
+}
+
+int32_t RilInterfaceImpl::SetRadioProtocol(int32_t slotId, int32_t serialId, const IRadioProtocol &radioProtocol)
+{
+    return TaskSchedule(&Telephony::HRilManager::SetRadioProtocol, slotId, serialId, radioProtocol);
 }
 
 int32_t RilInterfaceImpl::SimOpenLogicalChannel(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2)
