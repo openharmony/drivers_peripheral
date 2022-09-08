@@ -26,6 +26,7 @@
 #define BITS_TO_FROMAT          3
 #define VOLUME_AVERAGE          2
 #define INTEGER_TO_DEC          10
+#define DECIMAL_PART            5
 
 #define CONFIG_FRAME_COUNT     ((8000 * 2 * 1 + (CONFIG_FRAME_SIZE - 1)) / CONFIG_FRAME_SIZE)
 
@@ -592,8 +593,8 @@ int32_t AudioCaptureGetVolume(AudioHandle handle, float *volume)
         return AUDIO_HAL_ERR_INTERNAL;
     }
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / VOLUME_AVERAGE);
-    int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + 5) / INTEGER_TO_DEC); // delete 0.X num
-    *volume = (float)volumeT / INTEGER_TO_DEC;                                    // get volume (0-1)
+    int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + DECIMAL_PART) / INTEGER_TO_DEC); // delete 0.X num
+    *volume = (float)volumeT / INTEGER_TO_DEC;                                               // get volume (0-1)
     return AUDIO_HAL_SUCCESS;
 }
 

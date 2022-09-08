@@ -34,6 +34,7 @@
 #define VOLUME_AVERAGE              2
 #define INTEGER_TO_DEC              10
 #define SEC_TO_MILLSEC              1000
+#define DECIMAL_PART                5
 
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount)
 {
@@ -606,8 +607,8 @@ int32_t AudioRenderGetVolume(AudioHandle handle, float *volume)
         return AUDIO_HAL_ERR_INTERNAL;
     }
     volumeTemp = (volumeTemp - volMin) / ((volMax - volMin) / VOLUME_AVERAGE);
-    int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + 5) / INTEGER_TO_DEC); // delete 0.X num
-    *volume = (float)volumeT / INTEGER_TO_DEC;                                    // get volume (0-1)
+    int volumeT = (int)((pow(INTEGER_TO_DEC, volumeTemp) + DECIMAL_PART) / INTEGER_TO_DEC); // delete 0.X num
+    *volume = (float)volumeT / INTEGER_TO_DEC;                                               // get volume (0-1)
     return AUDIO_HAL_SUCCESS;
 }
 
