@@ -162,7 +162,7 @@ HWTEST_F(OffileStreamOperatorImplTest, UTestPreviewAndSnapshotCombineCapture, Te
     streamInfos.push_back(streamInfoSnapshot);
 
     CamRetCode rc = (CamRetCode)streamOperator_->CreateStreams(streamInfos);
-    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
     std::shared_ptr<CameraMetadata> modeSetting = std::make_shared<CameraMetadata>(2, 128);
     int64_t expoTime = 0;
     modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
@@ -172,16 +172,16 @@ HWTEST_F(OffileStreamOperatorImplTest, UTestPreviewAndSnapshotCombineCapture, Te
     std::vector<uint8_t> setting;
     OHOS::Camera::MetadataUtils::ConvertMetadataToVec(modeSetting, setting);
     rc = (CamRetCode)streamOperator_->CommitStreams(NORMAL, setting);
-    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 
     std::vector<std::string> cameraIds;
-    CamRetCode ret = (CamRetCode)cameraHost_->GetCameraIds(cameraIds);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    rc = (CamRetCode)cameraHost_->GetCameraIds(cameraIds);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 
     std::vector<uint8_t> ability;
     std::string cameraId = cameraIds.front();
-    ret = (CamRetCode)cameraHost_->GetCameraAbility(cameraId, ability);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    rc = (CamRetCode)cameraHost_->GetCameraAbility(cameraId, ability);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 
     int captureId = 2020;
     CaptureInfo captureInfo = {};
@@ -189,7 +189,7 @@ HWTEST_F(OffileStreamOperatorImplTest, UTestPreviewAndSnapshotCombineCapture, Te
     captureInfo.captureSetting_ = ability;
     captureInfo.enableShutterCallback_ = false;
     rc = (CamRetCode)streamOperator_->Capture(captureId, captureInfo, true);
-    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
     sleep(5);
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<IStreamOperatorCallback> streamOperatorCallback = std::make_shared<DemoStreamOperatorCallback>();
@@ -200,21 +200,21 @@ HWTEST_F(OffileStreamOperatorImplTest, UTestPreviewAndSnapshotCombineCapture, Te
 #endif
     rc = (CamRetCode)streamOperator_->ChangeToOfflineStream({ streamInfoSnapshot.streamId_ }, streamOperatorCallback,
         offlineStreamOperator);
-    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 
     cameraDevice_->Close();
     sleep(5);
 
     std::cout << "begin to release offlne stream" << std::endl;
     rc = (CamRetCode)offlineStreamOperator->CancelCapture(2020);
-    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 
     std::vector<int> streamIds = {1202};
     rc = (CamRetCode)offlineStreamOperator->ReleaseStreams(streamIds);
-    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 
     rc = (CamRetCode)offlineStreamOperator->Release();
-    EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 
     sleep(5);
 }

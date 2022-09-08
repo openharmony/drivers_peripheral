@@ -156,7 +156,7 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     if (sampleObj == nullptr) {
         std::cout << "ICameraHost get failed." << std::endl;
     }
-    ASSERT_TRUE(sampleObj != nullptr);
+    ASSERT_NE(nullptr, sampleObj);
 
     OHOS::sptr<CameraHostCallback> callback = new CameraHostCallback();
     sampleObj->SetCallback(callback);
@@ -264,10 +264,10 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     ret = streamOperator->ChangeToOfflineStream({streamInfoSnapshot->streamId_},
             offlineOperatorCallback, offlineOperator);
     std::cout << "4streamOperator->ChangeToOfflineStream ret = " << ret << std::endl;
-    EXPECT_EQ(Camera::NO_ERROR, ret);
-    EXPECT_EQ(false, offlineOperator == nullptr);
+    ASSERT_EQ(Camera::NO_ERROR, ret);
+    ASSERT_NE(nullptr, offlineOperator);
     cameraDevice->Close();
     sleep(10);
     ret = offlineOperator->Release();
-    EXPECT_EQ(false, ret != Camera::NO_ERROR);
+    ASSERT_EQ(Camera::NO_ERROR, ret);
 }

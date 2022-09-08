@@ -33,28 +33,16 @@ void StreamOperatorImplTest::TearDownTestCase(void)
 void StreamOperatorImplTest::SetUp(void)
 {
     bool ret = InitCameraHost();
-    if (!ret) {
-        std::cout << "StreamOperatorImplTest init camerahost failed" << std::endl;
-        return;
-    }
+    ASSERT_EQ(true, ret);
 
     ret = GetCameraIds();
-    if (!ret) {
-        std::cout << "StreamOperatorImplTest init GetCameraIds failed" << std::endl;
-        return;
-    }
+    ASSERT_EQ(true, ret);
 
     ret = GetCameraDevice();
-    if (!ret) {
-        std::cout << "StreamOperatorImplTest init GetCameraDevice failed" << std::endl;
-        return;
-    }
+    ASSERT_EQ(true, ret);
 
     ret = GetStreamOperator();
-    if (!ret) {
-        std::cout << "StreamOperatorImplTest init GetStreamOperator failed" << std::endl;
-        return;
-    }
+    ASSERT_EQ(true, ret);
 }
 
 void StreamOperatorImplTest::TearDown(void)
@@ -64,10 +52,6 @@ void StreamOperatorImplTest::TearDown(void)
 
 HWTEST_F(StreamOperatorImplTest, UTestIsStreamsSupported, TestSize.Level0)
 {
-    EXPECT_EQ(false, cameraDevice_ == nullptr);
-    bool rc = GetStreamOperator();
-    EXPECT_EQ(true, rc);
-
     OperationMode mode = NORMAL;
     std::shared_ptr<CameraMetadata> modeSetting = std::make_shared<CameraMetadata>(2, 128);
     int64_t expoTime = 0;
@@ -89,7 +73,7 @@ HWTEST_F(StreamOperatorImplTest, UTestIsStreamsSupported, TestSize.Level0)
     OHOS::Camera::MetadataUtils::ConvertMetadataToVec(modeSetting, setting);
     CamRetCode ret = (CamRetCode)streamOperator_->IsStreamsSupported(
         mode, setting, infos, pType);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 }
 
 HWTEST_F(StreamOperatorImplTest, UTestCapture, TestSize.Level0)
@@ -102,7 +86,7 @@ HWTEST_F(StreamOperatorImplTest, UTestCapture, TestSize.Level0)
     streamInfo.streamId_ = 1005;
     streamInfo.width_ = 640;
     streamInfo.height_ = 480;
-    streamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
+    streamInfo.format_ = PIXEL_FMT_RGBA_8888;
     streamInfo.dataspace_ = 8;
     streamInfo.intent_ = PREVIEW;
     std::shared_ptr<StreamConsumer> previewConsumer = std::make_shared<StreamConsumer>();
@@ -122,17 +106,17 @@ HWTEST_F(StreamOperatorImplTest, UTestCapture, TestSize.Level0)
 
     CamRetCode ret = (CamRetCode)streamOperator_->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams = " << ret << std::endl;
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 
     std::vector<std::string> cameraIds;
     ret = (CamRetCode)cameraHost_->GetCameraIds(cameraIds);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 
     std::vector<uint8_t> ability;
     std::string cameraId = cameraIds.front();
     ret = (CamRetCode)cameraHost_->GetCameraAbility(cameraId, ability);
     ret = (CamRetCode)streamOperator_->CommitStreams(NORMAL, ability);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 
     int captureId = 2001;
     CaptureInfo captureInfo = {};
@@ -141,15 +125,15 @@ HWTEST_F(StreamOperatorImplTest, UTestCapture, TestSize.Level0)
     captureInfo.enableShutterCallback_ = false;
     ret = (CamRetCode)streamOperator_->Capture(captureId, captureInfo, true);
     std::cout << "streamOperator->Capture = " << ret << std::endl;
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
     sleep(1);
 
     ret = (CamRetCode)streamOperator_->CancelCapture(captureId);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 
     std::vector<int> streamIds = {1005};
     ret = (CamRetCode)streamOperator_->ReleaseStreams(streamIds);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 }
 
 HWTEST_F(StreamOperatorImplTest, UTestCreateStreams, TestSize.Level0)
@@ -203,11 +187,11 @@ HWTEST_F(StreamOperatorImplTest, UTestCreateStreams, TestSize.Level0)
 
     CamRetCode ret = (CamRetCode)streamOperator_->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams = " << ret << std::endl;
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 
     std::vector<int> streamIds = {1001, 1002};
     ret = (CamRetCode)streamOperator_->ReleaseStreams(streamIds);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 }
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
 HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
@@ -249,7 +233,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
 
     CamRetCode ret = (CamRetCode)streamOperator_->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams = " << ret << std::endl;
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 
     StreamConsumer preview_consumer;
     OHOS::sptr<OHOS::IBufferProducer> producerTemp =
@@ -258,14 +242,14 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
     });
     OHOS::sptr<BufferProducerSequenceable> bufferQueue = new BufferProducerSequenceable(producerTemp);
     ret = (CamRetCode)streamOperator_->AttachBufferQueue(streamInfo->streamId_, bufferQueue);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 
     ret = (CamRetCode)streamOperator_->DetachBufferQueue(streamInfo->streamId_);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 
     std::vector<int> streamIds = {1011, 1012};
     ret = (CamRetCode)streamOperator_->ReleaseStreams(streamIds);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 }
 #else
 HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
@@ -307,7 +291,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
 
     CamRetCode ret = (CamRetCode)streamOperator_->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams = " << ret << std::endl;
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 
     StreamConsumer preview_consumer;
     OHOS::sptr<OHOS::IBufferProducer> producerTemp =
@@ -316,13 +300,13 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
     });
     OHOS::sptr<BufferProducerSequenceable> bufferQueue = new BufferProducerSequenceable(producerTemp);
     ret = (CamRetCode)streamOperator_->AttachBufferQueue(streamInfo.streamId_, bufferQueue);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 
     ret = (CamRetCode)streamOperator_->DetachBufferQueue(streamInfo.streamId_);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 
     std::vector<int> streamIds = {1011, 1012};
     ret = (CamRetCode)streamOperator_->ReleaseStreams(streamIds);
-    EXPECT_EQ(true, ret == HDI::Camera::V1_0::NO_ERROR);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 }
 #endif
