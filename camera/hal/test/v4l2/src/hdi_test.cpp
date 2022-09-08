@@ -15,6 +15,9 @@
 
 #include "hdi_test.h"
 
+constexpr int ITEM_CAPACITY_SIZE = 100;
+constexpr int DATA_CAPACITY_SIZE = 2000;
+
 void UtestHdiTest::SetUpTestCase(void){}
 void UtestHdiTest::TearDownTestCase(void){}
 void UtestHdiTest::SetUp(void)
@@ -40,7 +43,7 @@ TEST_F(UtestHdiTest, camera_hdi_0010)
 {
     std::cout << "==========[test log] GetCameraIds([out] String[] ids)." << std::endl;
     if (display_->cameraDevice == nullptr) {
-        sleep(3);
+        sleep(3); // waiting 3s, prepare for execute GetCameraIds.
         display_->rc = display_->cameraHost->GetCameraIds(display_->cameraIds);
         EXPECT_EQ(true, display_->rc == NO_ERROR);
         EXPECT_LT(0, display_->cameraIds.size());
@@ -60,7 +63,7 @@ TEST_F(UtestHdiTest, camera_hdi_0020)
     std::cout << "==========[test log] GetCameraAbility, normal cameraId." << std::endl;
     std::shared_ptr<CameraAbility> ability;
     if (display_->cameraDevice == nullptr) {
-        sleep(3);
+        sleep(3); // waiting 3s, prepare for execute GetCameraIds.
         display_->rc = display_->cameraHost->GetCameraIds(display_->cameraIds);
         EXPECT_EQ(true, display_->rc == NO_ERROR);
         for (int i = 0; i < display_->cameraIds.size(); i++) {
@@ -85,7 +88,7 @@ TEST_F(UtestHdiTest, camera_hdi_0021)
     std::cout << "==========[test log] GetCameraAbility, abnormal cameraId = 'abc'." << std::endl;
     std::shared_ptr<CameraAbility> ability;
     if (display_->cameraDevice == nullptr) {
-        sleep(3);
+        sleep(3); // waiting 3s, prepare for execute GetCameraAbility.
         display_->rc = display_->cameraHost->GetCameraAbility(cameraId, ability);
         std::cout << "==========[test log] display_->rc ="<< display_->rc << std::endl;
         EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
@@ -105,7 +108,7 @@ TEST_F(UtestHdiTest, camera_hdi_0022)
     std::cout << "==========[test log] GetCameraAbility, abnormal cameraId = ''." << std::endl;
     std::shared_ptr<CameraAbility> ability;
     if (display_->cameraDevice == nullptr) {
-        sleep(2);
+        sleep(2); // waiting 2s, prepare for execute GetCameraAbility.
         display_->rc = display_->cameraHost->GetCameraAbility(cameraId, ability);
         std::cout << "==========[test log] display_->rc ="<< display_->rc << std::endl;
         EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
@@ -123,7 +126,7 @@ TEST_F(UtestHdiTest, camera_hdi_0030)
 {
     std::cout << "==========[test log] OpenCamera, normal cameraId."<< std::endl;
     if (display_->cameraDevice == nullptr) {
-        sleep(3);
+        sleep(3); // waiting 3s, prepare for execute GetCameraIds.
         display_->cameraHost->GetCameraIds(display_->cameraIds);
         const std::shared_ptr<ICameraDeviceCallback> callback =
             std::make_shared<ICameraDeviceCallback>();
@@ -152,7 +155,7 @@ TEST_F(UtestHdiTest, camera_hdi_0031)
     if (display_->cameraDevice == nullptr) {
         const std::shared_ptr<ICameraDeviceCallback> callback =
             std::make_shared<ICameraDeviceCallback>();
-        sleep(3);
+        sleep(3); // waiting 3s, prepare for execute OpenCamera.
         display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
         EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
     }
@@ -172,7 +175,7 @@ TEST_F(UtestHdiTest, camera_hdi_0032)
     if (display_->cameraDevice == nullptr) {
         const std::shared_ptr<ICameraDeviceCallback> callback =
             std::make_shared<ICameraDeviceCallback>();
-        sleep(3);
+        sleep(3); // waiting 3s, prepare for execute OpenCamera.
         display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
         EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
     }
@@ -192,7 +195,7 @@ TEST_F(UtestHdiTest, camera_hdi_0033)
     if (display_->cameraDevice == nullptr) {
         const std::shared_ptr<ICameraDeviceCallback> callback =
             std::make_shared<ICameraDeviceCallback>();
-        sleep(3);
+        sleep(3); // waiting 3s, prepare for execute OpenCamera.
         display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
         EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
     }
@@ -209,7 +212,7 @@ TEST_F(UtestHdiTest, camera_hdi_0034)
 {
     std::cout << "==========[test log] OpenCamera, Callback is Null."<< std::endl;
     if (display_->cameraDevice == nullptr) {
-        sleep(3);
+        sleep(3); // waiting 3s, prepare for execute GetCameraIds.
         display_->cameraHost->GetCameraIds(display_->cameraIds);
         const std::shared_ptr<ICameraDeviceCallback> callback = nullptr;
         display_->rc = display_->cameraHost->OpenCamera(display_->cameraIds.front(),
@@ -231,7 +234,7 @@ TEST_F(UtestHdiTest, camera_hdi_0035)
     std::string cameraId = "abc";
     if (display_->cameraDevice == nullptr) {
         const std::shared_ptr<ICameraDeviceCallback> callback = nullptr;
-        sleep(3);
+        sleep(3); // waiting 3s, prepare for execute OpenCamera.
         display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
         EXPECT_EQ(true, display_->rc == INVALID_ARGUMENT);
     }
@@ -247,7 +250,7 @@ TEST_F(UtestHdiTest, camera_hdi_0035)
 TEST_F(UtestHdiTest, camera_hdi_0050)
 {
     std::cout << "==========[test log] GetStreamOprator, normal callback input." << std::endl;
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for execute OpenCamera.
     display_->OpenCamera();
     display_->streamOperatorCallback = std::make_shared<IStreamOperatorCallback>();
     display_->rc = display_->cameraDevice->GetStreamOperator(display_->streamOperatorCallback,
@@ -265,7 +268,7 @@ TEST_F(UtestHdiTest, camera_hdi_0050)
 TEST_F(UtestHdiTest, camera_hdi_0051)
 {
     std::cout << "==========[test log] GetStreamOprator, normal callback input." << std::endl;
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for execute OpenCamera.
     display_->OpenCamera();
     display_->streamOperatorCallback = nullptr;
     display_->rc = display_->cameraDevice->GetStreamOperator(display_->streamOperatorCallback,
@@ -283,10 +286,10 @@ TEST_F(UtestHdiTest, camera_hdi_0051)
 TEST_F(UtestHdiTest, camera_hdi_0060)
 {
     std::cout << "==========[test log] UpdateSettings, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION." << std::endl;
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for execute OpenCamera.
     display_->OpenCamera();
     // Issue 3A parameters
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
@@ -304,10 +307,10 @@ TEST_F(UtestHdiTest, camera_hdi_0061)
 {
     std::cout << "==========[test log] UpdateSettings, ";
     std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_AUTO." << std::endl;
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for execute OpenCamera.
     display_->OpenCamera();
     // Issue 3A parameters
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_AUTO;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
@@ -325,10 +328,10 @@ TEST_F(UtestHdiTest, camera_hdi_0063)
 {
     std::cout << "==========[test log] UpdateSettings, ";
     std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_TWILIGHT." << std::endl;
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for execute OpenCamera.
     display_->OpenCamera();
     // Issue 3A parameters
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_TWILIGHT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
@@ -346,10 +349,10 @@ TEST_F(UtestHdiTest, camera_hdi_0065)
 {
     std::cout << "==========[test log] UpdateSettings, ";
     std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_FLUORESCENT." << std::endl;
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for execute OpenCamera.
     display_->OpenCamera();
     // Issue 3A parameters
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);
@@ -367,10 +370,10 @@ TEST_F(UtestHdiTest, camera_hdi_0066)
 {
     std::cout << "==========[test log] UpdateSettings, ";
     std::cout << "OHOS_CAMERA_AWB_MODE:OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT." << std::endl;
-    sleep(3);
+    sleep(3); // waiting 3s, prepare for execute OpenCamera.
     display_->OpenCamera();
     // Issue 3A parameters
-    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
     uint8_t awbMode = OHOS_CAMERA_AWB_MODE_WARM_FLUORESCENT;
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->rc = display_->cameraDevice->UpdateSettings(meta);

@@ -49,11 +49,11 @@ TEST_F(UtestUSBCameraTest, camera_usb_0001)
         std::cout << "==========[test log] cameraId = " << cameraId << std::endl;
     }
     std::cout << "==========[test log] 2. please add or delete the usb camera, wait for 10s..."<< std::endl;
-    sleep(10);
+    sleep(10); // judging add or delete the usb camera, wait for 10s.
     std::cout << "==========[test log] r u ready? wait for 10s..."<< std::endl;
-    sleep(10);
-    std::cout << "==========[test log] 3. check zhe cameraID again... wait for 10s..."<< std::endl;
-    sleep(10);
+    sleep(10); // judging r u ready, wait for 10s.
+    std::cout << "==========[test log] 3. check the cameraID again... wait for 10s..."<< std::endl;
+    sleep(10); // checking the cameraID again, wait for 10s.
     std::cout << "==========[test log] Second cameraId.size = " << cameraIds.size() << std::endl;
     if (cameraIds.size() == 1) {
         cameraIds.clear();

@@ -20,6 +20,9 @@
 #include "enumerator_manager.h"
 #include "project_hardware.h"
 
+constexpr int ITEM_CAPACITY_SIZE = 30;
+constexpr int DATA_CAPACITY_SIZE = 2000;
+
 namespace OHOS::Camera {
 IMPLEMENT_DEVICEMANAGER(V4L2DeviceManager)
 V4L2DeviceManager::V4L2DeviceManager() {}
@@ -340,8 +343,8 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
             physicalSize.push_back((*iter).fmtdesc.width);
             physicalSize.push_back((*iter).fmtdesc.height);
         }
-        std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(30,
-            2000);
+        std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, 
+            DATA_CAPACITY_SIZE);
         meta->addEntry(OHOS_SENSOR_INFO_PHYSICAL_SIZE, physicalSize.data(), physicalSize.size());
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
 
@@ -356,7 +359,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
             if ((*iter).hardwareName == hardwareName) {
                 std::shared_ptr<CameraMetadata> meta =
-                    std::make_shared<CameraMetadata>(30, 2000);
+                    std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
                 uvcCb_(meta, uvcState, id);
                 hardwareList_.erase(iter);
                 break;
