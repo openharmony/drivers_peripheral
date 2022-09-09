@@ -13,11 +13,12 @@
  * limitations under the License.
  */
 
-#include "usbd_request_test.h"
 #include <iostream>
 #include <vector>
-#include "hdf_log.h"
+
 #include "UsbSubscriberTest.h"
+#include "hdf_log.h"
+#include "usbd_request_test.h"
 #include "v1_0/iusb_interface.h"
 #include "v1_0/usb_types.h"
 
@@ -42,7 +43,7 @@ using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
 
 namespace {
-    sptr<IUsbInterface> g_usbInterface = nullptr;
+sptr<IUsbInterface> g_usbInterface = nullptr;
 }
 
 struct UsbDev UsbdRequestTest::dev_ = {0, 0};

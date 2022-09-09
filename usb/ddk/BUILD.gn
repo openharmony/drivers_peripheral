@@ -15,6 +15,10 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/usb/usb.gni")
 
+config("libusbhost_acm_rawapi_all_dependent_config") {
+  include_dirs = [ "//drivers/hdf_core/adapter/uhdf2/include/host" ]
+}
+
 USB_HAL_PATH =
     rebase_path("//vendor/${product_company}/${product_name}/hals/usb")
 cmd = "if [ -f $USB_HAL_PATH/product.gni ]; then echo true; else echo false; fi"
@@ -62,10 +66,10 @@ ohos_shared_library("libusb_ddk_host") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
+    all_dependent_configs = [ ":libusbhost_acm_rawapi_all_dependent_config" ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -125,6 +129,7 @@ ohos_shared_library("libusb_ddk_device") {
     "//drivers/peripheral/usb/interfaces/ddk/device",
     "//drivers/peripheral/usb/interfaces/ddk/host",
   ]
+
   sources = [
     "device/src/adapter_if.c",
     "device/src/usbfn_cfg_mgr.c",
