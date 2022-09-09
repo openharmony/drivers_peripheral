@@ -16,7 +16,7 @@
 #include "codec_callback_type_stub.h"
 #include <dlfcn.h>
 #include <hdf_base.h>
-#include <hdf_device_desc.h>
+#include <hdf_dlist.h>
 #include <hdf_log.h>
 #include <hdf_remote_service.h>
 #include <osal_mem.h>
