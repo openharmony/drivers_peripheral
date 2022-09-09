@@ -504,7 +504,7 @@ TEST_F(VblankTest, CtrlTest)
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "WaitVblank timeout";
     ret = display->SetDisplayVsyncEnabled(false);
     ASSERT_TRUE(ret == DISPLAY_SUCCESS) << "SetDisplayVsyncEnabled failed";
-    usleep(100 * 1000);                              // wait for 100ms avoid the last vsync.
+    usleep(100 * 1000);            // wait for 100ms avoid the last vsync.
     ret = VblankCtr::GetInstance().WaitVblank(1000); // 1000ms
     ASSERT_TRUE(ret != DISPLAY_SUCCESS) << "vblank do not disable";
 }
