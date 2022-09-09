@@ -24,12 +24,10 @@
 #include "securec.h"
 
 namespace OHOS::Camera {
-static const unsigned int IMAGE_DATA_OFFSET = 20; 
+static const unsigned int IMAGE_DATA_OFFSET = 20;
 
-// Raw exif header data 
-static const unsigned char EXIF_HEADER[] = { 
-    0xff, 0xd8, 0xff, 0xe1
-};
+// Raw exif header data
+static const unsigned char EXIF_HEADER[] = {0xff, 0xd8, 0xff, 0xe1};
 
 static const unsigned int EXIF_HEADER_LENGTH = sizeof(EXIF_HEADER);
 
