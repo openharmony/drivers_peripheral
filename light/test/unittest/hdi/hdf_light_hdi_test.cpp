@@ -113,9 +113,27 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight001, TestSize.Level1)
         EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
-        effect.lightBrightness = 0x00800000;
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 0;
+        effect.lightColor.colorValue.rgbColor.b = 0;
         effect.flashEffect.flashMode = HDF_LIGHT_FLASH_NONE;
-        int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
+        ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        OsalSleep(g_sleepTime);
+        ret = g_lightInterface->TurnOffLight(iter.lightId);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+
+        effect.lightColor.colorValue.rgbColor.r = 0;
+        effect.lightColor.colorValue.rgbColor.g = 255;
+        ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        OsalSleep(g_sleepTime);
+        ret = g_lightInterface->TurnOffLight(iter.lightId);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+
+        effect.lightColor.colorValue.rgbColor.b = 255;
+        effect.lightColor.colorValue.rgbColor.g = 0;
+        ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
         EXPECT_EQ(HDF_SUCCESS, ret);
         OsalSleep(g_sleepTime);
         ret = g_lightInterface->TurnOffLight(iter.lightId);
@@ -144,10 +162,33 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight002, TestSize.Level1)
         EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
-        effect.lightBrightness = 0x00800000;
-        effect.flashEffect.flashMode = HDF_LIGHT_FLASH_BUTT;
-        int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
-        EXPECT_EQ(LIGHT_NOT_FLASH, ret);
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 0;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        effect.flashEffect.flashMode = HDF_LIGHT_FLASH_BLINK;
+        effect.flashEffect.onTime = ON_TIME;
+        effect.flashEffect.offTime = OFF_TIME;
+        ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        OsalSleep(g_sleepTime);
+        ret = g_lightInterface->TurnOffLight(iter.lightId);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+
+        effect.lightColor.colorValue.rgbColor.r = 0;
+        effect.lightColor.colorValue.rgbColor.g = 255;
+        ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        OsalSleep(g_sleepTime);
+        ret = g_lightInterface->TurnOffLight(iter.lightId);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+
+        effect.lightColor.colorValue.rgbColor.b = 255;
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
+        EXPECT_EQ(HDF_SUCCESS, ret);
+        OsalSleep(g_sleepTime);
+        ret = g_lightInterface->TurnOffLight(iter.lightId);
+        EXPECT_EQ(HDF_SUCCESS, ret);
     }
 }
 
@@ -158,6 +199,29 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight002, TestSize.Level1)
   * @tc.require: #I4NN4Z
   */
 HWTEST_F(HdfLightHdiTest, TurnOnLight003, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    uint32_t lightId = LIGHT_ID_BUTT;
+    HdfLightEffect effect;
+    effect.lightColor.colorValue.rgbColor.r = 255;
+    effect.lightColor.colorValue.rgbColor.g = 0;
+    effect.lightColor.colorValue.rgbColor.b = 0;
+    effect.flashEffect.flashMode = HDF_LIGHT_FLASH_BLINK;
+    effect.flashEffect.onTime = ON_TIME;
+    effect.flashEffect.offTime = OFF_TIME;
+
+    int32_t ret = g_lightInterface->TurnOnLight(lightId, effect);
+    EXPECT_EQ(LIGHT_NOT_SUPPORT, ret);
+}
+
+/**
+  * @tc.name: TurnOnLight004
+  * @tc.desc: TurnOnLight.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiTest, TurnOnLight004, TestSize.Level1)
 {
     ASSERT_NE(nullptr, g_lightInterface);
 
@@ -172,16 +236,73 @@ HWTEST_F(HdfLightHdiTest, TurnOnLight003, TestSize.Level1)
         EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
 
         HdfLightEffect effect;
-        effect.lightBrightness = 0x00800000;
-        effect.flashEffect.flashMode = HDF_LIGHT_FLASH_TIMED;
+        effect.lightColor.colorValue.rgbColor.r = 255;
+        effect.lightColor.colorValue.rgbColor.g = 0;
+        effect.lightColor.colorValue.rgbColor.b = 0;
+        effect.flashEffect.flashMode = HDF_LIGHT_FLASH_BUTT;
         effect.flashEffect.onTime = ON_TIME;
         effect.flashEffect.offTime = OFF_TIME;
-        int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        OsalSleep(g_sleepTime);
-        ret = g_lightInterface->TurnOffLight(iter.lightId);
+        ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
+        EXPECT_EQ(LIGHT_NOT_FLASH, ret);
+    }
+}
+
+/**
+  * @tc.name: TurnOnMultiLights001
+  * @tc.desc: TurnOnMultiLights.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiTest, TurnOnMultiLights001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    std::vector<HdfLightInfo> info;
+    int32_t ret = g_lightInterface->GetLightInfo(info);
+    EXPECT_EQ(0, ret);
+    printf("get light list num[%zu]\n\r", info.size());
+
+    for (auto iter : info)
+    {
+        EXPECT_GE(iter.lightId, MIN_LIGHT_ID);
+        EXPECT_LE(iter.lightId, MAX_LIGHT_ID);
+
+        std::vector<HdfLightColor> lightColor;
+        struct HdfLightColor light;
+        light.colorValue.rgbColor.r = 255;
+        light.colorValue.rgbColor.g = 0;
+        light.colorValue.rgbColor.b = 0;
+        lightColor.push_back(light);
+
+        ret = g_lightInterface->TurnOnMultiLights(iter.lightId, lightColor);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
+}
+
+/**
+  * @tc.name: TurnOnMultiLights002
+  * @tc.desc: TurnOnMultiLights.
+  * @tc.type: FUNC
+  * @tc.require: #I4NN4Z
+  */
+HWTEST_F(HdfLightHdiTest, TurnOnMultiLights002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_lightInterface);
+
+    uint32_t lightId = LIGHT_ID_BUTT;
+    std::vector<HdfLightColor> lightColor;
+    struct HdfLightColor light;
+    light.colorValue.rgbColor.r = 255;
+    light.colorValue.rgbColor.g = 0;
+    light.colorValue.rgbColor.b = 0;
+    std::vector<HdfLightInfo> info;
+    lightColor.push_back(light);
+    int32_t ret = g_lightInterface->GetLightInfo(info);
+    EXPECT_EQ(0, ret);
+    printf("get light list num[%zu]\n\r", info.size());
+
+    ret = g_lightInterface->TurnOnMultiLights(lightId, lightColor);
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
 }
 
 /**
