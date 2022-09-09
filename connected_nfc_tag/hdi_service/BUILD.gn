@@ -20,12 +20,12 @@ ohos_shared_library("libconnected_nfc_tag_service_1.0") {
   sources = [ "connected_nfc_tag_impl.cpp" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_connected_nfc_tag:connected_nfc_tag_idl_headers",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 
   install_images = [ chipset_base_dir ]
@@ -43,12 +43,12 @@ ohos_shared_library("connected_nfc_tag_hdi_driver") {
   ]
 
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 
   install_images = [ chipset_base_dir ]
