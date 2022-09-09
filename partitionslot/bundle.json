@@ -19,7 +19,7 @@
     "deps": {
       "components": [
         "ipc",
-        "utils_base",
+        "c_utils",
         "base",
         "hdf_core",
         "libhilog",
