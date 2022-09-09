@@ -96,7 +96,7 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const st
     int32_t ret = AudioProxyDispatchCall(manager->remote, AUDIO_HDI_MGR_LOAD_ADAPTER, data, reply);
     if (ret < 0) {
         AudioProxyBufReplyRecycle(data, reply);
-        AudioMemFree((void **)&hwAdapter);
+        AudioMemFree(reinterpret_cast<void **>(&hwAdapter));
         return ret;
     }
     hwAdapter->common.InitAllPorts = AudioProxyAdapterInitAllPorts;
@@ -131,7 +131,7 @@ void AudioProxyManagerUnloadAdapter(const struct AudioProxyManager *manager, con
             }
             i++;
         }
-        AudioMemFree((void **)&hwAdapter->portCapabilitys);
+        AudioMemFree(reinterpret_cast<void **>(const_cast<AudioPortAndCapability **>(&hwAdapter->portCapabilitys)));
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) == AUDIO_HAL_SUCCESS) {
         adapterName = hwAdapter->adapterDescriptor.adapterName;
@@ -147,7 +147,7 @@ void AudioProxyManagerUnloadAdapter(const struct AudioProxyManager *manager, con
         }
         AudioProxyBufReplyRecycle(data, reply);
     }
-    AudioMemFree((void **)&adapter);
+    AudioMemFree(reinterpret_cast<void **>(const_cast<AudioAdapter **>(&adapter)));
     return;
 }
 
