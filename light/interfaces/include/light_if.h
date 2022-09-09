@@ -84,6 +84,20 @@ struct LightInterface {
     int32_t (*TurnOnLight)(uint32_t lightId, struct LightEffect *effect);
 
     /**
+     * @brief Turn on multiple sub-lights contained in the corresponding light according to the specified light ID.
+     *
+     * @param lightId Indicates the light id. For details, see {@link HdfLightId}.
+     *
+     * @param colors Color and brightness corresponding to multiple lights, see {@link LightColor}.
+     *
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns negative value if the get failed.
+     *
+     * @since 3.2
+     */
+    int32_t (*TurnOnMultiLights)(uint32_t lightId, const struct LightColor *colors, const uint32_t count);
+
+    /**
      * @brief Turns off available lights in the list based on the specified light id.
      *
      * @param lightId Indicates the light id. For details, see {@link LightId}.

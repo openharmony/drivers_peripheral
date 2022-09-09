@@ -15,6 +15,7 @@
 
 #include "light_controller.h"
 #include <fcntl.h>
+#include <securec.h>
 #include <stdio.h>
 #include "hdf_base.h"
 #include "hdf_dlist.h"
@@ -26,6 +27,8 @@
 
 #define HDF_LOG_TAG           uhdf_light
 #define LIGHT_SERVICE_NAME    "hdf_light"
+
+#define MULTI_LIGHT_MAX_NUMBER    48
 
 static struct LightDevice *GetLightDevicePriv(void)
 {
@@ -60,9 +63,8 @@ static int32_t SendLightMsg(uint32_t cmd, struct HdfSBuf *msg, struct HdfSBuf *r
 
 static int32_t ReadLightInfo(struct HdfSBuf *reply, struct LightDevice *priv)
 {
-    uint32_t len;
     struct LightInfo *pos = NULL;
-    struct LightInfo *buf = NULL;
+    const char *name = NULL;
 
     if (!HdfSbufReadUint32(reply, &priv->lightNum)) {
         HDF_LOGE("%s: sbuf read lightNum failed", __func__);
@@ -83,12 +85,26 @@ static int32_t ReadLightInfo(struct HdfSBuf *reply, struct LightDevice *priv)
     pos = priv->lightInfoEntry;
 
     for (uint32_t i = 0; i < priv->lightNum; ++i) {
-        if (!HdfSbufReadBuffer(reply, (const void **)&buf, &len)) {
+        if (!HdfSbufReadUint32(reply, &pos->lightId)) {
+            HDF_LOGE("%{public}s:read lightId failed!", __func__);
             return HDF_FAILURE;
         }
 
-        pos->lightId = buf->lightId;
-        pos->reserved = buf->reserved;
+        name = HdfSbufReadString(reply);
+        if (strcpy_s(pos->lightName, NAME_MAX_LEN, name) != EOK) {
+            HDF_LOGE("%{public}s:copy lightName failed!", __func__);
+            return HDF_FAILURE;
+        }
+
+        if (!HdfSbufReadUint32(reply, &pos->lightNumber)) {
+            HDF_LOGE("%{public}s:read lightNumber failed!", __func__);
+            return HDF_FAILURE;
+        }
+
+        if (!HdfSbufReadInt32(reply, &pos->reserved)) {
+            HDF_LOGE("%{public}s:read reserved failed!", __func__);
+            return HDF_FAILURE;
+        }
         pos++;
     }
 
@@ -141,19 +157,19 @@ static int32_t GetLightInfo(struct LightInfo **lightInfo, uint32_t *count)
     return HDF_SUCCESS;
 }
 
-static int32_t ValidityJudgment(uint32_t lightId, struct LightEffect *effect)
+static int32_t OnLightValidityJudgment(uint32_t lightId, struct LightEffect *effect)
 {
     if (lightId >= LIGHT_ID_BUTT) {
         HDF_LOGE("%{public}s: id not supported", __func__);
         return LIGHT_NOT_SUPPORT;
     }
 
-    if (effect->flashEffect.flashMode > LIGHT_FLASH_TIMED) {
+    if (effect->flashEffect.flashMode > LIGHT_FLASH_BLINK) {
         HDF_LOGE("%{public}s: flashMode not supported", __func__);
         return LIGHT_NOT_FLASH;
     }
 
-    if ((effect->flashEffect.flashMode == LIGHT_FLASH_TIMED) && (effect->flashEffect.onTime == 0 ||
+    if ((effect->flashEffect.flashMode == LIGHT_FLASH_BLINK) && (effect->flashEffect.onTime == 0 ||
         effect->flashEffect.offTime == 0)) {
         HDF_LOGE("%{public}s: flashMode not supported", __func__);
         return LIGHT_NOT_FLASH;
@@ -171,7 +187,7 @@ static int32_t OnLight(uint32_t lightId, struct LightEffect *effect)
         return HDF_FAILURE;
     }
 
-    ret = ValidityJudgment(lightId, effect);
+    ret = OnLightValidityJudgment(lightId, effect);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: effect is false", __func__);
         return ret;
@@ -216,6 +232,87 @@ static int32_t OnLight(uint32_t lightId, struct LightEffect *effect)
     (void)OsalMutexUnlock(&priv->mutex);
 
     return ret;
+}
+
+static int32_t OnMultiLightsValidityJudgment(uint32_t lightId, const struct LightColor *colors, const uint32_t count)
+{
+    if (lightId >= LIGHT_ID_BUTT) {
+        HDF_LOGE("%{public}s: id not supported", __func__);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+
+    if (colors == NULL) {
+        HDF_LOGE("%{public}s: colors is nullptr", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (count == 0 || count > MULTI_LIGHT_MAX_NUMBER) {
+        HDF_LOGE("%{public}s: count out of range", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t OnMultiLights(uint32_t lightId, const struct LightColor *colors, const uint32_t count)
+{
+    int32_t ret;
+
+    ret = OnMultiLightsValidityJudgment(lightId, colors, count);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: effect is false", __func__);
+        return ret;
+    }
+
+    struct LightDevice *priv = GetLightDevicePriv();
+    (void)OsalMutexLock(&priv->mutex);
+
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
+    if (sBuf == NULL) {
+        HDF_LOGE("%{public}s: Failed to obtain sBuf", __func__);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return HDF_DEV_ERR_NO_MEMORY;
+    }
+
+    struct HdfSBuf *msg = HdfSbufBind((uintptr_t)HdfSbufGetData(sBuf), sizeof(struct LightColor) * count);
+
+    if (msg == NULL) {
+        HDF_LOGE("%{public}s: Failed to obtain msg", __func__);
+        HdfSbufRecycle(sBuf);
+        (void)OsalMutexUnlock(&priv->mutex);
+        return HDF_DEV_ERR_NO_MEMORY;
+    }
+
+    if (!HdfSbufWriteInt32(msg, lightId)) {
+        HDF_LOGE("%{public}s: Light write id failed", __func__);
+        goto EXIT;
+    }
+
+    if (!HdfSbufWriteInt32(msg, LIGHT_OPS_IO_CMD_ENABLE_MULTI_LIGHTS)) {
+        HDF_LOGE("%{public}s: Light write cmd failed", __func__);
+        goto EXIT;
+    }
+
+    if (!HdfSbufWriteBuffer(msg, colors, sizeof(*colors))) {
+        HDF_LOGE("%{public}s: Light write buf failed", __func__);
+        goto EXIT;
+    }
+
+    if (!HdfSbufWriteInt32(msg, count)) {
+        HDF_LOGE("%{public}s: Light write count failed", __func__);
+        goto EXIT;
+    }
+
+    ret = SendLightMsg(LIGHT_IO_CMD_OPS, msg, NULL);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: Light enable failed, ret[%{public}d]", __func__, ret);
+    }
+EXIT:
+    HdfSbufRecycle(msg);
+    HdfSbufRecycle(sBuf);
+    (void)OsalMutexUnlock(&priv->mutex);
+
+    return HDF_FAILURE;
 }
 
 static int32_t OffLight(uint32_t lightId)
@@ -272,6 +369,7 @@ const struct LightInterface *NewLightInterfaceInstance(void)
     lightDevInstance.GetLightInfo = GetLightInfo;
     lightDevInstance.TurnOnLight = OnLight;
     lightDevInstance.TurnOffLight = OffLight;
+    lightDevInstance.TurnOnMultiLights = OnMultiLights;
 
     priv->ioService = HdfIoServiceBind(LIGHT_SERVICE_NAME);
     if (priv->ioService == NULL) {
