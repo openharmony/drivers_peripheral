@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
-#include "usbd_transfer_test.h"
 #include <iostream>
 #include <vector>
-#include "hdf_log.h"
+
 #include "UsbSubscriberTest.h"
-#include "v1_0/usb_types.h"
+#include "hdf_log.h"
+#include "usbd_transfer_test.h"
 #include "v1_0/iusb_interface.h"
+#include "v1_0/usb_types.h"
 
 const int SLEEP_TIME = 3;
 uint8_t BUS_NUM_1 = 0;
@@ -39,7 +40,7 @@ using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
 
 namespace {
-    sptr<IUsbInterface> g_usbInterface = nullptr;
+sptr<IUsbInterface> g_usbInterface = nullptr;
 }
 
 struct UsbDev UsbdTransferTest::dev_ = {0, 0};
@@ -67,8 +68,7 @@ void UsbdTransferTest::SetUpTestCase(void)
 
     std::cout << "please connect device, press enter to continue" << std::endl;
     int c;
-    while ((c = getchar()) != '\n' && c != EOF) {
-    }
+    while ((c = getchar()) != '\n' && c != EOF) {}
 
     dev_ = {subscriber->busNum_, subscriber->devAddr_};
     ret = g_usbInterface->OpenDevice(dev_);
@@ -786,7 +786,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead001, TestSize.Level1)
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead001 %{public}d UsbdInterruptTransferRead=%{public}d", __LINE__,
-             ret);
+        ret);
     ASSERT_EQ(0, ret);
 }
 
@@ -811,7 +811,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead002, TestSize.Level1)
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead002 %{public}d UsbdInterruptTransferRead=%{public}d", __LINE__,
-             ret);
+        ret);
     ASSERT_NE(ret, 0);
 }
 
@@ -859,7 +859,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead004, TestSize.Level1)
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead004 %{public}d UsbdInterruptTransferRead=%{public}d", __LINE__,
-             ret);
+        ret);
     ASSERT_NE(ret, 0);
 }
 
@@ -884,7 +884,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead005, TestSize.Level1)
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead005 %{public}d UsbdInterruptTransferRead=%{public}d", __LINE__,
-             ret);
+        ret);
     ASSERT_NE(ret, 0);
 }
 
@@ -907,8 +907,8 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite001, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
-    HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite001 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
-             ret);
+    HDF_LOGI(
+        "UsbdTransferTest::UsbdInterruptTransferWrite001 %{public}d InterruptTransferWrite=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
 
@@ -932,8 +932,8 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite002, TestSize.Level1)
     uint8_t buffer[100] = "hello world Interrupt writ02";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
-    HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite002 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
-             ret);
+    HDF_LOGI(
+        "UsbdTransferTest::UsbdInterruptTransferWrite002 %{public}d InterruptTransferWrite=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
 }
 
@@ -957,8 +957,8 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite003, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointid};
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
-    HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite003 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
-             ret);
+    HDF_LOGI(
+        "UsbdTransferTest::UsbdInterruptTransferWrite003 %{public}d InterruptTransferWrite=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
 }
 
@@ -982,8 +982,8 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite004, TestSize.Level1)
     uint8_t buffer[100] = "hello world Interrupt writ04";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
-    HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite004 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
-             ret);
+    HDF_LOGI(
+        "UsbdTransferTest::UsbdInterruptTransferWrite004 %{public}d InterruptTransferWrite=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
 }
 
@@ -1007,8 +1007,8 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite005, TestSize.Level1)
     uint8_t buffer[100] = "hello world Interrupt writ05";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
-    HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite005 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
-             ret);
+    HDF_LOGI(
+        "UsbdTransferTest::UsbdInterruptTransferWrite005 %{public}d InterruptTransferWrite=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
 }
 
@@ -1033,8 +1033,8 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite006, TestSize.Level1)
     uint8_t buffer[100] = "hello world Interrupt writ06";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
-    HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite006 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
-             ret);
+    HDF_LOGI(
+        "UsbdTransferTest::UsbdInterruptTransferWrite006 %{public}d InterruptTransferWrite=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
 }
 
@@ -1057,8 +1057,8 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite007, TestSize.Level1)
     uint8_t buffer[100] = "hello world Interrupt writ07";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferWrite(dev, pipe, 1000, bufferdata);
-    HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite007 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
-             ret);
+    HDF_LOGI(
+        "UsbdTransferTest::UsbdInterruptTransferWrite007 %{public}d InterruptTransferWrite=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
 }
 
@@ -1081,8 +1081,8 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite008, TestSize.Level1)
     uint8_t buffer[100] = "hello world Interrupt writ08";
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->InterruptTransferWrite(dev, pipe, -1, bufferdata);
-    HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferWrite008 %{public}d InterruptTransferWrite=%{public}d", __LINE__,
-             ret);
+    HDF_LOGI(
+        "UsbdTransferTest::UsbdInterruptTransferWrite008 %{public}d InterruptTransferWrite=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
 

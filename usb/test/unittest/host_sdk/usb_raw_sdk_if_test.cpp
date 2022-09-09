@@ -234,11 +234,8 @@ static void AcmNotifyReqCallback(const void *requestArg)
         return;
     }
     struct AcmDevice *acm = static_cast<struct AcmDevice *>(req->userData);
-    if (acm == nullptr) {
-        return;
-    }
     struct UsbCdcNotification *dr = reinterpret_cast<struct UsbCdcNotification *>(req->buffer);
-    if (dr == nullptr) {
+    if (acm == nullptr || dr == nullptr) {
         return;
     }
     unsigned int currentSize = req->actualLength;
