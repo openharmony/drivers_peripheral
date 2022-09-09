@@ -48,7 +48,7 @@ public:
 
 static uint32_t U32_AT(const uint8_t *ptr)
 {
-    // 24, 16 and 8 respectively represent the shift lengths of ptr under different indexes (0, 1 and 2)
+    // 24, 16 and 8 represent the shift lengths of ptr for different indexes (0, 1, 2), index 3 needn't move.
     return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
 }
 
