@@ -76,7 +76,6 @@ ohos_shared_library("hdi_audio_bluetooth") {
     "$hdf_uhdf_path/utils:libhdf_utils",
     "${samgr_dir}/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//foundation/communication/bluetooth/services/bluetooth/ipc:btipc_static",
-    "//utils/native/base:utils",
   ]
 
   if (is_standard_system) {
@@ -84,7 +83,10 @@ ohos_shared_library("hdi_audio_bluetooth") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "ipc:ipc_single" ]
+  external_deps += [
+    "c_utils:utils",
+    "ipc:ipc_single",
+  ]
 
   public_configs = [ ":hdi_audio_config" ]
 
