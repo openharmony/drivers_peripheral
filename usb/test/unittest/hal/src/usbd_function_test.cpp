@@ -12,13 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "usbd_function_test.h"
+
 #include <iostream>
+
 #include "hdf_log.h"
 #include "if_system_ability_manager.h"
 #include "system_ability_definition.h"
-#include "v1_0/usb_types.h"
+#include "usbd_function_test.h"
 #include "v1_0/iusb_interface.h"
+#include "v1_0/usb_types.h"
 
 const int SLEEP_TIME = 3;
 const int TEST_PORT_ID = 1;
@@ -34,7 +36,7 @@ using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
 
 namespace {
-    sptr<IUsbInterface> g_usbInterface = nullptr;
+sptr<IUsbInterface> g_usbInterface = nullptr;
 }
 
 void UsbdFunctionTest::SetUpTestCase(void)
