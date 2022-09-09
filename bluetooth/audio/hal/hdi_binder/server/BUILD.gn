@@ -58,7 +58,6 @@ ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
     "$hdf_uhdf_path/host:libhdf_host",
     "$hdf_uhdf_path/utils:libhdf_utils",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough:hdi_audio_bluetooth",
-    "//utils/native/base:utils",
   ]
 
   defines = []
@@ -67,6 +66,7 @@ ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "c_utils:utils" ]
 
   public_configs = [ ":hdi_service_config" ]
 
