@@ -22,9 +22,9 @@ ohos_source_set("partitionslot_source") {
   sources = [ "src/partitionslot_manager.cpp" ]
   public_configs = [ ":exported_header_files" ]
   external_deps = [
+    "c_utils:utils",
     "hiviewdfx_hilog_native:libhilog",
     "init:libbegetutil",
-    "utils_base:utils",
   ]
 }
 
