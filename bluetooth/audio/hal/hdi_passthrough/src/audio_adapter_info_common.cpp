@@ -170,14 +170,14 @@ static void AudioAdapterJudegReleaseDescs(const struct AudioAdapterDescriptor *d
     }
 
     if (desc->adapterName != NULL) {
-        AudioMemFree((void **)&desc->adapterName);
+        AudioMemFree(reinterpret_cast<void **>(const_cast<char **>(&desc->adapterName)));
     }
 
     if (desc->ports != NULL) {
         portIdx = 0;
         if (desc->portNum <= 0 || desc->portNum > SUPPORT_PORT_NUM_MAX) {
             HDF_LOGE("desc->portNum error!\n");
-            AudioMemFree((void **)&desc->ports);
+            AudioMemFree(reinterpret_cast<void **>(const_cast<AudioPort **>(&desc->ports)));
 
             return;
         }
@@ -188,7 +188,7 @@ static void AudioAdapterJudegReleaseDescs(const struct AudioAdapterDescriptor *d
             }
             portIdx++;
         }
-        AudioMemFree((void **)&desc->ports);
+        AudioMemFree(reinterpret_cast<void **>(const_cast<AudioPort **>(&desc->ports)));
     }
 }
 
@@ -209,7 +209,7 @@ static void AudioAdapterReleaseDescs(const struct AudioAdapterDescriptor *descs,
         adapterIdx++;
     }
 
-    AudioMemFree((void **)&descs);
+    AudioMemFree(reinterpret_cast<void **>(const_cast<AudioAdapterDescriptor **>(&descs)));
 }
 
 static int32_t AudioAdapterGetDir(const char *dir)
@@ -298,7 +298,7 @@ static int32_t AudioAdapterParsePort(struct AudioPort *info, const cJSON *port)
 
         return ret;
     }
-    info->portName = (char *)calloc(1, PORT_NAME_LEN);
+    info->portName = static_cast<char *>(calloc(1, PORT_NAME_LEN));
     if (info->portName == NULL) {
         HDF_LOGE("Out of memory\n");
 
@@ -390,7 +390,7 @@ static int32_t AudioAdapterParseAdapter(struct AudioAdapterDescriptor *desc,
         return ret;
     }
 
-    desc->adapterName = (char *)calloc(1, ADAPTER_NAME_LEN);
+    desc->adapterName = static_cast<char *>(calloc(1, ADAPTER_NAME_LEN));
     if (desc->adapterName == NULL) {
         HDF_LOGE("Out of memory!\n");
 
@@ -451,7 +451,7 @@ static char *AudioAdaptersGetConfig(const char *fpath)
     if (fread(pJsonStr, jsonStrSize, 1, fp) != 1) {
         HDF_LOGE("read to file fail!");
         fclose(fp);
-        AudioMemFree((void **)&pJsonStr);
+        AudioMemFree(reinterpret_cast<void **>(&pJsonStr));
         return NULL;
     }
     if (fclose(fp) != 0) {
@@ -468,10 +468,10 @@ cJSON *AudioAdaptersGetConfigToJsonObj(const char *fpath)
     }
     cJSON *cJsonObj = cJSON_Parse(pJsonStr);
     if (cJsonObj == NULL) {
-        AudioMemFree((void **)&pJsonStr);
+        AudioMemFree(reinterpret_cast<void **>(&pJsonStr));
         return NULL;
     }
-    AudioMemFree((void **)&pJsonStr);
+    AudioMemFree(reinterpret_cast<void **>(&pJsonStr));
     cJSON *adapterNum = cJSON_GetObjectItem(cJsonObj, "adapterNum");
     if (adapterNum == NULL) {
         cJSON_Delete(cJsonObj);

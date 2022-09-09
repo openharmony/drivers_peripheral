@@ -73,7 +73,7 @@ int32_t AudioRenderStop(AudioHandle handle)
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (hwRender->renderParam.frameRenderMode.buffer != NULL) {
-        AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
+        AudioMemFree(reinterpret_cast<void **>(&hwRender->renderParam.frameRenderMode.buffer));
     } else {
         HDF_LOGE("Repeat invalid stop operation!");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
