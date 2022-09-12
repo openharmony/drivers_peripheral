@@ -15,20 +15,9 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/usb/usb.gni")
 
-USB_HAL_PATH =
-    rebase_path("//vendor/${product_company}/${product_name}/hals/usb")
-cmd = "if [ -f $USB_HAL_PATH/product.gni ]; then echo true; else echo false; fi"
-HAVE_USB_HAL_PATH =
-    exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
-if (HAVE_USB_HAL_PATH) {
-  import("$USB_HAL_PATH/product.gni")
-} else {
-  enable_linux_native_mode = false
-}
-
 config("usbd_private_config") {
   include_dirs = []
-  if (enable_linux_native_mode) {
+  if (drivers_peripheral_usb_feature_linux_native_model) {
     if (defined(defines)) {
       defines += [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
     } else {
