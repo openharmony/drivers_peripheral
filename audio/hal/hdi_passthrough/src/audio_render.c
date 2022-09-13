@@ -257,7 +257,7 @@ int32_t AudioRenderGetFrameSize(AudioHandle handle, uint64_t *size)
         AUDIO_FUNC_LOGE("FormatToBits failed! ret = %{public}d", ret);
         return ret;
     }
-    *size = FRAME_SIZE * channelCount * (formatBits >> 3);
+    *size = FRAME_SIZE * channelCount * (formatBits >> BITS_TO_FROMAT);
     return AUDIO_HAL_SUCCESS;
 }
 

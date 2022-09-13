@@ -960,11 +960,13 @@ int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
         cJSON_Delete(cJsonObj);
         return HDF_FAILURE;
     }
-    if (AudioAdaptersGetArraySize(adaptersObj, &realSize) != HDF_SUCCESS || realSize != g_adapterNum) {
-        AUDIO_FUNC_LOGE("realSize = %{public}d, adaptersNum = %{public}d.\n", realSize, g_adapterNum);
-        g_adapterNum = 0;
-        cJSON_Delete(cJsonObj);
-        return HDF_FAILURE;
+    if (g_adapterNum > 0) {
+        if (AudioAdaptersGetArraySize(adaptersObj, &realSize) != HDF_SUCCESS || realSize != (uint32_t)g_adapterNum) {
+            AUDIO_FUNC_LOGE("realSize = %{public}d, adaptersNum = %{public}d.\n", realSize, g_adapterNum);
+            g_adapterNum = 0;
+            cJSON_Delete(cJsonObj);
+            return HDF_FAILURE;
+        }
     }
     if (AudioAdaptersSetAdapterVar(adaptersObj) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("AudioAdaptersSetAdapterVar is failed!");
