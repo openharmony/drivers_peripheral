@@ -20,6 +20,7 @@
 
 using OHOS::HDI::Usb::V1_0::UsbDev;
 
+namespace {
 class UsbdTransferTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -29,4 +30,5 @@ public:
 
     static struct UsbDev dev_;
 };
+}
 #endif // USBD_TRANSFER_TEST_H
