@@ -1051,7 +1051,8 @@ static int32_t AudioRenderReqMmapBufferInit(
         return AUDIO_ERR_INTERNAL;
     }
 
-    desc.totalBufferFrames = reqSize / (render->renderParam.frameRenderMode.attrs.channelCount * (formatBits >> BITS_TO_FROMAT));
+    desc.totalBufferFrames = reqSize / (render->renderParam.frameRenderMode.attrs.channelCount *
+        (formatBits >> BITS_TO_FROMAT));
 
     InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
