@@ -169,7 +169,8 @@ HWTEST_F(HdfWifiServiceCTest, SetCountryCodeTest_005, TestSize.Level1)
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, codeDigital, size);
-    ASSERT_EQ(rc, HDF_SUCCESS);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
     rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, code, size);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
