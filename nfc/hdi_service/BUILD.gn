@@ -28,12 +28,12 @@ ohos_shared_library("libnfc_interface_service_1.0") {
   cflags = []
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_nfc:nfc_idl_headers",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 
   install_images = [ chipset_base_dir ]
@@ -55,12 +55,12 @@ ohos_shared_library("nfc_hdi_driver") {
   cflags = []
 
   external_deps = [
+    "c_utils:utils",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 
   install_images = [ chipset_base_dir ]
