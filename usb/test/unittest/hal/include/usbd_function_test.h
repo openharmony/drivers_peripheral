@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 
+namespace {
 class UsbdFunctionTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -24,4 +25,5 @@ public:
     void SetUp();
     void TearDown();
 };
+}
 #endif // USBD_FUNCTION_TEST_H
