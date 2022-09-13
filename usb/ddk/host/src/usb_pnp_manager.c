@@ -76,20 +76,8 @@ static int32_t UsbPnpManagerBind(struct HdfDeviceObject *device)
 #ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 int32_t UsbPnpManagerStartUeventThread()
 {
-    int32_t ret = DdkDevMgrInit();
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: DdkDevMgrInit error", __func__);
-        return HDF_FAILURE;
-    }
-
-    ret = DdkListenerMgrInit();
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: DdkListenerMgrInit error", __func__);
-        return HDF_FAILURE;
-    }
-
     pthread_t tid;
-    ret = pthread_create(&tid, NULL, DdkUeventMain, NULL);
+    int32_t ret = pthread_create(&tid, NULL, DdkUeventMain, NULL);
     if (ret != 0) {
         HDF_LOGE("%{public}s: create thread failed:%{public}d", __func__, ret);
         return ret;
@@ -109,32 +97,41 @@ static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
         .callBack = UsbDdkPnpLoaderEventReceived,
     };
     usbPnpListener.priv = (void *)(device);
+
+    int32_t ret = DdkDevMgrInit();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: DdkDevMgrInit error", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = DdkListenerMgrInit();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: DdkListenerMgrInit error", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = DdkUeventInit();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: DdkUeventInit error", __func__);
+        return ret;
+    }
 #ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
     if (UsbPnpManagerStartUeventThread() != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: start uevent thread failed", __func__);
         return HDF_FAILURE;
     }
-
+#endif
+    ret = UsbDdkPnpLoaderEventHandle();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: UsbDdkPnpLoaderEventHandle failed", __func__);
+        return ret;
+    }
     if (DdkListenerMgrAdd(&usbPnpListener) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: add listener failed", __func__);
         return HDF_FAILURE;
     }
-#else
-    struct HdfIoService *usbPnpServ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
-
-    if (usbPnpServ == NULL) {
-        HDF_LOGE("HdfIoServiceBind failed");
-        return HDF_ERR_INVALID_OBJECT;
-    }
-
-    int32_t status = HdfDeviceRegisterEventListener(usbPnpServ, &usbPnpListener);
-    if (status != HDF_SUCCESS) {
-        HDF_LOGE("HdfDeviceRegisterEventListener failed status=%d", status);
-        return status;
-    }
-#endif
-    HDF_LOGE("UsbPnpManagerInit done");
-    return UsbDdkPnpLoaderEventHandle();
+    HDF_LOGI("UsbPnpManagerInit done");
+    return HDF_SUCCESS;
 }
 
 static void UsbPnpManagerRelease(struct HdfDeviceObject *device)
