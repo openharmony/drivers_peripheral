@@ -21,7 +21,9 @@
 #include "ddk_sysfs_device.h"
 #include "hdf_base.h"
 #include "hdf_dlist.h"
+#include "hdf_io_service_if.h"
 #include "hdf_log.h"
+#include "hdf_sbuf.h"
 #include "osal_mem.h"
 #include "osal_mutex.h"
 #include "securec.h"
@@ -40,6 +42,7 @@ struct UsbDdkDeviceList {
     struct DListHead devList;
 };
 
+#ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 static struct UsbDdkDeviceList g_ddkDevList = {.isInit = false};
 
 static struct UsbDdkDeviceInfo *DdkDevMgrIsDevExists(uint64_t devAddr)
@@ -229,3 +232,66 @@ int32_t DdkDevMgrForEachDeviceSafe(DdkDevMgrHandleDev handle, void *priv)
     OsalMutexUnlock(&g_ddkDevList.listMutex);
     return HDF_SUCCESS;
 }
+#else                                                                           // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
+struct HdfIoService *g_usbPnpSrv = NULL;
+#define HDF_USB_INFO_MAX_SIZE (127 * sizeof(struct UsbPnpNotifyMatchInfoTable)) // 127  is max deivce num
+int32_t DdkDevMgrInit(void)
+{
+    g_usbPnpSrv = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
+    if (g_usbPnpSrv == NULL) {
+        HDF_LOGE("%{public}s: HdfIoServiceBind failed.", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    return HDF_SUCCESS;
+}
+
+int32_t DdkDevMgrForEachDeviceSafe(DdkDevMgrHandleDev handle, void *priv)
+{
+    if (g_usbPnpSrv == NULL || handle == NULL) {
+        HDF_LOGE("%{public}s: invalid param.", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+
+    struct HdfSBuf *reply = HdfSbufObtain(HDF_USB_INFO_MAX_SIZE);
+    if (reply == NULL) {
+        HDF_LOGE("%{public}s: HdfSbufObtain reply failed", __func__);
+        return HDF_DEV_ERR_NO_MEMORY;
+    }
+
+    // request device list from pnp service
+    int32_t ret = g_usbPnpSrv->dispatcher->Dispatch(&g_usbPnpSrv->object, USB_PNP_DRIVER_GETDEVICES, NULL, reply);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:failed to send service call, ret:%{public}d", __func__, ret);
+        HdfSbufRecycle(reply);
+        return ret;
+    }
+
+    // read device list
+    int32_t count = 0;
+    if (!HdfSbufReadInt32(reply, &count)) {
+        HDF_LOGE("%{public}s: failed to read count from reply", __func__);
+        HdfSbufRecycle(reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    HDF_LOGI("%{public}s: total obj num count:%{public}d ", __func__, count);
+    struct UsbPnpNotifyMatchInfoTable *info = NULL;
+    uint32_t infoSize = 0;
+    bool flag = false;
+    for (int32_t i = 0; i < count; ++i) {
+        flag = HdfSbufReadBuffer(reply, (const void **)(&info), &infoSize);
+        if (!flag || info == NULL) {
+            HDF_LOGE("%{public}s: HdfSbufReadBuffer failed, flag=%{public}d, info=%{public}p", __func__, flag, info);
+            HdfSbufRecycle(reply);
+            return HDF_ERR_INVALID_PARAM;
+        }
+        // call back
+        if (handle(info, priv) != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s: handle failed", __func__);
+        }
+    }
+
+    HdfSbufRecycle(reply);
+    return HDF_SUCCESS;
+}
+#endif                                                                          // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE

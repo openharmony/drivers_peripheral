@@ -91,7 +91,7 @@ public:
     static UsbInterfaceHandle *InterfaceIdToHandle(const HostDevice *dev, uint8_t id);
     static int32_t UsbdEventHandle(const sptr<UsbImpl> &inst);
     static int32_t UsbdEventHandleRelease(void);
-    
+
     HostDevice *FindDevFromService(uint8_t busNum, uint8_t devAddr);
 
 private:
@@ -118,12 +118,6 @@ private:
 
     int32_t BindUsbSubscriber(const sptr<IUsbdSubscriber> &subscriber);
 
-    inline int32_t UnbindUsbSubscriber()
-    {
-        subscriber_ = nullptr;
-        return HDF_SUCCESS;
-    }
-
     UsbdBulkASyncList *UsbdBulkASyncListInit(HostDevice *port, uint8_t ifId, uint8_t epId);
     UsbdBulkASyncList *UsbdBulkASyncListFind(HostDevice *port, uint8_t ifId, uint8_t epId);
     int32_t InitAsmBufferHandle(UsbdBufferHandle *handle, int32_t fd, int32_t size);
@@ -131,16 +125,16 @@ private:
     int32_t UsbdBulkASyncWriteSubmitStart(UsbdBulkASyncList *list);
     void ReleaseAsmBufferHandle(UsbdBufferHandle *handle);
     int32_t BulkRequestCancel(UsbdBulkASyncList *list);
-    int32_t UsbdAddDevicesOnStart();
     int32_t HdfReadDevice(int32_t *count, int32_t *size, HdfSBuf *reply);
     int32_t UsbdReleaseDevices();
 
     static int32_t UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbImpl *super, uint32_t id);
     static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data);
+    static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
 
 private:
-    static HdfIoService *usbPnpServ_;
     static HdfDevEventlistener usbPnpListener_;
+    static HdfDevEventlistener listenerForLoadService_;
 };
 } // namespace V1_0
 } // namespace Usb
