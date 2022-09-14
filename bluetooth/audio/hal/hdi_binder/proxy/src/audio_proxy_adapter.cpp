@@ -317,39 +317,39 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
     }
     hwRender->proxyRemoteHandle = hwAdapter->proxyRemoteHandle;
     if (GetAudioProxyRenderFunc(hwRender) < 0) {
-        AudioMemFree((void **)&hwRender);
+        AudioMemFree(reinterpret_cast<void **>(&hwRender));
         return AUDIO_HAL_ERR_INTERNAL;
     }
     /* Fill hwRender para */
     if (InitHwRenderParam(hwRender, desc, attrs) < 0) {
-        AudioMemFree((void **)&hwRender);
+        AudioMemFree(reinterpret_cast<void **>(&hwRender));
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
-        AudioMemFree((void **)&hwRender);
+        AudioMemFree(reinterpret_cast<void **>(&hwRender));
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (!HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
         AudioProxyBufReplyRecycle(data, reply);
-        AudioMemFree((void **)&hwRender);
+        AudioMemFree(reinterpret_cast<void **>(&hwRender));
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyCommonInitCreateData(data, hwAdapter, desc, attrs) < 0) {
         HDF_LOGE("Failed to obtain reply");
         AudioProxyBufReplyRecycle(data, reply);
-        AudioMemFree((void **)&hwRender);
+        AudioMemFree(reinterpret_cast<void **>(&hwRender));
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_CREATE_RENDER, data, reply);
     if (ret < 0) {
         HDF_LOGE("Send Server fail!");
         AudioProxyBufReplyRecycle(data, reply);
-        AudioMemFree((void **)&hwRender);
+        AudioMemFree(reinterpret_cast<void **>(&hwRender));
         return ret;
     }
     AudioProxyBufReplyRecycle(data, reply);
     if (AudioProxyAdapterCreateRenderSplit(hwAdapter, hwRender) < 0) {
-        AudioMemFree((void **)&hwRender);
+        AudioMemFree(reinterpret_cast<void **>(&hwRender));
         return AUDIO_HAL_ERR_INTERNAL;
     }
     *render = &hwRender->common;
@@ -367,7 +367,7 @@ int32_t AudioProxyAdapterDestroyRender(struct AudioAdapter *adapter, struct Audi
     if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (AudioProxyPreprocessRender((AudioHwRender *)render, &data, &reply) < 0) {
+    if (AudioProxyPreprocessRender(reinterpret_cast<AudioHwRender *>(render), &data, &reply) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_DESTROY, data, reply);
@@ -378,8 +378,8 @@ int32_t AudioProxyAdapterDestroyRender(struct AudioAdapter *adapter, struct Audi
         AudioProxyBufReplyRecycle(data, reply);
         return ret;
     }
-    AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
-    AudioMemFree((void **)&render);
+    AudioMemFree(reinterpret_cast<void **>(&hwRender->renderParam.frameRenderMode.buffer));
+    AudioMemFree(reinterpret_cast<void **>(&render));
     AudioProxyBufReplyRecycle(data, reply);
     return AUDIO_HAL_SUCCESS;
 }
