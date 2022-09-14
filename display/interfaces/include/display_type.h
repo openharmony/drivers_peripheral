@@ -84,7 +84,7 @@ typedef enum {
  * @brief Defines the buffer usage.
  *
  */
-enum {
+typedef enum {
     HBM_USE_CPU_READ = (1 << 0),        /**< CPU read buffer */
     HBM_USE_CPU_WRITE = (1 << 1),       /**< CPU write memory */
     HBM_USE_MEM_MMZ = (1 << 2),         /**< Media memory zone (MMZ) */
@@ -93,7 +93,35 @@ enum {
     HBM_USE_MEM_MMZ_CACHE = (1 << 5),   /**< MMZ with cache*/
     HBM_USE_MEM_FB = (1 << 6),          /**< Framebuffer */
     HBM_USE_ASSIGN_SIZE = (1 << 7),     /**< Memory assigned */
-};
+    HBM_USE_HW_RENDER = (1 << 8),       /**< For GPU write case */
+    HBM_USE_HW_TEXTURE = (1 << 9),      /**< For GPU read case */
+    HBM_USE_HW_COMPOSER = (1 << 10),    /**< For hardware composer */
+    HBM_USE_PROTECTED = (1 << 11),      /**< For safe buffer case, such as DRM */
+    HBM_USE_CAMERA_READ = (1 << 12),    /**< For camera read case */
+    HBM_USE_CAMERA_WRITE = (1 << 13),   /**< For camera write case */
+    HBM_USE_VIDEO_ENCODER = (1 << 14),  /**< For encode case */
+    HBM_USE_VIDEO_DECODER = (1 << 15),  /**< For decode case */
+    HBM_USE_VENDOR_PRI0 = (1 << 44),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI1 = (1 << 45),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI2 = (1 << 46),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI3 = (1 << 47),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI4 = (1 << 48),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI5 = (1 << 49),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI6 = (1 << 50),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI7 = (1 << 51),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI8 = (1 << 52),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI9 = (1 << 53),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI10 = (1 << 54),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI11 = (1 << 55),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI12 = (1 << 56),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI13 = (1 << 57),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI14 = (1 << 58),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI15 = (1 << 59),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI16 = (1 << 60),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI17 = (1 << 61),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI18 = (1 << 62),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI19 = (1 << 63),   /**< Reserverd for vendor */
+} DisplayBufferUsage;
 
 /**
  * @brief Enumerates pixel formats.
