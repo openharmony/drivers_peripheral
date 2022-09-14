@@ -32,7 +32,7 @@ static int32_t AdapterManageInit(struct AudioInfoInAdapter *adapterManage,
         return HDF_FAILURE;
     }
 
-    adapterManage->adapterName = (char *)calloc(1, MANAGER_ADAPTER_NAME_LEN);
+    adapterManage->adapterName = static_cast<char *>(calloc(1, MANAGER_ADAPTER_NAME_LEN));
     if (adapterManage->adapterName == NULL) {
         HDF_LOGE("%{public}s: calloc adapter name failed!", __func__);
 
@@ -43,7 +43,7 @@ static int32_t AdapterManageInit(struct AudioInfoInAdapter *adapterManage,
         adapterName, MANAGER_ADAPTER_NAME_LEN);
     if (ret != EOK) {
         HDF_LOGE("%{public}s: memcpy adapter name fail!", __func__);
-        AudioMemFree((void **)&adapterManage->adapterName);
+        AudioMemFree(reinterpret_cast<void **>(const_cast<char **>(&adapterManage->adapterName)));
 
         return HDF_FAILURE;
     }
@@ -88,7 +88,7 @@ void AdaptersServerManageRelease(
             AudioMemFree((void **)&adaptersManage[i].adapterName);
         }
     }
-    AudioMemFree((void **)&adaptersManage);
+    AudioMemFree(reinterpret_cast<void **>(const_cast<AudioInfoInAdapter **>(&adaptersManage)));
 }
 
 void AdaptersServerManageInfomationRecycle(void)
