@@ -16,29 +16,29 @@
 #ifndef OHOS_HDI_RIL_V1_0_RIL_INTERFACE_IMPL_H
 #define OHOS_HDI_RIL_V1_0_RIL_INTERFACE_IMPL_H
 
+#include "hril_manager.h"
+
 #include <hdf_log.h>
 #include <iproxy_broker.h>
 #include <iremote_object.h>
 
-#include "hril_manager.h"
-#include "v1_0/iril_interface.h"
+#include "v1_0/iril.h"
 #include "vector"
 
 namespace OHOS {
 namespace HDI {
 namespace Ril {
 namespace V1_0 {
-class RilInterfaceImpl : public IRilInterface {
+class RilImpl : public IRil {
 public:
-    RilInterfaceImpl() = default;
-    virtual ~RilInterfaceImpl() = default;
+    RilImpl() = default;
+    virtual ~RilImpl() = default;
 
     // Call
-    int32_t SetEmergencyCallList(
-        int32_t slotId, int32_t serialId, const IEmergencyInfoList &emergencyInfoList) override;
+    int32_t SetEmergencyCallList(int32_t slotId, int32_t serialId, const EmergencyInfoList &emergencyInfoList) override;
     int32_t GetEmergencyCallList(int32_t slotId, int32_t serialId) override;
     int32_t GetCallList(int32_t slotId, int32_t serialId) override;
-    int32_t Dial(int32_t slotId, int32_t serialId, const IDialInfo &dialInfo) override;
+    int32_t Dial(int32_t slotId, int32_t serialId, const DialInfo &dialInfo) override;
     int32_t Reject(int32_t slotId, int32_t serialId) override;
     int32_t Hangup(int32_t slotId, int32_t serialId, int32_t gsmIndex) override;
     int32_t Answer(int32_t slotId, int32_t serialId) override;
@@ -46,16 +46,15 @@ public:
     int32_t UnHoldCall(int32_t slotId, int32_t serialId) override;
     int32_t SwitchCall(int32_t slotId, int32_t serialId) override;
     int32_t CombineConference(int32_t slotId, int32_t serialId, int32_t callType) override;
-    int32_t SeparateConference(int32_t slotId, int32_t serialId, int32_t callIndex,
-        int32_t callType) override;
+    int32_t SeparateConference(int32_t slotId, int32_t serialId, int32_t callIndex, int32_t callType) override;
     int32_t GetCallWaiting(int32_t slotId, int32_t serialId) override;
     int32_t SetCallWaiting(int32_t slotId, int32_t serialId, int32_t activate) override;
     int32_t GetCallTransferInfo(int32_t slotId, int32_t serialId, int32_t reason) override;
-    int32_t SetCallTransferInfo(int32_t slotId, int32_t serialId,
-        const ICallForwardSetInfo &callForwardSetInfo) override;
+    int32_t SetCallTransferInfo(
+        int32_t slotId, int32_t serialId, const CallForwardSetInfo &callForwardSetInfo) override;
     int32_t GetCallRestriction(int32_t slotId, int32_t serialId, const std::string &fac) override;
-    int32_t SetCallRestriction(int32_t slotId, int32_t serialId,
-        const ICallRestrictionInfo &callRestrictionInfo) override;
+    int32_t SetCallRestriction(
+        int32_t slotId, int32_t serialId, const CallRestrictionInfo &callRestrictionInfo) override;
     int32_t GetClip(int32_t slotId, int32_t serialId) override;
     int32_t SetClip(int32_t slotId, int32_t serialId, int32_t action) override;
     int32_t GetClir(int32_t slotId, int32_t serialId) override;
@@ -68,21 +67,23 @@ public:
     int32_t GetMute(int32_t slotId, int32_t serialId) override;
     int32_t GetCallFailReason(int32_t slotId, int32_t serialId) override;
     int32_t CallSupplement(int32_t slotId, int32_t serialId, int32_t type) override;
-    int32_t SendDtmf(int32_t slotId, int32_t serialId, const IDtmfInfo &dtmfInfo) override;
-    int32_t StartDtmf(int32_t slotId, int32_t serialId, const IDtmfInfo &dtmfInfo) override;
-    int32_t StopDtmf(int32_t slotId, int32_t serialId, const IDtmfInfo &dtmfInfo) override;
-    int32_t SetBarringPassword(int32_t slotId, int32_t serialId, const ISetBarringInfo &setBarringInfo) override;
+    int32_t SendDtmf(int32_t slotId, int32_t serialId, const DtmfInfo &dtmfInfo) override;
+    int32_t StartDtmf(int32_t slotId, int32_t serialId, const DtmfInfo &dtmfInfo) override;
+    int32_t StopDtmf(int32_t slotId, int32_t serialId, const DtmfInfo &dtmfInfo) override;
+    int32_t SetBarringPassword(int32_t slotId, int32_t serialId, const SetBarringInfo &setBarringInfo) override;
 
     // Data
-    int32_t ActivatePdpContext(int32_t slotId, int32_t serialId, const IDataCallInfo &dataCallInfo) override;
-    int32_t DeactivatePdpContext(int32_t slotId, int32_t serialId, const IUniInfo &uniInfo) override;
-    int32_t GetPdpContextList(int32_t slotId, int32_t serialId, const IUniInfo &uniInfo) override;
-    int32_t SetInitApnInfo(int32_t slotId, int32_t serialId, const IDataProfileDataInfo &dataProfileDataInfo) override;
+    int32_t ActivatePdpContext(int32_t slotId, int32_t serialId, const DataCallInfo &dataCallInfo) override;
+    int32_t DeactivatePdpContext(int32_t slotId, int32_t serialId, const UniInfo &uniInfo) override;
+    int32_t GetPdpContextList(int32_t slotId, int32_t serialId, const UniInfo &uniInfo) override;
+    int32_t SetInitApnInfo(int32_t slotId, int32_t serialId, const DataProfileDataInfo &dataProfileDataInfo) override;
     int32_t GetLinkBandwidthInfo(int32_t slotId, int32_t serialId, int32_t cid) override;
     int32_t SetLinkBandwidthReportingRule(int32_t slotId, int32_t serialId,
-        const IDataLinkBandwidthReportingRule &dataLinkBandwidthReportingRule) override;
+        const DataLinkBandwidthReportingRule &dataLinkBandwidthReportingRule) override;
     int32_t SetDataPermitted(int32_t slotId, int32_t serialId, int32_t dataPermitted) override;
-    int32_t SetDataProfileInfo(int32_t slotId, int32_t serialId, const IDataProfilesInfo &dataProfilesInfo) override;
+    int32_t SetDataProfileInfo(int32_t slotId, int32_t serialId, const DataProfilesInfo &dataProfilesInfo) override;
+    int32_t SendDataPerformanceMode(int32_t slotId, int32_t serialId, const DataPerformanceInfo &dataPerformanceInfo) override;
+    int32_t SendDataSleepMode(int32_t slotId, int32_t serialId, const DataSleepInfo &dataSleepInfo) override;
 
     int32_t SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst) override;
     int32_t GetRadioState(int32_t slotId, int32_t serialId) override;
@@ -92,12 +93,12 @@ public:
     int32_t GetBasebandVersion(int32_t slotId, int32_t serialId) override;
     int32_t ShutDown(int32_t slotId, int32_t serialId) override;
 
-    int32_t GetSimIO(int32_t slotId, int32_t serialId, const ISimIoRequestInfo &simIO) override;
+    int32_t GetSimIO(int32_t slotId, int32_t serialId, const SimIoRequestInfo &simIO) override;
     int32_t GetSimStatus(int32_t slotId, int32_t serialId) override;
     int32_t GetImsi(int32_t slotId, int32_t serialId) override;
-    int32_t GetSimLockStatus(int32_t slotId, int32_t serialId, const ISimLockInfo &simLockInfo) override;
-    int32_t SetSimLock(int32_t slotId, int32_t serialId, const ISimLockInfo &simLockInfo) override;
-    int32_t ChangeSimPassword(int32_t slotId, int32_t serialId, const ISimPasswordInfo &simPassword) override;
+    int32_t GetSimLockStatus(int32_t slotId, int32_t serialId, const SimLockInfo &simLockInfo) override;
+    int32_t SetSimLock(int32_t slotId, int32_t serialId, const SimLockInfo &simLockInfo) override;
+    int32_t ChangeSimPassword(int32_t slotId, int32_t serialId, const SimPasswordInfo &simPassword) override;
     int32_t UnlockPin(int32_t slotId, int32_t serialId, const std::string &pin) override;
     int32_t UnlockPuk(int32_t slotId, int32_t serialId, const std::string &puk, const std::string &pin) override;
     int32_t UnlockPin2(int32_t slotId, int32_t serialId, const std::string &pin2) override;
@@ -108,15 +109,15 @@ public:
     int32_t SimStkSendCallSetupRequestResult(int32_t slotId, int32_t serialId, int32_t accept) override;
     int32_t SimStkIsReady(int32_t slotId, int32_t serialId) override;
     int32_t GetRadioProtocol(int32_t slotId, int32_t serialId) override;
-    int32_t SetRadioProtocol(int32_t slotId, int32_t serialId, const IRadioProtocol &radioProtocol) override;
+    int32_t SetRadioProtocol(int32_t slotId, int32_t serialId, const RadioProtocol &radioProtocol) override;
     int32_t SimOpenLogicalChannel(int32_t slotId, int32_t serialId, const std::string &appID, int32_t p2) override;
     int32_t SimCloseLogicalChannel(int32_t slotId, int32_t serialId, int32_t channelId) override;
     int32_t SimTransmitApduLogicalChannel(
-        int32_t slotId, int32_t serialId, const IApduSimIORequestInfo &apduSimIO) override;
+        int32_t slotId, int32_t serialId, const ApduSimIORequestInfo &apduSimIO) override;
     int32_t SimTransmitApduBasicChannel(
-        int32_t slotId, int32_t serialId, const IApduSimIORequestInfo &apduSimIO) override;
+        int32_t slotId, int32_t serialId, const ApduSimIORequestInfo &apduSimIO) override;
     int32_t SimAuthentication(
-        int32_t slotId, int32_t serialId, const ISimAuthenticationRequestInfo &simAuthInfo) override;
+        int32_t slotId, int32_t serialId, const SimAuthenticationRequestInfo &simAuthInfo) override;
     int32_t UnlockSimLock(int32_t slotId, int32_t serialId, int32_t lockType, const std::string &key) override;
 
     // Network
@@ -127,55 +128,61 @@ public:
     int32_t GetNetworkSearchInformation(int32_t slotId, int32_t serialId) override;
     int32_t GetNetworkSelectionMode(int32_t slotId, int32_t serialId) override;
     int32_t SetNetworkSelectionMode(
-        int32_t slotId, int32_t serialId, const ISetNetworkModeInfo &networkModeInfo) override;
+        int32_t slotId, int32_t serialId, const SetNetworkModeInfo &networkModeInfo) override;
     int32_t GetNeighboringCellInfoList(int32_t slotId, int32_t serialId) override;
     int32_t GetCurrentCellInfo(int32_t slotId, int32_t serialId) override;
     int32_t SetPreferredNetwork(int32_t slotId, int32_t serialId, int32_t preferredNetworkType) override;
     int32_t GetPreferredNetwork(int32_t slotId, int32_t serialId) override;
     int32_t GetPhysicalChannelConfig(int32_t slotId, int32_t serialId) override;
-    int32_t SetLocateUpdates(int32_t slotId, int32_t serialId, const IHRilRegNotifyMode mode) override;
+    int32_t SetLocateUpdates(int32_t slotId, int32_t serialId, const RilRegNotifyMode mode) override;
     int32_t SetNotificationFilter(int32_t slotId, int32_t serialId, int32_t newFilter) override;
     int32_t SetDeviceState(int32_t slotId, int32_t serialId, int32_t deviceStateType, int32_t deviceStateOn) override;
 
     // Sms
-    int32_t SendGsmSms(int32_t slotId, int32_t serialId, const IGsmSmsMessageInfo &gsmSmsMessageInfo) override;
-    int32_t SendCdmaSms(int32_t slotId, int32_t serialId, const ISendCdmaSmsMessageInfo &cdmaSmsMessageInfo) override;
-    int32_t AddSimMessage(int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo) override;
+    int32_t SendGsmSms(int32_t slotId, int32_t serialId, const GsmSmsMessageInfo &gsmSmsMessageInfo) override;
+    int32_t SendCdmaSms(int32_t slotId, int32_t serialId, const SendCdmaSmsMessageInfo &cdmaSmsMessageInfo) override;
+    int32_t AddSimMessage(int32_t slotId, int32_t serialId, const SmsMessageIOInfo &smsMessageIOInfo) override;
     int32_t DelSimMessage(int32_t slotId, int32_t serialId, int32_t index) override;
-    int32_t UpdateSimMessage(int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo) override;
-    int32_t AddCdmaSimMessage(int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo) override;
+    int32_t UpdateSimMessage(int32_t slotId, int32_t serialId, const SmsMessageIOInfo &smsMessageIOInfo) override;
+    int32_t AddCdmaSimMessage(int32_t slotId, int32_t serialId, const SmsMessageIOInfo &smsMessageIOInfo) override;
     int32_t DelCdmaSimMessage(int32_t slotId, int32_t serialId, int32_t index) override;
-    int32_t UpdateCdmaSimMessage(int32_t slotId, int32_t serialId, const ISmsMessageIOInfo &smsMessageIOInfo) override;
-    int32_t SetSmscAddr(int32_t slotId, int32_t serialId, const IServiceCenterAddress &serviceCenterAddress) override;
+    int32_t UpdateCdmaSimMessage(int32_t slotId, int32_t serialId, const SmsMessageIOInfo &smsMessageIOInfo) override;
+    int32_t SetSmscAddr(int32_t slotId, int32_t serialId, const ServiceCenterAddress &serviceCenterAddress) override;
     int32_t GetSmscAddr(int32_t slotId, int32_t serialId) override;
-    int32_t SetCBConfig(int32_t slotId, int32_t serialId, const ICBConfigInfo &cellBroadcastInfo) override;
+    int32_t SetCBConfig(int32_t slotId, int32_t serialId, const CBConfigInfo &cellBroadcastInfo) override;
     int32_t GetCBConfig(int32_t slotId, int32_t serialId) override;
     int32_t SetCdmaCBConfig(
-        int32_t slotId, int32_t serialId, const ICdmaCBConfigInfoList &cdmaCBConfigInfoList) override;
+        int32_t slotId, int32_t serialId, const CdmaCBConfigInfoList &cdmaCBConfigInfoList) override;
     int32_t GetCdmaCBConfig(int32_t slotId, int32_t serialId) override;
-    int32_t SendSmsMoreMode(int32_t slotId, int32_t serialId, const IGsmSmsMessageInfo &gsmSmsMessageInfo) override;
-    int32_t SendSmsAck(int32_t slotId, int32_t serialId, const IModeData &modeData) override;
+    int32_t SendSmsMoreMode(int32_t slotId, int32_t serialId, const GsmSmsMessageInfo &gsmSmsMessageInfo) override;
+    int32_t SendSmsAck(int32_t slotId, int32_t serialId, const ModeData &modeData) override;
+
+    int32_t SendRilAck() override;
 
     int32_t SetCallback(const sptr<IRilCallback> &rilCallback) override;
     int32_t Init();
     class RilDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        explicit RilDeathRecipient(const wptr<RilInterfaceImpl> &rilInterfaceImpl) : rilInterfaceImpl_(rilInterfaceImpl)
-        {}
+        explicit RilDeathRecipient(const wptr<RilImpl> &rilInterfaceImpl) : rilInterfaceImpl_(rilInterfaceImpl) {}
         virtual ~RilDeathRecipient() = default;
         virtual void OnRemoteDied(const wptr<IRemoteObject> &object) override;
 
     private:
-        wptr<RilInterfaceImpl> rilInterfaceImpl_;
+        wptr<RilImpl> rilInterfaceImpl_;
     };
+
     template<typename FuncType, typename... ParamTypes>
-    inline int32_t TaskSchedule(FuncType &&_func, ParamTypes &&... _args) const
+    inline int32_t TaskSchedule(FuncType &&_func, int32_t slotId, ParamTypes &&... _args) const
     {
         if (_func == nullptr || Telephony::HRilManager::manager_ == nullptr) {
             HDF_LOGE("manager or func is null pointer");
-            return HRIL_ERR_NULL_POINT;
+            return RIL_ERR_NULL_POINT;
         }
-        auto ret = (Telephony::HRilManager::manager_.get()->*(_func))(std::forward<ParamTypes>(_args)...);
+        if (slotId >= Telephony::HRilManager::manager_->GetMaxSimSlotCount()) {
+            HDF_LOGE("slotId is inValid");
+            return RIL_ERR_INVALID_PARAMETER;
+        }
+        auto ret = (Telephony::HRilManager::manager_.get()->*(_func))(slotId, std::forward<ParamTypes>(_args)...);
         return ret;
     }
 
