@@ -21,6 +21,7 @@
 #include <sys/mman.h>
 #include <unistd.h>
 #include <chrono>
+#include <sys/stat.h>
 #include "codec_type.h"
 #include "codec_omx_ext.h"
 
@@ -77,6 +78,8 @@ CodecHdiAdapterEncode::CodecHdiAdapterEncode() : fpIn_(nullptr), fpOut_(nullptr)
     width_ = 0;
     height_ = 0;
     componentId_ = 0;
+    srcFileSize_ = 0;
+    totalSrcSize_ = 0;
 }
 
 CodecHdiAdapterEncode::~CodecHdiAdapterEncode()
@@ -106,7 +109,8 @@ bool CodecHdiAdapterEncode::ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCo
 {
     bool ret = false;
     filledCount = fread(buf, 1, width_ * height_ * NUMERATOR / DENOMINATOR, fp);
-    if (feof(fp)) {
+    totalSrcSize_ += filledCount;
+    if (totalSrcSize_ >= srcFileSize_) {
         ret = true;
     }
     return ret;
@@ -121,6 +125,10 @@ bool CodecHdiAdapterEncode::Init(CommandOpt &opt)
     HDF_LOGI("width[%{public}d], height[%{public}d],stride_[%{public}d]", width_, height_, stride_);
     // gralloc init
     gralloc_ = OHOS::HDI::Display::V1_0::IDisplayGralloc::Get();
+    
+    struct stat fileStat = {0};
+    stat(opt.fileInput.c_str(), &fileStat);
+    srcFileSize_ = fileStat.st_size;
 
     fpIn_ = fopen(opt.fileInput.c_str(), "rb");
     fpOut_ = fopen(opt.fileOutput.c_str(), "wb+");
