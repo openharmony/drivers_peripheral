@@ -37,7 +37,6 @@ using namespace OHOS::HDI::Usb::V1_0;
 
 namespace {
 sptr<IUsbInterface> g_usbInterface = nullptr;
-}
 
 void UsbdFunctionTest::SetUpTestCase(void)
 {
@@ -357,4 +356,5 @@ HWTEST_F(UsbdFunctionTest, QueryPort001, TestSize.Level1)
     auto ret = g_usbInterface->QueryPort(portId, powerRole, dataRole, mode);
     HDF_LOGI("UsbdFunctionTest::QueryPort001 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
+}
 }
