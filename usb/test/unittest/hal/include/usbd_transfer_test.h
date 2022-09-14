@@ -28,7 +28,7 @@ public:
     void SetUp();
     void TearDown();
 
-    static struct UsbDev dev_;
+    static UsbDev dev_;
 };
 }
 #endif // USBD_TRANSFER_TEST_H
