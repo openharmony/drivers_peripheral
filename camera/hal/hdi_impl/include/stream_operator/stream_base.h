@@ -50,6 +50,7 @@ public:
     RetCode Capture(const std::shared_ptr<CaptureRequest>& request) override;
     RetCode OnFrame(const std::shared_ptr<CaptureRequest>& request) override;
     bool IsRunning() const override;
+    void DumpStatsInfo() const override;
 
     virtual void HandleRequest();
     virtual uint64_t GetUsage();
