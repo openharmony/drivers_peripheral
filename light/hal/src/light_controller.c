@@ -257,6 +257,7 @@ static int32_t OnMultiLightsValidityJudgment(uint32_t lightId, const struct Ligh
 static int32_t OnMultiLights(uint32_t lightId, const struct LightColor *colors, const uint32_t count)
 {
     int32_t ret;
+    struct HdfSBuf *sbuf = NULL;
 
     ret = OnMultiLightsValidityJudgment(lightId, colors, count);
     if (ret != HDF_SUCCESS) {
@@ -267,52 +268,46 @@ static int32_t OnMultiLights(uint32_t lightId, const struct LightColor *colors, 
     struct LightDevice *priv = GetLightDevicePriv();
     (void)OsalMutexLock(&priv->mutex);
 
-    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
-    if (sBuf == NULL) {
-        HDF_LOGE("%{public}s: Failed to obtain sBuf", __func__);
-        (void)OsalMutexUnlock(&priv->mutex);
+    sbuf = HdfSbufObtain(sizeof(struct LightColor) * count);
+    if (sbuf == NULL) {
+        HDF_LOGE("%{public}s: sbuf malloc failed", __func__);
         return HDF_DEV_ERR_NO_MEMORY;
     }
 
-    struct HdfSBuf *msg = HdfSbufBind((uintptr_t)HdfSbufGetData(sBuf), sizeof(struct LightColor) * count);
-
-    if (msg == NULL) {
-        HDF_LOGE("%{public}s: Failed to obtain msg", __func__);
-        HdfSbufRecycle(sBuf);
-        (void)OsalMutexUnlock(&priv->mutex);
-        return HDF_DEV_ERR_NO_MEMORY;
-    }
-
-    if (!HdfSbufWriteInt32(msg, lightId)) {
-        HDF_LOGE("%{public}s: Light write id failed", __func__);
+    if (!HdfSbufWriteInt32(sbuf, lightId)) {
+        HDF_LOGE("%{public}s: light write id failed", __func__);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
-    if (!HdfSbufWriteInt32(msg, LIGHT_OPS_IO_CMD_ENABLE_MULTI_LIGHTS)) {
-        HDF_LOGE("%{public}s: Light write cmd failed", __func__);
+    if (!HdfSbufWriteInt32(sbuf, LIGHT_OPS_IO_CMD_ENABLE_MULTI_LIGHTS)) {
+        HDF_LOGE("%{public}s: light write cmd failed", __func__);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
-    if (!HdfSbufWriteBuffer(msg, colors, sizeof(*colors))) {
-        HDF_LOGE("%{public}s: Light write buf failed", __func__);
+    if (!HdfSbufWriteBuffer(sbuf, colors, sizeof(*colors))) {
+        HDF_LOGE("%{public}s: light write buf failed", __func__);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
-    if (!HdfSbufWriteInt32(msg, count)) {
-        HDF_LOGE("%{public}s: Light write count failed", __func__);
+    if (!HdfSbufWriteInt32(sbuf, count)) {
+        HDF_LOGE("%{public}s: light write count failed", __func__);
+        ret = HDF_FAILURE;
         goto EXIT;
     }
 
-    ret = SendLightMsg(LIGHT_IO_CMD_OPS, msg, NULL);
+    ret = SendLightMsg(LIGHT_IO_CMD_OPS, sbuf, NULL);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: Light enable failed, ret[%{public}d]", __func__, ret);
+        HDF_LOGE("%{public}s: light enable failed, ret[%{public}d]", __func__, ret);
     }
+
 EXIT:
-    HdfSbufRecycle(msg);
-    HdfSbufRecycle(sBuf);
+    HdfSbufRecycle(sbuf);
     (void)OsalMutexUnlock(&priv->mutex);
 
-    return HDF_FAILURE;
+    return ret;
 }
 
 static int32_t OffLight(uint32_t lightId)
