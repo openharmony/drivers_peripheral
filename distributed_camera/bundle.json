@@ -39,7 +39,7 @@
 
             ],
             "test":[
-
+                "//drivers/peripheral/distributed_camera/hdi_service/test/unittest:hdf_service_test"
             ]
         }
     }
