@@ -23,6 +23,8 @@ ohos_shared_library("libhdi_display_gralloc_stub") {
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/display/hdi_service/gralloc/include",
     "//drivers/peripheral/base",
+    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
+    "//drivers/hdf_core/adapter/uhdf2/include/host",
   ]
 
   sources = [
@@ -35,10 +37,8 @@ ohos_shared_library("libhdi_display_gralloc_stub") {
 
   if (is_standard_system) {
     external_deps = [
-      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
     ]
