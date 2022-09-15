@@ -13,12 +13,12 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libril_interface_service_1.0") {
+ohos_shared_library("libril_service_1.0") {
   include_dirs = [
     "include",
     "//base/telephony/ril_adapter/services/hril/include",
   ]
-  sources = [ "src/ril_interface_impl.cpp" ]
+  sources = [ "src/ril_impl.cpp" ]
   deps = [
     "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
     "//base/telephony/ril_adapter/services/hril:hril",
@@ -26,7 +26,7 @@ ohos_shared_library("libril_interface_service_1.0") {
   ]
 
   defines = [
-    "LOG_TAG = \"RilInterfaceService\"",
+    "LOG_TAG = \"RilService\"",
     "LOG_DOMAIN = 0xD001F08",
   ]
   if (is_standard_system) {
@@ -60,7 +60,7 @@ ohos_shared_library("libril_driver") {
     "include",
     "//base/telephony/ril_adapter/services/hril_hdf/include",
   ]
-  sources = [ "src/ril_interface_driver.cpp" ]
+  sources = [ "src/ril_driver.cpp" ]
 
   deps = [
     "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
@@ -94,6 +94,6 @@ ohos_shared_library("libril_driver") {
 group("hdf_ril") {
   deps = [
     ":libril_driver",
-    ":libril_interface_service_1.0",
+    ":libril_service_1.0",
   ]
 }
