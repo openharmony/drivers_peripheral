@@ -83,7 +83,6 @@ void AudioIdlHdiAdapterTest::TearDown(void)
 * @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if the ports is initialize successfully.
 * @tc.type: FUNC
 */
-
 HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterInitAllPorts_001, TestSize.Level1)
 {
     int32_t ret;
@@ -147,7 +146,6 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterInitAllPorts_002, TestSize.Level1)
 * @tc.desc  Test AudioAdapterInitAllPorts API, return -3/-4 if the parameter adapter is nullptr.
 * @tc.type: FUNC
 */
-
 HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterInitAllPortsNull_003, TestSize.Level1)
 {
     int32_t ret;
@@ -230,7 +228,6 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapability_002, TestSize.Lev
 * @tc.desc  Test AudioAdapterGetPortCapability, return -3/-4 if the parameter adapter is nullptr.
 * @tc.type: FUNC
 */
-
 HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapabilityNull_003, TestSize.Level1)
 {
     int32_t ret;
@@ -261,7 +258,6 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapabilityNull_003, TestSize
             return -1 if the audioPort is not supported.
 * @tc.type: FUNC
 */
-
 HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterGetPortCapabilityNull_004, TestSize.Level1)
 {
     int32_t ret;
@@ -583,7 +579,6 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_001, TestSize.Level1)
      (2)passthrough mode: Returns -1,if the IAudioCapture object can't be created which was created
 * @tc.type: FUNC
 */
-
 HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_002, TestSize.Level1)
 {
     int32_t ret;
