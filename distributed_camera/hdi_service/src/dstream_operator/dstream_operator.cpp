@@ -167,7 +167,6 @@ int32_t DStreamOperator::CommitStreams(OperationMode mode, const std::vector<uin
         latestStreamSetting_ = setting;
     }
 
-    
     std::vector<DCStreamInfo> dCameraStreams;
     int32_t ret = ExtractStreamInfo(dCameraStreams);
     if (ret != CamRetCode::NO_ERROR) {
@@ -973,7 +972,8 @@ void DStreamOperator::EraseDCStream(int32_t streamId)
     dcStreamInfoMap_.erase(streamId);
 }
 
-void DStreamOperator::ExtractNotCaptureStream(bool isStreaming, std::vector<std::shared_ptr<DCStreamInfo>>& appendStreamInfo)
+void DStreamOperator::ExtractNotCaptureStream(bool isStreaming,
+    std::vector<std::shared_ptr<DCStreamInfo>>& appendStreamInfo)
 {
     std::lock_guard<std::mutex> autoLock(streamAttrLock_);
     for (auto iter = dcStreamInfoMap_.begin(); iter != dcStreamInfoMap_.end(); iter++) {
