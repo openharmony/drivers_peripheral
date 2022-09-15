@@ -21,9 +21,6 @@
         "hdf_core",
         "hiviewdfx_hilog_native",
         "ipc"
-      ],
-      "third_party": [
-        "xml2"
       ]
     },
     "build": {

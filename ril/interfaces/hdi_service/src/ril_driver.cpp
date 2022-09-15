@@ -18,21 +18,21 @@
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_sbuf_ipc.h"
-#include "v1_0/ril_interface_stub.h"
+#include "v1_0/ril_stub.h"
 #include "hril_hdf.h"
 
 using namespace OHOS::HDI::Ril::V1_0;
 using namespace OHOS::HDI::Ril;
 
-struct HdfRilInterfaceHost {
+struct HdfRilHost {
     struct IDeviceIoService ioService;
     OHOS::sptr<OHOS::IRemoteObject> stub;
 };
 
-static int32_t RilInterfaceDriverDispatch(
+static int32_t RilDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    auto *hdfRilInterfaceHost = CONTAINER_OF(client->device->service, struct HdfRilInterfaceHost, ioService);
+    auto *hdfRilHost = CONTAINER_OF(client->device->service, struct HdfRilHost, ioService);
 
     OHOS::MessageParcel *dataParcel = nullptr;
     OHOS::MessageParcel *replyParcel = nullptr;
@@ -46,78 +46,78 @@ static int32_t RilInterfaceDriverDispatch(
         HDF_LOGE("invalid reply sbuf object to dispatch");
         return HDF_ERR_INVALID_PARAM;
     }
-    int ret = hdfRilInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
+    int ret = hdfRilHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
     return ret;
 }
 
-static int32_t HdfRilInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+static int32_t HdfRilDriverInit(struct HdfDeviceObject *deviceObject)
 {
     InitRilAdapter();
     return HDF_SUCCESS;
 }
 
-static int32_t HdfRilInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+static int32_t HdfRilDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    auto *hdfRilInterfaceHost = new (std::nothrow) HdfRilInterfaceHost;
-    if (hdfRilInterfaceHost == nullptr) {
-        HDF_LOGE("%{public}s: failed to create HdfRilInterfaceHost object", __func__);
+    auto *hdfRilHost = new (std::nothrow) HdfRilHost;
+    if (hdfRilHost == nullptr) {
+        HDF_LOGE("%{public}s: failed to create HdfRilHost object", __func__);
         return HDF_FAILURE;
     }
 
-    hdfRilInterfaceHost->ioService.Dispatch = RilInterfaceDriverDispatch;
-    hdfRilInterfaceHost->ioService.Open = nullptr;
-    hdfRilInterfaceHost->ioService.Release = nullptr;
+    hdfRilHost->ioService.Dispatch = RilDriverDispatch;
+    hdfRilHost->ioService.Open = nullptr;
+    hdfRilHost->ioService.Release = nullptr;
 
-    auto serviceImpl = IRilInterface::Get(true);
+    auto serviceImpl = IRil::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
-        delete hdfRilInterfaceHost;
-        hdfRilInterfaceHost = nullptr;
+        delete hdfRilHost;
+        hdfRilHost = nullptr;
         return HDF_FAILURE;
     }
 
-    hdfRilInterfaceHost->stub =
-        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, IRilInterface::GetDescriptor());
-    if (hdfRilInterfaceHost->stub == nullptr) {
+    hdfRilHost->stub =
+        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, IRil::GetDescriptor());
+    if (hdfRilHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
-        delete hdfRilInterfaceHost;
-        hdfRilInterfaceHost = nullptr;
+        delete hdfRilHost;
+        hdfRilHost = nullptr;
         return HDF_FAILURE;
     }
 
     if (deviceObject == nullptr) {
         HDF_LOGE("%{public}s: failed to get device object", __func__);
-        delete hdfRilInterfaceHost;
-        hdfRilInterfaceHost = nullptr;
+        delete hdfRilHost;
+        hdfRilHost = nullptr;
         return HDF_FAILURE;
     }
-    deviceObject->service = &hdfRilInterfaceHost->ioService;
+    deviceObject->service = &hdfRilHost->ioService;
     return HDF_SUCCESS;
 }
 
-static void HdfRilInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfRilDriverRelease(struct HdfDeviceObject *deviceObject)
 {
     if (deviceObject == nullptr || deviceObject->service == nullptr) {
-        HDF_LOGE("HdfRilInterfaceDriverRelease not initted");
+        HDF_LOGE("HdfRilDriverRelease not initted");
         return;
     }
 
-    auto *hdfRilInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfRilInterfaceHost, ioService);
-    delete hdfRilInterfaceHost;
+    auto *hdfRilHost = CONTAINER_OF(deviceObject->service, struct HdfRilHost, ioService);
+    delete hdfRilHost;
 }
 
-static struct HdfDriverEntry g_RilInterfaceDriverEntry = {
+static struct HdfDriverEntry g_RilDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "ril_interface_service",
-    .Bind = HdfRilInterfaceDriverBind,
-    .Init = HdfRilInterfaceDriverInit,
-    .Release = HdfRilInterfaceDriverRelease,
+    .moduleName = "ril_service",
+    .Bind = HdfRilDriverBind,
+    .Init = HdfRilDriverInit,
+    .Release = HdfRilDriverRelease,
 };
 
 #ifndef __cplusplus
 extern "C" {
 #endif
-HDF_INIT(g_RilInterfaceDriverEntry);
+HDF_INIT(g_RilDriverEntry);
 #ifndef __cplusplus
 }
 #endif
