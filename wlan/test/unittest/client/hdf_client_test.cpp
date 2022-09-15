@@ -65,7 +65,8 @@ HWTEST_F(WifiClientTest, WifiClientSetCountryCode001, TestSize.Level1)
     ret = WifiSetCountryCode(WLAN_IFNAME, code, len);
     EXPECT_EQ(RET_CODE_SUCCESS, ret);
     ret = WifiSetCountryCode(WLAN_IFNAME, codeDigital, len);
-    EXPECT_EQ(RET_CODE_SUCCESS, ret);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
 }
 
 /**
