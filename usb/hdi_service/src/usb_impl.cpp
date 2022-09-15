@@ -1750,7 +1750,7 @@ int32_t UsbImpl::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const s
     UsbdBulkASyncList *list = UsbdBulkASyncListInit(port, pipe.intfId, pipe.endpointId);
     if (list == nullptr) {
         HDF_LOGE("%{public}s:UsbdBulkASyncListFind failed", __func__);
-        return HDF_SUCCESS;
+        return HDF_ERR_INVALID_PARAM;
     }
     list->cb = cb;
     if (list->cb == nullptr) {
@@ -1772,7 +1772,7 @@ int32_t UsbImpl::UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
     UsbdBulkASyncList *list = UsbdBulkASyncListFind(port, pipe.intfId, pipe.endpointId);
     if (list == nullptr) {
         HDF_LOGE("%{public}s:UsbdBulkASyncListFind failed", __func__);
-        return HDF_SUCCESS;
+        return HDF_ERR_INVALID_PARAM;
     }
     list->cb = nullptr;
     return HDF_SUCCESS;
