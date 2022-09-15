@@ -24,6 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace FaceAuth {
 namespace V1_0 {
+using BufferProducerSequenceable = OHOS::HDI::Camera::V1_0::BufferProducerSequenceable;
 class ExecutorImpl : public IExecutor {
 public:
     ExecutorImpl();
@@ -52,6 +53,8 @@ public:
 
     int32_t SendCommand(
         int32_t commandId, const std::vector<uint8_t> &extraInfo, const sptr<IExecutorCallback> &callbackObj) override;
+
+    int32_t SetBufferProducer(const sptr<BufferProducerSequenceable> &bufferProducer) override;
 
 private:
     struct ExecutorInfo executorInfo_;
