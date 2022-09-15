@@ -84,16 +84,44 @@ typedef enum {
  * @brief Defines the buffer usage.
  *
  */
-enum {
-    HBM_USE_CPU_READ = (1 << 0),        /**< CPU read buffer */
-    HBM_USE_CPU_WRITE = (1 << 1),       /**< CPU write memory */
-    HBM_USE_MEM_MMZ = (1 << 2),         /**< Media memory zone (MMZ) */
-    HBM_USE_MEM_DMA = (1 << 3),         /**< Direct memory access (DMA) buffer */
-    HBM_USE_MEM_SHARE = (1 << 4),       /**< Shared memory buffer*/
-    HBM_USE_MEM_MMZ_CACHE = (1 << 5),   /**< MMZ with cache*/
-    HBM_USE_MEM_FB = (1 << 6),          /**< Framebuffer */
-    HBM_USE_ASSIGN_SIZE = (1 << 7),     /**< Memory assigned */
-};
+typedef enum {
+    HBM_USE_CPU_READ = (1ULL << 0),        /**< CPU read buffer */
+    HBM_USE_CPU_WRITE = (1ULL << 1),       /**< CPU write memory */
+    HBM_USE_MEM_MMZ = (1ULL << 2),         /**< Media memory zone (MMZ) */
+    HBM_USE_MEM_DMA = (1ULL << 3),         /**< Direct memory access (DMA) buffer */
+    HBM_USE_MEM_SHARE = (1ULL << 4),       /**< Shared memory buffer*/
+    HBM_USE_MEM_MMZ_CACHE = (1ULL << 5),   /**< MMZ with cache*/
+    HBM_USE_MEM_FB = (1ULL << 6),          /**< Framebuffer */
+    HBM_USE_ASSIGN_SIZE = (1ULL << 7),     /**< Memory assigned */
+    HBM_USE_HW_RENDER = (1ULL << 8),       /**< For GPU write case */
+    HBM_USE_HW_TEXTURE = (1ULL << 9),      /**< For GPU read case */
+    HBM_USE_HW_COMPOSER = (1ULL << 10),    /**< For hardware composer */
+    HBM_USE_PROTECTED = (1ULL << 11),      /**< For safe buffer case, such as DRM */
+    HBM_USE_CAMERA_READ = (1ULL << 12),    /**< For camera read case */
+    HBM_USE_CAMERA_WRITE = (1ULL << 13),   /**< For camera write case */
+    HBM_USE_VIDEO_ENCODER = (1ULL << 14),  /**< For encode case */
+    HBM_USE_VIDEO_DECODER = (1ULL << 15),  /**< For decode case */
+    HBM_USE_VENDOR_PRI0 = (1ULL << 44),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI1 = (1ULL << 45),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI2 = (1ULL << 46),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI3 = (1ULL << 47),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI4 = (1ULL << 48),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI5 = (1ULL << 49),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI6 = (1ULL << 50),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI7 = (1ULL << 51),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI8 = (1ULL << 52),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI9 = (1ULL << 53),    /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI10 = (1ULL << 54),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI11 = (1ULL << 55),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI12 = (1ULL << 56),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI13 = (1ULL << 57),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI14 = (1ULL << 58),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI15 = (1ULL << 59),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI16 = (1ULL << 60),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI17 = (1ULL << 61),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI18 = (1ULL << 62),   /**< Reserverd for vendor */
+    HBM_USE_VENDOR_PRI19 = (1ULL << 63),   /**< Reserverd for vendor */
+} DisplayBufferUsage;
 
 /**
  * @brief Enumerates pixel formats.
