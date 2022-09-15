@@ -196,6 +196,24 @@ void FuzzSendCommand(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+void FuzzSetBufferProducer(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    sptr<IBufferProducer> bufferProducer = nullptr;
+    if (parcel.ReadBool()) {
+        auto surface = Surface::CreateSurfaceAsConsumer();
+        if (surface == nullptr) {
+            IAM_LOGE("CreateSurfaceAsConsumer fail");
+            return;
+        }
+        bufferProducer = surface->GetProducer();
+    }
+    sptr<BufferProducerSequenceable> producerSequenceable =
+        new (std::nothrow) BufferProducerSequenceable(bufferProducer);
+    g_executorImpl.SetBufferProducer(producerSequenceable);
+    IAM_LOGI("end");
+}
+
 using FuzzFunc = decltype(FuzzGetExecutorInfo);
 FuzzFunc *g_fuzzFuncs[] = {
     FuzzGetExecutorInfo,
@@ -207,6 +225,7 @@ FuzzFunc *g_fuzzFuncs[] = {
     FuzzDelete,
     FuzzCancel,
     FuzzSendCommand,
+    FuzzSetBufferProducer,
 };
 
 void FaceAuthHdiFuzzTest(const uint8_t *data, size_t size)

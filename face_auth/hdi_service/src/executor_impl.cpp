@@ -19,6 +19,7 @@
 
 #include "face_auth_defines.h"
 #include "iam_logger.h"
+#include "iam_para2str.h"
 
 #define LOG_LABEL OHOS::UserIam::Common::LABEL_FACE_AUTH_IMPL
 
@@ -182,6 +183,13 @@ int32_t ExecutorImpl::SendCommand(
                 return HDF_FAILURE;
             }
     }
+    return HDF_SUCCESS;
+}
+
+int32_t ExecutorImpl::SetBufferProducer(const sptr<BufferProducerSequenceable> &bufferProducer)
+{
+    IAM_LOGI("interface mock start set buffer producer %{public}s",
+        UserIam::Common::GetPointerNullStateString(bufferProducer.GetRefPtr()).c_str());
     return HDF_SUCCESS;
 }
 } // namespace V1_0
