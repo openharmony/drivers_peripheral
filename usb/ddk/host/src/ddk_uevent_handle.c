@@ -25,7 +25,6 @@
 #include "ddk_pnp_listener_mgr.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
-#include "hdf_remote_adapter_if.h"
 #include "securec.h"
 #include "usbfn_uevent_handle.h"
 

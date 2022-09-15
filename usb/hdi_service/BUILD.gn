@@ -68,7 +68,6 @@ ohos_shared_library("libusb_interface_service_1.0") {
       "hiviewdfx_hilog_native:libhilog",
       "init:libbegetutil",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
     ]
   } else {
