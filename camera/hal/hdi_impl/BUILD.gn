@@ -200,7 +200,6 @@ if (defined(ohos_lite)) {
       external_deps = [
         "c_utils:utils",
         "graphic_chipsetsdk:surface",
-        "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",

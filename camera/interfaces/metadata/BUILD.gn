@@ -20,7 +20,10 @@ ohos_shared_library("metadata") {
     "-Wall",
   ]
   cflags_cc = cflags
-  include_dirs = [ "//drivers/peripheral/camera/interfaces/metadata/include" ]
+  include_dirs = [
+    "//drivers/peripheral/camera/interfaces/metadata/include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+  ]
   if (defined(ohos_lite)) {
     sources = [
       "src/camera_metadata_info.cpp",
@@ -36,7 +39,6 @@ ohos_shared_library("metadata") {
     external_deps = [
       "c_utils:utils",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_single",
     ]
   }
 
