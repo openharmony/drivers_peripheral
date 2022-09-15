@@ -17,9 +17,8 @@ import("//build/test.gni")
 
 module_output_path = "memorytrackertest/"
 
-memorytracker_deps = [ "//utils/native/base:utils" ]
-
 memorytracker_external_deps = [
+  "c_utils:utils",
   "drivers_interface_memorytracker:libmemorytracker_proxy_1.0",
   "hdf_core:libhdf_utils",
   "ipc:ipc_core",
@@ -30,13 +29,11 @@ memmgr_public_deps = [ "//third_party/googletest:gtest_main" ]
 ohos_unittest("memorytracker_test") {
   module_out_path = module_output_path
   sources = [ "unittest/phone/hdf_memorytracker_test.cpp" ]
-  deps = memorytracker_deps
   if (is_standard_system) {
     external_deps = memorytracker_external_deps
     public_deps = memmgr_public_deps
   }
 }
-
 group("memorytracker_unittest") {
   testonly = true
   deps = [ ":memorytracker_test" ]
