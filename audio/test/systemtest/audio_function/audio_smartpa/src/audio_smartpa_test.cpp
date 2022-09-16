@@ -67,7 +67,7 @@ void AudioSmartPaTest::SetUpTestCase(void)
         struct AudioHwRenderParam *))dlsym(ptrHandle, "AudioInterfaceLibOutputRender");
     InterfaceLibCtlRender = (int32_t (*)(struct DevHandle *, int,
         struct AudioHwRenderParam *))dlsym(ptrHandle, "AudioInterfaceLibCtlRender");
-    CloseServiceRender = (void (*)(struct DevHandle *))dlsym(ptrHandle, "AudioCloseServiceRender");
+    CloseServiceRender = reinterpret_cast<void (*)(struct DevHandle *)>(dlsym(ptrHandle, "AudioCloseServiceRender"));
     if (BindServiceRender == nullptr || CloseServiceRender == nullptr ||
         InterfaceLibCtlRender == nullptr || InterfaceLibOutputRender == nullptr) {
         return;

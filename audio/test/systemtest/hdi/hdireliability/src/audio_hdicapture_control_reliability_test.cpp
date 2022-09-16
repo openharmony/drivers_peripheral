@@ -170,7 +170,7 @@ int32_t AudioHdiCaptureControlReliabilityTest::RelAudioCaptureFrame(struct Prepa
     uint64_t requestBytes = BUFFER_SIZE;
     uint64_t replyBytes = 0;
 
-    char *frame = static_cast<char *>calloc(1, BUFFER_SIZE);
+    char *frame = static_cast<char *>(calloc(1, BUFFER_SIZE));
     if (frame == nullptr) {
         return HDF_ERR_MALLOC_FAIL;
     }

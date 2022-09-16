@@ -57,12 +57,14 @@ void AudioLibCaptureTest::SetUpTestCase(void)
     if (ptrHandle == nullptr) {
         return;
     }
-    BindServiceCaptureSo = (struct DevHandle* (*)(const char *serverName))dlsym(ptrHandle, "AudioBindServiceCapture");
+    BindServiceCaptureSo = reinterpret_cast<struct DevHandle* (*)(const char *serverName)>(dlsym(ptrHandle,
+        "AudioBindServiceCapture"));
     InterfaceLibOutputCapture = (int32_t (*)(struct DevHandle *handle, int cmdId,
         struct AudioHwCaptureParam *handleData))dlsym(ptrHandle, "AudioInterfaceLibOutputCapture");
     InterfaceLibCtlCapture = (int32_t (*)(struct DevHandle *handle, int cmdId,
         struct AudioHwCaptureParam *handleData))dlsym(ptrHandle, "AudioInterfaceLibCtlCapture");
-    CloseServiceCaptureSo = (void (*)(struct DevHandle *handle))dlsym(ptrHandle, "AudioCloseServiceCapture");
+    CloseServiceCaptureSo = reinterpret_cast<void (*)(struct DevHandle *handle)>(dlsym(ptrHandle,
+        "AudioCloseServiceCapture"));
     if (BindServiceCaptureSo == nullptr || CloseServiceCaptureSo == nullptr ||
         InterfaceLibCtlCapture == nullptr || InterfaceLibOutputCapture == nullptr) {
         dlclose(ptrHandle);
