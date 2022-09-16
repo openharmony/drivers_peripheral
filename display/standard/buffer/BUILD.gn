@@ -17,6 +17,7 @@ import("//vendor/${product_company}/${product_name}/product.gni")
 group("display_buffer_entry") {
   deps = [
     "hdi_service:hdf_display_buffer_service",
-    "//device/soc/rockchip/rk3568/hardware/display:display_buffer_hwi_group",
+    #"//device/soc/rockchip/rk3568/hardware/display:display_buffer_hwi_group",
+    "model:display_buffer_model",
   ]
 }

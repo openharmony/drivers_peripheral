@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,18 +13,21 @@
  * limitations under the License.
  */
 
-#ifndef DISPLAY_COMMON_H
-#define DISPLAY_COMMON_H
-
-#include <functional>
-
+#ifndef HDI_TEST_RENDER_UTILS_H
+#define HDI_TEST_RENDER_UTILS_H
+#include "display_test.h"
+#include "hdi_test_device_common.h"
 namespace OHOS {
 namespace HDI {
 namespace Display {
-typedef void (*HotPlugCallback)(uint32_t devId, bool connected, void *data);
-typedef void (*VBlankCallback)(unsigned int sequence, uint64_t ns, void *data);
-typedef void (*RefreshCallback)(uint32_t devId, void *data);
-} // namespace Display
-} // namespace HDI
-} // namespace OHOS
-#endif /* DISPLAY_COMMON_H */
+namespace TEST {
+void SetUint32(uint32_t &dst, uint32_t value);
+void SetPixel(const BufferHandle &handle, int x, int y, uint32_t color);
+void ClearColor(const BufferHandle &handle, uint32_t color);
+} // OHOS
+} // HDI
+} // Display
+} // TEST
+
+
+#endif // HDI_TEST_RENDER_UTILS_H

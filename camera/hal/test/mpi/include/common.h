@@ -38,7 +38,6 @@
 #include "idevice_manager.h"
 #include "camera_metadata_info.h"
 #include "ibuffer.h"
-#include <display_type.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include "securec.h"

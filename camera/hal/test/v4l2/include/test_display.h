@@ -30,7 +30,6 @@
 #include "stream_operator_proxy.h"
 #include "idevice_manager.h"
 #include "camera_metadata_info.h"
-#include <display_type.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>

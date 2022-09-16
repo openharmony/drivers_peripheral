@@ -70,14 +70,14 @@ int32_t DisplayComposerService::LoadHwi()
     libHandle_ = dlopen(DISPLAY_COMPOSER_HWI_LIBRARY_NAME, RTLD_LAZY);
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 
-    createHwiFunc_ = reinterpret_cast<CreateComposerHwiFunc_t *>(dlsym(libHandle_, "CreateComposerHwi"));
+    createHwiFunc_ = reinterpret_cast<CreateComposerHwiFunc>(dlsym(libHandle_, "CreateComposerHwi"));
     errStr = dlerror();
     if (errStr) {
         HDF_LOGE("error: %{public}s", errStr);
         return HDF_FAILURE;
     }
 
-    destroyHwiFunc_ = reinterpret_cast<DestroyComposerHwiFunc_t *>(dlsym(libHandle_, "DestroyComposerHwi"));
+    destroyHwiFunc_ = reinterpret_cast<DestroyComposerHwiFunc>(dlsym(libHandle_, "DestroyComposerHwi"));
     errStr = dlerror();
     if (errStr) {
         HDF_LOGE("error: %{public}s", errStr);

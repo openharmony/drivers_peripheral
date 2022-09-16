@@ -21,7 +21,7 @@
 
 #include "constants.h"
 #include "dimage_buffer.h"
-#include "display_type.h"
+#include "v1_0/display_composer_type.h"
 #include "surface.h"
 #include "surface_buffer.h"
 

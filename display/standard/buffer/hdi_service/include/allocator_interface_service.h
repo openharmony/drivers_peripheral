@@ -38,8 +38,8 @@ private:
 private:
     void *libHandle_;
     IDisplayBufferHwi *hwiImpl_;
-    Create_DisplayBufferHwiFunc_t *createHwi_;
-    Destroy_DisplayBufferHwiFunc_t *destroyHwi_;
+    CreateDisplayBufferHwiFunc createHwi_;
+    DestroyDisplayBufferHwiFunc destroyHwi_;
 };
 } // namespace V1_0
 } // namespace Buffer

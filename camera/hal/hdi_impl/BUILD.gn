@@ -72,7 +72,6 @@ if (defined(ohos_lite)) {
       "$camera_path/utils/event",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "//drivers/peripheral/camera/interfaces/metadata/include",
-      "//drivers/peripheral/display/interfaces/include",
       "//drivers/peripheral/base",
 
       #producer
@@ -189,7 +188,6 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
       "//drivers/peripheral/camera/interfaces/metadata/include",
-      "//drivers/peripheral/display/interfaces/include",
 
       #producer
       "//utils/native/base/include",
@@ -231,6 +229,7 @@ if (defined(ohos_lite)) {
 
     if (is_standard_system) {
       external_deps = [
+        "drivers_interface_display:display_composer_idl_headers",
         "graphic_chipsetsdk:surface",
         "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",

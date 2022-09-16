@@ -18,7 +18,7 @@
 
 #include <surface_buffer.h>
 #include <memory>
-#include "display_type.h"
+#include "v1_0/display_composer_type.h"
 #include "ibuffer.h"
 
 namespace OHOS::Camera {
