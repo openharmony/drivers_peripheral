@@ -22,7 +22,6 @@
 #include <map>
 #include <hdf_log.h>
 #include <surface.h>
-#include <display_type.h>
 #include "camera_metadata_info.h"
 #include "ibuffer.h"
 #include "v1_0/ioffline_stream_operator.h"

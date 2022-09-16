@@ -53,7 +53,6 @@
 #include <vector>
 #include <map>
 #include <surface.h>
-#include <display_type.h>
 #include <iservice_registry.h>
 #include <iremote_proxy.h>
 #include <hdf_log.h>

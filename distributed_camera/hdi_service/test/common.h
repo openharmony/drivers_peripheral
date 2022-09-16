@@ -30,7 +30,7 @@
 #include <vector>
 
 #include "camera_metadata_info.h"
-#include "display_type.h"
+#include "v1_0/display_composer_type.h"
 #include "distributed_hardware_log.h"
 #include "idistributed_hardware_source.h"
 #include "iservice_registry.h"

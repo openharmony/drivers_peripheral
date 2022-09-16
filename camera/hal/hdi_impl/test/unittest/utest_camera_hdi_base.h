@@ -30,7 +30,6 @@
 #include "ibuffer.h"
 #include "ioffline_stream_operator.h"
 #include <surface.h>
-#include <display_type.h>
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/ioctl.h>

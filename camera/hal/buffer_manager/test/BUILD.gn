@@ -37,7 +37,6 @@ if (defined(ohos_lite)) {
       "//drivers/hdf_core/framework/include/utils",
       "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "//drivers/peripheral/base",
-      "//drivers/peripheral/display/interfaces/include",
       "//foundation/graphic/surface/interfaces/kits",
       "//foundation/graphic/surface/interfaces/innerkits",
     ]

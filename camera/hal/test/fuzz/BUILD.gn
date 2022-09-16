@@ -64,7 +64,6 @@ ohos_fuzztest("CameraIpcCameraDeviceRemoteFuzzTest") {
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
-    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -144,7 +143,6 @@ ohos_fuzztest("CameraIpcCameraHostServiceFuzzTest") {
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
-    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -224,7 +222,6 @@ ohos_fuzztest("CameraIpcOfflineFuzzTest") {
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
-    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -303,7 +300,6 @@ ohos_fuzztest("CameraIpcStreamOperatorFuzzTest") {
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
-    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -385,7 +381,6 @@ ohos_fuzztest("CameraIpcCameraDeviceCallbackFuzzTest") {
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
-    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -465,7 +460,6 @@ ohos_fuzztest("CameraIpcCameraHostCallbackFuzzTest") {
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
-    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
@@ -545,7 +539,6 @@ ohos_fuzztest("CameraIpcStreamOperatorCallbackFuzzTest") {
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
     "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/lite",
-    "//drivers/peripheral/display/interfaces/include",
   ]
 
   deps = [
