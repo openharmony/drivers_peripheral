@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,11 +13,13 @@
 
 import("//drivers/peripheral/camera/hal/camera.gni")
 
+at_root_path = "$camera_path/test/at"
+
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
   import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
 
-  config("camhdi_impl_utest_config") {
+  config("camhdi_at_test_config") {
     visibility = [ ":*" ]
     cflags_cc = [
       "-DGST_DISABLE_DEPRECATED",
@@ -27,17 +29,17 @@ if (defined(ohos_lite)) {
     cflags_cc += [ "-std=c++17" ]
   }
 
-  unittest("camera_hal_hdi_impl_unittest") {
+  unittest("camera_test_at") {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
     sources = [
+      "$at_root_path/hdi/utest_camera_device_impl.cpp",
+      "$at_root_path/hdi/utest_camera_hdi_base.cpp",
+      "$at_root_path/hdi/utest_camera_host_impl.cpp",
+      "$at_root_path/hdi/utest_stream_operator_impl.cpp",
       "$camera_path/../interfaces/hdi_passthrough/callback/src/camera_device_callback.cpp",
       "$camera_path/../interfaces/hdi_passthrough/callback/src/camera_host_callback.cpp",
       "$camera_path/../interfaces/hdi_passthrough/callback/src/stream_operator_callback.cpp",
-      "utest_camera_device_impl.cpp",
-      "utest_camera_hdi_base.cpp",
-      "utest_camera_host_impl.cpp",
-      "utest_stream_operator_impl.cpp",
     ]
 
     include_dirs = [
@@ -115,9 +117,9 @@ if (defined(ohos_lite)) {
   import("//build/test.gni")
   import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-  module_output_path = "hdf/camera"
+  module_output_path = "drivers_peripheral_camera/camera"
 
-  config("camhdi_impl_utest_config") {
+  config("camhdi_at_test_config") {
     visibility = [ ":*" ]
     cflags_cc = [
       "-DGST_DISABLE_DEPRECATED",
@@ -126,19 +128,18 @@ if (defined(ohos_lite)) {
     ]
   }
 
-  ohos_unittest("camera_hal_hdi_impl_unittest") {
+  ohos_unittest("camera_test_at") {
     testonly = true
     module_out_path = module_output_path
     sources = [
-      "utest_camera_device_impl.cpp",
-      "utest_camera_hdi_base.cpp",
-      "utest_camera_host_impl.cpp",
-      "utest_stream_operator_impl.cpp",
+      "$at_root_path/hdi/utest_camera_device_impl.cpp",
+      "$at_root_path/hdi/utest_camera_hdi_base.cpp",
+      "$at_root_path/hdi/utest_camera_host_impl.cpp",
+      "$at_root_path/hdi/utest_stream_operator_impl.cpp",
     ]
 
     include_dirs = [
       "//third_party/googletest/googletest/include/gtest",
-      "$camera_path/test/unittest",
       "$camera_path/../interfaces/include",
       "$camera_path/../interfaces/hdi_ipc",
       "$camera_path/../interfaces/hdi_ipc/utils/include",
@@ -204,6 +205,6 @@ if (defined(ohos_lite)) {
     }
 
     external_deps += [ "samgr:samgr_proxy" ]
-    public_configs = [ ":camhdi_impl_utest_config" ]
+    public_configs = [ ":camhdi_at_test_config" ]
   }
 }
