@@ -36,12 +36,13 @@ ohos_shared_library("camera_v4l2_adapter") {
     "$camera_path/include",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include",
     "//drivers/peripheral/camera/interfaces/metadata/include",
+    "//drivers/hdf_core/framework/include/utils",
+    "//drivers/hdf_core/adapter/uhdf2/osal/include",
   ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
