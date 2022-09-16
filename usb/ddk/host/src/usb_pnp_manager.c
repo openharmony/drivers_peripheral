@@ -26,7 +26,6 @@
 #include "hdf_device_object.h"
 #include "hdf_io_service_if.h"
 #include "hdf_log.h"
-#include "hdf_remote_adapter_if.h"
 #include "osal_mem.h"
 #include "securec.h"
 #include "usb_ddk_pnp_loader.h"
