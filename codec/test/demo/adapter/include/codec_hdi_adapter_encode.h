@@ -128,6 +128,8 @@ private:
     uint32_t width_;
     uint32_t height_;
     uint32_t stride_;
+    uint32_t srcFileSize_;
+    uint32_t totalSrcSize_;
     struct CodecComponentType *client_;
     struct CodecCallbackType *callback_;
     struct CodecComponentManager *omxMgr_;
