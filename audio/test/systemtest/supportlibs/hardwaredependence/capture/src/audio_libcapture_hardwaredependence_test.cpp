@@ -68,7 +68,8 @@ void AudioLibCaptureHardwareDependenceTest::SetUpTestCase(void)
     if (ptrHandle == nullptr) {
         return;
     }
-    BindServiceCaptureSo = (struct DevHandle* (*)(const char *))dlsym(ptrHandle, "AudioBindServiceCapture");
+    BindServiceCaptureSo = reinterpret_cast<struct DevHandle* (*)(const char *)>(dlsym(ptrHandle,
+        "AudioBindServiceCapture"));
     InterfaceLibOutputCapture = (int32_t (*)(struct DevHandle *handle, int cmdId,
         struct AudioHwCaptureParam *handleData))dlsym(ptrHandle, "AudioInterfaceLibOutputCapture");
     InterfaceLibCtlCapture = (int32_t (*)(struct DevHandle *handle, int cmdId,
