@@ -277,6 +277,7 @@ int32_t StreamOperator::ReleaseStreams(const std::vector<int32_t>& streamIds)
         if (it->second->IsRunning()) {
             it->second->StopStream();
         }
+        it->second->DumpStatsInfo();
         streamMap_.erase(it);
     }
 

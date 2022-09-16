@@ -52,6 +52,7 @@ public:
     virtual RetCode Capture(const std::shared_ptr<CaptureRequest>& request) = 0;
     virtual RetCode OnFrame(const std::shared_ptr<CaptureRequest>& request) = 0;
     virtual bool IsRunning() const = 0;
+    virtual void DumpStatsInfo() const = 0;
 
 public:
     static std::map<StreamIntent, std::string> g_availableStreamType;
