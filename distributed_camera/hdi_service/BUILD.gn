@@ -48,6 +48,7 @@ ohos_shared_library("libdistributed_camera_host_config") {
   deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0" ]
 
   external_deps = [
+    "drivers_interface_display:display_composer_idl_headers",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
@@ -70,7 +71,6 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "include/utils",
     "//utils/native/base/include",
     "//utils/system/safwk/native/include",
-    "${display_hdf_path}/interfaces/include",
     "${hdf_framework_path}/include/utils",
     "${hdf_framework_path}/include/core",
     "${hdf_framework_path}/include/osal",
@@ -116,6 +116,7 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
   ]
 
   external_deps = [
+    "drivers_interface_display:display_composer_idl_headers",
     "graphic_chipsetsdk:buffer_handle",
     "graphic_chipsetsdk:surface",
     "hdf_core:libhdf_utils",

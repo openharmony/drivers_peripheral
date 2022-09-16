@@ -23,7 +23,6 @@
 #include <thread>
 #include <vector>
 #include <gtest/gtest.h>
-#include "display_type.h"
 #include "ibuffer.h"
 #include "ibuffer_pool.h"
 #include "surface.h"
