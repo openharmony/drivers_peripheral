@@ -39,7 +39,7 @@ if (defined(ohos_lite)) {
     if (drivers_peripheral_input_feature_model) {
       testonly = true
       deps = [
-        "fuzztest:hdf_input_fuzztest",
+        "fuzztest/input_fuzzer:hdf_fuzztest_input",
         "unittest:hdf_unittest_input",
       ]
     }
