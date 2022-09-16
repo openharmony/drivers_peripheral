@@ -58,17 +58,11 @@ ohos_shared_library("libwlan_interface_service_1.0") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_single",
     ]
   } else {
-    external_deps = [
-      "hilog:libhilog",
-      "ipc:ipc_single",
-    ]
+    external_deps = [ "hilog:libhilog" ]
   }
 
   install_images = [ chipset_base_dir ]
@@ -111,17 +105,12 @@ ohos_shared_library("libwifi_hdi_c_device") {
     external_deps = [
       "c_utils:utils",
       "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_single",
     ]
   } else {
-    external_deps = [
-      "hilog:libhilog",
-      "ipc:ipc_single",
-    ]
+    external_deps = [ "hilog:libhilog" ]
   }
 
   install_images = [ chipset_base_dir ]

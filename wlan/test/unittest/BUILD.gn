@@ -75,7 +75,6 @@ if (defined(ohos_lite)) {
     sources =
         [ "//drivers/peripheral/wlan/test/unittest/hal/wifi_hal_test.cpp" ]
     deps = [
-      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//drivers/peripheral/wlan/client:wifi_driver_client",
       "//drivers/peripheral/wlan/hal:wifi_hal",
@@ -102,10 +101,8 @@ if (defined(ohos_lite)) {
     sources =
         [ "//drivers/peripheral/wlan/test/unittest/client/hdf_client_test.cpp" ]
     deps = [
-      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//drivers/peripheral/wlan/client:wifi_driver_client",
-      "//drivers/peripheral/wlan/hal:wifi_hal",
     ]
     public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
@@ -131,15 +128,10 @@ if (defined(ohos_lite)) {
         "//drivers/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
     cflags = configFlag
-    deps = [
-      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
-      "//drivers/peripheral/wlan/client:wifi_driver_client",
-      "//drivers/peripheral/wlan/hal:wifi_hal",
-    ]
+    deps = [ "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common" ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
-        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
       ]
     } else {
@@ -160,7 +152,6 @@ if (defined(ohos_lite)) {
 
     cflags = configFlag
     deps = [
-      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
       "//drivers/peripheral/wlan/client:wifi_driver_client",
       "//drivers/peripheral/wlan/hal:wifi_hal",
     ]
@@ -187,11 +178,7 @@ if (defined(ohos_lite)) {
         "//drivers/hdf_core/adapter/uhdf2/test/resource/wlan/ohos_test.xml"
 
     cflags = configFlag
-    deps = [
-      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
-      "//drivers/peripheral/wlan/client:wifi_driver_client",
-      "//drivers/peripheral/wlan/hal:wifi_hal",
-    ]
+    deps = [ "//drivers/peripheral/wlan/client:wifi_driver_client" ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
