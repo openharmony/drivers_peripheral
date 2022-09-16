@@ -25,7 +25,6 @@ if (is_standard_system) {
     include_dirs = [
       "//drivers/peripheral/display/interfaces/include",
       "//drivers/peripheral/base",
-      "//drivers/hdf_core/framework/core/common/include/host",
     ]
 
     sources = [
@@ -42,6 +41,7 @@ if (is_standard_system) {
 
     if (is_standard_system) {
       external_deps = [
+        "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
