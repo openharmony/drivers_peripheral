@@ -51,10 +51,7 @@ if (defined(ohos_lite)) {
       deps = [
         "buffer_manager/test:camera_hal_buffer_manager_unittest",
         "device_manager/test:camera_hal_device_manager_unittest",
-        "pipeline_core/test:camera_hal_pipeline_core_unittest",
-        "test/ci:camera_test_ci",
-        "test/fuzz:camera_hal_fuzztest",
-        "test/v4l2:camera_case_unittest",
+        "test/fuzztest:camera_hdi_fuzztest",
       ]
     }
   }
