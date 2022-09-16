@@ -36,7 +36,8 @@
         "//drivers/peripheral/camera/hal:camera_hal"
       ],
       "test": [
-        "//drivers/peripheral/camera/hal/test/ci:camera_test_ci"
+        "//drivers/peripheral/camera/hal/test/at:camera_test_at",
+        "//drivers/peripheral/camera/hal/test/ut:camera_test_ut"
       ],
       "inner_kits": [
         {
