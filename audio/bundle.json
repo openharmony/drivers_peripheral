@@ -29,7 +29,8 @@
       "components": [
         "hiviewdfx_hilog_native",
         "hdf_core",
-        "utils_base"
+        "utils_base",
+        "drivers_interface_audio"
       ],
       "third_party": [
         "bounds_checking_function",

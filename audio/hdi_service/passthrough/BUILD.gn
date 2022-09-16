@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-ohos_shared_library("hdi_audio_passthrough") {
+ohos_shared_library("audio_manager_service_1.0") {
   sources = [
     "//third_party/cJSON/cJSON.c",
     "src/audio_adapter.c",
