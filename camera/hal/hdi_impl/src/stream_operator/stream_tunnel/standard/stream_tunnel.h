@@ -18,7 +18,6 @@
 
 #include <mutex>
 #include <unordered_map>
-#include "display_type.h"
 #include "ibuffer.h"
 #include "surface.h"
 #include "surface_type.h"

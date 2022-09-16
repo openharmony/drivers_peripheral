@@ -23,7 +23,7 @@
 #include "iservice_registry.h"
 #include "stream_operator_impl.h"
 #include <surface.h>
-#include <display_type.h>
+#include "v1_0/display_composer_type.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <sys/ioctl.h>

@@ -1,0 +1,110 @@
+# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+
+group("display_composer_model") {
+    deps = [
+        ":libdisplay_composer_hwi_impl",
+        ":display_composer_vendor",
+    ]
+}
+
+ohos_shared_library("libdisplay_composer_hwi_impl") {
+
+    sources = [ "src/display_composer_hwi_impl.cpp" ]
+
+    include_dirs = [
+        "//drivers/peripheral/display/standard/utils/include",
+        "//drivers/hdf_core/adapter/uhdf2/model/display/composer",
+        "//drivers/peripheral/display/standard/composer/hdi_service/include",
+        "//drivers/peripheral/display/standard/composer/model/include",
+    ]
+
+    deps = [
+        ":display_composer_vendor",
+        "//foundation/graphic/graphic_2d/utils/buffer_handle:buffer_handle",
+    ]
+
+    external_deps = [
+        "utils_base:utils",
+        "ipc:ipc_core",
+        "hiviewdfx_hilog_native:libhilog",
+        "drivers_interface_display:display_composer_idl_headers",
+    ]
+
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_display"
+}
+
+ohos_shared_library("display_composer_vendor") {
+    sources = [
+        "src/drm_connector.cpp",
+        "src/drm_crtc.cpp",
+        "src/drm_device.cpp",
+        "src/drm_display.cpp",
+        "src/drm_encoder.cpp",
+        "src/drm_plane.cpp",
+        "src/drm_vsync_worker.cpp",
+        "src/hdi_composer.cpp",
+        "src/hdi_device_interface.cpp",
+        "src/hdi_display.cpp",
+        "src/hdi_drm_composition.cpp",
+        "src/hdi_drm_layer.cpp",
+        "src/hdi_gfx_composition.cpp",
+        "src/hdi_layer.cpp",
+        "src/hdi_netlink_monitor.cpp",
+        "src/hdi_session.cpp",
+        "src/display_gfx.cpp",
+    ]
+    output_name = "display_composer_vendor"
+    include_dirs = [
+        "include",
+        "//drivers/peripheral/display/standard/buffer/model/include",
+        "//drivers/peripheral/display/standard/buffer/hdi_service/include",
+        "//drivers/peripheral/display/standard/utils/include",
+        "//drivers/peripheral/base",
+        "//drivers/hdf_core/framework/include/utils",
+        "//drivers/hdf_core/adapter/uhdf2/osal/include",
+        "//drivers/hdf_core/adapter/uhdf2/model/display/composer",
+        "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+        "//foundation/graphic/standard/utils/include",
+        "//foundation/graphic/standard/prebuilts/librarys/drm/include",
+        "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
+        "//device/soc/rockchip/rk3568/hardware/rga/include",
+    ]
+
+    deps = [
+        "//third_party/libdrm:libdrm",
+        "//utils/native/base:utils",
+        "//drivers/peripheral/display/standard/buffer/model:libdisplay_buffer_hwi_impl",
+        "//device/soc/rockchip/rk3568/hardware/rga:librga",
+    ]
+    cflags_cc = [
+        "-Wno-error=unused-function",
+        "-Wno-error=missing-braces",
+        "-Wno-error=#warnings",
+    ]
+    external_deps = [
+        "hiviewdfx_hilog_native:libhilog",
+        "drivers_interface_display:display_buffer_idl_headers",
+        "drivers_interface_display:display_composer_idl_headers",
+    ]
+    install_enable = true
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_display"
+}
+

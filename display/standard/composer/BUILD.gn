@@ -13,7 +13,8 @@
 
 group("display_composer_entry") {
   deps = [
-    "//device/soc/rockchip/rk3568/hardware/display:display_composer_hwi_group",
+    #"//device/soc/rockchip/rk3568/hardware/display:display_composer_hwi_group",
     "//drivers/peripheral/display/standard/composer/hdi_service:display_composer_hdi_service",
+    "model:display_composer_model",
   ]
 }

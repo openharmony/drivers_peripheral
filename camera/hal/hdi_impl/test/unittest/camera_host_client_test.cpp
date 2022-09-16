@@ -29,7 +29,7 @@
 #include "iservice_registry.h"
 #include "ioffline_stream_operator.h"
 #include <surface.h>
-#include <display_type.h>
+#include "v1_0/display_composer_type.h"
 #include <stdio.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>

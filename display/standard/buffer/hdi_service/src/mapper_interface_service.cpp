@@ -63,14 +63,14 @@ int32_t MapperInterfaceService::LoadHwi()
     libHandle_ = dlopen(DISPLAY_BUFFER_HWI_LIBRARY_PATH, RTLD_NOW);
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 
-    createHwi_ = reinterpret_cast<Create_DisplayBufferHwiFunc_t *>(dlsym(libHandle_, "Create_DisplayBufferHwi"));
+    createHwi_ = reinterpret_cast<CreateDisplayBufferHwiFunc>(dlsym(libHandle_, "CreateDisplayBufferHwi"));
     errStr = dlerror();
     if (errStr) {
         HDF_LOGE("error: %{public}s", errStr);
         return HDF_FAILURE;
     }
 
-    destroyHwi_ = reinterpret_cast<Destroy_DisplayBufferHwiFunc_t *>(dlsym(libHandle_, "Destroy_DisplayBufferHwi"));
+    destroyHwi_ = reinterpret_cast<DestroyDisplayBufferHwiFunc>(dlsym(libHandle_, "DestroyDisplayBufferHwi"));
     errStr = dlerror();
     if (errStr) {
         HDF_LOGE("error: %{public}s", errStr);

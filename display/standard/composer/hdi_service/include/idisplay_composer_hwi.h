@@ -17,7 +17,7 @@
 #define OHOS_HDI_DISPLAY_V1_0_IDISPLAYCOMPOSERHWI_H
 
 #include <vector>
-#include "display_common.h"
+#include "common/include/display_common.h"
 #include "v1_0/display_composer_type.h"
 
 namespace OHOS {
@@ -69,15 +69,15 @@ public:
     virtual int32_t SetTransformMode(uint32_t devId, uint32_t layerId, TransformType type) = 0;
     virtual int32_t SetLayerDirtyRegion(uint32_t devIdHWI, uint32_t layerId, const IRect &region) = 0;
     virtual int32_t SetLayerVisibleRegion(uint32_t devId, uint32_t layerId, std::vector<IRect> &rects) = 0;
-    virtual int32_t SetLayerBuffer(uint32_t devId, uint32_t layerId, BufferHandle &buffer, int32_t fence) = 0;
+    virtual int32_t SetLayerBuffer(uint32_t devId, uint32_t layerId, const BufferHandle &buffer, int32_t fence) = 0;
     virtual int32_t SetLayerCompositionType(uint32_t devId, uint32_t layerId, CompositionType type) = 0;
     virtual int32_t SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType type) = 0;
     virtual int32_t SetLayerVisible(uint32_t devId, uint32_t layerId, bool visible) = 0;
 };
 
-using IDisplayComposerHwi *CreateComposerHwiFunc_t();
+using CreateComposerHwiFunc = IDisplayComposerHwi* (*)();
+using DestroyComposerHwiFunc = void (*)(IDisplayComposerHwi *hwi);
 extern "C" IDisplayComposerHwi *CreateComposerHwi();
-using void DestroyComposerHwiFunc_t(IDisplayComposerHwi *hwi);
 extern "C" void DestroyComposerHwi(IDisplayComposerHwi *hwi);
 } // namespace V1_0
 } // namespace Composer

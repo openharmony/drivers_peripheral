@@ -27,12 +27,24 @@
     },
     "build": {
       "sub_component": [
-        "//drivers/peripheral/display/hal:hdi_display"
+        "//drivers/peripheral/display/hal:hdi_display",
+        "//drivers/peripheral/display/standard/buffer:display_buffer_entry",
+        "//drivers/peripheral/display/standard/composer:display_composer_entry"
       ],
       "test": [
-        "//drivers/peripheral/display:display_test_entry"
+        "//drivers/peripheral/display:display_test_entry",
+        "//drivers/peripheral/display/standard/buffer/test:hdf_test_display_buffer",
+        "//drivers/peripheral/display/standard/composer/test:hdf_test_display_composer"
       ],
       "inner_kits": [
+        {
+          "name": "//drivers/peripheral/display/standard/composer/hdi_service:display_composer_hdi_service",
+          "header": {
+            "header_files": [
+            ],
+            "header_base": "//drivers/peripheral/displaydevice/hdi_service/include"
+          }
+        },
         {
           "name": "//drivers/peripheral/display/hal:hdi_display_device",
             "header": {
