@@ -15,7 +15,6 @@
 
 #include <gtest/gtest.h>
 #include "hdf_base.h"
-#include "hdf_uhdf_test.h"
 #include "hdf_sbuf.h"
 #include "wifi_hal.h"
 #include "wifi_hal_ap_feature.h"
