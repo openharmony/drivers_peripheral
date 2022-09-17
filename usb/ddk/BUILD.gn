@@ -15,10 +15,6 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/usb/usb.gni")
 
-config("libusbhost_acm_rawapi_all_dependent_config") {
-  include_dirs = [ "//drivers/hdf_core/adapter/uhdf2/include/host" ]
-}
-
 group("libusb_core") {
   deps = [
     ":libusb_ddk_device",
@@ -55,10 +51,10 @@ ohos_shared_library("libusb_ddk_host") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
-    all_dependent_configs = [ ":libusbhost_acm_rawapi_all_dependent_config" ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
@@ -97,7 +93,6 @@ ohos_shared_library("libusb_pnp_manager") {
     external_deps = [
       "c_utils:utils",
       "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
