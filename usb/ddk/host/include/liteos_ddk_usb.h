@@ -34,12 +34,12 @@
 #include "usb_controller.h"
 #include "usb_bus.h"
 
-#define UsbAdapterDeviceRequest         usb_device_request
-#define UsbAdapterDeviceDescriptor      usb_device_descriptor
-#define UsbAdapterHostEndpoint          usb_host_endpoint
-#define UsbAdapterDevice                usb_device
-#define UsbAdapterIsoPacketDescriptor   usb_iso_packet_descriptor
-#define UsbAdapterUrb                   urb
-#define UsbAdapterSpinLock              SPIN_LOCK_S
+typedef struct usb_device_request          UsbAdapterDeviceRequest;
+typedef struct usb_device_descriptor       UsbAdapterDeviceDescriptor;
+typedef struct usb_host_endpoint           UsbAdapterHostEndpoint;
+typedef struct usb_device                  UsbAdapterDevice;
+typedef struct usb_iso_packet_descriptor   UsbAdapterIsoPacketDescriptor;
+typedef struct urb                         UsbAdapterUrb;
+typedef struct SPIN_LOCK_S                 UsbAdapterSpinLock;
 
 #endif /* USB_LITEOS_DDK_USB_H */

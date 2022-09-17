@@ -25,6 +25,7 @@
 const int SLEEP_TIME = 3;
 const uint8_t BUS_NUM_255 = 255;
 const uint8_t DEV_ADDR_255 = 255;
+UsbDev UsbdDeviceTest::dev_ = {0, 0};
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -34,8 +35,6 @@ using namespace OHOS::HDI::Usb::V1_0;
 
 namespace {
 sptr<IUsbInterface> g_usbInterface = nullptr;
-}
-struct UsbDev UsbdDeviceTest::dev_ = {0, 0};
 
 void UsbdDeviceTest::SetUpTestCase(void)
 {
@@ -212,4 +211,5 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice004, TestSize.Level1)
     ASSERT_NE(ret, 0);
     dev = dev_;
     g_usbInterface->CloseDevice(dev);
+}
 }

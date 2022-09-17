@@ -56,7 +56,7 @@ static uint8_t g_endNum;
 static struct OsalSem g_timeSem;
 static struct usb_device *g_fd = NULL;
 static uint32_t g_sigCnt = 0;
-static struct UsbAdapterHostEndpoint *g_uhe = NULL;
+static UsbAdapterHostEndpoint *g_uhe = NULL;
 static bool g_writeOrRead = TEST_WRITE;
 static struct AcmDevice *g_acm = NULL;
 

@@ -860,6 +860,10 @@ struct UsbInterface *UsbClaimInterfaceUnforce(
     struct UsbSdkInterface *interfaceSdk = NULL;
 
     interfaceObj = UsbClaimInterface(session, busNum, usbAddr, interfaceIndex);
+    if (interfaceObj == NULL) {
+        HDF_LOGE("%{public}s:%{public}d interfaceObj is NULL", __func__, __LINE__);
+        return NULL;
+    }
 
     interfaceSdk = (struct UsbSdkInterface *)interfaceObj;
     if (OsalAtomicRead((OsalAtomic *)&interfaceSdk->refCount) > INTERFACE_REFCOUNT_UNFORCE) {
@@ -869,7 +873,6 @@ struct UsbInterface *UsbClaimInterfaceUnforce(
         }
         return NULL;
     }
-
     return interfaceObj;
 }
 
