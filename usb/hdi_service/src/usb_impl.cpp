@@ -32,14 +32,13 @@
 #include "usbd_load_usb_service.h"
 #include "usbd_port.h"
 
-
 namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace V1_0 {
 sptr<IUsbdSubscriber> UsbImpl::subscriber_ = nullptr;
-HdfIoService *UsbImpl::usbPnpServ_ = nullptr;
 HdfDevEventlistener UsbImpl::usbPnpListener_ = {0};
+HdfDevEventlistener UsbImpl::listenerForLoadService_ = {0};
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
 {
@@ -826,10 +825,6 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbImpl *super, 
 
     int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_NOTIFY_ADD_DEVICE) {
-        if (UsbdLoadUsbService::LoadUsbService() != 0) {
-            HDF_LOGE("usbhost LoadUsbServer error");
-            return HDF_FAILURE;
-        }
         UsbdDispatcher::UsbdDeviceCreateAndAttach(super, infoTable->busNum, infoTable->devNum);
         USBDeviceInfo info = {ACT_DEVUP, infoTable->busNum, infoTable->devNum};
         if (subscriber_ == nullptr) {
@@ -842,10 +837,6 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbImpl *super, 
         USBDeviceInfo info = {ACT_DEVDOWN, infoTable->busNum, infoTable->devNum};
         if (subscriber_ == nullptr) {
             HDF_LOGE("%{public}s: subscriber_ is nullptr, %{public}d", __func__, __LINE__);
-            return HDF_FAILURE;
-        }
-        if (UsbdLoadUsbService::RemoveUsbService() != 0) {
-            HDF_LOGE("usbhost RemoveUsbServer error");
             return HDF_FAILURE;
         }
         ret = subscriber_->DeviceEvent(info);
@@ -863,10 +854,6 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
 
     int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_DRIVER_GADGET_ADD) {
-        if (UsbdLoadUsbService::LoadUsbService() != 0) {
-            HDF_LOGE("usbdev LoadUsbServer error");
-            return HDF_FAILURE;
-        }
         USBDeviceInfo info = {ACT_UPDEVICE, 0, 0};
         if (subscriber_ == nullptr) {
             HDF_LOGE("%{public}s: subscriber_ is nullptr, %{public}d", __func__, __LINE__);
@@ -878,10 +865,6 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
         USBDeviceInfo info = {ACT_DOWNDEVICE, 0, 0};
         if (subscriber_ == nullptr) {
             HDF_LOGE("%{public}s: subscriber_ is nullptr, %{public}d", __func__, __LINE__);
-            return HDF_FAILURE;
-        }
-        if (UsbdLoadUsbService::RemoveUsbService() != 0) {
-            HDF_LOGE("usbdev RemoveUsbServer error");
             return HDF_FAILURE;
         }
         ret = subscriber_->DeviceEvent(info);
@@ -896,42 +879,42 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
     return ret;
 }
 
+int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
+{
+    (void)priv;
+    (void)data;
+    if (id == USB_PNP_DRIVER_GADGET_ADD || id == USB_PNP_NOTIFY_ADD_DEVICE) {
+        if (UsbdLoadUsbService::LoadUsbService() != 0) {
+            HDF_LOGE("usbdev LoadUsbServer error");
+            return HDF_FAILURE;
+        }
+    } else if (id == USB_PNP_DRIVER_GADGET_REMOVE || id == USB_PNP_NOTIFY_REMOVE_DEVICE) {
+        if (UsbdLoadUsbService::RemoveUsbService() != 0) {
+            HDF_LOGE("usbdev RemoveUsbServer error");
+            return HDF_FAILURE;
+        }
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
 {
-    usbPnpListener_.callBack = UsbdPnpLoaderEventReceived;
-    usbPnpListener_.priv = (void *)(inst.GetRefPtr());
-#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-    usbPnpServ_ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
-    if (usbPnpServ_ == nullptr) {
-        HDF_LOGE("%{public}s: HdfIoServiceBind faile.", __func__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-
-    int32_t status = HdfDeviceRegisterEventListener(usbPnpServ_, &usbPnpListener_);
-    if (status != HDF_SUCCESS) {
-        HDF_LOGE("HdfDeviceRegisterEventListener failed status=%{public}d", status);
-        return status;
-    }
-#else
-    if (DdkListenerMgrAdd(&usbPnpListener_) != HDF_SUCCESS) {
+    listenerForLoadService_.callBack = UsbdLoadServiceCallback;
+    if (DdkListenerMgrAdd(&listenerForLoadService_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
         return HDF_FAILURE;
     }
-#endif
     return HDF_SUCCESS;
 }
 
 int32_t UsbImpl::UsbdEventHandleRelease(void)
 {
-    int32_t ret = HDF_SUCCESS;
-    if (usbPnpServ_ != nullptr) {
-        ret = HdfDeviceUnregisterEventListener(usbPnpServ_, &usbPnpListener_);
-        HdfIoServiceRecycle(usbPnpServ_);
+    int32_t ret = DdkListenerMgrRemove(&listenerForLoadService_);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: DdkListenerMgrRemove failed", __func__);
     }
-    usbPnpServ_ = nullptr;
-    usbPnpListener_.callBack = nullptr;
-    usbPnpListener_.priv = nullptr;
-
+    listenerForLoadService_.callBack = nullptr;
+    listenerForLoadService_.priv = nullptr;
     return ret;
 }
 
@@ -947,112 +930,6 @@ int32_t UsbImpl::UsbdReleaseDevices()
     }
     OsalMutexUnlock(&lock_);
     return HDF_SUCCESS;
-}
-
-#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-int32_t UsbImpl::HdfReadDevice(int32_t *count, int32_t *size, HdfSBuf *reply)
-{
-    if (reply == nullptr) {
-        HDF_LOGE("%{public}s: reply is nullptr", __func__);
-        return HDF_FAILURE;
-    }
-
-    int32_t busNum;
-    if (!HdfSbufReadInt32(reply, &busNum)) {
-        HDF_LOGE("%{public}s: failed to read busNum from reply", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    int32_t devNum;
-    if (!HdfSbufReadInt32(reply, &devNum)) {
-        HDF_LOGE("%{public}s: failed to read devNum from reply", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    uint8_t devClass;
-    if (!HdfSbufReadUint8(reply, &devClass)) {
-        HDF_LOGE("%{public}s: failed to read devClass from reply", __func__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-
-    uint8_t subClass;
-    if (!HdfSbufReadUint8(reply, &subClass)) {
-        HDF_LOGE("%{public}s: failed to read subClass from reply", __func__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-
-    uint8_t protocol;
-    if (!HdfSbufReadUint8(reply, &protocol)) {
-        HDF_LOGE("%{public}s: failed to read protocol from reply", __func__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-    uint8_t status;
-    if (!HdfSbufReadUint8(reply, &status)) {
-        HDF_LOGE("%{public}s: failed to read status from reply", __func__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-
-    HDF_LOGI("%{public}s:busNum:%{public}d devNum:%{public}d class:%{public}d", __func__, busNum, devNum, devClass);
-    if (devClass != BASE_CLASS_HUB) {
-        UsbdDispatcher::UsbdDeviceCreateAndAttach(this, busNum, devNum);
-        USBDeviceInfo info = {ACT_DEVUP, busNum, devNum};
-        if (subscriber_ == nullptr) {
-            HDF_LOGE("%{public}s: subscriber_ is nullptr", __func__);
-            return HDF_FAILURE;
-        }
-        (void)subscriber_->DeviceEvent(info);
-        ++(*size);
-    }
-    ++(*count);
-    return HDF_SUCCESS;
-}
-#endif
-
-int32_t UsbImpl::UsbdAddDevicesOnStart()
-{
-    int32_t ret = HDF_SUCCESS;
-#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-    HdfIoService *usbPnpServ_ = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
-    if (usbPnpServ_ == nullptr) {
-        HDF_LOGE("%{public}s:HdfIoServiceBind failed", __func__);
-        return HDF_ERR_INVALID_OBJECT;
-    }
-
-    HdfSBuf *data = HdfSbufObtain(HDF_USB_INFO_MAX_SIZE);
-    if (data == nullptr) {
-        HDF_LOGE("%{public}s: %{public}d HdfSbufObtain failed", __func__, __LINE__);
-        HdfIoServiceRecycle(usbPnpServ_);
-        return HDF_DEV_ERR_NO_MEMORY;
-    }
-
-    HdfSBuf *reply = HdfSbufObtain(HDF_USB_INFO_MAX_SIZE);
-    if (reply == nullptr) {
-        HDF_LOGE("%{public}s: %{public}d HdfSbufObtain failed", __func__, __LINE__);
-        HdfSbufRecycle(data);
-        HdfIoServiceRecycle(usbPnpServ_);
-        return HDF_DEV_ERR_NO_MEMORY;
-    }
-
-    ret = usbPnpServ_->dispatcher->Dispatch(&usbPnpServ_->object, USB_PNP_DRIVER_GETDEVICES, data, reply);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:failed to send service call, ret:%{public}d", __func__, ret);
-        HdfSbufRecycle(data);
-        HdfSbufRecycle(reply);
-        HdfIoServiceRecycle(usbPnpServ_);
-        return ret;
-    }
-
-    int32_t count = 0;
-    int32_t size = 0;
-    do {
-        ret = HdfReadDevice(&count, &size, reply);
-    } while (ret == HDF_SUCCESS);
-
-    HdfSbufRecycle(data);
-    HdfSbufRecycle(reply);
-    HdfIoServiceRecycle(usbPnpServ_);
-#endif
-    return ret;
 }
 
 int32_t UsbImpl::OpenDevice(const UsbDev &dev)
@@ -1735,7 +1612,13 @@ int32_t UsbImpl::BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 
 int32_t UsbImpl::UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
-    UnbindUsbSubscriber();
+    subscriber_ = nullptr;
+    if (DdkListenerMgrRemove(&usbPnpListener_) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: remove listerer failed", __func__);
+        return HDF_FAILURE;
+    }
+    usbPnpListener_.callBack = nullptr;
+    usbPnpListener_.priv = nullptr;
     return HDF_SUCCESS;
 }
 
@@ -1869,7 +1752,12 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
 int32_t UsbImpl::BindUsbSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
     subscriber_ = subscriber;
-    UsbdAddDevicesOnStart();
+    usbPnpListener_.callBack = UsbdPnpLoaderEventReceived;
+    usbPnpListener_.priv = (void *)(this);
+    if (DdkListenerMgrAdd(&usbPnpListener_) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: register listerer failed", __func__);
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 } // namespace V1_0
