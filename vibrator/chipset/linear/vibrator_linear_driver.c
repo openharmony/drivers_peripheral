@@ -25,7 +25,7 @@ static struct VibratorLinearDriverData *GetLinearVibratorData(void)
     return g_linearVibratorData;
 }
 
-static int32_t StartLinearVibrator()
+static int32_t StartLinearVibrator(void)
 {
     int32_t ret;
     struct VibratorLinearDriverData *drvData = GetLinearVibratorData();
@@ -52,7 +52,7 @@ static int32_t StartEffectLinearVibrator(uint32_t effectType)
     return HDF_SUCCESS;
 }
 
-static int32_t StopLinearVibrator()
+static int32_t StopLinearVibrator(void)
 {
     int32_t ret;
     struct VibratorLinearDriverData *drvData = GetLinearVibratorData();
