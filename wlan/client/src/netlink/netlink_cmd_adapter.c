@@ -879,6 +879,10 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
     int32_t ret;
     struct ifreq req;
 
+    if (memset_s(&req, sizeof(req), 0, sizeof(req)) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%s: memset_s req failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
     fd = socket(PF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
     if (fd < 0) {
         HILOG_ERROR(LOG_CORE, "%s: open socket failed", __FUNCTION__);
@@ -886,6 +890,7 @@ int32_t SetMacAddr(const char *ifName, unsigned char *mac, uint8_t len)
     }
     if (strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName)) != EOK) {
         HILOG_ERROR(LOG_CORE, "%s: strncpy_s fail", __FUNCTION__);
+        close(fd);
         return RET_CODE_FAILURE;
     }
     req.ifr_addr.sa_family = ARPHRD_ETHER;
@@ -937,6 +942,10 @@ int32_t GetDevMacAddr(const char *ifName, int32_t type, uint8_t *mac, uint8_t le
     int32_t fd, ret;
     struct ifreq req;
 
+    if (memset_s(&req, sizeof(req), 0, sizeof(req)) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%s: memset_s req failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
     fd = socket(AF_INET, SOCK_DGRAM, 0);
     if (fd < 0) {
         HILOG_ERROR(LOG_CORE, "%s: open socket failed", __FUNCTION__);
