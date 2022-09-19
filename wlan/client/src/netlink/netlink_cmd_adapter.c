@@ -431,6 +431,7 @@ static int32_t ConnectEventSocket(void)
         return RET_CODE_SUCCESS;
     } while (0);
     CloseNetlinkSocket(g_wifiHalInfo.eventSock);
+    g_wifiHalInfo.eventSock = NULL;
     return ret;
 }
 
@@ -1453,6 +1454,7 @@ static int32_t FillHwprivIoctlData(HwprivIoctlData *ioctlData, uint8_t mode)
     if (strncpy_s(ioctlData->data.point.buf, ioctlData->data.point.length, modeStr, strlen(modeStr)) != EOK) {
         HILOG_ERROR(LOG_CORE, "%s: strncpy_s failed", __FUNCTION__);
         free(ioctlData->data.point.buf);
+        ioctlData->data.point.buf = NULL;
         return RET_CODE_FAILURE;
     }
 
