@@ -208,7 +208,7 @@ static ResultCode InsertScheduleToContext(CoAuthSchedule *schedule, UserAuthCont
 static ResultCode CreateAndInsertSchedules(UserAuthContext *context, uint32_t authMode)
 {
     LOG_INFO("start");
-    CoAuthSchedule *schedule;
+    CoAuthSchedule *schedule = NULL;
     if (authMode == SCHEDULE_MODE_AUTH) {
         schedule = CreateAuthSchedule(context);
     } else if (authMode == SCHEDULE_MODE_IDENTIFY) {
@@ -348,9 +348,10 @@ static bool IsContextDuplicate(uint64_t contextId)
     }
     LinkedListNode *tempNode = g_contextList->head;
     while (tempNode != NULL) {
-        UserAuthContext *context = tempNode->data;
+        UserAuthContext *context = (UserAuthContext *)tempNode->data;
         if (context == NULL) {
             LOG_ERROR("context is null, please check");
+            tempNode = tempNode->next;
             continue;
         }
         if (context->contextId == contextId) {

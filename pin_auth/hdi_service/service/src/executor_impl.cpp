@@ -29,11 +29,13 @@ namespace OHOS {
 namespace HDI {
 namespace PinAuth {
 namespace V1_0 {
-static constexpr uint32_t EXECUTOR_TYPE = 0;
-static constexpr uint32_t ENROLL_PIN = 0;
-static constexpr uint32_t AUTH_PIN = 1;
-static constexpr uint32_t OPENSSL_SUCCESS = 1;
-static constexpr uint32_t SUCCESS = 0;
+namespace {
+    constexpr uint32_t EXECUTOR_TYPE = 0;
+    constexpr uint32_t ENROLL_PIN = 0;
+    constexpr uint32_t AUTH_PIN = 1;
+    constexpr uint32_t OPENSSL_SUCCESS = 1;
+    constexpr uint32_t SUCCESS = 0;
+} // namespace
 
 ExecutorImpl::ExecutorImpl(std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi) : pinHdi_(pinHdi) {}
 
@@ -236,7 +238,7 @@ int32_t ExecutorImpl::OnSetData(uint64_t scheduleId, uint64_t authSubType, const
             IAM_LOGE("Error commandId");
     }
 
-    if (callback->OnResult(result, resultTlv) != SUCCESS) {
+    if (callback == nullptr || callback->OnResult(result, resultTlv) != SUCCESS) {
         IAM_LOGE("callbackObj Pin failed");
     }
     // Delete scheduleId from the scheduleMap_ when the enroll and authentication are successful
