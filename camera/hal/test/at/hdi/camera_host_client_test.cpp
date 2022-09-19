@@ -47,6 +47,10 @@ using namespace OHOS;
 using namespace testing::ext;
 using namespace OHOS::Camera;
 
+#ifdef HDF_LOG_TAG
+#undef HDF_LOG_TAG
+#endif
+
 #define HDF_LOG_TAG camera_service_test
 
 constexpr const char *TEST_SERVICE_NAME = "camera_service";
