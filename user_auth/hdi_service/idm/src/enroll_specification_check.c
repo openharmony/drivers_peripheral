@@ -42,6 +42,10 @@ static uint32_t GetMaxNumber(uint32_t authType)
 
 ResultCode CheckIdmOperationToken(int32_t userId, UserAuthTokenHal *authToken)
 {
+    if (authToken == NULL) {
+        LOG_ERROR("auth token is null");
+        return RESULT_BAD_PARAM;
+    }
     if (authToken->authType != PIN_AUTH) {
         LOG_ERROR("need pin token");
         return RESULT_VERIFY_TOKEN_FAIL;
