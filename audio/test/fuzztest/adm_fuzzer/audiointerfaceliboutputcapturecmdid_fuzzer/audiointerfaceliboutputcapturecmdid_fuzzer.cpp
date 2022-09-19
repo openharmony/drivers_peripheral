@@ -30,7 +30,8 @@ namespace Audio {
         }
         struct DevHandle *(*BindServiceCapture)(const char *) = nullptr;
         int32_t (*InterfaceLibOutputCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *) = nullptr;
-        BindServiceCapture = (struct DevHandle* (*)(const char *))dlsym(outputCapPtrHandle, "AudioBindServiceCapture");
+        BindServiceCapture = reinterpret_cast<struct DevHandle* (*)(const char *)>(dlsym(outputCapPtrHandle,
+            "AudioBindServiceCapture"));
         if (BindServiceCapture == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioBindServiceCapture failed \n", __func__);
             dlclose(outputCapPtrHandle);
