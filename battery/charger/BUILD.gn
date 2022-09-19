@@ -55,7 +55,6 @@ ohos_executable("charger") {
     "drivers_interface_battery:libbattery_proxy_1.1",
     "drivers_interface_light:liblight_proxy_1.0",
     "drivers_peripheral_input:hdi_input",
-    "hdf_core:libhdf_utils",
     "init:libbegetutil",
     "ipc:ipc_core",
   ]
