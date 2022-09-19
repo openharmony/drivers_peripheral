@@ -23,7 +23,7 @@ using namespace std;
 using namespace OHOS;
 using OHOS::sptr;
 using OHOS::HDI::Codec::V1_0::CodecCompCapability;
-using OHOS::HDI::Display::BufferHandleParcelable;
+using OHOS::HDI::Base::HdiBufferHandle;
 #define HDF_LOG_TAG     codec_omx_hdi_enc
 #define AV_COLOR_FORMAT OMX_COLOR_FormatYUV420SemiPlanar
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiEncode::gralloc_ = nullptr;
@@ -430,7 +430,7 @@ void CodecHdiEncode::FreeBuffers()
 
 void CodecHdiEncode::Release()
 {
-    omxMgr_->DestoryComponent(componentId_);
+    omxMgr_->DestroyComponent(componentId_);
     client_ = nullptr;
     callback_ = nullptr;
     omxMgr_ = nullptr;
@@ -553,9 +553,7 @@ bool CodecHdiEncode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, boo
             gralloc_->Mmap(*bufferHandle);
             endFlag = this->ReadOneFrame(fpIn_, (char *)bufferHandle->virAddr, bufferInfo->omxBuffer->filledLen);
             gralloc_->Unmap(*bufferHandle);
-            OHOS::sptr<BufferHandleParcelable> bufferParcel = new BufferHandleParcelable();
-            bufferParcel->Init(*bufferHandle);
-            bufferInfo->omxBuffer->bufferhandle = bufferParcel;
+            bufferInfo->omxBuffer->bufferhandle = new HdiBufferHandle(*bufferHandle);
         }
     } else {
         // read data from ashmem

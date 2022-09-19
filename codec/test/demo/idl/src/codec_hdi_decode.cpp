@@ -23,7 +23,7 @@ using namespace std;
 using namespace OHOS;
 using OHOS::sptr;
 using OHOS::HDI::Codec::V1_0::CodecCompCapability;
-using OHOS::HDI::Display::BufferHandleParcelable;
+using OHOS::HDI::Base::HdiBufferHandle;
 #define HDF_LOG_TAG     codec_omx_hdi_dec
 #define AV_COLOR_FORMAT OMX_COLOR_FormatYUV420SemiPlanar
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiDecode::gralloc_ = nullptr;
@@ -482,9 +482,7 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
             return err;
         }
         omxBuffer->fd = -1;
-        OHOS::sptr<BufferHandleParcelable> bufferParcel = new BufferHandleParcelable();
-        bufferParcel->Init(*bufferHandle);
-        omxBuffer->bufferhandle = bufferParcel;
+        omxBuffer->bufferhandle = new HdiBufferHandle(*bufferHandle);
         omxBuffer->allocLen = bufferSize;
         omxBuffer->fenceFd = -1;  // check use -1 first with no window
         omxBuffer->pts = 0;
@@ -544,7 +542,7 @@ void CodecHdiDecode::FreeBuffers()
 
 void CodecHdiDecode::Release()
 {
-    omxMgr_->DestoryComponent(componentId_);
+    omxMgr_->DestroyComponent(componentId_);
     client_ = nullptr;
     callback_ = nullptr;
     omxMgr_ = nullptr;

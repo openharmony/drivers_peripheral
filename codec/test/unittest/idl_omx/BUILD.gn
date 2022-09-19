@@ -33,7 +33,6 @@ ohos_unittest("codec_idl_omx_test") {
       "drivers_interface_codec:libcodec_proxy_1.0",
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
-      "hdf_core:libbufferhandle_parcelable",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
