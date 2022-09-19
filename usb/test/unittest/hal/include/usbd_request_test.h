@@ -20,6 +20,7 @@
 
 using OHOS::HDI::Usb::V1_0::UsbDev;
 
+namespace {
 class UsbdRequestTest : public testing::Test {
 public:
     static void SetUpTestCase();
@@ -27,6 +28,7 @@ public:
     void SetUp();
     void TearDown();
 
-    static struct UsbDev dev_;
+    static UsbDev dev_;
 };
+}
 #endif // USBD_Request_TEST_H

@@ -35,6 +35,7 @@ const uint8_t INTERFACEID_1 = 1;
 const int32_t INT32_INTERFACEID_1 = 1;
 const uint8_t POINTID_1 = 1;
 const uint8_t POINTID_129 = 130;
+UsbDev UsbdRequestTest::dev_ = {0, 0};
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -44,9 +45,6 @@ using namespace OHOS::HDI::Usb::V1_0;
 
 namespace {
 sptr<IUsbInterface> g_usbInterface = nullptr;
-}
-
-struct UsbDev UsbdRequestTest::dev_ = {0, 0};
 
 void UsbdRequestTest::SetUpTestCase(void)
 {
@@ -2019,4 +2017,5 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface008, TestSize.Level1)
     auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface008 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
+}
 }

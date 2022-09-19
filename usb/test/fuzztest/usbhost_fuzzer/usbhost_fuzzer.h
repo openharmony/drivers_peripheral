@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -12,18 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef USBD_FUNCTION_TEST_H
-#define USBD_FUNCTION_TEST_H
 
-#include <gtest/gtest.h>
+#ifndef USBHOST_FUZZER_H
+#define USBHOST_FUZZER_H
 
-namespace {
-class UsbdFunctionTest : public testing::Test {
-public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
-    void SetUp();
-    void TearDown();
-};
-}
-#endif // USBD_FUNCTION_TEST_H
+#define FUZZ_PROJECT_NAME "usbhost_fuzzer"
+
+#endif // USBHOST_FUZZER_H

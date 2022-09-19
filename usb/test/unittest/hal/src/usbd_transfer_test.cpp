@@ -32,6 +32,7 @@ const uint32_t LENGTH_NUM_255 = 255;
 const uint8_t INTERFACEID_1 = 1;
 const uint8_t POINTID_1 = 1;
 const uint8_t POINTID_129 = 130;
+UsbDev UsbdTransferTest::dev_ = {0, 0};
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -41,9 +42,6 @@ using namespace OHOS::HDI::Usb::V1_0;
 
 namespace {
 sptr<IUsbInterface> g_usbInterface = nullptr;
-}
-
-struct UsbDev UsbdTransferTest::dev_ = {0, 0};
 
 void UsbdTransferTest::SetUpTestCase(void)
 {
@@ -1394,4 +1392,5 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite008, TestSize.Level1)
     ret = g_usbInterface->IsoTransferWrite(dev, pipe, -1, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferWrite008 %{public}d IsoTransferWrite=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
+}
 }
