@@ -34,7 +34,7 @@ public:
     int32_t GetComponentCapabilityList(std::vector<CodecCompCapability> &capList, int32_t count) override;
     int32_t CreateComponent(sptr<ICodecComponent> &component, uint32_t &componentId, const std::string &compName,
                             int64_t appData, const sptr<ICodecCallback> &callbacks) override;
-    int32_t DestoryComponent(uint32_t componentId) override;
+    int32_t DestroyComponent(uint32_t componentId) override;
     void LoadCapabilityData(const DeviceResourceNode &node);
 
 private:
