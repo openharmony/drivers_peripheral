@@ -44,7 +44,13 @@
 
 namespace OHOS {
 namespace Camera {
-#define HDF_LOG_TAG camera_host
+    
+#ifdef HDF_LOG_TAG
+#undef HDF_LOG_TAG
+#endif
+
+#define HDF_LOG_TAG camera_service_test
+
 #define FILENAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #ifndef OHOS_DEBUG
