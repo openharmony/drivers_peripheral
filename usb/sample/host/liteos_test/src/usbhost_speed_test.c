@@ -211,21 +211,22 @@ static int32_t CheckParam(int32_t argc, const char *argv[], struct UsbSpeedTest 
         return HDF_ERR_INVALID_PARAM;
     }
     switch (argc) {
-        case 7:
-        case 6:
+        case 7: // 7 is number of arguments supplied to the main function
+        case 6: // 6 is number of arguments supplied to the main function
             g_spdServer = checkServer(argv[1]);  // 1 is argv second element
             speedTest->busNum = atoi(argv[2]);   // 2 is argv third element
             speedTest->devAddr = atoi(argv[3]);  // 3 is argv fourth element
             speedTest->ifaceNum = atoi(argv[4]); // 4 is argv fifth element
             speedTest->writeOrRead = GetWriteOrReadFlag(argv[5]); // 5 is argv sixth element
+            // 7 is number of arguments supplied to the main function
             if ((argc == 7) && (speedTest->writeOrRead == TEST_READ)) {
                 printData = (strncmp(argv[6], "printdata", 1)) ? false : true; // 6 is argv seventh element
             }
             break;
-        case 4:
+        case 4: // 4 number of arguments supplied to the main function
             g_spdServer = checkServer(argv[1]); // 1 is argv second element
             speedTest->busNum = 1;
-            speedTest->devAddr = 2;
+            speedTest->devAddr = 2; // 2 is device address
             speedTest->ifaceNum = atoi(argv[2]); // 2 is argv third element
             speedTest->writeOrRead = GetWriteOrReadFlag(argv[3]); // 3 is argv fourth element
             break;
