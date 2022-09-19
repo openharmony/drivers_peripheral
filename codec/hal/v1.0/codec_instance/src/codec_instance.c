@@ -238,8 +238,11 @@ int32_t DestroyCodecInstance(struct CodecInstance *instance)
         return HDF_FAILURE;
     }
 
-    instance->codecStatus = CODEC_STATUS_STOPED;
-    pthread_join(instance->task, NULL);
+    if (instance->codecStatus == CODEC_STATUS_STARTED) {
+        HDF_LOGE("%{public}s: wait codec task stop!", __func__);
+        instance->codecStatus = CODEC_STATUS_STOPED;
+        pthread_join(instance->task, NULL);
+    }
 
     ReleaseInputShm(instance);
     ReleaseOutputShm(instance);
