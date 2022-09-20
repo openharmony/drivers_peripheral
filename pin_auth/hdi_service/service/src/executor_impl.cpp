@@ -366,8 +366,7 @@ uint32_t ExecutorImpl::ScheduleMap::DeleteScheduleId(const uint64_t scheduleId)
 {
     IAM_LOGI("start");
     std::lock_guard<std::mutex> guard(mutex_);
-    if (scheduleInfo_.find(scheduleId) != scheduleInfo_.end()) {
-        scheduleInfo_.erase(scheduleId);
+    if (scheduleInfo_.erase(scheduleId) == 1) {
         IAM_LOGI("Delete scheduleId succ");
         return HDF_SUCCESS;
     }
