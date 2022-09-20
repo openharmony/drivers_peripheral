@@ -79,6 +79,7 @@ vector<string> InputDeviceManager::GetFiles(string path)
     }
     // sort the returned files
     sort(fileList.begin(), fileList.end());
+    closedir(dir);
     return fileList;
 }
 
@@ -116,7 +117,7 @@ void InputDeviceManager::DoRead(int32_t fd, struct input_event* event, size_t si
         for (auto &callbackFunc : reportEventPkgCallback_) {
             uint32_t index {0};
             auto ret = FindIndexFromFd(fd, &index);
-            printf("fd: %d index: %d\n ", fd, index);
+            printf("fd: %d index: %u\n ", fd, index);
             if (callbackFunc.second != nullptr &&  ret != INPUT_FAILURE) {
                 HDF_LOGI("report the device action data !!!!!");
                 callbackFunc.second->ReportEventPkgCallback(const_cast<const EventPackage*>(evtPkg), count, index);
