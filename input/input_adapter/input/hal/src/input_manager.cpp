@@ -123,8 +123,8 @@ static int32_t UnregisterHotPlugCallback(void)
 extern "C" {
 #endif
 
-int32_t InstanceReporterHdi(InputReporter **hdi);
-int32_t InstanceControllerHdi(InputController **hdi);
+int32_t InstanceReporterHdi(InputReporter **reporter);
+int32_t InstanceControllerHdi(InputController **controller);
 static int32_t InstanceManagerHdi(InputManager **manager)
 {
     InputManager *managerHdi = (InputManager *)OsalMemAlloc(sizeof(InputManager));
@@ -158,6 +158,7 @@ int32_t InstanceControllerHdi(InputController **controller)
         return INPUT_NOMEM;
     }
     (void)memset_s(controllerHdi, sizeof(InputController), 0, sizeof(InputController));
+    *controller = controllerHdi;
     return INPUT_SUCCESS;
 }
 
