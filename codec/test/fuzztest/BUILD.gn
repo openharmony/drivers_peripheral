@@ -14,6 +14,7 @@
 group("hdf_fuzztest_media_codec") {
   testonly = true
   deps = [
+    "//drivers/peripheral/codec/test/fuzztest/codec_fuzzer:fuzztest",
     "//drivers/peripheral/codec/test/fuzztest/codecallocatebuffer_fuzzer:fuzztest",
     "//drivers/peripheral/codec/test/fuzztest/codeccomponentroleenum_fuzzer:fuzztest",
     "//drivers/peripheral/codec/test/fuzztest/codeccomponenttunnelrequest_fuzzer:fuzztest",
