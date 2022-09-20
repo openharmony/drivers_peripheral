@@ -33,6 +33,8 @@ ohos_static_library("disp_dev_hdi_test_common") {
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/base",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
   ]
   output_name = "disp_dev_hdi_test_common"
   cflags = [
@@ -71,6 +73,8 @@ ohos_unittest("dispcomptest") {
     "//drivers/peripheral/base",
     "utils",
     ".",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
   ]
   external_deps = [
     "hdf_core:libhdf_utils",
