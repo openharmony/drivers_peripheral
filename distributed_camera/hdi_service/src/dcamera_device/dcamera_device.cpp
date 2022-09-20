@@ -282,7 +282,7 @@ CamRetCode DCameraDevice::OpenDCamera(const OHOS::sptr<ICameraDeviceCallback> &c
         return CamRetCode::DEVICE_ERROR;
     }
     {
-        unique_lock<mutex> lock(isOpenSessFailedlock_);
+        unique_lock<mutex> openStateLock(isOpenSessFailedlock_);
         if (isOpenSessFailed_) {
             DHLOGE("Open distributed camera session failed.");
             return CamRetCode::DEVICE_ERROR;
