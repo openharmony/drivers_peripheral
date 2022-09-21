@@ -35,7 +35,7 @@ RetCode HosV4L2Control::V4L2SetCtrls (int fd, std::vector<DeviceControl>& contro
             continue;
         }
 
-        if (count <= numControls) {
+        if (count < numControls) {
             cList[count].value = itr->value;
             count++;
         }
@@ -84,7 +84,7 @@ RetCode HosV4L2Control::V4L2GetCtrls (int fd, std::vector<DeviceControl>& contro
         if (itr->flags & V4L2_CTRL_FLAG_WRITE_ONLY) {
             continue;
         }
-        if (count <= numControls) {
+        if (count < numControls) {
             cList[count].id = itr->id;
             count++;
         }
