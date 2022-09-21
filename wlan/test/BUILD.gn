@@ -50,9 +50,11 @@ if (defined(ohos_lite)) {
         "hdi_service:WlanHdiServiceTestC",
         "performance:hdf_peripheral_wlan_test_performance",
         "unittest:hdf_client_wifi",
-        "unittest:hdf_common_wifi",
         "unittest:hdf_hal_wifi",
       ]
+      if (enable_HDF_NL80211) {
+        deps += [ "unittest:hdf_common_wifi" ]
+      }
     }
   }
 }
