@@ -23,12 +23,15 @@
 #include "v1_0/icamera_host_callback.h"
 #include "v1_0/dcamera_types.h"
 #include "v1_0/types.h"
+#include "constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
 using namespace OHOS::HDI::DistributedCamera::V1_0;
 using namespace OHOS::HDI::Camera::V1_0;
 class DCameraHost : public ICameraHost {
+const uint32_t ABILITYINFO_MAX_LENGTH = 50 * 1024 * 1024;
+const uint32_t ID_MAX_SIZE = 2 * DEVID_MAX_LENGTH;
 public:
     DCameraHost() = default;
     virtual ~DCameraHost() = default;
