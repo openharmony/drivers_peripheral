@@ -24,7 +24,6 @@ IDeviceManager::~IDeviceManager() {}
 
 std::shared_ptr<IDeviceManager> IDeviceManager::GetInstance()
 {
-    std::string deviceName = "V4L2DeviceManager";
     static std::shared_ptr<IDeviceManager> deviceManger = nullptr;
     if (deviceManger == nullptr) {
         deviceManger = GetDeviceManagerFactory.GetDeviceManagerByName(deviceName);

@@ -32,11 +32,12 @@ std::optional<int32_t> ConfigParser::GetTypeId(const std::string& str, G_STREAM_
 
 std::string ConfigParser::GetTypeStr(const int32_t& type, G_STREAM_INFO info, const int32_t& size) const
 {
+    std::string result = "";
     if (info == nullptr) {
         CAMERA_LOGE("info is nullptr.");
+        return result;
     }
 
-    std::string result;
     for (int i = 0; i < size; i++) {
         if (((info + i) != nullptr) && (info[i].name != nullptr)) {
             if (info[i].id == type) {
