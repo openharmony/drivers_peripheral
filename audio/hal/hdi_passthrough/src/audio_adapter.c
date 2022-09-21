@@ -1177,3 +1177,24 @@ int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struc
     }
     return AUDIO_HAL_ERR_INTERNAL;
 }
+
+int32_t AudioAdapterUpdateAudioRoute(struct AudioAdapter *adapter, const struct AudioRoute *route, int32_t *routeHandle)
+{
+    if (route == NULL || routeHandle == NULL || route->sinks == NULL || route->sources == NULL) {
+        AUDIO_FUNC_LOGE("some of the params in AudioAdapterUpdateAudioRoute null!");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    (void)adapter;
+    (void)routeHandle;
+
+    AUDIO_FUNC_LOGE("portId = %d", route->sinks[0].portId);
+    AUDIO_FUNC_LOGE("sinks' device type = %d", route->sinks[0].ext.device.type);
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t routeHandle)
+{
+    (void)adapter;
+    (void)routeHandle;
+    return AUDIO_HAL_ERR_NOT_SUPPORT;
+}
