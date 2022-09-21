@@ -15,6 +15,7 @@
 
 #include "dcamera.h"
 #include <chrono>
+#include "constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -194,6 +195,12 @@ std::string Base64Decode(const std::string& basicString)
 bool IsBase64(unsigned char c)
 {
     return (isalnum(c) || (c == '+') || (c == '/'));
+}
+
+bool IsDhBaseInfoInvalid(const DHBase& dhBase)
+{
+    return dhBase.deviceId_.empty() || (dhBase.deviceId_.length() > DEVID_MAX_LENGTH) ||
+        dhBase.dhId_.empty() || (dhBase.dhId_.length() > DHID_MAX_LENGTH);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
