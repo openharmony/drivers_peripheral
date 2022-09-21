@@ -24,6 +24,9 @@ using namespace OHOS::HDI::DistributedCamera::V1_0;
 class DCameraHost;
 class DCameraDevice;
 class DCameraProvider : public IDCameraProvider {
+const uint32_t ABILITYINFO_MAX_LENGTH = 50 * 1024 * 1024;
+const uint32_t HDF_EVENT_CONTENT_MAX_LENGTH = 50 * 1024 * 1024;
+const uint32_t SETTING_VALUE_MAX_LENGTH = 50 * 1024 * 1024;
 public:
     DCameraProvider() = default;
     virtual ~DCameraProvider() = default;
@@ -51,7 +54,8 @@ public:
     int32_t UpdateSettings(const DHBase &dhBase, const std::vector<DCameraSettings> &settings);
 
 private:
-    bool IsDhBaseInfoInvalid(const DHBase &dhBase);
+    bool IsDCameraSettingsInvalid(const DCameraSettings& result);
+    bool IsDCameraHDFEventInvalid(const DCameraHDFEvent& event);
     sptr<IDCameraProviderCallback> GetCallbackBydhBase(const DHBase &dhBase);
     OHOS::sptr<DCameraDevice> GetDCameraDevice(const DHBase &dhBase);
 

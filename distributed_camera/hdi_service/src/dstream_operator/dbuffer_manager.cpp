@@ -102,13 +102,13 @@ uint64_t DBufferManager::CameraUsageToGrallocUsage(const uint64_t cameraUsage)
     for (uint32_t i = 0; i < sizeof(cameraUsage) * BYTE; i++) {
         switch (cameraUsage & (test << i)) {
             case CAMERA_USAGE_SW_READ_OFTEN:
-                grallocUsage |= HBM_USE_CPU_READ;
+                grallocUsage |= BUFFER_USAGE_CPU_READ;
                 break;
             case CAMERA_USAGE_SW_WRITE_OFTEN:
-                grallocUsage |= HBM_USE_CPU_WRITE;
+                grallocUsage |= BUFFER_USAGE_CPU_WRITE;
                 break;
             case CAMERA_USAGE_MEM_DMA:
-                grallocUsage |= HBM_USE_MEM_DMA;
+                grallocUsage |= BUFFER_USAGE_MEM_DMA;
                 break;
             default:
                 break;

@@ -14,7 +14,7 @@ config("v4l2_maintest") {
 }
 
 ohos_executable("v4l2_main") {
-  install_enable = true
+  install_enable = false
   sources = [
     "$camera_path/adapter/platform/v4l2/src/driver_adapter/src/v4l2_buffer.cpp",
     "$camera_path/adapter/platform/v4l2/src/driver_adapter/src/v4l2_control.cpp",
@@ -29,16 +29,16 @@ ohos_executable("v4l2_main") {
     "$board_camera_path/driver_adapter/test/v4l2_test/include",
     "$camera_path/include",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include",
+    "//drivers/hdf_core/framework/include/utils",
+    "//drivers/hdf_core/adapter/uhdf2/osal/include",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
   defines += [ "V4L2_MAIN_TEST" ]
 
-  install_enable = true
   public_configs = [ ":v4l2_maintest" ]
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"

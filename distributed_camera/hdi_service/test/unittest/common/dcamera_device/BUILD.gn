@@ -31,9 +31,6 @@ config("module_private_config") {
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/device",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/host",
     "${distributedcamera_hdf_path}/interfaces/hdi_ipc/server/operator",
-    "//utils/native/base/include",
-    "//utils/system/safwk/native/include",
-    "${display_hdf_path}/interfaces/include",
     "${hdf_framework_path}/include/utils",
     "${hdf_framework_path}/include/core",
     "${hdf_framework_path}/include/osal",
@@ -60,18 +57,16 @@ ohos_unittest("HdfDcameraDeviceTest") {
     "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
-    "//utils/native/base:utils",
   ]
 
   public_deps = [ "//drivers/interface/distributed_camera/v1_0:libdistributed_camera_provider_stub_1.0" ]
 
   external_deps = [
+    "c_utils:utils",
     "drivers_interface_camera:libcamera_proxy_1.0",
     "graphic_chipsetsdk:buffer_handle",
     "graphic_chipsetsdk:surface",
-    "hdf_core:libhdf_utils",
     "ipc:ipc_single",
-    "utils_base:utils",
   ]
 
   defines = [

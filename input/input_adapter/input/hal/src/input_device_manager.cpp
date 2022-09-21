@@ -79,6 +79,7 @@ vector<string> InputDeviceManager::GetFiles(string path)
     }
     // sort the returned files
     sort(fileList.begin(), fileList.end());
+    closedir(dir);
     return fileList;
 }
 

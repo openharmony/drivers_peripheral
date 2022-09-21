@@ -12,6 +12,9 @@
   "component": {
     "name": "drivers_peripheral_input",
     "subsystem": "hdf",
+    "features": [
+      "drivers_peripheral_input_feature_model"
+    ],
     "syscap": [ "" ],
     "adapter_system_type": ["standard", "small"],
     "rom": "630KB",

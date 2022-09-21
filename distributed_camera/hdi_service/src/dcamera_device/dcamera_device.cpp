@@ -88,14 +88,14 @@ DCamRetCode DCameraDevice::CreateDStreamOperator()
 int32_t DCameraDevice::GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
     sptr<IStreamOperator> &streamOperator)
 {
-    if (dCameraStreamOperator_ == nullptr) {
-        DHLOGE("Distributed camera stream operator not init.");
-        return CamRetCode::DEVICE_ERROR;
+    if (callbackObj == nullptr) {
+        DHLOGE("DCameraDevice::GetStreamOperator, input stream operator callback is null.");
+        return CamRetCode::INVALID_ARGUMENT;
     }
 
-    if (callbackObj == nullptr) {
-        DHLOGE("Input callbackObj is null.");
-        return CamRetCode::INVALID_ARGUMENT;
+    if (dCameraStreamOperator_ == nullptr) {
+        DHLOGE("DCameraDevice::GetStreamOperator, input distributed camera stream operator is null.");
+        return CamRetCode::DEVICE_ERROR;
     }
 
     DCamRetCode ret = dCameraStreamOperator_->SetCallBack(callbackObj);
@@ -110,8 +110,8 @@ int32_t DCameraDevice::GetStreamOperator(const sptr<IStreamOperatorCallback> &ca
 
 int32_t DCameraDevice::UpdateSettings(const std::vector<uint8_t>& settings)
 {
-    if (settings.empty()) {
-        DHLOGE("DCameraDevice::UpdateSettings, input settings is null.");
+    if (settings.empty() || settings.size() > METADATA_CAPACITY_MAX_SIZE) {
+        DHLOGE("DCameraDevice::UpdateSettings, input settings is invalid.");
         return CamRetCode::INVALID_ARGUMENT;
     }
 
@@ -173,6 +173,11 @@ int32_t DCameraDevice::GetEnabledResults(std::vector<int32_t> &results)
 
 int32_t DCameraDevice::EnableResult(const std::vector<int32_t> &results)
 {
+    if (results.empty() || results.size() > METADATA_CAPACITY_MAX_SIZE) {
+        DHLOGE("DCameraDevice::EnableResult, input results is invalid.");
+        return CamRetCode::DEVICE_ERROR;
+    }
+
     if (dMetadataProcessor_ == nullptr) {
         DHLOGE("Metadata processor not init.");
         return CamRetCode::DEVICE_ERROR;
@@ -203,6 +208,11 @@ int32_t DCameraDevice::EnableResult(const std::vector<int32_t> &results)
 
 int32_t DCameraDevice::DisableResult(const std::vector<int32_t> &results)
 {
+    if (results.empty() || results.size() > METADATA_CAPACITY_MAX_SIZE) {
+        DHLOGE("DCameraDevice::DisableResult, input results is invalid.");
+        return CamRetCode::DEVICE_ERROR;
+    }
+
     if (dMetadataProcessor_ == nullptr) {
         DHLOGE("Metadata processor not init.");
         return CamRetCode::DEVICE_ERROR;

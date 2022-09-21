@@ -26,8 +26,6 @@ ohos_unittest("WlanHdiServiceTestC") {
   ]
 
   deps = [
-    "//drivers/peripheral/wlan/client:wifi_driver_client",
-    "//drivers/peripheral/wlan/hal:wifi_hal",
     "//drivers/peripheral/wlan/hdi_service:hdi_wlan_service",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
@@ -45,16 +43,12 @@ ohos_unittest("WlanHdiServiceTestC") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_wlan:libwlan_proxy_1.0",
-      "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += [ "ipc:ipc_single" ]
 }
 
 ###########################end###########################

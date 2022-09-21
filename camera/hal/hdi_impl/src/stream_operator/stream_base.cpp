@@ -157,6 +157,7 @@ RetCode StreamBase::StartStream()
     handler_ = std::make_unique<std::thread>([this, &threadName] {
         prctl(PR_SET_NAME, threadName.c_str());
         while (state_ == STREAM_STATE_BUSY) {
+            tunnel_->DumpStats(30); // set output interval to 30 second
             HandleRequest();
         }
     });
@@ -535,7 +536,7 @@ RetCode StreamBase::AttachStreamTunnel(std::shared_ptr<StreamTunnel>& tunnel)
     TunnelConfig config = {(uint32_t)streamConfig_.width, (uint32_t)streamConfig_.height,
         (uint32_t)streamConfig_.format, streamConfig_.usage};
     tunnel_->Config(config);
-
+    tunnel_->SetStreamId(streamId_);
     streamConfig_.tunnelMode = true;
     return RC_OK;
 }
@@ -587,5 +588,10 @@ bool StreamBase::IsRunning() const
 bool StreamBase::GetTunnelMode() const
 {
     return streamConfig_.tunnelMode;
+}
+
+void StreamBase::DumpStatsInfo() const
+{
+    tunnel_->DumpStats();
 }
 } // namespace OHOS::Camera

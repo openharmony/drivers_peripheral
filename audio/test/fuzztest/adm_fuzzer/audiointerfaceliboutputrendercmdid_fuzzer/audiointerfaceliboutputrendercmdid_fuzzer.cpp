@@ -29,8 +29,8 @@ namespace Audio {
         }
         struct DevHandle *(*BindServiceRender)(const char *) = nullptr;
         int32_t (*InterfaceLibOutputRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
-        BindServiceRender = (struct DevHandle* (*)(const char *))
-            dlsym(outputRenFuzzPtrHandle, "AudioBindServiceRender");
+        BindServiceRender = reinterpret_cast<struct DevHandle* (*)(const char *)>
+            (dlsym(outputRenFuzzPtrHandle, "AudioBindServiceRender"));
         if (BindServiceRender == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioBindServiceRender failed \n", __func__);
             dlclose(outputRenFuzzPtrHandle);
@@ -59,7 +59,8 @@ namespace Audio {
         }
         free(hwRender);
         void (*CloseService)(const struct DevHandle *) = nullptr;
-        CloseService = (void (*)(const struct DevHandle *))dlsym(outputRenFuzzPtrHandle, "AudioCloseServiceRender");
+        CloseService = reinterpret_cast<void (*)(const struct DevHandle *)>(dlsym(outputRenFuzzPtrHandle,
+            "AudioCloseServiceRender"));
         if (CloseService == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioCloseServiceRender failed \n", __func__);
             dlclose(outputRenFuzzPtrHandle);

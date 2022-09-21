@@ -904,17 +904,98 @@ int32_t AudioProxyAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volu
 int32_t AudioProxyAdapterUpdateAudioRoute(struct AudioAdapter *adapter,
     const struct AudioRoute *route, int32_t *routeHandle)
 {
-    (void)adapter;
-    (void)route;
-    (void)routeHandle;
-    return HDF_ERR_NOT_SUPPORT;
+    int32_t audioAdapterRet = HDF_FAILURE;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    struct HdfSBuf *audioAdapterData = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *audioAdapterReply = HdfSbufTypedObtain(SBUF_IPC);
+
+    if (audioAdapterData == NULL || audioAdapterReply == NULL) {
+        HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        audioAdapterRet = HDF_ERR_MALLOC_FAIL;
+        goto FINISHED;
+    }
+
+    if (AudioProxyWriteTokenAndNameForSetPassThrough(hwAdapter, audioAdapterData) != AUDIO_HAL_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed!", __func__);
+        audioAdapterRet = HDF_ERR_INVALID_PARAM;
+        goto FINISHED;
+    }
+
+    if (!AudioRouteBlockMarshalling(audioAdapterData, route)) {
+        HDF_LOGE("%{public}s: write route failed!", __func__);
+        audioAdapterRet = HDF_ERR_INVALID_PARAM;
+        goto FINISHED;
+    }
+
+    audioAdapterRet = AudioProxyDispatchCall(hwAdapter->proxyRemoteHandle, AUDIO_HDI_ADT_UPDATE_ROUTE,
+                                             audioAdapterData, audioAdapterReply);
+    if (audioAdapterRet != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, audioAdapterRet);
+        goto FINISHED;
+    }
+
+    if (!HdfSbufReadInt32(audioAdapterReply, routeHandle)) {
+        HDF_LOGE("%{public}s: read routeHandle failed!", __func__);
+        audioAdapterRet = HDF_ERR_INVALID_PARAM;
+        goto FINISHED;
+    }
+
+FINISHED:
+    if (audioAdapterData != NULL) {
+        HdfSbufRecycle(audioAdapterData);
+    }
+    if (audioAdapterReply != NULL) {
+        HdfSbufRecycle(audioAdapterReply);
+    }
+    return audioAdapterRet;
 }
 
 int32_t AudioProxyAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t routeHandle)
 {
-    (void)adapter;
-    (void)routeHandle;
-    return HDF_ERR_NOT_SUPPORT;
+    int32_t audioAdapterRet = HDF_FAILURE;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    struct HdfSBuf *audioAdapterData = HdfSbufTypedObtain(SBUF_IPC);
+    struct HdfSBuf *audioAdapterReply = HdfSbufTypedObtain(SBUF_IPC);
+    if (audioAdapterData == NULL || audioAdapterReply == NULL) {
+        HDF_LOGE("%{public}s: HdfSubf malloc failed!", __func__);
+        audioAdapterRet = HDF_ERR_MALLOC_FAIL;
+        goto FINISHED;
+    }
+
+    if (AudioProxyWriteTokenAndNameForSetPassThrough(hwAdapter, audioAdapterData) != AUDIO_HAL_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed!", __func__);
+        audioAdapterRet = HDF_ERR_INVALID_PARAM;
+        goto FINISHED;
+    }
+
+    if (!HdfSbufWriteInt32(audioAdapterData, routeHandle)) {
+        HDF_LOGE("%{public}s: write routeHandle failed!", __func__);
+        audioAdapterRet = HDF_ERR_INVALID_PARAM;
+        goto FINISHED;
+    }
+
+    audioAdapterRet = AudioProxyDispatchCall(hwAdapter->proxyRemoteHandle, AUDIO_HDI_ADT_RELEASE_ROUTE,
+                                             audioAdapterData, audioAdapterData);
+    if (audioAdapterRet != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, audioAdapterRet);
+        goto FINISHED;
+    }
+
+FINISHED:
+    if (audioAdapterData != NULL) {
+        HdfSbufRecycle(audioAdapterData);
+    }
+    if (audioAdapterReply != NULL) {
+        HdfSbufRecycle(audioAdapterReply);
+    }
+    return audioAdapterRet;
 }
 int32_t AudioProxyAdapterGetDeviceStatus(struct AudioAdapter *adapter, struct AudioDeviceStatus *status)
 {

@@ -27,31 +27,36 @@ if (defined(ohos_lite)) {
   group("camera_hal_unittest") {
     deps = []
   }
-} else {
+} else if (is_standard_system) {
   group("camera_hal") {
-    if (is_standard_system) {
-      if (target_cpu == "x86_64") {
-        deps = []
-      } else {
-        deps = [
-          "buffer_manager:camera_buffer_manager",
-          "device_manager:camera_device_manager",
-          "hdi_impl:camera_host_service_1.0",
-          "pipeline_core:camera_pipeline_core",
-          "utils:camera_utils",
-        ]
-        deps += [ "${chipset_build_deps}" ]
-      }
+    if (target_cpu == "x86_64") {
+      deps = []
+    } else {
+      deps = [
+        "buffer_manager:camera_buffer_manager",
+        "device_manager:camera_device_manager",
+        "hdi_impl:camera_host_service_1.0",
+        "pipeline_core:camera_pipeline_core",
+        "utils:camera_utils",
+      ]
+      deps += [ "${chipset_build_deps}" ]
     }
   }
-
   group("camera_hal_unittest") {
-    if (is_standard_system && target_cpu != "x86_64") {
+    if (target_cpu == "x86_64") {
+      deps = []
+    } else {
       testonly = true
       deps = [
-        "buffer_manager/test:camera_hal_buffer_manager_unittest",
+        # acceptance unit test
         "device_manager/test:camera_hal_device_manager_unittest",
+        "test/at:camera_test_at",
+
+        # fuzz test
         "test/fuzztest:camera_hdi_fuzztest",
+
+        # function unit test
+        "test/ut:camera_test_ut",
       ]
     }
   }

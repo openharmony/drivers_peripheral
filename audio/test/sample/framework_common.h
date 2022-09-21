@@ -18,7 +18,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+
+#ifdef IDL_SAMPLE
+#include "v1_0/audio_types.h"
+#else
 #include "audio_types.h"
+#endif
 
 #define AUDIO_FUNC_LOGE(fmt, arg...) do { \
         printf("%s: [%s]: [%d]:[ERROR]:" fmt"\n", __FILE__, __func__, __LINE__, ##arg); \
