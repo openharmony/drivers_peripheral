@@ -19,36 +19,32 @@
 #include <hdf_log.h>
 #include <osal_mem.h>
 
-struct WlanCallbackService {
-    struct WlanCallbackStub stub;
-};
-
-int32_t WlanCallbackResetDriver(struct IWlanCallback *self, uint32_t event, int32_t code, const char *ifName)
+static int32_t WlanCallbackResetDriver(struct IWlanCallback *self, uint32_t event, int32_t code, const char *ifName)
 {
     (void)self;
-    HDF_LOGE("WlanCallbackResetDriver: receive resetStatus=%{public}d \n", code);
+    HDF_LOGE("WlanCallbackResetDriver: receive resetStatus=%{public}d", code);
     return HDF_SUCCESS;
 }
 
-int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event, const struct HdfWifiScanResult *scanResult,
-    const char *ifName)
+static int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event,
+    const struct HdfWifiScanResult *scanResult, const char *ifName)
 {
     (void)self;
     if (scanResult == NULL || ifName == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    HDF_LOGE("HdiProcessScanResult: flags=%{public}d, caps=%{public}d, freq=%{public}d, beaconInt=%{public}d \n",
+    HDF_LOGE("HdiProcessScanResult: flags=%{public}d, caps=%{public}d, freq=%{public}d, beaconInt=%{public}d",
         scanResult->flags, scanResult->caps, scanResult->freq, scanResult->beaconInt);
-    HDF_LOGE("HdiProcessScanResult: qual=%{public}d, beaconIeLen=%{public}d, level=%{public}d\n", scanResult->qual,
+    HDF_LOGE("HdiProcessScanResult: qual=%{public}d, beaconIeLen=%{public}d, level=%{public}d", scanResult->qual,
         scanResult->beaconIeLen, scanResult->level);
-    HDF_LOGE("HdiProcessScanResult: age=%{public}d, ieLen=%{public}d\n", scanResult->age, scanResult->ieLen);
+    HDF_LOGE("HdiProcessScanResult: age=%{public}d, ieLen=%{public}d", scanResult->age, scanResult->ieLen);
     return HDF_SUCCESS;
 }
 
-int32_t WlanCallbackNetlinkMessage(struct IWlanCallback *self, const uint8_t *msg, uint32_t msgLen)
+static int32_t WlanCallbackNetlinkMessage(struct IWlanCallback *self, const uint8_t *msg, uint32_t msgLen)
 {
-    int32_t i;
+    uint32_t i;
     (void)self;
     if (msg == NULL) {
         HDF_LOGE("%{public}s: input parameter invalid!", __func__);
@@ -71,16 +67,10 @@ struct IWlanCallback *WlanCallbackServiceGet(void)
         return NULL;
     }
 
-    if (!WlanCallbackStubConstruct(&service->stub)) {
-        HDF_LOGE("%{public}s: construct WlanCallbackStub obj failed!", __func__);
-        OsalMemFree(service);
-        return NULL;
-    }
-
-    service->stub.interface.ResetDriverResult = WlanCallbackResetDriver;
-    service->stub.interface.ScanResult = WlanCallbackScanResult;
-    service->stub.interface.WifiNetlinkMessage = WlanCallbackNetlinkMessage;
-    return &service->stub.interface;
+    service->interface.ResetDriverResult = WlanCallbackResetDriver;
+    service->interface.ScanResult = WlanCallbackScanResult;
+    service->interface.WifiNetlinkMessage = WlanCallbackNetlinkMessage;
+    return &service->interface;
 }
 
 void WlanCallbackServiceRelease(struct IWlanCallback *instance)
@@ -90,6 +80,5 @@ void WlanCallbackServiceRelease(struct IWlanCallback *instance)
         return;
     }
 
-    WlanCallbackStubRelease(&service->stub);
     OsalMemFree(service);
 }

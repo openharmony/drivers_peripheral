@@ -53,6 +53,8 @@ if (defined(ohos_lite)) {
       "//utils/native/base/include",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "//drivers/peripheral/base",
+      "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
+      "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
     ]
 
     libs = []
@@ -60,7 +62,9 @@ if (defined(ohos_lite)) {
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//foundation/graphic/surface:surface",
+      "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable:libbufferhandle_parcelable",
     ]
+
     external_deps = [
       "drivers_peripheral_display:hdi_display",
       "hdf_core:libhdf_utils",
@@ -129,6 +133,8 @@ if (defined(ohos_lite)) {
       "$camera_path/include",
       "//utils/native/base/include",
       "//drivers/peripheral/camera/interfaces/metadata/include",
+      "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
+      "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
     ]
 
     libs = []
