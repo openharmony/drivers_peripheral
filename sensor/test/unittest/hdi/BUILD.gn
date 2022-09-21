@@ -23,11 +23,12 @@ ohos_unittest("hdi_unittest_sensor") {
   include_dirs = [
     "//drivers/peripheral/sensor/interfaces",
     "//drivers/peripheral/sensor/interfaces/include",
+    "//drivers/peripheral/sensor/test/common/include",
   ]
 
   sources = [
+    "//drivers/peripheral/sensor/test/common/src/sensor_callback_impl.cpp",
     "hdf_sensor_hdi_test.cpp",
-    "sensor_callback_impl.cpp",
   ]
   cflags = [
     "-Wall",

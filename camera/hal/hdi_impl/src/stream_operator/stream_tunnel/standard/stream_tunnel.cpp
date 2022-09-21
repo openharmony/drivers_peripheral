@@ -71,12 +71,14 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
             waitCV_.wait(l, [this] { return wakeup_ == true; });
             usleep(SLEEP_TIME);
         }
+        stats_.RequestBufferResult(sfError);
     } while (!stop_ && sfError == OHOS::SURFACE_ERROR_NO_BUFFER);
     wakeup_ = false;
 
     if (stop_) {
         if (sb != nullptr) {
-            bufferQueue_->CancelBuffer(sb);
+            int ret = bufferQueue_->CancelBuffer(sb);
+            stats_.CancelBufferResult(ret);
         }
         return nullptr;
     }
@@ -86,31 +88,7 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
         return nullptr;
     }
 
-    std::shared_ptr<IBuffer> cb = nullptr;
-    {
-        std::lock_guard<std::mutex> l(lock_);
-        for (auto it = buffers.begin(); it != buffers.end(); it++) {
-            if (it->second == sb) {
-                cb = it->first;
-            }
-        }
-    }
-    if (cb == nullptr) {
-        cb = std::make_shared<ImageBuffer>(CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
-        RetCode rc = BufferAdapter::SurfaceBufferToCameraBuffer(sb, cb);
-        if (rc != RC_OK || cb == nullptr) {
-            CAMERA_LOGE("create tunnel buffer failed.");
-            return nullptr;
-        }
-
-        cb->SetIndex(++index);
-        {
-            std::lock_guard<std::mutex> l(lock_);
-            buffers[cb] = sb;
-        }
-    } else {
-        cb->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
-    }
+    std::shared_ptr<IBuffer> cb = GetCameraBufferAndUpdateInfo(sb);
     restBuffers.fetch_add(1, std::memory_order_release);
     return cb;
 }
@@ -143,10 +121,12 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
                 extraData->ExtraSet(OHOS::Camera::captureId, buffer->GetCaptureId());
             }
         }
-        bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
+        int ret = bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
+        stats_.FlushBufferResult(ret);
         frameCount_++;
     } else {
-        bufferQueue_->CancelBuffer(sb);
+        int ret = bufferQueue_->CancelBuffer(sb);
+        stats_.CancelBufferResult(ret);
     }
 
     restBuffers.fetch_sub(1, std::memory_order_release);
@@ -213,5 +193,46 @@ void StreamTunnel::WaitForAllBufferReturned()
         CAMERA_LOGW(
             "WaitForAllBufferReturned done, restBuffers=%{public}u", restBuffers.load(std::memory_order_acquire));
     }
+}
+
+void StreamTunnel::DumpStats(int interval)
+{
+    stats_.DumpStats(interval);
+}
+
+void StreamTunnel::SetStreamId(int32_t streamId)
+{
+    streamId_ = streamId;
+    stats_.SetStreamId(streamId);
+}
+
+std::shared_ptr<IBuffer> StreamTunnel::GetCameraBufferAndUpdateInfo(OHOS::sptr<OHOS::SurfaceBuffer> sb)
+{
+    std::shared_ptr<IBuffer> cb = nullptr;
+    {
+        std::lock_guard<std::mutex> l(lock_);
+        for (auto it = buffers.begin(); it != buffers.end(); it++) {
+            if (it->second == sb) {
+                cb = it->first;
+            }
+        }
+    }
+    if (cb == nullptr) {
+        cb = std::make_shared<ImageBuffer>(CAMERA_BUFFER_SOURCE_TYPE_EXTERNAL);
+        RetCode rc = BufferAdapter::SurfaceBufferToCameraBuffer(sb, cb);
+        if (rc != RC_OK || cb == nullptr) {
+            CAMERA_LOGE("create tunnel buffer failed.");
+            return nullptr;
+        }
+
+        cb->SetIndex(++index);
+        {
+            std::lock_guard<std::mutex> l(lock_);
+            buffers[cb] = sb;
+        }
+    } else {
+        cb->SetBufferStatus(CAMERA_BUFFER_STATUS_OK);
+    }
+    return cb;
 }
 } // namespace OHOS::Camera

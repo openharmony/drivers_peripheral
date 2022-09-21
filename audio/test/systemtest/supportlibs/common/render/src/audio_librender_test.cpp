@@ -62,12 +62,13 @@ void AudioLibRenderTest::SetUpTestCase(void)
     if (ptrHandle == nullptr) {
         return;
     }
-    BindServiceRenderSo = (struct DevHandle* (*)(const char *serverName))dlsym(ptrHandle, "AudioBindServiceRender");
+    BindServiceRenderSo = reinterpret_cast<struct DevHandle* (*)(const char *serverName)>(dlsym(ptrHandle,
+        "AudioBindServiceRender"));
     InterfaceLibOutputRender = (int32_t (*)(struct DevHandle *, int cmdId,
         struct AudioHwRenderParam *handleData))dlsym(ptrHandle, "AudioInterfaceLibOutputRender");
     InterfaceLibCtlRender = (int32_t (*)(struct DevHandle *, int cmdId,
         struct AudioHwRenderParam *handleData))dlsym(ptrHandle, "AudioInterfaceLibCtlRender");
-    CloseServiceRenderSo = (void (*)(struct DevHandle *))dlsym(ptrHandle, "AudioCloseServiceRender");
+    CloseServiceRenderSo = reinterpret_cast<void (*)(struct DevHandle *)>(dlsym(ptrHandle, "AudioCloseServiceRender"));
     if (BindServiceRenderSo == nullptr || CloseServiceRenderSo == nullptr ||
         InterfaceLibCtlRender == nullptr || InterfaceLibOutputRender == nullptr) {
         dlclose(ptrHandle);

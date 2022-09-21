@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-ohos_shared_library("hdi_audio_passthrough") {
+ohos_shared_library("audio_manager_service_1.0") {
   sources = [
     "//third_party/cJSON/cJSON.c",
     "src/audio_adapter.c",
@@ -33,6 +33,7 @@ ohos_shared_library("hdi_audio_passthrough") {
     "//drivers/peripheral/audio/supportlibs/interfaces/include",
     "//third_party/cJSON",
     "//third_party/bounds_checking_function/include",
+    "//drivers/hdf_core/adapter/uhdf2/shared/include",
   ]
 
   public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
@@ -48,7 +49,6 @@ ohos_shared_library("hdi_audio_passthrough") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]

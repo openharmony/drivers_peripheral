@@ -1191,7 +1191,6 @@ static void ProcessMenu(int32_t choice)
 {
     int32_t i;
     if (choice == GET_CAPTURE_POSITION + 1) {
-        AUDIO_FUNC_LOGE("Exit from application program!");
         return;
     }
     if (g_capture == NULL && choice != 1) {

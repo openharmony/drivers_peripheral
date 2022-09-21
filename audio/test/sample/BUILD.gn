@@ -157,11 +157,14 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("idl_render") {
-    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
+    include_dirs = [ "//drivers/peripheral/audio/sample" ]
 
-    sources = [ "idl_render.c" ]
+    sources = [
+      "framework_common.c",
+      "idl_render.c",
+    ]
 
-    defines = []
+    defines = [ "IDL_SAMPLE" ]
     if (drivers_peripheral_audio_alsa_lib) {
       defines += [ "ALSA_LIB_MODE" ]
     }
@@ -169,6 +172,7 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "drivers_interface_audio:libaudio_proxy_1.0",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
@@ -185,11 +189,14 @@ if (defined(ohos_lite)) {
   }
 
   ohos_executable("idl_capture") {
-    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
+    include_dirs = [ "//drivers/peripheral/audio/sample" ]
 
-    sources = [ "idl_capture.c" ]
+    sources = [
+      "framework_common.c",
+      "idl_capture.c",
+    ]
 
-    defines = []
+    defines = [ "IDL_SAMPLE" ]
     if (drivers_peripheral_audio_alsa_lib) {
       defines += [ "ALSA_LIB_MODE" ]
     }
@@ -197,6 +204,7 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "drivers_interface_audio:libaudio_proxy_1.0",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",

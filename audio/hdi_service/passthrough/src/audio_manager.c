@@ -503,7 +503,7 @@ int32_t ReleaseAudioManagerObject(struct IAudioManager *object)
     return AUDIO_SUCCESS;
 }
 
-struct IAudioManager *AudioManagerGetInstance(const char *serviceName)
+struct IAudioManager *AudioManagerImplGetInstance(const char *serviceName)
 {
     (void)serviceName;
     struct AudioHwManager *service = (struct AudioHwManager *)OsalMemCalloc(sizeof(struct AudioHwManager));
@@ -518,7 +518,7 @@ struct IAudioManager *AudioManagerGetInstance(const char *serviceName)
     return &(service->interface);
 }
 
-void AudioManagerRelease(struct IAudioManager *instance)
+void AudioManagerImplRelease(struct IAudioManager *instance)
 {
     ReleaseAudioManagerObject(instance);
 }

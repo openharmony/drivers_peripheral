@@ -249,7 +249,9 @@ HWTEST_F(AudioProxyRenderTest, RenderGetCurrentChannelId_002, TestSize.Level1)
 HWTEST_F(AudioProxyRenderTest, RenderCheckSceneCapability_001, TestSize.Level1)
 {
     ASSERT_NE(render, nullptr);
-    AudioSceneDescriptor scene;
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = 0;
+    scene.desc.pins = PIN_OUT_SPEAKER;
     bool supported = false;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyRenderCheckSceneCapability(nullptr, &scene, &supported));
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyRenderCheckSceneCapability((AudioHandle)render, nullptr,
@@ -260,7 +262,9 @@ HWTEST_F(AudioProxyRenderTest, RenderCheckSceneCapability_001, TestSize.Level1)
 HWTEST_F(AudioProxyRenderTest, RenderCheckSceneCapability_002, TestSize.Level1)
 {
     ASSERT_NE(render, nullptr);
-    AudioSceneDescriptor scene;
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = 0;
+    scene.desc.pins = PIN_OUT_SPEAKER;
     bool supported = false;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     struct HdfRemoteService *proxyRemoteHandle = hwRender->proxyRemoteHandle;
@@ -273,7 +277,9 @@ HWTEST_F(AudioProxyRenderTest, RenderCheckSceneCapability_002, TestSize.Level1)
 HWTEST_F(AudioProxyRenderTest, RenderSelectScene_001, TestSize.Level1)
 {
     ASSERT_NE(render, nullptr);
-    AudioSceneDescriptor scene;
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = 0;
+    scene.desc.pins = PIN_OUT_SPEAKER;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyRenderSelectScene(nullptr, &scene));
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyRenderSelectScene((AudioHandle)render, nullptr));
 }
@@ -281,7 +287,9 @@ HWTEST_F(AudioProxyRenderTest, RenderSelectScene_001, TestSize.Level1)
 HWTEST_F(AudioProxyRenderTest, RenderSelectScene_002, TestSize.Level1)
 {
     ASSERT_NE(render, nullptr);
-    AudioSceneDescriptor scene;
+    struct AudioSceneDescriptor scene;
+    scene.scene.id = 0;
+    scene.desc.pins = PIN_OUT_SPEAKER;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     struct HdfRemoteService *proxyRemoteHandle = hwRender->proxyRemoteHandle;
     hwRender->proxyRemoteHandle = nullptr;
