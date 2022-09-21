@@ -46,6 +46,8 @@ ohos_unittest("test_hdisrv") {
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
+    "src/battery_config_test.cpp",
+    "src/battery_led_test.cpp",
     "src/hdi_service_test.cpp",
   ]
 
