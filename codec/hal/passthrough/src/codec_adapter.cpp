@@ -75,17 +75,16 @@ int32_t CodecAdapterCreateComponent(struct CodecComponentNode **codecNode, const
 
     tempNode->node = std::make_shared<ComponentNode>(comp, exInfo);
 
-    if (callbacks != nullptr) {
-        ret = tempNode->node->SetCallbacks(callbacks, appData);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s SetCallbacks error", __func__);
-            g_mgr.DeleteComponentInstance(comp);
-            tempNode->node = nullptr;
-            delete tempNode;
-            tempNode = nullptr;
-            return ret;
-        }
+    ret = tempNode->node->SetCallbacks(callbacks, appData);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s SetCallbacks error", __func__);
+        g_mgr.DeleteComponentInstance(comp);
+        tempNode->node = nullptr;
+        delete tempNode;
+        tempNode = nullptr;
+        return ret;
     }
+
     tempNode->node->SetState(OMX_StateLoaded);
 
     *codecNode = tempNode;
