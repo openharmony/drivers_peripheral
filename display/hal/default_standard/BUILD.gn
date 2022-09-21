@@ -35,6 +35,7 @@ ohos_shared_library("def_display_gralloc") {
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/base",
     "src/utils/",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
   ]
 
   output_name = "display_gralloc"
@@ -64,6 +65,7 @@ config("def_display_device_pub_config") {
     "//drivers/peripheral/base",
     "//drivers/peripheral/display/hal/default_standard/src/display_device",
     "//drivers/peripheral/display/hal/default_standard/include",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
   ]
 }
 
@@ -105,6 +107,7 @@ ohos_shared_library("def_display_device") {
     "src/display_device/core",
     "src/display_device/composer",
     "src/utils",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
   ]
 
   deps = [

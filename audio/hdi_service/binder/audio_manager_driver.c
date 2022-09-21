@@ -13,173 +13,21 @@
  * limitations under the License.
  */
 
-#include "audio_internal.h"
-#include "audio_internal_manager.h"
 #include "audio_uhdf_log.h"
 #include "hdf_base.h"
 #include "hdf_device_object.h"
 #include "hdf_dlist.h"
 #include "osal_mem.h"
-#include "v1_0/audio_adapter_stub.h"
-#include "v1_0/audio_capture_stub.h"
-#include "v1_0/audio_manager_stub.h"
-#include "v1_0/audio_render_stub.h"
+#include "stub_collector.h"
+#include "v1_0/iaudio_manager.h"
 
 #define HDF_LOG_TAG AUDIO_HDI_SVC
 
-struct AudioManagerService {
-    struct AudioManagerStub stub;
-    struct AudioAdapterInfo adapterInfos[SUPPORT_ADAPTER_NUM_MAX];
-};
-
 struct HdfAudioManagerHost {
-    struct IDeviceIoService ioservice;
-    struct AudioManagerService *service;
+    struct IDeviceIoService ioService;
+    struct IAudioManager *service;
+    struct HdfRemoteService **stubObject;
 };
-
-static int32_t IDLAudioAdapterCreateCapture(struct IAudioAdapter *self, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture)
-{
-    if (self == NULL || desc == NULL || attrs == NULL || capture == NULL) {
-        AUDIO_FUNC_LOGE("Param is NULL!");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (AudioAdapterCreateCapture(self, desc, attrs, capture) != HDF_SUCCESS || *capture == NULL) {
-        return HDF_FAILURE;
-    }
-    struct AudioCaptureStub *captureStub = CONTAINER_OF(*capture, struct AudioCaptureStub, interface);
-    if (!AudioCaptureStubConstruct(captureStub)) {
-        AUDIO_FUNC_LOGE("AudioCaptureStubConstruct failed!");
-        OsalMemFree(*capture);
-        *capture = NULL;
-        ((struct AudioHwAdapter *)self)->infos.captureServicePtr = NULL;
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
-
-static int32_t IDLAudioAdapterCreateRender(struct IAudioAdapter *self, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct IAudioRender **render)
-{
-    if (self == NULL || desc == NULL || attrs == NULL || render == NULL) {
-        AUDIO_FUNC_LOGE("Param is NULL!");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    if (AudioAdapterCreateRender(self, desc, attrs, render) != HDF_SUCCESS || *render == NULL) {
-        return HDF_FAILURE;
-    }
-    struct AudioRenderStub *renderStub = CONTAINER_OF(*render, struct AudioRenderStub, interface);
-    if (!AudioRenderStubConstruct(renderStub)) {
-        AUDIO_FUNC_LOGE("AudioRenderStubConstruct failed!");
-        OsalMemFree(*render);
-        *render = NULL;
-        ((struct AudioHwAdapter *)self)->infos.renderServicePtr = NULL;
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioAdapterServiceOverwrite(struct IAudioAdapter *adapter)
-{
-    if (adapter == NULL) {
-        AUDIO_FUNC_LOGE("Param is NULL!");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    adapter->CreateRender = IDLAudioAdapterCreateRender;
-    adapter->CreateCapture = IDLAudioAdapterCreateCapture;
-
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioManagerServiceLoadAdapter(
-    struct IAudioManager *manager, const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
-{
-    AUDIO_FUNC_LOGI("enter!");
-    int32_t ret;
-    if (manager == NULL || desc == NULL || adapter == NULL) {
-        AUDIO_FUNC_LOGE("Param is NULL!");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    ret = AudioManagerLoadAdapter(manager, desc, adapter);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("LoadAdapter error!");
-        return ret;
-    }
-
-    struct AudioAdapterStub *adapterStub = CONTAINER_OF(*adapter, struct AudioAdapterStub, interface);
-    if (!AudioAdapterStubConstruct(adapterStub)) {
-        AUDIO_FUNC_LOGE("AudioAdapterStubConstruct failed!");
-        if (AudioManagerUnloadAdapter(manager, desc->adapterName) != HDF_SUCCESS) {
-            AUDIO_FUNC_LOGW("AudioManagerUnloadAdapter failed!");
-        }
-        return HDF_FAILURE;
-    }
-
-    if (AudioAdapterServiceOverwrite(*adapter) != HDF_SUCCESS) {
-        if (AudioManagerUnloadAdapter(manager, desc->adapterName) != HDF_SUCCESS) {
-            AUDIO_FUNC_LOGW("AudioManagerUnloadAdapter failed!");
-        }
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioManagerServiceUnloadAdapter(struct IAudioManager *manager, const char *adapterName)
-{
-    return AudioManagerUnloadAdapter(manager, adapterName);
-}
-
-static int32_t AudioManagerServiceGetAllAdapters(
-    struct IAudioManager *manager, struct AudioAdapterDescriptor *descs, uint32_t *size)
-{
-    return AudioManagerGetAllAdapters(manager, descs, size);
-}
-
-static int32_t ReleaseAudioManagerServiceObject(struct IAudioManager *object)
-{
-    return ReleaseAudioManagerObject(object);
-}
-
-static struct AudioManagerService *AudioManagerServiceGet(void)
-{
-    struct AudioManagerService *service =
-        (struct AudioManagerService *)OsalMemCalloc(sizeof(struct AudioManagerService));
-    if (service == NULL) {
-        AUDIO_FUNC_LOGE("alloc AudioManagerService obj failed!");
-        return NULL;
-    }
-
-    if (!AudioManagerStubConstruct(&service->stub)) {
-        AUDIO_FUNC_LOGE("AudioManagerStubConstruct failed!");
-        OsalMemFree(service);
-        return NULL;
-    }
-
-    service->stub.interface.GetAllAdapters = AudioManagerServiceGetAllAdapters;
-    service->stub.interface.LoadAdapter = AudioManagerServiceLoadAdapter;
-    service->stub.interface.UnloadAdapter = AudioManagerServiceUnloadAdapter;
-    service->stub.interface.ReleaseAudioManagerObject = ReleaseAudioManagerServiceObject;
-
-    return service;
-}
-
-static void AudioManagerServiceRelease(struct AudioManagerService *instance)
-{
-    if (instance == NULL) {
-        AUDIO_FUNC_LOGE("Param is NULL!");
-        return;
-    }
-
-    ReleaseAudioManagerServiceObject(&(instance->stub.interface));
-    OsalMemFree(instance);
-}
 
 static int32_t AudioManagerDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
@@ -188,21 +36,20 @@ static int32_t AudioManagerDriverDispatch(
         AUDIO_FUNC_LOGE("Param is NULL!");
         return HDF_ERR_INVALID_PARAM;
     }
-    struct HdfAudioManagerHost *audioManagerHost =
-        CONTAINER_OF(client->device->service, struct HdfAudioManagerHost, ioservice);
-    if (audioManagerHost == NULL || audioManagerHost->service == NULL ||
-        audioManagerHost->service->stub.OnRemoteRequest == NULL) {
-        AUDIO_FUNC_LOGE("invalid service obj");
+
+    struct HdfAudioManagerHost *audiomanagerHost =
+        CONTAINER_OF(client->device->service, struct HdfAudioManagerHost, ioService);
+    if (audiomanagerHost->service == NULL || audiomanagerHost->stubObject == NULL) {
+        HDF_LOGE("%{public}s: invalid service obj", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
-        AUDIO_FUNC_LOGE("check interface desc failed!");
-        return HDF_FAILURE;
+    struct HdfRemoteService *stubObj = *audiomanagerHost->stubObject;
+    if (stubObj == NULL || stubObj->dispatcher == NULL || stubObj->dispatcher->Dispatch == NULL) {
+        return HDF_ERR_INVALID_OBJECT;
     }
 
-    return audioManagerHost->service->stub.OnRemoteRequest(
-        &audioManagerHost->service->stub.interface, cmdId, data, reply);
+    return stubObj->dispatcher->Dispatch((struct HdfRemoteService *)stubObj->target, cmdId, data, reply);
 }
 
 static int32_t HdfAudioManagerDriverInit(struct HdfDeviceObject *deviceObject)
@@ -233,15 +80,26 @@ static int32_t HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
         return HDF_ERR_MALLOC_FAIL;
     }
 
-    audiomanagerHost->ioservice.Dispatch = AudioManagerDriverDispatch;
-    audiomanagerHost->ioservice.Open = NULL;
-    audiomanagerHost->ioservice.Release = NULL;
-    audiomanagerHost->service = AudioManagerServiceGet();
-    if (audiomanagerHost->service == NULL) {
+    struct IAudioManager *serviceImpl = IAudioManagerGet(true);
+    if (serviceImpl == NULL) {
+        AUDIO_FUNC_LOGE("create serviceImpl failed!");
         OsalMemFree(audiomanagerHost);
         return HDF_FAILURE;
     }
-    deviceObject->service = &audiomanagerHost->ioservice;
+
+    struct HdfRemoteService **stubObj = StubCollectorGetOrNewObject(IAUDIOMANAGER_INTERFACE_DESC, serviceImpl);
+    if (stubObj == NULL) {
+        OsalMemFree(audiomanagerHost);
+        IAudioManagerRelease(serviceImpl, true);
+        return HDF_FAILURE;
+    }
+
+    audiomanagerHost->ioService.Dispatch = AudioManagerDriverDispatch;
+    audiomanagerHost->ioService.Open = NULL;
+    audiomanagerHost->ioService.Release = NULL;
+    audiomanagerHost->service = serviceImpl;
+    audiomanagerHost->stubObject = stubObj;
+    deviceObject->service = &audiomanagerHost->ioService;
 
     return HDF_SUCCESS;
 }
@@ -255,8 +113,14 @@ static void HdfAudioManagerDriverRelease(struct HdfDeviceObject *deviceObject)
     }
 
     struct HdfAudioManagerHost *audiomanagerHost =
-        CONTAINER_OF(deviceObject->service, struct HdfAudioManagerHost, ioservice);
-    AudioManagerServiceRelease(audiomanagerHost->service);
+        CONTAINER_OF(deviceObject->service, struct HdfAudioManagerHost, ioService);
+    if (audiomanagerHost == NULL) {
+        AUDIO_FUNC_LOGE("HdfAudioManagerHost is NULL!");
+        return;
+    }
+
+    StubCollectorRemoveObject(IAUDIOMANAGER_INTERFACE_DESC, audiomanagerHost->service);
+    IAudioManagerRelease(audiomanagerHost->service, true);
     OsalMemFree(audiomanagerHost);
 }
 

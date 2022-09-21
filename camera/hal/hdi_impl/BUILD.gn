@@ -91,6 +91,9 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/ipp/include",
 
       "//system/core/include/cutils",
+
+      "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
+      "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
     ]
 
     deps = [
@@ -208,6 +211,8 @@ if (defined(ohos_lite)) {
 
       # hcs parser
       "//system/core/include/cutils",
+      "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
+      "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
     ]
 
     deps = [

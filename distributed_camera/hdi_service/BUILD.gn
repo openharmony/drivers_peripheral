@@ -43,6 +43,8 @@ ohos_shared_library("libdistributed_camera_host_config") {
     "${distributedcamera_hdf_path}/hdi_service/include/utils",
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//third_party/jsoncpp/include",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
   ]
   sources = [ "./src/config/dcamera_host_config.cpp" ]
   deps = [ "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0" ]
@@ -80,6 +82,8 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "${hdf_uhdf_path}/include/host",
     "//third_party/jsoncpp/include",
     "//drivers/peripheral/camera/interfaces/metadata/include",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
   ]
 
   sources = [
