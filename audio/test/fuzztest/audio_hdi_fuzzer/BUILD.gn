@@ -16,13 +16,13 @@ import("//build/test.gni")
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-group("fuzztest") {
+group("audio_hdi_fuzzer") {
   testonly = true
   deps = []
 
   deps += [
-    "adm_fuzzer:adm_fuzzer",
-    "audio_hdi_fuzzer:audio_hdi_fuzzer",
-    "hdi_fuzzer:hdi_fuzzer",
+    "audioadapter_fuzzer:AudioAdapterFuzzTest",
+    "audiocapture_fuzzer:AudioCaptureFuzzTest",
+    "audiorender_fuzzer:AudioRenderFuzzTest",
   ]
 }
