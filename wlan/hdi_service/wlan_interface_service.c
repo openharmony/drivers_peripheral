@@ -86,19 +86,6 @@ int32_t WlanInterfaceServiceInit(void)
     return ret;
 }
 
-void WlanInterfaceServiceRelease(struct WlanInterfaceService *instance)
-{
-    if (instance != NULL) {
-        OsalMemFree(instance);
-    }
-    if (WlanInterfaceWifiDestruct() != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s destruct WiFi failed!", __func__);
-    }
-    if (WlanExtendInterfaceWifiDestruct() != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s wifi extend interface destruct failed!", __func__);
-    }
-}
-
 void WlanInterfaceImplRelease(struct IWlanInterface *instance)
 {
     if (instance == NULL) {
