@@ -89,12 +89,11 @@ private:
     uint64_t usage_ = 0;
 };
 
-struct FrameSpec {
+using FrameSpec = struct {
     int64_t bufferPoolId_;
     std::shared_ptr<IBuffer> buffer_;
 };
 
-using FrameSpec = struct FrameSpec;
 
 enum AdapterCmd : uint32_t {
     CMD_AE_EXPO,
