@@ -30,9 +30,9 @@ public:
                 const std::shared_ptr<PipelineSpec>& spec);
     virtual ~StreamPipelineStrategy() = default;
     virtual RetCode CheckPipelineSpecExist(const int32_t mode, const std::vector<int32_t>& types);
-    PortFormat SetPortFormat(G_PIPELINE_SPEC_DATA_TYPE &pipeSpecPtr, std::optional<int32_t>& typeId,
+    PortFormat SetPortFormat(G_PIPELINE_SPEC_DATA_TYPE &pipeSpecPtr, const std::optional<int32_t>& typeId,
                     int j, int k, HostStreamInfo hostStreamInfo);
-    void InitPipeSpecPtr(G_PIPELINE_SPEC_DATA_TYPE &pipeSpecPtr, std::string& keyStr);
+    void InitPipeSpecPtr(G_PIPELINE_SPEC_DATA_TYPE &pipeSpecPtr, const std::string& keyStr);
 
 protected:
     virtual std::string ConstructKeyStrIndex(const int32_t& mode);
