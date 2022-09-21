@@ -16,6 +16,7 @@
 #include "hdf_audio_server_common.h"
 #include "audio_adapter_info_common.h"
 #include "audio_events.h"
+#include "audio_types.h"
 #include "audio_uhdf_log.h"
 #include "hdf_audio_events.h"
 #include "hdf_audio_server.h"
@@ -1598,6 +1599,350 @@ static int32_t HdiServiceGetDevStatusByPnp(const struct HdfDeviceIoClient *clien
     return AUDIO_HAL_SUCCESS;
 }
 
+static bool AudioDevExtInfoBlockUnmarshalling(struct HdfSBuf *data, struct AudioDevExtInfo *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        goto ERROR;
+    }
+
+    if (!HdfSbufReadInt32(data, &dataBlock->moduleId)) {
+        HDF_LOGE("%{public}s: read dataBlock->moduleId failed!", __func__);
+        goto ERROR;
+    }
+
+    if (!HdfSbufReadInt32(data, (int32_t*)&dataBlock->type)) {
+        HDF_LOGE("%{public}s: read dataBlock->type failed!", __func__);
+        goto ERROR;
+    }
+
+    const char *descCp = HdfSbufReadString(data);
+    if (descCp == NULL) {
+        HDF_LOGE("%{public}s: read descCp failed!", __func__);
+        goto ERROR;
+    }
+
+    dataBlock->desc = strdup(descCp);
+    if (dataBlock->desc == NULL) {
+        HDF_LOGE("strdup fail in %{public}s", __func__);
+        goto ERROR;
+    }
+
+    return true;
+ERROR:
+    if (dataBlock->desc != NULL) {
+        OsalMemFree((void*)dataBlock->desc);
+        dataBlock->desc = NULL;
+    }
+
+    return false;
+}
+
+static bool AudioMixExtInfoBlockUnmarshalling(struct HdfSBuf *data, struct AudioMixExtInfo *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        return false;
+    }
+
+    const struct AudioMixExtInfo *dataBlockPtr = (const struct AudioMixExtInfo *)HdfSbufReadUnpadBuffer(data, sizeof(struct AudioMixExtInfo));
+    if (dataBlockPtr == NULL) {
+        HDF_LOGE("%{public}s: failed to read buffer data", __func__);
+        return false;
+    }
+
+    if (memcpy_s(dataBlock, sizeof(struct AudioMixExtInfo), dataBlockPtr, sizeof(struct AudioMixExtInfo)) != EOK) {
+        HDF_LOGE("%{public}s: failed to memcpy data", __func__);
+        return false;
+    }
+
+    return true;
+}
+
+static bool AudioSessionExtInfoBlockUnmarshalling(struct HdfSBuf *data, struct AudioSessionExtInfo *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        return false;
+    }
+
+    const struct AudioSessionExtInfo *dataBlockPtr = (const struct AudioSessionExtInfo *)HdfSbufReadUnpadBuffer(data,
+                                                      sizeof(struct AudioSessionExtInfo));
+    if (dataBlockPtr == NULL) {
+        HDF_LOGE("%{public}s: failed to read buffer data", __func__);
+        return false;
+    }
+
+    if (memcpy_s(dataBlock, sizeof(struct AudioSessionExtInfo), dataBlockPtr, sizeof(struct AudioSessionExtInfo)) != EOK) {
+        HDF_LOGE("%{public}s: failed to memcpy data", __func__);
+        return false;
+    }
+
+    return true;
+}
+
+static void AudioDevExtInfoFree(struct AudioDevExtInfo *dataBlock, bool freeSelf)
+{
+    if (dataBlock == NULL) {
+        return;
+    }
+
+    if (dataBlock->desc != NULL) {
+        OsalMemFree((void*)dataBlock->desc);
+        dataBlock->desc = NULL;
+    }
+
+    if (freeSelf) {
+        OsalMemFree(dataBlock);
+    }
+}
+
+static inline bool AudioInfoBlockUnmarshalling(enum AudioPortType type, struct HdfSBuf *data, RouteExtInfo *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        return false;
+    }
+    bool ret = true;
+    switch (type) {
+        case AUDIO_PORT_DEVICE_TYPE:
+            if (!AudioDevExtInfoBlockUnmarshalling(data, &dataBlock->device)) {
+                HDF_LOGE("%{public}s: write dataBlock->device failed!", __func__);
+                AudioDevExtInfoFree(&dataBlock->device, false);
+                ret = false;
+            }
+            break;
+        case AUDIO_PORT_MIX_TYPE:
+            if (!AudioMixExtInfoBlockUnmarshalling(data, &dataBlock->mix)) {
+                HDF_LOGE("%{public}s: write dataBlock->mix failed!", __func__);
+                ret = false;
+            }
+            break;
+        case AUDIO_PORT_SESSION_TYPE:
+            if (!AudioSessionExtInfoBlockUnmarshalling(data, &dataBlock->session)) {
+                HDF_LOGE("%{public}s: write dataBlock->session failed!", __func__);
+                ret = false;
+            }
+            break;
+        case AUDIO_PORT_UNASSIGNED_TYPE:
+        default:
+            ret = false;
+            break;
+    }
+
+    return ret;
+}
+
+static bool AudioRouteNodeBlockUnmarshalling(struct HdfSBuf *data, struct AudioRouteNode *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        return false;
+    }
+
+    if (!HdfSbufReadInt32(data, &dataBlock->portId)) {
+        HDF_LOGE("%{public}s: read dataBlock->portId failed!", __func__);
+        return false;
+    }
+
+    if (!HdfSbufReadInt32(data, (int32_t*)&dataBlock->role)) {
+        HDF_LOGE("%{public}s: read dataBlock->role failed!", __func__);
+        return false;
+    }
+
+    if (!HdfSbufReadInt32(data, (int32_t*)&dataBlock->type)) {
+        HDF_LOGE("%{public}s: read dataBlock->type failed!", __func__);
+        return false;
+    }
+
+    if (!AudioInfoBlockUnmarshalling(dataBlock->type, data, (RouteExtInfo*)&dataBlock->ext)) {
+        HDF_LOGE("%{public}s: read &dataBlock->ext failed!", __func__);
+        return false;
+    }
+
+    return true;
+}
+
+static bool AudioRouteBlockUnmarshalling(struct HdfSBuf *data, struct AudioRoute *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        return false;
+    }
+
+    struct AudioRouteNode* sourcesCp = NULL;
+    uint32_t sourcesNum = 0;
+    struct AudioRouteNode* sinksCp = NULL;
+    uint32_t sinksNum = 0;
+    if (!HdfSbufReadUint32(data, &sourcesNum)) {
+        HDF_LOGE("%{public}s: read sourcesNum failed!", __func__);
+        return false;
+    }
+    if (sourcesNum > 0) {
+        sourcesCp = (struct AudioRouteNode*)OsalMemCalloc(sizeof(struct AudioRouteNode) * sourcesNum);
+        if (sourcesCp == NULL) {
+            return false;
+        }
+        for (uint32_t i = 0; i < sourcesNum; i++) {
+            if (!AudioRouteNodeBlockUnmarshalling(data, &sourcesCp[i])) {
+                HDF_LOGE("%{public}s: read &sourcesCp[i] failed!", __func__);
+                OsalMemFree((void*)sourcesCp);
+                return false;
+            }
+        }
+    }
+    dataBlock->sources = sourcesCp;
+    dataBlock->sourcesNum = sourcesNum;
+
+    if (!HdfSbufReadUint32(data, &sinksNum)) {
+        HDF_LOGE("%{public}s: read sinksNum failed!", __func__);
+        OsalMemFree((void*)sourcesCp);
+        return false;
+    }
+    if (sinksNum > 0) {
+        sinksCp = (struct AudioRouteNode*)OsalMemCalloc(sizeof(struct AudioRouteNode) * sinksNum);
+        if (sinksCp == NULL) {
+            OsalMemFree((void*)sourcesCp);
+            return false;
+        }
+        for (uint32_t i = 0; i < sinksNum; i++) {
+            if (!AudioRouteNodeBlockUnmarshalling(data, &sinksCp[i])) {
+                HDF_LOGE("%{public}s: read &sinksCp[i] failed!", __func__);
+                OsalMemFree((void*)sourcesCp);
+                OsalMemFree((void*)sinksCp);
+                return false;
+            }
+        }
+    }
+    dataBlock->sinks = sinksCp;
+    dataBlock->sinksNum = sinksNum;
+
+    return true;
+}
+
+static void AudioRouteDevFreeByNum(const struct AudioRouteNode *routeNode, uint32_t num)
+{
+    uint32_t nodeCnt;
+    if (routeNode == NULL) {
+        AUDIO_FUNC_LOGI("routeNode has been freed");
+        return;
+    }
+
+    for (nodeCnt = 0; nodeCnt < num; nodeCnt++) {
+        if (routeNode[nodeCnt].type == AUDIO_PORT_DEVICE_TYPE) {
+            AudioDevExtInfoFree((struct AudioDevExtInfo *)&routeNode[nodeCnt].ext.device, false);
+        }
+    }
+}
+
+static void AudioRouteFree(struct AudioRoute *dataBlock, bool freeSelf)
+{
+    if (dataBlock == NULL) {
+        AUDIO_FUNC_LOGI("dataBlock has been freed");
+        return;
+    }
+
+    if (dataBlock->sources != NULL) {
+        AudioRouteDevFreeByNum(dataBlock->sources, dataBlock->sourcesNum);
+        OsalMemFree((void*)dataBlock->sources);
+    }
+
+    if (dataBlock->sinks != NULL) {
+        AudioRouteDevFreeByNum(dataBlock->sinks, dataBlock->sinksNum);
+        OsalMemFree((void*)dataBlock->sinks);
+    }
+
+    if (freeSelf) {
+        OsalMemFree((void*)dataBlock);
+    }
+}
+
+static int32_t HdiSerStubUpdateAudioRoute(const struct HdfDeviceIoClient *client, struct HdfSBuf *audioAdapterData,
+                                          struct HdfSBuf *audioAdapterReply)
+{
+    int32_t audioAdapterRet = HDF_FAILURE;
+    struct AudioRoute* route = NULL;
+    int32_t routeHandle = 0;
+    struct AudioAdapter *adapter = NULL;
+    const char *adapterName = NULL;
+
+    if ((adapterName = HdfSbufReadString(audioAdapterData)) == NULL) {
+        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    route = (struct AudioRoute*)OsalMemAlloc(sizeof(struct AudioRoute));
+    if (route == NULL) {
+        HDF_LOGE("%{public}s: malloc route failed", __func__);
+        audioAdapterRet = HDF_ERR_MALLOC_FAIL;
+    }
+
+    if (!AudioRouteBlockUnmarshalling(audioAdapterData, route)) {
+        HDF_LOGE("%{public}s: read route failed!", __func__);
+        audioAdapterRet = HDF_ERR_INVALID_PARAM;
+        goto FINISHED;
+    }
+
+    if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("adapter is NULL!");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    audioAdapterRet = adapter->UpdateAudioRoute(adapter, route, &routeHandle);
+    if (audioAdapterRet != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call UpdateAudioRoute function failed!", __func__);
+        goto FINISHED;
+    }
+
+    if (!HdfSbufWriteInt32(audioAdapterReply, routeHandle)) {
+        HDF_LOGE("%{public}s: write routeHandle failed!", __func__);
+        audioAdapterRet = HDF_ERR_INVALID_PARAM;
+        goto FINISHED;
+    }
+
+FINISHED:
+    if (route != NULL) {
+        AudioRouteFree(route, true);
+        route = NULL;
+    }
+    return audioAdapterRet;
+}
+
+static int32_t HdiSerStubReleaseAudioRoute(const struct HdfDeviceIoClient *client, struct HdfSBuf *audioAdapterData,
+                                           struct HdfSBuf *audioAdapterReply)
+{
+    int32_t audioAdapterRet = HDF_FAILURE;
+    int32_t routeHandle = 0;
+    struct AudioAdapter *adapter = NULL;
+    const char *adapterName = NULL;
+
+    if ((adapterName = HdfSbufReadString(audioAdapterData)) == NULL) {
+        AUDIO_FUNC_LOGE("adapterNameCase Is NULL");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    if (!HdfSbufReadInt32(audioAdapterData, &routeHandle)) {
+        HDF_LOGE("%{public}s: read &routeHandle failed!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    audioAdapterRet = adapter->ReleaseAudioRoute(adapter, routeHandle);
+    if (audioAdapterRet != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: call ReleaseAudioRoute function failed!", __func__);
+    }
+
+    return audioAdapterRet;
+}
+
 struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleList[] = {
     {AUDIO_HDI_MGR_GET_FUNCS, HdiServiceGetFuncs},
     {AUDIO_HDI_MGR_GET_ALL_ADAPTER, HdiServiceGetAllAdapter},
@@ -1607,6 +1952,8 @@ struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleList[] = {
     {AUDIO_HDI_ADT_GET_PORT_CAPABILITY, HdiServiceGetPortCapability},
     {AUDIO_HDI_ADT_SET_PASS_MODE, HdiServiceSetPassthroughMode},
     {AUDIO_HDI_ADT_GET_PASS_MODE, HdiServiceGetPassthroughMode},
+    {AUDIO_HDI_ADT_UPDATE_ROUTE, HdiSerStubUpdateAudioRoute},
+    {AUDIO_HDI_ADT_RELEASE_ROUTE, HdiSerStubReleaseAudioRoute},
     {AUDIO_HDI_PNP_DEV_STATUS, HdiServiceGetDevStatusByPnp},
     {AUDIO_HDI_RENDER_CREATE_RENDER, HdiServiceCreatRender},
     {AUDIO_HDI_RENDER_DESTROY, HdiServiceRenderDestory},
