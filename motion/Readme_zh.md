@@ -2,9 +2,9 @@
 
 ## 简介
 
-基于HDF（Hardware Driver Foundation）驱动框架开发的Motion驱动，能够屏蔽硬件器件差异，为上层服务提供稳定的手势识别基础能力接口，包括Motion使能/去使能、Motion订阅/去订阅等稳定的接口。
+基于HDF（Hardware Driver Foundation）驱动框架开发的Motion驱动，能够屏蔽硬件器件差异，为上层服务提供稳定的手势识别基础能力接口，包括Motion使能/去使能、Motion订阅/取消订阅等稳定的接口。
 
-Motion驱动模块如图1所示，上层为Framework层，提供MSDP服务，通过UHDF（User Hardware Driver Foundation）层的Motion Proxy与Motion Stub进行交互；而Motion Stub可调用Motion HDI实现类接口，从而实现上层服务的手势识别使能/去使能、手势识别订阅/去订阅等能力。。
+Motion驱动模块如图1所示，上层为Framework层，提供MSDP服务，通过UHDF（User Hardware Driver Foundation）层的Motion Proxy与Motion Stub进行交互；而Motion Stub可调用Motion HDI实现类接口，从而实现上层服务的手势识别使能/去使能、手势识别订阅/取消订阅等能力。
 
 **图 1** Motion驱动模块架构图
 
@@ -34,7 +34,7 @@ Motion驱动模块为上层服务提供可直接调用的能力接口，涉及�
 | int32_t EnableMotion(int32_t motionType)                     | 使能一种手势识别类型，只有数据订阅者使能手势识别后，才能获取订阅的手势识别数据。 |
 | int32_t DisableMotion(int32_t motionType)                    | 去使能一种手势识别类型。                                     |
 | int32_t Register(const sptr\<IMotionCallback\> &callbackObj)   | 订阅者成功注册手势识别数据回调函数，系统会将获取到的手势识别数据上报给订阅者。 |
-| int32_t Unregister(const sptr\<IMotionCallback\> &callbackObj) | 订阅者去注册手势识别数据回调函数。                           |
+| int32_t Unregister(const sptr\<IMotionCallback\> &callbackObj) | 订阅者取消注册手势识别数据回调函数。                           |
 
 ### 使用说明
 
