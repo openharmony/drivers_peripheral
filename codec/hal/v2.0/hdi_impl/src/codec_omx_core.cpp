@@ -106,7 +106,7 @@ int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::st
         HDF_LOGE("%{public}s: getRoles_ return err [%{public}x].", __func__, err);
         return err;
     }
-    if (roleCount <= 0) {
+    if (roleCount == 0) {
         return err;
     }
 
