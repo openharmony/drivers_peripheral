@@ -127,16 +127,16 @@ int32_t DdkListenerMgrAdd(struct HdfDevEventlistener *listener)
         return HDF_ERR_INVALID_PARAM;
     }
 
+    // notify all device to listener
+    struct UsbDdkDeviceHanldePriv handlePriv = {.listener = listener, .cmd = USB_PNP_NOTIFY_ADD_DEVICE};
     if (DdkListenerMgrIsExists(listener)) {
         HDF_LOGW("%{public}s: add listener repeatedly", __func__);
-        return HDF_SUCCESS;
+        return DdkDevMgrForEachDeviceSafe(DdkListenerMgrNotifyOne, (void *)&handlePriv);
     }
 
     OsalMutexLock(&g_ddkListenerList.listMutex);
     DListInsertTail(&listener->listNode, &g_ddkListenerList.listenerList);
     OsalMutexUnlock(&g_ddkListenerList.listMutex);
-    // notify all device to listener
-    struct UsbDdkDeviceHanldePriv handlePriv = {.listener = listener, .cmd = USB_PNP_NOTIFY_ADD_DEVICE};
     return DdkDevMgrForEachDeviceSafe(DdkListenerMgrNotifyOne, (void *)&handlePriv);
 }
 

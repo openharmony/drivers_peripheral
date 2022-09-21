@@ -14,10 +14,12 @@
  */
 
 #ifndef DDK_UEVENT_HANDLE_H
+#include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
 void *DdkUeventMain(void *);
+int32_t DdkUeventInit(void);
 #ifdef __cplusplus
 }
 #endif

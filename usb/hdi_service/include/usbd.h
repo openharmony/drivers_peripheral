@@ -30,7 +30,6 @@
 
 #define USB_MAX_INTERFACES 32
 #define USB_MAX_DEVICE_NUMBERS 127
-#define HDF_USB_INFO_MAX_SIZE  ((USB_MAX_DEVICE_NUMBERS) * 12) // all usb info, 12 byte is reply size
 #define DIRECTION_MASK         0x1
 #define USB_CTRL_SET_TIMEOUT   5000
 #define USB_PIPE_DIR_OFFSET    7
