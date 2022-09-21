@@ -385,9 +385,10 @@ void HosV4L2Buffers::SetCallback(BufCallback cb)
     CAMERA_LOGD("HosV4L2Buffers::SetCallback OK.");
     dequeueBuffer_ = cb;
 }
+
 RetCode HosV4L2Buffers::Flush(int fd)
 {
-    CAMERA_LOGE("HosV4L2Buffers::Flush\n");
+    CAMERA_LOGD("HosV4L2Buffers::Flush\n");
     return RC_OK;
 }
 } // namespace OHOS::Camera
