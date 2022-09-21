@@ -44,6 +44,8 @@ std::string Base64Encode(const unsigned char *toEncode, unsigned int len);
 std::string Base64Decode(const std::string& basicString);
 
 bool IsBase64(unsigned char c);
+
+bool IsDhBaseInfoInvalid(const DHBase& dhBase);
 } // namespace DistributedHardware
 } // namespace OHOS
 #endif // DISTRIBUTED_CAMERA_H
