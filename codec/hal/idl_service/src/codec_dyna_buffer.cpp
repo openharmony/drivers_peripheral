@@ -28,9 +28,7 @@ CodecDynaBuffer::CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer) : ICodecBuf
 
 CodecDynaBuffer::~CodecDynaBuffer()
 {
-    if (dynaBuffer_ != nullptr) {
-        dynaBuffer_ = nullptr;
-    }
+    dynaBuffer_ = nullptr;
 }
 
 sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
@@ -81,12 +79,9 @@ int32_t CodecDynaBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
         CODEC_LOGE("shMem_ is null or CheckInvalid return false");
         return HDF_ERR_INVALID_PARAM;
     }
-    if (codecBuffer.bufferhandle != nullptr) {
-        codecBuffer.bufferhandle = nullptr;
-    }
-    if (dynaBuffer_ != nullptr) {
-        dynaBuffer_ = nullptr;
-    }
+
+    codecBuffer.bufferhandle = nullptr;
+    dynaBuffer_ = nullptr;
 
     return HDF_SUCCESS;
 }
