@@ -348,7 +348,6 @@ static int32_t GetOneCapability(const struct DeviceResourceIface *iface,
 static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
     const char *nodeName, CodecCapablityGroup *capsGroup)
 {
-    CodecCapability *cap;
     int32_t index = 0;
     bool isVideoGroup = true;
     const struct DeviceResourceNode *codecGroupNode = NULL;
@@ -373,8 +372,7 @@ static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
             HDF_LOGE("%{public}s, failed to get child node: %{public}s, index error!", __func__, nodeName);
             return HDF_FAILURE;
         }
-        cap = &(capsGroup->capablitis[index++]);
-        GetOneCapability(iface, childNode, cap, isVideoGroup);
+        GetOneCapability(iface, childNode, &(capsGroup->capablitis[index++]), isVideoGroup);
     }
     return HDF_SUCCESS;
 }

@@ -432,7 +432,7 @@ static int32_t SerCodecQueueInput(struct HdfDeviceIoClient *client, struct HdfSB
         HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (bufCnt <= 0) {
+    if (bufCnt == 0) {
         HDF_LOGE("%{public}s: Param bufCnt err!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -487,7 +487,7 @@ static int32_t SerCodecDequeueInput(struct HdfDeviceIoClient *client, struct Hdf
         HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (bufCnt <= 0) {
+    if (bufCnt == 0) {
         HDF_LOGE("%{public}s: Param bufCnt err!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -534,7 +534,7 @@ static int32_t SerCodecQueueOutput(struct HdfDeviceIoClient *client, struct HdfS
         HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (bufCnt <= 0) {
+    if (bufCnt == 0) {
         HDF_LOGE("%{public}s: Param bufCnt err!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -589,7 +589,7 @@ static int32_t SerCodecDequeueOutput(struct HdfDeviceIoClient *client, struct Hd
         HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (bufCnt <= 0) {
+    if (bufCnt == 0) {
         HDF_LOGE("%{public}s: Param bufCnt err!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
