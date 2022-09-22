@@ -91,12 +91,12 @@ RetCode StreamPipelineStrategy::SetUpBasicInPortFormat(const NodeSpec& nodeSpec,
     return RC_OK;
 }
 PortFormat StreamPipelineStrategy::SetPortFormat(G_PIPELINE_SPEC_DATA_TYPE &pipeSpecPtr,
-                                                 std::optional<int32_t>& typeId,
+                                                 const std::optional<int32_t>& typeId,
                                                  int j,
                                                  int k,
                                                  HostStreamInfo hostStreamInfo)
 {
-    struct PortFormat f {
+    PortFormat f {
         .w_ = hostStreamInfo.width_,
         .h_ = hostStreamInfo.height_,
         .streamId_ = hostStreamInfo.streamId_,
@@ -110,7 +110,7 @@ PortFormat StreamPipelineStrategy::SetPortFormat(G_PIPELINE_SPEC_DATA_TYPE &pipe
     return f;
 }
 
-void StreamPipelineStrategy::InitPipeSpecPtr(G_PIPELINE_SPEC_DATA_TYPE &pipeSpecPtr, std::string& keyStr)
+void StreamPipelineStrategy::InitPipeSpecPtr(G_PIPELINE_SPEC_DATA_TYPE &pipeSpecPtr, const std::string& keyStr)
 {
     for (int i = 0; i < G_PIPELINE_SPECS_SIZE; i++) {
         if (G_PIPELINE_SPECS_TABLE[i].name == keyStr) {
@@ -137,7 +137,7 @@ RetCode StreamPipelineStrategy::SelectPipelineSpec(const int32_t& mode, Pipeline
             .type_ = std::string(pipeSpecPtr->nodeSpec[j].stream_type)
         };
         for (int k = pipeSpecPtr->nodeSpec[j].portSpecSize - 1; k >= 0; k--) {
-            struct PortInfo info {
+            PortInfo info {
                 .name_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].name),
                 .peerPortName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peer_port_name),
                 .peerPortNodeName_ = std::string(pipeSpecPtr->nodeSpec[j].portSpec[k].peer_port_node_name)
@@ -146,10 +146,10 @@ RetCode StreamPipelineStrategy::SelectPipelineSpec(const int32_t& mode, Pipeline
 
             std::optional<int32_t> typeId = GetTypeId(std::string(pipeSpecPtr->nodeSpec[j].stream_type),
                 G_STREAM_TABLE_PTR, G_STREAM_TABLE_SIZE);
-            struct PortFormat format {};
-            int32_t streamId = -1;
+            PortFormat format {};
+
             if (typeId) {
-                streamId = hostStreamMgr_->DesignateStreamIdForType(typeId.value());
+                int32_t streamId = hostStreamMgr_->DesignateStreamIdForType(typeId.value());
                 HostStreamInfo hostStreamInfo = hostStreamMgr_->GetStreamInfo(streamId);
                 PortFormat f = SetPortFormat(pipeSpecPtr, typeId, j, k, hostStreamInfo);
                 if (!f.needAllocation_) {
