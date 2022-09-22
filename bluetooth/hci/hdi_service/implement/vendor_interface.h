@@ -46,7 +46,7 @@ public:
     size_t SendPacket(Hci::HciPacketType type, const std::vector<uint8_t> &packet);
 
 private:
-    static void OnInitCallback(bt_op_result_t result);
+    static void OnInitCallback(BtOpResult result);
     static void* OnMallocCallback(int size);
     static void OnFreeCallback(void* buf);
     static size_t OnCmdXmitCallback(uint16_t opcode, void* buf);
@@ -59,8 +59,8 @@ private:
     InitializeCompleteCallback initializeCompleteCallback_;
     ReceiveDataCallback eventDataCallback_;
     void* vendorHandle_ = nullptr;
-    bt_vendor_interface_t *vendorInterface_ = nullptr;
-    static bt_vendor_callbacks_t vendorCallbacks_;
+    BtVendorInterface *vendorInterface_ = nullptr;
+    static BtVendorCallbacks vendorCallbacks_;
     HciWatcher watcher_;
     std::shared_ptr<Hci::HciProtocol> hci_ = nullptr;
     uint16_t vendorSentOpcode_ = 0;

@@ -352,7 +352,7 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
     int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwAdapter);
     if (ret != 0) {
         HDF_LOGE("AudioAdapterCreateRenderPre fail");
-        AudioMemFree((void **)&hwRender);
+        AudioMemFree(reinterpret_cast<void **>(&hwRender));
         return AUDIO_HAL_ERR_INTERNAL;
     }
     hwAdapter->adapterMgrRenderFlag++;
@@ -380,8 +380,8 @@ int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRend
         }
     }
     AudioReleaseRenderHandle(hwRender);
-    AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
-    AudioMemFree((void **)&render);
+    AudioMemFree(reinterpret_cast<void **>(&hwRender->renderParam.frameRenderMode.buffer));
+    AudioMemFree(reinterpret_cast<void **>(&render));
     return AUDIO_HAL_SUCCESS;
 }
 
