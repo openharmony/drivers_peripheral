@@ -109,7 +109,6 @@ int32_t ICodecBuffer::SyncWait(int fd, uint32_t timeout)
             retCode = -EPERM;
             errno = EINVAL;
         }
-        retCode = 0;
     }
     return retCode < 0 ? -errno : EOK;
 }

@@ -44,7 +44,6 @@ struct DynamicBuffer {
         bufferHandle = nullptr;
     }
 };
-using DynamicBuffer = struct DynamicBuffer;
 
 class ICodecBuffer : public RefBase {
 public:
