@@ -101,7 +101,7 @@ static void HdfRilDriverRelease(struct HdfDeviceObject *deviceObject)
         HDF_LOGE("HdfRilDriverRelease not initted");
         return;
     }
-
+    ReleaseRilAdapter();
     auto *hdfRilHost = CONTAINER_OF(deviceObject->service, struct HdfRilHost, ioService);
     delete hdfRilHost;
 }
