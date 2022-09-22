@@ -246,7 +246,7 @@ int32_t StreamOperator::CreateStreams(const std::vector<StreamInfo>& streamInfos
         if ((it.bufferQueue_)->producer_ != nullptr) {
             auto tunnel = std::make_shared<StreamTunnel>();
             CHECK_IF_PTR_NULL_RETURN_VALUE(tunnel, INSUFFICIENT_RESOURCES);
-            RetCode rc = tunnel->AttachBufferQueue((it.bufferQueue_)->producer_);
+            rc = tunnel->AttachBufferQueue((it.bufferQueue_)->producer_);
             CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, INVALID_ARGUMENT);
             if (stream->AttachStreamTunnel(tunnel) != RC_OK) {
                 CAMERA_LOGE("attach buffer queue to stream [id = %{public}d] failed", it.streamId_);
@@ -314,9 +314,8 @@ int32_t StreamOperator::CommitStreams(OperationMode mode, const std::vector<uint
     std::vector<StreamConfiguration> configs = {};
     {
         std::lock_guard<std::mutex> l(streamLock_);
-        for (auto it : streamMap_) {
-            configs.emplace_back(it.second->GetStreamAttribute());
-        }
+        std::transform(streamMap_.begin(), streamMap_.end(), std::back_inserter(configs),
+            [](auto &iter) { return iter.second->GetStreamAttribute(); });
     }
 
     std::shared_ptr<CameraMetadata> setting;

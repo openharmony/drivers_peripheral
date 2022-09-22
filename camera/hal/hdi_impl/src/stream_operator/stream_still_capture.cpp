@@ -73,9 +73,9 @@ RetCode StreamStillCapture::ChangeToOfflineStream(std::shared_ptr<OfflineStream>
         waitingList_.clear();
     }
 
-    std::lock_guard<std::mutex> l(offlineLock_);
+    std::lock_guard<std::mutex> offlineStreamLock(offlineLock_);
     {
-        std::lock_guard<std::mutex> l(tsLock_);
+        std::lock_guard<std::mutex> inTransitListLock(tsLock_);
         context->restRequests = inTransitList_;
         state_ = STREAM_STATE_OFFLINE;
         CAMERA_LOGI("there is/are %{public}u request(s) left in stream %{public}d.",
