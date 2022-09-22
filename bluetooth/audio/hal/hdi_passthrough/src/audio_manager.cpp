@@ -83,9 +83,9 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
             }
             i++;
         }
-        AudioMemFree((void **)&hwAdapter->portCapabilitys);
+        AudioMemFree(reinterpret_cast<void **>(&hwAdapter->portCapabilitys));
     }
-    AudioMemFree((void **)&adapter);
+    AudioMemFree(reinterpret_cast<void **>(&adapter));
 
     HDF_LOGI("%s call bluetooth DeRegisterObserver interface", __func__);
     OHOS::Bluetooth::DeRegisterObserver();
