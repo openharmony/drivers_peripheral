@@ -220,7 +220,7 @@ RetCode StreamBase::StopStream()
         return RC_ERROR;
     }
 
-    if (lastRequest_ != nullptr && lastRequest_->IsContinous() && !inTransitList_.empty()) {
+    if (lastRequest_ != nullptr && lastRequest_->IsContinous() && !inTransitList_.empty() && messenger_ != nullptr) {
         std::shared_ptr<ICaptureMessage> endMessage =
             std::make_shared<CaptureEndedMessage>(streamId_, lastRequest_->GetCaptureId(),
             lastRequest_->GetEndTime(), lastRequest_->GetOwnerCount(), tunnel_->GetFrameCount());
@@ -265,7 +265,7 @@ RetCode StreamBase::AddRequest(std::shared_ptr<CaptureRequest>& request)
 RetCode StreamBase::CancelRequest(const std::shared_ptr<CaptureRequest>& request)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(request, RC_ERROR);
-
+    CHECK_IF_PTR_NULL_RETURN_VALUE(messenger_, RC_ERROR);
     {
         // We don't care if this request is continious-capture or single-capture, just erase it.
         // And those requests in inTransitList_ removed in HandleResult.
@@ -448,6 +448,7 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(request, RC_ERROR);
     CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(messenger_, RC_ERROR);
     auto buffer = request->GetAttachedBuffer();
     CameraBufferStatus status = buffer->GetBufferStatus();
     if (status != CAMERA_BUFFER_STATUS_OK) {
@@ -463,7 +464,7 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
             return RC_OK;
         }
     }
-    if (request->NeedShutterCallback() && messenger_ != nullptr) {
+    if (request->NeedShutterCallback()) {
         std::shared_ptr<ICaptureMessage> shutterMessage = std::make_shared<FrameShutterMessage>(
             streamId_, request->GetCaptureId(), request->GetEndTime(), request->GetOwnerCount());
         messenger_->SendMessage(shutterMessage);
