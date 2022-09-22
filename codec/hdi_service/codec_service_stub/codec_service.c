@@ -93,6 +93,10 @@ static int32_t DefaultCbOutputBufferAvailable(UINTPTR userData, CodecBuffer *out
         output = bmWrapper->GetUsedOutputDataBuffer(bmWrapper, QUEUE_TIME_OUT);
     }
     outBuf->buffer[0].type = BUFFER_TYPE_VIRTUAL;
+    if (output == NULL) {
+        HDF_LOGE("%{public}s: output is NULL", __func__);
+        return HDF_FAILURE;
+    }
     outBuf->bufferId = output->bufferId;
     outBuf->buffer[0].buf = (intptr_t)GetOutputShm(g_codecInstance, output->bufferId)->virAddr;
 
@@ -323,10 +327,9 @@ int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const CodecBuffer *inputData, u
     }
 
     if (g_codecInstance->codecStatus == CODEC_STATUS_IDLE) {
-        uint32_t i;
         if (g_codecInstance->codecType == VIDEO_DECODER || g_codecInstance->codecType == AUDIO_DECODER ||
             g_codecInstance->codecType == VIDEO_ENCODER || g_codecInstance->codecType == AUDIO_ENCODER) {
-            for (i = 0; i < inputData->bufferCnt; i++) {
+            for (uint32_t i = 0; i < inputData->bufferCnt; i++) {
                 AddInputShm(g_codecInstance, &inputData->buffer[i], inputData->bufferId);
             }
         } else {
@@ -373,10 +376,9 @@ int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, CodecBuffer *outInfo, uint32_t
     }
 
     if (g_codecInstance->codecStatus == CODEC_STATUS_IDLE) {
-        uint32_t i;
         if (g_codecInstance->codecType == VIDEO_DECODER || g_codecInstance->codecType == AUDIO_DECODER ||
             g_codecInstance->codecType == VIDEO_ENCODER || g_codecInstance->codecType == AUDIO_ENCODER) {
-            for (i = 0; i < outInfo->bufferCnt; i++) {
+            for (uint32_t i = 0; i < outInfo->bufferCnt; i++) {
                 AddOutputShm(g_codecInstance, &outInfo->buffer[i], outInfo->bufferId);
             }
         } else {

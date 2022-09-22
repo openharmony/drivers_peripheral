@@ -101,7 +101,7 @@ int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::st
         CODEC_LOGE("getRoles_ return err [%{public}x].", err);
         return err;
     }
-    if (roleCount <= 0) {
+    if (roleCount == 0) {
         return err;
     }
 

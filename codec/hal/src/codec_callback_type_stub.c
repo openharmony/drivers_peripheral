@@ -58,7 +58,7 @@ static int32_t ReadArray(struct HdfSBuf *data, int8_t **array, uint32_t *arrayLe
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (bufferLen <= 0) {
+    if (bufferLen == 0) {
         *arrayLen = bufferLen;
         return HDF_SUCCESS;
     }
