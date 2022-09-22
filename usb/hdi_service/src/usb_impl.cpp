@@ -899,6 +899,8 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
 
 int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
 {
+    usbPnpListener_.callBack = UsbdPnpLoaderEventReceived;
+    usbPnpListener_.priv = (void *)(inst.GetRefPtr());
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
     if (DdkListenerMgrAdd(&listenerForLoadService_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
@@ -1752,8 +1754,6 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
 int32_t UsbImpl::BindUsbSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
     subscriber_ = subscriber;
-    usbPnpListener_.callBack = UsbdPnpLoaderEventReceived;
-    usbPnpListener_.priv = (void *)(this);
     if (DdkListenerMgrAdd(&usbPnpListener_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
         return HDF_FAILURE;
