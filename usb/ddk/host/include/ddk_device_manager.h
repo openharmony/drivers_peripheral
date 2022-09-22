@@ -20,6 +20,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#define USB_PNP_NOTIFY_SERVICE_NAME "hdf_usb_pnp_notify_service"
 typedef int32_t (*DdkDevMgrHandleDev)(const struct UsbPnpNotifyMatchInfoTable *device, void *priv);
 
 /*

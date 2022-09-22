@@ -152,6 +152,11 @@ int32_t UsbdPort::UpdatePort(int32_t mode, const sptr<IUsbdSubscriber> &subscrib
             HDF_LOGE("%{public}s invalid mode:%{public}d", __func__, mode);
             return HDF_FAILURE;
     }
+
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s subscriber is nullptr", __func__);
+        return HDF_FAILURE;
+    }
     subscriber->PortChangedEvent(currentPortInfo_);
     return HDF_SUCCESS;
 }
