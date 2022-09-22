@@ -231,7 +231,11 @@ HWTEST_F(AudioProxyAdapterTest, AdapterGetPortCapability_001, TestSize.Level1)
 HWTEST_F(AudioProxyAdapterTest, AdapterGetPortCapability_002, TestSize.Level1)
 {
     ASSERT_NE(adapter, nullptr);
-    struct AudioPort port;
+    struct AudioPort port = {
+        .dir = PORT_OUT,
+        .portId = 0,
+        .portName = "AOP",
+    };
     struct AudioPortCapability capability;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     struct HdfRemoteService *proxyRemoteHandle = hwAdapter->proxyRemoteHandle;
@@ -243,7 +247,11 @@ HWTEST_F(AudioProxyAdapterTest, AdapterGetPortCapability_002, TestSize.Level1)
 HWTEST_F(AudioProxyAdapterTest, AdapterGetPortCapability_003, TestSize.Level1)
 {
     ASSERT_NE(adapter, nullptr);
-    struct AudioPort port;
+    struct AudioPort port = {
+        .dir = PORT_OUT,
+        .portId = 0,
+        .portName = "AOP",
+    };
     struct AudioPortCapability capability;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     struct AudioPortAndCapability *hwAdapterPortCapabilitys = hwAdapter->portCapabilitys;
@@ -255,7 +263,11 @@ HWTEST_F(AudioProxyAdapterTest, AdapterGetPortCapability_003, TestSize.Level1)
 HWTEST_F(AudioProxyAdapterTest, AdapterGetPortCapability_004, TestSize.Level1)
 {
     ASSERT_NE(adapter, nullptr);
-    struct AudioPort port;
+    struct AudioPort port = {
+        .dir = PORT_OUT,
+        .portId = 0,
+        .portName = "AOP",
+    };
     struct AudioPortCapability capability;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     int32_t portNum = hwAdapter->adapterDescriptor.portNum;
