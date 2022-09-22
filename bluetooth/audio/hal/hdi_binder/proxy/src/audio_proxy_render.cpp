@@ -569,7 +569,7 @@ int32_t AudioProxyRenderSetExtraParams(AudioHandle handle, const char *keyValueL
 int32_t AudioProxyRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLenth)
 {
     LOG_PARA_INFO("AudioProxyRenderGetExtraParams enter!");
-    if (handle == NULL || keyValueList == NULL || listLenth <= 0) {
+    if (handle == NULL || keyValueList == NULL || listLenth <= 0 || listLenth > STR_MAX - 1) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct HdfSBuf *data = NULL;

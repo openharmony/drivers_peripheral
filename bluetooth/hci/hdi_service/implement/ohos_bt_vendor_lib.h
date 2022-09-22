@@ -31,12 +31,12 @@ typedef enum {
     HCI_ACL_OUT,    // HCI ACL downstream channel
     HCI_ACL_IN,     // HCI ACL upstream channel
     HCI_MAX_CHANNEL // Total channels
-} hci_channels_t;
+} HciChannels;
 
 typedef enum {
     BTC_OP_RESULT_SUCCESS,
     BTC_OP_RESULT_FAIL,
-} bt_op_result_t;
+} BtOpResult;
 
 /**
  * BT vendor lib cmd.
@@ -68,7 +68,7 @@ typedef enum {
 
     /**
      * initialization the BT Controller. it will be called after BT_OP_HCI_CHANNEL_OPEN.
-     * Controller Must call init_cb to notify the host once it has been done.
+     * Controller Must call initCb to notify the host once it has been done.
      */
     BT_OP_INIT,
 
@@ -104,22 +104,22 @@ typedef enum {
      * @param (void *)buf, struct of HC_BT_HDR.
      */
     BT_OP_EVENT_CALLBACK
-} bt_opcode_t;
+} BtOpcode;
 
 /**
  * initialization callback.
  */
-typedef void (*init_callback)(bt_op_result_t result);
+typedef void (*InitCallback)(BtOpResult result);
 
 /**
  * call the callback to malloc a size of buf.
  */
-typedef void* (*malloc_callback)(int size);
+typedef void* (*MallocCallback)(int size);
 
 /**
  * call the callback to free buf
  */
-typedef void (*free_callback)(void* buf);
+typedef void (*FreeCallback)(void* buf);
 
 /**
  *  hci command packet transmit callback
@@ -130,26 +130,26 @@ typedef void (*free_callback)(void* buf);
  *  HCI Command packet. For example, opcode = 0x0c03 for the HCI_RESET command
  *  packet.
  */
-typedef size_t (*cmd_xmit_callback)(uint16_t opcode, void* p_buf);
+typedef size_t (*CmdXmitCallback)(uint16_t opcode, void* pBuf);
 
 typedef struct {
     /**
-     * set to sizeof(bt_vendor_callbacks_t)
+     * set to sizeof(BtVendorCallbacks)
      */
     size_t size;
 
     /* notifies caller result of init request */
-    init_callback init_cb;
+    InitCallback initCb;
 
     /* buffer allocation request */
-    malloc_callback alloc;
+    MallocCallback alloc;
 
     /* buffer free request */
-    free_callback dealloc;
+    FreeCallback dealloc;
 
     /* hci command packet transmit request */
-    cmd_xmit_callback xmit_cb;
-} bt_vendor_callbacks_t;
+    CmdXmitCallback xmitCb;
+} BtVendorCallbacks;
 
 /**
  * Bluetooth Host/Controller VENDOR Interface
@@ -164,18 +164,18 @@ typedef struct {
      * Caller will open the interface and pass in the callback routines
      * to the implementation of this interface.
      */
-    int (*init)(const bt_vendor_callbacks_t* p_cb, unsigned char* local_bdaddr);
+    int (*init)(const BtVendorCallbacks* pCb, unsigned char* localBdaddr);
 
     /**
      * Vendor specific operations
      */
-    int (*op)(bt_opcode_t opcode, void* param);
+    int (*op)(BtOpcode opcode, void* param);
 
     /**
      * Closes the interface
      */
     void (*close)(void);
-} bt_vendor_interface_t;
+} BtVendorInterface;
 
 typedef struct {
     uint16_t event;

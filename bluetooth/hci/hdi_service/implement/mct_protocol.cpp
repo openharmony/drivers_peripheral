@@ -40,9 +40,9 @@ ssize_t MctProtocol::SendPacket(HciPacketType packetType, const std::vector<uint
     uint8_t type = packetType;
 
     if (packetType == HciPacketType::HCI_PACKET_TYPE_COMMAND) {
-        return Write(hciFds_[hci_channels_t::HCI_CMD], &type, sizeof(type));
+        return Write(hciFds_[HciChannels::HCI_CMD], &type, sizeof(type));
     } else if (packetType == HciPacketType::HCI_PACKET_TYPE_ACL_DATA) {
-        return Write(hciFds_[hci_channels_t::HCI_ACL_OUT], &type, sizeof(type));
+        return Write(hciFds_[HciChannels::HCI_ACL_OUT], &type, sizeof(type));
     }
 
     return 0;
