@@ -79,9 +79,8 @@ ComponentNode::ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appD
 
 ComponentNode::~ComponentNode()
 {
-    if (omxCallback_ != nullptr) {
-        omxCallback_ = nullptr;
-    }
+    omxCallback_ = nullptr;
+
     codecBufferMap_.clear();
     bufferHeaderMap_.clear();
     bufferIdCount_ = 0;

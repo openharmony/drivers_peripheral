@@ -19,7 +19,7 @@
 #include "ibuffer.h"
 namespace OHOS::Camera {
 using namespace OHOS::HDI::Camera::V1_0;
-struct HostStreamInfo {
+using HostStreamInfo = struct {
     StreamIntent type_;
     int32_t streamId_;
     int32_t width_;
@@ -31,7 +31,6 @@ struct HostStreamInfo {
     int32_t encodeType_;
     bool builed_ = false;
 };
-using HostStreamInfo = struct HostStreamInfo;
 
 using BufferCb = std::function<void(std::shared_ptr<IBuffer>)>;
 }

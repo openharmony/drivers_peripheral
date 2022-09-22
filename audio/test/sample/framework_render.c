@@ -67,6 +67,7 @@ struct AudioSampleAttributes g_attrs;
 struct AudioPort g_audioPort;
 struct AudioHeadInfo g_wavHeadInfo;
 static struct StrPara g_str;
+static int32_t g_audioRouteHandle;
 
 pthread_t g_tids;
 char *g_frame = NULL;
@@ -166,6 +167,7 @@ static int32_t InitAttrs(struct AudioSampleAttributes *renderAttrs)
     renderAttrs->startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (renderAttrs->frameSize);
     renderAttrs->stopThreshold = INT_32_MAX;
     renderAttrs->silenceThreshold = 0;
+    renderAttrs->streamId = 0;
     return HDF_SUCCESS;
 }
 
@@ -563,6 +565,34 @@ static int32_t PlayingAudioInitFile(void)
     }
     return HDF_SUCCESS;
 }
+static int32_t BindRouteToRender(int32_t streamid, enum AudioPortPin outputDevice)
+{
+    struct AudioRouteNode source = {
+        .portId = 0,
+        .role = AUDIO_PORT_SOURCE_ROLE,
+        .type = AUDIO_PORT_MIX_TYPE,
+        .ext.mix.moduleId = 0,
+        .ext.mix.streamId = streamid,
+    };
+
+    struct AudioRouteNode sink = {
+        .portId = 0,
+        .role = AUDIO_PORT_SINK_ROLE,
+        .type = AUDIO_PORT_DEVICE_TYPE,
+        .ext.device.moduleId = 0,
+        .ext.device.type = outputDevice,
+        .ext.device.desc = "pin_out_speaker",
+    };
+
+    struct AudioRoute route = {
+        .sourcesNum = 1,
+        .sources = &source,
+        .sinksNum = 1,
+        .sinks = &sink,
+    };
+
+    return g_adapter->UpdateAudioRoute(g_adapter, &route, &g_audioRouteHandle);
+}
 static int32_t PlayingAudioFiles(struct AudioRender **renderS)
 {
     if (renderS == NULL || g_adapter == NULL || g_adapter->CreateRender == NULL) {
@@ -585,6 +615,8 @@ static int32_t PlayingAudioFiles(struct AudioRender **renderS)
         FileClose(&g_file);
         return HDF_FAILURE;
     }
+
+    (void)BindRouteToRender(g_attrs.streamId, g_devDesc.pins);
     // Playing audio files
     if (render->control.Start((AudioHandle)render)) {
         AUDIO_FUNC_LOGE("Start Bind Fail!");

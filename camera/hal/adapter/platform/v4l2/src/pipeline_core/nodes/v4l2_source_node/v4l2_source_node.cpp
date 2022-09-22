@@ -65,7 +65,7 @@ RetCode V4L2SourceNode::Start(const int32_t streamId)
         }
     }
     rc = SourceNode::Start(streamId);
-    return RC_OK;
+    return rc;
 }
 
 V4L2SourceNode::~V4L2SourceNode()

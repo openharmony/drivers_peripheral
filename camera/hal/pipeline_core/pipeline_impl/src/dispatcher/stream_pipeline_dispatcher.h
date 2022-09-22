@@ -27,17 +27,17 @@ public:
     virtual ~StreamPipelineDispatcher() = default;
     static std::unique_ptr<StreamPipelineDispatcher> Create();
     virtual RetCode Update(const std::shared_ptr<Pipeline>& p);
-    virtual RetCode Prepare(const int32_t id);
-    virtual RetCode Start(const int32_t id);
-    virtual RetCode Config(const int32_t id, const CaptureMeta& meta);
+    virtual RetCode Prepare(const int32_t streamId);
+    virtual RetCode Start(const int32_t streamId);
+    virtual RetCode Config(const int32_t streamId, const CaptureMeta& meta);
     virtual RetCode UpdateSettingsConfig(const CaptureMeta& meta);
-    virtual RetCode Capture(const int32_t ids, const int32_t captureId);
+    virtual RetCode Capture(const int32_t streamId, const int32_t captureId);
     virtual RetCode CancelCapture(const int32_t streamId);
-    virtual RetCode Flush(const int32_t id);
+    virtual RetCode Flush(const int32_t streamId);
     virtual void SetCallback(const MetaDataCb cb);
     virtual RetCode SetDispatcherCallback();
-    virtual RetCode Stop(const int32_t id);
-    virtual RetCode Destroy(const int32_t id);
+    virtual RetCode Stop(const int32_t streamId);
+    virtual RetCode Destroy(const int32_t streamId);
     virtual std::shared_ptr<INode> GetNode(const int32_t streamId, const std::string name);
 protected:
     void GenerateNodeSeq(std::vector<std::shared_ptr<INode>>& nodeVec,

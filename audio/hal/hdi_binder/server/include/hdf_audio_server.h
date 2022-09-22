@@ -28,6 +28,8 @@ enum AudioHdiServerCmdId {
     AUDIO_HDI_ADT_GET_PORT_CAPABILITY,
     AUDIO_HDI_ADT_SET_PASS_MODE,
     AUDIO_HDI_ADT_GET_PASS_MODE,
+    AUDIO_HDI_ADT_UPDATE_ROUTE,
+    AUDIO_HDI_ADT_RELEASE_ROUTE,
     AUDIO_HDI_PNP_DEV_STATUS,
     /***********render***************/
     AUDIO_HDI_RENDER_CREATE_RENDER,
@@ -101,6 +103,11 @@ enum AudioHdiServerCmdId {
     AUDIO_HDI_CAPTURE_TURN_STAND_BY_MODE,
     AUDIO_HDI_CAPTURE_DEV_DUMP
 };
+typedef union {
+    struct AudioDevExtInfo device;   /* Specific Device Ext info */
+    struct AudioMixExtInfo mix;      /* Specific mix info */
+    struct AudioSessionExtInfo session; /* session specific info */
+} RouteExtInfo;
 
 typedef int32_t (*AudioAllfunc)(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply);
 struct HdiServiceDispatchCmdHandleList {

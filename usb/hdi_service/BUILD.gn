@@ -17,13 +17,6 @@ import("//drivers/peripheral/usb/usb.gni")
 
 config("usbd_private_config") {
   include_dirs = []
-  if (drivers_peripheral_usb_feature_linux_native_model) {
-    if (defined(defines)) {
-      defines += [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
-    } else {
-      defines = [ "USB_EVENT_NOTIFY_LINUX_NATIVE_MODE" ]
-    }
-  }
 }
 
 config("usbd_public_config") {
@@ -68,7 +61,6 @@ ohos_shared_library("libusb_interface_service_1.0") {
       "hiviewdfx_hilog_native:libhilog",
       "init:libbegetutil",
       "ipc:ipc_single",
-      "safwk:system_ability_fwk",
       "samgr:samgr_proxy",
     ]
   } else {

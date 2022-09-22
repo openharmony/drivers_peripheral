@@ -249,6 +249,8 @@ HWTEST_F(AudioProxyCaptureTest, CaptureCheckSceneCapability_001, TestSize.Level1
 {
     ASSERT_NE(capture, nullptr);
     struct AudioSceneDescriptor scene;
+    scene.scene.id = 0;
+    scene.desc.pins = PIN_IN_MIC;
     bool supported = false;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyCaptureCheckSceneCapability(nullptr, &scene, &supported));
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyCaptureCheckSceneCapability((AudioHandle)capture, nullptr,
@@ -264,6 +266,8 @@ HWTEST_F(AudioProxyCaptureTest, CaptureCheckSceneCapability_002, TestSize.Level1
     struct HdfRemoteService *proxyRemoteHandle = hwCapture->proxyRemoteHandle;
     hwCapture->proxyRemoteHandle = nullptr;
     struct AudioSceneDescriptor scene;
+    scene.scene.id = 0;
+    scene.desc.pins = PIN_IN_MIC;
     bool supported = false;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyCaptureCheckSceneCapability((AudioHandle)capture, &scene,
                                                                                  &supported));
@@ -274,6 +278,8 @@ HWTEST_F(AudioProxyCaptureTest, CaptureSelectScene_001, TestSize.Level1)
 {
     ASSERT_NE(capture, nullptr);
     struct AudioSceneDescriptor scene;
+    scene.scene.id = 0;
+    scene.desc.pins = PIN_IN_MIC;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyCaptureSelectScene(nullptr, &scene));
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyCaptureSelectScene((AudioHandle)capture, nullptr));
 }
@@ -285,6 +291,8 @@ HWTEST_F(AudioProxyCaptureTest, CaptureSelectScene_002, TestSize.Level1)
     struct HdfRemoteService *proxyRemoteHandle = hwCapture->proxyRemoteHandle;
     hwCapture->proxyRemoteHandle = nullptr;
     struct AudioSceneDescriptor scene;
+    scene.scene.id = 0;
+    scene.desc.pins = PIN_IN_MIC;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyCaptureSelectScene((AudioHandle)capture, &scene));
     hwCapture->proxyRemoteHandle = proxyRemoteHandle;
 }

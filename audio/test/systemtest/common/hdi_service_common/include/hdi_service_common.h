@@ -23,10 +23,9 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
 #include <sys/mman.h>
 #include <unistd.h>
-#include <gtest/gtest.h>
 #include "hdf_base.h"
 #include "hdf_io_service_if.h"
 #include "hdf_service_status.h"
@@ -38,19 +37,12 @@
 namespace OHOS {
 namespace Audio {
 #ifdef AUDIO_ADM_PASSTHROUGH
-    const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_passthrough");
     const int IS_ADM = true;
 #endif
 #ifdef AUDIO_ADM_SERVICE
-#ifdef __aarch64__
-    const std::string RESOLVED_PATH = "/system/lib64/libaudio_proxy_1.0.z.so";
-#else
-    const std::string RESOLVED_PATH = "/system/lib/libaudio_proxy_1.0.z.so";
+    const int IS_ADM = false;
 #endif
-    const int IS_ADM = true;
-#endif
-const std::string FUNCTION_NAME = "AudioManagerGetInstance";
-const std::string IDL_SERVER_NAME = "idl_audio_service";
+const std::string IDL_SERVER_NAME = "audio_manager_service";
 const std::string AUDIO_FILE = "/data/audiorendertest.wav";
 const std::string LOW_LATENCY_AUDIO_FILE = "/data/lowlatencyrendertest.wav";
 const std::string AUDIO_CAPTURE_FILE = "/data/audiocapture.wav";

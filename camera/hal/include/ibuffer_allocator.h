@@ -30,8 +30,10 @@ public:
     virtual RetCode Init() = 0;
 
     // allocate buffer
-    virtual std::shared_ptr<IBuffer>
-        AllocBuffer(const uint32_t width, const uint32_t height, const uint64_t cameraUsage, const uint32_t format) = 0;
+    virtual std::shared_ptr<IBuffer> AllocBuffer(const uint32_t width,
+                                                 const uint32_t height,
+                                                 const uint64_t cameraUsage,
+                                                 const uint32_t cameraFormat) = 0;
 
     // free the buffer
     virtual RetCode FreeBuffer(std::shared_ptr<IBuffer>&) = 0;

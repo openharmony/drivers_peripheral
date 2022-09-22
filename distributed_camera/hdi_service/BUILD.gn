@@ -69,7 +69,6 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "include/dstream_operator",
     "include/utils",
     "//utils/system/safwk/native/include",
-    "${display_hdf_path}/interfaces/include",
     "${hdf_framework_path}/include/utils",
     "${hdf_framework_path}/include/core",
     "${hdf_framework_path}/include/osal",
