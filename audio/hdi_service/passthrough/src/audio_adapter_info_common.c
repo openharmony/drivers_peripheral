@@ -192,11 +192,11 @@ static int32_t AudioAdaptersGetArraySize(const cJSON *cJsonObj, uint32_t *size)
 
     /* Follow the new adapterNum by the number of actual parses */
     adapterArraySize = cJSON_GetArraySize(cJsonObj);
+    *size = (uint32_t)adapterArraySize;
     if (adapterArraySize <= 0) {
         AUDIO_FUNC_LOGE("Failed to get JSON array size!");
         return HDF_FAILURE;
     }
-    *size = (uint32_t)adapterArraySize;
 
     return HDF_SUCCESS;
 }
