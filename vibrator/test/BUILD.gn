@@ -40,7 +40,7 @@ if (defined(ohos_lite)) {
       testonly = true
       deps += [
         "benchmarktest:hdf_vibrator_benchmark_test",
-        "fuzztest:hdf_vibrator_fuzztest",
+        "fuzztest/vibrator_fuzzer:hdf_fuzztest_vibrator",
         "unittest/hdi:hdf_unittest_hdi_vibrator",
       ]
     }
