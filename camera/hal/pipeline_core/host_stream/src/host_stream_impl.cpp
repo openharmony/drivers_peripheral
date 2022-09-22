@@ -22,7 +22,7 @@ public:
     bool GetStreamState() const override;
     void SetStreamState(bool state) override;
     BufferCb GetBufferCb() const override;
-    HostStreamImpl(const HostStreamInfo& type, BufferCb c = nullptr);
+    explicit HostStreamImpl(const HostStreamInfo& info, BufferCb c = nullptr);
     ~HostStreamImpl() override = default;
 protected:
     HostStreamInfo info_;

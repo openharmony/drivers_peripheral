@@ -175,45 +175,33 @@ RetCode NodeBase::UpdateSettingsConfig(const CaptureMeta& meta)
 
 int32_t NodeBase::GetNumberOfInPorts() const
 {
-    int32_t re = 0;
-    for (const auto& it : portVec_) {
-        if (it->Direction() == 0) {
-            re++;
-        }
-    }
+    int32_t re = std::count_if(portVec_.begin(), portVec_.end(), [](auto &it) { return it->Direction() == 0; });
     return re;
 }
 
 int32_t NodeBase::GetNumberOfOutPorts() const
 {
-    int32_t re = 0;
-    for (const auto& it : portVec_) {
-        if (it->Direction() == 1) {
-            re++;
-        }
-    }
+    int32_t re = std::count_if(portVec_.begin(), portVec_.end(), [](auto &it) { return it->Direction() == 1; });
     return re;
 }
 
 std::vector<std::shared_ptr<IPort>> NodeBase::GetInPorts() const
 {
     std::vector<std::shared_ptr<IPort>> re;
-    for (const auto& it : portVec_) {
-        if (it->Direction() == 0) {
-            re.push_back(it);
-        }
-    }
+
+    std::copy_if(portVec_.begin(), portVec_.end(), std::back_inserter(re),
+        [](auto &it) { return it->Direction() == 0; });
+
     return re;
 }
 
 std::vector<std::shared_ptr<IPort>> NodeBase::GetOutPorts()
 {
     std::vector<std::shared_ptr<IPort>> out = {};
-    for (const auto& it : portVec_) {
-        if (it->Direction() == 1) {
-            out.push_back(it);
-        }
-    }
+
+    std::copy_if(portVec_.begin(), portVec_.end(), std::back_inserter(out),
+        [](auto &it) { return it->Direction() == 1; });
+
     return out;
 }
 
@@ -248,11 +236,11 @@ RetCode NodeBase::CancelCapture(const int32_t streamId)
 void NodeBase::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     auto outPorts = GetOutPorts();
-    for (auto it : outPorts) {
-        if (it->format_.bufferPoolId_ == buffer->GetPoolId()) {
-            it->DeliverBuffer(buffer);
-            return;
-        }
+    auto it = std::find_if(outPorts.begin(), outPorts.end(),
+        [&buffer](auto &port) { return port->format_.bufferPoolId_ == buffer->GetPoolId(); });
+    if (it != outPorts.end()) {
+        (*it)->DeliverBuffer(buffer);
+        return;
     }
     return;
 }
@@ -263,11 +251,11 @@ void NodeBase::DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers)
         return;
     }
     auto outPorts = GetOutPorts();
-    for (auto it : outPorts) {
-        if (it->format_.bufferPoolId_ == buffers[0]->GetPoolId()) {
-            it->DeliverBuffers(buffers);
-            return;
-        }
+    auto it = std::find_if(outPorts.begin(), outPorts.end(),
+        [&buffers](auto &port) { return port->format_.bufferPoolId_ == buffers[0]->GetPoolId(); });
+    if (it != outPorts.end()) {
+        (*it)->DeliverBuffers(buffers);
+        return;
     }
     return;
 }

@@ -68,8 +68,6 @@ void OhosCameraDemo::SetStreamInfo(StreamInfo& streamInfo,
 
 void OhosCameraDemo::GetStreamOpt()
 {
-    int rc = 0;
-
     if (streamOperator_ == nullptr) {
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
         const std::shared_ptr<IStreamOperatorCallback> streamOperatorCallback =
@@ -77,7 +75,7 @@ void OhosCameraDemo::GetStreamOpt()
 #else
         const sptr<IStreamOperatorCallback> streamOperatorCallback = new DemoStreamOperatorCallback();
 #endif
-        rc = demoCameraDevice_->GetStreamOperator(streamOperatorCallback, streamOperator_);
+        int rc = demoCameraDevice_->GetStreamOperator(streamOperatorCallback, streamOperator_);
         if (rc != HDI::Camera::V1_0::NO_ERROR) {
             CAMERA_LOGE("demo test: GetStreamOpt GetStreamOperator fail\n");
             streamOperator_ = nullptr;
@@ -705,7 +703,6 @@ void OhosCameraDemo::SetAeExpo()
 void OhosCameraDemo::SetMetadata()
 {
     CAMERA_LOGI("demo test: SetMetadata enter\n");
-    int32_t expo;
     constexpr size_t entryCapacity = 100;
     constexpr size_t dataCapacity = 2000;
     std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(entryCapacity, dataCapacity);
@@ -802,7 +799,7 @@ RetCode OhosCameraDemo::StreamOffline(const int streamId)
     std::vector<int> streamIds;
     streamIds.push_back(streamId);
     rc = streamOperator_->ChangeToOfflineStream(streamIds, streamOperatorCallback, offlineStreamOperator);
-    if (rc != HDI::Camera::V1_0::NO_ERROR) {
+    if (rc != HDI::Camera::V1_0::NO_ERROR || offlineStreamOperator == nullptr) {
         CAMERA_LOGE("demo test: StreamOffline ChangeToOfflineStream error\n");
         return RC_ERROR;
     }
@@ -1008,7 +1005,6 @@ RetCode OhosCameraDemo::GetMirrorSupported(std::shared_ptr<CameraAbility> &abili
         return RC_ERROR;
     }
     mirrorSupported = *(entry.data.u8);
-    uint8_t  *tmpPtr = entry.data.u8;
     CAMERA_LOGD("demo test: mirrorSupported  %{public}d\n",  mirrorSupported);
     return RC_OK;
 }
