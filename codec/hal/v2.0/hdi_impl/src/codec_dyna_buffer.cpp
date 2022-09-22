@@ -26,9 +26,7 @@ CodecDynaBuffer::CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer) : ICodecBuf
 
 CodecDynaBuffer::~CodecDynaBuffer()
 {
-    if (dynaBuffer_ != nullptr) {
-        dynaBuffer_ = nullptr;
-    }
+    dynaBuffer_ = nullptr;
 }
 
 sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
@@ -88,9 +86,7 @@ int32_t CodecDynaBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
         codecBuffer.bufferLen = 0;
     }
 
-    if (dynaBuffer_ != nullptr) {
-        dynaBuffer_ = nullptr;
-    }
+    dynaBuffer_ = nullptr;
 
     return HDF_SUCCESS;
 }
