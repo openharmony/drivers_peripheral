@@ -512,7 +512,7 @@ int CodecHdiAdapterDecode::GetFreeBufferId()
     return bufferID;
 }
 
-void CodecHdiAdapterDecode::Run()
+void CodecHdiAdapterDecode::start()
 {
     if (client_ == nullptr) {
         HDF_LOGE("%{public}s error,client_ is null", __func__);
@@ -523,7 +523,11 @@ void CodecHdiAdapterDecode::Run()
         HDF_LOGE("%{public}s errNo[%{public}d] to SendCommand with StateSet:OMX_StateIdle", __func__, ret);
         return;
     }
+}
 
+void CodecHdiAdapterDecode::Run()
+{
+    CodecHdiAdapterDecode::start();
     auto t1 = std::chrono::system_clock::now();
     bool eosFlag = false;
     while (!eosFlag) {
@@ -550,7 +554,7 @@ void CodecHdiAdapterDecode::Run()
         if (eosFlag) {
             bufferInfo->omxBuffer->flag = OMX_BUFFERFLAG_EOS;
         }
-        ret = client_->EmptyThisBuffer(client_, bufferInfo->omxBuffer.get());
+        auto ret = client_->EmptyThisBuffer(client_, bufferInfo->omxBuffer.get());
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s EmptyThisBuffer error", __func__);
             return;
