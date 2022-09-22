@@ -59,7 +59,7 @@ ResultCode CheckIdmOperationToken(int32_t userId, UserAuthTokenHal *authToken)
     }
     uint64_t secureUid;
     ret = GetSecureUid(userId, &secureUid);
-    if (secureUid != authToken->secureUid) {
+    if (ret != RESULT_SUCCESS || secureUid != authToken->secureUid) {
         LOG_ERROR("check secureUid failed, token is invalid");
         return RESULT_BAD_MATCH;
     }

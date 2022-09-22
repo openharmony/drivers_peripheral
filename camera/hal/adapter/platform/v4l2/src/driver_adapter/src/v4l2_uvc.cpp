@@ -73,7 +73,6 @@ void HosV4L2UVC::V4L2UvcMatchDev(const std::string name, const std::string v4l2D
 {
     std::pair<std::map<std::string, std::string>::iterator, bool> iter;
     constexpr uint32_t nameSize = 16;
-    int i = 0;
     char devName[nameSize] = {0};
 
     CAMERA_LOGD("UVC:V4L2UvcMatchDev name %{public}s v4l2Device %{public}s inOut = %{public}d\n",
@@ -88,7 +87,7 @@ void HosV4L2UVC::V4L2UvcMatchDev(const std::string name, const std::string v4l2D
             iter = HosV4L2Dev::deviceMatch.insert(std::make_pair(std::string(devName), v4l2Device));
         }
         if (!iter.second) {
-            for (i = 1; i < MAXUVCNODE; i++) {
+            for (int i = 1; i < MAXUVCNODE; i++) {
                 if ((sprintf_s(devName, sizeof(devName), "%s%d", devName, i)) < 0) {
                     CAMERA_LOGE("%{public}s: sprintf devName failed", __func__);
                     return;
@@ -335,10 +334,10 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
     if (subsystem == "video4linux") {
         CAMERA_LOGD("UVC:ACTION = %{public}s, SUBSYSTEM = %{public}s, DEVNAME = %{public}s\n",
                     action.c_str(), subsystem.c_str(), devnode.c_str());
+
+        std::string devName = "/dev/" + devnode;
         if (action == "remove") {
             for (auto &itr : HosV4L2Dev::deviceMatch) {
-                std::string devName = {};
-                devName = "/dev/" + devnode;
                 if (itr.second == devName) {
                     CAMERA_LOGD("UVC:loop HosV4L2Dev::deviceMatch %{public}s\n", action.c_str());
                     V4L2UvcMatchDev(itr.first, devName, false);
@@ -347,8 +346,6 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
             }
         } else {
             struct v4l2_capability cap = {};
-            std::string devName = {};
-            devName = "/dev/" + devnode;
             rc = V4L2UvcGetCap(devName, cap);
             if (rc == RC_ERROR) {
                 CAMERA_LOGE("UVC:lop V4L2UvcGetCap err rc %d devnode = %{public}s\n", rc, devnode.c_str());

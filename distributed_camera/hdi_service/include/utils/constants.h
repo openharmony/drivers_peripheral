@@ -24,8 +24,12 @@ namespace DistributedHardware {
 const uint32_t YUV_WIDTH_RATIO = 3;
 const uint32_t YUV_HEIGHT_RATIO = 2;
 
-const uint32_t DEVID_MAX_LENGTH = 64;
-const uint32_t DHID_MAX_LENGTH = 64;
+const uint32_t DEVID_MAX_LENGTH = 256;
+const uint32_t DHID_MAX_LENGTH =  256;
+const uint32_t CONTAINER_CAPACITY_MAX_SIZE = 10 * 1024;
+const uint32_t METADATA_CAPACITY_MAX_SIZE = 10 * 1024 * 1024;
+const int32_t STREAM_HEIGHT_MAX_SIZE = 10000;
+const int32_t STREAM_WIDTH_MAX_SIZE = 10000;
 
 constexpr size_t DEFAULT_ENTRY_CAPACITY = 100;
 constexpr size_t DEFAULT_DATA_CAPACITY = 2000;

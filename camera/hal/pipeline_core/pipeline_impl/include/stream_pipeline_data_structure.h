@@ -24,14 +24,13 @@ extern "C" {
 #include "stream.h"
 }
 namespace OHOS::Camera {
-struct PortInfo {
+using PortInfo = struct {
     std::string name_;
     std::string peerPortName_;
     std::string peerPortNodeName_;
 };
-using PortInfo = struct PortInfo;
 
-struct PortFormat {
+using PortFormat = struct {
     int32_t w_;
     int32_t h_;
     uint32_t streamId_;
@@ -41,7 +40,6 @@ struct PortFormat {
     uint32_t bufferCount_;
     int64_t bufferPoolId_;
 };
-using PortFormat = struct PortFormat;
 
 struct PortSpec {
     uint8_t direction_;
@@ -92,9 +90,8 @@ struct PipelineSpec {
 #define G_PORT_SPEC_DATA_TYPE const struct HdfConfigPipelineSpecsPORTSpec*
 
 class INode;
-struct Pipeline {
+using Pipeline = struct {
     std::vector<std::shared_ptr<INode>> nodes_;
 };
-using Pipeline = struct Pipeline;
 }
 #endif

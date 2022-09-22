@@ -922,38 +922,6 @@ void TestAudioPortCapabilityFree(struct AudioPortCapability *dataBlock, bool fre
     }
 }
 
-int32_t LoadFuctionSymbol(void *&handle, TestGetAudioManager &getAudioManager, TestAudioManagerRelease &managerRelease,
-    TestAudioAdapterRelease &adapterRelease)
-{
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    if (path == nullptr) {
-        HDF_LOGE("%{public}s: AUDIO_TEST:path is not exist\n", __func__);
-        return HDF_FAILURE;
-    }
-    handle = dlopen(absPath, RTLD_LAZY);
-    if (handle == nullptr) {
-        HDF_LOGE("%{public}s: AUDIO_TEST:dlopen failed\n", __func__);
-        return HDF_FAILURE;
-    }
-    getAudioManager = (TestGetAudioManager)dlsym(handle, FUNCTION_NAME.c_str());
-    if (getAudioManager == nullptr) {
-        HDF_LOGE("%{public}s: AUDIO_TEST:load getAudioManager failed\n", __func__);
-        return HDF_FAILURE;
-    }
-    managerRelease = (TestAudioManagerRelease)(dlsym(handle, "AudioManagerRelease"));
-    if (managerRelease == nullptr) {
-        HDF_LOGE("%{public}s: AUDIO_TEST:load managerRelease failed\n", __func__);
-        return HDF_FAILURE;
-    }
-    adapterRelease = (TestAudioAdapterRelease)(dlsym(handle, "AudioAdapterRelease"));
-    if (adapterRelease == nullptr) {
-        HDF_LOGE("%{public}s: AUDIO_TEST:load adapterRelease failed\n", __func__);
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
 int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioCapture *&capture,
     TestAudioAdapterRelease adapterRelease, TestAudioCaptureRelease captureRelease)
 {
@@ -965,7 +933,7 @@ int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&a
         HDF_LOGE("%{public}s: AUDIO_TEST:fuction is nullptr\n", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret = adapter->DestroyCapture(adapter);
+    int32_t ret = adapter->DestroyCapture(adapter, nullptr);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AUDIO_TEST:DestroyCapture failed\n", __func__);
         return HDF_FAILURE;
@@ -993,7 +961,7 @@ int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&ad
         HDF_LOGE("%{public}s: AUDIO_TEST:fuction is nullptr\n", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret = adapter->DestroyRender(adapter);
+    int32_t ret = adapter->DestroyRender(adapter, nullptr);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AUDIO_TEST:DestroyCapture failed\n", __func__);
         return HDF_FAILURE;
