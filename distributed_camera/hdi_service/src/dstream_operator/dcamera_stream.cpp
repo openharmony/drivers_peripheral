@@ -54,7 +54,7 @@ DCamRetCode DCameraStream::InitDCameraStream(const StreamInfo &info)
 
     DCamRetCode ret = DCamRetCode::SUCCESS;
     if (dcStreamInfo_->bufferQueue_ != nullptr) {
-        DCamRetCode ret = InitDCameraBufferManager();
+        ret = InitDCameraBufferManager();
         if (ret != DCamRetCode::SUCCESS) {
             DHLOGE("Cannot init buffer manager.");
         }

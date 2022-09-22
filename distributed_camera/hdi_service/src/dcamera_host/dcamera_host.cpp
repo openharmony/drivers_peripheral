@@ -91,7 +91,7 @@ int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<u
         constexpr uint32_t WIDTH_OFFSET = 1;
         constexpr uint32_t HEIGHT_OFFSET = 2;
         constexpr uint32_t UNIT_LENGTH = 3;
-        int32_t ret = OHOS::Camera::FindCameraMetadataItem(ability->get(),
+        ret = OHOS::Camera::FindCameraMetadataItem(ability->get(),
             OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &item);
         DHLOGI("FindCameraMetadataItem item=%u, count=%u, dataType=%u", item.item, item.count, item.data_type);
         if (ret != CAM_META_SUCCESS) {
