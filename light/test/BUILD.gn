@@ -39,7 +39,7 @@ if (defined(ohos_lite)) {
     if (drivers_peripheral_light_feature_model) {
       testonly = true
       deps += [
-        "fuzztest:hdf_light_fuzztest",
+        "fuzztest/light_fuzzer:hdf_fuzztest_light",
         "unittest:hdf_unittest_light",
         "unittest/hdi:hdf_unittest_hdi_light",
       ]
