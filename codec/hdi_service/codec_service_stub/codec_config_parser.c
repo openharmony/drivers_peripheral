@@ -26,7 +26,7 @@
 #define MASK_NUM_LIMIT  32
 #endif
 
-static CodecCapablites codecCapabilites = {0};
+static CodecCapablites g_codecCapabilites = {0};
 static const struct DeviceResourceNode *g_resourceNode;
 
 static int32_t GetGroupCapabilitiesNumber(const struct DeviceResourceNode *node,
@@ -426,7 +426,7 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node)
         }
     }
 
-    codecCapabilites.inited = true;
+    g_codecCapabilites.inited = true;
     return HDF_SUCCESS;
 }
 
@@ -445,17 +445,17 @@ int32_t ClearCapabilityGroup()
             codecCapGroup->capablitis = NULL;
         }
     }
-    codecCapabilites.inited = false;
+    g_codecCapabilites.inited = false;
     return HDF_SUCCESS;
 }
 
 CodecCapablityGroup *GetCapablityGroup(int32_t groupIndex)
 {
     CodecCapablityGroup *codecCapGroups[] = {
-        &(codecCapabilites.videoHwEncoderGroup), &(codecCapabilites.videoHwDecoderGroup),
-        &(codecCapabilites.videoSwEncoderGroup), &(codecCapabilites.videoSwDecoderGroup),
-        &(codecCapabilites.audioHwEncoderGroup), &(codecCapabilites.audioHwDecoderGroup),
-        &(codecCapabilites.audioSwEncoderGroup), &(codecCapabilites.audioSwDecoderGroup)
+        &(g_codecCapabilites.videoHwEncoderGroup), &(g_codecCapabilites.videoHwDecoderGroup),
+        &(g_codecCapabilites.videoSwEncoderGroup), &(g_codecCapabilites.videoSwDecoderGroup),
+        &(g_codecCapabilites.audioHwEncoderGroup), &(g_codecCapabilites.audioHwDecoderGroup),
+        &(g_codecCapabilites.audioSwEncoderGroup), &(g_codecCapabilites.audioSwDecoderGroup)
     };
     if (groupIndex < 0) {
         return NULL;
@@ -468,7 +468,7 @@ CodecCapablityGroup *GetCapablityGroup(int32_t groupIndex)
 
 bool CodecCapablitesInited()
 {
-    return codecCapabilites.inited;
+    return g_codecCapabilites.inited;
 }
 
 int32_t ReloadCapabilities()
