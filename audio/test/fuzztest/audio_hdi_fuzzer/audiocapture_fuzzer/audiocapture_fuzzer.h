@@ -14,6 +14,6 @@
  */
 #ifndef AUDIOCAPTURE_FUZZER_H
 #define AUDIOCAPTURE_FUZZER_H
-#define FUZZ_PROJECT_NAME "audiocapture_sfuzzer"
+#define FUZZ_PROJECT_NAME "audiocapture_fuzzer"
 
 #endif
