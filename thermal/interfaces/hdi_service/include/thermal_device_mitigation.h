@@ -16,6 +16,7 @@
 #ifndef THERMAL_DEVICE_MITIGATION_H
 #define THERMAL_DEVICE_MITIGATION_H
 
+#include <mutex>
 #include <string>
 
 namespace OHOS {
@@ -40,6 +41,7 @@ public:
     int32_t SetFlag(bool flag);
 private:
     bool flag_ {false};
+    std::mutex mutex_;
 };
 } // V1_0
 } // Thermal

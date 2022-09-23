@@ -38,16 +38,13 @@ const int32_t ARG_2 = 2;
 const int32_t ARG_3 = 3;
 const int32_t ARG_4 = 4;
 const int32_t NUM_ZERO = 0;
-const std::string SIMULATION_TYPE_DIR = "/data/service/el0/thermal/sensor/%s/type";
-const std::string SIMULATION_TEMP_DIR = "/data/service/el0/thermal/sensor/%s/temp";
-std::string thermalDir = "/data/service/el0/thermal/sensor/";
-std::string thermalNodeDir = "/data/service/el0/thermal/sensor/%s";
-std::string thermalFileDir = "%s/%s";
-std::string thermalTypeDir = "/data/service/el0/thermal/sensor/%s/type";
-std::string thermalTempDir = "/data/service/el0/thermal/sensor/%s/temp";
-std::string mitigationDir = "/data/service/el0/thermal/cooling";
-std::string mitigationNodeDir = "/data/service/el0/thermal/cooling/%s";
-std::string mitigationNodeFileDir = "%s/%s";
+const std::string THERMAL_DIR = "/data/service/el0/thermal/sensor/";
+const std::string THERMAL_NODE_DIR = "/data/service/el0/thermal/sensor/%s";
+const std::string THERMAL_TYPE_DIR = "/data/service/el0/thermal/sensor/%s/type";
+const std::string THERMAL_TEMP_DIR = "/data/service/el0/thermal/sensor/%s/temp";
+const std::string MITIGATION_DIR = "/data/service/el0/thermal/cooling";
+const std::string MITIGATION_NODE_DIR = "/data/service/el0/thermal/cooling/%s";
+const std::string MITIGATION_NODE_FILE = "%s/%s";
 }
 int32_t ThermalSimulationNode::NodeInit()
 {
@@ -111,29 +108,29 @@ int32_t ThermalSimulationNode::AddSensorTypeTemp()
     sensor["cpu"] = 0;
     sensor["soc"] = 0;
     sensor["shell"] = 0;
-    CreateNodeDir(thermalDir);
+    CreateNodeDir(THERMAL_DIR);
     for (auto dir : sensor) {
-        ret = snprintf_s(nodeBuf, MAX_PATH, sizeof(nodeBuf) - ARG_1, thermalNodeDir.c_str(), dir.first.c_str());
+        ret = snprintf_s(nodeBuf, MAX_PATH, sizeof(nodeBuf) - ARG_1, THERMAL_NODE_DIR.c_str(), dir.first.c_str());
         if (ret < EOK) {
             return HDF_FAILURE;
         }
         THERMAL_HILOGI(COMP_HDI, "node name: %{public}s", nodeBuf);
         CreateNodeDir(static_cast<std::string>(nodeBuf));
         for (auto file : vFile) {
-            ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, thermalFileDir.c_str(), nodeBuf, file.c_str());
+            ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, "%s/%s", nodeBuf, file.c_str());
             if (ret < EOK) {
                 return HDF_FAILURE;
             }
             THERMAL_HILOGI(COMP_HDI, "file name: %{public}s", fileBuf);
             CreateNodeFile(static_cast<std::string>(fileBuf));
         }
-        ret = snprintf_s(typeBuf, MAX_PATH, sizeof(typeBuf) - ARG_1, thermalTypeDir.c_str(), dir.first.c_str());
+        ret = snprintf_s(typeBuf, MAX_PATH, sizeof(typeBuf) - ARG_1, THERMAL_TYPE_DIR.c_str(), dir.first.c_str());
         if (ret < EOK) {
             return HDF_FAILURE;
         }
         std::string type = dir.first;
         WriteFile(typeBuf, type, type.length());
-        ret = snprintf_s(tempBuf, MAX_PATH, sizeof(tempBuf) - ARG_1, thermalTempDir.c_str(), dir.first.c_str());
+        ret = snprintf_s(tempBuf, MAX_PATH, sizeof(tempBuf) - ARG_1, THERMAL_TEMP_DIR.c_str(), dir.first.c_str());
         if (ret < EOK) {
             return HDF_FAILURE;
         }
@@ -157,24 +154,24 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
     char fileBuf[MAX_PATH] = {0};
     int32_t temp = 0;
     std::string sTemp = std::to_string(temp);
-    CreateNodeDir(mitigationDir);
+    CreateNodeDir(MITIGATION_DIR);
     for (auto dir : vSensor) {
-        ret = snprintf_s(nodeBuf, MAX_PATH, sizeof(nodeBuf) - ARG_1, mitigationNodeDir.c_str(), dir.c_str());
+        ret = snprintf_s(nodeBuf, MAX_PATH, sizeof(nodeBuf) - ARG_1, MITIGATION_NODE_DIR.c_str(), dir.c_str());
         if (ret < EOK) return HDF_FAILURE;
         CreateNodeDir(static_cast<std::string>(nodeBuf));
         vFile.push_back(nodeBuf);
     }
-    ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_0].c_str(),
+    ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, MITIGATION_NODE_FILE.c_str(), vFile[ARG_0].c_str(),
         cpu.c_str());
     if (ret < EOK) return HDF_FAILURE;
     CreateNodeFile(static_cast<std::string>(fileBuf));
     WriteFile(fileBuf, sTemp, sTemp.length());
-    ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_1].c_str(),
+    ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, MITIGATION_NODE_FILE.c_str(), vFile[ARG_1].c_str(),
         charger.c_str());
     if (ret < EOK) return HDF_FAILURE;
     CreateNodeFile(static_cast<std::string>(fileBuf));
     WriteFile(fileBuf, sTemp, sTemp.length());
-    ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(), vFile[ARG_2].c_str(),
+    ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, MITIGATION_NODE_FILE.c_str(), vFile[ARG_2].c_str(),
         gpu.c_str());
     if (ret < EOK) {
         return HDF_FAILURE;
@@ -182,7 +179,7 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
     CreateNodeFile(static_cast<std::string>(fileBuf));
     WriteFile(fileBuf, sTemp, sTemp.length());
     for (auto b : vBattery) {
-        ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, mitigationNodeFileDir.c_str(),
+        ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, MITIGATION_NODE_FILE.c_str(),
             vFile[ARG_3].c_str(), b.c_str());
         if (ret < EOK) {
             return HDF_FAILURE;

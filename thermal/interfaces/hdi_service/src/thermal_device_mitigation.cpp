@@ -19,7 +19,6 @@
 #include <cstdlib>
 #include <fcntl.h>
 #include <fstream>
-#include <mutex>
 #include <unistd.h>
 
 #include "hdf_base.h"
@@ -41,7 +40,6 @@ const std::string GPU_FREQ_PATH = "/data/service/el0/thermal/cooling/gpu/freq";
 const std::string BATTERY_CHARGER_CURRENT_PATH = "/data/service/el0/thermal/cooling/charger/current";
 const std::string SIM_BATTERY_CURRENT_PATH = "/data/service/el0/thermal/cooling/battery/current";
 const std::string BATTERY_VOLTAGE_PATH = "/data/service/el0/thermal/cooling/battery/voltage";
-std::mutex mutex_;
 const std::string ACTUAL_BATTERY_CURRENT_PATH = "/sys/class/power_supply/battery/input_current_limited";
 const int32_t NUM_ZERO = 0;
 }
