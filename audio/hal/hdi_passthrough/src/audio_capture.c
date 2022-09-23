@@ -1083,6 +1083,7 @@ int32_t AudioCaptureTurnStandbyMode(AudioHandle handle)
 
 int32_t AudioCaptureAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
 {
+    uint32_t i;
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
@@ -1100,14 +1101,14 @@ int32_t AudioCaptureAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
     uint32_t mSize = capture->errorLog.iter;
     if (range < RANGE_MIN) {
         dprintf(fd, "%-5s  %-10s  %s\n", "count", "errorCode", "Time");
-        for (uint32_t i = 0; i < mSize; i++) {
+        for (i = 0; i < mSize; i++) {
             dprintf(fd, FORMAT_TWO, capture->errorLog.errorDump[i].count + 1,
                     capture->errorLog.errorDump[i].errorCode,
                     capture->errorLog.errorDump[i].currentTime);
         }
     } else {
         dprintf(fd, "%-5s  %-10s  %-20s  %-15s  %s\n", "count", "errorCode", "frames", "fail reason", "Time");
-        for (uint32_t i = 0; i < mSize; i++) {
+        for (i = 0; i < mSize; i++) {
             dprintf(fd, FORMAT_ONE, capture->errorLog.errorDump[i].count + 1,
                     capture->errorLog.errorDump[i].errorCode,
                     capture->errorLog.errorDump[i].frames,
