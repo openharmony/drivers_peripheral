@@ -53,7 +53,7 @@ if (defined(ohos_lite)) {
         "test/at:camera_test_at",
 
         # fuzz test
-        "test/fuzz:camera_hal_fuzztest",
+        "test/fuzztest:camera_hdi_fuzztest",
 
         # function unit test
         "test/ut:camera_test_ut",
