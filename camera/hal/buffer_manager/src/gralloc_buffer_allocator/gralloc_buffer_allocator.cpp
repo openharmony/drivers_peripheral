@@ -14,27 +14,27 @@
  */
 
 #include "gralloc_buffer_allocator.h"
+#include "display_buffer_hwi_impl.h"
 #include "buffer_adapter.h"
 #include "image_buffer.h"
 
 namespace OHOS::Camera {
+using namespace OHOS::Model::Buffer;
+using namespace OHOS::HDI::Display::Buffer::V1_0;
 GrallocBufferAllocator::GrallocBufferAllocator() {}
 
 GrallocBufferAllocator::~GrallocBufferAllocator()
 {
-    int32_t ret = GrallocUninitialize(grallocFuncs_);
-    if (ret != 0) {
-        CAMERA_LOGW("uninitialize gralloc failed, ret:%{public}d", ret);
-    }
 }
 
 RetCode GrallocBufferAllocator::Init()
 {
-    if (grallocFuncs_ != nullptr) {
+    if (dispBufferHwi_ != nullptr) {
         CAMERA_LOGD("init success.");
         return RC_OK;
     }
-    if (GrallocInitialize(&grallocFuncs_) != DISPLAY_SUCCESS) {
+    dispBufferHwi_.reset(new DisplayBufferHwiImpl());
+    if (dispBufferHwi_ == nullptr) {
         return RC_ERROR;
     }
 
@@ -46,13 +46,8 @@ std::shared_ptr<IBuffer> GrallocBufferAllocator::AllocBuffer(const uint32_t widt
                                                              const uint64_t cameraUsage,
                                                              const uint32_t cameraFormat)
 {
-    if (grallocFuncs_ == nullptr) {
-        CAMERA_LOGE("grallocFuncs_ is null");
-        return nullptr;
-    }
-
-    if (grallocFuncs_->AllocMem == nullptr) {
-        CAMERA_LOGE("not support alloc buffer");
+    if (dispBufferHwi_ == nullptr) {
+        CAMERA_LOGE("dispBufferHwi_ is null");
         return nullptr;
     }
 
@@ -68,7 +63,7 @@ std::shared_ptr<IBuffer> GrallocBufferAllocator::AllocBuffer(const uint32_t widt
         .usage =  usage,
         .format = format
     };
-    int32_t ret = grallocFuncs_->AllocMem(&info, &handle);
+    int32_t ret = dispBufferHwi_->AllocMem(info, handle);
     if (ret != DISPLAY_SUCCESS) {
         CAMERA_LOGE("Alloc graphic buffer failed, ret = %{public}d", ret);
         return nullptr;
@@ -84,8 +79,7 @@ std::shared_ptr<IBuffer> GrallocBufferAllocator::AllocBuffer(const uint32_t widt
 
 RetCode GrallocBufferAllocator::FreeBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    CHECK_IF_PTR_NULL_RETURN_VALUE(grallocFuncs_, RC_ERROR);
-    CHECK_IF_PTR_NULL_RETURN_VALUE(grallocFuncs_->FreeMem, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(dispBufferHwi_, RC_ERROR);
     CHECK_IF_PTR_NULL_RETURN_VALUE(buffer, RC_ERROR);
     CHECK_IF_NOT_EQUAL_RETURN_VALUE(buffer->GetSourceType(), sourceType_, RC_ERROR);
 
@@ -93,7 +87,7 @@ RetCode GrallocBufferAllocator::FreeBuffer(std::shared_ptr<IBuffer>& buffer)
     CHECK_IF_PTR_NULL_RETURN_VALUE(handle, RC_ERROR);
 
     CameraBufferToGrallocBuffer(buffer, *handle);
-    grallocFuncs_->FreeMem(handle);
+    dispBufferHwi_->FreeMem(*handle);
     buffer->Free();
 
     if (handle != nullptr) {
@@ -106,8 +100,7 @@ RetCode GrallocBufferAllocator::FreeBuffer(std::shared_ptr<IBuffer>& buffer)
 
 RetCode GrallocBufferAllocator::MapBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    CHECK_IF_PTR_NULL_RETURN_VALUE(grallocFuncs_, RC_ERROR);
-    CHECK_IF_PTR_NULL_RETURN_VALUE(grallocFuncs_->Mmap, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(dispBufferHwi_, RC_ERROR);
     CHECK_IF_PTR_NULL_RETURN_VALUE(buffer, RC_ERROR);
     CHECK_IF_NOT_EQUAL_RETURN_VALUE(buffer->GetSourceType(), sourceType_, RC_ERROR);
 
@@ -115,7 +108,7 @@ RetCode GrallocBufferAllocator::MapBuffer(std::shared_ptr<IBuffer>& buffer)
     CHECK_IF_PTR_NULL_RETURN_VALUE(bufHandle, RC_ERROR);
 
     CameraBufferToGrallocBuffer(buffer, *bufHandle);
-    void* virAddr = grallocFuncs_->Mmap(bufHandle);
+    void* virAddr = dispBufferHwi_->Mmap(*bufHandle);
     if (virAddr == nullptr) {
         CAMERA_LOGE("Map Buffer failed.");
         FreeBufferHandle(bufHandle);
@@ -133,8 +126,7 @@ RetCode GrallocBufferAllocator::MapBuffer(std::shared_ptr<IBuffer>& buffer)
 
 RetCode GrallocBufferAllocator::UnmapBuffer(std::shared_ptr<IBuffer>& buffer)
 {
-    CHECK_IF_PTR_NULL_RETURN_VALUE(grallocFuncs_, RC_ERROR);
-    CHECK_IF_PTR_NULL_RETURN_VALUE(grallocFuncs_->Unmap, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(dispBufferHwi_, RC_ERROR);
     CHECK_IF_PTR_NULL_RETURN_VALUE(buffer, RC_ERROR);
     CHECK_IF_NOT_EQUAL_RETURN_VALUE(buffer->GetSourceType(), sourceType_, RC_ERROR);
 
@@ -142,7 +134,7 @@ RetCode GrallocBufferAllocator::UnmapBuffer(std::shared_ptr<IBuffer>& buffer)
     CHECK_IF_PTR_NULL_RETURN_VALUE(handle, RC_ERROR);
 
     CameraBufferToGrallocBuffer(buffer, *handle);
-    if (grallocFuncs_->Unmap(handle) != DISPLAY_SUCCESS) {
+    if (dispBufferHwi_->Unmap(*handle) != DISPLAY_SUCCESS) {
         CAMERA_LOGE("Unmap buffer failed.");
         FreeBufferHandle(handle);
         return RC_ERROR;
@@ -160,8 +152,7 @@ RetCode GrallocBufferAllocator::UnmapBuffer(std::shared_ptr<IBuffer>& buffer)
 
 RetCode GrallocBufferAllocator::FlushCache(std::shared_ptr<IBuffer>& buffer)
 {
-    CHECK_IF_PTR_NULL_RETURN_VALUE(grallocFuncs_, RC_ERROR);
-    CHECK_IF_PTR_NULL_RETURN_VALUE(grallocFuncs_->FlushCache, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(dispBufferHwi_, RC_ERROR);
     CHECK_IF_PTR_NULL_RETURN_VALUE(buffer, RC_ERROR);
     CHECK_IF_NOT_EQUAL_RETURN_VALUE(buffer->GetSourceType(), sourceType_, RC_ERROR);
 
@@ -169,7 +160,7 @@ RetCode GrallocBufferAllocator::FlushCache(std::shared_ptr<IBuffer>& buffer)
     CHECK_IF_PTR_NULL_RETURN_VALUE(handle, RC_ERROR);
 
     CameraBufferToGrallocBuffer(buffer, *handle);
-    if (grallocFuncs_->FlushCache(handle) != DISPLAY_SUCCESS) {
+    if (dispBufferHwi_->FlushCache(*handle) != DISPLAY_SUCCESS) {
         CAMERA_LOGE("Flush cache buffer failed.");
         FreeBufferHandle(handle);
         return RC_ERROR;
@@ -183,8 +174,7 @@ RetCode GrallocBufferAllocator::FlushCache(std::shared_ptr<IBuffer>& buffer)
 
 RetCode GrallocBufferAllocator::InvalidateCache(std::shared_ptr<IBuffer>& buffer)
 {
-    CHECK_IF_PTR_NULL_RETURN_VALUE(grallocFuncs_, RC_ERROR);
-    CHECK_IF_PTR_NULL_RETURN_VALUE(grallocFuncs_->InvalidateCache, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(dispBufferHwi_, RC_ERROR);
     CHECK_IF_PTR_NULL_RETURN_VALUE(buffer, RC_ERROR);
     CHECK_IF_NOT_EQUAL_RETURN_VALUE(buffer->GetSourceType(), sourceType_, RC_ERROR);
 
@@ -192,7 +182,7 @@ RetCode GrallocBufferAllocator::InvalidateCache(std::shared_ptr<IBuffer>& buffer
     CHECK_IF_PTR_NULL_RETURN_VALUE(invalHandle, RC_ERROR);
 
     CameraBufferToGrallocBuffer(buffer, *invalHandle);
-    if (grallocFuncs_->InvalidateCache(invalHandle) != DISPLAY_SUCCESS) {
+    if (dispBufferHwi_->InvalidateCache(*invalHandle) != DISPLAY_SUCCESS) {
         CAMERA_LOGE("Invalidate cache buffer failed.");
         FreeBufferHandle(invalHandle);
         return RC_ERROR;
