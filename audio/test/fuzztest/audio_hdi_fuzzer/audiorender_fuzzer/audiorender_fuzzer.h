@@ -14,6 +14,6 @@
  */
 #ifndef AUDIORENDER_FUZZER_H
 #define AUDIORENDER_FUZZER_H
-#define FUZZ_PROJECT_NAME "audiorender_sfuzzer"
+#define FUZZ_PROJECT_NAME "audiorender_fuzzer"
 
 #endif

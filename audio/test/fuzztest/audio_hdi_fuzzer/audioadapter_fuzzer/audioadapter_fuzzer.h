@@ -14,6 +14,6 @@
  */
 #ifndef AUDIOADAPTER_FUZZER_H
 #define AUDIOADAPTER_FUZZER_H
-#define FUZZ_PROJECT_NAME "audioadapter_sfuzzer"
+#define FUZZ_PROJECT_NAME "audioadapter_fuzzer"
 
 #endif

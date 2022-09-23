@@ -20,7 +20,7 @@ module_output_path = "drivers_peripheral_audio/audio"
 
 ohos_fuzztest("AudioRenderFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//drivers/peripheral/audio/test/fuzztest/audio_hdi_fuzzer/audioadapter_fuzzer"
+  fuzz_config_file = "//drivers/peripheral/audio/test/fuzztest/audio_hdi_fuzzer/audiorender_fuzzer"
 
   sources = [
     "//drivers/peripheral/audio/test/systemtest/common/hdi_service_common/src/hdi_service_common.cpp",
