@@ -31,11 +31,9 @@ namespace {
     constexpr int32_t BITRATE = 3000000;
     constexpr int32_t FD_SIZE = sizeof(int);
     constexpr const char *ENCODER_AVC = "OMX.rk.video_encoder.avc";
-    constexpr int32_t DENOMINATOR = 2;
-    constexpr int32_t NUMERATOR = 3;
 }
 
-#define AV_COLOR_FORMAT OMX_COLOR_FormatYUV420SemiPlanar
+#define AV_COLOR_FORMAT (OMX_COLOR_FORMATTYPE)CODEC_OMX_COLOR_FORMAT_RGBA8888
 
 static CodecHdiEncode *g_core = nullptr;
 CodecHdiEncode::CodecHdiEncode() : fpIn_(nullptr), fpOut_(nullptr)
@@ -48,6 +46,8 @@ CodecHdiEncode::CodecHdiEncode() : fpIn_(nullptr), fpOut_(nullptr)
     width_ = 0;
     height_ = 0;
     componentId_ = 0;
+    color_ = ColorFormat::YUV420SP;
+    omxColorFormat_ = OMX_COLOR_FormatYUV420SemiPlanar;
 }
 
 CodecHdiEncode::~CodecHdiEncode()
@@ -76,7 +76,7 @@ void CodecHdiEncode::OnStatusChanged()
 bool CodecHdiEncode::ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount)
 {
     bool ret = false;
-    filledCount = fread(buf, 1, width_ * height_ * NUMERATOR / DENOMINATOR, fp);
+    filledCount = fread(buf, 1, GetInputBufferSize(), fp);
     if (feof(fp)) {
         ret = true;
     }
@@ -92,7 +92,12 @@ bool CodecHdiEncode::Init(CommandOpt &opt)
     HDF_LOGI("width[%{public}d], height[%{public}d]", width_, height_);
     // gralloc init
     gralloc_ = OHOS::HDI::Display::V1_0::IDisplayGralloc::Get();
-
+    color_ = opt.colorForamt;
+    if (color_ == ColorFormat::RGBA8888) {
+        omxColorFormat_ = AV_COLOR_FORMAT;
+    } else if (color_ == ColorFormat::BGRA8888) {
+        omxColorFormat_ = OMX_COLOR_Format32bitBGRA8888;
+    }
     fpIn_ = fopen(opt.fileInput.c_str(), "rb");
     fpOut_ = fopen(opt.fileOutput.c_str(), "wb+");
     if ((fpIn_ == nullptr) || (fpOut_ == nullptr)) {
@@ -277,7 +282,7 @@ int32_t CodecHdiEncode::UseBufferOnPort(PortIndex portIndex)
     }
 
     if (portIndex == PortIndex::PORT_INDEX_INPUT) {
-        bufferSize = width_ * height_ * NUMERATOR / DENOMINATOR;
+        bufferSize = GetInputBufferSize();
     } else if (bufferSize == 0) {
         bufferSize = width_ * height_;
         HDF_LOGI("bufferSize[%{public}d], width[%{public}d], height[%{public}d]", bufferSize, width_, height_);
@@ -546,11 +551,17 @@ int32_t CodecHdiEncode::CreateBufferHandle()
         HDF_LOGE("%{public}s gralloc_ is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-
+    PixelFormat pixForamt = PIXEL_FMT_YCBCR_420_SP;
+    if (color_ == ColorFormat::RGBA8888) {
+        pixForamt = PIXEL_FMT_RGBA_8888;
+    } else if (color_ == ColorFormat::BGRA8888) {
+        pixForamt = PIXEL_FMT_BGRA_8888;
+    }
+    
     AllocInfo alloc = {.width = this->stride_,
                        .height = this->height_,
                        .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
-                       .format = PIXEL_FMT_YCBCR_420_SP};
+                       .format = pixForamt};
 
     int32_t err = HDF_SUCCESS;
     for (size_t i = 0; i < BUFFER_COUNT; i++) {
@@ -599,6 +610,15 @@ int32_t CodecHdiEncode::OnFillBufferDone(struct CodecCallbackType *self, int64_t
 {
     HDF_LOGI("OnFillBufferDone: pBuffer.bufferID [%{public}d]", buffer->bufferId);
     return g_core->OnFillBufferDone(*buffer);
+}
+
+uint32_t CodecHdiEncode::GetInputBufferSize()
+{
+    if (color_ == ColorFormat::YUV420SP) {
+        return (width_ * height_ * 3 / 2); // 3:byte alignment, 2:byte alignment
+    } else {
+        return (width_ * height_ * 4); // 4: byte alignment for RGBA or BGRA
+    }
 }
 
 int32_t CodecHdiEncode::OnEmptyBufferDone(const struct OmxCodecBuffer &buffer)
@@ -660,7 +680,8 @@ int32_t CodecHdiEncode::ConfigPortDefine()
     param.format.video.nFrameHeight = height_;
     param.format.video.nStride = stride_;
     param.format.video.nSliceHeight = height_;
-    param.format.video.eColorFormat = AV_COLOR_FORMAT;
+    
+    param.format.video.eColorFormat = omxColorFormat_;
     err = client_->SetParameter(client_, OMX_IndexParamPortDefinition, (int8_t *)&param, sizeof(param));
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to SetParameter with PORT_INDEX_INPUT, index is OMX_IndexParamPortDefinition",
