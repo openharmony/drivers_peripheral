@@ -16,10 +16,11 @@
 #ifndef HOS_GRALLOC_BUFFER_ALLOCATOR_H
 #define HOS_GRALLOC_BUFFER_ALLOCATOR_H
 
-#include <display_gralloc.h>
+#include "idisplay_buffer_hwi.h"
 #include "buffer_allocator.h"
 
 namespace OHOS::Camera {
+using namespace OHOS::HDI::Display::Buffer::V1_0;
 class GrallocBufferAllocator : public BufferAllocator {
 public:
     GrallocBufferAllocator();
@@ -37,7 +38,7 @@ public:
     RetCode InvalidateCache(std::shared_ptr<IBuffer>& buffer) override;
 
 private:
-    GrallocFuncs* grallocFuncs_ = nullptr;
+    std::unique_ptr<IDisplayBufferHwi> dispBufferHwi_;
     const int32_t sourceType_ = CAMERA_BUFFER_SOURCE_TYPE_GRALLOC;
 
 private:
