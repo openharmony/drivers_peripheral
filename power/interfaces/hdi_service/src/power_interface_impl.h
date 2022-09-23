@@ -27,7 +27,7 @@ namespace Power {
 namespace V1_0 {
 class PowerInterfaceImpl : public IPowerInterface {
 public:
-    virtual ~PowerInterfaceImpl() {}
+    ~PowerInterfaceImpl() override {};
 
     int32_t RegisterCallback(const sptr<IPowerHdiCallback>& ipowerHdiCallback) override;
 
@@ -47,8 +47,8 @@ public:
     public:
         explicit PowerDeathRecipient(
             const wptr<PowerInterfaceImpl> &powerInterfaceImpl) : powerInterfaceImpl_(powerInterfaceImpl) {};
-        virtual ~PowerDeathRecipient() = default;
-        virtual void OnRemoteDied(const wptr<IRemoteObject> &object) override;
+        ~PowerDeathRecipient() override {};
+        void OnRemoteDied(const wptr<IRemoteObject> &object) override;
     private:
         wptr<PowerInterfaceImpl> powerInterfaceImpl_;
     };
