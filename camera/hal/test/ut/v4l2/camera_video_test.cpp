@@ -31,6 +31,149 @@ void CameraVideoTest::TearDown(void)
     display_->Close();
 }
 
+void CameraVideoTest::SetStreamInfo(StreamInfo &streamInfo, const std::shared_ptr<StreamCustomer> &streamCustomer,
+    const int streamId, const StreamIntent intent)
+{
+    sptr<OHOS::IBufferProducer> producer;
+    constexpr uint32_t DATA_SPACE = 8;
+    constexpr uint32_t TUNNEL_MODE = 5;
+    constexpr uint32_t BUFFER_QUEUE_SIZE = 8;
+    constexpr uint32_t WIDTH = 1280;
+    constexpr uint32_t HEIGHT = 960;
+    if (intent == PREVIEW) {
+        streamInfo.width_ = PREVIEW_WIDTH;
+        streamInfo.height_ = PREVIEW_HEIGHT;
+    } else if (intent == STILL_CAPTURE) {
+        streamInfo.width_ = WIDTH;
+        streamInfo.height_ = HEIGHT;
+        streamInfo.encodeType_ = ENCODE_TYPE_JPEG;
+    } else if (intent == VIDEO) {
+        streamInfo.width_ = WIDTH;
+        streamInfo.height_ = HEIGHT;
+        streamInfo.encodeType_ = ENCODE_TYPE_H264;
+    }
+    streamInfo.format_ = PIXEL_FMT_RGBA_8888;
+    streamInfo.streamId_ = streamId;
+    streamInfo.dataspace_ = DATA_SPACE;
+    streamInfo.intent_ = intent;
+    streamInfo.tunneledMode_ = TUNNEL_MODE;
+    producer = streamCustomer->CreateProducer();
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(BUFFER_QUEUE_SIZE);
+}
+
+void CameraVideoTest::CreateStream(int streamId, StreamIntent intent)
+{
+    StreamInfo streamInfo = {};
+    if (intent == PREVIEW) {
+        if (streamId == display_->streamId_preview) {
+            if (streamCustomerPreview_ == nullptr) {
+                streamCustomerPreview_ = std::make_shared<StreamCustomer>();
+                SetStreamInfo(streamInfo, streamCustomerPreview_, streamId, intent);
+            }
+        }
+    } else if (intent == STILL_CAPTURE) {
+        if (streamCustomerSnapshot_ == nullptr) {
+            streamCustomerSnapshot_ = std::make_shared<StreamCustomer>();
+            SetStreamInfo(streamInfo, streamCustomerSnapshot_, streamId, intent);
+        }
+    } else if (intent == VIDEO) {
+        if (streamCustomerVideo_ == nullptr) {
+            streamCustomerVideo_ = std::make_shared<StreamCustomer>();
+            SetStreamInfo(streamInfo, streamCustomerVideo_, streamId, intent);
+        }
+    }
+    std::vector<StreamInfo>().swap(streamInfos_);
+    streamInfos_.push_back(streamInfo);
+    CamRetCode result = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos_);
+    EXPECT_EQ(false, result != HDI::Camera::V1_0::NO_ERROR);
+    if (result == HDI::Camera::V1_0::NO_ERROR) {
+        std::cout << "==========[test log]CreateStreams success." << std::endl;
+    } else {
+        std::cout << "==========[test log]CreateStreams fail, result = " << result << std::endl;
+    }
+}
+
+void CameraVideoTest::CommitStream()
+{
+    CamRetCode result = (CamRetCode)display_->streamOperator->CommitStreams(NORMAL, display_->ability_);
+    EXPECT_EQ(false, result != HDI::Camera::V1_0::NO_ERROR);
+    if (result == HDI::Camera::V1_0::NO_ERROR) {
+        std::cout << "==========[test log]CommitStreams success." << std::endl;
+    } else {
+        std::cout << "==========[test log]CommitStreams fail, result = " << result << std::endl;
+    }
+}
+void CameraVideoTest::StartCapture(
+    int streamId, int captureId, bool shutterCallback, bool isStreaming, const CaptureInfo captureInfo)
+{
+    captureInfo_.streamIds_ = {streamId};
+    captureInfo_.captureSetting_ = display_->ability_;
+    captureInfo_.enableShutterCallback_ = shutterCallback;
+    CamRetCode result;
+    if (captureInfo.captureSetting_.size() != 0) {
+        result = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo, isStreaming);
+    } else {
+        result = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo_, isStreaming);
+    }
+
+    EXPECT_EQ(true, result == HDI::Camera::V1_0::NO_ERROR);
+    if (result == HDI::Camera::V1_0::NO_ERROR) {
+        std::cout << "==========[test log]check Capture: Capture success, " << captureId << std::endl;
+    } else {
+        std::cout << "==========[test log]check Capture: Capture fail, result = " << result << captureId << std::endl;
+    }
+
+    if (captureId == display_->captureId_preview) {
+        streamCustomerPreview_->ReceiveFrameOn([this](void *addr, const uint32_t size) {
+            std::cout << "==========[test log]preview size= " << size << std::endl;
+        });
+    } else if (captureId == display_->captureId_capture) {
+        streamCustomerSnapshot_->ReceiveFrameOn([this](void *addr, const uint32_t size) {
+            std::cout << "==========[test log]snapshot size= " << size << std::endl;
+        });
+    } else if (captureId == display_->captureId_video) {
+        streamCustomerVideo_->ReceiveFrameOn([this](void *addr, const uint32_t size) {
+            std::cout << "==========[test log]videosize= " << size << std::endl;
+        });
+    } else {
+        std::cout << "==========[test log]StartCapture ignore command " << std::endl;
+    }
+}
+
+void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds)
+{
+    constexpr uint32_t SLEEP_SECOND_ONE = 1;
+    constexpr uint32_t SLEEP_SECOND_TWO = 2;
+    sleep(SLEEP_SECOND_TWO);
+    if (sizeof(captureIds) > 0) {
+        for (auto &captureId : captureIds) {
+            if (captureId == display_->captureId_preview) {
+                streamCustomerPreview_->ReceiveFrameOff();
+            } else if (captureId == display_->captureId_capture) {
+                streamCustomerSnapshot_->ReceiveFrameOff();
+            } else if (captureId == display_->captureId_video) {
+                streamCustomerVideo_->ReceiveFrameOff();
+                sleep(SLEEP_SECOND_ONE);
+            } else {
+                std::cout << "==========[test log]StopStream ignore command. " << std::endl;
+            }
+        }
+
+        for (auto &captureId : captureIds) {
+            CamRetCode result = (CamRetCode)display_->streamOperator->CancelCapture(captureId);
+            sleep(SLEEP_SECOND_TWO);
+            EXPECT_EQ(true, result == HDI::Camera::V1_0::NO_ERROR);
+            if (result == HDI::Camera::V1_0::NO_ERROR) {
+                std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
+            } else {
+                std::cout << "==========[test log]check Capture: CancelCapture fail, result = " << result;
+                std::cout << "captureId = " << captureId << std::endl;
+            }
+        }
+    }
+    sleep(SLEEP_SECOND_ONE);
+}
 /**
   * @tc.name: Video
   * @tc.desc: Preview + video, commit together, success.
@@ -409,4 +552,53 @@ HWTEST_F(CameraVideoTest, camera_video_030, TestSize.Level2)
     } else {
         std::cout << "==========[test log] CommitStreams fail, rc = ." << display_->rc << std::endl;
     }
+}
+
+/**
+ * @tc.name: preview, still_capture and video
+ * @tc.desc: Commit 3 streams in order, Preview, still_capture and video streams.
+ * @tc.level: Level1
+ * @tc.size: MediumTest
+ * @tc.type: Function
+ */
+HWTEST_F(CameraVideoTest, camera_video_031, TestSize.Level1)
+{
+    display_->AchieveStreamOperator();
+
+    CreateStream(display_->streamId_preview, PREVIEW);
+    CreateStream(display_->streamId_capture, STILL_CAPTURE);
+    CreateStream(display_->streamId_video, VIDEO);
+
+    CommitStream();
+
+    CaptureInfo captureInfo = {};
+    StartCapture(display_->streamId_preview, display_->captureId_preview, false, true, captureInfo);
+    StartCapture(display_->streamId_video, display_->captureId_video, false, true, captureInfo);
+
+    constexpr double latitude = 27.987500;  // dummy data: Qomolangma latitde
+    constexpr double longitude = 86.927500; // dummy data: Qomolangma longituude
+    constexpr double altitude = 8848.86;    // dummy data: Qomolangma altitude
+
+    constexpr size_t entryCapacity = 100;
+    constexpr size_t dataCapacity = 2000;
+    std::shared_ptr<CameraSetting> captureSetting =
+        std::make_shared<CameraSetting>(entryCapacity, dataCapacity);
+    std::vector<double> gps;
+    gps.push_back(latitude);
+    gps.push_back(longitude);
+    gps.push_back(altitude);
+    captureSetting->addEntry(OHOS_JPEG_GPS_COORDINATES, gps.data(), gps.size());
+
+    captureInfo.streamIds_ = {display_->streamId_capture};
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(captureSetting, setting);
+    captureInfo.captureSetting_ = setting;
+    captureInfo.enableShutterCallback_ = false;
+    StartCapture(display_->streamId_capture, display_->captureId_capture, false, true, captureInfo);
+
+    constexpr uint32_t SLEEP_SECOND_FIVE = 5;
+    sleep(SLEEP_SECOND_FIVE);
+    std::vector<int> captureIds = {display_->captureId_preview, display_->captureId_video, display_->captureId_capture};
+    std::vector<int> streamIds = {display_->streamId_preview, display_->streamId_video, display_->streamId_capture};
+    StopStream(captureIds, streamIds);
 }

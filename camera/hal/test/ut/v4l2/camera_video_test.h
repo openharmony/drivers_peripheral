@@ -24,6 +24,18 @@ public:
     static void TearDownTestCase(void);
     void SetUp(void);
     void TearDown(void);
+    void CreateStream(int streamId, StreamIntent intent);
+    void CommitStream();
+    void SetStreamInfo(StreamInfo &streamInfo, const std::shared_ptr<StreamCustomer> &streamCustomer,
+        const int streamId, const StreamIntent intent);
+    void StartCapture(
+        int streamId, int captureId, bool shutterCallback, bool isStreaming, const CaptureInfo captureInfo);
+    void StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds);
+    CaptureInfo captureInfo_ = {};
+    std::shared_ptr<StreamCustomer> streamCustomerPreview_ = nullptr;
+    std::shared_ptr<StreamCustomer> streamCustomerSnapshot_ = nullptr;
+    std::shared_ptr<StreamCustomer> streamCustomerVideo_ = nullptr;
+    std::vector<StreamInfo> streamInfos_;
     std::shared_ptr<TestDisplay> display_ = nullptr;
 };
 #endif /* CAMERA_VIDEO_TEST_H */
