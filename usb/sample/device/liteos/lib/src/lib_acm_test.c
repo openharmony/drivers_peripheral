@@ -174,7 +174,6 @@ void acm_prop_write(const char *propName, const char *propValue)
 
 void acm_prop_read(const char *propName, char *propValue)
 {
-    uint32_t maxLen = 256;
     if (check_service()) {
         HDF_LOGE("%s: GetService err", __func__);
         return;
@@ -189,6 +188,7 @@ void acm_prop_read(const char *propName, char *propValue)
     }
     const char *tmp = HdfSbufReadString(g_reply);
     if (propValue && tmp && strlen(tmp) > 0) {
+        uint32_t maxLen = 256;
         errno_t err = memcpy_s(propValue, maxLen, tmp, strlen(tmp));
         if (err != EOK) {
             HDF_LOGE("%s:%d err=%d memcpy_s error", __func__, __LINE__, err);

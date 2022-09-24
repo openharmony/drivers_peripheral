@@ -57,11 +57,10 @@ int32_t OpenEp0AndMapAddr(struct UsbFnFuncMgr *funcMgr)
 
 static UsbFnRequestType GetReqType(struct UsbHandleMgr *handle, uint8_t pipe)
 {
-    int32_t ret;
     struct UsbFnPipeInfo info = {0};
     UsbFnRequestType type = USB_REQUEST_TYPE_INVALID;
     if (pipe > 0) {
-        ret = UsbFnIoMgrInterfaceGetPipeInfo(&(handle->intfMgr->interface), pipe - 1, &info);
+        int32_t ret = UsbFnIoMgrInterfaceGetPipeInfo(&(handle->intfMgr->interface), pipe - 1, &info);
         if (ret) {
             HDF_LOGE("%{public}s:%d UsbFnMgrInterfaceGetPipeInfo err", __func__, __LINE__);
             type = USB_REQUEST_TYPE_INVALID;
@@ -77,17 +76,13 @@ static UsbFnRequestType GetReqType(struct UsbHandleMgr *handle, uint8_t pipe)
 
 struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t pipe, uint32_t len)
 {
-    int32_t ret;
     int32_t ep;
-    uint8_t *mapAddr = NULL;
-    struct UsbFnRequest *req = NULL;
-    struct ReqList *reqList = NULL;
     struct UsbFnInterfaceMgr *intfMgr = handle->intfMgr;
     struct UsbFnFuncMgr *funcMgr = intfMgr->funcMgr;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     if (pipe == 0) {
         if (funcMgr->fd <= 0) {
-            ret = OpenEp0AndMapAddr(funcMgr);
+            int32_t ret = OpenEp0AndMapAddr(funcMgr);
             if (ret) {
                 return NULL;
             }
@@ -98,18 +93,18 @@ struct UsbFnRequest *UsbFnIoMgrRequestAlloc(struct UsbHandleMgr *handle, uint8_t
     } else {
         return NULL;
     }
-    mapAddr = fnOps->mapAddr(ep, len);
+    uint8_t *mapAddr = fnOps->mapAddr(ep, len);
     if (mapAddr == NULL) {
         HDF_LOGE("%{public}s:%d mapAddr failed", __func__, __LINE__);
         return NULL;
     }
 
-    reqList = UsbFnMemCalloc(sizeof(struct ReqList));
+    struct ReqList *reqList = UsbFnMemCalloc(sizeof(struct ReqList));
     if (reqList == NULL) {
         HDF_LOGE("%{public}s:%d UsbFnMemCalloc err", __func__, __LINE__);
         return NULL;
     }
-    req = &reqList->req;
+    struct UsbFnRequest *req = &reqList->req;
 
     if (pipe == 0) {
         DListInsertTail(&reqList->entry, &funcMgr->reqEntry);
@@ -310,21 +305,19 @@ struct UsbHandleMgr *UsbFnIoMgrInterfaceOpen(struct UsbFnInterface *interface)
 
 int32_t UsbFnIoMgrInterfaceClose(struct UsbHandleMgr *handle)
 {
-    int32_t ret;
-    uint32_t i;
     if (handle == NULL) {
         HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     struct UsbFnInterfaceMgr *interfaceMgr = handle->intfMgr;
-
     if (interfaceMgr == NULL || interfaceMgr->isOpen == false) {
         HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    for (i = 0; i < handle->numFd; i++) {
-        ret = fnOps->queueDel(handle->fds[i]);
+    for (uint32_t i = 0; i < handle->numFd; i++) {
+        int32_t ret = fnOps->queueDel(handle->fds[i]);
         if (ret) {
             HDF_LOGE("%{public}s:%d queueDel failed, ret=%d ", __func__, __LINE__, ret);
             return HDF_ERR_DEVICE_BUSY;
