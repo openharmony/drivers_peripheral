@@ -44,10 +44,6 @@ static void TestWrite(char *buf)
 #define NUM_INPUT 2
 int32_t AcmWrite(int32_t argc, const char *argv[])
 {
-    char str[STR_LEN] = {0};
-    int32_t status;
-    FILE *fp = NULL;
-    struct timeval time;
     struct HDIServiceManager *servmgr = HDIServiceManagerGet();
     if (servmgr == NULL) {
         HDF_LOGE("%s: HDIServiceManagerGet err", __func__);
@@ -65,11 +61,13 @@ int32_t AcmWrite(int32_t argc, const char *argv[])
         return HDF_FAILURE;
     }
 
-    status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_OPEN, g_data, g_reply);
+    int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_OPEN, g_data, g_reply);
     if (status != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
     if (argc >= NUM_INPUT) {
+        struct timeval time;
+        char str[STR_LEN] = {0};
         gettimeofday(&time, NULL);
         status = snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, send data[%s] to host\n", time.tv_sec,
             time.tv_usec, argv[1]);
@@ -77,7 +75,7 @@ int32_t AcmWrite(int32_t argc, const char *argv[])
             HDF_LOGE("%s: snprintf_s failed", __func__);
             return HDF_FAILURE;
         }
-        fp = fopen("/data/acm_write_xts", "a+");
+        FILE *fp = fopen("/data/acm_write_xts", "a+");
         if (fp == NULL) {
             HDF_LOGE("%s: fopen failed", __func__);
             return HDF_FAILURE;

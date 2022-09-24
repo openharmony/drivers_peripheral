@@ -431,7 +431,6 @@ static int32_t ParseInterfaceEndpoint(struct UsbRawInterfaceDescriptor *ifp, con
 {
     struct UsbRawEndpointDescriptor *endPoint = NULL;
     int32_t ret = HDF_SUCCESS;
-    uint8_t i;
 
     if (ifp->interfaceDescriptor.bNumEndpoints > 0) {
         endPoint = RawUsbMemCalloc(ifp->interfaceDescriptor.bNumEndpoints * sizeof(*endPoint));
@@ -441,7 +440,7 @@ static int32_t ParseInterfaceEndpoint(struct UsbRawInterfaceDescriptor *ifp, con
         }
 
         ifp->endPoint = endPoint;
-        for (i = 0; i < ifp->interfaceDescriptor.bNumEndpoints; i++) {
+        for (uint8_t i = 0; i < ifp->interfaceDescriptor.bNumEndpoints; i++) {
             ret = ParseEndpoint(endPoint + i, *buffer, *size);
             if (ret == 0) {
                 ifp->interfaceDescriptor.bNumEndpoints = i;
@@ -459,13 +458,10 @@ static int32_t ParseInterfaceEndpoint(struct UsbRawInterfaceDescriptor *ifp, con
 
 static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_t *buffer, int32_t size)
 {
-    int32_t len;
-    int32_t ret;
     const uint8_t *buffer0 = buffer;
     int32_t interfaceNumber = -1; // initial value of interfaceNumber is -1
     const struct UsbInterfaceDescriptor *ifDesc = NULL;
     struct UsbRawInterfaceDescriptor *ifp = NULL;
-    bool tempFlag = false;
 
     if (usbInterface == NULL || usbInterface->numAltsetting > USB_MAXALTSETTING) {
         HDF_LOGE("%{public}s: usbInterface is null or numAltsetting is invalid", __func__);
@@ -474,7 +470,8 @@ static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_
 
     while (size >= USB_DDK_DT_INTERFACE_SIZE) {
         ifp = (struct UsbRawInterfaceDescriptor *)(usbInterface->altsetting + usbInterface->numAltsetting);
-        if (RawParseDescriptor(size, buffer, USB_RAW_INTERFACE_DESCRIPTOR_TYPE, ifp) == HDF_FAILURE) {
+        int32_t ret = RawParseDescriptor(size, buffer, USB_RAW_INTERFACE_DESCRIPTOR_TYPE, ifp);
+        if (ret == HDF_FAILURE) {
             return buffer - buffer0;
         } else if (ret == HDF_ERR_IO) {
             HDF_LOGE("%{public}s: RawParseDescriptor failed", __func__);
@@ -491,7 +488,7 @@ static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_
 
         buffer += ifp->interfaceDescriptor.bLength;
         size -= (int)ifp->interfaceDescriptor.bLength;
-        len = FindNextDescriptor(buffer, size);
+        int32_t len = FindNextDescriptor(buffer, size);
         if (len != 0) {
             if (ParseInterfaceCopy(ifp, len, buffer) != EOK) {
                 HDF_LOGE("%{public}s: ParseInterfaceCopy failed", __func__);
@@ -508,7 +505,7 @@ static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_
         }
 
         ifDesc = (const struct UsbInterfaceDescriptor *)buffer;
-        tempFlag = (size < USB_DDK_DT_INTERFACE_SIZE) || (ifDesc->bDescriptorType != USB_DDK_DT_INTERFACE) ||
+        bool tempFlag = (size < USB_DDK_DT_INTERFACE_SIZE) || (ifDesc->bDescriptorType != USB_DDK_DT_INTERFACE) ||
             (ifDesc->bInterfaceNumber != interfaceNumber);
         if (tempFlag == true) {
             return buffer - buffer0;
@@ -851,7 +848,6 @@ struct UsbHostRequest *AllocRequest(const struct UsbDeviceHandle *devHandle, int
 int32_t FreeRequest(const struct UsbHostRequest *request)
 {
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
-
     if (osAdapterOps->freeRequest == NULL) {
         return HDF_ERR_NOT_SUPPORT;
     }
@@ -862,8 +858,6 @@ int32_t FreeRequest(const struct UsbHostRequest *request)
 int32_t RawFillBulkRequest(struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
     const struct UsbFillRequestData *fillRequestData)
 {
-    int32_t ret;
-
     if (request == NULL || request->buffer == NULL || devHandle == NULL || fillRequestData == NULL) {
         HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -874,10 +868,9 @@ int32_t RawFillBulkRequest(struct UsbHostRequest *request, const struct UsbDevic
             HDF_LOGE("%{public}s:%d invalid param", __func__, __LINE__);
             return HDF_ERR_INVALID_PARAM;
         }
-        ret = memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length);
-        if (ret != EOK) {
+        if (memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length) != EOK) {
             HDF_LOGE("%{public}s:%d memcpy_s failed!", __func__, __LINE__);
-            return ret;
+            return HDF_FAILURE;
         }
     }
     request->devHandle = (struct UsbDeviceHandle *)devHandle;
@@ -933,18 +926,15 @@ int32_t RawFillControlRequest(struct UsbHostRequest *request, const struct UsbDe
 int32_t RawFillInterruptRequest(struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
     const struct UsbFillRequestData *fillRequestData)
 {
-    int32_t ret;
-
     if (request == NULL || devHandle == NULL || fillRequestData == NULL) {
         HDF_LOGE("%{public}s:%d param is null!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (UsbEndpointDirOut(fillRequestData->endPoint)) {
-        ret = memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length);
-        if (ret != EOK) {
+        if (memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length) != EOK) {
             HDF_LOGE("%{public}s:%d memcpy_s failed!", __func__, __LINE__);
-            return ret;
+            return HDF_FAILURE;
         }
     }
     request->devHandle = (struct UsbDeviceHandle *)devHandle;
@@ -962,15 +952,13 @@ int32_t RawFillInterruptRequest(struct UsbHostRequest *request, const struct Usb
 int32_t RawFillIsoRequest(struct UsbHostRequest *request, const struct UsbDeviceHandle *devHandle,
     const struct UsbFillRequestData *fillRequestData)
 {
-    int32_t ret;
-
     if (request == NULL || devHandle == NULL || fillRequestData == NULL) {
         HDF_LOGE("%{public}s:%d param is NULL!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (UsbEndpointDirOut(fillRequestData->endPoint)) {
-        ret = memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length);
+        int32_t ret = memcpy_s(request->buffer, request->bufLen, fillRequestData->buffer, fillRequestData->length);
         if (ret != EOK) {
             HDF_LOGE("%{public}s:%d memcpy_s fail!", __func__, __LINE__);
             return ret;
@@ -1371,17 +1359,12 @@ int32_t RawKillSignal(struct UsbDeviceHandle *devHandle, UsbRawTidType tid)
 
 int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddRemoveInfo infoData)
 {
-    int32_t ret;
-    struct HdfSBuf *pnpData = NULL;
-    struct HdfSBuf *pnpReply = NULL;
-    int32_t replyData = 0;
-    bool flag = false;
-
     if (cmdType != USB_PNP_NOTIFY_ADD_INTERFACE && cmdType != USB_PNP_NOTIFY_REMOVE_INTERFACE) {
         HDF_LOGE("%{public}s:%d invalid param cmdType", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
+    int32_t ret;
     struct HdfIoService *serv = HdfIoServiceBind(USB_HOST_PNP_SERVICE_NAME);
     if (serv == NULL || serv->dispatcher == NULL || serv->dispatcher->Dispatch == NULL) {
         ret = HDF_FAILURE;
@@ -1389,8 +1372,8 @@ int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddR
         return ret;
     }
 
-    pnpData = HdfSbufObtainDefaultSize();
-    pnpReply = HdfSbufObtainDefaultSize();
+    struct HdfSBuf *pnpData = HdfSbufObtainDefaultSize();
+    struct HdfSBuf *pnpReply = HdfSbufObtainDefaultSize();
     if (pnpData == NULL || pnpReply == NULL) {
         ret = HDF_FAILURE;
         HDF_LOGE("%{public}s:%d GetService err", __func__, __LINE__);
@@ -1409,13 +1392,14 @@ int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddR
         goto OUT;
     }
 
-    flag = HdfSbufReadInt32(pnpReply, &replyData);
+    int32_t replyData = 0;
+    bool flag = HdfSbufReadInt32(pnpReply, &replyData);
     if (!flag || replyData != INT32_MAX) {
         ret = HDF_FAILURE;
         HDF_LOGE("%{public}s:%d cmdType = %d reply failed", __func__, __LINE__, cmdType);
         goto OUT;
     } else if (flag && replyData == INT32_MAX) {
-        HDF_LOGE("%{public}s:%d cmdType = %d reply success", __func__, __LINE__, cmdType);
+        HDF_LOGI("%{public}s:%d cmdType = %d reply success", __func__, __LINE__, cmdType);
     }
 
     ret = HDF_SUCCESS;
@@ -1453,17 +1437,12 @@ void *RawUsbMemAlloc(size_t size)
 
 void *RawUsbMemCalloc(size_t size)
 {
-    void *buf = NULL;
-    struct RawUsbRamTestList *testEntry = NULL;
-    struct RawUsbRamTestList *pos = NULL;
-    uint32_t totalSize = 0;
-
     if (size == 0) {
         HDF_LOGE("%{public}s:%d size is 0", __func__, __LINE__);
         return NULL;
     }
 
-    buf = OsalMemCalloc(size);
+    void *buf = OsalMemCalloc(size);
     if (buf == NULL) {
         HDF_LOGE("%{public}s: %{public}d, OsalMemCalloc failed", __func__, __LINE__);
         return NULL;
@@ -1480,7 +1459,7 @@ void *RawUsbMemCalloc(size_t size)
             OsalMutexInit(&g_usbRamTestHead->lock);
             DListHeadInit(&g_usbRamTestHead->list);
         }
-        testEntry = OsalMemCalloc(sizeof(struct RawUsbRamTestList));
+        struct RawUsbRamTestList *testEntry = OsalMemCalloc(sizeof(struct RawUsbRamTestList));
         if (testEntry == NULL) {
             HDF_LOGE("%{public}s:%d testEntry is NULL", __func__, __LINE__);
             OsalMemFree(buf);
@@ -1489,6 +1468,8 @@ void *RawUsbMemCalloc(size_t size)
         testEntry->address = (uintptr_t)buf;
         testEntry->size = size;
 
+        struct RawUsbRamTestList *pos = NULL;
+        uint32_t totalSize = 0;
         OsalMutexLock(&g_usbRamTestHead->lock);
         DListInsertTail(&testEntry->list, &g_usbRamTestHead->list);
         DLIST_FOR_EACH_ENTRY(pos, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
@@ -1503,17 +1484,16 @@ void *RawUsbMemCalloc(size_t size)
 
 void RawUsbMemFree(void *mem)
 {
-    struct RawUsbRamTestList *pos = NULL;
-    struct RawUsbRamTestList *tmp = NULL;
-    uint32_t totalSize = 0;
-    uint32_t size = 0;
-
     if (mem == NULL) {
         HDF_LOGE("%{public}s:%{public}d mem is null.", __func__, __LINE__);
         return;
     }
 
     if (g_usbRamTestFlag && g_usbRamTestHead != NULL) {
+        struct RawUsbRamTestList *pos = NULL;
+        struct RawUsbRamTestList *tmp = NULL;
+        uint32_t totalSize = 0;
+        uint32_t size = 0;
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
             if (pos->address == (uintptr_t)mem) {
@@ -1525,7 +1505,7 @@ void RawUsbMemFree(void *mem)
             totalSize += pos->size;
         }
         OsalMutexUnlock(&g_usbRamTestHead->lock);
-        HDF_LOGE("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);
+        HDF_LOGI("%{public}s rm size=%{public}d totalSize=%{public}d", __func__, size, totalSize);
     }
 
     if (mem != NULL) {
