@@ -182,18 +182,16 @@ FAIL:
 static int32_t UsbFnAdapterWriteDevStrings(
     int32_t fd, struct FconfigString * const gadgetName, const struct UsbFnDeviceDesc *descriptor)
 {
-    int32_t ret;
-    int32_t iCount;
-    struct FconfigDevStrings devStrings;
-
     if (gadgetName == NULL || descriptor == NULL) {
         HDF_LOGE("%{public}s: udcName is NULL", __func__);
         return HDF_ERR_IO;
     }
+
+    struct FconfigDevStrings devStrings;
     devStrings.gadgetName.len = gadgetName->len;
     devStrings.gadgetName.s = gadgetName->s;
-    for (iCount = 0; descriptor->deviceStrings[iCount]; iCount++) {
-        ret = UsbFnAdapterWriteDevString(fd, &devStrings, descriptor->deviceStrings[iCount]);
+    for (uint32_t iCount = 0; descriptor->deviceStrings[iCount]; iCount++) {
+        int32_t ret = UsbFnAdapterWriteDevString(fd, &devStrings, descriptor->deviceStrings[iCount]);
         if (ret != 0) {
             HDF_LOGE("%{public}s: UsbFnAdapterWriteDevString failed", __func__);
             return HDF_ERR_IO;
@@ -368,12 +366,8 @@ static void GetCountAndHead(struct UsbFunctionfsDescsHeadV2 *header, uint32_t *f
 
 static int32_t WriteFuncDescriptors(uint8_t ** const whereDec, struct UsbDescriptorHeader ** const headDes)
 {
-    int32_t ret;
-    int32_t i;
-
-    for (i = 0; headDes[i] != NULL; i++) {
-        ret = memcpy_s(*whereDec, headDes[i]->bLength, headDes[i], headDes[i]->bLength);
-        if (ret != EOK) {
+    for (uint32_t i = 0; headDes[i] != NULL; i++) {
+        if (memcpy_s(*whereDec, headDes[i]->bLength, headDes[i], headDes[i]->bLength) != EOK) {
             HDF_LOGE("%{public}s: memcpy_s failed!", __func__);
             return HDF_FAILURE;
         }
@@ -469,23 +463,25 @@ static int32_t UsbFnAdapterCreatPipes(int32_t ep0, const struct UsbFnFunction *f
 static int32_t UsbFnAdapterWriteFunctions(int32_t fd, struct UsbFnConfiguration * const usbFnConfig, int32_t cmd,
     struct FconfigString * const gadgetName, struct FconfigString * const configName)
 {
-    int32_t ret;
-    int32_t fdEp0;
-    int32_t iCount;
-    char tmp[MAX_PATHLEN];
-    struct FconfigFuncInfo funcInfo;
     if (usbFnConfig == NULL || gadgetName == NULL || configName == NULL) {
         HDF_LOGE("%{public}s: usbFnConfig is NULL", __func__);
         return HDF_ERR_IO;
     }
-    
+
+    int32_t fdEp0;
+    struct FconfigFuncInfo funcInfo;
     funcInfo.gadgetName.len = gadgetName->len;
     funcInfo.gadgetName.s = gadgetName->s;
     funcInfo.configName.len = configName->len;
     funcInfo.configName.s = configName->s;
-    for (iCount = 0; usbFnConfig->functions[iCount] != NULL; iCount++) {
-        (void)memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
-        ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "generic.%s", usbFnConfig->functions[iCount]->funcName);
+    for (uint32_t iCount = 0; usbFnConfig->functions[iCount] != NULL; iCount++) {
+        char tmp[MAX_PATHLEN];
+        if (memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN) != EOK) {
+            HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+            return HDF_FAILURE;
+        }
+        int32_t ret =
+            snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "generic.%s", usbFnConfig->functions[iCount]->funcName);
         if (ret < 0) {
             return HDF_ERR_IO;
         }
@@ -493,8 +489,7 @@ static int32_t UsbFnAdapterWriteFunctions(int32_t fd, struct UsbFnConfiguration 
         if (ret != HDF_SUCCESS) {
             return HDF_ERR_MALLOC_FAIL;
         }
-        ret = handle_ioctl(fd, cmd, &funcInfo);
-        if (ret != 0) {
+        if (handle_ioctl(fd, cmd, &funcInfo) != 0) {
             goto FAIL;
         }
         UsbFnMemFree(funcInfo.funcName.s);
@@ -510,7 +505,7 @@ static int32_t UsbFnAdapterWriteFunctions(int32_t fd, struct UsbFnConfiguration 
         if (UsbFnAdapterCreatPipes(fdEp0, usbFnConfig->functions[iCount]) != HDF_SUCCESS) {
             goto FAIL2;
         }
-        
+
         if (UsbFnAdapterClosePipe(fdEp0) != HDF_SUCCESS) {
             goto FAIL2;
         }
@@ -528,24 +523,20 @@ static int32_t UsbFnAdapterWriteConfigs(
 {
     struct FconfigCfgDesc configDesc;
     char tmp[MAX_PATHLEN];
-    int32_t ret;
-    int32_t iCount;
-    uint8_t confVal;
 
     if (gadgetName == NULL || descriptor == NULL || descriptor->configs == NULL) {
         HDF_LOGE("%{public}s: name is NULL", __func__);
         return HDF_ERR_IO;
     }
-    for (iCount = 0; descriptor->configs[iCount]; iCount++) {
+    for (uint32_t iCount = 0; descriptor->configs[iCount]; iCount++) {
         configDesc.gadgetName.len = gadgetName->len;
         configDesc.gadgetName.s = gadgetName->s;
-        confVal = descriptor->configs[iCount]->configurationValue;
-        ret = memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN);
-        if (ret != HDF_SUCCESS) {
+        uint8_t confVal = descriptor->configs[iCount]->configurationValue;
+        if (memset_s(tmp, MAX_PATHLEN, 0, MAX_PATHLEN) != EOK) {
             HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
-            return ret;
+            return HDF_FAILURE;
         }
-        ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "b.%u", confVal);
+        int32_t ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "b.%u", confVal);
         if (ret < 0) {
             return HDF_ERR_IO;
         }
@@ -744,19 +735,17 @@ FAIL:
 
 static int32_t UsbFnAdapterGetPipeInfo(int32_t ep, struct UsbFnPipeInfo * const pipeInfo)
 {
-    int32_t ret;
     if (ep <= 0 || pipeInfo == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
 
     struct usb_endpoint_descriptor desc;
-    ret = memset_s(&desc, sizeof(desc), 0, sizeof(desc));
-    if (ret != HDF_SUCCESS) {
+    if (memset_s(&desc, sizeof(desc), 0, sizeof(desc)) != EOK) {
         HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
-        return ret;
+        return HDF_FAILURE;
     }
 
-    ret = handle_ioctl(ep, GENERIC_CMD_GET_PIPE_INFO, &desc);
+    int32_t ret = handle_ioctl(ep, GENERIC_CMD_GET_PIPE_INFO, &desc);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: FUNCTIONFS_ENDPOINT_DESC failed!", __func__);
         return HDF_ERR_IO;
@@ -879,7 +868,6 @@ static int32_t EpEvent(struct UsbFnEventAll * const event, struct FconfigPollFd 
 static int32_t UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int32_t timeout)
 {
     uint8_t i;
-    int32_t ret;
     struct FconfigPollFd pfds[16] = {0};
     struct FconfigPollFd *pfd = &pfds[0];
     if (event == NULL) {
@@ -888,10 +876,10 @@ static int32_t UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int32_t timeou
     if ((event->ep0Num + event->epNum) == 0) {
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = memset_s(&pfds, sizeof(pfds), 0, sizeof(pfds));
-    if (ret != HDF_SUCCESS) {
+
+    if (memset_s(&pfds, sizeof(pfds), 0, sizeof(pfds)) != EOK) {
         HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
-        return ret;
+        return HDF_FAILURE;
     }
 
     for (i = 0; i < event->ep0Num; i++) {
@@ -930,26 +918,26 @@ static int32_t UsbFnAdapterPollEvent(struct UsbFnEventAll *event, int32_t timeou
 
 static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName, int32_t enable)
 {
-    int32_t ret;
-    int32_t configFd;
-    int32_t cmd;
     struct FconfigUdcInfo udcInfo;
 
-    configFd = UsbFnAdapterOpenFn();
+    int32_t configFd = UsbFnAdapterOpenFn();
     if (configFd <= 0) {
         return HDF_ERR_IO;
     }
-    ret = UsbFnAdapterCreateFconfigString(&udcInfo.gadgetName, deviceName);
+
+    int32_t ret = UsbFnAdapterCreateFconfigString(&udcInfo.gadgetName, deviceName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: create gadget_name failed!", __func__);
         return HDF_ERR_IO;
     }
-    cmd = enable ? FCONFIG_CMD_ENABLE_UDC : FCONFIG_CMD_DISABLE_UDC;
+
+    int32_t cmd = enable ? FCONFIG_CMD_ENABLE_UDC : FCONFIG_CMD_DISABLE_UDC;
     ret = UsbFnAdapterWriteFcofnigUDC(configFd, cmd, &udcInfo.gadgetName, udcName);
     if (ret != HDF_SUCCESS) {
         return HDF_ERR_IO;
     }
-    configFd = UsbFnAdapterClosefn(configFd);
+
+    ret = UsbFnAdapterClosefn(configFd);
     if (ret != 0) {
         HDF_LOGE("%{public}s: close failed!", __func__);
     }
@@ -959,20 +947,18 @@ static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName,
 static int32_t UsbFnWriteProp(const char *deviceName, const char *propName, uint32_t propValue)
 {
     struct FconfigDevdescInfo info;
-    int32_t ret;
-    int32_t configFd;
     if (deviceName == NULL || propName == NULL) {
         HDF_LOGE("%{public}s: param invail!", __func__);
         return HDF_ERR_IO;
     }
-    ret = UsbFnAdapterCreateFconfigString(&info.gadgetName, deviceName);
+    int32_t ret = UsbFnAdapterCreateFconfigString(&info.gadgetName, deviceName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: create gadget name failed!", __func__);
         return HDF_ERR_IO;
     }
     info.Prop.propName = propName;
     info.Prop.propValue = (uint32_t)propValue;
-    configFd = UsbFnAdapterOpenFn();
+    int32_t configFd = UsbFnAdapterOpenFn();
     if (configFd <= 0) {
         ret = HDF_ERR_IO;
         goto FAIL;
@@ -982,7 +968,7 @@ static int32_t UsbFnWriteProp(const char *deviceName, const char *propName, uint
         HDF_LOGE("%{public}s: ioctl failed!", __func__);
         goto FAIL;
     }
-    configFd = UsbFnAdapterClosefn(configFd);
+    ret = UsbFnAdapterClosefn(configFd);
     if (ret != 0) {
         HDF_LOGE("%{public}s: close failed!", __func__);
     }
@@ -996,13 +982,11 @@ static int32_t UsbFnWriteDesString(
     const char *deviceName, uint16_t lang, const char *stringName, const char *stringValue)
 {
     struct FconfigDevDescString info;
-    int32_t ret;
-    int32_t configFd;
     if (deviceName == NULL || stringName == NULL || stringValue == NULL) {
         HDF_LOGE("%{public}s: param invail!", __func__);
         return HDF_ERR_IO;
     }
-    ret = UsbFnAdapterCreateFconfigString(&info.gadgetName, deviceName);
+    int32_t ret = UsbFnAdapterCreateFconfigString(&info.gadgetName, deviceName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: create gadget name failed!", __func__);
         return HDF_ERR_IO;
@@ -1010,7 +994,7 @@ static int32_t UsbFnWriteDesString(
     info.Prop.lang = lang;
     info.Prop.propName = stringName;
     info.Prop.propValue = stringValue;
-    configFd = UsbFnAdapterOpenFn();
+    int32_t configFd = UsbFnAdapterOpenFn();
     if (configFd <= 0) {
         dprintf("%s, %d\n", __func__, __LINE__);
         ret = HDF_ERR_IO;
@@ -1021,7 +1005,7 @@ static int32_t UsbFnWriteDesString(
         HDF_LOGE("%{public}s: ioctl failed!", __func__);
         goto FAIL;
     }
-    configFd = UsbFnAdapterClosefn(configFd);
+    ret = UsbFnAdapterClosefn(configFd);
     if (ret != 0) {
         HDF_LOGE("%{public}s: close failed!", __func__);
     }
@@ -1038,12 +1022,7 @@ static void *UsbFnMemAlloc(size_t size)
 
 static void *UsbFnMemCalloc(size_t size)
 {
-    void *buf = NULL;
-    struct RawUsbRamTestList *testEntry = NULL;
-    struct RawUsbRamTestList *pos = NULL;
-    uint32_t totalSize = 0;
-
-    buf = OsalMemCalloc(size);
+    void *buf = OsalMemCalloc(size);
     if (buf == NULL) {
         HDF_LOGE("%{public}s: %{public}d, OsalMemCalloc failed", __func__, __LINE__);
         return NULL;
@@ -1060,7 +1039,7 @@ static void *UsbFnMemCalloc(size_t size)
             OsalMutexInit(&g_usbRamTestHead->lock);
             DListHeadInit(&g_usbRamTestHead->list);
         }
-        testEntry = OsalMemCalloc(sizeof(struct RawUsbRamTestList));
+        struct RawUsbRamTestList *testEntry = OsalMemCalloc(sizeof(struct RawUsbRamTestList));
         if (testEntry == NULL) {
             HDF_LOGE("%{public}s: %{public}d, OsalMemCalloc failed", __func__, __LINE__);
             OsalMemFree(buf);
@@ -1069,6 +1048,8 @@ static void *UsbFnMemCalloc(size_t size)
         testEntry->address = (uintptr_t)buf;
         testEntry->size = size;
 
+        struct RawUsbRamTestList *pos = NULL;
+        uint32_t totalSize = 0;
         OsalMutexLock(&g_usbRamTestHead->lock);
         DListInsertTail(&testEntry->list, &g_usbRamTestHead->list);
         DLIST_FOR_EACH_ENTRY(pos, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
@@ -1083,17 +1064,16 @@ static void *UsbFnMemCalloc(size_t size)
 
 void UsbFnMemFree(const void *mem)
 {
-    struct RawUsbRamTestList *pos = NULL;
-    struct RawUsbRamTestList *tmp = NULL;
-    uint32_t totalSize = 0;
-    uint32_t size = 0;
-
     if (mem == NULL) {
         HDF_LOGE("%{public}s:%{public}d invalid param mem.", __func__, __LINE__);
         return;
     }
 
     if (g_usbRamTestFlag && (g_usbRamTestHead != NULL)) {
+        struct RawUsbRamTestList *pos = NULL;
+        struct RawUsbRamTestList *tmp = NULL;
+        uint32_t totalSize = 0;
+        uint32_t size = 0;
         OsalMutexLock(&g_usbRamTestHead->lock);
         DLIST_FOR_EACH_ENTRY_SAFE(pos, tmp, &g_usbRamTestHead->list, struct RawUsbRamTestList, list) {
             if (pos->address == (uintptr_t)mem) {

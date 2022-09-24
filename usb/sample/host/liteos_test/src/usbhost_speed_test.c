@@ -139,11 +139,11 @@ static void ShowHelp(const char *name)
 
 static void *StopHandler(void)
 {
-    int32_t err, signo;
+    int32_t signo;
     g_stopHandlerTid = getpid();
 
     while (true) {
-        err = sigwait(&g_mask, &signo);
+        int32_t err = sigwait(&g_mask, &signo);
         if (err != 0) {
             printf("Sigwait failed: %d\n", err);
         }
@@ -205,7 +205,6 @@ static int32_t CheckParam(int32_t argc, const char *argv[], struct UsbSpeedTest 
 {
     int32_t ret = HDF_SUCCESS;
     bool printData = false;
-    int32_t paramNum;
 
     if ((argv == NULL) || (speedTest == NULL) || (argc <= 0)) {
         return HDF_ERR_INVALID_PARAM;
@@ -237,9 +236,8 @@ static int32_t CheckParam(int32_t argc, const char *argv[], struct UsbSpeedTest 
             break;
     }
     if (ret == HDF_SUCCESS) {
-        paramNum = argc - 1;
         speedTest->printData = printData;
-        speedTest->paramNum = paramNum;
+        speedTest->paramNum = argc - 1;
     }
 
     return ret;

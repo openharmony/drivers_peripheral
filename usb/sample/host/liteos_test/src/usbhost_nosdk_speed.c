@@ -104,7 +104,6 @@ static int32_t SendProcess(void *argurb)
 {
     (void)argurb;
     int32_t i;
-    int32_t err;
     while (!g_speedFlag) {
         OsalSemWait(&g_sem, HDF_WAIT_FOREVER);
         for (i = 0; i < TEST_CYCLE; i++) {
@@ -118,7 +117,7 @@ static int32_t SendProcess(void *argurb)
             i = TEST_CYCLE - 1;
         }
         g_sendUrb = urb[i].urb;
-        err = usb_setup_endpoint(g_fd, g_uhe, TEST_BYTE_COUNT_UINT);
+        int32_t err = usb_setup_endpoint(g_fd, g_uhe, TEST_BYTE_COUNT_UINT);
         if (err < 0) {
             DPRINTFN(0, "setup failed err:%d\n", err);
             return err;
@@ -168,10 +167,7 @@ static void UrbComplete(struct urb *curUrb)
 static int32_t BeginProcessHandleFirst(void)
 {
     char *data = NULL;
-    int32_t i;
-    int32_t ret;
-
-    for (i = 0; i < TEST_CYCLE; i++) {
+    for (int32_t i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].urb == NULL) {
             urb[i].urb = OsalMemCalloc(sizeof(struct urb));
             if (urb[i].urb == NULL) {
@@ -192,8 +188,7 @@ static int32_t BeginProcessHandleFirst(void)
             }
         }
 
-        ret = memset_s(data, TEST_LENGTH, 'c', TEST_LENGTH);
-        if (ret != EOK) {
+        if (memset_s(data, TEST_LENGTH, 'c', TEST_LENGTH) != EOK) {
             HDF_LOGE("%{public}s:%{public}d memset_s failed.", __func__, __LINE__);
             return -1;
         }
@@ -207,11 +202,8 @@ static int32_t BeginProcessHandleFirst(void)
 
 static int32_t BeginProcess(unsigned char endPoint)
 {
-    int32_t ret;
     const int32_t transNum = 0;
-    int32_t i;
-
-    if (endPoint <= 0) {
+    if (endPoint == 0) {
         HDF_LOGE("%{public}s:%{public}d parameter error\n", __func__, __LINE__);
         return -1;
     }
@@ -221,13 +213,14 @@ static int32_t BeginProcess(unsigned char endPoint)
         HDF_LOGE("%{public}s:%{public}d usb_find_host_endpoint error\n", __func__, __LINE__);
         return -1;
     }
-    ret = BeginProcessHandleFirst();
+    int32_t ret = BeginProcessHandleFirst();
     if (ret != HDF_SUCCESS) {
         return ret;
     }
 
     HDF_LOGI("%{public}s:%{public}d test NO SDK endpoint:%u\n", __func__, __LINE__, endPoint);
 
+    int32_t i;
     for (i = 0; i < TEST_CYCLE; i++) {
         if (urb[i].inUse == 0) {
             urb[i].inUse = 1;
