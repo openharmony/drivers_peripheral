@@ -1315,7 +1315,7 @@ int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExt
         }
         mExtraParams->route = route;
     } else if (strcmp(key, AUDIO_ATTR_PARAM_FORMAT) == 0) {
-        int32_t format;
+        int32_t format = 0;
         if ((ret = TransferFormat(value, &format)) < 0) {
             AUDIO_FUNC_LOGE("TransferFormat failed ! ret = %{public}d\n", ret);
             return HDF_FAILURE;
