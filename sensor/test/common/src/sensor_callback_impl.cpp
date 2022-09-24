@@ -79,8 +79,8 @@ namespace {
             }
 
             if (sensorNode.dataForm == 1) {
-                if (*(&data + j) > sensorNode.valueRange[j].lowThreshold &&
-                    *(&data + j) < sensorNode.valueRange[j].highThreshold) {
+                if (*(&data + j) >= sensorNode.valueRange[j].lowThreshold &&
+                    *(&data + j) <= sensorNode.valueRange[j].highThreshold) {
                     SensorCallbackImpl::sensorDataFlag &= 1;
                     printf("sensorDataFlag = 1;");
                 } else {
