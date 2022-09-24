@@ -502,7 +502,7 @@ static int32_t AudioAdaptersSetAdapter(
 
 int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor *descs, uint32_t *size)
 {
-    uint32_t realSize;
+    uint32_t realSize = 0;
     if (descs == NULL || size == NULL) {
         AUDIO_FUNC_LOGE("Invalid parameter!");
         return HDF_ERR_INVALID_PARAM;
