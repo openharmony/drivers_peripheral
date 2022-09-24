@@ -94,13 +94,13 @@ static int32_t OpenDevice(void)
 
 static int32_t ClaimInterface(unsigned int iface)
 {
-    if (g_fd < 0 || iface < 0) {
+    if (g_fd < 0 || iface == 0) {
         printf("parameter error\n");
         return -1;
     }
 
-    int32_t r = ioctl(g_fd, USBDEVFS_CLAIMINTERFACE, &iface);
-    if (r < 0) {
+    int32_t ret = ioctl(g_fd, USBDEVFS_CLAIMINTERFACE, &iface);
+    if (ret < 0) {
         printf("claim failed: iface=%u, errno=%2d(%s)\n", iface, errno, strerror(errno));
         return HDF_FAILURE;
     }
@@ -110,8 +110,6 @@ static int32_t ClaimInterface(unsigned int iface)
 
 static void FillUrb(struct UsbAdapterUrb *urb, int32_t len)
 {
-    int32_t ret;
-
     if (urb == NULL) {
         urb = OsalMemCalloc(sizeof(struct UsbAdapterUrb));
         urb->userContext = (void *)(urb);
@@ -120,7 +118,7 @@ static void FillUrb(struct UsbAdapterUrb *urb, int32_t len)
         urb->endPoint = g_endNum;
     }
     if ((g_endNum >> ENDPOINT_IN_OFFSET) == 0) {
-        ret = memset_s(urb->buffer, len, 'c', len);
+        int32_t ret = memset_s(urb->buffer, len, 'c', len);
         if (ret != EOK) {
             printf("memset_s failed: ret = %d\n", ret);
         }
@@ -159,7 +157,6 @@ static int32_t SendProcess(void *argurb)
 {
     (void)argurb;
     int32_t i;
-    int32_t r;
     while (!g_speedFlag) {
         OsalSemWait(&sem, HDF_WAIT_FOREVER);
         for (i = 0; i < TEST_CYCLE; i++) {
@@ -175,9 +172,9 @@ static int32_t SendProcess(void *argurb)
         }
         g_sendUrb = urb[i].urb;
         FillUrb(g_sendUrb, TEST_LENGTH);
-        r = ioctl(g_fd, USBDEVFS_SUBMITURB, g_sendUrb);
-        if (r < 0) {
-            printf("SubmitBulkRequest: ret:%d errno=%d\n", r, errno);
+        int32_t ret = ioctl(g_fd, USBDEVFS_SUBMITURB, g_sendUrb);
+        if (ret < 0) {
+            printf("SubmitBulkRequest: ret:%d errno=%d\n", ret, errno);
             urb[i].inUse = 0;
             continue;
         }
@@ -189,7 +186,6 @@ static int32_t SendProcess(void *argurb)
 static int32_t ReapProcess(void * const argurb)
 {
     (void)argurb;
-    int32_t r;
     struct UsbAdapterUrb *urbrecv = NULL;
     struct itimerval new_value, old_value;
     if (signal(SIGUSR1, SignalHandler) == SIG_ERR) {
@@ -199,7 +195,7 @@ static int32_t ReapProcess(void * const argurb)
     g_tid = (pid_t)syscall(SYS_gettid);
 
     while (!g_speedFlag) {
-        r = ioctl(g_fd, USBDEVFS_REAPURB, &urbrecv);
+        int32_t r = ioctl(g_fd, USBDEVFS_REAPURB, &urbrecv);
         if (r < 0) {
             continue;
         }
@@ -271,7 +267,7 @@ static int32_t BeginProcess(unsigned char endPoint)
     int32_t transNum = 0;
     int32_t i;
 
-    if ((g_fd < 0) || (endPoint <= 0)) {
+    if ((g_fd < 0) || (endPoint == 0)) {
         HDF_LOGE("%s: g_fd or endPoint is invalied", __func__);
         return -1;
     }

@@ -11,12 +11,12 @@
 
 该仓下主要包含USB Host DDK和USB Device DDK接口定义及其实现，提供的主要功能如下：
 
--   Usb Host DDK：负责提供用户态第三方功能驱动的USB设备数据读写接口，向内核USB驱动框架注册的设备插拔时间通知接口，提供移除USB逻辑设备的接口；
+-   USB Host DDK：负责提供用户态第三方功能驱动的USB设备数据读写接口、向内核USB驱动框架注册的设备插拔时间通知接口和移除USB逻辑设备的接口；
 
 **图 1**  USB仓HOST侧相关模块逻辑视图<a name="fig3672817152110"></a>
 ![](figures/logic-view-of-usb-host-modules.png "logic-view-of-usb-host-modules")
 
--   Usb Device DDK：负责创建和删除USB设备，接口的事件获取、打开、关闭等，管道同步异步读写通信，设置Usb自定义属性等；
+-   USB Device DDK：负责创建和删除USB设备，接口的事件获取、打开、关闭等，管道同步异步读写通信、设置USB自定义属性等；
 
 **图 2**  USB仓Device侧相关模块逻辑视图<a name="fig3672817152110"></a>
 ![](figures/logic-view-of-usb-device-modules.png "logic-view-of-usb-device-modules")
@@ -45,7 +45,7 @@
 
 ### 接口说明<a name="section1551164914237"></a>
 
-Usb Host DDK提供给用户态可直接调用的驱动能力接口，按照功能分类三大类：DDK初始化类、对interface对象操作类、对request对象操作类，可以提供DDK初始化、interface绑定和释放，打开和关闭操作，request的申请和释放，同步和异步传输等。
+USB Host DDK提供给用户态可直接调用的驱动能力接口，按照功能分为三大类：DDK初始化类、对interface对象操作类、对request对象操作类，可以提供DDK初始化、interface绑定和释放，打开和关闭设备操作，request的申请和释放，同步和异步传输等。
 
 提供的部分接口说明如[表1 USB Host DDK接口](#table1513255710559)所示：
 
@@ -289,7 +289,7 @@ Usb Host DDK提供给用户态可直接调用的驱动能力接口，按照功�
 </tbody>
 </table>
 
-Usb Device DDK提供设备管理、IO管理、配置管理，主要功能有：创建和删除设备、获取和打开接口、同步和异步传输等。
+USB Device DDK提供设备管理、IO管理、配置管理，主要功能有：创建和删除设备、获取和打开接口、同步和异步传输等。
 
 提供的部分接口说明如[表2 USB Device DDK接口](#table1513255710559)所示：
 
@@ -406,8 +406,8 @@ Usb Device DDK提供设备管理、IO管理、配置管理，主要功能有：�
 
 该仓核心功能包括两个方面：
 
-1.  Usb Host侧，包括DDK API和RAW API两套接口，提供用户态第三方功能驱动的USB设备数据读写接口。
-2.  Usb Device接口可以定制不同Usb设备，如串口、网卡、键盘、自定义设备等。
+1.  USB Host侧，包括DDK API和RAW API两套接口，提供用户态第三方功能驱动的USB设备数据读写接口。
+2.  USB Device接口可以定制不同Usb设备，如串口、网卡、键盘、自定义设备等。
 
 
 ## 相关仓<a name="section1371113476307"></a>

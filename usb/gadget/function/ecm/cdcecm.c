@@ -47,7 +47,6 @@ static inline unsigned EcmBitrate(void)
 static int32_t UsbEcmStartTx(struct UsbEcm *port)
 {
     struct DListHead *pool = &port->writePool;
-    int32_t ret;
     if (port->ecm == NULL) {
         return HDF_SUCCESS;
     }
@@ -68,7 +67,7 @@ static int32_t UsbEcmStartTx(struct UsbEcm *port)
         req->length = len;
         DListRemove(&req->list);
         port->writeBusy = true;
-        ret = UsbFnSubmitRequestAsync(req);
+        int32_t ret = UsbFnSubmitRequestAsync(req);
         port->writeBusy = false;
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: send request error %{public}d", __func__, ret);
@@ -613,7 +612,6 @@ static int32_t EcmDeviceDispatch(struct HdfDeviceIoClient *client, int32_t cmd,
 
 static int32_t EcmEnable(struct UsbEcmDevice *ecm)
 {
-    int32_t ret;
     struct UsbEcm *port = ecm->port;
 
     if (port == NULL) {
@@ -624,7 +622,7 @@ static int32_t EcmEnable(struct UsbEcmDevice *ecm)
     OsalMutexLock(&port->lock);
     port->ecm = ecm;
     if (port->refCount) {
-        ret = UsbEcmStartIo(port);
+        int32_t ret = UsbEcmStartIo(port);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: UsbEcmStartIo failed", __func__);
         }
@@ -723,12 +721,10 @@ static int32_t EcmAllocEp0Request(struct UsbEcmDevice *ecm)
 static int32_t EcmParseEachPipe(struct UsbEcmDevice *ecm, struct UsbEcmInterface *iface)
 {
     struct UsbFnInterface *fnIface = iface->fn;
-    uint32_t i;
-    int32_t ret;
-    for (i = 0; i < fnIface->info.numPipes; i++) {
+    for (uint32_t i = 0; i < fnIface->info.numPipes; i++) {
         struct UsbFnPipeInfo pipeInfo;
         (void)memset_s(&pipeInfo, sizeof(pipeInfo), 0, sizeof(pipeInfo));
-        ret = UsbFnGetInterfacePipeInfo(fnIface, i, &pipeInfo);
+        int32_t ret = UsbFnGetInterfacePipeInfo(fnIface, i, &pipeInfo);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: get pipe info error", __func__);
             return HDF_FAILURE;

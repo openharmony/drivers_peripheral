@@ -101,9 +101,9 @@ static void WriteSpeedDone(void)
 static void *StopHandler(void *arg)
 {
     (void)arg;
-    int32_t err, signo;
+    int32_t signo;
     while (1) {
-        err = sigwait(&g_mask, &signo);
+        int32_t err = sigwait(&g_mask, &signo);
         if (err != 0) {
             printf("Sigwait failed: %d\n", err);
         }
