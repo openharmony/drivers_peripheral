@@ -118,7 +118,7 @@ int32_t ComponentNode::GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param, uin
     }
 
     int32_t paramCnt = 0;
-    Param paramOut[PARAM_MAX_NUM] = {};
+    Param paramOut[PARAM_COUNT_MAX] = {};
     int32_t ret = Common::SplitParam(paramIndex, param, paramOut, paramCnt, codecType_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s error, paramIndex is not support", __func__);
@@ -150,7 +150,7 @@ int32_t ComponentNode::SetParameter(OMX_INDEXTYPE paramIndex, const int8_t *para
     }
 
     int32_t paramCnt = 1;
-    Param paramOut[PARAM_MAX_NUM] = {};
+    Param paramOut[PARAM_COUNT_MAX] = {};
     int32_t ret = Common::SplitParam(paramIndex, (int8_t *)param, paramOut, paramCnt, codecType_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s error, paramIndex is not support", __func__);
