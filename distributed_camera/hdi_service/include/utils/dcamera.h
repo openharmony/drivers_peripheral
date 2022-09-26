@@ -33,8 +33,6 @@ const std::string BASE_64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrs
 
 CamRetCode MapToExternalRetCode(DCamRetCode retCode);
 
-DCamRetCode MapToInternalRetCode(CamRetCode retCode);
-
 uint64_t GetCurrentLocalTimeStamp();
 
 void SplitString(const std::string &str, std::vector<std::string> &tokens, const std::string &delimiters);

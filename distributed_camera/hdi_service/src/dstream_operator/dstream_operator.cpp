@@ -174,9 +174,7 @@ int32_t DStreamOperator::CommitStreams(OperationMode mode, const std::vector<uin
         return CamRetCode::CAMERA_BUSY;
     }
 
-    if (currentOperMode_ != mode) {
-        currentOperMode_ = mode;
-    }
+    currentOperMode_ = mode;
 
     std::shared_ptr<OHOS::Camera::CameraMetadata> setting = nullptr;
     OHOS::Camera::MetadataUtils::ConvertVecToMetadata(modeSetting, setting);
