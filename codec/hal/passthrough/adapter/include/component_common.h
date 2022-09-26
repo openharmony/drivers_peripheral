@@ -20,7 +20,6 @@
 #include "codec_component_type.h"
 #include "codec_type.h"
 
-const int32_t PARAM_MAX_NUM = 30;
 const int32_t INPUT_PORTINDEX = 0;
 const int32_t OUTPUT_PORTINDEX = 1;
 

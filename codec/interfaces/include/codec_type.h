@@ -55,6 +55,8 @@ extern "C" {
  */
 typedef void *CODEC_HANDLETYPE;
 
+#define PARAM_COUNT_MAX 500
+
 /**
  * @brief Enumerates indexes of parameter types.
  */
