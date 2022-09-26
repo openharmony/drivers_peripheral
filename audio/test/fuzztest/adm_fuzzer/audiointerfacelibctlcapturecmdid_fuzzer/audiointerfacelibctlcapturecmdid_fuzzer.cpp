@@ -59,7 +59,8 @@ namespace Audio {
         }
         free(hwCapture);
         void (*CloseService)(const struct DevHandle *) = nullptr;
-        CloseService = (void (*)(const struct DevHandle *))dlsym(ctlcapFuzzPtrHandle, "AudioCloseServiceCapture");
+        CloseService = reinterpret_cast<void (*)(const struct DevHandle *)>(dlsym(ctlcapFuzzPtrHandle,
+            "AudioCloseServiceCapture"));
         if (CloseService == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioCloseServiceCapture failed \n", __func__);
             dlclose(ctlcapFuzzPtrHandle);
