@@ -205,12 +205,12 @@ static char *GetArrayStr(int32_t *array, int32_t arrayLen, int32_t endValue)
             HDF_LOGE("%{public}s: memset_s value failed, error code: %{public}d", __func__, ret);
             return arrayStr;
         }
-        ret = sprintf_s(value, sizeof(value) - 1, "0x0%X, ", array[i]);
+        ret = sprintf_s(value, sizeof(value), "0x0%X, ", array[i]);
         if (ret < 0) {
             HDF_LOGE("%{public}s: sprintf_s value failed, error code: %{public}d", __func__, ret);
             return arrayStr;
         }
-        len = strlen(value);
+        len = strnlen(value, ARRAY_TO_STR_LEN);
         ret = memcpy_s(arrayStr + totalLen, len, value, len);
         if (ret != EOK) {
             HDF_LOGE("%{public}s: memcpy_s arrayStr failed, error code: %{public}d", __func__, ret);
