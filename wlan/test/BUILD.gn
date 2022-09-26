@@ -47,6 +47,7 @@ if (defined(ohos_lite)) {
     testonly = true
     if (enable_HDF_UT) {
       deps = [
+        "fuzztest:hdf_wlan_fuzztest",
         "hdi_service:WlanHdiServiceTestC",
         "performance:hdf_peripheral_wlan_test_performance",
         "unittest:hdf_client_wifi",
