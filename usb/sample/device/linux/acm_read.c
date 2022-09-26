@@ -34,9 +34,6 @@ static struct HdfRemoteService *g_acmService;
 #define SLEEP_READ 100000
 static void TestRead(FILE *fp)
 {
-    int32_t ret;
-    char str[STR_LEN] = {0};
-    struct timeval time;
     HdfSbufFlush(g_reply);
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_READ, g_data, g_reply);
     if (status) {
@@ -45,8 +42,10 @@ static void TestRead(FILE *fp)
     }
     const char *tmp = HdfSbufReadString(g_reply);
     if (tmp && strlen(tmp) > 0) {
+        struct timeval time;
+        char str[STR_LEN] = {0};
         gettimeofday(&time, NULL);
-        ret = snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, recv data[%s] from host\n",
+        int32_t ret = snprintf_s(str, STR_LEN, STR_LEN - 1, "[XTSCHECK] %d.%06d, recv data[%s] from host\n",
             time.tv_sec, time.tv_usec, tmp);
         if (ret < 0) {
             HDF_LOGE("%s: snprintf_s failed", __func__);

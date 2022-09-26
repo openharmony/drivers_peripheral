@@ -179,8 +179,6 @@ static void AcmTestBulkCallback(struct UsbRequest *req)
 static int32_t SerialBegin(struct AcmDevice *acm)
 {
     uint32_t size = acm->dataSize;
-    int32_t ret;
-    struct AcmDb *db = NULL;
     int32_t dbn;
     if (AcmDbIsAvail(acm) != 0) {
         dbn = AcmDbAlloc(acm);
@@ -192,9 +190,13 @@ static int32_t SerialBegin(struct AcmDevice *acm)
         HDF_LOGE("AcmDbAlloc failed\n");
         return HDF_FAILURE;
     }
-    db = &acm->db[dbn];
+    struct AcmDb *db = &acm->db[dbn];
     db->len = acm->dataSize;
-    ret = AcmStartDb(acm, db, NULL);
+    int32_t ret = AcmStartDb(acm, db, NULL);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("acmstartdb is failed\n");
+        return HDF_FAILURE;
+    }
     return (int32_t)size;
 }
 
@@ -206,8 +208,6 @@ static struct UsbInterface *GetUsbInterfaceById(const struct AcmDevice *acm, uin
 static struct UsbPipeInfo *EnumePipe(
     const struct AcmDevice *acm, uint8_t interfaceIndex, UsbPipeType pipeType, UsbPipeDirection pipeDirection)
 {
-    uint8_t i;
-    int32_t ret;
     struct UsbInterfaceInfo *info = NULL;
     UsbInterfaceHandle *interfaceHandle = NULL;
     if (USB_PIPE_TYPE_CONTROL == pipeType) {
@@ -218,9 +218,9 @@ static struct UsbPipeInfo *EnumePipe(
         interfaceHandle = InterfaceIdToHandle(acm, info->interfaceIndex);
     }
 
-    for (i = 0; i <= info->pipeNum; i++) {
+    for (uint8_t i = 0; i <= info->pipeNum; i++) {
         struct UsbPipeInfo p;
-        ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &p);
+        int32_t ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
@@ -338,9 +338,7 @@ END:
 
 static int32_t InitUsbDdk(struct AcmDevice *acm)
 {
-    int32_t ret;
-
-    ret = UsbInitHostSdk(NULL);
+    int32_t ret = UsbInitHostSdk(NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbInitHostSdk failed", __func__);
         ret = HDF_ERR_IO;
