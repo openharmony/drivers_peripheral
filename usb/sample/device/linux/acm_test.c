@@ -54,7 +54,6 @@ static void TestWrite(char *buf)
 
 static void TestRead(void)
 {
-    size_t i;
     HdfSbufFlush(g_reply);
 
     if (HdfRemoteServiceWriteInterfaceToken(g_acmService, g_data) == false) {
@@ -69,7 +68,7 @@ static void TestRead(void)
     }
     const char *tmp = HdfSbufReadString(g_reply);
     if (tmp && strlen(tmp) > 0) {
-        for (i = 0; i < strlen(tmp); i++) {
+        for (size_t i = 0; i < strlen(tmp); i++) {
             if (tmp[i] == 0x0A || tmp[i] == 0x0D) {
                 printf("\r\n");
             } else {

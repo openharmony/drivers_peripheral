@@ -220,8 +220,6 @@ static struct UsbInterface *GetUsbInterfaceById(const struct AcmDevice *acm, uin
 static struct UsbPipeInfo *EnumePipe(
     const struct AcmDevice *acm, uint8_t interfaceIndex, UsbPipeType pipeType, UsbPipeDirection pipeDirection)
 {
-    uint8_t i;
-    int32_t ret;
     struct UsbInterfaceInfo *info = NULL;
     UsbInterfaceHandle *interfaceHandle = NULL;
     if (USB_PIPE_TYPE_CONTROL == pipeType) {
@@ -232,9 +230,9 @@ static struct UsbPipeInfo *EnumePipe(
         interfaceHandle = InterfaceIdToHandle(acm, info->interfaceIndex);
     }
 
-    for (i = 0; i <= info->pipeNum; i++) {
+    for (uint8_t i = 0; i <= info->pipeNum; i++) {
         struct UsbPipeInfo p;
-        ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &p);
+        int32_t ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &p);
         if (ret < 0) {
             continue;
         }
@@ -374,10 +372,8 @@ static int32_t UsbSerialSpeedInit(const struct UsbSpeedTest *input, int32_t *ifa
 
 static int32_t UsbSpeedDdkInit(void)
 {
-    int32_t ret;
     uint8_t i;
-
-    ret = UsbInitHostSdk(NULL);
+    int32_t ret = UsbInitHostSdk(NULL);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbInitHostSdk failed", __func__, __LINE__);
         return HDF_ERR_IO;

@@ -97,7 +97,6 @@ static void StartPThreadRead(void)
 #define SLEEP_GETCHAR 100000
 static void Test02(void)
 {
-    char ch;
     char str[STR_LEN] = {0};
     char *getStr = NULL;
     if (OsalMutexInit(&g_lock) != HDF_SUCCESS) {
@@ -106,7 +105,7 @@ static void Test02(void)
     }
     while (1) {
         printf("\ninput: \nr: for read acm\nw: for write acm \nq: for exit \n");
-        ch = (char)getchar();
+        char ch = (char)getchar();
         if (ch == 'r') {
             printf("input: 'q' quit reading\n");
             g_readRuning = true;
