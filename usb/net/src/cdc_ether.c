@@ -15,6 +15,7 @@
 
 #include <unistd.h>
 
+#include "cdc_ether.h"
 #include "hdf_base.h"
 #include "hdf_device_info.h"
 #include "hdf_log.h"
@@ -23,7 +24,6 @@
 #include "osal_time.h"
 #include "securec.h"
 #include "usb_ddk_interface.h"
-#include "cdc_ether.h"
 
 #define HDF_LOG_TAG USB_HOST_ECM
 
@@ -587,8 +587,6 @@ static void EcmFreePipes(struct EcmDevice *ecm)
 static struct UsbPipeInfo *EcmEnumePipe(
     struct EcmDevice *ecm, uint8_t interfaceIndex, UsbPipeType pipeType, UsbPipeDirection pipeDirection)
 {
-    uint8_t i;
-    int32_t ret;
     struct UsbInterfaceInfo *info = NULL;
     UsbInterfaceHandle *interfaceHandle = NULL;
     if (pipeType == USB_PIPE_TYPE_CONTROL) {
@@ -599,9 +597,9 @@ static struct UsbPipeInfo *EcmEnumePipe(
         interfaceHandle = ecm->devHandle[interfaceIndex];
     }
 
-    for (i = 0; i <= info->pipeNum; i++) {
+    for (uint8_t i = 0; i <= info->pipeNum; i++) {
         struct UsbPipeInfo p;
-        ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &p);
+        int32_t ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &p);
         if (ret < HDF_SUCCESS) {
             continue;
         }
@@ -795,7 +793,6 @@ EXIT:
 
 static void EcmReadBulk(struct UsbRequest *req)
 {
-    int32_t retval;
     int32_t status = req->compInfo.status;
     size_t size = req->compInfo.actualLength;
     struct EcmDevice *ecm = (struct EcmDevice *)req->compInfo.userData;
@@ -805,12 +802,11 @@ static void EcmReadBulk(struct UsbRequest *req)
             OsalMutexLock(&ecm->readLock);
             if (size) {
                 uint8_t *data = req->compInfo.buffer;
-                uint32_t count;
                 if (DataFifoIsFull(&ecm->readFifo)) {
                     HDF_LOGD("%s:%d fifo is full", __func__, __LINE__);
                     DataFifoSkip(&ecm->readFifo, size);
                 }
-                count = DataFifoWrite(&ecm->readFifo, data, size);
+                uint32_t count = DataFifoWrite(&ecm->readFifo, data, size);
                 if (count != size) {
                     HDF_LOGW("%s: write %u less than expected %zu", __func__, count, size);
                 }
@@ -823,7 +819,7 @@ static void EcmReadBulk(struct UsbRequest *req)
     }
 
     if (ecm->openFlag) {
-        retval = UsbSubmitRequestAsync(req);
+        int32_t retval = UsbSubmitRequestAsync(req);
         if (retval && retval != -EPERM) {
             HDF_LOGE("%s - usb_submit_urb failed: %d\n", __func__, retval);
         } else {
@@ -899,7 +895,6 @@ static int32_t EcmAllocIntReq(struct EcmDevice *ecm)
 
 static void EcmAllocReadReq(struct EcmDevice *ecm)
 {
-    int32_t ret;
     struct UsbRequestParams readParmas = {};
     for (int32_t i = 0; i < ECM_NR; i++) {
         ecm->readReq[i] = UsbAllocRequest(InterfaceIdToHandle(ecm, ecm->dataInPipe->interfaceId), 0, ecm->readSize);
@@ -917,7 +912,8 @@ static void EcmAllocReadReq(struct EcmDevice *ecm)
         readParmas.dataReq.numIsoPackets = 0;
         readParmas.dataReq.directon = (((uint32_t)(ecm->dataInPipe->pipeDirection)) >> USB_DIR_OFFSET) & 0x1;
         readParmas.dataReq.length = (int)ecm->readSize;
-        ret = UsbFillRequest(ecm->readReq[i], InterfaceIdToHandle(ecm, ecm->dataInPipe->interfaceId), &readParmas);
+        int32_t ret =
+            UsbFillRequest(ecm->readReq[i], InterfaceIdToHandle(ecm, ecm->dataInPipe->interfaceId), &readParmas);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: UsbFillRequest failed, ret=%d \n", __func__, ret);
             return;
