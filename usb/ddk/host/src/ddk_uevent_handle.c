@@ -175,7 +175,6 @@ void *DdkUeventMain(void *param)
         return NULL;
     }
 
-    int32_t ret;
     ssize_t rcvLen = 0;
     fd_set fds;
     char msg[UEVENT_MSG_LEN];
@@ -185,7 +184,7 @@ void *DdkUeventMain(void *param)
         FD_SET(fd, &fds);
         tv.tv_sec = TIMEVAL_SECOND;
         tv.tv_usec = TIMEVAL_USECOND;
-        ret = select(fd + 1, &fds, NULL, NULL, &tv);
+        int32_t ret = select(fd + 1, &fds, NULL, NULL, &tv);
         if (ret < 0) {
             continue;
         }

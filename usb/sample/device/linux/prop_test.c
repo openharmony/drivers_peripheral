@@ -145,15 +145,13 @@ FAIL:
 
 int32_t PropTest(int32_t argc, const char *argv[])
 {
-    int32_t ch;
-    int32_t ret;
     const char *propName = NULL;
     const char *propValue = NULL;
     bool setProp = false;
     bool getProp = false;
     bool registProp = false;
 
-    ch = *(argv[1]);
+    int32_t ch = *(argv[1]);
     switch (ch) {
         case 'r':
             propName = argv[0x2];
@@ -180,6 +178,8 @@ int32_t PropTest(int32_t argc, const char *argv[])
     if (DispatcherInit() != HDF_SUCCESS) {
         return 1;
     }
+
+    int32_t ret;
     if (getProp) {
         ret = TestPropGet(propName);
     } else if (setProp) {
@@ -188,6 +188,9 @@ int32_t PropTest(int32_t argc, const char *argv[])
         ret = TestPropRegist(propName, propValue);
     }
     DispatcherDeInit();
-
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: ret is not success", __func__);
+        return HDF_FAILURE;
+    }
     return 0;
 }
