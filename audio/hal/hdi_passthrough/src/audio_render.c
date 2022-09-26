@@ -1220,6 +1220,7 @@ int32_t AudioRenderTurnStandbyMode(AudioHandle handle)
 
 int32_t AudioRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
 {
+    uint32_t i;
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
@@ -1238,14 +1239,14 @@ int32_t AudioRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
     uint32_t mSize = render->errorLog.iter;
     if (range < RANGE_MIN) {
         dprintf(fd, "%-5s  %-10s  %s\n", "count", "errorCode", "Time");
-        for (uint32_t i = 0; i < mSize; i++) {
+        for (i = 0; i < mSize; i++) {
             dprintf(fd, FORMAT_TWO, render->errorLog.errorDump[i].count + 1,
                     render->errorLog.errorDump[i].errorCode,
                     render->errorLog.errorDump[i].currentTime);
         }
     } else {
         dprintf(fd, "%-5s  %-10s  %-20s  %-15s  %s\n", "count", "errorCode", "frames", "fail reason", "Time");
-        for (uint32_t i = 0; i < mSize; i++) {
+        for (i = 0; i < mSize; i++) {
             dprintf(fd, FORMAT_ONE, render->errorLog.errorDump[i].count + 1,
                     render->errorLog.errorDump[i].errorCode,
                     render->errorLog.errorDump[i].frames,
