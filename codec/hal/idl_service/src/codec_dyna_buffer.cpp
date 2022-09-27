@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 #include "codec_dyna_buffer.h"
-#include <buffer_handle_utils.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <libsync.h>
@@ -23,8 +22,14 @@ using namespace OHOS::HDI::Codec::V1_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-CodecDynaBuffer::CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer) : ICodecBuffer(codecBuffer)
-{}
+CodecDynaBuffer::CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer, BufferHandle *bufferHandle)
+    : ICodecBuffer(codecBuffer)
+{
+    dynaBuffer_ = std::make_shared<DynamicBuffer>();
+    if (dynaBuffer_ != nullptr) {
+        dynaBuffer_->bufferHandle = bufferHandle;
+    }
+}
 
 CodecDynaBuffer::~CodecDynaBuffer()
 {
@@ -40,9 +45,14 @@ sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
         bufferHandle = codecBuffer.bufferhandle->Move();
         codecBuffer.bufferhandle = nullptr;
     }
-    CodecDynaBuffer *buffer = new CodecDynaBuffer(codecBuffer);
-    buffer->dynaBuffer_ = std::make_shared<DynamicBuffer>();
-    buffer->dynaBuffer_->bufferHandle = bufferHandle;
+    CodecDynaBuffer *buffer = new CodecDynaBuffer(codecBuffer, bufferHandle);
+    if (buffer == nullptr) {
+        HDF_LOGE("%{public}s : buffer is nullptr", __func__);
+        if (bufferHandle != nullptr) {
+            FreeBufferHandle(bufferHandle);
+        }
+        return nullptr;
+    }
     return sptr<ICodecBuffer>(buffer);
 }
 
@@ -117,12 +127,11 @@ bool CodecDynaBuffer::CheckInvalid(struct OmxCodecBuffer &codecBuffer)
 void CodecDynaBuffer::ResetBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer)
 {
     (void)omxBuffer;
-    if (codecBuffer.bufferhandle == nullptr) {
+    if (codecBuffer.bufferhandle == nullptr || dynaBuffer_ == nullptr) {
         return;
     }
     auto bufferHandle = codecBuffer.bufferhandle->Move();
     codecBuffer.bufferhandle = nullptr;
-
     // if recv new BufferHandle, save it, but do not need to save to omxBuffer
     if (dynaBuffer_->bufferHandle != nullptr) {
         FreeBufferHandle(dynaBuffer_->bufferHandle);
