@@ -215,7 +215,7 @@ int32_t DrmConnector::PickIdleCrtcId(IdMapPtr<DrmEncoder> &encoders, IdMapPtr<Dr
 
 int32_t DrmConnector::UpdateModes()
 {
-    int drmFd= mDrmFdPtr->GetFd();
+    int drmFd = mDrmFdPtr->GetFd();
     drmModeConnectorPtr c = drmModeGetConnector(drmFd, mId);
     DISPLAY_CHK_RETURN((c == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("can not get connector"));
     mConnectState = c->connection;
