@@ -829,7 +829,7 @@ int32_t AudioCaptureGetExtraParams(struct IAudioCapture *handle, char *keyValueL
 {
     int32_t ret;
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
-    if (capture == NULL || keyValueList == NULL || listLenth <= 0) {
+    if (capture == NULL || keyValueList == NULL || listLenth == 0) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
