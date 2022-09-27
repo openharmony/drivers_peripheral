@@ -1091,7 +1091,8 @@ static const char *UsbFnCfgGetPropValueFromHcs(const struct UsbFnDeviceMgr *fnDe
     if (propTabCount <= 0) {
         return NULL;
     }
-    for (uint32_t count = 0; count < propTabCount; count++) {
+    uint32_t totalCount = (uint32_t)propTabCount;
+    for (uint32_t count = 0; count < totalCount; count++) {
         int32_t ret = drsOps->GetStringArrayElem(customNode, "propTable", count, &propNodeName, NULL);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: read stringList fail", __func__);

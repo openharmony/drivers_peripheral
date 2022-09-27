@@ -1017,7 +1017,7 @@ static void AcmNotifyComplete(uint8_t pipe, struct UsbFnRequest *req)
 
 static int32_t AcmAllocNotifyRequest(struct UsbAcmDevice *acm)
 {
-    /* allocate notification request */
+    /* allocate notification request, 2 means compatible liteOS and linux */
     acm->notifyReq =
         UsbFnAllocRequest(acm->ctrlIface.handle, acm->notifyPipe.id, sizeof(struct UsbCdcNotification) * 2);
     if (acm->notifyReq == NULL) {
