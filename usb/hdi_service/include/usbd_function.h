@@ -18,27 +18,29 @@
 
 #include <stdint.h>
 
-#define USB_FUNCTION_NONE 0
-#define USB_FUNCTION_ACM  1
-#define USB_FUNCTION_ECM  2
-#define USB_FUNCTION_HDC  4
-#define USB_FUNCTION_RNDIS  32
-#define USB_FUNCTION_STORAGE  512
+#define USB_FUNCTION_NONE    0
+#define USB_FUNCTION_ACM     1
+#define USB_FUNCTION_ECM     2
+#define USB_FUNCTION_HDC     4
+#define USB_FUNCTION_RNDIS   32
+#define USB_FUNCTION_STORAGE 512
+#define USB_FUNCTION_SUPPORT \
+    (USB_FUNCTION_ACM | USB_FUNCTION_ECM | USB_FUNCTION_HDC | USB_FUNCTION_RNDIS | USB_FUNCTION_STORAGE)
 
 #define DEV_SERVICE_NAME "usbfn_master"
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
 #define ECM_SERVICE_NAME "usbfn_cdcecm"
 
-#define SYS_USB_CONFIGFS         "sys.usb.configfs"
-#define SYS_USB_CONFIG           "sys.usb.config"
-#define HDC_CONFIG_OFF           "none"
-#define HDC_CONFIG_ON            "hdc"
-#define HDC_CONFIG_RNDIS         "rndis"
-#define HDC_CONFIG_STORAGE       "storage"
-#define HDC_CONFIG_RNDIS_HDC     "rndis_hdc"
-#define HDC_CONFIG_STORAGE_HDC   "storage_hdc"
-#define HDC_CONFIGFS_OFF "0"
-#define HDC_CONFIGFS_ON  "1"
+#define SYS_USB_CONFIGFS       "sys.usb.configfs"
+#define SYS_USB_CONFIG         "sys.usb.config"
+#define HDC_CONFIG_OFF         "none"
+#define HDC_CONFIG_ON          "hdc"
+#define HDC_CONFIG_RNDIS       "rndis"
+#define HDC_CONFIG_STORAGE     "storage"
+#define HDC_CONFIG_RNDIS_HDC   "rndis_hdc"
+#define HDC_CONFIG_STORAGE_HDC "storage_hdc"
+#define HDC_CONFIGFS_OFF       "0"
+#define HDC_CONFIGFS_ON        "1"
 
 #define FUNCTION_ADD 1
 #define FUNCTION_DEL 2
@@ -49,7 +51,7 @@
 #define ECM_RELEASE 101
 
 #define USB_FUNCTION_ACM_ECM 3
-#define HDC_READY_TIME 2000
+#define HDC_READY_TIME       2000
 namespace OHOS {
 namespace HDI {
 namespace Usb {
