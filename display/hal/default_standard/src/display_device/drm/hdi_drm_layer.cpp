@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-DrmGemBuffer::DrmGemBuffer(int drmfd, HdiLayerBuffer &hdl) : mDrmFd(drmfd)
+DrmGemBuffer::DrmGemBuffer(int drmFd, HdiLayerBuffer &hdl) : mDrmFd(drmFd)
 {
     DISPLAY_LOGD();
     Init(mDrmFd, hdl);
@@ -69,7 +69,7 @@ DrmGemBuffer::~DrmGemBuffer()
     }
 }
 
-bool DrmGemBuffer::IsValid()
+bool DrmGemBuffer::IsValid() const
 {
     DISPLAY_LOGD();
     return (mGemHandle != INVALID_DRM_ID) && (mFdId != INVALID_DRM_ID);

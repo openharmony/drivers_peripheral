@@ -37,7 +37,7 @@ public:
     virtual ~DrmCrtc() {}
     int32_t BindToDisplay(uint32_t id);
     void UnBindDisplay(uint32_t id);
-    bool CanBind();
+    bool CanBind() const;
     uint32_t GetId() const
     {
         return mId;
@@ -64,7 +64,7 @@ public:
     {
         return mActiveModeId;
     }
-    bool NeedModeSet()
+    bool NeedModeSet() const
     {
         return mNeedModeSet;
     }

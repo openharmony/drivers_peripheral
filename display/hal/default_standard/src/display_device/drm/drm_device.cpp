@@ -279,7 +279,6 @@ std::vector<std::shared_ptr<DrmPlane>> DrmDevice::GetDrmPlane(uint32_t pipe, uin
 
 std::unordered_map<uint32_t, std::shared_ptr<HdiDisplay>> DrmDevice::DiscoveryDisplay()
 {
-    int32_t ret;
     mDisplays.clear();
     drmModeResPtr res = drmModeGetResources(GetDrmFd());
     DISPLAY_CHK_RETURN((res == nullptr), mDisplays, DISPLAY_LOGE("can not get drm resource"));
@@ -293,7 +292,7 @@ std::unordered_map<uint32_t, std::shared_ptr<HdiDisplay>> DrmDevice::DiscoveryDi
     for (auto &connectorPair : mConnectors) {
         auto connector = connectorPair.second;
         uint32_t crtcId = 0;
-        ret = connector->PickIdleCrtcId(mEncoders, mCrtcs, crtcId);
+        int32_t ret = connector->PickIdleCrtcId(mEncoders, mCrtcs, crtcId);
         if (ret != DISPLAY_SUCCESS) {
             continue;
         }

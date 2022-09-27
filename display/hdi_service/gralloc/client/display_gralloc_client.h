@@ -34,10 +34,10 @@ public:
     virtual int32_t AllocMem(const AllocInfo& info, BufferHandle*& handle) const override;
     virtual void FreeMem(const BufferHandle& handle) const override;
     virtual void *Mmap(const BufferHandle& handle) const override;
-    virtual void *MmapCache(const BufferHandle &buffer) const override;
+    virtual void *MmapCache(const BufferHandle &handle) const override;
     virtual int32_t Unmap(const BufferHandle& handle) const override;
-    virtual int32_t FlushCache(const BufferHandle &buffer) const override;
-    virtual int32_t FlushMCache(const BufferHandle &buffer) const override;
+    virtual int32_t FlushCache(const BufferHandle &handle) const override;
+    virtual int32_t FlushMCache(const BufferHandle &handle) const override;
     virtual int32_t InvalidateCache(const BufferHandle& handle) const override;
     virtual int32_t IsSupportedAlloc(const std::vector<VerifyAllocInfo> &infos,
                                      std::vector<bool> &supporteds) const override;
