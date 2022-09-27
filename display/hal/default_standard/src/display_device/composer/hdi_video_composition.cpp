@@ -123,7 +123,7 @@ int32_t HdiVideoComposition::Apply(bool modeSet)
     return DISPLAY_SUCCESS;
 }
 
-void HdiVideoComposition::CLoseUnUsedLayer(std::vector<HdiLayer*> &layers)
+void HdiVideoComposition::CLoseUnUsedLayer(const std::vector<HdiLayer*> &layers)
 {
     DISPLAY_LOGD();
     std::vector<uint32_t> neededRemove;

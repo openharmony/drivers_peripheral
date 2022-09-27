@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-void DrmMode::ConvertToHdiMode(DisplayModeInfo &hdiMode)
+void DrmMode::ConvertToHdiMode(DisplayModeInfo &hdiMode) const
 {
     hdiMode.height = mModeInfo.vdisplay;
     hdiMode.width = mModeInfo.hdisplay;
@@ -29,7 +29,7 @@ void DrmMode::ConvertToHdiMode(DisplayModeInfo &hdiMode)
     hdiMode.id = mId;
 }
 
-DrmConnector::DrmConnector(drmModeConnector c, FdPtr &fd)
+DrmConnector::DrmConnector(drmModeConnector c, const FdPtr &fd)
     : mId(c.connector_id),
       mPhyWidth(c.mmWidth),
       mPhyHeight(c.mmHeight),
@@ -71,13 +71,12 @@ void DrmConnector::InitModes(drmModeConnector c)
 
 int32_t DrmConnector::Init(DrmDevice &drmDevice)
 {
-    int32_t ret;
     DrmProperty prop;
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((mDrmFdPtr == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("the mDrmFdPtr is NULL"));
     DISPLAY_CHK_RETURN((mDrmFdPtr->GetFd() == -1), DISPLAY_FAILURE, DISPLAY_LOGE("the drm fd is -1"));
     // find dpms prop
-    ret = drmDevice.GetConnectorProperty(*this, PROP_DPMS, prop);
+    int32_t ret = drmDevice.GetConnectorProperty(*this, PROP_DPMS, prop);
     DISPLAY_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_LOGE("can not get mode prop id"));
     mPropDpmsId = prop.propId;
     mDpmsState = prop.value;
@@ -180,7 +179,6 @@ void DrmConnector::ConvertToHdiType(uint32_t type, InterfaceType &hdiType)
 int32_t DrmConnector::TryPickEncoder(IdMapPtr<DrmEncoder> &encoders, uint32_t encoderId, IdMapPtr<DrmCrtc> &crtcs,
     uint32_t &crtcId)
 {
-    int ret;
     auto encoderIter = encoders.find(encoderId);
     if (encoderIter == encoders.end()) {
         DISPLAY_LOGW("can not find encoder for id : %{public}d", encoderId);
@@ -189,7 +187,7 @@ int32_t DrmConnector::TryPickEncoder(IdMapPtr<DrmEncoder> &encoders, uint32_t en
 
     auto &encoder = encoderIter->second;
     DISPLAY_LOGD("connector : %{public}d encoder : %{public}d", mId, encoder->GetId());
-    ret = encoder->PickIdleCrtcId(crtcs, crtcId);
+    int32_t ret = encoder->PickIdleCrtcId(crtcs, crtcId);
     DISPLAY_CHK_RETURN((ret == DISPLAY_SUCCESS), DISPLAY_SUCCESS,
         DISPLAY_LOGD("connector : %{public}d pick encoder : %{public}d", mId, encoder->GetId()));
     return DISPLAY_FAILURE;
@@ -231,8 +229,8 @@ int32_t DrmConnector::GetDisplaySupportedModes(uint32_t *num, DisplayModeInfo *m
 {
     DISPLAY_CHK_RETURN((num == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("num is nullptr"));
     *num = static_cast<int32_t>(mModes.size());
-    int i = 0;
     if (modes != nullptr) {
+        int i = 0;
         for (const auto &modeMap : mModes) {
             DrmMode mode = modeMap.second;
             mode.ConvertToHdiMode(*(modes + i));
@@ -251,7 +249,7 @@ int32_t DrmConnector::SetDpmsState(uint64_t dmps)
     return DISPLAY_SUCCESS;
 }
 
-bool DrmConnector::IsConnected()
+bool DrmConnector::IsConnected() const
 {
     return (mConnectState == DRM_MODE_CONNECTED);
 }
@@ -283,11 +281,10 @@ DrmModeBlock::DrmModeBlock(DrmMode &mode)
 
 int32_t DrmModeBlock::Init(DrmMode &mode)
 {
-    int ret;
     int drmFd = DrmDevice::GetDrmFd();
     DISPLAY_CHK_RETURN((drmFd < 0), DISPLAY_FAILURE, DISPLAY_LOGE("the drm fd is invalid"));
     drmModeModeInfo modeInfo = *(mode.GetModeInfoPtr());
-    ret = drmModeCreatePropertyBlob(drmFd, static_cast<void *>(&modeInfo), sizeof(modeInfo), &mBlockId);
+    int ret = drmModeCreatePropertyBlob(drmFd, static_cast<void *>(&modeInfo), sizeof(modeInfo), &mBlockId);
     DISPLAY_CHK_RETURN((ret != 0), DISPLAY_FAILURE, DISPLAY_LOGE("create property blob failed"));
     DISPLAY_LOGD("mBlockId %{public}d", mBlockId);
     return DISPLAY_SUCCESS;
@@ -296,11 +293,9 @@ int32_t DrmModeBlock::Init(DrmMode &mode)
 DrmModeBlock::~DrmModeBlock()
 {
     DISPLAY_LOGD("mBlockId %{public}d", mBlockId);
-    int drmFd;
-    int ret;
-    drmFd = DrmDevice::GetDrmFd();
+    int drmFd = DrmDevice::GetDrmFd();
     if ((mBlockId != DRM_INVALID_ID) && (drmFd >= 0)) {
-        ret = drmModeDestroyPropertyBlob(drmFd, mBlockId);
+        int ret = drmModeDestroyPropertyBlob(drmFd, mBlockId);
         if (ret != 0) {
             DISPLAY_LOGE("destroy property blob failed errno %{public}d", errno);
         }

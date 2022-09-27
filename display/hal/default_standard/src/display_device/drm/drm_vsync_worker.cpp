@@ -104,10 +104,9 @@ void DrmVsyncWorker::WorkThread()
 {
     DISPLAY_LOGD();
     unsigned int seq = 0;
-    uint64_t time = 0;
     while (WaitSignalAndCheckRuning()) {
         // wait the vblank
-        time = WaitNextVBlank(seq);
+        uint64_t time = WaitNextVBlank(seq);
         if (mCallBack != nullptr) {
             mCallBack->Vsync(seq, time);
         } else {
@@ -116,7 +115,7 @@ void DrmVsyncWorker::WorkThread()
     }
 }
 
-void DrmVsyncWorker::ReqesterVBlankCb(std::shared_ptr<VsyncCallBack> &cb)
+void DrmVsyncWorker::ReqesterVBlankCb(const std::shared_ptr<VsyncCallBack> &cb)
 {
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN_NOT_VALUE((cb == nullptr), DISPLAY_LOGE("the VBlankCallback is nullptr "));

@@ -58,8 +58,7 @@ static inline uint32_t RgbaGetA(uint32_t color)
 
 static constexpr inline uint32_t ColorSetARGB(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 {
-    return (r << R_PIX_OFFSET) | (g << G_PIX_OFFSET) |
-        (b << B_PIX_OFFSET) | (a << A_PIX_OFFSET);
+    return (r << R_PIX_OFFSET) | (g << G_PIX_OFFSET) | (b << B_PIX_OFFSET) | (a << A_PIX_OFFSET);
 }
 
 // blend none

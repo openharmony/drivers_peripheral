@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-DrmDisplay::DrmDisplay(std::shared_ptr<DrmConnector> &connector, std::shared_ptr<DrmCrtc> &crtc,
+DrmDisplay::DrmDisplay(std::shared_ptr<DrmConnector> &connector, const std::shared_ptr<DrmCrtc> &crtc,
     std::shared_ptr<DrmDevice> &drmDevice)
     : mDrmDevice(drmDevice), mConnector(connector), mCrtc(crtc)
 {}
