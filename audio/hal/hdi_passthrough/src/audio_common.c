@@ -137,11 +137,13 @@ void AudioLogRecord(int errorLevel, const char *format, ...)
     (void)time(&timeLog);
     tblock = localtime(&timeLog);
     if (tblock == NULL) {
+        va_end(args);
         return;
     }
     uint32_t ret = strftime(fileName, sizeof(fileName), "//data/log/drivers_peripheral_audio/audio_%Y%m%d.log",
         tblock);
     if (ret == 0) {
+        va_end(args);
         return;
     }
     if (fileName[0] == '\0') {

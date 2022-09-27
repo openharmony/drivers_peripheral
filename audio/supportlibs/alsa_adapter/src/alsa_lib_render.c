@@ -204,26 +204,6 @@ int32_t AudioCtlRenderSetPauseStu(
      * in AudioOutputRenderWrite interface.
      */
     return HDF_SUCCESS;
-
-    const char *adapterName = handleData->renderMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
-    if (cardIns == NULL || cardIns->renderPcmHandle == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
-        return HDF_FAILURE;
-    }
-
-    pause = handleData->renderMode.ctlParam.pause ? AUDIO_ALSALIB_IOCTRL_PAUSE : AUDIO_ALSALIB_IOCTRL_RESUME;
-    if (pause == AUDIO_ALSALIB_IOCTRL_RESUME) {
-        ret = snd_pcm_resume(cardIns->renderPcmHandle);
-    } else {
-        ret = snd_pcm_pause(cardIns->renderPcmHandle, pause);
-    }
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("snd_pcm_pause fail!");
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
 }
 
 static int32_t RenderSetMuteStuSub(struct AudioCardInfo *cardIns, int32_t muteState)
@@ -1171,7 +1151,7 @@ static int32_t RenderWriteiMmap(const struct AudioHwRenderParam *handleData, str
     uint32_t lastBuffSize;
     uint32_t loopTimes;
     uint32_t looper = 0;
-    uint32_t copyLen = 0;
+    uint32_t copyLen;
     int32_t count = 0;
     struct AudioMmapBufferDescripter *mmapBufDesc = NULL;
 
