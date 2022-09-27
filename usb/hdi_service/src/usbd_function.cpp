@@ -14,17 +14,18 @@
  */
 
 #include "usbd_function.h"
-#include <hdf_sbuf.h>
-#include <iservmgr_hdi.h>
-#include <message_option.h>
-#include <message_parcel.h>
-#include <string_ex.h>
+
 #include "devmgr_hdi.h"
 #include "hdf_log.h"
 #include "hdf_remote_service.h"
+#include "hdf_sbuf.h"
+#include "iservmgr_hdi.h"
+#include "message_option.h"
+#include "message_parcel.h"
 #include "osal_time.h"
 #include "parameter.h"
 #include "securec.h"
+#include "string_ex.h"
 #include "usbd_type.h"
 
 namespace OHOS {
@@ -133,14 +134,14 @@ int32_t UsbdFunction::SetFunctionToStorageHdc()
 
 int32_t UsbdFunction::SetFunctionToNone()
 {
+    UsbdFunction::SendCmdToService(ACM_SERVICE_NAME, ACM_RELEASE, USB_FUNCTION_ACM);
+    UsbdFunction::SendCmdToService(ECM_SERVICE_NAME, ECM_RELEASE, USB_FUNCTION_ECM);
+    UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_FUNCTION_ACM_ECM);
     int32_t ret = RemoveHdc();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:RemoveHdc error, ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    UsbdFunction::SendCmdToService(ACM_SERVICE_NAME, ACM_RELEASE, USB_FUNCTION_ACM);
-    UsbdFunction::SendCmdToService(ECM_SERVICE_NAME, ECM_RELEASE, USB_FUNCTION_ECM);
-    UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_FUNCTION_ACM_ECM);
     currentFuncs_ = USB_FUNCTION_NONE;
     return HDF_SUCCESS;
 }
@@ -225,13 +226,17 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
         HDF_LOGW("%{public}s:setFunctionToNone error", __func__);
     }
 
+    if (UsbdFunction::SetDDKFunction(funcs)) {
+        HDF_LOGE("%{public}s:SetDDKFunction error", __func__);
+        return HDF_FAILURE;
+    }
+
     switch (kfuns) {
         case USB_FUNCTION_HDC:
             if (UsbdFunction::AddHdc()) {
                 HDF_LOGE("%{public}s:AddHdc error", __func__);
                 return HDF_FAILURE;
             }
-            OsalMSleep(HDC_READY_TIME);
             break;
         case USB_FUNCTION_RNDIS:
             if (UsbdFunction::SetFunctionToRndis()) {
@@ -259,10 +264,6 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
             break;
         default:
             break;
-    }
-    if (UsbdFunction::SetDDKFunction(funcs)) {
-        HDF_LOGE("%{public}s:SetDDKFunction error", __func__);
-        return HDF_FAILURE;
     }
     currentFuncs_ = funcs;
     return HDF_SUCCESS;
