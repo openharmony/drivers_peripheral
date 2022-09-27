@@ -38,7 +38,7 @@ std::unique_ptr<HdiLayer> FbDisplay::CreateHdiLayer(LayerType type)
     return layer;
 }
 
-FbDisplay::FbDisplay(std::vector<int> &fds)
+FbDisplay::FbDisplay(const std::vector<int> &fds)
 {
     DISPLAY_LOGD();
     deviceFds_ = fds;
@@ -99,7 +99,6 @@ int32_t FbDisplay::GetDisplaySupportedModes(uint32_t *num, DisplayModeInfo *mode
 {
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((num == NULL), DISPLAY_NULL_PTR, DISPLAY_LOGE("num and modes is nullptr"));
-    DISPLAY_CHK_RETURN((*num < 0), DISPLAY_FAILURE, DISPLAY_LOGE("the num is invalid"));
     if (modes == NULL) {
         *num = modes_.size();
         return DISPLAY_SUCCESS;

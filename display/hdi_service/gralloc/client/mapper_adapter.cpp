@@ -37,7 +37,7 @@ MapperAdapter::~MapperAdapter()
     }
 }
 
-bool MapperAdapter::IsReady()
+bool MapperAdapter::IsReady() const
 {
     HDF_LOGI("%{public}s: entry", __func__);
     return mapperFuncs_ != nullptr;

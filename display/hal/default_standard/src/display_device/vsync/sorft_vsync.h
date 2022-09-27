@@ -32,7 +32,7 @@ public:
     int32_t Init();
     void EnableVsync(bool enable);
     void WorkThread();
-    void ReqesterVBlankCb(std::shared_ptr<VsyncCallBack> &cb);
+    void ReqesterVBlankCb(const std::shared_ptr<VsyncCallBack> &cb);
     bool CheckRuning();
 
 private:

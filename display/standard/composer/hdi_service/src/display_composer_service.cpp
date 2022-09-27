@@ -104,9 +104,8 @@ void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void *
 
 void DisplayComposerService::OnVBlank(unsigned int sequence, uint64_t ns, void *data)
 {
-    IVBlankCallback *remoteCb;
     if (data != nullptr) {
-        remoteCb = reinterpret_cast<IVBlankCallback *>(data);
+        IVBlankCallback *remoteCb = reinterpret_cast<IVBlankCallback *>(data);
         if (remoteCb != nullptr) {
             remoteCb->OnVBlank(sequence, ns);
         } else {

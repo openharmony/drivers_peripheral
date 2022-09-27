@@ -95,7 +95,7 @@ void SorftVsync::WorkThread()
     }
 }
 
-void SorftVsync::ReqesterVBlankCb(std::shared_ptr<VsyncCallBack> &cb)
+void SorftVsync::ReqesterVBlankCb(const std::shared_ptr<VsyncCallBack> &cb)
 {
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN_NOT_VALUE((cb == nullptr), DISPLAY_LOGE("the VBlankCallback is nullptr "));
