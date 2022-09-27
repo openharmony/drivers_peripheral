@@ -217,11 +217,11 @@ int32_t UsbdFunction::SetDDKFunction(uint32_t funcs)
 
 int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
 {
-    uint32_t kfuns = funcs & (~USB_FUNCTION_ACM_ECM);
-    if (funcs < USB_FUNCTION_NONE) {
+    if ((funcs | USB_FUNCTION_SUPPORT) != USB_FUNCTION_SUPPORT) {
         HDF_LOGE("%{public}s:funcs invalid", __func__);
         return HDF_FAILURE;
     }
+    uint32_t kfuns = funcs & (~USB_FUNCTION_ACM_ECM);
     if (UsbdFunction::SetFunctionToNone()) {
         HDF_LOGW("%{public}s:setFunctionToNone error", __func__);
     }
