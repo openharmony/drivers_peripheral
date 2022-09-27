@@ -978,7 +978,7 @@ int32_t AudioRenderSetExtraParams(struct IAudioRender *handle, const char *keyVa
 int32_t AudioRenderGetExtraParams(struct IAudioRender *handle, char *keyValueList, uint32_t listLenth)
 {
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
-    if (render == NULL || keyValueList == NULL || listLenth <= 0) {
+    if (render == NULL || keyValueList == NULL || listLenth == 0) {
         return AUDIO_ERR_INVALID_PARAM;
     }
 
