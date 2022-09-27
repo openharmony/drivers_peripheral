@@ -385,11 +385,13 @@ static int32_t FrameStartMmap(const struct StrPara *param)
 
     // start
     if (render == NULL || render->ReqMmapBuffer == NULL) {
+        free(mmapDesc.filePath);
         return HDF_FAILURE;
     }
 
     ret = render->ReqMmapBuffer(render, reqSize, &mmapDesc);
     if (ret < 0 || reqSize <= 0) {
+        free(mmapDesc.filePath);
         printf("Request map fail,please check.\n");
         return HDF_FAILURE;
     }
@@ -397,9 +399,11 @@ static int32_t FrameStartMmap(const struct StrPara *param)
     if (g_render != NULL) {
         ret = StopAudioFiles(&render);
         if (ret < 0) {
+            free(mmapDesc.filePath);
             AUDIO_FUNC_LOGE("StopAudioFiles File!");
         }
     }
+    free(mmapDesc.filePath);
     return HDF_SUCCESS;
 }
 

@@ -12,9 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "hdi_service_common.h"
+#include <sys/stat.h>
 #include "hdf_log.h"
 #include "osal_mem.h"
-#include "hdi_service_common.h"
 
 #define SREREO_CHANNEL 2
 #define MONO_CHANNEL   1
@@ -331,16 +332,13 @@ int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string
     InitAttrs(attrs);
     InitDevDesc(devDesc, audioPort.portId, pins);
     ret = (*adapter)->CreateRender(*adapter, &devDesc, &attrs, render);
-    if (ret < 0) {
+    if (ret < 0 || *render == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:Create render failed\n", __func__);
+        manager->UnloadAdapter(manager, adapterName.c_str());
+        IAudioAdapterRelease(*adapter, IS_STUB);
         free(audioPort.portName);
         free(devDesc.desc);
         return ret;
-    }
-    if (*render == nullptr) {
-        free(audioPort.portName);
-        free(devDesc.desc);
-        return HDF_FAILURE;
     }
     free(audioPort.portName);
     free(devDesc.desc);
@@ -406,16 +404,13 @@ int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::strin
     InitAttrs(attrs);
     InitDevDesc(devDesc, audioPort.portId, pins);
     ret = (*adapter)->CreateCapture(*adapter, &devDesc, &attrs, capture);
-    if (ret < 0) {
+    if (ret < 0 || *capture == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:Create capture failed\n", __func__);
+        manager->UnloadAdapter(manager, adapterName.c_str());
+        IAudioAdapterRelease(*adapter, IS_STUB);
         free(audioPort.portName);
         free(devDesc.desc);
         return ret;
-    }
-    if (*capture == nullptr) {
-        free(audioPort.portName);
-        free(devDesc.desc);
-        return HDF_FAILURE;
     }
     free(audioPort.portName);
     free(devDesc.desc);
@@ -752,6 +747,7 @@ int32_t InitMmapDesc(const string &path, struct AudioMmapBufferDescripter &desc,
 {
     FILE *fp;
     if (isRender) {
+        (void)chmod(path.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
         fp = fopen(path.c_str(), "rb+");
     } else {
         fp = fopen(path.c_str(), "wb+");
@@ -922,10 +918,10 @@ void TestAudioPortCapabilityFree(struct AudioPortCapability *dataBlock, bool fre
     }
 }
 
-int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioCapture *&capture,
-    TestAudioAdapterRelease adapterRelease, TestAudioCaptureRelease captureRelease)
+int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&adapter,
+    struct IAudioCapture *&capture)
 {
-    if (manager == nullptr || adapter == nullptr || adapterRelease == nullptr || captureRelease == nullptr) {
+    if (manager == nullptr || adapter == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:param is nullptr\n", __func__);
         return HDF_FAILURE;
     }
@@ -933,47 +929,56 @@ int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&a
         HDF_LOGE("%{public}s: AUDIO_TEST:fuction is nullptr\n", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret = adapter->DestroyCapture(adapter, nullptr);
+    struct AudioDeviceDescriptor devDesc;
+    InitDevDesc(devDesc, 0, PIN_IN_MIC);
+    int32_t ret = adapter->DestroyCapture(adapter, &devDesc);
     if (ret != HDF_SUCCESS) {
+        free(devDesc.desc);
         HDF_LOGE("%{public}s: AUDIO_TEST:DestroyCapture failed\n", __func__);
         return HDF_FAILURE;
     }
-    captureRelease(capture);
+    IAudioCaptureRelease(capture, IS_STUB);
     capture = nullptr;
+    free(devDesc.desc);
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AUDIO_TEST:UnloadAdapter failed\n", __func__);
         return HDF_FAILURE;
     }
-    adapterRelease(adapter);
+    IAudioAdapterRelease(adapter, IS_STUB);
     adapter = nullptr;
     return HDF_SUCCESS;
 }
 
-int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioRender *&render,
-    TestAudioAdapterRelease adapterRelease, TestAudioRenderRelease renderRelease)
+int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioRender *&render)
 {
-    if (manager == nullptr || adapter == nullptr || adapterRelease == nullptr || renderRelease == nullptr) {
+    if (manager == nullptr || adapter == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:param is nullptr\n", __func__);
         return HDF_FAILURE;
     }
+
+    struct AudioDeviceDescriptor devDesc;
+    InitDevDesc(devDesc, 0, PIN_OUT_SPEAKER);
     if (manager->UnloadAdapter == nullptr || adapter->DestroyRender == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:fuction is nullptr\n", __func__);
         return HDF_FAILURE;
     }
-    int32_t ret = adapter->DestroyRender(adapter, nullptr);
+
+    int32_t ret = adapter->DestroyRender(adapter, &devDesc);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: AUDIO_TEST:DestroyCapture failed\n", __func__);
+        free(devDesc.desc);
+        HDF_LOGE("%{public}s: AUDIO_TEST:DestroyRender failed\n", __func__);
         return HDF_FAILURE;
     }
-    renderRelease(render);
+    IAudioRenderRelease(render, IS_STUB);
     render = nullptr;
+    free(devDesc.desc);
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AUDIO_TEST:UnloadAdapter failed\n", __func__);
         return HDF_FAILURE;
     }
-    adapterRelease(adapter);
+    IAudioAdapterRelease(adapter, IS_STUB);
     adapter = nullptr;
     return HDF_SUCCESS;
 }
