@@ -38,7 +38,7 @@ private:
     void InitGfxSurface(ISurface &surface, HdiLayerBuffer &buffer);
     uint32_t CreateVideoLayerForHdiLayer(HdiLayer &hdiLayer);
     uint32_t GetVoLayerId(HdiLayer &hdiLayer);
-    void CLoseUnUsedLayer(std::vector<HdiLayer *> &layers);
+    void CLoseUnUsedLayer(const std::vector<HdiLayer *> &layers);
     std::unordered_map<uint32_t, uint32_t> layerMaps_;
     LayerFuncs *layerFuncs_ = nullptr;
     void *videoModule_ = nullptr;
