@@ -661,10 +661,6 @@ int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRend
         hwAdapter->adapterMgrRenderFlag--;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
-    if (hwRender == NULL) {
-        AUDIO_FUNC_LOGE("hwRenders is null!");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
     if (!(hwRender->renderParam.renderMode.ctlParam.stop)) {
         ret = render->control.Stop((AudioHandle)render);
         if (ret < 0) {
@@ -1010,10 +1006,6 @@ int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCap
         hwAdapter->adapterMgrCaptureFlag--;
     }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    if (hwCapture == NULL) {
-        AUDIO_FUNC_LOGE("hwCapture is null!");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
     if (hwCapture->captureParam.frameCaptureMode.buffer != NULL) {
         ret = capture->control.Stop((AudioHandle)capture);
         if (ret < 0) {
@@ -1095,7 +1087,7 @@ int32_t AudioAdapterSetPassthroughModeExec(struct AudioHwAdapter *hwAdapter, uin
         portCapabilityTemp++;
         portNum--;
     }
-    if (portCapability == NULL || portNum <= 0) {
+    if (portCapability == NULL || portNum == 0) {
         AUDIO_FUNC_LOGE("hwAdapter portCapabilitys is Not Find!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
