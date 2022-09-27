@@ -22,8 +22,8 @@
 using namespace std;
 using namespace OHOS;
 using OHOS::sptr;
+using OHOS::HDI::Base::NativeBuffer;
 using OHOS::HDI::Codec::V1_0::CodecCompCapability;
-using OHOS::HDI::Base::HdiBufferHandle;
 #define HDF_LOG_TAG     codec_omx_hdi_dec
 #define AV_COLOR_FORMAT OMX_COLOR_FormatYUV420SemiPlanar
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiDecode::gralloc_ = nullptr;
@@ -482,7 +482,7 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
             return err;
         }
         omxBuffer->fd = -1;
-        omxBuffer->bufferhandle = new HdiBufferHandle(*bufferHandle);
+        omxBuffer->bufferhandle = new NativeBuffer(bufferHandle);
         omxBuffer->allocLen = bufferSize;
         omxBuffer->fenceFd = -1;  // check use -1 first with no window
         omxBuffer->pts = 0;
@@ -490,6 +490,8 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
 
         OmxCodecBuffer outBuffer;
         auto err = client_->UseBuffer((uint32_t)PortIndex::PORT_INDEX_OUTPUT, *omxBuffer.get(), outBuffer);
+        omxBuffer->bufferhandle = nullptr;
+
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s failed to UseBuffer with  output port]", __func__);
             return err;

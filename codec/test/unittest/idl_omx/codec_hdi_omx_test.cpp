@@ -31,6 +31,7 @@
 using namespace std;
 using namespace testing::ext;
 using OHOS::sptr;
+using OHOS::HDI::Base::NativeBuffer;
 using OHOS::HDI::Codec::V1_0::CodecCallbackService;
 using OHOS::HDI::Codec::V1_0::CodecCompCapability;
 using OHOS::HDI::Codec::V1_0::CompVerInfo;
@@ -38,7 +39,6 @@ using OHOS::HDI::Codec::V1_0::ICodecCallback;
 using OHOS::HDI::Codec::V1_0::ICodecComponent;
 using OHOS::HDI::Codec::V1_0::ICodecComponentManager;
 using OHOS::HDI::Codec::V1_0::OmxCodecBuffer;
-using OHOS::HDI::Base::HdiBufferHandle;
 namespace {
     constexpr uint32_t WIDTH = 640;
     constexpr uint32_t HEIGHT = 480;
@@ -832,7 +832,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_008, TestSize.Level1)
     omxBuffer->size = sizeof(OmxCodecBuffer);
     omxBuffer->version = g_version;
     omxBuffer->bufferType = CODEC_BUFFER_TYPE_HANDLE;
-    omxBuffer->bufferhandle = new HdiBufferHandle(*bufferHandle);
+    omxBuffer->bufferhandle = new NativeBuffer(bufferHandle);
     omxBuffer->allocLen = handleSize;
     omxBuffer->fenceFd = FD_DEFAULT;
     omxBuffer->fd = FD_DEFAULT;
@@ -841,6 +841,8 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_008, TestSize.Level1)
 
     OmxCodecBuffer outBuffer;
     err = g_component->UseBuffer((uint32_t)PortIndex::PORT_INDEX_INPUT, *omxBuffer.get(), outBuffer);
+    omxBuffer->bufferhandle = nullptr;
+
     ASSERT_EQ(err, HDF_SUCCESS);
     omxBuffer->bufferId = outBuffer.bufferId;
 
@@ -888,8 +890,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_010, TestSize.Level1)
     omxBuffer->size = sizeof(OmxCodecBuffer);
     omxBuffer->version = g_version;
     omxBuffer->bufferType = CODEC_BUFFER_TYPE_DYNAMIC_HANDLE;
-
-    omxBuffer->bufferhandle = new HdiBufferHandle(*bufferHandle);
+    omxBuffer->bufferhandle = new NativeBuffer(bufferHandle);
     omxBuffer->allocLen = handleSize;
     omxBuffer->fenceFd = FD_DEFAULT;
     omxBuffer->fd = FD_DEFAULT;
@@ -898,6 +899,8 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_010, TestSize.Level1)
 
     OmxCodecBuffer outBuffer;
     err = g_component->UseBuffer((uint32_t)PortIndex::PORT_INDEX_OUTPUT, *omxBuffer.get(), outBuffer);
+    omxBuffer->bufferhandle = nullptr;
+
     ASSERT_EQ(err, HDF_SUCCESS);
     omxBuffer->bufferId = outBuffer.bufferId;
 
