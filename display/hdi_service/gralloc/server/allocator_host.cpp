@@ -41,7 +41,7 @@ int HdfAllocatorDriverInit(struct HdfDeviceObject *deviceObject)
 int HdfAllocatorDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HdfAllocatorService *allocatorService =
-        (HdfAllocatorService *)OsalMemAlloc(sizeof(HdfAllocatorService));
+        reinterpret_cast<HdfAllocatorService *>(OsalMemAlloc(sizeof(HdfAllocatorService)));
     if (allocatorService == nullptr) {
         HDF_LOGE("%{public}s: OsalMemAlloc failed", __func__);
         return HDF_FAILURE;
