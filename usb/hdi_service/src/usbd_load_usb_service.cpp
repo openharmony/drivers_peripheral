@@ -120,7 +120,7 @@ void UsbdLoadUsbService::UsbRemoveWorkEntry(int32_t sig)
             checkCount--;
             auto saObj = sm->CheckSystemAbility(USB_SYSTEM_ABILITY_ID);
             if (saObj == nullptr) {
-                OsalMSleep(SLEEP_DELAY);
+                OsalMDelay(SLEEP_DELAY);
                 continue;
             } else {
                 OnDemandLoadCallback::loading_ = false;
