@@ -423,7 +423,7 @@ int32_t AudioProxyAdapterDestroyRender(struct AudioAdapter *adapter, struct Audi
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
-    if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
+    if (hwRender->proxyRemoteHandle == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioProxyPreprocessRender((AudioHandle)render, &data, &reply) < 0) {
@@ -684,7 +684,7 @@ int32_t AudioProxyAdapterGetPortCapability(struct AudioAdapter *adapter,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL) {
+    if (hwAdapter->proxyRemoteHandle == NULL) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -782,7 +782,7 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL ||
+    if (hwAdapter->proxyRemoteHandle == NULL ||
         hwAdapter->adapterDescriptor.adapterName == NULL) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
@@ -851,7 +851,7 @@ int32_t AudioProxyAdapterGetPassthroughMode(struct AudioAdapter *adapter,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL) {
+    if (hwAdapter->proxyRemoteHandle == NULL) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
