@@ -24,6 +24,7 @@
 #include "ddk_pnp_listener_mgr.h"
 #include "hdf_slist.h"
 #include "osal_mutex.h"
+#include "parameter.h"
 #include "usb_ddk_interface.h"
 #include "usb_ddk_pnp_loader.h"
 #include "usb_interface_pool.h"
@@ -899,11 +900,13 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
 
 int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
 {
-    usbPnpListener_.callBack = UsbdPnpLoaderEventReceived;
-    usbPnpListener_.priv = (void *)(inst.GetRefPtr());
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
     if (DdkListenerMgrAdd(&listenerForLoadService_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
+        return HDF_FAILURE;
+    }
+    if (SetParameter(SYS_USBD_READY, SYS_USBD_ON) != 0) {
+        HDF_LOGE("%{public}s:set usbd read error", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -1635,7 +1638,7 @@ int32_t UsbImpl::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const s
     UsbdBulkASyncList *list = UsbdBulkASyncListInit(port, pipe.intfId, pipe.endpointId);
     if (list == nullptr) {
         HDF_LOGE("%{public}s:UsbdBulkASyncListFind failed", __func__);
-        return HDF_SUCCESS;
+        return HDF_ERR_INVALID_PARAM;
     }
     list->cb = cb;
     if (list->cb == nullptr) {
@@ -1657,7 +1660,7 @@ int32_t UsbImpl::UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
     UsbdBulkASyncList *list = UsbdBulkASyncListFind(port, pipe.intfId, pipe.endpointId);
     if (list == nullptr) {
         HDF_LOGE("%{public}s:UsbdBulkASyncListFind failed", __func__);
-        return HDF_SUCCESS;
+        return HDF_ERR_INVALID_PARAM;
     }
     list->cb = nullptr;
     return HDF_SUCCESS;
@@ -1754,6 +1757,8 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
 int32_t UsbImpl::BindUsbSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
     subscriber_ = subscriber;
+    usbPnpListener_.callBack = UsbdPnpLoaderEventReceived;
+    usbPnpListener_.priv = (void *)(this);
     if (DdkListenerMgrAdd(&usbPnpListener_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
         return HDF_FAILURE;
