@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_remote_adapter_if.h"
+#include <gtest/gtest.h>
 #include "hdi_service_common.h"
 #include "osal_mem.h"
 
@@ -31,35 +31,21 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
     static TestAudioManager *manager;
-    static TestAudioManagerRelease managerRelease;
-    static TestGetAudioManager getAudioManager;
-    static TestAudioAdapterRelease adapterRelease;
 };
 using THREAD_FUNC = void *(*)(void *);
-TestGetAudioManager AudioIdlHdiManagerPerformaceTest::getAudioManager = nullptr;
 TestAudioManager *AudioIdlHdiManagerPerformaceTest::manager = nullptr;
-void *AudioIdlHdiManagerPerformaceTest::handle = nullptr;
-TestAudioManagerRelease AudioIdlHdiManagerPerformaceTest::managerRelease = nullptr;
-TestAudioAdapterRelease AudioIdlHdiManagerPerformaceTest::adapterRelease = nullptr;
 
 void AudioIdlHdiManagerPerformaceTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    (void)HdfRemoteGetCallingPid();
-    manager = getAudioManager(IDL_SERVER_NAME.c_str());
+    manager = IAudioManagerGet(IS_STUB);
     ASSERT_NE(nullptr, manager);
 }
 
 void AudioIdlHdiManagerPerformaceTest::TearDownTestCase(void)
 {
-    if (managerRelease != nullptr && manager != nullptr) {
-        (void)managerRelease(manager);
-    }
-    if (handle != nullptr) {
-        (void)dlclose(handle);
+    if (manager != nullptr) {
+        (void)IAudioManagerRelease(manager, IS_STUB);
     }
 }
 
@@ -126,7 +112,7 @@ HWTEST_F(AudioIdlHdiManagerPerformaceTest, AudioManagerLoadAdapterPerformance_00
         audiopara.totalTime += audiopara.delayTime;
         ret = audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.desc->adapterName);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        adapterRelease(audiopara.adapter);
+        IAudioAdapterRelease(audiopara.adapter, IS_STUB);
         audiopara.adapter = nullptr;
     }
     TestReleaseAdapterDescs(&audiopara.descs, descsLen);
@@ -160,7 +146,7 @@ HWTEST_F(AudioIdlHdiManagerPerformaceTest, AudioManagerUnLoadAdapterPerformance_
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
-        adapterRelease(audiopara.adapter);
+        IAudioAdapterRelease(audiopara.adapter, IS_STUB);
         audiopara.adapter = nullptr;
         if (audiopara.audioPort.portName != nullptr) {
             free(audiopara.audioPort.portName);
