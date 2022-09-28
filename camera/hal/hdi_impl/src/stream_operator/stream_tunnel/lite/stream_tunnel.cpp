@@ -65,12 +65,14 @@ std::shared_ptr<IBuffer> StreamTunnel::GetBuffer()
             std::unique_lock<std::mutex> l(waitLock_);
             waitCV_.wait(l, [this] { return wakeup_ == true; });
         }
+        stats_.RequestBufferResult(sb);
     } while (!stop_ && sb == nullptr);
     wakeup_ = false;
 
     if (stop_) {
         if (sb != nullptr) {
-            bufferQueue_->CancelBuffer(sb);
+            int ret = bufferQueue_->CancelBuffer(sb);
+            stats_.CancelBufferResult(ret);
         }
         return nullptr;
     }
@@ -126,10 +128,12 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
             sb->SetInt32(OHOS::Camera::VIDEO_KEY_INFO_IS_KEY_FRAME, esInfo.isKey);
             sb->SetInt64(OHOS::Camera::VIDEO_KEY_INFO_TIMESTAMP, esInfo.timestamp);
         }
-        bufferQueue_->FlushBuffer(sb);
+        int ret = bufferQueue_->FlushBuffer(sb);
+        stats_.FlushBufferResult(ret);
         frameCount_++;
     } else {
-        bufferQueue_->CancelBuffer(sb);
+        int ret = bufferQueue_->CancelBuffer(sb);
+        stats_.CancelBufferResult(ret);
     }
 
     {
@@ -187,5 +191,16 @@ void StreamTunnel::WaitForAllBufferReturned()
         });
 
     return;
+}
+
+void StreamTunnel::DumpStats(int interval)
+{
+    stats_.DumpStats(interval);
+}
+
+void StreamTunnel::SetStreamId(int32_t streamId)
+{
+    streamId_ = streamId;
+    stats_.SetStreamId(streamId);
 }
 } // namespace OHOS::Camera

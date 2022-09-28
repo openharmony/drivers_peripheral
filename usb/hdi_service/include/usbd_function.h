@@ -24,6 +24,8 @@
 #define USB_FUNCTION_HDC  4
 #define USB_FUNCTION_RNDIS  32
 #define USB_FUNCTION_STORAGE  512
+#define USB_FUNCTION_SUPPORT \
+    (USB_FUNCTION_ACM | USB_FUNCTION_ECM | USB_FUNCTION_HDC | USB_FUNCTION_RNDIS | USB_FUNCTION_STORAGE)
 
 #define DEV_SERVICE_NAME "usbfn_master"
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
@@ -39,6 +41,8 @@
 #define HDC_CONFIG_STORAGE_HDC   "storage_hdc"
 #define HDC_CONFIGFS_OFF "0"
 #define HDC_CONFIGFS_ON  "1"
+#define SYS_USBD_READY   "sys.usbd.ready"
+#define SYS_USBD_ON      "1"
 
 #define FUNCTION_ADD 1
 #define FUNCTION_DEL 2

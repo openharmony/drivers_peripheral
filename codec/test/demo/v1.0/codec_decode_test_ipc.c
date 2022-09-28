@@ -494,6 +494,14 @@ static int32_t OpenFile(void)
         RevertDecodeStep1();
         return HDF_FAILURE;
     }
+
+    g_readFileBuf = (uint8_t *)OsalMemAlloc(g_cmd.width * g_cmd.height * FRAME_SIZE_OPERATOR);
+    if (g_readFileBuf == NULL) {
+        HDF_LOGE("%{public}s: g_readFileBuf malloc failed", __func__);
+        RevertDecodeStep3();
+        return HDF_FAILURE;
+    }
+
     return HDF_SUCCESS;
 }
 
@@ -549,12 +557,6 @@ static int32_t Decode(void)
     if (!InitBuffer(PACKET_BUFFER_NUM, g_cmd.width * g_cmd.height * FRAME_SIZE_OPERATOR, FRAME_BUFFER_NUM,
         g_cmd.width * g_cmd.height * FRAME_SIZE_OPERATOR)) {
         HDF_LOGE("%{public}s: InitBuffer failed", __func__);
-        RevertDecodeStep3();
-        return HDF_FAILURE;
-    }
-    g_readFileBuf = (uint8_t *)OsalMemAlloc(g_cmd.width * g_cmd.height * FRAME_SIZE_OPERATOR);
-    if (g_readFileBuf == NULL) {
-        HDF_LOGE("%{public}s: g_readFileBuf malloc failed", __func__);
         RevertDecodeStep3();
         return HDF_FAILURE;
     }

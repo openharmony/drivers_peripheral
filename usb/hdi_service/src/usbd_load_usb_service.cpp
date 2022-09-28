@@ -120,7 +120,7 @@ void UsbdLoadUsbService::UsbRemoveWorkEntry(int32_t sig)
             checkCount--;
             auto saObj = sm->CheckSystemAbility(USB_SYSTEM_ABILITY_ID);
             if (saObj == nullptr) {
-                OsalMSleep(SLEEP_DELAY);
+                OsalMDelay(SLEEP_DELAY);
                 continue;
             } else {
                 OnDemandLoadCallback::loading_ = false;
@@ -141,6 +141,16 @@ int32_t UsbdLoadUsbService::LoadUsbService()
     if (GetUsbLoadRemoveCount() == 0 && alarmRunning_ == false) {
         if (StartThreadUsbLoad() != HDF_SUCCESS) {
             HDF_LOGE("%s: usb load create thread failed", __func__);
+        }
+    } else {
+        sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (sm == nullptr) {
+            HDF_LOGE("GetSystemAbilityManager samgr object null");
+            return HDF_FAILURE;
+        }
+        auto saObj = sm->CheckSystemAbility(USB_SYSTEM_ABILITY_ID);
+        if (saObj == nullptr) {
+            StartThreadUsbLoad();
         }
     }
     IncreaseUsbLoadRemoveCount();

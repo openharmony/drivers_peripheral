@@ -402,8 +402,8 @@ static int32_t CodecProxySetParameter(struct ICodec *self, CODEC_HANDLETYPE hand
     int32_t ret;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (self == NULL || params == NULL || paramCnt < 0) {
-        HDF_LOGE("%{public}s: params null!", __func__);
+    if (self == NULL || params == NULL || paramCnt < 0 || paramCnt > PARAM_COUNT_MAX) {
+        HDF_LOGE("%{public}s: param is invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {
@@ -446,8 +446,8 @@ static int32_t CodecProxyGetParameter(struct ICodec *self, CODEC_HANDLETYPE hand
     int32_t ret;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (self == NULL || params == NULL) {
-        HDF_LOGE("%{public}s: params null!", __func__);
+    if (self == NULL || params == NULL || paramCnt < 0 || paramCnt > PARAM_COUNT_MAX) {
+        HDF_LOGE("%{public}s: param is invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (CodecProxyReqSBuf(&data, &reply) != HDF_SUCCESS) {

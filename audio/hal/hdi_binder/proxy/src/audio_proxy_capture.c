@@ -158,7 +158,7 @@ int32_t AudioProxyCaptureSetSampleAttributes(const AudioHandle handle, const str
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
-    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+    if (hwCapture->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("hwCapture or hwCapture->proxyRemoteHandle is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -589,7 +589,7 @@ int32_t AudioProxyCaptureSetExtraParams(const AudioHandle handle, const char *ke
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
-    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+    if (hwCapture->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("hwCapture or hwCapture->proxyRemoteHandle is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -617,7 +617,7 @@ int32_t AudioProxyCaptureGetExtraParams(const AudioHandle handle, char *keyValue
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
-    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+    if (hwCapture->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("The parameter is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -664,7 +664,7 @@ int32_t AudioProxyCaptureReqMmapBuffer(const AudioHandle handle,
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
-    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+    if (hwCapture->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("hwCapture parameter is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -700,7 +700,7 @@ int32_t AudioProxyCaptureGetMmapPosition(const AudioHandle handle, uint64_t *fra
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
-    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+    if (hwCapture->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("The parameter is empty");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -739,7 +739,7 @@ int32_t AudioProxyCaptureAddEffect(AudioHandle handle, uint64_t effectid)
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     hwCapture = (struct AudioHwCapture *)handle;
-    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+    if (hwCapture->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("The pointer is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -776,7 +776,7 @@ int32_t AudioProxyCaptureRemoveEffect(AudioHandle handle, uint64_t effectid)
     struct HdfSBuf *reply = NULL;
     struct HdfSBuf *data = NULL;
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
-    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+    if (hwCapture->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("The pointer is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -811,7 +811,7 @@ int32_t AudioProxyCaptureTurnStandbyMode(const AudioHandle handle)
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
-    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+    if (hwCapture->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("The hwCapture parameter is empty");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -843,7 +843,7 @@ int32_t AudioProxyCaptureAudioDevDump(const AudioHandle handle, int32_t range, i
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)handle;
-    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+    if (hwCapture->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("hwCapture parameter is empty");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }

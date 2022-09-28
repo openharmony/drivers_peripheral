@@ -44,7 +44,13 @@
 
 namespace OHOS {
 namespace Camera {
-#define HDF_LOG_TAG camera_host
+    
+#ifdef HDF_LOG_TAG
+#undef HDF_LOG_TAG
+#endif
+
+#define HDF_LOG_TAG camera_service_test
+
 #define FILENAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 
 #ifndef OHOS_DEBUG
@@ -164,7 +170,7 @@ enum AwbMode : uint32_t {
     AWB_MODE_WARM_FLUORESCENT,
 };
 
-using EsFrameInfo = struct EsFrameInfo {
+using EsFrameInfo = struct {
     int32_t size;
     int32_t align;
     int32_t isKey;

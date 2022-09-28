@@ -16,5 +16,3 @@ distributedcamera_hdf_path = "//drivers/peripheral/distributed_camera"
 camera_hdf_path = "//drivers/peripheral"
 
 hdf_framework_path = "//drivers/hdf_core/framework"
-
-display_hdf_path = "//drivers/peripheral/display"

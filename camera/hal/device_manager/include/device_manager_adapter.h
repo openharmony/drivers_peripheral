@@ -64,13 +64,12 @@ enum CameraId : int32_t {
     CAMERA_MAX
 };
 
-struct HardwareConfiguration {
+using HardwareConfiguration = struct HardwareConfiguration_t {
     CameraId cameraId;
     ManagerId managerId;
     ControllerId controllerId;
     std::string hardwareName;
 };
-using HardwareConfiguration = struct HardwareConfiguration;
 
 struct camera_metadata_rational {
     int32_t numerator;

@@ -89,10 +89,10 @@ RetCode ViController::StartVi()
 RetCode ViController::StopVi()
 {
     CAMERA_LOGI("%{public}s Vi StopVi", __FUNCTION__);
-    std::lock_guard<std::mutex> l(startVilock_);
+    std::lock_guard<std::mutex> vistateLock(startVilock_);
     RetCode rc = RC_OK;
     if (startViState_ == true) {
-        std::lock_guard<std::mutex> l(metaDataSetlock_);
+        std::lock_guard<std::mutex> metaDataLock(metaDataSetlock_);
         std::vector<int32_t>().swap(abilityMetaData_);
         viObject_->StopVi();
         startViState_ = false;
@@ -209,7 +209,7 @@ RetCode ViController::GetAEMetaData(std::shared_ptr<CameraMetadata> meta)
     static int64_t oldExpoTime = 0;
     int64_t expoTime = 0;
     RetCode rc = RC_ERROR;
-    std::lock_guard<std::mutex> l(metaDataSetlock_);
+    std::lock_guard<std::mutex> metaDataLock(metaDataSetlock_);
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
         switch (*iter) {
             case OHOS_SENSOR_EXPOSURE_TIME: {
@@ -219,7 +219,7 @@ RetCode ViController::GetAEMetaData(std::shared_ptr<CameraMetadata> meta)
                     return rc;
                 }
                 if (oldExpoTime != expoTime) {
-                    std::lock_guard<std::mutex> l(metaDataFlaglock_);
+                    std::lock_guard<std::mutex> flagLock(metaDataFlaglock_);
                     metaDataFlag_ = true;
                     oldExpoTime = expoTime;
                 }

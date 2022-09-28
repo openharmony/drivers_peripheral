@@ -11,6 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+declare_args() {
+  drivers_peripheral_input_feature_model = false
+}
+
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
@@ -28,11 +32,16 @@ if (defined(ohos_lite)) {
     features = []
   }
 } else {
+  import("//build/ohos.gni")
+
   group("hdf_test_input") {
-    testonly = true
-    deps = [
-      "fuzztest:hdf_input_fuzztest",
-      "unittest:hdf_unittest_input",
-    ]
+    deps = []
+    if (drivers_peripheral_input_feature_model) {
+      testonly = true
+      deps = [
+        "fuzztest/input_fuzzer:hdf_fuzztest_input",
+        "unittest:hdf_unittest_input",
+      ]
+    }
   }
 }

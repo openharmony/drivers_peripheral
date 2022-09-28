@@ -99,6 +99,7 @@ public:
     bool ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount);
 
 private:
+    uint32_t GetInputBufferSize();
     int32_t OnEmptyBufferDone(const struct OmxCodecBuffer &buffer);
     int32_t OnFillBufferDone(const struct OmxCodecBuffer &buffer);
     int32_t ConfigBitMode();
@@ -137,6 +138,8 @@ private:
     bool useBufferHandle_;
     static constexpr uint32_t alignment_ = 16;
     static OHOS::HDI::Display::V1_0::IDisplayGralloc *gralloc_;
+    ColorFormat color_;
+    OMX_COLOR_FORMATTYPE omxColorFormat_;
 };
 
 #endif  // CODEC_HDI_ENCODE_H

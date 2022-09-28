@@ -46,7 +46,7 @@ DCamRetCode DCameraStream::InitDCameraStream(const StreamInfo &info)
     dcStreamAttribute_.height_ = dcStreamInfo_->height_;
     dcStreamAttribute_.overrideFormat_ = dcStreamInfo_->format_;
     dcStreamAttribute_.overrideDataspace_ = dcStreamInfo_->dataspace_;
-    dcStreamAttribute_.producerUsage_ = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA;
+    dcStreamAttribute_.producerUsage_ = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA;
 
     dcStreamAttribute_.producerBufferCount_ = BUFFER_QUEUE_SIZE;
     dcStreamAttribute_.maxBatchCaptureCount_ = BUFFER_QUEUE_SIZE;
@@ -54,7 +54,7 @@ DCamRetCode DCameraStream::InitDCameraStream(const StreamInfo &info)
 
     DCamRetCode ret = DCamRetCode::SUCCESS;
     if (dcStreamInfo_->bufferQueue_ != nullptr) {
-        DCamRetCode ret = InitDCameraBufferManager();
+        ret = InitDCameraBufferManager();
         if (ret != DCamRetCode::SUCCESS) {
             DHLOGE("Cannot init buffer manager.");
         }
@@ -185,7 +185,7 @@ DCamRetCode DCameraStream::GetNextRequest()
 
     OHOS::sptr<OHOS::SurfaceBuffer> surfaceBuffer = nullptr;
     int32_t fence = -1;
-    int32_t usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA;
+    int32_t usage = BUFFER_USAGE_CPU_READ | BUFFER_USAGE_CPU_WRITE | BUFFER_USAGE_MEM_DMA;
     OHOS::BufferRequestConfig config = {
         .width = dcStreamInfo_->width_,
         .height = dcStreamInfo_->height_,

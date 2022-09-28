@@ -617,8 +617,9 @@ int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct Aud
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter)
+int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc)
 {
+    (void)desc;
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL) {
@@ -951,8 +952,9 @@ int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct Au
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter)
+int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc)
 {
+    (void)desc;
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL) {

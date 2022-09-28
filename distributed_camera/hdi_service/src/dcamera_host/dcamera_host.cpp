@@ -18,6 +18,7 @@
 #include "anonymous_string.h"
 #include "distributed_hardware_log.h"
 #include "metadata_utils.h"
+#include "dcamera.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -44,7 +45,7 @@ OHOS::sptr<DCameraHost> DCameraHost::GetInstance()
 int32_t DCameraHost::SetCallback(const sptr<ICameraHostCallback> &callbackObj)
 {
     if (callbackObj == nullptr) {
-        DHLOGE("DCameraHost::SetCallback, camera host callback is null.");
+        DHLOGE("DCameraHost::SetCallback, input camera host callback is null.");
         return CamRetCode::INVALID_ARGUMENT;
     }
     dCameraHostCallback_ = callbackObj;
@@ -65,12 +66,12 @@ int32_t DCameraHost::GetCameraIds(std::vector<std::string> &cameraIds)
 
 int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<uint8_t> &cameraAbility)
 {
-    DHLOGE("DCameraHost::GetCameraAbility for cameraId: %s", GetAnonyString(cameraId).c_str());
-
     if (IsCameraIdInvalid(cameraId)) {
-        DHLOGE("DCameraHost::GetCameraAbility, invalid camera id.");
+        DHLOGE("DCameraHost::GetCameraAbility, input cameraId is invalid.");
         return CamRetCode::INVALID_ARGUMENT;
     }
+
+    DHLOGE("DCameraHost::GetCameraAbility for cameraId: %s", GetAnonyString(cameraId).c_str());
 
     auto iter = dCameraDeviceMap_.find(cameraId);
     std::shared_ptr<CameraAbility> ability = nullptr;
@@ -90,7 +91,7 @@ int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<u
         constexpr uint32_t WIDTH_OFFSET = 1;
         constexpr uint32_t HEIGHT_OFFSET = 2;
         constexpr uint32_t UNIT_LENGTH = 3;
-        int32_t ret = OHOS::Camera::FindCameraMetadataItem(ability->get(),
+        ret = OHOS::Camera::FindCameraMetadataItem(ability->get(),
             OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &item);
         DHLOGI("FindCameraMetadataItem item=%u, count=%u, dataType=%u", item.item, item.count, item.data_type);
         if (ret != CAM_META_SUCCESS) {
@@ -114,12 +115,12 @@ int32_t DCameraHost::GetCameraAbility(const std::string &cameraId, std::vector<u
 int32_t DCameraHost::OpenCamera(const std::string &cameraId, const sptr<ICameraDeviceCallback> &callbackObj,
     sptr<ICameraDevice> &device)
 {
-    DHLOGI("DCameraHost::OpenCamera for cameraId: %s", GetAnonyString(cameraId).c_str());
-
     if (IsCameraIdInvalid(cameraId) || callbackObj == nullptr) {
-        DHLOGE("DCameraHost::OpenCamera, open camera id is empty or callback is null.");
+        DHLOGE("DCameraHost::OpenCamera, open camera id is invalid or camera device callback is null.");
         return CamRetCode::INVALID_ARGUMENT;
     }
+
+    DHLOGI("DCameraHost::OpenCamera for cameraId: %s", GetAnonyString(cameraId).c_str());
 
     auto iter = dCameraDeviceMap_.find(cameraId);
     if (iter == dCameraDeviceMap_.end()) {
@@ -161,8 +162,17 @@ int32_t DCameraHost::SetFlashlight(const std::string &cameraId, bool isEnable)
 DCamRetCode DCameraHost::AddDCameraDevice(const DHBase &dhBase, const std::string &abilityInfo,
     const sptr<IDCameraProviderCallback> &callback)
 {
+    if (IsDhBaseInfoInvalid(dhBase)) {
+        DHLOGE("DCameraHost::AddDCameraDevice, devId or dhId is invalid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     DHLOGI("DCameraHost::AddDCameraDevice for {devId: %s, dhId: %s}",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
+
+    if (abilityInfo.empty() || abilityInfo.length() > ABILITYINFO_MAX_LENGTH) {
+        DHLOGE("DCameraHost::AddDCameraDevice, input abilityInfo is invalid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
 
     OHOS::sptr<DCameraDevice> dcameraDevice = new (std::nothrow) DCameraDevice(dhBase, abilityInfo);
     if (dcameraDevice == nullptr) {
@@ -219,7 +229,7 @@ DCamRetCode DCameraHost::RemoveDCameraDevice(const DHBase &dhBase)
 
 bool DCameraHost::IsCameraIdInvalid(const std::string &cameraId)
 {
-    if (cameraId.empty()) {
+    if (cameraId.empty() || cameraId.length() > ID_MAX_SIZE) {
         return true;
     }
 

@@ -743,7 +743,7 @@ int32_t main(int32_t argc, char **argv)
     HDF_LOGI("%{public}s: ParseArguments input:%{public}s", __func__, g_cmd.fileInput);
     HDF_LOGI("%{public}s: ParseArguments output:%{public}s", __func__, g_cmd.fileOutput);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: ParseArguments failed");
+        HDF_LOGE("%{public}s: ParseArguments failed", __func__);
         return ret;
     }
 

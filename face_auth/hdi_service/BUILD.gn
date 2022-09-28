@@ -18,15 +18,19 @@ ohos_shared_library("libface_auth_interface_service_1.0") {
   include_dirs = [
     "include",
     "//base/useriam/user_auth_framework/common/logs",
+    "//base/useriam/user_auth_framework/common/utils",
   ]
   sources = [
     "src/executor_impl.cpp",
     "src/face_auth_interface_service.cpp",
   ]
 
+  deps = [ "//drivers/hdf_core/adapter/uhdf2/model/camera/sequenceable/buffer_producer:libbuffer_producer_sequenceable_1.0" ]
+
   external_deps = [
     "c_utils:utils",
     "drivers_interface_face_auth:face_auth_idl_headers",
+    "graphic_standard:surface",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
   ]

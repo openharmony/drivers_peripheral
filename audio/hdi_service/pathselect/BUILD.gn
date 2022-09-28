@@ -27,6 +27,7 @@ ohos_shared_library("hdi_idl_audio_path_select") {
     "//drivers/peripheral/audio/hdi_service/pathselect/include",
     "//third_party/cJSON",
     "//third_party/bounds_checking_function/include",
+    "//drivers/hdf_core/adapter/uhdf2/shared/include",
   ]
 
   public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
@@ -39,7 +40,6 @@ ohos_shared_library("hdi_idl_audio_path_select") {
     external_deps = [
       "c_utils:utils",
       "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {

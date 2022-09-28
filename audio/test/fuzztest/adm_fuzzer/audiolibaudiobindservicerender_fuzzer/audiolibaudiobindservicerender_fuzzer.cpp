@@ -29,7 +29,8 @@ namespace Audio {
             HDF_LOGE("%{public}s: dlopen failed \n", __func__);
             return false;
         }
-        BindServiceRender = (struct DevHandle *(*)(const char *))dlsym(ptrHandle, "AudioBindServiceRender");
+        BindServiceRender = reinterpret_cast<struct DevHandle *(*)(const char *)>(dlsym(ptrHandle,
+            "AudioBindServiceRender"));
         if (BindServiceRender == nullptr) {
             dlclose(ptrHandle);
             HDF_LOGE("%{public}s: dlsym AudioBindServiceRender failed \n", __func__);

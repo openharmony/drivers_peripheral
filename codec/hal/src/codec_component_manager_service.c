@@ -148,10 +148,12 @@ static int32_t OmxManagerDestroyComponent(uint32_t componentId)
 
 static void CodecComponentManagerServiceConstruct(struct CodecComponentManager *manager)
 {
-    manager->GetComponentNum = OmxManagerGetComponentNum;
-    manager->GetComponentCapabilityList = OmxManagerGetComponentCapabilityList;
-    manager->CreateComponent = OmxManagerCreateComponent;
-    manager->DestroyComponent = OmxManagerDestroyComponent;
+    if (manager != NULL) {
+        manager->GetComponentNum = OmxManagerGetComponentNum;
+        manager->GetComponentCapabilityList = OmxManagerGetComponentCapabilityList;
+        manager->CreateComponent = OmxManagerCreateComponent;
+        manager->DestroyComponent = OmxManagerDestroyComponent;
+    }
 }
 
 struct CodecComponentManagerSerivce *CodecComponentManagerSerivceGet(void)

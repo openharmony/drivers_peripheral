@@ -32,12 +32,14 @@ ohos_fuzztest("FaceAuthHdiFuzzTest") {
 
   deps = [
     "//base/useriam/user_auth_framework/common:iam_test",
+    "//drivers/hdf_core/adapter/uhdf2/model/camera/sequenceable/buffer_producer:libbuffer_producer_sequenceable_1.0",
     "//drivers/peripheral/face_auth/hdi_service:libface_auth_interface_service_1.0",
   ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_face_auth:face_auth_idl_headers",
+    "graphic_standard:surface",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]

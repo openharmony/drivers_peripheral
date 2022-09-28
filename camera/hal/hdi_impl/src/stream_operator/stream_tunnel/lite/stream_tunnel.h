@@ -22,6 +22,7 @@
 #include "ibuffer.h"
 #include "surface.h"
 #include "surface_type.h"
+#include "stream_statistics.h"
 
 namespace OHOS::Camera {
 struct TunnelConfig {
@@ -44,6 +45,8 @@ public:
     virtual void NotifyStart();
     virtual void NotifyStop();
     virtual void CleanBuffers();
+    void DumpStats(int interval = 0);
+    void SetStreamId(int32_t streamId);
 
     StreamTunnel() = default;
     virtual ~StreamTunnel();
@@ -65,6 +68,8 @@ protected:
     std::atomic<uint32_t> restBuffers = 0;
     std::mutex finishLock_;
     std::condition_variable finishCV_;
+    StreamStatistics stats_;
+    int32_t streamId_;
 };
 } // namespace OHOS::Camera
 #endif

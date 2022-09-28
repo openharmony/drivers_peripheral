@@ -18,7 +18,7 @@ namespace OHOS::Camera {
 class HostStreamMgrImpl : public HostStreamMgr {
 public:
     RetCode CreateHostStream(const HostStreamInfo& info, BufferCb c) override;
-    RetCode DestroyHostStream(const std::vector<int>& types) override;
+    RetCode DestroyHostStream(const std::vector<int>& streamIds) override;
     void GetStreamTypes(std::vector<int32_t>& s) const override;
     HostStreamInfo GetStreamInfo(const int32_t& id) const override;
     BufferCb GetBufferCb(const int32_t& type) const override;
@@ -69,9 +69,8 @@ RetCode HostStreamMgrImpl::DestroyHostStream(const std::vector<int>& streamIds)
 
 void HostStreamMgrImpl::GetStreamTypes(std::vector<int32_t>& s) const
 {
-    for (const auto& it : streams_) {
-        s.push_back(static_cast<std::underlying_type<StreamIntent>::type>(it->GetStreamType()));
-    }
+    std::transform(streams_.begin(), streams_.end(), std::back_inserter(s),
+        [](auto &iter) { return static_cast<std::underlying_type<StreamIntent>::type>(iter->GetStreamType()); });
     std::sort(s.begin(), s.end(), [](const int32_t& f, const int32_t& n) {
                     return f < n;
                 });
@@ -79,17 +78,16 @@ void HostStreamMgrImpl::GetStreamTypes(std::vector<int32_t>& s) const
 
 void HostStreamMgrImpl::GetStreamIds(std::vector<int32_t>& s) const
 {
-    for (auto& it : streams_) {
-        s.emplace_back(it->GetStreamId());
-    }
+    std::transform(streams_.begin(), streams_.end(), std::back_inserter(s),
+        [](auto &it) { return it->GetStreamId(); });
 }
 
 HostStreamInfo HostStreamMgrImpl::GetStreamInfo(const int32_t& id) const
 {
-    for (auto& it : streams_) {
-        if (it->GetStreamId() == id) {
-            return it->GetStreamInfo();
-        }
+    auto it = std::find_if(streams_.begin(), streams_.end(),
+        [id](const std::unique_ptr<HostStream>& s) { return s->GetStreamId() == id; });
+    if (it != streams_.end()) {
+        return (*it)->GetStreamInfo();
     }
     return {};
 }

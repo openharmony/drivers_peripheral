@@ -60,6 +60,9 @@ static struct Bh1745DrvData *Bh1745GetDrvData(void)
 static int32_t DynamicRangCovert(struct SensorCfgData *CfgData, uint32_t *rgbcData)
 {
     uint8_t timeItemNum;
+    uint8_t regValue;
+    int32_t ret;
+    uint32_t temp;
     struct SensorRegCfgGroupNode *timeGroupNode = NULL;
     int32_t index = EXTENDED_ALS_TIME_GROUP_INDEX_0;
 
@@ -70,14 +73,14 @@ static int32_t DynamicRangCovert(struct SensorCfgData *CfgData, uint32_t *rgbcDa
         return HDF_FAILURE;
     }
 
-    int32_t ret = ReadSensorRegCfgArray(&CfgData->busCfg, timeGroupNode, index, &regValue, sizeof(regValue));
+    ret = ReadSensorRegCfgArray(&CfgData->busCfg, timeGroupNode, index, &regValue, sizeof(regValue));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: Failed to read sensor register array ", __func__);
         return HDF_FAILURE;
     }
 
-    uint8_t regValue &= timeGroupNode->regCfgItem->mask;
-    uint32_t temp = GetTimeByRegValue(regValue, g_timeMap, timeItemNum);
+    regValue &= timeGroupNode->regCfgItem->mask;
+    temp = GetTimeByRegValue(regValue, g_timeMap, timeItemNum);
     index = GetRegGroupIndexByTime(temp, g_timeMap, timeItemNum);
     if (index < 0) {
         HDF_LOGE("%s: Index out of range ", __func__);

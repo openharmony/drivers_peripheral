@@ -15,6 +15,7 @@
 
 #include "dcamera.h"
 #include <chrono>
+#include "constants.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -52,29 +53,6 @@ CamRetCode MapToExternalRetCode(DCamRetCode retCode)
             break;
     }
     return CamRetCode::DEVICE_ERROR;
-}
-
-DCamRetCode MapToInternalRetCode(CamRetCode retCode)
-{
-    switch (retCode) {
-        case CamRetCode::NO_ERROR:
-            return DCamRetCode::SUCCESS;
-        case CamRetCode::CAMERA_BUSY:
-            return DCamRetCode::CAMERA_BUSY;
-        case CamRetCode::INSUFFICIENT_RESOURCES:
-            return DCamRetCode::EXCEED_MAX_NUMBER;
-        case CamRetCode::INVALID_ARGUMENT:
-            return DCamRetCode::INVALID_ARGUMENT;
-        case CamRetCode::METHOD_NOT_SUPPORTED:
-            return DCamRetCode::METHOD_NOT_SUPPORTED;
-        case CamRetCode::CAMERA_CLOSED:
-            return DCamRetCode::CAMERA_OFFLINE;
-        case CamRetCode::DEVICE_ERROR:
-            return DCamRetCode::FAILED;
-        default:
-            break;
-    }
-    return DCamRetCode::FAILED;
 }
 
 uint64_t GetCurrentLocalTimeStamp()
@@ -194,6 +172,12 @@ std::string Base64Decode(const std::string& basicString)
 bool IsBase64(unsigned char c)
 {
     return (isalnum(c) || (c == '+') || (c == '/'));
+}
+
+bool IsDhBaseInfoInvalid(const DHBase& dhBase)
+{
+    return dhBase.deviceId_.empty() || (dhBase.deviceId_.length() > DEVID_MAX_LENGTH) ||
+        dhBase.dhId_.empty() || (dhBase.dhId_.length() > DHID_MAX_LENGTH);
 }
 } // namespace DistributedHardware
 } // namespace OHOS

@@ -288,7 +288,7 @@ RetCode SensorController::GetAEMetaData(std::shared_ptr<CameraMetadata> meta)
     static int64_t oldExpoTime = 0;
     int64_t expoTime = 0;
     RetCode rc = RC_ERROR;
-    std::lock_guard<std::mutex> l(metaDataSetlock_);
+    std::lock_guard<std::mutex> metaDataLock(metaDataSetlock_);
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
         switch (*iter) {
             case OHOS_SENSOR_EXPOSURE_TIME: {
@@ -299,7 +299,7 @@ RetCode SensorController::GetAEMetaData(std::shared_ptr<CameraMetadata> meta)
                     return rc;
                 }
                 if (oldExpoTime != expoTime) {
-                    std::lock_guard<std::mutex> l(metaDataFlaglock_);
+                    std::lock_guard<std::mutex> flagLock(metaDataFlaglock_);
                     metaDataFlag_ = true;
                     oldExpoTime = expoTime;
                 }
@@ -319,7 +319,7 @@ RetCode SensorController::GetAWBMetaData(std::shared_ptr<CameraMetadata> meta)
     float colorGains[4] = {0};
     int value = 0;
     RetCode rc = RC_ERROR;
-    std::lock_guard<std::mutex> l(metaDataSetlock_);
+    std::lock_guard<std::mutex> metaDataLock(metaDataSetlock_);
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
         switch (*iter) {
             case OHOS_SENSOR_COLOR_CORRECTION_GAINS: {
@@ -331,7 +331,7 @@ RetCode SensorController::GetAWBMetaData(std::shared_ptr<CameraMetadata> meta)
                 colorGains[0] = (float)value;
                 int gainsSize = 4;
                 if (!CheckNumequal(oldColorGains, colorGains, gainsSize)) {
-                    std::lock_guard<std::mutex> l(metaDataFlaglock_);
+                    std::lock_guard<std::mutex> flagLock(metaDataFlaglock_);
                     metaDataFlag_ = true;
                     (void)memcpy_s(oldColorGains, sizeof(oldColorGains) / sizeof(float), colorGains,
                         gainsSize * sizeof(float));

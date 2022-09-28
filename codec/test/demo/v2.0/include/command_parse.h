@@ -17,7 +17,7 @@
 #include <cinttypes>
 #include <string>
 enum class codecMime { AVC, HEVC };
-
+enum class ColorFormat { YUV420SP = 0, RGBA8888, BGRA8888 };
 using CommandOpt = struct CommandOpt {
     std::string fileInput = "";
     std::string fileOutput = "";
@@ -25,6 +25,7 @@ using CommandOpt = struct CommandOpt {
     uint32_t height = 0;
     bool useBuffer = false;
     codecMime codec = codecMime::AVC;
+    ColorFormat colorForamt = ColorFormat::YUV420SP;
 };
 
 class CommandParse {

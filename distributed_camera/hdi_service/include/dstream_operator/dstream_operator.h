@@ -116,6 +116,11 @@ private:
     void AddStreamCaptureBufferNum(const pair<int, int>& streamPair);
     void EraseStreamCaptureBufferNum(const pair<int, int>& streamPair);
 
+    bool IsStreamInfosInvalid(const std::vector<StreamInfo> &infos);
+    bool IsCaptureInfoInvalid(const CaptureInfo &info);
+
+    int32_t DoCapture(int32_t captureId, const CaptureInfo &info, bool isStreaming);
+
 private:
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor_;
     OHOS::sptr<IStreamOperatorCallback> dcStreamOperatorCallback_;

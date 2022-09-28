@@ -39,7 +39,6 @@ if (defined(ohos_lite)) {
       external_deps = [
         "c_utils:utils",
         "drivers_interface_vibrator:vibrator_idl_headers",
-        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_single",
       ]
@@ -67,8 +66,6 @@ if (defined(ohos_lite)) {
     deps = [
       "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
       "//drivers/interface/vibrator/v1_1:libvibrator_stub_1.1",
-      "//drivers/peripheral/vibrator/hal:hdi_vibrator",
-      "//drivers/peripheral/vibrator/hdi_service:libvibrator_interface_service_1.1",
     ]
 
     cflags = [
@@ -83,7 +80,6 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
-        "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_single",
