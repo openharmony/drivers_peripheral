@@ -26,7 +26,7 @@ namespace DistributedHardware {
 DStreamOperator::DStreamOperator(std::shared_ptr<DMetadataProcessor> &dMetadataProcessor)
     : dMetadataProcessor_(dMetadataProcessor)
 {
-    DHLOGI("DStreamOperator::ctor, instance = %p", this);
+    DHLOGI("DStreamOperator construct");
 }
 
 int32_t DStreamOperator::IsStreamsSupported(OperationMode mode, const std::vector<uint8_t> &modeSetting,
