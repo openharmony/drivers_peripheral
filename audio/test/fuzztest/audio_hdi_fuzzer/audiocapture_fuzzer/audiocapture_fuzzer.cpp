@@ -59,10 +59,10 @@ void CaptureFucSwitch(struct IAudioCapture *&capture, uint32_t cmd, const uint8_
             capture->SelectScene(capture, reinterpret_cast<const struct AudioSceneDescriptor *>(rawData));
             break;
         case AUDIO_CAPTURE_SET_VOLUME:
-            capture->SetVolume(capture, *(float *)rawData);
+            capture->SetVolume(capture, *(reinterpret_cast<float *>(*rawData));
             break;
         case AUDIO_CAPTURE_SET_GAIN:
-            capture->SetGain(capture, *(float *)rawData);
+            capture->SetGain(capture, *(reinterpret_cast<float *>(*rawData));
             break;
         case AUDIO_CAPTURE_CAPTURE_FRAME: {
             uint32_t replyBytes = 0;
