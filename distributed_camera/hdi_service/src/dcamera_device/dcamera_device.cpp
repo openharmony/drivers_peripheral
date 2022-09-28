@@ -36,7 +36,7 @@ DCameraDevice::DCameraDevice(const DHBase &dhBase, const std::string &abilityInf
       dCameraStreamOperator_(nullptr),
       dMetadataProcessor_(nullptr)
 {
-    DHLOGI("DCameraDevice::ctor, instance = %p.", this);
+    DHLOGI("DCameraDevice construct");
     Init(abilityInfo);
 }
 
