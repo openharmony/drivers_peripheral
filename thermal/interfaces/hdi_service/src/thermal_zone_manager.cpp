@@ -199,11 +199,23 @@ int32_t ThermalZoneManager::ParseThermalZoneInfo()
     return UpdateThermalZoneData(tzPathMap);
 }
 
+void ThermalZoneManager::UpdateDataType(XMLThermalZoneInfo& tzIter, ReportedThermalData& data)
+{
+    if (tzIter.isReplace) {
+        data.type = tzIter.isReplace;
+    } else {
+        data.type = tzIter.type;
+    }
+}
+
 int32_t ThermalZoneManager::UpdateThermalZoneData(std::map<std::string, std::string> &tzPathMap)
 {
+    int32_t reportTime = 1;
+    std::vector<int32_t> multipleList;
     for (auto sensorIter : sensorTypeMap_) {
         auto tzInfoList = sensorIter.second->GetXMLThermalZoneInfo();
         auto tnInfoList = sensorIter.second->GetXMLThermalNodeInfo();
+        sensorIter.second->thermalDataList_.clear();
         for (auto tzIter : tzInfoList) {
             if (tzPathMap.empty()) {
                 break;
@@ -211,11 +223,7 @@ int32_t ThermalZoneManager::UpdateThermalZoneData(std::map<std::string, std::str
             auto typeIter = tzPathMap.find(tzIter.type);
             if (typeIter != tzPathMap.end()) {
                 ReportedThermalData data;
-                if (tzIter.isReplace) {
-                    data.type = tzIter.isReplace;
-                } else {
-                    data.type = tzIter.type;
-                }
+                UpdateDataType(tzIter, data);
                 data.tempPath = typeIter->second;
                 sensorIter.second->thermalDataList_.push_back(data);
             }
@@ -230,6 +238,9 @@ int32_t ThermalZoneManager::UpdateThermalZoneData(std::map<std::string, std::str
             sensorIter.second->thermalDataList_.push_back(data);
         }
     }
+    multipleList.push_back(reportTime);
+    CalculateMaxCd();
+    ReportThermalZoneData(reportTime, multipleList);
     return HDF_SUCCESS;
 }
 

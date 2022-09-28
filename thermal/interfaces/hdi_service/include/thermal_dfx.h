@@ -40,6 +40,7 @@ private:
     void StartThread();
     void CreateLogFile();
     void ProcessLogInfo(std::string& logFile, bool isEmpty);
+    void WriteToEmptyFile(std::ofstream& wStream, std::string& currentTime, uint32_t paramWidth);
     void WriteToFile(std::ofstream& wStream, std::string& currentTime, uint32_t paramWidth);
     void CompressFile();
     static void InfoChangedCallback(const char* key, const char* value, void* context);
