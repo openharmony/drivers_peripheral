@@ -107,10 +107,10 @@ static void DeleteFile(const char *path)
             if (IsSpecialDir(dirInfo->d_name)) {
                 continue;
             }
-            closedir(dir);
             DeleteFile(filePath);
             (void)remove(filePath);
         }
+        closedir(dir);
     }
 }
 

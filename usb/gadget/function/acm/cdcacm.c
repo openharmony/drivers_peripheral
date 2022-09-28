@@ -137,12 +137,11 @@ static void UsbSerialRxPush(struct UsbSerial *port)
         if (g_inFifo && req->actual) {
             uint32_t size = req->actual;
             uint8_t *data = req->buf;
-            uint32_t count;
 
             if (DataFifoIsFull(&port->readFifo)) {
                 DataFifoSkip(&port->readFifo, size);
             }
-            count = DataFifoWrite(&port->readFifo, data, size);
+            uint32_t count = DataFifoWrite(&port->readFifo, data, size);
             if (count != size) {
                 HDF_LOGW("%s: write %u less than expected %u", __func__, count, size);
             }

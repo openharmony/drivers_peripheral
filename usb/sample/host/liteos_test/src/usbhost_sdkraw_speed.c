@@ -45,7 +45,7 @@
 #define USB_RAW_IO_STOP_WAIT_MAX_TIME 2
 #define USB_DEVICE_VENDOR_ID          0x12D1
 #define USB_DEVICE_PRODUCT_ID         0x5000
-#define USB_RECV_COUNT_TSH 10000
+#define USB_RECV_COUNT_TSH            10000
 
 static struct AcmDevice *g_acm = NULL;
 static bool g_stopIoThreadFlag = false;
@@ -501,7 +501,7 @@ static void SpeedPrint(void)
     uint64_t count;
 
     sigCnt++;
-    count = sigCnt * TEST_PRINT_TIME;
+    count = (uint64_t)sigCnt * TEST_PRINT_TIME;
     if (count >= TEST_TIME) {
         g_speedFlag = true;
     }
