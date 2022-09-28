@@ -60,10 +60,10 @@ void RenderFucSwitch(struct IAudioRender *&render, uint32_t cmd, const uint8_t *
             render->SelectScene(render, reinterpret_cast<const struct AudioSceneDescriptor *>(rawData));
             break;
         case AUDIO_RENDER_SET_VOLUME:
-            render->SetVolume(render, *(float *)rawData);
+            render->SetVolume(render, *(reinterpret_cast<float *>(*rawData));
             break;
         case AUDIO_RENDER_SET_GAIN:
-            render->SetGain(render, *(float *)rawData);
+            render->SetGain(render, *(reinterpret_cast<float *>(*rawData));
             break;
         case AUDIO_RENDER_RENDER_FRAME: {
             uint64_t replyBytes = 0;
