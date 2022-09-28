@@ -6,11 +6,11 @@
     </base>
 
     <polling>
-        <group name="actual" interval="5000">
+        <group name="actual" interval="30000">
             <thermal_zone type="soc-thermal"/>
             <thermal_zone type="gpu-thermal"/>
         </group>
-        <group name="sim" interval="5000">
+        <group name="sim" interval="30000">
             <thermal_node type="soc" path="data/service/el0/thermal/sensor/soc/temp"/>
             <thermal_node type="cpu" path="data/service/el0/thermal/sensor/cpu/temp"/>
             <thermal_node type="ap" path="data/service/el0/thermal/sensor/ap/temp"/>

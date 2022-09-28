@@ -297,36 +297,41 @@ void ThermalDfx::ProcessLogInfo(std::string& logFile, bool isEmpty)
     std::ofstream wStream(logFile, std::ios::app);
     if (wStream.is_open()) {
         if (isEmpty) {
-            wStream << TIMESTAMP_TITLE;
-            for (uint32_t i = 0; i < paramWidth; ++i) {
-                wStream << " ";
-            }
-
-            std::vector<DfxTraceInfo> logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
-            for (auto info : logInfo) {
-                if (info.title.find("/")) {
-                    std::string titlePath = info.title;
-                    ParseValue(titlePath, info.title);
-                }
-                wStream << info.title;
-                if (info.value == logInfo.back().value &&
-                    info.title == logInfo.back().title) {
-                    break;
-                }
-                for (uint32_t i = 0; i < paramWidth; ++i) {
-                    wStream << " ";
-                }
-            }
-            wStream << "\n";
-
-            WriteToFile(wStream, currentTime, paramWidth);
-            wStream.close();
+            WriteToEmptyFile(wStream, currentTime, paramWidth);
             return;
         }
 
         WriteToFile(wStream, currentTime, paramWidth);
         wStream.close();
     }
+}
+
+void ThermalDfx::WriteToEmptyFile(std::ofstream& wStream, std::string& currentTime, uint32_t paramWidth)
+{
+    wStream << TIMESTAMP_TITLE;
+    for (uint32_t i = 0; i < paramWidth; ++i) {
+        wStream << " ";
+    }
+
+    std::vector<DfxTraceInfo> logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
+    for (auto info : logInfo) {
+        if (info.title.find("/")) {
+            std::string titlePath = info.title;
+            ParseValue(titlePath, info.title);
+        }
+        wStream << info.title;
+        if (info.value == logInfo.back().value &&
+            info.title == logInfo.back().title) {
+            break;
+        }
+        for (uint32_t i = 0; i < paramWidth; ++i) {
+            wStream << " ";
+        }
+    }
+    wStream << "\n";
+
+    WriteToFile(wStream, currentTime, paramWidth);
+    wStream.close();
 }
 
 void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime, uint32_t paramWidth)
