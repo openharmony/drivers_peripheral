@@ -19,6 +19,8 @@ ohos_unittest("partitionslot_hdi_1.0_test") {
   module_out_path = module_output_path
   sources = [ "unittest/hdf_partitionslot_test.cpp" ]
 
+  include_dirs = [ "//drivers/hdf_core/adapter/uhdf2/include" ]
+
   external_deps = [
     "c_utils:utils",
     "drivers_interface_partitionslot:libpartitionslot_proxy_1.0",
