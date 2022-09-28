@@ -268,8 +268,7 @@ DCamRetCode DCameraStream::GetDCameraBuffer(DCameraBuffer &buffer)
         std::lock_guard<std::mutex> lockSync(lockSync_);
         captureBufferCount_++;
     }
-    DHLOGD("Get buffer success. address = %p, index = %d, size = %d", buffer.bufferHandle_->GetBufferHandle()->virAddr,
-        buffer.index_, buffer.size_);
+    DHLOGD("Get buffer success. index = %d, size = %d", buffer.index_, buffer.size_);
     return DCamRetCode::SUCCESS;
 }
 
