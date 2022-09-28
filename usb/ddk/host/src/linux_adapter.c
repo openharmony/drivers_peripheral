@@ -438,9 +438,8 @@ static int32_t OsSubmitBulkRequestHandle(
         }
 
         if (i == 0) {
-            HDF_LOGE("submitUrb: ret=%d errno=%d \
-                urb->bufferLength=%d urb->buffer=%p urb->endPoint=%d urb->type=%d",
-                ret, errno, urb->bufferLength, urb->buffer, urb->endPoint, urb->type);
+            HDF_LOGE("submitUrb: ret=%d errno=%d urb->bufferLength=%d urb->endPoint=%d urb->type=%d", ret, errno,
+                urb->bufferLength, urb->endPoint, urb->type);
             return HDF_ERR_IO;
         }
         request->numRetired += numUrbs - i;
