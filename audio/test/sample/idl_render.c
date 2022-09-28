@@ -143,7 +143,7 @@ static int32_t CheckInputName(int type, void *val)
             break;
         case INPUT_UINT32:
             ret = scanf_s("%u", &inputUint);
-            if (inputUint > 0xFFFFFFFF || inputUint < 0) {
+            if (inputUint > 0xFFFFFFFF) {
                 return HDF_FAILURE;
             }
 
