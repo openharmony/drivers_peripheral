@@ -131,7 +131,7 @@ static int32_t CheckInputName(int type, void *val)
             break;
         case INPUT_UINT32:
             ret = scanf_s("%u", &renderInputUint);
-            if (renderInputUint > 0xFFFFFFFF || renderInputUint < 0) {
+            if (renderInputUint > 0xFFFFFFFF) {
                 return HDF_FAILURE;
             }
             *(uint32_t *)val = renderInputUint;
@@ -309,7 +309,7 @@ static int32_t StopAudioFiles(struct AudioRender **renderS)
     return ret;
 }
 
-static bool PrepareStopAndUloadAdapter(void)
+static bool PrepareStopAndUnloadAdapter(void)
 {
     bool soMode = false;
 
@@ -329,9 +329,7 @@ static bool PrepareStopAndUloadAdapter(void)
 
 static void StopRenderBySig(int32_t sig)
 {
-    bool soMode = false;
-
-    soMode = PrepareStopAndUloadAdapter();
+    (void)PrepareStopAndUnloadAdapter();
     dlclose(g_handle);
     g_closeEnd = 1;
 
@@ -1197,14 +1195,13 @@ int32_t main(int32_t argc, char const *argv[])
         return HDF_FAILURE;
     }
     (void)fclose(file);
-    bool soMode = false;
     if (InitParam() != HDF_SUCCESS) { // init
         AUDIO_FUNC_LOGE("InitParam Fail!");
         return HDF_FAILURE;
     }
 
     Choice();
-    soMode = PrepareStopAndUloadAdapter();
+    (void)PrepareStopAndUnloadAdapter();
     dlclose(g_handle);
     return 0;
 }

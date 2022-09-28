@@ -146,7 +146,7 @@ static int32_t CheckInputName(int type, void *val)
             break;
         case INPUT_UINT32:
             ret = scanf_s("%u", &inputUint);
-            if (inputUint > 0xFFFFFFFF || inputUint < 0) {
+            if (inputUint > 0xFFFFFFFF) {
                 return HDF_FAILURE;
             }
             *(uint32_t *)val = inputUint;
@@ -838,10 +838,6 @@ static int32_t InitParam(void)
         AUDIO_FUNC_LOGE("Open so Fail, reason:%s", dlerror());
         return HDF_FAILURE;
     }
-    struct AudioPort audioPort;
-    audioPort.dir = PORT_IN;
-    audioPort.portId = 0;
-    audioPort.portName = "AOP";
     char adapterNameCase[PATH_LEN] = "primary";
 
     if (GetCaptureManagerFunc(adapterNameCase) < 0) {
@@ -1277,9 +1273,6 @@ static int32_t CheckAndOpenFile(int32_t argc, char const *argv[])
         return HDF_FAILURE;
     }
     char *path = g_path;
-    if (path == NULL) {
-        return HDF_FAILURE;
-    }
     FILE *file = fopen(path, "wb+");
     if (file == NULL) {
         printf("failed to open '%s',Please enter the correct file name \n", g_path);
@@ -1295,7 +1288,6 @@ int32_t main(int32_t argc, char const *argv[])
     if (ret != HDF_SUCCESS) {
         return ret;
     }
-    bool soMode = false;
     if (InitParam() < 0) { // init
         AUDIO_FUNC_LOGE("InitParam Fail");
         return HDF_FAILURE;
@@ -1310,7 +1302,6 @@ int32_t main(int32_t argc, char const *argv[])
         if (g_manager->UnloadAdapter != NULL) {
             g_manager->UnloadAdapter(g_manager, g_adapter);
         }
-        soMode = true;
     }
     dlclose(g_handle);
     printf("Record file path:%s\n", g_path);
