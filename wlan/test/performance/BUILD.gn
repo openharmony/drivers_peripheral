@@ -41,7 +41,6 @@ if (defined(ohos_lite)) {
     sources = [ "//drivers/peripheral/wlan/test/performance/common/hdf_wlan_performance_test.cpp" ]
     deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
@@ -77,14 +76,12 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     deps = [
-      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
       "//drivers/peripheral/wlan/client:wifi_driver_client",
       "//drivers/peripheral/wlan/hal:wifi_hal",
     ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
-        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
       ]
     } else {

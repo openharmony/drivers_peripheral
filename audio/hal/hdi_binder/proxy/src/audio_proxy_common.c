@@ -451,3 +451,152 @@ int32_t AudioProxyReqMmapBufferWrite(struct HdfSBuf *data, int32_t reqSize,
     }
     return HDF_SUCCESS;
 }
+
+static bool AudioDevExtInfoBlockMarshalling(struct HdfSBuf *data, const struct AudioDevExtInfo *dataBlock)
+{
+    if (dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        return false;
+    }
+
+    if (!HdfSbufWriteInt32(data, dataBlock->moduleId)) {
+        HDF_LOGE("%{public}s: write dataBlock->moduleId failed!", __func__);
+        return false;
+    }
+
+    if (!HdfSbufWriteInt32(data, (int32_t)dataBlock->type)) {
+        HDF_LOGE("%{public}s: write dataBlock->type failed!", __func__);
+        return false;
+    }
+
+    if (!HdfSbufWriteString(data, dataBlock->desc)) {
+        HDF_LOGE("%{public}s: write dataBlock->desc failed!", __func__);
+        return false;
+    }
+
+    return true;
+}
+
+static bool AudioMixExtInfoBlockMarshalling(struct HdfSBuf *data, const struct AudioMixExtInfo *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        return false;
+    }
+
+    if (!HdfSbufWriteUnpadBuffer(data, (const uint8_t *)dataBlock, sizeof(struct AudioMixExtInfo))) {
+        HDF_LOGE("%{public}s: failed to write buffer data", __func__);
+        return false;
+    }
+    return true;
+}
+
+static bool AudioSessionExtInfoBlockMarshalling(struct HdfSBuf *data, const struct AudioSessionExtInfo *dataBlock)
+{
+    if (dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        return false;
+    }
+
+    if (!HdfSbufWriteUnpadBuffer(data, (const uint8_t *)dataBlock, sizeof(struct AudioSessionExtInfo))) {
+        HDF_LOGE("%{public}s: failed to write buffer data", __func__);
+        return false;
+    }
+    return true;
+}
+
+static inline bool AudioInfoBlockMarshalling(enum AudioPortType type, struct HdfSBuf *data, RouteExtInfo *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        return false;
+    }
+    bool ret = true;
+    switch (type) {
+        case AUDIO_PORT_DEVICE_TYPE:
+            if (!AudioDevExtInfoBlockMarshalling(data, &dataBlock->device)) {
+                HDF_LOGE("%{public}s: write dataBlock->device failed!", __func__);
+                ret = false;
+            }
+            break;
+        case AUDIO_PORT_MIX_TYPE:
+            if (!AudioMixExtInfoBlockMarshalling(data, &dataBlock->mix)) {
+                HDF_LOGE("%{public}s: write dataBlock->mix failed!", __func__);
+                ret = false;
+            }
+            break;
+        case AUDIO_PORT_SESSION_TYPE:
+            if (!AudioSessionExtInfoBlockMarshalling(data, &dataBlock->session)) {
+                HDF_LOGE("%{public}s: write dataBlock->session failed!", __func__);
+                ret = false;
+            }
+            break;
+        case AUDIO_PORT_UNASSIGNED_TYPE:
+        default:
+            ret = false;
+            break;
+    }
+
+    return ret;
+}
+
+static bool AudioRouteNodeBlockMarshalling(struct HdfSBuf *data, const struct AudioRouteNode *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        return false;
+    }
+
+    if (!HdfSbufWriteInt32(data, dataBlock->portId)) {
+        HDF_LOGE("%{public}s: write dataBlock->portId failed!", __func__);
+        return false;
+    }
+
+    if (!HdfSbufWriteInt32(data, (int32_t)dataBlock->role)) {
+        HDF_LOGE("%{public}s: write dataBlock->role failed!", __func__);
+        return false;
+    }
+
+    if (!HdfSbufWriteInt32(data, (int32_t)dataBlock->type)) {
+        HDF_LOGE("%{public}s: write dataBlock->type failed!", __func__);
+        return false;
+    }
+
+    if (!AudioInfoBlockMarshalling(dataBlock->type, data, (RouteExtInfo*)&dataBlock->ext)) {
+        HDF_LOGE("%{public}s: write dataBlock->ext failed!", __func__);
+        return false;
+    }
+
+    return true;
+}
+
+bool AudioRouteBlockMarshalling(struct HdfSBuf *data, const struct AudioRoute *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
+        return false;
+    }
+
+    if (!HdfSbufWriteUint32(data, dataBlock->sourcesNum)) {
+        HDF_LOGE("%{public}s: write dataBlock->sourcesLen failed!", __func__);
+        return false;
+    }
+    for (uint32_t i = 0; i < dataBlock->sourcesNum; i++) {
+        if (!AudioRouteNodeBlockMarshalling(data, &(dataBlock->sources)[i])) {
+            HDF_LOGE("%{public}s: write (dataBlock->sources)[i] failed!", __func__);
+            return false;
+        }
+    }
+
+    if (!HdfSbufWriteUint32(data, dataBlock->sinksNum)) {
+        HDF_LOGE("%{public}s: write dataBlock->sinksLen failed!", __func__);
+        return false;
+    }
+    for (uint32_t i = 0; i < dataBlock->sinksNum; i++) {
+        if (!AudioRouteNodeBlockMarshalling(data, &(dataBlock->sinks)[i])) {
+            HDF_LOGE("%{public}s: write (dataBlock->sinks)[i] failed!", __func__);
+            return false;
+        }
+    }
+    return true;
+}

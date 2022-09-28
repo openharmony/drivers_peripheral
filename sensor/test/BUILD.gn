@@ -36,7 +36,8 @@ if (defined(ohos_lite)) {
     if (drivers_peripheral_sensor_feature_model) {
       testonly = true
       deps += [
-        "fuzztest:hdf_sensor_fuzztest",
+        "benchmarktest:hdf_sensor_benchmark_test",
+        "fuzztest/sensor_fuzzer:hdf_fuzztest_sensor",
         "unittest/hdi:hdi_unittest_sensor",
       ]
     }

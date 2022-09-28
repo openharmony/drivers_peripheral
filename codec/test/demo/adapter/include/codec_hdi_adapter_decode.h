@@ -70,6 +70,7 @@ public:
     bool Configure();
     bool UseBuffers();
     void FreeBuffers();
+    void start();
     void Run();
     void Release();
     static int32_t OnEvent(struct CodecCallbackType *self, OMX_EVENTTYPE event, struct EventInfo *info);

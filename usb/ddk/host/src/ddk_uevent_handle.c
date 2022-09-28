@@ -24,18 +24,19 @@
 #include "ddk_device_manager.h"
 #include "ddk_pnp_listener_mgr.h"
 #include "hdf_base.h"
+#include "hdf_io_service_if.h"
 #include "hdf_log.h"
-#include "hdf_remote_adapter_if.h"
 #include "securec.h"
 #include "usbfn_uevent_handle.h"
 
+#define HDF_LOG_TAG usb_ddk_uevent
+
+#ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 #define UEVENT_MSG_LEN          2048
 #define UEVENT_SOCKET_GROUPS    0xffffffff
 #define UEVENT_SOCKET_BUFF_SIZE (64 * 1024)
 #define TIMEVAL_SECOND          0
 #define TIMEVAL_USECOND         (100 * 1000)
-
-#define HDF_LOG_TAG usb_ddk_uevent
 
 struct DdkUeventInfo {
     const char *action;
@@ -174,7 +175,6 @@ void *DdkUeventMain(void *param)
         return NULL;
     }
 
-    int32_t ret;
     ssize_t rcvLen = 0;
     fd_set fds;
     char msg[UEVENT_MSG_LEN];
@@ -184,7 +184,7 @@ void *DdkUeventMain(void *param)
         FD_SET(fd, &fds);
         tv.tv_sec = TIMEVAL_SECOND;
         tv.tv_usec = TIMEVAL_USECOND;
-        ret = select(fd + 1, &fds, NULL, NULL, &tv);
+        int32_t ret = select(fd + 1, &fds, NULL, NULL, &tv);
         if (ret < 0) {
             continue;
         }
@@ -206,3 +206,50 @@ void *DdkUeventMain(void *param)
         } while (rcvLen > 0);
     } while (true);
 }
+int32_t DdkUeventInit(void)
+{
+    return HDF_SUCCESS;
+}
+#else  // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
+static int32_t DdkUeventCallBack(void *priv, uint32_t id, struct HdfSBuf *data)
+{
+    if (id == USB_PNP_NOTIFY_REPORT_INTERFACE) {
+        return HDF_SUCCESS;
+    }
+
+    if (data == NULL) {
+        HDF_LOGE("%{public}s: HdfIoServiceBind failed.", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct UsbPnpNotifyMatchInfoTable *info = NULL;
+    if (id == USB_PNP_NOTIFY_ADD_DEVICE || id == USB_PNP_NOTIFY_REMOVE_DEVICE) {
+        uint32_t infoSize;
+        bool flag = HdfSbufReadBuffer(data, (const void **)(&info), &infoSize);
+        if (!flag || info == NULL) {
+            HDF_LOGE("%{public}s: HdfSbufReadBuffer failed, flag=%{public}d, info=%{public}p", __func__, flag, info);
+            return HDF_ERR_INVALID_PARAM;
+        }
+    }
+
+    HDF_LOGI("%{public}s: cmd is: %{public}u.", __func__, id);
+    DdkListenerMgrNotifyAll(info, id);
+    return HDF_SUCCESS;
+}
+
+int32_t DdkUeventInit(void)
+{
+    struct HdfIoService *usbPnpSrv = HdfIoServiceBind(USB_PNP_NOTIFY_SERVICE_NAME);
+    if (usbPnpSrv == NULL) {
+        HDF_LOGE("%{public}s: HdfIoServiceBind failed.", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+
+    static struct HdfDevEventlistener usbPnpListener = {.callBack = DdkUeventCallBack};
+    int32_t ret = HdfDeviceRegisterEventListener(usbPnpSrv, &usbPnpListener);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: HdfDeviceRegisterEventListener failed ret=%{public}d", __func__, ret);
+    }
+    return ret;
+}
+#endif // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE

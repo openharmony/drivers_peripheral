@@ -266,9 +266,7 @@ static struct UsbDevice *OsAllocDevice(struct UsbSession *session, struct UsbDev
 static int32_t OsReadDescriptors(struct UsbDevice *dev)
 {
     size_t allocLen = 0;
-    uint8_t *ptr = NULL;
     int32_t ret;
-    size_t count;
     if (dev == NULL) {
         HDF_LOGE("%{public}s:%d dev is NULL!", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
@@ -287,7 +285,7 @@ static int32_t OsReadDescriptors(struct UsbDevice *dev)
             DPRINTFN(0, "%s:%d\n", __func__, __LINE__);
             return HDF_ERR_MALLOC_FAIL;
         }
-        ptr = (uint8_t *)dev->descriptors + dev->descriptorsLength;
+        uint8_t *ptr = (uint8_t *)dev->descriptors + dev->descriptorsLength;
         if (ptr == NULL) {
             DPRINTFN(0, "%s:%d ptr is NULL\n", __func__, __LINE__);
             ret = HDF_ERR_INVALID_PARAM;
@@ -299,7 +297,7 @@ static int32_t OsReadDescriptors(struct UsbDevice *dev)
             return HDF_FAILURE;
         }
 
-        count = UGETW(osDev->adapterDevice->cdesc->wTotalLength);
+        size_t count = UGETW(osDev->adapterDevice->cdesc->wTotalLength);
         if (count > DESC_READ_LEN) {
             ret = HDF_ERR_IO;
             return ret;
@@ -602,23 +600,21 @@ static int32_t OsSubmitBulkRequestHandle(
 {
     struct Async *pas = NULL;
     int32_t numUrbs = request->numUrbs;
-    int32_t i;
-    int32_t ret;
     struct UsbDevice *dev = request->devHandle->dev;
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
     UsbAdapterDevice *adapterDevice = osDev->adapterDevice;
-    UsbAdapterHostEndpoint *uhe = NULL;
     UsbAdapterUrb *urb = NULL;
 
-    uhe = usb_find_host_endpoint(adapterDevice, request->requestType, request->endPoint);
+    UsbAdapterHostEndpoint *uhe = usb_find_host_endpoint(adapterDevice, request->requestType, request->endPoint);
     if (uhe == NULL) {
         DPRINTFN(0, "no found endpoint\n");
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
+    int32_t i;
     for (i = 0, pas = as; i < numUrbs; i++, pas++) {
         urb = &pas->urb;
-        ret = memset_s(urb, sizeof(*urb), 0, sizeof(*urb));
+        int32_t ret = memset_s(urb, sizeof(*urb), 0, sizeof(*urb));
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
             return HDF_FAILURE;
@@ -750,12 +746,9 @@ static int32_t OsAllocIsoUrbs(struct UsbHostRequest *request, int32_t numUrbs, s
 
 static int32_t OsSubmitIsoUrbs(struct UsbHostRequest *request, int32_t numUrbs, struct Async **pUrbs)
 {
-    int32_t i;
-    int32_t ret;
-
-    for (i = 0; i < numUrbs; i++) {
+    for (int32_t i = 0; i < numUrbs; i++) {
         UsbAdapterUrb *urb = &(pUrbs[i]->urb);
-        ret = OsSubmitUrb(urb, urb->dev, urb->endpoint);
+        int32_t ret = OsSubmitUrb(urb, urb->dev, urb->endpoint);
         DPRINTFN(0, "submitUrb:%d errno=%d\n", ret, errno);
         if (ret == 0) {
             continue;
@@ -791,11 +784,7 @@ static int32_t OsSubmitIsoUrbs(struct UsbHostRequest *request, int32_t numUrbs, 
 
 static int32_t OsSubmitIsoRequest(struct UsbHostRequest *request)
 {
-    struct Async **pUrbs = NULL;
-    int32_t numUrbs;
-    unsigned int packetLen;
     unsigned int totalLen = 0;
-    int32_t ret;
 
     if ((request == NULL) || (request->devHandle == NULL) || (request->numIsoPackets < 1)) {
         DPRINTFN(0, "%s:%d invalid param", __func__, __LINE__);
@@ -808,7 +797,7 @@ static int32_t OsSubmitIsoRequest(struct UsbHostRequest *request)
     }
 
     for (int32_t i = 0; i < request->numIsoPackets; i++) {
-        packetLen = request->isoPacketDesc[i].length;
+        unsigned int packetLen = request->isoPacketDesc[i].length;
         if (packetLen > MAX_ISO_DATA_BUFFER_LEN) {
             DPRINTFN(0, "%s:%d packet length: %u exceeds maximum: %u\n", __func__, __LINE__, packetLen,
                 MAX_ISO_DATA_BUFFER_LEN);
@@ -820,8 +809,8 @@ static int32_t OsSubmitIsoRequest(struct UsbHostRequest *request)
         DPRINTFN(0, "%s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    numUrbs = (request->numIsoPackets + (MAX_ISO_PACKETS_PER_URB - 1)) / MAX_ISO_PACKETS_PER_URB;
-    pUrbs = RawUsbMemCalloc(numUrbs * sizeof(struct Async *));
+    int32_t numUrbs = (request->numIsoPackets + (MAX_ISO_PACKETS_PER_URB - 1)) / MAX_ISO_PACKETS_PER_URB;
+    struct Async **pUrbs = RawUsbMemCalloc(numUrbs * sizeof(struct Async *));
     if (pUrbs == NULL) {
         DPRINTFN(0, "%s:%d RawUsbMemCalloc pUrbs failed", __func__, __LINE__);
         return HDF_ERR_MALLOC_FAIL;
@@ -830,7 +819,7 @@ static int32_t OsSubmitIsoRequest(struct UsbHostRequest *request)
     request->numUrbs = numUrbs;
     request->numRetired = 0;
     request->isoPacketOffset = 0;
-    ret = OsAllocIsoUrbs(request, numUrbs, pUrbs);
+    int32_t ret = OsAllocIsoUrbs(request, numUrbs, pUrbs);
     if (ret != HDF_SUCCESS) {
         DPRINTFN(0, "%s:%d alloc iso urbs failed", __func__, __LINE__);
         return ret;
@@ -974,13 +963,10 @@ OUT:
 
 static int32_t OsProcessAbnormalReap(struct UsbHostRequest *request, const UsbAdapterUrb *urb)
 {
-    int32_t ret;
-
     if (urb->actual_length > 0) {
         unsigned char *target = request->buffer + request->actualLength;
         if (urb->transfer_buffer != target) {
-            ret = memmove_s(target, urb->actual_length, urb->transfer_buffer, urb->actual_length);
-            if (ret != EOK) {
+            if (memmove_s(target, urb->actual_length, urb->transfer_buffer, urb->actual_length) != EOK) {
                 DPRINTFN(0, "%s: memmove_s failed, ret=%d", __func__, ret);
             }
         }
@@ -1327,14 +1313,13 @@ static struct UsbHostRequest *AdapterAllocRequest(
 
 static int32_t AdapterFreeRequest(struct UsbHostRequest *request)
 {
-    int32_t ret;
     if (request == NULL) {
         DPRINTFN(0, "%s:%d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (request->numUrbs > request->numRetired) {
         OsDiscardUrbs(request, request->numRetired, request->numUrbs);
-        ret = OsFreeRequest(request);
+        int32_t ret = OsFreeRequest(request);
         if (ret != HDF_SUCCESS) {
             return ret;
         }

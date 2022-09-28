@@ -275,7 +275,12 @@ static ResultCode StreamReadCredentialList(Buffer *parcel, uint32_t *index, Link
             Free(credentialInfo);
             return result;
         }
-        credentialList->insert(credentialList, credentialInfo);
+        result = credentialList->insert(credentialList, credentialInfo);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("credentialList insert failed");
+            Free(credentialInfo);
+            return result;
+        }
     }
     return RESULT_SUCCESS;
 }
@@ -308,7 +313,12 @@ static ResultCode StreamReadEnrolledList(Buffer *parcel, uint32_t *index, Linked
             Free(enrolledInfo);
             return result;
         }
-        enrolledList->insert(enrolledList, enrolledInfo);
+        result = enrolledList->insert(enrolledList, enrolledInfo);
+        if (result != RESULT_SUCCESS) {
+            LOG_ERROR("enrolledList insert failed");
+            Free(enrolledInfo);
+            return result;
+        }
     }
     return RESULT_SUCCESS;
 }
@@ -392,11 +402,13 @@ static bool StreamReadFileInfo(Buffer *parcel, LinkedList *userInfoList)
         }
         result = StreamReadUserInfo(parcel, &index, userInfo);
         if (result != RESULT_SUCCESS) {
+            LOG_ERROR("StreamRead failed");
             DestroyUserInfoNode(userInfo);
             return false;
         }
         result = userInfoList->insert(userInfoList, userInfo);
         if (result != RESULT_SUCCESS) {
+            LOG_ERROR("userInfoList insert failed");
             DestroyUserInfoNode(userInfo);
             return false;
         }

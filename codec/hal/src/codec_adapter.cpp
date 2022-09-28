@@ -34,7 +34,7 @@ int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *c
 {
     OMX_COMPONENTTYPE *comp = nullptr;
     CodecComponentNode *tempNode = new CodecComponentNode;
-    if (codecNode == nullptr) {
+    if (tempNode == nullptr) {
         HDF_LOGE("%{public}s create CodecComponentNode error", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }

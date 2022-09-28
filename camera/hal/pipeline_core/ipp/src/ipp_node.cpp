@@ -229,27 +229,24 @@ RetCode IppNode::SendNodeMetaData(const std::shared_ptr<CameraMetadata> meta)
 
 RetCode IppNode::SendExposureMetaData(const common_metadata_header_t *data)
 {
-    uint8_t exposureMode = 0;
     camera_metadata_item_t entry;
     (void) data;
 
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_EXPOSURE_MODE, &entry);
     if (ret == 0) {
-        exposureMode = *(entry.data.u8);
+        uint8_t exposureMode = *(entry.data.u8);
         CAMERA_LOGI("Set  exposureMode [%{public}d]", exposureMode);
     }
 
-    int64_t exposureTime = 0;
     ret = FindCameraMetadataItem(data, OHOS_SENSOR_EXPOSURE_TIME, &entry);
     if (ret == 0) {
-        exposureTime = *(entry.data.i64);
+        int64_t exposureTime = *(entry.data.i64);
         CAMERA_LOGI("Set exposureTime [%{public}d]", exposureTime);
     }
 
-    int32_t exposureCompensation = 0;
     ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &entry);
     if (ret == 0) {
-        exposureCompensation = *(entry.data.i32);
+        int32_t exposureCompensation = *(entry.data.i32);
         CAMERA_LOGI("Set exposureCompensation [%{public}d]", exposureCompensation);
     }
 
@@ -258,13 +255,12 @@ RetCode IppNode::SendExposureMetaData(const common_metadata_header_t *data)
 
 RetCode IppNode::SendFocusMetaData(const common_metadata_header_t *data)
 {
-    uint8_t focusMode = -1;
     camera_metadata_item_t entry;
     (void) data;
 
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FOCUS_MODE, &entry);
     if (ret == 0) {
-        focusMode = *(entry.data.u8);
+        uint8_t focusMode = *(entry.data.u8);
         CAMERA_LOGI("Set focusMode [%{public}d]", focusMode);
     }
 

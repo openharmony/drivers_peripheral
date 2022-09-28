@@ -157,6 +157,7 @@ RetCode StreamBase::StartStream()
     handler_ = std::make_unique<std::thread>([this, &threadName] {
         prctl(PR_SET_NAME, threadName.c_str());
         while (state_ == STREAM_STATE_BUSY) {
+            tunnel_->DumpStats(30); // set output interval to 30 second
             HandleRequest();
         }
     });
@@ -219,7 +220,7 @@ RetCode StreamBase::StopStream()
         return RC_ERROR;
     }
 
-    if (lastRequest_ != nullptr && lastRequest_->IsContinous() && !inTransitList_.empty()) {
+    if (lastRequest_ != nullptr && lastRequest_->IsContinous() && !inTransitList_.empty() && messenger_ != nullptr) {
         std::shared_ptr<ICaptureMessage> endMessage =
             std::make_shared<CaptureEndedMessage>(streamId_, lastRequest_->GetCaptureId(),
             lastRequest_->GetEndTime(), lastRequest_->GetOwnerCount(), tunnel_->GetFrameCount());
@@ -264,7 +265,7 @@ RetCode StreamBase::AddRequest(std::shared_ptr<CaptureRequest>& request)
 RetCode StreamBase::CancelRequest(const std::shared_ptr<CaptureRequest>& request)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(request, RC_ERROR);
-
+    CHECK_IF_PTR_NULL_RETURN_VALUE(messenger_, RC_ERROR);
     {
         // We don't care if this request is continious-capture or single-capture, just erase it.
         // And those requests in inTransitList_ removed in HandleResult.
@@ -447,6 +448,7 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(request, RC_ERROR);
     CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(messenger_, RC_ERROR);
     auto buffer = request->GetAttachedBuffer();
     CameraBufferStatus status = buffer->GetBufferStatus();
     if (status != CAMERA_BUFFER_STATUS_OK) {
@@ -462,7 +464,7 @@ RetCode StreamBase::OnFrame(const std::shared_ptr<CaptureRequest>& request)
             return RC_OK;
         }
     }
-    if (request->NeedShutterCallback() && messenger_ != nullptr) {
+    if (request->NeedShutterCallback()) {
         std::shared_ptr<ICaptureMessage> shutterMessage = std::make_shared<FrameShutterMessage>(
             streamId_, request->GetCaptureId(), request->GetEndTime(), request->GetOwnerCount());
         messenger_->SendMessage(shutterMessage);
@@ -535,7 +537,7 @@ RetCode StreamBase::AttachStreamTunnel(std::shared_ptr<StreamTunnel>& tunnel)
     TunnelConfig config = {(uint32_t)streamConfig_.width, (uint32_t)streamConfig_.height,
         (uint32_t)streamConfig_.format, streamConfig_.usage};
     tunnel_->Config(config);
-
+    tunnel_->SetStreamId(streamId_);
     streamConfig_.tunnelMode = true;
     return RC_OK;
 }
@@ -587,5 +589,10 @@ bool StreamBase::IsRunning() const
 bool StreamBase::GetTunnelMode() const
 {
     return streamConfig_.tunnelMode;
+}
+
+void StreamBase::DumpStatsInfo() const
+{
+    tunnel_->DumpStats();
 }
 } // namespace OHOS::Camera

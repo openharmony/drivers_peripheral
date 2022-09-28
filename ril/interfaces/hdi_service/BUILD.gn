@@ -19,11 +19,7 @@ ohos_shared_library("libril_service_1.0") {
     "//base/telephony/ril_adapter/services/hril/include",
   ]
   sources = [ "src/ril_impl.cpp" ]
-  deps = [
-    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
-    "//base/telephony/ril_adapter/services/hril:hril",
-    "//third_party/jsoncpp:jsoncpp",
-  ]
+  deps = [ "//base/telephony/ril_adapter/services/hril:hril" ]
 
   defines = [
     "LOG_TAG = \"RilService\"",
@@ -34,10 +30,6 @@ ohos_shared_library("libril_service_1.0") {
       "c_utils:utils",
       "drivers_interface_power:libpower_proxy_1.0",
       "drivers_interface_ril:ril_idl_headers",
-      "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
-      "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
     ]
@@ -63,18 +55,14 @@ ohos_shared_library("libril_driver") {
   sources = [ "src/ril_driver.cpp" ]
 
   deps = [
-    "//base/telephony/ril_adapter/interfaces/innerkits:hril_innerkits",
     "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
     "//drivers/interface/ril/v1_0:libril_stub_1.0",
-    "//third_party/jsoncpp:jsoncpp",
   ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
-      "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",

@@ -62,8 +62,6 @@ static void TestPnpWriteLog(char *strTmp)
 static void TestInitPnpInfo(enum UsbPnpNotifyServiceCmd cmdType)
 {
     struct UsbPnpNotifyMatchInfoTable infoTable;
-    uint8_t i;
-
     infoTable.usbDevAddr = 0;
     infoTable.devNum = 0;
     if (cmdType == USB_PNP_NOTIFY_REMOVE_TEST) {
@@ -84,7 +82,7 @@ static void TestInitPnpInfo(enum UsbPnpNotifyServiceCmd cmdType)
 
     if (cmdType != USB_PNP_NOTIFY_REMOVE_TEST) {
         infoTable.numInfos = USB_TEST_INTERFACE_NUM;
-        for (i = 0; i < infoTable.numInfos; i++) {
+        for (uint8_t i = 0; i < infoTable.numInfos; i++) {
             infoTable.interfaceInfo[i].interfaceClass = 0;
             infoTable.interfaceInfo[i].interfaceSubClass = 0;
             infoTable.interfaceInfo[i].interfaceProtocol = 0;
@@ -100,10 +98,7 @@ static void TestInitPnpInfo(enum UsbPnpNotifyServiceCmd cmdType)
 static void TestPnpAdd(struct HdfIoService *serv)
 {
     int32_t replyData = 0;
-    bool flag = false;
-
     TestPnpWriteLog("usb pnp sample device driver test add start");
-
     TestInitPnpInfo(USB_PNP_NOTIFY_ADD_TEST);
 
     int32_t status = serv->dispatcher->Dispatch(&serv->object, USB_PNP_NOTIFY_ADD_TEST, g_data, g_reply);
@@ -112,7 +107,7 @@ static void TestPnpAdd(struct HdfIoService *serv)
         return;
     }
 
-    flag = HdfSbufReadInt32(g_reply, &replyData);
+    bool flag = HdfSbufReadInt32(g_reply, &replyData);
     if ((!flag) || (replyData != INT32_MAX)) {
         TestPnpWriteLog("usb pnp sample device driver test add reply failed.");
     } else if (flag && replyData == INT32_MAX) {
@@ -123,19 +118,16 @@ static void TestPnpAdd(struct HdfIoService *serv)
 static void TestPnpRemove(struct HdfIoService *serv)
 {
     int32_t replyData = 0;
-    bool flag = false;
-
     TestPnpWriteLog("usb pnp sample device driver test remove start");
-
     TestInitPnpInfo(USB_PNP_NOTIFY_REMOVE_TEST);
 
     int32_t status = serv->dispatcher->Dispatch(&serv->object, USB_PNP_NOTIFY_REMOVE_TEST, g_data, g_reply);
-    if (status) {
+    if (status != HDF_SUCCESS) {
         HDF_LOGE("%s: Dispatch USB_PNP_NOTIFY_REMOVE_TEST failed status = %d", __func__, status);
         return;
     }
 
-    flag = HdfSbufReadInt32(g_reply, &replyData);
+    bool flag = HdfSbufReadInt32(g_reply, &replyData);
     if ((!flag) || (replyData != INT32_MAX)) {
         TestPnpWriteLog("usb pnp sample device driver test remove reply failed.");
     } else if (flag && replyData == INT32_MAX) {

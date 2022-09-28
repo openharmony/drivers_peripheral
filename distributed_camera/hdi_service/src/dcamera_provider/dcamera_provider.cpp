@@ -19,6 +19,7 @@
 #include "dcamera_device.h"
 #include "dcamera_host.h"
 #include "distributed_hardware_log.h"
+#include "dcamera.h"
 
 namespace OHOS {
 namespace DistributedHardware {
@@ -45,19 +46,19 @@ OHOS::sptr<DCameraProvider> DCameraProvider::GetInstance()
 int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::string& abilityInfo,
     const sptr<IDCameraProviderCallback>& callbackObj)
 {
-    DHLOGI("DCameraProvider::EnableDCameraDevice for {devId: %s, dhId: %s, abilityInfo length: %d}.",
-        GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str(), abilityInfo.length());
-
     if (IsDhBaseInfoInvalid(dhBase)) {
         DHLOGE("DCameraProvider::EnableDCameraDevice, devId or dhId is invalid.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
-    if (abilityInfo.empty()) {
-        DHLOGE("DCameraProvider::EnableDCameraDevice, dcamera ability is empty.");
+    DHLOGI("DCameraProvider::EnableDCameraDevice for {devId: %s, dhId: %s, abilityInfo length: %d}.",
+        GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str(), abilityInfo.length());
+
+    if (abilityInfo.empty() || abilityInfo.length() > ABILITYINFO_MAX_LENGTH) {
+        DHLOGE("DCameraProvider::EnableDCameraDevice, dcamera ability is empty or over limit.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
     if (callbackObj == nullptr) {
-        DHLOGE("DCameraProvider::EnableDCameraDevice, dcamera provider callbackObj is null.");
+        DHLOGE("DCameraProvider::EnableDCameraDevice, dcamera provider callback is null.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
@@ -76,13 +77,12 @@ int32_t DCameraProvider::EnableDCameraDevice(const DHBase& dhBase, const std::st
 
 int32_t DCameraProvider::DisableDCameraDevice(const DHBase& dhBase)
 {
-    DHLOGI("DCameraProvider::DisableDCameraDevice for {devId: %s, dhId: %s}.",
-        GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
-
     if (IsDhBaseInfoInvalid(dhBase)) {
         DHLOGE("DCameraProvider::DisableDCameraDevice, devId or dhId is invalid.");
         return DCamRetCode::INVALID_ARGUMENT;
     }
+    DHLOGI("DCameraProvider::DisableDCameraDevice for {devId: %s, dhId: %s}.",
+        GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
 
     OHOS::sptr<DCameraHost> dCameraHost = DCameraHost::GetInstance();
     if (dCameraHost == nullptr) {
@@ -100,6 +100,15 @@ int32_t DCameraProvider::DisableDCameraDevice(const DHBase& dhBase)
 
 int32_t DCameraProvider::AcquireBuffer(const DHBase& dhBase, int32_t streamId, DCameraBuffer& buffer)
 {
+    if (IsDhBaseInfoInvalid(dhBase)) {
+        DHLOGE("DCameraProvider::AcquireBuffer, devId or dhId is invalid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    if (streamId < 0) {
+        DHLOGE("DCameraProvider::AcquireBuffer, input streamId is invalid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+
     DHLOGD("DCameraProvider::AcquireBuffer for {devId: %s, dhId: %s}, streamId: %d.",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str(), streamId);
 
@@ -119,6 +128,19 @@ int32_t DCameraProvider::AcquireBuffer(const DHBase& dhBase, int32_t streamId, D
 
 int32_t DCameraProvider::ShutterBuffer(const DHBase& dhBase, int32_t streamId, const DCameraBuffer& buffer)
 {
+    if (IsDhBaseInfoInvalid(dhBase)) {
+        DHLOGE("DCameraProvider::ShutterBuffer, devId or dhId is invalid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    if (buffer.index_ < 0 || buffer.size_ < 0) {
+        DHLOGE("DCameraProvider::ShutterBuffer, input dcamera buffer is invalid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    if (streamId < 0) {
+        DHLOGE("DCameraProvider::ShutterBuffer, input streamId is invalid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+
     DHLOGD("DCameraProvider::ShutterBuffer for {devId: %s, dhId: %s}, streamId = %d, buffer index = %d.",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str(), streamId, buffer.index_);
 
@@ -136,6 +158,14 @@ int32_t DCameraProvider::ShutterBuffer(const DHBase& dhBase, int32_t streamId, c
 
 int32_t DCameraProvider::OnSettingsResult(const DHBase& dhBase, const DCameraSettings& result)
 {
+    if (IsDhBaseInfoInvalid(dhBase)) {
+        DHLOGE("DCameraProvider::OnSettingsResult, devId or dhId is invalid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    if (IsDCameraSettingsInvalid(result)) {
+        DHLOGE("DCameraProvider::OnSettingsResult, input dcamera settings is valid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     DHLOGI("DCameraProvider::OnSettingsResult for {devId: %s, dhId: %s}.",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
 
@@ -153,6 +183,14 @@ int32_t DCameraProvider::OnSettingsResult(const DHBase& dhBase, const DCameraSet
 
 int32_t DCameraProvider::Notify(const DHBase& dhBase, const DCameraHDFEvent& event)
 {
+    if (IsDhBaseInfoInvalid(dhBase)) {
+        DHLOGE("DCameraProvider::Notify, devId or dhId is invalid.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    if (IsDCameraHDFEventInvalid(event)) {
+        DHLOGE("DCameraProvider::Notify, input dcamera hdf event is null.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
     DHLOGI("DCameraProvider::Notify for {devId: %s, dhId: %s}.",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str());
 
@@ -291,10 +329,14 @@ int32_t DCameraProvider::UpdateSettings(const DHBase &dhBase, const std::vector<
     return callback->UpdateSettings(dhBase, settings);
 }
 
-bool DCameraProvider::IsDhBaseInfoInvalid(const DHBase &dhBase)
+bool DCameraProvider::IsDCameraSettingsInvalid(const DCameraSettings& result)
 {
-    return dhBase.deviceId_.empty() || (dhBase.deviceId_.size() > DEVID_MAX_LENGTH) ||
-        dhBase.dhId_.empty() || (dhBase.dhId_.size() > DHID_MAX_LENGTH);
+    return result.value_.empty() || result.value_.length() > SETTING_VALUE_MAX_LENGTH;
+}
+
+bool DCameraProvider::IsDCameraHDFEventInvalid(const DCameraHDFEvent& event)
+{
+    return event.content_.length() > HDF_EVENT_CONTENT_MAX_LENGTH;
 }
 
 sptr<IDCameraProviderCallback> DCameraProvider::GetCallbackBydhBase(const DHBase &dhBase)

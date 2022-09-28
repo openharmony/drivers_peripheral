@@ -31,7 +31,7 @@ public:
     std::shared_ptr<IBuffer> AllocBuffer(const uint32_t width,
                                                  const uint32_t height,
                                                  const uint64_t cameraUsage,
-                                                 const uint32_t format) override;
+                                                 const uint32_t cameraFormat) override;
     RetCode FreeBuffer(std::shared_ptr<IBuffer>& buffer) override;
     RetCode MapBuffer(std::shared_ptr<IBuffer>&) override;
     RetCode UnmapBuffer(std::shared_ptr<IBuffer>&) override;

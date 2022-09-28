@@ -15,7 +15,7 @@
  
 #ifndef CODEC_OMX_EXT_H
 #define CODEC_OMX_EXT_H
-
+#include <OMX_IVCommon.h>
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {
@@ -27,6 +27,14 @@ extern "C" {
 enum CodecOmxVideoExType {
     CODEC_OMX_VIDEO_CodingHEVC = 11, /** HEVC Index in Codec HDI */
 };
+
+/**
+ * @brief Enumerates the extended codec color format.
+ */
+enum CodecOmxColorFormatExt {
+    CODEC_OMX_COLOR_FORMAT_RGBA8888 = OMX_COLOR_FormatVendorStartUnused + 100,
+};
+
 /**
  * @brief Enumerates the buffer types.
  */

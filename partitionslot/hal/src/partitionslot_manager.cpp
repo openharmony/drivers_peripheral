@@ -15,6 +15,7 @@
 
 #include "partitionslot_manager.h"
 
+#include <fcntl.h>
 #include <unistd.h>
 #include <linux/limits.h>
 #include "param_wrapper.h"

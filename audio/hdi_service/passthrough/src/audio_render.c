@@ -978,7 +978,7 @@ int32_t AudioRenderSetExtraParams(struct IAudioRender *handle, const char *keyVa
 int32_t AudioRenderGetExtraParams(struct IAudioRender *handle, char *keyValueList, uint32_t listLenth)
 {
     struct AudioHwRender *render = (struct AudioHwRender *)handle;
-    if (render == NULL || keyValueList == NULL || listLenth <= 0) {
+    if (render == NULL || keyValueList == NULL || listLenth == 0) {
         return AUDIO_ERR_INVALID_PARAM;
     }
 
@@ -1026,34 +1026,31 @@ static int32_t AudioRenderReqMmapBufferInit(
     if (render == NULL || render->devDataHandle == NULL || tempDesc == NULL) {
         return AUDIO_ERR_INVALID_PARAM;
     }
-
     struct AudioMmapBufferDescripter desc = *tempDesc;
     uint32_t formatBits = 0;
-
     int32_t ret = FormatToBits(render->renderParam.frameRenderMode.attrs.format, &formatBits);
     if (ret < 0) {
         return ret;
     }
-
-    FILE *fp = fopen(desc.filePath, "rb+");
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(desc.filePath, pathBuf) == NULL) {
+        return AUDIO_ERR_INTERNAL;
+    }
+    FILE *fp = fopen(pathBuf, "rb+");
     if (fp == NULL) {
         AUDIO_FUNC_LOGE("Open file failed!");
         return AUDIO_ERR_INTERNAL;
     }
-
     int32_t flags = 0;
     int64_t fileSize = 0;
-
     ret = SetDescParam(&desc, fp, reqSize, &fileSize, &flags);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("SetDescParam failed!");
         fclose(fp);
         return AUDIO_ERR_INTERNAL;
     }
-
     desc.totalBufferFrames = reqSize / (render->renderParam.frameRenderMode.attrs.channelCount *
         (formatBits >> BITS_TO_FROMAT));
-
     InterfaceLibModeRenderPassthrough *pInterfaceLibModeRender = AudioPassthroughGetInterfaceLibModeRender();
     if (pInterfaceLibModeRender == NULL || *pInterfaceLibModeRender == NULL) {
         AUDIO_FUNC_LOGE("pInterfaceLibModeRender Is NULL");
@@ -1061,14 +1058,12 @@ static int32_t AudioRenderReqMmapBufferInit(
         fclose(fp);
         return AUDIO_ERR_INTERNAL;
     }
-
     render->renderParam.frameRenderMode.mmapBufDesc.memoryAddress = desc.memoryAddress;
     render->renderParam.frameRenderMode.mmapBufDesc.memoryFd = desc.memoryFd;
     render->renderParam.frameRenderMode.mmapBufDesc.totalBufferFrames = desc.totalBufferFrames;
     render->renderParam.frameRenderMode.mmapBufDesc.transferFrameSize = desc.transferFrameSize;
     render->renderParam.frameRenderMode.mmapBufDesc.isShareable = desc.isShareable;
     render->renderParam.frameRenderMode.mmapBufDesc.offset = desc.offset;
-
     ret = (*pInterfaceLibModeRender)(render->devDataHandle, &render->renderParam, AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER);
     munmap(desc.memoryAddress, reqSize);
     (void)fclose(fp);

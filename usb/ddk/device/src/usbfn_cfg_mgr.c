@@ -83,14 +83,12 @@ static uint32_t UsbFnCfgMgrParseDevDesc(const struct DeviceResourceNode *devDesc
 
 static int32_t UsbFnCfgMgrParseUsbFnDevDesc(const struct DeviceResourceNode *node, struct UsbFnDeviceDesc *fnDevDesc)
 {
-    struct DeviceResourceIface *drsOps = NULL;
     const char *childNodeName = NULL;
-    const struct DeviceResourceNode *devDescNode = NULL;
     if (node == NULL || fnDevDesc == NULL) {
         HDF_LOGE("%{public}s: node or fnDevDesc is null", __func__);
         return HDF_FAILURE;
     }
-    drsOps = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
+    struct DeviceResourceIface *drsOps = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (drsOps == NULL || drsOps->GetChildNode == NULL) {
         HDF_LOGE("%{public}s: invalid drs ops failed", __func__);
         return HDF_FAILURE;
@@ -99,7 +97,7 @@ static int32_t UsbFnCfgMgrParseUsbFnDevDesc(const struct DeviceResourceNode *nod
         HDF_LOGE("%{public}s: get usb_dev_desc node name failed", __func__);
         return HDF_FAILURE;
     }
-    devDescNode = drsOps->GetChildNode(node, childNodeName);
+    const struct DeviceResourceNode *devDescNode = drsOps->GetChildNode(node, childNodeName);
     if (devDescNode == NULL) {
         HDF_LOGE("%{public}s: childDevDescNode is null", __func__);
         return HDF_FAILURE;
@@ -305,13 +303,12 @@ static int32_t UsbFnCfgMgrParseInterfaceDesc(
 static int32_t UsbFnCfgMgrParseEndpointDesc(
     const struct DeviceResourceNode *node, const struct DeviceResourceIface *drsOps, uint8_t *descBuff)
 {
-    struct UsbEndpointDescriptor *desc = NULL;
-    uint16_t value;
-
     if (node == NULL || drsOps == NULL || descBuff == NULL) {
         return HDF_FAILURE;
     }
-    desc = (struct UsbEndpointDescriptor *)descBuff;
+
+    uint16_t value;
+    struct UsbEndpointDescriptor *desc = (struct UsbEndpointDescriptor *)descBuff;
     if (drsOps->GetUint8(node, DESC_LENGTH, &desc->bLength, 0) != HDF_SUCCESS ||
         drsOps->GetUint8(node, DESC_TYPE, &desc->bDescriptorType, 0) != HDF_SUCCESS ||
         drsOps->GetUint8(node, ENDPOINT_ADDRESS, &desc->bEndpointAddress, 0) != HDF_SUCCESS ||
@@ -960,9 +957,12 @@ void UsbFnCfgMgrFreeUsbFnDeviceDesc(struct UsbFnDeviceDesc *fnDevDesc)
 
 static uint8_t IsPropRegisted(const struct UsbFnInterface *intf, const char *name)
 {
+    if (DListIsEmpty(&g_cfgEntry) == true) {
+        return 0;
+    }
+
     struct UsbFnCfgPropMgr *obj = NULL;
     struct UsbFnCfgPropMgr *temp = NULL;
-
     DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_cfgEntry, struct UsbFnCfgPropMgr, entry) {
         if (obj->intf && (obj->intf == intf) && strcmp(name, obj->name) == 0) {
             return 1;
@@ -973,12 +973,10 @@ static uint8_t IsPropRegisted(const struct UsbFnInterface *intf, const char *nam
 
 static int32_t IsDevDescPropAndGetValue(const struct UsbFnInterface *intf, const char *name, uint16_t *value)
 {
-    struct UsbFnDeviceMgr *fnDevMgr = NULL;
-
     if (name == NULL || intf == NULL) {
         return 0;
     }
-    fnDevMgr = (struct UsbFnDeviceMgr *)intf->object;
+    struct UsbFnDeviceMgr *fnDevMgr = (struct UsbFnDeviceMgr *)intf->object;
     if (fnDevMgr == NULL || fnDevMgr->des == NULL || fnDevMgr->des->deviceDesc == NULL) {
         HDF_LOGE("%{public}s: fnDevMgr is null", __func__);
         return 0;
@@ -1034,15 +1032,11 @@ static const char *UsbFnCfgGetPropValueFromPropList(const struct UsbFnDeviceMgr 
     const struct UsbFnInterface *intf, const struct DeviceResourceIface *drsOps,
     const struct DeviceResourceNode *propListNode, const char *name)
 {
-    int32_t propCount;
-    int32_t count;
-    int32_t ret;
     uint8_t configNum;
     uint8_t interfaceNum;
     const char *propNodeName = NULL;
     const char *propValue = NULL;
     const char *propName = NULL;
-    const struct DeviceResourceNode *propNode = NULL;
     (void)fnDevMgr;
 
     if (drsOps->GetUint8(propListNode, "configNum", &configNum, 0) != HDF_SUCCESS) {
@@ -1057,17 +1051,17 @@ static const char *UsbFnCfgGetPropValueFromPropList(const struct UsbFnDeviceMgr 
         HDF_LOGE("%{public}s: prop List is not ringt", __func__);
         return NULL;
     }
-    propCount = drsOps->GetElemNum(propListNode, "propList");
+    int32_t propCount = drsOps->GetElemNum(propListNode, "propList");
     if (propCount <= 0) {
         return NULL;
     }
-    for (count = 0; count < propCount; count++) {
-        ret = drsOps->GetStringArrayElem(propListNode, "propList", count, &propNodeName, NULL);
+    for (int32_t count = 0; count < propCount; count++) {
+        int32_t ret = drsOps->GetStringArrayElem(propListNode, "propList", count, &propNodeName, NULL);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: read stringList fail", __func__);
             return NULL;
         }
-        propNode = drsOps->GetChildNode(propListNode, propNodeName);
+        const struct DeviceResourceNode *propNode = drsOps->GetChildNode(propListNode, propNodeName);
         if (propNode == NULL) {
             HDF_LOGE("%{public}s: propNode is null", __func__);
             return NULL;
@@ -1089,19 +1083,17 @@ static const char *UsbFnCfgGetPropValueFromPropList(const struct UsbFnDeviceMgr 
 static const char *UsbFnCfgGetPropValueFromHcs(const struct UsbFnDeviceMgr *fnDevMgr, const struct UsbFnInterface *intf,
     const struct DeviceResourceIface *drsOps, const struct DeviceResourceNode *customNode, const char *name)
 {
-    int32_t propTabCount;
-    int32_t count;
-    int32_t ret;
     const struct DeviceResourceNode *propListNode = NULL;
     const char *propNodeName = NULL;
     const char *propValue = NULL;
 
-    propTabCount = drsOps->GetElemNum(customNode, "propTable");
+    int32_t propTabCount = drsOps->GetElemNum(customNode, "propTable");
     if (propTabCount <= 0) {
         return NULL;
     }
-    for (count = 0; count < propTabCount; count++) {
-        ret = drsOps->GetStringArrayElem(customNode, "propTable", count, &propNodeName, NULL);
+    uint32_t totalCount = (uint32_t)propTabCount;
+    for (uint32_t count = 0; count < totalCount; count++) {
+        int32_t ret = drsOps->GetStringArrayElem(customNode, "propTable", count, &propNodeName, NULL);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: read stringList fail", __func__);
             return NULL;
@@ -1172,17 +1164,15 @@ static int32_t UsbFnCfgChangeUdcName(const struct UsbFnDeviceMgr *fnDevMgr, stru
 static int32_t UsbFnCfgChangeStrings(
     const struct UsbFnDeviceMgr *fnDevMgr, struct UsbFnAdapterOps *fnOps, uint32_t index, const char *propName)
 {
-    int32_t i;
-    int32_t ret;
-    struct UsbFnStrings **strings = NULL;
-
     if (fnDevMgr == NULL || fnDevMgr->des == NULL || fnDevMgr->des->deviceStrings == NULL) {
         return HDF_FAILURE;
     }
-    strings = fnDevMgr->des->deviceStrings;
-    for (i = 0; strings[i] != NULL; i++) {
-        ret = fnOps->writeDesString(fnDevMgr->name, strings[i]->language, propName, strings[i]->strings[index].s);
-        if (ret) {
+
+    struct UsbFnStrings **strings = fnDevMgr->des->deviceStrings;
+    for (int32_t i = 0; strings[i] != NULL; i++) {
+        int32_t ret =
+            fnOps->writeDesString(fnDevMgr->name, strings[i]->language, propName, strings[i]->strings[index].s);
+        if (ret != HDF_SUCCESS) {
             return HDF_FAILURE;
         }
     }
@@ -1228,9 +1218,12 @@ static int32_t UsbFnCfgChangeDevceDes(const struct UsbFnInterface *intf, const c
 
 static struct UsbFnCfgPropMgr *UsbfnCfgMgrFindPropMgr(const struct UsbFnInterface *intf, const char *name)
 {
+    if (DListIsEmpty(&g_cfgEntry) == true) {
+        return NULL;
+    }
+
     struct UsbFnCfgPropMgr *obj = NULL;
     struct UsbFnCfgPropMgr *temp = NULL;
-
     DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_cfgEntry, struct UsbFnCfgPropMgr, entry) {
         if (obj->intf && (obj->intf == intf) && strcmp(name, obj->name) == 0) {
             return obj;
@@ -1241,19 +1234,17 @@ static struct UsbFnCfgPropMgr *UsbfnCfgMgrFindPropMgr(const struct UsbFnInterfac
 
 int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf, const struct UsbFnRegistInfo *registInfo)
 {
-    struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
-    uint8_t isDevProp;
-    int32_t isRegist;
-    int32_t ret;
     if (intf == NULL || registInfo == NULL || registInfo->name == NULL) {
         return HDF_FAILURE;
     }
     if (g_cfgEntry.next == 0) {
         DListHeadInit(&g_cfgEntry);
     }
-    isDevProp = (uint8_t)IsDevDescProp(registInfo->name);
-    isRegist = IsPropRegisted(intf, registInfo->name);
-    if (isRegist) {
+
+    struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
+    uint8_t isDevProp = (uint8_t)IsDevDescProp(registInfo->name);
+    int32_t isRegist = IsPropRegisted(intf, registInfo->name);
+    if (isRegist != 0) {
         if (isDevProp == 0) {
             return HDF_FAILURE;
         } else {
@@ -1273,7 +1264,7 @@ int32_t UsbFnCfgMgrRegisterProp(const struct UsbFnInterface *intf, const struct 
 
     fnCfgPropMgr->isDevProp = isDevProp;
     fnCfgPropMgr->intf = intf;
-    ret = snprintf_s(fnCfgPropMgr->name, MAX_LEN, MAX_LEN - 1, "%s", registInfo->name);
+    int32_t ret = snprintf_s(fnCfgPropMgr->name, MAX_LEN, MAX_LEN - 1, "%s", registInfo->name);
     if (ret < 0) {
         HDF_LOGE("%{public}s: snprintf_s failed", __func__);
         return HDF_FAILURE;
@@ -1300,12 +1291,6 @@ void UsbFnCfgMgrUnRegisterAllProp(void)
 
 int32_t UsbFnCfgMgrGetProp(const struct UsbFnInterface *intf, const char *name, char *value)
 {
-    struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
-    uint16_t val;
-    int32_t ret;
-    char tmp[MAX_LEN];
-    const char *propValue = NULL;
-
     if (intf == NULL || name == NULL) {
         return HDF_FAILURE;
     }
@@ -1313,35 +1298,34 @@ int32_t UsbFnCfgMgrGetProp(const struct UsbFnInterface *intf, const char *name, 
         DListHeadInit(&g_cfgEntry);
     }
     if (IsPropRegisted(intf, name) == 0) {
+        uint16_t val;
         if (IsDevDescPropAndGetValue(intf, name, &val)) {
-            ret = snprintf_s(tmp, MAX_LEN, MAX_LEN - 1, "%x", val);
-            if (ret < 0) {
+            char tmp[MAX_LEN];
+            if (snprintf_s(tmp, MAX_LEN, MAX_LEN - 1, "%x", val) < 0) {
                 return HDF_FAILURE;
             }
-            ret = memcpy_s(value, strlen(tmp), tmp, strlen(tmp));
-            if (ret != 0) {
+            if (memcpy_s(value, strlen(tmp), tmp, strlen(tmp)) != 0) {
                 return HDF_FAILURE;
             }
             return HDF_SUCCESS;
         } else {
-            propValue = UsbFnCfgFindPropFromHcs(intf, name);
+            const char *propValue = UsbFnCfgFindPropFromHcs(intf, name);
             if (propValue == NULL) {
                 return HDF_FAILURE;
             }
-            ret = memcpy_s(value, strlen(propValue), propValue, strlen(propValue));
-            if (ret != EOK) {
+            if (memcpy_s(value, strlen(propValue), propValue, strlen(propValue)) != EOK) {
                 HDF_LOGE("%{public}s: memcpy_s failed", __func__);
                 return HDF_FAILURE;
             }
             return HDF_SUCCESS;
         }
     }
-    fnCfgPropMgr = UsbfnCfgMgrFindPropMgr(intf, name);
+
+    struct UsbFnCfgPropMgr *fnCfgPropMgr = UsbfnCfgMgrFindPropMgr(intf, name);
     if (fnCfgPropMgr == NULL) {
         return HDF_FAILURE;
     }
-    ret = memcpy_s(value, strlen(fnCfgPropMgr->value), fnCfgPropMgr->value, strlen(fnCfgPropMgr->value));
-    if (ret != EOK) {
+    if (memcpy_s(value, strlen(fnCfgPropMgr->value), fnCfgPropMgr->value, strlen(fnCfgPropMgr->value)) != EOK) {
         return HDF_FAILURE;
     }
     if (fnCfgPropMgr->getPropCallback) {
@@ -1352,37 +1336,36 @@ int32_t UsbFnCfgMgrGetProp(const struct UsbFnInterface *intf, const char *name, 
 
 int32_t UsbFnCfgMgrSetProp(const struct UsbFnInterface *intf, const char *name, const char *value)
 {
-    struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
-    int32_t deviceProp;
-    int32_t isRegist;
-    int32_t ret;
-    const char *propValue = NULL;
-    struct UsbFnRegistInfo registInfo;
     if (intf == NULL || name == NULL) {
         return HDF_FAILURE;
     }
+
     if (g_cfgEntry.next == 0) {
         DListHeadInit(&g_cfgEntry);
     }
+
+    struct UsbFnRegistInfo registInfo;
     registInfo.name = name;
     registInfo.value = value;
     registInfo.setProp = NULL;
     registInfo.getProp = NULL;
-    deviceProp = IsDevDescProp(name);
-    isRegist = IsPropRegisted(intf, name);
+    int32_t deviceProp = IsDevDescProp(name);
+    int32_t isRegist = IsPropRegisted(intf, name);
     if (isRegist == 0 && deviceProp == 0) {
-        propValue = UsbFnCfgFindPropFromHcs(intf, name);
-        if (propValue) {
+        const char *propValue = UsbFnCfgFindPropFromHcs(intf, name);
+        if (propValue != NULL) {
             return UsbFnCfgMgrRegisterProp(intf, &registInfo);
         }
         return HDF_FAILURE;
     }
+
+    struct UsbFnCfgPropMgr *fnCfgPropMgr = NULL;
     if (isRegist != 0) {
         fnCfgPropMgr = UsbfnCfgMgrFindPropMgr(intf, name);
         if (fnCfgPropMgr == NULL) {
             return HDF_FAILURE;
         }
-        ret = snprintf_s(fnCfgPropMgr->value, MAX_LEN, MAX_LEN - 1, "%s", value);
+        int32_t ret = snprintf_s(fnCfgPropMgr->value, MAX_LEN, MAX_LEN - 1, "%s", value);
         if (ret < 0) {
             return HDF_FAILURE;
         }

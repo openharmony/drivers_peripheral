@@ -31,10 +31,10 @@ RetCode HeapBufferAllocator::Init()
 
 std::shared_ptr<IBuffer> HeapBufferAllocator::AllocBuffer(const uint32_t width,
                                                           const uint32_t height,
-                                                          const uint64_t usage,
-                                                          const uint32_t format)
+                                                          const uint64_t cameraUsage,
+                                                          const uint32_t cameraFormat)
 {
-    uint32_t size = CalculateSize(width, height, usage, format);
+    uint32_t size = CalculateSize(width, height, cameraUsage, cameraFormat);
     char* heap = nullptr;
     if (size > 0) {
         heap = new (std::nothrow) char[size];
@@ -46,12 +46,12 @@ std::shared_ptr<IBuffer> HeapBufferAllocator::AllocBuffer(const uint32_t width,
     std::shared_ptr<IBuffer> buffer = std::make_shared<ImageBuffer>(sourceType_);
     if (buffer != nullptr) {
         buffer->SetSize(size);
-        buffer->SetUsage(usage);
+        buffer->SetUsage(cameraUsage);
         buffer->SetVirAddress(heap);
         buffer->SetStride(width);
         buffer->SetWidth(width);
         buffer->SetHeight(height);
-        buffer->SetFormat(format);
+        buffer->SetFormat(cameraFormat);
         CAMERA_LOGD("Alloc buffer succeed to shared memory segment size:%{public}d.", size);
     } else {
         delete[] heap;
