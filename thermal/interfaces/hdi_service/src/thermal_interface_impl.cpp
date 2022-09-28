@@ -133,6 +133,7 @@ int32_t ThermalInterfaceImpl::SetBatteryCurrent(int32_t current)
 int32_t ThermalInterfaceImpl::GetThermalZoneInfo(HdfThermalCallbackInfo& event)
 {
     if (thermalZoneMgr_ != nullptr) {
+        thermalZoneMgr_->ParseThermalZoneInfo();
         event.info = thermalZoneMgr_->tzInfoAcaualEvent_.info;
     }
     return HDF_SUCCESS;
