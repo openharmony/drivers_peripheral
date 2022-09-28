@@ -39,7 +39,7 @@ namespace Audio {
             return false;
         }
         ret = reqSizeFuzzCapture->control.Start((AudioHandle)reqSizeFuzzCapture);
-        if (ret < 0 || reqSizeFuzzManager == nullptr) {
+        if (ret < 0) {
             reqSizeFuzzAdapter->DestroyCapture(reqSizeFuzzAdapter, reqSizeFuzzCapture);
             reqSizeFuzzManager->UnloadAdapter(reqSizeFuzzManager, reqSizeFuzzAdapter);
             fclose(fp);
@@ -50,7 +50,7 @@ namespace Audio {
         int32_t reqSize = 0;
         struct AudioMmapBufferDescripter desc = {};
         ret = InitMmapDesc(fp, desc, reqSize, isRender);
-        if (ret < 0 || reqSizeFuzzManager == nullptr) {
+        if (ret < 0) {
             reqSizeFuzzAdapter->DestroyCapture(reqSizeFuzzAdapter, reqSizeFuzzCapture);
             reqSizeFuzzManager->UnloadAdapter(reqSizeFuzzManager, reqSizeFuzzAdapter);
             fclose(fp);
