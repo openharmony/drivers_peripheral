@@ -110,7 +110,7 @@ HWTEST_F(HdfLightHdiPerformanceTest, TurnOnLight001, TestSize.Level1)
         HdfLightEffect effect;
         effect.flashEffect.flashMode = HDF_LIGHT_FLASH_NONE;
         clock_gettime(CLOCK_REALTIME, &tv1);
-        int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
+        ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
         clock_gettime(CLOCK_REALTIME, &tv2);
 
         timeUsed = ((tv2.tv_sec * LIGHT_USEC_TIME + tv2.tv_nsec / LIGHT_MSEC_TIME) -
@@ -155,7 +155,7 @@ HWTEST_F(HdfLightHdiPerformanceTest, TurnOnLight002, TestSize.Level1)
         effect.flashEffect.onTime = ON_TIME;
         effect.flashEffect.offTime = OFF_TIME;
         clock_gettime(CLOCK_REALTIME, &tv1);
-        int32_t ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
+        ret = g_lightInterface->TurnOnLight(iter.lightId, effect);
         clock_gettime(CLOCK_REALTIME, &tv2);
 
         timeUsed = ((tv2.tv_sec * LIGHT_USEC_TIME + tv2.tv_nsec / LIGHT_MSEC_TIME) -
