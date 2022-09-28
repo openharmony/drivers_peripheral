@@ -687,6 +687,10 @@ static ResultCode TraverseCredentialList(const CredentialCondition *limit, const
             continue;
         }
         CredentialInfoHal *copy = (CredentialInfoHal *)Malloc(sizeof(CredentialInfoHal));
+        if (copy == NULL) {
+            LOG_ERROR("copy malloc failed");
+            return RESULT_NO_MEMORY;
+        }
         *copy = *nodeData;
         ResultCode ret = credListGet->insert(credListGet, copy);
         if (ret != RESULT_SUCCESS) {
