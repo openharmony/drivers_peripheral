@@ -32,7 +32,7 @@ bool AudioSetrenderspeedRenderFuzzTest(const uint8_t *data, size_t size)
     }
     float speed = 100;
 
-    struct AudioRender *renderFuzz = reinterpret_cast<struct AudioRender *>(*data);
+    struct AudioRender *renderFuzz = (struct AudioRender *)data;
     ret = setRenSpeedRender->SetRenderSpeed(renderFuzz, speed);
     if (ret == HDF_ERR_NOT_SUPPORT) {
         result = true;
