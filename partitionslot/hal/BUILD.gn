@@ -31,7 +31,10 @@ ohos_source_set("partitionslot_source") {
 ohos_shared_library("libpartition_slot_manager") {
   deps = [ ":partitionslot_source" ]
 
-  install_images = [ "updater" ]
+  install_images = [
+    "system",
+    "updater"
+  ]
 
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_partitionslot"
