@@ -33,7 +33,7 @@ ohos_shared_library("libpartition_slot_manager") {
 
   install_images = [
     "system",
-    "updater"
+    "updater",
   ]
 
   subsystem_name = "hdf"
