@@ -31,7 +31,7 @@ bool AudioSetvolumeRenderVolumeFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    int32_t volume = *(reinterpret_cast<float *>(*data));
+    int32_t volume = *(float *)data;
     ret = volumeFuzzRender->volume.SetVolume(volumeFuzzRender, volume);
     if (ret == HDF_SUCCESS) {
         result = true;
