@@ -30,10 +30,10 @@ int NfcVendorAdaptions::VendorOpen(nfc_stack_callback_t *p_cback,
     return phNxpNciHal_open(*p_cback, *p_data_cback);
 }
 
-int NfcVendorAdaptions::VendorCoreInitialized(uint16_t data_len,
+int NfcVendorAdaptions::VendorCoreInitialized(uint16_t core_init_rsp_len,
                                               uint8_t *p_core_init_rsp_params)
 {
-    return phNxpNciHal_core_initialized(data_len, p_core_init_rsp_params);
+    return phNxpNciHal_core_initialized(core_init_rsp_len, p_core_init_rsp_params);
 }
 
 int NfcVendorAdaptions::VendorWrite(uint16_t data_len, const uint8_t *p_data)
