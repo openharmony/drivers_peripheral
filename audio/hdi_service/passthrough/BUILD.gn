@@ -50,6 +50,7 @@ ohos_shared_library("audio_manager_service_1.0") {
     external_deps = [
       "c_utils:utils",
       "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
