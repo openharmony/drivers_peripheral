@@ -135,7 +135,6 @@ HWTEST_F(HdfLightTest, GetLightList002, TestSize.Level1)
 HWTEST_F(HdfLightTest, EnableLight001, TestSize.Level1)
 {
     int32_t i;
-    int32_t ret;
     struct LightEffect effect;
     effect.flashEffect.flashMode = LIGHT_FLASH_NONE;
     effect.flashEffect.onTime = 0;
@@ -145,7 +144,7 @@ HWTEST_F(HdfLightTest, EnableLight001, TestSize.Level1)
         effect.lightColor.colorValue.rgbColor.r = 255;
         effect.lightColor.colorValue.rgbColor.g = 0;
         effect.lightColor.colorValue.rgbColor.b = 0;
-        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        int32_t ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(0, ret);
 
         OsalSleep(LIGHT_WAIT_TIME);
@@ -175,7 +174,6 @@ HWTEST_F(HdfLightTest, EnableLight001, TestSize.Level1)
 HWTEST_F(HdfLightTest, EnableLight002, TestSize.Level1)
 {
     int32_t i;
-    int32_t ret;
     struct LightEffect effect;
     effect.flashEffect.flashMode = LIGHT_FLASH_BLINK;
     effect.flashEffect.onTime = ON_TIME;
@@ -185,7 +183,7 @@ HWTEST_F(HdfLightTest, EnableLight002, TestSize.Level1)
         effect.lightColor.colorValue.rgbColor.r = 255;
         effect.lightColor.colorValue.rgbColor.g = 0;
         effect.lightColor.colorValue.rgbColor.b = 0;
-        ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
+        int32_t ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(0, ret);
 
         OsalSleep(LIGHT_WAIT_TIME);
