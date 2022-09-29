@@ -73,6 +73,7 @@ group("led_service") {
 
 group("resources_service") {
   deps = [
+    "resources:device.charge.group.cfg",
     "resources:init.charger.cfg",
     "resources:resources_config",
     "resources:resources_config1",
