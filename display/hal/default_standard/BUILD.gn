@@ -40,8 +40,8 @@ ohos_shared_library("def_display_gralloc") {
   output_name = "display_gralloc"
   cflags = [ "-Wno-macro-redefined" ]
   deps = [
+    "//commonlibrary/memory_utils/libdmabufheap:libdmabufheap",
     "//third_party/libdrm:libdrm",
-    "//utils/memory/libdmabufheap:libdmabufheap",
   ]
 
   external_deps = [
