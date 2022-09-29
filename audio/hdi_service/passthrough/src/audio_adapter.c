@@ -22,6 +22,7 @@
 #include "hdf_types.h"
 #include "osal_mem.h"
 #include "securec.h"
+#include "stub_collector.h"
 
 #define HDF_LOG_TAG AUDIO_HDI_IMPL
 
@@ -628,6 +629,9 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, const struct Au
     }
 
     struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr;
+
+    StubCollectorRemoveObject(IAUDIORENDER_INTERFACE_DESC, render);
+
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is NULL!");
@@ -962,6 +966,9 @@ int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, const struct A
         return AUDIO_ERR_INVALID_PARAM;
     }
     struct IAudioCapture *capture = (struct IAudioCapture *)hwAdapter->infos.captureServicePtr;
+
+    StubCollectorRemoveObject(IAUDIOCAPTURE_INTERFACE_DESC, capture);
+
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is NULL!");
