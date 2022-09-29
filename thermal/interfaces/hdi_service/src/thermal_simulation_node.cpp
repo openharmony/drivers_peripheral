@@ -77,13 +77,13 @@ int32_t ThermalSimulationNode::CreateNodeDir(std::string dir)
 
 int32_t ThermalSimulationNode::CreateNodeFile(std::string filePath)
 {
-    int32_t fd = -1;
     if (access(filePath.c_str(), 0) != 0) {
-        fd = open(filePath.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP| S_IROTH);
+        int32_t fd = open(filePath.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP| S_IROTH);
         if (fd < NUM_ZERO) {
             THERMAL_HILOGE(COMP_HDI, "open failed to file.");
             return fd;
         }
+        close(fd);
     } else {
         THERMAL_HILOGD(COMP_HDI, "the file already exists.");
     }
@@ -92,9 +92,7 @@ int32_t ThermalSimulationNode::CreateNodeFile(std::string filePath)
 
 int32_t ThermalSimulationNode::AddSensorTypeTemp()
 {
-    int32_t ret;
-    std::string file[] = {"type", "temp"};
-    std::vector<std::string> vFile(file, file + ARG_2);
+    std::vector<std::string> vFile = {"type", "temp"};
     std::map<std::string, int32_t> sensor;
     char nodeBuf[MAX_PATH] = {0};
     char fileBuf[MAX_PATH] = {0};
@@ -110,13 +108,14 @@ int32_t ThermalSimulationNode::AddSensorTypeTemp()
     sensor["shell"] = 0;
     CreateNodeDir(THERMAL_DIR);
     for (auto dir : sensor) {
-        ret = snprintf_s(nodeBuf, MAX_PATH, sizeof(nodeBuf) - ARG_1, THERMAL_NODE_DIR.c_str(), dir.first.c_str());
+        int32_t ret = snprintf_s(nodeBuf, MAX_PATH, sizeof(nodeBuf) - ARG_1,
+            THERMAL_NODE_DIR.c_str(), dir.first.c_str());
         if (ret < EOK) {
             return HDF_FAILURE;
         }
         THERMAL_HILOGI(COMP_HDI, "node name: %{public}s", nodeBuf);
         CreateNodeDir(static_cast<std::string>(nodeBuf));
-        for (auto file : vFile) {
+        for (const auto& file : vFile) {
             ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, "%s/%s", nodeBuf, file.c_str());
             if (ret < EOK) {
                 return HDF_FAILURE;
