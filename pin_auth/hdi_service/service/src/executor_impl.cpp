@@ -83,8 +83,8 @@ int32_t ExecutorImpl::GetTemplateInfo(uint64_t templateId, TemplateInfo &info)
     }
 
     info.executorType = EXECUTOR_TYPE;
-    info.remainTimes = infoRet.remainTimes;
-    info.freezingTime = infoRet.freezingTime;
+    info.remainAttempts = infoRet.remainTimes;
+    info.lockoutDuration = infoRet.freezingTime;
 
     return HDF_SUCCESS;
 }

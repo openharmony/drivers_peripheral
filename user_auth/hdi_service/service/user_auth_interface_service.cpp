@@ -153,7 +153,7 @@ static int32_t CreateExecutorCommand(AuthResultInfo &info)
             IAM_LOGE("get unlock msg failed");
             return ret;
         }
-    } else if (info.remainTimes == 0) {
+    } else if (info.remainAttempts == 0) {
         ret = GetExecutorMsgList(PROPERMODE_LOCK, &executorSendMsg);
         if (ret != RESULT_SUCCESS) {
             IAM_LOGE("get lock msg failed");
@@ -217,8 +217,8 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
         return ret;
     }
     info.result = authResult.result;
-    info.remainTimes = authResult.remainTimes;
-    info.freezingTime = authResult.freezingTime;
+    info.remainAttempts = authResult.remainTimes;
+    info.lockoutDuration = authResult.freezingTime;
     if (info.result == RESULT_SUCCESS) {
         info.token.resize(sizeof(UserAuthTokenHal));
         if (memcpy_s(info.token.data(), info.token.size(), &authTokenHal, sizeof(authTokenHal)) != EOK) {

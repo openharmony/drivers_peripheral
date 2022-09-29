@@ -127,8 +127,8 @@ void FillFuzzExecutorSendMsgVector(Parcel &parcel, vector<ExecutorSendMsg> &vect
 void FillFuzzAuthResultInfo(Parcel &parcel, AuthResultInfo &authResultInfo)
 {
     authResultInfo.result = parcel.ReadUint32();
-    authResultInfo.freezingTime = parcel.ReadInt32();
-    authResultInfo.remainTimes = parcel.ReadInt32();
+    authResultInfo.lockoutDuration = parcel.ReadInt32();
+    authResultInfo.remainAttempts = parcel.ReadInt32();
     FillFuzzExecutorSendMsgVector(parcel, authResultInfo.msgs);
     FillFuzzUint8Vector(parcel, authResultInfo.token);
     IAM_LOGI("success");
