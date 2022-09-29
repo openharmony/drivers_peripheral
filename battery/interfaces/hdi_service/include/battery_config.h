@@ -17,54 +17,44 @@
 #define BATTERY_CONFIG_H
 
 #include <fstream>
-#include <string>
+#include <memory>
+#include <mutex>
 #include <vector>
+#include <string>
+
 #include <json/json.h>
+#include "nocopyable.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_1 {
-class BatteryConfig {
+class BatteryConfig : public NoCopyable {
 public:
-    struct LedConf {
-        int32_t capacityBegin;
-        int32_t capacityEnd;
-        int32_t color;
-        int32_t brightness;
+    struct LightConf {
+        int32_t beginSoc;
+        int32_t endSoc;
+        uint32_t rgb;
     };
-
-    struct TempConf {
-        int32_t lower;
-        int32_t upper;
-    };
-
-    void Init();
-    std::vector<LedConf> GetLedConf();
-    BatteryConfig::TempConf GetTempConf();
-    int32_t GetCapacityConf();
-    std::string GetCurrentLimitPathConf();
-    std::string GetVoltageLimitPathConf();
+    static BatteryConfig& GetInstance();
+    static void DestroyInstance();
+    bool ParseConfig(std::string configPath = "");
+    bool IsExist(std::string key) const;
+    int32_t GetInt(std::string key, int32_t defVal = 0) const;
+    std::string GetString(std::string key, std::string defVal = "") const;
+    const std::vector<LightConf>& GetLightConf() const;
 
 private:
-    enum JsonConfIndex {
-        INDEX_ZERO = 0,
-        INDEX_ONE,
-        INDEX_TWO,
-        INDEX_THREE,
-    };
-
-    int32_t ParseLedConf(Json::Value& root);
-    int32_t ParseTemperatureConf(Json::Value& root);
-    int32_t ParseCapacityConf(Json::Value& root);
-    int32_t ParseCurrentLimitConf(Json::Value& root);
-    int32_t ParseVoltageLimitConf(Json::Value& root);
-    void ParseConfig(const std::string& filename);
-    std::vector<BatteryConfig::LedConf> ledConf_;
-    struct TempConf tempConf_;
-    int32_t capacityConf_ = -1;
-    std::string currentPathConf_;
-    std::string voltagePathConf_;
+    bool OpenFile(std::ifstream& ifsConf, const std::string& configPath);
+    void ParseConfInner();
+    void ParseLightConf(std::string level);
+    Json::Value FindConf(const std::string& key) const;
+    bool SplitKey(const std::string& key, std::vector<std::string>& keys) const;
+    Json::Value GetValue(std::string key) const;
+    Json::Value config_;
+    std::vector<BatteryConfig::LightConf> lightConf_;
+    static std::mutex mutex_;
+    static std::shared_ptr<BatteryConfig> instance_;
 };
 }  // namespace V1_1
 }  // namespace Battery

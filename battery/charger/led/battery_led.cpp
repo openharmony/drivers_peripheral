@@ -14,140 +14,104 @@
  */
 
 #include "battery_led.h"
-
-#include "file_ex.h"
-#include "errors.h"
-#include "power_supply_provider.h"
 #include "battery_log.h"
-#include "v1_0/ilight_interface.h"
-#include "v1_0/light_types.h"
+
+using namespace OHOS::HDI::Light::V1_0;
+using namespace std;
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_1 {
 namespace {
-using namespace OHOS::HDI::Light::V1_0;
-
-constexpr int32_t CAPACITY_FULL = 100;
-constexpr int32_t LED_COLOR_GREEN = 2;
-constexpr int32_t LED_COLOR_RED = 4;
-constexpr int32_t LED_COLOR_YELLOW = 6;
-sptr<ILightInterface> g_light;
-static std::vector<HdfLightInfo> g_info;
+constexpr uint32_t MOVE_RIGHT_16 = 16;
+constexpr uint32_t MOVE_RIGHT_8 = 8;
 }
-
-void BatteryLed::InitLightInfo()
+void BatteryLed::InitLight()
 {
-    if (g_light == nullptr) {
-        g_light = ILightInterface::Get();
-        if (g_light == nullptr) {
-            BATTERY_HILOGE(FEATURE_CHARGING, "failed to get light hdi interface");
-            return;
-        }
-    }
-
-    int32_t ret = g_light->GetLightInfo(g_info);
-    if (ret < 0) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "get HdfLightInfo failed");
+    batteryLight_ = ILightInterface::Get();
+    if (batteryLight_ == nullptr) {
+        BATTERY_HILOGW(COMP_HDI, "Light interface is null");
         return;
     }
 
-    for (auto iter: g_info) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "HdfLightInfo.lightId: %{public}d", iter.lightId);
-    }
-}
-
-void BatteryLed::TurnOffLed()
-{
-    if (g_light == nullptr) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "g_light is nullptr");
+    vector<HdfLightInfo> lightInfo;
+    if (batteryLight_->GetLightInfo(lightInfo) < HDF_SUCCESS) {
+        BATTERY_HILOGW(COMP_HDI, "Get battert light failed");
         return;
     }
 
-    for (auto iter: g_info) {
-        if (iter.lightId == HDF_LIGHT_ID_BATTERY) {
-            g_light->TurnOffLight(iter.lightId);
-            BATTERY_HILOGD(FEATURE_CHARGING, "turn off led:%{public}d", iter.lightId);
-        }
-    }
-}
-
-void BatteryLed::UpdateLedColor(int32_t chargeState, int32_t capacity)
-{
-    if ((chargeState == PowerSupplyProvider::CHARGE_STATE_NONE) ||
-        (chargeState == PowerSupplyProvider::CHARGE_STATE_RESERVED)) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "not in charging state, turn off led");
-        TurnOffLed();
-        return;
-    }
-
-    std::unique_ptr<BatteryConfig> batteryConfig = std::make_unique<BatteryConfig>();
-    if (batteryConfig == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "make_unique BatteryConfig return nullptr");
-        return;
-    }
-    batteryConfig->Init();
-
-    auto ledConf = batteryConfig->GetLedConf();
-    for (auto it = ledConf.begin(); it != ledConf.end(); ++it) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "capacity=%{public}d, ledConf.begin()=%{public}d, ledConf.end()=%{public}d",
-            capacity, it->capacityBegin, it->capacityEnd);
-        if ((capacity >= it->capacityBegin) && (capacity < it->capacityEnd)) {
-            switch (it->color) {
-                case (LED_COLOR_GREEN): {
-                    BATTERY_HILOGD(FEATURE_CHARGING, "led color display green");
-                    WriteLedInfo(0, it->brightness, 0);
-                    break;
-                }
-                case (LED_COLOR_RED): {
-                    BATTERY_HILOGD(FEATURE_CHARGING, "led color display red");
-                    WriteLedInfo(it->brightness, 0, 0);
-                    break;
-                }
-                case (LED_COLOR_YELLOW): {
-                    BATTERY_HILOGD(FEATURE_CHARGING, "led color display yellow");
-                    WriteLedInfo(it->brightness, it->brightness, 0);
-                    break;
-                }
-                default: {
-                    BATTERY_HILOGD(FEATURE_CHARGING, "led color display error.");
-                    break;
-                }
-            }
-            break;
-        }
-
-        if (capacity == CAPACITY_FULL) {
-            BATTERY_HILOGD(FEATURE_CHARGING, "led color display green");
-            WriteLedInfo(0, it->brightness, 0);
+    for (const auto& item : lightInfo) {
+        if (item.lightId == HdfLightId::HDF_LIGHT_ID_BATTERY) {
+            available_ = true;
+            BATTERY_HILOGI(COMP_HDI, "Battery light is available");
             break;
         }
     }
 }
 
-void BatteryLed::WriteLedInfo(int32_t redBrightness, int32_t greenBrightness, int32_t blueBrightness)
+void BatteryLed::TurnOff()
 {
-    if (g_light == nullptr) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "g_light is nullptr");
+    if (!available_) {
         return;
     }
+    int32_t ret = batteryLight_->TurnOffLight(HdfLightId::HDF_LIGHT_ID_BATTERY);
+    if (ret < HDF_SUCCESS) {
+        BATTERY_HILOGW(COMP_HDI, "Failed to turn off the battery light");
+    }
+    lightColor_ = (ret < HDF_SUCCESS) ? lightColor_ : 0;
+}
 
+void BatteryLed::TurnOn(uint32_t color, int32_t brightness)
+{
+    if (!available_) {
+        return;
+    }
     struct HdfLightEffect effect = {
-        .lightColor.colorValue.rgbColor.r = redBrightness,
-        .lightColor.colorValue.rgbColor.g = greenBrightness,
-        .lightColor.colorValue.rgbColor.b = blueBrightness,
+        .lightColor.colorValue.rgbColor.brightness = brightness,
+        .lightColor.colorValue.rgbColor.r = (color >> MOVE_RIGHT_16) & 0xFF,
+        .lightColor.colorValue.rgbColor.g = (color >> MOVE_RIGHT_8) & 0xFF,
+        .lightColor.colorValue.rgbColor.b = color & 0xFF,
     };
+    BATTERY_HILOGD(COMP_HDI, "battery light color is %{public}d", color);
+    int32_t ret = batteryLight_->TurnOnLight(HdfLightId::HDF_LIGHT_ID_BATTERY, effect);
+    if (ret < HDF_SUCCESS) {
+        BATTERY_HILOGW(COMP_HDI, "Failed to turn on the battery light");
+    }
+    lightColor_ = (ret < HDF_SUCCESS) ? lightColor_ : color;
+}
 
-    for (auto iter: g_info) {
-        if (iter.lightId == HDF_LIGHT_ID_BATTERY) {
-            BATTERY_HILOGD(FEATURE_CHARGING,
-                "redBrightness: %{public}d, greenBrightness: %{public}d, blueBrightness: %{public}d",
-                redBrightness, greenBrightness, blueBrightness);
-            g_light->TurnOffLight(iter.lightId);
-            g_light->TurnOnLight(iter.lightId, effect);
+bool BatteryLed::UpdateColor(int32_t chargeState, int32_t capacity)
+{
+    if ((chargeState == static_cast<int32_t>(BatteryChargeState::CHARGE_STATE_NONE)) ||
+        (chargeState == static_cast<int32_t>(BatteryChargeState::CHARGE_STATE_RESERVED)) || !available_) {
+        BATTERY_HILOGD(COMP_HDI, "not in charging state, turn off battery light");
+        TurnOff();
+        return false;
+    }
+
+    const auto& lightConf = BatteryConfig::GetInstance().GetLightConf();
+    for (const auto& it : lightConf) {
+        if ((capacity >= it.beginSoc) && (capacity <= it.endSoc)) {
+            if (lightColor_ == it.rgb) {
+                return true;
+            }
+            TurnOff();
+            TurnOn(it.rgb);
+            return true;
         }
     }
+    return false;
+}
+
+bool BatteryLed::isAvailable() const
+{
+    return available_;
+}
+
+uint32_t BatteryLed::GetLightColor() const
+{
+    return lightColor_;
 }
 }  // namespace V1_1
 }  // namespace Battery

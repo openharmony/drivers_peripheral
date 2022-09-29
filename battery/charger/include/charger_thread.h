@@ -21,7 +21,6 @@
 #include <linux/input.h>
 #include "input_type.h"
 #include "battery_thread.h"
-#include "battery_config.h"
 #include "battery_vibrate.h"
 #include "battery_backlight.h"
 #include "battery_led.h"
@@ -55,7 +54,6 @@ private:
     void HandlePowerKeyState();
     void HandlePowerKey(int32_t keycode, int64_t now);
     static void HandleInputEvent(const struct input_event* iev);
-    std::unique_ptr<BatteryConfig> batteryConfig_ = nullptr;
     std::unique_ptr<PowerSupplyProvider> provider_ = nullptr;
     std::unique_ptr<BatteryVibrate> vibrate_ = nullptr;
     std::unique_ptr<BatteryBacklight> backlight_ = nullptr;
