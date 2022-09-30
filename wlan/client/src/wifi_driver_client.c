@@ -141,7 +141,7 @@ int32_t WifiRegisterHid2dCallback(Hid2dCallback func, const char *ifName)
         return RET_CODE_FAILURE;
     }
     do {
-        if (strcpy_s(event->ifName, IFNAMSIZ, ifName) != RET_CODE_SUCCESS) {
+        if (strcpy_s(event->ifName, IFNAMSIZ + 1, ifName) != RET_CODE_SUCCESS) {
             HDF_LOGE("%s: ifName strcpy_s fail", __FUNCTION__);
             break;
         }

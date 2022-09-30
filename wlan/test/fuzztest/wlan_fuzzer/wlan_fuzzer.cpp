@@ -78,13 +78,14 @@ static void WlanFucSwitch(struct IWlanInterface *interface, uint32_t cmd, const 
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
 {
+    (void)size;
+
     if (rawData == nullptr) {
         return false;
     }
     bool result = false;
     uint32_t cmd = Convert2Uint32(rawData);
     rawData = rawData + OFFSET;
-    size = size - OFFSET;
 
     g_wlanObj = IWlanInterfaceGetInstance(g_wlanServiceName, false);
     if (g_wlanObj == nullptr) {
