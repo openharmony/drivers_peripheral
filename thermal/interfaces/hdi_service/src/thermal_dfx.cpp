@@ -185,6 +185,7 @@ void ThermalDfx::CompressFile()
 
     if (fseek(fp, SEEK_SET, SEEK_END) != 0) {
         THERMAL_HILOGE(COMP_HDI, "fseek() failed");
+        fclose(fp);
         return;
     }
 
@@ -364,9 +365,9 @@ void ThermalDfx::GetTraceInfo()
     g_xmlTraceInfo.outpath = info.outpath;
 
     std::vector<DfxTraceInfo> logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
-    for (auto info : logInfo) {
-        THERMAL_HILOGD(COMP_HDI, "info.title = %{public}s, info.value = %{public}s",
-            info.title.c_str(), info.value.c_str());
+    for (const auto& item : logInfo) {
+        THERMAL_HILOGD(COMP_HDI, "item.title = %{public}s, item.value = %{public}s",
+            item.title.c_str(), item.value.c_str());
     }
 
     CreateLogFile();

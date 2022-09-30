@@ -162,7 +162,6 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
 
 void ThermalHdfConfig::ParsePollingSubNode(xmlNodePtr node, XMLThermalNodeInfo& tn)
 {
-    std::string rec;
     DfxTraceInfo info;
 
     xmlChar* xmlType = xmlGetProp(node, BAD_CAST"type");
@@ -238,9 +237,9 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
     info.value = valuePath;
     traceInfo_.emplace_back(info);
 
-    for (auto info : traceInfo_) {
-        THERMAL_HILOGD(COMP_HDI, "info.title = %{public}s, info.value = %{public}s",
-            info.title.c_str(), info.value.c_str());
+    for (const auto& item : traceInfo_) {
+        THERMAL_HILOGD(COMP_HDI, "item.title = %{public}s, item.value = %{public}s",
+            item.title.c_str(), item.value.c_str());
     }
 }
 
