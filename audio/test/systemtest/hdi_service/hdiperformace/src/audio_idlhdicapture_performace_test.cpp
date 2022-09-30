@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_remote_adapter_if.h"
+#include <gtest/gtest.h>
 #include "hdi_service_common.h"
 
 using namespace std;
@@ -24,7 +24,6 @@ namespace {
 const float COUNT = 1000;         // number of interface calls
 const long LOWLATENCY = 10000;    // low interface delay:10ms
 const long NORMALLATENCY = 30000; // normal interface delay:30ms
-const long HIGHLATENCY = 60000;   // high interface delay:60ms
 const int BUFFER = 1024 * 4;
 
 class AudioIdlHdiCapturePerformaceTest : public testing::Test {
@@ -33,201 +32,53 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
-    static void *handle;
-    static void (*AudioManagerRelease)(struct IAudioManager *);
-    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
-    static void (*AudioCaptureRelease)(struct IAudioCapture *);
-    static int32_t CreateCapture(TestAudioManager *manager, int pins, const std::string &adapterName,
-        struct IAudioAdapter **adapter, struct IAudioCapture **capture);
+    struct IAudioAdapter *adapter = nullptr;
+    struct IAudioCapture *capture = nullptr;
 };
 
-TestAudioManager *(*AudioIdlHdiCapturePerformaceTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiCapturePerformaceTest::manager = nullptr;
-void *AudioIdlHdiCapturePerformaceTest::handle = nullptr;
-void (*AudioIdlHdiCapturePerformaceTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
-void (*AudioIdlHdiCapturePerformaceTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
-void (*AudioIdlHdiCapturePerformaceTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
+
 void AudioIdlHdiCapturePerformaceTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handle = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handle);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handle, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
-    (void)HdfRemoteGetCallingPid();
-    manager = GetAudioManager(IDL_SERVER_NAME.c_str());
+    manager = IAudioManagerGet(IS_STUB);
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handle, "AudioManagerRelease"));
-    ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handle, "AudioAdapterRelease"));
-    ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handle, "AudioCaptureRelease"));
-    ASSERT_NE(nullptr, AudioCaptureRelease);
 }
 
 void AudioIdlHdiCapturePerformaceTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease !=nullptr) {
-        AudioManagerRelease(manager);
-        manager = nullptr;
-    }
-    if (handle != nullptr) {
-        dlclose(handle);
-        handle = nullptr;
-    }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
+    if (manager != nullptr) {
+        (void)IAudioManagerRelease(manager, IS_STUB);
     }
 }
 
-void AudioIdlHdiCapturePerformaceTest::SetUp(void) {}
-
-void AudioIdlHdiCapturePerformaceTest::TearDown(void) {}
-int32_t AudioIdlHdiCapturePerformaceTest::CreateCapture(TestAudioManager *manager, int pins,
-    const std::string &adapterName, struct IAudioAdapter **adapter, struct IAudioCapture **capture)
+void AudioIdlHdiCapturePerformaceTest::SetUp(void)
 {
-    int32_t ret;
-    struct AudioSampleAttributes attrs = {};
-    struct AudioDeviceDescriptor devDesc = {};
-    struct AudioPort audioPort = {};
-    if (adapter == nullptr || capture == nullptr) {
-        return HDF_ERR_INVALID_PARAM;
-    }
-    ret = GetLoadAdapter(manager, PORT_IN, adapterName, adapter, audioPort);
-    if (ret < 0) {
-        if (audioPort.portName != nullptr) {
-            free(audioPort.portName);
-        }
-        return ret;
-    }
-    if (*adapter == nullptr || (*adapter)->CreateCapture == nullptr) {
-        free(audioPort.portName);
-        return HDF_FAILURE;
-    }
-    InitAttrs(attrs);
-    attrs.silenceThreshold = BUFFER;
-    InitDevDesc(devDesc, audioPort.portId, pins);
-    ret = (*adapter)->CreateCapture(*adapter, &devDesc, &attrs, capture);
-    if (ret < 0 || *capture == nullptr) {
-        manager->UnloadAdapter(manager, adapterName.c_str());
-        AudioAdapterRelease(*adapter);
-        free(audioPort.portName);
-        free(devDesc.desc);
-        return HDF_FAILURE;
-    }
-    free(audioPort.portName);
-    free(devDesc.desc);
-    return HDF_SUCCESS;
-}
-/**
-* @tc.name  the performace of AudioCreateCapture
-* @tc.number  SUB_Audio_HDI_CreateCapture_Performance_001
-* @tc.devDesc  tests the performace of AudioCreateCapture interface by executing 1000 times,
-*              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
-*/
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CreateCapture_Performance_001, TestSize.Level1)
-{
-    int32_t ret;
-    struct PrepareAudioPara audiopara = {
-        .manager = manager, .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(),
-        .pins = PIN_IN_MIC, .totalTime = 0
-    };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = GetLoadAdapter(audiopara.manager, audiopara.portType, audiopara.adapterName,
-                         &audiopara.adapter, audiopara.audioPort);
+    ASSERT_NE(nullptr, manager);
+    int32_t ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    InitAttrs(audiopara.attrs);
-    InitDevDesc(audiopara.devDesc, audiopara.audioPort.portId, audiopara.pins);
-    for (int i = 0; i < COUNT; ++i) {
-        gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.adapter->CreateCapture(audiopara.adapter, &audiopara.devDesc, &audiopara.attrs,
-                                               &audiopara.capture);
-        gettimeofday(&audiopara.end, NULL);
-        if (ret < 0 || audiopara.capture == nullptr) {
-            audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-            AudioAdapterRelease(audiopara.adapter);
-            audiopara.adapter = nullptr;
-            ASSERT_EQ(HDF_SUCCESS, ret);
-        }
-        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
-                              (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
-        audiopara.totalTime += audiopara.delayTime;
-        ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-        AudioCaptureRelease(audiopara.capture);
-        audiopara.capture = nullptr;
-        EXPECT_EQ(HDF_SUCCESS, ret);
-    }
-    free(audiopara.devDesc.desc);
-    free(audiopara.audioPort.portName);
-    audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
-    EXPECT_GT(HIGHLATENCY, audiopara.averageDelayTime);
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
-/**
-* @tc.name  the performace of AudioDestroyCapture
-* @tc.number  SUB_Audio_HDI_DestroyCapture_Performance_001
-* @tc.devDesc  tests the performace of AudioDestroyCapture interface by executing 1000 times,
-*              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
-*/
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_DestroyCapture_Performance_001, TestSize.Level1)
+void AudioIdlHdiCapturePerformaceTest::TearDown(void)
 {
-    int32_t ret;
-    struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
-    };
-    ASSERT_NE(nullptr, audiopara.manager);
-    for (int i = 0; i < COUNT; ++i) {
-        ret = CreateCapture(audiopara.manager, audiopara.pins, ADAPTER_NAME, &audiopara.adapter,
-                            &audiopara.capture);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-        gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-        AudioCaptureRelease(audiopara.capture);
-        gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        audiopara.capture = nullptr;
-        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
-                              (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
-        audiopara.totalTime += audiopara.delayTime;
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-        AudioAdapterRelease(audiopara.adapter);
-        audiopara.adapter = nullptr;
-    }
-    audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
-    EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
+    int32_t ret = ReleaseCaptureSource(manager, adapter, capture);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 }
-
 /**
-* @tc.name  the performace of AudioCaptureStart
-* @tc.number  SUB_Audio_HDI_CaptureStart_Performance_001
+* @tc.name  AudioCaptureStartPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureStart interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureStart_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureStartPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
     };
-    ASSERT_NE(nullptr, audiopara.manager);
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
-        ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                            &audiopara.capture);
-        ASSERT_EQ(HDF_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->Start(audiopara.capture);
+        int32_t ret = audiopara.capture->Start(audiopara.capture);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
@@ -235,36 +86,23 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureStart_Performanc
         audiopara.totalTime += audiopara.delayTime;
         ret = audiopara.capture->Stop(audiopara.capture);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        AudioCaptureRelease(audiopara.capture);
-        audiopara.capture = nullptr;
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-        AudioAdapterRelease(audiopara.adapter);
-        audiopara.adapter = nullptr;
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 /**
-* @tc.name  the performace of AudioCapturePause
-* @tc.number  SUB_Audio_HDI_CapturePause_Performance_001
+* @tc.name  AudioCapturePausePerformance_001
 * @tc.devDesc  tests the performace of AudioCapturePause interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CapturePause_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCapturePausePerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->Start(audiopara.capture);
+    ASSERT_NE(nullptr, audiopara.capture);
+    int32_t ret = audiopara.capture->Start(audiopara.capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
@@ -281,32 +119,21 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CapturePause_Performanc
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     ret = audiopara.capture->Stop(audiopara.capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
 }
 
 /**
-* @tc.name  the performace of AudioCaptureResume
-* @tc.number  SUB_Audio_HDI_CaptureResume_Performance_001
+* @tc.name  AudioCaptureResumePerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureResume interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureResume_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureResumePerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->Start(audiopara.capture);
+    ASSERT_NE(nullptr, audiopara.capture);
+    int32_t ret = audiopara.capture->Start(audiopara.capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         ret = audiopara.capture->Pause(audiopara.capture);
@@ -314,7 +141,7 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureResume_Performan
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.capture->Resume(audiopara.capture);
         gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        ASSERT_EQ(HDF_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
@@ -323,33 +150,22 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureResume_Performan
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
     ret = audiopara.capture->Stop(audiopara.capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
 }
 
 /**
-* @tc.name  the performace of AudioCaptureStop
-* @tc.number  SUB_Audio_HDI_CaptureStop_Performance_001
+* @tc.name  AudioCaptureStopPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureStop interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureStop_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureStopPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
     };
-    ASSERT_NE(nullptr, audiopara.manager);
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
-        ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                            &audiopara.capture);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.capture->Start(audiopara.capture);
+        int32_t ret = audiopara.capture->Start(audiopara.capture);
         EXPECT_EQ(HDF_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.capture->Stop(audiopara.capture);
@@ -358,40 +174,27 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureStop_Performance
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
-        ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        audiopara.capture = nullptr;
-        AudioCaptureRelease(audiopara.capture);
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-        AudioAdapterRelease(audiopara.adapter);
-        audiopara.adapter = nullptr;
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSetSampleAttributes
-* @tc.number  SUB_Audio_HDI_CaptureSetSampleAttributes_Performance_001
+* @tc.name  AudioCaptureSetSampleAttributesPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureSetSampleAttributes interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureSetSampleAttributes_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureSetSampleAttributesPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_NE(nullptr, audiopara.capture);
     InitAttrs(audiopara.attrs);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->SetSampleAttributes(audiopara.capture, &audiopara.attrs);
+        int32_t ret = audiopara.capture->SetSampleAttributes(audiopara.capture, &audiopara.attrs);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
@@ -400,38 +203,25 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureSetSampleAttribu
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 /**
-* @tc.name  the performace of AudioCaptureCaptureFrame
-* @tc.number  SUB_Audio_HDI_CaptureCaptureFrame_Performance_001
+* @tc.name  AudioCaptureCaptureFramePerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureCaptureFrame interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureCaptureFrame_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureCaptureFramePerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .audioPort = {}, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
         .replyBytes = BUFFER, .requestBytes = BUFFER
     };
-    ASSERT_NE(nullptr, audiopara.manager);
+    ASSERT_NE(nullptr, audiopara.capture);
     audiopara.frame = (char *)calloc(1, BUFFER);
     ASSERT_NE(nullptr, audiopara.frame);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    if (ret < 0) {
-        free(audiopara.frame);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    InitAttrs(audiopara.attrs);
+    audiopara.attrs.silenceThreshold = BUFFER;
+    int32_t ret = audiopara.capture->SetSampleAttributes(audiopara.capture, &audiopara.attrs);
     ret = audiopara.capture->Start(audiopara.capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
@@ -446,40 +236,25 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureCaptureFrame_Per
     }
     ret = audiopara.capture->Stop(audiopara.capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    free(audiopara.devDesc.desc);
-    free(audiopara.audioPort.portName);
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(NORMALLATENCY, audiopara.averageDelayTime);
     free(audiopara.frame);
     audiopara.frame = nullptr;
 }
 /**
-* @tc.name  the performace of AudioCaptureGetSampleAttributes
-* @tc.number  SUB_Audio_HDI_CaptureGetSampleAttributes_Performance_001
+* @tc.name  AudioCaptureGetSampleAttributesPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureGetSampleAttributes interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetSampleAttributes_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureGetSampleAttributesPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_NE(nullptr, audiopara.capture);
     InitAttrs(audiopara.attrs);
-    ret = audiopara.capture->SetSampleAttributes(audiopara.capture, &audiopara.attrs);
+    int32_t ret = audiopara.capture->SetSampleAttributes(audiopara.capture, &audiopara.attrs);
     EXPECT_EQ(HDF_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
@@ -492,37 +267,24 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetSampleAttribu
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSetMute
-* @tc.number  SUB_Audio_HDI_CaptureSetMute_Performance_001
+* @tc.name  AudioCaptureSetMutePerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureSetMute interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
 
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureSetMute_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureSetMutePerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->SetMute(audiopara.capture, false);
+        int32_t ret = audiopara.capture->SetMute(audiopara.capture, false);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
@@ -534,34 +296,21 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureSetMute_Performa
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetMute
-* @tc.number  SUB_Audio_HDI_CaptureGetMute_Performance_001
+* @tc.name  AudioCaptureGetMutePerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureGetMute interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetMute_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureGetMutePerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->SetMute(audiopara.capture, false);
+    ASSERT_NE(nullptr, audiopara.capture);
+    int32_t ret = audiopara.capture->SetMute(audiopara.capture, false);
     EXPECT_EQ(HDF_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
@@ -575,37 +324,23 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetMute_Performa
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSetVolume
-* @tc.number  SUB_Audio_HDI_CaptureSetVolume_Performance_001
+* @tc.name  AudioCaptureSetVolumePerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureSetVolume interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureSetVolume_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureSetVolumePerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0,
-        .character.setvolume = 0.7
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0, .character.setvolume = 0.7
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->SetVolume(audiopara.capture, audiopara.character.setvolume);
+        int32_t ret = audiopara.capture->SetVolume(audiopara.capture, audiopara.character.setvolume);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         ret = audiopara.capture->GetVolume(audiopara.capture, &audiopara.character.getvolume);
@@ -617,34 +352,21 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureSetVolume_Perfor
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetVolume
-* @tc.number  SUB_Audio_HDI_CaptureGetVolume_Performance_001
+* @tc.name  AudioCaptureGetVolumePerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureGetVolume interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetVolume_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureGetVolumePerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0, .character.setvolume = 0.8
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0, .character.setvolume = 0.8
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->SetVolume(audiopara.capture, audiopara.character.setvolume);
+    ASSERT_NE(nullptr, audiopara.capture);
+    int32_t ret = audiopara.capture->SetVolume(audiopara.capture, audiopara.character.setvolume);
     EXPECT_EQ(HDF_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
@@ -658,34 +380,21 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetVolume_Perfor
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetGain
-* @tc.number  SUB_Audio_HDI_CaptureGetGain_Performance_001
+* @tc.name  AudioCaptureGetGainPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureGetGain interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetGain_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureGetGainPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0, .character.setgain = 7
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0, .character.setgain = 7
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->SetGain(audiopara.capture, audiopara.character.setgain);
+    ASSERT_NE(nullptr, audiopara.capture);
+    int32_t ret = audiopara.capture->SetGain(audiopara.capture, audiopara.character.setgain);
     EXPECT_EQ(HDF_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
@@ -699,36 +408,23 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetGain_Performa
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSetGain
-* @tc.number  SUB_Audio_HDI_CaptureSetGain_Performance_001
+* @tc.name  AudioCaptureSetGainPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureSetGain interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureSetGain_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureSetGainPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0, .character.setgain = 8
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0, .character.setgain = 8
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->SetGain(audiopara.capture, audiopara.character.setgain);
+        int32_t ret = audiopara.capture->SetGain(audiopara.capture, audiopara.character.setgain);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         ret = audiopara.capture->GetGain(audiopara.capture, &audiopara.character.getgain);
@@ -740,36 +436,24 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureSetGain_Performa
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetCurrentChannelId
-* @tc.number  SUB_Audio_HDI_CaptureGetCurrentChannelId_Performance_001
+* @tc.name  AudioCaptureGetCurrentChannelIdPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureGetCurrentChannelId interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureGetCurrentChannelIdPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->GetCurrentChannelId(audiopara.capture, &audiopara.character.getcurrentchannelId);
+        int32_t ret = audiopara.capture->GetCurrentChannelId(audiopara.capture,
+            &audiopara.character.getcurrentchannelId);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
@@ -778,36 +462,23 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetCurrentChanne
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetFrameCount
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameCount_Performance_001
+* @tc.name  AudioCaptureGetFrameCountPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureGetFrameCount interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetFrameCount_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureGetFrameCountPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->GetFrameCount(audiopara.capture, &audiopara.character.getframecount);
+        int32_t ret = audiopara.capture->GetFrameCount(audiopara.capture, &audiopara.character.getframecount);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         EXPECT_EQ(INITIAL_VALUE, audiopara.character.getframecount);
@@ -817,36 +488,23 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetFrameCount_Pe
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetFrameSize
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameSize_Performance_001
+* @tc.name  AudioCaptureGetFrameSizePerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureGetFrameSize interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetFrameSize_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureGetFrameSizePerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->GetFrameSize(audiopara.capture, &audiopara.character.getframesize);
+        int32_t ret = audiopara.capture->GetFrameSize(audiopara.capture, &audiopara.character.getframesize);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         EXPECT_GT(audiopara.character.getframesize, INITIAL_VALUE);
@@ -856,35 +514,22 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetFrameSize_Per
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureFlush
-* @tc.number  SUB_Audio_HDI_CaptureFlush_Performance_001
+* @tc.name  AudioCaptureFlushPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureFlush interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureFlush_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureFlushPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0
     };
-    ASSERT_NE(nullptr, audiopara.manager);
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
-        ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                            &audiopara.capture);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.capture->Start(audiopara.capture);
+        int32_t ret = audiopara.capture->Start(audiopara.capture);
         EXPECT_EQ(HDF_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.capture->Flush(audiopara.capture);
@@ -895,39 +540,26 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureFlush_Performanc
         audiopara.totalTime += audiopara.delayTime;
         ret = audiopara.capture->Stop(audiopara.capture);
         EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        AudioCaptureRelease(audiopara.capture);
-        audiopara.capture = nullptr;
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-        AudioAdapterRelease(audiopara.adapter);
-        audiopara.adapter = nullptr;
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetGainThreshold
-* @tc.number  SUB_Audio_HDI_CaptureGetGainThreshold_Performance_001
+* @tc.name  AudioCaptureGetGainThresholdPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureGetGainThreshold interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetGainThreshold_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureGetGainThresholdPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->GetGainThreshold(audiopara.capture, &audiopara.character.gainthresholdmin,
+        int32_t ret = audiopara.capture->GetGainThreshold(audiopara.capture, &audiopara.character.gainthresholdmin,
                 &audiopara.character.gainthresholdmax);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -939,40 +571,27 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetGainThreshold
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureCheckSceneCapability
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_Performance_001
+* @tc.name  AudioCaptureCheckSceneCapabilityPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureCheckSceneCapability interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureCheckSceneCapability_Performance_001,
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureCheckSceneCapabilityPerformance_001,
          TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0
     };
+    ASSERT_NE(nullptr, audiopara.capture);
     struct AudioSceneDescriptor scenes = { .scene.id = 0, .desc.pins = PIN_IN_MIC };
     bool supported = false;
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, ADAPTER_NAME, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         scenes.desc.desc = strdup("mic");
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->CheckSceneCapability(audiopara.capture, &scenes, &supported);
+        int32_t ret = audiopara.capture->CheckSceneCapability(audiopara.capture, &scenes, &supported);
         gettimeofday(&audiopara.end, NULL);
         free(scenes.desc.desc);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -982,75 +601,49 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureCheckSceneCapabi
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSelectScene
-* @tc.number  SUB_Audio_HDI_CaptureSelectScene_Performance_001
+* @tc.name  AudioCaptureSelectScenePerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureSelectScene interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureSelectScene_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureSelectScenePerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0
     };
+    ASSERT_NE(nullptr, audiopara.capture);
     struct AudioSceneDescriptor scenes = { .scene.id = 0, .desc.pins = PIN_IN_MIC };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, ADAPTER_NAME, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         scenes.desc.desc = strdup("mic");
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->SelectScene(audiopara.capture, &scenes);
+        int32_t ret = audiopara.capture->SelectScene(audiopara.capture, &scenes);
         gettimeofday(&audiopara.end, NULL);
-        free(scenes.desc.desc);
         EXPECT_EQ(HDF_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
+        free(scenes.desc.desc);
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioGetCapturePosition
-* @tc.number  SUB_Audio_HDI_GetCapturePosition_Performance_001
+* @tc.name  AudioGetCapturePositionPerformance_001
 * @tc.devDesc  tests the performace of AudioCaptureGetCapturePosition interface by executing 1000 times,
 *              and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_GetCapturePosition_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioGetCapturePositionPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->Start(audiopara.capture);
+    ASSERT_NE(nullptr, audiopara.capture);
+    int32_t ret = audiopara.capture->Start(audiopara.capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
@@ -1063,40 +656,24 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_GetCapturePosition_Perf
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.capture->Stop(audiopara.capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureSetExtraParams
-* @tc.number  SUB_Audio_HDI_CaptureSetExtraParams_Performance_001
+* @tc.name  AudioCaptureSetExtraParamsPerformance_001
 * @tc.desc  tests the performace of AudioCaptureSetExtraParams interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureSetExtraParams_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureSetExtraParamsPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->SetExtraParams(audiopara.capture, keyValueList);
+        int32_t ret = audiopara.capture->SetExtraParams(audiopara.capture, keyValueList);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
@@ -1105,38 +682,25 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureSetExtraParams_P
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetExtraParams
-* @tc.number  SUB_Audio_HDI_CaptureGetExtraParams_Performance_001
+* @tc.name  AudioCaptureGetExtraParamsPerformance_001
 * @tc.desc  tests the performace of AudioCaptureGetExtraParams interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetExtraParams_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureGetExtraParamsPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0
     };
+    ASSERT_NE(nullptr, audiopara.capture);
     char keyValueList[] = "attr-format=24;attr-frame-count=4096;";
     char keyValueListExp[] = "attr-route=0;attr-format=24;attr-channels=2;\
 attr-frame-count=4096;attr-sampling-rate=48000";
     int32_t listLenth = 256;
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, audiopara.adapterName, &audiopara.adapter,
-                        &audiopara.capture);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = audiopara.capture->SetExtraParams(audiopara.capture, keyValueList);
+    int32_t ret = audiopara.capture->SetExtraParams(audiopara.capture, keyValueList);
     EXPECT_EQ(HDF_SUCCESS, ret);
     for (int i = 0; i < COUNT; ++i) {
         char keyValueListValue[256] = {};
@@ -1151,42 +715,25 @@ attr-frame-count=4096;attr-sampling-rate=48000";
     }
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
 }
 
 /**
-* @tc.name  the performace of AudioCaptureGetMmapPosition
-* @tc.number  SUB_Audio_HDI_CaptureGetMmapPosition_Performance_001
+* @tc.name  AudioCaptureGetMmapPositionPerformance_001
 * @tc.desc  tests the performace of AudioCaptureGetMmapPosition interface by executing 1000 times,
 *           and calculates the delay time and average of Delay Time.
-* @tc.author: wengyin
+* @tc.type: PERF
 */
-HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetMmapPosition_Performance_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureGetMmapPositionPerformance_001, TestSize.Level1)
 {
-    int32_t ret;
     uint64_t frames = 0;
     int64_t timeExp = 0;
     struct PrepareAudioPara audiopara = {
-        .manager = manager, .adapter = nullptr, .capture = nullptr, .portType = PORT_IN,
-        .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC, .totalTime = 0
+        .capture = capture, .delayTime = 0, .totalTime = 0, .averageDelayTime =0
     };
-    ASSERT_NE(nullptr, audiopara.manager);
-    ret = CreateCapture(audiopara.manager, audiopara.pins, ADAPTER_NAME, &audiopara.adapter,
-                        &audiopara.capture);
-    if (ret < 0 || audiopara.capture == nullptr) {
-        ASSERT_EQ(HDF_SUCCESS, ret);
-        ASSERT_EQ(nullptr, audiopara.capture);
-    }
-
+    ASSERT_NE(nullptr, audiopara.capture);
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.capture->GetMmapPosition(audiopara.capture, &frames, &(audiopara.time));
+        int32_t ret = audiopara.capture->GetMmapPosition(audiopara.capture, &frames, &(audiopara.time));
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         EXPECT_EQ((audiopara.time.tvSec) * SECTONSEC + (audiopara.time.tvNSec), timeExp);
@@ -1195,14 +742,6 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, SUB_Audio_HDI_CaptureGetMmapPosition_
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
     }
-    ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    AudioCaptureRelease(audiopara.capture);
-    audiopara.capture = nullptr;
-    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapterName);
-    AudioAdapterRelease(audiopara.adapter);
-    audiopara.adapter = nullptr;
-
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }

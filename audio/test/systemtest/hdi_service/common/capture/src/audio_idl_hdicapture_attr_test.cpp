@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <gtest/gtest.h>
 #include "hdf_remote_adapter_if.h"
 #include "hdi_service_common.h"
 
@@ -23,99 +24,50 @@ using namespace OHOS::Audio;
 namespace {
 class AudioIdlHdiCaptureAttrTest : public testing::Test {
 public:
-public:
     static void SetUpTestCase(void);
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
     struct IAudioAdapter *adapter = nullptr;
     struct IAudioCapture *capture = nullptr;
-    static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
-    static void *handleSo;
-    static void (*AudioManagerRelease)(struct IAudioManager *);
-    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
-    static void (*AudioCaptureRelease)(struct IAudioCapture *);
-    void ReleaseCaptureSource(void);
 };
-
+    
 using THREAD_FUNC = void *(*)(void *);
-
-TestAudioManager *(*AudioIdlHdiCaptureAttrTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiCaptureAttrTest::manager = nullptr;
-void *AudioIdlHdiCaptureAttrTest::handleSo = nullptr;
-void (*AudioIdlHdiCaptureAttrTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
-void (*AudioIdlHdiCaptureAttrTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
-void (*AudioIdlHdiCaptureAttrTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
 
 void AudioIdlHdiCaptureAttrTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handleSo);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
-    (void)HdfRemoteGetCallingPid();
-    manager = GetAudioManager(IDL_SERVER_NAME.c_str());
+    manager = IAudioManagerGet(IS_STUB);
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
-    ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
-    ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handleSo, "AudioCaptureRelease"));
-    ASSERT_NE(nullptr, AudioCaptureRelease);
 }
 
 void AudioIdlHdiCaptureAttrTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease !=nullptr) {
-        AudioManagerRelease(manager);
-        manager = nullptr;
-    }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
-    }
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (manager != nullptr) {
+        (void)IAudioManagerRelease(manager, IS_STUB);
     }
 }
 
 void AudioIdlHdiCaptureAttrTest::SetUp(void)
 {
-    int32_t ret;
     ASSERT_NE(nullptr, manager);
-    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
+    int32_t ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiCaptureAttrTest::TearDown(void)
 {
-    ReleaseCaptureSource();
+    int32_t ret = ReleaseCaptureSource(manager, adapter, capture);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
-void AudioIdlHdiCaptureAttrTest::ReleaseCaptureSource(void)
-{
-    if (capture != nullptr && AudioCaptureRelease != nullptr) {
-        adapter->DestroyCapture(adapter);
-        AudioCaptureRelease(capture);
-        capture = nullptr;
-    }
-    if (adapter != nullptr && AudioAdapterRelease != nullptr) {
-        manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-        AudioAdapterRelease(adapter);
-        adapter = nullptr;
-    }
-}
 /**
-* @tc.name  Test AudioCaptureGetFrameSize API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameSize_001
+* @tc.name  AudioCaptureGetFrameSize_001
 * @tc.desc  test AudioCaptureGetFrameSize interface, return 0 is call successfully.
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameSize_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameSize_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t size = 0;
@@ -125,12 +77,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameSize_001, Test
     EXPECT_GT(size, INITIAL_VALUE);
 }
 /**
-* @tc.name  Test AudioCaptureGetFrameSize API via setting the parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameSize_Null_002
+* @tc.name  AudioCaptureGetFrameSizeNull_002
 * @tc.desc  test AudioCaptureGetFrameSize interface, return -3/-4 if the parameter handle is nullptr.
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameSize_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameSizeNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t size = 0;
@@ -140,12 +91,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameSize_Null_002,
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test AudioCaptureGetFrameSize API via setting the parameter size is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameSize_Null_003
+* @tc.name  AudioCaptureGetFrameSizeNull_003
 * @tc.desc  test AudioCaptureGetFrameSize interface, return -3 if the parameter size is nullptr.
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameSize_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameSizeNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t *sizeNull = nullptr;
@@ -154,12 +104,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameSize_Null_003,
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-* @tc.name  Test AudioCaptureGetFrameCount API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameCount_001
+* @tc.name  AudioCaptureGetFrameCount_001
 * @tc.desc  test AudioCaptureGetFrameCount interface, return 0 if the FrameCount is called after creating the object.
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameCount_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameCount_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -169,12 +118,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameCount_001, Tes
     EXPECT_EQ(count, INITIAL_VALUE);
 }
 /**
-* @tc.name  Test AudioCaptureGetFrameCount API via legal input in the difference scene
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameCount_001
+* @tc.name  AudioCaptureGetFrameCount_001
 * @tc.desc  test AudioCaptureGetFrameCount interface, return 0 if the GetFrameCount is called after started.
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameCount_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameCount_002, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -187,12 +135,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameCount_002, Tes
     capture->Stop(capture);
 }
 /**
-* @tc.name  Test AudioCaptureGetFrameCount API via setting the parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameCount_Null_003
+* @tc.name  AudioCaptureGetFrameCountNull_003
 * @tc.desc  test AudioCaptureGetFrameCount interface, return -3/-4 if the parameter handle is nullptr.
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameCount_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameCountNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -203,12 +150,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameCount_Null_003
 }
 
 /**
-* @tc.name  Test AudioCaptureGetFrameCount API via setting the parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetFrameCount_Null_004
+* @tc.name  AudioCaptureGetFrameCountNull_004
 * @tc.desc  test AudioCaptureGetFrameCount interface, return -3 if the parameter handle is nullptr.
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameCount_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetFrameCountNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t *countNull = nullptr;
@@ -217,12 +163,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetFrameCount_Null_004
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-* @tc.name  Test CaptureGetCurrentChannelId API via legal input
-* @tc.number  SUB_Audio_HDI_RenderGetCurrentChannelId_001
+* @tc.name  AudioRenderGetCurrentChannelId_001
 * @tc.desc  Test GetCurrentChannelId, return 0 if the default CurrentChannelId is obtained successfully
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetCurrentChannelId_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t channelId = 0;
@@ -233,12 +178,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_00
     EXPECT_EQ(channelIdValue, channelId);
 }
 /**
-* @tc.name  Test GetCurrentChannelId API via CurrentChannelId is obtained after started
-* @tc.number  SUB_Audio_HDI_CaptureGetCurrentChannelId_003
+* @tc.name  AudioCaptureGetCurrentChannelId_003
 * @tc.desc  Test GetCurrentChannelId interface, return 0 if CurrentChannelId is obtained after started
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetCurrentChannelId_003, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t channelId = 0;
@@ -253,12 +197,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_00
     capture->Stop(capture);
 }
 /**
-* @tc.name  Test GetCurrentChannelId API via setting the parameter capture is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetCurrentChannelId_Null_004
+* @tc.name  AudioCaptureGetCurrentChannelIdNull_004
 * @tc.desc  Test GetCurrentChannelId interface,return -3/-4 if set the parameter capture is nullptr
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetCurrentChannelIdNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t channelId = 0;
@@ -268,12 +211,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_Nu
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test CaptureGetCurrentChannelId API via setting the parameter channelId is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetCurrentChannelId_Null_005
+* @tc.name  AudioCaptureGetCurrentChannelIdNull_005
 * @tc.desc  Test CaptureGetCurrentChannelId interface, return -3 if setting the parameter channelId is nullptr
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_Null_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetCurrentChannelIdNull_005, TestSize.Level1)
 {
     int32_t ret = -1;
     uint32_t *channelIdNull = nullptr;
@@ -282,12 +224,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetCurrentChannelId_Nu
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-* @tc.name  Test CaptureSetExtraParams API via setting ExtraParams during playback
-* @tc.number  SUB_Audio_HDI_CaptureSetExtraParams_001
+* @tc.name  AudioCaptureSetExtraParams_001
 * @tc.desc  Test CaptureSetExtraParams interface,return 0 if the ExtraParams is set during playback
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_001, TestSize.Level1)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
@@ -298,7 +239,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_001, Te
     uint64_t FILESIZE = 1024;
     ASSERT_NE(nullptr, capture);
     struct PrepareAudioPara audiopara = {
-        .capture = capture, .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .self = this, .pins = PIN_IN_MIC,
+        .capture = capture, .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
         .path = AUDIO_CAPTURE_FILE.c_str(), .fileSize = FILESIZE
     };
 
@@ -323,12 +264,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_001, Te
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test CaptureSetExtraParams API via setting some parameters after playing
-* @tc.number  SUB_Audio_HDI_CaptureSetExtraParams_002
+* @tc.name  AudioCaptureSetExtraParams_002
 * @tc.desc  Test CaptureSetExtraParams interface,return 0 if some parameters is set after playing
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_002, TestSize.Level1)
 {
     int32_t ret = -1;
     char keyValueListOne[] = "attr-frame-count=4096;";
@@ -377,12 +317,11 @@ attr-sampling-rate=48000";
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test CaptureSetExtraParams API via setting keyvaluelist to a value outside the range
-* @tc.number  SUB_Audio_HDI_CaptureSetExtraParams_003
+* @tc.name  AudioCaptureSetExtraParams_003
 * @tc.desc  Test CaptureSetExtraParams interface,return -1 if the Keyvaluelist is a value out of range
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_003, TestSize.Level1)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-para=abc;";
@@ -391,12 +330,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_003, Te
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name  Test CaptureSetExtraParams API via adding parameters to keyvaluelist
-* @tc.number  SUB_Audio_HDI_CaptureSetExtraParams_004
+* @tc.name  AudioCaptureSetExtraParams_004
 * @tc.desc  Test CaptureSetExtraParams interface,return -1 if adding parameters to keyvaluelist
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_004, TestSize.Level1)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;\
@@ -406,14 +344,12 @@ attr-frame-count=82;attr-sampling-rate=48000;attr-para=abc";
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name  Test CaptureSetExtraParams API via setting ExtraParams When the key is the same and the value is
-    different
-* @tc.number  SUB_Audio_HDI_CaptureSetExtraParams_005
+* @tc.name  AudioCaptureSetExtraParams_005
 * @tc.desc  Test CaptureSetExtraParams interface,return 0 if set ExtraParams When the key is the same and the value
     is different
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_005, TestSize.Level1)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-frame-count=4096;";
@@ -436,12 +372,11 @@ attr-sampling-rate=48000";
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test CaptureSetExtraParams API via setting the parameter in keyvaluelist as an abnormal value
-* @tc.number  SUB_Audio_HDI_CaptureSetExtraParams_006
+* @tc.name  AudioCaptureSetExtraParams_006
 * @tc.desc  Test CaptureSetExtraParams interface,return -1 if set the parameter in keyvaluelist as an abnormal value
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParams_006, TestSize.Level1)
 {
     int32_t ret = -1;
     char attrSamplingRateError[] = "attr-sampling-rate=1234567;";
@@ -462,12 +397,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_006, Te
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name  Test CaptureSetExtraParams API via setting the parameter render is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureSetExtraParams_Null_007
+* @tc.name  AudioCaptureSetExtraParamsNull_007
 * @tc.desc  Test CaptureSetExtraParams interface,return -3/-4 if set the parameter render is nullptr
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_Null_007, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParamsNull_007, TestSize.Level1)
 {
     int32_t ret = -1;
     struct IAudioCapture *captureNull = nullptr;
@@ -477,12 +411,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_Null_00
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test CaptureSetExtraParams API via setting the format of ExtraParams is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureSetExtraParams_Null_008
+* @tc.name  AudioCaptureSetExtraParamsNull_008
 * @tc.desc  Test CaptureSetExtraParams interface,return -1 if set the format of ExtraParams is nullptr
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_Null_008, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetExtraParamsNull_008, TestSize.Level1)
 {
     int32_t ret = -1;
     char keyValueListNull[] = "attr-format=;";
@@ -491,12 +424,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetExtraParams_Null_00
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name  Test CaptureGetExtraParams API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureGetExtraParams_001
+* @tc.name  AudioCaptureGetExtraParams_001
 * @tc.desc  Test CaptureGetExtraParams interface,return 0 if the RenderGetExtraParams was obtained successfully
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetExtraParams_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetExtraParams_001, TestSize.Level1)
 {
     int32_t ret = -1;
     uint64_t count = 0;
@@ -507,8 +439,8 @@ attr-sampling-rate=48000";
     char keyValueListValue[256] = {};
     int32_t listLenth = 256;
     int32_t formatExp = 3;
-    uint32_t sampleRateExp = 48000;
     uint32_t channelCountExp = 2;
+    uint32_t sampleRateExp = 48000;
     uint32_t frameCountExp = 4096;
 
     ASSERT_NE(nullptr, capture);
@@ -533,12 +465,11 @@ attr-sampling-rate=48000";
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test CaptureGetExtraParams API via setting the parameter render is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureGetExtraParams_Null_002
+* @tc.name  AudioCaptureGetExtraParamsNull_002
 * @tc.desc  Test CaptureGetExtraParams interface,return -3/-4 if set the parameter render is nullptr
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetExtraParams_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetExtraParamsNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct IAudioCapture *captureNull = nullptr;
@@ -553,12 +484,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetExtraParams_Null_00
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test CaptureGetExtraParams API via setting listlength to be less than the actual length
-* @tc.number  SUB_Audio_HDI_CaptureGetExtraParams_003
+* @tc.name  AudioCaptureGetExtraParams_003
 * @tc.desc  Test CaptureGetExtraParams interface,return -1 if set listlength to be less than the actual length
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetExtraParams_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetExtraParams_003, TestSize.Level1)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;\
@@ -572,12 +502,11 @@ attr-frame-count=82;attr-sampling-rate=48000;";
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name  Test CaptureGetExtraParams API via setting listlenth equal to the actual length
-* @tc.number  SUB_Audio_HDI_CaptureGetExtraParams_004
+* @tc.name  AudioCaptureGetExtraParams_004
 * @tc.desc  Test CaptureGetExtraParams interface,return 0 if set listlenth equal to the actual length
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetExtraParams_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetExtraParams_004, TestSize.Level1)
 {
     int32_t ret = -1;
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=11111111111111111111;\
@@ -598,12 +527,11 @@ attr-sampling-rate=48000";
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test AudioCaptureSetSampleAttributes API via setting the capture is nullptr .
-* @tc.number  SUB_Audio_HDI_CaptureSetSampleAttributes_Null_007
+* @tc.name  AudioCaptureSetSampleAttributesNull_007
 * @tc.desc   Test AudioCaptureSetSampleAttributes interface, return -3/-4 if the capture is nullptr.
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetSampleAttributes_Null_007, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetSampleAttributesNull_007, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
@@ -616,12 +544,11 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureSetSampleAttributes_Nu
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test AudioCaptureGetSampleAttributes API via setting the capture is nullptr .
-* @tc.number  SUB_Audio_HDI_CaptureGetSampleAttributes_Null_002
+* @tc.name  AudioCaptureGetSampleAttributesNull_002
 * @tc.desc   Test AudioCaptureGetSampleAttributes interface, return -3/-4 if the capture is nullptr.
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureAttrTest, SUB_Audio_HDI_CaptureGetSampleAttributes_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetSampleAttributesNull_002, TestSize.Level1)
 {
     int32_t ret;
     struct AudioSampleAttributes attrs = {};

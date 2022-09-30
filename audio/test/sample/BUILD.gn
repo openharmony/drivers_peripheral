@@ -13,27 +13,170 @@
 
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-if (!defined(ohos_lite)) {
-  ohos_executable("idl_render") {
-    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
+if (defined(ohos_lite)) {
+  ohos_executable("audio_sample_render") {
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/sample",
+      "//commonlibrary/utils_lite/include",
+      "//third_party/bounds_checking_function/include",
+    ]
 
-    sources = [ "idl_render.c" ]
+    sources = [
+      "framework_common.c",
+      "framework_render.c",
+    ]
+
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
+    defines = []
+    install_enable = true
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_audio"
+  }
+
+  ohos_executable("audio_sample_capture") {
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/sample",
+      "//commonlibrary/utils_lite/include",
+      "//third_party/bounds_checking_function/include",
+      "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+    ]
+
+    sources = [
+      "framework_capture.c",
+      "framework_common.c",
+    ]
+
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
+    defines = []
+    install_enable = true
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_audio"
+  }
+} else {
+  ohos_executable("audio_sample_render") {
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/sample",
+    ]
+
+    sources = [
+      "framework_common.c",
+      "framework_render.c",
+    ]
 
     defines = []
+
+    if (is_standard_system) {
+      external_deps = [
+        "c_utils:utils",
+        "hdf_core:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+
+    install_enable = true
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_audio"
+  }
+
+  ohos_executable("audio_sample_capture") {
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+      "//drivers/peripheral/audio/sample",
+    ]
+
+    sources = [
+      "//drivers/peripheral/audio/hal/hdi_binder/server/src/hdf_audio_events.c",
+      "framework_capture.c",
+      "framework_common.c",
+    ]
+
+    defines = []
+
     if (drivers_peripheral_audio_alsa_lib) {
       defines += [ "ALSA_LIB_MODE" ]
     }
 
     if (is_standard_system) {
       external_deps = [
-        "hdf_core:libhdf_host",
+        "c_utils:utils",
+        "hdf_core:libhdf_ipc_adapter",
+        "hdf_core:libhdf_utils",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+
+    install_enable = true
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_audio"
+  }
+  ohos_executable("audio_sample_event") {
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+      "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+    ]
+
+    sources = [
+      "//drivers/peripheral/audio/hal/hdi_binder/server/src/hdf_audio_events.c",
+      "framework_event.c",
+    ]
+
+    defines = []
+
+    if (is_standard_system) {
+      external_deps = [
+        "c_utils:utils",
+        "hdf_core:libhdf_utils",
+        "hdf_core:libhdi",
+        "hiviewdfx_hilog_native:libhilog",
+      ]
+    } else {
+      external_deps = [ "hilog:libhilog" ]
+    }
+
+    install_enable = true
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_audio"
+  }
+
+  ohos_executable("idl_render") {
+    include_dirs = [ "//drivers/peripheral/audio/sample" ]
+
+    sources = [
+      "framework_common.c",
+      "idl_render.c",
+    ]
+
+    defines = [ "IDL_SAMPLE" ]
+    if (drivers_peripheral_audio_alsa_lib) {
+      defines += [ "ALSA_LIB_MODE" ]
+    }
+
+    if (is_standard_system) {
+      external_deps = [
+        "c_utils:utils",
+        "drivers_interface_audio:libaudio_proxy_1.0",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
-        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -46,23 +189,25 @@ if (!defined(ohos_lite)) {
   }
 
   ohos_executable("idl_capture") {
-    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
+    include_dirs = [ "//drivers/peripheral/audio/sample" ]
 
-    sources = [ "idl_capture.c" ]
+    sources = [
+      "framework_common.c",
+      "idl_capture.c",
+    ]
 
-    defines = []
+    defines = [ "IDL_SAMPLE" ]
     if (drivers_peripheral_audio_alsa_lib) {
       defines += [ "ALSA_LIB_MODE" ]
     }
 
     if (is_standard_system) {
       external_deps = [
-        "hdf_core:libhdf_host",
+        "c_utils:utils",
+        "drivers_interface_audio:libaudio_proxy_1.0",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
-        "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",
-        "utils_base:utils",
       ]
     } else {
       external_deps = [ "hilog:libhilog" ]
@@ -72,6 +217,15 @@ if (!defined(ohos_lite)) {
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
+  }
+}
+
+group("audio_sample") {
+  if (drivers_peripheral_audio_hdf_proxy_stub == true) {
+    deps = [
+      ":audio_sample_capture",
+      ":audio_sample_render",
+    ]
   }
 }
 
