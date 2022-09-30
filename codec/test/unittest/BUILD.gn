@@ -33,6 +33,6 @@ group("hdf_unittest_codec") {
     ]
   }
   if (HAVE_OMX_IL_PATH) {
-    deps += [ "hdi_omx:codec_hdi_omx_test" ]
+    deps += [ "hdi_omx:codec_hdi_2.0_test" ]
   }
 }
