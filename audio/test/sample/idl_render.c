@@ -1170,7 +1170,7 @@ static int32_t SelectRenderScene(struct IAudioRender **render)
 
     scene.desc.desc = "mic";
 
-    if (g_render == NULL || g_render->SelectScene) {
+    if (g_render == NULL || g_render->SelectScene == NULL) {
         AUDIO_FUNC_LOGE("Music already stop,");
         SystemInputFail();
         return HDF_FAILURE;
