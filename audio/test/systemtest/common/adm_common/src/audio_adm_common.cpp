@@ -112,7 +112,7 @@ int32_t AdmRenderFramePrepare(const std::string& path, char *&frame, uint32_t& r
         return HDF_FAILURE;
     }
     bufferSize = PcmFramesToBytes(attrs);
-    if (bufferSize <= 0) {
+    if (bufferSize == 0) {
         fclose(file);
         return HDF_FAILURE;
     }
