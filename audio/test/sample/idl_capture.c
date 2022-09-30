@@ -154,7 +154,7 @@ static int32_t CheckInputName(int type, void *val)
             break;
         case INPUT_UINT32:
             ret = scanf_s("%u", &capInputUint);
-            if (capInputUint > 0xFFFFFFFF || capInputUint < 0) {
+            if (capInputUint > 0xFFFFFFFF) {
                 return HDF_FAILURE;
             }
             *(uint32_t *)val = capInputUint;
@@ -807,10 +807,6 @@ static int32_t InitParam(void)
         return HDF_FAILURE;
     }
 
-    struct AudioPort audioPort;
-    audioPort.dir = PORT_IN;
-    audioPort.portId = 0;
-    audioPort.portName = "AOP";
     if (CaptureGetAdapterAndInitEnvParams(g_adapterName) < 0) {
         AUDIO_FUNC_LOGE("GetCaptureProxyManagerFunc Fail");
         if (g_audioManager != NULL) {

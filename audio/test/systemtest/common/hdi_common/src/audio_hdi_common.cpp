@@ -460,7 +460,7 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
     }
     uint32_t remainingDataSize = wavHeadInfo.dataSize;
     uint32_t bufferSize = PcmFramesToBytes(attrs);
-    if (bufferSize <= 0) {
+    if (bufferSize == 0) {
         return HDF_FAILURE;
     }
     char *frame = nullptr;
@@ -513,7 +513,7 @@ int32_t FrameStartCapture(struct AudioCapture *capture, FILE *file, const struct
         return HDF_FAILURE;
     }
     bufferSize = FRAME_COUNT * pcmBytes;
-    if (bufferSize <= 0) {
+    if (bufferSize == 0) {
         return HDF_FAILURE;
     }
     char *frame = nullptr;
@@ -620,7 +620,7 @@ int32_t StartRecord(struct AudioCapture *capture, FILE *file, uint64_t filesize)
             tryNumFrame = 0;
             uint32_t replyByte = static_cast<uint32_t>(replyBytes);
             size_t writeRet = fwrite(frame, replyByte, 1, file);
-            if (writeRet < 0) {
+            if (writeRet == 0) {
                 free(frame);
                 frame = nullptr;
                 return HDF_FAILURE;

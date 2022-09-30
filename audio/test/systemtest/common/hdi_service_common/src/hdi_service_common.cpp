@@ -476,7 +476,7 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct IAudioRender *render
     }
     uint32_t remainingDataSize = wavHeadInfo.dataSize;
     uint32_t bufferSize = PcmFramesToBytes(attrs);
-    if (bufferSize <= 0) {
+    if (bufferSize == 0) {
         return HDF_FAILURE;
     }
     char *frame = nullptr;
@@ -488,7 +488,7 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct IAudioRender *render
         if (g_frameStatus) {
             readSize = (remainingDataSize) > (bufferSize) ? (bufferSize) : (remainingDataSize);
             numRead = fread(frame, readSize, 1, file);
-            if (numRead <= 0) {
+            if (numRead == 0) {
                 free(frame);
                 return HDF_FAILURE;
             }
@@ -524,7 +524,7 @@ int32_t FrameStartCapture(struct IAudioCapture *capture, FILE *file, const struc
         return HDF_FAILURE;
     }
     bufferSize = FRAME_COUNT * pcmBytes;
-    if (bufferSize <= 0) {
+    if (bufferSize == 0) {
         return HDF_FAILURE;
     }
     char *frame = nullptr;
@@ -647,7 +647,7 @@ int32_t StartRecord(struct IAudioCapture *capture, FILE *file, uint64_t filesize
             }
             uint32_t replyByte = static_cast<uint32_t>(replyBytes);
             size_t writeRet = fwrite(frame, replyByte, 1, file);
-            if (writeRet < 0) {
+            if (writeRet == 0) {
                 free(frame);
                 return HDF_FAILURE;
             }
