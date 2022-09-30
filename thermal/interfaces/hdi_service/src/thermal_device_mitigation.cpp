@@ -46,9 +46,8 @@ const int32_t NUM_ZERO = 0;
 int32_t ThermalDeviceMitigation::WriteSysfsFd(int32_t fd, std::string buf, size_t bytesSize)
 {
     ssize_t pos = 0;
-    ssize_t recever = 0;
     do {
-        recever = write(fd, buf.c_str() + (size_t) pos, bytesSize - (size_t)pos);
+        ssize_t recever = write(fd, buf.c_str() + (size_t) pos, bytesSize - (size_t)pos);
         if (recever < NUM_ZERO) {
             return recever;
         }
@@ -171,7 +170,6 @@ int32_t ThermalDeviceMitigation::ExecuteChargerRequest(uint32_t current, const s
     int32_t ret = HDF_FAILURE;
     char currentBuf[MAX_PATH] = {0};
     char nodeBuf[MAX_BUF_PATH] = {0};
-    static uint32_t previous;
     if (access(path.c_str(), 0) != NUM_ZERO) {
         return ret;
     }
@@ -187,7 +185,6 @@ int32_t ThermalDeviceMitigation::ExecuteChargerRequest(uint32_t current, const s
     }
     if (WriteSysfsFile(nodeBuf, currentBuf, strlen(currentBuf)) > NUM_ZERO) {
         THERMAL_HILOGI(COMP_HDI, "Set current to %{public}d", current);
-        previous = current;
         ret = HDF_SUCCESS;
     } else {
         THERMAL_HILOGE(COMP_HDI, "failed to set current");

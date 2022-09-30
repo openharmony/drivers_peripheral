@@ -32,7 +32,6 @@ constexpr int32_t UEVENT_BUFF_SIZE = (64 * 1024);
 constexpr int32_t UEVENT_RESERVED_SIZE = 2;
 constexpr int32_t UEVENT_MSG_LEN = (2 * 1024);
 constexpr int32_t TIMER_FAST_SEC = 2;
-constexpr int32_t TIMER_SLOW_SEC = 10;
 constexpr int32_t SEC_TO_MSEC = 1000;
 const std::string POWER_SUPPLY = "SUBSYSTEM=power_supply";
 }
@@ -94,13 +93,10 @@ int32_t BatteryThread::RegisterCallback(int32_t fd, EventType et)
 
 void BatteryThread::UpdateEpollInterval(const int32_t chargeState)
 {
-    int32_t interval;
     if ((chargeState != PowerSupplyProvider::CHARGE_STATE_NONE) &&
         (chargeState != PowerSupplyProvider::CHARGE_STATE_RESERVED)) {
-        interval = TIMER_FAST_SEC;
-        epollInterval_ = interval * SEC_TO_MSEC;
+        epollInterval_ = TIMER_FAST_SEC * SEC_TO_MSEC;
     } else {
-        interval = TIMER_SLOW_SEC;
         epollInterval_ = -1;
     }
 }

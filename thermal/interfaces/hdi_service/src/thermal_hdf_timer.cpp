@@ -168,12 +168,11 @@ int32_t ThermalHdfTimer::InitProviderTimer()
 
 int32_t ThermalHdfTimer::LoopingThreadEntry(void *arg, int32_t epfd)
 {
-    int32_t nevents = 0;
     size_t eventct = callbackHandler_.size();
     struct epoll_event events[eventct];
     THERMAL_HILOGI(COMP_HDI, "%{public}d, %{public}zu", epfd, eventct);
     while (true) {
-        nevents = epoll_wait(epfd, events, eventct, -1);
+        int32_t nevents = epoll_wait(epfd, events, eventct, -1);
         if (nevents == -1) {
             continue;
         }
