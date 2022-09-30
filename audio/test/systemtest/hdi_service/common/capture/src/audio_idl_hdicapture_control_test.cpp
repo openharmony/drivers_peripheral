@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_remote_adapter_if.h"
+#include <gtest/gtest.h>
 #include "hdi_service_common.h"
 
 using namespace std;
@@ -29,54 +29,35 @@ public:
     void TearDown();
     struct IAudioCapture *capture = nullptr;
     struct IAudioAdapter *adapter = nullptr;
-    static TestGetAudioManager getAudioManager;
-    static void *handle;
     static TestAudioManager *manager;
-    static TestAudioManagerRelease managerRelease;
-    static TestAudioCaptureRelease captureRelease;
-    static TestAudioAdapterRelease adapterRelease;
 };
 
-using THREAD_FUNC = void *(*)(void *);
-void *AudioIdlHdiCaptureControlTest::handle = nullptr;
-TestGetAudioManager AudioIdlHdiCaptureControlTest::getAudioManager = nullptr;
 TestAudioManager *AudioIdlHdiCaptureControlTest::manager = nullptr;
-TestAudioManagerRelease AudioIdlHdiCaptureControlTest::managerRelease = nullptr;
-TestAudioAdapterRelease AudioIdlHdiCaptureControlTest::adapterRelease = nullptr;
-TestAudioCaptureRelease AudioIdlHdiCaptureControlTest::captureRelease = nullptr;
+using THREAD_FUNC = void *(*)(void *);
 
 void AudioIdlHdiCaptureControlTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    captureRelease = (TestAudioCaptureRelease)(dlsym(handle, "AudioCaptureRelease"));
-    ASSERT_NE(nullptr, captureRelease);
-    (void)HdfRemoteGetCallingPid();
-    manager = getAudioManager(IDL_SERVER_NAME.c_str());
+    manager = IAudioManagerGet(IS_STUB);
     ASSERT_NE(nullptr, manager);
 }
 
 void AudioIdlHdiCaptureControlTest::TearDownTestCase(void)
 {
-    if (managerRelease != nullptr && manager != nullptr) {
-        (void)managerRelease(manager);
-    }
-    if (handle != nullptr) {
-        (void)dlclose(handle);
+    if (manager != nullptr) {
+        (void)IAudioManagerRelease(manager, IS_STUB);
     }
 }
 
 void AudioIdlHdiCaptureControlTest::SetUp(void)
 {
-    int32_t ret;
     ASSERT_NE(nullptr, manager);
-    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
+    int32_t ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiCaptureControlTest::TearDown(void)
 {
-    int32_t ret = ReleaseCaptureSource(manager, adapter, capture, adapterRelease, captureRelease);
+    int32_t ret = ReleaseCaptureSource(manager, adapter, capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 

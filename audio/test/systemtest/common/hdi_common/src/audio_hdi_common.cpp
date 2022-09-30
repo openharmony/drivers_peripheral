@@ -781,6 +781,9 @@ int32_t CheckRegisterStatus(const struct AudioCtlElemId firstId, const struct Au
 
 int32_t StopAudio(struct PrepareAudioPara &audiopara)
 {
+    if (audiopara.manager == nullptr || audiopara.adapter == nullptr) {
+        return HDF_FAILURE;
+    }
     int32_t ret = -1;
     if (audiopara.capture != nullptr) {
         ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
@@ -806,10 +809,8 @@ int32_t StopAudio(struct PrepareAudioPara &audiopara)
         audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
         audiopara.render = nullptr;
     }
-    if (audiopara.manager != nullptr && audiopara.adapter != nullptr) {
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-        audiopara.adapter = nullptr;
-    }
+    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.adapter = nullptr;
     return AUDIO_HAL_SUCCESS;
 }
 

@@ -19,14 +19,14 @@ module_output_path = "drivers_peripheral_audio/audio"
 
 ohos_systemtest("hdf_audio_idlhdi_adapter_test") {
   module_out_path = module_output_path
-  public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
+
   sources = [
     "../../../common/hdi_service_common/src/hdi_service_common.cpp",
     "src/audio_idlhdi_adapter_test.cpp",
   ]
   external_deps = [
     "c_utils:utils",
-    "hdf_core:libhdf_ipc_adapter",
+    "drivers_interface_audio:libaudio_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
   ]

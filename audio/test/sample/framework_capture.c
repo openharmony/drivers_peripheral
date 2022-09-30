@@ -628,7 +628,8 @@ static int32_t RecordingAudioInitFile(void)
 
 static int32_t RecordingAudioInitCapture(struct AudioCapture **captureTemp)
 {
-    if (captureTemp == NULL) {
+    if (captureTemp == NULL || g_adapter == NULL || g_adapter->CreateCapture == NULL ||
+        g_adapter->DestroyCapture == NULL) {
         AUDIO_FUNC_LOGE("captureTemp is null");
         return HDF_FAILURE;
     }
@@ -640,17 +641,13 @@ static int32_t RecordingAudioInitCapture(struct AudioCapture **captureTemp)
     }
     ret = capture->control.Start((AudioHandle)capture);
     if (ret < 0) {
-        if (g_adapter != NULL && g_adapter->DestroyCapture != NULL) {
-            g_adapter->DestroyCapture(g_adapter, capture);
-        }
+        g_adapter->DestroyCapture(g_adapter, capture);
         return HDF_FAILURE;
     }
     uint32_t bufferSize = PcmFramesToBytes(g_attrs);
     g_frame = (char *)calloc(1, bufferSize);
     if (g_frame == NULL) {
-        if (g_adapter != NULL && g_adapter->DestroyCapture != NULL) {
-            g_adapter->DestroyCapture(g_adapter, capture);
-        }
+        g_adapter->DestroyCapture(g_adapter, capture);
         return HDF_FAILURE;
     }
 

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_remote_adapter_if.h"
+#include <gtest/gtest.h>
 #include "hdi_service_common.h"
 #include "osal_mem.h"
 
@@ -34,53 +34,29 @@ public:
     void TearDown();
     static struct IAudioAdapter *adapter;
     static struct AudioPort audioPort;
-    static void *handle;
     static TestAudioManager *manager;
-    static TestAudioManagerRelease managerRelease;
-    static TestGetAudioManager getAudioManager;
-    static TestAudioAdapterRelease adapterRelease;
-    static TestAudioRenderRelease renderRelease;
-    static TestAudioCaptureRelease captureRelease;
 };
 using THREAD_FUNC = void *(*)(void *);
-TestGetAudioManager AudioIdlHdiAdapterPerformaceTest::getAudioManager = nullptr;
 TestAudioManager *AudioIdlHdiAdapterPerformaceTest::manager = nullptr;
-void *AudioIdlHdiAdapterPerformaceTest::handle = nullptr;
-TestAudioManagerRelease AudioIdlHdiAdapterPerformaceTest::managerRelease = nullptr;
-TestAudioAdapterRelease AudioIdlHdiAdapterPerformaceTest::adapterRelease = nullptr;
-TestAudioRenderRelease AudioIdlHdiAdapterPerformaceTest::renderRelease = nullptr;
-TestAudioCaptureRelease AudioIdlHdiAdapterPerformaceTest::captureRelease = nullptr;
 struct IAudioAdapter *AudioIdlHdiAdapterPerformaceTest::adapter = nullptr;
 struct AudioPort AudioIdlHdiAdapterPerformaceTest::audioPort = {};
 
 void AudioIdlHdiAdapterPerformaceTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    renderRelease = (TestAudioRenderRelease)(dlsym(handle, "AudioRenderRelease"));
-    ASSERT_NE(nullptr, renderRelease);
-    captureRelease = (TestAudioCaptureRelease)(dlsym(handle, "AudioCaptureRelease"));
-    ASSERT_NE(nullptr, captureRelease);
-    (void)HdfRemoteGetCallingPid();
-    manager = getAudioManager(IDL_SERVER_NAME.c_str());
+    manager = IAudioManagerGet(IS_STUB);
     ASSERT_NE(nullptr, manager);
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
+    int32_t ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiAdapterPerformaceTest::TearDownTestCase(void)
 {
-    if (manager != nullptr || manager->UnloadAdapter != nullptr || adapter != nullptr) {
+    if (manager != nullptr && manager->UnloadAdapter != nullptr && adapter != nullptr) {
         int32_t ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
         EXPECT_EQ(HDF_SUCCESS, ret);
-        adapterRelease(adapter);
+        IAudioAdapterRelease(adapter, IS_STUB);
         free(audioPort.portName);
-    }
-    if (managerRelease != nullptr && manager != nullptr) {
-        (void)managerRelease(manager);
-    }
-    if (handle != nullptr) {
-        (void)dlclose(handle);
+        (void)IAudioManagerRelease(manager, IS_STUB);
     }
 }
 
@@ -238,8 +214,8 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioCreateRenderPerformance_001, Tes
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
-        ret = audiopara.adapter->DestroyRender(audiopara.adapter);
-        renderRelease(audiopara.render);
+        ret = audiopara.adapter->DestroyRender(audiopara.adapter, &audiopara.devDesc);
+        IAudioRenderRelease(audiopara.render, IS_STUB);
         audiopara.render = nullptr;
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
@@ -268,7 +244,7 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioDestroyRenderPerformance_001, Te
                                               &audiopara.render);
         EXPECT_EQ(HDF_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
-        audiopara.adapter->DestroyRender(audiopara.adapter);
+        audiopara.adapter->DestroyRender(audiopara.adapter, &audiopara.devDesc);
         gettimeofday(&audiopara.end, NULL);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
@@ -301,8 +277,8 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioCreateCapturePerformance_001, Te
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
-        ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-        captureRelease(audiopara.capture);
+        ret = audiopara.adapter->DestroyCapture(audiopara.adapter, &audiopara.devDesc);
+        IAudioCaptureRelease(audiopara.capture, IS_STUB);
         audiopara.capture = nullptr;
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
@@ -330,8 +306,8 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioDestroyCapturePerformance_001, T
                                                &audiopara.capture);
         ASSERT_EQ(HDF_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.adapter->DestroyCapture(audiopara.adapter);
-        captureRelease(audiopara.capture);
+        ret = audiopara.adapter->DestroyCapture(audiopara.adapter, &audiopara.devDesc);
+        IAudioCaptureRelease(audiopara.capture, IS_STUB);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         audiopara.capture = nullptr;
