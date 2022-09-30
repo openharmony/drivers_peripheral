@@ -25,7 +25,7 @@ namespace HDI {
 namespace Location {
 class LocationVendorInterface {
 public:
-    const GnssVendorInterface *GetGnssVendorInterface();
+    const GnssVendorInterface *GetGnssVendorInterface() const;
     const void *GetModuleInterface(int moduleId);
     static LocationVendorInterface* GetInstance();
     static void DestroyInstance();
