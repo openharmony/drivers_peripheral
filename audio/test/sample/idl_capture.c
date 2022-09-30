@@ -329,13 +329,16 @@ static int32_t FrameStartCaptureMmap(const struct StrParaCapture *param)
     mmapDesc.offset = 0;                                             // Recording must be 0
     // start
     if (capture == NULL || capture->ReqMmapBuffer == NULL) {
+        free(mmapDesc.filePath);
         return HDF_FAILURE;
     }
     int32_t ret = capture->ReqMmapBuffer(capture, FILE_CAPTURE_SIZE, &mmapDesc);
     if (ret < 0) {
+        free(mmapDesc.filePath);
         printf("Request map fail,please check.\n");
         return HDF_FAILURE;
     }
+    free(mmapDesc.filePath);
     return HDF_SUCCESS;
 }
 

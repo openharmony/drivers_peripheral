@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#include "hdf_remote_adapter_if.h"
-#include "osal_mem.h"
+#include <gtest/gtest.h>
 #include "hdi_service_common.h"
+#include "osal_mem.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -32,55 +32,36 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
     static TestAudioManager *manager;
     struct IAudioAdapter *adapter = nullptr;
     struct IAudioRender *render = nullptr;
-    static TestAudioManagerRelease managerRelease;
-    static TestGetAudioManager getAudioManager;
-    static TestAudioAdapterRelease adapterRelease;
-    static TestAudioRenderRelease renderRelease;
 };
 using THREAD_FUNC = void *(*)(void *);
-TestGetAudioManager AudioIdlHdiRenderPerformaceTest::getAudioManager = nullptr;
 TestAudioManager *AudioIdlHdiRenderPerformaceTest::manager = nullptr;
-void *AudioIdlHdiRenderPerformaceTest::handle = nullptr;
-TestAudioManagerRelease AudioIdlHdiRenderPerformaceTest::managerRelease = nullptr;
-TestAudioAdapterRelease AudioIdlHdiRenderPerformaceTest::adapterRelease = nullptr;
-TestAudioRenderRelease AudioIdlHdiRenderPerformaceTest::renderRelease = nullptr;
 
 void AudioIdlHdiRenderPerformaceTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    renderRelease = (TestAudioRenderRelease)(dlsym(handle, "AudioRenderRelease"));
-    ASSERT_NE(nullptr, renderRelease);
-    (void)HdfRemoteGetCallingPid();
-    manager = getAudioManager(IDL_SERVER_NAME.c_str());
+    manager = IAudioManagerGet(IS_STUB);
     ASSERT_NE(nullptr, manager);
 }
 
 void AudioIdlHdiRenderPerformaceTest::TearDownTestCase(void)
 {
-    if (managerRelease != nullptr && manager != nullptr) {
-        (void)managerRelease(manager);
-    }
-    if (handle != nullptr) {
-        (void)dlclose(handle);
+    if (manager != nullptr) {
+        (void)IAudioManagerRelease(manager, IS_STUB);
     }
 }
 
 void AudioIdlHdiRenderPerformaceTest::SetUp(void)
 {
-    int32_t ret;
     ASSERT_NE(nullptr, manager);
-    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
+    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiRenderPerformaceTest::TearDown(void)
 {
-    int32_t ret = ReleaseRenderSource(manager, adapter, render, adapterRelease, renderRelease);
+    int32_t ret = ReleaseRenderSource(manager, adapter, render);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 /**

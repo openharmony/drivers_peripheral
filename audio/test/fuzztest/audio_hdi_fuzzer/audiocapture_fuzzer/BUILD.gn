@@ -27,20 +27,15 @@ ohos_fuzztest("AudioCaptureFuzzTest") {
     "audiocapture_fuzzer.cpp",
   ]
   include_dirs = [
-    "//third_party/bounds_checking_function/include",
-    "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-    "//drivers/hdf_core/framework/include/utils",
     "//drivers/peripheral/audio/test/systemtest/common/hdi_service_common/include/",
     "//drivers/peripheral/audio/test/fuzztest/audio_hdi_fuzzer/audiocapture_fuzzer/include",
   ]
-  public_deps = [ "//drivers/interface/audio/v1_0:libaudio_stub_1.0" ]
+
   external_deps = [
     "c_utils:utils",
-    "hdf_core:libhdf_host",
-    "hdf_core:libhdf_ipc_adapter",
+    "drivers_interface_audio:libaudio_proxy_1.0",
     "hdf_core:libhdf_utils",
-    "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
   ]
+  defines = [ "AUDIO_ADM_PASSTHROUGH" ]
 }
