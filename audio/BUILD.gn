@@ -65,12 +65,3 @@ group("hdi_audio") {
     ]
   }
 }
-
-group("audio_sample_client") {
-  if (drivers_peripheral_audio_hdf_proxy_stub == true) {
-    deps = [
-      "sample:audio_sample_capture",
-      "sample:audio_sample_render",
-    ]
-  }
-}

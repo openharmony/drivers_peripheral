@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_remote_adapter_if.h"
+#include <gtest/gtest.h>
 #include "hdi_service_common.h"
 
 using namespace std;
@@ -27,94 +27,46 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct IAudioAdapter *adapter = nullptr;
     struct IAudioCapture *capture = nullptr;
-    static TestAudioManager *(*GetAudioManager)(const char *);
+    struct IAudioAdapter *adapter = nullptr;
     static TestAudioManager *manager;
-    static void *handleSo;
-    static void (*AudioManagerRelease)(struct IAudioManager *);
-    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
-    static void (*AudioCaptureRelease)(struct IAudioCapture *);
-    void ReleaseCaptureSource(void);
 };
 
-using THREAD_FUNC = void *(*)(void *);
-
-TestAudioManager *(*AudioIdlHdiCaptureControlTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiCaptureControlTest::manager = nullptr;
-void *AudioIdlHdiCaptureControlTest::handleSo = nullptr;
-void (*AudioIdlHdiCaptureControlTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
-void (*AudioIdlHdiCaptureControlTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
-void (*AudioIdlHdiCaptureControlTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
+using THREAD_FUNC = void *(*)(void *);
 
 void AudioIdlHdiCaptureControlTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handleSo);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
-    (void)HdfRemoteGetCallingPid();
-    manager = GetAudioManager(IDL_SERVER_NAME.c_str());
+    manager = IAudioManagerGet(IS_STUB);
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
-    ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
-    ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handleSo, "AudioCaptureRelease"));
-    ASSERT_NE(nullptr, AudioCaptureRelease);
 }
 
 void AudioIdlHdiCaptureControlTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease !=nullptr) {
-        AudioManagerRelease(manager);
-        manager = nullptr;
-    }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
-    }
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (manager != nullptr) {
+        (void)IAudioManagerRelease(manager, IS_STUB);
     }
 }
 
 void AudioIdlHdiCaptureControlTest::SetUp(void)
 {
-    int32_t ret;
     ASSERT_NE(nullptr, manager);
-    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
+    int32_t ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiCaptureControlTest::TearDown(void)
 {
-    ReleaseCaptureSource();
+    int32_t ret = ReleaseCaptureSource(manager, adapter, capture);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
-void AudioIdlHdiCaptureControlTest::ReleaseCaptureSource(void)
-{
-    if (capture != nullptr && AudioCaptureRelease != nullptr) {
-        adapter->DestroyCapture(adapter);
-        AudioCaptureRelease(capture);
-        capture = nullptr;
-    }
-    if (adapter != nullptr && AudioAdapterRelease != nullptr) {
-        manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-        AudioAdapterRelease(adapter);
-        adapter = nullptr;
-    }
-}
 /**
-* @tc.name  Test AudioCaptureStart API via legal input
-* @tc.number  SUB_Audio_HDI_StartCapture_001
+* @tc.name  AudioStartCapture_001
 * @tc.desc  Test AudioCaptureStart interface,return 0 if the audiocapture object is started successfully
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStart_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStart_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -123,12 +75,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStart_001, TestSize
     capture->Stop(capture);
 }
 /**
-* @tc.name  Test CaptureStart API via setting the incoming parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureStart_Null_002
+* @tc.name  AudioCaptureStartNull_002
 * @tc.desc  Test CaptureStart interface,return -3/-4 if the incoming parameter handle is nullptr
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStart_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStartNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct IAudioCapture *captureNull = nullptr;
@@ -138,12 +89,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStart_Null_002, Tes
     capture->Stop(capture);
 }
 /**
-* @tc.name  Test AudioCaptureStart API via start two capture object continuously
-* @tc.number  SUB_Audio_HDI_CaptureStart_003
+* @tc.name  AudioCaptureStart_003
 * @tc.desc  Test AudioCaptureStart interface,return 0 if the Audiocapturestart was successfully called twice
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStart_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStart_003, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -154,12 +104,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStart_003, TestSize
     capture->Stop(capture);
 }
 /**
-* @tc.name  Test AudioCaptureStop API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureStop_001
+* @tc.name  AudioCaptureStop_001
 * @tc.desc  Test AudioCaptureStop interface,return 0 if the audiocapture object is stopped successfully
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -169,12 +118,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_001, TestSize.
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test AudioCaptureStop API via stop two capture object continuously
-* @tc.number  SUB_Audio_HDI_CaptureStop_002
+* @tc.name  AudioCaptureStop_002
 * @tc.desc  Test AudioCaptureStop interface,return -2 if Audiocapturestop was successfully called twice
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_002, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -186,12 +134,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_002, TestSize.
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
 }
 /**
-* @tc.name  Test AudioCaptureStop API via start an audio capture after stopping
-* @tc.number  SUB_Audio_HDI_CaptureStop_003
+* @tc.name  AudioCaptureStop_003
 * @tc.desc  Test AudioCaptureStop interface,return 0 if stop and start an audio capture successfully
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_003, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -204,12 +151,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_003, TestSize.
     capture->Stop(capture);
 }
 /**
-* @tc.name  Test AudioCaptureStop API via the capture does not start and stop only
-* @tc.number  SUB_Audio_HDI_CaptureStop_004
+* @tc.name  AudioCaptureStop_004
 * @tc.desc  Test AudioCaptureStop interface,return -2 if the capture does not start and stop only
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStop_004, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -217,12 +163,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_004, TestSize.
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
 }
 /**
-* @tc.name Test CaptureStop API via setting the incoming parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureStop_Null_005
+* @tc.name  AudioCaptureStopNull_005
 * @tc.desc  Test CaptureStop interface, return -3/-4 if the incoming parameter handle is nullptr
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_Null_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureStopNull_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct IAudioCapture *captureNull = nullptr;
@@ -233,12 +178,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureStop_Null_005, Test
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name  Test CapturePause API via legal input
-* @tc.number  SUB_Audio_HDI_CapturePause_001
+* @tc.name  AudioCapturePause_001
 * @tc.desc  test HDI CapturePause interface, return 0 if the capture is paused after start
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -250,12 +194,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_001, TestSize
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test CapturePause API via the interface is called twice in a row
-* @tc.number  SUB_Audio_HDI_CapturePause_002
+* @tc.name  AudioCapturePause_002
 * @tc.desc  Test CapturePause interface, return -2 the second time if CapturePause is called twice
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_002, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -269,12 +212,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_002, TestSize
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test CapturePause API via setting the incoming parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_CapturePause_Null_003
+* @tc.name  AudioCapturePauseNull_003
 * @tc.desc  Test CapturePause interface,return -3/-4 if the incoming parameter handle is nullptr
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePauseNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct IAudioCapture *captureNull = nullptr;
@@ -287,12 +229,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_Null_003, Tes
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test CapturePause API via the capture is not Started and paused only.
-* @tc.number  SUB_Audio_HDI_CapturePause_004
+* @tc.name  AudioCapturePause_004
 * @tc.desc  Test AudioCapturePause interface,return -1 if the capture is not Started and paused only.
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_004, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -300,12 +241,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_004, TestSize
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name  Test CapturePause API via the capture is paused after stopped.
-* @tc.number  SUB_Audio_HDI_CapturePause_005
+* @tc.name  AudioCapturePause_005
 * @tc.desc  Test CapturePause interface, return -1 the capture is paused after stopped.
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCapturePause_005, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -317,12 +257,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CapturePause_005, TestSize
     EXPECT_EQ(HDF_FAILURE, ret);
 }
 /**
-* @tc.name  Test CaptureResume API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureResume_001
+* @tc.name  AudioCaptureResume_001
 * @tc.desc  Test CaptureResume interface,return 0 if the capture is resumed after paused
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -336,12 +275,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_001, TestSiz
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test CaptureResume API via the interface is called twice in a row
-* @tc.number  SUB_Audio_HDI_CaptureResume_002
+* @tc.name  AudioCaptureResume_002
 * @tc.desc  Test CaptureResume interface,return -2 the second time if the CaptureResume is called twice
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_002, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -358,12 +296,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_002, TestSiz
 }
 
 /**
-* @tc.name  Test CaptureResume API via the capture is resumed after started
-* @tc.number  SUB_Audio_HDI_CaptureResume_003
+* @tc.name  AudioCaptureResume_003
 * @tc.desc  test HDI CaptureResume interface,return -2 if the capture is resumed after started
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_003, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -375,12 +312,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_003, TestSiz
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test CaptureResume API via setting the incoming parameter handle is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureResume_Null_004
+* @tc.name  AudioCaptureResumeNull_004
 * @tc.desc  Test CaptureResume interface, return -3/-4 if the incoming parameter handle is nullptr
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResumeNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct IAudioCapture *captureNull = nullptr;
@@ -395,12 +331,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_Null_004, Te
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name  Test CaptureResume API via the capture is resumed after stopped
-* @tc.number  SUB_Audio_HDI_CaptureResume_005
+* @tc.name  AudioCaptureResume_005
 * @tc.desc  test HDI CaptureResume interface,return -2 if the capture is resumed after stopped
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_005, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -412,12 +347,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_005, TestSiz
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
 }
 /**
-* @tc.name  Test CaptureResume API via the capture Continue to start after resume
-* @tc.number  SUB_Audio_HDI_CaptureResume_006
+* @tc.name  AudioCaptureResume_006
 * @tc.desc  test HDI CaptureResume interface,return -1 if the capture Continue to start after resume
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_006, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureResume_006, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -433,12 +367,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureResume_006, TestSiz
 }
 
 /**
-* @tc.name  Test CaptureFlush API via legal input Verify that the data in the buffer is flushed after stop
-* @tc.number  SUB_Audio_HDI_CaptureFlush_001
+* @tc.name  AudioCaptureFlush_001
 * @tc.desc  Test CaptureFlush interface,return -2 if the data in the buffer is flushed successfully after stop
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureFlush_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureFlush_001, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, capture);
@@ -450,12 +383,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureFlush_001, TestSize
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
 }
 /**
-* @tc.name  Test CaptureFlush that the data in the buffer is flushed when handle is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureFlush_Null_002
+* @tc.name  AudioCaptureFlushNull_002
 * @tc.desc  Test CaptureFlush, return -3/-4 if the data in the buffer is flushed when handle is nullptr
-* @tc.author: ZengLifeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureFlush_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureFlushNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct IAudioCapture *captureNull = nullptr;
@@ -468,12 +400,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureFlush_Null_002, Tes
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 }
 /**
-* @tc.name    Test CaptureTurnStandbyMode API
-* @tc.number  SUB_Audio_HDI_CaptureTurnStandbyMode_001
+* @tc.name  AudioCaptureTurnStandbyMode_001
 * @tc.desc    Test CaptureTurnStandbyMode interface,return 0 if the interface use correctly.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureTurnStandbyMode_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureTurnStandbyMode_001, TestSize.Level1)
 {
     int32_t ret = -1;
 
@@ -485,12 +416,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureTurnStandbyMode_001
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name    Test CaptureTurnStandbyMode API vai setting the incoming parameter self is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureTurnStandbyMode_Null_002
+* @tc.name  AudioCaptureTurnStandbyModeNull_002
 * @tc.desc    Test CaptureTurnStandbyMode interface,return -3/-4 setting the incoming parameter self is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureTurnStandbyMode_Null_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureTurnStandbyModeNull_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct IAudioCapture *captureNull = nullptr;
@@ -505,12 +435,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureTurnStandbyMode_Nul
 }
 
 /**
-* @tc.name    Test CaptureAudioDevDump API via
-* @tc.number  SUB_Audio_HDI_CaptureAudioDevDump_001
+* @tc.name  AudioCaptureAudioDevDump_001
 * @tc.desc    Test CaptureAudioDevDump interface,return 0 if the interface use correctly.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_001, TestSize.Level1)
 {
     int32_t ret = -1;
     char pathBuf[] = "./DevDump.log";
@@ -524,7 +453,7 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_001, T
     }
     struct PrepareAudioPara audiopara = {
         .capture = capture, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(),
-        .self = this, .pins = PIN_OUT_SPEAKER, .path = AUDIO_CAPTURE_FILE.c_str()
+        .pins = PIN_OUT_SPEAKER, .path = AUDIO_CAPTURE_FILE.c_str()
     };
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     if (ret < 0) {
@@ -544,30 +473,29 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_001, T
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
-* @tc.name    Test CaptureAudioDevDump API via
-* @tc.number  SUB_Audio_HDI_CaptureAudioDevDump_002
+* @tc.name  AudioCaptureAudioDevDump_002
 * @tc.desc    Test CaptureAudioDevDump interface,return 0 if the interface use correctly.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_002, TestSize.Level1)
 {
     int32_t ret = -1;
     char path[] = "./DevDump.log";
     ASSERT_NE(nullptr, capture);
-    FILE *fp = fopen(path, "wb+");
-    ASSERT_NE(nullptr, fp);
-    int fd = fileno(fp);
+    FILE *file = fopen(path, "wb+");
+    ASSERT_NE(nullptr, file);
+    int fd = fileno(file);
     if (fd == -1) {
-        fclose(fp);
+        fclose(file);
         ASSERT_NE(fd, -1);
     }
     struct PrepareAudioPara audiopara = {
         .capture = capture, .portType = PORT_OUT, .adapterName = ADAPTER_NAME.c_str(),
-        .self = this, .pins = PIN_OUT_SPEAKER, .path = AUDIO_CAPTURE_FILE.c_str()
+        .pins = PIN_OUT_SPEAKER, .path = AUDIO_CAPTURE_FILE.c_str()
     };
     ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     if (ret < 0) {
-        fclose(fp);
+        fclose(file);
         ASSERT_EQ(HDF_SUCCESS, ret);
     }
     sleep(1);
@@ -578,42 +506,40 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_002, T
     sleep(1);
     ret = audiopara.capture->Resume(audiopara.capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    fclose(fp);
+    fclose(file);
     ret = ThreadRelease(audiopara);
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
-* @tc.name    Test CaptureAudioDevDump API via setting the incoming parameter range is out of range
-* @tc.number  SUB_Audio_HDI_CaptureAudioDevDump_003
+* @tc.name  AudioCaptureAudioDevDump_003
 * @tc.desc    Test CaptureAudioDevDump interface,return -3 if setting the incoming parameter range is out of range
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_003, TestSize.Level1)
 {
     int32_t ret = -1;
     char pathBuf[] = "./DevDump.log";
     ASSERT_NE(nullptr, capture);
-    FILE *fp = fopen(pathBuf, "wb+");
-    ASSERT_NE(nullptr, fp);
-    int fd = fileno(fp);
+    FILE *file = fopen(pathBuf, "wb+");
+    ASSERT_NE(nullptr, file);
+    int fd = fileno(file);
     if (fd == -1) {
-        fclose(fp);
+        fclose(file);
         ASSERT_NE(fd, -1);
     }
     ret = capture->AudioDevDump(capture, RANGE-1, fd);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->AudioDevDump(capture, OUT_OF_RANGE, fd);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    fclose(fp);
+    fclose(file);
 }
 /**
-* @tc.name    Test CaptureAudioDevDump API via setting the incoming parameter self is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureAudioDevDump_Null_004
+* @tc.name  AudioCaptureAudioDevDumpNull_004
 * @tc.desc    Test CaptureAudioDevDump interface,return -3/-4 if setting the incoming parameter self is nullptr
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDumpNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct IAudioCapture *captureNull = nullptr;
@@ -631,12 +557,11 @@ HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_Null_0
     fclose(fp);
 }
 /**
-* @tc.name    Test CaptureAudioDevDump API via setting the incoming parameter fd is illegal
-* @tc.number  SUB_Audio_HDI_CaptureAudioDevDump_005
+* @tc.name  AudioCaptureAudioDevDump_005
 * @tc.desc    Test CaptureAudioDevDump interface,return -3 if setting the incoming parameter fd is illegal
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureControlTest, SUB_Audio_HDI_CaptureAudioDevDump_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureControlTest, AudioCaptureAudioDevDump_005, TestSize.Level1)
 {
     int32_t ret = -1;
 

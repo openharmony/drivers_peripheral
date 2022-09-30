@@ -20,6 +20,7 @@
 #include "hdf_types.h"
 #include "osal_mem.h"
 #include "securec.h"
+#include "stub_collector.h"
 #include "audio_adapter_info_common.h"
 #include "audio_common.h"
 #include "audio_uhdf_log.h"
@@ -428,6 +429,8 @@ int32_t AudioManagerServiceRemvAdapter(struct IAudioManager *manager, uint32_t p
     struct AudioHwManager *audioManagerSer = (struct AudioHwManager *)manager;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)audioManagerSer->adapterInfos[pos].adapterServicePtr;
 
+    StubCollectorRemoveObject(IAUDIOADAPTER_INTERFACE_DESC, hwAdapter);
+
     if (hwAdapter == NULL) {
         AUDIO_FUNC_LOGE("manager == NULL || hwAdapter == NULL");
         return AUDIO_ERR_INVALID_PARAM;
@@ -514,7 +517,7 @@ int32_t ReleaseAudioManagerObject(struct IAudioManager *object)
     return AUDIO_SUCCESS;
 }
 
-struct IAudioManager *AudioManagerGetInstance(const char *serviceName)
+struct IAudioManager *AudioManagerImplGetInstance(const char *serviceName)
 {
     (void)serviceName;
     struct AudioHwManager *service = (struct AudioHwManager *)OsalMemCalloc(sizeof(struct AudioHwManager));
@@ -529,7 +532,7 @@ struct IAudioManager *AudioManagerGetInstance(const char *serviceName)
     return &(service->interface);
 }
 
-void AudioManagerRelease(struct IAudioManager *instance)
+void AudioManagerImplRelease(struct IAudioManager *instance)
 {
     ReleaseAudioManagerObject(instance);
 }

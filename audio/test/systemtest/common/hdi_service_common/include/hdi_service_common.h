@@ -13,9 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_IDlHDI_COMMON_H
-#define AUDIO_IDlHDI_COMMON_H
-#include <dlfcn.h>
+#ifndef AUDIO_IDLHDI_COMMON_H
+#define AUDIO_IDLHDI_COMMON_H
 #include <inttypes.h>
 #include <limits.h>
 #include <pthread.h>
@@ -23,34 +22,22 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
+#include <string>
 #include <sys/mman.h>
+#include <sys/time.h>
 #include <unistd.h>
-#include <gtest/gtest.h>
 #include "hdf_base.h"
-#include "hdf_io_service_if.h"
-#include "hdf_service_status.h"
-#include "ioservstat_listener.h"
-#include "svcmgr_ioservice.h"
 #include "v1_0/iaudio_manager.h"
 #include "v1_0/audio_types.h"
 
 namespace OHOS {
 namespace Audio {
 #ifdef AUDIO_ADM_PASSTHROUGH
-    const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_passthrough");
-    const int IS_ADM = true;
+    constexpr bool IS_STUB = true;
 #endif
 #ifdef AUDIO_ADM_SERVICE
-#ifdef __aarch64__
-    const std::string RESOLVED_PATH = "/system/lib64/libaudio_proxy_1.0.z.so";
-#else
-    const std::string RESOLVED_PATH = "/system/lib/libaudio_proxy_1.0.z.so";
+    constexpr bool IS_STUB = false;
 #endif
-    const int IS_ADM = true;
-#endif
-const std::string FUNCTION_NAME = "AudioManagerGetInstance";
-const std::string IDL_SERVER_NAME = "idl_audio_service";
 const std::string AUDIO_FILE = "/data/audiorendertest.wav";
 const std::string LOW_LATENCY_AUDIO_FILE = "/data/lowlatencyrendertest.wav";
 const std::string AUDIO_CAPTURE_FILE = "/data/audiocapture.wav";
@@ -60,7 +47,6 @@ const int AUDIO_ADAPTER_MAX_NUM = 5;
 const std::string ADAPTER_NAME = "primary";
 const std::string ADAPTER_NAME_OUT = "primary_ext";
 using TestAudioManager = struct IAudioManager;
-
 const std::string AUDIO_RIFF = "RIFF";
 const std::string AUDIO_WAVE = "WAVE";
 const std::string AUDIO_DATA = "data";
@@ -267,6 +253,11 @@ int32_t CheckWriteCompleteValue();
 void TestReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t descsLen);
 
 void TestAudioPortCapabilityFree(struct AudioPortCapability *dataBlock, bool freeSelf);
+
+int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&adapter,
+    struct IAudioCapture *&capture);
+
+int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioRender *&render);
 }
 }
 #endif // AUDIO_IDLHDI_COMMON_H

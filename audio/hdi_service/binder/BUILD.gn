@@ -20,14 +20,12 @@ ohos_shared_library("audio_manager_service") {
   include_dirs =
       [ "//drivers/peripheral/audio/hdi_service/passthrough/include" ]
 
-  deps = [
-    "//drivers/peripheral/audio/hdi_service/passthrough:hdi_audio_passthrough",
-  ]
   public_deps = [ "//drivers/interface/audio/v1_0:libaudio_stub_1.0" ]
   if (is_standard_system) {
     external_deps = [
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {

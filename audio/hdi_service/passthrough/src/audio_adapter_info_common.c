@@ -1028,11 +1028,13 @@ int32_t SetDescParam(
         AUDIO_FUNC_LOGE("fileno failed, fd is %{public}d", desc->memoryFd);
         return AUDIO_ERR_INTERNAL;
     }
+
     *fileSize = lseek(desc->memoryFd, 0, SEEK_END);
     if ((int64_t)reqSize > *fileSize) {
         AUDIO_FUNC_LOGE("reqSize is out of file Size!");
         return AUDIO_ERR_INVALID_PARAM;
     }
+
     desc->memoryAddress = mmap(NULL, reqSize, PROT_READ | PROT_WRITE, *flags, desc->memoryFd, 0);
     if (desc->memoryAddress == NULL || desc->memoryAddress == (void *)(-1)) {
         AUDIO_FUNC_LOGE("AudioRenderReqMmapBuffer mmap FAIL and errno is:%{public}d !", errno);
