@@ -82,7 +82,7 @@ void LocationVendorInterface::Init()
     }
 }
 
-const GnssVendorInterface *LocationVendorInterface::GetGnssVendorInterface()
+const GnssVendorInterface *LocationVendorInterface::GetGnssVendorInterface() const
 {
     if (vendorInterface_ == nullptr) {
         HDF_LOGE("%{public}s:GetGnssVendorInterface() failed.", __func__);
