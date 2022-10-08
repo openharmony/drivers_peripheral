@@ -31,7 +31,12 @@ int32_t GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
         LOG_ERROR("schedules is null");
         return RESULT_BAD_PARAM;
     }
-    UserAuthContext *authContext = GenerateAuthContext(param);
+    UserAuthContext *authContext = NULL;
+    ResultCode result = GenerateAuthContext(param, &authContext);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("GenerateAuthContext fail %{public}d", result);
+        return result;
+    }
     if (authContext == NULL) {
         LOG_ERROR("authContext is null");
         return RESULT_GENERAL_ERROR;
