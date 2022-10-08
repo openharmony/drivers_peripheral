@@ -61,7 +61,6 @@ class CodecHdiEncode {
             bufferHandleId = -1;
         }
     };
-    using BufferInfo = struct BufferInfo;
 
 public:
     CodecHdiEncode();
