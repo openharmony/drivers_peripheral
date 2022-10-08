@@ -1032,11 +1032,8 @@ static int32_t AudioRenderReqMmapBufferInit(
     if (ret < 0) {
         return ret;
     }
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(desc.filePath, pathBuf) == NULL) {
-        return AUDIO_ERR_INTERNAL;
-    }
-    FILE *fp = fopen(pathBuf, "rb+");
+
+    FILE *fp = fopen(desc.filePath, "rb+");
     if (fp == NULL) {
         AUDIO_FUNC_LOGE("Open file failed!");
         return AUDIO_ERR_INTERNAL;
