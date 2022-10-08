@@ -141,6 +141,10 @@ bool CodecHdiAdapterDecode::ReadOneFrameFromFile(FILE *fp, uint8_t *buf, uint32_
     temp += START_CODE_SIZE_FRAME;
     while (!feof(fp)) {
         t = fread(temp, 1, 1, fp);
+        if (t != 1) {
+            continue;
+        }
+
         if (*temp == START_CODE) {
             // check start code
             if ((temp[START_CODE_OFFSET_ONE] == 0) && (temp[START_CODE_OFFSET_SEC] == 0) &&

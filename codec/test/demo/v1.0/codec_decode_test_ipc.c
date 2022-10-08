@@ -111,12 +111,16 @@ static int32_t ReadOneFrameFromFile(FILE *fp, uint8_t *buf)
     // read start code first
     size_t t = fread(buf, 1, START_CODE_SIZE_FRAME, fp);
     if (t < START_CODE_SIZE_FRAME) {
-        return true;
+        return readSize;
     }
     uint8_t *temp = buf;
     temp += START_CODE_SIZE_FRAME;
     while (!feof(fp)) {
         t = fread(temp, 1, 1, fp);
+        if (t != 1) {
+            continue;
+        }
+
         if (*temp == START_CODE) {
             // check start code
             if ((temp[START_CODE_OFFSET_ONE] == 0) && (temp[START_CODE_OFFSET_SEC] == 0) &&
@@ -363,7 +367,7 @@ static void DecodeLoopHandleInput(const MpiDecLoopData *decData)
         } else {
             readSize = ReadOneFrameFromFile(decData->fpInput, g_readFileBuf);
             g_totalSrcSize += readSize;
-            g_pktEos = (g_totalSrcSize >= g_srcFileSize);
+            g_pktEos = (g_totalSrcSize >= g_srcFileSize | readSize <= 0);
         }
         if (g_pktEos) {
             HDF_LOGI("%{public}s: client inputData reach STREAM_FLAG_EOS", __func__);
