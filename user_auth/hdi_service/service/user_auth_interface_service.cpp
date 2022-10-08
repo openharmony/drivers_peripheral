@@ -119,9 +119,13 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
     std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *schedulesGet = nullptr;
     int32_t ret = GenerateSolutionFunc(solutionIn, &schedulesGet);
-    if (ret != RESULT_SUCCESS || schedulesGet == nullptr) {
-        IAM_LOGE("generate solution failed");
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("generate solution failed %{public}d", ret);
         return ret;
+    }
+    if (schedulesGet == nullptr) {
+        IAM_LOGE("get null schedule");
+        return RESULT_GENERAL_ERROR;
     }
     LinkedListNode *tempNode = schedulesGet->head;
     while (tempNode != nullptr) {
@@ -267,9 +271,13 @@ int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, AuthTy
     std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *scheduleGet = nullptr;
     int32_t ret = DoIdentify(param, &scheduleGet);
-    if (ret != RESULT_SUCCESS || scheduleGet == nullptr) {
+    if (ret != RESULT_SUCCESS) {
         IAM_LOGE("generate solution failed");
         return ret;
+    }
+    if (scheduleGet == nullptr) {
+        IAM_LOGE("get null schedule");
+        return RESULT_GENERAL_ERROR;
     }
     if (scheduleGet->head == nullptr || scheduleGet->head->data == nullptr) {
         IAM_LOGE("scheduleGet is invalid");
