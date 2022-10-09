@@ -33,7 +33,7 @@ public:
     uint8_t *GetBuffer() override;
 
 protected:
-    CodecHandleBuffer(struct OmxCodecBuffer &codecBuffer);
+    CodecHandleBuffer(struct OmxCodecBuffer &codecBuffer, BufferHandle *bufferHandle);
     bool CheckInvalid(struct OmxCodecBuffer &codecBuffer) override;
 
 private:

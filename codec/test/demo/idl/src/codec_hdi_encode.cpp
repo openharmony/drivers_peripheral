@@ -22,8 +22,8 @@
 using namespace std;
 using namespace OHOS;
 using OHOS::sptr;
+using OHOS::HDI::Base::NativeBuffer;
 using OHOS::HDI::Codec::V1_0::CodecCompCapability;
-using OHOS::HDI::Base::HdiBufferHandle;
 #define HDF_LOG_TAG     codec_omx_hdi_enc
 #define AV_COLOR_FORMAT OMX_COLOR_FormatYUV420SemiPlanar
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiEncode::gralloc_ = nullptr;
@@ -521,6 +521,7 @@ void CodecHdiEncode::Run()
             break;
         }
         err = client_->EmptyThisBuffer(*bufferInfo->omxBuffer.get());
+        bufferInfo->omxBuffer->bufferhandle = nullptr;
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s EmptyThisBuffer error", __func__);
             return;
@@ -553,7 +554,7 @@ bool CodecHdiEncode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, boo
             gralloc_->Mmap(*bufferHandle);
             endFlag = this->ReadOneFrame(fpIn_, (char *)bufferHandle->virAddr, bufferInfo->omxBuffer->filledLen);
             gralloc_->Unmap(*bufferHandle);
-            bufferInfo->omxBuffer->bufferhandle = new HdiBufferHandle(*bufferHandle);
+            bufferInfo->omxBuffer->bufferhandle = new NativeBuffer(bufferHandle);
         }
     } else {
         // read data from ashmem
