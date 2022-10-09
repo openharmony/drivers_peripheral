@@ -32,11 +32,11 @@
 #include "camera_metadata_info.h"
 
 #ifdef HITRACE_LOG_ENABLED
-#include "hitrace.h"
+#include "hitracechain.h"
 #define DFX_LOCAL_HITRACE_BEGIN     \
     HiviewDFX::HiTraceId _trace_id; \
-    _trace_id = OHOS::HiviewDFX::HiTrace::Begin(__FUNCTION__, HITRACE_FLAG_DEFAULT)
-#define DFX_LOCAL_HITRACE_END OHOS::HiviewDFX::HiTrace::End(_trace_id)
+    _trace_id = OHOS::HiviewDFX::HiTraceChain::Begin(__FUNCTION__, HITRACE_FLAG_DEFAULT)
+#define DFX_LOCAL_HITRACE_END OHOS::HiviewDFX::HiTraceChain::End(_trace_id)
 #else
 #define DFX_LOCAL_HITRACE_BEGIN
 #define DFX_LOCAL_HITRACE_END
