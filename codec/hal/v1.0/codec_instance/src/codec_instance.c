@@ -416,9 +416,9 @@ void ReleaseInputInfo(struct CodecInstance *instance)
         HDF_LOGE("%{public}s: Invalid param!", __func__);
         return;
     }
-    CodecBuffer *info;
+
     for (int32_t i = 0; i < instance->inputInfoCount; i++) {
-        info = instance->inputInfos[i];
+        CodecBuffer *info = instance->inputInfos[i];
         if (info != NULL) {
             OsalMemFree(info);
             instance->outputInfos[i] = NULL;
@@ -432,9 +432,9 @@ void ReleaseOutputInfo(struct CodecInstance *instance)
         HDF_LOGE("%{public}s: Invalid param!", __func__);
         return;
     }
-    CodecBuffer *info;
+
     for (int32_t i = 0; i < instance->outputInfoCount; i++) {
-        info = instance->outputInfos[i];
+        CodecBuffer *info = instance->outputInfos[i];
         if (info != NULL) {
             OsalMemFree(info);
             instance->outputInfos[i] = NULL;

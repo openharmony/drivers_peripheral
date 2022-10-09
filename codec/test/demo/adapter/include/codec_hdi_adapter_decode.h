@@ -35,7 +35,6 @@
 #include "command_adapter_parse.h"
 
 enum class PortIndex { PORT_INDEX_INPUT = 0, PORT_INDEX_OUTPUT = 1 };
-using OmxCodecBuffer = struct OmxCodecBuffer;
 
 class CodecHdiAdapterDecode {
     struct BufferInfo {

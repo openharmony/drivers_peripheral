@@ -84,7 +84,7 @@ static int32_t SerCodecInputBufferAvailable(struct ICodecCallback *serviceImpl,
         HDF_LOGE("%{public}s: read bufferCnt failed!", __func__);
         return HDF_FAILURE;
     }
-    if (bufCnt <= 0) {
+    if (bufCnt == 0) {
         HDF_LOGE("%{public}s: invalid bufferCnt!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
