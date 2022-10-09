@@ -452,18 +452,19 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
                        .height = this->height_,
                        .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
                        .format = PIXEL_FMT_YCBCR_420_SP};
-    int32_t err = HDF_SUCCESS;
+    
     for (int i = 0; i < bufferCount; i++) {
+        int32_t ret = HDF_SUCCESS;
         std::shared_ptr<OmxCodecBuffer> omxBuffer = std::make_shared<OmxCodecBuffer>();
         omxBuffer->size = sizeof(OmxCodecBuffer);
         omxBuffer->version.s.nVersionMajor = 1;
         omxBuffer->bufferType = CODEC_BUFFER_TYPE_HANDLE;
         BufferHandle *bufferHandle = nullptr;
-        err = gralloc_->AllocMem(alloc, bufferHandle);
-        HDF_LOGI("%{public}s AlloceMem ret val err[%{public}d], buffer [%{public}p]", __func__, err, bufferHandle);
-        if (DISPLAY_SUCCESS != err) {
+        ret = gralloc_->AllocMem(alloc, bufferHandle);
+        HDF_LOGI("%{public}s AlloceMem ret val err[%{public}d], buffer [%{public}p]", __func__, ret, bufferHandle);
+        if (DISPLAY_SUCCESS != ret) {
             HDF_LOGE("%{public}s AllocMem error", __func__);
-            return err;
+            return ret;
         }
         size_t handleSize =
             sizeof(BufferHandle) + (sizeof(int32_t) * (bufferHandle->reserveFds + bufferHandle->reserveInts));

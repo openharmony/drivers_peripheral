@@ -435,8 +435,7 @@ static int32_t SetupExtEncParams(Param *params, RKHdiEncodeSetup *encSetup, int3
     encSetup->gop.gopMode = VID_CODEC_GOPMODE_NORMALP;
     encSetup->gop.gopLen = 0;
     encSetup->gop.viLen = 0;
-    encSetup->gop.gop = encSetup->gop.gopLen ? encSetup->gop.gopLen: encSetup->fps.fpsOutNum *
-        FPS_OUT_NUM_OPERATOR;
+    encSetup->gop.gop = encSetup->fps.fpsOutNum * FPS_OUT_NUM_OPERATOR;
     param->val = &(encSetup->gop);
     param->size = sizeof(encSetup->gop);
 
@@ -507,7 +506,6 @@ static int32_t SetupEncParams(RKHdiEncodeSetup *encSetup)
 static void EncodeLoopHandleInput(const CodecEnvData *envData, uint8_t *readData)
 {
     int32_t ret = 0;
-    int32_t readSize = 0;
     int32_t acquireFd = 0;
 
     CodecBuffer *inputData = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
@@ -519,7 +517,7 @@ static void EncodeLoopHandleInput(const CodecEnvData *envData, uint8_t *readData
     if (ret == HDF_SUCCESS) {
         // when packet size is valid read the input binary file
         g_frameCount++;
-        readSize = ReadInputFromFile(envData->fpInput, readData);
+        int32_t readSize = ReadInputFromFile(envData->fpInput, readData);
         g_totalSrcSize += readSize;
         g_pktEos = (g_totalSrcSize >= g_SrcFileSize);
         if (g_pktEos) {

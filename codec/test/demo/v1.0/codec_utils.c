@@ -91,23 +91,19 @@ static int32_t ParseCmdOption(CodecCmd* cmd, const char *opt, const char *next)
 
 int32_t ParseArguments(CodecCmd* cmd, int argc, char **argv)
 {
-    const char *opt;
-    const char *next;
     int32_t optindex = 1;
     int32_t handleoptions = 1;
     int32_t ret = HDF_SUCCESS;
-    int32_t optMark = 0;
-    int32_t optName = 1;
 
     if ((argc <= 1) || (cmd == NULL))
         return ret;
 
     /* parse options */
     while (optindex < argc) {
-        opt = (const char*)argv[optindex++];
-        next = (const char*)argv[optindex];
-        optMark = CMD_OPTION_MARK_OFFSET;
-        optName = CMD_OPTION_NAME_OFFSET;
+        const char *opt = (const char*)argv[optindex++];
+        const char *next = (const char*)argv[optindex];
+        int32_t optMark = CMD_OPTION_MARK_OFFSET;
+        int32_t optName = CMD_OPTION_NAME_OFFSET;
 
         if (handleoptions && opt[optMark] == '-' && opt[optName] != '\0') {
             optMark++;

@@ -43,10 +43,9 @@ static struct option g_longOptions[] = {
 
 bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
 {
-    int c = 0;
     while (1) {
         int optionIndex = 0;
-        c = getopt_long(argc, argv, "c::i:o:w:h:", g_longOptions, &optionIndex);
+        int c = getopt_long(argc, argv, "c::i:o:w:h:", g_longOptions, &optionIndex);
         if (c == -1) {
             break;
         }
