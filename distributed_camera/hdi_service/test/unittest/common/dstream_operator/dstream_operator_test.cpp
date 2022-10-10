@@ -309,7 +309,8 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_008, TestSize.Level1)
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 
     int32_t captureId = 1000;
-    OHOS::sptr<IStreamOperatorCallback> offlineStreamOperatorCallback = new (std::nothrow) MockDStreamOperatorCallback();
+    OHOS::sptr<IStreamOperatorCallback> offlineStreamOperatorCallback =
+        new (std::nothrow) MockDStreamOperatorCallback();
     std::vector<int> offlineIds;
     offlineIds.push_back(captureId);
     OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
