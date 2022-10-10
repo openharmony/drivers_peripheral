@@ -59,10 +59,10 @@ void CaptureFucSwitch(struct IAudioCapture *&capture, uint32_t cmd, const uint8_
             capture->SelectScene(capture, reinterpret_cast<const struct AudioSceneDescriptor *>(rawData));
             break;
         case AUDIO_CAPTURE_SET_VOLUME:
-            capture->SetVolume(capture, *(reinterpret_cast<float *>(*rawData)));
+            capture->SetVolume(capture, *(reinterpret_cast<const float *>(rawData)));
             break;
         case AUDIO_CAPTURE_SET_GAIN:
-            capture->SetGain(capture, *(reinterpret_cast<float *>(*rawData)));
+            capture->SetGain(capture, *(reinterpret_cast<const float *>(rawData)));
             break;
         case AUDIO_CAPTURE_CAPTURE_FRAME: {
             uint32_t replyBytes = 0;
@@ -73,9 +73,19 @@ void CaptureFucSwitch(struct IAudioCapture *&capture, uint32_t cmd, const uint8_
         case AUDIO_CAPTURE_SET_EXTRA_PARAMS:
             capture->SetExtraParams(capture, reinterpret_cast<const char *>(rawData));
             break;
-        case AUDIO_CAPTURE_REQ_MMAP_BUFFER:
-            capture->ReqMmapBuffer(capture, *(int32_t *)rawData, 
-                                   reinterpret_cast<const struct AudioMmapBufferDescripter *>(rawData));
+        case AUDIO_CAPTURE_REQ_MMAP_BUFFER: {
+            struct AudioMmapBufferDescripter desc = {
+                .memoryAddress = reinterpret_cast<int8_t *>(const_cast<uint8_t *>(rawData)),
+                .memoryAddressLen = *(reinterpret_cast<const uint32_t *>(rawData)),
+                .memoryFd = *(reinterpret_cast<const int32_t *>(rawData)),
+                .totalBufferFrames = *(reinterpret_cast<const int32_t *>(rawData)),
+                .transferFrameSize = *(reinterpret_cast<const int32_t *>(rawData)),
+                .isShareable = *(reinterpret_cast<const int32_t *>(rawData)),
+                .offset = *(reinterpret_cast<const int32_t *>(rawData)),
+                .filePath = reinterpret_cast<char *>(const_cast<uint8_t *>(rawData)),
+            };
+            capture->ReqMmapBuffer(capture, *(reinterpret_cast<const int32_t *>(rawData)), &desc);
+        }
         break;
         case AUDIO_CAPTURE_DEV_DUMP:
             capture->AudioDevDump(capture, *(int *)rawData, *(int *)rawData);

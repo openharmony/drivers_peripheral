@@ -10,24 +10,25 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+import("//build/config/features.gni")
 import("//build/ohos.gni")
+import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-if (defined(ohos_lite)) {
-  group("audio_test_entry") {
-    deps = [ "systemtest:hdf_test_audio" ]
-  }
-} else {
-  group("audio_test_entry") {
-    if (drivers_peripheral_audio_hdf_proxy_stub == true) {
-      testonly = true
-      deps = [
-        "fuzztest:fuzztest",
-        "systemtest:systemtest",
-        "unittest:audiotest",
-      ]
-    }
-  }
+module_output_path = "drivers_peripheral_audio/audio"
+
+ohos_fuzztest("AudioManagerFuzzTest") {
+  module_out_path = module_output_path
+  fuzz_config_file = "//drivers/peripheral/audio/test/fuzztest/audio_hdi_fuzzer/audiomanager_fuzzer"
+
+  sources = [ "audiomanager_fuzzer.cpp" ]
+  include_dirs = [ "//drivers/peripheral/audio/test/fuzztest/audio_hdi_fuzzer/audiomanager_fuzzer/include" ]
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_audio:libaudio_proxy_1.0",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+  defines = [ "AUDIO_ADM_PASSTHROUGH" ]
 }
