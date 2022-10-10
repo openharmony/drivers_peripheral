@@ -102,7 +102,7 @@ HdiGrallocBuffer *HdiTestLayer::GetBackBuffer()
     return buffer;
 }
 
-HdiTestLayer::HdiTestLayer(LayerInfo &info, uint32_t id, uint32_t displayId)
+HdiTestLayer::HdiTestLayer(const LayerInfo &info, const uint32_t id, const uint32_t displayId)
     : mId(id), mDisplayID(displayId), mLayerInfo(info)
 {}
 
@@ -155,9 +155,8 @@ void HdiTestLayer::SetLayerCrop(IRect &rect)
 
 int32_t HdiTestLayer::PreparePresent()
 {
-    int ret;
     DISPLAY_TEST_LOGD();
-    ret = HdiTestDevice::GetInstance().GetLayerFuncs().SetLayerSize(mDisplayID, mId, &mDisplayRect);
+    int ret = HdiTestDevice::GetInstance().GetLayerFuncs().SetLayerSize(mDisplayID, mId, &mDisplayRect);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("set display rect failed"));
 
     ret = HdiTestDevice::GetInstance().GetLayerFuncs().SetLayerCrop(mDisplayID, mId, &mCropRect);

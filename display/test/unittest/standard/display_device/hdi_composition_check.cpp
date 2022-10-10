@@ -53,7 +53,7 @@ void HdiCompositionCheck::SimpleHandleAlpha(const LayerSettings &layers, uint32_
 }
 
 std::vector<uint32_t> HdiCompositionCheck::GetCheckColors(std::vector<LayerSettings> &layers,
-    std::vector<Point> &points)
+    const std::vector<Point> &points)
 {
     std::vector<uint32_t> colors;
     for (auto point : points) {
