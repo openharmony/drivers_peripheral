@@ -36,10 +36,7 @@
 #include "v1_0/iaudio_manager.h"
 #include "v1_0/audio_types.h"
 
-#define SERVICE_NAME                    "audio_manager_service"
-
-#define WAV_HEAD_OFFSET                 44
-#define WAV_HEAD_RIFF_OFFSET            8
+#define SERVICE_NAME "audio_manager_service"
 
 #define MOVE_LEFT_NUM                   8
 #define AUDIO_CHANNELCOUNT              2
@@ -62,14 +59,6 @@
 #define ONE_MS                          1000
 #define BITS_TO_FROMAT                  3
 
-struct StrParaCapture {
-    struct IAudioCapture *capture;
-    FILE *file;
-    struct AudioSampleAttributes attrs;
-    uint64_t *replyBytes;
-    char *frame;
-    int32_t bufferSize;
-};
 struct IAudioAdapter *g_adapter = NULL;
 struct AudioDeviceDescriptor g_devDesc;
 struct AudioSampleAttributes g_attrs;
@@ -81,7 +70,7 @@ pthread_t g_tids;
 FILE *g_file;
 char *g_frame;
 char g_path[PATH_MAX] = {'\0'};
-char g_adapterName[PATH_LEN] = "primary";
+char g_adapterName[PATH_LEN] = {0};
 
 enum AudioCaptureMode {
     CAPTURE_POLL = 1,
@@ -217,42 +206,6 @@ static uint32_t PcmFramesToBytes(const struct AudioSampleAttributes attrs)
     return DEEP_BUFFER_RENDER_PERIOD_SIZE * attrs.channelCount * (PcmFormatToBits(attrs.format) >> BITS_TO_FROMAT);
 }
 
-static int32_t AddWavFileHeader(const struct StrParaCapture *strParam)
-{
-    if (strParam == NULL) {
-        AUDIO_FUNC_LOGE("InitCaptureStrParam is NULL");
-        return HDF_FAILURE;
-    }
-
-    struct AudioHeadInfo headInfo;
-    (void)fseek(g_file, 0, SEEK_END);
-
-    headInfo.riffId = StringToInt("RIFF");
-    headInfo.riffSize = (uint32_t)ftell(g_file) - WAV_HEAD_RIFF_OFFSET;
-    headInfo.waveType = StringToInt("WAVE");
-    headInfo.audioFileFmtId = StringToInt("fmt ");
-    headInfo.audioFileFmtSize = PcmFormatToBits(strParam->attrs.format);
-    headInfo.audioFileFormat = 1;
-    headInfo.audioChannelNum = strParam->attrs.channelCount;
-    headInfo.audioSampleRate = strParam->attrs.sampleRate;
-    headInfo.audioByteRate =
-        headInfo.audioSampleRate * headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT;
-    headInfo.audioBlockAlign = (uint16_t)(headInfo.audioChannelNum * headInfo.audioFileFmtSize / PCM_8_BIT);
-    headInfo.audioBitsPerSample = (uint16_t)headInfo.audioFileFmtSize;
-    headInfo.dataId = StringToInt("data");
-    headInfo.dataSize = (uint32_t)ftell(g_file) - WAV_HEAD_OFFSET;
-
-    rewind(g_file);
-
-    size_t ret = fwrite(&headInfo, sizeof(struct AudioHeadInfo), 1, g_file);
-    if (ret != 1) {
-        AUDIO_FUNC_LOGE("write wav file head error");
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
-
 static int32_t StopButtonCapture(struct IAudioCapture **captureS)
 {
     if (captureS == NULL) {
@@ -291,7 +244,7 @@ static int32_t StopButtonCapture(struct IAudioCapture **captureS)
         g_frame = NULL;
     }
 
-    if (AddWavFileHeader(&g_str) < 0) {
+    if (AddWavFileHeader(g_file, &g_str) < 0) {
         AUDIO_FUNC_LOGE("AddWavFileHeader Fail");
         return HDF_FAILURE;
     }
@@ -600,54 +553,12 @@ static int32_t StartButtonCapture(struct IAudioCapture **captureS)
     return HDF_SUCCESS;
 }
 
-static int32_t SwitchAdapterCapture(struct AudioAdapterDescriptor *descs, const char *adapterNameCase,
-    enum AudioPortDirection portFlag, struct AudioPort *capturePort, const int32_t size)
-{
-    struct AudioAdapterDescriptor *desc = NULL;
-    int32_t index;
-    uint32_t port;
-    if (descs == NULL || adapterNameCase == NULL || capturePort == NULL) {
-        return HDF_FAILURE;
-    }
-
-    for (index = 0; index < size; index++) {
-        desc = &descs[index];
-        if (desc == NULL) {
-            continue;
-        }
-        if (desc->adapterName == NULL) {
-            return HDF_FAILURE;
-        }
-        if (strcmp((const char *)desc->adapterName, adapterNameCase)) {
-            printf("adapter name case = %s\n", adapterNameCase);
-            continue;
-        }
-        for (port = 0; port < desc->portsLen; port++) {
-            // Only find out the port of out in the sound card
-            if (desc->ports[port].dir == portFlag) {
-                *capturePort = desc->ports[port];
-                return index;
-            }
-        }
-    }
-    return HDF_FAILURE;
-}
-static void PrintMenu1(void)
-{
-    printf(" ============== Play Capture Loading Mode ===========\n");
-    printf("| 1. Capture Direct Loading                         |\n");
-    printf("| 2. Capture Service Loading                        |\n");
-    printf("| Note: switching is not supported in the MPI's     |\n");
-    printf("|       version.                                    |\n");
-    printf(" =================================================== \n");
-}
-
 static int32_t SelectLoadingMode(void)
 {
     system("clear");
     int choice = 0;
 
-    PrintMenu1();
+    PrintLoadModeMenu();
     printf("Please enter your choice: ");
 
     int32_t ret = CheckInputName(INPUT_INT, (void *)&choice);
@@ -655,10 +566,10 @@ static int32_t SelectLoadingMode(void)
         return HDF_FAILURE;
     }
     switch (choice) {
-        case 1: // 1. Capture Direct Loading
+        case 1: // 1. Capture Passthrough Loading
             g_isDirect = true;
             break;
-        case 2: // 2. Capture Service Loading
+        case 2: // 2. Capture IPC Loading
             g_isDirect = false;
             break;
         default:
@@ -701,9 +612,12 @@ static void ReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t 
     }
 }
 
-static int32_t GetManagerAndLoadAdapter(const char *adapterName, struct AudioPort *capturePort)
+static int32_t GetManagerAndLoadAdapter(struct AudioPort *capturePort)
 {
-    if (adapterName == NULL || capturePort == NULL) {
+    int32_t adapterIndex = 0;
+    uint32_t adapterNum = MAX_AUDIO_ADAPTER_DESC;
+
+    if (capturePort == NULL) {
         AUDIO_FUNC_LOGE("The Parameter is NULL");
         return HDF_FAILURE;
     }
@@ -718,45 +632,40 @@ static int32_t GetManagerAndLoadAdapter(const char *adapterName, struct AudioPor
     struct AudioAdapterDescriptor *captureDescs = (struct AudioAdapterDescriptor *)OsalMemCalloc(
         sizeof(struct AudioAdapterDescriptor) * (MAX_AUDIO_ADAPTER_DESC));
     if (captureDescs == NULL) {
-        AUDIO_FUNC_LOGE("OsalMemCalloc for descs failed");
         return HDF_FAILURE;
     }
-
-    uint32_t adapterNum = MAX_AUDIO_ADAPTER_DESC;
-
     int32_t ret = audioManager->GetAllAdapters(audioManager, captureDescs, &adapterNum);
     if (ret < 0 || adapterNum == 0) {
         AUDIO_FUNC_LOGE("Get All Adapters Fail");
         ReleaseAdapterDescs(&captureDescs, MAX_AUDIO_ADAPTER_DESC);
         return HDF_ERR_NOT_SUPPORT;
     }
-
-    // Get qualified sound card and port
-    enum AudioPortDirection port = PORT_OUT; // Set port information
-
-    int32_t index = SwitchAdapterCapture(captureDescs, adapterName, port, capturePort, adapterNum);
-    if (index < 0) {
-        AUDIO_FUNC_LOGE("Not Switch Adapter Fail");
+    if (SelectAudioCard(captureDescs, adapterNum, &adapterIndex) != HDF_SUCCESS) {
         ReleaseAdapterDescs(&captureDescs, MAX_AUDIO_ADAPTER_DESC);
         return HDF_ERR_NOT_SUPPORT;
     }
-
-    if (audioManager->LoadAdapter(audioManager, &captureDescs[index], &g_adapter)) {
+    if (strcpy_s(g_adapterName, PATH_LEN, captureDescs[adapterIndex - 1].adapterName) < 0) {
+        ReleaseAdapterDescs(&captureDescs, MAX_AUDIO_ADAPTER_DESC);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    if (SwitchAudioPort(&captureDescs[adapterIndex - 1], PORT_IN, capturePort) != HDF_SUCCESS) {
+        ReleaseAdapterDescs(&captureDescs, MAX_AUDIO_ADAPTER_DESC);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    if (audioManager->LoadAdapter(audioManager, &captureDescs[adapterIndex - 1], &g_adapter) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Load Adapter Fail");
         ReleaseAdapterDescs(&captureDescs, MAX_AUDIO_ADAPTER_DESC);
         return HDF_ERR_NOT_SUPPORT;
     }
 
     ReleaseAdapterDescs(&captureDescs, MAX_AUDIO_ADAPTER_DESC);
-    if (g_adapter == NULL) {
-        AUDIO_FUNC_LOGE("load audio device failed");
-        return HDF_FAILURE;
-    }
+
     return HDF_SUCCESS;
 }
+
 static int32_t InitCaptureParam(uint32_t portId)
 {
-    if (g_adapter == NULL) {
+    if (g_adapter == NULL || g_adapter->InitAllPorts == NULL) {
         AUDIO_FUNC_LOGE("g_adapter is NULL.");
         return HDF_FAILURE;
     }
@@ -778,21 +687,17 @@ static int32_t InitCaptureParam(uint32_t portId)
     return HDF_SUCCESS;
 }
 
-static int32_t CaptureGetAdapterAndInitEnvParams(const char *adapterName)
+static int32_t CaptureGetAdapterAndInitEnvParams(void)
 {
     struct AudioPort capturePort;
-    if (adapterName == NULL) {
-        AUDIO_FUNC_LOGE("The Parameter is NULL");
-        return HDF_FAILURE;
-    }
 
-    int32_t ret = GetManagerAndLoadAdapter(adapterName, &capturePort);
+    int32_t ret = GetManagerAndLoadAdapter(&capturePort);
     if (ret < 0) {
         return ret;
     }
 
     if (InitCaptureParam(capturePort.portId) < 0) {
-        g_audioManager->UnloadAdapter(g_audioManager, adapterName);
+        g_audioManager->UnloadAdapter(g_audioManager, g_adapterName);
         IAudioAdapterRelease(g_adapter, g_isDirect);
         g_adapter = NULL;
         return HDF_FAILURE;
@@ -807,7 +712,7 @@ static int32_t InitParam(void)
         return HDF_FAILURE;
     }
 
-    if (CaptureGetAdapterAndInitEnvParams(g_adapterName) < 0) {
+    if (CaptureGetAdapterAndInitEnvParams() < 0) {
         AUDIO_FUNC_LOGE("GetCaptureProxyManagerFunc Fail");
         if (g_audioManager != NULL) {
             IAudioManagerRelease(g_audioManager, g_isDirect);
@@ -1030,9 +935,8 @@ static int32_t SetCaptureAttributes(struct IAudioCapture **capture)
         printf("Current sample attributes:\n");
         printf("audioType is %u\nfomat is %u\nsampleRate is %u\nchannalCount is"
                "%u\nperiod is %u\nframesize is %u\nbigEndian is %u\nSignedData is %u\n",
-            captureAttrs.type, captureAttrs.format, captureAttrs.sampleRate,
-            captureAttrs.channelCount, captureAttrs.period, captureAttrs.frameSize,
-            captureAttrs.isBigEndian, captureAttrs.isSignedData);
+            captureAttrs.type, captureAttrs.format, captureAttrs.sampleRate, captureAttrs.channelCount,
+            captureAttrs.period, captureAttrs.frameSize, captureAttrs.isBigEndian, captureAttrs.isSignedData);
     }
 
     printf("Set Sample Attributes,");
@@ -1181,17 +1085,17 @@ static void PrintMenu2(void)
 }
 
 static struct ProcessCaptureMenuSwitchList g_processCaptureMenuSwitchList[] = {
-    {CAPTURE_START, StartButtonCapture},
-    {CAPTURE_STOP, StopButtonCapture},
-    {CAPTURE_RESUME, SetCaptureResume},
-    {CAPTURE_PAUSE, SetCaptyrePause},
-    {SET_CAPTURE_VOLUME, SetCaptureVolume},
-    {SET_CAPTURE_GAIN, SetCaptureGain},
-    {SET_CAPTURE_MUTE, SetCaptureMute},
-    {SET_CAPTURE_ATTRIBUTES, SetCaptureAttributes},
-    {SET_CAPTURE_SLECET_SCENE, SelectCaptureScene},
-    {GET_CAPTURE_EXT_PARAMS, GetCaptureExtParams},
-    {GET_CAPTURE_POSITION, GetCaptureMmapPosition},
+    {CAPTURE_START,            StartButtonCapture    },
+    {CAPTURE_STOP,             StopButtonCapture     },
+    {CAPTURE_RESUME,           SetCaptureResume      },
+    {CAPTURE_PAUSE,            SetCaptyrePause       },
+    {SET_CAPTURE_VOLUME,       SetCaptureVolume      },
+    {SET_CAPTURE_GAIN,         SetCaptureGain        },
+    {SET_CAPTURE_MUTE,         SetCaptureMute        },
+    {SET_CAPTURE_ATTRIBUTES,   SetCaptureAttributes  },
+    {SET_CAPTURE_SLECET_SCENE, SelectCaptureScene    },
+    {GET_CAPTURE_EXT_PARAMS,   GetCaptureExtParams   },
+    {GET_CAPTURE_POSITION,     GetCaptureMmapPosition},
 };
 
 static void ProcessMenu(int32_t choice)

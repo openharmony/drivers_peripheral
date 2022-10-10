@@ -16,6 +16,7 @@
 #include "hdf_audio_pnp_server.h"
 #include "hdf_audio_input_event.h"
 #include "hdf_audio_pnp_uevent.h"
+#include "hdf_audio_server.h"
 #include "hdf_device_desc.h"
 #include "hdf_device_object.h"
 #include "hdf_io_service_if.h"
@@ -28,7 +29,6 @@
 #define HDF_LOG_TAG             HDF_AUDIO_HAL_HOST
 #define AUDIO_HDI_SERVICE_NAME  "audio_hdi_usb_service"
 #define AUDIO_TOKEN_SERVER_NAME "ohos.hdi.audio_service"
-#define AUDIO_PNP_SEND_USB_CMD  8
 #define AUDIO_PNP_INFO_LEN_MAX  256
 
 static struct HdfDeviceObject *g_audioPnpDevice = NULL;
@@ -144,7 +144,8 @@ int32_t AudioPnpUpdateAndSend(struct AudioEvent audioEvent)
         return HDF_FAILURE;
     }
 
-    ret = AudioPnpStatusSend(AUDIO_HDI_SERVICE_NAME, AUDIO_TOKEN_SERVER_NAME, pnpInfo, AUDIO_PNP_SEND_USB_CMD);
+    ret = AudioPnpStatusSend(
+        AUDIO_HDI_SERVICE_NAME, AUDIO_TOKEN_SERVER_NAME, pnpInfo, AUDIO_HDI_PNP_DEV_STATUS);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("send info fail! ret = %{public}d", ret);
         return HDF_FAILURE;
