@@ -15,6 +15,7 @@
 #ifndef HDF_AUDIO_SERVER_H
 #define HDF_AUDIO_SERVER_H
 
+#include "audio_types.h"
 #include "hdf_device_desc.h"
 
 enum AudioHdiServerCmdId {
