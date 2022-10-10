@@ -29,7 +29,7 @@ namespace DISPLAY {
 namespace TEST {
 class HdiTestDisplay {
 public:
-    HdiTestDisplay(uint32_t id, DeviceFuncs &deviceFunc);
+    HdiTestDisplay(const uint32_t id, const DeviceFuncs &deviceFunc);
     virtual ~HdiTestDisplay() {}
     int32_t Init();
     int32_t GetModeInfoFromId(int32_t id, DisplayModeInfo &modeInfo);

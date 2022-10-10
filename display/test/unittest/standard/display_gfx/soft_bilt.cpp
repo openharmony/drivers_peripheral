@@ -66,7 +66,7 @@ static constexpr inline uint32_t ColorSetARGB(uint8_t r, uint8_t g, uint8_t b, u
 fs: sa      fd: 1.0-sa
 pixel = (foreground x fs + background x fd)
 */
-static inline void BlendNone(ColorRGBAf &src, ColorRGBAf &dst)
+static inline void BlendNone(const ColorRGBAf &src, ColorRGBAf &dst)
 {
     dst.mR = src.mR * src.mA + dst.mR * (1 - src.mA);
     dst.mG = src.mG * src.mA + dst.mG * (1 - src.mA);
@@ -85,7 +85,7 @@ static inline void BlendClear(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend src
-static inline void BlendSrc(ColorRGBAf &src, ColorRGBAf &dst)
+static inline void BlendSrc(const ColorRGBAf &src, ColorRGBAf &dst)
 {
     dst = src;
 }
@@ -105,7 +105,7 @@ static inline void BlendSrcOver(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend src in
-static inline void BlendSrcIn(ColorRGBAf &src, ColorRGBAf &dst)
+static inline void BlendSrcIn(const ColorRGBAf &src, ColorRGBAf &dst)
 {
     dst.mR = src.mR * dst.mA;
     dst.mG = src.mG * dst.mA;
@@ -114,7 +114,7 @@ static inline void BlendSrcIn(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend src out
-static inline void BlendSrcOut(ColorRGBAf &src, ColorRGBAf &dst)
+static inline void BlendSrcOut(const ColorRGBAf &src, ColorRGBAf &dst)
 {
     dst.mR = (1 - dst.mA) * src.mR;
     dst.mG = (1 - dst.mA) * src.mG;
@@ -123,7 +123,7 @@ static inline void BlendSrcOut(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend src Atop
-static inline void BlendAtop(ColorRGBAf &src, ColorRGBAf &dst)
+static inline void BlendAtop(const ColorRGBAf &src, ColorRGBAf &dst)
 {
     dst.mR = dst.mA * src.mR + (1 - src.mA) * dst.mR;
     dst.mG = dst.mA * src.mG + (1 - src.mA) * dst.mG;
@@ -139,7 +139,7 @@ static inline void BlendDst(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend dst atop
-static inline void BlendDstAtop(ColorRGBAf &src, ColorRGBAf &dst)
+static inline void BlendDstAtop(const ColorRGBAf &src, ColorRGBAf &dst)
 {
     dst.mR = src.mA * dst.mR + (1 - dst.mA) * src.mR;
     dst.mG = src.mA * dst.mG + (1 - dst.mA) * src.mG;
@@ -148,7 +148,7 @@ static inline void BlendDstAtop(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend dst in
-static inline void BlendDstIn(ColorRGBAf &src, ColorRGBAf &dst)
+static inline void BlendDstIn(const ColorRGBAf &src, ColorRGBAf &dst)
 {
     dst.mR = dst.mR * src.mA;
     dst.mG = dst.mG * src.mA;
@@ -157,7 +157,7 @@ static inline void BlendDstIn(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend dst out
-static inline void BlendDstOut(ColorRGBAf &src, ColorRGBAf &dst)
+static inline void BlendDstOut(const ColorRGBAf &src, ColorRGBAf &dst)
 {
     dst.mR = (1 - src.mA) * dst.mR;
     dst.mG = (1 - src.mA) * dst.mG;
@@ -166,7 +166,7 @@ static inline void BlendDstOut(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend dst over
-static inline void BlendDstOver(ColorRGBAf &src, ColorRGBAf &dst)
+static inline void BlendDstOver(const ColorRGBAf &src, ColorRGBAf &dst)
 {
     // the display_gfx has Premultiplied
     dst.mR *= dst.mA;
@@ -180,7 +180,7 @@ static inline void BlendDstOver(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend xor
-static inline void BlendXor(ColorRGBAf &src, ColorRGBAf &dst)
+static inline void BlendXor(const ColorRGBAf &src, ColorRGBAf &dst)
 {
     dst.mR = (1 - dst.mA) * src.mR + (1 - src.mA) * dst.mR;
     dst.mG = (1 - dst.mA) * src.mG + (1 - src.mA) * dst.mG;
@@ -189,7 +189,7 @@ static inline void BlendXor(ColorRGBAf &src, ColorRGBAf &dst)
 }
 
 // blend add
-static inline void BlendAdd(ColorRGBAf &src, ColorRGBAf &dst)
+static inline void BlendAdd(const ColorRGBAf &src, ColorRGBAf &dst)
 {
     dst.mR = std::max(0.0f, std::min(src.mR + dst.mR, 1.0f));
     dst.mG = std::max(0.0f, std::min(src.mG + dst.mG, 1.0f));
@@ -330,10 +330,9 @@ bool SoftBlit::RunAndCheck(const BufferHandle &exBuffer)
 
 SoftBlit::SoftBlit(const BufferHandle &srcBuffer, const IRect &srcRect, const BufferHandle &dstBuffer,
     const IRect &dstRect, const BlendType type)
-{
-    mSrcRect = srcRect;
-    mDstRect = dstRect;
-    mSrcBuffer = srcBuffer;
-    mDstBuffer = dstBuffer;
-    mType = type;
-}
+    : mSrcRect(srcRect),
+    mDstRect(dstRect),
+    mSrcBuffer(srcBuffer),
+    mDstBuffer(dstBuffer),
+    mType(type)
+{}
