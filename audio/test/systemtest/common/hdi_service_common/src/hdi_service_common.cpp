@@ -751,6 +751,7 @@ int32_t InitMmapDesc(const string &path, struct AudioMmapBufferDescripter &desc,
         fp = fopen(path.c_str(), "rb+");
     } else {
         fp = fopen(path.c_str(), "wb+");
+        (void)chmod(path.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
     }
     if (fp == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:fopen failed\n", __func__);
