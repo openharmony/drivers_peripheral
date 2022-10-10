@@ -467,7 +467,7 @@ void ChargerThread::Run(void* service)
 {
     BATTERY_HILOGI(FEATURE_CHARGING, "start run charger thread");
     Init();
-
+    UpdateBatteryInfo(nullptr);
     std::make_unique<std::thread>(&ChargerThread::LoopingThreadEntry, this, service)->join();
 }
 }  // namespace V1_1
