@@ -39,7 +39,6 @@ ohos_shared_library("liballocator_interface_service_1.0") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
-    "hdf_core:libbufferhandle_parcelable",
   ]
 
   install_images = [ chipset_base_dir ]
@@ -83,7 +82,6 @@ ohos_shared_library("libmapper_interface_service_1.0") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "utils_base:utils",
-    "hdf_core:libbufferhandle_parcelable",
   ]
 
   install_images = [ chipset_base_dir ]
