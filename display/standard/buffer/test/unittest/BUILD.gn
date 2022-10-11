@@ -25,7 +25,6 @@ ohos_unittest("dispbuf_ut") {
     "utils",
     "//drivers/peripheral/base",
     "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
   ]
   external_deps = [
     "hdf_core:libhdf_utils",

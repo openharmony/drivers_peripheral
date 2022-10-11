@@ -16,7 +16,6 @@
 #ifndef OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPERINTERFACESERVICE_H
 #define OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPERINTERFACESERVICE_H
 
-#include "buffer_handle_parcelable.h"
 #include "idisplay_buffer_hwi.h"
 #include "v1_0/display_buffer_type.h"
 #include "v1_0/imapper_interface.h"
@@ -31,13 +30,13 @@ public:
     MapperInterfaceService();
     virtual ~MapperInterfaceService();
 
-    int32_t FreeMem(const sptr<BufferHandleParcelable> &handle) override;
-    int32_t Mmap(const sptr<BufferHandleParcelable> &handle) override;
-    int32_t MmapCache(const sptr<BufferHandleParcelable> &buffer) override;
-    int32_t Unmap(const sptr<BufferHandleParcelable> &handle) override;
-    int32_t FlushCache(const sptr<BufferHandleParcelable> &handle) override;
-    int32_t FlushMCache(const sptr<BufferHandleParcelable> &buffer) override;
-    int32_t InvalidateCache(const sptr<BufferHandleParcelable> &handle) override;
+    int32_t FreeMem(const sptr<NativeBuffer> &handle) override;
+    int32_t Mmap(const sptr<NativeBuffer> &handle) override;
+    int32_t MmapCache(const sptr<NativeBuffer> &buffer) override;
+    int32_t Unmap(const sptr<NativeBuffer> &handle) override;
+    int32_t FlushCache(const sptr<NativeBuffer> &handle) override;
+    int32_t FlushMCache(const sptr<NativeBuffer> &buffer) override;
+    int32_t InvalidateCache(const sptr<NativeBuffer> &handle) override;
 
 private:
     int32_t LoadHwi();

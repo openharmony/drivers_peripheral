@@ -51,7 +51,7 @@ public:
     int32_t CreateVirtualDisplay(uint32_t width, uint32_t height, int32_t &format, uint32_t &devId) override;
     int32_t DestroyVirtualDisplay(uint32_t devId) override;
     int32_t SetVirtualDisplayBuffer(
-        uint32_t devId, const sptr<BufferHandleParcelable> &buffer, const sptr<HdifdParcelable> &fence) override;
+        uint32_t devId, const sptr<NativeBuffer> &buffer, const sptr<HdifdParcelable> &fence) override;
     int32_t SetDisplayProperty(uint32_t devId, uint32_t id, uint64_t value) override;
     int32_t CreateLayer(uint32_t devId, const LayerInfo &layerInfo, uint32_t &layerId) override;
     int32_t DestroyLayer(uint32_t devId, uint32_t layerId) override;

@@ -79,14 +79,14 @@ int32_t MapperInterfaceService::LoadHwi()
     return HDF_SUCCESS;
 }
 
-int32_t MapperInterfaceService::FreeMem(const sptr<BufferHandleParcelable> &handle)
+int32_t MapperInterfaceService::FreeMem(const sptr<NativeBuffer> &handle)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
     hwiImpl_->FreeMem(*handle->Move());
     return HDF_SUCCESS;
 }
 
-int32_t MapperInterfaceService::Mmap(const sptr<BufferHandleParcelable> &handle)
+int32_t MapperInterfaceService::Mmap(const sptr<NativeBuffer> &handle)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
     void *retPtr = hwiImpl_->Mmap(*handle->GetBufferHandle());
@@ -95,7 +95,7 @@ int32_t MapperInterfaceService::Mmap(const sptr<BufferHandleParcelable> &handle)
     return HDF_SUCCESS;
 }
 
-int32_t MapperInterfaceService::MmapCache(const sptr<BufferHandleParcelable> &handle)
+int32_t MapperInterfaceService::MmapCache(const sptr<NativeBuffer> &handle)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
     void *retPtr = hwiImpl_->MmapCache(*handle->GetBufferHandle());
@@ -103,28 +103,28 @@ int32_t MapperInterfaceService::MmapCache(const sptr<BufferHandleParcelable> &ha
     return HDF_SUCCESS;
 }
 
-int32_t MapperInterfaceService::Unmap(const sptr<BufferHandleParcelable> &handle)
+int32_t MapperInterfaceService::Unmap(const sptr<NativeBuffer> &handle)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
     int32_t ec = hwiImpl_->Unmap(*handle->GetBufferHandle());
     return ec;
 }
 
-int32_t MapperInterfaceService::FlushCache(const sptr<BufferHandleParcelable> &handle)
+int32_t MapperInterfaceService::FlushCache(const sptr<NativeBuffer> &handle)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
     int32_t ec = hwiImpl_->FlushCache(*handle->GetBufferHandle());
     return ec;
 }
 
-int32_t MapperInterfaceService::FlushMCache(const sptr<BufferHandleParcelable> &handle)
+int32_t MapperInterfaceService::FlushMCache(const sptr<NativeBuffer> &handle)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
     int32_t ec = hwiImpl_->FlushMCache(*handle->GetBufferHandle());
     return ec;
 }
 
-int32_t MapperInterfaceService::InvalidateCache(const sptr<BufferHandleParcelable> &handle)
+int32_t MapperInterfaceService::InvalidateCache(const sptr<NativeBuffer> &handle)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
     int32_t ec = hwiImpl_->InvalidateCache(*handle->GetBufferHandle());
