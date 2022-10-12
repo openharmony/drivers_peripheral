@@ -32,7 +32,7 @@ public:
     uint8_t *GetBuffer() override;
 
 protected:
-    CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer);
+    CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer, BufferHandle *bufferHandle);
     bool CheckInvalid(struct OmxCodecBuffer &codecBuffer) override;
 
 private:
