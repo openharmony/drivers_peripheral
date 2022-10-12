@@ -38,6 +38,8 @@ sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
         bufferHandle = codecBuffer.bufferhandle->Move();
         codecBuffer.bufferhandle = nullptr;
     }
+    codecBuffer.allocLen = sizeof(DynamicBuffer);
+
     CodecDynaBuffer *buffer = new CodecDynaBuffer(codecBuffer);
     buffer->dynaBuffer_ = std::make_shared<DynamicBuffer>();
     buffer->dynaBuffer_->bufferHandle = bufferHandle;
