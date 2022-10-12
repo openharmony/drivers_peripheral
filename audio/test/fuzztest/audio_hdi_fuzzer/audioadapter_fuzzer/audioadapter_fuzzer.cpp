@@ -26,6 +26,8 @@ enum AdapterCmdId {
     AUDIO_ADAPTER_CREAT_CAPTURE,
     AUDIO_ADAPTER_DESTORY_CAPTURE,
     AUDIO_ADAPTER_GET_PORT_CAPABILITY,
+    AUDIO_ADAPTER_SET_PASSTHROUGH_MODE,
+    AUDIO_ADAPTER_GET_PASSTHROUGH_MODE,
 };
 static uint32_t Convert2Uint32(const uint8_t *ptr)
 {
@@ -63,6 +65,25 @@ static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const
         case AUDIO_ADAPTER_GET_PORT_CAPABILITY: {
             struct AudioPortCapability capability = {};
             adapter->GetPortCapability(adapter, reinterpret_cast<const struct AudioPort *>(rawData), &capability);
+            break;
+        }
+        case AUDIO_ADAPTER_SET_PASSTHROUGH_MODE: {
+            struct AudioPort port = {
+                .dir = *(reinterpret_cast<const AudioPortDirection *>(rawData)),
+                .portId = *(reinterpret_cast<const uint32_t *>(rawData)),
+                .portName = reinterpret_cast<char *>(const_cast<uint8_t *>(rawData)),
+            };
+            adapter->SetPassthroughMode(adapter, &port, *(reinterpret_cast<const AudioPortPassthroughMode *>(rawData)));
+            break;
+        }
+        case AUDIO_ADAPTER_GET_PASSTHROUGH_MODE: {
+            AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
+            struct AudioPort port = {
+                .dir = *(reinterpret_cast<const AudioPortDirection *>(rawData)),
+                .portId = *(reinterpret_cast<const uint32_t *>(rawData)),
+                .portName = reinterpret_cast<char *>(const_cast<uint8_t *>(rawData)),
+            };
+            adapter->GetPassthroughMode(adapter, &port, &mode);
             break;
         }
         default:
