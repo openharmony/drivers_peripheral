@@ -35,6 +35,7 @@ sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
     // may be empty for bufferHandle
     codecBuffer.buffer = nullptr;
     codecBuffer.bufferLen = 0;
+    codecBuffer.allocLen = sizeof(DynamicBuffer);
 
     CodecDynaBuffer *buffer = new CodecDynaBuffer(codecBuffer);
     buffer->dynaBuffer_ = std::make_shared<DynamicBuffer>();
@@ -130,6 +131,7 @@ void CodecDynaBuffer::ResetBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFER
     }
     dynaBuffer_->bufferHandle = bufferHandle;
     codecBuffer.buffer = 0;
+    codecBuffer.filledLen = codecBuffer.bufferLen;
     codecBuffer.bufferLen = 0;
 }
 }  // namespace Omx
