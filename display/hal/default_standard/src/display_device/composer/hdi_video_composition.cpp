@@ -165,7 +165,7 @@ bool HdiVideoComposition::CanHandle(HdiLayer &hdiLayer)
         PIXEL_FMT_VYUY_422_PKG, /* *< VYUY422 packed format */
     };
 
-    if (hdiLayer.GetType() == LAYER_TYPE_SDIEBAND) {
+    if (hdiLayer.GetType() == LAYER_TYPE_SIDEBAND) {
         DISPLAY_LOGD("is sideband");
         return false;
     }
