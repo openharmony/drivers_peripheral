@@ -75,7 +75,7 @@ typedef enum {
 typedef enum {
     LAYER_TYPE_GRAPHIC,         /**< Graphic layer */
     LAYER_TYPE_OVERLAY,         /**< Overlay layer */
-    LAYER_TYPE_SDIEBAND,        /**< Sideband layer */
+    LAYER_TYPE_SIDEBAND,        /**< Sideband layer */
     LAYER_TYPE_CURSOR,          /**< Cursor Layer */
     LAYER_TYPE_BUTT             /**< Empty layer */
 } LayerType;
@@ -505,7 +505,7 @@ typedef enum {
 typedef enum {
     COLOR_GAMUT_INVALID = -1,            /**< Invalid */
     COLOR_GAMUT_NATIVE = 0,              /**< Native or default */
-    COLOR_GAMUT_SATNDARD_BT601 = 1,      /**< Standard BT601 */
+    COLOR_GAMUT_STANDARD_BT601 = 1,      /**< Standard BT601 */
     COLOR_GAMUT_STANDARD_BT709 = 2,      /**< Standard BT709 */
     COLOR_GAMUT_DCI_P3 = 3,              /**< DCI P3 */
     COLOR_GAMUT_SRGB = 4,                /**< SRGB */
