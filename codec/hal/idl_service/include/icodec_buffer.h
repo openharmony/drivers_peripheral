@@ -65,7 +65,6 @@ protected:
     ICodecBuffer()
     {}
     virtual bool CheckInvalid(struct OmxCodecBuffer &codecBuffer);
-
 protected:
     struct OmxCodecBuffer codecBuffer_;
 };
