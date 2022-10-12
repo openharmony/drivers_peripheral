@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 typedef void (*DestroyDataFunc)(void *data);
-typedef bool (*MatchFunc)(void *data, void *condition);
+typedef bool (*MatchFunc)(const void *data, const void *condition);
 
 typedef struct LinkedListNode {
     void *data;
