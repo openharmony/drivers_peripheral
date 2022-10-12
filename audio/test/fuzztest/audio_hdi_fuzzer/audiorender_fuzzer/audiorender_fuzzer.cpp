@@ -60,10 +60,10 @@ void RenderFucSwitch(struct IAudioRender *&render, uint32_t cmd, const uint8_t *
             render->SelectScene(render, reinterpret_cast<const struct AudioSceneDescriptor *>(rawData));
             break;
         case AUDIO_RENDER_SET_VOLUME:
-            render->SetVolume(render, *(reinterpret_cast<float *>(*rawData)));
+            render->SetVolume(render, *(reinterpret_cast<const float *>(rawData)));
             break;
         case AUDIO_RENDER_SET_GAIN:
-            render->SetGain(render, *(reinterpret_cast<float *>(*rawData)));
+            render->SetGain(render, *(reinterpret_cast<const float *>(rawData)));
             break;
         case AUDIO_RENDER_RENDER_FRAME: {
             uint64_t replyBytes = 0;
@@ -73,10 +73,20 @@ void RenderFucSwitch(struct IAudioRender *&render, uint32_t cmd, const uint8_t *
         case AUDIO_RENDER_SET_EXTRA_PARAMS:
             render->SetExtraParams(render, reinterpret_cast<const char *>(rawData));
             break;
-        case AUDIO_RENDER_REQ_MMAP_BUFFER:
-            render->ReqMmapBuffer(render, *(uint32_t *)rawData, 
-                                  reinterpret_cast<const struct AudioMmapBufferDescripter *>(rawData));
-        break;
+        case AUDIO_RENDER_REQ_MMAP_BUFFER: {
+            struct AudioMmapBufferDescripter desc = {
+                .memoryAddress = reinterpret_cast<int8_t *>(const_cast<uint8_t *>(rawData)),
+                .memoryAddressLen = *(reinterpret_cast<const uint32_t *>(rawData)),
+                .memoryFd = *(reinterpret_cast<const int32_t *>(rawData)),
+                .totalBufferFrames = *(reinterpret_cast<const int32_t *>(rawData)),
+                .transferFrameSize = *(reinterpret_cast<const int32_t *>(rawData)),
+                .isShareable = *(reinterpret_cast<const int32_t *>(rawData)),
+                .offset = *(reinterpret_cast<const int32_t *>(rawData)),
+                .filePath = reinterpret_cast<char *>(const_cast<uint8_t *>(rawData)),
+            };
+            render->ReqMmapBuffer(render, *(reinterpret_cast<const int32_t *>(rawData)), &desc);
+            break;
+        }
         case AUDIO_RENDER_SET_CHANNEL_MODE:
             render->SetChannelMode(render, *(AudioChannelMode *)rawData);
             break;
