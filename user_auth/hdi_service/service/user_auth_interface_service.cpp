@@ -135,7 +135,8 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
             return RESULT_UNKNOWN;
         }
         ScheduleInfo temp = {};
-        if (!CopyScheduleInfo((CoAuthSchedule *)tempNode->data, &temp)) {
+        auto coAuthSchedule = static_cast<CoAuthSchedule *>(tempNode->data);
+        if (!CopyScheduleInfo(coAuthSchedule, &temp)) {
             infos.clear();
             ret = RESULT_GENERAL_ERROR;
             break;
@@ -173,7 +174,7 @@ static int32_t CreateExecutorCommand(AuthResultInfo &info)
             DestroyLinkedList(executorSendMsg);
             return RESULT_UNKNOWN;
         }
-        ExecutorMsg *nodeData = (ExecutorMsg *)temp->data;
+        auto nodeData = static_cast<ExecutorMsg *>(temp->data);
         Buffer *nodeMsgBuffer = nodeData->msg;
         if (!IsBufferValid(nodeMsgBuffer)) {
             IAM_LOGE("node's buffer invalid");
@@ -284,7 +285,7 @@ int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, AuthTy
         DestroyLinkedList(scheduleGet);
         return RESULT_UNKNOWN;
     }
-    CoAuthSchedule *data = (CoAuthSchedule *)scheduleGet->head->data;
+    auto data = static_cast<CoAuthSchedule *>(scheduleGet->head->data);
     if (!CopyScheduleInfo(data, &scheduleInfo)) {
         IAM_LOGE("copy schedule failed");
         ret = RESULT_BAD_COPY;
@@ -515,7 +516,7 @@ int32_t UserAuthInterfaceService::GetCredential(int32_t userId, AuthType authTyp
             DestroyLinkedList(credList);
             return RESULT_UNKNOWN;
         }
-        CredentialInfoHal *credentialHal = (CredentialInfoHal *)temp->data;
+        auto credentialHal = static_cast<CredentialInfoHal *>(temp->data);
         CredentialInfo credentialInfo = {};
         CopyCredentialInfo(*credentialHal, credentialInfo);
         infos.push_back(credentialInfo);
@@ -588,7 +589,7 @@ int32_t UserAuthInterfaceService::EnforceDeleteUser(int32_t userId, std::vector<
             DestroyLinkedList(credList);
             return RESULT_UNKNOWN;
         }
-        CredentialInfoHal *credentialHal = (CredentialInfoHal *)temp->data;
+        auto credentialHal = static_cast<CredentialInfoHal *>(temp->data);
         CredentialInfo credentialInfo = {};
         CopyCredentialInfo(*credentialHal, credentialInfo);
         deletedInfos.push_back(credentialInfo);
@@ -629,7 +630,7 @@ static int32_t ObtainReconciliationData(uint32_t authType, uint32_t sensorHint, 
             DestroyLinkedList(credList);
             return RESULT_UNKNOWN;
         }
-        CredentialInfoHal *credentialInfo = (CredentialInfoHal *)temp->data;
+        auto credentialInfo = static_cast<CredentialInfoHal *>(temp->data);
         templateIds.push_back(credentialInfo->templateId);
         temp = temp->next;
     }

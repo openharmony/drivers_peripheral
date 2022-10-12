@@ -35,7 +35,7 @@ static void DestroyExecutorInfo(void *data)
     Free(data);
 }
 
-static bool IsExecutorIdMatchById(void *data, void *condition)
+static bool IsExecutorIdMatchById(const void *data, const void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("input para is null");
@@ -46,7 +46,7 @@ static bool IsExecutorIdMatchById(void *data, void *condition)
     return (executorInfo->executorIndex == executorIndex);
 }
 
-static bool IsExecutorNodeMatch(void *data, void *condition)
+static bool IsExecutorNodeMatch(const void *data, const void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("get null data");
@@ -81,7 +81,7 @@ void DestroyResourcePool(void)
     g_poolList = NULL;
 }
 
-static bool IsExecutorValid(ExecutorInfoHal *executorInfo)
+static bool IsExecutorValid(const ExecutorInfoHal *executorInfo)
 {
     if (executorInfo == NULL) {
         LOG_ERROR("get null data");

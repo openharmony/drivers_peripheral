@@ -437,7 +437,7 @@ ERROR:
     return RESULT_GENERAL_ERROR;
 }
 
-static bool MatchSchedule(void *data, void *condition)
+static bool MatchSchedule(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         LOG_ERROR("param is null");
@@ -460,7 +460,7 @@ ResultCode ScheduleOnceFinish(UserAuthContext *context, uint64_t scheduleId)
     return context->scheduleList->remove(context->scheduleList, &scheduleId, MatchSchedule, true);
 }
 
-static bool MatchContextSelf(void *data, void *condition)
+static bool MatchContextSelf(const void *data, const void *condition)
 {
     return data == condition;
 }
