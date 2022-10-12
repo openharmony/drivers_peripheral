@@ -41,13 +41,13 @@ int32_t CodecOMXCore::Init(const std::string &libName)
         HDF_LOGE("%{public}s:failed to dlopen %{public}s.", __func__, libName.c_str());
         return HDF_ERR_INVALID_PARAM;
     }
-
-    init_ = (InitFunc)dlsym(libHandle_, "OMX_Init");
-    deInit_ = (DeinitFunc)dlsym(libHandle_, "OMX_Deinit");
-    getHandle_ = (GetHandleFunc)dlsym(libHandle_, "OMX_GetHandle");
-    freeHandle_ = (FreeHandleFunc)dlsym(libHandle_, "OMX_FreeHandle");
-    getRoles_ = (GetRolesOfComponentFunc)dlsym(libHandle_, "OMX_GetRolesOfComponent");
-    componentNameEnum_ = (ComponentNameEnumFunc)dlsym(libHandle_, "OMX_ComponentNameEnum");
+    
+    init_ = reinterpret_cast<InitFunc>(dlsym(libHandle_, "OMX_Init"));
+    deInit_ = reinterpret_cast<DeinitFunc>(dlsym(libHandle_, "OMX_Deinit"));
+    getHandle_ = reinterpret_cast<GetHandleFunc>(dlsym(libHandle_, "OMX_GetHandle"));
+    freeHandle_ = reinterpret_cast<FreeHandleFunc>(dlsym(libHandle_, "OMX_FreeHandle"));
+    getRoles_ = reinterpret_cast<GetRolesOfComponentFunc>(dlsym(libHandle_, "OMX_GetRolesOfComponent"));
+    componentNameEnum_ = reinterpret_cast<ComponentNameEnumFunc>(dlsym(libHandle_, "OMX_ComponentNameEnum"));
 
     if (init_ != NULL) {
         (*(init_))();
