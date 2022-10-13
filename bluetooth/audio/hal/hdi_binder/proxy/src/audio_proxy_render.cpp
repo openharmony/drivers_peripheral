@@ -333,7 +333,7 @@ int32_t AudioProxyRenderGetGainThreshold(const AudioHandle handle, float *min, f
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
         HDF_LOGE("The pointer is invalid");
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -550,7 +550,7 @@ int32_t AudioProxyRenderSetExtraParams(AudioHandle handle, const char *keyValueL
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
         HDF_LOGE("The parameter is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -574,7 +574,7 @@ int32_t AudioProxyRenderGetExtraParams(AudioHandle handle, char *keyValueList, i
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
         HDF_LOGE("parameter is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;

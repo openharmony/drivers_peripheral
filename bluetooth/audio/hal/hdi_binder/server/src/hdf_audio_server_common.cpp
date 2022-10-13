@@ -39,7 +39,7 @@ static int32_t AdapterManageInit(struct AudioInfoInAdapter *adapterManage,
         return HDF_FAILURE;
     }
 
-    ret = memcpy_s((void *)adapterManage->adapterName, MANAGER_ADAPTER_NAME_LEN,
+    ret = memcpy_s(static_cast<void *>(const_cast<char *>(adapterManage->adapterName)), MANAGER_ADAPTER_NAME_LEN,
         adapterName, MANAGER_ADAPTER_NAME_LEN);
     if (ret != EOK) {
         HDF_LOGE("%{public}s: memcpy adapter name fail!", __func__);
@@ -110,8 +110,7 @@ int32_t AdaptersServerManageInit(const struct AudioAdapterDescriptor *descs, int
     }
 
     num = (num > MAX_AUDIO_ADAPTER_NUM_SERVER) ? MAX_AUDIO_ADAPTER_NUM_SERVER : num;
-    adaptersManage = (struct AudioInfoInAdapter *)calloc(1,
-        num * sizeof(struct AudioInfoInAdapter));
+    adaptersManage = reinterpret_cast<struct AudioInfoInAdapter *>(calloc(1, num * sizeof(struct AudioInfoInAdapter)));
     if (adaptersManage == NULL) {
         HDF_LOGE("%{public}s: calloc adaptersManage failed! ", __func__);
 
@@ -699,7 +698,7 @@ int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescripter *desc, struct H
         HDF_LOGE("%{public}s: memAddr Is NULL", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    desc->memoryAddress = (void *)(uintptr_t)memAddr;
+    desc->memoryAddress = reinterpret_cast<void *>((uintptr_t)memAddr);
     ret = HdfSbufReadFileDescriptor(data);
     if (ret < 0) {
         return HDF_FAILURE;
