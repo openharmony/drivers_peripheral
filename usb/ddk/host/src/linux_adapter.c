@@ -465,9 +465,14 @@ static int32_t OsSubmitBulkRequest(struct UsbHostRequest *request)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (request->length > MAX_BULK_DATA_BUFFER_LENGTH || request->length <= 0) {
-        HDF_LOGE("Bulk request size err");
-        return -1;
+    if (request->length <= 0) {
+        HDF_LOGE("%{public}d: Bulk request size err", __LINE__);
+        return HDF_FAILURE;
+    }
+
+    if (request->length > MAX_BULK_DATA_BUFFER_LENGTH) {
+        HDF_LOGE("%{public}d: Bulk request size err", __LINE__);
+        return HDF_FAILURE;
     }
 
     if (request->devHandle->caps & USB_ADAPTER_CAP_BULK_SCATTER_GATHER) {
@@ -480,9 +485,7 @@ static int32_t OsSubmitBulkRequest(struct UsbHostRequest *request)
         bulkBufferLen = MAX_BULK_DATA_BUFFER_LENGTH;
     }
     numUrbs = request->length / bulkBufferLen;
-    if (request->length == 0) {
-        numUrbs = 1;
-    } else if ((request->length % bulkBufferLen) > 0) {
+    if ((request->length % bulkBufferLen) >= 0) {
         numUrbs++;
     }
 
@@ -928,7 +931,7 @@ static int32_t AdapterGetConfigDescriptor(const struct UsbDevice *dev, uint8_t c
     struct UsbDeviceConfigDescriptor *config = NULL;
     uint8_t i;
 
-    if (dev == NULL || buffer == NULL || (dev != NULL && configIndex > dev->deviceDescriptor.bNumConfigurations)) {
+    if (dev == NULL || buffer == NULL || (configIndex > dev->deviceDescriptor.bNumConfigurations)) {
         HDF_LOGE("%{public}s:%{public}d Invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }

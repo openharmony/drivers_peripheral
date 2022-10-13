@@ -345,7 +345,7 @@ static int32_t ParseInterfaces(struct AcmDevice * const acmDevice)
     UsbFnInterfaceHandle handle = nullptr;
     int32_t ret;
     for (i = 0; i < acmDevice->fnDev->numInterfaces; i++) {
-        fnIface = (struct UsbFnInterface *)UsbFnGetInterface(acmDevice->fnDev, i);
+        fnIface = const_cast<UsbFnInterface *>(UsbFnGetInterface(acmDevice->fnDev, i));
         if (fnIface == nullptr) {
             return -1;
         }
@@ -450,7 +450,7 @@ static int32_t SendNotifyRequest(struct AcmDevice *acm, uint8_t type, uint16_t v
     int32_t ret;
 
     req = acm->notifyReq;
-    if ((req == nullptr) || ((req != nullptr) && (req->buf == nullptr))) {
+    if (req == nullptr || req->buf == nullptr) {
         return -1;
     }
     acm->notifyReq = nullptr;
@@ -463,7 +463,10 @@ static int32_t SendNotifyRequest(struct AcmDevice *acm, uint8_t type, uint16_t v
     notify->wValue = CPU_TO_LE16(value);
     notify->wIndex = CPU_TO_LE16(acm->ctrlIface.fn->info.index);
     notify->wLength = CPU_TO_LE16(length);
-    memcpy_s((void *)(notify + 1), length, data, length);
+    if (memcpy_s(static_cast<void *>(notify + 1), length, data, length) != EOK) {
+        HDF_LOGE("%{public}s:memcpy_s failed", __func__);
+        return -1;
+    }
 
     ret = UsbFnSubmitRequestAsync(req);
     return ret;
@@ -704,7 +707,7 @@ struct AcmDevice *SetUpAcmDevice(void)
     if (acmDevice == nullptr) {
         return nullptr;
     }
-    acmDevice->fnDev = (struct UsbFnDevice *)UsbFnCreateDevice("100e0000.hidwc3_0", &descData);
+    acmDevice->fnDev = UsbFnCreateDevice("100e0000.hidwc3_0", &descData);
     if (acmDevice->fnDev == nullptr) {
         return nullptr;
     }
