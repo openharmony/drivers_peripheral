@@ -16,7 +16,6 @@
 #ifndef OHOS_HDI_DISPLAY_BUFFER_V1_0_ALLOCATORINTERFACESERVICE_H
 #define OHOS_HDI_DISPLAY_BUFFER_V1_0_ALLOCATORINTERFACESERVICE_H
 
-#include "buffer_handle_parcelable.h"
 #include "idisplay_buffer_hwi.h"
 #include "v1_0/display_buffer_type.h"
 #include "v1_0/iallocator_interface.h"
@@ -30,7 +29,7 @@ class AllocatorInterfaceService : public IAllocatorInterface {
 public:
     AllocatorInterfaceService();
     virtual ~AllocatorInterfaceService();
-    int32_t AllocMem(const AllocInfo &info, sptr<BufferHandleParcelable> &handle) override;
+    int32_t AllocMem(const AllocInfo &info, sptr<NativeBuffer> &handle) override;
 
 private:
     int32_t LoadHwi();

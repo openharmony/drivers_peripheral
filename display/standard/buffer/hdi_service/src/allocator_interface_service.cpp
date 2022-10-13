@@ -80,7 +80,7 @@ int32_t AllocatorInterfaceService::LoadHwi()
     return HDF_SUCCESS;
 }
 
-int32_t AllocatorInterfaceService::AllocMem(const AllocInfo &info, sptr<BufferHandleParcelable> &handle)
+int32_t AllocatorInterfaceService::AllocMem(const AllocInfo &info, sptr<NativeBuffer> &handle)
 {
     BufferHandle *buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
@@ -88,9 +88,9 @@ int32_t AllocatorInterfaceService::AllocMem(const AllocInfo &info, sptr<BufferHa
     if (ec == HDF_SUCCESS) {
         CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
     }
-    BufferHandleParcelable *hdiBuffer = new BufferHandleParcelable(*buffer);
-    CHECK_NULLPOINTER_RETURN_VALUE(hdiBuffer, HDF_FAILURE);
-    handle = hdiBuffer;
+    handle = new NativeBuffer();
+    CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
+    handle->SetBufferHandle(buffer, true);
     return HDF_SUCCESS;
 }
 } // namespace V1_0

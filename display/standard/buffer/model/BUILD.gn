@@ -20,15 +20,23 @@ group("display_buffer_model") {
   ]
 }
 
+config("libdisplay_buffer_hwi_impl_config") {
+  include_dirs = [
+    "//drivers/peripheral/display/standard/buffer/model/include"
+  ]
+}
+
 ohos_shared_library("libdisplay_buffer_hwi_impl") {
   sources = [
     "src/display_buffer_hwi_impl.cpp",
   ]
+
+  public_configs = [ ":libdisplay_buffer_hwi_impl_config" ]
+
   include_dirs = [
     "include",
     "//drivers/peripheral/base",
     "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
     "//drivers/interface/display/buffer",
     "//drivers/peripheral/display/standard/utils/include",
     "//drivers/peripheral/display/standard/buffer/hdi_service/include",
@@ -67,7 +75,6 @@ ohos_shared_library("libdisplay_buffer_vendor") {
     "include",
     "//drivers/peripheral/base",
     "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
     "//drivers/peripheral/display/standard/utils/include",
     "//drivers/hdf_core/framework/include/utils",
     "//drivers/hdf_core/adapter/uhdf2/osal/include",

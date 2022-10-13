@@ -105,6 +105,14 @@
               ],
               "header_base": "//drivers/peripheral/display/hdi_service/gralloc/include"
           }
+        },
+        {
+          "name": "//drivers/peripheral/display/standard/buffer/model:libdisplay_buffer_hwi_impl",
+            "header": {
+              "header_files": [
+              ],
+              "header_base": "//drivers/peripheral/display/standard/buffer/model/include"
+          }
         }
       ]
     }

@@ -31,7 +31,6 @@ ohos_shared_library("libdisplay_composer_hwi_impl") {
         "//drivers/peripheral/display/standard/composer/hdi_service/include",
         "//drivers/peripheral/display/standard/composer/model/include",
         "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
-        "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
     ]
 
     deps = [
@@ -87,7 +86,6 @@ ohos_shared_library("display_composer_vendor") {
         "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
         "//device/soc/rockchip/rk3568/hardware/rga/include",
         "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
-        "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
     ]
 
     deps = [

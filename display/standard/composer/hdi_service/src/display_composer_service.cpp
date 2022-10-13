@@ -239,7 +239,7 @@ int32_t DisplayComposerService::DestroyVirtualDisplay(uint32_t devId)
 }
 
 int32_t DisplayComposerService::SetVirtualDisplayBuffer(
-    uint32_t devId, const sptr<BufferHandleParcelable> &buffer, const sptr<HdifdParcelable> &fence)
+    uint32_t devId, const sptr<NativeBuffer> &buffer, const sptr<HdifdParcelable> &fence)
 {
     BufferHandle *handle = buffer->GetBufferHandle();
     int32_t inFence = fence->GetFd();
