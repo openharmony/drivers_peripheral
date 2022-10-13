@@ -179,7 +179,7 @@ int32_t PropTest(int32_t argc, const char *argv[])
         return 1;
     }
 
-    int32_t ret;
+    int32_t ret = HDF_SUCCESS;
     if (getProp) {
         ret = TestPropGet(propName);
     } else if (setProp) {
