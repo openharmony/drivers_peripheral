@@ -202,7 +202,7 @@ int32_t AudioProxyCommonSetRenderCtrlParam(int cmId, AudioHandle handle, float p
     HDF_LOGI("%{public}s, ", __func__);
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
         HDF_LOGE("The hwRender parameter is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -239,7 +239,7 @@ int32_t AudioProxyCommonGetRenderCtrlParam(int cmId, AudioHandle handle, float *
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL || hwRender->proxyRemoteHandle == NULL) {
         HDF_LOGE("The pointer is empty");
         return AUDIO_HAL_ERR_INVALID_PARAM;

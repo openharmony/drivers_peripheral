@@ -88,7 +88,7 @@ bool VendorInterface::Initialize(
 
     vendorHandle_ = dlopen(BT_VENDOR_NAME, RTLD_NOW);
     if (vendorHandle_ == nullptr) {
-        HDF_LOGE("VendorInterface dlopen %{public}s failed.", BT_VENDOR_NAME);
+        HDF_LOGE("VendorInterface dlopen %{public}s failed, error code: %{public}s", BT_VENDOR_NAME, dlerror());
         return false;
     }
 
