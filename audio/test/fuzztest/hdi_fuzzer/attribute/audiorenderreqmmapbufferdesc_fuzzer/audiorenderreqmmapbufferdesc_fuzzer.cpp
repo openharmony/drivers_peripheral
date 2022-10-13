@@ -31,13 +31,14 @@ namespace Audio {
             HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
             return false;
         }
+        uint8_t *temp = const_cast<uint8_t *>(data);
         struct AudioMmapBufferDescripter descFuzz {
-            .memoryAddress = (void *)data,
-            .memoryFd = *(int32_t *)data,
-            .totalBufferFrames = *(int32_t *)data,
-            .transferFrameSize = *(int32_t *)data,
-            .isShareable = *(int32_t *)data,
-            .offset = *(uint32_t *)data,
+            .memoryAddress = reinterpret_cast<void *>(temp),
+            .memoryFd = *(reinterpret_cast<int32_t *>(temp)),
+            .totalBufferFrames = *(reinterpret_cast<int32_t *>(temp)),
+            .transferFrameSize = *(reinterpret_cast<int32_t *>(temp)),
+            .isShareable = *(reinterpret_cast<int32_t *>(temp)),
+            .offset = *reinterpret_cast<uint32_t *>(temp),
         };
 
         ret = render->attr.ReqMmapBuffer((AudioHandle)render, size, &descFuzz);

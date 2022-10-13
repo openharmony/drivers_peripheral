@@ -46,7 +46,7 @@ int32_t GetManager(TestAudioManager *&manager)
     if (handleSo == nullptr) {
         return HDF_FAILURE;
     }
-    GetAudioManager = (TestAudioManager *(*)())(dlsym(handleSo, FUNCTION_NAME.c_str()));
+    GetAudioManager = reinterpret_cast<TestAudioManager *(*)()>(dlsym(handleSo, FUNCTION_NAME.c_str()));
     if (GetAudioManager == nullptr) {
         return HDF_FAILURE;
     }

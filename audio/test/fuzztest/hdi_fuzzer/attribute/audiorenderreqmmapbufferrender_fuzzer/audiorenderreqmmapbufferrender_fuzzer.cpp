@@ -48,7 +48,7 @@ namespace Audio {
             return false;
         }
 
-        struct AudioRender *renderFuzz = (struct AudioRender *)data;
+        struct AudioRender *renderFuzz = reinterpret_cast<struct AudioRender *>(const_cast<uint8_t *>(data));
         ret = render->attr.ReqMmapBuffer((AudioHandle)renderFuzz, reqSize, &desc);
         if (ret == HDF_SUCCESS) {
             (void)munmap(desc.memoryAddress, reqSize);

@@ -48,7 +48,7 @@ namespace Audio {
             HDF_LOGE("%{public}s: Write hwparams to buffer failed \n", __func__);
             return false;
         }
-        int32_t cmdId = *(int32_t *)(data);
+        int32_t cmdId = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data)));
         ret = admDisRenFuzzService->dispatcher->Dispatch(&admDisRenFuzzService->object, cmdId, sBuf, reply);
         if (ret == HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Dispatch sucess \n", __func__);

@@ -31,7 +31,7 @@ bool AudioSetmuteRenderMuteFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    bool mute = *(bool *)data;
+    bool mute = *(reinterpret_cast<bool *>(const_cast<uint8_t *>(data)));
     ret = muteRenRender->volume.SetVolume(muteRenRender, mute);
     if (ret == HDF_SUCCESS) {
         result = true;
