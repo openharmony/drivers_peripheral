@@ -323,9 +323,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice * const acm, struct Usb
 
 static int32_t UsbAllocDataRequests(struct AcmDevice * const acm)
 {
-    int32_t i;
-    int32_t ret;
-    for (i = 0; i < TEST_CYCLE; i++) {
+    for (int32_t i = 0; i < TEST_CYCLE; i++) {
         struct AcmDb *snd = &acm->db[i];
         snd->request = UsbRawAllocRequest(acm->devHandle, 0, acm->dataEp->maxPacketSize);
         snd->instance = acm;
@@ -342,9 +340,9 @@ static int32_t UsbAllocDataRequests(struct AcmDevice * const acm)
         reqData.buffer = snd->buf;
         reqData.length = acm->dataSize;
 
-        ret = UsbRawFillBulkRequest(snd->request, acm->devHandle, &reqData);
+        int32_t ret = UsbRawFillBulkRequest(snd->request, acm->devHandle, &reqData);
         if (ret != HDF_SUCCESS) {
-            printf("%s: FillInterruptRequest failed, ret=%d", __func__, ret);
+            printf("%s: FillBulkRequest failed, ret = %d", __func__, ret);
             return HDF_FAILURE;
         }
     }

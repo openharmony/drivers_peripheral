@@ -40,7 +40,7 @@ bool UsbBulkTransferReadFuzzTest(const uint8_t *data, size_t size)
         HDF_LOGE("%{public}s: memcpy_s failed", __func__);
         return false;
     }
-    int32_t timeout = *(int32_t *)data;
+    int32_t timeout = *(reinterpret_cast<int32_t *>(*data));
     ret = usbInterface->BulkTransferRead(dev, pipe, timeout, reinterpret_cast<std::vector<uint8_t> &>(data));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: bulk transfer read succeed", __func__);

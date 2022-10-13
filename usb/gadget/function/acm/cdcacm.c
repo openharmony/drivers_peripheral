@@ -872,20 +872,13 @@ static int32_t AcmSerialCmd(
 static int32_t AcmDeviceDispatch(
     struct HdfDeviceIoClient *client, int32_t cmd, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
-    struct UsbAcmDevice *acm = NULL;
-    struct UsbSerial *port = NULL;
-
     if (client == NULL || client->device == NULL || client->device->service == NULL) {
         HDF_LOGE("%s: client is NULL", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    acm = (struct UsbAcmDevice *)client->device->service;
-    if (acm == NULL) {
-        return HDF_ERR_IO;
-    }
-
-    if (HdfDeviceObjectCheckInterfaceDesc(client->device, data) == false) {
+    struct UsbAcmDevice *acm = (struct UsbAcmDevice *)client->device->service;
+    if (!HdfDeviceObjectCheckInterfaceDesc(client->device, data)) {
         HDF_LOGE("%{public}s:%{public}d check interface desc fail", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -899,7 +892,7 @@ static int32_t AcmDeviceDispatch(
             HDF_LOGE("%s: unknown cmd %d", __func__, cmd);
             break;
     }
-    port = acm->port;
+    struct UsbSerial *port = acm->port;
     if (port == NULL) {
         return HDF_ERR_IO;
     }

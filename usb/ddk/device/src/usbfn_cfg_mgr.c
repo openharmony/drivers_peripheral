@@ -1184,12 +1184,11 @@ static int32_t UsbFnCfgChangeDevceDes(const struct UsbFnInterface *intf, const c
     int32_t ret;
     uint32_t data;
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
-    struct UsbFnDeviceMgr *fnDevMgr = NULL;
 
     if (name == NULL || intf == NULL || fnOps == NULL) {
         return HDF_FAILURE;
     }
-    fnDevMgr = (struct UsbFnDeviceMgr *)intf->object;
+    struct UsbFnDeviceMgr *fnDevMgr = (struct UsbFnDeviceMgr *)intf->object;
     if (fnDevMgr == NULL || fnDevMgr->des == NULL || fnDevMgr->des->deviceDesc == NULL ||
         fnDevMgr->des->deviceStrings == NULL) {
         HDF_LOGE("%{public}s: null", __func__);

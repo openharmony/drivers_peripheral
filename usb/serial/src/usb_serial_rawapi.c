@@ -930,9 +930,6 @@ static int32_t UsbSerialDeviceDispatch(
     }
 
     acm = (struct AcmDevice *)client->device->service;
-    if (acm == NULL) {
-        return HDF_FAILURE;
-    }
     port = acm->port;
     if (port == NULL) {
         return HDF_FAILURE;

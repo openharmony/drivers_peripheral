@@ -33,8 +33,8 @@ public:
         return 0;
     };
 
-    int32_t busNum_;
-    int32_t devAddr_;
+    int32_t busNum_ = 0;
+    int32_t devAddr_ = 0;
 };
 } // namespace USB
 } // namespace OHOS

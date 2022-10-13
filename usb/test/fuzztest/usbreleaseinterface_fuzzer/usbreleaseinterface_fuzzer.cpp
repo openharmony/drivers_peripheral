@@ -34,8 +34,7 @@ bool UsbReleaseInterfaceFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    uint8_t interfaceId = *(uint8_t *)data;
-    ret = usbInterface->ReleaseInterface(dev, interfaceId);
+    ret = usbInterface->ReleaseInterface(dev, *data);
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: reg bulk callback succeed", __func__);
     }
