@@ -61,6 +61,12 @@ static int32_t GetInitCaptureParaAttrs(struct HdfSBuf *data, struct AudioSampleA
         return HDF_FAILURE;
     }
     attrs->isSignedData = (bool)tempCapturePara;
+
+    if (!HdfSbufReadInt32(data, &attrs->streamId)) {
+        AUDIO_FUNC_LOGE("read streamId fail");
+        return HDF_FAILURE;
+    }
+
     return HDF_SUCCESS;
 }
 
