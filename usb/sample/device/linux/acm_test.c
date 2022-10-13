@@ -13,28 +13,30 @@
  * limitations under the License.
  */
 
-#include <hdf_log.h>
-#include <hdf_remote_service.h>
-#include <hdf_sbuf.h>
-#include <servmgr_hdi.h>
-#include <unistd.h>
-#include <sys/time.h>
+#include "cdcacm.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include <termios.h>
-#include "cdcacm.h"
-#include "osal_time.h"
+#include <unistd.h>
+
 #include <signal.h>
+#include <sys/time.h>
+#include <termios.h>
+
+#include "hdf_log.h"
+#include "hdf_remote_service.h"
+#include "hdf_sbuf.h"
+#include "osal_time.h"
+#include "servmgr_hdi.h"
 #include "usb_dev_test.h"
 
-#define HDF_LOG_TAG   cdc_acm_test
+#define HDF_LOG_TAG cdc_acm_test
 
 static int32_t g_running = 1;
 static struct termios g_orgOpts, g_newOpts;
 static struct HdfSBuf *g_data;
 static struct HdfSBuf *g_reply;
 static struct HdfRemoteService *g_acmService;
-static struct OsalThread      g_thread;
+static struct OsalThread g_thread;
 
 static void TestWrite(char *buf)
 {
@@ -44,7 +46,7 @@ static void TestWrite(char *buf)
         HDF_LOGE("%{public}s:%{public}d write interface token fail\n", __func__, __LINE__);
         return;
     }
-    
+
     (void)HdfSbufWriteString(g_data, buf);
     int32_t status = g_acmService->dispatcher->Dispatch(g_acmService, USB_SERIAL_WRITE, g_data, g_reply);
     if (status != HDF_SUCCESS) {
@@ -68,7 +70,8 @@ static void TestRead(void)
     }
     const char *tmp = HdfSbufReadString(g_reply);
     if (tmp && strlen(tmp) > 0) {
-        for (size_t i = 0; i < strlen(tmp); i++) {
+        size_t len = strlen(tmp);
+        for (size_t i = 0; i < len; i++) {
             if (tmp[i] == 0x0A || tmp[i] == 0x0D) {
                 printf("\r\n");
             } else {

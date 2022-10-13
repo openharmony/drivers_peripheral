@@ -91,7 +91,7 @@ static void SpeedPrint(void)
     uint64_t count;
 
     g_sigCnt++;
-    count = g_sigCnt * TEST_PRINT_TIME;
+    count = (uint64_t)g_sigCnt * TEST_PRINT_TIME;
     if (count >= TEST_TIME) {
         g_speedFlag = true;
     }
