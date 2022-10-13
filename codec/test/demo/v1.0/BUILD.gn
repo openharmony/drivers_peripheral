@@ -20,6 +20,7 @@ ohos_executable("codec_decode_test_ipc") {
     "//drivers/peripheral/codec/hal/v1.0/share_mem/src/share_mem.c",
     "//drivers/peripheral/codec/hdi_service/codec_service_stub/codec_callback_stub.c",
     "codec_decode_test_ipc.c",
+    "codec_gralloc_wrapper.cpp",
     "codec_utils.c",
   ]
 
@@ -77,6 +78,7 @@ ohos_executable("codec_encode_test_ipc") {
     "//drivers/peripheral/codec/hal/v1.0/share_mem/src/share_mem.c",
     "//drivers/peripheral/codec/hdi_service/codec_service_stub/codec_callback_stub.c",
     "codec_encode_test_ipc.c",
+    "codec_gralloc_wrapper.cpp",
     "codec_utils.c",
   ]
 

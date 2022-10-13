@@ -13,30 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef SHARE_MEM_H
-#define SHARE_MEM_H
+#ifndef DISPLAY_GRALLOC_WRAPPER_H
+#define DISPLAY_GRALLOC_WRAPPER_H
 
-#include <hdf_base.h>
-#include "codec_type.h"
+#include "share_mem.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-typedef struct {
-    int32_t id;
-    int32_t fd;         /**< Transmit fd through ipc for sharing memory */
-    int32_t size;
-    uint8_t *virAddr;   /**< Virtual address */
-    BufferType type;
-} ShareMemory;
-
-int32_t CreateFdShareMemory(ShareMemory *shareMemory);
-int32_t OpenFdShareMemory(ShareMemory *shareMemory);
-int32_t ReleaseFdShareMemory(ShareMemory *shareMemory);
+int32_t GrAllocatorInit(void);
+int32_t CreateGrShareMemory(BufferHandle **bufferHandle, AllocInfo *alloc, ShareMemory *shareMemory);
+int32_t DestroyGrShareMemory(BufferHandle *bufferHandle);
+int32_t OpenGrShareMemory(BufferHandle *bufferhandle, ShareMemory *shareMemory);
+int32_t ReleaseGrShareMemory(BufferHandle *bufferHandle, ShareMemory *shareMemory);
 
 #ifdef __cplusplus
 }
 #endif
-#endif  // SHARE_MEM_H
+
+#endif  // DISPLAY_GRALLOC_WRAPPER_H
