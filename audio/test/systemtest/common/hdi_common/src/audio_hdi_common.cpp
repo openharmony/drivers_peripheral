@@ -464,7 +464,7 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
         return HDF_FAILURE;
     }
     char *frame = nullptr;
-    frame = (char *)calloc(1, bufferSize);
+    frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -517,7 +517,7 @@ int32_t FrameStartCapture(struct AudioCapture *capture, FILE *file, const struct
         return HDF_FAILURE;
     }
     char *frame = nullptr;
-    frame = (char *)calloc(1, bufferSize);
+    frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -558,7 +558,7 @@ int32_t RenderFramePrepare(const std::string &path, char *&frame, uint64_t &read
         fclose(file);
         return HDF_FAILURE;
     }
-    frame = (char *)calloc(1, bufferSize);
+    frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
         fclose(file);
         return HDF_ERR_MALLOC_FAIL;
@@ -597,7 +597,7 @@ int32_t StartRecord(struct AudioCapture *capture, FILE *file, uint64_t filesize)
     if (ret < 0) {
         return ret;
     }
-    char *frame = (char *)calloc(1, BUFFER_LENTH);
+    char *frame = reinterpret_cast<char *>(calloc(1, BUFFER_LENTH));
     if (frame == nullptr) {
         return HDF_ERR_MALLOC_FAIL;
     }

@@ -32,7 +32,7 @@ namespace Audio {
         }
         struct AudioSampleAttributes attrs = {};
         InitAttrs(attrs);
-        struct AudioCapture *handle = (struct AudioCapture *)data;
+        struct AudioCapture *handle = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
         ret = setAttrCapCapture->attr.SetSampleAttributes(handle, &attrs);
         if (ret == HDF_SUCCESS) {
             result = true;

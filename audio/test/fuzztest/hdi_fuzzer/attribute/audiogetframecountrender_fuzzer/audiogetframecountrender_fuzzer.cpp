@@ -32,7 +32,7 @@ namespace Audio {
             return false;
         }
 
-        struct AudioRender *handle = (struct AudioRender *)data;
+        struct AudioRender *handle = reinterpret_cast<struct AudioRender *>(const_cast<uint8_t *>(data));
         ret = frameRender->attr.GetFrameCount(handle, &count);
         if (ret == HDF_SUCCESS) {
             result = true;

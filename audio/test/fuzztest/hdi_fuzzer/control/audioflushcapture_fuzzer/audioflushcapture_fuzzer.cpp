@@ -39,7 +39,7 @@ bool AudioFlushCaptureFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
+    struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
     ret = flushFuzzCapture->control.Flush((AudioHandle)captureFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;

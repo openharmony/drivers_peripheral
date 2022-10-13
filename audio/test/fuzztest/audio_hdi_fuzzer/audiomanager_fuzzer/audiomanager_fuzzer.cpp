@@ -48,15 +48,16 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     if (manager == nullptr) {
         return false;
     }
+    uint8_t *data = const_cast<uint8_t *>(rawData);
     switch (cmd) {
         case AUDIO_MANAGER_LOAD_ADAPTER: {
             struct AudioPort port = {
-                .dir = *(reinterpret_cast<const AudioPortDirection *>(rawData)),
-                .portId = *(reinterpret_cast<const uint32_t *>(rawData)),
-                .portName = reinterpret_cast<char *>(const_cast<uint8_t *>(rawData)),
+                .dir = *(reinterpret_cast<AudioPortDirection *>(data)),
+                .portId = *(reinterpret_cast<uint32_t *>(data)),
+                .portName = reinterpret_cast<char *>(data),
             };
             struct AudioAdapterDescriptor desc = {
-                .adapterName = reinterpret_cast<char *>(const_cast<uint8_t *>(rawData)),
+                .adapterName = reinterpret_cast<char *>(data),
                 .ports = &port,
             };
             struct IAudioAdapter *adapter = nullptr;
@@ -64,7 +65,7 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
             break;
         }
         case AUDIO_MANAGER_UNLOAD_ADAPTER:
-            manager->UnloadAdapter(manager, reinterpret_cast<const char *>(rawData));
+            manager->UnloadAdapter(manager, reinterpret_cast<char *>(data));
             break;
         default:
             break;

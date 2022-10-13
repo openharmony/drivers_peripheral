@@ -59,7 +59,7 @@ namespace Audio {
             return false;
         }
 
-        struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
+        struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
         ret = mmapBufferFuzzCapture->attr.ReqMmapBuffer((AudioHandle)captureFuzz, reqSize, &desc);
         if (ret == HDF_SUCCESS) {
             (void)munmap(desc.memoryAddress, reqSize);
