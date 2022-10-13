@@ -203,6 +203,8 @@ static int32_t CodecProxyCreate(struct ICodec *self, const char* name, CODEC_HAN
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
+    uint64_t codecHandle = 0;
+
     if (self == NULL || name == NULL || handle == NULL) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -220,11 +222,12 @@ static int32_t CodecProxyCreate(struct ICodec *self, const char* name, CODEC_HAN
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
-    if (!HdfSbufReadUint64(reply, (uint64_t *)handle)) {
+    if (!HdfSbufReadUint64(reply, &codecHandle)) {
         HDF_LOGE("%{public}s: read handle failed!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
+    *handle = (CODEC_HANDLETYPE)codecHandle;
     CodecProxySBufRecycle(data, reply);
     return ret;
 }
@@ -234,6 +237,7 @@ static int32_t CodecCreateByType(struct ICodec *self, CodecType type, AvCodecMim
     int32_t ret;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
+    uint64_t codecHandle = 0;
 
     if (self == NULL || handle == NULL) {
         return HDF_ERR_INVALID_PARAM;
@@ -263,11 +267,12 @@ static int32_t CodecCreateByType(struct ICodec *self, CodecType type, AvCodecMim
         CodecProxySBufRecycle(data, reply);
         return ret;
     }
-    if (!HdfSbufReadUint64(reply, (uint64_t *)handle)) {
+    if (!HdfSbufReadUint64(reply, &codecHandle)) {
         HDF_LOGE("%{public}s: failed to read handle!", __func__);
         CodecProxySBufRecycle(data, reply);
         return HDF_ERR_INVALID_PARAM;
     }
+    *handle = (CODEC_HANDLETYPE)codecHandle;
     CodecProxySBufRecycle(data, reply);
     return ret;
 }
