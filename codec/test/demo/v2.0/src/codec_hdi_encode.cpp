@@ -33,7 +33,7 @@ namespace {
     constexpr const char *ENCODER_AVC = "OMX.rk.video_encoder.avc";
 }
 
-#define AV_COLOR_FORMAT (OMX_COLOR_FORMATTYPE)CODEC_OMX_COLOR_FORMAT_RGBA8888
+#define AV_COLOR_FORMAT (OMX_COLOR_FORMATTYPE)CODEC_COLOR_FORMAT_RGBA8888
 
 static CodecHdiEncode *g_core = nullptr;
 CodecHdiEncode::CodecHdiEncode() : fpIn_(nullptr), fpOut_(nullptr)
