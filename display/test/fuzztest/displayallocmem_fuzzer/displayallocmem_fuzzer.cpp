@@ -24,8 +24,8 @@ namespace OHOS {
     {
         bool result = false;
         static AllocInfo info = {
-            .width = *(uint32_t *)data,
-            .height = *(uint32_t *)data,
+            .width = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data))),
+            .height = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data))),
         };
         BufferHandle *handle = nullptr;
         int32_t ret = IDisplayGralloc::Get()->AllocMem(info, handle);

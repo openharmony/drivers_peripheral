@@ -103,7 +103,7 @@ public:
         static VblankCtr instance;
         return instance;
     }
-    void NotifyVblank(unsigned int sequence, uint64_t ns, void *data);
+    void NotifyVblank(unsigned int sequence, uint64_t ns, const void *data);
     int32_t WaitVblank(uint32_t ms);
 
 protected:
