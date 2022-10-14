@@ -16,13 +16,13 @@
 #ifndef DISPLAY_BUFFER_UT_H
 #define DISPLAY_BUFFER_UT_H
 #include "gtest/gtest.h"
-#include "v1_0/iallocator_interface.h"
-#include "v1_0/imapper_interface.h"
+#include "v1_0/iallocator.h"
+#include "v1_0/imapper.h"
 #include "v1_0/display_buffer_type.h"
 #include "v1_0/include/idisplay_buffer.h"
 
-using OHOS::HDI::Display::Buffer::V1_0::IAllocatorInterface;
-using OHOS::HDI::Display::Buffer::V1_0::IMapperInterface;
+using OHOS::HDI::Display::Buffer::V1_0::IAllocator;
+using OHOS::HDI::Display::Buffer::V1_0::IMapper;
 using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
 using OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer;
 

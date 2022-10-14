@@ -13,22 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_DISPLAY_BUFFER_V1_0_ALLOCATORINTERFACESERVICE_H
-#define OHOS_HDI_DISPLAY_BUFFER_V1_0_ALLOCATORINTERFACESERVICE_H
+#ifndef OHOS_HDI_DISPLAY_BUFFER_V1_0_ALLOCATORSERVICE_H
+#define OHOS_HDI_DISPLAY_BUFFER_V1_0_ALLOCATORSERVICE_H
 
 #include "idisplay_buffer_hwi.h"
 #include "v1_0/display_buffer_type.h"
-#include "v1_0/iallocator_interface.h"
+#include "v1_0/iallocator.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Buffer {
 namespace V1_0 {
-class AllocatorInterfaceService : public IAllocatorInterface {
+class AllocatorService : public IAllocator {
 public:
-    AllocatorInterfaceService();
-    virtual ~AllocatorInterfaceService();
+    AllocatorService();
+    virtual ~AllocatorService();
     int32_t AllocMem(const AllocInfo &info, sptr<NativeBuffer> &handle) override;
 
 private:
@@ -45,4 +45,4 @@ private:
 } // namespace Display
 } // namespace HDI
 } // namespace OHOS
-#endif // OHOS_HDI_DISPLAY_BUFFER_V1_0_ALLOCATORINTERFACESERVICE_H
+#endif // OHOS_HDI_DISPLAY_BUFFER_V1_0_ALLOCATORSERVICE_H

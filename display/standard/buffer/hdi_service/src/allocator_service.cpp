@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "mapper_interface_service.h"
+#include "allocator_service.h"
 #include <dlfcn.h>
 #include <hdf_base.h>
 #include "display_log.h"
@@ -24,12 +24,12 @@ namespace HDI {
 namespace Display {
 namespace Buffer {
 namespace V1_0 {
-extern "C" IMapperInterface *MapperInterfaceImplGetInstance(void)
+extern "C" IAllocator *AllocatorImplGetInstance(void)
 {
-    return new (std::nothrow) MapperInterfaceService();
+    return new (std::nothrow) AllocatorService();
 }
 
-MapperInterfaceService::MapperInterfaceService()
+AllocatorService::AllocatorService()
     : libHandle_(nullptr),
     hwiImpl_(nullptr),
     createHwi_(nullptr),
@@ -44,7 +44,7 @@ MapperInterfaceService::MapperInterfaceService()
     }
 }
 
-MapperInterfaceService::~MapperInterfaceService()
+AllocatorService::~AllocatorService()
 {
     if (destroyHwi_ != nullptr && hwiImpl_ != nullptr) {
         destroyHwi_(hwiImpl_);
@@ -54,7 +54,7 @@ MapperInterfaceService::~MapperInterfaceService()
     }
 }
 
-int32_t MapperInterfaceService::LoadHwi()
+int32_t AllocatorService::LoadHwi()
 {
     const char *errStr = dlerror();
     if (errStr) {
@@ -76,59 +76,22 @@ int32_t MapperInterfaceService::LoadHwi()
         HDF_LOGE("error: %{public}s", errStr);
         return HDF_FAILURE;
     }
+
     return HDF_SUCCESS;
 }
 
-int32_t MapperInterfaceService::FreeMem(const sptr<NativeBuffer> &handle)
+int32_t AllocatorService::AllocMem(const AllocInfo &info, sptr<NativeBuffer> &handle)
 {
+    BufferHandle *buffer = nullptr;
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    hwiImpl_->FreeMem(*handle->Move());
+    int32_t ec = hwiImpl_->AllocMem(info, buffer);
+    if (ec == HDF_SUCCESS) {
+        CHECK_NULLPOINTER_RETURN_VALUE(buffer, HDF_FAILURE);
+    }
+    handle = new NativeBuffer();
+    CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
+    handle->SetBufferHandle(buffer, true);
     return HDF_SUCCESS;
-}
-
-int32_t MapperInterfaceService::Mmap(const sptr<NativeBuffer> &handle)
-{
-    CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    void *retPtr = hwiImpl_->Mmap(*handle->GetBufferHandle());
-    HDF_LOGD("%{public}s@%{public}d virAddr=%{public}p", __func__, __LINE__, handle->GetBufferHandle()->virAddr);
-    CHECK_NULLPOINTER_RETURN_VALUE(retPtr, HDF_FAILURE);
-    return HDF_SUCCESS;
-}
-
-int32_t MapperInterfaceService::MmapCache(const sptr<NativeBuffer> &handle)
-{
-    CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    void *retPtr = hwiImpl_->MmapCache(*handle->GetBufferHandle());
-    CHECK_NULLPOINTER_RETURN_VALUE(retPtr, HDF_FAILURE);
-    return HDF_SUCCESS;
-}
-
-int32_t MapperInterfaceService::Unmap(const sptr<NativeBuffer> &handle)
-{
-    CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->Unmap(*handle->GetBufferHandle());
-    return ec;
-}
-
-int32_t MapperInterfaceService::FlushCache(const sptr<NativeBuffer> &handle)
-{
-    CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->FlushCache(*handle->GetBufferHandle());
-    return ec;
-}
-
-int32_t MapperInterfaceService::FlushMCache(const sptr<NativeBuffer> &handle)
-{
-    CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->FlushMCache(*handle->GetBufferHandle());
-    return ec;
-}
-
-int32_t MapperInterfaceService::InvalidateCache(const sptr<NativeBuffer> &handle)
-{
-    CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
-    int32_t ec = hwiImpl_->InvalidateCache(*handle->GetBufferHandle());
-    return ec;
 }
 } // namespace V1_0
 } // namespace Buffer
