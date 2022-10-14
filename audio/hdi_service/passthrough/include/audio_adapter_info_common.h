@@ -43,7 +43,7 @@ enum AudioAdapterType {
 enum AudioAdapterType MatchAdapterType(const char *adapterName, uint32_t portId);
 struct AudioAdapterDescriptor *AudioAdapterGetConfigDescs(void);
 int32_t AudioAdapterGetAdapterNum(void);
-int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor *descs, uint32_t *size);
+int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor *descs, const uint32_t *size);
 int32_t AudioAdapterExist(const char *adapterName);
 int32_t InitPortForCapabilitySub(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex);
 int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key, void *value);
