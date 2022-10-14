@@ -44,7 +44,7 @@ ohos_shared_library("libinput_client") {
   }
   external_deps += [ "ipc:ipc_single" ]
 
-  install_images = [ vendor_base_dir ]
+  install_images = [ chipset_base_dir ]
   install_enable = true
   subsystem_name = "hidl_adapter"
   part_name = "hidl_adapter"
