@@ -24,15 +24,63 @@ extern "C" {
 /**
  * @brief Enumerates the extended codec codingtyps.
  */
-enum CodecOmxVideoExType {
+enum CodecVideoExType {
     CODEC_OMX_VIDEO_CodingHEVC = 11, /** HEVC Index in Codec HDI */
+};
+
+/**
+ * @brief Enumerates the extended HEVC profile.
+ */
+enum CodecHevcProfile {
+    CODEC_HEVC_PROFILE_INVALID = 0x0,
+    CODEC_HEVC_PROFILE_MAIN = 0x1,
+    CODEC_HEVC_PROFILE_MAIN10 = 0x2,
+    CODEC_HEVC_PROFILE_MAIN_STILL = 0x3,
+    // main_10 profile with HDR SEI support.
+    CODEC_HEVC_PROFILE_MAIN10_HDR10 = 0x1000,
+    CODEC_HEVC_PROFILE_MAIN10_HDR10_PLUS = 0x2000,
+    CODEC_HEVC_PROFILE_MAX = 0x7FFFFFFF
+};
+
+/**
+ * @brief Enumerates the extended HEVC level.
+ */
+enum CodecHevcLevel {
+    CODEC_HEVC_LEVEL_INVALID = 0x0,
+    CODEC_HEVC_MAIN_TIER_LEVEL1 = 0x1,
+    CODEC_HEVC_HIGH_TIER_LEVEL1 = 0x2,
+    CODEC_HEVC_MAIN_TIER_LEVEL2 = 0x4,
+    CODEC_HEVC_HIGH_TIER_LEVEL2 = 0x8,
+    CODEC_HEVC_MAIN_TIER_LEVEL21 = 0x10,
+    CODEC_HEVC_HIGH_TIER_LEVEL21 = 0x20,
+    CODEC_HEVC_MAIN_TIER_LEVEL3 = 0x40,
+    CODEC_HEVC_HIGH_TIER_LEVEL3 = 0x80,
+    CODEC_HEVC_MAIN_TIER_LEVEL31 = 0x100,
+    CODEC_HEVC_HIGH_TIER_LEVEL31 = 0x200,
+    CODEC_HEVC_MAIN_TIER_LEVEL4 = 0x400,
+    CODEC_HEVC_HIGH_TIER_LEVEL4 = 0x800,
+    CODEC_HEVC_MAIN_TIER_LEVEL41 = 0x1000,
+    CODEC_HEVC_HIGH_TIER_LEVEL41 = 0x2000,
+    CODEC_HEVC_MAIN_TIER_LEVEL5 = 0x4000,
+    CODEC_HEVC_HIGH_TIER_LEVEL5 = 0x8000,
+    CODEC_HEVC_MAIN_TIER_LEVEL51 = 0x10000,
+    CODEC_HEVC_HIGH_TIER_LEVEL51 = 0x20000,
+    CODEC_HEVC_MAIN_TIER_LEVEL52 = 0x40000,
+    CODEC_HEVC_HIGH_TIER_LEVEL52 = 0x80000,
+    CODEC_HEVC_MAIN_TIER_LEVEL6 = 0x100000,
+    CODEC_HEVC_HIGH_TIER_LEVEL6 = 0x200000,
+    CODEC_HEVC_MAIN_TIER_LEVEL61 = 0x400000,
+    CODEC_HEVC_HIGH_TIER_LEVEL61 = 0x800000,
+    CODEC_HEVC_MAIN_TIER_LEVEL62 = 0x1000000,
+    CODEC_HEVC_HIGH_TIER_LEVEL62 = 0x2000000,
+    CODEC_HEVC_HIGH_TIER_MAX = 0x7FFFFFFF
 };
 
 /**
  * @brief Enumerates the extended codec color format.
  */
-enum CodecOmxColorFormatExt {
-    CODEC_OMX_COLOR_FORMAT_RGBA8888 = OMX_COLOR_FormatVendorStartUnused + 100,
+enum CodecColorFormatExt {
+    CODEC_COLOR_FORMAT_RGBA8888 = OMX_COLOR_FormatVendorStartUnused + 100,
 };
 
 /**
@@ -131,7 +179,24 @@ enum OmxIndexCodecExType {
     OMX_IndexParamControlRateConstantQuality,
     /** PassthroughParam */
     OMX_IndexParamPassthrough,
+    /** OMX_IndexParamVideoHevc */
+    OMX_IndexParamVideoHevc,
 };
+
+/**
+ * @brief Structure for controlling HEVC video encoding
+ */
+struct CodecVideoParamHevc {
+    uint32_t size;                        /** Size of the structure */
+    union OMX_VERSIONTYPE version;        /** Component version */
+    uint32_t portIndex;                   /** Port index */
+    enum CodecHevcProfile profile;        /** Hevc profile. For details,  see {@link CodecHevcProfile}. */
+    enum CodecHevcLevel level;            /** Hevc level. For details,  see {@link CodecHevcLevel}. */
+    uint32_t keyFrameInterval;            /** Distance between consecutive I-frames (including one of the I frams).
+                                              0 means interval is unspecified and can be freely chosen by the codec.
+                                              1 means a stream of only I frams. other  means the real value. */
+};
+
 #ifdef __cplusplus
 #if __cplusplus
 }
