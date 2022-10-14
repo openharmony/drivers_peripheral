@@ -105,7 +105,7 @@ int32_t LayerInitialize(LayerFuncs **funcs)
 {
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((funcs == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("funcs is nullptr"));
-    LayerFuncs *lFunc = (LayerFuncs *)calloc(1, sizeof(LayerFuncs));
+    LayerFuncs *lFunc = reinterpret_cast<LayerFuncs *>(calloc(1, sizeof(LayerFuncs)));
     if (lFunc == nullptr) {
         DISPLAY_LOGE("can not calloc LayerFuncs");
         return DISPLAY_FAILURE;
