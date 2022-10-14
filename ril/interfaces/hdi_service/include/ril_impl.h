@@ -82,7 +82,8 @@ public:
         const DataLinkBandwidthReportingRule &dataLinkBandwidthReportingRule) override;
     int32_t SetDataPermitted(int32_t slotId, int32_t serialId, int32_t dataPermitted) override;
     int32_t SetDataProfileInfo(int32_t slotId, int32_t serialId, const DataProfilesInfo &dataProfilesInfo) override;
-    int32_t SendDataPerformanceMode(int32_t slotId, int32_t serialId, const DataPerformanceInfo &dataPerformanceInfo) override;
+    int32_t SendDataPerformanceMode(int32_t slotId, int32_t serialId,
+        const DataPerformanceInfo &dataPerformanceInfo) override;
     int32_t SendDataSleepMode(int32_t slotId, int32_t serialId, const DataSleepInfo &dataSleepInfo) override;
 
     int32_t SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst) override;

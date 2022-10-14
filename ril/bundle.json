@@ -18,9 +18,13 @@
     "ram": "1MB",
     "deps": {
       "components": [
+        "c_utils",
+        "drivers_interface_power",
+        "drivers_interface_ril",
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "ipc"
+        "ipc",
+        "ril_adapter"
       ]
     },
     "build": {
