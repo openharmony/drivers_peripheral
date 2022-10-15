@@ -170,18 +170,18 @@ int32_t WlanInterfaceGetAsscociatedStas(struct IWlanInterface *self, const struc
         return HDF_FAILURE;
     }
 
-    struct StaInfo *wifiStaInfo = (struct StaInfo *)OsalMemCalloc(sizeof(struct StaInfo));
+    struct StaInfo *wifiStaInfo = (struct StaInfo *)OsalMemCalloc(sizeof(struct StaInfo) * (*staInfoLen));
     if (wifiStaInfo == NULL) {
         HDF_LOGE("%{public}s:OsalMemCalloc failed!", __func__);
         return HDF_FAILURE;
     }
-    ret = g_apFeature->getAsscociatedStas(g_apFeature, wifiStaInfo, sizeof(struct StaInfo), num);
+    ret = g_apFeature->getAsscociatedStas(g_apFeature, wifiStaInfo, *staInfoLen, num);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s get associated sta failed!, error code: %{public}d", __func__, ret);
         OsalMemFree(wifiStaInfo);
         return ret;
     }
-    for (uint32_t i = 0; i < *staInfoLen; i++) {
+    for (uint32_t i = 0; i < (*num); i++) {
         staInfo[i].mac = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * ETH_ADDR_LEN);
         if (staInfo[i].mac != NULL) {
             if (memcpy_s(staInfo[i].mac, WIFI_MAC_ADDR_LENGTH, wifiStaInfo[i].mac, WIFI_MAC_ADDR_LENGTH) != EOK) {
@@ -196,80 +196,78 @@ int32_t WlanInterfaceGetAsscociatedStas(struct IWlanInterface *self, const struc
     return ret;
 }
 
+static int32_t GetBasefeature(const struct HdfFeatureInfo *ifeature, struct IWiFiBaseFeature **baseFeature)
+{
+    if (ifeature == NULL || baseFeature == NULL) {
+        HDF_LOGE("%{public}s ifeature or baseFeature is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (ifeature->type == PROTOCOL_80211_IFTYPE_AP) {
+        if (g_apFeature == NULL) {
+            HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
+            return HDF_FAILURE;
+        }
+        *baseFeature = &(g_apFeature->baseFeature);
+    } else if (ifeature->type == PROTOCOL_80211_IFTYPE_STATION) {
+        if (g_staFeature == NULL) {
+            HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+            return HDF_FAILURE;
+        }
+        *baseFeature = &(g_staFeature->baseFeature);
+    } else {
+        HDF_LOGE("%{public}s: wlan type is Invalid, featureType is %{public}d", __func__, ifeature->type);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t WlanInterfaceGetChipId(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature, uint8_t *chipId)
 {
     int32_t ret = HDF_FAILURE;
+    struct IWiFiBaseFeature *baseFeature = NULL;
 
     (void)self;
     if (ifeature == NULL || ifeature->ifName == NULL || chipId == NULL) {
         HDF_LOGE("%{public}s ifeature or ifName is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (ifeature->type == PROTOCOL_80211_IFTYPE_AP) {
-        if (g_apFeature == NULL) {
-            HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
-            return HDF_FAILURE;
-        }
-        ret = strcpy_s((g_apFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
-            return HDF_FAILURE;
-        }
-        ret = g_apFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)g_apFeature, chipId);
-    } else if (ifeature->type == PROTOCOL_80211_IFTYPE_STATION) {
-        if (g_staFeature == NULL) {
-            HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
-            return HDF_FAILURE;
-        }
-        ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
-            return HDF_FAILURE;
-        }
-        ret = g_staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)g_staFeature, chipId);
-    } else {
-        HDF_LOGE("%{public}s: wlan type is Invalid, featureType is %{public}d", __func__, ifeature->type);
+    ret = GetBasefeature(ifeature, &baseFeature);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s GetBasefeature failed!", __func__);
+        return HDF_FAILURE;
     }
-    return ret;
+    ret = strcpy_s(baseFeature->ifName, IFNAMSIZ, ifeature->ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+
+    return baseFeature->getChipId(baseFeature, chipId);
 }
 
 int32_t WlanInterfaceGetDeviceMacAddress(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature,
     uint8_t *mac, uint32_t *macLen, uint8_t len)
 {
     int32_t ret = HDF_FAILURE;
+    struct IWiFiBaseFeature *baseFeature = NULL;
 
     (void)self;
     if (ifeature == NULL || ifeature->ifName == NULL || mac == NULL || macLen == NULL) {
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (ifeature->type == PROTOCOL_80211_IFTYPE_AP) {
-        if (g_apFeature == NULL) {
-            HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
-            return HDF_FAILURE;
-        }
-        ret = strcpy_s((g_apFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
-            return HDF_FAILURE;
-        }
-        ret = g_apFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)g_apFeature, mac, len);
-        *macLen = ETH_ADDR_LEN;
-    } else if (ifeature->type == PROTOCOL_80211_IFTYPE_STATION) {
-        if (g_staFeature == NULL) {
-            HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
-            return HDF_FAILURE;
-        }
-        ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
-            return HDF_FAILURE;
-        }
-        ret = g_staFeature->baseFeature.getDeviceMacAddress((struct IWiFiBaseFeature *)g_staFeature, mac, len);
-        *macLen = ETH_ADDR_LEN;
-    } else {
-        HDF_LOGE("%{public}s: wlan type is invalid, featureType is %{public}d", __func__, ifeature->type);
+    ret = GetBasefeature(ifeature, &baseFeature);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s GetBasefeature failed!", __func__);
+        return HDF_FAILURE;
     }
+    ret = strcpy_s(baseFeature->ifName, IFNAMSIZ, ifeature->ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    ret = baseFeature->getDeviceMacAddress(baseFeature, mac, len);
+    *macLen = ETH_ADDR_LEN;
     return ret;
 }
 
@@ -306,16 +304,21 @@ int32_t WlanInterfaceGetFeatureType(struct IWlanInterface *self, const struct Hd
     int32_t *featureType)
 {
     (void)self;
+    int32_t ret;
+    int32_t type;
+    struct IWiFiBaseFeature *baseFeature = NULL;
+
     if (ifeature == NULL || featureType == NULL) {
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_apFeature == NULL) {
-        HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
+    ret = GetBasefeature(ifeature, &baseFeature);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s GetBasefeature failed!", __func__);
         return HDF_FAILURE;
     }
-    g_apFeature->baseFeature.type = ifeature->type;
-    int32_t type = g_apFeature->baseFeature.getFeatureType(&g_apFeature->baseFeature);
+    baseFeature->type = ifeature->type;
+    type = baseFeature->getFeatureType(baseFeature);
     *featureType = type;
     return HDF_SUCCESS;
 }
@@ -324,27 +327,25 @@ int32_t WlanInterfaceGetFreqsWithBand(struct IWlanInterface *self, const struct 
     const struct HdfWifiInfo *wifiInfo, int32_t *freq, uint32_t *freqLen)
 {
     int32_t ret;
+    struct IWiFiBaseFeature *baseFeature = NULL;
 
     (void)self;
     if (ifeature == NULL || ifeature->ifName == NULL || freq == NULL || freqLen == NULL || wifiInfo == NULL) {
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_apFeature == NULL) {
-        HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
+    ret = GetBasefeature(ifeature, &baseFeature);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s GetBasefeature failed!", __func__);
         return HDF_FAILURE;
     }
-    ret = strcpy_s((g_apFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
+    ret = strcpy_s(baseFeature->ifName, IFNAMSIZ, ifeature->ifName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    ret = g_apFeature->baseFeature.getValidFreqsWithBand(
-        (struct IWiFiBaseFeature *)g_apFeature, wifiInfo->band, freq, wifiInfo->size, freqLen);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s get valid freqs failed!, error code: %{public}d", __func__, ret);
-    }
-    return ret;
+
+    return baseFeature->getValidFreqsWithBand(baseFeature, wifiInfo->band, freq, wifiInfo->size, freqLen);
 }
 
 int32_t WlanInterfaceGetIfNamesByChipId(struct IWlanInterface *self, uint8_t chipId, char *ifName,
@@ -358,11 +359,18 @@ int32_t WlanInterfaceGetIfNamesByChipId(struct IWlanInterface *self, uint8_t chi
         return HDF_ERR_INVALID_PARAM;
     }
     char *name = NULL;
-    if (g_staFeature == NULL) {
-        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
-        return HDF_FAILURE;
+    
+    if (g_staFeature != NULL) {
+        HDF_LOGD("%{public}s g_staFeature is not NULL!", __func__);
+        ret = g_staFeature->baseFeature.getIfNamesByChipId(chipId, &name, num);
+    } else if (g_apFeature != NULL) {
+        HDF_LOGD("%{public}s g_apFeature is not NULL!", __func__);
+        ret = g_apFeature->baseFeature.getIfNamesByChipId(chipId, &name, num);
+    } else {
+        HDF_LOGE("%{public}s: ap and sta feature is Invalid.", __func__);
+        ret = HDF_FAILURE;
     }
-    ret = g_staFeature->baseFeature.getIfNamesByChipId(chipId, &name, num);
+
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s get name failed!, error code: %{public}d", __func__, ret);
         return ret;
@@ -381,22 +389,25 @@ int32_t WlanInterfaceGetNetworkIfaceName(struct IWlanInterface *self, const stru
     char *ifName, uint32_t ifNameLen)
 {
     int32_t ret;
+    const char *name = NULL;
+    struct IWiFiBaseFeature *baseFeature = NULL;
 
     (void)self;
     if (ifeature == NULL || ifeature->ifName == NULL || ifName == NULL) {
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_apFeature == NULL) {
-        HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
-        return HDF_FAILURE;
-    }
-    ret = strcpy_s((g_apFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
+    ret = GetBasefeature(ifeature, &baseFeature);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: strcpy_s apFeature ifName is failed!", __func__);
+        HDF_LOGE("%{public}s GetBasefeature failed!", __func__);
         return HDF_FAILURE;
     }
-    const char *name = g_apFeature->baseFeature.getNetworkIfaceName(&g_apFeature->baseFeature);
+    ret = strcpy_s(baseFeature->ifName, IFNAMSIZ, ifeature->ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    name = baseFeature->getNetworkIfaceName(baseFeature);
     if (name == NULL) {
         HDF_LOGE("%{public}s get network iface name failed!", __func__);
         return HDF_FAILURE;
@@ -737,40 +748,24 @@ int32_t WlanInterfaceSetMacAddress(struct IWlanInterface *self, const struct Hdf
     const uint8_t *mac, uint32_t macLen)
 {
     int32_t ret = HDF_FAILURE;
+    struct IWiFiBaseFeature *baseFeature = NULL;
 
     (void)self;
     if (ifeature == NULL || mac == NULL || ifeature->ifName == NULL) {
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (ifeature->type == PROTOCOL_80211_IFTYPE_AP) {
-        if (g_apFeature == NULL) {
-            HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
-            return HDF_FAILURE;
-        }
-        ret = strcpy_s((g_apFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
-            return HDF_FAILURE;
-        }
-        ret = g_apFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)g_apFeature,
-            (uint8_t *)mac, ETH_ADDR_LEN);
-    } else if (ifeature->type == PROTOCOL_80211_IFTYPE_STATION) {
-        if (g_staFeature == NULL) {
-            HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
-            return HDF_FAILURE;
-        }
-        ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
-            return HDF_FAILURE;
-        }
-        ret = g_staFeature->baseFeature.setMacAddress((struct IWiFiBaseFeature *)g_staFeature,
-            (uint8_t *)mac, ETH_ADDR_LEN);
-    } else {
-        HDF_LOGE("%{public}s: wlan type is invalid, featureType is %{public}d", __func__, ifeature->type);
+    ret = GetBasefeature(ifeature, &baseFeature);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s GetBasefeature failed!", __func__);
+        return HDF_FAILURE;
     }
-    return ret;
+    ret = strcpy_s(baseFeature->ifName, IFNAMSIZ, ifeature->ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    return baseFeature->setMacAddress(baseFeature, (uint8_t *)mac, ETH_ADDR_LEN);
 }
 
 int32_t WlanInterfaceSetScanningMacAddress(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature,
@@ -800,26 +795,25 @@ int32_t WlanInterfaceSetScanningMacAddress(struct IWlanInterface *self, const st
 int32_t WlanInterfaceSetTxPower(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature, int32_t power)
 {
     int32_t ret;
+    struct IWiFiBaseFeature *baseFeature = NULL;
 
     (void)self;
     if (ifeature == NULL || ifeature->ifName == NULL) {
         HDF_LOGE("%{public}s input parameter invalid!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_apFeature == NULL) {
-        HDF_LOGE("%{public}s g_apFeature is NULL!", __func__);
+    ret = GetBasefeature(ifeature, &baseFeature);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s GetBasefeature failed!", __func__);
         return HDF_FAILURE;
     }
-    ret = strcpy_s((g_apFeature->baseFeature).ifName, IFNAMSIZ, ifeature->ifName);
+    ret = strcpy_s(baseFeature->ifName, IFNAMSIZ, ifeature->ifName);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
-    ret = g_apFeature->baseFeature.setTxPower((struct IWiFiBaseFeature *)g_apFeature, power);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s set tx power failed!, error code: %{public}d", __func__, ret);
-    }
-    return ret;
+
+    return baseFeature->setTxPower(baseFeature, power);
 }
 
 int32_t WlanInterfaceGetNetDevInfo(struct IWlanInterface *self, struct HdfNetDeviceInfoResult *netDeviceInfoResult)
