@@ -19,7 +19,8 @@
       "drivers_peripheral_audio_user_mode",
       "drivers_peripheral_audio_full_test_suite",
       "drivers_peripheral_audio_policy_config",
-      "drivers_peripheral_audio_alsa_lib"
+      "drivers_peripheral_audio_alsa_lib",
+      "drivers_peripheral_audio_rich_device"
     ],
     "syscap": [ "" ],
     "adapter_system_type": ["standard", "small"],
