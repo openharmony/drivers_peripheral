@@ -62,7 +62,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0001, TestSize.Level3)
     char property[] = "frame_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
@@ -77,7 +76,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0001, TestSize.Level3)
         Test_->streamIds = {Test_->streamId_preview};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
     }
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -92,20 +90,17 @@ HWTEST_F(DfxTest, Camera_Dfx_0010, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_getstreamoperator_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_GetStreamOperator_Timeout = " << parameter << std::endl;
         Test_->Open();
         Test_->streamOperatorCallback = std::make_shared<StreamOperatorCallback>();
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -120,12 +115,12 @@ HWTEST_F(DfxTest, Camera_Dfx_0011, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_updatesettings_timeout";
     char value[] = "on";
-    int parameter;
+    
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_UpdateSettings_Timeout = " << parameter << std::endl;
         Test_->Open();
         // Issue 3A parameters
@@ -136,7 +131,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0011, TestSize.Level3)
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         std::cout << "cameraDevice->UpdateSettings's rc " << Test_->rc << std::endl;
     }
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -151,12 +145,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0012, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_getenabledresults_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_GetEnabledResults_Timeout = " << parameter << std::endl;
         Test_->Open();
         EXPECT_EQ(true, Test_->cameraDevice != nullptr);
@@ -169,7 +162,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0012, TestSize.Level3)
         Test_->rc = Test_->cameraDevice->SetResultMode(Camera::PER_FRAME);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -184,12 +176,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0013, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_getenabledresults_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_GetEnabledResults_Timeout = " << parameter << std::endl;
         Test_->Open();
         EXPECT_EQ(true, Test_->cameraDevice != nullptr);
@@ -202,7 +193,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0013, TestSize.Level3)
         Test_->rc = Test_->cameraDevice->SetResultMode(Camera::PER_FRAME);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -217,12 +207,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0014, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_disableresult_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_DisableResult_Timeout = " << parameter << std::endl;
         Test_->Open();
         // Get the parameter tag currently supported by the device
@@ -247,7 +236,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0014, TestSize.Level3)
         Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -262,17 +250,15 @@ HWTEST_F(DfxTest, Camera_Dfx_0015, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_close_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Close_Timeout = " << parameter << std::endl;
         Test_->Open();
         Test_->Close();
     }
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -286,12 +272,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0020, TestSize.Level3) {
     int result = 0;
     char property[] = "Hdi_IsStreamsSupported_Timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX:GetProperty Hdi_IsStreamsSupported_Timeout = " << parameter << std::endl;
         // Turn on the camera
         Test_->Open();
@@ -351,12 +336,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0021, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_createstreams_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_CreateStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
         // Create and get streamOperator information
@@ -402,12 +386,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0022, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_releasestreams_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_ReleaseStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
         // Create and get streamOperator information
@@ -453,12 +436,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0023, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_commitstreams_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_CommitStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
         // Start stream
@@ -469,7 +451,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0023, TestSize.Level3)
         Test_->streamIds = {Test_->streamId_preview};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
     }
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -484,12 +465,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0024, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_attachbufferqueue_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_AttachBufferQueue_Timeout = " << parameter << std::endl;
         Test_->Open();
         Test_->streamOperatorCallback = std::make_shared<StreamOperatorCallback>();
@@ -546,12 +526,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0025, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_detachbufferqueue_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_DetachBufferQueue_Timeout = " << parameter << std::endl;
         Test_->Open();
         Test_->streamOperatorCallback = std::make_shared<StreamOperatorCallback>();
@@ -612,12 +591,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0026, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_capture_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Capture_Timeout = " << parameter << std::endl;
         Test_->Open();
         // Configure preview stream information
@@ -630,7 +608,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0026, TestSize.Level3)
         Test_->streamIds = {Test_->streamId_preview};
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
     }
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -645,12 +622,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0027, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_change_to_offlinestream_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "======[test log] DFX:GetProperty Hdi_ChangeToOfflineStream_Timeout = " << parameter << std::endl;
         Test_->Open();
         // 1. Configure two streams of information
@@ -685,7 +661,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0027, TestSize.Level3)
         sleep(5);
         Test_->StopOfflineStream(Test_->captureId_capture);
     }
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -700,12 +675,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0030, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_offline_cancelcapture_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "======[test log] DFX:GetProperty Hdi_Offline_CancelCapture_Timeout = " << parameter << std::endl;
         Test_->Open();
         // 1. Configure two streams of information
@@ -740,7 +714,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0030, TestSize.Level3)
         sleep(5);
         Test_->StopOfflineStream(Test_->captureId_capture);
     }
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -755,12 +728,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0031, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_offline_releasestreams_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "=====[test log] DFX:GetProperty Hdi_Offline_ReleaseStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
         // 1. Configure two streams of information
@@ -795,7 +767,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0031, TestSize.Level3)
         sleep(5);
         Test_->StopOfflineStream(Test_->captureId_capture);
     }
-    result = SetParameter(property, "off");
 }
 
 /**
@@ -810,12 +781,11 @@ HWTEST_F(DfxTest, Camera_Dfx_0032, TestSize.Level3)
     int result = 0;
     char property[] = "hdi_offline_release_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
-        parameter = GetParameter(property, defValue, value1, 32);
+        char value1[32] = {0};
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Offline_Release_Timeout = " << parameter << std::endl;
         Test_->Open();
         // 1. Configure two streams of information
@@ -850,7 +820,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0032, TestSize.Level3)
         sleep(5);
         Test_->StopOfflineStream(Test_->captureId_capture);
     }
-    result = SetParameter(property, "off");
 }
 #else
 /**
@@ -880,7 +849,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0001, TestSize.Level3)
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->StopConsumer(Test_->intents);
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -905,8 +873,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0010, TestSize.Level3)
         Test_->rc = Test_->cameraDevice->GetStreamOperator(Test_->streamOperatorCallback, Test_->streamOperator);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -935,7 +901,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0011, TestSize.Level3)
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
         std::cout << "cameraDevice->UpdateSettings's rc " << Test_->rc << std::endl;
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -966,7 +931,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0012, TestSize.Level3)
         Test_->rc = Test_->cameraDevice->SetResultMode(Camera::PER_FRAME);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -997,7 +961,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0013, TestSize.Level3)
         Test_->rc = Test_->cameraDevice->SetResultMode(Camera::PER_FRAME);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -1039,7 +1002,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0014, TestSize.Level3)
         Test_->rc = Test_->cameraDevice->GetEnabledResults(results);
         EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -1062,7 +1024,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0015, TestSize.Level3)
         Test_->Open();
         Test_->Close();
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -1250,7 +1211,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0023, TestSize.Level3)
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->StopConsumer(Test_->intents);
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -1406,7 +1366,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0026, TestSize.Level3)
         Test_->StopStream(Test_->captureIds, Test_->streamIds);
         Test_->StopConsumer(Test_->intents);
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -1458,7 +1417,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0027, TestSize.Level3)
         Test_->StopOfflineStream(Test_->captureId_capture);
         Test_->StopConsumer(Test_->intents);
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -1510,7 +1468,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0030, TestSize.Level3)
         Test_->StopOfflineStream(Test_->captureId_capture);
         Test_->StopConsumer(Test_->intents);
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -1563,7 +1520,6 @@ HWTEST_F(DfxTest, Camera_Dfx_0031, TestSize.Level3)
         Test_->StopOfflineStream(Test_->captureId_capture);
         Test_->StopConsumer(Test_->intents);
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 
 /**
@@ -1615,6 +1571,5 @@ HWTEST_F(DfxTest, Camera_Dfx_0032, TestSize.Level3)
         Test_->StopOfflineStream(Test_->captureId_capture);
         Test_->StopConsumer(Test_->intents);
     }
-    result = OHOS::system::SetParameter(property, "off");
 }
 #endif

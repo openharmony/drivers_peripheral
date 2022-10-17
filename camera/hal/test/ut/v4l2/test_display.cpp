@@ -281,7 +281,7 @@ OHOS::Camera::RetCode TestDisplay::FBInit()
 
 void TestDisplay::ProcessImage(const unsigned char* p, unsigned char* fbp)
 {
-    unsigned char* in = (unsigned char*)p;
+    unsigned char* in = const_cast<unsigned char*>(p);
     int width = 640; // 640:Displays the size of the width
     int height = 480; // 480:Displays the size of the height
     int istride = 1280; // 1280:Initial value of span
@@ -335,10 +335,10 @@ void TestDisplay::LcdDrawScreen(unsigned char* displayBuf_, unsigned char* addr)
 void TestDisplay::BufferCallback(void* addr, int choice)
 {
     if (choice == preview_mode) {
-        LcdDrawScreen(displayBuf_, (unsigned char*)addr);
+        LcdDrawScreen(displayBuf_, static_cast<unsigned char*>(addr));
         return;
     } else {
-        LcdDrawScreen(displayBuf_, (unsigned char*)addr);
+        LcdDrawScreen(displayBuf_, static_cast<unsigned char*>(addr));
         std::cout << "==========[test log] capture start saveYuv......" << std::endl;
         SaveYUV("capture", (unsigned char*)addr, bufSize_);
         std::cout << "==========[test log] capture end saveYuv......" << std::endl;
@@ -353,9 +353,9 @@ void TestDisplay::Init()
         deviceManager->Init();
         init_flag = 1;
     }
-    constexpr const char *DEMO_SERVICE_NAME = "camera_service";
     std::cout << "==========[test log] TestDisplay::Init()." << std::endl;
     if (cameraHost == nullptr) {
+        constexpr const char *DEMO_SERVICE_NAME = "camera_service";
         cameraHost = ICameraHost::Get(DEMO_SERVICE_NAME, false);
         std::cout << "==========[test log] Camera::CameraHost::CreateCameraHost();" << std::endl;
         if (cameraHost == nullptr) {
@@ -395,8 +395,8 @@ void TestDisplay::UsbInit()
         deviceManager->Init();
         init_flag = 1;
     }
-    constexpr const char *DEMO_SERVICE_NAME = "camera_service";
     if (cameraHost == nullptr) {
+        constexpr const char *DEMO_SERVICE_NAME = "camera_service";
         cameraHost = ICameraHost::Get(DEMO_SERVICE_NAME, false);
         if (cameraHost == nullptr) {
             std::cout << "==========[test log] CreateCameraHost failed." << std::endl;

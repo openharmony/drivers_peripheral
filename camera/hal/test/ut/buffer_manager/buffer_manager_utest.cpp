@@ -389,7 +389,7 @@ HWTEST_F(BufferManagerTest, TestTrackingBufferLoop, TestSize.Level0)
 
 namespace OHOS::CameraUtest {
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
-bool BufferManagerTest::Stream::Init(std::shared_ptr<OHOS::Surface>& producer)
+bool BufferManagerTest::Stream::Init(const std::shared_ptr<OHOS::Surface>& producer)
 {
     Camera::BufferManager* manager = Camera::BufferManager::GetInstance();
     if (manager == nullptr) {
@@ -571,7 +571,7 @@ void BufferManagerTest::Stream::EnqueueBufferNonBlock()
     std::shared_ptr<IBuffer> buffer = nullptr;
     {
         std::lock_guard<std::mutex> l(lock_);
-        for (auto& it : bufferVec_) {
+        for (const auto& it : bufferVec_) {
             if (it.first == sb) {
                 buffer = it.second;
                 break;
@@ -609,7 +609,7 @@ void BufferManagerTest::Stream::DequeueBuffer(std::shared_ptr<IBuffer>& buffer)
 #endif
         {
             std::lock_guard<std::mutex> l(lock_);
-            for (auto& it : bufferVec_) {
+            for (const auto& it : bufferVec_) {
                 if (it.second == buffer) {
                     surfaceBuffer = it.first;
                     break;

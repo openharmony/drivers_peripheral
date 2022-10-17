@@ -392,7 +392,6 @@ void CameraHostImpl::OnCameraStatus(CameraId cameraId,
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);
             }
         }
-        logicalCameraId = config->SubtractCameraId(physicalCameraIds);
     }
 }
 } // end namespace OHOS::Camera

@@ -39,7 +39,7 @@ public:
     virtual std::shared_ptr<IBuffer> GetBuffer();
     virtual RetCode PutBuffer(const std::shared_ptr<IBuffer>& buffer);
     virtual RetCode SetBufferCount(const int32_t n);
-    virtual RetCode Config(const TunnelConfig config);
+    virtual RetCode Config(const TunnelConfig& config);
     virtual uint64_t GetFrameCount() const;
     virtual void WaitForAllBufferReturned();
     virtual void NotifyStart();

@@ -42,7 +42,7 @@ HWTEST_F(OpenCameraTest, Camera_Open_0001, TestSize.Level0)
     std::cout << "==========[test log]OpenCamera, success."<< std::endl;
     Test_->service->GetCameraIds(Test_->cameraIds);
     std::cout << "==========[test log]cameraIds size = "<< Test_->cameraIds.size() << std::endl;
-    for (auto &cameraId : Test_->cameraIds) {
+    for (const auto &cameraId : Test_->cameraIds) {
         std::cout << "==========[test log]cameraId = " << cameraId << std::endl;
     }
     std::string cameraId = Test_->cameraIds.front();
