@@ -39,7 +39,7 @@ bool AudioFlushRenderFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    struct AudioRender *renderFuzz = (struct AudioRender *)data;
+    struct AudioRender *renderFuzz = reinterpret_cast<struct AudioRender *>(const_cast<uint8_t *>(data));
     ret = flushFuzzRender->control.Flush((AudioHandle)renderFuzz);
     if (ret == HDF_ERR_NOT_SUPPORT) {
         result = true;

@@ -36,7 +36,7 @@ namespace Audio {
             dlclose(ptrHandle);
             return false;
         }
-        char *bindFuzz = reinterpret_cast<char *>(*data);
+        char *bindFuzz = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
         struct DevHandle *handle = BindServiceCapture(bindFuzz);
         if (handle == nullptr) {
             result = true;

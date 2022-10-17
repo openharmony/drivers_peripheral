@@ -33,7 +33,7 @@ bool AudioGetlatencyRenderFuzzTest(const uint8_t *data, size_t size)
     }
     uint32_t latencyTime = 0;
 
-    struct AudioRender *renderFuzz = (struct AudioRender *)data;
+    struct AudioRender *renderFuzz = reinterpret_cast<struct AudioRender *>(const_cast<uint8_t *>(data));
     ret = getLatRenFuzzRender->GetLatency(renderFuzz, &latencyTime);
     if (ret == HDF_SUCCESS) {
         result = true;

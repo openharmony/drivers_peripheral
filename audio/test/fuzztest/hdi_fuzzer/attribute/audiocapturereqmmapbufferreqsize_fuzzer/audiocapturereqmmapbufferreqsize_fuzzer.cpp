@@ -57,7 +57,7 @@ namespace Audio {
             HDF_LOGE("%{public}s: InitMmapDesc failed \n", __func__);
             return false;
         }
-        reqSize = *(int32_t *)data;
+        reqSize = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data)));
         ret = reqSizeFuzzCapture->attr.ReqMmapBuffer((AudioHandle)reqSizeFuzzCapture, reqSize, &desc);
         if (ret == HDF_SUCCESS) {
             (void)munmap(desc.memoryAddress, reqSize);

@@ -32,7 +32,7 @@ bool AudioSetvolumeCaptureFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    struct AudioCapture *handle = (struct AudioCapture *)data;
+    struct AudioCapture *handle = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
     ret = setVolCapCapture->volume.SetVolume(handle, volume);
     if (ret == HDF_SUCCESS) {
         result = true;

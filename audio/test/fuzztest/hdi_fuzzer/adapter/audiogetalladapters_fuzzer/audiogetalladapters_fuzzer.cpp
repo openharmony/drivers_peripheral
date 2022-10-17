@@ -30,7 +30,7 @@ bool AudioGetalladaptersFuzzTest(const uint8_t *data, size_t size)
     struct AudioAdapterDescriptor *descs = nullptr;
     int sizeone = 0;
 
-    TestAudioManager *managerFuzz = (TestAudioManager *)data;
+    TestAudioManager *managerFuzz = reinterpret_cast<TestAudioManager *>(const_cast<uint8_t *>(data));
     ret = getAllFuzzManager->GetAllAdapters(managerFuzz, &descs, &sizeone);
     if (ret == HDF_SUCCESS) {
         result = true;

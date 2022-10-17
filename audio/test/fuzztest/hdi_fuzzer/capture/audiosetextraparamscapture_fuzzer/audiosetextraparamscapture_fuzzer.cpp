@@ -31,7 +31,7 @@ bool AudioSetextraparamsCaptureFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
-    struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
+    struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
     ret = setExtFuzzCapture->attr.SetExtraParams(captureFuzz, keyValueList);
     if (ret == HDF_SUCCESS) {
         result = true;
