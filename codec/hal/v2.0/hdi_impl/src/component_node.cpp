@@ -32,7 +32,7 @@ namespace Omx {
 OMX_ERRORTYPE ComponentNode::OnEvent(OMX_HANDLETYPE component, void *appData, OMX_EVENTTYPE event, uint32_t data1,
                                      uint32_t data2, void *eventData)
 {
-    ComponentNode *node = (ComponentNode *)appData;
+    ComponentNode *node = static_cast<ComponentNode *>(appData);
     (void)component;
     if (node != nullptr) {
         node->OnEvent(event, data1, data2, eventData);
@@ -43,7 +43,7 @@ OMX_ERRORTYPE ComponentNode::OnEvent(OMX_HANDLETYPE component, void *appData, OM
 
 OMX_ERRORTYPE ComponentNode::OnEmptyBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer)
 {
-    ComponentNode *node = (ComponentNode *)appData;
+    ComponentNode *node = static_cast<ComponentNode *>(appData);
     (void)component;
     if (node != nullptr) {
         node->OnEmptyBufferDone(buffer);
@@ -53,7 +53,7 @@ OMX_ERRORTYPE ComponentNode::OnEmptyBufferDone(OMX_HANDLETYPE component, void *a
 
 OMX_ERRORTYPE ComponentNode::OnFillBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer)
 {
-    ComponentNode *node = (ComponentNode *)appData;
+    ComponentNode *node = static_cast<ComponentNode *>(appData);
     (void)component;
     if (node != nullptr) {
         node->OnFillBufferDone(buffer);
@@ -317,9 +317,9 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, struct OmxCodecBuffer &buff
     }
     OMX_BUFFERHEADERTYPE *bufferHdrType = nullptr;
     if (buffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
-        err = OMX_AllocateBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, buffer.allocLen);
+        err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen);
     } else {
-        err = OMX_UseBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, buffer.allocLen,
+        err = OMX_UseBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen,
                             codecBuffer->GetBuffer());
     }
 
@@ -345,7 +345,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer 
         return OMX_ErrorInvalidComponent;
     }
     OMX_BUFFERHEADERTYPE *bufferHdrType = 0;
-    int32_t err = OMX_AllocateBuffer((OMX_HANDLETYPE)comp_, &bufferHdrType, portIndex, 0, buffer.allocLen);
+    int32_t err = OMX_AllocateBuffer(static_cast<OMX_HANDLETYPE>(comp_), &bufferHdrType, portIndex, 0, buffer.allocLen);
     if (err != OMX_ErrorNone) {
         HDF_LOGE("%{public}s ,OMX_AllocateBuffer error, err = %{public}x", __func__, err);
         return err;
@@ -355,7 +355,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer 
     sptr<ICodecBuffer> codecBuffer = ICodecBuffer::AllocateCodecBuffer(buffer);
     if (codecBuffer == nullptr) {
         HDF_LOGE("%{public}s error, comp_ is null", __func__);
-        (void)OMX_FreeBuffer((OMX_HANDLETYPE)comp_, portIndex, bufferHdrType);
+        (void)OMX_FreeBuffer(static_cast<OMX_HANDLETYPE>(comp_), portIndex, bufferHdrType);
         return OMX_ErrorInvalidComponent;
     }
 
@@ -381,7 +381,7 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, struct OmxCodecBuffer &buf
         return err;
     }
 
-    err = OMX_FreeBuffer((OMX_HANDLETYPE)comp_, portIndex, bufferHdrType);
+    err = OMX_FreeBuffer(static_cast<OMX_HANDLETYPE>(comp_), portIndex, bufferHdrType);
     if (err != OMX_ErrorNone) {
         HDF_LOGE("%{public}s error, OMX_FreeBuffer err [%{public}x]", __func__, err);
         return err;
@@ -424,7 +424,7 @@ int32_t ComponentNode::EmptyThisBuffer(struct OmxCodecBuffer &buffer)
         return err;
     }
 
-    err = OMX_EmptyThisBuffer((OMX_HANDLETYPE)comp_, bufferHdrType);
+    err = OMX_EmptyThisBuffer(static_cast<OMX_HANDLETYPE>(comp_), bufferHdrType);
     return err;
 }
 
@@ -448,7 +448,7 @@ int32_t ComponentNode::FillThisBuffer(struct OmxCodecBuffer &buffer)
         return err;
     }
 
-    err = OMX_FillThisBuffer((OMX_HANDLETYPE)comp_, bufferHdrType);
+    err = OMX_FillThisBuffer(static_cast<OMX_HANDLETYPE>(comp_), bufferHdrType);
     return err;
 }
 
