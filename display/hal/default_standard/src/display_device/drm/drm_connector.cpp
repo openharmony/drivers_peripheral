@@ -99,7 +99,7 @@ int32_t DrmConnector::Init(DrmDevice &drmDevice)
     return DISPLAY_SUCCESS;
 }
 
-int32_t DrmConnector::GetBrightness(uint32_t &level)
+int32_t DrmConnector::GetBrightness(uint32_t &level) const
 {
     if (mPropBrightnessId == DRM_INVALID_ID) {
         DISPLAY_LOGE("the prop id of brightness is invalid");

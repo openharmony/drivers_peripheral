@@ -59,7 +59,7 @@ int32_t HdiTestDisplay::Init()
     return DISPLAY_SUCCESS;
 }
 
-int32_t HdiTestDisplay::GetModeInfoFromId(int32_t id, DisplayModeInfo &modeInfo)
+int32_t HdiTestDisplay::GetModeInfoFromId(int32_t id, DisplayModeInfo &modeInfo) const
 {
     DISPLAY_TEST_LOGD();
     for (const auto &mode : mModes) {
