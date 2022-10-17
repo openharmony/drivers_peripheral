@@ -32,7 +32,7 @@ bool AudioSetextraparamsCaptureKeyvaluelistFuzzTest(const uint8_t *data, size_t 
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartCapture failed \n", __func__);
         return false;
     }
-    char *keyValueListFuzz = (char *)data;
+    char *keyValueListFuzz = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
     ret = capKeyValueFuzzCapture->attr.SetExtraParams(capKeyValueFuzzCapture, keyValueListFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;

@@ -30,7 +30,7 @@ bool AudioSetextraparamsRenderKeyvaluelistFuzzTest(const uint8_t *data, size_t s
         HDF_LOGE("%{public}s: AudioGetManagerCreateStartRender failed \n", __func__);
         return false;
     }
-    char *keyValueListFuzz = (char *)data;
+    char *keyValueListFuzz = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
     ret = renKeyValueRender->attr.SetExtraParams(renKeyValueRender, keyValueListFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;

@@ -31,7 +31,7 @@ bool AudioPauseRenderFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    struct AudioRender *renderFuzz = (struct AudioRender *)data;
+    struct AudioRender *renderFuzz = reinterpret_cast<struct AudioRender *>(const_cast<uint8_t *>(data));
     ret = pauseFuzzRender->control.Pause((AudioHandle)renderFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;

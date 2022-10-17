@@ -43,8 +43,8 @@ namespace Audio {
             dlclose(ctlRenFuzzPtrHandle);
             return false;
         }
-        InterfaceLibCtlRender = (int32_t (*)(struct DevHandle *, int,
-            struct AudioHwRenderParam *))dlsym(ctlRenFuzzPtrHandle, "AudioInterfaceLibCtlRender");
+        InterfaceLibCtlRender = reinterpret_cast<int32_t (*)(struct DevHandle *, int,
+            struct AudioHwRenderParam *)>(dlsym(ctlRenFuzzPtrHandle, "AudioInterfaceLibCtlRender"));
         if (InterfaceLibCtlRender == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioInterfaceLibCtlRender failed \n", __func__);
             dlclose(ctlRenFuzzPtrHandle);
@@ -53,7 +53,7 @@ namespace Audio {
         struct AudioHwRender *hwRender = nullptr;
         int32_t ret = BindServiceAndHwRender(hwRender);
         hwRender->renderParam.renderMode.hwInfo.card = AUDIO_SERVICE_IN;
-        int32_t cmdId = *(reinterpret_cast<int32_t *>(*data));
+        int32_t cmdId = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data)));
         ret = InterfaceLibCtlRender(handle, cmdId, &hwRender->renderParam);
         if (ret == HDF_SUCCESS) {
             result = true;
