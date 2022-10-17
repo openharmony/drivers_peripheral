@@ -35,7 +35,7 @@ namespace Omx {
 OMX_ERRORTYPE ComponentNode::OnEvent(OMX_HANDLETYPE component, void *appData, OMX_EVENTTYPE event, uint32_t data1,
                                      uint32_t data2, void *eventData)
 {
-    ComponentNode *node = (ComponentNode *)appData;
+    ComponentNode *node = static_cast<ComponentNode *>(appData);
     (void)component;
     if (node != nullptr) {
         node->OnEvent(event, data1, data2, eventData);
@@ -45,7 +45,7 @@ OMX_ERRORTYPE ComponentNode::OnEvent(OMX_HANDLETYPE component, void *appData, OM
 
 OMX_ERRORTYPE ComponentNode::OnEmptyBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer)
 {
-    ComponentNode *node = (ComponentNode *)appData;
+    ComponentNode *node = static_cast<ComponentNode *>(appData);
     (void)component;
     if (node != nullptr) {
         node->OnEmptyBufferDone(buffer);
@@ -55,7 +55,7 @@ OMX_ERRORTYPE ComponentNode::OnEmptyBufferDone(OMX_HANDLETYPE component, void *a
 
 OMX_ERRORTYPE ComponentNode::OnFillBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer)
 {
-    ComponentNode *node = (ComponentNode *)appData;
+    ComponentNode *node = static_cast<ComponentNode *>(appData);
     (void)component;
     if (node != nullptr) {
         node->OnFillBufferDone(buffer);
