@@ -96,7 +96,7 @@ public:
     pthread_t previewThreadId_;
     std::mutex readyFrameLock_;
 
-    int fbFd_, readIndex_;
+    int fbFd_ = 0, readIndex_ = 0;
     struct fb_var_screeninfo vinfo_;
     struct fb_fix_screeninfo finfo_;
     
@@ -139,7 +139,7 @@ public:
     };
     CamRetCode rc;
     int init_flag = 0;
-    bool status;
+    bool status = false;
 
 public:
     TestDisplay();
