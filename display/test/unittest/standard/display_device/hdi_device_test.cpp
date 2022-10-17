@@ -334,7 +334,7 @@ void DeviceLayerDisplay::TearDown()
     HdiTestDevice::GetInstance().Clear();
 }
 
-void VblankCtr::NotifyVblank(unsigned int sequence, uint64_t ns, const void *data)
+void VblankCtr::NotifyVblank(unsigned int sequence, uint64_t ns, void *data)
 {
     DISPLAY_TEST_LOGD();
     if (data != nullptr) {
