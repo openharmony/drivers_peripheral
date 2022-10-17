@@ -33,7 +33,7 @@ public:
 private:
     static void CreateFile(const std::string& path, const std::string& content) ;
     static void InitDevicePah(std::string& path);
-    void InitDefaultSysfs() const;
+    static void InitDefaultSysfs();
     static void TraversalBacklightNode();
     bool screenOn_ = false;
 };
