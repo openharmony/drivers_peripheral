@@ -58,7 +58,7 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
             OsalMSleep(USB_IO_SLEEP_MS_TIME);
             continue;
         }
-    
+
         /* Get a request from curretn submit queue */
         ret = UsbIoGetRequest(&interfacePool->submitRequestQueue, &submitRequest);
 
