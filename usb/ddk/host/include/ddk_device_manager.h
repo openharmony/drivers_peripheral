@@ -22,7 +22,7 @@ extern "C" {
 #endif
 #define USB_PNP_NOTIFY_SERVICE_NAME "hdf_usb_pnp_notify_service"
 typedef int32_t (*DdkDevMgrHandleDev)(const struct UsbPnpNotifyMatchInfoTable *device, void *priv);
-
+typedef int32_t (*DdkDevMgrHandleGadget)(void *priv);
 /*
  * Init methed must be called before all other metheds
  * Success return 0, otherwise return non-zero
@@ -31,6 +31,7 @@ int32_t DdkDevMgrInit(void);
 const struct UsbPnpNotifyMatchInfoTable *DdkDevMgrCreateDevice(const char *deviceDir);
 int32_t DdkDevMgrRemoveDevice(int32_t busNum, int32_t devNum, struct UsbPnpNotifyMatchInfoTable *info);
 int32_t DdkDevMgrForEachDeviceSafe(DdkDevMgrHandleDev handle, void *priv);
+int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *priv);
 #ifdef __cplusplus
 }
 #endif
