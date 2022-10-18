@@ -98,6 +98,17 @@ static int32_t DdkListenerMgrNotifyOne(const struct UsbPnpNotifyMatchInfoTable *
     return ret;
 }
 
+static int32_t DdkListenerMgrNotifyGadgetOne(void *priv)
+{
+    struct UsbDdkDeviceHanldePriv *handlePriv = (struct UsbDdkDeviceHanldePriv *)priv;
+    const struct HdfDevEventlistener *listener = handlePriv->listener;
+    if (listener->callBack(listener->priv, handlePriv->cmd, NULL) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:callback failed", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
 void DdkListenerMgrNotifyAll(const struct UsbPnpNotifyMatchInfoTable *device, enum UsbPnpNotifyServiceCmd cmd)
 {
     OsalMutexLock(&g_ddkListenerList.listMutex);
@@ -129,15 +140,25 @@ int32_t DdkListenerMgrAdd(struct HdfDevEventlistener *listener)
 
     // notify all device to listener
     struct UsbDdkDeviceHanldePriv handlePriv = {.listener = listener, .cmd = USB_PNP_NOTIFY_ADD_DEVICE};
+    struct UsbDdkDeviceHanldePriv handlePriv1 = {.listener = listener, .cmd = USB_PNP_DRIVER_GADGET_ADD};
     if (DdkListenerMgrIsExists(listener)) {
         HDF_LOGW("%{public}s: add listener repeatedly", __func__);
-        return DdkDevMgrForEachDeviceSafe(DdkListenerMgrNotifyOne, (void *)&handlePriv);
+    } else {
+        OsalMutexLock(&g_ddkListenerList.listMutex);
+        DListInsertTail(&listener->listNode, &g_ddkListenerList.listenerList);
+        OsalMutexUnlock(&g_ddkListenerList.listMutex);
     }
-
-    OsalMutexLock(&g_ddkListenerList.listMutex);
-    DListInsertTail(&listener->listNode, &g_ddkListenerList.listenerList);
-    OsalMutexUnlock(&g_ddkListenerList.listMutex);
-    return DdkDevMgrForEachDeviceSafe(DdkListenerMgrNotifyOne, (void *)&handlePriv);
+    int32_t ret = DdkDevMgrForEachDeviceSafe(DdkListenerMgrNotifyOne, (void *)&handlePriv);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:DdkDevMgrForEachDeviceSafe failed", __func__);
+        return ret;
+    }
+    ret = DdkDevMgrGetGadgetLinkStatusSafe(DdkListenerMgrNotifyGadgetOne, (void *)&handlePriv1);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:DdkDevMgrGetGadgetLinkStatusSafe failed", __func__);
+        return ret;
+    }
+    return ret;
 }
 
 int32_t DdkListenerMgrRemove(struct HdfDevEventlistener *listener)
