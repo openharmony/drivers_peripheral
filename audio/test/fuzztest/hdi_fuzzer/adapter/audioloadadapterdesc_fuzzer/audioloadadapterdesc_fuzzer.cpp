@@ -29,19 +29,16 @@ bool AudioLoadadapterDescFuzzTest(const uint8_t *data, size_t size)
         HDF_LOGE("%{public}s: GetManager failed \n", __func__);
         return false;
     }
-
-    struct AudioPort port = {};
-    int32_t portCopySize = sizeof(port) > size ? size : sizeof(port);
-    if (memcpy_s((void *)&port, sizeof(port), data, portCopySize) != 0) {
-        return false;
-    }
-
-    struct AudioAdapterDescriptor descFuzz = {};
-    int32_t copySize = sizeof(descFuzz) > size ? size : sizeof(descFuzz);
-    if (memcpy_s((void *)&descFuzz, sizeof(descFuzz), data, copySize) != 0) {
-        return false;
-    }
-    descFuzz.ports = &port;
+    uint8_t *dataFuzz = const_cast<uint8_t *>(data);
+    struct AudioPort portFuzz = {
+        .dir = *(reinterpret_cast<AudioPortDirection *>(dataFuzz)),
+        .portId = *(reinterpret_cast<uint32_t *>(dataFuzz)),
+        .portName = reinterpret_cast<char *>(dataFuzz),
+    };
+    struct AudioAdapterDescriptor descFuzz = {
+        .adapterName = reinterpret_cast<char *>(dataFuzz),
+        .ports = &portFuzz,
+    };
     struct AudioAdapter *adapter = nullptr;
     ret = loadAdapterFuzzManager->LoadAdapter(loadAdapterFuzzManager, &descFuzz, &adapter);
     if (ret == HDF_SUCCESS) {
