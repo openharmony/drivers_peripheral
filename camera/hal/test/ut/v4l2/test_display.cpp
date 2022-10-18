@@ -39,7 +39,7 @@ uint64_t TestDisplay::GetCurrentLocalTimeStamp()
     return tmp.count();
 }
 
-void TestDisplay::StoreImage(const void *bufStart, const uint32_t size) const
+void TestDisplay::StoreImage(const unsigned char *bufStart, const uint32_t size) const
 {
     constexpr uint32_t pathLen = 64;
     char path[pathLen] = {0};
@@ -75,7 +75,7 @@ void TestDisplay::StoreImage(const void *bufStart, const uint32_t size) const
     close(imgFD);
 }
 
-void TestDisplay::StoreVideo(const void *bufStart, const uint32_t size) const
+void TestDisplay::StoreVideo(const unsigned char *bufStart, const uint32_t size) const
 {
     int ret = 0;
 
@@ -112,9 +112,9 @@ void TestDisplay::CloseFd()
     videoFd_ = -1;
 }
 
-void TestDisplay::PrintFaceDetectInfo(const void *bufStart, const uint32_t size) const
+void TestDisplay::PrintFaceDetectInfo(const unsigned char *bufStart, const uint32_t size) const
 {
-    common_metadata_header_t* data = static_cast<common_metadata_header_t*>((const_cast<void*>(bufStart)));
+    common_metadata_header_t* data = reinterpret_cast<common_metadata_header_t*>((const_cast<unsigned char*>(bufStart)));
     camera_metadata_item_t entry;
     int ret = 0;
     ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_DETECT_SWITCH, &entry);
@@ -192,21 +192,21 @@ int32_t TestDisplay::SaveYUV(char* type, unsigned char* buffer, int32_t size)
 
 int TestDisplay::DoFbMunmap(unsigned char* addr)
 {
-    int rc;
+    int ret;
     unsigned int size = vinfo_.xres * vinfo_.yres * vinfo_.bits_per_pixel / 8; // 8:picture size;
     CAMERA_LOGI("main test:munmapped size = %d, virt_addr = 0x%p\n", size, addr);
-    rc = (munmap(addr, finfo_.smem_len));
-    return rc;
+    ret = (munmap(addr, finfo_.smem_len));
+    return ret;
 }
 
 unsigned char* TestDisplay::DoFbMmap(int* pmemfd)
 {
     unsigned char* ret;
     int screensize = vinfo_.xres * vinfo_.yres * vinfo_.bits_per_pixel / 8; // 8:picture size
-    ret = (unsigned char*)mmap(NULL, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, *pmemfd, 0);
+    ret = (unsigned char*)mmap(nullptr, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, *pmemfd, 0);
     if (ret == MAP_FAILED) {
         CAMERA_LOGE("main test:do_mmap: pmem mmap() failed: %s (%d)\n", strerror(errno), errno);
-        return NULL;
+        return nullptr;
     }
     CAMERA_LOGI("main test:do_mmap: pmem mmap fd %d ptr %p len %u\n", *pmemfd, ret, screensize);
     return ret;
@@ -271,7 +271,7 @@ OHOS::Camera::RetCode TestDisplay::FBInit()
 
     CAMERA_LOGI("main test:allocating display buffer memory\n");
     displayBuf_ = DoFbMmap(&fbFd_);
-    if (displayBuf_ == NULL) {
+    if (displayBuf_ == nullptr) {
         CAMERA_LOGE("main test:error displayBuf_ mmap error\n");
         close(fbFd_);
         return RC_ERROR;
@@ -279,9 +279,9 @@ OHOS::Camera::RetCode TestDisplay::FBInit()
     return RC_OK;
 }
 
-void TestDisplay::ProcessImage(const unsigned char* p, unsigned char* fbp)
+void TestDisplay::ProcessImage(unsigned char* p, unsigned char* fbp)
 {
-    unsigned char* in = const_cast<unsigned char*>(p);
+    unsigned char* in = p;
     int width = 640; // 640:Displays the size of the width
     int height = 480; // 480:Displays the size of the height
     int istride = 1280; // 1280:Initial value of span
@@ -290,20 +290,20 @@ void TestDisplay::ProcessImage(const unsigned char* p, unsigned char* fbp)
     int32_t location = 0;
     int xpos = (vinfo_.xres - width) / 2;
     int ypos = (vinfo_.yres - height) / 2;
-    int y_pos, u_pos, v_pos;
+    int yPos, uPos, vPos;
 
-    y_pos = 0; // 0:Pixel initial value
-    u_pos = 1; // 1:Pixel initial value
-    v_pos = 3; // 3:Pixel initial value
+    yPos = 0; // 0:Pixel initial value
+    uPos = 1; // 1:Pixel initial value
+    vPos = 3; // 3:Pixel initial value
 
     for (y = ypos; y < (height + ypos); y++) {
         for (j = 0, x = xpos; j < width; j++, x++) {
             location = (x + vinfo_.xoffset) * (vinfo_.bits_per_pixel / 8) + // 8: The bytes for each time
             (y + vinfo_.yoffset) * finfo_.line_length; // add one y number of rows at a time
 
-            y0 = in[y_pos];
-            u = in[u_pos] - 128; // 128:display size
-            v = in[v_pos] - 128; // 128:display size
+            y0 = in[yPos];
+            u = in[uPos] - 128; // 128:display size
+            v = in[vPos] - 128; // 128:display size
 
             r = RANGE_LIMIT(y0 + v + ((v * 103) >> 8)); // 103,8:display range
             g = RANGE_LIMIT(y0 - ((u * 88) >> 8) - ((v * 183) >> 8)); // 88,8,183:display range
@@ -312,35 +312,35 @@ void TestDisplay::ProcessImage(const unsigned char* p, unsigned char* fbp)
             fbp[location + 1] = ((r & 0xF8) | (g >> 5)); // 5:display range
             fbp[location + 0] = (((g & 0x1C) << 3) | (b >> 3)); // 3:display range
 
-            y_pos += 2;
+            yPos += 2;
 
             if (j & 0x01) {
-                u_pos += 4;
-                v_pos += 4;
+                uPos += 4;
+                vPos += 4;
             }
         }
 
-        y_pos = 0; // 0:Pixel initial value
-        u_pos = 1; // 1:Pixel initial value
-        v_pos = 3; // 3:Pixel initial value
+        yPos = 0; // 0:Pixel initial value
+        uPos = 1; // 1:Pixel initial value
+        vPos = 3; // 3:Pixel initial value
         in += istride; // add one y number of rows at a time
     }
 }
 
-void TestDisplay::LcdDrawScreen(unsigned char* displayBuf_, unsigned char* addr)
+void TestDisplay::LcdDrawScreen(unsigned char* displayBuf, unsigned char* addr)
 {
-    ProcessImage(addr, displayBuf_);
+    ProcessImage(addr, displayBuf);
 }
 
-void TestDisplay::BufferCallback(void* addr, int choice)
+void TestDisplay::BufferCallback(unsigned char* addr, int choice)
 {
-    if (choice == preview_mode) {
-        LcdDrawScreen(displayBuf_, static_cast<unsigned char*>(addr));
+    if (choice == PREVIEW_MODE) {
+        LcdDrawScreen(displayBuf_, addr);
         return;
     } else {
-        LcdDrawScreen(displayBuf_, static_cast<unsigned char*>(addr));
+        LcdDrawScreen(displayBuf_, addr);
         std::cout << "==========[test log] capture start saveYuv......" << std::endl;
-        SaveYUV("capture", (unsigned char*)addr, bufSize_);
+        SaveYUV("capture", addr, bufSize_);
         std::cout << "==========[test log] capture end saveYuv......" << std::endl;
         return;
     }
@@ -349,9 +349,9 @@ void TestDisplay::BufferCallback(void* addr, int choice)
 void TestDisplay::Init()
 {
     std::shared_ptr<OHOS::Camera::IDeviceManager> deviceManager = OHOS::Camera::IDeviceManager::GetInstance();
-    if (!init_flag) {
+    if (!initFlag) {
         deviceManager->Init();
-        init_flag = 1;
+        initFlag = 1;
     }
     std::cout << "==========[test log] TestDisplay::Init()." << std::endl;
     if (cameraHost == nullptr) {
@@ -391,9 +391,9 @@ void TestDisplay::Init()
 void TestDisplay::UsbInit()
 {
     std::shared_ptr<OHOS::Camera::IDeviceManager> deviceManager = OHOS::Camera::IDeviceManager::GetInstance();
-    if (!init_flag) {
+    if (!initFlag) {
         deviceManager->Init();
-        init_flag = 1;
+        initFlag = 1;
     }
     if (cameraHost == nullptr) {
         constexpr const char *DEMO_SERVICE_NAME = "camera_service";
@@ -438,18 +438,18 @@ void TestDisplay::OpenCamera()
     }
 }
 
-float TestDisplay::calTime(struct timeval start, struct timeval end)
+float TestDisplay::CalTime(struct timeval start, struct timeval end)
 {
-    float time_use = 0;
-    time_use = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec); // 1000000:time
-    return time_use;
+    float timeUse = 0;
+    timeUse = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_usec - start.tv_usec); // 1000000:time
+    return timeUse;
 }
 
 void TestDisplay::AchieveStreamOperator()
 {
     // Create and get streamOperator information
-    OHOS::sptr<DemoStreamOperatorCallback> streamOperatorCallback = new DemoStreamOperatorCallback();
-    rc = (CamRetCode)cameraDevice->GetStreamOperator(streamOperatorCallback, streamOperator);
+    OHOS::sptr<DemoStreamOperatorCallback> streamOperatorCallback_ = new DemoStreamOperatorCallback();
+    rc = (CamRetCode)cameraDevice->GetStreamOperator(streamOperatorCallback_, streamOperator);
     EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
     if (rc == HDI::Camera::V1_0::NO_ERROR) {
         std::cout << "==========[test log] AchieveStreamOperator success." << std::endl;
@@ -465,7 +465,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             if (streamCustomerPreview_ == nullptr) {
                 streamCustomerPreview_ = std::make_shared<StreamCustomer>();
             }
-            streamInfoPre.streamId_ = streamId_preview;
+            streamInfoPre.streamId_ = STREAM_ID_PREVIEW;
             streamInfoPre.width_ = PREVIEW_WIDTH; // 640:picture width
             streamInfoPre.height_ = PREVIEW_HEIGHT; // 480:picture height
             streamInfoPre.format_ = PIXEL_FMT_RGBA_8888;
@@ -481,7 +481,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             if (streamCustomerVideo_ == nullptr) {
                 streamCustomerVideo_ = std::make_shared<StreamCustomer>();
             }
-            streamInfoVideo.streamId_ = streamId_video;
+            streamInfoVideo.streamId_ = STREAM_ID_VIDEO;
             streamInfoVideo.width_ = VIDEO_WIDTH; // 1280:picture width
             streamInfoVideo.height_ = VIDEO_HEIGHT; // 960:picture height
             streamInfoVideo.format_ = PIXEL_FMT_RGBA_8888;
@@ -498,7 +498,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             if (streamCustomerCapture_ == nullptr) {
                 streamCustomerCapture_ = std::make_shared<StreamCustomer>();
             }
-            streamInfoCapture.streamId_ = streamId_capture;
+            streamInfoCapture.streamId_ = STREAM_ID_CAPTURE;
             streamInfoCapture.width_ = CAPTURE_WIDTH; // 1280:picture width
             streamInfoCapture.height_ = CAPTURE_HEIGHT; // 960:picture height
             streamInfoCapture.format_ = PIXEL_FMT_RGBA_8888;
@@ -515,7 +515,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             if (streamCustomerAnalyze_ == nullptr) {
                 streamCustomerAnalyze_ = std::make_shared<StreamCustomer>();
             }
-            streamInfoAnalyze.streamId_ = streamId_analyze;
+            streamInfoAnalyze.streamId_ = STREAM_ID_ANALYZE;
             streamInfoAnalyze.width_ = ANALYZE_WIDTH; // 640:picture width
             streamInfoAnalyze.height_ = ANALYZE_HEIGHT; // 480:picture height
             streamInfoAnalyze.format_ = PIXEL_FMT_RGBA_8888;
@@ -559,19 +559,19 @@ void TestDisplay::StartCapture(int streamId, int captureId, bool shutterCallback
     } else {
         std::cout << "==========[test log]check Capture: Capture fail, rc = " << rc << captureId << std::endl;
     }
-    if (captureId == captureId_preview) {
+    if (captureId == CAPTURE_ID_PREVIEW) {
         streamCustomerPreview_->ReceiveFrameOn(nullptr);
-    } else if (captureId == captureId_capture) {
-        streamCustomerCapture_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
+    } else if (captureId == CAPTURE_ID_CAPTURE) {
+        streamCustomerCapture_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             StoreImage(addr, size);
         });
-    } else if (captureId == captureId_video) {
+    } else if (captureId == CAPTURE_ID_VIDEO) {
         OpenVideoFile();
-        streamCustomerVideo_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
+        streamCustomerVideo_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             StoreVideo(addr, size);
         });
-    } else if (captureId == captureId_analyze) {
-        streamCustomerAnalyze_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
+    } else if (captureId == CAPTURE_ID_ANALYZE) {
+        streamCustomerAnalyze_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             PrintFaceDetectInfo(addr, size);
         });
     }
@@ -584,15 +584,15 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
     sleep(SLEEP_SECOND_TWO);
     if (sizeof(captureIds) > 0) {
         for (auto &captureId : captureIds) {
-            if (captureId == captureId_preview) {
+            if (captureId == CAPTURE_ID_PREVIEW) {
                 streamCustomerPreview_->ReceiveFrameOff();
-            } else if (captureId == captureId_capture) {
+            } else if (captureId == CAPTURE_ID_CAPTURE) {
                 streamCustomerCapture_->ReceiveFrameOff();
-            } else if (captureId == captureId_video) {
+            } else if (captureId == CAPTURE_ID_VIDEO) {
                 streamCustomerVideo_->ReceiveFrameOff();
                 sleep(1);
                 CloseFd();
-            } else if (captureId == captureId_analyze) {
+            } else if (captureId == CAPTURE_ID_ANALYZE) {
                 streamCustomerAnalyze_->ReceiveFrameOff();
             }
         }
@@ -643,7 +643,7 @@ void DemoCameraDeviceCallback::PrintStabiliInfo(const std::shared_ptr<CameraMeta
     }
     videoStabiliMode = *(entry.data.u8);
     CAMERA_LOGI("videoStabiliMode: %{public}d", videoStabiliMode);
-    std::cout << "==========[test log] PrintStabiliInfo videoStabiliMode: " << (int)videoStabiliMode << std::endl;
+    std::cout << "==========[test log] PrintStabiliInfo videoStabiliMode: " << static_cast<int>(videoStabiliMode) << std::endl;
 }
 
 void DemoCameraDeviceCallback::PrintFpsInfo(const std::shared_ptr<CameraMetadata>& result)

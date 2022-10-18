@@ -153,12 +153,12 @@ HWTEST_F(PerformanceHdiTest, Camera_Performance_Hdi_0040, TestSize.Level3)
     // Open camera
     Test_->Open();
     // Cycle to turn on and off the flashlight
-    bool status;
     struct timeval start;
     struct timeval end;
     float time_use;
     float totle_time_use = 0;
     for (int i = 0; i < CYCLE_TIMES / 2; i++) {
+        bool status;
         std::cout << "Running " << i << " time" << std::endl;
         // Turn on the flashlight
         status = true;

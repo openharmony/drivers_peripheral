@@ -147,7 +147,6 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
     DEV_RES_NODE_FOR_EACH_ATTR(&node, drAttr) {}
 
     CAMERA_LOGD("metadata = %{public}s", node.name);
-    std::string cmpTmp;
     const int ENTRY_CAPACITY = 30;
     const int DATA_CAPACITY = 2000;
     std::shared_ptr<CameraMetadata> metadata = std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
