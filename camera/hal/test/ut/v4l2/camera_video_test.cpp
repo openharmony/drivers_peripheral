@@ -147,7 +147,7 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
     constexpr uint32_t SLEEP_SECOND_TWO = 2;
     sleep(SLEEP_SECOND_TWO);
     if (sizeof(captureIds) > 0) {
-        for (auto &captureId : captureIds) {
+        for (const auto &captureId : captureIds) {
             if (captureId == display_->captureId_preview) {
                 streamCustomerPreview_->ReceiveFrameOff();
             } else if (captureId == display_->captureId_capture) {

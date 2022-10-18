@@ -352,7 +352,7 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
                 return;
             }
             CAMERA_LOGD("UVC:loop HosV4L2Dev::deviceMatch %{public}s\n", action.c_str());
-            V4L2UvcMatchDev(std::string((char*)cap.driver), devName, true);
+            V4L2UvcMatchDev(std::string(reinterpret_cast<char*>(cap.driver)), devName, true);
         }
     }
 }

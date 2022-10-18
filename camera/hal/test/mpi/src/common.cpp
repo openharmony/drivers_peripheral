@@ -274,7 +274,7 @@ void Test::StartStream(std::vector<Camera::StreamIntent> intents)
     streamInfo = std::make_shared<Camera::StreamInfo>();
     streamInfo_video = std::make_shared<Camera::StreamInfo>();
     streamInfo_capture = std::make_shared<Camera::StreamInfo>();
-    for (auto& intent : intents) {
+    for (const auto& intent : intents) {
         if (intent == 0) {
             streamInfo->streamId_ = streamId_preview;
             streamInfo->width_ = 640; // 640:width of stream
@@ -429,7 +429,7 @@ void Test::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 
 void Test::StopConsumer(std::vector<Camera::StreamIntent> intents)
 {
-    for (auto& intent : intents) {
+    for (const auto& intent : intents) {
         consumerMap_[intent]->StopConsumer();
     }
 }

@@ -237,7 +237,7 @@ void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& con
                 menuTemp.index = menu.index;
                 menuTemp.id = menu.id;
                 menuTemp.value = menu.value;
-                menuTemp.name = std::string((char*)menu.name);
+                menuTemp.name = std::string(reinterpret_cast<char*>(menu.name));
                 ctrl.menu.push_back(menuTemp);
             }
         }
