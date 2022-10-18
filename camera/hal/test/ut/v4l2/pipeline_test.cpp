@@ -46,10 +46,10 @@ TEST_F(UtestPipelineTest, camera_ppl_0001)
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -69,11 +69,11 @@ TEST_F(UtestPipelineTest, camera_ppl_0002)
     display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    display_->StartCapture(display_->STREAM_ID_CAPTURE,, display_->CAPTURE_ID_CAPTURE, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview, display_->captureId_capture};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE,};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -93,11 +93,11 @@ TEST_F(UtestPipelineTest, camera_ppl_0003)
     display_->intents = {PREVIEW, VIDEO};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_video, display_->captureId_video, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview, display_->captureId_video};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_video};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -128,7 +128,7 @@ TEST_F(UtestPipelineTest, camera_ppl_0004)
     };
     producer->SetCallback(callback);
     display_->streamInfo = std::make_shared<StreamInfo>();
-    display_->streamInfo->streamId_ = display_->streamId_video;
+    display_->streamInfo->streamId_ = display_->STREAM_ID_VIDEO;
     display_->streamInfo->width_ = 640; // 640:picture width // 640:picture width
     display_->streamInfo->height_ = 480; // 480:picture height // 480:picture height
     display_->streamInfo->format_ = CAMERA_FORMAT_YUYV_422_PKG;
@@ -142,7 +142,7 @@ TEST_F(UtestPipelineTest, camera_ppl_0004)
     EXPECT_EQ(false, display_->rc == Camera::METHOD_NOT_SUPPORTED);
     if (display_->rc == Camera::METHOD_NOT_SUPPORTED) {
         std::cout << "==========[test log] CreateStreams METHOD_NOT_SUPPORTED, streamId = ";
-        std::cout << display_->streamId_video <<", intent = VIDEO" << std::endl;
+        std::cout << display_->STREAM_ID_VIDEO <<", intent = VIDEO" << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
     }

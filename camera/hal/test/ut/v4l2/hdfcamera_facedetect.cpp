@@ -47,8 +47,8 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
     display_->intents = {PREVIEW, STILL_CAPTURE, ANALYZE};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_analyze, display_->captureId_analyze, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    display_->StartCapture(display_->STREAM_ID_ANALYZE, display_->CAPTURE_ID_ANALYZE, false, true);
 
     // add dumy exif info
     constexpr double latitude = 27.987500; // dummy data: Qomolangma latitde
@@ -76,24 +76,24 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
     MetadataUtils::ConvertMetadataToVec(captureSetting, setting);
 
     CaptureInfo captureInfo = {};
-    captureInfo.streamIds_ = {display_->streamId_capture};
+    captureInfo.streamIds_ = {display_->STREAM_ID_CAPTURE};
     captureInfo.captureSetting_ = setting;
     captureInfo.enableShutterCallback_ = false;
-    display_->rc = (CamRetCode)display_->streamOperator->Capture(display_->captureId_capture, captureInfo, true);
+    display_->rc = (CamRetCode)display_->streamOperator->Capture(display_->CAPTURE_ID_CAPTURE, captureInfo, true);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log]check Capture: Capture success, " << display_->captureId_capture << std::endl;
+        std::cout << "==========[test log]check Capture: Capture success, " << display_->CAPTURE_ID_CAPTURE << std::endl;
     } else {
         std::cout << "==========[test log]check Capture: Capture fail, rc = " << display_->rc
-            << display_->captureId_capture << std::endl;
+            << display_->CAPTURE_ID_CAPTURE << std::endl;
     }
-    display_->streamCustomerCapture_->ReceiveFrameOn([this](void* addr, const uint32_t size) {
+    display_->streamCustomerCapture_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
         display_->StoreImage(addr, size);
     });
     sleep(2);
     // release stream
-    display_->captureIds = {display_->captureId_preview, display_->captureId_analyze, display_->captureId_capture};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_analyze, display_->streamId_capture};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_ANALYZE, display_->CAPTURE_ID_CAPTURE};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_ANALYZE, display_->STREAM_ID_CAPTURE};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -112,11 +112,11 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_002, TestSize.Level1)
     display_->intents = {PREVIEW, ANALYZE};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_analyze, display_->captureId_analyze, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    display_->StartCapture(display_->STREAM_ID_ANALYZE, display_->CAPTURE_ID_ANALYZE, false, true);
     sleep(2);
     // release stream
-    display_->captureIds = {display_->captureId_preview, display_->captureId_analyze};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_analyze};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_ANALYZE};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_ANALYZE};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }

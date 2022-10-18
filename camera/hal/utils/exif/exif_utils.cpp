@@ -327,7 +327,6 @@ void ExifUtils::ConvertAltitudeToRational(double altitude, exif_rational &outPut
     long long numerator = 0;
     long long denominator = 1;
     bool isSeparator = false;
-    char character;
     int count = 0;
     std::string strData = "";
     strData = std::to_string(altitude);
@@ -337,6 +336,7 @@ void ExifUtils::ConvertAltitudeToRational(double altitude, exif_rational &outPut
     CAMERA_LOGI("%{public}s count = %{public}d", __FUNCTION__, count);
     constexpr uint32_t digitPosition = 10;
     for (int i = 0; i < count; i++) {
+        char character;
         character = strData[i];
         if (character == '.') {
             isSeparator = true;

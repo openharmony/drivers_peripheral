@@ -61,9 +61,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0001, TestSize.Level3)
     int result = 0;
     char property[] = "frame_timeout";
     char value[] = "on";
-    int parameter;
     char defValue[] = "on";
-    char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
         Test_->Open();
@@ -93,10 +91,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0010, TestSize.Level3)
     char property[] = "hdi_getstreamoperator_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_GetStreamOperator_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -121,10 +119,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0011, TestSize.Level3)
     char property[] = "hdi_updatesettings_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_UpdateSettings_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -152,10 +150,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0012, TestSize.Level3)
     char property[] = "hdi_getenabledresults_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_GetEnabledResults_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -185,10 +183,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0013, TestSize.Level3)
     char property[] = "hdi_getenabledresults_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_GetEnabledResults_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -218,10 +216,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0014, TestSize.Level3)
     char property[] = "hdi_disableresult_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_DisableResult_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -263,10 +261,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0015, TestSize.Level3)
     char property[] = "hdi_close_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Close_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -287,10 +285,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0020, TestSize.Level3) {
     char property[] = "Hdi_IsStreamsSupported_Timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX:GetProperty Hdi_IsStreamsSupported_Timeout = " << parameter << std::endl;
         // Turn on the camera
@@ -352,10 +350,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0021, TestSize.Level3)
     char property[] = "hdi_createstreams_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_CreateStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -403,10 +401,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0022, TestSize.Level3)
     char property[] = "hdi_releasestreams_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_ReleaseStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -454,10 +452,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0023, TestSize.Level3)
     char property[] = "hdi_commitstreams_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_CommitStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -485,10 +483,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0024, TestSize.Level3)
     char property[] = "hdi_attachbufferqueue_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_AttachBufferQueue_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -547,10 +545,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0025, TestSize.Level3)
     char property[] = "hdi_detachbufferqueue_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_DetachBufferQueue_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -613,10 +611,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0026, TestSize.Level3)
     char property[] = "hdi_capture_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Capture_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -646,10 +644,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0027, TestSize.Level3)
     char property[] = "hdi_change_to_offlinestream_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "======[test log] DFX:GetProperty Hdi_ChangeToOfflineStream_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -701,10 +699,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0030, TestSize.Level3)
     char property[] = "hdi_offline_cancelcapture_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "======[test log] DFX:GetProperty Hdi_Offline_CancelCapture_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -756,10 +754,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0031, TestSize.Level3)
     char property[] = "hdi_offline_releasestreams_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "=====[test log] DFX:GetProperty Hdi_Offline_ReleaseStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -811,10 +809,10 @@ HWTEST_F(DfxTest, Camera_Dfx_0032, TestSize.Level3)
     char property[] = "hdi_offline_release_timeout";
     char value[] = "on";
     int parameter;
-    char defValue[] = "on";
     char value1[32] = {0};
     result = SetParameter(property, value);
     if (!result) {
+        char defValue[] = "on";
         parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Offline_Release_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -895,9 +893,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0010, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_GetStreamOperator_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_GetStreamOperator_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -921,9 +919,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0011, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_UpdateSettings_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_UpdateSettings_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -950,9 +948,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0012, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_GetEnabledResults_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_GetEnabledResults_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -981,9 +979,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0013, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_GetEnabledResults_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_GetEnabledResults_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -1012,9 +1010,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0014, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_DisableResult_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_DisableResult_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -1054,9 +1052,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0015, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_Close_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Close_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -1076,9 +1074,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0020, TestSize.Level3) {
     bool result = false;
     std::string property = "Hdi_IsStreamsSupported_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "======[test log] DFX: GetProperty Hdi_IsStreamsSupported_Timeout = " << parameter << std::endl;
         // Turn on the camera
@@ -1137,9 +1135,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0021, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_CreateStreams_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_CreateStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -1186,9 +1184,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0022, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_ReleaseStreams_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_ReleaseStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -1235,9 +1233,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0023, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_CommitStreams_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_CommitStreams_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -1265,9 +1263,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0024, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_AttachBufferQueue_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_AttachBufferQueue_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -1325,9 +1323,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0025, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_DetachBufferQueue_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_DetachBufferQueue_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -1389,9 +1387,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0026, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_Capture_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Capture_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -1421,9 +1419,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0027, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_ChangeToOfflineStream_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "======[test log] DFX: GetProperty Hdi_ChangeToOfflineStream_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -1473,9 +1471,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0030, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_Offline_CancelCapture_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "====[test log] DFX: GetProperty Hdi_Offline_CancelCapture_Timeout = " << parameter << std::endl;
         Test_->Open();
@@ -1525,9 +1523,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0031, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_Offline_ReleaseStreams_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "======[test log] DFX: GetProperty Hdi_Offline_ReleaseStreams_Timeout = ";
         std::cout << parameter << std::endl;
@@ -1578,9 +1576,9 @@ HWTEST_F(DfxTest, Camera_Dfx_0032, TestSize.Level3)
     bool result = false;
     std::string property = "Hdi_Offline_Release_Timeout";
     std::string value = "on";
-    std::string parameter;
     result = OHOS::system::SetParameter(property, value);
     if (result) {
+        std::string parameter;
         parameter = OHOS::system::GetParameter(property, value);
         std::cout << "==========[test log] DFX: GetProperty Hdi_Offline_Release_Timeout = " << parameter << std::endl;
         Test_->Open();

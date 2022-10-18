@@ -110,10 +110,7 @@ public:
 
     class Node {
     public:
-        explicit Node(const std::string name)
-        {
-            name_ = name;
-        }
+        explicit Node(const std::string name) : name_(name) {}
         virtual ~Node() = default;
 
         virtual void Connect(std::shared_ptr<Node>& nextNode);
