@@ -543,7 +543,7 @@ static int32_t ParseConfigurationDes(struct UsbRawConfigDescriptor *config, cons
 
     while (size > 0) {
         struct UsbInterfaceDescriptor *ifDesc = (struct UsbInterfaceDescriptor *)buffer;
-        if (config->configDescriptor.bNumInterfaces < USB_MAXINTERFACES) {
+        if (config->configDescriptor.bNumInterfaces >= USB_MAXINTERFACES) {
             HDF_LOGE("%{public}d: bNumInterfaces overlong.", config->configDescriptor.bNumInterfaces);
             return HDF_FAILURE;
         }
