@@ -26,7 +26,7 @@ namespace Bluetooth {
 namespace Hci {
 class MctProtocol : public HciProtocol {
 public:
-    MctProtocol(int fds[HCI_MAX_CHANNEL], HciDataCallback onAclReceive, HciDataCallback onScoReceive,
+    MctProtocol(const int fds[HCI_MAX_CHANNEL], HciDataCallback onAclReceive, HciDataCallback onScoReceive,
         HciDataCallback onEventReceive);
     ssize_t SendPacket(HciPacketType packetType, const std::vector<uint8_t> &packetData) override;
     void ReadEventData(int fd);
