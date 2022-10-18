@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_CAMERA_METADATA_CONTROLLER_H
-#define OHOS_CAMERA_METADATA_CONTROLLER_H
+#ifndef METADATA_CONTROLLER_H
+#define METADATA_CONTROLLER_H
 
 #include "metadata_config.h"
 #include <list>
@@ -69,11 +69,6 @@ private:
         std::shared_ptr<CameraMetadata> &outMeta);
     bool DealUpdateNewTagData(
         const std::vector<int32_t> &keys, common_metadata_header_t *data, std::shared_ptr<CameraMetadata> &outMeta);
-    bool UpdateU8Metadata(int32_t key, common_metadata_header_t *data, std::shared_ptr<CameraMetadata> &outMeta);
-    bool UpdateI32Metadata(int32_t key, common_metadata_header_t *data, std::shared_ptr<CameraMetadata> &outMeta);
-    bool UpdateI64Metadata(int32_t key, common_metadata_header_t *data, std::shared_ptr<CameraMetadata> &outMeta);
-    bool UpdateFloatMetadata(int32_t key, common_metadata_header_t *data, std::shared_ptr<CameraMetadata> &outMeta);
-    bool UpdateI32ArrayMetadata(int32_t key, common_metadata_header_t *data, std::shared_ptr<CameraMetadata> &outMeta);
 
     std::shared_ptr<MetadataConfig> metaDataConfig_ = nullptr;
     MetaDataCb updateSettingFunc_;
