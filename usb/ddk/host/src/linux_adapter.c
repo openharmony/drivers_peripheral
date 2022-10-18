@@ -465,12 +465,12 @@ static int32_t OsSubmitBulkRequest(struct UsbHostRequest *request)
     }
 
     if (request->length <= 0) {
-        HDF_LOGE("%{public}d: Bulk request size err", __LINE__);
+        HDF_LOGE("request->length less than the minimum");
         return HDF_FAILURE;
     }
 
     if (request->length > MAX_BULK_DATA_BUFFER_LENGTH) {
-        HDF_LOGE("%{public}d: Bulk request size err", __LINE__);
+        HDF_LOGE("request->length greater than the maximum");
         return HDF_FAILURE;
     }
 
@@ -484,7 +484,7 @@ static int32_t OsSubmitBulkRequest(struct UsbHostRequest *request)
         bulkBufferLen = MAX_BULK_DATA_BUFFER_LENGTH;
     }
     numUrbs = request->length / bulkBufferLen;
-    if ((request->length % bulkBufferLen) >= 0) {
+    if ((request->length % bulkBufferLen) > 0) {
         numUrbs++;
     }
 
