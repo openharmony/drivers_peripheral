@@ -99,11 +99,11 @@ HWTEST_F(HdfLightTest, GetLightList001, TestSize.Level1)
         return;
     }
 
-    printf("get light list num[%d]\n\r", g_count);
+    printf("get light list num[%u]\n\r", g_count);
     info = g_lightInfo;
 
     for (int i = 0; i < g_count; ++i) {
-        printf("get lightId[%d]\n\r", info->lightId);
+        printf("get lightId[%u]\n\r", info->lightId);
         EXPECT_GE(info->lightId, MIN_LIGHT_ID);
         EXPECT_LE(info->lightId, MAX_LIGHT_ID);
         info++;

@@ -135,7 +135,7 @@ int32_t InitHwCapture(struct AudioHwCapture *&hwCapture)
 
 int32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender)
 {
-    hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    hwRender = reinterpret_cast<struct AudioHwRender *>(calloc(1, sizeof(*hwRender)));
     if (hwRender == nullptr) {
         return HDF_FAILURE;
     }
@@ -148,7 +148,7 @@ int32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender)
 }
 int32_t BindServiceAndHwCapture(struct AudioHwCapture *&hwCapture)
 {
-    hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
+    hwCapture = reinterpret_cast<struct AudioHwCapture *>(calloc(1, sizeof(*hwCapture)));
     if (hwCapture == nullptr) {
         return HDF_FAILURE;
     }

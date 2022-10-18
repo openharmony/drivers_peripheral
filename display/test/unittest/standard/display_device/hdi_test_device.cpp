@@ -82,7 +82,7 @@ std::shared_ptr<HdiTestDisplay> HdiTestDevice::GetFirstDisplay()
     return mDisplays.begin()->second;
 }
 
-void HdiTestDevice::Clear()
+void HdiTestDevice::Clear() const
 {
     for (auto const & iter : mDisplays) {
         iter.second->Clear();

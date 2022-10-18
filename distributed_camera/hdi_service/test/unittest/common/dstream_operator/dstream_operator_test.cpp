@@ -19,6 +19,7 @@
 #include "distributed_hardware_log.h"
 #include "mock_dstream_operator_callback.h"
 #include "metadata_utils.h"
+#include "stream_consumer.h"
 
 using namespace testing::ext;
 
@@ -37,17 +38,36 @@ public:
 constexpr const char* TEST_DEV_ID = "bb536a637105409e904d4da83790a4a7";
 constexpr const char* TEST_CAM_ID = "camera_0";
 constexpr const char* TEST_ABILITY_VALUE = R"({"CodecType": ["avenc_mpeg4"],
-    "OutputFormat": {"Photo":[4], "Preview":[2, 3], "Video":[2, 3]},
     "Position": "BACK",
     "ProtocolVer": "1.0",
     "MetaData": "",
-    "Resolution": {
-    "2": ["1920*1080", "1504*720", "1440*1080", "1280*960", "1280*720", "1232*768", "1152*720", "960*720", "960*544",
-    "880*720", "720*720", "720*480", "640*480", "352*288", "320*240"],
-    "3": ["1920*1080", "1504*720", "1440*1080", "1280*960", "1280*720", "1232*768", "1152*720", "960*720", "960*544",
-    "880*720", "720*720", "720*480", "640*480", "352*288", "320*240"],
-    "4": ["3840*2160", "3264*2448", "3264*1840", "2304*1728", "2048*1536", "1920*1440", "1920*1080", "1744*1088",
-    "1280*720", "1232*768", "1152*720", "640*480", "320*240"]}})";
+    "Photo": {
+        "OutputFormat": [2, 4],
+        "Resolution": {
+            "2": ["1920*1080", "1504*720", "1440*1080", "1280*960", "1280*720", "1232*768", "1152*720", "960*720",
+            "960*544", "880*720", "720*720", "720*480", "640*480", "352*288", "320*240"],
+            "4": ["1920*1080", "1504*720", "1440*1080", "1280*960", "1280*720", "1232*768", "1152*720", "960*720",
+            "960*544", "880*720", "720*720", "720*480", "640*480", "352*288", "320*240"]
+        }
+    },
+    "Preview": {
+        "OutputFormat": [2, 3],
+        "Resolution": {
+            "2": ["1920*1080", "1504*720", "1440*1080", "1280*960", "1280*720", "1232*768", "1152*720", "960*720",
+                "960*544", "880*720", "720*720", "720*480", "640*480", "352*288", "320*240"],
+            "3": ["1920*1080", "1504*720", "1440*1080", "1280*960", "1280*720", "1232*768", "1152*720", "960*720",
+                "960*544", "880*720", "720*720", "720*480", "640*480", "352*288", "320*240"]
+        }
+    },
+    "Video": {
+        "OutputFormat": [2, 3],
+        "Resolution": {
+            "2": ["1920*1080", "1504*720", "1440*1080", "1280*960", "1280*720", "1232*768", "1152*720", "960*720",
+                "960*544", "880*720", "720*720", "720*480", "640*480", "352*288", "320*240"],
+            "3": ["1920*1080", "1504*720", "1440*1080", "1280*960", "1280*720", "1232*768", "1152*720", "960*720",
+                "960*544", "880*720", "720*720", "720*480", "640*480", "352*288", "320*240"]
+        }
+    }})";
 constexpr int TEST_STREAMID = 1001;
 constexpr int TEST_HEIGHT = 480;
 constexpr int TEST_WIDTH = 640;
@@ -139,7 +159,7 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_003, TestSize.Level1)
     streamInfo.dataspace_ = TEST_DATASPACE;
     streamInfo.intent_ = StreamIntent::PREVIEW;
     streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable();
+    streamInfo.bufferQueue_ = nullptr;
     streamInfo.encodeType_ = EncodeType::ENCODE_TYPE_NULL;
     std::vector<StreamInfo> streamInfos;
     streamInfos.push_back(streamInfo);
@@ -165,7 +185,10 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_004, TestSize.Level1)
     streamInfo.dataspace_ = TEST_DATASPACE;
     streamInfo.intent_ = StreamIntent::PREVIEW;
     streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable();
+    std::shared_ptr<StreamConsumer> streamConsumer = std::make_shared<StreamConsumer>();
+    sptr<OHOS::IBufferProducer> producer = streamConsumer->CreateProducer();
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(TEST_DATASPACE);
     streamInfo.encodeType_ = EncodeType::ENCODE_TYPE_NULL;
     std::vector<StreamInfo> streamInfos;
     streamInfos.push_back(streamInfo);
@@ -196,7 +219,10 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_005, TestSize.Level1)
     streamInfo.dataspace_ = TEST_DATASPACE;
     streamInfo.intent_ = StreamIntent::PREVIEW;
     streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable();
+    std::shared_ptr<StreamConsumer> streamConsumer = std::make_shared<StreamConsumer>();
+    sptr<OHOS::IBufferProducer> producer = streamConsumer->CreateProducer();
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(TEST_DATASPACE);
     std::vector<StreamInfo> streamInfos;
     streamInfos.push_back(streamInfo);
     int32_t rc = dstreamOperator_->CreateStreams(streamInfos);
@@ -230,15 +256,15 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_006, TestSize.Level1)
     streamInfo.dataspace_ = TEST_DATASPACE;
     streamInfo.intent_ = StreamIntent::PREVIEW;
     streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable();
+    streamInfo.bufferQueue_ = nullptr;
     std::vector<StreamInfo> streamInfos;
     streamInfos.push_back(streamInfo);
     int32_t rc = dstreamOperator_->CreateStreams(streamInfos);
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 
-    sptr<BufferProducerSequenceable> bufferProducer;
+    sptr<BufferProducerSequenceable> bufferProducer = nullptr;;
     rc = dstreamOperator_->AttachBufferQueue(streamInfo.streamId_, bufferProducer);
-    EXPECT_EQ(rc, CamRetCode::NO_ERROR);
+    EXPECT_EQ(rc, CamRetCode::INVALID_ARGUMENT);
     // release stream
     std::vector<int> streamIds;
     streamIds.push_back(streamInfo.streamId_);
@@ -264,13 +290,16 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_007, TestSize.Level1)
     streamInfo.dataspace_ = TEST_DATASPACE;
     streamInfo.intent_ = StreamIntent::PREVIEW;
     streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable();
+    std::shared_ptr<StreamConsumer> streamConsumer = std::make_shared<StreamConsumer>();
+    sptr<OHOS::IBufferProducer> producer = streamConsumer->CreateProducer();
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(TEST_DATASPACE);
     std::vector<StreamInfo> streamInfos;
     streamInfos.push_back(streamInfo);
     int32_t rc = dstreamOperator_->CreateStreams(streamInfos);
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 
-    sptr<BufferProducerSequenceable> bufferProducer;
+    sptr<BufferProducerSequenceable> bufferProducer = new BufferProducerSequenceable(producer);
     rc = dstreamOperator_->AttachBufferQueue(streamInfo.streamId_, bufferProducer);
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 
@@ -302,14 +331,18 @@ HWTEST_F(DStreamOperatorTest, dstream_operator_test_008, TestSize.Level1)
     streamInfo.dataspace_ = TEST_DATASPACE;
     streamInfo.intent_ = StreamIntent::PREVIEW;
     streamInfo.tunneledMode_ = TEST_TUNNELEDMODE;
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable();
+    std::shared_ptr<StreamConsumer> streamConsumer = std::make_shared<StreamConsumer>();
+    sptr<OHOS::IBufferProducer> producer = streamConsumer->CreateProducer();
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(TEST_DATASPACE);
     std::vector<StreamInfo> streamInfos;
     streamInfos.push_back(streamInfo);
     int32_t rc = dstreamOperator_->CreateStreams(streamInfos);
     EXPECT_EQ(rc, CamRetCode::NO_ERROR);
 
     int32_t captureId = 1000;
-    OHOS::sptr<IStreamOperatorCallback> offlineStreamOperatorCallback = new (std::nothrow) MockDStreamOperatorCallback();
+    OHOS::sptr<IStreamOperatorCallback> offlineStreamOperatorCallback =
+        new (std::nothrow) MockDStreamOperatorCallback();
     std::vector<int> offlineIds;
     offlineIds.push_back(captureId);
     OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;

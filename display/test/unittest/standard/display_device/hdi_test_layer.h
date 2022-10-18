@@ -50,7 +50,7 @@ private:
 
 class HdiTestLayer {
 public:
-    HdiTestLayer(LayerInfo &info, uint32_t id, uint32_t displayId);
+    HdiTestLayer(const LayerInfo &info, const uint32_t id, const uint32_t displayId);
     virtual ~HdiTestLayer();
     int32_t Init();
     int32_t PreparePresent();

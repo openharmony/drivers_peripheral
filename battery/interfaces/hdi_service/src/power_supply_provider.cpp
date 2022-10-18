@@ -899,8 +899,9 @@ void PowerSupplyProvider::InitDefaultSysfs()
     std::string mockBatteryPath = MOCK_POWER_SUPPLY_BASE_PATH + "/battery";
     std::string mockChargerPath = MOCK_POWER_SUPPLY_BASE_PATH + "/ohos_charger";
     std::string mockTechPath = MOCK_POWER_SUPPLY_BASE_PATH + "/ohos-fgu";
+
     if (access(mockBatteryPath.c_str(), 0) == -1) {
-        mkdir(mockBatteryPath.c_str(), S_IRWXU);
+        mkdir(mockBatteryPath.c_str(), S_IRWXU | S_IRWXG);
         sleep(MKDIR_WAIT_TIME);
     }
 

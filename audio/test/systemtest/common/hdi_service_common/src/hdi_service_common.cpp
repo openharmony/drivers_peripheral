@@ -252,8 +252,8 @@ int32_t GetAdapters(TestAudioManager *manager, struct AudioAdapterDescriptor *&d
         HDF_LOGE("%{public}s: AUDIO_TEST:descsLen is little than AUDIO_ADAPTER_MAX_NUM\n", __func__);
         return HDF_FAILURE;
     }
-    descs = (struct AudioAdapterDescriptor*)OsalMemCalloc(
-        sizeof(struct AudioAdapterDescriptor) * (descsLen));
+    descs = reinterpret_cast<struct AudioAdapterDescriptor*>(OsalMemCalloc(
+        sizeof(struct AudioAdapterDescriptor) * (descsLen)));
     if (descs == NULL) {
         return HDF_FAILURE;
     }
@@ -367,7 +367,7 @@ int32_t AudioRenderStartAndOneFrame(struct IAudioRender *render)
         }
         return HDF_FAILURE;
     }
-    ret = render->RenderFrame(render, (int8_t *)frame, numRead, &replyBytes);
+    ret = render->RenderFrame(render, reinterpret_cast<int8_t *>(frame), numRead, &replyBytes);
     if (ret < 0) {
         if (frame != nullptr) {
             free(frame);
@@ -480,7 +480,7 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct IAudioRender *render
         return HDF_FAILURE;
     }
     char *frame = nullptr;
-    frame = (char *)calloc(1, bufferSize);
+    frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -492,7 +492,7 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct IAudioRender *render
                 free(frame);
                 return HDF_FAILURE;
             }
-            ret = RenderTryOneFrame(render, (int8_t *)frame, readSize, &replyBytes);
+            ret = RenderTryOneFrame(render, reinterpret_cast<int8_t *>(frame), readSize, &replyBytes);
             if (ret < 0) {
                 free(frame);
                 return ret;
@@ -528,13 +528,13 @@ int32_t FrameStartCapture(struct IAudioCapture *capture, FILE *file, const struc
         return HDF_FAILURE;
     }
     char *frame = nullptr;
-    frame = (char *)calloc(1, bufferSize);
+    frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
         return HDF_ERR_MALLOC_FAIL;
     }
     requestBytes = bufferSize;
     replyBytes = bufferSize;
-    ret = capture->CaptureFrame(capture, (int8_t *)frame, &replyBytes, requestBytes);
+    ret = capture->CaptureFrame(capture, reinterpret_cast<int8_t *>(frame), &replyBytes, requestBytes);
     if (ret < 0) {
         HDF_LOGE("%{public}s: AUDIO_TEST:CaptureFrame failed\n", __func__);
         free(frame);
@@ -570,7 +570,7 @@ int32_t RenderFramePrepare(const std::string &path, char *&frame, uint64_t &read
         fclose(file);
         return HDF_FAILURE;
     }
-    frame = (char *)calloc(1, bufferSize);
+    frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
         fclose(file);
         return HDF_ERR_MALLOC_FAIL;
@@ -634,13 +634,13 @@ int32_t StartRecord(struct IAudioCapture *capture, FILE *file, uint64_t filesize
         HDF_LOGE("%{public}s: AUDIO_TEST:start failed\n", __func__);
         return ret;
     }
-    char *frame = (char *)calloc(1, BUFFER_LENTH);
+    char *frame = reinterpret_cast<char *>(calloc(1, BUFFER_LENTH));
     if (frame == nullptr) {
         return HDF_ERR_MALLOC_FAIL;
     }
     do {
         if (g_frameStatus) {
-            ret = CaptureTryOneFrame(capture, (int8_t *) frame, &replyBytes, requestBytes);
+            ret = CaptureTryOneFrame(capture, reinterpret_cast<int8_t *>(frame), &replyBytes, requestBytes);
             if (ret < 0) {
                 free(frame);
                 return ret;
@@ -751,6 +751,7 @@ int32_t InitMmapDesc(const string &path, struct AudioMmapBufferDescripter &desc,
         fp = fopen(path.c_str(), "rb+");
     } else {
         fp = fopen(path.c_str(), "wb+");
+        (void)chmod(path.c_str(), S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH);
     }
     if (fp == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:fopen failed\n", __func__);

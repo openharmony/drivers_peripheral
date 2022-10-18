@@ -174,14 +174,15 @@ int32_t CodecComponentConfig::GetOneCapability(const struct DeviceResourceIface 
                                                const struct DeviceResourceNode &childNode, CodecCompCapability &cap,
                                                bool isVideoGroup)
 {
-    if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_ROLE, (uint32_t *)&cap.role, MEDIA_ROLETYPE_INVALID) !=
-        HDF_SUCCESS) {
+    if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_ROLE, static_cast<uint32_t *>(&cap.role),
+                        MEDIA_ROLETYPE_INVALID) != HDF_SUCCESS) {
         cap.role = MEDIA_ROLETYPE_INVALID;
         CODEC_LOGE("failed to get mime for: %{public}s! Discarded", childNode.name);
         return HDF_FAILURE;
     }
 
-    if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_TYPE, (uint32_t *)&cap.type, INVALID_TYPE) != HDF_SUCCESS) {
+    if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_TYPE, static_cast<uint32_t *>(&cap.type), INVALID_TYPE) !=
+        HDF_SUCCESS) {
         cap.role = MEDIA_ROLETYPE_INVALID;
         cap.type = INVALID_TYPE;
         CODEC_LOGE("failed to get type for: %{public}s! Discarded", childNode.name);
@@ -235,24 +236,28 @@ int32_t CodecComponentConfig::GetMiscOfCapability(const struct DeviceResourceIfa
         return HDF_FAILURE;
     }
 
-    if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_MAX_INST, (uint32_t *)&cap.maxInst, 0) != HDF_SUCCESS) {
+    if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_MAX_INST, static_cast<uint32_t *>(&cap.maxInst), 0) !=
+        HDF_SUCCESS) {
         CODEC_LOGE("get uint32 config [%{public}s] err!", attr.attrName.c_str());
         return HDF_FAILURE;
     }
-    if (GetMaskedConfig(iface, childNode, CODEC_CONFIG_KEY_PROCESS_MODE_MASK, (uint32_t &)cap.processModeMask) !=
+    if (GetMaskedConfig(iface, childNode, CODEC_CONFIG_KEY_PROCESS_MODE_MASK,
+                        static_cast<uint32_t &>(cap.processModeMask)) != HDF_SUCCESS) {
+        CODEC_LOGE("get masked config [%{public}s] err!", attr.attrName.c_str());
+        return HDF_FAILURE;
+    }
+    if (GetMaskedConfig(iface, childNode, CODEC_CONFIG_KEY_CAPS_MASK, static_cast<uint32_t &>(cap.capsMask)) !=
         HDF_SUCCESS) {
         CODEC_LOGE("get masked config [%{public}s] err!", attr.attrName.c_str());
         return HDF_FAILURE;
     }
-    if (GetMaskedConfig(iface, childNode, CODEC_CONFIG_KEY_CAPS_MASK, (uint32_t &)cap.capsMask) != HDF_SUCCESS) {
-        CODEC_LOGE("get masked config [%{public}s] err!", attr.attrName.c_str());
-        return HDF_FAILURE;
-    }
-    if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_MIN_BITRATE, (uint32_t *)&(cap.bitRate.min), 0) != HDF_SUCCESS) {
+    if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_MIN_BITRATE, static_cast<uint32_t *>(&cap.bitRate.min), 0) !=
+        HDF_SUCCESS) {
         CODEC_LOGE("get uin32 config [%{public}s] err!", attr.attrName.c_str());
         return HDF_FAILURE;
     }
-    if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_MAX_BITRATE, (uint32_t *)&(cap.bitRate.max), 0) != HDF_SUCCESS) {
+    if (iface.GetUint32(&childNode, CODEC_CONFIG_KEY_MAX_BITRATE, static_cast<uint32_t *>(&cap.bitRate.max), 0) !=
+        HDF_SUCCESS) {
         CODEC_LOGE("get uin32 config [%{public}s] err!", attr.attrName.c_str());
         return HDF_FAILURE;
     }
@@ -275,7 +280,7 @@ int32_t CodecComponentConfig::GetUintTableConfig(const struct DeviceResourceIfac
     }
     if (count > 0) {
         std::unique_ptr<int32_t[]> array = std::make_unique<int32_t[]>(count);
-        iface.GetUint32Array(&node, attr.attrName.c_str(), (uint32_t *)array.get(), count, 0);
+        iface.GetUint32Array(&node, attr.attrName.c_str(), static_cast<uint32_t *>(array.get()), count, 0);
         attr.vec.assign(array.get(), array.get() + count);
     }
     return HDF_SUCCESS;
@@ -330,7 +335,7 @@ int32_t CodecComponentConfig::GetVideoPortCapability(const struct DeviceResource
 
     int32_t count = sizeof(nodeAttrs) / sizeof(ConfigUintNodeAttr);
     for (int32_t i = 0; i < count; i++) {
-        if (iface.GetUint32(&childNode, nodeAttrs[i].attrName.c_str(), (uint32_t *)&nodeAttrs[i].value,
+        if (iface.GetUint32(&childNode, nodeAttrs[i].attrName.c_str(), static_cast<uint32_t *>(&nodeAttrs[i].value),
                             nodeAttrs[i].defaultValue) != HDF_SUCCESS) {
             CODEC_LOGE("failed to get %{public}s.%{public}s!", childNode.name, nodeAttrs[i].attrName.c_str());
             return HDF_FAILURE;
@@ -338,7 +343,7 @@ int32_t CodecComponentConfig::GetVideoPortCapability(const struct DeviceResource
     }
     ConfigUintArrayNodeAttr arrayAttrs[] = {
         {CODEC_CONFIG_KEY_SUPPORT_PIXEL_FMTS, cap.port.video.supportPixFmts},
-        {CODEC_CONFIG_KEY_BITE_RATE_MODE, (std::vector<int32_t> &)cap.port.video.bitRatemode},
+        {CODEC_CONFIG_KEY_BITE_RATE_MODE, static_cast<std::vector<int32_t> &>(cap.port.video.bitRatemode)},
         {CODEC_CONFIG_KEY_MESURED_FRAME_RATE, cap.port.video.measuredFrameRate}};
 
     count = sizeof(arrayAttrs) / sizeof(ConfigUintArrayNodeAttr);

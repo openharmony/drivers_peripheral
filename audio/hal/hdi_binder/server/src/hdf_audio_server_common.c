@@ -1070,7 +1070,7 @@ int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("g_manager->GetAllAdapters error");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (size > MAX_AUDIO_ADAPTER_NUM_SERVER || size == 0 || descs == NULL || ret < 0) {
+    if (size > MAX_AUDIO_ADAPTER_NUM_SERVER || size == 0 || descs == NULL) {
         AUDIO_FUNC_LOGE("size or g_descs is error");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }

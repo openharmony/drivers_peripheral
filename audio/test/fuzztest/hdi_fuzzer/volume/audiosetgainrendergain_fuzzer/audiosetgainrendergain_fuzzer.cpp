@@ -30,7 +30,7 @@ bool AudioSetgainRenderGainFuzzTest(const uint8_t *data, size_t size)
         HDF_LOGE("%{public}s: AudioGetManagerCreateRender failed \n", __func__);
         return false;
     }
-    int32_t gain = *(float *)data;
+    int32_t gain = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data)));
     ret = gainRenRender->volume.SetGain(gainRenRender, gain);
     if (ret == HDF_SUCCESS) {
         result = true;

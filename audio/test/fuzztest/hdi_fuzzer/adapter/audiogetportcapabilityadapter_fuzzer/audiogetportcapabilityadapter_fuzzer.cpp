@@ -35,7 +35,7 @@ bool AudioGetportcapabilityAdapterFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
     struct AudioPortCapability capability = {};
-    struct AudioAdapter *adapterFuzz = (struct AudioAdapter *)data;
+    struct AudioAdapter *adapterFuzz = reinterpret_cast<struct AudioAdapter *>(const_cast<uint8_t *>(data));
     ret = getPortcapabilityFuzzAdapter->GetPortCapability(adapterFuzz, audioPort, &capability);
     if (ret == HDF_SUCCESS) {
         result = true;

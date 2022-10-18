@@ -45,7 +45,7 @@
 #define USB_RAW_IO_STOP_WAIT_MAX_TIME 2
 #define USB_DEVICE_VENDOR_ID          0x12D1
 #define USB_DEVICE_PRODUCT_ID         0x5000
-#define USB_RECV_COUNT_TSH 10000
+#define USB_RECV_COUNT_TSH            10000
 
 static struct AcmDevice *g_acm = NULL;
 static bool g_stopIoThreadFlag = false;
@@ -323,9 +323,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice * const acm, struct Usb
 
 static int32_t UsbAllocDataRequests(struct AcmDevice * const acm)
 {
-    int32_t i;
-    int32_t ret;
-    for (i = 0; i < TEST_CYCLE; i++) {
+    for (int32_t i = 0; i < TEST_CYCLE; i++) {
         struct AcmDb *snd = &acm->db[i];
         snd->request = UsbRawAllocRequest(acm->devHandle, 0, acm->dataEp->maxPacketSize);
         snd->instance = acm;
@@ -342,9 +340,9 @@ static int32_t UsbAllocDataRequests(struct AcmDevice * const acm)
         reqData.buffer = snd->buf;
         reqData.length = acm->dataSize;
 
-        ret = UsbRawFillBulkRequest(snd->request, acm->devHandle, &reqData);
+        int32_t ret = UsbRawFillBulkRequest(snd->request, acm->devHandle, &reqData);
         if (ret != HDF_SUCCESS) {
-            printf("%s: FillInterruptRequest failed, ret=%d", __func__, ret);
+            printf("%s: FillBulkRequest failed, ret = %d", __func__, ret);
             return HDF_FAILURE;
         }
     }
@@ -501,7 +499,7 @@ static void SpeedPrint(void)
     uint64_t count;
 
     sigCnt++;
-    count = sigCnt * TEST_PRINT_TIME;
+    count = (uint64_t)sigCnt * TEST_PRINT_TIME;
     if (count >= TEST_TIME) {
         g_speedFlag = true;
     }

@@ -41,7 +41,7 @@ bool UsbInterruptTransferReadFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    int32_t timeout = *(int32_t *)data;
+    int32_t timeout = *(reinterpret_cast<int32_t *>(*data));
     ret = usbInterface->InterruptTransferRead(dev, pipe, timeout, reinterpret_cast<std::vector<uint8_t> &>(data));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: interrupt transfer read succeed", __func__);

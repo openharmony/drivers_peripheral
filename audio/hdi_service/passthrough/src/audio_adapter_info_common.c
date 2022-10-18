@@ -500,7 +500,7 @@ static int32_t AudioAdaptersSetAdapter(
     return HDF_SUCCESS;
 }
 
-int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor *descs, uint32_t *size)
+int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor *descs, const uint32_t *size)
 {
     uint32_t realSize = 0;
     if (descs == NULL || size == NULL) {

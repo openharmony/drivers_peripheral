@@ -72,7 +72,7 @@ class TestStreamConsumerListener : public IBufferConsumerListener {
 
 class StreamConsumer {
     public:
-        OHOS::sptr<OHOS::IBufferProducer> CreateProducer(std::function<void(void*, uint32_t)>& callback)
+        OHOS::sptr<OHOS::IBufferProducer> CreateProducer(const std::function<void(void*, uint32_t)>& callback)
         {
             consumer_ = OHOS::Surface::CreateSurfaceAsConsumer();
             if (consumer_ == nullptr) {
@@ -169,7 +169,7 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     Camera::CamRetCode ret = sampleObj->GetCameraIds(cameraIds);
     std::cout << "GetCameraIds ret = " << ret << std::endl;
 
-    std::shared_ptr<CameraAbility> ability = nullptr;
+    std::shared_ptr<CameraAbility> ability;
     std::string cameraId = cameraIds.front();
 
     ret = sampleObj->GetCameraAbility(cameraId, ability);

@@ -70,7 +70,8 @@ static int32_t TestParaseCommand(int32_t paramNum, const char *cmdParam, int32_t
         return HDF_ERR_INVALID_PARAM;
     }
 
-    for (uint32_t i = 0; i < strlen(cmdParam); i++) {
+    uint32_t len = strlen(cmdParam);
+    for (uint32_t i = 0; i < len; i++) {
         switch (cmdParam[i]) {
             case 'A':
                 strcpy_s(apiType, DATA_MAX_LEN, "-SDK");

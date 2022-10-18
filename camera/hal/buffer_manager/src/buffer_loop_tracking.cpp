@@ -214,7 +214,7 @@ void TrackingStream::DumpTrace(BufferTraceGraph& graph)
         }
         std::list<TrackingBuffer> buffers = {};
         auto bufferList = n->GetTrackingBuffer();
-        for (auto& b : bufferList) {
+        for (const auto& b : bufferList) {
             if (b == nullptr) {
                 graph.clear();
                 return;

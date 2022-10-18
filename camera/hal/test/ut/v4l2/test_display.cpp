@@ -353,10 +353,10 @@ void TestDisplay::Init()
         deviceManager->Init();
         initFlag = 1;
     }
-    constexpr const char *demoServiceName = "camera_service";
     std::cout << "==========[test log] TestDisplay::Init()." << std::endl;
     if (cameraHost == nullptr) {
-        cameraHost = ICameraHost::Get(demoServiceName, false);
+        constexpr const char *DEMO_SERVICE_NAME = "camera_service";
+        cameraHost = ICameraHost::Get(DEMO_SERVICE_NAME, false);
         std::cout << "==========[test log] Camera::CameraHost::CreateCameraHost();" << std::endl;
         if (cameraHost == nullptr) {
             std::cout << "==========[test log] CreateCameraHost failed." << std::endl;
@@ -395,9 +395,9 @@ void TestDisplay::UsbInit()
         deviceManager->Init();
         initFlag = 1;
     }
-    constexpr const char *demoServiceName = "camera_service";
     if (cameraHost == nullptr) {
-        cameraHost = ICameraHost::Get(demoServiceName, false);
+        constexpr const char *DEMO_SERVICE_NAME = "camera_service";
+        cameraHost = ICameraHost::Get(DEMO_SERVICE_NAME, false);
         if (cameraHost == nullptr) {
             std::cout << "==========[test log] CreateCameraHost failed." << std::endl;
             return;

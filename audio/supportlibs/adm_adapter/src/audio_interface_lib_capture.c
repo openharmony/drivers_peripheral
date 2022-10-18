@@ -1057,7 +1057,7 @@ int32_t AudioOutputCaptureStartPrepare(const struct DevHandleCapture *handle,
         return HDF_FAILURE;
     }
     service = (struct HdfIoService *)handle->object;
-    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+    if (service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         AUDIO_FUNC_LOGE("CaptureStartPrepare Service is NULL!");
         return HDF_FAILURE;
     }
@@ -1078,7 +1078,7 @@ int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
         return HDF_FAILURE;
     }
     service = (struct HdfIoService *)handle->object;
-    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+    if (service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         AUDIO_FUNC_LOGE("CaptureStop Service is NULL!");
         return HDF_FAILURE;
     }
@@ -1172,7 +1172,7 @@ int32_t AudioOutputCaptureGetMmapPosition(const struct DevHandleCapture *handle,
     struct HdfIoService *service = NULL;
     struct HdfSBuf *reply = NULL;
     service = (struct HdfIoService *)handle->object;
-    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+    if (service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         AUDIO_FUNC_LOGE("The pointer is empty!");
         return HDF_FAILURE;
     }

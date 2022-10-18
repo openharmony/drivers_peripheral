@@ -128,7 +128,7 @@ public:
         return mDeviceSelect;
     }
 
-    int GetAcquireFenceFd()
+    int GetAcquireFenceFd() const
     {
         return mAcquireFence.GetFd();
     }
@@ -146,7 +146,7 @@ public:
         return fd;
     }
 
-    bool IsVisible()
+    bool IsVisible() const
     {
         return mVisible;
     }

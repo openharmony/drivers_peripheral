@@ -32,7 +32,7 @@ bool AudioGetmuteRenderFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    struct AudioRender *handle = (struct AudioRender *)data;
+    struct AudioRender *handle = reinterpret_cast<struct AudioRender *>(const_cast<uint8_t *>(data));
     ret = geMuteCapRender->volume.GetMute(handle, &mute);
     if (ret == HDF_SUCCESS) {
         result = true;

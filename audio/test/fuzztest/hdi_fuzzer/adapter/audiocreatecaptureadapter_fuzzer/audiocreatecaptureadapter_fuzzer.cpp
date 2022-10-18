@@ -40,7 +40,7 @@ bool AudioCreateCaptureAdapterFuzzTest(const uint8_t *data, size_t size)
     InitDevDesc(devDesc, adapterFuzzCapturePort->portId, PIN_IN_MIC);
 
     struct AudioCapture *capture = nullptr;
-    struct AudioAdapter *adapterFuzz = (struct AudioAdapter *)data;
+    struct AudioAdapter *adapterFuzz = reinterpret_cast<struct AudioAdapter *>(const_cast<uint8_t *>(data));
     ret = adapterFuzzAdapter->CreateCapture(adapterFuzz, &devDesc, &attrs, &capture);
     if (ret == HDF_SUCCESS) {
         result = true;

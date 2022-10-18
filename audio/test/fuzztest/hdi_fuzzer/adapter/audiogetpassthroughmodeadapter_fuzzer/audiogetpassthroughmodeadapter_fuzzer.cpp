@@ -36,7 +36,7 @@ bool AudioGetpassthroughmodeAdapterFuzzTest(const uint8_t *data, size_t size)
     }
     AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
 
-    struct AudioAdapter *adapterFuzz = (struct AudioAdapter *)data;
+    struct AudioAdapter *adapterFuzz = reinterpret_cast<struct AudioAdapter *>(const_cast<uint8_t *>(data));
     ret = getPassthroughFuzzAdapter->GetPassthroughMode(adapterFuzz, audioPort, &mode);
     if (ret == HDF_SUCCESS) {
         result = true;

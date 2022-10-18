@@ -1347,13 +1347,12 @@ static void AcmReadBulk(struct UsbRequest *req)
             HDF_LOGD("Bulk status: %d+size:%zu\n", status, size);
             if (size) {
                 uint8_t *data = req->compInfo.buffer;
-                uint32_t count;
                 OsalMutexLock(&acm->readLock);
                 if (DataFifoIsFull(&acm->port->readFifo)) {
                     HDF_LOGD("%s:%d", __func__, __LINE__);
                     DataFifoSkip(&acm->port->readFifo, size);
                 }
-                count = DataFifoWrite(&acm->port->readFifo, data, size);
+                uint32_t count = DataFifoWrite(&acm->port->readFifo, data, size);
                 if (count != size) {
                     HDF_LOGW("%s: write %u less than expected %zu", __func__, count, size);
                 }

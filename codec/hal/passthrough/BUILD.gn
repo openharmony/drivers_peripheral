@@ -65,6 +65,7 @@ ohos_shared_library("libcodec_hdi_passthrough_impl") {
     external_deps = [
       "c_utils:utils",
       "drivers_peripheral_display:hdi_gralloc_client",
+      "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]

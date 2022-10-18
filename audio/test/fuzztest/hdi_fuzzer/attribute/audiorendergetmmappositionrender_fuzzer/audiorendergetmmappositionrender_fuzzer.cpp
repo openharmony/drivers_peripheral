@@ -32,7 +32,7 @@ namespace Audio {
         }
         uint64_t frames = 0;
         struct AudioTimeStamp time = {};
-        struct AudioRender *renderFuzz = (struct AudioRender *)data;
+        struct AudioRender *renderFuzz = reinterpret_cast<struct AudioRender *>(const_cast<uint8_t *>(data));
         ret = render->attr.GetMmapPosition(renderFuzz, &frames, &time);
         if (ret == HDF_SUCCESS) {
             result = true;

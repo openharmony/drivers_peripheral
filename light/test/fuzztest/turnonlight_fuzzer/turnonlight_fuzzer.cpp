@@ -21,20 +21,19 @@
 using namespace OHOS::HDI::Light::V1_0;
 
 namespace OHOS {
-    bool TurnOnLightFuzzTest(const uint8_t* data, size_t size)
-    {
-        bool result = false;
-        sptr<ILightInterface> g_lightInterface = ILightInterface::Get();
-        if (!g_lightInterface->TurnOnLight(*(int32_t *)data, reinterpret_cast<const HdfLightEffect &>(data))) {
-            result = true;
-        }
-        return result;
+bool TurnOnLightFuzzTest(const uint8_t *data, size_t size)
+{
+    bool result = false;
+    sptr<ILightInterface> g_lightInterface = ILightInterface::Get();
+    if (!g_lightInterface->TurnOnLight(*static_cast<int32_t *>(data), reinterpret_cast<const HdfLightEffect &>(data))) {
+        result = true;
     }
+    return result;
 }
+} // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::TurnOnLightFuzzTest(data, size);
     return 0;
 }
-

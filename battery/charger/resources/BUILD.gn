@@ -548,3 +548,9 @@ ohos_prebuilt_etc("init.charger.cfg") {
   part_name = "drivers_peripheral_battery"
   subsystem_name = "hdf"
 }
+
+ohos_prebuilt_etc("device.charge.group.cfg") {
+  source = "device.charge.group.cfg"
+  part_name = "drivers_peripheral_battery"
+  subsystem_name = "hdf"
+}
