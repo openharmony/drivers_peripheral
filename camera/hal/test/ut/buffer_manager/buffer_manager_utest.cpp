@@ -571,11 +571,12 @@ void BufferManagerTest::Stream::EnqueueBufferNonBlock()
     std::shared_ptr<IBuffer> buffer = nullptr;
     {
         std::lock_guard<std::mutex> l(lock_);
-        for (auto& it : bufferVec_) {
-            if (it.first == sb) {
-                buffer = it.second;
-                break;
-            }
+        auto it = std::find_if(bufferVec_.begin(), bufferVec_.end(),
+            [sb](const std::pair<OHOS::sptr<OHOS::SurfaceBuffer>, std::shared_ptr<IBuffer>>& b) {
+            return b.first == sb;
+        });
+        if (it != bufferVec_.end()) {
+            buffer = it->second;
         }
     }
     if (buffer == nullptr) {
@@ -609,11 +610,12 @@ void BufferManagerTest::Stream::DequeueBuffer(std::shared_ptr<IBuffer>& buffer)
 #endif
         {
             std::lock_guard<std::mutex> l(lock_);
-            for (auto& it : bufferVec_) {
-                if (it.second == buffer) {
-                    surfaceBuffer = it.first;
-                    break;
-                }
+            auto it = std::find_if(bufferVec_.begin(), bufferVec_.end(),
+                [buffer](const std::pair<OHOS::sptr<OHOS::SurfaceBuffer>, std::shared_ptr<IBuffer>>& b) {
+                return b.second == buffer;
+            });
+            if (it != bufferVec_.end()) {
+                surfaceBuffer = it->first;
             }
         }
 

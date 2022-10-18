@@ -58,7 +58,6 @@ HWTEST_F(CameraHostImplTest, UTestSetFlashlight, TestSize.Level0)
     ret = GetCameraIds();
     ASSERT_EQ(true, ret);
 
-    std::shared_ptr<CameraAbility> ability = nullptr;
     std::string cameraId = cameraIds_.front();
     bool isEnable = true;
     CamRetCode rc = (CamRetCode)cameraHost_->SetFlashlight(cameraId, isEnable);

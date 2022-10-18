@@ -42,9 +42,9 @@ public:
 #else
     OHOS::sptr<OHOS::IBufferProducer> CreateProducer();
 #endif
-    void CamFrame(const std::function<void(void*, const uint32_t)> callback);
+    void CamFrame(const std::function<void(const unsigned char *, const uint32_t)> callback);
 
-    OHOS::Camera::RetCode ReceiveFrameOn(const std::function<void(void*, const uint32_t)> callback);
+    OHOS::Camera::RetCode ReceiveFrameOn(const std::function<void(const unsigned char *, const uint32_t)> callback);
     void ReceiveFrameOff();
 
 #ifndef CAMERA_BUILT_ON_OHOS_LITE
