@@ -24,7 +24,7 @@ namespace OHOS {
 namespace HDI {
 namespace Bluetooth {
 namespace Hci {
-MctProtocol::MctProtocol(int fds[HCI_MAX_CHANNEL], HciDataCallback onAclReceive, HciDataCallback onScoReceive,
+MctProtocol::MctProtocol(const int fds[HCI_MAX_CHANNEL], HciDataCallback onAclReceive, HciDataCallback onScoReceive,
     HciDataCallback onEventReceive)
 {
     for (int ii = 0; ii < HCI_MAX_CHANNEL; ii++) {
