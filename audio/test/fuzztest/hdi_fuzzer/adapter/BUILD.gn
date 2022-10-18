@@ -22,24 +22,15 @@ group("adapter") {
 
   deps += [
     # deps file
-    "audiocreatecaptureadapter_fuzzer:AudioCreateCaptureAdapterFuzzTest",
     "audiocreatecaptureattrs_fuzzer:AudioCreateCaptureAttrsFuzzTest",
     "audiocreatecapturedesc_fuzzer:AudioCreatecaptureDescFuzzTest",
-    "audiocreaterenderadapter_fuzzer:AudioCreaterenderAdapterFuzzTest",
     "audiocreaterenderattrs_fuzzer:AudioCreaterenderAttrsFuzzTest",
     "audiocreaterenderdesc_fuzzer:AudioCreaterenderDescFuzzTest",
-    "audiodestroycaptureadapter_fuzzer:AudioDestroycaptureAdapterFuzzTest",
     "audiodestroycapturecapture_fuzzer:AudioDestroycaptureCaptureFuzzTest",
-    "audiodestroyrenderadapter_fuzzer:AudioDestroyrenderAdapterFuzzTest",
     "audiodestroyrenderrender_fuzzer:AudioDestroyrenderRenderFuzzTest",
     "audiogetalladapters_fuzzer:AudioGetalladaptersFuzzTest",
-    "audiogetpassthroughmodeadapter_fuzzer:AudioGetpassthroughmodeAdapterFuzzTest",
-    "audiogetportcapabilityadapter_fuzzer:AudioGetportcapabilityAdapterFuzzTest",
-    "audioinitallports_fuzzer:AudioInitallportsFuzzTest",
     "audioloadadapterdesc_fuzzer:AudioLoadadapterDescFuzzTest",
     "audioloadadaptermanager_fuzzer:AudioLoadadapterManagerFuzzTest",
-    "audiosetpassthroughmodeadapter_fuzzer:AudioSetpassthroughmodeAdapterFuzzTest",
-    "audiounloadadapteradapter_fuzzer:AudioUnloadadapterAdapterFuzzTest",
     "audiounloadadaptermanager_fuzzer:AudioUnloadadapterManagerFuzzTest",
   ]
 }
