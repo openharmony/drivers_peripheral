@@ -430,19 +430,19 @@ RetCode HosV4L2Dev::UpdateSetting(const std::string& cameraID, AdapterCmd comman
             rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_EXPOSURE_ABSOLUTE, *(int32_t*)args);
             break;
         case CMD_EXPOSURE_COMPENSATION:
-            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_EXPOSURE, *(int32_t*)args);
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_EXPOSURE, *(const_cast<int32_t*>(args)));
             break;
         case CMD_AWB_MODE:
-            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE, *(int32_t*)args);
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE, *(const_cast<int32_t*>(args)));
             break;
         case CMD_FOCUS_MODE:
-            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_FOCUS_AUTO, *(int32_t*)args);
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_FOCUS_AUTO, *(const_cast<int32_t*>(args)));
             break;
         case CMD_METER_MODE:
             rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_EXPOSURE_METERING, *(int32_t*)args);
             break;
         case CMD_FLASH_MODE:
-            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_FLASH_LED_MODE, *(int32_t*)args);
+            rc = myControl_->V4L2SetCtrl(fd, V4L2_CID_FLASH_LED_MODE, *(const_cast<int32_t*>(args)));
             break;
         default:
             break;

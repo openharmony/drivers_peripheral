@@ -146,7 +146,7 @@ RetCode StreamTunnel::SetBufferCount(const int32_t n)
     return RC_OK;
 }
 
-RetCode StreamTunnel::Config(const TunnelConfig config)
+RetCode StreamTunnel::Config(const TunnelConfig& config)
 {
     requestConfig_.width = config.width;
     requestConfig_.height = config.height;

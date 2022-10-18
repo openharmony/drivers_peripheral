@@ -47,7 +47,7 @@ TEST_F(UtestOpenCameraTest, camera_open_0001)
     std::cout << "==========[test log] OpenCamera, success."<< std::endl;
     std::vector<std::string> cameraIds;
     display_->cameraHost->GetCameraIds(cameraIds);
-    for (auto &cameraId : cameraIds) {
+    for (const auto &cameraId : cameraIds) {
         std::cout << "cameraId = " << cameraId << std::endl;
     }
     std::string cameraId = cameraIds.front();

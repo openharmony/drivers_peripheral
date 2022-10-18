@@ -34,10 +34,7 @@ void StreamCustomer::CamFrame(const std::function<void(void*, uint32_t)> callbac
             void* addr = buff->GetVirAddr();
             int32_t size = buff->GetSize();
             if (callback != nullptr) {
-                int32_t gotSize = 0;
                 int32_t frameNum = 0;
-                int isKey = 0;
-                int64_t timestamp;
                 callback(addr, size);
             }
             consumer_->ReleaseBuffer(buff, -1);
