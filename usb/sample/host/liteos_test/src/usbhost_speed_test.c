@@ -165,29 +165,26 @@ static void *StopHandler(void)
 static enum speedServer checkServer(const char *input)
 {
     char middle[10] = {0};
-    enum speedServer out;
     if (input == NULL) {
         HDF_LOGE("%s:%d input is NULL", __func__, __LINE__);
-        out = SDKAPI_SERVER;
-        return out;
+        return SDKAPI_SERVER;
     }
 
     int32_t ret = strncpy_s(middle, sizeof(middle), input, (uint32_t)strlen(input));
     if (ret != EOK) {
         HDF_LOGE("%s:%d strncpy_s failed", __func__, __LINE__);
-        return out;
+        return SDKAPI_SERVER;
     }
 
-    if (!strcmp(middle, "-SDK")) {
-        out = SDKAPI_SERVER;
-    } else if (!strcmp(middle, "-RAW")) {
-        out = RAWAPI_SERVER;
-    } else if (!strcmp(middle, "-NOSDK")) {
-        out = NOSDK_SERVER;
-    } else {
-        out = SDKAPI_SERVER;
+    if (strcmp(middle, "-SDK") == 0) {
+        return SDKAPI_SERVER;
     }
-    return out;
+    if (strcmp(middle, "-RAW") == 0) {
+        return RAWAPI_SERVER;
+    }
+    if (strcmp(middle, "-NOSDK") == 0) {
+        return NOSDK_SERVER;
+    }
 }
 
 static int32_t GetWriteOrReadFlag(const char *buffer)

@@ -72,7 +72,7 @@ OUT:
     return mem;
 }
 
-static bool UsbFindUrb(struct Async *urb, struct DListHead *list)
+static bool UsbFindUrb(const struct Async *urb, struct DListHead *list)
 {
     bool findFlag = false;
     struct OsDev *osDev = CONTAINER_OF(list, struct OsDev, asyncCompleted);
