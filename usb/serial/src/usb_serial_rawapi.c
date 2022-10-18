@@ -848,7 +848,6 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
     int32_t size;
     struct AcmDevice *acm = port->acm;
     uint8_t *data = NULL;
-    uint32_t count;
     struct UsbRequestData requestData;
 
     if (g_syncRequest == NULL) {
@@ -872,13 +871,13 @@ static int32_t UsbSerialReadSync(const struct SerialDevice *port, const struct H
         return ret;
     }
 
-    count = (uint32_t)g_syncRequest->actualLength;
+    uint32_t count = (uint32_t)g_syncRequest->actualLength;
     data = (uint8_t *)OsalMemCalloc(count + 1);
     if (data == NULL) {
         HDF_LOGE("%s: OsalMemCalloc error", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
-    HDF_LOGD("buffer:%p-%s-actualLength:%d", g_syncRequest->buffer, (uint8_t *)g_syncRequest->buffer, count);
+    HDF_LOGD("buffer actualLength:%u", count);
 
     do {
         ret = memcpy_s(data, g_syncRequest->actualLength, g_syncRequest->buffer, count);
@@ -930,9 +929,6 @@ static int32_t UsbSerialDeviceDispatch(
     }
 
     acm = (struct AcmDevice *)client->device->service;
-    if (acm == NULL) {
-        return HDF_FAILURE;
-    }
     port = acm->port;
     if (port == NULL) {
         return HDF_FAILURE;
@@ -1131,13 +1127,12 @@ static void AcmReadBulkCallback(const void *requestArg)
             HDF_LOGD("Bulk status: %d+size:%zu", req->status, size);
             if (size) {
                 uint8_t *data = req->buffer;
-                uint32_t count;
 
                 OsalMutexLock(&acm->readLock);
                 if (DataFifoIsFull(&acm->port->readFifo)) {
                     DataFifoSkip(&acm->port->readFifo, size);
                 }
-                count = DataFifoWrite(&acm->port->readFifo, data, size);
+                uint32_t count = DataFifoWrite(&acm->port->readFifo, data, size);
                 if (count != size) {
                     HDF_LOGW("%s: write %u less than expected %zu", __func__, count, size);
                 }

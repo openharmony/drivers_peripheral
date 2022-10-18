@@ -88,7 +88,8 @@ int32_t AudioProxyManagerLoadAdapter(struct AudioProxyManager *manager, const st
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(struct AudioHwAdapter));
+    struct AudioHwAdapter *hwAdapter =
+        reinterpret_cast<struct AudioHwAdapter *>(calloc(1, sizeof(struct AudioHwAdapter)));
     if (hwAdapter == NULL) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_MALLOC_FAIL;
@@ -179,7 +180,8 @@ struct AudioProxyManager *GetAudioProxyManagerFuncs(void)
         HdfRemoteServiceRecycle(remote);
         return NULL;
     }
-    struct AudioProxyManager *proxyDevMgr = (AudioProxyManager *)OsalMemAlloc(sizeof(struct AudioProxyManager));
+    struct AudioProxyManager *proxyDevMgr =
+        reinterpret_cast<AudioProxyManager *>(OsalMemAlloc(sizeof(struct AudioProxyManager)));
     if (proxyDevMgr == NULL) {
         HDF_LOGE("malloc failed!");
         HdfRemoteServiceRecycle(remote);

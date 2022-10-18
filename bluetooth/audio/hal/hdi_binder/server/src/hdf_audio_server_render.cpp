@@ -625,7 +625,8 @@ int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     AudioSetRenderStatus(adapterName, true);
-    ret = render->RenderFrame(render, (const void *)frame, (uint64_t)requestBytes, &replyBytes);
+    ret = render->RenderFrame(render, static_cast<const void *>(frame),
+        static_cast<uint64_t>(requestBytes), &replyBytes);
     AudioSetRenderStatus(adapterName, false);
     HDF_LOGE("%{public}s,%{public}u,%{public}ju", __func__, requestBytes, replyBytes);
     if (ret < 0) {
@@ -898,7 +899,7 @@ int32_t HdiServiceRenderRegCallback(const struct HdfDeviceIoClient *client, stru
         HDF_LOGE("%{public}s: read cookie Is NULL", __func__);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    cookie = (void *)(uintptr_t)tempAddr;
+    cookie = reinterpret_cast<void *>((uintptr_t)tempAddr);
     if (!HdfSbufReadUint64(data, &tempAddr)) {
         HDF_LOGE("%{public}s: read callback pointer Is NULL", __func__);
         return AUDIO_HAL_ERR_INTERNAL;

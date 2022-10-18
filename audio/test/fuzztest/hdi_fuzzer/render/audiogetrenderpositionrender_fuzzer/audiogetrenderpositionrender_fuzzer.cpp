@@ -34,7 +34,7 @@ bool AudioGetrenderpositionRenderFuzzTest(const uint8_t *data, size_t size)
     uint64_t frames = 0;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
 
-    struct AudioRender *renderFuzz = (struct AudioRender *)data;
+    struct AudioRender *renderFuzz = reinterpret_cast<struct AudioRender *>(const_cast<uint8_t *>(data));
     ret = getRenPosFuzzRender->GetRenderPosition(renderFuzz, &frames, &time);
     if (ret == HDF_SUCCESS) {
         result = true;

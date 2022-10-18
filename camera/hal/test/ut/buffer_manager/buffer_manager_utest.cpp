@@ -389,7 +389,7 @@ HWTEST_F(BufferManagerTest, TestTrackingBufferLoop, TestSize.Level0)
 
 namespace OHOS::CameraUtest {
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
-bool BufferManagerTest::Stream::Init(std::shared_ptr<OHOS::Surface>& producer)
+bool BufferManagerTest::Stream::Init(const std::shared_ptr<OHOS::Surface>& producer)
 {
     Camera::BufferManager* manager = Camera::BufferManager::GetInstance();
     if (manager == nullptr) {

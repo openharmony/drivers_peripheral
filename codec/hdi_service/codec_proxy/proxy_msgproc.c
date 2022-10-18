@@ -16,6 +16,7 @@
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include <securec.h>
+#include "common_msgproc.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -236,7 +237,9 @@ static int32_t CodecProxyPackBufferInfo(struct HdfSBuf *data, const CodecBufferI
             return HDF_FAILURE;
         }
     } else if (buffer->type == BUFFER_TYPE_HANDLE) {
-        return HDF_FAILURE;
+        if (!PackBufferHandle(data, (BufferHandle *)buffer->buf)) {
+            return HDF_FAILURE;
+        }
     } else {
         HDF_LOGE("%{public}s: buffer->type is  err!", __func__);
         return HDF_FAILURE;
@@ -280,7 +283,9 @@ static int32_t CodecProxyParseBufferInfo(struct HdfSBuf *reply, CodecBufferInfo 
             return HDF_FAILURE;
         }
     } else if (buffer->type == BUFFER_TYPE_HANDLE) {
-        return HDF_FAILURE;
+        if (!ParseBufferHandle(reply, (BufferHandle **)&buffer->buf)) {
+            return HDF_FAILURE;
+        }
     }
     if (!HdfSbufReadUint32(reply, &buffer->offset)) {
         HDF_LOGE("%{public}s: read offset failed!", __func__);

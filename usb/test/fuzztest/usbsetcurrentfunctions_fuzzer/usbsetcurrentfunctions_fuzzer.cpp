@@ -33,7 +33,7 @@ bool UsbSetCurrentFunctionsFuzzTest(const uint8_t *data, size_t size)
         return ret;
     }
 
-    int32_t func = *(int32_t *)data;
+    int32_t timeout = *(reinterpret_cast<int32_t *>(*data));
     ret = usbInterface->SetCurrentFunctions(func);
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: set interface succeed", __func__);

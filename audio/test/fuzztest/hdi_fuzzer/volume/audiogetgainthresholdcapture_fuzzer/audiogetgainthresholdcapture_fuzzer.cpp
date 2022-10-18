@@ -32,7 +32,7 @@ bool AudioGetgainthresholdCaptureFuzzTest(const uint8_t *data, size_t size)
         HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
         return false;
     }
-    struct AudioCapture *handle = (struct AudioCapture *)data;
+    struct AudioCapture *handle = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
     ret = getGainThreCapture->volume.GetGainThreshold(handle, &min, &max);
     if (ret == HDF_SUCCESS) {
         result = true;

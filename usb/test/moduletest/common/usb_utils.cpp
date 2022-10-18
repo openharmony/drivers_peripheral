@@ -120,7 +120,6 @@ static void ParseFile(char *pch, struct ParseProcInfo &pinfo)
 void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
 {
     char s[100];
-    char *pch;
     struct ParseProcInfo pinfo = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0};
 
     FILE *fp = fopen(file.c_str(), "r");
@@ -132,8 +131,7 @@ void CalcProcInfoFromFile(struct ProcInfo &info, const string &file)
         if (fgets(s, sizeof(s), fp) == nullptr) {
             break;
         }
-        pch = strtok(s, " \t");
-        ParseFile(pch, pinfo);
+        ParseFile(strtok(s, " \t"), pinfo);
     }
 
     if (pinfo.ramCount == 0 || pinfo.cpuCount == 0) {

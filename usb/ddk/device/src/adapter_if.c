@@ -96,21 +96,21 @@ static void DeleteFile(const char *path)
 {
     DIR *dir = NULL;
     struct dirent *dirInfo = NULL;
-    char filePath[PATH_MAX];
 
     if (IsDir(path)) {
         if ((dir = opendir(path)) == NULL) {
             return;
         }
+        char filePath[PATH_MAX];
         while ((dirInfo = readdir(dir)) != NULL) {
             GetFilePath(path, dirInfo->d_name, filePath);
             if (IsSpecialDir(dirInfo->d_name)) {
                 continue;
             }
-            closedir(dir);
             DeleteFile(filePath);
             (void)remove(filePath);
         }
+        closedir(dir);
     }
 }
 
@@ -269,7 +269,6 @@ static int32_t UsbFnReadFile(const char *path, char *str, uint16_t len)
 static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName, int32_t enable)
 {
     char tmp[MAX_PATHLEN] = {0};
-    char udcTmp[MAX_NAMELEN] = {0};
     if (deviceName == NULL || udcName == NULL || IsDeviceDirExist(deviceName) == false) {
         return HDF_ERR_INVALID_PARAM;
     }
@@ -281,6 +280,7 @@ static int32_t UsbFnAdapterWriteUDC(const char *deviceName, const char *udcName,
     }
     if (enable != 0) {
         (void)UsbFnWriteFile(tmp, udcName);
+        char udcTmp[MAX_NAMELEN] = {0};
         for (int32_t i = 0; i < OPEN_CNT; i++) {
             (void)UsbFnReadFile(tmp, udcTmp, strlen(udcName));
             if (!strcmp(udcName, udcTmp)) {

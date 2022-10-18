@@ -146,7 +146,7 @@ uint32_t InitHwCapture(struct AudioHwCapture *&hwCapture, const std::string adap
     return HDF_SUCCESS;
 }
 int32_t CaptureReqMmapBufferInit(struct AudioFrameCaptureMode &frameCaptureMode,
-                                 std::string path, const int64_t fileSize)
+                                 const std::string path, const int64_t fileSize)
 {
     FILE *file = fopen(path.c_str(), "wb+");
     if (file == nullptr) {
@@ -163,7 +163,7 @@ int32_t CaptureReqMmapBufferInit(struct AudioFrameCaptureMode &frameCaptureMode,
     frameCaptureMode.mmapBufDesc.memoryAddress = mmap(NULL, fileSize, PROT_READ | PROT_WRITE,
         MAP_SHARED, fd, 0);
     if (frameCaptureMode.mmapBufDesc.memoryAddress == NULL ||
-        frameCaptureMode.mmapBufDesc.memoryAddress == (void *)(-1)) {
+        frameCaptureMode.mmapBufDesc.memoryAddress == reinterpret_cast<void *>(-1)) {
         (void)fclose(file);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -177,7 +177,7 @@ int32_t CaptureReqMmapBufferInit(struct AudioFrameCaptureMode &frameCaptureMode,
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t RenderReqMmapBufferInit(struct AudioFrameRenderMode &frameRenderMode, std::string path, int64_t &fileSize)
+int32_t RenderReqMmapBufferInit(struct AudioFrameRenderMode &frameRenderMode, const std::string path, int64_t &fileSize)
 {
     char absPath[PATH_MAX] = {0};
     if (realpath(path.c_str(), absPath) == nullptr) {
@@ -199,7 +199,7 @@ int32_t RenderReqMmapBufferInit(struct AudioFrameRenderMode &frameRenderMode, st
     frameRenderMode.mmapBufDesc.memoryAddress = mmap(NULL, fileSize, PROT_READ,
         MAP_SHARED, fd, 0);
     if (frameRenderMode.mmapBufDesc.memoryAddress == NULL ||
-        frameRenderMode.mmapBufDesc.memoryAddress == (void *)(-1)) {
+        frameRenderMode.mmapBufDesc.memoryAddress == reinterpret_cast<void *>(-1)) {
         (void)fclose(file);
         return HDF_FAILURE;
     }

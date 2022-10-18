@@ -131,7 +131,6 @@ uint32_t CheckPixel(const BufferHandle &handle, int x, int y, uint32_t color)
 
 void SetUint32(uint32_t &dst, uint32_t value)
 {
-    constexpr uint8_t BITS_PER_BYTE = 8;
     uint8_t *data = reinterpret_cast<uint8_t *>(&dst);
     for (uint8_t i = 0; i < sizeof(uint32_t); i++) {
         *(data + i) = (value >> ((sizeof(uint32_t) - i - 1) * BITS_PER_BYTE)) & 0xff;
@@ -168,7 +167,7 @@ void ClearColor(const BufferHandle &handle, uint32_t color)
     }
 }
 
-void ClearColorRect(const BufferHandle &handle, uint32_t color, IRect &rect)
+void ClearColorRect(const BufferHandle &handle, uint32_t color, const IRect &rect)
 {
     DISPLAY_TEST_LOGD("x %d, y %d w %d h %d color %x ", rect.x, rect.y, rect.w, rect.h, color);
     for (int32_t x = 0; x < rect.w; x++) {

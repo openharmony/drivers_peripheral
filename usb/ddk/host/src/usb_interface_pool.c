@@ -65,7 +65,7 @@ static HDF_STATUS IfDestroyPipeObj(const struct UsbSdkInterface *interfaceObj, c
 
     OsalMutexLock((struct OsalMutex *)&interfaceObj->listLock);
     DLIST_FOR_EACH_ENTRY_SAFE(pipePos, pipeTemp, &interfaceObj->pipeList, struct UsbPipe, object.entry) {
-        if (destroyFlag || (!destroyFlag && pipePos->object.objectId == pipeObj->object.objectId)) {
+        if (destroyFlag || pipePos->object.objectId == pipeObj->object.objectId) {
             found = true;
             DListRemove(&pipePos->object.entry);
             ret = IfFreePipeObj(pipePos);
@@ -780,8 +780,7 @@ HDF_STATUS UsbIfDestroyInterfaceObj(
     OsalMutexLock((struct OsalMutex *)&interfacePool->interfaceLock);
     DLIST_FOR_EACH_ENTRY_SAFE(
         interfacePos, interfaceTemp, &interfacePool->interfaceList, struct UsbSdkInterface, interface.object.entry) {
-        if (destroyFlag ||
-            (!destroyFlag && interfacePos->interface.object.objectId == interfaceObj->interface.object.objectId)) {
+        if (destroyFlag || interfacePos->interface.object.objectId == interfaceObj->interface.object.objectId) {
             found = true;
             DListRemove(&interfacePos->interface.object.entry);
             ret = IfFreeInterfaceObj(interfacePos);

@@ -16,12 +16,14 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libcodec_client") {
   include_dirs = [
     "//drivers/hdf_core/adapter/uhdf2/include/hdi",
+    "//drivers/peripheral/codec/hdi_service/common",
     "//drivers/peripheral/codec/interfaces/include",
   ]
   sources = [
     "codec_proxy/codec_callback_proxy.c",
     "codec_proxy/codec_proxy.c",
     "codec_proxy/proxy_msgproc.c",
+    "common/common_msgproc.c",
   ]
 
   if (is_standard_system) {
@@ -51,6 +53,7 @@ ohos_shared_library("libcodec_server") {
   include_dirs = [
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hdi_service/codec_proxy",
+    "//drivers/peripheral/codec/hdi_service/common/",
     "//drivers/peripheral/codec/hal/v1.0/codec_instance/include",
     "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
     "//drivers/peripheral/codec/hal/v1.0/oem_interface/include",
@@ -67,6 +70,7 @@ ohos_shared_library("libcodec_server") {
     "codec_service_stub/codec_service.c",
     "codec_service_stub/codec_stub.c",
     "codec_service_stub/stub_msgproc.c",
+    "common/common_msgproc.c",
   ]
 
   deps = [ "//drivers/peripheral/codec/hdi_service:codec_client" ]

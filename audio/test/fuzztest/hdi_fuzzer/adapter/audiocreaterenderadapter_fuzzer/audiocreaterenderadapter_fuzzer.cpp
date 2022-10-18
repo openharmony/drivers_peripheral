@@ -39,7 +39,7 @@ bool AudioCreaterenderAdapterFuzzTest(const uint8_t *data, size_t size)
     InitAttrs(attrs);
     InitDevDesc(devDesc, renderPort->portId, PIN_OUT_SPEAKER);
     struct AudioRender *render = nullptr;
-    struct AudioAdapter *adapterFuzz = (struct AudioAdapter *)data;
+    struct AudioAdapter *adapterFuzz = reinterpret_cast<struct AudioAdapter *>(const_cast<uint8_t *>(data));
     ret = adapter->CreateRender(adapterFuzz, &devDesc, &attrs, &render);
     if (ret == HDF_SUCCESS) {
         result = true;
