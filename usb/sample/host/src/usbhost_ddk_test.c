@@ -41,14 +41,6 @@ typedef enum {
 } SerialOPCmd;
 #endif
 
-struct TestUsbDeviceDescriptor {
-    uint16_t idVendor;
-    uint16_t idProduct;
-    uint8_t bDeviceClass;
-    uint8_t bDeviceSubClass;
-    uint8_t bDeviceProtocol;
-};
-
 #define BUFFER_MAX_LEN   1024
 #define SPEED_SLEEP_TIME 300
 
@@ -131,9 +123,8 @@ int32_t UsbHostDdkTestInit(const char *apiType)
     return HDF_SUCCESS;
 }
 
-static void TestModuleWriteLog(int32_t cmdType, const char *str, struct TestUsbDeviceDescriptor *data)
+static void TestModuleWriteLog(int32_t cmdType, const char *str)
 {
-    (void)data;
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
     bool runFlag = false;
 #else
@@ -208,7 +199,7 @@ int32_t UsbHostDdkTestAsyncRead(char * const readSbuf)
         }
         printf("%s:%d %s-%zu!\n", __func__, __LINE__, tmp, strlen(tmp));
         HDF_LOGD("%s:%d %s-%zu!", __func__, __LINE__, tmp, strlen(tmp));
-        TestModuleWriteLog(HOST_ACM_ASYNC_READ, tmp, NULL);
+        TestModuleWriteLog(HOST_ACM_ASYNC_READ, tmp);
     }
 
     return HDF_SUCCESS;
@@ -241,7 +232,7 @@ void UsbHostDdkTestAsyncWrite(const char *buf)
 
     printf("%s:%d %s-%zu!\n", __func__, __LINE__, buf, strlen(buf));
     HDF_LOGI("%s:%d %s-%zu!\n", __func__, __LINE__, buf, strlen(buf));
-    TestModuleWriteLog(HOST_ACM_ASYNC_WRITE, buf, NULL);
+    TestModuleWriteLog(HOST_ACM_ASYNC_WRITE, buf);
 }
 
 void UsbHostDdkTestSyncRead(char *readSbuf)
@@ -270,7 +261,7 @@ void UsbHostDdkTestSyncRead(char *readSbuf)
         }
         printf("%s:%d %s-%zu!\n", __func__, __LINE__, tmp, strlen(tmp));
         HDF_LOGD("%s:%d %s-%zu !", __func__, __LINE__, tmp, strlen(tmp));
-        TestModuleWriteLog(HOST_ACM_SYNC_READ, tmp, NULL);
+        TestModuleWriteLog(HOST_ACM_SYNC_READ, tmp);
     }
 }
 
@@ -298,7 +289,7 @@ void UsbHostDdkTestSyncWrite(const char *buf)
 
     printf("%s:%d %s-%zu!\n", __func__, __LINE__, buf, strlen(buf));
     HDF_LOGD("%s:%d %s-%zu!", __func__, __LINE__, buf, strlen(buf));
-    TestModuleWriteLog(HOST_ACM_SYNC_WRITE, buf, NULL);
+    TestModuleWriteLog(HOST_ACM_SYNC_WRITE, buf);
 }
 
 void UsbHostDdkTestCtrlClass(char *readSbuf)
@@ -323,7 +314,7 @@ void UsbHostDdkTestCtrlClass(char *readSbuf)
             }
         }
         printf("%s:%d usb serial control CMD_CLASS_CTRL command done\n", __func__, __LINE__);
-        TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_CLASS_CTRL", NULL);
+        TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_CLASS_CTRL");
     }
 }
 
@@ -343,7 +334,7 @@ void UsbHostDdkTestStdGetDes(char *readSbuf)
     }
 
     printf("%s:%d usb serial control CMD_STD_CTRL_GET_DESCRIPTOR command done\n", __func__, __LINE__);
-    TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_DESCRIPTOR", NULL);
+    TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_DESCRIPTOR");
     const char *tmp = HdfSbufReadString(g_reply);
     if (tmp && strlen(tmp) > 0) {
         if (readSbuf != NULL) {
@@ -353,7 +344,7 @@ void UsbHostDdkTestStdGetDes(char *readSbuf)
             }
         }
         printf("%s:%d %s!\n", __func__, __LINE__, tmp);
-        TestModuleWriteLog(HOST_ACM_CTRL_READ, tmp, NULL);
+        TestModuleWriteLog(HOST_ACM_CTRL_READ, tmp);
     } else {
         printf("%s:%d HdfSbufReadBuffer failed\n", __func__, __LINE__);
         HDF_LOGE("%s:%d HdfSbufReadBuffer failed", __func__, __LINE__);
@@ -378,7 +369,7 @@ void UsbHostDdkTestStdGetDesAsync(char *readSbuf)
     }
 
     printf("%s:%d usb serial control CMD_STD_CTRL_GET_DESCRIPTOR_ASYNC command done\n", __func__, __LINE__);
-    TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_DESCRIPTOR_ASYNC", NULL);
+    TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_DESCRIPTOR_ASYNC");
     const char *tmp = HdfSbufReadString(g_reply);
     if (tmp && strlen(tmp) > 0) {
         if (readSbuf != NULL) {
@@ -388,7 +379,7 @@ void UsbHostDdkTestStdGetDesAsync(char *readSbuf)
             }
         }
         printf("%s:%d %s!\n", __func__, __LINE__, tmp);
-        TestModuleWriteLog(HOST_ACM_CTRL_READ, tmp, NULL);
+        TestModuleWriteLog(HOST_ACM_CTRL_READ, tmp);
     } else {
         printf("%s:%d HdfSbufReadBuffer failed\n", __func__, __LINE__);
         HDF_LOGE("%s:%d HdfSbufReadBuffer failed", __func__, __LINE__);
@@ -425,7 +416,7 @@ void UsbHostDdkTestStdGetStatus(char *readSbuf)
             }
         }
         printf("%s:%d usb serial control CMD_STD_CTRL_GET_STATUS command done,data = %hu\n", __func__, __LINE__, data);
-        TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_STATUS", NULL);
+        TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_STATUS");
     }
 }
 
@@ -448,7 +439,7 @@ void TestStdGetConf(void)
     }
 
     printf("%s:%d usb serial control CMD_STD_CTRL_GET_CONFIGURATION command done\n", __func__, __LINE__);
-    TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_CONFIGURATION", NULL);
+    TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_CONFIGURATION");
     status = HdfSbufReadUint8(g_reply, &data);
     if (status < 0) {
         printf("%s:%d HdfSbufReadBuffer status = %d\n", __func__, __LINE__, status);
@@ -474,7 +465,7 @@ void TestStdGetInterface(void)
     }
 
     printf("%s:%d usb serial control CMD_STD_CTRL_GET_INTERFACE command done\n", __func__, __LINE__);
-    TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_INTERFACE", NULL);
+    TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_STD_CTRL_GET_INTERFACE");
     status = HdfSbufReadUint8(g_reply, &data);
     if (status < 0) {
         printf("%s:%d HdfSbufReadBuffer status = %d\n", __func__, __LINE__, status);
@@ -506,7 +497,7 @@ void UsbHostDdkTestSetBaudrate(uint32_t value)
 
     printf("%s:%d CMD_SET_BAUDRATE success\n", __func__, __LINE__);
     HDF_LOGI("%s:%d CMD_SET_BAUDRATE success", __func__, __LINE__);
-    TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_SET_BAUDRATE", NULL);
+    TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_SET_BAUDRATE");
 }
 
 void UsbHostDdkTestGetBaudrate(char *readSbuf)
@@ -535,7 +526,7 @@ void UsbHostDdkTestGetBaudrate(char *readSbuf)
             }
         }
         printf("%s:%d baudrate=%u usb serial control CMD_GET_BAUDRATE command done\n", __func__, __LINE__, value);
-        TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_GET_BAUDRATE", NULL);
+        TestModuleWriteLog(HOST_ACM_CTRL_WRITE, "CMD_GET_BAUDRATE");
     } else {
         printf("%s:%d HdfSbufReadUint32 failed!\n", __func__, __LINE__);
         HDF_LOGD("%s:%d HdfSbufReadUint32 failed!", __func__, __LINE__);
