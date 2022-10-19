@@ -45,7 +45,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0001)
     display_->cameraHost->GetCameraIds(cameraIds);
     std::cout << "==========[test log] First cameraId.size = " << cameraIds.size() << std::endl;
     std::cout << "==========[test log] OnCameraStatus interface has been mobilized" << std::endl;
-    for (auto &cameraId : cameraIds) {
+    for (const auto &cameraId : cameraIds) {
         std::cout << "==========[test log] cameraId = " << cameraId << std::endl;
     }
     std::cout << "==========[test log] 2. please add or delete the usb camera, wait for 10s..."<< std::endl;
@@ -59,7 +59,7 @@ TEST_F(UtestUSBCameraTest, camera_usb_0001)
         cameraIds.clear();
     }
     display_->cameraHost->GetCameraIds(cameraIds);
-    for (auto &cameraId : cameraIds) {
+    for (const auto &cameraId : cameraIds) {
         std::cout << "cameraId = " << cameraId << std::endl;
     }
 }

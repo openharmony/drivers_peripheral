@@ -162,10 +162,10 @@ RetCode HosV4L2UVC::V4L2UVCGetCapability(int fd, const std::string devName, std:
         return RC_ERROR;
     }
 
-    if (cameraId != std::string((char*)capability.driver)) {
+    if (cameraId != std::string(reinterpret_cast<char*>(capability.driver))) {
         return RC_ERROR;
     }
-    V4L2UvcMatchDev(std::string((char*)capability.driver), devName, true);
+    V4L2UvcMatchDev(std::string(reinterpret_cast<char*>(capability.driver)), devName, true);
 
     CAMERA_LOGD("UVC:v4l2 driver name = %{public}s\n", capability.driver);
     CAMERA_LOGD("UVC:v4l2 capabilities = 0x{public}%x\n", capability.capabilities);
