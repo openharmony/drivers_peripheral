@@ -131,7 +131,7 @@ void DoublePreviewTest::StartCapture(int streamId, int captureId, bool shutterCa
 void DoublePreviewTest::StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds)
 {
     if (sizeof(captureIds_) > 0) {
-        for (auto &captureId : captureIds_) {
+        for (const auto &captureId : captureIds_) {
             if (captureId == display_->captureId_preview) {
                 streamCustomerPreview_->ReceiveFrameOff();
             } else if (captureId == CAPTUREID_PREVIEW_DOUBLE) {

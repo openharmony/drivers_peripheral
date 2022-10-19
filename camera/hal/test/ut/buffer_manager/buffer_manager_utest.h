@@ -110,7 +110,7 @@ public:
 
     class Node {
     public:
-        explicit Node(const std::string name)
+        explicit Node(const std::string &name)
         {
             name_ = name;
         }
@@ -156,7 +156,7 @@ public:
         Pipeline() = default;
         ~Pipeline() = default;
 
-        bool AddStream(std::shared_ptr<Stream>& stream);
+        bool AddStream(const std::shared_ptr<Stream>& stream);
         void StartStream();
         void StopStream();
 

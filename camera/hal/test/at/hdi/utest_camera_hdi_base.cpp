@@ -111,7 +111,7 @@ bool CameraHdiBaseTest::GetCameraIds()
     return true;
 }
 
-int32_t CameraHdiBaseTest::SaveToFile(const std::string path, const void* buffer, int32_t size) const
+int32_t CameraHdiBaseTest::SaveToFile(const std::string &path, const void* buffer, int32_t size) const
 {
     char checkPath[PATH_MAX] = {0};
     if (::realpath(path.c_str(), checkPath) == nullptr) {

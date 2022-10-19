@@ -203,7 +203,7 @@ unsigned char* TestDisplay::DoFbMmap(int* pmemfd)
 {
     unsigned char* ret;
     int screensize = vinfo_.xres * vinfo_.yres * vinfo_.bits_per_pixel / 8; // 8:picture size
-    ret = (unsigned char*)mmap(NULL, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, *pmemfd, 0);
+    ret = static_cast<unsigned char*>(mmap(NULL, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, *pmemfd, 0));
     if (ret == MAP_FAILED) {
         CAMERA_LOGE("main test:do_mmap: pmem mmap() failed: %s (%d)\n", strerror(errno), errno);
         return NULL;
@@ -340,7 +340,7 @@ void TestDisplay::BufferCallback(void* addr, int choice)
     } else {
         LcdDrawScreen(displayBuf_, (unsigned char*)addr);
         std::cout << "==========[test log] capture start saveYuv......" << std::endl;
-        SaveYUV("capture", (unsigned char*)addr, bufSize_);
+        SaveYUV("capture", reinterpret_cast<unsigned char*>(addr), bufSize_);
         std::cout << "==========[test log] capture end saveYuv......" << std::endl;
         return;
     }
@@ -583,7 +583,7 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
     constexpr uint32_t SLEEP_SECOND_TWO = 2;
     sleep(SLEEP_SECOND_TWO);
     if (sizeof(captureIds) > 0) {
-        for (auto &captureId : captureIds) {
+        for (const auto &captureId : captureIds) {
             if (captureId == captureId_preview) {
                 streamCustomerPreview_->ReceiveFrameOff();
             } else if (captureId == captureId_capture) {
@@ -596,7 +596,7 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
                 streamCustomerAnalyze_->ReceiveFrameOff();
             }
         }
-        for (auto &captureId : captureIds) {
+        for (const auto &captureId : captureIds) {
             std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
             rc = (CamRetCode)streamOperator->CancelCapture(captureId);
             sleep(SLEEP_SECOND_TWO);

@@ -394,7 +394,7 @@ TEST_F(UtestHdiTest, camera_hdi_0070)
     std::vector<OHOS::Camera::MetaType> enableTypes;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(enableTypes);
     EXPECT_EQ(true, display_->rc == NO_ERROR);
-    for (auto &type : enableTypes) {
+    for (const auto &type : enableTypes) {
         std::cout << "==========[test log] type = " << type << std::endl;
     }
     display_->rc = display_->cameraDevice->SetResultMode(Camera::PER_FRAME);
@@ -415,7 +415,7 @@ TEST_F(UtestHdiTest, camera_hdi_0071)
     std::vector<OHOS::Camera::MetaType> enableTypes;
     display_->rc = display_->cameraDevice->GetEnabledReuslts(enableTypes);
     EXPECT_EQ(true, display_->rc == NO_ERROR);
-    for (auto &type : enableTypes) {
+    for (const auto &type : enableTypes) {
         std::cout << "==========[test log] type = " << type << std::endl;
     }
     display_->rc = display_->cameraDevice->SetResultMode(Camera::ON_CHANGED);

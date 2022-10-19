@@ -77,7 +77,7 @@ HWTEST_F(CameraDeviceImplTest, UTestGetEnabledResults, TestSize.Level0)
     CamRetCode rc = (CamRetCode)cameraDevice_->GetEnabledResults(results);
     ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 
-    for (auto &type : results) {
+    for (const auto &type : results) {
         std::cout << "MetaType = " << type << std::endl;
     }
 }
