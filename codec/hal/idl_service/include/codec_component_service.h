@@ -28,7 +28,7 @@ public:
     {}
     virtual ~CodecComponentService() = default;
     int32_t GetComponentVersion(CompVerInfo &verInfo) override;
-    int32_t SendCommand(OMX_COMMANDTYPE cmd, uint32_t param, const std::vector<int8_t> &cmdData) override;
+    int32_t SendCommand(uint32_t cmd, uint32_t param, const std::vector<int8_t> &cmdData) override;
     int32_t GetParameter(uint32_t index, const std::vector<int8_t> &inParamStruct,
                          std::vector<int8_t> &outParamStruct) override;
     int32_t SetParameter(uint32_t index, const std::vector<int8_t> &paramStruct) override;
@@ -36,7 +36,7 @@ public:
                       std::vector<int8_t> &outCfgStruct) override;
     int32_t SetConfig(uint32_t index, const std::vector<int8_t> &cfgStruct) override;
     int32_t GetExtensionIndex(const std::string &paramName, uint32_t &indexType) override;
-    int32_t GetState(OMX_STATETYPE &state) override;
+    int32_t GetState(uint32_t &state) override;
     int32_t ComponentTunnelRequest(uint32_t port, int32_t tunneledComp, uint32_t tunneledPort,
                                    const OMX_TUNNELSETUPTYPE &inTunnelSetup,
                                    OMX_TUNNELSETUPTYPE &outTunnelSetup) override;

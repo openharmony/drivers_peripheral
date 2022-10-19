@@ -124,7 +124,7 @@ int32_t ComponentNode::GetComponentVersion(CompVerInfo &verInfo)
     return err;
 }
 
-int32_t ComponentNode::SendCommand(OHOS::HDI::Codec::V1_0::OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData)
+int32_t ComponentNode::SendCommand(uint32_t cmd, uint32_t param, int8_t *cmdData)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_COMMANDTYPE omxCmd = static_cast<OMX_COMMANDTYPE>(cmd);
@@ -188,7 +188,7 @@ int32_t ComponentNode::GetExtensionIndex(const char *parameterName, uint32_t &in
     return err;
 }
 
-int32_t ComponentNode::GetState(OHOS::HDI::Codec::V1_0::OMX_STATETYPE &state)
+int32_t ComponentNode::GetState(uint32_t &state)
 {
     CHECK_AND_RETURN_RET_LOG(comp_ != nullptr, OMX_ErrorInvalidComponent, "comp_ is null");
     OMX_STATETYPE status = OMX_StateInvalid;
@@ -197,7 +197,7 @@ int32_t ComponentNode::GetState(OHOS::HDI::Codec::V1_0::OMX_STATETYPE &state)
         CODEC_LOGE("OMX_GetState ret value[%{public}x]", err);
         return err;
     }
-    state = static_cast<OHOS::HDI::Codec::V1_0::OMX_STATETYPE>(status);
+    state = static_cast<uint32_t>(status);
     return err;
 }
 
@@ -268,7 +268,7 @@ int32_t ComponentNode::OnEvent(OMX_EVENTTYPE event, uint32_t data1, uint32_t dat
     }
     (void)eventData;
     EventInfo info = {.appData = appData_, .data1 = data1, .data2 = data2};
-    (void)omxCallback_->EventHandler(static_cast<OHOS::HDI::Codec::V1_0::OMX_EVENTTYPE>(event), info);
+    (void)omxCallback_->EventHandler(static_cast<uint32_t>(event), info);
 
     return OMX_ErrorNone;
 }

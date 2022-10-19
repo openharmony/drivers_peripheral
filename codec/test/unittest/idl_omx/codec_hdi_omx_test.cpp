@@ -645,9 +645,9 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetExtensionIndexTest_002, TestSize.Level1)
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetStateTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    OHOS::HDI::Codec::V1_0::OMX_STATETYPE state = OHOS::HDI::Codec::V1_0::OMX_StateInvalid;
+    uint32_t state = OMX_StateInvalid;
     int32_t ret = g_component->GetState(state);
-    ASSERT_EQ(state, OHOS::HDI::Codec::V1_0::OMX_StateLoaded);
+    ASSERT_EQ(state, OMX_StateLoaded);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
@@ -670,8 +670,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiLoadedToIdleTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     std::vector<int8_t> cmdData;
-    int32_t ret = g_component->SendCommand(OHOS::HDI::Codec::V1_0::OMX_CommandStateSet,
-                                           OHOS::HDI::Codec::V1_0::OMX_StateIdle, cmdData);
+    int32_t ret = g_component->SendCommand(OMX_CommandStateSet, OMX_StateIdle, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
@@ -995,27 +994,26 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiWaitStateTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     // wait for Idle status
-    OHOS::HDI::Codec::V1_0::OMX_STATETYPE state = OHOS::HDI::Codec::V1_0::OMX_StateInvalid;
+    uint32_t state = OMX_StateInvalid;
     do {
         usleep(100);
         auto ret = g_component->GetState(state);
         ASSERT_EQ(ret, HDF_SUCCESS);
-    } while (state != OHOS::HDI::Codec::V1_0::OMX_StateIdle);
+    } while (state != OMX_StateIdle);
 }
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFillThisBufferTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     std::vector<int8_t> cmdData;
-    int32_t ret = g_component->SendCommand(OHOS::HDI::Codec::V1_0::OMX_CommandStateSet,
-                                           OHOS::HDI::Codec::V1_0::OMX_StateExecuting, cmdData);
+    int32_t ret = g_component->SendCommand(OMX_CommandStateSet, OMX_StateExecuting, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
-    OHOS::HDI::Codec::V1_0::OMX_STATETYPE state = OHOS::HDI::Codec::V1_0::OMX_StateInvalid;
+    uint32_t state = OMX_StateInvalid;
     do {
         ret = g_component->GetState(state);
         ASSERT_EQ(ret, HDF_SUCCESS);
         usleep(100);
-    } while (state != OHOS::HDI::Codec::V1_0::OMX_StateExecuting);
+    } while (state != OMX_StateExecuting);
 
     // fill this buffer need OMX_StateExecuting
     auto iter = outputBuffers.begin();
@@ -1094,8 +1092,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiExecutingToIdleTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     std::vector<int8_t> cmdData;
-    int32_t ret = g_component->SendCommand(OHOS::HDI::Codec::V1_0::OMX_CommandStateSet,
-                                           OHOS::HDI::Codec::V1_0::OMX_StateIdle, cmdData);
+    int32_t ret = g_component->SendCommand(OMX_CommandStateSet, OMX_StateIdle, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
@@ -1155,20 +1152,19 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiIdleToLoadedTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     std::vector<int8_t> cmdData;
-    int32_t ret = g_component->SendCommand(OHOS::HDI::Codec::V1_0::OMX_CommandStateSet,
-                                           OHOS::HDI::Codec::V1_0::OMX_StateLoaded, cmdData);
+    int32_t ret = g_component->SendCommand(OMX_CommandStateSet, OMX_StateLoaded, cmdData);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiWaitIdleTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
-    OHOS::HDI::Codec::V1_0::OMX_STATETYPE state = OHOS::HDI::Codec::V1_0::OMX_StateInvalid;
+    uint32_t state = OMX_StateInvalid;
     do {
         usleep(100);
         auto ret = g_component->GetState(state);
         ASSERT_EQ(ret, HDF_SUCCESS);
-    } while (state != OHOS::HDI::Codec::V1_0::OMX_StateLoaded);
+    } while (state != OMX_StateLoaded);
 }
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDeInitTest_001, TestSize.Level1)

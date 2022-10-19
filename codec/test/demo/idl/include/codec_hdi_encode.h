@@ -109,8 +109,7 @@ public:
     bool ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount);
     int32_t OnEmptyBufferDone(const struct OmxCodecBuffer &buffer) override;
     int32_t OnFillBufferDone(const struct OmxCodecBuffer &buffer) override;
-    int32_t EventHandler(OHOS::HDI::Codec::V1_0::OMX_EVENTTYPE event,
-                         const OHOS::HDI::Codec::V1_0::EventInfo &info) override;
+    int32_t EventHandler(uint32_t event, const OHOS::HDI::Codec::V1_0::EventInfo &info) override;
 
 private:
     int32_t ConfigBitMode();
