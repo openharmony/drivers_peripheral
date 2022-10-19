@@ -20,7 +20,7 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace V1_0 {
-int32_t CodecCallbackService::EventHandler(OMX_EVENTTYPE event, const EventInfo& info)
+int32_t CodecCallbackService::EventHandler(uint32_t event, const EventInfo &info)
 {
     (void)event;
     (void)info;

@@ -86,8 +86,7 @@ public:
     void Release();
     int32_t OnEmptyBufferDone(const struct OHOS::HDI::Codec::V1_0::OmxCodecBuffer &buffer) override;
     int32_t OnFillBufferDone(const struct OHOS::HDI::Codec::V1_0::OmxCodecBuffer &buffer) override;
-    int32_t EventHandler(OHOS::HDI::Codec::V1_0::OMX_EVENTTYPE event,
-                         const OHOS::HDI::Codec::V1_0::EventInfo &info) override;
+    int32_t EventHandler(uint32_t event, const OHOS::HDI::Codec::V1_0::EventInfo &info) override;
     template <typename T>
     inline void InitParam(T &param)
     {

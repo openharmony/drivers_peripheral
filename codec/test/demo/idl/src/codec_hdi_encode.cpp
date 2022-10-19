@@ -208,8 +208,7 @@ int32_t CodecHdiEncode::CheckAndUseBufferHandle()
 bool CodecHdiEncode::UseBuffers()
 {
     // commad to IDLE
-    auto err =
-        client_->SendCommand(OHOS::HDI::Codec::V1_0::OMX_CommandStateSet, OHOS::HDI::Codec::V1_0::OMX_StateIdle, {});
+    auto err = client_->SendCommand(OMX_CommandStateSet, OMX_StateIdle, {});
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to SendCommand with OMX_CommandStateSet:OMX_StateIdle", __func__);
         return false;
@@ -235,7 +234,7 @@ bool CodecHdiEncode::UseBuffers()
     }
 
     // wait executing state
-    OHOS::HDI::Codec::V1_0::OMX_STATETYPE status;
+    uint32_t status = OMX_StateInvalid;
     err = client_->GetState(status);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s GetState err [%{public}x]", __func__, err);
@@ -243,7 +242,7 @@ bool CodecHdiEncode::UseBuffers()
     }
 
     // wait loaded
-    if (status != OHOS::HDI::Codec::V1_0::OMX_StateIdle) {
+    if (status != OMX_StateIdle) {
         HDF_LOGI("Wait for OMX_StateLoaded status");
         this->WaitForStatusChanged();
     } else {
@@ -296,7 +295,7 @@ int32_t CodecHdiEncode::UseBufferOnPort(PortIndex portIndex)
 
     // if port is disable, changed to enable
     if (!portEnable) {
-        err = client_->SendCommand(OHOS::HDI::Codec::V1_0::OMX_CommandPortEnable, (uint32_t)portIndex, {});
+        err = client_->SendCommand(OMX_CommandPortEnable, (uint32_t)portIndex, {});
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s SendCommand OMX_CommandPortEnable::PORT_INDEX_INPUT error", __func__);
             return err;
@@ -399,8 +398,7 @@ int32_t CodecHdiEncode::UseDynaBuffer(int bufferCount, int bufferSize)
 void CodecHdiEncode::FreeBuffers()
 {
     // send command to loaded state
-    (void)client_->SendCommand(OHOS::HDI::Codec::V1_0::OMX_CommandStateSet, OHOS::HDI::Codec::V1_0::OMX_StateLoaded,
-                               {});
+    (void)client_->SendCommand(OMX_CommandStateSet, OMX_StateLoaded, {});
 
     // All the buffer must be released, otherwise the component will wait
     auto iter = omxBuffers_.begin();
@@ -412,7 +410,7 @@ void CodecHdiEncode::FreeBuffers()
     unUsedInBuffers_.clear();
     unUsedOutBuffers_.clear();
 
-    OHOS::HDI::Codec::V1_0::OMX_STATETYPE status = OHOS::HDI::Codec::V1_0::OMX_StateInvalid;
+    uint32_t status = OMX_StateInvalid;
     auto err = client_->GetState(status);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
@@ -420,7 +418,7 @@ void CodecHdiEncode::FreeBuffers()
     }
 
     // wait
-    if (status != OHOS::HDI::Codec::V1_0::OMX_StateLoaded) {
+    if (status != OMX_StateLoaded) {
         HDF_LOGI("Wait for OMX_StateLoaded status");
         this->WaitForStatusChanged();
     } else {
@@ -492,8 +490,7 @@ int32_t CodecHdiEncode::GetComponentName(std::string &compName)
 
 void CodecHdiEncode::Run()
 {
-    auto err = client_->SendCommand(OHOS::HDI::Codec::V1_0::OMX_CommandStateSet,
-                                    OHOS::HDI::Codec::V1_0::OMX_StateExecuting, {});
+    auto err = client_->SendCommand(OMX_CommandStateSet, OMX_StateExecuting, {});
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to SendCommand with OMX_CommandStateSet:OMX_StateIdle", __func__);
         return;
@@ -531,7 +528,7 @@ void CodecHdiEncode::Run()
         usleep(10000);  // 10000 for wait 10ms
         continue;
     }
-    (void)client_->SendCommand(OHOS::HDI::Codec::V1_0::OMX_CommandStateSet, OHOS::HDI::Codec::V1_0::OMX_StateIdle, {});
+    (void)client_->SendCommand(OMX_CommandStateSet, OMX_StateIdle, {});
     return;
 }
 
@@ -594,13 +591,12 @@ int32_t CodecHdiEncode::CreateBufferHandle()
     }
     return err;
 }
-int32_t CodecHdiEncode::EventHandler(OHOS::HDI::Codec::V1_0::OMX_EVENTTYPE event,
-                                     const OHOS::HDI::Codec::V1_0::EventInfo &info)
+int32_t CodecHdiEncode::EventHandler(uint32_t event, const OHOS::HDI::Codec::V1_0::EventInfo &info)
 {
     switch (event) {
-        case OHOS::HDI::Codec::V1_0::OMX_EventCmdComplete: {
-            OHOS::HDI::Codec::V1_0::OMX_COMMANDTYPE cmd = (OHOS::HDI::Codec::V1_0::OMX_COMMANDTYPE)info.data1;
-            if (OHOS::HDI::Codec::V1_0::OMX_CommandStateSet == cmd) {
+        case OMX_EventCmdComplete: {
+            OMX_COMMANDTYPE cmd = (OMX_COMMANDTYPE)info.data1;
+            if (OMX_CommandStateSet == cmd) {
                 HDF_LOGI("OMX_CommandStateSet reached, status is %{public}d", info.data2);
                 this->OnStatusChanged();
             }

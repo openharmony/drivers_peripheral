@@ -26,9 +26,9 @@ class CodecCallbackService : public ICodecCallback {
 public:
     CodecCallbackService() = default;
     virtual ~CodecCallbackService() = default;
-    int32_t EventHandler(OMX_EVENTTYPE event, const EventInfo& info) override;
-    int32_t EmptyBufferDone(int64_t appData, const OmxCodecBuffer& buffer) override;
-    int32_t FillBufferDone(int64_t appData, const OmxCodecBuffer& buffer) override;
+    int32_t EventHandler(uint32_t event, const EventInfo &info) override;
+    int32_t EmptyBufferDone(int64_t appData, const OmxCodecBuffer &buffer) override;
+    int32_t FillBufferDone(int64_t appData, const OmxCodecBuffer &buffer) override;
 };
 } // V1_0
 } // Codec
