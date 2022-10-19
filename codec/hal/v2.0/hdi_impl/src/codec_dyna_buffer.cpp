@@ -131,7 +131,7 @@ void CodecDynaBuffer::ResetBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFER
     }
     dynaBuffer_->bufferHandle = bufferHandle;
     codecBuffer.buffer = 0;
-    codecBuffer.filledLen = codecBuffer.bufferLen;
+    codecBuffer.filledLen = sizeof(DynamicBuffer);
     codecBuffer.bufferLen = 0;
 }
 }  // namespace Omx

@@ -17,7 +17,11 @@ import("//drivers/peripheral/audio/audio.gni")
 
 group("hdi_audio") {
   if (drivers_peripheral_audio_user_mode == false) {
-    deps = [ "hal/hdi_passthrough:hdi_audio" ]
+    if (drivers_peripheral_audio_rich_device == false) {
+      deps = [ "hal/hdi_passthrough:hdi_audio" ]
+    } else {
+      deps = [ "//vendor/hisi/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi:hdi_audio" ]
+    }
   } else {
     deps = [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
   }

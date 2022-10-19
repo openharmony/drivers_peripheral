@@ -31,7 +31,6 @@ namespace HDI {
 namespace Thermal {
 namespace V1_0 {
 namespace {
-const int32_t ERR_INVALID_FD = -1;
 const int32_t MS_PER_SECOND = 1000;
 const std::string THERMAL_SIMULATION_TAG = "sim_tz";
 }
@@ -74,130 +73,30 @@ int32_t ThermalHdfTimer::GetSimluationFlag()
     return isSim_;
 }
 
-int32_t ThermalHdfTimer::CreateProviderFd()
+void ThermalHdfTimer::TimerProviderCallback()
 {
-    timerFd_ = timerfd_create(CLOCK_MONOTONIC, TFD_NONBLOCK);
-    if (timerFd_ == ERR_INVALID_FD) {
-        THERMAL_HILOGE(COMP_HDI, "epoll create failed, epFd_ is invalid");
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    THERMAL_HILOGI(COMP_HDI, "interval %{public}d", thermalZoneMgr_->maxCd_);
-    SetTimerInterval(thermalZoneMgr_->maxCd_, timerFd_);
-    fcntl(timerFd_, F_SETFL, O_NONBLOCK);
-    callbackHandler_.insert(std::make_pair(timerFd_, &ThermalHdfTimer::TimerProviderCallback));
-    if (RegisterCallback(timerFd_, EVENT_TIMER_FD, epFd_)) {
-        THERMAL_HILOGI(COMP_HDI, "register Timer event failed");
-    }
-
-    THERMAL_HILOGI(COMP_HDI, "return");
-    return HDF_SUCCESS;
-}
-
-int32_t ThermalHdfTimer::RegisterCallback(const int32_t fd, const EventType et, int32_t epfd)
-{
-    struct epoll_event ev;
-
-    ev.events = EPOLLIN;
-    if (et == EVENT_TIMER_FD) {
-        ev.events |= EPOLLWAKEUP;
-    }
-    THERMAL_HILOGI(COMP_HDI, "%{public}d, %{public}d", epfd, fd);
-    ev.data.ptr = reinterpret_cast<void*>(this);
-    ev.data.fd = fd;
-    if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == HDF_FAILURE) {
-        THERMAL_HILOGE(COMP_HDI, "epoll_ctl failed, error num =%{public}d",
-            errno);
-        return HDF_FAILURE;
-    }
-    THERMAL_HILOGI(COMP_HDI, "return");
-    return HDF_SUCCESS;
-}
-
-void ThermalHdfTimer::TimerProviderCallback(void *service)
-{
-    unsigned long long timers;
-
-    if (read(timerFd_, &timers, sizeof(timers)) == -1) {
-        THERMAL_HILOGE(COMP_HDI, "read timerFd_ failed");
-        return;
-    }
-
     reportTime_ = reportTime_ + 1;
     ReportThermalData();
     ResetCount();
     return;
 }
 
-void ThermalHdfTimer::SetTimerInterval(int32_t interval, int32_t timerfd)
+int32_t ThermalHdfTimer::LoopingThreadEntry()
 {
-    struct itimerspec itval;
-
-    if (timerfd == ERR_INVALID_FD) {
-        return;
-    }
-
-    timerInterval_ = interval;
-
-    if (interval < 0) {
-        interval = 0;
-    }
-
-    itval.it_interval.tv_sec = interval / MS_PER_SECOND;
-    itval.it_interval.tv_nsec = 0;
-    itval.it_value.tv_sec = interval / MS_PER_SECOND;
-    itval.it_value.tv_nsec = 0;
-    if (timerfd_settime(timerfd, 0, &itval, nullptr) == -1) {
-        THERMAL_HILOGE(COMP_HDI, "timer failed\n");
-    }
-    THERMAL_HILOGD(COMP_HDI, "return");
-}
-
-int32_t ThermalHdfTimer::InitProviderTimer()
-{
-    int32_t ret;
-    epFd_ = epoll_create1(EPOLL_CLOEXEC);
-
-    ret = CreateProviderFd();
-    if (ret != HDF_SUCCESS) {
-        THERMAL_HILOGE(COMP_HDI, "failed to create polling fd");
-        return ret;
-    }
-    return HDF_SUCCESS;
-}
-
-int32_t ThermalHdfTimer::LoopingThreadEntry(void *arg, int32_t epfd)
-{
-    size_t eventct = callbackHandler_.size();
-    struct epoll_event events[eventct];
-    THERMAL_HILOGI(COMP_HDI, "%{public}d, %{public}zu", epfd, eventct);
     while (true) {
-        int32_t nevents = epoll_wait(epfd, events, eventct, -1);
-        if (nevents == -1) {
-            continue;
-        }
-        for (int32_t n = 0; n < nevents; ++n) {
-            if (events[n].data.ptr) {
-                ThermalHdfTimer *func = const_cast<ThermalHdfTimer *>(this);
-                (callbackHandler_.find(events[n].data.fd)->second)(func, arg);
-            }
-        }
+        std::this_thread::sleep_for(std::chrono::seconds(thermalZoneMgr_->maxCd_ / MS_PER_SECOND));
+        TimerProviderCallback();
     }
 }
 
-void ThermalHdfTimer::Run(void *service, int32_t epfd)
+void ThermalHdfTimer::Run()
 {
-    std::make_unique<std::thread>(&ThermalHdfTimer::LoopingThreadEntry, this, service, epfd)->detach();
+    std::make_unique<std::thread>(&ThermalHdfTimer::LoopingThreadEntry, this)->detach();
 }
 
-void ThermalHdfTimer::StartThread(void *service)
+void ThermalHdfTimer::StartThread()
 {
-    int32_t ret = InitProviderTimer();
-    if (ret != HDF_SUCCESS) {
-        THERMAL_HILOGE(COMP_HDI, "init Timer failed, ret: %{public}d", ret);
-        return;
-    }
-    Run(service, epFd_);
+    Run();
 }
 
 int32_t ThermalHdfTimer::Init()
@@ -206,7 +105,7 @@ int32_t ThermalHdfTimer::Init()
     if (thermalDfx != nullptr) {
         thermalDfx->Init();
     }
-    StartThread(this);
+    StartThread();
     return HDF_SUCCESS;
 }
 

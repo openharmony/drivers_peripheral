@@ -30,8 +30,8 @@ namespace Audio {
         }
         struct DevHandle *(*BindServiceCapture)(const char *) = nullptr;
         int32_t (*InterfaceLibCtlCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *) = nullptr;
-        BindServiceCapture = (struct DevHandle *(*)(const char *))
-            dlsym(ctlcapFuzzPtrHandle, "AudioBindServiceCapture");
+        BindServiceCapture = reinterpret_cast<struct DevHandle *(*)(const char *)>
+           (dlsym(ctlcapFuzzPtrHandle, "AudioBindServiceCapture"));
         if (BindServiceCapture == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioBindServiceCapture failed \n", __func__);
             dlclose(ctlcapFuzzPtrHandle);
@@ -43,8 +43,8 @@ namespace Audio {
             dlclose(ctlcapFuzzPtrHandle);
             return false;
         }
-        InterfaceLibCtlCapture = (int32_t (*)(struct DevHandle *, int,
-            struct AudioHwCaptureParam *))dlsym(ctlcapFuzzPtrHandle, "AudioInterfaceLibCtlCapture");
+        InterfaceLibCtlCapture = reinterpret_cast<int32_t (*)(struct DevHandle *, int,
+            struct AudioHwCaptureParam *)>(dlsym(ctlcapFuzzPtrHandle, "AudioInterfaceLibCtlCapture"));
         if (InterfaceLibCtlCapture == nullptr) {
             HDF_LOGE("%{public}s: dlsym AudioInterfaceLibCtlCapture failed \n", __func__);
             dlclose(ctlcapFuzzPtrHandle);
@@ -52,7 +52,7 @@ namespace Audio {
         }
         struct AudioHwCapture *hwCapture = nullptr;
         int32_t ret = BindServiceAndHwCapture(hwCapture);
-        int32_t cmdId = *(reinterpret_cast<int32_t *>(*data));
+        int32_t cmdId = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data)));
         ret = InterfaceLibCtlCapture(handle, cmdId, &hwCapture->captureParam);
         if (ret == HDF_SUCCESS) {
             result = true;

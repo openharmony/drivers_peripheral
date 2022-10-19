@@ -143,7 +143,7 @@ int32_t HdiDrmComposition::Apply(bool modeSet)
     DISPLAY_LOGD("mCompLayers size %{public}zd", mCompLayers.size());
     for (uint32_t i = 0; i < mCompLayers.size(); i++) {
         HdiDrmLayer *layer = static_cast<HdiDrmLayer *>(mCompLayers[i]);
-        auto &drmPlane = mPlanes[i];
+        const auto &drmPlane = mPlanes[i];
         ret = ApplyPlane(*layer, *drmPlane, atomicReqPtr.Get());
         if (ret != DISPLAY_SUCCESS) {
             DISPLAY_LOGE("apply plane failed");

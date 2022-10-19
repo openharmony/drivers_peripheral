@@ -555,12 +555,11 @@ RetCode SensorController::SendSensorMetaData(std::shared_ptr<CameraMetadata> met
 
 RetCode SensorController::SendAEMetaData(common_metadata_header_t *data)
 {
-    int32_t expo = 0;
     RetCode rc = RC_OK;
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &entry);
     if (ret == 0) {
-        expo = *(entry.data.i32);
+        int32_t expo = *(entry.data.i32);
         if (expo != 0) {
             int32_t aemode = 1;
             rc = sensorVideo_->UpdateSetting(GetName(), CMD_AE_EXPO, (int*)&aemode);
@@ -704,11 +703,10 @@ RetCode SensorController::SendMeterMetaData(common_metadata_header_t *data)
 RetCode SensorController::SendFlashMetaData(common_metadata_header_t *data)
 {
     RetCode rc = RC_OK;
-    uint8_t flashMode = 0;
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FLASH_MODE, &entry);
     if (ret == 0) {
-        flashMode = *(entry.data.u8);
+        uint8_t flashMode = *(entry.data.u8);
         rc = sensorVideo_->UpdateSetting(GetName(), CMD_FLASH_MODE, (int*)&flashMode);
         CAMERA_LOGI("Set CMD_FLASH_MODE [%{public}d]", flashMode);
         if (rc == RC_ERROR) {

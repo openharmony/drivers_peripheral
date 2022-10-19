@@ -47,7 +47,7 @@ TEST_F(UtestOpenCameraTest, camera_open_0001)
     std::cout << "==========[test log] OpenCamera, success."<< std::endl;
     std::vector<std::string> cameraIds;
     display_->cameraHost->GetCameraIds(cameraIds);
-    for (auto &cameraId : cameraIds) {
+    for (const auto &cameraId : cameraIds) {
         std::cout << "cameraId = " << cameraId << std::endl;
     }
     std::string cameraId = cameraIds.front();
@@ -199,11 +199,4 @@ TEST_F(UtestOpenCameraTest, camera_open_0050)
                 std::cout << display_->rc << ", cameraId = " << cameraId << std::endl;
             }
         }
-}
-
-int main(int argc, char *argv[])
-{
-    // start running all tests
-    testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

@@ -32,7 +32,7 @@ bool AudioSetextraparamsRenderFuzzTest(const uint8_t *data, size_t size)
     }
     char keyValueList[] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
 
-    struct AudioRender *renderFuzz = (struct AudioRender *)data;
+    struct AudioRender *renderFuzz = reinterpret_cast<struct AudioRender *>(const_cast<uint8_t *>(data));
     ret = setExtFuzzRender->attr.SetExtraParams(renderFuzz, keyValueList);
     if (ret == HDF_SUCCESS) {
         result = true;

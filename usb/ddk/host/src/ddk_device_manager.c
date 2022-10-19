@@ -277,11 +277,9 @@ int32_t DdkDevMgrForEachDeviceSafe(DdkDevMgrHandleDev handle, void *priv)
     HDF_LOGI("%{public}s: total obj num count:%{public}d ", __func__, count);
     struct UsbPnpNotifyMatchInfoTable *info = NULL;
     uint32_t infoSize = 0;
-    bool flag = false;
     for (int32_t i = 0; i < count; ++i) {
-        flag = HdfSbufReadBuffer(reply, (const void **)(&info), &infoSize);
-        if (!flag || info == NULL) {
-            HDF_LOGE("%{public}s: HdfSbufReadBuffer failed, flag=%{public}d, info=%{public}p", __func__, flag, info);
+        if (!HdfSbufReadBuffer(reply, (const void **)(&info), &infoSize) || info == NULL) {
+            HDF_LOGE("%{public}s: HdfSbufReadBuffer failed", __func__);
             HdfSbufRecycle(reply);
             return HDF_ERR_INVALID_PARAM;
         }

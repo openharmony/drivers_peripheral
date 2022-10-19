@@ -30,7 +30,7 @@ bool AudioSetvolumeCaptureVolumeFuzzTest(const uint8_t *data, size_t size)
         HDF_LOGE("%{public}s: AudioGetManagerCreateCapture failed \n", __func__);
         return false;
     }
-    int32_t volume = *(reinterpret_cast<float *>(*data));
+    int32_t volume = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data)));
     ret = volCapCapture->volume.SetVolume(volCapCapture, volume);
     if (ret == HDF_SUCCESS) {
         result = true;

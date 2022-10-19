@@ -33,14 +33,14 @@ bool AudioCaptureframeCaptureFuzzTest(const uint8_t *data, size_t size)
     }
     uint64_t replyBytes = 0;
     uint64_t requestBytes = BUFFER_LENTH;
-    char *frame = (char *)calloc(1, BUFFER_LENTH);
+    char *frame = reinterpret_cast<char *>(calloc(1, BUFFER_LENTH));
     if (frame == nullptr) {
         capFrameFuzzCapture->control.Stop((AudioHandle)capFrameFuzzCapture);
         capFrameFuzzAdapter->DestroyCapture(capFrameFuzzAdapter, capFrameFuzzCapture);
         capFrameFuzzManager->UnloadAdapter(capFrameFuzzManager, capFrameFuzzAdapter);
         return false;
     }
-    struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
+    struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
     ret = capFrameFuzzCapture->CaptureFrame(captureFuzz, frame, requestBytes, &replyBytes);
     if (ret == HDF_SUCCESS) {
         result = true;

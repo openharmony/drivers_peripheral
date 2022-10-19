@@ -33,7 +33,7 @@ namespace Audio {
         }
         uint64_t frames = 0;
         struct AudioTimeStamp time = {};
-        struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
+        struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
         ret = positionFuzzCapture->attr.GetMmapPosition(captureFuzz, &frames, &time);
         if (ret == HDF_SUCCESS) {
             result = true;

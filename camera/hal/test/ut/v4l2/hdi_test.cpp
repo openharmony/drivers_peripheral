@@ -84,10 +84,10 @@ TEST_F(UtestHdiTest, camera_hdi_0020)
   */
 TEST_F(UtestHdiTest, camera_hdi_0021)
 {
-    std::string cameraId = "abc";
     std::cout << "==========[test log] GetCameraAbility, abnormal cameraId = 'abc'." << std::endl;
     std::shared_ptr<CameraAbility> ability;
     if (display_->cameraDevice == nullptr) {
+        std::string cameraId = "abc";
         sleep(3); // waiting 3s, prepare for execute GetCameraAbility.
         display_->rc = display_->cameraHost->GetCameraAbility(cameraId, ability);
         std::cout << "==========[test log] display_->rc ="<< display_->rc << std::endl;
@@ -104,10 +104,10 @@ TEST_F(UtestHdiTest, camera_hdi_0021)
   */
 TEST_F(UtestHdiTest, camera_hdi_0022)
 {
-    std::string cameraId = "";
     std::cout << "==========[test log] GetCameraAbility, abnormal cameraId = ''." << std::endl;
     std::shared_ptr<CameraAbility> ability;
     if (display_->cameraDevice == nullptr) {
+        std::string cameraId = "";
         sleep(2); // waiting 2s, prepare for execute GetCameraAbility.
         display_->rc = display_->cameraHost->GetCameraAbility(cameraId, ability);
         std::cout << "==========[test log] display_->rc ="<< display_->rc << std::endl;
@@ -151,8 +151,8 @@ TEST_F(UtestHdiTest, camera_hdi_0030)
 TEST_F(UtestHdiTest, camera_hdi_0031)
 {
     std::cout << "==========[test log] OpenCamera, cameraID is not found."<< std::endl;
-    std::string cameraId = "qwerty";
     if (display_->cameraDevice == nullptr) {
+        std::string cameraId = "qwerty";
         const std::shared_ptr<ICameraDeviceCallback> callback =
             std::make_shared<ICameraDeviceCallback>();
         sleep(3); // waiting 3s, prepare for execute OpenCamera.
@@ -171,8 +171,8 @@ TEST_F(UtestHdiTest, camera_hdi_0031)
 TEST_F(UtestHdiTest, camera_hdi_0032)
 {
     std::cout << "==========[test log] OpenCamera, cameraID is illegal."<< std::endl;
-    std::string cameraId = "1";
     if (display_->cameraDevice == nullptr) {
+        std::string cameraId = "1";
         const std::shared_ptr<ICameraDeviceCallback> callback =
             std::make_shared<ICameraDeviceCallback>();
         sleep(3); // waiting 3s, prepare for execute OpenCamera.
@@ -191,8 +191,8 @@ TEST_F(UtestHdiTest, camera_hdi_0032)
 TEST_F(UtestHdiTest, camera_hdi_0033)
 {
     std::cout << "==========[test log] OpenCamera, cameraID is Empty."<< std::endl;
-    std::string cameraId = "";
     if (display_->cameraDevice == nullptr) {
+        std::string cameraId = "";
         const std::shared_ptr<ICameraDeviceCallback> callback =
             std::make_shared<ICameraDeviceCallback>();
         sleep(3); // waiting 3s, prepare for execute OpenCamera.
@@ -231,8 +231,8 @@ TEST_F(UtestHdiTest, camera_hdi_0034)
 TEST_F(UtestHdiTest, camera_hdi_0035)
 {
     std::cout << "==========[test log] OpenCamera, cameraID is not found, callback is null."<< std::endl;
-    std::string cameraId = "abc";
     if (display_->cameraDevice == nullptr) {
+        std::string cameraId = "abc";
         const std::shared_ptr<ICameraDeviceCallback> callback = nullptr;
         sleep(3); // waiting 3s, prepare for execute OpenCamera.
         display_->rc = display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
