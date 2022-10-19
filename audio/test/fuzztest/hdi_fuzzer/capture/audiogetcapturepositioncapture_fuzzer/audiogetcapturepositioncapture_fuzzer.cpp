@@ -34,7 +34,7 @@ bool AudioGetcapturepositionCaptureFuzzTest(const uint8_t *data, size_t size)
     uint64_t replyBytes = 0;
     uint64_t requestBytes = BUFFER_LENTH;
     struct AudioTimeStamp time = {.tvSec = 0, .tvNSec = 0};
-    char *frame = (char *)calloc(1, BUFFER_LENTH);
+    char *frame = reinterpret_cast<char *>(calloc(1, BUFFER_LENTH));
     if (frame == nullptr) {
         getCapPosFuzzCapture->control.Stop((AudioHandle)getCapPosFuzzCapture);
         getCapPosFuzzAdapter->DestroyCapture(getCapPosFuzzAdapter, getCapPosFuzzCapture);
@@ -50,7 +50,7 @@ bool AudioGetcapturepositionCaptureFuzzTest(const uint8_t *data, size_t size)
     }
 
     replyBytes = 0;
-    struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
+    struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
     ret = getCapPosFuzzCapture->GetCapturePosition(captureFuzz, &replyBytes, &time);
     if (ret == HDF_SUCCESS) {
         result = true;

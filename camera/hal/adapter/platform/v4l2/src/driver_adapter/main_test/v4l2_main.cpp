@@ -503,7 +503,7 @@ void* V4L2FrameThread(void* data)
     for (i = 0; i < g_bufCont; ++i) {
         V4L2SetBuffers(i, buffptr, bufSize, devname);
 
-        addr[i] = (unsigned char*)malloc(bufSize);
+        addr[i] = reinterpret_cast<unsigned char*>(malloc(bufSize));
         if (addr[i] == nullptr) {
             CAMERA_LOGE("main test:V4L2PreviewThread malloc buffers fail \n");
             goto done;
@@ -662,10 +662,10 @@ void StartUvcFrame()
 
 void StartCapture()
 {
-    std::string devName;
 
     StopAllFrame(0);
     if (g_isPreviewOn || g_isPreviewOnUvc) {
+        std::string devName;
         if (g_isPreviewOn) {
             g_isPreviewOn = false;
             g_isCaptureOn = true;
@@ -709,13 +709,12 @@ void StartCapture()
 void SetAWb()
 {
     int value;
-    std::string devName;
     constexpr uint32_t awbModeValue = 8;
-
     if (g_isPreviewOn || g_isPreviewOnUvc) {
         auto v4l2Dev = std::make_shared<HosV4L2Dev>();
         if (v4l2Dev != nullptr) {
             if (g_isPreviewOn) {
+                std::string devName;
                 devName = TEST_SENSOR_NAME;
                 v4l2Dev->QuerySetting(devName, CMD_AWB_MODE, &value);
                 CAMERA_LOGD("v4l2Dev->QuerySetting CMD_AWB_MODE value %d\n", value);
@@ -731,13 +730,13 @@ void SetAWb()
 
 void SetExpotime()
 {
-    std::string devName;
     int value;
     constexpr uint32_t aeExpotimeValue = 50;
 
     if (g_isPreviewOn || g_isPreviewOnUvc) {
         auto v4l2Dev = std::make_shared<HosV4L2Dev>();
         if (v4l2Dev != nullptr) {
+            std::string devName;
             if (g_isPreviewOn) {
                 devName = TEST_SENSOR_NAME;
                 v4l2Dev->QuerySetting(devName, CMD_AE_EXPOTIME, &value);
@@ -767,12 +766,12 @@ void SetExpotime()
 
 void SetAeExpo()
 {
-    std::string devName;
     int value;
 
     if (g_isPreviewOn || g_isPreviewOnUvc) {
         auto v4l2Dev = std::make_shared<HosV4L2Dev>();
         if (v4l2Dev != nullptr) {
+            std::string devName;
             if (g_isPreviewOn) {
                 devName = TEST_SENSOR_NAME;
                 v4l2Dev->QuerySetting(devName, CMD_AE_EXPO, &value);
@@ -796,11 +795,11 @@ void SetAeExpo()
 
 void StartVideo()
 {
-    std::string devName;
     constexpr uint32_t videoTime = 10;
 
     StopAllFrame(0);
     if (g_isPreviewOn || g_isPreviewOnUvc) {
+        std::string devName;
         if (g_isPreviewOn) {
             g_isPreviewOn = false;
             g_isVideoOn = true;

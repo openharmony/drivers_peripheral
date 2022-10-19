@@ -237,7 +237,7 @@ void NodeBase::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     auto outPorts = GetOutPorts();
     auto it = std::find_if(outPorts.begin(), outPorts.end(),
-        [&buffer](auto &port) { return port->format_.bufferPoolId_ == buffer->GetPoolId(); });
+        [&buffer](const auto &port) { return port->format_.bufferPoolId_ == buffer->GetPoolId(); });
     if (it != outPorts.end()) {
         (*it)->DeliverBuffer(buffer);
         return;
@@ -252,7 +252,7 @@ void NodeBase::DeliverBuffers(std::vector<std::shared_ptr<IBuffer>>& buffers)
     }
     auto outPorts = GetOutPorts();
     auto it = std::find_if(outPorts.begin(), outPorts.end(),
-        [&buffers](auto &port) { return port->format_.bufferPoolId_ == buffers[0]->GetPoolId(); });
+        [&buffers](const auto &port) { return port->format_.bufferPoolId_ == buffers[0]->GetPoolId(); });
     if (it != outPorts.end()) {
         (*it)->DeliverBuffers(buffers);
         return;

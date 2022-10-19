@@ -31,7 +31,7 @@ bool AudioSetrenderspeedSpeedFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    float speedFuzz = *(float *)data;
+    float speedFuzz = *(reinterpret_cast<float *>(const_cast<uint8_t *>(data)));
     ret = setSpeedRender->SetRenderSpeed(setSpeedRender, speedFuzz);
     if (ret == HDF_ERR_NOT_SUPPORT) {
         result = true;

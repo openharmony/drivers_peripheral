@@ -31,7 +31,7 @@ RetCode EnumeratorManager::Init()
         CAMERA_LOGE("%s Create HosV4L2UVC fail", __FUNCTION__);
         return RC_ERROR;
     }
-    uvcVideo_->V4L2UvcDetectInit([&](const std::string hardwareName,
+    uvcVideo_->V4L2UvcDetectInit([&](const std::string& hardwareName,
         std::vector<DeviceControl>& deviceControl,
         std::vector<DeviceFormat>& deviceFormat, bool uvcState) {
         UvcCallBack(hardwareName, deviceControl, deviceFormat, uvcState);

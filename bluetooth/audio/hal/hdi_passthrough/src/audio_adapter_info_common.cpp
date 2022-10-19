@@ -304,7 +304,7 @@ static int32_t AudioAdapterParsePort(struct AudioPort *info, const cJSON *port)
 
         return HDF_ERR_MALLOC_FAIL;
     }
-    ret = memcpy_s((void *)info->portName, PORT_NAME_LEN,
+    ret = memcpy_s(static_cast<void *>(const_cast<char *>(info->portName)), PORT_NAME_LEN,
         portName->valuestring, strlen(portName->valuestring));
     if (ret != EOK) {
         HDF_LOGE("memcpy_s port name fail");
@@ -350,7 +350,7 @@ static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const
         return HDF_FAILURE;
     }
 
-    desc->ports = (struct AudioPort *)calloc(1, desc->portNum * sizeof(struct AudioPort));
+    desc->ports = reinterpret_cast<struct AudioPort *>(calloc(1, desc->portNum * sizeof(struct AudioPort)));
     if (desc->ports == NULL) {
         HDF_LOGE("Out of memory!\n");
 
@@ -396,7 +396,7 @@ static int32_t AudioAdapterParseAdapter(struct AudioAdapterDescriptor *desc,
 
         return HDF_ERR_MALLOC_FAIL;
     }
-    ret = memcpy_s((void *)desc->adapterName, ADAPTER_NAME_LEN,
+    ret = memcpy_s(static_cast<void *>(const_cast<char *>(desc->adapterName)), ADAPTER_NAME_LEN,
         adapterName->valuestring, strlen(adapterName->valuestring));
     if (ret != EOK) {
         HDF_LOGE("memcpy_s adapter name fail!\n");
@@ -443,7 +443,7 @@ static char *AudioAdaptersGetConfig(const char *fpath)
         fclose(fp);
         return NULL;
     }
-    pJsonStr = (char *)calloc(1, (uint32_t)jsonStrSize);
+    pJsonStr = static_cast<char *>(calloc(1, (uint32_t)jsonStrSize));
     if (pJsonStr == NULL) {
         fclose(fp);
         return NULL;
@@ -503,8 +503,8 @@ static int32_t AudioAdaptersSetAdapter(struct AudioAdapterDescriptor **descs,
         return HDF_SUCCESS;
     }
 
-    *descs = (struct AudioAdapterDescriptor *)calloc(1,
-        adapterNum * sizeof(struct AudioAdapterDescriptor));
+    *descs = reinterpret_cast<struct AudioAdapterDescriptor *>(calloc(1,
+        adapterNum * sizeof(struct AudioAdapterDescriptor)));
     if (*descs == NULL) {
         HDF_LOGE("calloc g_audioAdapterDescs failed");
 
@@ -685,8 +685,8 @@ int32_t HdmiPortInit(struct AudioPort portIndex, struct AudioPortCapability *cap
     capabilityIndex->formats = &g_formatIdZero;
     capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000 | AUDIO_SAMPLE_RATE_MASK_24000;
     capabilityIndex->subPortsNum = 1;
-    capabilityIndex->subPorts = (struct AudioSubPortCapability *)calloc(capabilityIndex->subPortsNum,
-        sizeof(struct AudioSubPortCapability));
+    capabilityIndex->subPorts = reinterpret_cast<struct AudioSubPortCapability *>(calloc(capabilityIndex->subPortsNum,
+        sizeof(struct AudioSubPortCapability)));
     if (capabilityIndex->subPorts == NULL) {
         HDF_LOGE("The pointer is null!");
         return HDF_FAILURE;
@@ -898,19 +898,19 @@ int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key,
     int32_t ret = HDF_FAILURE;
     char strValue[MAP_MAX] = { 0 };
     if (strcmp(key, AUDIO_ATTR_PARAM_ROUTE) == 0) {
-        ret = sprintf_s(strValue, sizeof(strValue), "%s=%d;", key, *((int32_t *)value));
+        ret = sprintf_s(strValue, sizeof(strValue), "%s=%d;", key, *(reinterpret_cast<int32_t *>(value)));
     } else if (strcmp(key, AUDIO_ATTR_PARAM_FORMAT) == 0) {
         uint32_t formatBits = 0;
-        ret = FormatToBits((AudioFormat)(*((int32_t *)value)), &formatBits);
+        ret = FormatToBits((AudioFormat)(*(reinterpret_cast<int32_t *>(value))), &formatBits);
         if (ret == 0) {
             ret = sprintf_s(strValue, sizeof(strValue), "%s=%u;", key, formatBits);
         }
     } else if (strcmp(key, AUDIO_ATTR_PARAM_CHANNELS) == 0) {
-        ret = sprintf_s(strValue, sizeof(strValue), "%s=%u;", key, *((uint32_t *)value));
+        ret = sprintf_s(strValue, sizeof(strValue), "%s=%u;", key, *(reinterpret_cast<uint32_t *>(value)));
     } else if (strcmp(key, AUDIO_ATTR_PARAM_FRAME_COUNT) == 0) {
-        ret = sprintf_s(strValue, sizeof(strValue), "%s=%llu;", key, *((uint64_t *)value));
+        ret = sprintf_s(strValue, sizeof(strValue), "%s=%llu;", key, *(reinterpret_cast<uint64_t *>(value)));
     } else if (strcmp(key, AUDIO_ATTR_PARAM_SAMPLING_RATE) == 0) {
-        ret = sprintf_s(strValue, sizeof(strValue), "%s=%u", key, *((uint32_t *)value));
+        ret = sprintf_s(strValue, sizeof(strValue), "%s=%u", key, *(reinterpret_cast<uint32_t *>(value)));
     } else {
         HDF_LOGE("NO this key correspond value!");
         return HDF_FAILURE;

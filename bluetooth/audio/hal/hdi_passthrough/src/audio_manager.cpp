@@ -46,7 +46,7 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
         HDF_LOGE("%s: not supported this adapter %s", __func__, desc->adapterName);
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)calloc(1, sizeof(*hwAdapter));
+    struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(calloc(1, sizeof(*hwAdapter)));
     if (hwAdapter == NULL) {
         HDF_LOGE("%s: calloc AudioHwAdapter failed", __func__);
         return AUDIO_HAL_ERR_MALLOC_FAIL;

@@ -323,7 +323,7 @@ extern "C" {
 int32_t DeviceInitialize(DeviceFuncs **funcs)
 {
     DISPLAY_CHK_RETURN((funcs == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("in funcs is null"));
-    DeviceFuncs *dFuncs = (DeviceFuncs *)calloc(1, sizeof(DeviceFuncs));
+    DeviceFuncs *dFuncs = reinterpret_cast<DeviceFuncs *>(calloc(1, sizeof(DeviceFuncs)));
     DISPLAY_CHK_RETURN((dFuncs == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("can not calloc"));
 
     dFuncs->RegHotPlugCallback = RegHotPlugCallback;
@@ -367,7 +367,7 @@ int32_t DeviceUninitialize(DeviceFuncs *funcs)
 int32_t LayerInitialize(LayerFuncs **funcs)
 {
     DISPLAY_CHK_RETURN((funcs == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("the in funcs is nullptr"));
-    LayerFuncs *lFuncs = (LayerFuncs *)calloc(1, sizeof(LayerFuncs));
+    LayerFuncs *lFuncs = reinterpret_cast<LayerFuncs *>(calloc(1, sizeof(LayerFuncs)));
     DISPLAY_CHK_RETURN((lFuncs == nullptr), DISPLAY_FAILURE, DISPLAY_LOGE("can not calloc errno: %{public}d", errno));
     lFuncs->SetLayerAlpha = SetLayerAlpha;
     lFuncs->CreateLayer = CreateLayer;

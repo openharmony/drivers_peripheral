@@ -73,7 +73,7 @@ protected:
     virtual bool GetCameraDevice();
     virtual bool GetStreamOperator();
     virtual bool GetCameraIds();
-    int32_t SaveToFile(const std::string &path, const void* buffer, int32_t size) const;
+    int32_t SaveToFile(const std::string& path, const void* buffer, int32_t size) const;
     uint64_t GetCurrentLocalTimeStamp() const;
     int32_t SaveYUV(const char* type, const void* buffer, int32_t size);
 

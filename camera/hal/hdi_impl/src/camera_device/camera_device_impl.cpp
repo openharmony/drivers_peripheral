@@ -425,10 +425,10 @@ void CameraDeviceImpl::ResultMetadata()
         return;
     }
 
-    std::vector<uint8_t> result;
     std::shared_ptr<CameraMetadata> metadata;
     RetCode rc = GetMetadataResults(metadata);
     if (rc == RC_OK || metaResultMode_ == PER_FRAME) {
+        std::vector<uint8_t> result;
         uint64_t timestamp = GetCurrentLocalTimeStamp();
         MetadataUtils::ConvertMetadataToVec(metadata, result);
         cameraDeciceCallback_->OnResult(timestamp, result);

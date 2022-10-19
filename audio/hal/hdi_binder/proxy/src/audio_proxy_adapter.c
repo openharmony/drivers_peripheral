@@ -249,11 +249,8 @@ static int32_t InitAllPortsDispatchSplit(struct AudioHwAdapter *hwAdapter)
 
 int32_t AudioProxyAdapterInitAllPorts(struct AudioAdapter *adapter)
 {
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxyAdapter address passed in is invalid");
-        return ret;
-    }
+    int32_t ret = AUDIO_HAL_SUCCESS;
+
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || hwAdapter->adapterDescriptor.adapterName == NULL ||
         hwAdapter->proxyRemoteHandle == NULL) {
@@ -360,11 +357,8 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
     AUDIO_FUNC_LOGI();
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxyAdapter address passed in is invalid");
-        return ret;
-    }
+    int32_t ret = AUDIO_HAL_SUCCESS;
+
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL || desc == NULL || attrs == NULL || render == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -407,11 +401,8 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
 
 int32_t AudioProxyAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRender *render)
 {
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxyAdapter address passed in is invalid");
-        return ret;
-    }
+    int32_t ret = AUDIO_HAL_SUCCESS;
+
     ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxyRender address passed in is invalid");
@@ -548,11 +539,8 @@ int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struc
                                        const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxyAdapter address passed in is invalid");
-        return ret;
-    }
+    int32_t ret = AUDIO_HAL_SUCCESS;
+
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
@@ -603,11 +591,8 @@ int32_t AudioProxyAdapterDestroyCapture(struct AudioAdapter *adapter, struct Aud
     if (adapter == NULL || capture == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxy adapter address passed in is invalid");
-        return ret;
-    }
+    int32_t ret = AUDIO_HAL_SUCCESS;
+
     ret = AudioCheckCaptureAddr((AudioHandle)capture);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
@@ -669,11 +654,8 @@ int32_t AudioProxyAdapterGetPortCapability(struct AudioAdapter *adapter,
     const struct AudioPort *port, struct AudioPortCapability *capability)
 {
     AUDIO_FUNC_LOGI();
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxy adapter address passed in is invalid");
-        return ret;
-    }
+    int32_t ret = AUDIO_HAL_SUCCESS;
+
     if (adapter == NULL || port == NULL || port->portName == NULL || capability == NULL || (port->portId < 0)) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -766,11 +748,8 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
     AUDIO_FUNC_LOGI();
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxy adapter address passed in is invalid");
-        return ret;
-    }
+    int32_t ret = AUDIO_HAL_SUCCESS;
+
     if (adapter == NULL || port == NULL || port->portName == NULL) {
         AUDIO_FUNC_LOGE("Params is null.");
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -834,11 +813,8 @@ static int32_t AudioProxyWriteTokenAndNameForGetPassThrough(struct AudioHwAdapte
 int32_t AudioProxyAdapterGetPassthroughMode(struct AudioAdapter *adapter,
     const struct AudioPort *port, enum AudioPortPassthroughMode *mode)
 {
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxy adapter address passed in is invalid");
-        return ret;
-    }
+    int32_t ret = AUDIO_HAL_SUCCESS;
+
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     if (adapter == NULL || port == NULL || port->portName == NULL || mode == NULL) {

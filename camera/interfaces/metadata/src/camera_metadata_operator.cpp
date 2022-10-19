@@ -64,8 +64,8 @@ common_metadata_header_t *FillCameraMetadata(common_metadata_header_t *buffer, s
     metadataHeader->items_start = AlignTo(sizeof(common_metadata_header_t), ITEM_ALIGNMENT);
     metadataHeader->data_count = 0;
     metadataHeader->data_capacity = dataCapacity;
-    size_t dataUnaligned = (uint8_t *)(GetMetadataItems(metadataHeader) +
-                            metadataHeader->item_capacity) - (uint8_t *)metadataHeader;
+    size_t dataUnaligned = reinterpret_cast<uint8_t *>(GetMetadataItems(metadataHeader) +
+                            metadataHeader->item_capacity) - reinterpret_cast<uint8_t *>(metadataHeader);
     metadataHeader->data_start = AlignTo(dataUnaligned, DATA_ALIGNMENT);
 
     METADATA_DEBUG_LOG("FillCameraMetadata end");
@@ -402,12 +402,11 @@ int MetadataExpandItemMem(common_metadata_header_t *dst, camera_metadata_item_en
         METADATA_ERR_LOG("MetadataExpandItemMem item is null or dst is null");
         return CAM_META_INVALID_PARAM;
     }
-    int32_t ret = CAM_META_SUCCESS;
     uint8_t *start = GetMetadataData(dst) + item->data.offset;
     uint8_t *end = start + oldItemSize;
     size_t length = dst->data_count - item->data.offset - oldItemSize;
     if (length != 0) {
-        ret = memmove_s(start, length, end, length);
+        int32_t ret = memmove_s(start, length, end, length);
         if (ret != EOK) {
             METADATA_ERR_LOG("MetadataExpandItemMem memory move failed");
             return CAM_META_FAILURE;

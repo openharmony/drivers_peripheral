@@ -36,7 +36,7 @@ namespace Audio {
             HDF_LOGE("%{public}s: dlsym AudioBindServiceRender failed \n", __func__);
             return false;
         }
-        char *bindFuzz = reinterpret_cast<char *>(*data);
+        char *bindFuzz = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
         struct DevHandle *handle = BindServiceRender(bindFuzz);
         if (handle != nullptr) {
             result = true;

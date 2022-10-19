@@ -415,7 +415,6 @@ static int32_t UsbSpeedDdkInit(void)
 
 static int32_t UsbSpeedRequestHandle(void)
 {
-    int32_t rc;
     for (int32_t i = 0; i < TEST_CYCLE; i++) {
         struct AcmDb *snd = &(g_acm->db[i]);
         snd->request = UsbAllocRequest(InterfaceIdToHandle(g_acm, g_acm->dataPipe->interfaceId), 0, g_acm->dataSize);
@@ -436,15 +435,14 @@ static int32_t UsbSpeedRequestHandle(void)
         parmas.dataReq.buffer = snd->buf;
         parmas.dataReq.directon = (((uint8_t)g_acm->dataPipe->pipeDirection) >> USB_PIPE_DIR_OFFSET) & 0x1;
         snd->dbNum = g_acm->transmitting;
-        rc = UsbFillRequest(snd->request, InterfaceIdToHandle(g_acm, g_acm->dataPipe->interfaceId), &parmas);
+        int32_t rc = UsbFillRequest(snd->request, InterfaceIdToHandle(g_acm, g_acm->dataPipe->interfaceId), &parmas);
         if (rc != HDF_SUCCESS) {
-            printf("%s:UsbFillRequest failed,ret=%d \n", __func__, rc);
-            goto END;
+            printf("%s:UsbFillRequest failed,ret = %d \n", __func__, rc);
+            return rc;
         }
     }
 
-END:
-    return rc;
+    return HDF_SUCCESS;
 }
 
 static void UsbSpeedDdkExit(void)

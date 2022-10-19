@@ -46,7 +46,7 @@ int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *c
         tempNode = nullptr;
         return err;
     }
-    tempNode->node->SetHandle((OMX_HANDLETYPE)comp);
+    tempNode->node->SetHandle(static_cast<OMX_HANDLETYPE>(comp));
 
     *codecNode = tempNode;
     return HDF_SUCCESS;
@@ -58,7 +58,7 @@ int32_t OmxAdapterDestroyComponent(struct CodecComponentNode *codecNode)
         HDF_LOGE("%{public}s codecNode is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    auto err = g_mgr.DeleteComponentInstance((OMX_COMPONENTTYPE *)codecNode->node->GetHandle());
+    auto err = g_mgr.DeleteComponentInstance(static_cast<OMX_COMPONENTTYPE*>(codecNode->node->GetHandle()));
     if (err != OMX_ErrorNone) {
         HDF_LOGE("%{public}s DeleteComponentInstance err[%{public}d]", __func__, err);
         return err;

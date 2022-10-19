@@ -42,7 +42,7 @@ int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uin
 
 int32_t AudioRenderStart(AudioHandle handle)
 {
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -56,7 +56,7 @@ int32_t AudioRenderStart(AudioHandle handle)
         OHOS::Bluetooth::StartPlaying();
     }
 
-    char *buffer = (char *)calloc(1, FRAME_DATA);
+    char *buffer = static_cast<char *>(calloc(1, FRAME_DATA));
     if (buffer == NULL) {
         HDF_LOGE("Calloc Render buffer Fail!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
@@ -68,7 +68,7 @@ int32_t AudioRenderStart(AudioHandle handle)
 int32_t AudioRenderStop(AudioHandle handle)
 {
     HDF_LOGI("AudioRenderStop");
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -89,7 +89,7 @@ int32_t AudioRenderStop(AudioHandle handle)
 
 int32_t AudioRenderPause(AudioHandle handle)
 {
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -114,7 +114,7 @@ int32_t AudioRenderPause(AudioHandle handle)
 int32_t AudioRenderResume(AudioHandle handle)
 {
     HDF_LOGI("AudioRenderResume");
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -135,7 +135,7 @@ int32_t AudioRenderResume(AudioHandle handle)
 int32_t AudioRenderFlush(AudioHandle handle)
 {
     HDF_LOGI("AudioRenderFlush");
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -144,7 +144,7 @@ int32_t AudioRenderFlush(AudioHandle handle)
 
 int32_t AudioRenderGetFrameSize(AudioHandle handle, uint64_t *size)
 {
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     const int shift = 3;
     if (hwRender == NULL || size == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -162,7 +162,7 @@ int32_t AudioRenderGetFrameSize(AudioHandle handle, uint64_t *size)
 
 int32_t AudioRenderGetFrameCount(AudioHandle handle, uint64_t *count)
 {
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL || count == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -178,7 +178,7 @@ int32_t AudioRenderSetSampleAttributes(AudioHandle handle, const struct AudioSam
 
 int32_t AudioRenderGetSampleAttributes(AudioHandle handle, struct AudioSampleAttributes *attrs)
 {
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL || attrs == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -200,7 +200,7 @@ int32_t AudioRenderGetSampleAttributes(AudioHandle handle, struct AudioSampleAtt
 int32_t AudioRenderGetCurrentChannelId(AudioHandle handle, uint32_t *channelId)
 {
     HDF_LOGI("AudioRenderGetCurrentChannelId");
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)handle;
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(handle);
     if (hwRender == NULL || channelId == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -334,7 +334,7 @@ int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
     }
 
     LOGV("%s, WriteFrame", __func__);
-    return OHOS::Bluetooth::WriteFrame((const uint8_t *)frame, (uint32_t)requestBytes);
+    return OHOS::Bluetooth::WriteFrame(reinterpret_cast<const uint8_t *>(frame), static_cast<uint32_t>(requestBytes));
 }
 
 int32_t AudioRenderGetRenderPosition(struct AudioRender *render, uint64_t *frames, struct AudioTimeStamp *time)
@@ -408,7 +408,7 @@ int32_t SetValue(struct ExtraParams mExtraParams, struct AudioHwRender *render)
 
 int32_t AudioRenderSetExtraParams(AudioHandle handle, const char *keyValueList)
 {
-    struct AudioHwRender *render = (struct AudioHwRender *)handle;
+    struct AudioHwRender *render = reinterpret_cast<struct AudioHwRender *>(handle);
     if (render == NULL || keyValueList == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -428,7 +428,7 @@ int32_t AudioRenderSetExtraParams(AudioHandle handle, const char *keyValueList)
 
 int32_t AudioRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLenth)
 {
-    struct AudioHwRender *render = (struct AudioHwRender *)handle;
+    struct AudioHwRender *render = reinterpret_cast<struct AudioHwRender *>(handle);
     if (render == NULL || keyValueList == NULL || listLenth <= 0) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -474,7 +474,7 @@ int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct Aud
 
 int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time)
 {
-    struct AudioHwRender *render = (struct AudioHwRender *)handle;
+    struct AudioHwRender *render = reinterpret_cast<struct AudioHwRender *>(handle);
     if (render == NULL || frames == NULL || time == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -491,7 +491,7 @@ int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct 
 
 int32_t AudioRenderTurnStandbyMode(AudioHandle handle)
 {
-    struct AudioHwRender *render = (struct AudioHwRender *)handle;
+    struct AudioHwRender *render = reinterpret_cast<struct AudioHwRender *>(handle);
     if (render == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -504,7 +504,7 @@ int32_t AudioRenderTurnStandbyMode(AudioHandle handle)
 
 int32_t AudioRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
 {
-    struct AudioHwRender *render = (struct AudioHwRender *)handle;
+    struct AudioHwRender *render = reinterpret_cast<struct AudioHwRender *>(handle);
     if (render == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
@@ -535,7 +535,7 @@ int32_t AudioRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd)
 }
 int32_t CallbackProcessing(AudioHandle handle, AudioCallbackType callBackType)
 {
-    struct AudioHwRender *render = (struct AudioHwRender *)handle;
+    struct AudioHwRender *render = reinterpret_cast<struct AudioHwRender *>(handle);
     if (render == NULL) {
         HDF_LOGI("Unregistered callback.\n");
         return HDF_FAILURE;

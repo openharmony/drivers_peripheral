@@ -35,7 +35,7 @@ bool AudioInitallportsFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    struct AudioAdapter *adapterFuzz = (struct AudioAdapter *)data;
+    struct AudioAdapter *adapterFuzz = reinterpret_cast<struct AudioAdapter *>(const_cast<uint8_t *>(data));
     ret = initallFuzzAdapter->InitAllPorts(adapterFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;
