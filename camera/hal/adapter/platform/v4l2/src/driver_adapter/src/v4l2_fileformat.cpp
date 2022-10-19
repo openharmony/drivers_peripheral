@@ -124,7 +124,7 @@ RetCode HosFileFormat::V4L2GetCapability(int fd, const std::string& devName, std
         return RC_ERROR;
     }
 
-    if (cameraId != std::string((char*)cap.driver)) {
+    if (cameraId != std::string(reinterpret_cast<char*>(cap.driver))) {
         return RC_ERROR;
     }
 
