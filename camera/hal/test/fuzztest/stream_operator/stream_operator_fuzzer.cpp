@@ -22,6 +22,7 @@ bool CameraStreamOperatorFuzzTest(const uint8_t *rawData, size_t size)
     if (rawData == nullptr) {
         return false;
     }
+    constexpr uint32_t sleepTime = 2;
     uint32_t code = U32_AT(rawData);
     rawData = rawData + OFFSET;
     size = size - OFFSET;
@@ -36,7 +37,7 @@ bool CameraStreamOperatorFuzzTest(const uint8_t *rawData, size_t size)
     sptr<IStreamOperator> streamOperator = new OHOS::Camera::StreamOperator();
     sptr<StreamOperatorStub> IpcStream = new StreamOperatorStub(streamOperator);
     
-    sleep(2); // sleep two second
+    sleep(sleepTime); // sleep two second
     IpcStream->OnRemoteRequest(code, data, reply, option);
 
     return true;

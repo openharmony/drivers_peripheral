@@ -49,10 +49,10 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0001, TestSize.Level3)
     std::cout << "==========[test log] Performance: Check Open camera's time consuming."<< std::endl;
     struct timeval start;
     struct timeval end;
-    float time_use;
     float totle_time_use = 0;
     g_writeIntoFile.open("TimeConsuming.txt", ios::app);
     for (int i= 0; i < CYCLE_TIMES; i++) {
+        float time_use;
         std::cout << "Running " << i << " time" << std::endl;
         gettimeofday(&start, NULL);
         Test_ = std::make_shared<OHOS::Camera::Test>();
@@ -151,12 +151,12 @@ HWTEST_F(PerformanceFuncTest, Camera_Performance_0003, TestSize.Level3)
     std::cout << "==========[test log] Performance: Check Close camera's time consuming."<< std::endl;
     struct timeval start;
     struct timeval end;
-    float time_use;
     float totle_time_use = 0;
     g_writeIntoFile.open("TimeConsuming.txt", ios::app);
     Test_ = std::make_shared<OHOS::Camera::Test>();
     Test_->Init();
     for (int i= 0; i < CYCLE_TIMES; i++) {
+        float time_use;
         std::cout << "Running " << i << " time" << std::endl;
         Test_->Open();
         gettimeofday(&start, NULL);
