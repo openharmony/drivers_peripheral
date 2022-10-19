@@ -22,6 +22,7 @@ bool CameraHostFuzzTest(const uint8_t *rawData, size_t size)
     if (rawData == nullptr) {
         return false;
     }
+    constexpr uint32_t sleepTime = 2;
     uint32_t code = U32_AT(rawData);
     rawData = rawData + OFFSET;
     size = size - OFFSET;
@@ -36,7 +37,7 @@ bool CameraHostFuzzTest(const uint8_t *rawData, size_t size)
     sptr<ICameraHost> cameraHost = new OHOS::Camera::CameraHostImpl();
     sptr<CameraHostStub> IpcHost = new CameraHostStub(cameraHost);
     
-    sleep(2); // sleep two second
+    sleep(sleepTime); // sleep two second
     IpcHost->OnRemoteRequest(code, data, reply, option);
 
     return true;

@@ -46,10 +46,10 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0190)
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -142,10 +142,10 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0193)
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -168,7 +168,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0194)
     // Get preview
     int captureId = 2001;
     std::shared_ptr<CaptureInfo> captureInfo = std::make_shared<CaptureInfo>();
-    captureInfo->streamIds_ = {display_->streamId_preview};
+    captureInfo->streamIds_ = {display_->STREAM_ID_PREVIEW};
     captureInfo->enableShutterCallback_ = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, false);
     EXPECT_EQ(true, display_->rc == NO_ERROR);
@@ -209,7 +209,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0195)
     // Get preview
     int captureId = -1;
     std::shared_ptr<CaptureInfo> captureInfo = std::make_shared<CaptureInfo>();
-    captureInfo->streamIds_ = {display_->streamId_preview};
+    captureInfo->streamIds_ = {display_->STREAM_ID_PREVIEW};
     captureInfo->enableShutterCallback_ = false;
     bool isStreaming = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, isStreaming);
@@ -239,10 +239,10 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0196)
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, true, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, true, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -262,10 +262,10 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0200)
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -287,7 +287,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0201)
     // Get preview
     int captureId = 100;
     std::shared_ptr<CaptureInfo> captureInfo = std::make_shared<CaptureInfo>();
-    captureInfo->streamIds_ = {display_->streamId_preview};
+    captureInfo->streamIds_ = {display_->STREAM_ID_PREVIEW};
     captureInfo->enableShutterCallback_ = false;
     bool isStreaming = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, isStreaming);
@@ -433,7 +433,6 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0212)
     } else {
         std::cout << "==========[test log] GetStreamOperator fail, rc = " << display_->rc << std::endl;
     }
-    std::shared_ptr<IBufferProducer> producer = nullptr;
     // Create data stream
     display_->streamInfo = std::make_shared<StreamInfo>();
     display_->streamInfo->streamId_ = DEFAULT_STREAM_ID;

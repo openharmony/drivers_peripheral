@@ -52,7 +52,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0001)
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
     int32_t expo = 0xa0;
@@ -62,8 +62,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0001)
     sleep(10); // update settings, exposure for 10s
 
     // Post action of stream operation
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -86,8 +86,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0002)
     display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    display_->StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true);
 
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
@@ -98,8 +98,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0002)
     sleep(2); // update settings, AWB mode auto for 2s.
 
     // release stream
-    display_->captureIds = {display_->captureId_preview, display_->captureId_capture};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -120,7 +120,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0003)
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
 
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
@@ -131,8 +131,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0003)
     display_->cameraDevice->UpdateSettings(meta);
 
     // Post action of stream operation
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -154,8 +154,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0004) // 3A mode white balance blue scene
     display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    display_->StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true);
 
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
@@ -166,8 +166,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0004) // 3A mode white balance blue scene
     sleep(2); // update settings, AWB mode auto for 2s.
 
     // release stream
-    display_->captureIds = {display_->captureId_preview, display_->captureId_capture};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -189,7 +189,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0005)
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
 
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
@@ -200,8 +200,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0005)
     display_->cameraDevice->UpdateSettings(meta);
 
     // Post action of stream operation
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -222,7 +222,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0006)
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
 
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
@@ -233,8 +233,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0006)
     sleep(5); // update settings, AWB mode daylight for 5s.
 
     // Post action of stream operation
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -256,7 +256,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0007) // 3A mode reset
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
 
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
@@ -267,8 +267,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0007) // 3A mode reset
     display_->cameraDevice->UpdateSettings(meta);
 
     // Post action of stream operation
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -292,8 +292,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0008)
     display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    display_->StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true);
 
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
@@ -303,8 +303,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0008)
     display_->cameraDevice->UpdateSettings(meta);
 
     // release stream
-    display_->captureIds = {display_->captureId_preview, display_->captureId_capture};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -325,7 +325,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0009) // 3A mode white balance yellow scene
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
 
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
@@ -335,8 +335,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0009) // 3A mode white balance yellow scene
     display_->cameraDevice->UpdateSettings(meta);
 
     // Post action of stream operation
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -358,8 +358,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0010)
     display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    display_->StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true);
 
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
@@ -369,8 +369,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0010)
     display_->cameraDevice->UpdateSettings(meta);
 
     // release stream
-    display_->captureIds = {display_->captureId_preview, display_->captureId_capture};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -391,7 +391,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0030)
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Start capture
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
     int32_t expo = 0xa0;
@@ -400,8 +400,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0030)
     std::cout << "==========[test log] UpdateSettings, exposure for 3s." << std::endl;
     sleep(3);  // update settings, exposure for 3s
     // Post action of stream operation
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 
     // Turn off the device
@@ -415,10 +415,10 @@ TEST_F(UtestCamera3ATest, camera_3a_0030)
     display_->intents = {PREVIEW};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
     // release stream
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -439,8 +439,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0031) // 3A mode white balance green scene
     display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    display_->StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true);
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
     int32_t expo = 0xa0;
@@ -451,8 +451,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0031) // 3A mode white balance green scene
     std::cout << "==========[test log] UpdateSettings, exposure for 10s." << std::endl;
     sleep(10); // update settings, exposure for 10s
     // release stream
-    display_->captureIds = {display_->captureId_preview, display_->captureId_capture};
-    display_->streamIds = {display_->streamId_preview, display_->streamId_capture};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
@@ -473,8 +473,8 @@ TEST_F(UtestCamera3ATest, camera_3a_0040)
     display_->intents = {PREVIEW, STILL_CAPTURE};
     display_->StartStream(display_->intents);
     // Get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
-    display_->StartCapture(display_->streamId_capture, display_->captureId_capture, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    display_->StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true);
 
     // Issue 3A parameters
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
