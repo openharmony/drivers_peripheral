@@ -241,10 +241,6 @@ static int32_t AudioManagerServiceAddAdapter(
 static uint32_t AudioManagerServiceFindAdapterPos(struct IAudioManager *manager, const char *adapterName)
 {
     uint32_t i;
-    if (manager == NULL || adapterName == NULL || strlen(adapterName) == 0) {
-        AUDIO_FUNC_LOGE("Invalid input param!");
-        return SUPPORT_ADAPTER_NUM_MAX;
-    }
 
     struct AudioHwManager *audioManagerSer = (struct AudioHwManager *)manager;
     for (i = 0; i < SUPPORT_ADAPTER_NUM_MAX; i++) {
@@ -484,6 +480,11 @@ int32_t AudioManagerLoadAdapter(
 
 int32_t AudioManagerUnloadAdapter(struct IAudioManager *manager, const char *adapterName)
 {
+    if (manager == NULL || adapterName == NULL || strlen(adapterName) == 0) {
+        AUDIO_FUNC_LOGE("Invalid input param!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+
     uint32_t pos = AudioManagerServiceFindAdapterPos(manager, adapterName);
     if (pos >= SUPPORT_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("AudioManagerServiceUnloadAdapter failed!");
