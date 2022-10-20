@@ -35,13 +35,10 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
 
   group("hdf_test_input") {
-    deps = []
+    testonly = true
+    deps = [ "fuzztest/input_fuzzer:hdf_fuzztest_input" ]
     if (drivers_peripheral_input_feature_model) {
-      testonly = true
-      deps = [
-        "fuzztest/input_fuzzer:hdf_fuzztest_input",
-        "unittest:hdf_unittest_input",
-      ]
+      deps += [ "unittest:hdf_unittest_input" ]
     }
   }
 }
