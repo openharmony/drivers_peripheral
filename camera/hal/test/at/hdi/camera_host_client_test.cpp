@@ -159,6 +159,7 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     sptr<ICameraHost> sampleObj = ICameraHost::Get(TEST_SERVICE_NAME);
     if (sampleObj == nullptr) {
         std::cout << "ICameraHost get failed." << std::endl;
+        return;
     }
     ASSERT_NE(nullptr, sampleObj);
 

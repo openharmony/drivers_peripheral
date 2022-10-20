@@ -1021,7 +1021,6 @@ HWTEST_F(CameraPreviewTest, camera_preview_062, TestSize.Level2)
     std::cout << "==========[test log] ReleaseStreams no exist streamID, expect success." << std::endl;
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
-    std::vector<std::shared_ptr<StreamInfo>> streamInfos;
     display_->rc = (CamRetCode)display_->streamOperator->ReleaseStreams(
         {9999});
     std::cout << "streamOperator->ReleaseStreams's RetCode = " << display_->rc << std::endl;

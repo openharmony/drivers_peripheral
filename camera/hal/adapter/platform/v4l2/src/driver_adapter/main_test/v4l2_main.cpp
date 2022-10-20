@@ -662,7 +662,6 @@ void StartUvcFrame()
 
 void StartCapture()
 {
-
     StopAllFrame(0);
     if (g_isPreviewOn || g_isPreviewOnUvc) {
         std::string devName;
@@ -714,8 +713,7 @@ void SetAWb()
         auto v4l2Dev = std::make_shared<HosV4L2Dev>();
         if (v4l2Dev != nullptr) {
             if (g_isPreviewOn) {
-                std::string devName;
-                devName = TEST_SENSOR_NAME;
+                std::string devName = TEST_SENSOR_NAME;
                 v4l2Dev->QuerySetting(devName, CMD_AWB_MODE, &value);
                 CAMERA_LOGD("v4l2Dev->QuerySetting CMD_AWB_MODE value %d\n", value);
 
@@ -736,9 +734,8 @@ void SetExpotime()
     if (g_isPreviewOn || g_isPreviewOnUvc) {
         auto v4l2Dev = std::make_shared<HosV4L2Dev>();
         if (v4l2Dev != nullptr) {
-            std::string devName;
             if (g_isPreviewOn) {
-                devName = TEST_SENSOR_NAME;
+                std::string devName = TEST_SENSOR_NAME;
                 v4l2Dev->QuerySetting(devName, CMD_AE_EXPOTIME, &value);
                 CAMERA_LOGD("v4l2Dev->QuerySetting CMD_AE_EXPOTIME value %d\n", value);
 
@@ -771,9 +768,8 @@ void SetAeExpo()
     if (g_isPreviewOn || g_isPreviewOnUvc) {
         auto v4l2Dev = std::make_shared<HosV4L2Dev>();
         if (v4l2Dev != nullptr) {
-            std::string devName;
             if (g_isPreviewOn) {
-                devName = TEST_SENSOR_NAME;
+                std::string devName = TEST_SENSOR_NAME;
                 v4l2Dev->QuerySetting(devName, CMD_AE_EXPO, &value);
                 CAMERA_LOGD("v4l2Dev->QuerySetting CMD_AE_EXPO value %d\n", value);
 
