@@ -443,7 +443,7 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
 int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender);
 int32_t AudioAdapterCreateRender(struct IAudioAdapter *self, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioRender **render);
-int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter);
+int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc);
 int32_t GetAudioCaptureFunc(struct AudioHwCapture *hwCapture);
 int32_t InitHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs);
@@ -453,7 +453,7 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
 int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture);
 int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture);
-int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter);
+int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc);
 int32_t AudioAdapterGetPortCapability(
     struct IAudioAdapter *self, const struct AudioPort *port, struct AudioPortCapability *capability);
 int32_t AudioAdapterSetPassthroughMode(
