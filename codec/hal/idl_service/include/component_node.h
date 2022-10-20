@@ -38,13 +38,13 @@ public:
     ~ComponentNode();
     int32_t OpenHandle(const std::string& name);
     int32_t GetComponentVersion(CompVerInfo &verInfo);
-    int32_t SendCommand(OHOS::HDI::Codec::V1_0::OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData);
+    int32_t SendCommand(uint32_t cmd, uint32_t param, int8_t *cmdData);
     int32_t GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param);
     int32_t SetParameter(OMX_INDEXTYPE paramIndex, const int8_t *param);
     int32_t GetConfig(OMX_INDEXTYPE index, int8_t *config);
     int32_t SetConfig(OMX_INDEXTYPE index, const int8_t *config);
     int32_t GetExtensionIndex(const char *parameterName, uint32_t& index);
-    int32_t GetState(OHOS::HDI::Codec::V1_0::OMX_STATETYPE &state);
+    int32_t GetState(uint32_t &state);
     int32_t ComponentTunnelRequest(uint32_t port, int32_t omxHandleTypeTunneledComp, uint32_t tunneledPort,
                                    OHOS::HDI::Codec::V1_0::OMX_TUNNELSETUPTYPE &tunnelSetup);
     int32_t UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer);

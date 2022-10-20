@@ -20,8 +20,7 @@ CodecHdiCallback::CodecHdiCallback(std::shared_ptr<ICodecHdiCallBackBase> codecH
     codecHdi_ = codecHdi;
 }
 
-int32_t CodecHdiCallback::EventHandler(OHOS::HDI::Codec::V1_0::OMX_EVENTTYPE event,
-                                       const OHOS::HDI::Codec::V1_0::EventInfo &info)
+int32_t CodecHdiCallback::EventHandler(uint32_t event, const OHOS::HDI::Codec::V1_0::EventInfo &info)
 {
     if (codecHdi_) {
         codecHdi_->EventHandler(event, info);
