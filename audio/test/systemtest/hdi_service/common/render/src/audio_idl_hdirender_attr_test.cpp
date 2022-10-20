@@ -791,7 +791,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetSampleAttributesNull_007, Test
     struct IAudioRender *renderNull = nullptr;
     struct AudioSampleAttributes attrs = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
 
     ret = render->SetSampleAttributes(renderNull, &attrs);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
@@ -810,7 +810,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetSampleAttributesNull_002, Test
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes *attrsValue = nullptr;
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
 
     ret = render->GetSampleAttributes(renderNull, &attrs);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);

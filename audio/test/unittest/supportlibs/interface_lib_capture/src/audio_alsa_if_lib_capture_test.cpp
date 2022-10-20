@@ -89,7 +89,7 @@ int32_t AudioAlsaIfLibCaptureTest::AudioCapInitHwParams(struct AudioHwCapturePar
     (void)memcpy_s(handleData->captureMode.hwInfo.adapterName, NAME_LEN, "primary", strlen("primary"));
     handleData->frameCaptureMode.attrs.channelCount = capChannel;
     handleData->frameCaptureMode.attrs.sampleRate = capSampleRate;
-    handleData->frameCaptureMode.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+    handleData->frameCaptureMode.attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     handleData->frameCaptureMode.attrs.isBigEndian = false;
     handleData->frameCaptureMode.attrs.isSignedData = true;
     return HDF_SUCCESS;
@@ -462,7 +462,7 @@ HWTEST_F(AudioAlsaIfLibCaptureTest, AudioOutputCaptureRead_002, TestSize.Level1)
     memset_s(handleData, sizeof(AudioHwCaptureParam), 0, sizeof(AudioHwCaptureParam));
     ret = AudioCapInitHwParams(handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    int32_t frameSize = capChannel * 2; /* 2 is for AUDIO_FORMAT_PCM_16_BIT to byte */
+    int32_t frameSize = capChannel * 2; /* 2 is for AUDIO_FORMAT_TYPE_PCM_16_BIT to byte */
     ASSERT_NE(frameSize, 0);
     char *bufferFrameSize = new char[capFrameData];
     memset_s(bufferFrameSize, capFrameData, 0, capFrameData);
@@ -492,7 +492,7 @@ HWTEST_F(AudioAlsaIfLibCaptureTest, AudioOutputCaptureReqMmapBuffer_002, TestSiz
     memset_s(handleData, sizeof(AudioHwCaptureParam), 0, sizeof(AudioHwCaptureParam));
     ret = AudioCapInitHwParams(handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    int32_t capFrameSize = capChannel * 2; /* 2 is for AUDIO_FORMAT_PCM_16_BIT to byte */
+    int32_t capFrameSize = capChannel * 2; /* 2 is for AUDIO_FORMAT_TYPE_PCM_16_BIT to byte */
     ASSERT_NE(capFrameSize, 0);
     handleData->frameCaptureMode.mmapBufDesc.totalBufferFrames = capMmapFrameData / capFrameSize;
     char *mmapBufferFrameSize = new char[capMmapFrameData];
@@ -523,7 +523,7 @@ HWTEST_F(AudioAlsaIfLibCaptureTest, AudioOutputCaptureGetMmapPosition_002, TestS
     memset_s(handleData, sizeof(AudioHwCaptureParam), 0, sizeof(AudioHwCaptureParam));
     ret = AudioCapInitHwParams(handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    int32_t mmapFrameSize = capChannel * 2; /* 2 is for AUDIO_FORMAT_PCM_16_BIT to byte */
+    int32_t mmapFrameSize = capChannel * 2; /* 2 is for AUDIO_FORMAT_TYPE_PCM_16_BIT to byte */
     ASSERT_NE(mmapFrameSize, 0);
     handleData->frameCaptureMode.mmapBufDesc.totalBufferFrames = capMmapFrameData / mmapFrameSize;
     handleData->frameCaptureMode.mmapBufDesc.memoryAddress = mmapBuffer ;

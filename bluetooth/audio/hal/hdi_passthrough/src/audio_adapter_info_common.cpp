@@ -669,7 +669,7 @@ int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
     return HDF_SUCCESS;
 }
 
-static AudioFormat g_formatIdZero = AUDIO_FORMAT_PCM_16_BIT;
+static AudioFormat g_formatIdZero = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 int32_t HdmiPortInit(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
 {
     if (capabilityIndex == NULL) {
@@ -703,16 +703,16 @@ int32_t FormatToBits(AudioFormat format, uint32_t *formatBits)
         return HDF_FAILURE;
     }
     switch (format) {
-        case AUDIO_FORMAT_PCM_32_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_32_BIT:
             *formatBits = BIT_NUM_32;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_24_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_24_BIT:
             *formatBits = BIT_NUM_24;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_16_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_16_BIT:
             *formatBits = BIT_NUM_16;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_8_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_8_BIT:
             *formatBits = BIT_NUM_8;
             return HDF_SUCCESS;
         default:
@@ -727,16 +727,16 @@ int32_t BitsToFormat(AudioFormat *format, long formatBits)
     }
     switch (formatBits) {
         case BIT_NUM_32:
-            *format = AUDIO_FORMAT_PCM_32_BIT;
+            *format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
             return HDF_SUCCESS;
         case BIT_NUM_24:
-            *format = AUDIO_FORMAT_PCM_24_BIT;
+            *format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
             return HDF_SUCCESS;
         case BIT_NUM_16:
-            *format = AUDIO_FORMAT_PCM_16_BIT;
+            *format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
             return HDF_SUCCESS;
         case BIT_NUM_8:
-            *format = AUDIO_FORMAT_PCM_8_BIT;
+            *format = AUDIO_FORMAT_TYPE_PCM_8_BIT;
             return HDF_SUCCESS;
         default:
             return HDF_ERR_NOT_SUPPORT;

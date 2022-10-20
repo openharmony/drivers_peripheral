@@ -224,7 +224,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderGetVolume_001, TestSize.Level1)
 * @tc.name  AudioRenderSetSampleAttributes_001
 * @tc.desc  Test AudioRenderSetSampleAttributes ,the setting parameters are as follows.
 *    attrs.type = AUDIO_IN_MEDIA;
-*    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *    attrs.sampleRate = AUDIO_SAMPLE_RATE_MASK_8000;
 *    attrs.channelCount = 1;
 * @tc.type: FUNC
@@ -241,7 +241,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderSetSampleAttributes_001, TestSize.Level1
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, 1, 8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, 1, 8000);
 
     ret = render->attr.SetSampleAttributes(render, &attrs);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -249,7 +249,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderSetSampleAttributes_001, TestSize.Level1
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(ret2, attrsValue.sampleRate);
     EXPECT_EQ(ret1, attrsValue.channelCount);
 
@@ -261,7 +261,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderSetSampleAttributes_001, TestSize.Level1
 * @tc.desc  Test AudioRenderGetSampleAttributes ,the setting parameters are as follows.
 * @tc.type: FUNC
 *    attrs.type = AUDIO_IN_MEDIA;
-*    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *    attrs.sampleRate = 8000;
 *    attrs.channelCount = 1;
 */
@@ -278,12 +278,12 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderGetSampleAttributes_001, TestSize.Level1
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, 1, 8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, 1, 8000);
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(ret1, attrsValue.sampleRate);
     EXPECT_EQ(ret2, attrsValue.channelCount);
 
@@ -952,11 +952,11 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderGetFrameSize_004, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, 2, 48000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, 2, 48000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(sampleRateExp, attrsValue.sampleRate);
     EXPECT_EQ(channelCountExp, attrsValue.channelCount);
 
@@ -1009,11 +1009,11 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderGetFrameCount_004, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, 2, 8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, 2, 8000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(sampleRateExp, attrsValue.sampleRate);
     EXPECT_EQ(channelCountExp, attrsValue.channelCount);
 
@@ -1069,7 +1069,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderGetCurrentChannelId_002, TestSize.Level1
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME_USB, &adapter, &render);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, 1, 32000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, 1, 32000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -1776,7 +1776,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderGetMmapPosition_002, TestSize.Level1)
         ASSERT_EQ(nullptr, audiopara.render);
     }
     InitAttrs(audiopara.attrs);
-    audiopara.attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+    audiopara.attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
     audiopara.attrs.channelCount = 1;
     ret = audiopara.render->attr.SetSampleAttributes(audiopara.render, &(audiopara.attrs));
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);

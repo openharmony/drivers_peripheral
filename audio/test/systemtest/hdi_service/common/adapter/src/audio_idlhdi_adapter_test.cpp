@@ -845,7 +845,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_004, TestSize.Level1)
 
     InitAttrs(attrs);
     InitDevDesc(devDesc, audioPort.portId, PIN_OUT_SPEAKER);
-    attrs.format = AUDIO_FORMAT_AAC_MAIN;
+    attrs.format = AUDIO_FORMAT_TYPE_AAC_MAIN;
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
     EXPECT_EQ(HDF_FAILURE, ret);
     attrs.channelCount = channelCountErr;

@@ -167,7 +167,7 @@ static int32_t InitAttrsCapture(struct AudioSampleAttributes *captureAttrs)
         return HDF_FAILURE;
     }
     /* Initialization of audio parameters for playback */
-    captureAttrs->format = AUDIO_FORMAT_PCM_16_BIT;
+    captureAttrs->format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     captureAttrs->channelCount = AUDIO_CHANNELCOUNT;
     captureAttrs->sampleRate = AUDIO_SAMPLE_RATE_48K;
     captureAttrs->interleaved = 0;
@@ -875,10 +875,10 @@ static int32_t SetCaptureResume(struct IAudioCapture **capture)
 static void PrintAttributesFromat(void)
 {
     printf(" ============= Capture Sample Attributes Fromat =============== \n");
-    printf("| 1. Capture AUDIO_FORMAT_PCM_8_BIT                            |\n");
-    printf("| 2. Capture AUDIO_FORMAT_PCM_16_BIT                           |\n");
-    printf("| 3. Capture AUDIO_FORMAT_PCM_24_BIT                           |\n");
-    printf("| 4. Capture AUDIO_FORMAT_PCM_32_BIT                           |\n");
+    printf("| 1. Capture AUDIO_FORMAT_TYPE_PCM_8_BIT                            |\n");
+    printf("| 2. Capture AUDIO_FORMAT_TYPE_PCM_16_BIT                           |\n");
+    printf("| 3. Capture AUDIO_FORMAT_TYPE_PCM_24_BIT                           |\n");
+    printf("| 4. Capture AUDIO_FORMAT_TYPE_PCM_32_BIT                           |\n");
     printf(" ============================================================== \n");
 }
 
@@ -898,20 +898,20 @@ static int32_t SelectAttributesFomat(uint32_t *fomat)
         return HDF_FAILURE;
     }
     switch (val) {
-        case AUDIO_FORMAT_PCM_8_BIT:
-            *fomat = AUDIO_FORMAT_PCM_8_BIT;
+        case AUDIO_FORMAT_TYPE_PCM_8_BIT:
+            *fomat = AUDIO_FORMAT_TYPE_PCM_8_BIT;
             break;
-        case AUDIO_FORMAT_PCM_16_BIT:
-            *fomat = AUDIO_FORMAT_PCM_16_BIT;
+        case AUDIO_FORMAT_TYPE_PCM_16_BIT:
+            *fomat = AUDIO_FORMAT_TYPE_PCM_16_BIT;
             break;
-        case AUDIO_FORMAT_PCM_24_BIT:
-            *fomat = AUDIO_FORMAT_PCM_24_BIT;
+        case AUDIO_FORMAT_TYPE_PCM_24_BIT:
+            *fomat = AUDIO_FORMAT_TYPE_PCM_24_BIT;
             break;
-        case AUDIO_FORMAT_PCM_32_BIT:
-            *fomat = AUDIO_FORMAT_PCM_32_BIT;
+        case AUDIO_FORMAT_TYPE_PCM_32_BIT:
+            *fomat = AUDIO_FORMAT_TYPE_PCM_32_BIT;
             break;
         default:
-            *fomat = AUDIO_FORMAT_PCM_16_BIT;
+            *fomat = AUDIO_FORMAT_TYPE_PCM_16_BIT;
             break;
     }
     return HDF_SUCCESS;
