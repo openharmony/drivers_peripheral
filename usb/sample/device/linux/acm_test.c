@@ -130,7 +130,9 @@ static void WriteThread(void)
     char str[STR_LEN] = {0};
     while (g_running != 0) {
         str[0] = (char)getchar();
-        TestWrite(str);
+        if (g_running != 0) {
+            TestWrite(str);
+        }
     }
 }
 
