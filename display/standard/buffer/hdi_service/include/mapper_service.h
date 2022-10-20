@@ -13,22 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPERINTERFACESERVICE_H
-#define OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPERINTERFACESERVICE_H
+#ifndef OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPERSERVICE_H
+#define OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPERSERVICE_H
 
 #include "idisplay_buffer_hwi.h"
 #include "v1_0/display_buffer_type.h"
-#include "v1_0/imapper_interface.h"
+#include "v1_0/imapper.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace Buffer {
 namespace V1_0 {
-class MapperInterfaceService : public IMapperInterface {
+class MapperService : public IMapper {
 public:
-    MapperInterfaceService();
-    virtual ~MapperInterfaceService();
+    MapperService();
+    virtual ~MapperService();
 
     int32_t FreeMem(const sptr<NativeBuffer> &handle) override;
     int32_t Mmap(const sptr<NativeBuffer> &handle) override;
@@ -54,4 +54,4 @@ private:
 } // namespace HDI
 } // namespace OHOS
 
-#endif // OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPERINTERFACESERVICE_H
+#endif // OHOS_HDI_DISPLAY_BUFFER_V1_0_MAPPERSERVICE_H
