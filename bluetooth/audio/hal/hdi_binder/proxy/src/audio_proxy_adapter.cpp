@@ -157,7 +157,7 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     return HDF_SUCCESS;
 }
 
-AudioFormat g_formatIdZero = AUDIO_FORMAT_PCM_16_BIT;
+AudioFormat g_formatIdZero = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
 {
     if (capabilityIndex == NULL) {

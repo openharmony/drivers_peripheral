@@ -305,7 +305,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetFrameSizeWhenSizeIsNull, TestSize.Leve
 HWTEST_F(AudioCaptureTest, AudioCaptureGetFrameSizeWhenParamIsNotSupport, TestSize.Level1)
 {
     AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
-    hwCapture->captureParam.frameCaptureMode.attrs.format = AUDIO_FORMAT_AAC_MAIN;
+    hwCapture->captureParam.frameCaptureMode.attrs.format = AUDIO_FORMAT_TYPE_AAC_MAIN;
     AudioHandle handle = (AudioHandle)hwCapture;
     uint64_t frameSize = FRAME_DATA;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioCaptureGetFrameSize(handle, &frameSize));
@@ -365,7 +365,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetSampleAttributesWhenFormatIsError, Tes
 {
     AudioHandle handle = (AudioHandle)capture;
     AudioFormat format = attrs.format;
-    attrs.format = AUDIO_FORMAT_G711A;
+    attrs.format = AUDIO_FORMAT_TYPE_G711A;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioCaptureSetSampleAttributes(handle, &attrs));
     attrs.format = format;
 }
@@ -1200,7 +1200,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureReqMmapBufferWhenFormatIsError, TestSize.
     AudioHandle handle = (AudioHandle)hwCapture;
     int32_t reqSize = 0;
     struct AudioMmapBufferDescripter desc;
-    hwCapture->captureParam.frameCaptureMode.attrs.format = AUDIO_FORMAT_G711A;
+    hwCapture->captureParam.frameCaptureMode.attrs.format = AUDIO_FORMAT_TYPE_G711A;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioCaptureReqMmapBuffer(handle, reqSize, &desc));
 }
 

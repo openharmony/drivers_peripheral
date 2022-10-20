@@ -483,7 +483,7 @@ HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_013, TestSize.Level1)
     if (audiopara.render != nullptr) {
         audiopara.attrs.type = AUDIO_IN_MEDIA;
         audiopara.attrs.interleaved = false;
-        audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+        audiopara.attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
         audiopara.attrs.sampleRate = 48000;
         audiopara.attrs.channelCount = 2;
         audiopara.attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
@@ -495,7 +495,7 @@ HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_013, TestSize.Level1)
 
         EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
         EXPECT_FALSE(attrsValue.interleaved);
-        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+        EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
         EXPECT_EQ(samplerateValue, attrsValue.sampleRate);
         EXPECT_EQ(channelcountValue, attrsValue.channelCount);
     }
@@ -682,7 +682,7 @@ HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_006, TestSize.Level1)
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
         EXPECT_FALSE(attrsValue.interleaved);
-        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+        EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
         EXPECT_EQ(SAMPLERATEEXOECT, attrsValue.sampleRate);
         EXPECT_EQ(CHANNELCOUNTEXOECT, attrsValue.channelCount);
     }

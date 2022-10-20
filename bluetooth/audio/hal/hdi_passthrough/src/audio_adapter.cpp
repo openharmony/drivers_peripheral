@@ -121,16 +121,16 @@ int32_t AttrFormatToBit(const struct AudioSampleAttributes *attrs, int32_t *form
     }
     AudioFormat audioFormat = attrs->format;
     switch (audioFormat) {
-        case AUDIO_FORMAT_PCM_8_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_8_BIT:
             *format = BIT_NUM_8;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_16_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_16_BIT:
             *format = BIT_NUM_16;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_24_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_24_BIT:
             *format = BIT_NUM_24;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_32_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_32_BIT:
             *format = BIT_NUM_32;
             return HDF_SUCCESS;
         default:
@@ -184,7 +184,7 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     return HDF_SUCCESS;
 }
 
-AudioFormat g_formatIdZero = AUDIO_FORMAT_PCM_16_BIT;
+AudioFormat g_formatIdZero = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
 {
     if (capabilityIndex == NULL) {

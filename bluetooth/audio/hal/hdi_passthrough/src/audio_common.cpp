@@ -63,16 +63,16 @@ int32_t CheckAttrSamplingRate(uint32_t param)
 int32_t CheckAttrFormat(AudioFormat param)
 {
     switch (param) {
-        case AUDIO_FORMAT_PCM_8_BIT:
-        case AUDIO_FORMAT_PCM_16_BIT:
-        case AUDIO_FORMAT_PCM_24_BIT:
-        case AUDIO_FORMAT_PCM_32_BIT:
-        case AUDIO_FORMAT_AAC_MAIN:
-        case AUDIO_FORMAT_AAC_LC:
-        case AUDIO_FORMAT_AAC_LD:
-        case AUDIO_FORMAT_AAC_ELD:
-        case AUDIO_FORMAT_AAC_HE_V1:
-        case AUDIO_FORMAT_AAC_HE_V2:
+        case AUDIO_FORMAT_TYPE_PCM_8_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_16_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_24_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_32_BIT:
+        case AUDIO_FORMAT_TYPE_AAC_MAIN:
+        case AUDIO_FORMAT_TYPE_AAC_LC:
+        case AUDIO_FORMAT_TYPE_AAC_LD:
+        case AUDIO_FORMAT_TYPE_AAC_ELD:
+        case AUDIO_FORMAT_TYPE_AAC_HE_V1:
+        case AUDIO_FORMAT_TYPE_AAC_HE_V2:
             break;
         default:
             return HDF_ERR_NOT_SUPPORT;

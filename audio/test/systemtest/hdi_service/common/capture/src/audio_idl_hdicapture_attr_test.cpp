@@ -537,7 +537,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureSetSampleAttributesNull_007, Te
     struct AudioSampleAttributes attrs = {};
     struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
     ret = capture->SetSampleAttributes(captureNull, &attrs);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
     ret = capture->SetSampleAttributes(capture, nullptr);
@@ -554,7 +554,7 @@ HWTEST_F(AudioIdlHdiCaptureAttrTest, AudioCaptureGetSampleAttributesNull_002, Te
     struct AudioSampleAttributes attrs = {};
     struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_48000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_48000);
     ret = capture->GetSampleAttributes(captureNull, &attrs);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
     ret = capture->GetSampleAttributes(capture, nullptr);

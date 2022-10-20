@@ -29,7 +29,7 @@ namespace Audio {
         struct AudioPcmHwParams hwParams {
             .streamType = AUDIO_RENDER_STREAM, .channels = AUDIO_CHANNEL_BOTH_RIGHT,
             .rate = BROADCAST_AM_RATE, .periodSize = FRAME_DATA / 2,
-            .periodCount = 32, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
+            .periodCount = 32, .format = AUDIO_FORMAT_TYPE_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
             .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
         };
 
