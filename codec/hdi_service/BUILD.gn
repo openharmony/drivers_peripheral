@@ -61,6 +61,7 @@ ohos_shared_library("libcodec_server") {
   ]
   sources = [
     "//drivers/peripheral/codec/hal/v1.0/codec_instance/src/codec_instance.c",
+    "//drivers/peripheral/codec/hal/v1.0/codec_instance/src/codec_instance_manager.cpp",
     "//drivers/peripheral/codec/hal/v1.0/share_mem/src/ashmem_wrapper.cpp",
     "//drivers/peripheral/codec/hal/v1.0/share_mem/src/share_mem.c",
     "codec_service_stub/codec_callback_service.c",
