@@ -28,7 +28,7 @@ enum CaptureCmdId {
     AUDIO_CAPTURE_SET_GAIN,
     AUDIO_CAPTURE_CAPTURE_FRAME,
     AUDIO_CAPTURE_SET_EXTRA_PARAMS,
-    AUDIO_CAPTURE_REQ_MMAP_BUFFER, 
+    AUDIO_CAPTURE_REQ_MMAP_BUFFER,
     AUDIO_CAPTURE_DEV_DUMP,
 };
 
@@ -63,7 +63,7 @@ void AudioCaptureReqMmapBuffer(struct IAudioCapture *&capture, uint8_t *&data)
 void CaptureFucSwitch(struct IAudioCapture *&capture, uint32_t cmd, const uint8_t *&rawData)
 {
     uint8_t *data = const_cast<uint8_t *>(rawData);
-    switch(cmd) {
+    switch (cmd) {
         case AUDIO_CAPTURE_SET_SAMPLE_ATTR:
             capture->SetSampleAttributes(capture, reinterpret_cast<const struct AudioSampleAttributes *>(rawData));
             break;
