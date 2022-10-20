@@ -292,8 +292,7 @@ void HosV4L2UVC::loopUvcDevice()
     FD_SET(uDevFd, &fds);
     FD_SET(eventFd, &fds);
     while (g_uvcDetectEnable) {
-        int rc;
-        rc = select(((uDevFd > eventFd) ? uDevFd : eventFd) + 1, &fds, &fds, NULL, NULL);
+        int rc = select(((uDevFd > eventFd) ? uDevFd : eventFd) + 1, &fds, &fds, NULL, NULL);
         if (rc > 0 && FD_ISSET(uDevFd, &fds)) {
             usleep(delayTime);
             constexpr uint32_t buffSize = 4096;

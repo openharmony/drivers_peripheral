@@ -70,10 +70,10 @@ TEST_F(UtestPipelineTest, camera_ppl_0002)
     display_->StartStream(display_->intents);
     // Get preview
     display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
-    display_->StartCapture(display_->STREAM_ID_CAPTURE,, display_->CAPTURE_ID_CAPTURE, false, true);
+    display_->StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true);
     // release stream
     display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
-    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE,};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }
 
