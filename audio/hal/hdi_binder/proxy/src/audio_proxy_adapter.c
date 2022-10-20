@@ -73,14 +73,14 @@ static int32_t AudioProxyCommonInitAttrs(struct HdfSBuf *data, const struct Audi
 }
 
 static int32_t AudioProxyCommonInitCreateData(struct HdfSBuf *data, const struct AudioHwAdapter *adapter,
-    const struct AudioDeviceDescriptor *desc, const struct AudioSampleAttributes *attrs)
+                                              const struct AudioSampleAttributes *attrs)
 {
     AUDIO_FUNC_LOGI();
-    if (data == NULL || adapter == NULL || desc == NULL || attrs == NULL) {
-        AUDIO_FUNC_LOGE("data == NULL || adapter == NULL || desc == NULL || attrs == NULL");
+    if (data == NULL || adapter == NULL || attrs == NULL) {
+        AUDIO_FUNC_LOGE("data == NULL || adapter == NULL || attrs == NULL");
         return HDF_FAILURE;
     }
-    uint32_t tempDesc;
+
     uint32_t tempAtrr;
     int32_t pid = getpid();
     const char *adapterName = adapter->adapterDescriptor.adapterName;
@@ -111,15 +111,34 @@ static int32_t AudioProxyCommonInitCreateData(struct HdfSBuf *data, const struct
     if (AudioProxyCommonInitAttrs(data, attrs) < 0) {
         return HDF_FAILURE;
     }
+
+    if (!HdfSbufWriteInt32(data, attrs->streamId)) {
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioWriteDeviceDescriptor(struct HdfSBuf *data, const struct AudioDeviceDescriptor *desc)
+{
+    AUDIO_FUNC_LOGI();
+    if (data == NULL || desc == NULL) {
+        AUDIO_FUNC_LOGE("invalid params of AudioWriteDeviceDescriptor");
+        return HDF_FAILURE;
+    }
+
+    uint32_t tempDesc;
     if (!HdfSbufWriteUint32(data, desc->portId)) {
         AUDIO_FUNC_LOGE("portId Write Fail");
         return HDF_FAILURE;
     }
+
     tempDesc = (uint32_t)desc->pins;
     if (!HdfSbufWriteUint32(data, tempDesc)) {
         AUDIO_FUNC_LOGE("pins Write Fail");
         return HDF_FAILURE;
     }
+
     return HDF_SUCCESS;
 }
 
@@ -344,10 +363,17 @@ static inline int32_t AudioProxyWriteTokenAndInitData(struct AudioHwAdapter *hwA
         AUDIO_FUNC_LOGE("write interface token failed");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (AudioProxyCommonInitCreateData(data, hwAdapter, desc, attrs) < 0) {
+
+    if (AudioProxyCommonInitCreateData(data, hwAdapter, attrs) < 0) {
         AUDIO_FUNC_LOGE("Failed to obtain reply");
         return AUDIO_HAL_ERR_INTERNAL;
     }
+
+    if (AudioWriteDeviceDescriptor(data, desc) < 0) {
+        AUDIO_FUNC_LOGE("Failed to write audio device descriptor");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
     return AUDIO_HAL_SUCCESS;
 }
 
