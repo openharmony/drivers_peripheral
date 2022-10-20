@@ -40,11 +40,9 @@ public:
 
     int32_t Init();
     void ReportThermalData();
-    int32_t LoopingThreadEntry(void *arg, int32_t epfd);
-    void Run(void *service, int32_t epfd);
-    void StartThread(void *service);
-    int32_t RegisterCallback(const int32_t fd, const EventType et, int32_t epfd);
-    void SetTimerInterval(int32_t interval, int32_t timerfd);
+    int32_t LoopingThreadEntry();
+    void Run();
+    void StartThread();
     void ResetCount();
     void SetSimluationFlag();
     int32_t GetSimluationFlag();
@@ -52,13 +50,9 @@ public:
     void SetThermalEventCb(const sptr<IThermalCallback> &thermalCb);
     void DumpSensorConfigInfo();
 private:
-    int32_t InitProviderTimer();
-    void TimerProviderCallback(void *service);
+    void TimerProviderCallback();
     int32_t CreateProviderFd();
 
-    int32_t epFd_ {-1};
-    int32_t timerFd_ {-1};
-    int32_t timerInterval_ {-1};
     std::map<int32_t, Callback> callbackHandler_;
     std::shared_ptr<ThermalSimulationNode> node_;
     std::shared_ptr<ThermalZoneManager> thermalZoneMgr_;
