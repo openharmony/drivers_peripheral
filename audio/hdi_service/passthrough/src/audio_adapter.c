@@ -22,6 +22,7 @@
 #include "hdf_types.h"
 #include "osal_mem.h"
 #include "securec.h"
+#include "stub_collector.h"
 
 #define HDF_LOG_TAG AUDIO_HDI_IMPL
 
@@ -622,8 +623,9 @@ int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct Aud
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter)
+int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc)
 {
+    (void)desc;
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL) {
@@ -632,6 +634,9 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter)
     }
 
     struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr;
+
+    StubCollectorRemoveObject(IAUDIORENDER_INTERFACE_DESC, render);
+
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender == NULL) {
         AUDIO_FUNC_LOGE("hwRender is NULL!");
@@ -956,8 +961,9 @@ int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct Au
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter)
+int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc)
 {
+    (void)desc;
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL) {
@@ -965,6 +971,9 @@ int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter)
         return AUDIO_ERR_INVALID_PARAM;
     }
     struct IAudioCapture *capture = (struct IAudioCapture *)hwAdapter->infos.captureServicePtr;
+
+    StubCollectorRemoveObject(IAUDIOCAPTURE_INTERFACE_DESC, capture);
+
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     if (hwCapture == NULL) {
         AUDIO_FUNC_LOGE("hwCapture is NULL!");

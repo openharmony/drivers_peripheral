@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_remote_adapter_if.h"
+#include <gtest/gtest.h>
 #include "hdi_service_common.h"
 
 using namespace std;
@@ -29,92 +29,44 @@ public:
     void TearDown();
     struct IAudioAdapter *adapter = nullptr;
     struct IAudioCapture *capture = nullptr;
-    static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
-    static void *handleSo;
-    static void (*AudioManagerRelease)(struct IAudioManager *);
-    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
-    static void (*AudioCaptureRelease)(struct IAudioCapture *);
-    void ReleaseCaptureSource(void);
 };
 
-using THREAD_FUNC = void *(*)(void *);
-
-TestAudioManager *(*AudioIdlHdiCaptureSceneTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiCaptureSceneTest::manager = nullptr;
-void *AudioIdlHdiCaptureSceneTest::handleSo = nullptr;
-void (*AudioIdlHdiCaptureSceneTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
-void (*AudioIdlHdiCaptureSceneTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
-void (*AudioIdlHdiCaptureSceneTest::AudioCaptureRelease)(struct IAudioCapture *) = nullptr;
+using THREAD_FUNC = void *(*)(void *);
 
 void AudioIdlHdiCaptureSceneTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handleSo);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
-    (void)HdfRemoteGetCallingPid();
-    manager = GetAudioManager(IDL_SERVER_NAME.c_str());
+    manager = IAudioManagerGet(IS_STUB);
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
-    ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
-    ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioCaptureRelease = (void (*)(struct IAudioCapture *))(dlsym(handleSo, "AudioCaptureRelease"));
-    ASSERT_NE(nullptr, AudioCaptureRelease);
 }
 
 void AudioIdlHdiCaptureSceneTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease !=nullptr) {
-        AudioManagerRelease(manager);
-        manager = nullptr;
-    }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
-    }
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (manager != nullptr) {
+        (void)IAudioManagerRelease(manager, IS_STUB);
     }
 }
 
 void AudioIdlHdiCaptureSceneTest::SetUp(void)
 {
-    int32_t ret;
     ASSERT_NE(nullptr, manager);
-    ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
+    int32_t ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiCaptureSceneTest::TearDown(void)
 {
-    ReleaseCaptureSource();
+    int32_t ret = ReleaseCaptureSource(manager, adapter, capture);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
-void AudioIdlHdiCaptureSceneTest::ReleaseCaptureSource(void)
-{
-    if (capture != nullptr && AudioCaptureRelease != nullptr) {
-        adapter->DestroyCapture(adapter);
-        AudioCaptureRelease(capture);
-        capture = nullptr;
-    }
-    if (adapter != nullptr && AudioAdapterRelease != nullptr) {
-        manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-        AudioAdapterRelease(adapter);
-        adapter = nullptr;
-    }
-}
 /**
-* @tc.name   Test AudioCaptureCheckSceneCapability API and check scene's capability
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_001
+* @tc.name  AudioCaptureCheckSceneCapability_001
 * @tc.desc  Test AudioCaptureCheckSceneCapability interface,return 0 if check scene's capability successful.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = false;
@@ -130,18 +82,17 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_
 }
 #ifndef ALSA_LIB_MODE
 /**
-* @tc.name   Test checking scene's capability where the scene is not configured in the json.
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_002
+* @tc.name  AudioCaptureCheckSceneCapability_002
 * @tc.desc  Test AudioCreateCapture interface,return -1 if the scene is not configured in the json.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_002, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
     struct AudioSceneDescriptor scenes = {};
     ASSERT_NE(nullptr, capture);
-    scenes.scene.id = 5;
+    scenes.scene.id = 5; // invlalid id
     scenes.desc.pins = PIN_IN_MIC;
     scenes.desc.desc = strdup("mic");
     ret = capture->CheckSceneCapability(capture, &scenes, &supported);
@@ -150,12 +101,11 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_
 }
 #endif
 /**
-* @tc.name   Test checking scene's capability where the capture is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_Null_003
+* @tc.name  AudioCaptureCheckSceneCapabilityNull_003
 * @tc.desc  Test AudioCreateCapture interface,return -3/-4 if the capture is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapabilityNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -173,12 +123,11 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_
     free(scenes.desc.desc);
 }
 /**
-* @tc.name   Test checking scene's capability where the scene is nullptr
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_Null_004
+* @tc.name  AudioCaptureCheckSceneCapabilityNull_004
 * @tc.desc  Test AudioCreateCapture interface,return -3 if the scene is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapabilityNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -192,12 +141,11 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_
 }
 #ifdef AUDIO_ADM_PASSTHROUGH
 /**
-* @tc.name   Test checking scene's capability where the parameter supported is nullptr.
-* @tc.number  SUB_Audio_HDI_CaptureCheckSceneCapability_Null_005
+* @tc.name  AudioCaptureCheckSceneCapabilityNull_005
 * @tc.desc  Test AudioCreateCapture interface,return -3 if the parameter supported is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_Null_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureCheckSceneCapabilityNull_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -211,12 +159,11 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureCheckSceneCapability_
 }
 #endif
 /**
-* @tc.name  Test AudioCaptureSelectScene API via legal input
-* @tc.number  SUB_Audio_HDI_CaptureSelectScene_001
+* @tc.name  AudioCaptureSelectScene_001
 * @tc.desc  Test AudioCaptureSelectScene interface,return 0 if select capture's scene successful.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureSelectScene_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -229,12 +176,11 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureSelectScene_001, Test
     free(scenes.desc.desc);
 }
 /**
-* @tc.name  Test AudioCaptureSelectScene API after capture start.
-* @tc.number  SUB_Audio_HDI_CaptureSelectScene_002
+* @tc.name  AudioCaptureSelectScene_002
 * @tc.desc  Test AudioCaptureSelectScene, return 0 if select capture's scene successful after capture start.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureSelectScene_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -253,12 +199,11 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureSelectScene_002, Test
     free(scenes.desc.desc);
 }
 /**
-* @tc.name  Test AudioCaptureSelectScene API where the parameter handle is nullptr.
-* @tc.number  SUB_Audio_HDI_CaptureSelectScene_Null_003
+* @tc.name  AudioCaptureSelectSceneNull_003
 * @tc.desc  Test AudioCaptureSelectScene, return -3/-4 if the parameter handle is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureSelectScene_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectSceneNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -273,12 +218,11 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureSelectScene_Null_003,
     free(scenes.desc.desc);
 }
 /**
-* @tc.name  Test AudioCaptureSelectScene API where the parameter scene is nullptr.
-* @tc.number  SUB_Audio_HDI_CaptureSelectScene_Null_004
+* @tc.name  AudioCaptureSelectSceneNull_004
 * @tc.desc  Test AudioCaptureSelectScene, return -3 if the parameter scene is nullptr.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureSelectScene_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectSceneNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor *scenes = nullptr;
@@ -289,18 +233,17 @@ HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureSelectScene_Null_004,
 }
 #ifndef ALSA_LIB_MODE
 /**
-* @tc.name  Test AudioCaptureSelectScene API where the scene is not configured in the json.
-* @tc.number  SUB_Audio_HDI_CaptureSelectScene_005
+* @tc.name  AudioCaptureSelectScene_005
 * @tc.desc  Test AudioCaptureSelectScene, return -1 if the scene is not configured in the json.
-* @tc.author: ZengLiFeng
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiCaptureSceneTest, SUB_Audio_HDI_CaptureSelectScene_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiCaptureSceneTest, AudioCaptureSelectScene_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
     ASSERT_NE(nullptr, capture);
 
-    scenes.scene.id = 5;
+    scenes.scene.id = 5; // invlalid id
     scenes.desc.pins = PIN_OUT_HDMI;
     scenes.desc.desc = strdup("mic");
     ret = capture->SelectScene(capture, &scenes);

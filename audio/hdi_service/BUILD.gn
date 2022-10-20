@@ -14,7 +14,7 @@
 group("idl_audio") {
   deps = [
     "binder:audio_manager_service",
-    "passthrough:hdi_audio_passthrough",
+    "passthrough:audio_manager_service_1.0",
     "pathselect:hdi_idl_audio_path_select",
     "supportlibs:hdi_audio_capture",
     "supportlibs:hdi_audio_render",

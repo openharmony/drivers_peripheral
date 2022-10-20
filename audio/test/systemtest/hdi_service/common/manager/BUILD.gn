@@ -22,21 +22,19 @@ if (!defined(ohos_lite)) {
 
   ohos_systemtest("hdf_audio_idlhdi_manager_test") {
     module_out_path = module_output_path
-    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
+
     sources = [
       "../../../common/hdi_service_common/src/hdi_service_common.cpp",
       "src/audio_idlhdi_manager_test.cpp",
     ]
     include_dirs = [ "//drivers/peripheral/audio/test/systemtest/common/hdi_service_common/include" ]
-    if (is_standard_system) {
-      external_deps = [
-        "hdf_core:libhdf_ipc_adapter",
-        "hdf_core:libhdf_utils",
-        "hiviewdfx_hilog_native:libhilog",
-      ]
-    } else {
-      external_deps = [ "hilog:libhilog" ]
-    }
+
+    external_deps = [
+      "drivers_interface_audio:libaudio_proxy_1.0",
+      "hdf_core:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
+
     deps = [
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",

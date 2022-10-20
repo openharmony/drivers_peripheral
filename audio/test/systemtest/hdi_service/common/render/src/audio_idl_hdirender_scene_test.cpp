@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_remote_adapter_if.h"
+#include <gtest/gtest.h>
 #include "hdi_service_common.h"
 
 using namespace std;
@@ -27,96 +27,45 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    struct IAudioAdapter *adapter = nullptr;
     struct IAudioRender *render = nullptr;
-    static TestAudioManager *(*GetAudioManager)(const char *);
     static TestAudioManager *manager;
-    static void *handleSo;
-    static void (*AudioManagerRelease)(struct IAudioManager *);
-    static void (*AudioAdapterRelease)(struct IAudioAdapter *);
-    static void (*AudioRenderRelease)(struct IAudioRender *);
-    void ReleaseAudioSource(void);
+    struct IAudioAdapter *adapter = nullptr;
 };
 
-TestAudioManager *(*AudioIdlHdiRenderSceneTest::GetAudioManager)(const char *) = nullptr;
 TestAudioManager *AudioIdlHdiRenderSceneTest::manager = nullptr;
-void *AudioIdlHdiRenderSceneTest::handleSo = nullptr;
-void (*AudioIdlHdiRenderSceneTest::AudioManagerRelease)(struct IAudioManager *) = nullptr;
-void (*AudioIdlHdiRenderSceneTest::AudioAdapterRelease)(struct IAudioAdapter *) = nullptr;
-void (*AudioIdlHdiRenderSceneTest::AudioRenderRelease)(struct IAudioRender *) = nullptr;
 
 void AudioIdlHdiRenderSceneTest::SetUpTestCase(void)
 {
-    char absPath[PATH_MAX] = {0};
-    char *path = realpath(RESOLVED_PATH.c_str(), absPath);
-    ASSERT_NE(nullptr, path);
-    handleSo = dlopen(absPath, RTLD_LAZY);
-    ASSERT_NE(nullptr, handleSo);
-    GetAudioManager = (TestAudioManager *(*)(const char *))(dlsym(handleSo, FUNCTION_NAME.c_str()));
-    ASSERT_NE(nullptr, GetAudioManager);
-    (void)HdfRemoteGetCallingPid();
-    manager = GetAudioManager(IDL_SERVER_NAME.c_str());
+    manager = IAudioManagerGet(IS_STUB);
     ASSERT_NE(nullptr, manager);
-    AudioManagerRelease = (void (*)(struct IAudioManager *))(dlsym(handleSo, "AudioManagerRelease"));
-    ASSERT_NE(nullptr, AudioManagerRelease);
-    AudioAdapterRelease = (void (*)(struct IAudioAdapter *))(dlsym(handleSo, "AudioAdapterRelease"));
-    ASSERT_NE(nullptr, AudioAdapterRelease);
-    AudioRenderRelease = (void (*)(struct IAudioRender *))(dlsym(handleSo, "AudioRenderRelease"));
-    ASSERT_NE(nullptr, AudioRenderRelease);
 }
 
 void AudioIdlHdiRenderSceneTest::TearDownTestCase(void)
 {
-    if (AudioManagerRelease !=nullptr) {
-        AudioManagerRelease(manager);
-        manager = nullptr;
-    }
-    if (GetAudioManager != nullptr) {
-        GetAudioManager = nullptr;
-    }
-    if (handleSo != nullptr) {
-        dlclose(handleSo);
-        handleSo = nullptr;
+    if (manager != nullptr) {
+        (void)IAudioManagerRelease(manager, IS_STUB);
     }
 }
 
 void AudioIdlHdiRenderSceneTest::SetUp(void)
 {
-    int32_t ret;
     ASSERT_NE(nullptr, manager);
-    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
+    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiRenderSceneTest::TearDown(void)
 {
-    ReleaseAudioSource();
-}
-
-void AudioIdlHdiRenderSceneTest::ReleaseAudioSource(void)
-{
-    int32_t ret = -1;
-    if (render != nullptr && AudioRenderRelease != nullptr) {
-        ret = adapter->DestroyRender(adapter);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        AudioRenderRelease(render);
-        render = nullptr;
-    }
-    if (adapter != nullptr && AudioAdapterRelease != nullptr) {
-        ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        AudioAdapterRelease(adapter);
-        adapter = nullptr;
-    }
+    int32_t ret = ReleaseRenderSource(manager, adapter, render);
+    ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 /**
-* @tc.name     Test AudioRenderCheckSceneCapability API and check scene's capability
-* @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_001
+* @tc.name  AudioRenderCheckSceneCapability_001
 * @tc.desc    Test AudioRenderCheckSceneCapability interface,return 0 if check scene's capability successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapability_001, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = false;
@@ -132,12 +81,11 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_00
     free(scenes.desc.desc);
 }
 /**
-* @tc.name     Test checking scene's capability where the scene is not configed in the josn.
-* @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_002
+* @tc.name  AudioRenderCheckSceneCapability_002
 * @tc.desc    Test RenderCheckSceneCapability interface,return -1 if the scene is not configed in the josn.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapability_002, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -152,12 +100,11 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_00
     free(scenes.desc.desc);
 }
 /**
-* @tc.name     Test checking scene's capability where the render is nullptr
-* @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_Null_003
+* @tc.name  AudioRenderCheckSceneCapabilityNull_003
 * @tc.desc    Test AudioRenderCheckSceneCapability,return -3/-4 if the render is nullptr.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapabilityNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -173,12 +120,11 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_Nu
     free(scenes.desc.desc);
 }
 /**
-* @tc.name     Test AudioRenderCheckSceneCapability API and check scene's capability
-* @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_Null_004
+* @tc.name  AudioRenderCheckSceneCapabilityNull_004
 * @tc.desc    Test AudioRenderCheckSceneCapability interface,return -3 if the scene is nullptr.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapabilityNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     bool supported = true;
@@ -190,12 +136,11 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_Nu
 }
 #ifdef AUDIO_ADM_PASSTHROUGH
 /**
-* @tc.name     Test AudioRenderCheckSceneCapability API and check scene's capability
-* @tc.number  SUB_Audio_HDI_RenderCheckSceneCapability_Null_005
+* @tc.name  AudioRenderCheckSceneCapabilityNull_005
 * @tc.desc    Test AudioRenderCheckSceneCapability interface,return -3 if the supported is nullptr.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_Null_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderCheckSceneCapabilityNull_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -210,12 +155,11 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderCheckSceneCapability_Nu
 }
 #endif
 /**
-* @tc.name    Test RenderSelectScene API via legal input
-* @tc.number  SUB_Audio_HDI_RenderSelectScene_001
+* @tc.name  AudioRenderSelectScene_001
 * @tc.desc    Test RenderSelectScene interface,return 0 if select Render's scene successful.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderSelectScene_001, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderSelectScene_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -234,12 +178,11 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderSelectScene_001, TestSi
     free(scenes.desc.desc);
 }
 /**
-* @tc.name    Test RenderSelectScene API after Render start.
-* @tc.number  SUB_Audio_HDI_RenderSelectScene_002
+* @tc.name  AudioRenderSelectScene_002
 * @tc.desc    Test RenderSelectScene, return 0 if select Render's scene successful after Render start.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderSelectScene_002, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderSelectScene_002, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};
@@ -258,12 +201,11 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderSelectScene_002, TestSi
     free(scenes.desc.desc);
 }
 /**
-* @tc.name    Test RenderSelectScene API where the parameter handle is nullptr.
-* @tc.number  SUB_Audio_HDI_RenderSelectScene_Null_003
+* @tc.name  AudioRenderSelectSceneNull_003
 * @tc.desc    Test RenderSelectScene, return -3/-4 if the parameter handle is nullptr.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderSelectScene_Null_003, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderSelectSceneNull_003, TestSize.Level1)
 {
     int32_t ret = -1;
     ASSERT_NE(nullptr, render);
@@ -278,12 +220,11 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderSelectScene_Null_003, T
     free(scenes.desc.desc);
 }
 /**
-* @tc.name    Test RenderSelectScene API where the parameter scene is nullptr.
-* @tc.number  SUB_Audio_HDI_RenderSelectScene_Null_004
+* @tc.name  AudioRenderSelectSceneNull_004
 * @tc.desc    Test RenderSelectScene, return -3 if the parameter scene is nullptr.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderSelectScene_Null_004, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioRenderSelectSceneNull_004, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor *scenes = nullptr;
@@ -293,12 +234,11 @@ HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_RenderSelectScene_Null_004, T
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 }
 /**
-* @tc.name    Test AudioRenderSelectScene API where the scene is not configed in the josn.
-* @tc.number  SUB_Audio_HDI_AudioRenderSelectScene_005
+* @tc.name  AudioAudioRenderSelectScene_005
 * @tc.desc    Test AudioRenderSelectScene, return -1 if the scene is not configed in the josn.
-* @tc.author: liweiming
+* @tc.type: FUNC
 */
-HWTEST_F(AudioIdlHdiRenderSceneTest, SUB_Audio_HDI_AudioRenderSelectScene_005, TestSize.Level1)
+HWTEST_F(AudioIdlHdiRenderSceneTest, AudioAudioRenderSelectScene_005, TestSize.Level1)
 {
     int32_t ret = -1;
     struct AudioSceneDescriptor scenes = {};

@@ -23,7 +23,8 @@
       "components": [
         "hiviewdfx_hilog_native",
         "hdf_core",
-        "utils_base"
+        "utils_base",
+        "drivers_interface_audio"
       ],
       "third_part": [
         "bounds_checking_function",
@@ -35,8 +36,8 @@
         "//drivers/peripheral/audio:hdi_audio"
       ],
       "test": [
-        "//drivers/peripheral/audio:audio_sample_client",
         "//drivers/peripheral/audio/test:audio_test_entry",
+        "//drivers/peripheral/audio/test/sample:audio_sample",
         "//drivers/peripheral/audio/test/sample:idl_audio_sample"
       ],
       "inner_kits":[
