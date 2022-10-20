@@ -22,8 +22,7 @@ public:
     CodecHdiCallback(std::shared_ptr<ICodecHdiCallBackBase> codecHdi);
     virtual ~CodecHdiCallback() = default;
 
-    int32_t EventHandler(OHOS::HDI::Codec::V1_0::OMX_EVENTTYPE event,
-                         const OHOS::HDI::Codec::V1_0::EventInfo &info) override;
+    int32_t EventHandler(uint32_t event, const OHOS::HDI::Codec::V1_0::EventInfo &info) override;
 
     int32_t EmptyBufferDone(int64_t appData, const OHOS::HDI::Codec::V1_0::OmxCodecBuffer &buffer) override;
 
