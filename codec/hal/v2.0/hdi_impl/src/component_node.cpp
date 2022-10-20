@@ -223,7 +223,7 @@ int32_t ComponentNode::ComponentRoleEnum(uint8_t *role, uint32_t roleLen, uint32
         return err;
     }
 
-    size_t omxRoleLen = strlen((const char *)omxRole);
+    size_t omxRoleLen = strlen(reinterpret_cast<const char *>(omxRole));
     if (omxRoleLen == 0) {
         HDF_LOGW("%{public}s error, omxRoleLen is 0 [%{public}zu] ", __func__, omxRoleLen);
     } else {
