@@ -89,7 +89,7 @@ OHOS::sptr<ICodecBuffer> CodecShareBuffer::Allocate(struct OmxCodecBuffer &codec
     codecBuffer.filledLen = 0;
 
     CodecShareBuffer *buffer = new CodecShareBuffer(codecBuffer);
-    codecBuffer.buffer = (uint8_t *)(uintptr_t)sharedFD;
+    codecBuffer.buffer = reinterpret_cast<uint8_t *>(sharedFD);
     codecBuffer.bufferLen = sizeof(int);
     buffer->SetAshMem(sharedMemory);
     return OHOS::sptr<ICodecBuffer>(buffer);
