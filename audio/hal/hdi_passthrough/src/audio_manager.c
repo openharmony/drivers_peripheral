@@ -257,6 +257,7 @@ static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, str
     hwAdapter->common.GetPortCapability = AudioAdapterGetPortCapability;
     hwAdapter->common.SetPassthroughMode = AudioAdapterSetPassthroughMode;
     hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
+    hwAdapter->common.SetVoiceVolume = AudioAdapterSetVoiceVolume;
     hwAdapter->common.UpdateAudioRoute = AudioAdapterUpdateAudioRoute;
     hwAdapter->common.ReleaseAudioRoute = AudioAdapterReleaseAudioRoute;
     hwAdapter->adapterDescriptor = *desc;

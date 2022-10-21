@@ -444,6 +444,7 @@ int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struc
 int32_t AudioAdapterUpdateAudioRoute(struct AudioAdapter *adapter, const struct AudioRoute *route, int32_t *routeHandle);
 int32_t AudioAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t routeHandle);
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
+int32_t AudioAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume);
 int32_t AudioRenderStart(AudioHandle handle);
 int32_t AudioRenderStop(AudioHandle handle);
 int32_t AudioRenderPause(AudioHandle handle);
