@@ -453,143 +453,20 @@ bool MetadataController::DealUpdateNewTagData(
 {
     bool result = false;
     for (auto it = keys.cbegin(); it != keys.cend(); it++) {
-        switch (*it) {
-            case OHOS_CONTROL_AWB_MODE:       // fallthrough
-            case OHOS_CONTROL_FOCUS_MODE:     // fallthrough
-            case OHOS_CONTROL_FOCUS_STATE:    // fallthrough
-            case OHOS_CONTROL_EXPOSURE_MODE:  // fallthrough
-            case OHOS_CONTROL_EXPOSURE_STATE: // fallthrough
-            case OHOS_CONTROL_FLASH_MODE:     // fallthrough
-            case OHOS_CONTROL_METER_MODE:     // fallthrough
-            case OHOS_CONTROL_VIDEO_STABILIZATION_MODE: {
-                result = UpdateU8Metadata(*it, data, outMeta);
-                break;
-            }
-            case OHOS_CAMERA_STREAM_ID: // fallthrough
-            case OHOS_CONTROL_AE_EXPOSURE_COMPENSATION: {
-                result = UpdateI32Metadata(*it, data, outMeta);
-                break;
-            }
-            case OHOS_SENSOR_EXPOSURE_TIME: {
-                result = UpdateI64Metadata(*it, data, outMeta);
-                break;
-            }
-            case OHOS_SENSOR_COLOR_CORRECTION_GAINS: {
-                result = UpdateFloatMetadata(*it, data, outMeta);
-                break;
-            }
-            case OHOS_CONTROL_FPS_RANGES: // fallthrough
-            case OHOS_CONTROL_AF_REGIONS: // fallthrough
-            case OHOS_CONTROL_METER_POINT: {
-                result = UpdateI32ArrayMetadata(*it, data, outMeta);
-                break;
-            }
-            default: {
-                CAMERA_LOGW("invalid param %{public}d", *it);
-                break;
-            }
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, *it, &entry);
+        if (ret != 0) {
+            CAMERA_LOGE("get [%{public}d] error", *it);
+            return false;
+        }
+
+        result = outMeta->addEntry(*it, (void*)entry.data.u8, entry.count);
+        if (!result) {
+            CAMERA_LOGE("update key [%{public}d] error", *it);
+            return false;
         }
     }
     return result;
-}
-
-bool MetadataController::UpdateU8Metadata(
-    int32_t key, common_metadata_header_t *data, std::shared_ptr<CameraMetadata> &outMeta)
-{
-    uint8_t value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        CAMERA_LOGE("get [%{public}d] error", key);
-        return false;
-    }
-    value = *(entry.data.u8);
-    bool result = outMeta->addEntry(key, &value, sizeof(value));
-    if (!result) {
-        CAMERA_LOGE("update u8 key [%{public}d] error", key);
-        return false;
-    }
-    return true;
-}
-
-bool MetadataController::UpdateI32Metadata(
-    int32_t key, common_metadata_header_t *data, std::shared_ptr<CameraMetadata> &outMeta)
-{
-    int32_t value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        CAMERA_LOGE("get [%{public}d] error", key);
-        return false;
-    }
-    value = *(entry.data.i32);
-    bool result = outMeta->addEntry(key, &value, DATA_COUNT);
-    if (!result) {
-        CAMERA_LOGE("update i32 key [%{public}d] error", key);
-        return false;
-    }
-    return true;
-}
-
-bool MetadataController::UpdateI64Metadata(
-    int32_t key, common_metadata_header_t *data, std::shared_ptr<CameraMetadata> &outMeta)
-{
-    int64_t value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        CAMERA_LOGE("get [%{public}d] error", key);
-        return false;
-    }
-    value = *(entry.data.i64);
-    bool result = outMeta->addEntry(key, &value, DATA_COUNT);
-    if (!result) {
-        CAMERA_LOGE("update i64 key [%{public}d] error", key);
-        return false;
-    }
-    return true;
-}
-
-bool MetadataController::UpdateFloatMetadata(
-    int32_t key, common_metadata_header_t *data, std::shared_ptr<CameraMetadata> &outMeta)
-{
-    float value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        CAMERA_LOGE("get [%{public}d] error", key);
-        return false;
-    }
-    value = *(entry.data.f);
-    bool result = outMeta->addEntry(key, &value, DATA_COUNT);
-    if (!result) {
-        CAMERA_LOGE("update float key [%{public}d] error", key);
-        return false;
-    }
-    return true;
-}
-
-bool MetadataController::UpdateI32ArrayMetadata(
-    int32_t key, common_metadata_header_t *data, std::shared_ptr<CameraMetadata> &outMeta)
-{
-    std::vector<int32_t> results;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        CAMERA_LOGE("get [%{public}d] error", key);
-        return false;
-    }
-    uint32_t count = entry.count;
-
-    for (int i = 0; i < count; i++) {
-        results.push_back(*(entry.data.i32 + i));
-    }
-    bool result = outMeta->addEntry(key, results.data(), results.size());
-    if (!result) {
-        CAMERA_LOGE("update i32Array key [%{public}d] error", key);
-        return false;
-    }
-    return true;
 }
 
 void MetadataController::DealMessage()
