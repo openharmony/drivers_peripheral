@@ -1170,6 +1170,13 @@ int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struc
     return AUDIO_HAL_ERR_INTERNAL;
 }
 
+int32_t AudioAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume)
+{
+    (void)adapter;
+    (void)volume;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
 int32_t AudioAdapterUpdateAudioRoute(struct AudioAdapter *adapter, const struct AudioRoute *route, int32_t *routeHandle)
 {
     if (route == NULL || routeHandle == NULL || route->sinks == NULL || route->sources == NULL) {
