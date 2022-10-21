@@ -383,7 +383,7 @@ int32_t CodecHdiAdapterDecode::UseBufferOnPort(PortIndex portIndex, int bufferCo
         int fd = AshmemCreate(0, bufferSize);
         shared_ptr<Ashmem> sharedMem = make_shared<Ashmem>(fd, bufferSize);
         omxBuffer->bufferLen = FD_SIZE;
-        omxBuffer->buffer = (uint8_t *)(unsigned long)fd;
+        omxBuffer->buffer = reinterpret_cast<uint8_t *>(fd);
         omxBuffer->allocLen = bufferSize;
         omxBuffer->fenceFd = -1;
         omxBuffer->pts = 0;
@@ -548,11 +548,13 @@ void CodecHdiAdapterDecode::Run()
             continue;
         }
         auto bufferInfo = iter->second;
-        void *sharedAddr = (void *)bufferInfo->avSharedPtr->ReadFromAshmem(0, 0);
+        void *sharedAddr = const_cast<void *>(bufferInfo->avSharedPtr->ReadFromAshmem(0, 0));
         if (needSplit_ == 1) {
-            eosFlag = this->ReadOnePacket(fpIn_, (uint8_t *)sharedAddr, bufferInfo->omxBuffer->filledLen);
+            eosFlag = this->ReadOnePacket(fpIn_, reinterpret_cast<uint8_t *>(sharedAddr),
+                bufferInfo->omxBuffer->filledLen);
         } else {
-            eosFlag = this->ReadOneFrameFromFile(fpIn_, (uint8_t *)sharedAddr, bufferInfo->omxBuffer->filledLen);
+            eosFlag = this->ReadOneFrameFromFile(fpIn_, reinterpret_cast<uint8_t *>(sharedAddr),
+                bufferInfo->omxBuffer->filledLen);
         }
         bufferInfo->omxBuffer->offset = 0;
         if (eosFlag) {
@@ -567,7 +569,6 @@ void CodecHdiAdapterDecode::Run()
     // wait
     while (!this->exit_) {
         usleep(USLEEP_TIME);
-        continue;
     }
     auto t2 = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = t2 - t1;
@@ -634,7 +635,7 @@ int32_t CodecHdiAdapterDecode::OnFillBufferDone(const struct OmxCodecBuffer &buf
     auto bufferInfo = iter->second;
     if (bufferInfo->avSharedPtr != nullptr) {
         const void *addr = bufferInfo->avSharedPtr->ReadFromAshmem(buffer.filledLen, buffer.offset);
-        DumpOutputToFile(fpOut_, (uint8_t *)addr);
+        DumpOutputToFile(fpOut_, reinterpret_cast<uint8_t *>(const_cast<void *>(addr)));
     }
 
     (void)fflush(fpOut_);
