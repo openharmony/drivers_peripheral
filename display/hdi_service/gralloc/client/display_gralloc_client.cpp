@@ -22,6 +22,22 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
+class GrallocDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    GrallocDeathRecipient(AllocatorDeathCallback func, void *data) : deathCbFun_(func), data_(data) {};
+    void OnRemoteDied(const wptr<IRemoteObject> &object) override 
+    {
+        HDF_LOGI("%{public}s: allocator service is dead", __func__);
+        if (deathCbFun_ != nullptr) {
+            HDF_LOGI("%{public}s: notify the death event of allocator to RS", __func__);
+            deathCbFun_(data_);
+        }
+    }
+private:
+    AllocatorDeathCallback deathCbFun_;
+    void *data_;
+};
+
 IDisplayGralloc *IDisplayGralloc::Get()
 {
     IDisplayGralloc *instance = nullptr;
@@ -39,6 +55,23 @@ DisplayGrallocClient::DisplayGrallocClient() : mapperAdapter_(std::make_shared<M
     allocatorProxy_ = IDisplayAllocator::Get("hdi_display_gralloc_service");
     if (allocatorProxy_ == nullptr) {
         return;
+    }
+}
+
+int32_t DisplayGrallocClient::RegAllocatorDeathCallback(AllocatorDeathCallback func, void *data)
+{
+    const sptr<IRemoteObject::DeathRecipient> recipient = new GrallocDeathRecipient(func, data);
+    if (allocatorProxy_ == nullptr) {
+        HDF_LOGE("%{public}s: allocatorProxy_ is null", __func__);
+        return DISPLAY_FAILURE;
+    }
+    bool ret = allocatorProxy_->AsObject()->AddDeathRecipient(recipient);
+    if (ret) {
+        HDF_LOGI("%{public}s: add alocator death notify success", __func__);
+        return DISPLAY_SUCCESS;
+    } else {
+        HDF_LOGE("%{public}s: add alocator death notify failed", __func__);
+        return DISPLAY_FAILURE;
     }
 }
 
