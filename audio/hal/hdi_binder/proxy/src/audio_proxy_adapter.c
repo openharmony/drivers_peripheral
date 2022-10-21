@@ -897,9 +897,43 @@ int32_t AudioProxyAdapterGetMicMute(struct AudioAdapter *adapter, bool *mute)
 
 int32_t AudioProxyAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume)
 {
-    (void)adapter;
-    (void)volume;
-    return HDF_ERR_NOT_SUPPORT;
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("the parameter is empty");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter->proxyRemoteHandle == NULL) {
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (AudioProxyWriteTokenAndNameForSetPassThrough(hwAdapter, data) != AUDIO_HAL_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed!", __func__);
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteFloat(data, volume)) {
+        AUDIO_FUNC_LOGE("adapterName Write Fail");
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+
+    int ret = AudioProxyDispatchCall(hwAdapter->proxyRemoteHandle, AUDIO_HDI_ADT_SET_VOICE_VOLUME, data, reply);
+    if (ret != AUDIO_HAL_SUCCESS) {
+        AUDIO_FUNC_LOGE("%{public}s:set parameter failed!", __func__);
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
 }
 
 int32_t AudioProxyAdapterUpdateAudioRoute(struct AudioAdapter *adapter,
