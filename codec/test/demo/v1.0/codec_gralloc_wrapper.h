@@ -26,7 +26,7 @@ extern "C"
 int32_t GrAllocatorInit(void);
 int32_t CreateGrShareMemory(BufferHandle **bufferHandle, AllocInfo *alloc, ShareMemory *shareMemory);
 int32_t DestroyGrShareMemory(BufferHandle *bufferHandle);
-int32_t OpenGrShareMemory(BufferHandle *bufferhandle, ShareMemory *shareMemory);
+int32_t OpenGrShareMemory(BufferHandle *bufferHandle, ShareMemory *shareMemory);
 int32_t ReleaseGrShareMemory(BufferHandle *bufferHandle, ShareMemory *shareMemory);
 
 #ifdef __cplusplus
