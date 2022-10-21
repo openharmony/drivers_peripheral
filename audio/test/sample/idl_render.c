@@ -724,7 +724,6 @@ static int32_t InitParam(void)
     g_audioPort.portName = "AOP";
 
     if (RenderGetAdapterAndInitEnvParams() < 0) {
-
         AUDIO_FUNC_LOGE("GetProxyManagerFunc Fail");
 
         if (g_audioManager != NULL) {

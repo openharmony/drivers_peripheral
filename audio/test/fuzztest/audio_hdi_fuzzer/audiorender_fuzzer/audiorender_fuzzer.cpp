@@ -64,7 +64,7 @@ void AudioRenderReqMmapBuffer(struct IAudioRender *&render, uint8_t *&data)
 void RenderFucSwitch(struct IAudioRender *&render, uint32_t cmd, const uint8_t *&rawData, size_t size)
 {
     uint8_t *data = const_cast<uint8_t *>(rawData);
-    switch(cmd) {
+    switch (cmd) {
         case AUDIO_RENDER_SET_SAMPLE_ATTR:
             render->SetSampleAttributes(render, reinterpret_cast<const struct AudioSampleAttributes *>(rawData));
             break;

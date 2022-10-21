@@ -1645,7 +1645,8 @@ static bool AudioMixExtInfoBlockUnmarshalling(struct HdfSBuf *data, struct Audio
         return false;
     }
 
-    const struct AudioMixExtInfo *dataBlockPtr = (const struct AudioMixExtInfo *)HdfSbufReadUnpadBuffer(data, sizeof(struct AudioMixExtInfo));
+    const struct AudioMixExtInfo *dataBlockPtr = (const struct AudioMixExtInfo *)HdfSbufReadUnpadBuffer(data,
+        sizeof(struct AudioMixExtInfo));
     if (dataBlockPtr == NULL) {
         HDF_LOGE("%{public}s: failed to read buffer data", __func__);
         return false;
@@ -1673,7 +1674,8 @@ static bool AudioSessionExtInfoBlockUnmarshalling(struct HdfSBuf *data, struct A
         return false;
     }
 
-    if (memcpy_s(dataBlock, sizeof(struct AudioSessionExtInfo), dataBlockPtr, sizeof(struct AudioSessionExtInfo)) != EOK) {
+    if (memcpy_s(dataBlock, sizeof(struct AudioSessionExtInfo), dataBlockPtr,
+                 sizeof(struct AudioSessionExtInfo)) != EOK) {
         HDF_LOGE("%{public}s: failed to memcpy data", __func__);
         return false;
     }
