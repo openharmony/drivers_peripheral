@@ -1945,6 +1945,40 @@ static int32_t HdiSerStubReleaseAudioRoute(const struct HdfDeviceIoClient *clien
     return audioAdapterRet;
 }
 
+static int32_t HdiServiceAdapterSetVoiceVolume(const struct HdfDeviceIoClient *client,
+                                               struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    float volume = 0;
+    struct AudioAdapter *adapter = NULL;
+    const char *adapterName = NULL;
+
+    if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is NULL");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    if ((adapterName = HdfSbufReadString(data)) == NULL) {
+        AUDIO_FUNC_LOGE("adapterName Is NULL ");
+        return HDF_FAILURE;
+    }
+
+    if ((HdfSbufReadFloat(data, &volume))) {
+        AUDIO_FUNC_LOGE("volume Is NULL ");
+        return HDF_FAILURE;
+    }
+
+    if (AudioAdapterListGetAdapter(adapterName, &adapter) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("adapter is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    return adapter->SetVoiceVolume(adapter, volume);
+}
+
 struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleList[] = {
     {AUDIO_HDI_MGR_GET_FUNCS, HdiServiceGetFuncs},
     {AUDIO_HDI_MGR_GET_ALL_ADAPTER, HdiServiceGetAllAdapter},
@@ -1956,6 +1990,7 @@ struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleList[] = {
     {AUDIO_HDI_ADT_GET_PASS_MODE, HdiServiceGetPassthroughMode},
     {AUDIO_HDI_ADT_UPDATE_ROUTE, HdiSerStubUpdateAudioRoute},
     {AUDIO_HDI_ADT_RELEASE_ROUTE, HdiSerStubReleaseAudioRoute},
+    {AUDIO_HDI_ADT_SET_VOICE_VOLUME, HdiServiceAdapterSetVoiceVolume},
     {AUDIO_HDI_PNP_DEV_STATUS, HdiServiceGetDevStatusByPnp},
     {AUDIO_HDI_RENDER_CREATE_RENDER, HdiServiceCreatRender},
     {AUDIO_HDI_RENDER_DESTROY, HdiServiceRenderDestory},
