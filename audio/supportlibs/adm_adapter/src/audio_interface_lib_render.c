@@ -1078,7 +1078,7 @@ int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
         break;
     } while (tryNum > 0);
     if (tryNum > 0) {
-        (void)AudioCallbackModeStatus(handleData, AUDIO_NONBLOCK_WRITE_COMPELETED);
+        (void)AudioCallbackModeStatus(handleData, AUDIO_NONBLOCK_WRITE_COMPLETED);
         return HDF_SUCCESS;
     } else {
         (void)AudioCallbackModeStatus(handleData, AUDIO_ERROR_OCCUR);
