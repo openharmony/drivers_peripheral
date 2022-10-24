@@ -924,10 +924,9 @@ int32_t UsbImpl::UsbdEventHandleRelease(void)
 
 int32_t UsbImpl::UsbdReleaseDevices()
 {
-    HostDevice *port;
     OsalMutexLock(&lock_);
     while (!HdfSListIsEmpty(&devList_)) {
-        port = reinterpret_cast<HostDevice *>(HdfSListPop(&devList_));
+        HostDevice *port = reinterpret_cast<HostDevice *>(HdfSListPop(&devList_));
         if (port != nullptr) {
             UsbdDispatcher::UsbdRelease(port);
             OsalMemFree(port);
