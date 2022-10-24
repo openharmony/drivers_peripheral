@@ -1197,3 +1197,24 @@ int32_t AudioAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t rout
     (void)routeHandle;
     return AUDIO_HAL_ERR_NOT_SUPPORT;
 }
+
+int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                   const char *condition, const char *value)
+{
+    (void)adapter;
+    (void)key;
+    (void)condition;
+    (void)value;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                   const char *condition, char *value, int32_t length)
+{
+    (void)adapter;
+    (void)key;
+    (void)condition;
+    (void)value;
+    (void)length;
+    return HDF_ERR_NOT_SUPPORT;
+}
