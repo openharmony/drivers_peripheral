@@ -363,7 +363,6 @@ int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
 {
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
-    HDF_LOGI("%{public}s buf is: %{public}s", __func__, buf);
     std::string currentMaxNode = "Battery";
     for (auto iter = nodeInfo_.begin(); iter != nodeInfo_.end(); ++iter) {
         if (iter->first == "current_max") {
@@ -377,7 +376,6 @@ int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
         return ret;
     }
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: maxCurrent is %{public}d", __func__, value);
     *maxCurrent = value;
 
     return HDF_SUCCESS;
@@ -400,7 +398,6 @@ int32_t PowerSupplyProvider::ParsePluggedMaxVoltage(int32_t* maxVoltage) const
         return ret;
     }
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: maxCurrent is %{public}d", __func__, value);
     *maxVoltage = value;
 
     return HDF_SUCCESS;
@@ -453,7 +450,6 @@ void PowerSupplyProvider::ParseUeventToBatterydInfo(const char* msg, struct Batt
     while (*msg) {
         for (int i = 0; batteryAssigners[i].prefix; ++i) {
             if (!strncmp(msg, batteryAssigners[i].prefix, batteryAssigners[i].prefixLen)) {
-                HDF_LOGI("%{public}s: msg: %{public}s", __func__, msg);
                 msg += batteryAssigners[i].prefixLen;
                 batteryAssigners[i].Assigner(msg, info);
                 break;
@@ -499,18 +495,15 @@ void PowerSupplyProvider::SetSysFilePath(const std::string& path)
         HDF_LOGI("%{public}s path is empty", __func__);
         path_ = "/data/local/tmp";
         return;
-    } else {
-        HDF_LOGI("%{public}s path is not empty", __func__);
     }
     path_ = path;
-    HDF_LOGI("%{public}s: path is %{public}s", __func__, path.c_str());
 }
 
 std::string PowerSupplyProvider::CreateFile(std::string path, std::string content)
 {
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        HDF_LOGI("%{public}s: Cannot create file %{public}s", __func__, path.c_str());
+        HDF_LOGE("%{public}s: Cannot create file %{public}s", __func__, path.c_str());
         return nullptr;
     }
     stream << content.c_str() << std::endl;
@@ -531,7 +524,6 @@ void PowerSupplyProvider::InitBatteryPath()
             HDF_LOGI("%{public}s: system Battery path is exist", __func__);
             return;
         }
-        HDF_LOGI("%{public}s: create mock battery path", __func__);
         InitDefaultSysfs();
     }
     return;
@@ -561,7 +553,6 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs(void)
         }
 
         if (entry->d_type == DT_DIR || entry->d_type == DT_LNK) {
-            HDF_LOGI("%{public}s: init sysfs info of %{public}s", __func__, entry->d_name);
             if (index_ >= MAX_SYSFS_SIZE) {
                 HDF_LOGE("%{public}s: too many plugged types", __func__);
                 break;
@@ -574,7 +565,7 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs(void)
     nodeInfo_.clear();
     TraversalNode();
     FormatSysfsPaths(&sysfsInfo);
-    HDF_LOGI("%{public}s: index_ is %{public}d", __func__, index_);
+    HDF_LOGD("%{public}s: index_ is %{public}d", __func__, index_);
     closedir(dir);
 
     return HDF_SUCCESS;
@@ -633,7 +624,7 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
 
     dir = opendir(batteryPath.c_str());
     if (dir == nullptr) {
-        HDF_LOGI("%{public}s: subfolder file is not exist.", __func__);
+        HDF_LOGE("%{public}s: subfolder file is not exist.", __func__);
         return;
     }
 
@@ -675,7 +666,6 @@ int32_t PowerSupplyProvider::ParseCapacity(int32_t* capacity) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: capacity is %{public}d", __func__, value);
     *capacity = value;
 
     return HDF_SUCCESS;
@@ -691,7 +681,6 @@ int32_t PowerSupplyProvider::ParseTotalEnergy(int32_t* totalEnergy) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: totalEnergy is %{public}d", __func__, value);
     *totalEnergy = value;
 
     return HDF_SUCCESS;
@@ -707,7 +696,6 @@ int32_t PowerSupplyProvider::ParseCurrentAverage(int32_t* curAverage) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: curAverage is %{public}d", __func__, value);
     *curAverage = value;
 
     return HDF_SUCCESS;
@@ -723,7 +711,6 @@ int32_t PowerSupplyProvider::ParseCurrentNow(int32_t* curNow) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: curNow is %{public}d", __func__, value);
     *curNow = value;
 
     return HDF_SUCCESS;
@@ -739,7 +726,6 @@ int32_t PowerSupplyProvider::ParseRemainEnergy(int32_t* remainEnergy) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: remainEnergy is %{public}d", __func__, value);
     *remainEnergy = value;
 
     return HDF_SUCCESS;
@@ -754,7 +740,6 @@ int32_t PowerSupplyProvider::ParseVoltage(int32_t* voltage) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: voltage is %{public}d", __func__, value);
     *voltage = value;
 
     return HDF_SUCCESS;
@@ -769,7 +754,6 @@ int32_t PowerSupplyProvider::ParseTemperature(int32_t* temperature) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: temperature is %{public}d", __func__, value);
     *temperature = value;
 
     return HDF_SUCCESS;
@@ -785,7 +769,6 @@ int32_t PowerSupplyProvider::ParseHealthState(int32_t* healthState) const
 
     Trim(buf);
     *healthState = HealthStateEnumConverter(buf);
-    HDF_LOGI("%{public}s: healthState is %{public}d", __func__, *healthState);
     return HDF_SUCCESS;
 }
 
@@ -799,7 +782,6 @@ int32_t PowerSupplyProvider::ParsePluggedType(int32_t* pluggedType) const
         return HDF_ERR_NOT_SUPPORT;
     }
 
-    HDF_LOGI("%{public}s: return online plugged type %{public}d", __func__, type);
     *pluggedType = type;
     return HDF_SUCCESS;
 }
@@ -814,7 +796,6 @@ int32_t PowerSupplyProvider::ParseChargeState(int32_t* chargeState) const
 
     Trim(buf);
     *chargeState = ChargeStateEnumConverter(buf);
-    HDF_LOGI("%{public}s: chargeState is %{public}d", __func__, *chargeState);
     return HDF_SUCCESS;
 }
 
@@ -827,7 +808,6 @@ int32_t PowerSupplyProvider::ParsePresent(int8_t* present) const
     }
 
     int8_t value = (int8_t)ParseInt(buf);
-    HDF_LOGI("%{public}s: present is %{public}d", __func__, value);
     *present = value;
     return HDF_SUCCESS;
 }
@@ -841,7 +821,6 @@ int32_t PowerSupplyProvider::ParseChargeCounter(int32_t* chargeCounter) const
     }
 
     int32_t value = ParseInt(buf);
-    HDF_LOGI("%{public}s: temperature is %{public}d", __func__, value);
     *chargeCounter = value;
 
     return HDF_SUCCESS;
@@ -850,15 +829,12 @@ int32_t PowerSupplyProvider::ParseChargeCounter(int32_t* chargeCounter) const
 int32_t PowerSupplyProvider::ParseTechnology(std::string& technology) const
 {
     char buf[MAX_BUFF_SIZE] = {0};
-    HDF_LOGI("%{public}s: technology path is %{public}s", __func__, batterySysfsInfo_.technologyPath.c_str());
-
     int32_t ret = ReadBatterySysfsToBuff(batterySysfsInfo_.technologyPath.c_str(), buf, sizeof(buf));
     if (ret != HDF_SUCCESS) {
         return ret;
     }
 
     technology.assign(buf, strlen(buf));
-    HDF_LOGI("%{public}s: technology is %{public}s", __func__, technology.c_str());
     return HDF_SUCCESS;
 }
 

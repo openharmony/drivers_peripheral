@@ -78,7 +78,6 @@ int32_t BatteryInterfaceImpl::Init()
 
 int32_t BatteryInterfaceImpl::Register(const sptr<IBatteryCallback>& event)
 {
-    HDF_LOGI("%{public}s subcriber is %{public}p", __func__, event.GetRefPtr());
     g_cbEvent = event;
 
     if (g_cbEvent != nullptr) {
@@ -98,7 +97,6 @@ int32_t BatteryInterfaceImpl::UnRegister()
 
 int32_t BatteryInterfaceImpl::ChangePath(const std::string& path)
 {
-    HDF_LOGI("%{public}s enter, path is %{public}s", __func__, path.c_str());
     giver_->SetSysFilePath(path);
     giver_->InitPowerSupplySysfs();
     return HDF_SUCCESS;
