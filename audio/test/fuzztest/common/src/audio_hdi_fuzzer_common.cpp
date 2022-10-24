@@ -58,7 +58,7 @@ int32_t GetManager(TestAudioManager *&manager)
 }
 int32_t InitAttrs(struct AudioSampleAttributes& attrs)
 {
-    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.channelCount = CHANNELCOUNT;
     attrs.sampleRate = SAMPLERATE;
     attrs.interleaved = 0;

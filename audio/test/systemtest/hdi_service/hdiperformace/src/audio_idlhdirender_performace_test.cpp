@@ -830,7 +830,7 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderSetSampleAttributesPerforma
         .render = render, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
     };
     ASSERT_NE(nullptr, audiopara.render);
-    InitAttrsUpdate(audiopara.attrs, AUDIO_FORMAT_PCM_16_BIT, 2, 8000);
+    InitAttrsUpdate(audiopara.attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, 2, 8000);
 
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
@@ -840,7 +840,7 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderSetSampleAttributesPerforma
         ret = audiopara.render->GetSampleAttributes(audiopara.render, &audiopara.attrsValue);
         EXPECT_EQ(HDF_SUCCESS, ret);
         EXPECT_EQ(AUDIO_IN_MEDIA, audiopara.attrsValue.type);
-        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, audiopara.attrsValue.format);
+        EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, audiopara.attrsValue.format);
         EXPECT_EQ(expSampleRate, audiopara.attrsValue.sampleRate);
         EXPECT_EQ(expChannelCount, audiopara.attrsValue.channelCount);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
@@ -865,7 +865,7 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetSampleAttributesPerforma
         .render = render, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
     };
     ASSERT_NE(nullptr, audiopara.render);
-    InitAttrsUpdate(audiopara.attrs, AUDIO_FORMAT_PCM_24_BIT, 2, 8000);
+    InitAttrsUpdate(audiopara.attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, 2, 8000);
 
     for (int i = 0; i < COUNT; ++i) {
         ret = audiopara.render->SetSampleAttributes(audiopara.render, &audiopara.attrs);
@@ -875,7 +875,7 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetSampleAttributesPerforma
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         EXPECT_EQ(AUDIO_IN_MEDIA, audiopara.attrsValue.type);
-        EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, audiopara.attrsValue.format);
+        EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, audiopara.attrsValue.format);
         EXPECT_EQ(expSampleRate, audiopara.attrsValue.sampleRate);
         EXPECT_EQ(expChannelCount, audiopara.attrsValue.channelCount);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -

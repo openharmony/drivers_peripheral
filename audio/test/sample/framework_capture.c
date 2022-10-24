@@ -161,7 +161,7 @@ static int32_t InitAttrsCapture(struct AudioSampleAttributes *captureAttrs)
         return HDF_FAILURE;
     }
     /* Initialization of audio parameters for playback */
-    captureAttrs->format = AUDIO_FORMAT_PCM_16_BIT;
+    captureAttrs->format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     captureAttrs->channelCount = AUDIO_CHANNELCOUNT;
     captureAttrs->sampleRate = AUDIO_SAMPLE_RATE_48K;
     captureAttrs->interleaved = 1;
@@ -901,10 +901,10 @@ static int32_t SetCaptureResume(struct AudioCapture **capture)
 static void PrintAttributesFromat(void)
 {
     printf(" ============= Capture Sample Attributes Format =============== \n");
-    printf("| 1. Capture AUDIO_FORMAT_PCM_8_BIT                            |\n");
-    printf("| 2. Capture AUDIO_FORMAT_PCM_16_BIT                           |\n");
-    printf("| 3. Capture AUDIO_FORMAT_PCM_24_BIT                           |\n");
-    printf("| 4. Capture AUDIO_FORMAT_PCM_32_BIT                           |\n");
+    printf("| 1. Capture AUDIO_FORMAT_TYPE_PCM_8_BIT                            |\n");
+    printf("| 2. Capture AUDIO_FORMAT_TYPE_PCM_16_BIT                           |\n");
+    printf("| 3. Capture AUDIO_FORMAT_TYPE_PCM_24_BIT                           |\n");
+    printf("| 4. Capture AUDIO_FORMAT_TYPE_PCM_32_BIT                           |\n");
     printf(" ============================================================== \n");
 }
 

@@ -736,16 +736,16 @@ int32_t CheckParaFormat(struct AudioPcmHwParams hwParams, snd_pcm_format_t *alsa
     /** Little Endian */
     if (!isBigEndian) {
         switch (audioFormat) {
-            case AUDIO_FORMAT_PCM_8_BIT:
+            case AUDIO_FORMAT_TYPE_PCM_8_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S8; /** Signed 8 bit */
                 break;
-            case AUDIO_FORMAT_PCM_16_BIT:
+            case AUDIO_FORMAT_TYPE_PCM_16_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S16_LE; /** Signed 16 bit Little Endian */
                 break;
-            case AUDIO_FORMAT_PCM_24_BIT:
+            case AUDIO_FORMAT_TYPE_PCM_24_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S24_LE; /** Signed 24 bit Little Endian */
                 break;
-            case AUDIO_FORMAT_PCM_32_BIT:
+            case AUDIO_FORMAT_TYPE_PCM_32_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S32_LE; /** Signed 32 bit Little Endian */
                 break;
             default:
@@ -753,16 +753,16 @@ int32_t CheckParaFormat(struct AudioPcmHwParams hwParams, snd_pcm_format_t *alsa
         }
     } else { /** Big Endian */
         switch (audioFormat) {
-            case AUDIO_FORMAT_PCM_8_BIT:
+            case AUDIO_FORMAT_TYPE_PCM_8_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S8; /** Signed 8 bit */
                 break;
-            case AUDIO_FORMAT_PCM_16_BIT:
+            case AUDIO_FORMAT_TYPE_PCM_16_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S16_BE; /** Signed 16 bit Big Endian */
                 break;
-            case AUDIO_FORMAT_PCM_24_BIT:
+            case AUDIO_FORMAT_TYPE_PCM_24_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S24_BE; /** Signed 24 bit Big Endian */
                 break;
-            case AUDIO_FORMAT_PCM_32_BIT:
+            case AUDIO_FORMAT_TYPE_PCM_32_BIT:
                 *alsaPcmFormat = SND_PCM_FORMAT_S32_BE; /** Signed 32 bit Big Endian */
                 break;
             default:

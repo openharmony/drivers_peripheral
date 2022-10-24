@@ -141,7 +141,7 @@ static int32_t InitAttrs(struct AudioSampleAttributes *renderAttrs)
         return HDF_FAILURE;
     }
     /* Initialization of audio parameters for playback */
-    renderAttrs->format = AUDIO_FORMAT_PCM_16_BIT;
+    renderAttrs->format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     renderAttrs->channelCount = AUDIO_CHANNELCOUNT;
     renderAttrs->sampleRate = AUDIO_SAMPLE_RATE_48K;
     renderAttrs->interleaved = 1;
@@ -787,10 +787,10 @@ static int32_t SetRenderResume(struct AudioRender **render)
 static void PrintRenderAttributesFromat(void)
 {
     printf(" ============= Render Sample Attributes Format =============== \n");
-    printf("| 1. Render AUDIO_FORMAT_PCM_8_BIT                            |\n");
-    printf("| 2. Render AUDIO_FORMAT_PCM_16_BIT                           |\n");
-    printf("| 3. Render AUDIO_FORMAT_PCM_24_BIT                           |\n");
-    printf("| 4. Render AUDIO_FORMAT_PCM_32_BIT                           |\n");
+    printf("| 1. Render AUDIO_FORMAT_TYPE_PCM_8_BIT                            |\n");
+    printf("| 2. Render AUDIO_FORMAT_TYPE_PCM_16_BIT                           |\n");
+    printf("| 3. Render AUDIO_FORMAT_TYPE_PCM_24_BIT                           |\n");
+    printf("| 4. Render AUDIO_FORMAT_TYPE_PCM_32_BIT                           |\n");
     printf(" ============================================================= \n");
 }
 
