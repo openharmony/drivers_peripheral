@@ -504,9 +504,7 @@ void MetadataController::SetDeviceDefaultMetadata(std::shared_ptr<CameraMetadata
 void MetadataController::Start()
 {
     peerFrame_ = true;
-    if (updateSettingFunc_ != nullptr) {
-        updateSettingFunc_ = nullptr;
-    }
+    updateSettingFunc_ = nullptr;
 
     abilityMetaData_.clear();
 

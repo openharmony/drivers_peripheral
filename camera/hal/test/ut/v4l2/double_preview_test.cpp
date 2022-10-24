@@ -104,7 +104,7 @@ void DoublePreviewTest::StartCapture(int streamId, int captureId, bool shutterCa
     captureInfo_.streamIds_ = {streamId};
     captureInfo_.captureSetting_ = display_->ability_;
     captureInfo_.enableShutterCallback_ = shutterCallback;
-    constexpr uint32_t SLEEP_SECOND_TWO = 2; // sleep two second
+    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 2; // sleep two second
     result_ = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo_, isStreaming);
     EXPECT_EQ(true, result_ == HDI::Camera::V1_0::NO_ERROR);
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
@@ -125,13 +125,13 @@ void DoublePreviewTest::StartCapture(int streamId, int captureId, bool shutterCa
     } else {
         std::cout << "==========[test log]StartCapture ignore command " << std::endl;
     }
-    sleep(SLEEP_SECOND_TWO);
+    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
 }
 
 void DoublePreviewTest::StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds)
 {
     if (sizeof(captureIds_) > 0) {
-        for (auto &captureId : captureIds_) {
+        for (const auto &captureId : captureIds_) {
             if (captureId == display_->CAPTURE_ID_PREVIEW) {
                 streamCustomerPreview_->ReceiveFrameOff();
             } else if (captureId == CAPTUREID_PREVIEW_DOUBLE) {
@@ -187,8 +187,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_001, TestSize.Level1)
     StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
     StartCapture(STREAMID_PREVIEW_DOUBLE, CAPTUREID_PREVIEW_DOUBLE, false, true);
 
-    constexpr uint32_t SLEEP_SECOND_TEN = 10; // sleep ten second
-    sleep(SLEEP_SECOND_TEN);
+    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 10; // sleep ten second 
+    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
 
     streamIds_ = {display_->STREAM_ID_PREVIEW, STREAMID_PREVIEW_DOUBLE};
     captureIds_ = {display_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE};
@@ -239,7 +239,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_002, TestSize.Level1)
     display_->rc = (CamRetCode)display_->streamOperator->Capture(display_->CAPTURE_ID_CAPTURE, captureInfo, true);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log]check Capture: Capture success, " << display_->CAPTURE_ID_CAPTURE << std::endl;
+        std::cout << "==========[test log]check Capture: Capture success, " << 
+            display_->CAPTURE_ID_CAPTURE << std::endl;
     } else {
         std::cout << "==========[test log]check Capture: Capture fail, rc = " << display_->rc
             << display_->CAPTURE_ID_CAPTURE << std::endl;
@@ -248,8 +249,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_002, TestSize.Level1)
         display_->StoreImage(addr, size);
     });
 
-    constexpr uint32_t SLEEP_SECOND_FIVE = 5; // sleep five second
-    sleep(SLEEP_SECOND_FIVE);
+    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 5; // sleep five second
+    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
 
     streamIds_ = {display_->STREAM_ID_PREVIEW, STREAMID_PREVIEW_DOUBLE};
     captureIds_ = {display_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE};
@@ -282,8 +283,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_003, TestSize.Level1)
     StartCapture(STREAMID_PREVIEW_DOUBLE, CAPTUREID_PREVIEW_DOUBLE, false, true);
     display_->StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true);
 
-    constexpr uint32_t SLEEP_SECOND_FIVE = 5; // sleep five second
-    sleep(SLEEP_SECOND_FIVE);
+    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 5; // sleep five second
+    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
 
     streamIds_ = {display_->STREAM_ID_PREVIEW, STREAMID_PREVIEW_DOUBLE};
     captureIds_ = {display_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE};
