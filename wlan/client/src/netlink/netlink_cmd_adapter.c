@@ -639,11 +639,6 @@ static int32_t ParserSupportComboInfo(struct nl_msg *msg, void *arg)
     return NL_SKIP;
 }
 
-struct PrivDevMac {
-    uint8_t *mac;
-    uint8_t len;
-};
-
 static struct nlattr *GetWiphyBands(struct genlmsghdr *hdr)
 {
     struct nlattr *attrMsg[NL80211_ATTR_MAX + 1];
