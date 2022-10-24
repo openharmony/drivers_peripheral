@@ -625,7 +625,6 @@ void CodecHdiDecode::Run()
     // wait
     while (!this->exit_) {
         usleep(10000);  // 10000: sleep time 10ms
-        continue;
     }
     auto t2 = std::chrono::system_clock::now();
     std::chrono::duration<double> diff = t2 - t1;

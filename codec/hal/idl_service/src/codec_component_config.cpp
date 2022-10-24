@@ -300,10 +300,6 @@ int32_t CodecComponentConfig::GetMaskedConfig(const struct DeviceResourceIface &
 
     if (count > 0) {
         std::unique_ptr<uint32_t[]> values = std::make_unique<uint32_t[]>(count);
-        if (values == NULL) {
-            CODEC_LOGE("failed to allocate mem for %{public}s!", attrName.c_str());
-            return HDF_FAILURE;
-        }
         iface.GetUint32Array(&node, attrName.c_str(), values.get(), count, 0);
         for (int32_t index = 0; index < count; index++) {
             mask |= values[index];
