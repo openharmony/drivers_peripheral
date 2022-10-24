@@ -110,19 +110,19 @@ int32_t CheckWavFileHeader(FILE *file, struct AudioHeadInfo *wavHeadInfo, struct
     attrs->sampleRate = wavHeadInfo->audioSampleRate;
     switch (wavHeadInfo->audioBitsPerSample) {
         case PCM_8_BIT: {
-            attrs->format = AUDIO_FORMAT_PCM_8_BIT;
+            attrs->format = AUDIO_FORMAT_TYPE_PCM_8_BIT;
             break;
         }
         case PCM_16_BIT: {
-            attrs->format = AUDIO_FORMAT_PCM_16_BIT;
+            attrs->format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
             break;
         }
         case PCM_24_BIT: {
-            attrs->format = AUDIO_FORMAT_PCM_24_BIT;
+            attrs->format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
             break;
         }
         case PCM_32_BIT: {
-            attrs->format = AUDIO_FORMAT_PCM_32_BIT;
+            attrs->format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
             break;
         }
         default:
@@ -194,20 +194,20 @@ int32_t CheckPcmFormat(int32_t val, uint32_t *audioPcmFormat)
         return HDF_FAILURE;
     }
     switch (val) {
-        case AUDIO_FORMAT_PCM_8_BIT:
-            *audioPcmFormat = AUDIO_FORMAT_PCM_8_BIT;
+        case AUDIO_FORMAT_TYPE_PCM_8_BIT:
+            *audioPcmFormat = AUDIO_FORMAT_TYPE_PCM_8_BIT;
             break;
-        case AUDIO_FORMAT_PCM_16_BIT:
-            *audioPcmFormat = AUDIO_FORMAT_PCM_16_BIT;
+        case AUDIO_FORMAT_TYPE_PCM_16_BIT:
+            *audioPcmFormat = AUDIO_FORMAT_TYPE_PCM_16_BIT;
             break;
-        case AUDIO_FORMAT_PCM_24_BIT:
-            *audioPcmFormat = AUDIO_FORMAT_PCM_24_BIT;
+        case AUDIO_FORMAT_TYPE_PCM_24_BIT:
+            *audioPcmFormat = AUDIO_FORMAT_TYPE_PCM_24_BIT;
             break;
-        case AUDIO_FORMAT_PCM_32_BIT:
-            *audioPcmFormat = AUDIO_FORMAT_PCM_32_BIT;
+        case AUDIO_FORMAT_TYPE_PCM_32_BIT:
+            *audioPcmFormat = AUDIO_FORMAT_TYPE_PCM_32_BIT;
             break;
         default:
-            *audioPcmFormat = AUDIO_FORMAT_PCM_16_BIT;
+            *audioPcmFormat = AUDIO_FORMAT_TYPE_PCM_16_BIT;
             break;
     }
 
@@ -217,9 +217,9 @@ int32_t CheckPcmFormat(int32_t val, uint32_t *audioPcmFormat)
 uint32_t PcmFormatToBits(enum AudioFormat formatBit)
 {
     switch (formatBit) {
-        case AUDIO_FORMAT_PCM_16_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_16_BIT:
             return PCM_16_BIT;
-        case AUDIO_FORMAT_PCM_8_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_8_BIT:
             return PCM_8_BIT;
         default:
             return PCM_16_BIT;

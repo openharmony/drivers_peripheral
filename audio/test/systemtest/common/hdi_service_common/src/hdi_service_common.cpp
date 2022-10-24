@@ -30,7 +30,7 @@ namespace OHOS {
 namespace Audio {
 int32_t InitAttrs(struct AudioSampleAttributes &attrs)
 {
-    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.channelCount = CHANNELCOUNT;
     attrs.sampleRate = SAMPLERATE;
     attrs.interleaved = 0;
@@ -141,13 +141,13 @@ int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs, const std::string &a
 uint32_t PcmFormatToBits(int format)
 {
     switch (format) {
-        case AUDIO_FORMAT_PCM_8_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_8_BIT:
             return PCM_8_BIT;
-        case AUDIO_FORMAT_PCM_16_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_16_BIT:
             return PCM_16_BIT;
-        case AUDIO_FORMAT_PCM_24_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_24_BIT:
             return PCM_24_BIT;
-        case AUDIO_FORMAT_PCM_32_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_32_BIT:
             return PCM_32_BIT;
         default:
             return PCM_16_BIT;
@@ -193,19 +193,19 @@ int32_t WavHeadAnalysis(struct AudioHeadInfo &wavHeadInfo, FILE *file, struct Au
     attrs.sampleRate = wavHeadInfo.audioSampleRate;
     switch (wavHeadInfo.audioBitsPerSample) {
         case PCM_8_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_8_BIT;
+            attrs.format = AUDIO_FORMAT_TYPE_PCM_8_BIT;
             break;
         }
         case PCM_16_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+            attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
             break;
         }
         case PCM_24_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+            attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
             break;
         }
         case PCM_32_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_32_BIT;
+            attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
             break;
         }
         default:

@@ -141,16 +141,16 @@ int32_t AttrFormatToBit(const struct AudioSampleAttributes *attrs, int32_t *form
 
     enum AudioFormat audioFormat = attrs->format;
     switch (audioFormat) {
-        case AUDIO_FORMAT_PCM_8_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_8_BIT:
             *format = BIT_NUM_8;
             break;
-        case AUDIO_FORMAT_PCM_16_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_16_BIT:
             *format = BIT_NUM_16;
             break;
-        case AUDIO_FORMAT_PCM_24_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_24_BIT:
             *format = BIT_NUM_24;
             break;
-        case AUDIO_FORMAT_PCM_32_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_32_BIT:
             *format = BIT_NUM_32;
             break;
         default:

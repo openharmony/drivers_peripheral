@@ -42,7 +42,7 @@ namespace Audio {
 int32_t InitRenderFramepara(struct AudioFrameRenderMode& frameRenderMode)
 {
     InitAttrs(frameRenderMode.attrs);
-    frameRenderMode.frames = AUDIO_FORMAT_PCM_16_BIT;
+    frameRenderMode.frames = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     frameRenderMode.mode = AUDIO_CHANNEL_BOTH_RIGHT;
     frameRenderMode.periodSize = G_PERIODSIZE;
     frameRenderMode.periodCount = G_PERIODCOUNT;

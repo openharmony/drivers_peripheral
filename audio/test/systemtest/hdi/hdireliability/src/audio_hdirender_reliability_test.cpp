@@ -545,7 +545,7 @@ HWTEST_F(AudioHdiRenderReliabilityTest, AudioRenderSetSampleAttributesReliabilit
         ret = arrpara[i].render->attr.GetSampleAttributes(arrpara[i].render, &(arrpara[i].attrsValue));
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(AUDIO_IN_MEDIA, arrpara[i].attrsValue.type);
-        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, arrpara[i].attrsValue.format);
+        EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, arrpara[i].attrsValue.format);
         EXPECT_EQ(rateExpc, arrpara[i].attrsValue.sampleRate);
         EXPECT_EQ(count, arrpara[i].attrsValue.channelCount);
     }
@@ -581,7 +581,7 @@ HWTEST_F(AudioHdiRenderReliabilityTest, AudioRenderGetSampleAttributesReliabilit
         pthread_join(tids[i], &result);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, (intptr_t)result);
         EXPECT_EQ(AUDIO_IN_MEDIA, arrpara[i].attrsValue.type);
-        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, arrpara[i].attrsValue.format);
+        EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, arrpara[i].attrsValue.format);
         EXPECT_EQ(rateExpc, arrpara[i].attrsValue.sampleRate);
         EXPECT_EQ(count, arrpara[i].attrsValue.channelCount);
     }

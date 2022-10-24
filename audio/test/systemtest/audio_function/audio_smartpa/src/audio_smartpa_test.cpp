@@ -315,7 +315,7 @@ HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_006, TestSize.Level1)
     sleep(1);
     if (audiopara.render != nullptr) {
         audiopara.attrs.type = AUDIO_IN_MEDIA;
-        audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+        audiopara.attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
         audiopara.attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
         audiopara.attrs.sampleRate = 48000;
         audiopara.attrs.channelCount = 1;
@@ -327,7 +327,7 @@ HWTEST_F(AudioSmartPaTest, AudioFunctionSmartpaTest_006, TestSize.Level1)
         EXPECT_EQ(HDF_SUCCESS, ret);
 
         EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+        EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
         EXPECT_EQ(samplerateValue, attrsValue.sampleRate);
         EXPECT_EQ(channelcountValue, attrsValue.channelCount);
         EXPECT_EQ(INT_32_MAX, attrsValue.stopThreshold);
