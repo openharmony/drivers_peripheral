@@ -56,9 +56,8 @@ int32_t BatteryConfig::ParseLedConf(Json::Value& root)
 {
     struct LedConf ledConf;
     int size = root["led"]["table"].size();
-    HDF_LOGI("%{public}s: size = %{public}d", __func__, size);
     if (size == 0) {
-        HDF_LOGI("%{public}s: read json file fail.", __func__);
+        HDF_LOGW("%{public}s: read json file fail.", __func__);
         ledConf.capacityBegin = DEFAULT_CAPACITY_BEGIN_CONF;
         ledConf.capacityEnd = DEFAULT_CAPACITY_END_CONF;
         ledConf.color = DEFAULT_LED_COLOR_CONF;
@@ -73,9 +72,6 @@ int32_t BatteryConfig::ParseLedConf(Json::Value& root)
         ledConf.capacityEnd = root["led"]["table"][i][INDEX_ONE].asInt();
         ledConf.color = root["led"]["table"][i][INDEX_TWO].asInt();
         ledConf.brightness = root["led"]["table"][i][INDEX_THREE].asInt();
-        HDF_LOGI("%{public}s: capacityBegin= %{public}d, capacityEnd=%{public}d, color=%{public}d, \
-            brightness=%{public}d", __func__, ledConf.capacityBegin, ledConf.capacityEnd, ledConf.color, \
-            ledConf.brightness);
         ledConf_.emplace_back(ledConf);
     }
     return HDF_SUCCESS;
@@ -85,7 +81,7 @@ int32_t BatteryConfig::ParseTempConf(Json::Value& root)
 {
     int size = root["temperature"]["table"].size();
     if (size == 0) {
-        HDF_LOGI("%{public}s parse temperature config file fail.", __func__);
+        HDF_LOGW("%{public}s parse temperature config file fail.", __func__);
         tempConf_.lower = DEFAULT_LOWER_TEMP_CONF;
         tempConf_.upper = DEFAULT_UPPER_TEMP_CONF;
         return HDF_ERR_INVALID_OBJECT;
@@ -93,9 +89,6 @@ int32_t BatteryConfig::ParseTempConf(Json::Value& root)
 
     tempConf_.lower = root["temperature"]["table"][INDEX_ZERO].asInt();
     tempConf_.upper = root["temperature"]["table"][INDEX_ONE].asInt();
-    HDF_LOGI("%{public}s: tempConf_.lower=%{public}d, tempConf_.upper=%{public}d", __func__, \
-        tempConf_.lower, tempConf_.upper);
-
     return HDF_SUCCESS;
 }
 
@@ -103,13 +96,12 @@ int32_t BatteryConfig::ParseCapacityConf(Json::Value& root)
 {
     int size = root["soc"]["table"].size();
     if (size == 0) {
-        HDF_LOGI("%{public}s parse capacity config file fail.", __func__);
+        HDF_LOGW("%{public}s parse capacity config file fail.", __func__);
         capacityConf_ = DEFAULT_CAPACITY_CONF;
         return HDF_ERR_INVALID_OBJECT;
     }
 
     capacityConf_ = root["soc"]["table"][INDEX_ZERO].asInt();
-    HDF_LOGI("%{public}s: capacityConf_ = %{public}d", __func__, capacityConf_);
     return HDF_SUCCESS;
 }
 

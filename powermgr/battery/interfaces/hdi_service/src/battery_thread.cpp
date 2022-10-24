@@ -46,7 +46,6 @@ static sptr<IBatteryCallback> g_callback;
 void BatteryThread::InitCallback(const sptr<IBatteryCallback>& event)
 {
     g_callback = event;
-    HDF_LOGI("%{public}s: g_callback is %{public}p", __func__, event.GetRefPtr());
 }
 
 int32_t BatteryThread::OpenUeventSocket(void) const
@@ -258,14 +257,6 @@ void BatteryThread::UpdateBatteryInfo(void* service, char* msg)
     event.present = batteryInfo->present_;
     event.technology = batteryInfo->technology_;
 
-    HDF_LOGI("%{public}s: BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
-        "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
-        "pluggedMaxVoltage=%{public}d, chargeState=%{public}d, chargeCounter=%{public}d, present=%{public}d, " \
-        "technology=%{public}s", __func__, batteryInfo->capacity_, batteryInfo->voltage_,
-        batteryInfo->temperature_, batteryInfo->healthState_, batteryInfo->pluggedType_,
-        batteryInfo->pluggedMaxCurrent_, batteryInfo->pluggedMaxVoltage_, batteryInfo->chargeState_,
-        batteryInfo->chargeCounter_, batteryInfo->present_, batteryInfo->technology_.c_str());
-
     if (g_callback != nullptr) {
         HDF_LOGI("%{public}s g_callback is not nullptr", __func__);
         g_callback->Update(event);
@@ -297,19 +288,10 @@ void BatteryThread::UpdateBatteryInfo(void* service)
     event.present = batteryInfo->present_;
     event.technology = batteryInfo->technology_;
 
-    HDF_LOGI("%{public}s: BatteryInfo capacity=%{public}d, voltage=%{public}d, temperature=%{public}d, " \
-        "healthState=%{public}d, pluggedType=%{public}d, pluggedMaxCurrent=%{public}d, " \
-        "pluggedMaxVoltage=%{public}d, chargeState=%{public}d, chargeCounter=%{public}d, present=%{public}d, " \
-        "technology=%{public}s", __func__, batteryInfo->capacity_, batteryInfo->voltage_,
-        batteryInfo->temperature_, batteryInfo->healthState_, batteryInfo->pluggedType_,
-        batteryInfo->pluggedMaxCurrent_, batteryInfo->pluggedMaxVoltage_, batteryInfo->chargeState_,
-        batteryInfo->chargeCounter_, batteryInfo->present_, batteryInfo->technology_.c_str());
-
     if (g_callback != nullptr) {
-        HDF_LOGI("%{public}s g_callback is not nullptr", __func__);
         g_callback->Update(event);
     } else {
-        HDF_LOGI("%{public}s g_callback is nullptr", __func__);
+        HDF_LOGW("%{public}s g_callback is nullptr", __func__);
     }
 
     return;
@@ -346,7 +328,6 @@ int BatteryThread::LoopingThreadEntry(void* arg)
         if ((timeout < 0) || (waitTimeout > 0 && waitTimeout < timeout)) {
             timeout = waitTimeout;
         }
-        HDF_LOGI("%{public}s: timeout=%{public}d, nevents=%{public}d", __func__, timeout, nevents);
 
         nevents = epoll_wait(epFd_, events, cbct, timeout);
         if (nevents == -1) {
