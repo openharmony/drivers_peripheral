@@ -98,8 +98,8 @@ common_metadata_header_t *AllocateCameraMetadataBuffer(uint32_t item_capacity, u
         return (common_metadata_header_t *) buffer;
     }
 
-    common_metadata_header_t *metadataHeader = FillCameraMetadata(const_cast<common_metadata_header_t *>(buffer), memoryRequired,
-                                                                  item_capacity, data_capacity);
+    common_metadata_header_t *metadataHeader = FillCameraMetadata(
+        const_cast<common_metadata_header_t *>(buffer), memoryRequired,item_capacity, data_capacity);
     if (metadataHeader == nullptr) {
         METADATA_ERR_LOG("AllocateCameraMetadataBuffer metadataHeader is null");
         free(buffer);
