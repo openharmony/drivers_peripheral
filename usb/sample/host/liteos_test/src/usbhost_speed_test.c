@@ -185,6 +185,7 @@ static enum speedServer checkServer(const char *input)
     if (strcmp(middle, "-NOSDK") == 0) {
         return NOSDK_SERVER;
     }
+    return SDKAPI_SERVER;
 }
 
 static int32_t GetWriteOrReadFlag(const char *buffer)
