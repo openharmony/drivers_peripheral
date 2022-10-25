@@ -31,7 +31,7 @@ extern "C" {
 
 static bool g_wifiIsStarted = false;
 
-static int32_t StartInner(struct IWiFi *iwifi)
+static int32_t StartInner(const struct IWiFi *iwifi)
 {
     int32_t ret;
 
@@ -59,7 +59,7 @@ static int32_t StartInner(struct IWiFi *iwifi)
     return ret;
 }
 
-static int32_t StopInner(struct IWiFi *iwifi)
+static int32_t StopInner(const struct IWiFi *iwifi)
 {
     if (iwifi == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
