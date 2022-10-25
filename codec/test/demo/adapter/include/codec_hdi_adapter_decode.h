@@ -60,7 +60,6 @@ class CodecHdiAdapterDecode {
             portIndex = PortIndex::PORT_INDEX_INPUT;
         }
     };
-    using BufferInfo = struct BufferInfo;
 
 public:
     CodecHdiAdapterDecode();
