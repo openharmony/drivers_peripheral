@@ -19,7 +19,7 @@
 StreamCustomer::StreamCustomer() {}
 StreamCustomer::~StreamCustomer() {}
 
-void StreamCustomer::CamFrame(const std::function<void(void*, uint32_t)> callback)
+void StreamCustomer::CamFrame(const std::function<void(const unsigned char *, uint32_t)> callback)
 {
     CAMERA_LOGD("test:enter CamFrame thread ++ \n");
     OHOS::Rect damage;
@@ -34,8 +34,7 @@ void StreamCustomer::CamFrame(const std::function<void(void*, uint32_t)> callbac
             void* addr = buff->GetVirAddr();
             int32_t size = buff->GetSize();
             if (callback != nullptr) {
-                int32_t frameNum = 0;
-                callback(addr, size);
+                callback(static_cast<const unsigned char*>(addr), size);
             }
             consumer_->ReleaseBuffer(buff, -1);
         }
@@ -63,7 +62,7 @@ OHOS::sptr<OHOS::IBufferProducer> StreamCustomer::CreateProducer()
     return producer;
 }
 
-OHOS::Camera::RetCode StreamCustomer::ReceiveFrameOn(const std::function<void(void*, uint32_t)> callback)
+OHOS::Camera::RetCode StreamCustomer::ReceiveFrameOn(const std::function<void(const unsigned char *, uint32_t)> callback)
 {
     CAMERA_LOGD("test:ReceiveFrameOn enter");
 

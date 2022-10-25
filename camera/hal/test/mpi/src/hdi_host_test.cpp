@@ -88,9 +88,9 @@ HWTEST_F(HdiHostTest, Camera_Hdi_0020, TestSize.Level0)
   */
 HWTEST_F(HdiHostTest, Camera_Hdi_0021, TestSize.Level2)
 {
-    std::string cameraId = "abc";
     std::cout << "==========[test log]Check hdi_host: GetCameraAbility, abnormal cameraId = 'abc'." << std::endl;
     if (Test_->cameraDevice == nullptr) {
+        std::string cameraId = "abc";
         Test_->rc = Test_->service->GetCameraAbility(cameraId, Test_->ability);
         std::cout << "==========[test log]Check hdi_host: Test_->rc ="<< Test_->rc << std::endl;
         EXPECT_EQ(true, Test_->rc == Camera::CamRetCode::INVALID_ARGUMENT);
@@ -105,9 +105,9 @@ HWTEST_F(HdiHostTest, Camera_Hdi_0021, TestSize.Level2)
   */
 HWTEST_F(HdiHostTest, Camera_Hdi_0022, TestSize.Level2)
 {
-    std::string cameraId = "";
     std::cout << "==========[test log]Check hdi_host: GetCameraAbility, abnormal cameraId = ''." << std::endl;
     if (Test_->cameraDevice == nullptr) {
+        std::string cameraId = "";
         Test_->rc = Test_->service->GetCameraAbility(cameraId, Test_->ability);
         std::cout << "==========[test log]Check hdi_host: Test_->rc ="<< Test_->rc << std::endl;
         EXPECT_EQ(true, Test_->rc == Camera::CamRetCode::INVALID_ARGUMENT);
@@ -145,8 +145,8 @@ HWTEST_F(HdiHostTest, Camera_Hdi_0030, TestSize.Level0)
 HWTEST_F(HdiHostTest, Camera_Hdi_0031, TestSize.Level2)
 {
     std::cout << "==========[test log]Check hdi_host: OpenCamera, cameraID is not found."<< std::endl;
-    std::string cameraId = "qwerty";
     if (Test_->cameraDevice == nullptr) {
+        std::string cameraId = "qwerty";
         Test_->CreateDeviceCallback();
         Test_->rc = Test_->service->OpenCamera(cameraId, Test_->deviceCallback, Test_->cameraDevice);
         EXPECT_EQ(true, Test_->rc == Camera::INVALID_ARGUMENT);
@@ -162,8 +162,8 @@ HWTEST_F(HdiHostTest, Camera_Hdi_0031, TestSize.Level2)
 HWTEST_F(HdiHostTest, Camera_Hdi_0032, TestSize.Level2)
 {
     std::cout << "==========[test log]Check hdi_host: OpenCamera, cameraID is illegal."<< std::endl;
-    std::string cameraId = "1";
     if (Test_->cameraDevice == nullptr) {
+        std::string cameraId = "1";
         Test_->CreateDeviceCallback();
         Test_->rc = Test_->service->OpenCamera(cameraId, Test_->deviceCallback, Test_->cameraDevice);
         EXPECT_EQ(true, Test_->rc == Camera::INVALID_ARGUMENT);
@@ -179,8 +179,8 @@ HWTEST_F(HdiHostTest, Camera_Hdi_0032, TestSize.Level2)
 HWTEST_F(HdiHostTest, Camera_Hdi_0033, TestSize.Level2)
 {
     std::cout << "==========[test log]Check hdi_host: OpenCamera, cameraID is Empty."<< std::endl;
-    std::string cameraId = "";
     if (Test_->cameraDevice == nullptr) {
+        std::string cameraId = "";
         Test_->CreateDeviceCallback();
         Test_->rc = Test_->service->OpenCamera(cameraId, Test_->deviceCallback, Test_->cameraDevice);
         EXPECT_EQ(true, Test_->rc == Camera::INVALID_ARGUMENT);
@@ -213,8 +213,8 @@ HWTEST_F(HdiHostTest, Camera_Hdi_0034, TestSize.Level2)
 HWTEST_F(HdiHostTest, Camera_Hdi_0035, TestSize.Level2)
 {
     std::cout << "==========[test log]Check hdi_host: OpenCamera, cameraID is not found, callback is null."<< std::endl;
-    std::string cameraId = "abc";
     if (Test_->cameraDevice == nullptr) {
+        std::string cameraId = "abc";
         Test_->CreateDeviceCallback();
         Test_->rc = Test_->service->OpenCamera(cameraId, Test_->deviceCallback, Test_->cameraDevice);
         EXPECT_EQ(true, Test_->rc == Camera::INVALID_ARGUMENT);
