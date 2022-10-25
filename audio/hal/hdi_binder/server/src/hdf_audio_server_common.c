@@ -2050,7 +2050,7 @@ static int32_t HdiServiceAdapterGetExtraParams(const struct HdfDeviceIoClient *c
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
-    int ret = adapter->GetExtraParams(adapter, key, condition, value, length);
+    int32_t ret = adapter->GetExtraParams(adapter, key, condition, value, length);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("GetExtraParams FAIL");
         return ret;
