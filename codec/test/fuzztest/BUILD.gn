@@ -20,7 +20,6 @@ group("hdf_fuzztest_media_codec") {
     "//drivers/peripheral/codec/test/fuzztest/codeccomponenttunnelrequest_fuzzer:fuzztest",
     "//drivers/peripheral/codec/test/fuzztest/codeccreatecomponent_fuzzer:fuzztest",
     "//drivers/peripheral/codec/test/fuzztest/codecfreebuffer_fuzzer:fuzztest",
-    "//drivers/peripheral/codec/test/fuzztest/codecgetcomponentcapabilitylist_fuzzer:fuzztest",
     "//drivers/peripheral/codec/test/fuzztest/codecgetconfig_fuzzer:fuzztest",
     "//drivers/peripheral/codec/test/fuzztest/codecgetextensionIndex_fuzzer:fuzztest",
     "//drivers/peripheral/codec/test/fuzztest/codecgetparameter_fuzzer:fuzztest",
