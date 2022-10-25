@@ -159,6 +159,7 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     sptr<ICameraHost> sampleObj = ICameraHost::Get(TEST_SERVICE_NAME);
     if (sampleObj == nullptr) {
         std::cout << "ICameraHost get failed." << std::endl;
+        return;
     }
     ASSERT_NE(nullptr, sampleObj);
 
@@ -172,43 +173,42 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     std::shared_ptr<CameraAbility> ability;
     std::string cameraId = cameraIds.front();
 
-    ret = sampleObj->GetCameraAbility(cameraId, ability);
-
+    ret |= sampleObj->GetCameraAbility(cameraId, ability);
     common_metadata_header_t *meta = ability->get();
     size_t tagCount = get_camera_metadata_data_count(meta);
     std::cout << "CameraRemoteTest tagcount = " << tagCount << std::endl;
 
     OHOS::sptr<CameraDeviceCallback> deviceCallback = new CameraDeviceCallback();
     OHOS::sptr<ICameraDevice> cameraDevice = nullptr;
-    ret = sampleObj->OpenCamera(cameraId, deviceCallback, cameraDevice);
+    ret |= sampleObj->OpenCamera(cameraId, deviceCallback, cameraDevice);
     if (cameraDevice == nullptr) {
         return;
     }
     std::cout << "sampleObj->OpenCamera ret = " << ret << std::endl;
 
-    ret = cameraDevice->UpdateSettings(ability);
+    ret |= cameraDevice->UpdateSettings(ability);
     std::cout << "UpdateSettings camRetCode = " << ret << std::endl;
 
     OHOS::Camera::ResultCallbackMode resultCallbackMode = OHOS::Camera::ON_CHANGED;
-    ret = cameraDevice->SetResultMode(resultCallbackMode);
+    ret |= cameraDevice->SetResultMode(resultCallbackMode);
     std::cout << "cameraDevice->SetResultMode = " << ret << std::endl;
 
     std::vector<OHOS::Camera::MetaType> results;
     results.push_back(OHOS_SENSOR_EXPOSURE_TIME);
     results.push_back(OHOS_SENSOR_COLOR_CORRECTION_GAINS);
-    ret = cameraDevice->EnableResult(results);
+    ret |= cameraDevice->EnableResult(results);
     std::cout << "cameraDevice->EnableResult = " << ret << std::endl;
 
     std::vector<Camera::MetaType> disable_tag;
-    ret = cameraDevice->GetEnabledResults(disable_tag);
+    ret |= cameraDevice->GetEnabledResults(disable_tag);
     std::cout << "cameraDevice->GetEnabledResults = " << ret << std::endl;
 
-    ret = cameraDevice->DisableResult(disable_tag);
+    ret |= cameraDevice->DisableResult(disable_tag);
     std::cout << "cameraDevice->DisableResult = " << ret << std::endl;
 
     OHOS::sptr<StreamOperatorCallback> streamOperatorCallback = new StreamOperatorCallback();
     OHOS::sptr<IStreamOperator> streamOperator = nullptr;
-    ret = cameraDevice->GetStreamOperator(streamOperatorCallback, streamOperator);
+    ret |= cameraDevice->GetStreamOperator(streamOperatorCallback, streamOperator);
     std::cout << "GetStreamOperator camRetCode = " << ret << std::endl;
 
     OHOS::Camera::OperationMode operationMode = NORMAL;
@@ -227,7 +227,7 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
                 CAMERA_LOGI("received a preview buffer ..."); });
     streamInfo->tunneledMode_ = 5;
     streamInfos.push_back(streamInfo);
-    ret = streamOperator->IsStreamsSupported(NORMAL, ability, streamInfo, supportType);
+    ret |= streamOperator->IsStreamsSupported(NORMAL, ability, streamInfo, supportType);
     std::cout << "streamOperator->IsStreamsSupported = " << ret << std::endl;
 
     std::shared_ptr<Camera::StreamInfo> streamInfoSnapshot = std::make_shared<Camera::StreamInfo>();
@@ -244,10 +244,10 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     streamInfoSnapshot->tunneledMode_ = 5;
     streamInfos.push_back(streamInfoSnapshot);
 
-    ret = streamOperator->CreateStreams(streamInfos);
+    ret |= streamOperator->CreateStreams(streamInfos);
     std::cout << "streamOperator->CreateStreams = " << ret << std::endl;
 
-    ret = streamOperator->CommitStreams(OHOS::Camera::NORMAL, ability);
+    ret |= streamOperator->CommitStreams(OHOS::Camera::NORMAL, ability);
     std::cout << "streamOperator->CommitStreams = " << ret << std::endl;
 
     int captureId = 2001;
@@ -255,17 +255,17 @@ HWTEST_F(CameraRemoteTest, HostSetCallback, TestSize.Level0)
     captureInfo->streamIds_ = {streamInfo->streamId_, streamInfoSnapshot->streamId_};
     captureInfo->captureSetting_ = ability;
     captureInfo->enableShutterCallback_ = false;
-    ret = streamOperator->Capture(captureId, captureInfo, true);
+    ret |= streamOperator->Capture(captureId, captureInfo, true);
     std::cout << "streamOperator->Capture = " << ret << std::endl;
     sleep(10);
 
     std::vector<std::shared_ptr<StreamAttribute>> attributes;
-    ret = streamOperator->GetStreamAttributes(attributes);
+    ret |= streamOperator->GetStreamAttributes(attributes);
     std::cout << "streamOperator->GetStreamAttributes = " << ret << std::endl;
 
     OHOS::sptr<IOfflineStreamOperator> offlineOperator = nullptr;
     OHOS::sptr<IStreamOperatorCallback> offlineOperatorCallback = streamOperatorCallback;
-    ret = streamOperator->ChangeToOfflineStream({streamInfoSnapshot->streamId_},
+    ret |= streamOperator->ChangeToOfflineStream({streamInfoSnapshot->streamId_},
             offlineOperatorCallback, offlineOperator);
     std::cout << "4streamOperator->ChangeToOfflineStream ret = " << ret << std::endl;
     ASSERT_EQ(Camera::NO_ERROR, ret);

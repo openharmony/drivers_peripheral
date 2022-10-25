@@ -336,8 +336,7 @@ void ExifUtils::ConvertAltitudeToRational(double altitude, exif_rational &outPut
     CAMERA_LOGI("%{public}s count = %{public}d", __FUNCTION__, count);
     constexpr uint32_t digitPosition = 10;
     for (int i = 0; i < count; i++) {
-        char character;
-        character = strData[i];
+        char character = strData[i];
         if (character == '.') {
             isSeparator = true;
         } else {
