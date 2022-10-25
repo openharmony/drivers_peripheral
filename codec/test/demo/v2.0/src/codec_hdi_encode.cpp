@@ -498,7 +498,6 @@ void CodecHdiEncode::Run()
     }
     while (!this->exit_) {
         usleep(10000);  // 10000: sleep time 10ms
-        continue;
     }
     (void)client_->SendCommand(client_, OMX_CommandStateSet, OMX_StateIdle, NULL, 0);
     return;
@@ -521,7 +520,8 @@ bool CodecHdiEncode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, boo
         BufferHandle *bufferHandle = bufferHandles_[bufferHandleId];
         if (bufferHandle != nullptr) {
             gralloc_->Mmap(*bufferHandle);
-            endFlag = this->ReadOneFrame(fpIn_, (char *)bufferHandle->virAddr, bufferInfo->omxBuffer->filledLen);
+            endFlag = this->ReadOneFrame(fpIn_, reinterpret_cast<char *>(bufferHandle->virAddr),
+                bufferInfo->omxBuffer->filledLen);
             bufferInfo->omxBuffer->filledLen = bufferHandle->stride * bufferHandle->height;
             gralloc_->Unmap(*bufferHandle);
             bufferInfo->omxBuffer->buffer = reinterpret_cast<uint8_t *>(bufferHandle);
@@ -530,8 +530,8 @@ bool CodecHdiEncode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, boo
         }
     } else {
         // read data from ashmem
-        void *sharedAddr = (void *)bufferInfo->avSharedPtr->ReadFromAshmem(0, 0);
-        endFlag = this->ReadOneFrame(fpIn_, (char *)sharedAddr, bufferInfo->omxBuffer->filledLen);
+        void *sharedAddr = const_cast<void *>(bufferInfo->avSharedPtr->ReadFromAshmem(0, 0));
+        endFlag = this->ReadOneFrame(fpIn_, reinterpret_cast<char *>(sharedAddr), bufferInfo->omxBuffer->filledLen);
     }
     bufferInfo->omxBuffer->offset = 0;
     if (endFlag) {

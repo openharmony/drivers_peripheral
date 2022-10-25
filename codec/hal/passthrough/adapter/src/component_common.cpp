@@ -569,7 +569,7 @@ static void SplitParamVideoPortFormat(int8_t *paramIn, Param *paramOut, int32_t 
     paramOut[index].val = setMark ? (void *)&(param->xFramerate) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->xFramerate) : 0;
     index++;
-    param->eColorFormat = (OMX_COLOR_FORMATTYPE)ConvertColorFormatToPixelFormat(param->eColorFormat);
+    param->eColorFormat = static_cast<OMX_COLOR_FORMATTYPE>(ConvertColorFormatToPixelFormat(param->eColorFormat));
     if ((CodecPixelFormat)param->eColorFormat != PIXEL_FORMAT_NONE || !setMark) {
         paramOut[index].key = KEY_PIXEL_FORMAT;
         paramOut[index].val = setMark ? (void *)&(param->eColorFormat) : nullptr;
@@ -585,7 +585,7 @@ static void SplitParamVideoAvc(int8_t *paramIn, Param *paramOut, int32_t &paramC
     OMX_VIDEO_PARAM_AVCTYPE *param = reinterpret_cast<OMX_VIDEO_PARAM_AVCTYPE *>(paramIn);
     int32_t index = 0;
     paramOut[index].key = KEY_VIDEO_PROFILE;
-    param->eProfile = (OMX_VIDEO_AVCPROFILETYPE)ConvertAvcProfileToProfile(param->eProfile);
+    param->eProfile = static_cast<OMX_VIDEO_AVCPROFILETYPE>(ConvertAvcProfileToProfile(param->eProfile));
     paramOut[index].val = setMark ? (void *)&(param->eProfile) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->eProfile) : 0;
     index++;
@@ -688,28 +688,28 @@ static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, i
                 break;
             }
             case KEY_MIMETYPE: {
-                int32_t codingType = ConvertMimeTypeToCodingType(*((AvCodecMime *)paramIn[i].val));
+                int32_t codingType = ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
                 param->format.video.eCompressionFormat = (OMX_VIDEO_CODINGTYPE)codingType;
                 break;
             }
             case KEY_VIDEO_WIDTH:
-                param->format.video.nFrameWidth = *((OMX_U32 *)paramIn[i].val);
+                param->format.video.nFrameWidth = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_VIDEO_HEIGHT:
-                param->format.video.nFrameHeight = *((OMX_U32 *)paramIn[i].val);
+                param->format.video.nFrameHeight = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_VIDEO_STRIDE:
-                param->format.video.nStride = *((OMX_S32 *)paramIn[i].val);
+                param->format.video.nStride = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_BITRATE:
-                param->format.video.nBitrate = *((OMX_U32 *)paramIn[i].val);
+                param->format.video.nBitrate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_VIDEO_FRAME_RATE:
-                param->format.video.xFramerate = *((OMX_U32 *)paramIn[i].val);
+                param->format.video.xFramerate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_PIXEL_FORMAT:
                 param->format.video.eColorFormat =
-                         ConvertPixelFormatToColorFormat(*((CodecPixelFormat *)paramIn[i].val));
+                         ConvertPixelFormatToColorFormat(*(reinterpret_cast<CodecPixelFormat *>(paramIn[i].val)));
                 break;
 
             default: {
@@ -741,8 +741,8 @@ static int32_t ParseParamPortDefinitionAudio(Param *paramIn, int8_t *paramOut, i
                 break;
             }
             case KEY_MIMETYPE: {
-                int32_t codingType = ConvertMimeTypeToCodingType(*((AvCodecMime *)paramIn[i].val));
-                param->format.audio.eEncoding = (OMX_AUDIO_CODINGTYPE)codingType;
+                int32_t codingType = ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
+                param->format.audio.eEncoding = static_cast<OMX_AUDIO_CODINGTYPE>(codingType);
                 break;
             }
 
@@ -778,7 +778,8 @@ static int32_t ParseParamAudioPortFormat(Param *paramIn, int8_t *paramOut, int32
         validCount++;
         switch (paramIn[i].key) {
             case KEY_MIMETYPE: {
-                    int32_t codingType = ConvertMimeTypeToCodingType(*((AvCodecMime *)paramIn[i].val));
+                    int32_t codingType =
+                        ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
                     param->eEncoding = (OMX_AUDIO_CODINGTYPE)codingType;
                 break;
             }
@@ -804,13 +805,13 @@ static int32_t ParseParamAudioPcm(Param *paramIn, int8_t *paramOut, int32_t para
         validCount++;
         switch (paramIn[i].key) {
             case KEY_AUDIO_CHANNEL_COUNT:
-                param->nChannels = *((OMX_U32 *)paramIn[i].val);
+                param->nChannels = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_AUDIO_POINTS_PER_FRAME:
-                param->nBitPerSample = *((OMX_U32 *)paramIn[i].val);
+                param->nBitPerSample = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_AUDIO_SAMPLE_RATE:
-                param->nSamplingRate = *((OMX_U32 *)paramIn[i].val);
+                param->nSamplingRate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
 
             default: {
@@ -834,19 +835,21 @@ static int32_t ParseParamAudioAac(Param *paramIn, int8_t *paramOut, int32_t para
         validCount++;
         switch (paramIn[i].key) {
             case KEY_AUDIO_CHANNEL_COUNT:
-                param->nChannels = *((OMX_U32 *)paramIn[i].val);
+                param->nChannels = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_AUDIO_SAMPLE_RATE:
-                param->nSampleRate = *((OMX_U32 *)paramIn[i].val);
+                param->nSampleRate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_BITRATE:
-                param->nBitRate = *((OMX_U32 *)paramIn[i].val);
+                param->nBitRate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_AUDIO_PROFILE:
-                param->eAACProfile = (OMX_AUDIO_AACPROFILETYPE)ConvertProfileToOmxProfile(*((Profile *)paramIn[i].val));
+                param->eAACProfile = (OMX_AUDIO_AACPROFILETYPE)
+                    ConvertProfileToOmxProfile(*(reinterpret_cast<Profile *>(paramIn[i].val)));
                 break;
             case KEY_AUDIO_SOUND_MODE:
-                param->eChannelMode = ConvertSoundModeToChannelMode(*((AudioSoundMode *)paramIn[i].val));
+                param->eChannelMode =
+                    ConvertSoundModeToChannelMode(*(reinterpret_cast<AudioSoundMode *>(paramIn[i].val)));
                 break;
 
             default: {
@@ -870,16 +873,17 @@ static int32_t ParseParamAudioMp3(Param *paramIn, int8_t *paramOut, int32_t para
         validCount++;
         switch (paramIn[i].key) {
             case KEY_AUDIO_CHANNEL_COUNT:
-                param->nChannels = *((OMX_U32 *)paramIn[i].val);
+                param->nChannels = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_AUDIO_SAMPLE_RATE:
-                param->nSampleRate = *((OMX_U32 *)paramIn[i].val);
+                param->nSampleRate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_BITRATE:
-                param->nBitRate = *((OMX_U32 *)paramIn[i].val);
+                param->nBitRate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
             case KEY_AUDIO_SOUND_MODE:
-                param->eChannelMode = ConvertSoundModeToChannelMode(*((AudioSoundMode *)paramIn[i].val));
+                param->eChannelMode =
+                    ConvertSoundModeToChannelMode(*(reinterpret_cast<AudioSoundMode *>(paramIn[i].val)));
                 break;
 
             default: {
@@ -903,7 +907,7 @@ static int32_t ParseParamAudioG726(Param *paramIn, int8_t *paramOut, int32_t par
         validCount++;
         switch (paramIn[i].key) {
             case KEY_AUDIO_CHANNEL_COUNT:
-                param->nChannels = *((OMX_U32 *)paramIn[i].val);
+                param->nChannels = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
 
             default: {
@@ -927,11 +931,12 @@ static int32_t ParseParamImagePortFormat(Param *paramIn, int8_t *paramOut, int32
         validCount++;
         switch (paramIn[i].key) {
             case KEY_MIMETYPE:
-                param->eCompressionFormat =
-                    (OMX_IMAGE_CODINGTYPE)ConvertMimeTypeToCodingType(*((AvCodecMime *)paramIn[i].val));
+                param->eCompressionFormat = (OMX_IMAGE_CODINGTYPE)
+                    ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
                 break;
             case KEY_PIXEL_FORMAT:
-                param->eColorFormat = ConvertPixelFormatToColorFormat(*((CodecPixelFormat *)paramIn[i].val));
+                param->eColorFormat =
+                    ConvertPixelFormatToColorFormat(*(reinterpret_cast<CodecPixelFormat *>(paramIn[i].val)));
                 break;
 
             default: {
@@ -955,7 +960,7 @@ static int32_t ParseParamQfactor(Param *paramIn, int8_t *paramOut, int32_t param
         validCount++;
         switch (paramIn[i].key) {
             case KEY_IMAGE_Q_FACTOR:
-                param->nQFactor = *((OMX_U32 *)paramIn[i].val);
+                param->nQFactor = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
 
             default: {
@@ -979,14 +984,15 @@ static int32_t ParseParamVideoPortFormat(Param *paramIn, int8_t *paramOut, int32
         validCount++;
         switch (paramIn[i].key) {
             case KEY_MIMETYPE:
-                param->eCompressionFormat =
-                    (OMX_VIDEO_CODINGTYPE)ConvertMimeTypeToCodingType(*((AvCodecMime *)paramIn[i].val));
+                param->eCompressionFormat = (OMX_VIDEO_CODINGTYPE)
+                    ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
                 break;
             case KEY_PIXEL_FORMAT:
-                param->eColorFormat = ConvertPixelFormatToColorFormat(*((CodecPixelFormat *)paramIn[i].val));
+                param->eColorFormat =
+                    ConvertPixelFormatToColorFormat(*(reinterpret_cast<CodecPixelFormat *>(paramIn[i].val)));
                 break;
             case KEY_VIDEO_FRAME_RATE:
-                param->xFramerate = *((OMX_U32 *)paramIn[i].val);
+                param->xFramerate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 break;
 
             default: {
@@ -1010,7 +1016,8 @@ static int32_t ParseParamVideoAvc(Param *paramIn, int8_t *paramOut, int32_t para
         validCount++;
         switch (paramIn[i].key) {
             case KEY_VIDEO_PROFILE:
-                param->eProfile = (OMX_VIDEO_AVCPROFILETYPE)ConvertProfileToOmxProfile(*((Profile *)paramIn[i].val));
+                param->eProfile =
+                    static_cast<OMX_VIDEO_AVCPROFILETYPE>(ConvertProfileToOmxProfile(*((Profile *)paramIn[i].val)));
                 break;
 
             default: {
@@ -1034,7 +1041,8 @@ static int32_t ParseParamVideoBitrate(Param *paramIn, int8_t *paramOut, int32_t 
         validCount++;
         switch (paramIn[i].key) {
             case KEY_VIDEO_RC_MODE:
-                param->eControlRate = ConvertRcModeToRateType(*((VideoCodecRcMode *)paramIn[i].val));
+                param->eControlRate =
+                    ConvertRcModeToRateType(*(reinterpret_cast<VideoCodecRcMode *>(paramIn[i].val)));
                 break;
 
             default: {
