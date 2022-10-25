@@ -936,6 +936,114 @@ int32_t AudioProxyAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volu
     return ret;
 }
 
+int32_t AudioProxyAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                        const char *condition, const char *value)
+{
+    if (adapter == NULL || value == NULL) {
+        AUDIO_FUNC_LOGE("the parameter is empty");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    (void)key;
+    (void)condition;
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
+        AUDIO_FUNC_LOGE("AudioProxyAdapterSetExtraParams FAIL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter->proxyRemoteHandle == NULL) {
+        AUDIO_FUNC_LOGE("hwAdapter->proxyRemoteHandle is NULL");
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (AudioProxyWriteTokenAndNameForSetPassThrough(hwAdapter, data) != AUDIO_HAL_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed!", __func__);
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteString(data, value)) {
+        AUDIO_FUNC_LOGE("value write fail");
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+
+    int ret = AudioProxyDispatchCall(hwAdapter->proxyRemoteHandle, AUDIO_HDI_ADT_SET_EXTRA_PARAMS, data, reply);
+    if (ret != AUDIO_HAL_SUCCESS) {
+        AUDIO_FUNC_LOGE("%{public}s:set parameter failed!", __func__);
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
+}
+
+int32_t AudioProxyAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                        const char *condition, char *value, int32_t length)
+{
+    if (adapter == NULL || value == NULL || length <= 0) {
+        AUDIO_FUNC_LOGE("AudioProxyAdapterGetExtraParams FAIL");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    (void)key;
+    (void)condition;
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    const char *strValue = NULL;
+    if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
+        AUDIO_FUNC_LOGE("AudioProxyAdapterGetExtraParams FAIL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter->proxyRemoteHandle == NULL) {
+        AUDIO_FUNC_LOGE("parameter is null");
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (AudioProxyWriteTokenAndNameForSetPassThrough(hwAdapter, data) != AUDIO_HAL_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed!", __func__);
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteInt32(data, length)) {
+        AUDIO_FUNC_LOGE("length write fail");
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    int ret = AudioProxyDispatchCall(hwAdapter->proxyRemoteHandle, AUDIO_HDI_ADT_GET_EXTRA_PARAMS, data, reply);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioProxyAdapterGetExtraParams FAIL");
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+
+    strValue = HdfSbufReadString(reply);
+    if (strValue == NULL) {
+        AUDIO_FUNC_LOGE("value is empty");
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    ret = strncpy_s(value, length, strValue, strlen(strValue));
+    if (ret != 0) {
+        AUDIO_FUNC_LOGE("copy failed!");
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
+}
+
 int32_t AudioProxyAdapterUpdateAudioRoute(struct AudioAdapter *adapter,
     const struct AudioRoute *route, int32_t *routeHandle)
 {
@@ -1032,6 +1140,7 @@ FINISHED:
     }
     return audioAdapterRet;
 }
+
 int32_t AudioProxyAdapterGetDeviceStatus(struct AudioAdapter *adapter, struct AudioDeviceStatus *status)
 {
     (void)adapter;

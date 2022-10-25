@@ -38,6 +38,7 @@ namespace comfun {
     const int32_t MANAGER_ADAPTER_NAME_LEN = 32;
     const int32_t AUDIO_CAPTURE_BUF_TEST = 8192 * 2;
     const int32_t AUDIO_RENDER_BUF_TEST = 1024;
+    const int32_t AUDIO_ADAPTER_BUF_TEST = 1024;
     const int32_t ADAPTER_COUNT = 32;
     const int32_t DYNAMIC_LIB_PATH_MAX = 256;
     const float HALF_OF_NORMAL_VALUE = 0.5;
