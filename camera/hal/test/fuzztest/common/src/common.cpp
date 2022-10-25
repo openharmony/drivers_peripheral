@@ -18,6 +18,9 @@
 namespace OHOS {
 uint32_t U32_AT(const uint8_t *ptr)
 {
+    const int threeDigitMove = 24;
+    const int twoDigitMove = 16;
+    const int oneDigitMove = 8;
     if (ptr == nullptr) {
         return 0;
     }
@@ -25,6 +28,6 @@ uint32_t U32_AT(const uint8_t *ptr)
      * Move the 0th digit 24 to the left, the first digit 16 to the left, the second digit 8 to the left,
      * and the third digit no left
      */
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | ptr[3];
+    return (ptr[0] << threeDigitMove) | (ptr[1] << twoDigitMove) | (ptr[2] << oneDigitMove) | ptr[3];
 }
 }

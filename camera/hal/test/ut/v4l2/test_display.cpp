@@ -114,7 +114,8 @@ void TestDisplay::CloseFd()
 
 void TestDisplay::PrintFaceDetectInfo(const unsigned char *bufStart, const uint32_t size) const
 {
-    common_metadata_header_t* data = reinterpret_cast<common_metadata_header_t*>((const_cast<unsigned char*>(bufStart)));
+    common_metadata_header_t* data = reinterpret_cast<common_metadata_header_t*>(
+        const_cast<unsigned char*>(bufStart));
     camera_metadata_item_t entry;
     int ret = 0;
     ret = FindCameraMetadataItem(data, OHOS_STATISTICS_FACE_DETECT_SWITCH, &entry);
@@ -203,7 +204,7 @@ unsigned char* TestDisplay::DoFbMmap(int* pmemfd)
 {
     unsigned char* ret;
     int screensize = vinfo_.xres * vinfo_.yres * vinfo_.bits_per_pixel / 8; // 8:picture size
-    ret = (unsigned char*)mmap(nullptr, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, *pmemfd, 0);
+    ret = static_cast<unsigned char*>(mmap(NULL, screensize, PROT_READ | PROT_WRITE, MAP_SHARED, *pmemfd, 0));
     if (ret == MAP_FAILED) {
         CAMERA_LOGE("main test:do_mmap: pmem mmap() failed: %s (%d)\n", strerror(errno), errno);
         return nullptr;
@@ -291,10 +292,14 @@ void TestDisplay::ProcessImage(unsigned char* p, unsigned char* fbp)
     int xpos = (vinfo_.xres - width) / 2;
     int ypos = (vinfo_.yres - height) / 2;
     int yPos, uPos, vPos;
+    int yPosIncrement, uPosIncrement, vPosIncrement;
 
     yPos = 0; // 0:Pixel initial value
     uPos = 1; // 1:Pixel initial value
     vPos = 3; // 3:Pixel initial value
+    yPosIncrement = 2;
+    uPosIncrement = 4;
+    vPosIncrement = 4;
 
     for (y = ypos; y < (height + ypos); y++) {
         for (j = 0, x = xpos; j < width; j++, x++) {
@@ -312,11 +317,11 @@ void TestDisplay::ProcessImage(unsigned char* p, unsigned char* fbp)
             fbp[location + 1] = ((r & 0xF8) | (g >> 5)); // 5:display range
             fbp[location + 0] = (((g & 0x1C) << 3) | (b >> 3)); // 3:display range
 
-            yPos += 2;
+            yPos += yPosIncrement;
 
             if (j & 0x01) {
-                uPos += 4;
-                vPos += 4;
+                uPos += uPosIncrement;
+                vPos += vPosIncrement;
             }
         }
 
@@ -340,7 +345,7 @@ void TestDisplay::BufferCallback(unsigned char* addr, int choice)
     } else {
         LcdDrawScreen(displayBuf_, addr);
         std::cout << "==========[test log] capture start saveYuv......" << std::endl;
-        SaveYUV("capture", addr, bufSize_);
+        SaveYUV("capture", reinterpret_cast<unsigned char*>(addr), bufSize_);
         std::cout << "==========[test log] capture end saveYuv......" << std::endl;
         return;
     }
@@ -580,8 +585,8 @@ void TestDisplay::StartCapture(int streamId, int captureId, bool shutterCallback
 
 void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& streamIds)
 {
-    constexpr uint32_t SLEEP_SECOND_TWO = 2;
-    sleep(SLEEP_SECOND_TWO);
+    constexpr uint32_t TIME_FOR_WAIT_CANCEL_CAPTURE = 2;
+    sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
     if (sizeof(captureIds) > 0) {
         for (auto &captureId : captureIds) {
             if (captureId == CAPTURE_ID_PREVIEW) {
@@ -596,10 +601,10 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
                 streamCustomerAnalyze_->ReceiveFrameOff();
             }
         }
-        for (auto &captureId : captureIds) {
+        for (const auto &captureId : captureIds) {
             std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
             rc = (CamRetCode)streamOperator->CancelCapture(captureId);
-            sleep(SLEEP_SECOND_TWO);
+            sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
             EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
             if (rc == HDI::Camera::V1_0::NO_ERROR) {
                 std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
@@ -643,7 +648,8 @@ void DemoCameraDeviceCallback::PrintStabiliInfo(const std::shared_ptr<CameraMeta
     }
     videoStabiliMode = *(entry.data.u8);
     CAMERA_LOGI("videoStabiliMode: %{public}d", videoStabiliMode);
-    std::cout << "==========[test log] PrintStabiliInfo videoStabiliMode: " << static_cast<int>(videoStabiliMode) << std::endl;
+    std::cout << "==========[test log] PrintStabiliInfo videoStabiliMode: " << 
+        static_cast<int>(videoStabiliMode) << std::endl;
 }
 
 void DemoCameraDeviceCallback::PrintFpsInfo(const std::shared_ptr<CameraMetadata>& result)

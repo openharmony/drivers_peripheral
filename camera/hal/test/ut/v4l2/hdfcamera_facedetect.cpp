@@ -82,7 +82,8 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
     display_->rc = (CamRetCode)display_->streamOperator->Capture(display_->CAPTURE_ID_CAPTURE, captureInfo, true);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log]check Capture: Capture success, " << display_->CAPTURE_ID_CAPTURE << std::endl;
+        std::cout << "==========[test log]check Capture: Capture success, " << 
+            display_->CAPTURE_ID_CAPTURE << std::endl;
     } else {
         std::cout << "==========[test log]check Capture: Capture fail, rc = " << display_->rc
             << display_->CAPTURE_ID_CAPTURE << std::endl;
