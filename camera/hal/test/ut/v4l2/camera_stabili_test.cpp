@@ -81,7 +81,7 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_001, TestSize.Level1)
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
         ITEM_CAPACITY, DATA_CAPACITY);
     uint8_t videoStabiliMode = videoStabilizationAvailableModes_[0];
-    bool addEntryRet = meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &videoStabiliMode, DATA_COUNT);
+    meta->addEntry(OHOS_CONTROL_VIDEO_STABILIZATION_MODE, &videoStabiliMode, DATA_COUNT);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
 
@@ -93,10 +93,10 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_001, TestSize.Level1)
     }
 
     // get preview
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
 
     // release stream
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }

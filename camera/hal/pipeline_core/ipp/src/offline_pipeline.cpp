@@ -82,7 +82,7 @@ RetCode OfflinePipeline::CancelCapture(int32_t captureId)
         return RC_OK;
     }
 
-    std::vector<std::shared_ptr<IBuffer>> cache = {};
+    std::vector<std::shared_ptr<IBuffer>> cache;
     {
         std::unique_lock<std::mutex> l(queueLock_);
         auto it = std::find_if(bufferCache_.begin(), bufferCache_.end(),

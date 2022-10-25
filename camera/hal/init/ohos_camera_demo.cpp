@@ -612,7 +612,7 @@ RetCode OhosCameraDemo::StartPreviewStream()
 
 RetCode OhosCameraDemo::ReleaseAllStream()
 {
-    std::vector<int> streamIds = {};
+    std::vector<int> streamIds;
 
     CAMERA_LOGD("demo test: ReleaseAllStream enter");
 

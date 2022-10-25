@@ -59,7 +59,7 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
     };
     producer->SetCallback(callback);
     std::shared_ptr<StreamInfo> streamInfoPre = std::make_shared<StreamInfo>();
-    streamInfoPre->streamId_ = display_->streamId_preview;
+    streamInfoPre->streamId_ = display_->STREAM_ID_PREVIEW;
     streamInfoPre->width_ = DEFAULT_TEST_WIDTH_VALUE;
     streamInfoPre->height_ = DEFAULT_TEST_HEIGHT_VALUE;
     streamInfoPre->format_ = CAMERA_FORMAT_YUYV_422_PKG;
@@ -72,10 +72,10 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
     EXPECT_EQ(true, display_->rc == NO_ERROR);
     if (display_->rc == NO_ERROR) {
         std::cout << "==========[test log] CreateStreams success, streamId = ";
-        std::cout << display_->streamId_capture <<", intent = STILL_CAPTURE" << std::endl;
+        std::cout << display_->STREAM_ID_CAPTURE, <<", intent = STILL_CAPTURE" << std::endl;
     } else {
         std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc <<" , streamId = ";
-        std::cout << display_->streamId_capture <<", intent = STILL_CAPTURE" << std::endl;
+        std::cout << display_->STREAM_ID_CAPTURE, <<", intent = STILL_CAPTURE" << std::endl;
     }
     // Submit stream information
     display_->rc = display_->streamOperator->CommitStreams(DUAL, nullptr);
@@ -86,9 +86,9 @@ TEST_F(UtestLogicCameraTest, camera_logic_0001)
         std::cout << "==========[test log] CommitStreams DUAL fail, rc = " << display_->rc << std::endl;
     }
     // capture
-    display_->StartCapture(display_->streamId_preview, display_->captureId_preview, false, true);
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
     // post-processing
-    display_->captureIds = {display_->captureId_preview};
-    display_->streamIds = {display_->streamId_preview};
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
     display_->StopStream(display_->captureIds, display_->streamIds);
 }

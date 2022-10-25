@@ -224,7 +224,6 @@ void Test::GetCameraMetadata()
         std::cout << "==========[test log]GetCameraAbility failed, rc = " << rc << std::endl;
     }
     common_metadata_header_t* data = ability->get();
-    int32_t expo = 0;
     camera_metadata_item_t entry;
     int ret = FindCameraMetadataItem(data, OHOS_CONTROL_AE_AVAILABLE_MODES, &entry);
     if (ret == 0) {
