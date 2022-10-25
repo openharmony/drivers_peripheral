@@ -55,6 +55,7 @@ bool CodecFuzzTest(const uint8_t* rawData, size_t size)
         return false;
     }
 
+    HdfSbufWriteBuffer(data, CODEC_INTERFACE_TOKEN.c_str(), CODEC_INTERFACE_TOKEN.length());
     HdfSbufWriteBuffer(data, rawData, size);
 
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);

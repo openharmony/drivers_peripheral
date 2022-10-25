@@ -13,7 +13,7 @@
 
 import("//build/config/features.gni")
 import("//build/test.gni")
-module_output_path = "hdf/codec"
+module_output_path = "drivers_peripheral_codec/codec"
 
 ohos_fuzztest("CodecGetExtensionIndexFuzzTest") {
   module_out_path = module_output_path
