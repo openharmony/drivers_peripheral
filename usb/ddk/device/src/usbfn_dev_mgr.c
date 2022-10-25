@@ -61,16 +61,14 @@ static void GetInterfaceInfo(const struct UsbInterfaceDescriptor *intf, struct U
 
 static void CreateInterface(struct UsbFnDeviceDesc *des, struct UsbFnDeviceMgr *devMgr)
 {
-    uint32_t i, j, k;
     uint32_t fnCnt = 0;
-    int32_t ret;
     struct UsbInterfaceDescriptor *intf = NULL;
-
     g_intfCnt = 0;
     g_epCnt = 1;
     g_fnCntOld = 0;
-    for (i = 0; des->configs[i] != NULL; i++) {
-        for (j = 0; des->configs[i]->functions[j] != NULL; j++) {
+    
+    for (uint32_t i = 0; des->configs[i] != NULL; i++) {
+        for (uint32_t j = 0; des->configs[i]->functions[j] != NULL; j++) {
             if (strncmp(des->configs[i]->functions[j]->funcName, FUNCTION_GENERIC, strlen(FUNCTION_GENERIC))) {
                 continue;
             }
@@ -79,14 +77,14 @@ static void CreateInterface(struct UsbFnDeviceDesc *des, struct UsbFnDeviceMgr *
             }
             DListHeadInit(&devMgr->funcMgr[fnCnt].reqEntry);
             devMgr->funcMgr[fnCnt].object = &devMgr->fnDev.object;
-            ret = snprintf_s(devMgr->funcMgr[fnCnt].name, MAX_NAMELEN, MAX_NAMELEN - 1, "%s",
+            int32_t ret = snprintf_s(devMgr->funcMgr[fnCnt].name, MAX_NAMELEN, MAX_NAMELEN - 1, "%s",
                 des->configs[i]->functions[j]->funcName);
             if (ret < 0) {
                 HDF_LOGE("%{public}s: snprintf_s failed", __func__);
                 return;
             }
 
-            for (k = 0; des->configs[i]->functions[j]->fsDescriptors[k] != NULL; k++) {
+            for (uint32_t k = 0; des->configs[i]->functions[j]->fsDescriptors[k] != NULL; k++) {
                 intf = (struct UsbInterfaceDescriptor *)des->configs[i]->functions[j]->fsDescriptors[k];
                 GetInterfaceInfo(intf, devMgr, fnCnt, des->configs[i]);
             }
@@ -101,8 +99,8 @@ static int32_t FindEmptyId(void)
     int32_t devCnt = 1;
     struct UsbObject *obj = NULL;
     struct UsbObject *temp = NULL;
-    int32_t i;
     if (g_devEntry.next != 0 && !DListIsEmpty(&g_devEntry)) {
+        int32_t i;
         for (i = 1; i < MAX_LIST; i++) {
             int32_t isUse = 0;
             DLIST_FOR_EACH_ENTRY_SAFE(obj, temp, &g_devEntry, struct UsbObject, entry) {

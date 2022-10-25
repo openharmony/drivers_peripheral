@@ -1168,7 +1168,6 @@ int32_t UsbdDispatcher::UsbdBulkASyncPutAsmData(UsbdBufferHandle *handle, uint8_
         return HDF_ERR_INVALID_PARAM;
     }
 
-    uint32_t tlen;
     int32_t ret = HDF_SUCCESS;
     OsalMutexLock(&handle->lock);
     do {
@@ -1177,7 +1176,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncPutAsmData(UsbdBufferHandle *handle, uint8_
             ret = HDF_ERR_BAD_FD;
             break;
         }
-        tlen = (handle->size > handle->rcur) ? (handle->size - handle->rcur) : 0;
+        uint32_t tlen = (handle->size > handle->rcur) ? (handle->size - handle->rcur) : 0;
         tlen = tlen < len ? tlen : len;
         if (tlen > 0) {
             ret = memcpy_s(handle->starAddr + handle->rcur, tlen, buffer, len);
