@@ -58,17 +58,18 @@ static void WlanFucSwitch(struct IWlanInterface *interface, uint32_t cmd, const 
         case CMD_WLAN_INTERFACE_GET_ASSCOCIATED_STAS: {
             struct HdfStaInfo staInfo[WLAN_MAX_NUM_STA_WITH_AP] = {{0}};
             uint32_t staInfoLen = WLAN_MAX_NUM_STA_WITH_AP;
-            ifeature.ifName = (char *)rawData;
-            ifeature.type = *(int32_t *)rawData;
+            ifeature.ifName = const_cast<char *>(reinterpret_cast<const char *>(rawData));
+            ifeature.type = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
             interface->GetAsscociatedStas(interface, &ifeature, staInfo, &staInfoLen, &num);
             break;
         }
         case CMD_WLAN_INTERFACE_GET_DEVICE_MAC_ADDRESS: {
             uint8_t mac[ETH_ADDR_LEN] = {0};
             uint32_t macLen = ETH_ADDR_LEN;
-            ifeature.ifName = (char *)rawData;
-            ifeature.type = *(int32_t *)rawData;
-            interface->GetDeviceMacAddress(interface, &ifeature, mac, &macLen, *(uint8_t *)rawData);
+            ifeature.ifName = const_cast<char *>(reinterpret_cast<const char *>(rawData));
+            ifeature.type = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+            interface->GetDeviceMacAddress(interface, &ifeature, mac, &macLen,
+                *const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(rawData)));
             break;
         }
         default:
