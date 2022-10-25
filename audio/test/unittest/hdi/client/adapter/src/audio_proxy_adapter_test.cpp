@@ -451,4 +451,22 @@ HWTEST_F(AudioProxyAdapterTest, AdapterGetExtraParams_002, TestSize.Level1)
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioProxyAdapterGetExtraParams(adapter, key, condition, value, length));
     hwAdapter->proxyRemoteHandle = proxyRemoteHandle;
 }
+
+HWTEST_F(AudioProxyAdapterTest, AdapterSetVoiceVolume_001, TestSize.Level1)
+{
+    ASSERT_NE(adapter, nullptr);
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyAdapterSetExtraParams(nullptr, volume));
+}
+
+HWTEST_F(AudioProxyAdapterTest, AdapterSetVoiceVolume_002, TestSize.Level1)
+{
+    ASSERT_NE(adapter, nullptr);
+    float volume = 0;
+    struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
+    struct HdfRemoteService *proxyRemoteHandle = hwAdapter->proxyRemoteHandle;
+    hwAdapter->proxyRemoteHandle = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioProxyAdapterSetExtraParams(adapter, volume));
+    hwAdapter->proxyRemoteHandle = proxyRemoteHandle;
+}
 }
