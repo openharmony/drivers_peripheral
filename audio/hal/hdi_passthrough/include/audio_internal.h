@@ -168,7 +168,7 @@ struct AudioFrameRenderMode {
     void* cookie;
     CallbackProcessFunc callbackProcess;
     AudioHandle renderhandle;
-    struct AudioMmapBufferDescripter mmapBufDesc;
+    struct AudioMmapBufferDescriptor mmapBufDesc;
 };
 
 struct AudioGain {
@@ -292,7 +292,7 @@ struct AudioFrameCaptureMode {
     char *buffer;
     uint64_t bufferFrameSize;
     uint64_t bufferSize;
-    struct AudioMmapBufferDescripter mmapBufDesc;
+    struct AudioMmapBufferDescriptor mmapBufDesc;
 };
 
 struct AudioHwCaptureParam {
@@ -480,7 +480,7 @@ int32_t AudioRenderSetChannelMode(struct AudioRender *render, enum AudioChannelM
 int32_t AudioRenderGetChannelMode(struct AudioRender *render, enum AudioChannelMode *mode);
 int32_t AudioRenderSetExtraParams(AudioHandle handle, const char *keyValueList);
 int32_t AudioRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLenth);
-int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
+int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc);
 int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioRenderAddEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioRenderRemoveEffect(AudioHandle handle, uint64_t effectid);
@@ -513,7 +513,7 @@ int32_t AudioCaptureCaptureFrame(struct AudioCapture *capture, void *frame,
 int32_t AudioCaptureGetCapturePosition(struct AudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioCaptureSetExtraParams(AudioHandle handle, const char *keyValueList);
 int32_t AudioCaptureGetExtraParams(const AudioHandle handle, char *keyValueList, int32_t listLenth);
-int32_t AudioCaptureReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
+int32_t AudioCaptureReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc);
 int32_t AudioCaptureGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioCaptureAddEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioCaptureRemoveEffect(AudioHandle handle, uint64_t effectid);

@@ -261,7 +261,7 @@ static int32_t FrameStartMmap(const struct StrPara *param)
     }
     const struct StrPara *strParam = param;
     struct IAudioRender *render = strParam->render;
-    struct AudioMmapBufferDescripter mmapDesc;
+    struct AudioMmapBufferDescriptor mmapDesc;
 
     (void)signal(SIGINT, StreamClose);
 

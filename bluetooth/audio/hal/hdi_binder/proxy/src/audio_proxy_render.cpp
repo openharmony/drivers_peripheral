@@ -609,7 +609,7 @@ int32_t AudioProxyRenderGetExtraParams(AudioHandle handle, char *keyValueList, i
     return ret;
 }
 
-int32_t AudioProxyRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc)
+int32_t AudioProxyRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
     if (handle == NULL || desc == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;

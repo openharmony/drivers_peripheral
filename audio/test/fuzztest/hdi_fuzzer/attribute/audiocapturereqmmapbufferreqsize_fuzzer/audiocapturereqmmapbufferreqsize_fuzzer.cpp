@@ -48,7 +48,7 @@ namespace Audio {
         }
         bool isRender = false;
         int32_t reqSize = 0;
-        struct AudioMmapBufferDescripter desc = {};
+        struct AudioMmapBufferDescriptor desc = {};
         ret = InitMmapDesc(fp, desc, reqSize, isRender);
         if (ret < 0) {
             reqSizeFuzzAdapter->DestroyCapture(reqSizeFuzzAdapter, reqSizeFuzzCapture);
