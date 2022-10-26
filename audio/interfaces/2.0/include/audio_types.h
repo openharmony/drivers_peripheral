@@ -335,8 +335,8 @@ enum AudioDrainNotifyType {
  * @brief Enumerates callback notification events.
  */
 enum AudioCallbackType {
-    AUDIO_NONBLOCK_WRITE_COMPELETED, /**< The non-block write is complete. */
-    AUDIO_DRAIN_COMPELETED,          /**< The draining is complete. */
+    AUDIO_NONBLOCK_WRITE_COMPLETED, /**< The non-block write is complete. */
+    AUDIO_DRAIN_COMPLETED,          /**< The draining is complete. */
     AUDIO_FLUSH_COMPLETED,           /**< The flush is complete. */
     AUDIO_RENDER_FULL,               /**< The render buffer is full.*/
     AUDIO_ERROR_OCCUR,               /**< An error occurs.*/

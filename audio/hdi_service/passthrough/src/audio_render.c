@@ -1186,8 +1186,8 @@ int32_t CallbackProcessing(AudioHandle handle, enum AudioCallbackType callBackTy
 
     bool isCallBack = false;
     switch (callBackType) {
-        case AUDIO_NONBLOCK_WRITE_COMPELETED:
-        case AUDIO_DRAIN_COMPELETED:
+        case AUDIO_NONBLOCK_WRITE_COMPLETED:
+        case AUDIO_DRAIN_COMPLETED:
         case AUDIO_FLUSH_COMPLETED:
         case AUDIO_RENDER_FULL:
         case AUDIO_ERROR_OCCUR:
