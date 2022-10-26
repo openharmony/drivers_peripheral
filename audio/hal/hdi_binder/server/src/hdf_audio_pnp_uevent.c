@@ -276,12 +276,18 @@ int32_t AudioPnpUeventStartThread(void)
 {
     pthread_t thread;
     pthread_attr_t tidsAttr;
+    const char *thread_name = "pnp_event";
 
     AUDIO_FUNC_LOGI("create audio uevent thread.");
     pthread_attr_init(&tidsAttr);
     pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
     if (pthread_create(&thread, &tidsAttr, AudioPnpUeventStart, NULL) != 0) {
         AUDIO_FUNC_LOGE("create AudioPnpUeventStart thread failed!");
+        return HDF_FAILURE;
+    }
+
+    if (pthread_setname_np(thread, thread_name) != 0) {
+        AUDIO_FUNC_LOGE("AudioPnpUeventStartThread setname failed!");
         return HDF_FAILURE;
     }
 
