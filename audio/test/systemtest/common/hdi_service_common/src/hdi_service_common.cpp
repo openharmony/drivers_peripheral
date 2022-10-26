@@ -838,8 +838,8 @@ int32_t AudioRenderCallback(struct IAudioCallback *self, AudioCallbackType type,
     (void)reserved;
     (void)cookie;
     switch (type) {
-        case AUDIO_NONBLOCK_WRITE_COMPELETED:
-            g_writeCompleted = AUDIO_WRITE_COMPELETED_VALUE;
+        case AUDIO_NONBLOCK_WRITE_COMPLETED:
+            g_writeCompleted = AUDIO_WRITE_COMPLETED_VALUE;
             return HDF_SUCCESS;
         case AUDIO_RENDER_FULL:
             g_renderFull = AUDIO_RENDER_FULL_VALUE;
@@ -849,7 +849,7 @@ int32_t AudioRenderCallback(struct IAudioCallback *self, AudioCallbackType type,
             return HDF_SUCCESS;
         case AUDIO_ERROR_OCCUR:
             return HDF_FAILURE;
-        case AUDIO_DRAIN_COMPELETED:
+        case AUDIO_DRAIN_COMPLETED:
             return HDF_FAILURE;
         default:
             return HDF_FAILURE;
@@ -857,7 +857,7 @@ int32_t AudioRenderCallback(struct IAudioCallback *self, AudioCallbackType type,
 }
 int32_t CheckWriteCompleteValue()
 {
-    if (g_writeCompleted == AUDIO_WRITE_COMPELETED_VALUE)
+    if (g_writeCompleted == AUDIO_WRITE_COMPLETED_VALUE)
         return HDF_SUCCESS;
     else
         return HDF_FAILURE;
