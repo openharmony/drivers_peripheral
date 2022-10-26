@@ -14,16 +14,18 @@
  */
 
 #include "usbd_load_usb_service.h"
+
 #include <cstdlib>
 #include <iostream>
 #include <unistd.h>
+
 #include "iservice_registry.h"
 #include "osal_thread.h"
 #include "osal_time.h"
 
 using namespace OHOS;
 using namespace std;
-#define HDF_LOG_TAG   usbd_load_usb_service
+#define HDF_LOG_TAG usbd_load_usb_service
 
 namespace OHOS {
 namespace HDI {
@@ -33,12 +35,9 @@ uint32_t UsbdLoadUsbService::count_ = 0;
 bool UsbdLoadUsbService::alarmRunning_ = false;
 bool OnDemandLoadCallback::loading_ = false;
 
-OnDemandLoadCallback::OnDemandLoadCallback()
-{
-}
+OnDemandLoadCallback::OnDemandLoadCallback() {}
 
-void OnDemandLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId,
-    const sptr<IRemoteObject>& remoteObject)
+void OnDemandLoadCallback::OnLoadSystemAbilitySuccess(int32_t systemAbilityId, const sptr<IRemoteObject> &remoteObject)
 {
     loading_ = false;
     HDF_LOGI("%s: OnLoadSystemAbilitySuccess systemAbilityId: %d", __func__, systemAbilityId);

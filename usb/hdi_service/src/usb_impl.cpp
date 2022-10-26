@@ -14,6 +14,7 @@
  */
 
 #include "usb_impl.h"
+
 #include <cerrno>
 #include <hdf_base.h>
 #include <hdf_log.h>
