@@ -162,11 +162,11 @@ WLAN驱动模块通过HAL/HDI层(HAL是直调，HDI是通过IPC调用)对Wi-Fi S
 <td class="cellrowborder" valign="top" headers="mcps1.2.4.1.2 "><p id="p17272317145516"><a name="p17272317145516"></a><a name="p17272317145516"></a>获取底层上报上来的测量结果。</p>
 </td>
 </tr>
-<tr id="row27321001058"><td class="cellrowborder" valign="top" width="30.91%" headers="mcps1.2.4.1.2 "><p id="p77321105516"><a name="p77321105516"></a><a name="p77321105516"></a>int32_t (*GetAsscociatedStas)(struct IWlanInterface *self, const struct HdfFeatureInfo* ifeature,struct HdfStaInfo* staInfo, uint32_t* staInfoLen, uint32_t* num);</p>
+<tr id="row27321001058"><td class="cellrowborder" valign="top" width="30.91%" headers="mcps1.2.4.1.2 "><p id="p77321105516"><a name="p77321105516"></a><a name="p77321105516"></a>int32_t (*GetAssociatedStas)(struct IWlanInterface *self, const struct HdfFeatureInfo* ifeature,struct HdfStaInfo* staInfo, uint32_t* staInfoLen, uint32_t* num);</p>
 </td>
 <td class="cellrowborder" rowspan="2" valign="top" width="6.950000000000001%" headers="mcps1.2.4.1.1 "><p id="p134208191041"><a name="p134208191041"></a><a name="p134208191041"></a>wifi_hal_ap_feature.h</p>
 </td>
-<td class="cellrowborder" valign="top" width="30.91%" headers="mcps1.2.4.1.2 "><p id="p77321105516"><a name="p77321105516"></a><a name="p77321105516"></a>int32_t (*getAsscociatedStas)(const struct IWiFiAp *apFeature, struct StaInfo *staInfo, uint32_t count, uint32_t *num);</p>
+<td class="cellrowborder" valign="top" width="30.91%" headers="mcps1.2.4.1.2 "><p id="p77321105516"><a name="p77321105516"></a><a name="p77321105516"></a>int32_t (*getAssociatedStas)(const struct IWiFiAp *apFeature, struct StaInfo *staInfo, uint32_t count, uint32_t *num);</p>
 </td>
 <td class="cellrowborder" valign="top" width="20.14%" headers="mcps1.2.4.1.3 "><p id="p1673213014513"><a name="p1673213014513"></a><a name="p1673213014513"></a>获取连接上的所有STA的信息（目前只包含MAC地址）。</p>
 </td>
