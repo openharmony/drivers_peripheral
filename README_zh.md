@@ -22,6 +22,8 @@
 -   wlan：WLAN HDI接口定义与实现，包括创建和销毁HAL层和WLAN驱动的通道、获取本设备支持的WLAN特性等，详见wlan目录下的[readme](wlan/README_zh.md)文档。
 -   usb：USB DDK接口定义与实现，负责提供USB Host侧和USB Device侧的设备管理、配置、数据读写等接口，详见usb目录下的[readme](usb/README_zh.md)文档。
 -   camera：Camera HDI接口定义及其实现，对上层Camera Service提供HDI的具体实现，对下管理Camera各个硬件设备等，详见camera目录下的[readme](camera/README_zh.md)文档。
+-   ril：Ril HDI接口定义及其实现，提供通话、SIM卡、短彩信、搜网、蜂窝数据相关的业务处理能力等，详见ril目录下的[readme](ril/README_zh.md)文档。
+
 ## 相关仓<a name="section1371113476307"></a>
 
 [驱动子系统](https://gitee.com/openharmony/docs/blob/master/zh-cn/readme/%E9%A9%B1%E5%8A%A8%E5%AD%90%E7%B3%BB%E7%BB%9F.md)
