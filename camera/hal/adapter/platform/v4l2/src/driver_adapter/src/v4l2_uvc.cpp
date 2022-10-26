@@ -14,6 +14,7 @@
  */
 
 #include <mutex>
+#include <sys/prctl.h>
 #include "securec.h"
 #include "v4l2_control.h"
 #include "v4l2_fileformat.h"
@@ -291,6 +292,7 @@ void HosV4L2UVC::loopUvcDevice()
     FD_ZERO(&fds);
     FD_SET(uDevFd, &fds);
     FD_SET(eventFd, &fds);
+    prctl(PR_SET_NAME, "loopUvcDevice");
     while (g_uvcDetectEnable) {
         int rc;
         rc = select(((uDevFd > eventFd) ? uDevFd : eventFd) + 1, &fds, &fds, NULL, NULL);
