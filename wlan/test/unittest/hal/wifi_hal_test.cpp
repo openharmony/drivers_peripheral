@@ -1174,12 +1174,12 @@ HWTEST_F(WifiHalTest, HalGetChipId002, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetAsscociatedStas001
+ * @tc.name: GetAssociatedStas001
  * @tc.desc: wifi hal get association state function test
  * @tc.type: FUNC
  * @tc.require: AR000H603L
  */
-HWTEST_F(WifiHalTest, GetAsscociatedStas001, TestSize.Level1)
+HWTEST_F(WifiHalTest, GetAssociatedStas001, TestSize.Level1)
 {
     int32_t ret;
     struct IWiFiAp *apFeature = nullptr;
@@ -1190,15 +1190,15 @@ HWTEST_F(WifiHalTest, GetAsscociatedStas001, TestSize.Level1)
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_NE(nullptr, apFeature);
-    ret = apFeature->getAsscociatedStas(nullptr, staInfo, MAX_ASSOC_STA_NUM, &num);
+    ret = apFeature->getAssociatedStas(nullptr, staInfo, MAX_ASSOC_STA_NUM, &num);
     EXPECT_NE(HDF_SUCCESS, ret);
-    ret = apFeature->getAsscociatedStas(apFeature, nullptr, MAX_ASSOC_STA_NUM, &num);
+    ret = apFeature->getAssociatedStas(apFeature, nullptr, MAX_ASSOC_STA_NUM, &num);
     EXPECT_NE(HDF_SUCCESS, ret);
-    ret = apFeature->getAsscociatedStas(apFeature, staInfo, 0, &num);
+    ret = apFeature->getAssociatedStas(apFeature, staInfo, 0, &num);
     EXPECT_NE(HDF_SUCCESS, ret);
-    ret = apFeature->getAsscociatedStas(apFeature, staInfo, MAX_ASSOC_STA_NUM, nullptr);
+    ret = apFeature->getAssociatedStas(apFeature, staInfo, MAX_ASSOC_STA_NUM, nullptr);
     EXPECT_NE(HDF_SUCCESS, ret);
-    ret = apFeature->getAsscociatedStas(apFeature, staInfo, MAX_ASSOC_STA_NUM, &num);
+    ret = apFeature->getAssociatedStas(apFeature, staInfo, MAX_ASSOC_STA_NUM, &num);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);

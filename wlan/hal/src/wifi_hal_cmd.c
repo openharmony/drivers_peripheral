@@ -183,10 +183,10 @@ int32_t HalCmdSetTxPower(const char *ifName, int32_t power)
     return ret;
 }
 
-int32_t HalCmdGetAsscociatedStas(const char *ifName, struct StaInfo *staInfo, uint32_t count, uint32_t *num)
+int32_t HalCmdGetAssociatedStas(const char *ifName, struct StaInfo *staInfo, uint32_t count, uint32_t *num)
 {
     if (num == NULL) {
-        HDF_LOGE("%s: HalCmdGetAsscociatedStas num NULL!", __FUNCTION__);
+        HDF_LOGE("%s: HalCmdGetAssociatedStas num NULL!", __FUNCTION__);
         return HDF_FAILURE;
     }
     int32_t ret;
