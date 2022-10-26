@@ -1151,7 +1151,7 @@ static int32_t RenderWriteiMmap(const struct AudioHwRenderParam *handleData, str
     uint32_t looper = 0;
     uint32_t copyLen;
     int32_t count = 0;
-    struct AudioMmapBufferDescripter *mmapBufDesc = NULL;
+    struct AudioMmapBufferDescriptor *mmapBufDesc = NULL;
 
     if (handleData == NULL || cardIns == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -1163,7 +1163,7 @@ static int32_t RenderWriteiMmap(const struct AudioHwRenderParam *handleData, str
         AUDIO_FUNC_LOGE("frame size = 0!");
         return HDF_FAILURE;
     }
-    mmapBufDesc = (struct AudioMmapBufferDescripter *)&(handleData->frameRenderMode.mmapBufDesc);
+    mmapBufDesc = (struct AudioMmapBufferDescriptor *)&(handleData->frameRenderMode.mmapBufDesc);
     totalSize = (uint32_t)mmapBufDesc->totalBufferFrames * frameSize;
     lastBuffSize = ((totalSize % MIN_PERIOD_SIZE) == 0) ? MIN_PERIOD_SIZE : (totalSize % MIN_PERIOD_SIZE);
     loopTimes = (lastBuffSize == MIN_PERIOD_SIZE) ? (totalSize / MIN_PERIOD_SIZE) : (totalSize / MIN_PERIOD_SIZE + 1);

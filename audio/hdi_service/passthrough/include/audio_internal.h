@@ -160,7 +160,7 @@ struct AudioFrameRenderMode {
     void *cookie;
     CallbackProcessFunc callbackProcess;
     AudioHandle renderhandle;
-    struct AudioMmapBufferDescripter mmapBufDesc;
+    struct AudioMmapBufferDescriptor mmapBufDesc;
 };
 
 struct AudioGain {
@@ -286,7 +286,7 @@ struct AudioFrameCaptureMode {
     char *buffer;
     uint64_t bufferFrameSize;
     uint64_t bufferSize;
-    struct AudioMmapBufferDescripter mmapBufDesc;
+    struct AudioMmapBufferDescriptor mmapBufDesc;
 };
 
 struct AudioHwCaptureParam {
@@ -493,7 +493,7 @@ int32_t AudioRenderGetChannelMode(struct IAudioRender *self, enum AudioChannelMo
 int32_t AudioRenderSetExtraParams(struct IAudioRender *self, const char *keyValueList);
 int32_t AudioRenderGetExtraParams(struct IAudioRender *self, char *keyValueList, uint32_t keyValueListLen);
 int32_t AudioRenderReqMmapBuffer(
-    struct IAudioRender *self, int32_t reqSize, const struct AudioMmapBufferDescripter *desc);
+    struct IAudioRender *self, int32_t reqSize, const struct AudioMmapBufferDescriptor *desc);
 int32_t AudioRenderGetMmapPosition(struct IAudioRender *self, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioRenderTurnStandbyMode(struct IAudioRender *self);
 int32_t AudioRenderAudioDevDump(struct IAudioRender *self, int32_t range, int32_t fd);
@@ -524,7 +524,7 @@ int32_t AudioCaptureGetCapturePosition(struct IAudioCapture *self, uint64_t *fra
 int32_t AudioCaptureSetExtraParams(struct IAudioCapture *self, const char *keyValueList);
 int32_t AudioCaptureGetExtraParams(struct IAudioCapture *self, char *keyValueList, uint32_t keyValueListLen);
 int32_t AudioCaptureReqMmapBuffer(
-    struct IAudioCapture *self, int32_t reqSize, const struct AudioMmapBufferDescripter *desc);
+    struct IAudioCapture *self, int32_t reqSize, const struct AudioMmapBufferDescriptor *desc);
 int32_t AudioCaptureGetMmapPosition(struct IAudioCapture *self, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioCaptureTurnStandbyMode(struct IAudioCapture *self);
 int32_t AudioCaptureAudioDevDump(struct IAudioCapture *self, int32_t range, int32_t fd);

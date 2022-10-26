@@ -75,7 +75,7 @@ int32_t AudioProxyRenderSetChannelMode(struct AudioRender *render, enum AudioCha
 int32_t AudioProxyRenderGetChannelMode(struct AudioRender *render, enum AudioChannelMode *mode);
 int32_t AudioProxyRenderSetExtraParams(AudioHandle render, const char *keyValueList);
 int32_t AudioProxyRenderGetExtraParams(AudioHandle render, char *keyValueList, int32_t listLenth);
-int32_t AudioProxyRenderReqMmapBuffer(AudioHandle render, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
+int32_t AudioProxyRenderReqMmapBuffer(AudioHandle render, int32_t reqSize, struct AudioMmapBufferDescriptor *desc);
 int32_t AudioProxyRenderGetMmapPosition(AudioHandle render, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioProxyRenderTurnStandbyMode(AudioHandle render);
 int32_t AudioProxyRenderAudioDevDump(AudioHandle render, int32_t range, int32_t fd);
@@ -111,7 +111,7 @@ int32_t AudioProxyCaptureGetCapturePosition(struct AudioCapture *capture,
 int32_t AudioProxyCaptureSetExtraParams(AudioHandle capture, const char *keyValueList);
 int32_t AudioProxyCaptureGetExtraParams(const AudioHandle capture, char *keyValueList, int32_t listLenth);
 int32_t AudioProxyCaptureReqMmapBuffer(const AudioHandle capture,
-    int32_t reqSize, struct AudioMmapBufferDescripter *desc);
+    int32_t reqSize, struct AudioMmapBufferDescriptor *desc);
 int32_t AudioProxyCaptureGetMmapPosition(const AudioHandle capture, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioProxyCaptureTurnStandbyMode(const AudioHandle capture);
 int32_t AudioProxyCaptureAudioDevDump(AudioHandle capture, int32_t range, int32_t fd);

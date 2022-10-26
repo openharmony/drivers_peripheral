@@ -345,7 +345,7 @@ enum AudioCallbackType {
 /**
  * @brief Describes a mmap buffer.
  */
-struct AudioMmapBufferDescripter {
+struct AudioMmapBufferDescriptor {
     void *memoryAddress;                 /**< Pointer to the mmap buffer */
     int32_t memoryFd;                    /**< File descriptor of the mmap buffer */
     int32_t totalBufferFrames;           /**< Total size of the mmap buffer (unit: frame )*/

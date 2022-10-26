@@ -1666,7 +1666,7 @@ HWTEST_F(AudioUsbRenderTest, AudioRenderReqMmapBuffer_001, TestSize.Level1)
     int32_t ret = -1;
     bool isRender = true;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioRender *render = nullptr;
     struct AudioAdapter *adapter = nullptr;
     struct AudioSampleAttributes attrs = {};

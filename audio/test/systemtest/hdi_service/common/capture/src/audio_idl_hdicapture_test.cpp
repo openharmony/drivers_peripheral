@@ -400,7 +400,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBuffer_001, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     ASSERT_NE(nullptr, capture);
     int32_t ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -425,7 +425,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBuffer_002, TestSize.Level1)
     int32_t ret;
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     ASSERT_NE(nullptr, capture);
     ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -448,7 +448,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBuffer_003, TestSize.Level1)
     int32_t ret;
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     ASSERT_NE(nullptr, capture);
     ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -473,7 +473,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBuffer_004, TestSize.Level1)
     int32_t ret;
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     ASSERT_NE(nullptr, capture);
     ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -494,7 +494,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBuffer_005, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     ASSERT_NE(nullptr, capture);
     int32_t ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -517,7 +517,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBufferNull_006, TestSize.Lev
     int32_t ret;
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct IAudioCapture *captureNull = nullptr;
     ASSERT_NE(nullptr, capture);
     ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
@@ -538,7 +538,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBufferNull_007, TestSize.Lev
 {
     int32_t ret;
     uint32_t reqSize = 0;
-    struct AudioMmapBufferDescripter *descNull = nullptr;
+    struct AudioMmapBufferDescriptor *descNull = nullptr;
     ASSERT_NE(nullptr, capture);
     reqSize = FILE_CAPTURE_SIZE;
     ret = capture->Start(capture);

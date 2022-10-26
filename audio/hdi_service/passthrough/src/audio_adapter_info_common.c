@@ -1015,7 +1015,7 @@ int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count, struct Ext
 }
 
 int32_t SetDescParam(
-    struct AudioMmapBufferDescripter *desc, FILE *fp, int32_t reqSize, int64_t *fileSize, int32_t *flags)
+    struct AudioMmapBufferDescriptor *desc, FILE *fp, int32_t reqSize, int64_t *fileSize, int32_t *flags)
 {
     if (fp == NULL || desc == NULL || fileSize == NULL || flags == NULL) {
         AUDIO_FUNC_LOGE("Invalid parameter!");

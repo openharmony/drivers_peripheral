@@ -932,7 +932,7 @@ int32_t AudioCaptureGetExtraParams(const AudioHandle handle, char *keyValueList,
 }
 
 static int32_t AudioCaptureReqMmapBufferInit(struct AudioHwCapture *capture, int32_t reqSize,
-    struct AudioMmapBufferDescripter *desc)
+    struct AudioMmapBufferDescriptor *desc)
 {
     if (capture == NULL || capture->devDataHandle == NULL || desc == NULL) {
         AUDIO_FUNC_LOGE("capture or capture->devDataHandle or desc is null!");
@@ -984,7 +984,7 @@ static int32_t AudioCaptureReqMmapBufferInit(struct AudioHwCapture *capture, int
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t AudioCaptureReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc)
+int32_t AudioCaptureReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {

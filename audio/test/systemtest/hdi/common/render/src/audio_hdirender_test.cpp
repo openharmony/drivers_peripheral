@@ -648,7 +648,7 @@ HWTEST_F(AudioHdiRenderTest, AudioRenderReqMmapBuffer_001, TestSize.Level1)
     int32_t ret = -1;
     bool isRender = true;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioRender *render = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
@@ -691,7 +691,7 @@ HWTEST_F(AudioHdiRenderTest, AudioRenderReqMmapBuffer_002, TestSize.Level1)
     int32_t ret = -1;
     bool isRender = true;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioRender *render = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
@@ -726,7 +726,7 @@ HWTEST_F(AudioHdiRenderTest, AudioRenderReqMmapBuffer_003, TestSize.Level1)
     int32_t ret = -1;
     bool isRender = true;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioRender *render = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
@@ -765,7 +765,7 @@ HWTEST_F(AudioHdiRenderTest, AudioRenderReqMmapBuffer_004, TestSize.Level1)
     bool isRender = true;
     int32_t reqSize = 0;
     ASSERT_NE(nullptr, manager);
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioRender *render = nullptr;
     struct AudioAdapter *adapter = nullptr;
     FILE *fp = fopen(LOW_LATENCY_AUDIO_FILE.c_str(), "rb+");
@@ -799,7 +799,7 @@ HWTEST_F(AudioHdiRenderTest, AudioRenderReqMmapBuffer_005, TestSize.Level1)
     int32_t ret = -1;
     bool isRender = true;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioRender *render = nullptr;
     struct AudioAdapter *adapter = nullptr;
     FILE *fp = fopen(LOW_LATENCY_AUDIO_FILE.c_str(), "rb+");
@@ -833,7 +833,7 @@ HWTEST_F(AudioHdiRenderTest, AudioRenderReqMmapBuffer_006, TestSize.Level1)
     int32_t ret = -1;
     bool isRender = true;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioRender *render = nullptr;
     struct AudioRender *renderNull = nullptr;
     ASSERT_NE(nullptr, manager);
@@ -868,8 +868,8 @@ HWTEST_F(AudioHdiRenderTest, AudioRenderReqMmapBuffer_007, TestSize.Level1)
     int32_t ret = -1;
     bool isRender = true;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
-    struct AudioMmapBufferDescripter *descNull = nullptr;
+    struct AudioMmapBufferDescriptor desc = {};
+    struct AudioMmapBufferDescriptor *descNull = nullptr;
     struct AudioRender *render = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);

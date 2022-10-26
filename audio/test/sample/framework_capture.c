@@ -372,7 +372,7 @@ static int32_t FrameStartCaptureMmap(const AudioHandle param)
     }
     struct StrParaCapture *strParam = (struct StrParaCapture *)param;
     struct AudioCapture *capture = strParam->capture;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     // Modify file size
 
     int fd = fileno(strParam->file);

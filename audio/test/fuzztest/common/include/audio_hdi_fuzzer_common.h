@@ -104,7 +104,7 @@ int32_t AudioGetManagerCreateCapture(TestAudioManager *&manager, struct AudioAda
 int32_t AudioGetManagerCreateStartCapture(TestAudioManager *&manager, struct AudioAdapter **adapter,
     struct AudioCapture **capture);
 
-int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescripter &desc, int32_t &reqSize, bool flag);
+int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescriptor &desc, int32_t &reqSize, bool flag);
 }
 }
 #endif // AUDIO_HDI_FUZZER_COMMON_H

@@ -728,7 +728,7 @@ int32_t HdiServiceCaptureReqMmapBuffer(const struct HdfDeviceIoClient *client,
         return ret;
     }
 
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     int32_t reqSize = 0;
     if (!HdfSbufReadInt32(data, &reqSize)) {
         return AUDIO_HAL_ERR_INTERNAL;

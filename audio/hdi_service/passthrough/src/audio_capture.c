@@ -879,7 +879,7 @@ int32_t AudioCaptureGetExtraParams(struct IAudioCapture *handle, char *keyValueL
 }
 
 static int32_t AudioCaptureReqMmapBufferInit(
-    struct AudioHwCapture *capture, int32_t reqSize, const struct AudioMmapBufferDescripter *tempDesc)
+    struct AudioHwCapture *capture, int32_t reqSize, const struct AudioMmapBufferDescriptor *tempDesc)
 {
     if (capture == NULL || capture->devDataHandle == NULL || tempDesc == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -887,7 +887,7 @@ static int32_t AudioCaptureReqMmapBufferInit(
     }
     int32_t flags = 0;
     int64_t fileSize = 0;
-    struct AudioMmapBufferDescripter desc = *tempDesc;
+    struct AudioMmapBufferDescriptor desc = *tempDesc;
     uint32_t formatBits = 0;
     int32_t ret = FormatToBits(capture->captureParam.frameCaptureMode.attrs.format, &formatBits);
     if (ret < 0) {
@@ -930,7 +930,7 @@ static int32_t AudioCaptureReqMmapBufferInit(
 }
 
 int32_t AudioCaptureReqMmapBuffer(
-    struct IAudioCapture *handle, int32_t reqSize, const struct AudioMmapBufferDescripter *desc)
+    struct IAudioCapture *handle, int32_t reqSize, const struct AudioMmapBufferDescriptor *desc)
 {
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL || capture->devDataHandle == NULL || desc == NULL) {

@@ -1001,7 +1001,7 @@ int32_t HdiServicePositionWrite(struct HdfSBuf *reply,
     return HDF_SUCCESS;
 }
 
-int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescripter *desc, struct HdfSBuf *data)
+int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescriptor *desc, struct HdfSBuf *data)
 {
     int32_t ret;
     if (desc == NULL || data == NULL) {
