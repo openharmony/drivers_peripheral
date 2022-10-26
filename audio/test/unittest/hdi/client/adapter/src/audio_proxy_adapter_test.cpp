@@ -451,4 +451,11 @@ HWTEST_F(AudioProxyAdapterTest, AdapterGetExtraParams_002, TestSize.Level1)
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioProxyAdapterGetExtraParams(adapter, key, condition, value, length));
     hwAdapter->proxyRemoteHandle = proxyRemoteHandle;
 }
+
+HWTEST_F(AudioProxyAdapterTest, AdapterSetVoiceVolume_001, TestSize.Level1)
+{
+    ASSERT_NE(adapter, nullptr);
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, AudioProxyAdapterSetVoiceVolume(adapter, volume));
+}
 }
