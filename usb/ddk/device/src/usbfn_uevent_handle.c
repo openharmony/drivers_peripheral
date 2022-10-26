@@ -14,12 +14,12 @@
  */
 #include "ddk_uevent_handle.h"
 
-#include <string.h>
-#include <unistd.h>
+#include <linux/netlink.h>
 #include <pthread.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <linux/netlink.h>
+#include <unistd.h>
 
 #include "ddk_pnp_listener_mgr.h"
 #include "default_config.h"
@@ -50,28 +50,28 @@ struct UsbFnUeventInfo {
 static void UsbFnDispatchUevent(const struct UsbFnUeventInfo *info)
 {
     bool isGadgetConnect = strcmp(info->devPath, USB_GADGET_UEVENT_PATH) == 0;
-        isGadgetConnect = isGadgetConnect && strcmp(info->usbState, "CONNECTED") == 0;
+    isGadgetConnect = (isGadgetConnect && strcmp(info->usbState, "CONNECTED") == 0);
     if (isGadgetConnect) {
         DdkListenerMgrNotifyAll(NULL, USB_PNP_DRIVER_GADGET_ADD);
         return;
     }
 
     bool isGadgetDisconnect = strcmp(info->devPath, USB_GADGET_UEVENT_PATH) == 0;
-        isGadgetDisconnect = isGadgetDisconnect && strcmp(info->usbState, "DISCONNECTED") == 0;
+    isGadgetDisconnect = (isGadgetDisconnect && strcmp(info->usbState, "DISCONNECTED") == 0);
     if (isGadgetDisconnect) {
         DdkListenerMgrNotifyAll(NULL, USB_PNP_DRIVER_GADGET_REMOVE);
         return;
     }
 
     bool isPort2Device = strcmp(info->subSystem, "dual_role_usb") == 0;
-        isPort2Device = isPort2Device && strcmp(info->dualRoleMode, "ufp") == 0;
+    isPort2Device = (isPort2Device && strcmp(info->dualRoleMode, "ufp") == 0);
     if (isPort2Device) {
         DdkListenerMgrNotifyAll(NULL, USB_PNP_DRIVER_PORT_DEVICE);
         return;
     }
 
     bool isPort2Host = strcmp(info->subSystem, "dual_role_usb") == 0;
-        isPort2Host = isPort2Host && strcmp(info->dualRoleMode, "dfp") == 0;
+    isPort2Host = (isPort2Host && strcmp(info->dualRoleMode, "dfp") == 0);
     if (isPort2Host) {
         DdkListenerMgrNotifyAll(NULL, USB_PNP_DRIVER_PORT_HOST);
         return;
