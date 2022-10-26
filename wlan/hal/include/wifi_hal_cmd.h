@@ -34,7 +34,7 @@ int32_t HalCmdGetDevMacAddr(const char *ifName, int32_t type, unsigned char *mac
 int32_t HalCmdSetMacAddr(const char *ifName, unsigned char *mac, uint8_t len);
 int32_t HalCmdSetTxPower(const char *ifName, int32_t power);
 int32_t HalCmdSetCountryCode(const char *ifName, const char *code, uint32_t len);
-int32_t HalCmdGetAsscociatedStas(const char *ifName, struct StaInfo *staInfo, uint32_t count, uint32_t *num);
+int32_t HalCmdGetAssociatedStas(const char *ifName, struct StaInfo *staInfo, uint32_t count, uint32_t *num);
 int32_t HalCmdSetScanningMacAddress(const char *ifName, unsigned char *scanMac, uint8_t len);
 int32_t HalCmdGetValidFreqWithBand(const char *ifName, int32_t band, int32_t *freqs, uint32_t size, uint32_t *num);
 int32_t HalCmdGetChipId(const char *ifName, uint8_t *chipId);

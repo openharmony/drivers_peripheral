@@ -80,7 +80,7 @@ struct IWiFiAp {
      * @since 1.0
      * @version 1.0
      */
-    int32_t (*getAsscociatedStas)(const struct IWiFiAp *apFeature, struct StaInfo *staInfo,
+    int32_t (*getAssociatedStas)(const struct IWiFiAp *apFeature, struct StaInfo *staInfo,
         uint32_t count, uint32_t *num);
 
     /**
