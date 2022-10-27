@@ -158,6 +158,22 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetCapabilityTest_001, TestSize.Level1)
     PrintCapability(&cap, 0);
 }
 
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetCapabilityTest_002, TestSize.Level1)
+{
+    CodecCapability cap;
+    int32_t ret = g_codecObj->CodecGetCapability(g_codecObj, MEDIA_MIMETYPE_VIDEO_HEVC, VIDEO_DECODER, 0, &cap);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    PrintCapability(&cap, 0);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetCapabilityTest_003, TestSize.Level1)
+{
+    CodecCapability cap;
+    int32_t ret = g_codecObj->CodecGetCapability(g_codecObj, MEDIA_MIMETYPE_VIDEO_AVC, VIDEO_DECODER, 0, &cap);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    PrintCapability(&cap, 0);
+}
+
 HWTEST_F(CodecProxyTest, HdfCodecHdiV1InitCodecTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_codecObj != nullptr);
@@ -206,9 +222,57 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetCodecTypeTest_001, TestSize.Level1)
     params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
     ASSERT_TRUE(params != nullptr);
     params->key = KEY_CODEC_TYPE;
-    CodecType ct = VIDEO_DECODER;
-    params->val = (void *)&ct;
-    params->size = sizeof(ct);
+    CodecType type = VIDEO_DECODER;
+    params->val = (void *)&type;
+    params->size = sizeof(type);
+
+    int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
+    OsalMemFree(params);
+    ASSERT_EQ(errorCode, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetGopModeTest_001, TestSize.Level1)
+{
+    Param *params;
+    int paramCnt = 1;
+    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    ASSERT_TRUE(params != nullptr);
+    params->key = KEY_VIDEO_GOP_MODE;
+    VideoCodecGopMode mode = VID_CODEC_GOPMODE_NORMALP;
+    params->val = (void *)&mode;
+    params->size = sizeof(mode);
+
+    int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
+    OsalMemFree(params);
+    ASSERT_EQ(errorCode, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetMimeTypeTest_001, TestSize.Level1)
+{
+    Param *params;
+    int paramCnt = 1;
+    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    ASSERT_TRUE(params != nullptr);
+    params->key = KEY_MIMETYPE;
+    AvCodecMime mime = MEDIA_MIMETYPE_IMAGE_JPEG;
+    params->val = (void *)&mime;
+    params->size = sizeof(mime);
+
+    int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
+    OsalMemFree(params);
+    ASSERT_EQ(errorCode, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetPixelFormatTest_001, TestSize.Level1)
+{
+    Param *params;
+    int paramCnt = 1;
+    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    ASSERT_TRUE(params != nullptr);
+    params->key = KEY_PIXEL_FORMAT;
+    CodecPixelFormat format = PIXEL_FORMAT_YUV_422_I;
+    params->val = (void *)&format;
+    params->size = sizeof(format);
 
     int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
     OsalMemFree(params);
@@ -246,6 +310,53 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetSplitModeTest_001, TestSize.Level1)
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetSplitParseTest_001, TestSize.Level1)
+{
+    Param *params;
+    int paramCnt = 1;
+    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    ASSERT_TRUE(params != nullptr);
+    params->key = (ParamKey)ParamExtKey::KEY_EXT_SPLIT_PARSE_RK;
+    params->val = nullptr;
+    params->size = 0;
+
+    int32_t errorCode = g_codecObj->CodecGetParameter(g_codecObj, g_handle, params, paramCnt);
+    OsalMemFree(params);
+    ASSERT_EQ(errorCode, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetDecFrameNumTest_001, TestSize.Level1)
+{
+    Param *params;
+    int paramCnt = 1;
+    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    ASSERT_TRUE(params != nullptr);
+    params->key = (ParamKey)ParamExtKey::KEY_EXT_DEC_FRAME_NUM_RK;
+    int32_t frameNum = 1;
+    params->val = (void *)&frameNum;
+    params->size = sizeof(frameNum);
+
+    int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
+    OsalMemFree(params);
+    ASSERT_EQ(errorCode, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetDecFrameTest_001, TestSize.Level1)
+{
+    Param *params;
+    int paramCnt = 1;
+    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    ASSERT_TRUE(params != nullptr);
+    params->key = (ParamKey)ParamExtKey::KEY_EXT_DEC_FRAME_NUM_RK;
+    params->val = nullptr;
+    params->size = 0;
+
+    int32_t errorCode = g_codecObj->CodecGetParameter(g_codecObj, g_handle, params, paramCnt);
+    OsalMemFree(params);
+    ASSERT_EQ(errorCode, HDF_SUCCESS);
+}
+
+
 HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueInputTest_001, TestSize.Level1)
 {
     g_inputBuffer.id = 0;
@@ -264,8 +375,8 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueInputTest_001, TestSize.Level1)
     g_inputInfoData->buffer[0].capacity = TEST_PACKET_BUFFER_SIZE;
     g_inputInfoData->buffer[0].buf = (intptr_t)g_inputBuffer.fd;
 
-    int32_t errorCode = g_codecObj->CodecQueueInput(g_codecObj,
-        g_handle, g_inputInfoData, (uint32_t)QUEUE_TIME_OUT, -1);
+    int32_t errorCode = g_codecObj->CodecQueueInput(g_codecObj, g_handle, g_inputInfoData,
+        (uint32_t)QUEUE_TIME_OUT, -1);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
@@ -353,6 +464,24 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1FlushTest_001, TestSize.Level1)
     int32_t errorCode = g_codecObj->CodecFlush(g_codecObj, g_handle, directType);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
     ASSERT_EQ(directType, OUTPUT_TYPE);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1FlushTest_002, TestSize.Level1)
+{
+    DirectionType directType = INPUT_TYPE;
+
+    int32_t errorCode = g_codecObj->CodecFlush(g_codecObj, g_handle, directType);
+    ASSERT_EQ(errorCode, HDF_SUCCESS);
+    ASSERT_EQ(directType, INPUT_TYPE);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1FlushTest_003, TestSize.Level1)
+{
+    DirectionType directType = ALL_TYPE;
+
+    int32_t errorCode = g_codecObj->CodecFlush(g_codecObj, g_handle, directType);
+    ASSERT_EQ(errorCode, HDF_SUCCESS);
+    ASSERT_EQ(directType, ALL_TYPE);
 }
 
 HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetCallbackTest_001, TestSize.Level1)
