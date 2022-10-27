@@ -33,7 +33,7 @@ void BatteryLedTest::SetUpTestCase(void)
     BatteryConfig::GetInstance().ParseConfig(VENDOR_BATTERY_CONFIG_PATH);
     g_led.InitLight();
 
-    GTEST_LOG_(INFO) << "available battery light " << g_led.isAvailable();
+    GTEST_LOG_(INFO) << "available battery light " << g_led.IsAvailable();
 }
 
 void BatteryLedTest::TearDown(void)
@@ -48,7 +48,7 @@ void BatteryLedTest::TearDown(void)
  */
 HWTEST_F (BatteryLedTest, BatteryLight001, TestSize.Level1)
 {
-    if (!g_led.isAvailable()) {
+    if (!g_led.IsAvailable()) {
         return;
     }
     GTEST_LOG_(INFO) << "initial:" << g_led.GetLightColor();
@@ -70,7 +70,7 @@ HWTEST_F (BatteryLedTest, BatteryLight001, TestSize.Level1)
  */
 HWTEST_F (BatteryLedTest, BatteryLight002, TestSize.Level1)
 {
-    if (!g_led.isAvailable()) {
+    if (!g_led.IsAvailable()) {
         return;
     }
     GTEST_LOG_(INFO) << "initial:" << g_led.GetLightColor();
@@ -87,7 +87,7 @@ HWTEST_F (BatteryLedTest, BatteryLight002, TestSize.Level1)
  */
 HWTEST_F (BatteryLedTest, BatteryLight003, TestSize.Level1)
 {
-    if (!g_led.isAvailable()) {
+    if (!g_led.IsAvailable()) {
         return;
     }
     GTEST_LOG_(INFO) << "initial:" << g_led.GetLightColor();
@@ -104,7 +104,7 @@ HWTEST_F (BatteryLedTest, BatteryLight003, TestSize.Level1)
  */
 HWTEST_F (BatteryLedTest, BatteryLight004, TestSize.Level1)
 {
-    if (!g_led.isAvailable()) {
+    if (!g_led.IsAvailable()) {
         return;
     }
     GTEST_LOG_(INFO) << "initial:" << g_led.GetLightColor();
@@ -121,7 +121,7 @@ HWTEST_F (BatteryLedTest, BatteryLight004, TestSize.Level1)
  */
 HWTEST_F (BatteryLedTest, BatteryLight005, TestSize.Level1)
 {
-    if (!g_led.isAvailable()) {
+    if (!g_led.IsAvailable()) {
         return;
     }
     GTEST_LOG_(INFO) << "initial:" << g_led.GetLightColor();
