@@ -40,7 +40,6 @@ const std::string MOCK_BACKLIGHT_PATH = "/data/service/el0/display/brightness";
 std::string g_backlightNode = "backlight";
 }
 
-
 BatteryBacklight::BatteryBacklight()
 {
     InitDefaultSysfs();
@@ -130,11 +129,11 @@ void BatteryBacklight::CreateFile(const std::string& path, const std::string& co
         BATTERY_HILOGD(FEATURE_CHARGING, "Cannot create file %{private}s", path.c_str());
         return;
     }
-    stream << content.c_str() << std::endl;
+    stream << content << std::endl;
     stream.close();
 }
 
-void BatteryBacklight::InitDefaultSysfs() const
+void BatteryBacklight::InitDefaultSysfs()
 {
     BATTERY_HILOGI(FEATURE_CHARGING, "create default brightness path");
     CreateFile(MOCK_BACKLIGHT_PATH, "127");
