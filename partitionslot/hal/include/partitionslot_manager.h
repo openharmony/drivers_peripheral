@@ -34,7 +34,7 @@ public:
 
 private:
     int32_t WriteSlot(int fd, int32_t slot, off_t offset, off_t size);
-    int ReadMisc(const std::string &miscDevice, off_t offset, off_t size);
+    int ReadMisc(off_t offset, off_t size);
     int WriteSlotToMisc(int32_t slot, off_t offset, off_t size);
 };
 } // V1_0
