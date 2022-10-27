@@ -539,7 +539,6 @@ HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_002, TestSize.Level1)
     sleep(1);
     if (audiopara.capture != nullptr) {
         FrameStatus(0);
-        sleep(1);
         ret = audiopara.capture->control.Pause((AudioHandle)(audiopara.capture));
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         sleep(1);
@@ -675,14 +674,9 @@ HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_006, TestSize.Level1)
     int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    sleep(1);
     if (audiopara.capture != nullptr) {
-        FrameStatus(0);
-        usleep(300000);
         ret = audiopara.capture->attr.SetSampleAttributes(audiopara.capture, &attrs);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        usleep(300000);
-        FrameStatus(1);
         sleep(1);
         ret = audiopara.capture->attr.GetSampleAttributes(audiopara.capture, &attrsValue);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
