@@ -60,7 +60,7 @@ void DrmCrtc::UnBindDisplay(uint32_t id)
     }
 }
 
-bool DrmCrtc::CanBind()
+bool DrmCrtc::CanBind() const
 {
     return (mDisplayId == INVALIDE_DISPLAY_ID);
 }

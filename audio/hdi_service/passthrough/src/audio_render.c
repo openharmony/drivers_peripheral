@@ -1032,11 +1032,8 @@ static int32_t AudioRenderReqMmapBufferInit(
     if (ret < 0) {
         return ret;
     }
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(desc.filePath, pathBuf) == NULL) {
-        return AUDIO_ERR_INTERNAL;
-    }
-    FILE *fp = fopen(pathBuf, "rb+");
+
+    FILE *fp = fopen(desc.filePath, "rb+");
     if (fp == NULL) {
         AUDIO_FUNC_LOGE("Open file failed!");
         return AUDIO_ERR_INTERNAL;
@@ -1189,8 +1186,8 @@ int32_t CallbackProcessing(AudioHandle handle, enum AudioCallbackType callBackTy
 
     bool isCallBack = false;
     switch (callBackType) {
-        case AUDIO_NONBLOCK_WRITE_COMPELETED:
-        case AUDIO_DRAIN_COMPELETED:
+        case AUDIO_NONBLOCK_WRITE_COMPLETED:
+        case AUDIO_DRAIN_COMPLETED:
         case AUDIO_FLUSH_COMPLETED:
         case AUDIO_RENDER_FULL:
         case AUDIO_ERROR_OCCUR:

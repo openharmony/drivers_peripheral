@@ -37,12 +37,12 @@ int32_t CodecOMXCore::Init(const std::string &libName)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    init_ = (InitFunc)dlsym(libHandle_, "OMX_Init");
-    deInit_ = (DeinitFunc)dlsym(libHandle_, "OMX_Deinit");
-    getHandle_ = (GetHandleFunc)dlsym(libHandle_, "OMX_GetHandle");
-    freeHandle_ = (FreeHandleFunc)dlsym(libHandle_, "OMX_FreeHandle");
-    getRoles_ = (GetRolesOfComponentFunc)dlsym(libHandle_, "OMX_GetRolesOfComponent");
-    componentNameEnum_ = (ComponentNameEnumFunc)dlsym(libHandle_, "OMX_ComponentNameEnum");
+    init_ = static_cast<InitFunc>(dlsym(libHandle_, "OMX_Init"));
+    deInit_ = static_cast<DeinitFunc>(dlsym(libHandle_, "OMX_Deinit"));
+    getHandle_ = static_cast<GetHandleFunc>(dlsym(libHandle_, "OMX_GetHandle"));
+    freeHandle_ = static_cast<FreeHandleFunc>(dlsym(libHandle_, "OMX_FreeHandle"));
+    getRoles_ = static_cast<GetRolesOfComponentFunc>(dlsym(libHandle_, "OMX_GetRolesOfComponent"));
+    componentNameEnum_ = static_cast<ComponentNameEnumFunc>(dlsym(libHandle_, "OMX_ComponentNameEnum"));
 
     if (init_ != NULL) {
         (*(init_))();

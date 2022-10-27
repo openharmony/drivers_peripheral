@@ -221,6 +221,7 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
         HDF_LOGE("%{public}s:funcs invalid", __func__);
         return HDF_FAILURE;
     }
+
     uint32_t kfuns = funcs & (~USB_FUNCTION_ACM_ECM);
     if (UsbdFunction::SetFunctionToNone()) {
         HDF_LOGW("%{public}s:setFunctionToNone error", __func__);

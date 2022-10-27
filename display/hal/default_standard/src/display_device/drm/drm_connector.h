@@ -43,7 +43,7 @@ public:
     {
         return &mModeInfo;
     }
-    void ConvertToHdiMode(DisplayModeInfo &hdiMode);
+    void ConvertToHdiMode(DisplayModeInfo &hdiMode) const;
 
 private:
     drmModeModeInfo mModeInfo = { 0 };
@@ -66,7 +66,7 @@ private:
 
 class DrmConnector {
 public:
-    DrmConnector(drmModeConnector c, FdPtr &fd);
+    DrmConnector(drmModeConnector c, const FdPtr &fd);
     virtual ~DrmConnector() {}
     uint32_t GetId() const
     {
@@ -99,9 +99,9 @@ public:
         return mDpmsState;
     }
     int32_t SetDpmsState(uint64_t dmps);
-    bool IsConnected();
+    bool IsConnected() const;
 
-    int32_t GetBrightness(uint32_t& level);
+    int32_t GetBrightness(uint32_t& level) const;
     int32_t SetBrightness(uint32_t level);
 
 private:

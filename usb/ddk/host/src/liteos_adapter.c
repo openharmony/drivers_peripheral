@@ -72,7 +72,7 @@ OUT:
     return mem;
 }
 
-static bool UsbFindUrb(struct Async *urb, struct DListHead *list)
+static bool UsbFindUrb(const struct Async *urb, struct DListHead *list)
 {
     bool findFlag = false;
     struct OsDev *osDev = CONTAINER_OF(list, struct OsDev, asyncCompleted);
@@ -96,12 +96,12 @@ static void OsUrbComplete(UsbAdapterUrb *urb)
     struct Async *as = CONTAINER_OF(urb, struct Async, urb);
     struct UsbDevice *dev = as->dev;
     if (dev == NULL) {
-        DPRINTFN(0, "--dev:%p\n", dev);
+        DPRINTFN(0, "dev is null\n");
         return;
     }
     struct OsDev *osDev = (struct OsDev *)dev->privateData;
     if (osDev == NULL) {
-        DPRINTFN(0, "--osDev:%p\n", osDev);
+        DPRINTFN(0, "osDev is null\n");
         return;
     }
     as->state = URB_REAP_STATE;
@@ -135,13 +135,12 @@ static int32_t OsSubmitUrb(UsbAdapterUrb *urb, UsbAdapterDevice *adapterDevice, 
 
 static int32_t OsControlMsg(UsbAdapterUrb *urb)
 {
-    int32_t err;
     uint16_t actLen = 0;
     UsbAdapterDevice *adapterDevice = urb->dev;
     void *buffer = urb->transfer_buffer;
     UsbAdapterDeviceRequest req;
 
-    err = memcpy_s(&req, sizeof(UsbAdapterDeviceRequest), buffer, sizeof(req));
+    int32_t err = memcpy_s(&req, sizeof(UsbAdapterDeviceRequest), buffer, sizeof(UsbAdapterDeviceRequest));
     if (err != EOK) {
         DPRINTFN(0, "%s:%d err=%d\n", __func__, __LINE__, err);
         err = HDF_ERR_IO;
@@ -482,7 +481,7 @@ static void OsDiscardUrbs(const struct UsbHostRequest *request, int32_t first, i
         if (as->state == URB_SUBMIT_STATE) {
             DPRINTFN(0, "usb kill urb\n");
             usb_kill_urb(urb);
-            DPRINTFN(0, "%s:%d discard request%p+as:%p\n", __func__, __LINE__, request, as);
+            DPRINTFN(0, "%s:%d discard request\n", __func__, __LINE__);
         }
     }
 }

@@ -56,6 +56,18 @@ static int32_t GetInitRenderParaAttrs(struct HdfSBuf *data, struct AudioSampleAt
         return HDF_FAILURE;
     }
     attrs->isBigEndian = (bool)tempRenderPara;
+
+    if (!HdfSbufReadUint32(data, &tempRenderPara)) {
+        AUDIO_FUNC_LOGE("read attrs isSignedData fail");
+        return HDF_FAILURE;
+    }
+    attrs->isSignedData = (bool)tempRenderPara;
+
+    if (!HdfSbufReadInt32(data, &attrs->streamId)) {
+        AUDIO_FUNC_LOGE("read streamId fail");
+        return HDF_FAILURE;
+    }
+
     return HDF_SUCCESS;
 }
 
@@ -84,14 +96,11 @@ static int32_t GetInitRenderPara(struct HdfSBuf *data, struct AudioDeviceDescrip
         return HDF_FAILURE;
     }
     attrs->interleaved = (bool)tempRenderPara;
+
     if (GetInitRenderParaAttrs(data, attrs) < 0) {
         return HDF_FAILURE;
     }
-    if (!HdfSbufReadUint32(data, &tempRenderPara)) {
-        AUDIO_FUNC_LOGE("read attrs isSignedData fail");
-        return HDF_FAILURE;
-    }
-    attrs->isSignedData = (bool)tempRenderPara;
+
     if (!HdfSbufReadUint32(data, &devDesc->portId)) {
         AUDIO_FUNC_LOGE("read portId fail");
         return HDF_FAILURE;

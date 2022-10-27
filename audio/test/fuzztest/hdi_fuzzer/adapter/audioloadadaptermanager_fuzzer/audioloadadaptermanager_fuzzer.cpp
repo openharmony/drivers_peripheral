@@ -31,13 +31,13 @@ bool AudioLoadadapterManagerFuzzTest(const uint8_t *data, size_t size)
     struct AudioAdapterDescriptor *descs = nullptr;
     int sizeone = 0;
     ret = loadAdapterFuzzManager->GetAllAdapters(loadAdapterFuzzManager, &descs, &sizeone);
-    if (ret < 0 || loadAdapterFuzzManager == nullptr) {
+    if (ret < 0) {
         HDF_LOGE("%{public}s: GetAllAdapters failed \n", __func__);
         return false;
     }
     struct AudioAdapterDescriptor *desc = &descs[0];
     struct AudioAdapter *adapter = nullptr;
-    TestAudioManager *managerFuzz = (TestAudioManager *)data;
+    TestAudioManager *managerFuzz = reinterpret_cast<TestAudioManager *>(const_cast<uint8_t *>(data));
     ret = loadAdapterFuzzManager->LoadAdapter(managerFuzz, desc, &adapter);
     if (ret == HDF_SUCCESS) {
         result = true;

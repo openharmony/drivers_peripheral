@@ -29,28 +29,26 @@ enum class MyOptIndex {
 };
 
 static struct option g_longOptions[] = {
-    {"width",  required_argument, nullptr, (int)MyOptIndex::OPT_INDEX_WIDTH        },
-    {"height", required_argument, nullptr, (int)MyOptIndex::OPT_INDEX_HEIGHT       },
-    {"in",     required_argument, nullptr, (int)MyOptIndex::OPT_INDEX_INPUT        },
-    {"out",    required_argument, nullptr, (int)MyOptIndex::OPT_INDEX_OUTPUT       },
-    {"color",  optional_argument, nullptr, (int)MyOptIndex::OPT_INDEX_COLOR        },
-    {"nocopy", no_argument,       nullptr, (int)MyOptIndex::OPT_INDEX_BUFFER_HANDLE},
-    {"HEVC",   no_argument,       nullptr, (int)MyOptIndex::OPT_INDEX_HEVC         },
-    {"help",   no_argument,       nullptr, (int)MyOptIndex::OPT_INDEX_HELP         },
-    {nullptr,  0,                 nullptr, (int)MyOptIndex::OPT_INDEX_UNKONWN      }
-};
-} // namespace
+    {"width", required_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_WIDTH)},
+    {"height", required_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HEIGHT)},
+    {"in", required_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_INPUT)},
+    {"out", required_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_OUTPUT)},
+    {"color", optional_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_COLOR)},
+    {"nocopy", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_BUFFER_HANDLE)},
+    {"HEVC", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HEVC)},
+    {"help", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HELP)},
+    {nullptr, 0, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_UNKONWN)}};
+}  // namespace
 
 bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
 {
-    int c = 0;
     while (1) {
         int optionIndex = 0;
-        c = getopt_long(argc, argv, "c::i:o:w:h:", g_longOptions, &optionIndex);
+        int c = getopt_long(argc, argv, "c::i:o:w:h:", g_longOptions, &optionIndex);
         if (c == -1) {
             break;
         }
-        MyOptIndex index = (MyOptIndex)c;
+        MyOptIndex index = static_cast<MyOptIndex>(c);
         switch (index) {
             case MyOptIndex::OPT_INDEX_BUFFER_HANDLE:
                 opt.useBuffer = true;

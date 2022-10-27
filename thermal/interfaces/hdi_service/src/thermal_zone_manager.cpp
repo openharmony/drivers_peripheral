@@ -251,11 +251,9 @@ void ThermalZoneManager::CalculateMaxCd()
     }
 
     std::vector<int32_t> intervalList;
-    if (!sensorTypeMap_.empty()) {
-        for (auto sensorIter : sensorTypeMap_) {
-            intervalList.push_back(sensorIter.second->GetInterval());
-        }
-    }
+    std::transform(sensorTypeMap_.begin(), sensorTypeMap_.end(), std::back_inserter(intervalList),
+        [](auto& sensorIter) { return sensorIter.second->GetInterval(); });
+
     maxCd_ = GetIntervalCommonDivisor(intervalList);
     THERMAL_HILOGI(COMP_HDI, "maxCd_ %{public}d", maxCd_);
 }

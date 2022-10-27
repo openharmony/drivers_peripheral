@@ -13,7 +13,8 @@
     "name": "drivers_peripheral_input",
     "subsystem": "hdf",
     "features": [
-      "drivers_peripheral_input_feature_model"
+      "drivers_peripheral_input_feature_model",
+      "drivers_peripheral_input_feature_passthrough"
     ],
     "syscap": [ "" ],
     "adapter_system_type": ["standard", "small"],

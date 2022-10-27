@@ -24,7 +24,7 @@ namespace HDI {
 namespace DISPLAY {
 class DisplayModuleLoader {
 public:
-    static std::unique_ptr<DisplayModuleLoader> Create(const std::string pathName)
+    static std::unique_ptr<DisplayModuleLoader> Create(const std::string &pathName)
     {
         void *handle = dlopen(pathName.c_str(), RTLD_NOW | RTLD_NOLOAD);
         if (handle == nullptr) {
@@ -38,7 +38,7 @@ public:
 
     explicit DisplayModuleLoader(void *handle) : handle_(handle) {}
 
-    void *GetSymbol(const std::string symbol)
+    void *GetSymbol(const std::string &symbol)
     {
         return dlsym(handle_, symbol.c_str());
     }

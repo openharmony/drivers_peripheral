@@ -171,23 +171,23 @@ static int32_t GetAudioProxyAdapterFunc(struct AudioHwAdapter *hwAdapter)
     hwAdapter->common.SetMicMute = AudioProxyAdapterSetMicMute;
     hwAdapter->common.GetMicMute = AudioProxyAdapterGetMicMute;
     hwAdapter->common.SetVoiceVolume = AudioProxyAdapterSetVoiceVolume;
+    hwAdapter->common.SetExtraParams = AudioProxyAdapterSetExtraParams;
+    hwAdapter->common.GetExtraParams = AudioProxyAdapterGetExtraParams;
     hwAdapter->common.UpdateAudioRoute = AudioProxyAdapterUpdateAudioRoute;
     hwAdapter->common.ReleaseAudioRoute = AudioProxyAdapterReleaseAudioRoute;
     return HDF_SUCCESS;
 }
+
 static int32_t AudioProxyManagerLoadAdapterDispatch(struct AudioHwAdapter *hwAdapter,
     struct AudioProxyManager *proxyManager, const struct AudioAdapterDescriptor *desc,
     struct HdfSBuf *data, struct HdfSBuf *reply)
 {
+    int32_t ret = AUDIO_HAL_SUCCESS;
     if (hwAdapter == NULL || proxyManager == NULL || desc == NULL || data == NULL || reply == NULL) {
         AUDIO_FUNC_LOGE("param is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    int32_t ret = AudioAddAdapterAddrToList((AudioHandle)((&hwAdapter->common)), desc);
-    if (ret < 0) { // add for Fuzz test
-        AUDIO_FUNC_LOGE("The proxy AudioProxyAdapterAddrGet check Failed");
-        return ret;
-    }
+
     ret = AudioProxyDispatchCall(hwAdapter->proxyRemoteHandle, AUDIO_HDI_MGR_LOAD_ADAPTER, data, reply);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Failed to send service call!!");
@@ -198,6 +198,7 @@ static int32_t AudioProxyManagerLoadAdapterDispatch(struct AudioHwAdapter *hwAda
     }
     return AUDIO_HAL_SUCCESS;
 }
+
 int32_t AudioProxyManagerLoadAdapter(struct AudioManager *manager, const struct AudioAdapterDescriptor *desc,
     struct AudioAdapter **adapter)
 {
@@ -253,11 +254,7 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
     if (manager == NULL || adapter == NULL) {
         return;
     }
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxy Adapter address passed in is invalid");
-        return;
-    }
+    int32_t ret = AUDIO_HAL_SUCCESS;
 
     struct AudioProxyManager *proxyManager = CONTAINER_OF(manager, struct AudioProxyManager, impl);
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;

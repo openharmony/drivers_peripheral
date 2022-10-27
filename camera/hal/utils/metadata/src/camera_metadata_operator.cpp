@@ -35,13 +35,13 @@ uint32_t MaxAlignment(uint32_t dataAlignment, uint32_t metadataAlignment)
 
 uint8_t *GetMetadataData(const common_metadata_header_t *metadataHeader)
 {
-    return (uint8_t *)metadataHeader + metadataHeader->data_start;
+    return reinterpret_cast<uint8_t *>(metadataHeader) + metadataHeader->data_start;
 }
 
 camera_metadata_item_entry_t *GetMetadataItems(const common_metadata_header_t *metadataHeader)
 {
     return (camera_metadata_item_entry_t *)
-        ((uint8_t *)metadataHeader + metadataHeader->items_start);
+        (reinterpret_cast<uint8_t *>(metadataHeader) + metadataHeader->items_start);
 }
 
 common_metadata_header_t *FillCameraMetadata(common_metadata_header_t *buffer, size_t memoryRequired,
@@ -53,7 +53,7 @@ common_metadata_header_t *FillCameraMetadata(common_metadata_header_t *buffer, s
         return nullptr;
     }
 
-    common_metadata_header_t *metadataHeader = (common_metadata_header_t *)buffer;
+    common_metadata_header_t *metadataHeader = const_cast<common_metadata_header_t *>(buffer);
     metadataHeader->version = CURRENT_CAMERA_METADATA_VERSION;
     metadataHeader->size = memoryRequired;
     metadataHeader->item_count = 0;
@@ -61,8 +61,8 @@ common_metadata_header_t *FillCameraMetadata(common_metadata_header_t *buffer, s
     metadataHeader->items_start = AlignTo(sizeof(common_metadata_header_t), ITEM_ALIGNMENT);
     metadataHeader->data_count = 0;
     metadataHeader->data_capacity = dataCapacity;
-    size_t dataUnaligned = (uint8_t *)(GetMetadataItems(metadataHeader) +
-                                metadataHeader->item_capacity) - (uint8_t *)metadataHeader;
+    size_t dataUnaligned = reinterpret_cast<uint8_t *>(GetMetadataItems(metadataHeader) +
+                                metadataHeader->item_capacity) - static_cast<uint8_t *>metadataHeader;
     metadataHeader->data_start = AlignTo(dataUnaligned, DATA_ALIGNMENT);
 
     METADATA_DEBUG_LOG("FillCameraMetadata end");
@@ -98,8 +98,8 @@ common_metadata_header_t *AllocateCameraMetadataBuffer(uint32_t item_capacity, u
         return (common_metadata_header_t *) buffer;
     }
 
-    common_metadata_header_t *metadataHeader = FillCameraMetadata((common_metadata_header_t *)buffer, memoryRequired,
-                                                                  item_capacity, data_capacity);
+    common_metadata_header_t *metadataHeader = FillCameraMetadata(
+        const_cast<common_metadata_header_t *>(buffer), memoryRequired,item_capacity, data_capacity);
     if (metadataHeader == nullptr) {
         METADATA_ERR_LOG("AllocateCameraMetadataBuffer metadataHeader is null");
         free(buffer);

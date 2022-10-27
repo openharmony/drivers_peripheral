@@ -365,7 +365,7 @@ std::string MetadataUtils::EncodeToString(std::shared_ptr<CameraMetadata> metada
         encodeData += dataLen;
         encodeDataLen -= dataLen;
     }
-
+            
     if (meta->data_count != 0) {
         ret = memcpy_s(encodeData, encodeDataLen, GetMetadataData(meta), meta->data_count);
         if (ret != EOK) {
@@ -373,7 +373,6 @@ std::string MetadataUtils::EncodeToString(std::shared_ptr<CameraMetadata> metada
             return {};
         }
         encodeData += meta->data_count;
-        encodeDataLen -= meta->data_count;
     }
     METADATA_DEBUG_LOG("MetadataUtils::EncodeToString Calculated length: %{public}d, encoded length: %{public}d",
                        s.capacity(), (encodeData - &s[0]));

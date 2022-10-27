@@ -35,7 +35,7 @@ namespace Audio {
             return false;
         }
 
-        struct AudioCapture *handle = (struct AudioCapture *)data;
+        struct AudioCapture *handle = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
         ret = checkSceneFuzzCapture->scene.CheckSceneCapability(handle, &scenes, &supported);
         if (ret == HDF_SUCCESS) {
             result = true;

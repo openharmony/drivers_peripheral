@@ -27,7 +27,7 @@ namespace HDI {
 namespace DISPLAY {
 class FbDisplay : public HdiDisplay {
 public:
-    explicit FbDisplay(std::vector<int> &fds);
+    explicit FbDisplay(const std::vector<int> &fds);
     virtual ~FbDisplay();
     int32_t Init() override;
     int32_t GetDisplayCapability(DisplayCapability *info) override;

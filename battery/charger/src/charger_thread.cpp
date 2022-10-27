@@ -25,6 +25,7 @@
 #include "input_manager.h"
 #include "input_type.h"
 #include "init_reboot.h"
+#include "battery_config.h"
 #include "battery_log.h"
 
 namespace OHOS {
@@ -191,7 +192,7 @@ void ChargerThread::UpdateBatteryInfo(void* arg)
     HandleTemperature(temperature);
     HandleCapacity(capacity_);
 
-    led_->UpdateLedColor(chargeState_, capacity_);
+    led_->UpdateColor(chargeState_, capacity_);
     if (backlight_->GetScreenState()) {
         UpdateAnimation(capacity_);
     }
@@ -199,7 +200,8 @@ void ChargerThread::UpdateBatteryInfo(void* arg)
 
 void ChargerThread::HandleCapacity(const int32_t& capacity)
 {
-    auto lowCapacity = batteryConfig_->GetCapacityConf();
+    const int32_t DEFAULT_CAPACITY_CONF = -1;
+    auto lowCapacity = BatteryConfig::GetInstance().GetInt("soc.shutdown", DEFAULT_CAPACITY_CONF);
     BATTERY_HILOGD(FEATURE_CHARGING, "capacity=%{public}d, lowCapacity=%{public}d", capacity, lowCapacity);
     if ((capacity <= lowCapacity) &&
         ((chargeState_ == PowerSupplyProvider::CHARGE_STATE_NONE) ||
@@ -211,12 +213,15 @@ void ChargerThread::HandleCapacity(const int32_t& capacity)
 
 void ChargerThread::HandleTemperature(const int32_t& temperature)
 {
-    auto tempConf = batteryConfig_->GetTempConf();
-    BATTERY_HILOGD(FEATURE_CHARGING, "temperature=%{public}d, tempConf.lower=%{public}d, tempConf.upper=%{public}d",
-        temperature, tempConf.lower, tempConf.upper);
+    const int32_t DEFAULT_UPPER_TEMP_CONF = INT32_MAX;
+    const int32_t DEFAULT_LOWER_TEMP_CONF = INT32_MIN;
+    auto& batteryConfig = BatteryConfig::GetInstance();
+    auto highTemp = batteryConfig.GetInt("temperature.high", DEFAULT_UPPER_TEMP_CONF);
+    auto lowTemp = batteryConfig.GetInt("temperature.low", DEFAULT_LOWER_TEMP_CONF);
+    BATTERY_HILOGD(FEATURE_CHARGING, "temperature=%{public}d, lowTemp=%{public}d, highTemp=%{public}d",
+        temperature, lowTemp, highTemp);
 
-    if (((temperature <= tempConf.lower) || (temperature >= tempConf.upper)) &&
-        (tempConf.lower != tempConf.upper)) {
+    if (((temperature <= lowTemp) || (temperature >= highTemp)) && (lowTemp != highTemp)) {
         BATTERY_HILOGW(FEATURE_CHARGING, "temperature out of range, shutdown device");
         DoReboot(SHUTDOWN_CMD.c_str());
     }
@@ -240,7 +245,7 @@ void ChargerThread::HandleChargingState()
             BATTERY_HILOGD(FEATURE_CHARGING, "wait plugin");
             backlightWait_ = now - 1;
             backlight_->TurnOnScreen();
-            led_->TurnOffLed();
+            led_->TurnOff();
             AnimationLabel::needStop_ = true;
             pluginWait_ = now + SHUTDOWN_TIME_MS;
         } else if (now >= pluginWait_) {
@@ -255,7 +260,7 @@ void ChargerThread::HandleChargingState()
             BATTERY_HILOGI(FEATURE_CHARGING, "update capacity_=%{public}d", capacity_);
             backlightWait_ = now - 1;
             backlight_->TurnOnScreen();
-            led_->UpdateLedColor(chargeState_, capacity_);
+            led_->UpdateColor(chargeState_, capacity_);
             AnimationLabel::needStop_ = true;
             UpdateAnimation(capacity_);
         }
@@ -418,12 +423,7 @@ void ChargerThread::InitInput()
 void ChargerThread::Init()
 {
     BATTERY_HILOGD(FEATURE_CHARGING, "start init charger thread");
-    batteryConfig_ = std::make_unique<BatteryConfig>();
-    if (batteryConfig_ == nullptr) {
-        BATTERY_HILOGE(FEATURE_CHARGING, "make_unique BatteryConfig return nullptr");
-        return;
-    }
-    batteryConfig_->Init();
+    BatteryConfig::GetInstance().ParseConfig();
 
     provider_ = std::make_unique<PowerSupplyProvider>();
     if (provider_ == nullptr) {
@@ -456,8 +456,8 @@ void ChargerThread::Init()
         BATTERY_HILOGE(FEATURE_CHARGING, "make_unique BatteryLed return nullptr");
         return;
     }
-    led_->InitLightInfo();
-    led_->TurnOffLed();
+    led_->InitLight();
+    led_->TurnOff();
 
     AnimationInit();
     InitInput();
@@ -467,7 +467,7 @@ void ChargerThread::Run(void* service)
 {
     BATTERY_HILOGI(FEATURE_CHARGING, "start run charger thread");
     Init();
-
+    UpdateBatteryInfo(nullptr);
     std::make_unique<std::thread>(&ChargerThread::LoopingThreadEntry, this, service)->join();
 }
 }  // namespace V1_1

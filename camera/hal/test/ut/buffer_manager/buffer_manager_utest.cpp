@@ -191,7 +191,7 @@ HWTEST_F(BufferManagerTest, TestGrallocBuffer, TestSize.Level0)
     Camera::BufferManager* manager = Camera::BufferManager::GetInstance();
     EXPECT_EQ(true, manager != nullptr);
 
-    uint32_t formatTest[] = {CAMERA_FORMAT_YCBCR_420_SP, CAMERA_FORMAT_YCRCB_420_SP,
+    const uint32_t formatTest[] = {CAMERA_FORMAT_YCBCR_420_SP, CAMERA_FORMAT_YCRCB_420_SP,
                              CAMERA_FORMAT_YCBCR_420_P, CAMERA_FORMAT_YCRCB_420_P};
     for (auto f : formatTest) {
         int64_t bufferPoolId = manager->GenerateBufferPoolId();
@@ -389,7 +389,7 @@ HWTEST_F(BufferManagerTest, TestTrackingBufferLoop, TestSize.Level0)
 
 namespace OHOS::CameraUtest {
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
-bool BufferManagerTest::Stream::Init(std::shared_ptr<OHOS::Surface>& producer)
+bool BufferManagerTest::Stream::Init(const std::shared_ptr<OHOS::Surface>& producer)
 {
     Camera::BufferManager* manager = Camera::BufferManager::GetInstance();
     if (manager == nullptr) {
@@ -571,11 +571,12 @@ void BufferManagerTest::Stream::EnqueueBufferNonBlock()
     std::shared_ptr<IBuffer> buffer = nullptr;
     {
         std::lock_guard<std::mutex> l(lock_);
-        for (auto& it : bufferVec_) {
-            if (it.first == sb) {
-                buffer = it.second;
-                break;
-            }
+        auto it = std::find_if(bufferVec_.begin(), bufferVec_.end(),
+            [sb](const std::pair<OHOS::sptr<OHOS::SurfaceBuffer>, std::shared_ptr<IBuffer>>& b) {
+            return b.first == sb;
+        });
+        if (it != bufferVec_.end()) {
+            buffer = it->second;
         }
     }
     if (buffer == nullptr) {
@@ -609,11 +610,12 @@ void BufferManagerTest::Stream::DequeueBuffer(std::shared_ptr<IBuffer>& buffer)
 #endif
         {
             std::lock_guard<std::mutex> l(lock_);
-            for (auto& it : bufferVec_) {
-                if (it.second == buffer) {
-                    surfaceBuffer = it.first;
-                    break;
-                }
+            auto it = std::find_if(bufferVec_.begin(), bufferVec_.end(),
+                [buffer](const std::pair<OHOS::sptr<OHOS::SurfaceBuffer>, std::shared_ptr<IBuffer>>& b) {
+                return b.second == buffer;
+            });
+            if (it != bufferVec_.end()) {
+                surfaceBuffer = it->first;
             }
         }
 
@@ -649,7 +651,7 @@ std::shared_ptr<IBufferPool> BufferManagerTest::Stream::GetBufferPool() const
     return bufferPool_;
 }
 
-bool BufferManagerTest::Pipeline::AddStream(std::shared_ptr<Stream>& stream)
+bool BufferManagerTest::Pipeline::AddStream(const std::shared_ptr<Stream>& stream)
 {
     std::lock_guard<std::mutex> l(streamLock_);
     localStream_ = std::make_shared<LocalStream>();

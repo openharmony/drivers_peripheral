@@ -95,7 +95,7 @@ static int32_t HandleSyncRequest(struct UsbHostRequest *request, const struct Us
     const struct UsbRequestData *requestData, unsigned char type)
 {
     int32_t ret;
-    int32_t completed = 0;
+    static int32_t completed = 0;
 
     if (UsbEndpointDirOut(requestData->endPoint)) {
         ret = memcpy_s(request->buffer, request->bufLen, requestData->data, requestData->length);
@@ -516,7 +516,7 @@ static int32_t ParseInterface(struct UsbRawInterface *usbInterface, const uint8_
 }
 
 static int32_t ParseConfigurationDes(struct UsbRawConfigDescriptor *config, const uint8_t *buffer, int32_t size,
-    struct UsbRawInterface *usbInterface, uint8_t nIntf[])
+    struct UsbRawInterface *usbInterface, const uint8_t *nIntf)
 {
     int32_t ret, len;
     uint8_t i;
@@ -543,6 +543,10 @@ static int32_t ParseConfigurationDes(struct UsbRawConfigDescriptor *config, cons
 
     while (size > 0) {
         struct UsbInterfaceDescriptor *ifDesc = (struct UsbInterfaceDescriptor *)buffer;
+        if (config->configDescriptor.bNumInterfaces >= USB_MAXINTERFACES) {
+            HDF_LOGE("%{public}d: bNumInterfaces overlong.", config->configDescriptor.bNumInterfaces);
+            return HDF_FAILURE;
+        }
         for (i = 0; i < config->configDescriptor.bNumInterfaces; ++i) {
             if (nIntf[i] == ifDesc->bInterfaceNumber) {
                 usbInterface = (struct UsbRawInterface *)config->interface[i];
@@ -563,9 +567,6 @@ static int32_t ParseConfigurationDes(struct UsbRawConfigDescriptor *config, cons
 
 static int32_t ParseConfiguration(struct UsbRawConfigDescriptor *config, const uint8_t *buffer, int32_t size)
 {
-    int32_t i;
-    uint8_t j;
-    uint32_t len;
     struct UsbRawInterface *usbInterface = NULL;
     uint8_t nIntf[USB_MAXINTERFACES] = {0};
     uint8_t nAlts[USB_MAXINTERFACES] = {0};
@@ -589,15 +590,14 @@ static int32_t ParseConfiguration(struct UsbRawConfigDescriptor *config, const u
     intfNum = GetInterfaceNumber(buffer, size, nIntf, nAlts);
     config->configDescriptor.bNumInterfaces = (uint8_t)intfNum;
 
-    for (i = 0; i < intfNum; ++i) {
-        j = nAlts[i];
+    for (int32_t i = 0; i < intfNum; ++i) {
+        uint8_t j = nAlts[i];
         if (j > USB_MAXALTSETTING) {
             HDF_LOGW("%{public}s: too many alternate settings: %hhu", __func__, j);
             nAlts[i] = USB_MAXALTSETTING;
             j = USB_MAXALTSETTING;
         }
-        len = sizeof(struct UsbRawInterface) + sizeof(struct UsbRawInterfaceDescriptor) * j;
-        usbInterface = RawUsbMemCalloc(len);
+        usbInterface = RawUsbMemCalloc(sizeof(struct UsbRawInterface) + sizeof(struct UsbRawInterfaceDescriptor) * j);
         config->interface[i] = usbInterface;
         if (usbInterface == NULL) {
             return HDF_ERR_MALLOC_FAIL;
@@ -621,7 +621,7 @@ static int32_t DescToConfig(const uint8_t *buf, int32_t size, struct UsbRawConfi
     }
 
     ret = ParseConfiguration(tmpConfig, buf, size);
-    if (ret < 0 && tmpConfig != NULL) {
+    if (ret < 0) {
         HDF_LOGE("%{public}s: ParseConfiguration failed with error = %d", __func__, ret);
         RawUsbMemFree(tmpConfig);
         tmpConfig = NULL;
@@ -1382,29 +1382,29 @@ int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddR
 
     if (!HdfSbufWriteBuffer(pnpData, (const void *)(&infoData), sizeof(struct UsbPnpAddRemoveInfo))) {
         HDF_LOGE("%{public}s:%d sbuf write infoData failed", __func__, __LINE__);
-        ret = HDF_FAILURE;
         goto OUT;
     }
 
     ret = serv->dispatcher->Dispatch(&serv->object, cmdType, pnpData, pnpReply);
-    if (ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%d Dispatch USB_PNP_NOTIFY_REMOVE_TEST failed ret = %d", __func__, __LINE__, ret);
         goto OUT;
     }
 
     int32_t replyData = 0;
-    bool flag = HdfSbufReadInt32(pnpReply, &replyData);
-    if (!flag || replyData != INT32_MAX) {
-        ret = HDF_FAILURE;
+    if (!HdfSbufReadInt32(pnpReply, &replyData)) {
+        HDF_LOGE("%{public}s:HdfSbufReadInt32 failed", __func__);
+        goto OUT;
+    }
+    if (replyData != INT32_MAX) {
         HDF_LOGE("%{public}s:%d cmdType = %d reply failed", __func__, __LINE__, cmdType);
         goto OUT;
-    } else if (flag && replyData == INT32_MAX) {
-        HDF_LOGI("%{public}s:%d cmdType = %d reply success", __func__, __LINE__, cmdType);
     }
-
     ret = HDF_SUCCESS;
+    HDF_LOGI("%{public}s:%d cmdType = %d reply success", __func__, __LINE__, cmdType);
 
 OUT:
+    ret = HDF_FAILURE;
     HdfSbufRecycle(pnpData);
     HdfSbufRecycle(pnpReply);
 ERR_SBUF:

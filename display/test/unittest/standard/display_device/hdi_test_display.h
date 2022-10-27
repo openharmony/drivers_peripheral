@@ -29,10 +29,10 @@ namespace DISPLAY {
 namespace TEST {
 class HdiTestDisplay {
 public:
-    HdiTestDisplay(uint32_t id, DeviceFuncs &deviceFunc);
+    HdiTestDisplay(const uint32_t id, const DeviceFuncs &deviceFunc);
     virtual ~HdiTestDisplay() {}
     int32_t Init();
-    int32_t GetModeInfoFromId(int32_t id, DisplayModeInfo &modeInfo);
+    int32_t GetModeInfoFromId(int32_t id, DisplayModeInfo &modeInfo) const;
     std::shared_ptr<HdiTestLayer> CreateHdiTestLayer(LayerInfo &info);
     std::shared_ptr<HdiTestLayer> CreateHdiTestLayer(uint32_t w, uint32_t h);
     int32_t Commit();

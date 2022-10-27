@@ -812,11 +812,11 @@ HWTEST_F(AudioHdiRenderTest, AudioRenderReqMmapBuffer_005, TestSize.Level1)
     }
     ret = InitMmapDesc(fp, desc, reqSize, isRender);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    desc.memoryFd = 1;
+    desc.memoryFd = -1; // -1 is invalid fd
     ret =  render->control.Start((AudioHandle)render);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret =  render->attr.ReqMmapBuffer((AudioHandle)render, reqSize, &desc);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
     fclose(fp);
     render->control.Stop((AudioHandle)render);
     adapter->DestroyRender(adapter, render);

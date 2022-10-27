@@ -287,19 +287,16 @@ static void UsbParseConfigDescriptorProcess(
 
 static int32_t UsbParseConfigDescriptor(struct AcmDevice * const acm, struct UsbRawConfigDescriptor * const config)
 {
-    uint8_t i;
-    int32_t ret;
-
-    if ((acm == NULL) || (config == NULL)) {
+    if (acm == NULL || config == NULL) {
         HDF_LOGE("%s:%d acm or config is NULL", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    for (i = 0; i < acm->interfaceCnt; i++) {
+    for (uint8_t i = 0; i < acm->interfaceCnt; i++) {
         uint8_t interfaceIndex = acm->interfaceIndex[i];
         const struct UsbRawInterface *interface = config->interface[interfaceIndex];
 
-        ret = UsbRawClaimInterface(acm->devHandle, interfaceIndex);
+        int32_t ret = UsbRawClaimInterface(acm->devHandle, interfaceIndex);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s:%d claim interface %u failed", __func__, __LINE__, i);
             return ret;
@@ -313,9 +310,7 @@ static int32_t UsbParseConfigDescriptor(struct AcmDevice * const acm, struct Usb
 
 static int32_t UsbAllocDataRequests(struct AcmDevice * const acm)
 {
-    int32_t i;
-    int32_t ret;
-    for (i = 0; i < TEST_CYCLE; i++) {
+    for (int32_t i = 0; i < TEST_CYCLE; i++) {
         struct AcmDb *snd = &acm->db[i];
         snd->request = UsbRawAllocRequest(acm->devHandle, 0, acm->dataEp->maxPacketSize);
         snd->instance = acm;
@@ -332,7 +327,7 @@ static int32_t UsbAllocDataRequests(struct AcmDevice * const acm)
         reqData.buffer = snd->buf;
         reqData.length = acm->dataSize;
 
-        ret = UsbRawFillBulkRequest(snd->request, acm->devHandle, &reqData);
+        int32_t ret = UsbRawFillBulkRequest(snd->request, acm->devHandle, &reqData);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%s: FillInterruptRequest failed, ret=%d", __func__, ret);
             return HDF_FAILURE;

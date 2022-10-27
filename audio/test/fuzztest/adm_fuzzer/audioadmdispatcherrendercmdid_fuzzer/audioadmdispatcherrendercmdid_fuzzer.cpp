@@ -29,7 +29,7 @@ namespace Audio {
         struct AudioPcmHwParams hwParams {
             .streamType = AUDIO_RENDER_STREAM, .channels = AUDIO_CHANNEL_BOTH_RIGHT,
             .rate = BROADCAST_AM_RATE, .periodSize = FRAME_DATA / 2,
-            .periodCount = 32, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
+            .periodCount = 32, .format = AUDIO_FORMAT_TYPE_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
             .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
         };
 
@@ -48,7 +48,7 @@ namespace Audio {
             HDF_LOGE("%{public}s: Write hwparams to buffer failed \n", __func__);
             return false;
         }
-        int32_t cmdId = *(int32_t *)(data);
+        int32_t cmdId = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data)));
         ret = admDisRenFuzzService->dispatcher->Dispatch(&admDisRenFuzzService->object, cmdId, sBuf, reply);
         if (ret == HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Dispatch sucess \n", __func__);

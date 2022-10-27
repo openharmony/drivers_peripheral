@@ -134,7 +134,7 @@ HWTEST_F(AudioAdapterTest, CheckParaAttrWhenFormatIsNotSupport, TestSize.Level1)
 {
     struct AudioSampleAttributes attrs;
     EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
-    attrs.format = AUDIO_FORMAT_G726;
+    attrs.format = AUDIO_FORMAT_TYPE_G726;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, CheckParaAttr(&attrs));
 }
 
@@ -163,7 +163,7 @@ HWTEST_F(AudioAdapterTest, AttrFormatToBitWhenAttrsIsNotSupport, TestSize.Level1
 {
     struct AudioSampleAttributes attrs;
     EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
-    attrs.format = AUDIO_FORMAT_AAC_MAIN;
+    attrs.format = AUDIO_FORMAT_TYPE_AAC_MAIN;
     int32_t format = -1;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AttrFormatToBit(&attrs, &format));
 }
@@ -227,7 +227,7 @@ HWTEST_F(AudioAdapterTest, InitHwRenderParamWhenFormatIsNotSupport, TestSize.Lev
     EXPECT_EQ(HDF_SUCCESS, InitDevDesc(desc));
     struct AudioSampleAttributes attrs;
     EXPECT_EQ(HDF_SUCCESS, InitAttrs(attrs));
-    attrs.format = AUDIO_FORMAT_AAC_MAIN;
+    attrs.format = AUDIO_FORMAT_TYPE_AAC_MAIN;
     struct AudioHwRender hwRender;
     EXPECT_EQ(HDF_SUCCESS, InitHwRender(hwRender, desc, attrs));
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, InitHwRenderParam(&hwRender, &desc, &attrs));
@@ -645,7 +645,7 @@ HWTEST_F(AudioAdapterTest, InitHwCaptureParamWhenFormatIsNotSupport, TestSize.Le
     EXPECT_EQ(HDF_SUCCESS, InitDevDescCapture(desc));
     struct AudioSampleAttributes attrs;
     EXPECT_EQ(HDF_SUCCESS, InitAttrsCapture(attrs));
-    attrs.format = AUDIO_FORMAT_AAC_MAIN;
+    attrs.format = AUDIO_FORMAT_TYPE_AAC_MAIN;
     struct AudioHwCapture hwCapture;
     EXPECT_EQ(HDF_SUCCESS, InitHwCapture(hwCapture, desc, attrs));
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, InitHwCaptureParam(&hwCapture, &desc, &attrs));

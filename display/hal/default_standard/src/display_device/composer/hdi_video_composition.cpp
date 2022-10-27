@@ -123,7 +123,7 @@ int32_t HdiVideoComposition::Apply(bool modeSet)
     return DISPLAY_SUCCESS;
 }
 
-void HdiVideoComposition::CLoseUnUsedLayer(std::vector<HdiLayer*> &layers)
+void HdiVideoComposition::CLoseUnUsedLayer(const std::vector<HdiLayer*> &layers)
 {
     DISPLAY_LOGD();
     std::vector<uint32_t> neededRemove;
@@ -165,7 +165,7 @@ bool HdiVideoComposition::CanHandle(HdiLayer &hdiLayer)
         PIXEL_FMT_VYUY_422_PKG, /* *< VYUY422 packed format */
     };
 
-    if (hdiLayer.GetType() == LAYER_TYPE_SDIEBAND) {
+    if (hdiLayer.GetType() == LAYER_TYPE_SIDEBAND) {
         DISPLAY_LOGD("is sideband");
         return false;
     }

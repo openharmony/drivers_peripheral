@@ -15,6 +15,7 @@
 #ifndef HDF_AUDIO_SERVER_H
 #define HDF_AUDIO_SERVER_H
 
+#include "audio_types.h"
 #include "hdf_device_desc.h"
 
 enum AudioHdiServerCmdId {
@@ -24,6 +25,9 @@ enum AudioHdiServerCmdId {
     AUDIO_HDI_MGR_LOAD_ADAPTER,
     AUDIO_HDI_MGR_UNLOAD_ADAPTER,
 
+    AUDIO_HDI_ADT_SET_VOICE_VOLUME,
+    AUDIO_HDI_ADT_SET_EXTRA_PARAMS,
+    AUDIO_HDI_ADT_GET_EXTRA_PARAMS,
     AUDIO_HDI_ADT_INIT_PORTS,
     AUDIO_HDI_ADT_GET_PORT_CAPABILITY,
     AUDIO_HDI_ADT_SET_PASS_MODE,

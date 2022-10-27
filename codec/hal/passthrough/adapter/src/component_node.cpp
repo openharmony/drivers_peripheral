@@ -151,7 +151,7 @@ int32_t ComponentNode::SetParameter(OMX_INDEXTYPE paramIndex, const int8_t *para
 
     int32_t paramCnt = 1;
     Param paramOut[PARAM_COUNT_MAX] = {};
-    int32_t ret = Common::SplitParam(paramIndex, (int8_t *)param, paramOut, paramCnt, codecType_);
+    int32_t ret = Common::SplitParam(paramIndex, const_cast<int8_t *>(param), paramOut, paramCnt, codecType_);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s error, paramIndex is not support", __func__);
         return ret;
@@ -281,7 +281,7 @@ int32_t ComponentNode::SetCallbacks(const CodecCallbackType *omxCallback, int64_
         }
         setCallbackComplete_ = true;
     }
-    this->omxCallback_ = (CodecCallbackType *)omxCallback;
+    this->omxCallback_ = const_cast<CodecCallbackType *>(omxCallback);
     this->appData_ = appData;
 
     return ret;
@@ -418,7 +418,8 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
         return ret;
     }
 
-    CodecBuffer *codecBuffer = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
+    CodecBuffer *codecBuffer = reinterpret_cast<CodecBuffer *>
+        (OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo)));
     if (codecBuffer == nullptr) {
         HDF_LOGE("%{public}s error, codecBuffer is nullptr", __func__);
         return HDF_FAILURE;
@@ -466,7 +467,8 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
         return ret;
     }
 
-    CodecBuffer *codecBuffer = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
+    CodecBuffer *codecBuffer = reinterpret_cast<CodecBuffer *>
+        (OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo)));
     if (codecBuffer == nullptr) {
         HDF_LOGE("%{public}s error, codecBuffer is nullptr", __func__);
         return HDF_FAILURE;
@@ -514,7 +516,8 @@ int32_t ComponentNode::EmptyThisBuffer(const OmxCodecBuffer &buffer)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    CodecBuffer *codecBuffer = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
+    CodecBuffer *codecBuffer = reinterpret_cast<CodecBuffer *>
+        (OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo)));
     if (codecBuffer == nullptr) {
         HDF_LOGE("%{public}s error, codecBuffer is nullptr", __func__);
         return HDF_FAILURE;
@@ -540,7 +543,8 @@ int32_t ComponentNode::FillThisBuffer(const OmxCodecBuffer &buffer)
         return HDF_ERR_INVALID_PARAM;
     }
 
-    CodecBuffer *codecBuffer = (CodecBuffer *)OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo));
+    CodecBuffer *codecBuffer = reinterpret_cast<CodecBuffer *>
+        (OsalMemCalloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo)));
     if (codecBuffer == nullptr) {
         HDF_LOGE("%{public}s error, codecBuffer is nullptr", __func__);
         return HDF_FAILURE;

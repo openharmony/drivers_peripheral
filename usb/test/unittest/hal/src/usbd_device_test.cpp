@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
+#include "usbd_device_test.h"
+
 #include <iostream>
 #include <vector>
 
 #include "UsbSubscriberTest.h"
 #include "hdf_log.h"
-#include "usbd_device_test.h"
 #include "v1_0/iusb_interface.h"
 #include "v1_0/usb_types.h"
 
@@ -212,4 +213,4 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice004, TestSize.Level1)
     dev = dev_;
     g_usbInterface->CloseDevice(dev);
 }
-}
+} // namespace

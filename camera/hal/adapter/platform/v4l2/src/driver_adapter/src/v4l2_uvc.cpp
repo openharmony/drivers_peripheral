@@ -14,6 +14,7 @@
  */
 
 #include <mutex>
+#include <sys/prctl.h>
 #include "securec.h"
 #include "v4l2_control.h"
 #include "v4l2_fileformat.h"
@@ -162,10 +163,10 @@ RetCode HosV4L2UVC::V4L2UVCGetCapability(int fd, const std::string devName, std:
         return RC_ERROR;
     }
 
-    if (cameraId != std::string((char*)capability.driver)) {
+    if (cameraId != std::string(reinterpret_cast<char*>(capability.driver))) {
         return RC_ERROR;
     }
-    V4L2UvcMatchDev(std::string((char*)capability.driver), devName, true);
+    V4L2UvcMatchDev(std::string(reinterpret_cast<char*>(capability.driver)), devName, true);
 
     CAMERA_LOGD("UVC:v4l2 driver name = %{public}s\n", capability.driver);
     CAMERA_LOGD("UVC:v4l2 capabilities = 0x{public}%x\n", capability.capabilities);
@@ -282,7 +283,6 @@ void HosV4L2UVC::V4L2GetUsbString(std::string& action, std::string& subsystem,
 void HosV4L2UVC::loopUvcDevice()
 {
     fd_set fds;
-    int rc;
     constexpr uint32_t delayTime = 200000;
     CAMERA_LOGD("UVC:loopUVCDevice fd = %{public}d getuid() = %{public}d\n", uDevFd_, getuid());
     V4L2UvcEnmeDevices();
@@ -292,8 +292,9 @@ void HosV4L2UVC::loopUvcDevice()
     FD_ZERO(&fds);
     FD_SET(uDevFd, &fds);
     FD_SET(eventFd, &fds);
+    prctl(PR_SET_NAME, "loopUvcDevice");
     while (g_uvcDetectEnable) {
-        rc = select(((uDevFd > eventFd) ? uDevFd : eventFd) + 1, &fds, &fds, NULL, NULL);
+        int rc = select(((uDevFd > eventFd) ? uDevFd : eventFd) + 1, &fds, &fds, NULL, NULL);
         if (rc > 0 && FD_ISSET(uDevFd, &fds)) {
             usleep(delayTime);
             constexpr uint32_t buffSize = 4096;
@@ -330,21 +331,22 @@ int HosV4L2UVC::CheckBuf(unsigned int len, char *buf)
 
 void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsystem, std::string& devnode)
 {
-    int rc;
     if (subsystem == "video4linux") {
         CAMERA_LOGD("UVC:ACTION = %{public}s, SUBSYSTEM = %{public}s, DEVNAME = %{public}s\n",
                     action.c_str(), subsystem.c_str(), devnode.c_str());
 
         std::string devName = "/dev/" + devnode;
         if (action == "remove") {
-            for (auto &itr : HosV4L2Dev::deviceMatch) {
-                if (itr.second == devName) {
-                    CAMERA_LOGD("UVC:loop HosV4L2Dev::deviceMatch %{public}s\n", action.c_str());
-                    V4L2UvcMatchDev(itr.first, devName, false);
-                    break;
-                }
+            auto itr = std::find_if(HosV4L2Dev::deviceMatch.begin(), HosV4L2Dev::deviceMatch.end(),
+                [devName](const std::map<std::string, std::string>::value_type& pair) {
+                return pair.second == devName;
+            });
+            if (itr != HosV4L2Dev::deviceMatch.end()) {
+                CAMERA_LOGD("UVC:loop HosV4L2Dev::deviceMatch %{public}s\n", action.c_str());
+                V4L2UvcMatchDev(itr->first, devName, false);
             }
         } else {
+            int rc;
             struct v4l2_capability cap = {};
             rc = V4L2UvcGetCap(devName, cap);
             if (rc == RC_ERROR) {
@@ -352,7 +354,7 @@ void HosV4L2UVC::UpdateV4L2UvcMatchDev(std::string& action, std::string& subsyst
                 return;
             }
             CAMERA_LOGD("UVC:loop HosV4L2Dev::deviceMatch %{public}s\n", action.c_str());
-            V4L2UvcMatchDev(std::string((char*)cap.driver), devName, true);
+            V4L2UvcMatchDev(std::string(reinterpret_cast<char*>(cap.driver)), devName, true);
         }
     }
 }

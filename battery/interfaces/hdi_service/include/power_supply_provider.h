@@ -82,7 +82,8 @@ public:
     void UpdateInfoByReadSysFile(struct BatterydInfo* info) const;
     void SetSysFilePath(const std::string& path);
     void InitBatteryPath();
-    int32_t SetChargingLimit(const std::vector<ChargingLimit>& chargingLimit);
+    int32_t SetChargingLimit(const std::vector<ChargingLimit>& chargingLimit,
+        std::string& currentPath, std::string& voltagePath);
 
 private:
     struct PowerSupplySysfsInfo {

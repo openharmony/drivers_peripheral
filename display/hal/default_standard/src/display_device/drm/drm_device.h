@@ -62,9 +62,9 @@ public:
 private:
     static FdPtr mDrmFd;
     static std::shared_ptr<DrmDevice> mInstance;
-    void FindAllCrtc(const drmModeResPtr &drmRes);
-    void FindAllEncoder(const drmModeResPtr &drmRes);
-    void FindAllConnector(const drmModeResPtr &drmRes);
+    void FindAllCrtc(const drmModeResPtr &res);
+    void FindAllEncoder(const drmModeResPtr &res);
+    void FindAllConnector(const drmModeResPtr &res);
     void FindAllPlane();
     int InitNetLink();
     IdMapPtr<HdiDisplay> mDisplays;

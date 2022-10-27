@@ -46,7 +46,7 @@ private:
 
 class HdiDrmComposition : public HdiComposition {
 public:
-    HdiDrmComposition(std::shared_ptr<DrmConnector> &connector, std::shared_ptr<DrmCrtc> &crtc,
+    HdiDrmComposition(std::shared_ptr<DrmConnector> &connector, const std::shared_ptr<DrmCrtc> &crtc,
         std::shared_ptr<DrmDevice> &drmDevice);
     virtual ~HdiDrmComposition() {}
     int32_t Init();
@@ -55,7 +55,7 @@ public:
     int32_t UpdateMode(std::unique_ptr<DrmModeBlock> &modeBlock, drmModeAtomicReq &pset);
 
 private:
-    int32_t ApplyPlane(HdiDrmLayer &layer, DrmPlane &drmPlane, drmModeAtomicReqPtr pset);
+    int32_t ApplyPlane(HdiDrmLayer &layer, const DrmPlane &drmPlane, drmModeAtomicReqPtr pset);
     std::shared_ptr<DrmDevice> mDrmDevice;
     std::shared_ptr<DrmConnector> mConnector;
     std::shared_ptr<DrmCrtc> mCrtc;

@@ -34,7 +34,7 @@ bool AudioGetchannelmodeRenderFuzzTest(const uint8_t *data, size_t size)
     }
     AudioChannelMode mode = AUDIO_CHANNEL_NORMAL;
 
-    struct AudioRender *renderFuzz = (struct AudioRender *)data;
+    struct AudioRender *renderFuzz = reinterpret_cast<struct AudioRender *>(const_cast<uint8_t *>(data));
     ret = getChannelFuzzRender->GetChannelMode(renderFuzz, &mode);
     if (ret == HDF_SUCCESS) {
         result = true;

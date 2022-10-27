@@ -40,8 +40,8 @@ ohos_shared_library("def_display_gralloc") {
   output_name = "display_gralloc"
   cflags = [ "-Wno-macro-redefined" ]
   deps = [
+    "//commonlibrary/memory_utils/libdmabufheap:libdmabufheap",
     "//third_party/libdrm:libdrm",
-    "//utils/memory/libdmabufheap:libdmabufheap",
   ]
 
   external_deps = [
@@ -108,8 +108,8 @@ ohos_shared_library("def_display_device") {
   ]
 
   deps = [
-    ":def_display_gralloc",
     ":def_display_layer_video",
+    "//drivers/peripheral/display/hal:hdi_display_gralloc",
     "//third_party/libdrm:libdrm",
   ]
 

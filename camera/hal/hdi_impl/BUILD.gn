@@ -209,7 +209,7 @@ if (defined(ohos_lite)) {
         "ipc:ipc_single",
       ]
       if (use_hitrace) {
-        external_deps += [ "hitrace_native:libhitrace" ]
+        external_deps += [ "hitrace_native:libhitracechain" ]
       }
     } else {
       external_deps = [ "hilog:libhilog" ]

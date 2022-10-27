@@ -19,6 +19,7 @@
 #include "hdf_audio_server_common.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_STUB
+#define INTERNEL_INPUT_STEAM_ID 1
 
 static int32_t GetInitCaptureParaAttrs(struct HdfSBuf *data, struct AudioSampleAttributes *attrs)
 {
@@ -61,6 +62,12 @@ static int32_t GetInitCaptureParaAttrs(struct HdfSBuf *data, struct AudioSampleA
         return HDF_FAILURE;
     }
     attrs->isSignedData = (bool)tempCapturePara;
+
+    if (!HdfSbufReadInt32(data, &attrs->streamId)) {
+        AUDIO_FUNC_LOGE("read streamId fail");
+        return HDF_FAILURE;
+    }
+
     return HDF_SUCCESS;
 }
 
@@ -143,6 +150,8 @@ int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct Hd
     if (ret < 0) {
         return ret;
     }
+
+    attrs.streamId = INTERNEL_INPUT_STEAM_ID;
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
     if (capture == NULL || ret < 0) {
         AUDIO_FUNC_LOGE("Failed to CreateCapture");

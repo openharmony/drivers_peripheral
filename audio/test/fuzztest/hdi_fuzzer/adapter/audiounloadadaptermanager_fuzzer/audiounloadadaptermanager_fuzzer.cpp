@@ -35,7 +35,7 @@ bool AudioUnloadadapterManagerFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    TestAudioManager *managerFuzz = (TestAudioManager *)data;
+    TestAudioManager *managerFuzz = reinterpret_cast<TestAudioManager *>(const_cast<uint8_t *>(data));
     unloadAdapterFuzzManager->UnloadAdapter(managerFuzz, unloadAdapterFuzzAdapter);
     unloadAdapterFuzzManager->UnloadAdapter(unloadAdapterFuzzManager, unloadAdapterFuzzAdapter);
     return true;

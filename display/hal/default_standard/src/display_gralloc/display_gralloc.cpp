@@ -65,7 +65,7 @@ int32_t GrallocInitialize(GrallocFuncs **funcs)
 {
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN((funcs == nullptr), DISPLAY_PARAM_ERR, DISPLAY_LOGE("funcs is nullptr"));
-    GrallocFuncs *grallocFuncs = (GrallocFuncs *)malloc(sizeof(GrallocFuncs));
+    GrallocFuncs *grallocFuncs = reinterpret_cast<GrallocFuncs *>(malloc(sizeof(GrallocFuncs)));
     DISPLAY_CHK_RETURN((grallocFuncs == nullptr), DISPLAY_NULL_PTR, DISPLAY_LOGE("malloc failed"));
     (void)memset_s(grallocFuncs, sizeof(GrallocFuncs), 0, sizeof(GrallocFuncs));
     // initialize gralloc

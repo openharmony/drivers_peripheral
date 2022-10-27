@@ -53,12 +53,6 @@ static int32_t IoSendProcess(const void *interfacePoolArg)
     int32_t i;
 
     while (true) {
-        if (interfacePool == NULL) {
-            HDF_LOGE("%{public}s:%d interfacePool is NULL", __func__, __LINE__);
-            OsalMSleep(USB_IO_SLEEP_MS_TIME);
-            continue;
-        }
-
         /* Get a request from curretn submit queue */
         ret = UsbIoGetRequest(&interfacePool->submitRequestQueue, &submitRequest);
 

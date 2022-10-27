@@ -449,7 +449,7 @@ HWTEST_F(AudioUsbCaputerTest, AudioCaptureFlush_001, TestSize.Level1)
 * @tc.name  AudioCaptureSetSampleAttributes_001
 * @tc.desc  Test AudioCaptureSetSampleAttributes ,the setting parameters are as follows.
 *    attrs.type = AUDIO_IN_MEDIA;
-*    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *    attrs.sampleRate = 8000;
 *    attrs.channelCount = 1;
 * @tc.type: FUNC
@@ -466,12 +466,12 @@ HWTEST_F(AudioUsbCaputerTest, AudioCaptureSetSampleAttributes_001, TestSize.Leve
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_USB, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, 1, 8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, 1, 8000);
 
     ret = AudioCaptureSetGetSampleAttributes(attrs, attrsValue, capture);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(ret2, attrsValue.sampleRate);
     EXPECT_EQ(ret1, attrsValue.channelCount);
 
@@ -482,7 +482,7 @@ HWTEST_F(AudioUsbCaputerTest, AudioCaptureSetSampleAttributes_001, TestSize.Leve
 * @tc.name  AudioCaptureGetSampleAttributes_001
 * @tc.desc  Test AudioCaptureGetSampleAttributes ,the setting parameters are as follows.
 *    attrs.type = AUDIO_IN_MEDIA;
-*    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *    attrs.sampleRate = 8000;
 *    attrs.channelCount = 1;
 * @tc.type: FUNC
@@ -501,12 +501,12 @@ HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetSampleAttributes_001, TestSize.Leve
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->attr.GetSampleAttributes(capture, &attrsValue);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, 1, 32000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, 1, 32000);
 
     ret = AudioCaptureSetGetSampleAttributes(attrs, attrsValue, capture);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(ret1, attrsValue.sampleRate);
     EXPECT_EQ(ret2, attrsValue.channelCount);
 
@@ -625,7 +625,7 @@ HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetCurrentChannelId_002, TestSize.Leve
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_USB, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, 1, 48000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, 1, 48000);
 
     ret = AudioCaptureSetGetSampleAttributes(attrs, attrsValue, capture);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -1130,7 +1130,7 @@ HWTEST_F(AudioUsbCaputerTest, AudioCaptureGetMmapPosition_002, TestSize.Level1)
         ASSERT_EQ(nullptr, audiopara.capture);
     }
     InitAttrs(audiopara.attrs);
-    audiopara.attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+    audiopara.attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
     audiopara.attrs.channelCount = 1;
     ret = audiopara.capture->attr.SetSampleAttributes(audiopara.capture, &(audiopara.attrs));
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);

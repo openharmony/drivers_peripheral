@@ -40,7 +40,7 @@ namespace Audio {
             return false;
         }
         ret = mmapBufferFuzzCapture->control.Start((AudioHandle)mmapBufferFuzzCapture);
-        if (ret < 0 || mmapBufferFuzzManager == nullptr) {
+        if (ret < 0) {
             mmapBufferFuzzAdapter->DestroyCapture(mmapBufferFuzzAdapter, mmapBufferFuzzCapture);
             mmapBufferFuzzManager->UnloadAdapter(mmapBufferFuzzManager, mmapBufferFuzzAdapter);
             fclose(fp);
@@ -51,7 +51,7 @@ namespace Audio {
         int32_t reqSize = 0;
         struct AudioMmapBufferDescripter desc = {};
         ret = InitMmapDesc(fp, desc, reqSize, isRender);
-        if (ret < 0 || mmapBufferFuzzManager == nullptr) {
+        if (ret < 0) {
             mmapBufferFuzzAdapter->DestroyCapture(mmapBufferFuzzAdapter, mmapBufferFuzzCapture);
             mmapBufferFuzzManager->UnloadAdapter(mmapBufferFuzzManager, mmapBufferFuzzAdapter);
             (void)fclose(fp);
@@ -59,7 +59,7 @@ namespace Audio {
             return false;
         }
 
-        struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
+        struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
         ret = mmapBufferFuzzCapture->attr.ReqMmapBuffer((AudioHandle)captureFuzz, reqSize, &desc);
         if (ret == HDF_SUCCESS) {
             (void)munmap(desc.memoryAddress, reqSize);

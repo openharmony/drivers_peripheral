@@ -24,7 +24,6 @@
 #include "ddk_pnp_listener_mgr.h"
 #include "hdf_slist.h"
 #include "osal_mutex.h"
-#include "parameter.h"
 #include "usb_ddk_interface.h"
 #include "usb_ddk_pnp_loader.h"
 #include "usb_interface_pool.h"
@@ -40,6 +39,7 @@ namespace V1_0 {
 sptr<IUsbdSubscriber> UsbImpl::subscriber_ = nullptr;
 HdfDevEventlistener UsbImpl::usbPnpListener_ = {0};
 HdfDevEventlistener UsbImpl::listenerForLoadService_ = {0};
+sptr<UsbImpl::UsbDeathRecipient> UsbImpl::deathRecipient_ = nullptr;
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
 {
@@ -66,7 +66,7 @@ HostDevice *UsbImpl::FindDevFromService(uint8_t busNum, uint8_t devAddr)
     OsalMutexLock(&lock_);
     HdfSListIteratorInit(&it, &devList_);
     while (HdfSListIteratorHasNext(&it)) {
-        port = (HostDevice *)HdfSListIteratorNext(&it);
+        port = reinterpret_cast<HostDevice *>(HdfSListIteratorNext(&it));
         if (port == nullptr) {
             continue;
         }
@@ -255,7 +255,7 @@ int32_t UsbImpl::UsbdRequestSyncReleaseList(HostDevice *port)
     OsalMutexLock(&port->reqSyncLock);
     HdfSListIteratorInit(&it, &port->reqSyncList);
     while (HdfSListIteratorHasNext(&it)) {
-        UsbdRequestSync *req = (UsbdRequestSync *)HdfSListIteratorNext(&it);
+        UsbdRequestSync *req = reinterpret_cast<UsbdRequestSync *>(HdfSListIteratorNext(&it));
         if (req == nullptr) {
             continue;
         }
@@ -281,7 +281,7 @@ int32_t UsbImpl::UsbdRequestASyncReleaseList(HostDevice *port)
     OsalMutexLock(&port->reqASyncLock);
     HdfSListIteratorInit(&it, &port->reqASyncList);
     while (HdfSListIteratorHasNext(&it)) {
-        UsbdRequestASync *req = (UsbdRequestASync *)HdfSListIteratorNext(&it);
+        UsbdRequestASync *req = reinterpret_cast<UsbdRequestASync *>(HdfSListIteratorNext(&it));
         if (req == nullptr) {
             continue;
         }
@@ -438,7 +438,7 @@ int32_t UsbImpl::UsbdBulkWriteSyncBase(
     uint32_t msize = (uint32_t)requestSync->pipe.maxPacketSize;
     while (tcur < length) {
         uint32_t tsize = (length - tcur) < msize ? (length - tcur) : msize;
-        requestSync->params.dataReq.buffer = (unsigned char *)(buffer + tcur);
+        requestSync->params.dataReq.buffer = static_cast<unsigned char *>(const_cast<uint8_t *>(buffer) + tcur);
         requestSync->params.dataReq.length = tsize;
         tcur += tsize;
         ret = UsbFillRequest(requestSync->request, requestSync->ifHandle, &requestSync->params);
@@ -473,7 +473,7 @@ UsbdRequestASync *UsbImpl::UsbdFindRequestASync(HostDevice *port, uint8_t interf
     OsalMutexLock(&port->reqASyncLock);
     HdfSListIteratorInit(&it, &port->reqASyncList);
     while (HdfSListIteratorHasNext(&it)) {
-        req = (UsbdRequestASync *)HdfSListIteratorNext(&it);
+        req = reinterpret_cast<UsbdRequestASync *>(HdfSListIteratorNext(&it));
         if (req == nullptr) {
             continue;
         }
@@ -532,7 +532,8 @@ int32_t UsbImpl::FunRequestQueueFillAndSubmit(
         return ret;
     }
 
-    OsalSemInit(&((UsbIfRequest *)reqAsync->reqMsg.request)->hostRequest->sem, 0);
+    UsbIfRequest *requestConvertVal = reinterpret_cast<UsbIfRequest *>(reqAsync->reqMsg.request);
+    OsalSemInit(&requestConvertVal->hostRequest->sem, 0);
     ret = UsbSubmitRequestAsync(reqAsync->reqMsg.request);
     if (ret == HDF_SUCCESS) {
         OsalMutexLock(&port->requestLock);
@@ -585,8 +586,9 @@ int32_t UsbImpl::GetRequestMsgData(
     }
 
     int32_t ret = HDF_SUCCESS;
+    UsbIfRequest *reqValue = reinterpret_cast<UsbIfRequest *>(reqMsg->reqMsg.request);
     if ((int32_t)(reqMsg->reqMsg.request->compInfo.status) == -1) {
-        ret = OsalSemWait(&((UsbIfRequest *)reqMsg->reqMsg.request)->hostRequest->sem, timeout);
+        ret = OsalSemWait(&reqValue->hostRequest->sem, timeout);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:OsalSemWait failed, ret:%{public}d", __func__, ret);
             OsalMutexLock(&port->requestLock);
@@ -598,7 +600,7 @@ int32_t UsbImpl::GetRequestMsgData(
 
     OsalMutexLock(&reqMsg->lock);
     *length = reqMsg->reqMsg.length;
-    *buffer = (uint8_t *)reqMsg->reqMsg.buffer;
+    *buffer = static_cast<uint8_t *>(reqMsg->reqMsg.buffer);
     reqMsg->reqMsg.buffer = nullptr;
     reqMsg->reqMsg.length = 0;
     reqMsg->status = 0;
@@ -677,7 +679,7 @@ int32_t UsbImpl::InitAsmBufferHandle(UsbdBufferHandle *handle, int32_t fd, int32
     handle->rcur = 0;
     handle->cbflg = 0;
     lseek(fd, 0, SEEK_SET);
-    handle->starAddr = (uint8_t *)mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    handle->starAddr = static_cast<uint8_t *>(mmap(nullptr, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0));
     close(fd);
     if (handle->starAddr == nullptr) {
         handle->fd = -1;
@@ -847,7 +849,7 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbImpl *super, 
 
 int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data)
 {
-    UsbImpl *super = (UsbImpl *)priv;
+    UsbImpl *super = static_cast<UsbImpl *>(priv);
     if (super == nullptr) {
         HDF_LOGE("%{public}s priv super is nullptr", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -900,13 +902,13 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
 
 int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
 {
+    (void)UsbdLoadUsbService::CloseUsbService();
+
+    usbPnpListener_.callBack = UsbdPnpLoaderEventReceived;
+    usbPnpListener_.priv = static_cast<void *>(inst.GetRefPtr());
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
     if (DdkListenerMgrAdd(&listenerForLoadService_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
-        return HDF_FAILURE;
-    }
-    if (SetParameter(SYS_USBD_READY, SYS_USBD_ON) != 0) {
-        HDF_LOGE("%{public}s:set usbd read error", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -927,7 +929,7 @@ int32_t UsbImpl::UsbdReleaseDevices()
 {
     OsalMutexLock(&lock_);
     while (!HdfSListIsEmpty(&devList_)) {
-        HostDevice *port = (HostDevice *)HdfSListPop(&devList_);
+        HostDevice *port = reinterpret_cast<HostDevice *>(HdfSListPop(&devList_));
         if (port != nullptr) {
             UsbdDispatcher::UsbdRelease(port);
             OsalMemFree(port);
@@ -1033,9 +1035,9 @@ int32_t UsbImpl::GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descr
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    UsbInterfaceHandleEntity *handle = (UsbInterfaceHandleEntity *)port->ctrDevHandle;
+    UsbInterfaceHandleEntity *handle = reinterpret_cast<UsbInterfaceHandleEntity *>(port->ctrDevHandle);
     OsalMutexLock(&handle->devHandle->lock);
-    uint8_t *ptr = (uint8_t *)handle->devHandle->dev->descriptors;
+    uint8_t *ptr = static_cast<uint8_t *>(handle->devHandle->dev->descriptors);
     uint32_t length = handle->devHandle->dev->descriptorsLength;
     descriptor.assign(ptr, ptr + length);
     OsalMutexUnlock(&handle->devHandle->lock);
@@ -1050,7 +1052,7 @@ int32_t UsbImpl::GetFileDescriptor(const UsbDev &dev, int32_t &fd)
         return HDF_DEV_ERR_NO_DEVICE;
     }
 
-    UsbInterfaceHandleEntity *handle = (UsbInterfaceHandleEntity *)port->ctrDevHandle;
+    UsbInterfaceHandleEntity *handle = reinterpret_cast<UsbInterfaceHandleEntity *>(port->ctrDevHandle);
     OsalMutexLock(&handle->devHandle->lock);
     fd = handle->devHandle->fd;
     OsalMutexUnlock(&handle->devHandle->lock);
@@ -1287,22 +1289,18 @@ int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &c
         (UsbRequestDirection)(((uint32_t)ctrl.requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
     controlParams.reqType = (UsbControlRequestType)(((uint32_t)ctrl.requestType >> CMD_OFFSET_5) & CMD_TYPE_MASK);
     controlParams.size = MAX_CONTROL_BUFF_SIZE;
-    controlParams.data = (void *)OsalMemAlloc(controlParams.size);
+    controlParams.data = static_cast<void *>(OsalMemCalloc(controlParams.size));
     if (controlParams.data == nullptr) {
-        HDF_LOGE("%{public}s:OsalMemAlloc failed", __func__);
+        HDF_LOGE("%{public}s:OsalMemCalloc failed", __func__);
         return HDF_ERR_MALLOC_FAIL;
-    }
-    if (memset_s(controlParams.data, controlParams.size, 0, controlParams.size) != EOK) {
-        HDF_LOGE("%{public}s:%{public}d  memset_s failed", __func__, __LINE__);
-        OsalMemFree(controlParams.data);
-        return HDF_FAILURE;
     }
     int32_t ret = UsbControlTransferEx(port, &controlParams, ctrl.timeout);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbControlTransfer failed ret:%{public}d\n", __func__, __LINE__, ret);
     }
 
-    data.assign((uint8_t *)controlParams.data, (uint8_t *)controlParams.data + controlParams.size);
+    uint8_t *dataValue = static_cast<uint8_t *>(controlParams.data);
+    data.assign(dataValue, dataValue + controlParams.size);
     OsalMemFree(controlParams.data);
     return ret;
 }
@@ -1333,7 +1331,7 @@ int32_t UsbImpl::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &
         (UsbRequestDirection)(((uint32_t)ctrl.requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK);
     controlParams.reqType = (UsbControlRequestType)(((uint32_t)ctrl.requestType >> CMD_OFFSET_5) & CMD_TYPE_MASK);
     controlParams.size = data.size();
-    controlParams.data = (void *)data.data();
+    controlParams.data = static_cast<void *>(const_cast<uint8_t *>(data.data()));
     int32_t ret = UsbControlTransferEx(port, &controlParams, ctrl.timeout);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%{public}d UsbControlTransfer failed ret:%{public}d\n", __func__, __LINE__, ret);
@@ -1489,7 +1487,7 @@ int32_t UsbImpl::RequestQueue(
         return HDF_FAILURE;
     }
 
-    reqAsync->reqMsg.clientData = (void *)clientDataAddr;
+    reqAsync->reqMsg.clientData = static_cast<void *>(clientDataAddr);
     reqAsync->reqMsg.clientLength = sizeof(uint8_t) * clientData.size();
     ret = FunRequestQueueFillAndSubmit(port, reqAsync, bufferAddr, sizeof(uint8_t) * buffer.size());
     if (ret != HDF_SUCCESS) {
@@ -1519,8 +1517,9 @@ int32_t UsbImpl::RequestWait(
         return ret;
     }
 
+    UsbIfRequest *reqValue = reinterpret_cast<UsbIfRequest *>(reqMsg->reqMsg.request);
     if ((int32_t)(reqMsg->reqMsg.request->compInfo.status) == -1) {
-        ret = OsalSemWait(&((UsbIfRequest *)reqMsg->reqMsg.request)->hostRequest->sem, timeout);
+        ret = OsalSemWait(&reqValue->hostRequest->sem, timeout);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:OsalSemWait failed, ret=%{public}d", __func__, ret);
             OsalMutexLock(&port->requestLock);
@@ -1538,8 +1537,8 @@ int32_t UsbImpl::RequestWait(
         return ret;
     }
 
-    uint8_t *clientDataAddr = (uint8_t *)(reqMsg->reqMsg.clientData);
-    uint8_t *bufferAddr = (uint8_t *)(reqMsg->reqMsg.request->compInfo.buffer);
+    uint8_t *clientDataAddr = static_cast<uint8_t *>(reqMsg->reqMsg.clientData);
+    uint8_t *bufferAddr = static_cast<uint8_t *>(reqMsg->reqMsg.request->compInfo.buffer);
     clientData.assign(clientDataAddr, clientDataAddr + reqMsg->reqMsg.clientLength);
     buffer.assign(bufferAddr, bufferAddr + reqMsg->reqMsg.request->compInfo.length);
     UsbdRequestASyncReleaseData(reqMsg);
@@ -1578,12 +1577,14 @@ int32_t UsbImpl::GetCurrentFunctions(int32_t &funcs)
 
 int32_t UsbImpl::SetCurrentFunctions(int32_t funcs)
 {
+    OsalMutexLock(&lock_);
     int32_t ret = UsbdFunction::UsbdSetFunction(funcs);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:UsbdSetFunction failed, ret:%{public}d", __func__, ret);
+        OsalMutexUnlock(&lock_);
         return ret;
     }
-
+    OsalMutexUnlock(&lock_);
     return HDF_SUCCESS;
 }
 
@@ -1611,20 +1612,45 @@ int32_t UsbImpl::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRol
 
 int32_t UsbImpl::BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
+    deathRecipient_ = new UsbImpl::UsbDeathRecipient();
+    if (deathRecipient_ == nullptr) {
+        return HDF_FAILURE;
+    }
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IUsbdSubscriber>(subscriber);
+    bool result = remote->AddDeathRecipient(deathRecipient_);
+    if (!result) {
+        HDF_LOGE("%{public}s:AddUsbDeathRecipient failed", __func__);
+        return HDF_FAILURE;
+    }
+
     BindUsbSubscriber(subscriber);
     return HDF_SUCCESS;
 }
 
 int32_t UsbImpl::UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IUsbdSubscriber>(subscriber);
+    bool result = remote->RemoveDeathRecipient(deathRecipient_);
+    if (!result) {
+        HDF_LOGE("%{public}s:RemoveUsbDeathRecipient failed", __func__);
+        return HDF_FAILURE;
+    }
+
     subscriber_ = nullptr;
     if (DdkListenerMgrRemove(&usbPnpListener_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: remove listerer failed", __func__);
         return HDF_FAILURE;
     }
-    usbPnpListener_.callBack = nullptr;
-    usbPnpListener_.priv = nullptr;
     return HDF_SUCCESS;
+}
+
+void UsbImpl::UsbDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    subscriber_ = nullptr;
+    if (DdkListenerMgrRemove(&usbPnpListener_) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: remove listerer failed", __func__);
+    }
+    UsbdLoadUsbService::SetUsbLoadRemoveCount(UsbdLoadUsbService::GetUsbLoadRemoveCount());
 }
 
 int32_t UsbImpl::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<IUsbdBulkCallback> &cb)
@@ -1638,7 +1664,7 @@ int32_t UsbImpl::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const s
     UsbdBulkASyncList *list = UsbdBulkASyncListInit(port, pipe.intfId, pipe.endpointId);
     if (list == nullptr) {
         HDF_LOGE("%{public}s:UsbdBulkASyncListFind failed", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_ERR_MALLOC_FAIL;
     }
     list->cb = cb;
     if (list->cb == nullptr) {
@@ -1660,7 +1686,7 @@ int32_t UsbImpl::UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
     UsbdBulkASyncList *list = UsbdBulkASyncListFind(port, pipe.intfId, pipe.endpointId);
     if (list == nullptr) {
         HDF_LOGE("%{public}s:UsbdBulkASyncListFind failed", __func__);
-        return HDF_ERR_INVALID_PARAM;
+        return HDF_FAILURE;
     }
     list->cb = nullptr;
     return HDF_SUCCESS;
@@ -1744,7 +1770,7 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
     if (list == nullptr) {
         HDF_LOGW("%{public}s:UsbdBulkASyncListFind failed interfaceId:%{public}u endpointId:%{public}u", __func__,
             pipe.intfId, pipe.endpointId);
-        return HDF_SUCCESS;
+        return HDF_FAILURE;
     }
     sptr<IUsbdBulkCallback> tcb = list->cb;
     list->cb = nullptr;
@@ -1757,8 +1783,6 @@ int32_t UsbImpl::BulkCancel(const UsbDev &dev, const UsbPipe &pipe)
 int32_t UsbImpl::BindUsbSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
     subscriber_ = subscriber;
-    usbPnpListener_.callBack = UsbdPnpLoaderEventReceived;
-    usbPnpListener_.priv = (void *)(this);
     if (DdkListenerMgrAdd(&usbPnpListener_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register listerer failed", __func__);
         return HDF_FAILURE;

@@ -179,7 +179,7 @@ HWTEST_F(HdfWifiServiceCTest, SetCountryCodeTest_005, TestSize.Level1)
 
 /**
  * @tc.name: GetNetworkIfaceNameTest_006
- * @tc.desc: Wifi hdi get network interface name function test
+ * @tc.desc: Wifi hdi get network interface name function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
@@ -199,7 +199,7 @@ HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_006, TestSize.Level1)
 
 /**
  * @tc.name: GetFeatureTypeTest_007
- * @tc.desc: Wifi hdi get feature type function test
+ * @tc.desc: Wifi hdi get feature type function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
@@ -219,7 +219,7 @@ HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_007, TestSize.Level1)
 
 /**
  * @tc.name: SetMacAddressTest_008
- * @tc.desc: Wifi hdi set mac addr function test
+ * @tc.desc: Wifi hdi set mac addr function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
@@ -244,7 +244,7 @@ HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_008, TestSize.Level1)
 
 /**
  * @tc.name: GetDeviceMacAddressTest_009
- * @tc.desc: Wifi hdi get device mac addr function test
+ * @tc.desc: Wifi hdi get device mac addr function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
@@ -265,7 +265,7 @@ HWTEST_F(HdfWifiServiceCTest, GetDeviceMacAddressTest_009, TestSize.Level1)
 
 /**
  * @tc.name: GetFreqsWithBandTest_010
- * @tc.desc: Wifi hdi get freqs function test
+ * @tc.desc: Wifi hdi get freqs function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
@@ -301,7 +301,7 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
 
 /**
  * @tc.name: SetTxPowerTest_011
- * @tc.desc: Wifi hdi set tx power function test
+ * @tc.desc: Wifi hdi set tx power function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
@@ -321,7 +321,7 @@ HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_011, TestSize.Level1)
 
 /**
  * @tc.name: GetChipIdTest_012
- * @tc.desc: Wifi hdi get chip id function test
+ * @tc.desc: Wifi hdi get chip id function test on STA feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
@@ -542,7 +542,7 @@ HWTEST_F(HdfWifiServiceCTest, GetChipIdTest_022, TestSize.Level1)
 
 /**
  * @tc.name: GetDeviceMacAddressTest_023
- * @tc.desc: Wifi hdi get device mac addr function test
+ * @tc.desc: Wifi hdi get device mac addr function test on STA feature
  * @tc.type: FUNC
  * @tc.require: AR000H603L
  */
@@ -585,7 +585,7 @@ HWTEST_F(HdfWifiServiceCTest, GetFeatureByIfNameTest_024, TestSize.Level1)
 
 /**
  * @tc.name: SetMacAddressTest_025
- * @tc.desc: Wifi hdi set mac addr function test
+ * @tc.desc: Wifi hdi set mac addr function test on STA feature
  * @tc.type: FUNC
  * @tc.require: AR000H603L
  */
@@ -850,5 +850,96 @@ HWTEST_F(HdfWifiServiceCTest, GetStaInfo_037, TestSize.Level1)
     rc = g_wlanObj->GetStaInfo(g_wlanObj, ifName, &info, mac, ETH_ADDR_LEN);
     flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
     ASSERT_TRUE(flag);
+}
+
+/**
+ * @tc.name: GetFeatureTypeTest_038
+ * @tc.desc: Wifi hdi get feature type function test on STA feature
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_038, TestSize.Level1)
+{
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
+    struct HdfFeatureInfo ifeature;
+    int32_t featureType;
+
+    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->GetFeatureType(g_wlanObj, &ifeature, &featureType);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: GetFreqsWithBandTest_039
+ * @tc.desc: Wifi hdi get freqs function test on STA feature
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_039, TestSize.Level1)
+{
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
+    struct HdfFeatureInfo ifeature;
+    struct HdfWifiInfo wifiInfo;
+    int32_t freq[WLAN_FREQ_MAX_NUM] = {0};
+    uint32_t freqLen = WLAN_FREQ_MAX_NUM;
+    wifiInfo.band = IEEE80211_BAND_2GHZ;
+    wifiInfo.size = WLAN_FREQ_MAX_NUM;
+    uint32_t i;
+
+    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->GetFreqsWithBand(g_wlanObj, &ifeature, &wifiInfo, freq, &freqLen);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    if (rc == HDF_SUCCESS) {
+        for (i = 0; i < freqLen; i++) {
+            printf("%s: freq[%d] = %d\n", __func__, i, freq[i]);
+        }
+    }
+
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: GetNetworkIfaceNameTest_040
+ * @tc.desc: Wifi hdi get network interface name function test on STA feature
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_040, TestSize.Level1)
+{
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
+    struct HdfFeatureInfo ifeature;
+    char ifNames[IFNAMSIZ] = {0};
+
+    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->GetNetworkIfaceName(g_wlanObj, &ifeature, ifNames, IFNAMSIZ);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: SetTxPowerTest_041
+ * @tc.desc: Wifi hdi set tx power function test on STA feature
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_041, TestSize.Level1)
+{
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
+    struct HdfFeatureInfo ifeature;
+    int32_t power = WLAN_TX_POWER;
+
+    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->SetTxPower(g_wlanObj, &ifeature, power);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
 }
 };

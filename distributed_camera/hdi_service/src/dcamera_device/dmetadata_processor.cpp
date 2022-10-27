@@ -569,6 +569,50 @@ void* DMetadataProcessor::GetMetadataItemData(const camera_metadata_item_t &item
     }
 }
 
+void DMetadataProcessor::GetEachNodeSupportedResolution(std::vector<int>& formats, const std::string rootNode,
+    std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue)
+{
+    for (const auto &format : formats) {
+        std::string formatStr = std::to_string(format);
+        if (rootValue[rootNode]["Resolution"][formatStr].isArray() &&
+            rootValue[rootNode]["Resolution"][formatStr].size() > 0) {
+            std::vector<DCResolution> resolutionVec;
+            uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
+            for (uint32_t i = 0; i < size; i++) {
+                std::string resoStr = rootValue[rootNode]["Resolution"][formatStr][i].asString();
+                std::vector<std::string> reso;
+                SplitString(resoStr, reso, STAR_SEPARATOR);
+                if (reso.size() != SIZE_FMT_LEN) {
+                    continue;
+                }
+                uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
+                uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
+                if (height == 0 || width == 0 ||
+                    ((rootNode == "Photo") &&
+                     ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
+                    ((rootNode != "Photo") &&
+                     (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
+                    continue;
+                }
+                DCResolution resolution(width, height);
+                resolutionVec.push_back(resolution);
+            }
+            if (!resolutionVec.empty()) {
+                std::sort(resolutionVec.begin(), resolutionVec.end());
+                supportedFormats[format] = resolutionVec;
+                if ((rootNode != "Photo") && (maxPreviewResolution_ < resolutionVec[0])) {
+                    maxPreviewResolution_.width_ = resolutionVec[0].width_;
+                    maxPreviewResolution_.height_ = resolutionVec[0].height_;
+                }
+                if ((rootNode == "Photo") && (maxPhotoResolution_ < resolutionVec[0])) {
+                    maxPhotoResolution_.width_ = resolutionVec[0].width_;
+                    maxPhotoResolution_.height_ = resolutionVec[0].height_;
+                }
+            }
+        }
+    }
+}
+
 std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupportedFormats(const std::string &abilityInfo)
 {
     std::map<int, std::vector<DCResolution>> supportedFormats;
@@ -582,69 +626,36 @@ std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupported
         return supportedFormats;
     }
 
-    std::set<int> allFormats;
-    if (rootValue["OutputFormat"]["Preview"].isArray() && (rootValue["OutputFormat"]["Preview"].size() > 0)) {
-        uint32_t size = rootValue["OutputFormat"]["Preview"].size();
-        for (uint32_t i = 0; i < size; i++) {
-            allFormats.insert((rootValue["OutputFormat"]["Preview"][i]).asInt());
-        }
-    }
-
-    if (rootValue["OutputFormat"]["Video"].isArray() && (rootValue["OutputFormat"]["Video"].size() > 0)) {
-        uint32_t size = rootValue["OutputFormat"]["Video"].size();
-        for (uint32_t i = 0; i < size; i++) {
-            allFormats.insert((rootValue["OutputFormat"]["Video"][i]).asInt());
-        }
-    }
-
     std::vector<int> photoFormats;
-    if (rootValue["OutputFormat"]["Photo"].isArray() && (rootValue["OutputFormat"]["Photo"].size() > 0)) {
-        uint32_t size = rootValue["OutputFormat"]["Photo"].size();
+    if (rootValue["Photo"]["OutputFormat"].isArray() && (rootValue["Photo"]["OutputFormat"].size() > 0)) {
+        uint32_t size = rootValue["Photo"]["OutputFormat"].size();
         for (uint32_t i = 0; i < size; i++) {
-            photoFormats.push_back((rootValue["OutputFormat"]["Photo"][i]).asInt());
-            allFormats.insert((rootValue["OutputFormat"]["Photo"][i]).asInt());
+            photoFormats.push_back((rootValue["Photo"]["OutputFormat"][i]).asInt());
         }
     }
 
-    for (const auto &format : allFormats) {
-        bool isPhotoFormat = (std::find(photoFormats.begin(), photoFormats.end(), format) != photoFormats.end());
-        std::string formatStr = std::to_string(format);
-        if (rootValue["Resolution"][formatStr].isArray() && rootValue["Resolution"][formatStr].size() > 0) {
-            std::vector<DCResolution> resolutionVec;
-            uint32_t size = rootValue["Resolution"][formatStr].size();
-            for (uint32_t i = 0; i < size; i++) {
-                std::string resoStr = rootValue["Resolution"][formatStr][i].asString();
-                std::vector<std::string> reso;
-                SplitString(resoStr, reso, STAR_SEPARATOR);
-                if (reso.size() != SIZE_FMT_LEN) {
-                    continue;
-                }
-                uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
-                uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
-                if (height == 0 || width == 0 ||
-                    (isPhotoFormat && ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
-                    (!isPhotoFormat &&
-                    (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
-                    continue;
-                }
-                DCResolution resolution(width, height);
-                resolutionVec.push_back(resolution);
-            }
-            if (!resolutionVec.empty()) {
-                std::sort(resolutionVec.begin(), resolutionVec.end());
-                supportedFormats[format] = resolutionVec;
+    GetEachNodeSupportedResolution(photoFormats, "Photo", supportedFormats, rootValue);
 
-                if (!isPhotoFormat && (maxPreviewResolution_ < resolutionVec[0])) {
-                    maxPreviewResolution_.width_ = resolutionVec[0].width_;
-                    maxPreviewResolution_.height_ = resolutionVec[0].height_;
-                }
-                if (isPhotoFormat && (maxPhotoResolution_ < resolutionVec[0])) {
-                    maxPhotoResolution_.width_ = resolutionVec[0].width_;
-                    maxPhotoResolution_.height_ = resolutionVec[0].height_;
-                }
-            }
+    std::vector<int> previewFormats;
+    if (rootValue["Preview"]["OutputFormat"].isArray() && (rootValue["Preview"]["OutputFormat"].size() > 0)) {
+        uint32_t size = rootValue["Preview"]["OutputFormat"].size();
+        for (uint32_t i = 0; i < size; i++) {
+            previewFormats.push_back((rootValue["Preview"]["OutputFormat"][i]).asInt());
         }
     }
+
+    GetEachNodeSupportedResolution(previewFormats, "Preview", supportedFormats, rootValue);
+
+    std::vector<int> videoFormats;
+    if (rootValue["Video"]["OutputFormat"].isArray() && (rootValue["Video"]["OutputFormat"].size() > 0)) {
+        uint32_t size = rootValue["Video"]["OutputFormat"].size();
+        for (uint32_t i = 0; i < size; i++) {
+            videoFormats.push_back((rootValue["Video"]["OutputFormat"][i]).asInt());
+        }
+    }
+
+    GetEachNodeSupportedResolution(videoFormats, "Video", supportedFormats, rootValue);
+
     return supportedFormats;
 }
 

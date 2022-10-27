@@ -18,7 +18,7 @@
 #include <string>
 enum class codecMime { AVC, HEVC };
 enum class ColorFormat { YUV420SP = 0, RGBA8888, BGRA8888 };
-using CommandOpt = struct CommandOpt {
+struct CommandOpt {
     std::string fileInput = "";
     std::string fileOutput = "";
     uint32_t width = 0;

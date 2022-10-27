@@ -55,6 +55,14 @@ uint32_t UsbdLoadUsbService::GetUsbLoadRemoveCount()
     return count_;
 }
 
+void UsbdLoadUsbService::SetUsbLoadRemoveCount(uint32_t count)
+{
+    count_ = count;
+    if (count_ > 0) {
+        StartThreadUsbLoad();
+    }
+}
+
 void UsbdLoadUsbService::IncreaseUsbLoadRemoveCount()
 {
     HDF_LOGI("%s: IncreaseUsbLoadRemoveCount count_: %d", __func__, count_);
@@ -166,6 +174,26 @@ int32_t UsbdLoadUsbService::RemoveUsbService()
     }
     DecreaseUsbLoadRemoveCount();
     return HDF_SUCCESS;
+}
+
+void UsbdLoadUsbService::CloseUsbService()
+{
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sm == nullptr) {
+        HDF_LOGE("GetSystemAbilityManager samgr object null");
+        return;
+    }
+    auto saObj = sm->CheckSystemAbility(USB_SYSTEM_ABILITY_ID);
+    if (saObj == nullptr) {
+        HDF_LOGI("Usb service not start");
+        return;
+    }
+    if (sm->RemoveSystemAbility(USB_SYSTEM_ABILITY_ID) != ERR_OK) {
+        HDF_LOGE("RemoveSystemAbility failed");
+        return;
+    }
+    // wait for usb service close
+    OsalMSleep(SLEEP_DELAY);
 }
 } // namespace V1_0
 } // namespace Usb

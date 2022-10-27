@@ -53,14 +53,14 @@ void HdiCompositionCheck::SimpleHandleAlpha(const LayerSettings &layers, uint32_
 }
 
 std::vector<uint32_t> HdiCompositionCheck::GetCheckColors(std::vector<LayerSettings> &layers,
-    std::vector<Point> &points)
+    const std::vector<Point> &points)
 {
     std::vector<uint32_t> colors;
     for (auto point : points) {
         uint32_t color = 0;
         for (uint32_t i = layers.size(); i > 0; i--) {
             auto layer = layers[i - 1];
-            IRect &rect = layer.displayRect;
+            const IRect &rect = layer.displayRect;
             // check whether the point is inside the rect
             if ((point.x >= rect.x) && (point.x < (rect.x + rect.w)) && (point.y >= rect.y) &&
                 (point.y < (rect.y + rect.h))) {
@@ -83,7 +83,7 @@ int32_t HdiCompositionCheck::Check(std::vector<LayerSettings> &layers, BufferHan
     // get the all check point
     std::vector<Point> points;
     for (auto layer : layers) {
-        IRect &rect = layer.displayRect;
+        const IRect &rect = layer.displayRect;
         if (checkType == CHECK_VERTEX) {
             GetCheckPoints({ rect.x, rect.y }, points);
             GetCheckPoints({ rect.x, rect.y + rect.h }, points);

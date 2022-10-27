@@ -250,7 +250,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueInputTest_001, TestSize.Level1)
 {
     g_inputBuffer.id = 0;
     g_inputBuffer.size = TEST_PACKET_BUFFER_SIZE;
-    int32_t ret = CreateShareMemory(&g_inputBuffer);
+    int32_t ret = CreateFdShareMemory(&g_inputBuffer);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
     g_inputInfoData = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * 1);
@@ -309,7 +309,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueOutputTest_001, TestSize.Level1)
 {
     g_outputBuffer.id = 1;
     g_outputBuffer.size = TEST_FRAME_BUFFER_SIZE;
-    int32_t ret = CreateShareMemory(&g_outputBuffer);
+    int32_t ret = CreateFdShareMemory(&g_outputBuffer);
     ASSERT_EQ(ret, HDF_SUCCESS);
 
     g_outputInfoData = (CodecBuffer *)OsalMemAlloc(sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * 1);

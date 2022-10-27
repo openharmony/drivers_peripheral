@@ -20,7 +20,7 @@ namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
 namespace TEST {
-HdiTestDisplay::HdiTestDisplay(uint32_t id, DeviceFuncs &deviceFunc) : mId(id), mDeviceFunc(deviceFunc) {}
+HdiTestDisplay::HdiTestDisplay(const uint32_t id, const DeviceFuncs &deviceFunc) : mId(id), mDeviceFunc(deviceFunc) {}
 
 int32_t HdiTestDisplay::Init()
 {
@@ -33,7 +33,7 @@ int32_t HdiTestDisplay::Init()
     uint32_t num = 0;
     ret = mDeviceFunc.GetDisplaySupportedModes(mId, &num, nullptr);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("can not get modes num"));
-    DISPLAY_TEST_CHK_RETURN((num <= 0), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("the mode num is %d", num));
+    DISPLAY_TEST_CHK_RETURN((num == 0), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("the mode num is %d", num));
     mModes.resize(num);
     ret = mDeviceFunc.GetDisplaySupportedModes(mId, &num, mModes.data());
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("can not get modes"));
@@ -59,7 +59,7 @@ int32_t HdiTestDisplay::Init()
     return DISPLAY_SUCCESS;
 }
 
-int32_t HdiTestDisplay::GetModeInfoFromId(int32_t id, DisplayModeInfo &modeInfo)
+int32_t HdiTestDisplay::GetModeInfoFromId(int32_t id, DisplayModeInfo &modeInfo) const
 {
     DISPLAY_TEST_LOGD();
     for (const auto &mode : mModes) {

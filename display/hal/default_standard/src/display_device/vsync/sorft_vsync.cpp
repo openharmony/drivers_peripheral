@@ -78,7 +78,6 @@ void SorftVsync::WorkThread()
 {
     DISPLAY_LOGD();
     unsigned int seq = 0;
-    uint64_t time = 0;
     const int SIXTY_HZ_OF_TIME = 16666;
     struct timespec ts;
     while (CheckRuning()) {
@@ -87,7 +86,7 @@ void SorftVsync::WorkThread()
         seq++;
         if (callback_ != nullptr) {
             clock_gettime(CLOCK_MONOTONIC, &ts);
-            time = ts.tv_nsec;
+            uint64_t time = ts.tv_nsec;
             callback_->Vsync(seq, time);
         } else {
             DISPLAY_LOGE("the callbac is nullptr");
@@ -95,7 +94,7 @@ void SorftVsync::WorkThread()
     }
 }
 
-void SorftVsync::ReqesterVBlankCb(std::shared_ptr<VsyncCallBack> &cb)
+void SorftVsync::ReqesterVBlankCb(const std::shared_ptr<VsyncCallBack> &cb)
 {
     DISPLAY_LOGD();
     DISPLAY_CHK_RETURN_NOT_VALUE((cb == nullptr), DISPLAY_LOGE("the VBlankCallback is nullptr "));

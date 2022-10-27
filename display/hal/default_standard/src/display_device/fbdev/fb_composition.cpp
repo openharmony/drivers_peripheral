@@ -42,7 +42,7 @@ int32_t FbComposition::FbFresh(int fd, HdiLayer &clientlayer, int &fence)
     return DISPLAY_SUCCESS;
 }
 
-FbComposition::FbComposition(std::vector<int> &fbs)
+FbComposition::FbComposition(const std::vector<int> &fbs)
 {
     DISPLAY_LOGD();
     fds_ = fbs;

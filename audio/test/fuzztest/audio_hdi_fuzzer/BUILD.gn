@@ -23,6 +23,7 @@ group("audio_hdi_fuzzer") {
   deps += [
     "audioadapter_fuzzer:AudioAdapterFuzzTest",
     "audiocapture_fuzzer:AudioCaptureFuzzTest",
+    "audiomanager_fuzzer:AudioManagerFuzzTest",
     "audiorender_fuzzer:AudioRenderFuzzTest",
   ]
 }
