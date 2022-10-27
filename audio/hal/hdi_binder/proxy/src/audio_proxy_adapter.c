@@ -402,7 +402,9 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
 int32_t AudioProxyAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRender *render)
 {
     int32_t ret = AUDIO_HAL_SUCCESS;
-
+    if (adapter == NULL || render == NULL) {
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
     ret = AudioCheckRenderAddr((AudioHandle)render);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("The proxyRender address passed in is invalid");
@@ -410,9 +412,6 @@ int32_t AudioProxyAdapterDestroyRender(struct AudioAdapter *adapter, struct Audi
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (adapter == NULL || render == NULL) {
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     if (hwRender->proxyRemoteHandle == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;

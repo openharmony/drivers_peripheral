@@ -251,8 +251,6 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, AudioGetAllAdapterReliability_001
 HWTEST_F(AudioHdiRenderControlReliabilityTest, AudioLoadlAdapterReliability_001, TestSize.Level1)
 {
     int32_t ret = -1;
-    int32_t failcount = 0;
-    int32_t succeedcount = 0;
     g_para[0].manager = manager;
     ASSERT_NE(nullptr, g_para[0].manager);
     pthread_t tids[PTHREAD_SAMEADA_COUNT];
@@ -266,16 +264,8 @@ HWTEST_F(AudioHdiRenderControlReliabilityTest, AudioLoadlAdapterReliability_001,
         void *loadadapterresult = nullptr;
         pthread_join(tids[i], &loadadapterresult);
         ret = (intptr_t)loadadapterresult;
-        if (ret == 0) {
-            EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-            succeedcount = succeedcount + 1;
-        } else {
-            EXPECT_EQ(AUDIO_HAL_ERR_NOTREADY, ret);
-            failcount = failcount + 1;
-        }
+        EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     }
-    EXPECT_EQ(failcount, PTHREAD_SAMEADA_COUNT - 1);
-    EXPECT_EQ(succeedcount, 1);
     g_para[0].manager->UnloadAdapter(g_para[0].manager, g_para[0].adapter);
     g_para[0].adapter = nullptr;
 }
