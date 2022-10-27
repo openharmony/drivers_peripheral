@@ -15,8 +15,9 @@
 
 #ifndef OHOS_HDI_USB_V1_0_USBIMPL_H
 #define OHOS_HDI_USB_V1_0_USBIMPL_H
-
 #include "hdf_slist.h"
+#include "iproxy_broker.h"
+#include "iremote_object.h"
 #include "osal_mutex.h"
 #include "usb_session.h"
 #include "usbd.h"
@@ -131,10 +132,17 @@ private:
     static int32_t UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbImpl *super, uint32_t id);
     static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data);
     static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
+    class UsbDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit UsbDeathRecipient() {};
+        ~UsbDeathRecipient() override {};
+        void OnRemoteDied(const wptr<IRemoteObject> &object) override;
+    };
 
 private:
     static HdfDevEventlistener usbPnpListener_;
     static HdfDevEventlistener listenerForLoadService_;
+    static sptr<UsbImpl::UsbDeathRecipient> deathRecipient_;
 };
 } // namespace V1_0
 } // namespace Usb
