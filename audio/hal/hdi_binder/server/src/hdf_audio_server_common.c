@@ -1945,6 +1945,125 @@ static int32_t HdiSerStubReleaseAudioRoute(const struct HdfDeviceIoClient *clien
     return audioAdapterRet;
 }
 
+static int32_t HdiServiceAdapterSetVoiceVolume(const struct HdfDeviceIoClient *client,
+                                               struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    float volume = 0;
+    struct AudioAdapter *adapter = NULL;
+    const char *adapterName = NULL;
+
+    if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is NULL");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    if ((adapterName = HdfSbufReadString(data)) == NULL) {
+        AUDIO_FUNC_LOGE("adapterName Is NULL ");
+        return HDF_FAILURE;
+    }
+
+    if ((HdfSbufReadFloat(data, &volume))) {
+        AUDIO_FUNC_LOGE("volume Is NULL ");
+        return HDF_FAILURE;
+    }
+
+    if (AudioAdapterListGetAdapter(adapterName, &adapter) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("adapter is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    return adapter->SetVoiceVolume(adapter, volume);
+}
+
+static int32_t HdiServiceAdapterSetExtraParams(const struct HdfDeviceIoClient *client,
+                                               struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("the parameter is empty");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    struct AudioAdapter *adapter = NULL;
+    const char *adapterName = NULL;
+    const char *value = NULL;
+    enum AudioExtParamKey key = AUDIO_EXT_PARAM_KEY_NONE;
+    const char *condition = NULL;
+
+    if ((adapterName = HdfSbufReadString(data)) == NULL) {
+        AUDIO_FUNC_LOGE("adapterName is NULL");
+        return HDF_FAILURE;
+    }
+
+    if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter FAIL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("adapter is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    value = HdfSbufReadString(data);
+    if (value == NULL) {
+        AUDIO_FUNC_LOGE("value is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    return adapter->SetExtraParams(adapter, key, condition, value);
+}
+
+static int32_t HdiServiceAdapterGetExtraParams(const struct HdfDeviceIoClient *client,
+                                               struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("the parameter is empty");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    int32_t length = 0;
+    struct AudioAdapter *adapter = NULL;
+    const char *adapterName = NULL;
+    enum AudioExtParamKey key = AUDIO_EXT_PARAM_KEY_NONE;
+    const char *condition = NULL;
+    char value[STR_MAX] = { 0 };
+
+    if ((adapterName = HdfSbufReadString(data)) == NULL) {
+        AUDIO_FUNC_LOGE("adapterName is NULL");
+        return HDF_FAILURE;
+    }
+
+    if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter FAIL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("adapter is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufReadInt32(data, &length)) {
+        AUDIO_FUNC_LOGE("HdiServiceAdapterGetExtraParams FAIL! length is 0.");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    int ret = adapter->GetExtraParams(adapter, key, condition, value, length);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("GetExtraParams FAIL");
+        return ret;
+    }
+
+    if (!HdfSbufWriteString(reply, value)) {
+        AUDIO_FUNC_LOGE("value write fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    return AUDIO_HAL_SUCCESS;
+}
+
 struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleList[] = {
     {AUDIO_HDI_MGR_GET_FUNCS, HdiServiceGetFuncs},
     {AUDIO_HDI_MGR_GET_ALL_ADAPTER, HdiServiceGetAllAdapter},
@@ -1956,6 +2075,9 @@ struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleList[] = {
     {AUDIO_HDI_ADT_GET_PASS_MODE, HdiServiceGetPassthroughMode},
     {AUDIO_HDI_ADT_UPDATE_ROUTE, HdiSerStubUpdateAudioRoute},
     {AUDIO_HDI_ADT_RELEASE_ROUTE, HdiSerStubReleaseAudioRoute},
+    {AUDIO_HDI_ADT_SET_VOICE_VOLUME, HdiServiceAdapterSetVoiceVolume},
+    {AUDIO_HDI_ADT_SET_EXTRA_PARAMS, HdiServiceAdapterSetExtraParams},
+    {AUDIO_HDI_ADT_GET_EXTRA_PARAMS, HdiServiceAdapterGetExtraParams},
     {AUDIO_HDI_PNP_DEV_STATUS, HdiServiceGetDevStatusByPnp},
     {AUDIO_HDI_RENDER_CREATE_RENDER, HdiServiceCreatRender},
     {AUDIO_HDI_RENDER_DESTROY, HdiServiceRenderDestory},

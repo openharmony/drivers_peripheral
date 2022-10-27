@@ -257,8 +257,11 @@ static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, str
     hwAdapter->common.GetPortCapability = AudioAdapterGetPortCapability;
     hwAdapter->common.SetPassthroughMode = AudioAdapterSetPassthroughMode;
     hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
+    hwAdapter->common.SetVoiceVolume = AudioAdapterSetVoiceVolume;
     hwAdapter->common.UpdateAudioRoute = AudioAdapterUpdateAudioRoute;
     hwAdapter->common.ReleaseAudioRoute = AudioAdapterReleaseAudioRoute;
+    hwAdapter->common.SetExtraParams = AudioAdapterSetExtraParams;
+    hwAdapter->common.GetExtraParams = AudioAdapterGetExtraParams;
     hwAdapter->adapterDescriptor = *desc;
     hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
     hwAdapter->adapterMgrCaptureFlag = 0; // The adapterMgrCaptureFlag init is zero
