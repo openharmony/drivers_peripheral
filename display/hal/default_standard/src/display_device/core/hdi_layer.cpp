@@ -202,7 +202,7 @@ void HdiLayer::SetPixel(const BufferHandle &handle, int x, int y, uint32_t color
 void HdiLayer::ClearColor(uint32_t color)
 {
     DISPLAY_LOGD();
-    BufferHandle &handle = mHdiBuffer->mHandle;
+    const BufferHandle &handle = mHdiBuffer->mHandle;
     for (int32_t x = 0; x < handle.width; x++) {
         for (int32_t y = 0; y < handle.height; y++) {
             SetPixel(handle, x, y, color);

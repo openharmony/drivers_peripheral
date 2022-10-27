@@ -60,7 +60,7 @@ RetCode HosFileFormat::V4L2SearchFormat(int fd, std::vector<DeviceFormat>& fmtDe
                 }
 
                 DeviceFormat currentFormat = {};
-                currentFormat.fmtdesc.description = std::string((char*)enumFmtDesc.description);
+                currentFormat.fmtdesc.description = std::string(reinterpret_cast<char*>(enumFmtDesc.description));
                 currentFormat.fmtdesc.pixelformat = enumFmtDesc.pixelformat;
                 currentFormat.fmtdesc.width = frmSize.discrete.width;
                 currentFormat.fmtdesc.height = frmSize.discrete.height;
@@ -124,12 +124,12 @@ RetCode HosFileFormat::V4L2GetCapability(int fd, const std::string& devName, std
         return RC_ERROR;
     }
 
-    if (cameraId != std::string((char*)cap.driver)) {
+    if (cameraId != std::string(reinterpret_cast<char*>(cap.driver))) {
         return RC_ERROR;
     }
 
     std::lock_guard<std::mutex> l(HosV4L2Dev::deviceFdLock_);
-    HosV4L2Dev::deviceMatch.insert(std::make_pair(std::string((char*)cap.driver), devName));
+    HosV4L2Dev::deviceMatch.insert(std::make_pair(std::string(reinterpret_cast<char*>(cap.driver)), devName));
 
     CAMERA_LOGD("v4l2 driver name = %{public}s\n", cap.driver);
     CAMERA_LOGD("v4l2 capabilities = 0x%{public}x\n", cap.capabilities);

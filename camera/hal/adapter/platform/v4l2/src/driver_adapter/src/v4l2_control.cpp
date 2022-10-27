@@ -188,7 +188,7 @@ void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
     ctrl.step = qCtrl.step;
     ctrl.default_value = qCtrl.default_value;
     ctrl.flags = qCtrl.flags;
-    ctrl.name = std::string((char*)qCtrl.name);
+    ctrl.name = std::string(reinterpret_cast<char*>(qCtrl.name));
 
     if (qCtrl.type == V4L2_CTRL_TYPE_CTRL_CLASS) {
         CAMERA_LOGD("%-14s\n", qCtrl.name);
@@ -237,7 +237,7 @@ void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& con
                 menuTemp.index = menu.index;
                 menuTemp.id = menu.id;
                 menuTemp.value = menu.value;
-                menuTemp.name = std::string((char*)menu.name);
+                menuTemp.name = std::string(reinterpret_cast<char*>(menu.name));
                 ctrl.menu.push_back(menuTemp);
             }
         }
@@ -282,7 +282,7 @@ int HosV4L2Control::V4L2GetControl(int fd, std::vector<DeviceControl>& control, 
             mTemp.index = menu.index;
             mTemp.id = menu.id;
             mTemp.value = menu.value;
-            mTemp.name = std::string((char*)menu.name);
+            mTemp.name = std::string(reinterpret_cast<char*>(menu.name));
             ctrl.menu.push_back(mTemp);
         }
     }

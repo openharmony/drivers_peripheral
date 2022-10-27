@@ -87,7 +87,7 @@ private:
     bool HasContinuousCaptureInfo(int captureId);
     int32_t ExtractStreamInfo(std::vector<DCStreamInfo>& dCameraStreams);
     void ExtractCaptureInfo(std::vector<DCCaptureInfo> &captureInfos);
-    void ExtractCameraAttr(Json::Value &rootValue, std::set<int> &allFormats, std::vector<int> &photoFormats);
+    void ExtractCameraAttr(Json::Value &rootValue, std::vector<int>& formats, const std::string rootNode);
     DCamRetCode GetInputCaptureInfo(const CaptureInfo& srcCaptureInfo, bool isStreaming,
         std::shared_ptr<DCCaptureInfo>& inputCaptureInfo);
     void AppendCaptureInfo(std::shared_ptr<DCCaptureInfo> &appendCaptureInfo, bool isStreaming,
@@ -129,7 +129,9 @@ private:
     DHBase dhBase_;
     std::vector<DCEncodeType> dcSupportedCodecType_;
     std::map<DCSceneType, std::vector<int>> dcSupportedFormatMap_;
-    std::map<int, std::vector<DCResolution>> dcSupportedResolutionMap_;
+    std::map<int, std::vector<DCResolution>> dcSupportedPhotoResolutionMap_;
+    std::map<int, std::vector<DCResolution>> dcSupportedPreviewResolutionMap_;
+    std::map<int, std::vector<DCResolution>> dcSupportedVideoResolutionMap_;
 
     std::map<int, std::shared_ptr<DCameraStream>> halStreamMap_;
     std::map<int, std::shared_ptr<DCStreamInfo>> dcStreamInfoMap_;

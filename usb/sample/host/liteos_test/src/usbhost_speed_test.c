@@ -13,18 +13,20 @@
  * limitations under the License.
  */
 
-#include "securec.h"
+#include "hdf_io_service_if.h"
+#include <stdio.h>
+#include <unistd.h>
+
+#include <sys/time.h>
+
 #include "hdf_log.h"
 #include "osal_mem.h"
-#include "hdf_io_service_if.h"
-#include <unistd.h>
-#include <sys/time.h>
-#include <stdio.h>
 #include "osal_mutex.h"
+#include "securec.h"
 #include "signal.h"
 
-#define TEST_WRITE              true
-#define TEST_READ               false
+#define TEST_WRITE         true
+#define TEST_READ          false
 #define SERVER_NAME_SDKAPI "usb_sdkapispeed_service"
 #define SERVER_NAME_RAWAPI "usb_rawapispeed_service"
 #define SERVER_NAME_NOSDK  "usb_nosdkspeed_service"
@@ -117,15 +119,17 @@ static void SpeedInit(void)
 
 static void SpeedExit(void)
 {
+    if (g_service == NULL) {
+        printf("%s: g_service is null", __func__);
+        return;
+    }
     int32_t status = g_service->dispatcher->Dispatch(&g_service->object, USB_SERIAL_CLOSE, g_data, g_reply);
     if (status) {
         printf("%s: Dispatch USB_SERIAL_CLOSE err status = %d\n", __func__, status);
     }
 
-    if (g_service != NULL) {
-        HdfIoServiceRecycle(g_service);
-        g_service = NULL;
-    }
+    HdfIoServiceRecycle(g_service);
+    g_service = NULL;
     HdfSbufRecycle(g_data);
     HdfSbufRecycle(g_reply);
 }
@@ -158,32 +162,30 @@ static void *StopHandler(void)
     }
 }
 
-static enum speedServer checkServer(const char* input)
+static enum speedServer checkServer(const char *input)
 {
     char middle[10] = {0};
-    enum speedServer out;
     if (input == NULL) {
         HDF_LOGE("%s:%d input is NULL", __func__, __LINE__);
-        out = SDKAPI_SERVER;
-        return out;
+        return SDKAPI_SERVER;
     }
 
     int32_t ret = strncpy_s(middle, sizeof(middle), input, (uint32_t)strlen(input));
     if (ret != EOK) {
         HDF_LOGE("%s:%d strncpy_s failed", __func__, __LINE__);
-        return out;
+        return SDKAPI_SERVER;
     }
 
-    if (!strcmp(middle, "-SDK")) {
-        out = SDKAPI_SERVER;
-    } else if (!strcmp(middle, "-RAW")) {
-        out = RAWAPI_SERVER;
-    } else if (!strcmp(middle, "-NOSDK")) {
-        out = NOSDK_SERVER;
-    } else {
-        out = SDKAPI_SERVER;
+    if (strcmp(middle, "-SDK") == 0) {
+        return SDKAPI_SERVER;
     }
-    return out;
+    if (strcmp(middle, "-RAW") == 0) {
+        return RAWAPI_SERVER;
+    }
+    if (strcmp(middle, "-NOSDK") == 0) {
+        return NOSDK_SERVER;
+    }
+    return SDKAPI_SERVER;
 }
 
 static int32_t GetWriteOrReadFlag(const char *buffer)
@@ -210,8 +212,8 @@ static int32_t CheckParam(int32_t argc, const char *argv[], struct UsbSpeedTest 
         return HDF_ERR_INVALID_PARAM;
     }
     switch (argc) {
-        case 7: // 7 is number of arguments supplied to the main function
-        case 6: // 6 is number of arguments supplied to the main function
+        case 7:                                  // 7 is number of arguments supplied to the main function
+        case 6:                                  // 6 is number of arguments supplied to the main function
             g_spdServer = checkServer(argv[1]);  // 1 is argv second element
             speedTest->busNum = atoi(argv[2]);   // 2 is argv third element
             speedTest->devAddr = atoi(argv[3]);  // 3 is argv fourth element
@@ -222,11 +224,11 @@ static int32_t CheckParam(int32_t argc, const char *argv[], struct UsbSpeedTest 
                 printData = (strncmp(argv[6], "printdata", 1)) ? false : true; // 6 is argv seventh element
             }
             break;
-        case 4: // 4 number of arguments supplied to the main function
+        case 4:                                 // 4 number of arguments supplied to the main function
             g_spdServer = checkServer(argv[1]); // 1 is argv second element
             speedTest->busNum = 1;
-            speedTest->devAddr = 2; // 2 is device address
-            speedTest->ifaceNum = atoi(argv[2]); // 2 is argv third element
+            speedTest->devAddr = 2;                               // 2 is device address
+            speedTest->ifaceNum = atoi(argv[2]);                  // 2 is argv third element
             speedTest->writeOrRead = GetWriteOrReadFlag(argv[3]); // 3 is argv fourth element
             break;
         default:

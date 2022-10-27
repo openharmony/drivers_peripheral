@@ -48,7 +48,7 @@ namespace OHOS {
 namespace Audio {
 int32_t InitAttrs(struct AudioSampleAttributes &attrs)
 {
-    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.channelCount = CHANNELCOUNT;
     attrs.sampleRate = SAMPLERATE;
     attrs.interleaved = 0;
@@ -152,13 +152,13 @@ int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs, const std::string &a
 uint32_t PcmFormatToBits(int format)
 {
     switch (format) {
-        case AUDIO_FORMAT_PCM_8_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_8_BIT:
             return PCM_8_BIT;
-        case AUDIO_FORMAT_PCM_16_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_16_BIT:
             return PCM_16_BIT;
-        case AUDIO_FORMAT_PCM_24_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_24_BIT:
             return PCM_24_BIT;
-        case AUDIO_FORMAT_PCM_32_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_32_BIT:
             return PCM_32_BIT;
         default:
             return PCM_16_BIT;
@@ -199,19 +199,19 @@ int32_t WavHeadAnalysis(struct AudioHeadInfo &wavHeadInfo, FILE *file, struct Au
     attrs.sampleRate = wavHeadInfo.audioSampleRate;
     switch (wavHeadInfo.audioBitsPerSample) {
         case PCM_8_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_8_BIT;
+            attrs.format = AUDIO_FORMAT_TYPE_PCM_8_BIT;
             break;
         }
         case PCM_16_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+            attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
             break;
         }
         case PCM_24_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+            attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
             break;
         }
         case PCM_32_BIT: {
-            attrs.format = AUDIO_FORMAT_PCM_32_BIT;
+            attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
             break;
         }
         default:
@@ -460,11 +460,11 @@ int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct AudioRender *render,
     }
     uint32_t remainingDataSize = wavHeadInfo.dataSize;
     uint32_t bufferSize = PcmFramesToBytes(attrs);
-    if (bufferSize <= 0) {
+    if (bufferSize == 0) {
         return HDF_FAILURE;
     }
     char *frame = nullptr;
-    frame = (char *)calloc(1, bufferSize);
+    frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -513,11 +513,11 @@ int32_t FrameStartCapture(struct AudioCapture *capture, FILE *file, const struct
         return HDF_FAILURE;
     }
     bufferSize = FRAME_COUNT * pcmBytes;
-    if (bufferSize <= 0) {
+    if (bufferSize == 0) {
         return HDF_FAILURE;
     }
     char *frame = nullptr;
-    frame = (char *)calloc(1, bufferSize);
+    frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -558,7 +558,7 @@ int32_t RenderFramePrepare(const std::string &path, char *&frame, uint64_t &read
         fclose(file);
         return HDF_FAILURE;
     }
-    frame = (char *)calloc(1, bufferSize);
+    frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
         fclose(file);
         return HDF_ERR_MALLOC_FAIL;
@@ -597,7 +597,7 @@ int32_t StartRecord(struct AudioCapture *capture, FILE *file, uint64_t filesize)
     if (ret < 0) {
         return ret;
     }
-    char *frame = (char *)calloc(1, BUFFER_LENTH);
+    char *frame = reinterpret_cast<char *>(calloc(1, BUFFER_LENTH));
     if (frame == nullptr) {
         return HDF_ERR_MALLOC_FAIL;
     }
@@ -620,7 +620,7 @@ int32_t StartRecord(struct AudioCapture *capture, FILE *file, uint64_t filesize)
             tryNumFrame = 0;
             uint32_t replyByte = static_cast<uint32_t>(replyBytes);
             size_t writeRet = fwrite(frame, replyByte, 1, file);
-            if (writeRet < 0) {
+            if (writeRet == 0) {
                 free(frame);
                 frame = nullptr;
                 return HDF_FAILURE;
@@ -781,6 +781,9 @@ int32_t CheckRegisterStatus(const struct AudioCtlElemId firstId, const struct Au
 
 int32_t StopAudio(struct PrepareAudioPara &audiopara)
 {
+    if (audiopara.manager == nullptr || audiopara.adapter == nullptr) {
+        return HDF_FAILURE;
+    }
     int32_t ret = -1;
     if (audiopara.capture != nullptr) {
         ret = audiopara.capture->control.Stop((AudioHandle)(audiopara.capture));
@@ -806,10 +809,8 @@ int32_t StopAudio(struct PrepareAudioPara &audiopara)
         audiopara.adapter->DestroyRender(audiopara.adapter, audiopara.render);
         audiopara.render = nullptr;
     }
-    if (audiopara.manager != nullptr && audiopara.adapter != nullptr) {
-        audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
-        audiopara.adapter = nullptr;
-    }
+    audiopara.manager->UnloadAdapter(audiopara.manager, audiopara.adapter);
+    audiopara.adapter = nullptr;
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -1004,8 +1005,8 @@ int32_t RecordMapAudio(struct PrepareAudioPara &audiopara)
 int32_t AudioRenderCallback(enum AudioCallbackType type, void *reserved, void *cookie)
 {
     switch (type) {
-        case AUDIO_NONBLOCK_WRITE_COMPELETED:
-            g_writeCompleted = AUDIO_WRITE_COMPELETED_VALUE;
+        case AUDIO_NONBLOCK_WRITE_COMPLETED:
+            g_writeCompleted = AUDIO_WRITE_COMPLETED_VALUE;
             return HDF_SUCCESS;
         case AUDIO_RENDER_FULL:
             g_renderFull = AUDIO_RENDER_FULL_VALUE;
@@ -1015,7 +1016,7 @@ int32_t AudioRenderCallback(enum AudioCallbackType type, void *reserved, void *c
             return HDF_SUCCESS;
         case AUDIO_ERROR_OCCUR:
             return HDF_FAILURE;
-        case AUDIO_DRAIN_COMPELETED:
+        case AUDIO_DRAIN_COMPLETED:
             return HDF_FAILURE;
         default:
             return HDF_FAILURE;
@@ -1023,7 +1024,7 @@ int32_t AudioRenderCallback(enum AudioCallbackType type, void *reserved, void *c
 }
 int32_t CheckWriteCompleteValue()
 {
-    if (g_writeCompleted == AUDIO_WRITE_COMPELETED_VALUE)
+    if (g_writeCompleted == AUDIO_WRITE_COMPLETED_VALUE)
         return HDF_SUCCESS;
     else
         return HDF_FAILURE;

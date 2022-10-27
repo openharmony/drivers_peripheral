@@ -38,7 +38,7 @@ RetCode ForkNode::Start(const int32_t streamId)
     inPutPorts_ = GetInPorts();
     outPutPorts_ = GetOutPorts();
 
-    for (auto& in : inPutPorts_) {
+    for (const auto& in : inPutPorts_) {
         for (auto& out : outPutPorts_) {
             if (out->format_.streamId_ != in->format_.streamId_) {
                 id = out->format_.streamId_;

@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
+#include "usbd_transfer_test.h"
+
 #include <iostream>
 #include <vector>
 
 #include "UsbSubscriberTest.h"
 #include "hdf_log.h"
 #include "securec.h"
-#include "usbd_transfer_test.h"
 #include "v1_0/iusb_interface.h"
 #include "v1_0/usb_types.h"
 
@@ -39,7 +40,9 @@ const uint8_t PIPE_INTERFACEID_255 = 255;
 const uint8_t POINTID_1 = 1;
 const uint8_t POINTID_99 = 99;
 const uint8_t POINTID_129 = 130;
-const uint32_t ASHMEM_MAX_SIZE = 1024;
+const uint8_t POINTID_BULK_IN = 0x82;
+const uint8_t POINTID_BULK_OUT = 0x01;
+const int32_t ASHMEM_MAX_SIZE = 1024;
 UsbDev UsbdTransferTest::dev_ = {0, 0};
 
 using namespace testing::ext;
@@ -139,7 +142,7 @@ void UsbdTransferTest::TearDown(void) {}
 /**
  * @tc.name: UsbdControlTransfer001
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly, standard request: get configuration
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer001, TestSize.Level1)
@@ -157,7 +160,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer001, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer002
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
- * @tc.desc: 反向测试：BUS_NUM_255
+ * @tc.desc: Negative test: parameters exception, busNum error, standard request: get configuration
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer002, TestSize.Level1)
@@ -175,7 +178,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer002, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer003
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
- * @tc.desc: 反向测试：DEV_ADDR_255
+ * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get configuration
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer003, TestSize.Level1)
@@ -193,7 +196,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer003, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer004
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
- * @tc.desc: 反向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly, standard request: get descriptor(device)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer004, TestSize.Level1)
@@ -211,6 +214,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer004, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer005
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error, standard request: get descriptor(device)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer005, TestSize.Level1)
@@ -228,6 +232,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer005, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer006
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get descriptor(device)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer006, TestSize.Level1)
@@ -245,6 +250,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer006, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer007
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly, standard request: get interface
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer007, TestSize.Level1)
@@ -263,6 +269,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer007, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer008
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error, standard request: get interface
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer008, TestSize.Level1)
@@ -281,6 +288,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer008, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer009
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get interface
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer009, TestSize.Level1)
@@ -299,6 +307,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer009, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer010
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * Positive test: parameters correctly, standard request: get status(recipient device)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer010, TestSize.Level1)
@@ -316,6 +325,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer010, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer011
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error, standard request: get status(device)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer011, TestSize.Level1)
@@ -333,6 +343,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer011, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer012
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get status(device)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer012, TestSize.Level1)
@@ -350,6 +361,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer012, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer013
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * Positive test: parameters correctly, standard request: get status(interface)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer013, TestSize.Level1)
@@ -367,6 +379,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer013, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer014
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error, standard request: get status(interface)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer014, TestSize.Level1)
@@ -384,6 +397,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer014, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer015
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get status(interface)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer015, TestSize.Level1)
@@ -401,6 +415,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer015, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer016
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly, standard request: get status(endpoint)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer016, TestSize.Level1)
@@ -418,6 +433,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer016, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer017
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error, standard request: get status(endpoint)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer017, TestSize.Level1)
@@ -435,6 +451,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer017, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer018
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get status(endpoint)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer018, TestSize.Level1)
@@ -452,6 +469,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer018, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer019
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly, standard request: sync frame
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer019, TestSize.Level1)
@@ -469,6 +487,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer019, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer020
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error, standard request: sync frame
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer020, TestSize.Level1)
@@ -486,6 +505,7 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer020, TestSize.Level1)
 /**
  * @tc.name: UsbdControlTransfer021
  * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error, standard request: sync frame
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransfer021, TestSize.Level1)
@@ -504,13 +524,14 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransfer021, TestSize.Level1)
  * @tc.name: UsbdBulkTransferRead001
  * @tc.desc: Test functions to BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead001, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t pointid = POINTID_129;
+    uint8_t pointid = POINTID_BULK_IN;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -520,22 +541,23 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead001, TestSize.Level1)
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->BulkTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead001 %{public}d UsbdBulkTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    ASSERT_EQ(0, ret);
 }
 
 /**
  * @tc.name: UsbdBulkTransferRead002
  * @tc.desc: Test functions to BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead002, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t pointid = POINTID_129;
+    uint8_t pointid = POINTID_BULK_IN;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead002 %{public}d ReleaseInterface=%{public}d", __LINE__, ret);
+    HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
     dev.busNum = BUS_NUM_222;
     uint32_t length = 100;
@@ -551,13 +573,14 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead002, TestSize.Level1)
  * @tc.name: UsbdBulkTransferRead003
  * @tc.desc: Test functions to BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead003, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t pointid = POINTID_129;
+    uint8_t pointid = POINTID_BULK_IN;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -575,13 +598,14 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead003, TestSize.Level1)
  * @tc.name: UsbdBulkTransferRead004
  * @tc.desc: Test functions to BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, intfId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead004, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t pointid = POINTID_129;
+    uint8_t pointid = POINTID_BULK_IN;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -599,13 +623,14 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead004, TestSize.Level1)
  * @tc.name: UsbdBulkTransferRead005
  * @tc.desc: Test functions to BulkTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, endpointId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead005, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t pointid = POINTID_129;
+    uint8_t pointid = POINTID_BULK_IN;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdTransferTest::UsbdBulkTransferRead005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -623,6 +648,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferRead005, TestSize.Level1)
  * @tc.name: UsbdBulkTransferWrite001
  * @tc.desc: Test functions to BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite001, TestSize.Level1)
@@ -646,6 +672,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite001, TestSize.Level1)
  * @tc.name: UsbdBulkTransferWrite002
  * @tc.desc: Test functions to BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite002, TestSize.Level1)
@@ -670,6 +697,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite002, TestSize.Level1)
  * @tc.name: UsbdBulkTransferWrite003
  * @tc.desc: Test functions to BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite003, TestSize.Level1)
@@ -694,6 +722,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite003, TestSize.Level1)
  * @tc.name: UsbdBulkTransferWrite004
  * @tc.desc: Test functions to BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, intfId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite004, TestSize.Level1)
@@ -718,6 +747,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite004, TestSize.Level1)
  * @tc.name: UsbdBulkTransferWrite005
  * @tc.desc: Test functions to BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, endpointId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite005, TestSize.Level1)
@@ -742,6 +772,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite005, TestSize.Level1)
  * @tc.name: UsbdBulkTransferWrite006
  * @tc.desc: Test functions to BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite006, TestSize.Level1)
@@ -767,6 +798,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite006, TestSize.Level1)
  * @tc.name: UsbdBulkTransferWrite007
  * @tc.desc: Test functions to BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, ClaimInterface failed first
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite007, TestSize.Level1)
@@ -790,6 +822,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite007, TestSize.Level1)
  * @tc.name: UsbdBulkTransferWrite008
  * @tc.desc: Test functions to BulkTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly, different in timeout
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite008, TestSize.Level1)
@@ -813,6 +846,7 @@ HWTEST_F(UsbdTransferTest, UsbdBulkTransferWrite008, TestSize.Level1)
  * @tc.name: InterruptTransferRead001
  * @tc.desc: Test functions to InterruptTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead001, TestSize.Level1)
@@ -830,13 +864,14 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead001, TestSize.Level1)
     ret = g_usbInterface->InterruptTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead001 %{public}d UsbdInterruptTransferRead=%{public}d", __LINE__,
         ret);
-    ASSERT_NE(0, ret);
+    ASSERT_EQ(0, ret);
 }
 
 /**
  * @tc.name: UsbdInterruptTransferRead002
  * @tc.desc: Test functions to InterruptTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead002, TestSize.Level1)
@@ -845,7 +880,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead002, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_129;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead002 %{public}d ReleaseInterface=%{public}d", __LINE__, ret);
+    HDF_LOGI("UsbdTransferTest::UsbdInterruptTransferRead002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
     dev.busNum = BUS_NUM_222;
     uint32_t length = 100;
@@ -862,6 +897,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead002, TestSize.Level1)
  * @tc.name: UsbdInterruptTransferRead003
  * @tc.desc: Test functions to InterruptTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead003, TestSize.Level1)
@@ -885,6 +921,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead003, TestSize.Level1)
  * @tc.name: UsbdInterruptTransferRead004
  * @tc.desc: Test functions to InterruptTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, intfId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead004, TestSize.Level1)
@@ -910,6 +947,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead004, TestSize.Level1)
  * @tc.name: UsbdInterruptTransferRead005
  * @tc.desc: Test functions to InterruptTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, endpointId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead005, TestSize.Level1)
@@ -935,6 +973,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferRead005, TestSize.Level1)
  * @tc.name: UsbdInterruptTransferWrite001
  * @tc.desc: Test functions to InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite001, TestSize.Level1)
@@ -959,6 +998,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite001, TestSize.Level1)
  * @tc.name: UsbdInterruptTransferWrite002
  * @tc.desc: Test functions to InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite002, TestSize.Level1)
@@ -984,6 +1024,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite002, TestSize.Level1)
  * @tc.name: UsbdInterruptTransferWrite003
  * @tc.desc: Test functions to InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite003, TestSize.Level1)
@@ -1009,6 +1050,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite003, TestSize.Level1)
  * @tc.name: UsbdInterruptTransferWrite004
  * @tc.desc: Test functions to InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, intfId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite004, TestSize.Level1)
@@ -1034,6 +1076,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite004, TestSize.Level1)
  * @tc.name: UsbdInterruptTransferWrite005
  * @tc.desc: Test functions to InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, endpointId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite005, TestSize.Level1)
@@ -1059,6 +1102,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite005, TestSize.Level1)
  * @tc.name: UsbdInterruptTransferWrite006
  * @tc.desc: Test functions to InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite006, TestSize.Level1)
@@ -1085,6 +1129,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite006, TestSize.Level1)
  * @tc.name: UsbdInterruptTransferWrite007
  * @tc.desc: Test functions to InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, ClaimInterface failed first
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite007, TestSize.Level1)
@@ -1109,6 +1154,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite007, TestSize.Level1)
  * @tc.name: UsbdInterruptTransferWrite008
  * @tc.desc: Test functions to InterruptTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * Positive test: parameters correctly, different in timeout
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite008, TestSize.Level1)
@@ -1133,6 +1179,7 @@ HWTEST_F(UsbdTransferTest, UsbdInterruptTransferWrite008, TestSize.Level1)
  * @tc.name: UsbdIsoTransferRead001
  * @tc.desc: Test functions to IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead001, TestSize.Level1)
@@ -1149,13 +1196,14 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead001, TestSize.Level1)
     std::vector<uint8_t> bufferdata = {buffer, buffer + length};
     ret = g_usbInterface->IsoTransferRead(dev, pipe, 1000, bufferdata);
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead001 %{public}d UsbdIsoTransferRead=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
+    ASSERT_EQ(0, ret);
 }
 
 /**
  * @tc.name: UsbdIsoTransferRead002
  * @tc.desc: Test functions to IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead002, TestSize.Level1)
@@ -1165,7 +1213,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead002, TestSize.Level1)
     uint8_t pointid = POINTID_129;
     HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead002 %{public}d interfaceId=%{public}d", __LINE__, interfaceId);
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead002 %{public}d ReleaseInterface=%{public}d", __LINE__, ret);
+    HDF_LOGI("UsbdTransferTest::UsbdIsoTransferRead002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
     dev.busNum = BUS_NUM_222;
     uint32_t length = 100;
@@ -1181,6 +1229,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead002, TestSize.Level1)
  * @tc.name: UsbdIsoTransferRead003
  * @tc.desc: Test functions to IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead003, TestSize.Level1)
@@ -1205,6 +1254,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead003, TestSize.Level1)
  * @tc.name: UsbdIsoTransferRead004
  * @tc.desc: Test functions to IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, intfId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead004, TestSize.Level1)
@@ -1229,6 +1279,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead004, TestSize.Level1)
  * @tc.name: UsbdIsoTransferRead005
  * @tc.desc: Test functions to IsoTransferRead(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, endpointId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead005, TestSize.Level1)
@@ -1253,6 +1304,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferRead005, TestSize.Level1)
  * @tc.name: UsbdIsoTransferWrite001
  * @tc.desc: Test functions to IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite001, TestSize.Level1)
@@ -1276,6 +1328,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite001, TestSize.Level1)
  * @tc.name: UsbdIsoTransferWrite002
  * @tc.desc: Test functions to IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite002, TestSize.Level1)
@@ -1300,6 +1353,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite002, TestSize.Level1)
  * @tc.name: UsbdIsoTransferWrite003
  * @tc.desc: Test functions to IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite003, TestSize.Level1)
@@ -1324,6 +1378,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite003, TestSize.Level1)
  * @tc.name: UsbdIsoTransferWrite004
  * @tc.desc: Test functions to IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, intfId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite004, TestSize.Level1)
@@ -1348,6 +1403,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite004, TestSize.Level1)
  * @tc.name: UsbdIsoTransferWrite005
  * @tc.desc: Test functions to IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, endpointId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite005, TestSize.Level1)
@@ -1372,6 +1428,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite005, TestSize.Level1)
  * @tc.name: UsbdIsoTransferWrite006
  * @tc.desc: Test functions to IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite006, TestSize.Level1)
@@ -1397,6 +1454,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite006, TestSize.Level1)
  * @tc.name: UsbdIsoTransferWrite007
  * @tc.desc: Test functions to IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Negative test: parameters exception, endpointId error, ClaimInterface failed first
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite007, TestSize.Level1)
@@ -1420,6 +1478,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite007, TestSize.Level1)
  * @tc.name: UsbdIsoTransferWrite008
  * @tc.desc: Test functions to IsoTransferWrite(const UsbDev &dev, const UsbPipe &pipe, int32_t timeout,
  * std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly, different in timeout
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite008, TestSize.Level1)
@@ -1442,6 +1501,7 @@ HWTEST_F(UsbdTransferTest, UsbdIsoTransferWrite008, TestSize.Level1)
 /**
  * @tc.name: BulkWrite001
  * @tc.desc: Test functions to int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BulkWrite001, TestSize.Level1)
@@ -1465,6 +1525,7 @@ HWTEST_F(UsbdTransferTest, BulkWrite001, TestSize.Level1)
 /**
  * @tc.name: BulkWrite002
  * @tc.desc: Test functions to int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BulkWrite002, TestSize.Level1)
@@ -1489,6 +1550,7 @@ HWTEST_F(UsbdTransferTest, BulkWrite002, TestSize.Level1)
 /**
  * @tc.name: BulkWrite003
  * @tc.desc: Test functions to int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BulkWrite003, TestSize.Level1)
@@ -1513,6 +1575,7 @@ HWTEST_F(UsbdTransferTest, BulkWrite003, TestSize.Level1)
 /**
  * @tc.name: BulkWrite004
  * @tc.desc: Test functions to int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+ * @tc.desc: Negative test: parameters exception, intfId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BulkWrite004, TestSize.Level1)
@@ -1537,6 +1600,7 @@ HWTEST_F(UsbdTransferTest, BulkWrite004, TestSize.Level1)
 /**
  * @tc.name: BulkWrite005
  * @tc.desc: Test functions to int32_t BulkWrite(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+ * @tc.desc: Negative test: parameters exception, endpointId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BulkWrite005, TestSize.Level1)
@@ -1561,6 +1625,7 @@ HWTEST_F(UsbdTransferTest, BulkWrite005, TestSize.Level1)
 /**
  * @tc.name: BulkRead001
  * @tc.desc: Test functions to int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BulkRead001, TestSize.Level1)
@@ -1577,13 +1642,14 @@ HWTEST_F(UsbdTransferTest, BulkRead001, TestSize.Level1)
     struct UsbPipe pipe = {interfaceId, pointid};
     (void)InitAshmemOne(ashmem, asmSize, rflg);
     ret = g_usbInterface->BulkRead(dev, pipe, ashmem);
-    HDF_LOGI("UsbdTransferTest::BulkRead001 %{public}d BulkWrite=%{public}d", __LINE__, ret);
+    HDF_LOGI("UsbdTransferTest::BulkRead001 %{public}d BulkRead=%{public}d", __LINE__, ret);
     ASSERT_EQ(ret, 0);
 }
 
 /**
  * @tc.name: BulkRead002
  * @tc.desc: Test functions to int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BulkRead002, TestSize.Level1)
@@ -1601,13 +1667,14 @@ HWTEST_F(UsbdTransferTest, BulkRead002, TestSize.Level1)
     dev.busNum = BUS_NUM_99;
     (void)InitAshmemOne(ashmem, asmSize, rflg);
     ret = g_usbInterface->BulkRead(dev, pipe, ashmem);
-    HDF_LOGI("UsbdTransferTest::BulkRead002 %{public}d BulkWrite=%{public}d", __LINE__, ret);
+    HDF_LOGI("UsbdTransferTest::BulkRead002 %{public}d BulkRead=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
 }
 
 /**
  * @tc.name: BulkRead003
  * @tc.desc: Test functions to int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BulkRead003, TestSize.Level1)
@@ -1625,13 +1692,14 @@ HWTEST_F(UsbdTransferTest, BulkRead003, TestSize.Level1)
     dev.devAddr = DEV_ADDR_244;
     (void)InitAshmemOne(ashmem, asmSize, rflg);
     ret = g_usbInterface->BulkRead(dev, pipe, ashmem);
-    HDF_LOGI("UsbdTransferTest::BulkRead003 %{public}d BulkWrite=%{public}d", __LINE__, ret);
+    HDF_LOGI("UsbdTransferTest::BulkRead003 %{public}d BulkRead=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
 }
 
 /**
  * @tc.name: BulkRead004
  * @tc.desc: Test functions to int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+ * @tc.desc: Negative test: parameters exception, intfId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BulkRead004, TestSize.Level1)
@@ -1649,13 +1717,14 @@ HWTEST_F(UsbdTransferTest, BulkRead004, TestSize.Level1)
     pipe.intfId = PIPE_INTERFACEID_255;
     (void)InitAshmemOne(ashmem, asmSize, rflg);
     ret = g_usbInterface->BulkRead(dev, pipe, ashmem);
-    HDF_LOGI("UsbdTransferTest::BulkRead004 %{public}d BulkWrite=%{public}d", __LINE__, ret);
+    HDF_LOGI("UsbdTransferTest::BulkRead004 %{public}d BulkRead=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
 }
 
 /**
  * @tc.name: BulkRead005
  * @tc.desc: Test functions to int32_t BulkRead(const UsbDev &dev, const UsbPipe &pipe, const sptr<Ashmem> &ashmem)
+ * @tc.desc: Negative test: parameters exception, endpointId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, BulkRead005, TestSize.Level1)
@@ -1673,223 +1742,23 @@ HWTEST_F(UsbdTransferTest, BulkRead005, TestSize.Level1)
     pipe.endpointId = PIPE_ENDPOINTID_255;
     (void)InitAshmemOne(ashmem, asmSize, rflg);
     ret = g_usbInterface->BulkRead(dev, pipe, ashmem);
-    HDF_LOGI("UsbdTransferTest::BulkRead005 %{public}d BulkWrite=%{public}d", __LINE__, ret);
+    HDF_LOGI("UsbdTransferTest::BulkRead005 %{public}d BulkRead=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
-}
-
-/**
- * @tc.name: BindUsbdSubscriber001
- * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdTransferTest, BindUsbdSubscriber001, TestSize.Level1)
-{
-    auto ret = g_usbInterface->SetPortRole(1, 100, 1);
-    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber001 [Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
-        exit(0);
-    }
-    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
-    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber001 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-}
-
-/**
- * @tc.name: BindUsbdSubscriber002
- * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdTransferTest, BindUsbdSubscriber002, TestSize.Level1)
-{
-    auto ret = g_usbInterface->SetPortRole(100, 1, 1);
-    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber002 [Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
-        exit(0);
-    }
-    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
-    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber002 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-}
-
-/**
- * @tc.name: BindUsbdSubscriber003
- * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdTransferTest, BindUsbdSubscriber003, TestSize.Level1)
-{
-    auto ret = g_usbInterface->SetPortRole(100, 100, 1);
-    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber003 [Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
-        exit(0);
-    }
-    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
-    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber003 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-}
-
-/**
- * @tc.name: BindUsbdSubscriber004
- * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdTransferTest, BindUsbdSubscriber004, TestSize.Level1)
-{
-    auto ret = g_usbInterface->SetPortRole(100, 100, 100);
-    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber004 [Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
-        exit(0);
-    }
-    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
-    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber004 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-}
-
-/**
- * @tc.name: BindUsbdSubscriber005
- * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdTransferTest, BindUsbdSubscriber005, TestSize.Level1)
-{
-    auto ret = g_usbInterface->SetPortRole(100, 1, 100);
-    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber005 [Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
-        exit(0);
-    }
-    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
-    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber005 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-}
-
-/**
- * @tc.name: UnbindUsbdSubscriber001
- * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber001, TestSize.Level1)
-{
-    auto ret = g_usbInterface->SetPortRole(1, 100, 1);
-    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber001 [Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
-        exit(0);
-    }
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
-    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber001 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-}
-
-/**
- * @tc.name: UnbindUsbdSubscriber002
- * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber002, TestSize.Level1)
-{
-    auto ret = g_usbInterface->SetPortRole(100, 1, 1);
-    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber002 [Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
-        exit(0);
-    }
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
-    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber002 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
-}
-
-/**
- * @tc.name: UnbindUsbdSubscriber003
- * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber003, TestSize.Level1)
-{
-    auto ret = g_usbInterface->SetPortRole(100, 100, 1);
-    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber003 [Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
-        exit(0);
-    }
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
-    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber003 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
-}
-
-/**
- * @tc.name: UnbindUsbdSubscriber004
- * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber004, TestSize.Level1)
-{
-    auto ret = g_usbInterface->SetPortRole(100, 100, 100);
-    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber004 [Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
-        exit(0);
-    }
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
-    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber004 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
-}
-
-/**
- * @tc.name: UnbindUsbdSubscriber005
- * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
- * @tc.type: FUNC
- */
-HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber005, TestSize.Level1)
-{
-    auto ret = g_usbInterface->SetPortRole(100, 1, 100);
-    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber005 [Device] %{public}d SetPortRole=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
-    if (subscriber == nullptr) {
-        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
-        exit(0);
-    }
-    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
-    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber005 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
-    ASSERT_NE(0, ret);
 }
 
 /**
  * @tc.name: RegBulkCallback001
  * @tc.desc: Test functions to RegBulkCallback
  * @tc.desc: int32_t RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<IUsbdBulkCallback> &cb)
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, RegBulkCallback001, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t pointid = POINTID_1;
+    uint8_t pointid = POINTID_BULK_OUT;
     struct UsbPipe pipe = {interfaceId, pointid};
-    pipe.endpointId = PIPE_ENDPOINTID_255;
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
     if (usbdBulkCallback == nullptr) {
         HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
@@ -1897,20 +1766,21 @@ HWTEST_F(UsbdTransferTest, RegBulkCallback001, TestSize.Level1)
     }
     auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
     HDF_LOGI("UsbdTransferTest::RegBulkCallback001 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
  * @tc.name: RegBulkCallback002
  * @tc.desc: Test functions to RegBulkCallback
  * @tc.desc: int32_t RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<IUsbdBulkCallback> &cb)
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, RegBulkCallback002, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t pointid = POINTID_1;
+    uint8_t pointid = POINTID_BULK_OUT;
     struct UsbPipe pipe = {interfaceId, pointid};
     dev.busNum = BUS_NUM_99;
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
@@ -1927,13 +1797,14 @@ HWTEST_F(UsbdTransferTest, RegBulkCallback002, TestSize.Level1)
  * @tc.name: RegBulkCallback003
  * @tc.desc: Test functions to int32_t RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe,
  * const sptr<IUsbdBulkCallback> &cb)
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, RegBulkCallback003, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t pointid = POINTID_1;
+    uint8_t pointid = POINTID_BULK_OUT;
     struct UsbPipe pipe = {interfaceId, pointid};
     dev.devAddr = DEV_ADDR_244;
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
@@ -1950,13 +1821,14 @@ HWTEST_F(UsbdTransferTest, RegBulkCallback003, TestSize.Level1)
  * @tc.name: RegBulkCallback004
  * @tc.desc: Test functions to int32_t RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe,
  * const sptr<IUsbdBulkCallback> &cb)
+ * @tc.desc: Negative test: parameters exception, intfId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, RegBulkCallback004, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t pointid = POINTID_1;
+    uint8_t pointid = POINTID_BULK_OUT;
     struct UsbPipe pipe = {interfaceId, pointid};
     pipe.intfId = PIPE_INTERFACEID_255;
     sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
@@ -1973,20 +1845,16 @@ HWTEST_F(UsbdTransferTest, RegBulkCallback004, TestSize.Level1)
  * @tc.name: RegBulkCallback005
  * @tc.desc: Test functions to int32_t RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe,
  * const sptr<IUsbdBulkCallback> &cb)
+ * @tc.desc: Negative test: parameters exception, cb error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, RegBulkCallback005, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t pointid = POINTID_99;
+    uint8_t pointid = POINTID_BULK_OUT;
     struct UsbPipe pipe = {interfaceId, pointid};
-    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
-    if (usbdBulkCallback == nullptr) {
-        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
-        exit(0);
-    }
-    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, nullptr);
     HDF_LOGI("UsbdTransferTest::RegBulkCallback005 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
 }
@@ -1994,6 +1862,7 @@ HWTEST_F(UsbdTransferTest, RegBulkCallback005, TestSize.Level1)
 /**
  * @tc.name: UnRegBulkCallback001
  * @tc.desc: Test functions to int32_t UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UnRegBulkCallback001, TestSize.Level1)
@@ -2002,15 +1871,23 @@ HWTEST_F(UsbdTransferTest, UnRegBulkCallback001, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     struct UsbPipe pipe = {interfaceId, pointid};
-    dev.busNum = BUS_NUM_222;
-    auto ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    if (usbdBulkCallback == nullptr) {
+        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    HDF_LOGI("UsbdTransferTest::UnRegBulkCallback001 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
     HDF_LOGI("UsbdTransferTest::UnRegBulkCallback001 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
  * @tc.name: UnRegBulkCallback002
  * @tc.desc: Test functions to int32_t UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UnRegBulkCallback002, TestSize.Level1)
@@ -2019,15 +1896,28 @@ HWTEST_F(UsbdTransferTest, UnRegBulkCallback002, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     struct UsbPipe pipe = {interfaceId, pointid};
+    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    if (usbdBulkCallback == nullptr) {
+        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    HDF_LOGI("UsbdTransferTest::UnRegBulkCallback002 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
     dev.devAddr = DEV_ADDR_244;
-    auto ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
     HDF_LOGI("UsbdTransferTest::UnRegBulkCallback002 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
+    dev = dev_;
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    HDF_LOGI("UsbdTransferTest::UnRegBulkCallback002 %{public}d again UnRegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
  * @tc.name: UnRegBulkCallback003
  * @tc.desc: Test functions to int32_t UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
+ * @tc.desc: Negative test: parameters exception, intfId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UnRegBulkCallback003, TestSize.Level1)
@@ -2036,15 +1926,28 @@ HWTEST_F(UsbdTransferTest, UnRegBulkCallback003, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     struct UsbPipe pipe = {interfaceId, pointid};
-    dev.busNum = 244;
-    auto ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    if (usbdBulkCallback == nullptr) {
+        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    HDF_LOGI("UsbdTransferTest::UnRegBulkCallback003 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
+    pipe.intfId = PIPE_INTERFACEID_244;
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
     HDF_LOGI("UsbdTransferTest::UnRegBulkCallback003 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
+    pipe = {interfaceId, pointid};
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    HDF_LOGI("UsbdTransferTest::UnRegBulkCallback003 %{public}d again UnRegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
  * @tc.name: UnRegBulkCallback004
  * @tc.desc: Test functions to int32_t UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
+ * @tc.desc: Positive test: call again
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UnRegBulkCallback004, TestSize.Level1)
@@ -2053,15 +1956,26 @@ HWTEST_F(UsbdTransferTest, UnRegBulkCallback004, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     struct UsbPipe pipe = {interfaceId, pointid};
-    dev.devAddr = DEV_ADDR_99;
-    auto ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    if (usbdBulkCallback == nullptr) {
+        HDF_LOGE("%{public}s:UsbdBulkCallbackTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    HDF_LOGI("UsbdTransferTest::UnRegBulkCallback004 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
     HDF_LOGI("UsbdTransferTest::UnRegBulkCallback004 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    ASSERT_EQ(ret, 0);
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    HDF_LOGI("UsbdTransferTest::UnRegBulkCallback004 %{public}d again UnRegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
  * @tc.name: UnRegBulkCallback005
  * @tc.desc: Test functions to int32_t UnRegBulkCallback(const UsbDev &dev, const UsbPipe &pipe)
+ * @tc.desc: Positive test: no register
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UnRegBulkCallback005, TestSize.Level1)
@@ -2070,10 +1984,245 @@ HWTEST_F(UsbdTransferTest, UnRegBulkCallback005, TestSize.Level1)
     uint8_t interfaceId = INTERFACEID_1;
     uint8_t pointid = POINTID_1;
     struct UsbPipe pipe = {interfaceId, pointid};
-    dev.busNum = BUS_NUM_222;
-    dev.devAddr = DEV_ADDR_99;
     auto ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
     HDF_LOGI("UsbdTransferTest::UnRegBulkCallback005 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    ASSERT_EQ(ret, 0);
 }
+
+/**
+ * @tc.name: UnbindUsbdSubscriber001
+ * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber001, TestSize.Level1)
+{
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber001 %{public}d first BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber001 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
 }
+
+/**
+ * @tc.name: UnbindUsbdSubscriber002
+ * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Negative test: no bind first
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber002, TestSize.Level1)
+{
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber002 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_NE(0, ret);
+}
+
+/**
+ * @tc.name: UnbindUsbdSubscriber003
+ * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Positive test: no bind first, unbind failed; then bind, unbind success
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber003, TestSize.Level1)
+{
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber003 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_NE(0, ret);
+    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber003 %{public}d first BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    HDF_LOGI(
+        "UsbdTransferTest::UnbindUsbdSubscriber003 %{public}d again UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UnbindUsbdSubscriber004
+ * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Negative test: call twice
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber004, TestSize.Level1)
+{
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber004 %{public}d first BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    HDF_LOGI(
+        "UsbdTransferTest::UnbindUsbdSubscriber004 %{public}d first UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    HDF_LOGI(
+        "UsbdTransferTest::UnbindUsbdSubscriber004 %{public}d again UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_NE(0, ret);
+}
+
+/**
+ * @tc.name: UnbindUsbdSubscriber005
+ * @tc.desc: Test functions to int32_t UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Positive test: test repeatedly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, UnbindUsbdSubscriber005, TestSize.Level1)
+{
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber005 %{public}d first BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    HDF_LOGI(
+        "UsbdTransferTest::UnbindUsbdSubscriber005 %{public}d first UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::UnbindUsbdSubscriber005 %{public}d again BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    HDF_LOGI(
+        "UsbdTransferTest::UnbindUsbdSubscriber005 %{public}d again UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: BindUsbdSubscriber001
+ * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, BindUsbdSubscriber001, TestSize.Level1)
+{
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber001 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: BindUsbdSubscriber002
+ * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Positive test: bind different
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, BindUsbdSubscriber002, TestSize.Level1)
+{
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber002 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    sptr<UsbSubscriberTest> subscriber2 = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    ret = g_usbInterface->BindUsbdSubscriber(subscriber2);
+    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber002 %{public}d again BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: BindUsbdSubscriber003
+ * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Positive test: bind same
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, BindUsbdSubscriber003, TestSize.Level1)
+{
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber003 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber003 %{public}d again BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: BindUsbdSubscriber004
+ * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Positive test: bind and unbind, then bind another
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, BindUsbdSubscriber004, TestSize.Level1)
+{
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber004 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::bindUsbdSubscriber005 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    sptr<UsbSubscriberTest> subscriber2 = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    ret = g_usbInterface->BindUsbdSubscriber(subscriber2);
+    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber004 again %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: BindUsbdSubscriber005
+ * @tc.desc: Test functions to int32_t BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
+ * @tc.desc: Positive test: bind again after unbind
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdTransferTest, BindUsbdSubscriber005, TestSize.Level1)
+{
+    sptr<UsbSubscriberTest> subscriber = new UsbSubscriberTest();
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:UsbSubscriberTest new failed.", __func__);
+        exit(0);
+    }
+    auto ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::BindUsbdSubscriber005 %{public}d BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->UnbindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::bindUsbdSubscriber005 %{public}d UnbindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    ret = g_usbInterface->BindUsbdSubscriber(subscriber);
+    HDF_LOGI("UsbdTransferTest::bindUsbdSubscriber005 %{public}d again BindUsbdSubscriber=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+} // namespace

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_remote_adapter_if.h"
+#include <gtest/gtest.h>
 #include "hdi_service_common.h"
 
 using namespace std;
@@ -27,56 +27,37 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
     struct IAudioRender *render = nullptr;
     static TestAudioManager *manager;
     struct IAudioAdapter *adapter = nullptr;
-    static TestGetAudioManager getAudioManager;
-    static TestAudioAdapterRelease adapterRelease;
-    static TestAudioRenderRelease renderRelease;
-    static TestAudioManagerRelease managerRelease;
 };
 
-using THREAD_FUNC = void *(*)(void *);
-TestGetAudioManager AudioIdlHdiRenderHardwareDependenceTest::getAudioManager = nullptr;
 TestAudioManager *AudioIdlHdiRenderHardwareDependenceTest::manager = nullptr;
-void *AudioIdlHdiRenderHardwareDependenceTest::handle = nullptr;
-TestAudioManagerRelease AudioIdlHdiRenderHardwareDependenceTest::managerRelease = nullptr;
-TestAudioAdapterRelease AudioIdlHdiRenderHardwareDependenceTest::adapterRelease = nullptr;
-TestAudioRenderRelease AudioIdlHdiRenderHardwareDependenceTest::renderRelease = nullptr;
+using THREAD_FUNC = void *(*)(void *);
 
 void AudioIdlHdiRenderHardwareDependenceTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    renderRelease = (TestAudioRenderRelease)(dlsym(handle, "AudioRenderRelease"));
-    ASSERT_NE(nullptr, renderRelease);
-    (void)HdfRemoteGetCallingPid();
-    manager = getAudioManager(IDL_SERVER_NAME.c_str());
+    manager = IAudioManagerGet(IS_STUB);
     ASSERT_NE(nullptr, manager);
 }
 
 void AudioIdlHdiRenderHardwareDependenceTest::TearDownTestCase(void)
 {
-    if (managerRelease != nullptr && manager != nullptr) {
-        (void)managerRelease(manager);
-    }
-    if (handle != nullptr) {
-        (void)dlclose(handle);
+    if (manager != nullptr) {
+        (void)IAudioManagerRelease(manager, IS_STUB);
     }
 }
 
 void AudioIdlHdiRenderHardwareDependenceTest::SetUp(void)
 {
-    int32_t ret;
     ASSERT_NE(nullptr, manager);
-    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
+    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiRenderHardwareDependenceTest::TearDown(void)
 {
-    int32_t ret = ReleaseRenderSource(manager, adapter, render, adapterRelease, renderRelease);
+    int32_t ret = ReleaseRenderSource(manager, adapter, render);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -93,11 +74,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameSize_004, T
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
 
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_48000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_48000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 
@@ -118,11 +99,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameSize_005, T
     struct AudioSampleAttributes attrsValue = {};
 
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_48000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_48000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 
@@ -142,11 +123,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameSize_006, T
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_44100, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 
@@ -166,11 +147,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameSize_007, T
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, 1, SAMPLE_RATE_48000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, 1, SAMPLE_RATE_48000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 
@@ -190,11 +171,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_004, 
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_8000, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 
@@ -219,11 +200,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_005, 
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_8000, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 
@@ -248,11 +229,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_006, 
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_44100, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 
@@ -275,11 +256,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_007, 
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_32000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_32000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_32000, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 
@@ -294,7 +275,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_007, 
 * @tc.name  AudioRenderSetSampleAttributes_001
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *     attrs.sampleRate = AUDIO_SAMPLE_RATE_MASK_8000;
 *     attrs.channelCount = 1;
 * @tc.type: FUNC
@@ -304,7 +285,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
 
     ret = render->SetSampleAttributes(render, &attrs);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -312,7 +293,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     ret = render->GetSampleAttributes(render, &attrsValue);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_8000, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
@@ -320,7 +301,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_002
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_11025;
 *     attrs.channelCount = 2;
 * @tc.type: FUNC
@@ -331,13 +312,13 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_11025);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_11025);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_11025, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
@@ -345,7 +326,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_003
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_22050;
 *     attrs.channelCount = 1;
 * @tc.type: FUNC
@@ -356,12 +337,12 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_22050);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_22050);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_22050, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
@@ -369,7 +350,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_004
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_32000;
 *     attrs.channelCount = 2;
 * @tc.type: FUNC
@@ -380,13 +361,13 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_32000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_32000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_32000, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
@@ -394,7 +375,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_005
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_44100;
 *     attrs.channelCount = 1;
 * @tc.type: FUNC
@@ -405,19 +386,19 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_44100, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
 /**
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_COMMUNICATION;
-*     attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_48000;
 *     attrs.channelCount = 2;
 * @tc.type: FUNC
@@ -428,12 +409,12 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_48000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_48000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
@@ -441,7 +422,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_008
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_12000;
 *     attrs.channelCount = 1;
 * @tc.type: FUNC
@@ -452,12 +433,12 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_12000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_12000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_12000, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
@@ -465,7 +446,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_009
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_16000;
 *     attrs.channelCount = 1;
 * @tc.type: FUNC
@@ -476,11 +457,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_16000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_16000);
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_16000, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
@@ -488,7 +469,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_010
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_24000;
 *     attrs.channelCount = 2;
 * @tc.type: FUNC
@@ -500,12 +481,12 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
 
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_24000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_24000);
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_24000, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
@@ -513,7 +494,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_011
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_64000;
 *     attrs.channelCount = 2;
 * @tc.type: FUNC
@@ -524,13 +505,13 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_64000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_64000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_64000, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
@@ -538,7 +519,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_012
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_96000;
 *     attrs.channelCount = 1;
 * @tc.type: FUNC
@@ -549,11 +530,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_96000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_96000);
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_96000, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
@@ -561,7 +542,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_013
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *     attrs.sampleRate = 0xFFFFFFFFu;
 *     attrs.channelCount = 2;
 * @tc.type: FUNC
@@ -571,7 +552,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     int32_t ret;
     struct AudioSampleAttributes attrs = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, DOUBLE_CHANNEL_COUNT, 0xFFFFFFFFu);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, DOUBLE_CHANNEL_COUNT, 0xFFFFFFFFu);
 
     ret = render->SetSampleAttributes(render, &attrs);
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, ret);
@@ -593,18 +574,18 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs3 = {};
     ASSERT_NE(nullptr, render);
 
-    InitAttrsUpdate(attrs1, AUDIO_FORMAT_PCM_8_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
+    InitAttrsUpdate(attrs1, AUDIO_FORMAT_TYPE_PCM_8_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
     ret = render->SetSampleAttributes(render, &attrs1);
     EXPECT_EQ(HDF_FAILURE, ret);
 
-    InitAttrsUpdate(attrs2, AUDIO_FORMAT_PCM_32_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_11025);
+    InitAttrsUpdate(attrs2, AUDIO_FORMAT_TYPE_PCM_32_BIT, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_11025);
     ret = render->SetSampleAttributes(render, &attrs2);
 #ifdef ALSA_LIB_MODE
     EXPECT_EQ(HDF_SUCCESS, ret);
 #else
     EXPECT_EQ(HDF_FAILURE, ret);
 #endif
-    InitAttrsUpdate(attrs3, AUDIO_FORMAT_AAC_MAIN, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_22050);
+    InitAttrsUpdate(attrs3, AUDIO_FORMAT_TYPE_AAC_MAIN, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_22050);
     ret = render->SetSampleAttributes(render, &attrs3);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
@@ -612,7 +593,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_015
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_AAC_LC/LD/ELD;
+*     attrs.format = AUDIO_FORMAT_TYPE_AAC_LC/LD/ELD;
 *     attrs.sampleRate = SAMPLE_RATE_32000/SAMPLE_RATE_44100/SAMPLE_RATE_48000;
 *     attrs.channelCount = 1/2;
 * @tc.type: FUNC
@@ -625,15 +606,15 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs3 = {};
     ASSERT_NE(nullptr, render);
 
-    InitAttrsUpdate(attrs1, AUDIO_FORMAT_AAC_LC, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_32000);
+    InitAttrsUpdate(attrs1, AUDIO_FORMAT_TYPE_AAC_LC, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_32000);
     ret = render->SetSampleAttributes(render, &attrs1);
     EXPECT_EQ(HDF_FAILURE, ret);
 
-    InitAttrsUpdate(attrs2, AUDIO_FORMAT_AAC_LD, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
+    InitAttrsUpdate(attrs2, AUDIO_FORMAT_TYPE_AAC_LD, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
     ret = render->SetSampleAttributes(render, &attrs2);
     EXPECT_EQ(HDF_FAILURE, ret);
 
-    InitAttrsUpdate(attrs3, AUDIO_FORMAT_AAC_ELD, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_48000);
+    InitAttrsUpdate(attrs3, AUDIO_FORMAT_TYPE_AAC_ELD, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_48000);
     ret = render->SetSampleAttributes(render, &attrs3);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
@@ -641,7 +622,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_016
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_AAC_HE_V1/V2
+*     attrs.format = AUDIO_FORMAT_TYPE_AAC_HE_V1/V2
 *     attrs.sampleRate = SAMPLE_RATE_8000/SAMPLE_RATE_44100;
 *     attrs.channelCount = 1/2;
 * @tc.type: FUNC
@@ -653,11 +634,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs2 = {};
     ASSERT_NE(nullptr, render);
 
-    InitAttrsUpdate(attrs1, AUDIO_FORMAT_AAC_HE_V1, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
+    InitAttrsUpdate(attrs1, AUDIO_FORMAT_TYPE_AAC_HE_V1, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
     ret = render->SetSampleAttributes(render, &attrs1);
     EXPECT_EQ(HDF_FAILURE, ret);
 
-    InitAttrsUpdate(attrs2, AUDIO_FORMAT_AAC_HE_V2, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
+    InitAttrsUpdate(attrs2, AUDIO_FORMAT_TYPE_AAC_HE_V2, DOUBLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
     ret = render->SetSampleAttributes(render, &attrs2);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
@@ -665,7 +646,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderSetSampleAttributes_017
 * @tc.desc    Test RenderSetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_16_BIT
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT
 *     attrs.sampleRate = SAMPLE_RATE_8000;
 *     attrs.channelCount = 5;
 * @tc.type: FUNC
@@ -676,7 +657,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
     struct AudioSampleAttributes attrs = {};
     ASSERT_NE(nullptr, render);
     uint32_t silenceThreshold = 5;
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, silenceThreshold, SAMPLE_RATE_8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, silenceThreshold, SAMPLE_RATE_8000);
     ret = render->SetSampleAttributes(render, &attrs);
     EXPECT_EQ(HDF_FAILURE, ret);
 }
@@ -684,7 +665,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderSetSampleAttributes
 * @tc.name  AudioRenderGetSampleAttributes_001
 * @tc.desc    Test RenderGetSampleAttributes ,the setting parameters are as follows.
 *     attrs.type = AUDIO_IN_MEDIA;
-*     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+*     attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 *     attrs.sampleRate = SAMPLE_RATE_8000;
 *     attrs.channelCount = 1;
 * @tc.type: FUNC
@@ -696,11 +677,11 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetSampleAttributes
     struct AudioSampleAttributes attrsValue = {};
     ASSERT_NE(nullptr, render);
 
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_8000, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 }
@@ -719,7 +700,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetCurrentChannelId
     struct AudioSampleAttributes attrsValue = {};
 
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_32000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_24_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_32000);
 
     ret = AudioRenderSetGetSampleAttributes(attrs, attrsValue, render);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -731,7 +712,8 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetCurrentChannelId
 }
 /**
     * @tc.name  AudioRenderGetRenderPosition_009
-    * @tc.desc    Test GetRenderPosition interface,return 0 if get framesize define format to AUDIO_FORMAT_PCM_16_BIT
+    * @tc.desc    Test GetRenderPosition interface,return 0 if get framesize
+    * define format to AUDIO_FORMAT_TYPE_PCM_16_BIT
     * @tc.type: FUNC
 */
 HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_009, TestSize.Level1)
@@ -747,14 +729,14 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_0
     InitAttrs(attrs);
     attrs.type = AUDIO_IN_MEDIA;
     attrs.interleaved = false;
-    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.sampleRate = SAMPLE_RATE_48000;
     attrs.channelCount = 2;
     ret = render->SetSampleAttributes(render, &attrs);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = render->GetSampleAttributes(render, &attrsValue);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
     ret = AudioRenderStartAndOneFrame(render);
@@ -767,7 +749,8 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_0
 }
 /**
     * @tc.name  AudioRenderGetRenderPosition_010
-    * @tc.desc    Test GetRenderPosition interface,return 0 if get framesize define format to AUDIO_FORMAT_PCM_24_BIT
+    * @tc.desc    Test GetRenderPosition interface,return 0 if get framesize
+    * define format to AUDIO_FORMAT_TYPE_PCM_24_BIT
     * @tc.type: FUNC
 */
 HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_010, TestSize.Level1)
@@ -783,14 +766,14 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_0
     InitAttrs(attrs);
     attrs.type = AUDIO_IN_MEDIA;
     attrs.interleaved = false;
-    attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
     attrs.sampleRate = SAMPLE_RATE_48000;
     attrs.channelCount = 2;
     ret = render->SetSampleAttributes(render, &attrs);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = render->GetSampleAttributes(render, &attrsValue);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
     ret = AudioRenderStartAndOneFrame(render);
@@ -819,7 +802,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_0
     InitAttrs(attrs);
     attrs.type = AUDIO_IN_MEDIA;
     attrs.interleaved = false;
-    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.sampleRate = SAMPLE_RATE_48000;
     attrs.channelCount = 1;
     ret = render->SetSampleAttributes(render, &attrs);
@@ -827,7 +810,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_0
     ret = render->GetSampleAttributes(render, &attrsValue);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
     ret = AudioRenderStartAndOneFrame(render);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -855,14 +838,14 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_0
     InitAttrs(attrs);
     attrs.type = AUDIO_IN_MEDIA;
     attrs.interleaved = false;
-    attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
     attrs.sampleRate = SAMPLE_RATE_48000;
     attrs.channelCount = 1;
     ret = render->SetSampleAttributes(render, &attrs);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = render->GetSampleAttributes(render, &attrsValue);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_FORMAT_PCM_24_BIT, attrsValue.format);
+    EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_24_BIT, attrsValue.format);
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
     EXPECT_EQ(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
     ret = AudioRenderStartAndOneFrame(render);
@@ -888,7 +871,7 @@ HWTEST_F(AudioIdlHdiRenderHardwareDependenceTest, AudioRenderGetMmapPosition_002
         .path = LOW_LATENCY_AUDIO_FILE.c_str(), .render = render
     };
     InitAttrs(audiopara.attrs);
-    audiopara.attrs.format = AUDIO_FORMAT_PCM_24_BIT;
+    audiopara.attrs.format = AUDIO_FORMAT_TYPE_PCM_24_BIT;
     audiopara.attrs.channelCount = 1;
     ret = audiopara.render->SetSampleAttributes(audiopara.render, &(audiopara.attrs));
     EXPECT_EQ(HDF_SUCCESS, ret);

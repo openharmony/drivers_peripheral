@@ -13,28 +13,42 @@
  * limitations under the License.
  */
 
+#include "usbd_request_test.h"
+
 #include <iostream>
 #include <vector>
 
 #include "UsbSubscriberTest.h"
 #include "hdf_log.h"
-#include "usbd_request_test.h"
 #include "v1_0/iusb_interface.h"
 #include "v1_0/usb_types.h"
 
 const int SLEEP_TIME = 3;
+const uint8_t INDEX_0 = 0;
+const uint8_t INDEX_1 = 1;
+const uint8_t INDEX_255 = 255;
+const uint8_t CONFIG_ID_0 = 0;
+const uint8_t CONFIG_ID_1 = 1;
+const uint8_t CONFIG_ID_222 = 222;
 const uint8_t BUS_NUM_255 = 255;
 const uint8_t DEV_ADDR_255 = 255;
 const uint8_t BUS_NUM_222 = 222;
+const uint8_t STRING_ID_233 = 233;
 const uint8_t DEV_ADDR_222 = 222;
 const uint32_t LENGTH_NUM_255 = 255;
 const uint32_t TAG_LENGTH_NUM_1000 = 1000;
 const int TAG_NUM_10 = 10;
 const int TAG_NUM_11 = 11;
 const uint8_t INTERFACEID_1 = 1;
+const uint8_t INTERFACEID_255 = 255;
 const int32_t INT32_INTERFACEID_1 = 1;
+const int32_t INT32_INTERFACEID_255 = 255;
 const uint8_t POINTID_1 = 1;
 const uint8_t POINTID_129 = 130;
+const uint8_t POINTID_158 = 158;
+const uint8_t POINTID_255 = 255;
+const uint8_t POINTID_BULK_IN = 0x82;
+const uint8_t POINTID_BULK_OUT = 0x01;
 UsbDev UsbdRequestTest::dev_ = {0, 0};
 
 using namespace testing::ext;
@@ -98,12 +112,12 @@ void UsbdRequestTest::TearDown(void) {}
  * @tc.name: UsbdConfig001
  * @tc.desc: Test functions to SetConfig
  * @tc.desc: int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetConfig001, TestSize.Level1)
 {
-    uint8_t configIndex = 1;
+    uint8_t configIndex = INDEX_1;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfigConfig001 %{public}d SetConfig=%{public}d", __LINE__, ret);
@@ -114,12 +128,12 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig001, TestSize.Level1)
  * @tc.name: UsbdConfig002
  * @tc.desc: Test functions to SetConfig
  * @tc.desc: int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetConfig002, TestSize.Level1)
 {
-    uint8_t configIndex = 1;
+    uint8_t configIndex = INDEX_1;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
     auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig002 %{public}d SetConfig=%{public}d", __LINE__, ret);
@@ -130,12 +144,12 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig002, TestSize.Level1)
  * @tc.name: UsbdConfig003
  * @tc.desc: Test functions to SetConfig
  * @tc.desc: int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);
- * @tc.desc: 反向测试：参数异常，devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetConfig003, TestSize.Level1)
 {
-    uint8_t configIndex = 1;
+    uint8_t configIndex = INDEX_1;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
     auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig003 %{public}d SetConfig=%{public}d", __LINE__, ret);
@@ -146,16 +160,16 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig003, TestSize.Level1)
  * @tc.name: UsbdConfig004
  * @tc.desc: Test functions to SetConfig
  * @tc.desc: int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);
- * @tc.desc: 反向测试：参数异常，configIndex错误
+ * @tc.desc: Negative test: parameters exception, configIndex error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetConfig004, TestSize.Level1)
 {
-    uint8_t configIndex = 222;
+    uint8_t configIndex = INDEX_255;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->SetConfig(dev, configIndex);
     ASSERT_NE(ret, 0);
-    configIndex = 1;
+    configIndex = INDEX_1;
     ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig004 %{public}d SetConfig=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -165,12 +179,12 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig004, TestSize.Level1)
  * @tc.name: UsbdConfig005
  * @tc.desc: Test functions to SetConfig
  * @tc.desc: int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);
- * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetConfig005, TestSize.Level1)
 {
-    uint8_t configIndex = 1;
+    uint8_t configIndex = INDEX_1;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
     auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig005 %{public}d SetConfig=%{public}d", __LINE__, ret);
@@ -181,12 +195,12 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig005, TestSize.Level1)
  * @tc.name: UsbdConfig006
  * @tc.desc: Test functions to SetConfig
  * @tc.desc: int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);
- * @tc.desc: 反向测试：参数异常，busNum、configIndex错误
+ * @tc.desc: Negative test: parameters exception, busNum && configIndex error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetConfig006, TestSize.Level1)
 {
-    uint8_t configIndex = 222;
+    uint8_t configIndex = INDEX_255;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
     auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig006 %{public}d SetConfig=%{public}d", __LINE__, ret);
@@ -197,12 +211,12 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig006, TestSize.Level1)
  * @tc.name: UsbdConfig007
  * @tc.desc: Test functions to SetConfig
  * @tc.desc: int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);
- * @tc.desc: 反向测试：devAddr、configIndex错误
+ * @tc.desc: Negative test: parameters exception, devAddr && configIndex error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetConfig007, TestSize.Level1)
 {
-    uint8_t configIndex = 222;
+    uint8_t configIndex = INDEX_255;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
     auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig007 %{public}d SetConfig=%{public}d", __LINE__, ret);
@@ -213,12 +227,12 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig007, TestSize.Level1)
  * @tc.name: UsbdConfig008
  * @tc.desc: Test functions to SetConfig
  * @tc.desc: int32_t SetConfig(const UsbDev &dev, uint8_t configIndex);
- * @tc.desc: 反向测试：busNum、devAddr、configIndex错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr && configIndex error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetConfig008, TestSize.Level1)
 {
-    uint8_t configIndex = 222;
+    uint8_t configIndex = INDEX_255;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
     auto ret = g_usbInterface->SetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetConfig008 %{public}d SetConfig=%{public}d", __LINE__, ret);
@@ -231,12 +245,12 @@ HWTEST_F(UsbdRequestTest, UsbdSetConfig008, TestSize.Level1)
  * @tc.name: UsbdConfig001
  * @tc.desc: Test functions to GetConfig
  * @tc.desc: int32_t GetConfig(const UsbDev &dev, uint8_t &configIndex);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfig001, TestSize.Level1)
 {
-    uint8_t configIndex = 1;
+    uint8_t configIndex = INDEX_1;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->GetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfig001 %{public}d GetConfig=%{public}d", __LINE__, ret);
@@ -247,12 +261,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfig001, TestSize.Level1)
  * @tc.name: UsbdConfig002
  * @tc.desc: Test functions to GetConfig
  * @tc.desc: int32_t GetConfig(const UsbDev &dev, uint8_t &configIndex);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfig002, TestSize.Level1)
 {
-    uint8_t configIndex = 1;
+    uint8_t configIndex = INDEX_1;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
     auto ret = g_usbInterface->GetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfig002 %{public}d GetConfig=%{public}d", __LINE__, ret);
@@ -263,12 +277,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfig002, TestSize.Level1)
  * @tc.name: UsbdConfig003
  * @tc.desc: Test functions to GetConfig
  * @tc.desc: int32_t GetConfig(const UsbDev &dev, uint8_t &configIndex);
- * @tc.desc: 反向测试：参数异常，devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfig003, TestSize.Level1)
 {
-    uint8_t configIndex = 1;
+    uint8_t configIndex = INDEX_1;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
     auto ret = g_usbInterface->GetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfig003 %{public}d GetConfig=%{public}d", __LINE__, ret);
@@ -279,12 +293,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfig003, TestSize.Level1)
  * @tc.name: UsbdConfig004
  * @tc.desc: Test functions to GetConfig
  * @tc.desc: int32_t GetConfig(const UsbDev &dev, uint8_t &configIndex);
- * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfig004, TestSize.Level1)
 {
-    uint8_t configIndex = 1;
+    uint8_t configIndex = INDEX_1;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
     auto ret = g_usbInterface->GetConfig(dev, configIndex);
     HDF_LOGI("UsbdRequestTest::UsbdGetConfig004 %{public}d GetConfig=%{public}d", __LINE__, ret);
@@ -295,7 +309,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfig004, TestSize.Level1)
  * @tc.name: UsbdClaimInterface001
  * @tc.desc: Test functions to ClaimInterface
  * @tc.desc: int32_t  ClaimInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdClaimInterface001, TestSize.Level1)
@@ -311,7 +325,7 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface001, TestSize.Level1)
  * @tc.name: UsbdClaimInterface002
  * @tc.desc: Test functions to ClaimInterface
  * @tc.desc: int32_t  ClaimInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdClaimInterface002, TestSize.Level1)
@@ -328,7 +342,7 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface002, TestSize.Level1)
  * @tc.name: UsbdClaimInterface003
  * @tc.desc: Test functions to ClaimInterface
  * @tc.desc: int32_t  ClaimInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：参数异常，devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdClaimInterface003, TestSize.Level1)
@@ -344,14 +358,14 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface003, TestSize.Level1)
  * @tc.name: UsbdClaimInterface004
  * @tc.desc: Test functions to ClaimInterface
  * @tc.desc: int32_t  ClaimInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：参数异常，interfaceid错误
+ * @tc.desc: Negative test: parameters exception, interfaceid error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdClaimInterface004, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
     struct UsbDev dev = dev_;
-    interfaceId = 255;
+    interfaceId = INTERFACEID_255;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface004 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -361,7 +375,7 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface004, TestSize.Level1)
  * @tc.name: UsbdClaimInterface005
  * @tc.desc: Test functions to ClaimInterface
  * @tc.desc: int32_t  ClaimInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdClaimInterface005, TestSize.Level1)
@@ -377,12 +391,12 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface005, TestSize.Level1)
  * @tc.name: UsbdClaimInterface006
  * @tc.desc: Test functions to ClaimInterface
  * @tc.desc: int32_t  ClaimInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：参数异常，busNum、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, busNum && interfaceid error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdClaimInterface006, TestSize.Level1)
 {
-    uint8_t interfaceId = 255;
+    uint8_t interfaceId = INTERFACEID_255;
     struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface006 %{public}d ret=%{public}d", __LINE__, ret);
@@ -393,12 +407,12 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface006, TestSize.Level1)
  * @tc.name: UsbdClaimInterface007
  * @tc.desc: Test functions to ClaimInterface
  * @tc.desc: int32_t  ClaimInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：devAddr、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, devAddr && interfaceid error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdClaimInterface007, TestSize.Level1)
 {
-    uint8_t interfaceId = 255;
+    uint8_t interfaceId = INTERFACEID_255;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface007 %{public}d ret=%{public}d", __LINE__, ret);
@@ -409,12 +423,12 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface007, TestSize.Level1)
  * @tc.name: UsbdClaimInterface008
  * @tc.desc: Test functions to ClaimInterface
  * @tc.desc: int32_t  ClaimInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：busNum、devAddr、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr && interfaceid error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdClaimInterface008, TestSize.Level1)
 {
-    uint8_t interfaceId = 255;
+    uint8_t interfaceId = INTERFACEID_255;
     struct UsbDev dev = {BUS_NUM_255, DEV_ADDR_255};
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface008 %{public}d ret=%{public}d", __LINE__, ret);
@@ -427,13 +441,13 @@ HWTEST_F(UsbdRequestTest, UsbdClaimInterface008, TestSize.Level1)
  * @tc.name: UsbdSetInterface001
  * @tc.desc: Test functions to SetInterface
  * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetInterface001, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t altIndex = 0;
+    uint8_t altIndex = INDEX_0;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdClaimInterface001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
@@ -447,13 +461,13 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface001, TestSize.Level1)
  * @tc.name: UsbdSetInterface002
  * @tc.desc: Test functions to SetInterface
  * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetInterface002, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t altIndex = 0;
+    uint8_t altIndex = INDEX_0;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
@@ -468,13 +482,13 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface002, TestSize.Level1)
  * @tc.name: UsbdSetInterface003
  * @tc.desc: Test functions to SetInterface
  * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: 反向测试：参数异常，devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetInterface003, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t altIndex = 0;
+    uint8_t altIndex = INDEX_255;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
@@ -489,18 +503,18 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface003, TestSize.Level1)
  * @tc.name: UsbdSetInterface004
  * @tc.desc: Test functions to SetInterface
  * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: 反向测试：参数异常，interfaceId 错误
+ * @tc.desc: Negative test: parameters exception, interfaceId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetInterface004, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t altIndex = 222;
+    uint8_t altIndex = INDEX_255;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    interfaceId = 222;
+    interfaceId = INTERFACEID_255;
     ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface004 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -510,19 +524,19 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface004, TestSize.Level1)
  * @tc.name: UsbdSetInterface005
  * @tc.desc: Test functions to SetInterface
  * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetInterface005, TestSize.Level1)
 {
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t altIndex = 0;
+    uint8_t altIndex = INDEX_0;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    dev.busNum = 233;
-    dev.devAddr = 233;
+    dev.busNum = BUS_NUM_222;
+    dev.devAddr = DEV_ADDR_222;
     ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface005 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -532,19 +546,19 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface005, TestSize.Level1)
  * @tc.name: UsbdSetInterface006
  * @tc.desc: Test functions to SetInterface
  * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: 反向测试：参数异常，busNum、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, busNum && interfaceId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetInterface006, TestSize.Level1)
 {
     int32_t interfaceId = INT32_INTERFACEID_1;
-    uint8_t altIndex = 1;
+    uint8_t altIndex = INDEX_1;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface006 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    dev.busNum = 224;
-    interfaceId = 224;
+    dev.busNum = BUS_NUM_255;
+    interfaceId = INT32_INTERFACEID_255;
     ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface006 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -554,19 +568,19 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface006, TestSize.Level1)
  * @tc.name: UsbdSetInterface007
  * @tc.desc: Test functions to SetInterface
  * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: 反向测试：devAddr、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, devAddr && interfaceId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetInterface007, TestSize.Level1)
 {
     int32_t interfaceId = INT32_INTERFACEID_1;
-    uint8_t altIndex = 225;
+    uint8_t altIndex = INDEX_255;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface007 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    dev.devAddr = 225;
-    interfaceId = 225;
+    dev.devAddr = DEV_ADDR_255;
+    interfaceId = INT32_INTERFACEID_255;
     ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface007 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -576,20 +590,20 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface007, TestSize.Level1)
  * @tc.name: UsbdSetInterface008
  * @tc.desc: Test functions to SetInterface
  * @tc.desc: int32_t SetInterface(const UsbDev &dev, uint8_t interfaceId, uint8_t altIndex);
- * @tc.desc: 反向测试：busNum、devAddr、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr && interfaceId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdSetInterface008, TestSize.Level1)
 {
-    uint8_t altIndex = 225;
+    uint8_t altIndex = INDEX_255;
     int32_t interfaceId = INT32_INTERFACEID_1;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface008 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    dev.busNum = 225;
-    dev.devAddr = 225;
-    interfaceId = 225;
+    dev.busNum = BUS_NUM_255;
+    dev.devAddr = DEV_ADDR_255;
+    interfaceId = INT32_INTERFACEID_255;
     ret = g_usbInterface->SetInterface(dev, interfaceId, altIndex);
     HDF_LOGI("UsbdRequestTest::UsbdSetInterface008 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -599,7 +613,7 @@ HWTEST_F(UsbdRequestTest, UsbdSetInterface008, TestSize.Level1)
  * @tc.name: UsbdDescriptor001
  * @tc.desc: Test functions to GetDeviceDescriptor
  * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor001, TestSize.Level1)
@@ -618,7 +632,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor001, TestSize.Level1)
  * @tc.name: UsbdDescriptor002
  * @tc.desc: Test functions to GetDeviceDescriptor
  * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor002, TestSize.Level1)
@@ -637,12 +651,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor002, TestSize.Level1)
  * @tc.name: UsbdDescriptor003
  * @tc.desc: Test functions to GetDeviceDescriptor
  * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor003, TestSize.Level1)
 {
-    uint8_t devAddr = 233;
+    uint8_t devAddr = DEV_ADDR_222;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {dev_.busNum, devAddr};
@@ -657,7 +671,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor003, TestSize.Level1)
  * @tc.name: UsbdDescriptor004
  * @tc.desc: Test functions to GetDeviceDescriptor
  * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，length错误
+ * @tc.desc: Negative test: parameters exception, length error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor004, TestSize.Level1)
@@ -676,13 +690,13 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor004, TestSize.Level1)
  * @tc.name: UsbdDescriptor005
  * @tc.desc: Test functions to GetDeviceDescriptor
  * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor005, TestSize.Level1)
 {
-    uint8_t busNum = 99;
-    uint8_t devAddr = 99;
+    uint8_t busNum = BUS_NUM_222;
+    uint8_t devAddr = DEV_ADDR_222;
     uint8_t buffer[LENGTH_NUM_255] = {};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {busNum, devAddr};
@@ -697,7 +711,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor005, TestSize.Level1)
  * @tc.name: UsbdDescriptor006
  * @tc.desc: Test functions to GetDeviceDescriptor
  * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，busNum、length错误
+ * @tc.desc: Negative test: parameters exception, busNum && length error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor006, TestSize.Level1)
@@ -716,7 +730,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor006, TestSize.Level1)
  * @tc.name: UsbdDescriptor007
  * @tc.desc: Test functions to GetDeviceDescriptor
  * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：devAddr、length错误
+ * @tc.desc: Negative test: parameters exception, devAddr && length error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor007, TestSize.Level1)
@@ -735,13 +749,13 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor007, TestSize.Level1)
  * @tc.name: UsbdDescriptor008
  * @tc.desc: Test functions to GetDeviceDescriptor
  * @tc.desc: int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：busNum、devAddr、length错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr && length error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor008, TestSize.Level1)
 {
-    uint8_t busNum = 233;
-    uint8_t devAddr = 234;
+    uint8_t busNum = BUS_NUM_222;
+    uint8_t devAddr = DEV_ADDR_222;
     uint8_t buffer[] = {};
     uint32_t length = 0;
     struct UsbDev dev = {busNum, devAddr};
@@ -758,7 +772,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetDeviceDescriptor008, TestSize.Level1)
  * @tc.name: UsbdDescriptor001
  * @tc.desc: Test functions to GetStringDescriptor
  * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor001, TestSize.Level1)
@@ -778,7 +792,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor001, TestSize.Level1)
  * @tc.name: UsbdDescriptor002
  * @tc.desc: Test functions to GetStringDescriptor
  * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor002, TestSize.Level1)
@@ -798,7 +812,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor002, TestSize.Level1)
  * @tc.name: UsbdDescriptor003
  * @tc.desc: Test functions to GetStringDescriptor
  * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，stringId错误
+ * @tc.desc: Negative test: parameters exception, stringId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor003, TestSize.Level1)
@@ -818,7 +832,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor003, TestSize.Level1)
  * @tc.name: UsbdDescriptor004
  * @tc.desc: Test functions to GetStringDescriptor
  * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor004, TestSize.Level1)
@@ -838,7 +852,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor004, TestSize.Level1)
  * @tc.name: UsbdDescriptor005
  * @tc.desc: Test functions to GetStringDescriptor
  * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor005, TestSize.Level1)
@@ -858,7 +872,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor005, TestSize.Level1)
  * @tc.name: UsbdDescriptor006
  * @tc.desc: Test functions to GetStringDescriptor
  * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor006, TestSize.Level1)
@@ -878,12 +892,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor006, TestSize.Level1)
  * @tc.name: UsbdDescriptor007
  * @tc.desc: Test functions to GetStringDescriptor
  * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：devAddr、stringID错误
+ * @tc.desc: Negative test: parameters exception, devAddr && stringID error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor007, TestSize.Level1)
 {
-    uint8_t stringId = 233;
+    uint8_t stringId = STRING_ID_233;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
@@ -898,12 +912,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor007, TestSize.Level1)
  * @tc.name: UsbdDescriptor008
  * @tc.desc: Test functions to GetStringDescriptor
  * @tc.desc: int32_t GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：busNum、devAddr、length错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr && stringID error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor008, TestSize.Level1)
 {
-    uint8_t stringId = 222;
+    uint8_t stringId = STRING_ID_233;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
@@ -920,12 +934,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetStringDescriptor008, TestSize.Level1)
  * @tc.name: UsbdDescriptor001
  * @tc.desc: Test functions to GetConfigDescriptor
  * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor001, TestSize.Level1)
 {
-    uint8_t configId = 0;
+    uint8_t configId = CONFIG_ID_0;
     uint8_t buffer[LENGTH_NUM_255] = {};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = dev_;
@@ -940,12 +954,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor001, TestSize.Level1)
  * @tc.name: UsbdDescriptor002
  * @tc.desc: Test functions to GetConfigDescriptor
  * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor002, TestSize.Level1)
 {
-    uint8_t configId = 1;
+    uint8_t configId = CONFIG_ID_1;
     uint8_t buffer[LENGTH_NUM_255] = {};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
@@ -960,12 +974,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor002, TestSize.Level1)
  * @tc.name: UsbdDescriptor003
  * @tc.desc: Test functions to GetConfigDescriptor
  * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor003, TestSize.Level1)
 {
-    uint8_t configId = 1;
+    uint8_t configId = CONFIG_ID_1;
     uint8_t buffer[LENGTH_NUM_255] = {};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
@@ -980,12 +994,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor003, TestSize.Level1)
  * @tc.name: UsbdDescriptor004
  * @tc.desc: Test functions to GetConfigDescriptor
  * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，configId
+ * @tc.desc: Negative test: parameters exception, configId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor004, TestSize.Level1)
 {
-    uint8_t configId = 1;
+    uint8_t configId = CONFIG_ID_1;
     uint8_t buffer[LENGTH_NUM_255] = {};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = dev_;
@@ -1000,12 +1014,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor004, TestSize.Level1)
  * @tc.name: UsbdDescriptor005
  * @tc.desc: Test functions to GetConfigDescriptor
  * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor005, TestSize.Level1)
 {
-    uint8_t configId = 1;
+    uint8_t configId = CONFIG_ID_1;
     uint8_t buffer[LENGTH_NUM_255] = {};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
@@ -1020,12 +1034,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor005, TestSize.Level1)
  * @tc.name: UsbdDescriptor006
  * @tc.desc: Test functions to GetConfigDescriptor
  * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：参数异常，busNum、configId错误
+ * @tc.desc: Negative test: parameters exception, busNum && configId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor006, TestSize.Level1)
 {
-    uint8_t configId = 222;
+    uint8_t configId = CONFIG_ID_222;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, dev_.devAddr};
@@ -1040,12 +1054,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor006, TestSize.Level1)
  * @tc.name: UsbdDescriptor007
  * @tc.desc: Test functions to GetConfigDescriptor
  * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：devAddr、configId错误
+ * @tc.desc: Negative test: parameters exception, devAddr && configId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor007, TestSize.Level1)
 {
-    uint8_t configId = 222;
+    uint8_t configId = CONFIG_ID_222;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_222};
@@ -1060,12 +1074,12 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor007, TestSize.Level1)
  * @tc.name: UsbdDescriptor008
  * @tc.desc: Test functions to GetConfigDescriptor
  * @tc.desc: int32_t GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试：busNum、devAddr、configId错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr && configId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor008, TestSize.Level1)
 {
-    uint8_t configId = 222;
+    uint8_t configId = CONFIG_ID_222;
     uint8_t buffer[LENGTH_NUM_255] = {0};
     uint32_t length = LENGTH_NUM_255;
     struct UsbDev dev = {BUS_NUM_222, DEV_ADDR_222};
@@ -1080,7 +1094,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetConfigDescriptor008, TestSize.Level1)
  * @tc.name: UsbdGetRawDescriptor001
  * @tc.desc: Test functions to GetRawDescriptor
  * @tc.desc: int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor001, TestSize.Level1)
@@ -1097,7 +1111,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor001, TestSize.Level1)
  * @tc.name: UsbdGetRawDescriptor002
  * @tc.desc: Test functions to GetRawDescriptor
  * @tc.desc: int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试: 错误参数
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor002, TestSize.Level1)
@@ -1114,7 +1128,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor002, TestSize.Level1)
  * @tc.name: UsbdGetRawDescriptor003
  * @tc.desc: Test functions to GetRawDescriptor
  * @tc.desc: int32_t GetRawDescriptor(const UsbDev &dev, std::vector<uint8_t> &descriptor);
- * @tc.desc: 反向测试: 错误参数
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor003, TestSize.Level1)
@@ -1131,7 +1145,7 @@ HWTEST_F(UsbdRequestTest, UsbdGetRawDescriptor003, TestSize.Level1)
  * @tc.name: GetFileDescriptor001
  * @tc.desc: Test functions to GetFileDescriptor
  * @tc.desc: int32_t GetFileDescriptor(const UsbDev &dev, int32_t &fd);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, GetFileDescriptor001, TestSize.Level1)
@@ -1147,7 +1161,7 @@ HWTEST_F(UsbdRequestTest, GetFileDescriptor001, TestSize.Level1)
  * @tc.name: GetFileDescriptor002
  * @tc.desc: Test functions to GetFileDescriptor
  * @tc.desc: int32_t GetFileDescriptor(const UsbDev &dev, int32_t &fd);
- * @tc.desc: 反向测试：参数错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, GetFileDescriptor002, TestSize.Level1)
@@ -1163,7 +1177,7 @@ HWTEST_F(UsbdRequestTest, GetFileDescriptor002, TestSize.Level1)
  * @tc.name: GetFileDescriptor003
  * @tc.desc: Test functions to GetFileDescriptor
  * @tc.desc: int32_t GetFileDescriptor(const UsbDev &dev, int32_t &fd);
- * @tc.desc: 反向测试：参数错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, GetFileDescriptor003, TestSize.Level1)
@@ -1179,7 +1193,7 @@ HWTEST_F(UsbdRequestTest, GetFileDescriptor003, TestSize.Level1)
  * @tc.name: GetFileDescriptor004
  * @tc.desc: Test functions to GetFileDescriptor
  * @tc.desc: int32_t GetFileDescriptor(const UsbDev &dev, int32_t &fd);
- * @tc.desc: 反向测试：参数错误
+ * @tc.desc: Negative test: parameters exception, fd error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, GetFileDescriptor004, TestSize.Level1)
@@ -1196,7 +1210,7 @@ HWTEST_F(UsbdRequestTest, GetFileDescriptor004, TestSize.Level1)
  * @tc.desc: Test functions to RequestQueue
  * @tc.desc: int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, std::vector<uint8_t> &clientData,
         std::vector<uint8_t> &buffer);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestQueue001, TestSize.Level1)
@@ -1224,7 +1238,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue001, TestSize.Level1)
  * @tc.desc: Test functions to RequestQueue
  * @tc.desc: int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, std::vector<uint8_t> &clientData,
         std::vector<uint8_t> &buffer);
- * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestQueue002, TestSize.Level1)
@@ -1253,7 +1267,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue002, TestSize.Level1)
  * @tc.desc: Test functions to RequestQueue
  * @tc.desc: int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, std::vector<uint8_t> &clientData,
         std::vector<uint8_t> &buffer);
- * @tc.desc: 反向测试：参数异常，devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestQueue003, TestSize.Level1)
@@ -1282,7 +1296,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue003, TestSize.Level1)
  * @tc.desc: Test functions to RequestQueue
  * @tc.desc: int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, std::vector<uin        t8_t> &clientData,
         std::vector<uint8_t> &buffer);
- * @tc.desc: 反向测试：参数异常，busNum、configIndex错误
+ * @tc.desc: Negative test: parameters exception, busNum && configIndex error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestQueue004, TestSize.Level1)
@@ -1312,7 +1326,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue004, TestSize.Level1)
  * @tc.desc: Test functions to RequestQueue
  * @tc.desc: int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, std::vector<uint8_t> &clientData,
         std::vector<uint8_t> &buffer);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestQueue005, TestSize.Level1)
@@ -1340,7 +1354,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue005, TestSize.Level1)
  * @tc.desc: Test functions to RequestQueue
  * @tc.desc: int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, std::vector<uint8_t> &clientData,
         std::vector<uint8_t> &buffer);
- * @tc.desc: 反向测试：参数异常，busNum、interfaceId、pointid错误
+ * @tc.desc: Negative test: parameters exception, busNum && interfaceId && pointid error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestQueue006, TestSize.Level1)
@@ -1370,7 +1384,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue006, TestSize.Level1)
  * @tc.desc: Test functions to RequestQueue
  * @tc.desc: int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, std::vector<uint8_t> &clientData,
         std::vector<uint8_t> &buffer);
- * @tc.desc: 正向测试
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestQueue007, TestSize.Level1)
@@ -1397,7 +1411,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue007, TestSize.Level1)
  * @tc.desc: Test functions to RequestQueue
  * @tc.desc: int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, std::vector<uint8_t> &clientData,
         std::vector<uint8_t> &buffer);
- * @tc.desc: 反向测试：interfaceId错误
+ * @tc.desc: Negative test: parameters exception, interfaceId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestQueue008, TestSize.Level1)
@@ -1425,7 +1439,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue008, TestSize.Level1)
  * @tc.desc: Test functions to RequestQueue
  * @tc.desc: int32_t RequestQueue(const UsbDev &dev, const UsbPipe &pipe, std::vector<uint8_t> &clientData,
         std::vector<uint8_t> &buffer);
- * @tc.desc: 反向测试：interfaceId、poinid错误
+ * @tc.desc: Negative test: parameters exception, interfaceId && pointid error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestQueue009, TestSize.Level1)
@@ -1456,7 +1470,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestQueue009, TestSize.Level1)
  * @tc.desc: Test functions to RequestWait
  * @tc.desc: int32_t RequestWait(const UsbDev &dev, std::vector<uint8_t> &clientData, std::vector<uint8_t> &buffer,
  * int32_t timeout);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestWait001, TestSize.Level1)
@@ -1490,7 +1504,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestWait001, TestSize.Level1)
  * @tc.desc: Test functions to RequestWait
  * @tc.desc: int32_t RequestWait(const UsbDev &dev, std::vector<uint8_t> &clientData, std::vector<uint8_t> &buffer,
  * int32_t timeout);
- * @tc.desc: 反向测试：busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestWait002, TestSize.Level1)
@@ -1525,7 +1539,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestWait002, TestSize.Level1)
  * @tc.desc: Test functions to RequestWait
  * @tc.desc: int32_t RequestWait(const UsbDev &dev, std::vector<uint8_t> &clientData, std::vector<uint8_t> &buffer,
  * int32_t timeout);
- * @tc.desc: 反向测试：devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestWait003, TestSize.Level1)
@@ -1560,7 +1574,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestWait003, TestSize.Level1)
  * @tc.desc: Test functions to RequestWait
  * @tc.desc: int32_t RequestWait(const UsbDev &dev, std::vector<uint8_t> &clientData, std::vector<uint8_t> &buffer,
  * int32_t timeout);
- * @tc.desc: 反向测试：timeout错误
+ * @tc.desc: Negative test: parameters exception, timeout error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestWait004, TestSize.Level1)
@@ -1594,7 +1608,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestWait004, TestSize.Level1)
  * @tc.desc: Test functions to RequestWait
  * @tc.desc: int32_t RequestWait(const UsbDev &dev, std::vector<uint8_t> &clientData, std::vector<uint8_t> &buffer,
  * int32_t timeout);
- * @tc.desc: 反向测试：busNum、devAddr错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestWait005, TestSize.Level1)
@@ -1631,7 +1645,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestWait005, TestSize.Level1)
  * @tc.name: UsbdRequest001
  * @tc.desc: Test functions to RequestCancel
  * @tc.desc: int32_t RequestCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestCancel001, TestSize.Level1)
@@ -1660,7 +1674,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel001, TestSize.Level1)
  * @tc.name: UsbdRequest002
  * @tc.desc: Test functions to RequestCancel
  * @tc.desc: int32_t RequestCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestCancel002, TestSize.Level1)
@@ -1685,8 +1699,9 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel002, TestSize.Level1)
     ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel002 %{public}d RequestCancel=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
-    dev.busNum = dev_.busNum;
+    dev = dev_;
     ret = g_usbInterface->RequestCancel(dev, pipe);
+    HDF_LOGI("UsbdRequestTest::UsbdRequestCancel002 again %{public}d RequestCancel=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
 
@@ -1694,7 +1709,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel002, TestSize.Level1)
  * @tc.name: UsbdRequest003
  * @tc.desc: Test functions to RequestCancel
  * @tc.desc: int32_t RequestCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 反向测试：参数异常，devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestCancel003, TestSize.Level1)
@@ -1718,8 +1733,9 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel003, TestSize.Level1)
     ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel003 %{public}d RequestCancel=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
-    dev.devAddr = dev_.devAddr;
+    dev = dev_;
     ret = g_usbInterface->RequestCancel(dev, pipe);
+    HDF_LOGI("UsbdRequestTest::UsbdRequestCancel003 again %{public}d RequestCancel=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
 
@@ -1727,7 +1743,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel003, TestSize.Level1)
  * @tc.name: UsbdRequest004
  * @tc.desc: Test functions to RequestCancel
  * @tc.desc: int32_t RequestCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 反向测试：参数异常，interfaceid错误 结果正常？？？
+ * @tc.desc: Positive test: intfId && endpointId error in pipe but not used
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestCancel004, TestSize.Level1)
@@ -1736,7 +1752,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel004, TestSize.Level1)
     struct UsbDev dev = dev_;
     uint32_t length = LENGTH_NUM_255;
     uint8_t buffer[LENGTH_NUM_255] = "request004";
-    uint8_t pointid = POINTID_129;
+    uint8_t pointid = POINTID_BULK_OUT;
     uint8_t interfaceId = INTERFACEID_1;
     auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
@@ -1747,10 +1763,14 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel004, TestSize.Level1)
     ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d RequestQueue=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    pipe.intfId = 222;
-    pipe.endpointId = 222;
+    pipe.intfId = INTERFACEID_255;
+    pipe.endpointId = POINTID_255;
     ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d RequestCancel=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+    pipe = {interfaceId, pointid};
+    ret = g_usbInterface->RequestCancel(dev, pipe);
+    HDF_LOGI("UsbdRequestTest::UsbdRequestCancel004 %{public}d again RequestCancel=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
 
@@ -1758,7 +1778,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel004, TestSize.Level1)
  * @tc.name: UsbdRequest005
  * @tc.desc: Test functions to RequestCancel
  * @tc.desc: int32_t RequestCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 正向测试
+ * @tc.desc: Negative test: call twice
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestCancel005, TestSize.Level1)
@@ -1781,13 +1801,17 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel005, TestSize.Level1)
     ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel005 %{public}d RequestCancel=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
+    dev = dev_;
+    pipe = {interfaceId, pointid};
+    ret = g_usbInterface->RequestCancel(dev, pipe);
+    ASSERT_EQ(0, ret);
 }
 
 /**
  * @tc.name: UsbdRequest006
  * @tc.desc: Test functions to RequestCancel
  * @tc.desc: int32_t RequestCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 反向测试：参数异常，busNum、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, busNum error && interfaceid ignore
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestCancel006, TestSize.Level1)
@@ -1807,7 +1831,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel006, TestSize.Level1)
     ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel006 %{public}d RequestQueue=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    dev.busNum = 224;
+    dev.busNum = BUS_NUM_255;
     pipe.intfId = 224;
     ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel006 %{public}d RequestCancel=%{public}d", __LINE__, ret);
@@ -1822,7 +1846,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel006, TestSize.Level1)
  * @tc.name: UsbdRequest007
  * @tc.desc: Test functions to RequestCancel
  * @tc.desc: int32_t RequestCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 反向测试：参数异常，devAddr、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, devAddr error && interfaceid ignore
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestCancel007, TestSize.Level1)
@@ -1842,8 +1866,8 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel007, TestSize.Level1)
     ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel007 %{public}d RequestQueue=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    dev.devAddr = 224;
-    pipe.intfId = 224;
+    dev.devAddr = DEV_ADDR_222;
+    pipe.intfId = INTERFACEID_255;
     ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel007 %{public}d RequestCancel=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -1857,7 +1881,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel007, TestSize.Level1)
  * @tc.name: UsbdRequest008
  * @tc.desc: Test functions to RequestCancel
  * @tc.desc: int32_t RequestCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 反向测试：参数异常，busNum、devAddr、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, busNum error && devAddr error && interfaceid ignore
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdRequestCancel008, TestSize.Level1)
@@ -1879,7 +1903,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel008, TestSize.Level1)
     ASSERT_EQ(0, ret);
     dev.busNum = BUS_NUM_222;
     dev.devAddr = DEV_ADDR_222;
-    pipe.intfId = 222;
+    pipe.intfId = INTERFACEID_255;
     ret = g_usbInterface->RequestCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::UsbdRequestCancel008 %{public}d RequestCancel=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -1895,7 +1919,7 @@ HWTEST_F(UsbdRequestTest, UsbdRequestCancel008, TestSize.Level1)
  * @tc.name: UsbdReleaseInterface001
  * @tc.desc: Test functions to ReleaseInterface
  * @tc.desc: int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface001, TestSize.Level1)
@@ -1911,7 +1935,7 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface001, TestSize.Level1)
  * @tc.name: UsbdReleaseInterface002
  * @tc.desc: Test functions to ReleaseInterface
  * @tc.desc: int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface002, TestSize.Level1)
@@ -1927,7 +1951,7 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface002, TestSize.Level1)
  * @tc.name: UsbdReleaseInterface003
  * @tc.desc: Test functions to ReleaseInterface
  * @tc.desc: int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：参数异常，devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface003, TestSize.Level1)
@@ -1943,12 +1967,12 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface003, TestSize.Level1)
  * @tc.name: UsbdReleaseInterface004
  * @tc.desc: Test functions to ReleaseInterface
  * @tc.desc: int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：参数异常，interfaceid错误
+ * @tc.desc: Negative test: parameters exception, interfaceid error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface004, TestSize.Level1)
 {
-    uint8_t interfaceId = 255;
+    uint8_t interfaceId = INTERFACEID_255;
     struct UsbDev dev = dev_;
     auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface004 %{public}d ret=%{public}d", __LINE__, ret);
@@ -1959,7 +1983,7 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface004, TestSize.Level1)
  * @tc.name: UsbdReleaseInterface005
  * @tc.desc: Test functions to ReleaseInterface
  * @tc.desc: int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：参数异常，busNum、devAddr错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface005, TestSize.Level1)
@@ -1975,12 +1999,12 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface005, TestSize.Level1)
  * @tc.name: UsbdReleaseInterface006
  * @tc.desc: Test functions to ReleaseInterface
  * @tc.desc: int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：参数异常，busNum、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, busNum && interfaceid error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface006, TestSize.Level1)
 {
-    int32_t interfaceId = 255;
+    int32_t interfaceId = INTERFACEID_255;
     struct UsbDev dev = {DEV_ADDR_255, dev_.devAddr};
     auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface006 %{public}d ret=%{public}d", __LINE__, ret);
@@ -1991,12 +2015,12 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface006, TestSize.Level1)
  * @tc.name: UsbdReleaseInterface007
  * @tc.desc: Test functions to ReleaseInterface
  * @tc.desc: int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：devAddr、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, devAddr && interfaceid error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface007, TestSize.Level1)
 {
-    int32_t interfaceId = 255;
+    int32_t interfaceId = INTERFACEID_255;
     struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
     auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface007 %{public}d ret=%{public}d", __LINE__, ret);
@@ -2007,12 +2031,12 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface007, TestSize.Level1)
  * @tc.name: UsbdReleaseInterface008
  * @tc.desc: Test functions to ReleaseInterface
  * @tc.desc: int32_t ReleaseInterface(const UsbDev &dev, uint8_t interfaceId);
- * @tc.desc: 反向测试：busNum、devAddr、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr && interfaceid error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, UsbdReleaseInterface008, TestSize.Level1)
 {
-    int32_t interfaceId = 255;
+    int32_t interfaceId = INTERFACEID_255;
     struct UsbDev dev = {BUS_NUM_255, DEV_ADDR_255};
     auto ret = g_usbInterface->ReleaseInterface(dev, interfaceId);
     HDF_LOGI("UsbdRequestTest::UsbdReleaseInterface008 %{public}d ret=%{public}d", __LINE__, ret);
@@ -2023,159 +2047,135 @@ HWTEST_F(UsbdRequestTest, UsbdReleaseInterface008, TestSize.Level1)
  * @tc.name: BulkCancel001
  * @tc.desc: Test functions to BulkCancel
  * @tc.desc: int32_t BulkCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, BulkCancel001, TestSize.Level1)
 {
-    uint8_t pointid = POINTID_129;
-    uint8_t interfaceId = INTERFACEID_1;
-    uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     struct UsbDev dev = dev_;
-    uint8_t buffer[LENGTH_NUM_255] = "request001";
-    uint32_t length = LENGTH_NUM_255;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::BulkCancel001 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    uint8_t interfaceId = INTERFACEID_1;
+    uint8_t pointid = POINTID_BULK_IN;
     struct UsbPipe pipe = {interfaceId, pointid};
-    std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
-    std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
-    HDF_LOGI("UsbdRequestTest::BulkCancel001 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    HDF_LOGI("UsbdTransferTest::BulkCancel001 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
     ret = g_usbInterface->BulkCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::BulkCancel001 %{public}d BulkCancel=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    HDF_LOGI("UsbdTransferTest::BulkCancel001 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
  * @tc.name: BulkCancel002
  * @tc.desc: Test functions to BulkCancel
  * @tc.desc: int32_t BulkCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 反向测试：参数异常，busNum错误
+ * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, BulkCancel002, TestSize.Level1)
 {
-    uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     struct UsbDev dev = dev_;
-    uint32_t length = LENGTH_NUM_255;
-    uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
-    uint8_t buffer[LENGTH_NUM_255] = "request002";
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::BulkCancel002 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    uint8_t pointid = POINTID_BULK_IN;
     struct UsbPipe pipe = {interfaceId, pointid};
-    std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
-    std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
-    HDF_LOGI("UsbdRequestTest::BulkCancel002 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    HDF_LOGI("UsbdTransferTest::BulkCancel002 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
     dev.busNum = BUS_NUM_222;
     ret = g_usbInterface->BulkCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::BulkCancel002 %{public}d BulkCancel=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    dev.busNum = dev_.busNum;
-    ret = g_usbInterface->RequestCancel(dev, pipe);
-    ASSERT_EQ(0, ret);
+    ASSERT_NE(0, ret);
+    dev = dev_;
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    HDF_LOGI("UsbdTransferTest::BulkCancel002 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
  * @tc.name: BulkCancel003
  * @tc.desc: Test functions to BulkCancel
  * @tc.desc: int32_t BulkCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 反向测试：参数异常，devAddr错误
+ * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, BulkCancel003, TestSize.Level1)
 {
-    uint8_t tag[TAG_LENGTH_NUM_1000] = "queue read";
     struct UsbDev dev = dev_;
-    uint8_t buffer[LENGTH_NUM_255] = "request003";
-    uint32_t length = LENGTH_NUM_255;
-    uint8_t pointid = POINTID_129;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::BulkCancel003 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-    std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_10};
-    std::vector<uint8_t> bufferdata = {buffer, buffer + length};
+    uint8_t pointid = POINTID_BULK_IN;
     struct UsbPipe pipe = {interfaceId, pointid};
-    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
-    HDF_LOGI("UsbdRequestTest::BulkCancel003 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    HDF_LOGI("UsbdTransferTest::BulkCancel003 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
     dev.devAddr = DEV_ADDR_222;
     ret = g_usbInterface->BulkCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::BulkCancel003 %{public}d BulkCancel=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
-    dev.devAddr = dev_.devAddr;
-    ret = g_usbInterface->BulkCancel(dev, pipe);
-    ASSERT_EQ(0, ret);
+    ASSERT_NE(0, ret);
+    dev = dev_;
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    HDF_LOGI("UsbdTransferTest::BulkCancel003 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
  * @tc.name: BulkCancel004
  * @tc.desc: Test functions to BulkCancel
  * @tc.desc: int32_t BulkCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 反向测试：参数异常，busNum、devAddr、interfaceid错误
+ * @tc.desc: Negative test: parameters exception, busNum && devAddr && interfaceid error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, BulkCancel004, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
-    uint8_t buffer[LENGTH_NUM_255] = "request004";
-    uint8_t pointid = POINTID_1;
     uint8_t interfaceId = INTERFACEID_1;
-    uint32_t length = LENGTH_NUM_255;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::BulkCancel004 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
-    uint8_t tag[TAG_LENGTH_NUM_1000] = "queue Write";
+    uint8_t pointid = POINTID_BULK_IN;
     struct UsbPipe pipe = {interfaceId, pointid};
-    std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_11};
-    std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
-    HDF_LOGI("UsbdRequestTest::BulkCancel004 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    HDF_LOGI("UsbdTransferTest::BulkCancel004 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
     dev.busNum = BUS_NUM_222;
     dev.devAddr = DEV_ADDR_222;
-    pipe.intfId = 222;
+    pipe.intfId = POINTID_255;
     ret = g_usbInterface->BulkCancel(dev, pipe);
     HDF_LOGI("UsbdRequestTest::BulkCancel004 %{public}d BulkCancel=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    ASSERT_NE(0, ret);
     dev = dev_;
-    pipe.intfId = INTERFACEID_1;
-    ret = g_usbInterface->BulkCancel(dev, pipe);
-    ASSERT_EQ(0, ret);
+    pipe = {interfaceId, pointid};
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    HDF_LOGI("UsbdTransferTest::BulkCancel004 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
 }
 
 /**
  * @tc.name: BulkCancel005
  * @tc.desc: Test functions to BulkCancel
  * @tc.desc: int32_t BulkCancel(const UsbDev &dev, const UsbPipe &pipe);
- * @tc.desc: 正向测试
+ * @tc.desc: Negative test: parameters exception, intfId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdRequestTest, BulkCancel005, TestSize.Level1)
 {
     struct UsbDev dev = dev_;
-    uint8_t buffer[LENGTH_NUM_255] = "request005";
-    uint32_t length = LENGTH_NUM_255;
-    uint8_t pointid = POINTID_1;
     uint8_t interfaceId = INTERFACEID_1;
-    auto ret = g_usbInterface->ClaimInterface(dev, interfaceId, 1);
-    HDF_LOGI("UsbdRequestTest::UsbdRequestCancel005 %{public}d ClaimInterface=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    uint8_t pointid = POINTID_BULK_IN;
     struct UsbPipe pipe = {interfaceId, pointid};
-    uint8_t tag[TAG_LENGTH_NUM_1000] = "queue Write";
-    std::vector<uint8_t> clientdata = {tag, tag + TAG_NUM_11};
-    std::vector<uint8_t> bufferdata = {buffer, buffer + length};
-    ret = g_usbInterface->RequestQueue(dev, pipe, clientdata, bufferdata);
-    HDF_LOGI("UsbdRequestTest::UsbdRequestCancel005 %{public}d RequestQueue=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    sptr<UsbdBulkCallbackTest> usbdBulkCallback = new UsbdBulkCallbackTest();
+    auto ret = g_usbInterface->RegBulkCallback(dev, pipe, usbdBulkCallback);
+    HDF_LOGI("UsbdTransferTest::BulkCancel004 %{public}d RegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
+    pipe.intfId = POINTID_158;
     ret = g_usbInterface->BulkCancel(dev, pipe);
-    HDF_LOGI("UsbdRequestTest::UsbdRequestCancel005 %{public}d BulkCancel=%{public}d", __LINE__, ret);
-    ASSERT_EQ(0, ret);
+    HDF_LOGI("UsbdRequestTest::BulkCancel004 %{public}d BulkCancel=%{public}d", __LINE__, ret);
+    ASSERT_NE(0, ret);
+    pipe = {interfaceId, pointid};
+    ret = g_usbInterface->UnRegBulkCallback(dev, pipe);
+    HDF_LOGI("UsbdTransferTest::BulkCancel004 %{public}d UnRegBulkCallback=%{public}d", __LINE__, ret);
+    ASSERT_EQ(ret, 0);
 }
-}
+} // namespace

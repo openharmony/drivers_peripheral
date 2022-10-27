@@ -57,8 +57,8 @@ void UsbdDispatcher::UsbdReadCallback(UsbRequest *req)
         return;
     }
 
-    UsbIfRequest *reqObj = (UsbIfRequest *)req;
-    UsbdRequestASync *dev = (UsbdRequestASync *)req->compInfo.userData;
+    UsbIfRequest *reqObj = reinterpret_cast<UsbIfRequest *>(req);
+    UsbdRequestASync *dev = static_cast<UsbdRequestASync *>(req->compInfo.userData);
     if (dev == nullptr) {
         HDF_LOGE("%{public}s:invalid param dev is nullptr!", __func__);
         OsalSemPost(&reqObj->hostRequest->sem);
@@ -87,10 +87,10 @@ int32_t UsbdDispatcher::UsbControlSetUp(UsbControlParams *controlParams, UsbCont
     controlReq->reqType = controlParams->reqType;
     controlReq->directon = controlParams->directon;
     controlReq->request = controlParams->request;
-    controlReq->value = (uint16_t)(CPU_TO_LE16(controlParams->value));
-    controlReq->index = *(uint16_t *)(CPU_TO_LE16(controlParams->data));
+    controlReq->value = controlParams->value;
+    controlReq->index = *(static_cast<uint16_t *>(controlParams->data));
     controlReq->buffer = controlParams->data;
-    controlReq->length = (uint32_t)(CPU_TO_LE16(controlParams->size));
+    controlReq->length = static_cast<uint32_t>(controlParams->size);
     return HDF_SUCCESS;
 }
 
@@ -181,7 +181,7 @@ void UsbdDispatcher::UsbdFreeCtrlPipe(HostDevice *dev)
 
 int32_t UsbdDispatcher::UsbdGetCtrlPipe(HostDevice *dev)
 {
-    UsbPipeInfo *pipe = (UsbPipeInfo *)OsalMemCalloc(sizeof(UsbPipeInfo));
+    UsbPipeInfo *pipe = static_cast<UsbPipeInfo *>(OsalMemCalloc(sizeof(UsbPipeInfo)));
     if (pipe == nullptr) {
         HDF_LOGE("%{public}s:OsalMemCalloc failed", __func__);
         return HDF_ERR_MALLOC_FAIL;
@@ -212,7 +212,7 @@ UsbdRequestSync *UsbdDispatcher::UsbdFindRequestSync(HostDevice *port, uint8_t i
     OsalMutexLock(&port->reqSyncLock);
     HdfSListIteratorInit(&it, &port->reqSyncList);
     while (HdfSListIteratorHasNext(&it)) {
-        req = (UsbdRequestSync *)HdfSListIteratorNext(&it);
+        req = reinterpret_cast<UsbdRequestSync *>(HdfSListIteratorNext(&it));
         if (req == nullptr) {
             continue;
         }
@@ -231,7 +231,7 @@ UsbdRequestSync *UsbdDispatcher::UsbdFindRequestSync(HostDevice *port, uint8_t i
 
 UsbdRequestSync *UsbdDispatcher::UsbdRequestSyncAlloc(void)
 {
-    UsbdRequestSync *req = (UsbdRequestSync *)OsalMemCalloc(sizeof(UsbdRequestSync));
+    UsbdRequestSync *req = static_cast<UsbdRequestSync *>(OsalMemCalloc(sizeof(UsbdRequestSync)));
     if (req == nullptr) {
         HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
         return req;
@@ -340,7 +340,7 @@ int32_t UsbdDispatcher::CtrlTranParamGetReqType(HdfSBuf *data, UsbControlParams 
         }
     } else {
         length = MAX_CONTROL_BUFF_SIZE;
-        buffer = (uint8_t *)OsalMemCalloc(length);
+        buffer = static_cast<uint8_t *>(OsalMemCalloc(length));
         if (buffer == nullptr) {
             HDF_LOGE("%{public}s:OsalMemCalloc failed length = %{public}u", __func__, length);
             return HDF_ERR_MALLOC_FAIL;
@@ -474,7 +474,7 @@ void UsbdDispatcher::RemoveDevFromService(UsbImpl *service, HostDevice *port)
     OsalMutexLock(&service->lock_);
     HdfSListIteratorInit(&it, &service->devList_);
     while (HdfSListIteratorHasNext(&it)) {
-        tempPort = (HostDevice *)HdfSListIteratorNext(&it);
+        tempPort = reinterpret_cast<HostDevice *>(HdfSListIteratorNext(&it));
         if (tempPort == nullptr) {
             continue;
         }
@@ -498,7 +498,7 @@ int32_t UsbdDispatcher::UsbdClaimInterfaces(HostDevice *dev)
         return HDF_FAILURE;
     }
 
-    dev->ctrIface = GetUsbInterfaceById((const HostDevice *)dev, USB_CTRL_INTERFACE_ID);
+    dev->ctrIface = GetUsbInterfaceById(const_cast<const HostDevice *>(dev), USB_CTRL_INTERFACE_ID);
     if (dev->ctrIface == nullptr) {
         HDF_LOGE("%{public}s:GetUsbInterfaceById nullptr", __func__);
         UsbdReleaseInterfaces(dev);
@@ -659,13 +659,14 @@ int32_t UsbdDispatcher::UsbdMallocAndFill(uint8_t *&dataAddr, const std::vector<
         return HDF_SUCCESS;
     }
     
-    dataAddr = (uint8_t *)OsalMemAlloc(length);
+    dataAddr = static_cast<uint8_t *>(OsalMemCalloc(length));
     if (dataAddr == nullptr) {
         HDF_LOGE("%{public}s: OsalMemAlloc failed", __func__);
         return HDF_FAILURE;
     }
 
-    int32_t err = memcpy_s((void *)dataAddr, length, data.data(), length);
+    void *dataAddrCovert = static_cast<void *>(dataAddr);
+    int32_t err = memcpy_s(dataAddrCovert, length, data.data(), length);
     if (err != EOK) {
         HDF_LOGE("%{public}s: memcpy_s failed", __func__);
         OsalMemFree(dataAddr);
@@ -690,12 +691,12 @@ int32_t UsbdDispatcher::FillReqAyncParams(
     params->requestType = USB_REQUEST_PARAMS_DATA_TYPE;
     params->timeout = USB_CTRL_SET_TIMEOUT;
     params->dataReq.numIsoPackets = 0;
-    params->userData = (void *)userData;
+    params->userData = static_cast<void *>(userData);
     params->dataReq.length = length;
     params->dataReq.directon = (UsbRequestDirection)((pipe->pipeDirection >> USB_PIPE_DIR_OFFSET) & 0x1);
     if (bWrite) {
         params->callback = UsbdWriteCallback;
-        params->dataReq.buffer = (unsigned char *)buffer;
+        params->dataReq.buffer = const_cast<uint8_t *>(buffer);
     } else {
         params->callback = UsbdReadCallback;
         params->dataReq.length = length;
@@ -705,7 +706,7 @@ int32_t UsbdDispatcher::FillReqAyncParams(
 
 UsbdRequestASync *UsbdDispatcher::UsbdRequestASyncAlloc(void)
 {
-    UsbdRequestASync *req = (UsbdRequestASync *)OsalMemCalloc(sizeof(UsbdRequestASync));
+    UsbdRequestASync *req = static_cast<UsbdRequestASync *>(OsalMemCalloc(sizeof(UsbdRequestASync)));
     if (req == nullptr) {
         HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
         return req;
@@ -837,7 +838,7 @@ int32_t UsbdDispatcher::HostDeviceCreate(HostDevice **port)
         return HDF_ERR_INVALID_OBJECT;
     }
 
-    HostDevice *tmp = (HostDevice *)OsalMemCalloc(sizeof(HostDevice));
+    HostDevice *tmp = static_cast<HostDevice *>(OsalMemCalloc(sizeof(HostDevice)));
     if (tmp == nullptr) {
         HDF_LOGE("%{public}s:OsalMemCalloc failed", __func__);
         return HDF_ERR_MALLOC_FAIL;
@@ -968,7 +969,7 @@ HostDevice *UsbdDispatcher::UsbdFindDevForBusNum(UsbImpl *service, uint8_t busNu
     OsalMutexLock(&service->lock_);
     HdfSListIteratorInit(&it, &service->devList_);
     while (HdfSListIteratorHasNext(&it)) {
-        tempPort = (HostDevice *)HdfSListIteratorNext(&it);
+        tempPort = reinterpret_cast<HostDevice *>(HdfSListIteratorNext(&it));
         if (!tempPort) {
             continue;
         }
@@ -1064,10 +1065,10 @@ UsbdBulkASyncList *UsbdDispatcher::UsbdBulkASyncListAlloc(HostDevice *port, uint
         return nullptr;
     }
 
-    UsbdBulkASyncList *bulkAsyncList = (UsbdBulkASyncList *)OsalMemCalloc(sizeof(UsbdBulkASyncList));
+    UsbdBulkASyncList *bulkAsyncList = reinterpret_cast<UsbdBulkASyncList *>(OsalMemCalloc(sizeof(UsbdBulkASyncList)));
     if (bulkAsyncList == nullptr) {
         HDF_LOGE("%{public}s:malloc failed!", __func__);
-        return bulkAsyncList;
+        return nullptr;
     }
     bulkAsyncList->ifId = ifId;
     bulkAsyncList->epId = epId;
@@ -1167,7 +1168,6 @@ int32_t UsbdDispatcher::UsbdBulkASyncPutAsmData(UsbdBufferHandle *handle, uint8_
         return HDF_ERR_INVALID_PARAM;
     }
 
-    uint32_t tlen = len;
     int32_t ret = HDF_SUCCESS;
     OsalMutexLock(&handle->lock);
     do {
@@ -1176,7 +1176,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncPutAsmData(UsbdBufferHandle *handle, uint8_
             ret = HDF_ERR_BAD_FD;
             break;
         }
-        tlen = (handle->size > handle->rcur) ? (handle->size - handle->rcur) : 0;
+        uint32_t tlen = (handle->size > handle->rcur) ? (handle->size - handle->rcur) : 0;
         tlen = tlen < len ? tlen : len;
         if (tlen > 0) {
             ret = memcpy_s(handle->starAddr + handle->rcur, tlen, buffer, len);
@@ -1240,14 +1240,14 @@ int32_t UsbdDispatcher::UsbdBulkAsyncGetAsmReqLen(UsbdBufferHandle *handle, uint
 int32_t UsbdDispatcher::UsbdBulkASyncReqWriteAutoSubmit(UsbRequest *request)
 {
     UsbRequestParams params;
-    UsbdBulkASyncReqNode *db = (UsbdBulkASyncReqNode *)request->compInfo.userData;
+    UsbdBulkASyncReqNode *db = static_cast<UsbdBulkASyncReqNode *>(request->compInfo.userData);
     int32_t ret = memcpy_s(&params, sizeof(params), &db->list->pList->params, sizeof(params));
     if (ret != EOK) {
         HDF_LOGE("%{public}s:%{public}d memcpy_s failed", __func__, ret);
         return ret;
     }
 
-    params.userData = (void *)db;
+    params.userData = static_cast<void *>(db);
     ret = UsbdBulkAsyncGetAsmData(&db->list->pList->asmHandle, &params, db->list->pList->pipe.maxPacketSize);
     if (ret != HDF_SUCCESS) {
         UsbdBulkASyncReqNodeSetNoUse(db);
@@ -1271,7 +1271,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncReqWriteAutoSubmit(UsbRequest *request)
 int32_t UsbdDispatcher::UsbdBulkASyncReqReadAutoSubmit(UsbRequest *request)
 {
     uint32_t readLen = 0;
-    UsbdBulkASyncReqNode *db = (UsbdBulkASyncReqNode *)request->compInfo.userData;
+    UsbdBulkASyncReqNode *db = static_cast<UsbdBulkASyncReqNode *>(request->compInfo.userData);
     int32_t ret =
         UsbdBulkASyncPutAsmData(&db->list->pList->asmHandle, request->compInfo.buffer, request->compInfo.actualLength);
     if (ret != HDF_SUCCESS) {
@@ -1288,8 +1288,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncReqReadAutoSubmit(UsbRequest *request)
         return HDF_DEV_ERR_NODATA;
     }
     db->request->compInfo.status = USB_REQUEST_COMPLETED;
-    UsbHostRequest *hostRequest = nullptr;
-    hostRequest = ((UsbIfRequest *)request)->hostRequest;
+    UsbHostRequest *hostRequest = reinterpret_cast<UsbIfRequest *>(request)->hostRequest;
     if (readLen != (uint32_t)hostRequest->length) {
         UsbRequestParams params;
         ret = memcpy_s(&params, sizeof(params), &db->list->pList->params, sizeof(params));
@@ -1299,7 +1298,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncReqReadAutoSubmit(UsbRequest *request)
         }
 
         params.dataReq.length = readLen;
-        params.userData = (void *)db;
+        params.userData = static_cast<void *>(db);
         ret = UsbFillRequest(request, db->list->pList->ifHandle, &params);
         if (ret != HDF_SUCCESS) {
             UsbdBulkASyncReqNodeSetNoUse(db);
@@ -1323,7 +1322,7 @@ void UsbdDispatcher::UsbdBulkASyncWriteCallbackAutoSubmit(UsbRequest *request)
     }
 
     int32_t ret = HDF_SUCCESS;
-    UsbdBulkASyncReqNode *node = (UsbdBulkASyncReqNode *)request->compInfo.userData;
+    UsbdBulkASyncReqNode *node = static_cast<UsbdBulkASyncReqNode *>(request->compInfo.userData);
     int32_t status = request->compInfo.status;
     if (status != 0) {
         UsbdBulkASyncReqNodeSetNoUse(node);
@@ -1363,7 +1362,7 @@ void UsbdDispatcher::UsbdBulkASyncReadCallbackAutoSubmit(UsbRequest *request)
     }
 
     int32_t ret = HDF_SUCCESS;
-    UsbdBulkASyncReqNode *node = (UsbdBulkASyncReqNode *)request->compInfo.userData;
+    UsbdBulkASyncReqNode *node = static_cast<UsbdBulkASyncReqNode *>(request->compInfo.userData);
     int32_t status = request->compInfo.status;
     if (status != 0) {
         UsbdBulkASyncReqNodeSetNoUse(node);
@@ -1424,7 +1423,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncReqWriteSubmit(UsbdBulkASyncReqNode *req)
         return ret;
     }
 
-    params.userData = (void *)req;
+    params.userData = static_cast<void *>(req);
     ret = UsbdBulkAsyncGetAsmData(&req->list->pList->asmHandle, &params, req->list->pList->pipe.maxPacketSize);
     if (ret != HDF_SUCCESS) {
         UsbdBulkASyncReqNodeSetNoUse(req);
@@ -1465,7 +1464,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncReqReadSubmit(UsbdBulkASyncReqNode *db)
     }
 
     params.dataReq.length = readLen;
-    params.userData = (void *)db;
+    params.userData = static_cast<void *>(db);
     ret = UsbFillRequest(db->request, db->list->pList->ifHandle, &params);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:UsbFillRequest failed", __func__);

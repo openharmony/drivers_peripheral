@@ -639,11 +639,6 @@ static int32_t ParserSupportComboInfo(struct nl_msg *msg, void *arg)
     return NL_SKIP;
 }
 
-struct PrivDevMac {
-    uint8_t *mac;
-    uint8_t len;
-};
-
 static struct nlattr *GetWiphyBands(struct genlmsghdr *hdr)
 {
     struct nlattr *attrMsg[NL80211_ATTR_MAX + 1];
@@ -999,7 +994,7 @@ int32_t GetValidFreqByBand(const char *ifName, int32_t band, struct FreqInfoResu
     genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_WIPHY, 0);
     nla_put_flag(msg, NL80211_ATTR_SPLIT_WIPHY_DUMP);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
-    ret = memset_s(result->freqs, size * sizeof(uint32_t), 0, sizeof(result->freqs));
+    ret = memset_s(result->freqs, size * sizeof(uint32_t), 0, size * sizeof(uint32_t));
     if (ret != EOK) {
         HILOG_ERROR(LOG_CORE, "%s: memset_s result->freqs  failed", __FUNCTION__);
         nlmsg_free(msg);

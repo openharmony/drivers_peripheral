@@ -121,16 +121,16 @@ int32_t AttrFormatToBit(const struct AudioSampleAttributes *attrs, int32_t *form
     }
     AudioFormat audioFormat = attrs->format;
     switch (audioFormat) {
-        case AUDIO_FORMAT_PCM_8_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_8_BIT:
             *format = BIT_NUM_8;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_16_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_16_BIT:
             *format = BIT_NUM_16;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_24_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_24_BIT:
             *format = BIT_NUM_24;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_32_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_32_BIT:
             *format = BIT_NUM_32;
             return HDF_SUCCESS;
         default:
@@ -184,7 +184,7 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     return HDF_SUCCESS;
 }
 
-AudioFormat g_formatIdZero = AUDIO_FORMAT_PCM_16_BIT;
+AudioFormat g_formatIdZero = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
 {
     if (capabilityIndex == NULL) {
@@ -208,8 +208,9 @@ int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCap
         capabilityIndex->formats = &g_formatIdZero;
         capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000;
         capabilityIndex->subPortsNum = 1;
-        capabilityIndex->subPorts = (struct AudioSubPortCapability *)calloc(capabilityIndex->subPortsNum,
-                                                                            sizeof(struct AudioSubPortCapability));
+        capabilityIndex->subPorts =
+            reinterpret_cast<struct AudioSubPortCapability *>(calloc(capabilityIndex->subPortsNum,
+            sizeof(struct AudioSubPortCapability)));
         if (capabilityIndex->subPorts == NULL) {
             HDF_LOGE("capabilityIndex subPorts is NULL!");
             return HDF_FAILURE;
@@ -273,7 +274,7 @@ int32_t AudioAdapterInitAllPorts(struct AudioAdapter *adapter)
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioPortAndCapability *portCapability =
-        (struct AudioPortAndCapability *)calloc(portNum, sizeof(struct AudioPortAndCapability));
+        reinterpret_cast<struct AudioPortAndCapability *>(calloc(portNum, sizeof(struct AudioPortAndCapability)));
     if (portCapability == NULL) {
         HDF_LOGE("portCapability is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
@@ -344,7 +345,7 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
         HDF_LOGE("Create render repeatedly!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(calloc(1, sizeof(*hwRender)));
     if (hwRender == NULL) {
         HDF_LOGE("hwRender is NULL!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;

@@ -93,7 +93,7 @@ int32_t AudioAlsaIfLibRenderTest::AudioInitHwParams(struct AudioHwRenderParam * 
     (void)memcpy_s(handleData->renderMode.hwInfo.adapterName, NAME_LEN, "primary", strlen("primary"));
     handleData->frameRenderMode.attrs.channelCount = channel;
     handleData->frameRenderMode.attrs.sampleRate = sampleRate;
-    handleData->frameRenderMode.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+    handleData->frameRenderMode.attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     handleData->frameRenderMode.attrs.isBigEndian = false;
     handleData->frameRenderMode.attrs.isSignedData = true;
     return HDF_SUCCESS;
@@ -525,7 +525,7 @@ HWTEST_F(AudioAlsaIfLibRenderTest, AudioOutputRenderWrite_002, TestSize.Level1)
     memset_s(handleData, sizeof(AudioHwRenderParam), 0, sizeof(AudioHwRenderParam));
     ret = AudioInitHwParams(handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    int32_t frameSize = channel * 2; /* 2 is for AUDIO_FORMAT_PCM_16_BIT to byte */
+    int32_t frameSize = channel * 2; /* 2 is for AUDIO_FORMAT_TYPE_PCM_16_BIT to byte */
     ASSERT_NE(frameSize, 0);
     handleData->frameRenderMode.bufferFrameSize = frameData / frameSize;
     char *bufferFrame = new char[frameData];
@@ -559,7 +559,7 @@ HWTEST_F(AudioAlsaIfLibRenderTest, AudioOutputRenderReqMmapBuffer_002, TestSize.
     memset_s(handleData, sizeof(AudioHwRenderParam), 0, sizeof(AudioHwRenderParam));
     ret = AudioInitHwParams(handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    int32_t frameSize = channel * 2; /* 2 is for AUDIO_FORMAT_PCM_16_BIT to byte */
+    int32_t frameSize = channel * 2; /* 2 is for AUDIO_FORMAT_TYPE_PCM_16_BIT to byte */
     ASSERT_NE(frameSize, 0);
     handleData->frameRenderMode.mmapBufDesc.totalBufferFrames = mmapFrameData / frameSize;
     char *mmapBufferFrames = new char[mmapFrameData];
@@ -589,7 +589,7 @@ HWTEST_F(AudioAlsaIfLibRenderTest, AudioOutputRenderGetMmapPosition_002, TestSiz
     memset_s(handleData, sizeof(AudioHwRenderParam), 0, sizeof(AudioHwRenderParam));
     ret = AudioInitHwParams(handleData);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    int32_t mmapFrameSize = channel * 2; /* 2 is for AUDIO_FORMAT_PCM_16_BIT to byte */
+    int32_t mmapFrameSize = channel * 2; /* 2 is for AUDIO_FORMAT_TYPE_PCM_16_BIT to byte */
     ASSERT_NE(mmapFrameSize, 0);
     handleData->frameRenderMode.mmapBufDesc.totalBufferFrames = mmapFrameData / mmapFrameSize;
     char mmapBuffer[mmapFrameData];

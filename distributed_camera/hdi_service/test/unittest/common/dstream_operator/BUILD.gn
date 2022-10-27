@@ -49,7 +49,10 @@ config("module_private_config") {
 ohos_unittest("HdfDstreamOperatorTest") {
   module_out_path = module_out_path
 
-  sources = [ "dstream_operator_test.cpp" ]
+  sources = [
+    "dstream_operator_test.cpp",
+    "stream_consumer.cpp",
+  ]
 
   configs = [ ":module_private_config" ]
 

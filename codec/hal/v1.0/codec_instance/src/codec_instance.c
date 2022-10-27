@@ -14,6 +14,7 @@
  */
 
 #include "codec_instance.h"
+#include <buffer_handle_utils.h>
 #include <dlfcn.h>
 #include <securec.h>
 #include "hdf_log.h"
@@ -88,7 +89,7 @@ static int32_t InitBufferManagerIf(struct CodecInstance *instance)
     return HDF_SUCCESS;
 }
 
-static int32_t WaitForBufferData(struct CodecInstance *instance, CodecBuffer *outputData)
+static int32_t WaitForOutputDataBuffer(struct CodecInstance *instance, CodecBuffer *outputData)
 {
     struct BufferManagerWrapper *bmWrapper = instance->bufferManagerWrapper;
     CodecBuffer *output = NULL;
@@ -96,13 +97,41 @@ static int32_t WaitForBufferData(struct CodecInstance *instance, CodecBuffer *ou
         if (bmWrapper->IsInputDataBufferReady(bmWrapper, QUEUE_TIME_OUT)
             && bmWrapper->IsUsedOutputDataBufferReady(bmWrapper, QUEUE_TIME_OUT)) {
             output = bmWrapper->GetUsedOutputDataBuffer(bmWrapper, QUEUE_TIME_OUT);
-            if (output != NULL) {
-                CopyCodecBuffer(outputData, output);
-                outputData->buffer[0].type = BUFFER_TYPE_VIRTUAL;
-                outputData->buffer[0].buf = (intptr_t)GetOutputShm(instance, output->bufferId)->virAddr;
-                break;
+            if (output == NULL) {
+                continue;
             }
+            if (!SetOemCodecBufferType(outputData, output)) {
+                HDF_LOGE("%{public}s: SetOemCodecBufferType failed!", __func__);
+                return HDF_FAILURE;
+            }
+            if (!CopyCodecBufferWithTypeSwitch(instance, outputData, output, false)) {
+                HDF_LOGE("%{public}s: CopyCodecBuffer failed!", __func__);
+                return HDF_FAILURE;
+            }
+            break;
         }
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t PrepareInputDataBuffer(struct BufferManagerWrapper *bmWrapper,
+    struct CodecInstance *instance, CodecBuffer *bufferToOemCodec)
+{
+    if (!bmWrapper->IsInputDataBufferReady(bmWrapper, QUEUE_TIME_OUT)) {
+        return HDF_ERR_TIMEOUT;
+    }
+    CodecBuffer *bufferInQueue = bmWrapper->GetInputDataBuffer(bmWrapper, QUEUE_TIME_OUT);
+    if (bufferInQueue == NULL) {
+        return HDF_ERR_TIMEOUT;
+    }
+
+    if (!SetOemCodecBufferType(bufferToOemCodec, bufferInQueue)) {
+        HDF_LOGE("%{public}s: SetOemCodecBufferType failed!", __func__);
+        return HDF_FAILURE;
+    }
+    if (!CopyCodecBufferWithTypeSwitch(instance, bufferToOemCodec, bufferInQueue, false)) {
+        HDF_LOGE("%{public}s: CopyCodecBuffer failed!", __func__);
+        return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
@@ -124,28 +153,18 @@ static void *CodecTaskThread(void *arg)
     int32_t codecBufferSize = sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * BUFFER_COUNT;
     CodecBuffer *inputData = (CodecBuffer *)OsalMemCalloc(codecBufferSize);
     CodecBuffer *outputData = (CodecBuffer *)OsalMemCalloc(codecBufferSize);
-    CodecBuffer *input = NULL;
     int32_t ret = HDF_FAILURE;
 
     inputData->bufferCnt = BUFFER_COUNT;
     outputData->bufferCnt = BUFFER_COUNT;
-    if (WaitForBufferData(instance, outputData) != HDF_SUCCESS) {
+    if (WaitForOutputDataBuffer(instance, outputData) != HDF_SUCCESS) {
         return NULL;
     }
-    
     while (instance->codecStatus == CODEC_STATUS_STARTED) {
-        if (!bmWrapper->IsInputDataBufferReady(bmWrapper, QUEUE_TIME_OUT)) {
-            continue;
-        }
-        
-        input = bmWrapper->GetInputDataBuffer(bmWrapper, QUEUE_TIME_OUT);
-        if (input == NULL) {
+        if (PrepareInputDataBuffer(bmWrapper, instance, inputData) != HDF_SUCCESS) {
             continue;
         }
 
-        CopyCodecBuffer(inputData, input);
-        inputData->buffer[0].type = BUFFER_TYPE_VIRTUAL;
-        inputData->buffer[0].buf = (intptr_t)GetInputShm(instance, input->bufferId)->virAddr;
         if (instance->codecType == VIDEO_DECODER) {
             ret = instance->codecOemIface->codecDecode(instance->handle, inputData, outputData, QUEUE_TIME_OUT);
         } else if (instance->codecType == VIDEO_ENCODER) {
@@ -249,68 +268,108 @@ int32_t DestroyCodecInstance(struct CodecInstance *instance)
     ReleaseInputInfo(instance);
     ReleaseOutputInfo(instance);
 
-    dlclose(instance->oemLibHandle);
     if (instance->codecOemIface != NULL) {
         OsalMemFree(instance->codecOemIface);
     }
-    instance->bufferManagerIface->deleteBufferManager(&(instance->bufferManagerWrapper));
-    dlclose(instance->bufferManagerLibHandle);
+    dlclose(instance->oemLibHandle);
     if (instance->bufferManagerIface != NULL) {
+        instance->bufferManagerIface->deleteBufferManager(&(instance->bufferManagerWrapper));
         OsalMemFree(instance->bufferManagerIface);
     }
+    dlclose(instance->bufferManagerLibHandle);
+    OsalMemFree(instance);
     return HDF_SUCCESS;
 }
 
-void AddInputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId)
+bool SetOemCodecBufferType(CodecBuffer *bufferToOemCodec, CodecBuffer *bufferInQueue)
+{
+    if (bufferToOemCodec == NULL || bufferInQueue == NULL) {
+        HDF_LOGE("%{public}s: Invalid params!", __func__);
+        return false;
+    }
+    if (bufferInQueue->buffer[0].type == BUFFER_TYPE_HANDLE) {
+        bufferToOemCodec->buffer[0].type = BUFFER_TYPE_HANDLE;
+    } else {
+        bufferToOemCodec->buffer[0].type = BUFFER_TYPE_VIRTUAL;
+    }
+    return true;
+}
+
+int32_t AddInputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId)
 {
     if (instance == NULL || bufferInfo == NULL) {
         HDF_LOGE("%{public}s: Invalid param!", __func__);
-        return;
+        return HDF_FAILURE;
     }
     int32_t count = instance->inputBuffersCount;
+    if (count >= MAX_BUFFER_NUM) {
+        HDF_LOGE("%{public}s: ShareMemory buffer array full!", __func__);
+        return HDF_FAILURE;
+    }
     instance->inputBuffers[count].id = bufferId;
-    instance->inputBuffers[count].fd = (int32_t)bufferInfo->buf;
     instance->inputBuffers[count].size = bufferInfo->capacity;
-    OpenShareMemory(&instance->inputBuffers[count]);
+    instance->inputBuffers[count].type = bufferInfo->type;
+    if (bufferInfo->type == BUFFER_TYPE_HANDLE) {
+        BufferHandle *bufferHandle = (BufferHandle *)bufferInfo->buf;
+        if (bufferHandle == NULL) {
+            HDF_LOGE("%{public}s: null bufferHandle!", __func__);
+            return HDF_FAILURE;
+        }
+        instance->inputBuffers[count].fd = bufferHandle->fd;
+    } else if (bufferInfo->type == BUFFER_TYPE_FD) {
+        instance->inputBuffers[count].fd = (int32_t)bufferInfo->buf;
+        if (OpenFdShareMemory(&instance->inputBuffers[count]) != HDF_SUCCESS) {
+            return HDF_FAILURE;
+        }
+    }
     instance->inputBuffersCount++;
+    return HDF_SUCCESS;
 }
 
-void AddOutputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId)
+int32_t AddOutputShm(struct CodecInstance *instance, const CodecBufferInfo *bufferInfo, int32_t bufferId)
 {
     if (instance == NULL || bufferInfo == NULL) {
         HDF_LOGE("%{public}s: Invalid param!", __func__);
-        return;
+        return HDF_FAILURE;
     }
     int32_t count = instance->outputBuffersCount;
+    if (count >= MAX_BUFFER_NUM) {
+        HDF_LOGE("%{public}s: ShareMemory buffer array full!", __func__);
+        return HDF_FAILURE;
+    }
     instance->outputBuffers[count].id = bufferId;
-    instance->outputBuffers[count].fd = (int32_t)bufferInfo->buf;
     instance->outputBuffers[count].size = bufferInfo->capacity;
-    OpenShareMemory(&instance->outputBuffers[count]);
+    instance->outputBuffers[count].type = bufferInfo->type;
+    if (bufferInfo->type == BUFFER_TYPE_HANDLE) {
+        BufferHandle *bufferHandle = (BufferHandle *)bufferInfo->buf;
+        if (bufferHandle == NULL) {
+            HDF_LOGE("%{public}s: null bufferHandle!", __func__);
+            return HDF_FAILURE;
+        }
+        instance->outputBuffers[count].fd = bufferHandle->fd;
+    } else if (bufferInfo->type == BUFFER_TYPE_FD) {
+        instance->outputBuffers[count].fd = (int32_t)bufferInfo->buf;
+        if (OpenFdShareMemory(&instance->outputBuffers[count]) != HDF_SUCCESS) {
+            return HDF_FAILURE;
+        }
+    }
     instance->outputBuffersCount++;
+    return HDF_SUCCESS;
 }
 
-ShareMemory* GetInputShm(struct CodecInstance *instance, int32_t id)
+static ShareMemory* GetShmById(struct CodecInstance *instance, int32_t id)
 {
+    int32_t i;
     if (instance == NULL) {
         HDF_LOGE("%{public}s: Invalid param!", __func__);
         return NULL;
     }
-    for (int32_t i = 0; i < instance->inputBuffersCount; i++) {
+    for (i = 0; i < instance->inputBuffersCount; i++) {
         if (instance->inputBuffers[i].id == id) {
             return &(instance->inputBuffers[i]);
         }
     }
-    HDF_LOGE("%{public}s: not found for bufferId:%{public}d!", __func__, id);
-    return NULL;
-}
-
-ShareMemory* GetOutputShm(struct CodecInstance *instance, int32_t id)
-{
-    if (instance == NULL) {
-        HDF_LOGE("%{public}s: Invalid param!", __func__);
-        return NULL;
-    }
-    for (int32_t i = 0; i < instance->outputBuffersCount; i++) {
+    for (i = 0; i < instance->outputBuffersCount; i++) {
         if (instance->outputBuffers[i].id == id) {
             return &(instance->outputBuffers[i]);
         }
@@ -336,8 +395,7 @@ int32_t GetFdById(struct CodecInstance *instance, int32_t id)
             return instance->outputBuffers[i].fd;
         }
     }
-
-    HDF_LOGE("%{public}s: failed to found bufferId:%{public}d!", __func__, id);
+    HDF_LOGE("%{public}s: failed to find! bufferId:%{public}d!", __func__, id);
     return HDF_FAILURE;
 }
 
@@ -348,7 +406,9 @@ void ReleaseInputShm(struct CodecInstance *instance)
         return;
     }
     for (int32_t i = 0; i < instance->inputBuffersCount; i++) {
-        ReleaseShareMemory(&instance->inputBuffers[i]);
+        if (instance->inputBuffers[i].type == BUFFER_TYPE_FD) {
+            ReleaseFdShareMemory(&instance->inputBuffers[i]);
+        }
     }
 }
 void ReleaseOutputShm(struct CodecInstance *instance)
@@ -358,28 +418,40 @@ void ReleaseOutputShm(struct CodecInstance *instance)
         return;
     }
     for (int32_t i = 0; i < instance->outputBuffersCount; i++) {
-        ReleaseShareMemory(&instance->outputBuffers[i]);
+        if (instance->outputBuffers[i].type == BUFFER_TYPE_FD) {
+            ReleaseFdShareMemory(&instance->outputBuffers[i]);
+        }
     }
 }
 
-void AddInputInfo(struct CodecInstance *instance, CodecBuffer *info)
+int32_t AddInputInfo(struct CodecInstance *instance, CodecBuffer *info)
 {
     if (instance == NULL || info == NULL) {
         HDF_LOGE("%{public}s: Invalid param!", __func__);
-        return;
+        return HDF_FAILURE;
+    }
+    if (instance->inputInfoCount >= MAX_BUFFER_NUM) {
+        HDF_LOGE("%{public}s: CodecBuffer array full!", __func__);
+        return HDF_FAILURE;
     }
     instance->inputInfos[instance->inputInfoCount] = info;
     instance->inputInfoCount++;
+    return HDF_SUCCESS;
 }
 
-void AddOutputInfo(struct CodecInstance *instance, CodecBuffer *info)
+int32_t AddOutputInfo(struct CodecInstance *instance, CodecBuffer *info)
 {
     if (instance == NULL || info == NULL) {
         HDF_LOGE("%{public}s: Invalid param!", __func__);
-        return;
+        return HDF_FAILURE;
+    }
+    if (instance->outputInfoCount >= MAX_BUFFER_NUM) {
+        HDF_LOGE("%{public}s: CodecBuffer array full!", __func__);
+        return HDF_FAILURE;
     }
     instance->outputInfos[instance->outputInfoCount] = info;
     instance->outputInfoCount++;
+    return HDF_SUCCESS;
 }
 
 CodecBuffer* GetInputInfo(struct CodecInstance *instance, uint32_t id)
@@ -410,19 +482,29 @@ CodecBuffer* GetOutputInfo(struct CodecInstance *instance, uint32_t id)
     return NULL;
 }
 
+void ReleaseCodecBuffer(CodecBuffer *info)
+{
+    if (info == NULL) {
+        HDF_LOGI("%{public}s: Invalid param!", __func__);
+        return;
+    }
+    for (uint32_t i = 0; i < info->bufferCnt; i++) {
+        if (info->buffer[i].type == BUFFER_TYPE_HANDLE) {
+            FreeBufferHandle((BufferHandle *)info->buffer[i].buf);
+        }
+    }
+    OsalMemFree(info);
+}
+
 void ReleaseInputInfo(struct CodecInstance *instance)
 {
     if (instance == NULL) {
         HDF_LOGE("%{public}s: Invalid param!", __func__);
         return;
     }
-    CodecBuffer *info;
     for (int32_t i = 0; i < instance->inputInfoCount; i++) {
-        info = instance->inputInfos[i];
-        if (info != NULL) {
-            OsalMemFree(info);
-            instance->outputInfos[i] = NULL;
-        }
+        ReleaseCodecBuffer(instance->inputInfos[i]);
+        instance->inputInfos[i] = NULL;
     }
 }
 
@@ -432,13 +514,9 @@ void ReleaseOutputInfo(struct CodecInstance *instance)
         HDF_LOGE("%{public}s: Invalid param!", __func__);
         return;
     }
-    CodecBuffer *info;
     for (int32_t i = 0; i < instance->outputInfoCount; i++) {
-        info = instance->outputInfos[i];
-        if (info != NULL) {
-            OsalMemFree(info);
-            instance->outputInfos[i] = NULL;
-        }
+        ReleaseCodecBuffer(instance->outputInfos[i]);
+        instance->outputInfos[i] = NULL;
     }
 }
 
@@ -449,17 +527,13 @@ void ResetBuffers(struct CodecInstance *instance)
         return;
     }
     int32_t i;
-    for (i = 0; i< instance->inputBuffersCount; i++) {
-        ReleaseShareMemory(&instance->inputBuffers[i]);
-    }
-    for (i = 0; i< instance->outputBuffersCount; i++) {
-        ReleaseShareMemory(&instance->outputBuffers[i]);
-    }
+    ReleaseInputShm(instance);
+    ReleaseOutputShm(instance);
     for (i = 0; i< instance->inputInfoCount; i++) {
-        OsalMemFree(instance->inputInfos[i]);
+        ReleaseCodecBuffer(instance->inputInfos[i]);
     }
     for (i = 0; i< instance->outputInfoCount; i++) {
-        OsalMemFree(instance->outputInfos[i]);
+        ReleaseCodecBuffer(instance->outputInfos[i]);
     }
 
     instance->inputBuffersCount = 0;
@@ -468,7 +542,19 @@ void ResetBuffers(struct CodecInstance *instance)
     instance->outputInfoCount = 0;
 }
 
-bool CopyCodecBuffer(CodecBuffer *dst, const CodecBuffer *src)
+void EmptyCodecBuffer(CodecBuffer *buf)
+{
+    if (buf == NULL) {
+        return;
+    }
+    for (uint32_t i = 0; i < buf->bufferCnt; i++) {
+        buf->buffer[i].length = 0;
+        buf->buffer[i].offset = 0;
+    }
+}
+
+bool CopyCodecBufferWithTypeSwitch(struct CodecInstance *instance, CodecBuffer *dst,
+    const CodecBuffer *src, bool ignoreBuf)
 {
     if (dst == NULL || src == NULL) {
         HDF_LOGE("%{public}s: Nullpoint, dst: %{public}p, src: %{public}p", __func__, dst, src);
@@ -478,13 +564,55 @@ bool CopyCodecBuffer(CodecBuffer *dst, const CodecBuffer *src)
         HDF_LOGE("%{public}s: size not match", __func__);
         return false;
     }
-    int32_t size = sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * src->bufferCnt;
-    int32_t ret = memcpy_s(dst, size, src, size);
-    if (ret != EOK) {
-        HDF_LOGE("%{public}s: memcpy_s failed, error code: %{public}d", __func__, ret);
-        return false;
+    dst->bufferId = src->bufferId;
+    dst->timeStamp = src->timeStamp;
+    dst->flag = src->flag;
+    for (uint32_t i = 0; i < src->bufferCnt; i++) {
+        dst->buffer[i].offset = src->buffer[i].offset;
+        dst->buffer[i].length = src->buffer[i].length;
+        dst->buffer[i].capacity = src->buffer[i].capacity;
+        if (ignoreBuf) {
+            continue;
+        } else if (dst->buffer[i].type == src->buffer[i].type) {
+            dst->buffer[i].buf = src->buffer[i].buf;
+        } else if (dst->buffer[i].type == BUFFER_TYPE_VIRTUAL && src->buffer[i].type == BUFFER_TYPE_FD) {
+            dst->buffer[i].buf = (intptr_t)GetShmById(instance, src->bufferId)->virAddr;
+        } else if (dst->buffer[i].type == BUFFER_TYPE_VIRTUAL && src->buffer[i].type == BUFFER_TYPE_HANDLE) {
+            dst->buffer[i].buf = (intptr_t)GetShmById(instance, src->bufferId)->virAddr;
+        }
+        if (dst->buffer[i].buf == 0) {
+            HDF_LOGE("%{public}s: buf value invalid! bufferId:%{public}d", __func__, src->bufferId);
+            return false;
+        }
     }
     return true;
+}
+
+static BufferHandle *DupBufferHandle(const BufferHandle *handle)
+{
+    if (handle == NULL) {
+        HDF_LOGE("%{public}s handle is NULL", __func__);
+        return NULL;
+    }
+
+    BufferHandle *newHandle = AllocateBufferHandle(handle->reserveFds, handle->reserveInts);
+    if (newHandle == NULL) {
+        HDF_LOGE("%{public}s AllocateBufferHandle failed, newHandle is NULL", __func__);
+        return NULL;
+    }
+
+    newHandle->fd = handle->fd;
+    newHandle->width = handle->width;
+    newHandle->stride = handle->stride;
+    newHandle->height = handle->height;
+    newHandle->size = handle->size;
+    newHandle->format = handle->format;
+    newHandle->usage = handle->usage;
+    newHandle->virAddr = handle->virAddr;
+    newHandle->phyAddr = handle->phyAddr;
+    newHandle->key = handle->key;
+
+    return newHandle;
 }
 
 CodecBuffer* DupCodecBuffer(const CodecBuffer *src)
@@ -504,6 +632,11 @@ CodecBuffer* DupCodecBuffer(const CodecBuffer *src)
         HDF_LOGE("%{public}s: memcpy_s failed, error code: %{public}d", __func__, ret);
         OsalMemFree(dst);
         return NULL;
+    }
+    for (uint32_t i = 0; i < src->bufferCnt; i++) {
+        if (dst->buffer[i].type == BUFFER_TYPE_HANDLE) {
+            dst->buffer[i].buf = (intptr_t)DupBufferHandle((BufferHandle *)src->buffer[i].buf);
+        }
     }
     return dst;
 }

@@ -157,7 +157,7 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     return HDF_SUCCESS;
 }
 
-AudioFormat g_formatIdZero = AUDIO_FORMAT_PCM_16_BIT;
+AudioFormat g_formatIdZero = AUDIO_FORMAT_TYPE_PCM_16_BIT;
 int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
 {
     if (capabilityIndex == NULL) {
@@ -181,8 +181,9 @@ int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCap
         capabilityIndex->formats = &g_formatIdZero;
         capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000;
         capabilityIndex->subPortsNum = 1;
-        capabilityIndex->subPorts = (struct AudioSubPortCapability *)calloc(capabilityIndex->subPortsNum,
-            sizeof(struct AudioSubPortCapability));
+        capabilityIndex->subPorts =
+            reinterpret_cast<struct AudioSubPortCapability *>(calloc(capabilityIndex->subPortsNum,
+            sizeof(struct AudioSubPortCapability)));
         if (capabilityIndex->subPorts == NULL) {
             HDF_LOGE("pointer is null!");
             return HDF_FAILURE;
@@ -243,8 +244,8 @@ int32_t AudioProxyAdapterInitAllPorts(struct AudioAdapter *adapter)
         HDF_LOGE("ports is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    struct AudioPortAndCapability *portCapability = (struct AudioPortAndCapability *)calloc(portNum,
-        sizeof(struct AudioPortAndCapability));
+    struct AudioPortAndCapability *portCapability = reinterpret_cast<struct AudioPortAndCapability *>(calloc(portNum,
+        sizeof(struct AudioPortAndCapability)));
     if (portCapability == NULL) {
         HDF_LOGE("portCapability is NULL!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
@@ -310,7 +311,7 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
     if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL || desc == NULL || attrs == NULL || render == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    struct AudioHwRender *hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    struct AudioHwRender *hwRender = reinterpret_cast<struct AudioHwRender *>(calloc(1, sizeof(*hwRender)));
     if (hwRender == NULL) {
         HDF_LOGE("hwRender is NULL!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;

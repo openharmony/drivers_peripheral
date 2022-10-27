@@ -15,6 +15,7 @@
 
 #include "battery_interface_impl.h"
 #include "hdf_base.h"
+#include "battery_config.h"
 #include "battery_log.h"
 
 namespace OHOS {
@@ -51,19 +52,13 @@ int32_t BatteryInterfaceImpl::Init()
     provider_->InitBatteryPath();
     provider_->InitPowerSupplySysfs();
 
-    batteryConfig_ = std::make_unique<OHOS::HDI::Battery::V1_1::BatteryConfig>();
-    if (batteryConfig_ == nullptr) {
-        BATTERY_HILOGE(COMP_HDI, "make_unique BatteryConfig error");
-        return HDF_ERR_MALLOC_FAIL;
-    }
-    batteryConfig_->Init();
+    auto& batteryConfig = BatteryConfig::GetInstance();
+    batteryConfig.ParseConfig();
+    currentPath_ = batteryConfig.GetString("charger.current_limit.path");
+    voltagePath_ = batteryConfig.GetString("charger.voltage_limit.path");
 
-    batteryLed_ = std::make_unique<OHOS::HDI::Battery::V1_1::BatteryLed>();
-    if (batteryLed_ == nullptr) {
-        BATTERY_HILOGE(COMP_HDI, "make_unique BatteryLed error");
-        return HDF_ERR_MALLOC_FAIL;
-    }
-    batteryLed_->InitLightInfo();
+    // The configuration can be released when it is not needed
+    BatteryConfig::DestroyInstance();
 
     loop_ = std::make_unique<OHOS::HDI::Battery::V1_1::BatteryThread>();
     if (loop_ == nullptr) {
@@ -230,7 +225,7 @@ int32_t BatteryInterfaceImpl::GetBatteryInfo(BatteryInfo& info)
 
 int32_t BatteryInterfaceImpl::SetChargingLimit(const std::vector<ChargingLimit>& chargingLimit)
 {
-    return provider_->SetChargingLimit(chargingLimit);
+    return provider_->SetChargingLimit(chargingLimit, currentPath_, voltagePath_);
 }
 
 int32_t BatteryInterfaceImpl::AddBatteryDeathRecipient(const sptr<IBatteryCallback>& callback)

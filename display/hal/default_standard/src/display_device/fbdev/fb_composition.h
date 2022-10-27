@@ -23,7 +23,7 @@ namespace HDI {
 namespace DISPLAY {
 class FbComposition : public HdiComposition {
 public:
-    explicit FbComposition(std::vector<int> &fbs);
+    explicit FbComposition(const std::vector<int> &fbs);
     virtual ~FbComposition();
     int32_t Init();
     int32_t SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &clientLayer);

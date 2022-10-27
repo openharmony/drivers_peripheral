@@ -17,28 +17,24 @@
 #define SHARE_MEM_H
 
 #include <hdf_base.h>
+#include "codec_type.h"
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#define STREAM_PACKET_BUFFER_NUM    4
-#define MEDIA_FRAME_BUFFER_NUM      10
-
-#define MEM_NAME_LEN    128
-
 typedef struct {
-    char memName[MEM_NAME_LEN];
     int32_t id;
-    int32_t fd;             /**< Transmit fd through ipc for sharing memory */
+    int32_t fd;         /**< Transmit fd through ipc for sharing memory */
     int32_t size;
     uint8_t *virAddr;   /**< Virtual address */
+    BufferType type;
 } ShareMemory;
 
-int32_t CreateShareMemory(ShareMemory *shareMemory);
-int32_t OpenShareMemory(ShareMemory *shareMemory);
-int32_t ReleaseShareMemory(ShareMemory *shareMemory);
+int32_t CreateFdShareMemory(ShareMemory *shareMemory);
+int32_t OpenFdShareMemory(ShareMemory *shareMemory);
+int32_t ReleaseFdShareMemory(ShareMemory *shareMemory);
 
 #ifdef __cplusplus
 }

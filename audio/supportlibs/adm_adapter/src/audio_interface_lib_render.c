@@ -1078,7 +1078,7 @@ int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
         break;
     } while (tryNum > 0);
     if (tryNum > 0) {
-        (void)AudioCallbackModeStatus(handleData, AUDIO_NONBLOCK_WRITE_COMPELETED);
+        (void)AudioCallbackModeStatus(handleData, AUDIO_NONBLOCK_WRITE_COMPLETED);
         return HDF_SUCCESS;
     } else {
         (void)AudioCallbackModeStatus(handleData, AUDIO_ERROR_OCCUR);
@@ -1132,7 +1132,7 @@ int32_t AudioOutputRenderStartPrepare(const struct DevHandle *handle,
     }
 
     service = (struct HdfIoService *)handle->object;
-    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+    if (service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         AUDIO_FUNC_LOGE("Failed to obtain the service.!");
         return HDF_FAILURE;
     }
@@ -1156,7 +1156,7 @@ int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
     }
 
     struct HdfIoService *service = (struct HdfIoService *)handle->object;
-    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+    if (service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         AUDIO_FUNC_LOGE("RenderStartPrepare Service is NULL!");
         return HDF_FAILURE;
     }
@@ -1188,7 +1188,7 @@ int32_t AudioOutputRenderStop(const struct DevHandle *handle,
     }
     struct HdfIoService *service = NULL;
     service = (struct HdfIoService *)handle->object;
-    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+    if (service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         AUDIO_FUNC_LOGE("RenderStop Service is NULL!");
         return HDF_FAILURE;
     }
@@ -1290,7 +1290,7 @@ int32_t AudioOutputRenderGetMmapPosition(const struct DevHandle *handle,
     }
 
     service = (struct HdfIoService *)handle->object;
-    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+    if (service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
         AUDIO_FUNC_LOGE("service or service->dispatcher or service->dispatcher->Dispatch is null!");
         return HDF_FAILURE;
     }

@@ -483,7 +483,7 @@ HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_013, TestSize.Level1)
     if (audiopara.render != nullptr) {
         audiopara.attrs.type = AUDIO_IN_MEDIA;
         audiopara.attrs.interleaved = false;
-        audiopara.attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+        audiopara.attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
         audiopara.attrs.sampleRate = 48000;
         audiopara.attrs.channelCount = 2;
         audiopara.attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
@@ -495,7 +495,7 @@ HWTEST_F(AudioServerFunctionTest, AudioFunctionRenderTest_013, TestSize.Level1)
 
         EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
         EXPECT_FALSE(attrsValue.interleaved);
-        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+        EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
         EXPECT_EQ(samplerateValue, attrsValue.sampleRate);
         EXPECT_EQ(channelcountValue, attrsValue.channelCount);
     }
@@ -539,7 +539,6 @@ HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_002, TestSize.Level1)
     sleep(1);
     if (audiopara.capture != nullptr) {
         FrameStatus(0);
-        sleep(1);
         ret = audiopara.capture->control.Pause((AudioHandle)(audiopara.capture));
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         sleep(1);
@@ -675,20 +674,15 @@ HWTEST_F(AudioServerFunctionTest, AudioFunctionCaptureTest_006, TestSize.Level1)
     int32_t ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordAudio, &audiopara);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    sleep(1);
     if (audiopara.capture != nullptr) {
-        FrameStatus(0);
-        usleep(300000);
         ret = audiopara.capture->attr.SetSampleAttributes(audiopara.capture, &attrs);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-        usleep(300000);
-        FrameStatus(1);
         sleep(1);
         ret = audiopara.capture->attr.GetSampleAttributes(audiopara.capture, &attrsValue);
         EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
         EXPECT_EQ(AUDIO_IN_MEDIA, attrsValue.type);
         EXPECT_FALSE(attrsValue.interleaved);
-        EXPECT_EQ(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
+        EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
         EXPECT_EQ(SAMPLERATEEXOECT, attrsValue.sampleRate);
         EXPECT_EQ(CHANNELCOUNTEXOECT, attrsValue.channelCount);
     }

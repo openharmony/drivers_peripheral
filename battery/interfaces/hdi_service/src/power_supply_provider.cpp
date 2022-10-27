@@ -899,8 +899,9 @@ void PowerSupplyProvider::InitDefaultSysfs()
     std::string mockBatteryPath = MOCK_POWER_SUPPLY_BASE_PATH + "/battery";
     std::string mockChargerPath = MOCK_POWER_SUPPLY_BASE_PATH + "/ohos_charger";
     std::string mockTechPath = MOCK_POWER_SUPPLY_BASE_PATH + "/ohos-fgu";
+
     if (access(mockBatteryPath.c_str(), 0) == -1) {
-        mkdir(mockBatteryPath.c_str(), S_IRWXU);
+        mkdir(mockBatteryPath.c_str(), S_IRWXU | S_IRWXG);
         sleep(MKDIR_WAIT_TIME);
     }
 
@@ -920,7 +921,8 @@ void PowerSupplyProvider::InitDefaultSysfs()
     path_ = MOCK_POWER_SUPPLY_BASE_PATH;
 }
 
-int32_t PowerSupplyProvider::SetChargingLimit(const std::vector<ChargingLimit>& chargerLimitList)
+int32_t PowerSupplyProvider::SetChargingLimit(const std::vector<ChargingLimit>& chargerLimitList,
+    std::string& currentPath, std::string& voltagePath)
 {
     BATTERY_HILOGD(FEATURE_BATT_INFO, "enter");
     if (chargerLimitList.empty()) {
@@ -928,20 +930,13 @@ int32_t PowerSupplyProvider::SetChargingLimit(const std::vector<ChargingLimit>& 
         return HDF_ERR_INVALID_PARAM;
     }
 
-    std::unique_ptr<BatteryConfig> batteryConfig = std::make_unique<BatteryConfig>();
-    if (batteryConfig == nullptr) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "make_unique BatteryConfig return nullptr");
-        return HDF_ERR_MALLOC_FAIL;
-    }
-    batteryConfig->Init();
-
     std::string limitPath;
     std::string chargeLimitStr;
     for (auto& iter : chargerLimitList) {
         if (iter.type == ChargingLimitType::TYPE_CURRENT) {
-            limitPath = batteryConfig->GetCurrentLimitPathConf();
+            limitPath = currentPath;
         } else if (iter.type == ChargingLimitType::TYPE_VOLTAGE) {
-            limitPath = batteryConfig->GetVoltageLimitPathConf();
+            limitPath = voltagePath;
         }
         chargeLimitStr = chargeLimitStr + (iter.protocol + " " + std::to_string(iter.value) + "\n");
     }

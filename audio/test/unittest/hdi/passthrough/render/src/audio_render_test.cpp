@@ -77,7 +77,7 @@ HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenFrameCountIsNull, TestSize.Level1)
 HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenParamIsNotSupport, TestSize.Level1)
 {
     struct AudioFrameRenderMode *frameRenderMode = new struct AudioFrameRenderMode;
-    frameRenderMode->attrs.format = AUDIO_FORMAT_AAC_MAIN;
+    frameRenderMode->attrs.format = AUDIO_FORMAT_TYPE_AAC_MAIN;
     uint64_t bytes = FRAME_DATA;
     uint32_t frameCount = 0;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT,
@@ -89,7 +89,7 @@ HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenParamIsNotSupport, TestSize.Level1
 HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenChannelCountIsZero, TestSize.Level1)
 {
     struct AudioFrameRenderMode *frameRenderMode = new struct AudioFrameRenderMode;
-    frameRenderMode->attrs.format = AUDIO_FORMAT_PCM_8_BIT;
+    frameRenderMode->attrs.format = AUDIO_FORMAT_TYPE_PCM_8_BIT;
     frameRenderMode->attrs.channelCount = 0;
     uint64_t bytes = FRAME_DATA;
     uint32_t frameCount = 0;
@@ -101,7 +101,7 @@ HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenChannelCountIsZero, TestSize.Level
 HWTEST_F(AudioRenderTest, PcmBytesToFramesWhenParamIsValid, TestSize.Level1)
 {
     struct AudioFrameRenderMode *frameRenderMode = new struct AudioFrameRenderMode;
-    frameRenderMode->attrs.format = AUDIO_FORMAT_PCM_8_BIT;
+    frameRenderMode->attrs.format = AUDIO_FORMAT_TYPE_PCM_8_BIT;
     frameRenderMode->attrs.channelCount = 1;
     uint64_t bytes = FRAME_DATA;
     uint32_t frameCount = 0;
@@ -345,7 +345,7 @@ HWTEST_F(AudioRenderTest, AudioRenderGetFrameSizeWhenSizeIsNull, TestSize.Level1
 HWTEST_F(AudioRenderTest, AudioRenderGetFrameSizeWhenParamIsNotSupport, TestSize.Level1)
 {
     AudioHwRender *hwRender = (AudioHwRender *)render;
-    hwRender->renderParam.frameRenderMode.attrs.format = AUDIO_FORMAT_AAC_MAIN;
+    hwRender->renderParam.frameRenderMode.attrs.format = AUDIO_FORMAT_TYPE_AAC_MAIN;
     AudioHandle handle = (AudioHandle)hwRender;
     uint64_t frameSize = FRAME_DATA;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioRenderGetFrameSize(handle, &frameSize));
@@ -409,7 +409,7 @@ HWTEST_F(AudioRenderTest, AudioRenderSetSampleAttributesWhenDevDataHandleIsNull,
 HWTEST_F(AudioRenderTest, AudioRenderSetSampleAttributesWhenFormatIsError, TestSize.Level1)
 {
     AudioHandle handle = (AudioHandle)render;
-    attrs.format = AUDIO_FORMAT_G711A;
+    attrs.format = AUDIO_FORMAT_TYPE_G711A;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioRenderSetSampleAttributes(handle, &attrs));
 }
 
@@ -1067,7 +1067,7 @@ HWTEST_F(AudioRenderTest, AudioRenderRenderFrameWhenFormatIsNotSupport, TestSize
 {
     ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioRenderStart((AudioHandle)render));
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
-    hwRender->renderParam.frameRenderMode.attrs.format = AUDIO_FORMAT_AAC_MAIN;
+    hwRender->renderParam.frameRenderMode.attrs.format = AUDIO_FORMAT_TYPE_AAC_MAIN;
     void *frame = (void *)calloc(1, FRAME_DATA);
     ASSERT_NE(nullptr, frame);
     uint64_t requestBytes = FRAME_DATA;
@@ -1471,7 +1471,7 @@ HWTEST_F(AudioRenderTest, AudioRenderReqMmapBufferWhenFormatIsError, TestSize.Le
     int32_t reqSize = REQ_SIZE;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     AudioFormat tempFormat = hwRender->renderParam.frameRenderMode.attrs.format;
-    hwRender->renderParam.frameRenderMode.attrs.format = AUDIO_FORMAT_G726;
+    hwRender->renderParam.frameRenderMode.attrs.format = AUDIO_FORMAT_TYPE_G726;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioRenderReqMmapBuffer(render, reqSize, &desc));
     hwRender->renderParam.frameRenderMode.attrs.format = tempFormat;
 }

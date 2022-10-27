@@ -17,6 +17,7 @@
 #include <osal_mem.h>
 #include <unistd.h>
 #include "hdf_log.h"
+#include "hdi/idevmgr_hdi.h"
 #include "v1_0/ipartition_slot.h"
 
 namespace OHOS {
@@ -24,18 +25,35 @@ namespace PartitionSlot {
 using namespace testing;
 using namespace testing::ext;
 using namespace OHOS::HDI::Partitionslot::V1_0;
+using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
 
 class HDFPartitionSlotTest : public testing::Test {
 public:
-    static void SetUpTestCase() {}
-    static void TearDownTestCase() {}
+    static void SetUpTestCase()
+    {
+        auto devmgr = IDeviceManager::Get();
+        if (devmgr != nullptr) {
+            devmgr->LoadDevice("partition_slot_service");
+        } else {
+            std::cout << "Get devmgr failed" << std::endl;
+        }
+    }
+    static void TearDownTestCase()
+    {
+        auto devmgr = IDeviceManager::Get();
+        if (devmgr != nullptr) {
+            devmgr->UnloadDevice("partition_slot_service");
+        } else {
+            std::cout << "Get devmgr failed" << std::endl;
+        }
+    }
     void SetUp() {}
     void TearDown() {}
 };
 
 HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_001, TestSize.Level1)
 {
-    printf("begin get currentslot by service \n");
+    std::cout << "begin get currentslot by service" << std::endl;
     int numOfSlots = 0;
     int currentSlot = -1;
     sptr<IPartitionSlot> partitionslot = IPartitionSlot::Get();
@@ -45,7 +63,7 @@ HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_001, TestSize.Level1)
 
 HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_002, TestSize.Level1)
 {
-    printf("begin get suffix by service \n");
+    std::cout << "begin get suffix by service" << std::endl;
     std::string suffix = "";
     int slot = 2;
     sptr<IPartitionSlot> partitionslot = IPartitionSlot::Get();
@@ -55,7 +73,7 @@ HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_002, TestSize.Level1)
 
 HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_003, TestSize.Level1)
 {
-    printf("begin set active slot by service \n");
+    std::cout << "begin set active slot by service" << std::endl;
     int numOfSlots = 0;
     int currentSlot = 0;
     sptr<IPartitionSlot> partitionslot = IPartitionSlot::Get();
@@ -67,7 +85,7 @@ HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_003, TestSize.Level1)
 
 HWTEST_F(HDFPartitionSlotTest, HdfPartitionSlotTest_004, TestSize.Level1)
 {
-    printf("begin set unbootable slot by service \n");
+    std::cout << "begin set unbootable slot by service" << std::endl;
     sptr<IPartitionSlot> partitionslot = IPartitionSlot::Get();
     ASSERT_TRUE(partitionslot != nullptr);
     ASSERT_TRUE(partitionslot->SetSlotUnbootable(2) == 0);

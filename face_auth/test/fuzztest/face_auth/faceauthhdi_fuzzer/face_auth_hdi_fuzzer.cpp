@@ -39,7 +39,7 @@ namespace V1_0 {
 namespace {
 class DummyIExecutorCallback : public IExecutorCallback {
 public:
-    DummyIExecutorCallback(int32_t result, int32_t acquire) : result_(result), acquire_(acquire)
+    DummyIExecutorCallback(int32_t result, int32_t tip) : result_(result), tip_(tip)
     {
     }
 
@@ -49,15 +49,15 @@ public:
         return result_;
     }
 
-    int32_t OnAcquireInfo(int32_t acquire, const std::vector<uint8_t> &extraInfo) override
+    int32_t OnTip(int32_t tip, const std::vector<uint8_t> &extraInfo) override
     {
-        IAM_LOGI("result %{public}d extraInfo len %{public}zu", acquire, extraInfo.size());
-        return acquire_;
+        IAM_LOGI("tip %{public}d extraInfo len %{public}zu", tip, extraInfo.size());
+        return tip_;
     }
 
 private:
     int32_t result_;
-    int32_t acquire_;
+    int32_t tip_;
 };
 
 ExecutorImpl g_executorImpl;
@@ -77,8 +77,8 @@ void FillFuzzExecutorInfo(Parcel &parcel, ExecutorInfo &executorInfo)
 void FillFuzzTemplateInfo(Parcel &parcel, TemplateInfo &templateInfo)
 {
     templateInfo.executorType = parcel.ReadUint32();
-    templateInfo.freezingTime = parcel.ReadInt32();
-    templateInfo.remainTimes = parcel.ReadInt32();
+    templateInfo.lockoutDuration = parcel.ReadInt32();
+    templateInfo.remainAttempts = parcel.ReadInt32();
     FillFuzzUint8Vector(parcel, templateInfo.extraInfo);
     IAM_LOGI("success");
 }

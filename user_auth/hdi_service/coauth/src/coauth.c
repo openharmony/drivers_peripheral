@@ -119,7 +119,7 @@ ResultCode AddCoAuthSchedule(const CoAuthSchedule *coAuthSchedule)
     return result;
 }
 
-static bool IsScheduleMatch(void *data, void *condition)
+static bool IsScheduleMatch(const void *data, const void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("get null data");

@@ -381,7 +381,6 @@ void *LayerStubInstance()
 void DestroyLayerStub(void *obj)
 {
     delete reinterpret_cast<VideoLayerStub *>(obj);
-    obj = nullptr;
 }
 
 int32_t LayerServiceOnRemoteRequest(void *stub, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)

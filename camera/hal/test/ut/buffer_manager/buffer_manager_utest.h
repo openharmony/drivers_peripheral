@@ -110,10 +110,7 @@ public:
 
     class Node {
     public:
-        explicit Node(const std::string name)
-        {
-            name_ = name;
-        }
+        explicit Node(const std::string name) : name_(name) {}
         virtual ~Node() = default;
 
         virtual void Connect(std::shared_ptr<Node>& nextNode);
@@ -132,10 +129,10 @@ public:
 
     class SinkNode : public Node {
     public:
-        explicit SinkNode(const std::string name) : Node(name) {}
+        explicit SinkNode(const std::string& name) : Node(name) {}
         ~SinkNode() override {}
         void Deliver(std::shared_ptr<IBuffer>& buffer) override;
-        void BindCallback(const std::function<void(std::shared_ptr<IBuffer>&)>& callback);
+        void BindCallback(const std::function<void(std::shared_ptr<IBuffer>&)>& func);
 
     private:
         std::function<void(std::shared_ptr<IBuffer>&)> callback_ = nullptr;
@@ -156,7 +153,7 @@ public:
         Pipeline() = default;
         ~Pipeline() = default;
 
-        bool AddStream(std::shared_ptr<Stream>& stream);
+        bool AddStream(const std::shared_ptr<Stream>& stream);
         void StartStream();
         void StopStream();
 

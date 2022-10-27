@@ -113,7 +113,7 @@ std::shared_ptr<OfflinePipeline> OfflinePipelineManager::FindOfflinePipeline(int
 {
     std::lock_guard<std::mutex> l(lock_);
     std::shared_ptr<OfflinePipeline> op = nullptr;
-    for (auto& it : offlinePipelineList_) {
+    for (const auto& it : offlinePipelineList_) {
         if (it.first == id) {
             op = it.second;
         }

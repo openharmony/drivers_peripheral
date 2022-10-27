@@ -40,7 +40,7 @@ namespace Audio {
 int32_t InitRenderFramepara(struct AudioFrameRenderMode& frameRenderMode)
 {
     InitAttrs(frameRenderMode.attrs);
-    frameRenderMode.frames = AUDIO_FORMAT_PCM_16_BIT;
+    frameRenderMode.frames = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     frameRenderMode.mode = AUDIO_CHANNEL_BOTH_RIGHT;
     frameRenderMode.periodSize = G_PERIODSIZE;
     frameRenderMode.periodCount = G_PERIODCOUNT;
@@ -135,7 +135,7 @@ int32_t InitHwCapture(struct AudioHwCapture *&hwCapture)
 
 int32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender)
 {
-    hwRender = (struct AudioHwRender *)calloc(1, sizeof(*hwRender));
+    hwRender = reinterpret_cast<struct AudioHwRender *>(calloc(1, sizeof(*hwRender)));
     if (hwRender == nullptr) {
         return HDF_FAILURE;
     }
@@ -148,7 +148,7 @@ int32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender)
 }
 int32_t BindServiceAndHwCapture(struct AudioHwCapture *&hwCapture)
 {
-    hwCapture = (struct AudioHwCapture *)calloc(1, sizeof(*hwCapture));
+    hwCapture = reinterpret_cast<struct AudioHwCapture *>(calloc(1, sizeof(*hwCapture)));
     if (hwCapture == nullptr) {
         return HDF_FAILURE;
     }

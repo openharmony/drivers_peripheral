@@ -52,7 +52,7 @@ RetCode V4L2SourceNode::Start(const int32_t streamId)
         return RC_ERROR;
     }
     std::vector<std::shared_ptr<IPort>> outPorts = GetOutPorts();
-    for (auto& it : outPorts) {
+    for (const auto& it : outPorts) {
         DeviceFormat format;
         format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUV420;
         format.fmtdesc.width = it->format_.w_;

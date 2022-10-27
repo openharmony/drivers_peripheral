@@ -112,11 +112,11 @@ int32_t AdmRenderFramePrepare(const std::string& path, char *&frame, uint32_t& r
         return HDF_FAILURE;
     }
     bufferSize = PcmFramesToBytes(attrs);
-    if (bufferSize <= 0) {
+    if (bufferSize == 0) {
         fclose(file);
         return HDF_FAILURE;
     }
-    frame = (char *)calloc(1, bufferSize);
+    frame = reinterpret_cast<char *>(calloc(1, bufferSize));
     if (frame == nullptr) {
         fclose(file);
         return HDF_FAILURE;
@@ -259,7 +259,7 @@ int32_t ReadCtrlInfo(struct HdfIoService *service, struct AudioCtlElemId id, int
     RecycleBuf(readBuf, readReply);
     return HDF_SUCCESS;
 }
-int32_t WriteHwParams(string serviceName, struct HdfIoService *&service, struct AudioPcmHwParams hwParams)
+int32_t WriteHwParams(const string serviceName, struct HdfIoService *&service, struct AudioPcmHwParams hwParams)
 {
     int32_t ret = -1;
     int32_t cmdid = -1;

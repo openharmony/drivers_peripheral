@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace HDI {
 namespace DISPLAY {
-HdiDrmComposition::HdiDrmComposition(std::shared_ptr<DrmConnector> &connector, std::shared_ptr<DrmCrtc> &crtc,
+HdiDrmComposition::HdiDrmComposition(std::shared_ptr<DrmConnector> &connector, const std::shared_ptr<DrmCrtc> &crtc,
     std::shared_ptr<DrmDevice> &drmDevice)
     : mDrmDevice(drmDevice), mConnector(connector), mCrtc(crtc)
 {
@@ -53,7 +53,7 @@ int32_t HdiDrmComposition::SetLayers(std::vector<HdiLayer *> &layers, HdiLayer &
     return DISPLAY_SUCCESS;
 }
 
-int32_t HdiDrmComposition::ApplyPlane(HdiDrmLayer &layer, DrmPlane &drmPlane, drmModeAtomicReqPtr pset)
+int32_t HdiDrmComposition::ApplyPlane(HdiDrmLayer &layer, const DrmPlane &drmPlane, drmModeAtomicReqPtr pset)
 {
     // set fence in
     int ret;
@@ -90,14 +90,13 @@ int32_t HdiDrmComposition::ApplyPlane(HdiDrmLayer &layer, DrmPlane &drmPlane, dr
 int32_t HdiDrmComposition::UpdateMode(std::unique_ptr<DrmModeBlock> &modeBlock, drmModeAtomicReq &pset)
 {
     // set the mode
-    int ret;
     DISPLAY_LOGD();
     if (mCrtc->NeedModeSet()) {
         modeBlock = mConnector->GetModeBlockFromId(mCrtc->GetActiveModeId());
         if ((modeBlock != nullptr) && (modeBlock->GetBlockId() != DRM_INVALID_ID)) {
             // set to active
             DISPLAY_LOGD("set crtc to active");
-            ret = drmModeAtomicAddProperty(&pset, mCrtc->GetId(), mCrtc->GetActivePropId(), 1);
+            int ret = drmModeAtomicAddProperty(&pset, mCrtc->GetId(), mCrtc->GetActivePropId(), 1);
             DISPLAY_CHK_RETURN((ret < 0), DISPLAY_FAILURE,
                 DISPLAY_LOGE("can not add the active prop errno %{public}d", errno));
 
@@ -144,7 +143,7 @@ int32_t HdiDrmComposition::Apply(bool modeSet)
     DISPLAY_LOGD("mCompLayers size %{public}zd", mCompLayers.size());
     for (uint32_t i = 0; i < mCompLayers.size(); i++) {
         HdiDrmLayer *layer = static_cast<HdiDrmLayer *>(mCompLayers[i]);
-        auto &drmPlane = mPlanes[i];
+        const auto &drmPlane = mPlanes[i];
         ret = ApplyPlane(*layer, *drmPlane, atomicReqPtr.Get());
         if (ret != DISPLAY_SUCCESS) {
             DISPLAY_LOGE("apply plane failed");

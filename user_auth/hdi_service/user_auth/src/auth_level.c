@@ -111,7 +111,7 @@ static ResultCode GetAsl(uint32_t authType, uint32_t *asl)
     if (executorList->getSize(executorList) == 0) {
         LOG_ERROR("executor is unregistered");
         DestroyLinkedList(executorList);
-        return RESULT_NOT_FOUND;
+        return RESULT_TYPE_NOT_SUPPORT;
     }
     LinkedListNode *temp = executorList->head;
     while (temp != NULL) {
@@ -143,7 +143,7 @@ static ResultCode GetAcl(int32_t userId, uint32_t authType, uint32_t *acl)
     if (credList == NULL || credList->getSize(credList) == 0) {
         LOG_ERROR("query credential failed");
         DestroyLinkedList(credList);
-        return RESULT_NOT_FOUND;
+        return RESULT_NOT_ENROLLED;
     }
     *acl = 0;
     LinkedListNode *temp =  credList->head;

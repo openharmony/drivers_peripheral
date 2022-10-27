@@ -402,4 +402,60 @@ HWTEST_F(AudioProxyAdapterTest, AdapterGetPassthroughMode_005, TestSize.Level1)
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioProxyAdapterGetPassthroughMode(adapter, &port, &mode));
     hwAdapter->proxyRemoteHandle = proxyRemoteHandle;
 }
+
+HWTEST_F(AudioProxyAdapterTest, AdapterSetExtraParams_001, TestSize.Level1)
+{
+    ASSERT_NE(adapter, nullptr);
+    enum AudioExtParamKey key = AUDIO_EXT_PARAM_KEY_NONE;
+    const char *condition = nullptr;
+    char value[AUDIO_ADAPTER_BUF_TEST];
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyAdapterSetExtraParams(nullptr, key, condition, value));
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyAdapterSetExtraParams(adapter, key, condition, nullptr));
+}
+
+HWTEST_F(AudioProxyAdapterTest, AdapterSetExtraParams_002, TestSize.Level1)
+{
+    ASSERT_NE(adapter, nullptr);
+    enum AudioExtParamKey key = AUDIO_EXT_PARAM_KEY_NONE;
+    const char *condition = nullptr;
+    char value[AUDIO_ADAPTER_BUF_TEST];
+    struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
+    struct HdfRemoteService *proxyRemoteHandle = hwAdapter->proxyRemoteHandle;
+    hwAdapter->proxyRemoteHandle = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioProxyAdapterSetExtraParams(adapter, key, condition, value));
+    hwAdapter->proxyRemoteHandle = proxyRemoteHandle;
+}
+
+HWTEST_F(AudioProxyAdapterTest, AdapterGetExtraParams_001, TestSize.Level1)
+{
+    ASSERT_NE(adapter, nullptr);
+    enum AudioExtParamKey key = AUDIO_EXT_PARAM_KEY_NONE;
+    const char *condition = nullptr;
+    char value[AUDIO_ADAPTER_BUF_TEST];
+    int32_t length = AUDIO_ADAPTER_BUF_TEST;
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyAdapterGetExtraParams(nullptr, key, condition, value, length));
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyAdapterGetExtraParams(adapter, key, condition, nullptr, length));
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyAdapterGetExtraParams(adapter, key, condition, value, 0));
+}
+
+HWTEST_F(AudioProxyAdapterTest, AdapterGetExtraParams_002, TestSize.Level1)
+{
+    ASSERT_NE(adapter, nullptr);
+    enum AudioExtParamKey key = AUDIO_EXT_PARAM_KEY_NONE;
+    const char *condition = nullptr;
+    char value[AUDIO_ADAPTER_BUF_TEST];
+    int32_t length = AUDIO_ADAPTER_BUF_TEST;
+    struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
+    struct HdfRemoteService *proxyRemoteHandle = hwAdapter->proxyRemoteHandle;
+    hwAdapter->proxyRemoteHandle = nullptr;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioProxyAdapterGetExtraParams(adapter, key, condition, value, length));
+    hwAdapter->proxyRemoteHandle = proxyRemoteHandle;
+}
+
+HWTEST_F(AudioProxyAdapterTest, AdapterSetVoiceVolume_001, TestSize.Level1)
+{
+    ASSERT_NE(adapter, nullptr);
+    float volume = 0;
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, AudioProxyAdapterSetVoiceVolume(adapter, volume));
+}
 }

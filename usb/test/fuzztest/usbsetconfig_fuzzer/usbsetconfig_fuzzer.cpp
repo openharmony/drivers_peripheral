@@ -34,8 +34,7 @@ bool UsbSetConfigFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    uint8_t configIndex = *(uint8_t *)data;
-    ret = usbInterface->SetConfig(dev, configIndex);
+    ret = usbInterface->SetConfig(dev, *data);
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: set config succeed", __func__);
     }

@@ -36,7 +36,7 @@ public:
     void WorkThread();
     uint64_t WaitNextVBlank(unsigned int &sq);
     bool WaitSignalAndCheckRuning();
-    void ReqesterVBlankCb(std::shared_ptr<VsyncCallBack> &cb);
+    void ReqesterVBlankCb(const std::shared_ptr<VsyncCallBack> &cb);
 
 private:
     int mDrmFd = 0;

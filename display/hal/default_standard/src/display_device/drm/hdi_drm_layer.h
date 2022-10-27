@@ -35,7 +35,7 @@ public:
     {
         return mFdId;
     }
-    bool IsValid();
+    bool IsValid() const;
 
 private:
     void Init(int drmFd, HdiLayerBuffer &hdl);

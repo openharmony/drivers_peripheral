@@ -140,16 +140,16 @@ int32_t AttrFormatToBit(const struct AudioSampleAttributes *attrs, int32_t *form
     }
     enum AudioFormat audioFormat = attrs->format;
     switch (audioFormat) {
-        case AUDIO_FORMAT_PCM_8_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_8_BIT:
             *format = BIT_NUM_8;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_16_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_16_BIT:
             *format = BIT_NUM_16;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_24_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_24_BIT:
             *format = BIT_NUM_24;
             return HDF_SUCCESS;
-        case AUDIO_FORMAT_PCM_32_BIT:
+        case AUDIO_FORMAT_TYPE_PCM_32_BIT:
             *format = BIT_NUM_32;
             return HDF_SUCCESS;
         default:
@@ -1170,6 +1170,13 @@ int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struc
     return AUDIO_HAL_ERR_INTERNAL;
 }
 
+int32_t AudioAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume)
+{
+    (void)adapter;
+    (void)volume;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
 int32_t AudioAdapterUpdateAudioRoute(struct AudioAdapter *adapter, const struct AudioRoute *route, int32_t *routeHandle)
 {
     if (route == NULL || routeHandle == NULL || route->sinks == NULL || route->sources == NULL) {
@@ -1189,4 +1196,25 @@ int32_t AudioAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t rout
     (void)adapter;
     (void)routeHandle;
     return AUDIO_HAL_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                   const char *condition, const char *value)
+{
+    (void)adapter;
+    (void)key;
+    (void)condition;
+    (void)value;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                   const char *condition, char *value, int32_t length)
+{
+    (void)adapter;
+    (void)key;
+    (void)condition;
+    (void)value;
+    (void)length;
+    return HDF_ERR_NOT_SUPPORT;
 }

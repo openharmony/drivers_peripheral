@@ -22,7 +22,7 @@
 #include <vector>
 #include "constants.h"
 #include "dcamera.h"
-
+#include "json/json.h"
 #include "v1_0/dcamera_types.h"
 #include "v1_0/types.h"
 
@@ -66,6 +66,8 @@ private:
     void* GetMetadataItemData(const camera_metadata_item_t &item);
     std::map<int, std::vector<DCResolution>> GetDCameraSupportedFormats(const std::string &abilityInfo);
     void InitDcameraBaseAbility();
+    void GetEachNodeSupportedResolution(std::vector<int>& formats, const std::string rootNode,
+        std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue);
     void SetFpsRanges();
 
 private:

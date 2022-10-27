@@ -19,7 +19,6 @@
 #include <iremote_object.h>
 #include <iproxy_broker.h>
 #include "batteryd_api.h"
-#include "battery_config.h"
 #include "battery_led.h"
 #include "battery_thread.h"
 #include "power_supply_provider.h"
@@ -63,11 +62,12 @@ public:
 private:
     std::unique_ptr<OHOS::HDI::Battery::V1_1::PowerSupplyProvider> provider_ = nullptr;
     std::unique_ptr<OHOS::HDI::Battery::V1_1::BatteryThread> loop_ = nullptr;
-    std::unique_ptr<OHOS::HDI::Battery::V1_1::BatteryConfig> batteryConfig_ = nullptr;
     std::unique_ptr<OHOS::HDI::Battery::V1_1::BatteryLed> batteryLed_ = nullptr;
     sptr<IBatteryCallback> batteryCallback_ = nullptr;
     int32_t AddBatteryDeathRecipient(const sptr<IBatteryCallback>& callback);
     int32_t RemoveBatteryDeathRecipient(const sptr<IBatteryCallback>& callback);
+    std::string currentPath_;
+    std::string voltagePath_;
 };
 } // V1_1
 } // Battery

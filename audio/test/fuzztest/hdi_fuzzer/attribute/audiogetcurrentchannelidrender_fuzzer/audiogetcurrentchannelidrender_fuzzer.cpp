@@ -32,7 +32,7 @@ namespace Audio {
             return false;
         }
 
-        struct AudioRender *handle = (struct AudioRender *)data;
+        struct AudioRender *handle = reinterpret_cast<struct AudioRender *>(const_cast<uint8_t *>(data));
         ret = getCurrentRender->attr.GetCurrentChannelId(handle, &channelId);
         if (ret == HDF_SUCCESS) {
             result = true;

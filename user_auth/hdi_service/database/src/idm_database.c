@@ -39,7 +39,7 @@ static ResultCode GetAllEnrolledInfoFromUser(UserInfo *userInfo, EnrolledInfoHal
 static ResultCode DeleteUser(int32_t userId);
 static CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList *credentialList);
 static CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedList *credentialList);
-static bool MatchCredentialById(void *data, void *condition);
+static bool MatchCredentialById(const void *data, const void *condition);
 static ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func);
 
 ResultCode InitUserInfoList(void)
@@ -63,7 +63,7 @@ void DestroyUserInfoList(void)
     g_userInfoList = NULL;
 }
 
-static bool MatchUserInfo(void *data, void *condition)
+static bool MatchUserInfo(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         LOG_ERROR("please check invalid node");
@@ -526,7 +526,7 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
     return ret;
 }
 
-static bool MatchCredentialById(void *data, void *condition)
+static bool MatchCredentialById(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         return false;
@@ -539,7 +539,7 @@ static bool MatchCredentialById(void *data, void *condition)
     return false;
 }
 
-static bool MatchEnrolledInfoByType(void *data, void *condition)
+static bool MatchEnrolledInfoByType(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         return false;

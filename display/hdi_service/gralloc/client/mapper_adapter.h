@@ -28,7 +28,7 @@ class MapperAdapter {
 public:
     MapperAdapter();
     virtual ~MapperAdapter();
-    bool IsReady();
+    bool IsReady() const;
     int32_t MapBuffer(const BufferHandle& handle, void *&outData) const;
     int32_t UnmapBuffer(const BufferHandle& handle) const;
     int32_t InvalidateCache(const BufferHandle& handle) const;

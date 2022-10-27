@@ -259,7 +259,7 @@ bool UtilsDataStub::EncodeStreamInfo(const std::shared_ptr<StreamInfo> &pInfo, M
     bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(pInfo->width_)));
     bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(pInfo->height_)));
     bRet = (bRet && parcel.WriteInt32(static_cast<int32_t>(pInfo->format_)));
-    bRet = (bRet = (bRet && parcel.WriteInt32(pInfo->intent_)));
+    bRet = (bRet && parcel.WriteInt32(pInfo->intent_));
     bRet = (bRet && parcel.WriteBool(pInfo->tunneledMode_));
     bool bufferQueueFlag = (pInfo->bufferQueue_->producer_ != nullptr) ? true : false;
     bRet = (bRet && parcel.WriteBool(bufferQueueFlag));
@@ -419,17 +419,17 @@ bool UtilsDataStub::ReadMetadata(camera_metadata_item_t &entry, MessageParcel &d
 void UtilsDataStub::EntryDataToBuffer(const camera_metadata_item_t &entry, void **buffer)
 {
     if (entry.data_type == META_TYPE_BYTE) {
-        *buffer = (void*)entry.data.u8;
+        *buffer = static_cast<void*>(entry.data.u8);
     } else if (entry.data_type == META_TYPE_INT32) {
-        *buffer = (void*)entry.data.i32;
+        *buffer = static_cast<void*>(entry.data.i32);
     } else if (entry.data_type == META_TYPE_FLOAT) {
-        *buffer = (void*)entry.data.f;
+        *buffer = static_cast<void*>(entry.data.f);
     } else if (entry.data_type == META_TYPE_INT64) {
-        *buffer = (void*)entry.data.i64;
+        *buffer = static_cast<void*>(entry.data.i64);
     } else if (entry.data_type == META_TYPE_DOUBLE) {
-        *buffer = (void*)entry.data.d;
+        *buffer = static_cast<void*>(entry.data.d);
     } else if (entry.data_type == META_TYPE_RATIONAL) {
-        *buffer = (void*)entry.data.r;
+        *buffer = static_cast<void*>(entry.data.r);
     }
 }
 }

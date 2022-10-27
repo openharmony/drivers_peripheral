@@ -5,7 +5,7 @@
   "license": "Apache License 2.0",
   "publishAs": "code-segment",
   "segment": {
-    "destPath": "drivers/peripheral/connected_tag"
+    "destPath": "drivers/peripheral/connected_nfc_tag"
   },
   "dirs": {},
   "scripts": {},

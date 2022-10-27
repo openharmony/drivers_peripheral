@@ -24,8 +24,8 @@
 
 static bool IsContextDuplicate(uint64_t contextId);
 static ResultCode CreateAndInsertSchedules(UserAuthContext *context, uint32_t authMode);
-static CoAuthSchedule *CreateAuthSchedule(UserAuthContext *context);
-static CoAuthSchedule *CreateIdentifySchedule(const UserAuthContext *context);
+static ResultCode CreateAuthSchedule(UserAuthContext *context, CoAuthSchedule **schedule);
+static ResultCode CreateIdentifySchedule(const UserAuthContext *context, CoAuthSchedule **schedule);
 static void DestroyContextNode(void *data);
 static ResultCode InsertScheduleToContext(CoAuthSchedule *schedule, UserAuthContext *context);
 
@@ -77,38 +77,44 @@ static UserAuthContext *InitAuthContext(AuthSolutionHal params)
     return context;
 }
 
-UserAuthContext *GenerateAuthContext(AuthSolutionHal params)
+ResultCode GenerateAuthContext(AuthSolutionHal params, UserAuthContext **context)
 {
     LOG_INFO("start");
+    if (context == NULL) {
+        LOG_ERROR("context is null");
+        return RESULT_BAD_PARAM;
+    }
     if (g_contextList == NULL) {
         LOG_ERROR("need init");
-        return NULL;
+        return RESULT_NEED_INIT;
     }
     if (IsContextDuplicate(params.contextId)) {
         LOG_ERROR("contextId is duplicate");
-        return NULL;
+        return RESULT_DUPLICATE_CHECK_FAILED;
     }
-    UserAuthContext *context = InitAuthContext(params);
-    if (context == NULL) {
+    *context = InitAuthContext(params);
+    if (*context == NULL) {
         LOG_ERROR("init context failed");
-        return NULL;
+        return RESULT_GENERAL_ERROR;
     }
-    ResultCode ret = CreateAndInsertSchedules(context, SCHEDULE_MODE_AUTH);
+    ResultCode ret = CreateAndInsertSchedules(*context, SCHEDULE_MODE_AUTH);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("create schedule failed %{public}d", ret);
+        DestroyContextNode(*context);
+        *context = NULL;
+        return ret;
+    }
+    ret = g_contextList->insert(g_contextList, *context);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("create schedule failed");
-        DestroyContextNode(context);
-        return NULL;
+        DestroyContextNode(*context);
+        *context = NULL;
+        return RESULT_GENERAL_ERROR;
     }
-    ret = g_contextList->insert(g_contextList, context);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("create schedule failed");
-        DestroyContextNode(context);
-        return NULL;
-    }
-    return context;
+    return RESULT_SUCCESS;
 }
 
-static CoAuthSchedule *CreateIdentifySchedule(const UserAuthContext *context)
+static ResultCode CreateIdentifySchedule(const UserAuthContext *context, CoAuthSchedule **schedule)
 {
     ScheduleParam scheduleParam = {};
     scheduleParam.associateId.contextId = context->contextId;
@@ -116,7 +122,12 @@ static CoAuthSchedule *CreateIdentifySchedule(const UserAuthContext *context)
     scheduleParam.collectorSensorHint = context->collectorSensorHint;
     scheduleParam.verifierSensorHint = context->collectorSensorHint;
     scheduleParam.scheduleMode = SCHEDULE_MODE_IDENTIFY;
-    return GenerateSchedule(&scheduleParam);
+    *schedule = GenerateSchedule(&scheduleParam);
+    if (*schedule == NULL) {
+        LOG_ERROR("GenerateSchedule failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    return RESULT_SUCCESS;
 }
 
 static UserAuthContext *InitIdentifyContext(const IdentifyParam *params)
@@ -209,17 +220,18 @@ static ResultCode CreateAndInsertSchedules(UserAuthContext *context, uint32_t au
 {
     LOG_INFO("start");
     CoAuthSchedule *schedule = NULL;
+    ResultCode result = RESULT_BAD_PARAM;
     if (authMode == SCHEDULE_MODE_AUTH) {
-        schedule = CreateAuthSchedule(context);
+        result = CreateAuthSchedule(context, &schedule);
     } else if (authMode == SCHEDULE_MODE_IDENTIFY) {
-        schedule = CreateIdentifySchedule(context);
+        result = CreateIdentifySchedule(context, &schedule);
     } else {
         LOG_ERROR("authMode is invalid");
-        return RESULT_BAD_PARAM;
+        return result;
     }
-    if (schedule == NULL) {
-        LOG_INFO("schedule is null");
-        return RESULT_BAD_PARAM;
+    if (result != RESULT_SUCCESS) {
+        LOG_INFO("create schedule fail %{public}d", result);
+        return result;
     }
     if (AddCoAuthSchedule(schedule) != RESULT_SUCCESS) {
         LOG_ERROR("AddCoAuthSchedule failed");
@@ -252,6 +264,20 @@ static LinkedList *GetAuthCredentialList(const UserAuthContext *context)
     return QueryCredentialLimit(&condition);
 }
 
+static ResultCode CheckCredentialSize(LinkedList *credList)
+{
+    uint32_t credNum = credList->getSize(credList);
+    if (credNum == 0) {
+        LOG_ERROR("credNum is 0");
+        return RESULT_NOT_ENROLLED;
+    }
+    if (credNum > MAX_CREDENTIAL) {
+        LOG_ERROR("credNum exceed limit");
+        return RESULT_EXCEED_LIMIT;
+    }
+    return RESULT_SUCCESS;
+}
+
 static ResultCode QueryAuthTempletaInfo(UserAuthContext *context, TemplateIdArrays *templateIds,
     uint32_t *sensorHint, uint32_t *matcher, uint32_t *acl)
 {
@@ -260,13 +286,13 @@ static ResultCode QueryAuthTempletaInfo(UserAuthContext *context, TemplateIdArra
         LOG_ERROR("query credential failed");
         return RESULT_UNKNOWN;
     }
-    uint32_t credNum = credList->getSize(credList);
-    if (credNum == 0 || credNum > MAX_CREDENTIAL) {
-        LOG_ERROR("credNum is failed");
+    ResultCode checkResult = CheckCredentialSize(credList);
+    if (checkResult != RESULT_SUCCESS) {
+        LOG_ERROR("CheckCredentialSize failed %{public}d", checkResult);
         DestroyLinkedList(credList);
-        return RESULT_EXCEED_LIMIT;
+        return checkResult;
     }
-    templateIds->value = (uint64_t *)Malloc(sizeof(uint64_t) * credNum);
+    templateIds->value = (uint64_t *)Malloc(sizeof(uint64_t) * credList->getSize(credList));
     if (templateIds->value == NULL) {
         LOG_ERROR("value malloc failed");
         DestroyLinkedList(credList);
@@ -304,7 +330,7 @@ FAIL:
     return RESULT_UNKNOWN;
 }
 
-static CoAuthSchedule *CreateAuthSchedule(UserAuthContext *context)
+static ResultCode CreateAuthSchedule(UserAuthContext *context, CoAuthSchedule **schedule)
 {
     TemplateIdArrays templateIds;
     uint32_t verifierSensorHint;
@@ -312,8 +338,8 @@ static CoAuthSchedule *CreateAuthSchedule(UserAuthContext *context)
     uint32_t acl;
     ResultCode ret = QueryAuthTempletaInfo(context, &templateIds, &verifierSensorHint, &executorMatcher, &acl);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("QueryAuthTempletaInfo failed");
-        return NULL;
+        LOG_ERROR("QueryAuthTempletaInfo failed %{public}d", ret);
+        return ret;
     }
     ScheduleParam scheduleParam = {};
     scheduleParam.associateId.contextId = context->contextId;
@@ -323,21 +349,22 @@ static CoAuthSchedule *CreateAuthSchedule(UserAuthContext *context)
     scheduleParam.templateIds = &templateIds;
     scheduleParam.executorMatcher = executorMatcher;
     scheduleParam.scheduleMode = SCHEDULE_MODE_AUTH;
-    CoAuthSchedule *schedule = GenerateSchedule(&scheduleParam);
-    if (schedule == NULL) {
+    *schedule = GenerateSchedule(&scheduleParam);
+    if (*schedule == NULL) {
         LOG_ERROR("schedule is null");
         Free(templateIds.value);
-        return NULL;
+        return RESULT_GENERAL_ERROR;
     }
     uint32_t scheduleAtl;
-    ret = QueryScheduleAtl(schedule, acl, &scheduleAtl);
+    ret = QueryScheduleAtl(*schedule, acl, &scheduleAtl);
     if (ret != RESULT_SUCCESS || context->authTrustLevel > scheduleAtl) {
         Free(templateIds.value);
-        DestroyCoAuthSchedule(schedule);
-        return NULL;
+        DestroyCoAuthSchedule(*schedule);
+        *schedule = NULL;
+        return ret;
     }
     Free(templateIds.value);
-    return schedule;
+    return RESULT_SUCCESS;
 }
 
 static bool IsContextDuplicate(uint64_t contextId)
@@ -410,7 +437,7 @@ ERROR:
     return RESULT_GENERAL_ERROR;
 }
 
-static bool MatchSchedule(void *data, void *condition)
+static bool MatchSchedule(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         LOG_ERROR("param is null");
@@ -433,7 +460,7 @@ ResultCode ScheduleOnceFinish(UserAuthContext *context, uint64_t scheduleId)
     return context->scheduleList->remove(context->scheduleList, &scheduleId, MatchSchedule, true);
 }
 
-static bool MatchContextSelf(void *data, void *condition)
+static bool MatchContextSelf(const void *data, const void *condition)
 {
     return data == condition;
 }

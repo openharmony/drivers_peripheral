@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "hdf_remote_adapter_if.h"
+#include <gtest/gtest.h>
 #include "hdi_service_common.h"
 
 using namespace std;
@@ -27,56 +27,37 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
     struct IAudioAdapter *adapter = nullptr;
     struct IAudioRender *render = nullptr;
     static TestAudioManager *manager;
-    static TestGetAudioManager getAudioManager;
-    static TestAudioManagerRelease managerRelease;
-    static TestAudioAdapterRelease adapterRelease;
-    static TestAudioRenderRelease renderRelease;
 };
 
-using THREAD_FUNC = void *(*)(void *);
-void *AudioIdlHdiRenderAttrTest::handle = nullptr;
-TestGetAudioManager AudioIdlHdiRenderAttrTest::getAudioManager = nullptr;
 TestAudioManager *AudioIdlHdiRenderAttrTest::manager = nullptr;
-TestAudioManagerRelease AudioIdlHdiRenderAttrTest::managerRelease = nullptr;
-TestAudioAdapterRelease AudioIdlHdiRenderAttrTest::adapterRelease = nullptr;
-TestAudioRenderRelease AudioIdlHdiRenderAttrTest::renderRelease = nullptr;
+using THREAD_FUNC = void *(*)(void *);
 
 void AudioIdlHdiRenderAttrTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFuctionSymbol(handle, getAudioManager, managerRelease, adapterRelease);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    renderRelease = (TestAudioRenderRelease)(dlsym(handle, "AudioRenderRelease"));
-    ASSERT_NE(nullptr, renderRelease);
-    (void)HdfRemoteGetCallingPid();
-    manager = getAudioManager(IDL_SERVER_NAME.c_str());
+    manager = IAudioManagerGet(IS_STUB);
     ASSERT_NE(nullptr, manager);
 }
 
 void AudioIdlHdiRenderAttrTest::TearDownTestCase(void)
 {
-    if (managerRelease != nullptr && manager != nullptr) {
-        (void)managerRelease(manager);
-    }
-    if (handle != nullptr) {
-        (void)dlclose(handle);
+    if (manager != nullptr) {
+        (void)IAudioManagerRelease(manager, IS_STUB);
     }
 }
 
 void AudioIdlHdiRenderAttrTest::SetUp(void)
 {
-    int32_t ret;
     ASSERT_NE(nullptr, manager);
-    ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
+    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiRenderAttrTest::TearDown(void)
 {
-    int32_t ret = ReleaseRenderSource(manager, adapter, render, adapterRelease, renderRelease);
+    int32_t ret = ReleaseRenderSource(manager, adapter, render);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -810,7 +791,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderSetSampleAttributesNull_007, Test
     struct IAudioRender *renderNull = nullptr;
     struct AudioSampleAttributes attrs = {};
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_8000);
 
     ret = render->SetSampleAttributes(renderNull, &attrs);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
@@ -829,7 +810,7 @@ HWTEST_F(AudioIdlHdiRenderAttrTest, AudioRenderGetSampleAttributesNull_002, Test
     struct AudioSampleAttributes attrs = {};
     struct AudioSampleAttributes *attrsValue = nullptr;
     ASSERT_NE(nullptr, render);
-    InitAttrsUpdate(attrs, AUDIO_FORMAT_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
+    InitAttrsUpdate(attrs, AUDIO_FORMAT_TYPE_PCM_16_BIT, SINGLE_CHANNEL_COUNT, SAMPLE_RATE_44100);
 
     ret = render->GetSampleAttributes(renderNull, &attrs);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);

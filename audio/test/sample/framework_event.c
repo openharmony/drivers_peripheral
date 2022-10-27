@@ -231,7 +231,6 @@ static int32_t AudioPnpDeviceRemove(enum AudioDeviceType deviceType)
     }
 }
 
-
 static int32_t AudioPnpMsgParse(struct AudioEvent *pnpMsg)
 {
     if (pnpMsg == NULL) {
@@ -288,7 +287,7 @@ static void AudioUsbPnpOnSvcStatusReceived(struct ServiceStatusListener *listene
            "@@@@@ status     : %d\n"
            "@@@@@ info       : %s"
            "\n===============================================================================\n",
-           svcStatus->serviceName, svcStatus->deviceClass, svcStatus->status, svcStatus->info);
+        svcStatus->serviceName, svcStatus->deviceClass, svcStatus->status, svcStatus->info);
 
     (void)AudioGetUsbPnpStatus(svcStatus);
     (void)AudioGetLoadStatus(svcStatus);

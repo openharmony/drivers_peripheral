@@ -54,7 +54,7 @@ typedef struct IdentifyParam {
 
 ResultCode InitUserAuthContextList();
 void DestoryUserAuthContextList(void);
-UserAuthContext *GenerateAuthContext(AuthSolutionHal params);
+ResultCode GenerateAuthContext(AuthSolutionHal params, UserAuthContext **context);
 UserAuthContext *GenerateIdentifyContext(IdentifyParam params);
 
 UserAuthContext *GetContext(uint64_t contextId);

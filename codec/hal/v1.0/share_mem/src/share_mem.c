@@ -20,13 +20,13 @@
 
 #define HDF_LOG_TAG codec_hdi_share_mem
 
-int32_t CreateShareMemory(ShareMemory *shareMemory)
+int32_t CreateFdShareMemory(ShareMemory *shareMemory)
 {
     if (shareMemory == NULL || shareMemory->size <= 0) {
         HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_FAILURE;
     }
-    int32_t fd = AshmemCreateFd(shareMemory->memName, shareMemory->size);
+    int32_t fd = AshmemCreateFd("", shareMemory->size);
     if (fd < 0) {
         HDF_LOGE("%{public}s invalid fd", __func__);
         return HDF_FAILURE;
@@ -36,12 +36,13 @@ int32_t CreateShareMemory(ShareMemory *shareMemory)
     if ((void*)shareMemory->virAddr == MAP_FAILED) {
         HDF_LOGE("%{public}s: Failed to map fd!", __func__);
         shareMemory->virAddr = NULL;
+        return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;
 }
 
-int32_t OpenShareMemory(ShareMemory *shareMemory)
+int32_t OpenFdShareMemory(ShareMemory *shareMemory)
 {
     if (shareMemory == NULL || shareMemory->fd < 0) {
         HDF_LOGE("%{public}s invalid param", __func__);
@@ -51,12 +52,13 @@ int32_t OpenShareMemory(ShareMemory *shareMemory)
     if ((void*)shareMemory->virAddr == MAP_FAILED) {
         HDF_LOGE("%{public}s: Failed to map fd!", __func__);
         shareMemory->virAddr = NULL;
+        return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;
 }
 
-int32_t ReleaseShareMemory(ShareMemory *shareMemory)
+int32_t ReleaseFdShareMemory(ShareMemory *shareMemory)
 {
     if (shareMemory == NULL || shareMemory->virAddr == NULL) {
         HDF_LOGE("%{public}s invalid param", __func__);
@@ -66,3 +68,4 @@ int32_t ReleaseShareMemory(ShareMemory *shareMemory)
     CloseAshmemFd(shareMemory->fd);
     return HDF_SUCCESS;
 }
+

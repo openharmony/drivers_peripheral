@@ -28,7 +28,7 @@ namespace Audio {
         struct HdfSBuf *reply = nullptr;
         struct AudioPcmHwParams hwParams {
             .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .rate = 11025, .periodSize = 8192,
-            .periodCount = 32, .format = AUDIO_FORMAT_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
+            .periodCount = 32, .format = AUDIO_FORMAT_TYPE_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
             .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
         };
 
@@ -47,7 +47,7 @@ namespace Audio {
             HDF_LOGE("%{public}s: Write HwParams to buf failed\n", __func__);
             return false;
         }
-        int32_t cmdId = *(int32_t *)(data);
+        int32_t cmdId = *(reinterpret_cast<int32_t *>(const_cast<uint8_t *>(data)));
         ret = admDisCapFuzzService->dispatcher->Dispatch(&admDisCapFuzzService->object, cmdId, sBuf, reply);
         if (ret == HDF_SUCCESS) {
             HDF_LOGE("%{public}s: Dispatch success\n", __func__);

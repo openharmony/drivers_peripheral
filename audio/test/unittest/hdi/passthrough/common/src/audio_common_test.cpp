@@ -74,7 +74,7 @@ int32_t InitHwCapture(struct AudioHwCapture &hwCapture, const struct AudioDevice
 void InitAttrsCommon(struct AudioSampleAttributes &attrs)
 {
     /* Initialization of audio parameters for playback */
-    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
+    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
     attrs.channelCount = AUDIO_CHANNELCOUNT;
     attrs.sampleRate = AUDIO_SAMPLE_RATE_48K;
     attrs.interleaved = 0;
@@ -127,7 +127,7 @@ int32_t AudioRenderCallbackUtTest(enum AudioCallbackType type, void *reserved, v
     (void)reserved;
     (void)cookie;
     switch (type) {
-        case AUDIO_NONBLOCK_WRITE_COMPELETED:
+        case AUDIO_NONBLOCK_WRITE_COMPLETED:
             return HDF_SUCCESS;
         case AUDIO_RENDER_FULL:
             return HDF_SUCCESS;
@@ -135,7 +135,7 @@ int32_t AudioRenderCallbackUtTest(enum AudioCallbackType type, void *reserved, v
             return HDF_SUCCESS;
         case AUDIO_ERROR_OCCUR:
             return HDF_FAILURE;
-        case AUDIO_DRAIN_COMPELETED:
+        case AUDIO_DRAIN_COMPLETED:
             return HDF_FAILURE;
         default:
             return HDF_FAILURE;

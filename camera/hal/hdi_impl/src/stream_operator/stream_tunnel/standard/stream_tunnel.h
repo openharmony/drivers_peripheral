@@ -35,11 +35,10 @@ struct TunnelConfig {
 class StreamTunnel {
 public:
     virtual RetCode AttachBufferQueue(OHOS::sptr<OHOS::IBufferProducer>& producer);
-    virtual RetCode DetachBufferQueue();
     virtual std::shared_ptr<IBuffer> GetBuffer();
     virtual RetCode PutBuffer(const std::shared_ptr<IBuffer>& buffer);
     virtual RetCode SetBufferCount(const int32_t n);
-    virtual RetCode Config(const TunnelConfig config);
+    virtual RetCode Config(const TunnelConfig& config);
     virtual uint64_t GetFrameCount() const;
     virtual void WaitForAllBufferReturned();
     virtual void NotifyStart();
@@ -47,6 +46,7 @@ public:
     virtual void CleanBuffers();
     void DumpStats(int interval = 0);
     void SetStreamId(int32_t streamId);
+    RetCode DetachBufferQueue();
 
     StreamTunnel() = default;
     virtual ~StreamTunnel();
@@ -74,7 +74,7 @@ protected:
     std::mutex finishLock_ = {};
     std::condition_variable finishCV_ = {};
     StreamStatistics stats_;
-    int32_t streamId_;
+    int32_t streamId_ = 0;
 };
 } // namespace OHOS::Camera
 #endif

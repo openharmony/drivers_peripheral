@@ -32,7 +32,7 @@ bool AudioCaptureframeRequestbytesFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
     uint64_t replyBytes = 0;
-    char *frame = (char *)data;
+    char *frame = reinterpret_cast<char *>(const_cast<uint8_t *>(data));
     ret = reqBytesFuzzCapture->CaptureFrame(reqBytesFuzzCapture, frame, size, &replyBytes);
     if (ret == HDF_SUCCESS) {
         result = true;

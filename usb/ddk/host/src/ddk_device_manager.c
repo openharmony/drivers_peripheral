@@ -232,6 +232,13 @@ int32_t DdkDevMgrForEachDeviceSafe(DdkDevMgrHandleDev handle, void *priv)
     OsalMutexUnlock(&g_ddkDevList.listMutex);
     return HDF_SUCCESS;
 }
+
+int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *priv)
+{
+    (void)handle;
+    (void)priv;
+    return HDF_SUCCESS;
+}
 #else                                                                           // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 struct HdfIoService *g_usbPnpSrv = NULL;
 #define HDF_USB_INFO_MAX_SIZE (127 * sizeof(struct UsbPnpNotifyMatchInfoTable)) // 127  is max deivce num
@@ -277,11 +284,9 @@ int32_t DdkDevMgrForEachDeviceSafe(DdkDevMgrHandleDev handle, void *priv)
     HDF_LOGI("%{public}s: total obj num count:%{public}d ", __func__, count);
     struct UsbPnpNotifyMatchInfoTable *info = NULL;
     uint32_t infoSize = 0;
-    bool flag = false;
     for (int32_t i = 0; i < count; ++i) {
-        flag = HdfSbufReadBuffer(reply, (const void **)(&info), &infoSize);
-        if (!flag || info == NULL) {
-            HDF_LOGE("%{public}s: HdfSbufReadBuffer failed, flag=%{public}d, info=%{public}p", __func__, flag, info);
+        if (!HdfSbufReadBuffer(reply, (const void **)(&info), &infoSize) || info == NULL) {
+            HDF_LOGE("%{public}s: HdfSbufReadBuffer failed", __func__);
             HdfSbufRecycle(reply);
             return HDF_ERR_INVALID_PARAM;
         }
@@ -292,6 +297,58 @@ int32_t DdkDevMgrForEachDeviceSafe(DdkDevMgrHandleDev handle, void *priv)
     }
 
     HdfSbufRecycle(reply);
+    return HDF_SUCCESS;
+}
+
+static int32_t DdkDevMgrGetGadgetStatus(int32_t *gadgetStatus)
+{
+    if (g_usbPnpSrv == NULL) {
+        HDF_LOGE("%{public}s: invalid param.", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+
+    struct HdfSBuf *reply = HdfSbufObtain(HDF_USB_INFO_MAX_SIZE);
+    if (reply == NULL) {
+        HDF_LOGE("%{public}s: HdfSbufObtain reply failed", __func__);
+        return HDF_DEV_ERR_NO_MEMORY;
+    }
+
+    int32_t ret = g_usbPnpSrv->dispatcher->Dispatch(&g_usbPnpSrv->object,
+        USB_PNP_DRIVER_GET_GADGET_LINK_STATUS, NULL, reply);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s:failed to send service call, ret:%{public}d", __func__, ret);
+        HdfSbufRecycle(reply);
+        return ret;
+    }
+
+    if (!HdfSbufReadInt32(reply, gadgetStatus)) {
+        HDF_LOGE("%{public}s: failed to read count from reply", __func__);
+        HdfSbufRecycle(reply);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    HdfSbufRecycle(reply);
+    return HDF_SUCCESS;
+}
+
+int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *priv)
+{
+    if (priv == NULL || handle == NULL) {
+        HDF_LOGE("%{public}s: invalid param.", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    int32_t gadgetStatus = 0;
+    if (DdkDevMgrGetGadgetStatus(&gadgetStatus) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: DdkDevMgrGetGadgetStatus failed", __func__);
+        return HDF_FAILURE;
+    }
+    // gadget add
+    if (gadgetStatus != 0) {
+        // call back
+        if (handle(priv) != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s: handle failed", __func__);
+        }
+    }
     return HDF_SUCCESS;
 }
 #endif                                                                          // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE

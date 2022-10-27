@@ -31,7 +31,7 @@ bool AudioStopCaptureFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
+    struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(const_cast<uint8_t *>(data));
     ret = stopFuzzCapture->control.Stop((AudioHandle)captureFuzz);
     if (ret == HDF_SUCCESS) {
         result = true;

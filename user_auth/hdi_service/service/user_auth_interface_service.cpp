@@ -119,9 +119,13 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
     std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *schedulesGet = nullptr;
     int32_t ret = GenerateSolutionFunc(solutionIn, &schedulesGet);
-    if (ret != RESULT_SUCCESS || schedulesGet == nullptr) {
-        IAM_LOGE("generate solution failed");
+    if (ret != RESULT_SUCCESS) {
+        IAM_LOGE("generate solution failed %{public}d", ret);
         return ret;
+    }
+    if (schedulesGet == nullptr) {
+        IAM_LOGE("get null schedule");
+        return RESULT_GENERAL_ERROR;
     }
     LinkedListNode *tempNode = schedulesGet->head;
     while (tempNode != nullptr) {
@@ -131,7 +135,8 @@ int32_t UserAuthInterfaceService::BeginAuthentication(uint64_t contextId, const 
             return RESULT_UNKNOWN;
         }
         ScheduleInfo temp = {};
-        if (!CopyScheduleInfo((CoAuthSchedule *)tempNode->data, &temp)) {
+        auto coAuthSchedule = static_cast<CoAuthSchedule *>(tempNode->data);
+        if (!CopyScheduleInfo(coAuthSchedule, &temp)) {
             infos.clear();
             ret = RESULT_GENERAL_ERROR;
             break;
@@ -153,7 +158,7 @@ static int32_t CreateExecutorCommand(AuthResultInfo &info)
             IAM_LOGE("get unlock msg failed");
             return ret;
         }
-    } else if (info.remainTimes == 0) {
+    } else if (info.remainAttempts == 0) {
         ret = GetExecutorMsgList(PROPERMODE_LOCK, &executorSendMsg);
         if (ret != RESULT_SUCCESS) {
             IAM_LOGE("get lock msg failed");
@@ -169,7 +174,7 @@ static int32_t CreateExecutorCommand(AuthResultInfo &info)
             DestroyLinkedList(executorSendMsg);
             return RESULT_UNKNOWN;
         }
-        ExecutorMsg *nodeData = (ExecutorMsg *)temp->data;
+        auto nodeData = static_cast<ExecutorMsg *>(temp->data);
         Buffer *nodeMsgBuffer = nodeData->msg;
         if (!IsBufferValid(nodeMsgBuffer)) {
             IAM_LOGE("node's buffer invalid");
@@ -217,8 +222,8 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
         return ret;
     }
     info.result = authResult.result;
-    info.remainTimes = authResult.remainTimes;
-    info.freezingTime = authResult.freezingTime;
+    info.remainAttempts = authResult.remainTimes;
+    info.lockoutDuration = authResult.freezingTime;
     if (info.result == RESULT_SUCCESS) {
         info.token.resize(sizeof(UserAuthTokenHal));
         if (memcpy_s(info.token.data(), info.token.size(), &authTokenHal, sizeof(authTokenHal)) != EOK) {
@@ -267,16 +272,20 @@ int32_t UserAuthInterfaceService::BeginIdentification(uint64_t contextId, AuthTy
     std::lock_guard<std::mutex> lock(g_mutex);
     LinkedList *scheduleGet = nullptr;
     int32_t ret = DoIdentify(param, &scheduleGet);
-    if (ret != RESULT_SUCCESS || scheduleGet == nullptr) {
+    if (ret != RESULT_SUCCESS) {
         IAM_LOGE("generate solution failed");
         return ret;
+    }
+    if (scheduleGet == nullptr) {
+        IAM_LOGE("get null schedule");
+        return RESULT_GENERAL_ERROR;
     }
     if (scheduleGet->head == nullptr || scheduleGet->head->data == nullptr) {
         IAM_LOGE("scheduleGet is invalid");
         DestroyLinkedList(scheduleGet);
         return RESULT_UNKNOWN;
     }
-    CoAuthSchedule *data = (CoAuthSchedule *)scheduleGet->head->data;
+    auto data = static_cast<CoAuthSchedule *>(scheduleGet->head->data);
     if (!CopyScheduleInfo(data, &scheduleInfo)) {
         IAM_LOGE("copy schedule failed");
         ret = RESULT_BAD_COPY;
@@ -507,7 +516,7 @@ int32_t UserAuthInterfaceService::GetCredential(int32_t userId, AuthType authTyp
             DestroyLinkedList(credList);
             return RESULT_UNKNOWN;
         }
-        CredentialInfoHal *credentialHal = (CredentialInfoHal *)temp->data;
+        auto credentialHal = static_cast<CredentialInfoHal *>(temp->data);
         CredentialInfo credentialInfo = {};
         CopyCredentialInfo(*credentialHal, credentialInfo);
         infos.push_back(credentialInfo);
@@ -580,7 +589,7 @@ int32_t UserAuthInterfaceService::EnforceDeleteUser(int32_t userId, std::vector<
             DestroyLinkedList(credList);
             return RESULT_UNKNOWN;
         }
-        CredentialInfoHal *credentialHal = (CredentialInfoHal *)temp->data;
+        auto credentialHal = static_cast<CredentialInfoHal *>(temp->data);
         CredentialInfo credentialInfo = {};
         CopyCredentialInfo(*credentialHal, credentialInfo);
         deletedInfos.push_back(credentialInfo);
@@ -621,7 +630,7 @@ static int32_t ObtainReconciliationData(uint32_t authType, uint32_t sensorHint, 
             DestroyLinkedList(credList);
             return RESULT_UNKNOWN;
         }
-        CredentialInfoHal *credentialInfo = (CredentialInfoHal *)temp->data;
+        auto credentialInfo = static_cast<CredentialInfoHal *>(temp->data);
         templateIds.push_back(credentialInfo->templateId);
         temp = temp->next;
     }

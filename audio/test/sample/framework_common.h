@@ -20,14 +20,17 @@
 #include <stdlib.h>
 
 #ifdef IDL_SAMPLE
-#include "v1_0/audio_types.h"
+#include "v1_0/iaudio_manager.h"
 #else
-#include "audio_types.h"
+#include "audio_manager.h"
 #endif
 
-#define AUDIO_FUNC_LOGE(fmt, arg...) do { \
-        printf("%s: [%s]: [%d]:[ERROR]:" fmt"\n", __FILE__, __func__, __LINE__, ##arg); \
+#define AUDIO_FUNC_LOGE(fmt, arg...)                                                     \
+    do {                                                                                 \
+        printf("%s: [%s]: [%d]:[ERROR]:" fmt "\n", __FILE__, __func__, __LINE__, ##arg); \
     } while (0)
+
+#define WAV_HEAD_OFFSET 44
 
 struct AudioHeadInfo {
     uint32_t riffId;
@@ -46,15 +49,23 @@ struct AudioHeadInfo {
 };
 
 enum AudioPcmBit {
-    PCM_8_BIT  = 8,        /* 8-bit PCM */
-    PCM_16_BIT = 16,       /* 16-bit PCM */
-    PCM_24_BIT = 24,       /* 24-bit PCM */
-    PCM_32_BIT = 32,       /* 32-bit PCM */
+    PCM_8_BIT = 8,   /* 8-bit PCM */
+    PCM_16_BIT = 16, /* 16-bit PCM */
+    PCM_24_BIT = 24, /* 24-bit PCM */
+    PCM_32_BIT = 32, /* 32-bit PCM */
 };
 
-enum LoadingMode {
-    DIRECT = 1,
-    SERVICE = 2,
+struct StrParaCapture {
+#ifdef IDL_SAMPLE
+    struct IAudioCapture *capture;
+#else
+    struct AudioCapture *capture;
+#endif
+    FILE *file;
+    struct AudioSampleAttributes attrs;
+    uint64_t *replyBytes;
+    char *frame;
+    int32_t bufferSize;
 };
 
 void SystemInputFail(void);
@@ -64,4 +75,10 @@ uint32_t PcmFormatToBits(enum AudioFormat formatBit);
 void CleanStdin(void);
 void FileClose(FILE **file);
 int32_t FormatLoadLibPath(char *resolvedPath, int32_t pathLen, int choice);
+int32_t SelectAudioCard(struct AudioAdapterDescriptor *descs, int32_t size, int32_t *adapterIndex);
+int32_t SwitchAudioPort(
+    struct AudioAdapterDescriptor *descs, enum AudioPortDirection portFlag, struct AudioPort *renderPort);
+void PrintLoadModeMenu(void);
+int32_t CheckWavFileHeader(FILE *file, struct AudioHeadInfo *wavHeadInfo, struct AudioSampleAttributes *attrs);
+int32_t AddWavFileHeader(FILE *file, const struct StrParaCapture *strParam);
 #endif

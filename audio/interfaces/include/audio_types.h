@@ -134,19 +134,19 @@ struct AudioSceneDescriptor {
  * @brief Enumerates the audio format.
  */
 enum AudioFormat {
-    AUDIO_FORMAT_PCM_8_BIT  = 0x1u,       /**< 8-bit PCM */
-    AUDIO_FORMAT_PCM_16_BIT = 0x2u,       /**< 16-bit PCM */
-    AUDIO_FORMAT_PCM_24_BIT = 0x3u,       /**< 24-bit PCM */
-    AUDIO_FORMAT_PCM_32_BIT = 0x4u,       /**< 32-bit PCM */
-    AUDIO_FORMAT_AAC_MAIN   = 0x1000001u, /**< AAC main */
-    AUDIO_FORMAT_AAC_LC     = 0x1000002u, /**< AAC LC */
-    AUDIO_FORMAT_AAC_LD     = 0x1000003u, /**< AAC LD */
-    AUDIO_FORMAT_AAC_ELD    = 0x1000004u, /**< AAC ELD */
-    AUDIO_FORMAT_AAC_HE_V1  = 0x1000005u, /**< AAC HE_V1 */
-    AUDIO_FORMAT_AAC_HE_V2  = 0x1000006u, /**< AAC HE_V2 */
-    AUDIO_FORMAT_G711A      = 0x2000001u, /**< G711A */
-    AUDIO_FORMAT_G711U      = 0x2000002u, /**< G711u */
-    AUDIO_FORMAT_G726       = 0x2000003u, /**< G726 */
+    AUDIO_FORMAT_TYPE_PCM_8_BIT  = 0x1u,       /**< 8-bit PCM */
+    AUDIO_FORMAT_TYPE_PCM_16_BIT = 0x2u,       /**< 16-bit PCM */
+    AUDIO_FORMAT_TYPE_PCM_24_BIT = 0x3u,       /**< 24-bit PCM */
+    AUDIO_FORMAT_TYPE_PCM_32_BIT = 0x4u,       /**< 32-bit PCM */
+    AUDIO_FORMAT_TYPE_AAC_MAIN   = 0x1000001u, /**< AAC main */
+    AUDIO_FORMAT_TYPE_AAC_LC     = 0x1000002u, /**< AAC LC */
+    AUDIO_FORMAT_TYPE_AAC_LD     = 0x1000003u, /**< AAC LD */
+    AUDIO_FORMAT_TYPE_AAC_ELD    = 0x1000004u, /**< AAC ELD */
+    AUDIO_FORMAT_TYPE_AAC_HE_V1  = 0x1000005u, /**< AAC HE_V1 */
+    AUDIO_FORMAT_TYPE_AAC_HE_V2  = 0x1000006u, /**< AAC HE_V2 */
+    AUDIO_FORMAT_TYPE_G711A      = 0x2000001u, /**< G711A */
+    AUDIO_FORMAT_TYPE_G711U      = 0x2000002u, /**< G711u */
+    AUDIO_FORMAT_TYPE_G726       = 0x2000003u, /**< G726 */
 };
 
 /**
@@ -334,8 +334,8 @@ enum AudioDrainNotifyType {
  * @brief Enumerates callback notification events.
  */
 enum AudioCallbackType {
-    AUDIO_NONBLOCK_WRITE_COMPELETED, /**< The non-block write is complete. */
-    AUDIO_DRAIN_COMPELETED,          /**< The draining is complete. */
+    AUDIO_NONBLOCK_WRITE_COMPLETED, /**< The non-block write is complete. */
+    AUDIO_DRAIN_COMPLETED,          /**< The draining is complete. */
     AUDIO_FLUSH_COMPLETED,           /**< The flush is complete. */
     AUDIO_RENDER_FULL,               /**< The render buffer is full.*/
     AUDIO_ERROR_OCCUR,               /**< An error occurs.*/

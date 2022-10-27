@@ -85,8 +85,8 @@ static void SvStatusCallback(GnssSatelliteStatus *svInfo)
         HDF_LOGE("%{public}s:sv_info is null.", __func__);
         return;
     }
-    if (svInfo->satellitesNum <= 0) {
-        HDF_LOGE("%{public}s:satellites_num <= 0.", __func__);
+    if (svInfo->satellitesNum == 0) {
+        HDF_LOGE("%{public}s:satellites_num == 0.", __func__);
         return;
     }
     SatelliteStatusInfo svStatus;

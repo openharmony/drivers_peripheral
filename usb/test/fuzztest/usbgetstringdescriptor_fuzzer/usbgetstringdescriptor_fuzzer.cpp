@@ -34,8 +34,7 @@ bool UsbGetStringDescriptorFuzzTest(const uint8_t *data, size_t size)
         return false;
     }
 
-    uint8_t descId = *(uint8_t *)data;
-    ret = usbInterface->GetStringDescriptor(dev, descId, reinterpret_cast<std::vector<uint8_t> &>(data));
+    ret = usbInterface->GetStringDescriptor(dev, *data, reinterpret_cast<std::vector<uint8_t> &>(data));
     if (ret == HDF_SUCCESS) {
         HDF_LOGI("%{public}s: get string descriptor succeed", __func__);
     }
