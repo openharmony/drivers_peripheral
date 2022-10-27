@@ -44,7 +44,7 @@ uint8_t *GetMetadataData(const common_metadata_header_t *metadataHeader)
 camera_metadata_item_entry_t *GetMetadataItems(const common_metadata_header_t *metadataHeader)
 {
     return reinterpret_cast<camera_metadata_item_entry_t *>(
-        (reinterpret_cast<uint8_t *>(const_cast<common_metadata_header_t *>(metadataHeader)) + 
+        (reinterpret_cast<uint8_t *>(const_cast<common_metadata_header_t *>(metadataHeader)) +
         metadataHeader->items_start));
 }
 
