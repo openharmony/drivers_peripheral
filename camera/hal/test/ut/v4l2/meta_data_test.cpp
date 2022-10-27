@@ -24,7 +24,7 @@ constexpr uint32_t DATA_CAPACITY = 2000;
 constexpr int32_t FPS_RANGE = 20;
 constexpr int32_t FPS_RANGE_CHANGE = 30;
 
-const std::vector<int32_t> DATA_BASE = {
+static const std::vector<int32_t> DATA_BASE = {
     OHOS_CAMERA_STREAM_ID,
     OHOS_SENSOR_COLOR_CORRECTION_GAINS,
     OHOS_SENSOR_EXPOSURE_TIME,
