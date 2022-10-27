@@ -1,4 +1,4 @@
-/*
+=/*
  * Copyright (c) 2021 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -308,7 +308,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0070, TestSize.Level0)
     std::vector<Camera::MetaType> enableTypes;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(enableTypes);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    for (auto &type : enableTypes) {
+    for (const auto &type : enableTypes) {
         std::cout << "==========[test log]Check hdi_device: type = " << type << std::endl;
     }
     Test_->rc = Test_->cameraDevice->SetResultMode(Camera::PER_FRAME);
@@ -329,7 +329,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0071, TestSize.Level2)
     std::vector<Camera::MetaType> enableTypes;
     Test_->rc = Test_->cameraDevice->GetEnabledResults(enableTypes);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    for (auto &type : enableTypes) {
+    for (const auto &type : enableTypes) {
         std::cout << "==========[test log] hdi_device: type = " << type << std::endl;
     }
     Test_->rc = Test_->cameraDevice->SetResultMode(Camera::ON_CHANGED);

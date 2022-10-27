@@ -153,7 +153,7 @@ public:
         Pipeline() = default;
         ~Pipeline() = default;
 
-        bool AddStream(std::shared_ptr<Stream>& stream);
+        bool AddStream(const std::shared_ptr<Stream>& stream);
         void StartStream();
         void StopStream();
 

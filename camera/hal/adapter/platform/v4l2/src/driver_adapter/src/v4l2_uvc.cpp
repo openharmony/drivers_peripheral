@@ -162,10 +162,10 @@ RetCode HosV4L2UVC::V4L2UVCGetCapability(int fd, const std::string devName, std:
         return RC_ERROR;
     }
 
-    if (cameraId != std::string((char*)capability.driver)) {
+    if (cameraId != std::string(reinterpret_cast<char*>(capability.driver))) {
         return RC_ERROR;
     }
-    V4L2UvcMatchDev(std::string((char*)capability.driver), devName, true);
+    V4L2UvcMatchDev(std::string(reinterpret_cast<char*>(capability.driver)), devName, true);
 
     CAMERA_LOGD("UVC:v4l2 driver name = %{public}s\n", capability.driver);
     CAMERA_LOGD("UVC:v4l2 capabilities = 0x{public}%x\n", capability.capabilities);
@@ -292,8 +292,7 @@ void HosV4L2UVC::loopUvcDevice()
     FD_SET(uDevFd, &fds);
     FD_SET(eventFd, &fds);
     while (g_uvcDetectEnable) {
-        int rc;
-        rc = select(((uDevFd > eventFd) ? uDevFd : eventFd) + 1, &fds, &fds, NULL, NULL);
+        int rc = select(((uDevFd > eventFd) ? uDevFd : eventFd) + 1, &fds, &fds, NULL, NULL);
         if (rc > 0 && FD_ISSET(uDevFd, &fds)) {
             usleep(delayTime);
             constexpr uint32_t buffSize = 4096;

@@ -262,7 +262,7 @@ RetCode ViController::GetColorCorrectionGains(std::shared_ptr<CameraMetadata> me
     float colorGains[DATA_COUNT] = {0};
     RetCode rc = RC_ERROR;
 
-    rc = viObject_->QuerySetting(OHOS_SENSOR_COLOR_CORRECTION_GAINS, (char*)colorGains);
+    rc = viObject_->QuerySetting(OHOS_SENSOR_COLOR_CORRECTION_GAINS, reinterpret_cast<char*>(colorGains));
     if (rc != RC_OK) {
         CAMERA_LOGE("%{public}s CMD_AWB_COLORGAINS QuerySetting fail", __FUNCTION__);
         return rc;
