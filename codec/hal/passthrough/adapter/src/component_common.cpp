@@ -1016,8 +1016,8 @@ static int32_t ParseParamVideoAvc(Param *paramIn, int8_t *paramOut, int32_t para
         validCount++;
         switch (paramIn[i].key) {
             case KEY_VIDEO_PROFILE:
-                param->eProfile =
-                    static_cast<OMX_VIDEO_AVCPROFILETYPE>(ConvertProfileToOmxProfile(*((Profile *)paramIn[i].val)));
+                param->eProfile = static_cast<OMX_VIDEO_AVCPROFILETYPE>
+                    (ConvertProfileToOmxProfile(*(reinterpret_cast<Profile *>(paramIn[i].val))));
                 break;
 
             default: {
