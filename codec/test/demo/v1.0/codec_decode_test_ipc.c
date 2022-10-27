@@ -412,7 +412,7 @@ static void DecodeLoopHandleInput(const MpiDecLoopData *decData)
         } else {
             readSize = ReadOneFrameFromFile(decData->fpInput, g_readFileBuf);
             g_totalSrcSize += readSize;
-            g_pktEos = ((g_totalSrcSize >= g_srcFileSize) | (readSize <= 0));
+            g_pktEos = ((g_totalSrcSize >= g_srcFileSize) || (readSize <= 0));
         }
         if (g_pktEos) {
             HDF_LOGI("%{public}s: client inputData reach STREAM_FLAG_EOS", __func__);
