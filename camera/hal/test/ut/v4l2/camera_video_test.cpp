@@ -143,9 +143,9 @@ void CameraVideoTest::StartCapture(
 
 void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds)
 {
-    constexpr uint32_t SLEEP_SECOND_ONE = 1;
-    constexpr uint32_t SLEEP_SECOND_TWO = 2;
-    sleep(SLEEP_SECOND_TWO);
+    constexpr uint32_t TIME_FOR_RECEIVE_FRAME_OFF = 1;
+    constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 2;
+    sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
     if (sizeof(captureIds) > 0) {
         for (const auto &captureId : captureIds) {
             if (captureId == display_->CAPTURE_ID_PREVIEW) {
@@ -154,7 +154,7 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
                 streamCustomerSnapshot_->ReceiveFrameOff();
             } else if (captureId == display_->CAPTURE_ID_VIDEO) {
                 streamCustomerVideo_->ReceiveFrameOff();
-                sleep(SLEEP_SECOND_ONE);
+                sleep(TIME_FOR_RECEIVE_FRAME_OFF);
             } else {
                 std::cout << "==========[test log]StopStream ignore command. " << std::endl;
             }
@@ -162,7 +162,7 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
 
         for (auto &captureId : captureIds) {
             CamRetCode result = (CamRetCode)display_->streamOperator->CancelCapture(captureId);
-            sleep(SLEEP_SECOND_TWO);
+            sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
             EXPECT_EQ(true, result == HDI::Camera::V1_0::NO_ERROR);
             if (result == HDI::Camera::V1_0::NO_ERROR) {
                 std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
@@ -172,7 +172,7 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
             }
         }
     }
-    sleep(SLEEP_SECOND_ONE);
+    sleep(TIME_FOR_RECEIVE_FRAME_OFF);
 }
 /**
   * @tc.name: Video
@@ -596,9 +596,10 @@ HWTEST_F(CameraVideoTest, camera_video_031, TestSize.Level1)
     captureInfo.enableShutterCallback_ = false;
     StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true, captureInfo);
 
-    constexpr uint32_t SLEEP_SECOND_FIVE = 5;
-    sleep(SLEEP_SECOND_FIVE);
-    std::vector<int> captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO, display_->CAPTURE_ID_CAPTURE};
+    constexpr uint32_t TIME_FOR_WAIT_INIT_CAPTUREIDS = 5;
+    sleep(TIME_FOR_WAIT_INIT_CAPTUREIDS);
+    std::vector<int> captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO,
+        display_->CAPTURE_ID_CAPTURE};
     std::vector<int> streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO, display_->STREAM_ID_CAPTURE};
     StopStream(captureIds, streamIds);
 }

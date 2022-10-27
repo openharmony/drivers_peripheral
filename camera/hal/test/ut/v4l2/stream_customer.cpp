@@ -62,7 +62,8 @@ OHOS::sptr<OHOS::IBufferProducer> StreamCustomer::CreateProducer()
     return producer;
 }
 
-OHOS::Camera::RetCode StreamCustomer::ReceiveFrameOn(const std::function<void(const unsigned char *, uint32_t)> callback)
+OHOS::Camera::RetCode StreamCustomer::ReceiveFrameOn(
+    const std::function<void(const unsigned char *, uint32_t)> callback)
 {
     CAMERA_LOGD("test:ReceiveFrameOn enter");
 
