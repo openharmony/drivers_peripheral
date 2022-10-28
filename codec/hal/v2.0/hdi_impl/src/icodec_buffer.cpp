@@ -117,6 +117,7 @@ int32_t ICodecBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFF
 {
     omxBuffer.nOffset = codecBuffer.offset;
     omxBuffer.nFilledLen = codecBuffer.filledLen;
+    omxBuffer.nFlags = codecBuffer.flag;
     return HDF_SUCCESS;
 }
 
