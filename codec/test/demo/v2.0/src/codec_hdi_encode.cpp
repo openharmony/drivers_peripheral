@@ -184,7 +184,7 @@ int32_t CodecHdiEncode::CheckAndUseBufferHandle()
     usage.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
     err = client_->GetParameter(client_, OMX_IndexParamGetBufferHandleUsage, (int8_t *)&usage, sizeof(usage));
     HDF_LOGI(
-        "OMX_GetParameter:OMX_IndexParamGetBufferHandleUsage:PORT_INDEX_INPUT, err [%{public}x], usage[%{public}d]",
+        "OMX_GetParameter:GetBufferHandleUsage:PORT_INDEX_INPUT, err [%{public}x], usage[%{public}" PRIu64 "]",
         err, usage.usage);
     if (err != HDF_SUCCESS) {
         return err;
