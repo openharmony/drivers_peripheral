@@ -456,6 +456,6 @@ HWTEST_F(AudioProxyAdapterTest, AdapterSetVoiceVolume_001, TestSize.Level1)
 {
     ASSERT_NE(adapter, nullptr);
     float volume = 0;
-    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, AudioProxyAdapterSetVoiceVolume(adapter, volume));
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioProxyAdapterSetVoiceVolume(adapter, volume));
 }
 }
