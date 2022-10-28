@@ -65,10 +65,10 @@ namespace Audio {
     const std::string AUDIO_CAPTURE_FILE = "/userdata/audiocapture.wav";
     const std::string AUDIO_LOW_LATENCY_CAPTURE_FILE = "/userdata/lowlatencycapturetest.wav";
 #else
-    const std::string AUDIO_FILE = "/data/audiorendertest.wav";
-    const std::string LOW_LATENCY_AUDIO_FILE = "/data/lowlatencyrendertest.wav";
-    const std::string AUDIO_CAPTURE_FILE = "/data/audiocapture.wav";
-    const std::string AUDIO_LOW_LATENCY_CAPTURE_FILE = "/data/lowlatencycapturetest.wav";
+    const std::string AUDIO_FILE = "/data/test/audiorendertest.wav";
+    const std::string LOW_LATENCY_AUDIO_FILE = "/data/test/lowlatencyrendertest.wav";
+    const std::string AUDIO_CAPTURE_FILE = "/data/test/audiocapture.wav";
+    const std::string AUDIO_LOW_LATENCY_CAPTURE_FILE = "/data/test/lowlatencycapturetest.wav";
 #endif
 const std::string ADAPTER_NAME = "primary";
 const std::string ADAPTER_NAME_OUT = "primary_ext";
