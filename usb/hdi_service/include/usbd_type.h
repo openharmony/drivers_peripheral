@@ -205,7 +205,6 @@ enum PortPowerRole { SOURCE, SINK };
 
 enum PortMode { HOST, DEVICE, OTG };
 
-// Keep it same as the inner kit usb_info.h
 struct UsbdInfo {
     int32_t capacity;
     int32_t voltage;
