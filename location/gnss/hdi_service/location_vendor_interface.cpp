@@ -90,7 +90,7 @@ const GnssVendorInterface *LocationVendorInterface::GetGnssVendorInterface() con
     return vendorInterface_;
 }
 
-const void *LocationVendorInterface::GetModuleInterface(int moduleId)
+const void *LocationVendorInterface::GetModuleInterface(int moduleId) const
 {
     auto vendorInterface = GetGnssVendorInterface();
     if (vendorInterface == nullptr) {
