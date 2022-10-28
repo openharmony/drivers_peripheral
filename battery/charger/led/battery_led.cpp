@@ -41,13 +41,10 @@ void BatteryLed::InitLight()
         return;
     }
 
-    for (const auto& item : lightInfo) {
-        if (item.lightId == HdfLightId::HDF_LIGHT_ID_BATTERY) {
-            available_ = true;
-            BATTERY_HILOGI(COMP_HDI, "Battery light is available");
-            break;
-        }
-    }
+    available_ = std::any_of(lightInfo.begin(), lightInfo.end(), [](const auto &item) {
+        return item.lightId == HdfLightId::HDF_LIGHT_ID_BATTERY;
+    });
+    BATTERY_HILOGI(COMP_HDI, "Battery light is available: %{public}d", available_);
 }
 
 void BatteryLed::TurnOff()
@@ -90,8 +87,8 @@ bool BatteryLed::UpdateColor(int32_t chargeState, int32_t capacity)
         return false;
     }
 
-    const auto& lightConf = BatteryConfig::GetInstance().GetLightConf();
-    for (const auto& it : lightConf) {
+    const auto &lightConf = BatteryConfig::GetInstance().GetLightConf();
+    for (const auto &it : lightConf) {
         if ((capacity >= it.beginSoc) && (capacity <= it.endSoc)) {
             if (lightColor_ == it.rgb) {
                 return true;
@@ -104,7 +101,7 @@ bool BatteryLed::UpdateColor(int32_t chargeState, int32_t capacity)
     return false;
 }
 
-bool BatteryLed::isAvailable() const
+bool BatteryLed::IsAvailable() const
 {
     return available_;
 }
@@ -113,7 +110,7 @@ uint32_t BatteryLed::GetLightColor() const
 {
     return lightColor_;
 }
-}  // namespace V1_1
-}  // namespace Battery
-}  // namespace HDI
-}  // namespace OHOS
+} // namespace V1_1
+} // namespace Battery
+} // namespace HDI
+} // namespace OHOS

@@ -347,7 +347,6 @@ void ChargerThread::HandlePowerKey(int32_t keycode, int64_t now)
             }
         }
     }
-    key.up = false;
 }
 
 void ChargerThread::HandleInputEvent(const struct input_event* iev)
