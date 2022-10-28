@@ -70,7 +70,7 @@ struct GetBufferHandleUsageParams {
     uint32_t size;                 /** Size of the structure */
     union OMX_VERSIONTYPE version; /** Component version */
     uint32_t portIndex;            /** Port index */
-    uint32_t usage;                /** Usage */
+    uint64_t usage;                /** Usage */
 };
 
 /**
