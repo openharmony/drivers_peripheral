@@ -248,20 +248,13 @@ void PowerSupplyProvider::FormatSysfsPaths(struct PowerSupplySysfsInfo *info)
 
 int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t size) const
 {
-    size_t readSize;
     int32_t fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to open %{private}s", path);
         return HDF_ERR_IO;
     }
 
-    readSize = read(fd, buf, size - 1);
-    if (readSize < NUM_ZERO) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to read %{private}s", path);
-        close(fd);
-        return HDF_ERR_IO;
-    }
-
+    size_t readSize = read(fd, buf, size - 1);
     buf[readSize] = '\0';
     Trim(buf);
     close(fd);
@@ -357,12 +350,12 @@ int32_t PowerSupplyProvider::ParsePluggedMaxCurrent(int32_t* maxCurrent) const
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
     std::string currentMaxNode = POWER_SUPPLY_BATTERY;
-    for (const auto& iter : nodeNamePathMap_) {
-        if (iter.first == "current_max") {
-            currentMaxNode = iter.second;
-            break;
-        }
+
+    const auto& item = nodeNamePathMap_.find("current_max");
+    if (item != nodeNamePathMap_.end()) {
+        currentMaxNode = item->second;
     }
+
     std::string currentMaxPath = POWER_SUPPLY_BASE_PATH + "/" + currentMaxNode + "/" + "current_max";
     int32_t ret = ReadBatterySysfsToBuff(currentMaxPath.c_str(), buf, sizeof(buf));
     if (ret != HDF_SUCCESS) {
@@ -379,12 +372,12 @@ int32_t PowerSupplyProvider::ParsePluggedMaxVoltage(int32_t* maxVoltage) const
     char buf[MAX_BUFF_SIZE] = {0};
     GetPluggedTypeName(buf, sizeof(buf));
     std::string voltageMaxNode = POWER_SUPPLY_BATTERY;
-    for (const auto& iter : nodeNamePathMap_) {
-        if (iter.first == "voltage_max") {
-            voltageMaxNode = iter.second;
-            break;
-        }
+
+    const auto& item = nodeNamePathMap_.find("voltage_max");
+    if (item != nodeNamePathMap_.end()) {
+        voltageMaxNode = item->second;
     }
+
     std::string voltageMaxPath = POWER_SUPPLY_BASE_PATH + "/" + voltageMaxNode + "/" + "voltage_max";
     int32_t ret = ReadBatterySysfsToBuff(voltageMaxPath.c_str(), buf, sizeof(buf));
     if (ret != HDF_SUCCESS) {
@@ -518,12 +511,12 @@ void PowerSupplyProvider::CreateFile(const std::string& path, const std::string&
 void PowerSupplyProvider::InitBatteryPath()
 {
     std::string sysLowercaseBatteryPath = "/sys/class/power_supply/battery";
-    std::string sysCapitalBatteryPath = "/sys/class/power_supply/Battery";
 
     if (access(sysLowercaseBatteryPath.c_str(), F_OK) == 0) {
         BATTERY_HILOGI(FEATURE_BATT_INFO, "system battery path is exist");
         return;
     } else {
+        std::string sysCapitalBatteryPath = "/sys/class/power_supply/Battery";
         if (access(sysCapitalBatteryPath.c_str(), F_OK) == 0) {
             BATTERY_HILOGI(FEATURE_BATT_INFO, "system Battery path is exist");
             return;
@@ -932,7 +925,7 @@ int32_t PowerSupplyProvider::SetChargingLimit(const std::vector<ChargingLimit>& 
 
     std::string limitPath;
     std::string chargeLimitStr;
-    for (auto& iter : chargerLimitList) {
+    for (const auto& iter : chargerLimitList) {
         if (iter.type == ChargingLimitType::TYPE_CURRENT) {
             limitPath = currentPath;
         } else if (iter.type == ChargingLimitType::TYPE_VOLTAGE) {

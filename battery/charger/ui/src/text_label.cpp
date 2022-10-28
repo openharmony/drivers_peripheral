@@ -117,9 +117,8 @@ void TextLabel::InitFont()
     int32_t fontColorType = 0;
 
     char resPath[MAX_TEXT_SIZE + 1];
-    uint32_t offset = 2;
 
-    if (memset_s(resPath, MAX_TEXT_SIZE + offset, 0, MAX_TEXT_SIZE + 1) != EOK) {
+    if (memset_s(resPath, MAX_TEXT_SIZE + 1, 0, MAX_TEXT_SIZE + 1) != EOK) {
         BATTERY_HILOGW(FEATURE_CHARGING, "memset_s failed");
         return;
     }
@@ -188,9 +187,8 @@ void TextLabel::InitFont()
 FILE* TextLabel::InitFontType()
 {
     char resPath[MAX_TEXT_SIZE + 1];
-    uint32_t offset = 2;
 
-    if (memset_s(resPath, MAX_TEXT_SIZE + offset, 0, MAX_TEXT_SIZE + 1) != EOK) {
+    if (memset_s(resPath, MAX_TEXT_SIZE + 1, 0, MAX_TEXT_SIZE + 1) != EOK) {
         return nullptr;
     }
     switch (fontType_) {
