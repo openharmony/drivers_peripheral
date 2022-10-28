@@ -103,16 +103,14 @@ int32_t ParseArguments(CodecCmd* cmd, int argc, char **argv)
         const char *next = (const char*)argv[optindex];
         int32_t optMark = CMD_OPTION_MARK_OFFSET;
         int32_t optName = CMD_OPTION_NAME_OFFSET;
-        int32_t handleoptions = 1;
 
-        if (handleoptions && opt[optMark] == '-' && opt[optName] != '\0') {
+        if ((opt[optMark] == '-') && (opt[optName] != '\0')) {
             optMark++;
             optName++;
-            if (opt[optMark] == '-' && opt[optName] != '\0') {
+            if ((opt[optMark] == '-') && (opt[optName] != '\0')) {
                 opt++;
             }
-            if (opt[optMark] == '-' && opt[optName] == '\0') {
-                handleoptions = 0;
+            if ((opt[optMark] == '-') && (opt[optName] == '\0')) {
                 ret = HDF_FAILURE;
                 break;
             }
