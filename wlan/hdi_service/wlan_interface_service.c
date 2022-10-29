@@ -41,7 +41,7 @@ struct IWlanInterface *WlanInterfaceImplGetInstance(void)
     service->interface.Stop = WlanInterfaceStop;
     service->interface.CreateFeature = WlanInterfaceCreateFeature;
     service->interface.DestroyFeature = WlanInterfaceDestroyFeature;
-    service->interface.GetAsscociatedStas = WlanInterfaceGetAsscociatedStas;
+    service->interface.GetAssociatedStas = WlanInterfaceGetAssociatedStas;
     service->interface.GetChipId = WlanInterfaceGetChipId;
     service->interface.GetDeviceMacAddress = WlanInterfaceGetDeviceMacAddress;
     service->interface.GetFeatureByIfName = WlanInterfaceGetFeatureByIfName;
