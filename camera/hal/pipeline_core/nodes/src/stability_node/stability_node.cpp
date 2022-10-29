@@ -47,16 +47,17 @@ void StabilityNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
 
     int32_t id = buffer->GetStreamId();
 
-    std::vector<std::shared_ptr<IPort>> outPutPorts = GetOutPorts();
-    for (auto &it : outPutPorts) {
-        if (it->format_.streamId_ == id) {
-            it->DeliverBuffer(buffer);
-            if (it != nullptr) {
-                CAMERA_LOGI("StabilityNode deliver buffer streamid = %{public}d", it->format_.streamId_);
-            }
-            return;
-        }
+    auto &it = std::find_if(outPutPorts.begin(), outPutPorts.end(), [id](const std::shared_ptr<IPort>& port) {
+        return port->format_.streamId_ == id;
+    });
+    if (it == outPutPorts.end()) {
+        return -1;
     }
+    it->DeliverBuffer(buffer);
+    if (it != nullptr) {
+        CAMERA_LOGI("StabilityNode deliver buffer streamid = %{public}d", it->format_.streamId_);
+    }
+    return;
 }
 
 RetCode StabilityNode::PrintNodeMetaData(std::shared_ptr<CameraMetadata> meta)
