@@ -460,7 +460,7 @@ bool MetadataController::DealUpdateNewTagData(
             return false;
         }
 
-        result = outMeta->addEntry(*it, (void*)entry.data.u8, entry.count);
+        result = outMeta->addEntry(*it, static_cast<void*>(entry.data.u8), entry.count);
         if (!result) {
             CAMERA_LOGE("update key [%{public}d] error", *it);
             return false;
