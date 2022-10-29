@@ -208,7 +208,7 @@ HWTEST_F(DfxTest, Camera_Dfx_0014, TestSize.Level3)
     if (!result) {
         char defValue[] = "on";
         char value1[32] = {0};
-        int arameter = GetParameter(property, defValue, value1, 32);
+        int parameter = GetParameter(property, defValue, value1, 32);
         std::cout << "==========[test log] DFX: GetProperty Hdi_DisableResult_Timeout = " << parameter << std::endl;
         Test_->Open();
         // Get the parameter tag currently supported by the device
