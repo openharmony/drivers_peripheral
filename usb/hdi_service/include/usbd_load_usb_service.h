@@ -47,8 +47,10 @@ public:
     ~UsbdLoadUsbService() = default;
     static int32_t LoadUsbService();
     static int32_t RemoveUsbService();
-private:
+    static void SetUsbLoadRemoveCount(uint32_t count);
     static uint32_t GetUsbLoadRemoveCount();
+    static void CloseUsbService();
+private:
     static void IncreaseUsbLoadRemoveCount();
     static void DecreaseUsbLoadRemoveCount();
     static int32_t UsbLoadWorkEntry(void *para);

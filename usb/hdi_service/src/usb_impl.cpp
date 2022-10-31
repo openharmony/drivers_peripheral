@@ -39,6 +39,7 @@ namespace V1_0 {
 sptr<IUsbdSubscriber> UsbImpl::subscriber_ = nullptr;
 HdfDevEventlistener UsbImpl::usbPnpListener_ = {0};
 HdfDevEventlistener UsbImpl::listenerForLoadService_ = {0};
+sptr<UsbImpl::UsbDeathRecipient> UsbImpl::deathRecipient_ = nullptr;
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
 {
@@ -899,6 +900,8 @@ int32_t UsbImpl::UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data)
 
 int32_t UsbImpl::UsbdEventHandle(const sptr<UsbImpl> &inst)
 {
+    (void)UsbdLoadUsbService::CloseUsbService();
+
     usbPnpListener_.callBack = UsbdPnpLoaderEventReceived;
     usbPnpListener_.priv = (void *)(inst.GetRefPtr());
     listenerForLoadService_.callBack = UsbdLoadServiceCallback;
@@ -1575,12 +1578,14 @@ int32_t UsbImpl::GetCurrentFunctions(int32_t &funcs)
 
 int32_t UsbImpl::SetCurrentFunctions(int32_t funcs)
 {
+    OsalMutexLock(&lock_);
     int32_t ret = UsbdFunction::UsbdSetFunction(funcs);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:UsbdSetFunction failed, ret:%{public}d", __func__, ret);
+        OsalMutexUnlock(&lock_);
         return ret;
     }
-
+    OsalMutexUnlock(&lock_);
     return HDF_SUCCESS;
 }
 
@@ -1608,20 +1613,45 @@ int32_t UsbImpl::QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRol
 
 int32_t UsbImpl::BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
+    deathRecipient_ = new UsbImpl::UsbDeathRecipient();
+    if (deathRecipient_ == nullptr) {
+        return HDF_FAILURE;
+    }
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IUsbdSubscriber>(subscriber);
+    bool result = remote->AddDeathRecipient(deathRecipient_);
+    if (!result) {
+        HDF_LOGE("%{public}s:AddUsbDeathRecipient failed", __func__);
+        return HDF_FAILURE;
+    }
+
     BindUsbSubscriber(subscriber);
     return HDF_SUCCESS;
 }
 
 int32_t UsbImpl::UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
+    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IUsbdSubscriber>(subscriber);
+    bool result = remote->RemoveDeathRecipient(deathRecipient_);
+    if (!result) {
+        HDF_LOGE("%{public}s:RemoveUsbDeathRecipient failed", __func__);
+        return HDF_FAILURE;
+    }
+
     subscriber_ = nullptr;
     if (DdkListenerMgrRemove(&usbPnpListener_) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: remove listerer failed", __func__);
         return HDF_FAILURE;
     }
-    usbPnpListener_.callBack = nullptr;
-    usbPnpListener_.priv = nullptr;
     return HDF_SUCCESS;
+}
+
+void UsbImpl::UsbDeathRecipient::OnRemoteDied(const wptr<IRemoteObject> &object)
+{
+    subscriber_ = nullptr;
+    if (DdkListenerMgrRemove(&usbPnpListener_) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: remove listerer failed", __func__);
+    }
+    UsbdLoadUsbService::SetUsbLoadRemoveCount(UsbdLoadUsbService::GetUsbLoadRemoveCount());
 }
 
 int32_t UsbImpl::RegBulkCallback(const UsbDev &dev, const UsbPipe &pipe, const sptr<IUsbdBulkCallback> &cb)
