@@ -297,9 +297,9 @@ void TestDisplay::ProcessImage(unsigned char* p, unsigned char* fbp)
     yPos = 0; // 0:Pixel initial value
     uPos = 1; // 1:Pixel initial value
     vPos = 3; // 3:Pixel initial value
-    yPosIncrement = 2; //2:yPos increase value
-    uPosIncrement = 4; //4:uPos increase value
-    vPosIncrement = 4; //4:vPos increase value
+    yPosIncrement = 2; // 2:yPos increase value
+    uPosIncrement = 4; // 4:uPos increase value
+    vPosIncrement = 4; // 4:vPos increase value
 
     for (y = ypos; y < (height + ypos); y++) {
         for (j = 0, x = xpos; j < width; j++, x++) {
