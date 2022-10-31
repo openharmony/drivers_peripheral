@@ -19,7 +19,8 @@ module_output_path = "drivers_peripheral_audio/audio"
 
 ohos_systemtest("hdf_audio_idlhdi_render_test") {
   module_out_path = module_output_path
-  public_deps = [ "//drivers/interface/audio/v1_0:libaudio_proxy_1.0" ]
+  resource_config_file =
+      "//drivers/peripheral/audio/test/resource/ohos_test.xml"
   sources = [
     "../../../common/hdi_service_common/src/hdi_service_common.cpp",
     "src/audio_idl_hdirender_attr_test.cpp",
