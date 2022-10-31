@@ -32,6 +32,7 @@
 #include <linux/netlink.h>
 #include <linux/nl80211.h>
 #include <linux/wireless.h>
+#include <linux/version.h>
 
 #include "../wifi_common_cmd.h"
 #include "hilog/log.h"
@@ -88,13 +89,19 @@ static inline uint32_t BIT(uint8_t x)
 
 #define WLAN_IFACE_LENGTH 4
 #define P2P_IFACE_LENGTH 3
+#ifndef KERNEL_VERSION
+#define KERNEL_VERSION(a, b, c) (((a) << 16) + ((b) << 8) + ((c) > 255 ? 255 : (c)))
+#endif
 
 // vendor attr
 enum AndrWifiAttr {
-    ANDR_WIFI_ATTRIBUTE_NUM_FEATURE_SET,
-    ANDR_WIFI_ATTRIBUTE_FEATURE_SET,
-    ANDR_WIFI_ATTRIBUTE_RANDOM_MAC_OUI,
-    ANDR_WIFI_ATTRIBUTE_NODFS_SET,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
+    WIFI_ATTRIBUTE_INVALID,
+#endif
+    WIFI_ATTRIBUTE_NUM_FEATURE_SET,
+    WIFI_ATTRIBUTE_FEATURE_SET,
+    WIFI_ATTRIBUTE_RANDOM_MAC_OUI,
+    WIFI_ATTRIBUTE_NODFS_SET,
     WIFI_ATTRIBUTE_COUNTRY
 };
 
@@ -132,9 +139,15 @@ typedef struct {
 } HwprivIoctlData;
 
 typedef struct {
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
+    uint8_t *buf;
+    uint32_t size;
+    uint32_t len;
+#else
     uint32_t size;
     uint32_t len;
     uint8_t *buf;
+#endif
 } WifiPrivCmd;
 
 static struct WifiHalInfo g_wifiHalInfo = {0};
@@ -1117,7 +1130,7 @@ int32_t SetScanMacAddr(const char *ifName, uint8_t *scanMac, uint8_t len)
         nlmsg_free(msg);
         return RET_CODE_FAILURE;
     }
-    nla_put(msg, ANDR_WIFI_ATTRIBUTE_RANDOM_MAC_OUI, len, scanMac);
+    nla_put(msg, WIFI_ATTRIBUTE_RANDOM_MAC_OUI, len, scanMac);
     nla_nest_end(msg, data);
     ret = NetlinkSendCmdSync(msg, NULL, NULL);
     if (ret != RET_CODE_SUCCESS) {
