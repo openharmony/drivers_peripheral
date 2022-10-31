@@ -161,6 +161,7 @@ int32_t AudioPnpInputStartThread(void)
 {
     pthread_t thread;
     pthread_attr_t tidsAttr;
+    const char *threadName = "audio_pnp_input";
 
     AUDIO_FUNC_LOGI("enter.");
     g_bRunThread = true;
@@ -169,6 +170,11 @@ int32_t AudioPnpInputStartThread(void)
     if (pthread_create(&thread, &tidsAttr, AudioPnpInputStart, NULL) != 0) {
         AUDIO_FUNC_LOGE("[pthread_create] failed!");
         g_bRunThread = false;
+        return HDF_FAILURE;
+    }
+
+    if (pthread_setname_np(thread, threadName) != 0) {
+        AUDIO_FUNC_LOGE("AudioPnpInputStartThread setname failed!");
         return HDF_FAILURE;
     }
 
