@@ -38,7 +38,7 @@
 
 #define INTENSITY_MAPPING_VALUE(value) {0XA8 + ((value) * (0XFF - 0XA8)) / 100}
 
-#define FREQUENCY_MAPPING_VALUE(value) {1000000 / (98.46 * (value))}
+#define FREQUENCY_MAPPING_VALUE(value) {1000000 / (98 * (value))}
 
 enum Drv2605lConfigValueIndex {
     DRV2605L_ADDR_INDEX,
