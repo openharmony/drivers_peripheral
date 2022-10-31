@@ -32,8 +32,12 @@ public:
     RetCode Flush(const int32_t streamId) override;
     RetCode Stop(const int32_t streamId) override;
     RetCode GetDeviceController();
+    RetCode SetCallback() override;
     void SetBufferCallback() override;
     RetCode ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec) override;
+private:
+    void OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata);
+    int32_t GetStreamId(const CaptureMeta &meta);
 
 private:
     std::mutex                              requestLock_;

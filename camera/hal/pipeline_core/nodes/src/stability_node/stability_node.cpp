@@ -47,16 +47,16 @@ void StabilityNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
 
     int32_t id = buffer->GetStreamId();
 
-    auto &it = std::find_if(outPutPorts.begin(), outPutPorts.end(), [id](const std::shared_ptr<IPort>& port) {
+    std::vector<std::shared_ptr<IPort>> outPutPorts = GetOutPorts();
+    auto it = std::find_if(outPutPorts.begin(), outPutPorts.end(), [id](const std::shared_ptr<IPort> &port) {
         return port->format_.streamId_ == id;
     });
     if (it == outPutPorts.end()) {
-        return -1;
+        CAMERA_LOGE("StabilityNode invalid output ports.");
+        return;
     }
-    it->DeliverBuffer(buffer);
-    if (it != nullptr) {
-        CAMERA_LOGI("StabilityNode deliver buffer streamid = %{public}d", it->format_.streamId_);
-    }
+    (*it)->DeliverBuffer(buffer);
+    CAMERA_LOGI("StabilityNode deliver buffer streamid = %{public}d", (*it)->format_.streamId_);
     return;
 }
 

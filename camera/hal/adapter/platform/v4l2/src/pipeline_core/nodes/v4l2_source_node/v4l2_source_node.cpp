@@ -12,6 +12,7 @@
  */
 
 #include "v4l2_source_node.h"
+#include "metadata_controller.h"
 #include <unistd.h>
 
 namespace OHOS::Camera {
@@ -19,6 +20,17 @@ V4L2SourceNode::V4L2SourceNode(const std::string& name, const std::string& type)
     : SourceNode(name, type), NodeBase(name, type)
 {
     CAMERA_LOGI("%s enter, type(%s)\n", name_.c_str(), type_.c_str());
+    RetCode rc = RC_OK;
+    deviceManager_ = IDeviceManager::GetInstance();
+    if (deviceManager_ == nullptr) {
+        CAMERA_LOGE("get device manager failed.");
+        return;
+    }
+    rc = GetDeviceController();
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("GetDeviceController failed.");
+        return;
+    }
 }
 
 RetCode V4L2SourceNode::GetDeviceController()
@@ -96,6 +108,47 @@ RetCode V4L2SourceNode::Stop(const int32_t streamId)
     }
 
     return SourceNode::Stop(streamId);
+}
+
+RetCode V4L2SourceNode::SetCallback()
+{
+    MetadataController &metaDataController = MetadataController::GetInstance();
+    metaDataController.AddNodeCallback([this](const std::shared_ptr<CameraMetadata> &metadata) {
+        OnMetadataChanged(metadata);
+    });
+    return RC_OK;
+}
+
+int32_t V4L2SourceNode::GetStreamId(const CaptureMeta &meta)
+{
+    common_metadata_header_t *data = meta->get();
+    if (data == nullptr) {
+        CAMERA_LOGE("data is nullptr");
+        return RC_ERROR;
+    }
+    camera_metadata_item_t entry;
+    int32_t streamId = -1;
+    int rc = FindCameraMetadataItem(data, OHOS_CAMERA_STREAM_ID, &entry);
+    if (rc == 0) {
+        streamId = *entry.data.i32;
+    }
+    return streamId;
+}
+
+void V4L2SourceNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata)
+{
+    if (metadata == nullptr) {
+        CAMERA_LOGE("meta is nullptr");
+        return;
+    }
+    constexpr uint32_t DEVICE_STREAM_ID = 0;
+    if (sensorController_ != nullptr) {
+        if (GetStreamId(metadata) == DEVICE_STREAM_ID) {
+            sensorController_->Configure(metadata);
+        }
+    } else {
+        CAMERA_LOGE("V4L2SourceNode sensorController_ is null");
+    }
 }
 
 void V4L2SourceNode::SetBufferCallback()

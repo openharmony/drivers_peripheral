@@ -154,12 +154,8 @@ void SensorManager::SetNodeCallBack(const NodeBufferCb cb, std::string hardwareN
 
 void SensorManager::SetMetaDataCallBack(const MetaDataCb cb, std::string hardwareName)
 {
-    for (auto iter = sensorList_.cbegin(); iter != sensorList_.cend(); iter++) {
-        if ((*iter)->GetName() == hardwareName) {
-            (*iter)->SetMetaDataCallBack(cb);
-            return;
-        }
-    }
+    (void)cb;
+    (void)hardwareName;
 }
 
 RetCode SensorManager::DestroyController(ControllerId controllerId, std::string hardwareName)
