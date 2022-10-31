@@ -147,6 +147,8 @@ if (defined(ohos_lite)) {
 
   ohos_systemtest("hdf_audio_hdi_render_reliability_test") {
     module_out_path = module_output_path
+    resource_config_file =
+        "//drivers/peripheral/audio/test/resource/ohos_test.xml"
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdirender_reliability_test.cpp",
@@ -243,6 +245,8 @@ if (defined(ohos_lite)) {
 
   ohos_systemtest("hdf_audio_hdi_render_control_reliability_test") {
     module_out_path = module_output_path
+    resource_config_file =
+        "//drivers/peripheral/audio/test/resource/ohos_test.xml"
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "src/audio_hdirender_control_reliability_test.cpp",
