@@ -73,6 +73,7 @@ static HWTEST_F(CameraFpsTest, camera_fps_001, TestSize.Level1)
 
     // enable result
     std::vector<int32_t> resultsList;
+    resultsList.push_back(OHOS_CAMERA_STREAM_ID);
     resultsList.push_back(OHOS_CONTROL_FPS_RANGES);
     display_->cameraDevice->EnableResult(resultsList);
 
@@ -89,6 +90,8 @@ static HWTEST_F(CameraFpsTest, camera_fps_001, TestSize.Level1)
     fpsRange.push_back(fpsRange_[0]);
     fpsRange.push_back(fpsRange_[1]);
     meta->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
+    const int32_t deviceStreamId = 0;
+    meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
     display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);

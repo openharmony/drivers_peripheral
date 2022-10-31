@@ -19,10 +19,6 @@
 #include "test_display.h"
 #define PREVIEW_WIDTH 640
 #define PREVIEW_HEIGHT 480
-#define CAMERA_CAPTURE_WIDTH 640
-#define CAMERA_CAPTURE_HEIGHT 480
-#define CAMERA_VIDEO_WIDTH 640
-#define CAMERA_VIDEO_HEIGHT 480
 
 enum {
     STREAMID_PREVIEW_DOUBLE = 1004, // double preview streamID
@@ -49,7 +45,5 @@ public:
     std::shared_ptr<StreamCustomer> streamCustomerPreviewDouble_ = nullptr;
     std::vector<StreamInfo> streamInfos_;
     CaptureInfo captureInfo_ = {};
-    std::vector<int> captureIds_;
-    std::vector<int> streamIds_;
 };
 #endif /* DOUBLE_PREVIEW_H */

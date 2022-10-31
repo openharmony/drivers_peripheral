@@ -30,7 +30,6 @@ public:
     virtual RetCode Prepare(const int32_t streamId);
     virtual RetCode Start(const int32_t streamId);
     virtual RetCode Config(const int32_t streamId, const CaptureMeta& meta);
-    virtual RetCode UpdateSettingsConfig(const CaptureMeta& meta);
     virtual RetCode Capture(const int32_t streamId, const int32_t captureId);
     virtual RetCode CancelCapture(const int32_t streamId);
     virtual RetCode Flush(const int32_t streamId);

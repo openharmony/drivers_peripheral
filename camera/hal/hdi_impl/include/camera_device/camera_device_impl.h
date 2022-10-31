@@ -41,6 +41,7 @@ public:
     int32_t GetStreamOperator(const sptr<IStreamOperatorCallback>& callbackObj,
         sptr<IStreamOperator>& streamOperator) override;
     int32_t UpdateSettings(const std::vector<uint8_t>& settings) override;
+    int32_t GetSettings(std::vector<uint8_t> &settings) override;
     int32_t SetResultMode(ResultCallbackMode mode) override;
     int32_t GetEnabledResults(std::vector<int32_t>& results) override;
     int32_t EnableResult(const std::vector<int32_t>& results) override;
@@ -51,9 +52,6 @@ public:
     std::shared_ptr<IPipelineCore> GetPipelineCore() const;
     CamRetCode SetCallback(const OHOS::sptr<ICameraDeviceCallback> &callback);
     ResultCallbackMode GetMetaResultMode() const;
-    /* RC_OK: metadata changed；RC_ERROR: metadata unchanged； */
-    RetCode GetMetadataResults(std::shared_ptr<CameraMetadata> &metadata);
-    void ResultMetadata();
     void GetCameraId(std::string &cameraId) const;
     void SetStatus(bool isOpened);
     void OnRequestTimeout();
@@ -62,10 +60,8 @@ public:
     bool IsOpened() const;
 private:
     RetCode GetEnabledFromCfg();
-    bool CompareTagData(const camera_metadata_item_t &baseEntry,
-        const camera_metadata_item_t &newEntry);
-    RetCode UpdataMetadataResultsBase();
     uint64_t GetCurrentLocalTimeStamp();
+    void InitMetadataController();
 
 private:
     bool isOpened_;
@@ -78,8 +74,6 @@ private:
     std::vector<MetaType> deviceMetaTypes_;
     std::mutex enabledRstMutex_;
     std::vector<MetaType> enabledResults_;
-    std::shared_ptr<CameraMetadata> metadataResultsBase_;
-    std::mutex metaRstMutex_;
     std::shared_ptr<CameraMetadata> metadataResults_;
 
     // to keep OHOS::sptr<IStreamOperator> alive

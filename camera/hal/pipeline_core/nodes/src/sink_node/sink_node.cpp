@@ -12,6 +12,7 @@
  */
 
 #include "sink_node.h"
+#include "metadata_controller.h"
 
 namespace OHOS::Camera {
 SinkNode::SinkNode(const std::string& name, const std::string& type)
@@ -35,6 +36,11 @@ RetCode SinkNode::Stop(const int32_t streamId)
 void SinkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 {
     cb_(buffer);
+    int32_t streamId = buffer->GetStreamId();
+    constexpr uint32_t DEVICE_STREAM_ID = 0;
+    MetadataController& metaDataController = MetadataController::GetInstance();
+    metaDataController.NotifyMetaData(streamId);
+    metaDataController.NotifyMetaData(DEVICE_STREAM_ID);
     return;
 }
 
