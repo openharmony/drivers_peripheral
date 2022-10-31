@@ -58,7 +58,6 @@ void StabilityNode::DeliverBuffer(std::shared_ptr<IBuffer> &buffer)
         CAMERA_LOGI("StabilityNode deliver buffer streamid = %{public}d", it->format_.streamId_);
     }
     return;
-    
 }
 
 RetCode StabilityNode::PrintNodeMetaData(std::shared_ptr<CameraMetadata> meta)
