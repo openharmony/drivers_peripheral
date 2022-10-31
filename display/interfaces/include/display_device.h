@@ -89,6 +89,8 @@ typedef void (*VBlankCallback)(unsigned int sequence, uint64_t ns, void *data);
  */
 typedef void (*RefreshCallback)(uint32_t devId, void *data);
 
+typedef void (*ComposerDeathCallback)(void *data);
+
 /**
  * @brief  Defines pointers to the functions of the display device.
  */
@@ -679,6 +681,8 @@ int32_t DeviceInitialize(DeviceFuncs **funcs);
  * @version 1.0
  */
 int32_t DeviceUninitialize(DeviceFuncs *funcs);
+
+int32_t RegComposerDeathCallback(ComposerDeathCallback callback, void *data);
 
 #ifdef __cplusplus
 }
