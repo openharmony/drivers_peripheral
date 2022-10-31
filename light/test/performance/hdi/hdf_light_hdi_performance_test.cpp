@@ -150,8 +150,8 @@ HWTEST_F(HdfLightHdiPerformanceTest, TurnOnLight002, TestSize.Level1)
         struct timespec tv1 = (struct timespec) {0};
         struct timespec tv2 = (struct timespec) {0};
         HdfLightEffect effect;
-        effect.lightBrightness = 0x00800000;
-        effect.flashEffect.flashMode = HDF_LIGHT_FLASH_TIMED;
+        effect.lightColor.colorValue.rgbColor.r = 0xFF;
+        effect.flashEffect.flashMode = HDF_LIGHT_FLASH_BLINK;
         effect.flashEffect.onTime = ON_TIME;
         effect.flashEffect.offTime = OFF_TIME;
         clock_gettime(CLOCK_REALTIME, &tv1);
