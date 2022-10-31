@@ -18,7 +18,6 @@
 #include <unistd.h>
 #include <linux/limits.h>
 #include "param_wrapper.h"
-#include "fs_manager.h"
 #include "hilog/log.h"
 
 namespace OHOS {
@@ -35,22 +34,13 @@ constexpr off_t MISC_PARTITION_ACTIVE_SLOT_SIZE = 4;
 constexpr off_t MISC_PARTITION_UNBOOT_SLOT_OFFSET = MISC_PARTITION_ACTIVE_SLOT_OFFSET + MISC_PARTITION_ACTIVE_SLOT_SIZE;
 constexpr off_t MISC_PARTITION_UNBOOT_SLOT_SIZE = 4;
 
+#define MISC_DEVICE_NODE "/dev/block/by-name/misc"
+
 int32_t PartitionSlotManager::GetCurrentSlot(int32_t& currentSlot, int32_t& numOfSlots)
 {
     HILOG_DEBUG(LOG_CORE, "%{public}s called!", __func__);
     numOfSlots = system::GetIntParameter("ohos.boot.bootslots", 1);
-    char miscDev[PATH_MAX] = { 0 };
-    int ret = GetBlockDevicePath("/misc", miscDev, PATH_MAX);
-    if (ret != 0) {
-        HILOG_ERROR(LOG_CORE, "GetBlockDevicePath failed");
-        return -1;
-    }
-    std::string miscDevice = std::string(miscDev);
-    if (miscDevice.empty()) {
-        HILOG_ERROR(LOG_CORE, "miscDevice is empty");
-        return -1;
-    }
-    currentSlot = ReadMisc(miscDevice, MISC_PARTITION_ACTIVE_SLOT_OFFSET, MISC_PARTITION_ACTIVE_SLOT_SIZE);
+    currentSlot = ReadMisc(MISC_PARTITION_ACTIVE_SLOT_OFFSET, MISC_PARTITION_ACTIVE_SLOT_SIZE);
     HILOG_INFO(LOG_CORE, "current slot is %{public}d, numOfSlots is %{public}d", currentSlot, numOfSlots);
     return 0;
 }
@@ -93,9 +83,9 @@ int32_t PartitionSlotManager::WriteSlot(int fd, int32_t slot, off_t offset, off_
     return 0;
 }
 
-int PartitionSlotManager::ReadMisc(const std::string &miscDevice, off_t offset, off_t size)
+int PartitionSlotManager::ReadMisc(off_t offset, off_t size)
 {
-    int fd = open(miscDevice.c_str(), O_RDWR | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    int fd = open(MISC_DEVICE_NODE, O_RDWR | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (fd < 0) {
         return -1;
     }
@@ -121,20 +111,9 @@ int PartitionSlotManager::WriteSlotToMisc(int32_t slot, off_t offset, off_t size
         HILOG_ERROR(LOG_CORE, "Invalid slot : %{public}d", slot);
         return -1;
     }
-    char miscDev[PATH_MAX] = { 0 };
-    int ret = GetBlockDevicePath("/misc", miscDev, PATH_MAX);
-    if (ret != 0) {
-        return -1;
-    }
-    std::string miscDevice = std::string(miscDev);
-    if (miscDevice.empty()) {
-        HILOG_ERROR(LOG_CORE, "miscDevice is empty");
-        return -1;
-    }
-    HILOG_INFO(LOG_CORE, "WriteSlotToMisc miscDevice %{public}s ", miscDevice.c_str());
-    int fd = open(miscDevice.c_str(), O_RDWR | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
+    int fd = open(MISC_DEVICE_NODE, O_RDWR | O_CLOEXEC, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (fd < 0) {
-        HILOG_ERROR(LOG_CORE, "Failed to open miscDevice %{public}s errno %{public}d ", miscDevice.c_str(), errno);
+        HILOG_ERROR(LOG_CORE, "Failed to open miscDevice errno %{public}d ", errno);
         return -1;
     }
 
