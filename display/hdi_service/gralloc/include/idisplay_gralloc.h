@@ -24,9 +24,12 @@ namespace OHOS {
 namespace HDI {
 namespace Display {
 namespace V1_0 {
+using AllocatorDeathCallback = void (*)(void *);
 class IDisplayGralloc {
 public:
     virtual ~IDisplayGralloc() = default;
+
+    virtual int32_t RegAllocatorDeathCallback(AllocatorDeathCallback func, void* data) = 0;
 
     /**
      * @brief Obtains all interfaces of IDisplayGralloc.

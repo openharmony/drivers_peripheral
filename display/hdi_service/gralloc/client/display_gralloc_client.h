@@ -39,6 +39,7 @@ public:
     int32_t FlushCache(const BufferHandle &handle) const override;
     int32_t FlushMCache(const BufferHandle &handle) const override;
     int32_t InvalidateCache(const BufferHandle& handle) const override;
+    int32_t RegAllocatorDeathCallback(AllocatorDeathCallback func, void *data) override;
     int32_t IsSupportedAlloc(const std::vector<VerifyAllocInfo> &infos,
                              std::vector<bool> &supporteds) const override;
 
