@@ -15,6 +15,24 @@
 #include "test_display.h"
 using namespace std;
 
+const std::vector<int32_t> DATA_BASE = {
+    OHOS_CAMERA_STREAM_ID,
+    OHOS_SENSOR_COLOR_CORRECTION_GAINS,
+    OHOS_SENSOR_EXPOSURE_TIME,
+    OHOS_CONTROL_EXPOSURE_MODE,
+    OHOS_CONTROL_AE_EXPOSURE_COMPENSATION,
+    OHOS_CONTROL_FOCUS_MODE,
+    OHOS_CONTROL_METER_MODE,
+    OHOS_CONTROL_FLASH_MODE,
+    OHOS_CONTROL_FPS_RANGES,
+    OHOS_CONTROL_AWB_MODE,
+    OHOS_CONTROL_AF_REGIONS,
+    OHOS_CONTROL_METER_POINT,
+    OHOS_CONTROL_VIDEO_STABILIZATION_MODE,
+    OHOS_CONTROL_FOCUS_STATE,
+    OHOS_CONTROL_EXPOSURE_STATE,
+};
+
 TestDisplay::TestDisplay()
 {
 }
@@ -628,13 +646,16 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
     }
 }
 
-void DemoCameraDeviceCallback::PrintStabiliInfo(const std::shared_ptr<CameraMetadata>& result)
+void DemoCameraDeviceCallback::PrintStabiliInfo(const std::vector<uint8_t>& result)
 {
-    if (result == nullptr) {
+    std::shared_ptr<CameraMetadata> metaData;
+    MetadataUtils::ConvertVecToMetadata(result, metaData);
+
+    if (metaData == nullptr) {
         CAMERA_LOGE("TestDisplay: result is null");
         return;
     }
-    common_metadata_header_t* data = result->get();
+    common_metadata_header_t* data = metaData->get();
     if (data == nullptr) {
         CAMERA_LOGE("TestDisplay: data is null");
         return;
@@ -652,13 +673,16 @@ void DemoCameraDeviceCallback::PrintStabiliInfo(const std::shared_ptr<CameraMeta
         static_cast<int>(videoStabiliMode) << std::endl;
 }
 
-void DemoCameraDeviceCallback::PrintFpsInfo(const std::shared_ptr<CameraMetadata>& result)
+void DemoCameraDeviceCallback::PrintFpsInfo(const std::vector<uint8_t>& result)
 {
-    if (result == nullptr) {
+    std::shared_ptr<CameraMetadata> metaData;
+    MetadataUtils::ConvertVecToMetadata(result, metaData);
+
+    if (metaData == nullptr) {
         CAMERA_LOGE("TestDisplay: result is null");
         return;
     }
-    common_metadata_header_t* data = result->get();
+    common_metadata_header_t* data = metaData->get();
     if (data == nullptr) {
         CAMERA_LOGE("TestDisplay: data is null");
         return;
@@ -688,6 +712,9 @@ int32_t DemoCameraDeviceCallback::OnError(ErrorType type, int32_t errorCode)
 int32_t DemoCameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector<uint8_t>& result)
 {
     CAMERA_LOGI("%{public}s, enter.", __func__);
+    PrintStabiliInfo(result);
+    PrintFpsInfo(result);
+    DealCameraMetadata(result);
     return RC_OK;
 }
 
@@ -721,6 +748,138 @@ int32_t DemoStreamOperatorCallback::OnCaptureEnded(int32_t captureId, const std:
 {
     CAMERA_LOGI("%{public}s, enter.", __func__);
     return RC_OK;
+}
+
+void DemoCameraDeviceCallback::DealCameraMetadata(const std::vector<uint8_t> &settings)
+{
+    std::shared_ptr<CameraMetadata> result;
+    MetadataUtils::ConvertVecToMetadata(settings, result);
+    if (result == nullptr) {
+        std::cout << "TestDisplay: result is null" << std::endl;
+        return;
+    }
+    common_metadata_header_t *data = result->get();
+    if (data == nullptr) {
+        CAMERA_LOGE("data is null");
+        return;
+    }
+    for (auto it = DATA_BASE.cbegin(); it != DATA_BASE.cend(); it++) {
+        PrintCameraMetadata(*it, data);
+    }
+}
+
+void DemoCameraDeviceCallback::PrintCameraMetadata(int32_t key, common_metadata_header_t *data)
+{
+    switch (key) {
+        case OHOS_CONTROL_AWB_MODE:
+        case OHOS_CONTROL_FOCUS_MODE:
+        case OHOS_CONTROL_FOCUS_STATE:
+        case OHOS_CONTROL_EXPOSURE_MODE:
+        case OHOS_CONTROL_EXPOSURE_STATE:
+        case OHOS_CONTROL_FLASH_MODE:
+        case OHOS_CONTROL_METER_MODE:
+        case OHOS_CONTROL_VIDEO_STABILIZATION_MODE: {
+            PrintU8Metadata(key, data);
+            break;
+        }
+        case OHOS_CAMERA_STREAM_ID:
+        case OHOS_CONTROL_AE_EXPOSURE_COMPENSATION: {
+            PrintI32Metadata(key, data);
+            break;
+        }
+        case OHOS_SENSOR_EXPOSURE_TIME: {
+            PrintI64Metadata(key, data);
+            break;
+        }
+        case OHOS_SENSOR_COLOR_CORRECTION_GAINS: {
+            PrintFloatMetadata(key, data);
+            break;
+        }
+        case OHOS_CONTROL_FPS_RANGES:
+        case OHOS_CONTROL_AF_REGIONS:
+        case OHOS_CONTROL_METER_POINT: {
+            PrintI32ArrayMetadata(key, data);
+            break;
+        }
+        default: {
+            std::cout << "TestDisplay: invalid param and key = " << key << std::endl;
+            break;
+        }
+    }
+}
+
+void DemoCameraDeviceCallback::PrintU8Metadata(int32_t key, common_metadata_header_t *data)
+{
+    uint8_t value;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, key, &entry);
+    if (ret != 0) {
+        std::cout << "TestDisplay: get  key error and key = " << key << std::endl;
+        return;
+    }
+    value = *(entry.data.u8);
+    std::cout << "TestDisplay: valueu8 = " << static_cast<int>(value) << " and key = " << key << std::endl;
+}
+
+void DemoCameraDeviceCallback::PrintI32Metadata(int32_t key, common_metadata_header_t *data)
+{
+    int32_t value;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, key, &entry);
+    if (ret != 0) {
+        std::cout << "TestDisplay: get  key error and key = " << key << std::endl;
+        return;
+    }
+    value = *(entry.data.i32);
+
+    std::cout << "TestDisplay: valueI32 = " << value << " and key = " << key << std::endl;
+}
+
+void DemoCameraDeviceCallback::PrintI64Metadata(int32_t key, common_metadata_header_t *data)
+{
+    int64_t value;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, key, &entry);
+    if (ret != 0) {
+        std::cout << "TestDisplay: get  key error and key = " << key << std::endl;
+        return;
+    }
+    value = *(entry.data.i64);
+    std::cout << "TestDisplay: valueI64 = " << value << " and key = " << key<< std::endl;
+}
+
+void DemoCameraDeviceCallback::PrintFloatMetadata(int32_t key, common_metadata_header_t *data)
+{
+    float value;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, key, &entry);
+    if (ret != 0) {
+        std::cout << "TestDisplay: get  key error and key = " << key<< std::endl;
+        return;
+    }
+    value = *(entry.data.f);
+    std::cout << "TestDisplay: valueFloat = " << std::showpoint << value << " and key = " << key << std::endl;
+}
+
+void DemoCameraDeviceCallback::PrintI32ArrayMetadata(int32_t key, common_metadata_header_t *data)
+{
+    std::vector<int32_t> results;
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, key, &entry);
+    if (ret != 0) {
+        std::cout << "TestDisplay: get  key error and key = " << key << std::endl;
+        return;
+    }
+    uint32_t count = entry.count;
+    std::cout << "==========[test log] count =" << count << std::endl;
+
+    for (int i = 0; i < count; i++) {
+        results.push_back(*(entry.data.i32 + i));
+    }
+
+    for (auto iterator = results.begin(); iterator != results.end(); iterator++) {
+        std::cout << "TestDisplay: valueArray = " << *iterator << " and key = " << key << std::endl;
+    }
 }
 
 int32_t DemoStreamOperatorCallback::OnCaptureError(int32_t captureId, const std::vector<CaptureErrorInfo>& infos)

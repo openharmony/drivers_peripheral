@@ -78,13 +78,10 @@ RetCode StreamPipelineDispatcher::Update(const std::shared_ptr<Pipeline>& p)
 
 RetCode StreamPipelineDispatcher::SetDispatcherCallback()
 {
-    CAMERA_LOGI("StreamPipelineDispatcher line: %{public}d", __LINE__);
     RetCode ret = RC_OK;
     for (auto iter = seqNode_.begin(); iter != seqNode_.end(); iter++) {
         for (auto it = iter->second.rbegin(); it != iter->second.rend(); it++) {
-            CAMERA_LOGI("SetCallback node %{public}s begin", (*it)->GetName().c_str());
-            ret = (*it)->SetCallback(metaDataCb_) | ret;
-            CAMERA_LOGI("SetCallback node %{public}s end", (*it)->GetName().c_str());
+            ret = (*it)->SetCallback() | ret;
         }
     }
     return ret;
@@ -150,19 +147,6 @@ RetCode StreamPipelineDispatcher::Config(const int32_t streamId, const CaptureMe
     RetCode ret = RC_OK;
     for (auto it = seqNode_[streamId].rbegin(); it != seqNode_[streamId].rend(); it++) {
         ret = (*it)->Config(streamId, meta) | ret;
-    }
-    return ret;
-}
-
-RetCode StreamPipelineDispatcher::UpdateSettingsConfig(const CaptureMeta& meta)
-{
-    RetCode ret = RC_OK;
-    for (auto iter = seqNode_.begin(); iter != seqNode_.end(); iter++) {
-        for (auto it = iter->second.rbegin(); it != iter->second.rend(); it++) {
-            CAMERA_LOGV("UpdateSettingsConfig node %{public}s begin", (*it)->GetName().c_str());
-            ret = (*it)->UpdateSettingsConfig(meta) | ret;
-            CAMERA_LOGV("UpdateSettingsConfig node %{public}s end", (*it)->GetName().c_str());
-        }
     }
     return ret;
 }
