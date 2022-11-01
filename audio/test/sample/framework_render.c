@@ -279,7 +279,7 @@ static int32_t FrameStartMmap(const AudioHandle param)
     }
     struct StrPara *strParam = (struct StrPara *)param;
     struct AudioRender *render = strParam->render;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     ProcessCommonSig();
     // get file length
     FILE *fp = NULL;

@@ -34,6 +34,6 @@ int32_t AudioProxyCommonSetRenderCtrlParam(int cmId, AudioHandle handle, float p
 int32_t AudioProxyCommonGetRenderCtrlParam(int cmId, AudioHandle handle, float *param);
 int32_t AudioProxyGetMmapPositionRead(struct HdfSBuf *reply, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioProxyReqMmapBufferWrite(struct HdfSBuf *data, int32_t reqSize,
-    const struct AudioMmapBufferDescripter *desc);
+    const struct AudioMmapBufferDescriptor *desc);
 }
 #endif

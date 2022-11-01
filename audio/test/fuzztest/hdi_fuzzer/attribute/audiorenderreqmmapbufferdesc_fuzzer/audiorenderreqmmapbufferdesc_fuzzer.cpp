@@ -32,7 +32,7 @@ namespace Audio {
             return false;
         }
         uint8_t *temp = const_cast<uint8_t *>(data);
-        struct AudioMmapBufferDescripter descFuzz {
+        struct AudioMmapBufferDescriptor descFuzz {
             .memoryAddress = reinterpret_cast<void *>(temp),
             .memoryFd = *(reinterpret_cast<int32_t *>(temp)),
             .totalBufferFrames = *(reinterpret_cast<int32_t *>(temp)),

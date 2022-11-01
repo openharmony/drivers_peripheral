@@ -585,7 +585,7 @@ HWTEST_F(AudioProxyCaptureTest, CaptureReqMmapBuffer_001, TestSize.Level1)
 {
     ASSERT_NE(capture, nullptr);
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyCaptureReqMmapBuffer(nullptr, reqSize, &desc));
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyCaptureReqMmapBuffer((AudioHandle)capture, reqSize, nullptr));
 }
@@ -597,7 +597,7 @@ HWTEST_F(AudioProxyCaptureTest, CaptureReqMmapBuffer_002, TestSize.Level1)
     struct HdfRemoteService *proxyRemoteHandle = hwCapture->proxyRemoteHandle;
     hwCapture->proxyRemoteHandle = nullptr;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyCaptureReqMmapBuffer((AudioHandle)capture, reqSize, &desc));
     hwCapture->proxyRemoteHandle = proxyRemoteHandle;
 }

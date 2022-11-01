@@ -235,7 +235,7 @@ int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, st
 int32_t AudioCaptureSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
     struct IAudioCapture *capture);
 
-int32_t InitMmapDesc(const std::string &path, struct AudioMmapBufferDescripter &desc, int32_t &reqSize, bool flag);
+int32_t InitMmapDesc(const std::string &path, struct AudioMmapBufferDescriptor &desc, int32_t &reqSize, bool flag);
 
 int32_t PlayMapAudioFile(struct PrepareAudioPara &audiopara);
 

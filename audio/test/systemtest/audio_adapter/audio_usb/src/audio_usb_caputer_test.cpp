@@ -1027,7 +1027,7 @@ HWTEST_F(AudioUsbCaputerTest, AudioCaptureReqMmapBuffer_001, TestSize.Level1)
     int32_t ret = -1;
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioCapture *capture = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);

@@ -634,7 +634,7 @@ HWTEST_F(AudioProxyRenderTest, RenderReqMmapBuffer_001, TestSize.Level1)
 {
     ASSERT_NE(render, nullptr);
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyRenderReqMmapBuffer(nullptr, reqSize, &desc));
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyRenderReqMmapBuffer((AudioHandle)render, reqSize, nullptr));
 }
@@ -643,7 +643,7 @@ HWTEST_F(AudioProxyRenderTest, RenderReqMmapBuffer_002, TestSize.Level1)
 {
     ASSERT_NE(render, nullptr);
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     struct HdfRemoteService *proxyRemoteHandle = hwRender->proxyRemoteHandle;
     hwRender->proxyRemoteHandle = nullptr;

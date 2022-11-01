@@ -912,7 +912,7 @@ int32_t RecordAudio(struct PrepareAudioPara &audiopara)
     (void)fclose(file);
     return AUDIO_HAL_SUCCESS;
 }
-int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescripter &desc, int32_t &reqSize, bool flag)
+int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescriptor &desc, int32_t &reqSize, bool flag)
 {
     if (fp == NULL) {
         return HDF_FAILURE;
@@ -943,7 +943,7 @@ int32_t PlayMapAudioFile(struct PrepareAudioPara &audiopara)
     int32_t reqSize = 0;
     bool isRender = true;
     FrameStatus(1);
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     if (audiopara.render == nullptr) {
         return HDF_FAILURE;
     }
@@ -977,7 +977,7 @@ int32_t RecordMapAudio(struct PrepareAudioPara &audiopara)
     int32_t ret = -1;
     int32_t reqSize = 0;
     bool isRender = false;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     if (audiopara.capture == nullptr) {
         return HDF_FAILURE;
     }

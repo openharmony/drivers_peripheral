@@ -33,7 +33,7 @@ namespace Audio {
             return false;
         }
 
-        struct AudioMmapBufferDescripter descFuzz = {};
+        struct AudioMmapBufferDescriptor descFuzz = {};
         int32_t copySize = sizeof(descFuzz) > size ? size : sizeof(descFuzz);
         if (memcpy_s((void *)&descFuzz, sizeof(descFuzz), data, copySize) != 0) {
             return false;
