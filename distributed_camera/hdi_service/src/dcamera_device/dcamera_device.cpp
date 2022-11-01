@@ -143,6 +143,15 @@ int32_t DCameraDevice::UpdateSettings(const std::vector<uint8_t>& settings)
     return MapToExternalRetCode(static_cast<DCamRetCode>(ret));
 }
 
+int32_t DCameraDevice::GetSettings(std::vector<uint8_t> &settings)
+{
+    if (settings.empty()) {
+        DHLOGE("Get settings failed.");
+        return CamRetCode::DEVICE_ERROR;
+    }
+    return CamRetCode::NO_ERROR;
+}
+
 int32_t DCameraDevice::SetResultMode(ResultCallbackMode mode)
 {
     if (dMetadataProcessor_ == nullptr) {

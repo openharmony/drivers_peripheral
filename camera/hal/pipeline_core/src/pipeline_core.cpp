@@ -22,19 +22,6 @@ RetCode PipelineCore::Init()
     return RC_OK;
 }
 
-void PipelineCore::UpdateMetadata(std::shared_ptr<CameraMetadata> meta)
-{
-    RetCode rc = RC_OK;
-    std::shared_ptr<IDeviceManager> deviceManager = IDeviceManager::GetInstance();
-    deviceManager->Configure(meta);
-    rc = spc_->UpdateSettingsConfig(meta);
-    if (rc == RC_ERROR) {
-        CAMERA_LOGE("update metadata failed.");
-        return;
-    }
-    return;
-}
-
 std::shared_ptr<HostStreamMgr> PipelineCore::GetHostStreamMgr() const
 {
     return context_->streamMgr_;

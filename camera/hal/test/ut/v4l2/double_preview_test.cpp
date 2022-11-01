@@ -15,6 +15,7 @@
 #include "double_preview_test.h"
 
 using namespace testing::ext;
+constexpr uint32_t TIME_FOR_WAIT_CANCEL_CAPTURE = 2;
 
 void DoublePreviewTest::SetUpTestCase(void)
 {}
@@ -44,12 +45,8 @@ void DoublePreviewTest::SetStreamInfo(StreamInfo &streamInfo,
         streamInfo.width_ = PREVIEW_WIDTH;
         streamInfo.height_ = PREVIEW_HEIGHT;
         streamInfo.format_ = PIXEL_FMT_RGBA_8888;
-        if (streamId == display_->STREAM_ID_PREVIEW) {
-            streamInfo.streamId_ = streamId;
-        } else if (streamId == STREAMID_PREVIEW_DOUBLE) {
-            streamInfo.streamId_ = streamId;
-        }
     }
+    streamInfo.streamId_ = streamId;
     streamInfo.dataspace_ = DATA_SPACE;
     streamInfo.intent_ = intent;
     streamInfo.tunneledMode_ = TUNNEL_MODE;
@@ -80,7 +77,7 @@ void DoublePreviewTest::CreateStream(int streamId, StreamIntent intent)
         }
     }
     result_ = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos_);
-    EXPECT_EQ(false, result_!= HDI::Camera::V1_0::NO_ERROR);
+    EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
         std::cout << "==========[test log]CreateStreams success." << std::endl;
     } else {
@@ -91,7 +88,7 @@ void DoublePreviewTest::CreateStream(int streamId, StreamIntent intent)
 void DoublePreviewTest::CommitStream()
 {
     result_ = (CamRetCode)display_->streamOperator->CommitStreams(NORMAL, display_->ability_);
-    EXPECT_EQ(false, result_ != HDI::Camera::V1_0::NO_ERROR);
+    EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
         std::cout << "==========[test log]CommitStreams preview success." << std::endl;
     } else {
@@ -106,7 +103,7 @@ void DoublePreviewTest::StartCapture(int streamId, int captureId, bool shutterCa
     captureInfo_.enableShutterCallback_ = shutterCallback;
     constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 2; // sleep two second
     result_ = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo_, isStreaming);
-    EXPECT_EQ(true, result_ == HDI::Camera::V1_0::NO_ERROR);
+    EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
         std::cout << "==========[test log]check Capture: Capture success, " << captureId << std::endl;
     } else {
@@ -130,36 +127,34 @@ void DoublePreviewTest::StartCapture(int streamId, int captureId, bool shutterCa
 
 void DoublePreviewTest::StopStream(std::vector<int> &captureIds, std::vector<int> &streamIds)
 {
-    if (sizeof(captureIds_) > 0) {
-        for (const auto &captureId : captureIds_) {
-            if (captureId == display_->CAPTURE_ID_PREVIEW) {
-                streamCustomerPreview_->ReceiveFrameOff();
-            } else if (captureId == CAPTUREID_PREVIEW_DOUBLE) {
-                streamCustomerPreviewDouble_->ReceiveFrameOff();
-            } else {
-                std::cout << "==========[test log]StopStream ignore command. " <<  std::endl;
-            }
-        }
-        for (auto &captureId : captureIds_) {
-            result_ = (CamRetCode)display_->streamOperator->CancelCapture(captureId);
-            EXPECT_EQ(true, result_ == HDI::Camera::V1_0::NO_ERROR);
-            if (result_ == HDI::Camera::V1_0::NO_ERROR) {
-                std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
-            } else {
-                std::cout << "==========[test log]check Capture: CancelCapture fail, result_ = " << result_;
-                std::cout << "captureId = " << captureId << std::endl;
-            }
+    sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
+    if (sizeof(captureIds) == 0) {
+        return;
+    }
+    for (auto &captureId : captureIds) {
+        if (captureId == display_->CAPTURE_ID_PREVIEW) {
+            streamCustomerPreview_->ReceiveFrameOff();
+        } else if (captureId == CAPTUREID_PREVIEW_DOUBLE) {
+            streamCustomerPreviewDouble_->ReceiveFrameOff();
+        }  else if (captureId == display_->CAPTURE_ID_CAPTURE) {
+            display_->streamCustomerCapture_->ReceiveFrameOff();
+        } else if (captureId == display_->CAPTURE_ID_VIDEO) {
+            display_->streamCustomerVideo_->ReceiveFrameOff();
+            sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
+            display_->CloseFd();
+        } else {
+            std::cout << "==========[test log]StopStream ignore command. " <<  std::endl;
         }
     }
-
-    if (sizeof(streamIds_) > 0) {
-        result_ = (CamRetCode)display_->streamOperator->ReleaseStreams(streamIds_);
-        EXPECT_EQ(true, result_ == HDI::Camera::V1_0::NO_ERROR);
+    for (auto &captureId : captureIds) {
+        result_ = (CamRetCode)display_->streamOperator->CancelCapture(captureId);
+        sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
+        EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
         if (result_ == HDI::Camera::V1_0::NO_ERROR) {
-            std::cout << "==========[test log]check Capture: ReleaseStreams success." << std::endl;
+            std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
         } else {
-            std::cout << "==========[test log]check Capture: ReleaseStreams fail, result_ = " << result_ << std::endl;
-            std::cout << "streamIds_ = " << streamIds_.front() << std::endl;
+            std::cout << "==========[test log]check Capture: CancelCapture fail, result_ = " << result_;
+            std::cout << "captureId = " << captureId << std::endl;
         }
     }
 }
@@ -190,9 +185,9 @@ static HWTEST_F(DoublePreviewTest, double_preview_001, TestSize.Level1)
     constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 10; // sleep ten second 
     sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
 
-    streamIds_ = {display_->STREAM_ID_PREVIEW, STREAMID_PREVIEW_DOUBLE};
-    captureIds_ = {display_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE};
-    StopStream(captureIds_, streamIds_);
+    std::vector<int> captureIds = {display_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE};
+    std::vector<int> streamIds = {display_->STREAM_ID_PREVIEW, STREAMID_PREVIEW_DOUBLE};
+    StopStream(captureIds, streamIds);
 }
 
 /**
@@ -237,7 +232,7 @@ static HWTEST_F(DoublePreviewTest, double_preview_002, TestSize.Level1)
     captureInfo.captureSetting_ = setting;
     captureInfo.enableShutterCallback_ = false;
     display_->rc = (CamRetCode)display_->streamOperator->Capture(display_->CAPTURE_ID_CAPTURE, captureInfo, true);
-    EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
+    EXPECT_EQ(display_->rc, HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
         std::cout << "==========[test log]check Capture: Capture success, " << 
             display_->CAPTURE_ID_CAPTURE << std::endl;
@@ -252,12 +247,10 @@ static HWTEST_F(DoublePreviewTest, double_preview_002, TestSize.Level1)
     constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 5; // sleep five second
     sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
 
-    streamIds_ = {display_->STREAM_ID_PREVIEW, STREAMID_PREVIEW_DOUBLE};
-    captureIds_ = {display_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE};
-    std::vector<int> captureIds =  {display_->CAPTURE_ID_CAPTURE};
-    std::vector<int> streamIds = {display_->STREAM_ID_CAPTURE};
-    StopStream(captureIds_, streamIds_);
-    display_->StopStream(captureIds, streamIds);
+    std::vector<int> captureIds = {display_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE,
+        display_->CAPTURE_ID_CAPTURE};
+    std::vector<int> streamIds = {display_->STREAM_ID_PREVIEW, STREAMID_PREVIEW_DOUBLE, display_->STREAM_ID_CAPTURE};
+    StopStream(captureIds, streamIds);
 }
 
 /**
@@ -286,10 +279,8 @@ static HWTEST_F(DoublePreviewTest, double_preview_003, TestSize.Level1)
     constexpr uint32_t TIME_FOR_WAIT_IMAGE_PREVIEW = 5; // sleep five second
     sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
 
-    streamIds_ = {display_->STREAM_ID_PREVIEW, STREAMID_PREVIEW_DOUBLE};
-    captureIds_ = {display_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE};
-    std::vector<int> captureIds =  {display_->CAPTURE_ID_VIDEO};
-    std::vector<int> streamIds = {display_->STREAM_ID_VIDEO};
-    StopStream(captureIds_, streamIds_);
-    display_->StopStream(captureIds, streamIds);
+    std::vector<int> captureIds = {display_->CAPTURE_ID_PREVIEW, CAPTUREID_PREVIEW_DOUBLE,
+        display_->CAPTURE_ID_VIDEO};
+    std::vector<int> streamIds = {display_->STREAM_ID_PREVIEW, STREAMID_PREVIEW_DOUBLE, display_->STREAM_ID_VIDEO};
+    StopStream(captureIds, streamIds);
 }
