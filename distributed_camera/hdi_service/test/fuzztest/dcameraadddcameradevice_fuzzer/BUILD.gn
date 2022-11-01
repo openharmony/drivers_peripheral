@@ -16,16 +16,16 @@ import(
     "//drivers/peripheral/distributed_camera/hdi_service/test/fuzztest/dcamera_fuzz.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("DcameraGetCameraIdsFuzzTest") {
-  module_out_path = "distributed_camera/dcameragetcameraIds"
+ohos_fuzztest("DcameraAddDCameraDeviceFuzzTest") {
+  module_out_path = "distributed_camera/dcameraadddcameradevice"
 
-  fuzz_config_file = "${distributedcamera_hdf_path}/hdi_service/test/fuzztest/dcameragetcameraIds_fuzzer"
+  fuzz_config_file = "${distributedcamera_hdf_path}/hdi_service/test/fuzztest/dcameraadddcameradevice_fuzzer"
 
-  include_dirs += [ "${distributedcamera_hdf_path}/hdi_service/test/fuzztest/dcameragetcameraIds_fuzzer" ]
+  include_dirs += [ "${distributedcamera_hdf_path}/hdi_service/test/fuzztest/dcameraadddcameradevice_fuzzer" ]
 
-  sources = [ "dcameragetcameraIds_fuzzer.cpp" ]
+  sources = [ "dcameraadddcameradevice_fuzzer.cpp" ]
 
-  defines += [ "DH_LOG_TAG=\"DcameraGetCameraIdsFuzzTest\"" ]
+  defines += [ "DH_LOG_TAG=\"DcameraAddDCameraDeviceFuzzTest\"" ]
 
   deps = dcamera_deps
 
@@ -35,6 +35,6 @@ ohos_fuzztest("DcameraGetCameraIdsFuzzTest") {
 ###############################################################################
 group("fuzztest") {
   testonly = true
-  deps = [ ":DcameraGetCameraIdsFuzzTest" ]
+  deps = [ ":DcameraAddDCameraDeviceFuzzTest" ]
 }
 ###############################################################################

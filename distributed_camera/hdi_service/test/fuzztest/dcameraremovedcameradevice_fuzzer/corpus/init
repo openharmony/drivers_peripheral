@@ -11,16 +11,4 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("hdf_dcamera_fuzztest") {
-  testonly = true
-  deps = [
-    "dcameraadddcameradevice_fuzzer:fuzztest",
-    "dcameragetcameraIds_fuzzer:fuzztest",
-    "dcameragetcameraability_fuzzer:fuzztest",
-    "dcameragetdevicebydhbase_fuzzer:fuzztest",
-    "dcameranotifydcamerastatus_fuzzer:fuzztest",
-    "dcameraopencamera_fuzzer:fuzztest",
-    "dcameraremovedcameradevice_fuzzer:fuzztest",
-    "dcamerasetflashlight_fuzzer:fuzztest",
-  ]
-}
+FUZZ
