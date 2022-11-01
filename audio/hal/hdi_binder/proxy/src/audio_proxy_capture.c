@@ -651,7 +651,7 @@ int32_t AudioProxyCaptureGetExtraParams(const AudioHandle handle, char *keyValue
     return ret;
 }
 int32_t AudioProxyCaptureReqMmapBuffer(const AudioHandle handle,
-    int32_t reqSize, struct AudioMmapBufferDescripter *desc)
+    int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
     int32_t ret = AudioCheckCaptureAddr(handle);
     if (ret < 0) {

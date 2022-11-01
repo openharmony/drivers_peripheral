@@ -202,7 +202,7 @@ struct AudioFrameRenderMode {
     uint64_t bufferSize;
     RenderCallback callback;
     void* cookie;
-    struct AudioMmapBufferDescripter mmapBufDesc;
+    struct AudioMmapBufferDescriptor mmapBufDesc;
 };
 
 struct AudioGain {
@@ -378,7 +378,7 @@ int32_t AudioRenderSetChannelMode(struct AudioRender *render, AudioChannelMode m
 int32_t AudioRenderGetChannelMode(struct AudioRender *render, AudioChannelMode *mode);
 int32_t AudioRenderSetExtraParams(AudioHandle handle, const char *keyValueList);
 int32_t AudioRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_t listLenth);
-int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
+int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc);
 int32_t AudioRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioRenderTurnStandbyMode(AudioHandle handle);
 int32_t AudioRenderAudioDevDump(AudioHandle handle, int32_t range, int32_t fd);

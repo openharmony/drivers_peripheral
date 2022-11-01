@@ -1076,7 +1076,7 @@ int32_t AudioRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_
 }
 
 static int32_t AudioRenderReqMmapBufferInit(struct AudioHwRender *render,
-    int32_t reqSize, struct AudioMmapBufferDescripter *desc)
+    int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
     if (render == NULL || render->devDataHandle == NULL || desc == NULL) {
         AUDIO_FUNC_LOGE("render or render->devDataHandle or desc is null!");
@@ -1127,7 +1127,7 @@ static int32_t AudioRenderReqMmapBufferInit(struct AudioHwRender *render,
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc)
+int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {
