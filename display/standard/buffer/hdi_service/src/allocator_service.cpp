@@ -90,7 +90,11 @@ int32_t AllocatorService::AllocMem(const AllocInfo &info, sptr<NativeBuffer> &ha
     }
     handle = new NativeBuffer();
     CHECK_NULLPOINTER_RETURN_VALUE(handle, HDF_FAILURE);
-    handle->SetBufferHandle(buffer, true);
+    handle->SetBufferHandle(buffer, true, [this](BufferHandle *handle) {
+        if (hwiImpl_ != nullptr) {
+            hwiImpl_->FreeMem(*handle);
+        }
+    });
     return HDF_SUCCESS;
 }
 } // namespace V1_0
