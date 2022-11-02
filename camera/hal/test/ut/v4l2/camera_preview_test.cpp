@@ -1428,3 +1428,26 @@ HWTEST_F(CameraPreviewTest, camera_preview_093, TestSize.Level2)
     display_->rc = (CamRetCode)display_->streamOperator->ReleaseStreams(captureInfo.streamIds_);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
 }
+
+/**
+  * @tc.name: GetStreamAttributes
+  * @tc.desc: GetStreamAttributes, success.
+  * @tc.level: Level2
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+HWTEST_F(CameraPreviewTest, camera_preview_094, TestSize.Level2)
+{
+    display_->AchieveStreamOperator();
+    // start stream
+    display_->intents = {PREVIEW};
+    display_->StartStream(display_->intents);
+
+    std::vector<StreamAttribute> attributes;
+    display_->rc = (CamRetCode)display_->streamOperator->GetStreamAttributes(attributes);
+    EXPECT_EQ(display_->rc, HDI::Camera::V1_0::NO_ERROR);
+
+    // release stream
+    display_->rc = (CamRetCode)display_->streamOperator->ReleaseStreams({PREVIEW});
+    EXPECT_EQ(display_->rc, HDI::Camera::V1_0::NO_ERROR);
+}
