@@ -247,7 +247,9 @@ void BatteryThread::StartThread(void* service)
 
 void BatteryThread::Run(void* service)
 {
-    std::make_unique<std::thread>(&BatteryThread::LoopingThreadEntry, this, service)->detach();
+    std::thread batteryThread(&BatteryThread::LoopingThreadEntry, this, service);
+    pthread_setname_np(batteryThread.native_handle(), "battery_thread");
+    batteryThread.detach();
 }
 } // namespace V1_1
 } // namespace Battery
