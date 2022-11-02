@@ -21,7 +21,7 @@ int32_t WlanInterfaceStart(struct IWlanInterface *self);
 int32_t WlanInterfaceStop(struct IWlanInterface *self);
 int32_t WlanInterfaceCreateFeature(struct IWlanInterface *self, int32_t type, struct HdfFeatureInfo *ifeature);
 int32_t WlanInterfaceDestroyFeature(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature);
-int32_t WlanInterfaceGetAsscociatedStas(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature,
+int32_t WlanInterfaceGetAssociatedStas(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature,
     struct HdfStaInfo *staInfo, uint32_t *staInfoLen, uint32_t *num);
 int32_t WlanInterfaceGetChipId(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature, uint8_t *chipId);
 int32_t WlanInterfaceGetDeviceMacAddress(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature,
