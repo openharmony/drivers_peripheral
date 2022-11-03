@@ -255,6 +255,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetParameterTest_001, TestSize.Level1)
     CodecVideoPortFormatParam pixFormat;
     InitExtParam(pixFormat);
     pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_OUTPUT;
+    pixFormat.codecColorIndex = 0;
     auto ret = component_->GetParameter(component_, OMX_IndexCodecVideoPortFormat,
                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
     ASSERT_EQ(ret, HDF_SUCCESS);
@@ -266,6 +267,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetParameterTest_002, TestSize.Level1)
     CodecVideoPortFormatParam pixFormat;
     InitExtParam(pixFormat);
     pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    pixFormat.codecColorIndex = 0;
     auto ret = component_->GetParameter(component_, OMX_IndexCodecVideoPortFormat,
                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
     ASSERT_EQ(ret, HDF_SUCCESS);
@@ -382,6 +384,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetParameterTest_006, TestSize.Level1)
     CodecVideoPortFormatParam pixFormat;
     InitExtParam(pixFormat);
     pixFormat.portIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    pixFormat.codecColorIndex = 0;
     auto ret = component_->GetParameter(component_, OMX_IndexCodecVideoPortFormat,
                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
     ASSERT_EQ(ret, HDF_SUCCESS);

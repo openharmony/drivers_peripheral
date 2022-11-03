@@ -16,18 +16,6 @@
 #include <getopt.h>
 #include <iostream>
 namespace {
-enum class MyOptIndex {
-    OPT_INDEX_UNKONWN = 0,
-    OPT_INDEX_BUFFER_HANDLE,
-    OPT_INDEX_HEVC,
-    OPT_INDEX_HELP,
-    OPT_INDEX_HEIGHT = 'h',
-    OPT_INDEX_INPUT = 'i',
-    OPT_INDEX_OUTPUT = 'o',
-    OPT_INDEX_WIDTH = 'w',
-    OPT_INDEX_COLOR = 'c'
-};
-
 static struct option g_longOptions[] = {
     {"width", required_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_WIDTH)},
     {"height", required_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HEIGHT)},
@@ -36,10 +24,30 @@ static struct option g_longOptions[] = {
     {"color", optional_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_COLOR)},
     {"nocopy", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_BUFFER_HANDLE)},
     {"HEVC", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HEVC)},
+    {"MPEG4", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_MPEG4)},
+    {"VP9", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_VP9)},
     {"help", no_argument, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_HELP)},
     {nullptr, 0, nullptr, static_cast<int>(MyOptIndex::OPT_INDEX_UNKONWN)}};
 }  // namespace
 
+void CommandParse::ParseCodingType(const MyOptIndex index, CommandOpt &opt)
+{
+    MyOptIndex optIndex = static_cast<MyOptIndex>(index);
+    switch (optIndex) {
+        case MyOptIndex::OPT_INDEX_HEVC:
+            opt.codec = CodecMime::HEVC;
+            break;
+        case MyOptIndex::OPT_INDEX_VP9:
+            opt.codec = CodecMime::VP9;
+            break;
+        case MyOptIndex::OPT_INDEX_MPEG4:
+            opt.codec = CodecMime::MPEG4;
+            break;
+        default:
+            ShowUsage();
+            break;
+    }
+}
 bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
 {
     while (1) {
@@ -52,9 +60,6 @@ bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
         switch (index) {
             case MyOptIndex::OPT_INDEX_BUFFER_HANDLE:
                 opt.useBuffer = true;
-                break;
-            case MyOptIndex::OPT_INDEX_HEVC:
-                opt.codec = codecMime::HEVC;
                 break;
             case MyOptIndex::OPT_INDEX_HELP:
                 ShowUsage();
@@ -77,7 +82,7 @@ bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
                 }
                 break;
             default:
-                ShowUsage();
+                ParseCodingType(index, opt);
                 break;
         }
     }
@@ -97,7 +102,9 @@ void CommandParse::ShowUsage()
     std::cout << " -cN, --color=N             The color format in the file. 0 is YUV420SP, 1 is RGBA888, 2 is BGRA888, "
                  "the default is 0."
               << std::endl;
-    std::cout << " --HEVC                     HEVC decode or HEVC encode, AVC for default." << std::endl;
+    std::cout << " --HEVC                     HEVC decode or encode, AVC for default." << std::endl;
+    std::cout << " --MPEG4                    MPEG4 decode or encode, AVC for default." << std::endl;
+    std::cout << " --VP9                      VP9 decode or encode, AVC for default." << std::endl;
     std::cout << " --nocopy                   Support BufferHandle." << std::endl;
     std::cout << " --help                     The help info." << std::endl;
 }
