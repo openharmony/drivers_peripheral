@@ -25,10 +25,8 @@
 #include <sys/types.h>
 
 #include "hdf_base.h"
-#include "hdf_log.h"
 #include "securec.h"
-
-#define HDF_LOG_TAG ThermalSimulationNode
+#include "thermal_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -71,13 +69,13 @@ int32_t ThermalSimulationNode::CreateNodeDir(std::string dir)
     if (access(dir.c_str(), 0) != NUM_ZERO) {
         int32_t flag = mkdir(dir.c_str(), S_IRWXU | S_IRWXG | S_IROTH| S_IXOTH);
         if (flag == NUM_ZERO) {
-            HDF_LOGI("%{public}s: Create directory successfully.", __func__);
+            THERMAL_HILOGI(COMP_HDI, "Create directory successfully.");
         } else {
-            HDF_LOGE("%{public}s: Fail to create directory, flag: %{public}d", __func__, flag);
+            THERMAL_HILOGE(COMP_HDI, "Fail to create directory, flag: %{public}d", flag);
             return flag;
         }
     } else {
-        HDF_LOGE("%{public}s: This directory already exists.", __func__);
+        THERMAL_HILOGD(COMP_HDI, "This directory already exists.");
     }
     return HDF_SUCCESS;
 }
@@ -88,11 +86,11 @@ int32_t ThermalSimulationNode::CreateNodeFile(std::string filePath)
     if (access(filePath.c_str(), 0) != 0) {
         fd = open(filePath.c_str(), O_CREAT | O_RDWR, S_IRUSR | S_IWUSR | S_IRGRP| S_IROTH);
         if (fd < NUM_ZERO) {
-            HDF_LOGE("%{public}s: open failed to file.", __func__);
+            THERMAL_HILOGE(COMP_HDI, "open failed to file.");
             return fd;
         }
     } else {
-        HDF_LOGI("%{public}s: the file already exists.", __func__);
+        THERMAL_HILOGD(COMP_HDI, "the file already exists.");
     }
     return HDF_SUCCESS;
 }
@@ -121,14 +119,14 @@ int32_t ThermalSimulationNode::AddSensorTypeTemp()
         if (ret < NUM_ZERO) {
             return HDF_FAILURE;
         }
-        HDF_LOGI("%{public}s: node name: %{public}s", __func__, nodeBuf);
+        THERMAL_HILOGI(COMP_HDI, "node name: %{public}s", nodeBuf);
         CreateNodeDir(static_cast<std::string>(nodeBuf));
         for (auto file : vFile) {
             ret = snprintf_s(fileBuf, PATH_MAX, sizeof(fileBuf) - ARG_1, thermalFileDir.c_str(), nodeBuf, file.c_str());
             if (ret < NUM_ZERO) {
                 return HDF_FAILURE;
             }
-            HDF_LOGI("%{public}s: file name: %{public}s", __func__, fileBuf);
+            THERMAL_HILOGI(COMP_HDI, "file name: %{public}s", fileBuf);
             CreateNodeFile(static_cast<std::string>(fileBuf));
         }
         ret = snprintf_s(typeBuf, PATH_MAX, sizeof(typeBuf) - ARG_1, thermalTypeDir.c_str(), dir.first.c_str());
@@ -201,7 +199,7 @@ int32_t ThermalSimulationNode::WriteFile(std::string path, std::string buf, size
 {
     int32_t fd = open(path.c_str(), O_RDWR);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: open failed to file.", __func__);
+        THERMAL_HILOGE(COMP_HDI, "open failed to file.");
     }
     write(fd, buf.c_str(), size);
     close(fd);

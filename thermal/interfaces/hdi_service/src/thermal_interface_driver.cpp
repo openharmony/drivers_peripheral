@@ -15,12 +15,9 @@
 
 #include <hdf_base.h>
 #include <hdf_device_desc.h>
-#include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
 #include <osal_mem.h>
 #include "thermal_interface_impl.h"
-
-#define HDF_LOG_TAG ThermalInterfaceDriver
 
 using namespace OHOS::HDI::Thermal::V1_0;
 
@@ -41,7 +38,6 @@ static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
 
     (void)SbufToParcel(reply, &replyParcel);
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:invalid data sbuf object to dispatch", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
@@ -50,18 +46,15 @@ static int32_t ThermalInterfaceDriverDispatch(struct HdfDeviceIoClient *client, 
 
 int HdfThermalInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfThermalInterfaceDriverInit enter");
     return HDF_SUCCESS;
 }
 
 int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfThermalInterfaceDriverBind enter");
 
     struct HdfThermalInterfaceHost *hdfThermalInterfaceHost = (struct HdfThermalInterfaceHost *)OsalMemAlloc(
         sizeof(struct HdfThermalInterfaceHost));
     if (hdfThermalInterfaceHost == nullptr) {
-        HDF_LOGE("HdfThermalInterfaceDriverBind OsalMemAlloc HdfThermalInterfaceHost failed!");
         return HDF_FAILURE;
     }
 
@@ -76,7 +69,6 @@ int HdfThermalInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
 void HdfThermalInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("HdfThermalInterfaceDriverRelease enter");
     struct HdfThermalInterfaceHost *hdfThermalInterfaceHost =
         CONTAINER_OF(deviceObject->service, struct HdfThermalInterfaceHost, ioservice);
     delete hdfThermalInterfaceHost->service;
@@ -98,3 +90,4 @@ HDF_INIT(g_thermalinterfaceDriverEntry);
 #ifndef __cplusplus
 }
 #endif
+

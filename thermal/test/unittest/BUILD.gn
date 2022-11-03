@@ -22,6 +22,7 @@ ohos_unittest("hdi_unittest_thermal") {
 
   include_dirs = [
     "//drivers/peripheral/thermal/interfaces",
+    "//drivers/peripheral/thermal/interfaces/hdi_service/include",
     "//drivers/peripheral/thermal/interfaces/include/",
   ]
 
@@ -49,3 +50,4 @@ ohos_unittest("hdi_unittest_thermal") {
     external_deps = [ "hilog:libhilog" ]
   }
 }
+
