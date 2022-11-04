@@ -13,10 +13,10 @@
 
 import("//build/test.gni")
 
-group("hdf_composer_unittest") {
+group("hdf_display_device_test") {
   testonly = true
   deps = [
-    ":composer_ut",
+    ":dispcomptest",
   ]
 }
 
@@ -26,10 +26,10 @@ config("module_private_config") {
   visibility = [ ":*" ]
 }
 
-ohos_unittest("composer_ut") {
+ohos_unittest("dispcomptest") {
   module_out_path = module_output_path
   sources = [
-    "hdi_composer_ut.cpp",
+    "hdi_device_test.cpp",
   ]
   deps = [
     "//drivers/peripheral/display/standard/composer/test/common:disp_dev_hdi_test_common",
