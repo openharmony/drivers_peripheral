@@ -20,6 +20,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include "usbd.h"
 #include "v1_0/iusbd_subscriber.h"
 #include "v1_0/usb_types.h"
 
@@ -53,7 +54,8 @@ namespace V1_0 {
 class UsbdPort {
 public:
     static UsbdPort &GetInstance();
-    int32_t SetPort(int32_t portId, int32_t powerRole, int32_t dataRole, const sptr<IUsbdSubscriber> &callbackObj);
+    int32_t SetPort(int32_t portId, int32_t powerRole, int32_t dataRole,
+        UsbdSubscriber *usbdSubscribers, uint32_t len);
     int32_t QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode);
     int32_t UpdatePort(int32_t mode, const sptr<IUsbdSubscriber> &subscriber);
 
