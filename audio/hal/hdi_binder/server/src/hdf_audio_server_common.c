@@ -1378,6 +1378,10 @@ int32_t HdiServiceInitAllPorts(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    if (adapter == NULL) {
+        AUDIO_FUNC_LOGE("adapter is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     if (adapter->InitAllPorts(adapter)) {
         AUDIO_FUNC_LOGE("InitAllPorts fail");
         return AUDIO_HAL_ERR_INTERNAL;
@@ -1457,6 +1461,10 @@ int32_t HdiServiceGetPortCapability(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("HdiServiceCreatRender adapter is NULL!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
+    if (adapter->GetPortCapability == NULL) {
+        AUDIO_FUNC_LOGE("GetPortCapability is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     int32_t ret = adapter->GetPortCapability(adapter, &port, &capability);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("GetPortCapability failed ret = %{public}d", ret);
@@ -1507,6 +1515,10 @@ int32_t HdiServiceSetPassthroughMode(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("HdiServiceCreatRender adapter is NULL!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
+    if (adapter->SetPassthroughMode == NULL) {
+        AUDIO_FUNC_LOGE("SetPassthroughMode is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     int ret = adapter->SetPassthroughMode(adapter, &port, mode);
     return ret;
 }
@@ -1549,6 +1561,10 @@ int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *client,
     if (adapter == NULL) {
         AUDIO_FUNC_LOGE("adapter is NULL!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+    if (adapter->GetPassthroughMode == NULL) {
+        AUDIO_FUNC_LOGE("GetPassthroughMode is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = adapter->GetPassthroughMode(adapter, &port, &mode);
     if (ret < 0) {
@@ -1894,6 +1910,10 @@ static int32_t HdiSerStubUpdateAudioRoute(const struct HdfDeviceIoClient *client
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
+    if (adapter->UpdateAudioRoute == NULL) {
+        AUDIO_FUNC_LOGE("UpdateAudioRoute is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     audioAdapterRet = adapter->UpdateAudioRoute(adapter, route, &routeHandle);
     if (audioAdapterRet != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call UpdateAudioRoute function failed!", __func__);
@@ -1937,6 +1957,10 @@ static int32_t HdiSerStubReleaseAudioRoute(const struct HdfDeviceIoClient *clien
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
+    if (adapter == NULL || adapter->ReleaseAudioRoute == NULL) {
+        AUDIO_FUNC_LOGE("adapter or ReleaseAudioRoute is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     audioAdapterRet = adapter->ReleaseAudioRoute(adapter, routeHandle);
     if (audioAdapterRet != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call ReleaseAudioRoute function failed!", __func__);
@@ -1972,10 +1996,11 @@ static int32_t HdiServiceAdapterSetVoiceVolume(const struct HdfDeviceIoClient *c
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
-    if (adapter == NULL) {
-        AUDIO_FUNC_LOGE("adapter is NULL");
+    if (adapter == NULL || adapter->SetVoiceVolume == NULL) {
+        AUDIO_FUNC_LOGE("adapter or SetVoiceVolume is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
+
     return adapter->SetVoiceVolume(adapter, volume);
 }
 
@@ -2002,14 +2027,15 @@ static int32_t HdiServiceAdapterSetExtraParams(const struct HdfDeviceIoClient *c
         AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (adapter == NULL) {
-        AUDIO_FUNC_LOGE("adapter is NULL");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
 
     value = HdfSbufReadString(data);
     if (value == NULL) {
         AUDIO_FUNC_LOGE("value is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (adapter == NULL || adapter->SetExtraParams == NULL) {
+        AUDIO_FUNC_LOGE("adapter or SetExtraParams is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
@@ -2040,13 +2066,14 @@ static int32_t HdiServiceAdapterGetExtraParams(const struct HdfDeviceIoClient *c
         AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter FAIL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (adapter == NULL) {
-        AUDIO_FUNC_LOGE("adapter is NULL");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
 
     if (!HdfSbufReadInt32(data, &length)) {
         AUDIO_FUNC_LOGE("HdiServiceAdapterGetExtraParams FAIL! length is 0.");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (adapter == NULL || adapter->GetExtraParams == NULL) {
+        AUDIO_FUNC_LOGE("adapter or GetExtraParams is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
