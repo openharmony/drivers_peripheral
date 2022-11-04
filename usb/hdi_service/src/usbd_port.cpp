@@ -114,15 +114,20 @@ int32_t UsbdPort::SetPortInit(int32_t portId, int32_t powerRole, int32_t dataRol
     return HDF_SUCCESS;
 }
 
-int32_t UsbdPort::SetPort(int32_t portId, int32_t powerRole, int32_t dataRole, const sptr<IUsbdSubscriber> &callbackObj)
+int32_t UsbdPort::SetPort(int32_t portId, int32_t powerRole, int32_t dataRole,
+    UsbdSubscriber *usbdSubscribers, uint32_t len)
 {
     int32_t ret = SetPortInit(portId, powerRole, dataRole);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: SetPortInit failed! ret:%{public}d", __func__, ret);
         return ret;
     }
+    for (uint32_t i = 0; i < len; i++) {
+        if (usbdSubscribers[i].subscriber != nullptr) {
+            usbdSubscribers[i].subscriber->PortChangedEvent(currentPortInfo_);
+        }
+    }
 
-    callbackObj->PortChangedEvent(currentPortInfo_);
     return HDF_SUCCESS;
 }
 
