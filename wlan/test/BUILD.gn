@@ -23,7 +23,7 @@ if (!defined(ohos_lite)) {
   if (HAVE_WLAN_HALUT_PATH) {
     import("$WLAN_HALUT_PATH/product.gni")
   } else {
-    enable_HDF_UT = true
+    enable_HDF_UT = false
   }
 }
 
