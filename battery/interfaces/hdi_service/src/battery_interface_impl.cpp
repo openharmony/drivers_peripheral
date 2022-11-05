@@ -24,6 +24,7 @@ namespace Battery {
 namespace V1_1 {
 namespace {
 sptr<BatteryInterfaceImpl::BatteryDeathRecipient> g_deathRecipient = nullptr;
+bool g_isHdiStart = false;
 }
 
 extern "C" IBatteryInterface *BatteryInterfaceImplGetInstance(void)
@@ -82,15 +83,18 @@ int32_t BatteryInterfaceImpl::Register(const sptr<IBatteryCallback>& callback)
         BATTERY_HILOGW(FEATURE_BATT_INFO, "callback is nullptr");
         return HDF_ERR_INVALID_PARAM;
     }
-    batteryCallback_ = callback;
-    loop_->InitCallback(batteryCallback_);
+    if (!g_isHdiStart) {
+        batteryCallback_ = callback;
+        loop_->InitCallback(batteryCallback_);
 
-    g_deathRecipient = new BatteryInterfaceImpl::BatteryDeathRecipient(this);
-    if (g_deathRecipient == nullptr) {
-        BATTERY_HILOGE(COMP_HDI, "Failed to allocate BatteryDeathRecipient");
-        return HDF_ERR_MALLOC_FAIL;
+        g_deathRecipient = new BatteryInterfaceImpl::BatteryDeathRecipient(this);
+        if (g_deathRecipient == nullptr) {
+            BATTERY_HILOGE(COMP_HDI, "Failed to allocate BatteryDeathRecipient");
+            return HDF_ERR_MALLOC_FAIL;
+        }
+        AddBatteryDeathRecipient(batteryCallback_);
+        g_isHdiStart = true;
     }
-    AddBatteryDeathRecipient(batteryCallback_);
     return HDF_SUCCESS;
 }
 
