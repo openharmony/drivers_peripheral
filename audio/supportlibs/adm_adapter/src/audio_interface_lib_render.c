@@ -1212,12 +1212,10 @@ int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
         ret = service->dispatcher->Dispatch(&service->object, cmdId, sBuf, reply);
         if (ret != HDF_SUCCESS) {
             LOG_FUN_ERR("Failed to send service call!");
-            AudioBufReplyRecycle(sBuf, reply);
             return ret;
         }
         if (!HdfSbufReadUint32(reply, &buffStatus)) {
             LOG_FUN_ERR("Failed to Get buffStatus!");
-            AudioBufReplyRecycle(sBuf, reply);
             return HDF_FAILURE;
         }
         if (buffStatus == CIR_BUFF_FULL) {

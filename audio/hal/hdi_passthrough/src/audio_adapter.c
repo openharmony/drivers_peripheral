@@ -17,6 +17,7 @@
 #include "audio_adapter.h"
 #include "audio_interface_lib_capture.h"
 #include "audio_interface_lib_render.h"
+#include "osal_mem.h"
 
 #define CONFIG_CHANNEL_COUNT  2 // two channels
 #define GAIN_MAX 50.0
@@ -453,6 +454,15 @@ int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender)
     return HDF_SUCCESS;
 }
 
+void AudioCreateRenderRelease(struct AudioHwRender **hwRender)
+{
+    if (hwRender != NULL && *hwRender != NULL) {
+        AudioMemFree((void **)&((*hwRender)->renderParam.frameRenderMode.buffer));
+    }
+    AudioMemFree((void **)hwRender);
+    return;
+}
+
 int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
                                  const struct AudioSampleAttributes *attrs, struct AudioRender **render)
 {
@@ -477,28 +487,28 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
     int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwAdapter);
     if (ret != 0) {
         LOG_FUN_ERR("AudioAdapterCreateRenderPre fail");
-        AudioMemFree((void **)&hwRender);
+        AudioCreateRenderRelease(&hwRender);
         return HDF_FAILURE;
     }
     /* bindRenderService */
     hwRender->devDataHandle = (*pBindServiceRender)(RENDER_CMD);
     if (hwRender->devDataHandle == NULL) {
         LOG_FUN_ERR("Render bind service failed");
-        AudioMemFree((void **)&hwRender);
+        AudioCreateRenderRelease(&hwRender);
         return HDF_FAILURE;
     }
     hwRender->devCtlHandle = (*pBindServiceRender)(CTRL_CMD);
     if (hwRender->devCtlHandle == NULL) {
         LOG_FUN_ERR("Render bind service failed");
         AudioReleaseRenderHandle(hwRender);
-        AudioMemFree((void **)&hwRender);
+        AudioCreateRenderRelease(&hwRender);
         return HDF_FAILURE;
     }
     ret = AudioAdapterBindServiceRender(hwRender);
     if (ret != 0) {
         LOG_FUN_ERR("AudioAdapterBindServiceRender fail");
         AudioReleaseRenderHandle(hwRender);
-        AudioMemFree((void **)&hwRender);
+        AudioCreateRenderRelease(&hwRender);
         return HDF_FAILURE;
     }
     hwAdapter->adapterMgrRenderFlag++;
