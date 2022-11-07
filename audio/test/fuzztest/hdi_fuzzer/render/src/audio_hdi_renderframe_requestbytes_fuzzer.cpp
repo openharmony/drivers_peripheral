@@ -27,21 +27,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         return ret;
     }
     uint64_t replyBytes = 0;
-    char *frame = (char *)calloc(1, BUFFER_LENTH);
-    if (frame == nullptr) {
-        render->control.Stop((AudioHandle)render);
-        adapter->DestroyRender(adapter, render);
-        manager->UnloadAdapter(manager, adapter);
-        return 0;
-    }
-    uint64_t requestBytesFuzz = size;
-    render->RenderFrame(render, frame, requestBytesFuzz, &replyBytes);
+    char *frame = (char *)data;
+    ret = render->RenderFrame(render, frame, size, &replyBytes);
 
     render->control.Stop((AudioHandle)render);
     adapter->DestroyRender(adapter, render);
     manager->UnloadAdapter(manager, adapter);
     render = nullptr;
-    free(frame);
-    frame = nullptr;
     return 0;
 }
