@@ -35,8 +35,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
         manager->UnloadAdapter(manager, adapter);
         return 0;
     }
-    uint8_t *dataFuzz = const_cast<uint8_t *>(data);
-    struct AudioCapture *captureFuzz = reinterpret_cast<struct AudioCapture *>(dataFuzz);
+    struct AudioCapture *captureFuzz = (struct AudioCapture *)data;
     capture->CaptureFrame(captureFuzz, frame, requestBytes, &replyBytes);
 
     capture->control.Stop((AudioHandle)capture);
