@@ -143,6 +143,10 @@ int32_t HdiServiceCreatRender(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("AudioCreatRenderCheck: Render is working can not replace!");
         return ret;
     }
+    if (adapter->CreateRender == NULL) {
+        AUDIO_FUNC_LOGE("CreateRender is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
     if (render == NULL || ret < 0) {
         AUDIO_FUNC_LOGE("Failed to CreateRender");
@@ -183,6 +187,10 @@ int32_t HdiServiceRenderDestory(const struct HdfDeviceIoClient *client,
     if (adapter == NULL || render == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
+    if (adapter->DestroyRender == NULL) {
+        AUDIO_FUNC_LOGE("DestroyRender is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = adapter->DestroyRender(adapter, render);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("DestroyRender failed!");
@@ -204,6 +212,10 @@ int32_t HdiServiceRenderStart(const struct HdfDeviceIoClient *client, struct Hdf
     if (ret < 0) {
         return ret;
     }
+    if (render == NULL || render->control.Start == NULL) {
+        AUDIO_FUNC_LOGE("render or Start is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->control.Start((AudioHandle)render);
 }
 
@@ -216,6 +228,10 @@ int32_t HdiServiceRenderStop(const struct HdfDeviceIoClient *client, struct HdfS
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->control.Stop == NULL) {
+        AUDIO_FUNC_LOGE("render or Stop is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     return render->control.Stop((AudioHandle)render);
 }
@@ -231,6 +247,10 @@ int32_t HdiServiceRenderPause(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
+    if (render == NULL || render->control.Pause == NULL) {
+        AUDIO_FUNC_LOGE("render or Pause is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->control.Pause((AudioHandle)render);
 }
 
@@ -243,6 +263,10 @@ int32_t HdiServiceRenderResume(const struct HdfDeviceIoClient *client, struct Hd
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->control.Resume == NULL) {
+        AUDIO_FUNC_LOGE("render or Resume is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     return render->control.Resume((AudioHandle)render);
 }
@@ -258,6 +282,10 @@ int32_t HdiServiceRenderFlush(const struct HdfDeviceIoClient *client, struct Hdf
     if (ret < 0) {
         return ret;
     }
+    if (render == NULL || render->control.Flush == NULL) {
+        AUDIO_FUNC_LOGE("render or Flush is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->control.Flush((AudioHandle)render);
 }
 
@@ -272,6 +300,10 @@ int32_t HdiServiceRenderGetFrameSize(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->attr.GetFrameSize == NULL) {
+        AUDIO_FUNC_LOGE("render or GetFrameSize is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     if (render->attr.GetFrameSize((AudioHandle)render, &size)) {
         return AUDIO_HAL_ERR_INTERNAL;
@@ -294,6 +326,10 @@ int32_t HdiServiceRenderGetFrameCount(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->attr.GetFrameCount == NULL) {
+        AUDIO_FUNC_LOGE("render or GetFrameCount is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     if (render->attr.GetFrameCount((AudioHandle)render, &count)) {
         return AUDIO_HAL_ERR_INTERNAL;
@@ -320,6 +356,10 @@ int32_t HdiServiceRenderSetSampleAttr(const struct HdfDeviceIoClient *client,
     if (ReadAudioSapmleAttrbutes(data, &attrs) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    if (render == NULL || render->attr.SetSampleAttributes == NULL) {
+        AUDIO_FUNC_LOGE("render or SetSampleAttributes is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->attr.SetSampleAttributes((AudioHandle)render, &attrs);
 }
 
@@ -334,6 +374,10 @@ int32_t HdiServiceRenderGetSampleAttr(const struct HdfDeviceIoClient *client,
     int32_t ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->attr.GetSampleAttributes == NULL) {
+        AUDIO_FUNC_LOGE("render or GetSampleAttributes is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = render->attr.GetSampleAttributes((AudioHandle)render, &attrs);
     if (ret < 0) {
@@ -356,6 +400,10 @@ int32_t HdiServiceRenderGetCurChannelId(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->attr.GetCurrentChannelId == NULL) {
+        AUDIO_FUNC_LOGE("render or GetCurrentChannelId is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = render->attr.GetCurrentChannelId((AudioHandle)render, &channelId);
     if (ret < 0) {
@@ -388,6 +436,10 @@ int32_t HdiServiceRenderCheckSceneCapability(const struct HdfDeviceIoClient *cli
         return AUDIO_HAL_ERR_INTERNAL;
     }
     scene.desc.pins = (enum AudioPortPin)temporaryPins;
+    if (render == NULL || render->scene.CheckSceneCapability == NULL) {
+        AUDIO_FUNC_LOGE("render or CheckSceneCapability is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = render->scene.CheckSceneCapability((AudioHandle)render, &scene, &supported);
     if (ret < 0) {
         return ret;
@@ -421,6 +473,10 @@ int32_t HdiServiceRenderSelectScene(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     scene.desc.pins = (enum AudioPortPin)tempPins;
+    if (render == NULL || render->scene.SelectScene == NULL) {
+        AUDIO_FUNC_LOGE("render or SelectScene is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->scene.SelectScene((AudioHandle)render, &scene);
 }
 
@@ -436,6 +492,10 @@ int32_t HdiServiceRenderGetMute(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->volume.GetMute == NULL) {
+        AUDIO_FUNC_LOGE("render or GetMute is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = render->volume.GetMute((AudioHandle)render, &mute);
     if (ret < 0) {
@@ -465,6 +525,10 @@ int32_t HdiServiceRenderSetMute(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     mute = (bool)tempMute;
+    if (render == NULL || render->volume.SetMute == NULL) {
+        AUDIO_FUNC_LOGE("render or SetMute is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->volume.SetMute((AudioHandle)render, mute);
 }
 
@@ -484,6 +548,10 @@ int32_t HdiServiceRenderSetVolume(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     float setVolume = (float)volume / VOLUME_CHANGE;
+    if (render == NULL || render->volume.SetVolume == NULL) {
+        AUDIO_FUNC_LOGE("render or SetVolume is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->volume.SetVolume((AudioHandle)render, setVolume);
 }
 
@@ -498,6 +566,10 @@ int32_t HdiServiceRenderGetVolume(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->volume.GetVolume == NULL) {
+        AUDIO_FUNC_LOGE("render or GetVolume is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = render->volume.GetVolume((AudioHandle)render, &volume);
     if (ret < 0) {
@@ -521,6 +593,10 @@ int32_t HdiServiceRenderGetGainThreshold(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->volume.GetGainThreshold == NULL) {
+        AUDIO_FUNC_LOGE("render or GetGainThreshold is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = render->volume.GetGainThreshold((AudioHandle)render, &min, &max);
     if (ret < 0) {
@@ -549,6 +625,10 @@ int32_t HdiServiceRenderGetGain(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
+    if (render == NULL || render->volume.GetGain == NULL) {
+        AUDIO_FUNC_LOGE("render or GetGain is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = render->volume.GetGain((AudioHandle)render, &gain);
     if (ret < 0) {
         return ret;
@@ -575,6 +655,10 @@ int32_t HdiServiceRenderSetGain(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint32(data, &tempGain)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    if (render == NULL || render->volume.SetGain == NULL) {
+        AUDIO_FUNC_LOGE("render or SetGain is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->volume.SetGain((AudioHandle)render, (float)tempGain);
 }
 
@@ -589,6 +673,10 @@ int32_t HdiServiceRenderGetLatency(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->GetLatency == NULL) {
+        AUDIO_FUNC_LOGE("render or GetLatency is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = render->GetLatency((AudioHandle)render, &ms);
     if (ret < 0) {
@@ -632,6 +720,10 @@ int32_t HdiServiceRenderRenderFrame(const struct HdfDeviceIoClient *client,
     }
     AudioSetRenderStatus(adapterName, true);
     (void)OsalMutexLock(&g_renderLock);
+    if (render == NULL || render->RenderFrame == NULL) {
+        AUDIO_FUNC_LOGE("render or RenderFrame is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = render->RenderFrame((AudioHandle)render, (const void *)frame, (uint64_t)requestBytes, &replyBytes);
     (void)OsalMutexUnlock(&g_renderLock);
     AudioSetRenderStatus(adapterName, false);
@@ -656,6 +748,10 @@ int32_t HdiServiceRenderGetRenderPosition(const struct HdfDeviceIoClient *client
         return ret;
     }
     (void)OsalMutexLock(&g_renderLock);
+    if (render == NULL || render->GetRenderPosition == NULL) {
+        AUDIO_FUNC_LOGE("render or GetRenderPosition is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = render->GetRenderPosition((AudioHandle)render, &frames, &time);
     (void)OsalMutexUnlock(&g_renderLock);
     if (ret < 0) {
@@ -679,6 +775,10 @@ int32_t HdiServiceRenderGetSpeed(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->GetRenderSpeed == NULL) {
+        AUDIO_FUNC_LOGE("render or GetRenderSpeed is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = render->GetRenderSpeed((AudioHandle)render, &speed);
     if (ret < 0) {
@@ -706,6 +806,10 @@ int32_t HdiServiceRenderSetSpeed(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint64(data, &speed)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    if (render == NULL || render->SetRenderSpeed == NULL) {
+        AUDIO_FUNC_LOGE("render or SetRenderSpeed is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->SetRenderSpeed((AudioHandle)render, (float)speed);
 }
 
@@ -727,6 +831,10 @@ int32_t HdiServiceRenderSetChannelMode(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     mode = (enum AudioChannelMode)tempMode;
+    if (render == NULL || render->SetChannelMode == NULL) {
+        AUDIO_FUNC_LOGE("render or SetChannelMode is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->SetChannelMode((AudioHandle)render, mode);
 }
 
@@ -742,6 +850,10 @@ int32_t HdiServiceRenderGetChannelMode(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         AUDIO_FUNC_LOGE("CheckAndGetRender failed.");
         return ret;
+    }
+    if (render == NULL || render->GetChannelMode == NULL) {
+        AUDIO_FUNC_LOGE("render or GetChannelMode is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = render->GetChannelMode((AudioHandle)render, &mode);
     if (ret < 0) {
@@ -770,6 +882,10 @@ int32_t HdiServiceRenderSetExtraParams(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("keyValueList Is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    if (render == NULL || render->attr.SetExtraParams == NULL) {
+        AUDIO_FUNC_LOGE("render or SetExtraParams is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->attr.SetExtraParams((AudioHandle)render, keyValueList);
 }
 
@@ -792,6 +908,10 @@ int32_t HdiServiceRenderGetExtraParams(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     char keyValueList[STR_MAX] = { 0 };
+    if (render == NULL || render->attr.GetExtraParams == NULL) {
+        AUDIO_FUNC_LOGE("render or GetExtraParams is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = render->attr.GetExtraParams((AudioHandle)render, keyValueList, listLenth);
     if (ret < 0) {
         return ret;
@@ -821,6 +941,10 @@ int32_t HdiServiceRenderReqMmapBuffer(const struct HdfDeviceIoClient *client,
     if (HdiServiceReqMmapBuffer(&desc, data) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    if (render == NULL || render->attr.ReqMmapBuffer == NULL) {
+        AUDIO_FUNC_LOGE("render or ReqMmapBuffer is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->attr.ReqMmapBuffer((AudioHandle)render, reqSize, &desc);
 }
 
@@ -837,6 +961,10 @@ int32_t HdiServiceRenderGetMmapPosition(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->attr.GetMmapPosition == NULL) {
+        AUDIO_FUNC_LOGE("render or GetMmapPosition is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = render->attr.GetMmapPosition((AudioHandle)render, &frames, &time);
     if (ret < 0) {
@@ -871,6 +999,10 @@ int32_t HdiServiceRenderAddEffect(const struct HdfDeviceIoClient *client,
         return HDF_FAILURE;
     }
 
+    if (render->attr.AddAudioEffect == NULL) {
+        AUDIO_FUNC_LOGE("AddAudioEffect is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->attr.AddAudioEffect((AudioHandle)render, effectid);
 }
 
@@ -896,6 +1028,10 @@ int32_t HdiServiceRenderRemoveEffect(const struct HdfDeviceIoClient *client,
         return HDF_FAILURE;
     }
 
+    if (render->attr.RemoveAudioEffect == NULL) {
+        AUDIO_FUNC_LOGE("RemoveAudioEffect is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->attr.RemoveAudioEffect((AudioHandle)render, effectid);
 }
 
@@ -910,6 +1046,10 @@ int32_t HdiServiceRenderTurnStandbyMode(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetRender(&render, data);
     if (ret < 0) {
         return ret;
+    }
+    if (render == NULL || render->control.Stop == NULL) {
+        AUDIO_FUNC_LOGE("render or Stop is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     return render->control.Stop((AudioHandle)render);
 }
@@ -934,6 +1074,10 @@ int32_t HdiServiceRenderDevDump(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t fd = ret;
+    if (render == NULL || render->control.AudioDevDump == NULL) {
+        AUDIO_FUNC_LOGE("render or AudioDevDump is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->control.AudioDevDump((AudioHandle)render, range, fd);
 }
 
@@ -960,6 +1104,10 @@ int32_t HdiServiceRenderRegCallback(const struct HdfDeviceIoClient *client, stru
         return AUDIO_HAL_ERR_INTERNAL;
     }
     pCallback = (RenderCallback)(uintptr_t)tempAddr;
+    if (render == NULL || render->RegCallback == NULL) {
+        AUDIO_FUNC_LOGE("render or RegCallback is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->RegCallback((AudioHandle)render, pCallback, cookie);
 }
 
@@ -979,6 +1127,10 @@ int32_t HdiServiceRenderDrainBuffer(const struct HdfDeviceIoClient *client, stru
         return AUDIO_HAL_ERR_INTERNAL;
     }
     type = (enum AudioDrainNotifyType)tempType;
+    if (render == NULL || render->DrainBuffer == NULL) {
+        AUDIO_FUNC_LOGE("render or DrainBuffer is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return render->DrainBuffer((AudioHandle)render, &type);
 }
 
