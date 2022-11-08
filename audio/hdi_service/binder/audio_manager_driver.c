@@ -54,7 +54,13 @@ static int32_t AudioManagerDriverDispatch(
 
 static int32_t HdfAudioManagerDriverInit(struct HdfDeviceObject *deviceObject)
 {
-    (void)deviceObject;
+    if (deviceObject == NULL) {
+        AUDIO_FUNC_LOGE("deviceObject is null!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO)) {
+        AUDIO_FUNC_LOGE("Set Primary DEVICE_CLASS_AUDIO fail!");
+    }
 
     return HDF_SUCCESS;
 }
