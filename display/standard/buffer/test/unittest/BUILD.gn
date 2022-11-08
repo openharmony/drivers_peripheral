@@ -38,3 +38,27 @@ ohos_unittest("dispbuf_ut") {
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_display"
 }
+
+ohos_unittest("death_test") {
+  module_out_path = module_output_path
+  sources = [ "death_test.cpp" ]
+  deps = [
+    "//third_party/googletest:gtest_main",
+  ]
+  include_dirs = [
+    "utils",
+    "//drivers/peripheral/base",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
+  ]
+  external_deps = [
+    "hdf_core:libhdf_utils",
+    "utils_base:utils",
+    "ipc:ipc_core",
+    "hiviewdfx_hilog_native:libhilog",
+    "hdf_core:libdisplay_buffer_hdi_impl",
+    "drivers_interface_display:display_buffer_idl_headers",
+    "drivers_interface_display:display_composer_idl_headers",
+  ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_display"
+}
