@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,6 +47,7 @@ public:
     DCamRetCode ReturnDCameraBuffer(const DCameraBuffer &buffer);
     DCamRetCode FinishCommitStream();
     bool HasBufferQueue();
+    void DoCapture();
     void CancelCaptureWait();
 
 private:
@@ -56,6 +57,7 @@ private:
     void SetSurfaceBuffer(OHOS::sptr<OHOS::SurfaceBuffer>& surfaceBuffer, const DCameraBuffer &buffer);
     DCamRetCode CancelDCameraBuffer();
     DCamRetCode FlushDCameraBuffer(const DCameraBuffer &buffer);
+    uint64_t GetVideoTimeStamp();
 
 private:
     int32_t index_ = -1;
