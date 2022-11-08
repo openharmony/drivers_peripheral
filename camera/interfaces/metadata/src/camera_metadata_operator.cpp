@@ -241,7 +241,9 @@ int AddCameraMetadataItem(common_metadata_header_t *dst, uint32_t item, const vo
 {
     METADATA_DEBUG_LOG("AddCameraMetadataItem start");
     const char *name = GetCameraMetadataItemName(item);
-    name = name ? name : "<unknown>";
+    if (name == nullptr) {
+        name = "<unknown>";
+    }
     METADATA_DEBUG_LOG("AddCameraMetadataItem item id: %{public}u, name: %{public}s, "
                        "dataCount: %{public}zu", item, name, dataCount);
 
@@ -379,8 +381,10 @@ int FindCameraMetadataItem(const common_metadata_header_t *src, uint32_t item, c
 {
     uint32_t index = 0;
     const char *name = GetCameraMetadataItemName(item);
-    name = name ? name : "<unknown>";
-    METADATA_DEBUG_LOG("FindCameraMetadataItem item id: %{public}u, name: %{public}s",item, name);
+    if (name == nullptr) {
+        name = "<unknown>";
+    }
+    METADATA_DEBUG_LOG("FindCameraMetadataItem item id: %{public}u, name: %{public}s", item, name);
     int ret = FindCameraMetadataItemIndex(src, item, &index);
     if (ret != CAM_META_SUCCESS) {
         return ret;
@@ -500,7 +504,9 @@ int UpdateCameraMetadataItem(common_metadata_header_t *dst, uint32_t item, const
 {
     METADATA_DEBUG_LOG("UpdateCameraMetadataItem item id: %{public}u, dataCount: %{public}u", item, dataCount);
     const char *name = GetCameraMetadataItemName(item);
-    name = name ? name : "<unknown>";
+    if (name == nullptr) {
+        name = "<unknown>";
+    }
     METADATA_DEBUG_LOG("UpdateCameraMetadataItem item id: %{public}u, name: %{public}s, "
                        "dataCount: %{public}u", item, name, dataCount);
     if (!dataCount || data == nullptr) {
