@@ -363,6 +363,7 @@ int32_t DStreamOperator::DoCapture(int32_t captureId, const CaptureInfo &info, b
             DHLOGE("Stream %d has not bufferQueue.", id);
             return CamRetCode::INVALID_ARGUMENT;
         }
+        stream->DoCapture();
         InsertEnableShutter(id, info.enableShutterCallback_);
         DHLOGI("DStreamOperator::DoCapture info: "+
             "captureId=%d, streamId=%d, isStreaming=%d", captureId, id, isStreaming);
