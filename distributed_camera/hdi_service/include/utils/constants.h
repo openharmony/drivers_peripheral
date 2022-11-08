@@ -60,6 +60,7 @@ const std::string ENCODE_TYPE_STR_H265 = "OMX_hisi_video_encoder_hevc";
 const std::string ENCODE_TYPE_STR_JPEG = "jpeg";
 const std::string DC_LOG_TITLE_TAG = "DCAMERA";
 constexpr int32_t LOG_MAX_LEN = 4096;
+constexpr uint64_t SEC_TO_NSEC_TIMES = 1000000000;
 
 typedef enum {
     OHOS_CAMERA_FORMAT_INVALID = 0,
