@@ -241,8 +241,9 @@ int AddCameraMetadataItem(common_metadata_header_t *dst, uint32_t item, const vo
 {
     METADATA_DEBUG_LOG("AddCameraMetadataItem start");
     const char *name = GetCameraMetadataItemName(item);
-    METADATA_INFO_LOG("AddCameraMetadataItem item id: %{public}u, name: %{public}s, "
-                      "dataCount: %{public}zu", item, name ? name : "<unknown>", dataCount);
+    name = name ? name : "<unknown>";
+    METADATA_DEBUG_LOG("AddCameraMetadataItem item id: %{public}u, name: %{public}s, "
+                       "dataCount: %{public}zu", item, name, dataCount);
 
     if (dst == nullptr) {
         METADATA_ERR_LOG("AddCameraMetadataItem common_metadata_header_t is null");
@@ -378,8 +379,8 @@ int FindCameraMetadataItem(const common_metadata_header_t *src, uint32_t item, c
 {
     uint32_t index = 0;
     const char *name = GetCameraMetadataItemName(item);
-    METADATA_INFO_LOG("FindCameraMetadataItem item id: %{public}u, name: %{public}s",
-                      item, name ? name : "<unknown>");
+    name = name ? name : "<unknown>";
+    METADATA_DEBUG_LOG("FindCameraMetadataItem item id: %{public}u, name: %{public}s",item, name);
     int ret = FindCameraMetadataItemIndex(src, item, &index);
     if (ret != CAM_META_SUCCESS) {
         return ret;
@@ -499,8 +500,9 @@ int UpdateCameraMetadataItem(common_metadata_header_t *dst, uint32_t item, const
 {
     METADATA_DEBUG_LOG("UpdateCameraMetadataItem item id: %{public}u, dataCount: %{public}u", item, dataCount);
     const char *name = GetCameraMetadataItemName(item);
-    METADATA_INFO_LOG("UpdateCameraMetadataItem item id: %{public}u, name: %{public}s, "
-                      "dataCount: %{public}u", item, name ? name : "<unknown>", dataCount);
+    name = name ? name : "<unknown>";
+    METADATA_DEBUG_LOG("UpdateCameraMetadataItem item id: %{public}u, name: %{public}s, "
+                       "dataCount: %{public}u", item, name, dataCount);
     if (!dataCount || data == nullptr) {
         METADATA_ERR_LOG("UpdateCameraMetadataItem data is not valid. item: %{public}u, "
                          "dataCount: %{public}u", item, dataCount);
