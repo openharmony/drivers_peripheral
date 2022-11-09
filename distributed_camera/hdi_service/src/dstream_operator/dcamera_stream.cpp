@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -334,18 +334,33 @@ DCamRetCode DCameraStream::ReturnDCameraBuffer(const DCameraBuffer &buffer)
 
 void DCameraStream::SetSurfaceBuffer(OHOS::sptr<OHOS::SurfaceBuffer>& surfaceBuffer, const DCameraBuffer &buffer)
 {
-    int64_t timeStamp = static_cast<int64_t>(GetCurrentLocalTimeStamp());
     if (dcStreamInfo_->intent_ == StreamIntent::VIDEO) {
         int32_t size = (dcStreamInfo_->width_) * (dcStreamInfo_->height_) * YUV_WIDTH_RATIO / YUV_HEIGHT_RATIO;
+        int64_t timeStamp = static_cast<int64_t>(GetVideoTimeStamp());
         surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
         surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
         surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
     } else if (dcStreamInfo_->intent_ == StreamIntent::STILL_CAPTURE) {
         int32_t size = buffer.size_;
+        int64_t timeStamp = static_cast<int64_t>(GetCurrentLocalTimeStamp());
         surfaceBuffer->GetExtraData()->ExtraSet("dataSize", size);
         surfaceBuffer->GetExtraData()->ExtraSet("isKeyFrame", (int32_t)0);
         surfaceBuffer->GetExtraData()->ExtraSet("timeStamp", timeStamp);
     }
+}
+
+uint64_t DCameraStream::GetVideoTimeStamp()
+{
+    struct timespec tp;
+    clock_gettime(CLOCK_MONOTONIC, &tp);
+    return tp.tv_sec * SEC_TO_NSEC_TIMES + tp.tv_nsec;
+}
+
+void DCameraStream::DoCapture()
+{
+    DHLOGI("Do capture, streamId %d", dcStreamInfo_->streamId_);
+    std::lock_guard<std::mutex> lockRequest(requestMutex_);
+    isCancelCapture_ = false;
 }
 
 void DCameraStream::CancelCaptureWait()
