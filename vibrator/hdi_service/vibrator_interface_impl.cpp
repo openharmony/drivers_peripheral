@@ -31,6 +31,7 @@ extern "C" IVibratorInterface *VibratorInterfaceImplGetInstance(void)
 
 int32_t VibratorInterfaceImpl::StartOnce(uint32_t duration)
 {
+    HDF_LOGI("%{public}s: Enter the StartOnce function, duration is %{public}u", __func__, duration);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
     if (vibratorInterface == nullptr || vibratorInterface->StartOnce == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
@@ -45,6 +46,7 @@ int32_t VibratorInterfaceImpl::StartOnce(uint32_t duration)
 
 int32_t VibratorInterfaceImpl::Start(const std::string& effectType)
 {
+    HDF_LOGI("%{public}s: Enter the Start function", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
     if (vibratorInterface == nullptr || vibratorInterface->Start == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
@@ -59,6 +61,7 @@ int32_t VibratorInterfaceImpl::Start(const std::string& effectType)
 
 int32_t VibratorInterfaceImpl::Stop(HdfVibratorMode mode)
 {
+    HDF_LOGI("%{public}s: Enter the Stop function, mode is %{public}u", __func__, mode);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
     if (vibratorInterface == nullptr || vibratorInterface->Stop == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
@@ -86,6 +89,7 @@ int32_t VibratorInterfaceImpl::Stop(HdfVibratorMode mode)
 
 int32_t VibratorInterfaceImpl::GetVibratorInfo(std::vector<HdfVibratorInfo>& vibratorInfo)
 {
+    HDF_LOGI("%{public}s: Enter the GetVibratorInfo function.", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
     if (vibratorInterface == nullptr || vibratorInterface->GetVibratorInfo == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
@@ -118,6 +122,8 @@ int32_t VibratorInterfaceImpl::GetVibratorInfo(std::vector<HdfVibratorInfo>& vib
 
 int32_t VibratorInterfaceImpl::EnableVibratorModulation(uint32_t duration, int32_t intensity, int32_t frequency)
 {
+    HDF_LOGI("%{public}s: duration is %{public}u, intensity is %{public}d, frequency is %{public}d.",
+        __func__, duration, intensity, frequency);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
     if (vibratorInterface == nullptr || vibratorInterface->EnableVibratorModulation == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
