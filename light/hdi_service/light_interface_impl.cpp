@@ -31,6 +31,7 @@ extern "C" ILightInterface *LightInterfaceImplGetInstance(void)
 
 int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
 {
+    HDF_LOGI("%{public}s: Enter the GetLightInfo function.", __func__);
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
     if (lightInterface == nullptr || lightInterface->GetLightInfo == nullptr) {
         HDF_LOGE("%{public}s: get light Module instance failed", __func__);
@@ -57,6 +58,7 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
 
 int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffect& effect)
 {
+    HDF_LOGI("%{public}s: Enter the GetLightInfo function, lightId is %{public}d", __func__, lightId);
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
     if (lightInterface == nullptr || lightInterface->TurnOnLight == nullptr) {
         HDF_LOGE("%{public}s: get light Module instance failed", __func__);
@@ -85,6 +87,7 @@ int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffect& e
 
 int32_t LightInterfaceImpl::TurnOnMultiLights(int32_t lightId, const std::vector<HdfLightColor>& colors)
 {
+    HDF_LOGI("%{public}s: Enter the GetLightInfo function, lightId is %{public}d", __func__, lightId);
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
     if (lightInterface == nullptr || lightInterface->TurnOnMultiLights == nullptr) {
         HDF_LOGE("%{public}s: get light module instance failed", __func__);
@@ -115,6 +118,7 @@ int32_t LightInterfaceImpl::TurnOnMultiLights(int32_t lightId, const std::vector
 
 int32_t LightInterfaceImpl::TurnOffLight(int32_t lightId)
 {
+    HDF_LOGI("%{public}s: Enter the TurnOffLight function, lightId is %{public}d", __func__, lightId);
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
     if (lightInterface == nullptr || lightInterface->TurnOffLight == nullptr) {
         HDF_LOGE("%{public}s: get light Module instance failed", __func__);

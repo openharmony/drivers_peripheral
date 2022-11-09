@@ -139,6 +139,7 @@ void SensorImpl::Init()
 
 int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
 {
+    HDF_LOGI("%{public}s: Enter the GetAllSensorInfo function.", __func__);
     if (sensorInterface == nullptr || sensorInterface->GetAllSensors == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -186,6 +187,7 @@ int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
 
 int32_t SensorImpl::Enable(int32_t sensorId)
 {
+    HDF_LOGI("%{public}s: Enter the Enable function, sensorId is %{public}d", __func__, sensorId);
     if (sensorInterface == nullptr || sensorInterface->Enable == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -201,6 +203,7 @@ int32_t SensorImpl::Enable(int32_t sensorId)
 
 int32_t SensorImpl::Disable(int32_t sensorId)
 {
+    HDF_LOGI("%{public}s: Enter the Disable function, sensorId is %{public}d", __func__, sensorId);
     if (sensorInterface == nullptr || sensorInterface->Disable == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -216,6 +219,8 @@ int32_t SensorImpl::Disable(int32_t sensorId)
 
 int32_t SensorImpl::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
+    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is %{public}lld, reportInterval is %{public}lld.",
+        __func__, sensorId, samplingInterval, reportInterval);
     if (sensorInterface == nullptr || sensorInterface->SetBatch == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -231,7 +236,8 @@ int32_t SensorImpl::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t
 
 int32_t SensorImpl::SetMode(int32_t sensorId, int32_t mode)
 {
-    HDF_LOGI("%{public}s SetMode fail, sensorId %{public}d, mode %{public}d", __func__, sensorId, mode);
+    HDF_LOGI("%{public}s: Enter the SetMode function, sensorId is %{public}d, mode is %{public}d",
+        __func__, sensorId, mode);
     if (sensorInterface == nullptr || sensorInterface->SetMode == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -247,6 +253,8 @@ int32_t SensorImpl::SetMode(int32_t sensorId, int32_t mode)
 
 int32_t SensorImpl::SetOption(int32_t sensorId, uint32_t option)
 {
+    HDF_LOGI("%{public}s: Enter the SetOption function, sensorId is %{public}d, option is %{public}u",
+        __func__, sensorId, option);
     if (sensorInterface == nullptr || sensorInterface->SetOption == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -262,6 +270,7 @@ int32_t SensorImpl::SetOption(int32_t sensorId, uint32_t option)
 
 int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
+    HDF_LOGI("%{public}s: Enter the Register function, groupId is %{public}d", __func__, groupId);
     if (sensorInterface == nullptr || sensorInterface->Register == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
@@ -317,6 +326,7 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallback> &callb
 
 int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallback> &callbackObj)
 {
+    HDF_LOGI("%{public}s: Enter the Unregister function, groupId is %{public}d", __func__, groupId);
     std::lock_guard<std::mutex> lock(g_mutex);
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackObj);
     int32_t ret = UnregisterImpl(groupId, remote.GetRefPtr());
