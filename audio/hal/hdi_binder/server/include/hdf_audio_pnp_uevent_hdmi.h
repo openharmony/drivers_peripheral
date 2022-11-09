@@ -13,13 +13,13 @@
  * limitations under the License.
  */
 
-#ifndef HDF_AUDIO_INPUT_EVENT_H
-#define HDF_AUDIO_INPUT_EVENT_H
+#ifndef HDF_AUDIO_PNP_UEVENT_HDMI_H
+#define HDF_AUDIO_PNP_UEVENT_HDMI_H
 
 #include "hdf_types.h"
 
-/* start input-event to monitor analog headset/headphone */
-int32_t AudioHeadsetPnpInputStartThread(void);
-void AudioHeadsetPnpInputEndThread(void);
+/* start uevent to monitor HDMI */
+int32_t AudioHdmiPnpUeventStartThread(void);
+void AudioHdmiPnpUeventStopThread(void);
 
 #endif
