@@ -91,12 +91,12 @@ static int32_t AudioAnalogHeadsetDeviceCheck(struct AudioPnpUevent *audioPnpUeve
         if (audioPnpUevent->switchState[0] == '0') {
             audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
             audioEvent.deviceType = h2wTypeLast;
-        } else if (audioPnpUevent->switchState[0] == '1') {
+        } else if ((audioPnpUevent->switchState[0] == '1') || (audioPnpUevent->switchState[0] == '2')) {
             audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
             audioEvent.deviceType = HDF_AUDIO_HEADSET;
         } else {
             audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
-            audioEvent.deviceType = HDF_AUDIO_HEADPHONE;
+            audioEvent.deviceType = HDF_AUDIO_DEVICE_UNKOWN;
         }
         h2wTypeLast = audioEvent.deviceType;
     } else {
