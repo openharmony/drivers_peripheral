@@ -29,7 +29,7 @@ const uint32_t HDF_EVENT_CONTENT_MAX_LENGTH = 50 * 1024 * 1024;
 const uint32_t SETTING_VALUE_MAX_LENGTH = 50 * 1024 * 1024;
 public:
     DCameraProvider() = default;
-    virtual ~DCameraProvider() = default;
+    ~DCameraProvider() override = default;
     DCameraProvider(const DCameraProvider &other) = delete;
     DCameraProvider(DCameraProvider &&other) = delete;
     DCameraProvider& operator=(const DCameraProvider &other) = delete;

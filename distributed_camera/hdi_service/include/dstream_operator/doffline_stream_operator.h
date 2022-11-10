@@ -24,7 +24,7 @@ using namespace OHOS::HDI::Camera::V1_0;
 class DOfflineStreamOperator : public IOfflineStreamOperator {
 public:
     DOfflineStreamOperator() = default;
-    virtual ~DOfflineStreamOperator() = default;
+    ~DOfflineStreamOperator() override = default;
     DOfflineStreamOperator(const DOfflineStreamOperator &other) = delete;
     DOfflineStreamOperator(DOfflineStreamOperator &&other) = delete;
     DOfflineStreamOperator& operator=(const DOfflineStreamOperator &other) = delete;
