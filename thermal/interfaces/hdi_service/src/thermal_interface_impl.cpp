@@ -31,6 +31,7 @@ namespace Thermal {
 namespace V1_0 {
 namespace {
 const std::string HDI_XML_NAME = HDF_ETC_DIR "/thermal_config/hdf/thermal_hdi_config.xml";
+bool g_isHdiStart = false;
 }
 static sptr<IThermalCallback> theramalCb_ = nullptr;
 static std::shared_ptr<HdfThermalCallbackInfo> callbackInfo_ = nullptr;
@@ -144,9 +145,12 @@ int32_t ThermalInterfaceImpl::Register(const sptr<IThermalCallback>& callbackObj
     if (hdfTimer_ == nullptr) return HDF_FAILURE;
     hdfTimer_->SetThermalEventCb(theramalCb_);
 
-    ret = hdfTimer_->Init();
-    if (ret != HDF_SUCCESS) {
-        return ret;
+    if (!g_isHdiStart) {
+        ret = hdfTimer_->Init();
+        if (ret != HDF_SUCCESS) {
+            return ret;
+        }
+        g_isHdiStart = true;
     }
     return HDF_SUCCESS;
 }
