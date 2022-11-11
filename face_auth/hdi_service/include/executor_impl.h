@@ -29,7 +29,7 @@ class ExecutorImpl : public IExecutor {
 public:
     ExecutorImpl();
 
-    virtual ~ExecutorImpl() = default;
+    ~ExecutorImpl() override = default;
 
     int32_t GetExecutorInfo(ExecutorInfo &executorInfo) override;
 

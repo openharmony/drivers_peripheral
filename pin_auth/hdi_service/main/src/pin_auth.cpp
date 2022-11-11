@@ -95,7 +95,7 @@ int32_t PinAuth::PinResultToCoAuthResult(int resultCode)
 static ResultCode InitPinEnrollParam(PinEnrollParam *pinEnrollParam, uint64_t scheduleId, uint64_t subType,
     std::vector<uint8_t> &salt, const std::vector<uint8_t> &pinData)
 {
-    pinEnrollParam->scheduleId= scheduleId;
+    pinEnrollParam->scheduleId = scheduleId;
     pinEnrollParam->subType = subType;
     if (memcpy_s(&(pinEnrollParam->salt[0]), CONST_SALT_LEN, &salt[0], CONST_SALT_LEN) != EOK) {
         LOG_ERROR("copy salt to pinEnrollParam fail!");

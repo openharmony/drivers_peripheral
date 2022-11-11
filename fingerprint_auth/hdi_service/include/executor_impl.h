@@ -28,11 +28,11 @@ class ExecutorImpl : public IExecutor {
 public:
     ExecutorImpl();
 
-    virtual ~ExecutorImpl() = default;
+    ~ExecutorImpl() override = default;
 
-    int32_t GetExecutorInfo(ExecutorInfo &info) override;
+    int32_t GetExecutorInfo(ExecutorInfo &executorInfo) override;
 
-    int32_t GetTemplateInfo(uint64_t templateId, TemplateInfo &info) override;
+    int32_t GetTemplateInfo(uint64_t templateId, TemplateInfo &templateInfo) override;
 
     int32_t OnRegisterFinish(const std::vector<uint64_t> &templateIdList,
         const std::vector<uint8_t> &frameworkPublicKey, const std::vector<uint8_t> &extraInfo) override;

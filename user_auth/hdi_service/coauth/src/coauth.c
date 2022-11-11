@@ -25,7 +25,7 @@
 // Used to cache the ongoing coAuth scheduling.
 static LinkedList *g_scheduleList = NULL;
 
-static bool IsCoAuthInit()
+static bool IsCoAuthInit(void)
 {
     return g_scheduleList != NULL;
 }

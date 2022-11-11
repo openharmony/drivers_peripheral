@@ -168,8 +168,8 @@ static int32_t CreateExecutorCommand(AuthResultInfo &info)
         return RESULT_SUCCESS;
     }
     LinkedListNode *temp = executorSendMsg->head;
-    while (temp != NULL) {
-        if (temp->data == NULL) {
+    while (temp != nullptr) {
+        if (temp->data == nullptr) {
             IAM_LOGE("list node is invalid");
             DestroyLinkedList(executorSendMsg);
             return RESULT_UNKNOWN;
@@ -231,7 +231,7 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
             info.token.clear();
             return RESULT_BAD_COPY;
         }
-        if (authResult.rootSecret != NULL) {
+        if (authResult.rootSecret != nullptr) {
             info.rootSecret.resize(authResult.rootSecret->contentSize);
             if (memcpy_s(info.rootSecret.data(), info.rootSecret.size(),
                 authResult.rootSecret->buf, authResult.rootSecret->contentSize) != EOK) {
@@ -401,7 +401,7 @@ int32_t UserAuthInterfaceService::BeginEnrollment(int32_t userId, const std::vec
         }
     }
     const CoAuthSchedule *scheduleInfo = GetCoAuthSchedule(scheduleId);
-    if (scheduleInfo == NULL) {
+    if (scheduleInfo == nullptr) {
         IAM_LOGE("get schedule info failed");
         return RESULT_UNKNOWN;
     }
@@ -451,7 +451,7 @@ int32_t UserAuthInterfaceService::UpdateEnrollmentResult(int32_t userId, const s
         DestoryBuffer(scheduleResultBuffer);
         return ret;
     }
-    Buffer *rootSecret = NULL;
+    Buffer *rootSecret = nullptr;
     if (isUpdate) {
         CredentialInfoHal oldCredentialHal = {};
         ret = UpdateCredentialFunc(userId, scheduleResultBuffer, &info.credentialId, &oldCredentialHal, &rootSecret);
@@ -459,7 +459,7 @@ int32_t UserAuthInterfaceService::UpdateEnrollmentResult(int32_t userId, const s
     } else {
         ret = AddCredentialFunc(userId, scheduleResultBuffer, &info.credentialId, &rootSecret);
     }
-    if (rootSecret != NULL) {
+    if (rootSecret != nullptr) {
         info.rootSecret.resize(rootSecret->contentSize);
         if (memcpy_s(info.rootSecret.data(), info.rootSecret.size(), rootSecret->buf, rootSecret->contentSize) != EOK) {
             IAM_LOGE("failed to copy rootSecret");
@@ -511,7 +511,7 @@ int32_t UserAuthInterfaceService::GetCredential(int32_t userId, AuthType authTyp
     infos.reserve(credList->getSize(credList));
     LinkedListNode *temp = credList->head;
     while (temp != nullptr) {
-        if (temp->data == NULL) {
+        if (temp->data == nullptr) {
             IAM_LOGE("list node is invalid");
             DestroyLinkedList(credList);
             return RESULT_UNKNOWN;
@@ -583,8 +583,8 @@ int32_t UserAuthInterfaceService::EnforceDeleteUser(int32_t userId, std::vector<
     }
     RefreshValidTokenTime();
     LinkedListNode *temp = credList->head;
-    while (temp != NULL) {
-        if (temp->data == NULL) {
+    while (temp != nullptr) {
+        if (temp->data == nullptr) {
             IAM_LOGE("list node is invalid");
             DestroyLinkedList(credList);
             return RESULT_UNKNOWN;
@@ -619,13 +619,13 @@ static int32_t ObtainReconciliationData(uint32_t authType, uint32_t sensorHint, 
     SetCredentialConditionAuthType(&condition, authType);
     SetCredentialConditionExecutorSensorHint(&condition, sensorHint);
     LinkedList *credList = QueryCredentialLimit(&condition);
-    if (credList == NULL) {
+    if (credList == nullptr) {
         IAM_LOGE("query credential failed");
         return RESULT_NOT_FOUND;
     }
     LinkedListNode *temp = credList->head;
-    while (temp != NULL) {
-        if (temp->data == NULL) {
+    while (temp != nullptr) {
+        if (temp->data == nullptr) {
             IAM_LOGE("list node is invalid");
             DestroyLinkedList(credList);
             return RESULT_UNKNOWN;
