@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 ResultCode OpenEditSession(int32_t userId, uint8_t *challenge, uint32_t challengeLen);
-ResultCode CloseEditSession();
+ResultCode CloseEditSession(void);
 
 ResultCode AssociateCoauthSchedule(uint64_t scheduleId, uint32_t authType, bool isUpdate);
 void BreakOffCoauthSchedule(void);
