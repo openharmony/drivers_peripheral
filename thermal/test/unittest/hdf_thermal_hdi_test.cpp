@@ -54,7 +54,6 @@ sptr<IThermalInterface> g_thermalInterface = nullptr;
 sptr<IThermalCallback> g_callback = new ThermalCallbackMock();
 std::mutex g_mutex;
 const uint32_t MAX_PATH = 256;
-const uint32_t WAIT_TIME = 1;
 const std::string CPU_FREQ_PATH = "/data/service/el0/thermal/cooling/cpu/freq";
 const std::string GPU_FREQ_PATH = "/data/service/el0/thermal/cooling/gpu/freq";
 const std::string BATTERY_CHARGER_CURRENT_PATH = "/data/service/el0/thermal/cooling/battery/current";
@@ -145,7 +144,6 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest002, TestSize.Level1)
         return;
     }
 
-    sleep(WAIT_TIME);
     ret = HdfThermalHdiTest::ReadFile(cpuBuf, freqValue, sizeof(freqValue));
     if (ret != HDF_SUCCESS) {
         THERMAL_HILOGE(LABEL_TEST, "HdfThermalHdiTest002: Failed to read file ");
@@ -178,7 +176,6 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest003, TestSize.Level1)
         return;
     }
 
-    sleep(WAIT_TIME);
     ret = HdfThermalHdiTest::ReadFile(cpuBuf, freqValue, sizeof(freqValue));
     if (ret != HDF_SUCCESS) {
         THERMAL_HILOGE(LABEL_TEST, "HdfThermalHdiTest003: Failed to read file ");
@@ -211,7 +208,6 @@ HWTEST_F(HdfThermalHdiTest, HdfThermalHdiTest004, TestSize.Level1)
         return;
     }
 
-    sleep(WAIT_TIME);
     ret = HdfThermalHdiTest::ReadFile(cpuBuf, currentValue, sizeof(currentValue));
     if (ret != HDF_SUCCESS) {
         THERMAL_HILOGE(LABEL_TEST, "HdfThermalHdiTest004: Failed to read file ");
