@@ -38,7 +38,7 @@ class DStreamOperator : public IStreamOperator {
 public:
     explicit DStreamOperator(std::shared_ptr<DMetadataProcessor> &dMetadataProcessor);
     DStreamOperator() = default;
-    virtual ~DStreamOperator() = default;
+    ~DStreamOperator() override = default;
     DStreamOperator(const DStreamOperator &other) = delete;
     DStreamOperator(DStreamOperator &&other) = delete;
     DStreamOperator& operator=(const DStreamOperator &other) = delete;
@@ -88,6 +88,7 @@ private:
     int32_t ExtractStreamInfo(std::vector<DCStreamInfo>& dCameraStreams);
     void ExtractCaptureInfo(std::vector<DCCaptureInfo> &captureInfos);
     void ExtractCameraAttr(Json::Value &rootValue, std::vector<int>& formats, const std::string rootNode);
+    void GetCameraAttr(Json::Value &rootValue, std::string formatStr, const std::string rootNode, int format);
     DCamRetCode GetInputCaptureInfo(const CaptureInfo& srcCaptureInfo, bool isStreaming,
         std::shared_ptr<DCCaptureInfo>& inputCaptureInfo);
     void AppendCaptureInfo(std::shared_ptr<DCCaptureInfo> &appendCaptureInfo, bool isStreaming,
