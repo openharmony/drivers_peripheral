@@ -14,6 +14,7 @@
  */
 
 #include "sensor_impl.h"
+#include <cinttypes>
 #include <unordered_map>
 #include <mutex>
 #include <iproxy_broker.h>
@@ -219,8 +220,8 @@ int32_t SensorImpl::Disable(int32_t sensorId)
 
 int32_t SensorImpl::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t reportInterval)
 {
-    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is %{public}lld, reportInterval is %{public}lld.",
-        __func__, sensorId, samplingInterval, reportInterval);
+    HDF_LOGI("%{public}s: sensorId is %{public}d, samplingInterval is [%{public}" PRId64 "], \
+        reportInterval is [%{public}" PRId64 "].", __func__, sensorId, samplingInterval, reportInterval);
     if (sensorInterface == nullptr || sensorInterface->SetBatch == nullptr) {
         HDF_LOGE("%{public}s: get sensor Module instance failed", __func__);
         return HDF_FAILURE;
