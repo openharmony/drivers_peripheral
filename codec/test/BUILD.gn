@@ -16,6 +16,7 @@ group("hdf_test_media_codec") {
   deps = [
     "demo:hdf_demo_codec",
     "fuzztest:hdf_fuzztest_media_codec",
+    "fuzztest_adapter:hdf_fuzztest_media_codec_adapter",
     "unittest:hdf_unittest_codec",
   ]
 }
