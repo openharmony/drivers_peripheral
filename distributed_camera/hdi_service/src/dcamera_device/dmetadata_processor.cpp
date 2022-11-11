@@ -576,39 +576,45 @@ void DMetadataProcessor::GetEachNodeSupportedResolution(std::vector<int>& format
         std::string formatStr = std::to_string(format);
         if (rootValue[rootNode]["Resolution"][formatStr].isArray() &&
             rootValue[rootNode]["Resolution"][formatStr].size() > 0) {
-            std::vector<DCResolution> resolutionVec;
-            uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
-            for (uint32_t i = 0; i < size; i++) {
-                std::string resoStr = rootValue[rootNode]["Resolution"][formatStr][i].asString();
-                std::vector<std::string> reso;
-                SplitString(resoStr, reso, STAR_SEPARATOR);
-                if (reso.size() != SIZE_FMT_LEN) {
-                    continue;
-                }
-                uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
-                uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
-                if (height == 0 || width == 0 ||
-                    ((rootNode == "Photo") &&
-                     ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
-                    ((rootNode != "Photo") &&
-                     (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
-                    continue;
-                }
-                DCResolution resolution(width, height);
-                resolutionVec.push_back(resolution);
-            }
-            if (!resolutionVec.empty()) {
-                std::sort(resolutionVec.begin(), resolutionVec.end());
-                supportedFormats[format] = resolutionVec;
-                if ((rootNode != "Photo") && (maxPreviewResolution_ < resolutionVec[0])) {
-                    maxPreviewResolution_.width_ = resolutionVec[0].width_;
-                    maxPreviewResolution_.height_ = resolutionVec[0].height_;
-                }
-                if ((rootNode == "Photo") && (maxPhotoResolution_ < resolutionVec[0])) {
-                    maxPhotoResolution_.width_ = resolutionVec[0].width_;
-                    maxPhotoResolution_.height_ = resolutionVec[0].height_;
-                }
-            }
+            GetNodeSupportedResolution(format, formatStr, rootNode, supportedFormats, rootValue);
+        }
+    }
+}
+
+void DMetadataProcessor::GetNodeSupportedResolution(int format, std::string formatStr, const std::string rootNode,
+    std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue)
+{
+    std::vector<DCResolution> resolutionVec;
+    uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
+    for (uint32_t i = 0; i < size; i++) {
+        std::string resoStr = rootValue[rootNode]["Resolution"][formatStr][i].asString();
+        std::vector<std::string> reso;
+        SplitString(resoStr, reso, STAR_SEPARATOR);
+        if (reso.size() != SIZE_FMT_LEN) {
+            continue;
+        }
+        uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
+        uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
+        if (height == 0 || width == 0 ||
+            ((rootNode == "Photo") &&
+                ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
+            ((rootNode != "Photo") &&
+                (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
+            continue;
+        }
+        DCResolution resolution(width, height);
+        resolutionVec.push_back(resolution);
+    }
+    if (!resolutionVec.empty()) {
+        std::sort(resolutionVec.begin(), resolutionVec.end());
+        supportedFormats[format] = resolutionVec;
+        if ((rootNode != "Photo") && (maxPreviewResolution_ < resolutionVec[0])) {
+            maxPreviewResolution_.width_ = resolutionVec[0].width_;
+            maxPreviewResolution_.height_ = resolutionVec[0].height_;
+        }
+        if ((rootNode == "Photo") && (maxPhotoResolution_ < resolutionVec[0])) {
+            maxPhotoResolution_.width_ = resolutionVec[0].width_;
+            maxPhotoResolution_.height_ = resolutionVec[0].height_;
         }
     }
 }

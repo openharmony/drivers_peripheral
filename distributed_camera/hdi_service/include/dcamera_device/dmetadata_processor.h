@@ -68,6 +68,8 @@ private:
     void InitDcameraBaseAbility();
     void GetEachNodeSupportedResolution(std::vector<int>& formats, const std::string rootNode,
         std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue);
+    void GetNodeSupportedResolution(int format, std::string formatStr, const std::string rootNode,
+        std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue);
     void SetFpsRanges();
 
 private:

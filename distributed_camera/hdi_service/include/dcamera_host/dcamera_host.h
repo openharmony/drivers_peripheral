@@ -34,7 +34,7 @@ const uint32_t ABILITYINFO_MAX_LENGTH = 50 * 1024 * 1024;
 const uint32_t ID_MAX_SIZE = 2 * DEVID_MAX_LENGTH;
 public:
     DCameraHost() = default;
-    virtual ~DCameraHost() = default;
+    ~DCameraHost() override = default;
     DCameraHost(const DCameraHost &other) = delete;
     DCameraHost(DCameraHost &&other) = delete;
     DCameraHost& operator=(const DCameraHost &other) = delete;
