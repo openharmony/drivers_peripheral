@@ -97,7 +97,8 @@ int32_t CheckParaDesc(const struct AudioDeviceDescriptor *desc, const char *type
             return HDF_ERR_NOT_SUPPORT;
         }
     } else if (!strcmp(type, TYPE_RENDER)) {
-        if (pins == PIN_OUT_SPEAKER || pins == PIN_OUT_HEADSET || pins == PIN_OUT_LINEOUT || pins == PIN_OUT_HDMI) {
+        if (pins == PIN_OUT_SPEAKER || pins == PIN_OUT_HEADSET || pins == PIN_OUT_LINEOUT || pins == PIN_OUT_HDMI ||
+            pins == PIN_OUT_HEADPHONE) {
             return HDF_SUCCESS;
         } else {
             AUDIO_FUNC_LOGE("TYPE_RENDER does not support this pins:%{public}d!", pins);
