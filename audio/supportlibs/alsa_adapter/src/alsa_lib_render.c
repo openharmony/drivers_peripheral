@@ -393,6 +393,9 @@ int32_t AudioCtlRenderSceneSelect(
                 cardIns, adapterName, "Digital Playback Path", SND_PLAY_PATH, SND_OUT_CARD_SPK);
         case PIN_OUT_HEADSET:
             return AudioMixerSetCtrlMode(cardIns, adapterName, "Digital Playback Path", SND_PLAY_PATH, SND_OUT_CARD_HP);
+        case PIN_OUT_HEADPHONE:
+            return AudioMixerSetCtrlMode(
+                cardIns, adapterName, "Digital Playback Path", SND_PLAY_PATH, SND_OUT_CARD_HP_NO_MIC);
         default:
             AUDIO_FUNC_LOGE("This mode is not currently supported!");
             break;
