@@ -30,8 +30,8 @@
 static bool g_ecmReleaseFlag = false;
 
 static void EcmWriteBulk(struct UsbRequest *req);
-static void EcmAllocWriteReq(struct EcmDevice *ecm);
-static void EcmFreeWriteReq(struct EcmDevice *ecm);
+static void EcmAllocWriteReq(struct EcmDevice * const ecm);
+static void EcmFreeWriteReq(struct EcmDevice * const ecm);
 static int32_t EcmAllocIntReq(struct EcmDevice *ecm);
 static void EcmAllocReadReq(struct EcmDevice *ecm);
 static void EcmFreeReadReq(struct EcmDevice *ecm);
@@ -128,7 +128,7 @@ static int32_t EcmStartWb(struct EcmDevice *ecm, struct EcmWb *wb)
     parmas.dataReq.length = wb->len;
     parmas.dataReq.buffer = wb->buf;
     rc = UsbFillRequest(wb->request, InterfaceIdToHandle(ecm, ecm->dataOutPipe->interfaceId), &parmas);
-    if (HDF_SUCCESS != rc) {
+    if (rc != HDF_SUCCESS) {
         HDF_LOGE("%s: UsbFillRequest failed, ret=%d", __func__, rc);
         return rc;
     }

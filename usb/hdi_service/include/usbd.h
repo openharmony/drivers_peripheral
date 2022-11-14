@@ -33,11 +33,6 @@
 #define DIRECTION_MASK         0x1
 #define USB_CTRL_SET_TIMEOUT   5000
 #define USB_PIPE_DIR_OFFSET    7
-
-using OHOS::HDI::Usb::V1_0::IUsbdBulkCallback;
-
-using OHOS::sptr;
-
 #define USBD_BULKASYNCREQ_NUM_MAX 64
 
 namespace OHOS {
@@ -78,7 +73,7 @@ struct UsbdBulkASyncList {
     struct HostDevice *instance;
     struct UsbdBulkASyncList *next;
     UsbInterfaceHandle *ifHandle;
-    sptr<IUsbdBulkCallback> cb;
+    sptr<HDI::Usb::V1_0::IUsbdBulkCallback> cb;
     struct UsbdBulkASyncReqList rList;
     struct UsbPipeInfo pipe;
     struct UsbRequestParams params;

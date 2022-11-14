@@ -638,7 +638,7 @@ static struct UsbFnDeviceDesc g_masterFuncDevice = {
 };
 
 struct UsbFnDevice *g_fnDev = NULL;
-static int32_t MasterReleaseFuncDevice()
+static int32_t MasterReleaseFuncDevice(void)
 {
     int32_t ret;
     if (g_fnDev == NULL) {
