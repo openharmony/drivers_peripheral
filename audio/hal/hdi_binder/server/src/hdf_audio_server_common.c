@@ -2066,6 +2066,12 @@ static int32_t HdiServiceAdapterGetExtraParams(const struct HdfDeviceIoClient *c
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
+    condition = HdfSbufReadString(data);
+    if (condition == NULL) {
+        AUDIO_FUNC_LOGE("condition is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
     if (!HdfSbufReadInt32(data, &length)) {
         AUDIO_FUNC_LOGE("HdiServiceAdapterGetExtraParams FAIL! length is 0.");
         return AUDIO_HAL_ERR_INTERNAL;
