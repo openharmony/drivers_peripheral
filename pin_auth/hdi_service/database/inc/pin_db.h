@@ -99,7 +99,7 @@ ResultCode DoGetSalt(uint64_t templateId, uint8_t *salt, uint32_t *saltLen);
 ResultCode DelPinById(uint64_t templateId);
 ResultCode AuthPinById(const uint8_t *inputData, const uint32_t inputDataLen, uint64_t templateId,
     Buffer *outRootSecret);
-ResultCode ComputeFreezeTime(uint64_t templateId, uint32_t *remainingFT, uint32_t count, uint64_t startFreezeTime);
+ResultCode ComputeFreezeTime(uint64_t templateId, uint32_t *freezeTime, uint32_t count, uint64_t startFreezeTime);
 ResultCode GetRemainTimes(uint64_t templateId, uint32_t *remainingAuthTimes, uint32_t authErrorConut);
 ResultCode GetSubType(uint64_t templateId, uint64_t *subType);
 ResultCode GetAntiBruteInfo(uint64_t templateId, uint32_t *authErrorConut, uint64_t *startFreezeTime);

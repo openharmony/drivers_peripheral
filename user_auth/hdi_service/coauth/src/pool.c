@@ -59,7 +59,7 @@ static bool IsExecutorNodeMatch(const void *data, const void *condition)
         executorInfo->executorSensorHint == executorIndex->executorSensorHint);
 }
 
-static bool IsInit()
+static bool IsInit(void)
 {
     return g_poolList != NULL;
 }
@@ -241,7 +241,7 @@ static bool IsExecutorMatch(const ExecutorCondition *condition, const ExecutorIn
     return true;
 }
 
-LinkedList *QueryExecutor(const ExecutorCondition *limit)
+LinkedList *QueryExecutor(const ExecutorCondition *condition)
 {
     if (!IsInit()) {
         LOG_ERROR("pool not init");
@@ -265,7 +265,7 @@ LinkedList *QueryExecutor(const ExecutorCondition *limit)
             LOG_ERROR("get invalid executor info");
             continue;
         }
-        if (!IsExecutorMatch(limit, executorInfo)) {
+        if (!IsExecutorMatch(condition, executorInfo)) {
             continue;
         }
         ExecutorInfoHal *copy = CopyExecutorInfo(executorInfo);

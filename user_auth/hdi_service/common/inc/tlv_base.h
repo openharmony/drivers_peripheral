@@ -63,9 +63,9 @@ uint32_t Ntohl(uint32_t data);
 uint64_t Ntohll(uint64_t data);
 
 TlvListNode *CreateTlvList(void);
-int32_t DestroyTlvList(TlvListNode *list);
+int32_t DestroyTlvList(TlvListNode *head);
 TlvType *CreateTlvType(int32_t type, uint32_t length, const void *value);
-int32_t AddTlvNode(TlvListNode *list, const TlvObject *object);
+int32_t AddTlvNode(TlvListNode *head, const TlvObject *object);
 
 #ifdef __cplusplus
 }
