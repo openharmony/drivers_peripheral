@@ -31,7 +31,7 @@
     "build": {
       "sub_component": [
         "//drivers/peripheral/thermal:thermal_entry",
-        "//drivers/peripheral/thermal/etc:thermal.para"
+        "//drivers/peripheral/thermal/etc:param_files"
       ],
       "test": [
         "//drivers/peripheral/thermal/test:hdf_test_thermal"
