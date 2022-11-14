@@ -65,6 +65,7 @@ static bool WriteWakeCount(const std::string& count);
 static void NotifyCallback(int code);
 namespace {
     sptr<PowerInterfaceImpl::PowerDeathRecipient> g_deathRecipient = nullptr;
+    bool g_isHdiStart = false;
 }
 
 extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
@@ -75,16 +76,19 @@ extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
 int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback>& ipowerHdiCallback)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
-    g_callback = ipowerHdiCallback;
-    if (g_callback == nullptr) {
-        UnRegister();
-        return HDF_SUCCESS;
+    if (!g_isHdiStart) {
+        g_callback = ipowerHdiCallback;
+        if (g_callback == nullptr) {
+            UnRegister();
+            return HDF_SUCCESS;
+        }
+        g_deathRecipient = new PowerDeathRecipient(this);
+        if (g_deathRecipient == nullptr) {
+            return HDF_FAILURE;
+        }
+        AddPowerDeathRecipient(g_callback);
+        g_isHdiStart = true;
     }
-    g_deathRecipient = new PowerDeathRecipient(this);
-    if (g_deathRecipient == nullptr) {
-        return HDF_FAILURE;
-    }
-    AddPowerDeathRecipient(g_callback);
     return HDF_SUCCESS;
 }
 
