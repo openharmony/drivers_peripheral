@@ -88,6 +88,7 @@ struct CodecVideoPortFormatParam {
     uint32_t size;                                         /** Size of the structure */
     union OMX_VERSIONTYPE version;                         /** Component version */
     uint32_t portIndex;                                    /** Port index */
+    uint32_t codecColorIndex;                              /** Color format index */
     uint32_t codecColorFormat;                             /** Color format defined in Display */
     uint32_t codecCompressFormat;                          /** See  */
     uint32_t framerate;                                    /** Q16 format */
