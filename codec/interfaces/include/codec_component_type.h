@@ -67,6 +67,8 @@ typedef enum {
     MEDIA_ROLETYPE_VIDEO_HEVC,
     /** MPEG4 video */
     MEDIA_ROLETYPE_VIDEO_MPEG4,
+    /** VP9 video */
+    MEDIA_ROLETYPE_VIDEO_VP9,
     /** Audio codec */
     MEDIA_ROLETYPE_AUDIO_FIRST = 0x10000,
     /** Advanced Audio Coding (AAC) */
