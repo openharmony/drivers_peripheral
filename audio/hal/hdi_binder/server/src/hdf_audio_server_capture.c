@@ -146,6 +146,10 @@ int32_t HdiServiceCreatCapture(const struct HdfDeviceIoClient *client, struct Hd
     }
 
     attrs.streamId = INTERNEL_INPUT_STEAM_ID;
+    if (adapter->CreateCapture == NULL) {
+        AUDIO_FUNC_LOGE("CreateCapture is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
     if (capture == NULL || ret < 0) {
         AUDIO_FUNC_LOGE("Failed to CreateCapture");
@@ -182,6 +186,10 @@ int32_t HdiServiceCaptureDestory(const struct HdfDeviceIoClient *client, struct 
         AUDIO_FUNC_LOGE("AudioAdapterListGetAdapterCapture failed ret = %{public}d", ret);
         return ret;
     }
+    if (adapter == NULL || adapter->DestroyCapture == NULL) {
+        AUDIO_FUNC_LOGE("adapter or DestroyCapture is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = adapter->DestroyCapture(adapter, capture);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("DestroyCapture failed!");
@@ -205,6 +213,10 @@ int32_t HdiServiceCaptureStart(const struct HdfDeviceIoClient *client, struct Hd
         AUDIO_FUNC_LOGE("AudioAdapterListCheckAndGetCapture failed ret = %{public}d", ret);
         return ret;
     }
+    if (capture == NULL || capture->control.Start == NULL) {
+        AUDIO_FUNC_LOGE("capture or Start is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->control.Start((AudioHandle)capture);
 }
 
@@ -217,6 +229,10 @@ int32_t HdiServiceCaptureStop(const struct HdfDeviceIoClient *client, struct Hdf
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
+    }
+    if (capture == NULL || capture->control.Stop == NULL) {
+        AUDIO_FUNC_LOGE("capture or Stop is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     return capture->control.Stop((AudioHandle)capture);
 }
@@ -231,6 +247,10 @@ int32_t HdiServiceCapturePause(const struct HdfDeviceIoClient *client, struct Hd
     if (ret < 0) {
         return ret;
     }
+    if (capture == NULL || capture->control.Pause == NULL) {
+        AUDIO_FUNC_LOGE("capture or Pause is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->control.Pause((AudioHandle)capture);
 }
 
@@ -244,6 +264,10 @@ int32_t HdiServiceCaptureResume(const struct HdfDeviceIoClient *client, struct H
     if (ret < 0) {
         return ret;
     }
+    if (capture == NULL || capture->control.Resume == NULL) {
+        AUDIO_FUNC_LOGE("capture or Resume is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->control.Resume((AudioHandle)capture);
 }
 
@@ -256,6 +280,10 @@ int32_t HdiServiceCaptureFlush(const struct HdfDeviceIoClient *client, struct Hd
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
+    }
+    if (capture == NULL || capture->control.Flush == NULL) {
+        AUDIO_FUNC_LOGE("capture or Flush is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     return capture->control.Flush((AudioHandle)capture);
 }
@@ -271,6 +299,10 @@ int32_t HdiServiceCaptureGetFrameSize(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
+    }
+    if (capture == NULL || capture->attr.GetFrameSize == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetFrameSize is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     if (capture->attr.GetFrameSize((AudioHandle)capture, &size)) {
         return AUDIO_HAL_ERR_INTERNAL;
@@ -292,6 +324,10 @@ int32_t HdiServiceCaptureGetFrameCount(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
+    }
+    if (capture == NULL || capture->attr.GetFrameCount == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetFrameCount is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     if (capture->attr.GetFrameCount((AudioHandle)capture, &count)) {
         return AUDIO_HAL_ERR_INTERNAL;
@@ -320,6 +356,10 @@ int32_t HdiServiceCaptureSetSampleAttr(const struct HdfDeviceIoClient *client,
     if (ReadAudioSapmleAttrbutes(data, &attrs) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    if (capture == NULL || capture->attr.SetSampleAttributes == NULL) {
+        AUDIO_FUNC_LOGE("capture or SetSampleAttributes is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->attr.SetSampleAttributes((AudioHandle)capture, &attrs);
 }
 
@@ -334,6 +374,10 @@ int32_t HdiServiceCaptureGetSampleAttr(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
+    }
+    if (capture == NULL || capture->attr.GetSampleAttributes == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetSampleAttributes is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = capture->attr.GetSampleAttributes((AudioHandle)capture, &attrs);
     if (ret < 0) {
@@ -356,6 +400,10 @@ int32_t HdiServiceCaptureGetCurChannelId(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
+    }
+    if (capture == NULL || capture->attr.GetCurrentChannelId == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetCurrentChannelId is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = capture->attr.GetCurrentChannelId((AudioHandle)capture, &channelId);
     if (ret < 0) {
@@ -389,6 +437,10 @@ int32_t HdiServiceCaptureCheckSceneCapability(const struct HdfDeviceIoClient *cl
         return AUDIO_HAL_ERR_INTERNAL;
     }
     scene.desc.pins = (enum AudioPortPin) interimPins;
+    if (capture == NULL || capture->scene.CheckSceneCapability == NULL) {
+        AUDIO_FUNC_LOGE("capture or CheckSceneCapability is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = capture->scene.CheckSceneCapability((AudioHandle)capture, &scene, &supported);
     if (ret < 0) {
         return ret;
@@ -420,6 +472,10 @@ int32_t HdiServiceCaptureSelectScene(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     scene.desc.pins = (enum AudioPortPin) tempPins;
+    if (capture == NULL || capture->scene.SelectScene == NULL) {
+        AUDIO_FUNC_LOGE("capture or SelectScene is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->scene.SelectScene((AudioHandle)capture, &scene);
 }
 
@@ -436,6 +492,10 @@ int32_t HdiServiceCaptureGetMute(const struct HdfDeviceIoClient *client,
     ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
+    }
+    if (capture == NULL || capture->volume.GetMute == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetMute is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = capture->volume.GetMute((AudioHandle)capture, &mute);
     if (ret < 0) {
@@ -467,6 +527,10 @@ int32_t HdiServiceCaptureSetMute(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     mute = (bool)tempMute;
+    if (capture == NULL || capture->volume.SetMute == NULL) {
+        AUDIO_FUNC_LOGE("capture or SetMute is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->volume.SetMute((AudioHandle)capture, mute);
 }
 
@@ -487,6 +551,10 @@ int32_t HdiServiceCaptureSetVolume(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     float setVolume = (float)volume / VOLUME_CHANGE;
+    if (capture == NULL || capture->volume.SetVolume == NULL) {
+        AUDIO_FUNC_LOGE("capture or SetVolume is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->volume.SetVolume((AudioHandle)capture, setVolume);
 }
 
@@ -502,6 +570,10 @@ int32_t HdiServiceCaptureGetVolume(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
+    }
+    if (capture == NULL || capture->volume.GetVolume == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetVolume is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = capture->volume.GetVolume((AudioHandle)capture, &volume);
     if (ret < 0) {
@@ -528,6 +600,10 @@ int32_t HdiServiceCaptureGetGainThreshold(const struct HdfDeviceIoClient *client
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
+    }
+    if (capture == NULL || capture->volume.GetGainThreshold == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetGainThreshold is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = capture->volume.GetGainThreshold((AudioHandle)capture, &min, &max);
     if (ret < 0) {
@@ -557,6 +633,10 @@ int32_t HdiServiceCaptureGetGain(const struct HdfDeviceIoClient *client,
     if (ret < 0) {
         return ret;
     }
+    if (capture == NULL || capture->volume.GetGain == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetGain is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = capture->volume.GetGain((AudioHandle)capture, &gain);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("GetGain failed! ret = %{public}d", ret);
@@ -582,6 +662,10 @@ int32_t HdiServiceCaptureSetGain(const struct HdfDeviceIoClient *client,
         return ret;
     }
     if (!HdfSbufReadUint32(data, &gain)) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (capture == NULL || capture->volume.SetGain == NULL) {
+        AUDIO_FUNC_LOGE("capture or SetGain is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     return capture->volume.SetGain((AudioHandle)capture, (float)gain);
@@ -617,6 +701,10 @@ int32_t HdiServiceCaptureCaptureFrame(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
     AudioSetCaptureBusy(index, true);
+    if (capture == NULL || capture->CaptureFrame == NULL) {
+        AUDIO_FUNC_LOGE("capture or CaptureFrame is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = capture->CaptureFrame((AudioHandle)capture, (void *)frame, requestBytes, &replyBytes);
     AudioSetCaptureBusy(index, false);
     if (ret < 0) {
@@ -648,6 +736,10 @@ int32_t HdiServiceCaptureGetCapturePosition(const struct HdfDeviceIoClient *clie
     if (ret < 0) {
         return ret;
     }
+    if (capture == NULL || capture->GetCapturePosition == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetCapturePosition is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = capture->GetCapturePosition((AudioHandle)capture, &frames, &time);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("GetCapturePosition fail");
@@ -675,6 +767,10 @@ int32_t HdiServiceCaptureSetExtraParams(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("keyValueList Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
+    if (capture == NULL || capture->attr.SetExtraParams == NULL) {
+        AUDIO_FUNC_LOGE("capture or SetExtraParams is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->attr.SetExtraParams((AudioHandle)capture, keyValueList);
 }
 
@@ -698,6 +794,10 @@ int32_t HdiServiceCaptureGetExtraParams(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     char keyValueList[STR_MAX] = { 0 };
+    if (capture == NULL || capture->attr.GetExtraParams == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetExtraParams is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = capture->attr.GetExtraParams((AudioHandle)capture, keyValueList, listLenth);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("GetExtraParams failed! ret = %{public}d", ret);
@@ -730,6 +830,10 @@ int32_t HdiServiceCaptureReqMmapBuffer(const struct HdfDeviceIoClient *client,
     if (HdiServiceReqMmapBuffer(&desc, data) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    if (capture == NULL || capture->attr.ReqMmapBuffer == NULL) {
+        AUDIO_FUNC_LOGE("capture or ReqMmapBuffer is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->attr.ReqMmapBuffer((AudioHandle)capture, reqSize, &desc);
 }
 
@@ -747,6 +851,10 @@ int32_t HdiServiceCaptureGetMmapPosition(const struct HdfDeviceIoClient *client,
         return ret;
     }
 
+    if (capture == NULL || capture->attr.GetMmapPosition == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetMmapPosition is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     ret = capture->attr.GetMmapPosition((AudioHandle)capture, &frames, &time);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("GetMmapPosition failed! ret = %{public}d", ret);
@@ -780,6 +888,10 @@ int32_t HdiServiceCaptureAddEffect(const struct HdfDeviceIoClient *client,
         return HDF_FAILURE;
     }
 
+    if (capture->attr.AddAudioEffect == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetMmapPosition is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->attr.AddAudioEffect((AudioHandle)capture, effectid);
 }
 
@@ -805,6 +917,10 @@ int32_t HdiServiceCaptureRemoveEffect(const struct HdfDeviceIoClient *client,
         return HDF_FAILURE;
     }
 
+    if (capture->attr.RemoveAudioEffect == NULL) {
+        AUDIO_FUNC_LOGE("capture or GetMmapPosition is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->attr.RemoveAudioEffect((AudioHandle)capture, effectid);
 }
 
@@ -819,6 +935,10 @@ int32_t HdiServiceCaptureTurnStandbyMode(const struct HdfDeviceIoClient *client,
     int ret = AudioAdapterListCheckAndGetCapture(&capture, data);
     if (ret < 0) {
         return ret;
+    }
+    if (capture == NULL || capture->control.Stop == NULL) {
+        AUDIO_FUNC_LOGE("capture or Stop is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
     }
     return capture->control.Stop((AudioHandle)capture);
 }
@@ -844,6 +964,10 @@ int32_t HdiServiceCaptureDevDump(const struct HdfDeviceIoClient *client,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     int32_t fd = ret;
+    if (capture == NULL || capture->control.AudioDevDump == NULL) {
+        AUDIO_FUNC_LOGE("capture or AudioDevDump is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     return capture->control.AudioDevDump((AudioHandle)capture, range, fd);
 }
 
