@@ -17,7 +17,7 @@
 #define USBD_TYPE_H
 
 #include <stdint.h>
-#include <stdlib.h>
+#include <cstdlib>
 
 #define USB_MAX_INTERFACES 32
 
@@ -27,17 +27,17 @@
 /**
  * Bitmask used for extracting the USBEndpoint direction from it's address
  */
-static const int32_t USB_ENDPOINT_DIR_MASK = 0x80;
+const int32_t USB_ENDPOINT_DIR_MASK = 0x80;
 
 /**
  * Used to signify direction of data for USBEndpoint is IN, device to host
  */
-static const int32_t USB_ENDPOINT_DIR_IN = 0x80;
+const int32_t USB_ENDPOINT_DIR_IN = 0x80;
 
 /**
  * Used to signify direction of data for USBEndpoint is OUT, host to device
  */
-static const int32_t USB_ENDPOINT_DIR_OUT = 0;
+const int32_t USB_ENDPOINT_DIR_OUT = 0;
 
 typedef void (*UsbdRequestCallback)(uint8_t *requestArg);
 

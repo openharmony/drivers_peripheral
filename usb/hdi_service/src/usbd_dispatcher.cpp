@@ -136,7 +136,7 @@ int32_t UsbdDispatcher::GetInterfacePipe(
 
     for (uint8_t i = 1; i <= info->pipeNum; ++i) {
         int32_t ret = UsbGetPipeInfo(interfaceHandle, info->curAltSetting, i, &pipeTmp);
-        if (ret == HDF_SUCCESS && ((pipeTmp.pipeAddress | (uint8_t)pipeTmp.pipeDirection) == pipeAddr)) {
+        if (ret == HDF_SUCCESS && ((pipeTmp.pipeAddress | static_cast<uint8_t>(pipeTmp.pipeDirection)) == pipeAddr)) {
             if (pipe) {
                 *pipe = pipeTmp;
             }
@@ -255,9 +255,9 @@ void UsbdDispatcher::UsbRequestParamsWSyncInit(UsbRequestParams *params, int32_t
     params->pipeAddress = pipe->pipeDirection | pipe->pipeAddress;
     params->pipeId = pipe->pipeId;
     params->requestType = USB_REQUEST_PARAMS_DATA_TYPE;
-    params->timeout = (uint32_t)timeout;
+    params->timeout = static_cast<uint32_t>(timeout);
     params->dataReq.numIsoPackets = 0;
-    params->dataReq.directon = (UsbRequestDirection)((pipe->pipeDirection >> USB_DIR_OFFSET) & 0x1);
+    params->dataReq.directon = static_cast<UsbRequestDirection>((pipe->pipeDirection >> USB_DIR_OFFSET) & 0x1);
     params->dataReq.length = pipe->maxPacketSize;
 }
 
@@ -318,7 +318,7 @@ void UsbdDispatcher::UsbRequestParamsInit(UsbRequestParams *params, int32_t time
     params->pipeAddress = 0;
     params->pipeId = 0;
     params->requestType = USB_REQUEST_PARAMS_CTRL_TYPE;
-    params->timeout = (uint32_t)timeout;
+    params->timeout = static_cast<uint32_t>(timeout);
 }
 
 int32_t UsbdDispatcher::CtrlTranParamGetReqType(HdfSBuf *data, UsbControlParams *pCtrParams, uint32_t requestType)
@@ -334,7 +334,7 @@ int32_t UsbdDispatcher::CtrlTranParamGetReqType(HdfSBuf *data, UsbControlParams 
     int32_t direction = (requestType >> DIRECTION_OFFSET_7) & ENDPOINT_DIRECTION_MASK;
     int32_t cmdType = (requestType >> CMD_OFFSET_5) & CMD_TYPE_MASK;
     if (direction == USB_REQUEST_DIR_TO_DEVICE) {
-        if (!HdfSbufReadBuffer(data, (const void **)&buffer, &length)) {
+        if (!HdfSbufReadBuffer(data, (const void **)(&buffer), &length)) {
             HDF_LOGE("%{public}s:hdf sbuf Read failed", __func__);
             return HDF_FAILURE;
         }
@@ -346,9 +346,9 @@ int32_t UsbdDispatcher::CtrlTranParamGetReqType(HdfSBuf *data, UsbControlParams 
             return HDF_ERR_MALLOC_FAIL;
         }
     }
-    pCtrParams->target = (UsbRequestTargetType)target;
-    pCtrParams->directon = (UsbRequestDirection)direction;
-    pCtrParams->reqType = (UsbControlRequestType)cmdType;
+    pCtrParams->target = static_cast<UsbRequestTargetType>(target);
+    pCtrParams->directon = static_cast<UsbRequestDirection>(direction);
+    pCtrParams->reqType = static_cast<UsbControlRequestType>(cmdType);
     pCtrParams->size = length;
     pCtrParams->data = buffer;
     return HDF_SUCCESS;
@@ -390,7 +390,7 @@ int32_t UsbdDispatcher::CtrlTransferParamInit(HdfSBuf *data, UsbControlParams *p
         return HDF_ERR_IO;
     }
 
-    pCtrParams->request = (uint8_t)requestCmd;
+    pCtrParams->request = static_cast<uint8_t>(requestCmd);
     pCtrParams->value = value;
     pCtrParams->index = index;
     int32_t ret = CtrlTranParamGetReqType(data, pCtrParams, requestType);
@@ -693,7 +693,7 @@ int32_t UsbdDispatcher::FillReqAyncParams(
     params->dataReq.numIsoPackets = 0;
     params->userData = static_cast<void *>(userData);
     params->dataReq.length = length;
-    params->dataReq.directon = (UsbRequestDirection)((pipe->pipeDirection >> USB_PIPE_DIR_OFFSET) & 0x1);
+    params->dataReq.directon = static_cast<UsbRequestDirection>((pipe->pipeDirection >> USB_PIPE_DIR_OFFSET) & 0x1);
     if (bWrite) {
         params->callback = UsbdWriteCallback;
         params->dataReq.buffer = const_cast<uint8_t *>(buffer);
@@ -1028,7 +1028,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncReqInit(UsbdBulkASyncReqList *list, UsbdBul
         list->node[i].list = list;
         list->node[i].id = i;
         DListInsertTail(&list->node[i].node, &list->eList);
-        pList->params.userData = (void *)&list->node[i];
+        pList->params.userData = static_cast<void *>(&list->node[i]);
     }
 
     if (i != USBD_BULKASYNCREQ_NUM_MAX) {
@@ -1125,7 +1125,7 @@ int32_t UsbdDispatcher::UsbdBulkReadRemoteCallback(
     OsalMutexLock(&handle->lock);
     uint8_t flag = handle->cbflg;
     handle->cbflg = 1;
-    int32_t actLength = (int32_t)handle->rcur;
+    int32_t actLength = static_cast<int32_t>(handle->rcur);
     OsalMutexUnlock(&handle->lock);
     if (flag) {
         return HDF_SUCCESS;
@@ -1148,7 +1148,7 @@ int32_t UsbdDispatcher::UsbdBulkWriteRemoteCallback(
     OsalMutexLock(&handle->lock);
     uint8_t flag = handle->cbflg;
     handle->cbflg = 1;
-    int32_t actLength = (int32_t)handle->cur;
+    int32_t actLength = static_cast<int32_t>(handle->cur);
     OsalMutexUnlock(&handle->lock);
     if (flag) {
         return HDF_SUCCESS;
@@ -1289,7 +1289,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncReqReadAutoSubmit(UsbRequest *request)
     }
     db->request->compInfo.status = USB_REQUEST_COMPLETED;
     UsbHostRequest *hostRequest = reinterpret_cast<UsbIfRequest *>(request)->hostRequest;
-    if (readLen != (uint32_t)hostRequest->length) {
+    if (readLen != static_cast<uint32_t>(hostRequest->length)) {
         UsbRequestParams params;
         ret = memcpy_s(&params, sizeof(params), &db->list->pList->params, sizeof(params));
         if (ret != EOK) {
@@ -1402,7 +1402,7 @@ int32_t UsbdDispatcher::UsbdBulkASyncReqFillParams(UsbPipeInfo *pipe, UsbRequest
     params->requestType = USB_REQUEST_PARAMS_DATA_TYPE;
     params->timeout = USB_CTRL_SET_TIMEOUT;
     params->dataReq.numIsoPackets = 0;
-    params->dataReq.directon = (UsbRequestDirection)((pipe->pipeDirection >> USB_PIPE_DIR_OFFSET) & 0x1);
+    params->dataReq.directon = static_cast<UsbRequestDirection>((pipe->pipeDirection >> USB_PIPE_DIR_OFFSET) & 0x1);
     params->dataReq.length = pipe->maxPacketSize;
 
     if (pipe->pipeDirection == USB_PIPE_DIRECTION_OUT) {

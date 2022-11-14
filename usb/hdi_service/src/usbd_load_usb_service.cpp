@@ -102,7 +102,7 @@ int32_t UsbdLoadUsbService::StartThreadUsbLoad()
     struct OsalThreadParam threadCfg = {0};
     threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
     threadCfg.stackSize = HDF_PROCESS_STACK_SIZE;
-    ret = OsalThreadCreate(&threadUsbLoad, (OsalThreadEntry)UsbLoadWorkEntry, NULL);
+    ret = OsalThreadCreate(&threadUsbLoad, static_cast<OsalThreadEntry>(UsbLoadWorkEntry), nullptr);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%d OsalThreadCreate failed, ret = %d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
