@@ -21,6 +21,7 @@
 #include <ashmem.h>
 #include <buffer_handle.h>
 #include <condition_variable>
+#include <fstream>
 #include <idisplay_gralloc.h>
 #include <list>
 #include <map>
@@ -30,9 +31,9 @@
 #include "codec_callback_type_stub.h"
 #include "codec_component_manager.h"
 #include "codec_component_type.h"
+#include "codec_packet_reader.h"
 #include "codec_types.h"
 #include "command_parse.h"
-
 enum class PortIndex { PORT_INDEX_INPUT = 0, PORT_INDEX_OUTPUT = 1 };
 
 class CodecHdiDecode {
@@ -103,7 +104,6 @@ public:
     }
     void WaitForStatusChanged();
     void OnStatusChanged();
-    bool ReadOnePacket(FILE *fp, char *buf, uint32_t &filledCount);
 
 private:
     int32_t UseBufferOnPort(PortIndex portIndex);
@@ -120,10 +120,11 @@ private:
     {
         return (((width) + alignment_ - 1) & (~(alignment_ - 1)));
     }
+    int32_t GetComponent();
 
 private:
-    FILE *fpIn_;  // input file
-    FILE *fpOut_;
+    std::ifstream ioIn_;
+    std::ofstream ioOut_;
     uint32_t width_;
     uint32_t height_;
     uint32_t stride_;
@@ -138,10 +139,11 @@ private:
     std::condition_variable statusCondition_;
     std::mutex statusLock_;
     bool exit_;
-    codecMime codecMime_;
+    CodecMime codecMime_;
     bool useBufferHandle_;
     int count_;
     static constexpr uint32_t alignment_ = 16;
     static OHOS::HDI::Display::V1_0::IDisplayGralloc *gralloc_;
+    CodecPacketReader::Ptr reader_;
 };
 #endif /* CODEC_HDI_DECODE_H */
