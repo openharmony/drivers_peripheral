@@ -31,33 +31,19 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static TestGetAudioManager getAudioManager;
-    static void *handle;
     static TestAudioManager *manager;
 };
 
-TestGetAudioManager AudioServerFunctionTest::getAudioManager = nullptr;
-void *AudioServerFunctionTest::handle = nullptr;
 TestAudioManager *AudioServerFunctionTest::manager = nullptr;
 using THREAD_FUNC = void *(*)(void *);
 
 void AudioServerFunctionTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioServerFunctionTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioServerFunctionTest::TearDownTestCase(void) {}
 
 void AudioServerFunctionTest::SetUp(void) {}
 

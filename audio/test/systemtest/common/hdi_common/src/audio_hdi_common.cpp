@@ -1043,22 +1043,6 @@ int32_t CheckFlushValue()
     else
         return HDF_FAILURE;
 }
-int32_t LoadFunction(void *&handle, TestGetAudioManager &getAudioManager)
-{
-    char absPath[PATH_MAX] = {0};
-    if (realpath(RESOLVED_PATH.c_str(), absPath) == nullptr) {
-        return HDF_FAILURE;
-    }
-    handle = dlopen(absPath, RTLD_LAZY);
-    if (handle == nullptr) {
-        return HDF_FAILURE;
-    }
-    getAudioManager = (TestGetAudioManager)(dlsym(handle, FUNCTION_NAME.c_str()));
-    if (getAudioManager == nullptr) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
 int32_t ReleaseCaptureSource(struct AudioManager *manager, struct AudioAdapter *&adapter,
     struct AudioCapture *&capture)
 {

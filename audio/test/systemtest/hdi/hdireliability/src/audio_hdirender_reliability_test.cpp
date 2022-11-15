@@ -38,10 +38,8 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    AudioAdapter *adapter = nullptr;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
+    AudioAdapter *adapter = nullptr;
     AudioRender *render = nullptr;
     static int32_t RelAudioRenderSetGain(struct PrepareAudioPara& ptr);
     static int32_t RelAudioRenderGetGain(struct PrepareAudioPara& ptr);
@@ -63,27 +61,15 @@ public:
 };
 
 using THREAD_FUNC = void *(*)(void *);
-void *AudioHdiRenderReliabilityTest::handle = nullptr;
-TestGetAudioManager AudioHdiRenderReliabilityTest::getAudioManager = nullptr;
 TestAudioManager *AudioHdiRenderReliabilityTest::manager = nullptr;
 
 void AudioHdiRenderReliabilityTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioHdiRenderReliabilityTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioHdiRenderReliabilityTest::TearDownTestCase(void) {}
 
 void AudioHdiRenderReliabilityTest::SetUp(void)
 {
