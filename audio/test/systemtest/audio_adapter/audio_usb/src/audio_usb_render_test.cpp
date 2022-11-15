@@ -49,33 +49,19 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
 };
 
 using THREAD_FUNC = void *(*)(void *);
-void *AudioUsbRenderTest::handle = nullptr;
-TestGetAudioManager AudioUsbRenderTest::getAudioManager = nullptr;
 TestAudioManager *AudioUsbRenderTest::manager = nullptr;
 
 void AudioUsbRenderTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioUsbRenderTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioUsbRenderTest::TearDownTestCase(void) {}
 
 void AudioUsbRenderTest::SetUp(void) {}
 
