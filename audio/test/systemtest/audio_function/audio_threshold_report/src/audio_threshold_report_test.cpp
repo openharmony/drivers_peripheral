@@ -40,25 +40,19 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
     static struct ISvcMgrIoservice *servmgr;
     static struct ServiceStatusListener *listener;
     static TestAudioManager *manager;
-    static TestGetAudioManager getAudioManager;
 };
 
-TestGetAudioManager AudioThresholdReportTest::getAudioManager = nullptr;
-void *AudioThresholdReportTest::handle = nullptr;
 TestAudioManager *AudioThresholdReportTest::manager = nullptr;
 struct ISvcMgrIoservice *AudioThresholdReportTest::servmgr = nullptr;
 struct ServiceStatusListener *AudioThresholdReportTest::listener = nullptr;
 using THREAD_FUNC = void *(*)(void *);
 void AudioThresholdReportTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
     (void)HdfRemoteGetCallingPid();
-    ASSERT_NE(nullptr, getAudioManager);
+    ASSERT_NE(nullptr, GetAudioManagerFuncs();
     manager = getAudioManager();
     ASSERT_NE(nullptr, manager);
     servmgr = SvcMgrIoserviceGet();
@@ -76,12 +70,6 @@ void AudioThresholdReportTest::TearDownTestCase(void)
     if (manager != nullptr) {
         (void)manager->ReleaseAudioManagerObject(manager);
         manager = nullptr;
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-    if (handle != nullptr) {
-        (void)dlclose(handle);
     }
     (void)servmgr->UnregisterServiceStatusListener(servmgr, listener);
     (void)HdiServiceStatusListenerFree(listener);
