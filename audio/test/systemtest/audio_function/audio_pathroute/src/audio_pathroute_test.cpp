@@ -62,32 +62,18 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
 };
 
-void *AudioPathRouteTest::handle = nullptr;
-TestGetAudioManager AudioPathRouteTest::getAudioManager = nullptr;
 TestAudioManager *AudioPathRouteTest::manager = nullptr;
 
 void AudioPathRouteTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioPathRouteTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioPathRouteTest::TearDownTestCase(void) {}
 
 void AudioPathRouteTest::SetUp(void) {}
 
