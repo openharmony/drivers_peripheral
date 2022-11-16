@@ -77,7 +77,7 @@ struct AudioPnpUevent {
 static int32_t AudioAnalogHeadsetDeviceCheck(struct AudioPnpUevent *audioPnpUevent)
 {
     struct AudioEvent audioEvent;
-    static int32_t h2wTypeLast = HDF_AUDIO_HEADSET;
+    static uint32_t h2wTypeLast = HDF_AUDIO_HEADSET;
     if (audioPnpUevent == NULL) {
         AUDIO_FUNC_LOGE("audioPnpUevent is null!");
         return HDF_ERR_INVALID_PARAM;
