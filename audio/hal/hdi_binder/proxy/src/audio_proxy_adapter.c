@@ -715,7 +715,7 @@ int32_t AudioProxyAdapterGetPortCapability(struct AudioAdapter *adapter,
         AUDIO_FUNC_LOGE("hwAdapter portCapabilitys is NULL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    int32_t portNum = hwAdapter->adapterDescriptor.portNum;
+    uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
     while (hwAdapterPortCapabilitys != NULL && (portNum > 0)) {
         if (hwAdapterPortCapabilitys->port.portId == port->portId) {
             *capability = hwAdapterPortCapabilitys->capability;

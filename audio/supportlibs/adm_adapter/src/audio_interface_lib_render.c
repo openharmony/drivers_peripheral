@@ -1071,7 +1071,7 @@ int32_t AudioOutputRenderWriteFrame(struct HdfIoService *service,
             (void)AudioCallbackModeStatus(handleData, AUDIO_RENDER_FULL);
             tryNum--;
             ms = buffStatus >= 0 ? buffStatus : 10; // 10 is wait for 10 ms
-            usleep(ms*TIME_COUNT_MS_TO_US);
+            usleep(ms * TIME_COUNT_MS_TO_US);
             AUDIO_FUNC_LOGD("Cir buff is full, wait for %{public}d ms", ms);
             continue;
         }

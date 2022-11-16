@@ -124,7 +124,7 @@ int32_t CheckParaAttr(const struct AudioSampleAttributes *attrs)
         return HDF_ERR_NOT_SUPPORT;
     }
     enum AudioCategory audioCategory = attrs->type;
-    if (AUDIO_IN_MEDIA != audioCategory && AUDIO_IN_COMMUNICATION != audioCategory) {
+    if (audioCategory != AUDIO_IN_MEDIA && audioCategory != AUDIO_IN_COMMUNICATION) {
         AUDIO_FUNC_LOGE("audioCategory:%{public}d is neither AUDIO_IN_MEDIA not or AUDIO_IN_COMMUNICATION",
             audioCategory);
         return HDF_ERR_NOT_SUPPORT;
@@ -875,36 +875,36 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
         AUDIO_FUNC_LOGE("hwCapture or hwCapture->devCtlHandle or hwCapture->devDataHandle is null!");
         return HDF_FAILURE;
     }
-    InterfaceLibModeCaptureSo *LibCap = AudioSoGetInterfaceLibModeCapture();
-    if (LibCap == NULL || *LibCap == NULL) {
+    InterfaceLibModeCaptureSo *libCap = AudioSoGetInterfaceLibModeCapture();
+    if (libCap == NULL || *libCap == NULL) {
         AUDIO_FUNC_LOGE("lib capture func not exist");
         return HDF_FAILURE;
     }
-    if ((*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN) < 0) {
+    if ((*libCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN) < 0) {
         AUDIO_FUNC_LOGE("CAPTURE_OPEN FAIL");
         return HDF_FAILURE;
     }
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-    if ((*LibCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE) < 0) {
+    if ((*libCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE) < 0) {
         AUDIO_FUNC_LOGE("SetParams FAIL!");
-        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
+        (void)AudioCtrlCaptureClose(hwCapture, libCap);
         return HDF_FAILURE;
     }
 #endif
-    if ((*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_HW_PARAMS) < 0) {
+    if ((*libCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_HW_PARAMS) < 0) {
         AUDIO_FUNC_LOGE("AudioCaptureStart SetParams FAIL");
-        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
+        (void)AudioCtrlCaptureClose(hwCapture, libCap);
         return HDF_FAILURE;
     }
-    if ((*LibCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE) < 0) {
+    if ((*libCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE) < 0) {
         AUDIO_FUNC_LOGE("SetParams FAIL!");
-        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
+        (void)AudioCtrlCaptureClose(hwCapture, libCap);
         return HDF_FAILURE;
     }
-    if ((*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE) < 0) {
+    if ((*libCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE) < 0) {
         AUDIO_FUNC_LOGE("AudioCaptureStart prepare FAIL");
-        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
+        (void)AudioCtrlCaptureClose(hwCapture, libCap);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
