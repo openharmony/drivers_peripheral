@@ -66,7 +66,7 @@ if (defined(ohos_lite)) {
     public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   }
 } else {
-  module_output_path = "hdf/input"
+  module_output_path = "drivers_peripheral_input/input"
   ohos_unittest("hdf_unittest_input") {
     module_out_path = module_output_path
     include_dirs = [
