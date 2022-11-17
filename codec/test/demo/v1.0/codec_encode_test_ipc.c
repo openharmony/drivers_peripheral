@@ -65,6 +65,7 @@
 #define ENC_SETUP_FPS_IN_NUM        24
 #define ENC_SETUP_FPS_OUT_NUM       24
 #define PARAM_ARRAY_LEN             20
+#define YUV_ALIGNMENT               16
 
 typedef struct {
     char            *codecName;
@@ -94,25 +95,28 @@ int32_t g_totalSrcSize = 0;
 int32_t g_totalDstSize = 0;
 int32_t g_frameCount = 0;
 
-void DumpOutputToFile(FILE *fp, uint8_t *addr, uint32_t len)
+static uint32_t inline AlignUp(uint32_t width, uint32_t alignment)
+{
+    if (alignment < 1) {
+        return width;
+    }
+    return (((width) + alignment - 1) & (~(alignment - 1)));
+}
+
+static void DumpOutputToFile(FILE *fp, uint8_t *addr, uint32_t len)
 {
     size_t ret = fwrite(addr, 1, len, fp);
     if (ret != len) {
-        HDF_LOGE("%{public}s: DumpOutputToFile failed", __func__);
+        HDF_LOGE("%{public}s: Dump packet failed, ret: %{public}d", __func__, ret);
     }
 }
 
 static int32_t ReadInputFromFile(FILE *fp, uint8_t *addr)
 {
     int32_t readSize = 0;
-    int32_t frameSize = g_cmd.width * g_cmd.height * FRAME_SIZE_MULTI / FRAME_SIZE_OPERATOR;
-    int32_t loop = frameSize / READ_SEGMENT_SIZE;
-    for (int32_t i = 0; i < loop; i++) {
-        readSize += fread(addr + readSize, 1, READ_SEGMENT_SIZE, fp);
-    }
-    if (frameSize % READ_SEGMENT_SIZE > 0) {
-        readSize += fread(addr + readSize, 1, frameSize % READ_SEGMENT_SIZE, fp);
-    }
+    uint32_t wStride = AlignUp(g_cmd.width, YUV_ALIGNMENT);
+    int32_t frameSize = (wStride * g_cmd.height * FRAME_SIZE_MULTI) / FRAME_SIZE_OPERATOR;
+    readSize += fread(addr, 1, frameSize, fp);
     return readSize;
 }
 
