@@ -32,7 +32,7 @@ static ResultCode InsertScheduleToContext(CoAuthSchedule *schedule, UserAuthCont
 // Stores information about the current user authentication schedule.
 static LinkedList *g_contextList = NULL;
 
-ResultCode InitUserAuthContextList()
+ResultCode InitUserAuthContextList(void)
 {
     if (g_contextList != NULL) {
         return RESULT_SUCCESS;

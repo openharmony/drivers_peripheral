@@ -19,7 +19,7 @@
 #include "audio_internal.h"
 #include "v1_0/audio_types.h"
 
-int32_t AudioPathSelGetConfToJsonObj();
+int32_t AudioPathSelGetConfToJsonObj(void);
 int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdaptType adaptType);
 
 #endif

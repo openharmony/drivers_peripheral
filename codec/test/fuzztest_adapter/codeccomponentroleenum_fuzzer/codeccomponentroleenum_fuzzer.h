@@ -13,24 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef BATTERY_HDI_CONFIG_TEST_H
-#define BATTERY_HDI_CONFIG_TEST_H
+#ifndef CODECCOMPONENTROLEENUM_FUZZER
+#define CODECCOMPONENTROLEENUM_FUZZER
 
-#include <gtest/gtest.h>
+#define FUZZ_PROJECT_NAME "codeccomponentroleenum_fuzzer"
 
-namespace OHOS {
-namespace HDI {
-namespace Battery {
-namespace V1_1 {
-class BatteryConfigTest : public testing::Test {
-public:
-    static constexpr uint32_t RED_LIGHT = (255 << 16);
-    static constexpr uint32_t GREEN_LIGHT = (255 << 8);
-    static constexpr uint32_t YELLOW_LIGHT = (255 << 16) | (255 << 8);
-    static constexpr uint32_t LIGHT_OFF = 0;
-};
-} // namespace V1_1
-} // namespace Battery
-} // namespace HDI
-} // namespace OHOS
-#endif // BATTERY_HDI_CONFIG_TEST_H
+#endif

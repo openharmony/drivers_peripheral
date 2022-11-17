@@ -27,7 +27,7 @@ namespace V1_0 {
 class FingerprintAuthInterfaceService : public IFingerprintAuthInterface {
 public:
     FingerprintAuthInterfaceService();
-    virtual ~FingerprintAuthInterfaceService() = default;
+    ~FingerprintAuthInterfaceService() override = default;
 
     int32_t GetExecutorList(std::vector<sptr<IExecutor>> &executorList) override;
 

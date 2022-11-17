@@ -16,7 +16,7 @@
 #ifndef OHOS_HDI_PARTITIONSLOT_PARTITIONSLOT_MANAGER_H
 #define OHOS_HDI_PARTITIONSLOT_PARTITIONSLOT_MANAGER_H
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 #include "singleton.h"

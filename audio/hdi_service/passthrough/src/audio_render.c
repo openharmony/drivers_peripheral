@@ -799,7 +799,7 @@ int32_t AudioRenderRenderFrame(
         AUDIO_FUNC_LOGE("Render Frame Paras is NULL!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    if (FRAME_DATA < frameLen) {
+    if (frameLen > FRAME_DATA) {
         AUDIO_FUNC_LOGE("Out of FRAME_DATA size!");
         return AUDIO_ERR_INTERNAL;
     }

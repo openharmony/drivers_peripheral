@@ -986,7 +986,7 @@ HostDevice *UsbdDispatcher::UsbdFindDevForBusNum(UsbImpl *service, uint8_t busNu
     return nullptr;
 }
 
-int32_t UsbdDispatcher::UsbdRemoveBusDev(UsbImpl *service, uint8_t busNum)
+int32_t UsbdDispatcher::UsbdRemoveBusDev(UsbImpl *service, uint8_t busNum, const sptr<IUsbdSubscriber> &subscriber)
 {
     HostDevice *tempPort = nullptr;
     USBDeviceInfo info;
@@ -998,7 +998,7 @@ int32_t UsbdDispatcher::UsbdRemoveBusDev(UsbImpl *service, uint8_t busNum)
             break;
         }
         info = {ACT_DEVDOWN, tempPort->busNum, tempPort->devAddr};
-        ret = service->subscriber_->DeviceEvent(info);
+        ret = subscriber->DeviceEvent(info);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s failed to notify subscriber, ret: %{public}d", __func__, ret);
             return ret;

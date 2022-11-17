@@ -114,7 +114,7 @@ public:
     static int32_t FunDetachDevice(HostDevice *port, HdfSBuf *data);
     static int32_t UsbdDeviceDettach(UsbImpl *service, uint8_t busNum, uint8_t devAddr);
     static HostDevice *UsbdFindDevForBusNum(UsbImpl *service, uint8_t busNum);
-    static int32_t UsbdRemoveBusDev(UsbImpl *service, uint8_t busNum);
+    static int32_t UsbdRemoveBusDev(UsbImpl *service, uint8_t busNum, const sptr<IUsbdSubscriber> &subscriber);
     static int32_t UsbdBulkASyncReqInit(UsbdBulkASyncReqList *list, UsbdBulkASyncList *pList);
     static UsbdBulkASyncList *UsbdBulkASyncListAlloc(HostDevice *port, uint8_t ifId, uint8_t epId);
     static int32_t UsbdBulkASyncReqNodeSetNoUse(UsbdBulkASyncReqNode *db);

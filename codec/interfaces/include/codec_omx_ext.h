@@ -25,6 +25,7 @@ extern "C" {
  * @brief Enumerates the extended codec codingtyps.
  */
 enum CodecVideoExType {
+    CODEC_OMX_VIDEO_CodingVP9  = 10, /** VP9 Index in Codec HDI */
     CODEC_OMX_VIDEO_CodingHEVC = 11, /** HEVC Index in Codec HDI */
 };
 
@@ -136,6 +137,7 @@ struct CodecVideoPortFormatParam {
     uint32_t size;                                         /** Size of the structure */
     union OMX_VERSIONTYPE version;                         /** Component version */
     uint32_t portIndex;                                    /** Port index */
+    uint32_t codecColorIndex;                              /** Color format index */
     uint32_t codecColorFormat;                             /** Color format defined in Display */
     uint32_t codecCompressFormat;                          /** See  */
     uint32_t framerate;                                    /** Q16 format */
