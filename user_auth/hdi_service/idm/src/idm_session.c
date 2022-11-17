@@ -38,7 +38,7 @@ struct SessionInfo {
     bool isScheduleValid;
 } *g_session;
 
-static bool IsSessionExist()
+static bool IsSessionExist(void)
 {
     if (g_session == NULL) {
         LOG_INFO("the session does not exist");
@@ -125,7 +125,7 @@ bool IsValidTokenTime(uint64_t tokenTime)
     return tokenTime >= g_session->validAuthTokenTime;
 }
 
-ResultCode CloseEditSession()
+ResultCode CloseEditSession(void)
 {
     if (!IsSessionExist()) {
         return RESULT_GENERAL_ERROR;

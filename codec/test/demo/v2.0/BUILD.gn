@@ -26,6 +26,7 @@ ohos_executable("codec_hdi_omx_decode") {
 
   sources = [
     "src/codec_hdi_decode.cpp",
+    "src/codec_packet_reader.cpp",
     "src/command_parse.cpp",
   ]
 

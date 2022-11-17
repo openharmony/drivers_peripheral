@@ -52,12 +52,6 @@ int32_t CodecAdapterCreateComponent(struct CodecComponentNode **codecNode, const
         HDF_LOGE("%{public}s compName or callbacks is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    CODEC_HANDLETYPE comp = nullptr;
-    CodecComponentNode *tempNode = new CodecComponentNode;
-    if (tempNode == nullptr) {
-        HDF_LOGE("%{public}s create CodecComponentNode error", __func__);
-        return HDF_ERR_MALLOC_FAIL;
-    }
 
     CodecExInfo exInfo;
     auto ret = GetBasicInfoByCompName((uint8_t *)&exInfo, compName);
@@ -65,6 +59,14 @@ int32_t CodecAdapterCreateComponent(struct CodecComponentNode **codecNode, const
         HDF_LOGE("%{public}s GetBasicInfoByCompName error", __func__);
         return ret;
     }
+
+    CODEC_HANDLETYPE comp = nullptr;
+    CodecComponentNode *tempNode = new CodecComponentNode;
+    if (tempNode == nullptr) {
+        HDF_LOGE("%{public}s create CodecComponentNode error", __func__);
+        return HDF_ERR_MALLOC_FAIL;
+    }
+
     ret = g_mgr.CreateComponentInstance(compName, comp);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s ceate component instance ret[%{public}d]", __func__, ret);

@@ -98,7 +98,7 @@ typedef struct ExecutorMsg {
     Buffer *msg;
 } ExecutorMsg;
 
-ExecutorResultInfo *CreateExecutorResultInfo(const Buffer *executorResultInfo);
+ExecutorResultInfo *CreateExecutorResultInfo(const Buffer *tlv);
 void DestoryExecutorResultInfo(ExecutorResultInfo *result);
 ResultCode GetExecutorMsgList(uint32_t authPropertyMode, LinkedList **executorMsg);
 

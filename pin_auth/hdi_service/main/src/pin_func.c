@@ -148,7 +148,7 @@ ResultCode DoDeleteTemplate(uint64_t templateId)
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
-ResultCode GenerateKeyPair()
+ResultCode GenerateKeyPair(void)
 {
     DestoryKeyPair(g_keyPair);
     g_keyPair = GenerateEd25519KeyPair();

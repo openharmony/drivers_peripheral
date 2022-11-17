@@ -250,7 +250,7 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    int32_t i = 0;
+    uint32_t i = 0;
     if (manager == NULL || adapter == NULL) {
         return;
     }

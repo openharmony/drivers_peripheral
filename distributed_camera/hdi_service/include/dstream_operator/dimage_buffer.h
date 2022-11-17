@@ -54,7 +54,7 @@ public:
     void SetUsage(const uint64_t usage);
     void SetPhyAddress(const uint64_t addr);
     void SetFileDescriptor(const int32_t fd);
-    void SetTimestamp(const uint64_t timestamp);
+    void SetTimestamp(const uint64_t timeStamp);
     void SetFrameNumber(const uint64_t frameNumber);
     void SetCaptureId(const int32_t id);
     void SetValidFlag(const bool flag);

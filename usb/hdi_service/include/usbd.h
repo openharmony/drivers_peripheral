@@ -33,6 +33,7 @@
 #define DIRECTION_MASK         0x1
 #define USB_CTRL_SET_TIMEOUT   5000
 #define USB_PIPE_DIR_OFFSET    7
+#define MAX_SUBSCRIBER         10
 #define USBD_BULKASYNCREQ_NUM_MAX 64
 
 namespace OHOS {
@@ -166,6 +167,14 @@ struct UsbdRequestASync {
     struct UsbRequestParams params;
     uint8_t endPointAddr;
     uint8_t status;
+};
+
+struct UsbdSubscriber {
+    sptr<IUsbdSubscriber> subscriber;
+    void *impl;
+    struct HdfDevEventlistener usbPnpListener;
+    sptr<IRemoteObject> remote;
+    void *deathRecipient;
 };
 } // namespace V1_0
 } // namespace Usb

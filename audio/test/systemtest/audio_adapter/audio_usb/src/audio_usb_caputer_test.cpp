@@ -51,33 +51,19 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
 };
 
 using THREAD_FUNC = void *(*)(void *);
-void *AudioUsbCaputerTest::handle = nullptr;
-TestGetAudioManager AudioUsbCaputerTest::getAudioManager = nullptr;
 TestAudioManager *AudioUsbCaputerTest::manager = nullptr;
 
 void AudioUsbCaputerTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioUsbCaputerTest::TearDownTestCase(void)
-{
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-}
+void AudioUsbCaputerTest::TearDownTestCase(void) {}
 
 void AudioUsbCaputerTest::SetUp(void) {}
 
@@ -945,7 +931,7 @@ HWTEST_F(AudioUsbCaputerTest, AudioCaptureFrame_001, TestSize.Level1)
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = capture->control.Start((AudioHandle)capture);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    char *frame = static_cast<char *>calloc(1, BUFFER_SIZE);
+    char *frame = static_cast<char *>(calloc(1, BUFFER_SIZE));
     EXPECT_NE(nullptr, frame);
     ret = capture->CaptureFrame(capture, frame, requestBytes, &replyBytes);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
@@ -974,7 +960,7 @@ HWTEST_F(AudioUsbCaputerTest, AudioCaptureFrame_005, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME_USB, &adapter, &capture);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    char *frame = static_cast<char *>calloc(1, BUFFER_SIZE);
+    char *frame = static_cast<char *>(calloc(1, BUFFER_SIZE));
     EXPECT_NE(nullptr, frame);
     ret = capture->CaptureFrame(capture, frame, requestBytes, &replyBytes);
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);

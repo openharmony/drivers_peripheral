@@ -52,7 +52,7 @@ typedef struct IdentifyParam {
     uint32_t executorSensorHint;
 } IdentifyParam;
 
-ResultCode InitUserAuthContextList();
+ResultCode InitUserAuthContextList(void);
 void DestoryUserAuthContextList(void);
 ResultCode GenerateAuthContext(AuthSolutionHal params, UserAuthContext **context);
 UserAuthContext *GenerateIdentifyContext(IdentifyParam params);

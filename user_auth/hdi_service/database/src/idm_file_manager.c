@@ -348,7 +348,7 @@ static ResultCode StreamReadUserInfo(Buffer *parcel, uint32_t *index, UserInfo *
     return RESULT_SUCCESS;
 }
 
-static Buffer *ReadFileInfo()
+static Buffer *ReadFileInfo(void)
 {
     FileOperator *fileOperator = GetFileOperator(DEFAULT_FILE_OPERATOR);
     if (!IsFileOperatorValid(fileOperator)) {

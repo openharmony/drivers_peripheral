@@ -363,6 +363,7 @@ int32_t DStreamOperator::DoCapture(int32_t captureId, const CaptureInfo &info, b
             DHLOGE("Stream %d has not bufferQueue.", id);
             return CamRetCode::INVALID_ARGUMENT;
         }
+        stream->DoCapture();
         InsertEnableShutter(id, info.enableShutterCallback_);
         DHLOGI("DStreamOperator::DoCapture info: "+
             "captureId=%d, streamId=%d, isStreaming=%d", captureId, id, isStreaming);
@@ -492,37 +493,43 @@ void DStreamOperator::ExtractCameraAttr(Json::Value &rootValue, std::vector<int>
         std::string formatStr = std::to_string(format);
         if (rootValue[rootNode]["Resolution"][formatStr].isArray() &&
             rootValue[rootNode]["Resolution"][formatStr].size() > 0) {
-            std::vector<DCResolution> resolutionVec;
-            uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
-            for (uint32_t i = 0; i < size; i++) {
-                std::string resoStr = rootValue[rootNode]["Resolution"][formatStr][i].asString();
-                std::vector<std::string> reso;
-                SplitString(resoStr, reso, STAR_SEPARATOR);
-                if (reso.size() != SIZE_FMT_LEN) {
-                    continue;
-                }
-                uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
-                uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
-                if (height == 0 || width == 0 ||
-                    ((rootNode == "Photo") &&
-                     ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
-                    ((rootNode != "Photo") &&
-                     (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
-                    continue;
-                }
-                DCResolution resolution(width, height);
-                resolutionVec.push_back(resolution);
-            }
-            if (!resolutionVec.empty()) {
-                std::sort(resolutionVec.begin(), resolutionVec.end());
-                if (rootNode == "Preview") {
-                    dcSupportedPreviewResolutionMap_[format] = resolutionVec;
-                } else if (rootNode == "Video") {
-                    dcSupportedVideoResolutionMap_[format] = resolutionVec;
-                } else if (rootNode == "Photo") {
-                    dcSupportedPhotoResolutionMap_[format] = resolutionVec;
-                }
-            }
+            GetCameraAttr(rootValue, formatStr, rootNode, format);
+        }
+    }
+}
+
+void DStreamOperator::GetCameraAttr(Json::Value &rootValue, std::string formatStr, const std::string rootNode,
+    int format)
+{
+    std::vector<DCResolution> resolutionVec;
+    uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
+    for (uint32_t i = 0; i < size; i++) {
+        std::string resoStr = rootValue[rootNode]["Resolution"][formatStr][i].asString();
+        std::vector<std::string> reso;
+        SplitString(resoStr, reso, STAR_SEPARATOR);
+        if (reso.size() != SIZE_FMT_LEN) {
+            continue;
+        }
+        uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
+        uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
+        if (height == 0 || width == 0 ||
+            ((rootNode == "Photo") &&
+                ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
+            ((rootNode != "Photo") &&
+                (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
+            continue;
+        }
+        DCResolution resolution(width, height);
+        resolutionVec.push_back(resolution);
+    }
+    if (!resolutionVec.empty()) {
+        std::sort(resolutionVec.begin(), resolutionVec.end());
+        if (rootNode == "Preview") {
+            dcSupportedPreviewResolutionMap_[format] = resolutionVec;
+        } else if (rootNode == "Video") {
+            dcSupportedVideoResolutionMap_[format] = resolutionVec;
+        } else if (rootNode == "Photo") {
+            dcSupportedPhotoResolutionMap_[format] = resolutionVec;
         }
     }
 }

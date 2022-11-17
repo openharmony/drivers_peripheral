@@ -447,7 +447,7 @@ int32_t AudioAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t rout
 int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
                                    const char *condition, const char *value);
 int32_t AudioAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
-                                   const char *condition, char *value, int32_t lenth);
+                                   const char *condition, char *value, int32_t length);
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
 int32_t AudioAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume);
 int32_t AudioRenderStart(AudioHandle handle);

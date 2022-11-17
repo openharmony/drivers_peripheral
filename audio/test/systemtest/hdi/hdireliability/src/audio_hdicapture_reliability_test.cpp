@@ -39,8 +39,6 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
     static int32_t RelAudioCaptureSetMute(struct PrepareAudioPara& ptr);
     static int32_t RelAudioCaptureGetMute(struct PrepareAudioPara& ptr);
@@ -63,28 +61,15 @@ public:
 };
 
 using THREAD_FUNC = void *(*)(void *);
-
-void *AudioHdiCaptureReliabilityTest::handle = nullptr;
-TestGetAudioManager AudioHdiCaptureReliabilityTest::getAudioManager = nullptr;
 TestAudioManager *AudioHdiCaptureReliabilityTest::manager = nullptr;
 
 void AudioHdiCaptureReliabilityTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioHdiCaptureReliabilityTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioHdiCaptureReliabilityTest::TearDownTestCase(void) {}
 
 void AudioHdiCaptureReliabilityTest::SetUp(void)
 {

@@ -37,7 +37,7 @@ config("module_private_config") {
   ]
 }
 
-##############################systemtest##########################################
+##############################systemtest_reboot##########################################
 ohos_systemtest("test_reboot") {
   module_out_path = "${module_output_path}"
 
@@ -72,8 +72,49 @@ ohos_systemtest("test_reboot") {
   ]
 }
 
+##############################systemtest_battery_sys_test##########################################
+
+ohos_systemtest("test_battery_sys_test") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "//drivers/peripheral/battery/utils/include" ]
+
+  sources = [
+    "//drivers/peripheral/battery/charger/backlight/battery_backlight.cpp",
+    "//drivers/peripheral/battery/charger/led/battery_led.cpp",
+    "//drivers/peripheral/battery/charger/src/charger_thread.cpp",
+    "//drivers/peripheral/battery/charger/vibrate/battery_vibrate.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
+    "src/battery_sys_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${hdf_uhdf_path}/utils:libhdf_utils",
+    "//drivers/peripheral/battery/charger/ui:libminui",
+    "//third_party/googletest:gtest_main",
+    "//third_party/jsoncpp:jsoncpp",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_battery:libbattery_proxy_1.1",
+    "drivers_interface_input:hdi_input",
+    "drivers_interface_light:liblight_proxy_1.0",
+    "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+  ]
+}
+
 group("systemtest") {
   testonly = true
 
-  deps = [ ":test_reboot" ]
+  deps = [
+    ":test_battery_sys_test",
+    ":test_reboot",
+  ]
 }

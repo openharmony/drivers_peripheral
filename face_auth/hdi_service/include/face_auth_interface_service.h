@@ -27,7 +27,7 @@ namespace V1_0 {
 class FaceAuthInterfaceService : public IFaceAuthInterface {
 public:
     FaceAuthInterfaceService();
-    virtual ~FaceAuthInterfaceService() = default;
+    ~FaceAuthInterfaceService() override = default;
 
     int32_t GetExecutorList(std::vector<sptr<IExecutor>> &executorList) override;
 
