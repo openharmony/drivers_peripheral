@@ -35,12 +35,14 @@
 #define QUEUE_TIME_OUT              10
 #define HEIGHT_OPERATOR             2
 #define FRAME_SIZE_OPERATOR         2
+#define FRAME_SIZE_MULTI            3
 #define START_CODE_OFFSET_ONE       (-1)
 #define START_CODE_OFFSET_SEC       (-2)
 #define START_CODE_OFFSET_THIRD     (-3)
 #define START_CODE_SIZE_FRAME       4
 #define START_CODE_SIZE_SLICE       3
 #define START_CODE                  0x1
+#define YUV_ALIGNMENT               16
 
 typedef struct {
     char            *codecName;
@@ -69,33 +71,22 @@ int32_t g_srcFileSize = 0;
 int32_t g_totalSrcSize = 0;
 int32_t g_totalFrames = 0;
 
+static uint32_t inline AlignUp(uint32_t width, uint32_t alignment)
+{
+    if (alignment < 1) {
+        return width;
+    }
+    return (((width) + alignment - 1) & (~(alignment - 1)));
+}
+
 static void DumpOutputToFile(FILE *fp, uint8_t *addr)
 {
-    uint32_t width = g_cmd.width;
+    uint32_t wStride = AlignUp(g_cmd.width, YUV_ALIGNMENT);
     uint32_t height = g_cmd.height;
-    uint32_t horStride = g_cmd.width;
-    uint32_t verStride = g_cmd.height;
-    uint8_t *base = addr;
-    size_t ret = 0;
-
-    // MPP_FMT_YUV420SP
-    uint32_t i;
-    uint8_t *baseY = base;
-    uint8_t *baseC = base + horStride * verStride;
-
-    for (i = 0; i < height; i++, baseY += horStride) {
-        ret = fwrite(baseY, 1, width, fp);
-        if (ret != width) {
-            HDF_LOGE("%{public}s: DumpOutputToFile failed", __func__);
-            continue;
-        }
-    }
-    for (i = 0; i < height / HEIGHT_OPERATOR; i++, baseC += horStride) {
-        ret = fwrite(baseC, 1, width, fp);
-        if (ret != width) {
-            HDF_LOGE("%{public}s: DumpOutputToFile failed", __func__);
-            continue;
-        }
+    size_t bufferSize = (wStride * height * FRAME_SIZE_MULTI) / FRAME_SIZE_OPERATOR;
+    size_t ret = fwrite(addr, 1, bufferSize, fp);
+    if (ret != bufferSize) {
+        HDF_LOGE("%{public}s: Dump frame failed, ret: %{public}d", __func__, ret);
     }
 }
 
