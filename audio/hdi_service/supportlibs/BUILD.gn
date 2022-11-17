@@ -108,8 +108,10 @@ if (defined(ohos_lite)) {
           [ "//drivers/peripheral/audio/supportlibs/adm_adapter/include" ]
     }
 
+    defines = [ "AUDIO_HDI_SERVICE_MODE" ]
+
     if (enable_audio_hal_hdf_log) {
-      defines = [ "AUDIO_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     if (is_standard_system) {
@@ -165,8 +167,10 @@ if (defined(ohos_lite)) {
           [ "//drivers/peripheral/audio/supportlibs/adm_adapter/include" ]
     }
 
+    defines = [ "AUDIO_HDI_SERVICE_MODE" ]
+
     if (enable_audio_hal_hdf_log) {
-      defines = [ "AUDIO_HDF_LOG" ]
+      defines += [ "AUDIO_HDF_LOG" ]
     }
 
     if (is_standard_system) {

@@ -23,6 +23,7 @@
 #include "audio_interface_lib_render.h"
 #include "audio_internal.h"
 #include "audio_uhdf_log.h"
+#include "securec.h"
 
 #define HDF_LOG_TAG AUDIO_HDI_IMPL
 

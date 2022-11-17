@@ -61,7 +61,7 @@ extern "C" {
 #define PRIMARY                             "primary"
 #define USB                                 "usb"
 #define A2DP                                "a2dp"
-
+#define HDMI                                "hdmi"
 
 /**
  * @brief Enumerates HAL return value types.
@@ -124,10 +124,6 @@ enum AudioTurnStandbyMode {
     AUDIO_TURN_STANDBY_LATER = 0,
     AUDIO_TURN_STANDBY_NOW,
     AUDIO_TURN_STANDBY_BUTT,
-};
-
-struct DevHandleCapture {
-    void *object;
 };
 
 struct DevHandle {
@@ -303,8 +299,8 @@ struct AudioHwCaptureParam {
 struct AudioHwCapture {
     struct AudioCapture common;
     struct AudioHwCaptureParam captureParam;
-    struct DevHandleCapture *devDataHandle;   // Bind Data handle
-    struct DevHandleCapture *devCtlHandle;    // Bind Ctl handle
+    struct DevHandle *devDataHandle;   // Bind Data handle
+    struct DevHandle *devCtlHandle;    // Bind Ctl handle
     struct HdfRemoteService *proxyRemoteHandle; // proxyRemoteHandle
     struct ErrorLog errorLog;
 };
@@ -389,9 +385,9 @@ typedef struct DevHandle *(*BindServiceRenderSo)(const char *);
 typedef int32_t (*InterfaceLibModeRenderSo)(struct DevHandle *, struct AudioHwRenderParam *, int);
 typedef void(*CloseServiceRenderSo)(struct DevHandle *);
 
-typedef struct DevHandleCapture *(*BindServiceCaptureSo)(const char *);
-typedef int32_t (*InterfaceLibModeCaptureSo)(struct DevHandleCapture *, struct AudioHwCaptureParam *, int);
-typedef void(*CloseServiceCaptureSo)(struct DevHandleCapture *);
+typedef struct DevHandle *(*BindServiceCaptureSo)(const char *);
+typedef int32_t (*InterfaceLibModeCaptureSo)(struct DevHandle *, struct AudioHwCaptureParam *, int);
+typedef void(*CloseServiceCaptureSo)(struct DevHandle *);
 
 typedef int32_t (*PathSelGetConfToJsonObj)(void);
 typedef int32_t (*PathSelAnalysisJson)(void *adapterParam, enum AudioAdaptType adaptType);

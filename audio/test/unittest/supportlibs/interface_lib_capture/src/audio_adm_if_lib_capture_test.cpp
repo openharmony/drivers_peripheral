@@ -21,47 +21,47 @@ using namespace std;
 using namespace testing::ext;
 namespace {
 extern "C" {
-struct HdfSBuf *AudioObtainHdfSBuf();
+struct HdfSBuf *HdfSbufObtainDefaultSize();
 int32_t SetHwParamsCapture(const struct AudioHwCaptureParam * const handleData);
 int32_t AudioServiceCaptureDispatch(struct HdfIoService *service,
     int cmdId, struct HdfSBuf *sBuf, struct HdfSBuf *reply);
 int32_t AudioCtlCaptureSetPauseBuf(struct HdfSBuf *sBuf, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureSetPauseStu(const struct DevHandleCapture *handle,
+int32_t AudioCtlCaptureSetPauseStu(const struct DevHandle *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData);
 int32_t AudioCtlCaptureGetVolumeSBuf(struct HdfSBuf *sBuf, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureGetVolume(const struct DevHandleCapture *handle,
+int32_t AudioCtlCaptureGetVolume(const struct DevHandle *handle,
     int cmdId, struct AudioHwCaptureParam *handleData);
 int32_t AudioCtlCaptureSetVolumeSBuf(struct HdfSBuf *sBuf, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureSetVolume(const struct DevHandleCapture *handle,
+int32_t AudioCtlCaptureSetVolume(const struct DevHandle *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData);
 int32_t AudioCtlCaptureSetMuteSBuf(struct HdfSBuf *sBuf, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureSetMuteStu(const struct DevHandleCapture *handle,
+int32_t AudioCtlCaptureSetMuteStu(const struct DevHandle *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData);
 int32_t AudioCtlCaptureGetMuteSBuf(struct HdfSBuf *sBuf, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureGetMuteStu(const struct DevHandleCapture *handle,
+int32_t AudioCtlCaptureGetMuteStu(const struct DevHandle *handle,
     int cmdId, struct AudioHwCaptureParam *handleData);
 int32_t AudioCtlCaptureSetGainSBuf(struct HdfSBuf *sBuf, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureSetGainStu(const struct DevHandleCapture *handle,
+int32_t AudioCtlCaptureSetGainStu(const struct DevHandle *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData);
 int32_t AudioCtlCaptureGetGainSBuf(struct HdfSBuf *sBuf, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureGetGainStu(const struct DevHandleCapture *handle,
+int32_t AudioCtlCaptureGetGainStu(const struct DevHandle *handle,
     int cmdId, struct AudioHwCaptureParam *handleData);
 int32_t AudioCtlCaptureSceneSelectSBuf(struct HdfSBuf *sBuf,
     struct AudioHwCaptureParam *handleData, int32_t deviceIndex);
-int32_t AudioCtlCaptureSceneSelect(const struct DevHandleCapture *handle,
+int32_t AudioCtlCaptureSceneSelect(const struct DevHandle *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData);
 int32_t AudioCtlCaptureGetGainThresholdSBuf(struct HdfSBuf *sBuf, struct AudioHwCaptureParam *handleData);
-int32_t AudioCtlCaptureGetGainThreshold(const struct DevHandleCapture *handle,
+int32_t AudioCtlCaptureGetGainThreshold(const struct DevHandle *handle,
     int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioInterfaceLibCtlCapture(const struct DevHandleCapture *handle,
+int32_t AudioInterfaceLibCtlCapture(const struct DevHandle *handle,
     int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioOutputCaptureHwParams(const struct DevHandleCapture *handle,
+int32_t AudioOutputCaptureHwParams(const struct DevHandle *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData);
-int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle,
+int32_t AudioOutputCaptureRead(const struct DevHandle *handle,
     int cmdId, struct AudioHwCaptureParam *handleData);
-int32_t AudioOutputCaptureStop(const struct DevHandleCapture *handle,
+int32_t AudioOutputCaptureStop(const struct DevHandle *handle,
     int cmdId, const struct AudioHwCaptureParam *handleData);
-int32_t AudioInterfaceLibOutputCapture(const struct DevHandleCapture *handle, int cmdId,
+int32_t AudioInterfaceLibOutputCapture(const struct DevHandle *handle, int cmdId,
     struct AudioHwCaptureParam *handleData);
 }
 
@@ -108,7 +108,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetPauseBuf_001, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetPauseBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureSetPauseBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -117,7 +117,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetPauseBuf_002, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetPauseBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureSetPauseBuf(sBuf, handleData);
@@ -139,7 +139,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetVolumeSBuf_001, TestSize.Le
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetVolumeSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureGetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -148,7 +148,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetVolumeSBuf_002, TestSize.Le
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetVolumeSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureGetVolumeSBuf(sBuf, handleData);
@@ -170,7 +170,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetVolumeSBuf_001, TestSize.Le
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetVolumeSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureSetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -179,7 +179,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetVolumeSBuf_002, TestSize.Le
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetVolumeSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureSetVolumeSBuf(sBuf, handleData);
@@ -201,7 +201,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetMuteSBuf_001, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetMuteSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureSetMuteSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -210,7 +210,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetMuteSBuf_002, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetMuteSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureSetMuteSBuf(sBuf, handleData);
@@ -232,7 +232,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetMuteSBuf_001, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetMuteSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureGetMuteSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -241,7 +241,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetMuteSBuf_002, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetMuteSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureGetMuteSBuf(sBuf, handleData);
@@ -263,7 +263,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetGainSBuf_001, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetGainSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureSetGainSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -272,7 +272,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetGainSBuf_002, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSetGainSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureSetGainSBuf(sBuf, handleData);
@@ -294,7 +294,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetGainSBuf_001, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetGainSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureGetGainSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -303,7 +303,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetGainSBuf_002, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetGainSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureGetGainSBuf(sBuf, handleData);
@@ -326,7 +326,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSceneSelectSBuf_001, TestSize.
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSceneSelectSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = nullptr;
     int32_t deviceIndex = 0;
     int32_t ret = AudioCtlCaptureSceneSelectSBuf(sBuf, handleData, deviceIndex);
@@ -336,7 +336,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSceneSelectSBuf_002, TestSize.
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureSceneSelectSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t deviceIndex = 0;
@@ -359,7 +359,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetGainThresholdSBuf_001, Test
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetGainThresholdSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = nullptr;
     int32_t ret = AudioCtlCaptureGetGainThresholdSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -368,7 +368,7 @@ HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetGainThresholdSBuf_002, Test
 
 HWTEST_F(AudioAdmIfLibCaptureTest, AudioCtlCaptureGetGainThresholdSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwCaptureParam *handleData = new AudioHwCaptureParam;
     handleData->captureMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlCaptureGetGainThresholdSBuf(sBuf, handleData);
