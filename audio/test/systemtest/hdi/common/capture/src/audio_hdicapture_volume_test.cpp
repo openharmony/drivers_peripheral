@@ -47,32 +47,18 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
 };
 
-void *AudioHdiCaptureVolumeTest::handle = nullptr;
-TestGetAudioManager AudioHdiCaptureVolumeTest::getAudioManager = nullptr;
 TestAudioManager *AudioHdiCaptureVolumeTest::manager = nullptr;
 
 void AudioHdiCaptureVolumeTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioHdiCaptureVolumeTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioHdiCaptureVolumeTest::TearDownTestCase(void) {}
 
 void AudioHdiCaptureVolumeTest::SetUp(void) {}
 void AudioHdiCaptureVolumeTest::TearDown(void) {}

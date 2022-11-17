@@ -36,15 +36,11 @@ public:
     static int32_t (*InterfaceLibCtlRender)(struct DevHandle *, int32_t, struct AudioHwRenderParam *);
     static void (*CloseServiceRender)(struct DevHandle *);
     static void *ptrHandle;
-    static TestGetAudioManager getAudioManager;
-    static void *handle;
     static TestAudioManager *manager;
     int32_t BindServiceAndHwRender(struct AudioHwRender *&hwRender, const std::string BindName,
          const std::string adapterNameCase, struct DevHandle *&handle) const;
 };
 
-TestGetAudioManager AudioSmartPaTest::getAudioManager = nullptr;
-void *AudioSmartPaTest::handle = nullptr;
 TestAudioManager *AudioSmartPaTest::manager = nullptr;
 struct DevHandle *(*AudioSmartPaTest::BindServiceRender)(const char *) = nullptr;
 int32_t (*AudioSmartPaTest::InterfaceLibOutputRender)(struct DevHandle *, int, struct AudioHwRenderParam *) = nullptr;
@@ -55,9 +51,7 @@ using THREAD_FUNC = void *(*)(void *);
 
 void AudioSmartPaTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
     string resolvedPathOne = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_render");
     ptrHandle = dlopen(resolvedPathOne.c_str(), RTLD_LAZY);
@@ -76,12 +70,6 @@ void AudioSmartPaTest::SetUpTestCase(void)
 
 void AudioSmartPaTest::TearDownTestCase(void)
 {
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
     if (ptrHandle != nullptr) {
         (void)dlclose(ptrHandle);
     }
