@@ -959,13 +959,12 @@ int32_t AudioProxyAdapterSetExtraParams(struct AudioAdapter *adapter, enum Audio
 int32_t AudioProxyAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
                                         const char *condition, char *value, int32_t length)
 {
-    if (adapter == NULL || value == NULL || length <= 0) {
+    if (adapter == NULL || value == NULL || condition == NULL || length <= 0) {
         AUDIO_FUNC_LOGE("AudioProxyAdapterGetExtraParams FAIL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
     (void)key;
-    (void)condition;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     const char *strValue = NULL;
@@ -985,6 +984,12 @@ int32_t AudioProxyAdapterGetExtraParams(struct AudioAdapter *adapter, enum Audio
         HDF_LOGE("%{public}s: write interface token failed!", __func__);
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteString(data, condition)) {
+        AUDIO_FUNC_LOGE("condition write fail");
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteInt32(data, length)) {
