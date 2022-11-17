@@ -99,6 +99,7 @@ Note:If the text contains special characters, please escape them according to th
                 <filteritem type="filepath" name="camera/figures/.*.png" desc="camera architecture diagram"/>
                 <filteritem type="filepath" name="usb/figures/.*.png" desc="usb architecture diagram"/>
                 <filteritem type="filepath" name="display/test/resource/.*.bmp" desc="display test image"/>
+                <filteritem type="filepath" name="battery/charger/resources/HarmonyOS_Sans_SC_Regular_Small.ttf" desc="charger font library"/>
             </filefilter>
         </filefilterlist>
     </oatconfig>

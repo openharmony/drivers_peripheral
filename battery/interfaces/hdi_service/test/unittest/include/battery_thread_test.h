@@ -24,10 +24,10 @@ namespace HDI {
 namespace Battery {
 namespace V1_1 {
 namespace {
-    struct BatteryThreadUnitTest {};
-    struct BatteryConfigUnitTest {};
-    struct ChargerThreadUnitTest {};
-}
+struct BatteryThreadUnitTest {};
+struct BatteryConfigUnitTest {};
+struct ChargerThreadUnitTest {};
+} // namespace
 
 int32_t OpenUeventSocketTest(BatteryThread& bthread);
 void UpdateEpollIntervalTest(const int32_t chargeState, BatteryThread& bthread);
@@ -45,7 +45,7 @@ int32_t GetChargeStateTest(ChargerThread& cthread);
 void HandleCapacityTest(const int32_t& capacity, ChargerThread& cthread);
 void ChargerThreadHandleTemperatureTest(const int32_t& temperature, ChargerThread& cthread);
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class OpenUeventSocketImplement {
     friend int32_t OpenUeventSocketTest(BatteryThread& bthread)
     {
@@ -53,7 +53,7 @@ class OpenUeventSocketImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class UpdateEpollIntervalImplement {
     friend void UpdateEpollIntervalTest(const int32_t chargeState, BatteryThread& bthread)
     {
@@ -61,7 +61,7 @@ class UpdateEpollIntervalImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class GetEpollIntervalImplement {
     friend int GetEpollIntervalTest(BatteryThread& bthread)
     {
@@ -69,7 +69,7 @@ class GetEpollIntervalImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class InitImplement {
     friend int32_t InitTest(void* service, BatteryThread& bthread)
     {
@@ -77,7 +77,7 @@ class InitImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class GetEpollFdImplement {
     friend int32_t GetEpollFdTest(BatteryThread& bthread)
     {
@@ -85,7 +85,7 @@ class GetEpollFdImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class InitUeventImplement {
     friend int32_t InitUeventTest(BatteryThread& bthread)
     {
@@ -93,7 +93,7 @@ class InitUeventImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class ChargerThreadInitImplement {
     friend void ChargerThreadInitTest(ChargerThread& cthread)
     {
@@ -101,7 +101,7 @@ class ChargerThreadInitImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class GetUeventFdImplement {
     friend int32_t GetUeventFdTest(BatteryThread& bthread)
     {
@@ -109,7 +109,7 @@ class GetUeventFdImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class ParseConfigImplement {
     friend void ParseConfigTest(const std::string filename, BatteryConfig& bconfig)
     {
@@ -117,7 +117,7 @@ class ParseConfigImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class CycleMattersImplement {
     friend void CycleMattersTest(ChargerThread& cthread)
     {
@@ -125,7 +125,7 @@ class CycleMattersImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class GetBatteryInfoImplement {
     friend bool GetBatteryInfoTest(ChargerThread& cthread)
     {
@@ -133,7 +133,7 @@ class GetBatteryInfoImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class HandleCapacityImplement {
     friend void HandleCapacityTest(const int32_t& capacity, ChargerThread& cthread)
     {
@@ -141,7 +141,7 @@ class HandleCapacityImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class GetChargeStateImplement {
     friend int32_t GetChargeStateTest(ChargerThread& cthread)
     {
@@ -149,7 +149,7 @@ class GetChargeStateImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class SetChargeStateImplement {
     friend void SetChargeStateTest(const int32_t state, ChargerThread& cthread)
     {
@@ -157,7 +157,7 @@ class SetChargeStateImplement {
     }
 };
 
-template<typename Tag, typename PrivateFun, PrivateFun privateFun>
+template <typename Tag, typename PrivateFun, PrivateFun privateFun>
 class ChargerThreadHandleTemperatureImplement {
     friend void ChargerThreadHandleTemperatureTest(const int32_t& temperature, ChargerThread& cthread)
     {
@@ -165,95 +165,47 @@ class ChargerThreadHandleTemperatureImplement {
     }
 };
 
-template class OpenUeventSocketImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::OpenUeventSocket),
-    &BatteryThread::OpenUeventSocket
->;
+template class OpenUeventSocketImplement<BatteryThreadUnitTest, decltype(&BatteryThread::OpenUeventSocket),
+    &BatteryThread::OpenUeventSocket>;
 
-template class UpdateEpollIntervalImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::UpdateEpollInterval),
-    &BatteryThread::UpdateEpollInterval
->;
+template class UpdateEpollIntervalImplement<BatteryThreadUnitTest, decltype(&BatteryThread::UpdateEpollInterval),
+    &BatteryThread::UpdateEpollInterval>;
 
-template class GetEpollIntervalImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::epollInterval_),
-    &BatteryThread::epollInterval_
->;
+template class GetEpollIntervalImplement<BatteryThreadUnitTest, decltype(&BatteryThread::epollInterval_),
+    &BatteryThread::epollInterval_>;
 
-template class InitImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::Init),
-    &BatteryThread::Init
->;
+template class InitImplement<BatteryThreadUnitTest, decltype(&BatteryThread::Init), &BatteryThread::Init>;
 
-template class GetEpollFdImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::epFd_),
-    &BatteryThread::epFd_
->;
+template class GetEpollFdImplement<BatteryThreadUnitTest, decltype(&BatteryThread::epFd_), &BatteryThread::epFd_>;
 
-template class InitUeventImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::InitUevent),
-    &BatteryThread::InitUevent
->;
+template class InitUeventImplement<BatteryThreadUnitTest, decltype(&BatteryThread::InitUevent),
+    &BatteryThread::InitUevent>;
 
-template class ChargerThreadInitImplement <
-    ChargerThreadUnitTest,
-    decltype(&ChargerThread::Init),
-    &ChargerThread::Init
->;
+template class ChargerThreadInitImplement<ChargerThreadUnitTest, decltype(&ChargerThread::Init), &ChargerThread::Init>;
 
-template class CycleMattersImplement <
-    ChargerThreadUnitTest,
-    decltype(&ChargerThread::CycleMatters),
-    &ChargerThread::CycleMatters
->;
+template class CycleMattersImplement<ChargerThreadUnitTest, decltype(&ChargerThread::CycleMatters),
+    &ChargerThread::CycleMatters>;
 
-template class GetUeventFdImplement <
-    BatteryThreadUnitTest,
-    decltype(&BatteryThread::ueventFd_),
-    &BatteryThread::ueventFd_
->;
+template class GetUeventFdImplement<BatteryThreadUnitTest, decltype(&BatteryThread::ueventFd_),
+    &BatteryThread::ueventFd_>;
 
-template class ParseConfigImplement <
-    BatteryConfigUnitTest,
-    decltype(&BatteryConfig::ParseConfig),
-    &BatteryConfig::ParseConfig
->;
+template class ParseConfigImplement<BatteryConfigUnitTest, decltype(&BatteryConfig::ParseConfig),
+    &BatteryConfig::ParseConfig>;
 
-template class GetBatteryInfoImplement <
-    ChargerThreadUnitTest,
-    decltype(&ChargerThread::started_),
-    &ChargerThread::started_
->;
+template class GetBatteryInfoImplement<ChargerThreadUnitTest, decltype(&ChargerThread::started_),
+    &ChargerThread::started_>;
 
-template class HandleCapacityImplement <
-    ChargerThreadUnitTest,
-    decltype(&ChargerThread::HandleCapacity),
-    &ChargerThread::HandleCapacity
->;
+template class HandleCapacityImplement<ChargerThreadUnitTest, decltype(&ChargerThread::HandleCapacity),
+    &ChargerThread::HandleCapacity>;
 
-template class GetChargeStateImplement <
-    ChargerThreadUnitTest,
-    decltype(&ChargerThread::chargeState_),
-    &ChargerThread::chargeState_
->;
+template class GetChargeStateImplement<ChargerThreadUnitTest, decltype(&ChargerThread::chargeState_),
+    &ChargerThread::chargeState_>;
 
-template class SetChargeStateImplement <
-    ChargerThreadUnitTest,
-    decltype(&ChargerThread::chargeState_),
-    &ChargerThread::chargeState_
->;
+template class SetChargeStateImplement<ChargerThreadUnitTest, decltype(&ChargerThread::chargeState_),
+    &ChargerThread::chargeState_>;
 
-template class ChargerThreadHandleTemperatureImplement <
-    ChargerThreadUnitTest,
-    decltype(&ChargerThread::HandleTemperature),
-    &ChargerThread::HandleTemperature
->;
+template class ChargerThreadHandleTemperatureImplement<ChargerThreadUnitTest,
+    decltype(&ChargerThread::HandleTemperature), &ChargerThread::HandleTemperature>;
 
 class BatteryThreadTest {
 public:
