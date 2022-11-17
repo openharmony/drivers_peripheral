@@ -114,9 +114,9 @@ static int32_t InitCaptureSoHandle(const char *captureSoPath)
             AUDIO_FUNC_LOGE("open lib capture so fail, reason:%{public}s", dlerror());
             return HDF_FAILURE;
         }
-        g_bindServiceCapture = dlsym(g_ptrCaptureHandle, "AudioBindServiceCapture");
+        g_bindServiceCapture = dlsym(g_ptrCaptureHandle, "AudioBindService");
         g_interfaceLibModeCapture = dlsym(g_ptrCaptureHandle, "AudioInterfaceLibModeCapture");
-        g_closeServiceCapture = dlsym(g_ptrCaptureHandle, "AudioCloseServiceCapture");
+        g_closeServiceCapture = dlsym(g_ptrCaptureHandle, "AudioCloseService");
         if (g_bindServiceCapture == NULL || g_interfaceLibModeCapture == NULL || g_closeServiceCapture == NULL) {
             AUDIO_FUNC_LOGE("lib capture so func not found!");
             AudioDlClose(&g_ptrCaptureHandle);
@@ -142,9 +142,9 @@ static int32_t InitRenderSoHandle(const char *renderSoPath)
             AUDIO_FUNC_LOGE("open lib render so fail, reason:%{public}s", dlerror());
             return HDF_FAILURE;
         }
-        g_bindServiceRender = dlsym(g_ptrRenderHandle, "AudioBindServiceRender");
+        g_bindServiceRender = dlsym(g_ptrRenderHandle, "AudioBindService");
         g_interfaceLibModeRender = dlsym(g_ptrRenderHandle, "AudioInterfaceLibModeRender");
-        g_closeServiceRender = dlsym(g_ptrRenderHandle, "AudioCloseServiceRender");
+        g_closeServiceRender = dlsym(g_ptrRenderHandle, "AudioCloseService");
         if (g_bindServiceRender == NULL || g_interfaceLibModeRender == NULL || g_closeServiceRender == NULL) {
             AUDIO_FUNC_LOGE("lib render so func not found!");
             AudioDlClose(&g_ptrRenderHandle);

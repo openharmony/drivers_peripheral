@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "audio_common_test.h"
+#include "osal_mem.h"
 
 using namespace std;
 using namespace comfun;
