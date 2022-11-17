@@ -23,7 +23,7 @@
 
 #define CJSONFILE_CONFIG_PATH HDF_CONFIG_DIR"/audio_paths.json"
 
-int32_t AudioPathSelGetConfToJsonObj();
+int32_t AudioPathSelGetConfToJsonObj(void);
 int32_t AudioPathSelAnalysisJson(const AudioHandle adapterParam, enum AudioAdaptType adaptType);
 
 #endif

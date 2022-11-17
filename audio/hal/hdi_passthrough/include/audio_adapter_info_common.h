@@ -61,7 +61,7 @@ int32_t InitPortForCapabilitySub(struct AudioPort portIndex, struct AudioPortCap
 int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamValMap[], int32_t *count);
 int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key, void *value);
 int32_t GetErrorReason(int reason, char* reasonDesc);
-int32_t GetCurrentTime(char *time);
+int32_t GetCurrentTime(char *currentTime);
 int32_t CheckAttrRoute(int32_t param);
 int32_t CheckAttrChannel(uint32_t param);
 int32_t TransferRoute(const char *value, int32_t *route);
