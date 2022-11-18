@@ -25,6 +25,10 @@ if (defined(ohos_lite)) {
 } else {
   group("hdf_test_display_composer") {
     testonly = true
-    deps = [ "unittest:hdf_unittest_display" ]
+    deps = [ 
+        "fuzztest:hdf_composer_fuzztest",
+        "unittest:hdf_composer_unittest",
+        "display_device:hdf_display_device_test",
+    ]
   }
 }
