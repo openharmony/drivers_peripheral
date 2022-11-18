@@ -135,6 +135,7 @@ if (defined(ohos_lite)) {
       "$at_root_path/hdi/utest_camera_device_impl.cpp",
       "$at_root_path/hdi/utest_camera_hdi_base.cpp",
       "$at_root_path/hdi/utest_camera_host_impl.cpp",
+      "$at_root_path/hdi/utest_offline_stream_operator.cpp",
       "$at_root_path/hdi/utest_stream_operator_impl.cpp",
     ]
 
@@ -153,6 +154,7 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/include/camera_device",
       "$camera_path/hdi_impl/include/stream_operator",
       "$camera_path/hdi_impl/include/offline_stream_operator",
+      "$camera_path/hdi_impl/src/stream_operator/stream_tunnel/standard",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
       "$camera_path/utils/event",
