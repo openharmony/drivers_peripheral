@@ -46,30 +46,14 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     TestAudioManager *manager = nullptr;
 };
 
-void *AudioHdiManagerTest::handle = nullptr;
-TestGetAudioManager AudioHdiManagerTest::getAudioManager = nullptr;
-
-void AudioHdiManagerTest::SetUpTestCase(void)
-{
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-}
-    
-void AudioHdiManagerTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-}
+void AudioHdiManagerTest::SetUpTestCase(void) {}
+void AudioHdiManagerTest::TearDownTestCase(void) {}
 void AudioHdiManagerTest::SetUp(void)
 {
-    ASSERT_NE(nullptr, getAudioManager);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
@@ -141,7 +125,7 @@ HWTEST_F(AudioHdiManagerTest, AudioReleaseAudioManagerObject_004, TestSize.Level
     ret = manager->ReleaseAudioManagerObject(manager);
     EXPECT_TRUE(ret);
 
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
     ASSERT_NE(nullptr, manager->GetAllAdapters);
     ASSERT_NE(nullptr, manager->LoadAdapter);

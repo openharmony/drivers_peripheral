@@ -42,6 +42,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/test/systemtest/audio_function/audio_server/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
   }
 } else {
   module_output_path = "drivers_peripheral_audio/audio"
@@ -72,9 +73,12 @@ if (defined(ohos_lite)) {
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       defines += [ "AUDIO_ADM_SO" ]
     }
     if (enable_audio_adm_service) {
+      deps +=
+          [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
     }
   }
