@@ -414,17 +414,21 @@ group("function") {
 ```bash
 ./out/rk3568/tests/systemtest/drivers_peripheral_audio/audio
 ```
-#### 4.2 测试套及资源文件推送
+#### 4.2 测试套及资源文件推送（手动执行）
 1. 测试用例执行依赖文件推送
-</br>Render相关测试用例执行需要推送audiorendertest.wav和lowlatencyrendertest.wav两个音频文件，音频文件路径为hdf_core/adapter/uhdf2/test/resource/audio/audiofile。推动至开发板”/data”目录下，在cmd窗口输入命令:
+
+Render相关测试用例执行需要推送audiorendertest.wav和lowlatencyrendertest.wav两个音频文件，音频文件路径为drivers/peripheral/audio/test/resource/。推动至开发板”/data/test”目录下,具体哪些用例需要推送音频文件可查看drivers/peripheral/audio/test/resource/ohos_test.xml，在cmd窗口输入命令:
 ```bash
-hdc file send XXX[本地路径]/audiorendertest.wav  /data
+hdc shll mkdir /data/test
+hdc file send XXX[本地路径]/audiorendertest.wav  /data/test
+hdc file send XXX[本地路径]/lowlatencyrendertest.wav  /data/test
 ```
 
 2. 测试用例推送
-</br>测试用例使用hdc推送至开发板，在cmd窗口输入命令：
+
+测试用例使用hdc推送至开发板，在cmd窗口输入命令：
 ```bash
-hdc file send XXX[本地路径]/hdf_audio_hdi_manager_test  /data
+hdc file send XXX[本地路径]/hdf_audio_hdi_manager_test  /data/test
 ```
 
 #### 4.3 测试用例执行（手动执行）
@@ -436,9 +440,9 @@ hdc file send XXX[本地路径]/hdf_audio_hdi_manager_test  /data
  ```
 
 2. 修改测试用例权限及执行
-进入data目录，输入命令
+进入/data/test目录，输入命令
 ```bash
-cd /data                 #进入data目录
+cd /data/test                 #进入data目录
 chmod  +x “测试套名称"   #更改测试套权限
 ./测试套                 #执行测试套
 ```
