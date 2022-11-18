@@ -112,109 +112,11 @@ void OffileStreamOperatorImplTest::TearDown(void)
     std::cout << "Camera::StreamOperatorImp TearDown.." << std::endl;
 }
 
-HWTEST_F(OffileStreamOperatorImplTest, UTestPreviewAndSnapshotCombineCapture, TestSize.Level0)
+HWTEST_F(OffileStreamOperatorImplTest, UTestRelease, TestSize.Level0)
 {
-    sptr<OHOS::IBufferProducer> producer;
-    sptr<OHOS::IBufferProducer> producer_;
-    std::vector<StreamInfo> streamInfos;
-    StreamInfo streamInfo = {};
-    streamInfo.streamId_ = 1201;
-    streamInfo.width_ = 720;
-    streamInfo.height_ = 480;
-    streamInfo.format_ = PIXEL_FMT_YCRCB_420_SP;
-    streamInfo.dataspace_ = 8;
-    streamInfo.intent_ = PREVIEW;
-    streamInfo.tunneledMode_ = 5;
-    std::shared_ptr<StreamConsumer> previewConsumer = std::make_shared<StreamConsumer>();
-#ifdef CAMERA_BUILT_ON_OHOS_LITE
-    producer = previewConsumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
-        SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
-    });
-#else
-    producer = previewConsumer->CreateProducer([this](void* addr, uint32_t size) {
-        SaveYUV("preview", addr, size);
-    });
-#endif
-    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
-    streamInfo.bufferQueue_->producer_->SetQueueSize(8);
-    streamInfos.push_back(streamInfo);
-
-    StreamInfo streamInfoSnapshot = {};
-    streamInfoSnapshot.streamId_ = 1202;
-    streamInfoSnapshot.width_ = 720;
-    streamInfoSnapshot.height_ = 480;
-    streamInfoSnapshot.format_ = PIXEL_FMT_YCRCB_420_SP;
-    streamInfoSnapshot.dataspace_ = 8;
-    streamInfoSnapshot.intent_ = STILL_CAPTURE;
-    streamInfoSnapshot.tunneledMode_ = 5;
-    std::shared_ptr<StreamConsumer> snapshotConsumer = std::make_shared<StreamConsumer>();;
-#ifdef CAMERA_BUILT_ON_OHOS_LITE
-    producer = snapshotConsumer->CreateProducer([this](OHOS::SurfaceBuffer* buffer) {
-        SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
-    });
-#else
-    producer = snapshotConsumer->CreateProducer([this](void* addr, uint32_t size) {
-        SaveYUV("preview", addr, size);
-    });
-#endif
-    streamInfoSnapshot.bufferQueue_ = new BufferProducerSequenceable(producer_);
-    streamInfo.bufferQueue_->producer_->SetQueueSize(8);
-    streamInfos.push_back(streamInfoSnapshot);
-
-    CamRetCode rc = (CamRetCode)streamOperator_->CreateStreams(streamInfos);
-    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
-    std::shared_ptr<CameraMetadata> modeSetting = std::make_shared<CameraMetadata>(2, 128);
-    int64_t expoTime = 0;
-    modeSetting->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
-    int64_t colorGains[4] = {0};
-    modeSetting->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4);
-
-    std::vector<uint8_t> setting;
-    OHOS::Camera::MetadataUtils::ConvertMetadataToVec(modeSetting, setting);
-    rc = (CamRetCode)streamOperator_->CommitStreams(NORMAL, setting);
-    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
-
-    std::vector<std::string> cameraIds;
-    rc = (CamRetCode)cameraHost_->GetCameraIds(cameraIds);
-    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
-
-    std::vector<uint8_t> ability;
-    std::string cameraId = cameraIds.front();
-    rc = (CamRetCode)cameraHost_->GetCameraAbility(cameraId, ability);
-    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
-
-    int captureId = 2020;
-    CaptureInfo captureInfo = {};
-    captureInfo.streamIds_ = {streamInfo.streamId_, streamInfoSnapshot.streamId_};
-    captureInfo.captureSetting_ = ability;
-    captureInfo.enableShutterCallback_ = false;
-    rc = (CamRetCode)streamOperator_->Capture(captureId, captureInfo, true);
-    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
-    sleep(5);
-#ifdef CAMERA_BUILT_ON_OHOS_LITE
-    std::shared_ptr<IStreamOperatorCallback> streamOperatorCallback = std::make_shared<DemoStreamOperatorCallback>();
-    std::shared_ptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
-#else
-    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = new DemoStreamOperatorCallback();
-    OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
-#endif
-    rc = (CamRetCode)streamOperator_->ChangeToOfflineStream({ streamInfoSnapshot.streamId_ }, streamOperatorCallback,
-        offlineStreamOperator);
-    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
-
-    cameraDevice_->Close();
-    sleep(5);
-
-    std::cout << "begin to release offlne stream" << std::endl;
-    rc = (CamRetCode)offlineStreamOperator->CancelCapture(2020);
-    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
-
-    std::vector<int> streamIds = {1202};
-    rc = (CamRetCode)offlineStreamOperator->ReleaseStreams(streamIds);
-    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
+    CamRetCode rc;
+    OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = new OfflineStreamOperator();
 
     rc = (CamRetCode)offlineStreamOperator->Release();
     ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
-
-    sleep(5);
 }

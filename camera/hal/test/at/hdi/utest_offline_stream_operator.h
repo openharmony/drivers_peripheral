@@ -17,6 +17,7 @@
 #define UTEST_CAMERA_HOST_IMPL_TEST_H
 
 #include "utest_camera_hdi_base.h"
+#include "offline_stream_operator.h"
 
 class OffileStreamOperatorImplTest : public CameraHdiBaseTest {
 public:
@@ -72,29 +73,12 @@ public:
                             callback_(address, size);
                         }
                         consumer_->ReleaseBuffer(buffer, -1);
-                        shotCount_--;
-                        if (shotCount_ == 0) {
-                            std::unique_lock<std::mutex> l(l_);
-                            cv_.notify_one();
-                        }
                     }
                 }
             });
 
             return producer;
         }
-
-        void TakeSnapshot()
-        {
-            shotCount_++;
-        }
-
-        void WaitSnapshotEnd() const
-        {
-            std::unique_lock<std::mutex> l(l_);
-            cv_.wait(l, [this]() { return shotCount_ == 0; });
-        }
-
         ~StreamConsumer()
         {
             running_ = false;
@@ -105,10 +89,7 @@ public:
         }
 
     public:
-        std::atomic<uint64_t> shotCount_ = 0;
-        std::mutex l_;
         bool running_ = true;
-        std::condition_variable cv_;
         OHOS::sptr<OHOS::Surface> consumer_ = nullptr;
         std::function<void(void*, uint32_t)> callback_ = nullptr;
         std::thread* consumerThread_ = nullptr;
