@@ -38,10 +38,10 @@ namespace Audio {
 #ifdef AUDIO_ADM_SERVICE
     constexpr bool IS_STUB = false;
 #endif
-const std::string AUDIO_FILE = "/data/audiorendertest.wav";
-const std::string LOW_LATENCY_AUDIO_FILE = "/data/lowlatencyrendertest.wav";
-const std::string AUDIO_CAPTURE_FILE = "/data/audiocapture.wav";
-const std::string AUDIO_LOW_LATENCY_CAPTURE_FILE = "/data/lowlatencycapturetest.wav";
+const std::string AUDIO_FILE = "/data/test/audiorendertest.wav";
+const std::string LOW_LATENCY_AUDIO_FILE = "/data/test/lowlatencyrendertest.wav";
+const std::string AUDIO_CAPTURE_FILE = "/data/test/audiocapture.wav";
+const std::string AUDIO_LOW_LATENCY_CAPTURE_FILE = "/data/test/lowlatencycapturetest.wav";
 
 const int AUDIO_ADAPTER_MAX_NUM = 5;
 const std::string ADAPTER_NAME = "primary";
