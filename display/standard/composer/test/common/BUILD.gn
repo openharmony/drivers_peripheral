@@ -13,49 +13,41 @@
 
 import("//build/test.gni")
 
-module_output_path = "hdf/display_buffer"
-
-ohos_unittest("dispbuf_ut") {
-  module_out_path = module_output_path
-  sources = [ "display_buffer_ut.cpp" ]
-  deps = [
-    "//third_party/googletest:gtest_main",
-  ]
-  include_dirs = [
-    "utils",
-    "//drivers/peripheral/base",
-    "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
-  ]
-  external_deps = [
-    "hdf_core:libhdf_utils",
-    "utils_base:utils",
-    "ipc:ipc_core",
-    "hiviewdfx_hilog_native:libhilog",
-    "hdf_core:libdisplay_buffer_hdi_impl",
-    "drivers_interface_display:display_buffer_idl_headers",
-    "drivers_interface_display:display_composer_idl_headers",
-  ]
-  subsystem_name = "hdf"
-  part_name = "drivers_peripheral_display"
+config("module_private_config") {
+  visibility = [ ":*" ]
 }
 
-ohos_unittest("death_test") {
-  module_out_path = module_output_path
-  sources = [ "death_test.cpp" ]
-  deps = [
-    "//third_party/googletest:gtest_main",
+ohos_static_library("disp_dev_hdi_test_common") {
+  sources = [
+    "display_test_utils.cpp",
+    "hdi_composition_check.cpp",
+    "hdi_test_device.cpp",
+    "hdi_test_display.cpp",
+    "hdi_test_layer.cpp",
   ]
   include_dirs = [
-    "utils",
+    "include",
+    "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
+    "//drivers/peripheral/display/standard/utils/include",
+    "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/base",
     "//drivers/hdf_core/adapter/uhdf2/model/display/base/hdifd_parcelable",
+    "//drivers/hdf_core/adapter/uhdf2/model/display/base/bufferhandle_parcelable",
   ]
+  output_name = "disp_dev_hdi_test_common"
+  cflags = [
+    "-DGRALLOC_GBM_SUPPORT",
+    "-Wno-macro-redefined",
+  ]
+
+  deps = []
+
   external_deps = [
-    "hdf_core:libhdf_utils",
-    "utils_base:utils",
-    "ipc:ipc_core",
     "hiviewdfx_hilog_native:libhilog",
+    "utils_base:utils",
+    #"drivers_interface_display:display_composer_idl_headers",
     "hdf_core:libdisplay_buffer_hdi_impl",
+    "hdf_core:libdisplay_composer_hdi_impl",
     "drivers_interface_display:display_buffer_idl_headers",
     "drivers_interface_display:display_composer_idl_headers",
   ]
