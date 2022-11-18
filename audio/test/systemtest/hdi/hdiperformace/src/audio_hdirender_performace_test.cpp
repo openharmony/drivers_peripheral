@@ -51,32 +51,18 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
 };
 
-void *AudioHdiRenderPerformaceTest::handle = nullptr;
-TestGetAudioManager AudioHdiRenderPerformaceTest::getAudioManager = nullptr;
 TestAudioManager *AudioHdiRenderPerformaceTest::manager = nullptr;
 
 void AudioHdiRenderPerformaceTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioHdiRenderPerformaceTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioHdiRenderPerformaceTest::TearDownTestCase(void) {}
 
 void AudioHdiRenderPerformaceTest::SetUp(void) {}
 
