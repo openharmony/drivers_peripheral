@@ -111,7 +111,7 @@ int32_t AudioCheckParaAttr(const struct AudioSampleAttributes *attrs)
     }
 
     enum AudioCategory audioCategory = attrs->type;
-    if (AUDIO_IN_MEDIA != audioCategory && AUDIO_IN_COMMUNICATION != audioCategory) {
+    if (audioCategory != AUDIO_IN_MEDIA && audioCategory != AUDIO_IN_COMMUNICATION) {
         AUDIO_FUNC_LOGE("audioCategory error!");
         return HDF_ERR_NOT_SUPPORT;
     }
