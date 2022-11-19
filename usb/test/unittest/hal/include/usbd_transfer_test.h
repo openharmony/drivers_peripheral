@@ -17,6 +17,7 @@
 
 #include <gtest/gtest.h>
 #include "v1_0/usb_types.h"
+#include "v1_0/iusbd_bulk_callback.h"
 
 using OHOS::HDI::Usb::V1_0::UsbDev;
 
@@ -29,6 +30,19 @@ public:
     void TearDown();
 
     static UsbDev dev_;
+};
+class UsbdBulkCallbackTest : public OHOS::HDI::Usb::V1_0::IUsbdBulkCallback {
+public:
+    UsbdBulkCallbackTest() = default;
+    ~UsbdBulkCallbackTest() = default;
+    int32_t OnBulkWriteCallback(int32_t status, int32_t actLength) override
+    {
+        return 0;
+    };
+    int32_t OnBulkReadCallback(int32_t status, int32_t actLength) override
+    {
+        return 0;
+    };
 };
 }
 #endif // USBD_TRANSFER_TEST_H
