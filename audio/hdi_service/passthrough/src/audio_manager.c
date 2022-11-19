@@ -304,7 +304,7 @@ int32_t AudioManagerGetAllAdapters(struct IAudioManager *manager, struct AudioAd
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
+static int32_t LoadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         return AUDIO_ERR_INVALID_PARAM;
@@ -330,14 +330,14 @@ static int32_t loadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
+static int32_t LoadAdapterPrimary(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("primary desc or adapter is null");
         return AUDIO_ERR_INVALID_PARAM;
     }
 
-    int32_t ret = loadAdapterImpl(desc, adapter);
+    int32_t ret = LoadAdapterImpl(desc, adapter);
     if (ret != AUDIO_SUCCESS) {
         return ret;
     }
@@ -345,14 +345,14 @@ static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, str
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
+static int32_t LoadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("usb desc or adapter is null");
         return AUDIO_ERR_INVALID_PARAM;
     }
 
-    int32_t ret = loadAdapterImpl(desc, adapter);
+    int32_t ret = LoadAdapterImpl(desc, adapter);
     if (ret != AUDIO_SUCCESS) {
         return ret;
     }
@@ -360,7 +360,7 @@ static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct 
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
+static int32_t LoadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         return AUDIO_ERR_INVALID_PARAM;
@@ -369,7 +369,7 @@ static int32_t loadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-static int32_t selectAppropriateAdapter(
+static int32_t SelectAppropriateAdapter(
     enum AudioAdapterType adapterType, const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     int32_t ret;
@@ -380,23 +380,23 @@ static int32_t selectAppropriateAdapter(
     switch (adapterType) {
         case AUDIO_ADAPTER_PRIMARY:
         case AUDIO_ADAPTER_PRIMARY_EXT:
-            ret = loadAdapterPrimary(desc, adapter);
+            ret = LoadAdapterPrimary(desc, adapter);
             if (ret != AUDIO_SUCCESS) {
-                AUDIO_FUNC_LOGE("loadAdapterPrimary failed.");
+                AUDIO_FUNC_LOGE("LoadAdapterPrimary failed.");
                 return ret;
             }
             break;
         case AUDIO_ADAPTER_USB:
-            ret = loadAdapterUsb(desc, adapter);
+            ret = LoadAdapterUsb(desc, adapter);
             if (ret != AUDIO_SUCCESS) {
-                AUDIO_FUNC_LOGE("loadAdapterUsb failed.");
+                AUDIO_FUNC_LOGE("LoadAdapterUsb failed.");
                 return ret;
             }
             break;
         case AUDIO_ADAPTER_A2DP:
-            ret = loadAdapterA2dp(desc, adapter);
+            ret = LoadAdapterA2dp(desc, adapter);
             if (ret != AUDIO_SUCCESS) {
-                AUDIO_FUNC_LOGE("loadAdapterA2dp failed.");
+                AUDIO_FUNC_LOGE("LoadAdapterA2dp failed.");
                 return ret;
             }
             break;
@@ -466,7 +466,7 @@ int32_t AudioManagerLoadAdapter(
     }
 
     enum AudioAdapterType sndCardType = MatchAdapterType(desc->adapterName, desc->ports[0].portId);
-    int32_t ret = selectAppropriateAdapter(sndCardType, &(AudioAdapterGetConfigDescs()[index]), adapter);
+    int32_t ret = SelectAppropriateAdapter(sndCardType, &(AudioAdapterGetConfigDescs()[index]), adapter);
     if (ret != AUDIO_SUCCESS) {
         AUDIO_FUNC_LOGE("Load adapter failed.");
         return ret;

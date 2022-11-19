@@ -116,7 +116,7 @@ int32_t AudioPnpUpdateInfoOnly(struct AudioEvent audioEvent)
     int32_t ret;
     char pnpInfo[AUDIO_PNP_INFO_LEN_MAX] = {0};
 
-    ret = snprintf_s(pnpInfo, AUDIO_PNP_INFO_LEN_MAX, AUDIO_PNP_INFO_LEN_MAX - 1, "EVENT_TYPE=%d;DEVICE_TYPE=%d",
+    ret = snprintf_s(pnpInfo, AUDIO_PNP_INFO_LEN_MAX, AUDIO_PNP_INFO_LEN_MAX - 1, "EVENT_TYPE=%u;DEVICE_TYPE=%u",
         audioEvent.eventType, audioEvent.deviceType);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("snprintf_s failed!");
@@ -138,7 +138,7 @@ int32_t AudioPnpUpdateAndSend(struct AudioEvent audioEvent)
     int32_t ret;
     char pnpInfo[AUDIO_PNP_INFO_LEN_MAX] = {0};
 
-    ret = snprintf_s(pnpInfo, AUDIO_PNP_INFO_LEN_MAX, AUDIO_PNP_INFO_LEN_MAX - 1, "EVENT_TYPE=%d;DEVICE_TYPE=%d",
+    ret = snprintf_s(pnpInfo, AUDIO_PNP_INFO_LEN_MAX, AUDIO_PNP_INFO_LEN_MAX - 1, "EVENT_TYPE=%u;DEVICE_TYPE=%u",
         audioEvent.eventType, audioEvent.deviceType);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("snprintf_s fail!");
