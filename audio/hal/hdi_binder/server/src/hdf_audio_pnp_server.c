@@ -26,7 +26,7 @@
 #include "securec.h"
 #include "servmgr_hdi.h"
 
-#define HDF_LOG_TAG             HDF_AUDIO_HAL_HOST
+#define HDF_LOG_TAG             HDF_AUDIO_HOST
 #define AUDIO_HDI_SERVICE_NAME  "audio_hdi_usb_service"
 #define AUDIO_TOKEN_SERVER_NAME "ohos.hdi.audio_service"
 #define AUDIO_PNP_INFO_LEN_MAX  256
@@ -186,7 +186,6 @@ static int32_t HdfAudioPnpInit(struct HdfDeviceObject *device)
     g_audioPnpDevice = device;
     AudioPnpUeventStartThread();
     AudioPnpInputStartThread();
-
     AUDIO_FUNC_LOGI("end.");
     return HDF_SUCCESS;
 }
