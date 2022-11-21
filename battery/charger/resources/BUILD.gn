@@ -541,6 +541,14 @@ ohos_prebuilt_etc("resources_config65") {
   subsystem_name = "hdf"
 }
 
+ohos_prebuilt_etc("charger_font") {
+  source = "HarmonyOS_Sans_SC_Regular_Small.ttf"
+  install_images = [ chipset_base_dir ]
+  relative_install_dir = "charger/resources"
+  part_name = "drivers_peripheral_battery"
+  subsystem_name = "hdf"
+}
+
 ohos_prebuilt_etc("init.charger.cfg") {
   source = "init.charger.cfg"
   install_images = [ chipset_base_dir ]

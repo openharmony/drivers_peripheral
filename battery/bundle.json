@@ -34,6 +34,7 @@
         "//drivers/peripheral/battery:battery_entry",
         "//drivers/peripheral/battery/charger:charger_group",
         "//drivers/peripheral/battery/charger:led_service",
+        "//drivers/peripheral/battery/charger:charger_animation",
         "//drivers/peripheral/battery/charger:resources_service"
       ],
       "test": [

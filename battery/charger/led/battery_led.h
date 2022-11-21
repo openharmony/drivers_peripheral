@@ -16,10 +16,10 @@
 #ifndef BATTERY_LED_H
 #define BATTERY_LED_H
 
-#include "v1_0/ilight_interface.h"
-#include "v1_0/light_types.h"
 #include "battery_config.h"
 #include "power_supply_provider.h"
+#include "v1_0/ilight_interface.h"
+#include "v1_0/light_types.h"
 
 namespace OHOS {
 namespace HDI {
@@ -42,8 +42,8 @@ private:
     bool available_ {false};
     uint32_t lightColor_ {0};
 };
-}  // namespace V1_1
-}  // namespace Battery
-}  // namespace HDI
-}  // namespace OHOS
+} // namespace V1_1
+} // namespace Battery
+} // namespace HDI
+} // namespace OHOS
 #endif

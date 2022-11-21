@@ -880,7 +880,7 @@ void PowerSupplyProvider::CreateMockBatteryPath(std::string& mockBatteryPath)
     CreateFile(mockBatteryPath + "/input_current_limit", "0");
     CreateFile(mockBatteryPath + "/online", "1");
     CreateFile(mockBatteryPath + "/present", "0");
-    CreateFile(mockBatteryPath + "/status", "Full");
+    CreateFile(mockBatteryPath + "/status", "Charging");
     CreateFile(mockBatteryPath + "/temp", "222");
     CreateFile(mockBatteryPath + "/voltage_avg", "4123456");
     CreateFile(mockBatteryPath + "/voltage_now", "4123456");
