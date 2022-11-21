@@ -18,11 +18,13 @@ group("hdf_dcamera_fuzztest") {
     "dcameraadddcameradevice_fuzzer:fuzztest",
     "dcameraclosesession_fuzzer:fuzztest",
     "dcameraconfigurestreams_fuzzer:fuzztest",
+    "dcameracreatestreams_fuzzer:fuzztest",
     "dcameradisabledcameradevice_fuzzer:fuzztest",
     "dcameraenabledcameradevice_fuzzer:fuzztest",
     "dcameragetcameraIds_fuzzer:fuzztest",
     "dcameragetcameraability_fuzzer:fuzztest",
     "dcameragetdevicebydhbase_fuzzer:fuzztest",
+    "dcameraisstreamssupported_fuzzer:fuzztest",
     "dcameranotify_fuzzer:fuzztest",
     "dcameranotifydcamerastatus_fuzzer:fuzztest",
     "dcameraonsettingsresult_fuzzer:fuzztest",
@@ -35,5 +37,9 @@ group("hdf_dcamera_fuzztest") {
     "dcamerastartcapture_fuzzer:fuzztest",
     "dcamerastopcapture_fuzzer:fuzztest",
     "dcameraupdatesettings_fuzzer:fuzztest",
+    "dstreamattachbufferqueue_fuzzer:fuzztest",
+    "dstreamcancelcapture_fuzzer:fuzztest",
+    "dstreamcapture_fuzzer:fuzztest",
+    "dstreamchangetoofflinestream_fuzzer:fuzztest",
   ]
 }
