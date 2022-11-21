@@ -69,7 +69,7 @@ static int32_t AdapterManageInit(struct AudioInfoInAdapter *adapterManage,
     }
 
     ret = memcpy_s((void *)adapterManage->adapterName, MANAGER_ADAPTER_NAME_LEN,
-        adapterName, MANAGER_ADAPTER_NAME_LEN);
+        adapterName, strlen(adapterName));
     if (ret != EOK) {
         AUDIO_FUNC_LOGE("memcpy adapter name fail!");
         AudioMemFree((void **)&adapterManage->adapterName);
