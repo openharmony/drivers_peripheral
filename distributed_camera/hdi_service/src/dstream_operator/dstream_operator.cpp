@@ -322,7 +322,7 @@ int32_t DStreamOperator::DetachBufferQueue(int32_t streamId)
 
 void DStreamOperator::ExtractCaptureInfo(std::vector<DCCaptureInfo> &captureInfos)
 {
-    for (auto &captureInfo : cachedDCaptureInfoList_) {
+    for (const auto &captureInfo : cachedDCaptureInfoList_) {
         DCCaptureInfo capture;
         capture.streamIds_.assign(captureInfo->streamIds_.begin(), captureInfo->streamIds_.end());
         capture.width_ = captureInfo->width_;
