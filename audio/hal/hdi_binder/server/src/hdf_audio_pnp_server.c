@@ -26,7 +26,7 @@
 #include "securec.h"
 #include "servmgr_hdi.h"
 
-#define HDF_LOG_TAG             HDF_AUDIO_HAL_HOST
+#define HDF_LOG_TAG             HDF_AUDIO_HOST
 #define AUDIO_HDI_SERVICE_NAME  "audio_hdi_usb_service"
 #define AUDIO_TOKEN_SERVER_NAME "ohos.hdi.audio_service"
 #define AUDIO_PNP_SEND_USB_CMD  8
