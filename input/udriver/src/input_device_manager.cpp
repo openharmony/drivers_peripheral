@@ -602,8 +602,7 @@ int32_t InputDeviceManager::GetDevice(int32_t deviceIndex, InputDeviceInfo **dev
             continue;
         }
     }
-    HDF_LOGD("%{public}s: devIndex: %{public}d ret: %{public}d inputDevList_ size:%{public}u",
-             __func__, deviceIndex, ret, inputDevList_.size());
+    HDF_LOGD("%{public}s: devIndex: %{public}d ret: %{public}d", __func__, deviceIndex, ret);
     return ret;
 }
 
@@ -625,8 +624,7 @@ int32_t InputDeviceManager::GetDeviceList(uint32_t *devNum, InputDeviceInfo **de
             sizeof(InputDeviceInfo));
     }
     *devNum = inputDevList_.size();
-    HDF_LOGD("%{public}s: devNum: %{public}u size: %{public}u devIndex_: %{public}d",
-             __func__, *devNum, inputDevList_.size(), devIndex_);
+    HDF_LOGD("%{public}s: devNum: %{public}u devIndex_: %{public}d", __func__, *devNum, devIndex_);
 
     return INPUT_SUCCESS;
 }
