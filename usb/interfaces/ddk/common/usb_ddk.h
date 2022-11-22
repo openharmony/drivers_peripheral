@@ -39,6 +39,7 @@
 #include "hdf_base.h"
 #include <endian.h>
 
+#ifdef __BYTE_ORDER
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 /**
  * @brief Implements 16-bit little-endian conversion.
@@ -58,6 +59,7 @@
  */
 #define CPU_TO_LE32(x) \
     ((((x)&0xff000000u) >> 24) | (((x)&0x00ff0000u) >> 8) | (((x)&0x0000ff00u) << 8) | (((x)&0x000000ffu) << 24))
+#endif
 #endif
 
 /**
@@ -267,8 +269,8 @@ struct UsbInterfaceAssocDescriptor {
 struct UsbFunctionfsStringsHead {
     uint32_t magic;
     uint32_t length;
-    uint32_t str_count;
-    uint32_t lang_count;
+    uint32_t strCount;
+    uint32_t langCount;
 } __attribute__((packed));
 
 struct UsbFunctionfsDescsHeadV2 {
@@ -543,7 +545,7 @@ struct UsbCdcEtherDesc {
  *
  * @return Returns <b>1</b> if the specified endpoint is in the input direction; returns <b>0</b> otherwise.
  */
-static inline int32_t UsbEndpointDirIn(uint8_t ep)
+inline int32_t UsbEndpointDirIn(uint8_t ep)
 {
     return ((ep & USB_DDK_ENDPOINT_DIR_MASK) == USB_DDK_DIR_IN);
 }
@@ -556,7 +558,7 @@ static inline int32_t UsbEndpointDirIn(uint8_t ep)
  *
  * @return Returns <b>1</b> if the specified endpoint is in the output direction; returns <b>0</b> otherwise.
  */
-static inline int32_t UsbEndpointDirOut(uint8_t ep)
+inline int32_t UsbEndpointDirOut(uint8_t ep)
 {
     return ((ep & USB_DDK_ENDPOINT_DIR_MASK) == USB_DDK_DIR_OUT);
 }
