@@ -299,7 +299,7 @@ int32_t UsbRawSendInterruptRequest(
  * otherwise.
  */
 int32_t UsbRawGetConfigDescriptor(
-    const UsbRawDevice *rawDev, uint8_t configIndex, struct UsbRawConfigDescriptor **config);
+    const UsbRawDevice *rawDev, uint8_t configIndex, struct UsbRawConfigDescriptor ** const config);
 
 /**
  * @brief Releases the memory space of the device configuration descriptor.
@@ -318,7 +318,7 @@ void UsbRawFreeConfigDescriptor(const struct UsbRawConfigDescriptor *config);
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int32_t UsbRawGetConfiguration(const UsbRawHandle *devHandle, int32_t *config);
+int32_t UsbRawGetConfiguration(const UsbRawHandle * const devHandle, int32_t *config);
 
 /**
  * @brief Sets the active device configuration.
@@ -352,7 +352,7 @@ int32_t UsbRawGetDescriptor(const struct UsbRawRequest *request, const UsbRawHan
  *
  * @return Returns the device pointer if any; returns <b>NULL</b> otherwise. For details, see {@link UsbRawDevice}.
  */
-UsbRawDevice *UsbRawGetDevice(const UsbRawHandle *devHandle);
+UsbRawDevice *UsbRawGetDevice(const UsbRawHandle * const devHandle);
 
 /**
  * @brief Obtains the USB device descriptor of a specified device.
