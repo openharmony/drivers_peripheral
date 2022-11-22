@@ -21,7 +21,5 @@
 /* start uevent to monitor USB headset/headphone */
 int32_t AudioPnpUeventStartThread(void);
 void AudioPnpUeventStopThread(void);
-bool DetectAudioUsbDevice(void);
-bool DetectAudioAnalogHeadsetDevice(void);
 
 #endif
