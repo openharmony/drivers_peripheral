@@ -1986,7 +1986,7 @@ static int32_t HdiServiceAdapterSetVoiceVolume(const struct HdfDeviceIoClient *c
         return HDF_FAILURE;
     }
 
-    if (HdfSbufReadFloat(data, &volume)) {
+    if (!HdfSbufReadFloat(data, &volume)) {
         AUDIO_FUNC_LOGE("volume Is NULL ");
         return HDF_FAILURE;
     }
