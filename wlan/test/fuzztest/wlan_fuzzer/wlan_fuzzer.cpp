@@ -60,7 +60,7 @@ static void WlanFucSwitch(struct IWlanInterface *interface, uint32_t cmd, const 
             uint32_t staInfoLen = WLAN_MAX_NUM_STA_WITH_AP;
             ifeature.ifName = const_cast<char *>(reinterpret_cast<const char *>(rawData));
             ifeature.type = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
-            interface->GetAsscociatedStas(interface, &ifeature, staInfo, &staInfoLen, &num);
+            interface->GetAssociatedStas(interface, &ifeature, staInfo, &staInfoLen, &num);
             break;
         }
         case CMD_WLAN_INTERFACE_GET_DEVICE_MAC_ADDRESS: {

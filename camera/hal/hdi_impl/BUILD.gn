@@ -147,6 +147,7 @@ if (defined(ohos_lite)) {
       "$camera_path/../interfaces/hdi_ipc/callback/operator/include",
       "$camera_path/include",
       "$camera_path/hdi_impl",
+      "$camera_path/metadata_manager/include",
       "$camera_path/utils/watchdog",
       "$camera_path/hdi_impl/include",
       "$camera_path/hdi_impl/include/camera_host",
@@ -184,6 +185,7 @@ if (defined(ohos_lite)) {
     deps = [
       "$camera_path/buffer_manager:camera_buffer_manager",
       "$camera_path/device_manager:camera_device_manager",
+      "$camera_path/metadata_manager:camera_metadata_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "$camera_path/utils:camera_utils",
       "//drivers/interface/camera/v1_0:libcamera_stub_1.0",

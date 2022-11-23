@@ -96,7 +96,7 @@ void AdaptersServerManageInfomationRecycle(void);
 int32_t AdaptersServerManageInit(const struct AudioAdapterDescriptor *descs, int32_t num);
 int32_t HdiServicePositionWrite(struct HdfSBuf *reply,
     uint64_t frames, struct AudioTimeStamp time);
-int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescripter *desc, struct HdfSBuf *data);
+int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescriptor *desc, struct HdfSBuf *data);
 
 int32_t HdiServiceGetFuncs();
 int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,

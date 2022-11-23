@@ -17,3 +17,8 @@ group("unittest") {
   testonly = true
   deps = [ "unittest/:unittest" ]
 }
+
+group("systemtest") {
+  testonly = true
+  deps = [ "systemtest/:systemtest" ]
+}

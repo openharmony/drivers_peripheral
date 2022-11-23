@@ -360,7 +360,7 @@ static ResultCode RemoveAllFile(const uint64_t templateId)
     return RESULT_SUCCESS;
 }
 
-static uint64_t GeneratePinTemplateId()
+static uint64_t GeneratePinTemplateId(void)
 {
     for (uint32_t i = 0; i < MAX_RANDOM_TIME; i++) {
         uint64_t templateId = INVALID_TEMPLATE_ID;
@@ -535,7 +535,7 @@ static ResultCode DelPinInDb(const uint32_t index)
     return ret;
 }
 
-ResultCode DelPinById(const uint64_t templateId)
+ResultCode DelPinById(uint64_t templateId)
 {
     ResultCode ret = LoadPinDb();
     if (ret != RESULT_SUCCESS) {
@@ -679,7 +679,7 @@ EXIT:
 static Buffer *GenerateExpandData(const char *str, const uint8_t *data, const uint32_t dataLen)
 {
     /* CONST_EXPAND_DATA_LEN is twice the size of dataLen */
-    if (strlen(str) > dataLen || (CONST_EXPAND_DATA_LEN / 2) != dataLen) {
+    if (dataLen < strlen(str) || dataLen != (CONST_EXPAND_DATA_LEN / 2)) {
         LOG_ERROR("bad param.");
         return NULL;
     }
@@ -842,7 +842,7 @@ ERROR:
     return ret;
 }
 
-ResultCode DoGetSalt(const uint64_t templateId, uint8_t *salt, uint32_t *saltLen)
+ResultCode DoGetSalt(uint64_t templateId, uint8_t *salt, uint32_t *saltLen)
 {
     if (salt == NULL || saltLen == NULL || templateId == INVALID_TEMPLATE_ID) {
         LOG_ERROR("get invalid salt params.");

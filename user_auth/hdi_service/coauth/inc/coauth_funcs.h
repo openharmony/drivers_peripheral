@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-int32_t RegisterExecutor(const ExecutorInfoHal *executorInfo, uint64_t *executorIndex);
+int32_t RegisterExecutor(const ExecutorInfoHal *registerInfo, uint64_t *executorIndex);
 int32_t UnRegisterExecutor(uint64_t executorIndex);
 
 #ifdef __cplusplus

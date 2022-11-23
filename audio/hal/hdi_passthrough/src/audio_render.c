@@ -732,8 +732,8 @@ int32_t AudioRenderGetLatency(struct AudioRender *render, uint32_t *ms)
         AUDIO_FUNC_LOGE("divisor byteRate is zero!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    uint32_t period_ms = (periodCount * periodSize * SEC_TO_MILLSEC) / byteRate;
-    *ms = period_ms;
+    uint32_t periodMs = (periodCount * periodSize * SEC_TO_MILLSEC) / byteRate;
+    *ms = periodMs;
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -845,7 +845,7 @@ int32_t AudioRenderRenderFrame(struct AudioRender *render, const void *frame,
         AUDIO_FUNC_LOGE("Render not started!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (FRAME_DATA < requestBytes) {
+    if (requestBytes > FRAME_DATA) {
         AUDIO_FUNC_LOGE("Out of FRAME_DATA size!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -1076,7 +1076,7 @@ int32_t AudioRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_
 }
 
 static int32_t AudioRenderReqMmapBufferInit(struct AudioHwRender *render,
-    int32_t reqSize, struct AudioMmapBufferDescripter *desc)
+    int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
     if (render == NULL || render->devDataHandle == NULL || desc == NULL) {
         AUDIO_FUNC_LOGE("render or render->devDataHandle or desc is null!");
@@ -1127,7 +1127,7 @@ static int32_t AudioRenderReqMmapBufferInit(struct AudioHwRender *render,
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc)
+int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
     int32_t ret = AudioCheckRenderAddr(handle);
     if (ret < 0) {

@@ -30,6 +30,9 @@
         "sub_component": [
           "//drivers/peripheral/power:power_entry"
         ],
+        "test": [
+          "//drivers/peripheral/power/test:hdf_test_power"
+        ],
         "inner_kits": []
       }
     }

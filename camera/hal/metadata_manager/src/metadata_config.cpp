@@ -51,9 +51,9 @@ bool MetadataConfig::UpdateSettingsConfig(int32_t streamId, bool isNew, const st
             return false;
         }
         if (isNew) {
-            result = metadata_[streamId]->addEntry(*it, (void*)entry.data.u8, entry.count);
+            result = metadata_[streamId]->addEntry(*it, static_cast<void *>(entry.data.u8), entry.count);
         } else {
-            result = metadata_[streamId]->updateEntry(*it, (void*)entry.data.u8, entry.count);
+            result = metadata_[streamId]->updateEntry(*it, static_cast<void *>(entry.data.u8), entry.count);
         }
         if (!result) {
             CAMERA_LOGE("add key: [%{public}d] failed", *it);

@@ -55,7 +55,7 @@ enum AudioPortPinPathSel {
     PATH_DEV_MAX,
 };
 
-int32_t AudioPathSelGetConfToJsonObj()
+int32_t AudioPathSelGetConfToJsonObj(void)
 {
     FILE *fpJson = NULL;
     char *pJsonStr = NULL;

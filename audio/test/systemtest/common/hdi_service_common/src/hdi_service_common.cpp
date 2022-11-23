@@ -743,7 +743,7 @@ int32_t RecordAudio(struct PrepareAudioPara &audiopara)
     (void) fclose(file);
     return HDF_SUCCESS;
 }
-int32_t InitMmapDesc(const string &path, struct AudioMmapBufferDescripter &desc, int32_t &reqSize, bool isRender)
+int32_t InitMmapDesc(const string &path, struct AudioMmapBufferDescriptor &desc, int32_t &reqSize, bool isRender)
 {
     FILE *fp;
     if (isRender) {
@@ -787,7 +787,7 @@ int32_t PlayMapAudioFile(struct PrepareAudioPara &audiopara)
     int32_t reqSize = 0;
     bool isRender = true;
     FrameStatus(1);
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     if (audiopara.render == nullptr) {
         return HDF_FAILURE;
     }
@@ -811,7 +811,7 @@ int32_t RecordMapAudio(struct PrepareAudioPara &audiopara)
     int32_t ret = -1;
     int32_t reqSize = 0;
     bool isRender = false;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     if (audiopara.capture == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:param is invlaid\n", __func__);
         return HDF_FAILURE;

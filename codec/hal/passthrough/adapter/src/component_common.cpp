@@ -59,7 +59,9 @@ static AvCodecMime ConvertVideoCodingTypeToMimeType(int32_t codingType)
         case CODEC_OMX_VIDEO_CodingHEVC:
             codecMime = MEDIA_MIMETYPE_VIDEO_HEVC;
             break;
-
+        case OMX_VIDEO_CodingMPEG4:
+            codecMime = MEDIA_MIMETYPE_VIDEO_MPEG4;
+            break;
         default:
             HDF_LOGW("%{public}s warn, unsupport codingType[%{public}d]", __func__, codingType);
             break;
@@ -96,6 +98,9 @@ static int32_t ConvertMimeTypeToCodingType(AvCodecMime mimeType)
             break;
         case MEDIA_MIMETYPE_VIDEO_HEVC:
             codingType = CODEC_OMX_VIDEO_CodingHEVC;
+            break;
+        case MEDIA_MIMETYPE_VIDEO_MPEG4:
+            codingType = OMX_VIDEO_CodingMPEG4;
             break;
         case MEDIA_MIMETYPE_AUDIO_PCM:
             codingType = OMX_AUDIO_CodingPCM;
@@ -1016,8 +1021,8 @@ static int32_t ParseParamVideoAvc(Param *paramIn, int8_t *paramOut, int32_t para
         validCount++;
         switch (paramIn[i].key) {
             case KEY_VIDEO_PROFILE:
-                param->eProfile =
-                    static_cast<OMX_VIDEO_AVCPROFILETYPE>(ConvertProfileToOmxProfile(*((Profile *)paramIn[i].val)));
+                param->eProfile = static_cast<OMX_VIDEO_AVCPROFILETYPE>
+                    (ConvertProfileToOmxProfile(*(reinterpret_cast<Profile *>(paramIn[i].val))));
                 break;
 
             default: {

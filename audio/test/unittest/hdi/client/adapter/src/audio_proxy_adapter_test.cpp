@@ -430,7 +430,7 @@ HWTEST_F(AudioProxyAdapterTest, AdapterGetExtraParams_001, TestSize.Level1)
 {
     ASSERT_NE(adapter, nullptr);
     enum AudioExtParamKey key = AUDIO_EXT_PARAM_KEY_NONE;
-    const char *condition = nullptr;
+    char condition[AUDIO_ADAPTER_BUF_TEST];
     char value[AUDIO_ADAPTER_BUF_TEST];
     int32_t length = AUDIO_ADAPTER_BUF_TEST;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioProxyAdapterGetExtraParams(nullptr, key, condition, value, length));
@@ -442,7 +442,7 @@ HWTEST_F(AudioProxyAdapterTest, AdapterGetExtraParams_002, TestSize.Level1)
 {
     ASSERT_NE(adapter, nullptr);
     enum AudioExtParamKey key = AUDIO_EXT_PARAM_KEY_NONE;
-    const char *condition = nullptr;
+    char condition[AUDIO_ADAPTER_BUF_TEST];
     char value[AUDIO_ADAPTER_BUF_TEST];
     int32_t length = AUDIO_ADAPTER_BUF_TEST;
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
@@ -456,6 +456,6 @@ HWTEST_F(AudioProxyAdapterTest, AdapterSetVoiceVolume_001, TestSize.Level1)
 {
     ASSERT_NE(adapter, nullptr);
     float volume = 0;
-    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, AudioProxyAdapterSetVoiceVolume(adapter, volume));
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioProxyAdapterSetVoiceVolume(adapter, volume));
 }
 }

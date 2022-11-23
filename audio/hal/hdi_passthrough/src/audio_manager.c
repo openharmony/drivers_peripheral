@@ -24,7 +24,7 @@
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
 static struct AudioManager g_audioManagerFuncs = {0};
-static bool audioAdapterAddrMgrFlag = false;
+static bool g_audioAdapterAddrMgrFlag = false;
 struct AudioAdapterDescriptor *g_localAddrAudioAdapterOut = NULL; // add for Fuzz
 int g_localAdapterNum = 0; // add for Fuzz
 
@@ -238,7 +238,7 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
     return AUDIO_HAL_SUCCESS;
 }
 
-static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+static int32_t LoadAdapterPrimary(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("param desc or adapter is null!");
@@ -276,7 +276,7 @@ static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, str
     return AUDIO_HAL_SUCCESS;
 }
 
-static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+static int32_t LoadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("param attrs or adapter is null!");
@@ -311,7 +311,7 @@ static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct 
     return AUDIO_HAL_SUCCESS;
 }
 
-static int32_t loadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
+static int32_t LoadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -320,7 +320,7 @@ static int32_t loadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct
     return AUDIO_HAL_SUCCESS;
 }
 
-static int32_t selectAppropriateAdapter(enum AudioAdapterType adapterType,
+static int32_t SelectAppropriateAdapter(enum AudioAdapterType adapterType,
     const struct AudioAdapterDescriptor *desc, struct AudioAdapter **adapter)
 {
     int32_t ret;
@@ -332,24 +332,24 @@ static int32_t selectAppropriateAdapter(enum AudioAdapterType adapterType,
     switch (adapterType) {
         case AUDIO_ADAPTER_PRIMARY:
         case AUDIO_ADAPTER_PRIMARY_EXT:
-            ret = loadAdapterPrimary(desc, adapter);
+            ret = LoadAdapterPrimary(desc, adapter);
             if (ret != AUDIO_HAL_SUCCESS) {
-                AUDIO_FUNC_LOGE("loadAdapterPrimary failed. ret = %{public}d", ret);
+                AUDIO_FUNC_LOGE("LoadAdapterPrimary failed. ret = %{public}d", ret);
                 return ret;
             }
             break;
         case AUDIO_ADAPTER_USB:
-            ret = loadAdapterUsb(desc, adapter);
+            ret = LoadAdapterUsb(desc, adapter);
             if (ret != AUDIO_HAL_SUCCESS) {
-                AUDIO_FUNC_LOGE("loadAdapterUsb failed.ret = %{public}d", ret);
+                AUDIO_FUNC_LOGE("LoadAdapterUsb failed.ret = %{public}d", ret);
                 return ret;
             }
-            AUDIO_FUNC_LOGE("Can't loadAdapterUsb.");
+            AUDIO_FUNC_LOGE("Can't LoadAdapterUsb.");
             break;
         case AUDIO_ADAPTER_A2DP:
-            ret = loadAdapterA2dp(desc, adapter);
+            ret = LoadAdapterA2dp(desc, adapter);
             if (ret != AUDIO_HAL_SUCCESS) {
-                AUDIO_FUNC_LOGE("loadAdapterA2dp failed.");
+                AUDIO_FUNC_LOGE("LoadAdapterA2dp failed.");
                 return ret;
             }
             break;
@@ -393,7 +393,7 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     }
 
     enum AudioAdapterType sndCardType = MatchAdapterType(desc->adapterName, desc->ports[0].portId);
-    int32_t ret = selectAppropriateAdapter(sndCardType, desc, adapter);
+    int32_t ret = SelectAppropriateAdapter(sndCardType, desc, adapter);
     if (ret != AUDIO_HAL_SUCCESS) {
         AUDIO_FUNC_LOGE("Load adapter failed. ret = %{public}d\n", ret);
         return ret;
@@ -432,11 +432,11 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
 
 bool ReleaseAudioManagerObject(struct AudioManager *object)
 {
-    if ((&g_audioManagerFuncs) != object || object == NULL) {
+    if (object != (&g_audioManagerFuncs) || object == NULL) {
         return false;
     }
     ReleaseAudioManagerObjectComm(object);
-    audioAdapterAddrMgrFlag = false;
+    g_audioAdapterAddrMgrFlag = false;
     return true;
 }
 
@@ -454,10 +454,10 @@ static void AudioMgrConstruct(struct AudioManager *audioMgr)
 
 struct AudioManager *GetAudioManagerFuncs(void)
 {
-    if (!audioAdapterAddrMgrFlag) {
+    if (!g_audioAdapterAddrMgrFlag) {
         AudioAdapterAddrMgrInit(); // memset for Fuzz
         AudioMgrConstruct(&g_audioManagerFuncs);
-        audioAdapterAddrMgrFlag = true;
+        g_audioAdapterAddrMgrFlag = true;
     }
     return &g_audioManagerFuncs;
 }

@@ -87,7 +87,7 @@ bool IsEd25519KeyPairValid(const KeyPair *keyPair)
     return true;
 }
 
-KeyPair *GenerateEd25519KeyPair()
+KeyPair *GenerateEd25519KeyPair(void)
 {
     KeyPair *keyPair = CreateEd25519KeyPair();
     if (keyPair == NULL) {

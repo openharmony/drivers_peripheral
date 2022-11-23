@@ -148,9 +148,8 @@ RetCode NodeBase::Flush(const int32_t streamId)
     return RC_OK;
 }
 
-RetCode NodeBase::SetCallback(const MetaDataCb cb)
+RetCode NodeBase::SetCallback()
 {
-    (void)cb;
     return RC_OK;
 }
 
@@ -167,11 +166,6 @@ RetCode NodeBase::Config(const int32_t streamId, const CaptureMeta& meta)
     return RC_OK;
 }
 
-RetCode NodeBase::UpdateSettingsConfig(const CaptureMeta& meta)
-{
-    (void)meta;
-    return RC_OK;
-}
 
 int32_t NodeBase::GetNumberOfInPorts() const
 {

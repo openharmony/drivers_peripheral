@@ -22,6 +22,7 @@
 #include <ashmem.h>
 #include <buffer_handle.h>
 #include <condition_variable>
+#include <fstream>
 #include <idisplay_gralloc.h>
 #include <list>
 #include <map>
@@ -95,7 +96,7 @@ public:
     }
     void WaitForStatusChanged();
     void OnStatusChanged();
-    bool ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount);
+    bool ReadOneFrame(char *buf, uint32_t &filledCount);
 
 private:
     uint32_t GetInputBufferSize();
@@ -114,10 +115,12 @@ private:
     {
         return (((width) + alignment_ - 1) & (~(alignment_ - 1)));
     }
+    int32_t GetComponent();
+    OMX_VIDEO_CODINGTYPE GetCompressFormat();
 
 private:
-    FILE *fpIn_;  // input file
-    FILE *fpOut_;
+    std::ifstream ioIn_;
+    std::ofstream ioOut_;
     uint32_t width_;
     uint32_t height_;
     uint32_t stride_;
@@ -138,6 +141,8 @@ private:
     static constexpr uint32_t alignment_ = 16;
     static OHOS::HDI::Display::V1_0::IDisplayGralloc *gralloc_;
     ColorFormat color_;
+    int count_;
+    CodecMime codecMime_;
     OMX_COLOR_FORMATTYPE omxColorFormat_;
 };
 

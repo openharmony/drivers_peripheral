@@ -804,7 +804,7 @@ int32_t HdiServiceRenderReqMmapBuffer(const struct HdfDeviceIoClient *client,
     if (client == NULL || data == NULL || reply == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     int32_t reqSize = 0;
     struct AudioRender *render = NULL;
     int ret = AudioAdapterListCheckAndGetRender(&render, data);

@@ -26,35 +26,21 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
     struct AudioAdapter *adapter = nullptr;
     struct AudioRender *render = nullptr;
 };
 
 using THREAD_FUNC = void *(*)(void *);
-void *AudioHdiRenderHardwareDependenceTest::handle = nullptr;
-TestGetAudioManager AudioHdiRenderHardwareDependenceTest::getAudioManager = nullptr;
 TestAudioManager *AudioHdiRenderHardwareDependenceTest::manager = nullptr;
 
 void AudioHdiRenderHardwareDependenceTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioHdiRenderHardwareDependenceTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioHdiRenderHardwareDependenceTest::TearDownTestCase(void) {}
 void AudioHdiRenderHardwareDependenceTest::SetUp(void)
 {
     ASSERT_NE(nullptr, manager);

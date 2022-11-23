@@ -42,7 +42,7 @@ int32_t AudioProxyCommonSetCaptureCtrlParam(int cmId, AudioHandle handle, float 
 int32_t AudioProxyCommonGetCaptureCtrlParam(int cmId, AudioHandle handle, float *param);
 int32_t AudioProxyGetMmapPositionRead(struct HdfSBuf *reply, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioProxyReqMmapBufferWrite(struct HdfSBuf *data, int32_t reqSize,
-    const struct AudioMmapBufferDescripter *desc);
+    const struct AudioMmapBufferDescriptor *desc);
 
 int32_t AudioProxyRenderAddEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioProxyRenderRemoveEffect(AudioHandle handle, uint64_t effectid);

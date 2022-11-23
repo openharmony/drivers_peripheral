@@ -28,8 +28,6 @@ const int32_t DEFAULT_COMBO_SIZE = 6;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
 const uint32_t RESET_TIME = 20;
 const uint32_t MEAS_CHANNEL_TIME = 10;
-const uint32_t TEST_BUF_SIZE = 64;
-
 const char *WLAN_SERVICE_NAME = "wlan_interface_service";
 
 class HdfWifiServiceCTest : public testing::Test {
@@ -131,12 +129,12 @@ HWTEST_F(HdfWifiServiceCTest, GetFeatureByIfNameTest_003, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetAsscociatedStasTest_004
+ * @tc.name: GetAssociatedStasTest_004
  * @tc.desc: Wifi hdi get assoc stas function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, GetAsscociatedStasTest_004, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetAssociatedStasTest_004, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
     struct HdfFeatureInfo ifeature;
@@ -146,7 +144,7 @@ HWTEST_F(HdfWifiServiceCTest, GetAsscociatedStasTest_004, TestSize.Level1)
 
     int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetAsscociatedStas(g_wlanObj, &ifeature, staInfo, &staInfoLen, &num);
+    rc = g_wlanObj->GetAssociatedStas(g_wlanObj, &ifeature, staInfo, &staInfoLen, &num);
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
@@ -822,15 +820,29 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_036, TestSize.Level1)
 {
     const char *ifName = "wlan0";
     int32_t rc;
-    int32_t cmdId;
-    int8_t data[TEST_BUF_SIZE] = {0};
     bool flag;
 
-    for (cmdId = CMD_HID2D_MODULE_INIT; cmdId <= CMD_SET_CHAN_ADJUST; cmdId++) {
-        rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, cmdId, data, TEST_BUF_SIZE);
-        flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-        ASSERT_TRUE(flag);
-    }
+    uint8_t deviceType = 5;
+    rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, CMD_HID2D_MODULE_INIT, (const int8_t *)&deviceType,
+        sizeof(deviceType));
+    flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT));
+    ASSERT_TRUE(flag);
+
+    uint8_t batterylevel = 50;
+    rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, CMD_SET_BATTERY_LEVEL, (const int8_t *)&batterylevel,
+        sizeof(batterylevel));
+    flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT));
+    ASSERT_TRUE(flag);
+
+    struct AdjustChannelInfo chanInfo;
+    chanInfo.msgId = 5;
+    chanInfo.chanNumber = 36;
+    chanInfo.bandwidth = 80;
+    chanInfo.switchType = 0;
+    rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, CMD_SET_CHAN_ADJUST, (const int8_t *)&chanInfo,
+        sizeof(chanInfo));
+    flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT));
+    ASSERT_TRUE(flag);
 }
 
 /**

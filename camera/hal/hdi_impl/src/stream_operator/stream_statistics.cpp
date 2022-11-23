@@ -75,7 +75,11 @@ void StreamStatistics::Clear()
 
 void StreamStatistics::DumpStats(int interval)
 {
-    clock_gettime(CLOCK_MONOTONIC, &timestamp_);
+    if (clock_gettime(CLOCK_MONOTONIC, &timestamp_) != 0) {
+        CAMERA_LOGE("clock_gettime error");
+        return;
+    }
+
     if (lastOutputTime_ == 0) {
         lastOutputTime_ = timestamp_.tv_sec;
         return;

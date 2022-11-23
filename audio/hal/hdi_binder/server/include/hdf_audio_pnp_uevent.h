@@ -20,5 +20,6 @@
 
 /* start uevent to monitor USB headset/headphone */
 int32_t AudioPnpUeventStartThread(void);
+void AudioPnpUeventStopThread(void);
 
 #endif

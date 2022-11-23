@@ -89,6 +89,7 @@ public:
     int32_t maxCd_;
 private:
     int32_t UpdateThermalZoneData(std::map<std::string, std::string> &tzPathMap);
+    void UpdateDataType(XMLThermalZoneInfo& tzIter, ReportedThermalData& data);
     ThermalHdfConfig::ThermalTypeMap sensorTypeMap_;
     struct ThermalZoneSysfsPathInfo tzSysPathInfo_;
     std::list<ThermalZoneSysfsPathInfo> lTzSysPathInfo_;

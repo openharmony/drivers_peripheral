@@ -1170,7 +1170,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureReqMmapBufferWhenHandleIsNull, TestSize.L
     AudioHwCapture *hwCapture = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioCaptureReqMmapBuffer(handle, reqSize, &desc));
 }
 
@@ -1189,7 +1189,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureReqMmapBufferWhenDevDataHandleIsNull, Tes
     hwCapture->devDataHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioCaptureReqMmapBuffer(handle, reqSize, &desc));
     hwCapture->devDataHandle = devDataHandle;
 }
@@ -1199,7 +1199,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureReqMmapBufferWhenFormatIsError, TestSize.
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     AudioHandle handle = (AudioHandle)hwCapture;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     hwCapture->captureParam.frameCaptureMode.attrs.format = AUDIO_FORMAT_TYPE_G711A;
     EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioCaptureReqMmapBuffer(handle, reqSize, &desc));
 }
@@ -1209,7 +1209,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureReqMmapBufferWhenReqSizeOverThanFileSize,
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     AudioHandle handle = (AudioHandle)hwCapture;
     int32_t reqSize = 1024;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioCaptureReqMmapBuffer(handle, reqSize, &desc));
 }
 

@@ -47,7 +47,7 @@ static uint32_t Convert2Uint32(const uint8_t *ptr)
 void AudioCaptureReqMmapBuffer(struct IAudioCapture *&capture, uint8_t *&data)
 {
     int32_t temp = *(reinterpret_cast<int32_t *>(data));
-    struct AudioMmapBufferDescripter desc = {
+    struct AudioMmapBufferDescriptor desc = {
         .memoryAddress = reinterpret_cast<int8_t *>(data),
         .memoryAddressLen = *(reinterpret_cast<uint32_t *>(data)),
         .memoryFd = temp,

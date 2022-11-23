@@ -180,7 +180,7 @@ RetCode HosFileFormat::V4L2SetFmt(int fd, DeviceFormat& format)
     if (bufType_ == 0) {
         V4L2SearchBufType(fd);
         if (bufType_ == V4L2_BUF_TYPE_PRIVATE) {
-            CAMERA_LOGE("V4L2GetFmt bufType_ == 0\n");
+            CAMERA_LOGE("V4L2SetFmt bufType_ == 0\n");
             return RC_ERROR;
         }
     }
@@ -214,7 +214,7 @@ RetCode HosFileFormat::V4L2GetCrop(int fd, DeviceFormat& format)
     if (bufType_ == 0) {
         V4L2SearchBufType(fd);
         if (bufType_ == V4L2_BUF_TYPE_PRIVATE) {
-            CAMERA_LOGE("V4L2GetFmt bufType_ == 0\n");
+            CAMERA_LOGE("V4L2GetCrop bufType_ == 0\n");
             return RC_ERROR;
         }
     }
@@ -241,7 +241,7 @@ RetCode HosFileFormat::V4L2SetCrop(int fd, DeviceFormat& format)
     if (bufType_ == 0) {
         V4L2SearchBufType(fd);
         if (bufType_ == V4L2_BUF_TYPE_PRIVATE) {
-            CAMERA_LOGE("V4L2GetFmt bufType_ == 0\n");
+            CAMERA_LOGE("V4L2SetCrop bufType_ == 0\n");
             return RC_ERROR;
         }
     }
@@ -268,7 +268,7 @@ RetCode HosFileFormat::V4L2GetCropCap(int fd, DeviceFormat& format)
     if (bufType_ == 0) {
         V4L2SearchBufType(fd);
         if (bufType_ == V4L2_BUF_TYPE_PRIVATE) {
-            CAMERA_LOGE("V4L2GetFmt bufType_ == 0\n");
+            CAMERA_LOGE("V4L2GetCropCap bufType_ == 0\n");
             return RC_ERROR;
         }
     }

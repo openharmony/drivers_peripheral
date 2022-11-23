@@ -48,9 +48,9 @@
 
 #define MAX_REQUESTASYNC_NUM 20
 
-static constexpr int32_t CMD_OFFSET_5 = 5;
-static constexpr int32_t DIRECTION_OFFSET_7 = 7;
-static constexpr int32_t TYPE_OFFSET_8 = 8;
+constexpr int32_t CMD_OFFSET_5 = 5;
+constexpr int32_t DIRECTION_OFFSET_7 = 7;
+constexpr int32_t TYPE_OFFSET_8 = 8;
 
 enum UsbdReqNodeStatus {
     USBD_REQNODE_INIT,
@@ -79,11 +79,11 @@ public:
     static int32_t UsbdGetCtrlPipe(HostDevice *dev);
     static UsbdRequestSync *UsbdFindRequestSync(HostDevice *port, uint8_t interfaceId, uint8_t pipeAddr);
     static UsbdRequestSync *UsbdRequestSyncAlloc(void);
-    static void UsbRequestParamsWSyncInit(UsbRequestParams *parmas, int32_t timeout, const UsbPipeInfo *pipe);
+    static void UsbRequestParamsWSyncInit(UsbRequestParams *params, int32_t timeout, const UsbPipeInfo *pipe);
     static int32_t UsbdRequestSyncInit(
         HostDevice *port, UsbInterfaceHandle *ifHandle, UsbPipeInfo *pipe, UsbdRequestSync *requestSync);
     static int32_t UsbdRequestSyncRelease(UsbdRequestSync *requestSync);
-    static void UsbRequestParamsInit(UsbRequestParams *parmas, int32_t timeout);
+    static void UsbRequestParamsInit(UsbRequestParams *params, int32_t timeout);
     static int32_t CtrlTranParamGetReqType(HdfSBuf *data, UsbControlParams *pCtrParams, uint32_t requestType);
     static int32_t CtrlTransferParamInit(HdfSBuf *data, UsbControlParams *pCtrParams, int32_t *timeout);
     static void UsbdReleaseInterfaces(HostDevice *dev);
@@ -102,7 +102,7 @@ public:
     static int32_t UsbdMallocAndFill(uint8_t *&dataAddr, const std::vector<uint8_t> &data);
     static int32_t FillReqAyncParams(
         UsbdRequestASync *userData, UsbPipeInfo *pipe,
-        UsbRequestParams *parmas, const uint8_t *buffer, uint32_t length);
+        UsbRequestParams *params, const uint8_t *buffer, uint32_t length);
     static UsbdRequestASync *UsbdRequestASyncAlloc(void);
     static int32_t UsbdRequestASyncInit(
         HostDevice *port, UsbInterfaceHandle *ifHandle, UsbPipeInfo *pipe, UsbdRequestASync *request);
@@ -114,7 +114,7 @@ public:
     static int32_t FunDetachDevice(HostDevice *port, HdfSBuf *data);
     static int32_t UsbdDeviceDettach(UsbImpl *service, uint8_t busNum, uint8_t devAddr);
     static HostDevice *UsbdFindDevForBusNum(UsbImpl *service, uint8_t busNum);
-    static int32_t UsbdRemoveBusDev(UsbImpl *service, uint8_t busNum);
+    static int32_t UsbdRemoveBusDev(UsbImpl *service, uint8_t busNum, const sptr<IUsbdSubscriber> &subscriber);
     static int32_t UsbdBulkASyncReqInit(UsbdBulkASyncReqList *list, UsbdBulkASyncList *pList);
     static UsbdBulkASyncList *UsbdBulkASyncListAlloc(HostDevice *port, uint8_t ifId, uint8_t epId);
     static int32_t UsbdBulkASyncReqNodeSetNoUse(UsbdBulkASyncReqNode *db);

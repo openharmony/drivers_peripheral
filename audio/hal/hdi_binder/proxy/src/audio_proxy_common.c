@@ -415,7 +415,7 @@ int32_t AudioProxyGetMmapPositionRead(struct HdfSBuf *reply, uint64_t *frames, s
 }
 
 int32_t AudioProxyReqMmapBufferWrite(struct HdfSBuf *data, int32_t reqSize,
-    const struct AudioMmapBufferDescripter *desc)
+    const struct AudioMmapBufferDescriptor *desc)
 {
     if (data == NULL || desc == NULL) {
         return HDF_FAILURE;

@@ -20,6 +20,15 @@ ohos_prebuilt_etc("init.usb.configfs.cfg") {
   part_name = "drivers_peripheral_usb"
 }
 
+ohos_prebuilt_etc("usb.para.dac") {
+  source = "usb.para.dac"
+  part_name = "drivers_peripheral_usb"
+  module_install_dir = "etc/param"
+}
+
 group("usb_etc_files") {
-  deps = [ ":init.usb.configfs.cfg" ]
+  deps = [
+    ":init.usb.configfs.cfg",
+    ":usb.para.dac",
+  ]
 }

@@ -43,6 +43,7 @@ public:
     int32_t GetStreamOperator(const sptr<IStreamOperatorCallback> &callbackObj,
         sptr<IStreamOperator> &streamOperator) override;
     int32_t UpdateSettings(const std::vector<uint8_t> &settings) override;
+    int32_t GetSettings(std::vector<uint8_t> &settings);
     int32_t SetResultMode(ResultCallbackMode mode) override;
     int32_t GetEnabledResults(std::vector<int32_t> &results) override;
     int32_t EnableResult(const std::vector<int32_t> &results) override;

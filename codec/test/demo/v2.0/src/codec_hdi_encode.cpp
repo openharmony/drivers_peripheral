@@ -30,13 +30,12 @@ namespace {
     constexpr int32_t BUFFER_COUNT = 10;
     constexpr int32_t BITRATE = 3000000;
     constexpr int32_t FD_SIZE = sizeof(int);
-    constexpr const char *ENCODER_AVC = "OMX.rk.video_encoder.avc";
 }
 
-#define AV_COLOR_FORMAT (OMX_COLOR_FORMATTYPE)CODEC_OMX_COLOR_FORMAT_RGBA8888
+#define AV_COLOR_FORMAT (OMX_COLOR_FORMATTYPE) CODEC_COLOR_FORMAT_RGBA8888
 
 static CodecHdiEncode *g_core = nullptr;
-CodecHdiEncode::CodecHdiEncode() : fpIn_(nullptr), fpOut_(nullptr)
+CodecHdiEncode::CodecHdiEncode()
 {
     client_ = nullptr;
     callback_ = nullptr;
@@ -45,20 +44,20 @@ CodecHdiEncode::CodecHdiEncode() : fpIn_(nullptr), fpOut_(nullptr)
     useBufferHandle_ = false;
     width_ = 0;
     height_ = 0;
+    count_ = 0;
     componentId_ = 0;
     color_ = ColorFormat::YUV420SP;
+    codecMime_ = CodecMime::AVC;
     omxColorFormat_ = OMX_COLOR_FormatYUV420SemiPlanar;
 }
 
 CodecHdiEncode::~CodecHdiEncode()
 {
-    if (fpOut_ != nullptr) {
-        fclose(fpOut_);
-        fpOut_ = nullptr;
+    if (ioOut_.is_open()) {
+        ioOut_.close();
     }
-    if (fpIn_ != nullptr) {
-        fclose(fpIn_);
-        fpIn_ = nullptr;
+    if (ioIn_.is_open()) {
+        ioIn_.close();
     }
 }
 
@@ -73,11 +72,11 @@ void CodecHdiEncode::OnStatusChanged()
     statusCondition_.notify_one();
 }
 
-bool CodecHdiEncode::ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount)
+bool CodecHdiEncode::ReadOneFrame(char *buf, uint32_t &filledCount)
 {
     bool ret = false;
-    filledCount = fread(buf, 1, GetInputBufferSize(), fp);
-    if (feof(fp)) {
+    ioIn_.read(buf, GetInputBufferSize());
+    if (ioIn_.eof()) {
         ret = true;
     }
     return ret;
@@ -91,6 +90,8 @@ bool CodecHdiEncode::Init(CommandOpt &opt)
     this->useBufferHandle_ = opt.useBuffer;
     HDF_LOGI("width[%{public}d], height[%{public}d]", width_, height_);
     // gralloc init
+    codecMime_ = opt.codec;
+
     gralloc_ = OHOS::HDI::Display::V1_0::IDisplayGralloc::Get();
     color_ = opt.colorForamt;
     if (color_ == ColorFormat::RGBA8888) {
@@ -98,9 +99,9 @@ bool CodecHdiEncode::Init(CommandOpt &opt)
     } else if (color_ == ColorFormat::BGRA8888) {
         omxColorFormat_ = OMX_COLOR_Format32bitBGRA8888;
     }
-    fpIn_ = fopen(opt.fileInput.c_str(), "rb");
-    fpOut_ = fopen(opt.fileOutput.c_str(), "wb+");
-    if ((fpIn_ == nullptr) || (fpOut_ == nullptr)) {
+    ioIn_.open(opt.fileInput, std::ios_base::binary);
+    ioOut_.open(opt.fileOutput, std::ios_base::binary | std::ios_base::trunc);
+    if (!ioOut_.is_open() || !ioIn_.is_open()) {
         HDF_LOGE("%{public}s:failed to open file %{public}s or %{public}s", __func__, opt.fileInput.c_str(),
                  opt.fileOutput.c_str());
         return false;
@@ -118,8 +119,7 @@ bool CodecHdiEncode::Init(CommandOpt &opt)
     callback_->FillBufferDone = &CodecHdiEncode::OnFillBufferDone;
 
     // create a component
-    auto err = omxMgr_->CreateComponent(&client_, &componentId_, const_cast<char *>(ENCODER_AVC),
-                                        reinterpret_cast<int64_t>(this), callback_);
+    auto err = GetComponent();
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to CreateComponent", __func__);
         return false;
@@ -191,9 +191,8 @@ int32_t CodecHdiEncode::CheckAndUseBufferHandle()
     usage.portIndex = static_cast<uint32_t>(PortIndex::PORT_INDEX_INPUT);
     err = client_->GetParameter(client_, OMX_IndexParamGetBufferHandleUsage, reinterpret_cast<int8_t *>(&usage),
                                 sizeof(usage));
-    HDF_LOGI(
-        "OMX_GetParameter:GetBufferHandleUsage:PORT_INDEX_INPUT, err [%{public}x], usage[%{public}" PRIu64 "]",
-        err, usage.usage);
+    HDF_LOGI("OMX_GetParameter:GetBufferHandleUsage:PORT_INDEX_INPUT, err [%{public}x], usage[%{public}" PRIu64 "]",
+             err, usage.usage);
     if (err != HDF_SUCCESS) {
         return err;
     }
@@ -262,8 +261,8 @@ int32_t CodecHdiEncode::UseBufferOnPort(PortIndex portIndex)
     OMX_PARAM_PORTDEFINITIONTYPE param;
     InitParam(param);
     param.nPortIndex = static_cast<uint32_t>(portIndex);
-    auto err = client_->GetParameter(client_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param),
-                                     sizeof(param));
+    auto err =
+        client_->GetParameter(client_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed to GetParameter with OMX_IndexParamPortDefinition : portIndex[%{public}d]",
                  __func__, portIndex);
@@ -468,6 +467,7 @@ void CodecHdiEncode::Run()
         HDF_LOGE("%{public}s failed to SendCommand with OMX_CommandStateSet:OMX_StateIdle", __func__);
         return;
     }
+    auto t1 = std::chrono::system_clock::now();
     if (!FillAllTheBuffer()) {
         HDF_LOGE("%{public}s FillAllTheBuffer error", __func__);
         return;
@@ -500,6 +500,9 @@ void CodecHdiEncode::Run()
         usleep(10000);  // 10000: sleep time 10ms
     }
     (void)client_->SendCommand(client_, OMX_CommandStateSet, OMX_StateIdle, NULL, 0);
+    auto t2 = std::chrono::system_clock::now();
+    std::chrono::duration<double> diff = t2 - t1;
+    HDF_LOGI("encoder costtime %{public}f, count=%{public}d", diff.count(), count_);
     return;
 }
 
@@ -520,8 +523,8 @@ bool CodecHdiEncode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, boo
         BufferHandle *bufferHandle = bufferHandles_[bufferHandleId];
         if (bufferHandle != nullptr) {
             gralloc_->Mmap(*bufferHandle);
-            endFlag = this->ReadOneFrame(fpIn_, reinterpret_cast<char *>(bufferHandle->virAddr),
-                bufferInfo->omxBuffer->filledLen);
+            endFlag =
+                this->ReadOneFrame(reinterpret_cast<char *>(bufferHandle->virAddr), bufferInfo->omxBuffer->filledLen);
             bufferInfo->omxBuffer->filledLen = bufferHandle->stride * bufferHandle->height;
             gralloc_->Unmap(*bufferHandle);
             bufferInfo->omxBuffer->buffer = reinterpret_cast<uint8_t *>(bufferHandle);
@@ -531,7 +534,7 @@ bool CodecHdiEncode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, boo
     } else {
         // read data from ashmem
         void *sharedAddr = const_cast<void *>(bufferInfo->avSharedPtr->ReadFromAshmem(0, 0));
-        endFlag = this->ReadOneFrame(fpIn_, reinterpret_cast<char *>(sharedAddr), bufferInfo->omxBuffer->filledLen);
+        endFlag = this->ReadOneFrame(reinterpret_cast<char *>(sharedAddr), bufferInfo->omxBuffer->filledLen);
     }
     bufferInfo->omxBuffer->offset = 0;
     if (endFlag) {
@@ -553,7 +556,7 @@ int32_t CodecHdiEncode::CreateBufferHandle()
     } else if (color_ == ColorFormat::BGRA8888) {
         pixForamt = PIXEL_FMT_BGRA_8888;
     }
-    
+
     AllocInfo alloc = {.width = this->stride_,
                        .height = this->height_,
                        .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
@@ -611,9 +614,9 @@ int32_t CodecHdiEncode::OnFillBufferDone(struct CodecCallbackType *self, int64_t
 uint32_t CodecHdiEncode::GetInputBufferSize()
 {
     if (color_ == ColorFormat::YUV420SP) {
-        return (width_ * height_ * 3 / 2); // 3:byte alignment, 2:byte alignment
+        return (width_ * height_ * 3 / 2);  // 3:byte alignment, 2:byte alignment
     } else {
-        return (width_ * height_ * 4); // 4: byte alignment for RGBA or BGRA
+        return (width_ * height_ * 4);  // 4: byte alignment for RGBA or BGRA
     }
 }
 
@@ -641,11 +644,11 @@ int32_t CodecHdiEncode::OnFillBufferDone(const struct OmxCodecBuffer &buffer)
     }
 
     auto bufferInfo = iter->second;
-    const void *addr = bufferInfo->avSharedPtr->ReadFromAshmem(buffer.filledLen, buffer.offset);
+    void *addr = const_cast<void *>(bufferInfo->avSharedPtr->ReadFromAshmem(buffer.filledLen, buffer.offset));
     // save to file
-    (void)fwrite(addr, 1, buffer.filledLen, fpOut_);
-    (void)fflush(fpOut_);
-
+    ioOut_.write(static_cast<char *>(addr), buffer.filledLen);
+    ioOut_.flush();
+    count_++;
     if (buffer.flag == OMX_BUFFERFLAG_EOS) {
         exit_ = true;
         HDF_LOGI("OnFillBufferDone the END coming");
@@ -677,7 +680,7 @@ int32_t CodecHdiEncode::ConfigPortDefine()
     param.format.video.nFrameHeight = height_;
     param.format.video.nStride = stride_;
     param.format.video.nSliceHeight = height_;
-    
+
     param.format.video.eColorFormat = omxColorFormat_;
     err =
         client_->SetParameter(client_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param), sizeof(param));
@@ -711,7 +714,59 @@ int32_t CodecHdiEncode::ConfigPortDefine()
     }
     return HDF_SUCCESS;
 }
+int32_t CodecHdiEncode::GetComponent()
+{
+    int32_t count = omxMgr_->GetComponentNum();
+    if (count <= 0) {
+        HDF_LOGE("%{public}s: GetComponentNum ret %{public}d", __func__, count);
+        return HDF_FAILURE;
+    }
+    auto caps = std::make_unique<CodecCompCapability[]>(count);
+    auto err = omxMgr_->GetComponentCapabilityList(caps.get(), count);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: GetComponentCapabilityList ret %{public}d", __func__, err);
+        return err;
+    }
+    std::string compName("");
+    for (int32_t i = 0; i < count; i++) {
+        if (caps[i].type != VIDEO_ENCODER) {
+            continue;
+        }
+        if (((caps[i].role == MEDIA_ROLETYPE_VIDEO_AVC) && (codecMime_ == CodecMime::AVC)) ||
+            ((caps[i].role == MEDIA_ROLETYPE_VIDEO_HEVC) && (codecMime_ == CodecMime::HEVC))) {
+            compName = caps[i].compName;
+            break;
+        }
+    }
+    if (compName.empty()) {
+        HDF_LOGE("%{public}s: role is unexpected ", __func__);
+        return HDF_FAILURE;
+    }
+    return omxMgr_->CreateComponent(&client_, &componentId_, compName.data(), reinterpret_cast<int64_t>(this),
+                                    callback_);
+}
 
+OMX_VIDEO_CODINGTYPE CodecHdiEncode::GetCompressFormat()
+{
+    OMX_VIDEO_CODINGTYPE compressFmt = OMX_VIDEO_CodingAVC;
+    switch (codecMime_) {
+        case CodecMime::AVC:
+            compressFmt = OMX_VIDEO_CodingAVC;
+            break;
+        case CodecMime::HEVC:
+            compressFmt = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingHEVC;
+            break;
+        case CodecMime::MPEG4:
+            compressFmt = OMX_VIDEO_CodingMPEG4;
+            break;
+        case CodecMime::VP9:
+            compressFmt = (OMX_VIDEO_CODINGTYPE)CODEC_OMX_VIDEO_CodingVP9;
+            break;
+        default:
+            break;
+    }
+    return compressFmt;
+}
 int32_t CodecHdiEncode::ConfigBitMode()
 {
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
@@ -726,7 +781,7 @@ int32_t CodecHdiEncode::ConfigBitMode()
     HDF_LOGI("set Format PORT_INDEX_INPUT eCompressionFormat = %{public}d, eColorFormat=%{public}d",
              param.eCompressionFormat, param.eColorFormat);
     param.xFramerate = FRAME;
-    param.eCompressionFormat = OMX_VIDEO_CodingAVC;
+    param.eCompressionFormat = GetCompressFormat();
     err = client_->SetParameter(client_, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param),
                                 sizeof(param));
     if (err != HDF_SUCCESS) {

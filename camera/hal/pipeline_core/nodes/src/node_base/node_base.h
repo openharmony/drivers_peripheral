@@ -63,10 +63,9 @@ public:
     RetCode Init(const int32_t streamId) override;
     RetCode Start(const int32_t streamId) override;
     RetCode Flush(const int32_t streamId) override;
-    RetCode SetCallback(const MetaDataCb cb) override;
+    RetCode SetCallback() override;
     RetCode Stop(const int32_t streamId) override;
     RetCode Config(const int32_t streamId, const CaptureMeta& meta) override;
-    RetCode UpdateSettingsConfig(const CaptureMeta& meta) override;
     RetCode Capture(const int32_t streamId, const int32_t captureId) override;
     RetCode CancelCapture(const int32_t streamId) override;
     int32_t GetNumberOfInPorts() const override;

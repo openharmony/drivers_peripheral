@@ -268,7 +268,7 @@ int32_t AudioGetManagerCreateStartCapture(TestAudioManager *&manager, struct Aud
     }
     return HDF_SUCCESS;
 }
-int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescripter &desc, int32_t &reqSize, bool flag)
+int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescriptor &desc, int32_t &reqSize, bool flag)
 {
     if (fp == NULL) {
         return HDF_FAILURE;

@@ -123,7 +123,7 @@ struct AudioAttribute {
      * @param desc Indicates the pointer to the mmap buffer descriptor.
      * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
      */
-    int32_t (*ReqMmapBuffer)(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc);
+    int32_t (*ReqMmapBuffer)(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc);
 
     /**
      * @brief Obtains the read/write position of the current mmap buffer.

@@ -465,7 +465,7 @@ int32_t AudioRenderGetExtraParams(AudioHandle handle, char *keyValueList, int32_
     return AUDIO_HAL_SUCCESS;
 }
 
-int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescripter *desc)
+int32_t AudioRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
     (void)desc;
     HDF_LOGI("AudioRenderReqMmapBuffer Success!");
