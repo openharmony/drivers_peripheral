@@ -15,8 +15,8 @@
 
 #include "charger_thread.h"
 
-#include "errors.h"
 #include "battery_log.h"
+#include "errors.h"
 
 int main(int argc, char** argv)
 {

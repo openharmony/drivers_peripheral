@@ -136,6 +136,7 @@ if (defined(ohos_lite)) {
       "$ut_root_path/v4l2/camera_video_test.cpp",
       "$ut_root_path/v4l2/double_preview_test.cpp",
       "$ut_root_path/v4l2/hdfcamera_facedetect.cpp",
+      "$ut_root_path/v4l2/meta_data_test.cpp",
       "$ut_root_path/v4l2/open_camera_test.cpp",
       "$ut_root_path/v4l2/stream_customer.cpp",
       "$ut_root_path/v4l2/test_display.cpp",
@@ -196,6 +197,9 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/include/stream_operator",
       "$camera_path/hdi_impl/include/offline_stream_operator",
       "$camera_path/hdi_impl/src/stream_operator/stream_tunnel/standard",
+
+      # metadata manager includes
+      "$camera_path/metadata_manager/include",
     ]
 
     deps = [

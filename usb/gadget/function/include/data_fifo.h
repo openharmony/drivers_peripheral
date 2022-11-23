@@ -34,7 +34,7 @@ struct DataFifo {
 };
 
 /* DataFifo Helper function */
-static inline void DataFifoInit(struct DataFifo *fifo, uint32_t size, void *data)
+inline void DataFifoInit(struct DataFifo *fifo, uint32_t size, void *data)
 {
     fifo->rdIdx = 0;
     fifo->wrIdx = 0;
@@ -42,12 +42,12 @@ static inline void DataFifoInit(struct DataFifo *fifo, uint32_t size, void *data
     fifo->data = data;
 }
 
-static inline bool DataFifoIsInitialized(struct DataFifo *fifo)
+inline bool DataFifoIsInitialized(struct DataFifo *fifo)
 {
     return fifo->size != 0;
 }
 
-static inline void DataFifoReset(struct DataFifo *fifo)
+inline void DataFifoReset(struct DataFifo *fifo)
 {
     fifo->rdIdx = fifo->wrIdx = 0;
 }
@@ -57,22 +57,22 @@ static inline uint32_t DataFifoLen(struct DataFifo *fifo)
     return fifo->wrIdx - fifo->rdIdx;
 }
 
-static inline bool DataFifoIsEmpty(struct DataFifo *fifo)
+inline bool DataFifoIsEmpty(struct DataFifo *fifo)
 {
     return fifo->wrIdx == fifo->rdIdx;
 }
 
-static inline bool DataFifoIsFull(struct DataFifo *fifo)
+inline bool DataFifoIsFull(struct DataFifo *fifo)
 {
     return DataFifoLen(fifo) > (fifo->size - 1);
 }
 
-static inline uint32_t DataFifoAvailSize(struct DataFifo *fifo)
+inline uint32_t DataFifoAvailSize(struct DataFifo *fifo)
 {
     return fifo->size - DataFifoLen(fifo);
 }
 
-static inline void DataFifoSkip(struct DataFifo *fifo, uint32_t size)
+inline void DataFifoSkip(struct DataFifo *fifo, uint32_t size)
 {
     fifo->rdIdx += size;
 }

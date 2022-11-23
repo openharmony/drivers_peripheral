@@ -1428,7 +1428,7 @@ HWTEST_F(AudioRenderTest, AudioRenderReqMmapBufferWhenRenderIsNull, TestSize.Lev
     AudioHwRender *hwRender = nullptr;
     AudioHandle handle = (AudioHandle)hwRender;
     int32_t reqSize = REQ_SIZE;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderReqMmapBuffer(handle, reqSize, &desc));
 }
 
@@ -1437,7 +1437,7 @@ HWTEST_F(AudioRenderTest, AudioRenderReqMmapBufferWhenDevCtlHandleIsNull, TestSi
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     struct DevHandle *devDataHandle = hwRender->devDataHandle;
     hwRender->devDataHandle = nullptr;
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     int32_t reqSize = REQ_SIZE;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderReqMmapBuffer((struct AudioRender *)hwRender, reqSize, &desc));
     hwRender->devDataHandle = devDataHandle;
@@ -1450,7 +1450,7 @@ HWTEST_F(AudioRenderTest, AudioRenderReqMmapBufferWhenDevCtlHandleIsError, TestS
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
     hwRender->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     int32_t reqSize = REQ_SIZE;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderReqMmapBuffer((struct AudioRender *)hwRender, reqSize, &desc));
     hwRender->devDataHandle = devDataHandle;
@@ -1460,14 +1460,14 @@ HWTEST_F(AudioRenderTest, AudioRenderReqMmapBufferWhenDevCtlHandleIsError, TestS
 
 HWTEST_F(AudioRenderTest, AudioRenderReqMmapBufferWhenDescIsNull, TestSize.Level1)
 {
-    struct AudioMmapBufferDescripter *desc = nullptr;
+    struct AudioMmapBufferDescriptor *desc = nullptr;
     int32_t reqSize = REQ_SIZE;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioRenderReqMmapBuffer(render, reqSize, desc));
 }
 
 HWTEST_F(AudioRenderTest, AudioRenderReqMmapBufferWhenFormatIsError, TestSize.Level1)
 {
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     int32_t reqSize = REQ_SIZE;
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
     AudioFormat tempFormat = hwRender->renderParam.frameRenderMode.attrs.format;

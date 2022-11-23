@@ -150,7 +150,7 @@ int32_t WlanInterfaceDestroyFeature(struct IWlanInterface *self, const struct Hd
     return ret;
 }
 
-int32_t WlanInterfaceGetAsscociatedStas(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature,
+int32_t WlanInterfaceGetAssociatedStas(struct IWlanInterface *self, const struct HdfFeatureInfo *ifeature,
     struct HdfStaInfo *staInfo, uint32_t *staInfoLen, uint32_t *num)
 {
     int32_t ret;
@@ -175,7 +175,7 @@ int32_t WlanInterfaceGetAsscociatedStas(struct IWlanInterface *self, const struc
         HDF_LOGE("%{public}s:OsalMemCalloc failed!", __func__);
         return HDF_FAILURE;
     }
-    ret = g_apFeature->getAsscociatedStas(g_apFeature, wifiStaInfo, *staInfoLen, num);
+    ret = g_apFeature->getAssociatedStas(g_apFeature, wifiStaInfo, *staInfoLen, num);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s get associated sta failed!, error code: %{public}d", __func__, ret);
         OsalMemFree(wifiStaInfo);
@@ -515,7 +515,7 @@ static int32_t WlanFillScanResultInfo(WifiScanResult *wifiScanResult, struct Hdf
         }
     }
     if ((wifiScanResult->ie != NULL) && (wifiScanResult->ieLen != 0)) {
-        scanResult->ie = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) *wifiScanResult->ieLen);
+        scanResult->ie = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * wifiScanResult->ieLen);
         if (scanResult->ie != NULL) {
             if (memcpy_s(scanResult->ie, wifiScanResult->ieLen, wifiScanResult->ie,
                 wifiScanResult->ieLen) != EOK) {

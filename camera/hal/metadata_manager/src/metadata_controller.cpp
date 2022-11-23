@@ -55,12 +55,20 @@ MetadataController &MetadataController::GetInstance()
 void MetadataController::SetUpdateSettingCallback(const MetaDataCb &cb)
 {
     std::unique_lock<std::mutex> lock(dataConfigLock_);
+    if (!isInit_) {
+        CAMERA_LOGE("already set update setting callback.");
+        return;
+    }
     updateSettingFunc_ = cb;
 }
 
 void MetadataController::UnSetUpdateSettingCallback()
 {
     std::unique_lock<std::mutex> lock(dataConfigLock_);
+    if (!isInit_) {
+        CAMERA_LOGE("already set update setting callback.");
+        return;
+    }
     updateSettingFunc_ = nullptr;
 }
 
@@ -460,7 +468,7 @@ bool MetadataController::DealUpdateNewTagData(
             return false;
         }
 
-        result = outMeta->addEntry(*it, (void*)entry.data.u8, entry.count);
+        result = outMeta->addEntry(*it, static_cast<void *>(entry.data.u8), entry.count);
         if (!result) {
             CAMERA_LOGE("update key [%{public}d] error", *it);
             return false;
@@ -492,6 +500,11 @@ void MetadataController::DealMessage()
 
 void MetadataController::SetDeviceDefaultMetadata(std::shared_ptr<CameraMetadata> &meta)
 {
+    if (isInit_) {
+        CAMERA_LOGE("already set device default meta data.");
+        return;
+    }
+    isInit_ = true;
     if (metaDataConfig_ != nullptr) {
         metaDataConfig_.reset();
     }
@@ -503,6 +516,10 @@ void MetadataController::SetDeviceDefaultMetadata(std::shared_ptr<CameraMetadata
 
 void MetadataController::Start()
 {
+    if (!isInit_) {
+        CAMERA_LOGE("already start.");
+        return;
+    }
     peerFrame_ = true;
     updateSettingFunc_ = nullptr;
 
@@ -535,6 +552,11 @@ void MetadataController::Start()
 
 void MetadataController::Stop()
 {
+    if (!isInit_) {
+        CAMERA_LOGE("invalid stop.");
+        return;
+    }
+    isInit_ = false;
     isRunning_.store(false);
     cv_.notify_all();
     StopThread();

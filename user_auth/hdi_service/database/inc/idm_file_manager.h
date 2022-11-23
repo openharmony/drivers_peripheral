@@ -27,7 +27,7 @@ extern "C" {
 
 LinkedList *LoadFileInfo(void);
 ResultCode UpdateFileInfo(LinkedList *userInfoList);
-ResultCode DeleteFile();
+ResultCode DeleteFile(void);
 
 #ifdef __cplusplus
 }

@@ -84,6 +84,7 @@ private:
     std::queue<std::shared_ptr<CameraMetadata>> queue_;
     std::atomic_bool isRunning_;
     std::thread *notifyChangedMetadata_ = nullptr;
+    bool isInit_ = false;
 };
 } // namespace Camera
 } // namespace OHOS

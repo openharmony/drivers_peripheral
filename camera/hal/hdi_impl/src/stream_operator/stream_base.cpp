@@ -593,6 +593,8 @@ bool StreamBase::GetTunnelMode() const
 
 void StreamBase::DumpStatsInfo() const
 {
-    tunnel_->DumpStats();
+    if (tunnel_ != nullptr) {
+        tunnel_->DumpStats();
+    }
 }
 } // namespace OHOS::Camera

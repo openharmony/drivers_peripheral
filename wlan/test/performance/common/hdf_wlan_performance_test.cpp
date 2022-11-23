@@ -264,7 +264,7 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHaGetValidFreqsWithBand001, TestSize.Level1
  * @tc.type: FUNC
  * @tc.require: AR000F869K
  */
-HWTEST_F(HdfWlanPerformanceTest, WifiHalGetAsscociatedStas001, TestSize.Level1)
+HWTEST_F(HdfWlanPerformanceTest, WifiHalGetAssociatedStas001, TestSize.Level1)
 {
     int ret;
     struct IWiFiAp *apFeature = nullptr;
@@ -277,10 +277,10 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetAsscociatedStas001, TestSize.Level1)
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_NE(nullptr, apFeature);
-    ret = apFeature->getAsscociatedStas(apFeature, nullptr, 0, nullptr);
+    ret = apFeature->getAssociatedStas(apFeature, nullptr, 0, nullptr);
     EXPECT_NE(HDF_SUCCESS, ret);
     clock_gettime(CLOCK_REALTIME, &tv1);
-    ret = apFeature->getAsscociatedStas(apFeature, staInfo, WLAN_MAX_NUM_STA_WITH_AP, &num);
+    ret = apFeature->getAssociatedStas(apFeature, staInfo, WLAN_MAX_NUM_STA_WITH_AP, &num);
     clock_gettime(CLOCK_REALTIME, &tv2);
     timeUsed = ((tv2.tv_sec * USEC_TIME + tv2.tv_nsec / MSEC_TIME) -
         (tv1.tv_sec * USEC_TIME + tv1.tv_nsec / MSEC_TIME));

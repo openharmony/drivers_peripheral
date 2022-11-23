@@ -89,6 +89,8 @@ enum AudioPortPin {
     PIN_OUT_USB_EXT              = 0x20u,      /**< Extended USB output pin*/
     PIN_OUT_EARPIECE             = 0x30u,      /**< Earpiece output pin */
     PIN_OUT_BLUETOOTH_SCO        = 0x40u,      /**< Bluetooth SCO output pin */
+    PIN_OUT_DAUDIO_DEFAULT       = 0x80u,
+    PIN_OUT_HEADPHONE            = 0x100u,     /**< Wired headphone output pin*/
     PIN_IN_MIC                   = 0x8000001u, /**< Microphone input pin */
     PIN_IN_HS_MIC                = 0x8000002u, /**< Wired headset microphone pin for input */
     PIN_IN_LINEIN                = 0x8000004u, /**< Line-in pin */
@@ -344,7 +346,7 @@ enum AudioCallbackType {
 /**
  * @brief Describes a mmap buffer.
  */
-struct AudioMmapBufferDescripter {
+struct AudioMmapBufferDescriptor {
     void *memoryAddress;                 /**< Pointer to the mmap buffer */
     int32_t memoryFd;                    /**< File descriptor of the mmap buffer */
     int32_t totalBufferFrames;           /**< Total size of the mmap buffer (unit: frame )*/

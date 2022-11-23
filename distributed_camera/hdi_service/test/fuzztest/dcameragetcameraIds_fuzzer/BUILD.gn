@@ -12,9 +12,8 @@
 # limitations under the License.
 
 #####################hydra-fuzz###################
-import("//build/ohos.gni")
-import("//build/test.gni")
-import("//drivers/peripheral/distributed_camera/distributedcamera.gni")
+import(
+    "//drivers/peripheral/distributed_camera/hdi_service/test/fuzztest/dcamera_fuzz.gni")
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DcameraGetCameraIdsFuzzTest") {
@@ -22,40 +21,15 @@ ohos_fuzztest("DcameraGetCameraIdsFuzzTest") {
 
   fuzz_config_file = "${distributedcamera_hdf_path}/hdi_service/test/fuzztest/dcameragetcameraIds_fuzzer"
 
-  include_dirs = [
-    "${distributedcamera_hdf_path}/hdi_service/include/dcamera_device",
-    "${distributedcamera_hdf_path}/hdi_service/include/dcamera_host",
-    "${distributedcamera_hdf_path}/hdi_service/include/dcamera_provider",
-    "${distributedcamera_hdf_path}/hdi_service/include/dstream_operator",
-    "${distributedcamera_hdf_path}/hdi_service/include/utils",
-    "//drivers/peripheral/camera/interfaces/metadata/include",
-  ]
-
-  cflags = [
-    "-g",
-    "-O0",
-    "-Wno-unused-variable",
-    "-fno-omit-frame-pointer",
-  ]
+  include_dirs += [ "${distributedcamera_hdf_path}/hdi_service/test/fuzztest/dcameragetcameraIds_fuzzer" ]
 
   sources = [ "dcameragetcameraIds_fuzzer.cpp" ]
 
-  deps = [
-    "${distributedcamera_hdf_path}/hdi_service:libdistributed_camera_hdf_service_1.0",
-    "//drivers/peripheral/camera/interfaces/metadata:metadata",
-    "//third_party/jsoncpp:jsoncpp",
-  ]
+  defines += [ "DH_LOG_TAG=\"DcameraGetCameraIdsFuzzTest\"" ]
 
-  defines = [
-    "HI_LOG_ENABLE",
-    "DH_LOG_TAG=\"DcameraGetCameraIdsFuzzTest\"",
-    "LOG_DOMAIN=0xD004100",
-  ]
+  deps = dcamera_deps
 
-  external_deps = [
-    "c_utils:utils",
-    "ipc:ipc_core",
-  ]
+  external_deps = dcamera_external_deps
 }
 
 ###############################################################################

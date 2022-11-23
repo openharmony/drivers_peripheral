@@ -26,14 +26,14 @@ extern "C" {
 #endif
 #endif
 
-static int32_t GetAsscociatedStasInner(const struct IWiFiAp *apFeature,
+static int32_t GetAssociatedStasInner(const struct IWiFiAp *apFeature,
     struct StaInfo *staInfo, uint32_t size, uint32_t *num)
 {
     if (apFeature == NULL || staInfo == NULL || size == 0 || num == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    return HalCmdGetAsscociatedStas(apFeature->baseFeature.ifName, staInfo, size, num);
+    return HalCmdGetAssociatedStas(apFeature->baseFeature.ifName, staInfo, size, num);
 }
 
 static int32_t SetCountryCodeInner(const struct IWiFiAp *apFeature, const char *code, uint32_t len)
@@ -45,11 +45,11 @@ static int32_t SetCountryCodeInner(const struct IWiFiAp *apFeature, const char *
     return HalCmdSetCountryCode(apFeature->baseFeature.ifName, code, len);
 }
 
-static int32_t GetAsscociatedStas(const struct IWiFiAp *apFeature,
+static int32_t HalGetAssociatedStas(const struct IWiFiAp *apFeature,
     struct StaInfo *staInfo, uint32_t count, uint32_t *num)
 {
     HalMutexLock();
-    int32_t ret = GetAsscociatedStasInner(apFeature, staInfo, count, num);
+    int32_t ret = GetAssociatedStasInner(apFeature, staInfo, count, num);
     HalMutexUnlock();
     return ret;
 }
@@ -72,7 +72,7 @@ int32_t InitApFeature(struct IWiFiAp **fe)
         HDF_LOGE("%s: init base feature, line: %d", __FUNCTION__, __LINE__);
         return HDF_FAILURE;
     }
-    (*fe)->getAsscociatedStas = GetAsscociatedStas;
+    (*fe)->getAssociatedStas = HalGetAssociatedStas;
     (*fe)->setCountryCode = HalSetCountryCode;
     return HDF_SUCCESS;
 }

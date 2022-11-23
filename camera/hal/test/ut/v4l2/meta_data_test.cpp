@@ -85,7 +85,7 @@ void MetaDataTest::CreateStream(int streamId, StreamIntent intent)
     StreamInfo streamInfo = {};
 
     if (intent == PREVIEW) {
-        if (streamId == display_->streamId_preview) {
+        if (streamId == display_->STREAM_ID_PREVIEW) {
             if (streamCustomerPreview_ == nullptr) {
                 streamCustomerPreview_ = std::make_shared<StreamCustomer>();
                 SetStreamInfo(streamInfo, streamCustomerPreview_, streamId, intent);
@@ -143,16 +143,16 @@ void MetaDataTest::StartCapture(
     } else {
         std::cout << "==========[test log]check Capture: Capture fail, result_ = " << result_ << captureId << std::endl;
     }
-    if (captureId == display_->captureId_preview) {
-        streamCustomerPreview_->ReceiveFrameOn([this](void *addr, const uint32_t size) {
+    if (captureId == display_->CAPTURE_ID_PREVIEW) {
+        streamCustomerPreview_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             std::cout << "==========[test log]preview size= " << size << std::endl;
         });
-    } else if (captureId == display_->captureId_capture) {
-        streamCustomerSnapshot_->ReceiveFrameOn([this](void *addr, const uint32_t size) {
+    } else if (captureId == display_->CAPTURE_ID_CAPTURE) {
+        streamCustomerSnapshot_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             std::cout << "==========[test log]snapshot size= " << size << std::endl;
         });
-    } else if (captureId == display_->captureId_video) {
-        streamCustomerVideo_->ReceiveFrameOn([this](void *addr, const uint32_t size) {
+    } else if (captureId == display_->CAPTURE_ID_VIDEO) {
+        streamCustomerVideo_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
             std::cout << "==========[test log]videosize= " << size << std::endl;
         });
     } else {
@@ -167,11 +167,11 @@ void MetaDataTest::StopStream(std::vector<int> &captureIds, std::vector<int> &st
         return;
     }
     for (auto &captureId : captureIds) {
-        if (captureId == display_->captureId_preview) {
+        if (captureId == display_->CAPTURE_ID_PREVIEW) {
             streamCustomerPreview_->ReceiveFrameOff();
-        } else if (captureId == display_->captureId_capture) {
+        } else if (captureId == display_->CAPTURE_ID_CAPTURE) {
             streamCustomerSnapshot_->ReceiveFrameOff();
-        } else if (captureId == display_->captureId_video) {
+        } else if (captureId == display_->CAPTURE_ID_VIDEO) {
             streamCustomerVideo_->ReceiveFrameOff();
             sleep(SLEEP_SECOND_ONE);
         } else {
@@ -195,7 +195,7 @@ void MetaDataTest::StopStream(std::vector<int> &captureIds, std::vector<int> &st
 void MetaDataTest::StartCustomCapture()
 {
     CaptureInfo captureInfo = {};
-    StartCapture(display_->streamId_preview, display_->captureId_preview, false, true, captureInfo);
+    StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true, captureInfo);
     constexpr double latitude = 27.987500;  // dummy data: Qomolangma latitde
     constexpr double longitude = 86.927500; // dummy data: Qomolangma longituude
     constexpr double altitude = 8848.86;    // dummy data: Qomolangma altitude
@@ -206,41 +206,41 @@ void MetaDataTest::StartCustomCapture()
     gps.push_back(altitude);
     captureSetting->addEntry(OHOS_JPEG_GPS_COORDINATES, gps.data(), gps.size());
 
-    captureInfo.streamIds_ = {display_->streamId_capture};
+    captureInfo.streamIds_ = {display_->STREAM_ID_CAPTURE};
     std::vector<uint8_t> snapshotSetting;
     MetadataUtils::ConvertMetadataToVec(captureSetting, snapshotSetting);
     captureInfo.captureSetting_ = snapshotSetting;
     captureInfo.enableShutterCallback_ = false;
-    StartCapture(display_->streamId_capture, display_->captureId_capture, false, true, captureInfo);
+    StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, true, captureInfo);
 }
 
 void MetaDataTest::StartPreviewVideoStream()
 {
-    CreateStream(display_->streamId_preview, PREVIEW);
-    CreateStream(display_->streamId_video, VIDEO);
+    CreateStream(display_->STREAM_ID_PREVIEW, PREVIEW);
+    CreateStream(display_->STREAM_ID_VIDEO, VIDEO);
     CommitStream();
 }
 
 void MetaDataTest::StartPreviewCaptureStream()
 {
-    CreateStream(display_->streamId_preview, PREVIEW);
-    CreateStream(display_->streamId_capture, STILL_CAPTURE);
+    CreateStream(display_->STREAM_ID_PREVIEW, PREVIEW);
+    CreateStream(display_->STREAM_ID_CAPTURE, STILL_CAPTURE);
     CommitStream();
 }
 
 void MetaDataTest::StopPreviewVideoStream()
 {
     sleep(SLEEP_SECOND_TWO);
-    std::vector<int> captureIds = {display_->captureId_preview, display_->captureId_video};
-    std::vector<int> streamIds = {display_->streamId_preview, display_->streamId_video};
+    std::vector<int> captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_VIDEO};
+    std::vector<int> streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_VIDEO};
     StopStream(captureIds, streamIds);
 }
 
 void MetaDataTest::StopPreviewCaptureStream()
 {
     sleep(SLEEP_SECOND_TWO);
-    std::vector<int> captureIds = {display_->captureId_preview, display_->captureId_capture};
-    std::vector<int> streamIds = {display_->streamId_preview, display_->streamId_capture};
+    std::vector<int> captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
+    std::vector<int> streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE};
     StopStream(captureIds, streamIds);
 }
 
@@ -285,8 +285,8 @@ void MetaDataTest::UpdateSettings(std::shared_ptr<CameraSetting> &metaData)
 void MetaDataTest::StartPreviewVideoCapture()
 {
     CaptureInfo captureInfo = {};
-    StartCapture(display_->streamId_preview, display_->captureId_preview, false, true, captureInfo);
-    StartCapture(display_->streamId_video, display_->captureId_video, false, true, captureInfo);
+    StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true, captureInfo);
+    StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true, captureInfo);
 }
 
 void MetaDataTest::PrintCameraMetadata(const std::vector<uint8_t> &settings)
@@ -532,7 +532,7 @@ static HWTEST_F(MetaDataTest, meta_data_004, TestSize.Level1)
     Prepare(ResultCallbackMode::PER_FRAME, results);
 
     std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(ENTRY_CAPACITY, DATA_CAPACITY);
-    const int32_t streamId = display_->streamId_video;
+    const int32_t streamId = display_->STREAM_ID_VIDEO;
     metaData->addEntry(OHOS_CAMERA_STREAM_ID, &streamId, DATA_COUNT);
 
     uint8_t videoStabilizationMode = OHOS_CAMERA_VIDEO_STABILIZATION_LOW;
@@ -562,7 +562,7 @@ static HWTEST_F(MetaDataTest, meta_data_005, TestSize.Level1)
     Prepare(ResultCallbackMode::ON_CHANGED, results);
 
     std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(ENTRY_CAPACITY, DATA_CAPACITY);
-    const int32_t streamId = display_->streamId_video;
+    const int32_t streamId = display_->STREAM_ID_VIDEO;
     metaData->addEntry(OHOS_CAMERA_STREAM_ID, &streamId, DATA_COUNT);
 
     uint8_t videoStabilizationMode = OHOS_CAMERA_VIDEO_STABILIZATION_LOW;
@@ -677,7 +677,7 @@ static HWTEST_F(MetaDataTest, meta_data_008, TestSize.Level1)
     Prepare(ResultCallbackMode::ON_CHANGED, results);
 
     std::shared_ptr<CameraSetting> metaData = std::make_shared<CameraSetting>(ENTRY_CAPACITY, DATA_CAPACITY);
-    const int32_t deviceStreamId = display_->streamId_capture;
+    const int32_t deviceStreamId = display_->STREAM_ID_CAPTURE;
     metaData->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, DATA_COUNT);
 
     uint8_t aeMode = OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO;
@@ -721,7 +721,7 @@ static HWTEST_F(MetaDataTest, meta_data_009, TestSize.Level1)
     SetFps(metaDataDevice, FPS_RANGE, false);
 
     std::shared_ptr<CameraSetting> metaDataStream = std::make_shared<CameraSetting>(ENTRY_CAPACITY, DATA_CAPACITY);
-    const int32_t streamId = display_->streamId_capture;
+    const int32_t streamId = display_->STREAM_ID_CAPTURE;
     metaDataStream->addEntry(OHOS_CAMERA_STREAM_ID, &streamId, DATA_COUNT);
 
     uint8_t aeMode = OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO;

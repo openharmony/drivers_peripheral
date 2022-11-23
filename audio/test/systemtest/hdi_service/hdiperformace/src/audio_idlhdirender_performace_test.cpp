@@ -896,7 +896,7 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderReqMmapBufferPerformance_00
     int32_t ret;
     bool isRender = true;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct PrepareAudioPara audiopara = {
         .render = render, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
     };

@@ -799,7 +799,7 @@ int32_t AudioRenderRenderFrame(
         AUDIO_FUNC_LOGE("Render Frame Paras is NULL!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    if (FRAME_DATA < frameLen) {
+    if (frameLen > FRAME_DATA) {
         AUDIO_FUNC_LOGE("Out of FRAME_DATA size!");
         return AUDIO_ERR_INTERNAL;
     }
@@ -1021,12 +1021,12 @@ int32_t AudioRenderGetExtraParams(struct IAudioRender *handle, char *keyValueLis
 }
 
 static int32_t AudioRenderReqMmapBufferInit(
-    struct AudioHwRender *render, int32_t reqSize, const struct AudioMmapBufferDescripter *tempDesc)
+    struct AudioHwRender *render, int32_t reqSize, const struct AudioMmapBufferDescriptor *tempDesc)
 {
     if (render == NULL || render->devDataHandle == NULL || tempDesc == NULL) {
         return AUDIO_ERR_INVALID_PARAM;
     }
-    struct AudioMmapBufferDescripter desc = *tempDesc;
+    struct AudioMmapBufferDescriptor desc = *tempDesc;
     uint32_t formatBits = 0;
     int32_t ret = FormatToBits(render->renderParam.frameRenderMode.attrs.format, &formatBits);
     if (ret < 0) {
@@ -1072,7 +1072,7 @@ static int32_t AudioRenderReqMmapBufferInit(
 }
 
 int32_t AudioRenderReqMmapBuffer(
-    struct IAudioRender *handle, int32_t reqSize, const struct AudioMmapBufferDescripter *desc)
+    struct IAudioRender *handle, int32_t reqSize, const struct AudioMmapBufferDescriptor *desc)
 {
     int32_t ret = 0;
     struct AudioHwRender *render = (struct AudioHwRender *)handle;

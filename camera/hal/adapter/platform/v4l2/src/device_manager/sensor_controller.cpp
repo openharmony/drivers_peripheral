@@ -137,23 +137,6 @@ void SensorController::SetNodeCallBack(const NodeBufferCb cb)
     });
 }
 
-void SensorController::SetMetaDataCallBack(const MetaDataCb cb)
-{
-    std::lock_guard<std::mutex> lock(metaDataFlaglock_);
-    if (firstSetCallback_) {
-        CAMERA_LOGI("SensorController line: %{public}d", __LINE__);
-        firstSetCallback_ = false;
-        fromDeviceMetaDataCb_ = cb;
-        metaDataCb_ = fromDeviceMetaDataCb_;
-    } else if (cb == nullptr) {
-        CAMERA_LOGI("SensorController line: %{public}d", __LINE__);
-        metaDataCb_ = fromDeviceMetaDataCb_;
-    } else {
-        CAMERA_LOGI("SensorController line: %{public}d", __LINE__);
-        metaDataCb_ = cb;
-    }
-}
-
 void SensorController::BufferCallback(std::shared_ptr<FrameSpec> buffer)
 {
     if (nodeBufferCb_ == nullptr) {
@@ -167,31 +150,6 @@ void SensorController::BufferCallback(std::shared_ptr<FrameSpec> buffer)
     int64_t timestamp = static_cast<uint64_t>(tv.tv_sec) * UNIT_COUNT * UNIT_COUNT + tv.tv_usec;
     buffer->buffer_->SetEsTimestamp(timestamp);
     nodeBufferCb_(buffer);
-
-    const int ENTRY_CAPACITY = 30; // 30:entry capacity
-    const int DATA_CAPACITY = 2000; // 2000:data capacity
-    std::shared_ptr<CameraMetadata> meta =
-        std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
-    if (meta == nullptr) {
-        CAMERA_LOGE("meta is nullptr");
-        return;
-    }
-    RetCode rc = GetAbilityMetaData(meta);
-    std::lock_guard<std::mutex> lock(metaDataFlaglock_);
-    if (rc == RC_OK && metaDataFlag_ == true) {
-        if (metaDataCb_ == nullptr) {
-            CAMERA_LOGE("metaDataCb_ is nullptr");
-            return;
-        }
-        metaDataCb_(meta);
-        metaDataFlag_ = false;
-    } else {
-        if (rc == RC_ERROR) {
-            CAMERA_LOGE("%s GetAbilityMetaData error", __FUNCTION__);
-        } else {
-            CAMERA_LOGI("%s no send", __FUNCTION__);
-        }
-    }
 }
 
 RetCode SensorController::GetAbilityMetaData(std::shared_ptr<CameraMetadata> meta)

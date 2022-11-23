@@ -21,3 +21,18 @@ ohos_prebuilt_etc("thermal.para") {
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_thermal"
 }
+
+ohos_prebuilt_etc("thermal.para.dac") {
+  source = "thermal.para.dac"
+  relative_install_dir = "param"
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_thermal"
+}
+
+group("param_files") {
+  deps = [
+    ":thermal.para",
+    ":thermal.para.dac",
+  ]
+}

@@ -211,6 +211,11 @@ HWTEST_F(CameraVideoTest, camera_video_002, TestSize.Level1)
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
 
+    std::vector<int32_t> resultsList;
+    resultsList.push_back(OHOS_CAMERA_STREAM_ID);
+    resultsList.push_back(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION);
+    display_->cameraDevice->EnableResult(resultsList);
+
     // start stream
     display_->intents = {PREVIEW, VIDEO};
     display_->StartStream(display_->intents);
@@ -221,6 +226,8 @@ HWTEST_F(CameraVideoTest, camera_video_002, TestSize.Level1)
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
+    const int32_t deviceStreamId = 0;
+    meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
     display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
@@ -478,6 +485,11 @@ HWTEST_F(CameraVideoTest, camera_video_021, TestSize.Level1)
     std::cout << "==========[test log] Video mode, preview, set 3A, success." << std::endl;
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     display_->AchieveStreamOperator();
+
+    std::vector<int32_t> resultsList;
+    resultsList.push_back(OHOS_CAMERA_STREAM_ID);
+    resultsList.push_back(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION);
+    display_->cameraDevice->EnableResult(resultsList);
     // start stream
     display_->intents = {PREVIEW, VIDEO};
     display_->StartStream(display_->intents);
@@ -488,6 +500,8 @@ HWTEST_F(CameraVideoTest, camera_video_021, TestSize.Level1)
     std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(100, 2000);
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
+    const int32_t deviceStreamId = 0;
+    meta->addEntry(OHOS_CAMERA_STREAM_ID, &deviceStreamId, 1);
     std::vector<uint8_t> setting;
     MetadataUtils::ConvertMetadataToVec(meta, setting);
     display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);

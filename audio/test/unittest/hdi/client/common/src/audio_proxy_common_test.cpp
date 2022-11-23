@@ -223,7 +223,7 @@ HWTEST_F(AudioProxyCommonTest, ReqMmapBufferWrite_001, TestSize.Level1)
 {
     int32_t reqSize = 0;
     struct HdfSBuf *data = AudioProxyObtainHdfSBuf();
-    struct AudioMmapBufferDescripter desc;
+    struct AudioMmapBufferDescriptor desc;
     EXPECT_EQ(HDF_FAILURE, AudioProxyReqMmapBufferWrite(nullptr, reqSize, &desc));
     EXPECT_EQ(HDF_FAILURE, AudioProxyReqMmapBufferWrite(data, reqSize, nullptr));
     HdfSbufRecycle(data);

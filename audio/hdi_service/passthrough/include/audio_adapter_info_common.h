@@ -48,11 +48,11 @@ int32_t AudioAdapterExist(const char *adapterName);
 int32_t InitPortForCapabilitySub(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex);
 int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key, void *value);
 int32_t GetErrorReason(int reason, char *reasonDesc);
-int32_t GetCurrentTime(char *time);
+int32_t GetCurrentTime(char *currentTime);
 int32_t FormatToBits(enum AudioFormat format, uint32_t *formatBits);
 int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count, struct ExtraParams *mExtraParams, int32_t *sumOk);
 int32_t SetDescParam(
-    struct AudioMmapBufferDescripter *desc, FILE *fp, int32_t reqSize, int64_t *fileSize, int32_t *flags);
+    struct AudioMmapBufferDescriptor *desc, FILE *fp, int32_t reqSize, int64_t *fileSize, int32_t *flags);
 bool ReleaseAudioManagerObjectComm(struct IAudioManager *object);
 
 #endif

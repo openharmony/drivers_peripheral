@@ -31,7 +31,7 @@
 #define SHA256_DIGEST_SIZE 32
 #define SHA512_DIGEST_SIZE 64
 
-static KeyPair *CreateEd25519KeyPair()
+static KeyPair *CreateEd25519KeyPair(void)
 {
     KeyPair *keyPair = Malloc(sizeof(KeyPair));
     if (keyPair == NULL) {

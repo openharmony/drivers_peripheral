@@ -19,7 +19,7 @@
 #undef HDF_LOG_TAG
 #endif
 
-#define HDF_LOG_TAG camera_service_test
+#define HDF_LOG_TAG camera_hdi_test
 
 constexpr const char *TEST_SERVICE_NAME = "camera_service";
 

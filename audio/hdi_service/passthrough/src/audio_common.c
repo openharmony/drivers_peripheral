@@ -111,7 +111,7 @@ int32_t AudioCheckParaAttr(const struct AudioSampleAttributes *attrs)
     }
 
     enum AudioCategory audioCategory = attrs->type;
-    if (AUDIO_IN_MEDIA != audioCategory && AUDIO_IN_COMMUNICATION != audioCategory) {
+    if (audioCategory != AUDIO_IN_MEDIA && audioCategory != AUDIO_IN_COMMUNICATION) {
         AUDIO_FUNC_LOGE("audioCategory error!");
         return HDF_ERR_NOT_SUPPORT;
     }
@@ -146,7 +146,7 @@ int32_t TimeToAudioTimeStamp(uint64_t bufferFrameSize, struct AudioTimeStamp *ti
     return HDF_SUCCESS;
 }
 
-void AudioLogRecord(int errorLevel, const char *format, ...)
+void AudioLogRecord(int32_t errorLevel, const char *format, ...)
 {
     va_list args;
     FILE *fp = NULL;

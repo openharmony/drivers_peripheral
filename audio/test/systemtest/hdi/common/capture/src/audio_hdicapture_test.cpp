@@ -51,33 +51,19 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
 };
 
 using THREAD_FUNC = void *(*)(void *);
-void *AudioHdiCaptureTest::handle = nullptr;
-TestGetAudioManager AudioHdiCaptureTest::getAudioManager = nullptr;
 TestAudioManager *AudioHdiCaptureTest::manager = nullptr;
 
 void AudioHdiCaptureTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioHdiCaptureTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioHdiCaptureTest::TearDownTestCase(void) {}
 
 
 void AudioHdiCaptureTest::SetUp(void) {}
@@ -482,7 +468,7 @@ HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_001, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioCapture *capture = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
@@ -518,7 +504,7 @@ HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_002, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioCapture *capture = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
@@ -552,7 +538,7 @@ HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_003, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioCapture *capture = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
@@ -589,7 +575,7 @@ HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_004, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioCapture *capture = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
@@ -623,7 +609,7 @@ HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_005, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioCapture *capture = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);
@@ -657,7 +643,7 @@ HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_006, TestSize.Level1)
 {
     bool isRender = false;
     int32_t reqSize = 0;
-    struct AudioMmapBufferDescripter desc = {};
+    struct AudioMmapBufferDescriptor desc = {};
     struct AudioCapture *capture = nullptr;
     struct AudioCapture *captureNull = nullptr;
     struct AudioAdapter *adapter = nullptr;
@@ -690,7 +676,7 @@ HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_006, TestSize.Level1)
 HWTEST_F(AudioHdiCaptureTest, AudioCaptureReqMmapBuffer_007, TestSize.Level1)
 {
     uint32_t reqSize = 0;
-    struct AudioMmapBufferDescripter *descNull = nullptr;
+    struct AudioMmapBufferDescriptor *descNull = nullptr;
     struct AudioCapture *capture = nullptr;
     struct AudioAdapter *adapter = nullptr;
     ASSERT_NE(nullptr, manager);

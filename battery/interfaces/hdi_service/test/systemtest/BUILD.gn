@@ -1,0 +1,162 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+
+module_output_path = "drivers_peripheral_battery/battery"
+
+###############################################################################
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "include",
+    "//third_party/libpng",
+    "//drivers/peripheral/battery/charger/led",
+    "//drivers/peripheral/battery/charger/backlight",
+    "//drivers/peripheral/battery/charger/vibrate",
+    "//drivers/peripheral/battery/charger/include",
+    "//drivers/peripheral/battery/interfaces/hdi_service/test/unittest/include",
+    "//drivers/peripheral/battery/interfaces/include/",
+    "//drivers/peripheral/battery/include/",
+    "//drivers/peripheral/battery/interfaces/hdi_service/include",
+    "//drivers/peripheral/battery/charger/led",
+    "//drivers/peripheral/battery/charger/ui",
+    "//drivers/peripheral/battery/utils/include",
+    "//drivers/peripheral/display/interfaces/include",
+    "//drivers/hdf_core/framework/ability/sbuf/include",
+    "//drivers/hdf_core/framework/include/platform",
+    "//drivers/hdf_core/framework/include/core",
+    "//drivers/hdf_core/framework/include/osal",
+    "//drivers/hdf_core/framework/include/utils",
+    "//drivers/hdf_core/framework/include/config",
+    "//drivers/hdf_core/framework/include",
+    "//drivers/peripheral/input/hal/include",
+    "//drivers/peripheral/input/interfaces/include",
+    "//foundation/graphic/ui/frameworks",
+    "//foundation/graphic/ui/interfaces/kits",
+    "//foundation/graphic/ui/interfaces/innerkits",
+    "//foundation/graphic/utils/interfaces/kits",
+    "//foundation/graphic/utils/interfaces/innerkits",
+    "//base/update/updater/utils/include",
+    "//base/update/updater/utils/json",
+    "//base/update/updater/services",
+    "//base/update/updater/interfaces/kits/include",
+    "//base/update/updater/services/include/log",
+    "//base/update/updater/services/include",
+    "//base/update/updater/services/ui",
+    "//base/update/updater/services/ui/include",
+    "//base/update/updater/services/ui/control",
+    "//base/update/updater/services/ui/driver",
+    "//base/update/updater/services/ui/view",
+    "//base/update/updater/services/ui/view/layout",
+    "//base/update/updater/services/ui/language",
+  ]
+}
+
+##############################systemtest_reboot##########################################
+ohos_systemtest("test_reboot") {
+  module_out_path = "${module_output_path}"
+
+  sources = [
+    "//drivers/peripheral/battery/charger/backlight/battery_backlight.cpp",
+    "//drivers/peripheral/battery/charger/led/battery_led.cpp",
+    "//drivers/peripheral/battery/charger/src/charger.cpp",
+    "//drivers/peripheral/battery/charger/src/charger_thread.cpp",
+    "//drivers/peripheral/battery/charger/ui/charger_animation.cpp",
+    "//drivers/peripheral/battery/charger/vibrate/battery_vibrate.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
+    "src/reboot_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${hdf_uhdf_path}/utils:libhdf_utils",
+    "//base/update/updater/services/ui:libui",
+    "//drivers/peripheral/display/hal:hdi_display_device",
+    "//foundation/graphic/ui/ext/updater:libupdater_layout",
+    "//third_party/cJSON:cjson_static",
+    "//third_party/googletest:gtest_main",
+    "//third_party/jsoncpp:jsoncpp",
+    "//third_party/libdrm:libdrm",
+    "//third_party/libpng:libpng",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_battery:libbattery_proxy_1.1",
+    "drivers_interface_input:hdi_input",
+    "drivers_interface_light:liblight_proxy_1.0",
+    "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+  ]
+}
+
+##############################systemtest_battery_sys_test##########################################
+
+ohos_systemtest("test_battery_sys_test") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "//drivers/peripheral/battery/utils/include" ]
+
+  sources = [
+    "//drivers/peripheral/battery/charger/backlight/battery_backlight.cpp",
+    "//drivers/peripheral/battery/charger/led/battery_led.cpp",
+    "//drivers/peripheral/battery/charger/src/charger.cpp",
+    "//drivers/peripheral/battery/charger/src/charger_thread.cpp",
+    "//drivers/peripheral/battery/charger/ui/charger_animation.cpp",
+    "//drivers/peripheral/battery/charger/vibrate/battery_vibrate.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
+    "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
+    "src/battery_sys_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${hdf_uhdf_path}/utils:libhdf_utils",
+    "//base/update/updater/services/ui:libui",
+    "//drivers/peripheral/display/hal:hdi_display_device",
+    "//foundation/graphic/ui/ext/updater:libupdater_layout",
+    "//third_party/cJSON:cjson_static",
+    "//third_party/googletest:gtest_main",
+    "//third_party/jsoncpp:jsoncpp",
+    "//third_party/libdrm:libdrm",
+    "//third_party/libpng:libpng",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_battery:libbattery_proxy_1.1",
+    "drivers_interface_input:hdi_input",
+    "drivers_interface_light:liblight_proxy_1.0",
+    "hiviewdfx_hilog_native:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_core",
+  ]
+}
+
+group("systemtest") {
+  testonly = true
+
+  deps = [
+    ":test_battery_sys_test",
+    ":test_reboot",
+  ]
+}

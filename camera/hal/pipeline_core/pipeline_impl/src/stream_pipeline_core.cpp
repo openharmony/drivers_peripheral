@@ -117,15 +117,6 @@ RetCode StreamPipelineCore::Config(const std::vector<int>& streamIds, const Capt
     return re;
 }
 
-RetCode StreamPipelineCore::UpdateSettingsConfig(const CaptureMeta& meta)
-{
-    CAMERA_LOGE("StreamPipelineCore %{public}s: line: %{public}d", __FUNCTION__, __LINE__);
-    std::lock_guard<std::recursive_mutex> l(mutex_);
-    RetCode re = RC_OK;
-    dispatcher_->UpdateSettingsConfig(meta);
-    return re;
-}
-
 RetCode StreamPipelineCore::Capture(const std::vector<int>& streamIds, const int32_t captureId)
 {
     std::lock_guard<std::recursive_mutex> l(mutex_);

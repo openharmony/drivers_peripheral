@@ -26,11 +26,11 @@ bool TurnOffLightFuzzTest(const uint8_t *data, size_t size)
     bool result = false;
     sptr<ILightInterface> g_lightInterface = ILightInterface::Get();
 
-    if (!g_lightInterface->TurnOnLight(*static_cast<int32_t *>(data), reinterpret_cast<const HdfLightEffect &>(data))) {
+    if (!g_lightInterface->TurnOnLight(static_cast<int32_t>(*data), reinterpret_cast<const HdfLightEffect &>(data))) {
         result = true;
     }
 
-    if (!g_lightInterface->TurnOffLight(*static_cast<int32_t *>(data))) {
+    if (!g_lightInterface->TurnOffLight(static_cast<int32_t>(*data))) {
         result = true;
     }
     return result;

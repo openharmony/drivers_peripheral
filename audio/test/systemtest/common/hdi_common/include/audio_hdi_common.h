@@ -45,30 +45,17 @@
 
 namespace OHOS {
 namespace Audio {
-#ifdef AUDIO_ADM_SO
-    const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
-    const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio");
-    const int IS_ADM = true;
-#endif
-#ifdef AUDIO_ADM_SERVICE
-    const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
-    const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
-    using TestAudioManager = struct AudioManager;
-    const int IS_ADM = true;
-#endif
+
 #ifdef __LITEOS__
-    const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
-    const std::string RESOLVED_PATH = "/usr/lib/libhdi_audio.so";
-    const int IS_ADM = true;
     const std::string AUDIO_FILE = "/userdata/audiorendertest.wav";
     const std::string LOW_LATENCY_AUDIO_FILE = "/userdata/lowlatencyrendertest.wav";
     const std::string AUDIO_CAPTURE_FILE = "/userdata/audiocapture.wav";
     const std::string AUDIO_LOW_LATENCY_CAPTURE_FILE = "/userdata/lowlatencycapturetest.wav";
 #else
-    const std::string AUDIO_FILE = "/data/audiorendertest.wav";
-    const std::string LOW_LATENCY_AUDIO_FILE = "/data/lowlatencyrendertest.wav";
-    const std::string AUDIO_CAPTURE_FILE = "/data/audiocapture.wav";
-    const std::string AUDIO_LOW_LATENCY_CAPTURE_FILE = "/data/lowlatencycapturetest.wav";
+    const std::string AUDIO_FILE = "/data/test/audiorendertest.wav";
+    const std::string LOW_LATENCY_AUDIO_FILE = "/data/test/lowlatencyrendertest.wav";
+    const std::string AUDIO_CAPTURE_FILE = "/data/test/audiocapture.wav";
+    const std::string AUDIO_LOW_LATENCY_CAPTURE_FILE = "/data/test/lowlatencycapturetest.wav";
 #endif
 const std::string ADAPTER_NAME = "primary";
 const std::string ADAPTER_NAME_OUT = "primary_ext";
@@ -289,7 +276,7 @@ int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, st
 int32_t AudioCaptureSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
     struct AudioCapture *capture);
 
-int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescripter &desc, int32_t &reqSize, bool flag);
+int32_t InitMmapDesc(FILE *fp, struct AudioMmapBufferDescriptor &desc, int32_t &reqSize, bool flag);
 
 int32_t PlayMapAudioFile(struct PrepareAudioPara &audiopara);
 
@@ -298,7 +285,6 @@ int32_t AudioRenderCallback(enum AudioCallbackType type, void *reserved, void *c
 int32_t CheckFlushValue();
 int32_t CheckRenderFullValue();
 int32_t CheckWriteCompleteValue();
-int32_t LoadFunction(void *&handle, TestGetAudioManager &getAudioManager);
 
 int32_t ReleaseCaptureSource(struct AudioManager *manager, struct AudioAdapter *&adapter,
     struct AudioCapture *&capture);

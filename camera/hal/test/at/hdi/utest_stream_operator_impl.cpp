@@ -310,3 +310,63 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
     ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
 }
 #endif
+
+HWTEST_F(StreamOperatorImplTest, UTestChangeToOfflineStream, TestSize.Level0)
+{
+    sptr<OHOS::IBufferProducer> producer;
+    OperationMode operationMode = NORMAL;
+    StreamSupportType supportType;
+    std::vector<StreamInfo> streamInfos;
+    StreamInfo streamInfo = {};
+    streamInfo.streamId_ = 1005;
+    streamInfo.width_ = 640;
+    streamInfo.height_ = 480;
+    streamInfo.format_ = PIXEL_FMT_RGBA_8888;
+    streamInfo.dataspace_ = 8;
+    streamInfo.intent_ = STILL_CAPTURE;
+    std::shared_ptr<StreamConsumer> previewConsumer = std::make_shared<StreamConsumer>();
+    producer = previewConsumer->CreateProducer([this](void* addr, uint32_t size) {
+        SaveYUV("preview", addr, size);
+    });
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    streamInfo.bufferQueue_->producer_->SetQueueSize(8);
+    streamInfo.tunneledMode_ = 5;
+    streamInfos.push_back(streamInfo);
+
+    CamRetCode ret = (CamRetCode)streamOperator_->CreateStreams(streamInfos);
+    std::cout << "streamOperator->CreateStreams = " << ret << std::endl;
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
+
+    std::vector<std::string> cameraIds;
+    ret = (CamRetCode)cameraHost_->GetCameraIds(cameraIds);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
+
+    std::vector<uint8_t> ability;
+    std::string cameraId = cameraIds.front();
+    ret = (CamRetCode)cameraHost_->GetCameraAbility(cameraId, ability);
+    ret = (CamRetCode)streamOperator_->CommitStreams(NORMAL, ability);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
+
+    int captureId = 2001;
+    CaptureInfo captureInfo = {};
+    captureInfo.streamIds_ = {streamInfo.streamId_};
+    captureInfo.captureSetting_ = ability;
+    captureInfo.enableShutterCallback_ = false;
+    ret = (CamRetCode)streamOperator_->Capture(captureId, captureInfo, true);
+    std::cout << "streamOperator->Capture = " << ret << std::endl;
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
+    sleep(1);
+
+    OHOS::sptr<IStreamOperatorCallback> streamOperatorCallback = new DemoStreamOperatorCallback();
+    OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = nullptr;
+    ret = (CamRetCode)streamOperator_->ChangeToOfflineStream({ streamInfo.streamId_  }, streamOperatorCallback,
+        offlineStreamOperator);
+    ASSERT_EQ(DEVICE_ERROR, ret);
+
+    ret = (CamRetCode)streamOperator_->CancelCapture(captureId);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
+
+    std::vector<int> streamIds = {1005};
+    ret = (CamRetCode)streamOperator_->ReleaseStreams(streamIds);
+    ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, ret);
+}

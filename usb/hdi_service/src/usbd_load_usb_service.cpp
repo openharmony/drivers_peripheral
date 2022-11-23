@@ -101,7 +101,16 @@ int32_t UsbdLoadUsbService::StartThreadUsbLoad()
     struct OsalThreadParam threadCfg = {0};
     threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
     threadCfg.stackSize = HDF_PROCESS_STACK_SIZE;
-    ret = OsalThreadCreate(&threadUsbLoad, (OsalThreadEntry)UsbLoadWorkEntry, NULL);
+    sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (sm == nullptr) {
+        HDF_LOGE("%{public}s:GetSystemAbilityManager failed", __func__);
+        return HDF_FAILURE;
+    }
+    auto saObj = sm->CheckSystemAbility(USB_SYSTEM_ABILITY_ID);
+    if (saObj != nullptr) {
+        return HDF_SUCCESS;
+    }
+    ret = OsalThreadCreate(&threadUsbLoad, static_cast<OsalThreadEntry>(UsbLoadWorkEntry), nullptr);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:%d OsalThreadCreate failed, ret = %d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
@@ -149,16 +158,8 @@ int32_t UsbdLoadUsbService::LoadUsbService()
         if (StartThreadUsbLoad() != HDF_SUCCESS) {
             HDF_LOGE("%s: usb load create thread failed", __func__);
         }
-    } else {
-        sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (sm == nullptr) {
-            HDF_LOGE("GetSystemAbilityManager samgr object null");
-            return HDF_FAILURE;
-        }
-        auto saObj = sm->CheckSystemAbility(USB_SYSTEM_ABILITY_ID);
-        if (saObj == nullptr) {
-            StartThreadUsbLoad();
-        }
+    } else if (OnDemandLoadCallback::loading_ == false) {
+        StartThreadUsbLoad();
     }
     IncreaseUsbLoadRemoveCount();
     return HDF_SUCCESS;

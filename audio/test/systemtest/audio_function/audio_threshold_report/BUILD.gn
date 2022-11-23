@@ -21,6 +21,8 @@ if (!defined(ohos_lite)) {
 
   ohos_systemtest("hdf_audio_threshold_report_test") {
     module_out_path = module_output_path
+    resource_config_file =
+        "//drivers/peripheral/audio/test/resource/ohos_test.xml"
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
       "//drivers/peripheral/audio/hal/hdi_binder/server/src/hdf_audio_events.c",
@@ -52,9 +54,12 @@ if (!defined(ohos_lite)) {
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       defines += [ "AUDIO_ADM_SO" ]
     }
     if (enable_audio_adm_service) {
+      deps +=
+          [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
     }
   }

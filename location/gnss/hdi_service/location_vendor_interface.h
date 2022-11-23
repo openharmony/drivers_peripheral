@@ -26,7 +26,7 @@ namespace Location {
 class LocationVendorInterface {
 public:
     const GnssVendorInterface *GetGnssVendorInterface() const;
-    const void *GetModuleInterface(int moduleId);
+    const void *GetModuleInterface(int moduleId) const;
     static LocationVendorInterface* GetInstance();
     static void DestroyInstance();
 private:

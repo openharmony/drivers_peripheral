@@ -22,15 +22,35 @@ config("module_private_config") {
 
   include_dirs = [
     "include",
-    "//drivers/peripheral/battery/charger/ui/include",
     "//drivers/peripheral/battery/charger/led",
-    "//drivers/peripheral/battery/charger/backlight",
-    "//drivers/peripheral/battery/charger/vibrate",
-    "//drivers/peripheral/battery/charger/include",
     "//drivers/peripheral/battery/interfaces/include",
-    "//drivers/peripheral/battery/include",
+    "//drivers/peripheral/battery/charger/include",
     "//drivers/peripheral/battery/interfaces/hdi_service/include",
+    "//drivers/peripheral/battery/interfaces/hdi_service/test/systemtest/include",
     "//drivers/peripheral/battery/utils/include",
+    "//drivers/peripheral/battery/charger/vibrate",
+    "//drivers/peripheral/battery/charger/backlight",
+    "//drivers/peripheral/battery/charger/ui",
+    "//drivers/peripheral/input/hal/include",
+    "//drivers/peripheral/input/interfaces/include",
+    "//foundation/graphic/ui/frameworks",
+    "//foundation/graphic/ui/interfaces/kits",
+    "//foundation/graphic/ui/interfaces/innerkits",
+    "//foundation/graphic/utils/interfaces/kits",
+    "//foundation/graphic/utils/interfaces/innerkits",
+    "//base/update/updater/utils/include",
+    "//base/update/updater/utils/json",
+    "//base/update/updater/services",
+    "//base/update/updater/interfaces/kits/include",
+    "//base/update/updater/services/include/log",
+    "//base/update/updater/services/include",
+    "//base/update/updater/services/ui",
+    "//base/update/updater/services/ui/include",
+    "//base/update/updater/services/ui/control",
+    "//base/update/updater/services/ui/driver",
+    "//base/update/updater/services/ui/view",
+    "//base/update/updater/services/ui/view/layout",
+    "//base/update/updater/services/ui/language",
   ]
 }
 
@@ -41,12 +61,13 @@ ohos_unittest("test_hdisrv") {
   sources = [
     "//drivers/peripheral/battery/charger/backlight/battery_backlight.cpp",
     "//drivers/peripheral/battery/charger/led/battery_led.cpp",
+    "//drivers/peripheral/battery/charger/src/charger.cpp",
     "//drivers/peripheral/battery/charger/src/charger_thread.cpp",
+    "//drivers/peripheral/battery/charger/ui/charger_animation.cpp",
     "//drivers/peripheral/battery/charger/vibrate/battery_vibrate.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
-    "src/battery_config_test.cpp",
     "src/battery_led_test.cpp",
     "src/hdi_service_test.cpp",
   ]
@@ -54,11 +75,15 @@ ohos_unittest("test_hdisrv") {
   configs = [ ":module_private_config" ]
 
   deps = [
+    "//base/update/updater/services/ui:libui",
     "//drivers/interface/battery/v1_1:libbattery_stub_1.1",
-    "//drivers/peripheral/battery/charger/ui:libminui",
+    "//drivers/peripheral/display/hal:hdi_display_device",
+    "//foundation/graphic/ui/ext/updater:libupdater_layout",
+    "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
+    "//third_party/libdrm:libdrm",
     "//third_party/libpng:libpng",
   ]
 
@@ -82,7 +107,9 @@ ohos_unittest("test_capacity_shutdown") {
   sources = [
     "//drivers/peripheral/battery/charger/backlight/battery_backlight.cpp",
     "//drivers/peripheral/battery/charger/led/battery_led.cpp",
+    "//drivers/peripheral/battery/charger/src/charger.cpp",
     "//drivers/peripheral/battery/charger/src/charger_thread.cpp",
+    "//drivers/peripheral/battery/charger/ui/charger_animation.cpp",
     "//drivers/peripheral/battery/charger/vibrate/battery_vibrate.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
@@ -93,8 +120,11 @@ ohos_unittest("test_capacity_shutdown") {
   configs = [ ":module_private_config" ]
 
   deps = [
+    "//base/update/updater/services/ui:libui",
     "//drivers/interface/battery/v1_1:libbattery_stub_1.1",
-    "//drivers/peripheral/battery/charger/ui:libminui",
+    "//drivers/peripheral/display/hal:hdi_display_device",
+    "//foundation/graphic/ui/ext/updater:libupdater_layout",
+    "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",

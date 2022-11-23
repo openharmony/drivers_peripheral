@@ -91,9 +91,7 @@ const std::vector<BatteryConfig::LightConf>& BatteryConfig::GetLightConf() const
 void BatteryConfig::DestroyInstance()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (instance_ != nullptr) {
-        instance_ = nullptr;
-    }
+    instance_ = nullptr;
 }
 
 bool BatteryConfig::OpenFile(std::ifstream& ifsConf, const std::string& configPath)
