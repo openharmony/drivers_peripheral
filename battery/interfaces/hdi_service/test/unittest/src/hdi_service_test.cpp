@@ -575,7 +575,7 @@ static int32_t PluggedTypeEnumConverter(const char* str)
 
 int32_t ReadSysfsFile(const char* path, char* buf, size_t size)
 {
-    int fd = open(path, O_RDONLY);
+    int fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
     if (fd < NUM_ZERO) {
         BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", path);
         return HDF_ERR_IO;
