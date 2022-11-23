@@ -90,7 +90,7 @@ int32_t HdfThermalHdiTest::ReadFile(const char *path, char *buf, size_t size)
     std::lock_guard<std::mutex> lck(g_mutex);
     int32_t ret;
 
-    int32_t fd = open(path, O_RDONLY);
+    int32_t fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
     if (fd < HDF_SUCCESS) {
         THERMAL_HILOGE(LABEL_TEST, "WriteFile: failed to open file %{public}d", fd);
         return HDF_FAILURE;
