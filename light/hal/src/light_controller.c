@@ -101,8 +101,8 @@ static int32_t ReadLightInfo(struct HdfSBuf *reply, struct LightDevice *priv)
             return HDF_FAILURE;
         }
 
-        if (!HdfSbufReadInt32(reply, &pos->reserved)) {
-            HDF_LOGE("%{public}s:read reserved failed!", __func__);
+        if (!HdfSbufReadInt32(reply, &pos->lightType)) {
+            HDF_LOGE("%{public}s:read lightType failed!", __func__);
             return HDF_FAILURE;
         }
         pos++;
