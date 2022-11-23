@@ -142,7 +142,7 @@ inline void ThermalZoneManager::Trim(char* str) const
 int32_t ThermalZoneManager::ReadSysfsFile(const char* path, char* buf, size_t size) const
 {
     int32_t readSize;
-    int32_t fd = open(path, O_RDONLY);
+    int32_t fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
     if (fd < NUM_ZERO) {
         THERMAL_HILOGW(COMP_HDI, "failed to open %{private}s", path);
         return HDF_ERR_IO;
