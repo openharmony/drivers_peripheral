@@ -195,7 +195,7 @@ int32_t UsbdFunction::SetFunctionToACMECM()
 
 int32_t UsbdFunction::SetDDKFunction(uint32_t funcs)
 {
-    uint32_t acmEcm = (uint32_t)funcs & USB_FUNCTION_ACM_ECM;
+    uint32_t acmEcm = static_cast<uint32_t>(funcs) & USB_FUNCTION_ACM_ECM;
     if (acmEcm == USB_FUNCTION_ACM) {
         if (SetFunctionToACM()) {
             HDF_LOGE("%{public}s:set function to acm error", __func__);
