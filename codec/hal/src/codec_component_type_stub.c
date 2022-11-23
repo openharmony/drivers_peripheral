@@ -25,7 +25,7 @@
 
 #define HDF_LOG_TAG codec_hdi_server
 
-#ifdef __ARM64__
+#ifdef __ARCH64__
 #define DRIVER_PATH "/vendor/lib64"
 #else
 #define DRIVER_PATH "/vendor/lib"
