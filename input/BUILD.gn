@@ -11,15 +11,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("input.gni")
+
 if (defined(ohos_lite)) {
   group("input_entry") {
     deps = [ "hal:hdi_input" ]
   }
 } else {
   group("input_entry") {
-    deps = [
-      "hal:hdi_input",
-      "//drivers/peripheral/input/hdi_service:hdi_input_service",
-    ]
+    deps = [ "//drivers/peripheral/input/hdi_service:hdi_input_service" ]
+    if (drivers_peripheral_input_feature_model) {
+      deps += [ "hal:hdi_input" ]
+    }
+    if (drivers_peripheral_input_feature_udriver) {
+      deps += [ "udriver:hdi_input_udriver" ]
+    }
   }
 }

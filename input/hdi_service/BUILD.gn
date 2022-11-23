@@ -10,25 +10,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("//drivers/peripheral/input/input.gni")
 
 ohos_shared_library("libinput_interfaces_service_1.0") {
   include_dirs = [
     "//drivers/peripheral/input/interfaces/include/",
     "//drivers/peripheral/input/hal/include/",
+    "//third_party/FreeBSD/sys/dev/evdev",
   ]
-  sources = [ "input_interfaces_impl.cpp" ]
-  public_deps = [ "//drivers/peripheral/input/hal:hdi_input" ]
+  if (drivers_peripheral_input_feature_model) {
+    deps = [ "//drivers/peripheral/input/hal:hdi_input" ]
+  }
+  if (drivers_peripheral_input_feature_udriver) {
+    include_dirs += [ "//drivers/peripheral/input/udriver/include/" ]
+    deps = [ "//drivers/peripheral/input/udriver:hdi_input_udriver" ]
+  }
 
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
-  ]
+  sources = [ "input_interfaces_impl.cpp" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -59,15 +60,6 @@ ohos_shared_library("libinput_driver") {
   sources = [ "input_interfaces_driver.cpp" ]
 
   deps = [ "//drivers/interface/input/v1_0:libinput_stub_1.0" ]
-
-  cflags = [
-    "-Wall",
-    "-Wextra",
-    "-Werror",
-    "-fsigned-char",
-    "-fno-common",
-    "-fno-strict-aliasing",
-  ]
 
   if (is_standard_system) {
     external_deps = [

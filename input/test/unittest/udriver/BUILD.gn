@@ -13,8 +13,8 @@
 
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-hdi_input_base_path = "//drivers/peripheral/hidl_adapter/input_ipc"
-module_output_path = "hdf/input"
+hdi_input_base_path = "//drivers/peripheral/input"
+module_output_path = "drivers_peripheral_input/input"
 config("camhdi_impl_utest_config") {
   visibility = [ ":*" ]
   cflags_cc = [
@@ -30,8 +30,9 @@ config("camhdi_impl_utest_config") {
     "-Wno-builtin-requires-header",
     "-Wno-unused-variable",
     "-Wno-unused-label",
+    "-Wno-implicit-function-declaration",
     "-Wno-format",
-    "-Wno-int32_t-conversion",
+    "-Wno-int-conversion",
     "-Wno-unused-function",
     "-Wno-thread-safety-attributes",
     "-Wno-inconsistent-missing-override",
@@ -42,48 +43,31 @@ config("camhdi_impl_utest_config") {
   ]
 }
 
-ohos_unittest("hdi_input_unittest_neu_ipc") {
+ohos_unittest("input_udriver_unittest") {
   testonly = true
   module_out_path = module_output_path
   install_enable = true
-  sources = [
-    "unittest/utest_input_hdi_base.cpp",
-    "unittest/utest_input_manager_impl.cpp",
-  ]
+  sources = [ "./hdi_input_test.cpp" ]
 
   include_dirs = [
-    "$hdi_input_base_path/include",
-    "$hdi_input_base_path/client/include",
-    "$hdi_input_base_path/service/include",
-    "$hdi_input_base_path/client/include",
-    "$hdi_input_base_path/test/include",
-    "//third_party/libevdev/include/linux/linux",
-
-    # HCS
-    "//system/core/include/cutils",
+    "$hdi_input_base_path/interfaces/include",
+    "$hdi_input_base_path/udriver/include",
   ]
 
   deps = [
-    "../client:libinput_client",
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest",
-    "//third_party/googletest:gtest_main",
+    "//drivers/hdf_core/adapter/uhdf2//hdi:libhdi",
+    "//drivers/hdf_core/adapter/uhdf2//utils:libhdf_utils",
+    "//drivers/peripheral/input/udriver:hdi_input_udriver",
   ]
 
   if (is_standard_system) {
     external_deps = [
-      "c_utils:utils",
-      "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
-      "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
-      "ipc:ipc_single",
+      "c_utils:utils",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  external_deps += [ "samgr_L2:samgr_proxy" ]
   public_configs = [ ":camhdi_impl_utest_config" ]
 }
