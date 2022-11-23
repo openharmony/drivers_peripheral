@@ -89,6 +89,8 @@ protected:
     std::mutex tsLock_ = {};
     std::list<std::shared_ptr<CaptureRequest>> inTransitList_ = {};
 
+    std::mutex smLock_ = {};
+
     std::unique_ptr<std::thread> handler_ = nullptr;
     std::shared_ptr<CaptureRequest> lastRequest_ = nullptr;
 };
