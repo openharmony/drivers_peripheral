@@ -269,8 +269,8 @@ static void GetHeaderStr(struct UsbFnStrings ** const strings, struct UsbFunctio
     }
     headerStr->magic = htole32(FUNCTIONFS_STRINGS_MAGIC);
     headerStr->length = htole32(sizeof(struct UsbFunctionfsStringsHead) + langCount * sizeof(uint16_t) + len);
-    headerStr->str_count = strCount;
-    headerStr->lang_count = langCount;
+    headerStr->strCount = strCount;
+    headerStr->langCount = langCount;
 }
 
 static int32_t UsbFnWriteStrings(int32_t ep0, struct UsbFnStrings ** const strings)
@@ -294,13 +294,13 @@ static int32_t UsbFnWriteStrings(int32_t ep0, struct UsbFnStrings ** const strin
     }
     whereDec += sizeof(struct UsbFunctionfsStringsHead);
 
-    for (i = 0; i < headerStr.lang_count; i++) {
+    for (i = 0; i < headerStr.langCount; i++) {
         ret = memcpy_s(whereDec, headerStr.length - (whereDec - str), &strings[i]->language, sizeof(uint16_t));
         if (ret != EOK) {
             goto ERR;
         }
         whereDec += sizeof(uint16_t);
-        for (j = 0; j < headerStr.str_count; j++) {
+        for (j = 0; j < headerStr.strCount; j++) {
             if (strlen(strings[i]->strings[j].s)) {
                 ret = memcpy_s(whereDec, headerStr.length - (whereDec - str), strings[i]->strings[j].s,
                     strlen(strings[i]->strings[j].s));
@@ -956,8 +956,8 @@ static int32_t UsbFnWriteProp(const char *deviceName, const char *propName, uint
         HDF_LOGE("%{public}s: create gadget name failed!", __func__);
         return HDF_ERR_IO;
     }
-    info.Prop.propName = propName;
-    info.Prop.propValue = (uint32_t)propValue;
+    info.prop.propName = propName;
+    info.prop.propValue = (uint32_t)propValue;
     int32_t configFd = UsbFnAdapterOpenFn();
     if (configFd <= 0) {
         ret = HDF_ERR_IO;
@@ -991,9 +991,9 @@ static int32_t UsbFnWriteDesString(
         HDF_LOGE("%{public}s: create gadget name failed!", __func__);
         return HDF_ERR_IO;
     }
-    info.Prop.lang = lang;
-    info.Prop.propName = stringName;
-    info.Prop.propValue = stringValue;
+    info.prop.lang = lang;
+    info.prop.propName = stringName;
+    info.prop.propValue = stringValue;
     int32_t configFd = UsbFnAdapterOpenFn();
     if (configFd <= 0) {
         dprintf("%s, %d\n", __func__, __LINE__);

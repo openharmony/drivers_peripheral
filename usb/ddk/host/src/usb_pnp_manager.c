@@ -73,7 +73,7 @@ static int32_t UsbPnpManagerBind(struct HdfDeviceObject *device)
 }
 
 #ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-int32_t UsbPnpManagerStartUeventThread()
+int32_t UsbPnpManagerStartUeventThread(void)
 {
     pthread_t tid;
     int32_t ret = pthread_create(&tid, NULL, DdkUeventMain, NULL);
