@@ -483,7 +483,7 @@ int32_t AudioRenderGetVolume(struct IAudioRender *handle, float *volume);
 int32_t AudioRenderGetGainThreshold(struct IAudioRender *handle, float *min, float *max);
 int32_t AudioRenderGetGain(struct IAudioRender *handle, float *gain);
 int32_t AudioRenderSetGain(struct IAudioRender *handle, float gain);
-int32_t AudioRenderGetLatency(struct IAudioRender *handle, uint32_t *ms);
+int32_t AudioRenderGetLatency(struct IAudioRender *render, uint32_t *ms);
 int32_t AudioRenderRenderFrame(struct IAudioRender *render, const int8_t *frame,
     uint32_t frameLen, uint64_t *replyBytes);
 int32_t AudioRenderGetRenderPosition(struct IAudioRender *render, uint64_t *frames, struct AudioTimeStamp *time);
@@ -524,7 +524,7 @@ int32_t AudioCaptureCaptureFrame(struct IAudioCapture *capture, int8_t *frame,
     uint32_t *frameLen, uint64_t requestBytes);
 int32_t AudioCaptureGetCapturePosition(struct IAudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time);
 int32_t AudioCaptureSetExtraParams(struct IAudioCapture *handle, const char *keyValueList);
-int32_t AudioCaptureGetExtraParams(struct IAudioCapture *handle, char *keyValueList, uint32_t keyValueListLen);
+int32_t AudioCaptureGetExtraParams(struct IAudioCapture *handle, char *keyValueList, uint32_t listLenth);
 int32_t AudioCaptureReqMmapBuffer(
     struct IAudioCapture *handle, int32_t reqSize, const struct AudioMmapBufferDescriptor *desc);
 int32_t AudioCaptureGetMmapPosition(struct IAudioCapture *handle, uint64_t *frames, struct AudioTimeStamp *time);
