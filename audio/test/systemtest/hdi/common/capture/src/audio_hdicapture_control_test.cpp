@@ -261,7 +261,8 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_008, TestSize.Level1)
 }
 /**
 * @tc.name  AudioCreateCapture_008
-* @tc.desc  Test AudioCreateCapture interface,Returns -1 if the incoming parameter adapter which port type is PORT_OUT
+* @tc.desc  Test AudioCreateCapture interface,Returns -1 if the incoming parameter adapter which DevDesc'pins is
+* PIN_OUT_SPEAKER
 * @tc.type: FUNC
 */
 HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_009, TestSize.Level1)
@@ -274,7 +275,7 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_009, TestSize.Level1)
     struct AudioCapture *capture = nullptr;
 
     ASSERT_NE(nullptr, manager);
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_OUT, &adapter, capturePort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, capturePort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = InitAttrs(attrs);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);

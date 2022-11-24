@@ -168,9 +168,9 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       "src/hdf_audio_input_event.c",
       "src/hdf_audio_pnp_server.c",
       "src/hdf_audio_pnp_uevent.c",
+      "src/hdf_audio_pnp_uevent_hdmi.c",
     ]
 
-    deps = []
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
