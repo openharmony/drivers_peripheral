@@ -133,10 +133,10 @@ private:
     static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
     class UsbDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        explicit UsbDeathRecipient(
-            const sptr<IUsbdSubscriber> &deathSubscriber) : deathSubscriber_(deathSubscriber) {};
+        explicit UsbDeathRecipient(const sptr<IUsbdSubscriber> &deathSubscriber) : deathSubscriber_(deathSubscriber) {};
         ~UsbDeathRecipient() override {};
         void OnRemoteDied(const wptr<IRemoteObject> &object) override;
+
     private:
         sptr<IUsbdSubscriber> deathSubscriber_;
     };
@@ -144,6 +144,7 @@ private:
 private:
     static HdfDevEventlistener listenerForLoadService_;
     static UsbdSubscriber subscribers_[MAX_SUBSCRIBER];
+    static bool isGadgetConnected_;
 };
 } // namespace V1_0
 } // namespace Usb

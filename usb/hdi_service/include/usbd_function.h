@@ -19,11 +19,11 @@
 #include <stdint.h>
 
 #define USB_FUNCTION_NONE    0
-#define USB_FUNCTION_ACM     1
-#define USB_FUNCTION_ECM     2
-#define USB_FUNCTION_HDC     4
-#define USB_FUNCTION_RNDIS   32
-#define USB_FUNCTION_STORAGE 512
+#define USB_FUNCTION_ACM     (1 << 0)
+#define USB_FUNCTION_ECM     (1 << 1)
+#define USB_FUNCTION_HDC     (1 << 2)
+#define USB_FUNCTION_RNDIS   (1 << 5)
+#define USB_FUNCTION_STORAGE (1 << 9)
 #define USB_FUNCTION_SUPPORT \
     (USB_FUNCTION_ACM | USB_FUNCTION_ECM | USB_FUNCTION_HDC | USB_FUNCTION_RNDIS | USB_FUNCTION_STORAGE)
 
@@ -50,8 +50,7 @@
 #define ECM_INIT    100
 #define ECM_RELEASE 101
 
-#define USB_FUNCTION_ACM_ECM 3
-#define HDC_READY_TIME       2000
+#define USB_DDK_FUNCTION_SUPPORT (USB_FUNCTION_ACM | USB_FUNCTION_ECM)
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -68,14 +67,15 @@ private:
     static int32_t RemoveHdc();
     static int32_t AddHdc();
     static int32_t SetFunctionToNone();
-    static int32_t SetFunctionToACM();
-    static int32_t SetFunctionToECM();
-    static int32_t SetFunctionToACMECM();
     static int32_t SetFunctionToRndis();
     static int32_t SetFunctionToStorage();
     static int32_t SetFunctionToRndisHdc();
     static int32_t SetFunctionToStorageHdc();
     static int32_t SetDDKFunction(uint32_t funcs);
+    static int32_t UsbdEnableDevice();
+    static int32_t UsbdWaitUdc();
+    static int32_t UsbdInitDDKFunction(uint32_t funcs);
+    static int32_t UsbdSetKernelFunction(int32_t kfuns);
     static uint32_t currentFuncs_;
 };
 } // namespace V1_0
