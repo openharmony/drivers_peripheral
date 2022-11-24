@@ -349,6 +349,10 @@ int32_t UsbFnIoMgrInterfaceGetPipeInfo(struct UsbFnInterface *interface, uint8_t
     struct UsbFnAdapterOps *fnOps = UsbFnAdapterGetOps();
     struct UsbFnInterfaceMgr *interfaceMgr = (struct UsbFnInterfaceMgr *)interface;
     if (interfaceMgr->isOpen) {
+        if (pipeId >= MAX_EP) {
+            HDF_LOGE("%{public}s pipeId overflow", __func__);
+            return HDF_ERR_INVALID_PARAM;
+        }
         fd = interfaceMgr->handle->fds[pipeId];
         ret = fnOps->getPipeInfo(fd, info);
         if (ret) {
