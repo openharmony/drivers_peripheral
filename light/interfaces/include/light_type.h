@@ -81,6 +81,17 @@ enum LightId {
 };
 
 /**
+ * @brief Enumerates the light types.
+ *
+ * @since 3.2
+ */
+enum HdfLightType {
+    HDF_LIGHT_TYPE_SINGLE_COLOR = 1,
+    HDF_LIGHT_TYPE_RGB_COLOR = 2,
+    HDF_LIGHT_TYPE_WRGB_COLOR = 3,
+};
+
+/**
  * @brief Enumerates the lighting modes.
  *
  * @since 3.1
@@ -110,17 +121,17 @@ struct LightFlashEffect {
 };
 
 /**
- * @brief Defines the color and brightness of the light.
+ * @brief Defines the color and extended information of the light.
  *
- * The parameters include the These parameters include red, green, blue values and brightness values.
+ * The parameters include four parameters include red, green, blue values and extended information.
  *
  * @since 3.2
  */
 struct RGBColor {
-    int brightness;    /** Brightness value 0-255. */
-    int r;    /** Red value range 0-255. */
-    int g;    /** Green value range 0-255. */
-    int b;    /** Blue value range 0-255. */
+    uint8_t r;          /** Red value range 0-255. */
+    uint8_t g;          /** Green value range 0-255. */
+    uint8_t b;          /** Blue value range 0-255. */
+    uint8_t reserved;  /** Custom extended information. */
 };
 
 /**
@@ -131,21 +142,22 @@ struct RGBColor {
  * @since 3.2
  */
 struct WRGBColor {
-    int w;    /** White value range 0-255. */
-    int r;    /** Red value range 0-255. */
-    int g;    /** Green value range 0-255. */
-    int b;    /** Blue value range 0-255. */
+    uint8_t w;    /** White value range 0-255. */
+    uint8_t r;    /** Red value range 0-255. */
+    uint8_t g;    /** Green value range 0-255. */
+    uint8_t b;    /** Blue value range 0-255. */
 };
 
 /**
- * @brief Defines two modes for setting the light.
+ * @brief Defines three modes for setting the light.
  *
- * The parameters include RGB mode and WRGB mode.
+ * The parameters include single color mode, RGB mode and WRGB mode.
  *
  * @since 3.2
  */
 union ColorValue {
-    struct WRGBColor wrgbColor;    /** WRGB mode, see {@link WRGBColor}. */
+    int32_t singleColor;         /** Single color mode. */
+    struct WRGBColor wrgbColor;  /** WRGB mode, see {@link WRGBColor}. */
     struct RGBColor rgbColor;    /** RGB mode, see {@link RGBColor}. */
 };
 
@@ -176,15 +188,15 @@ struct LightEffect {
 /**
  * @brief Defines the basic light information.
  *
- * Basic light information includes the light id and custom extended information.
+ * Basic light information includes the light id, light name, light number and light type.
  *
  * @since 3.1
  */
 struct LightInfo {
-    uint32_t lightId;    /** Light id. For details, see {@link LightId}. */
-    uint32_t lightNumber;    /** Number of physical lights in the logic controller. */
+    uint32_t lightId;                /** Light id. For details, see {@link LightId}. */
+    uint32_t lightNumber;            /** Number of physical lights in the logic controller. */
     char lightName[NAME_MAX_LEN];    /** Logic light name. */
-    int32_t reserved;    /** Custom extended information. */
+    int32_t lightType;                /** Light type. For details, see {@link HdfLightType}. */
 };
 
 #ifdef __cplusplus
