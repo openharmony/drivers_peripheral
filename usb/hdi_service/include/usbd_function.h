@@ -83,6 +83,10 @@ private:
     static int32_t SetFunctionToRndisHdc();
     static int32_t SetFunctionToStorageHdc();
     static int32_t SetDDKFunction(uint32_t funcs);
+    static int32_t UsbdEnableDevice();
+    static int32_t UsbdWaitUdc();
+    static int32_t UsbdInitDDKFunction(uint32_t funcs);
+    static int32_t UsbdSetKernelFunction(int32_t kfuns);
     static uint32_t currentFuncs_;
 };
 } // namespace V1_0

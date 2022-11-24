@@ -39,6 +39,7 @@ namespace Usb {
 namespace V1_0 {
 HdfDevEventlistener UsbImpl::listenerForLoadService_ = {0};
 UsbdSubscriber UsbImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
+bool UsbImpl::isGadgetConnected_ = false;
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
 {
@@ -859,6 +860,7 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
 
     int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_DRIVER_GADGET_ADD) {
+        isGadgetConnected_ = true;
         USBDeviceInfo info = {ACT_UPDEVICE, 0, 0};
         if (subscriber == nullptr) {
             HDF_LOGE("%{public}s: subscriber is nullptr, %{public}d", __func__, __LINE__);
@@ -867,6 +869,7 @@ int32_t UsbImpl::UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *da
         ret = subscriber->DeviceEvent(info);
         return ret;
     } else if (id == USB_PNP_DRIVER_GADGET_REMOVE) {
+        isGadgetConnected_ = false;
         USBDeviceInfo info = {ACT_DOWNDEVICE, 0, 0};
         if (subscriber == nullptr) {
             HDF_LOGE("%{public}s: subscriber is nullptr, %{public}d", __func__, __LINE__);
@@ -994,8 +997,8 @@ int32_t UsbImpl::GetStringDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     uint16_t length = MAX_CONTROL_BUFF_SIZE;
     uint8_t buffer[USB_MAX_DESCRIPTOR_SIZE] = {0};
     UsbControlParams controlParams = {0};
-    MakeUsbControlParams(&controlParams, buffer, length, (static_cast<int32_t>(USB_DDK_DT_STRING) << TYPE_OFFSET_8) +
-        descId, 0);
+    MakeUsbControlParams(
+        &controlParams, buffer, length, (static_cast<int32_t>(USB_DDK_DT_STRING) << TYPE_OFFSET_8) + descId, 0);
     int32_t ret = UsbControlTransferEx(port, &controlParams, GET_STRING_SET_TIMEOUT);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:UsbControlTransferEx failed ret=%{public}d", __func__, ret);
@@ -1017,8 +1020,8 @@ int32_t UsbImpl::GetConfigDescriptor(const UsbDev &dev, uint8_t descId, std::vec
     uint16_t length = MAX_CONTROL_BUFF_SIZE;
     uint8_t buffer[USB_MAX_DESCRIPTOR_SIZE] = {0};
     UsbControlParams controlParams = {0};
-    MakeUsbControlParams(&controlParams, buffer, length, (static_cast<int32_t>(USB_DDK_DT_CONFIG) << TYPE_OFFSET_8)
-        + descId, 0);
+    MakeUsbControlParams(
+        &controlParams, buffer, length, (static_cast<int32_t>(USB_DDK_DT_CONFIG) << TYPE_OFFSET_8) + descId, 0);
     int32_t ret = UsbControlTransferEx(port, &controlParams, USB_CTRL_SET_TIMEOUT);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:UsbControlTransferEx failed ret=%{public}d", __func__, ret);
@@ -1289,8 +1292,8 @@ int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &c
     controlParams.target = (UsbRequestTargetType)(static_cast<uint32_t>(ctrl.requestType) & USB_RECIP_MASK);
     controlParams.directon = (UsbRequestDirection)((static_cast<uint32_t>(ctrl.requestType) >> DIRECTION_OFFSET_7) &
         ENDPOINT_DIRECTION_MASK);
-    controlParams.reqType = (UsbControlRequestType)((static_cast<uint32_t>(ctrl.requestType) >> CMD_OFFSET_5) &
-        CMD_TYPE_MASK);
+    controlParams.reqType =
+        (UsbControlRequestType)((static_cast<uint32_t>(ctrl.requestType) >> CMD_OFFSET_5) & CMD_TYPE_MASK);
     controlParams.size = MAX_CONTROL_BUFF_SIZE;
     controlParams.data = static_cast<void *>(OsalMemCalloc(controlParams.size));
     if (controlParams.data == nullptr) {
@@ -1332,8 +1335,8 @@ int32_t UsbImpl::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &
     controlParams.target = (UsbRequestTargetType)(static_cast<uint32_t>(ctrl.requestType) & USB_RECIP_MASK);
     controlParams.directon = (UsbRequestDirection)((static_cast<uint32_t>(ctrl.requestType) >> DIRECTION_OFFSET_7) &
         ENDPOINT_DIRECTION_MASK);
-    controlParams.reqType = (UsbControlRequestType)((static_cast<uint32_t>(ctrl.requestType) >> CMD_OFFSET_5) &
-        CMD_TYPE_MASK);
+    controlParams.reqType =
+        (UsbControlRequestType)((static_cast<uint32_t>(ctrl.requestType) >> CMD_OFFSET_5) & CMD_TYPE_MASK);
     controlParams.size = data.size();
     controlParams.data = static_cast<void *>(const_cast<uint8_t *>(data.data()));
     int32_t ret = UsbControlTransferEx(port, &controlParams, ctrl.timeout);
@@ -1581,6 +1584,10 @@ int32_t UsbImpl::GetCurrentFunctions(int32_t &funcs)
 
 int32_t UsbImpl::SetCurrentFunctions(int32_t funcs)
 {
+    if (!isGadgetConnected_) {
+        HDF_LOGE("%{public}s:gadget is not connected", __func__);
+        return HDF_DEV_ERR_NO_DEVICE;
+    }
     OsalMutexLock(&lock_);
     int32_t ret = UsbdFunction::UsbdSetFunction(funcs);
     if (ret != HDF_SUCCESS) {
