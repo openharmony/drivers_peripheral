@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,30 +11,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/test.gni")
+import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
-if (defined(ohos_lite)) {
-  import("//build/lite/config/test.gni")
-} else {
-  import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-}
 
-group("audiotest") {
-  if (!defined(ohos_lite)) {
+group("hdi_client_advance") {
+  if (!defined(ohos_lite) && !drivers_peripheral_audio_user_mode) {
     testonly = true
-  }
-  deps = []
-
-  # hal ut
-  if (drivers_peripheral_audio_full_test_suite) {
-    if (drivers_peripheral_audio_rich_device) {
-      deps += [ "hdi/client_advance:hdi_client_advance" ]
-    } else {
-      deps += [
-        "hdi/client:hdi_client",
-        "hdi/passthrough:hdi_passthrough",
-        "supportlibs:interface_lib",
-      ]
-    }
+    deps = [
+      "adapter:hdf_audio_proxy_adapter_advance_test",
+      "capture:hdf_audio_proxy_capture_advance_test",
+      "common:hdf_audio_proxy_common_advance_test",
+      "manager:hdf_audio_proxy_manager_advance_test",
+      "render:hdf_audio_proxy_render_advance_test",
+    ]
   }
 }
