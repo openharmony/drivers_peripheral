@@ -246,6 +246,10 @@ int32_t BatteryInterfaceImpl::AddBatteryDeathRecipient(const sptr<IBatteryCallba
 
 int32_t BatteryInterfaceImpl::RemoveBatteryDeathRecipient(const sptr<IBatteryCallback>& callback)
 {
+    if (callback == nullptr) {
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "remove callback is nullptr");
+        return HDF_ERR_INVALID_PARAM;
+    }
     const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IBatteryCallback>(callback);
     bool result = remote->RemoveDeathRecipient(g_deathRecipient);
     if (!result) {
