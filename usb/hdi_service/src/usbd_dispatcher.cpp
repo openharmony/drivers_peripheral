@@ -116,7 +116,7 @@ int32_t UsbdDispatcher::GetInterfacePipe(
         HDF_LOGE("%{public}s:memset_s failed ", __func__);
         return HDF_FAILURE;
     }
-    
+
     if (dev == nullptr || interface == nullptr || pipe == nullptr) {
         HDF_LOGE("%{public}s:invalid params", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -658,7 +658,7 @@ int32_t UsbdDispatcher::UsbdMallocAndFill(uint8_t *&dataAddr, const std::vector<
         HDF_LOGI("%{public}s: data is empty", __func__);
         return HDF_SUCCESS;
     }
-    
+
     dataAddr = static_cast<uint8_t *>(OsalMemCalloc(length));
     if (dataAddr == nullptr) {
         HDF_LOGE("%{public}s: OsalMemAlloc failed", __func__);
@@ -733,7 +733,7 @@ int32_t UsbdDispatcher::UsbdRequestASyncInit(
         HDF_LOGE("%{public}s:%{public}d memcpy_s failed", __func__, ret);
         return ret;
     }
-    
+
     request->ifHandle = ifHandle;
     request->reqMsg.request = UsbAllocRequest(request->ifHandle, 0, request->pipe.maxPacketSize);
     if (request->reqMsg.request == nullptr) {
@@ -758,8 +758,8 @@ UsbdRequestASync *UsbdDispatcher::UsbdRequestASyncCreatAndInsert(
 
     int32_t ret = GetPipe(port, interfaceId, pipeAddr, &pipe);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: get pipe info failed interfaceId=%{public}d, pipeAddr=%{public}d",
-            __func__, interfaceId, pipeAddr);
+        HDF_LOGE("%{public}s: get pipe info failed interfaceId=%{public}d, pipeAddr=%{public}d", __func__, interfaceId,
+            pipeAddr);
         return nullptr;
     }
 
@@ -864,8 +864,8 @@ int32_t UsbdDispatcher::FunAttachDevice(HostDevice *port, HdfSBuf *data, HdfSBuf
         return HDF_ERR_INVALID_PARAM;
     }
     if (port->initFlag) {
-        HDF_LOGD("%{public}s:device is already on flag:%{public}d bus:%{public}d dev:%{public}d",
-            __func__, port->initFlag, port->busNum, port->devAddr);
+        HDF_LOGD("%{public}s:device is already on flag:%{public}d bus:%{public}d dev:%{public}d", __func__,
+            port->initFlag, port->busNum, port->devAddr);
         return HDF_SUCCESS;
     }
 
@@ -1058,7 +1058,7 @@ UsbdBulkASyncList *UsbdDispatcher::UsbdBulkASyncListAlloc(HostDevice *port, uint
         HDF_LOGE("%{public}s:GetPipe failed, ret:%{public}d", __func__, ret);
         return nullptr;
     }
-    
+
     UsbInterfaceHandle *ifHandle = UsbImpl::InterfaceIdToHandle(port, ifId);
     if (ifHandle == nullptr) {
         HDF_LOGE("%{public}s:get interface handle failed", __func__);
@@ -1224,7 +1224,7 @@ int32_t UsbdDispatcher::UsbdBulkAsyncGetAsmReqLen(UsbdBufferHandle *handle, uint
         HDF_LOGE("%{public}s:%{public}d invalid param", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
-    
+
     uint32_t tlen = 0;
     OsalMutexLock(&handle->lock);
     if (handle->cur < handle->size) {
@@ -1275,8 +1275,8 @@ int32_t UsbdDispatcher::UsbdBulkASyncReqReadAutoSubmit(UsbRequest *request)
     int32_t ret =
         UsbdBulkASyncPutAsmData(&db->list->pList->asmHandle, request->compInfo.buffer, request->compInfo.actualLength);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s:%{public}d UsbdBulkASyncPutAsmData error size:%{public}d ret:%{public}d",
-            __func__, __LINE__, request->compInfo.actualLength, ret);
+        HDF_LOGE("%{public}s:%{public}d UsbdBulkASyncPutAsmData error size:%{public}d ret:%{public}d", __func__,
+            __LINE__, request->compInfo.actualLength, ret);
         UsbdBulkASyncReqNodeSetNoUse(db);
         return ret;
     }
@@ -1328,8 +1328,8 @@ void UsbdDispatcher::UsbdBulkASyncWriteCallbackAutoSubmit(UsbRequest *request)
         UsbdBulkASyncReqNodeSetNoUse(node);
         ret = UsbdBulkWriteRemoteCallback(node->list->pList->cb, status, &node->list->pList->asmHandle);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbdBulkWriteRemoteCallback failed, ret:%{public}d "
-                "req:%{public}p id:%{public}d status:%{public}d", __func__, __LINE__, ret, request, node->id, status);
+            HDF_LOGE("%{public}s:%{public}d UsbdBulkWriteRemoteCallback failed, ret:%{public}d req:%{public}p "
+                "id:%{public}d status:%{public}d", __func__, __LINE__, ret, request, node->id, status);
         }
         return;
     }
@@ -1347,8 +1347,9 @@ void UsbdDispatcher::UsbdBulkASyncWriteCallbackAutoSubmit(UsbRequest *request)
     } else if (ret != HDF_SUCCESS) {
         ret = UsbdBulkWriteRemoteCallback(node->list->pList->cb, ret, &node->list->pList->asmHandle);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbdBulkWriteRemoteCallback failed "
-                "ret:%{public}d req:%{public}p id:%{public}d", __func__, __LINE__, ret, request, node->id);
+            HDF_LOGE(
+                "%{public}s:%{public}d UsbdBulkWriteRemoteCallback failed ret:%{public}d req:%{public}p id:%{public}d",
+                __func__, __LINE__, ret, request, node->id);
         }
         return;
     }
@@ -1368,8 +1369,8 @@ void UsbdDispatcher::UsbdBulkASyncReadCallbackAutoSubmit(UsbRequest *request)
         UsbdBulkASyncReqNodeSetNoUse(node);
         ret = UsbdBulkReadRemoteCallback(node->list->pList->cb, status, &node->list->pList->asmHandle);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbdBulkReadRemoteCallback failed, ret:%{public}d "
-                "req:%{public}p id:%{public}d status:%{public}d", __func__, __LINE__, ret, request, node->id, status);
+            HDF_LOGE("%{public}s:%{public}d UsbdBulkReadRemoteCallback failed, ret:%{public}d req:%{public}p "
+                "id:%{public}d status:%{public}d", __func__, __LINE__, ret, request, node->id, status);
         }
         return;
     }
@@ -1387,8 +1388,9 @@ void UsbdDispatcher::UsbdBulkASyncReadCallbackAutoSubmit(UsbRequest *request)
     } else if (ret != HDF_SUCCESS) {
         ret = UsbdBulkReadRemoteCallback(node->list->pList->cb, ret, &node->list->pList->asmHandle);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbdBulkReadRemoteCallback failed "
-                "ret:%{public}d req:%{public}p id:%{public}d", __func__, __LINE__, ret, request, node->id);
+            HDF_LOGE(
+                "%{public}s:%{public}d UsbdBulkReadRemoteCallback failed ret:%{public}d req:%{public}p id:%{public}d",
+                __func__, __LINE__, ret, request, node->id);
         }
         return;
     }

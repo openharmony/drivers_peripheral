@@ -15,6 +15,7 @@
 
 #ifndef OHOS_HDI_USB_V1_0_USBIMPL_H
 #define OHOS_HDI_USB_V1_0_USBIMPL_H
+
 #include "hdf_slist.h"
 #include "iproxy_broker.h"
 #include "iremote_object.h"

@@ -14,6 +14,7 @@
  */
 
 #include "adapter_if.h"
+
 #include <dirent.h>
 #include <endian.h>
 #include <fcntl.h>
