@@ -15,6 +15,10 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
+declare_args() {
+  drivers_peripheral_codec_support_omx = false
+}
+
 ohos_unittest("codec_hdi_omx_test") {
   module_out_path = "drivers_peripheral_codec/codec"
   include_dirs = [
@@ -24,7 +28,10 @@ ohos_unittest("codec_hdi_omx_test") {
     "//third_party/openmax/api/1.1.2",
     "//drivers/peripheral/display/hdi_service/gralloc/include",
   ]
-  sources = [ "codec_hdi_omx_test.cpp" ]
+  sources = [
+    "codec_hdi_manger_test.cpp",
+    "codec_hdi_omx_test.cpp",
+  ]
   deps = [
     "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
     "//third_party/googletest:gtest_main",
@@ -44,40 +51,13 @@ ohos_unittest("codec_hdi_omx_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-}
-
-ohos_unittest("codec_hdi_manager_test") {
-  module_out_path = "drivers_peripheral_codec/codec"
-  include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-    "//drivers/peripheral/codec/interfaces/include",
-    "//drivers/peripheral/codec/hal/include",
-    "//third_party/openmax/api/1.1.2",
-  ]
-  sources = [ "codec_hdi_manger_test.cpp" ]
-  deps = [
-    "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
-    "//third_party/googletest:gtest_main",
-  ]
-
-  if (is_standard_system) {
-    external_deps = [
-      "c_utils:utils",
-      "hdf_core:libhdf_host",
-      "hdf_core:libhdf_ipc_adapter",
-      "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
-      "hiviewdfx_hilog_native:libhilog",
-    ]
-  } else {
-    external_deps = [ "hilog:libhilog" ]
+  defines = []
+  if (drivers_peripheral_codec_support_omx) {
+    defines += [ "SUPPORT_OMX" ]
   }
 }
 
 group("codec_hdi_2.0_test") {
   testonly = true
-  deps = [
-    ":codec_hdi_manager_test",
-    ":codec_hdi_omx_test",
-  ]
+  deps = [ ":codec_hdi_omx_test" ]
 }
