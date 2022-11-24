@@ -22,9 +22,9 @@
 #include "usbfn_cfg_mgr.h"
 #include "usbfn_io_mgr.h"
 
-#define HDF_LOG_TAG usbfn_dev_mgr
+#define HDF_LOG_TAG    usbfn_dev_mgr
 #define SLEEP_TIME_OUT 100
-#define SLEEP_TIMES 20
+#define SLEEP_TIMES    20
 
 static struct DListHead g_devEntry = {0};
 static uint32_t g_intfCnt = 0;
@@ -66,7 +66,7 @@ static void CreateInterface(struct UsbFnDeviceDesc *des, struct UsbFnDeviceMgr *
     g_intfCnt = 0;
     g_epCnt = 1;
     g_fnCntOld = 0;
-    
+
     for (uint32_t i = 0; des->configs[i] != NULL; i++) {
         for (uint32_t j = 0; des->configs[i]->functions[j] != NULL; j++) {
             if (strncmp(des->configs[i]->functions[j]->funcName, FUNCTION_GENERIC, strlen(FUNCTION_GENERIC))) {
