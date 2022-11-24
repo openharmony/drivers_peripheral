@@ -26,7 +26,7 @@ using namespace OHOS::USB;
 using namespace std;
 using namespace OHOS::HDI::Usb::V1_0;
 
-sptr<IUsbInterface> g_usbInterface = nullptr;
+using namespace {sptr<IUsbInterface> g_usbInterface = nullptr;}
 #define BIND_TIME 60
 int32_t main(int32_t argc, const char *argv[])
 {
