@@ -239,8 +239,8 @@ static ResultCode CreateAndInsertSchedules(UserAuthContext *context, uint32_t au
         return RESULT_UNKNOWN;
     }
     if (InsertScheduleToContext(schedule, context) != RESULT_SUCCESS) {
-        DestroyCoAuthSchedule(schedule);
         RemoveCoAuthSchedule(schedule->scheduleId);
+        DestroyCoAuthSchedule(schedule);
         LOG_ERROR("insert failed");
         return RESULT_UNKNOWN;
     }
