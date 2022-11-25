@@ -19,7 +19,7 @@
 #include "hdf_types.h"
 
 /* start uevent to monitor USB headset/headphone */
-int32_t AudioUsbPnpUeventStartThread(void);
-void AudioUsbPnpUeventStopThread(void);
+int32_t AudioPnpUeventStartThread(void);
+void AudioPnpUeventStopThread(void);
 
 #endif

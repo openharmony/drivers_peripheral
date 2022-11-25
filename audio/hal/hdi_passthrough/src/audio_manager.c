@@ -331,7 +331,7 @@ static int32_t SelectAppropriateAdapter(enum AudioAdapterType adapterType,
     }
     switch (adapterType) {
         case AUDIO_ADAPTER_PRIMARY:
-        case AUDIO_ADAPTER_HDMI:
+        case AUDIO_ADAPTER_PRIMARY_EXT:
             ret = LoadAdapterPrimary(desc, adapter);
             if (ret != AUDIO_HAL_SUCCESS) {
                 AUDIO_FUNC_LOGE("LoadAdapterPrimary failed. ret = %{public}d", ret);

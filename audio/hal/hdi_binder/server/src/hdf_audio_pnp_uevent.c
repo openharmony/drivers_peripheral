@@ -595,14 +595,14 @@ static void *AudioPnpUeventStart(void *useless)
     return NULL;
 }
 
-int32_t AudioUsbPnpUeventStartThread(void)
+int32_t AudioPnpUeventStartThread(void)
 {
     pthread_t thread;
     pthread_attr_t tidsAttr;
-    const char *threadName = "pnp_usb";
+    const char *threadName = "pnp_uevent";
     g_pnpThreadRunning = true;
 
-    AUDIO_FUNC_LOGI("create audio usb uevent thread");
+    AUDIO_FUNC_LOGI("create audio uevent thread");
     pthread_attr_init(&tidsAttr);
     pthread_attr_setdetachstate(&tidsAttr, PTHREAD_CREATE_DETACHED);
     if (pthread_create(&thread, &tidsAttr, AudioPnpUeventStart, NULL) != 0) {
@@ -611,14 +611,14 @@ int32_t AudioUsbPnpUeventStartThread(void)
     }
 
     if (pthread_setname_np(thread, threadName) != 0) {
-        AUDIO_FUNC_LOGE("setname failed");
+        AUDIO_FUNC_LOGE("AudioPnpUeventStartThread setname failed");
         return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;
 }
 
-void AudioUsbPnpUeventStopThread(void)
+void AudioPnpUeventStopThread(void)
 {
     AUDIO_FUNC_LOGI("audio pnp uevent thread exit");
     g_pnpThreadRunning = false;
