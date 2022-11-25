@@ -65,18 +65,13 @@ sptr<IDisplayAllocator> IDisplayAllocator::Get(const char *serviceName)
     }
     HDF_LOGI("%{public}s: get service:%{public}s success cnt:%{public}u", __func__, serviceName, cnt);
 
-    if (remote != nullptr) {
-        sptr<AllocatorProxy> hostSptr = iface_cast<AllocatorProxy>(remote);
-        if (hostSptr == nullptr) {
-            HDF_LOGE("%{public}s: IServiceManager GetService null ptr", __func__);
-            return nullptr;
-        }
-        HDF_LOGE("%{public}s: GetService %{public}s ok", __func__, serviceName);
-        return hostSptr;
+    sptr<AllocatorProxy> hostSptr = iface_cast<AllocatorProxy>(remote);
+    if (hostSptr == nullptr) {
+        HDF_LOGE("%{public}s: IServiceManager GetService null ptr", __func__);
+        return nullptr;
     }
-    HDF_LOGE("%{public}s: IServiceManager GetService %{public}s failed", __func__, serviceName);
-
-    return nullptr;
+    HDF_LOGE("%{public}s: GetService %{public}s ok", __func__, serviceName);
+    return hostSptr;
 }
 
 int32_t AllocatorProxy::AllocMem(const AllocInfo &info, BufferHandle *&handle)
