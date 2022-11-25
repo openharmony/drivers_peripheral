@@ -306,6 +306,11 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
         return HDF_FAILURE;
     }
 
+    if (funcs == USB_FUNCTION_NONE) {
+        HDF_LOGI("%{public}s, none function", __func__);
+        return HDF_SUCCESS;
+    }
+
     if (UsbdWaitUdc() != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, wait udc failed", __func__);
         return HDF_FAILURE;
