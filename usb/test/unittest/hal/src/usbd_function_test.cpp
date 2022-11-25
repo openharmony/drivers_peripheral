@@ -13,12 +13,13 @@
  * limitations under the License.
  */
 
+#include "usbd_function_test.h"
+
 #include <iostream>
 
 #include "hdf_log.h"
 #include "if_system_ability_manager.h"
 #include "system_ability_definition.h"
-#include "usbd_function_test.h"
 #include "v1_0/iusb_interface.h"
 #include "v1_0/usb_types.h"
 
@@ -26,9 +27,13 @@ const int SLEEP_TIME = 3;
 const int TEST_PORT_ID = 1;
 const int TEST_POWER_ROLE = 2;
 const int TEST_DATAR_ROLE = 2;
+const int USB_FUNCTION_INVALID = -1;
 const int USB_FUNCTION_ACM = 1;
 const int USB_FUNCTION_ECM = 2;
 const int USB_FUNCTION_HDC = 4;
+const int USB_FUNCTION_RNDIS = 32;
+const int USB_FUNCTION_STORAGE = 512;
+const int USB_FUNCTION_UNSUPPORTED = 128;
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -64,7 +69,7 @@ void UsbdFunctionTest::TearDown(void) {}
  * @tc.name: UsbdGetCurrentFunctions001
  * @tc.desc: Test functions to GetCurrentFunctions
  * @tc.desc: int32_t GetCurrentFunctions(int32_t &funcs);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdGetCurrentFunctions001, TestSize.Level1)
@@ -79,7 +84,7 @@ HWTEST_F(UsbdFunctionTest, UsbdGetCurrentFunctions001, TestSize.Level1)
  * @tc.name: UsbdGetCurrentFunctions002
  * @tc.desc: Test functions to GetCurrentFunctions
  * @tc.desc: int32_t GetCurrentFunctions(int32_t &funcs);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdGetCurrentFunctions002, TestSize.Level1)
@@ -99,12 +104,12 @@ HWTEST_F(UsbdFunctionTest, UsbdGetCurrentFunctions002, TestSize.Level1)
  * @tc.name: UsbdSetCurrentFunctions001
  * @tc.desc: Test functions to SetCurrentFunctions
  * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions001, TestSize.Level1)
 {
-    int32_t funcs = 1;
+    int32_t funcs = USB_FUNCTION_ACM;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions001 %{public}d SetCurrentFunctions=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
@@ -114,12 +119,12 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions001, TestSize.Level1)
  * @tc.name: UsbdSetCurrentFunctions002
  * @tc.desc: Test functions to SetCurrentFunctions
  * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
- * @tc.desc: 反向测试：参数异常，funcs错误
+ * @tc.desc: Negative test: parameters exception, funcs error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions002, TestSize.Level1)
 {
-    int32_t funcs = -1;
+    int32_t funcs = USB_FUNCTION_INVALID;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdFunction002 %{public}d, ret=%{public}d, funcs=%{public}d", __LINE__, ret, funcs);
     ASSERT_NE(ret, 0);
@@ -128,7 +133,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions002, TestSize.Level1)
  * @tc.name: UsbdSetCurrentFunctions003
  * @tc.desc: Test functions to SetCurrentFunctions
  * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions003, TestSize.Level1)
@@ -143,7 +148,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions003, TestSize.Level1)
  * @tc.name: UsbdSetCurrentFunctions004
  * @tc.desc: Test functions to SetCurrentFunctions
  * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions004, TestSize.Level1)
@@ -158,7 +163,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions004, TestSize.Level1)
  * @tc.name: UsbdSetCurrentFunctions005
  * @tc.desc: Test functions to SetCurrentFunctions
  * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions005, TestSize.Level1)
@@ -173,7 +178,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions005, TestSize.Level1)
  * @tc.name: UsbdSetCurrentFunctions006
  * @tc.desc: Test functions to SetCurrentFunctions
  * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions006, TestSize.Level1)
@@ -188,7 +193,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions006, TestSize.Level1)
  * @tc.name: UsbdSetCurrentFunctions007
  * @tc.desc: Test functions to SetCurrentFunctions
  * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions007, TestSize.Level1)
@@ -203,22 +208,82 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions007, TestSize.Level1)
  * @tc.name: UsbdSetCurrentFunctions008
  * @tc.desc: Test functions to SetCurrentFunctions
  * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
- * @tc.desc: 反向测试：参数异常，funcs错误
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions008, TestSize.Level1)
 {
-    int32_t funcs = 8;
+    int32_t funcs = USB_FUNCTION_RNDIS;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions008 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdSetCurrentFunctions009
+ * @tc.desc: Test functions to SetCurrentFunctions
+ * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions009, TestSize.Level1)
+{
+    int32_t funcs = USB_FUNCTION_STORAGE;
+    auto ret = g_usbInterface->SetCurrentFunctions(funcs);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions009 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdSetCurrentFunctions010
+ * @tc.desc: Test functions to SetCurrentFunctions
+ * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions010, TestSize.Level1)
+{
+    int32_t funcs = USB_FUNCTION_RNDIS | USB_FUNCTION_HDC;
+    auto ret = g_usbInterface->SetCurrentFunctions(funcs);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions010 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdSetCurrentFunctions011
+ * @tc.desc: Test functions to SetCurrentFunctions
+ * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions011, TestSize.Level1)
+{
+    int32_t funcs = USB_FUNCTION_STORAGE | USB_FUNCTION_HDC;
+    auto ret = g_usbInterface->SetCurrentFunctions(funcs);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions0011 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdSetCurrentFunctions012
+ * @tc.desc: Test functions to SetCurrentFunctions
+ * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
+ * @tc.desc: Negative test: parameters exception, funcs error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions012, TestSize.Level1)
+{
+    int32_t funcs = USB_FUNCTION_UNSUPPORTED;
+    auto ret = g_usbInterface->SetCurrentFunctions(funcs);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions008 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(0, ret);
 }
 
 /**
  * @tc.name: UsbdSetPortRole001
  * @tc.desc: Test functions to SetPortRole
  * @tc.desc: int32_t SetPortRole(int32_t portId,int32_t powerRole,int32_t dataRole)
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetPortRole001, TestSize.Level1)
@@ -232,7 +297,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole001, TestSize.Level1)
  * @tc.name: UsbdSetPortRole002
  * @tc.desc: Test functions to SetPortRole
  * @tc.desc: int32_t SetPortRole(int32_t portId,int32_t powerRole,int32_t dataRole)
- * @tc.desc: 反向测试：参数异常，portId错误
+ * @tc.desc: Negative test: parameters exception, portId error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetPortRole002, TestSize.Level1)
@@ -246,7 +311,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole002, TestSize.Level1)
  * @tc.name: UsbdSetPortRole003
  * @tc.desc: Test functions to SetPortRole
  * @tc.desc: int32_t SetPortRole(int32_t portId,int32_t powerRole,int32_t dataRole)
- * @tc.desc: 反向测试：参数异常，powerRole错误
+ * @tc.desc: Negative test: parameters exception, powerRole error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetPortRole003, TestSize.Level1)
@@ -260,7 +325,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole003, TestSize.Level1)
  * @tc.name: UsbdSetPortRole004
  * @tc.desc: Test functions to SetPortRole
  * @tc.desc: int32_t SetPortRole(int32_t portId,int32_t powerRole,int32_t dataRole)
- * @tc.desc: 反向测试：参数异常，dataRole错误
+ * @tc.desc: Negative test: parameters exception, dataRole error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetPortRole004, TestSize.Level1)
@@ -274,7 +339,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole004, TestSize.Level1)
  * @tc.name: UsbdSetPortRole005
  * @tc.desc: Test functions to SetPortRole
  * @tc.desc: int32_t SetPortRole(int32_t portId,int32_t powerRole,int32_t dataRole)
- * @tc.desc: 反向测试：参数异常，portId、powerRole错误
+ * @tc.desc: Negative test: parameters exception, portId && powerRole error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetPortRole005, TestSize.Level1)
@@ -288,7 +353,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole005, TestSize.Level1)
  * @tc.name: UsbdSetPortRole006
  * @tc.desc: Test functions to SetPortRole
  * @tc.desc: int32_t SetPortRole(int32_t portId,int32_t powerRole,int32_t dataRole)
- * @tc.desc: 反向测试：参数异常，portId、dataRole错误
+ * @tc.desc: Negative test: parameters exception, portId && dataRole error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetPortRole006, TestSize.Level1)
@@ -302,7 +367,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole006, TestSize.Level1)
  * @tc.name: UsbdSetPortRole007
  * @tc.desc: Test functions to SetPortRole
  * @tc.desc: int32_t SetPortRole(int32_t portId,int32_t powerRole,int32_t dataRole)
- * @tc.desc: 反向测试：powerRole、dataRole错误
+ * @tc.desc: Negative test: parameters exception, powerRole && dataRole error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetPortRole007, TestSize.Level1)
@@ -316,7 +381,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole007, TestSize.Level1)
  * @tc.name: UsbdSetPortRole008
  * @tc.desc: Test functions to SetPortRole
  * @tc.desc: int32_t SetPortRole(int32_t portId,int32_t powerRole,int32_t dataRole)
- * @tc.desc: 反向测试：portId、powerRole、dataRole错误
+ * @tc.desc: Negative test: parameters exception, portId && powerRole && dataRole error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetPortRole008, TestSize.Level1)
@@ -330,7 +395,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole008, TestSize.Level1)
  * @tc.name: SetPortRole009
  * @tc.desc: Test functions to SetPortRole
  * @tc.desc: int32_t SetPortRole(int32_t portId,int32_t powerRole,int32_t dataRole)
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, SetPortRole09, TestSize.Level1)
@@ -344,7 +409,7 @@ HWTEST_F(UsbdFunctionTest, SetPortRole09, TestSize.Level1)
  * @tc.name: QueryPort001
  * @tc.desc: Test functions to QueryPort
  * @tc.desc: int32_t QueryPort(int32_t &portId, int32_t &powerRole, int32_t &dataRole, int32_t &mode);
- * @tc.desc: 正向测试：参数正确
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, QueryPort001, TestSize.Level1)
@@ -357,4 +422,4 @@ HWTEST_F(UsbdFunctionTest, QueryPort001, TestSize.Level1)
     HDF_LOGI("UsbdFunctionTest::QueryPort001 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
-}
+} // namespace
