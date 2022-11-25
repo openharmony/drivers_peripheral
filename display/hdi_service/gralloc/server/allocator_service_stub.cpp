@@ -42,9 +42,9 @@ int32_t AllocatorServiceStub::AllocaltorStubAllocMem(MessageParcel &data, Messag
     int32_t errCode = AllocMem(info, buffer);
     if (!reply.WriteInt32(errCode)) {
         if (buffer != nullptr) {
-            FreeBufferHandle(buffer);
+            (void)FreeMem(*buffer);
         }
-        HDF_LOGE("AllocMem: write reply failed!");
+        HDF_LOGE("AllocMem: write reply failed");
         return HDF_FAILURE;
     }
 
@@ -54,12 +54,12 @@ int32_t AllocatorServiceStub::AllocaltorStubAllocMem(MessageParcel &data, Messag
     }
 
     if (WriteBufferHandle(reply, *buffer) != true) {
-        FreeBufferHandle(buffer);
+        (void)FreeMem(*buffer);
         HDF_LOGE("%{public}s: WriteBufferHandle failed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    FreeBufferHandle(buffer);
+    (void)FreeMem(*buffer);
     return HDF_SUCCESS;
 }
 
