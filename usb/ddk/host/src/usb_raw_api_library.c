@@ -1382,6 +1382,7 @@ int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddR
 
     if (!HdfSbufWriteBuffer(pnpData, (const void *)(&infoData), sizeof(struct UsbPnpAddRemoveInfo))) {
         HDF_LOGE("%{public}s:%d sbuf write infoData failed", __func__, __LINE__);
+        ret = HDF_FAILURE;
         goto OUT;
     }
 
@@ -1394,17 +1395,18 @@ int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddR
     int32_t replyData = 0;
     if (!HdfSbufReadInt32(pnpReply, &replyData)) {
         HDF_LOGE("%{public}s:HdfSbufReadInt32 failed", __func__);
+        ret = HDF_FAILURE;
         goto OUT;
     }
     if (replyData != INT32_MAX) {
         HDF_LOGE("%{public}s:%d cmdType = %d reply failed", __func__, __LINE__, cmdType);
+        ret = HDF_FAILURE;
         goto OUT;
     }
     ret = HDF_SUCCESS;
     HDF_LOGI("%{public}s:%d cmdType = %d reply success", __func__, __LINE__, cmdType);
 
 OUT:
-    ret = HDF_FAILURE;
     HdfSbufRecycle(pnpData);
     HdfSbufRecycle(pnpReply);
 ERR_SBUF:
