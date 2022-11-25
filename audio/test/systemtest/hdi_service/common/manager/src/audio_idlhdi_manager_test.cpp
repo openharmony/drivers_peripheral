@@ -296,6 +296,39 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_006, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     free(desc.adapterName);
 }
+
+/**
+* @tc.name  AudioLoadAdapter_007
+* @tc.desc  test LoadAdapter interface，Returns 0 if If two different sound cards are loaded at the same time
+* @tc.type: FUNC
+*/
+HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_007, TestSize.Level1)
+{
+    int32_t ret = -1;
+    struct AudioPort audioPort = {};
+    struct AudioPort secondAudioPort = {};
+    struct IAudioAdapter *firstAdapter = nullptr;
+    struct IAudioAdapter *secondAdapter = nullptr;
+    ASSERT_NE(nullptr, manager);
+
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &firstAdapter, audioPort);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_OUT, &secondAdapter, secondAudioPort);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = manager->UnloadAdapter(manager, ADAPTER_NAME_OUT.c_str());
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    IAudioAdapterRelease(firstAdapter, IS_STUB);
+    IAudioAdapterRelease(secondAdapter, IS_STUB);
+    if (audioPort.portName != nullptr) {
+        free(audioPort.portName);
+    }
+    if (secondAudioPort.portName != nullptr) {
+        free(secondAudioPort.portName);
+    }
+}
 /**
 * @tc.name  AudioLoadAdapter_008
 * @tc.desc  test LoadAdapter interface，Load two sound cards at the same time, Returns 0 If the loading is successful,
