@@ -97,7 +97,7 @@ void InitAttrsCommon(struct AudioSampleAttributes &attrs)
 int32_t InitAttrs(struct AudioSampleAttributes &attrs)
 {
     InitAttrsCommon(attrs);
-    attrs.format = AUDIO_FORMAT_TYPE_PCM_32_BIT;
+    attrs.format = AUDIO_FORMAT_PCM_32_BIT;
     attrs.channelCount = AUDIO_CHANNELCOUNT;
     attrs.interleaved = 1;
     attrs.type = AUDIO_IN_MEDIA;
@@ -125,7 +125,7 @@ int32_t InitDevDesc(struct AudioDeviceDescriptor &devDesc, const uint32_t portId
 int32_t InitAttrsCapture(struct AudioSampleAttributes &attrs)
 {
     InitAttrsCommon(attrs);
-    attrs.format = AUDIO_FORMAT_TYPE_PCM_16_BIT;
+    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
     attrs.channelCount = AUDIO_CAPTURE_CHANNELCOUNT;
     attrs.silenceThreshold = SILENCE_THRESHOLD;
     return HDF_SUCCESS;
@@ -145,7 +145,7 @@ int32_t AudioRenderCallbackUtTest(enum AudioCallbackType type, void *reserved, v
     (void)reserved;
     (void)cookie;
     switch (type) {
-        case AUDIO_NONBLOCK_WRITE_COMPLETED:
+        case AUDIO_NONBLOCK_WRITE_COMPELETED:
             return HDF_SUCCESS;
         case AUDIO_RENDER_FULL:
             return HDF_SUCCESS;
@@ -153,7 +153,7 @@ int32_t AudioRenderCallbackUtTest(enum AudioCallbackType type, void *reserved, v
             return HDF_SUCCESS;
         case AUDIO_ERROR_OCCUR:
             return HDF_FAILURE;
-        case AUDIO_DRAIN_COMPLETED:
+        case AUDIO_DRAIN_COMPELETED:
             return HDF_FAILURE;
         default:
             return HDF_FAILURE;
