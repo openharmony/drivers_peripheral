@@ -230,7 +230,7 @@ typedef enum {
     MEDIA_MIMETYPE_IMAGE_JPEG = 0,        /**< JPEG image */
     MEDIA_MIMETYPE_VIDEO_AVC,             /**< H.264 video */
     MEDIA_MIMETYPE_VIDEO_HEVC,            /**< H.265 video */
-
+    MEDIA_MIMETYPE_VIDEO_MPEG4,           /**< MPEG4 video */
     MEDIA_MIMETYPE_AUDIO_FIRST = 0x10000, /**< Dummy id pointing at the start of audio codecs */
     MEDIA_MIMETYPE_AUDIO_AAC = 0x10000,   /**< AAC audio */
     MEDIA_MIMETYPE_AUDIO_G711A,           /**< G711A audio */
