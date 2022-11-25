@@ -1675,6 +1675,10 @@ int32_t UsbImpl::BindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 
 int32_t UsbImpl::UnbindUsbdSubscriber(const sptr<IUsbdSubscriber> &subscriber)
 {
+    if (subscriber == nullptr) {
+        HDF_LOGE("%{public}s:subscriber is  null", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     int32_t i;
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IUsbdSubscriber>(subscriber);
     for (i = 0; i < MAX_SUBSCRIBER; i++) {
