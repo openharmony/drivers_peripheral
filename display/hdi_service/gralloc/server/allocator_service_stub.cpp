@@ -54,9 +54,7 @@ int32_t AllocatorServiceStub::AllocaltorStubAllocMem(MessageParcel &data, Messag
     }
 
     if (WriteBufferHandle(reply, *buffer) != true) {
-        if (buffer != nullptr) {
-            FreeBufferHandle(buffer);
-        }
+        FreeBufferHandle(buffer);
         HDF_LOGE("%{public}s: WriteBufferHandle failed", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
