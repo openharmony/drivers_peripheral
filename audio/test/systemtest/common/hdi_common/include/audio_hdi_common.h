@@ -207,6 +207,8 @@ struct PrepareAudioPara {
 
 int32_t InitAttrs(struct AudioSampleAttributes &attrs);
 
+int32_t InitAttrsCapture(struct AudioSampleAttributes &attrs);
+
 int32_t InitDevDesc(struct AudioDeviceDescriptor &devDesc, const uint32_t portId, int pins);
 
 int32_t SwitchAdapter(struct AudioAdapterDescriptor *descs, const std::string &adapterNameCase,
