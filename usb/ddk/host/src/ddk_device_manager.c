@@ -17,8 +17,11 @@
 
 #include <ctype.h>
 #include <dirent.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 #include "ddk_sysfs_device.h"
+#include "default_config.h"
 #include "hdf_base.h"
 #include "hdf_dlist.h"
 #include "hdf_io_service_if.h"
@@ -44,6 +47,11 @@ struct UsbDdkDeviceList {
 
 #ifdef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
 static struct UsbDdkDeviceList g_ddkDevList = {.isInit = false};
+#define STATE_STRING_LENGTH 20
+
+#ifndef USB_GADGET_STATE_PATH
+#define USB_GADGET_STATE_PATH "invalid_path"
+#endif
 
 static struct UsbDdkDeviceInfo *DdkDevMgrIsDevExists(uint64_t devAddr)
 {
@@ -235,8 +243,32 @@ int32_t DdkDevMgrForEachDeviceSafe(DdkDevMgrHandleDev handle, void *priv)
 
 int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *priv)
 {
-    (void)handle;
-    (void)priv;
+    if (priv == NULL || handle == NULL) {
+        HDF_LOGE("%{public}s: invalid param.", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    int32_t fd = open(USB_GADGET_STATE_PATH, O_RDONLY | O_CLOEXEC);
+    if (fd == -1) {
+        HDF_LOGE("%{public}s: open file failed  errno:%{public}d", __func__, errno);
+        return HDF_ERR_IO;
+    }
+
+    char buf[STATE_STRING_LENGTH] = {0};
+    ssize_t numRead = read(fd, buf, STATE_STRING_LENGTH);
+    close(fd);
+    if (numRead <= 0) {
+        HDF_LOGE("%{public}s: read state failed errno:%{public}d", __func__, errno);
+        return HDF_ERR_IO;
+    }
+
+    if ((strncmp(buf, "CONNECTED", strlen("CONNECTED")) == 0) ||
+        (strncmp(buf, "CONFIGURED", strlen("CONFIGURED")) == 0)) {
+        // call back
+        if (handle(priv) != HDF_SUCCESS) {
+            HDF_LOGW("%{public}s: handle failed", __func__);
+        }
+    }
+
     return HDF_SUCCESS;
 }
 #else                                                                           // USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
@@ -313,8 +345,8 @@ static int32_t DdkDevMgrGetGadgetStatus(int32_t *gadgetStatus)
         return HDF_DEV_ERR_NO_MEMORY;
     }
 
-    int32_t ret = g_usbPnpSrv->dispatcher->Dispatch(&g_usbPnpSrv->object,
-        USB_PNP_DRIVER_GET_GADGET_LINK_STATUS, NULL, reply);
+    int32_t ret =
+        g_usbPnpSrv->dispatcher->Dispatch(&g_usbPnpSrv->object, USB_PNP_DRIVER_GET_GADGET_LINK_STATUS, NULL, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:failed to send service call, ret:%{public}d", __func__, ret);
         HdfSbufRecycle(reply);
