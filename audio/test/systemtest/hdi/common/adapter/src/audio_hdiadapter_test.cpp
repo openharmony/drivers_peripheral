@@ -332,6 +332,39 @@ HWTEST_F(AudioHdiAdapterTest, AudioAdapterInitAllPorts_001, TestSize.Level1)
 }
 
 /**
+* @tc.name  AudioAdapterInitAllPorts_002
+* @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if loads two adapters successfully.
+* @tc.type: FUNC
+*/
+HWTEST_F(AudioHdiAdapterTest, AudioAdapterInitAllPorts_002, TestSize.Level1)
+{
+    int32_t ret = -1;
+    int32_t ret2 = -1;
+    struct AudioPort* renderPort = nullptr;
+    struct AudioPort* renderPortUsb = nullptr;
+    struct AudioAdapter *adapter = nullptr;
+    struct AudioAdapter *adapter1 = nullptr;
+
+    ASSERT_NE(nullptr, manager);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
+    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
+    ASSERT_NE(nullptr, adapter);
+    ret2 = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_OUT, &adapter1, renderPortUsb);
+    if (ret2 < 0 || adapter1 == nullptr) {
+        manager->UnloadAdapter(manager, adapter);
+        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret2);
+    }
+    ret = adapter->InitAllPorts(adapter);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+
+    ret2 = adapter1->InitAllPorts(adapter1);
+    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret2);
+
+    manager->UnloadAdapter(manager, adapter);
+    manager->UnloadAdapter(manager, adapter1);
+}
+
+/**
 * @tc.name  AudioAdapterInitAllPorts_003
 * @tc.desc  Test AudioAdapterInitAllPorts API, return -1 if the parameter adapter is empty.
 * @tc.type: FUNC

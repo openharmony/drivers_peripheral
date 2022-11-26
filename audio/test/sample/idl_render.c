@@ -43,6 +43,13 @@
 #define BITS_TO_FROMAT                 3
 #define SERVICE_NAME                   "audio_manager_service"
 
+enum RenderSoundCardMode {
+    PRIMARY = 1,
+    PRIMARY_EXT = 2,
+    AUDIO_USB = 3,
+    AUDIO_A2DP = 4,
+};
+
 struct StrPara {
     struct IAudioRender *render;
     FILE *file;
@@ -718,6 +725,7 @@ static int32_t InitParam(void)
 
     if (RenderGetAdapterAndInitEnvParams() < 0) {
         AUDIO_FUNC_LOGE("GetProxyManagerFunc Fail");
+
         if (g_audioManager != NULL) {
             IAudioManagerRelease(g_audioManager, g_isDirect);
             g_audioManager = NULL;

@@ -375,7 +375,7 @@ static int32_t SelectAppropriateAdapter(
     }
     switch (adapterType) {
         case AUDIO_ADAPTER_PRIMARY:
-        case AUDIO_ADAPTER_HDMI:
+        case AUDIO_ADAPTER_PRIMARY_EXT:
             ret = LoadAdapterPrimary(desc, adapter);
             if (ret != AUDIO_SUCCESS) {
                 AUDIO_FUNC_LOGE("LoadAdapterPrimary failed.");

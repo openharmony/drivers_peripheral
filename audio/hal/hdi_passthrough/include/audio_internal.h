@@ -56,13 +56,12 @@ extern "C" {
 #define KEY_VALUE_LIST_LEN 128
 
 #define HDF_AUDIO_CODEC_PRIMARY_DEV         "hdf_audio_codec_primary_dev"
-#define HDF_AUDIO_CODEC_HDMI_DEV            "hdf_audio_codec_hdmi_dev"
 #define HDF_AUDIO_CODEC_USB_DEV             "hdf_audio_codec_usb_dev"
 #define HDF_AUDIO_CODEC_A2DP_DEV            "hdf_audio_codec_a2dp_dev"
 #define PRIMARY                             "primary"
 #define USB                                 "usb"
 #define A2DP                                "a2dp"
-#define HDMI                                "hdmi"
+
 
 /**
  * @brief Enumerates HAL return value types.

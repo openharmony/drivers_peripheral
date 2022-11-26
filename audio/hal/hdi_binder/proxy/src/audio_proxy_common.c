@@ -54,7 +54,7 @@ int32_t AudioProxyAdapterGetRemoteHandle(struct AudioProxyManager *proxyManager,
         AUDIO_FUNC_LOGE("AudioProxyAdapterGetRemoteHandle parameter is null");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0 || strncmp(adapterName, HDMI, strlen(HDMI)) == 0) {
+    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
         hwAdapter->proxyRemoteHandle = proxyManager->remote;
     } else if (strncmp(adapterName, USB, strlen(USB)) == 0) {
         hwAdapter->proxyRemoteHandle = proxyManager->usbRemote;
