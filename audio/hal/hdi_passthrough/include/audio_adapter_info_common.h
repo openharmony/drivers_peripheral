@@ -32,8 +32,8 @@
 #define AUDIO_PRIMARY_ID_MIN        0
 #define AUDIO_PRIMARY_ID_MAX        10
 
-#define AUDIO_HDMI_ID_MIN    11
-#define AUDIO_HDMI_ID_MAX    20
+#define AUDIO_PRIMARY_EXT_ID_MIN    11
+#define AUDIO_PRIMARY_EXT_ID_MAX    20
 
 #define AUDIO_USB_ID_MIN            21
 #define AUDIO_USB_ID_MAX            30
@@ -43,7 +43,7 @@
 
 enum AudioAdapterType {
     AUDIO_ADAPTER_PRIMARY = 0,  /* internal sound card */
-    AUDIO_ADAPTER_HDMI,         /* hdmi sound card */
+    AUDIO_ADAPTER_PRIMARY_EXT,  /* extern sound card */
     AUDIO_ADAPTER_USB,         /* usb sound card */
     AUDIO_ADAPTER_A2DP,         /* blue tooth sound card */
     AUDIO_ADAPTER_MAX,          /* Invalid value. */

@@ -34,7 +34,7 @@
         }]
     },
     {
-        "name": "hdmi",
+        "name": "primary_ext",
         "portnum": 1,
         "port": [{
             "dir": "PORT_OUT",

@@ -240,8 +240,6 @@ static int32_t AudioMakeCardServiceName(
     }
     if (strncmp(adapterDescriptor->adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
         ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_PRIMARY_DEV, portId);
-    } else if (strncmp(adapterDescriptor->adapterName, HDMI, strlen(HDMI)) == 0) {
-        ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_HDMI_DEV, priPortId);
     } else if (strncmp(adapterDescriptor->adapterName, USB, strlen(USB)) == 0) {
         ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_PRIMARY_DEV, priPortId);
     } else if (strncmp(adapterDescriptor->adapterName, A2DP, strlen(A2DP)) == 0) {

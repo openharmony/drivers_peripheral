@@ -19,7 +19,7 @@
 #include "hdf_types.h"
 
 /* start input-event to monitor analog headset/headphone */
-int32_t AudioHeadsetPnpInputStartThread(void);
-void AudioHeadsetPnpInputEndThread(void);
+int32_t AudioPnpInputStartThread(void);
+void AudioPnpInputEndThread(void);
 
 #endif
