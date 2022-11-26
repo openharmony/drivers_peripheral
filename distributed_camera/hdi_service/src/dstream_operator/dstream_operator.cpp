@@ -393,9 +393,6 @@ int32_t DStreamOperator::DoCapture(int32_t captureId, const CaptureInfo &info, b
     captureInfo->enableShutterCallback_ = info.enableShutterCallback_;
     InsertCaptureInfo(captureId, captureInfo);
 
-    if (dcStreamOperatorCallback_) {
-        dcStreamOperatorCallback_->OnCaptureStarted(captureId, info.streamIds_);
-    }
     SetCapturing(true);
     DHLOGI("DStreamOperator::DoCapture, start distributed camera capture success.");
 
@@ -626,6 +623,12 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const DCameraBuffer &bu
     if (captureId == -1) {
         DHLOGE("ShutterBuffer failed, invalid streamId = %d", streamId);
         return DCamRetCode::INVALID_ARGUMENT;
+    }
+
+    if (buffer.index_ == 0 && dcStreamOperatorCallback_ != nullptr) {
+        vector<int> tmpStreamIds;
+        tmpStreamIds.push_back(streamId);
+        dcStreamOperatorCallback_->OnCaptureStarted(captureId, tmpStreamIds);
     }
 
     auto stream = FindHalStreamById(streamId);
