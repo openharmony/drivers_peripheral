@@ -61,10 +61,6 @@ ohos_unittest("test_hdisrv") {
   sources = [
     "//drivers/peripheral/battery/charger/backlight/battery_backlight.cpp",
     "//drivers/peripheral/battery/charger/led/battery_led.cpp",
-    "//drivers/peripheral/battery/charger/src/charger.cpp",
-    "//drivers/peripheral/battery/charger/src/charger_thread.cpp",
-    "//drivers/peripheral/battery/charger/ui/charger_animation.cpp",
-    "//drivers/peripheral/battery/charger/vibrate/battery_vibrate.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
@@ -104,18 +100,7 @@ ohos_unittest("test_hdisrv") {
 ohos_unittest("test_capacity_shutdown") {
   module_out_path = module_output_path
 
-  sources = [
-    "//drivers/peripheral/battery/charger/backlight/battery_backlight.cpp",
-    "//drivers/peripheral/battery/charger/led/battery_led.cpp",
-    "//drivers/peripheral/battery/charger/src/charger.cpp",
-    "//drivers/peripheral/battery/charger/src/charger_thread.cpp",
-    "//drivers/peripheral/battery/charger/ui/charger_animation.cpp",
-    "//drivers/peripheral/battery/charger/vibrate/battery_vibrate.cpp",
-    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
-    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
-    "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
-    "src/capacity_shutdown_test.cpp",
-  ]
+  sources = [ "src/capacity_shutdown_test.cpp" ]
 
   configs = [ ":module_private_config" ]
 
