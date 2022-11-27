@@ -822,6 +822,9 @@ void DStreamOperator::AppendCaptureInfo(std::shared_ptr<DCCaptureInfo> &appendCa
                 break;
             }
         }
+        if (inputCaptureInfo->type_ == DCStreamType::SNAPSHOT_FRAME) {
+            ChooseSuitableStreamId(appendCaptureInfo);
+        }
         inputCaptureInfo->isCapture_ = isStreaming ? false : true;
     }
 }
@@ -969,6 +972,30 @@ void DStreamOperator::ChooseSuitableEncodeType(std::vector<std::shared_ptr<DCStr
             captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_JPEG;
         } else {
             captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_NULL;
+        }
+    }
+}
+
+void DStreamOperator::ChooseSuitableStreamId(std::shared_ptr<DCCaptureInfo> &captureInfo)
+{
+    if (captureInfo == nullptr) {
+        DHLOGE("DStreamOperator::ChooseSuitableStreamId captureInfo is null");
+        return;
+    }
+
+    captureInfo->streamIds_.clear();
+    std::lock_guard<std::mutex> autoLock(streamAttrLock_);
+    for (auto iter : halCaptureInfoMap_) {
+        for (auto id : iter.second->streamIds_) {
+            auto dcStreamInfo = dcStreamInfoMap_.find(id);
+            if (dcStreamInfo == dcStreamInfoMap_.end()) {
+                continue;
+            }
+
+            if (dcStreamInfo->second->type_ == DCStreamType::CONTINUOUS_FRAME) {
+                DHLOGI("DStreamOperator::ChooseSuitableStreamId, streamId: %d", id);
+                captureInfo->streamIds_.push_back(id);
+            }
         }
     }
 }
