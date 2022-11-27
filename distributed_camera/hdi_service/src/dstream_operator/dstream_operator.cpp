@@ -706,11 +706,11 @@ void DStreamOperator::Release()
     DHLOGI("DStreamOperator::Release, begin release stream operator.");
 
     std::vector<int> streamIds = GetStreamIds();
+    SetCapturing(false);
     ReleaseStreams(streamIds);
     if (latestStreamSetting_) {
         latestStreamSetting_ = nullptr;
     }
-    SetCapturing(false);
     {
         std::lock_guard<std::mutex> lockStream(halStreamLock_);
         halStreamMap_.clear();
