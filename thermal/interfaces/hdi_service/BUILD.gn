@@ -27,6 +27,7 @@ ohos_shared_library("libthermal_interface_service_1.0") {
     "src/thermal_dfx.cpp",
     "src/thermal_hdf_config.cpp",
     "src/thermal_hdf_timer.cpp",
+    "src/thermal_hdf_utils.cpp",
     "src/thermal_interface_impl.cpp",
     "src/thermal_simulation_node.cpp",
     "src/thermal_zone_manager.cpp",

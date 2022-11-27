@@ -45,7 +45,6 @@ private:
     void CompressFile();
     static void InfoChangedCallback(const char* key, const char* value, void* context);
     bool PrepareWriteDfxLog();
-    int32_t ParseValue(const std::string& path, std::string& value);
     int32_t LoopingThreadEntry();
     std::string GetFileNameIndex(const uint32_t index);
 };

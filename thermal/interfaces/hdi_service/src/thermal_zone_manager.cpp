@@ -28,6 +28,7 @@
 #include <sys/types.h>
 
 #include "osal/osal_mem.h"
+#include "thermal_hdf_utils.h"
 #include "thermal_log.h"
 
 using namespace std;
@@ -37,7 +38,6 @@ namespace HDI {
 namespace Thermal {
 namespace V1_0 {
 namespace {
-const int32_t MAX_BUFF_SIZE = 128;
 const int32_t MAX_SYSFS_SIZE = 128;
 const std::string THERMAL_SYSFS = "/sys/devices/virtual/thermal";
 const std::string THERMAL_ZONE_DIR_NAME = "thermal_zone%d";
@@ -130,53 +130,9 @@ int32_t ThermalZoneManager::InitThermalZoneSysfs()
     return HDF_SUCCESS;
 }
 
-inline void ThermalZoneManager::Trim(char* str) const
-{
-    if (str == nullptr) {
-        return;
-    }
-
-    str[strcspn(str, "\n")] = 0;
-}
-
-int32_t ThermalZoneManager::ReadSysfsFile(const char* path, char* buf, size_t size) const
-{
-    int32_t readSize;
-    int32_t fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
-    if (fd < NUM_ZERO) {
-        THERMAL_HILOGW(COMP_HDI, "failed to open %{private}s", path);
-        return HDF_ERR_IO;
-    }
-
-    readSize = read(fd, buf, size - 1);
-    if (readSize < NUM_ZERO) {
-        THERMAL_HILOGW(COMP_HDI, "failed to read %{private}s", path);
-        close(fd);
-        return HDF_ERR_IO;
-    }
-
-    buf[readSize] = '\0';
-    Trim(buf);
-    close(fd);
-
-    return HDF_SUCCESS;
-}
-
-int32_t ThermalZoneManager::ReadThermalSysfsToBuff(const char* path, char* buf, size_t size) const
-{
-    int32_t ret = ReadSysfsFile(path, buf, size);
-    if (ret != HDF_SUCCESS) {
-        THERMAL_HILOGW(COMP_HDI, "read path %{private}s failed, ret: %{public}d", path, ret);
-        return ret;
-    }
-
-    return HDF_SUCCESS;
-}
-
 int32_t ThermalZoneManager::ParseThermalZoneInfo()
 {
     int32_t ret;
-    char bufType[MAX_BUFF_SIZE] = {0};
     THERMAL_HILOGD(COMP_HDI, "start to parse thermal zone");
 
     ret = InitThermalZoneSysfs();
@@ -185,14 +141,14 @@ int32_t ThermalZoneManager::ParseThermalZoneInfo()
     }
     std::map<std::string, std::string> tzPathMap;
     if (!lTzSysPathInfo_.empty()) {
-        THERMAL_HILOGI(COMP_HDI, "tzInfo.size=%{public}zu", GetLTZPathInfo().size());
+        THERMAL_HILOGI(COMP_HDI, "thermal_zone size: %{public}zu", GetLTZPathInfo().size());
         for (auto iter = lTzSysPathInfo_.begin(); iter != lTzSysPathInfo_.end(); iter++) {
-            ret = ReadThermalSysfsToBuff(iter->typePath, bufType, sizeof(bufType));
+            std::string tzType;
+            ret = ThermalHdfUtils::GetInstance().ReadNode(iter->typePath, tzType);
             if (ret != HDF_SUCCESS) {
-                THERMAL_HILOGE(COMP_HDI, "failed to read thermal zone type");
-                return ret;
+                THERMAL_HILOGE(COMP_HDI, "read tz type failed, path: %{public}s", iter->typePath);
+                continue;
             }
-            std::string tzType = bufType;
             tzPathMap.insert(std::make_pair(tzType, iter->temperturePath));
         }
     }
@@ -309,14 +265,12 @@ void ThermalZoneManager::SetMultiples()
 
 void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<int32_t> &multipleList)
 {
-    char tempBuf[MAX_BUFF_SIZE] = {0};
     if (sensorTypeMap_.empty()) {
         THERMAL_HILOGD(COMP_HDI, "sensorTypeMap is empty"); {
             return;
         }
     }
 
-    int32_t ret;
     tzInfoAcaualEvent_.info.clear();
     multipleList.clear();
     for (auto sensorIter : sensorTypeMap_) {
@@ -327,17 +281,11 @@ void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<i
         THERMAL_HILOGD(COMP_HDI, "multiple %{public}d", sensorIter.second->multiple_);
         if (reportTime % (sensorIter.second->multiple_) == NUM_ZERO) {
             for (auto iter : sensorIter.second->thermalDataList_) {
-                THERMAL_HILOGD(COMP_HDI, "data type %{public}s", iter.type.c_str());
-                THERMAL_HILOGD(COMP_HDI, "data temp path %{private}s", iter.tempPath.c_str());
                 ThermalZoneInfo info;
                 info.type = iter.type;
-                ret = ReadThermalSysfsToBuff(iter.tempPath.c_str(), tempBuf, sizeof(tempBuf));
-                if (ret != NUM_ZERO) {
-                    THERMAL_HILOGE(COMP_HDI, "failed to read thermal zone temp");
-                    continue;
-                }
-                info.temp = ConvertInt(tempBuf);
-                THERMAL_HILOGD(COMP_HDI, "temp=%{public}d", info.temp);
+                info.temp = ThermalHdfUtils::GetInstance().ReadNodeToInt(iter.tempPath);
+                THERMAL_HILOGD(COMP_HDI, "type: %{public}s temp: %{public}d path %{public}s",
+                    iter.type.c_str(), info.temp, iter.tempPath.c_str());
                 tzInfoAcaualEvent_.info.push_back(info);
             }
         }
