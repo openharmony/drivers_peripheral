@@ -79,6 +79,7 @@ private:
         std::shared_ptr<DCCaptureInfo> &captureInfo);
     void ChooseSuitableEncodeType(std::vector<std::shared_ptr<DCStreamInfo>> &streamInfo,
         std::shared_ptr<DCCaptureInfo> &captureInfo);
+    void ChooseSuitableStreamId(std::shared_ptr<DCCaptureInfo> &captureInfo);
     void ConvertStreamInfo(const StreamInfo &srcInfo, std::shared_ptr<DCStreamInfo> &dstInfo);
     DCEncodeType ConvertDCEncodeType(std::string &srcEncodeType);
     std::shared_ptr<DCCaptureInfo> BuildSuitableCaptureInfo(const CaptureInfo& srcCaptureInfo,
