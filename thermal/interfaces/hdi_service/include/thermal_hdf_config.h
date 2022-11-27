@@ -74,7 +74,7 @@ public:
     {
         return baseConfig_;
     }
-    std::vector<DfxTraceInfo> GetTracingInfo()
+    std::vector<DfxTraceInfo>& GetTracingInfo()
     {
         return traceInfo_;
     }
