@@ -199,7 +199,7 @@ int32_t UsbdFunction::UsbdWaitUdc()
 {
     // get udc name
     char udcName[UDC_NAME_MAX_LEN] = {0};
-    int32_t ret = GetParameter("sys.usb.controller", "invalid", udcName, UDC_NAME_MAX_LEN);
+    int32_t ret = GetParameter("sys.usb.controller", "invalid", udcName, UDC_NAME_MAX_LEN - 1);
     if (ret <= 0) {
         HDF_LOGE("%{public}s: GetParameter failed", __func__);
         return HDF_FAILURE;
