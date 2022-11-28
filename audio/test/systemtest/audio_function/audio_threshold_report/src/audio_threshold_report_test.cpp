@@ -52,7 +52,7 @@ using THREAD_FUNC = void *(*)(void *);
 void AudioThresholdReportTest::SetUpTestCase(void)
 {
     (void)HdfRemoteGetCallingPid();
-    ASSERT_NE(nullptr, GetAudioManagerFuncs();
+    ASSERT_NE(nullptr, GetAudioManagerFuncs());
     manager = getAudioManager();
     ASSERT_NE(nullptr, manager);
     servmgr = SvcMgrIoserviceGet();

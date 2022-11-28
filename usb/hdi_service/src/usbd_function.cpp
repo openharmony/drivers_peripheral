@@ -179,16 +179,16 @@ int32_t UsbdFunction::UsbdEnableDevice()
     int32_t ret = GetParameter("sys.usb.controller", "invalid", udcName, UDC_NAME_MAX_LEN);
     if (ret <= 0) {
         HDF_LOGE("%{public}s: GetParameter failed", __func__);
-        return HDF_FAILURE;
-    }
-
-    ret = fwrite(udcName, strlen(udcName), 1, fp);
-    if (ret != 1) {
-        HDF_LOGE("%{public}s: fwrite failed", __func__);
         (void)fclose(fp);
         return HDF_FAILURE;
     }
+
+    size_t count = fwrite(udcName, strlen(udcName), 1, fp);
     (void)fclose(fp);
+    if (count != 1) {
+        HDF_LOGE("%{public}s: fwrite failed", __func__);
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
 }
 
@@ -196,7 +196,7 @@ int32_t UsbdFunction::UsbdWaitUdc()
 {
     // get udc name
     char udcName[UDC_NAME_MAX_LEN] = {0};
-    int32_t ret = GetParameter("sys.usb.controller", "invalid", udcName, UDC_NAME_MAX_LEN);
+    int32_t ret = GetParameter("sys.usb.controller", "invalid", udcName, UDC_NAME_MAX_LEN - 1);
     if (ret <= 0) {
         HDF_LOGE("%{public}s: GetParameter failed", __func__);
         return HDF_FAILURE;
@@ -209,6 +209,8 @@ int32_t UsbdFunction::UsbdWaitUdc()
             HDF_LOGE("%{public}s: fopen failed", __func__);
             return HDF_ERR_BAD_FD;
         }
+
+        (void)memset_s(tmpName, UDC_NAME_MAX_LEN, 0, UDC_NAME_MAX_LEN);
         if (fread(tmpName, strlen(udcName), 1, fp) != 1) {
             HDF_LOGE("%{public}s: fread failed", __func__);
         }
