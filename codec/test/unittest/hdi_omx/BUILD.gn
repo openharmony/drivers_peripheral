@@ -15,8 +15,12 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
+declare_args() {
+  drivers_peripheral_codec_support_omx = false
+}
+
 ohos_unittest("codec_hdi_omx_test") {
-  module_out_path = "hdf/codec"
+  module_out_path = "drivers_peripheral_codec/codec"
   include_dirs = [
     "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
@@ -24,9 +28,12 @@ ohos_unittest("codec_hdi_omx_test") {
     "//third_party/openmax/api/1.1.2",
     "//drivers/peripheral/display/hdi_service/gralloc/include",
   ]
-  sources = [ "codec_hdi_omx_test.cpp" ]
+  sources = [
+    "codec_hdi_manger_test.cpp",
+    "codec_hdi_omx_test.cpp",
+  ]
   deps = [
-    "//drivers/peripheral/codec/hal:codec_hdi_omx",
+    "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
     "//third_party/googletest:gtest_main",
   ]
 
@@ -44,14 +51,13 @@ ohos_unittest("codec_hdi_omx_test") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-
-  OMX_IL_PATH = rebase_path(
-          "//device/soc/${device_company}/${product_name}/hardware/omx_il")
-  cmd = "if [ -f ${OMX_IL_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
-  HAVE_OMX_IL_PATH =
-      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
-
-  if (HAVE_OMX_IL_PATH) {
-    cflags = [ "-DSUPPORT_OMX" ]
+  defines = []
+  if (drivers_peripheral_codec_support_omx) {
+    defines += [ "SUPPORT_OMX" ]
   }
+}
+
+group("codec_hdi_2.0_test") {
+  testonly = true
+  deps = [ ":codec_hdi_omx_test" ]
 }
