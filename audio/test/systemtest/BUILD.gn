@@ -31,13 +31,17 @@ if (defined(ohos_lite)) {
     testonly = true
     deps = []
     if (drivers_peripheral_audio_full_test_suite) {
-      deps += [
-        "hdi:hdi",
-        "hdi_service:hdi_service_st",
-        "supportlibs:supportlibs",
+      if (drivers_peripheral_audio_rich_device) {
+        deps += [ "hdi_advance:hdi_advance" ]
+      } else {
+        deps += [
+          "hdi:hdi",
+          "hdi_service:hdi_service_st",
+          "supportlibs:supportlibs",
 
-        #"audio_adapter:audio_adapter",
-      ]
+          #"audio_adapter:audio_adapter",
+        ]
+      }
       if (!defined(drivers_peripheral_audio_alsa_lib) ||
           drivers_peripheral_audio_alsa_lib == false) {
         deps += [
