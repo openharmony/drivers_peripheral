@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,8 +26,9 @@
 #define AUDIO_REPLY_EXTEND 64
 #define AUDIO_SIZE_FRAME_16K (16 * 1024)
 #define AUDIO_TRYNUM 2
-#define AUDIO_TRYNUM_TIME 3000
-#define AUDIO_US_TO_MS 1000
+#define AUDIO_US_TO_MS          1000
+#define AUDIO_TRYNUM_TIME       ((AUDIO_US_TO_MS) * 3)
+#define AUDIO_CAP_WAIT_DELAY    ((AUDIO_US_TO_MS) * 5)
 
 /* Out Put Capture */
 static struct AudioPcmHwParams g_hwParams;
