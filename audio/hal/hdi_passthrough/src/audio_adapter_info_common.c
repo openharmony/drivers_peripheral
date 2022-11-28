@@ -544,7 +544,6 @@ enum AudioAdapterType MatchAdapterType(const char *adapterName, uint32_t portId)
 {
     if (adapterName == NULL) {
         AUDIO_FUNC_LOGE("Invalid parameter!\n");
-
         return AUDIO_ADAPTER_MAX;
     }
 
@@ -553,6 +552,8 @@ enum AudioAdapterType MatchAdapterType(const char *adapterName, uint32_t portId)
             return AUDIO_ADAPTER_PRIMARY;
         }
         return AUDIO_ADAPTER_PRIMARY_EXT;
+    } else if (strcmp(adapterName, HDMI) == 0) {
+        return AUDIO_ADAPTER_HDMI;
     } else if (strcmp(adapterName, USB) == 0) {
         return AUDIO_ADAPTER_USB;
     } else if (strcmp(adapterName, A2DP) == 0) {
@@ -579,6 +580,11 @@ int32_t AudioAdapterCheckPortId(const char *adapterName, uint32_t portId)
             break;
         case AUDIO_ADAPTER_PRIMARY_EXT:
             if (portId < AUDIO_PRIMARY_EXT_ID_MIN || portId > AUDIO_PRIMARY_EXT_ID_MAX) {
+                AUDIO_FUNC_LOGE("portId is invalid!");
+                return HDF_FAILURE;
+            }
+        case AUDIO_ADAPTER_HDMI:
+            if (portId < AUDIO_HDMI_ID_MIN || portId > AUDIO_HDMI_ID_MAX) {
                 AUDIO_FUNC_LOGE("portId is invalid!");
                 return HDF_FAILURE;
             }
@@ -1025,6 +1031,8 @@ int32_t InitPortForCapabilitySub(struct AudioPort portIndex, struct AudioPortCap
         capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000 | AUDIO_SAMPLE_RATE_MASK_8000;
     } else if (portIndex.portId >= AUDIO_PRIMARY_EXT_ID_MIN && portIndex.portId <= AUDIO_PRIMARY_EXT_ID_MAX) {
         capabilityIndex->deviceId = PIN_OUT_SPEAKER;
+    } else if (portIndex.portId >= AUDIO_HDMI_ID_MIN && portIndex.portId <= AUDIO_HDMI_ID_MAX) {
+        capabilityIndex->deviceId = PIN_OUT_HDMI;
         capabilityIndex->sampleRateMasks = AUDIO_SAMPLE_RATE_MASK_16000 | AUDIO_SAMPLE_RATE_MASK_24000;
     } else {
         AUDIO_FUNC_LOGE("The port ID not support!");

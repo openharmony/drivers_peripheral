@@ -1137,6 +1137,7 @@ static int32_t MatchAppropriateAdapter(enum AudioAdapterType adapterType)
     switch (adapterType) {
         case AUDIO_ADAPTER_PRIMARY:
         case AUDIO_ADAPTER_PRIMARY_EXT:
+        case AUDIO_ADAPTER_HDMI:
             if (AudioHdiGetLoadServerFlag() != AUDIO_SERVER_PRIMARY) {
                 AUDIO_FUNC_LOGE("Can't loadAdapterPrimary.");
                 return AUDIO_HAL_ERR_INTERNAL;
@@ -1169,11 +1170,11 @@ static int AudioServiceUpateDevice(struct HdfDeviceObject *device, const char *s
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (HdfDeviceObjectSetServInfo(device, servInfo) != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("HdfDeviceObjectSetServInfo failed!");
+        AUDIO_FUNC_LOGW("HdfDeviceObjectSetServInfo failed!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (HdfDeviceObjectUpdate(device) != AUDIO_HAL_SUCCESS) {
-        AUDIO_FUNC_LOGE("HdfDeviceObjectUpdate failed!");
+        AUDIO_FUNC_LOGW("HdfDeviceObjectUpdate failed!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
@@ -1196,7 +1197,7 @@ int32_t AudioServiceStateChange(struct HdfDeviceObject *device, struct AudioEven
                          g_audioEventService.deviceType);
     if (ret >= 0) {
         if (AudioServiceUpateDevice(device, (const char *)strMsg) != AUDIO_HAL_SUCCESS) {
-            AUDIO_FUNC_LOGE("AudioServiceUpate fail!");
+            AUDIO_FUNC_LOGW("AudioServiceUpate fail!");
             return AUDIO_HAL_ERR_INTERNAL;
         }
     }
@@ -1305,6 +1306,7 @@ static int32_t HdiServiceLoadAdapterSub(struct HdfDeviceObject *device, struct A
     switch (sndCardType) {
         case AUDIO_ADAPTER_PRIMARY:
         case AUDIO_ADAPTER_PRIMARY_EXT:
+        case AUDIO_ADAPTER_HDMI:
             g_audioEventService.eventType = HDF_AUDIO_SERVICE_VALID;
             g_audioEventLoad.deviceType = HDF_AUDIO_PRIMARY_DEVICE;
             return HdiServiceDevOnLine(device, manager, desc, adapter, adapterName);
