@@ -34,7 +34,7 @@ public:
     AllocatorServiceStub() = default;
     virtual ~AllocatorServiceStub() = default;
     int32_t OnRemoteRequest(uint32_t cmdId, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-
+    virtual int32_t FreeMem(BufferHandle &handle) = 0;
 private:
     int32_t AllocaltorStubAllocMem(MessageParcel &data, MessageParcel &reply, MessageOption &option);
 };

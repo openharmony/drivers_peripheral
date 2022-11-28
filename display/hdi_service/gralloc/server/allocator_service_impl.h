@@ -33,7 +33,7 @@ public:
     AllocatorService();
     virtual ~AllocatorService() override;
     int32_t AllocMem(const AllocInfo &info, BufferHandle *&handle) override;
-
+    int32_t FreeMem(BufferHandle &handle) override;
 private:
     GrallocFuncs *grallocFuncs_;
 };
