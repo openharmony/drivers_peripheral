@@ -44,12 +44,20 @@ AllocatorService::~AllocatorService()
 int32_t AllocatorService::AllocMem(const AllocInfo &info, BufferHandle *&handle)
 {
     if (grallocFuncs_ == nullptr) {
-        if (GrallocInitialize(&grallocFuncs_) != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: gralloc init failed", __func__);
-            return HDF_FAILURE;
-        }
+        HDF_LOGE("%{public}s: grallocFuncs_ is nullptr", __func__);
+        return HDF_FAILURE;
     }
     return grallocFuncs_->AllocMem(&info, &handle);
+}
+
+int32_t AllocatorService::FreeMem(BufferHandle &handle)
+{
+    if (grallocFuncs_ == nullptr) {
+        HDF_LOGE("%{public}s: grallocFuncs_ is nullptr", __func__);
+        return HDF_FAILURE;
+    }
+    grallocFuncs_->FreeMem(&handle);
+    return HDF_SUCCESS;
 }
 } // namespace V1_0
 } // namespace Display
