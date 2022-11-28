@@ -61,7 +61,7 @@ extern "C" {
 #define PRIMARY                             "primary"
 #define USB                                 "usb"
 #define A2DP                                "a2dp"
-
+#define HDMI                                "hdmi"
 
 /**
  * @brief Enumerates HAL return value types.
