@@ -249,7 +249,7 @@ int32_t DdkDevMgrGetGadgetLinkStatusSafe(DdkDevMgrHandleGadget handle, void *pri
     }
     int32_t fd = open(USB_GADGET_STATE_PATH, O_RDONLY | O_CLOEXEC);
     if (fd == -1) {
-        HDF_LOGE("%{public}s: open file failed  errno:%{public}d", __func__, errno);
+        HDF_LOGE("%{public}s: open %{public}s failed  errno:%{public}d", __func__, USB_GADGET_STATE_PATH, errno);
         return HDF_ERR_IO;
     }
 
