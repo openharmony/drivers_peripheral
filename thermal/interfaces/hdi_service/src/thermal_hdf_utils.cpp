@@ -15,8 +15,7 @@
 
 #include "thermal_hdf_utils.h"
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <securec.h>
 
 #include "hdf_base.h"
 #include "thermal_log.h"
