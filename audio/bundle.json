@@ -45,7 +45,8 @@
       "test": [
         "//drivers/peripheral/audio/test:audio_test_entry",
         "//drivers/peripheral/audio/test/sample:audio_sample",
-        "//drivers/peripheral/audio/test/sample:idl_audio_sample"
+        "//drivers/peripheral/audio/test/sample:idl_audio_sample",
+        "//drivers/peripheral/audio/test/audio_utils/audio_mixer:audio_mixer"
       ],
       "inner_kits":[
         {
