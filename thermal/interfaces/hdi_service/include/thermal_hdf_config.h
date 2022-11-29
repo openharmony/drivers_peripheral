@@ -38,12 +38,13 @@ struct XMLThermal {
 
 struct DfxTraceInfo {
     std::string title;
-    std::string value;
+    std::string valuePath;
 };
 
-struct XMLTracingInfo {
-    std::string interval;
-    std::string outpath;
+struct XmlTraceConfig {
+    uint32_t interval = 0;
+    uint8_t width = 0;
+    std::string outPath;
 };
 
 class ThermalHdfConfig {
@@ -78,15 +79,15 @@ public:
     {
         return traceInfo_;
     }
-    XMLTracingInfo GetXmlTraceInfo()
+    XmlTraceConfig& GetXmlTraceConfig()
     {
-        return trace_;
+        return traceConfig_;
     }
 private:
     std::shared_ptr<BaseInfoConfig> baseConfig_;
     ThermalTypeMap typesMap_;
     XMLThermal thermal_;
-    XMLTracingInfo trace_;
+    XmlTraceConfig traceConfig_;
     std::vector<DfxTraceInfo> traceInfo_;
 };
 } // V1_0
