@@ -24,23 +24,15 @@ namespace Thermal {
 namespace V1_0 {
 class ThermalHdfUtils {
 public:
-    static ThermalHdfUtils& GetInstance()
-    {
-        static ThermalHdfUtils instance;
-        return instance;
-    }
-
-    int32_t ReadNodeToInt(const std::string& path);
-    int32_t ReadNode(const std::string& path, std::string& out);
-    int32_t WriteNode(const std::string& path, std::string& data);
-
-private:
     ThermalHdfUtils() = default;
     ~ThermalHdfUtils() = default;
     ThermalHdfUtils(const ThermalHdfUtils&) = delete;
     ThermalHdfUtils& operator=(const ThermalHdfUtils) = delete;
 
-    void TrimStr(std::string& str);
+    static int32_t ReadNodeToInt(const std::string& path);
+    static int32_t ReadNode(const std::string& path, std::string& out);
+    static int32_t WriteNode(const std::string& path, std::string& data);
+    static void TrimStr(std::string& str);
 };
 } // V1_0
 } // Thermal

@@ -30,8 +30,8 @@ namespace HDI {
 namespace Thermal {
 namespace V1_0 {
 namespace {
-const std::string HDI_XML_NAME = HDF_ETC_DIR "/thermal_config/hdf/thermal_hdi_config.xml";
-const std::string HDI_XML_CUST_NAME = HDF_ETC_DIR "/thermal_config/hdf/cust/thermal_hdi_config.xml";
+const std::string HDI_XML_PATH = HDF_ETC_DIR "/thermal_config/hdf/thermal_hdi_config.xml";
+const std::string HDI_CUST_XML_PATH = HDF_ETC_DIR "/thermal_config/cust/thermal_hdi_config.xml";
 bool g_isHdiStart = false;
 }
 static sptr<IThermalCallback> theramalCb_ = nullptr;
@@ -53,10 +53,10 @@ ThermalInterfaceImpl::ThermalInterfaceImpl()
 
 int32_t ThermalInterfaceImpl::Init()
 {
-    int32_t ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(HDI_XML_CUST_NAME);
+    int32_t ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(HDI_CUST_XML_PATH);
     if (ret != HDF_SUCCESS) {
         THERMAL_HILOGI(COMP_HDI, "init thermal hdi common XML");
-        ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(HDI_XML_NAME);
+        ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(HDI_XML_PATH);
         if (ret != HDF_SUCCESS) {
             THERMAL_HILOGE(COMP_HDI, "failed to init XML, ret: %{public}d", ret);
             return HDF_FAILURE;

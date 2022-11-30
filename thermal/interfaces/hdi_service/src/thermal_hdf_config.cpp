@@ -218,7 +218,7 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
         if (!xmlStrcmp(subNode->name, BAD_CAST"title")) {
             xmlChar* titlePath = xmlGetProp(subNode, BAD_CAST"path");
             if (titlePath != nullptr) {
-                ThermalHdfUtils::GetInstance().ReadNode(
+                ThermalHdfUtils::ReadNode(
                     std::string(reinterpret_cast<char*>(titlePath)), title);
                 THERMAL_HILOGD(COMP_HDI, "title form path is: %{private}s", title.c_str());
                 xmlFree(titlePath);
