@@ -146,7 +146,7 @@ int32_t ThermalZoneManager::ParseThermalZoneInfo()
             std::string tzType;
             ret = ThermalHdfUtils::ReadNode(iter->typePath, tzType);
             if (ret != HDF_SUCCESS) {
-                THERMAL_HILOGE(COMP_HDI, "read tz type failed, path: %{public}s", iter->typePath);
+                THERMAL_HILOGE(COMP_HDI, "read tz type failed, path: %{private}s", iter->typePath);
                 continue;
             }
             tzPathMap.insert(std::make_pair(tzType, iter->temperturePath));
