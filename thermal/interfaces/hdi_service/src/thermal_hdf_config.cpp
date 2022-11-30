@@ -246,7 +246,7 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
     traceInfo_.emplace_back(info);
 
     for (const auto& item : traceInfo_) {
-        THERMAL_HILOGD(COMP_HDI, "item.title = %{public}s, item.valuePath = %{public}s",
+        THERMAL_HILOGD(COMP_HDI, "item.title = %{public}s, item.valuePath = %{private}s",
             item.title.c_str(), item.valuePath.c_str());
     }
 }
