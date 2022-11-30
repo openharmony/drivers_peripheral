@@ -1,0 +1,79 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+if (defined(ohos_lite)) {
+  import("//build/lite/config/test.gni")
+} else {
+  import("//build/test.gni")
+  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+}
+import("//drivers/peripheral/audio/audio.gni")
+
+if (defined(ohos_lite)) {
+  moduletest("hdf_audio_hdi_capture_hardware_dependence_advance_test") {
+    sources = [
+      "../../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_hardware_dependence_test.cpp",
+    ]
+
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+      "//third_party/bounds_checking_function/include",
+      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
+      "//drivers/hdf_core/adapter/uhdf2/include/hdi",
+      "//drivers/hdf_core/framework/include/utils",
+      "//drivers/hdf_core/framework/include/core",
+      "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
+      "//third_party/googletest/googletest/include/gtest",
+    ]
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+  }
+} else {
+  module_output_path = "drivers_peripheral_audio/audio"
+
+  ohos_systemtest("hdf_audio_hdi_capture_hardware_dependence_advance_test") {
+    module_out_path = module_output_path
+    sources = [
+      "../../../common/hdi_common/src/audio_hdi_common.cpp",
+      "src/audio_hdicapture_hardware_dependence_test.cpp",
+    ]
+
+    include_dirs = [
+      "//drivers/peripheral/audio/interfaces/include",
+      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+      "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
+    ]
+    deps = [
+      "//third_party/googletest:gmock_main",
+      "//third_party/googletest:gtest_main",
+    ]
+    external_deps = [
+      "c_utils:utils",
+      "hdf_core:libhdf_utils",
+    ]
+    defines = []
+    if (enable_audio_adm_passthrough) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+      defines += [ "AUDIO_ADM_SO" ]
+    }
+    if (enable_audio_adm_service) {
+      deps +=
+          [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
+      defines += [ "AUDIO_ADM_SERVICE" ]
+    }
+    if ("${product_name}" == "rk3568") {
+      defines += [ "PRODUCT_RK3568" ]
+    }
+  }
+}
