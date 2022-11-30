@@ -83,6 +83,8 @@ ohos_shared_library("libusb_driver") {
     "//drivers/interface/usb/v1_0:libusb_stub_1.0",
   ]
 
+  shlib_type = "hdi"
+
   configs = [ ":usbd_private_config" ]
 
   public_configs = [ ":usbd_public_config" ]
