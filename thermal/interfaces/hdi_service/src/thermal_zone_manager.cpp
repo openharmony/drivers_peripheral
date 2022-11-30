@@ -144,7 +144,7 @@ int32_t ThermalZoneManager::ParseThermalZoneInfo()
         THERMAL_HILOGI(COMP_HDI, "thermal_zone size: %{public}zu", GetLTZPathInfo().size());
         for (auto iter = lTzSysPathInfo_.begin(); iter != lTzSysPathInfo_.end(); iter++) {
             std::string tzType;
-            ret = ThermalHdfUtils::GetInstance().ReadNode(iter->typePath, tzType);
+            ret = ThermalHdfUtils::ReadNode(iter->typePath, tzType);
             if (ret != HDF_SUCCESS) {
                 THERMAL_HILOGE(COMP_HDI, "read tz type failed, path: %{public}s", iter->typePath);
                 continue;
@@ -283,8 +283,8 @@ void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<i
             for (auto iter : sensorIter.second->thermalDataList_) {
                 ThermalZoneInfo info;
                 info.type = iter.type;
-                info.temp = ThermalHdfUtils::GetInstance().ReadNodeToInt(iter.tempPath);
-                THERMAL_HILOGD(COMP_HDI, "type: %{public}s temp: %{public}d path %{public}s",
+                info.temp = ThermalHdfUtils::ReadNodeToInt(iter.tempPath);
+                THERMAL_HILOGD(COMP_HDI, "type: %{public}s temp: %{public}d path %{private}s",
                     iter.type.c_str(), info.temp, iter.tempPath.c_str());
                 tzInfoAcaualEvent_.info.push_back(info);
             }

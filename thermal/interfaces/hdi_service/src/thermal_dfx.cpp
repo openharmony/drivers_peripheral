@@ -317,7 +317,7 @@ void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime)
     std::vector<DfxTraceInfo>& logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
     std::string value;
     for (auto info : logInfo) {
-        ThermalHdfUtils::GetInstance().ReadNode(info.valuePath, value);
+        ThermalHdfUtils::ReadNode(info.valuePath, value);
         wStream << value;
         if (info.valuePath == logInfo.back().valuePath && info.title == logInfo.back().title) {
             break;
@@ -360,7 +360,7 @@ int32_t ThermalDfx::Init()
     g_interval = config.interval > MIN_INTERVAL ? config.interval: MIN_INTERVAL;
     g_width = config.width > DEFAULT_WIDTH ? config.width : DEFAULT_WIDTH;
     g_outPath = config.outPath;
-    THERMAL_HILOGI(COMP_HDI, "tarce init interval: %{public}d width: %{public}d outpath: %{public}s",
+    THERMAL_HILOGI(COMP_HDI, "tarce init interval: %{public}d width: %{public}d outpath: %{private}s",
         g_interval, g_width, g_outPath.c_str());
     StartThread();
     return HDF_SUCCESS;
