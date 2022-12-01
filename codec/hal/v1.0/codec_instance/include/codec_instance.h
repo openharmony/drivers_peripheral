@@ -63,7 +63,7 @@ struct CodecInstance {
 };
 
 struct CodecInstance* GetCodecInstance(void);
-int32_t InitCodecInstance(struct CodecInstance *instance);
+int32_t InitCodecInstance(struct CodecInstance *instance, struct CodecOemIf *oemIf);
 int32_t RunCodecInstance(struct CodecInstance *instance);
 int32_t StopCodecInstance(struct CodecInstance *instance);
 int32_t DestroyCodecInstance(struct CodecInstance *instance);

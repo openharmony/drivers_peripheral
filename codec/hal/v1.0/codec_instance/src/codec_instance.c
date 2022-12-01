@@ -26,39 +26,6 @@
 #define CODEC_BUFFER_MANAGER_LIB_NAME   "libcodec_buffer_manager.z.so"
 #define BUFFER_COUNT    1
 
-static int32_t InitCodecOemIf(struct CodecInstance *instance)
-{
-    if (instance == NULL || instance->codecOemIface == NULL) {
-        HDF_LOGE("%{public}s: Invalid param!", __func__);
-        return HDF_FAILURE;
-    }
-
-    void *libHandle = dlopen(CODEC_OEM_INTERFACE_LIB_NAME, RTLD_NOW);
-    if (libHandle == NULL) {
-        HDF_LOGE("%{public}s: lib %{public}s dlopen failed, error code[%{public}s]",
-            __func__, CODEC_OEM_INTERFACE_LIB_NAME, dlerror());
-        return HDF_FAILURE;
-    }
-
-    struct CodecOemIf *iface = instance->codecOemIface;
-    iface->codecInit = (CodecInitType)dlsym(libHandle, "CodecInit");
-    iface->codecDeinit = (CodecDeinitType)dlsym(libHandle, "CodecDeinit");
-    iface->codecCreate = (CodecCreateType)dlsym(libHandle, "CodecCreate");
-    iface->codecDestroy = (CodecDestroyType)dlsym(libHandle, "CodecDestroy");
-    iface->codecSetParameter = (CodecSetParameterType)dlsym(libHandle, "CodecSetParameter");
-    iface->codecGetParameter = (CodecGetParameterType)dlsym(libHandle, "CodecGetParameter");
-    iface->codecStart = (CodecStartType)dlsym(libHandle, "CodecStart");
-    iface->codecStop = (CodecStopType)dlsym(libHandle, "CodecStop");
-    iface->codecFlush = (CodecFlushType)dlsym(libHandle, "CodecFlush");
-    iface->codecSetCallback = (CodecSetCallbackType)dlsym(libHandle, "CodecSetCallback");
-    iface->codecDecode = (CodecDecodeType)dlsym(libHandle, "CodecDecode");
-    iface->codecEncode = (CodecEncodeType)dlsym(libHandle, "CodecEncode");
-    iface->codecEncodeHeader = (CodecEncodeHeaderType)dlsym(libHandle, "CodecEncodeHeader");
-
-    instance->oemLibHandle = libHandle;
-    return HDF_SUCCESS;
-}
-
 static int32_t InitBufferManagerIf(struct CodecInstance *instance)
 {
     if (instance == NULL || instance->bufferManagerIface == NULL) {
@@ -195,23 +162,13 @@ struct CodecInstance* GetCodecInstance(void)
     return instance;
 }
 
-int32_t InitCodecInstance(struct CodecInstance *instance)
+int32_t InitCodecInstance(struct CodecInstance *instance, struct CodecOemIf *oemIf)
 {
-    if (instance == NULL) {
+    if (instance == NULL || oemIf == NULL) {
         HDF_LOGE("%{public}s: Invalid param!", __func__);
         return HDF_FAILURE;
     }
-    
-    instance->codecOemIface = (struct CodecOemIf *)OsalMemCalloc(sizeof(struct CodecOemIf));
-    if (instance->codecOemIface == NULL) {
-        HDF_LOGE("%{public}s: codecOemIface mem alloc failed", __func__);
-        return HDF_FAILURE;
-    }
-    int32_t ret = InitCodecOemIf(instance);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: InitCodecOemIf failed", __func__);
-        return HDF_FAILURE;
-    }
+    instance->codecOemIface = oemIf;
     instance->bufferManagerIface = (struct BufferManagerIf *)OsalMemAlloc(sizeof(struct BufferManagerIf));
     if (instance->bufferManagerIface == NULL) {
         HDF_LOGE("%{public}s: bufferManagerIface mem alloc failed", __func__);
@@ -258,7 +215,7 @@ int32_t DestroyCodecInstance(struct CodecInstance *instance)
     }
 
     if (instance->codecStatus == CODEC_STATUS_STARTED) {
-        HDF_LOGE("%{public}s: wait codec task stop!", __func__);
+        HDF_LOGI("%{public}s: wait codec task stop!", __func__);
         instance->codecStatus = CODEC_STATUS_STOPED;
         pthread_join(instance->task, NULL);
     }
@@ -268,16 +225,11 @@ int32_t DestroyCodecInstance(struct CodecInstance *instance)
     ReleaseInputInfo(instance);
     ReleaseOutputInfo(instance);
 
-    if (instance->codecOemIface != NULL) {
-        OsalMemFree(instance->codecOemIface);
-    }
-    dlclose(instance->oemLibHandle);
     if (instance->bufferManagerIface != NULL) {
         instance->bufferManagerIface->deleteBufferManager(&(instance->bufferManagerWrapper));
         OsalMemFree(instance->bufferManagerIface);
     }
     dlclose(instance->bufferManagerLibHandle);
-    OsalMemFree(instance);
     return HDF_SUCCESS;
 }
 
