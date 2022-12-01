@@ -124,12 +124,12 @@ void ThermalHdfTimer::ReportThermalData()
 
 void ThermalHdfTimer::ResetCount()
 {
-    THERMAL_HILOGI(COMP_HDI, "multipleList_:%{public}zu", multipleList_.size());
+    THERMAL_HILOGD(COMP_HDI, "multipleList_:%{public}zu", multipleList_.size());
     if (multipleList_.empty()) return;
 
     int32_t maxValue = *(std::max_element(multipleList_.begin(), multipleList_.end()));
     if (reportTime_ == maxValue) {
-        THERMAL_HILOGI(COMP_HDI, "reportTime:%{public}d", reportTime_);
+        THERMAL_HILOGD(COMP_HDI, "reportTime:%{public}d", reportTime_);
         reportTime_ = 0;
     }
     tzInfoEvent_.info.clear();
