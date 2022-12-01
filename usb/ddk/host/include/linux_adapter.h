@@ -45,6 +45,8 @@ static inline pid_t gettid()
 #define MAX_BULK_SHARE_MEMERY_SIZE      sizeof(struct UsbHostRequest) + \
     (URBS_PER_REQUEST * sizeof(struct UsbAdapterUrb)) + MAX_BULK_DATA_BUFFER_LENGTH
 #define MAX_CTRL_BUFFER_LENGTH  4096
+#define MAX_DRIVER_NAME_LENGTH  256
+#define DISCONNECT_CLAIM_EXCEPT_DRIVER  2
 
 #define USB_ADAPTER_URB_TYPE_ISO                0
 #define USB_ADAPTER_URB_TYPE_INTERRUPT          1
@@ -64,14 +66,18 @@ static inline pid_t gettid()
 #define USBDEVFS_CONTROL            _IOWR('U', 0, struct UsbControlRequestData)
 #define USBDEVFS_SETINTERFACE       _IOR('U', 4, struct UsbAdapterSetInterface)
 #define USBDEVFS_SETCONFIGURATION   _IOR('U', 5, unsigned int)
+#define USBDEVFS_GETDRIVER          _IOW('U', 8, struct UsbAdapterGetdriver)
 #define USBDEVFS_SUBMITURB          _IOR('U', 10, struct UsbAdapterUrb)
 #define USBDEVFS_DISCARDURB         _IO('U', 11)
 #define USBDEVFS_REAPURB            _IOW('U', 12, void *)
 #define USBDEVFS_CLAIMINTERFACE     _IOR('U', 15, unsigned int)
 #define USBDEVFS_RELEASEINTERFACE   _IOR('U', 16, unsigned int)
+#define USBDEVFS_IOCTL              _IOWR('U', 18, struct UsbAdapterIoctl)
 #define USBDEVFS_RESET              _IO('U', 20)
 #define USBDEVFS_CLEAR_HALT         _IOR('U', 21, unsigned int)
+#define USBDEVFS_DISCONNECT         _IO('U', 22)
 #define USBDEVFS_GET_CAPABILITIES   _IOR('U', 26, unsigned int)
+#define USBDEVFS_DISCONNECT_CLAIM   _IOR('U', 27, struct UsbAdapterDisconnectClaim)
 #define USBDEVFS_ALLOC_STREAMS      _IOR('U', 28, struct UsbAdapterStreams)
 #define USBDEVFS_FREE_STREAMS       _IOR('U', 29, struct UsbAdapterStreams)
 
@@ -84,6 +90,23 @@ struct UsbAdapterStreams {
     unsigned int numStreams;
     unsigned int numEps;
     unsigned char eps[0];
+};
+
+struct UsbAdapterGetdriver {
+    unsigned int interface;
+    char driver[MAX_DRIVER_NAME_LENGTH];
+};
+
+struct UsbAdapterIoctl {
+    unsigned int interface;
+    unsigned int code;
+    void *data;
+};
+
+struct UsbAdapterDisconnectClaim {
+    unsigned int interface;
+    unsigned int flags;
+    char driver[MAX_DRIVER_NAME_LENGTH];
 };
 
 struct UsbOsAdapterOps {
@@ -105,6 +128,7 @@ struct UsbOsAdapterOps {
     int32_t (*submitRequest)(struct UsbHostRequest *request);
     int32_t (*cancelRequest)(struct UsbHostRequest *request);
     int32_t (*urbCompleteHandle)(const struct UsbDeviceHandle *devHandle);
+    int32_t (*detachKernelDriverAndClaim)(const struct UsbDeviceHandle *handle, uint32_t interfaceNumber);
 };
 
 struct UsbOsAdapterOps *UsbAdapterGetOps(void);

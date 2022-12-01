@@ -129,5 +129,6 @@ void *RawUsbMemAlloc(size_t size);
 void *RawUsbMemCalloc(size_t size);
 void RawUsbMemFree(void *mem);
 int32_t RawUsbMemTestTrigger(bool enable);
+int32_t RawClaimInterfaceForce(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber);
 
 #endif /* USB_RAW_API_LIBRARY_H */
