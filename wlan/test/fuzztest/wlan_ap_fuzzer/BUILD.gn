@@ -16,10 +16,10 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "drivers_peripheral_wlan/wlan"
 
-ohos_fuzztest("WlanFuzzTest") {
+ohos_fuzztest("WlanApFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "//drivers/peripheral/wlan/test/fuzztest/wlan_fuzzer"
+  fuzz_config_file = "//drivers/peripheral/wlan/test/fuzztest/wlan_ap_fuzzer"
 
   include_dirs = [
     "//drivers/peripheral/wlan/interfaces/include",
@@ -41,10 +41,10 @@ ohos_fuzztest("WlanFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "wlan_fuzzer.cpp" ]
+  sources = [ "wlan_ap_fuzzer.cpp" ]
 }
 
-group("wlan_fuzztest") {
+group("wlan_ap_fuzztest") {
   testonly = true
-  deps = [ ":WlanFuzzTest" ]
+  deps = [ ":WlanApFuzzTest" ]
 }
