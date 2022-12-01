@@ -25,6 +25,8 @@ extern "C"
 {
 #endif
 
+void InitOemIfaceLock(void);
+void DeinitOemIfaceLock(void);
 int32_t CodecInit();
 int32_t CodecDeinit();
 int32_t CodecEnumerateCapability(uint32_t index, CodecCapability *cap);
