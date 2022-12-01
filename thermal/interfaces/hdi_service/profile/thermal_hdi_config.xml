@@ -22,7 +22,7 @@
         </group>
     </polling>
 
-    <tracing interval="5000" outpath="/data/log/thermal/thermal-log">
+    <tracing interval="5000" width="20" outpath="/data/log/thermal/thermal-log">
         <node>
             <title path="sys/class/thermal/thermal_zone0/type"/>
             <value path="sys/class/thermal/thermal_zone0/temp"/>

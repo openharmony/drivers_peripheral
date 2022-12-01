@@ -73,9 +73,6 @@ public:
 
     int32_t InitThermalZoneSysfs();
     int32_t ParseThermalZoneInfo();
-    void Trim(char* str) const;
-    int32_t ReadThermalSysfsToBuff(const char* path, char* buf, size_t size) const;
-    int32_t ReadSysfsFile(const char* path, char* buf, size_t size) const;
     void FormatThermalSysfsPaths(struct ThermalSysfsPathInfo *pTSysPathInfo);
     void FormatThermalPaths(char *path, size_t size, const char *format, const char* name);
     void ClearThermalZoneInfo();
