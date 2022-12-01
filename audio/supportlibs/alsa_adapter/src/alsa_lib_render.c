@@ -188,8 +188,6 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
 int32_t AudioCtlRenderSetPauseStu(
     const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
 {
-    struct AudioCardInfo *cardIns = NULL;
-
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
