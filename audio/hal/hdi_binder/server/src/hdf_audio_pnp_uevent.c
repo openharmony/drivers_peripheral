@@ -349,13 +349,13 @@ static int32_t AudioUsbHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUevent
 static int32_t AudioAnalogHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUevent)
 {
     struct AudioEvent audioEvent;
-    static uint32_t h2wTypeLast = HDF_AUDIO_HEADSET;
     if (audioPnpUevent == NULL) {
         AUDIO_FUNC_LOGE("audioPnpUevent is null!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (strncmp(audioPnpUevent->subSystem, UEVENT_SUBSYSTEM_SWITCH, strlen(UEVENT_SUBSYSTEM_SWITCH)) == 0) {
+        static uint32_t h2wTypeLast = HDF_AUDIO_HEADSET;
         if (strncmp(audioPnpUevent->switchName, UEVENT_SWITCH_NAME_H2W, strlen(UEVENT_SWITCH_NAME_H2W)) != 0) {
             AUDIO_FUNC_LOGE("the switch name of 'h2w' not found!");
             return HDF_FAILURE;
