@@ -178,8 +178,9 @@ int32_t ComponentNode::ComponentTunnelRequest(uint32_t port, int32_t omxHandleTy
         return OMX_ErrorInvalidComponent;
     }
     OMX_COMPONENTTYPE *comType = static_cast<OMX_COMPONENTTYPE *>(comp_);
-    unsigned long tunneledComp = (unsigned long)omxHandleTypeTunneledComp;
-    return comType->ComponentTunnelRequest(comp_, port, (OMX_HANDLETYPE)tunneledComp, tunneledPort, tunnelSetup);
+    unsigned long tunneledComp = static_cast<unsigned long>(omxHandleTypeTunneledComp);
+    return comType->ComponentTunnelRequest(comp_, port, reinterpret_cast<OMX_HANDLETYPE>(tunneledComp),
+        tunneledPort, tunnelSetup);
 }
 
 int32_t ComponentNode::SetCallbacks(struct CodecCallbackType *omxCallback, int64_t appData)
@@ -199,7 +200,7 @@ int32_t ComponentNode::UseEglImage(struct OmxCodecBuffer &buffer, uint32_t portI
 {
     OMX_BUFFERHEADERTYPE *pBufferHdrType = nullptr;
 
-    auto err = OMX_UseEGLImage(comp_, &pBufferHdrType, portIndex, 0, eglImage);
+    auto err = OMX_UseEGLImage(comp_, &pBufferHdrType, portIndex, nullptr, eglImage);
     if (err != OMX_ErrorNone) {
         HDF_LOGE("%{public}s OMX_UseEGLImage error[0x%{public}x]", __func__, err);
         return err;

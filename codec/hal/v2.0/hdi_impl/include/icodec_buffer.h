@@ -46,10 +46,10 @@ struct DynamicBuffer {
 
 class ICodecBuffer : public RefBase {
 public:
-    ICodecBuffer(struct OmxCodecBuffer &codecBuffer);
-    virtual ~ICodecBuffer();
-    sptr<ICodecBuffer> static CreateCodeBuffer(struct OmxCodecBuffer &codecBuffer);
-    sptr<ICodecBuffer> static AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer);
+    explicit ICodecBuffer(struct OmxCodecBuffer &codecBuffer);
+    virtual ~ICodecBuffer() override;
+    static sptr<ICodecBuffer> CreateCodeBuffer(struct OmxCodecBuffer &codecBuffer);
+    static sptr<ICodecBuffer> AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer);
     virtual int32_t FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
     virtual int32_t EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer);
     virtual int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer) = 0;

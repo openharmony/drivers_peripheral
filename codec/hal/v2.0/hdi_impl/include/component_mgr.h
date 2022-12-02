@@ -35,16 +35,16 @@ public:
 
 public:
     ComponentMgr();
-    ~ComponentMgr();
+    ~ComponentMgr() override;
     ComponentMgr(const ComponentMgr &) = delete;
     ComponentMgr &operator=(const ComponentMgr &) = delete;
 
     virtual int32_t CreateComponentInstance(const char *componentName, const OMX_CALLBACKTYPE *callbacks, void *appData,
-                                            OMX_COMPONENTTYPE **component);
+                                            OMX_COMPONENTTYPE **component) override;
 
-    virtual int32_t DeleteComponentInstance(OMX_COMPONENTTYPE *component);
+    virtual int32_t DeleteComponentInstance(OMX_COMPONENTTYPE *component) override;
 
-    virtual int32_t GetRolesForComponent(const char *componentName, std::vector<std::string> *roles);
+    virtual int32_t GetRolesForComponent(const char *componentName, std::vector<std::string> *roles) override;
 
 private:
     void AddVendorComponent();

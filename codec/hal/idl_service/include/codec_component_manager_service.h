@@ -38,7 +38,7 @@ public:
     void LoadCapabilityData(const DeviceResourceNode &node);
 
 private:
-    uint32_t GetNextComponentId(void);
+    static uint32_t GetNextComponentId(void);
 
 private:
     std::map<uint32_t, sptr<ICodecComponent>> componentMap_;
