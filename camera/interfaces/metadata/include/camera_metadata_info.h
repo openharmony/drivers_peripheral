@@ -16,8 +16,8 @@
 #ifndef CAMERA_METADATA_INFO_H
 #define CAMERA_METADATA_INFO_H
 
-#include <stdio.h>
-#include <stdint.h>
+#include <cstdio>
+#include <cstdint>
 #include "camera_metadata_operator.h"
 
 namespace OHOS::Camera {
