@@ -31,13 +31,13 @@ CodecOMXCore::~CodecOMXCore()
 int32_t CodecOMXCore::Init(const std::string &libName)
 {
     char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(libName.c_str(), pathBuf) == NULL) {
+    if (realpath(libName.c_str(), pathBuf) == nullptr) {
         HDF_LOGE("%{public}s: realpath failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     libHandle_ = dlopen(pathBuf, RTLD_LAZY);
-    if (libHandle_ == NULL) {
+    if (libHandle_ == nullptr) {
         HDF_LOGE("%{public}s:failed to dlopen %{public}s.", __func__, libName.c_str());
         return HDF_ERR_INVALID_PARAM;
     }
@@ -49,7 +49,7 @@ int32_t CodecOMXCore::Init(const std::string &libName)
     getRoles_ = reinterpret_cast<GetRolesOfComponentFunc>(dlsym(libHandle_, "OMX_GetRolesOfComponent"));
     componentNameEnum_ = reinterpret_cast<ComponentNameEnumFunc>(dlsym(libHandle_, "OMX_ComponentNameEnum"));
 
-    if (init_ != NULL) {
+    if (init_ != nullptr) {
         (*(init_))();
     }
     return HDF_SUCCESS;

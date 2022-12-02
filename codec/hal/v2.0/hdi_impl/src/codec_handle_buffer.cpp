@@ -85,7 +85,7 @@ int32_t CodecHandleBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
     if (codecBuffer.buffer != nullptr) {
         auto bufferHandle = reinterpret_cast<BufferHandle *>(codecBuffer.buffer);
         FreeBufferHandle(bufferHandle);
-        codecBuffer.buffer = 0;
+        codecBuffer.buffer = nullptr;
         codecBuffer.bufferLen = 0;
     }
 
@@ -134,7 +134,7 @@ void CodecHandleBuffer::ResetBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFF
         bufferHandle_ = bufferHandle;
 
         omxBuffer.pBuffer = reinterpret_cast<uint8_t *>(bufferHandle_);
-        codecBuffer.buffer = 0;
+        codecBuffer.buffer = nullptr;
         codecBuffer.bufferLen = 0;
     }
 }
