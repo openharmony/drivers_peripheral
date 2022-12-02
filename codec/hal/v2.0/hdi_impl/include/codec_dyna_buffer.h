@@ -22,8 +22,8 @@ namespace Codec {
 namespace Omx {
 class CodecDynaBuffer : ICodecBuffer {
 public:
-    ~CodecDynaBuffer();
-    sptr<ICodecBuffer> static Create(struct OmxCodecBuffer &codecBuffer);
+    ~CodecDynaBuffer() override;
+    static sptr<ICodecBuffer> Create(struct OmxCodecBuffer &codecBuffer);
     int32_t FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer) override;
     int32_t EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer) override;
     int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer) override;
@@ -32,7 +32,7 @@ public:
     uint8_t *GetBuffer() override;
 
 protected:
-    CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer);
+    explicit CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer);
     bool CheckInvalid(struct OmxCodecBuffer &codecBuffer) override;
 
 private:

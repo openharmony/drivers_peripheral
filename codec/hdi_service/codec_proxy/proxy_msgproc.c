@@ -375,7 +375,7 @@ int32_t CodecProxyParseFenceFd(struct HdfSBuf *reply, int32_t *fenceFd)
     return HDF_SUCCESS;
 }
 
-int32_t CodecProxyPackFenceFd(struct HdfSBuf *data, int fenceFd)
+int32_t CodecProxyPackFenceFd(struct HdfSBuf *data, int32_t fenceFd)
 {
     uint8_t validFd = fenceFd >= 0;
     if (!HdfSbufWriteUint8(data, validFd)) {
