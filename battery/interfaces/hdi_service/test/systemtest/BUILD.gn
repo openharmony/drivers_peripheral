@@ -34,16 +34,6 @@ config("module_private_config") {
     "//drivers/peripheral/battery/charger/led",
     "//drivers/peripheral/battery/charger/ui",
     "//drivers/peripheral/battery/utils/include",
-    "//drivers/peripheral/display/interfaces/include",
-    "//drivers/hdf_core/framework/ability/sbuf/include",
-    "//drivers/hdf_core/framework/include/platform",
-    "//drivers/hdf_core/framework/include/core",
-    "//drivers/hdf_core/framework/include/osal",
-    "//drivers/hdf_core/framework/include/utils",
-    "//drivers/hdf_core/framework/include/config",
-    "//drivers/hdf_core/framework/include",
-    "//drivers/peripheral/input/hal/include",
-    "//drivers/peripheral/input/interfaces/include",
     "//foundation/graphic/ui/frameworks",
     "//foundation/graphic/ui/interfaces/kits",
     "//foundation/graphic/ui/interfaces/innerkits",
@@ -51,7 +41,6 @@ config("module_private_config") {
     "//foundation/graphic/utils/interfaces/innerkits",
     "//base/update/updater/utils/include",
     "//base/update/updater/utils/json",
-    "//base/update/updater/services",
     "//base/update/updater/interfaces/kits/include",
     "//base/update/updater/services/include/log",
     "//base/update/updater/services/include",
@@ -72,7 +61,6 @@ ohos_systemtest("test_reboot") {
   sources = [
     "//drivers/peripheral/battery/charger/backlight/battery_backlight.cpp",
     "//drivers/peripheral/battery/charger/led/battery_led.cpp",
-    "//drivers/peripheral/battery/charger/src/charger.cpp",
     "//drivers/peripheral/battery/charger/src/charger_thread.cpp",
     "//drivers/peripheral/battery/charger/ui/charger_animation.cpp",
     "//drivers/peripheral/battery/charger/vibrate/battery_vibrate.cpp",
@@ -85,15 +73,11 @@ ohos_systemtest("test_reboot") {
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${hdf_uhdf_path}/utils:libhdf_utils",
     "//base/update/updater/services/ui:libui",
     "//drivers/peripheral/display/hal:hdi_display_device",
-    "//foundation/graphic/ui/ext/updater:libupdater_layout",
     "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
-    "//third_party/libdrm:libdrm",
-    "//third_party/libpng:libpng",
   ]
 
   external_deps = [
@@ -115,39 +99,20 @@ ohos_systemtest("test_battery_sys_test") {
   include_dirs = [ "//drivers/peripheral/battery/utils/include" ]
 
   sources = [
-    "//drivers/peripheral/battery/charger/backlight/battery_backlight.cpp",
-    "//drivers/peripheral/battery/charger/led/battery_led.cpp",
-    "//drivers/peripheral/battery/charger/src/charger.cpp",
-    "//drivers/peripheral/battery/charger/src/charger_thread.cpp",
-    "//drivers/peripheral/battery/charger/ui/charger_animation.cpp",
-    "//drivers/peripheral/battery/charger/vibrate/battery_vibrate.cpp",
     "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
-    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
-    "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
     "src/battery_sys_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]
 
   deps = [
-    "${hdf_uhdf_path}/utils:libhdf_utils",
-    "//base/update/updater/services/ui:libui",
-    "//drivers/peripheral/display/hal:hdi_display_device",
-    "//foundation/graphic/ui/ext/updater:libupdater_layout",
-    "//third_party/cJSON:cjson_static",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
-    "//third_party/libdrm:libdrm",
-    "//third_party/libpng:libpng",
   ]
 
   external_deps = [
     "c_utils:utils",
-    "drivers_interface_battery:libbattery_proxy_1.1",
-    "drivers_interface_input:hdi_input",
-    "drivers_interface_light:liblight_proxy_1.0",
     "hiviewdfx_hilog_native:libhilog",
-    "init:libbegetutil",
     "ipc:ipc_core",
   ]
 }
