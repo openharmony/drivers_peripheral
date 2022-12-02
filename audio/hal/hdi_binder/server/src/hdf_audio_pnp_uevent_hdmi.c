@@ -207,9 +207,6 @@ static void *AudioHdmiPnpUeventStart(void *useless)
         (void)memset_s(buf, RECV_BUFFER_SIZE, 0, RECV_BUFFER_SIZE);
 
         buflen = recv(sockFd, buf, RECV_BUFFER_SIZE, 0);
-        if (buflen < 0) {
-            AUDIO_FUNC_LOGE("recvmsg error");
-        }
 
         if (AudioPnpUeventParse(buf) != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("AudioPnpUeventParse failed");
