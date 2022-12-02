@@ -23,7 +23,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-void CodecComponentTypeServiceConstruct(struct CodecComponentType *service);
+void CodecComponentTypeServiceConstruct(struct CodecComponentType *instance);
 struct CodecComponentType *CodecComponentTypeServiceGet(void);
 void CodecComponentTypeServiceRelease(struct CodecComponentType *self);
 void CodecComponentTypeServiceSetCodecNode(struct CodecComponentType *self, struct CodecComponentNode *codecNode);
