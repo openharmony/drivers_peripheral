@@ -61,7 +61,7 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string& path)
     if (!xmlStrcmp(rootNode->name, BAD_CAST"thermal")) {
         xmlChar* xmlVersion = xmlGetProp(rootNode, BAD_CAST"version");
         if (xmlVersion != nullptr) {
-            this->thermal_.version = std::stof(std::string(reinterpret_cast<char*>(xmlVersion)));
+            this->thermal_.version = std::string(reinterpret_cast<char*>(xmlVersion));
             xmlFree(xmlVersion);
             THERMAL_HILOGD(COMP_HDI, "version: %{public}s", this->thermal_.version.c_str());
         }
