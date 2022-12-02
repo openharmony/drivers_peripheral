@@ -17,6 +17,7 @@
 #define OHOS_HDI_USB_V1_0_USBD_FUNCTION_H
 
 #include <stdint.h>
+#include <string>
 
 #define USB_FUNCTION_NONE    0
 #define USB_FUNCTION_ACM     (1 << 0)
@@ -33,9 +34,8 @@
 #define DEV_SERVICE_NAME "usbfn_master"
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
 #define ECM_SERVICE_NAME "usbfn_cdcecm"
-#define MTP_SERVICE_NAME "usbfn_mtp"
 /* mtp and ptp use same driver */
-#define PTP_SERVICE_NAME "usbfn_mtp"
+#define MTP_PTP_SERVICE_NAME "usbfn_mtp"
 
 #define SYS_USB_CONFIGFS       "sys.usb.configfs"
 #define SYS_USB_CONFIG         "sys.usb.config"
@@ -55,13 +55,12 @@
 #define ACM_RELEASE 101
 #define ECM_INIT    100
 #define ECM_RELEASE 101
-#define MTP_INIT    100
-#define MTP_RELEASE 101
-#define PTP_INIT    100
-#define PTP_RELEASE 101
+#define MTP_PTP_INIT    100
+#define MTP_PTP_RELEASE 101
 
 #define USB_DDK_FUNCTION_SUPPORT (USB_FUNCTION_ACM | USB_FUNCTION_ECM | USB_FUNCTION_MTP | USB_FUNCTION_PTP)
 #define HDC_READY_TIME           2000
+
 namespace OHOS {
 namespace HDI {
 namespace Usb {
@@ -72,7 +71,6 @@ public:
     ~UsbdFunction() = default;
     static int32_t UsbdSetFunction(uint32_t funcs);
     static int32_t UsbdGetFunction();
-
 private:
     static int32_t SendCmdToService(const char *name, int32_t cmd, unsigned char funcMask);
     static int32_t RemoveHdc();
@@ -87,6 +85,9 @@ private:
     static int32_t UsbdWaitUdc();
     static int32_t UsbdInitDDKFunction(uint32_t funcs);
     static int32_t UsbdSetKernelFunction(int32_t kfuns);
+    static void UsbdUnregisterDevice(const std::string &serviceName);
+    static int32_t UsbdRegisterDevice(const std::string &serviceName);
+
     static uint32_t currentFuncs_;
 };
 } // namespace V1_0
