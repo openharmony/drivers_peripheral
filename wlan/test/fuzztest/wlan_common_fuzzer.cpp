@@ -13,15 +13,13 @@
  * limitations under the License.
  */
 #include "wlan_common_fuzzer.h"
-#include "securec.h"
 
 #define WLAN_FREQ_MAX_NUM 35
-#define IFNAMSIZ 16
 #define ETH_ADDR_LEN 6
 
 static uint32_t g_wlanTestSize = 0;
 
-uint32_t SetWlanDataSize(uint32_t *dataSize)
+uint32_t SetWlanDataSize(const uint32_t *dataSize)
 {
     if (dataSize != nullptr) {
         g_wlanTestSize = *dataSize;
@@ -174,20 +172,12 @@ void FuzzResetDriver(struct IWlanInterface *interface, const uint8_t *rawData)
     uint8_t chipId = *const_cast<uint8_t *>(rawData);
     char ifName[IFNAMSIZ] = {0};
 
-    struct IWlanCallback *wlanCallbackObj = WlanCallbackServiceGet();
-    if (wlanCallbackObj == nullptr) {
-        HDF_LOGE("%{public}s: wlanCallbackObj get failed!", __FUNCTION__);
-        return;
-    }
     if (memcpy_s(ifName, sizeof(ifName) - 1, rawData, sizeof(ifName) - 1) != EOK) {
         HDF_LOGE("%{public}s: ifName memcpy_s failed!", __FUNCTION__);
         return;
     }
 
-    interface->RegisterEventCallback(interface, wlanCallbackObj, ifName);
     interface->ResetDriver(interface, chipId, ifName);
-    interface->UnregisterEventCallback(interface, wlanCallbackObj, ifName);
-    WlanCallbackServiceRelease(wlanCallbackObj);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
