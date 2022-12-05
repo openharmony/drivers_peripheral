@@ -26,7 +26,7 @@ namespace V1_0 {
 class GnssInterfaceImpl : public IGnssInterface {
 public:
     GnssInterfaceImpl();
-    virtual ~GnssInterfaceImpl();
+    ~GnssInterfaceImpl() override;
 
     int32_t SetGnssConfigPara(const GnssConfigPara& para) override;
 
