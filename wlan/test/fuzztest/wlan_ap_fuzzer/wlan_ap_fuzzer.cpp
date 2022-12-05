@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "wlan_fuzzer.h"
+#include "wlan_ap_fuzzer.h"
 
 #include "hdf_log.h"
 #include "v1_0/iwlan_interface.h"
