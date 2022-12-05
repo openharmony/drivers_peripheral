@@ -164,7 +164,7 @@ static int32_t OnLightValidityJudgment(uint32_t lightId, struct LightEffect *eff
         return LIGHT_NOT_SUPPORT;
     }
 
-    if (effect->flashEffect.flashMode > LIGHT_FLASH_BLINK) {
+    if (effect->flashEffect.flashMode < LIGHT_FLASH_NONE || effect->flashEffect.flashMode > LIGHT_FLASH_BLINK) {
         HDF_LOGE("%{public}s: flashMode not supported", __func__);
         return LIGHT_NOT_FLASH;
     }
