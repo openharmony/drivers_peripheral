@@ -344,17 +344,23 @@ int32_t LoadCodecCapabilityFromHcs(const struct DeviceResourceNode *node, CodecC
     for (index = 0; index < CODEC_CAPABLITY_GROUP_NUM; index++) {
         if (GetGroupCapabilitiesNumber(node, codecGroupsNodeName[index], &codecNum) == HDF_SUCCESS) {
             codecCapGroup = codecCapGroups[index];
-            if (codecNum > 0) {
-                codecCapGroup->num = codecNum;
-                codecCapGroup->capablitis
-                    = (CodecCompCapability *)OsalMemAlloc(sizeof(CodecCompCapability) * codecNum);
-            } else {
+            if (codecNum <= 0) {
                 codecCapGroup->capablitis = NULL;
                 codecCapGroup->num = 0;
+                continue;
             }
-            if (codecNum > 0 && codecCapGroup->capablitis == NULL) {
+            size_t capablitisSize = sizeof(CodecCompCapability) * codecNum;
+            codecCapGroup->capablitis = (CodecCompCapability *)OsalMemAlloc(capablitisSize);
+            if (codecCapGroup->capablitis == NULL) {
                 codecCapGroup->num = 0;
                 HDF_LOGE("%{public}s, MemAlloc for capability group failed!", __func__);
+                return HDF_FAILURE;
+            }
+            int32_t ret = memset_s(codecCapGroup->capablitis, capablitisSize, 0, capablitisSize);
+            if (ret != EOK) {
+                codecCapGroup->num = 0;
+                OsalMemFree(codecCapGroup->capablitis);
+                HDF_LOGE("%{public}s, memset_s for capability group failed!", __func__);
                 return HDF_FAILURE;
             }
             caps->total += codecCapGroup->num;
