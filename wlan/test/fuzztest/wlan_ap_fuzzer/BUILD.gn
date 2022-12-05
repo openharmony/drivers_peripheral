@@ -24,6 +24,7 @@ ohos_fuzztest("WlanApFuzzTest") {
   include_dirs = [
     "//drivers/peripheral/wlan/interfaces/include",
     "//drivers/peripheral/wlan/test/hdi_service",
+    "//drivers/peripheral/wlan/test/fuzztest",
   ]
 
   deps = [ "//drivers/peripheral/wlan/hdi_service:hdi_wlan_service" ]
@@ -41,7 +42,13 @@ ohos_fuzztest("WlanApFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
 
-  sources = [ "wlan_ap_fuzzer.cpp" ]
+  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+
+  sources = [
+    "//drivers/peripheral/wlan/test/fuzztest/wlan_common_fuzzer.cpp",
+    "//drivers/peripheral/wlan/test/hdi_service/wlan_callback_impl.c",
+    "wlan_ap_fuzzer.cpp",
+  ]
 }
 
 group("wlan_ap_fuzztest") {

@@ -14,118 +14,123 @@
  */
 
 #include "wlan_ap_fuzzer.h"
-
-#include "hdf_log.h"
-#include "v1_0/iwlan_interface.h"
-#include "v1_0/wlan_types.h"
-#include "wifi_hal_base_feature.h"
-#include "wlan_callback_impl.h"
-
-#define HDF_LOG_TAG HDF_WIFI_CORE
+#include "wlan_common_fuzzer.h"
 
 namespace OHOS {
 namespace WIFI {
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
 const char *g_wlanServiceName = "wlan_interface_service";
-const uint32_t ETH_ADDR_LEN = 6;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
 const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
-struct HdfFeatureInfo ifeature;
 struct IWlanInterface *g_wlanObj = nullptr;
 uint32_t num = 0;
 
-enum  WlanCmdId {
-    CMD_WLAN_INTERFACE_GET_ASSCOCIATED_STAS,
-    CMD_WLAN_INTERFACE_GET_DEVICE_MAC_ADDRESS,
-};
-
-uint32_t Convert2Uint32(const uint8_t *ptr)
+void FuzzGetAssociatedStas(struct IWlanInterface *interface, const uint8_t *rawData)
 {
-    if (ptr == nullptr) {
-        return 0;
+    char ifName[IFNAMSIZ] = {0};
+    struct HdfFeatureInfo feature;
+    struct HdfStaInfo staInfo[WLAN_MAX_NUM_STA_WITH_AP] = {{0}};
+    uint32_t staInfoLen = WLAN_MAX_NUM_STA_WITH_AP;
+    feature.type = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+
+    if (memcpy_s(ifName, sizeof(ifName) - 1, rawData, sizeof(ifName) - 1) != EOK) {
+        HDF_LOGE("%{public}s: ifName memcpy_s failed!", __FUNCTION__);
+        return;
     }
-    /*
-     * Move the 0th digit 24 to the left, the first digit 16 to the left, the second digit 8 to the left,
-     * and the third digit no left
-     */
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
+    feature.ifName = ifName;
+
+    interface->GetAssociatedStas(interface, &feature, staInfo, &staInfoLen, &num);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
-static void WlanFucSwitch(struct IWlanInterface *interface, uint32_t cmd, const uint8_t *rawData)
+void FuzzSetCountryCode(struct IWlanInterface *interface, const uint8_t *rawData)
 {
-    switch (cmd) {
-        case CMD_WLAN_INTERFACE_GET_ASSCOCIATED_STAS: {
-            struct HdfStaInfo staInfo[WLAN_MAX_NUM_STA_WITH_AP] = {{0}};
-            uint32_t staInfoLen = WLAN_MAX_NUM_STA_WITH_AP;
-            ifeature.ifName = const_cast<char *>(reinterpret_cast<const char *>(rawData));
-            ifeature.type = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
-            interface->GetAssociatedStas(interface, &ifeature, staInfo, &staInfoLen, &num);
-            break;
-        }
-        case CMD_WLAN_INTERFACE_GET_DEVICE_MAC_ADDRESS: {
-            uint8_t mac[ETH_ADDR_LEN] = {0};
-            uint32_t macLen = ETH_ADDR_LEN;
-            ifeature.ifName = const_cast<char *>(reinterpret_cast<const char *>(rawData));
-            ifeature.type = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
-            interface->GetDeviceMacAddress(interface, &ifeature, mac, &macLen,
-                *const_cast<uint8_t *>(reinterpret_cast<const uint8_t *>(rawData)));
-            break;
-        }
-        default:
-            break;
+    const char *mac = reinterpret_cast<const char *>(rawData);
+    uint32_t macLen = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
+    struct HdfFeatureInfo feature;
+    feature.ifName = const_cast<char *>(reinterpret_cast<const char *>(rawData));
+    feature.type = *const_cast<uint32_t *>(reinterpret_cast<const uint32_t *>(rawData));
+
+    interface->SetCountryCode(interface, &feature, mac, macLen);
+    HDF_LOGI("%{public}s: success", __FUNCTION__);
+}
+
+static FuzzWlanFuncs g_fuzzWlanFuncs[] = {
+    FuzzGetAssociatedStas,
+    FuzzSetCountryCode,
+    FuzzGetChipId,
+    FuzzGetDeviceMacAddress,
+    FuzzGetFeatureType,
+    FuzzGetFreqsWithBand,
+    FuzzGetNetworkIfaceName,
+    FuzzSetMacAddress,
+    FuzzSetTxPower,
+    FuzzGetPowerMode,
+    FuzzSetPowerMode,
+    FuzzGetIfNamesByChipId,
+    FuzzResetDriver,
+    FuzzStartChannelMeas,
+    FuzzSetProjectionScreenParam,
+    FuzzWifiSendCmdIoctl,
+    FuzzGetFeatureByIfName,
+    FuzzGetStaInfo,
+    FuzzGetChannelMeasResult,
+};
+
+static void FuncToOptimal(struct IWlanInterface *interface, uint32_t cmdId, const uint8_t *data)
+{
+    FuzzWlanFuncs fuzzWlanFunc = g_fuzzWlanFuncs[cmdId];
+    if (fuzzWlanFunc != nullptr) {
+        fuzzWlanFunc(interface, data);
     }
+    return;
 }
 
 bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
 {
-    (void)size;
+    struct HdfFeatureInfo ifeature;
 
     if (rawData == nullptr) {
         return false;
     }
     bool result = false;
-    uint32_t cmd = Convert2Uint32(rawData);
+    uint32_t cmdId = Convert2Uint32(rawData) % ((sizeof(g_fuzzWlanFuncs) / sizeof(g_fuzzWlanFuncs[0])));
     rawData = rawData + OFFSET;
-
+    uint32_t dataSize = size - OFFSET;
+    if (SetWlanDataSize(&dataSize) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: set data size failed!", __FUNCTION__);
+        return result;
+    }
     g_wlanObj = IWlanInterfaceGetInstance(g_wlanServiceName, false);
     if (g_wlanObj == nullptr) {
         HDF_LOGE("%{public}s: g_wlanObj is null", __FUNCTION__);
         return result;
     }
-
     int32_t ret = g_wlanObj->Start(g_wlanObj);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Start failed! ret=%{public}d", __FUNCTION__, ret);
-        IWlanInterfaceReleaseInstance(g_wlanServiceName, g_wlanObj, false);
         return result;
     }
-
-    ret = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: CreateFeature failed! ret=%{public}d", __FUNCTION__, ret);
-        ret = g_wlanObj->Stop(g_wlanObj);
+    do {
+        ret = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: Stop failed! ret=%{public}d", __FUNCTION__, ret);
+            HDF_LOGE("%{public}s: CreateFeature failed! ret=%{public}d", __FUNCTION__, ret);
+            break;
         }
-        IWlanInterfaceReleaseInstance(g_wlanServiceName, g_wlanObj, false);
-        return false;
-    }
-
-    WlanFucSwitch(g_wlanObj, cmd, rawData);
-
-    ret = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: DestroyFeature failed! ret=%{public}d", __FUNCTION__, ret);
-        result = false;
-    }
-
+        FuncToOptimal(g_wlanObj, cmdId, rawData);
+        ret = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: DestroyFeature failed! ret=%{public}d", __FUNCTION__, ret);
+            break;
+        }
+        result = true;
+    } while (false);
     ret = g_wlanObj->Stop(g_wlanObj);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: Stop failed! ret=%{public}d", __FUNCTION__, ret);
         result = false;
     }
-
     IWlanInterfaceReleaseInstance(g_wlanServiceName, g_wlanObj, false);
     return result;
 }

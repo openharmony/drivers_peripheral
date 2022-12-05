@@ -20,10 +20,12 @@
 #include "v1_0/wlan_types.h"
 #include "wlan_callback_impl.h"
 #include "wifi_hal_base_feature.h"
+#include "securec.h"
 
 #define HDF_LOG_TAG HDF_WIFI_CORE
+#define IFNAMSIZ 16
 
-uint32_t SetWlanDataSize(uint32_t *dataSize);
+uint32_t SetWlanDataSize(const uint32_t *dataSize);
 uint32_t GetWlanDataSize(uint32_t *dataSize);
 uint32_t Convert2Uint32(const uint8_t *ptr);
 void FuzzGetChipId(struct IWlanInterface *interface, const uint8_t *rawData);
