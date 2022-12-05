@@ -37,7 +37,14 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       if (drivers_peripheral_audio_rich_device == false) {
         deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       } else {
-        deps += [ "//vendor/hisi/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi:hdi_audio" ]
+        AUDIO_VENDOR_LIB_PATH = rebase_path(
+                "//vendor/$device_company/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi")
+        cmd = "if [ -f ${AUDIO_VENDOR_LIB_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
+        HAVE_AUDIO_VENDOR_LIB =
+            exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+        if (HAVE_AUDIO_VENDOR_LIB) {
+          deps += [ "${AUDIO_VENDOR_LIB_PATH}:hdi_audio" ]
+        }
       }
     } else {
       deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
@@ -85,7 +92,14 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       if (drivers_peripheral_audio_rich_device == false) {
         deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       } else {
-        deps += [ "//vendor/hisi/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi:hdi_audio" ]
+        AUDIO_VENDOR_LIB_PATH = rebase_path(
+                "//vendor/$device_company/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi")
+        cmd = "if [ -f ${AUDIO_VENDOR_LIB_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
+        HAVE_AUDIO_VENDOR_LIB =
+            exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+        if (HAVE_AUDIO_VENDOR_LIB) {
+          deps += [ "${AUDIO_VENDOR_LIB_PATH}:hdi_audio" ]
+        }
       }
     } else {
       deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
@@ -131,7 +145,14 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       if (drivers_peripheral_audio_rich_device == false) {
         deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       } else {
-        deps += [ "//vendor/hisi/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi:hdi_audio" ]
+        AUDIO_VENDOR_LIB_PATH = rebase_path(
+                "//vendor/$device_company/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi")
+        cmd = "if [ -f ${AUDIO_VENDOR_LIB_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
+        HAVE_AUDIO_VENDOR_LIB =
+            exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+        if (HAVE_AUDIO_VENDOR_LIB) {
+          deps += [ "${AUDIO_VENDOR_LIB_PATH}:hdi_audio" ]
+        }
       }
     } else {
       deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
