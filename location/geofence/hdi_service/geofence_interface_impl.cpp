@@ -27,6 +27,10 @@ extern "C" IGeofenceInterface *GeofenceInterfaceImplGetInstance(void)
     return new (std::nothrow) GeofenceInterfaceImpl();
 }
 
+GeofenceInterfaceImpl::~GeofenceInterfaceImpl()
+{
+}
+
 int32_t GeofenceInterfaceImpl::SetGeofenceCallback(const sptr<IGeofenceCallback>& callbackObj)
 {
     return HDF_SUCCESS;
