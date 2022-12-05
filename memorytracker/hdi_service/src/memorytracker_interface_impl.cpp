@@ -16,25 +16,45 @@
 #include "memorytracker_interface_impl.h"
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include <dlfcn.h>
 
 namespace OHOS {
 namespace HDI {
 namespace Memorytracker {
 namespace V1_0 {
 #define HDF_LOG_TAG           hdf_memorytracker_impl
+using GetDevMemFunc = int32_t (*)(int32_t, MemoryTrackerType, std::vector<MemoryRecord>&);
 
 extern "C" IMemoryTrackerInterface *MemoryTrackerInterfaceImplGetInstance(void)
 {
     return new (std::nothrow) MemoryTrackerInterfaceImpl();
 }
 
-// vendor should implement this method
 int32_t MemoryTrackerInterfaceImpl::GetDevMem(int32_t pid, MemoryTrackerType type, std::vector<MemoryRecord>& records)
 {
     HDF_LOGI("%{public}s called!", __func__);
-    // just for testing
-    records.push_back( { FLAG_UNMAPPED, 123 } ); // 123: just for testing
-    records.push_back( { FLAG_MAPPED, 456 } ); // 456: just for testing
+
+    auto libMemTrackHandle = dlopen("libmemorytracker.default.so", RTLD_NOW);
+    if (!libMemTrackHandle) {
+        HDF_LOGE("%{public}s, dlopen libmemorytracker failed!", __func__);
+        return HDF_FAILURE;
+    }
+
+    auto getDevMemFunc = reinterpret_cast<GetDevMemFunc>(dlsym(libMemTrackHandle, "GetDevMem"));
+    if (!getDevMemFunc) {
+        HDF_LOGE("%{public}s, dlsym getDevMemFunc failed!", __func__);
+        dlclose(libMemTrackHandle);
+        return HDF_FAILURE;
+    }
+
+    if (getDevMemFunc(pid, type, records) != 0) {
+        HDF_LOGE("%{public}s, get device memory failed!", __func__);
+        dlclose(libMemTrackHandle);
+        return HDF_FAILURE;
+    }
+
+    dlclose(libMemTrackHandle);
+    HDF_LOGI("%{public}s, get device memory success!", __func__);
     return HDF_SUCCESS;
 }
 } // V1_0
