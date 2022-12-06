@@ -205,13 +205,9 @@ struct PrepareAudioPara {
     struct AudioDeviceDescriptor devDesc;
 };
 
-void InitAttrsCommon(struct AudioSampleAttributes &attrs);
+int32_t InitAttrs(struct AudioSampleAttributes &attrs);
 
-void InitAttrs(struct AudioSampleAttributes &attrs);
-
-void InitAttrsRender(struct AudioSampleAttributes &attrs);
-
-void InitAttrsCapture(struct AudioSampleAttributes &attrs);
+int32_t InitAttrsCapture(struct AudioSampleAttributes &attrs);
 
 int32_t InitDevDesc(struct AudioDeviceDescriptor &devDesc, const uint32_t portId, int pins);
 
@@ -273,7 +269,7 @@ int32_t PlayAudioFile(struct PrepareAudioPara &audiopara);
 
 int32_t RecordAudio(struct PrepareAudioPara &audiopara);
 
-void InitAttrsUpdate(struct AudioSampleAttributes &attrs, int format, uint32_t channelCount,
+int32_t InitAttrsUpdate(struct AudioSampleAttributes &attrs, int format, uint32_t channelCount,
     uint32_t sampleRate, uint32_t silenceThreshold = BUFFER_LENTH);
 
 int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,

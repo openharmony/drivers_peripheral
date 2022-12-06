@@ -696,7 +696,7 @@ HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_009, TestSize.Level1)
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    InitAttrs(attrs);
+    ret = InitAttrs(attrs);
     InitDevDesc(devDesc, renderPort->portId, PIN_OUT_SPEAKER);
 
     devDesc.portId = -5;
@@ -729,7 +729,7 @@ HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_010, TestSize.Level1)
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    InitAttrs(attrs);
+    ret = InitAttrs(attrs);
     InitDevDesc(devDesc, portID, PIN_OUT_SPEAKER);
 
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
