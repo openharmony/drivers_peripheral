@@ -105,4 +105,26 @@
             <option name="push" value="audiorendertest.wav -> /data/test" src="res"/>
         </preparer>
     </target>
+    <target name="hdf_audio_hdi_render_attr_advance_test">
+        <preparer>
+            <option name="push" value="audiorendertest.wav -> /data/test" src="res"/>
+        </preparer>
+    </target>
+	<target name="hdf_audio_hdi_render_advance_test">
+        <preparer>
+            <option name="push" value="audiorendertest.wav -> /data/test" src="res"/>
+            <option name="push" value="lowlatencyrendertest.wav -> /data/test" src="res"/>
+        </preparer>
+    </target>
+	<target name="hdf_audio_hdi_render_scene_advance_test">
+        <preparer>
+            <option name="push" value="audiorendertest.wav -> /data/test" src="res"/>
+        </preparer>
+    </target>
+	<target name="hdf_audio_hdi_render_hardware_dependence_advance_test">
+        <preparer>
+            <option name="push" value="audiorendertest.wav -> /data/test" src="res"/>
+            <option name="push" value="lowlatencyrendertest.wav -> /data/test" src="res"/>
+        </preparer>
+    </target>
 </configuration>
