@@ -192,9 +192,6 @@ if (defined(ohos_lite)) {
           [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
     }
-    if (!drivers_peripheral_audio_rich_device) {
-      defines += [ "FEATURE_SMALL_DEVICE" ]
-    }
   }
 
   ohos_systemtest("hdf_audio_hdi_capture_reliability_test") {
@@ -230,9 +227,6 @@ if (defined(ohos_lite)) {
           [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
     }
-    if (!drivers_peripheral_audio_rich_device) {
-      defines += [ "FEATURE_SMALL_DEVICE" ]
-    }
   }
 
   ohos_systemtest("hdf_audio_hdi_capture_control_reliability_test") {
@@ -267,9 +261,6 @@ if (defined(ohos_lite)) {
       deps +=
           [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
-    }
-    if (!drivers_peripheral_audio_rich_device) {
-      defines += [ "FEATURE_SMALL_DEVICE" ]
     }
   }
 
@@ -307,9 +298,6 @@ if (defined(ohos_lite)) {
       deps +=
           [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
-    }
-    if (!drivers_peripheral_audio_rich_device) {
-      defines += [ "FEATURE_SMALL_DEVICE" ]
     }
   }
 }
