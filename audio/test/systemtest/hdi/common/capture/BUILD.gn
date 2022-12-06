@@ -210,9 +210,6 @@ if (defined(ohos_lite)) {
         drivers_peripheral_audio_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
     }
-    if (!drivers_peripheral_audio_rich_device) {
-      defines += [ "FEATURE_SMALL_DEVICE" ]
-    }
   }
   ohos_systemtest("hdf_audio_hdi_capture_control_test") {
     module_out_path = module_output_path
@@ -255,9 +252,6 @@ if (defined(ohos_lite)) {
     if (defined(drivers_peripheral_audio_alsa_lib) &&
         drivers_peripheral_audio_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
-    }
-    if (!drivers_peripheral_audio_rich_device) {
-      defines += [ "FEATURE_SMALL_DEVICE" ]
     }
   }
   ohos_systemtest("hdf_audio_hdi_capture_volume_test") {
@@ -302,9 +296,6 @@ if (defined(ohos_lite)) {
         drivers_peripheral_audio_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
     }
-    if (!drivers_peripheral_audio_rich_device) {
-      defines += [ "FEATURE_SMALL_DEVICE" ]
-    }
   }
   ohos_systemtest("hdf_audio_hdi_capture_scene_test") {
     module_out_path = module_output_path
@@ -348,9 +339,6 @@ if (defined(ohos_lite)) {
         drivers_peripheral_audio_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
     }
-    if (!drivers_peripheral_audio_rich_device) {
-      defines += [ "FEATURE_SMALL_DEVICE" ]
-    }
   }
   ohos_systemtest("hdf_audio_hdi_capture_test") {
     module_out_path = module_output_path
@@ -389,9 +377,6 @@ if (defined(ohos_lite)) {
       deps +=
           [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
-    }
-    if (!drivers_peripheral_audio_rich_device) {
-      defines += [ "FEATURE_SMALL_DEVICE" ]
     }
   }
 }
