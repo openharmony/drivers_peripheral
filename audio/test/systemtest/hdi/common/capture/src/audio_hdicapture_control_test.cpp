@@ -177,8 +177,7 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_005, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, capturePort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, capturePort->portId, PIN_IN_MIC);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapterNull, &devDesc, &attrs, &capture);
@@ -203,8 +202,7 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_006, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, capturePort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = adapter->CreateCapture(adapter, devDesc, &attrs, &capture);
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
@@ -251,8 +249,7 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_008, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, capturePort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, capturePort->portId, PIN_IN_MIC);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, capture);
@@ -276,8 +273,7 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_009, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_OUT, &adapter, capturePort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, capturePort->portId, PIN_OUT_SPEAKER);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
@@ -303,8 +299,7 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_010, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, capturePort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, portID, PIN_IN_MIC);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
