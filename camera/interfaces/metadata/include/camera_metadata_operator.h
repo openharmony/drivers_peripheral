@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <string>
 
 #include "camera_device_ability_items.h"
 
@@ -34,6 +35,7 @@
     MaxAlignment(MaxAlignment(DATA_ALIGNMENT, METADATA_ALIGNMENT), ITEM_ALIGNMENT)
 
 #define INDEX_COUNTER 2
+#define WRAP_LENGTH 4
 
 // data type
 enum {
@@ -53,6 +55,16 @@ enum {
     META_TYPE_RATIONAL = 6,
     // Number of data type
     META_NUM_TYPES
+};
+
+const static char *OHOS_CAMERA_METADATA_TYPE[META_NUM_TYPES] = {
+    [META_TYPE_BYTE] = "byte",
+    [META_TYPE_INT32] = "int32",
+    [META_TYPE_UINT32] = "uint32",
+    [META_TYPE_FLOAT] = "float",
+    [META_TYPE_INT64] = "int64",
+    [META_TYPE_DOUBLE] = "double",
+    [META_TYPE_RATIONAL] = "rational"
 };
 
 typedef struct camera_rational {
@@ -168,6 +180,8 @@ int DeleteCameraMetadataItemByIndex(common_metadata_header_t *dst, uint32_t inde
 
 // Free camera metadata buffer
 void FreeCameraMetadataBuffer(common_metadata_header_t *dst);
+
+std::string MetadataItemDump(const common_metadata_header_t *metadataHeader, uint32_t item);
 
 // Internal use
 camera_metadata_item_entry_t *GetMetadataItems(const common_metadata_header_t *metadataHeader);
