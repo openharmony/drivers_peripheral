@@ -56,23 +56,7 @@ void InitAttrsCommon(struct AudioSampleAttributes &attrs)
     attrs.sampleRate = SAMPLE_RATE_48000;
 }
 
-void InitAttrs(struct AudioSampleAttributes &attrs)
-{
-    attrs.sampleRate = SAMPLERATE;
-    attrs.format = AUDIO_FORMAT_PCM_16_BIT;
-    attrs.channelCount = CHANNELCOUNT;
-    attrs.interleaved = 0;
-    attrs.type = AUDIO_IN_MEDIA;
-    attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
-    attrs.frameSize = PCM_16_BIT * CHANNELCOUNT / MOVE_LEFT_NUM;
-    attrs.isBigEndian = false;
-    attrs.isSignedData = true;
-    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (PCM_16_BIT * attrs.channelCount / MOVE_LEFT_NUM);
-    attrs.stopThreshold = INT_32_MAX;
-    attrs.silenceThreshold = BUFFER_LENTH;
-}
-
-void InitAttrsRender(struct AudioSampleAttributes &attrs)
+int32_t InitAttrs(struct AudioSampleAttributes &attrs)
 {
     InitAttrsCommon(attrs);
     attrs.format = AUDIO_FORMAT_PCM_32_BIT;
@@ -80,28 +64,27 @@ void InitAttrsRender(struct AudioSampleAttributes &attrs)
     attrs.interleaved = 1;
     attrs.type = AUDIO_IN_MEDIA;
     attrs.silenceThreshold = 0;
+    return HDF_SUCCESS;
 }
 
-void InitAttrsCapture(struct AudioSampleAttributes &attrs)
+int32_t InitAttrsCapture(struct AudioSampleAttributes &attrs)
 {
     InitAttrsCommon(attrs);
     attrs.format = AUDIO_FORMAT_PCM_16_BIT;
     attrs.channelCount = AUDIO_CAPTURE_CHANNELCOUNT;
     attrs.silenceThreshold = SILENCE_THRESHOLD;
+    return HDF_SUCCESS;
 }
 
-void InitAttrsUpdate(struct AudioSampleAttributes &attrs, int format, uint32_t channelCount,
+int32_t InitAttrsUpdate(struct AudioSampleAttributes &attrs, int format, uint32_t channelCount,
     uint32_t sampleRate, uint32_t silenceThreshold)
 {
-#ifdef FEATURE_SMALL_DEVICE
     InitAttrs(attrs);
-#else
-    InitAttrsRender(attrs);
-#endif
     attrs.format = (enum AudioFormat)format;
     attrs.sampleRate = sampleRate;
     attrs.channelCount = channelCount;
     attrs.silenceThreshold = silenceThreshold;
+    return HDF_SUCCESS;
 }
 int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
     struct AudioRender *render)
@@ -409,7 +392,7 @@ int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::strin
     if (*adapter == nullptr || (*adapter)->CreateCapture == nullptr) {
         return HDF_FAILURE;
     }
-#ifdef FEATURE_SMALL_DEVICE
+#ifdef PRODUCT_RK3568
     InitAttrs(attrs);
 #else
     InitAttrsCapture(attrs);
@@ -450,7 +433,7 @@ int32_t AudioCreateStartCapture(TestAudioManager *manager, struct AudioCapture *
         manager->UnloadAdapter(manager, *adapter);
         return HDF_FAILURE;
     }
-#ifdef FEATURE_SMALL_DEVICE
+#ifdef PRODUCT_RK3568
     InitAttrs(attrs);
 #else
     InitAttrsCapture(attrs);
@@ -470,7 +453,7 @@ int32_t AudioCaptureStartAndOneFrame(struct AudioCapture *capture)
 {
     int32_t ret = -1;
     struct AudioSampleAttributes attrs = {};
-#ifdef FEATURE_SMALL_DEVICE
+#ifdef PRODUCT_RK3568
     InitAttrs(attrs);
 #else
     InitAttrsCapture(attrs);
@@ -588,11 +571,7 @@ int32_t RenderFramePrepare(const std::string &path, char *&frame, uint64_t &read
     uint32_t remainingDataSize = 0;
     struct AudioSampleAttributes attrs = {};
     struct AudioHeadInfo headInfo = {};
-#ifdef FEATURE_SMALL_DEVICE
     InitAttrs(attrs);
-#else
-    InitAttrsRender(attrs);
-#endif
     char absPath[PATH_MAX] = {0};
     if (realpath(path.c_str(), absPath) == nullptr) {
         return HDF_FAILURE;

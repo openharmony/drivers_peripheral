@@ -82,8 +82,5 @@ if (defined(ohos_lite)) {
         drivers_peripheral_audio_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
     }
-    if (!drivers_peripheral_audio_rich_device) {
-      defines += [ "FEATURE_SMALL_DEVICE" ]
-    }
   }
 }
