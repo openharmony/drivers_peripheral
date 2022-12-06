@@ -21,13 +21,13 @@ group("hdf_fuzztest_media_codec_adapter") {
 
   if (HAVE_CODEC_OEM_PATH) {
     deps = [
-      "//drivers/peripheral/codec/test/fuzztest_adapter/codecallocatebuffer_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest_adapter/codeccomponentroleenum_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest_adapter/codeccomponenttunnelrequest_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest_adapter/codeccreatecomponent_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest_adapter/codecfreebuffer_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest_adapter/codecgetcomponentcapabilitylist_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest_adapter/codecgetconfig_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest_adapter/codecallocatebuffer_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest_adapter/codeccomponentroleenum_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest_adapter/codeccomponenttunnelrequest_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest_adapter/codeccreatecomponent_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest_adapter/codecfreebuffer_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest_adapter/codecgetcomponentcapabilitylist_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest_adapter/codecgetconfig_adapter_fuzzer:fuzztest",
     ]
   }
 }
