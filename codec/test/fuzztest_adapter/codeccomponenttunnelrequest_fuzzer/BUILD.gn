@@ -18,15 +18,15 @@ module_output_path = "drivers_peripheral_codec/codec"
 ohos_fuzztest("CodecAdapterComponentTunnelRequestFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "//drivers/peripheral/codec/test/fuzztest_adapter/codeccomponenttunnelrequest_adapter_fuzzer"
+  fuzz_config_file = "//drivers/peripheral/codec/test/fuzztest_adapter/codeccomponenttunnelrequest_fuzzer"
 
   include_dirs = [
     "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
-    "//drivers/peripheral/codec/test/fuzztest_adapter/codeccomponenttunnelrequest_adapter_fuzzer",
-    "//drivers/peripheral/codec/test/fuzztest_adapter/codeccommon_adapter_fuzzer",
+    "//drivers/peripheral/codec/test/fuzztest_adapter/codeccomponenttunnelrequest_fuzzer",
+    "//drivers/peripheral/codec/test/fuzztest_adapter/codeccommon_fuzzer",
   ]
 
   deps = [ "//drivers/peripheral/codec/hal/passthrough:codec_hdi_passthrough" ]
@@ -45,7 +45,7 @@ ohos_fuzztest("CodecAdapterComponentTunnelRequestFuzzTest") {
   ]
 
   sources = [
-    "../codeccommon_adapter_fuzzer/codeccommon_fuzzer.cpp",
+    "../codeccommon_fuzzer/codeccommon_fuzzer.cpp",
     "codeccomponenttunnelrequest_fuzzer.cpp",
   ]
 }

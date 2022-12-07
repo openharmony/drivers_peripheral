@@ -19,15 +19,15 @@ ohos_fuzztest("CodecAdapterFreeBufferFuzzTest") {
   module_out_path = module_output_path
 
   fuzz_config_file =
-      "//drivers/peripheral/codec/test/fuzztest_adapter/codecfreebuffer_adapter_fuzzer"
+      "//drivers/peripheral/codec/test/fuzztest_adapter/codecfreebuffer_fuzzer"
 
   include_dirs = [
     "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
-    "//drivers/peripheral/codec/test/fuzztest_adapter/codecfreebuffer_adapter_fuzzer",
-    "//drivers/peripheral/codec/test/fuzztest_adapter/codeccommon_adapter_fuzzer",
+    "//drivers/peripheral/codec/test/fuzztest_adapter/codecfreebuffer_fuzzer",
+    "//drivers/peripheral/codec/test/fuzztest_adapter/codeccommon_fuzzer",
   ]
 
   deps = [ "//drivers/peripheral/codec/hal/passthrough:codec_hdi_passthrough" ]
@@ -46,7 +46,7 @@ ohos_fuzztest("CodecAdapterFreeBufferFuzzTest") {
   ]
 
   sources = [
-    "../codeccommon_adapter_fuzzer/codeccommon_fuzzer.cpp",
+    "../codeccommon_fuzzer/codeccommon_fuzzer.cpp",
     "codecfreebuffer_fuzzer.cpp",
   ]
 }

@@ -15,19 +15,18 @@ import("//build/config/features.gni")
 import("//build/test.gni")
 module_output_path = "drivers_peripheral_codec/codec"
 
-ohos_fuzztest("CodecAdapterGetConfigFuzzTest") {
+ohos_fuzztest("CodecAdapterComponentRoleEnumFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file =
-      "//drivers/peripheral/codec/test/fuzztest_adapter/codecgetconfig_adapter_fuzzer"
+  fuzz_config_file = "//drivers/peripheral/codec/test/fuzztest_adapter/codeccomponentroleenum_fuzzer"
 
   include_dirs = [
     "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
-    "//drivers/peripheral/codec/test/fuzztest_adapter/codecgetconfig_adapter_fuzzer",
-    "//drivers/peripheral/codec/test/fuzztest_adapter/codeccommon_adapter_fuzzer",
+    "//drivers/peripheral/codec/test/fuzztest_adapter/codeccomponentroleenum_fuzzer",
+    "//drivers/peripheral/codec/test/fuzztest_adapter/codeccommon_fuzzer",
   ]
 
   deps = [ "//drivers/peripheral/codec/hal/passthrough:codec_hdi_passthrough" ]
@@ -46,13 +45,13 @@ ohos_fuzztest("CodecAdapterGetConfigFuzzTest") {
   ]
 
   sources = [
-    "../codeccommon_adapter_fuzzer/codeccommon_fuzzer.cpp",
-    "codecgetconfig_fuzzer.cpp",
+    "../codeccommon_fuzzer/codeccommon_fuzzer.cpp",
+    "codeccomponentroleenum_fuzzer.cpp",
   ]
 }
 
 group("fuzztest") {
   testonly = true
   deps = []
-  deps += [ ":CodecAdapterGetConfigFuzzTest" ]
+  deps += [ ":CodecAdapterComponentRoleEnumFuzzTest" ]
 }

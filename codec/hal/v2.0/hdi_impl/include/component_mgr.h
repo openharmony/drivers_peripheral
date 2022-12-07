@@ -46,6 +46,8 @@ public:
 
     virtual int32_t GetRolesForComponent(const char *componentName, std::vector<std::string> *roles) override;
 
+    virtual int32_t GetCoreOfComponent(CodecOMXCore* &core, const char *componentName) override;
+
 private:
     void AddVendorComponent();
     void AddSoftComponent();
