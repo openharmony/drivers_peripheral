@@ -24,9 +24,9 @@ namespace Codec {
 namespace Omx {
 class CodecShareBuffer : ICodecBuffer {
 public:
-    ~CodecShareBuffer();
-    OHOS::sptr<ICodecBuffer> static Create(struct OmxCodecBuffer &codecBuffer);
-    OHOS::sptr<ICodecBuffer> static Allocate(struct OmxCodecBuffer &codecBuffer);
+    ~CodecShareBuffer() override;
+    static OHOS::sptr<ICodecBuffer> Create(struct OmxCodecBuffer &codecBuffer);
+    static OHOS::sptr<ICodecBuffer> Allocate(struct OmxCodecBuffer &codecBuffer);
     int32_t FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer) override;
     int32_t EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFERHEADERTYPE &omxBuffer) override;
     int32_t FreeBuffer(struct OmxCodecBuffer &codecBuffer) override;
@@ -36,7 +36,7 @@ public:
     uint8_t *GetBuffer() override;
 
 protected:
-    CodecShareBuffer(struct OmxCodecBuffer &codecBuffer);
+    explicit CodecShareBuffer(struct OmxCodecBuffer &codecBuffer);
     bool CheckInvalid(struct OmxCodecBuffer &codecBuffer) override;
 
 private:

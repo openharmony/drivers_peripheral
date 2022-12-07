@@ -24,7 +24,7 @@ namespace Memorytracker {
 namespace V1_0 {
 class MemoryTrackerInterfaceImpl : public IMemoryTrackerInterface {
 public:
-    virtual ~MemoryTrackerInterfaceImpl() {}
+    ~MemoryTrackerInterfaceImpl() override {}
 
     int32_t GetDevMem(int32_t pid, MemoryTrackerType type, std::vector<MemoryRecord>& records) override;
 };

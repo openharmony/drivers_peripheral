@@ -146,7 +146,7 @@ int32_t TimeToAudioTimeStamp(uint64_t bufferFrameSize, struct AudioTimeStamp *ti
     return HDF_SUCCESS;
 }
 
-void AudioLogRecord(int errorLevel, const char *format, ...)
+void AudioLogRecord(int32_t errorLevel, const char *format, ...)
 {
     va_list args;
     FILE *fp = NULL;

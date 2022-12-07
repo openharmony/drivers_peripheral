@@ -322,7 +322,7 @@ int32_t DStreamOperator::DetachBufferQueue(int32_t streamId)
 
 void DStreamOperator::ExtractCaptureInfo(std::vector<DCCaptureInfo> &captureInfos)
 {
-    for (auto &captureInfo : cachedDCaptureInfoList_) {
+    for (const auto &captureInfo : cachedDCaptureInfoList_) {
         DCCaptureInfo capture;
         capture.streamIds_.assign(captureInfo->streamIds_.begin(), captureInfo->streamIds_.end());
         capture.width_ = captureInfo->width_;
@@ -393,9 +393,6 @@ int32_t DStreamOperator::DoCapture(int32_t captureId, const CaptureInfo &info, b
     captureInfo->enableShutterCallback_ = info.enableShutterCallback_;
     InsertCaptureInfo(captureId, captureInfo);
 
-    if (dcStreamOperatorCallback_) {
-        dcStreamOperatorCallback_->OnCaptureStarted(captureId, info.streamIds_);
-    }
     SetCapturing(true);
     DHLOGI("DStreamOperator::DoCapture, start distributed camera capture success.");
 
@@ -634,6 +631,12 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const DCameraBuffer &bu
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
+    if (buffer.index_ == 0 && dcStreamOperatorCallback_ != nullptr) {
+        vector<int> tmpStreamIds;
+        tmpStreamIds.push_back(streamId);
+        dcStreamOperatorCallback_->OnCaptureStarted(captureId, tmpStreamIds);
+    }
+
     auto stream = FindHalStreamById(streamId);
     if (stream != nullptr) {
         DCamRetCode ret = stream->ReturnDCameraBuffer(buffer);
@@ -703,11 +706,11 @@ void DStreamOperator::Release()
     DHLOGI("DStreamOperator::Release, begin release stream operator.");
 
     std::vector<int> streamIds = GetStreamIds();
+    SetCapturing(false);
     ReleaseStreams(streamIds);
     if (latestStreamSetting_) {
         latestStreamSetting_ = nullptr;
     }
-    SetCapturing(false);
     {
         std::lock_guard<std::mutex> lockStream(halStreamLock_);
         halStreamMap_.clear();
@@ -824,6 +827,9 @@ void DStreamOperator::AppendCaptureInfo(std::shared_ptr<DCCaptureInfo> &appendCa
                 appendCaptureInfo = cacheCapture;
                 break;
             }
+        }
+        if (inputCaptureInfo->type_ == DCStreamType::SNAPSHOT_FRAME) {
+            ChooseSuitableStreamId(appendCaptureInfo);
         }
         inputCaptureInfo->isCapture_ = isStreaming ? false : true;
     }
@@ -972,6 +978,30 @@ void DStreamOperator::ChooseSuitableEncodeType(std::vector<std::shared_ptr<DCStr
             captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_JPEG;
         } else {
             captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_NULL;
+        }
+    }
+}
+
+void DStreamOperator::ChooseSuitableStreamId(std::shared_ptr<DCCaptureInfo> &captureInfo)
+{
+    if (captureInfo == nullptr) {
+        DHLOGE("DStreamOperator::ChooseSuitableStreamId captureInfo is null");
+        return;
+    }
+
+    captureInfo->streamIds_.clear();
+    std::lock_guard<std::mutex> autoLock(streamAttrLock_);
+    for (auto iter : halCaptureInfoMap_) {
+        for (auto id : iter.second->streamIds_) {
+            auto dcStreamInfo = dcStreamInfoMap_.find(id);
+            if (dcStreamInfo == dcStreamInfoMap_.end()) {
+                continue;
+            }
+
+            if (dcStreamInfo->second->type_ == DCStreamType::CONTINUOUS_FRAME) {
+                DHLOGI("DStreamOperator::ChooseSuitableStreamId, streamId: %d", id);
+                captureInfo->streamIds_.push_back(id);
+            }
         }
     }
 }

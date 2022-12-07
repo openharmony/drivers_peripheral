@@ -22,8 +22,10 @@ ohos_prebuilt_etc("init.usb.configfs.cfg") {
 
 ohos_prebuilt_etc("usb.para.dac") {
   source = "usb.para.dac"
+  relative_install_dir = "param"
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
   part_name = "drivers_peripheral_usb"
-  module_install_dir = "etc/param"
 }
 
 group("usb_etc_files") {

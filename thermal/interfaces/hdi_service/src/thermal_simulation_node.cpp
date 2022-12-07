@@ -191,7 +191,7 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
 
 int32_t ThermalSimulationNode::WriteFile(std::string path, std::string buf, size_t size)
 {
-    int32_t fd = open(path.c_str(), O_RDWR);
+    int32_t fd = open(path.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
     if (fd < NUM_ZERO) {
         THERMAL_HILOGE(COMP_HDI, "open failed to file.");
     }

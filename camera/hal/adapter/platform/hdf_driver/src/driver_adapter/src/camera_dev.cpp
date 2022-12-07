@@ -25,7 +25,7 @@ HosCameraDev::~HosCameraDev() {}
 
 char* HosCameraDev::GetCameraName(const std::string& cameraId)
 {
-    int cameraId_list;
+    int cameraId_list = 0;
     char deviceName[DEVICE_NAME_NUM] = {0};
 
     for (auto iter = hardware.cbegin(); iter != hardware.cend(); iter++) {
@@ -265,7 +265,6 @@ RetCode HosCameraDev::ReleaseBuffers(const std::string& cameraId, int type)
 
 void HosCameraDev::loopBuffers(const std::string& cameraId, int type)
 {
-    int32_t ret = 0;
     char deviceName[DEVICE_NAME_NUM] = {0};
 
     if (myBuffers_ == nullptr) {
@@ -277,7 +276,7 @@ void HosCameraDev::loopBuffers(const std::string& cameraId, int type)
         return;
     }
     while (streamNumber_ > 0) {
-        ret = myBuffers_->CameraStreamDequeue(type, permissionId_, deviceName);
+        int32_t ret = myBuffers_->CameraStreamDequeue(type, permissionId_, deviceName);
         if (ret != HDF_SUCCESS) {
             CAMERA_LOGE("CameraStreamDequeue failed!\n");
             return;

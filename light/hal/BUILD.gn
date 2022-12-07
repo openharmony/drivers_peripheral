@@ -17,8 +17,13 @@ import("//build/ohos.gni")
 LIGHT_ROOT_DIR = "//drivers/peripheral/light"
 
 if (defined(ohos_lite)) {
+  config("libhdi_light_pub_config") {
+    visibility = [ ":*" ]
+  }
+
   FWK_ROOT_DIR = "//drivers/hdf_core/framework"
   ohos_shared_library("hdi_light") {
+    output_extension = "z.so"
     sources = [ "$LIGHT_ROOT_DIR/hal/src/light_controller.c" ]
 
     include_dirs = [
@@ -31,8 +36,12 @@ if (defined(ohos_lite)) {
       "//third_party/bounds_checking_function/include",
     ]
 
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-    public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    public_configs = [ ":libhdi_light_pub_config" ]
+    deps = [
+      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
 
     cflags = [
       "-Wall",
@@ -45,15 +54,6 @@ if (defined(ohos_lite)) {
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_light"
-    if (is_standard_system) {
-      external_deps = [
-        "c_utils:utils",
-        "hdf_core:libhdf_utils",
-        "hiviewdfx_hilog_native:libhilog",
-      ]
-    } else {
-      external_deps = [ "hilog:libhilog" ]
-    }
   }
 } else {
   config("libhdi_light_pub_config") {

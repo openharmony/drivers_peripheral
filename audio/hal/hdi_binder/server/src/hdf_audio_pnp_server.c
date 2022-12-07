@@ -17,6 +17,7 @@
 #include "audio_uhdf_log.h"
 #include "hdf_audio_input_event.h"
 #include "hdf_audio_pnp_uevent.h"
+#include "hdf_audio_pnp_uevent_hdmi.h"
 #include "hdf_audio_server.h"
 #include "hdf_device_desc.h"
 #include "hdf_device_object.h"
@@ -26,10 +27,12 @@
 #include "securec.h"
 #include "servmgr_hdi.h"
 
-#define HDF_LOG_TAG             HDF_AUDIO_HAL_HOST
+#define HDF_LOG_TAG             HDF_AUDIO_HOST
 #define AUDIO_HDI_SERVICE_NAME  "audio_hdi_usb_service"
 #define AUDIO_TOKEN_SERVER_NAME "ohos.hdi.audio_service"
 #define AUDIO_PNP_INFO_LEN_MAX  256
+#define AUDIO_CONTROL           "hdf_audio_control"
+#define AUDIO_UNLOAD_DRIVER_ID  4
 
 static struct HdfDeviceObject *g_audioPnpDevice = NULL;
 
@@ -184,8 +187,9 @@ static int32_t HdfAudioPnpInit(struct HdfDeviceObject *device)
         return HDF_FAILURE;
     }
     g_audioPnpDevice = device;
-    AudioPnpUeventStartThread();
-    AudioPnpInputStartThread();
+    AudioUsbPnpUeventStartThread();
+    AudioHeadsetPnpInputStartThread();
+    AudioHdmiPnpUeventStartThread();
 
     AUDIO_FUNC_LOGI("end.");
     return HDF_SUCCESS;
@@ -199,12 +203,75 @@ static void HdfAudioPnpRelease(struct HdfDeviceObject *device)
         return;
     }
 
-    AudioPnpUeventStopThread();
-    AudioPnpInputEndThread();
+    AudioUsbPnpUeventStopThread();
+    AudioHeadsetPnpInputEndThread();
+    AudioHdmiPnpUeventStopThread();
     device->service = NULL;
 
     AUDIO_FUNC_LOGI("end.");
     return;
+}
+
+int32_t AudioUhdfUnloadDriver(const char *driverName)
+{
+    struct HdfSBuf *sBuf = NULL;
+    struct HdfIoService *service = NULL;
+
+    if (driverName == NULL) {
+        AUDIO_FUNC_LOGE("param is NULL!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    service = HdfIoServiceBind(AUDIO_CONTROL);
+    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+        AUDIO_FUNC_LOGE("Bind service failed!");
+        return HDF_FAILURE;
+    }
+
+    sBuf = HdfSbufObtainDefaultSize();
+    if (sBuf == NULL) {
+        HdfIoServiceRecycle(service);
+        AUDIO_FUNC_LOGE("sbuf data malloc failed!");
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufWriteString(sBuf, driverName)) {
+        HdfSbufRecycle(sBuf);
+        HdfIoServiceRecycle(service);
+        AUDIO_FUNC_LOGE("driverName Write Fail!");
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = service->dispatcher->Dispatch(&service->object, AUDIO_UNLOAD_DRIVER_ID, sBuf, NULL);
+    if (ret != HDF_SUCCESS) {
+        HdfSbufRecycle(sBuf);
+        HdfIoServiceRecycle(service);
+        AUDIO_FUNC_LOGE("Unload HDMI Driver dispatch error");
+        return HDF_FAILURE;
+    }
+
+    HdfSbufRecycle(sBuf);
+    HdfIoServiceRecycle(service);
+    return HDF_SUCCESS;
+}
+
+int32_t AudioUhdfLoadDriver(const char *driverName)
+{
+    struct HdfIoService *serv = NULL;
+
+    if (driverName == NULL) {
+        AUDIO_FUNC_LOGE("param is NULL!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    serv = HdfIoServiceBind(driverName);
+    if (serv == NULL) {
+        AUDIO_FUNC_LOGE("error HdfIoServiceBind %{public}s", driverName);
+        return HDF_FAILURE;
+    }
+
+    HdfIoServiceRecycle(serv);
+    return HDF_SUCCESS;
 }
 
 struct HdfDriverEntry g_hdiAudioPnpEntry = {

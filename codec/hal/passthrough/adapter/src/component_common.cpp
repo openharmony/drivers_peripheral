@@ -714,7 +714,7 @@ static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, i
                 break;
             case KEY_PIXEL_FORMAT:
                 param->format.video.eColorFormat =
-                         ConvertPixelFormatToColorFormat(*(reinterpret_cast<CodecPixelFormat *>(paramIn[i].val)));
+                    ConvertPixelFormatToColorFormat(*(reinterpret_cast<CodecPixelFormat *>(paramIn[i].val)));
                 break;
 
             default: {
