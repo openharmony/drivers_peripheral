@@ -56,12 +56,13 @@ extern "C" {
 #define KEY_VALUE_LIST_LEN 128
 
 #define HDF_AUDIO_CODEC_PRIMARY_DEV         "hdf_audio_codec_primary_dev"
+#define HDF_AUDIO_CODEC_HDMI_DEV            "hdf_audio_codec_hdmi_dev"
 #define HDF_AUDIO_CODEC_USB_DEV             "hdf_audio_codec_usb_dev"
 #define HDF_AUDIO_CODEC_A2DP_DEV            "hdf_audio_codec_a2dp_dev"
 #define PRIMARY                             "primary"
 #define USB                                 "usb"
 #define A2DP                                "a2dp"
-
+#define HDMI                                "hdmi"
 
 /**
  * @brief Enumerates HAL return value types.
@@ -447,7 +448,7 @@ int32_t AudioAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t rout
 int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
                                    const char *condition, const char *value);
 int32_t AudioAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
-                                   const char *condition, char *value, int32_t lenth);
+                                   const char *condition, char *value, int32_t length);
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
 int32_t AudioAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume);
 int32_t AudioRenderStart(AudioHandle handle);

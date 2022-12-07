@@ -17,7 +17,7 @@
 #define BUFFER_MANAGER_H
 
 #include <queue>
-#include <signal.h>
+#include <csignal>
 #include <pthread.h>
 #include "codec_type.h"
 #include "osal_mutex.h"

@@ -28,6 +28,7 @@
 #include "directory_ex.h"
 #include "parameter.h"
 #include "securec.h"
+#include "thermal_hdf_utils.h"
 #include "thermal_log.h"
 #include "thermal_zone_manager.h"
 #include "zlib.h"
@@ -38,28 +39,25 @@ namespace Thermal {
 namespace V1_0 {
 namespace {
 constexpr uint8_t LOG_INDEX_LEN = 4;
-constexpr int32_t MSEC_TO_SEC = 1000;
 constexpr int32_t MAX_FILE_NUM = 10;
 constexpr int32_t MAX_FILE_SIZE = 10 * 1024 *1024;
 constexpr int32_t MAX_TIME_LEN = 20;
-constexpr int32_t MAX_BUFF_SIZE = 128;
 constexpr int32_t TIME_FORMAT_1 = 1;
 constexpr int32_t TIME_FORMAT_2 = 2;
 constexpr int32_t COMPRESS_READ_BUF_SIZE = 4096;
+constexpr uint8_t DEFAULT_WIDTH = 20;
+constexpr uint32_t DEFAULT_INTERVAL = 5000;
+constexpr uint32_t MIN_INTERVAL = 100;
 const std::string TIMESTAMP_TITLE = "timestamp";
-const std::string DEFAULT_WIDTH = "20";
-const std::string DEFAULT_INTERVAL = "5000";
 const std::string DEFAULT_ENABLE = "true";
-const std::string THERMAL_LOG_WIDTH = "persist.thermal.log.width";
-const std::string THERMAL_LOG_INTERVAL = "persist.thermal.log.interval";
 const std::string THERMAL_LOG_ENABLE = "persist.thermal.log.enable";
+uint8_t g_width = DEFAULT_WIDTH;
+uint32_t g_interval = DEFAULT_INTERVAL;
 uint32_t g_currentLogIndex = 0;
 bool g_firstCreate = true;
 std::deque<std::string> g_saveLogFile;
-XMLTracingInfo g_xmlTraceInfo;
+std::string g_outPath = "";
 std::string g_logTime = "";
-std::string g_width = DEFAULT_WIDTH;
-std::string g_interval = DEFAULT_INTERVAL;
 std::string g_enable = DEFAULT_ENABLE;
 }
 
@@ -174,7 +172,7 @@ bool ThermalDfx::Compress(const std::string& dataFile, const std::string& destFi
 void ThermalDfx::CompressFile()
 {
     unsigned long size;
-    std::string unCompressFile = g_xmlTraceInfo.outpath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
+    std::string unCompressFile = g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
         "." + g_logTime;
 
     FILE* fp = fopen(unCompressFile.c_str(), "rb");
@@ -201,7 +199,7 @@ void ThermalDfx::CompressFile()
         THERMAL_HILOGW(COMP_HDI, "fclose() failed");
     }
 
-    std::string compressFile = g_xmlTraceInfo.outpath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
+    std::string compressFile = g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
         "." + g_logTime + ".gz";
     if (!Compress(unCompressFile, compressFile)) {
         THERMAL_HILOGE(COMP_HDI, "CompressFile fail");
@@ -223,27 +221,9 @@ void ThermalDfx::CompressFile()
     g_logTime = GetCurrentTime(TIME_FORMAT_1);
 }
 
-int32_t ThermalDfx::ParseValue(const std::string& path, std::string& value)
-{
-    char bufType[MAX_BUFF_SIZE] = {0};
-    std::unique_ptr<ThermalZoneManager> thermalZoneMgr = std::make_unique<ThermalZoneManager>();
-    if (thermalZoneMgr == nullptr) {
-        THERMAL_HILOGE(COMP_HDI, "thermalZoneMgr is nullptr");
-        return -1;
-    }
-
-    int32_t ret = thermalZoneMgr->ReadThermalSysfsToBuff(path.c_str(), bufType, sizeof(bufType));
-    if (ret != HDF_SUCCESS) {
-        return ret;
-    }
-
-    value = bufType;
-    return HDF_SUCCESS;
-}
-
 bool ThermalDfx::PrepareWriteDfxLog()
 {
-    if (g_xmlTraceInfo.outpath == "") {
+    if (g_outPath == "") {
         THERMAL_HILOGW(COMP_HDI, "parse thermal_hdi_config.xml outpath fail");
         return false;
     }
@@ -266,10 +246,10 @@ void ThermalDfx::CreateLogFile()
         g_logTime = GetCurrentTime(TIME_FORMAT_1);
         g_firstCreate = false;
     }
-    std::string logFile = g_xmlTraceInfo.outpath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
+    std::string logFile = g_outPath + "/" + "thermal." + GetFileNameIndex(g_currentLogIndex) +
         "." + g_logTime;
-    if (access(g_xmlTraceInfo.outpath.c_str(), 0) == -1) {
-        auto ret = ForceCreateDirectory(g_xmlTraceInfo.outpath.c_str());
+    if (access(g_outPath.c_str(), 0) == -1) {
+        auto ret = ForceCreateDirectory(g_outPath.c_str());
         if (!ret) {
             THERMAL_HILOGE(COMP_HDI, "create output dir failed");
             return;
@@ -292,131 +272,79 @@ void ThermalDfx::CreateLogFile()
 
 void ThermalDfx::ProcessLogInfo(std::string& logFile, bool isEmpty)
 {
-    uint32_t paramWidth = static_cast<uint32_t>(std::stoi(g_width.c_str()));
-
     std::string currentTime = GetCurrentTime(TIME_FORMAT_2);
     std::ofstream wStream(logFile, std::ios::app);
     if (wStream.is_open()) {
         if (isEmpty) {
-            WriteToEmptyFile(wStream, currentTime, paramWidth);
+            WriteToEmptyFile(wStream, currentTime);
             return;
         }
 
-        WriteToFile(wStream, currentTime, paramWidth);
+        WriteToFile(wStream, currentTime);
         wStream.close();
     }
 }
 
-void ThermalDfx::WriteToEmptyFile(std::ofstream& wStream, std::string& currentTime, uint32_t paramWidth)
+void ThermalDfx::WriteToEmptyFile(std::ofstream& wStream, std::string& currentTime)
 {
     wStream << TIMESTAMP_TITLE;
-    for (uint32_t i = 0; i < paramWidth; ++i) {
+    for (uint8_t i = 0; i < g_width; ++i) {
         wStream << " ";
     }
 
     std::vector<DfxTraceInfo> logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
     for (auto info : logInfo) {
-        if (info.title.find("/")) {
-            std::string titlePath = info.title;
-            ParseValue(titlePath, info.title);
-        }
         wStream << info.title;
-        if (info.value == logInfo.back().value &&
-            info.title == logInfo.back().title) {
+        if (info.valuePath == logInfo.back().valuePath && info.title == logInfo.back().title) {
             break;
         }
-        for (uint32_t i = 0; i < paramWidth; ++i) {
+        for (uint8_t i = 0; i < g_width - info.title.length(); ++i) {
             wStream << " ";
         }
     }
     wStream << "\n";
 
-    WriteToFile(wStream, currentTime, paramWidth);
+    WriteToFile(wStream, currentTime);
     wStream.close();
 }
 
-void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime, uint32_t paramWidth)
+void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime)
 {
     wStream << currentTime;
-    for (uint32_t i = 0; i < paramWidth + TIMESTAMP_TITLE.length() - currentTime.length(); ++i) {
+    for (uint8_t i = 0; i < g_width + TIMESTAMP_TITLE.length() - currentTime.length(); ++i) {
         wStream << " ";
     }
-    std::vector<DfxTraceInfo> logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
+    std::vector<DfxTraceInfo>& logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
+    std::string value;
     for (auto info : logInfo) {
-        std::string valuePath = info.value;
-        ParseValue(valuePath, info.value);
-        wStream << info.value;
-        if (info.value == logInfo.back().value &&
-            info.title == logInfo.back().title) {
+        ThermalHdfUtils::ReadNode(info.valuePath, value);
+        wStream << value;
+        if (info.valuePath == logInfo.back().valuePath && info.title == logInfo.back().title) {
             break;
         }
-
-        if (info.title.find("/")) {
-            std::string titlePath = info.title;
-            ParseValue(titlePath, info.title);
-        }
-        for (uint32_t i = 0; i < paramWidth + info.title.length() - info.value.length(); ++i) {
+        for (uint8_t i = 0; i < g_width - value.length(); ++i) {
             wStream << " ";
         }
     }
     wStream << "\n";
-}
-
-void ThermalDfx::GetTraceInfo()
-{
-    XMLTracingInfo info = ThermalHdfConfig::GetInsance().GetXmlTraceInfo();
-
-    g_xmlTraceInfo.interval = info.interval;
-    g_xmlTraceInfo.outpath = info.outpath;
-
-    std::vector<DfxTraceInfo> logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
-    for (const auto& item : logInfo) {
-        THERMAL_HILOGD(COMP_HDI, "item.title = %{public}s, item.value = %{public}s",
-            item.title.c_str(), item.value.c_str());
-    }
-
-    CreateLogFile();
 }
 
 void ThermalDfx::InfoChangedCallback(const char* key, const char* value, void* context)
 {
-    if (key == nullptr) {
-        return;
-    }
-
-    if (strcmp(key, THERMAL_LOG_WIDTH.c_str()) == 0) {
-        if (value == nullptr) {
-            return;
-        }
-        g_width = value;
-        return;
-    }
-    if (strcmp(key, THERMAL_LOG_INTERVAL.c_str()) == 0) {
-        if (value == nullptr) {
-            return;
-        }
-        g_interval = value;
+    if (key == nullptr || value == nullptr) {
         return;
     }
     if (strcmp(key, THERMAL_LOG_ENABLE.c_str()) == 0) {
-        if (value == nullptr) {
-            return;
-        }
         g_enable = value;
-        return;
     }
-    return;
 }
 
 int32_t ThermalDfx::LoopingThreadEntry()
 {
-    WatchParameter(THERMAL_LOG_WIDTH.c_str(), InfoChangedCallback, nullptr);
-    WatchParameter(THERMAL_LOG_INTERVAL.c_str(), InfoChangedCallback, nullptr);
     WatchParameter(THERMAL_LOG_ENABLE.c_str(), InfoChangedCallback, nullptr);
     while (true) {
-        THERMAL_HILOGD(COMP_HDI, "interval = %{public}s", g_interval.c_str());
-        std::this_thread::sleep_for(std::chrono::seconds(std::stoi(g_interval.c_str()) / MSEC_TO_SEC));
-        GetTraceInfo();
+        std::this_thread::sleep_for(std::chrono::milliseconds(g_interval));
+        CreateLogFile();
         CompressFile();
     }
 }
@@ -428,6 +356,12 @@ void ThermalDfx::StartThread()
 
 int32_t ThermalDfx::Init()
 {
+    XmlTraceConfig& config = ThermalHdfConfig::GetInsance().GetXmlTraceConfig();
+    g_interval = config.interval > MIN_INTERVAL ? config.interval: MIN_INTERVAL;
+    g_width = config.width > DEFAULT_WIDTH ? config.width : DEFAULT_WIDTH;
+    g_outPath = config.outPath;
+    THERMAL_HILOGI(COMP_HDI, "tarce init interval: %{public}d width: %{public}d outpath: %{private}s",
+        g_interval, g_width, g_outPath.c_str());
     StartThread();
     return HDF_SUCCESS;
 }

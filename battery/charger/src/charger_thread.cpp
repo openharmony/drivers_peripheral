@@ -14,47 +14,42 @@
  */
 
 #include "charger_thread.h"
-
-#include <cinttypes>
-#include <securec.h>
-#include <parameters.h>
-#include <linux/netlink.h>
-#include "updater_ui.h"
-#include "text_label.h"
-#include "view.h"
-#include "input_manager.h"
-#include "input_type.h"
-#include "init_reboot.h"
 #include "battery_config.h"
 #include "battery_log.h"
+#include "charger_animation.h"
+#include "init_reboot.h"
+#include "input_manager.h"
+#include "input_type.h"
+#include <cinttypes>
+#include <linux/netlink.h>
+#include <parameters.h>
+#include <securec.h>
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
 namespace V1_1 {
 namespace {
-constexpr int32_t SHUTDOWN_TIME_MS = 2000;
 constexpr int32_t SEC_TO_MSEC = 1000;
 constexpr int32_t NSEC_TO_MSEC = 1000000;
 constexpr int32_t REBOOT_TIME = 2000;
 constexpr int32_t BACKLIGHT_OFF_TIME_MS = 10000;
 constexpr int32_t VIBRATE_TIME_MS = 75;
-constexpr int32_t MAX_IMG_COUNT = 62;
-constexpr int32_t MAX_IMG_NAME_SIZE = 255;
-constexpr int32_t LOOP_TOP_PICTURES = 10;
 const std::string REBOOT_CMD = "";
 const std::string SHUTDOWN_CMD = "shutdown";
-}
+} // namespace
+
+std::unique_ptr<ChargerAnimation> ChargerThread::animation_ = nullptr;
+bool ChargerThread::isChargeStateChanged_ = false;
+bool ChargerThread::isConfigParse_ = false;
+int32_t ChargerThread::lackPowerCapacity_ = -1;
+InputEventCb g_callback = {nullptr};
 
 struct KeyState {
     bool up;
     bool down;
     int64_t timestamp;
 };
-
-Frame* g_hosFrame = nullptr;
-AnimationLabel* g_animationLabel = nullptr;
-TextLabel* g_updateInfoLabel = nullptr;
 struct KeyState g_keys[KEY_MAX + 1] = {};
 
 static int64_t GetCurrentTime()
@@ -77,10 +72,6 @@ int32_t ChargerThread::UpdateWaitInterval()
     int64_t nextWait = INT64_MAX;
     int64_t timeout = INVALID;
 
-    if (pluginWait_ != INVALID) {
-        nextWait = pluginWait_ - currentTime;
-    }
-
     if (keyWait_ != INVALID && keyWait_ < nextWait) {
         nextWait = keyWait_;
     }
@@ -100,71 +91,6 @@ int32_t ChargerThread::UpdateWaitInterval()
     return static_cast<int32_t>(timeout);
 }
 
-void ChargerThread::AnimationInit()
-{
-    BATTERY_HILOGD(FEATURE_CHARGING, "start init animation");
-    int32_t screenH = 0;
-    int32_t screenW = 0;
-    auto* sfDev = new SurfaceDev(SurfaceDev::DevType::DRM_DEVICE);
-    sfDev->GetScreenSize(screenW, screenH);
-    View::BRGA888Pixel bgColor {0x00, 0x00, 0x00, 0xff};
-
-    g_hosFrame = new Frame(screenW, screenH, View::PixelFormat::BGRA888, sfDev);
-    g_hosFrame->SetBackgroundColor(&bgColor);
-
-    g_animationLabel = new AnimationLabel(90, 240, 360, 960 >> 1, g_hosFrame);
-    g_animationLabel->SetBackgroundColor(&bgColor);
-    LoadImages(g_animationLabel);
-
-    g_updateInfoLabel = new TextLabel(screenW / 3, 340, screenW / 3, 100, g_hosFrame);
-    g_updateInfoLabel->SetOutLineBold(false, false);
-    g_updateInfoLabel->SetBackgroundColor(&bgColor);
-
-    BATTERY_HILOGD(FEATURE_CHARGING, "finish init animation");
-}
-
-void ChargerThread::LoadImages(AnimationLabel* animationLabel)
-{
-    BATTERY_HILOGD(FEATURE_CHARGING, "start load images");
-    char nameBuf[MAX_IMG_NAME_SIZE];
-    for (int32_t i = 0; i < MAX_IMG_COUNT; i++) {
-        if (memset_s(nameBuf, MAX_IMG_NAME_SIZE, 0, MAX_IMG_NAME_SIZE) != EOK) {
-            BATTERY_HILOGW(FEATURE_CHARGING, "memset_s failed");
-            return;
-        }
-
-        if (i < LOOP_TOP_PICTURES) {
-            if (snprintf_s(nameBuf, MAX_IMG_NAME_SIZE, MAX_IMG_NAME_SIZE - 1,
-                           "/vendor/etc/charger/resources/loop0000%d.png", i) == -1) {
-                BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s failed, index=%{public}d", i);
-                return;
-            }
-        } else {
-            if (snprintf_s(nameBuf, MAX_IMG_NAME_SIZE, MAX_IMG_NAME_SIZE - 1,
-                           "/vendor/etc/charger/resources/loop000%d.png", i) == -1) {
-                BATTERY_HILOGW(FEATURE_CHARGING, "snprintf_s failed, index=%{public}d", i);
-                return;
-            }
-        }
-
-        animationLabel->AddImg(nameBuf);
-    }
-    animationLabel->AddStaticImg(nameBuf);
-}
-
-void ChargerThread::UpdateAnimation(const int32_t& capacity)
-{
-    BATTERY_HILOGD(FEATURE_CHARGING, "start update animation, capacity=%{public}d", capacity);
-    AnimationLabel::needStop_ = false;
-
-    struct FocusInfo info {false, false};
-    struct Bold bold {false, false};
-    View::BRGA888Pixel bgColor {0x00, 0x00, 0x00, 0xff};
-    std::string displaySoc = "  " + std::to_string(capacity) + "%";
-    TextLabelInit(g_updateInfoLabel, displaySoc, bold, info, bgColor);
-    g_animationLabel->UpdateLoop();
-}
-
 void ChargerThread::CycleMatters()
 {
     if (!started_) {
@@ -172,10 +98,8 @@ void ChargerThread::CycleMatters()
         backlightWait_ = GetCurrentTime() - 1;
     }
 
-    provider_->ParseCapacity(&capacity_);
-    provider_->ParseChargeState(&chargeState_);
-    BATTERY_HILOGI(FEATURE_CHARGING, "chargeState_=%{public}d, capacity_=%{public}d", chargeState_, capacity_);
-
+    UpdateBatteryInfo(nullptr);
+    BATTERY_HILOGD(FEATURE_CHARGING, "chargeState_=%{public}d, capacity_=%{public}d", chargeState_, capacity_);
     UpdateEpollInterval(chargeState_);
 }
 
@@ -185,29 +109,23 @@ void ChargerThread::UpdateBatteryInfo(void* arg)
     int32_t temperature = 0;
     provider_->ParseTemperature(&temperature);
     provider_->ParseCapacity(&capacity_);
+    int32_t oldChargeState = chargeState_;
     provider_->ParseChargeState(&chargeState_);
     BATTERY_HILOGD(FEATURE_CHARGING, "temperature=%{public}d, capacity_=%{public}d, chargeState_=%{public}d",
         temperature, capacity_, chargeState_);
+    if (chargeState_ != oldChargeState) {
+        isChargeStateChanged_ = true;
+    } else {
+        isChargeStateChanged_ = false;
+    }
 
     HandleTemperature(temperature);
     HandleCapacity(capacity_);
 
     led_->UpdateColor(chargeState_, capacity_);
-    if (backlight_->GetScreenState()) {
-        UpdateAnimation(capacity_);
-    }
-}
 
-void ChargerThread::HandleCapacity(const int32_t& capacity)
-{
-    const int32_t DEFAULT_CAPACITY_CONF = -1;
-    auto lowCapacity = BatteryConfig::GetInstance().GetInt("soc.shutdown", DEFAULT_CAPACITY_CONF);
-    BATTERY_HILOGD(FEATURE_CHARGING, "capacity=%{public}d, lowCapacity=%{public}d", capacity, lowCapacity);
-    if ((capacity <= lowCapacity) &&
-        ((chargeState_ == PowerSupplyProvider::CHARGE_STATE_NONE) ||
-        (chargeState_ == PowerSupplyProvider::CHARGE_STATE_RESERVED))) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "low capacity, shutdown device");
-        DoReboot(SHUTDOWN_CMD.c_str());
+    if (backlight_->GetScreenState() == BatteryBacklight::SCREEN_ON) {
+        UpdateAnimation(chargeState_, capacity_);
     }
 }
 
@@ -218,13 +136,61 @@ void ChargerThread::HandleTemperature(const int32_t& temperature)
     auto& batteryConfig = BatteryConfig::GetInstance();
     auto highTemp = batteryConfig.GetInt("temperature.high", DEFAULT_UPPER_TEMP_CONF);
     auto lowTemp = batteryConfig.GetInt("temperature.low", DEFAULT_LOWER_TEMP_CONF);
-    BATTERY_HILOGD(FEATURE_CHARGING, "temperature=%{public}d, lowTemp=%{public}d, highTemp=%{public}d",
-        temperature, lowTemp, highTemp);
+    BATTERY_HILOGD(FEATURE_CHARGING, "temperature=%{public}d, lowTemp=%{public}d, highTemp=%{public}d", temperature,
+        lowTemp, highTemp);
 
     if (((temperature <= lowTemp) || (temperature >= highTemp)) && (lowTemp != highTemp)) {
         BATTERY_HILOGW(FEATURE_CHARGING, "temperature out of range, shutdown device");
         DoReboot(SHUTDOWN_CMD.c_str());
     }
+}
+
+void ChargerThread::HandleCapacity(const int32_t& capacity)
+{
+    if (capacity > lackPowerCapacity_ &&
+        (chargeState_ == PowerSupplyProvider::CHARGE_STATE_DISABLE ||
+            chargeState_ == PowerSupplyProvider::CHARGE_STATE_NONE)) {
+        BATTERY_HILOGW(FEATURE_CHARGING, "Not Charging, Shutdown system");
+        DoReboot(SHUTDOWN_CMD.c_str());
+    }
+}
+
+void ChargerThread::UpdateAnimation(const int32_t& chargeState, const int32_t& capacity)
+{
+    BATTERY_HILOGD(FEATURE_CHARGING, "start update animation, capacity=%{public}d", capacity);
+    if ((chargeState == PowerSupplyProvider::CHARGE_STATE_NONE) ||
+        (chargeState == PowerSupplyProvider::CHARGE_STATE_RESERVED)) {
+        BATTERY_HILOGD(FEATURE_CHARGING, "Unknown charge state");
+        return;
+    }
+
+    if (capacity <= lackPowerCapacity_) {
+        if (chargeState == PowerSupplyProvider::CHARGE_STATE_ENABLE) { // Charging state
+            BATTERY_HILOGD(FEATURE_CHARGING, "Lack power");
+            animation_->AnimationStop();
+            animation_->LackPowerNotChargingPromptStop();
+            animation_->LackPowerChargingPromptStart();
+        } else if (chargeState == PowerSupplyProvider::CHARGE_STATE_DISABLE) { // Not charging state
+            BATTERY_HILOGD(FEATURE_CHARGING, "Lack power, please connect charger");
+            animation_->AnimationStop();
+            animation_->LackPowerChargingPromptStop();
+            animation_->LackPowerNotChargingPromptStart();
+        } else {
+            BATTERY_HILOGD(FEATURE_CHARGING, "capacity=%{public}d, chargeState=%{public}d", capacity, chargeState);
+        }
+    } else if (chargeState == PowerSupplyProvider::CHARGE_STATE_ENABLE ||
+        chargeState == PowerSupplyProvider::CHARGE_STATE_FULL) { // Charging state
+        BATTERY_HILOGD(FEATURE_CHARGING, "Display animation according capacity");
+        animation_->LackPowerChargingPromptStop();
+        animation_->LackPowerNotChargingPromptStop();
+        animation_->AnimationStart(capacity);
+    }
+}
+
+void ChargerThread::InitAnimation()
+{
+    animation_ = std::make_unique<ChargerAnimation>();
+    animation_->InitConfig();
 }
 
 void ChargerThread::SetKeyWait(struct KeyState& key, int64_t timeout)
@@ -237,56 +203,81 @@ void ChargerThread::SetKeyWait(struct KeyState& key, int64_t timeout)
 
 void ChargerThread::HandleChargingState()
 {
-    int64_t now = GetCurrentTime();
-    BATTERY_HILOGD(FEATURE_CHARGING, "chargeState_=%{public}d, now=%{public}" PRId64 "", chargeState_, now);
     if ((chargeState_ == PowerSupplyProvider::CHARGE_STATE_NONE) ||
         (chargeState_ == PowerSupplyProvider::CHARGE_STATE_RESERVED)) {
-        if (pluginWait_ == INVALID) {
-            BATTERY_HILOGD(FEATURE_CHARGING, "wait plugin");
-            backlightWait_ = now - 1;
-            backlight_->TurnOnScreen();
-            led_->TurnOff();
-            AnimationLabel::needStop_ = true;
-            pluginWait_ = now + SHUTDOWN_TIME_MS;
-        } else if (now >= pluginWait_) {
-            BATTERY_HILOGI(FEATURE_CHARGING, "shutdown device, charger unplugged, pluginWait_=%{public}" PRId64 "",
-                pluginWait_);
-            DoReboot(SHUTDOWN_CMD.c_str());
-        } else {
-            BATTERY_HILOGD(FEATURE_CHARGING, "ShutDownDevice timer already in scheduled.");
-        }
-    } else {
-        if (pluginWait_ != INVALID) {
-            BATTERY_HILOGI(FEATURE_CHARGING, "update capacity_=%{public}d", capacity_);
-            backlightWait_ = now - 1;
-            backlight_->TurnOnScreen();
-            led_->UpdateColor(chargeState_, capacity_);
-            AnimationLabel::needStop_ = true;
-            UpdateAnimation(capacity_);
-        }
-        pluginWait_ = INVALID;
+        return;
+    }
+
+    if (isChargeStateChanged_) {
+        BATTERY_HILOGD(FEATURE_CHARGING, "Charging State has changed");
+        backlight_->TurnOnScreen();
+        backlightWait_ = GetCurrentTime() - 1;
+        UpdateAnimation(chargeState_, capacity_);
+        isChargeStateChanged_ = false;
     }
 }
 
 void ChargerThread::HandleScreenState()
 {
     if (backlightWait_ != INVALID && GetCurrentTime() > backlightWait_ + BACKLIGHT_OFF_TIME_MS) {
-        BATTERY_HILOGI(FEATURE_CHARGING, "turn off screen");
         backlight_->TurnOffScreen();
-        AnimationLabel::needStop_ = true;
+        animation_->AnimationStop();
+        animation_->LackPowerChargingPromptStop();
+        animation_->LackPowerNotChargingPromptStop();
         backlightWait_ = INVALID;
+    }
+}
+
+void ChargerThread::HandlePowerKeyState()
+{
+    auto now = GetCurrentTime();
+    HandlePowerKey(KEY_POWER, now);
+
+    BATTERY_HILOGD(FEATURE_CHARGING, "keyWait_=%{public}" PRId64 "", keyWait_);
+    if (keyWait_ != INVALID && now > keyWait_) {
+        keyWait_ = INVALID;
+    }
+}
+
+void ChargerThread::HandlePowerKey(int32_t keycode, int64_t now)
+{
+    static bool turnOnByKeydown = false;
+    if (keycode == KEY_POWER) {
+        if (g_keys[keycode].down) {
+            int64_t rebootTime = g_keys[keycode].timestamp + REBOOT_TIME;
+            if (now >= rebootTime) {
+                BATTERY_HILOGW(FEATURE_CHARGING, "reboot machine");
+                backlight_->TurnOffScreen();
+                vibrate_->HandleVibration(VIBRATE_TIME_MS);
+                DoReboot(REBOOT_CMD.c_str());
+            } else if (backlight_->GetScreenState() == BatteryBacklight::SCREEN_OFF) {
+                SetKeyWait(g_keys[keycode], REBOOT_TIME);
+                backlight_->TurnOnScreen();
+                UpdateAnimation(chargeState_, capacity_);
+                backlightWait_ = now - 1;
+                turnOnByKeydown = true;
+            }
+        } else if (g_keys[keycode].up) {
+            if (backlight_->GetScreenState() == BatteryBacklight::SCREEN_ON && !turnOnByKeydown) {
+                backlight_->TurnOffScreen();
+                animation_->AnimationStop();
+                animation_->LackPowerChargingPromptStop();
+                animation_->LackPowerNotChargingPromptStop();
+                backlightWait_ = INVALID;
+            } else {
+                backlight_->TurnOnScreen();
+                backlightWait_ = now - 1;
+                UpdateAnimation(chargeState_, capacity_);
+            }
+            g_keys[keycode].up = false;
+            turnOnByKeydown = false;
+        }
     }
 }
 
 void ChargerThread::SetKeyState(int32_t code, int32_t value, int64_t now)
 {
-    BATTERY_HILOGD(FEATURE_CHARGING, "now=%{public}" PRId64 "", now);
-    bool down;
-    if (!!value) {
-        down = true;
-    } else {
-        down = false;
-    }
+    bool down = !!value;
 
     if (code > KEY_MAX) {
         return;
@@ -304,59 +295,14 @@ void ChargerThread::SetKeyState(int32_t code, int32_t value, int64_t now)
     g_keys[code].up = true;
 }
 
-void ChargerThread::HandlePowerKeyState()
-{
-    auto now = GetCurrentTime();
-    BATTERY_HILOGD(FEATURE_CHARGING, "now=%{public}" PRId64 "", now);
-    HandlePowerKey(KEY_POWER, now);
-
-    BATTERY_HILOGD(FEATURE_CHARGING, "keyWait_=%{public}" PRId64 "", keyWait_);
-    if (keyWait_ != INVALID && now > keyWait_) {
-        keyWait_ = INVALID;
-    }
-}
-
-void ChargerThread::HandlePowerKey(int32_t keycode, int64_t now)
-{
-    KeyState key = g_keys[keycode];
-    if (keycode == KEY_POWER) {
-        if (key.down) {
-            BATTERY_HILOGD(FEATURE_CHARGING, "power key down");
-            int64_t rebootTime = key.timestamp + REBOOT_TIME;
-            if (now >= rebootTime) {
-                BATTERY_HILOGD(FEATURE_CHARGING, "reboot machine");
-                backlight_->TurnOffScreen();
-                AnimationLabel::needStop_ = true;
-                vibrate_->HandleVibration(VIBRATE_TIME_MS);
-                DoReboot(REBOOT_CMD.c_str());
-            } else {
-                SetKeyWait(key, REBOOT_TIME);
-                backlight_->TurnOnScreen();
-                AnimationLabel::needStop_ = true;
-                UpdateAnimation(capacity_);
-                backlightWait_ = now - 1;
-                BATTERY_HILOGD(FEATURE_CHARGING, "turn on the screen");
-            }
-        } else {
-            if (key.up) {
-                BATTERY_HILOGD(FEATURE_CHARGING, "power key up");
-                backlight_->TurnOnScreen();
-                AnimationLabel::needStop_ = true;
-                UpdateAnimation(capacity_);
-                backlightWait_ = now - 1;
-            }
-        }
-    }
-}
-
 void ChargerThread::HandleInputEvent(const struct input_event* iev)
 {
     input_event ev {};
     ev.type = iev->type;
     ev.code = iev->code;
     ev.value = iev->value;
-    BATTERY_HILOGD(FEATURE_CHARGING, "ev.type=%{public}d, ev.code=%{public}d, ev.value=%{public}d",
-        ev.type, ev.code, ev.value);
+    BATTERY_HILOGD(FEATURE_CHARGING, "ev.type=%{public}u, ev.code=%{public}u, ev.value=%{public}d"
+        , ev.type, ev.code, ev.value);
 
     if (ev.type != EV_KEY) {
         return;
@@ -367,9 +313,8 @@ void ChargerThread::HandleInputEvent(const struct input_event* iev)
 void ChargerThread::EventPkgCallback(const InputEventPackage** pkgs, uint32_t count, uint32_t devIndex)
 {
     (void)devIndex;
-    BATTERY_HILOGD(FEATURE_CHARGING, "start key event callback");
     if (pkgs == nullptr || *pkgs == nullptr) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "pkgs or *pkgs is nullptr");
+        BATTERY_HILOGE(FEATURE_CHARGING, "pkgs or *pkgs is nullptr");
         return;
     }
     for (uint32_t i = 0; i < count; i++) {
@@ -384,46 +329,52 @@ void ChargerThread::EventPkgCallback(const InputEventPackage** pkgs, uint32_t co
 
 void ChargerThread::InitInput()
 {
-    BATTERY_HILOGD(FEATURE_CHARGING, "start init input");
     IInputInterface* inputInterface = nullptr;
     int32_t ret = GetInputInterface(&inputInterface);
     if (ret != INPUT_SUCCESS) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "get input driver interface failed, ret=%{public}d", ret);
+        BATTERY_HILOGE(FEATURE_CHARGING, "get input driver interface failed, ret=%{public}d", ret);
         return;
     }
 
-    const uint32_t DEVICE_INDEX = 1;
-    ret = inputInterface->iInputManager->OpenInputDevice(DEVICE_INDEX);
+    const uint32_t POWERKEY_INPUT_DEVICE = 2;
+    ret = inputInterface->iInputManager->OpenInputDevice(POWERKEY_INPUT_DEVICE);
     if (ret != INPUT_SUCCESS) {
-        BATTERY_HILOGD(FEATURE_CHARGING, "open device failed, index=%{public}u, ret=%{public}d", DEVICE_INDEX, ret);
+        BATTERY_HILOGE(FEATURE_CHARGING, "open device failed, index=%{public}u, ret=%{public}d"
+            , POWERKEY_INPUT_DEVICE, ret);
         return;
     }
 
     uint32_t devType = InputDevType::INDEV_TYPE_UNKNOWN;
-    ret = inputInterface->iInputController->GetDeviceType(DEVICE_INDEX, &devType);
+    ret = inputInterface->iInputController->GetDeviceType(POWERKEY_INPUT_DEVICE, &devType);
     if (ret != INPUT_SUCCESS) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "get device type failed, index=%{public}u, ret=%{public}d", DEVICE_INDEX, ret);
+        BATTERY_HILOGE(
+            FEATURE_CHARGING, "get device type failed, index=%{public}u, ret=%{public}d", POWERKEY_INPUT_DEVICE, ret);
         return;
     }
 
-    InputEventCb callback = {
-        .EventPkgCallback = EventPkgCallback
-    };
-    ret = inputInterface->iInputReporter->RegisterReportCallback(DEVICE_INDEX, &callback);
+    /* first param is powerkey input device, refer to device node '/dev/hdf_input_event2', so pass 2 */
+    g_callback.EventPkgCallback = EventPkgCallback;
+    ret = inputInterface->iInputReporter->RegisterReportCallback(POWERKEY_INPUT_DEVICE, &g_callback);
     if (ret != INPUT_SUCCESS) {
-        BATTERY_HILOGW(FEATURE_CHARGING, "register callback failed, index=%{public}u, ret=%{public}d", DEVICE_INDEX,
-                       ret);
+        BATTERY_HILOGE(FEATURE_CHARGING, "register callback failed, index=%{public}u, ret=%{public}d"
+            , POWERKEY_INPUT_DEVICE, ret);
         return;
     }
-
-    BATTERY_HILOGD(FEATURE_CHARGING, "finish init input, index=%{public}u, type=%{public}u", DEVICE_INDEX, devType);
 }
 
-void ChargerThread::Init()
+void ChargerThread::InitLackPowerCapacity()
 {
-    BATTERY_HILOGD(FEATURE_CHARGING, "start init charger thread");
-    BatteryConfig::GetInstance().ParseConfig();
+    if (!isConfigParse_) {
+        isConfigParse_ = BatteryConfig::GetInstance().ParseConfig();
+    }
 
+    auto& batteryConfig = BatteryConfig::GetInstance();
+    lackPowerCapacity_ = batteryConfig.GetInt("soc.shutdown");
+    BATTERY_HILOGD(FEATURE_CHARGING, "lackPowerCapacity_ = %{public}d", lackPowerCapacity_);
+}
+
+void ChargerThread::InitBatteryFileSystem()
+{
     provider_ = std::make_unique<PowerSupplyProvider>();
     if (provider_ == nullptr) {
         BATTERY_HILOGE(FEATURE_CHARGING, "make_unique PowerSupplyProvider return nullptr");
@@ -431,7 +382,10 @@ void ChargerThread::Init()
     }
     provider_->InitBatteryPath();
     provider_->InitPowerSupplySysfs();
+}
 
+void ChargerThread::InitVibration()
+{
     vibrate_ = std::make_unique<BatteryVibrate>();
     if (vibrate_ == nullptr) {
         BATTERY_HILOGE(FEATURE_CHARGING, "make_unique BatteryVibrate return nullptr");
@@ -441,24 +395,42 @@ void ChargerThread::Init()
     if (!vibrate_->InitVibration()) {
         BATTERY_HILOGW(FEATURE_CHARGING, "InitVibration failed, vibration does not work");
     }
+}
 
+void ChargerThread::InitBacklight()
+{
     backlight_ = std::make_unique<BatteryBacklight>();
     if (backlight_ == nullptr) {
         BATTERY_HILOGE(FEATURE_CHARGING, "make_unique BatteryBacklight return nullptr");
         return;
     }
-    backlight_->InitBacklightSysfs();
     backlight_->TurnOnScreen();
+}
 
+void ChargerThread::InitLed()
+{
     led_ = std::make_unique<BatteryLed>();
     if (led_ == nullptr) {
         BATTERY_HILOGE(FEATURE_CHARGING, "make_unique BatteryLed return nullptr");
         return;
     }
+
+    if (!isConfigParse_) {
+        isConfigParse_ = BatteryConfig::GetInstance().ParseConfig();
+    }
     led_->InitLight();
     led_->TurnOff();
+}
 
-    AnimationInit();
+void ChargerThread::Init()
+{
+    BATTERY_HILOGD(FEATURE_CHARGING, "start init charger thread");
+    InitLackPowerCapacity();
+    InitBatteryFileSystem();
+    InitVibration();
+    InitBacklight();
+    InitLed();
+    InitAnimation();
     InitInput();
 }
 
@@ -466,10 +438,9 @@ void ChargerThread::Run(void* service)
 {
     BATTERY_HILOGI(FEATURE_CHARGING, "start run charger thread");
     Init();
-    UpdateBatteryInfo(nullptr);
     std::make_unique<std::thread>(&ChargerThread::LoopingThreadEntry, this, service)->join();
 }
-}  // namespace V1_1
-}  // namespace Battery
-}  // namespace HDI
-}  // namespace OHOS
+} // namespace V1_1
+} // namespace Battery
+} // namespace HDI
+} // namespace OHOS

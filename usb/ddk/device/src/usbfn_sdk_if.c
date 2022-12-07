@@ -23,9 +23,11 @@
 #define HDF_LOG_TAG usbfn_sdk_if
 
 static struct UsbDeviceFunctionsInfo g_functionsInfo[] = {
-    {"f_generic.a", 1},
-    {"f_generic.e", 1 << 1},
-    {NULL, 0},
+    {"f_generic.a",   1     },
+    {"f_generic.e",   1 << 1},
+    {"f_generic.mtp", 1 << 3},
+    {"f_generic.ptp", 1 << 4},
+    {NULL,            0     },
 };
 
 static int32_t IsDescriptorOk(struct UsbFnDeviceDesc *des)
@@ -114,20 +116,22 @@ const struct UsbFnDevice *UsbFnCreateDevice(const char *udcName, struct UsbFnDes
         return NULL;
     }
     if (UsbFnMgrDeviceGet(udcName) != NULL) {
-        HDF_LOGE("%{public}s:%{public}s haved create", __func__, udcName);
+        HDF_LOGE("%{public}s: udc %{public}s haved create", __func__, udcName);
         return NULL;
     }
+    HDF_LOGD("%{public}s: type=%{public}d, fMask=%{public}d", __func__, descriptor->type, descriptor->functionMask);
     if (descriptor->type == USBFN_DESC_DATA_TYPE_PROP) {
         property = descriptor->property;
+        HDF_LOGD("%{public}s: use descriptor in HCS", __func__);
         des = UsbFnCfgMgrGetInstanceFromHCS(property);
         if (des == NULL) {
-            HDF_LOGE("%{public}s:get descriptors from Hcs failed", __func__);
+            HDF_LOGE("%{public}s: get descriptors from HCS failed", __func__);
             return NULL;
         }
-        UsbFnChangeFunction(des, descriptor);
     } else {
         des = descriptor->descriptor;
     }
+    UsbFnChangeFunction(des, descriptor);
     ret = IsDescriptorOk(des);
     if (ret) {
         return NULL;

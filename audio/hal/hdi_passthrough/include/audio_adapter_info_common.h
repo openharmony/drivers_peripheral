@@ -35,6 +35,9 @@
 #define AUDIO_PRIMARY_EXT_ID_MIN    11
 #define AUDIO_PRIMARY_EXT_ID_MAX    20
 
+#define AUDIO_HDMI_ID_MIN    11
+#define AUDIO_HDMI_ID_MAX    20
+
 #define AUDIO_USB_ID_MIN            21
 #define AUDIO_USB_ID_MAX            30
 
@@ -44,6 +47,7 @@
 enum AudioAdapterType {
     AUDIO_ADAPTER_PRIMARY = 0,  /* internal sound card */
     AUDIO_ADAPTER_PRIMARY_EXT,  /* extern sound card */
+    AUDIO_ADAPTER_HDMI,         /* hdmi sound card */
     AUDIO_ADAPTER_USB,         /* usb sound card */
     AUDIO_ADAPTER_A2DP,         /* blue tooth sound card */
     AUDIO_ADAPTER_MAX,          /* Invalid value. */
@@ -61,7 +65,7 @@ int32_t InitPortForCapabilitySub(struct AudioPort portIndex, struct AudioPortCap
 int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamValMap[], int32_t *count);
 int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key, void *value);
 int32_t GetErrorReason(int reason, char* reasonDesc);
-int32_t GetCurrentTime(char *time);
+int32_t GetCurrentTime(char *currentTime);
 int32_t CheckAttrRoute(int32_t param);
 int32_t CheckAttrChannel(uint32_t param);
 int32_t TransferRoute(const char *value, int32_t *route);

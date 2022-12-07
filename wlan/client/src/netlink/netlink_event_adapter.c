@@ -102,8 +102,8 @@ static void QcaWifiEventScanDoneProcess(const char *ifName, struct nlattr *data,
 
 static void WifiEventVendorProcess(const char *ifName, struct nlattr **attr)
 {
-    uint32_t vendor_id;
-    uint32_t subcmd;
+    uint32_t vendorId;
+    uint32_t subCmd;
     uint8_t *data = NULL;
     uint32_t len;
 
@@ -116,9 +116,9 @@ static void WifiEventVendorProcess(const char *ifName, struct nlattr **attr)
         return;
     }
 
-    vendor_id = nla_get_u32(attr[NL80211_ATTR_VENDOR_ID]);
-    subcmd = nla_get_u32(attr[NL80211_ATTR_VENDOR_SUBCMD]);
-    if (vendor_id != OUI_QCA || subcmd != NL80211_SCAN_DONE) {
+    vendorId = nla_get_u32(attr[NL80211_ATTR_VENDOR_ID]);
+    subCmd = nla_get_u32(attr[NL80211_ATTR_VENDOR_SUBCMD]);
+    if (vendorId != OUI_QCA || subCmd != NL80211_SCAN_DONE) {
         HILOG_ERROR(LOG_CORE, "%s: unsupported vendor event", __FUNCTION__);
         return;
     }

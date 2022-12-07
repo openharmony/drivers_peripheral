@@ -26,7 +26,7 @@ namespace V1_0 {
 class AGnssInterfaceImpl : public IAGnssInterface {
 public:
     AGnssInterfaceImpl();
-    virtual ~AGnssInterfaceImpl();
+    ~AGnssInterfaceImpl() override;
 
     int32_t SetAgnssCallback(const sptr<IAGnssCallback>& callbackObj) override;
 

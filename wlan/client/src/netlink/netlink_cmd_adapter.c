@@ -95,7 +95,7 @@ static inline uint32_t BIT(uint8_t x)
 
 // vendor attr
 enum AndrWifiAttr {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
+#if (defined(LINUX_VERSION_CODE) && LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
     WIFI_ATTRIBUTE_INVALID,
 #endif
     WIFI_ATTRIBUTE_NUM_FEATURE_SET,
@@ -139,7 +139,7 @@ typedef struct {
 } HwprivIoctlData;
 
 typedef struct {
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
+#if (defined(LINUX_VERSION_CODE) && LINUX_VERSION_CODE >= KERNEL_VERSION(5, 4, 0))
     uint8_t *buf;
     uint32_t size;
     uint32_t len;
@@ -574,8 +574,7 @@ static int32_t ParserIsSupportCombo(struct nl_msg *msg, void *arg)
     }
 
     if (attr[NL80211_ATTR_INTERFACE_COMBINATIONS] != NULL) {
-        nla_for_each_nested(nlComb, attr[NL80211_ATTR_INTERFACE_COMBINATIONS], i)
-        {
+        nla_for_each_nested(nlComb, attr[NL80211_ATTR_INTERFACE_COMBINATIONS], i) {
             // parse all enum nl80211_if_combination_attrs type
             ret = nla_parse_nested(attrComb, MAX_NL80211_IFACE_COMB, nlComb, ifaceCombPolicy);
             if (ret != 0) {
@@ -620,8 +619,7 @@ static int32_t ParserSupportComboInfo(struct nl_msg *msg, void *arg)
 
     if (attr[NL80211_ATTR_INTERFACE_COMBINATIONS] != NULL) {
         // get each ieee80211_iface_combination
-        nla_for_each_nested(nlComb, attr[NL80211_ATTR_INTERFACE_COMBINATIONS], i)
-        {
+        nla_for_each_nested(nlComb, attr[NL80211_ATTR_INTERFACE_COMBINATIONS], i) {
             ret = nla_parse_nested(attrComb, MAX_NL80211_IFACE_COMB, nlComb, ifaceCombPolicy);
             if (ret != 0) {
                 HILOG_ERROR(LOG_CORE, "%s: nla_parse_nested nlComb failed", __FUNCTION__);
@@ -632,14 +630,14 @@ static int32_t ParserSupportComboInfo(struct nl_msg *msg, void *arg)
                 return RET_CODE_NOT_SUPPORT;
             }
             // parse each ieee80211_iface_limit
-            nla_for_each_nested(nlLimit, attrComb[NL80211_IFACE_COMB_LIMITS], j)
-            {
+            nla_for_each_nested(nlLimit, attrComb[NL80211_IFACE_COMB_LIMITS], j) {
                 ret = nla_parse_nested(attrLimit, MAX_NL80211_IFACE_LIMIT, nlLimit, ifaceLimitPolicy);
-                if (ret || !attrLimit[NL80211_IFACE_LIMIT_TYPES])
+                if (ret || !attrLimit[NL80211_IFACE_LIMIT_TYPES]) {
+                    HILOG_ERROR(LOG_CORE, "%s: iface limit types not supported", __FUNCTION__);
                     return RET_CODE_NOT_SUPPORT; /* broken combination */
+                }
                 // parse each ieee80211_iface_limit's types
-                nla_for_each_nested(nlMode, attrLimit[NL80211_IFACE_LIMIT_TYPES], k)
-                {
+                nla_for_each_nested(nlMode, attrLimit[NL80211_IFACE_LIMIT_TYPES], k) {
                     type = nla_type(nlMode);
                     if (type > WIFI_IFTYPE_UNSPECIFIED && type < WIFI_IFTYPE_MAX) {
                         HILOG_INFO(LOG_CORE, "%s: mode: %d", __FUNCTION__, type);
@@ -677,8 +675,7 @@ static void GetCenterFreq(struct nlattr *bands, struct FreqInfoResult *result)
     freqPolicy[NL80211_FREQUENCY_ATTR_MAX_TX_POWER].type = NLA_U32;
 
     // get each ieee80211_channel
-    nla_for_each_nested(nlFreq, bands, i)
-    {
+    nla_for_each_nested(nlFreq, bands, i) {
         data = nla_data(nlFreq);
         len = nla_len(nlFreq);
         nla_parse(attrFreq, NL80211_FREQUENCY_ATTR_MAX, data, len, freqPolicy);
@@ -726,13 +723,13 @@ static int32_t ParserValidFreq(struct nl_msg *msg, void *arg)
     }
 
     // get each ieee80211_supported_band
-    nla_for_each_nested(nlBand, attrWiphyBands, i)
-    {
+    nla_for_each_nested(nlBand, attrWiphyBands, i) {
         data = nla_data(nlBand);
         len = nla_len(nlBand);
         nla_parse(attrBand, NL80211_BAND_ATTR_MAX, data, len, NULL);
-        if (attrBand[NL80211_BAND_ATTR_FREQS] == NULL)
+        if (attrBand[NL80211_BAND_ATTR_FREQS] == NULL) {
             continue;
+        }
         GetCenterFreq(attrBand[NL80211_BAND_ATTR_FREQS], result);
     }
     return NL_SKIP;

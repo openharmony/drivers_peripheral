@@ -42,6 +42,114 @@ void AdaptorAlgorithmTest::TearDown()
 }
 
 /**
+ * @tc.name: KeyPair test
+ * @tc.desc: verify KeyPair
+ * @tc.type: FUNC
+ * @tc.require: #I64XCB
+ */
+HWTEST_F(AdaptorAlgorithmTest, KeyPair_Test, TestSize.Level1)
+{
+    DestoryKeyPair(nullptr);
+
+    std::vector<uint8_t> dataTest(32, 1);
+    Buffer *data = CreateBufferByData(&dataTest[0], 32);
+    EXPECT_NE(data, nullptr);
+    KeyPair keyPair2 = {};
+    keyPair2.pubKey = nullptr;
+    keyPair2.priKey = CopyBuffer(data);
+    EXPECT_NE(keyPair2.priKey, nullptr);
+    bool result = IsEd25519KeyPairValid(&keyPair2);
+    EXPECT_EQ(result, false);
+    DestoryBuffer(keyPair2.priKey);
+
+    KeyPair keyPair3 = {};
+    keyPair3.priKey = nullptr;
+    keyPair3.pubKey = CopyBuffer(data);
+    EXPECT_NE(keyPair3.pubKey, nullptr);
+    result = IsEd25519KeyPairValid(&keyPair3);
+    EXPECT_EQ(result, false);
+    DestoryBuffer(keyPair3.pubKey);
+    DestoryBuffer(data);
+
+    KeyPair *keyPair4 = GenerateEd25519KeyPair();
+    EXPECT_NE(keyPair4, nullptr);
+    result = IsEd25519KeyPairValid(keyPair4);
+    EXPECT_EQ(result, true);
+    DestoryKeyPair(keyPair4);
+}
+
+/**
+ * @tc.name: Ed25519Sign test
+ * @tc.desc: sign Ed25519
+ * @tc.type: FUNC
+ * @tc.require: #I64XCB
+ */
+HWTEST_F(AdaptorAlgorithmTest, Ed25519Sign_Test, TestSize.Level1)
+{
+    constexpr uint32_t keyLen = 32;
+    std::vector<uint8_t> dataTest(keyLen, 1);
+    Buffer *data = CreateBufferByData(&dataTest[0], keyLen);
+    EXPECT_NE(data, nullptr);
+    Buffer *signContent = nullptr;
+    KeyPair *keyPair = GenerateEd25519KeyPair();
+    EXPECT_NE(keyPair, nullptr);
+
+    int32_t result = Ed25519Sign(nullptr, data, &signContent);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+
+    result = Ed25519Sign(keyPair, nullptr, &signContent);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+
+    result = Ed25519Sign(keyPair, data, nullptr);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+
+    result = Ed25519Sign(keyPair, data, &signContent);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+
+    DestoryBuffer(signContent);
+    DestoryKeyPair(keyPair);
+    DestoryBuffer(data);
+}
+
+/**
+ * @tc.name: Ed25519Verify test
+ * @tc.desc: verify Ed25519
+ * @tc.type: FUNC
+ * @tc.require: #I64XCB
+ */
+HWTEST_F(AdaptorAlgorithmTest, Ed25519Verify_Test, TestSize.Level1)
+{
+    constexpr uint32_t constLen = 64;
+    std::vector<uint8_t> dataTest(constLen, 1);
+    Buffer *data = CreateBufferByData(&dataTest[0], constLen);
+    KeyPair *keyPair = GenerateEd25519KeyPair();
+    EXPECT_NE(keyPair, nullptr);
+    Buffer *signContent = nullptr;
+
+    int32_t result = Ed25519Sign(keyPair, data, &signContent);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+
+    result = Ed25519Verify(nullptr, data, signContent);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+
+    result = Ed25519Verify(keyPair->pubKey, nullptr, signContent);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+
+    result = Ed25519Verify(keyPair->pubKey, data, nullptr);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+
+    result = Ed25519Verify(keyPair->priKey, data, signContent);
+    EXPECT_EQ(result, RESULT_GENERAL_ERROR);
+
+    result = Ed25519Verify(keyPair->pubKey, data, signContent);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+
+    DestoryBuffer(signContent);
+    DestoryKeyPair(keyPair);
+    DestoryBuffer(data);
+}
+
+/**
  * @tc.name: ase_encode_null
  * @tc.desc: verify Aes256GcmEncryptNoPadding
  * @tc.type: FUNC

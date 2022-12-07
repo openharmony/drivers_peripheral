@@ -35,15 +35,26 @@ if (defined(ohos_lite)) {
   import("//build/ohos.gni")
 
   group("hdf_test_light") {
-    deps = []
+    testonly = true
+    deps = [ "unittest/hdi:hdf_unittest_hdi_light_common" ]
     if (drivers_peripheral_light_feature_model) {
-      testonly = true
       deps += [
         "benchmarktest:hdf_light_benchmark_test",
         "fuzztest/light_fuzzer:hdf_fuzztest_light",
         "unittest:hdf_unittest_light",
-        "unittest/hdi:hdf_unittest_hdi_light",
       ]
+    }
+
+    HDI_LIGHT_UNITTEST_PATH =
+        rebase_path("//device/soc/${device_company}/common/hal/light/test")
+    cmd = "if [ -f ${HDI_LIGHT_UNITTEST_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
+    HAVE_LIGHT_UNITTEST =
+        exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+
+    if (HAVE_LIGHT_UNITTEST) {
+      deps += [ "${HDI_LIGHT_UNITTEST_PATH}:light_hdi_unittest" ]
+    } else {
+      deps += [ "unittest/hdi:hdf_unittest_hdi_light" ]
     }
   }
 }

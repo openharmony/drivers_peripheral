@@ -250,7 +250,6 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
 {
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    uint32_t i = 0;
     if (manager == NULL || adapter == NULL) {
         return;
     }
@@ -263,6 +262,7 @@ void AudioProxyManagerUnloadAdapter(struct AudioManager *manager, struct AudioAd
         return;
     }
     if (hwAdapter->portCapabilitys != NULL) {
+        uint32_t i = 0;
         while (i < hwAdapter->adapterDescriptor.portNum) {
             if (&hwAdapter->portCapabilitys[i] != NULL) {
                 AudioMemFree((void **)&hwAdapter->portCapabilitys[i].capability.subPorts);

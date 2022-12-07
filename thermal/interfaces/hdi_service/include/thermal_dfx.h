@@ -36,16 +36,14 @@ private:
     void UpdateInterval();
     std::string CanonicalizeSpecPath(const char* src);
     bool Compress(const std::string& dataFile, const std::string& destFile);
-    void GetTraceInfo();
     void StartThread();
     void CreateLogFile();
     void ProcessLogInfo(std::string& logFile, bool isEmpty);
-    void WriteToEmptyFile(std::ofstream& wStream, std::string& currentTime, uint32_t paramWidth);
-    void WriteToFile(std::ofstream& wStream, std::string& currentTime, uint32_t paramWidth);
+    void WriteToEmptyFile(std::ofstream& wStream, std::string& currentTime);
+    void WriteToFile(std::ofstream& wStream, std::string& currentTime);
     void CompressFile();
     static void InfoChangedCallback(const char* key, const char* value, void* context);
     bool PrepareWriteDfxLog();
-    int32_t ParseValue(const std::string& path, std::string& value);
     int32_t LoopingThreadEntry();
     std::string GetFileNameIndex(const uint32_t index);
 };

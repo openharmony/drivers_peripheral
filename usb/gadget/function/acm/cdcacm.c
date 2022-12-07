@@ -175,14 +175,14 @@ static bool g_isReadDone = false;
 static uint64_t g_readCnt = 0;
 struct timeval g_readTimeStart, g_readTimeEnd;
 static float g_readSpeed = 0;
-static bool isGetReadTimeStart = false;
+static bool g_isGetReadTimeStart = false;
 static void UsbSerialReadComplete(uint8_t pipe, struct UsbFnRequest *req)
 {
     struct UsbSerial *port = (struct UsbSerial *)req->context;
     if ((!g_isReadDone) && g_isStartRead && req->status == USB_REQUEST_COMPLETED) {
         g_readCnt += req->actual;
-        if (!isGetReadTimeStart) {
-            isGetReadTimeStart = true;
+        if (!g_isGetReadTimeStart) {
+            g_isGetReadTimeStart = true;
             gettimeofday(&g_readTimeStart, NULL);
         }
     }
@@ -198,7 +198,7 @@ static int32_t SpeedReadThread(void *arg)
     g_readCnt = 0;
     g_isReadDone = false;
     g_readSpeed = 0;
-    isGetReadTimeStart = false;
+    g_isGetReadTimeStart = false;
     double timeUse;
     double usec = 1000000;
     double k = 1024;
@@ -240,13 +240,13 @@ static int32_t StartThreadReadSpeed(struct UsbSerial *port)
     threadCfg.stackSize = HDF_PROCESS_STACK_SIZE;
 
     ret = OsalThreadCreate(&g_threadRead, (OsalThreadEntry)SpeedReadThread, port);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
 
     ret = OsalThreadStart(&g_threadRead, &threadCfg);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
@@ -484,14 +484,14 @@ static bool g_isWriteDone = false;
 static uint64_t g_writeCnt = 0;
 struct timeval g_timeStart, g_timeEnd;
 static float g_speed = 0;
-static bool isGetWriteTimeStart = false;
+static bool g_isGetWriteTimeStart = false;
 static void UsbSerialWriteSpeedComplete(uint8_t pipe, struct UsbFnRequest *req)
 {
     switch (req->status) {
         case USB_REQUEST_COMPLETED:
             g_writeCnt += req->actual;
-            if (!isGetWriteTimeStart) {
-                isGetWriteTimeStart = true;
+            if (!g_isGetWriteTimeStart) {
+                g_isGetWriteTimeStart = true;
                 gettimeofday(&g_timeStart, NULL);
             }
             if (g_isWriteDone) {
@@ -517,7 +517,7 @@ static int32_t SpeedThread(void *arg)
 {
     g_writeCnt = 0;
     g_isWriteDone = false;
-    isGetWriteTimeStart = false;
+    g_isGetWriteTimeStart = false;
     g_speed = 0;
     double timeUse;
     double usec = 1000000;
@@ -576,13 +576,13 @@ static int32_t StartThreadSpeed(struct UsbSerial *port)
     threadCfg.stackSize = HDF_PROCESS_STACK_SIZE;
 
     ret = OsalThreadCreate(&g_thread, (OsalThreadEntry)SpeedThread, port);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalThreadCreate failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
 
     ret = OsalThreadStart(&g_thread, &threadCfg);
-    if (HDF_SUCCESS != ret) {
+    if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s:%d OsalThreadStart failed, ret=%d ", __func__, __LINE__, ret);
         return HDF_ERR_DEVICE_BUSY;
     }
@@ -1328,8 +1328,9 @@ static int32_t AcmSendBreak(struct UsbAcmDevice *acm, int32_t duration)
 
     state = acm->serialState;
     state &= ~SERIAL_STATE_BREAK;
-    if (duration)
+    if (duration != 0) {
         state |= SERIAL_STATE_BREAK;
+    }
 
     acm->serialState = state;
     return AcmNotifySerialState(acm);

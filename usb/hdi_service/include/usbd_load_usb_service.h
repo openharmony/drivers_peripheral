@@ -15,8 +15,8 @@
 
 #ifndef USBD_LOAD_USB_SERVICE_H
 #define USBD_LOAD_USB_SERVICE_H
-#include <signal.h>
-#include <stdlib.h>
+#include <csignal>
+#include <cstdlib>
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include "system_ability_definition.h"

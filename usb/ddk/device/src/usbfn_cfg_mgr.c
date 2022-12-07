@@ -14,6 +14,7 @@
  */
 
 #include "usbfn_cfg_mgr.h"
+
 #include <device_resource_if.h>
 #include <hcs_tree_if.h>
 #include <hdf_base.h>
@@ -319,7 +320,7 @@ static int32_t UsbFnCfgMgrParseEndpointDesc(
         return HDF_FAILURE;
     }
     desc->wMaxPacketSize = LE16_TO_CPU(value);
-    if (USB_DDK_DT_ENDPOINT_AUDIO_SIZE == desc->bLength) {
+    if (desc->bLength == USB_DDK_DT_ENDPOINT_AUDIO_SIZE) {
         if (drsOps->GetUint8(node, ENDPOINT_REFRESH, &desc->bRefresh, 0) != HDF_SUCCESS ||
             drsOps->GetUint8(node, ENDPOINT_SYNCADDR, &desc->bSynchAddress, 0) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: read fail", __func__);

@@ -33,7 +33,7 @@ class ComponentNode : NoCopyable {
 public:
     ComponentNode(struct CodecCallbackType *callback, int64_t appData);
 
-    ~ComponentNode();
+    ~ComponentNode() override;
 
     int32_t GetComponentVersion(struct CompVerInfo &verInfo);
 
@@ -72,12 +72,12 @@ public:
 
     int32_t DeInit();
 
-    OMX_ERRORTYPE static OnEvent(OMX_HANDLETYPE component, void *appData, OMX_EVENTTYPE event, uint32_t data1,
+    static OMX_ERRORTYPE OnEvent(OMX_HANDLETYPE component, void *appData, OMX_EVENTTYPE event, uint32_t data1,
                                  uint32_t data2, void *eventData);
 
-    OMX_ERRORTYPE static OnEmptyBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer);
+    static OMX_ERRORTYPE OnEmptyBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer);
 
-    OMX_ERRORTYPE static OnFillBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer);
+    static OMX_ERRORTYPE OnFillBufferDone(OMX_HANDLETYPE component, void *appData, OMX_BUFFERHEADERTYPE *buffer);
 
     void SetHandle(OMX_HANDLETYPE comp)
     {
