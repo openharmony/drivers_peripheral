@@ -16,8 +16,8 @@
 #ifndef CAMERA_METADATA_OPERATOR_H
 #define CAMERA_METADATA_OPERATOR_H
 
-#include <stdint.h>
-#include <stdio.h>
+#include <cstdio>
+#include <cstdint>
 
 #include "camera_device_ability_items.h"
 
@@ -122,7 +122,7 @@ typedef enum camera_metadata_sec {
 } camera_metadata_sec_t;
 
 /* Return codes */
-#define CAM_META_FAILURE         -1
+#define CAM_META_FAILURE        (-1)
 #define CAM_META_SUCCESS         0
 #define CAM_META_INVALID_PARAM   2
 #define CAM_META_ITEM_NOT_FOUND  3

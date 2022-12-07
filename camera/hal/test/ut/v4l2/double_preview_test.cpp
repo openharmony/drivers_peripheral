@@ -131,7 +131,7 @@ void DoublePreviewTest::StopStream(std::vector<int> &captureIds, std::vector<int
     if (sizeof(captureIds) == 0) {
         return;
     }
-    for (auto &captureId : captureIds) {
+    for (const auto &captureId : captureIds) {
         if (captureId == display_->CAPTURE_ID_PREVIEW) {
             streamCustomerPreview_->ReceiveFrameOff();
         } else if (captureId == CAPTUREID_PREVIEW_DOUBLE) {
