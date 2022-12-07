@@ -19,6 +19,10 @@ ohos_unittest("PinAuthHdiUtTest") {
 
   include_dirs = [
     "adaptor/inc",
+    "common/inc",
+    "database/inc",
+    "main/inc",
+    "service/inc",
     "//drivers/peripheral/pin_auth/hdi_service/adaptor/inc",
     "//drivers/peripheral/pin_auth/hdi_service/common/inc",
     "//drivers/peripheral/pin_auth/hdi_service/database/inc",
@@ -26,7 +30,17 @@ ohos_unittest("PinAuthHdiUtTest") {
     "//drivers/peripheral/pin_auth/hdi_service/service/inc",
   ]
 
-  sources = [ "adaptor/src/adaptor_algorithm_test.cpp" ]
+  sources = [
+    "adaptor/src/adaptor_algorithm_test.cpp",
+    "adaptor/src/adaptor_file_test.cpp",
+    "adaptor/src/adaptor_memory_test.cpp",
+    "adaptor/src/adaptor_time_test.cpp",
+    "common/src/buffer_test.cpp",
+    "database/src/pin_db_test.cpp",
+    "main/src/pin_auth_test.cpp",
+    "main/src/pin_func_test.cpp",
+    "service/src/executor_impl_test.cpp",
+  ]
 
   deps = [
     "//base/useriam/user_auth_framework/common:iam_test",
@@ -35,6 +49,7 @@ ohos_unittest("PinAuthHdiUtTest") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_pin_auth:libpin_auth_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
