@@ -52,7 +52,7 @@ template <class T>
 void MetadataUtils::WriteData(T data, std::vector<uint8_t>& cameraAbility)
 {
     T dataTemp = data;
-    uint8_t *dataPtr = (uint8_t *)&dataTemp;
+    uint8_t *dataPtr = reinterpret_cast<uint8_t *>(&dataTemp);
     for (size_t j = 0; j < sizeof(T); j++) {
         cameraAbility.push_back(*(dataPtr + j));
     }
@@ -67,7 +67,7 @@ void MetadataUtils::ReadData(T &data, int32_t &index, const std::vector<uint8_t>
     for (size_t j = 0; j < sizeof(T); j++) {
         array[j] = cameraAbility.at(index++);
     }
-    ptr = (T *)array;
+    ptr = reinterpret_cast<T *>(array);
     data = *ptr;
 }
 } // namespace Camera
