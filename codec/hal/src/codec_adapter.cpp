@@ -19,6 +19,8 @@
 #include "codec_adapter_interface.h"
 #include "component_mgr.h"
 #include "component_node.h"
+#define HDF_LOG_TAG codec_hdi_server
+
 using namespace OHOS::Codec::Omx;
 
 static ComponentMgr g_mgr;
@@ -242,6 +244,46 @@ int32_t OmxAdapterComponentRoleEnum(struct CodecComponentNode *codecNode, uint8_
         return HDF_ERR_INVALID_PARAM;
     }
     return codecNode->node->ComponentRoleEnum(role, roleLen, index);
+}
+
+int32_t OmxAdapterSetComponentRole(struct CodecComponentNode *codecNode, char *compName)
+{
+    if (codecNode == nullptr || codecNode->node == nullptr || compName == nullptr) {
+        HDF_LOGE("%{public}s codecNode, compName is null", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    CodecOMXCore *core;
+    auto err = g_mgr.GetCoreOfComponent(core, compName);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s core is null", __func__);
+        return err;
+    }
+    
+    std::vector<std::string> roles;
+    std::string name = compName;
+    int32_t ret = core->GetRolesOfComponent(name, roles);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: GetRoleOfComponent return err [%{public}d]", __func__, ret);
+        return ret;
+    }
+    uint32_t roleIndex = 0;
+    HDF_LOGI("%{public}s: RoleName = [%{public}s]", __func__, roles[roleIndex].c_str());
+
+    OMX_PARAM_COMPONENTROLETYPE role;
+    uint32_t res = strncpy_s(reinterpret_cast<char *>(role.cRole), OMX_MAX_STRINGNAME_SIZE,
+                             roles[roleIndex].c_str(), roles[roleIndex].length());
+    if (res != EOK) {
+        HDF_LOGE("%{public}s: strncpy_s return err [%{public}d]", __func__, err);
+        return HDF_FAILURE;
+    }
+    role.nSize = sizeof(role);
+    ret = codecNode->node->SetParameter(OMX_IndexParamStandardComponentRole,
+                                        reinterpret_cast<int8_t *>(&role), sizeof(role));
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: OMX_IndexParamStandardComponentRole err [%{public}d]", __func__, ret);
+    }
+    
+    return ret;
 }
 #ifdef __cplusplus
 };

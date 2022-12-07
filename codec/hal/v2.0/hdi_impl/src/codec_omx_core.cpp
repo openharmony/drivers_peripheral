@@ -19,6 +19,9 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <securec.h>
+
+#define HDF_LOG_TAG codec_hdi_server
+
 namespace OHOS {
 namespace Codec {
 namespace Omx {
@@ -101,27 +104,31 @@ int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::st
         return HDF_ERR_INVALID_PARAM;
     }
     uint32_t roleCount = 0;
-    uint32_t err = (*getRoles_)(const_cast<char *>(name.c_str()), &roleCount, nullptr);
+    int32_t err = (*getRoles_)(const_cast<char *>(name.c_str()), &roleCount, nullptr);
     if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: getRoles_ return err [%{public}x].", __func__, err);
+        HDF_LOGE("%{public}s: getRoles_ nullptr return err [%{public}x].", __func__, err);
         return err;
     }
     if (roleCount == 0) {
+        HDF_LOGE("%{public}s: roleCount = 0 ", __func__);
         return err;
     }
 
-    char role[roleCount][OMX_MAX_STRINGNAME_SIZE];
-    uint32_t bufferSize = sizeof(char) * (roleCount * OMX_MAX_STRINGNAME_SIZE);
-    int32_t ret = memset_s(role, sizeof(role), 0, bufferSize);
-    if (ret != EOK) {
-        HDF_LOGE("%{public}s: memset failed, error code: [%{public}d]", __func__, ret);
-        return HDF_FAILURE;
+    char *role[roleCount];
+    char array[roleCount][OMX_MAX_STRINGNAME_SIZE];
+    for (uint32_t i = 0; i < roleCount; i++) {
+        int32_t ret = memset_s(array[i], OMX_MAX_STRINGNAME_SIZE, 0, OMX_MAX_STRINGNAME_SIZE);
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s: memset_s array err [%{public}x].", __func__, ret);
+            return ret;
+        }
+        role[i] = array[i];
     }
 
     uint32_t roleLen = roleCount;
     err = (*getRoles_)(const_cast<char *>(name.c_str()), &roleCount, reinterpret_cast<OMX_U8 **>(role));
     if (err != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: getRoles_ return err [%{public}x].", __func__, err);
+        HDF_LOGE("%{public}s: getRoles_ pRole return err [%{public}x].", __func__, err);
         return err;
     }
     for (uint32_t i = 0; i < roleLen; i++) {

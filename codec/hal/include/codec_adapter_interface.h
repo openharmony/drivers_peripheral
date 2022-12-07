@@ -110,7 +110,10 @@ extern int32_t OmxAdapterUseEglImage(struct CodecComponentNode *codecNode, struc
  */
 extern int32_t OmxAdapterComponentRoleEnum(struct CodecComponentNode *codecNode, uint8_t *role, uint32_t roleLen,
                                            uint32_t index);
-
+/**
+ * @brief Set the role for the component.
+ */
+extern int32_t OmxAdapterSetComponentRole(struct CodecComponentNode *codecNode, char *compName);
 #ifdef __cplusplus
 };
 #endif
