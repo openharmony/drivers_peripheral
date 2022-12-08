@@ -37,7 +37,7 @@ namespace OHOS {
 namespace HDI {
 namespace Usb {
 namespace V1_0 {
-HdfDevEventlistener UsbImpl::listenerForLoadService_ = {0};
+HdfDevEventlistener UsbImpl::listenerForLoadService_ = {nullptr};
 UsbdSubscriber UsbImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbImpl::isGadgetConnected_ = false;
 
@@ -1290,7 +1290,7 @@ int32_t UsbImpl::ControlTransferRead(const UsbDev &dev, const UsbCtrlTransfer &c
     controlParams.value = ctrl.value;
     controlParams.index = ctrl.index;
     controlParams.target = (UsbRequestTargetType)(static_cast<uint32_t>(ctrl.requestType) & USB_RECIP_MASK);
-    controlParams.directon = (UsbRequestDirection)((static_cast<uint32_t>(ctrl.requestType) >> DIRECTION_OFFSET_7) &
+    controlParams.directon = (UsbRequestDirection)(((static_cast<uint32_t>(ctrl.requestType)) >> DIRECTION_OFFSET_7) &
         ENDPOINT_DIRECTION_MASK);
     controlParams.reqType =
         (UsbControlRequestType)((static_cast<uint32_t>(ctrl.requestType) >> CMD_OFFSET_5) & CMD_TYPE_MASK);
@@ -1333,7 +1333,7 @@ int32_t UsbImpl::ControlTransferWrite(const UsbDev &dev, const UsbCtrlTransfer &
     controlParams.value = ctrl.value;
     controlParams.index = ctrl.index;
     controlParams.target = (UsbRequestTargetType)(static_cast<uint32_t>(ctrl.requestType) & USB_RECIP_MASK);
-    controlParams.directon = (UsbRequestDirection)((static_cast<uint32_t>(ctrl.requestType) >> DIRECTION_OFFSET_7) &
+    controlParams.directon = (UsbRequestDirection)(((static_cast<uint32_t>(ctrl.requestType)) >> DIRECTION_OFFSET_7) &
         ENDPOINT_DIRECTION_MASK);
     controlParams.reqType =
         (UsbControlRequestType)((static_cast<uint32_t>(ctrl.requestType) >> CMD_OFFSET_5) & CMD_TYPE_MASK);

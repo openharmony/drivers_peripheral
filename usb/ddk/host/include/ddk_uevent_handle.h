@@ -18,7 +18,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-void *DdkUeventMain(void *);
+void *DdkUeventMain(void *param);
 int32_t DdkUeventInit(void);
 #ifdef __cplusplus
 }
