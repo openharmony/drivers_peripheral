@@ -51,6 +51,7 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
         hdfLightInfo.lightId = lightInfo->lightId;
         hdfLightInfo.lightType = lightInfo->lightType;
         hdfLightInfo.lightName = lightInfo->lightName;
+        hdfLightInfo.lightNumber = lightInfo->lightNumber;
         info.push_back(hdfLightInfo);
         lightInfo++;
     }
