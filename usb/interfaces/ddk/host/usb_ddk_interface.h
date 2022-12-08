@@ -408,7 +408,7 @@ int32_t UsbSelectInterfaceSetting(const UsbInterfaceHandle *interfaceHandle, uin
  * @param pipeInfo Indicates the pointer to the obtained pipe information.
  *
  */
-int32_t UsbGetPipeInfo(const UsbInterfaceHandle *interfaceHandle, uint8_t settingIndex,
+int32_t UsbGetPipeInfo(const UsbInterfaceHandle *interfaceHandle, uint8_t altSettingIndex,
     uint8_t pipeId, struct UsbPipeInfo *pipeInfo);
 
 /**
@@ -453,7 +453,7 @@ int32_t UsbFreeRequest(const struct UsbRequest *request);
  * @return Returns <b>0</b> if the operation is successful; returns a negative value defined in {@link HDF_STATUS}
  * otherwise.
  */
-int32_t UsbSubmitRequestAsync(const struct UsbRequest *request);
+int32_t UsbSubmitRequestAsync(const struct UsbRequest *const request);
 
 /**
  * @brief Fills an I/O request based on specified parameters.
