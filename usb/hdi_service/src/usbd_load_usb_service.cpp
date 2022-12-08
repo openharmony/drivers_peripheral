@@ -98,7 +98,7 @@ int32_t UsbdLoadUsbService::StartThreadUsbLoad()
 {
     int32_t ret;
     struct OsalThread threadUsbLoad;
-    struct OsalThreadParam threadCfg = {0};
+    struct OsalThreadParam threadCfg = {nullptr};
     threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
     threadCfg.stackSize = HDF_PROCESS_STACK_SIZE;
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
