@@ -92,9 +92,9 @@ HWTEST_F(HdfLightHdiTest, GetLightInfo_001, TestSize.Level1)
     EXPECT_GT(g_info.size(), 0);
     printf("get light list num[%zu]\n\r", g_info.size());
 
-    for (auto iter : g_info)
-    {
-        printf("lightId[%d], lightName[%s]\n\r", iter.lightId, iter.lightName.c_str());
+    for (auto iter : g_info) {
+        printf("lightId[%d], lightName[%s], lightNumber[%d]\n\r",\
+            iter.lightId, iter.lightName.c_str(), iter.lightNumber);
     }
 }
 
