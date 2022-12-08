@@ -90,7 +90,7 @@ static int32_t AudioPnpUeventParse(const char *str)
         return HDF_FAILURE;
     }
 
-    while (*str != 0) {
+    while (*str != '\0') {
         if (strncmp(str, UEVENT_STATE, strlen(UEVENT_STATE)) == 0) {
             const char *temp = str + strlen(UEVENT_STATE) + 1; // 1 is a skip character '='
             if (strncmp(temp, UEVENT_HDMI_STATE, strlen(UEVENT_HDMI_STATE)) == 0) {
@@ -156,7 +156,7 @@ static int32_t AudioHdmiOpenEventPoll(int32_t *sockFd, int *fdEpoll)
     return HDF_SUCCESS;
 }
 
-static uint32_t InitializeHdmiStateInternal(void)
+static int32_t InitializeHdmiStateInternal(void)
 {
     char buffer[FILE_BUFFER_SIZE] = {0};
 
@@ -195,7 +195,7 @@ static void *AudioHdmiPnpUeventStart(void *useless)
     }
 
     while (g_hdmiPnpThreadRunning) {
-        uint64_t buflen;
+        int64_t buflen;
         struct epoll_event ev;
         char buf[RECV_BUFFER_SIZE];
 
