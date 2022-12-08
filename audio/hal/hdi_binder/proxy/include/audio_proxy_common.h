@@ -16,8 +16,8 @@
 #define AUDIO_PROXY_COMMON_H
 
 #include "audio_internal.h"
-#include "hdf_audio_server.h"
 #include "audio_proxy_manager.h"
+#include "hdf_audio_server.h"
 
 #define CONFIG_CHANNEL_COUNT  2 // two channels
 #define GAIN_MAX 50.0
@@ -49,6 +49,9 @@ int32_t AudioProxyRenderRemoveEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioProxyCaptureAddEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioProxyCaptureRemoveEffect(AudioHandle handle, uint64_t effectid);
 bool AudioRouteBlockMarshalling(struct HdfSBuf *data, const struct AudioRoute *dataBlock);
+bool AudioAdapterDescriptorBlockUnmarshalling(struct HdfSBuf *data, struct AudioAdapterDescriptor *dataBlock);
+void AudioAdapterDescriptorFreeArray(struct AudioAdapterDescriptor **dataBlock, uint32_t *size);
+bool AudioPortCapabilityBlockUnmarshalling(struct HdfSBuf *data, struct AudioPortCapability *dataBlock);
 #ifdef __cplusplus
 }
 #endif

@@ -25,8 +25,6 @@
 
 static struct AudioManager g_audioManagerFuncs = {0};
 static bool g_audioAdapterAddrMgrFlag = false;
-struct AudioAdapterDescriptor *g_localAddrAudioAdapterOut = NULL; // add for Fuzz
-int g_localAdapterNum = 0; // add for Fuzz
 
 BindServiceRenderSo g_bindServiceRender = NULL;
 InterfaceLibModeRenderSo g_interfaceLibModeRender = NULL;
@@ -84,7 +82,6 @@ CloseServiceCaptureSo *AudioSoGetCloseServiceCapture(void)
 {
     return &g_closeServiceCapture;
 }
-
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
 PathSelGetConfToJsonObj *AudioSoGetPathSelGetConfToJsonObj(void)
@@ -183,41 +180,26 @@ static int32_t InitPathSelectSoHandle(const char *pathSelectSoPath)
 }
 #endif
 
-int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
-    struct AudioAdapterDescriptor **descs, int *size)
+static int32_t AudioInitDynamicLib(void)
 {
-    AUDIO_FUNC_LOGI();
-    if (manager == NULL || descs == NULL || size == NULL) {
-        AUDIO_FUNC_LOGE("param manager or descs or size is null!");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    int32_t ret = AudioAdaptersForUser(descs, size);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioAdaptersForUser FAIL! ret = %{public}d", ret);
-        return AUDIO_HAL_ERR_NOTREADY; // Failed to read sound card configuration file
-    }
     if (g_captureSoPath == NULL || g_renderSoPath == NULL) {
         AUDIO_FUNC_LOGE("sopath is error");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    if (*descs != NULL && size != NULL && (*size) > 0) {
-        g_localAddrAudioAdapterOut  = *descs;
-        g_localAdapterNum = *size;
-    } else {
-        AUDIO_FUNC_LOGE("Get AudioAdapterDescriptor Failed");
-        return AUDIO_HAL_ERR_INVALID_OBJECT;
-    }
-    ret = InitCaptureSoHandle(g_captureSoPath);
+
+    int32_t ret = InitCaptureSoHandle(g_captureSoPath);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("InitCaptureSoHandle FAIL!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
+
     ret = InitRenderSoHandle(g_renderSoPath);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("InitRenderSoHandle FAIL!");
         AudioDlClose(&g_ptrCaptureHandle);
         return AUDIO_HAL_ERR_INTERNAL;
     }
+
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
     ret = InitPathSelectSoHandle(g_pathSelectSoPath);
     if (ret < 0 || g_pathSelGetConfToJsonObj == NULL) {
@@ -226,6 +208,7 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
         AudioDlClose(&g_ptrCaptureHandle);
         return AUDIO_HAL_ERR_INTERNAL;
     }
+
     ret = g_pathSelGetConfToJsonObj();
     if (ret < 0) {
         AUDIO_FUNC_LOGE("g_pathSelGetConfToJsonObj FAIL!");
@@ -235,6 +218,31 @@ int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
         return AUDIO_HAL_ERR_INTERNAL;
     }
 #endif
+
+    return AUDIO_HAL_SUCCESS;
+}
+
+int32_t AudioManagerGetAllAdapters(struct AudioManager *manager,
+                                   struct AudioAdapterDescriptor **descs,
+                                   int *size)
+{
+    AUDIO_FUNC_LOGI();
+    if (manager == NULL || descs == NULL || size == NULL) {
+        AUDIO_FUNC_LOGE("param manager or descs or size is null!");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    int32_t ret = AudioInitDynamicLib();
+    if (ret != AUDIO_HAL_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioInitDynamicLib FAIL! ret = %{public}d", ret);
+        return ret;
+    }
+
+    ret = AudioAdaptersForUser(descs, size);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioAdaptersForUser FAIL! ret = %{public}d", ret);
+        return AUDIO_HAL_ERR_NOTREADY; // Failed to read sound card configuration file
+    }
     return AUDIO_HAL_SUCCESS;
 }
 
@@ -265,12 +273,6 @@ static int32_t LoadAdapterPrimary(const struct AudioAdapterDescriptor *desc, str
     hwAdapter->adapterDescriptor = *desc;
     hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
     hwAdapter->adapterMgrCaptureFlag = 0; // The adapterMgrCaptureFlag init is zero
-    int32_t ret = AudioAddAdapterAddrToList((AudioHandle)(&hwAdapter->common), desc);
-    if (ret < 0) { // add for Fuzz
-        AUDIO_FUNC_LOGE("AudioAdapterAddrGet check Failed");
-        AudioMemFree((void **)&hwAdapter);
-        return ret;
-    }
     *adapter = &hwAdapter->common;
 
     return AUDIO_HAL_SUCCESS;
@@ -300,12 +302,6 @@ static int32_t LoadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct 
     hwAdapter->adapterDescriptor = *desc;
     hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
     hwAdapter->adapterMgrCaptureFlag = 0; // The adapterMgrCaptureFlag init is zero
-    int32_t ret = AudioAddAdapterAddrToList((AudioHandle)(&hwAdapter->common), desc);
-    if (ret < 0) { // add for Fuzz
-        AUDIO_FUNC_LOGE("AudioAdapterAddrGet check Failed");
-        AudioMemFree((void **)&hwAdapter);
-        return ret;
-    }
     *adapter = &hwAdapter->common;
 
     return AUDIO_HAL_SUCCESS;
@@ -370,23 +366,7 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
         AUDIO_FUNC_LOGE("param is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    bool descFlag = false;
-    if (g_localAdapterNum <= 0 || g_localAdapterNum > SUPPORT_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("g_localAdapterNum is invalid!");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (g_localAddrAudioAdapterOut != NULL) {
-        for (int index = 0; index < g_localAdapterNum; index++) {
-            if (&g_localAddrAudioAdapterOut[index] == desc) {
-                descFlag = true;
-                break;
-            }
-        }
-        if (!descFlag) {
-            AUDIO_FUNC_LOGE("The desc address passed in is invalid");
-            return AUDIO_HAL_ERR_INVALID_OBJECT;
-        }
-    }
+
     AUDIO_FUNC_LOGI("adapter name %{public}s", desc->adapterName);
     if (AudioAdapterExist(desc->adapterName)) {
         AUDIO_FUNC_LOGE("not supported this adapter %{public}s", desc->adapterName);
@@ -405,11 +385,6 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
 
 void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter *adapter)
 {
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The adapter address passed in is invalid! ret = %{public}d", ret);
-        return;
-    }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (manager == NULL || hwAdapter == NULL) {
         return;
@@ -424,9 +399,6 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
             i++;
         }
         AudioMemFree((void **)&hwAdapter->portCapabilitys);
-    }
-    if (AudioDelAdapterAddrFromList((AudioHandle)adapter)) {
-        AUDIO_FUNC_LOGE("adapter or render not in MgrList");
     }
     AudioMemFree((void **)&adapter);
 }
@@ -456,7 +428,6 @@ static void AudioMgrConstruct(struct AudioManager *audioMgr)
 struct AudioManager *GetAudioManagerFuncs(void)
 {
     if (!g_audioAdapterAddrMgrFlag) {
-        AudioAdapterAddrMgrInit(); // memset for Fuzz
         AudioMgrConstruct(&g_audioManagerFuncs);
         g_audioAdapterAddrMgrFlag = true;
     }

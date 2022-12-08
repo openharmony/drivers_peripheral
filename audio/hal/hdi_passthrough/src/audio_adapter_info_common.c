@@ -16,9 +16,9 @@
 #include "audio_adapter_info_common.h"
 #include <ctype.h>
 #include <limits.h>
+#include "audio_uhdf_log.h"
 #include "cJSON.h"
 #include "osal_mem.h"
-#include "audio_uhdf_log.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
@@ -34,206 +34,8 @@
 #define MAX_ADDR_RECORD_NUM     (SUPPORT_ADAPTER_NUM_MAX * 3)
 
 int32_t g_adapterNum = 0;
-struct AudioAdapterDescriptor *g_audioAdapterOut = NULL;
 struct AudioAdapterDescriptor *g_audioAdapterDescs = NULL;
-static const char *g_adaptersName[SUPPORT_ADAPTER_NUM_MAX] = {NULL};
-static const char *g_portsName[SUPPORT_ADAPTER_NUM_MAX][SUPPORT_PORT_NUM_MAX] = {{NULL}};
-
-
-struct AudioAddrDB g_localAudioAddrList[MAX_ADDR_RECORD_NUM];
-bool g_fuzzCheckFlag = true;
-
-void AudioSetFuzzCheckFlag(bool check)
-{
-    g_fuzzCheckFlag = check;
-    return;
-}
-
-void AudioAdapterAddrMgrInit()
-{
-    (void)memset_s(&g_localAudioAddrList, sizeof(g_localAudioAddrList), 0, sizeof(g_localAudioAddrList));
-    for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
-        g_localAudioAddrList[index].addrType = AUDIO_INVALID_ADDR;
-    }
-    return;
-}
-
-int32_t AudioAddAdapterAddrToList(AudioHandle adapter, const struct AudioAdapterDescriptor *desc)
-{
-    int pos = MAX_ADDR_RECORD_NUM;
-    if (adapter == NULL || desc == NULL || desc->adapterName == NULL) {
-        AUDIO_FUNC_LOGE("adapter or desc or desc->adapterName is null!");
-        return AUDIO_HAL_ERR_INVALID_OBJECT;
-    }
-    for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
-        if (g_localAudioAddrList[index].adapterName) {
-            if (!strcmp(g_localAudioAddrList[index].adapterName, desc->adapterName)) {
-                AUDIO_FUNC_LOGE("The adapter has been loaded. Please reselect the adapter!");
-                return AUDIO_HAL_ERR_NOTREADY;
-            } else {
-                continue;
-            }
-        } else {
-            if (pos == MAX_ADDR_RECORD_NUM && (g_localAudioAddrList[index].addrType == AUDIO_INVALID_ADDR)) {
-                pos = index;
-            }
-        }
-    }
-    if (pos < MAX_ADDR_RECORD_NUM) {
-        g_localAudioAddrList[pos].adapterName = desc->adapterName;
-        g_localAudioAddrList[pos].addrValue = adapter;
-        g_localAudioAddrList[pos].addrType = AUDIO_ADAPTER_ADDR;
-        return AUDIO_HAL_SUCCESS;
-    }
-    return AUDIO_HAL_ERR_INVALID_PARAM;
-}
-
-int32_t AudioCheckAdapterAddr(AudioHandle adapter)
-{
-    if (g_fuzzCheckFlag == false) {
-        return AUDIO_HAL_SUCCESS;
-    }
-    if (adapter != NULL) {
-        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
-            if (g_localAudioAddrList[index].addrValue == adapter &&
-                g_localAudioAddrList[index].addrType == AUDIO_ADAPTER_ADDR) {
-                return AUDIO_HAL_SUCCESS;
-            }
-        }
-        return AUDIO_HAL_ERR_INVALID_OBJECT;
-    }
-    return AUDIO_HAL_ERR_INVALID_PARAM;
-}
-
-int32_t AudioDelAdapterAddrFromList(AudioHandle adapter)
-{
-    if (adapter != NULL) {
-        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
-            if (g_localAudioAddrList[index].addrValue == adapter &&
-                g_localAudioAddrList[index].addrType == AUDIO_ADAPTER_ADDR) {
-                g_localAudioAddrList[index].addrValue = NULL;
-                g_localAudioAddrList[index].adapterName = NULL;
-                g_localAudioAddrList[index].addrType = AUDIO_INVALID_ADDR;
-                return AUDIO_HAL_SUCCESS;
-            }
-        }
-        return AUDIO_HAL_ERR_INVALID_OBJECT;
-    }
-    return AUDIO_HAL_ERR_INVALID_PARAM;
-}
-
-int32_t AudioAddRenderAddrToList(AudioHandle render)
-{
-    if (render != NULL) {
-        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
-            if (g_localAudioAddrList[index].addrValue == NULL) {
-                g_localAudioAddrList[index].addrValue = render;
-                g_localAudioAddrList[index].addrType = AUDIO_RENDER_ADDR;
-                return AUDIO_HAL_SUCCESS;
-            }
-        }
-        return AUDIO_HAL_ERR_INVALID_OBJECT;
-    }
-    return AUDIO_HAL_ERR_INVALID_PARAM;
-}
-
-int32_t AudioCheckRenderAddr(AudioHandle render)
-{
-    if (g_fuzzCheckFlag == false) {
-        return AUDIO_HAL_SUCCESS;
-    }
-    if (render != NULL) {
-        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
-            if (g_localAudioAddrList[index].addrValue == render &&
-                g_localAudioAddrList[index].addrType == AUDIO_RENDER_ADDR) {
-                return AUDIO_HAL_SUCCESS;
-            }
-        }
-        return AUDIO_HAL_ERR_INVALID_OBJECT;
-    }
-    return AUDIO_HAL_ERR_INVALID_PARAM;
-}
-
-int32_t AudioDelRenderAddrFromList(AudioHandle render)
-{
-    if (render != NULL) {
-        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
-            if (g_localAudioAddrList[index].addrValue == render &&
-                g_localAudioAddrList[index].addrType == AUDIO_RENDER_ADDR) {
-                g_localAudioAddrList[index].addrValue = NULL;
-                g_localAudioAddrList[index].addrType = AUDIO_INVALID_ADDR;
-                return AUDIO_HAL_SUCCESS;
-            }
-        }
-        return AUDIO_HAL_ERR_INVALID_OBJECT;
-    }
-    return AUDIO_HAL_ERR_INVALID_PARAM;
-}
-
-int32_t AudioAddCaptureAddrToList(AudioHandle capture)
-{
-    if (capture != NULL) {
-        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
-            if (g_localAudioAddrList[index].addrValue == NULL) {
-                g_localAudioAddrList[index].addrValue = capture;
-                g_localAudioAddrList[index].addrType = AUDIO_CAPTURE_ADDR;
-                return AUDIO_HAL_SUCCESS;
-            }
-        }
-    }
-    return AUDIO_HAL_ERR_INVALID_OBJECT;
-}
-
-int32_t AudioCheckCaptureAddr(AudioHandle capture)
-{
-    if (g_fuzzCheckFlag == false) {
-        return AUDIO_HAL_SUCCESS;
-    }
-    if (capture != NULL) {
-        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
-            if (g_localAudioAddrList[index].addrValue == capture &&
-                g_localAudioAddrList[index].addrType == AUDIO_CAPTURE_ADDR) {
-                return AUDIO_HAL_SUCCESS;
-            }
-        }
-        return AUDIO_HAL_ERR_INVALID_OBJECT;
-    }
-    return AUDIO_HAL_ERR_INVALID_PARAM;
-}
-
-
-int32_t AudioDelCaptureAddrFromList(AudioHandle capture)
-{
-    if (capture != NULL) {
-        for (int index = 0; index < MAX_ADDR_RECORD_NUM; index++) {
-            if (g_localAudioAddrList[index].addrValue == capture &&
-                g_localAudioAddrList[index].addrType == AUDIO_CAPTURE_ADDR) {
-                g_localAudioAddrList[index].addrValue = NULL;
-                g_localAudioAddrList[index].addrType = AUDIO_INVALID_ADDR;
-                return AUDIO_HAL_SUCCESS;
-            }
-        }
-        return AUDIO_HAL_ERR_INVALID_OBJECT;
-    }
-    return AUDIO_HAL_ERR_INVALID_PARAM;
-}
-
-static void ClearAdaptersAllName(void)
-{
-    int i, j;
-
-    for (i = 0; i < SUPPORT_ADAPTER_NUM_MAX; i++) {
-        g_adaptersName[i] = NULL;
-        for (j = 0; j < SUPPORT_PORT_NUM_MAX; j++) {
-            g_portsName[i][j] = NULL;
-        }
-    }
-}
-
-struct AudioAdapterDescriptor *AudioAdapterGetConfigOut(void)
-{
-    return g_audioAdapterOut;
-}
+static const char *g_captureSoPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_interface_lib_capture");
 
 struct AudioAdapterDescriptor *AudioAdapterGetConfigDescs(void)
 {
@@ -243,83 +45,6 @@ struct AudioAdapterDescriptor *AudioAdapterGetConfigDescs(void)
 int32_t AudioAdapterGetAdapterNum(void)
 {
     return g_adapterNum;
-}
-
-static int32_t AudioAdapterCheckPortFlow(const char *name)
-{
-    uint32_t len;
-
-    if (name == NULL) {
-        AUDIO_FUNC_LOGE("Invalid parameter!\n");
-
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    len = strlen(name);
-    if (len == 0) {
-        AUDIO_FUNC_LOGE("port name is null!\n");
-
-        return HDF_FAILURE;
-    } else if (len >= PORT_NAME_LEN) {
-        AUDIO_FUNC_LOGE("port name is too long!\n");
-
-        return HDF_FAILURE;
-    } else {
-        /* Nothing to do */
-    }
-
-    if (strcmp(name, "AIP") && strcmp(name, "AOP") && strcmp(name, "AIOP")) {
-        AUDIO_FUNC_LOGE("Incorrect port name: [ %{public}s ]!\n", name);
-
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioAdapterCheckName(const char *name)
-{
-    uint32_t len;
-
-    if (name == NULL) {
-        AUDIO_FUNC_LOGE("Invalid parameter!\n");
-
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    len = strlen(name);
-    if (len == 0) {
-        AUDIO_FUNC_LOGE("adapter name is null!\n");
-
-        return HDF_FAILURE;
-    } else if (len >= ADAPTER_NAME_LEN) {
-        AUDIO_FUNC_LOGE("adapter name is too long!\n");
-
-        return HDF_FAILURE;
-    } else {
-        /* Nothing to do */
-    }
-
-    if (!isalpha(*name++)) { // Names must begin with a letter
-        AUDIO_FUNC_LOGE("The adapter name of the illegal!\n");
-
-        return HDF_FAILURE;
-    }
-
-    while (*name != '\0') {
-        if (*name == '_') {
-            name++;
-            continue;
-        }
-
-        if (!isalnum(*name++)) {
-            AUDIO_FUNC_LOGE("The adapter name of the illegal!\n");
-
-            return HDF_FAILURE;
-        }
-    }
-
-    return HDF_SUCCESS;
 }
 
 int32_t AudioAdapterExist(const char *adapterName)
@@ -375,7 +100,7 @@ static void AudioAdapterJudegReleaseDescs(const struct AudioAdapterDescriptor *d
     }
 }
 
-static void AudioAdapterReleaseDescs(const struct AudioAdapterDescriptor *descs, int32_t adapterNum)
+void AudioAdapterReleaseDescs(const struct AudioAdapterDescriptor *descs, int32_t adapterNum)
 {
     int32_t adapterIdx = 0;
 
@@ -394,150 +119,6 @@ static void AudioAdapterReleaseDescs(const struct AudioAdapterDescriptor *descs,
     }
 
     AudioMemFree((void **)&descs);
-}
-
-static int32_t AudioAdapterGetDir(const char *dir)
-{
-    if (dir == NULL) {
-        AUDIO_FUNC_LOGE("param dir is null!");
-        return HDF_FAILURE;
-    }
-    if (strcmp(dir, "PORT_OUT") == 0) {
-        return PORT_OUT;
-    } else if (strcmp(dir, "PORT_IN") == 0) {
-        return PORT_IN;
-    } else if (strcmp(dir, "PORT_OUT_IN") == 0) {
-        return PORT_OUT_IN;
-    } else {
-        return HDF_FAILURE;
-    }
-}
-
-static int32_t AudioAdaptersGetArraySize(const cJSON *cJsonObj, uint32_t *size)
-{
-    int adapterArraySize;
-
-    if (cJsonObj == NULL || size == NULL) {
-        AUDIO_FUNC_LOGE("Invalid parameter!\n");
-
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    /* Follow the new adapterNum by the number of actual parses */
-    adapterArraySize = cJSON_GetArraySize(cJsonObj);
-    if (adapterArraySize <= 0) {
-        AUDIO_FUNC_LOGE("Failed to get JSON array size!\n");
-
-        return HDF_FAILURE;
-    }
-    *size = (uint32_t)adapterArraySize;
-
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioAdapterParsePortGetDir(struct AudioPort *info, const cJSON *port)
-{
-    if (info == NULL || port == NULL) {
-        AUDIO_FUNC_LOGE("Invalid parameter!\n");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    int32_t ret;
-    cJSON *portDir = NULL;
-
-    portDir = cJSON_GetObjectItem(port, "dir");
-    if (portDir == NULL || portDir->valuestring == NULL) {
-        AUDIO_FUNC_LOGE("cJSON_GetObjectItem portDir failed!");
-        return HDF_FAILURE;
-    }
-    ret = AudioAdapterGetDir(portDir->valuestring);
-    if (ret == HDF_FAILURE) {
-        AUDIO_FUNC_LOGE("port dir error! ret = %{public}d", ret);
-        return ret;
-    }
-    info->dir = ret;
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioAdapterParsePortGetID(struct AudioPort *info, const cJSON *port)
-{
-    if (info == NULL || port == NULL) {
-        AUDIO_FUNC_LOGE("Invalid parameter!\n");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    int32_t tmpId;
-    cJSON *portID = NULL;
-
-    portID = cJSON_GetObjectItem(port, "id");
-    if (portID == NULL) {
-        AUDIO_FUNC_LOGE("cJSON_GetObjectItem portID failed!");
-        return HDF_FAILURE;
-    }
-    tmpId = portID->valueint;
-    if (tmpId < 0 || tmpId > SUPPORT_PORT_ID_MAX) {
-        AUDIO_FUNC_LOGE("portID error!\n");
-        return HDF_FAILURE;
-    }
-    info->portId = (uint32_t)tmpId;
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioAdapterParsePortGetPortName(struct AudioPort *info, const cJSON *port)
-{
-    if (info == NULL || port == NULL) {
-        AUDIO_FUNC_LOGE("Invalid parameter!\n");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    int32_t ret;
-    cJSON *portName = NULL;
-
-    portName = cJSON_GetObjectItem(port, "name");
-    if (portName == NULL || portName->valuestring == NULL) {
-        AUDIO_FUNC_LOGE("cJSON_GetObjectItem portName failed!");
-        return HDF_FAILURE;
-    }
-    ret = AudioAdapterCheckPortFlow(portName->valuestring);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Port name error!\n");
-        return ret;
-    }
-    info->portName = (char *)OsalMemCalloc(PORT_NAME_LEN);
-    if (info->portName == NULL) {
-        AUDIO_FUNC_LOGE("Out of memory\n");
-
-        return HDF_ERR_MALLOC_FAIL;
-    }
-    ret = memcpy_s((void *)info->portName, PORT_NAME_LEN,
-                   portName->valuestring, strlen(portName->valuestring));
-    if (ret != EOK) {
-        AUDIO_FUNC_LOGE("memcpy_s port name fail");
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioAdapterParsePort(struct AudioPort *info, const cJSON *port)
-{
-    int32_t ret;
-    if (info == NULL || port == NULL) {
-        AUDIO_FUNC_LOGE("Invalid parameter!\n");
-        return HDF_ERR_INVALID_PARAM;
-    }
-    ret = AudioAdapterParsePortGetDir(info, port);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("AudioAdapterParsePortGetDir failed!\n");
-        return ret;
-    }
-    ret = AudioAdapterParsePortGetID(info, port);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("AudioAdapterParsePortGetID failed!\n");
-        return ret;
-    }
-    ret = AudioAdapterParsePortGetPortName(info, port);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("AudioAdapterParsePortGetPortName failed!\n");
-        return ret;
-    }
-    return HDF_SUCCESS;
 }
 
 enum AudioAdapterType MatchAdapterType(const char *adapterName, uint32_t portId)
@@ -609,382 +190,44 @@ int32_t AudioAdapterCheckPortId(const char *adapterName, uint32_t portId)
     return HDF_SUCCESS;
 }
 
-static int32_t AudioAdapterParsePorts(struct AudioAdapterDescriptor *desc, const cJSON *adapter)
+static InterfaceLibGetCardInfoSo AudioGetCardInfoFunc(void)
 {
-    uint32_t i;
-    int32_t ret, tmpNum;
-    cJSON *adapterPort = NULL;
-    uint32_t realSize = 0;
-    if (desc == NULL || adapter == NULL) {
-        AUDIO_FUNC_LOGE("Invalid parameter!\n");
-
-        return HDF_ERR_INVALID_PARAM;
-    }
-    cJSON *adapterPortNum = cJSON_GetObjectItem(adapter, "portnum");
-    if (adapterPortNum == NULL) {
-        AUDIO_FUNC_LOGE("cJSON_GetObjectItem portnum failed!");
-        return HDF_FAILURE;
-    }
-    tmpNum = cJSON_GetNumberValue(adapterPortNum);
-    if (tmpNum <= 0 || tmpNum > SUPPORT_PORT_NUM_MAX) {
-        AUDIO_FUNC_LOGE("portnum error! tmpNum = %{public}d\n", tmpNum);
-
-        return HDF_FAILURE;
-    }
-    desc->portNum = (uint32_t)tmpNum;
-
-    cJSON *adapterPorts = cJSON_GetObjectItem(adapter, "port");
-    if (adapterPorts == NULL) {
-        return HDF_FAILURE;
-    }
-    ret = AudioAdaptersGetArraySize(adapterPorts, &realSize);
-    if (ret != HDF_SUCCESS || realSize != desc->portNum) {
-        AUDIO_FUNC_LOGE("realSize = %{public}u, portNum = %{public}u.\n", realSize, desc->portNum);
-        return HDF_FAILURE;
-    }
-
-    desc->ports = (struct AudioPort *)OsalMemCalloc(desc->portNum * sizeof(struct AudioPort));
-    if (desc->ports == NULL) {
-        AUDIO_FUNC_LOGE("Out of memory!\n");
-
-        return HDF_ERR_MALLOC_FAIL;
-    }
-    for (i = 0; i < desc->portNum; i++) {
-        adapterPort = cJSON_GetArrayItem(adapterPorts, i);
-        if (adapterPort != NULL) {
-            ret = AudioAdapterParsePort(&desc->ports[i], adapterPort);
-            if (ret != HDF_SUCCESS) {
-                return ret;
-            }
-
-            ret = AudioAdapterCheckPortId(desc->adapterName, desc->ports[i].portId);
-            if (ret != HDF_SUCCESS) {
-                return ret;
-            }
-        }
-    }
-    return HDF_SUCCESS;
-}
-
-static int32_t AudioAdapterParseAdapter(struct AudioAdapterDescriptor *desc,
-                                        const cJSON *adapter)
-{
-    int32_t ret;
-
-    if (desc == NULL || adapter == NULL) {
-        AUDIO_FUNC_LOGE("Invalid parameter!\n");
-
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    cJSON *adapterName = cJSON_GetObjectItem(adapter, "name");
-    if (adapterName == NULL || adapterName->valuestring == NULL) {
-        AUDIO_FUNC_LOGE("adapterName or adapterName->valuestring is null!");
-        return HDF_FAILURE;
-    }
-    ret = AudioAdapterCheckName(adapterName->valuestring);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("The Adapter name is incorrect!\n");
-
-        return ret;
-    }
-
-    desc->adapterName = (char *)OsalMemCalloc(ADAPTER_NAME_LEN);
-    if (desc->adapterName == NULL) {
-        AUDIO_FUNC_LOGE("Out of memory!\n");
-
-        return HDF_ERR_MALLOC_FAIL;
-    }
-    ret = memcpy_s((void *)desc->adapterName, ADAPTER_NAME_LEN,
-        adapterName->valuestring, strlen(adapterName->valuestring));
-    if (ret != EOK) {
-        AUDIO_FUNC_LOGE("memcpy_s adapter name fail!\n");
-
-        return HDF_FAILURE;
-    }
-
-    ret = AudioAdapterParsePorts(desc, adapter);
-    if (ret != HDF_SUCCESS) {
-        return ret;
-    }
-
-    return HDF_SUCCESS;
-}
-
-static char *AudioAdaptersGetConfig(const char *fpath)
-{
-    char *pJsonStr = NULL;
-
-    if (fpath == NULL) {
-        /* The file path is bad or unreadable */
-        AUDIO_FUNC_LOGE("fpath is null!");
+    void *handle = dlopen(g_captureSoPath, RTLD_LAZY);
+    if (handle == NULL) {
+        AUDIO_FUNC_LOGE("open lib capture so fail, reason:%{public}s", dlerror());
         return NULL;
     }
-    char pathBuf[PATH_MAX] = {'\0'};
-    if (realpath(fpath, pathBuf) == NULL) {
+
+    InterfaceLibGetCardInfoSo cardInfo = dlsym(handle, "AudioGetAllCardInfo");
+    if (cardInfo == NULL) {
+        AUDIO_FUNC_LOGE("lib capture so func not found! %{public}s", dlerror());
+        AudioDlClose(&handle);
         return NULL;
     }
-    FILE *fp = fopen(pathBuf, "r");
-    if (fp == NULL) {
-        AUDIO_FUNC_LOGE("Can not open config file [ %{public}s ].\n", fpath);
-        return NULL;
-    }
-    if (fseek(fp, 0, SEEK_END) != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("fseek fail!");
-        (void)fclose(fp);
-        return NULL;
-    }
-    int32_t jsonStrSize = ftell(fp);
-    if (jsonStrSize <= 0) {
-        (void)fclose(fp);
-        return NULL;
-    }
-    rewind(fp);
-    if (jsonStrSize > CONFIG_FILE_SIZE_MAX) {
-        AUDIO_FUNC_LOGE("The configuration file is too large to load!\n");
-        (void)fclose(fp);
-        return NULL;
-    }
-    pJsonStr = (char *)OsalMemCalloc((uint32_t)jsonStrSize + 1);
-    if (pJsonStr == NULL) {
-        AUDIO_FUNC_LOGE("alloc pJsonStr failed!");
-        (void)fclose(fp);
-        return NULL;
-    }
-    if (fread(pJsonStr, jsonStrSize, 1, fp) != 1) {
-        AUDIO_FUNC_LOGE("read to file fail!");
-        (void)fclose(fp);
-        AudioMemFree((void **)&pJsonStr);
-        return NULL;
-    }
-    (void)fclose(fp);
-    return pJsonStr;
-}
 
-cJSON *AudioAdaptersGetConfigToJsonObj(const char *fpath)
-{
-    char *pJsonStr = AudioAdaptersGetConfig(fpath);
-    if (pJsonStr == NULL) {
-        AUDIO_FUNC_LOGE("AudioAdaptersGetConfig failed!");
-        return NULL;
-    }
-    cJSON *cJsonObj = cJSON_Parse(pJsonStr);
-    if (cJsonObj == NULL) {
-        AudioMemFree((void **)&pJsonStr);
-        return NULL;
-    }
-    AudioMemFree((void **)&pJsonStr);
-    cJSON *adapterNum = cJSON_GetObjectItem(cJsonObj, "adapterNum");
-    if (adapterNum == NULL) {
-        AUDIO_FUNC_LOGE("cJSON_GetObjectItem adapterNum failed!");
-        cJSON_Delete(cJsonObj);
-        return NULL;
-    }
-    g_adapterNum = adapterNum->valueint;
-    if (g_adapterNum <= 0 || g_adapterNum > SUPPORT_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("Adapter number error!\n");
-        cJSON_Delete(cJsonObj);
-        return NULL;
-    }
-    return cJsonObj;
-}
-
-static int32_t AudioAdaptersSetAdapter(struct AudioAdapterDescriptor **descs,
-    int32_t adapterNum, const cJSON *adaptersObj)
-{
-    int32_t i, ret;
-    cJSON *adapterObj = NULL;
-
-    if (descs == NULL || adaptersObj == NULL ||
-        adapterNum <= 0 || adapterNum > SUPPORT_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("Invalid parameter!\n");
-
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (*descs != NULL) {
-        /* Existing content is no longer assigned twice */
-        return HDF_SUCCESS;
-    }
-
-    *descs = (struct AudioAdapterDescriptor *)OsalMemCalloc(
-        adapterNum * sizeof(struct AudioAdapterDescriptor));
-    if (*descs == NULL) {
-        AUDIO_FUNC_LOGE("alloc g_audioAdapterDescs failed");
-
-        return HDF_ERR_MALLOC_FAIL;
-    }
-
-    for (i = 0; i < adapterNum; i++) {
-        adapterObj = cJSON_GetArrayItem(adaptersObj, i);
-        if (adapterObj != NULL) {
-            ret = AudioAdapterParseAdapter(&(*descs)[i], adapterObj);
-            if (ret != HDF_SUCCESS) {
-                AUDIO_FUNC_LOGE("AudioAdapterParseAdapter failed ret = %{public}d", ret);
-                AudioAdapterReleaseDescs(*descs, adapterNum);
-                *descs = NULL;
-
-                return HDF_FAILURE;
-            }
-        }
-    }
-
-    return HDF_SUCCESS;
-}
-
-static void AudioAdaptersNamesRepair(void)
-{
-    int i, realNum;
-
-    if (g_audioAdapterOut == NULL ||
-        g_audioAdapterDescs == NULL || g_adapterNum <= 0) {
-        return;
-    }
-
-    realNum = (g_adapterNum < SUPPORT_ADAPTER_NUM_MAX) ? g_adapterNum : SUPPORT_ADAPTER_NUM_MAX;
-    for (i = 0; i < realNum; i++) {
-        if (g_adaptersName[i] == NULL) {
-            return;
-        }
-
-        if (strcmp(g_audioAdapterOut[i].adapterName, g_audioAdapterDescs[i].adapterName)) {
-            /* Retrieve the location of the port name */
-            g_audioAdapterOut[i].adapterName = g_adaptersName[i];
-        }
-    }
-}
-
-static void AudioPortsNamesRepair(void)
-{
-    int32_t i;
-    uint32_t j;
-    int32_t adapterNum;
-    uint32_t portNum;
-
-    if (g_audioAdapterOut == NULL ||
-        g_audioAdapterDescs == NULL || g_adapterNum <= 0) {
-        return;
-    }
-
-    adapterNum = (g_adapterNum < SUPPORT_ADAPTER_NUM_MAX) ? g_adapterNum : SUPPORT_ADAPTER_NUM_MAX;
-    for (i = 0; i < adapterNum; i++) {
-        portNum = (g_audioAdapterOut[i].portNum < SUPPORT_PORT_NUM_MAX) ?
-            g_audioAdapterOut[i].portNum : SUPPORT_PORT_NUM_MAX;
-        for (j = 0; j < portNum; j++) {
-            if (g_portsName[i][j] == NULL) {
-                return;
-            }
-            if (strcmp(g_audioAdapterOut[i].ports[j].portName, g_audioAdapterDescs[i].ports[j].portName)) {
-                /* Retrieve the location of the sound card name */
-                g_audioAdapterOut[i].ports[j].portName = g_portsName[i][j];
-            }
-        }
-    }
-}
-
-static void AudioAdaptersNamesRecord(void)
-{
-    int i, currentNum;
-
-    if (g_audioAdapterOut == NULL ||
-        g_audioAdapterDescs == NULL || g_adapterNum <= 0) {
-        return;
-    }
-
-    currentNum = (g_adapterNum < SUPPORT_ADAPTER_NUM_MAX) ? g_adapterNum : SUPPORT_ADAPTER_NUM_MAX;
-    for (i = 0; i < currentNum; i++) {
-        /* Record the location of the sound card name */
-        g_adaptersName[i] = g_audioAdapterOut[i].adapterName;
-    }
-}
-
-static void AudioPortsNamesRecord(void)
-{
-    int32_t i;
-    uint32_t j;
-    int32_t adapterCurNum;
-    uint32_t portCurNum;
-
-    if (g_audioAdapterOut == NULL || g_audioAdapterDescs == NULL || g_adapterNum <= 0) {
-        return;
-    }
-
-    adapterCurNum = (g_adapterNum < SUPPORT_ADAPTER_NUM_MAX) ? g_adapterNum : SUPPORT_ADAPTER_NUM_MAX;
-    for (i = 0; i < adapterCurNum; i++) {
-        portCurNum = (g_audioAdapterOut[i].portNum < SUPPORT_PORT_NUM_MAX) ?
-            g_audioAdapterOut[i].portNum : SUPPORT_PORT_NUM_MAX;
-        for (j = 0; j < portCurNum; j++) {
-            /* Record the location of the port name */
-            g_portsName[i][j] = g_audioAdapterOut[i].ports[j].portName;
-        }
-    }
-}
-int32_t AudioAdaptersSetAdapterVar(cJSON *adaptersObj)
-{
-    if (adaptersObj == NULL) {
-        AUDIO_FUNC_LOGE("adaptersObj is NULL!");
-        return HDF_FAILURE;
-    }
-    if (AudioAdaptersSetAdapter(&g_audioAdapterDescs, g_adapterNum, adaptersObj) != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("AudioAdaptersSetAdapter g_audioAdapterDescs is failed!");
-        return HDF_FAILURE;
-    }
-    if (AudioAdaptersSetAdapter(&g_audioAdapterOut, g_adapterNum, adaptersObj) != HDF_SUCCESS) {
-        /* g_audioAdapterOut failure also releases g_audioAdapterDescs */
-        AUDIO_FUNC_LOGE("AudioAdaptersSetAdapter g_audioAdapterOut is failed!");
-        AudioAdapterReleaseDescs(g_audioAdapterDescs, g_adapterNum);
-        ClearAdaptersAllName();
-        g_audioAdapterDescs = NULL;
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
+    return cardInfo;
 }
 
 int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
 {
-    uint32_t realSize = 0;
     if (descs == NULL || size == NULL) {
         AUDIO_FUNC_LOGE("param descs or size is null!");
         return HDF_ERR_INVALID_PARAM;
     }
-    if (g_audioAdapterDescs != NULL && g_audioAdapterOut != NULL &&
-        g_adapterNum > 0 && g_adapterNum <= SUPPORT_ADAPTER_NUM_MAX) {
-        AudioAdaptersNamesRepair();
-        AudioPortsNamesRepair();
-        /* Existing content is no longer assigned twice */
-        *descs = g_audioAdapterOut;
-        *size = g_adapterNum;
-        return HDF_SUCCESS;
-    }
-    cJSON *cJsonObj = AudioAdaptersGetConfigToJsonObj(AUDIO_ADAPTER_CONFIG);
-    if (cJsonObj == NULL) {
-        AUDIO_FUNC_LOGE("AudioAdaptersGetConfigToJsonObj failed!");
+
+    InterfaceLibGetCardInfoSo getCardInfo = AudioGetCardInfoFunc();
+    if (getCardInfo == NULL) {
+        AUDIO_FUNC_LOGE("AudioGetCardInfoFunc is failed!");
         return HDF_FAILURE;
     }
-    cJSON *adaptersObj = cJSON_GetObjectItem(cJsonObj, "adapters");
-    if (adaptersObj == NULL) {
-        AUDIO_FUNC_LOGE("cJSON_GetObjectItem adapters failed!");
-        cJSON_Delete(cJsonObj);
+
+    if (getCardInfo(descs, size) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioSoGetInterfaceLibCardInfo is failed!");
         return HDF_FAILURE;
     }
-    if (g_adapterNum > 0) {
-        if (AudioAdaptersGetArraySize(adaptersObj, &realSize) != HDF_SUCCESS || realSize != (uint32_t)g_adapterNum) {
-            AUDIO_FUNC_LOGE("realSize = %{public}d, adaptersNum = %{public}d.\n", realSize, g_adapterNum);
-            g_adapterNum = 0;
-            cJSON_Delete(cJsonObj);
-            return HDF_FAILURE;
-        }
-    }
-    if (AudioAdaptersSetAdapterVar(adaptersObj) != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("AudioAdaptersSetAdapterVar is failed!");
-        g_adapterNum = 0;
-        cJSON_Delete(cJsonObj);
-        return HDF_FAILURE;
-    }
-    AudioAdaptersNamesRecord();
-    AudioPortsNamesRecord();
-    *descs = g_audioAdapterOut;
-    *size = g_adapterNum;
-    cJSON_Delete(cJsonObj);
+
+    g_audioAdapterDescs = *descs;
+    g_adapterNum = *size;
     return HDF_SUCCESS;
 }
 
@@ -995,21 +238,8 @@ bool ReleaseAudioManagerObjectComm(struct AudioManager *object)
         return false;
     }
 
-    object->GetAllAdapters = NULL;
-    object->LoadAdapter = NULL;
-    object->UnloadAdapter = NULL;
-    object->ReleaseAudioManagerObject = NULL;
-
-    if (g_audioAdapterDescs != NULL && g_audioAdapterOut != NULL &&
-        g_adapterNum > 0 && g_adapterNum <= SUPPORT_ADAPTER_NUM_MAX) {
-        AudioAdaptersNamesRepair();
-        AudioPortsNamesRepair();
-    }
-
     AudioAdapterReleaseDescs(g_audioAdapterDescs, g_adapterNum);
-    AudioAdapterReleaseDescs(g_audioAdapterOut, g_adapterNum);
     g_audioAdapterDescs = NULL;
-    g_audioAdapterOut = NULL;
     g_adapterNum = 0;
 
     return true;
@@ -1438,4 +668,3 @@ int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count,
     }
     return AUDIO_HAL_SUCCESS;
 }
-

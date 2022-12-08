@@ -14,12 +14,10 @@
  */
 
 #include "audio_interface_lib_common.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-
 #include "audio_common.h"
 #include "audio_if_lib_render.h"
 #include "audio_uhdf_log.h"
@@ -34,6 +32,8 @@
 #define ADAPTER_NAME_SUFFIX        2
 #define SUPPORT_CAPTURE_OR_RENDER  1
 #define SUPPORT_CAPTURE_AND_RENDER 2
+
+#define DECADE 10
 
 struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
 {
@@ -165,6 +165,7 @@ static struct DevHandle *AudioBindServiceObject(struct DevHandle * const handle,
     char *serviceName = (char *)OsalMemCalloc(NAME_LEN);
     if (serviceName == NULL) {
         AUDIO_FUNC_LOGE("Failed to alloc serviceName");
+        AudioMemFree((void **)&handle);
         return NULL;
     }
 
@@ -172,6 +173,7 @@ static struct DevHandle *AudioBindServiceObject(struct DevHandle * const handle,
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Failed to snprintf_s");
         AudioMemFree((void **)&serviceName);
+        AudioMemFree((void **)&handle);
         return NULL;
     }
 
@@ -179,6 +181,7 @@ static struct DevHandle *AudioBindServiceObject(struct DevHandle * const handle,
     if (service == NULL) {
         AUDIO_FUNC_LOGE("Failed to get service!");
         AudioMemFree((void **)&serviceName);
+        AudioMemFree((void **)&handle);
         return NULL;
     }
 
@@ -203,14 +206,12 @@ struct DevHandle *AudioBindService(const char *name)
     }
 
     object = AudioBindServiceObject(handle, name);
-    if (object == NULL) {
+    if (object != NULL) {
+        handle->object = object;
+    } else {
         AUDIO_FUNC_LOGE("handle->object is NULL!");
-        AudioMemFree((void **)&handle);
         return NULL;
     }
-
-    handle->object = object;
-
     AUDIO_FUNC_LOGI("BIND SERVICE SUCCESS!");
     return handle;
 }
@@ -239,13 +240,12 @@ static int8_t AudioCardParsePortId(const char *name)
     uint8_t portId = 0;
     size_t nameLen = strlen(name);
 
-    /* Get audio card device id */
-    for (i = ADAPTER_NAME_SUFFIX; i > 0 ; i--) {
+    for (i = 2; i > 0; i--) {
         if (name[nameLen - i] > '9' || name[nameLen - i] < '0') {
             continue;
         }
 
-        portId += (name[nameLen - i] - '0') * ((i - 1) ? ADAPTER_PORT_ID_MSB : 1);
+        portId += (name[nameLen - i] - '0') * ((i - 1) ? DECADE : 1);
     }
 
     return portId;
@@ -278,7 +278,7 @@ static char *AudioCardNameTransform(const char *name, int8_t *portId)
 
 static int32_t AudioReadCardPortToDesc(struct HdfSBuf *reply, struct AudioAdapterDescriptor *desc, int8_t portId)
 {
-    uint8_t portNum;
+    uint8_t portNum = 0;
 
     if (desc == NULL) {
         AUDIO_FUNC_LOGE("descs is null!");
@@ -291,9 +291,9 @@ static int32_t AudioReadCardPortToDesc(struct HdfSBuf *reply, struct AudioAdapte
     }
 
     if (portNum == PORT_IN || portNum == PORT_OUT) {
-        portNum = SUPPORT_CAPTURE_OR_RENDER;
+        portNum = 1; // support capture | render
     } else if (portNum == PORT_OUT_IN) {
-        portNum = SUPPORT_CAPTURE_AND_RENDER;
+        portNum = 2; // support capture & render
     } else {
         AUDIO_FUNC_LOGE("portNum value failed!");
         return HDF_FAILURE;
@@ -318,8 +318,17 @@ static int32_t AudioReadCardPortToDesc(struct HdfSBuf *reply, struct AudioAdapte
             return HDF_FAILURE;
         }
 
-        // Compatible with IDL
-        desc->ports[i].portName = strdup("useless");
+        if (desc->ports[i].dir == PORT_IN) {
+            desc->ports[i].portName = strdup("AIP");
+        } else if (desc->ports[i].dir == PORT_OUT) {
+            desc->ports[i].portName = strdup("AOP");
+        } else if (desc->ports[i].dir == PORT_OUT_IN) {
+            desc->ports[i].portName = strdup("AOIP");
+        } else {
+            AudioMemFree((void **)&desc->ports);
+            AUDIO_FUNC_LOGE("desc->ports[i].dir = %{public}d", desc->ports[i].dir);
+            return HDF_FAILURE;
+        }
         desc->ports[i].portId = portId;
     }
 
@@ -370,7 +379,7 @@ static int32_t AudioReadCardInfoToDesc(struct HdfSBuf *reply, struct AudioAdapte
         return HDF_FAILURE;
     }
 
-    if (*descs  == NULL) {
+    if (*descs == NULL) {
         AUDIO_FUNC_LOGI("*descs is NULL");
         *descs = (struct AudioAdapterDescriptor *)OsalMemCalloc(sizeof(struct AudioAdapterDescriptor) * (*sndCardNum));
         if (*descs == NULL) {
