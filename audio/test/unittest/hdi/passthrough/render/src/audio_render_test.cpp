@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "audio_common_test.h"
+#include "hdf_io_service_if.h"
 
 using namespace std;
 using namespace comfun;

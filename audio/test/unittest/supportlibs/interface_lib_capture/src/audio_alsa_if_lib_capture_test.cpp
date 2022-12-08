@@ -30,7 +30,7 @@ const string BIND_CAPTURE = "capture";
 
 class AudioAlsaIfLibCaptureTest : public testing::Test {
 public:
-    static struct DevHandleCapture *handle;
+    static struct DevHandle *handle;
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
@@ -40,7 +40,7 @@ public:
     int32_t AudioCapResourceRelease(struct AudioHwCaptureParam *&handleData);
 };
 
-struct DevHandleCapture *AudioAlsaIfLibCaptureTest::handle = nullptr;
+struct DevHandle *AudioAlsaIfLibCaptureTest::handle = nullptr;
 
 void AudioAlsaIfLibCaptureTest::SetUpTestCase()
 {
