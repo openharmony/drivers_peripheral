@@ -129,10 +129,6 @@ enum AudioTurnStandbyMode {
     AUDIO_TURN_STANDBY_BUTT,
 };
 
-struct DevHandleCapture {
-    void *object;
-};
-
 struct DevHandle {
     void *object;
 };
@@ -301,8 +297,8 @@ struct AudioHwCapture {
     struct HdfRemoteService *proxyRemoteHandle;
     struct HdfRemoteDispatcher dispatcher;
     struct AudioHwCaptureParam captureParam;
-    struct DevHandleCapture *devDataHandle; // Bind Data handle
-    struct DevHandleCapture *devCtlHandle;  // Bind Ctl handle
+    struct DevHandle *devDataHandle; // Bind Data handle
+    struct DevHandle *devCtlHandle;  // Bind Ctl handle
     struct ErrorLog errorLog;
 };
 
@@ -412,9 +408,9 @@ typedef struct DevHandle *(*BindServiceRenderPassthrough)(const char *);
 typedef int32_t (*InterfaceLibModeRenderPassthrough)(struct DevHandle *, struct AudioHwRenderParam *, int);
 typedef void (*CloseServiceRenderPassthrough)(struct DevHandle *);
 
-typedef struct DevHandleCapture *(*BindServiceCapturePassthrough)(const char *);
-typedef int32_t (*InterfaceLibModeCapturePassthrough)(struct DevHandleCapture *, struct AudioHwCaptureParam *, int);
-typedef void (*CloseServiceCapturePassthrough)(struct DevHandleCapture *);
+typedef struct DevHandle *(*BindServiceCapturePassthrough)(const char *);
+typedef int32_t (*InterfaceLibModeCapturePassthrough)(struct DevHandle *, struct AudioHwCaptureParam *, int);
+typedef void (*CloseServiceCapturePassthrough)(struct DevHandle *);
 
 typedef int32_t (*PathSelGetConfToJsonObj)(void);
 typedef int32_t (*PathSelAnalysisJson)(void *adapterParam, enum AudioAdaptType adaptType);

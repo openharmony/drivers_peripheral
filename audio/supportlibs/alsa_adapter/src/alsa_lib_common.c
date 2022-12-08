@@ -30,6 +30,9 @@
 #define ALSA_CARD_CONFIG_FILE HDF_CONFIG_DIR "/alsa_adapter.json"
 #define ALSA_CONFIG_FILE_MAX  (2 * 1024) // 2KB
 
+#define SUPPORT_CAPTURE_OR_RENDER  1
+#define SUPPORT_CAPTURE_AND_RENDER 2
+
 struct CardStream {
     int card;
     snd_pcm_stream_t stream; /** Playback stream or Capture stream */
@@ -1146,5 +1149,263 @@ int32_t CardInfoParseFromConfig(void)
     cJSON_Delete(cJsonObj);
     g_parseFlag = true;
 
+    return HDF_SUCCESS;
+}
+
+struct DevHandle *AudioBindService(const char *name)
+{
+    (void)name;
+    struct DevHandle *handle = (struct DevHandle *)OsalMemCalloc(sizeof(struct DevHandle));
+    if (handle == NULL) {
+        AUDIO_FUNC_LOGE("OsalMemCalloc handle failed!!!");
+        return NULL;
+    }
+
+    static struct HdfIoService hdfIoService;
+    handle->object = &hdfIoService;
+    return handle;
+}
+
+void AudioCloseService(const struct DevHandle *handle)
+{
+    if (handle != NULL || handle->object == NULL) {
+        AUDIO_FUNC_LOGE("handle or handle->object is NULL");
+    }
+    AudioMemFree((void **)&handle);
+}
+
+static void AudioPortNameFree(struct AudioPort *dataBlock, uint32_t portsLen)
+{
+    if (dataBlock == NULL) {
+        return;
+    }
+
+    for (uint32_t i = 0; i < portsLen; i++) {
+        OsalMemFree((void *)dataBlock[i].portName);
+        dataBlock[i].portName = NULL;
+    }
+    OsalMemFree(dataBlock);
+}
+
+static void AudioFreeDesc(struct AudioAdapterDescriptor **descList, uint32_t sndCardNum)
+{
+    if (descList == NULL || *descList == NULL) {
+        AUDIO_FUNC_LOGE("AudioFreeDesc failed!");
+        return;
+    }
+
+    for (uint32_t index = 0; index < sndCardNum; index++) {
+        if ((*descList)[index].adapterName != NULL) {
+            AudioMemFree((void **)&((*descList)[index].adapterName));
+            (*descList)[index].adapterName = NULL;
+        }
+#ifndef AUDIO_HDI_SERVICE_MODE
+        AudioPortNameFree((*descList)[index].ports, (*descList)[index].portNum);
+#else
+        AudioPortNameFree((*descList)[index].ports, (*descList)[index].portsLen);
+#endif
+    }
+
+    AudioMemFree((void **)descList);
+}
+
+static char *AudioMatchCardName(char *cardName, int32_t cardType, int32_t cardNum)
+{
+    if (strcmp(cardName, PRIMARY) == 0) {
+        g_sndCardList[cardType][cardNum]->cardName[0] = 0;
+        return strdup("primary");
+    } else if (strcmp(cardName, HDMI) == 0) {
+        g_sndCardList[cardType][cardNum]->cardName[0] = 0;
+        return strdup("hdmi");
+    } else {
+        AUDIO_FUNC_LOGI("audio card fail to identify");
+    }
+    return NULL;
+}
+
+static char *AudioCardNameTransform(void)
+{
+    for (int32_t i = 0; i < SND_CARD_MAX; i++) {
+        for (int32_t j = 0; j < AUDIO_MAX_CARD_NUM; j++) {
+            if (g_sndCardList[i][j] != NULL && strlen(g_sndCardList[i][j]->cardName) != 0) {
+                return AudioMatchCardName(g_sndCardList[i][j]->cardName, i, j);
+            }
+        }
+    }
+    return NULL;
+}
+
+static void InitAudioPortOut(struct AudioPort *audioPort)
+{
+    audioPort->dir = PORT_OUT;
+    audioPort->portId = 0;
+    audioPort->portName = strdup("AOP");
+}
+
+static void InitAudioPortIn(struct AudioPort *audioPort)
+{
+    audioPort->dir = PORT_IN;
+    audioPort->portId = 0;
+    audioPort->portName = strdup("AIP");
+}
+
+static void InitAudioPortOutAndIn(struct AudioPort *audioPort)
+{
+    audioPort->dir = PORT_OUT_IN;
+    audioPort->portId = 0;
+    audioPort->portName = strdup("AIOP");
+}
+
+static int32_t InitAudioPortsForUser(struct AudioAdapterDescriptor *desc)
+{
+    if (desc == NULL || desc->adapterName == NULL || desc->ports == NULL) {
+        AUDIO_FUNC_LOGE("Paras is null!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (strcmp(desc->adapterName, PRIMARY) == 0) {
+        InitAudioPortOut(&desc->ports[0]);
+        InitAudioPortIn(&desc->ports[SUPPORT_CAPTURE_OR_RENDER]);
+        InitAudioPortOutAndIn(&desc->ports[SUPPORT_CAPTURE_AND_RENDER]);
+    } else if (strcmp(desc->adapterName, HDMI) == 0) {
+        InitAudioPortOut(&desc->ports[0]);
+    } else if (strcmp(desc->adapterName, USB) == 0) {
+        InitAudioPortOut(&desc->ports[0]);
+        InitAudioPortIn(&desc->ports[SUPPORT_CAPTURE_OR_RENDER]);
+    } else {
+        AUDIO_FUNC_LOGE("Unknown sound card type does not support this sound card temporarily!");
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioReadCardPortToDesc(struct AudioAdapterDescriptor *desc)
+{
+    uint8_t portNum;
+
+    if (desc == NULL || desc->adapterName == NULL) {
+        AUDIO_FUNC_LOGE("descs or desc->adapterName is NULL!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (strcmp(desc->adapterName, PRIMARY) == 0) {
+        portNum = PORT_OUT_IN; /* support (capture, render, capture & render) */
+    } else if (strcmp(desc->adapterName, HDMI) == 0) {
+        portNum = PORT_OUT; /* support render */
+    } else if (strcmp(desc->adapterName, USB) == 0) {
+        portNum = PORT_IN; /* support (capture, render) */
+    } else {
+        AUDIO_FUNC_LOGE("Unknown sound card type does not support this sound card temporarily!");
+        return HDF_FAILURE;
+    }
+
+#ifndef AUDIO_HDI_SERVICE_MODE
+    desc->portNum = portNum;
+#else
+    desc->portsLen = portNum;
+#endif
+
+    desc->ports = (struct AudioPort *)OsalMemCalloc(sizeof(struct AudioPort) * portNum);
+    if (desc->ports == NULL) {
+        AUDIO_FUNC_LOGE("OsalMemCalloc failed!");
+        return HDF_FAILURE;
+    }
+    if (InitAudioPortsForUser(desc) < 0) {
+        AUDIO_FUNC_LOGE("InitAudioPortsForUser failed!");
+        AudioMemFree((void **)&desc->ports);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioReadCardInfoToDesc(struct AudioAdapterDescriptor **descs, uint8_t cardNum, bool usbAudioState)
+{
+    int32_t index = 0;
+    int32_t cardNumTemp = 0;
+    if (descs == NULL || cardNum == 0) {
+        AUDIO_FUNC_LOGE("Parameter error.");
+        return HDF_FAILURE;
+    }
+    cardNumTemp = cardNum;
+    *descs = (struct AudioAdapterDescriptor *)OsalMemCalloc(sizeof(struct AudioAdapterDescriptor) * cardNum);
+    if (*descs == NULL) {
+        AUDIO_FUNC_LOGE("OsalMemCalloc descs is NULL");
+        return HDF_FAILURE;
+    }
+    if (usbAudioState) {
+        (*descs)[cardNum - 1].adapterName = strdup(USB);
+        cardNumTemp = cardNum - 1;
+    }
+
+    for (index = 0; index < cardNumTemp; index++) {
+        (*descs)[index].adapterName = AudioCardNameTransform();
+        if ((*descs)[index].adapterName == NULL) {
+            AUDIO_FUNC_LOGE("(*descs)[index].adapterName is NULL!");
+            AudioFreeDesc(descs, cardNum);
+            return HDF_FAILURE;
+        }
+    }
+
+    for (index = 0; index < cardNum; index++) {
+        if (AudioReadCardPortToDesc(&(*descs)[index]) != HDF_SUCCESS) {
+            AUDIO_FUNC_LOGE("read port failed!");
+            AudioFreeDesc(descs, cardNum);
+            return HDF_FAILURE;
+        }
+    }
+
+    return HDF_SUCCESS;
+}
+
+static bool CheckUsbAudioIsInserted(struct AlsaCardsList *cardList)
+{
+    if (cardList == NULL) {
+        AUDIO_FUNC_LOGE("The parameter is empty.");
+        return false;
+    }
+
+    for (int32_t i = 0; i < MAX_CARD_NUM; i++) {
+        /** External codec */
+        if (strcmp(USB_AUDIO, cardList->alsaDevIns[i].pcmInfoId) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+int32_t AudioGetAllCardInfo(struct AudioAdapterDescriptor **descs, int32_t *sndCardNum)
+{
+    if (descs == NULL || sndCardNum == NULL) {
+        AUDIO_FUNC_LOGE("descs or sndCardNum is NULL!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    AUDIO_FUNC_LOGI("enter!");
+    /* Parse sound card from configuration file */
+    int32_t ret = CardInfoParseFromConfig();
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("parse config file failed! ret = %{public}d", ret);
+        return HDF_FAILURE;
+    }
+
+    /* Read sound card list from alsa hardware */
+    (void)memset_s(&g_alsaCardsList, sizeof(struct AlsaCardsList), 0, sizeof(struct AlsaCardsList));
+    GetDeviceList(&g_alsaCardsList, SND_PCM_STREAM_PLAYBACK);
+
+    /* Check whether there is a USB sound card through pcmInfoId ("USB Audio") */
+    bool usbAduioFlag = CheckUsbAudioIsInserted(&g_alsaCardsList);
+    if (usbAduioFlag) {
+        g_sndCardsNum += 1;
+    }
+    *sndCardNum = g_sndCardsNum;
+
+    /* Reconstruct sound card information to user */
+    if (AudioReadCardInfoToDesc(descs, g_sndCardsNum, usbAduioFlag) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioReadCardInfoToDesc failed!");
+        *sndCardNum = 0;
+        CardInfoRelease();
+        return HDF_FAILURE;
+    }
+    CardInfoRelease();
     return HDF_SUCCESS;
 }

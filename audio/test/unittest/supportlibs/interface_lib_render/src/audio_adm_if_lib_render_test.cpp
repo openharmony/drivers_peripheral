@@ -21,7 +21,7 @@ using namespace std;
 using namespace testing::ext;
 namespace {
 extern "C" {
-struct HdfSBuf *AudioObtainHdfSBuf();
+struct HdfSBuf *HdfSbufObtainDefaultSize();
 int32_t IoctlWrite(const struct AudioHwRenderParam *handleData);
 int32_t AudioServiceRenderDispatch(struct HdfIoService *service, int cmdId,
     struct HdfSBuf *sBuf, struct HdfSBuf *reply);
@@ -114,7 +114,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetVolumeSBuf_001, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetVolumeSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -123,7 +123,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetVolumeSBuf_002, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetVolumeSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = new AudioHwRenderParam;
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSetVolumeSBuf(sBuf, handleData);
@@ -145,7 +145,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetVolumeSBuf_001, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetVolumeSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -154,7 +154,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetVolumeSBuf_002, TestSize.Leve
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetVolumeSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = new AudioHwRenderParam;
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderGetVolumeSBuf(sBuf, handleData);
@@ -176,7 +176,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetPauseBuf_001, TestSize.Level1
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetPauseBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSetPauseBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -185,7 +185,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetPauseBuf_002, TestSize.Level1
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetPauseBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = new AudioHwRenderParam;
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSetPauseBuf(sBuf, handleData);
@@ -207,7 +207,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetMuteBuf_001, TestSize.Level1)
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetMuteBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSetMuteBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -216,7 +216,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetMuteBuf_002, TestSize.Level1)
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetMuteBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = new AudioHwRenderParam;
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSetMuteBuf(sBuf, handleData);
@@ -238,7 +238,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetMuteSBuf_001, TestSize.Level1
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetMuteSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderGetMuteSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -247,7 +247,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetMuteSBuf_002, TestSize.Level1
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetMuteSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = new AudioHwRenderParam;
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderGetMuteSBuf(sBuf, handleData);
@@ -269,7 +269,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetGainBuf_001, TestSize.Level1)
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetGainBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSetGainBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -278,7 +278,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetGainBuf_002, TestSize.Level1)
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetGainBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = new AudioHwRenderParam;
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSetGainBuf(sBuf, handleData);
@@ -300,7 +300,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetGainSBuf_001, TestSize.Level1
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetGainSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderGetGainSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -309,7 +309,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetGainSBuf_002, TestSize.Level1
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetGainSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = new AudioHwRenderParam;
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderGetGainSBuf(sBuf, handleData);
@@ -332,7 +332,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSceneSelectSBuf_001, TestSize.Le
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSceneSelectSBuf_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = nullptr;
     int32_t deviceIndex = 0;
     int32_t ret = AudioCtlRenderSceneSelectSBuf(sBuf, handleData, deviceIndex);
@@ -342,7 +342,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSceneSelectSBuf_002, TestSize.Le
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSceneSelectSBuf_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = new AudioHwRenderParam;
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t deviceIndex = 0;
@@ -365,7 +365,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSceneGetGainThreshold_001, TestS
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSceneGetGainThreshold_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSceneGetGainThresholdSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -374,7 +374,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSceneGetGainThreshold_002, TestS
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSceneGetGainThreshold_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = new AudioHwRenderParam;
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSceneGetGainThresholdSBuf(sBuf, handleData);
@@ -396,7 +396,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetChannelMode_001, TestSize.Lev
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetChannelMode_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderSetChannelModeBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -405,7 +405,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetChannelMode_002, TestSize.Lev
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderSetChannelMode_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = new AudioHwRenderParam;
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderSetChannelModeBuf(sBuf, handleData);
@@ -427,7 +427,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetChannelMode_001, TestSize.Lev
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetChannelMode_002, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = nullptr;
     int32_t ret = AudioCtlRenderGetChannelModeSBuf(sBuf, handleData);
     EXPECT_EQ(HDF_FAILURE, ret);
@@ -436,7 +436,7 @@ HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetChannelMode_002, TestSize.Lev
 
 HWTEST_F(AudioAdmIfLibRenderTest, AudioCtlRenderGetChannelMode_003, TestSize.Level1)
 {
-    struct HdfSBuf *sBuf = AudioObtainHdfSBuf();
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
     AudioHwRenderParam *handleData = new AudioHwRenderParam;
     handleData->renderMode.hwInfo.card = AUDIO_SERVICE_IN;
     int32_t ret = AudioCtlRenderGetChannelModeSBuf(sBuf, handleData);

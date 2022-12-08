@@ -37,4 +37,6 @@ struct AudioPcmHwParams {
     bool isSignedData;
     char *cardServiceName;
 };
+
+int32_t AudioGetAllCardInfo(struct AudioAdapterDescriptor **descs, int32_t *sndCardNum);
 #endif /* AUDIO_IF_LIB_COMMON_H */
