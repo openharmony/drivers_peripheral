@@ -851,32 +851,19 @@ int32_t UsbExitHostSdk(const struct UsbSession *session)
     return RawExit(session);
 }
 
-struct UsbInterface *UsbClaimInterfaceUnforce(
-    const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
+static void SetPoolQueryPara(struct UsbPoolQueryPara *poolQueryPara, uint8_t busNum, uint8_t usbAddr)
 {
-    struct UsbInterface *interfaceObj = UsbClaimInterface(session, busNum, usbAddr, interfaceIndex);
-    if (interfaceObj == NULL) {
-        HDF_LOGE("%{public}s:%{public}d interfaceObj is NULL", __func__, __LINE__);
-        return NULL;
-    }
-
-    struct UsbSdkInterface *interfaceSdk = (struct UsbSdkInterface *)interfaceObj;
-    if (OsalAtomicRead((OsalAtomic *)&interfaceSdk->refCount) > INTERFACE_REFCOUNT_UNFORCE) {
-        int32_t ret = UsbReleaseInterface(interfaceObj);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbReleaseInterface failed!", __func__, __LINE__);
-        }
-        return NULL;
-    }
-    return interfaceObj;
+    poolQueryPara->type = USB_POOL_NORMAL_TYPE;
+    poolQueryPara->busNum = busNum;
+    poolQueryPara->usbAddr = usbAddr;
 }
 
-struct UsbInterface *UsbClaimInterface(
-    const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
+static struct UsbInterface *ClaimInterface(
+    const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex, bool force)
 {
     struct UsbPoolQueryPara poolQueryPara = {0};
     struct UsbInterfacePool *interfacePool = NULL;
-    struct UsbInterfaceQueryPara interfaceQueryPara = {0};
+    struct UsbInterfaceQueryPara interfaceQueryPara = {USB_INTERFACE_INTERFACE_INDEX_TYPE, interfaceIndex, 0};
     struct UsbSdkInterface *interfaceObj = NULL;
     struct UsbDeviceHandle *devHandle = NULL;
     struct UsbSession *realSession = RawGetSession(session);
@@ -887,10 +874,8 @@ struct UsbInterface *UsbClaimInterface(
         HDF_LOGE("%{public}s:%{public}d interfacePoolList is empty", __func__, __LINE__);
         return NULL;
     }
+    SetPoolQueryPara(&poolQueryPara, busNum, usbAddr);
 
-    poolQueryPara.type = USB_POOL_NORMAL_TYPE;
-    poolQueryPara.busNum = busNum;
-    poolQueryPara.usbAddr = usbAddr;
     interfacePool = IfFindInterfacePool(realSession, poolQueryPara, true);
     if (interfacePool == NULL || interfacePool->device == NULL) {
         interfacePool = IfGetInterfacePool(&devHandle, realSession, busNum, usbAddr);
@@ -900,8 +885,6 @@ struct UsbInterface *UsbClaimInterface(
         }
     }
 
-    interfaceQueryPara.type = USB_INTERFACE_INTERFACE_INDEX_TYPE;
-    interfaceQueryPara.interfaceIndex = interfaceIndex;
     interfaceObj = IfFindInterfaceObj(interfacePool, interfaceQueryPara, true, &claimFlag, true);
     if (interfaceObj == NULL) {
         HDF_LOGE("%{public}s:%{public}d interfaceObj is null", __func__, __LINE__);
@@ -911,7 +894,11 @@ struct UsbInterface *UsbClaimInterface(
     if (interfaceIndex != USB_CTRL_INTERFACE_ID && claimFlag) {
         OsalMutexLock(&interfacePool->interfaceLock);
         devHandle = interfacePool->device->devHandle;
-        ret = RawClaimInterface(devHandle, interfaceIndex);
+        if (force) {
+            ret = RawClaimInterfaceForce(devHandle, interfaceIndex);
+        } else {
+            ret = RawClaimInterface(devHandle, interfaceIndex);
+        }
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s:%{public}d RawClaimInterface failed, ret = %d", __func__, __LINE__, ret);
             AdapterAtomicDec(&interfaceObj->refCount);
@@ -926,6 +913,32 @@ struct UsbInterface *UsbClaimInterface(
 ERROR:
     (void)IfDestoryDevice(realSession, interfacePool, devHandle, true);
     return NULL;
+}
+
+struct UsbInterface *UsbClaimInterfaceUnforce(
+    const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
+{
+    struct UsbInterface *interfaceObj = ClaimInterface(session, busNum, usbAddr, interfaceIndex, false);
+    if (interfaceObj == NULL) {
+        HDF_LOGE("%{public}s: interfaceObj is NULL", __func__);
+        return NULL;
+    }
+
+    struct UsbSdkInterface *interfaceSdk = (struct UsbSdkInterface *)interfaceObj;
+    if (OsalAtomicRead((OsalAtomic *)&interfaceSdk->refCount) > INTERFACE_REFCOUNT_UNFORCE) {
+        int32_t ret = UsbReleaseInterface(interfaceObj);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: UsbReleaseInterface failed!", __func__);
+        }
+        return NULL;
+    }
+    return interfaceObj;
+}
+
+struct UsbInterface *UsbClaimInterface(
+    const struct UsbSession *session, uint8_t busNum, uint8_t usbAddr, uint8_t interfaceIndex)
+{
+    return ClaimInterface(session, busNum, usbAddr, interfaceIndex, true);
 }
 
 int32_t UsbReleaseInterface(const struct UsbInterface *interfaceObj)
