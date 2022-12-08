@@ -17,7 +17,6 @@ import("//drivers/peripheral/audio/audio.gni")
 
 ohos_shared_library("audio_manager_service_1.0") {
   sources = [
-    "//third_party/cJSON/cJSON.c",
     "src/audio_adapter.c",
     "src/audio_adapter_info_common.c",
     "src/audio_capture.c",
@@ -31,7 +30,6 @@ ohos_shared_library("audio_manager_service_1.0") {
     "//drivers/peripheral/audio/hdi_service/pathselect/include",
     "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
     "//drivers/peripheral/audio/supportlibs/interfaces/include",
-    "//third_party/cJSON",
     "//third_party/bounds_checking_function/include",
     "//drivers/hdf_core/adapter/uhdf2/shared/include",
   ]

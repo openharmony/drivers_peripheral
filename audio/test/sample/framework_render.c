@@ -229,8 +229,11 @@ static bool PrepareStopAndUnloadAdapter(void)
         if (g_manager->UnloadAdapter != NULL) {
             g_manager->UnloadAdapter(g_manager, g_adapter);
         }
-    }
 
+        if (g_manager->ReleaseAudioManagerObject != NULL) {
+            g_manager->ReleaseAudioManagerObject(g_manager);
+        }
+    }
     return soMode;
 }
 
