@@ -259,29 +259,22 @@ int32_t UsbdFunction::UsbdSetKernelFunction(int32_t kfuns)
         case USB_FUNCTION_HDC:
             HDF_LOGI("%{public}s: set hdc", __func__);
             return UsbdFunction::AddHdc();
-            break;
         case USB_FUNCTION_RNDIS:
             HDF_LOGI("%{public}s: set rndis", __func__);
             return UsbdFunction::SetFunctionToRndis();
-            break;
         case USB_FUNCTION_STORAGE:
             HDF_LOGI("%{public}s: set mass_storage", __func__);
             return UsbdFunction::SetFunctionToStorage();
-            break;
         case USB_FUNCTION_RNDIS | USB_FUNCTION_HDC:
             HDF_LOGI("%{public}s: set rndis hdc", __func__);
             return UsbdFunction::SetFunctionToRndisHdc();
-            break;
         case USB_FUNCTION_STORAGE | USB_FUNCTION_HDC:
             HDF_LOGI("%{public}s: set storage hdc", __func__);
             return UsbdFunction::SetFunctionToStorageHdc();
-            break;
         default:
             HDF_LOGI("%{public}s: enable device", __func__);
             return UsbdEnableDevice();
-            break;
     }
-    return HDF_SUCCESS;
 }
 
 int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)

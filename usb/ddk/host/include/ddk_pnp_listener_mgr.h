@@ -20,7 +20,7 @@
 extern "C" {
 #endif
 
-int32_t DdkListenerMgrInit();
+int32_t DdkListenerMgrInit(void);
 int32_t DdkListenerMgrRemove(struct HdfDevEventlistener *listener);
 int32_t DdkListenerMgrAdd(struct HdfDevEventlistener *listener);
 void DdkListenerMgrNotifyAll(const struct UsbPnpNotifyMatchInfoTable *device, enum UsbPnpNotifyServiceCmd cmd);

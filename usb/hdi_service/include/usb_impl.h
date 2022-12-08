@@ -40,7 +40,7 @@ public:
     HdfDeviceObject *device_;
 
     UsbImpl();
-    virtual ~UsbImpl();
+    ~UsbImpl() override;
     int32_t OpenDevice(const UsbDev &dev) override;
     int32_t CloseDevice(const UsbDev &dev) override;
     int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor) override;
