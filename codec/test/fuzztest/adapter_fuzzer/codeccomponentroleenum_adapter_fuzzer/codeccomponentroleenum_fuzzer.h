@@ -16,6 +16,6 @@
 #ifndef CODECCOMPONENTROLEENUM_FUZZER
 #define CODECCOMPONENTROLEENUM_FUZZER
 
-#define FUZZ_PROJECT_NAME "codeccomponentroleenum_fuzzer"
+#define FUZZ_PROJECT_NAME "codeccomponentroleenum_adapter_fuzzer"
 
 #endif

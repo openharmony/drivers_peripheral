@@ -16,6 +16,6 @@
 #ifndef CODECGETCONFIG_FUZZER
 #define CODECGETCONFIG_FUZZER
 
-#define FUZZ_PROJECT_NAME "codecgetconfig_fuzzer"
+#define FUZZ_PROJECT_NAME "codecgetconfig_adapter_fuzzer"
 
 #endif

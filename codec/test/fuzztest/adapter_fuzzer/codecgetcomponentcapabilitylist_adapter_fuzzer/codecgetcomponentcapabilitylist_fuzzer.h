@@ -16,6 +16,6 @@
 #ifndef CODECGETCOMPONENTCAPABILITYLIST_FUZZER
 #define CODECGETCOMPONENTCAPABILITYLIST_FUZZER
 
-#define FUZZ_PROJECT_NAME "codecgetcomponentcapabilitylist_fuzzer"
+#define FUZZ_PROJECT_NAME "codecgetcomponentcapabilitylist_adapter_fuzzer"
 
 #endif
