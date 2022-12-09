@@ -16,6 +16,6 @@
 #ifndef CODECFREEBUFFER_FUZZER
 #define CODECFREEBUFFER_FUZZER
 
-#define FUZZ_PROJECT_NAME "codecfreebuffer_fuzzer"
+#define FUZZ_PROJECT_NAME "codecfreebuffer_adapter_fuzzer"
 
 #endif
