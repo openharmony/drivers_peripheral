@@ -14,7 +14,7 @@ The Ril driver module contains definitions and implementation code of Ril hardwa
 
 **Figure 1** Architecture of the Ril driver module
 
-![Ril driver module] (figures/ril-driver-module-architecture_zh.png)
+![Ril driver module](figures/ril-driver-module-architecture.png)
 
 ## Directory Structure
 
