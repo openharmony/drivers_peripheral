@@ -115,6 +115,17 @@ void ComponentMgr::CleanComponent()
 
     compoentsCore_.clear();
 }
+
+int32_t ComponentMgr::GetCoreOfComponent(CodecOMXCore* &core, const char *componentName)
+{
+    auto iter = compoentsCore_.find(componentName);
+    if (iter == compoentsCore_.end() || iter->second == nullptr) {
+        HDF_LOGE("%{public}s: can not find component[%{public}s] in core", __func__, componentName);
+        return HDF_FAILURE;
+    }
+    core = iter->second.get();
+    return HDF_SUCCESS;
+}
 }  // namespace Omx
 }  // namespace Codec
 }  // namespace OHOS
