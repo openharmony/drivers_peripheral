@@ -266,7 +266,7 @@ HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenCapabilityIndexIsNull, Te
     struct AudioPort portIndex;
     EXPECT_EQ(HDF_SUCCESS, InitPort(portIndex));
     struct AudioPortCapability *capabilityIndex = nullptr;
-    EXPECT_EQ(HDF_SUCCESS, InitForGetPortCapability(portIndex, capabilityIndex));
+    EXPECT_EQ(HDF_FAILURE, InitForGetPortCapability(portIndex, capabilityIndex));
 }
 
 HWTEST_F(AudioAdapterTest, InitForGetPortCapabilityWhenDirIsPortIn, TestSize.Level1)
