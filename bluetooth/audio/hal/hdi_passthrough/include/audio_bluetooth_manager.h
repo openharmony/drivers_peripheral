@@ -32,16 +32,19 @@ typedef struct BtA2dpAudioCallback {
 }BtA2dpAudioCallback;
 
 int GetPlayingState();
-RawAddress& GetDevice();
 void GetProxy();
 void RegisterObserver();
 void DeRegisterObserver();
-BluetoothA2dpCodecStatus GetCodecStatus();
+
+#ifdef A2DP_HDI_SERVICE
+bool SetUp();
+void TearDown();
+#endif
+
 int WriteFrame(const uint8_t *data, uint32_t size);
 int StartPlaying();
 int SuspendPlaying();
 int StopPlaying();
-void GetRenderPosition(uint16_t &delayValue, uint16_t &dataSize, uint32_t &timeStamp);
 }
 }
 
