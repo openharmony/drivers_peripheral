@@ -23,24 +23,42 @@
 #include "system_ability_definition.h"
 #include "audio_bluetooth_manager.h"
 
+#ifdef A2DP_HDI_SERVICE
+#include "bluetooth_audio_device.h"
+#endif
+
+#define HDF_LOG_TAG BTAudioBluetoothManager
+
 namespace OHOS {
 namespace Bluetooth {
 using namespace OHOS::bluetooth;
 
+#ifdef A2DP_HDI_SERVICE
+using namespace OHOS::bluetooth::audio;
+static const char *g_bluetoothAudioDeviceSoPath = HDF_LIBRARY_FULL_PATH("libbluetooth_audio_session");
+static void *g_ptrAudioDeviceHandle = NULL;
+SetUpFunc setUpFunc;
+TearDownFunc tearDownFunc;
+GetStateFunc getStateFunc;
+StartPlayingFunc startPlayingFunc;
+SuspendPlayingFunc suspendPlayingFunc;
+StopPlayingFunc stopPlayingFunc;
+WriteFrameFunc writeFrameFunc;
+#endif
+
 sptr<IBluetoothA2dpSrc> g_proxy_ = nullptr;
 static sptr<BluetoothA2dpSrcObserver> g_btA2dpSrcObserverCallbacks = nullptr;
 int g_playState = A2DP_NOT_PLAYING;
-RawAddress g_device;
 
 static void AudioOnConnectionStateChanged(const RawAddress &device, int state)
 {
-    HDF_LOGD("audio_bluetooth_manager %{public}s, state:%{public}d", __func__, state);
-    g_device = RawAddress(device);
+    HDF_LOGI("%{public}s, state:%{public}d", __func__, state);
+    (void) state;
 }
 
 static void AudioOnPlayingStatusChanged(const RawAddress &device, int playingState, int error)
 {
-    HDF_LOGD("audio_bluetooth_manager %{public}s, playingState:%{public}d", __func__, playingState);
+    HDF_LOGI("%{public}s, playingState:%{public}d", __func__, playingState);
     g_playState = playingState;
     (void) error;
 }
@@ -61,59 +79,54 @@ static BtA2dpAudioCallback g_hdiCallbacks = {
 
 int GetPlayingState()
 {
-    HDF_LOGD("audio_bluetooth_manager %{public}s: state:%{public}d", __func__, g_playState);
+    HDF_LOGI("%{public}s: state:%{public}d", __func__, g_playState);
     return g_playState;
-}
-
-RawAddress& GetDevice()
-{
-    return g_device;
 }
 
 void GetProxy()
 {
-    HDF_LOGD("audio_bluetooth_manager %{public}s start", __func__);
+    HDF_LOGI("%{public}s start", __func__);
     sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (!samgr) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: error: no samgr", __func__);
+        HDF_LOGE("%{public}s: error: no samgr", __func__);
         return;
     }
 
     sptr<IRemoteObject> hostRemote = samgr->GetSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID);
     if (!hostRemote) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: failed: no hostRemote", __func__);
+        HDF_LOGE("%{public}s: failed: no hostRemote", __func__);
         return;
     }
 
     sptr<IBluetoothHost> hostProxy = iface_cast<IBluetoothHost>(hostRemote);
     if (!hostProxy) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: error: host no proxy", __func__);
+        HDF_LOGE("%{public}s: error: host no proxy", __func__);
         return;
     }
 
     sptr<IRemoteObject> remote = hostProxy->GetProfile("A2dpSrcServer");
     if (!remote) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: error: no remote", __func__);
+        HDF_LOGE("%{public}s: error: no remote", __func__);
         return;
     }
 
     g_proxy_ = iface_cast<IBluetoothA2dpSrc>(remote);
     if (!g_proxy_) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: error: no proxy", __func__);
+        HDF_LOGE("%{public}s: error: no proxy", __func__);
         return;
     }
 }
 
 void RegisterObserver()
 {
-    HDF_LOGD("audio_bluetooth_manager %{public}s", __func__);
+    HDF_LOGI("%{public}s", __func__);
     g_btA2dpSrcObserverCallbacks = new (std::nothrow) BluetoothA2dpSrcObserver(&g_hdiCallbacks);
     if (!g_btA2dpSrcObserverCallbacks) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: g_btA2dpSrcObserverCallbacks is null", __func__);
+        HDF_LOGE("%{public}s: g_btA2dpSrcObserverCallbacks is null", __func__);
         return;
     }
     if (!g_proxy_) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: g_proxy_ is null", __func__);
+        HDF_LOGE("%{public}s: g_proxy_ is null", __func__);
         return;
     }
     g_proxy_->RegisterObserver(g_btA2dpSrcObserverCallbacks);
@@ -121,78 +134,152 @@ void RegisterObserver()
 
 void DeRegisterObserver()
 {
-    HDF_LOGD("audio_bluetooth_manager %{public}s", __func__);
+    HDF_LOGI("%{public}s", __func__);
     if (!g_proxy_) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: g_proxy_ is null", __func__);
+        HDF_LOGE("%{public}s: g_proxy_ is null", __func__);
         return;
     }
     g_proxy_->DeregisterObserver(g_btA2dpSrcObserverCallbacks);
 }
 
-BluetoothA2dpCodecStatus GetCodecStatus()
+#ifdef A2DP_HDI_SERVICE
+static bool InitAudioDeviceSoHandle(const char* path)
 {
-    HDF_LOGD("audio_bluetooth_manager %{public}s", __func__);
-    BluetoothA2dpCodecStatus codecStatus;
-    if (!g_proxy_) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: g_proxy_ is null", __func__);
-        return codecStatus;
+    if (path == NULL) {
+        HDF_LOGE("%{public}s: path is NULL", __func__);
+        return false;
     }
-    codecStatus = g_proxy_->GetCodecStatus(g_proxy_->GetActiveSinkDevice());
-    return codecStatus;
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(path, pathBuf) == NULL) {
+        return false;
+    }
+    if (g_ptrAudioDeviceHandle == NULL) {
+        g_ptrAudioDeviceHandle = dlopen(pathBuf, RTLD_LAZY);
+        if (g_ptrAudioDeviceHandle == NULL) {
+            HDF_LOGE("%{public}s: open lib so fail, reason:%{public}d ", __func__, dlerror());
+            return false;
+        }
+
+        setUpFunc = (SetUpFunc)dlsym(g_ptrAudioDeviceHandle, "SetUp");
+        tearDownFunc = (TearDownFunc)dlsym(g_ptrAudioDeviceHandle, "TearDown");
+        getStateFunc = (GetStateFunc)dlsym(g_ptrAudioDeviceHandle, "GetState");
+        startPlayingFunc = (StartPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "StartPlaying");
+        suspendPlayingFunc = (SuspendPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "SuspendPlaying");
+        stopPlayingFunc = (StopPlayingFunc)dlsym(g_ptrAudioDeviceHandle, "StopPlaying");
+        writeFrameFunc = (WriteFrameFunc)dlsym(g_ptrAudioDeviceHandle, "WriteFrame");
+        if (setUpFunc == NULL || tearDownFunc == NULL || getStateFunc == NULL || startPlayingFunc == NULL ||
+            suspendPlayingFunc == NULL || stopPlayingFunc == NULL || writeFrameFunc == NULL) {
+                HDF_LOGE("%{public}s: lib so func not found", __func__);
+                return false;
+        }
+    }
+    return true;
 }
+
+bool SetUp()
+{
+    bool ret = false;
+    ret = InitAudioDeviceSoHandle(g_bluetoothAudioDeviceSoPath);
+    if (ret == true) {
+        ret = setUpFunc();
+    }
+    if (ret == false) {
+        HDF_LOGE("%{public}s failed!", __func__);
+    }
+    return ret;
+}
+
+void TearDown()
+{
+    tearDownFunc();
+}
+#endif
+
 
 int WriteFrame(const uint8_t *data, uint32_t size)
 {
-    HDF_LOGD("audio_bluetooth_manager %{public}s", __func__);
+    HDF_LOGI("%{public}s", __func__);
+#ifdef A2DP_HDI_SERVICE
+    BTAudioStreamState state = getStateFunc();
+    if (state != BTAudioStreamState::STARTED) {
+        HDF_LOGE("%{public}s: state=%{public}hhu is bad state", __func__, state);
+        return RET_BAD_STATUS;
+    }
+    return writeFrameFunc(data, size);
+#else
     if (!g_proxy_) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: g_proxy_ is null", __func__);
+        HDF_LOGE("%{public}s: g_proxy_ is null", __func__);
         return RET_BAD_STATUS;
     }
     if (g_playState == A2DP_NOT_PLAYING) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: playState is not Streaming", __func__);
+        HDF_LOGE("%{public}s: playState is not Streaming", __func__);
         return RET_BAD_STATUS;
     }
     return g_proxy_->WriteFrame(data, size);
+#endif
 }
 
 int StartPlaying()
 {
-    HDF_LOGD("audio_bluetooth_manager %{public}s", __func__);
+    HDF_LOGI("%{public}s", __func__);
+#ifdef A2DP_HDI_SERVICE
+    int retval = 0;
+    BTAudioStreamState state = getStateFunc();
+    HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
+    if (state == BTAudioStreamState::IDLE) {
+        retval = (startPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
+    } else {
+        HDF_LOGE("%{public}s: state=%{public}hhu is bad state", __func__, state);
+    }
+    return retval;
+#else
     if (!g_proxy_) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: g_proxy_ is null", __func__);
+        HDF_LOGE("%{public}s: g_proxy_ is null", __func__);
         return RET_BAD_STATUS;
     }
     return g_proxy_->StartPlaying(g_proxy_->GetActiveSinkDevice());
+#endif
 }
 
 int SuspendPlaying()
 {
-    HDF_LOGD("audio_bluetooth_manager %{public}s", __func__);
+    HDF_LOGI("%{public}s", __func__);
+#ifdef A2DP_HDI_SERVICE
+    int retval = 0;
+    BTAudioStreamState state = getStateFunc();
+    HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
+    if (state == BTAudioStreamState::STARTED) {
+        retval = (suspendPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
+    } else {
+        HDF_LOGE("%{public}s: state=%{public}hhu is bad state", __func__, state);
+    }
+    return retval;
+#else
     if (!g_proxy_) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: g_proxy_ is null", __func__);
+        HDF_LOGE("%{public}s: g_proxy_ is null", __func__);
         return RET_BAD_STATUS;
     }
     return g_proxy_->SuspendPlaying(g_proxy_->GetActiveSinkDevice());
+#endif
 }
 
 int StopPlaying()
 {
-    HDF_LOGD("audio_bluetooth_manager %{public}s", __func__);
+    HDF_LOGI("%{public}s", __func__);
+#ifdef A2DP_HDI_SERVICE
+    BTAudioStreamState state = getStateFunc();
+    HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
+    if (state != BTAudioStreamState::INVALID) {
+        stopPlayingFunc();
+    }
+    return HDF_SUCCESS;
+#else
     if (!g_proxy_) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: g_proxy_ is null", __func__);
+        HDF_LOGE("%{public}s: g_proxy_ is null", __func__);
         return RET_BAD_STATUS;
     }
     return g_proxy_->StopPlaying(g_proxy_->GetActiveSinkDevice());
-}
-
-void GetRenderPosition(uint16_t &delayValue, uint16_t &dataSize, uint32_t &timeStamp)
-{
-    HDF_LOGD("audio_bluetooth_manager %{public}s", __func__);
-    if (!g_proxy_) {
-        HDF_LOGE("audio_bluetooth_manager %{public}s: g_proxy_ is null", __func__);
-        return;
-    }
-    return g_proxy_->GetRenderPosition(delayValue, dataSize, timeStamp);
+#endif
 }
 }
 }
