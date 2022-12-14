@@ -156,7 +156,7 @@ static bool InitAudioDeviceSoHandle(const char* path)
     if (g_ptrAudioDeviceHandle == NULL) {
         g_ptrAudioDeviceHandle = dlopen(pathBuf, RTLD_LAZY);
         if (g_ptrAudioDeviceHandle == NULL) {
-            HDF_LOGE("%{public}s: open lib so fail, reason:%{public}d ", __func__, dlerror());
+            HDF_LOGE("%{public}s: open lib so fail, reason:%{public}s ", __func__, dlerror());
             return false;
         }
 
