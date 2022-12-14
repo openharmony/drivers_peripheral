@@ -23,9 +23,10 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "hdf_base.h"
+
 #include "audio_common.h"
 #include "audio_manager.h"
+#include "hdf_base.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -390,6 +391,8 @@ typedef struct DevHandle *(*BindServiceCaptureSo)(const char *);
 typedef int32_t (*InterfaceLibModeCaptureSo)(struct DevHandle *, struct AudioHwCaptureParam *, int);
 typedef void(*CloseServiceCaptureSo)(struct DevHandle *);
 
+typedef int32_t (*InterfaceLibGetCardInfoSo)(struct AudioAdapterDescriptor **, int *);
+
 typedef int32_t (*PathSelGetConfToJsonObj)(void);
 typedef int32_t (*PathSelAnalysisJson)(void *adapterParam, enum AudioAdaptType adaptType);
 
@@ -517,6 +520,9 @@ int32_t AudioCaptureRemoveEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioCaptureTurnStandbyMode(AudioHandle handle);
 int32_t AudioCaptureAudioDevDump(AudioHandle handle, int32_t range, int32_t fd);
 int32_t CallbackProcessing(AudioHandle handle, enum AudioCallbackType callBackType);
+
+struct AudioAdapterDescriptor *AudioAdapterGetConfigDescs(void);
+int32_t AudioAdapterGetAdapterNum(void);
 
 #ifdef __cplusplus
 }

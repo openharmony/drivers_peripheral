@@ -1208,6 +1208,10 @@ int32_t main(int32_t argc, char const *argv[])
         if (g_manager->UnloadAdapter != NULL) {
             g_manager->UnloadAdapter(g_manager, g_adapter);
         }
+
+        if (g_manager->ReleaseAudioManagerObject != NULL) {
+            g_manager->ReleaseAudioManagerObject(g_manager);
+        }
     }
     dlclose(g_handle);
     printf("Record file path:%s\n", g_path);

@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
+#include "audio_internal.h"
 #include "audio_proxy_common.h"
-#include <servmgr_hdi.h>
 #include "audio_uhdf_log.h"
+#include "osal_mem.h"
+#include "servmgr_hdi.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 
@@ -61,8 +63,8 @@ int32_t AudioProxyAdapterGetRemoteHandle(struct AudioProxyManager *proxyManager,
     } else if (strncmp(adapterName, A2DP, strlen(A2DP)) == 0) {
         hwAdapter->proxyRemoteHandle = proxyManager->a2dpRemote;
     } else {
-        AUDIO_FUNC_LOGE("Remote not found!");
-        return AUDIO_HAL_ERR_INVALID_PARAM;
+        AUDIO_FUNC_LOGE("An unsupported Adapter.");
+        return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
     return HDF_SUCCESS;
 }
@@ -599,4 +601,226 @@ bool AudioRouteBlockMarshalling(struct HdfSBuf *data, const struct AudioRoute *d
         }
     }
     return true;
+}
+
+static void AudioPortFree(struct AudioPort *dataBlock, uint32_t portNum)
+{
+    if (dataBlock == NULL) {
+        return;
+    }
+
+    for (uint32_t i = 0; i < portNum; i++) {
+        if (dataBlock[i].portName != NULL) {
+            OsalMemFree((void *)dataBlock[i].portName);
+            dataBlock[i].portName = NULL;
+        }
+    }
+
+    OsalMemFree((void *)dataBlock);
+}
+
+static bool AudioPortBlockUnmarshalling(struct HdfSBuf *data, struct AudioPort *dataBlock)
+{
+    if (data == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf", __func__);
+        return false;
+    }
+
+    if (dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid data block", __func__);
+        return false;
+    }
+
+    if (!HdfSbufReadInt32(data, (int32_t*)&dataBlock->dir)) {
+        HDF_LOGE("%{public}s: read dataBlock->dir failed!", __func__);
+        return false;
+    }
+
+    if (!HdfSbufReadUint32(data, &dataBlock->portId)) {
+        HDF_LOGE("%{public}s: read dataBlock->portId failed!", __func__);
+        return false;
+    }
+
+    return true;
+}
+
+bool AudioAdapterDescriptorBlockUnmarshalling(struct HdfSBuf *data, struct AudioAdapterDescriptor *dataBlock)
+{
+    if (data == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf", __func__);
+        return false;
+    }
+
+    if (dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid data block", __func__);
+        return false;
+    }
+
+    dataBlock->adapterName = strdup(HdfSbufReadString(data));
+    if (dataBlock->adapterName == NULL) {
+        HDF_LOGE("%{public}s: read adapterName failed!", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufReadUint32(data, &dataBlock->portNum)) {
+        HDF_LOGE("%{public}s: read portsCpLen failed!", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (dataBlock->portNum > 0) {
+        dataBlock->ports = (struct AudioPort*)OsalMemCalloc(sizeof(struct AudioPort) * dataBlock->portNum);
+        if (dataBlock->ports == NULL) {
+            goto ERRORS;
+        }
+        for (uint32_t i = 0; i < dataBlock->portNum; i++) {
+            if (!AudioPortBlockUnmarshalling(data, &(dataBlock->ports[i]))) {
+                HDF_LOGE("%{public}s: read &portsCp[i] failed!", __func__);
+                goto ERRORS;
+            }
+        }
+    }
+    return true;
+ERRORS:
+    if (dataBlock->adapterName != NULL) {
+        OsalMemFree((void *)dataBlock->adapterName);
+        dataBlock->adapterName = NULL;
+    }
+
+    AudioPortFree(dataBlock->ports, dataBlock->portNum);
+    dataBlock->ports = NULL;
+    return false;
+}
+
+void AudioAdapterDescriptorFreeArray(struct AudioAdapterDescriptor **descs, uint32_t *size)
+{
+    if (descs == NULL || *descs == NULL || *size == 0) {
+        return;
+    }
+
+    struct AudioAdapterDescriptor *dataBlock = *descs;
+
+    for (uint32_t i = 0; i < *size; i++) {
+        if (dataBlock[i].adapterName != NULL) {
+            OsalMemFree((void *)dataBlock[i].adapterName);
+            dataBlock[i].adapterName = NULL;
+        }
+
+        AudioPortFree(dataBlock[i].ports, dataBlock[i].portNum);
+        dataBlock[i].ports = NULL;
+    }
+
+    OsalMemFree((void *)dataBlock);
+    dataBlock = NULL;
+    *size = 0;
+}
+
+static bool AudioSubPortCapabilityBlockUnmarshalling(struct HdfSBuf *data, struct AudioPortCapability *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: data or dataBlock is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufReadUint32(data, &dataBlock->subPortsNum)) {
+        HDF_LOGE("%{public}s: read subPortsCpLen failed!", __func__);
+        return HDF_FAILURE;
+    }
+
+    if (dataBlock->subPortsNum <= 0) {
+        HDF_LOGE("%{public}s: read subPortsCpLen failed!", __func__);
+        return HDF_FAILURE;
+    }
+
+    dataBlock->subPorts = (struct AudioSubPortCapability*)OsalMemCalloc(
+        sizeof(struct AudioSubPortCapability) * dataBlock->subPortsNum);
+    if (dataBlock->subPorts == NULL) {
+        HDF_LOGE("%{public}s: read subPortsCpLen failed!", __func__);
+        return HDF_FAILURE;
+    }
+
+    struct AudioSubPortCapability *subPorts = dataBlock->subPorts;
+    for (uint32_t i = 0; i < dataBlock->subPortsNum; i++) {
+        if (!HdfSbufReadUint32(data, &subPorts[i].portId)) {
+            HDF_LOGE("%{public}s: read dataBlock->portId failed!", __func__);
+            return HDF_FAILURE;
+        }
+
+        subPorts[i].desc = HdfSbufReadString(data);
+        if (subPorts[i].desc == NULL) {
+            HDF_LOGE("%{public}s: subPorts[%{public}d].desc is NULL!", __func__, i);
+            return HDF_FAILURE;
+        }
+
+        if (!HdfSbufReadInt32(data, (int32_t*)&subPorts[i].mask)) {
+            HDF_LOGE("%{public}s: read dataBlock->mask failed!", __func__);
+            return HDF_FAILURE;
+        }
+    }
+
+    return true;
+}
+
+bool AudioPortCapabilityBlockUnmarshalling(struct HdfSBuf *data, struct AudioPortCapability *dataBlock)
+{
+    if (data == NULL || dataBlock == NULL) {
+        HDF_LOGE("%{public}s: invalid sbuf or dataBlock", __func__);
+        return false;
+    }
+
+    if (!HdfSbufReadUint32(data, &dataBlock->deviceType)) {
+        HDF_LOGE("%{public}s: read dataBlock->deviceType failed!", __func__);
+        return false;
+    }
+    if (!HdfSbufReadUint32(data, &dataBlock->deviceId)) {
+        HDF_LOGE("%{public}s: read dataBlock->deviceId failed!", __func__);
+        return false;
+    }
+    if (!HdfSbufReadInt8(data, (int8_t *)&dataBlock->hardwareMode)) {
+        HDF_LOGE("%{public}s: read dataBlock->hardwareMode failed!", __func__);
+        return false;
+    }
+
+    if (!HdfSbufReadUint32(data, &dataBlock->formatNum)) {
+        HDF_LOGE("%{public}s: read dataBlock->formatNum failed!", __func__);
+        return false;
+    }
+
+
+    if (dataBlock->formats == NULL) {
+        dataBlock->formats = (enum AudioFormat *)OsalMemCalloc(sizeof(enum AudioFormat));
+    }
+
+    if (dataBlock->formats == NULL) {
+        HDF_LOGE("%{public}s: dataBlock->formats is null!", __func__);
+    }
+    if (!HdfSbufReadInt32(data, (int32_t*)dataBlock->formats)) {
+        HDF_LOGE("%{public}s: read dataBlock->channelCount failed!", __func__);
+        return false;
+    }
+
+    if (!HdfSbufReadUint32(data, &dataBlock->sampleRateMasks)) {
+        HDF_LOGE("%{public}s: read dataBlock->sampleRateMasks failed!", __func__);
+        return false;
+    }
+
+    if (!HdfSbufReadInt32(data, (int32_t*)&dataBlock->channelMasks)) {
+        HDF_LOGE("%{public}s: read dataBlock->channelMasks failed!", __func__);
+        return false;
+    }
+
+    if (!HdfSbufReadUint32(data, &dataBlock->channelCount)) {
+        HDF_LOGE("%{public}s: read dataBlock->channelCount failed!", __func__);
+        return false;
+    }
+
+    if (!AudioSubPortCapabilityBlockUnmarshalling(data, dataBlock)) {
+        HDF_LOGE("%{public}s: read &subPortsCp[i] failed!", __func__);
+        goto ERRORS;
+    }
+
+    return true;
+ERRORS:
+    OsalMemFree(dataBlock->subPorts);
+    dataBlock->subPorts = NULL;
+    return false;
 }
