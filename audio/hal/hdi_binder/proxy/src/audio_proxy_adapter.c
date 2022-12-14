@@ -13,12 +13,12 @@
  * limitations under the License.
  */
 
-#include "hdf_remote_service.h"
-#include "osal_mem.h"
-#include "audio_adapter_info_common.h"
+#include "audio_internal.h"
 #include "audio_proxy_common.h"
 #include "audio_proxy_internal.h"
 #include "audio_uhdf_log.h"
+#include "hdf_remote_service.h"
+#include "osal_mem.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_PROXY
 
@@ -199,42 +199,6 @@ int32_t InitHwRenderParam(struct AudioHwRender *hwRender, const struct AudioDevi
     return HDF_SUCCESS;
 }
 
-enum AudioFormat g_formatIdZero = AUDIO_FORMAT_TYPE_PCM_16_BIT;
-int32_t InitForGetPortCapability(struct AudioPort portIndex, struct AudioPortCapability *capabilityIndex)
-{
-    if (capabilityIndex == NULL) {
-        AUDIO_FUNC_LOGE("Parameter is null");
-        return HDF_FAILURE;
-    }
-    /* get capabilityIndex from driver or default */
-    if (portIndex.dir != PORT_OUT) {
-        capabilityIndex->hardwareMode = true;
-        capabilityIndex->channelMasks = AUDIO_CHANNEL_STEREO;
-        capabilityIndex->channelCount = CONFIG_CHANNEL_COUNT;
-        return HDF_SUCCESS;
-    }
-    if (InitPortForCapabilitySub(portIndex, capabilityIndex) != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("InitPortForCapability fail");
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
-}
-
-void AudioAdapterReleaseCapSubPorts(const struct AudioPortAndCapability *portCapabilitys, const int32_t num)
-{
-    int32_t i = 0;
-    if (portCapabilitys == NULL) {
-        return;
-    }
-    while (i < num) {
-        if (&portCapabilitys[i] == NULL) {
-            break;
-        }
-        AudioMemFree((void **)(&portCapabilitys[i].capability.subPorts));
-        i++;
-    }
-    return;
-}
 static int32_t InitAllPortsDispatchSplit(struct AudioHwAdapter *hwAdapter)
 {
     if (hwAdapter == NULL || hwAdapter->adapterDescriptor.adapterName == NULL || hwAdapter->proxyRemoteHandle == NULL) {
@@ -268,39 +232,14 @@ static int32_t InitAllPortsDispatchSplit(struct AudioHwAdapter *hwAdapter)
 
 int32_t AudioProxyAdapterInitAllPorts(struct AudioAdapter *adapter)
 {
-    int32_t ret = AUDIO_HAL_SUCCESS;
-
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || hwAdapter->adapterDescriptor.adapterName == NULL ||
         hwAdapter->proxyRemoteHandle == NULL) {
         AUDIO_FUNC_LOGE("hwAdapter Is NULL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    /* Fake data */
-    uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
-    struct AudioPort *ports = hwAdapter->adapterDescriptor.ports;
-    if (ports == NULL || portNum == 0) {
-        AUDIO_FUNC_LOGE("ports is NULL!");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    struct AudioPortAndCapability *portCapability = (struct AudioPortAndCapability *)OsalMemCalloc(
-        portNum * sizeof(struct AudioPortAndCapability));
-    if (portCapability == NULL) {
-        AUDIO_FUNC_LOGE("portCapability is NULL!");
-        return AUDIO_HAL_ERR_MALLOC_FAIL;
-    }
-    for (uint32_t i = 0; i < portNum; i++) {
-        portCapability[i].port = ports[i];
-        if (InitForGetPortCapability(ports[i], &portCapability[i].capability)) {
-            AUDIO_FUNC_LOGE("ports Init Invalid!");
-            AudioAdapterReleaseCapSubPorts(portCapability, portNum);
-            AudioMemFree((void **)&portCapability);
-            return AUDIO_HAL_ERR_INTERNAL;
-        }
-    }
-    hwAdapter->portCapabilitys = portCapability;
-    hwAdapter->portCapabilitys->mode = PORT_PASSTHROUGH_LPCM;
-    ret = InitAllPortsDispatchSplit(hwAdapter);
+
+    int32_t ret = InitAllPortsDispatchSplit(hwAdapter);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("InitAllPortsDispatchSplit Fail");
         return ret;
@@ -339,17 +278,9 @@ static int32_t AudioProxyRenderDispatchSplit(const struct AudioHwAdapter *hwAdap
     if (AudioProxyAdapterCreateRenderSplit(hwAdapter, hwRender) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    int32_t ret = AudioAddRenderAddrToList((AudioHandle)(&hwRender->common));
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxyRender address get is invalid");
-        return ret;
-    }
-    ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_CREATE_RENDER, data, reply);
+    int32_t ret = AudioProxyDispatchCall(hwRender->proxyRemoteHandle, AUDIO_HDI_RENDER_CREATE_RENDER, data, reply);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Send Server fail!");
-        if (AudioDelRenderAddrFromList((AudioHandle)(&hwRender->common)) < 0) {
-            AUDIO_FUNC_LOGE("AudioDelRenderAddrFromList failed.");
-        }
         return ret;
     }
     return AUDIO_HAL_SUCCESS;
@@ -396,28 +327,28 @@ int32_t AudioProxyAdapterCreateRender(struct AudioAdapter *adapter, const struct
     }
     hwRender->proxyRemoteHandle = hwAdapter->proxyRemoteHandle;
     if (GetAudioProxyRenderFunc(hwRender) < 0) {
-        AudioMemFree((void **)&hwRender);
+        OsalMemFree((void *)hwRender);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     /* Fill hwRender para */
     if (InitHwRenderParam(hwRender, desc, attrs) < 0) {
-        AudioMemFree((void **)&hwRender);
+        OsalMemFree((void *)hwRender);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
-        AudioMemFree((void **)&hwRender);
+        OsalMemFree((void *)hwRender);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyWriteTokenAndInitData(hwAdapter, data, desc, attrs) != AUDIO_HAL_SUCCESS) {
         AUDIO_FUNC_LOGE("Render write interface token or initdata failed");
         AudioProxyBufReplyRecycle(data, reply);
-        AudioMemFree((void **)&hwRender);
+        OsalMemFree((void *)hwRender);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = AudioProxyRenderDispatchSplit(hwAdapter, hwRender, data, reply);
     if (ret < 0) {
         AudioProxyBufReplyRecycle(data, reply);
-        AudioMemFree((void **)&hwRender);
+        OsalMemFree((void *)hwRender);
         return ret;
     }
     *render = &hwRender->common;
@@ -430,11 +361,6 @@ int32_t AudioProxyAdapterDestroyRender(struct AudioAdapter *adapter, struct Audi
     int32_t ret = AUDIO_HAL_SUCCESS;
     if (adapter == NULL || render == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
-    }
-    ret = AudioCheckRenderAddr((AudioHandle)render);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxyRender address passed in is invalid");
-        return ret;
     }
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
@@ -453,11 +379,8 @@ int32_t AudioProxyAdapterDestroyRender(struct AudioAdapter *adapter, struct Audi
             return ret;
         }
     }
-    if (AudioDelRenderAddrFromList((AudioHandle)render) < 0) {
-        AUDIO_FUNC_LOGE("proxyAdapter or proxyRender not in MgrList");
-    }
-    AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
-    AudioMemFree((void **)&render);
+    OsalMemFree((void *)hwRender->renderParam.frameRenderMode.buffer);
+    OsalMemFree((void *)render);
     AudioProxyBufReplyRecycle(data, reply);
     return ret;
 }
@@ -544,17 +467,10 @@ static int32_t AudioProxyCaptureDispatchSplit(const struct AudioHwAdapter *hwAda
     if (AudioProxyAdapterCreateCaptureSplit(hwAdapter, hwCapture) < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    int32_t ret = AudioAddCaptureAddrToList((AudioHandle)(&hwCapture->common));
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxyCapture address get is invalid");
-        return ret;
-    }
-    ret = AudioProxyDispatchCall(hwCapture->proxyRemoteHandle, AUDIO_HDI_CAPTURE_CREATE_CAPTURE, data, reply);
+    int32_t ret = AudioProxyDispatchCall(hwCapture->proxyRemoteHandle,
+        AUDIO_HDI_CAPTURE_CREATE_CAPTURE, data, reply);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Send Server fail!");
-        if (AudioDelCaptureAddrFromList((AudioHandle)(&hwCapture->common)) < 0) {
-            AUDIO_FUNC_LOGE("AudioDelRenderAddrFromList failed.");
-        }
         return ret;
     }
     return AUDIO_HAL_SUCCESS;
@@ -580,28 +496,28 @@ int32_t AudioProxyAdapterCreateCapture(struct AudioAdapter *adapter, const struc
     }
     hwCapture->proxyRemoteHandle = hwAdapter->proxyRemoteHandle;
     if (GetAudioProxyCaptureFunc(hwCapture) < 0) {
-        AudioMemFree((void **)&hwCapture);
+        OsalMemFree((void *)hwCapture);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     /* Fill hwRender para */
     if (InitProxyHwCaptureParam(hwCapture, desc, attrs) < 0) {
-        AudioMemFree((void **)&hwCapture);
+        OsalMemFree((void *)hwCapture);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
-        AudioMemFree((void **)&hwCapture);
+        OsalMemFree((void *)hwCapture);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyWriteTokenAndInitData(hwAdapter, data, desc, attrs) != AUDIO_HAL_SUCCESS) {
         AUDIO_FUNC_LOGE("Capture write interface token or initdata failed");
         AudioProxyBufReplyRecycle(data, reply);
-        AudioMemFree((void **)&hwCapture);
+        OsalMemFree((void *)hwCapture);
         return AUDIO_HAL_ERR_INTERNAL;
     }
     ret = AudioProxyCaptureDispatchSplit(hwAdapter, hwCapture, data, reply);
     if (ret < 0) {
         AudioProxyBufReplyRecycle(data, reply);
-        AudioMemFree((void **)&hwCapture);
+        OsalMemFree((void *)hwCapture);
         return ret;
     }
     *capture = &hwCapture->common;
@@ -618,11 +534,6 @@ int32_t AudioProxyAdapterDestroyCapture(struct AudioAdapter *adapter, struct Aud
     }
     int32_t ret = AUDIO_HAL_SUCCESS;
 
-    ret = AudioCheckCaptureAddr((AudioHandle)capture);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The proxy capture address passed in is invalid");
-        return ret;
-    }
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
@@ -638,38 +549,36 @@ int32_t AudioProxyAdapterDestroyCapture(struct AudioAdapter *adapter, struct Aud
             return ret;
         }
     }
-    if (AudioDelCaptureAddrFromList((AudioHandle)capture)) {
-        AUDIO_FUNC_LOGE("proxy adapter or capture not in MgrList");
-    }
-    AudioMemFree((void **)&hwCapture->captureParam.frameCaptureMode.buffer);
-    AudioMemFree((void **)&capture);
+    OsalMemFree((void *)hwCapture->captureParam.frameCaptureMode.buffer);
+    OsalMemFree((void *)capture);
     AudioProxyBufReplyRecycle(data, reply);
     return ret;
 }
 static int32_t AudioProxyAdapterWritePortCapability(const struct AudioHwAdapter *hwAdapter,
     const struct AudioPort *port, struct HdfSBuf *data)
 {
-    if (hwAdapter == NULL || port == NULL || data == NULL) {
-        return HDF_FAILURE;
-    }
     if (hwAdapter->adapterDescriptor.adapterName == NULL) {
+        AUDIO_FUNC_LOGE("hwAdapter->adapterDescriptor.adapterName is null!");
         return HDF_FAILURE;
     }
-    const char *adapterName = hwAdapter->adapterDescriptor.adapterName;
-    if (!HdfSbufWriteString(data, adapterName)) {
+
+    if (!HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
+        AUDIO_FUNC_LOGE("HdfRemoteServiceWriteInterfaceToken failed!");
         return HDF_FAILURE;
     }
-    uint32_t tempDir = (uint32_t)port->dir;
-    if (!HdfSbufWriteUint32(data, tempDir)) {
+
+    if (!HdfSbufWriteString(data, hwAdapter->adapterDescriptor.adapterName)) {
+        AUDIO_FUNC_LOGE("HdfSbufWriteString adapterName failed!");
         return HDF_FAILURE;
     }
+
+    if (!HdfSbufWriteUint32(data, (uint32_t)port->dir)) {
+        AUDIO_FUNC_LOGE("HdfSbufWriteUint32 port->dir failed!");
+        return HDF_FAILURE;
+    }
+
     if (!HdfSbufWriteUint32(data, port->portId)) {
-        return HDF_FAILURE;
-    }
-    if (port->portName == NULL) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteString(data, port->portName)) {
+        AUDIO_FUNC_LOGE("HdfSbufWriteUint32 port->portId failed!");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -678,60 +587,66 @@ static int32_t AudioProxyAdapterWritePortCapability(const struct AudioHwAdapter 
 int32_t AudioProxyAdapterGetPortCapability(struct AudioAdapter *adapter,
     const struct AudioPort *port, struct AudioPortCapability *capability)
 {
-    AUDIO_FUNC_LOGI();
-    int32_t ret = AUDIO_HAL_SUCCESS;
-
-    if (adapter == NULL || port == NULL || port->portName == NULL || capability == NULL || (port->portId < 0)) {
-        return AUDIO_HAL_ERR_INVALID_PARAM;
+    if (adapter == NULL || port == NULL || capability == NULL || (port->portId < 0)) {
+        AUDIO_FUNC_LOGE("invalid param");
+        return HDF_ERR_INVALID_PARAM;
     }
 
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
+
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
-        return AUDIO_HAL_ERR_INTERNAL;
+        AUDIO_FUNC_LOGE("AudioProxyPreprocessSBuf failed");
+        return HDF_FAILURE;
     }
+
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter->proxyRemoteHandle == NULL) {
+        AUDIO_FUNC_LOGE("hwAdapter->proxyRemoteHandle is null");
         AudioProxyBufReplyRecycle(data, reply);
-        return AUDIO_HAL_ERR_INTERNAL;
+        return HDF_FAILURE;
     }
-    if (!HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
-        AudioProxyBufReplyRecycle(data, reply);
-        return AUDIO_HAL_ERR_INTERNAL;
+
+    int32_t ret = AudioProxyAdapterWritePortCapability(hwAdapter, port, data);
+    if (ret != HDF_SUCCESS) {
+        goto ERROR;
     }
-    if (AudioProxyAdapterWritePortCapability(hwAdapter, port, data)) {
-        AudioProxyBufReplyRecycle(data, reply);
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
+
     ret = AudioProxyDispatchCall(hwAdapter->proxyRemoteHandle, AUDIO_HDI_ADT_GET_PORT_CAPABILITY, data, reply);
-    if (ret < 0) {
-        AudioProxyBufReplyRecycle(data, reply);
-        return ret;
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioProxyDispatchCall failed ret = %{public}d", ret);
+        goto ERROR;
     }
+
+    if (hwAdapter->portCapabilitys == NULL) {
+        hwAdapter->portCapabilitys =
+            (struct AudioPortAndCapability *)OsalMemCalloc(sizeof(struct AudioPortAndCapability));
+    }
+
+    if (hwAdapter->portCapabilitys == NULL) {
+        AUDIO_FUNC_LOGE("hwAdapter->portCapabilitys is null");
+        goto ERROR;
+    }
+
+    if (!AudioPortCapabilityBlockUnmarshalling(reply, &hwAdapter->portCapabilitys->capability)) {
+        AUDIO_FUNC_LOGE("AudioPortCapabilityBlockUnmarshalling failed");
+        goto ERROR;
+    }
+
+    *capability = hwAdapter->portCapabilitys->capability;
+
     AudioProxyBufReplyRecycle(data, reply);
-    /* proxy must init local capability ,this capability the same of Server's */
-    struct AudioPortAndCapability *hwAdapterPortCapabilitys = hwAdapter->portCapabilitys;
-    if (hwAdapterPortCapabilitys == NULL) {
-        AUDIO_FUNC_LOGE("hwAdapter portCapabilitys is NULL!");
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    uint32_t portNum = hwAdapter->adapterDescriptor.portNum;
-    while (hwAdapterPortCapabilitys != NULL && (portNum > 0)) {
-        if (hwAdapterPortCapabilitys->port.portId == port->portId) {
-            *capability = hwAdapterPortCapabilitys->capability;
-            return AUDIO_HAL_SUCCESS;
-        }
-        hwAdapterPortCapabilitys++;
-        portNum--;
-    }
-    return AUDIO_HAL_ERR_INTERNAL;
+    return HDF_SUCCESS;
+ERROR:
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
 }
 
 static int32_t AudioProxyAdapterSetAndGetPassthroughModeSBuf(struct HdfSBuf *data,
     const struct HdfSBuf *reply, const struct AudioPort *port)
 {
     (void)reply;
-    if (data == NULL || port == NULL || port->portName == NULL) {
+    if (data == NULL || port == NULL) {
         return HDF_FAILURE;
     }
     uint32_t tempDir = port->dir;
@@ -739,10 +654,6 @@ static int32_t AudioProxyAdapterSetAndGetPassthroughModeSBuf(struct HdfSBuf *dat
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(data, port->portId)) {
-        return HDF_FAILURE;
-    }
-    if (!HdfSbufWriteString(data, port->portName)) {
-        AUDIO_FUNC_LOGE("HdfSbufWriteString error");
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -775,11 +686,11 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
     struct HdfSBuf *reply = NULL;
     int32_t ret = AUDIO_HAL_SUCCESS;
 
-    if (adapter == NULL || port == NULL || port->portName == NULL) {
+    if (adapter == NULL || port == NULL) {
         AUDIO_FUNC_LOGE("Params is null.");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (port->dir != PORT_OUT || port->portId < 0 || strcmp(port->portName, "AOP") != 0) {
+    if (port->dir != PORT_OUT || port->portId < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
@@ -842,10 +753,10 @@ int32_t AudioProxyAdapterGetPassthroughMode(struct AudioAdapter *adapter,
 
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
-    if (adapter == NULL || port == NULL || port->portName == NULL || mode == NULL) {
+    if (adapter == NULL || port == NULL || mode == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (port->dir != PORT_OUT || port->portId < 0 || strcmp(port->portName, "AOP") != 0) {
+    if (port->dir != PORT_OUT || port->portId < 0) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
@@ -985,12 +896,13 @@ int32_t AudioProxyAdapterSetExtraParams(struct AudioAdapter *adapter, enum Audio
 int32_t AudioProxyAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
                                         const char *condition, char *value, int32_t length)
 {
-    if (adapter == NULL || value == NULL || condition == NULL || length <= 0) {
+    if (adapter == NULL || value == NULL || length <= 0) {
         AUDIO_FUNC_LOGE("AudioProxyAdapterGetExtraParams FAIL");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
 
     (void)key;
+    (void)condition;
     struct HdfSBuf *data = NULL;
     struct HdfSBuf *reply = NULL;
     const char *strValue = NULL;
@@ -1010,12 +922,6 @@ int32_t AudioProxyAdapterGetExtraParams(struct AudioAdapter *adapter, enum Audio
         HDF_LOGE("%{public}s: write interface token failed!", __func__);
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
-    }
-
-    if (!HdfSbufWriteString(data, condition)) {
-        AUDIO_FUNC_LOGE("condition write fail");
-        AudioProxyBufReplyRecycle(data, reply);
-        return HDF_FAILURE;
     }
 
     if (!HdfSbufWriteInt32(data, length)) {

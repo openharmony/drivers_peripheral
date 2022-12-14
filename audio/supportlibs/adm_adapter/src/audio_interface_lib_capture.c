@@ -147,7 +147,9 @@ int32_t AudioCtlCaptureSetPauseStu(const struct DevHandle *handle,
 
     ret = AudioServiceDispatch(handle->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(sBuf, NULL);
         AUDIO_FUNC_LOGE("SetPauseStu Failed to send service call!");
+        return ret;
     }
 
     AudioFreeHdfSBuf(sBuf, NULL);
@@ -252,7 +254,9 @@ int32_t AudioCtlCaptureSetVolume(const struct DevHandle *handle,
 
     ret = AudioServiceDispatch(handle->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(sBuf, NULL);
         AUDIO_FUNC_LOGE("CaptureSetVolume Service Failed!");
+        return ret;
     }
 
     AudioFreeHdfSBuf(sBuf, NULL);
@@ -299,7 +303,9 @@ int32_t AudioCtlCaptureSetMuteStu(const struct DevHandle *handle,
 
     ret = AudioServiceDispatch(handle->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(sBuf, NULL);
         AUDIO_FUNC_LOGE("CaptureSetMuteStu Service is NULL!");
+        return ret;
     }
 
     AudioFreeHdfSBuf(sBuf, NULL);
@@ -405,6 +411,8 @@ int32_t AudioCtlCaptureSetGainStu(const struct DevHandle *handle,
     ret = AudioServiceDispatch(handle->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("CaptureSetGainStu Failed to send service call!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
     }
 
     AudioFreeHdfSBuf(sBuf, NULL);

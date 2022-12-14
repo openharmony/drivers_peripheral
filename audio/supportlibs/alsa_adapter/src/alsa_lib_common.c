@@ -1168,10 +1168,12 @@ struct DevHandle *AudioBindService(const char *name)
 
 void AudioCloseService(const struct DevHandle *handle)
 {
-    if (handle != NULL || handle->object == NULL) {
-        AUDIO_FUNC_LOGE("handle or handle->object is NULL");
+    if (handle != NULL) {
+        if (handle->object == NULL) {
+            AUDIO_FUNC_LOGE("handle or handle->object is NULL");
+        }
+        AudioMemFree((void **)&handle);
     }
-    AudioMemFree((void **)&handle);
 }
 
 static void AudioPortNameFree(struct AudioPort *dataBlock, uint32_t portsLen)

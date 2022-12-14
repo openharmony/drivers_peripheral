@@ -32,7 +32,8 @@
 #define AUDIO_TOKEN_SERVER_NAME "ohos.hdi.audio_service"
 #define AUDIO_PNP_INFO_LEN_MAX  256
 #define AUDIO_CONTROL           "hdf_audio_control"
-#define AUDIO_UNLOAD_DRIVER_ID  4
+
+#define AUDIODRV_CTRL_IOCTRL_ELEM_HDMI 5 // define from adm control stream id
 
 static struct HdfDeviceObject *g_audioPnpDevice = NULL;
 
@@ -242,7 +243,7 @@ int32_t AudioUhdfUnloadDriver(const char *driverName)
         return HDF_FAILURE;
     }
 
-    int32_t ret = service->dispatcher->Dispatch(&service->object, AUDIO_UNLOAD_DRIVER_ID, sBuf, NULL);
+    int32_t ret = service->dispatcher->Dispatch(&service->object, AUDIODRV_CTRL_IOCTRL_ELEM_HDMI, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         HdfSbufRecycle(sBuf);
         HdfIoServiceRecycle(service);
