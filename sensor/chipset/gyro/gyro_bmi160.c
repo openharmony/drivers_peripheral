@@ -18,11 +18,6 @@
 
 static struct Bmi160DrvData *g_bmi160DrvData = NULL;
 
-static struct Bmi160DrvData *GyroBmi160GetDrvData(void)
-{
-    return g_bmi160DrvData;
-}
-
 /* IO config for int-pin and I2C-pin */
 #define SENSOR_I2C6_DATA_REG_ADDR 0x114f004c
 #define SENSOR_I2C6_CLK_REG_ADDR  0x114f0048
