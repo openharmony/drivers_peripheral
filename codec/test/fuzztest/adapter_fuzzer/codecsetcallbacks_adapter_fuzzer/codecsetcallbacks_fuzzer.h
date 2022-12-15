@@ -13,9 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef CODECCOMPONENTTUNNELREQUEST_FUZZER
-#define CODECCOMPONENTTUNNELREQUEST_FUZZER
+#ifndef CODECSETCALLBACKS_FUZZER
+#define CODECSETCALLBACKS_FUZZER
 
-#define FUZZ_PROJECT_NAME "codeccomponenttunnelrequest_adapter_fuzzer"
+#define FUZZ_PROJECT_NAME "codecsetcallbacks_adapter_fuzzer"
 
 #endif

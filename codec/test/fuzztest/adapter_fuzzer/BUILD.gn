@@ -28,6 +28,14 @@ group("hdf_fuzztest_media_codec_adapter") {
       "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecfreebuffer_adapter_fuzzer:fuzztest",
       "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecgetcomponentcapabilitylist_adapter_fuzzer:fuzztest",
       "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecgetconfig_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecgetextensionIndex_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecgetparameter_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecsendcommand_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecsetcallbacks_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecsetconfig_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecsetparameter_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecusebuffer_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecuseeglimage_adapter_fuzzer:fuzztest",
     ]
   }
 }

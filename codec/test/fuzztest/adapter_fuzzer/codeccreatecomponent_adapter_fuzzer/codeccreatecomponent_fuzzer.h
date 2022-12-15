@@ -16,6 +16,6 @@
 #ifndef CODECCREATCOMPONENT_FUZZER
 #define CODECCREATCOMPONENT_FUZZER
 
-#define FUZZ_PROJECT_NAME "codeccreatecomponent_fuzzer"
+#define FUZZ_PROJECT_NAME "codeccreatecomponent_adapter_fuzzer"
 
 #endif
