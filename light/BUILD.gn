@@ -17,9 +17,19 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("light_entry") {
-    deps = [
-      "//drivers/peripheral/light/hal:hdi_light",
-      "//drivers/peripheral/light/hdi_service:hdf_light_service",
-    ]
+    HDI_LIGHT_SERVICE_PATH =
+        rebase_path("//device/soc/${device_company}/common/hal/light")
+    cmd = "if [ -f ${HDI_LIGHT_SERVICE_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
+    HAVE_LIGHT_HDI_SERVICE =
+        exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+
+    if (HAVE_LIGHT_HDI_SERVICE) {
+      deps = [ "${HDI_LIGHT_SERVICE_PATH}:light_hdi_service" ]
+    } else {
+      deps = [
+        "//drivers/peripheral/light/hal:hdi_light",
+        "//drivers/peripheral/light/hdi_service:hdf_light_service",
+      ]
+    }
   }
 }
