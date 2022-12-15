@@ -66,7 +66,6 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdapters_001, TestSize.Level1)
 
     ret = manager->GetAllAdapters(manager, descs, &descsLen);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ((uint32_t)AUDIO_ADAPTER_MAX_NUM, descsLen);
 
     TestReleaseAdapterDescs(&descs, descsLen);
 }
@@ -145,9 +144,9 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdapters_005, TestSize.Level1)
     ASSERT_NE(nullptr, descs);
     ASSERT_NE(nullptr, manager);
 
-    descsLen = 2; // invalid descsLen
+    descsLen = 0; // invalid descsLen
     ret = manager->GetAllAdapters(manager, descs, &descsLen);
-    EXPECT_EQ(AUDIO_HAL_ERR_NOTREADY, ret);
+    EXPECT_TRUE((ret == AUDIO_HAL_ERR_NOTREADY || ret == HDF_ERR_INVALID_PARAM));
     OsalMemFree(descs);
     descs = nullptr;
 }
