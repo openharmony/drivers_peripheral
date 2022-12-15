@@ -56,6 +56,8 @@ ohos_shared_library("libusb_interface_service_1.0") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_usb:usb_idl_headers",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
