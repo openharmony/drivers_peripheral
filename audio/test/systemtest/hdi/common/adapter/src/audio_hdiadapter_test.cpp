@@ -77,7 +77,7 @@ HWTEST_F(AudioHdiAdapterTest, AudioGetAllAdapters_001, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = manager->GetAllAdapters(manager, &descs, &size);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_ADAPTER_MAX_NUM, size);
+    EXPECT_LT(0, size);
 }
 
 /**
@@ -198,10 +198,7 @@ HWTEST_F(AudioHdiAdapterTest, AudioLoadAdapter_002, TestSize.Level1)
     struct AudioAdapter *adapter = nullptr;
 
     ret = manager->LoadAdapter(manager, desc, &adapter);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    desc->adapterName = "internal";
-    ret = manager->LoadAdapter(manager, desc, &adapter);
-    manager->UnloadAdapter(manager, adapter);
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
 }
 
 /**
@@ -214,7 +211,7 @@ HWTEST_F(AudioHdiAdapterTest, AudioLoadAdapter_003, TestSize.Level1)
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioAdapterDescriptor desc = {
-        .adapterName = "illegal",
+        .adapterName = "primary",
         .portNum = 2,
         .ports = nullptr,
     };

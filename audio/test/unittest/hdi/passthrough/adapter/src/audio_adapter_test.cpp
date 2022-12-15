@@ -850,14 +850,6 @@ HWTEST_F(AudioAdapterTest, AudioAdapterGetPortCapabilityWhenCapabilityIsNull, Te
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPortCapability(adapter, port, nullptr));
 }
 
-HWTEST_F(AudioAdapterTest, AudioAdapterGetPortCapabilityWhenPortNameIsNull, TestSize.Level1)
-{
-    struct AudioPort port;
-    port.portName = nullptr;
-    struct AudioPortCapability capability;
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPortCapability(adapter, &port, &capability));
-}
-
 HWTEST_F(AudioAdapterTest, AudioAdapterGetPortCapabilityWhenPortCapabilitysIsNull, TestSize.Level1)
 {
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
@@ -908,14 +900,6 @@ HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenPortIsNull, TestSiz
 {
     AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterSetPassthroughMode(adapter, nullptr, mode));
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenPortNameIsNull, TestSize.Level1)
-{
-    struct AudioPort port;
-    port.portName = nullptr;
-    AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterSetPassthroughMode(adapter, &port, mode));
 }
 
 HWTEST_F(AudioAdapterTest, AudioAdapterSetPassthroughModeWhenPortDirIsPortIn, TestSize.Level1)
@@ -1002,14 +986,6 @@ HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenModeIsNull, TestSiz
 {
     struct AudioPort *port = desc->ports;
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPassthroughMode(adapter, port, nullptr));
-}
-
-HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenPortNameIsNull, TestSize.Level1)
-{
-    struct AudioPort port;
-    port.portName = nullptr;
-    AudioPortPassthroughMode mode = PORT_PASSTHROUGH_LPCM;
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, AudioAdapterGetPassthroughMode(adapter, &port, &mode));
 }
 
 HWTEST_F(AudioAdapterTest, AudioAdapterGetPassthroughModeWhenPortDirIsPortIn, TestSize.Level1)

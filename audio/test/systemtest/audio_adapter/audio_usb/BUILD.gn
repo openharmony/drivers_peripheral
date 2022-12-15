@@ -56,4 +56,7 @@ ohos_systemtest("hdf_audio_usb_adapter_test") {
         [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
     defines += [ "AUDIO_ADM_SERVICE" ]
   }
+  if (!drivers_peripheral_audio_rich_device) {
+    defines += [ "FEATURE_SMALL_DEVICE" ]
+  }
 }

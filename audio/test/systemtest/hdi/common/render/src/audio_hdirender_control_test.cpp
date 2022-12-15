@@ -702,10 +702,7 @@ HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_009, TestSize.Level1)
     devDesc.portId = -5;
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
-    devDesc.pins = PIN_NONE;
-    ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
-    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
-    devDesc.desc = "devtestname";
+    InitDevDesc(devDesc, renderPort->portId, PIN_NONE);
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
