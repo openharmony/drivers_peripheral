@@ -128,7 +128,7 @@ HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenDescIsError, TestSize.Leve
     desc->portNum = 1;
     struct AudioAdapter *adapter;
     ret = managerFuncs->LoadAdapter(managerFuncs, desc, &adapter);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_OBJECT, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     managerFuncs->UnloadAdapter(managerFuncs, adapter);
     adapter = nullptr;
     delete desc;
@@ -149,7 +149,7 @@ HWTEST_F(AudioManagerTest, AudioManagerLoadAdapterWhenAdapterNameIsError, TestSi
     desc->adapterName = "abc";
     static struct AudioAdapter *adapter;
     ret = managerFuncs->LoadAdapter(managerFuncs, desc, &adapter);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
     managerFuncs->UnloadAdapter(managerFuncs, adapter);
     adapter = nullptr;
 }

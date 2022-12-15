@@ -253,7 +253,7 @@ HWTEST_F(AudioHdiRenderSceneTest, AudioRenderSelectScene_003, TestSize.Level1)
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     scenes.scene.id = 0;
-    scenes.desc.pins = PIN_IN_MIC;
+    scenes.desc.pins = PIN_OUT_SPEAKER;
     ret = render->scene.SelectScene(renderNull, &scenes);
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
