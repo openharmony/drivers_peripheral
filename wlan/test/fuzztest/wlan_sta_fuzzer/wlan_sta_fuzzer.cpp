@@ -30,15 +30,7 @@ static void FuzzStartScan(struct IWlanInterface *interface, const uint8_t *rawDa
     feature.ifName = const_cast<char *>(reinterpret_cast<const char *>(rawData));
     feature.type = *const_cast<int32_t *>(reinterpret_cast<const int32_t *>(rawData));
 
-    struct IWlanCallback *wlanCallbackObj = WlanCallbackServiceGet();
-    if (wlanCallbackObj == nullptr) {
-        HDF_LOGE("%{public}s: wlanCallbackObj get failed!", __FUNCTION__);
-        return;
-    }
-    interface->RegisterEventCallback(interface, wlanCallbackObj, feature.ifName);
     interface->StartScan(interface, &feature, &scan);
-    interface->UnregisterEventCallback(interface, wlanCallbackObj, feature.ifName);
-    WlanCallbackServiceRelease(wlanCallbackObj);
     HDF_LOGI("%{public}s: success", __FUNCTION__);
 }
 
