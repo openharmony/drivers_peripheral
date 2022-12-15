@@ -21,10 +21,10 @@
 #include <string.h>
 #include <sys/mman.h>
 #include <unistd.h>
-#include "hdf_base.h"
-#include "inttypes.h"
 #include "audio_manager.h"
 #include "framework_common.h"
+#include "hdf_base.h"
+#include "inttypes.h"
 
 #define BUFFER_LEN                     256
 #define AUDIO_CHANNELCOUNT             2
@@ -198,6 +198,7 @@ static int32_t StopAudioFiles(struct AudioRender **renderS)
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Stop Render!");
     }
+
     if (g_adapter == NULL || g_adapter->DestroyRender == NULL) {
         return HDF_FAILURE;
     }
@@ -450,6 +451,7 @@ static int32_t StartPlayThread(int32_t palyModeFlag)
     }
     return HDF_SUCCESS;
 }
+
 static int32_t PlayingAudioInitFile(void)
 {
     if (g_file != NULL) {
@@ -472,6 +474,7 @@ static int32_t PlayingAudioInitFile(void)
     }
     return HDF_SUCCESS;
 }
+
 static int32_t BindRouteToRender(int32_t streamid, enum AudioPortPin outputDevice)
 {
     struct AudioRouteNode source = {
@@ -790,10 +793,10 @@ static int32_t SetRenderResume(struct AudioRender **render)
 static void PrintRenderAttributesFromat(void)
 {
     printf(" ============= Render Sample Attributes Format =============== \n");
-    printf("| 1. Render AUDIO_FORMAT_TYPE_PCM_8_BIT                            |\n");
-    printf("| 2. Render AUDIO_FORMAT_TYPE_PCM_16_BIT                           |\n");
-    printf("| 3. Render AUDIO_FORMAT_TYPE_PCM_24_BIT                           |\n");
-    printf("| 4. Render AUDIO_FORMAT_TYPE_PCM_32_BIT                           |\n");
+    printf("| 1. Render AUDIO_FORMAT_TYPE_PCM_8_BIT                        |\n");
+    printf("| 2. Render AUDIO_FORMAT_TYPE_PCM_16_BIT                       |\n");
+    printf("| 3. Render AUDIO_FORMAT_TYPE_PCM_24_BIT                       |\n");
+    printf("| 4. Render AUDIO_FORMAT_TYPE_PCM_32_BIT                       |\n");
     printf(" ============================================================= \n");
 }
 
@@ -871,6 +874,98 @@ static int32_t SetRenderAttributes(struct AudioRender **render)
     return ret;
 }
 
+static int32_t PrintRenderSelectPinFirst(struct AudioSceneDescriptor *scene)
+{
+    system("clear");
+    printf(" ==================== Select Pin =====================  \n");
+    printf("| 0. Speaker                                           |\n");
+    printf("| 1. HeadPhones                                        |\n");
+    printf(" =====================================================  \n");
+
+    printf("Please input your choice:\n");
+    int32_t val = 0;
+    int32_t ret = CheckInputName(INPUT_INT, (void *)&val);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Invalid value!");
+        SystemInputFail();
+        return HDF_FAILURE;
+    }
+
+    if (val == 1) {
+        scene->desc.pins = PIN_OUT_HEADSET;
+    } else {
+        scene->desc.pins = PIN_OUT_SPEAKER;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t PrintRenderSelectPinSecond(struct AudioSceneDescriptor *scene)
+{
+    system("clear");
+    printf(" ==================== Select Pin =====================  \n");
+    printf("| 0. Speaker                                           |\n");
+    printf("| 1. HeadPhones                                        |\n");
+    printf("| 2. Speaker and HeadPhones                            |\n");
+    printf(" =====================================================  \n");
+
+    printf("Please input your choice:\n");
+    int32_t val = 0;
+    int32_t ret = CheckInputName(INPUT_INT, (void *)&val);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Invalid value!");
+        SystemInputFail();
+        return HDF_FAILURE;
+    }
+
+    if (val == 1) {
+        scene->desc.pins = PIN_OUT_HEADSET;
+    } else if (val == 0) {
+        scene->desc.pins = PIN_OUT_SPEAKER;
+    } else {
+        scene->desc.pins = PIN_OUT_SPEAKER | PIN_OUT_HEADSET;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t PrintRenderSelectPinThird(struct AudioSceneDescriptor *scene)
+{
+    system("clear");
+    printf(" ==================== Select Pin =====================  \n");
+    printf("| 0. Speaker                                           |\n");
+    printf("| 1. HeadPhones                                        |\n");
+    printf(" =====================================================  \n");
+
+    printf("Please input your choice:\n");
+    int32_t val = 0;
+    int32_t ret = CheckInputName(INPUT_INT, (void *)&val);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Invalid value!");
+        SystemInputFail();
+        return HDF_FAILURE;
+    }
+
+    if (val == 1) {
+        scene->desc.pins = PIN_OUT_HEADSET;
+    } else {
+        scene->desc.pins = PIN_OUT_SPEAKER;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static void SelectSceneMenu(void)
+{
+    printf(" =================== Select Scene ======================== \n");
+    printf("0 is Midea.                                               |\n");
+    printf("1 is Communication.                                       |\n");
+    printf("2 is Ring-Tone.                                           |\n");
+    printf("3 is Voice-Call.                                          |\n");
+    printf("4 is Mmap.                                                |\n");
+    printf(" ========================================================= \n");
+}
+
 static int32_t SelectRenderScene(struct AudioRender **render)
 {
     (void)render;
@@ -878,32 +973,45 @@ static int32_t SelectRenderScene(struct AudioRender **render)
     int32_t ret;
     int val = 0;
     struct AudioSceneDescriptor scene;
-    printf(" =================== Select Scene ===================== \n");
-    printf("0 is Speaker.                                          |\n");
-    printf("1 is HeadPhones.                                       |\n");
-    printf(" ====================================================== \n");
+    SelectSceneMenu();
     printf("Please input your choice:\n");
     ret = CheckInputName(INPUT_INT, (void *)&val);
-    if (ret < 0 || (val != 0 && val != 1)) {
+    if (ret < 0) {
         AUDIO_FUNC_LOGE("Invalid value!");
         SystemInputFail();
         return HDF_FAILURE;
     }
-    if (val == 1) {
-        scene.scene.id = 0;
-        scene.desc.pins = PIN_OUT_HEADSET;
-    } else {
-        scene.scene.id = 0;
-        scene.desc.pins = PIN_OUT_SPEAKER;
+
+    switch (val) {
+        case AUDIO_IN_MEDIA:
+            scene.scene.id = AUDIO_IN_MEDIA;
+            PrintRenderSelectPinFirst(&scene);
+            break;
+        case AUDIO_IN_COMMUNICATION:
+            scene.scene.id = AUDIO_IN_COMMUNICATION;
+            PrintRenderSelectPinSecond(&scene);
+            break;
+        case AUDIO_IN_RINGTONE:
+            scene.scene.id = AUDIO_IN_RINGTONE;
+            scene.desc.pins = PIN_OUT_SPEAKER | PIN_OUT_HEADSET;
+            break;
+        case AUDIO_IN_CALL:
+            scene.scene.id = AUDIO_IN_CALL;
+            PrintRenderSelectPinThird(&scene);
+            break;
+        case AUDIO_MMAP_NOIRQ:
+            scene.scene.id = AUDIO_MMAP_NOIRQ;
+            PrintRenderSelectPinFirst(&scene);
+            break;
+        default:
+            break;
     }
-    if (g_render == NULL) {
+    if (g_render == NULL || g_render->scene.SelectScene == NULL) {
         AUDIO_FUNC_LOGE("Music already stop,");
         SystemInputFail();
         return HDF_FAILURE;
     }
-    if (g_render->scene.SelectScene == NULL) {
-        return HDF_FAILURE;
-    }
+
     ret = g_render->scene.SelectScene((AudioHandle)g_render, &scene);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Select scene fail\n");

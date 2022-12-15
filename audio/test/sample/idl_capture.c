@@ -980,33 +980,75 @@ static int32_t SetCaptureAttributes(struct IAudioCapture **capture)
     return ret;
 }
 
-static int32_t SelectCaptureScene(struct IAudioCapture **capture)
+static int32_t PrintCaptureSelectPin(struct AudioSceneDescriptor *scene)
 {
-    (void)capture;
-    int val = 0;
-    struct AudioSceneDescriptor captureScene;
-
     system("clear");
+    printf(" ==================== Select Pin =====================  \n");
+    printf("| 0. MIC                                                |\n");
+    printf("| 1. MIC HeadSet                                        |\n");
+    printf(" =====================================================  \n");
 
-    printf(" ====================  Select Scene ==================== \n");
-    printf("0 is Mic.                                               |\n");
-    printf("1 is Headphone mic.                                     |\n");
-    printf(" ======================================================= \n");
     printf("Please input your choice:\n");
-
+    int32_t val = 0;
     int32_t ret = CheckInputName(INPUT_INT, (void *)&val);
-    if (ret < 0 || (val != 0 && val != 1)) {
-        AUDIO_FUNC_LOGE("Invalid value,");
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Invalid value!");
         SystemInputFail();
         return HDF_FAILURE;
     }
 
     if (val == 1) {
-        captureScene.scene.id = 0;
-        captureScene.desc.pins = PIN_IN_HS_MIC;
+        scene->desc.pins = PIN_IN_HS_MIC;
     } else {
-        captureScene.scene.id = 0;
-        captureScene.desc.pins = PIN_IN_MIC;
+        scene->desc.pins = PIN_IN_MIC;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static void SelectSceneMenu(void)
+{
+    printf(" ====================  Select Scene ==================== \n");
+    printf("0 is Midea.                                             |\n");
+    printf("1 is Communication.                                     |\n");
+    printf("2 is Voice-all.                                         |\n");
+    printf(" ======================================================= \n");
+}
+
+static int32_t SelectCaptureScene(struct IAudioCapture **capture)
+{
+    (void)capture;
+    int32_t val = 0;
+    struct AudioSceneDescriptor captureScene;
+    system("clear");
+    SelectSceneMenu();
+    printf("Please input your choice:\n");
+
+    int32_t ret = CheckInputName(INPUT_INT, (void *)&val);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Invalid value,");
+        SystemInputFail();
+        return HDF_FAILURE;
+    }
+
+    switch (val) {
+        case AUDIO_IN_MEDIA:
+            captureScene.scene.id = AUDIO_IN_MEDIA;
+            break;
+        case AUDIO_IN_COMMUNICATION:
+            captureScene.scene.id = AUDIO_IN_COMMUNICATION;
+            break;
+        case AUDIO_IN_CALL - 1:
+            captureScene.scene.id = AUDIO_IN_CALL;
+            break;
+        default:
+            AUDIO_FUNC_LOGE("Select Scene invaild.");
+            return HDF_FAILURE;
+    }
+    ret = PrintCaptureSelectPin(&captureScene);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Select pin failed");
+        return HDF_FAILURE;
     }
 
     captureScene.desc.desc = "mic";
@@ -1023,6 +1065,7 @@ static int32_t SelectCaptureScene(struct IAudioCapture **capture)
     }
     return ret;
 }
+
 static int32_t GetCaptureExtParams(struct IAudioCapture **capture)
 {
     (void)capture;

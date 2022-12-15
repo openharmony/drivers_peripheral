@@ -98,7 +98,7 @@ int32_t CheckParaDesc(const struct AudioDeviceDescriptor *desc, const char *type
         }
     } else if (!strcmp(type, TYPE_RENDER)) {
         if (pins == PIN_OUT_SPEAKER || pins == PIN_OUT_HEADSET || pins == PIN_OUT_LINEOUT || pins == PIN_OUT_HDMI ||
-            pins == PIN_OUT_HEADPHONE) {
+            pins == PIN_OUT_HEADPHONE || pins == (PIN_OUT_SPEAKER | PIN_OUT_HEADSET)) {
             return HDF_SUCCESS;
         } else {
             AUDIO_FUNC_LOGE("TYPE_RENDER does not support this pins:%{public}d!", pins);
@@ -123,12 +123,13 @@ int32_t CheckParaAttr(const struct AudioSampleAttributes *attrs)
         AUDIO_FUNC_LOGE("CheckParaAttr does not support! ret = %{public}d", ret);
         return HDF_ERR_NOT_SUPPORT;
     }
+
     enum AudioCategory audioCategory = attrs->type;
-    if (audioCategory != AUDIO_IN_MEDIA && audioCategory != AUDIO_IN_COMMUNICATION) {
-        AUDIO_FUNC_LOGE("audioCategory:%{public}d is neither AUDIO_IN_MEDIA not or AUDIO_IN_COMMUNICATION",
-            audioCategory);
+    if (audioCategory < AUDIO_IN_MEDIA || audioCategory > AUDIO_MMAP_NOIRQ) {
+        AUDIO_FUNC_LOGE("Audio category error!");
         return HDF_ERR_NOT_SUPPORT;
     }
+
     enum AudioFormat audioFormat = attrs->format;
     return CheckAttrFormat(audioFormat);
 }
