@@ -52,11 +52,6 @@ static uint32_t g_green[BH1745_COEFFICIENT_GREEN] = {
     BH1745_COEFFICIENT_GREEN_LEVEL_1
 };
 
-static struct Bh1745DrvData *Bh1745GetDrvData(void)
-{
-    return g_bh1745DrvData;
-}
-
 static int32_t DynamicRangCovert(struct SensorCfgData *CfgData, uint32_t *rgbcData)
 {
     uint8_t timeItemNum;

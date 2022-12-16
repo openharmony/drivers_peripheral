@@ -18,11 +18,6 @@
 
 static struct Ak8789DrvData *g_ak8789DrvData = NULL;
 
-static struct Ak8789DrvData *Ak8789GetDrvData(void)
-{
-    return g_ak8789DrvData;
-}
-
 /* IO config for int-pin and Gpio-pin */
 #define SENSOR_HALL_DATA_REG_ADDR 0x114f0040
 #define SENSOR_HALL_CLK_REG_ADDR  0x114f0044
