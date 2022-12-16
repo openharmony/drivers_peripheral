@@ -33,7 +33,7 @@
       ],
       "test": [
         "//drivers/peripheral/user_auth/test/fuzztest/user_auth:fuzztest",
-        "//drivers/peripheral/user_auth/test/unittest:UserAuthHdiTest"
+        "//drivers/peripheral/user_auth/test/unittest:driver_userauth_unittest"
       ],
       "inner_kits": [
       ]
