@@ -1472,6 +1472,10 @@ int32_t SetPowerMode(const char *ifName, uint8_t mode)
     int32_t ret;
     HwprivIoctlData ioctlData;
 
+    if (ifName == NULL || mode >= WIFI_POWER_MODE_NUM) {
+        HILOG_ERROR(LOG_CORE, "%s: Invalid parameter", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
     (void)memset_s(&ioctlData, sizeof(ioctlData), 0, sizeof(ioctlData));
     fd = socket(PF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
     if (fd < 0) {
