@@ -14,6 +14,10 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
+declare_args() {
+  drivers_peripheral_codec_support_role = false
+}
+
 ohos_shared_library("libcodec_hdi_omx_server") {
   include_dirs = [
     "//drivers/peripheral/codec/interfaces/include",
@@ -53,7 +57,10 @@ ohos_shared_library("libcodec_hdi_omx_server") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-
+  defines = []
+  if (drivers_peripheral_codec_support_role) {
+    defines += [ "SUPPORT_ROLE" ]
+  }
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_codec"
