@@ -37,6 +37,8 @@ public:
     virtual int32_t DeleteComponentInstance(OMX_COMPONENTTYPE *component) = 0;
 
     virtual int32_t GetRolesForComponent(const char *componentName, std::vector<std::string> *vRoles) = 0;
+
+    virtual int32_t GetCoreOfComponent(CodecOMXCore* &core, const char *componentName) = 0;
 };
 }  // namespace Omx
 }  // namespace Codec
