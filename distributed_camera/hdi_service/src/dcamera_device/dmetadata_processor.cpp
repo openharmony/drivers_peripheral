@@ -574,10 +574,13 @@ void DMetadataProcessor::GetEachNodeSupportedResolution(std::vector<int>& format
 {
     for (const auto &format : formats) {
         std::string formatStr = std::to_string(format);
-        if (rootValue[rootNode]["Resolution"][formatStr].isArray() &&
-            rootValue[rootNode]["Resolution"][formatStr].size() > 0) {
-            GetNodeSupportedResolution(format, formatStr, rootNode, supportedFormats, rootValue);
+        if (!rootValue[rootNode].isMember("Resolution") ||
+            !rootValue[rootNode]["Resolution"].isMember(formatStr) ||
+            !rootValue[rootNode]["Resolution"][formatStr].isArray() ||
+            rootValue[rootNode]["Resolution"][formatStr].size() == 0) {
+            return;
         }
+        GetNodeSupportedResolution(format, formatStr, rootNode, supportedFormats, rootValue);
     }
 }
 
@@ -587,6 +590,9 @@ void DMetadataProcessor::GetNodeSupportedResolution(int format, std::string form
     std::vector<DCResolution> resolutionVec;
     uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
     for (uint32_t i = 0; i < size; i++) {
+        if (!rootValue[rootNode]["Resolution"][formatStr][i].isString()) {
+            continue;
+        }
         std::string resoStr = rootValue[rootNode]["Resolution"][formatStr][i].asString();
         std::vector<std::string> reso;
         SplitString(resoStr, reso, STAR_SEPARATOR);
@@ -631,37 +637,72 @@ std::map<int, std::vector<DCResolution>> DMetadataProcessor::GetDCameraSupported
         !rootValue.isObject()) {
         return supportedFormats;
     }
+    ParsePhotoFormats(rootValue, supportedFormats);
+    ParsePreviewFormats(rootValue, supportedFormats);
+    ParseVideoFormats(rootValue, supportedFormats);
+    return supportedFormats;
+}
 
+std::map<int, std::vector<DCResolution>> DMetadataProcessor::ParsePhotoFormats(Json::Value rootValue,
+    std::map<int, std::vector<DCResolution>> supportedFormats)
+{
+    if (!rootValue.isMember("Photo") || !rootValue["Photo"].isMember("OutputFormat") ||
+        !rootValue["Photo"]["OutputFormat"].isArray() || rootValue["Photo"]["OutputFormat"].size() == 0) {
+        return supportedFormats;
+    }
     std::vector<int> photoFormats;
-    if (rootValue["Photo"]["OutputFormat"].isArray() && (rootValue["Photo"]["OutputFormat"].size() > 0)) {
-        uint32_t size = rootValue["Photo"]["OutputFormat"].size();
-        for (uint32_t i = 0; i < size; i++) {
+    uint32_t size = rootValue["Photo"]["OutputFormat"].size();
+    if (size > JSON_ARRAY_MAX_SIZE) {
+        return supportedFormats;
+    }
+    for (uint32_t i = 0; i < size; i++) {
+        if ((rootValue["Photo"]["OutputFormat"][i]).isInt()) {
             photoFormats.push_back((rootValue["Photo"]["OutputFormat"][i]).asInt());
         }
     }
-
     GetEachNodeSupportedResolution(photoFormats, "Photo", supportedFormats, rootValue);
+    return supportedFormats;
+}
 
+std::map<int, std::vector<DCResolution>> DMetadataProcessor::ParsePreviewFormats(Json::Value rootValue,
+    std::map<int, std::vector<DCResolution>> supportedFormats)
+{
+    if (!rootValue.isMember("Preview") || !rootValue["Preview"].isMember("OutputFormat") ||
+        !rootValue["Preview"]["OutputFormat"].isArray() || (rootValue["Preview"]["OutputFormat"].size() == 0)) {
+        return supportedFormats;
+    }
     std::vector<int> previewFormats;
-    if (rootValue["Preview"]["OutputFormat"].isArray() && (rootValue["Preview"]["OutputFormat"].size() > 0)) {
-        uint32_t size = rootValue["Preview"]["OutputFormat"].size();
-        for (uint32_t i = 0; i < size; i++) {
+    uint32_t size = rootValue["Preview"]["OutputFormat"].size();
+    if (size > JSON_ARRAY_MAX_SIZE) {
+        return supportedFormats;
+    }
+    for (uint32_t i = 0; i < size; i++) {
+        if ((rootValue["Preview"]["OutputFormat"][i]).isInt()) {
             previewFormats.push_back((rootValue["Preview"]["OutputFormat"][i]).asInt());
         }
     }
-
     GetEachNodeSupportedResolution(previewFormats, "Preview", supportedFormats, rootValue);
+    return supportedFormats;
+}
 
+std::map<int, std::vector<DCResolution>> DMetadataProcessor::ParseVideoFormats(Json::Value rootValue,
+    std::map<int, std::vector<DCResolution>> supportedFormats)
+{
+    if (!rootValue.isMember("Video") || !rootValue["Video"].isMember("OutputFormat") ||
+        !rootValue["Video"]["OutputFormat"].isArray() || (rootValue["Video"]["OutputFormat"].size() == 0)) {
+        return supportedFormats;
+    }
     std::vector<int> videoFormats;
-    if (rootValue["Video"]["OutputFormat"].isArray() && (rootValue["Video"]["OutputFormat"].size() > 0)) {
-        uint32_t size = rootValue["Video"]["OutputFormat"].size();
-        for (uint32_t i = 0; i < size; i++) {
+    uint32_t size = rootValue["Video"]["OutputFormat"].size();
+    if (size > JSON_ARRAY_MAX_SIZE) {
+        return supportedFormats;
+    }
+    for (uint32_t i = 0; i < size; i++) {
+        if ((rootValue["Video"]["OutputFormat"][i]).isInt()) {
             videoFormats.push_back((rootValue["Video"]["OutputFormat"][i]).asInt());
         }
     }
-
     GetEachNodeSupportedResolution(videoFormats, "Video", supportedFormats, rootValue);
-
     return supportedFormats;
 }
 
