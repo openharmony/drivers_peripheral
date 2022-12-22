@@ -25,10 +25,18 @@
 #include "ed25519_key.h"
 #include "idm_database.h"
 
-static bool IsExecutorInfoValid(const ExecutorResultInfo *executorResultInfo, const Buffer *data, const Buffer *sign);
-static Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode, const TemplateIdArrays *templateIds);
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
 
-static ResultCode ParseExecutorResultRemainTime(ExecutorResultInfo *result, TlvListNode *body)
+IAM_STATIC bool IsExecutorInfoValid(const ExecutorResultInfo *executorResultInfo, const Buffer *data,
+    const Buffer *sign);
+IAM_STATIC Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode,
+    const TemplateIdArrays *templateIds);
+
+IAM_STATIC ResultCode ParseExecutorResultRemainTime(ExecutorResultInfo *result, TlvListNode *body)
 {
     int32_t ret = GetInt32Para(body, AUTH_REMAIN_COUNT, &result->remainTimes);
     if (ret != OPERA_SUCC) {
@@ -38,7 +46,7 @@ static ResultCode ParseExecutorResultRemainTime(ExecutorResultInfo *result, TlvL
     return RESULT_SUCCESS;
 }
 
-static ResultCode ParseExecutorResultFreezingTime(ExecutorResultInfo *result, TlvListNode *body)
+IAM_STATIC ResultCode ParseExecutorResultFreezingTime(ExecutorResultInfo *result, TlvListNode *body)
 {
     int32_t ret = GetInt32Para(body, AUTH_REMAIN_TIME, &result->freezingTime);
     if (ret != OPERA_SUCC) {
@@ -48,7 +56,7 @@ static ResultCode ParseExecutorResultFreezingTime(ExecutorResultInfo *result, Tl
     return RESULT_SUCCESS;
 }
 
-static ResultCode ParseExecutorResultAcl(ExecutorResultInfo *result, TlvListNode *body)
+IAM_STATIC ResultCode ParseExecutorResultAcl(ExecutorResultInfo *result, TlvListNode *body)
 {
     int32_t ret = GetUint32Para(body, AUTH_CAPABILITY_LEVEL, &result->capabilityLevel);
     if (ret != OPERA_SUCC) {
@@ -58,7 +66,7 @@ static ResultCode ParseExecutorResultAcl(ExecutorResultInfo *result, TlvListNode
     return RESULT_SUCCESS;
 }
 
-static ResultCode ParseExecutorResultTemplateId(ExecutorResultInfo *result, TlvListNode *body)
+IAM_STATIC ResultCode ParseExecutorResultTemplateId(ExecutorResultInfo *result, TlvListNode *body)
 {
     int32_t ret = GetUint64Para(body, AUTH_TEMPLATE_ID, &result->templateId);
     if (ret != OPERA_SUCC) {
@@ -68,7 +76,7 @@ static ResultCode ParseExecutorResultTemplateId(ExecutorResultInfo *result, TlvL
     return RESULT_SUCCESS;
 }
 
-static ResultCode ParseExecutorResultScheduleId(ExecutorResultInfo *result, TlvListNode *body)
+IAM_STATIC ResultCode ParseExecutorResultScheduleId(ExecutorResultInfo *result, TlvListNode *body)
 {
     int32_t ret = GetUint64Para(body, AUTH_SCHEDULE_ID, &result->scheduleId);
     if (ret != OPERA_SUCC) {
@@ -78,7 +86,7 @@ static ResultCode ParseExecutorResultScheduleId(ExecutorResultInfo *result, TlvL
     return RESULT_SUCCESS;
 }
 
-static ResultCode ParseExecutorResultCode(ExecutorResultInfo *result, TlvListNode *body)
+IAM_STATIC ResultCode ParseExecutorResultCode(ExecutorResultInfo *result, TlvListNode *body)
 {
     int32_t ret = GetInt32Para(body, AUTH_RESULT_CODE, &result->result);
     if (ret != OPERA_SUCC) {
@@ -88,7 +96,7 @@ static ResultCode ParseExecutorResultCode(ExecutorResultInfo *result, TlvListNod
     return RESULT_SUCCESS;
 }
 
-static ResultCode ParseExecutorResultAuthSubType(ExecutorResultInfo *result, TlvListNode *body)
+IAM_STATIC ResultCode ParseExecutorResultAuthSubType(ExecutorResultInfo *result, TlvListNode *body)
 {
     int32_t ret = GetUint64Para(body, AUTH_SUBTYPE, &result->authSubType);
     if (ret != OPERA_SUCC) {
@@ -98,7 +106,7 @@ static ResultCode ParseExecutorResultAuthSubType(ExecutorResultInfo *result, Tlv
     return RESULT_SUCCESS;
 }
 
-static ResultCode ParseExecutorResultInfo(const Buffer *data, ExecutorResultInfo *result)
+IAM_STATIC ResultCode ParseExecutorResultInfo(const Buffer *data, ExecutorResultInfo *result)
 {
     TlvListNode *parseBody = CreateTlvList();
     if (parseBody == NULL) {
@@ -147,7 +155,7 @@ EXIT:
     return ret;
 }
 
-static Buffer *ParseExecutorResultData(TlvListNode *body)
+IAM_STATIC Buffer *ParseExecutorResultData(TlvListNode *body)
 {
     Buffer *data = GetBuffPara(body, AUTH_DATA);
     if (!IsBufferValid(data)) {
@@ -157,7 +165,7 @@ static Buffer *ParseExecutorResultData(TlvListNode *body)
     return data;
 }
 
-static Buffer *ParseExecutorResultSign(TlvListNode *body)
+IAM_STATIC Buffer *ParseExecutorResultSign(TlvListNode *body)
 {
     Buffer *sign = GetBuffPara(body, AUTH_SIGNATURE);
     if (!IsBufferValid(sign)) {
@@ -167,7 +175,7 @@ static Buffer *ParseExecutorResultSign(TlvListNode *body)
     return sign;
 }
 
-static ResultCode ParseRoot(ExecutorResultInfo *result, TlvListNode *body)
+IAM_STATIC ResultCode ParseRoot(ExecutorResultInfo *result, TlvListNode *body)
 {
     Buffer *msg = GetBuffPara(body, AUTH_ROOT);
     if (!IsBufferValid(msg)) {
@@ -269,7 +277,8 @@ void DestoryExecutorResultInfo(ExecutorResultInfo *result)
     Free(result);
 }
 
-static bool IsExecutorInfoValid(const ExecutorResultInfo *executorResultInfo, const Buffer *data, const Buffer *sign)
+IAM_STATIC bool IsExecutorInfoValid(const ExecutorResultInfo *executorResultInfo, const Buffer *data,
+    const Buffer *sign)
 {
     if (executorResultInfo == NULL) {
         LOG_ERROR("there is a problem with the data content");
@@ -302,7 +311,8 @@ static bool IsExecutorInfoValid(const ExecutorResultInfo *executorResultInfo, co
     return true;
 }
 
-static Buffer *SerializeExecutorMsgData(uint32_t authType, uint32_t propertyMode, const TemplateIdArrays *templateIds)
+IAM_STATIC Buffer *SerializeExecutorMsgData(uint32_t authType, uint32_t propertyMode,
+    const TemplateIdArrays *templateIds)
 {
     if ((propertyMode != PROPERMODE_UNLOCK && propertyMode != PROPERMODE_LOCK) ||
         templateIds->num > MAX_TEMPLATE_OF_SCHEDULE) {
@@ -355,7 +365,7 @@ FAIL:
     return NULL;
 }
 
-static Buffer *SerializeExecutorMsg(const Buffer *data, const Buffer *signatrue)
+IAM_STATIC Buffer *SerializeExecutorMsg(const Buffer *data, const Buffer *signatrue)
 {
     TlvListNode *parseBody = CreateTlvList();
     if (parseBody == NULL) {
@@ -392,7 +402,7 @@ FAIL:
     return NULL;
 }
 
-static Buffer *SerializeRootMsg(const Buffer *msg)
+IAM_STATIC Buffer *SerializeRootMsg(const Buffer *msg)
 {
     TlvListNode *rootParseBody = CreateTlvList();
     if (rootParseBody == NULL) {
@@ -422,7 +432,7 @@ static Buffer *SerializeRootMsg(const Buffer *msg)
     return rootMsg;
 }
 
-static Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode, const TemplateIdArrays *templateIds)
+IAM_STATIC Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode, const TemplateIdArrays *templateIds)
 {
     if (templateIds == NULL) {
         LOG_ERROR("templateIds is null");
@@ -456,7 +466,7 @@ static Buffer *CreateExecutorMsg(uint32_t authType, uint32_t authPropertyMode, c
     return rootMsg;
 }
 
-static void DestoryExecutorMsg(void *data)
+IAM_STATIC void DestoryExecutorMsg(void *data)
 {
     if (data == NULL) {
         return;
@@ -466,7 +476,7 @@ static void DestoryExecutorMsg(void *data)
     Free(msg);
 }
 
-static ResultCode GetExecutorTemplateList(const ExecutorInfoHal *executorNode, TemplateIdArrays *templateIds)
+IAM_STATIC ResultCode GetExecutorTemplateList(const ExecutorInfoHal *executorNode, TemplateIdArrays *templateIds)
 {
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, executorNode->authType);
@@ -514,7 +524,7 @@ static ResultCode GetExecutorTemplateList(const ExecutorInfoHal *executorNode, T
     return RESULT_SUCCESS;
 }
 
-static ResultCode AssemblyMessage(const ExecutorInfoHal *executorNode, uint32_t authPropertyMode,
+IAM_STATIC ResultCode AssemblyMessage(const ExecutorInfoHal *executorNode, uint32_t authPropertyMode,
     LinkedList *executorMsg)
 {
     TemplateIdArrays templateIds;
@@ -549,7 +559,7 @@ static ResultCode AssemblyMessage(const ExecutorInfoHal *executorNode, uint32_t 
     return ret;
 }
 
-static ResultCode TraverseExecutor(uint32_t executorRole, uint32_t authPropertyMode, LinkedList *executorMsg)
+IAM_STATIC ResultCode TraverseExecutor(uint32_t executorRole, uint32_t authPropertyMode, LinkedList *executorMsg)
 {
     ExecutorCondition condition = {};
     SetExecutorConditionExecutorRole(&condition, executorRole);

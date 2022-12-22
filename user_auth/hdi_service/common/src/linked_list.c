@@ -20,7 +20,13 @@
 #include "adaptor_log.h"
 #include "adaptor_memory.h"
 
-static ResultCode InsertNode(LinkedList *list, void *data)
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
+IAM_STATIC ResultCode InsertNode(LinkedList *list, void *data)
 {
     if (list == NULL) {
         LOG_ERROR("list is null");
@@ -42,7 +48,7 @@ static ResultCode InsertNode(LinkedList *list, void *data)
     return RESULT_SUCCESS;
 }
 
-static ResultCode RemoveNode(LinkedList *list, void *condition, MatchFunc matchFunc, bool destroyNode)
+IAM_STATIC ResultCode RemoveNode(LinkedList *list, void *condition, MatchFunc matchFunc, bool destroyNode)
 {
     if (list == NULL) {
         LOG_ERROR("list is null");
@@ -80,7 +86,7 @@ static ResultCode RemoveNode(LinkedList *list, void *condition, MatchFunc matchF
     return RESULT_SUCCESS;
 }
 
-static uint32_t GetSize(LinkedList *list)
+IAM_STATIC uint32_t GetSize(LinkedList *list)
 {
     if (list == NULL) {
         LOG_ERROR("list is null");
@@ -89,7 +95,7 @@ static uint32_t GetSize(LinkedList *list)
     return list->size;
 }
 
-static bool IteratorHasNext(LinkedListIterator *iterator)
+IAM_STATIC bool IteratorHasNext(LinkedListIterator *iterator)
 {
     if (iterator == NULL) {
         LOG_ERROR("iterator is null");
@@ -98,7 +104,7 @@ static bool IteratorHasNext(LinkedListIterator *iterator)
     return iterator->current != NULL;
 }
 
-static void *IteratorNext(LinkedListIterator *iterator)
+IAM_STATIC void *IteratorNext(LinkedListIterator *iterator)
 {
     if (!IteratorHasNext(iterator)) {
         LOG_ERROR("reach end");
@@ -109,7 +115,7 @@ static void *IteratorNext(LinkedListIterator *iterator)
     return current->data;
 }
 
-static LinkedListIterator *CreateIterator(struct LinkedList *list)
+IAM_STATIC LinkedListIterator *CreateIterator(struct LinkedList *list)
 {
     if (list == NULL) {
         LOG_ERROR("list is null");
@@ -126,7 +132,7 @@ static LinkedListIterator *CreateIterator(struct LinkedList *list)
     return iterator;
 }
 
-static void DestroyIterator(LinkedListIterator *iterator)
+IAM_STATIC void DestroyIterator(LinkedListIterator *iterator)
 {
     if (iterator == NULL) {
         LOG_ERROR("iterator is null");
@@ -157,7 +163,7 @@ LinkedList *CreateLinkedList(DestroyDataFunc destroyDataFunc)
     return list;
 }
 
-static void DestroyLinkedListNode(const LinkedList *list, LinkedListNode *node)
+IAM_STATIC void DestroyLinkedListNode(const LinkedList *list, LinkedListNode *node)
 {
     if (node == NULL) {
         LOG_ERROR("node is null");

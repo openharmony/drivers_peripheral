@@ -22,7 +22,13 @@
 #include "adaptor_log.h"
 #include "defines.h"
 
-static bool IsFileExist(const char *fileName)
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
+IAM_STATIC bool IsFileExist(const char *fileName)
 {
     if (fileName == NULL) {
         LOG_ERROR("get null file name");
@@ -36,7 +42,7 @@ static bool IsFileExist(const char *fileName)
     return true;
 }
 
-static int32_t ReadFile(const char *fileName, uint8_t *buf, uint32_t len)
+IAM_STATIC int32_t ReadFile(const char *fileName, uint8_t *buf, uint32_t len)
 {
     if ((fileName == NULL) || (buf == NULL) || (len == 0)) {
         LOG_ERROR("get bad params");
@@ -58,7 +64,7 @@ static int32_t ReadFile(const char *fileName, uint8_t *buf, uint32_t len)
     return RESULT_SUCCESS;
 }
 
-static int32_t WriteFile(const char *fileName, const uint8_t *buf, uint32_t len)
+IAM_STATIC int32_t WriteFile(const char *fileName, const uint8_t *buf, uint32_t len)
 {
     if ((fileName == NULL) || (buf == NULL) || (len == 0)) {
         LOG_ERROR("get bad params");
@@ -90,7 +96,7 @@ static int32_t WriteFile(const char *fileName, const uint8_t *buf, uint32_t len)
     return RESULT_SUCCESS;
 }
 
-static int32_t GetFileLen(const char *fileName, uint32_t *len)
+IAM_STATIC int32_t GetFileLen(const char *fileName, uint32_t *len)
 {
     if ((fileName == NULL) || (len == NULL)) {
         LOG_ERROR("get bad params");
@@ -118,7 +124,7 @@ static int32_t GetFileLen(const char *fileName, uint32_t *len)
     return RESULT_SUCCESS;
 }
 
-static int32_t DeleteFile(const char *fileName)
+IAM_STATIC int32_t DeleteFile(const char *fileName)
 {
     if (fileName == NULL) {
         LOG_ERROR("get bad params");

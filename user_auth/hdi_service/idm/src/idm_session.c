@@ -26,6 +26,12 @@
 #define SESSION_VALIDITY_PERIOD (10 * 60 * 1000)
 #define MAX_CHALLENGE_GENERATION_TIMES 5
 
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
 // User IDM session information.
 struct SessionInfo {
     int32_t userId;
@@ -38,7 +44,7 @@ struct SessionInfo {
     bool isScheduleValid;
 } *g_session;
 
-static bool IsSessionExist(void)
+IAM_STATIC bool IsSessionExist(void)
 {
     if (g_session == NULL) {
         LOG_INFO("the session does not exist");
@@ -47,7 +53,7 @@ static bool IsSessionExist(void)
     return true;
 }
 
-static ResultCode GenerateChallenge(uint8_t *challenge, uint32_t challengeLen)
+IAM_STATIC ResultCode GenerateChallenge(uint8_t *challenge, uint32_t challengeLen)
 {
     for (uint32_t i = 0; i < MAX_CHALLENGE_GENERATION_TIMES; ++i) {
         if (SecureRandom(challenge, challengeLen) != RESULT_SUCCESS) {

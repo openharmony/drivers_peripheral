@@ -22,7 +22,13 @@
 #include "adaptor_log.h"
 #include "adaptor_memory.h"
 
-static int32_t PutTlvObject(TlvListNode *head, int32_t type, uint32_t length, const void *value)
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
+IAM_STATIC int32_t PutTlvObject(TlvListNode *head, int32_t type, uint32_t length, const void *value)
 {
     if ((head == NULL) || (value == NULL) || (length > MAX_BUFFER_SIZE)) {
         return PARAM_ERR;
@@ -110,7 +116,7 @@ int32_t ParseTlvWrapper(const uint8_t *buffer, uint32_t bufferSize, TlvListNode 
     return OPERA_SUCC;
 }
 
-static uint8_t *GetTlvValue(TlvListNode *node, int32_t msgType, uint32_t *len)
+IAM_STATIC uint8_t *GetTlvValue(TlvListNode *node, int32_t msgType, uint32_t *len)
 {
     if ((node == NULL) || (len == NULL)) {
         LOG_ERROR("GetTlvValue input invalid");
