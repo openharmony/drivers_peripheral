@@ -29,17 +29,23 @@
 #define PRE_APPLY_LEN 2048
 #define VERSION 0
 
-static uint32_t GetRemainSpace(const Buffer *object)
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
+IAM_STATIC uint32_t GetRemainSpace(const Buffer *object)
 {
     return object->maxSize - object->contentSize;
 }
 
-static uint8_t *GetStreamAddress(const Buffer *object)
+IAM_STATIC uint8_t *GetStreamAddress(const Buffer *object)
 {
     return object->buf + object->contentSize;
 }
 
-static ResultCode CapacityExpansion(Buffer *object, uint32_t targetCapacity)
+IAM_STATIC ResultCode CapacityExpansion(Buffer *object, uint32_t targetCapacity)
 {
     if (!IsBufferValid(object) || object->maxSize > MAX_BUFFER_LEN / DEFAULT_EXPANSION_RATIO) {
         LOG_ERROR("invalid params");
@@ -69,7 +75,7 @@ static ResultCode CapacityExpansion(Buffer *object, uint32_t targetCapacity)
     return RESULT_SUCCESS;
 }
 
-static ResultCode StreamWrite(Buffer *parcel, void *from, uint32_t size)
+IAM_STATIC ResultCode StreamWrite(Buffer *parcel, void *from, uint32_t size)
 {
     if (!IsBufferValid(parcel) || from == NULL) {
         LOG_ERROR("invalid params");
@@ -90,7 +96,7 @@ static ResultCode StreamWrite(Buffer *parcel, void *from, uint32_t size)
     return RESULT_SUCCESS;
 }
 
-static ResultCode StreamWriteEnrolledInfo(Buffer *parcel, LinkedList *enrolledList)
+IAM_STATIC ResultCode StreamWriteEnrolledInfo(Buffer *parcel, LinkedList *enrolledList)
 {
     if (!IsBufferValid(parcel) || enrolledList == NULL) {
         LOG_ERROR("invalid params");
@@ -117,7 +123,7 @@ static ResultCode StreamWriteEnrolledInfo(Buffer *parcel, LinkedList *enrolledLi
     return RESULT_SUCCESS;
 }
 
-static ResultCode StreamWriteCredentialList(Buffer *parcel, LinkedList *credentialList)
+IAM_STATIC ResultCode StreamWriteCredentialList(Buffer *parcel, LinkedList *credentialList)
 {
     if (!IsBufferValid(parcel) || credentialList == NULL) {
         LOG_ERROR("invalid params");
@@ -144,7 +150,7 @@ static ResultCode StreamWriteCredentialList(Buffer *parcel, LinkedList *credenti
     return RESULT_SUCCESS;
 }
 
-static ResultCode StreamWriteUserInfo(Buffer *parcel, UserInfo *userInfo)
+IAM_STATIC ResultCode StreamWriteUserInfo(Buffer *parcel, UserInfo *userInfo)
 {
     if (!IsBufferValid(parcel) || userInfo == NULL) {
         LOG_ERROR("invalid params");
@@ -233,7 +239,7 @@ EXIT:
     return ret;
 }
 
-static ResultCode StreamRead(Buffer *parcel, uint32_t *index, void *to, uint32_t size)
+IAM_STATIC ResultCode StreamRead(Buffer *parcel, uint32_t *index, void *to, uint32_t size)
 {
     if (parcel->contentSize <= *index || parcel->contentSize - *index < size) {
         LOG_ERROR("the buffer length is insufficient");
@@ -247,7 +253,7 @@ static ResultCode StreamRead(Buffer *parcel, uint32_t *index, void *to, uint32_t
     return RESULT_SUCCESS;
 }
 
-static ResultCode StreamReadCredentialList(Buffer *parcel, uint32_t *index, LinkedList *credentialList)
+IAM_STATIC ResultCode StreamReadCredentialList(Buffer *parcel, uint32_t *index, LinkedList *credentialList)
 {
     if (!IsBufferValid(parcel) || credentialList == NULL) {
         LOG_ERROR("invalid params");
@@ -285,7 +291,7 @@ static ResultCode StreamReadCredentialList(Buffer *parcel, uint32_t *index, Link
     return RESULT_SUCCESS;
 }
 
-static ResultCode StreamReadEnrolledList(Buffer *parcel, uint32_t *index, LinkedList *enrolledList)
+IAM_STATIC ResultCode StreamReadEnrolledList(Buffer *parcel, uint32_t *index, LinkedList *enrolledList)
 {
     if (!IsBufferValid(parcel) || enrolledList == NULL) {
         LOG_ERROR("invalid params");
@@ -323,7 +329,7 @@ static ResultCode StreamReadEnrolledList(Buffer *parcel, uint32_t *index, Linked
     return RESULT_SUCCESS;
 }
 
-static ResultCode StreamReadUserInfo(Buffer *parcel, uint32_t *index, UserInfo *userInfo)
+IAM_STATIC ResultCode StreamReadUserInfo(Buffer *parcel, uint32_t *index, UserInfo *userInfo)
 {
     ResultCode result = StreamRead(parcel, index, &userInfo->userId, sizeof(int32_t));
     if (result != RESULT_SUCCESS) {
@@ -348,7 +354,7 @@ static ResultCode StreamReadUserInfo(Buffer *parcel, uint32_t *index, UserInfo *
     return RESULT_SUCCESS;
 }
 
-static Buffer *ReadFileInfo(void)
+IAM_STATIC Buffer *ReadFileInfo(void)
 {
     FileOperator *fileOperator = GetFileOperator(DEFAULT_FILE_OPERATOR);
     if (!IsFileOperatorValid(fileOperator)) {
@@ -375,7 +381,7 @@ static Buffer *ReadFileInfo(void)
     return parcel;
 }
 
-static bool StreamReadFileInfo(Buffer *parcel, LinkedList *userInfoList)
+IAM_STATIC bool StreamReadFileInfo(Buffer *parcel, LinkedList *userInfoList)
 {
     uint32_t index = 0;
     uint32_t userNum;
