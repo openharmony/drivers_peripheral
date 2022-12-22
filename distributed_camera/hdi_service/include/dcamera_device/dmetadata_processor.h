@@ -65,6 +65,9 @@ private:
     uint32_t GetDataSize(uint32_t type);
     void* GetMetadataItemData(const camera_metadata_item_t &item);
     std::map<int, std::vector<DCResolution>> GetDCameraSupportedFormats(const std::string &abilityInfo);
+    void ParsePhotoFormats(Json::Value& rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats);
+    void ParsePreviewFormats(Json::Value& rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats);
+    void ParseVideoFormats(Json::Value& rootValue, std::map<int, std::vector<DCResolution>>& supportedFormats);
     void InitDcameraBaseAbility();
     void GetEachNodeSupportedResolution(std::vector<int>& formats, const std::string rootNode,
         std::map<int, std::vector<DCResolution>>& supportedFormats, Json::Value& rootValue);
@@ -73,6 +76,7 @@ private:
     void SetFpsRanges();
 
 private:
+    constexpr static uint32_t JSON_ARRAY_MAX_SIZE = 1000;
     std::function<void(uint64_t, std::shared_ptr<OHOS::Camera::CameraMetadata>)> resultCallback_;
     std::shared_ptr<CameraAbility> dCameraAbility_;
     std::string protocolVersion_;
