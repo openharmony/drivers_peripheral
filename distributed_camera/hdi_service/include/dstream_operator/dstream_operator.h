@@ -59,6 +59,9 @@ public:
         const sptr<IStreamOperatorCallback> &callbackObj, sptr<IOfflineStreamOperator> &offlineOperator) override;
 
     DCamRetCode InitOutputConfigurations(const DHBase &dhBase, const std::string &abilityInfo);
+    DCamRetCode ParsePhotoFormats(Json::Value& rootValue);
+    DCamRetCode ParsePreviewFormats(Json::Value& rootValue);
+    DCamRetCode ParseVideoFormats(Json::Value& rootValue);
     DCamRetCode AcquireBuffer(int streamId, DCameraBuffer &buffer);
     DCamRetCode ShutterBuffer(int streamId, const DCameraBuffer &buffer);
     DCamRetCode SetCallBack(OHOS::sptr<IStreamOperatorCallback> const &callback);
@@ -124,6 +127,7 @@ private:
     int32_t DoCapture(int32_t captureId, const CaptureInfo &info, bool isStreaming);
 
 private:
+    constexpr static uint32_t JSON_ARRAY_MAX_SIZE = 1000;
     std::shared_ptr<DMetadataProcessor> dMetadataProcessor_;
     OHOS::sptr<IStreamOperatorCallback> dcStreamOperatorCallback_;
     function<void(ErrorType, int)> errorCallback_;
