@@ -19,18 +19,24 @@
 #include "idm_database.h"
 #include "idm_session.h"
 
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
 typedef struct {
     AuthType authType;
     uint32_t maxErollNumber;
 } SpecificationMap;
 
-static SpecificationMap g_specificationMap[] = {
+IAM_STATIC SpecificationMap g_specificationMap[] = {
     {PIN_AUTH, MAX_NUMBER_OF_PIN_PER_USER},
     {FACE_AUTH, MAX_NUMBER_OF_FACE_PER_USER},
     {FINGER_AUTH, MAX_NUMBER_OF_FINGERS_PER_USER},
 };
 
-static uint32_t GetMaxNumber(uint32_t authType)
+IAM_STATIC uint32_t GetMaxNumber(uint32_t authType)
 {
     for (uint32_t i = 0; i < sizeof(g_specificationMap) / sizeof(SpecificationMap); ++i) {
         if (g_specificationMap[i].authType == authType) {

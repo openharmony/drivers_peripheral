@@ -24,7 +24,13 @@
 #include "idm_database.h"
 #include "enroll_specification_check.h"
 
-static CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param)
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
+IAM_STATIC CoAuthSchedule *GenerateIdmSchedule(const PermissionCheckParam *param)
 {
     ScheduleParam scheduleParam = {};
     scheduleParam.associateId.userId = param->userId;
@@ -126,7 +132,7 @@ EXIT:
     return ret;
 }
 
-static void GetInfoFromResult(CredentialInfoHal *credentialInfo, const ExecutorResultInfo *result,
+IAM_STATIC void GetInfoFromResult(CredentialInfoHal *credentialInfo, const ExecutorResultInfo *result,
     const CoAuthSchedule *schedule)
 {
     credentialInfo->authType = schedule->authType;
@@ -136,7 +142,8 @@ static void GetInfoFromResult(CredentialInfoHal *credentialInfo, const ExecutorR
     credentialInfo->executorMatcher = schedule->executors[0].executorMatcher;
 }
 
-static int32_t GetCredentialInfoFromSchedule(const ExecutorResultInfo *executorInfo, CredentialInfoHal *credentialInfo)
+IAM_STATIC int32_t GetCredentialInfoFromSchedule(const ExecutorResultInfo *executorInfo,
+    CredentialInfoHal *credentialInfo)
 {
     uint64_t currentScheduleId;
     uint32_t scheduleAuthType;
@@ -267,7 +274,7 @@ int32_t GetUserInfoFunc(int32_t userId, uint64_t *secureUid, uint64_t *pinSubTyp
     return GetEnrolledInfo(userId, enrolledInfoArray, enrolledNum);
 }
 
-static int32_t GetDeletedCredential(int32_t userId, CredentialInfoHal *deletedCredential)
+IAM_STATIC int32_t GetDeletedCredential(int32_t userId, CredentialInfoHal *deletedCredential)
 {
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, PIN_AUTH);
@@ -288,7 +295,7 @@ static int32_t GetDeletedCredential(int32_t userId, CredentialInfoHal *deletedCr
     return RESULT_SUCCESS;
 }
 
-static int32_t CheckResultValid(uint64_t scheduleId, int32_t userId)
+IAM_STATIC int32_t CheckResultValid(uint64_t scheduleId, int32_t userId)
 {
     uint64_t currentScheduleId;
     uint32_t scheduleAuthType;
