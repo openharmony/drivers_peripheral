@@ -35,11 +35,11 @@ OHOS::Camera::RetCode CameraAbilityTest::GetSensorOrientation(std::shared_ptr<Ca
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_SENSOR_ORIENTATION, &entry);
     if (ret != 0) {
-        std::cout << "==========[test log] get OHOS_SENSOR_ORIENTATION error." << std::endl;
+        CAMERA_LOGE("get OHOS_SENSOR_ORIENTATION error.");
         return OHOS::Camera::RC_ERROR;
     }
     sensorOrientation = *(entry.data.i32);
-    std::cout << "==========[test log] get sensorOrientation =" << sensorOrientation << std::endl;
+    CAMERA_LOGD("get sensorOrientation = %{public}d", sensorOrientation);
     return OHOS::Camera::RC_OK;
 }
 
@@ -50,11 +50,11 @@ OHOS::Camera::RetCode CameraAbilityTest::GetFlashAvailable(std::shared_ptr<Camer
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_ABILITY_FLASH_AVAILABLE, &entry);
     if (ret != 0) {
-        std::cout << "==========[test log] get OHOS_ABILITY_FLASH_AVAILABLE error." << std::endl;
+        CAMERA_LOGE("get OHOS_ABILITY_FLASH_AVAILABLE error.");
         return OHOS::Camera::RC_ERROR;
     }
     flashAvailable = *(entry.data.u8);
-    std::cout << "==========[test log] get flashAvailable =" << static_cast<int>(flashAvailable) << std::endl;
+    CAMERA_LOGD("get flashAvailable = %{public}d", static_cast<int>(flashAvailable));
     return OHOS::Camera::RC_OK;
 }
 
@@ -65,18 +65,18 @@ OHOS::Camera::RetCode CameraAbilityTest::GetAfAvailable(std::shared_ptr<CameraAb
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_CONTROL_AF_AVAILABLE_MODES, &entry);
     if (ret != 0) {
-        std::cout << "==========[test log] get OHOS_CONTROL_AF_AVAILABLE_MODES error." << std::endl;
+        CAMERA_LOGE("get OHOS_CONTROL_AF_AVAILABLE_MODES error.");
         return OHOS::Camera::RC_ERROR;
     }
     uint32_t count = entry.count;
-    std::cout << "==========[test log] count =" << count << std::endl;
+    CAMERA_LOGD("count = %{public}u", count);
 
     for (int i = 0; i < count; i++) {
         afAvailable.push_back(*(entry.data.u8 + i));
     }
 
     for (auto it = afAvailable.begin(); it != afAvailable.end(); it++) {
-        std::cout << "==========[test log] afAvailable =" << static_cast<int>(*it) << std::endl;
+        CAMERA_LOGI("afAvailable = %{public}d", static_cast<int>(*it));
     }
     return OHOS::Camera::RC_OK;
 }
@@ -88,18 +88,18 @@ OHOS::Camera::RetCode CameraAbilityTest::GetZoomRatioRange(std::shared_ptr<Camer
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_ABILITY_ZOOM_RATIO_RANGE, &entry);
     if (ret != 0) {
-        std::cout << "==========[test log] get OHOS_ABILITY_ZOOM_RATIO_RANGE error." << std::endl;
+        CAMERA_LOGE("get OHOS_ABILITY_ZOOM_RATIO_RANGE error.");
         return OHOS::Camera::RC_ERROR;
     }
     uint32_t count = entry.count;
-    std::cout << "==========[test log] count =" << count << std::endl;
+    CAMERA_LOGD("count = %{public}u", count);
 
     for (int i = 0; i < count; i++) {
         zoomRatioRange.push_back(*(entry.data.f + i));
     }
 
     for (auto it = zoomRatioRange.begin(); it != zoomRatioRange.end(); it++) {
-        std::cout << "==========[test log] zoomRatioRange =" << *it << std::endl;
+        CAMERA_LOGI("zoomRatioRange = %{public}f", *it);
     }
     return OHOS::Camera::RC_OK;
 }
@@ -111,11 +111,11 @@ OHOS::Camera::RetCode CameraAbilityTest::GetJpegOrientation(std::shared_ptr<Came
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_JPEG_ORIENTATION, &entry);
     if (ret != 0) {
-        std::cout << "==========[test log] get OHOS_JPEG_ORIENTATION error." << std::endl;
+        CAMERA_LOGE("get OHOS_JPEG_ORIENTATION error.");
         return OHOS::Camera::RC_ERROR;
     }
     jpegOrientation = *(entry.data.i32);
-    std::cout << "==========[test log] get jpegOrientation =" << jpegOrientation << std::endl;
+    CAMERA_LOGD("get jpegOrientation = %{public}d", jpegOrientation);
     return OHOS::Camera::RC_OK;
 }
 
@@ -134,7 +134,7 @@ void CameraAbilityTest::TearDown(void)
 static HWTEST_F(CameraAbilityTest, camera_ability_001, TestSize.Level1)
 {
     if (display_->ability == nullptr) {
-        std::cout << "==========[test log] ability is null." << std::endl;
+        CAMERA_LOGE("ability is null.");
         return;
     }
     GetSensorOrientation(display_->ability);
