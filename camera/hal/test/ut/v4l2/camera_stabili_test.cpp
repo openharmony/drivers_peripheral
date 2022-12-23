@@ -40,14 +40,14 @@ void CameraStabiliTest::GetAvalialbleVideoStabilizationModes(
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_ABILITY_VIDEO_STABILIZATION_MODES, &entry);
     if (ret != 0) {
-        std::cout << "==========[test log] get OHOS_ABILITY_VIDEO_STABILIZATION_MODES error." << std::endl;
+        CAMERA_LOGE("get OHOS_ABILITY_VIDEO_STABILIZATION_MODES error.");
     }
     uint32_t count = entry.count;
     for (int i = 0 ; i < count; i++) {
         videoStabilizationAvailableModes_.push_back(*(entry.data.u8 + i));
     }
     for (auto it = videoStabilizationAvailableModes_.begin(); it != videoStabilizationAvailableModes_.end(); it++) {
-        std::cout << "==========[test log] videoStabilizationAvailableModes : " << (int)*it << std::endl;
+        CAMERA_LOGI("videoStabilizationAvailableModes: %{public}d", static_cast<int>(*it));
     }
 }
 
@@ -62,7 +62,7 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_001, TestSize.Level1)
 {
     // get camera ability
     if (display_->ability == nullptr) {
-        std::cout << "==========[test log] ability is null." << std::endl;
+        CAMERA_LOGE("ability is null.");
         return;
     }
     GetAvalialbleVideoStabilizationModes(display_->ability);
@@ -89,9 +89,9 @@ static HWTEST_F(CameraStabiliTest, camera_stabili_001, TestSize.Level1)
 
     display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] UpdateSettings success" << std::endl;
+        CAMERA_LOGI("UpdateSettings success");
     } else {
-        std::cout << "==========[test log] UpdateSettings fail, rc = " << display_->rc << std::endl;
+        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", display_->rc);
     }
 
     // get preview

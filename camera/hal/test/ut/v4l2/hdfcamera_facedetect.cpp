@@ -82,11 +82,10 @@ static HWTEST_F(HdfCameraFaceDetect, CameraFaceDetect_001, TestSize.Level1)
     display_->rc = (CamRetCode)display_->streamOperator->Capture(display_->CAPTURE_ID_CAPTURE, captureInfo, true);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log]check Capture: Capture success, " << 
-            display_->CAPTURE_ID_CAPTURE << std::endl;
+        CAMERA_LOGI("check Capture: Capture success, captureId = %{public}d", display_->CAPTURE_ID_CAPTURE);
     } else {
-        std::cout << "==========[test log]check Capture: Capture fail, rc = " << display_->rc
-            << display_->CAPTURE_ID_CAPTURE << std::endl;
+        CAMERA_LOGE("check Capture: Capture fail, captureId = %{public}d, rc = %{public}d",
+            display_->CAPTURE_ID_CAPTURE, display_->rc);
     }
     display_->streamCustomerCapture_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
         display_->StoreImage(addr, size);

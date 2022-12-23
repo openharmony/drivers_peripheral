@@ -20,14 +20,9 @@ void UtestOpenCameraTest::TearDownTestCase(void)
 {}
 void UtestOpenCameraTest::SetUp(void)
 {
-    std::cout << "==========[test log] UtestOpenCameraTest::SetUp.display_0： "<<display_<< std::endl;
     if (display_ == nullptr) {
-        std::cout << "==========[test log] UtestOpenCameraTest::SetUp.display_1： "<<display_<< std::endl;
         display_ = std::make_shared<TestDisplay>();
-        std::cout << "==========[test log] UtestOpenCameraTest::SetUp.display_2： "<<display_<< std::endl;
-        std::cout << "==========[test log] UtestOpenCameraTest::SetUp.display_3： "<<display_<< std::endl;
         display_->Init();
-        std::cout << "==========[test log] UtestOpenCameraTest::SetUp.display_4： "<<display_<< std::endl;
     }
 }
 void UtestOpenCameraTest::TearDown(void)
@@ -44,11 +39,11 @@ void UtestOpenCameraTest::TearDown(void)
   */
 TEST_F(UtestOpenCameraTest, camera_open_0001)
 {
-    std::cout << "==========[test log] OpenCamera, success."<< std::endl;
+    CAMERA_LOGD("OpenCamera, success.");
     std::vector<std::string> cameraIds;
     display_->cameraHost->GetCameraIds(cameraIds);
     for (const auto &cameraId : cameraIds) {
-        std::cout << "cameraId = " << cameraId << std::endl;
+        CAMERA_LOGI("cameraId = %{public}s", cameraId.c_str());
     }
     std::string cameraId = cameraIds.front();
     const OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
@@ -66,13 +61,13 @@ TEST_F(UtestOpenCameraTest, camera_open_0001)
   */
 TEST_F(UtestOpenCameraTest, camera_open_0010)
 {
-    std::cout << "==========[test log] OpenCamera, cameraID is not found."<< std::endl;
+    CAMERA_LOGD("OpenCamera, cameraID is not found.");
     sptr<ICameraHost> cameraHost = display_->CameraHostImplGetInstance();
     std::string cameraId = "qwerty";
     OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
-    std::cout << "opencamera begin" << std::endl;
+    CAMERA_LOGD("opencamera begin");
     display_->rc = (CamRetCode)cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-    std::cout << "opencamera end" << std::endl;
+    CAMERA_LOGD("opencamera end");
     EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
 }
 
@@ -85,7 +80,7 @@ TEST_F(UtestOpenCameraTest, camera_open_0010)
   */
 TEST_F(UtestOpenCameraTest, camera_open_0011)
 {
-    std::cout << "==========[test log] OpenCamera, cameraID is illegal."<< std::endl;
+    CAMERA_LOGD("OpenCamera, cameraID is illegal.");
     std::string cameraId = "1";
     OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
     display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
@@ -101,7 +96,7 @@ TEST_F(UtestOpenCameraTest, camera_open_0011)
   */
 TEST_F(UtestOpenCameraTest, camera_open_0012)
 {
-    std::cout << "==========[test log] OpenCamera, cameraID is Empty."<< std::endl;
+    CAMERA_LOGD("OpenCamera, cameraID is Empty.");
     std::string cameraId;
     OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
     display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
@@ -117,7 +112,7 @@ TEST_F(UtestOpenCameraTest, camera_open_0012)
   */
 TEST_F(UtestOpenCameraTest, camera_open_0020)
 {
-    std::cout << "==========[test log] OpenCamera, Callback is Null."<< std::endl;
+    CAMERA_LOGD("OpenCamera, Callback is Null.");
     std::string cameraId = "CAMERA_FIRST";
     OHOS::sptr<ICameraDeviceCallback> callback = nullptr;
     display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
@@ -133,13 +128,13 @@ TEST_F(UtestOpenCameraTest, camera_open_0020)
   */
 TEST_F(UtestOpenCameraTest, camera_open_0030)
 {
-    std::cout << "==========[test log] OpenCamera, cameraID is not found, callback is null."<< std::endl;
+    CAMERA_LOGD("OpenCamera, cameraID is not found, callback is null.");
     sptr<ICameraHost> cameraHost = display_->CameraHostImplGetInstance();
     std::string cameraId = "qwerty";
     OHOS::sptr<ICameraDeviceCallback> callback = nullptr;
-    std::cout << "opencamera begin" << std::endl;
+    CAMERA_LOGD("opencamera begin");
     display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
-    std::cout << "opencamera end" << std::endl;
+    CAMERA_LOGD("opencamera end");
     EXPECT_EQ(INVALID_ARGUMENT, display_-> rc);
 }
 
@@ -152,7 +147,7 @@ TEST_F(UtestOpenCameraTest, camera_open_0030)
   */
 TEST_F(UtestOpenCameraTest, camera_open_0031)
 {
-    std::cout << "==========[test log] OpenCamera, cameraID is illegal, callback is null."<< std::endl;
+    CAMERA_LOGD("OpenCamera, cameraID is illegal, callback is null.");
     std::string cameraId = "1";
     OHOS::sptr<ICameraDeviceCallback> callback = nullptr;
     display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
@@ -168,7 +163,7 @@ TEST_F(UtestOpenCameraTest, camera_open_0031)
   */
 TEST_F(UtestOpenCameraTest, camera_open_0032)
 {
-    std::cout << "==========[test log] OpenCamera, cameraID is Empty, callback is null."<< std::endl;
+    CAMERA_LOGD("OpenCamera, cameraID is Empty, callback is null.");
     std::string cameraId;
     OHOS::sptr<ICameraDeviceCallback> callback = nullptr;
     display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
@@ -184,19 +179,18 @@ TEST_F(UtestOpenCameraTest, camera_open_0032)
   */
 TEST_F(UtestOpenCameraTest, camera_open_0050)
 {
-    std::cout << "==========[test log] Open all Cameras."<< std::endl;
+    CAMERA_LOGD("Open all Cameras.");
     std::vector<std::string> cameraIds;
     display_->cameraHost->GetCameraIds(cameraIds);
     for (auto &cameraId : cameraIds) {
-        std::cout << "cameraId = " << cameraId << std::endl;
+        CAMERA_LOGI("cameraId = %{public}s", cameraId.c_str());
         const OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
         display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);
         EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
         if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-            std::cout << "==========[test log] OpenCamera success, cameraId = " << cameraId << std::endl;
-            } else {
-                std::cout << "==========[test log] OpenCamera fail, rc = ";
-                std::cout << display_->rc << ", cameraId = " << cameraId << std::endl;
-            }
+            CAMERA_LOGI("OpenCamera success, cameraId = %{public}s", cameraId.c_str());
+        } else {
+            CAMERA_LOGE("OpenCamera fail, rc = %{public}d, cameraId = %{public}s", display_->rc, cameraId.c_str());
         }
+    }
 }
