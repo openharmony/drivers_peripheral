@@ -488,39 +488,53 @@ void DStreamOperator::ExtractCameraAttr(Json::Value &rootValue, std::vector<int>
 {
     for (const auto &format : formats) {
         std::string formatStr = std::to_string(format);
-        if (rootValue[rootNode]["Resolution"][formatStr].isArray() &&
-            rootValue[rootNode]["Resolution"][formatStr].size() > 0) {
-            std::vector<DCResolution> resolutionVec;
-            uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
-            for (uint32_t i = 0; i < size; i++) {
-                std::string resoStr = rootValue[rootNode]["Resolution"][formatStr][i].asString();
-                std::vector<std::string> reso;
-                SplitString(resoStr, reso, STAR_SEPARATOR);
-                if (reso.size() != SIZE_FMT_LEN) {
-                    continue;
-                }
-                uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
-                uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
-                if (height == 0 || width == 0 ||
-                    ((rootNode == "Photo") &&
-                     ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
-                    ((rootNode != "Photo") &&
-                     (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
-                    continue;
-                }
-                DCResolution resolution(width, height);
-                resolutionVec.push_back(resolution);
-            }
-            if (!resolutionVec.empty()) {
-                std::sort(resolutionVec.begin(), resolutionVec.end());
-                if (rootNode == "Preview") {
-                    dcSupportedPreviewResolutionMap_[format] = resolutionVec;
-                } else if (rootNode == "Video") {
-                    dcSupportedVideoResolutionMap_[format] = resolutionVec;
-                } else if (rootNode == "Photo") {
-                    dcSupportedPhotoResolutionMap_[format] = resolutionVec;
-                }
-            }
+        if (!rootValue[rootNode].isMember("Resolution") || !rootValue[rootNode]["Resolution"].isMember(formatStr) ||
+            !rootValue[rootNode]["Resolution"][formatStr].isArray() ||
+            rootValue[rootNode]["Resolution"][formatStr].size() == 0 ||
+            rootValue[rootNode]["Resolution"][formatStr].size() > JSON_ARRAY_MAX_SIZE) {
+            DHLOGE("Resolution or %s error.", formatStr.c_str());
+            continue;
+        }
+        GetCameraAttr(rootValue, formatStr, rootNode, format);
+    }
+}
+
+void DStreamOperator::GetCameraAttr(Json::Value &rootValue, std::string formatStr, const std::string rootNode,
+    int format)
+{
+    std::vector<DCResolution> resolutionVec;
+    uint32_t size = rootValue[rootNode]["Resolution"][formatStr].size();
+    for (uint32_t i = 0; i < size; i++) {
+        if (!rootValue[rootNode]["Resolution"][formatStr][i].isString()) {
+            DHLOGE("Resolution %s %d ,is not string.", formatStr.c_str(), i);
+            continue;
+        }
+        std::string resoStr = rootValue[rootNode]["Resolution"][formatStr][i].asString();
+        std::vector<std::string> reso;
+        SplitString(resoStr, reso, STAR_SEPARATOR);
+        if (reso.size() != SIZE_FMT_LEN) {
+            continue;
+        }
+        uint32_t width = static_cast<uint32_t>(std::stoi(reso[0]));
+        uint32_t height = static_cast<uint32_t>(std::stoi(reso[1]));
+        if (height == 0 || width == 0 ||
+            ((rootNode == "Photo") &&
+                ((width * height) > (MAX_SUPPORT_PHOTO_WIDTH * MAX_SUPPORT_PHOTO_HEIGHT))) ||
+            ((rootNode != "Photo") &&
+                (width > MAX_SUPPORT_PREVIEW_WIDTH || height > MAX_SUPPORT_PREVIEW_HEIGHT))) {
+            continue;
+        }
+        DCResolution resolution(width, height);
+        resolutionVec.push_back(resolution);
+    }
+    if (!resolutionVec.empty()) {
+        std::sort(resolutionVec.begin(), resolutionVec.end());
+        if (rootNode == "Preview") {
+            dcSupportedPreviewResolutionMap_[format] = resolutionVec;
+        } else if (rootNode == "Video") {
+            dcSupportedVideoResolutionMap_[format] = resolutionVec;
+        } else if (rootNode == "Photo") {
+            dcSupportedPhotoResolutionMap_[format] = resolutionVec;
         }
     }
 }
@@ -528,7 +542,6 @@ void DStreamOperator::ExtractCameraAttr(Json::Value &rootValue, std::vector<int>
 DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, const std::string &abilityInfo)
 {
     dhBase_ = dhBase;
-
     JSONCPP_STRING errs;
     Json::CharReaderBuilder readerBuilder;
     Json::Value rootValue;
@@ -540,44 +553,23 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    if (rootValue["CodecType"].isArray()) {
-        uint32_t size = rootValue["CodecType"].size();
-        for (uint32_t i = 0; i < size; i++) {
+    if (!rootValue.isMember("CodecType") || !rootValue["CodecType"].isArray() ||
+        rootValue["CodecType"].size() == 0 || rootValue["CodecType"].size() > JSON_ARRAY_MAX_SIZE) {
+        DHLOGE("CodecType error.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    uint32_t size = rootValue["CodecType"].size();
+    for (uint32_t i = 0; i < size; i++) {
+        if ((rootValue["CodecType"][i]).isString()) {
             std::string codeType = (rootValue["CodecType"][i]).asString();
             dcSupportedCodecType_.push_back(ConvertDCEncodeType(codeType));
         }
     }
 
-    std::vector<int> photoFormats;
-    if (rootValue["Photo"]["OutputFormat"].isArray() && (rootValue["Photo"]["OutputFormat"].size() > 0)) {
-        uint32_t size = rootValue["Photo"]["OutputFormat"].size();
-        for (uint32_t i = 0; i < size; i++) {
-            photoFormats.push_back((rootValue["Photo"]["OutputFormat"][i]).asInt());
-        }
-        dcSupportedFormatMap_[DCSceneType::PHOTO] = photoFormats;
+    if (ParsePhotoFormats(rootValue) != SUCCESS || ParsePreviewFormats(rootValue) != SUCCESS ||
+        ParseVideoFormats(rootValue) != SUCCESS) {
+        return DCamRetCode::INVALID_ARGUMENT;
     }
-    ExtractCameraAttr(rootValue, photoFormats, "Photo");
-
-    std::vector<int> previewFormats;
-    if (rootValue["Preview"]["OutputFormat"].isArray() && (rootValue["Preview"]["OutputFormat"].size() > 0)) {
-        uint32_t size = rootValue["Preview"]["OutputFormat"].size();
-        for (uint32_t i = 0; i < size; i++) {
-            previewFormats.push_back((rootValue["Preview"]["OutputFormat"][i]).asInt());
-        }
-        dcSupportedFormatMap_[DCSceneType::PREVIEW] = previewFormats;
-    }
-    ExtractCameraAttr(rootValue, previewFormats, "Preview");
-
-    std::vector<int> videoFormats;
-    if (rootValue["Video"]["OutputFormat"].isArray() && (rootValue["Video"]["OutputFormat"].size() > 0)) {
-        uint32_t size = rootValue["Video"]["OutputFormat"].size();
-        for (uint32_t i = 0; i < size; i++) {
-            videoFormats.push_back((rootValue["Video"]["OutputFormat"][i]).asInt());
-        }
-        dcSupportedFormatMap_[DCSceneType::VIDEO] = videoFormats;
-    }
-    ExtractCameraAttr(rootValue, videoFormats, "Video");
-
 
     bool resolutionMap = false;
     if (!dcSupportedPhotoResolutionMap_.empty() || !dcSupportedPreviewResolutionMap_.empty() ||
@@ -589,7 +581,66 @@ DCamRetCode DStreamOperator::InitOutputConfigurations(const DHBase &dhBase, cons
         DHLOGE("Input ablity info is invalid.");
         return DEVICE_NOT_INIT;
     }
+    return SUCCESS;
+}
 
+DCamRetCode DStreamOperator::ParsePhotoFormats(Json::Value& rootValue)
+{
+    if (!rootValue.isMember("Photo") || !rootValue["Photo"].isMember("OutputFormat") ||
+        !rootValue["Photo"]["OutputFormat"].isArray() || rootValue["Photo"]["OutputFormat"].size() == 0 ||
+        rootValue["Photo"]["OutputFormat"].size() > JSON_ARRAY_MAX_SIZE) {
+        DHLOGE("Photo or photo output format error.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    std::vector<int> photoFormats;
+    uint32_t size = rootValue["Photo"]["OutputFormat"].size();
+    for (uint32_t i = 0; i < size; i++) {
+        if ((rootValue["Photo"]["OutputFormat"][i]).isInt()) {
+            photoFormats.push_back((rootValue["Photo"]["OutputFormat"][i]).asInt());
+        }
+    }
+    dcSupportedFormatMap_[DCSceneType::PHOTO] = photoFormats;
+    ExtractCameraAttr(rootValue, photoFormats, "Photo");
+    return SUCCESS;
+}
+
+DCamRetCode DStreamOperator::ParsePreviewFormats(Json::Value& rootValue)
+{
+    if (!rootValue.isMember("Preview") || !rootValue["Preview"].isMember("OutputFormat") ||
+        !rootValue["Preview"]["OutputFormat"].isArray() || rootValue["Preview"]["OutputFormat"].size() == 0 ||
+        rootValue["Preview"]["OutputFormat"].size() > JSON_ARRAY_MAX_SIZE) {
+        DHLOGE("Preview or preview output format error.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    std::vector<int> previewFormats;
+    uint32_t size = rootValue["Preview"]["OutputFormat"].size();
+    for (uint32_t i = 0; i < size; i++) {
+        if ((rootValue["Preview"]["OutputFormat"][i]).isInt()) {
+            previewFormats.push_back((rootValue["Preview"]["OutputFormat"][i]).asInt());
+        }
+    }
+    dcSupportedFormatMap_[DCSceneType::PREVIEW] = previewFormats;
+    ExtractCameraAttr(rootValue, previewFormats, "Preview");
+    return SUCCESS;
+}
+
+DCamRetCode DStreamOperator::ParseVideoFormats(Json::Value& rootValue)
+{
+    if (!rootValue.isMember("Video") || !rootValue["Video"].isMember("OutputFormat") ||
+        !rootValue["Video"]["OutputFormat"].isArray() || rootValue["Video"]["OutputFormat"].size() == 0 ||
+        rootValue["Video"]["OutputFormat"].size() > JSON_ARRAY_MAX_SIZE) {
+        DHLOGE("Video or video output format error.");
+        return DCamRetCode::INVALID_ARGUMENT;
+    }
+    std::vector<int> videoFormats;
+    uint32_t size = rootValue["Video"]["OutputFormat"].size();
+    for (uint32_t i = 0; i < size; i++) {
+        if ((rootValue["Video"]["OutputFormat"][i]).isInt()) {
+            videoFormats.push_back((rootValue["Video"]["OutputFormat"][i]).asInt());
+        }
+    }
+    dcSupportedFormatMap_[DCSceneType::VIDEO] = videoFormats;
+    ExtractCameraAttr(rootValue, videoFormats, "Video");
     return SUCCESS;
 }
 
