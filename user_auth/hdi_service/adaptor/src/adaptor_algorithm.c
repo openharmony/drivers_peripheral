@@ -31,7 +31,13 @@
 #define SHA256_DIGEST_SIZE 32
 #define SHA512_DIGEST_SIZE 64
 
-static KeyPair *CreateEd25519KeyPair(void)
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
+IAM_STATIC KeyPair *CreateEd25519KeyPair(void)
 {
     KeyPair *keyPair = Malloc(sizeof(KeyPair));
     if (keyPair == NULL) {
@@ -212,7 +218,7 @@ EXIT:
     return ret;
 }
 
-static int32_t IamHmac(const EVP_MD *alg, const Buffer *hmacKey, const Buffer *data, Buffer *hmac)
+IAM_STATIC int32_t IamHmac(const EVP_MD *alg, const Buffer *hmacKey, const Buffer *data, Buffer *hmac)
 {
     if (!IsBufferValid(hmacKey) || hmacKey->contentSize > INT_MAX ||
         !IsBufferValid(data) || !IsBufferValid(hmac) || hmac->maxSize > UINT_MAX) {
