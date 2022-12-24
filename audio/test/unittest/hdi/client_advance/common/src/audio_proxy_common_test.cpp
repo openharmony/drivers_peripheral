@@ -90,7 +90,7 @@ HWTEST_F(AudioProxyCommonTest, AdapterGetRemoteHandle_002, TestSize.Level1)
     const char *adapterName = "abc";
     struct AudioHwAdapter hwAdapter;
     struct AudioProxyManager proxyManager;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, AudioProxyAdapterGetRemoteHandle(&proxyManager, &hwAdapter, adapterName));
+    EXPECT_EQ(HDF_ERR_NOT_SUPPORT, AudioProxyAdapterGetRemoteHandle(&proxyManager, &hwAdapter, adapterName));
 }
 
 HWTEST_F(AudioProxyCommonTest, AudioProxyPreprocessRender_001, TestSize.Level1)
