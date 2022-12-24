@@ -44,7 +44,7 @@ int32_t CodecOMXCore::Init(const std::string &libName)
         HDF_LOGE("%{public}s:failed to dlopen %{public}s.", __func__, libName.c_str());
         return HDF_ERR_INVALID_PARAM;
     }
-    
+
     init_ = reinterpret_cast<InitFunc>(dlsym(libHandle_, "OMX_Init"));
     deInit_ = reinterpret_cast<DeinitFunc>(dlsym(libHandle_, "OMX_Deinit"));
     getHandle_ = reinterpret_cast<GetHandleFunc>(dlsym(libHandle_, "OMX_GetHandle"));
@@ -97,6 +97,7 @@ int32_t CodecOMXCore::ComponentNameEnum(std::string &name, uint32_t index)
     }
     return err;
 }
+
 int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::string> &roles)
 {
     if (getRoles_ == nullptr) {
