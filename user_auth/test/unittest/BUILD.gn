@@ -14,39 +14,12 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-ohos_unittest("UserAuthHdiTest") {
-  module_out_path = "user_auth_framework/user_auth_hdi"
-
-  include_dirs = [
-    "inc",
-    "//drivers/peripheral/user_auth/hdi_service/adaptor/inc",
-    "//drivers/peripheral/user_auth/hdi_service/coauth/inc",
-    "//drivers/peripheral/user_auth/hdi_service/common/inc",
-    "//drivers/peripheral/user_auth/hdi_service/database/inc",
-    "//drivers/peripheral/user_auth/hdi_service/idm/inc",
-    "//drivers/peripheral/user_auth/hdi_service/interface/inc",
-    "//drivers/peripheral/user_auth/hdi_service/key_mgr/inc",
-    "//drivers/peripheral/user_auth/hdi_service/user_auth/inc",
-  ]
-
-  sources = [
-    "src/signature_operation.cpp",
-    "src/user_auth_interface_service_test.cpp",
-  ]
-
-  deps = [ "//drivers/peripheral/user_auth/hdi_service:libuser_auth_interface_service_1.0" ]
-
-  configs = [
-    "//base/useriam/user_auth_framework/common:iam_utils_config",
-    "//base/useriam/user_auth_framework/common:iam_log_config",
-  ]
-  remove_configs = [ "//build/config/compiler:no_exceptions" ]
-
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_user_auth:libuser_auth_proxy_1.0",
-    "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
+group("driver_userauth_unittest") {
+  testonly = true
+  deps = [
+    "base_test:UserAuthBaseTest",
+    "co_auth:UserAuthCoAuthTest",
+    "database:UserAuthIdmCommonTest",
+    "service_test:UserAuthHdiTest",
   ]
 }
