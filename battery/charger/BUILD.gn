@@ -79,7 +79,7 @@ ohos_executable("charger") {
     "//base/update/updater/services/ui:libui",
     "//drivers/peripheral/display/hal:hdi_display_device",
     "//foundation/graphic/ui/ext/updater:libupdater_layout",
-    "//third_party/cJSON:cjson_static",
+    "//third_party/cJSON:cjson",
     "//third_party/jsoncpp:jsoncpp",
     "//third_party/libdrm:libdrm",
     "//third_party/libpng:libpng",

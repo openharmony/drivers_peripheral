@@ -75,7 +75,7 @@ ohos_systemtest("test_reboot") {
   deps = [
     "//base/update/updater/services/ui:libui",
     "//drivers/peripheral/display/hal:hdi_display_device",
-    "//third_party/cJSON:cjson_static",
+    "//third_party/cJSON:cjson",
     "//third_party/googletest:gtest_main",
     "//third_party/jsoncpp:jsoncpp",
   ]
