@@ -196,33 +196,6 @@ HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPortCapability_006, TestSize.Level1
 }
 
 /**
-* @tc.name  AudioAdapterSetPassthroughMode_001
-* @tc.desc  test AdapterSetPassthroughMode interface, return 0 if PortType is PORT_OUT.
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioHdiAdapterTest, AudioAdapterSetPassthroughMode_001, TestSize.Level1)
-{
-    int32_t ret = HDF_FAILURE;
-    struct AudioPort* audioPort = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-
-    ASSERT_NE(nullptr, manager);
-    AudioPortPassthroughMode modeLpcm = PORT_PASSTHROUGH_AUTO;
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, adapter);
-    ret = adapter->InitAllPorts(adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = adapter->SetPassthroughMode(adapter, audioPort, PORT_PASSTHROUGH_LPCM);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    ret = adapter->GetPassthroughMode(adapter, audioPort, &modeLpcm);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    EXPECT_NE(PORT_PASSTHROUGH_LPCM, modeLpcm);
-
-    manager->UnloadAdapter(manager, adapter);
-}
-
-/**
 * @tc.name  AudioAdapterSetPassthroughMode_002
 * @tc.desc  test AdapterSetPassthroughMode interface, return -1 if PortType is PORT_IN.
 * @tc.type: FUNC
@@ -280,11 +253,6 @@ HWTEST_F(AudioHdiAdapterTest, AudioAdapterSetPassthroughMode_004, TestSize.Level
     struct AudioAdapter *adapter = nullptr;
 
     ASSERT_NE(nullptr, manager);
-    struct AudioPort audioPortError = {
-        .dir = PORT_OUT,
-        .portId = 8,
-        .portName = "AIP1",
-    };
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
@@ -292,60 +260,6 @@ HWTEST_F(AudioHdiAdapterTest, AudioAdapterSetPassthroughMode_004, TestSize.Level
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = adapter->SetPassthroughMode(adapter, audioPortNull, mode);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
-
-    ret = adapter->SetPassthroughMode(adapter, &audioPortError, mode);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    manager->UnloadAdapter(manager, adapter);
-}
-
-/**
-* @tc.name  AudioAdapterSetPassthroughMode_005
-* @tc.desc  test AdapterSetPassthroughMode interface, return -1 if the not supported mode.
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioHdiAdapterTest, AudioAdapterSetPassthroughMode_005, TestSize.Level1)
-{
-    int32_t ret = HDF_FAILURE;
-    struct AudioPort* audioPort = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-
-    ASSERT_NE(nullptr, manager);
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, adapter);
-    ret = adapter->InitAllPorts(adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = adapter->SetPassthroughMode(adapter, audioPort, PORT_PASSTHROUGH_RAW);
-    EXPECT_NE(HDF_FAILURE, ret);
-
-    manager->UnloadAdapter(manager, adapter);
-}
-
-/**
-* @tc.name  AudioAdapterGetPassthroughMode_001
-* @tc.desc  test AdapterGetPassthroughMode interface, return 0 if is get successfully.
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPassthroughMode_001, TestSize.Level1)
-{
-    int32_t ret = HDF_FAILURE;
-    struct AudioPort* audioPort = nullptr;
-    AudioPortPassthroughMode mode = PORT_PASSTHROUGH_AUTO;
-    struct AudioAdapter *adapter = nullptr;
-
-    ASSERT_NE(nullptr, manager);
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, adapter);
-    ret = adapter->InitAllPorts(adapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = adapter->SetPassthroughMode(adapter, audioPort, PORT_PASSTHROUGH_LPCM);
-    EXPECT_NE(HDF_SUCCESS, ret);
-
-    ret = adapter->GetPassthroughMode(adapter, audioPort, &mode);
-    EXPECT_NE(HDF_SUCCESS, ret);
-    EXPECT_NE(PORT_PASSTHROUGH_LPCM, mode);
 
     manager->UnloadAdapter(manager, adapter);
 }
@@ -389,11 +303,6 @@ HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPassthroughMode_003, TestSize.Level
     struct AudioAdapter *adapter = nullptr;
 
     ASSERT_NE(nullptr, manager);
-    struct AudioPort audioPortError = {
-        .dir = PORT_OUT,
-        .portId = 8,
-        .portName = "AIP",
-    };
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ASSERT_NE(nullptr, adapter);
@@ -402,8 +311,6 @@ HWTEST_F(AudioHdiAdapterTest, AudioAdapterGetPassthroughMode_003, TestSize.Level
     ret = adapter->GetPassthroughMode(adapter, audioPortNull, &mode);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 
-    ret = adapter->GetPassthroughMode(adapter, &audioPortError, &mode);
-    EXPECT_EQ(HDF_FAILURE, ret);
     manager->UnloadAdapter(manager, adapter);
 }
 
