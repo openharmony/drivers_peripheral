@@ -31,7 +31,7 @@ namespace Thermal {
 namespace V1_0 {
 namespace {
 const std::string HDI_XML_PATH = HDF_ETC_DIR "/thermal_config/hdf/thermal_hdi_config.xml";
-const std::string HDI_CUST_XML_PATH = HDF_ETC_DIR "/thermal_config/cust/thermal_hdi_config.xml";
+const std::string HDI_CUST_XML_PATH = "/chip_prod/etc/thermal_config/cust/thermal_hdi_config.xml";
 bool g_isHdiStart = false;
 }
 static sptr<IThermalCallback> theramalCb_ = nullptr;
