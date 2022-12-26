@@ -24,6 +24,8 @@
 #define AUDIO_HDF_SBUF_IPC 1
 #define PROXY_VOLUME_CHANGE 100
 
+#define SUPPORT_PORT_NUM_MAX 10
+
 struct HdfSBuf *AudioProxyObtainHdfSBuf(void)
 {
     enum HdfSbufType bufType;
@@ -641,6 +643,12 @@ static bool AudioPortBlockUnmarshalling(struct HdfSBuf *data, struct AudioPort *
         return false;
     }
 
+    dataBlock->portName = strdup(HdfSbufReadString(data));
+    if (dataBlock->portName == NULL) {
+        HDF_LOGE("%{public}s: read portName failed!", __func__);
+        return false;
+    }
+
     return true;
 }
 
@@ -659,24 +667,26 @@ bool AudioAdapterDescriptorBlockUnmarshalling(struct HdfSBuf *data, struct Audio
     dataBlock->adapterName = strdup(HdfSbufReadString(data));
     if (dataBlock->adapterName == NULL) {
         HDF_LOGE("%{public}s: read adapterName failed!", __func__);
-        return HDF_FAILURE;
+        return false;
     }
 
     if (!HdfSbufReadUint32(data, &dataBlock->portNum)) {
         HDF_LOGE("%{public}s: read portsCpLen failed!", __func__);
-        return HDF_FAILURE;
+        return false;
     }
 
-    if (dataBlock->portNum > 0) {
-        dataBlock->ports = (struct AudioPort*)OsalMemCalloc(sizeof(struct AudioPort) * dataBlock->portNum);
-        if (dataBlock->ports == NULL) {
+    if (dataBlock->portNum == 0 || dataBlock->portNum > SUPPORT_PORT_NUM_MAX) {
+        HDF_LOGE("%{public}s: error portNum is %{public}u", __func__, dataBlock->portNum);
+        return false;
+    }
+    dataBlock->ports = (struct AudioPort*)OsalMemCalloc(sizeof(struct AudioPort) * dataBlock->portNum);
+    if (dataBlock->ports == NULL) {
+        goto ERRORS;
+    }
+    for (uint32_t i = 0; i < dataBlock->portNum; i++) {
+        if (!AudioPortBlockUnmarshalling(data, &(dataBlock->ports[i]))) {
+            HDF_LOGE("%{public}s: read &portsCp[i] failed!", __func__);
             goto ERRORS;
-        }
-        for (uint32_t i = 0; i < dataBlock->portNum; i++) {
-            if (!AudioPortBlockUnmarshalling(data, &(dataBlock->ports[i]))) {
-                HDF_LOGE("%{public}s: read &portsCp[i] failed!", __func__);
-                goto ERRORS;
-            }
         }
     }
     return true;
@@ -718,42 +728,42 @@ static bool AudioSubPortCapabilityBlockUnmarshalling(struct HdfSBuf *data, struc
 {
     if (data == NULL || dataBlock == NULL) {
         HDF_LOGE("%{public}s: data or dataBlock is NULL!", __func__);
-        return HDF_FAILURE;
+        return false;
     }
 
     if (!HdfSbufReadUint32(data, &dataBlock->subPortsNum)) {
-        HDF_LOGE("%{public}s: read subPortsCpLen failed!", __func__);
-        return HDF_FAILURE;
+        HDF_LOGE("%{public}s: read subPortsNum failed!", __func__);
+        return false;
     }
 
     if (dataBlock->subPortsNum <= 0) {
-        HDF_LOGE("%{public}s: read subPortsCpLen failed!", __func__);
-        return HDF_FAILURE;
+        HDF_LOGE("%{public}s: error subPortsNum is %{public}d", __func__, dataBlock->subPortsNum);
+        return false;
     }
 
     dataBlock->subPorts = (struct AudioSubPortCapability*)OsalMemCalloc(
         sizeof(struct AudioSubPortCapability) * dataBlock->subPortsNum);
     if (dataBlock->subPorts == NULL) {
-        HDF_LOGE("%{public}s: read subPortsCpLen failed!", __func__);
-        return HDF_FAILURE;
+        HDF_LOGE("%{public}s: dataBlock->subPorts malloc failed!", __func__);
+        return false;
     }
 
     struct AudioSubPortCapability *subPorts = dataBlock->subPorts;
     for (uint32_t i = 0; i < dataBlock->subPortsNum; i++) {
         if (!HdfSbufReadUint32(data, &subPorts[i].portId)) {
-            HDF_LOGE("%{public}s: read dataBlock->portId failed!", __func__);
-            return HDF_FAILURE;
+            HDF_LOGE("%{public}s: read dataBlock[%{public}u]->portId failed!", __func__, i);
+            return false;
         }
 
         subPorts[i].desc = HdfSbufReadString(data);
         if (subPorts[i].desc == NULL) {
-            HDF_LOGE("%{public}s: subPorts[%{public}d].desc is NULL!", __func__, i);
-            return HDF_FAILURE;
+            HDF_LOGE("%{public}s: subPorts[%{public}u].desc is NULL!", __func__, i);
+            return false;
         }
 
         if (!HdfSbufReadInt32(data, (int32_t*)&subPorts[i].mask)) {
-            HDF_LOGE("%{public}s: read dataBlock->mask failed!", __func__);
-            return HDF_FAILURE;
+            HDF_LOGE("%{public}s: read dataBlock[%{public}u]->mask failed!", __func__, i);
+            return false;
         }
     }
 

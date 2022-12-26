@@ -561,7 +561,10 @@ static int32_t AudioProxyAdapterWritePortCapability(const struct AudioHwAdapter 
         AUDIO_FUNC_LOGE("hwAdapter->adapterDescriptor.adapterName is null!");
         return HDF_FAILURE;
     }
-
+    if (port == NULL || port->portName == NULL) {
+        AUDIO_FUNC_LOGE("port or port->portName is null!");
+        return HDF_FAILURE;
+    }
     if (!HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
         AUDIO_FUNC_LOGE("HdfRemoteServiceWriteInterfaceToken failed!");
         return HDF_FAILURE;
@@ -581,6 +584,12 @@ static int32_t AudioProxyAdapterWritePortCapability(const struct AudioHwAdapter 
         AUDIO_FUNC_LOGE("HdfSbufWriteUint32 port->portId failed!");
         return HDF_FAILURE;
     }
+
+    if (!HdfSbufWriteString(data, port->portName)) {
+        AUDIO_FUNC_LOGE("HdfSbufWriteUint32 port->portName failed!");
+        return HDF_FAILURE;
+    }
+
     return HDF_SUCCESS;
 }
 
@@ -639,14 +648,14 @@ int32_t AudioProxyAdapterGetPortCapability(struct AudioAdapter *adapter,
     return HDF_SUCCESS;
 ERROR:
     AudioProxyBufReplyRecycle(data, reply);
-    return ret;
+    return HDF_FAILURE;
 }
 
 static int32_t AudioProxyAdapterSetAndGetPassthroughModeSBuf(struct HdfSBuf *data,
     const struct HdfSBuf *reply, const struct AudioPort *port)
 {
     (void)reply;
-    if (data == NULL || port == NULL) {
+    if (data == NULL || port == NULL || port->portName == NULL) {
         return HDF_FAILURE;
     }
     uint32_t tempDir = port->dir;
@@ -656,6 +665,11 @@ static int32_t AudioProxyAdapterSetAndGetPassthroughModeSBuf(struct HdfSBuf *dat
     if (!HdfSbufWriteUint32(data, port->portId)) {
         return HDF_FAILURE;
     }
+    if (!HdfSbufWriteString(data, port->portName)) {
+        AUDIO_FUNC_LOGE("HdfSbufWriteString error");
+        return HDF_FAILURE;
+    }
+
     return HDF_SUCCESS;
 }
 
