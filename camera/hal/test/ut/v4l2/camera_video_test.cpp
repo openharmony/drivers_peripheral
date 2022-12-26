@@ -88,9 +88,9 @@ void CameraVideoTest::CreateStream(int streamId, StreamIntent intent)
     CamRetCode result = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos_);
     EXPECT_EQ(false, result != HDI::Camera::V1_0::NO_ERROR);
     if (result == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log]CreateStreams success." << std::endl;
+        CAMERA_LOGI("CreateStreams success.");
     } else {
-        std::cout << "==========[test log]CreateStreams fail, result = " << result << std::endl;
+        CAMERA_LOGE("CreateStreams fail, result = %{public}d", result);
     }
 }
 
@@ -99,9 +99,9 @@ void CameraVideoTest::CommitStream()
     CamRetCode result = (CamRetCode)display_->streamOperator->CommitStreams(NORMAL, display_->ability_);
     EXPECT_EQ(false, result != HDI::Camera::V1_0::NO_ERROR);
     if (result == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log]CommitStreams success." << std::endl;
+        CAMERA_LOGI("CommitStreams success.");
     } else {
-        std::cout << "==========[test log]CommitStreams fail, result = " << result << std::endl;
+        CAMERA_LOGE("CommitStreams fail, result = %{public}d", result);
     }
 }
 void CameraVideoTest::StartCapture(
@@ -119,25 +119,25 @@ void CameraVideoTest::StartCapture(
 
     EXPECT_EQ(true, result == HDI::Camera::V1_0::NO_ERROR);
     if (result == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log]check Capture: Capture success, " << captureId << std::endl;
+        CAMERA_LOGI("check Capture: Capture success, captureId = %{public}d", captureId);
     } else {
-        std::cout << "==========[test log]check Capture: Capture fail, result = " << result << captureId << std::endl;
+        CAMERA_LOGE("check Capture: Capture fail, captureId = %{public}d, result = %{public}d", captureId, result);
     }
 
     if (captureId == display_->CAPTURE_ID_PREVIEW) {
         streamCustomerPreview_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
-            std::cout << "==========[test log]preview size= " << size << std::endl;
+            CAMERA_LOGI("preview size = %{public}u", size);
         });
     } else if (captureId == display_->CAPTURE_ID_CAPTURE) {
         streamCustomerSnapshot_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
-            std::cout << "==========[test log]snapshot size= " << size << std::endl;
+            CAMERA_LOGI("snapshot size = %{public}u", size);
         });
     } else if (captureId == display_->CAPTURE_ID_VIDEO) {
         streamCustomerVideo_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
-            std::cout << "==========[test log]videosize= " << size << std::endl;
+            CAMERA_LOGI("video size = %{public}u", size);
         });
     } else {
-        std::cout << "==========[test log]StartCapture ignore command " << std::endl;
+        CAMERA_LOGE("StartCapture ignore command");
     }
 }
 
@@ -156,7 +156,7 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
                 streamCustomerVideo_->ReceiveFrameOff();
                 sleep(TIME_FOR_RECEIVE_FRAME_OFF);
             } else {
-                std::cout << "==========[test log]StopStream ignore command. " << std::endl;
+                CAMERA_LOGE("StopStream ignore command.");
             }
         }
 
@@ -165,10 +165,10 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
             sleep(TIME_FOR_WAIT_IMAGE_PREVIEW);
             EXPECT_EQ(true, result == HDI::Camera::V1_0::NO_ERROR);
             if (result == HDI::Camera::V1_0::NO_ERROR) {
-                std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
+                CAMERA_LOGI("check Capture: CancelCapture success, captureId = %{public}d", captureId);
             } else {
-                std::cout << "==========[test log]check Capture: CancelCapture fail, result = " << result;
-                std::cout << "captureId = " << captureId << std::endl;
+                CAMERA_LOGE("check Capture: CancelCapture fail, captureId = %{public}d, result = %{public}d",
+                    captureId, result);
             }
         }
     }
@@ -183,7 +183,7 @@ void CameraVideoTest::StopStream(std::vector<int> &captureIds, std::vector<int> 
   */
 HWTEST_F(CameraVideoTest, camera_video_001, TestSize.Level1)
 {
-    std::cout << "==========[test log] 1 Preview + video, commit together, success." << std::endl;
+    CAMERA_LOGD("Preview + video, commit together, success.");
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
@@ -207,7 +207,7 @@ HWTEST_F(CameraVideoTest, camera_video_001, TestSize.Level1)
   */
 HWTEST_F(CameraVideoTest, camera_video_002, TestSize.Level1)
 {
-    std::cout << "==========[test log] Preview + video, commit together, set 3A, success." << std::endl;
+    CAMERA_LOGD("Preview + video, commit together, set 3A, success.");
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
 
@@ -232,9 +232,9 @@ HWTEST_F(CameraVideoTest, camera_video_002, TestSize.Level1)
     MetadataUtils::ConvertMetadataToVec(meta, setting);
     display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] UpdateSettings success, for 5s." << std::endl;
+        CAMERA_LOGI("UpdateSettings success, for 5s.");
     } else {
-        std::cout << "==========[test log] UpdateSettings fail, rc = " << display_->rc << std::endl;
+        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", display_->rc);
     }
     sleep(3);
 
@@ -253,8 +253,7 @@ HWTEST_F(CameraVideoTest, camera_video_002, TestSize.Level1)
   */
 HWTEST_F(CameraVideoTest, camera_video_003, TestSize.Level1)
 {
-    std::cout << "==========[test log] Preview + video, commit together, then close device,";
-    std::cout << "and preview + video again." << std::endl;
+    CAMERA_LOGD("Preview + video, commit together, then close device, and preview + video again.");
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
@@ -272,7 +271,7 @@ HWTEST_F(CameraVideoTest, camera_video_003, TestSize.Level1)
     display_->Close();
     // Turn on the device
     display_->Init();
-    std::cout << "==========[test log] The 2nd time." << std::endl;
+    CAMERA_LOGD("The 2nd time.");
 
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
@@ -297,8 +296,7 @@ HWTEST_F(CameraVideoTest, camera_video_003, TestSize.Level1)
   */
 HWTEST_F(CameraVideoTest, camera_video_004, TestSize.Level1)
 {
-    std::cout << "==========[test log] Preview + video, commit together, then close device,";
-    std::cout << "and preview + capture." << std::endl;
+    CAMERA_LOGD("Preview + video, commit together, then close device, and preview + capture.");
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
@@ -314,7 +312,7 @@ HWTEST_F(CameraVideoTest, camera_video_004, TestSize.Level1)
 
     // Turn off the device
     display_->Close();
-    std::cout << "==========[test log] cameraDevice->Close" << std::endl;
+    CAMERA_LOGD("cameraDevice->Close");
     // Turn on the device
     display_->Init();
 
@@ -341,7 +339,7 @@ HWTEST_F(CameraVideoTest, camera_video_004, TestSize.Level1)
   */
 HWTEST_F(CameraVideoTest, camera_video_005, TestSize.Level1)
 {
-    std::cout << "==========[test log] 1 Preview + video, commit together, success." << std::endl;
+    CAMERA_LOGD("Preview + video, commit together, success.");
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // start stream
@@ -365,7 +363,7 @@ HWTEST_F(CameraVideoTest, camera_video_005, TestSize.Level1)
   */
 HWTEST_F(CameraVideoTest, camera_video_010, TestSize.Level2)
 {
-    std::cout << "==========[test log] Video start&stop, for 5 times, success." << std::endl;
+    CAMERA_LOGD("Video start&stop, for 5 times, success.");
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     for (int i = 0; i < 5; i++) {
@@ -391,7 +389,7 @@ HWTEST_F(CameraVideoTest, camera_video_010, TestSize.Level2)
   */
 HWTEST_F(CameraVideoTest, camera_video_011, TestSize.Level2)
 {
-    std::cout << "==========[test log] Video start&stop, for 5 times, success." << std::endl;
+    CAMERA_LOGD("Video start&stop, for 5 times, success.");
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     for (int i = 0; i < 5; i++) {
@@ -420,7 +418,7 @@ HWTEST_F(CameraVideoTest, camera_video_011, TestSize.Level2)
   */
 HWTEST_F(CameraVideoTest, camera_video_020, TestSize.Level2)
 {
-    std::cout << "==========[test log] Video mode, preview, success." << std::endl;
+    CAMERA_LOGD("Video mode, preview, success.");
     // Create and get streamOperator information
     display_->AchieveStreamOperator();
     // Create data stream
@@ -442,34 +440,32 @@ HWTEST_F(CameraVideoTest, camera_video_020, TestSize.Level2)
     display_->rc = (CamRetCode)display_->streamOperator->CancelCapture(display_->CAPTURE_ID_VIDEO);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] CancelCapture success, captureId = ";
-        std::cout << display_->CAPTURE_ID_VIDEO << std::endl;
+        CAMERA_LOGI("CancelCapture success, captureId = %{public}d", display_->CAPTURE_ID_VIDEO);
     } else {
-        std::cout << "==========[test log] CancelCapture fail, rc = " << display_->rc << std::endl;
+        CAMERA_LOGE("CancelCapture fail, rc = %{public}d", display_->rc);
     }
     display_->rc = (CamRetCode)display_->streamOperator->CancelCapture(display_->CAPTURE_ID_PREVIEW);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] CancelCapture success, captureId = ";
-        std::cout << display_->CAPTURE_ID_PREVIEW << std::endl;
+        CAMERA_LOGI("CancelCapture success, captureId = %{public}d", display_->CAPTURE_ID_PREVIEW);
     } else {
-        std::cout << "==========[test log] CancelCapture fail, rc = " << display_->rc << std::endl;
+        CAMERA_LOGE("CancelCapture fail, rc = %{public}d", display_->rc);
     }
     display_->rc = (CamRetCode)display_->streamOperator->ReleaseStreams(
         {display_->STREAM_ID_VIDEO});
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] ReleaseStreams success." << std::endl;
+        CAMERA_LOGI("ReleaseStreams success.");
     } else {
-        std::cout << "==========[test log] ReleaseStreams fail, rc = " << display_->rc << std::endl;
+        CAMERA_LOGE("ReleaseStreams fail, rc = %{public}d", display_->rc);
     }
     display_->rc = (CamRetCode)display_->streamOperator->ReleaseStreams(
         {display_->STREAM_ID_PREVIEW});
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] ReleaseStreams success." << std::endl;
+        CAMERA_LOGI("ReleaseStreams success.");
     } else {
-        std::cout << "==========[test log] ReleaseStreams fail, rc = " << display_->rc << std::endl;
+        CAMERA_LOGE("ReleaseStreams fail, rc = %{public}d", display_->rc);
     }
 }
 
@@ -482,7 +478,7 @@ HWTEST_F(CameraVideoTest, camera_video_020, TestSize.Level2)
   */
 HWTEST_F(CameraVideoTest, camera_video_021, TestSize.Level1)
 {
-    std::cout << "==========[test log] Video mode, preview, set 3A, success." << std::endl;
+    CAMERA_LOGD("Video mode, preview, set 3A, success.");
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     display_->AchieveStreamOperator();
 
@@ -506,9 +502,9 @@ HWTEST_F(CameraVideoTest, camera_video_021, TestSize.Level1)
     MetadataUtils::ConvertMetadataToVec(meta, setting);
     display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] UpdateSettings success, for 5s." << std::endl;
+        CAMERA_LOGI("UpdateSettings success, for 5s.");
     } else {
-        std::cout << "==========[test log] UpdateSettings fail, rc = " << display_->rc << std::endl;
+        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", display_->rc);
     }
     sleep(3);
 
@@ -527,8 +523,7 @@ HWTEST_F(CameraVideoTest, camera_video_021, TestSize.Level1)
   */
 HWTEST_F(CameraVideoTest, camera_video_030, TestSize.Level2)
 {
-    std::cout << "==========[test log] Video mode without preview, system not support,";
-    std::cout << "expected return fail." << std::endl;
+    CAMERA_LOGD("Video mode without preview, system not support, expected return fail.");
 
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     display_->AchieveStreamOperator();
@@ -537,7 +532,7 @@ HWTEST_F(CameraVideoTest, camera_video_030, TestSize.Level2)
     OHOS::sptr<OHOS::IBufferProducer> producer = streamCustomer->CreateProducer();
     producer->SetQueueSize(8); // 8:set bufferQueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferQueue size
-        std::cout << "~~~~~~~" << std::endl;
+        CAMERA_LOGE("~~~~~~~");
     }
 
     std::vector<StreamInfo> streamInfos;
@@ -553,18 +548,17 @@ HWTEST_F(CameraVideoTest, camera_video_030, TestSize.Level2)
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(false, display_->rc == OHOS::Camera::METHOD_NOT_SUPPORTED);
     if (display_->rc == OHOS::Camera::METHOD_NOT_SUPPORTED) {
-        std::cout << "==========[test log] CreateStreams METHOD_NOT_SUPPORTED, streamId = ";
-        std::cout << display_->STREAM_ID_VIDEO <<", intent = VIDEO" << std::endl;
+        CAMERA_LOGI("CreateStreams METHOD_NOT_SUPPORTED, streamId = %{public}d", display_->STREAM_ID_VIDEO);
     } else {
-        std::cout << "==========[test log] CreateStreams fail, rc = " << display_->rc << std::endl;
+        CAMERA_LOGE("CreateStreams fail, rc = %{public}d", display_->rc);
     }
     std::vector<uint8_t> modeSetting = {};
     display_->rc = (CamRetCode)display_->streamOperator->CommitStreams(NORMAL, modeSetting);
     EXPECT_EQ(false, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] CommitStreams success." << std::endl;
+        CAMERA_LOGI("CommitStreams success.");
     } else {
-        std::cout << "==========[test log] CommitStreams fail, rc = ." << display_->rc << std::endl;
+        CAMERA_LOGE("CommitStreams fail, rc = %{public}d", display_->rc);
     }
 }
 

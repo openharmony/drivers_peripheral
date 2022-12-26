@@ -34,22 +34,22 @@ public:
 
 void DispatcherTest::SetUpTestCase(void)
 {
-    std::cout << "Camera::DispatcherTest SetUpTestCase" << std::endl;
+    CAMERA_LOGD("Camera::DispatcherTest SetUpTestCase");
 }
 
 void DispatcherTest::TearDownTestCase(void)
 {
-    std::cout << "Camera::DispatcherTest TearDownTestCase" << std::endl;
+    CAMERA_LOGD("Camera::DispatcherTest TearDownTestCase");
 }
 
 void DispatcherTest::SetUp(void)
 {
-    std::cout << "Camera::DispatcherTest SetUp" << std::endl;
+    CAMERA_LOGD("Camera::DispatcherTest SetUp");
 }
 
 void DispatcherTest::TearDown(void)
 {
-    std::cout << "Camera::DispatcherTest TearDown.." << std::endl;
+    CAMERA_LOGD("Camera::DispatcherTest TearDown..");
 }
 
 HWTEST_F(DispatcherTest, NormalTest, TestSize.Level0)

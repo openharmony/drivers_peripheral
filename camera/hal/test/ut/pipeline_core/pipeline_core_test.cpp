@@ -37,22 +37,22 @@ public:
 
 void PipelineCoreTest::SetUpTestCase(void)
 {
-    std::cout << "Camera::PipelineCore SetUpTestCase" << std::endl;
+    CAMERA_LOGD("Camera::PipelineCore SetUpTestCase");
 }
 
 void PipelineCoreTest::TearDownTestCase(void)
 {
-    std::cout << "Camera::PipelineCore TearDownTestCase" << std::endl;
+    CAMERA_LOGD("Camera::PipelineCore TearDownTestCase");
 }
 
 void PipelineCoreTest::SetUp(void)
 {
-    std::cout << "Camera::PipelineCore SetUp" << std::endl;
+    CAMERA_LOGD("Camera::PipelineCore SetUp");
 }
 
 void PipelineCoreTest::TearDown(void)
 {
-    std::cout << "Camera::PipelineCore TearDown.." << std::endl;
+    CAMERA_LOGD("Camera::PipelineCore TearDown..");
 }
 
 HWTEST_F(PipelineCoreTest, PipelineCore_NormalPreviewTest, TestSize.Level0)

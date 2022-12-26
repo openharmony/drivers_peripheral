@@ -42,12 +42,6 @@ public:
     void Prepare(ResultCallbackMode mode, std::vector<MetaType> &results);
     void UpdateSettings(std::shared_ptr<CameraSetting> &metaData);
     void StartPreviewVideoCapture();
-    void PrintCameraMetadata(const std::vector<uint8_t> &settings);
-    void PrintU8Metadata(int32_t key, common_metadata_header_t *data);
-    void PrintI32Metadata(int32_t key, common_metadata_header_t *data);
-    void PrintI64Metadata(int32_t key, common_metadata_header_t *data);
-    void PrintFloatMetadata(int32_t key, common_metadata_header_t *data);
-    void PrintI32ArrayMetadata(int32_t key, common_metadata_header_t *data);
 
 public:
     CamRetCode result_;
