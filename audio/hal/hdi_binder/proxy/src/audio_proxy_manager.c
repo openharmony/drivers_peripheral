@@ -32,6 +32,8 @@
 #define CONFIG_FRAME_COUNT     ((8000 * 2 * 1 + (CONFIG_FRAME_SIZE - 1)) / CONFIG_FRAME_SIZE)
 #define AUDIO_MAGIC            (0xAAAAAAAA)
 
+#define MAX_AUDIO_ADAPTER_NUM_SERVER 8
+
 static bool audioProxyAdapterAddrMgrFlag = false;
 static struct AudioAdapterDescriptor *g_localAudioProxyAdapterAddrOut = NULL; // add for Fuzz
 int g_localAudioProxyAdapterNum = 0; // add for Fuzz
@@ -65,6 +67,11 @@ static int32_t AudioProxySendGetAllAdapter(struct HdfRemoteService *remoteHandle
 
     if (!HdfSbufReadUint32(reply, size)) {
         AUDIO_FUNC_LOGE("read descs size failed!");
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if (*size == 0 || *size > MAX_AUDIO_ADAPTER_NUM_SERVER) {
+        AUDIO_FUNC_LOGE("error desc size is %{public}u!", *size);
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
