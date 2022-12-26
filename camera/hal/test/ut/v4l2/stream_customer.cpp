@@ -75,7 +75,7 @@ OHOS::Camera::RetCode StreamCustomer::ReceiveFrameOn(
             return OHOS::Camera::RC_ERROR;
         }
     } else {
-        CAMERA_LOGD("test:ReceiveFrameOn loop thread is running\n");
+        CAMERA_LOGI("test:ReceiveFrameOn loop thread is running\n");
     }
     CAMERA_LOGD("test:ReceiveFrameOn exit");
 

@@ -150,7 +150,6 @@ void TestDisplay::PrintFaceDetectInfo(const unsigned char *bufStart, const uint3
         return;
     }
     uint32_t rectCount = entry.count;
-    std::cout << "==========[test log] PrintFaceDetectInfo rectCount=" << rectCount << std::endl;
     CAMERA_LOGI("demo test: rectCount=%{public}d", rectCount);
     std::vector<std::vector<float>> faceRectangles;
     std::vector<float> faceRectangle;
@@ -160,8 +159,7 @@ void TestDisplay::PrintFaceDetectInfo(const unsigned char *bufStart, const uint3
     faceRectangles.push_back(faceRectangle);
     for (std::vector<std::vector<float>>::iterator it = faceRectangles.begin(); it < faceRectangles.end(); it++) {
         for (std::vector<float>::iterator innerIt = (*it).begin(); innerIt < (*it).end(); innerIt++) {
-            std::cout << "==========[test log] PrintFaceDetectInfo innerIt : " << *innerIt << std::endl;
-            CAMERA_LOGI("demo test: innerIt : %{public}f \n", *innerIt);
+            CAMERA_LOGI("demo test: innerIt : %{public}f", *innerIt);
         }
     }
 
@@ -171,15 +169,13 @@ void TestDisplay::PrintFaceDetectInfo(const unsigned char *bufStart, const uint3
         return;
     }
     uint32_t idCount = entry.count;
-    std::cout << "==========[test log] PrintFaceDetectInfo idCount=" << idCount << std::endl;
     CAMERA_LOGI("demo test: idCount=%{public}d", idCount);
     std::vector<int32_t> faceIds;
     for (int i = 0; i < idCount; i++) {
         faceIds.push_back(*(entry.data.i32 + i));
     }
     for (auto it = faceIds.begin(); it != faceIds.end(); it++) {
-        std::cout << "==========[test log] PrintFaceDetectInfo faceIds : " << *it << std::endl;
-        CAMERA_LOGI("demo test: faceIds : %{public}d\n", *it);
+        CAMERA_LOGI("demo test: faceIds : %{public}d", *it);
     }
 }
 
@@ -376,25 +372,25 @@ void TestDisplay::Init()
         deviceManager->Init();
         initFlag = 1;
     }
-    std::cout << "==========[test log] TestDisplay::Init()." << std::endl;
+    CAMERA_LOGD("TestDisplay::Init().");
     if (cameraHost == nullptr) {
         constexpr const char *DEMO_SERVICE_NAME = "camera_service";
         cameraHost = ICameraHost::Get(DEMO_SERVICE_NAME, false);
-        std::cout << "==========[test log] Camera::CameraHost::CreateCameraHost();" << std::endl;
+        CAMERA_LOGI("Camera::CameraHost::CreateCameraHost()");
         if (cameraHost == nullptr) {
-            std::cout << "==========[test log] CreateCameraHost failed." << std::endl;
+            CAMERA_LOGE("CreateCameraHost failed.");
             return;
         }
-        std::cout << "==========[test log] CreateCameraHost success." << std::endl;
+        CAMERA_LOGI("CreateCameraHost success.");
     }
 
     OHOS::sptr<DemoCameraHostCallback> cameraHostCallback = new DemoCameraHostCallback();
     OHOS::Camera::RetCode ret = cameraHost->SetCallback(cameraHostCallback);
     if (ret != HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] SetCallback failed." << std::endl;
+        CAMERA_LOGE("SetCallback failed.");
         return;
     } else {
-        std::cout << "==========[test log] SetCallback success." << std::endl;
+        CAMERA_LOGI("SetCallback success.");
     }
 
     if (cameraDevice == nullptr) {
@@ -404,10 +400,10 @@ void TestDisplay::Init()
         const OHOS::sptr<DemoCameraDeviceCallback> callback = new DemoCameraDeviceCallback();
         rc = (CamRetCode)cameraHost->OpenCamera(cameraIds.front(), callback, cameraDevice);
         if (rc != HDI::Camera::V1_0::NO_ERROR || cameraDevice == nullptr) {
-            std::cout << "==========[test log] OpenCamera failed, rc = " << rc << std::endl;
+            CAMERA_LOGE("OpenCamera failed, rc = %{public}d", rc);
             return;
         }
-        std::cout << "==========[test log]  OpenCamera success." << std::endl;
+        CAMERA_LOGI("OpenCamera success.");
     }
 }
 
@@ -440,7 +436,7 @@ void TestDisplay::UsbInit()
 
 void TestDisplay::Close()
 {
-    std::cout << "==========[test log] cameraDevice->Close()." << std::endl;
+    CAMERA_LOGD("cameraDevice->Close().");
     if (cameraDevice != nullptr) {
         cameraDevice->Close();
         cameraDevice = nullptr;
@@ -475,9 +471,9 @@ void TestDisplay::AchieveStreamOperator()
     rc = (CamRetCode)cameraDevice->GetStreamOperator(streamOperatorCallback_, streamOperator);
     EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
     if (rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] AchieveStreamOperator success." << std::endl;
+        CAMERA_LOGI("AchieveStreamOperator success.");
     } else {
-        std::cout << "==========[test log] AchieveStreamOperator fail, rc = " << rc << std::endl;
+        CAMERA_LOGE("AchieveStreamOperator fail, rc = %{public}d", rc);
     }
 }
 
@@ -497,7 +493,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoPre.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoPre.bufferQueue_ = new BufferProducerSequenceable(streamCustomerPreview_->CreateProducer());
             streamInfoPre.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
-            std::cout << "==========[test log]preview success." << std::endl;
+            CAMERA_LOGD("preview success.");
             std::vector<StreamInfo>().swap(streamInfos);
             streamInfos.push_back(streamInfoPre);
         } else if (intent == VIDEO) {
@@ -514,7 +510,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoVideo.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoVideo.bufferQueue_ = new BufferProducerSequenceable(streamCustomerVideo_->CreateProducer());
             streamInfoVideo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
-            std::cout << "==========[test log]video success." << std::endl;
+            CAMERA_LOGD("video success.");
             std::vector<StreamInfo>().swap(streamInfos);
             streamInfos.push_back(streamInfoVideo);
         } else if (intent == STILL_CAPTURE) {
@@ -531,7 +527,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoCapture.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoCapture.bufferQueue_ = new BufferProducerSequenceable(streamCustomerCapture_->CreateProducer());
             streamInfoCapture.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
-            std::cout << "==========[test log]capture success." << std::endl;
+            CAMERA_LOGD("capture success.");
             std::vector<StreamInfo>().swap(streamInfos);
             streamInfos.push_back(streamInfoCapture);
         } else if (intent == ANALYZE) {
@@ -547,24 +543,24 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoAnalyze.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoAnalyze.bufferQueue_ = new BufferProducerSequenceable(streamCustomerAnalyze_->CreateProducer());
             streamInfoAnalyze.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
-            std::cout << "==========[test log]analyze success." << std::endl;
+            CAMERA_LOGD("analyze success.");
             std::vector<StreamInfo>().swap(streamInfos);
             streamInfos.push_back(streamInfoAnalyze);
         }
         rc = (CamRetCode)streamOperator->CreateStreams(streamInfos);
         EXPECT_EQ(false, rc != HDI::Camera::V1_0::NO_ERROR);
         if (rc == HDI::Camera::V1_0::NO_ERROR) {
-            std::cout << "==========[test log]CreateStreams success." << std::endl;
+            CAMERA_LOGI("CreateStreams success.");
         } else {
-            std::cout << "==========[test log]CreateStreams fail, rc = " << rc << std::endl;
+            CAMERA_LOGE("CreateStreams fail, rc = %{public}d", rc);
         }
         
         rc = (CamRetCode)streamOperator->CommitStreams(NORMAL, ability_);
         EXPECT_EQ(false, rc != HDI::Camera::V1_0::NO_ERROR);
         if (rc == HDI::Camera::V1_0::NO_ERROR) {
-            std::cout << "==========[test log]CommitStreams success." << std::endl;
+            CAMERA_LOGI("CommitStreams success.");
         } else {
-            std::cout << "==========[test log]CommitStreams fail, rc = " << rc << std::endl;
+            CAMERA_LOGE("CommitStreams fail, rc = %{public}d", rc);
         }
     }
 }
@@ -578,9 +574,9 @@ void TestDisplay::StartCapture(int streamId, int captureId, bool shutterCallback
     rc = (CamRetCode)streamOperator->Capture(captureId, captureInfo, isStreaming);
     EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
     if (rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log]check Capture: Capture success, " << captureId << std::endl;
+        CAMERA_LOGI("check Capture: Capture success, captureId = %{public}d", captureId);
     } else {
-        std::cout << "==========[test log]check Capture: Capture fail, rc = " << rc << captureId << std::endl;
+        CAMERA_LOGE("check Capture: Capture fail, rc = %{public}d, captureId = %{public}d", rc, captureId);
     }
     if (captureId == CAPTURE_ID_PREVIEW) {
         streamCustomerPreview_->ReceiveFrameOn(nullptr);
@@ -620,15 +616,15 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
             }
         }
         for (const auto &captureId : captureIds) {
-            std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
+            CAMERA_LOGI("check Capture: CancelCapture success, captureId = %{public}d", captureId);
             rc = (CamRetCode)streamOperator->CancelCapture(captureId);
             sleep(TIME_FOR_WAIT_CANCEL_CAPTURE);
             EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
             if (rc == HDI::Camera::V1_0::NO_ERROR) {
-                std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
+                CAMERA_LOGI("check Capture: CancelCapture success, captureId = %{public}d", captureId);
             } else {
-                std::cout << "==========[test log]check Capture: CancelCapture fail, rc = " << rc;
-                std::cout << "captureId = " << captureId << std::endl;
+                CAMERA_LOGE("check Capture: CancelCapture fail, rc = %{public}d, captureId = %{public}d",
+                    rc, captureId);
             }
         }
     }
@@ -638,10 +634,10 @@ void TestDisplay::StopStream(std::vector<int>& captureIds, std::vector<int>& str
         rc = (CamRetCode)streamOperator->ReleaseStreams(streamIds);
         EXPECT_EQ(true, rc == HDI::Camera::V1_0::NO_ERROR);
         if (rc == HDI::Camera::V1_0::NO_ERROR) {
-            std::cout << "==========[test log]check Capture: ReleaseStreams success." << std::endl;
+            CAMERA_LOGI("check Capture: ReleaseStreams success.");
         } else {
-            std::cout << "==========[test log]check Capture: ReleaseStreams fail, rc = " << rc << std::endl;
-            std::cout << "streamIds = " << streamIds.front() << std::endl;
+            CAMERA_LOGE("check Capture: ReleaseStreams fail, rc = %{public}d, streamIds = %{public}d",
+                rc, streamIds.front());
         }
     }
 }
@@ -668,9 +664,7 @@ void DemoCameraDeviceCallback::PrintStabiliInfo(const std::vector<uint8_t>& resu
         return;
     }
     videoStabiliMode = *(entry.data.u8);
-    CAMERA_LOGI("videoStabiliMode: %{public}d", videoStabiliMode);
-    std::cout << "==========[test log] PrintStabiliInfo videoStabiliMode: " << 
-        static_cast<int>(videoStabiliMode) << std::endl;
+    CAMERA_LOGI("videoStabiliMode: %{public}d", static_cast<int>(videoStabiliMode));
 }
 
 void DemoCameraDeviceCallback::PrintFpsInfo(const std::vector<uint8_t>& result)
@@ -698,9 +692,7 @@ void DemoCameraDeviceCallback::PrintFpsInfo(const std::vector<uint8_t>& result)
     for (int i = 0; i < entry.count; i++) {
         fpsRange.push_back(*(entry.data.i32 + i));
     }
-    CAMERA_LOGI("Set fpsRange: [%{public}d, %{public}d]", fpsRange[0], fpsRange[1]);
-    std::cout << "==========[test log] PrintFpsInfo fpsRange: [" << fpsRange[0] << ", " <<
-        fpsRange[1] << "]" << std::endl;
+    CAMERA_LOGI("PrintFpsInfo fpsRange: [%{public}d, %{public}d]", fpsRange[0], fpsRange[1]);
 }
 
 #ifndef CAMERA_BUILT_ON_OHOS_LITE
@@ -755,7 +747,7 @@ void DemoCameraDeviceCallback::DealCameraMetadata(const std::vector<uint8_t> &se
     std::shared_ptr<CameraMetadata> result;
     MetadataUtils::ConvertVecToMetadata(settings, result);
     if (result == nullptr) {
-        std::cout << "TestDisplay: result is null" << std::endl;
+        CAMERA_LOGE("TestDisplay: result is null");
         return;
     }
     common_metadata_header_t *data = result->get();
@@ -764,121 +756,9 @@ void DemoCameraDeviceCallback::DealCameraMetadata(const std::vector<uint8_t> &se
         return;
     }
     for (auto it = DATA_BASE.cbegin(); it != DATA_BASE.cend(); it++) {
-        PrintCameraMetadata(*it, data);
-    }
-}
-
-void DemoCameraDeviceCallback::PrintCameraMetadata(int32_t key, common_metadata_header_t *data)
-{
-    switch (key) {
-        case OHOS_CONTROL_AWB_MODE:
-        case OHOS_CONTROL_FOCUS_MODE:
-        case OHOS_CONTROL_FOCUS_STATE:
-        case OHOS_CONTROL_EXPOSURE_MODE:
-        case OHOS_CONTROL_EXPOSURE_STATE:
-        case OHOS_CONTROL_FLASH_MODE:
-        case OHOS_CONTROL_METER_MODE:
-        case OHOS_CONTROL_VIDEO_STABILIZATION_MODE: {
-            PrintU8Metadata(key, data);
-            break;
-        }
-        case OHOS_CAMERA_STREAM_ID:
-        case OHOS_CONTROL_AE_EXPOSURE_COMPENSATION: {
-            PrintI32Metadata(key, data);
-            break;
-        }
-        case OHOS_SENSOR_EXPOSURE_TIME: {
-            PrintI64Metadata(key, data);
-            break;
-        }
-        case OHOS_SENSOR_COLOR_CORRECTION_GAINS: {
-            PrintFloatMetadata(key, data);
-            break;
-        }
-        case OHOS_CONTROL_FPS_RANGES:
-        case OHOS_CONTROL_AF_REGIONS:
-        case OHOS_CONTROL_METER_POINT: {
-            PrintI32ArrayMetadata(key, data);
-            break;
-        }
-        default: {
-            std::cout << "TestDisplay: invalid param and key = " << key << std::endl;
-            break;
-        }
-    }
-}
-
-void DemoCameraDeviceCallback::PrintU8Metadata(int32_t key, common_metadata_header_t *data)
-{
-    uint8_t value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        std::cout << "TestDisplay: get  key error and key = " << key << std::endl;
-        return;
-    }
-    value = *(entry.data.u8);
-    std::cout << "TestDisplay: valueu8 = " << static_cast<int>(value) << " and key = " << key << std::endl;
-}
-
-void DemoCameraDeviceCallback::PrintI32Metadata(int32_t key, common_metadata_header_t *data)
-{
-    int32_t value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        std::cout << "TestDisplay: get  key error and key = " << key << std::endl;
-        return;
-    }
-    value = *(entry.data.i32);
-
-    std::cout << "TestDisplay: valueI32 = " << value << " and key = " << key << std::endl;
-}
-
-void DemoCameraDeviceCallback::PrintI64Metadata(int32_t key, common_metadata_header_t *data)
-{
-    int64_t value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        std::cout << "TestDisplay: get  key error and key = " << key << std::endl;
-        return;
-    }
-    value = *(entry.data.i64);
-    std::cout << "TestDisplay: valueI64 = " << value << " and key = " << key<< std::endl;
-}
-
-void DemoCameraDeviceCallback::PrintFloatMetadata(int32_t key, common_metadata_header_t *data)
-{
-    float value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        std::cout << "TestDisplay: get  key error and key = " << key<< std::endl;
-        return;
-    }
-    value = *(entry.data.f);
-    std::cout << "TestDisplay: valueFloat = " << std::showpoint << value << " and key = " << key << std::endl;
-}
-
-void DemoCameraDeviceCallback::PrintI32ArrayMetadata(int32_t key, common_metadata_header_t *data)
-{
-    std::vector<int32_t> results;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        std::cout << "TestDisplay: get  key error and key = " << key << std::endl;
-        return;
-    }
-    uint32_t count = entry.count;
-    std::cout << "==========[test log] count =" << count << std::endl;
-
-    for (int i = 0; i < count; i++) {
-        results.push_back(*(entry.data.i32 + i));
-    }
-
-    for (auto iterator = results.begin(); iterator != results.end(); iterator++) {
-        std::cout << "TestDisplay: valueArray = " << *iterator << " and key = " << key << std::endl;
+        std::string st = {};
+        st = MetadataItemDump(data, *it);
+        CAMERA_LOGI("%{publid}s", st.c_str());
     }
 }
 

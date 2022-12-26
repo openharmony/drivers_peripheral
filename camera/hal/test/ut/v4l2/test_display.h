@@ -182,12 +182,6 @@ public:
     void PrintStabiliInfo(const std::vector<uint8_t>& result);
     void PrintFpsInfo(const std::vector<uint8_t>& result);
     void DealCameraMetadata(const std::vector<uint8_t> &settings);
-    void PrintCameraMetadata(int32_t key, common_metadata_header_t *data);
-    void PrintU8Metadata(int32_t key, common_metadata_header_t *data);
-    void PrintI32Metadata(int32_t key, common_metadata_header_t *data);
-    void PrintI64Metadata(int32_t key, common_metadata_header_t *data);
-    void PrintFloatMetadata(int32_t key, common_metadata_header_t *data);
-    void PrintI32ArrayMetadata(int32_t key, common_metadata_header_t *data);
 };
 
 class DemoCameraHostCallback : public ICameraHostCallback {

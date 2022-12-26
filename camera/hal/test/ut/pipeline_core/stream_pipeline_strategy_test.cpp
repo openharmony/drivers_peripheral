@@ -32,22 +32,22 @@ public:
 
 void StrategyTest::SetUpTestCase(void)
 {
-    std::cout << "Camera::StrategyTest SetUpTestCase" << std::endl;
+    CAMERA_LOGD("Camera::StrategyTest SetUpTestCase");
 }
 
 void StrategyTest::TearDownTestCase(void)
 {
-    std::cout << "Camera::StrategyTest TearDownTestCase" << std::endl;
+    CAMERA_LOGD("Camera::StrategyTest TearDownTestCase");
 }
 
 void StrategyTest::SetUp(void)
 {
-    std::cout << "Camera::StrategyTest SetUp" << std::endl;
+    CAMERA_LOGD("Camera::StrategyTest SetUp");
 }
 
 void StrategyTest::TearDown(void)
 {
-    std::cout << "Camera::StrategyTest TearDown.." << std::endl;
+    CAMERA_LOGD("Camera::StrategyTest TearDown..");
 }
 
 HWTEST_F(StrategyTest, NormalPreviewTest, TestSize.Level0)

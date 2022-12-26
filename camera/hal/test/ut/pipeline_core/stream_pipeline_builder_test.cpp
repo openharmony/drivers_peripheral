@@ -35,23 +35,23 @@ protected:
 
 void BuilderTest::SetUpTestCase(void)
 {
-    std::cout << "Camera::Builder SetUpTestCase" << std::endl;
+    CAMERA_LOGD("Camera::Builder SetUpTestCase");
 }
 
 void BuilderTest::TearDownTestCase(void)
 {
-    std::cout << "Camera::Builder TearDownTestCase" << std::endl;
+    CAMERA_LOGD("Camera::Builder TearDownTestCase");
 }
 
 void BuilderTest::SetUp(void)
 {
-    std::cout << "Camera::Builder SetUp" << std::endl;
+    CAMERA_LOGD("Camera::Builder SetUp");
 }
 
 void BuilderTest::TearDown(void)
 {
     spec_.reset();
-    std::cout << "Camera::Builder TearDown.." << std::endl;
+    CAMERA_LOGD("Camera::Builder TearDown..");
 }
 
 HWTEST_F(BuilderTest, NormalTest, TestSize.Level0)
