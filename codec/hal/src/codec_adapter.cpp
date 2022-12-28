@@ -258,7 +258,7 @@ int32_t OmxAdapterSetComponentRole(struct CodecComponentNode *codecNode, char *c
         HDF_LOGE("%{public}s core is null", __func__);
         return err;
     }
-    
+
     std::vector<std::string> roles;
     std::string name = compName;
     int32_t ret = core->GetRolesOfComponent(name, roles);
@@ -282,7 +282,7 @@ int32_t OmxAdapterSetComponentRole(struct CodecComponentNode *codecNode, char *c
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: OMX_IndexParamStandardComponentRole err [%{public}d]", __func__, ret);
     }
-    
+
     return ret;
 }
 #ifdef __cplusplus
