@@ -175,6 +175,10 @@ typedef enum {
     ROTATE_90,              /**< Rotation by 90 degrees */
     ROTATE_180,             /**< Rotation by 180 degrees */
     ROTATE_270,             /**< Rotation by 270 degrees */
+    MIRROR_H,               /**< Mirror transform horizontally */
+    MIRROR_V,               /**< Mirror transform vertically */
+    MIRROR_H_ROTATE_90,     /**< Mirror transform horizontally, rotation by 90 degrees */
+    MIRROR_V_ROTATE_90,     /**< Mirror transform vertically, rotation by 90 degrees */
     ROTATE_BUTT             /**< Invalid operation */
 } TransformType;
 
