@@ -37,6 +37,8 @@ public:
         std::vector<uint8_t>& cameraAbility);
     static void ConvertVecToMetadata(const std::vector<uint8_t>& cameraAbility,
         std::shared_ptr<CameraMetadata> &metadata);
+    static void FreeMetadataBuffer(camera_metadata_item_t &entry);
+
 private:
     static bool WriteMetadata(const camera_metadata_item_t &item, MessageParcel &data);
     static bool ReadMetadata(camera_metadata_item_t &item, MessageParcel &data);
