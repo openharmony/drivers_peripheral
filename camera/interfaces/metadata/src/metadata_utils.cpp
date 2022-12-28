@@ -220,6 +220,7 @@ void MetadataUtils::ConvertVecToMetadata(const std::vector<uint8_t>& cameraAbili
         void *buffer = nullptr;
         MetadataUtils::ItemDataToBuffer(item_, &buffer);
         (void)AddCameraMetadataItem(meta, item_.item, buffer, item_.count);
+        FreeMetadataBuffer(item_);
     }
 }
 
@@ -269,6 +270,7 @@ void MetadataUtils::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Ca
         void *buffer = nullptr;
         MetadataUtils::ItemDataToBuffer(item_, &buffer);
         (void)AddCameraMetadataItem(meta, item_.item, buffer, item_.count);
+        FreeMetadataBuffer(item_);
     }
 }
 
@@ -460,7 +462,7 @@ bool MetadataUtils::ReadMetadata(camera_metadata_item_t &item, MessageParcel &da
         data.ReadUInt8Vector(&byteBuffers);
         item.data.u8 = new(std::nothrow) uint8_t[item.count];
         if (item.data.u8 != nullptr) {
-            for (i = 0; i < item.count; i++) {
+            for (i = 0; i < item.count && i < byteBuffers.size(); i++) {
                 item.data.u8[i] = byteBuffers.at(i);
             }
         }
@@ -469,7 +471,7 @@ bool MetadataUtils::ReadMetadata(camera_metadata_item_t &item, MessageParcel &da
         data.ReadInt32Vector(&int32Buffers);
         item.data.i32 = new(std::nothrow) int32_t[item.count];
         if (item.data.i32 != nullptr) {
-            for (i = 0; i < item.count; i++) {
+            for (i = 0; i < item.count && i < int32Buffers.size(); i++) {
                 item.data.i32[i] = int32Buffers.at(i);
             }
         }
@@ -478,7 +480,7 @@ bool MetadataUtils::ReadMetadata(camera_metadata_item_t &item, MessageParcel &da
         data.ReadFloatVector(&floatBuffers);
         item.data.f = new(std::nothrow) float[item.count];
         if (item.data.f != nullptr) {
-            for (i = 0; i < item.count; i++) {
+            for (i = 0; i < item.count && i < floatBuffers.size(); i++) {
                 item.data.f[i] = floatBuffers.at(i);
             }
         }
@@ -487,7 +489,7 @@ bool MetadataUtils::ReadMetadata(camera_metadata_item_t &item, MessageParcel &da
         data.ReadUInt32Vector(&uInt32Buffers);
         item.data.ui32 = new(std::nothrow) uint32_t[item.count];
         if (item.data.ui32 != nullptr) {
-            for (i = 0; i < item.count; i++) {
+            for (i = 0; i < item.count && i < uInt32Buffers.size(); i++) {
                 item.data.ui32[i] = uInt32Buffers.at(i);
             }
         }
@@ -496,7 +498,7 @@ bool MetadataUtils::ReadMetadata(camera_metadata_item_t &item, MessageParcel &da
         data.ReadInt64Vector(&int64uBffers);
         item.data.i64 = new(std::nothrow) int64_t[item.count];
         if (item.data.i64 != nullptr) {
-            for (i = 0; i < item.count; i++) {
+            for (i = 0; i < item.count && i < int64uBffers.size(); i++) {
                 item.data.i64[i] = int64uBffers.at(i);
             }
         }
@@ -505,7 +507,7 @@ bool MetadataUtils::ReadMetadata(camera_metadata_item_t &item, MessageParcel &da
         data.ReadDoubleVector(&doubleBuffers);
         item.data.d = new(std::nothrow) double[item.count];
         if (item.data.d != nullptr) {
-            for (i = 0; i < item.count; i++) {
+            for (i = 0; i < item.count && i < doubleBuffers.size(); i++) {
                 item.data.d[i] = doubleBuffers.at(i);
             }
         }
@@ -515,7 +517,7 @@ bool MetadataUtils::ReadMetadata(camera_metadata_item_t &item, MessageParcel &da
         item.data.r = new(std::nothrow) camera_rational_t[item.count];
         if (item.data.r != nullptr) {
             for (i = 0, j = 0;
-                    i < item.count && j < static_cast<size_t>(rationalBuffers.size());
+                    i < item.count && j < static_cast<size_t>(rationalBuffers.size() - 1);
                     i++, j += INDEX_COUNTER) {
                 item.data.r[i].numerator = rationalBuffers.at(j);
                 item.data.r[i].denominator = rationalBuffers.at(j + 1);
@@ -545,6 +547,39 @@ void MetadataUtils::ItemDataToBuffer(const camera_metadata_item_t &item, void **
         *buffer = reinterpret_cast<void *>(item.data.d);
     } else if (item.data_type == META_TYPE_RATIONAL) {
         *buffer = reinterpret_cast<void *>(item.data.r);
+    }
+}
+
+void MetadataUtils::FreeMetadataBuffer(camera_metadata_item_t &entry)
+{
+    if (entry.data_type == META_TYPE_BYTE) {
+        if (entry.data.u8 != nullptr) {
+            delete[] entry.data.u8;
+        }
+    } else if (entry.data_type == META_TYPE_INT32) {
+        if (entry.data.i32 != nullptr) {
+            delete[] entry.data.i32;
+        }
+    } else if (entry.data_type == META_TYPE_FLOAT) {
+        if (entry.data.f != nullptr) {
+            delete[] entry.data.f;
+        }
+    } else if (entry.data_type == META_TYPE_INT64) {
+        if (entry.data.i64 != nullptr) {
+            delete[] entry.data.i64;
+        }
+    } else if (entry.data_type == META_TYPE_UINT32) {
+        if (entry.data.ui32 != nullptr) {
+            delete[] entry.data.ui32;
+        }
+    } else if (entry.data_type == META_TYPE_DOUBLE) {
+        if (entry.data.d != nullptr) {
+            delete[] entry.data.d;
+        }
+    } else if (entry.data_type == META_TYPE_RATIONAL) {
+        if (entry.data.r != nullptr) {
+            delete[] entry.data.r;
+        }
     }
 }
 } // Camera
