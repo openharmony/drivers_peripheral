@@ -146,7 +146,25 @@ HWTEST_F(HdfMotionTest, EnableMotion_002, TestSize.Level1)
         return;
     }
     int32_t ret = g_motionInterface->EnableMotion(HDF_MOTION_TYPE_MAX);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    OsalSleep(2);
+
+    ret = g_motionInterface->DisableMotion(HDF_MOTION_TYPE_MAX);
+    EXPECT_NE(HDF_SUCCESS, ret);
+}
+
+HWTEST_F(HdfMotionTest, EnableMotion_003, TestSize.Level1)
+{
+    if (g_motionInterface == nullptr) {
+        ASSERT_NE(nullptr, g_motionInterface);
+        return;
+    }
+    int32_t ret = g_motionInterface->EnableMotion(HDF_MOTION_TYPE_WRIST_UP);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    OsalSleep(2);
+
+    ret = g_motionInterface->DisableMotion(HDF_MOTION_TYPE_WRIST_UP);
+    EXPECT_NE(HDF_SUCCESS, ret);
 }
 
 HWTEST_F(HdfMotionTest, DisableMotion_001, TestSize.Level1)
