@@ -193,5 +193,10 @@ uint32_t GetCameraMetadataDataSize(const common_metadata_header_t *metadata_head
 int32_t CopyCameraMetadataItems(common_metadata_header_t *newMetadata, const common_metadata_header_t *oldMetadata);
 size_t CalculateCameraMetadataItemDataSize(uint32_t type, size_t data_count);
 int32_t GetCameraMetadataItemType(uint32_t item, uint32_t *data_type);
+common_metadata_header_t *FillCameraMetadata(common_metadata_header_t *buffer, size_t memoryRequired,
+                                             uint32_t itemCapacity, uint32_t dataCapacity);
+int32_t GetMetadataSection(uint32_t itemSection, uint32_t *section);
+int MetadataExpandItemMem(common_metadata_header_t *dst, camera_metadata_item_entry_t *item,
+    size_t oldItemSize);
 } // Camera
 #endif // CAMERA_METADATA_OPERATOR_H
