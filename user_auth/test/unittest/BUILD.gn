@@ -19,7 +19,9 @@ group("driver_userauth_unittest") {
   deps = [
     "base_test:UserAuthBaseTest",
     "co_auth:UserAuthCoAuthTest",
-    "database:UserAuthIdmCommonTest",
+    "database:UserAuthDatabaseTest",
+    "idm_test:UserAuthIdmTest",
     "service_test:UserAuthHdiTest",
+    "user_auth_test:UserAuthUserAuthTest",
   ]
 }
