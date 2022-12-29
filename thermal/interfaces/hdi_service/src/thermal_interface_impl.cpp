@@ -80,11 +80,9 @@ int32_t ThermalInterfaceImpl::Init()
         hdfTimer_->SetSimluationFlag();
     }
 
-    if (hdfTimer_->GetSimluationFlag()) {
-        ret = simulation_->NodeInit();
-        if (ret != HDF_SUCCESS) {
-            return HDF_FAILURE;
-        }
+    ret = simulation_->NodeInit();
+    if (ret != HDF_SUCCESS) {
+        return HDF_FAILURE;
     }
 
     thermalZoneMgr_->CalculateMaxCd();
