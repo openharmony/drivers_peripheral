@@ -71,6 +71,12 @@ public:
         return std::stoi(value.c_str());
     }
 
+    HdfThermalCallbackInfo GetCallbackInfo()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        return tzInfoAcaualEvent_;
+    }
+
     int32_t InitThermalZoneSysfs();
     int32_t ParseThermalZoneInfo();
     void FormatThermalSysfsPaths(struct ThermalSysfsPathInfo *pTSysPathInfo);
@@ -82,12 +88,12 @@ public:
     void CalculateMaxCd();
     int32_t ReadFile(const char *path, char *buf, size_t size);
     void ReportThermalZoneData(int32_t reportTime, std::vector<int32_t> &multipleList);
-    HdfThermalCallbackInfo tzInfoAcaualEvent_;
     int32_t maxCd_;
 private:
     int32_t UpdateThermalZoneData(std::map<std::string, std::string> &tzPathMap);
     void UpdateDataType(XMLThermalZoneInfo& tzIter, ReportedThermalData& data);
     ThermalHdfConfig::ThermalTypeMap sensorTypeMap_;
+    HdfThermalCallbackInfo tzInfoAcaualEvent_;
     struct ThermalZoneSysfsPathInfo tzSysPathInfo_;
     std::list<ThermalZoneSysfsPathInfo> lTzSysPathInfo_;
     std::vector<ThermalZoneInfo> tzInfoList_;
