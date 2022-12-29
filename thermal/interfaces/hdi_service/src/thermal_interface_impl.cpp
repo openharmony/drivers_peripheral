@@ -137,7 +137,7 @@ int32_t ThermalInterfaceImpl::GetThermalZoneInfo(HdfThermalCallbackInfo& event)
 {
     if (thermalZoneMgr_ != nullptr) {
         thermalZoneMgr_->ParseThermalZoneInfo();
-        event.info = thermalZoneMgr_->tzInfoAcaualEvent_.info;
+        event.info = thermalZoneMgr_->GetCallbackInfo().info;
     }
     return HDF_SUCCESS;
 }
