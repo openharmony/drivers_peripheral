@@ -221,7 +221,7 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
         IAM_LOGE("execute func failed");
         return ret;
     }
-    info.result = static_cast<uint32_t>(authResult.result);
+    info.result = authResult.result;
     info.remainAttempts = authResult.remainTimes;
     info.lockoutDuration = authResult.freezingTime;
     if (info.result == RESULT_SUCCESS) {
