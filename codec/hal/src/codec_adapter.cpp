@@ -270,8 +270,8 @@ int32_t OmxAdapterSetComponentRole(struct CodecComponentNode *codecNode, char *c
     HDF_LOGI("%{public}s: RoleName = [%{public}s]", __func__, roles[roleIndex].c_str());
 
     OMX_PARAM_COMPONENTROLETYPE role;
-    uint32_t res = strncpy_s(reinterpret_cast<char *>(role.cRole), OMX_MAX_STRINGNAME_SIZE,
-                             roles[roleIndex].c_str(), roles[roleIndex].length());
+    errno_t res = strncpy_s(reinterpret_cast<char *>(role.cRole), OMX_MAX_STRINGNAME_SIZE,
+                            roles[roleIndex].c_str(), roles[roleIndex].length());
     if (res != EOK) {
         HDF_LOGE("%{public}s: strncpy_s return err [%{public}d]", __func__, err);
         return HDF_FAILURE;
