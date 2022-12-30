@@ -15,7 +15,34 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-module_output_path = "hdf/light"
+module_output_path = "drivers_peripheral_light/light"
+ohos_unittest("hdf_unittest_hdi_light_common") {
+  module_out_path = module_output_path
+  include_dirs = [ "//drivers/peripheral/light/interfaces/include" ]
+
+  sources = [ "hdf_light_hdi_common_test.cpp" ]
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_light:liblight_proxy_1.0",
+      "hdf_core:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_single",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+  external_deps += [ "ipc:ipc_single" ]
+}
+
 ohos_unittest("hdf_unittest_hdi_light") {
   module_out_path = module_output_path
   include_dirs = [ "//drivers/peripheral/light/interfaces/include" ]

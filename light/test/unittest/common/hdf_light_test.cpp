@@ -102,7 +102,7 @@ HWTEST_F(HdfLightTest, GetLightList001, TestSize.Level1)
     printf("get light list num[%u]\n\r", g_count);
     info = g_lightInfo;
 
-    for (int i = 0; i < g_count; ++i) {
+    for (uint32_t i = 0; i < g_count; ++i) {
         printf("get lightId[%u]\n\r", info->lightId);
         EXPECT_GE(info->lightId, MIN_LIGHT_ID);
         EXPECT_LE(info->lightId, MAX_LIGHT_ID);
@@ -134,7 +134,7 @@ HWTEST_F(HdfLightTest, GetLightList002, TestSize.Level1)
   */
 HWTEST_F(HdfLightTest, EnableLight001, TestSize.Level1)
 {
-    int32_t i;
+    uint32_t i;
     struct LightEffect effect;
     effect.flashEffect.flashMode = LIGHT_FLASH_NONE;
     effect.flashEffect.onTime = 0;
@@ -173,7 +173,7 @@ HWTEST_F(HdfLightTest, EnableLight001, TestSize.Level1)
   */
 HWTEST_F(HdfLightTest, EnableLight002, TestSize.Level1)
 {
-    int32_t i;
+    uint32_t i;
     struct LightEffect effect;
     effect.flashEffect.flashMode = LIGHT_FLASH_BLINK;
     effect.flashEffect.onTime = ON_TIME;
@@ -223,7 +223,7 @@ HWTEST_F(HdfLightTest, EnableLight002, TestSize.Level1)
   */
 HWTEST_F(HdfLightTest, EnableLight003, TestSize.Level1)
 {
-    int32_t i;
+    uint32_t i;
     int32_t ret;
     uint32_t lightId = LIGHT_ID_BUTT;
     struct LightEffect effect;
@@ -242,7 +242,7 @@ HWTEST_F(HdfLightTest, EnableLight003, TestSize.Level1)
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(LIGHT_NOT_FLASH, ret);
 
-        effect.flashEffect.flashMode = HDF_LIGHT_FLASH_GRADIENT;
+        effect.flashEffect.flashMode = LIGHT_FLASH_GRADIENT;
         effect.flashEffect.onTime = 0;
         ret = g_lightDev->TurnOnLight(g_lightInfo[i].lightId, &effect);
         EXPECT_EQ(LIGHT_NOT_FLASH, ret);
