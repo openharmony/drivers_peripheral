@@ -102,7 +102,7 @@ enum LightFlashMode {
     /** Blinking */
     LIGHT_FLASH_BLINK    = 1,
     /** Gradient */
-    HDF_LIGHT_FLASH_GRADIENT = 2,
+    LIGHT_FLASH_GRADIENT = 2,
     /** Invalid mode */
     LIGHT_FLASH_BUTT     = 3,
 };
