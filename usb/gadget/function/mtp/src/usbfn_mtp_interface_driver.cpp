@@ -1,0 +1,131 @@
+/*
+ * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <hdf_base.h>
+#include <hdf_device_desc.h>
+#include <hdf_log.h>
+#include <hdf_sbuf_ipc.h>
+
+#include "default_config.h"
+#include "usbfn_mtp_impl.h"
+#include "v1_0/usbfn_mtp_interface_stub.h"
+
+#define HDF_LOG_TAG usbfn_mtp_interface_driver
+
+using namespace OHOS::HDI::Usb::Gadget::Mtp::V1_0;
+
+struct HdfUsbfnMtpInterfaceHost {
+    struct IDeviceIoService ioService;
+    OHOS::sptr<OHOS::IRemoteObject> stub;
+};
+
+static int32_t UsbfnMtpInterfaceDriverDispatch(
+    struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    auto *hdfUsbfnMtpInterfaceHost = CONTAINER_OF(client->device->service, struct HdfUsbfnMtpInterfaceHost, ioService);
+
+    OHOS::MessageParcel *dataParcel = nullptr;
+    OHOS::MessageParcel *replyParcel = nullptr;
+    OHOS::MessageOption option;
+
+    if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: invalid data sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (SbufToParcel(reply, &replyParcel) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: invalid reply sbuf object to dispatch", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    return hdfUsbfnMtpInterfaceHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
+}
+
+static int HdfUsbfnMtpInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
+{
+    HDF_LOGI("%{public}s: driver init start", __func__);
+    return HDF_SUCCESS;
+}
+
+static int HdfUsbfnMtpInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
+{
+    HDF_LOGI("%{public}s: driver bind start", __func__);
+    auto *hdfUsbfnMtpInterfaceHost = new (std::nothrow) HdfUsbfnMtpInterfaceHost;
+    if (hdfUsbfnMtpInterfaceHost == nullptr) {
+        HDF_LOGE("%{public}s: failed to create create HdfUsbfnMtpInterfaceHost object", __func__);
+        return HDF_FAILURE;
+    }
+
+    hdfUsbfnMtpInterfaceHost->ioService.Dispatch = UsbfnMtpInterfaceDriverDispatch;
+    hdfUsbfnMtpInterfaceHost->ioService.Open = NULL;
+    hdfUsbfnMtpInterfaceHost->ioService.Release = NULL;
+
+    auto serviceImpl = IUsbfnMtpInterface::Get(true);
+    if (serviceImpl == nullptr) {
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        delete hdfUsbfnMtpInterfaceHost;
+        return HDF_FAILURE;
+    }
+
+    hdfUsbfnMtpInterfaceHost->stub =
+        OHOS::HDI::ObjectCollector::GetInstance().GetOrNewObject(serviceImpl, IUsbfnMtpInterface::GetDescriptor());
+    if (hdfUsbfnMtpInterfaceHost->stub == nullptr) {
+        HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfUsbfnMtpInterfaceHost;
+        return HDF_FAILURE;
+    }
+
+    deviceObject->service = &hdfUsbfnMtpInterfaceHost->ioService;
+
+    struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
+    if (iface == NULL) {
+        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed\n", __func__);
+    }
+    const char *udcName = nullptr;
+    if (iface->GetString(deviceObject->property, "udc_name", &udcName, UDC_NAME) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: read udc_name failed, use default: %{public}s", __func__, UDC_NAME);
+    }
+    sptr<UsbfnMtpImpl> impl = static_cast<UsbfnMtpImpl *>(serviceImpl.GetRefPtr());
+    impl->udcName_ = udcName;
+    return HDF_SUCCESS;
+}
+
+static void HdfUsbfnMtpInterfaceDriverRelease(struct HdfDeviceObject *deviceObject)
+{
+    HDF_LOGI("%{public}s: driver release start", __func__);
+    if (deviceObject->service == nullptr) {
+        return;
+    }
+
+    auto *hdfUsbfnMtpInterfaceHost = CONTAINER_OF(deviceObject->service, struct HdfUsbfnMtpInterfaceHost, ioService);
+    if (hdfUsbfnMtpInterfaceHost != nullptr) {
+        delete hdfUsbfnMtpInterfaceHost;
+    }
+}
+
+struct HdfDriverEntry g_usbfnmtpinterfaceDriverEntry = {
+    .moduleVersion = 1,
+    .moduleName = "usbfn_mtp",
+    .Bind = HdfUsbfnMtpInterfaceDriverBind,
+    .Init = HdfUsbfnMtpInterfaceDriverInit,
+    .Release = HdfUsbfnMtpInterfaceDriverRelease,
+};
+
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+HDF_INIT(g_usbfnmtpinterfaceDriverEntry);
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
