@@ -17,6 +17,10 @@ import("//drivers/peripheral/audio/audio.gni")
 
 samgr_dir = "//foundation/systemabilitymgr/samgr"
 
+declare_args() {
+  bluetooth_a2dp_hdi = false
+}
+
 config("hdi_audio_config") {
   visibility = [ ":*" ]
 
@@ -43,6 +47,10 @@ config("hdi_audio_config") {
 }
 
 ohos_shared_library("hdi_audio_bluetooth") {
+  if (bluetooth_a2dp_hdi) {
+    defines = [ "A2DP_HDI_SERVICE" ]
+  }
+
   sources = [
     "//third_party/cJSON/cJSON.c",
     "src/audio_adapter.cpp",
