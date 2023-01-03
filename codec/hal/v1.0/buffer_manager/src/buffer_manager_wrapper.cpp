@@ -30,7 +30,7 @@ static bool IsInputDataBufferReadyImpl(const struct BufferManagerWrapper *buffer
     }
 
     CodecBuffer *buffer =
-        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->GetBuffer(timeoutMs, true);
+        (reinterpret_cast<BufferManager*>(bufferManagerWrapper->inputBufferManager))->GetBuffer(timeoutMs, true);
     return (buffer != nullptr);
 }
 
@@ -42,7 +42,7 @@ static CodecBuffer* GetInputDataBufferImpl(const struct BufferManagerWrapper *bu
     }
 
     CodecBuffer *buffer =
-        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->GetBuffer(timeoutMs, false);
+        (reinterpret_cast<BufferManager*>(bufferManagerWrapper->inputBufferManager))->GetBuffer(timeoutMs, false);
     return buffer;
 }
 
@@ -55,27 +55,28 @@ static CodecBuffer* GetUsedInputDataBufferImpl(const struct BufferManagerWrapper
     }
 
     CodecBuffer *buffer =
-        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->GetUsedBuffer(timeoutMs, false);
+        (reinterpret_cast<BufferManager*>(bufferManagerWrapper->inputBufferManager))->GetUsedBuffer(timeoutMs, false);
     return buffer;
 }
 
-static void PutInputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
+static void PutInputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *buffer)
 {
-    if (bufferManagerWrapper == nullptr || info == nullptr) {
+    if (bufferManagerWrapper == nullptr || buffer == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return;
     }
 
-    ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->PutBuffer(info);
+    (reinterpret_cast<BufferManager*>(bufferManagerWrapper->inputBufferManager))->PutBuffer(buffer);
 }
 
-static void PutUsedInputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
+static void PutUsedInputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *buffer)
 {
-    if (bufferManagerWrapper == nullptr || info == nullptr) {
+    if (bufferManagerWrapper == nullptr || buffer == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return;
     }
-    ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->inputBufferManager))->PutUsedBuffer(info);
+
+    (reinterpret_cast<BufferManager*>(bufferManagerWrapper->inputBufferManager))->PutUsedBuffer(buffer);
 }
 
 static bool IsUsedOutputDataBufferReadyImpl(const struct BufferManagerWrapper *bufferManagerWrapper, uint32_t timeoutMs)
@@ -86,7 +87,7 @@ static bool IsUsedOutputDataBufferReadyImpl(const struct BufferManagerWrapper *b
     }
 
     CodecBuffer *buffer =
-        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->outputBufferManager))->GetUsedBuffer(timeoutMs, true);
+        (reinterpret_cast<BufferManager*>(bufferManagerWrapper->outputBufferManager))->GetUsedBuffer(timeoutMs, true);
     return (buffer != nullptr);
 }
 
@@ -98,7 +99,7 @@ static CodecBuffer* GetOutputDataBufferImpl(const struct BufferManagerWrapper *b
     }
 
     CodecBuffer *buffer =
-        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->outputBufferManager))->GetBuffer(timeoutMs, false);
+        (reinterpret_cast<BufferManager*>(bufferManagerWrapper->outputBufferManager))->GetBuffer(timeoutMs, false);
     return buffer;
 }
 
@@ -111,27 +112,28 @@ static CodecBuffer* GetUsedOutputDataBufferImpl(const struct BufferManagerWrappe
     }
 
     CodecBuffer *buffer =
-        ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->outputBufferManager))->GetUsedBuffer(timeoutMs, false);
+        (reinterpret_cast<BufferManager*>(bufferManagerWrapper->outputBufferManager))->GetUsedBuffer(timeoutMs, false);
     return buffer;
 }
 
-static void PutOutputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
+static void PutOutputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *buffer)
 {
-    if (bufferManagerWrapper == nullptr || info == nullptr) {
+    if (bufferManagerWrapper == nullptr || buffer == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return;
     }
 
-    ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->outputBufferManager))->PutBuffer(info);
+    (reinterpret_cast<BufferManager*>(bufferManagerWrapper->outputBufferManager))->PutBuffer(buffer);
 }
 
-static void PutUsedOutputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *info)
+static void PutUsedOutputDataBufferImpl(const struct BufferManagerWrapper *bufferManagerWrapper, CodecBuffer *buffer)
 {
-    if (bufferManagerWrapper == nullptr || info == nullptr) {
+    if (bufferManagerWrapper == nullptr || buffer == nullptr) {
         HDF_LOGE("%{public}s: invalid params!", __func__);
         return;
     }
-    ((BufferManager<CodecBuffer>*)(bufferManagerWrapper->outputBufferManager))->PutUsedBuffer(info);
+
+    (reinterpret_cast<BufferManager*>(bufferManagerWrapper->outputBufferManager))->PutUsedBuffer(buffer);
 }
 
 static void ConstructBufferManager(struct BufferManagerWrapper *bufferManager)
@@ -151,16 +153,16 @@ static void ConstructBufferManager(struct BufferManagerWrapper *bufferManager)
 struct BufferManagerWrapper* GetBufferManager(void)
 {
     struct BufferManagerWrapper *bufferManager = new struct BufferManagerWrapper;
-    bufferManager->inputBufferManager = new BufferManager<CodecBuffer>();
-    bufferManager->outputBufferManager = new BufferManager<CodecBuffer>();
+    bufferManager->inputBufferManager = new BufferManager();
+    bufferManager->outputBufferManager = new BufferManager();
     ConstructBufferManager(bufferManager);
     return bufferManager;
 }
 
 void DeleteBufferManager(struct BufferManagerWrapper **ppBufferManager)
 {
-    delete (BufferManager<CodecBuffer>*)((*ppBufferManager)->inputBufferManager);
-    delete (BufferManager<CodecBuffer>*)((*ppBufferManager)->outputBufferManager);
+    delete reinterpret_cast<BufferManager*>((*ppBufferManager)->inputBufferManager);
+    delete reinterpret_cast<BufferManager*>((*ppBufferManager)->outputBufferManager);
     delete *ppBufferManager;
 }
 
