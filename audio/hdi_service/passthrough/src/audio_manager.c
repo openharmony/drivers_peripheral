@@ -36,6 +36,8 @@ BindServiceCapturePassthrough g_bindServiceCapture = NULL;
 InterfaceLibModeCapturePassthrough g_interfaceLibModeCapture = NULL;
 CloseServiceCapturePassthrough g_closeServiceCapture = NULL;
 
+InterfaceLibModeGetAllCardInfo g_getAllCardInfo = NULL;
+
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
 PathSelGetConfToJsonObj g_pathSelGetConfToJsonObj = NULL;
 PathSelAnalysisJson g_pathSelAnalysisJson = NULL;
@@ -113,9 +115,12 @@ static int32_t InitCapturePassthroughHandle(const char *capturePassthroughPath)
             AUDIO_FUNC_LOGE("open lib capture so fail, reason:%{public}s", dlerror());
             return HDF_FAILURE;
         }
-        g_bindServiceCapture = dlsym(g_ptrCaptureHandle, "AudioBindServiceCapture");
+        g_bindServiceCapture = dlsym(g_ptrCaptureHandle, "AudioBindService");
         g_interfaceLibModeCapture = dlsym(g_ptrCaptureHandle, "AudioInterfaceLibModeCapture");
-        g_closeServiceCapture = dlsym(g_ptrCaptureHandle, "AudioCloseServiceCapture");
+        g_closeServiceCapture = dlsym(g_ptrCaptureHandle, "AudioCloseService");
+        if (g_getAllCardInfo == NULL) {
+            g_getAllCardInfo = dlsym(g_ptrCaptureHandle, "AudioGetAllCardInfo");
+        }
         if (g_bindServiceCapture == NULL || g_interfaceLibModeCapture == NULL || g_closeServiceCapture == NULL) {
             AUDIO_FUNC_LOGE("lib capture so func not found!");
             AudioDlClose(&g_ptrCaptureHandle);
@@ -141,9 +146,12 @@ static int32_t InitRenderPassthroughHandle(const char *renderPassthroughPath)
             AUDIO_FUNC_LOGE("open lib render so fail, reason:%{public}s", dlerror());
             return HDF_FAILURE;
         }
-        g_bindServiceRender = dlsym(g_ptrRenderHandle, "AudioBindServiceRender");
+        g_bindServiceRender = dlsym(g_ptrRenderHandle, "AudioBindService");
         g_interfaceLibModeRender = dlsym(g_ptrRenderHandle, "AudioInterfaceLibModeRender");
-        g_closeServiceRender = dlsym(g_ptrRenderHandle, "AudioCloseServiceRender");
+        g_closeServiceRender = dlsym(g_ptrRenderHandle, "AudioCloseService");
+        if (g_getAllCardInfo == NULL) {
+            g_getAllCardInfo = dlsym(g_ptrRenderHandle, "AudioGetAllCardInfo");
+        }
         if (g_bindServiceRender == NULL || g_interfaceLibModeRender == NULL || g_closeServiceRender == NULL) {
             AUDIO_FUNC_LOGE("lib render so func not found!");
             AudioDlClose(&g_ptrRenderHandle);
@@ -254,26 +262,19 @@ static uint32_t AudioManagerServiceFindAdapterPos(struct IAudioManager *manager,
     return SUPPORT_ADAPTER_NUM_MAX;
 }
 
-int32_t AudioManagerGetAllAdapters(struct IAudioManager *manager, struct AudioAdapterDescriptor *descs, uint32_t *size)
+static int32_t AudioInitDynamicLib(void)
 {
-    AUDIO_FUNC_LOGI("enter!");
-    if (manager == NULL || descs == NULL || size == NULL) {
-        return AUDIO_ERR_INVALID_PARAM;
-    }
-    int32_t ret = AudioAdaptersForUser(descs, size);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioAdaptersForUser FAIL!");
-        return AUDIO_ERR_NOTREADY; // Failed to read sound card configuration file
-    }
     if (g_capturePassthroughPath == NULL || g_renderPassthroughPath == NULL) {
         AUDIO_FUNC_LOGE("sopath is error");
         return AUDIO_ERR_INTERNAL;
     }
-    ret = InitCapturePassthroughHandle(g_capturePassthroughPath);
+
+    int32_t ret = InitCapturePassthroughHandle(g_capturePassthroughPath);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("InitCapturePassthroughHandle FAIL!");
         return AUDIO_ERR_INTERNAL;
     }
+
     ret = InitRenderPassthroughHandle(g_renderPassthroughPath);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("InitRenderPassthroughHandle FAIL!");
@@ -288,6 +289,7 @@ int32_t AudioManagerGetAllAdapters(struct IAudioManager *manager, struct AudioAd
         AudioDlClose(&g_ptrCaptureHandle);
         return AUDIO_ERR_INTERNAL;
     }
+
     ret = g_pathSelGetConfToJsonObj();
     if (ret < 0) {
         AUDIO_FUNC_LOGE("g_pathSelGetConfToJsonObj FAIL!");
@@ -300,7 +302,29 @@ int32_t AudioManagerGetAllAdapters(struct IAudioManager *manager, struct AudioAd
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
+int32_t AudioManagerGetAllAdapters(struct IAudioManager *manager,
+    struct AudioAdapterDescriptor *descs, uint32_t *size)
+{
+    AUDIO_FUNC_LOGI("enter!");
+    if (manager == NULL || descs == NULL || size == NULL) {
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+
+    int32_t ret = AudioInitDynamicLib();
+    if (ret != AUDIO_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioInitDynamicLib FAIL! ret = %{public}d", ret);
+        return ret;
+    }
+
+    ret = AudioAdaptersForUser(g_getAllCardInfo, descs, size);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioAdaptersForUser FAIL!");
+        return AUDIO_ERR_NOTREADY;
+    }
+    return AUDIO_SUCCESS;
+}
+
+static int32_t LoadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         return AUDIO_ERR_INVALID_PARAM;
@@ -326,14 +350,14 @@ static int32_t loadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
+static int32_t LoadAdapterPrimary(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("primary desc or adapter is null");
         return AUDIO_ERR_INVALID_PARAM;
     }
 
-    int32_t ret = loadAdapterImpl(desc, adapter);
+    int32_t ret = LoadAdapterImpl(desc, adapter);
     if (ret != AUDIO_SUCCESS) {
         return ret;
     }
@@ -341,14 +365,14 @@ static int32_t loadAdapterPrimary(const struct AudioAdapterDescriptor *desc, str
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
+static int32_t LoadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         AUDIO_FUNC_LOGE("usb desc or adapter is null");
         return AUDIO_ERR_INVALID_PARAM;
     }
 
-    int32_t ret = loadAdapterImpl(desc, adapter);
+    int32_t ret = LoadAdapterImpl(desc, adapter);
     if (ret != AUDIO_SUCCESS) {
         return ret;
     }
@@ -356,7 +380,7 @@ static int32_t loadAdapterUsb(const struct AudioAdapterDescriptor *desc, struct 
     return AUDIO_SUCCESS;
 }
 
-static int32_t loadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
+static int32_t LoadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     if (desc == NULL || adapter == NULL) {
         return AUDIO_ERR_INVALID_PARAM;
@@ -365,7 +389,7 @@ static int32_t loadAdapterA2dp(const struct AudioAdapterDescriptor *desc, struct
     return AUDIO_ERR_NOT_SUPPORT;
 }
 
-static int32_t selectAppropriateAdapter(
+static int32_t SelectAppropriateAdapter(
     enum AudioAdapterType adapterType, const struct AudioAdapterDescriptor *desc, struct IAudioAdapter **adapter)
 {
     int32_t ret;
@@ -376,23 +400,24 @@ static int32_t selectAppropriateAdapter(
     switch (adapterType) {
         case AUDIO_ADAPTER_PRIMARY:
         case AUDIO_ADAPTER_PRIMARY_EXT:
-            ret = loadAdapterPrimary(desc, adapter);
+        case AUDIO_ADAPTER_HDMI:
+            ret = LoadAdapterPrimary(desc, adapter);
             if (ret != AUDIO_SUCCESS) {
-                AUDIO_FUNC_LOGE("loadAdapterPrimary failed.");
+                AUDIO_FUNC_LOGE("LoadAdapterPrimary failed.");
                 return ret;
             }
             break;
         case AUDIO_ADAPTER_USB:
-            ret = loadAdapterUsb(desc, adapter);
+            ret = LoadAdapterUsb(desc, adapter);
             if (ret != AUDIO_SUCCESS) {
-                AUDIO_FUNC_LOGE("loadAdapterUsb failed.");
+                AUDIO_FUNC_LOGE("LoadAdapterUsb failed.");
                 return ret;
             }
             break;
         case AUDIO_ADAPTER_A2DP:
-            ret = loadAdapterA2dp(desc, adapter);
+            ret = LoadAdapterA2dp(desc, adapter);
             if (ret != AUDIO_SUCCESS) {
-                AUDIO_FUNC_LOGE("loadAdapterA2dp failed.");
+                AUDIO_FUNC_LOGE("LoadAdapterA2dp failed.");
                 return ret;
             }
             break;
@@ -462,7 +487,7 @@ int32_t AudioManagerLoadAdapter(
     }
 
     enum AudioAdapterType sndCardType = MatchAdapterType(desc->adapterName, desc->ports[0].portId);
-    int32_t ret = selectAppropriateAdapter(sndCardType, &(AudioAdapterGetConfigDescs()[index]), adapter);
+    int32_t ret = SelectAppropriateAdapter(sndCardType, &(AudioAdapterGetConfigDescs()[index]), adapter);
     if (ret != AUDIO_SUCCESS) {
         AUDIO_FUNC_LOGE("Load adapter failed.");
         return ret;

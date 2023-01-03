@@ -45,21 +45,8 @@
 
 namespace OHOS {
 namespace Audio {
-#ifdef AUDIO_ADM_SO
-    const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
-    const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio");
-    const int IS_ADM = true;
-#endif
-#ifdef AUDIO_ADM_SERVICE
-    const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
-    const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
-    using TestAudioManager = struct AudioManager;
-    const int IS_ADM = true;
-#endif
+
 #ifdef __LITEOS__
-    const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
-    const std::string RESOLVED_PATH = "/usr/lib/libhdi_audio.so";
-    const int IS_ADM = true;
     const std::string AUDIO_FILE = "/userdata/audiorendertest.wav";
     const std::string LOW_LATENCY_AUDIO_FILE = "/userdata/lowlatencyrendertest.wav";
     const std::string AUDIO_CAPTURE_FILE = "/userdata/audiocapture.wav";
@@ -218,7 +205,13 @@ struct PrepareAudioPara {
     struct AudioDeviceDescriptor devDesc;
 };
 
-int32_t InitAttrs(struct AudioSampleAttributes &attrs);
+void InitAttrsCommon(struct AudioSampleAttributes &attrs);
+
+void InitAttrs(struct AudioSampleAttributes &attrs);
+
+void InitAttrsRender(struct AudioSampleAttributes &attrs);
+
+void InitAttrsCapture(struct AudioSampleAttributes &attrs);
 
 int32_t InitDevDesc(struct AudioDeviceDescriptor &devDesc, const uint32_t portId, int pins);
 
@@ -280,7 +273,7 @@ int32_t PlayAudioFile(struct PrepareAudioPara &audiopara);
 
 int32_t RecordAudio(struct PrepareAudioPara &audiopara);
 
-int32_t InitAttrsUpdate(struct AudioSampleAttributes &attrs, int format, uint32_t channelCount,
+void InitAttrsUpdate(struct AudioSampleAttributes &attrs, int format, uint32_t channelCount,
     uint32_t sampleRate, uint32_t silenceThreshold = BUFFER_LENTH);
 
 int32_t AudioRenderSetGetSampleAttributes(struct AudioSampleAttributes attrs, struct AudioSampleAttributes &attrsValue,
@@ -298,7 +291,6 @@ int32_t AudioRenderCallback(enum AudioCallbackType type, void *reserved, void *c
 int32_t CheckFlushValue();
 int32_t CheckRenderFullValue();
 int32_t CheckWriteCompleteValue();
-int32_t LoadFunction(void *&handle, TestGetAudioManager &getAudioManager);
 
 int32_t ReleaseCaptureSource(struct AudioManager *manager, struct AudioAdapter *&adapter,
     struct AudioCapture *&capture);

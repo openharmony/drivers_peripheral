@@ -37,10 +37,12 @@ using namespace std;
 using namespace testing::ext;
 namespace {
 constexpr int32_t WIDTH = 640;
-constexpr int32_t HEIGHT = 480;
+#ifdef SUPPORT_OMX
 constexpr uint32_t MAX_ROLE_INDEX = 1000;
-constexpr int32_t BUFFER_SIZE = WIDTH * HEIGHT * 3;
 constexpr int32_t ROLE_LEN = 240;
+#endif
+constexpr int32_t HEIGHT = 480;
+constexpr int32_t BUFFER_SIZE = WIDTH * HEIGHT * 3;
 constexpr int32_t FRAMERATE = 30 << 16;
 constexpr uint32_t BUFFER_ID_ERROR = 65000;
 class CodecHdiOmxTest : public testing::Test {
@@ -249,6 +251,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetVersionTest_002, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
+#ifdef SUPPORT_OMX
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetParameterTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -272,6 +275,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetParameterTest_002, TestSize.Level1)
                                         reinterpret_cast<int8_t *>(&pixFormat), sizeof(pixFormat));
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
+#endif
 
 // Test GetParameter
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetParameterTest_003, TestSize.Level1)
@@ -378,6 +382,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetParameterTest_005, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
+#ifdef SUPPORT_OMX
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetParameterTest_006, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -393,6 +398,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetParameterTest_006, TestSize.Level1)
                                    sizeof(pixFormat));
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
+#endif
 
 // Test GetConfig
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetConfigTest_001, TestSize.Level1)
@@ -478,6 +484,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetConfigTest_004, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
+#ifdef SUPPORT_OMX
 // Test GetExtensionIndex
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetExtensionIndexTest_001, TestSize.Level1)
 {
@@ -487,6 +494,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetExtensionIndexTest_001, TestSize.Level1)
         component_->GetExtensionIndex(component_, "OMX.Topaz.index.param.extended_video", (uint32_t *)&indexType);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
+#endif
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetExtensionIndexTest_002, TestSize.Level1)
 {
@@ -528,6 +536,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiGetStateTest_002, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
+#ifdef SUPPORT_OMX
 // Test ComponentTunnelRequest
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiTunnelRequestTest_001, TestSize.Level1)
 {
@@ -541,6 +550,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiTunnelRequestTest_001, TestSize.Level1)
                                                   tunneledPort, &tunnelSetup);
     ASSERT_NE(ret, HDF_SUCCESS);
 }
+#endif
 
 // Test SendCommand
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiLoadedToExecutingTest_001, TestSize.Level1)
@@ -668,6 +678,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_004, TestSize.Level1)
     ASSERT_NE(err, HDF_SUCCESS);
 }
 
+#ifdef SUPPORT_OMX
 // Use buffer on input index
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_005, TestSize.Level1)
 {
@@ -805,6 +816,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_010, TestSize.Level1)
     FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
     ASSERT_FALSE(ret);
 }
+#endif
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_005, TestSize.Level1)
 {
@@ -843,6 +855,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseEglImageTest_001, TestSize.Level1)
     eglImage = nullptr;
 }
 
+#ifdef SUPPORT_OMX
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiBufferFillAndEmptyTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -894,6 +907,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiBufferFillAndEmptyTest_001, TestSize.Level1
     } while (state != OMX_StateLoaded);
     component_->ComponentDeInit(component_);
 }
+#endif
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFillThisBufferTest_002, TestSize.Level1)
 {
@@ -941,6 +955,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetCallbackTest_001, TestSize.Level1)
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
 
+#ifdef SUPPORT_OMX
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -948,6 +963,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_001, TestSize.Level1)
     auto ret = component_->ComponentRoleEnum(component_, role, ROLE_LEN, 0);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
+#endif
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_002, TestSize.Level1)
 {
@@ -956,6 +972,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_002, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
+#ifdef SUPPORT_OMX
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiRoleEnumTest_003, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -971,6 +988,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiExecutingToIdleTest_001, TestSize.Level1)
     auto ret = component_->SendCommand(component_, OMX_CommandStateSet, OMX_StateIdle, nullptr, 0);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
+#endif
 
 // Release input buffer
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_001, TestSize.Level1)
@@ -990,6 +1008,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_001, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
+#ifdef SUPPORT_OMX
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_002, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -1006,6 +1025,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_002, TestSize.Level1)
     ret = FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
     ASSERT_TRUE(ret);
 }
+#endif
 
 // Release input buffer
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_003, TestSize.Level1)
@@ -1025,6 +1045,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_003, TestSize.Level1)
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
+#ifdef SUPPORT_OMX
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_004, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
@@ -1041,6 +1062,7 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiFreeBufferTest_004, TestSize.Level1)
     ret = FreeBufferOnPort(PortIndex::PORT_INDEX_INPUT);
     ASSERT_TRUE(ret);
 }
+
 // When ComponentDeInit, must change to Loaded State
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDeInitTest_001, TestSize.Level1)
 {
@@ -1057,5 +1079,6 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiDeInitTest_001, TestSize.Level1)
     ret = component_->ComponentDeInit(component_);
     ASSERT_EQ(ret, HDF_SUCCESS);
 }
+#endif
 
 }  // namespace

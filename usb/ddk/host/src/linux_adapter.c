@@ -1016,6 +1016,50 @@ static int32_t AdapterClaimInterface(const struct UsbDeviceHandle *handle, unsig
     return HDF_SUCCESS;
 }
 
+static int32_t AdapterDetachKernelDriverAndClaim(const struct UsbDeviceHandle *handle, uint32_t interfaceNumber)
+{
+    struct UsbAdapterDisconnectClaim dc;
+    int32_t ret;
+    if (handle == NULL) {
+        HDF_LOGE("%{public}s: invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    struct UsbAdapterGetdriver getDriver = {interfaceNumber, {0}};
+    ret = ioctl(handle->fd, USBDEVFS_GETDRIVER, &getDriver);
+    if (ret != 0 && errno == ENODATA) {
+        HDF_LOGI("%{public}s: no usb driver", __func__);
+        return AdapterClaimInterface(handle, interfaceNumber);
+    }
+    if (ret == 0 && strcmp(getDriver.driver, "usbfs") == 0) {
+        HDF_LOGI("%{public}s: usbfs already claimed", __func__);
+        return HDF_SUCCESS;
+    }
+
+    dc.interface = interfaceNumber;
+    ret = strcpy_s(dc.driver, MAX_DRIVER_NAME_LENGTH, "usbfs");
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s: strcpy_s failed", __func__);
+        return ret;
+    }
+    dc.flags = DISCONNECT_CLAIM_EXCEPT_DRIVER;
+    ret = ioctl(handle->fd, USBDEVFS_DISCONNECT_CLAIM, &dc);
+    if (ret == 0) {
+        return HDF_SUCCESS;
+    }
+    if (errno != ENOTTY) {
+        HDF_LOGE("%{public}s: disconnect-and-claim failed errno %{public}d", __func__, errno);
+        return ret;
+    }
+
+    struct UsbAdapterIoctl command = {interfaceNumber, USBDEVFS_DISCONNECT, NULL};
+    ret = ioctl(handle->fd, USBDEVFS_IOCTL, &command);
+    if (ret != 0) {
+        HDF_LOGE("%{public}s; disconnet failed errno = %{public}d", __func__, errno);
+        return ret;
+    }
+    return AdapterClaimInterface(handle, interfaceNumber);
+}
+
 static int32_t AdapterReleaseInterface(const struct UsbDeviceHandle *handle, unsigned int interfaceNumber)
 {
     int32_t ret;
@@ -1271,6 +1315,7 @@ static struct UsbOsAdapterOps g_usbAdapter = {
     .submitRequest = AdapterSubmitRequest,
     .cancelRequest = AdapterCancelRequest,
     .urbCompleteHandle = AdapterUrbCompleteHandle,
+    .detachKernelDriverAndClaim = AdapterDetachKernelDriverAndClaim,
 };
 
 static void OsSignalHandler(int32_t signo)

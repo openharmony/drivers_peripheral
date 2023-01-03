@@ -1,0 +1,41 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+group("hdf_fuzztest_media_codec_adapter") {
+  testonly = true
+  CODEC_OEM_PATH = rebase_path(
+          "//device/soc/${device_company}/${product_name}/hardware/codec")
+  cmd = "if [ -f ${CODEC_OEM_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
+  HAVE_CODEC_OEM_PATH =
+      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
+
+  if (HAVE_CODEC_OEM_PATH) {
+    deps = [
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecallocatebuffer_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codeccomponentroleenum_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codeccomponenttunnelrequest_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codeccreatecomponent_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecfreebuffer_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecgetcomponentcapabilitylist_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecgetconfig_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecgetextensionIndex_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecgetparameter_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecsendcommand_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecsetcallbacks_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecsetconfig_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecsetparameter_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecusebuffer_adapter_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecuseeglimage_adapter_fuzzer:fuzztest",
+    ]
+  }
+}

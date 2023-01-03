@@ -30,7 +30,8 @@ namespace HDI {
 namespace Thermal {
 namespace V1_0 {
 namespace {
-const std::string HDI_XML_NAME = HDF_ETC_DIR "/thermal_config/hdf/thermal_hdi_config.xml";
+const std::string HDI_XML_PATH = HDF_ETC_DIR "/thermal_config/hdf/thermal_hdi_config.xml";
+const std::string HDI_CUST_XML_PATH = "/chip_prod/etc/thermal_config/cust/thermal_hdi_config.xml";
 bool g_isHdiStart = false;
 }
 static sptr<IThermalCallback> theramalCb_ = nullptr;
@@ -52,10 +53,14 @@ ThermalInterfaceImpl::ThermalInterfaceImpl()
 
 int32_t ThermalInterfaceImpl::Init()
 {
-    int32_t ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(HDI_XML_NAME);
+    int32_t ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(HDI_CUST_XML_PATH);
     if (ret != HDF_SUCCESS) {
-        THERMAL_HILOGE(COMP_HDI, "failed to init XML, ret: %{public}d", ret);
-        return HDF_FAILURE;
+        THERMAL_HILOGI(COMP_HDI, "init thermal hdi common XML");
+        ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(HDI_XML_PATH);
+        if (ret != HDF_SUCCESS) {
+            THERMAL_HILOGE(COMP_HDI, "failed to init XML, ret: %{public}d", ret);
+            return HDF_FAILURE;
+        }
     }
 
     if (simulation_ == nullptr) {
@@ -75,11 +80,9 @@ int32_t ThermalInterfaceImpl::Init()
         hdfTimer_->SetSimluationFlag();
     }
 
-    if (hdfTimer_->GetSimluationFlag()) {
-        ret = simulation_->NodeInit();
-        if (ret != HDF_SUCCESS) {
-            return HDF_FAILURE;
-        }
+    ret = simulation_->NodeInit();
+    if (ret != HDF_SUCCESS) {
+        return HDF_FAILURE;
     }
 
     thermalZoneMgr_->CalculateMaxCd();

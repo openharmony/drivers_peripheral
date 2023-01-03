@@ -26,21 +26,27 @@
 #define MEM_GROWTH_FACTOR 2
 #define MAX_CREDENTIAL_RETURN 5000
 
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
 // Caches IDM user information.
-static LinkedList *g_userInfoList = NULL;
+IAM_STATIC LinkedList *g_userInfoList = NULL;
 
 // Caches the current user to reduce the number of user list traversal times.
-static UserInfo *g_currentUser = NULL;
+IAM_STATIC UserInfo *g_currentUser = NULL;
 
 typedef bool (*DuplicateCheckFunc)(LinkedList *collection, uint64_t value);
 
-static UserInfo *QueryUserInfo(int32_t userId);
-static ResultCode GetAllEnrolledInfoFromUser(UserInfo *userInfo, EnrolledInfoHal **enrolledInfos, uint32_t *num);
-static ResultCode DeleteUser(int32_t userId);
-static CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList *credentialList);
-static CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedList *credentialList);
-static bool MatchCredentialById(const void *data, const void *condition);
-static ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func);
+IAM_STATIC UserInfo *QueryUserInfo(int32_t userId);
+IAM_STATIC ResultCode GetAllEnrolledInfoFromUser(UserInfo *userInfo, EnrolledInfoHal **enrolledInfos, uint32_t *num);
+IAM_STATIC ResultCode DeleteUser(int32_t userId);
+IAM_STATIC CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList *credentialList);
+IAM_STATIC CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedList *credentialList);
+IAM_STATIC bool MatchCredentialById(const void *data, const void *condition);
+IAM_STATIC ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func);
 
 ResultCode InitUserInfoList(void)
 {
@@ -63,7 +69,7 @@ void DestroyUserInfoList(void)
     g_userInfoList = NULL;
 }
 
-static bool MatchUserInfo(const void *data, const void *condition)
+IAM_STATIC bool MatchUserInfo(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         LOG_ERROR("please check invalid node");
@@ -77,7 +83,7 @@ static bool MatchUserInfo(const void *data, const void *condition)
     return false;
 }
 
-static bool IsUserInfoValid(UserInfo *userInfo)
+IAM_STATIC bool IsUserInfoValid(UserInfo *userInfo)
 {
     if (userInfo == NULL) {
         LOG_ERROR("userInfo is null");
@@ -189,7 +195,7 @@ ResultCode DeleteUserInfo(int32_t userId, LinkedList **creds)
     return ret;
 }
 
-static UserInfo *QueryUserInfo(int32_t userId)
+IAM_STATIC UserInfo *QueryUserInfo(int32_t userId)
 {
     UserInfo *user = g_currentUser;
     if (user != NULL && user->userId == userId) {
@@ -216,7 +222,7 @@ static UserInfo *QueryUserInfo(int32_t userId)
     return NULL;
 }
 
-static ResultCode GetAllEnrolledInfoFromUser(UserInfo *userInfo, EnrolledInfoHal **enrolledInfos, uint32_t *num)
+IAM_STATIC ResultCode GetAllEnrolledInfoFromUser(UserInfo *userInfo, EnrolledInfoHal **enrolledInfos, uint32_t *num)
 {
     LinkedList *enrolledInfoList = userInfo->enrolledInfoList;
     uint32_t size = enrolledInfoList->getSize(enrolledInfoList);
@@ -253,7 +259,7 @@ EXIT:
     return result;
 }
 
-static bool IsSecureUidDuplicate(LinkedList *userInfoList, uint64_t secureUid)
+IAM_STATIC bool IsSecureUidDuplicate(LinkedList *userInfoList, uint64_t secureUid)
 {
     if (userInfoList == NULL) {
         LOG_ERROR("the user list is empty, and the branch is abnormal");
@@ -273,7 +279,7 @@ static bool IsSecureUidDuplicate(LinkedList *userInfoList, uint64_t secureUid)
     return false;
 }
 
-static UserInfo *CreateUser(int32_t userId)
+IAM_STATIC UserInfo *CreateUser(int32_t userId)
 {
     UserInfo *user = InitUserInfoNode();
     if (!IsUserInfoValid(user)) {
@@ -291,7 +297,7 @@ static UserInfo *CreateUser(int32_t userId)
     return user;
 }
 
-static ResultCode DeleteUser(int32_t userId)
+IAM_STATIC ResultCode DeleteUser(int32_t userId)
 {
     if (g_userInfoList == NULL) {
         return RESULT_BAD_PARAM;
@@ -299,7 +305,7 @@ static ResultCode DeleteUser(int32_t userId)
     return g_userInfoList->remove(g_userInfoList, &userId, MatchUserInfo, true);
 }
 
-static bool IsCredentialIdDuplicate(LinkedList *userInfoList, uint64_t credentialId)
+IAM_STATIC bool IsCredentialIdDuplicate(LinkedList *userInfoList, uint64_t credentialId)
 {
     (void)userInfoList;
     CredentialCondition condition = {};
@@ -318,7 +324,7 @@ static bool IsCredentialIdDuplicate(LinkedList *userInfoList, uint64_t credentia
     return false;
 }
 
-static bool IsEnrolledIdDuplicate(LinkedList *enrolledList, uint64_t enrolledId)
+IAM_STATIC bool IsEnrolledIdDuplicate(LinkedList *enrolledList, uint64_t enrolledId)
 {
     LinkedListNode *temp = enrolledList->head;
     EnrolledInfoHal *enrolledInfo = NULL;
@@ -333,7 +339,7 @@ static bool IsEnrolledIdDuplicate(LinkedList *enrolledList, uint64_t enrolledId)
     return false;
 }
 
-static ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func)
+IAM_STATIC ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *destValue, DuplicateCheckFunc func)
 {
     if (collection == NULL || destValue == NULL || func == NULL) {
         LOG_ERROR("param is null");
@@ -356,7 +362,7 @@ static ResultCode GenerateDeduplicateUint64(LinkedList *collection, uint64_t *de
     return RESULT_GENERAL_ERROR;
 }
 
-static ResultCode UpdateEnrolledId(LinkedList *enrolledList, uint32_t authType)
+IAM_STATIC ResultCode UpdateEnrolledId(LinkedList *enrolledList, uint32_t authType)
 {
     LinkedListNode *temp = enrolledList->head;
     EnrolledInfoHal *enrolledInfo = NULL;
@@ -393,7 +399,7 @@ static ResultCode UpdateEnrolledId(LinkedList *enrolledList, uint32_t authType)
     return ret;
 }
 
-static ResultCode AddCredentialToUser(UserInfo *user, CredentialInfoHal *credentialInfo)
+IAM_STATIC ResultCode AddCredentialToUser(UserInfo *user, CredentialInfoHal *credentialInfo)
 {
     if (g_userInfoList == NULL) {
         LOG_ERROR("g_userInfoList is uninitialized");
@@ -434,7 +440,7 @@ static ResultCode AddCredentialToUser(UserInfo *user, CredentialInfoHal *credent
     return ret;
 }
 
-static ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo)
+IAM_STATIC ResultCode AddUser(int32_t userId, CredentialInfoHal *credentialInfo)
 {
     if (g_userInfoList == NULL) {
         LOG_ERROR("please init");
@@ -526,7 +532,7 @@ ResultCode AddCredentialInfo(int32_t userId, CredentialInfoHal *credentialInfo)
     return ret;
 }
 
-static bool MatchCredentialById(const void *data, const void *condition)
+IAM_STATIC bool MatchCredentialById(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         return false;
@@ -539,7 +545,7 @@ static bool MatchCredentialById(const void *data, const void *condition)
     return false;
 }
 
-static bool MatchEnrolledInfoByType(const void *data, const void *condition)
+IAM_STATIC bool MatchEnrolledInfoByType(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         return false;
@@ -599,7 +605,7 @@ ResultCode DeleteCredentialInfo(int32_t userId, uint64_t credentialId, Credentia
     return UpdateFileInfo(g_userInfoList);
 }
 
-static CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList *credentialList)
+IAM_STATIC CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList *credentialList)
 {
     if (credentialList == NULL) {
         return NULL;
@@ -617,7 +623,7 @@ static CredentialInfoHal *QueryCredentialById(uint64_t credentialId, LinkedList 
     return credentialInfo;
 }
 
-static CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedList *credentialList)
+IAM_STATIC CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedList *credentialList)
 {
     if (credentialList == NULL) {
         return NULL;
@@ -635,7 +641,7 @@ static CredentialInfoHal *QueryCredentialByAuthType(uint32_t authType, LinkedLis
     return credentialInfo;
 }
 
-static bool IsCredMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
+IAM_STATIC bool IsCredMatch(const CredentialCondition *limit, const CredentialInfoHal *credentialInfo)
 {
     if ((limit->conditionFactor & CREDENTIAL_CONDITION_CREDENTIAL_ID) != 0 &&
         limit->credentialId != credentialInfo->credentialId) {
@@ -660,7 +666,7 @@ static bool IsCredMatch(const CredentialCondition *limit, const CredentialInfoHa
     return true;
 }
 
-static bool IsUserMatch(const CredentialCondition *limit, const UserInfo *user)
+IAM_STATIC bool IsUserMatch(const CredentialCondition *limit, const UserInfo *user)
 {
     if ((limit->conditionFactor & CREDENTIAL_CONDITION_USER_ID) != 0 && limit->userId != user->userId) {
         return false;
@@ -668,7 +674,7 @@ static bool IsUserMatch(const CredentialCondition *limit, const UserInfo *user)
     return true;
 }
 
-static ResultCode TraverseCredentialList(const CredentialCondition *limit, const LinkedList *credentialList,
+IAM_STATIC ResultCode TraverseCredentialList(const CredentialCondition *limit, const LinkedList *credentialList,
     LinkedList *credListGet)
 {
     if (credentialList == NULL) {

@@ -26,7 +26,7 @@ namespace V1_1 {
 namespace {
 constexpr uint32_t MOVE_RIGHT_16 = 16;
 constexpr uint32_t MOVE_RIGHT_8 = 8;
-}
+} // namespace
 void BatteryLed::InitLight()
 {
     batteryLight_ = ILightInterface::Get();
@@ -59,13 +59,12 @@ void BatteryLed::TurnOff()
     lightColor_ = (ret < HDF_SUCCESS) ? lightColor_ : 0;
 }
 
-void BatteryLed::TurnOn(uint32_t color, int32_t brightness)
+void BatteryLed::TurnOn(uint32_t color)
 {
     if (!available_) {
         return;
     }
     struct HdfLightEffect effect = {
-        .lightColor.colorValue.rgbColor.brightness = brightness,
         .lightColor.colorValue.rgbColor.r = (color >> MOVE_RIGHT_16) & 0xFF,
         .lightColor.colorValue.rgbColor.g = (color >> MOVE_RIGHT_8) & 0xFF,
         .lightColor.colorValue.rgbColor.b = color & 0xFF,
@@ -87,8 +86,8 @@ bool BatteryLed::UpdateColor(int32_t chargeState, int32_t capacity)
         return false;
     }
 
-    const auto &lightConf = BatteryConfig::GetInstance().GetLightConf();
-    for (const auto &it : lightConf) {
+    const auto& lightConf = BatteryConfig::GetInstance().GetLightConf();
+    for (const auto& it : lightConf) {
         if ((capacity >= it.beginSoc) && (capacity <= it.endSoc)) {
             if (lightColor_ == it.rgb) {
                 return true;

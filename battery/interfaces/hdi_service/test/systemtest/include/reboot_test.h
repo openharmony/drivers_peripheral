@@ -17,7 +17,6 @@
 #define REBOOT_TEST_H
 
 #include <gtest/gtest.h>
-#include "power_supply_provider.h"
 #include "battery_thread_test.h"
 #include "charger_thread.h"
 

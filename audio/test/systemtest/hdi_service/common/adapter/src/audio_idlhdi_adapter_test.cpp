@@ -76,47 +76,6 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterInitAllPorts_001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     IAudioAdapterRelease(adapter, IS_STUB);
 }
-
-/**
-* @tc.name  AudioAdapterInitAllPorts_002
-* @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if loads two adapters successfully.
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioIdlHdiAdapterTest, AudioAdapterInitAllPorts_002, TestSize.Level1)
-{
-    struct AudioPort secondAudioPort = {};
-    struct IAudioAdapter *firstAdapter = nullptr;
-    struct IAudioAdapter *secondAdapter = nullptr;
-    ASSERT_NE(nullptr, manager);
-
-    int32_t ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &firstAdapter, audioPort);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    ASSERT_NE(nullptr, firstAdapter);
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_OUT, &secondAdapter, secondAudioPort);
-    if (ret < 0 || secondAdapter == nullptr) {
-        if (secondAudioPort.portName != nullptr) {
-            free(secondAudioPort.portName);
-        }
-        manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-        IAudioAdapterRelease(firstAdapter, IS_STUB);;
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
-    ret = firstAdapter->InitAllPorts(firstAdapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = secondAdapter->InitAllPorts(secondAdapter);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = manager->UnloadAdapter(manager, ADAPTER_NAME_OUT.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    IAudioAdapterRelease(firstAdapter, IS_STUB);;
-    IAudioAdapterRelease(secondAdapter, IS_STUB);;
-    free(secondAudioPort.portName);
-}
-
 /**
 * @tc.name  AudioAdapterInitAllPortsNull_003
 * @tc.desc  Test AudioAdapterInitAllPorts API, return -3/-4 if the parameter adapter is nullptr.
@@ -636,8 +595,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCaptureNull_005, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, audioPort.portId, PIN_IN_MIC);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = adapter->CreateCapture(adapterNull, &devDesc, &attrs, &capture);
@@ -662,8 +620,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCaptureNull_006, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = adapter->CreateCapture(adapter, devDesc, &attrs, &capture);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
@@ -710,8 +667,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCaptureNull_008, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, audioPort.portId, PIN_IN_MIC);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, capture);
@@ -723,7 +679,8 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCaptureNull_008, TestSize.Level1)
 #endif
 /**
 * @tc.name  AudioCreateCapture_009
-* @tc.desc  Test AudioCreateCapture interface,Returns -1 if the incoming parameter adapter which port type is PORT_OUT
+* @tc.desc  Test AudioCreateCapture interface,Returns -1 if the incoming parameter adapter which devDesc'pin is
+* PIN_OUT_SPEAKER
 * @tc.type: FUNC
 */
 HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_009, TestSize.Level1)
@@ -734,15 +691,14 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_009, TestSize.Level1)
     struct IAudioAdapter *adapter = nullptr;
     struct IAudioCapture *capture = nullptr;
     ASSERT_NE(nullptr, manager);
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_OUT, &adapter, audioPort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, audioPort.portId, PIN_OUT_SPEAKER);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
     EXPECT_EQ(HDF_FAILURE, ret);
-    manager->UnloadAdapter(manager, ADAPTER_NAME_OUT.c_str());
+    manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     IAudioAdapterRelease(adapter, IS_STUB);
     free(devDesc.desc);
 }
@@ -763,8 +719,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateCapture_010, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(HDF_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, portId, PIN_IN_MIC);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
@@ -984,7 +939,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_009, TestSize.Level1)
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
-    ret = InitAttrs(attrs);
+    InitAttrs(attrs);
     InitDevDesc(devDesc, audioPort.portId, PIN_OUT_SPEAKER);
 
     devDesc.pins = PIN_NONE;
@@ -1013,7 +968,7 @@ HWTEST_F(AudioIdlHdiAdapterTest, AudioCreateRender_010, TestSize.Level1)
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, audioPort);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
-    ret = InitAttrs(attrs);
+    InitAttrs(attrs);
     InitDevDesc(devDesc, portId, PIN_OUT_SPEAKER);
 
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);

@@ -22,10 +22,16 @@
 #include "adaptor_memory.h"
 #include "pool.h"
 
-// Used to cache the ongoing coAuth scheduling.
-static LinkedList *g_scheduleList = NULL;
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
 
-static bool IsCoAuthInit(void)
+// Used to cache the ongoing coAuth scheduling.
+IAM_STATIC LinkedList *g_scheduleList = NULL;
+
+IAM_STATIC bool IsCoAuthInit(void)
 {
     return g_scheduleList != NULL;
 }
@@ -119,7 +125,7 @@ ResultCode AddCoAuthSchedule(const CoAuthSchedule *coAuthSchedule)
     return result;
 }
 
-static bool IsScheduleMatch(const void *data, const void *condition)
+IAM_STATIC bool IsScheduleMatch(const void *data, const void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("get null data");
@@ -168,7 +174,7 @@ const CoAuthSchedule *GetCoAuthSchedule(uint64_t scheduleId)
     return NULL;
 }
 
-static bool IsScheduleIdDuplicate(uint64_t scheduleId)
+IAM_STATIC bool IsScheduleIdDuplicate(uint64_t scheduleId)
 {
     LinkedListNode *temp = g_scheduleList->head;
     CoAuthSchedule *schedule = NULL;
@@ -183,7 +189,7 @@ static bool IsScheduleIdDuplicate(uint64_t scheduleId)
     return false;
 }
 
-static ResultCode GenerateValidScheduleId(uint64_t *scheduleId)
+IAM_STATIC ResultCode GenerateValidScheduleId(uint64_t *scheduleId)
 {
     if (g_scheduleList == NULL) {
         LOG_ERROR("g_poolList is null");
@@ -206,8 +212,8 @@ static ResultCode GenerateValidScheduleId(uint64_t *scheduleId)
     return RESULT_GENERAL_ERROR;
 }
 
-static ResultCode MountExecutorOnce(const LinkedList *executors, CoAuthSchedule *coAuthSchedule, uint32_t sensorHint,
-    uint32_t executorRole)
+IAM_STATIC ResultCode MountExecutorOnce(const LinkedList *executors, CoAuthSchedule *coAuthSchedule,
+    uint32_t sensorHint, uint32_t executorRole)
 {
     LinkedListNode *tempNode = executors->head;
     while (tempNode != NULL) {
@@ -232,7 +238,7 @@ static ResultCode MountExecutorOnce(const LinkedList *executors, CoAuthSchedule 
     return RESULT_NOT_FOUND;
 }
 
-static ResultCode MountExecutor(const ScheduleParam *param, CoAuthSchedule *coAuthSchedule)
+IAM_STATIC ResultCode MountExecutor(const ScheduleParam *param, CoAuthSchedule *coAuthSchedule)
 {
     ExecutorCondition condition = {};
     SetExecutorConditionAuthType(&condition, param->authType);

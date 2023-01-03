@@ -174,7 +174,7 @@ int32_t DdkListenerMgrRemove(struct HdfDevEventlistener *listener)
     return HDF_SUCCESS;
 }
 
-int32_t DdkListenerMgrInit()
+int32_t DdkListenerMgrInit(void)
 {
     if (g_ddkListenerList.isInit) {
         return HDF_SUCCESS;

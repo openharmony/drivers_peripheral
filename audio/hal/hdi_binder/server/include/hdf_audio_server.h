@@ -22,6 +22,7 @@ enum AudioHdiServerCmdId {
     /*************public*************/
     AUDIO_HDI_MGR_GET_FUNCS = 0,
     AUDIO_HDI_MGR_GET_ALL_ADAPTER,
+    AUDIO_HDI_MGR_RELEASE,
     AUDIO_HDI_MGR_LOAD_ADAPTER,
     AUDIO_HDI_MGR_UNLOAD_ADAPTER,
 

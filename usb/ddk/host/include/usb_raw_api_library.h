@@ -103,7 +103,7 @@ int32_t RawSendInterruptRequest(const struct UsbHostRequest *request, const stru
 struct UsbHostRequest *RawAllocRequest(const struct UsbDeviceHandle *devHandle, int32_t isoPackets, int32_t length);
 int32_t RawFreeRequest(const struct UsbHostRequest *request);
 int32_t RawGetConfigDescriptor(const struct UsbDevice *dev, uint8_t configIndex,
-    struct UsbRawConfigDescriptor **config);
+    struct UsbRawConfigDescriptor ** const config);
 void RawClearConfiguration(struct UsbRawConfigDescriptor *config);
 int32_t RawGetConfiguration(const struct UsbDeviceHandle *devHandle, int32_t *config);
 int32_t RawSetConfiguration(const struct UsbDeviceHandle *devHandle, int32_t configuration);
@@ -129,5 +129,6 @@ void *RawUsbMemAlloc(size_t size);
 void *RawUsbMemCalloc(size_t size);
 void RawUsbMemFree(void *mem);
 int32_t RawUsbMemTestTrigger(bool enable);
+int32_t RawClaimInterfaceForce(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber);
 
 #endif /* USB_RAW_API_LIBRARY_H */

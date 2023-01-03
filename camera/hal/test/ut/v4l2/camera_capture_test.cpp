@@ -63,8 +63,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_001, TestSize.Level1)
   */
 HWTEST_F(CameraCaptureTest, camera_capture_002, TestSize.Level1)
 {
-    std::cout << "==========[test log] Preview + capture, then cloase camera,";
-    std::cout << "and preview + capture again." << std::endl;
+    CAMERA_LOGD("Preview + capture, then close camera, and preview + capture again.");
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
@@ -103,7 +102,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_002, TestSize.Level1)
   */
 HWTEST_F(CameraCaptureTest, camera_capture_003, TestSize.Level1)
 {
-    std::cout << "==========[test log] Capture with 3A, success." << std::endl;
+    CAMERA_LOGD("Capture with 3A, success.");
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
@@ -122,9 +121,9 @@ HWTEST_F(CameraCaptureTest, camera_capture_003, TestSize.Level1)
     MetadataUtils::ConvertMetadataToVec(meta, setting);
     display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] UpdateSettings success, for 10s." << std::endl;
+        CAMERA_LOGI("UpdateSettings success, for 10s.");
     } else {
-        std::cout << "==========[test log] UpdateSettings fail, rc = " << display_->rc << std::endl;
+        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", display_->rc);
     }
     // release stream
     display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
@@ -141,8 +140,8 @@ HWTEST_F(CameraCaptureTest, camera_capture_003, TestSize.Level1)
   */
 HWTEST_F(CameraCaptureTest, camera_capture_004, TestSize.Level1)
 {
-    std::cout << "==========[test log] Preview + capture, then switch to preview + video." << std::endl;
-    std::cout << "==========[test log] First, create preview + capture." << std::endl;
+    CAMERA_LOGD("Preview + capture, then switch to preview + video.");
+    CAMERA_LOGD("First, create preview + capture.");
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
@@ -157,7 +156,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_004, TestSize.Level1)
     display_->StopStream(display_->captureIds, display_->streamIds);
     sleep(5);
 
-    std::cout << "==========[test log] Next, switch to preview + video." << display_->rc << std::endl;
+    CAMERA_LOGD("Next, switch to preview + video, rc = %{public}d", display_->rc);
     // Get the stream manager
     display_->AchieveStreamOperator();
     // start stream
@@ -191,7 +190,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_006, TestSize.Level1)
     display_->StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, false);
 
     sleep(5);
-    std::cout << "==========[test log] frame off." << std::endl;
+    CAMERA_LOGD("frame off.");
     display_->streamCustomerPreview_->ReceiveFrameOff();
     display_->streamCustomerCapture_->ReceiveFrameOff();
 
@@ -199,17 +198,17 @@ HWTEST_F(CameraCaptureTest, camera_capture_006, TestSize.Level1)
         {display_->STREAM_ID_CAPTURE});
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] ReleaseStreams success." << std::endl;
+        CAMERA_LOGI("ReleaseStreams success.");
     } else {
-        std::cout << "==========[test log] ReleaseStreams fail, rc = ." << display_->rc << std::endl;
+        CAMERA_LOGE("ReleaseStreams fail, rc = %{public}d", display_->rc);
     }
     display_->rc = (CamRetCode)display_->streamOperator->ReleaseStreams(
         {display_->STREAM_ID_PREVIEW});
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] ReleaseStreams success." << std::endl;
+        CAMERA_LOGI("ReleaseStreams success.");
     } else {
-        std::cout << "==========[test log] ReleaseStreams fail, rc = ." << display_->rc << std::endl;
+        CAMERA_LOGE("ReleaseStreams fail, rc = %{public}d", display_->rc);
     }
 }
 
@@ -222,7 +221,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_006, TestSize.Level1)
   */
 HWTEST_F(CameraCaptureTest, camera_capture_010, TestSize.Level1)
 {
-    std::cout << "==========[test log] Preview and still_capture streams." << std::endl;
+    CAMERA_LOGD("Preview and still_capture streams.");
     // Configure two streams of information
     EXPECT_EQ(true, display_->cameraDevice != nullptr);
     display_->AchieveStreamOperator();
@@ -246,32 +245,32 @@ HWTEST_F(CameraCaptureTest, camera_capture_010, TestSize.Level1)
     display_->rc = (CamRetCode)display_->streamOperator->CancelCapture(display_->CAPTURE_ID_CAPTURE);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] CancelCapture success." << std::endl;
+        CAMERA_LOGI("CancelCapture success.");
     } else {
-        std::cout << "==========[test log] CancelCapture fail, rc = ." << display_->rc << std::endl;
+        CAMERA_LOGE("CancelCapture fail, rc = %{public}d", display_->rc);
     }
     display_->rc = (CamRetCode)display_->streamOperator->CancelCapture(display_->CAPTURE_ID_PREVIEW);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] CancelCapture success." << std::endl;
+        CAMERA_LOGI("CancelCapture success.");
     } else {
-        std::cout << "==========[test log] CancelCapture fail, rc = ." << display_->rc << std::endl;
+        CAMERA_LOGE("CancelCapture fail, rc = %{public}d", display_->rc);
     }
     display_->rc = (CamRetCode)display_->streamOperator->ReleaseStreams(
         {display_->STREAM_ID_CAPTURE});
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] ReleaseStreams success." << std::endl;
+        CAMERA_LOGI("ReleaseStreams success.");
     } else {
-        std::cout << "==========[test log] ReleaseStreams fail, rc = ." << display_->rc << std::endl;
+        CAMERA_LOGE("ReleaseStreams fail, rc = %{public}d", display_->rc);
     }
     display_->rc = (CamRetCode)display_->streamOperator->ReleaseStreams(
         {display_->STREAM_ID_PREVIEW});
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] ReleaseStreams success." << std::endl;
+        CAMERA_LOGI("ReleaseStreams success.");
     } else {
-        std::cout << "==========[test log] ReleaseStreams fail, rc = ." << display_->rc << std::endl;
+        CAMERA_LOGE("ReleaseStreams fail, rc = %{public}d", display_->rc);
     }
 }
 
@@ -284,14 +283,14 @@ HWTEST_F(CameraCaptureTest, camera_capture_010, TestSize.Level1)
   */
 HWTEST_F(CameraCaptureTest, camera_capture_020, TestSize.Level1)
 {
-    std::cout << "==========[test log] No preview, only still_capture." << std::endl;
+    CAMERA_LOGD("No preview, only still_capture.");
     // start stream
     display_->AchieveStreamOperator();
     std::shared_ptr<StreamCustomer> streamCustomer = std::make_shared<StreamCustomer>();
     OHOS::sptr<OHOS::IBufferProducer> producer = streamCustomer->CreateProducer();
     producer->SetQueueSize(8); // buffer queue size
     if (producer->GetQueueSize() != 8) { // buffer queue size
-        std::cout << "~~~~~~~" << std::endl;
+        CAMERA_LOGE("~~~~~~~");
     }
     streamCustomer->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
         display_->StoreImage(addr, size);
@@ -337,14 +336,14 @@ HWTEST_F(CameraCaptureTest, camera_capture_020, TestSize.Level1)
   */
 HWTEST_F(CameraCaptureTest, camera_capture_021, TestSize.Level1)
 {
-    std::cout << "==========[test log] Still_capture stream, capture->isStreaming = true." << std::endl;
+    CAMERA_LOGD("Still_capture stream, capture->isStreaming = true.");
     // start stream
     display_->AchieveStreamOperator();
     std::shared_ptr<StreamCustomer> streamCustomer = std::make_shared<StreamCustomer>();
     OHOS::sptr<OHOS::IBufferProducer> producer = streamCustomer->CreateProducer();
     producer->SetQueueSize(8); // 8:set bufferqueue size
     if (producer->GetQueueSize() != 8) { // 8:get bufferqueue size
-        std::cout << "~~~~~~~" << std::endl;
+        CAMERA_LOGE("~~~~~~~");
     }
     streamCustomer->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
         display_->StoreImage(addr, size);
@@ -381,8 +380,8 @@ HWTEST_F(CameraCaptureTest, camera_capture_021, TestSize.Level1)
     CAMERA_LOGE("ReleaseStreams! rc:0x%x\n", display_->rc);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] ReleaseStreams success." << std::endl;
+        CAMERA_LOGI("ReleaseStreams success.");
     } else {
-        std::cout << "==========[test log] ReleaseStreams fail, rc = ." << display_->rc << std::endl;
+        CAMERA_LOGE("ReleaseStreams fail, rc = %{public}d", display_->rc);
     }
 }

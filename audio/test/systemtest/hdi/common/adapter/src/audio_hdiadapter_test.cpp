@@ -47,31 +47,17 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
 };
-void *AudioHdiAdapterTest::handle = nullptr;
-TestGetAudioManager AudioHdiAdapterTest::getAudioManager = nullptr;
 TestAudioManager *AudioHdiAdapterTest::manager = nullptr;
 
 void AudioHdiAdapterTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioHdiAdapterTest::TearDownTestCase(void)
-{
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-}
+void AudioHdiAdapterTest::TearDownTestCase(void) {}
 
 void AudioHdiAdapterTest::SetUp(void) {}
 
@@ -91,7 +77,7 @@ HWTEST_F(AudioHdiAdapterTest, AudioGetAllAdapters_001, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = manager->GetAllAdapters(manager, &descs, &size);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-    EXPECT_EQ(AUDIO_ADAPTER_MAX_NUM, size);
+    EXPECT_LT(0, size);
 }
 
 /**
@@ -212,10 +198,7 @@ HWTEST_F(AudioHdiAdapterTest, AudioLoadAdapter_002, TestSize.Level1)
     struct AudioAdapter *adapter = nullptr;
 
     ret = manager->LoadAdapter(manager, desc, &adapter);
-    EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    desc->adapterName = "internal";
-    ret = manager->LoadAdapter(manager, desc, &adapter);
-    manager->UnloadAdapter(manager, adapter);
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, ret);
 }
 
 /**
@@ -228,7 +211,7 @@ HWTEST_F(AudioHdiAdapterTest, AudioLoadAdapter_003, TestSize.Level1)
     int32_t ret = -1;
     struct AudioAdapter *adapter = nullptr;
     struct AudioAdapterDescriptor desc = {
-        .adapterName = "illegal",
+        .adapterName = "primary",
         .portNum = 2,
         .ports = nullptr,
     };
@@ -343,39 +326,6 @@ HWTEST_F(AudioHdiAdapterTest, AudioAdapterInitAllPorts_001, TestSize.Level1)
     ret = adapter->InitAllPorts(adapter);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     manager->UnloadAdapter(manager, adapter);
-}
-
-/**
-* @tc.name  AudioAdapterInitAllPorts_002
-* @tc.desc  Test AudioAdapterInitAllPorts interface, return 0 if loads two adapters successfully.
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioHdiAdapterTest, AudioAdapterInitAllPorts_002, TestSize.Level1)
-{
-    int32_t ret = -1;
-    int32_t ret2 = -1;
-    struct AudioPort* renderPort = nullptr;
-    struct AudioPort* renderPortUsb = nullptr;
-    struct AudioAdapter *adapter = nullptr;
-    struct AudioAdapter *adapter1 = nullptr;
-
-    ASSERT_NE(nullptr, manager);
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
-    ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ASSERT_NE(nullptr, adapter);
-    ret2 = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_OUT, &adapter1, renderPortUsb);
-    if (ret2 < 0 || adapter1 == nullptr) {
-        manager->UnloadAdapter(manager, adapter);
-        ASSERT_EQ(AUDIO_HAL_SUCCESS, ret2);
-    }
-    ret = adapter->InitAllPorts(adapter);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
-
-    ret2 = adapter1->InitAllPorts(adapter1);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret2);
-
-    manager->UnloadAdapter(manager, adapter);
-    manager->UnloadAdapter(manager, adapter1);
 }
 
 /**

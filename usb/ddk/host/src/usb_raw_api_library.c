@@ -834,6 +834,28 @@ OUT:
     return ret;
 }
 
+int32_t RawClaimInterfaceForce(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber)
+{
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+
+    if (devHandle == NULL || interfaceNumber < 0 || interfaceNumber >= USB_MAXINTERFACES ||
+        osAdapterOps->claimInterface == NULL) {
+        HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (((devHandle->claimedInterfaces) & (1U << interfaceNumber)) != 0) {
+        return HDF_SUCCESS;
+    }
+
+    OsalMutexLock(&devHandle->lock);
+    int32_t ret = osAdapterOps->detachKernelDriverAndClaim(devHandle, interfaceNumber);
+    if (ret == HDF_SUCCESS) {
+        devHandle->claimedInterfaces |= 1U << interfaceNumber;
+    }
+    OsalMutexUnlock(&devHandle->lock);
+    return ret;
+}
+
 struct UsbHostRequest *AllocRequest(const struct UsbDeviceHandle *devHandle, int32_t isoPackets, size_t length)
 {
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
@@ -1382,6 +1404,7 @@ int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddR
 
     if (!HdfSbufWriteBuffer(pnpData, (const void *)(&infoData), sizeof(struct UsbPnpAddRemoveInfo))) {
         HDF_LOGE("%{public}s:%d sbuf write infoData failed", __func__, __LINE__);
+        ret = HDF_FAILURE;
         goto OUT;
     }
 
@@ -1394,17 +1417,18 @@ int32_t RawInitPnpService(enum UsbPnpNotifyServiceCmd cmdType, struct UsbPnpAddR
     int32_t replyData = 0;
     if (!HdfSbufReadInt32(pnpReply, &replyData)) {
         HDF_LOGE("%{public}s:HdfSbufReadInt32 failed", __func__);
+        ret = HDF_FAILURE;
         goto OUT;
     }
     if (replyData != INT32_MAX) {
         HDF_LOGE("%{public}s:%d cmdType = %d reply failed", __func__, __LINE__, cmdType);
+        ret = HDF_FAILURE;
         goto OUT;
     }
     ret = HDF_SUCCESS;
     HDF_LOGI("%{public}s:%d cmdType = %d reply success", __func__, __LINE__, cmdType);
 
 OUT:
-    ret = HDF_FAILURE;
     HdfSbufRecycle(pnpData);
     HdfSbufRecycle(pnpReply);
 ERR_SBUF:

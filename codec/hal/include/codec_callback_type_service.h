@@ -22,7 +22,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-void CodecCallbackTypeServiceConstruct(struct CodecCallbackType* service);
+void CodecCallbackTypeServiceConstruct(struct CodecCallbackType *service);
 
 #ifdef __cplusplus
 }

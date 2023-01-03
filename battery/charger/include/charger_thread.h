@@ -18,13 +18,13 @@
 
 #include <thread>
 
-#include <linux/input.h>
-#include "input_type.h"
-#include "battery_thread.h"
-#include "battery_vibrate.h"
 #include "battery_backlight.h"
 #include "battery_led.h"
-#include "animation_label.h"
+#include "battery_thread.h"
+#include "battery_vibrate.h"
+#include "charger_animation.h"
+#include "input_type.h"
+#include <linux/input.h>
 
 namespace OHOS {
 namespace HDI {
@@ -33,9 +33,10 @@ namespace V1_1 {
 class ChargerThread : public BatteryThread {
 public:
     friend class BatteryThreadTest;
+
 private:
     void Init();
-    static void UpdateAnimation(const int32_t& capacity);
+    static void UpdateAnimation(const int32_t& chargeState, const int32_t& capacity);
     void Run(void* service) override;
     void UpdateBatteryInfo(void* arg) override;
     void HandleChargingState();
@@ -45,8 +46,7 @@ private:
     void HandleStates() override;
     int32_t UpdateWaitInterval() override;
     void CycleMatters() override;
-    static void AnimationInit();
-    static void LoadImages(AnimationLabel* animationLabel);
+    static void InitAnimation();
     void SetKeyWait(struct KeyState& key, int64_t timeout);
     static void SetKeyState(int32_t code, int32_t value, int64_t now);
     static void InitInput();
@@ -54,21 +54,30 @@ private:
     void HandlePowerKeyState();
     void HandlePowerKey(int32_t keycode, int64_t now);
     static void HandleInputEvent(const struct input_event* iev);
+    void InitLackPowerCapacity();
+    void InitBatteryFileSystem();
+    void InitVibration();
+    void InitBacklight();
+    void InitLed();
     std::unique_ptr<PowerSupplyProvider> provider_ = nullptr;
     std::unique_ptr<BatteryVibrate> vibrate_ = nullptr;
     std::unique_ptr<BatteryBacklight> backlight_ = nullptr;
     std::unique_ptr<BatteryLed> led_ = nullptr;
 
     static const int32_t INVALID = -1;
-    int64_t pluginWait_ = INVALID;
     int64_t keyWait_ = INVALID;
     int64_t backlightWait_ = INVALID;
     int32_t capacity_ = INVALID;
     int32_t chargeState_ = PowerSupplyProvider::BatteryChargeState::CHARGE_STATE_RESERVED;
     bool started_ = false;
+
+    static std::unique_ptr<ChargerAnimation> animation_;
+    static bool isChargeStateChanged_;
+    static bool isConfigParse_;
+    static int32_t lackPowerCapacity_;
 };
-}  // namespace V1_1
-}  // namespace Battery
-}  // namespace HDI
-}  // namespace OHOS
+} // namespace V1_1
+} // namespace Battery
+} // namespace HDI
+} // namespace OHOS
 #endif

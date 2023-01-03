@@ -62,8 +62,14 @@ int32_t AudioManagerLoadAdapter(struct AudioManager *manager, const struct Audio
     hwAdapter->adapterMgrRenderFlag = 0; // The adapterMgrRenderFlag init is zero
 
     HDF_LOGI("%s call bluetooth RegisterObserver interface", __func__);
+#ifndef A2DP_HDI_SERVICE
     OHOS::Bluetooth::GetProxy();
     OHOS::Bluetooth::RegisterObserver();
+#else
+    if (!OHOS::Bluetooth::SetUp()) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+#endif
     
     return AUDIO_HAL_SUCCESS;
 }
@@ -88,7 +94,11 @@ void AudioManagerUnloadAdapter(struct AudioManager *manager, struct AudioAdapter
     AudioMemFree(reinterpret_cast<void **>(&adapter));
 
     HDF_LOGI("%s call bluetooth DeRegisterObserver interface", __func__);
+#ifndef A2DP_HDI_SERVICE
     OHOS::Bluetooth::DeRegisterObserver();
+#else
+    OHOS::Bluetooth::TearDown();
+#endif
 }
 
 static struct AudioManager g_audioManagerFuncs = {

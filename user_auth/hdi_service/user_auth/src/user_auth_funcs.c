@@ -25,6 +25,12 @@
 #include "idm_database.h"
 #include "user_sign_centre.h"
 
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
 int32_t GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
 {
     if (schedules == NULL) {
@@ -49,7 +55,7 @@ int32_t GenerateSolutionFunc(AuthSolutionHal param, LinkedList **schedules)
     return ret;
 }
 
-static int32_t SetAuthResult(uint32_t authType, const ExecutorResultInfo *info, AuthResult *result)
+IAM_STATIC int32_t SetAuthResult(uint32_t authType, const ExecutorResultInfo *info, AuthResult *result)
 {
     result->freezingTime = info->freezingTime;
     result->remainTimes = info->remainTimes;

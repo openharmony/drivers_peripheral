@@ -23,6 +23,7 @@
 #include "audio_interface_lib_render.h"
 #include "audio_internal.h"
 #include "audio_uhdf_log.h"
+#include "securec.h"
 
 #define HDF_LOG_TAG AUDIO_HDI_IMPL
 
@@ -799,7 +800,7 @@ int32_t AudioRenderRenderFrame(
         AUDIO_FUNC_LOGE("Render Frame Paras is NULL!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    if (FRAME_DATA < frameLen) {
+    if (frameLen > FRAME_DATA) {
         AUDIO_FUNC_LOGE("Out of FRAME_DATA size!");
         return AUDIO_ERR_INTERNAL;
     }

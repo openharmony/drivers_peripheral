@@ -39,7 +39,7 @@ void CameraFpsTest::GetFpsRange(std::shared_ptr<CameraAbility> &ability)
     camera_metadata_item_t entry;
     int ret = OHOS::Camera::FindCameraMetadataItem(data, OHOS_ABILITY_FPS_RANGES, &entry);
     if (ret != 0) {
-        std::cout << "==========[test log] get OHOS_ABILITY_FPS_RANGES error." << std::endl;
+        CAMERA_LOGE("get OHOS_ABILITY_FPS_RANGES error.");
     }
 
     uint32_t count = entry.count;
@@ -48,7 +48,7 @@ void CameraFpsTest::GetFpsRange(std::shared_ptr<CameraAbility> &ability)
     }
 
     for (auto it = fpsRange_.begin(); it != fpsRange_.end(); it++) {
-        std::cout << "==========[test log] fpsRange : " << *it << std::endl;
+        CAMERA_LOGI("fpsRange : %{public}d", *it);
     }
 }
 
@@ -63,7 +63,7 @@ static HWTEST_F(CameraFpsTest, camera_fps_001, TestSize.Level1)
 {
     // get camera ability
     if (display_->ability == nullptr) {
-        std::cout << "==========[test log] ability is null." << std::endl;
+        CAMERA_LOGE("ability is null.");
         return;
     }
     GetFpsRange(display_->ability);
@@ -96,9 +96,9 @@ static HWTEST_F(CameraFpsTest, camera_fps_001, TestSize.Level1)
     MetadataUtils::ConvertMetadataToVec(meta, setting);
     display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
     if (display_->rc == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] UpdateSettings success." << std::endl;
+        CAMERA_LOGI("UpdateSettings success.");
     } else {
-        std::cout << "==========[test log] UpdateSettings fail, rc = " << display_->rc << std::endl;
+        CAMERA_LOGE("UpdateSettings fail, rc = %{public}d", display_->rc);
     }
 
     // get preview

@@ -16,8 +16,9 @@
 #ifndef CAMERA_METADATA_OPERATOR_H
 #define CAMERA_METADATA_OPERATOR_H
 
-#include <stdint.h>
-#include <stdio.h>
+#include <cstdio>
+#include <cstdint>
+#include <string>
 
 #include "camera_device_ability_items.h"
 
@@ -34,6 +35,7 @@
     MaxAlignment(MaxAlignment(DATA_ALIGNMENT, METADATA_ALIGNMENT), ITEM_ALIGNMENT)
 
 #define INDEX_COUNTER 2
+#define WRAP_LENGTH 4
 
 // data type
 enum {
@@ -53,6 +55,16 @@ enum {
     META_TYPE_RATIONAL = 6,
     // Number of data type
     META_NUM_TYPES
+};
+
+const static char *OHOS_CAMERA_METADATA_TYPE[META_NUM_TYPES] = {
+    [META_TYPE_BYTE] = "byte",
+    [META_TYPE_INT32] = "int32",
+    [META_TYPE_UINT32] = "uint32",
+    [META_TYPE_FLOAT] = "float",
+    [META_TYPE_INT64] = "int64",
+    [META_TYPE_DOUBLE] = "double",
+    [META_TYPE_RATIONAL] = "rational"
 };
 
 typedef struct camera_rational {
@@ -122,7 +134,7 @@ typedef enum camera_metadata_sec {
 } camera_metadata_sec_t;
 
 /* Return codes */
-#define CAM_META_FAILURE         -1
+#define CAM_META_FAILURE        (-1)
 #define CAM_META_SUCCESS         0
 #define CAM_META_INVALID_PARAM   2
 #define CAM_META_ITEM_NOT_FOUND  3
@@ -169,6 +181,8 @@ int DeleteCameraMetadataItemByIndex(common_metadata_header_t *dst, uint32_t inde
 // Free camera metadata buffer
 void FreeCameraMetadataBuffer(common_metadata_header_t *dst);
 
+std::string MetadataItemDump(const common_metadata_header_t *metadataHeader, uint32_t item);
+
 // Internal use
 camera_metadata_item_entry_t *GetMetadataItems(const common_metadata_header_t *metadataHeader);
 uint8_t *GetMetadataData(const common_metadata_header_t *metadataHeader);
@@ -179,5 +193,10 @@ uint32_t GetCameraMetadataDataSize(const common_metadata_header_t *metadata_head
 int32_t CopyCameraMetadataItems(common_metadata_header_t *newMetadata, const common_metadata_header_t *oldMetadata);
 size_t CalculateCameraMetadataItemDataSize(uint32_t type, size_t data_count);
 int32_t GetCameraMetadataItemType(uint32_t item, uint32_t *data_type);
+common_metadata_header_t *FillCameraMetadata(common_metadata_header_t *buffer, size_t memoryRequired,
+                                             uint32_t itemCapacity, uint32_t dataCapacity);
+int32_t GetMetadataSection(uint32_t itemSection, uint32_t *section);
+int MetadataExpandItemMem(common_metadata_header_t *dst, camera_metadata_item_entry_t *item,
+    size_t oldItemSize);
 } // Camera
 #endif // CAMERA_METADATA_OPERATOR_H

@@ -14,11 +14,11 @@
  */
 
 #include "audio_adapter.h"
-#include "osal_mem.h"
 #include "audio_adapter_info_common.h"
-#include "audio_uhdf_log.h"
 #include "audio_interface_lib_capture.h"
 #include "audio_interface_lib_render.h"
+#include "audio_uhdf_log.h"
+#include "osal_mem.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_IMPL
 
@@ -98,7 +98,7 @@ int32_t CheckParaDesc(const struct AudioDeviceDescriptor *desc, const char *type
         }
     } else if (!strcmp(type, TYPE_RENDER)) {
         if (pins == PIN_OUT_SPEAKER || pins == PIN_OUT_HEADSET || pins == PIN_OUT_LINEOUT || pins == PIN_OUT_HDMI ||
-            pins == PIN_OUT_HEADPHONE) {
+            pins == PIN_OUT_HEADPHONE || pins == (PIN_OUT_SPEAKER | PIN_OUT_HEADSET)) {
             return HDF_SUCCESS;
         } else {
             AUDIO_FUNC_LOGE("TYPE_RENDER does not support this pins:%{public}d!", pins);
@@ -123,12 +123,13 @@ int32_t CheckParaAttr(const struct AudioSampleAttributes *attrs)
         AUDIO_FUNC_LOGE("CheckParaAttr does not support! ret = %{public}d", ret);
         return HDF_ERR_NOT_SUPPORT;
     }
+
     enum AudioCategory audioCategory = attrs->type;
-    if (AUDIO_IN_MEDIA != audioCategory && AUDIO_IN_COMMUNICATION != audioCategory) {
-        AUDIO_FUNC_LOGE("audioCategory:%{public}d is neither AUDIO_IN_MEDIA not or AUDIO_IN_COMMUNICATION",
-            audioCategory);
+    if (audioCategory < AUDIO_IN_MEDIA || audioCategory > AUDIO_MMAP_NOIRQ) {
+        AUDIO_FUNC_LOGE("Audio category error!");
         return HDF_ERR_NOT_SUPPORT;
     }
+
     enum AudioFormat audioFormat = attrs->format;
     return CheckAttrFormat(audioFormat);
 }
@@ -184,7 +185,7 @@ static int32_t AudioCheckDescPortId(const struct AudioAdapterDescriptor *adapter
         AUDIO_FUNC_LOGE("Get adapterNum fail!");
         return HDF_FAILURE;
     }
-    struct AudioAdapterDescriptor *descs = AudioAdapterGetConfigOut();
+    struct AudioAdapterDescriptor *descs = AudioAdapterGetConfigDescs();
     if (descs == NULL) {
         AUDIO_FUNC_LOGE("Get adapterDescs is NULL!");
         return HDF_FAILURE;
@@ -233,12 +234,16 @@ static int32_t AudioMakeCardServiceName(char *cardServiceName, const struct Audi
     }
     if (strncmp(adapterDescriptor->adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
         ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_PRIMARY_DEV, portId);
+    } else if (strncmp(adapterDescriptor->adapterName, HDMI, strlen(HDMI)) == 0) {
+        ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_HDMI_DEV, priPortId);
     } else if (strncmp(adapterDescriptor->adapterName, USB, strlen(USB)) == 0) {
         ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_PRIMARY_DEV, priPortId);
     } else if (strncmp(adapterDescriptor->adapterName, A2DP, strlen(A2DP)) == 0) {
         ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_A2DP_DEV, portId);
     } else {
-        AUDIO_FUNC_LOGE("The selected sound card is not in the range of sound card list, please check!");
+        AUDIO_FUNC_LOGE(
+            "The selected sound card is not in the range of sound card list, please check name = %s !",
+            adapterDescriptor->adapterName);
         return HDF_FAILURE;
     }
     return ret;
@@ -330,11 +335,6 @@ void AudioAdapterReleaseCapSubPorts(const struct AudioPortAndCapability *portCap
 
 int32_t AudioAdapterInitAllPorts(struct AudioAdapter *adapter)
 {
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The adapter address passed in is invalid");
-        return ret;
-    }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL) {
         AUDIO_FUNC_LOGE("hwAdapter Is NULL");
@@ -591,11 +591,6 @@ static void AudioCreateRenderRelease(struct AudioHwRender **hwRender)
 int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
                                  const struct AudioSampleAttributes *attrs, struct AudioRender **render)
 {
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The adapter address passed in is invalid");
-        return ret;
-    }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || desc == NULL || attrs == NULL || render == NULL) {
         AUDIO_FUNC_LOGE("hwAdapter or desc or attrs or render is null!");
@@ -615,7 +610,7 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
         AUDIO_FUNC_LOGE("hwRender is NULL!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
-    ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwAdapter);
+    int32_t ret = AudioAdapterCreateRenderPre(hwRender, desc, attrs, hwAdapter);
     if (ret != 0) {
         AUDIO_FUNC_LOGE("AudioAdapterCreateRenderPre fail");
         AudioCreateRenderRelease(&hwRender);
@@ -628,14 +623,7 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
         AudioCreateRenderRelease(&hwRender);
         return ret;
     }
-    /* add for Fuzz */
-    ret = AudioAddRenderAddrToList((AudioHandle)(&hwRender->common));
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The render address get is invalid ret = %{public}d", ret);
-        AudioReleaseRenderHandle(hwRender);
-        AudioCreateRenderRelease(&hwRender);
-        return ret;
-    }
+
     *render = &hwRender->common;
     hwAdapter->adapterMgrRenderFlag++;
     return AUDIO_HAL_SUCCESS;
@@ -643,16 +631,7 @@ int32_t AudioAdapterCreateRender(struct AudioAdapter *adapter, const struct Audi
 
 int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRender *render)
 {
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The adapter address passed in is invalid");
-        return ret;
-    }
-    ret = AudioCheckRenderAddr((AudioHandle)render);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The render address passed in is invalid! ret = %{public}d", ret);
-        return ret;
-    }
+    int32_t ret;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || render == NULL) {
         AUDIO_FUNC_LOGE("hwAdapter or render is null!");
@@ -674,12 +653,9 @@ int32_t AudioAdapterDestroyRender(struct AudioAdapter *adapter, struct AudioRend
         return HDF_FAILURE;
     }
     ret = (*pInterfaceLibModeRender)(hwRender->devDataHandle, &hwRender->renderParam,
-                                     AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE);
+        AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Audio RENDER_CLOSE FAIL");
-    }
-    if (AudioDelRenderAddrFromList((AudioHandle)render)) {
-        AUDIO_FUNC_LOGE("adapter or render not in MgrList");
     }
     AudioReleaseRenderHandle(hwRender);
     AudioMemFree((void **)&hwRender->renderParam.frameRenderMode.buffer);
@@ -875,36 +851,36 @@ int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture)
         AUDIO_FUNC_LOGE("hwCapture or hwCapture->devCtlHandle or hwCapture->devDataHandle is null!");
         return HDF_FAILURE;
     }
-    InterfaceLibModeCaptureSo *LibCap = AudioSoGetInterfaceLibModeCapture();
-    if (LibCap == NULL || *LibCap == NULL) {
+    InterfaceLibModeCaptureSo *libCap = AudioSoGetInterfaceLibModeCapture();
+    if (libCap == NULL || *libCap == NULL) {
         AUDIO_FUNC_LOGE("lib capture func not exist");
         return HDF_FAILURE;
     }
-    if ((*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN) < 0) {
+    if ((*libCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTRL_CAPTURE_OPEN) < 0) {
         AUDIO_FUNC_LOGE("CAPTURE_OPEN FAIL");
         return HDF_FAILURE;
     }
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-    if ((*LibCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE) < 0) {
+    if ((*libCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_SCENESELECT_CAPTURE) < 0) {
         AUDIO_FUNC_LOGE("SetParams FAIL!");
-        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
+        (void)AudioCtrlCaptureClose(hwCapture, libCap);
         return HDF_FAILURE;
     }
 #endif
-    if ((*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_HW_PARAMS) < 0) {
+    if ((*libCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_HW_PARAMS) < 0) {
         AUDIO_FUNC_LOGE("AudioCaptureStart SetParams FAIL");
-        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
+        (void)AudioCtrlCaptureClose(hwCapture, libCap);
         return HDF_FAILURE;
     }
-    if ((*LibCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE) < 0) {
+    if ((*libCap)(hwCapture->devCtlHandle, &hwCapture->captureParam, AUDIODRV_CTL_IOCTL_VOL_THRESHOLD_CAPTURE) < 0) {
         AUDIO_FUNC_LOGE("SetParams FAIL!");
-        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
+        (void)AudioCtrlCaptureClose(hwCapture, libCap);
         return HDF_FAILURE;
     }
-    if ((*LibCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE) < 0) {
+    if ((*libCap)(hwCapture->devDataHandle, &hwCapture->captureParam, AUDIO_DRV_PCM_IOCTL_PREPARE_CAPTURE) < 0) {
         AUDIO_FUNC_LOGE("AudioCaptureStart prepare FAIL");
-        (void)AudioCtrlCaptureClose(hwCapture, LibCap);
+        (void)AudioCtrlCaptureClose(hwCapture, libCap);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -937,11 +913,6 @@ int32_t AudioCaptureBindService(struct AudioHwCapture *hwCapture, BindServiceCap
 int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
                                   const struct AudioSampleAttributes *attrs, struct AudioCapture **capture)
 {
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The adapter address passed in is invalid");
-        return ret;
-    }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL) {
         AUDIO_FUNC_LOGE("hwAdapter or desc or attrs or capture is null!");
@@ -961,7 +932,7 @@ int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct Aud
         AUDIO_FUNC_LOGE("alloc AudioHwCapture failed!");
         return AUDIO_HAL_ERR_MALLOC_FAIL;
     }
-    ret = AudioAdapterCreateCapturePre(hwCapture, desc, attrs, hwAdapter);
+    int32_t ret = AudioAdapterCreateCapturePre(hwCapture, desc, attrs, hwAdapter);
     if (ret != 0) {
         AUDIO_FUNC_LOGE("AudioAdapterCreateCapturePre fail");
         AudioMemFree((void **)&hwCapture);
@@ -974,13 +945,6 @@ int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct Aud
         AudioMemFree((void **)&hwCapture);
         return ret;
     }
-    ret = AudioAddCaptureAddrToList((AudioHandle)(&hwCapture->common));
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The capture address get is invalid");
-        AudioReleaseCaptureHandle(hwCapture);
-        AudioMemFree((void **)&hwCapture);
-        return ret;
-    }
     *capture = &hwCapture->common;
     hwAdapter->adapterMgrCaptureFlag++;
     return AUDIO_HAL_SUCCESS;
@@ -988,16 +952,7 @@ int32_t AudioAdapterCreateCapture(struct AudioAdapter *adapter, const struct Aud
 
 int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCapture *capture)
 {
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The adapter address passed in is invalid");
-        return ret;
-    }
-    ret = AudioCheckCaptureAddr((AudioHandle)capture);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The capture address passed in is invalid! ret = %{public}d", ret);
-        return ret;
-    }
+    int32_t ret;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL || capture == NULL) {
         AUDIO_FUNC_LOGE("hwAdapter or capture is null!");
@@ -1019,12 +974,9 @@ int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCap
         return HDF_FAILURE;
     }
     ret = (*pInterfaceLibModeCapture)(hwCapture->devDataHandle, &hwCapture->captureParam,
-                                      AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE);
+        AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("CAPTURE_CLOSE FAIL");
-    }
-    if (AudioDelCaptureAddrFromList((AudioHandle)capture)) {
-        AUDIO_FUNC_LOGE("adapter or capture not in MgrList");
     }
     AudioReleaseCaptureHandle(hwCapture);
     AudioMemFree((void **)&hwCapture->captureParam.frameCaptureMode.buffer);
@@ -1039,14 +991,9 @@ int32_t AudioAdapterDestroyCapture(struct AudioAdapter *adapter, struct AudioCap
 int32_t AudioAdapterGetPortCapability(struct AudioAdapter *adapter, const struct AudioPort *port,
                                       struct AudioPortCapability *capability)
 {
-    int32_t ret = AudioCheckAdapterAddr((AudioHandle)adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The adapter address passed in is invalid");
-        return ret;
-    }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    if (hwAdapter == NULL || port == NULL || port->portName == NULL || capability == NULL) {
-        AUDIO_FUNC_LOGE("hwAdapter or port or port->portName or capability is null!");
+    if (hwAdapter == NULL || port == NULL || capability == NULL) {
+        AUDIO_FUNC_LOGE("hwAdapter or port or capability is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     struct AudioPortAndCapability *hwAdapterPortCapabilitys = hwAdapter->portCapabilitys;
@@ -1115,17 +1062,12 @@ int32_t AudioAdapterSetPassthroughModeExec(struct AudioHwAdapter *hwAdapter, uin
 int32_t AudioAdapterSetPassthroughMode(struct AudioAdapter *adapter,
                                        const struct AudioPort *port, enum AudioPortPassthroughMode mode)
 {
-    int32_t ret = AudioCheckAdapterAddr(adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The adapter address passed in is invalid");
-        return ret;
-    }
-    if (adapter == NULL || port == NULL || port->portName == NULL) {
-        AUDIO_FUNC_LOGE("adapter or format or port->portName is null!");
+    if (adapter == NULL || port == NULL) {
+        AUDIO_FUNC_LOGE("adapter or format is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (port->dir != PORT_OUT || port->portId < 0 || strcmp(port->portName, "AOP") != 0) {
-        AUDIO_FUNC_LOGE("port->dir or port->portId or port->portName is invalid!");
+    if (port->dir != PORT_OUT) {
+        AUDIO_FUNC_LOGE("port->dir is invalid!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
@@ -1133,24 +1075,19 @@ int32_t AudioAdapterSetPassthroughMode(struct AudioAdapter *adapter,
         AUDIO_FUNC_LOGE("The pointer is null!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    ret = AudioAdapterSetPassthroughModeExec(hwAdapter, port->portId, mode);
+    int32_t ret = AudioAdapterSetPassthroughModeExec(hwAdapter, port->portId, mode);
     return ret;
 }
 
 int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struct AudioPort *port,
                                        enum AudioPortPassthroughMode *mode)
 {
-    int32_t ret = AudioCheckAdapterAddr(adapter);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("The adapter address passed in is invalid");
-        return ret;
-    }
-    if (adapter == NULL || port == NULL || port->portName == NULL || mode == NULL) {
-        AUDIO_FUNC_LOGE("adapter or port or port->portName or mode is null!");
+    if (adapter == NULL || port == NULL || mode == NULL) {
+        AUDIO_FUNC_LOGE("adapter or port or mode is null!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
-    if (port->dir != PORT_OUT || port->portId < 0 || strcmp(port->portName, "AOP") != 0) {
-        AUDIO_FUNC_LOGE("port->dir or port->portId or port->portName is invalid!");
+    if (port->dir != PORT_OUT || port->portId < 0) {
+        AUDIO_FUNC_LOGE("port->dir or port->portId is invalid!");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;

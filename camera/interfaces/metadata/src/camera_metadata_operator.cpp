@@ -16,6 +16,7 @@
 #include "camera_metadata_operator.h"
 #include <cstring>
 #include <securec.h>
+#include <iostream>
 #include "camera_metadata_item_info.h"
 #include "metadata_log.h"
 
@@ -651,6 +652,232 @@ int32_t CopyCameraMetadataItems(common_metadata_header_t *newMetadata, const com
     newMetadata->data_count = oldMetadata->data_count;
 
     return CAM_META_SUCCESS;
+}
+
+std::string U8ItemToString(int32_t item, const camera_metadata_item_t entry)
+{
+    std::string st = {};
+    uint32_t count = entry.count;
+    std::string dataStr = std::to_string(*(entry.data.u8));
+    for (uint32_t i = 1; i < count; i++) {
+        if ((i % WRAP_LENGTH) == 0) {
+            dataStr += "]\n\t[" + std::to_string(*(entry.data.u8 + i));
+        } else {
+            dataStr += " " + std::to_string(*(entry.data.u8 + i));
+        }
+    }
+
+    const char *name = GetCameraMetadataItemName(item);
+    if (name == nullptr) {
+        METADATA_ERR_LOG("U8ItemToString: get u8 item name fail!");
+        return st;
+    }
+    std::string nameStr(name);
+
+    st = nameStr + " (" + std::to_string(entry.index) + "): " +
+        OHOS_CAMERA_METADATA_TYPE[entry.data_type] + "[" + std::to_string(count) + "]" + "\n\t[" + dataStr + "]";
+
+    return st;
+}
+
+std::string I32ItemToString(int32_t item, const camera_metadata_item_t entry)
+{
+    std::string st = {};
+    uint32_t count = entry.count;
+    std::string dataStr = std::to_string(*(entry.data.i32));
+    for (uint32_t i = 1; i < count; i++) {
+        if ((i % WRAP_LENGTH) == 0) {
+            dataStr += "]\n\t[" + std::to_string(*(entry.data.i32 + i));
+        } else {
+            dataStr += " " + std::to_string(*(entry.data.i32 + i));
+        }
+    }
+
+    const char *name = GetCameraMetadataItemName(item);
+    if (name == nullptr) {
+        METADATA_ERR_LOG("I32ItemToString: get i32 item name fail!");
+        return st;
+    }
+    std::string nameStr(name);
+
+    st = nameStr + " (" + std::to_string(entry.index) + "): " +
+        OHOS_CAMERA_METADATA_TYPE[entry.data_type] + "[" + std::to_string(count) + "]" + "\n\t[" + dataStr + "]";
+
+    return st;
+}
+
+std::string U32ItemToString(int32_t item, const camera_metadata_item_t entry)
+{
+    std::string st = {};
+    uint32_t count = entry.count;
+    std::string dataStr = std::to_string(*(entry.data.ui32));
+    for (uint32_t i = 1; i < count; i++) {
+        if ((i % WRAP_LENGTH) == 0) {
+            dataStr += "]\n\t[" + std::to_string(*(entry.data.ui32 + i));
+        } else {
+            dataStr += " " + std::to_string(*(entry.data.ui32 + i));
+        }
+    }
+
+    const char *name = GetCameraMetadataItemName(item);
+    if (name == nullptr) {
+        METADATA_ERR_LOG("U32ItemToString: get u32 item name fail!");
+        return st;
+    }
+    std::string nameStr(name);
+
+    st = nameStr + " (" + std::to_string(entry.index) + "): " +
+        OHOS_CAMERA_METADATA_TYPE[entry.data_type] + "[" + std::to_string(count) + "]" + "\n\t[" + dataStr + "]";
+
+    return st;
+}
+
+std::string I64ItemToString(int32_t item, const camera_metadata_item_t entry)
+{
+    std::string st = {};
+    uint32_t count = entry.count;
+    std::string dataStr = std::to_string(*(entry.data.i64));
+    for (uint32_t i = 1; i < count; i++) {
+        if ((i % WRAP_LENGTH) == 0) {
+            dataStr += "]\n\t[" + std::to_string(*(entry.data.i64 + i));
+        } else {
+            dataStr += " " + std::to_string(*(entry.data.i64 + i));  
+        }
+    }
+
+    const char *name = GetCameraMetadataItemName(item);
+    if (name == nullptr) {
+        METADATA_ERR_LOG("I64ItemToString: get i64 item name fail!");
+        return st;
+    }
+    std::string nameStr(name);
+
+    st = nameStr + " (" + std::to_string(entry.index) + "): " +
+        OHOS_CAMERA_METADATA_TYPE[entry.data_type] + "[" + std::to_string(count) + "]" + "\n\t[" + dataStr + "]";
+
+    return st;
+}
+
+std::string FloatItemToString(int32_t item, const camera_metadata_item_t entry)
+{
+    std::string st = {};
+    uint32_t count = entry.count;
+    std::string dataStr = std::to_string(*(entry.data.f));
+    for (uint32_t i = 1; i < count; i++) {
+        if ((i % WRAP_LENGTH) == 0) {
+            dataStr += "]\n\t[" + std::to_string(*(entry.data.f + i));
+        } else {
+            dataStr += " " + std::to_string(*(entry.data.f + i));
+        }
+    }
+
+    const char *name = GetCameraMetadataItemName(item);
+    if (name == nullptr) {
+        METADATA_ERR_LOG("FloatItemToString: get float item name fail!");
+        return st;
+    }
+    std::string nameStr(name);
+
+    st = nameStr + " (" + std::to_string(entry.index) + "): " +
+        OHOS_CAMERA_METADATA_TYPE[entry.data_type] + "[" + std::to_string(count) + "]" + "\n\t[" + dataStr + "]";
+
+    return st;
+}
+
+std::string DoubleItemToString(int32_t item, const camera_metadata_item_t entry)
+{
+    std::string st = {};
+    uint32_t count = entry.count;
+    std::string dataStr = std::to_string(*(entry.data.d));
+    for (uint32_t i = 1; i < count; i++) {
+        if ((i % WRAP_LENGTH) == 0) {
+            dataStr += "]\n\t[" + std::to_string(*(entry.data.d + i));
+        } else {
+            dataStr += " " + std::to_string(*(entry.data.d + i));
+        }
+    }
+
+    const char *name = GetCameraMetadataItemName(item);
+    if (name == nullptr) {
+        METADATA_ERR_LOG("DoubleItemToString: get double item name fail!");
+        return st;
+    }
+    std::string nameStr(name);
+
+    st = nameStr + " (" + std::to_string(entry.index) + "): " +
+        OHOS_CAMERA_METADATA_TYPE[entry.data_type] + "[" + std::to_string(count) + "]" + "\n\t[" + dataStr + "]";
+
+    return st;
+}
+
+std::string RationalItemToString(int32_t item, const camera_metadata_item_t entry)
+{
+    std::string st = {};
+    uint32_t count = entry.count;
+    std::string dataStr = std::to_string((*(entry.data.r)).numerator) + "/" +
+        std::to_string((*(entry.data.r)).denominator);
+    for (uint32_t i = 1; i < count; i++) {
+        if ((i % WRAP_LENGTH) == 0) {
+            dataStr += "]\n\t[" + std::to_string((*(entry.data.r + i)).numerator) + "/" +
+                std::to_string((*(entry.data.r + i)).denominator);
+        } else {
+            dataStr += " " + std::to_string((*(entry.data.r + i)).numerator) + "/" +
+                std::to_string((*(entry.data.r + i)).denominator);
+        }
+    }
+
+    const char *name = GetCameraMetadataItemName(item);
+    if (name == nullptr) {
+        METADATA_ERR_LOG("RationalItemToString: get rational item name fail!");
+        return st;
+    }
+    std::string nameStr(name);
+
+    st = nameStr + " (" + std::to_string(entry.index) + "): " +
+        OHOS_CAMERA_METADATA_TYPE[entry.data_type] + "[" + std::to_string(count) + "]" + "\n\t[" + dataStr + "]";
+
+    return st;
+}
+
+std::string MetadataItemDump(const common_metadata_header_t *metadataHeader, uint32_t item)
+{
+    camera_metadata_item_t entry;
+    std::string st = {};
+
+    int ret = FindCameraMetadataItem(metadataHeader, item, &entry);
+    if (ret != 0) {
+        METADATA_ERR_LOG("get item error and item = %{public}d", item);
+        return st;
+    }
+
+    switch (entry.data_type) {
+        case META_TYPE_BYTE:
+            st = U8ItemToString(item, entry);
+            break;
+        case META_TYPE_INT32:
+            st = I32ItemToString(item, entry);
+            break;
+        case META_TYPE_UINT32:
+            st = U32ItemToString(item, entry);
+            break;
+        case META_TYPE_FLOAT:
+            st = FloatItemToString(item, entry);
+            break;
+        case META_TYPE_INT64:
+            st = I64ItemToString(item, entry);
+            break;
+        case META_TYPE_DOUBLE:
+            st = DoubleItemToString(item, entry);
+            break;
+        case META_TYPE_RATIONAL:
+            st = RationalItemToString(item, entry);
+            break;
+        default:
+            METADATA_ERR_LOG("invalid param and item = %{public}d", item);
+            break; 
+    }
+
+    return st;
 }
 } // Camera
 

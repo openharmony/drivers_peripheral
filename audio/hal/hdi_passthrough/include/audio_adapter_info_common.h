@@ -16,24 +16,28 @@
 #ifndef AUDIO_ADAPTER_INFO_COMMON_H
 #define AUDIO_ADAPTER_INFO_COMMON_H
 
-#include <stdio.h>
 #include <dlfcn.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <fcntl.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <string.h>
 #include <time.h>
-#include "securec.h"
-#include "audio_types.h"
+
 #include "audio_internal.h"
+#include "audio_types.h"
+#include "securec.h"
 
 #define AUDIO_PRIMARY_ID_MIN        0
 #define AUDIO_PRIMARY_ID_MAX        10
 
 #define AUDIO_PRIMARY_EXT_ID_MIN    11
 #define AUDIO_PRIMARY_EXT_ID_MAX    20
+
+#define AUDIO_HDMI_ID_MIN    11
+#define AUDIO_HDMI_ID_MAX    20
 
 #define AUDIO_USB_ID_MIN            21
 #define AUDIO_USB_ID_MAX            30
@@ -44,6 +48,7 @@
 enum AudioAdapterType {
     AUDIO_ADAPTER_PRIMARY = 0,  /* internal sound card */
     AUDIO_ADAPTER_PRIMARY_EXT,  /* extern sound card */
+    AUDIO_ADAPTER_HDMI,         /* hdmi sound card */
     AUDIO_ADAPTER_USB,         /* usb sound card */
     AUDIO_ADAPTER_A2DP,         /* blue tooth sound card */
     AUDIO_ADAPTER_MAX,          /* Invalid value. */
@@ -52,7 +57,6 @@ enum AudioAdapterType {
 enum AudioAdapterType MatchAdapterType(const char *adapterName, uint32_t portId);
 int32_t AudioAdapterCheckPortId(const char *adapterName, uint32_t portId);
 
-struct AudioAdapterDescriptor *AudioAdapterGetConfigOut(void);
 struct AudioAdapterDescriptor *AudioAdapterGetConfigDescs(void);
 int32_t AudioAdapterGetAdapterNum(void);
 int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size);
@@ -61,7 +65,7 @@ int32_t InitPortForCapabilitySub(struct AudioPort portIndex, struct AudioPortCap
 int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamValMap[], int32_t *count);
 int32_t AddElementToList(char *keyValueList, int32_t listLenth, const char *key, void *value);
 int32_t GetErrorReason(int reason, char* reasonDesc);
-int32_t GetCurrentTime(char *time);
+int32_t GetCurrentTime(char *currentTime);
 int32_t CheckAttrRoute(int32_t param);
 int32_t CheckAttrChannel(uint32_t param);
 int32_t TransferRoute(const char *value, int32_t *route);
@@ -74,17 +78,6 @@ int32_t BitsToFormat(enum AudioFormat *format, int32_t formatBits);
 int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExtraParams);
 int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count,
     struct ExtraParams *mExtraParams, int32_t *sumOk);
-void AudioAdapterAddrMgrInit(void);
-int32_t AudioAddAdapterAddrToList(AudioHandle adapter, const struct AudioAdapterDescriptor *desc);
-int32_t AudioCheckAdapterAddr(AudioHandle adapter);
-int32_t AudioDelAdapterAddrFromList(AudioHandle adapter);
-int32_t AudioAddRenderAddrToList(AudioHandle render);
-int32_t AudioCheckRenderAddr(AudioHandle render);
-int32_t AudioDelRenderAddrFromList(AudioHandle render);
-int32_t AudioAddCaptureAddrToList(AudioHandle capture);
-int32_t AudioCheckCaptureAddr(AudioHandle capture);
-int32_t AudioDelCaptureAddrFromList(AudioHandle capture);
-void AudioSetFuzzCheckFlag(bool check);
 bool ReleaseAudioManagerObjectComm(struct AudioManager *object);
-
+void AudioAdapterReleaseDescs(const struct AudioAdapterDescriptor *descs, int32_t adapterNum);
 #endif

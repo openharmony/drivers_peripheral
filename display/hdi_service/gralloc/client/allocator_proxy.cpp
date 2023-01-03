@@ -30,38 +30,48 @@ namespace Display {
 namespace V1_0 {
 sptr<IDisplayAllocator> IDisplayAllocator::Get(const char *serviceName)
 {
-    do {
-        using namespace OHOS::HDI::ServiceManager::V1_0;
+    constexpr uint32_t sleepTime = 10000;
+    constexpr uint32_t waitSvcTimeout = 1000;
+    constexpr uint32_t waitSvcMgrTimeout = 10;
+    constexpr uint32_t printPeriod = 100;
+    using namespace OHOS::HDI::ServiceManager::V1_0;
 
-        static sptr<IServiceManager> servMgr = nullptr;
-        uint32_t cnt = 0;
-        do {
-            servMgr = IServiceManager::Get();
-            HDF_LOGI("%{public}s: IServiceManager cnt:%{public}d", __func__, ++cnt);
-            usleep(10000);  // 10 ms
-        } while (servMgr == nullptr);
-
-        cnt = 0;
-        sptr<IRemoteObject> remote = nullptr;
-        do {
-            remote = servMgr->GetService(serviceName);
-            HDF_LOGI("%{public}s: get IServiceManager IDisplayAllocator cnt:%{public}d", __func__, ++cnt);
-            usleep(10000);  // 10 ms
-        } while (remote == nullptr);
-
-        if (remote != nullptr) {
-            sptr<AllocatorProxy> hostSptr = iface_cast<AllocatorProxy>(remote);
-            if (hostSptr == nullptr) {
-                HDF_LOGE("%{public}s: IServiceManager GetService null ptr", __func__);
-                return nullptr;
-            }
-            HDF_LOGE("%{public}s: GetService %{public}s ok", __func__, serviceName);
-            return hostSptr;
+    static sptr<IServiceManager> servMgr = IServiceManager::Get();
+    uint32_t cnt = 0;
+    while (servMgr == nullptr) {
+        if (cnt > waitSvcMgrTimeout) {
+            HDF_LOGE("%{public}s: wait IServiceManager timeout cnt:%{public}u", __func__, cnt);
+            return nullptr;
         }
-        HDF_LOGE("%{public}s: IServiceManager GetService %{public}s failed", __func__, serviceName);
-    } while(false);
+        usleep(sleepTime);  // 10 ms
+        servMgr = IServiceManager::Get();
+        cnt++;
+        HDF_LOGI("%{public}s: IServiceManager cnt:%{public}u", __func__, cnt);
+    }
+    HDF_LOGI("%{public}s: get IServiceManager success cnt:%{public}u", __func__, cnt);
 
-    return nullptr;
+    cnt = 0;
+    sptr<IRemoteObject> remote = servMgr->GetService(serviceName);
+    while (remote == nullptr) {
+        if (cnt > waitSvcTimeout) {
+            HDF_LOGE("%{public}s: wait service:%{public}s timeout cnt:%{public}u", __func__, serviceName, cnt);
+            return nullptr;
+        }
+        usleep(sleepTime);  // 10 ms
+        remote = servMgr->GetService(serviceName);
+        if (((cnt++) % printPeriod) == 0) {
+            HDF_LOGI("%{public}s: get service:%{public}s cnt:%{public}u", __func__, serviceName, cnt);
+        }
+    }
+    HDF_LOGI("%{public}s: get service:%{public}s success cnt:%{public}u", __func__, serviceName, cnt);
+
+    sptr<AllocatorProxy> hostSptr = iface_cast<AllocatorProxy>(remote);
+    if (hostSptr == nullptr) {
+        HDF_LOGE("%{public}s: IServiceManager GetService null ptr", __func__);
+        return nullptr;
+    }
+    HDF_LOGE("%{public}s: GetService %{public}s ok", __func__, serviceName);
+    return hostSptr;
 }
 
 int32_t AllocatorProxy::AllocMem(const AllocInfo &info, BufferHandle *&handle)

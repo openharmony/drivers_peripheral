@@ -1,114 +1,140 @@
 {
     "hdf_audio_codec_primary_dev0": [
         {
-            "deep-buffer-playback Speaker": [
+            "deep-buffer-playback": [
                 {
-                    "name": "DACL Left Speaker Mixer",
-                    "value": 1
-                },
-                {
-                    "name": "DACR Left Speaker Mixer",
-                    "value": 1
+                    "Headphones": [
+                        {
+                            "name": "Speaker1 Switch",
+                            "value": 0
+                        }
+                    ],
+                    "Speaker": [
+                        {
+                            "name": "Headphone1 Switch",
+                            "value": 1
+                        },
+                        {
+                            "name": "Headphone2 Switch",
+                            "value": 1
+                        }
+                    ],
+                    "MIC": [
+                        {
+                            "name": "RPGA MIC Switch",
+                            "value": 1
+                        }
+                    ],
+                    "micHs": [
+                        {
+                            "name": "LPGA MIC Switch",
+                            "value": 0
+                        }
+                    ]
                 }
             ],
-            "Speaker": [
+            "low-latency-communication": [
                 {
-                    "name": "Internally Codec Enable",
-                    "value": 1
-                },
-                {
-                    "name": "Dacl enable",
-                    "value": 1
-                },
-                {
-                    "name": "Dacr enable",
-                    "value": 1
+                    "Speaker": [
+                        {
+                            "name": "Speaker1 Switch",
+                            "value": 1
+                        }
+                    ],
+                    "Headphones": [
+                        {
+                            "name": "Headphone1 Switch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Headphone2 Switch",
+                            "value": 0
+                        }
+                    ],
+                    "MIC": [
+                        {
+                            "name": "RPGA MIC Switch",
+                            "value": 1
+                        }
+                    ],
+                    "micHs": [
+                        {
+                            "name": "LPGA MIC Switch",
+                            "value": 0
+                        }
+                    ]
                 }
             ],
-            "headphones": [
+            "ringtone-playback": [
                 {
-                    "name": "Dacl enable",
-                    "value": 0
-                },
-                {
-                    "name": "Dacr enable",
-                    "value": 0
+                    "Speaker": [
+                        {
+                            "name": "Speaker1 Switch",
+                            "value": 1
+                        }
+                    ],
+                    "Headphones": [
+                        {
+                            "name": "Headphone1 Switch",
+                            "value": 1
+                        },
+                        {
+                            "name": "Headphone2 Switch",
+                            "value": 1
+                        }
+                    ]
                 }
             ],
-            "deep-buffer-playback headphones": [
+            "voice-call": [
                 {
-                    "name": "DACL Left Speaker Mixer",
-                    "value": 1
-                },
-                {
-                    "name": "DACR Left Speaker Mixer",
-                    "value": 1
+                    "Speaker": [
+                        {
+                            "name": "Speaker1 Switch",
+                            "value": 1
+                        }
+                    ],
+                    "Headphones": [
+                        {
+                            "name": "Headphone1 Switch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Headphone2 Switch",
+                            "value": 0
+                        }
+                    ],
+                    "MIC": [
+                        {
+                            "name": "RPGA MIC Switch",
+                            "value": 1
+                        }
+                    ],
+                    "micHs": [
+                        {
+                            "name": "LPGA MIC Switch",
+                            "value": 0
+                        }
+                    ]
                 }
             ],
-            "deep-buffer-playback mic": [
+            "low-latency-noirq-playback": [
                 {
-                    "name": "DACL Left Speaker Mixer",
-                    "value": 1
-                },
-                {
-                    "name": "DACR Left Speaker Mixer",
-                    "value": 1
-                }
-            ],
-            "deep-buffer-playback micHs": [
-                {
-                    "name": "DACL Left Speaker Mixer",
-                    "value": 1
-                },
-                {
-                    "name": "DACR Left Speaker Mixer",
-                    "value": 1
-                }
-            ],
-            "mic": [
-                {
-                    "name": "Internally Codec Enable",
-                    "value": 1
-                },
-                {
-                    "name": "LPGA MIC Switch",
-                    "value": 1
-                },
-                {
-                    "name": "RPGA MIC Switch",
-                    "value": 0
-                }
-            ],
-            "micHs": [
-                {
-                    "name": "LPGA MIC Switch",
-                    "value": 0
-                },
-                {
-                    "name": "RPGA MIC Switch",
-                    "value": 0
-                }
-            ]
-        }
-    ],
-    "hdf_audio_codec_primary_dev11": [
-        {
-            "deep-buffer-playback Speaker": [
-                {
-                    "name": "External Codec Enable",
-                    "value": 2
-                }
-            ],
-            "Speaker": [
-                {
-                    "name": "External Codec Enable",
-                    "value": 2
-                }
-            ],
-            "mic": [
-                {
-                    "name": "External Codec Enable",
-                    "value": 2
+                    "Speaker": [
+                        {
+                            "name": "Speaker1 Switch",
+                            "value": 1
+                        }
+                    ],
+                    "Headphones": [
+                        {
+                            "name": "Headphone1 Switch",
+                            "value": 0
+                        },
+                        {
+                            "name": "Headphone2 Switch",
+                            "value": 0
+                        }
+                    ]
                 }
             ]
         }

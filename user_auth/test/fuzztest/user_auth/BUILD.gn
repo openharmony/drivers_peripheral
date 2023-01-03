@@ -13,5 +13,8 @@
 
 group("fuzztest") {
   testonly = true
-  deps = [ "userauthhdi_fuzzer:UserAuthHdiFuzzTest" ]
+  deps = [
+    "userauth_fuzzer:UserAuthFuzzTest",
+    "userauthhdi_fuzzer:UserAuthHdiFuzzTest",
+  ]
 }

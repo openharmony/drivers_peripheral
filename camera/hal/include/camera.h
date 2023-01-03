@@ -49,7 +49,7 @@ namespace Camera {
 #undef HDF_LOG_TAG
 #endif
 
-#define HDF_LOG_TAG camera_service_test
+#define HDF_LOG_TAG camera_hdi_service
 
 #define FILENAME (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
 

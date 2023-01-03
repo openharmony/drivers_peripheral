@@ -17,8 +17,10 @@
 #include <hdf_log.h>
 #include <osal_mem.h>
 #include "codec_config_parser.h"
+#ifndef CODEC_HAL_PASSTHROUGH
+#include "codec_service.h"
+#endif
 #include "codec_stub.h"
-
 
 static int32_t CodecServiceDispatch(struct HdfDeviceIoClient *client, int cmdId,
     struct HdfSBuf *data, struct HdfSBuf *reply)
@@ -31,6 +33,9 @@ static void HdfCodecDriverRelease(struct HdfDeviceObject *deviceObject)
     struct IDeviceIoService *testService = deviceObject->service;
     OsalMemFree(testService);
     ClearCapabilityGroup();
+#ifndef CODEC_HAL_PASSTHROUGH
+    DeinitOemIfaceLock();
+#endif
 }
 
 static int HdfCodecDriverBind(struct HdfDeviceObject *deviceObject)
@@ -62,6 +67,9 @@ static int HdfCodecDriverInit(struct HdfDeviceObject *deviceObject)
         HDF_LOGE("LoadCodecCapabilityFromHcs failed");
         ClearCapabilityGroup();
     }
+#ifndef CODEC_HAL_PASSTHROUGH
+    InitOemIfaceLock();
+#endif
     return HDF_SUCCESS;
 }
 

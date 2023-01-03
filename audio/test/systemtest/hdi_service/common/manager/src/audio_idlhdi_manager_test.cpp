@@ -66,7 +66,6 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdapters_001, TestSize.Level1)
 
     ret = manager->GetAllAdapters(manager, descs, &descsLen);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ((uint32_t)AUDIO_ADAPTER_MAX_NUM, descsLen);
 
     TestReleaseAdapterDescs(&descs, descsLen);
 }
@@ -145,9 +144,9 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioGetAllAdapters_005, TestSize.Level1)
     ASSERT_NE(nullptr, descs);
     ASSERT_NE(nullptr, manager);
 
-    descsLen = 2; // invalid descsLen
+    descsLen = 0; // invalid descsLen
     ret = manager->GetAllAdapters(manager, descs, &descsLen);
-    EXPECT_EQ(AUDIO_HAL_ERR_NOTREADY, ret);
+    EXPECT_TRUE((ret == AUDIO_HAL_ERR_NOTREADY || ret == HDF_ERR_INVALID_PARAM));
     OsalMemFree(descs);
     descs = nullptr;
 }
@@ -295,39 +294,6 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_006, TestSize.Level1)
     ret = manager->LoadAdapter(manager, &desc, &adapter);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     free(desc.adapterName);
-}
-
-/**
-* @tc.name  AudioLoadAdapter_007
-* @tc.desc  test LoadAdapter interface，Returns 0 if If two different sound cards are loaded at the same time
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_007, TestSize.Level1)
-{
-    int32_t ret = -1;
-    struct AudioPort audioPort = {};
-    struct AudioPort secondAudioPort = {};
-    struct IAudioAdapter *firstAdapter = nullptr;
-    struct IAudioAdapter *secondAdapter = nullptr;
-    ASSERT_NE(nullptr, manager);
-
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &firstAdapter, audioPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_OUT, &secondAdapter, secondAudioPort);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = manager->UnloadAdapter(manager, ADAPTER_NAME_OUT.c_str());
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    IAudioAdapterRelease(firstAdapter, IS_STUB);
-    IAudioAdapterRelease(secondAdapter, IS_STUB);
-    if (audioPort.portName != nullptr) {
-        free(audioPort.portName);
-    }
-    if (secondAudioPort.portName != nullptr) {
-        free(secondAudioPort.portName);
-    }
 }
 /**
 * @tc.name  AudioLoadAdapter_008

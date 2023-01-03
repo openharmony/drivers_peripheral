@@ -515,7 +515,7 @@ static int32_t WlanFillScanResultInfo(WifiScanResult *wifiScanResult, struct Hdf
         }
     }
     if ((wifiScanResult->ie != NULL) && (wifiScanResult->ieLen != 0)) {
-        scanResult->ie = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) *wifiScanResult->ieLen);
+        scanResult->ie = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * wifiScanResult->ieLen);
         if (scanResult->ie != NULL) {
             if (memcpy_s(scanResult->ie, wifiScanResult->ieLen, wifiScanResult->ie,
                 wifiScanResult->ieLen) != EOK) {

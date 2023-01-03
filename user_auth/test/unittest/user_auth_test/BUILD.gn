@@ -1,0 +1,86 @@
+# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+ohos_unittest("UserAuthUserAuthTest") {
+  module_out_path = "useriam/user_auth_hdi"
+
+  cflags = [ "-DIAM_TEST_ENABLE" ]
+
+  include_dirs = [
+    "//drivers/peripheral/user_auth/hdi_service/adaptor/inc",
+    "//drivers/peripheral/user_auth/hdi_service/coauth/inc",
+    "//drivers/peripheral/user_auth/hdi_service/common/inc",
+    "//drivers/peripheral/user_auth/hdi_service/database/inc",
+    "//drivers/peripheral/user_auth/hdi_service/idm/inc",
+    "//drivers/peripheral/user_auth/hdi_service/interface",
+    "//drivers/peripheral/user_auth/hdi_service/key_mgr/inc",
+    "//drivers/peripheral/user_auth/hdi_service/user_auth/inc",
+  ]
+
+  sources = [
+    "//drivers/peripheral/user_auth/hdi_service/adaptor/src/adaptor_algorithm.c",
+    "//drivers/peripheral/user_auth/hdi_service/adaptor/src/adaptor_file.c",
+    "//drivers/peripheral/user_auth/hdi_service/adaptor/src/adaptor_memory.c",
+    "//drivers/peripheral/user_auth/hdi_service/adaptor/src/adaptor_time.c",
+    "//drivers/peripheral/user_auth/hdi_service/adaptor/src/file_operator.c",
+    "//drivers/peripheral/user_auth/hdi_service/coauth/src/coauth.c",
+    "//drivers/peripheral/user_auth/hdi_service/coauth/src/coauth_funcs.c",
+    "//drivers/peripheral/user_auth/hdi_service/coauth/src/executor_message.c",
+    "//drivers/peripheral/user_auth/hdi_service/coauth/src/pool.c",
+    "//drivers/peripheral/user_auth/hdi_service/common/src/buffer.c",
+    "//drivers/peripheral/user_auth/hdi_service/common/src/linked_list.c",
+    "//drivers/peripheral/user_auth/hdi_service/common/src/tlv_base.c",
+    "//drivers/peripheral/user_auth/hdi_service/common/src/tlv_wrapper.c",
+    "//drivers/peripheral/user_auth/hdi_service/database/src/idm_common.c",
+    "//drivers/peripheral/user_auth/hdi_service/database/src/idm_database.c",
+    "//drivers/peripheral/user_auth/hdi_service/database/src/idm_file_manager.c",
+    "//drivers/peripheral/user_auth/hdi_service/hal_sdk/useriam_common.cpp",
+    "//drivers/peripheral/user_auth/hdi_service/idm/src/enroll_specification_check.c",
+    "//drivers/peripheral/user_auth/hdi_service/idm/src/idm_session.c",
+    "//drivers/peripheral/user_auth/hdi_service/idm/src/user_idm_funcs.c",
+    "//drivers/peripheral/user_auth/hdi_service/key_mgr/src/ed25519_key.c",
+    "//drivers/peripheral/user_auth/hdi_service/key_mgr/src/token_key.c",
+    "//drivers/peripheral/user_auth/hdi_service/service/user_auth_interface_service.cpp",
+    "//drivers/peripheral/user_auth/hdi_service/user_auth/src/auth_level.c",
+    "//drivers/peripheral/user_auth/hdi_service/user_auth/src/context_manager.c",
+    "//drivers/peripheral/user_auth/hdi_service/user_auth/src/identify_funcs.c",
+    "//drivers/peripheral/user_auth/hdi_service/user_auth/src/user_auth_funcs.c",
+    "//drivers/peripheral/user_auth/hdi_service/user_auth/src/user_sign_centre.c",
+    "auth_level_test.cpp",
+    "context_manager_test.cpp",
+    "identify_funcs_test.cpp",
+    "user_auth_funcs_test.cpp",
+    "user_sign_centre_test.cpp",
+  ]
+
+  deps = [ "//third_party/openssl:libcrypto_shared" ]
+
+  configs = [
+    "//base/useriam/user_auth_framework/common:iam_utils_config",
+    "//base/useriam/user_auth_framework/common:iam_log_config",
+  ]
+  remove_configs = [ "//build/config/compiler:no_exceptions" ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_user_auth:user_auth_idl_headers",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "ipc:ipc_single",
+  ]
+}

@@ -104,12 +104,12 @@ struct FconfigPropSting {
 
 struct FconfigDevdescInfo {
     struct FconfigString      gadgetName;
-    struct FconfigProp        Prop;
+    struct FconfigProp        prop;
 };
 
 struct FconfigDevDescString {
     struct FconfigString      gadgetName;
-    struct FconfigPropSting   Prop;
+    struct FconfigPropSting   prop;
 };
 
 struct FconfigPollFd {
