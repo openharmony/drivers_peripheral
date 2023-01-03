@@ -290,7 +290,6 @@ HWTEST_F(AudioProxyAdapterTest, AdapterSetPassthroughMode_001, TestSize.Level1)
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
     ret = AudioProxyAdapterSetPassthroughMode(adapter, nullptr, PORT_PASSTHROUGH_LPCM);
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
-    port.portName = nullptr;
     ret = AudioProxyAdapterSetPassthroughMode(adapter, &port, PORT_PASSTHROUGH_LPCM);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
 }

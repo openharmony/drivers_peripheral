@@ -33,6 +33,8 @@ struct AudioManager *g_serverManager = NULL;
 #define MANAGER_ADAPTER_NAME_LEN        32
 #define SERVER_INFO_LEN 128
 
+#define SUPPORT_PORT_NUM_MAX 10
+
 int32_t g_serverAdapterNum = 0;
 
 struct AudioInfoInAdapter g_renderAndCaptureManage[MAX_AUDIO_ADAPTER_NUM_SERVER];
@@ -1029,6 +1031,11 @@ static bool AudioPortBlockMarshalling(struct HdfSBuf *data, const struct AudioPo
         return false;
     }
 
+    if (!HdfSbufWriteString(data, dataBlock->portName)) {
+        HDF_LOGE("%{public}s: write dataBlock->portName failed!", __func__);
+        return false;
+    }
+
     return true;
 }
 
@@ -1053,6 +1060,12 @@ static bool AudioAdapterDescriptorBlockMarshalling(struct HdfSBuf *data, const s
         HDF_LOGE("%{public}s: write dataBlock->portNum failed!", __func__);
         return false;
     }
+
+    if (dataBlock->portNum == 0 || dataBlock->portNum > SUPPORT_PORT_NUM_MAX) {
+        HDF_LOGE("%{public}s: error portNum is %{public}u", __func__, dataBlock->portNum);
+        return false;
+    }
+
     for (uint32_t i = 0; i < dataBlock->portNum; i++) {
         if (!AudioPortBlockMarshalling(data, &(dataBlock->ports)[i])) {
             HDF_LOGE("%{public}s: write (dataBlock->ports)[i] failed!", __func__);
@@ -1588,12 +1601,17 @@ int32_t HdiServiceGetPortCapability(const struct HdfDeviceIoClient *client,
     }
 
     if (!HdfSbufReadUint32(data, (uint32_t *)&port.dir)) {
-        AUDIO_FUNC_LOGE("write port.dir error");
+        AUDIO_FUNC_LOGE("read port.dir error");
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
     if (!HdfSbufReadUint32(data, &port.portId)) {
-        AUDIO_FUNC_LOGE("write port.portId error");
+        AUDIO_FUNC_LOGE("read port.portId error");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if ((port.portName = HdfSbufReadString(data)) == NULL) {
+        AUDIO_FUNC_LOGE("read port.portName error");
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
@@ -1643,6 +1661,10 @@ int32_t HdiServiceSetPassthroughMode(const struct HdfDeviceIoClient *client,
     if (!HdfSbufReadUint32(data, &port.portId)) {
         return AUDIO_HAL_ERR_INTERNAL;
     }
+    if ((port.portName = HdfSbufReadString(data)) == NULL) {
+        AUDIO_FUNC_LOGE("read port.portName failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
     uint32_t tempMode = 0;
     if (!HdfSbufReadUint32(data, &tempMode)) {
         return AUDIO_HAL_ERR_INTERNAL;
@@ -1690,6 +1712,10 @@ int32_t HdiServiceGetPassthroughMode(const struct HdfDeviceIoClient *client,
     }
     port.dir = (enum AudioPortDirection)tempDir;
     if (!HdfSbufReadUint32(data, &port.portId)) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    if ((port.portName = HdfSbufReadString(data)) == NULL) {
+        AUDIO_FUNC_LOGE("read port.portName failed");
         return AUDIO_HAL_ERR_INTERNAL;
     }
     if (AudioAdapterListGetAdapter(adapterName, &adapter)) {
