@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//build/test.gni")
 
-ohos_unittest("UserAuthDatabaseTest") {
+ohos_unittest("UserAuthUserAuthTest") {
   module_out_path = "useriam/user_auth_hdi"
 
   cflags = [ "-DIAM_TEST_ENABLE" ]
@@ -28,7 +28,6 @@ ohos_unittest("UserAuthDatabaseTest") {
     "//drivers/peripheral/user_auth/hdi_service/interface",
     "//drivers/peripheral/user_auth/hdi_service/key_mgr/inc",
     "//drivers/peripheral/user_auth/hdi_service/user_auth/inc",
-    "//drivers/peripheral/user_auth/test/unittest/test_utils",
   ]
 
   sources = [
@@ -60,9 +59,11 @@ ohos_unittest("UserAuthDatabaseTest") {
     "//drivers/peripheral/user_auth/hdi_service/user_auth/src/identify_funcs.c",
     "//drivers/peripheral/user_auth/hdi_service/user_auth/src/user_auth_funcs.c",
     "//drivers/peripheral/user_auth/hdi_service/user_auth/src/user_sign_centre.c",
-    "idm_common_test.cpp",
-    "idm_database_test.cpp",
-    "idm_file_manager_test.cpp",
+    "auth_level_test.cpp",
+    "context_manager_test.cpp",
+    "identify_funcs_test.cpp",
+    "user_auth_funcs_test.cpp",
+    "user_sign_centre_test.cpp",
   ]
 
   deps = [ "//third_party/openssl:libcrypto_shared" ]
