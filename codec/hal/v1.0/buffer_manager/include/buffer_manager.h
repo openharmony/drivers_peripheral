@@ -27,29 +27,29 @@
 
 #define HDF_NANO_UNITS 1000000000
 
-template <class T>
 class BufferManager {
 public:
     BufferManager();
     ~BufferManager();
     void Stop();
-    T* GetBuffer(uint32_t timeoutMs, bool isChecking);
-    T* GetUsedBuffer(uint32_t timeoutMs, bool isChecking);
-    void PutBuffer(T *info);
-    void PutUsedBuffer(T *info);
+    CodecBuffer* GetBuffer(uint32_t timeoutMs, bool isChecking);
+    CodecBuffer* GetUsedBuffer(uint32_t timeoutMs, bool isChecking);
+    void PutBuffer(CodecBuffer *buffer);
+    void PutUsedBuffer(CodecBuffer *buffer);
 
 private:
     void ConstructTimespec(struct timespec *time,  uint32_t timeoutMs);
-    T* PollBufferQueue(bool isChecking);
-    T* PollUsedBufferQueue(bool isChecking);
+    CodecBuffer* PollBufferQueue(bool isChecking);
+    CodecBuffer* PollUsedBufferQueue(bool isChecking);
 
     int32_t status;
     OsalMutex bufferQueueLock;
     OsalMutex usedBufferQueueLock;
     pthread_cond_t inputCond = PTHREAD_COND_INITIALIZER;
     pthread_cond_t outputCond = PTHREAD_COND_INITIALIZER;
-    std::queue<T*> bufferQueue;
-    std::queue<T*> usedBufferQueue;
+    std::queue<CodecBuffer*> bufferQueue;
+    std::queue<CodecBuffer*> usedBufferQueue;
 };
 
 #endif  // BUFFER_MANAGER_H
+
