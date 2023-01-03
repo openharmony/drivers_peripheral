@@ -29,7 +29,7 @@
 #define AUDIO_ADAPTER_CONFIG HDF_CONFIG_DIR "/audio_adapter.json"
 #define ADAPTER_NAME_LEN     32
 #define PORT_NAME_LEN        ADAPTER_NAME_LEN
-#define SUPPORT_PORT_NUM_MAX 4
+#define SUPPORT_PORT_NUM_MAX 10
 #define SUPPORT_PORT_ID_MAX  41
 #define CONFIG_FILE_SIZE_MAX ((SUPPORT_ADAPTER_NUM_MAX) * 1024 * 2) // 16KB
 #define CONFIG_CHANNEL_COUNT 2                                    // two channels
