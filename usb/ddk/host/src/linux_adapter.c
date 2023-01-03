@@ -1024,6 +1024,16 @@ static int32_t AdapterDetachKernelDriverAndClaim(const struct UsbDeviceHandle *h
         HDF_LOGE("%{public}s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    struct UsbAdapterGetdriver getDriver = {interfaceNumber, {0}};
+    ret = ioctl(handle->fd, USBDEVFS_GETDRIVER, &getDriver);
+    if (ret != 0 && errno == ENODATA) {
+        HDF_LOGI("%{public}s: no usb driver", __func__);
+        return AdapterClaimInterface(handle, interfaceNumber);
+    }
+    if (ret == 0 && strcmp(getDriver.driver, "usbfs") == 0) {
+        HDF_LOGI("%{public}s: usbfs already claimed", __func__);
+        return HDF_SUCCESS;
+    }
 
     dc.interface = interfaceNumber;
     ret = strcpy_s(dc.driver, MAX_DRIVER_NAME_LENGTH, "usbfs");
@@ -1042,11 +1052,6 @@ static int32_t AdapterDetachKernelDriverAndClaim(const struct UsbDeviceHandle *h
     }
 
     struct UsbAdapterIoctl command = {interfaceNumber, USBDEVFS_DISCONNECT, NULL};
-    struct UsbAdapterGetdriver getDriver = {interfaceNumber, {0}};
-    ret = ioctl(handle->fd, USBDEVFS_GETDRIVER, &getDriver);
-    if (ret == 0 && strcmp(getDriver.driver, "usbfs") == 0) {
-        return HDF_SUCCESS;
-    }
     ret = ioctl(handle->fd, USBDEVFS_IOCTL, &command);
     if (ret != 0) {
         HDF_LOGE("%{public}s; disconnet failed errno = %{public}d", __func__, errno);
