@@ -35,6 +35,7 @@ ohos_unittest("UserAuthBaseTest") {
     "src/adaptor_memory_test.cpp",
     "src/adaptor_time_test.cpp",
     "src/buffer_test.cpp",
+    "src/key_mgr_test.cpp",
     "src/tlv_base_test.cpp",
   ]
 
