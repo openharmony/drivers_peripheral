@@ -19,6 +19,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "hdf_remote_service.h"
+#include "osal_mem.h"
 
 namespace commonfun {
 void *GetDynamicLibHandle(const std::string path)
@@ -191,13 +192,28 @@ int32_t GetAdapters(TestAudioManager *manager, struct AudioAdapterDescriptor **d
     if (descs == nullptr) {
         return HDF_ERR_INVALID_PARAM;
     }
-    int32_t ret = manager->GetAllAdapters(manager, descs, &size);
-    if (ret < 0) {
-        return ret;
-    }
+    size = 1;
+    uint32_t portNum = 2;
+    struct AudioPort *ports = (struct AudioPort*)OsalMemCalloc(sizeof(struct AudioPort) * (portNum));
+    ports[0] = {
+        .dir = PORT_OUT,
+        .portId = 0,
+    };
+    ports[1] = {
+        .dir = PORT_IN,
+        .portId = 11,
+    };
+    *descs = (struct AudioAdapterDescriptor*)OsalMemCalloc(sizeof(struct AudioAdapterDescriptor) * (size));
     if (*descs == nullptr) {
         return HDF_FAILURE;
     }
+
+    **descs = {
+        .adapterName = "primary",
+        .portNum = portNum,
+        .ports = ports,
+    };
+
     return HDF_SUCCESS;
 }
 

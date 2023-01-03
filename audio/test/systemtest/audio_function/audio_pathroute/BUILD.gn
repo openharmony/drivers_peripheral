@@ -56,6 +56,9 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
+    if (!drivers_peripheral_audio_rich_device) {
+      defines = [ "FEATURE_SMALL_DEVICE" ]
+    }
   }
 } else {
   module_output_path = "drivers_peripheral_audio/audio"

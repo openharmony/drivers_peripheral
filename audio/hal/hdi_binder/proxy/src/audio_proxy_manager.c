@@ -34,7 +34,7 @@
 
 static bool audioProxyAdapterAddrMgrFlag = false;
 static struct AudioAdapterDescriptor *g_localAudioProxyAdapterAddrOut = NULL; // add for Fuzz
-int g_localAudioProxyAdapterNum = 0; // add for Fuzz
+int g_localAudioProxyAdapterNum = 1; // add for Fuzz
 static struct AudioProxyManager g_localAudioProxyMgr = {0}; // serverManager
 
 static int32_t AudioProxySendGetAllAdapter(struct HdfRemoteService *remoteHandle,

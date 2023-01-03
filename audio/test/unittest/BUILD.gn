@@ -26,15 +26,14 @@ group("audiotest") {
   deps = []
 
   # hal ut
+  if (drivers_peripheral_audio_rich_device) {
+    deps += [ "hdi/client_advance:hdi_client_advance" ]
+  }
   if (drivers_peripheral_audio_full_test_suite) {
-    if (drivers_peripheral_audio_rich_device) {
-      deps += [ "hdi/client_advance:hdi_client_advance" ]
-    } else {
-      deps += [
-        "hdi/client:hdi_client",
-        "hdi/passthrough:hdi_passthrough",
-        "supportlibs:interface_lib",
-      ]
-    }
+    deps += [
+      "hdi/client:hdi_client",
+      "hdi/passthrough:hdi_passthrough",
+      "supportlibs:interface_lib",
+    ]
   }
 }
