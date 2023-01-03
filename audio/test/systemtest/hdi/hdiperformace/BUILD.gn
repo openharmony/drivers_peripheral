@@ -48,6 +48,9 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/test/systemtest/hdi/hdiperformace/include",
     ]
     deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    if (!drivers_peripheral_audio_rich_device) {
+      defines = [ "FEATURE_SMALL_DEVICE" ]
+    }
   }
 
   moduletest("hdf_audio_hdi_capture_performace_test") {
@@ -78,6 +81,9 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/test/systemtest/hdi/hdiperformace/include",
     ]
     deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    if (!drivers_peripheral_audio_rich_device) {
+      defines = [ "FEATURE_SMALL_DEVICE" ]
+    }
   }
 } else {
   module_output_path = "drivers_peripheral_audio/audio"
