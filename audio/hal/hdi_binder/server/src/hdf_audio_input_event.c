@@ -124,7 +124,7 @@ static int32_t AudioPnpInputOpen(void)
     for (i = 0; i < INPUT_EVT_MAX_CNT; i++) {
         g_fdSets[j].fd = open(devices[i], O_RDONLY);
         if (g_fdSets[j].fd < 0) {
-            AUDIO_FUNC_LOGE("[open] %{public}s failed!", devices[i]);
+            AUDIO_FUNC_LOGW("[open] %{public}s failed!", devices[i]);
             continue;
         }
         AUDIO_FUNC_LOGI("[open] %{public}s success!", devices[i]);
@@ -157,11 +157,11 @@ static void *AudioPnpInputStart(void *useless)
     return NULL;
 }
 
-int32_t AudioPnpInputStartThread(void)
+int32_t AudioHeadsetPnpInputStartThread(void)
 {
     pthread_t thread;
     pthread_attr_t tidsAttr;
-    const char *threadName = "audio_pnp_input";
+    const char *threadName = "pnp_headset";
 
     AUDIO_FUNC_LOGI("enter.");
     g_bRunThread = true;
@@ -174,14 +174,14 @@ int32_t AudioPnpInputStartThread(void)
     }
 
     if (pthread_setname_np(thread, threadName) != 0) {
-        AUDIO_FUNC_LOGE("AudioPnpInputStartThread setname failed!");
+        AUDIO_FUNC_LOGE("Setname failed!");
         return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;
 }
 
-void AudioPnpInputEndThread(void)
+void AudioHeadsetPnpInputEndThread(void)
 {
     AUDIO_FUNC_LOGI("enter.");
     g_bRunThread = false;

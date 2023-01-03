@@ -49,7 +49,9 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
     while (count--) {
         HdfLightInfo hdfLightInfo;
         hdfLightInfo.lightId = lightInfo->lightId;
-        hdfLightInfo.reserved = lightInfo->reserved;
+        hdfLightInfo.lightType = lightInfo->lightType;
+        hdfLightInfo.lightName = lightInfo->lightName;
+        hdfLightInfo.lightNumber = lightInfo->lightNumber;
         info.push_back(hdfLightInfo);
         lightInfo++;
     }
@@ -58,7 +60,7 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
 
 int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffect& effect)
 {
-    HDF_LOGI("%{public}s: Enter the GetLightInfo function, lightId is %{public}d", __func__, lightId);
+    HDF_LOGI("%{public}s: Enter the TurnOnLight function, lightId is %{public}d", __func__, lightId);
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
     if (lightInterface == nullptr || lightInterface->TurnOnLight == nullptr) {
         HDF_LOGE("%{public}s: get light Module instance failed", __func__);
@@ -67,7 +69,6 @@ int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffect& e
 
     LightEffect lightEffect;
     lightEffect.lightColor.colorValue.rgbColor.b = effect.lightColor.colorValue.rgbColor.b;
-    lightEffect.lightColor.colorValue.rgbColor.brightness = effect.lightColor.colorValue.rgbColor.brightness;
     lightEffect.lightColor.colorValue.rgbColor.g = effect.lightColor.colorValue.rgbColor.g;
     lightEffect.lightColor.colorValue.rgbColor.r = effect.lightColor.colorValue.rgbColor.r;
     lightEffect.lightColor.colorValue.wrgbColor.b = effect.lightColor.colorValue.wrgbColor.b;
@@ -87,7 +88,7 @@ int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffect& e
 
 int32_t LightInterfaceImpl::TurnOnMultiLights(int32_t lightId, const std::vector<HdfLightColor>& colors)
 {
-    HDF_LOGI("%{public}s: Enter the GetLightInfo function, lightId is %{public}d", __func__, lightId);
+    HDF_LOGI("%{public}s: Enter the TurnOnMultiLights function, lightId is %{public}d", __func__, lightId);
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
     if (lightInterface == nullptr || lightInterface->TurnOnMultiLights == nullptr) {
         HDF_LOGE("%{public}s: get light module instance failed", __func__);
@@ -99,7 +100,6 @@ int32_t LightInterfaceImpl::TurnOnMultiLights(int32_t lightId, const std::vector
     int32_t i = 0;
     for (auto iter : colors) {
         lightColor[i].colorValue.rgbColor.b = iter.colorValue.rgbColor.b;
-        lightColor[i].colorValue.rgbColor.brightness = iter.colorValue.rgbColor.brightness;
         lightColor[i].colorValue.rgbColor.g = iter.colorValue.rgbColor.g;
         lightColor[i].colorValue.rgbColor.r = iter.colorValue.rgbColor.r;
         lightColor[i].colorValue.wrgbColor.b = iter.colorValue.wrgbColor.b;

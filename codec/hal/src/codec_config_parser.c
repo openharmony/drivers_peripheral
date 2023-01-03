@@ -39,7 +39,7 @@ static int32_t GetGroupCapabilitiesNumber(const struct DeviceResourceNode *node,
     const struct DeviceResourceNode *codecGroupNode = NULL;
     struct DeviceResourceNode *childNode = NULL;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    if (iface ==NULL) {
+    if (iface == NULL) {
         HDF_LOGE("%{public}s, failed, iface NULL!", __func__);
         return HDF_FAILURE;
     }
@@ -302,7 +302,7 @@ static int32_t GetGroupCapabilities(const struct DeviceResourceNode *node,
     const struct DeviceResourceNode *codecGroupNode = NULL;
     struct DeviceResourceNode *childNode = NULL;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    if (iface ==NULL) {
+    if (iface == NULL) {
         HDF_LOGE("%{public}s, failed, iface NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }

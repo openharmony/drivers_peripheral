@@ -14,6 +14,10 @@
  */
 
 #include "hdi_service_test.h"
+#include "battery_log.h"
+#include "battery_thread_test.h"
+#include "hdf_base.h"
+#include "power_supply_provider.h"
 #include <chrono>
 #include <condition_variable>
 #include <csignal>
@@ -28,11 +32,6 @@
 #include <sys/stat.h>
 #include <thread>
 #include <vector>
-#include "battery_thread_test.h"
-#include "battery_vibrate.h"
-#include "hdf_base.h"
-#include "power_supply_provider.h"
-#include "battery_log.h"
 
 using namespace testing::ext;
 using namespace OHOS;
@@ -60,17 +59,11 @@ void HdiServiceTest::SetUpTestCase(void)
     }
 }
 
-void HdiServiceTest::TearDownTestCase(void)
-{
-}
+void HdiServiceTest::TearDownTestCase(void) {}
 
-void HdiServiceTest::SetUp(void)
-{
-}
+void HdiServiceTest::SetUp(void) {}
 
-void HdiServiceTest::TearDown(void)
-{
-}
+void HdiServiceTest::TearDown(void) {}
 
 struct StringEnumMap {
     const char* str;
@@ -91,7 +84,7 @@ std::string CreateFile(std::string path, std::string content)
 
 static void CheckSubfolderNode(const std::string& path)
 {
-    DIR *dir = nullptr;
+    DIR* dir = nullptr;
     struct dirent* entry = nullptr;
     std::string batteryPath = SYSTEM_BATTERY_PATH + "/" + path;
     BATTERY_HILOGI(LABEL_TEST, "subfolder path is:%{private}s", batteryPath.c_str());
@@ -496,17 +489,17 @@ static void Trim(char* str)
 static int32_t HealthStateEnumConverter(const char* str)
 {
     struct StringEnumMap healthStateEnumMap[] = {
-        { "Good", PowerSupplyProvider::BATTERY_HEALTH_GOOD },
-        { "Cold", PowerSupplyProvider::BATTERY_HEALTH_COLD },
-        { "Warm", PowerSupplyProvider::BATTERY_HEALTH_GOOD }, // JEITA specification
-        { "Cool", PowerSupplyProvider::BATTERY_HEALTH_GOOD }, // JEITA specification
-        { "Hot", PowerSupplyProvider::BATTERY_HEALTH_OVERHEAT }, // JEITA specification
-        { "Overheat", PowerSupplyProvider::BATTERY_HEALTH_OVERHEAT },
-        { "Over voltage", PowerSupplyProvider::BATTERY_HEALTH_OVERVOLTAGE },
-        { "Dead", PowerSupplyProvider::BATTERY_HEALTH_DEAD },
-        { "Unknown", PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN },
-        { "Unspecified failure", PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN },
-        { NULL, PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN },
+        {"Good",                PowerSupplyProvider::BATTERY_HEALTH_GOOD       },
+        {"Cold",                PowerSupplyProvider::BATTERY_HEALTH_COLD       },
+        {"Warm",                PowerSupplyProvider::BATTERY_HEALTH_GOOD       }, // JEITA specification
+        {"Cool",                PowerSupplyProvider::BATTERY_HEALTH_GOOD       }, // JEITA specification
+        {"Hot",                 PowerSupplyProvider::BATTERY_HEALTH_OVERHEAT   }, // JEITA specification
+        {"Overheat",            PowerSupplyProvider::BATTERY_HEALTH_OVERHEAT   },
+        {"Over voltage",        PowerSupplyProvider::BATTERY_HEALTH_OVERVOLTAGE},
+        {"Dead",                PowerSupplyProvider::BATTERY_HEALTH_DEAD       },
+        {"Unknown",             PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN    },
+        {"Unspecified failure", PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN    },
+        {NULL,                  PowerSupplyProvider::BATTERY_HEALTH_UNKNOWN    },
     };
 
     for (int i = 0; healthStateEnumMap[i].str; ++i) {
@@ -556,19 +549,19 @@ static int32_t ReadHealthStateSysfs()
 static int32_t PluggedTypeEnumConverter(const char* str)
 {
     struct StringEnumMap pluggedTypeEnumMap[] = {
-        { "USB", PowerSupplyProvider::PLUGGED_TYPE_USB },
-        { "USB_PD_DRP", PowerSupplyProvider::PLUGGED_TYPE_USB },
-        { "Wireless", PowerSupplyProvider::PLUGGED_TYPE_WIRELESS },
-        { "Mains", PowerSupplyProvider::PLUGGED_TYPE_AC },
-        { "UPS", PowerSupplyProvider::PLUGGED_TYPE_AC },
-        { "USB_ACA", PowerSupplyProvider::PLUGGED_TYPE_AC },
-        { "USB_C", PowerSupplyProvider::PLUGGED_TYPE_AC },
-        { "USB_CDP", PowerSupplyProvider::PLUGGED_TYPE_AC },
-        { "USB_DCP", PowerSupplyProvider::PLUGGED_TYPE_AC },
-        { "USB_HVDCP", PowerSupplyProvider::PLUGGED_TYPE_AC },
-        { "USB_PD", PowerSupplyProvider::PLUGGED_TYPE_AC },
-        { "Unknown", PowerSupplyProvider::PLUGGED_TYPE_BUTT },
-        { NULL, PowerSupplyProvider::PLUGGED_TYPE_BUTT },
+        {"USB",        PowerSupplyProvider::PLUGGED_TYPE_USB     },
+        {"USB_PD_DRP", PowerSupplyProvider::PLUGGED_TYPE_USB     },
+        {"Wireless",   PowerSupplyProvider::PLUGGED_TYPE_WIRELESS},
+        {"Mains",      PowerSupplyProvider::PLUGGED_TYPE_AC      },
+        {"UPS",        PowerSupplyProvider::PLUGGED_TYPE_AC      },
+        {"USB_ACA",    PowerSupplyProvider::PLUGGED_TYPE_AC      },
+        {"USB_C",      PowerSupplyProvider::PLUGGED_TYPE_AC      },
+        {"USB_CDP",    PowerSupplyProvider::PLUGGED_TYPE_AC      },
+        {"USB_DCP",    PowerSupplyProvider::PLUGGED_TYPE_AC      },
+        {"USB_HVDCP",  PowerSupplyProvider::PLUGGED_TYPE_AC      },
+        {"USB_PD",     PowerSupplyProvider::PLUGGED_TYPE_AC      },
+        {"Unknown",    PowerSupplyProvider::PLUGGED_TYPE_BUTT    },
+        {NULL,         PowerSupplyProvider::PLUGGED_TYPE_BUTT    },
     };
 
     for (int i = 0; pluggedTypeEnumMap[i].str; ++i) {
@@ -582,7 +575,7 @@ static int32_t PluggedTypeEnumConverter(const char* str)
 
 int32_t ReadSysfsFile(const char* path, char* buf, size_t size)
 {
-    int fd = open(path, O_RDONLY);
+    int fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
     if (fd < NUM_ZERO) {
         BATTERY_HILOGE(LABEL_TEST, "failed to open %{private}s", path);
         return HDF_ERR_IO;
@@ -640,12 +633,12 @@ static int32_t ReadPluggedTypeSysfs()
 int32_t ChargeStateEnumConverter(const char* str)
 {
     struct StringEnumMap chargeStateEnumMap[] = {
-        { "Discharging", PowerSupplyProvider::CHARGE_STATE_NONE },
-        { "Charging", PowerSupplyProvider::CHARGE_STATE_ENABLE },
-        { "Full", PowerSupplyProvider::CHARGE_STATE_FULL },
-        { "Not charging", PowerSupplyProvider::CHARGE_STATE_DISABLE },
-        { "Unknown", PowerSupplyProvider::CHARGE_STATE_RESERVED },
-        { NULL, PowerSupplyProvider::CHARGE_STATE_RESERVED },
+        {"Discharging",  PowerSupplyProvider::CHARGE_STATE_NONE    },
+        {"Charging",     PowerSupplyProvider::CHARGE_STATE_ENABLE  },
+        {"Full",         PowerSupplyProvider::CHARGE_STATE_FULL    },
+        {"Not charging", PowerSupplyProvider::CHARGE_STATE_DISABLE },
+        {"Unknown",      PowerSupplyProvider::CHARGE_STATE_RESERVED},
+        {NULL,           PowerSupplyProvider::CHARGE_STATE_RESERVED},
     };
 
     for (int i = 0; chargeStateEnumMap[i].str; ++i) {
@@ -816,7 +809,7 @@ static bool IsNotMock()
  * @tc.desc: Test functions of PowerSupplyProvider
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, ProviderIsNotNull, TestSize.Level1)
+HWTEST_F(HdiServiceTest, ProviderIsNotNull, TestSize.Level1)
 {
     ASSERT_TRUE(giver_ != nullptr);
     if (!IsNotMock()) {
@@ -831,14 +824,14 @@ HWTEST_F (HdiServiceTest, ProviderIsNotNull, TestSize.Level1)
  * @tc.desc: Test functions of ParseTemperature
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService001, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService001, TestSize.Level1)
 {
     int32_t temperature = 0;
     if (IsNotMock()) {
         giver_->ParseTemperature(&temperature);
         int32_t sysfsTemp = ReadTemperatureSysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService001::temperature=%{public}d, t=%{public}d",
-            temperature, sysfsTemp);
+        BATTERY_HILOGI(
+            LABEL_TEST, "Not Mock HdiService001::temperature=%{public}d, t=%{public}d", temperature, sysfsTemp);
         ASSERT_TRUE(temperature == sysfsTemp);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "battery/temp", "567");
@@ -853,14 +846,13 @@ HWTEST_F (HdiServiceTest, HdiService001, TestSize.Level1)
  * @tc.desc: Test functions of ParseVoltage
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService002, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService002, TestSize.Level1)
 {
     int32_t voltage = 0;
     if (IsNotMock()) {
         giver_->ParseVoltage(&voltage);
         int32_t sysfsVoltage = ReadVoltageSysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService002::voltage=%{public}d, v=%{public}d",
-            voltage, sysfsVoltage);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService002::voltage=%{public}d, v=%{public}d", voltage, sysfsVoltage);
         ASSERT_TRUE(voltage == sysfsVoltage);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "battery/voltage_avg", "4123456");
@@ -876,14 +868,14 @@ HWTEST_F (HdiServiceTest, HdiService002, TestSize.Level1)
  * @tc.desc: Test functions of ParseCapacity
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService003, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService003, TestSize.Level1)
 {
     int32_t capacity = -1;
     if (IsNotMock()) {
         giver_->ParseCapacity(&capacity);
         int32_t sysfsCapacity = ReadCapacitySysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mcok HdiService003::capacity=%{public}d, l=%{public}d",
-            capacity, sysfsCapacity);
+        BATTERY_HILOGI(
+            LABEL_TEST, "Not Mcok HdiService003::capacity=%{public}d, l=%{public}d", capacity, sysfsCapacity);
         ASSERT_TRUE(capacity == sysfsCapacity);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "battery/capacity", "11");
@@ -898,14 +890,14 @@ HWTEST_F (HdiServiceTest, HdiService003, TestSize.Level1)
  * @tc.desc: Test functions of ParseHealthState
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService004, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService004, TestSize.Level1)
 {
     int32_t healthState = -1;
     if (IsNotMock()) {
         giver_->ParseHealthState(&healthState);
         int32_t sysfsHealthState = ReadHealthStateSysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService004::healthState=%{public}d, h=%{public}d",
-            healthState, sysfsHealthState);
+        BATTERY_HILOGI(
+            LABEL_TEST, "Not Mock HdiService004::healthState=%{public}d, h=%{public}d", healthState, sysfsHealthState);
         ASSERT_TRUE(healthState == sysfsHealthState);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "battery/health", "Good");
@@ -921,14 +913,14 @@ HWTEST_F (HdiServiceTest, HdiService004, TestSize.Level1)
  * @tc.desc: Test functions of ParsePluggedType
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService005, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService005, TestSize.Level1)
 {
     int32_t pluggedType = PowerSupplyProvider::PLUGGED_TYPE_NONE;
     if (IsNotMock()) {
         giver_->ParsePluggedType(&pluggedType);
         int32_t sysfsPluggedType = ReadPluggedTypeSysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService005::pluggedType=%{public}d, p=%{public}d",
-            pluggedType, sysfsPluggedType);
+        BATTERY_HILOGI(
+            LABEL_TEST, "Not Mock HdiService005::pluggedType=%{public}d, p=%{public}d", pluggedType, sysfsPluggedType);
         ASSERT_TRUE(pluggedType == sysfsPluggedType);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "ohos_charger/online", "1");
@@ -945,14 +937,14 @@ HWTEST_F (HdiServiceTest, HdiService005, TestSize.Level1)
  * @tc.desc: Test functions of ParseChargeState
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService006, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService006, TestSize.Level1)
 {
     int32_t chargeState = PowerSupplyProvider::CHARGE_STATE_RESERVED;
     if (IsNotMock()) {
         giver_->ParseChargeState(&chargeState);
         int32_t sysfsChargeState = ReadChargeStateSysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService006::chargeState=%{public}d, cs=%{public}d",
-            chargeState, sysfsChargeState);
+        BATTERY_HILOGI(
+            LABEL_TEST, "Not Mock HdiService006::chargeState=%{public}d, cs=%{public}d", chargeState, sysfsChargeState);
         ASSERT_TRUE(chargeState == sysfsChargeState);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "battery/status", "Not charging");
@@ -968,14 +960,14 @@ HWTEST_F (HdiServiceTest, HdiService006, TestSize.Level1)
  * @tc.desc: Test functions of ParseChargeCounter
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService007, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService007, TestSize.Level1)
 {
     int32_t chargeCounter = -1;
     if (IsNotMock()) {
         giver_->ParseChargeCounter(&chargeCounter);
         int32_t sysfsChargeCounter = ReadChargeCounterSysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mcok HdiService007::chargeCounter=%{public}d, cc=%{public}d",
-            chargeCounter, sysfsChargeCounter);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mcok HdiService007::chargeCounter=%{public}d, cc=%{public}d", chargeCounter,
+            sysfsChargeCounter);
         ASSERT_TRUE(chargeCounter == sysfsChargeCounter);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "battery/charge_counter", "12345");
@@ -990,14 +982,13 @@ HWTEST_F (HdiServiceTest, HdiService007, TestSize.Level1)
  * @tc.desc: Test functions of ParsePresent
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService008, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService008, TestSize.Level1)
 {
     int8_t present = -1;
     if (IsNotMock()) {
         giver_->ParsePresent(&present);
         int32_t sysfsPresent = ReadPresentSysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService008::present=%{public}d, p=%{public}d",
-            present, sysfsPresent);
+        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService008::present=%{public}d, p=%{public}d", present, sysfsPresent);
         ASSERT_TRUE(present == sysfsPresent);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "battery/present", "1");
@@ -1012,15 +1003,15 @@ HWTEST_F (HdiServiceTest, HdiService008, TestSize.Level1)
  * @tc.desc: Test functions to get value of technology
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService009, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService009, TestSize.Level1)
 {
     std::string technology = "invalid";
     if (IsNotMock()) {
         giver_->ParseTechnology(technology);
         std::string sysfsTechnology = "";
         ReadTechnologySysfs(sysfsTechnology);
-        BATTERY_HILOGI(LABEL_TEST, "HdiService009::technology=%{public}s, ty=%{public}s",
-            technology.c_str(), sysfsTechnology.c_str());
+        BATTERY_HILOGI(LABEL_TEST, "HdiService009::technology=%{public}s, ty=%{public}s", technology.c_str(),
+            sysfsTechnology.c_str());
         ASSERT_TRUE(technology == sysfsTechnology);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "ohos-fgu/technology", "Li");
@@ -1035,7 +1026,7 @@ HWTEST_F (HdiServiceTest, HdiService009, TestSize.Level1)
  * @tc.desc: Test functions to get fd of socket
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService010, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService010, TestSize.Level1)
 {
     using namespace OHOS::HDI::Battery::V1_1;
 
@@ -1052,7 +1043,7 @@ HWTEST_F (HdiServiceTest, HdiService010, TestSize.Level1)
  * @tc.desc: Test functions UpdateEpollInterval when charge-online
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService011, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService011, TestSize.Level1)
 {
     const int32_t CHARGE_STATE_ENABLE = 1;
     BatteryThread bt;
@@ -1069,7 +1060,7 @@ HWTEST_F (HdiServiceTest, HdiService011, TestSize.Level1)
  * @tc.desc: Test functions UpdateEpollInterval when charge-offline
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService012, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService012, TestSize.Level1)
 {
     const int32_t CHARGE_STATE_NONE = 0;
     BatteryThread bt;
@@ -1086,7 +1077,7 @@ HWTEST_F (HdiServiceTest, HdiService012, TestSize.Level1)
  * @tc.desc: Test functions Init
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService013, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService013, TestSize.Level1)
 {
     void* service = nullptr;
     BatteryThread bt;
@@ -1100,69 +1091,18 @@ HWTEST_F (HdiServiceTest, HdiService013, TestSize.Level1)
 }
 
 /**
- * @tc.name: HdiService020
- * @tc.desc: Test functions InitVibration in ChargerThread
- * @tc.type: FUNC
- */
-HWTEST_F (HdiServiceTest, HdiService020, TestSize.Level1)
-{
-    std::unique_ptr<BatteryVibrate> vibrate = std::make_unique<BatteryVibrate>();
-    const std::string VIBRATOR_PLAYMODE_PATH = "/sys/class/leds/vibrator/play_mode";
-    const std::string VIBRATOR_DURATIONMODE_PATH = "/sys/class/leds/vibrator/duration";
-    auto ret = vibrate->InitVibration();
-    if ((access(VIBRATOR_PLAYMODE_PATH.c_str(), F_OK) == 0) ||
-        (access(VIBRATOR_DURATIONMODE_PATH.c_str(), F_OK) == 0)) {
-        ASSERT_TRUE(ret);
-    } else {
-        ASSERT_FALSE(ret);
-    }
-}
-
-/**
- * @tc.name: HdiService021
- * @tc.desc: Test functions CycleMatters in ChargerThread
- * @tc.type: FUNC
- */
-HWTEST_F (HdiServiceTest, HdiService021, TestSize.Level1)
-{
-    ChargerThread ct;
-
-    ChargerThreadInitTest(ct);
-    CycleMattersTest(ct);
-    auto getBatteryInfo = GetBatteryInfoTest(ct);
-
-    ASSERT_TRUE(getBatteryInfo);
-}
-
-/**
- * @tc.name: HdiService022
- * @tc.desc: Test functions HandleBacklight
- * @tc.type: FUNC
- */
-HWTEST_F (HdiServiceTest, HdiService022, TestSize.Level1)
-{
-    std::unique_ptr<BatteryBacklight> backlight = std::make_unique<BatteryBacklight>();
-    backlight->InitBacklightSysfs();
-    auto ret = backlight->HandleBacklight(0);
-    BATTERY_HILOGI(LABEL_TEST, "HdiService022::ret==%{public}d", ret);
-    backlight->TurnOnScreen();
-
-    ASSERT_TRUE(ret != -1);
-}
-
-/**
  * @tc.name: HdiService023
  * @tc.desc: Test functions of ParseTotalEnergy
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService023, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService023, TestSize.Level1)
 {
     int32_t totalEnergy = 0;
     if (IsNotMock()) {
         giver_->ParseTotalEnergy(&totalEnergy);
         int32_t sysfsTotalEnergy = ReadTotalEnergySysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService023::totalEnergy=%{public}d, t=%{public}d",
-            totalEnergy, sysfsTotalEnergy);
+        BATTERY_HILOGI(
+            LABEL_TEST, "Not Mock HdiService023::totalEnergy=%{public}d, t=%{public}d", totalEnergy, sysfsTotalEnergy);
         ASSERT_TRUE(totalEnergy == sysfsTotalEnergy);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "battery/charge_full", "4000000");
@@ -1177,14 +1117,14 @@ HWTEST_F (HdiServiceTest, HdiService023, TestSize.Level1)
  * @tc.desc: Test functions of ParseCurrentAverage
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService024, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService024, TestSize.Level1)
 {
     int32_t currentAvg = HDF_FAILURE;
     if (IsNotMock()) {
         giver_->ParseCurrentAverage(&currentAvg);
         int32_t sysfsCurrentAvg = ReadCurrentAverageSysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService024::currentAvg=%{public}d, t=%{public}d",
-            currentAvg, sysfsCurrentAvg);
+        BATTERY_HILOGI(
+            LABEL_TEST, "Not Mock HdiService024::currentAvg=%{public}d, t=%{public}d", currentAvg, sysfsCurrentAvg);
         ASSERT_TRUE(currentAvg == sysfsCurrentAvg);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "battery/current_avg", "1000");
@@ -1199,14 +1139,14 @@ HWTEST_F (HdiServiceTest, HdiService024, TestSize.Level1)
  * @tc.desc: Test functions of ParseCurrentNow
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService025, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService025, TestSize.Level1)
 {
     int32_t currentNow = 0;
     if (IsNotMock()) {
         giver_->ParseCurrentNow(&currentNow);
         int32_t sysfsCurrentNow = ReadCurrentNowSysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService025::currentNow=%{public}d, t=%{public}d",
-            currentNow, sysfsCurrentNow);
+        BATTERY_HILOGI(
+            LABEL_TEST, "Not Mock HdiService025::currentNow=%{public}d, t=%{public}d", currentNow, sysfsCurrentNow);
         ASSERT_TRUE(currentNow == sysfsCurrentNow);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "battery/current_now", "1000");
@@ -1221,14 +1161,14 @@ HWTEST_F (HdiServiceTest, HdiService025, TestSize.Level1)
  * @tc.desc: Test functions of ParseChargeNow
  * @tc.type: FUNC
  */
-HWTEST_F (HdiServiceTest, HdiService026, TestSize.Level1)
+HWTEST_F(HdiServiceTest, HdiService026, TestSize.Level1)
 {
     int32_t chargeNow = 0;
     if (IsNotMock()) {
         giver_->ParseRemainEnergy(&chargeNow);
         int32_t sysfsChargeNow = ReadRemainEnergySysfs();
-        BATTERY_HILOGI(LABEL_TEST, "Not Mock HdiService026::chargeNow=%{public}d, t=%{public}d",
-            chargeNow, sysfsChargeNow);
+        BATTERY_HILOGI(
+            LABEL_TEST, "Not Mock HdiService026::chargeNow=%{public}d, t=%{public}d", chargeNow, sysfsChargeNow);
         ASSERT_TRUE(chargeNow == sysfsChargeNow);
     } else {
         CreateFile(MOCK_BATTERY_PATH + "battery/charge_now", "1000");
@@ -1237,4 +1177,4 @@ HWTEST_F (HdiServiceTest, HdiService026, TestSize.Level1)
         ASSERT_TRUE(chargeNow == 1000);
     }
 }
-}
+} // namespace HdiServiceTest

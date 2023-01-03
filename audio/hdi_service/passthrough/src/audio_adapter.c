@@ -98,8 +98,8 @@ int32_t CheckParaDesc(const struct AudioDeviceDescriptor *desc, const char *type
             return HDF_SUCCESS;
         }
     } else if (!strcmp(type, TYPE_RENDER)) {
-        if (pins == PIN_OUT_SPEAKER || pins == PIN_OUT_HEADSET || pins == PIN_OUT_LINEOUT || pins == PIN_OUT_HDMI ||
-            pins == PIN_OUT_HEADPHONE) {
+        if (pins == PIN_OUT_SPEAKER || pins == PIN_OUT_HEADSET || pins == PIN_OUT_LINEOUT || pins == PIN_OUT_HDMI
+            || pins == (PIN_OUT_SPEAKER | PIN_OUT_HEADSET)) {
             return HDF_SUCCESS;
         }
     }
@@ -125,10 +125,11 @@ int32_t CheckParaAttr(const struct AudioSampleAttributes *attrs)
     }
 
     enum AudioCategory audioCategory = attrs->type;
-    if (audioCategory != AUDIO_IN_MEDIA && audioCategory != AUDIO_IN_COMMUNICATION) {
+    if (audioCategory < AUDIO_IN_MEDIA || audioCategory > AUDIO_MMAP_NOIRQ) {
         AUDIO_FUNC_LOGE("Audio category error!");
         return HDF_ERR_NOT_SUPPORT;
     }
+
     enum AudioFormat audioFormat = attrs->format;
     return CheckAttrFormat(audioFormat);
 }
@@ -240,6 +241,8 @@ static int32_t AudioMakeCardServiceName(
     }
     if (strncmp(adapterDescriptor->adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
         ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_PRIMARY_DEV, portId);
+    } else if (strncmp(adapterDescriptor->adapterName, HDMI, strlen(HDMI)) == 0) {
+        ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_HDMI_DEV, priPortId);
     } else if (strncmp(adapterDescriptor->adapterName, USB, strlen(USB)) == 0) {
         ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_PRIMARY_DEV, priPortId);
     } else if (strncmp(adapterDescriptor->adapterName, A2DP, strlen(A2DP)) == 0) {

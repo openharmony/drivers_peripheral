@@ -22,15 +22,21 @@
 #include "coauth.h"
 #include "idm_database.h"
 
-static bool IsContextDuplicate(uint64_t contextId);
-static ResultCode CreateAndInsertSchedules(UserAuthContext *context, uint32_t authMode);
-static ResultCode CreateAuthSchedule(UserAuthContext *context, CoAuthSchedule **schedule);
-static ResultCode CreateIdentifySchedule(const UserAuthContext *context, CoAuthSchedule **schedule);
-static void DestroyContextNode(void *data);
-static ResultCode InsertScheduleToContext(CoAuthSchedule *schedule, UserAuthContext *context);
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
+IAM_STATIC bool IsContextDuplicate(uint64_t contextId);
+IAM_STATIC ResultCode CreateAndInsertSchedules(UserAuthContext *context, uint32_t authMode);
+IAM_STATIC ResultCode CreateAuthSchedule(UserAuthContext *context, CoAuthSchedule **schedule);
+IAM_STATIC ResultCode CreateIdentifySchedule(const UserAuthContext *context, CoAuthSchedule **schedule);
+IAM_STATIC void DestroyContextNode(void *data);
+IAM_STATIC ResultCode InsertScheduleToContext(CoAuthSchedule *schedule, UserAuthContext *context);
 
 // Stores information about the current user authentication schedule.
-static LinkedList *g_contextList = NULL;
+IAM_STATIC LinkedList *g_contextList = NULL;
 
 ResultCode InitUserAuthContextList(void)
 {
@@ -50,7 +56,7 @@ void DestoryUserAuthContextList(void)
     g_contextList = NULL;
 }
 
-static UserAuthContext *InitAuthContext(AuthSolutionHal params)
+IAM_STATIC UserAuthContext *InitAuthContext(AuthSolutionHal params)
 {
     UserAuthContext *context = (UserAuthContext *)Malloc(sizeof(UserAuthContext));
     if (context == NULL) {
@@ -114,7 +120,7 @@ ResultCode GenerateAuthContext(AuthSolutionHal params, UserAuthContext **context
     return RESULT_SUCCESS;
 }
 
-static ResultCode CreateIdentifySchedule(const UserAuthContext *context, CoAuthSchedule **schedule)
+IAM_STATIC ResultCode CreateIdentifySchedule(const UserAuthContext *context, CoAuthSchedule **schedule)
 {
     ScheduleParam scheduleParam = {};
     scheduleParam.associateId.contextId = context->contextId;
@@ -130,7 +136,7 @@ static ResultCode CreateIdentifySchedule(const UserAuthContext *context, CoAuthS
     return RESULT_SUCCESS;
 }
 
-static UserAuthContext *InitIdentifyContext(const IdentifyParam *params)
+IAM_STATIC UserAuthContext *InitIdentifyContext(const IdentifyParam *params)
 {
     UserAuthContext *context = (UserAuthContext *)Malloc(sizeof(UserAuthContext));
     if (context == NULL) {
@@ -210,13 +216,13 @@ UserAuthContext *GetContext(uint64_t contextId)
     return NULL;
 }
 
-static ResultCode InsertScheduleToContext(CoAuthSchedule *schedule, UserAuthContext *context)
+IAM_STATIC ResultCode InsertScheduleToContext(CoAuthSchedule *schedule, UserAuthContext *context)
 {
     LinkedList *scheduleList = context->scheduleList;
     return scheduleList->insert(scheduleList, schedule);
 }
 
-static ResultCode CreateAndInsertSchedules(UserAuthContext *context, uint32_t authMode)
+IAM_STATIC ResultCode CreateAndInsertSchedules(UserAuthContext *context, uint32_t authMode)
 {
     LOG_INFO("start");
     CoAuthSchedule *schedule = NULL;
@@ -239,15 +245,15 @@ static ResultCode CreateAndInsertSchedules(UserAuthContext *context, uint32_t au
         return RESULT_UNKNOWN;
     }
     if (InsertScheduleToContext(schedule, context) != RESULT_SUCCESS) {
-        DestroyCoAuthSchedule(schedule);
         RemoveCoAuthSchedule(schedule->scheduleId);
+        DestroyCoAuthSchedule(schedule);
         LOG_ERROR("insert failed");
         return RESULT_UNKNOWN;
     }
     return RESULT_SUCCESS;
 }
 
-static LinkedList *GetAuthCredentialList(const UserAuthContext *context)
+IAM_STATIC LinkedList *GetAuthCredentialList(const UserAuthContext *context)
 {
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, context->authType);
@@ -264,7 +270,7 @@ static LinkedList *GetAuthCredentialList(const UserAuthContext *context)
     return QueryCredentialLimit(&condition);
 }
 
-static ResultCode CheckCredentialSize(LinkedList *credList)
+IAM_STATIC ResultCode CheckCredentialSize(LinkedList *credList)
 {
     uint32_t credNum = credList->getSize(credList);
     if (credNum == 0) {
@@ -278,7 +284,7 @@ static ResultCode CheckCredentialSize(LinkedList *credList)
     return RESULT_SUCCESS;
 }
 
-static ResultCode QueryAuthTempletaInfo(UserAuthContext *context, TemplateIdArrays *templateIds,
+IAM_STATIC ResultCode QueryAuthTempletaInfo(UserAuthContext *context, TemplateIdArrays *templateIds,
     uint32_t *sensorHint, uint32_t *matcher, uint32_t *acl)
 {
     LinkedList *credList = GetAuthCredentialList(context);
@@ -330,7 +336,7 @@ FAIL:
     return RESULT_UNKNOWN;
 }
 
-static ResultCode CreateAuthSchedule(UserAuthContext *context, CoAuthSchedule **schedule)
+IAM_STATIC ResultCode CreateAuthSchedule(UserAuthContext *context, CoAuthSchedule **schedule)
 {
     TemplateIdArrays templateIds;
     uint32_t verifierSensorHint;
@@ -367,7 +373,7 @@ static ResultCode CreateAuthSchedule(UserAuthContext *context, CoAuthSchedule **
     return RESULT_SUCCESS;
 }
 
-static bool IsContextDuplicate(uint64_t contextId)
+IAM_STATIC bool IsContextDuplicate(uint64_t contextId)
 {
     if (g_contextList == NULL) {
         LOG_ERROR("context list is null");
@@ -437,7 +443,7 @@ ERROR:
     return RESULT_GENERAL_ERROR;
 }
 
-static bool MatchSchedule(const void *data, const void *condition)
+IAM_STATIC bool MatchSchedule(const void *data, const void *condition)
 {
     if (data == NULL || condition == NULL) {
         LOG_ERROR("param is null");
@@ -460,7 +466,7 @@ ResultCode ScheduleOnceFinish(UserAuthContext *context, uint64_t scheduleId)
     return context->scheduleList->remove(context->scheduleList, &scheduleId, MatchSchedule, true);
 }
 
-static bool MatchContextSelf(const void *data, const void *condition)
+IAM_STATIC bool MatchContextSelf(const void *data, const void *condition)
 {
     return data == condition;
 }
@@ -478,7 +484,7 @@ void DestoryContext(UserAuthContext *context)
     g_contextList->remove(g_contextList, context, MatchContextSelf, true);
 }
 
-static void DestroyContextNode(void *data)
+IAM_STATIC void DestroyContextNode(void *data)
 {
     if (data == NULL) {
         return;

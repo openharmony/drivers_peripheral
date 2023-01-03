@@ -15,6 +15,7 @@
 #include "ddk_uevent_handle.h"
 
 #include <linux/netlink.h>
+#include <poll.h>
 #include <pthread.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -26,6 +27,7 @@
 #include "hdf_base.h"
 #include "hdf_io_service_if.h"
 #include "hdf_log.h"
+#include "osal_time.h"
 #include "securec.h"
 #include "usbfn_uevent_handle.h"
 
@@ -37,6 +39,7 @@
 #define UEVENT_SOCKET_BUFF_SIZE (64 * 1024)
 #define TIMEVAL_SECOND          0
 #define TIMEVAL_USECOND         (100 * 1000)
+#define UEVENT_POLL_WAIT_TIME   100
 
 struct DdkUeventInfo {
     const char *action;
@@ -67,8 +70,17 @@ static int DdkUeventOpen(int *fd)
     int buffSize = UEVENT_SOCKET_BUFF_SIZE;
     if (setsockopt(socketfd, SOL_SOCKET, SO_RCVBUF, &buffSize, sizeof(buffSize)) != 0) {
         HDF_LOGE("%{public}s: setsockopt failed!", __func__);
+        close(socketfd);
         return HDF_FAILURE;
     }
+
+    const int32_t on = 1; // turn on passcred
+    if (setsockopt(socketfd, SOL_SOCKET, SO_PASSCRED, &on, sizeof(on)) != 0) {
+        HDF_LOGE("setsockopt failed!");
+        close(socketfd);
+        return HDF_FAILURE;
+    }
+
     if (bind(socketfd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
         HDF_LOGE("%{public}s: bind socketfd failed!", __func__);
         close(socketfd);
@@ -167,45 +179,80 @@ static void DdkHandleUevent(const char msg[], ssize_t rcvLen)
     return;
 }
 
+static ssize_t DdkReadUeventMsg(int sockFd, char *buffer, size_t length)
+{
+    struct iovec iov;
+    iov.iov_base = buffer;
+    iov.iov_len = length;
+
+    struct sockaddr_nl addr;
+    (void)memset_s(&addr, sizeof(addr), 0, sizeof(addr));
+
+    struct msghdr msghdr = {0};
+    msghdr.msg_name = &addr;
+    msghdr.msg_namelen = sizeof(addr);
+    msghdr.msg_iov = &iov;
+    msghdr.msg_iovlen = 1;
+
+    char credMsg[CMSG_SPACE(sizeof(struct ucred))] = {0};
+    msghdr.msg_control = credMsg;
+    msghdr.msg_controllen = sizeof(credMsg);
+
+    ssize_t len = recvmsg(sockFd, &msghdr, 0);
+    if (len <= 0) {
+        return HDF_FAILURE;
+    }
+
+    struct cmsghdr *hdr = CMSG_FIRSTHDR(&msghdr);
+    if (hdr == NULL || hdr->cmsg_type != SCM_CREDENTIALS) {
+        HDF_LOGE("Unexpected control message, ignored");
+        *buffer = '\0';
+        return HDF_FAILURE;
+    }
+
+    return len;
+}
+
 void *DdkUeventMain(void *param)
 {
     (void)param;
-    int fd = -1;
-    if (DdkUeventOpen(&fd) != HDF_SUCCESS) {
+    int socketfd = -1;
+    if (DdkUeventOpen(&socketfd) != HDF_SUCCESS) {
+        HDF_LOGE("DdkUeventOpen failed");
         return NULL;
     }
 
     ssize_t rcvLen = 0;
-    fd_set fds;
     char msg[UEVENT_MSG_LEN];
-    struct timeval tv;
+
+    struct pollfd fd;
+    fd.fd = socketfd;
+    fd.events = POLLIN | POLLERR;
+    fd.revents = 0;
     do {
-        FD_ZERO(&fds);
-        FD_SET(fd, &fds);
-        tv.tv_sec = TIMEVAL_SECOND;
-        tv.tv_usec = TIMEVAL_USECOND;
-        int32_t ret = select(fd + 1, &fds, NULL, NULL, &tv);
-        if (ret < 0) {
-            continue;
-        }
-        if (!(ret > 0 && FD_ISSET(fd, &fds))) {
+        if (poll(&fd, 1, -1) <= 0) {
+            HDF_LOGE("usb event poll fail %{public}d", errno);
+            OsalMSleep(UEVENT_POLL_WAIT_TIME);
             continue;
         }
 
-        (void)memset_s(msg, UEVENT_MSG_LEN, 0, UEVENT_MSG_LEN);
-        do {
-            if ((rcvLen = recv(fd, msg, UEVENT_MSG_LEN, 0)) < 0) {
-                HDF_LOGE("recv failed");
-                return NULL;
-            }
-            if (rcvLen == (ssize_t)UEVENT_MSG_LEN) {
+        if (((uint32_t)fd.revents & POLLIN) == POLLIN) {
+            (void)memset_s(&msg, sizeof(msg), 0, sizeof(msg));
+            rcvLen = DdkReadUeventMsg(socketfd, msg, UEVENT_MSG_LEN);
+            if (rcvLen <= 0) {
                 continue;
             }
             DdkHandleUevent(msg, rcvLen);
             UsbFnHandleUevent(msg, rcvLen);
-        } while (rcvLen > 0);
+        } else if (((uint32_t)fd.revents & POLLERR) == POLLERR) {
+            HDF_LOGE("usb event poll error");
+        }
     } while (true);
+
+    close(socketfd);
+    return NULL;
 }
+
 int32_t DdkUeventInit(void)
 {
     return HDF_SUCCESS;

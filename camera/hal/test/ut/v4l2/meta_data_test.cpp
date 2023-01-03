@@ -109,9 +109,9 @@ void MetaDataTest::CreateStream(int streamId, StreamIntent intent)
     EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
 
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log]CreateStreams success." << std::endl;
+        CAMERA_LOGI("CreateStreams success.");
     } else {
-        std::cout << "==========[test log]CreateStreams fail, result_ = " << result_ << std::endl;
+        CAMERA_LOGE("CreateStreams fail, result_ = %{public}d", result_);
     }
 }
 
@@ -120,9 +120,9 @@ void MetaDataTest::CommitStream()
     result_ = static_cast<CamRetCode>(display_->streamOperator->CommitStreams(NORMAL, display_->ability_));
     EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log]CommitStreams preview success." << std::endl;
+        CAMERA_LOGI("CommitStreams preview success.");
     } else {
-        std::cout << "==========[test log]CommitStreams preview  fail, result_ = " << result_ << std::endl;
+        CAMERA_LOGE("CommitStreams preview fail, result_ = %{public}d", result_);
     }
 }
 
@@ -139,24 +139,24 @@ void MetaDataTest::StartCapture(
     }
     EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
     if (result_ == HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log]check Capture: Capture success, " << captureId << std::endl;
+        CAMERA_LOGI("Capture success, captureId = %{public}d", captureId);
     } else {
-        std::cout << "==========[test log]check Capture: Capture fail, result_ = " << result_ << captureId << std::endl;
+        CAMERA_LOGE("check Capture: Capture fail, captureId = %{public}d, result_ = %{public}d", captureId, result_);
     }
     if (captureId == display_->CAPTURE_ID_PREVIEW) {
         streamCustomerPreview_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
-            std::cout << "==========[test log]preview size= " << size << std::endl;
+            CAMERA_LOGI("preview size = %{public}u", size);
         });
     } else if (captureId == display_->CAPTURE_ID_CAPTURE) {
         streamCustomerSnapshot_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
-            std::cout << "==========[test log]snapshot size= " << size << std::endl;
+            CAMERA_LOGI("snapshot size = %{public}u", size);
         });
     } else if (captureId == display_->CAPTURE_ID_VIDEO) {
         streamCustomerVideo_->ReceiveFrameOn([this](const unsigned char *addr, const uint32_t size) {
-            std::cout << "==========[test log]videosize= " << size << std::endl;
+            CAMERA_LOGI("video size = %{public}u", size);
         });
     } else {
-        std::cout << "==========[test log]StartCapture ignore command " << std::endl;
+        CAMERA_LOGE("StartCapture ignore command ");
     }
 }
 
@@ -166,7 +166,7 @@ void MetaDataTest::StopStream(std::vector<int> &captureIds, std::vector<int> &st
     if (sizeof(captureIds) == 0) {
         return;
     }
-    for (auto &captureId : captureIds) {
+    for (const auto &captureId : captureIds) {
         if (captureId == display_->CAPTURE_ID_PREVIEW) {
             streamCustomerPreview_->ReceiveFrameOff();
         } else if (captureId == display_->CAPTURE_ID_CAPTURE) {
@@ -175,7 +175,7 @@ void MetaDataTest::StopStream(std::vector<int> &captureIds, std::vector<int> &st
             streamCustomerVideo_->ReceiveFrameOff();
             sleep(SLEEP_SECOND_ONE);
         } else {
-            std::cout << "==========[test log]StopStream ignore command. " << std::endl;
+            CAMERA_LOGE("StopStream ignore command ");
         }
     }
     for (auto &captureId : captureIds) {
@@ -183,10 +183,10 @@ void MetaDataTest::StopStream(std::vector<int> &captureIds, std::vector<int> &st
         sleep(SLEEP_SECOND_TWO);
         EXPECT_EQ(result_, HDI::Camera::V1_0::NO_ERROR);
         if (result_ == HDI::Camera::V1_0::NO_ERROR) {
-            std::cout << "==========[test log]check Capture: CancelCapture success," << captureId << std::endl;
+            CAMERA_LOGI("check Capture: CancelCapture success, captureId = %{public}d", captureId);
         } else {
-            std::cout << "==========[test log]check Capture: CancelCapture fail, result_ = " << result_;
-            std::cout << "captureId = " << captureId << std::endl;
+            CAMERA_LOGE("check Capture: CancelCapture fail, captureId = %{public}d, result_ = %{public}d",
+                captureId, result_);
         }
     }
     sleep(SLEEP_SECOND_ONE);
@@ -263,7 +263,7 @@ void MetaDataTest::Prepare(ResultCallbackMode mode, std::vector<MetaType> &resul
     display_->cameraDevice->SetResultMode(mode);
 
     if (results.size() == 0) {
-        std::cout << "results size is null" << std::endl;
+        CAMERA_LOGE("results size is null");
         return;
     }
     display_->cameraDevice->EnableResult(results);
@@ -275,10 +275,10 @@ void MetaDataTest::UpdateSettings(std::shared_ptr<CameraSetting> &metaData)
     MetadataUtils::ConvertMetadataToVec(metaData, setting);
     display_->rc = static_cast<CamRetCode>(display_->cameraDevice->UpdateSettings(setting));
     if (display_->rc != HDI::Camera::V1_0::NO_ERROR) {
-        std::cout << "==========[test log] UpdateSettings error." << display_->rc << std::endl;
+        CAMERA_LOGE("UpdateSettings error, rc = %{public}d", display_->rc);
         return;
     } else {
-        std::cout << "==========[test log] UpdateSettings ok." << display_->rc << std::endl;
+        CAMERA_LOGI("UpdateSettings ok, rc = %{public}d", display_->rc);
     }
 }
 
@@ -287,134 +287,6 @@ void MetaDataTest::StartPreviewVideoCapture()
     CaptureInfo captureInfo = {};
     StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true, captureInfo);
     StartCapture(display_->STREAM_ID_VIDEO, display_->CAPTURE_ID_VIDEO, false, true, captureInfo);
-}
-
-void MetaDataTest::PrintCameraMetadata(const std::vector<uint8_t> &settings)
-{
-    std::shared_ptr<CameraMetadata> result;
-    MetadataUtils::ConvertVecToMetadata(settings, result);
-    if (result == nullptr) {
-        std::cout << "result is null" << std::endl;
-        return;
-    }
-    common_metadata_header_t *data = result->get();
-    if (data == nullptr) {
-        std::cout << "data is null" << std::endl;
-        return;
-    }
-
-    for (auto it = DATA_BASE.cbegin(); it != DATA_BASE.cend(); it++) {
-        switch (*it) {
-            case OHOS_CONTROL_AWB_MODE:
-            case OHOS_CONTROL_FOCUS_MODE:
-            case OHOS_CONTROL_FOCUS_STATE:
-            case OHOS_CONTROL_EXPOSURE_MODE:
-            case OHOS_CONTROL_EXPOSURE_STATE:
-            case OHOS_CONTROL_FLASH_MODE:
-            case OHOS_CONTROL_METER_MODE:
-            case OHOS_CONTROL_VIDEO_STABILIZATION_MODE: {
-                PrintU8Metadata(*it, data);
-                break;
-            }
-            case OHOS_CAMERA_STREAM_ID:
-            case OHOS_CONTROL_AE_EXPOSURE_COMPENSATION: {
-                PrintI32Metadata(*it, data);
-                break;
-            }
-            case OHOS_SENSOR_EXPOSURE_TIME: {
-                PrintI64Metadata(*it, data);
-                break;
-            }
-            case OHOS_SENSOR_COLOR_CORRECTION_GAINS: {
-                PrintFloatMetadata(*it, data);
-                break;
-            }
-            case OHOS_CONTROL_FPS_RANGES:
-            case OHOS_CONTROL_AF_REGIONS:
-            case OHOS_CONTROL_METER_POINT: {
-                PrintI32ArrayMetadata(*it, data);
-                break;
-            }
-            default: {
-                std::cout << "invalid param and key = " << *it << std::endl;
-                break;
-            }
-        }
-    }
-}
-
-void MetaDataTest::PrintU8Metadata(int32_t key, common_metadata_header_t *data)
-{
-    uint8_t value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        std::cout << "get  key error and key = " << key << std::endl;
-        return;
-    }
-    value = *(entry.data.u8);
-    std::cout << "MetaDataTest valueu8 = " << static_cast<int>(value) << " and key = " << key << std::endl;
-}
-
-void MetaDataTest::PrintI32Metadata(int32_t key, common_metadata_header_t *data)
-{
-    int32_t value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        std::cout << "get  key error and key = " << key << std::endl;
-        return;
-    }
-    value = *(entry.data.i32);
-
-    std::cout << "MetaDataTest valueI32 = " << value << " and key = " << key << std::endl;
-}
-
-void MetaDataTest::PrintI64Metadata(int32_t key, common_metadata_header_t *data)
-{
-    int64_t value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        std::cout << "get  key error and key = " << key << std::endl;
-        return;
-    }
-    value = *(entry.data.i64);
-    std::cout << "MetaDataTest valueI64 = " << value << " and key = " << key << std::endl;
-}
-
-void MetaDataTest::PrintFloatMetadata(int32_t key, common_metadata_header_t *data)
-{
-    float value;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        std::cout << "get  key error and key = " << key << std::endl;
-        return;
-    }
-    value = *(entry.data.f);
-    std::cout << "MetaDataTest valueFloat = " << std::showpoint << value << " and key = " << key << std::endl;
-}
-
-void MetaDataTest::PrintI32ArrayMetadata(int32_t key, common_metadata_header_t *data)
-{
-    std::vector<int32_t> results;
-    camera_metadata_item_t entry;
-    int ret = FindCameraMetadataItem(data, key, &entry);
-    if (ret != 0) {
-        std::cout << "get  key error and key = " << key << std::endl;
-        return;
-    }
-    uint32_t count = entry.count;
-    std::cout << "MetaDataTest count =" << count << std::endl;
-
-    for (int i = 0; i < count; i++) {
-        results.push_back(*(entry.data.i32 + i));
-    }
-
-    for (auto iterator = results.begin(); iterator != results.end(); iterator++) {
-        std::cout << "MetaDataTest valueArray = " << *iterator << " and key = " << key << std::endl;
-    }
 }
 
 /**

@@ -188,8 +188,6 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
 int32_t AudioCtlRenderSetPauseStu(
     const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
 {
-    struct AudioCardInfo *cardIns = NULL;
-
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -1306,86 +1304,6 @@ int32_t AudioInterfaceLibOutputRender(const struct DevHandle *handle, int cmdId,
     }
 
     return ret;
-}
-
-int32_t AudioBindServiceRenderObject(struct DevHandle *handle, const char *name)
-{
-    int32_t ret;
-    struct HdfIoService *service = NULL;
-
-    if (handle == NULL || name == NULL) {
-        AUDIO_FUNC_LOGE("Parameter error!");
-        return HDF_FAILURE;
-    }
-
-    char *serviceName = (char *)OsalMemCalloc(NAME_LEN);
-    if (serviceName == NULL) {
-        AUDIO_FUNC_LOGE("Failed to OsalMemCalloc memory!");
-        return HDF_FAILURE;
-    }
-
-    ret = snprintf_s(serviceName, NAME_LEN - 1, SERVIC_NAME_MAX_LEN + 1, "hdf_audio_%s", name);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("Render: Failed to snprintf_s");
-        AudioMemFree((void **)&serviceName);
-        return HDF_FAILURE;
-    }
-
-    service = HdfIoServiceBindName(serviceName);
-    if (service == NULL) {
-        AUDIO_FUNC_LOGE("Render: Failed to get service!");
-        AudioMemFree((void **)&serviceName);
-        return HDF_FAILURE;
-    }
-    AudioMemFree((void **)&serviceName);
-    handle->object = service;
-
-    return HDF_SUCCESS;
-}
-
-/* CreatRender for Bind handle */
-struct DevHandle *AudioBindServiceRender(const char *name)
-{
-    int32_t ret;
-
-    if (name == NULL) {
-        AUDIO_FUNC_LOGE("service name NULL!");
-        return NULL;
-    }
-
-    struct DevHandle *handle = (struct DevHandle *)OsalMemCalloc(sizeof(struct DevHandle));
-    if (handle == NULL) {
-        AUDIO_FUNC_LOGE("OsalMemCalloc handle failed!!!");
-        return NULL;
-    }
-
-    ret = AudioBindServiceRenderObject(handle, name);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Bind Service Render Object failed!");
-        AudioMemFree((void **)&handle);
-        return NULL;
-    }
-
-    /* Render: Parsing primary sound card from configuration file */
-    ret = CardInfoParseFromConfig();
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Render: parse config file failed!");
-        AudioMemFree((void **)&handle);
-        return NULL;
-    }
-    AUDIO_FUNC_LOGI("BIND SERVICE SUCCESS!");
-
-    return handle;
-}
-
-void AudioCloseServiceRender(const struct DevHandle *handle)
-{
-    if (handle != NULL) {
-        if (handle->object == NULL) {
-            AUDIO_FUNC_LOGE("Render handle or handle->object is NULL");
-        }
-        AudioMemFree((void **)&handle);
-    }
 }
 
 int32_t AudioInterfaceLibModeRender(const struct DevHandle *handle, struct AudioHwRenderParam *handleData, int cmdId)

@@ -75,7 +75,7 @@ void CodecHdiEncode::OnStatusChanged()
 bool CodecHdiEncode::ReadOneFrame(char *buf, uint32_t &filledCount)
 {
     bool ret = false;
-    ioIn_.read(buf, GetInputBufferSize());
+    filledCount = ioIn_.read(buf, GetInputBufferSize()).gcount();
     if (ioIn_.eof()) {
         ret = true;
     }

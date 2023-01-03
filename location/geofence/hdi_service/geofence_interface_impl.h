@@ -26,7 +26,7 @@ namespace V1_0 {
 class GeofenceInterfaceImpl : public IGeofenceInterface {
 public:
     GeofenceInterfaceImpl() = default;
-    virtual ~GeofenceInterfaceImpl() = default;
+    ~GeofenceInterfaceImpl() override;
 
     int32_t SetGeofenceCallback(const sptr<IGeofenceCallback>& callbackObj) override;
 

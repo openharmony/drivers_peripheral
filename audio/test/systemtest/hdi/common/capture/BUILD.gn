@@ -47,6 +47,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/common/capture/include",
     ]
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
   }
   moduletest("hdf_audio_hdi_capture_control_test") {
     sources = [
@@ -75,6 +76,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/common/capture/include",
     ]
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
   }
   moduletest("hdf_audio_hdi_capture_volume_test") {
     sources = [
@@ -103,6 +105,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/common/capture/include",
     ]
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
   }
   moduletest("hdf_audio_hdi_capture_scene_test") {
     sources = [
@@ -131,6 +134,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/common/capture/include",
     ]
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
   }
   moduletest("hdf_audio_hdi_capture_test") {
     sources = [
@@ -159,6 +163,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/common/capture/include",
     ]
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
   }
 } else {
   module_output_path = "drivers_peripheral_audio/audio"
@@ -193,14 +198,20 @@ if (defined(ohos_lite)) {
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       defines += [ "AUDIO_ADM_SO" ]
     }
     if (enable_audio_adm_service) {
+      deps +=
+          [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
     }
     if (defined(drivers_peripheral_audio_alsa_lib) &&
         drivers_peripheral_audio_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
+    }
+    if (!drivers_peripheral_audio_rich_device) {
+      defines += [ "FEATURE_SMALL_DEVICE" ]
     }
   }
   ohos_systemtest("hdf_audio_hdi_capture_control_test") {
@@ -233,14 +244,20 @@ if (defined(ohos_lite)) {
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       defines += [ "AUDIO_ADM_SO" ]
     }
     if (enable_audio_adm_service) {
+      deps +=
+          [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
     }
     if (defined(drivers_peripheral_audio_alsa_lib) &&
         drivers_peripheral_audio_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
+    }
+    if (!drivers_peripheral_audio_rich_device) {
+      defines += [ "FEATURE_SMALL_DEVICE" ]
     }
   }
   ohos_systemtest("hdf_audio_hdi_capture_volume_test") {
@@ -273,14 +290,20 @@ if (defined(ohos_lite)) {
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       defines += [ "AUDIO_ADM_SO" ]
     }
     if (enable_audio_adm_service) {
+      deps +=
+          [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
     }
     if (defined(drivers_peripheral_audio_alsa_lib) &&
         drivers_peripheral_audio_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
+    }
+    if (!drivers_peripheral_audio_rich_device) {
+      defines += [ "FEATURE_SMALL_DEVICE" ]
     }
   }
   ohos_systemtest("hdf_audio_hdi_capture_scene_test") {
@@ -313,14 +336,20 @@ if (defined(ohos_lite)) {
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       defines += [ "AUDIO_ADM_SO" ]
     }
     if (enable_audio_adm_service) {
+      deps +=
+          [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
     }
     if (defined(drivers_peripheral_audio_alsa_lib) &&
         drivers_peripheral_audio_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
+    }
+    if (!drivers_peripheral_audio_rich_device) {
+      defines += [ "FEATURE_SMALL_DEVICE" ]
     }
   }
   ohos_systemtest("hdf_audio_hdi_capture_test") {
@@ -353,10 +382,16 @@ if (defined(ohos_lite)) {
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       defines += [ "AUDIO_ADM_SO" ]
     }
     if (enable_audio_adm_service) {
+      deps +=
+          [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
+    }
+    if (!drivers_peripheral_audio_rich_device) {
+      defines += [ "FEATURE_SMALL_DEVICE" ]
     }
   }
 }

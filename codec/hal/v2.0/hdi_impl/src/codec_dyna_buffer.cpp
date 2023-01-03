@@ -83,7 +83,7 @@ int32_t CodecDynaBuffer::FreeBuffer(struct OmxCodecBuffer &codecBuffer)
         auto bufferHandle = reinterpret_cast<BufferHandle *>(codecBuffer.buffer);
         // if recv new BufferHandle, free it
         FreeBufferHandle(bufferHandle);
-        codecBuffer.buffer = 0;
+        codecBuffer.buffer = nullptr;
         codecBuffer.bufferLen = 0;
     }
 
@@ -130,7 +130,7 @@ void CodecDynaBuffer::ResetBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFER
         FreeBufferHandle(dynaBuffer_->bufferHandle);
     }
     dynaBuffer_->bufferHandle = bufferHandle;
-    codecBuffer.buffer = 0;
+    codecBuffer.buffer = nullptr;
     codecBuffer.filledLen = sizeof(DynamicBuffer);
     codecBuffer.bufferLen = 0;
 }

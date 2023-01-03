@@ -30,6 +30,9 @@ if (defined(ohos_lite)) {
   group("systemtest") {
     testonly = true
     deps = []
+    if (drivers_peripheral_audio_rich_device) {
+      deps += [ "hdi_advance:hdi_advance" ]
+    }
     if (drivers_peripheral_audio_full_test_suite) {
       deps += [
         "hdi:hdi",

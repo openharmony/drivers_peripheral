@@ -43,6 +43,13 @@ CodecBuffer *g_inputInfoData = nullptr;
 CodecBuffer *g_outputInfoData = nullptr;
 CODEC_HANDLETYPE g_handle = NULL;
 
+typedef struct {
+    VideoCodecGopMode gopMode;
+    uint32_t gopLen;
+    int32_t gop;
+    int32_t viLen;
+} HdiGopSetup;
+
 class CodecProxyTest : public testing::Test {
 public:
     static void SetUpTestCase() {}
@@ -183,7 +190,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1InitCodecTest_001, TestSize.Level1)
 
 HWTEST_F(CodecProxyTest, HdfCodecHdiV1CreateCodecTest_001, TestSize.Level1)
 {
-    const char* name = "codec.avc.hardware.decoder";
+    const char* name = "codec.avc.hardware.encoder";
     int32_t errorCode = g_codecObj->CodecCreate(g_codecObj, name, &g_handle);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
     ASSERT_TRUE(g_handle != nullptr);
@@ -237,10 +244,15 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetGopModeTest_001, TestSize.Level1)
     int paramCnt = 1;
     params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
     ASSERT_TRUE(params != nullptr);
+    
+    HdiGopSetup gop;
+    gop.gopMode = VID_CODEC_GOPMODE_NORMALP;
+    gop.gopLen = 0;
+    gop.viLen = 0;
+    gop.gop = 48;
     params->key = KEY_VIDEO_GOP_MODE;
-    VideoCodecGopMode mode = VID_CODEC_GOPMODE_NORMALP;
-    params->val = (void *)&mode;
-    params->size = sizeof(mode);
+    params->val = (void *)&gop;
+    params->size = sizeof(gop);
 
     int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
     OsalMemFree(params);
@@ -270,7 +282,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetPixelFormatTest_001, TestSize.Level1)
     params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
     ASSERT_TRUE(params != nullptr);
     params->key = KEY_PIXEL_FORMAT;
-    CodecPixelFormat format = PIXEL_FORMAT_YUV_422_I;
+    CodecPixelFormat format = PIXEL_FORMAT_YCBCR_420_SP;
     params->val = (void *)&format;
     params->size = sizeof(format);
 

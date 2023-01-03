@@ -47,33 +47,19 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
 };
 
 using THREAD_FUNC = void *(*)(void *);
-void *AudioHdiRenderSceneTest::handle = nullptr;
-TestGetAudioManager AudioHdiRenderSceneTest::getAudioManager = nullptr;
 TestAudioManager *AudioHdiRenderSceneTest::manager = nullptr;
 
 void AudioHdiRenderSceneTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioHdiRenderSceneTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioHdiRenderSceneTest::TearDownTestCase(void) {}
 
 void AudioHdiRenderSceneTest::SetUp(void) {}
 
@@ -267,7 +253,7 @@ HWTEST_F(AudioHdiRenderSceneTest, AudioRenderSelectScene_003, TestSize.Level1)
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
     scenes.scene.id = 0;
-    scenes.desc.pins = PIN_IN_MIC;
+    scenes.desc.pins = PIN_OUT_SPEAKER;
     ret = render->scene.SelectScene(renderNull, &scenes);
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 

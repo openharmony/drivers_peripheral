@@ -901,10 +901,10 @@ static int32_t SetCaptureResume(struct AudioCapture **capture)
 static void PrintAttributesFromat(void)
 {
     printf(" ============= Capture Sample Attributes Format =============== \n");
-    printf("| 1. Capture AUDIO_FORMAT_TYPE_PCM_8_BIT                            |\n");
-    printf("| 2. Capture AUDIO_FORMAT_TYPE_PCM_16_BIT                           |\n");
-    printf("| 3. Capture AUDIO_FORMAT_TYPE_PCM_24_BIT                           |\n");
-    printf("| 4. Capture AUDIO_FORMAT_TYPE_PCM_32_BIT                           |\n");
+    printf("| 1. Capture AUDIO_FORMAT_TYPE_PCM_8_BIT                        |\n");
+    printf("| 2. Capture AUDIO_FORMAT_TYPE_PCM_16_BIT                       |\n");
+    printf("| 3. Capture AUDIO_FORMAT_TYPE_PCM_24_BIT                       |\n");
+    printf("| 4. Capture AUDIO_FORMAT_TYPE_PCM_32_BIT                       |\n");
     printf(" ============================================================== \n");
 }
 
@@ -979,6 +979,41 @@ static int32_t SetCaptureAttributes(struct AudioCapture **capture)
     return ret;
 }
 
+static int32_t PrintCaptureSelectPin(struct AudioSceneDescriptor *scene)
+{
+    system("clear");
+    printf(" ==================== Select Pin =====================  \n");
+    printf("| 0. MIC                                                |\n");
+    printf("| 1. MIC HeadSet                                        |\n");
+    printf(" =====================================================  \n");
+
+    printf("Please input your choice:\n");
+    int32_t val = 0;
+    int32_t ret = CheckInputName(INPUT_INT, (void *)&val);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Invalid value!");
+        SystemInputFail();
+        return HDF_FAILURE;
+    }
+
+    if (val == 1) {
+        scene->desc.pins = PIN_IN_HS_MIC;
+    } else {
+        scene->desc.pins = PIN_IN_MIC;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static void SelectSceneMenu(void)
+{
+    printf(" ====================  Select Scene ==================== \n");
+    printf("0 is Midea.                                             |\n");
+    printf("1 is Communication.                                     |\n");
+    printf("2 is Voice-all.                                         |\n");
+    printf(" ======================================================= \n");
+}
+
 static int32_t SelectCaptureScene(struct AudioCapture **capture)
 {
     (void)capture;
@@ -986,32 +1021,45 @@ static int32_t SelectCaptureScene(struct AudioCapture **capture)
     int32_t ret;
     int val = 0;
     struct AudioSceneDescriptor scene;
-    printf(" ====================  Select Scene ==================== \n");
-    printf("0 is Mic.                                               |\n");
-    printf("1 is Headphone mic.                                     |\n");
-    printf(" ======================================================= \n");
+    SelectSceneMenu();
     printf("Please input your choice:\n");
     ret = CheckInputName(INPUT_INT, (void *)&val);
-    if (ret < 0 || (val != 0 && val != 1)) {
+    if (ret < 0) {
         AUDIO_FUNC_LOGE("Invalid value,");
         SystemInputFail();
         return HDF_FAILURE;
     }
-    if (val == 1) {
-        scene.scene.id = 0;
-        scene.desc.pins = PIN_IN_HS_MIC;
-    } else {
-        scene.scene.id = 0;
-        scene.desc.pins = PIN_IN_MIC;
+
+    switch (val) {
+        case AUDIO_IN_MEDIA:
+            scene.scene.id = AUDIO_IN_MEDIA;
+            break;
+        case AUDIO_IN_COMMUNICATION:
+            scene.scene.id = AUDIO_IN_COMMUNICATION;
+            break;
+        case AUDIO_IN_CALL - 1:
+            scene.scene.id = AUDIO_IN_CALL;
+            break;
+        default:
+            AUDIO_FUNC_LOGE("Select Scene invaild.");
+            return HDF_FAILURE;
     }
+    ret = PrintCaptureSelectPin(&scene);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Select pin failed");
+        return HDF_FAILURE;
+    }
+
     if (g_capture == NULL) {
         AUDIO_FUNC_LOGE("Record already stop,");
         SystemInputFail();
         return HDF_FAILURE;
     }
+
     if (g_capture->scene.SelectScene == NULL) {
         return HDF_FAILURE;
     }
+
     ret = g_capture->scene.SelectScene((AudioHandle)g_capture, &scene);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Select scene fail");
@@ -1207,6 +1255,10 @@ int32_t main(int32_t argc, char const *argv[])
     if (g_manager != NULL) {
         if (g_manager->UnloadAdapter != NULL) {
             g_manager->UnloadAdapter(g_manager, g_adapter);
+        }
+
+        if (g_manager->ReleaseAudioManagerObject != NULL) {
+            g_manager->ReleaseAudioManagerObject(g_manager);
         }
     }
     dlclose(g_handle);

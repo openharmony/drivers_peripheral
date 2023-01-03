@@ -49,32 +49,18 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
 };
 
-void *AudioHdiCaptureControlTest::handle = nullptr;
-TestGetAudioManager AudioHdiCaptureControlTest::getAudioManager = nullptr;
 TestAudioManager *AudioHdiCaptureControlTest::manager = nullptr;
 
 void AudioHdiCaptureControlTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioHdiCaptureControlTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioHdiCaptureControlTest::TearDownTestCase(void) {}
 
 void AudioHdiCaptureControlTest::SetUp(void) {}
 
@@ -191,8 +177,7 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_005, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, capturePort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, capturePort->portId, PIN_IN_MIC);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapterNull, &devDesc, &attrs, &capture);
@@ -217,8 +202,7 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_006, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, capturePort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = adapter->CreateCapture(adapter, devDesc, &attrs, &capture);
     EXPECT_EQ(AUDIO_HAL_ERR_INVALID_PARAM, ret);
 
@@ -265,8 +249,7 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_008, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, capturePort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, capturePort->portId, PIN_IN_MIC);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, capture);
@@ -275,7 +258,8 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_008, TestSize.Level1)
 }
 /**
 * @tc.name  AudioCreateCapture_008
-* @tc.desc  Test AudioCreateCapture interface,Returns -1 if the incoming parameter adapter which port type is PORT_OUT
+* @tc.desc  Test AudioCreateCapture interface,Returns -1 if the incoming parameter adapter which DevDesc'pins is
+* PIN_OUT_SPEAKER
 * @tc.type: FUNC
 */
 HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_009, TestSize.Level1)
@@ -288,10 +272,9 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_009, TestSize.Level1)
     struct AudioCapture *capture = nullptr;
 
     ASSERT_NE(nullptr, manager);
-    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME_OUT, &adapter, capturePort);
+    ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, capturePort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, capturePort->portId, PIN_OUT_SPEAKER);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);
@@ -317,8 +300,7 @@ HWTEST_F(AudioHdiCaptureControlTest, AudioCreateCapture_010, TestSize.Level1)
     ASSERT_NE(nullptr, manager);
     ret = GetLoadAdapter(manager, PORT_IN, ADAPTER_NAME, &adapter, capturePort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
-    ret = InitAttrs(attrs);
-    EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
+    InitAttrs(attrs);
     ret = InitDevDesc(devDesc, portID, PIN_IN_MIC);
     EXPECT_EQ(AUDIO_HAL_SUCCESS, ret);
     ret = adapter->CreateCapture(adapter, &devDesc, &attrs, &capture);

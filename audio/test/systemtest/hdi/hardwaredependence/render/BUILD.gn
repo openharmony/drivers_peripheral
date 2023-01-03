@@ -38,6 +38,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/hardwaredependence/render/include",
     ]
+    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
   }
 } else {
   module_output_path = "drivers_peripheral_audio/audio"
@@ -66,9 +67,12 @@ if (defined(ohos_lite)) {
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       defines += [ "AUDIO_ADM_SO" ]
     }
     if (enable_audio_adm_service) {
+      deps +=
+          [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
     }
     if ("${product_name}" == "rk3568") {
@@ -77,6 +81,9 @@ if (defined(ohos_lite)) {
     if (defined(drivers_peripheral_audio_alsa_lib) &&
         drivers_peripheral_audio_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
+    }
+    if (!drivers_peripheral_audio_rich_device) {
+      defines += [ "FEATURE_SMALL_DEVICE" ]
     }
   }
 }

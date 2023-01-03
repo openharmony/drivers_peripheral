@@ -20,6 +20,12 @@
 #include "idm_database.h"
 #include "pool.h"
 
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
 typedef enum Asl {
     ASL0 = 0,
     ASL1 = 1,
@@ -50,7 +56,7 @@ typedef struct {
 } AtlGeneration;
 
 // Used to map the authentication capability level and authentication security level to the authentication trust level.
-static AtlGeneration g_generationAtl[] = {
+IAM_STATIC AtlGeneration g_generationAtl[] = {
     {ATL4, ACL3, ASL2}, {ATL3, ACL2, ASL2}, {ATL2, ACL2, ASL1},
     {ATL2, ACL1, ASL2}, {ATL1, ACL1, ASL0}, {ATL0, ACL0, ASL0},
 };
@@ -65,7 +71,7 @@ uint32_t GetAtl(uint32_t acl, uint32_t asl)
     return ATL0;
 }
 
-static ResultCode QueryScheduleAsl(const CoAuthSchedule *coAuthSchedule, uint32_t *asl)
+IAM_STATIC ResultCode QueryScheduleAsl(const CoAuthSchedule *coAuthSchedule, uint32_t *asl)
 {
     if (coAuthSchedule == NULL || asl == NULL || coAuthSchedule->executorSize == 0) {
         LOG_ERROR("param is null");
@@ -98,7 +104,7 @@ ResultCode QueryScheduleAtl(const CoAuthSchedule *coAuthSchedule, uint32_t acl, 
     return RESULT_SUCCESS;
 }
 
-static ResultCode GetAsl(uint32_t authType, uint32_t *asl)
+IAM_STATIC ResultCode GetAsl(uint32_t authType, uint32_t *asl)
 {
     uint32_t allInOneMaxEsl = 0;
     ExecutorCondition condition = {};
@@ -134,7 +140,7 @@ static ResultCode GetAsl(uint32_t authType, uint32_t *asl)
     return RESULT_SUCCESS;
 }
 
-static ResultCode GetAcl(int32_t userId, uint32_t authType, uint32_t *acl)
+IAM_STATIC ResultCode GetAcl(int32_t userId, uint32_t authType, uint32_t *acl)
 {
     CredentialCondition condition = {};
     SetCredentialConditionAuthType(&condition, authType);

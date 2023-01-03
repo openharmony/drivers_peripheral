@@ -47,32 +47,18 @@ public:
     static void TearDownTestCase(void);
     void SetUp();
     void TearDown();
-    static void *handle;
-    static TestGetAudioManager getAudioManager;
     static TestAudioManager *manager;
 };
 
-void *AudioHdiRenderControlTest::handle = nullptr;
-TestGetAudioManager AudioHdiRenderControlTest::getAudioManager = nullptr;
 TestAudioManager *AudioHdiRenderControlTest::manager = nullptr;
 
 void AudioHdiRenderControlTest::SetUpTestCase(void)
 {
-    int32_t ret = LoadFunction(handle, getAudioManager);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(nullptr, manager);
 }
 
-void AudioHdiRenderControlTest::TearDownTestCase(void)
-{
-    if (handle != nullptr) {
-        (void)dlclose(handle);
-    }
-    if (getAudioManager != nullptr) {
-        getAudioManager = nullptr;
-    }
-}
+void AudioHdiRenderControlTest::TearDownTestCase(void) {}
 
 void AudioHdiRenderControlTest::SetUp(void) {}
 
@@ -710,16 +696,13 @@ HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_009, TestSize.Level1)
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    ret = InitAttrs(attrs);
+    InitAttrs(attrs);
     InitDevDesc(devDesc, renderPort->portId, PIN_OUT_SPEAKER);
 
     devDesc.portId = -5;
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
-    devDesc.pins = PIN_NONE;
-    ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
-    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
-    devDesc.desc = "devtestname";
+    InitDevDesc(devDesc, renderPort->portId, PIN_NONE);
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 
@@ -743,7 +726,7 @@ HWTEST_F(AudioHdiRenderControlTest, AudioCreateRender_010, TestSize.Level1)
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &adapter, renderPort);
     ASSERT_EQ(AUDIO_HAL_SUCCESS, ret);
 
-    ret = InitAttrs(attrs);
+    InitAttrs(attrs);
     InitDevDesc(devDesc, portID, PIN_OUT_SPEAKER);
 
     ret = adapter->CreateRender(adapter, &devDesc, &attrs, &render);

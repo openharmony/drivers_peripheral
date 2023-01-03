@@ -55,6 +55,7 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
   }
@@ -100,10 +101,16 @@ if (defined(ohos_lite)) {
     ]
     defines = []
     if (enable_audio_adm_passthrough) {
+      deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
       defines += [ "AUDIO_ADM_SO" ]
     }
     if (enable_audio_adm_service) {
+      deps +=
+          [ "//drivers/peripheral/audio/hal/hdi_binder/proxy:hdi_audio_client" ]
       defines += [ "AUDIO_ADM_SERVICE" ]
+    }
+    if (!drivers_peripheral_audio_rich_device) {
+      defines += [ "FEATURE_SMALL_DEVICE" ]
     }
   }
 }

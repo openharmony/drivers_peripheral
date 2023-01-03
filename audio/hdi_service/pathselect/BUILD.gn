@@ -17,25 +17,27 @@ import("//drivers/peripheral/audio/audio.gni")
 
 ohos_shared_library("hdi_idl_audio_path_select") {
   sources = [
+    "//drivers/peripheral/audio/hal/pathselect/src/audio_pathselect.c",
     "//drivers/peripheral/audio/hdi_service/passthrough/src/audio_common.c",
-    "//drivers/peripheral/audio/hdi_service/pathselect/src/audio_pathselect.c",
     "//third_party/cJSON/cJSON.c",
   ]
 
   include_dirs = [
     "//drivers/peripheral/audio/hdi_service/passthrough/include",
-    "//drivers/peripheral/audio/hdi_service/pathselect/include",
+    "//drivers/peripheral/audio/hal/pathselect/include",
     "//third_party/cJSON",
     "//third_party/bounds_checking_function/include",
     "//drivers/hdf_core/adapter/uhdf2/shared/include",
   ]
 
   public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
-  defines = []
+  defines = [ "IDL_MODE" ]
   if (enable_audio_hal_hdf_log) {
     defines += [ "AUDIO_HDF_LOG" ]
   }
-
+  if (drivers_peripheral_audio_alsa_lib) {
+    defines += [ "ALSA_LIB_MODE" ]
+  }
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",

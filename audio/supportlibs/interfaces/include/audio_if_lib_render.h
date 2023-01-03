@@ -28,6 +28,9 @@ enum AudioInterfaceLibRenderCtrl {
     AUDIODRV_CTL_IOCTL_ELEM_INFO = CTRL_NUM, // Ctrl
     AUDIODRV_CTL_IOCTL_ELEM_READ,
     AUDIODRV_CTL_IOCTL_ELEM_WRITE,
+    AUDIODRV_CTL_IOCTL_ELEM_LIST,
+    AUDIODRV_CTL_IOCTL_ELEM_CARD,
+    AUDIODRV_CTL_IOCTL_ELEM_HDMI,
     AUDIODRV_CTL_IOCTL_MUTE_READ,     // mute
     AUDIODRV_CTL_IOCTL_MUTE_WRITE,
     AUDIODRV_CTL_IOCTL_PAUSE_WRITE,
@@ -52,8 +55,6 @@ int32_t AudioOutputRenderStart(const struct DevHandle *handle,
     int cmdId, const struct AudioHwRenderParam *handleData);
 int32_t AudioOutputRenderGetMmapPosition(const struct DevHandle *handle,
     int cmdId, struct AudioHwRenderParam *handleData);
-struct DevHandle *AudioBindServiceRender(const char *name);
-void AudioCloseServiceRender(const struct DevHandle *handle);
 int32_t AudioInterfaceLibModeRender(const struct DevHandle *handle,
     struct AudioHwRenderParam *handleData, int cmdId);
 int32_t AudioOutputRenderHwParams(const struct DevHandle *handle,

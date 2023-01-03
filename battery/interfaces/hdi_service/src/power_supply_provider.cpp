@@ -248,7 +248,7 @@ void PowerSupplyProvider::FormatSysfsPaths(struct PowerSupplySysfsInfo *info)
 
 int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t size) const
 {
-    int32_t fd = open(path, O_RDONLY);
+    int32_t fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
     if (fd < NUM_ZERO) {
         BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to open %{private}s", path);
         return HDF_ERR_IO;
@@ -486,7 +486,6 @@ void PowerSupplyProvider::SetSysFilePath(const std::string& path)
 {
     if (path.empty()) {
         BATTERY_HILOGI(FEATURE_BATT_INFO, "path is empty");
-        path_ = MOCK_POWER_SUPPLY_BASE_PATH;
         return;
     }
     path_ = path;
@@ -880,7 +879,7 @@ void PowerSupplyProvider::CreateMockBatteryPath(std::string& mockBatteryPath)
     CreateFile(mockBatteryPath + "/input_current_limit", "0");
     CreateFile(mockBatteryPath + "/online", "1");
     CreateFile(mockBatteryPath + "/present", "0");
-    CreateFile(mockBatteryPath + "/status", "Full");
+    CreateFile(mockBatteryPath + "/status", "Charging");
     CreateFile(mockBatteryPath + "/temp", "222");
     CreateFile(mockBatteryPath + "/voltage_avg", "4123456");
     CreateFile(mockBatteryPath + "/voltage_now", "4123456");

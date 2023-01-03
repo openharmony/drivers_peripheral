@@ -14,6 +14,7 @@
  */
 
 #include "adapter_if.h"
+
 #include <dirent.h>
 #include <endian.h>
 #include <fcntl.h>
@@ -432,8 +433,8 @@ static void GetHeaderStr(struct UsbFnStrings ** const strings, struct UsbFunctio
     }
     headerStr->magic = htole32(FUNCTIONFS_STRINGS_MAGIC);
     headerStr->length = htole32(sizeof(struct UsbFunctionfsStringsHead) + langCount * sizeof(uint16_t) + len);
-    headerStr->str_count = strCount;
-    headerStr->lang_count = langCount;
+    headerStr->strCount = strCount;
+    headerStr->langCount = langCount;
 }
 
 static int32_t UsbFnWriteStrings(int32_t ep0, struct UsbFnStrings ** const strings)
@@ -457,13 +458,13 @@ static int32_t UsbFnWriteStrings(int32_t ep0, struct UsbFnStrings ** const strin
     }
     whereDec += sizeof(struct UsbFunctionfsStringsHead);
 
-    for (i = 0; i < headerStr.lang_count; i++) {
+    for (i = 0; i < headerStr.langCount; i++) {
         ret = memcpy_s(whereDec, headerStr.length - (whereDec - str), &strings[i]->language, sizeof(uint16_t));
         if (ret != EOK) {
             goto ERR;
         }
         whereDec += sizeof(uint16_t);
-        for (j = 0; j < headerStr.str_count; j++) {
+        for (j = 0; j < headerStr.strCount; j++) {
             if (strlen(strings[i]->strings[j].s)) {
                 ret = memcpy_s(whereDec, headerStr.length - (whereDec - str), strings[i]->strings[j].s,
                     strlen(strings[i]->strings[j].s));
@@ -947,49 +948,6 @@ static int32_t UsbFnAdapterDelDevice(const char *deviceName, const char *udcName
     return 0;
 }
 
-#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-static int32_t UsbFnAdapterWaitUDC(const char *deviceName, const char *udcName)
-{
-    int32_t ret, i;
-    char tmp[MAX_PATHLEN] = {0};
-    char udcTmp[MAX_NAMELEN] = {0};
-    if (deviceName == NULL || udcName == NULL || IsDeviceDirExist(deviceName) == false) {
-        return HDF_ERR_INVALID_PARAM;
-    }
-
-    ret = snprintf_s(tmp, MAX_PATHLEN, MAX_PATHLEN - 1, "%s/%s/UDC", CONFIGFS_DIR, deviceName);
-    if (ret < 0) {
-        HDF_LOGE("%{public}s: snprintf_s failed", __func__);
-        return HDF_ERR_IO;
-    }
-    for (i = 0; i < OPEN_CNT; i++) {
-        (void)UsbFnReadFile(tmp, udcTmp, strlen(udcName));
-        if (!strcmp(udcName, udcTmp)) {
-            HDF_LOGD("%{public}s: hdc enable udc", __func__);
-            return 0;
-        }
-        usleep(SLEEP_DELAY);
-    }
-    return HDF_ERR_IO;
-}
-#endif
-
-static int32_t EnableDevice(const char *udcName, const char *devName, struct UsbFnDeviceDesc *descriptor)
-{
-    int32_t ret;
-#ifndef USB_EVENT_NOTIFY_LINUX_NATIVE_MODE
-    (void)UsbFnAdapterWriteUDC(devName, "none", 0);
-    if (!UsbFnAdapterWaitUDC(devName, udcName)) {
-        return 0;
-    }
-#endif
-    ret = UsbFnAdapterWriteUDC(devName, udcName, 1);
-    if (ret != HDF_SUCCESS) {
-        (void)UsbFnAdapterDelDevice(devName, udcName, descriptor);
-    }
-    return ret;
-}
-
 static bool CreateFun(struct UsbFnFunction *function, const char *devName, uint8_t *confVal, int32_t *ret)
 {
     if (function == NULL || devName == NULL || confVal == NULL || ret == NULL) {
@@ -1056,7 +1014,7 @@ static int32_t UsbFnAdapterCreateDevice(const char *udcName, const char *devName
         }
     }
 
-    return EnableDevice(udcName, devName, descriptor);
+    return HDF_SUCCESS;
 }
 
 static int32_t UsbFnAdapterGetPipeInfo(int32_t ep, struct UsbFnPipeInfo * const pipeInfo)

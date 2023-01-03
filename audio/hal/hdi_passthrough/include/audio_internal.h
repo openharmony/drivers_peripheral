@@ -23,9 +23,10 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "hdf_base.h"
+
 #include "audio_common.h"
 #include "audio_manager.h"
+#include "hdf_base.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -56,12 +57,13 @@ extern "C" {
 #define KEY_VALUE_LIST_LEN 128
 
 #define HDF_AUDIO_CODEC_PRIMARY_DEV         "hdf_audio_codec_primary_dev"
+#define HDF_AUDIO_CODEC_HDMI_DEV            "hdf_audio_codec_hdmi_dev"
 #define HDF_AUDIO_CODEC_USB_DEV             "hdf_audio_codec_usb_dev"
 #define HDF_AUDIO_CODEC_A2DP_DEV            "hdf_audio_codec_a2dp_dev"
 #define PRIMARY                             "primary"
 #define USB                                 "usb"
 #define A2DP                                "a2dp"
-
+#define HDMI                                "hdmi"
 
 /**
  * @brief Enumerates HAL return value types.
@@ -124,10 +126,6 @@ enum AudioTurnStandbyMode {
     AUDIO_TURN_STANDBY_LATER = 0,
     AUDIO_TURN_STANDBY_NOW,
     AUDIO_TURN_STANDBY_BUTT,
-};
-
-struct DevHandleCapture {
-    void *object;
 };
 
 struct DevHandle {
@@ -303,8 +301,8 @@ struct AudioHwCaptureParam {
 struct AudioHwCapture {
     struct AudioCapture common;
     struct AudioHwCaptureParam captureParam;
-    struct DevHandleCapture *devDataHandle;   // Bind Data handle
-    struct DevHandleCapture *devCtlHandle;    // Bind Ctl handle
+    struct DevHandle *devDataHandle;   // Bind Data handle
+    struct DevHandle *devCtlHandle;    // Bind Ctl handle
     struct HdfRemoteService *proxyRemoteHandle; // proxyRemoteHandle
     struct ErrorLog errorLog;
 };
@@ -389,9 +387,11 @@ typedef struct DevHandle *(*BindServiceRenderSo)(const char *);
 typedef int32_t (*InterfaceLibModeRenderSo)(struct DevHandle *, struct AudioHwRenderParam *, int);
 typedef void(*CloseServiceRenderSo)(struct DevHandle *);
 
-typedef struct DevHandleCapture *(*BindServiceCaptureSo)(const char *);
-typedef int32_t (*InterfaceLibModeCaptureSo)(struct DevHandleCapture *, struct AudioHwCaptureParam *, int);
-typedef void(*CloseServiceCaptureSo)(struct DevHandleCapture *);
+typedef struct DevHandle *(*BindServiceCaptureSo)(const char *);
+typedef int32_t (*InterfaceLibModeCaptureSo)(struct DevHandle *, struct AudioHwCaptureParam *, int);
+typedef void(*CloseServiceCaptureSo)(struct DevHandle *);
+
+typedef int32_t (*InterfaceLibGetCardInfoSo)(struct AudioAdapterDescriptor **, int *);
 
 typedef int32_t (*PathSelGetConfToJsonObj)(void);
 typedef int32_t (*PathSelAnalysisJson)(void *adapterParam, enum AudioAdaptType adaptType);
@@ -447,7 +447,7 @@ int32_t AudioAdapterReleaseAudioRoute(struct AudioAdapter *adapter, int32_t rout
 int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
                                    const char *condition, const char *value);
 int32_t AudioAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
-                                   const char *condition, char *value, int32_t lenth);
+                                   const char *condition, char *value, int32_t length);
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
 int32_t AudioAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume);
 int32_t AudioRenderStart(AudioHandle handle);
@@ -520,6 +520,9 @@ int32_t AudioCaptureRemoveEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioCaptureTurnStandbyMode(AudioHandle handle);
 int32_t AudioCaptureAudioDevDump(AudioHandle handle, int32_t range, int32_t fd);
 int32_t CallbackProcessing(AudioHandle handle, enum AudioCallbackType callBackType);
+
+struct AudioAdapterDescriptor *AudioAdapterGetConfigDescs(void);
+int32_t AudioAdapterGetAdapterNum(void);
 
 #ifdef __cplusplus
 }

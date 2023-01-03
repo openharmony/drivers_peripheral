@@ -101,8 +101,8 @@ static int32_t ReadLightInfo(struct HdfSBuf *reply, struct LightDevice *priv)
             return HDF_FAILURE;
         }
 
-        if (!HdfSbufReadInt32(reply, &pos->reserved)) {
-            HDF_LOGE("%{public}s:read reserved failed!", __func__);
+        if (!HdfSbufReadInt32(reply, &pos->lightType)) {
+            HDF_LOGE("%{public}s:read lightType failed!", __func__);
             return HDF_FAILURE;
         }
         pos++;
@@ -164,7 +164,7 @@ static int32_t OnLightValidityJudgment(uint32_t lightId, struct LightEffect *eff
         return LIGHT_NOT_SUPPORT;
     }
 
-    if (effect->flashEffect.flashMode > LIGHT_FLASH_BLINK) {
+    if (effect->flashEffect.flashMode < LIGHT_FLASH_NONE || effect->flashEffect.flashMode > LIGHT_FLASH_BLINK) {
         HDF_LOGE("%{public}s: flashMode not supported", __func__);
         return LIGHT_NOT_FLASH;
     }

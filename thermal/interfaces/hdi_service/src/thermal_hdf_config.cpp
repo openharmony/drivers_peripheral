@@ -15,6 +15,7 @@
 
 #include "thermal_hdf_config.h"
 
+#include "thermal_hdf_utils.h"
 #include "thermal_log.h"
 #include "hdf_remote_service.h"
 #include "osal/osal_mem.h"
@@ -47,7 +48,7 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string& path)
     std::unique_ptr<xmlDoc, decltype(&xmlFreeDoc)> docPtr(
         xmlReadFile(path.c_str(), nullptr, XML_PARSE_NOBLANKS), xmlFreeDoc);
     if (docPtr == nullptr) {
-        THERMAL_HILOGE(COMP_HDI, "failed to read xml file");
+        THERMAL_HILOGW(COMP_HDI, "failed to read xml file");
         return HDF_ERR_INVALID_OBJECT;
     }
 
@@ -60,7 +61,7 @@ int32_t ThermalHdfConfig::ParseThermalHdiXMLConfig(const std::string& path)
     if (!xmlStrcmp(rootNode->name, BAD_CAST"thermal")) {
         xmlChar* xmlVersion = xmlGetProp(rootNode, BAD_CAST"version");
         if (xmlVersion != nullptr) {
-            this->thermal_.version = std::stof(std::string(reinterpret_cast<char*>(xmlVersion)));
+            this->thermal_.version = std::string(reinterpret_cast<char*>(xmlVersion));
             xmlFree(xmlVersion);
             THERMAL_HILOGD(COMP_HDI, "version: %{public}s", this->thermal_.version.c_str());
         }
@@ -181,16 +182,23 @@ void ThermalHdfConfig::ParseTracingNode(xmlNodePtr node)
 {
     xmlChar* xmlInterval = xmlGetProp(node, BAD_CAST"interval");
     if (xmlInterval != nullptr) {
-        this->trace_.interval = std::string(reinterpret_cast<char *>(xmlInterval));
+        this->traceConfig_.interval = static_cast<uint32_t>(atoi(reinterpret_cast<char *>(xmlInterval)));
         xmlFree(xmlInterval);
-        THERMAL_HILOGD(COMP_HDI, "interval: %{public}s", this->trace_.interval.c_str());
+        THERMAL_HILOGD(COMP_HDI, "interval: %{public}d", this->traceConfig_.interval);
+    }
+
+    xmlChar* xmlWidth = xmlGetProp(node, BAD_CAST"width");
+    if (xmlWidth != nullptr) {
+        this->traceConfig_.width = static_cast<uint32_t>(atoi(reinterpret_cast<char *>(xmlWidth)));
+        xmlFree(xmlWidth);
+        THERMAL_HILOGD(COMP_HDI, "width: %{public}d", this->traceConfig_.width);
     }
 
     xmlChar* xmlOutpath = xmlGetProp(node, BAD_CAST"outpath");
     if (xmlOutpath != nullptr) {
-        this->trace_.outpath = std::string(reinterpret_cast<char *>(xmlOutpath));
+        this->traceConfig_.outPath = std::string(reinterpret_cast<char *>(xmlOutpath));
         xmlFree(xmlOutpath);
-        THERMAL_HILOGD(COMP_HDI, "outpath: %{private}s", this->trace_.outpath.c_str());
+        THERMAL_HILOGD(COMP_HDI, "outpath: %{private}s", this->traceConfig_.outPath.c_str());
     }
 
     auto cur  = node->xmlChildrenNode;
@@ -202,7 +210,7 @@ void ThermalHdfConfig::ParseTracingNode(xmlNodePtr node)
 
 void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
 {
-    std::string namePath;
+    std::string title;
     DfxTraceInfo info;
     std::string valuePath;
 
@@ -210,15 +218,16 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
         if (!xmlStrcmp(subNode->name, BAD_CAST"title")) {
             xmlChar* titlePath = xmlGetProp(subNode, BAD_CAST"path");
             if (titlePath != nullptr) {
-                namePath = std::string(reinterpret_cast<char*>(titlePath));
-                THERMAL_HILOGD(COMP_HDI, "namePath in path: %{private}s", namePath.c_str());
+                ThermalHdfUtils::ReadNode(
+                    std::string(reinterpret_cast<char*>(titlePath)), title);
+                THERMAL_HILOGD(COMP_HDI, "title form path is: %{private}s", title.c_str());
                 xmlFree(titlePath);
             }
 
             xmlChar* titleName = xmlGetProp(subNode, BAD_CAST"name");
             if (titleName != nullptr) {
-                namePath = std::string(reinterpret_cast<char*>(titleName));
-                THERMAL_HILOGD(COMP_HDI, "namePath in name: %{private}s", namePath.c_str());
+                title = std::string(reinterpret_cast<char*>(titleName));
+                THERMAL_HILOGD(COMP_HDI, "title is: %{private}s", title.c_str());
                 xmlFree(titleName);
             }
         }
@@ -232,13 +241,13 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
         }
     }
 
-    info.title = namePath;
-    info.value = valuePath;
+    info.title = title;
+    info.valuePath = valuePath;
     traceInfo_.emplace_back(info);
 
     for (const auto& item : traceInfo_) {
-        THERMAL_HILOGD(COMP_HDI, "item.title = %{public}s, item.value = %{public}s",
-            item.title.c_str(), item.value.c_str());
+        THERMAL_HILOGD(COMP_HDI, "item.title = %{public}s, item.valuePath = %{private}s",
+            item.title.c_str(), item.valuePath.c_str());
     }
 }
 

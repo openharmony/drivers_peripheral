@@ -97,7 +97,7 @@ static int32_t AudioCaptureSetPauseState(snd_pcm_t *pcm, int32_t pause)
 }
 
 int32_t AudioCtlCaptureSetPauseStu(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     int32_t pause;
@@ -127,7 +127,7 @@ int32_t AudioCtlCaptureSetPauseStu(
 }
 
 int32_t AudioCtlCaptureGetVolume(
-    const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     long volEverage;
@@ -175,7 +175,7 @@ int32_t AudioCtlCaptureGetVolume(
 }
 
 int32_t AudioCtlCaptureSetVolume(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     int32_t vol;
@@ -216,7 +216,7 @@ int32_t AudioCtlCaptureSetVolume(
 }
 
 int32_t AudioCtlCaptureSetMuteStu(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     bool muteState;
@@ -251,8 +251,7 @@ int32_t AudioCtlCaptureSetMuteStu(
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtlCaptureGetMuteStu(
-    const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+int32_t AudioCtlCaptureGetMuteStu(const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     struct AudioCardInfo *cardInstance;
 
@@ -279,7 +278,7 @@ int32_t AudioCtlCaptureGetMuteStu(
 }
 
 int32_t AudioCtlCaptureSetGainStu(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
@@ -290,8 +289,7 @@ int32_t AudioCtlCaptureSetGainStu(
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtlCaptureGetGainStu(
-    const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+int32_t AudioCtlCaptureGetGainStu(const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
@@ -303,7 +301,7 @@ int32_t AudioCtlCaptureGetGainStu(
 }
 
 int32_t AudioCtlCaptureSceneSelect(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     int32_t deviceNum;
 
@@ -323,7 +321,7 @@ int32_t AudioCtlCaptureSceneSelect(
 }
 
 int32_t AudioCtlCaptureGetGainThreshold(
-    const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
@@ -335,7 +333,7 @@ int32_t AudioCtlCaptureGetGainThreshold(
 }
 
 int32_t AudioCtlCaptureGetVolThreshold(
-    const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     long volMax = MIN_VOLUME;
@@ -371,8 +369,7 @@ int32_t AudioCtlCaptureGetVolThreshold(
     return HDF_SUCCESS;
 }
 
-int32_t AudioInterfaceLibCtlCapture(
-    const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+int32_t AudioInterfaceLibCtlCapture(const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
 
@@ -687,7 +684,7 @@ static int32_t SetSWParams(snd_pcm_t *handle, snd_pcm_sw_params_t *swparams)
 }
 
 int32_t AudioOutputCaptureHwParams(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     struct AudioCardInfo *cardIns;
@@ -810,8 +807,7 @@ static int32_t InitMixerCtlElement(const char *adapterName, struct AudioCardInfo
  * brief: Opens a capture PCM
  * param mode Open mode (see #SND_PCM_NONBLOCK, #SND_PCM_ASYNC)
  */
-int32_t AudioOutputCaptureOpen(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+int32_t AudioOutputCaptureOpen(const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     struct AudioCardInfo *cardIns;
@@ -1059,7 +1055,7 @@ static int32_t AudioCaptureReadFrame(
     return HDF_SUCCESS;
 }
 
-int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+int32_t AudioOutputCaptureRead(const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     snd_pcm_uframes_t bufferSize = 0;
@@ -1108,8 +1104,7 @@ int32_t AudioOutputCaptureRead(const struct DevHandleCapture *handle, int cmdId,
     return HDF_SUCCESS;
 }
 
-int32_t AudioOutputCaptureStart(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+int32_t AudioOutputCaptureStart(const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
@@ -1121,7 +1116,7 @@ int32_t AudioOutputCaptureStart(
 }
 
 int32_t AudioOutputCapturePrepare(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     struct AudioCardInfo *cardIns;
@@ -1148,8 +1143,7 @@ int32_t AudioOutputCapturePrepare(
     return HDF_SUCCESS;
 }
 
-int32_t AudioOutputCaptureClose(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+int32_t AudioOutputCaptureClose(const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     struct AudioCardInfo *cardIns;
@@ -1191,9 +1185,7 @@ int32_t AudioOutputCaptureClose(
     return HDF_SUCCESS;
 }
 
-// Stop capture first, and then close the resource
-int32_t AudioOutputCaptureStop(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+int32_t AudioOutputCaptureStop(const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
     struct AudioCardInfo *cardIns;
@@ -1302,7 +1294,7 @@ static int32_t MmapDescWriteBufferCapture(const struct AudioHwCaptureParam *hand
 }
 
 int32_t AudioOutputCaptureReqMmapBuffer(
-    const struct DevHandleCapture *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
 
@@ -1322,7 +1314,7 @@ int32_t AudioOutputCaptureReqMmapBuffer(
 }
 
 int32_t AudioOutputCaptureGetMmapPosition(
-    const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     struct AudioCardInfo *cardIns;
 
@@ -1343,89 +1335,8 @@ int32_t AudioOutputCaptureGetMmapPosition(
     return HDF_SUCCESS;
 }
 
-static int32_t AudioBindServiceCaptureObject(struct DevHandleCapture * const handle, const char *name)
-{
-    int32_t ret;
-    char *serviceName;
-    struct HdfIoService *service;
-
-    if (handle == NULL || name == NULL) {
-        AUDIO_FUNC_LOGE("service name or handle is NULL!");
-        return HDF_FAILURE;
-    }
-
-    serviceName = (char *)OsalMemCalloc(NAME_LEN);
-    if (serviceName == NULL) {
-        AUDIO_FUNC_LOGE("Failed to alloc serviceName");
-        return HDF_FAILURE;
-    }
-
-    ret = snprintf_s(serviceName, NAME_LEN - 1, SERVIC_NAME_MAX_LEN + 1, "hdf_audio_%s", name);
-    if (ret < 0) {
-        AudioMemFree((void **)&serviceName);
-        return HDF_FAILURE;
-    }
-
-    service = HdfIoServiceBindName(serviceName);
-    if (service == NULL) {
-        AUDIO_FUNC_LOGE("Capture: Failed to get service!");
-        AudioMemFree((void **)&serviceName);
-        return HDF_FAILURE;
-    }
-    AudioMemFree((void **)&serviceName);
-    handle->object = service;
-
-    return HDF_SUCCESS;
-}
-
-/* CreatCapture for Bind handle */
-struct DevHandleCapture *AudioBindServiceCapture(const char *name)
-{
-    int32_t ret;
-    struct DevHandleCapture *handle = NULL;
-
-    if (name == NULL) {
-        AUDIO_FUNC_LOGE("service name NULL!");
-        return NULL;
-    }
-
-    handle = (struct DevHandleCapture *)OsalMemCalloc(sizeof(struct DevHandleCapture));
-    if (handle == NULL) {
-        AUDIO_FUNC_LOGE("Failed to alloc handle");
-        return NULL;
-    }
-
-    ret = AudioBindServiceCaptureObject(handle, name);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("AudioBindServiceCaptureObject failed!");
-        AudioMemFree((void **)&handle);
-        return NULL;
-    }
-
-    /* Capture: Parsing primary sound card from configuration file */
-    ret = CardInfoParseFromConfig();
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Capture: parse config file failed!");
-        AudioMemFree((void **)&handle);
-        return NULL;
-    }
-    AUDIO_FUNC_LOGI("BIND SERVICE SUCCESS!");
-
-    return handle;
-}
-
-void AudioCloseServiceCapture(const struct DevHandleCapture *handle)
-{
-    if (handle != NULL) {
-        if (handle->object == NULL) {
-            AUDIO_FUNC_LOGE("Capture handle or handle->object is NULL");
-        }
-        AudioMemFree((void **)&handle);
-    }
-}
-
 int32_t AudioInterfaceLibOutputCapture(
-    const struct DevHandleCapture *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+    const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
 
@@ -1474,8 +1385,7 @@ int32_t AudioInterfaceLibOutputCapture(
     return ret;
 }
 
-int32_t AudioInterfaceLibModeCapture(
-    const struct DevHandleCapture *handle, struct AudioHwCaptureParam *handleData, int cmdId)
+int32_t AudioInterfaceLibModeCapture(const struct DevHandle *handle, struct AudioHwCaptureParam *handleData, int cmdId)
 {
     AUDIO_FUNC_LOGI();
     if (handle == NULL || handleData == NULL) {

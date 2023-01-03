@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "audio_common_test.h"
+#include "hdf_io_service_if.h"
 
 using namespace std;
 using namespace comfun;
@@ -74,7 +75,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureStartWhenBufferIsNotNull, TestSize.Level1
 HWTEST_F(AudioCaptureTest, AudioCaptureStartWhenDevDataHandleIsNull, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     hwCapture->devDataHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioCaptureStart(handle));
@@ -84,10 +85,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureStartWhenDevDataHandleIsNull, TestSize.Le
 HWTEST_F(AudioCaptureTest, AudioCaptureStartWhenDevDataHandleIsError, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devDataHandle = reinterpret_cast<struct DevHandleCapture *>(service);
+    hwCapture->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioHandle handle = (AudioHandle)hwCapture;
 #ifdef ALSA_LIB_MODE
     EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStart(handle));
@@ -117,7 +118,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureStopWhenDevDataHandleIsNull, TestSize.Lev
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     AudioHandle handle = (AudioHandle)hwCapture;
     ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStart(handle));
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     hwCapture->devDataHandle = nullptr;
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioCaptureStop(handle));
     hwCapture->devDataHandle = devDataHandle;
@@ -136,10 +137,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureStopWhenDevDataHandleIsError, TestSize.Le
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     AudioHandle handle = (AudioHandle)hwCapture;
     ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStart(handle));
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devDataHandle = reinterpret_cast<struct DevHandleCapture *>(service);
+    hwCapture->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
 #ifdef ALSA_LIB_MODE
     EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStop(handle));
 #else
@@ -186,7 +187,7 @@ HWTEST_F(AudioCaptureTest, AudioCapturePauseWhenDevDataHandleIsNull, TestSize.Le
     struct AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
     AudioHandle handle = (AudioHandle)hwCapture;
     ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStart(handle));
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     hwCapture->devDataHandle = nullptr;
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioCapturePause(handle));
     hwCapture->devDataHandle = devDataHandle;
@@ -197,10 +198,10 @@ HWTEST_F(AudioCaptureTest, AudioCapturePauseWhenDevDataHandleIsError, TestSize.L
     struct AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
     AudioHandle handle = (AudioHandle)hwCapture;
     ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStart(handle));
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devDataHandle = reinterpret_cast<struct DevHandleCapture *>(service);
+    hwCapture->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
 #ifdef ALSA_LIB_MODE
     EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioCapturePause(handle));
 #else
@@ -241,7 +242,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureResumeWhenDevDataHandleIsNull, TestSize.L
     AudioHandle handle = (AudioHandle)hwCapture;
     ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStart(handle));
     ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioCapturePause(handle));
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     hwCapture->devDataHandle = nullptr;
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioCaptureResume(handle));
     hwCapture->devDataHandle = devDataHandle;
@@ -253,10 +254,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureResumeWhenDevDataHandleIsError, TestSize.
     AudioHandle handle = (AudioHandle)hwCapture;
     ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStart(handle));
     ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioCapturePause(handle));
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devDataHandle = reinterpret_cast<struct DevHandleCapture *>(service);
+    hwCapture->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
 #ifdef ALSA_LIB_MODE
     EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureResume(handle));
 #else
@@ -354,7 +355,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetSampleAttributesWhenAttrsIsNull, TestS
 HWTEST_F(AudioCaptureTest, AudioCaptureSetSampleAttributesWhenDevDataHandleIsNull, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     hwCapture->devDataHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioCaptureSetSampleAttributes(handle, &attrs));
@@ -373,10 +374,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetSampleAttributesWhenFormatIsError, Tes
 HWTEST_F(AudioCaptureTest, AudioCaptureSetSampleAttributesWhenDevDataHandleIsError, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devDataHandle = reinterpret_cast<struct DevHandleCapture *>(service);
+    hwCapture->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioHandle handle = (AudioHandle)hwCapture;
 #ifdef ALSA_LIB_MODE
     EXPECT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureSetSampleAttributes(handle, &attrs));
@@ -506,7 +507,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSelectSceneWhenSceneIsNull, TestSize.Leve
 HWTEST_F(AudioCaptureTest, AudioCaptureSelectSceneWhenDevCtlHandleIsNull, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     hwCapture->devCtlHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     struct AudioSceneDescriptor *scene = new AudioSceneDescriptor;
@@ -519,10 +520,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSelectSceneWhenDevCtlHandleIsNull, TestSi
 HWTEST_F(AudioCaptureTest, AudioCaptureSelectSceneWhenDevCtlHandleIsError, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devCtlHandle = reinterpret_cast<struct DevHandleCapture *>(service);
+    hwCapture->devCtlHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioHandle handle = (AudioHandle)hwCapture;
     struct AudioSceneDescriptor scene;
     scene.scene.id = AUDIO_IN_MEDIA;
@@ -559,7 +560,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetMuteWhenHandleIsNull, TestSize.Level1)
 HWTEST_F(AudioCaptureTest, AudioCaptureSetMuteWhenDevCtlHandleIsNull, TestSize.Level1)
 {
     AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     hwCapture->devCtlHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     bool mute = true;
@@ -570,10 +571,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetMuteWhenDevCtlHandleIsNull, TestSize.L
 HWTEST_F(AudioCaptureTest, AudioCaptureSetMuteWhenDevCtlHandleIsError, TestSize.Level1)
 {
     AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devCtlHandle = (struct DevHandleCapture *)service;
+    hwCapture->devCtlHandle = (struct DevHandle *)service;
     AudioHandle handle = (AudioHandle)hwCapture;
     bool mute = true;
 #ifdef ALSA_LIB_MODE
@@ -611,7 +612,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetMuteWhenMuteIsNull, TestSize.Level1)
 HWTEST_F(AudioCaptureTest, AudioCaptureGetMuteWhenDevCtlHandleIsNull, TestSize.Level1)
 {
     AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     hwCapture->devCtlHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     bool mute = false;
@@ -622,10 +623,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetMuteWhenDevCtlHandleIsNull, TestSize.L
 HWTEST_F(AudioCaptureTest, AudioCaptureGetMuteWhenDevCtlHandleIsError, TestSize.Level1)
 {
     AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devCtlHandle = (struct DevHandleCapture *)service;
+    hwCapture->devCtlHandle = (struct DevHandle *)service;
     AudioHandle handle = (AudioHandle)hwCapture;
     bool mute = false;
 #ifdef ALSA_LIB_MODE
@@ -653,7 +654,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetVolumeWhenHandleIsNull, TestSize.Level
 HWTEST_F(AudioCaptureTest, AudioCaptureSetVolumeWhenDevCtlHandleIsNull, TestSize.Level1)
 {
     AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     hwCapture->devCtlHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     float volume = 0;
@@ -680,10 +681,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetVolumeWhenHandleIsError, TestSize.Leve
 HWTEST_F(AudioCaptureTest, AudioCaptureSetVolumeWhenDevCtlHandleIsError, TestSize.Level1)
 {
     AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devCtlHandle = (struct DevHandleCapture *)service;
+    hwCapture->devCtlHandle = (struct DevHandle *)service;
     AudioHandle handle = (AudioHandle)hwCapture;
     float volume = 0;
 #ifdef ALSA_LIB_MODE
@@ -718,7 +719,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetVolumeWhenVolumeIsNull, TestSize.Level
 HWTEST_F(AudioCaptureTest, AudioCaptureGetVolumeWhenDevCtlHandleIsNull, TestSize.Level1)
 {
     AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     hwCapture->devCtlHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     float volume = 0;
@@ -729,10 +730,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetVolumeWhenDevCtlHandleIsNull, TestSize
 HWTEST_F(AudioCaptureTest, AudioCaptureGetVolumeWhenDevCtlHandleIsError, TestSize.Level1)
 {
     AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devCtlHandle = (struct DevHandleCapture *)service;
+    hwCapture->devCtlHandle = (struct DevHandle *)service;
     AudioHandle handle = (AudioHandle)hwCapture;
     float volume = 0;
 #ifdef ALSA_LIB_MODE
@@ -784,7 +785,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetGainThresholdWhenMaxIsNull, TestSize.L
 HWTEST_F(AudioCaptureTest, AudioCaptureGetGainThresholdWhenDevCtlHandleIsNull, TestSize.Level1)
 {
     AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     hwCapture->devCtlHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     float min = GAIN_MIN;
@@ -796,10 +797,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetGainThresholdWhenDevCtlHandleIsNull, T
 HWTEST_F(AudioCaptureTest, AudioCaptureGetGainThresholdWhenDevCtlHandleIsError, TestSize.Level1)
 {
     AudioHwCapture *hwCapture = (AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devCtlHandle = (struct DevHandleCapture *)service;
+    hwCapture->devCtlHandle = (struct DevHandle *)service;
     AudioHandle handle = (AudioHandle)hwCapture;
     float min = GAIN_MIN;
     float max = GAIN_MAX;
@@ -834,7 +835,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetGainWhenGainIsNull, TestSize.Level1)
 HWTEST_F(AudioCaptureTest, AudioCaptureGetGainWhenDevCtlHandleIsNull, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     hwCapture->devCtlHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     float gain = 0;
@@ -845,10 +846,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetGainWhenDevCtlHandleIsNull, TestSize.L
 HWTEST_F(AudioCaptureTest, AudioCaptureGetGainWhenDevCtlHandleIsError, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devCtlHandle = reinterpret_cast<struct DevHandleCapture *>(service);
+    hwCapture->devCtlHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioHandle handle = (AudioHandle)hwCapture;
     float gain = 0;
 #ifdef ALSA_LIB_MODE
@@ -882,7 +883,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetGainWhenGainIsLessThanZero, TestSize.L
 HWTEST_F(AudioCaptureTest, AudioCaptureSetGainWhenDevCtlHandleIsNull, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     hwCapture->devCtlHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     float gain = 0;
@@ -893,10 +894,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSetGainWhenDevCtlHandleIsNull, TestSize.L
 HWTEST_F(AudioCaptureTest, AudioCaptureSetGainWhenDevCtlHandleIsError, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devCtlHandle = hwCapture->devCtlHandle;
+    struct DevHandle *devCtlHandle = hwCapture->devCtlHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devCtlHandle = reinterpret_cast<struct DevHandleCapture *>(service);
+    hwCapture->devCtlHandle = reinterpret_cast<struct DevHandle *>(service);
     AudioHandle handle = (AudioHandle)hwCapture;
     float gain = 0;
 #ifdef ALSA_LIB_MODE
@@ -947,7 +948,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureCaptureFrameWhenDevDataHandleIsNull, Test
 {
     ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStart((AudioHandle)capture));
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     hwCapture->devDataHandle = nullptr;
     void *frame = (void *)calloc(1, FRAME_DATA);
     ASSERT_NE(nullptr, frame);
@@ -963,10 +964,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureCaptureFrameWhenDevDataHandleIsError, Tes
 {
     ASSERT_EQ(AUDIO_HAL_SUCCESS, AudioCaptureStart((AudioHandle)capture));
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devDataHandle = reinterpret_cast<struct DevHandleCapture *>(service);
+    hwCapture->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
     void *frame = (void *)calloc(1, FRAME_DATA);
     ASSERT_NE(nullptr, frame);
     uint64_t requestBytes = FRAME_DATA;
@@ -1128,7 +1129,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetMmapPositionWhenTimeIsNull, TestSize.L
 HWTEST_F(AudioCaptureTest, AudioCaptureGetMmapPositionWhenDevDataHandleIsNull, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     hwCapture->devDataHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     uint64_t frames = 0;
@@ -1141,10 +1142,10 @@ HWTEST_F(AudioCaptureTest, AudioCaptureGetMmapPositionWhenDevDataHandleIsError, 
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     AudioHandle handle = (AudioHandle)hwCapture;
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     struct HdfIoService *service = new HdfIoService;
     (void)memset_s(service, sizeof(struct HdfIoService), 0, sizeof(struct HdfIoService));
-    hwCapture->devDataHandle = reinterpret_cast<struct DevHandleCapture *>(service);
+    hwCapture->devDataHandle = reinterpret_cast<struct DevHandle *>(service);
     uint64_t frames = 0;
     struct AudioTimeStamp time;
 #ifdef ALSA_LIB_MODE
@@ -1185,7 +1186,7 @@ HWTEST_F(AudioCaptureTest, AudioCaptureReqMmapBufferWhenDescIsNull, TestSize.Lev
 HWTEST_F(AudioCaptureTest, AudioCaptureReqMmapBufferWhenDevDataHandleIsNull, TestSize.Level1)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    struct DevHandleCapture *devDataHandle = hwCapture->devDataHandle;
+    struct DevHandle *devDataHandle = hwCapture->devDataHandle;
     hwCapture->devDataHandle = nullptr;
     AudioHandle handle = (AudioHandle)hwCapture;
     int32_t reqSize = 0;

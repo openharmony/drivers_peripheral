@@ -22,20 +22,25 @@
 #include "adaptor_memory.h"
 
 #define MAX_DUPLICATE_CHECK 100
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
 
 // Resource pool list, which caches registered executor information.
-static LinkedList *g_poolList = NULL;
+IAM_STATIC LinkedList *g_poolList = NULL;
 
-static void DestroyExecutorInfo(void *data)
+IAM_STATIC void DestroyExecutorInfo(void *data)
 {
-    if (data  == NULL) {
+    if (data == NULL) {
         LOG_ERROR("data is null");
         return;
     }
     Free(data);
 }
 
-static bool IsExecutorIdMatchById(const void *data, const void *condition)
+IAM_STATIC bool IsExecutorIdMatchById(const void *data, const void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("input para is null");
@@ -46,7 +51,7 @@ static bool IsExecutorIdMatchById(const void *data, const void *condition)
     return (executorInfo->executorIndex == executorIndex);
 }
 
-static bool IsExecutorNodeMatch(const void *data, const void *condition)
+IAM_STATIC bool IsExecutorNodeMatch(const void *data, const void *condition)
 {
     if ((condition == NULL) || (data == NULL)) {
         LOG_ERROR("get null data");
@@ -59,7 +64,7 @@ static bool IsExecutorNodeMatch(const void *data, const void *condition)
         executorInfo->executorSensorHint == executorIndex->executorSensorHint);
 }
 
-static bool IsInit(void)
+IAM_STATIC bool IsInit(void)
 {
     return g_poolList != NULL;
 }
@@ -81,7 +86,7 @@ void DestroyResourcePool(void)
     g_poolList = NULL;
 }
 
-static bool IsExecutorValid(const ExecutorInfoHal *executorInfo)
+IAM_STATIC bool IsExecutorValid(const ExecutorInfoHal *executorInfo)
 {
     if (executorInfo == NULL) {
         LOG_ERROR("get null data");
@@ -90,7 +95,7 @@ static bool IsExecutorValid(const ExecutorInfoHal *executorInfo)
     return true;
 }
 
-static bool IsExecutorIdDuplicate(uint64_t executorIndex)
+IAM_STATIC bool IsExecutorIdDuplicate(uint64_t executorIndex)
 {
     LinkedListNode *temp = g_poolList->head;
     ExecutorInfoHal *executorInfo = NULL;
@@ -105,7 +110,7 @@ static bool IsExecutorIdDuplicate(uint64_t executorIndex)
     return false;
 }
 
-static ResultCode GenerateValidExecutorId(uint64_t *executorIndex)
+IAM_STATIC ResultCode GenerateValidExecutorId(uint64_t *executorIndex)
 {
     if (g_poolList == NULL) {
         LOG_ERROR("g_poolList is null");
@@ -128,7 +133,7 @@ static ResultCode GenerateValidExecutorId(uint64_t *executorIndex)
     return RESULT_GENERAL_ERROR;
 }
 
-static LinkedList *QueryRepeatExecutor(const ExecutorInfoHal *executorInfo)
+IAM_STATIC LinkedList *QueryRepeatExecutor(const ExecutorInfoHal *executorInfo)
 {
     ExecutorCondition condition = {};
     SetExecutorConditionAuthType(&condition, executorInfo->authType);
@@ -215,7 +220,7 @@ ExecutorInfoHal *CopyExecutorInfo(ExecutorInfoHal *src)
     return dest;
 }
 
-static bool IsExecutorMatch(const ExecutorCondition *condition, const ExecutorInfoHal *credentialInfo)
+IAM_STATIC bool IsExecutorMatch(const ExecutorCondition *condition, const ExecutorInfoHal *credentialInfo)
 {
     if ((condition->conditonFactor & EXECUTOR_CONDITION_INDEX) != 0 &&
         condition->executorIndex != credentialInfo->executorIndex) {

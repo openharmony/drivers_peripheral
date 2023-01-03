@@ -32,6 +32,7 @@ namespace HDI {
 namespace Bluetooth {
 namespace Hci {
 namespace V1_0 {
+constexpr size_t BT_VENDOR_INVALID_DATA_LEN = 0;
 bt_vendor_callbacks_t VendorInterface::vendorCallbacks_ = {
     .size = sizeof(bt_vendor_callbacks_t),
     .init_cb = VendorInterface::OnInitCallback,
@@ -134,6 +135,7 @@ bool VendorInterface::Initialize(
 void VendorInterface::CleanUp()
 {
     if (vendorInterface_ == nullptr) {
+        HDF_LOGE("VendorInterface::CleanUp, vendorInterface_ is nullptr.");
         return;
     }
 
@@ -153,6 +155,11 @@ void VendorInterface::CleanUp()
 
 size_t VendorInterface::SendPacket(Hci::HciPacketType type, const std::vector<uint8_t> &packet)
 {
+    if (vendorInterface_ == nullptr) {
+        HDF_LOGE("VendorInterface::SendPacket, vendorInterface_ is nullptr.");
+        return BT_VENDOR_INVALID_DATA_LEN;
+    }
+
     {
         std::lock_guard<std::mutex> lock(wakeupMutex_);
         activity_ = true;
@@ -223,7 +230,9 @@ void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
         buff->offset = 0;
         buff->layer_specific = 0;
         (void)memcpy_s(buff->data, buffSize - sizeof(HC_BT_HDR), data.data(), data.size());
-        vendorInterface_->op(bt_opcode_t::BT_OP_EVENT_CALLBACK, buff);
+        if (vendorInterface_ && vendorInterface_->op) {
+            vendorInterface_->op(bt_opcode_t::BT_OP_EVENT_CALLBACK, buff);
+        }
         delete[] buff;
     } else if (vendorSentOpcode_ != 0 && data[0] == Hci::HCI_EVENT_CODE_COMMAND_COMPLETE) {
         uint8_t opcodeOffset = hci_->GetPacketHeaderInfo(Hci::HCI_PACKET_TYPE_EVENT).headerSize + 1;
@@ -237,7 +246,9 @@ void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
             buff->layer_specific = 0;
             (void)memcpy_s(buff->data, buffSize - sizeof(HC_BT_HDR), data.data(), data.size());
             vendorSentOpcode_ = 0;
-            vendorInterface_->op(bt_opcode_t::BT_OP_EVENT_CALLBACK, buff);
+            if (vendorInterface_ && vendorInterface_->op) {
+                vendorInterface_->op(bt_opcode_t::BT_OP_EVENT_CALLBACK, buff);
+            }
             delete[] buff;
         }
     }
@@ -248,7 +259,7 @@ void VendorInterface::OnEventReceived(const std::vector<uint8_t> &data)
 void VendorInterface::WatcherTimeout()
 {
     std::lock_guard<std::mutex> lock(wakeupMutex_);
-    if (!activity_ && wakeupLock_) {
+    if (!activity_ && wakeupLock_ && vendorInterface_ && vendorInterface_->op) {
         vendorInterface_->op(bt_opcode_t::BT_OP_WAKEUP_UNLOCK, nullptr);
         wakeupLock_ = false;
     }

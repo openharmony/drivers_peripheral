@@ -56,6 +56,7 @@ StreamBase::~StreamBase()
 
 RetCode StreamBase::ConfigStream(StreamConfiguration& config)
 {
+    std::unique_lock<std::mutex> l(smLock_);
     if (state_ != STREAM_STATE_IDLE) {
         return RC_ERROR;
     }
@@ -74,6 +75,7 @@ RetCode StreamBase::ConfigStream(StreamConfiguration& config)
 
 RetCode StreamBase::CommitStream()
 {
+    std::unique_lock<std::mutex> l(smLock_);
     if (state_ != STREAM_STATE_IDLE) {
         return RC_ERROR;
     }
@@ -138,6 +140,7 @@ RetCode StreamBase::StartStream()
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
 
+    std::unique_lock<std::mutex> l(smLock_);
     if (state_ != STREAM_STATE_ACTIVE) {
         return RC_ERROR;
     }
@@ -179,6 +182,7 @@ RetCode StreamBase::StartStream()
 RetCode StreamBase::StopStream()
 {
     CHECK_IF_PTR_NULL_RETURN_VALUE(pipeline_, RC_ERROR);
+    std::unique_lock<std::mutex> l(smLock_);
     if (state_ == STREAM_STATE_IDLE) {
         CAMERA_LOGI("stream [id:%{public}d], no need to stop", streamId_);
         return RC_OK;
@@ -191,6 +195,7 @@ RetCode StreamBase::StopStream()
     cv_.notify_one();
     if (handler_ != nullptr) {
         handler_->join();
+        handler_ = nullptr;
     }
 
     if (!waitingList_.empty()) {
@@ -527,6 +532,7 @@ uint64_t StreamBase::GetFrameCount() const
 
 RetCode StreamBase::AttachStreamTunnel(std::shared_ptr<StreamTunnel>& tunnel)
 {
+    std::unique_lock<std::mutex> l(smLock_);
     if (state_ == STREAM_STATE_BUSY || state_ == STREAM_STATE_OFFLINE) {
         return RC_ERROR;
     }
@@ -544,6 +550,7 @@ RetCode StreamBase::AttachStreamTunnel(std::shared_ptr<StreamTunnel>& tunnel)
 
 RetCode StreamBase::DetachStreamTunnel()
 {
+    std::unique_lock<std::mutex> l(smLock_);
     if (state_ == STREAM_STATE_BUSY || state_ == STREAM_STATE_OFFLINE) {
         return RC_ERROR;
     }

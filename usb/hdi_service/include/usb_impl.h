@@ -15,6 +15,7 @@
 
 #ifndef OHOS_HDI_USB_V1_0_USBIMPL_H
 #define OHOS_HDI_USB_V1_0_USBIMPL_H
+
 #include "hdf_slist.h"
 #include "iproxy_broker.h"
 #include "iremote_object.h"
@@ -37,10 +38,9 @@ public:
     HdfSList devList_;
     UsbSession *session_;
     HdfDeviceObject *device_;
-    static sptr<IUsbdSubscriber> subscriber_;
 
     UsbImpl();
-    virtual ~UsbImpl();
+    ~UsbImpl() override;
     int32_t OpenDevice(const UsbDev &dev) override;
     int32_t CloseDevice(const UsbDev &dev) override;
     int32_t GetDeviceDescriptor(const UsbDev &dev, std::vector<uint8_t> &decriptor) override;
@@ -129,20 +129,23 @@ private:
     int32_t HdfReadDevice(int32_t *count, int32_t *size, HdfSBuf *reply);
     int32_t UsbdReleaseDevices();
 
-    static int32_t UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbImpl *super, uint32_t id);
+    static int32_t UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *usbdSubscriber, uint32_t id);
     static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data);
     static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
     class UsbDeathRecipient : public IRemoteObject::DeathRecipient {
     public:
-        explicit UsbDeathRecipient() {};
+        explicit UsbDeathRecipient(const sptr<IUsbdSubscriber> &deathSubscriber) : deathSubscriber_(deathSubscriber) {};
         ~UsbDeathRecipient() override {};
         void OnRemoteDied(const wptr<IRemoteObject> &object) override;
+
+    private:
+        sptr<IUsbdSubscriber> deathSubscriber_;
     };
 
 private:
-    static HdfDevEventlistener usbPnpListener_;
     static HdfDevEventlistener listenerForLoadService_;
-    static sptr<UsbImpl::UsbDeathRecipient> deathRecipient_;
+    static UsbdSubscriber subscribers_[MAX_SUBSCRIBER];
+    static bool isGadgetConnected_;
 };
 } // namespace V1_0
 } // namespace Usb

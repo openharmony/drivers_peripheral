@@ -25,7 +25,13 @@
 
 #define TOKEN_VALIDITY_PERIOD (10 * 60 * 1000)
 
-static bool IsTimeValid(const UserAuthTokenHal *userAuthToken)
+#ifdef IAM_TEST_ENABLE
+#define IAM_STATIC
+#else
+#define IAM_STATIC static
+#endif
+
+IAM_STATIC bool IsTimeValid(const UserAuthTokenHal *userAuthToken)
 {
     uint64_t currentTime = GetSystemTime();
     if (currentTime < userAuthToken->time) {

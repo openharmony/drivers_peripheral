@@ -29,6 +29,8 @@ int32_t AudioPnpStatusSend(const char *serverName,
 int32_t AudioPnpUpdateInfo(const char *statusInfo);
 int32_t AudioPnpUpdateInfoOnly(struct AudioEvent audioEvent);
 int32_t AudioPnpUpdateAndSend(struct AudioEvent audioEvent);
+int32_t AudioUhdfUnloadDriver(const char *driverName);
+int32_t AudioUhdfLoadDriver(const char *driverName);
 
 #ifdef __cplusplus
 }

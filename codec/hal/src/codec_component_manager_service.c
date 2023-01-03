@@ -99,6 +99,15 @@ static int32_t OmxManagerCreateComponent(struct CodecComponentType **component, 
         OsalMemFree(node);
         return HDF_ERR_INVALID_PARAM;
     }
+#ifdef SUPPORT_ROLE
+    err = OmxAdapterSetComponentRole(codecNode, compName);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s, OMXAdapterSetComponentRole err [%{public}x]", __func__, err);
+        CodecComponentTypeServiceRelease(comp);
+        OsalMemFree(node);
+        return HDF_ERR_INVALID_PARAM;
+    }
+#endif
     *component = comp;
     pthread_mutex_lock(&g_service->listMute);
     *componentId = GetNextComponentId();
