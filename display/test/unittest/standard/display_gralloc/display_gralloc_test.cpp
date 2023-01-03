@@ -21,7 +21,7 @@
 
 namespace {
 #define ALIGN_UP(x, a) ((((x) + ((a)-1)) / (a)) * (a))
-#define WIDTH_ALIGN 8U
+#define HEIGHT_ALIGN 2U
 
 const AllocTestPrms GRALLOC_TEST_SETS[] = {
     // num0
@@ -43,8 +43,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBX_8888
             },
-        .expectStride = 4352,
-        .expectSize = 8355840
+        .expectStride = 1088 * 4,
+        .expectSize = 1920 * 1088 * 4
     },
     // num2
     {
@@ -65,8 +65,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBA_8888
             },
-        .expectStride = 4352,
-        .expectSize = 8355840
+        .expectStride = 1088 * 4,
+        .expectSize = 1920 * 1088 * 4
     },
     // num4
     {
@@ -76,8 +76,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGB_888
         },
-        .expectStride = 3264,
-        .expectSize = 6266880
+        .expectStride = 1088 * 3,
+        .expectSize =  1920 * 1088 * 3
     },
     // num5
     {
@@ -87,8 +87,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRA_8888
             },
-        .expectStride = 4352,
-        .expectSize = 8355840
+        .expectStride = 1088 * 4,
+        .expectSize = 1920 * 1088 * 4
     },
     // num6
     {
@@ -98,8 +98,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRX_8888
         },
-        .expectStride = 4352,
-        .expectSize = 8355840
+        .expectStride = 1088 * 4,
+        .expectSize = 1920 * 1088 * 4
     },
     // num7
     {
@@ -109,8 +109,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBA_4444
         },
-        .expectStride = 2176,
-        .expectSize = 4177920
+        .expectStride = 1088 * 2,
+        .expectSize = 1920 * 1088 * 2
     },
     // num8
     {
@@ -121,8 +121,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBX_4444
         },
-        .expectStride = 2176,
-        .expectSize = 4177920
+        .expectStride = 1088 * 2,
+        .expectSize = 1920 * 1088 * 2
     },
     // num9
     {
@@ -132,8 +132,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRA_4444
         },
-        .expectStride = 2176,
-        .expectSize = 4177920
+        .expectStride = 1088 * 2,
+        .expectSize = 1920 * 1088 * 2
     },
     // num10
     {
@@ -143,8 +143,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRX_4444
         },
-        .expectStride = 2176,
-        .expectSize = 4177920
+        .expectStride = 1088 * 2,
+        .expectSize = 1920 * 1088 * 2
     },
     // num11
     {
@@ -154,8 +154,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGR_565
         },
-        .expectStride = 2176,
-        .expectSize = 4177920
+        .expectStride = 1088 * 2,
+        .expectSize = 1920 * 1088 * 2
     },
     // num12
     {
@@ -165,8 +165,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRA_5551
         },
-        .expectStride = 2176,
-        .expectSize = 4177920
+        .expectStride = 1088 * 2,
+        .expectSize = 1920 * 1088 * 2
     },
     // num13
     {
@@ -176,8 +176,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRX_5551
         },
-        .expectStride = 2176,
-        .expectSize = 4177920
+        .expectStride = 1088 * 2,
+        .expectSize = 1920 * 1088 * 2
     },
     // num14
     {
@@ -187,8 +187,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCBCR_420_SP
         },
-        .expectStride = 1664,
-        .expectSize = 3194880,
+        .expectStride = 1088,
+        .expectSize = 1920 * 1088 * 3 / 2,
     },
     // num15
     {
@@ -198,8 +198,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCRCB_420_SP
         },
-        .expectStride = 1664,
-        .expectSize = 3194880,
+        .expectStride = 1088,
+        .expectSize = 1920 * 1088 * 3 / 2,
     },
     // num16
     {
@@ -209,8 +209,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCBCR_420_P
         },
-        .expectStride = 1664,
-        .expectSize = 3194880
+        .expectStride = 1088,
+        .expectSize = 1920 * 1088 * 3 / 2
     },
     // num17
     {
@@ -220,8 +220,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_YCRCB_420_P
         },
-        .expectStride = 1664,
-        .expectSize = 3194880
+        .expectStride = 1088,
+        .expectSize = 1920 * 1088 * 3 / 2
     },
     // num18
     {
@@ -231,8 +231,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA,
             .format = PIXEL_FMT_RGBX_8888
         },
-        .expectStride = 4352,
-        .expectSize = 8355840
+        .expectStride = 1088 * 4,
+        .expectSize = 1920 * 1088 * 4
     },
     // num19
     {
@@ -242,8 +242,8 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ,
             .format = PIXEL_FMT_RGBX_8888
         },
-        .expectStride = 4352, // expectStride
-        .expectSize = 8355840 // expectSize
+        .expectStride = 1088 * 4,
+        .expectSize = 1920 * 1088 * 4
     },
     // num20
     {
@@ -253,14 +253,14 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBX_8888
         },
-        .expectStride = 4352, // expectStride
-        .expectSize = 8355840 // expectSize
+        .expectStride = 1088 * 4,
+        .expectSize = 1920 * 1088 * 4
     },
 };
 
 static bool CheckBufferHandle(AllocTestPrms &info, BufferHandle &buffer)
 {
-    if (buffer.stride != (ALIGN_UP(info.expectStride, WIDTH_ALIGN))) {
+    if (buffer.stride != (ALIGN_UP(info.expectStride, HEIGHT_ALIGN))) {
         DISPLAY_TEST_LOGE("stride check failed stride %d, expect stride %d ", buffer.stride, info.expectStride);
         DISPLAY_TEST_LOGE("stride check failed format %d width %d, height %d ", info.allocInfo.format,
             info.allocInfo.width, info.allocInfo.height);
@@ -370,5 +370,5 @@ TEST_P(GrallocAllocTest, GrallocAlloc)
     ASSERT_TRUE(ret == DISPLAY_SUCCESS);
 }
 
-INSTANTIATE_TEST_CASE_P(AllocTest, GrallocAllocTest, ::testing::ValuesIn(GRALLOC_TEST_SETS));
+INSTANTIATE_TEST_SUITE_P(AllocTest, GrallocAllocTest, ::testing::ValuesIn(GRALLOC_TEST_SETS));
 }
