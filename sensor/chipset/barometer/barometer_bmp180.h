@@ -14,7 +14,7 @@
 
 #define BMP180_REG_CHIP_ID         0xD0
 
-// i2c slave address
+// i2c address
 
 #define BMP180_ADDR                0x77
 
