@@ -125,6 +125,8 @@ private:
     bool IsCaptureInfoInvalid(const CaptureInfo &info);
 
     int32_t DoCapture(int32_t captureId, const CaptureInfo &info, bool isStreaming);
+    void InsertNotifyCaptureMap(int32_t captureId);
+    void EraseNotifyCaptureMap(int32_t captureId);
 
 private:
     constexpr static uint32_t JSON_ARRAY_MAX_SIZE = 1000;
@@ -152,6 +154,7 @@ private:
     std::mutex isCapturingLock_;
     OperationMode currentOperMode_ = OperationMode::NORMAL;
     std::shared_ptr<OHOS::Camera::CameraMetadata> latestStreamSetting_;
+    std::map<int, bool> notifyCaptureStartedMap_;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
