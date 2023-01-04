@@ -16,6 +16,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "audio_proxy_common_fun_test.h"
+#include "osal_mem.h"
 
 using namespace commonfun;
 using namespace testing::ext;
@@ -39,7 +40,7 @@ void AudioProxyCaptureTest::SetUp()
     managerFuncs = GetAudioManagerFuncs();
     ASSERT_NE(managerFuncs, nullptr);
     int32_t size = 0;
-    ASSERT_EQ(HDF_SUCCESS,  managerFuncs->GetAllAdapters(managerFuncs, &descs, &size));
+    ASSERT_EQ(HDF_SUCCESS, GetAdapters(managerFuncs, &descs, size));
 
     desc = &descs[0];
     ASSERT_EQ(HDF_SUCCESS, managerFuncs->LoadAdapter(managerFuncs, desc, &adapter));

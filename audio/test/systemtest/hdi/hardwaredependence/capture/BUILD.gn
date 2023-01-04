@@ -33,11 +33,15 @@ if (defined(ohos_lite)) {
       "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
       "//drivers/hdf_core/adapter/uhdf2/include/hdi",
       "//drivers/hdf_core/framework/include/utils",
+      "//drivers/hdf_core/framework/include/osal",
       "//drivers/hdf_core/framework/include/core",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
     deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    if (!drivers_peripheral_audio_rich_device) {
+      defines = [ "FEATURE_SMALL_DEVICE" ]
+    }
   }
 } else {
   module_output_path = "drivers_peripheral_audio/audio"
@@ -53,6 +57,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
+      "//drivers/hdf_core/framework/include/osal",
     ]
     deps = [
       "//third_party/googletest:gmock_main",

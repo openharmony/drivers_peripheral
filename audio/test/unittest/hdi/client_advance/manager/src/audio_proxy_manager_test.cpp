@@ -17,6 +17,7 @@
 #include <gtest/gtest.h>
 #include "hdf_dlist.h"
 #include "audio_proxy_common_fun_test.h"
+#include "osal_mem.h"
 
 using namespace std;
 using namespace commonfun;
@@ -26,7 +27,6 @@ class AudioProxyManagerTest : public testing::Test {
 public:
     uint32_t audioCheck = 0xAAAAAAAA;
     struct AudioManager *manager = nullptr;
-    struct AudioManager *(*getAudioManager)(void) = NULL;
     struct AudioAdapterDescriptor *descs = nullptr;
     struct AudioAdapterDescriptor *desc = nullptr;
     struct AudioAdapter *adapter = nullptr;
@@ -37,14 +37,11 @@ public:
 
 void AudioProxyManagerTest::SetUp()
 {
-    clientHandle = GetDynamicLibHandle(RESOLVED_PATH);
-    ASSERT_NE(clientHandle, nullptr);
-    getAudioManager = (struct AudioManager *(*)())(dlsym(clientHandle, FUNCTION_NAME.c_str()));
-    ASSERT_NE(getAudioManager, nullptr);
-    manager = getAudioManager();
+    manager = GetAudioManagerFuncs();
     ASSERT_NE(manager, nullptr);
     int32_t size = 0;
-    ASSERT_EQ(HDF_SUCCESS, manager->GetAllAdapters(manager, &descs, &size));
+    ASSERT_EQ(HDF_SUCCESS, GetAdapters(manager, &descs, size));
+    
     desc = &descs[0];
     ASSERT_EQ(HDF_SUCCESS, manager->LoadAdapter(manager, desc, &adapter));
 }
