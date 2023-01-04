@@ -42,6 +42,7 @@ ohos_unittest("hdf_audio_proxy_capture_advance_test") {
   ]
   external_deps = [
     "c_utils:utils",
+    "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
   ]
 }

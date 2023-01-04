@@ -35,6 +35,11 @@
 
 #include "audio_hdi_common.h"
 
+#ifdef FEATURE_SMALL_DEVICE
+#else
+    #include "osal_mem.h"
+#endif
+
 #define SREREO_CHANNEL 2
 #define MONO_CHANNEL   1
 #define AUDIO_CHANNELCOUNT 2
@@ -253,17 +258,40 @@ int32_t WavHeadAnalysis(struct AudioHeadInfo &wavHeadInfo, FILE *file, struct Au
 }
 int32_t GetAdapters(TestAudioManager *manager, struct AudioAdapterDescriptor **descs, int &size)
 {
-    int32_t ret = -1;
     if (descs == nullptr) {
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = manager->GetAllAdapters(manager, descs, &size);
+#ifdef FEATURE_SMALL_DEVICE
+    int32_t ret = manager->GetAllAdapters(manager, descs, &size);
     if (ret < 0) {
         return ret;
     }
     if (*descs == nullptr) {
         return HDF_FAILURE;
     }
+#else
+    size = 1;
+    uint32_t portNum = 2;
+    struct AudioPort *ports = (struct AudioPort*)OsalMemCalloc(sizeof(struct AudioPort) * (portNum));
+    ports[0] = {
+        .dir = PORT_OUT,
+        .portId = 0,
+    };
+    ports[1] = {
+        .dir = PORT_IN,
+        .portId = 11,
+    };
+    *descs = (struct AudioAdapterDescriptor*)OsalMemCalloc(sizeof(struct AudioAdapterDescriptor) * (size));
+    if (*descs == nullptr) {
+        return HDF_FAILURE;
+    }
+
+    **descs = {
+        .adapterName = "primary",
+        .portNum = portNum,
+        .ports = ports,
+    };
+#endif
     return HDF_SUCCESS;
 }
 
