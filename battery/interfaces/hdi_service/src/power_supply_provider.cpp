@@ -211,15 +211,9 @@ void PowerSupplyProvider::FormatPath(std::string& path,
     BATTERY_HILOGD(FEATURE_BATT_INFO, "path is %{private}s", path.c_str());
 }
 
-void PowerSupplyProvider::FormatSysfsPaths(struct PowerSupplySysfsInfo *info)
+void PowerSupplyProvider::FormatSysfsPaths()
 {
     // Format paths for power supply types
-    FormatPath(info->typePath, PATH_MAX, "%s/%s/type", path_.c_str(), nodeNamePathMap_["type"].c_str());
-    FormatPath(info->onlinePath, PATH_MAX, "%s/%s/online", path_.c_str(), nodeNamePathMap_["online"].c_str());
-    FormatPath(info->currentMaxPath, PATH_MAX, "%s/%s/current_max", path_.c_str(),
-               nodeNamePathMap_["current_max"].c_str());
-    FormatPath(info->voltageMaxPath, PATH_MAX, "%s/%s/voltage_max", path_.c_str(),
-               nodeNamePathMap_["voltage_max"].c_str());
     FormatPath(batterySysfsInfo_.capacityPath, PATH_MAX, "%s/%s/capacity", path_.c_str(),
                nodeNamePathMap_["capacity"].c_str());
     FormatPath(batterySysfsInfo_.voltagePath, PATH_MAX, "%s/%s/voltage_now", path_.c_str(),
@@ -556,10 +550,9 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs()
             index_++;
         }
     }
-    struct PowerSupplySysfsInfo sysfsInfo = {};
     nodeNamePathMap_.clear();
     TraversalNode();
-    FormatSysfsPaths(&sysfsInfo);
+    FormatSysfsPaths();
     BATTERY_HILOGD(FEATURE_BATT_INFO, "init power supply sysfs nodes, total count %{public}d", index_);
     closedir(dir);
 

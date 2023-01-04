@@ -86,14 +86,6 @@ public:
         std::string& currentPath, std::string& voltagePath);
 
 private:
-    struct PowerSupplySysfsInfo {
-        char* name;
-        std::string typePath;
-        std::string onlinePath;
-        std::string currentMaxPath;
-        std::string voltageMaxPath;
-    } powerSupplySysfsInfos_;
-
     struct BatterySysfsInfo {
         char* name;
         std::string capacityPath;
@@ -130,7 +122,7 @@ private:
     void TraversalNode();
     void CheckSubfolderNode(const std::string& path);
     void FormatPath(std::string& path, size_t size, const char* format, const char* basePath, const char* name) const;
-    void FormatSysfsPaths(struct PowerSupplySysfsInfo* info);
+    void FormatSysfsPaths();
     int32_t ReadSysfsFile(const char* path, char* buf, size_t size) const;
     int32_t ReadBatterySysfsToBuff(const char* path, char* buf, size_t size) const;
     void GetPluggedTypeName(char* buf, size_t size) const;
