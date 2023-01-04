@@ -459,7 +459,7 @@ RetCode OhosCameraDemo::CaptureOnDualStreams(const int streamIdSecond)
     CaptureInfo secondCaptureInfo;
     secondCaptureInfo.streamIds_ = {streamIdSecond};
     secondCaptureInfo.captureSetting_ = cameraAbility_;
-    previewCaptureInfo.enableShutterCallback_ = false;
+    secondCaptureInfo.enableShutterCallback_ = false;
 
     if (streamIdSecond == STREAM_ID_CAPTURE) {
         rc = streamOperator_->Capture(CAPTURE_ID_CAPTURE, secondCaptureInfo, true);
