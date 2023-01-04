@@ -354,6 +354,7 @@ int32_t DStreamOperator::Capture(int32_t captureId, const CaptureInfo &info, boo
 int32_t DStreamOperator::DoCapture(int32_t captureId, const CaptureInfo &info, bool isStreaming)
 {
     for (const auto &id : info.streamIds_) {
+        InsertNotifyCaptureMap(id);
         auto stream = FindHalStreamById(id);
         if (stream == nullptr) {
             DHLOGE("Invalid stream id %d", id);
@@ -437,6 +438,7 @@ int32_t DStreamOperator::CancelCapture(int32_t captureId)
         tmp.streamId_ = id;
         info.push_back(tmp);
         EraseStreamCaptureBufferNum(std::make_pair(captureId, id));
+        EraseNotifyCaptureMap(id);
     }
     if (dcStreamOperatorCallback_) {
         dcStreamOperatorCallback_->OnCaptureEnded(captureId, info);
@@ -676,10 +678,14 @@ DCamRetCode DStreamOperator::ShutterBuffer(int streamId, const DCameraBuffer &bu
         return DCamRetCode::INVALID_ARGUMENT;
     }
 
-    if (buffer.index_ == 0 && dcStreamOperatorCallback_ != nullptr) {
-        vector<int> tmpStreamIds;
-        tmpStreamIds.push_back(streamId);
-        dcStreamOperatorCallback_->OnCaptureStarted(captureId, tmpStreamIds);
+    auto iter = notifyCaptureStartedMap_.find(streamId);
+    if (iter != notifyCaptureStartedMap_.end()) {
+        if (!iter->second && dcStreamOperatorCallback_ != nullptr) {
+            vector<int> tmpStreamIds;
+            tmpStreamIds.push_back(streamId);
+            dcStreamOperatorCallback_->OnCaptureStarted(captureId, tmpStreamIds);
+            iter->second = true;
+        }
     }
 
     auto stream = FindHalStreamById(streamId);
@@ -766,6 +772,7 @@ void DStreamOperator::Release()
     enableShutterCbkMap_.clear();
     acceptedBufferNum_.clear();
     cachedDCaptureInfoList_.clear();
+    notifyCaptureStartedMap_.clear();
     dcStreamOperatorCallback_ = nullptr;
 }
 
@@ -1199,6 +1206,18 @@ void DStreamOperator::EraseStreamCaptureBufferNum(const pair<int, int>& streamPa
 {
     std::lock_guard<std::mutex> autoLock(streamAttrLock_);
     acceptedBufferNum_.erase(streamPair);
+}
+
+void DStreamOperator::InsertNotifyCaptureMap(int32_t streamId)
+{
+    std::lock_guard<std::mutex> autoLock(streamAttrLock_);
+    notifyCaptureStartedMap_.emplace(streamId, false);
+}
+
+void DStreamOperator::EraseNotifyCaptureMap(int32_t streamId)
+{
+    std::lock_guard<std::mutex> autoLock(streamAttrLock_);
+    notifyCaptureStartedMap_.erase(streamId);
 }
 } // namespace DistributedHardware
 } // namespace OHOS
