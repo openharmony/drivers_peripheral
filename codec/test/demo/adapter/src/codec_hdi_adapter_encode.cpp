@@ -108,7 +108,7 @@ void CodecHdiAdapterEncode::OnStatusChanged()
 bool CodecHdiAdapterEncode::ReadOneFrame(FILE *fp, char *buf, uint32_t &filledCount)
 {
     bool ret = false;
-    filledCount = fread(buf, 1, width_ * height_ * NUMERATOR / DENOMINATOR, fp);
+    filledCount = fread(buf, 1, (stride_ * height_ * NUMERATOR) / DENOMINATOR, fp);
     totalSrcSize_ += filledCount;
     if (totalSrcSize_ >= srcFileSize_) {
         ret = true;
