@@ -31,7 +31,6 @@ using namespace OHOS;
 namespace {
     constexpr int32_t FD_SIZE = sizeof(int);
     constexpr int32_t FRAME = (30 << 16);
-    constexpr int32_t HEIGHT_OPERATOR = 2;
     constexpr const char *DECODER_AVC = "rk.video_decoder.avc";
     constexpr const char *DECODER_HEVC = "rk.video_decoder.hevc";
     constexpr int32_t START_CODE_OFFSET_ONE = -1;
@@ -41,6 +40,8 @@ namespace {
     constexpr int32_t START_CODE_SIZE_SLICE = 3;
     constexpr int32_t START_CODE = 1;
     constexpr int32_t USLEEP_TIME = 10000;
+    constexpr int32_t FRAME_SIZE_OPERATOR = 2;
+    constexpr int32_t FRAME_SIZE_MULTI = 3;
 }
 
 #define HDF_LOG_TAG codec_omx_hdi_dec
@@ -92,31 +93,10 @@ void CodecHdiAdapterDecode::OnStatusChanged()
 
 void CodecHdiAdapterDecode::DumpOutputToFile(FILE *fp, uint8_t *addr)
 {
-    uint32_t width = width_;
-    uint32_t height = height_;
-    uint32_t horStride = width_;
-    uint32_t verStride = height_;
-    uint8_t *base = addr;
-    size_t ret = 0;
-
-    // MPP_FMT_YUV420SP
-    uint32_t i;
-    uint8_t *baseY = base;
-    uint8_t *baseC = base + horStride * verStride;
-
-    for (i = 0; i < height; i++, baseY += horStride) {
-        ret = fwrite(baseY, 1, width, fp);
-        if (ret != width) {
-            HDF_LOGE("%{public}s: first fwrite failed", __func__);
-            continue;
-        }
-    }
-    for (i = 0; i < height / HEIGHT_OPERATOR; i++, baseC += horStride) {
-        ret = fwrite(baseC, 1, width, fp);
-        if (ret != width) {
-            HDF_LOGE("%{public}s: second fwrite failed", __func__);
-            continue;
-        }
+    size_t bufferSize = (stride_ * height_ * FRAME_SIZE_MULTI) / FRAME_SIZE_OPERATOR;
+    size_t ret = fwrite(addr, 1, bufferSize, fp);
+    if (ret != bufferSize) {
+        HDF_LOGE("%{public}s: Dump frame failed, ret: %{public}d", __func__, ret);
     }
 }
 
