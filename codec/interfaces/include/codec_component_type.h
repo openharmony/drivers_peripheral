@@ -163,6 +163,7 @@ typedef struct {
                                               see {@link CodecCapsMask}. */
     RangeValue bitRate;                   /** Supported bit rate range. */
     PortCap port;                         /** Supported audio and video encoding/decoding capabilities. */
+    bool canSwapWidthHeight;              /** Whether width and height verification is supported. */
 } CodecCompCapability;
 
 /**

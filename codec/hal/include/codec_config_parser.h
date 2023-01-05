@@ -56,6 +56,7 @@
 #define CODEC_CONFIG_KEY_MAX_FRAME_RATE         "maxFrameRate"
 #define CODEC_CONFIG_KEY_BITE_RATE_MODE         "bitRateMode"
 #define CODEC_CONFIG_KEY_MESURED_FRAME_RATE     "measuredFrameRate"
+#define CODEC_CONFIG_KEY_CAN_SWAP_WIDTH_HEIGHT  "canSwapWidthHeight"
 
 #define CODEC_CONFIG_KEY_SAMPLE_FORMATS         "sampleFormats"
 #define CODEC_CONFIG_KEY_SAMPLE_RATE            "sampleRate"

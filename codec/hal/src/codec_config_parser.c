@@ -267,6 +267,7 @@ static int32_t GetOneCapability(const struct DeviceResourceIface *iface,
         return HDF_FAILURE;
     }
     cap->isSoftwareCodec = iface->GetBool(childNode, CODEC_CONFIG_KEY_IS_SOFTWARE_CODEC);
+    cap->canSwapWidthHeight = iface->GetBool(childNode, CODEC_CONFIG_KEY_CAN_SWAP_WIDTH_HEIGHT);
 
     if (GetMiscOfCapability(iface, childNode, cap) != HDF_SUCCESS) {
         cap->role = MEDIA_ROLETYPE_INVALID;
