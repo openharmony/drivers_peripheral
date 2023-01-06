@@ -25,7 +25,7 @@
 #include "light_type.h"
 #include "osal_mem.h"
 
-#define HDF_LOG_TAG           uhdf_light
+#define HDF_LOG_TAG           uhdf_light_service
 #define LIGHT_SERVICE_NAME    "hdf_light"
 
 #define MULTI_LIGHT_MAX_NUMBER    48

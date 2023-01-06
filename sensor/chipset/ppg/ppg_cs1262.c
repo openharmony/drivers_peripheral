@@ -13,7 +13,7 @@
 #include "osal_mem.h"
 #include "osal_time.h"
 
-#define HDF_LOG_TAG hdf_sensor_cs1262
+#define HDF_LOG_TAG khdf_sensor_ppg_driver
 
 static struct Cs1262DrvData *g_cs1262DrvData = NULL;
 

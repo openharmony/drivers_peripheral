@@ -20,9 +20,10 @@
 #include <iproxy_broker.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include "hitrace_meter.h"
 #include "callback_death_recipient.h"
 
-#define HDF_LOG_TAG uhdf_sensor
+#define HDF_LOG_TAG uhdf_sensor_service
 
 namespace OHOS {
 namespace HDI {
@@ -150,7 +151,9 @@ int32_t SensorImpl::GetAllSensorInfo(std::vector<HdfSensorInformation> &info)
     struct SensorInformation *tmp = nullptr;
     int32_t count = 0;
 
+    StartTrace(HITRACE_TAG_SENSORS, "GetAllSensorInfo");
     int32_t ret = sensorInterface->GetAllSensors(&sensorInfo, &count);
+    FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
         return ret;
@@ -194,7 +197,9 @@ int32_t SensorImpl::Enable(int32_t sensorId)
         return HDF_FAILURE;
     }
 
+    StartTrace(HITRACE_TAG_SENSORS, "Enable");
     int32_t ret = sensorInterface->Enable(sensorId);
+    FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
@@ -210,7 +215,9 @@ int32_t SensorImpl::Disable(int32_t sensorId)
         return HDF_FAILURE;
     }
 
+    StartTrace(HITRACE_TAG_SENSORS, "Disable");
     int32_t ret = sensorInterface->Disable(sensorId);
+    FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
@@ -227,7 +234,9 @@ int32_t SensorImpl::SetBatch(int32_t sensorId, int64_t samplingInterval, int64_t
         return HDF_FAILURE;
     }
 
+    StartTrace(HITRACE_TAG_SENSORS, "SetBatch");
     int32_t ret = sensorInterface->SetBatch(sensorId, samplingInterval, reportInterval);
+    FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
@@ -244,7 +253,9 @@ int32_t SensorImpl::SetMode(int32_t sensorId, int32_t mode)
         return HDF_FAILURE;
     }
 
+    StartTrace(HITRACE_TAG_SENSORS, "SetMode");
     int32_t ret = sensorInterface->SetMode(sensorId, mode);
+    FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s SetMode failed, error code is %{public}d", __func__, ret);
     }
@@ -261,7 +272,9 @@ int32_t SensorImpl::SetOption(int32_t sensorId, uint32_t option)
         return HDF_FAILURE;
     }
 
+    StartTrace(HITRACE_TAG_SENSORS, "SetOption");
     int32_t ret = sensorInterface->SetOption(sensorId, option);
+    FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
@@ -307,11 +320,13 @@ int32_t SensorImpl::Register(int32_t groupId, const sptr<ISensorCallback> &callb
         return HDF_FAILURE;
     }
     int32_t ret = HDF_FAILURE;
+    StartTrace(HITRACE_TAG_SENSORS, "Register");
     if (groupId == TRADITIONAL_SENSOR_TYPE) {
         ret = sensorInterface->Register(groupId, TradtionalSensorDataCallback);
     } else if (groupId == MEDICAL_SENSOR_TYPE) {
         ret = sensorInterface->Register(groupId, MedicalSensorDataCallback);
     }
+    FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         int32_t removeResult = RemoveSensorDeathRecipient(callbackObj);
         if (removeResult != SENSOR_SUCCESS) {
@@ -330,10 +345,13 @@ int32_t SensorImpl::Unregister(int32_t groupId, const sptr<ISensorCallback> &cal
     HDF_LOGI("%{public}s: Enter the Unregister function, groupId is %{public}d", __func__, groupId);
     std::lock_guard<std::mutex> lock(g_mutex);
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackObj);
+    StartTrace(HITRACE_TAG_SENSORS, "Unregister");
     int32_t ret = UnregisterImpl(groupId, remote.GetRefPtr());
+    FinishTrace(HITRACE_TAG_SENSORS);
     if (ret != SENSOR_SUCCESS) {
         HDF_LOGE("%{public}s: Unregister failed groupId[%{public}d]", __func__, groupId);
     }
+
     return ret;
 }
 

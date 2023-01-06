@@ -14,7 +14,7 @@
 #include "sensor_device_manager.h"
 #include "sensor_hall_driver.h"
 
-#define HDF_LOG_TAG    hdf_sensor_hall
+#define HDF_LOG_TAG    khdf_sensor_hall_driver
 
 static struct Ak8789DrvData *g_ak8789DrvData = NULL;
 
