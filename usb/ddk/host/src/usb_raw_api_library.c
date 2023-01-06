@@ -866,6 +866,28 @@ OUT:
     return ret;
 }
 
+int32_t RawClaimInterfaceForce(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber)
+{
+    struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
+
+    if (devHandle == NULL || interfaceNumber < 0 || interfaceNumber >= USB_MAXINTERFACES ||
+        osAdapterOps->claimInterface == NULL) {
+        HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (((devHandle->claimedInterfaces) & (1U << interfaceNumber)) != 0) {
+        return HDF_SUCCESS;
+    }
+
+    OsalMutexLock(&devHandle->lock);
+    int32_t ret = osAdapterOps->detachKernelDriverAndClaim(devHandle, interfaceNumber);
+    if (ret == HDF_SUCCESS) {
+        devHandle->claimedInterfaces |= 1U << interfaceNumber;
+    }
+    OsalMutexUnlock(&devHandle->lock);
+    return ret;
+}
+
 struct UsbHostRequest *AllocRequest(const struct UsbDeviceHandle *devHandle,  int32_t isoPackets, size_t length)
 {
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
