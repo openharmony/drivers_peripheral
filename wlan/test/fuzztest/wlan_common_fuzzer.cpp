@@ -16,6 +16,9 @@
 
 #define WLAN_FREQ_MAX_NUM 35
 #define ETH_ADDR_LEN 6
+#define BITS_NUM_24 24
+#define BITS_NUM_16 16
+#define BITS_NUM_8 8
 
 static uint32_t g_wlanTestSize = 0;
 
@@ -48,7 +51,7 @@ uint32_t Convert2Uint32(const uint8_t *ptr)
      * Move the 0th digit 24 to the left, the first digit 16 to the left, the second digit 8 to the left,
      * and the third digit no left
      */
-    return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
+    return (ptr[0] << BITS_NUM_24) | (ptr[1] << BITS_NUM_16) | (ptr[2] << BITS_NUM_8) | (ptr[3]);
 }
 
 void FuzzGetChipId(struct IWlanInterface *interface, const uint8_t *rawData)
