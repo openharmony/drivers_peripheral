@@ -16,9 +16,10 @@
 #include "light_interface_impl.h"
 #include <hdf_base.h>
 #include <hdf_log.h>
+#include "hitrace_meter.h"
 #include "light_if.h"
 
-#define HDF_LOG_TAG           uhdf_light
+#define HDF_LOG_TAG           uhdf_light_service
 
 namespace OHOS {
 namespace HDI {
@@ -40,7 +41,9 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
 
     struct LightInfo *lightInfo = nullptr;
     uint32_t count = 0;
+    StartTrace(HITRACE_TAG_MISC, "GetLightInfo");
     int32_t ret = lightInterface->GetLightInfo(&lightInfo, &count);
+    FinishTrace(HITRACE_TAG_MISC);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
         return ret;
@@ -55,6 +58,7 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
         info.push_back(hdfLightInfo);
         lightInfo++;
     }
+
     return HDF_SUCCESS;
 }
 
@@ -78,7 +82,9 @@ int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffect& e
     lightEffect.flashEffect.flashMode = effect.flashEffect.flashMode;
     lightEffect.flashEffect.onTime = effect.flashEffect.onTime;
     lightEffect.flashEffect.offTime = effect.flashEffect.offTime;
+    StartTrace(HITRACE_TAG_MISC, "TurnOnLight");
     int32_t ret = lightInterface->TurnOnLight(lightId, &lightEffect);
+    FinishTrace(HITRACE_TAG_MISC);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
@@ -108,7 +114,9 @@ int32_t LightInterfaceImpl::TurnOnMultiLights(int32_t lightId, const std::vector
         lightColor[i++].colorValue.wrgbColor.w = iter.colorValue.wrgbColor.w;
     }
 
+    StartTrace(HITRACE_TAG_MISC, "TurnOnMultiLights");
     int32_t ret = lightInterface->TurnOnMultiLights(lightId, lightColor, num);
+    FinishTrace(HITRACE_TAG_MISC);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
@@ -124,7 +132,9 @@ int32_t LightInterfaceImpl::TurnOffLight(int32_t lightId)
         HDF_LOGE("%{public}s: get light Module instance failed", __func__);
         return HDF_FAILURE;
     }
+    StartTrace(HITRACE_TAG_MISC, "TurnOffLight");
     int32_t ret = lightInterface->TurnOffLight(lightId);
+    FinishTrace(HITRACE_TAG_MISC);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }

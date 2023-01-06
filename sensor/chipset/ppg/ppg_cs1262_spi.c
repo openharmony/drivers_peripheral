@@ -9,7 +9,7 @@
 #include "ppg_cs1262_spi.h"
 #include "spi_if.h"
 
-#define HDF_LOG_TAG hdf_sensor_cs1262_spi
+#define HDF_LOG_TAG khdf_sensor_ppg_driver
 
 #define CS1262_HEAD_BUF_SINGLEREG_LEN 4
 #define CS1262_HEAD_BUF_FULL_LEN 6

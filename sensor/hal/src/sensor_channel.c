@@ -22,7 +22,7 @@
 #include "sensor_manager.h"
 #include "sensor_type.h"
 
-#define HDF_LOG_TAG    uhdf_sensor
+#define HDF_LOG_TAG    uhdf_sensor_service
 
 #define ACCEL_ACCURACY    ((HDI_SENSOR_GRAVITY) / (HDI_SENSOR_UNITS) / (HDI_SENSOR_UNITS))
 #define GYRO_ACCURACY     ((1 / (HDI_SENSOR_FLOAT_UNITS)) * ((HDI_SENSOR_PI) / (HDI_SENSOR_SEMICIRCLE)))

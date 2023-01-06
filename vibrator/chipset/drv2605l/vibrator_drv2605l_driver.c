@@ -19,7 +19,7 @@
 #include "vibrator_parser.h"
 #include "vibrator_driver_type.h"
 
-#define HDF_LOG_TAG    hdf_drv2605l_driver
+#define HDF_LOG_TAG    khdf_vibrator_driver
 
 struct Drv2605lDriverData *g_drv2605lDrvData = NULL;
 
