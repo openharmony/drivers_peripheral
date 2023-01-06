@@ -18,7 +18,7 @@
 #include <hdf_log.h>
 #include "vibrator_if.h"
 
-#define HDF_LOG_TAG              uhdf_vibrator
+#define HDF_LOG_TAG    uhdf_vibrator_service
 
 namespace OHOS {
 namespace HDI {

@@ -33,6 +33,7 @@ ohos_shared_library("libsensor_interface_service_1.0") {
       "c_utils:utils",
       "drivers_interface_sensor:sensor_idl_headers",
       "hdf_core:libhdf_utils",
+      "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
     ]

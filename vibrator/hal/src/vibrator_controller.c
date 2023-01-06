@@ -19,7 +19,7 @@
 #include "hdf_log.h"
 #include "osal_mem.h"
 
-#define HDF_LOG_TAG              uhdf_vibrator
+#define HDF_LOG_TAG    uhdf_vibrator_service
 #define EFFECT_SUN 64
 #define VIBRATOR_SERVICE_NAME    "hdf_misc_vibrator"
 

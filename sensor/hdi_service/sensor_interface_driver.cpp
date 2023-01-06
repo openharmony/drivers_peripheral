@@ -21,7 +21,7 @@
 #include "sensor_if.h"
 #include "v1_0/sensor_interface_stub.h"
 
-#define HDF_LOG_TAG    hdf_sensor_if_driver
+#define HDF_LOG_TAG    uhdf_sensor_service
 
 using namespace OHOS::HDI::Sensor::V1_0;
 
