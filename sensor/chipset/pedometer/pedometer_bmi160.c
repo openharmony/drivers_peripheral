@@ -14,7 +14,7 @@
 #include "sensor_device_manager.h"
 #include "sensor_pedometer_driver.h"
 
-#define HDF_LOG_TAG    hdf_sensor_pedometer
+#define HDF_LOG_TAG    khdf_sensor_pedometer_driver
 
 static struct Bmi160DrvData *g_bmi160DrvData = NULL;
 

@@ -14,7 +14,7 @@
 #include "sensor_config_controller.h"
 #include "sensor_device_manager.h"
 
-#define HDF_LOG_TAG    hdf_sensor_accel
+#define HDF_LOG_TAG    khdf_sensor_accel_driver
 #define MXC6655_RANGE    (16384 * 2)
 #define MXC6655_PRECISION    12
 #define MXC6655_BOUNDARY    (0x1 << (MXC6655_PRECISION - 1))

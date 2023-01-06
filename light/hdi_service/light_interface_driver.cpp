@@ -20,7 +20,7 @@
 #include <osal_mem.h>
 #include "v1_0/light_interface_stub.h"
 
-#define HDF_LOG_TAG           hdf_light_if_driver
+#define HDF_LOG_TAG           uhdf_light_service
 
 using namespace OHOS::HDI::Light::V1_0;
 
