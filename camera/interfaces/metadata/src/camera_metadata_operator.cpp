@@ -293,14 +293,14 @@ int AddCameraMetadataItem(common_metadata_header_t *dst, uint32_t item, const vo
     metadataItem->count = dataCount;
 
     if (dataBytes == 0) {
-        ret = memcpy_s(metadataItem->data.value, dataPayloadBytes, data, dataPayloadBytes);
+        ret = memcpy_s(metadataItem->data.value, METADATA_HEADER_DATA_SIZE, data, dataPayloadBytes);
         if (ret != EOK) {
             METADATA_ERR_LOG("AddCameraMetadataItem memory copy failed");
             return CAM_META_FAILURE;
         }
     } else {
         metadataItem->data.offset = dst->data_count;
-        ret = memcpy_s(GetMetadataData(dst) + metadataItem->data.offset, dataPayloadBytes, data,
+        ret = memcpy_s(GetMetadataData(dst) + metadataItem->data.offset, dst->data_capacity - dst->data_count, data,
             dataPayloadBytes);
         if (ret != EOK) {
             METADATA_ERR_LOG("AddCameraMetadataItem memory copy failed");
