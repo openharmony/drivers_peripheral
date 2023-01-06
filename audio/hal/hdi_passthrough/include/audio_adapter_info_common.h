@@ -78,6 +78,6 @@ int32_t BitsToFormat(enum AudioFormat *format, int32_t formatBits);
 int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExtraParams);
 int32_t AudioSetExtraParams(const char *keyValueList, int32_t *count,
     struct ExtraParams *mExtraParams, int32_t *sumOk);
-bool ReleaseAudioManagerObjectComm(struct AudioManager *object);
+bool ReleaseAudioManagerObjectComm(const struct AudioManager *object);
 void AudioAdapterReleaseDescs(const struct AudioAdapterDescriptor *descs, int32_t adapterNum);
 #endif

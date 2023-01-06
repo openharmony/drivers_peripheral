@@ -2202,7 +2202,7 @@ static int32_t HdiServiceAdapterSetExtraParams(const struct HdfDeviceIoClient *c
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
-    if (adapter == NULL || adapter->SetExtraParams == NULL) {
+    if (adapter->SetExtraParams == NULL) {
         AUDIO_FUNC_LOGE("adapter or SetExtraParams is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -2244,7 +2244,7 @@ static int32_t HdiServiceAdapterGetExtraParams(const struct HdfDeviceIoClient *c
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
-    if (adapter == NULL || adapter->GetExtraParams == NULL) {
+    if (adapter->GetExtraParams == NULL) {
         AUDIO_FUNC_LOGE("adapter or GetExtraParams is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }

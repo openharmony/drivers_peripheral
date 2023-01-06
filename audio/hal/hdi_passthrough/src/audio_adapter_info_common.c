@@ -231,7 +231,7 @@ int32_t AudioAdaptersForUser(struct AudioAdapterDescriptor **descs, int *size)
     return HDF_SUCCESS;
 }
 
-bool ReleaseAudioManagerObjectComm(struct AudioManager *object)
+bool ReleaseAudioManagerObjectComm(const struct AudioManager *object)
 {
     if (object == NULL) {
         AUDIO_FUNC_LOGE("param object is null!");
