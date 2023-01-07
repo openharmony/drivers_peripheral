@@ -124,7 +124,7 @@ static int32_t AudioHdmiOpenEventPoll(int32_t *sockFd, int *fdEpoll)
 
     *sockFd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
     if (*sockFd < 0) {
-        AUDIO_FUNC_LOGE("new socket failed");
+        AUDIO_FUNC_LOGE("new socket failed, %{public}d", errno);
         close(*fdEpoll);
         return HDF_FAILURE;
     }

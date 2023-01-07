@@ -91,14 +91,14 @@ static int32_t AudioPnpInputPollAndRead(void)
 
     ret = poll(g_fdSets, (nfds_t)n, -1);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("[poll] failed!");
+        AUDIO_FUNC_LOGE("[poll] failed, %{public}d", errno);
         return HDF_FAILURE;
     }
 
     for (i = 0; i < n; i++) {
         if ((uint32_t)g_fdSets[i].revents & POLLIN) {
             if (read(g_fdSets[i].fd, (void *)&evt, sizeof(evt)) < 0) {
-                AUDIO_FUNC_LOGE("[read] failed!");
+                AUDIO_FUNC_LOGE("[read] failed, %{public}d", errno);
                 return HDF_FAILURE;
             }
             AudioPnpInputCheck(evt);
