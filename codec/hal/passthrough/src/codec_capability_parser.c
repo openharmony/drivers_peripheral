@@ -20,7 +20,7 @@
 #include <securec.h>
 
 #define HDF_LOG_TAG codec_capability_parser
-#ifdef __ARM64__
+#ifdef __ARCH64__
 #define MASK_NUM_LIMIT 64
 #else
 #define MASK_NUM_LIMIT 32
