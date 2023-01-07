@@ -189,14 +189,14 @@ static int32_t DetectAnalogHeadsetState(struct AudioEvent *audioEvent)
     int8_t state = 0;
     FILE *fp = fopen(SWITCH_STATE_PATH, "r");
     if (fp == NULL) {
-        AUDIO_FUNC_LOGE("audio open switch state node fail");
+        AUDIO_FUNC_LOGE("audio open switch state node fail, %{public}d", errno);
         return HDF_ERR_INVALID_PARAM;
     }
 
     size_t ret = fread(&state, STATE_PATH_ITEM_SIZE, STATE_PATH_ITEM_SIZE, fp);
     if (ret == 0) {
         (void)fclose(fp);
-        AUDIO_FUNC_LOGE("audio read switch state node fail");
+        AUDIO_FUNC_LOGE("audio read switch state node fail, %{public}d", errno);
         return HDF_FAILURE;
     }
 
@@ -474,24 +474,24 @@ static int AudioPnpUeventOpen(int *fd)
 
     socketFd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
     if (socketFd < 0) {
-        AUDIO_FUNC_LOGE("socketFd failed! ret = %{public}d", socketFd);
+        AUDIO_FUNC_LOGE("socket failed, %{public}d", errno);
         return HDF_FAILURE;
     }
 
     if (setsockopt(socketFd, SOL_SOCKET, SO_RCVBUF, &buffSize, sizeof(buffSize)) != 0) {
-        AUDIO_FUNC_LOGE("setsockopt failed!");
+        AUDIO_FUNC_LOGE("setsockopt SO_RCVBUF failed, %{public}d", errno);
         close(socketFd);
         return HDF_FAILURE;
     }
 
     if (setsockopt(socketFd, SOL_SOCKET, SO_PASSCRED, &on, sizeof(on)) != 0) {
-        AUDIO_FUNC_LOGE("setsockopt failed!");
+        AUDIO_FUNC_LOGE("setsockopt SO_PASSCRED failed, %{public}d", errno);
         close(socketFd);
         return HDF_FAILURE;
     }
 
     if (bind(socketFd, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-        AUDIO_FUNC_LOGE("bind socketFd failed!");
+        AUDIO_FUNC_LOGE("bind socket failed, %{public}d", errno);
         close(socketFd);
         return HDF_FAILURE;
     }
