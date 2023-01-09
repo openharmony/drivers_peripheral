@@ -16,31 +16,27 @@
 #include "buffer_manager.h"
 #include <securec.h>
 
-template <class T>
-BufferManager<T>::BufferManager()
+BufferManager::BufferManager()
 {
     OsalMutexInit(&bufferQueueLock);
     OsalMutexInit(&usedBufferQueueLock);
 }
 
-template <class T>
-BufferManager<T>::~BufferManager()
+BufferManager::~BufferManager()
 {
     OsalMutexDestroy(&bufferQueueLock);
     OsalMutexDestroy(&usedBufferQueueLock);
 }
 
-template <class T>
-void BufferManager<T>::Stop()
+void BufferManager::Stop()
 {
     status = CODEC_STATUS_STOPPED;
 }
 
-template <class T>
-T* BufferManager<T>::GetBuffer(uint32_t timeoutMs, bool isChecking)
+CodecBuffer* BufferManager::GetBuffer(uint32_t timeoutMs, bool isChecking)
 {
     OsalMutexLock(&bufferQueueLock);
-    T *inputData = nullptr;
+    CodecBuffer *inputData = nullptr;
     inputData = PollBufferQueue(isChecking);
     if (inputData == nullptr) {
         if (timeoutMs == HDF_WAIT_FOREVER) {
@@ -60,11 +56,10 @@ T* BufferManager<T>::GetBuffer(uint32_t timeoutMs, bool isChecking)
     return inputData;
 }
 
-template <class T>
-T* BufferManager<T>::GetUsedBuffer(uint32_t timeoutMs, bool isChecking)
+CodecBuffer* BufferManager::GetUsedBuffer(uint32_t timeoutMs, bool isChecking)
 {
     OsalMutexLock(&usedBufferQueueLock);
-    T *outputData = nullptr;
+    CodecBuffer *outputData = nullptr;
     outputData = PollUsedBufferQueue(isChecking);
     if (outputData == nullptr) {
         if (timeoutMs == HDF_WAIT_FOREVER) {
@@ -84,8 +79,7 @@ T* BufferManager<T>::GetUsedBuffer(uint32_t timeoutMs, bool isChecking)
     return outputData;
 }
 
-template <class T>
-void BufferManager<T>::ConstructTimespec(struct timespec *time, uint32_t timeoutMs)
+void BufferManager::ConstructTimespec(struct timespec *time, uint32_t timeoutMs)
 {
     memset_s(time, sizeof(timespec), 0, sizeof(timespec));
     clock_gettime(CLOCK_REALTIME, time);
@@ -97,50 +91,45 @@ void BufferManager<T>::ConstructTimespec(struct timespec *time, uint32_t timeout
     }
 }
 
-template <class T>
-T* BufferManager<T>::PollBufferQueue(bool isChecking)
+CodecBuffer* BufferManager::PollBufferQueue(bool isChecking)
 {
-    T *info = nullptr;
+    CodecBuffer *buffer = nullptr;
     if (bufferQueue.size() == 0) {
         return nullptr;
     }
-    info = bufferQueue.front();
+    buffer = bufferQueue.front();
     if (!isChecking) {
         bufferQueue.pop();
     }
-    return info;
+    return buffer;
 }
 
-template <class T>
-T* BufferManager<T>::PollUsedBufferQueue(bool isChecking)
+CodecBuffer* BufferManager::PollUsedBufferQueue(bool isChecking)
 {
-    T *info = nullptr;
+    CodecBuffer *buffer = nullptr;
     if (usedBufferQueue.size() == 0) {
         return nullptr;
     }
-    info = usedBufferQueue.front();
+    buffer = usedBufferQueue.front();
     if (!isChecking) {
         usedBufferQueue.pop();
     }
-    return info;
+    return buffer;
 }
 
-template <class T>
-void BufferManager<T>::PutBuffer(T *info)
+void BufferManager::PutBuffer(CodecBuffer *buffer)
 {
     OsalMutexLock(&bufferQueueLock);
-    bufferQueue.push(info);
+    bufferQueue.push(buffer);
     pthread_cond_signal(&inputCond);
     OsalMutexUnlock(&bufferQueueLock);
 }
 
-template <class T>
-void BufferManager<T>::PutUsedBuffer(T *info)
+void BufferManager::PutUsedBuffer(CodecBuffer *buffer)
 {
     OsalMutexLock(&usedBufferQueueLock);
-    usedBufferQueue.push(info);
+    usedBufferQueue.push(buffer);
     pthread_cond_signal(&outputCond);
     OsalMutexUnlock(&usedBufferQueueLock);
 }
 
-template class BufferManager<CodecBuffer>;
