@@ -107,7 +107,7 @@ static void DumpOutputToFile(FILE *fp, uint8_t *addr, uint32_t len)
 {
     size_t ret = fwrite(addr, 1, len, fp);
     if (ret != len) {
-        HDF_LOGE("%{public}s: Dump packet failed, ret: %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: Dump packet failed, ret: %{public}zu", __func__, ret);
     }
 }
 
