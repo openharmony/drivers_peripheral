@@ -96,7 +96,7 @@ void CodecHdiAdapterDecode::DumpOutputToFile(FILE *fp, uint8_t *addr)
     size_t bufferSize = (stride_ * height_ * FRAME_SIZE_MULTI) / FRAME_SIZE_OPERATOR;
     size_t ret = fwrite(addr, 1, bufferSize, fp);
     if (ret != bufferSize) {
-        HDF_LOGE("%{public}s: Dump frame failed, ret: %{public}d", __func__, ret);
+        HDF_LOGE("%{public}s: Dump frame failed, ret: %{public}zu", __func__, ret);
     }
 }
 
