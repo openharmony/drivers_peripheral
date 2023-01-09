@@ -168,30 +168,34 @@ int32_t ThermalZoneManager::UpdateThermalZoneData(std::map<std::string, std::str
 {
     int32_t reportTime = 1;
     std::vector<int32_t> multipleList;
-    for (auto sensorIter : sensorTypeMap_) {
-        auto tzInfoList = sensorIter.second->GetXMLThermalZoneInfo();
-        auto tnInfoList = sensorIter.second->GetXMLThermalNodeInfo();
-        sensorIter.second->thermalDataList_.clear();
-        for (auto tzIter : tzInfoList) {
-            if (tzPathMap.empty()) {
-                break;
+    {
+        // Multi-threaded access to sensorTypeMap_ requires locking
+        std::lock_guard<std::mutex> lock(mutex_);
+        for (auto sensorIter : sensorTypeMap_) {
+            auto tzInfoList = sensorIter.second->GetXMLThermalZoneInfo();
+            auto tnInfoList = sensorIter.second->GetXMLThermalNodeInfo();
+            sensorIter.second->thermalDataList_.clear();
+            for (auto tzIter : tzInfoList) {
+                if (tzPathMap.empty()) {
+                    break;
+                }
+                auto typeIter = tzPathMap.find(tzIter.type);
+                if (typeIter != tzPathMap.end()) {
+                    ReportedThermalData data;
+                    UpdateDataType(tzIter, data);
+                    data.tempPath = typeIter->second;
+                    sensorIter.second->thermalDataList_.push_back(data);
+                }
             }
-            auto typeIter = tzPathMap.find(tzIter.type);
-            if (typeIter != tzPathMap.end()) {
+            for (auto tnIter : tnInfoList) {
                 ReportedThermalData data;
-                UpdateDataType(tzIter, data);
-                data.tempPath = typeIter->second;
+                data.type = tnIter.type;
+                if (access(tnIter.path.c_str(), 0) == NUM_ZERO) {
+                    THERMAL_HILOGD(COMP_HDI, "This directory already exists.");
+                    data.tempPath = tnIter.path;
+                }
                 sensorIter.second->thermalDataList_.push_back(data);
             }
-        }
-        for (auto tnIter : tnInfoList) {
-            ReportedThermalData data;
-            data.type = tnIter.type;
-            if (access(tnIter.path.c_str(), 0) == NUM_ZERO) {
-                THERMAL_HILOGD(COMP_HDI, "This directory already exists.");
-                data.tempPath = tnIter.path;
-            }
-            sensorIter.second->thermalDataList_.push_back(data);
         }
     }
     multipleList.push_back(reportTime);
@@ -211,6 +215,7 @@ void ThermalZoneManager::ClearThermalZoneInfo()
 
 void ThermalZoneManager::CalculateMaxCd()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     sensorTypeMap_ = ThermalHdfConfig::GetInsance().GetSensorTypeMap();
     if (sensorTypeMap_.empty()) {
         THERMAL_HILOGE(COMP_HDI, "configured sensor info is empty");
@@ -265,10 +270,10 @@ void ThermalZoneManager::SetMultiples()
 
 void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<int32_t> &multipleList)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (sensorTypeMap_.empty()) {
-        THERMAL_HILOGD(COMP_HDI, "sensorTypeMap is empty"); {
-            return;
-        }
+        THERMAL_HILOGD(COMP_HDI, "sensorTypeMap is empty");
+        return;
     }
 
     tzInfoAcaualEvent_.info.clear();
