@@ -272,7 +272,8 @@ int32_t GetAdapters(TestAudioManager *manager, struct AudioAdapterDescriptor **d
 #else
     size = 1;
     uint32_t portNum = 2;
-    struct AudioPort *ports = (struct AudioPort*)OsalMemCalloc(sizeof(struct AudioPort) * (portNum));
+    struct AudioPort *ports = reinterpret_cast<struct AudioPort*>(OsalMemCalloc(sizeof(struct AudioPort) *
+        (portNum)));
     ports[0] = {
         .dir = PORT_OUT,
         .portId = 0,
@@ -281,7 +282,8 @@ int32_t GetAdapters(TestAudioManager *manager, struct AudioAdapterDescriptor **d
         .dir = PORT_IN,
         .portId = 11,
     };
-    *descs = (struct AudioAdapterDescriptor*)OsalMemCalloc(sizeof(struct AudioAdapterDescriptor) * (size));
+    *descs = reinterpret_cast<struct AudioAdapterDescriptor*>(OsalMemCalloc(sizeof(struct AudioAdapterDescriptor) *
+        (size)));
     if (*descs == nullptr) {
         return HDF_FAILURE;
     }

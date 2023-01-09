@@ -195,7 +195,6 @@ static void *AudioHdmiPnpUeventStart(void *useless)
     }
 
     while (g_hdmiPnpThreadRunning) {
-        int64_t buflen;
         struct epoll_event ev;
         char buf[RECV_BUFFER_SIZE];
 
@@ -206,7 +205,7 @@ static void *AudioHdmiPnpUeventStart(void *useless)
 
         (void)memset_s(buf, RECV_BUFFER_SIZE, 0, RECV_BUFFER_SIZE);
 
-        buflen = recv(sockFd, buf, RECV_BUFFER_SIZE, 0);
+        (void)recv(sockFd, buf, RECV_BUFFER_SIZE, 0);
 
         if (AudioPnpUeventParse(buf) != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("AudioPnpUeventParse failed");

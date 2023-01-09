@@ -535,7 +535,7 @@ int32_t AudioProxyAdapterDestroyCapture(struct AudioAdapter *adapter, struct Aud
     int32_t ret = AUDIO_HAL_SUCCESS;
 
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
-    if (hwCapture == NULL || hwCapture->proxyRemoteHandle == NULL) {
+    if (hwCapture->proxyRemoteHandle == NULL) {
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
     if (AudioProxyPreprocessCapture((AudioHandle)capture, &data, &reply) < 0) {
