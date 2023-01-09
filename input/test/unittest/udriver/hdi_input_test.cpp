@@ -111,7 +111,11 @@ static void ReportHotPlugEventPkgCallback(const InputHotPlugEvent *msg)
   */
 HWTEST_F(HdiInputTest, ScanInputDevice001, TestSize.Level1)
 {
-    InputDevDesc sta[MAX_DEVICES] = {0};
+    InputDevDesc sta[MAX_DEVICES];
+    if (memset_s(sta, MAX_DEVICES * sizeof(InputDevDesc), 0, MAX_DEVICES * sizeof(InputDevDesc)) != EOK) {
+        printf("%s: memset_s failed\n", __func__);
+        return;
+    }
     printf("%s: [Input] ScanInputDevice001 enter %d\n", __func__, __LINE__);
     int32_t ret;
     INPUT_CHECK_NULL_POINTER(g_inputInterface, INPUT_NULL_PTR);
