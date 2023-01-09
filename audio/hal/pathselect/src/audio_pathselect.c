@@ -259,14 +259,12 @@ static int32_t SetRenderPathValue(
 static int32_t SetMatchRenderDevicePath(
     int32_t tpins, struct AudioHwRenderParam *renderParam, cJSON *cJsonObj, const char *deviceType, int32_t value)
 {
-    int32_t ret;
-
     if (cJsonObj == NULL || renderParam == NULL) {
         AUDIO_FUNC_LOGE("param Is NULL");
         return HDF_ERR_INVALID_PARAM;
     }
     if (strcasecmp(cJsonObj->string, deviceType) == 0) {
-        ret = SetRenderPathValue(tpins, cJsonObj, renderParam, value);
+        int32_t ret = SetRenderPathValue(tpins, cJsonObj, renderParam, value);
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGE("set value failed!");
             return ret;
