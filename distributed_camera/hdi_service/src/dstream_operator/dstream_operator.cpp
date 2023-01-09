@@ -806,7 +806,9 @@ void DStreamOperator::ConvertStreamInfo(const StreamInfo &srcInfo, std::shared_p
 
     if ((srcInfo.intent_ == STILL_CAPTURE) || (srcInfo.intent_ == POST_VIEW)) {
         dstInfo->type_ = DCStreamType::SNAPSHOT_FRAME;
-        if (dstInfo->encodeType_ == DCEncodeType::ENCODE_TYPE_JPEG) {
+        if (srcInfo.format_ == PIXEL_FMT_RGBA_8888) {
+            dstInfo->format_ = OHOS_CAMERA_FORMAT_RGBA_8888;
+        } else if (srcInfo.format_ == PIXEL_FMT_YCRCB_420_SP) {
             dstInfo->format_ = OHOS_CAMERA_FORMAT_JPEG;
         } else if (dstInfo->encodeType_ == DCEncodeType::ENCODE_TYPE_NULL) {
             dstInfo->format_ = OHOS_CAMERA_FORMAT_YCRCB_420_SP;
@@ -846,9 +848,9 @@ DCamRetCode DStreamOperator::NegotiateSuitableCaptureInfo(const CaptureInfo& src
         for (auto id : info->streamIds_) {
             idString += (std::to_string(id) + ", ");
         }
-        DHLOGI("cachedDCaptureInfo: ids=[%s], width=%d, height=%d, format=%d, type=%d, isCapture=%d",
-            idString.empty() ? idString.c_str() : (idString.substr(0, idString.length() - INGNORE_STR_LEN)).c_str(),
-            info->width_, info->height_, info->format_, info->type_, info->isCapture_);
+        DHLOGI("cachedDCaptureInfo: ids=%s width=%d, height=%d, format=%d, dataspace=%d, isCapture=%d," +
+            "encodeType=%d, streamType=%d", idString.c_str(), info->width_, info->height_, info->format_,
+            info->dataspace_, info->isCapture_, info->encodeType_, info->type_);
     }
     return SUCCESS;
 }
@@ -1011,10 +1013,15 @@ void DStreamOperator::ChooseSuitableEncodeType(std::vector<std::shared_ptr<DCStr
     std::shared_ptr<DCCaptureInfo> &captureInfo)
 {
     if ((streamInfo.at(0))->type_ == DCStreamType::CONTINUOUS_FRAME) {
-        if (count(dcSupportedCodecType_.begin(), dcSupportedCodecType_.end(), DCEncodeType::ENCODE_TYPE_H265)) {
+        if (count(dcSupportedCodecType_.begin(), dcSupportedCodecType_.end(),
+            DCEncodeType::ENCODE_TYPE_H265)) {
             captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_H265;
-        } else if (count(dcSupportedCodecType_.begin(), dcSupportedCodecType_.end(), DCEncodeType::ENCODE_TYPE_H264)) {
+        } else if (count(dcSupportedCodecType_.begin(), dcSupportedCodecType_.end(),
+            DCEncodeType::ENCODE_TYPE_H264)) {
             captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_H264;
+        } else if (count(dcSupportedCodecType_.begin(), dcSupportedCodecType_.end(),
+            DCEncodeType::ENCODE_TYPE_MPEG4_ES)) {
+            captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_MPEG4_ES;
         } else {
             captureInfo->encodeType_ = DCEncodeType::ENCODE_TYPE_NULL;
         }
@@ -1053,12 +1060,15 @@ void DStreamOperator::ChooseSuitableStreamId(std::shared_ptr<DCCaptureInfo> &cap
 
 DCEncodeType DStreamOperator::ConvertDCEncodeType(std::string &srcEncodeType)
 {
+    DHLOGI("DStreamOperator::ConvertDCEncodeType %s", srcEncodeType.c_str());
     if (srcEncodeType == ENCODE_TYPE_STR_H264) {
         return DCEncodeType::ENCODE_TYPE_H264;
     } else if (srcEncodeType == ENCODE_TYPE_STR_H265) {
         return DCEncodeType::ENCODE_TYPE_H265;
     } else if (srcEncodeType == ENCODE_TYPE_STR_JPEG) {
         return DCEncodeType::ENCODE_TYPE_JPEG;
+    }  else if (srcEncodeType == ENCODE_TYPE_STR_MPEG4_ES) {
+        return DCEncodeType::ENCODE_TYPE_MPEG4_ES;
     } else {
         return DCEncodeType::ENCODE_TYPE_NULL;
     }
