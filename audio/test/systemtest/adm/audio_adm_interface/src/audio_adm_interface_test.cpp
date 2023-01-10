@@ -1172,6 +1172,7 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostWrite_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct HdfSBuf *sBufT = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct HdfSBuf *reply = nullptr;
@@ -1181,28 +1182,29 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostWrite_001, TestSize.Level1)
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
 
+    ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
+    ASSERT_EQ(HDF_SUCCESS, ret);
+
+    ret = WriteCardSeviceNameToSBuf(cardNameBuf);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = WriteFrameToSBuf(sBufT, AUDIO_FILE);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
-    if (ret < 0) {
-        HdfSbufRecycle(sBufT);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, nullptr, nullptr);
+
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_WRITE, sBufT, reply);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    if (ret < 0) {
-        HdfIoServiceRecycle(service);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSbufRecycle(sBufT);
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1212,10 +1214,12 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostWrite_001, TestSize.Level1)
 */
 HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRead_001, TestSize.Level1)
 {
+    int32_t ret = HDF_FAILURE;
     int32_t tryNumReply = 100;
     uint32_t buffStatus = 0;
     uint32_t readSize = 0;
     struct HdfIoService *service = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioXferi transfer;
     struct AudioPcmHwParams hwParams {
@@ -1223,16 +1227,17 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRead_001, TestSize.Level1)
         .periodCount = 8, .format = AUDIO_FORMAT_TYPE_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
-    int32_t ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
-    ASSERT_EQ(HDF_SUCCESS, ret);
+    ASSERT_EQ(HDF_SUCCESS, WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams));
+    EXPECT_EQ(HDF_SUCCESS, WriteCardSeviceNameToSBuf(cardNameBuf));
+
     struct HdfSBuf *reply = HdfSbufTypedObtainCapacity(SBUF_RAW, (AUDIO_SIZE_FRAME + AUDIO_REPLY_EXTEND));
     ASSERT_NE(nullptr, reply);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_START, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_START, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     do {
-        ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_READ, nullptr, reply);
+        ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_READ, cardNameBuf, reply);
         EXPECT_EQ(HDF_SUCCESS, ret);
         EXPECT_GE(HdfSbufReadUint32(reply, &buffStatus), HDF_SUCCESS);
         if ((int32_t)buffStatus != CIR_BUFF_NORMAL) {
@@ -1248,17 +1253,16 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRead_001, TestSize.Level1)
     ret = HdfSbufReadBuffer(reply, (const void **) & (transfer.buf), &readSize);
     EXPECT_NE(transfer.buf, nullptr);
     EXPECT_NE(readSize, (uint32_t)0);
-    if ((ret = WriteToSBuf(sBufTStop)) < 0) {
-        HdfSbufRecycle(reply);
-        HdfIoServiceRecycle(service);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    ret = WriteToSBuf(sBufTStop);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSbufRecycle(reply);
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 
@@ -1272,6 +1276,7 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderPrepare_001, TestSize.Level
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 11025,
         .periodCount = 8, .format = AUDIO_FORMAT_TYPE_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
@@ -1279,18 +1284,22 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderPrepare_001, TestSize.Level
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, nullptr, nullptr);
+
+    ret = WriteCardSeviceNameToSBuf(cardNameBuf);
     EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, cardNameBuf, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = WriteToSBuf(sBufTStop);
-    if (ret < 0) {
-        HdfIoServiceRecycle(service);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 
@@ -1303,6 +1312,7 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCapturePrepare_001, TestSize.Leve
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
@@ -1312,7 +1322,10 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCapturePrepare_001, TestSize.Leve
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);
 
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, nullptr, nullptr);
+    ret = WriteCardSeviceNameToSBuf(cardNameBuf);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
     if (ret < 0) {
@@ -1321,9 +1334,10 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCapturePrepare_001, TestSize.Leve
     }
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1335,28 +1349,33 @@ HWTEST_F(AudioAdmInterfaceTest, StreamHostRenderStart_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 11025,
         .periodCount = 8, .format = AUDIO_FORMAT_TYPE_PCM_24_BIT, .cardServiceName = CARD_SEVICE_NAME.c_str(),
         .isBigEndian = 0, .isSignedData = 1, .silenceThreshold = 16384
     };
+
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, nullptr, nullptr);
+
+    ret = WriteCardSeviceNameToSBuf(cardNameBuf);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_START, nullptr, nullptr);
+
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, cardNameBuf, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_START, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    if (ret < 0) {
-        HdfIoServiceRecycle(service);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1368,6 +1387,7 @@ HWTEST_F(AudioAdmInterfaceTest, StreamHostCaptureStart_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
@@ -1376,20 +1396,23 @@ HWTEST_F(AudioAdmInterfaceTest, StreamHostCaptureStart_001, TestSize.Level1)
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, nullptr, nullptr);
+
+    ret = WriteCardSeviceNameToSBuf(cardNameBuf);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_START, nullptr, nullptr);
+
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_START, cardNameBuf, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = WriteToSBuf(sBufTStop);
-    if (ret < 0) {
-        HdfIoServiceRecycle(service);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1401,6 +1424,7 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderStop_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 44100,
@@ -1409,18 +1433,22 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderStop_001, TestSize.Level1)
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, nullptr, nullptr);
+
+    ret = WriteCardSeviceNameToSBuf(cardNameBuf);
     EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, cardNameBuf, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = WriteToSBuf(sBufTStop);
-    if (ret < 0) {
-        HdfIoServiceRecycle(service);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_CLOSE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1432,6 +1460,7 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCaptureStop_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 44100,
@@ -1440,16 +1469,19 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCaptureStop_001, TestSize.Level1)
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, nullptr, nullptr);
+
+    ret = WriteCardSeviceNameToSBuf(cardNameBuf);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    if (ret < 0) {
-        HdfIoServiceRecycle(service);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1461,6 +1493,7 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderPause_001, TestSize.Level1)
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 11025,
@@ -1469,20 +1502,23 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderPause_001, TestSize.Level1)
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, nullptr, nullptr);
+
+    ret = WriteCardSeviceNameToSBuf(cardNameBuf);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_START, nullptr, nullptr);
+
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PAUSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_START, cardNameBuf, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PAUSE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    if (ret < 0) {
-        HdfIoServiceRecycle(service);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1494,6 +1530,7 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCapturePause_001, TestSize.Level1
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
@@ -1502,20 +1539,23 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCapturePause_001, TestSize.Level1
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, nullptr, nullptr);
+
+    ret = WriteCardSeviceNameToSBuf(cardNameBuf);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_START, nullptr, nullptr);
+
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PAUSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_START, cardNameBuf, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PAUSE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    if (ret < 0) {
-        HdfIoServiceRecycle(service);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1527,6 +1567,7 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderResume_001, TestSize.Level1
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_RENDER_STREAM, .channels = 2, .period = 4096, .rate = 11025,
@@ -1535,22 +1576,24 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostRenderResume_001, TestSize.Level1
     };
     ret = WriteHwParams(HDF_RENDER_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, nullptr, nullptr);
+
+    ret = WriteCardSeviceNameToSBuf(cardNameBuf);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_START, nullptr, nullptr);
+
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PREPARE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PAUSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_START, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_RESUME, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_PAUSE, cardNameBuf, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_RESUME, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = WriteToSBuf(sBufTStop);
-    if (ret < 0) {
-        HdfIoServiceRecycle(service);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_RENDER_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 /**
@@ -1562,6 +1605,7 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCaptureResume_001, TestSize.Level
 {
     int32_t ret = -1;
     struct HdfIoService *service = nullptr;
+    struct HdfSBuf *cardNameBuf = nullptr;
     struct HdfSBuf *sBufTStop = nullptr;
     struct AudioPcmHwParams hwParams {
         .streamType = AUDIO_CAPTURE_STREAM, .channels = 2, .period = 4096, .rate = 11025,
@@ -1570,24 +1614,27 @@ HWTEST_F(AudioAdmInterfaceTest, AudioStreamHostCaptureResume_001, TestSize.Level
     };
     ret = WriteHwParams(HDF_CAPTURE_SERVICE, service, hwParams);
     ASSERT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, nullptr, nullptr);
+
+    ret = WriteCardSeviceNameToSBuf(cardNameBuf);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_START, nullptr, nullptr);
+
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PREPARE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PAUSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_START, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_RESUME, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_PAUSE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_RESUME, cardNameBuf, nullptr);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
     ret = WriteToSBuf(sBufTStop);
-    if (ret < 0) {
-        HdfIoServiceRecycle(service);
-        ASSERT_EQ(HDF_SUCCESS, ret);
-    }
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_STOP, sBufTStop, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, nullptr, nullptr);
+    ret = service->dispatcher->Dispatch(&service->object, AUDIO_DRV_PCM_IOCTRL_CAPTURE_CLOSE, cardNameBuf, nullptr);
     EXPECT_EQ(HDF_SUCCESS, ret);
     HdfSbufRecycle(sBufTStop);
+    HdfSbufRecycle(cardNameBuf);
     HdfIoServiceRecycle(service);
 }
 }

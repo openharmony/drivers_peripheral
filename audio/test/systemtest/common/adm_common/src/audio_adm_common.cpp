@@ -152,6 +152,12 @@ int32_t WriteFrameToSBuf(struct HdfSBuf *&sBufT, const std::string& path)
         return HDF_FAILURE;
     }
 
+    if (!HdfSbufWriteString(sBufT, CARD_SEVICE_NAME.c_str())) {
+        free(buf);
+        buf = nullptr;
+        return HDF_FAILURE;
+    }
+
     if (!HdfSbufWriteUint32(sBufT, frameSize)) {
         free(buf);
         buf = nullptr;
@@ -173,8 +179,27 @@ int32_t WriteToSBuf(struct HdfSBuf *&sBufT)
     if (sBufT == NULL) {
         return HDF_FAILURE;
     }
+    if (!HdfSbufWriteString(sBufT, CARD_SEVICE_NAME.c_str())) {
+        HdfSbufRecycle(sBufT);
+        sBufT = nullptr;
+        return HDF_FAILURE;
+    }
 
     if (!HdfSbufWriteUint32(sBufT, 0)) {
+        HdfSbufRecycle(sBufT);
+        sBufT = nullptr;
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+int32_t WriteCardSeviceNameToSBuf(struct HdfSBuf *&sBufT)
+{
+    sBufT = HdfSbufObtainDefaultSize();
+    if (sBufT == NULL) {
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufWriteString(sBufT, CARD_SEVICE_NAME.c_str())) {
         HdfSbufRecycle(sBufT);
         sBufT = nullptr;
         return HDF_FAILURE;
