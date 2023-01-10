@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -19,4 +19,18 @@ ohos_prebuilt_etc("hdf_peripheral.cfg") {
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "hdf_core"
+}
+
+ohos_prebuilt_etc("audio_hifi_watchdog.para") {
+  source = "etc/audio_hifi_watchdog.para"
+  subsystem_name = "hdf"
+  part_name = "hdf_core"
+  module_install_dir = "etc/param"
+}
+
+ohos_prebuilt_etc("audio_hifi_watchdog.para.dac") {
+  source = "etc/audio_hifi_watchdog.para.dac"
+  subsystem_name = "hdf"
+  part_name = "hdf_core"
+  module_install_dir = "etc/param"
 }
