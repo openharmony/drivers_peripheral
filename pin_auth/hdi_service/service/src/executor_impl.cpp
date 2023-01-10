@@ -130,13 +130,13 @@ int32_t ExecutorImpl::Enroll(uint64_t scheduleId, const std::vector<uint8_t> &ex
     if (NewSalt(salt) != HDF_SUCCESS) {
         IAM_LOGE("new salt failed");
         CallError(callbackObj, GENERAL_ERROR);
-        return HDF_FAILURE;
+        return HDF_SUCCESS;
     }
     int32_t result = scheduleMap_.AddScheduleInfo(scheduleId, ENROLL_PIN, callbackObj, 0, salt);
     if (result != HDF_SUCCESS) {
         IAM_LOGE("Add scheduleInfo failed, fail code : %{public}d", result);
         CallError(callbackObj, GENERAL_ERROR);
-        return result;
+        return HDF_SUCCESS;
     }
     result = callbackObj->OnGetData(scheduleId, salt, 0);
     if (result != SUCCESS) {
@@ -162,7 +162,7 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, con
     if (pinHdi_ == nullptr) {
         IAM_LOGE("pinHdi_ is nullptr");
         CallError(callbackObj, INVALID_PARAMETERS);
-        return HDF_FAILURE;
+        return HDF_SUCCESS;
     }
     static_cast<void>(extraInfo);
     std::vector<uint8_t> salt;
@@ -170,25 +170,25 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, con
     if (result  != SUCCESS) {
         IAM_LOGE("get salt failed, fail code : %{public}d", result);
         CallError(callbackObj, GENERAL_ERROR);
-        return HDF_FAILURE;
+        return HDF_SUCCESS;
     }
     result = scheduleMap_.AddScheduleInfo(scheduleId, AUTH_PIN, callbackObj, templateId, salt);
     if (result != HDF_SUCCESS) {
         IAM_LOGE("Add scheduleInfo failed, fail code : %{public}d", result);
         CallError(callbackObj, GENERAL_ERROR);
-        return result;
+        return HDF_SUCCESS;
     }
     OHOS::UserIam::PinAuth::PinCredentialInfo infoRet = {};
     result = pinHdi_->QueryPinInfo(templateId, infoRet);
     if (result != SUCCESS) {
         IAM_LOGE("Get TemplateInfo failed, fail code : %{public}d", result);
         CallError(callbackObj, result);
-        return HDF_FAILURE;
+        return HDF_SUCCESS;
     }
     if (infoRet.remainTimes == 0 || infoRet.freezingTime > 0) {
         IAM_LOGE("Pin authentication is now frozen state");
         CallError(callbackObj, LOCKED);
-        return HDF_FAILURE;
+        return HDF_SUCCESS;
     }
     result = callbackObj->OnGetData(scheduleId, salt, 0);
     if (result != SUCCESS) {
