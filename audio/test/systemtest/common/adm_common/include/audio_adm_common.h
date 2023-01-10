@@ -106,6 +106,8 @@ int32_t ReadCtrlInfo(struct HdfIoService *service, struct AudioCtlElemId id, int
 int32_t WriteHwParams(std::string serviceName, struct HdfIoService *&service, struct AudioPcmHwParams hwParams);
 
 int32_t WriteToSBuf(struct HdfSBuf *&sBufT);
+
+int32_t WriteCardSeviceNameToSBuf(struct HdfSBuf *&sBufT);
 }
 }
 #endif // AUDIO_ADM_COMMON_H

@@ -21,7 +21,16 @@
 #define MOVE_LEFT_NUM        8
 #define WAV_HEAD_RIFF_OFFSET 8
 #define UHDF_PASSTHROUGH_LIB "libhdi_audio"
-#define UHDF_IPC_LIB         "libhdi_audio_client"
+
+#ifdef __LITEOS__
+#define UHDF_IPC_LIB "/usr/lib/libhdi_audio_client.z.so"
+#else
+#ifdef __aarch64__
+#define UHDF_IPC_LIB "/system/lib64/libhdi_audio_client.z.so"
+#else
+#define UHDF_IPC_LIB "/system/lib/libhdi_audio_client.z.so"
+#endif
+#endif
 
 int32_t SwitchAudioPort(
     struct AudioAdapterDescriptor *descs, enum AudioPortDirection portFlag, struct AudioPort *renderPort)
@@ -259,7 +268,7 @@ int32_t FormatLoadLibPath(char *resolvedPath, int32_t pathLen, int choice)
             }
             break;
         case 2: // 2 is IPC Loading
-            uhdfLibPath = HDF_LIBRARY_FULL_PATH(UHDF_IPC_LIB);
+            uhdfLibPath = UHDF_IPC_LIB;
             if (snprintf_s(resolvedPath, pathLen, pathLen - 1, "%s", uhdfLibPath) < 0) {
                 AUDIO_FUNC_LOGE("snprintf_s failed!");
                 return HDF_FAILURE;
