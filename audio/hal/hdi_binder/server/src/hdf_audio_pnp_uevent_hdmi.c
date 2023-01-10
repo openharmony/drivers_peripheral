@@ -30,6 +30,7 @@
 #include "hdf_audio_server_common.h"
 #include "hdf_base.h"
 #include "hdf_io_service.h"
+#include "osal_time.h"
 #include "securec.h"
 
 #define HDF_LOG_TAG HDF_AUDIO_HAL_HOST
@@ -122,6 +123,7 @@ static int32_t AudioHdmiOpenEventPoll(int32_t *sockFd, int *fdEpoll)
         return HDF_FAILURE;
     }
 
+    OsalMSleep(30); // Wait 30ms to resolve the conflict with the pnp uevent "address already in use"
     *sockFd = socket(AF_NETLINK, SOCK_DGRAM, NETLINK_KOBJECT_UEVENT);
     if (*sockFd < 0) {
         AUDIO_FUNC_LOGE("new socket failed, %{public}d", errno);
