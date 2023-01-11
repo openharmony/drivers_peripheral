@@ -130,6 +130,9 @@ struct UsbOsAdapterOps {
     int32_t (*urbCompleteHandle)(const struct UsbDeviceHandle *devHandle);
     int32_t (*detachKernelDriverAndClaim)(const struct UsbDeviceHandle *handle, uint32_t interfaceNumber);
 };
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct UsbOsAdapterOps *UsbAdapterGetOps(void);
 UsbRawTidType UsbAdapterGetTid(void);
@@ -138,4 +141,7 @@ int32_t UsbAdapterKillSignal(struct UsbDeviceHandle *devHandle, UsbRawTidType ti
 int32_t AdapterAtomicInc(OsalAtomic *v);
 int32_t AdapterAtomicDec(OsalAtomic *v);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* USB_HOST_LINUX_ADAPTER_H */

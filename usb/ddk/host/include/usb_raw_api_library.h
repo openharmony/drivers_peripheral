@@ -76,6 +76,9 @@ struct RawUsbRamTestList {
     struct DListHead list;
     struct OsalMutex lock;
 };
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 struct UsbSession *RawGetSession(const struct UsbSession *session);
 int32_t RawInit(struct UsbSession **session);
@@ -131,4 +134,7 @@ void RawUsbMemFree(void *mem);
 int32_t RawUsbMemTestTrigger(bool enable);
 int32_t RawClaimInterfaceForce(struct UsbDeviceHandle *devHandle, uint32_t interfaceNumber);
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* USB_RAW_API_LIBRARY_H */
