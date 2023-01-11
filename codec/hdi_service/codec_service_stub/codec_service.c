@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -481,6 +481,12 @@ int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int32_t *
         *acquireFd = -1;
         inputData->buffer[0].type = info->buffer[0].type;
         CopyCodecBufferWithTypeSwitch(instance, inputData, info, false);
+        // fd has been transmitted at the initial time, here set invalid to avoid being transmitted again
+        if (inputData->buffer[0].type == BUFFER_TYPE_FD) {
+            inputData->buffer[0].buf = -1;
+        } else if (inputData->buffer[0].type == BUFFER_TYPE_HANDLE) {
+            inputData->buffer[0].buf = 0;
+        }
     } else {
         return HDF_ERR_TIMEOUT;
     }
@@ -541,6 +547,12 @@ int32_t CodecDequeueOutput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int32_t 
         *acquireFd = -1;
         outInfo->buffer[0].type = info->buffer[0].type;
         CopyCodecBufferWithTypeSwitch(instance, outInfo, info, false);
+        // fd has been transmitted at the initial time, here set invalid to avoid being transmitted again
+        if (outInfo->buffer[0].type == BUFFER_TYPE_FD) {
+            outInfo->buffer[0].buf = -1;
+        } else if (outInfo->buffer[0].type == BUFFER_TYPE_HANDLE) {
+            outInfo->buffer[0].buf = 0;
+        }
     } else {
         return HDF_ERR_TIMEOUT;
     }
