@@ -26,6 +26,9 @@ if (defined(ohos_lite)) {
 } else {
   group("hdf_test_usb") {
     testonly = true
-    deps = [ "unittest/hal:hal_test" ]
+    deps = [
+      "unittest/hal:hal_test",
+      "unittest/mock:usb_mock_test",
+    ]
   }
 }

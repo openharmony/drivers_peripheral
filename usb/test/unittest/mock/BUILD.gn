@@ -1,0 +1,150 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("//drivers/peripheral/usb/usb.gni")
+
+module_output_path = "hdf/usb"
+
+config("module_private_config") {
+  visibility = [ ":*" ]
+
+  include_dirs = [
+    "include",
+    "//drivers/peripheral/usb/hdi_service/include",
+    "//drivers/hdf_core/framework/include",
+    "//drivers/peripheral/usb/ddk/host/include",
+    "//third_party/googletest/googlemock/include",
+    "//drivers/peripheral/usb/test/unittest/mock/include",
+    "//drivers/peripheral/usb/gadget/function/include",
+    "//utils/system/safwk/native/include",
+    "${usb_driver_path}/test/UsbSubscriberTest",
+  ]
+}
+
+ohos_unittest("transfer_auto_test") {
+  sources = [
+    "src/mock_linux_adapter.cpp",
+    "src/usbd_transfer_auto_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.0",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_usb:libusb_proxy_1.0",
+    "eventhandler:libeventhandler",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  module_out_path = module_output_path
+}
+
+ohos_unittest("device_auto_test") {
+  sources = [
+    "${usb_driver_path}/test/UsbSubscriberTest/UsbSubscriberTest.cpp",
+    "src/mock_linux_adapter.cpp",
+    "src/usbd_device_auto_test.cpp",
+  ]
+
+  include_dirs = [ "${usb_driver_path}/test/UsbSubscriberTest" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.0",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_usb:libusb_proxy_1.0",
+    "eventhandler:libeventhandler",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  module_out_path = module_output_path
+}
+
+ohos_unittest("request_auto_test") {
+  sources = [
+    "src/mock_linux_adapter.cpp",
+    "src/usbd_request_auto_test.cpp",
+  ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.0",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_usb:libusb_proxy_1.0",
+    "eventhandler:libeventhandler",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  module_out_path = module_output_path
+}
+
+ohos_unittest("function_auto_test") {
+  sources = [ "src/usbd_function_auto_test.cpp" ]
+
+  configs = [ ":module_private_config" ]
+
+  deps = [
+    "${usb_driver_path}/ddk:libusb_core",
+    "${usb_driver_path}/hdi_service:libusb_interface_service_1.0",
+    "//third_party/googletest:gmock_main",
+    "//third_party/googletest:gtest_main",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_usb:libusb_proxy_1.0",
+    "eventhandler:libeventhandler",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+    "safwk:system_ability_fwk",
+    "samgr:samgr_proxy",
+  ]
+  module_out_path = module_output_path
+}
+
+group("usb_mock_test") {
+  testonly = true
+  deps = []
+}
