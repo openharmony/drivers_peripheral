@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -228,6 +228,44 @@ int32_t CodecSerPackParam(struct HdfSBuf *reply, Param *param)
     return HDF_SUCCESS;
 }
 
+static int32_t CodecSerPackBufOfBufferInfo(struct HdfSBuf *reply, const CodecBufferInfo *buffer)
+{
+    if (reply == NULL || buffer == NULL) {
+        HDF_LOGE("%{public}s: params null!", __func__);
+        return HDF_FAILURE;
+    }
+    if (buffer->type == BUFFER_TYPE_VIRTUAL) {
+        if (!HdfSbufWriteBuffer(reply, (void *)buffer->buf, buffer->length)) {
+            HDF_LOGE("%{public}s: Write virtual buffer failed!", __func__);
+            return HDF_FAILURE;
+        }
+    } else if (buffer->type == BUFFER_TYPE_FD) {
+        uint8_t validFd = buffer->buf >= 0 ? 1 : 0;
+        if (!HdfSbufWriteUint8(reply, validFd)) {
+            HDF_LOGE("%{public}s: write validFd failed!", __func__);
+            return HDF_FAILURE;
+        }
+        if (validFd && !HdfSbufWriteFileDescriptor(reply, (int32_t)buffer->buf)) {
+            HDF_LOGE("%{public}s: Write fd failed!", __func__);
+            return HDF_FAILURE;
+        }
+    } else if (buffer->type == BUFFER_TYPE_HANDLE) {
+        uint8_t validHandle = buffer->buf != 0 ? 1 : 0;
+        if (!HdfSbufWriteUint8(reply, validHandle)) {
+            HDF_LOGE("%{public}s: write validHandle failed!", __func__);
+            return HDF_FAILURE;
+        }
+        if (validHandle && !PackBufferHandle(reply, (BufferHandle *)buffer->buf)) {
+            return HDF_FAILURE;
+        }
+    } else {
+        HDF_LOGE("%{public}s: buffer->type incorrect!", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 static int32_t CodecSerPackBufferInfo(struct HdfSBuf *reply, const CodecBufferInfo *buffer)
 {
     if (reply == NULL || buffer == NULL) {
@@ -238,20 +276,9 @@ static int32_t CodecSerPackBufferInfo(struct HdfSBuf *reply, const CodecBufferIn
         HDF_LOGE("%{public}s: Write tempType failed!", __func__);
         return HDF_FAILURE;
     }
-    if (buffer->type == BUFFER_TYPE_VIRTUAL) {
-        if (!HdfSbufWriteBuffer(reply, (void *)buffer->buf, buffer->length)) {
-            HDF_LOGE("%{public}s: Write addr failed!", __func__);
-            return HDF_FAILURE;
-        }
-    } else if (buffer->type == BUFFER_TYPE_FD) {
-        if (!HdfSbufWriteFileDescriptor(reply, (int32_t)buffer->buf)) {
-            HDF_LOGE("%{public}s: Write fd failed!", __func__);
-            return HDF_FAILURE;
-        }
-    } else if (buffer->type == BUFFER_TYPE_HANDLE) {
-        if (!PackBufferHandle(reply, (BufferHandle *)buffer->buf)) {
-            return HDF_FAILURE;
-        }
+    int32_t ret = CodecSerPackBufOfBufferInfo(reply, buffer);
+    if (ret != HDF_SUCCESS) {
+        return ret;
     }
     if (!HdfSbufWriteUint32(reply, buffer->offset)) {
         HDF_LOGE("%{public}s: Write offset failed!", __func__);
@@ -262,15 +289,63 @@ static int32_t CodecSerPackBufferInfo(struct HdfSBuf *reply, const CodecBufferIn
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint32(reply, buffer->capacity)) {
-        HDF_LOGE("%{public}s: Write size failed!", __func__);
+        HDF_LOGE("%{public}s: Write capacity failed!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
 }
 
+static int32_t CodecSerParseBufOfBufferInfo(struct HdfSBuf *data, CodecBufferInfo *buffer)
+{
+    if (data == NULL || buffer == NULL) {
+        HDF_LOGE("%{public}s: params null!", __func__);
+        return HDF_FAILURE;
+    }
+    uint32_t readLen = 0;
+    if (buffer->type == BUFFER_TYPE_VIRTUAL) {
+        void *buf = (void *)buffer->buf;
+        if (!HdfSbufReadBuffer(data, (const void **)&buf, &readLen)) {
+            HDF_LOGE("%{public}s: read addr failed!", __func__);
+            return HDF_FAILURE;
+        }
+    } else if (buffer->type == BUFFER_TYPE_FD) {
+        uint8_t validFd = 0;
+        if (!HdfSbufReadUint8(data, &validFd)) {
+            HDF_LOGE("%{public}s: read validFd failed!", __func__);
+            return HDF_FAILURE;
+        }
+        if (validFd != 0) {
+            buffer->buf = (intptr_t)HdfSbufReadFileDescriptor(data);
+            if (buffer->buf < 0) {
+                HDF_LOGE("%{public}s: read fd failed!", __func__);
+                return HDF_FAILURE;
+            }
+        } else {
+            buffer->buf = (intptr_t)(-1);
+        }
+    } else if (buffer->type == BUFFER_TYPE_HANDLE) {
+        uint8_t validHandle = 0;
+        if (!HdfSbufReadUint8(data, &validHandle)) {
+            HDF_LOGE("%{public}s: read validHandle failed!", __func__);
+            return HDF_FAILURE;
+        }
+        if (validHandle != 0) {
+            if (!ParseBufferHandle(data, (BufferHandle **)&buffer->buf)) {
+                return HDF_FAILURE;
+            }
+        } else {
+            buffer->buf = (intptr_t)(0);
+        }
+    }  else {
+        HDF_LOGE("%{public}s: buffer->type incorrect!", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 static int32_t CodecSerParseBufferInfo(struct HdfSBuf *data, CodecBufferInfo *buffer)
 {
-    uint32_t readLen = 0;
     if (data == NULL || buffer == NULL) {
         HDF_LOGE("%{public}s: params null!", __func__);
         return HDF_FAILURE;
@@ -279,22 +354,9 @@ static int32_t CodecSerParseBufferInfo(struct HdfSBuf *data, CodecBufferInfo *bu
         HDF_LOGE("%{public}s: read type failed!", __func__);
         return HDF_FAILURE;
     }
-    if (buffer->type == BUFFER_TYPE_VIRTUAL) {
-        void *buf = (void *)buffer->buf;
-        if (!HdfSbufReadBuffer(data, (const void **)&buf, &readLen)) {
-            HDF_LOGE("%{public}s: read addr failed!", __func__);
-            return HDF_FAILURE;
-        }
-    } else if (buffer->type == BUFFER_TYPE_FD) {
-        buffer->buf = (intptr_t)HdfSbufReadFileDescriptor(data);
-        if (buffer->buf < 0) {
-            HDF_LOGE("%{public}s: read fd failed!", __func__);
-            return HDF_FAILURE;
-        }
-    } else if (buffer->type == BUFFER_TYPE_HANDLE) {
-        if (!ParseBufferHandle(data, (BufferHandle **)&buffer->buf)) {
-            return HDF_FAILURE;
-        }
+    int32_t ret = CodecSerParseBufOfBufferInfo(data, buffer);
+    if (ret != HDF_SUCCESS) {
+        return ret;
     }
     if (!HdfSbufReadUint32(data, &buffer->offset)) {
         HDF_LOGE("%{public}s: read offset failed!", __func__);
@@ -305,7 +367,7 @@ static int32_t CodecSerParseBufferInfo(struct HdfSBuf *data, CodecBufferInfo *bu
         return HDF_FAILURE;
     }
     if (!HdfSbufReadUint32(data, &buffer->capacity)) {
-        HDF_LOGE("%{public}s: read size failed!", __func__);
+        HDF_LOGE("%{public}s: read capacity failed!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
