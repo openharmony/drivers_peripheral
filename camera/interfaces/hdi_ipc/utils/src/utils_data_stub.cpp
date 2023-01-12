@@ -217,6 +217,7 @@ void UtilsDataStub::ConvertVecToMetadata(const std::vector<uint8_t>& cameraAbili
         void *buffer = nullptr;
         MetadataUtils::ItemDataToBuffer(item_, &buffer);
         (void)AddCameraMetadataItem(meta, item_.item, buffer, item_.count);
+        MetadataUtils::FreeMetadataBuffer(item_);
     }
 }
 
@@ -249,6 +250,7 @@ void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Ca
         if (buffer != nullptr) {
             (void)Camera::AddCameraMetadataItem(meta, entry.item, buffer, entry.count);
         }
+        MetadataUtils::FreeMetadataBuffer(item_);
     }
 }
 

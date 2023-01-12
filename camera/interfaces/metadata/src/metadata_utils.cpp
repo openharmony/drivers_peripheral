@@ -220,6 +220,7 @@ void MetadataUtils::ConvertVecToMetadata(const std::vector<uint8_t>& cameraAbili
         void *buffer = nullptr;
         MetadataUtils::ItemDataToBuffer(item_, &buffer);
         (void)AddCameraMetadataItem(meta, item_.item, buffer, item_.count);
+        FreeMetadataBuffer(item_);
     }
 }
 
@@ -269,6 +270,7 @@ void MetadataUtils::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Ca
         void *buffer = nullptr;
         MetadataUtils::ItemDataToBuffer(item_, &buffer);
         (void)AddCameraMetadataItem(meta, item_.item, buffer, item_.count);
+        FreeMetadataBuffer(item_);
     }
 }
 
@@ -545,6 +547,39 @@ void MetadataUtils::ItemDataToBuffer(const camera_metadata_item_t &item, void **
         *buffer = reinterpret_cast<void *>(item.data.d);
     } else if (item.data_type == META_TYPE_RATIONAL) {
         *buffer = reinterpret_cast<void *>(item.data.r);
+    }
+}
+
+void MetadataUtils::FreeMetadataBuffer(camera_metadata_item_t &entry)
+{
+    if (entry.data_type == META_TYPE_BYTE) {
+        if (entry.data.u8 != nullptr) {
+            delete[] entry.data.u8;
+        }
+    } else if (entry.data_type == META_TYPE_INT32) {
+        if (entry.data.i32 != nullptr) {
+            delete[] entry.data.i32;
+        }
+    } else if (entry.data_type == META_TYPE_FLOAT) {
+        if (entry.data.f != nullptr) {
+            delete[] entry.data.f;
+        }
+    } else if (entry.data_type == META_TYPE_INT64) {
+        if (entry.data.i64 != nullptr) {
+            delete[] entry.data.i64;
+        }
+    } else if (entry.data_type == META_TYPE_UINT32) {
+        if (entry.data.ui32 != nullptr) {
+            delete[] entry.data.ui32;
+        }
+    } else if (entry.data_type == META_TYPE_DOUBLE) {
+        if (entry.data.d != nullptr) {
+            delete[] entry.data.d;
+        }
+    } else if (entry.data_type == META_TYPE_RATIONAL) {
+        if (entry.data.r != nullptr) {
+            delete[] entry.data.r;
+        }
     }
 }
 } // Camera
