@@ -13,6 +13,9 @@
     "name": "drivers_peripheral_usb",
     "subsystem": "hdf",
     "features": ["drivers_peripheral_usb_feature_linux_native_model"],
+    "hisysevent_config": [
+      "//drivers/peripheral/usb/hisysevent.yaml"
+    ],
     "syscap": [ "" ],
     "adapter_system_type": ["standard", "small"],
     "rom": "820KB",
