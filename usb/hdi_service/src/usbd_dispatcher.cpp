@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -903,7 +903,11 @@ int32_t UsbdDispatcher::FunAttachDevice(HostDevice *port, HdfSBuf *data, HdfSBuf
 
 int32_t UsbdDispatcher::UsbdDeviceCreateAndAttach(const sptr<UsbImpl> &service, uint8_t busNum, uint8_t devAddr)
 {
-    HostDevice *port = nullptr;
+    HostDevice *port = service->FindDevFromService(busNum, devAddr);
+    if (port != nullptr) {
+        HDF_LOGI("%{public}s:device already add", __func__);
+        return HDF_ERR_DEVICE_BUSY;
+    }
     int32_t ret = HostDeviceCreate(&port);
     if (ret == HDF_SUCCESS) {
         port->busNum = busNum;
