@@ -838,8 +838,7 @@ int32_t RawClaimInterfaceForce(struct UsbDeviceHandle *devHandle, uint32_t inter
 {
     struct UsbOsAdapterOps *osAdapterOps = UsbAdapterGetOps();
 
-    if (devHandle == NULL || interfaceNumber < 0 || interfaceNumber >= USB_MAXINTERFACES ||
-        osAdapterOps->claimInterface == NULL) {
+    if (devHandle == NULL || interfaceNumber >= USB_MAXINTERFACES || osAdapterOps->claimInterface == NULL) {
         HDF_LOGE("%{public}s:%d HDF_ERR_INVALID_PARAM", __func__, __LINE__);
         return HDF_ERR_INVALID_PARAM;
     }
