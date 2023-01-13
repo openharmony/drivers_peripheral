@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,13 +29,25 @@ namespace Codec {
     static const int32_t DATA_TYPE = 100;
     static const int32_t DATA_PTS = 200;
     static const int32_t DATA_FLAG = 300;
-    static const int32_t testingAppData = 33;
+    static const int32_t TESTING_APP_DATA = 33;
 
-    CodecComponentManager *manager = nullptr;
-    CodecComponentType *component = nullptr;
-    CodecCallbackType *callback = nullptr;
-    uint32_t componentId = 0;
-    static int32_t appData = testingAppData;
+    CodecComponentManager *g_manager = nullptr;
+    CodecComponentType *g_component = nullptr;
+    CodecCallbackType *g_callback = nullptr;
+    uint32_t g_componentId = 0;
+    static int32_t g_appData = TESTING_APP_DATA;
+
+    uint32_t Convert2Uint32(const uint8_t* ptr)
+    {
+        if (ptr == nullptr) {
+            return 0;
+        }
+        /*
+         * Move the 0th digit 24 to the left, the first digit 16 to the left, the second digit 8 to the left,
+         * and the third digit no left
+         */
+        return (ptr[0] << 24) | (ptr[1] << 16) | (ptr[2] << 8) | (ptr[3]);
+    }
 
     void FillDataOmxCodecBuffer(struct OmxCodecBuffer *dataFuzz)
     {
@@ -56,23 +68,22 @@ namespace Codec {
 
     bool Preconditions()
     {
-        manager = GetCodecComponentManager();
-        callback = CodecCallbackTypeStubGetInstance();
-        if (manager == nullptr) {
+        g_manager = GetCodecComponentManager();
+        if (g_manager == nullptr) {
             HDF_LOGE("%{public}s: GetCodecComponentManager failed\n", __func__);
             return false;
         }
 
-        int32_t ret = manager->CreateComponent(&component, &componentId, (char*)"compName", appData, callback);
-        if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: CreateComponent failed\n", __func__);
+        g_callback = CodecCallbackTypeStubGetInstance();
+        if (g_callback == nullptr) {
+            HDF_LOGE("%{public}s: CodecCallbackTypeStubGetInstance failed\n", __func__);
             return false;
         }
 
-        OMX_STATETYPE state;
-        ret = component->GetState(component, &state);
+        std::string compName("OMX.rk.video_encoder.avc");
+        int32_t ret = g_manager->CreateComponent(&g_component, &g_componentId, compName.data(), g_appData, g_callback);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: GetState Component failed\n", __func__);
+            HDF_LOGE("%{public}s: CreateComponent failed\n", __func__);
             return false;
         }
 
@@ -81,12 +92,12 @@ namespace Codec {
 
     bool Destroy()
     {
-        int32_t ret = manager->DestroyComponent(componentId);
+        int32_t ret = g_manager->DestroyComponent(g_componentId);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: DestroyComponent failed\n", __func__);
             return false;
         }
-        CodecComponentTypeRelease(component);
+        CodecComponentTypeRelease(g_component);
         CodecComponentManagerRelease();
         return true;
     }

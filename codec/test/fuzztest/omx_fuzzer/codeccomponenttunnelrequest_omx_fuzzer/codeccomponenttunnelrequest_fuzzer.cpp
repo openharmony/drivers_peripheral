@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,29 +29,39 @@ namespace {
 
 namespace OHOS {
 namespace Codec {
-    bool CodecComponentTunnelRequest(const uint8_t* data, size_t size)
+    bool CodecComponentTunnelRequest(const uint8_t *data, size_t size)
     {
         struct AllParameters params;
         if (data == nullptr) {
             return false;
         }
 
-        if (memcpy_s((void *)&params, sizeof(params), data, sizeof(params)) != 0) {
-            return false;
+        uint8_t *rawData = const_cast<uint8_t *>(data);
+        if (size > sizeof(uint32_t) + sizeof(int32_t) + sizeof(uint32_t) + sizeof(OMX_TUNNELSETUPTYPE *)) {
+            params.port = Convert2Uint32(rawData);
+            rawData = rawData + sizeof(uint32_t);
+            params.tunneledComp = static_cast<int32_t>(Convert2Uint32(rawData));
+            rawData = rawData + sizeof(int32_t);
+            params.tunneledPort = Convert2Uint32(rawData);
+            rawData = rawData + sizeof(uint32_t);
+            params.tunnelSetup = reinterpret_cast<OMX_TUNNELSETUPTYPE *>(rawData);
+        } else {
+            params.tunneledComp = static_cast<int32_t>(Convert2Uint32(rawData));
+            params.port = Convert2Uint32(rawData);
+            params.tunneledPort = Convert2Uint32(rawData);
+            params.tunnelSetup = reinterpret_cast<OMX_TUNNELSETUPTYPE *>(rawData);
         }
 
-        bool result = false;
-        result = Preconditions();
+        bool result = Preconditions();
         if (!result) {
             HDF_LOGE("%{public}s: Preconditions failed\n", __func__);
             return false;
         }
 
-        int32_t ret = component->ComponentTunnelRequest(component, params.port, params.tunneledComp,
+        int32_t ret = g_component->ComponentTunnelRequest(g_component, params.port, params.tunneledComp,
             params.tunneledPort, params.tunnelSetup);
-        if (ret == HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: ComponentTunnelRequest succeed\n", __func__);
-            result = true;
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: ComponentTunnelRequest failed, ret is [%{public}x]\n", __func__, ret);
         }
 
         result = Destroy();
@@ -60,12 +70,12 @@ namespace Codec {
             return false;
         }
 
-        return result;
+        return true;
     }
 } // namespace codec
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::Codec::CodecComponentTunnelRequest(data, size);
     return 0;

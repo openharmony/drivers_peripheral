@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,10 +18,9 @@
 
 namespace OHOS {
 namespace Codec {
-    bool CodecAllocateBuffer(const uint8_t* data, size_t size)
+    bool CodecAllocateBuffer(const uint8_t *data, size_t size)
     {
-        bool result = false;
-        result = Preconditions();
+        bool result = Preconditions();
         if (!result) {
             HDF_LOGE("%{public}s: Preconditions failed\n", __func__);
             return false;
@@ -29,10 +28,9 @@ namespace Codec {
 
         struct OmxCodecBuffer buffer;
         FillDataOmxCodecBuffer(&buffer);
-        int32_t ret = component->AllocateBuffer(component, *(uint32_t *)data, &buffer);
-        if (ret == HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: AllocateBuffer succeed\n", __func__);
-            result = true;
+        int32_t ret = g_component->AllocateBuffer(g_component, static_cast<uint32_t >(*data), &buffer);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: AllocateBuffer failed, ret is [%{public}x]\n", __func__, ret);
         }
 
         result = Destroy();
@@ -41,12 +39,12 @@ namespace Codec {
             return false;
         }
 
-        return result;
+        return true;
     }
 } // namespace codec
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::Codec::CodecAllocateBuffer(data, size);
     return 0;
