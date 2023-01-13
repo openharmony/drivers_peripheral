@@ -42,6 +42,16 @@
 #include "audio_internal.h"
 #include "audio_types.h"
 
+#ifdef __LITEOS__
+#define HDF_AUDIO_CLIENT_FULL_PATH_LIB "/usr/lib/libhdi_audio_client.z.so"
+#else
+#ifdef __aarch64__
+#define HDF_AUDIO_CLIENT_FULL_PATH_LIB "/system/lib64/libhdi_audio_client.z.so"
+#else
+#define HDF_AUDIO_CLIENT_FULL_PATH_LIB "/system/lib/libhdi_audio_client.z.so"
+#endif
+#endif
+
 namespace OHOS {
 namespace Audio {
 using namespace std;
@@ -52,7 +62,7 @@ using namespace std;
 #endif
 #ifdef AUDIO_ADM_SERVICE
     const std::string FUNCTION_NAME = "GetAudioManagerFuncs";
-    const std::string RESOLVED_PATH = HDF_LIBRARY_FULL_PATH("libhdi_audio_client");
+    const std::string RESOLVED_PATH = HDF_AUDIO_CLIENT_FULL_PATH_LIB;
 #endif
 using TestAudioManager = struct AudioManager;
 const uint32_t INT_32_MAX = 0x7fffffff;
