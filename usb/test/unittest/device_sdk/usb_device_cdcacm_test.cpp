@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -251,8 +251,8 @@ static struct UsbFnFunction g_acmFunction = {
 #define DRIVER_DESC         "HDC Device"
 #define CONFIG_DESC         "hdc"
 
-static struct UsbDeviceDescriptor g_cdcMasterDeviceDesc = {
-    .bLength = sizeof(g_cdcMasterDeviceDesc),
+static struct UsbDeviceDescriptor g_cdcUsbFnDeviceDesc = {
+    .bLength = sizeof(g_cdcUsbFnDeviceDesc),
     .bDescriptorType = USB_DDK_DT_DEVICE,
     .bcdUSB = CPU_TO_LE16(BCD_USB),
     .bDeviceClass = 0,
@@ -295,7 +295,7 @@ struct UsbFnFunction *g_functions[] = {
 #endif
     nullptr};
 
-static struct UsbFnConfiguration g_masterConfig = {
+static struct UsbFnConfiguration g_usbFnConfig = {
     .configurationValue = 1,
     .iConfiguration = USB_FUNC_CONFIG_IDX,
     .attributes = USB_CFG_BUS_POWERED,
@@ -304,18 +304,18 @@ static struct UsbFnConfiguration g_masterConfig = {
 };
 
 static struct UsbFnConfiguration *g_configs[] = {
-    &g_masterConfig,
+    &g_usbFnConfig,
     nullptr,
 };
 
 struct UsbFnDeviceDesc g_acmFnDevice = {
-    .deviceDesc = &g_cdcMasterDeviceDesc,
+    .deviceDesc = &g_cdcUsbFnDeviceDesc,
     .deviceStrings = g_devStrings,
     .configs = g_configs,
 };
 
-enum DevMasterCmd {
-    DEV_MASTER_RELEASE = 1,
+enum DevUsbFnCmd {
+    DEV_USBFN_RELEASE = 1,
 };
 
 static struct Serial *SerialAlloc(void)

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@
 #include "usbfn_interface.h"
 #include "usbfn_request.h"
 
-#define DEV_MASTER_SERVICE_NAME "usbfn_master"
+#define DEV_USBFN_SERVICE_NAME "usbfn"
 #define TEST_TIMES              10
 #define BUFFER_LEN              64
 #define WAIT_10MS               10
