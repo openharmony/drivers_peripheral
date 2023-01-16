@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -83,7 +83,7 @@ static void DumpOutputToFile(FILE *fp, uint8_t *addr)
 {
     uint32_t wStride = AlignUp(g_cmd.width, YUV_ALIGNMENT);
     uint32_t height = g_cmd.height;
-    size_t bufferSize = (wStride * height * FRAME_SIZE_MULTI) / FRAME_SIZE_OPERATOR;
+    size_t bufferSize = (size_t)((wStride * height * FRAME_SIZE_MULTI) / FRAME_SIZE_OPERATOR);
     size_t ret = fwrite(addr, 1, bufferSize, fp);
     if (ret != bufferSize) {
         HDF_LOGE("%{public}s: Dump frame failed, ret: %{public}zu", __func__, ret);

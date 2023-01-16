@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,17 +21,19 @@
 #include "codec_component_manager.h"
 
 #include <osal_mem.h>
+#include <string>
 #include <hdf_log.h>
 namespace OHOS {
 namespace Codec {
-    extern CodecComponentManager *manager;
-    extern CodecComponentType *component;
-    extern CodecCallbackType *callback;
-    extern uint32_t componentId;
+    extern CodecComponentManager *g_manager;
+    extern CodecComponentType *g_component;
+    extern CodecCallbackType *g_callback;
+    extern uint32_t g_componentId;
 
     void FillDataOmxCodecBuffer(struct OmxCodecBuffer *dataFuzz);
     bool Preconditions();
     bool Destroy();
+    uint32_t Convert2Uint32(const uint8_t* ptr);
 } // namespace codec
 } // namespace OHOS
 #endif // CODECCOMMON_FUZZER_H
