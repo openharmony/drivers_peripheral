@@ -509,12 +509,14 @@ TEST_F(VblankTest, CtrlTest)
     ASSERT_TRUE(ret != DISPLAY_SUCCESS) << "vblank do not disable";
 }
 
+namespace {
 INSTANTIATE_TEST_SUITE_P(MultiLayer, DeviceLayerDisplay, ::testing::ValuesIn(TEST_MULTILAYER));
 INSTANTIATE_TEST_SUITE_P(SingleLayer, DeviceLayerDisplay, ::testing::ValuesIn(TEST_SINGLE_LAYER));
 INSTANTIATE_TEST_SUITE_P(ScaleLayer, DeviceLayerDisplay, ::testing::ValuesIn(TEST_SCALE));
 INSTANTIATE_TEST_SUITE_P(VideoLayer, DeviceLayerDisplay, ::testing::ValuesIn(TEST_VIDEO));
 INSTANTIATE_TEST_SUITE_P(LayerAlpha, DeviceLayerDisplay, ::testing::ValuesIn(TEST_ALPHA));
 INSTANTIATE_TEST_SUITE_P(Rotation, LayerRotateTest, ::testing::ValuesIn(TEST_ROTATE));
+} // anoynamous namespace
 
 int main(int argc, char **argv)
 {

@@ -42,7 +42,7 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .height = 1920,
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBX_8888
-            },
+        },
         .expectStride = 1088 * 4,
         .expectSize = 1920 * 1088 * 4
     },
@@ -64,7 +64,7 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .height = 1920,
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_RGBA_8888
-            },
+        },
         .expectStride = 1088 * 4,
         .expectSize = 1920 * 1088 * 4
     },
@@ -86,7 +86,7 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .height = 1920,
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ | HBM_USE_CPU_WRITE,
             .format = PIXEL_FMT_BGRA_8888
-            },
+        },
         .expectStride = 1088 * 4,
         .expectSize = 1920 * 1088 * 4
     },
@@ -241,7 +241,7 @@ const AllocTestPrms GRALLOC_TEST_SETS[] = {
             .height = 1920,
             .usage = HBM_USE_MEM_DMA | HBM_USE_CPU_READ,
             .format = PIXEL_FMT_RGBX_8888
-        }
+        },
         .expectStride = 1088 * 4,
         .expectSize = 1920 * 1088 * 4
     },
