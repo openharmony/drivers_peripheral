@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,28 +28,35 @@ namespace {
 
 namespace OHOS {
 namespace Codec {
-    bool CodecGetParameter(const uint8_t* data, size_t size)
+    bool CodecGetParameter(const uint8_t *data, size_t size)
     {
         struct AllParameters params;
         if (data == nullptr) {
             return false;
         }
 
-        if (memcpy_s((void *)&params, sizeof(params), data, sizeof(params)) != 0) {
-            return false;
+        uint8_t *rawData = const_cast<uint8_t *>(data);
+        params.paramIndex = Convert2Uint32(rawData);
+        if (size > sizeof(uint32_t) + sizeof(int8_t *) + sizeof(uint32_t)) {
+            rawData = rawData + sizeof(uint32_t);
+            size = size - sizeof(uint32_t);
+            params.paramStruct = reinterpret_cast<int8_t *>(rawData);
+            params.paramStructLen = size;
+        } else {
+            params.paramStruct = reinterpret_cast<int8_t *>(rawData);
+            params.paramStructLen = size;
         }
 
-        bool result = false;
-        result = Preconditions();
+        bool result = Preconditions();
         if (!result) {
             HDF_LOGE("%{public}s: Preconditions failed\n", __func__);
             return false;
         }
  
-        int32_t ret = component->GetParameter(component, params.paramIndex, params.paramStruct, params.paramStructLen);
-        if (ret == HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: GetParameter succeed\n", __func__);
-            result = true;
+        int32_t ret = g_component->GetParameter(g_component, params.paramIndex, params.paramStruct,
+            params.paramStructLen);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: GetParameter failed, ret is [%{public}x]\n", __func__, ret);
         }
 
         result = Destroy();
@@ -58,12 +65,12 @@ namespace Codec {
             return false;
         }
 
-        return result;
+        return true;
     }
 } // namespace codec
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::Codec::CodecGetParameter(data, size);
     return 0;

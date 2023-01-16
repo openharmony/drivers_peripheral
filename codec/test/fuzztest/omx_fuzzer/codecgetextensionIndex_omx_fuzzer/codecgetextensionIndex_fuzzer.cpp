@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,37 +18,21 @@
 
 #include <securec.h>
 
-namespace {
-    struct AllParameters {
-        char *paramName;
-        uint32_t *indexType;
-    };
-}
-
 namespace OHOS {
 namespace Codec {
-    bool CodecGetExtensionIndex(const uint8_t* data, size_t size)
+    bool CodecGetExtensionIndex(const uint8_t *data, size_t size)
     {
-        struct AllParameters params;
-        if (data == nullptr) {
-            return false;
-        }
-
-        if (memcpy_s((void *)&params, sizeof(params), data, sizeof(params)) != 0) {
-            return false;
-        }
-
-        bool result = false;
-        result = Preconditions();
+        uint8_t *rawData = const_cast<uint8_t *>(data);
+        uint32_t *indexType = reinterpret_cast<uint32_t *>(rawData);
+        bool result = Preconditions();
         if (!result) {
             HDF_LOGE("%{public}s: Preconditions failed\n", __func__);
             return false;
         }
 
-        int32_t ret = component->GetExtensionIndex(component, params.paramName, params.indexType);
-        if (ret == HDF_SUCCESS) {
-            HDF_LOGI("%{public}s: GetExtensionIndex succeed\n", __func__);
-            result = true;
+        int32_t ret = g_component->GetExtensionIndex(g_component, "OMX.Topaz.index.param.extended_test", indexType);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: GetExtensionIndex failed, ret is [%{public}x]\n", __func__, ret);
         }
 
         result = Destroy();
@@ -57,12 +41,12 @@ namespace Codec {
             return false;
         }
 
-        return result;
+        return true;
     }
 } // namespace codec
 } // namespace OHOS
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::Codec::CodecGetExtensionIndex(data, size);
     return 0;
