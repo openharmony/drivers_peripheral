@@ -117,7 +117,7 @@ void ThermalHdfTimer::ReportThermalData()
     }
 
     thermalZoneMgr_->ReportThermalZoneData(reportTime_, multipleList_);
-    tzInfoEvent_ = thermalZoneMgr_->tzInfoAcaualEvent_;
+    tzInfoEvent_ = thermalZoneMgr_->GetCallbackInfo();
     // callback thermal event
     thermalCb_->OnThermalDataEvent(tzInfoEvent_);
 }
