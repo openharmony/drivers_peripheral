@@ -320,7 +320,11 @@ int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string
     if (*adapter == nullptr || (*adapter)->CreateRender == nullptr) {
         return HDF_FAILURE;
     }
+#ifdef FEATURE_SMALL_DEVICE
     InitAttrs(attrs);
+#else
+    InitAttrsRender(attrs);
+#endif
     InitDevDesc(devDesc, renderPort->portId, pins);
     ret = (*adapter)->CreateRender(*adapter, &devDesc, &attrs, render);
     if (ret < 0) {
