@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,14 +34,14 @@ namespace Codec {
             return false;
         }
 
-        CodecCompCapability *capList = (CodecCompCapability *)OsalMemAlloc(sizeof(CodecCompCapability)
-            *reinterpret_cast<int64_t>(data));
+        CodecCompCapability *capList = reinterpret_cast<CodecCompCapability *>(OsalMemAlloc(sizeof(CodecCompCapability)
+            *reinterpret_cast<int64_t>(data)));
         if (capList == NULL) {
             HDF_LOGE("%{public}s: OsalMemAlloc CodecCompCapability failed\n", __func__);
             return false;
         }
 
-        int32_t ret = manager->GetComponentCapabilityList(capList, *(int32_t *)data);
+        int32_t ret = manager->GetComponentCapabilityList(capList, static_cast<int32_t>(*data));
         if (ret == HDF_SUCCESS) {
             HDF_LOGI("%{public}s: GetComponentCapabilityList succeed\n", __func__);
             result = true;
