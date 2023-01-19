@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -808,16 +808,78 @@ int32_t AudioProxyAdapterGetPassthroughMode(struct AudioAdapter *adapter,
 
 int32_t AudioProxyAdapterSetMicMute(struct AudioAdapter *adapter, bool mute)
 {
-    (void)adapter;
-    (void)mute;
-    return HDF_ERR_NOT_SUPPORT;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL) {
+        AUDIO_FUNC_LOGE("the parameter is null");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
+        AUDIO_FUNC_LOGE("AudioProxyAdapterSetMicMute FAIL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (AudioProxyWriteTokenAndNameForSetPassThrough(hwAdapter, data) != AUDIO_HAL_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed!", __func__);
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteUint32(data, (uint32_t)mute)) {
+        AUDIO_FUNC_LOGE("tempMute Write Fail");
+        AudioProxyBufReplyRecycle(data, reply);
+        return HDF_FAILURE;
+    }
+
+    int ret = AudioProxyDispatchCall(hwAdapter->proxyRemoteHandle, AUDIO_HDI_ADT_SET_MIC_MUTE, data, reply);
+    if (ret != AUDIO_HAL_SUCCESS) {
+        AUDIO_FUNC_LOGE("%{public}s:set parameter failed!", __func__);
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
 }
 
 int32_t AudioProxyAdapterGetMicMute(struct AudioAdapter *adapter, bool *mute)
 {
-    (void)adapter;
-    (void)mute;
-    return HDF_ERR_NOT_SUPPORT;
+    uint32_t tempMute = 0;
+    struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
+    if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL || mute == NULL) {
+        AUDIO_FUNC_LOGE("the parameter is null");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    if (AudioProxyPreprocessSBuf(&data, &reply) < 0) {
+        AUDIO_FUNC_LOGE("AudioProxyAdapterGetMicMute FAIL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (AudioProxyWriteTokenAndNameForSetPassThrough(hwAdapter, data) != AUDIO_HAL_SUCCESS) {
+        HDF_LOGE("%{public}s: write interface token failed!", __func__);
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    int32_t ret = AudioProxyDispatchCall(hwAdapter->proxyRemoteHandle, AUDIO_HDI_ADT_GET_MIC_MUTE, data, reply);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioProxyAdapterGetMicMute FAIL");
+        AudioProxyBufReplyRecycle(data, reply);
+        return ret;
+    }
+
+    if (!HdfSbufReadUint32(reply, &tempMute)) {
+        AUDIO_FUNC_LOGE("tempMute Read Fail");
+        AudioProxyBufReplyRecycle(data, reply);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    *mute = (bool)tempMute;
+    AudioProxyBufReplyRecycle(data, reply);
+    return ret;
 }
 
 int32_t AudioProxyAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume)
