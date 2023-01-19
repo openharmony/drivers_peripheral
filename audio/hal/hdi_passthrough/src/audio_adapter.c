@@ -237,7 +237,7 @@ static int32_t AudioMakeCardServiceName(char *cardServiceName, const struct Audi
     } else if (strncmp(adapterDescriptor->adapterName, HDMI, strlen(HDMI)) == 0) {
         ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_HDMI_DEV, priPortId);
     } else if (strncmp(adapterDescriptor->adapterName, USB, strlen(USB)) == 0) {
-        ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_PRIMARY_DEV, priPortId);
+        ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_USB_DEV, priPortId);
     } else if (strncmp(adapterDescriptor->adapterName, A2DP, strlen(A2DP)) == 0) {
         ret = AudioFormatServiceName(cardServiceName, HDF_AUDIO_CODEC_A2DP_DEV, portId);
     } else {

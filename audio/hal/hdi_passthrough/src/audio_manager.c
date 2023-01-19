@@ -341,7 +341,6 @@ static int32_t SelectAppropriateAdapter(enum AudioAdapterType adapterType,
                 AUDIO_FUNC_LOGE("LoadAdapterUsb failed.ret = %{public}d", ret);
                 return ret;
             }
-            AUDIO_FUNC_LOGE("Can't LoadAdapterUsb.");
             break;
         case AUDIO_ADAPTER_A2DP:
             ret = LoadAdapterA2dp(desc, adapter);

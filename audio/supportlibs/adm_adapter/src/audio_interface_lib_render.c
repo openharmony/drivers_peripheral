@@ -187,6 +187,12 @@ int32_t AudioCtlRenderSetPauseStu(const struct DevHandle *handle,
         return HDF_FAILURE;
     }
 
+    if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
+        AUDIO_FUNC_LOGE("HdfSbufWriteString cardServiceName failed!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+
     if (AudioCtlRenderSetPauseBuf(sBuf, handleData) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderSetPauseStu Failed to Set Pause sBuf!");
         AudioFreeHdfSBuf(sBuf, NULL);
@@ -799,6 +805,11 @@ int32_t FrameSbufWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPar
         AUDIO_FUNC_LOGE("param is null!");
         return HDF_FAILURE;
     }
+    if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
+        AUDIO_FUNC_LOGE("[HdfSbufWriteString]-[cardServiceName] failed!");
+        return HDF_FAILURE;
+    }
+
     if (!HdfSbufWriteUint32(sBuf, (uint32_t)(handleData->frameRenderMode.bufferFrameSize))) {
         AUDIO_FUNC_LOGE("[HdfSbufWriteUint32]-[bufferFrameSize] failed!");
         return HDF_FAILURE;
@@ -954,8 +965,18 @@ int32_t AudioOutputRenderStartPrepare(const struct DevHandle *handle,
         AUDIO_FUNC_LOGE("Invalid parameters!");
         return HDF_FAILURE;
     }
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
+    if (sBuf == NULL) {
+        AUDIO_FUNC_LOGE("HdfSbufObtainDefaultSize failed!");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
 
-    ret = AudioServiceDispatch(handle->object, cmdId, NULL, NULL);
+    ret = AudioServiceDispatch(handle->object, cmdId, sBuf, NULL);
+    AudioFreeHdfSBuf(sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderStartPrepare Failed to send service call cmdId = %{public}d!", cmdId);
     }
@@ -977,6 +998,7 @@ int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
     }
 
     if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
+        AUDIO_FUNC_LOGE("HdfSbufWriteString cardServiceName failed!");
         AudioFreeHdfSBuf(sBuf, NULL);
         return HDF_FAILURE;
     }
@@ -1002,6 +1024,11 @@ int32_t AudioOutputRenderStop(const struct DevHandle *handle,
         AUDIO_FUNC_LOGE("HdfSbufObtainDefaultSize failed!");
         return HDF_FAILURE;
     }
+    if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
+        AUDIO_FUNC_LOGE("HdfSbufWriteString cardServiceName failed!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
 
     if (!HdfSbufWriteUint32(sBuf, handleData->renderMode.ctlParam.turnStandbyStatus)) {
         AUDIO_FUNC_LOGE("HdfSbufWriteUint32 turnStandbyStatus failed!");
@@ -1024,6 +1051,11 @@ int32_t MmapDescWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPara
         return HDF_FAILURE;
     }
     uint64_t mmapAddr = (uint64_t)(uintptr_t)(handleData->frameRenderMode.mmapBufDesc.memoryAddress);
+    if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
+        AUDIO_FUNC_LOGE("HdfSbufWriteString cardServiceName failed!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
     if (!HdfSbufWriteUint64(sBuf, mmapAddr)) {
         AUDIO_FUNC_LOGE("HdfSbufWriteUint64 mmapAddr failed!");
         return HDF_FAILURE;
@@ -1092,13 +1124,25 @@ int32_t AudioOutputRenderGetMmapPosition(const struct DevHandle *handle,
         AUDIO_FUNC_LOGE("RenderGetMmapPosition Failed to obtain reply");
         return HDF_FAILURE;
     }
-
-    int32_t ret = AudioServiceDispatch(handle->object, cmdId, NULL, reply);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("Failed to send service call!");
-        AudioFreeHdfSBuf(reply, NULL);
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
+    if (sBuf == NULL) {
+        AUDIO_FUNC_LOGE("HdfSbufObtainDefaultSize failed!");
         return HDF_FAILURE;
     }
+
+    if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
+        AUDIO_FUNC_LOGE("HdfSbufWriteString cardServiceName failed!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = AudioServiceDispatch(handle->object, cmdId, sBuf, reply);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Failed to send service call!");
+        AudioFreeHdfSBuf(sBuf, reply);
+        return HDF_FAILURE;
+    }
+    AudioFreeHdfSBuf(sBuf, NULL);
 
     if (!HdfSbufReadUint64(reply, &frames)) {
         AUDIO_FUNC_LOGE("failed to get mmap position sBuf!");
