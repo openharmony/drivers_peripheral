@@ -54,14 +54,14 @@ namespace Codec {
         dataFuzz->bufferId = DATA_BUFFERID;
         dataFuzz->size = DATA_SIZE;
         dataFuzz->version.nVersion = DATA_VERSION_NVERSION;
-        dataFuzz->bufferType = (enum CodecBufferType)DATA_BUFFERTYPE;
-        dataFuzz->buffer = (uint8_t*)OsalMemAlloc(DATA_BUFFERLEN);
+        dataFuzz->bufferType = static_cast<enum CodecBufferType>(DATA_BUFFERTYPE);
+        dataFuzz->buffer = reinterpret_cast<uint8_t *>(OsalMemAlloc(DATA_BUFFERLEN));
         dataFuzz->bufferLen = DATA_BUFFERLEN;
         dataFuzz->allocLen = DATA_ALLOCLEN;
         dataFuzz->filledLen = DATA_FILLEDLEN;
         dataFuzz->offset = DATA_OFFSET;
         dataFuzz->fenceFd = DATA_FENCEFD;
-        dataFuzz->type = (enum ShareMemTypes)DATA_TYPE;
+        dataFuzz->type = static_cast<enum ShareMemTypes>(DATA_TYPE);
         dataFuzz->pts = DATA_PTS;
         dataFuzz->flag = DATA_FLAG;
     }
