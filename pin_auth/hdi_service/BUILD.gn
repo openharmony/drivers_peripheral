@@ -79,6 +79,7 @@ ohos_shared_library("libpin_auth_driver") {
     "ipc:ipc_single",
   ]
 
+  shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
   subsystem_name = "hdf"

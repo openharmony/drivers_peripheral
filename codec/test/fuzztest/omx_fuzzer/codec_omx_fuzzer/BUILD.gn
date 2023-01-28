@@ -19,7 +19,8 @@ module_output_path = "drivers_peripheral_codec/codec"
 ohos_fuzztest("CodecFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codec_omx_fuzzer"
+  fuzz_config_file =
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codec_omx_fuzzer"
 
   include_dirs = [
     "//drivers/peripheral/codec/interfaces/include",
@@ -37,7 +38,7 @@ ohos_fuzztest("CodecFuzzTest") {
 
   sources = [ "codec_fuzzer.cpp" ]
 
-  deps = [ "//drivers/peripheral/codec/hal:libcodec_hdi_omx_server" ]
+  deps = [ "//drivers/peripheral/codec/hal:libcodec_hdi_omx_server_static" ]
 
   external_deps = [
     "hdf_core:libhdf_utils",

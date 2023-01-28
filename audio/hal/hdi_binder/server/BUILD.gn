@@ -66,6 +66,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       defines += [ "AUDIO_HDF_LOG" ]
     }
 
+    shlib_type = "hdi"
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
@@ -209,6 +210,7 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       defines += [ "AUDIO_HDF_LOG" ]
     }
 
+    shlib_type = "hdi"
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"

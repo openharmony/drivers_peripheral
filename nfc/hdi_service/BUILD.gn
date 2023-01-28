@@ -64,6 +64,7 @@ ohos_shared_library("nfc_hdi_driver") {
     "ipc:ipc_single",
   ]
 
+  shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_nfc"
