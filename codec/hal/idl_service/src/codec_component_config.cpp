@@ -56,7 +56,8 @@ namespace {
     constexpr char CODEC_CONFIG_KEY_MAX_FRAME_RATE[] = "maxFrameRate";
     constexpr char CODEC_CONFIG_KEY_BITE_RATE_MODE[] = "bitRateMode";
     constexpr char CODEC_CONFIG_KEY_MESURED_FRAME_RATE[] = "measuredFrameRate";
-    
+    constexpr char CODEC_CONFIG_KEY_CAN_SWAP_WIDTH_HEIGHT[] = "canSwapWidthHeight";
+
     constexpr char CODEC_CONFIG_KEY_SAMPLE_FORMATS[] = "sampleFormats";
     constexpr char CODEC_CONFIG_KEY_SAMPLE_RATE[] = "sampleRate";
     constexpr char CODEC_CONFIG_KEY_CHANNEL_LAYOUTS[] = "channelLayouts";
@@ -203,6 +204,7 @@ int32_t CodecComponentConfig::GetOneCapability(const struct DeviceResourceIface 
     cap.compName = compName;
 
     cap.isSoftwareCodec = iface.GetBool(&childNode, CODEC_CONFIG_KEY_IS_SOFTWARE_CODEC);
+    cap.canSwapWidthHeight = iface.GetBool(&childNode, CODEC_CONFIG_KEY_CAN_SWAP_WIDTH_HEIGHT);
 
     if (GetMiscOfCapability(iface, childNode, cap) != HDF_SUCCESS) {
         cap.role = MEDIA_ROLETYPE_INVALID;
