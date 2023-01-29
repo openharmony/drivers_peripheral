@@ -517,7 +517,7 @@ static int32_t SetupEncParams(RKHdiEncodeSetup *encSetup)
 
     param = &params[paramCount++];
     param->key = KEY_PIXEL_FORMAT;
-    encSetup->fmt = PIXEL_FORMAT_YCBCR_420_SP;
+    encSetup->fmt = PIXEL_FMT_YCBCR_420_SP;
     param->val = &(encSetup->fmt);
     param->size = sizeof(encSetup->fmt);
 

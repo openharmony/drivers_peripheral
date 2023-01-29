@@ -282,7 +282,7 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetPixelFormatTest_001, TestSize.Level1)
     params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
     ASSERT_TRUE(params != nullptr);
     params->key = KEY_PIXEL_FORMAT;
-    CodecPixelFormat format = PIXEL_FORMAT_YCBCR_420_SP;
+    PixelFormat format = PIXEL_FMT_YCBCR_420_SP;
     params->val = (void *)&format;
     params->size = sizeof(format);
 
