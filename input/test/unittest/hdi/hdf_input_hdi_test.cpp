@@ -51,7 +51,7 @@ public:
 
 void HdfInputHdiTest::SetUpTestCase()
 {
-    g_inputInterfaces = IInputInterfaces::Get();
+    g_inputInterfaces = IInputInterfaces::Get(true);
     if (g_inputInterfaces != nullptr) {
         g_callback = new InputCallbackImpl(g_inputInterfaces, nullptr);
         g_hotplugCb = new InputCallbackImpl(g_inputInterfaces, g_callback);
