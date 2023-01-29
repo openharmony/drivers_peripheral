@@ -367,9 +367,9 @@ static int32_t SetDecParameter(void)
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
     paramCnt = 1;
     param.key = KEY_PIXEL_FORMAT;
-    CodecPixelFormat fmt = PIXEL_FORMAT_NONE;
+    PixelFormat fmt = PIXEL_FMT_BUTT;
     param.val = &fmt;
-    param.size = sizeof(CodecPixelFormat);
+    param.size = sizeof(PixelFormat);
     ret = g_codecProxy->CodecGetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: CodecSetParameter failed", __func__);

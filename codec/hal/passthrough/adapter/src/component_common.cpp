@@ -126,33 +126,33 @@ static int32_t ConvertMimeTypeToCodingType(AvCodecMime mimeType)
     return codingType;
 }
 
-static CodecPixelFormat ConvertColorFormatToPixelFormat(OMX_COLOR_FORMATTYPE formatType)
+static PixelFormat ConvertColorFormatToPixelFormat(OMX_COLOR_FORMATTYPE formatType)
 {
-    CodecPixelFormat pixelFormat = PIXEL_FORMAT_NONE;
+    PixelFormat pixelFormat = PIXEL_FMT_BUTT;
     switch (formatType) {
         case OMX_COLOR_FormatYUV422SemiPlanar:
-            pixelFormat = PIXEL_FORMAT_YCBCR_422_SP;
+            pixelFormat = PIXEL_FMT_YCBCR_422_SP;
             break;
         case OMX_COLOR_FormatYUV420SemiPlanar:
-            pixelFormat = PIXEL_FORMAT_YCBCR_420_SP;
+            pixelFormat = PIXEL_FMT_YCBCR_420_SP;
             break;
         case OMX_COLOR_FormatYUV422Planar:
-            pixelFormat = PIXEL_FORMAT_YCBCR_422_P;
+            pixelFormat = PIXEL_FMT_YCBCR_422_P;
             break;
         case OMX_COLOR_FormatYUV420Planar:
-            pixelFormat = PIXEL_FORMAT_YCBCR_420_P;
+            pixelFormat = PIXEL_FMT_YCBCR_420_P;
             break;
         case OMX_COLOR_FormatYCbYCr:
-            pixelFormat = PIXEL_FORMAT_YUYV_422_PKG;
+            pixelFormat = PIXEL_FMT_YUYV_422_PKG;
             break;
         case OMX_COLOR_FormatCbYCrY:
-            pixelFormat = PIXEL_FORMAT_UYVY_422_PKG;
+            pixelFormat = PIXEL_FMT_UYVY_422_PKG;
             break;
         case OMX_COLOR_FormatYCrYCb:
-            pixelFormat = PIXEL_FORMAT_YVYU_422_PKG;
+            pixelFormat = PIXEL_FMT_YVYU_422_PKG;
             break;
         case OMX_COLOR_FormatCrYCbY:
-            pixelFormat = PIXEL_FORMAT_VYUY_422_PKG;
+            pixelFormat = PIXEL_FMT_VYUY_422_PKG;
             break;
 
         default:
@@ -163,32 +163,32 @@ static CodecPixelFormat ConvertColorFormatToPixelFormat(OMX_COLOR_FORMATTYPE for
     return pixelFormat;
 }
 
-static OMX_COLOR_FORMATTYPE ConvertPixelFormatToColorFormat(CodecPixelFormat pixelFormat)
+static OMX_COLOR_FORMATTYPE ConvertPixelFormatToColorFormat(PixelFormat pixelFormat)
 {
     OMX_COLOR_FORMATTYPE formatType = OMX_COLOR_FormatUnused;
     switch (pixelFormat) {
-        case PIXEL_FORMAT_YCBCR_422_SP:
+        case PIXEL_FMT_YCBCR_422_SP:
             formatType = OMX_COLOR_FormatYUV422SemiPlanar;
             break;
-        case PIXEL_FORMAT_YCBCR_420_SP:
+        case PIXEL_FMT_YCBCR_420_SP:
             formatType = OMX_COLOR_FormatYUV420SemiPlanar;
             break;
-        case PIXEL_FORMAT_YCBCR_422_P:
+        case PIXEL_FMT_YCBCR_422_P:
             formatType = OMX_COLOR_FormatYUV422Planar;
             break;
-        case PIXEL_FORMAT_YCBCR_420_P:
+        case PIXEL_FMT_YCBCR_420_P:
             formatType = OMX_COLOR_FormatYUV420Planar;
             break;
-        case PIXEL_FORMAT_YUYV_422_PKG:
+        case PIXEL_FMT_YUYV_422_PKG:
             formatType = OMX_COLOR_FormatYCbYCr;
             break;
-        case PIXEL_FORMAT_UYVY_422_PKG:
+        case PIXEL_FMT_UYVY_422_PKG:
             formatType = OMX_COLOR_FormatCbYCrY;
             break;
-        case PIXEL_FORMAT_YVYU_422_PKG:
+        case PIXEL_FMT_YVYU_422_PKG:
             formatType = OMX_COLOR_FormatYCrYCb;
             break;
-        case PIXEL_FORMAT_VYUY_422_PKG:
+        case PIXEL_FMT_VYUY_422_PKG:
             formatType = OMX_COLOR_FormatCrYCbY;
             break;
 
@@ -394,8 +394,8 @@ static void SplitParamPortDefinitionVideo(int8_t *paramIn, Param *paramOut, int3
     paramOut[index].size = setMark ? sizeof(param->format.video.xFramerate) : 0;
     index++;
     param->format.video.eColorFormat =
-                (OMX_COLOR_FORMATTYPE)ConvertColorFormatToPixelFormat(param->format.video.eColorFormat);
-    if ((CodecPixelFormat)param->format.video.eColorFormat != PIXEL_FORMAT_NONE || !setMark) {
+        static_cast<OMX_COLOR_FORMATTYPE>(ConvertColorFormatToPixelFormat(param->format.video.eColorFormat));
+    if (static_cast<PixelFormat>(param->format.video.eColorFormat) != PIXEL_FMT_BUTT || !setMark) {
         paramOut[index].key = KEY_PIXEL_FORMAT;
         paramOut[index].val = setMark ? (void *)&(param->format.video.eColorFormat) : nullptr;
         paramOut[index].size = setMark ? sizeof(param->format.video.eColorFormat) : 0;
@@ -414,7 +414,7 @@ static void SplitParamPortDefinitionAudio(int8_t *paramIn, Param *paramOut, int3
     index++;
     paramOut[index].key = KEY_MIMETYPE;
     param->format.audio.eEncoding =
-        (OMX_AUDIO_CODINGTYPE)ConvertAudioCodingTypeToMimeType(param->format.audio.eEncoding);
+        static_cast<OMX_AUDIO_CODINGTYPE>(ConvertAudioCodingTypeToMimeType(param->format.audio.eEncoding));
     paramOut[index].val = setMark ? (void *)&(param->format.audio.eEncoding) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->format.audio.eEncoding) : 0;
     index++;
@@ -539,8 +539,8 @@ static void SplitParamImagePortFormat(int8_t *paramIn, Param *paramOut, int32_t 
     paramOut[index].val = setMark ? (void *)&(param->eCompressionFormat) : nullptr;
     paramOut[index].size = setMark ? sizeof(param->eCompressionFormat) : 0;
     index++;
-    param->eColorFormat = (OMX_COLOR_FORMATTYPE)ConvertColorFormatToPixelFormat(param->eColorFormat);
-    if ((CodecPixelFormat)param->eColorFormat != PIXEL_FORMAT_NONE || !setMark) {
+    param->eColorFormat = static_cast<OMX_COLOR_FORMATTYPE>(ConvertColorFormatToPixelFormat(param->eColorFormat));
+    if (static_cast<PixelFormat>(param->eColorFormat) != PIXEL_FMT_BUTT || !setMark) {
         paramOut[index].key = KEY_PIXEL_FORMAT;
         paramOut[index].val = setMark ? (void *)&(param->eColorFormat) : nullptr;
         paramOut[index].size = setMark ? sizeof(param->eColorFormat) : 0;
@@ -575,7 +575,7 @@ static void SplitParamVideoPortFormat(int8_t *paramIn, Param *paramOut, int32_t 
     paramOut[index].size = setMark ? sizeof(param->xFramerate) : 0;
     index++;
     param->eColorFormat = static_cast<OMX_COLOR_FORMATTYPE>(ConvertColorFormatToPixelFormat(param->eColorFormat));
-    if ((CodecPixelFormat)param->eColorFormat != PIXEL_FORMAT_NONE || !setMark) {
+    if (static_cast<PixelFormat>(param->eColorFormat) != PIXEL_FMT_BUTT || !setMark) {
         paramOut[index].key = KEY_PIXEL_FORMAT;
         paramOut[index].val = setMark ? (void *)&(param->eColorFormat) : nullptr;
         paramOut[index].size = setMark ? sizeof(param->eColorFormat) : 0;
@@ -714,7 +714,7 @@ static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, i
                 break;
             case KEY_PIXEL_FORMAT:
                 param->format.video.eColorFormat =
-                    ConvertPixelFormatToColorFormat(*(reinterpret_cast<CodecPixelFormat *>(paramIn[i].val)));
+                    ConvertPixelFormatToColorFormat(*(reinterpret_cast<PixelFormat *>(paramIn[i].val)));
                 break;
 
             default: {
@@ -941,7 +941,7 @@ static int32_t ParseParamImagePortFormat(Param *paramIn, int8_t *paramOut, int32
                 break;
             case KEY_PIXEL_FORMAT:
                 param->eColorFormat =
-                    ConvertPixelFormatToColorFormat(*(reinterpret_cast<CodecPixelFormat *>(paramIn[i].val)));
+                    ConvertPixelFormatToColorFormat(*(reinterpret_cast<PixelFormat *>(paramIn[i].val)));
                 break;
 
             default: {
@@ -994,7 +994,7 @@ static int32_t ParseParamVideoPortFormat(Param *paramIn, int8_t *paramOut, int32
                 break;
             case KEY_PIXEL_FORMAT:
                 param->eColorFormat =
-                    ConvertPixelFormatToColorFormat(*(reinterpret_cast<CodecPixelFormat *>(paramIn[i].val)));
+                    ConvertPixelFormatToColorFormat(*(reinterpret_cast<PixelFormat *>(paramIn[i].val)));
                 break;
             case KEY_VIDEO_FRAME_RATE:
                 param->xFramerate = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
