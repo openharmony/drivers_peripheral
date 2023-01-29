@@ -30,6 +30,7 @@ ohos_shared_library("libdistributed_camera_provider_config") {
     "ipc:ipc_single",
   ]
 
+  shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_distributed_camera"
@@ -56,6 +57,7 @@ ohos_shared_library("libdistributed_camera_host_config") {
     "ipc:ipc_single",
   ]
 
+  shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_distributed_camera"

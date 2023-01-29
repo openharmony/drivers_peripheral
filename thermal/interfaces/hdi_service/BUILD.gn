@@ -85,6 +85,7 @@ ohos_shared_library("libthermal_driver") {
     ]
   }
 
+  shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_thermal"

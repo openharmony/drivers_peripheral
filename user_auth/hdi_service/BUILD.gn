@@ -98,6 +98,7 @@ ohos_shared_library("libuser_auth_driver") {
 
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
+  shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_user_auth"

@@ -70,6 +70,7 @@ ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
 
   public_configs = [ ":hdi_service_config" ]
 
+  shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_bluetooth"
