@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,6 +76,20 @@ enum VibratorMode {
 };
 
 /**
+ * @brief Enumerates the effect types of the composite effects.
+ *
+ * @since 3.2
+ */
+enum EffectType {
+    /**< Indicates the time effect type of the given time series. */
+    EFFECT_TYPE_TIME,
+    /**< Indicates primitive vibration effect type for a given primitive vibration sequence. */
+    EFFECT_TYPE_PRIMITIVE,
+    /**< Indicates invalid the effect type. */
+    EFFECT_TYPE_BUTT,
+};
+
+/**
  * @brief Defines the vibration parameters.
  *
  * The parameters include the setting intensity and frequency capability the on and intensity and frequency range.
@@ -84,17 +98,84 @@ enum VibratorMode {
  */
 struct VibratorInfo {
     /**< setting intensity capability. 1 indicates support, 0 indicates not support. */
-    int32_t isSupportIntensity;
+    bool isSupportIntensity;
     /**< setting frequency capability. 1 indicates support, 0 indicates not support. */
-    int32_t isSupportFrequency;
-    /**< Max intensity */
-    int32_t intensityMaxValue;
-    /**< Min intensity */
-    int32_t intensityMinValue;
-    /**< Max frequency */
-    int32_t frequencyMaxValue;
-    /**< Min frequency */
-    int32_t frequencyMinValue;
+    bool isSupportFrequency;
+    /**< Max intensity. */
+    uint16_t intensityMaxValue;
+    /**< Min intensity. */
+    uint16_t intensityMinValue;
+    /**< Max frequency(Hz). */
+    int16_t frequencyMaxValue;
+    /**< Min frequency(Hz). */
+    int16_t frequencyMinValue;
+};
+
+/**
+ * @brief Defines the time effect parameters.
+ *
+ * The parameters include delay, time, intensity and frequency of vibration.
+ *
+ * @since 3.2
+ */
+struct TimeEffect {
+    int32_t delay;        /** Waiting time. */
+    int32_t time;         /** Vibration time. */
+    uint16_t intensity;   /** Vibration intensity. */
+    int16_t frequency;    /** Vibration frequency(Hz). */
+};
+
+/**
+ * @brief Defines the primitive effect parameters.
+ *
+ * The parameters include delay, effect id and vibration intensity.
+ *
+ * @since 3.2
+ */
+struct PrimitiveEffect {
+    int32_t delay;         /** Waiting time. */
+    int32_t effectId;      /** Effect id. */
+    uint16_t intensity;    /** Vibration intensity. */
+};
+
+/**
+ * @brief Defines two effects for custom composite effects.
+ *
+ * The parameters include time effect and primitive effect.
+ *
+ * @since 3.2
+ */
+union Effect {
+    struct TimeEffect timeEffect;              /** Time effect, see {@link TimeEffect}. */
+    struct PrimitiveEffect primitiveEffect;    /** Primitive effect, see {@link PrimitiveEffect}. */
+};
+
+/**
+ * @brief Defines the composite vibration effect parameters.
+ *
+ * The parameters include type and sequences of composite effects.
+ *
+ * @since 3.2
+ */
+struct CompositeEffect {
+    /** Type of the composite effect, see {@link union HdfEffectType}. */
+    int32_t type;
+    /** The sequences of composite effects, see {@link union Effect}. */
+    union Effect effects[];
+};
+
+/**
+ * @brief Defines the vibration effect information.
+ *
+ * The information include the capability to set the effect and the vibration duration of the effect.
+ *
+ * @since 3.2
+ */
+struct EffectInfo {
+    /** Vibration duration of the effect, in milliseconds. */
+    int32_t duration;
+    /**< setting effect capability. 1 indicates support, 0 indicates not support. */
+    bool isSupportEffect;
 };
 
 #ifdef __cplusplus
