@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -265,6 +265,8 @@ static int32_t LoadAdapterPrimary(const struct AudioAdapterDescriptor *desc, str
     hwAdapter->common.GetPortCapability = AudioAdapterGetPortCapability;
     hwAdapter->common.SetPassthroughMode = AudioAdapterSetPassthroughMode;
     hwAdapter->common.GetPassthroughMode = AudioAdapterGetPassthroughMode;
+    hwAdapter->common.SetMicMute = AudioAdapterSetMicMute;
+    hwAdapter->common.GetMicMute = AudioAdapterGetMicMute;
     hwAdapter->common.SetVoiceVolume = AudioAdapterSetVoiceVolume;
     hwAdapter->common.UpdateAudioRoute = AudioAdapterUpdateAudioRoute;
     hwAdapter->common.ReleaseAudioRoute = AudioAdapterReleaseAudioRoute;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -449,6 +449,8 @@ int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtPa
 int32_t AudioAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
                                    const char *condition, char *value, int32_t length);
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
+int32_t AudioAdapterSetMicMute(struct AudioAdapter *adapter, bool mute);
+int32_t AudioAdapterGetMicMute(struct AudioAdapter *adapter, bool *mute);
 int32_t AudioAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume);
 int32_t AudioRenderStart(AudioHandle handle);
 int32_t AudioRenderStop(AudioHandle handle);
