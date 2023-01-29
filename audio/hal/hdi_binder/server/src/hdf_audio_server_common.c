@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2133,6 +2133,83 @@ static int32_t HdiSerStubReleaseAudioRoute(const struct HdfDeviceIoClient *clien
     return audioAdapterRet;
 }
 
+static int32_t HdiServiceAdapterSetMicMute(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    bool mute = false;
+    uint32_t tempMute = 0;
+    struct AudioAdapter *adapter = NULL;
+    const char *adapterName = NULL;
+
+    if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is NULL");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    if ((adapterName = HdfSbufReadString(data)) == NULL) {
+        AUDIO_FUNC_LOGE("adapterName Is NULL ");
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufReadUint32(data, &tempMute)) {
+        AUDIO_FUNC_LOGE("tempMute Is NULL ");
+        return HDF_FAILURE;
+    }
+    mute = (bool)tempMute;
+
+    if (AudioAdapterListGetAdapter(adapterName, &adapter) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (adapter == NULL || adapter->SetMicMute == NULL) {
+        AUDIO_FUNC_LOGE("adapter or SetMicMute is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    return adapter->SetMicMute(adapter, mute);
+}
+
+static int32_t HdiServiceAdapterGetMicMute(const struct HdfDeviceIoClient *client,
+    struct HdfSBuf *data, struct HdfSBuf *reply)
+{
+    if (client == NULL || data == NULL || reply == NULL) {
+        AUDIO_FUNC_LOGE("client or data or reply is NULL");
+        return AUDIO_HAL_ERR_INVALID_PARAM;
+    }
+
+    bool mute = false;
+    struct AudioAdapter *adapter = NULL;
+    const char *adapterName = NULL;
+
+    if ((adapterName = HdfSbufReadString(data)) == NULL) {
+        AUDIO_FUNC_LOGE("adapterName Is NULL ");
+        return HDF_FAILURE;
+    }
+
+    if (AudioAdapterListGetAdapter(adapterName, &adapter) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioAdapterListGetAdapter fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (adapter == NULL || adapter->GetMicMute == NULL) {
+        AUDIO_FUNC_LOGE("adapter or SetMicMute is NULL");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    int ret = adapter->GetMicMute(adapter, &mute);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("GetMicMute FAIL");
+        return ret;
+    }
+
+    if (!HdfSbufWriteUint32(reply, (uint32_t)mute)) {
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    return AUDIO_HAL_SUCCESS;
+}
+
 static int32_t HdiServiceAdapterSetVoiceVolume(const struct HdfDeviceIoClient *client,
                                                struct HdfSBuf *data, struct HdfSBuf *reply)
 {
@@ -2275,6 +2352,8 @@ struct HdiServiceDispatchCmdHandleList g_hdiServiceDispatchCmdHandleList[] = {
     {AUDIO_HDI_ADT_GET_PASS_MODE, HdiServiceGetPassthroughMode},
     {AUDIO_HDI_ADT_UPDATE_ROUTE, HdiSerStubUpdateAudioRoute},
     {AUDIO_HDI_ADT_RELEASE_ROUTE, HdiSerStubReleaseAudioRoute},
+    {AUDIO_HDI_ADT_SET_MIC_MUTE, HdiServiceAdapterSetMicMute},
+    {AUDIO_HDI_ADT_GET_MIC_MUTE, HdiServiceAdapterGetMicMute},
     {AUDIO_HDI_ADT_SET_VOICE_VOLUME, HdiServiceAdapterSetVoiceVolume},
     {AUDIO_HDI_ADT_SET_EXTRA_PARAMS, HdiServiceAdapterSetExtraParams},
     {AUDIO_HDI_ADT_GET_EXTRA_PARAMS, HdiServiceAdapterGetExtraParams},

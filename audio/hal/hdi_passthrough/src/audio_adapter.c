@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1106,6 +1106,20 @@ int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struc
         portNum--;
     }
     return AUDIO_HAL_ERR_INTERNAL;
+}
+
+int32_t AudioAdapterSetMicMute(struct AudioAdapter *adapter, bool mute)
+{
+    (void)adapter;
+    (void)mute;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterGetMicMute(struct AudioAdapter *adapter, bool *mute)
+{
+    (void)adapter;
+    (void)mute;
+    return HDF_ERR_NOT_SUPPORT;
 }
 
 int32_t AudioAdapterSetVoiceVolume(struct AudioAdapter *adapter, float volume)
