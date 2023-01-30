@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -450,5 +450,19 @@ HWTEST_F(AudioProxyAdapterTest, AdapterGetExtraParams_002, TestSize.Level1)
     hwAdapter->proxyRemoteHandle = nullptr;
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioProxyAdapterGetExtraParams(adapter, key, condition, value, length));
     hwAdapter->proxyRemoteHandle = proxyRemoteHandle;
+}
+
+HWTEST_F(AudioProxyAdapterTest, AdapterSetMicMute_001, TestSize.Level1)
+{
+    ASSERT_NE(adapter, nullptr);
+    bool mute = false;
+    EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, AudioProxyAdapterSetMicMute(adapter, mute));
+}
+
+HWTEST_F(AudioProxyAdapterTest, AdapterGetMicMute_001, TestSize.Level1)
+{
+    ASSERT_NE(adapter, nullptr);
+    bool mute = false;
+    EXPECT_EQ(AUDIO_HAL_ERR_NOT_SUPPORT, AudioProxyAdapterGetMicMute(adapter, &mute));
 }
 }
