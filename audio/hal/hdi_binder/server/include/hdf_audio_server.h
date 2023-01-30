@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,8 @@ enum AudioHdiServerCmdId {
     AUDIO_HDI_MGR_LOAD_ADAPTER,
     AUDIO_HDI_MGR_UNLOAD_ADAPTER,
 
+    AUDIO_HDI_ADT_SET_MIC_MUTE,
+    AUDIO_HDI_ADT_GET_MIC_MUTE,
     AUDIO_HDI_ADT_SET_VOICE_VOLUME,
     AUDIO_HDI_ADT_SET_EXTRA_PARAMS,
     AUDIO_HDI_ADT_GET_EXTRA_PARAMS,
