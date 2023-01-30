@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,14 +26,14 @@
 #include "usbfn_interface.h"
 #include "usbfn_request.h"
 
-#define HDF_LOG_TAG dev_master
+#define HDF_LOG_TAG dev_usbfn
 
-enum DevMasterCmd {
-    DEV_MASTER_INIT = 0x1,
-    DEV_MASTER_RELEASE,
+enum DevUsbFnCmd {
+    DEV_USBFN_INIT = 0x1,
+    DEV_USBFN_RELEASE,
 };
 
-struct DevMasterMgr {
+struct DevUsbFnMgr {
     struct IDeviceIoService service;
     struct UsbFnDescriptorData descData;
     struct HdfDeviceObject *device;
@@ -41,7 +41,7 @@ struct DevMasterMgr {
 };
 
 struct UsbFnDevice *g_fnDev = NULL;
-static int32_t MasterReleaseFuncDevice(void)
+static int32_t UsbFnReleaseFuncDevice(void)
 {
     int32_t ret;
     if (g_fnDev == NULL) {
@@ -61,7 +61,7 @@ static int32_t MasterReleaseFuncDevice(void)
 static int32_t UsbFnRegistUsbfnDevice(struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct HdfDeviceObject *device = client->device;
-    struct DevMasterMgr *devMgr = NULL;
+    struct DevUsbFnMgr *devMgr = NULL;
     struct UsbFnDevice *fnDev = NULL;
     uint8_t value;
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
@@ -70,32 +70,32 @@ static int32_t UsbFnRegistUsbfnDevice(struct HdfDeviceIoClient *client, struct H
         HDF_LOGE("%{public}s: iface is invalid", __func__);
         return HDF_FAILURE;
     }
-    devMgr = (struct DevMasterMgr *)device->service;
+    devMgr = (struct DevUsbFnMgr *)device->service;
     if (HdfSbufReadUint8(data, &value) != true) {
         HDF_LOGE("%{public}s: read sbuf failed", __func__);
         return HDF_FAILURE;
     }
-    HDF_LOGD("%{public}s: data=%{public}d, descriptor in %{public}s", __func__, value,
+    HDF_LOGI("%{public}s: data=%{public}d, descriptor in %{public}s", __func__, value,
         (devMgr->descData.type == USBFN_DESC_DATA_TYPE_DESC ? "code" : "hcs"));
     devMgr->descData.functionMask = value;
     fnDev = (struct UsbFnDevice *)UsbFnCreateDevice(devMgr->udcName, &devMgr->descData);
     if (fnDev == NULL) {
         HDF_LOGE("%{public}s: create usb function device failed", __func__);
         if (!HdfSbufWriteInt8(reply, 0)) {
-            HDF_LOGE("%{public}s: fn_master sbuf write error", __func__);
+            HDF_LOGE("%{public}s: fn_usbfn sbuf write error", __func__);
         }
         return HDF_FAILURE;
     }
     g_fnDev = fnDev;
     if (!HdfSbufWriteInt8(reply, value)) {
-        HDF_LOGE("%{public}s: fn_master sbuf write error", __func__);
+        HDF_LOGE("%{public}s: fn_usbfn sbuf write error", __func__);
         return HDF_FAILURE;
     }
-    HDF_LOGD("%{public}s: create device done, reply: %{public}d", __func__, value);
+    HDF_LOGI("%{public}s: create device done, reply: %{public}d", __func__, value);
     return HDF_SUCCESS;
 }
 
-static int32_t MasterDispatch(
+static int32_t UsbFnDispatch(
     struct HdfDeviceIoClient *client, int32_t cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
@@ -110,14 +110,14 @@ static int32_t MasterDispatch(
     }
 
     switch (cmdId) {
-        case DEV_MASTER_INIT:
+        case DEV_USBFN_INIT:
             ret = UsbFnRegistUsbfnDevice(client, data, reply);
             if (ret != HDF_SUCCESS) {
                 HDF_LOGE("%{public}s: create usbfn device failed", __func__);
             }
             break;
-        case DEV_MASTER_RELEASE:
-            ret = MasterReleaseFuncDevice();
+        case DEV_USBFN_RELEASE:
+            ret = UsbFnReleaseFuncDevice();
             break;
         default:
             ret = HDF_ERR_INVALID_OBJECT;
@@ -128,14 +128,14 @@ static int32_t MasterDispatch(
 }
 
 /* HdfDriverEntry implementations */
-static int32_t MasterDriverBind(struct HdfDeviceObject *device)
+static int32_t UsbFnDriverBind(struct HdfDeviceObject *device)
 {
-    struct DevMasterMgr *devMgr = NULL;
+    struct DevUsbFnMgr *devMgr = NULL;
     if (device == NULL) {
         HDF_LOGE("%{public}s: device is null\n", __func__);
         return HDF_FAILURE;
     }
-    devMgr = (struct DevMasterMgr *)OsalMemCalloc(sizeof(*devMgr));
+    devMgr = (struct DevUsbFnMgr *)OsalMemCalloc(sizeof(*devMgr));
     if (devMgr == NULL) {
         HDF_LOGE("%{public}s: usbfn Alloc usb devMgr failed\n", __func__);
         return HDF_FAILURE;
@@ -149,13 +149,13 @@ static int32_t MasterDriverBind(struct HdfDeviceObject *device)
 
     devMgr->device = device;
     device->service = &(devMgr->service);
-    devMgr->device->service->Dispatch = MasterDispatch;
+    devMgr->device->service->Dispatch = UsbFnDispatch;
     return HDF_SUCCESS;
 }
 
-static int32_t MasterDriverInit(struct HdfDeviceObject *device)
+static int32_t UsbFnDriverInit(struct HdfDeviceObject *device)
 {
-    struct DevMasterMgr *devMgr = NULL;
+    struct DevUsbFnMgr *devMgr = NULL;
     uint8_t useHcs;
 
     struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
@@ -163,7 +163,7 @@ static int32_t MasterDriverInit(struct HdfDeviceObject *device)
         HDF_LOGE("%{public}s: iface is invalid\n", __func__);
         return HDF_FAILURE;
     }
-    devMgr = (struct DevMasterMgr *)device->service;
+    devMgr = (struct DevUsbFnMgr *)device->service;
     if (iface->GetString(device->property, "udc_name", &devMgr->udcName, UDC_NAME) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read udc_name failed, use default: %{public}s", __func__, UDC_NAME);
     }
@@ -178,10 +178,10 @@ static int32_t MasterDriverInit(struct HdfDeviceObject *device)
     return HDF_SUCCESS;
 }
 
-static void MasterDriverRelease(struct HdfDeviceObject *device)
+static void UsbFnDriverRelease(struct HdfDeviceObject *device)
 {
-    struct DevMasterMgr *devMgr = NULL;
-    devMgr = (struct DevMasterMgr *)device->service;
+    struct DevUsbFnMgr *devMgr = NULL;
+    devMgr = (struct DevUsbFnMgr *)device->service;
     if (devMgr == NULL) {
         HDF_LOGE("%{public}s: descriptor is NULL", __func__);
         return;
@@ -189,12 +189,12 @@ static void MasterDriverRelease(struct HdfDeviceObject *device)
     OsalMemFree(devMgr);
 }
 
-struct HdfDriverEntry g_masterDriverEntry = {
+struct HdfDriverEntry g_usbFnDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "usbfn_master",
-    .Bind = MasterDriverBind,
-    .Init = MasterDriverInit,
-    .Release = MasterDriverRelease,
+    .moduleName = "usbfn",
+    .Bind = UsbFnDriverBind,
+    .Init = UsbFnDriverInit,
+    .Release = UsbFnDriverRelease,
 };
 
-HDF_INIT(g_masterDriverEntry);
+HDF_INIT(g_usbFnDriverEntry);
