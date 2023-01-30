@@ -53,7 +53,7 @@ bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
     while (1) {
         int optionIndex = 0;
         int c = getopt_long(argc, argv, "c::i:o:w:h:", g_longOptions, &optionIndex);
-        if (c == -1 || optarg == 0) {
+        if (c == -1) {
             break;
         }
         MyOptIndex index = static_cast<MyOptIndex>(c);
