@@ -90,7 +90,53 @@ ohos_shared_library("libcodec_server") {
     external_deps = [ "hilog:libhilog" ]
   }
 
+  shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+}
+
+ohos_static_library("libcodec_server_static") {
+  include_dirs = [
+    "//drivers/peripheral/codec/interfaces/include",
+    "//drivers/peripheral/codec/hdi_service/codec_proxy",
+    "//drivers/peripheral/codec/hdi_service/common/",
+    "//drivers/peripheral/codec/hal/v1.0/codec_instance/include",
+    "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
+    "//drivers/peripheral/codec/hal/v1.0/oem_interface/include",
+    "//drivers/peripheral/codec/hal/v1.0/buffer_manager/include",
+  ]
+  sources = [
+    "//drivers/peripheral/codec/hal/v1.0/codec_instance/src/codec_instance.c",
+    "//drivers/peripheral/codec/hal/v1.0/codec_instance/src/codec_instance_manager.cpp",
+    "//drivers/peripheral/codec/hal/v1.0/share_mem/src/ashmem_wrapper.cpp",
+    "//drivers/peripheral/codec/hal/v1.0/share_mem/src/share_mem.c",
+    "codec_service_stub/codec_callback_service.c",
+    "codec_service_stub/codec_callback_stub.c",
+    "codec_service_stub/codec_config_parser.c",
+    "codec_service_stub/codec_host.c",
+    "codec_service_stub/codec_service.c",
+    "codec_service_stub/codec_stub.c",
+    "codec_service_stub/stub_msgproc.c",
+    "common/common_msgproc.c",
+  ]
+
+  deps = [ "//drivers/peripheral/codec/hdi_service:codec_client" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_peripheral_display:hdi_gralloc_client",
+      "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_codec"
 }
