@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,18 +28,18 @@ namespace Audio {
             HDF_LOGE("%{public}s: dlopen failed\n", __func__);
             return false;
         }
-        struct DevHandle *(*BindServiceCapture)(const char *) = nullptr;
+        struct DevHandle *(*AudioBindService)(const char *) = nullptr;
         int32_t (*InterfaceLibCtlCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *) = nullptr;
-        BindServiceCapture = reinterpret_cast<struct DevHandle *(*)(const char *)>
-           (dlsym(ctlcapFuzzPtrHandle, "AudioBindServiceCapture"));
-        if (BindServiceCapture == nullptr) {
-            HDF_LOGE("%{public}s: dlsym AudioBindServiceCapture failed \n", __func__);
+        AudioBindService = reinterpret_cast<struct DevHandle *(*)(const char *)>
+           (dlsym(ctlcapFuzzPtrHandle, "AudioBindService"));
+        if (AudioBindService == nullptr) {
+            HDF_LOGE("%{public}s: dlsym AudioBindService failed \n", __func__);
             dlclose(ctlcapFuzzPtrHandle);
             return false;
         }
-        struct DevHandle *handle = BindServiceCapture(BIND_CONTROL.c_str());
+        struct DevHandle *handle = AudioBindService(BIND_CONTROL.c_str());
         if (handle == nullptr) {
-            HDF_LOGE("%{public}s: BindServiceCapture failed \n", __func__);
+            HDF_LOGE("%{public}s: AudioBindService failed \n", __func__);
             dlclose(ctlcapFuzzPtrHandle);
             return false;
         }
