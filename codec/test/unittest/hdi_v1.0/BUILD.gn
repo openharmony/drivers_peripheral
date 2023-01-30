@@ -45,9 +45,12 @@ ohos_unittest("codec_hdi_1.0_test") {
 
   deps = [
     "//drivers/peripheral/codec/hdi_service:codec_client",
-    "//drivers/peripheral/codec/hdi_service:codec_service",
     "//third_party/googletest:gtest_main",
   ]
+
+  if (HAVE_CODEC_OEM_PATH) {
+    deps += [ "//drivers/peripheral/codec/hdi_service:libcodec_server_static" ]
+  }
 
   if (is_standard_system) {
     external_deps = [
