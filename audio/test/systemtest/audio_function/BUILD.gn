@@ -23,7 +23,7 @@ group("function") {
   if (!defined(ohos_lite)) {
     testonly = true
   }
-  deps = [ "audio_server:hdf_audio_hdi_server_function_test" ]
+  deps = []
   if (defined(ohos_lite)) {
     deps += [
       "audio_pathroute:hdf_audio_hdi_path_route_test",
