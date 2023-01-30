@@ -24,10 +24,13 @@ if (defined(ohos_lite)) {
     if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       testonly = true
       deps = [
-        "fuzztest:fuzztest",
         "systemtest:systemtest",
         "unittest:audiotest",
       ]
+
+      if (!drivers_peripheral_audio_rich_device) {
+        deps += [ "fuzztest:fuzztest" ]
+      }
     }
   }
 }
