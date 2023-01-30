@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -79,7 +79,7 @@ HWTEST_F(UsbDevicePerformanceTest, CheckDeviceSdkProcInfo, TestSize.Level1)
         system(("chmod +x " + script).c_str());
     }
     printf("try to start usb_watch_process.sh...\n");
-    ASSERT_EQ(system(("nohup sh " + script + " usbfnMaster_host > /data/nohup.out &").c_str()), 0);
+    ASSERT_EQ(system(("nohup sh " + script + " usbfn_host > /data/nohup.out &").c_str()), 0);
     printf("usb_watch_process.sh is running...\n");
     for (int32_t i = 0; i < 1000; i++) {
         system("usb_dev_test -2 $RANDOM");
@@ -95,7 +95,7 @@ HWTEST_F(UsbDevicePerformanceTest, CheckDeviceSdkProcInfo, TestSize.Level1)
     CalcProcInfoFromFile(info, logFile);
     EXPECT_LT(info.cpuPeak, 15) << "ErrInfo: cpu peak is not less than 15%";
     EXPECT_LT(info.cpuAvg, 10) << "ErrInfo: average cpu is not less than 10%";
-    res = popen("ps -ef | grep 'usbfnMaster_host' | grep -v grep | wc -l", "r");
+    res = popen("ps -ef | grep 'usbfn_host' | grep -v grep | wc -l", "r");
     pch = ParseSysCmdResult(*res, 1, 1);
     processCount = stoi(pch);
     EXPECT_EQ(processCount, 1) << "ErrInfo: device sdk process count is not equal to 1";

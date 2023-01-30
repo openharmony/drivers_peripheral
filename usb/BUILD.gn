@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -25,7 +25,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/usb/ddk:libusb_core",
       "//drivers/peripheral/usb/gadget/function/acm:libusbfn_cdcacm",
       "//drivers/peripheral/usb/gadget/function/ecm:libusbfn_cdcecm",
-      "//drivers/peripheral/usb/gadget/function/master:libusbfn_master",
+      "//drivers/peripheral/usb/gadget/function/usbfn:libusbfn",
       "//drivers/peripheral/usb/hdi_service:hdi_usb_service",
       "//drivers/peripheral/usb/net:libusbhost_ecm",
       "//drivers/peripheral/usb/serial:libusbhost_acm",
