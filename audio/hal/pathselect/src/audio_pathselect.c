@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -51,7 +51,7 @@ int32_t AudioPathSelGetConfToJsonObj(void)
     }
     fpJson = fopen(CJSONFILE_CONFIG_PATH, "r");
     if (fpJson == NULL) {
-        AUDIO_FUNC_LOGE("audio_paths.json file fail!");
+        AUDIO_FUNC_LOGE("open %{pulbic}s fail!", CJSONFILE_CONFIG_PATH);
         return HDF_FAILURE;
     }
     if (fseek(fpJson, 0, SEEK_END) != HDF_SUCCESS) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,11 +17,15 @@
 #define ALSA_LIB_COMMON_H
 
 #include "asoundlib.h"
+#include "audio_if_lib_common.h"
+#include "audio_uhdf_log.h"
 #include "hdf_io_service_if.h"
 #include "hdf_sbuf.h"
 #include "osal_mem.h"
-#include "audio_uhdf_log.h"
-#include "audio_if_lib_common.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define SERVIC_NAME_MAX_LEN 32
 
@@ -38,35 +42,8 @@
 #define AUDIO_ALSALIB_MMAP_MAX      10
 #define AUDIO_ALSALIB_RETYR         3
 
-enum SndRKPlayPathItem {
-    SND_OUT_CARD_OFF,            /* close play path */
-    SND_OUT_CARD_RCV,            /* speaker */
-    SND_OUT_CARD_SPK,            /* speaker */
-    SND_OUT_CARD_HP,             /* headphone */
-    SND_OUT_CARD_HP_NO_MIC,      /* headphone */
-    SND_OUT_CARD_BT,             /* bluetooth (Don't set!!!) */
-    SND_OUT_CARD_SPK_HP,         /* speaker and headphone */
-    SND_OUT_CARD_RING_SPK,       /* speaker */
-    SND_OUT_CARD_RING_HP,        /* headphone */
-    SND_OUT_CARD_RING_HP_NO_MIC, /* headphone */
-    SND_OUT_CARD_RING_SPK_HP     /* speaker and headphone */
-};
-
-enum SndRKCapPathItem {
-    SND_IN_CARD_MIC_OFF,        /* close capture path */
-    SND_IN_CARD_MAIN_MIC,       /* main mic */
-    SND_IN_CARD_HANDS_FREE_MIC, /* hands free mic */
-    SND_IN_CARD_BT_SCO_MIC      /* bluetooth sco mic (Don't set!!!) */
-};
-
-enum SndRKCtrlNumId {
-    SND_PLAY_PATH = 1, /* play path  */
-    SND_CAP_MIC_PATH,  /* capture path */
-    SND_DACL_PLAY_VOL, /* play left volume path */
-    SND_DACR_PLAY_VOL, /* play right volume path */
-    SND_DACL_CAP_VOL,  /* capture left volume path */
-    SND_DACR_CAP_VOL   /* capture right volume path */
-};
+#define ALSA_CTL_NAME_LEN 64
+#define MIXER_CTL_MAX_NUM 64
 
 enum SndCardType {
     SND_CARD_UNKNOWN = -1,
@@ -77,10 +54,18 @@ enum SndCardType {
     SND_CARD_MAX
 };
 
+struct MixerCtlVolumeName {
+    char name[ALSA_CTL_NAME_LEN]; /* name part of simple element identifier */
+};
+
 struct DevProcInfo {
-    char cardName[CARD_ID_LEN_MAX];
-    char cid[CARD_ID_LEN_MAX]; /* cardX/id match */
-    char did[CARD_ID_LEN_MAX]; /* dai id match */
+    char cardName[CARD_ID_LEN_MAX];                /* adapter name */
+    char cid[CARD_ID_LEN_MAX];                     /* cardX/id match */
+    char did[CARD_ID_LEN_MAX];                     /* dai id match */
+    struct MixerCtlVolumeName *ctlRenderNameList;  /* Simple mixer control list */
+    struct MixerCtlVolumeName *ctlCaptureNameList; /* Simple mixer control list */
+    uint32_t ctlRenderVolNameCount;
+    uint32_t ctlCaptureVolNameCount;
 };
 
 struct AlsaDevInfo {
@@ -90,13 +75,28 @@ struct AlsaDevInfo {
     int32_t device;
 };
 
+struct AlsaCardsList {
+    struct AlsaDevInfo alsaDevIns[MAX_CARD_NUM];
+};
+
+struct AlsaMixerPath {
+    const char *pathName; /* ASCII name of item */
+    uint32_t numId;       /* numeric identifier */
+    uint32_t item;        /* item number */
+};
+
+struct AlsaMixerElem {
+    snd_mixer_elem_t *elem; /* Simple mixer control */
+};
+
 struct AudioCardInfo {
     uint8_t cardStatus;
     snd_pcm_t *capturePcmHandle;
     snd_pcm_t *renderPcmHandle;
     snd_mixer_t *mixer;
-    snd_mixer_elem_t *ctrlLeftVolume;
-    snd_mixer_elem_t *ctrlRightVolume;
+    struct AlsaMixerElem *volElemList; /* Simple mixer control list for primary */
+    uint32_t volElemCount;             /* Simple mixer control list count for primary */
+    snd_mixer_elem_t *usbCtlVolume;
     bool renderMmapFlag;
     bool captureMmapFlag;
     int32_t renderMuteValue;
@@ -109,26 +109,35 @@ struct AudioCardInfo {
     char devName[MAX_CARD_NAME_LEN + 1];
     char alsaCardId[MAX_CARD_NAME_LEN + 1];
     char ctrlName[MAX_CARD_NAME_LEN + 1];
-    struct AlsaDevInfo alsaDevIns[MAX_CARD_NUM];
+    char alsaPcmInfoId[MAX_CARD_NAME_LEN + 1];
     struct AudioPcmHwParams hwRenderParams;
     struct AudioPcmHwParams hwCaptureParams;
+    struct AlsaMixerPath renderMixerPath;
+    struct AlsaMixerPath captureMixerPath;
 };
 
-struct HdfIoService *HdfIoServiceBindName(const char *serviceName);
+struct DevHandle *AudioBindService(const char *name);
+void AudioCloseService(const struct DevHandle *handle);
 void InitSound(snd_mixer_t **mixer, char *hwCtlName);
 int32_t CloseMixerHandle(snd_mixer_t *alsaMixHandle);
 int32_t InitCardIns(void);
 struct AudioCardInfo *GetCardIns(const char *cardName);
-struct AudioCardInfo *AudioGetCardInfo(const char *adapterName, snd_pcm_stream_t stream);
+struct AudioCardInfo *AudioGetCardInstance(const char *adapterName);
+int32_t AudioGetCardInfo(struct AudioCardInfo *cardIns, const char *adapterName, snd_pcm_stream_t stream);
+int32_t InitMixerCtlElement(
+    const char *adapterName, struct AudioCardInfo *cardIns, snd_mixer_t *mixer, snd_pcm_stream_t stream);
 void CheckCardStatus(struct AudioCardInfo *cardIns);
 int32_t CheckParaFormat(struct AudioPcmHwParams hwParams, snd_pcm_format_t *alsaPcmFormat);
 int32_t DestroyCardList(void);
 int32_t GetSelCardInfo(struct AudioCardInfo *cardIns, struct AlsaDevInfo *devInsHandle);
 int32_t MatchSelAdapter(const char *adapterName, struct AudioCardInfo *cardIns);
-int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_elem_t *pcmElement);
-int32_t AudioMixerSetCtrlMode(
-    struct AudioCardInfo *cardIns, const char *adapterName, const char *mixerCtrlName, int numId, int item);
-snd_mixer_elem_t *AudioUsbFindElement(snd_mixer_t *mixer);
+int32_t GetPriMixerCtlElement(struct AudioCardInfo *cardIns, snd_mixer_t *mixer, snd_pcm_stream_t stream);
+int32_t AudioSetCtrlVolumeRange(struct AudioCardInfo *cardIns, const char *adapterName, snd_pcm_stream_t stream);
 int32_t CardInfoParseFromConfig(void);
-
+int32_t AudioMixerSetCtrlMode(struct AudioCardInfo *cardIns, const char *adapterName, snd_pcm_stream_t stream);
+int32_t EnableAudioRenderRoute(const struct AudioHwRenderParam *renderData);
+int32_t EnableAudioCaptureRoute(const struct AudioHwCaptureParam *captureData);
+#ifdef __cplusplus
+}
+#endif
 #endif /* ALSA_LIB_COMMON_H */

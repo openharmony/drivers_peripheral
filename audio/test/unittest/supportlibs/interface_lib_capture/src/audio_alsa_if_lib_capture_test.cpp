@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,12 +52,12 @@ void AudioAlsaIfLibCaptureTest::TearDownTestCase()
 
 void AudioAlsaIfLibCaptureTest::SetUp()
 {
-    handle = AudioBindServiceCapture(BIND_CAPTURE.c_str());
+    handle = AudioBindService(BIND_CAPTURE.c_str());
 }
 
 void AudioAlsaIfLibCaptureTest::TearDown()
 {
-    AudioCloseServiceCapture(handle);
+    AudioCloseService(handle);
 }
 
 int32_t AudioAlsaIfLibCaptureTest::AudioInterfaceCaptureInit(struct AudioHwCaptureParam *&handleData)
