@@ -62,7 +62,7 @@ static int32_t ReadVibratorInfo(struct HdfSBuf *reply, struct VibratorDevice *pr
     }
 
     if (buf == NULL || len != sizeof(struct VibratorInfo)) {
-        HDF_LOGE("%{public}s: read size is error, len = %{public}d, size = %{public}d\n",\
+        HDF_LOGE("%{public}s: read size is error, len = %{public}d, size = %{public}zu\n",\
             __func__, len, sizeof(struct VibratorInfo));
         HdfSbufRecycle(reply);
         return HDF_FAILURE;
