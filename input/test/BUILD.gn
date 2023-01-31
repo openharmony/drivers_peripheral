@@ -34,9 +34,15 @@ if (defined(ohos_lite)) {
 
   group("hdf_test_input") {
     testonly = true
-    deps = [ "fuzztest/input_fuzzer:hdf_fuzztest_input" ]
+    deps = []
+    if (!drivers_peripheral_input_feature_passthrough) {
+      deps += [ "fuzztest/input_fuzzer:hdf_fuzztest_input" ]
+    }
     if (drivers_peripheral_input_feature_model) {
-      deps += [ "unittest:hdf_unittest_input" ]
+      deps += [
+        "unittest:hdf_unittest_input",
+        "unittest/hdi:hdi_unittest_input",
+      ]
     }
     if (drivers_peripheral_input_feature_udriver) {
       deps += [ "unittest/udriver:input_udriver_unittest" ]
