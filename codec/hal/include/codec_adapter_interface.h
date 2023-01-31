@@ -114,6 +114,10 @@ int32_t OmxAdapterComponentRoleEnum(struct CodecComponentNode *codecNode, uint8_
  * @brief Set the role for the component.
  */
 int32_t OmxAdapterSetComponentRole(struct CodecComponentNode *codecNode, char *compName);
+/**
+ * @brief build hidumper reply.
+ */
+int32_t OmxAdapterWriteDumperData(char *info, uint32_t size, uint32_t compId, struct CodecComponentNode *codecNode);
 #ifdef __cplusplus
 };
 #endif
