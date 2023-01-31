@@ -89,6 +89,10 @@ public:
         return comp_;
     }
 
+    uint32_t getBufferCount()
+    {
+        return codecBufferMap_.size();
+    }
 public:
     static OMX_CALLBACKTYPE callbacks_;  // callbacks
 

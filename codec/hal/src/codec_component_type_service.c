@@ -37,7 +37,8 @@ static int32_t CodecComponentTypeGetComponentVersion(struct CodecComponentType *
 static int32_t CodecComponentTypeSendCommand(struct CodecComponentType *self,
     enum OMX_COMMANDTYPE cmd, uint32_t param, int8_t *cmdData, uint32_t cmdDataLen)
 {
-    HDF_LOGI("%{public}s, service impl!", __func__);
+    HDF_LOGI("%{public}s, service impl!, type [%{public}d], cmd [%{public}d]", __func__,
+             (uint32_t)cmd, param);
 
     struct CodecComponentTypeService *service = (struct CodecComponentTypeService *)self;
     return OmxAdapterSendCommand(service->codecNode, cmd, param, cmdData, cmdDataLen);
