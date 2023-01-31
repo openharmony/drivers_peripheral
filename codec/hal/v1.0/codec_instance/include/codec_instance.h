@@ -51,8 +51,6 @@ struct CodecInstance {
     void *oemLibHandle;
     struct CodecOemIf *codecOemIface;
 
-    void *bufferManagerLibHandle;
-    struct BufferManagerIf *bufferManagerIface;
     struct BufferManagerWrapper *bufferManagerWrapper;
 
     CODEC_HANDLETYPE handle;

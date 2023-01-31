@@ -23,38 +23,7 @@
 #define HDF_LOG_TAG codec_hdi_instance
 
 #define CODEC_OEM_INTERFACE_LIB_NAME    "libcodec_oem_interface.z.so"
-#define CODEC_BUFFER_MANAGER_LIB_NAME   "libcodec_buffer_manager.z.so"
 #define BUFFER_COUNT    1
-
-static int32_t InitBufferManagerIf(struct CodecInstance *instance)
-{
-    if (instance == NULL || instance->bufferManagerIface == NULL) {
-        HDF_LOGE("%{public}s: Invalid param!", __func__);
-        return HDF_FAILURE;
-    }
-
-    void *libHandle = dlopen(CODEC_BUFFER_MANAGER_LIB_NAME, RTLD_NOW);
-    if (libHandle == NULL) {
-        HDF_LOGE("%{public}s: lib %{public}s dlopen failed, error code[%{public}s]",
-            __func__, CODEC_BUFFER_MANAGER_LIB_NAME, dlerror());
-        return HDF_FAILURE;
-    }
-
-    struct BufferManagerIf *iface = instance->bufferManagerIface;
-    iface->getBufferManager = (GetBufferManagerType)dlsym(libHandle, "GetBufferManager");
-    iface->deleteBufferManager = (DeleteBufferManagerType)dlsym(libHandle, "DeleteBufferManager");
-    if (iface->getBufferManager != NULL) {
-        HDF_LOGI("%{public}s:  dlsym ok", __func__);
-        instance->bufferManagerWrapper = iface->getBufferManager();
-    } else {
-        HDF_LOGE("%{public}s: lib %{public}s dlsym failed, error code[%{public}s]",
-            __func__, CODEC_BUFFER_MANAGER_LIB_NAME, dlerror());
-        return HDF_FAILURE;
-    }
-
-    instance->bufferManagerLibHandle = libHandle;
-    return HDF_SUCCESS;
-}
 
 static int32_t WaitForOutputDataBuffer(struct CodecInstance *instance, CodecBuffer *outputData)
 {
@@ -169,12 +138,13 @@ int32_t InitCodecInstance(struct CodecInstance *instance, struct CodecOemIf *oem
         return HDF_FAILURE;
     }
     instance->codecOemIface = oemIf;
-    instance->bufferManagerIface = (struct BufferManagerIf *)OsalMemAlloc(sizeof(struct BufferManagerIf));
-    if (instance->bufferManagerIface == NULL) {
-        HDF_LOGE("%{public}s: bufferManagerIface mem alloc failed", __func__);
+    instance->bufferManagerWrapper = GetBufferManager();
+    if (instance->bufferManagerWrapper == NULL) {
+        HDF_LOGE("%{public}s: GetBufferManager failed", __func__);
         return HDF_FAILURE;
     }
-    return InitBufferManagerIf(instance);
+
+    return HDF_SUCCESS;
 }
 
 int32_t RunCodecInstance(struct CodecInstance *instance)
@@ -225,11 +195,7 @@ int32_t DestroyCodecInstance(struct CodecInstance *instance)
     ReleaseInputInfo(instance);
     ReleaseOutputInfo(instance);
 
-    if (instance->bufferManagerIface != NULL) {
-        instance->bufferManagerIface->deleteBufferManager(&(instance->bufferManagerWrapper));
-        OsalMemFree(instance->bufferManagerIface);
-    }
-    dlclose(instance->bufferManagerLibHandle);
+    DeleteBufferManager(&(instance->bufferManagerWrapper));
     return HDF_SUCCESS;
 }
 
