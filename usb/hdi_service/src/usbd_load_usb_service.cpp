@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,9 +19,11 @@
 #include <iostream>
 #include <unistd.h>
 
+#include "hdf_base.h"
 #include "iservice_registry.h"
 #include "osal_thread.h"
 #include "osal_time.h"
+#include "securec.h"
 
 using namespace OHOS;
 using namespace std;
@@ -98,7 +100,12 @@ int32_t UsbdLoadUsbService::StartThreadUsbLoad()
 {
     int32_t ret;
     struct OsalThread threadUsbLoad;
-    struct OsalThreadParam threadCfg = {nullptr};
+    struct OsalThreadParam threadCfg;
+    ret = memset_s(&threadCfg, sizeof(threadCfg), 0, sizeof(threadCfg));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s:%{public}d memset_s failed", __func__, __LINE__);
+        return ret;
+    }
     threadCfg.priority = OSAL_THREAD_PRI_DEFAULT;
     threadCfg.stackSize = HDF_PROCESS_STACK_SIZE;
     sptr<ISystemAbilityManager> sm = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
