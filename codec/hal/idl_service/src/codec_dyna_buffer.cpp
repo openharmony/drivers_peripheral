@@ -23,8 +23,12 @@ using namespace OHOS::HDI::Codec::V1_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-CodecDynaBuffer::CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer) : ICodecBuffer(codecBuffer)
-{}
+CodecDynaBuffer::CodecDynaBuffer(struct OmxCodecBuffer &codecBuffer, BufferHandle *bufferHandle)
+    : ICodecBuffer(codecBuffer)
+{
+    dynaBuffer_ = std::make_shared<DynamicBuffer>();
+    dynaBuffer_->bufferHandle = bufferHandle;
+}
 
 CodecDynaBuffer::~CodecDynaBuffer()
 {
@@ -39,10 +43,7 @@ sptr<ICodecBuffer> CodecDynaBuffer::Create(struct OmxCodecBuffer &codecBuffer)
         codecBuffer.bufferhandle = nullptr;
     }
     codecBuffer.allocLen = sizeof(DynamicBuffer);
-
-    CodecDynaBuffer *buffer = new CodecDynaBuffer(codecBuffer);
-    buffer->dynaBuffer_ = std::make_shared<DynamicBuffer>();
-    buffer->dynaBuffer_->bufferHandle = bufferHandle;
+    CodecDynaBuffer *buffer = new CodecDynaBuffer(codecBuffer, bufferHandle);
     return sptr<ICodecBuffer>(buffer);
 }
 
