@@ -205,7 +205,7 @@ HWTEST_F(AudioHdiRenderSceneTest, AudioRenderSelectScene_001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = AudioRenderStartAndOneFrame(render);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = render->control.Stop((AudioHandle)render);
     adapter->DestroyRender(adapter, render);
