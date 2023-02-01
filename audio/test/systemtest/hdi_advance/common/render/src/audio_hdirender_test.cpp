@@ -168,7 +168,7 @@ HWTEST_F(AudioHdiRenderTest, AudioRenderGetRenderPosition_001, TestSize.Level1)
     }
 
     ret = ThreadRelease(audiopara);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
 * @tc.name  AudioRenderGetRenderPosition_002
@@ -197,14 +197,14 @@ HWTEST_F(AudioHdiRenderTest, AudioRenderGetRenderPosition_002, TestSize.Level1)
         FrameStatus(0);
         usleep(1000);
         ret = audiopara.render->control.Pause((AudioHandle)(audiopara.render));
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_NE(HDF_SUCCESS, ret);
         ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
         EXPECT_EQ(HDF_SUCCESS, ret);
         EXPECT_GT((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
         EXPECT_GT(frames, INITIAL_VALUE);
         usleep(1000);
         ret = audiopara.render->control.Resume((AudioHandle)(audiopara.render));
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_NE(HDF_SUCCESS, ret);
         FrameStatus(1);
         ret = audiopara.render->GetRenderPosition(audiopara.render, &frames, &time);
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -213,7 +213,7 @@ HWTEST_F(AudioHdiRenderTest, AudioRenderGetRenderPosition_002, TestSize.Level1)
     }
 
     ret = ThreadRelease(audiopara);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
 * @tc.name  AudioRenderGetRenderPosition_003

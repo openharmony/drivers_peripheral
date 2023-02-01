@@ -160,13 +160,13 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, AudioCaptureGetFrameCount_005, T
     EXPECT_NE(HDF_SUCCESS, ret);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->attr.GetFrameCount(capture, &count);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_GT(count, INITIAL_VALUE);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
     * @tc.name  AudioCaptureGetFrameCount_006
@@ -186,13 +186,13 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, AudioCaptureGetFrameCount_006, T
     EXPECT_NE(HDF_SUCCESS, ret);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->attr.GetFrameCount(capture, &count);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_GT(count, INITIAL_VALUE);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 #ifndef PRODUCT_RK3568
 /**
@@ -213,13 +213,13 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, AudioCaptureGetFrameCount_007, T
     EXPECT_NE(HDF_SUCCESS, ret);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->attr.GetFrameCount(capture, &count);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_GT(count, INITIAL_VALUE);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
     * @tc.name  AudioCaptureGetFrameCount_008
@@ -239,13 +239,13 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, AudioCaptureGetFrameCount_008, T
     EXPECT_NE(HDF_SUCCESS, ret);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->attr.GetFrameCount(capture, &count);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_GT(count, INITIAL_VALUE);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 #endif
 #ifndef PRODUCT_RK3568
@@ -303,14 +303,14 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, AudioCaptureGetCapturePosition_0
     EXPECT_EQ(AUDIO_FORMAT_TYPE_PCM_16_BIT, attrsValue.format);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->GetCapturePosition(capture, &frames, &time);
     EXPECT_NE(HDF_SUCCESS, ret);
     EXPECT_EQ((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
     EXPECT_EQ(frames, INITIAL_VALUE);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
     * @tc.name  AudioCaptureGetCapturePosition_010
@@ -341,14 +341,14 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, AudioCaptureGetCapturePosition_0
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->GetCapturePosition(capture, &frames, &time);
     EXPECT_NE(HDF_SUCCESS, ret);
     EXPECT_EQ((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
     EXPECT_EQ(frames, INITIAL_VALUE);
 
     ret = capture->control.Stop((AudioHandle)capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 #ifndef PRODUCT_RK3568
 /**
@@ -381,13 +381,14 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, AudioCaptureGetCapturePosition_0
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->GetCapturePosition(capture, &frames, &time);
     EXPECT_NE(HDF_SUCCESS, ret);
     EXPECT_EQ((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
     EXPECT_EQ(frames, INITIAL_VALUE);
 
-    capture->control.Stop((AudioHandle)capture);
+    ret = capture->control.Stop((AudioHandle)capture);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
     * @tc.name  AudioCaptureGetCapturePosition_012
@@ -417,13 +418,14 @@ HWTEST_F(AudioHdiCaptureHardwareDependenceTest, AudioCaptureGetCapturePosition_0
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = capture->GetCapturePosition(capture, &frames, &time);
     EXPECT_NE(HDF_SUCCESS, ret);
     EXPECT_EQ((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
     EXPECT_EQ(frames, INITIAL_VALUE);
 
-    capture->control.Stop((AudioHandle)capture);
+    ret = capture->control.Stop((AudioHandle)capture);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 #endif
 }
