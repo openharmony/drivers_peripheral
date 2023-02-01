@@ -36,6 +36,7 @@ ohos_shared_library("libcodec_hdi_omx_server") {
     "src/codec_component_type_service.c",
     "src/codec_component_type_stub.c",
     "src/codec_config_parser.c",
+    "src/codec_dfx_service.c",
     "src/codec_types.c",
     "v2.0/hdi_impl/src/codec_dyna_buffer.cpp",
     "v2.0/hdi_impl/src/codec_handle_buffer.cpp",
@@ -57,6 +58,7 @@ ohos_shared_library("libcodec_hdi_omx_server") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "hitrace_native:hitrace_meter" ]
   defines = []
   if (drivers_peripheral_codec_support_role) {
     defines += [ "SUPPORT_ROLE" ]
@@ -86,6 +88,7 @@ ohos_static_library("libcodec_hdi_omx_server_static") {
     "src/codec_component_type_service.c",
     "src/codec_component_type_stub.c",
     "src/codec_config_parser.c",
+    "src/codec_dfx_service.c",
     "src/codec_types.c",
     "v2.0/hdi_impl/src/codec_dyna_buffer.cpp",
     "v2.0/hdi_impl/src/codec_handle_buffer.cpp",
@@ -107,6 +110,7 @@ ohos_static_library("libcodec_hdi_omx_server_static") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
+  external_deps += [ "hitrace_native:hitrace_meter" ]
   defines = []
   if (drivers_peripheral_codec_support_role) {
     defines += [ "SUPPORT_ROLE" ]

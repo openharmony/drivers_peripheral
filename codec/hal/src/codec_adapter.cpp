@@ -19,6 +19,7 @@
 #include "codec_adapter_interface.h"
 #include "component_mgr.h"
 #include "component_node.h"
+#include "hitrace_meter.h"
 #define HDF_LOG_TAG codec_hdi_server
 
 using namespace OHOS::Codec::Omx;
@@ -34,6 +35,7 @@ extern "C" {
 int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *compName, int64_t appData,
                                   struct CodecCallbackType *callbacks)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "OMXAdapterCreateComponent");
     OMX_COMPONENTTYPE *comp = nullptr;
     CodecComponentNode *tempNode = new CodecComponentNode;
     if (tempNode == nullptr) {
@@ -163,6 +165,7 @@ int32_t OmxAdapterComponentTunnelRequest(struct CodecComponentNode *codecNode, u
 
 int32_t OmxAdapterUseBuffer(struct CodecComponentNode *codecNode, uint32_t portIndex, struct OmxCodecBuffer *omxBuffer)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "OmxAdapterUseBuffer");
     if (codecNode == nullptr || codecNode->node == nullptr || omxBuffer == nullptr) {
         HDF_LOGE("%{public}s codecNode, node or omxBuffer is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -182,6 +185,7 @@ int32_t OmxAdapterAllocateBuffer(struct CodecComponentNode *codecNode, uint32_t 
 
 int32_t OmxAdapterFreeBuffer(struct CodecComponentNode *codecNode, uint32_t portIndex, struct OmxCodecBuffer *omxBuffer)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "OmxAdapterFreeBuffer");
     if (codecNode == nullptr || codecNode->node == nullptr || omxBuffer == nullptr) {
         HDF_LOGE("%{public}s codecNode, node or omxBuffer is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -191,6 +195,7 @@ int32_t OmxAdapterFreeBuffer(struct CodecComponentNode *codecNode, uint32_t port
 
 int32_t OmxAdapterEmptyThisBuffer(struct CodecComponentNode *codecNode, struct OmxCodecBuffer *omxBuffer)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "OmxAdapterEmptyThisBuffer");
     if (codecNode == nullptr || codecNode->node == nullptr || omxBuffer == nullptr) {
         HDF_LOGE("%{public}s codecNode, node or omxBuffer is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -200,6 +205,7 @@ int32_t OmxAdapterEmptyThisBuffer(struct CodecComponentNode *codecNode, struct O
 
 int32_t OmxAdapterFillThisBuffer(struct CodecComponentNode *codecNode, struct OmxCodecBuffer *omxBuffer)
 {
+    HITRACE_METER_NAME(HITRACE_TAG_OHOS, "OmxAdapterFillThisBuffer");
     if (codecNode == nullptr || codecNode->node == nullptr || omxBuffer == nullptr) {
         HDF_LOGE("%{public}s codecNode, node or omxBuffer is null", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -284,6 +290,29 @@ int32_t OmxAdapterSetComponentRole(struct CodecComponentNode *codecNode, char *c
     }
 
     return ret;
+}
+
+int32_t OmxAdapterWriteDumperData(char *info, uint32_t size, uint32_t compId, struct CodecComponentNode *codecNode)
+{
+    OMX_STATETYPE state;
+    int32_t ret = OmxAdapterGetState(codecNode, &state);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: OmxAdapterWriteDumperData error!", __func__);
+        return HDF_FAILURE;
+    }
+    std::string dump = "compId = ";
+    dump.append(std::to_string(compId));
+    dump.append(", state = ").append(std::to_string(state));
+    if (codecNode->node != nullptr) {
+        dump.append(", bufferCount = ").append(std::to_string(codecNode->node->getBufferCount()));
+    }
+    dump.append("\n");
+    errno_t error = strncpy_s(info, size, dump.c_str(), dump.length());
+    if (error != EOK) {
+        HDF_LOGE("%{public}s: strncpy_s return err [%{public}d]", __func__, error);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
 }
 #ifdef __cplusplus
 };
