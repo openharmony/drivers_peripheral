@@ -23,7 +23,8 @@ using namespace OHOS::HDI::Codec::V1_0;
 namespace OHOS {
 namespace Codec {
 namespace Omx {
-CodecHandleBuffer::CodecHandleBuffer(struct OmxCodecBuffer &codecBuffer) : ICodecBuffer(codecBuffer)
+CodecHandleBuffer::CodecHandleBuffer(struct OmxCodecBuffer &codecBuffer, BufferHandle *bufferHandle)
+    : ICodecBuffer(codecBuffer), bufferHandle_(bufferHandle)
 {}
 
 CodecHandleBuffer::~CodecHandleBuffer()
@@ -40,10 +41,9 @@ sptr<ICodecBuffer> CodecHandleBuffer::Create(struct OmxCodecBuffer &codecBuffer)
         CODEC_LOGE("bufferHandle is null");
         return nullptr;
     }
-    auto bufferHandle = codecBuffer.bufferhandle->Move();
+    BufferHandle *bufferHandle = codecBuffer.bufferhandle->Move();
     codecBuffer.bufferhandle = nullptr;
-    CodecHandleBuffer *buffer = new CodecHandleBuffer(codecBuffer);
-    buffer->bufferHandle_ = bufferHandle;
+    CodecHandleBuffer *buffer = new CodecHandleBuffer(codecBuffer, bufferHandle);
     return sptr<ICodecBuffer>(buffer);
 }
 
