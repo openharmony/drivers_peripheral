@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <devhost_dump_reg.h>
 #include <hdf_device_desc.h>
 #include <hdf_device_object.h>
 #include <hdf_log.h>
@@ -20,6 +21,7 @@
 #include "codec_component_capability_config.h"
 #include "codec_component_manager_service.h"
 #include "codec_component_type_stub.h"
+#include "codec_dfx_service.h"
 
 #define HDF_LOG_TAG codec_hdi_server
 
@@ -54,6 +56,9 @@ static int32_t HdfCodecComponentTypeDriverInit(struct HdfDeviceObject *deviceObj
     InitDataNode(deviceObject->property);
     if (LoadCapabilityData() != HDF_SUCCESS) {
         ClearCapabilityData();
+    }
+    if (DevHostRegisterDumpHost(DevCodecHostDump) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: DevHostRegisterDumpHost error!", __func__);
     }
     return HDF_SUCCESS;
 }
