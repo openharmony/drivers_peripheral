@@ -25,7 +25,7 @@ int32_t CodecComponentService::GetComponentVersion(CompVerInfo &verInfo)
     return node_->GetComponentVersion(verInfo);
 }
 
-int32_t CodecComponentService::SendCommand(OMX_COMMANDTYPE cmd, uint32_t param, const std::vector<int8_t> &cmdData)
+int32_t CodecComponentService::SendCommand(CodecCommandType cmd, uint32_t param, const std::vector<int8_t> &cmdData)
 {
     CODEC_LOGD("cmd [%{public}d]", cmd);
     return node_->SendCommand(cmd, param, const_cast<int8_t *>(cmdData.data()));
@@ -65,7 +65,7 @@ int32_t CodecComponentService::GetExtensionIndex(const std::string &paramName, u
     return node_->GetExtensionIndex(paramName.c_str(), indexType);
 }
 
-int32_t CodecComponentService::GetState(OMX_STATETYPE &state)
+int32_t CodecComponentService::GetState(CodecStateType &state)
 {
     return node_->GetState(state);
 }
