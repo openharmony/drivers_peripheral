@@ -48,7 +48,7 @@ if (is_standard_system) {
       external_deps = [ "hilog:libhilog" ]
     }
     external_deps += [ "graphic_chipsetsdk:surface" ]
-
+    install_enable = false
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_display"
   }
