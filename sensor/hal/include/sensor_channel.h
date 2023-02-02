@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -27,6 +27,8 @@
 #define HDI_SENSOR_FLOAT_UNITS      (1000.0f)
 #define HDI_SENSOR_FLOAT_HUN_UNITS  (100.0f)
 #define HDI_SENSOR_FLOAT_TEN_UNITS  (10.0f)
+#define MAX_DUMP_DATA_SIZE 10
+#define DATA_LENGTH 32
 
 enum SensorDataDimension {
     DATA_X             = 1,
@@ -45,9 +47,26 @@ struct SensorCovertCoff {
     float coff[DATA_MAX_DATA_SIZE];
 };
 
+struct SensorDumpDate {
+    int32_t sensorId;
+    int32_t version;
+    int64_t timestamp;
+    uint32_t option;
+    int32_t mode;
+    uint8_t data[DATA_LENGTH];
+    uint32_t dataLen;
+};
+
+struct SensorDatePack {
+    int32_t count;
+    int32_t pos;
+    struct SensorDumpDate listDumpArr[MAX_DUMP_DATA_SIZE];
+};
+
 int32_t Register(int32_t groupId, RecordDataCallback cb);
 int32_t Unregister(int32_t groupId, RecordDataCallback cb);
 struct HdfDevEventlistener *GetSensorListener(void);
 void SetSensorIdBySensorType(enum SensorTypeTag type, int32_t sensorId);
+struct SensorDatePack *GetEventData(void);
 
 #endif /* HDI_SENSOR_CHANNEL_H */

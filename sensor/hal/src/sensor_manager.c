@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,6 +14,7 @@
  */
 
 #include "sensor_manager.h"
+#include "sensor_dump.h"
 #include <fcntl.h>
 #include "hdf_dlist.h"
 #include "hdf_io_service_if.h"
@@ -164,6 +165,7 @@ const struct SensorInterface *NewSensorInterfaceInstance(void)
     }
     manager->initState = true;
     HDF_LOGD("%{public}s: Get sensor device instance success", __func__);
+    SensorDevRegisterDump();
     return &sensorDevInstance;
 }
 

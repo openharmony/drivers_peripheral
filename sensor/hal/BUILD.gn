@@ -1,4 +1,4 @@
-#Copyright (c) 2021 Huawei Device Co., Ltd.
+#Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 #Licensed under the Apache License, Version 2.0 (the "License");
 #you may not use this file except in compliance with the License.
 #You may obtain a copy of the License at
@@ -70,6 +70,7 @@ if (defined(ohos_lite)) {
     sources = [
       "$SENSOR_ROOT_DIR/hal/src/sensor_channel.c",
       "$SENSOR_ROOT_DIR/hal/src/sensor_controller.c",
+      "$SENSOR_ROOT_DIR/hal/src/sensor_dump.c",
       "$SENSOR_ROOT_DIR/hal/src/sensor_manager.c",
     ]
 
@@ -78,6 +79,7 @@ if (defined(ohos_lite)) {
       "$SENSOR_ROOT_DIR/interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
+    deps = [ "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host" ]
     defines = [ "__OHOS__USER__" ]
     cflags = [
       "-Wall",
