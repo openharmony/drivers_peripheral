@@ -87,6 +87,7 @@ ohos_shared_library("libcodec_driver") {
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_codec"
+  shlib_type = "hdi"
 }
 
 group("codec_idl_omx_service") {
