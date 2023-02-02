@@ -291,15 +291,13 @@ void TestDisplay::ProcessImage(unsigned char* p, unsigned char* fbp)
     int32_t location = 0;
     int xpos = (vinfo_.xres - width) / 2;
     int ypos = (vinfo_.yres - height) / 2;
-    int yPos, uPos, vPos;
-    int yPosIncrement, uPosIncrement, vPosIncrement;
 
-    yPos = 0; // 0:Pixel initial value
-    uPos = 1; // 1:Pixel initial value
-    vPos = 3; // 3:Pixel initial value
-    yPosIncrement = 2; // 2:yPos increase value
-    uPosIncrement = 4; // 4:uPos increase value
-    vPosIncrement = 4; // 4:vPos increase value
+    int yPos = 0; // 0:Pixel initial value
+    int uPos = 1; // 1:Pixel initial value
+    int vPos = 3; // 3:Pixel initial value
+    int yPosIncrement = 2; // 2:yPos increase value
+    int uPosIncrement = 4; // 4:uPos increase value
+    int vPosIncrement = 4; // 4:vPos increase value
 
     for (y = ypos; y < (height + ypos); y++) {
         for (j = 0, x = xpos; j < width; j++, x++) {

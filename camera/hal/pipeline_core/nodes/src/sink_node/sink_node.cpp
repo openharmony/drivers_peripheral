@@ -13,6 +13,7 @@
 
 #include "sink_node.h"
 
+// namespace OHOS::Camera
 namespace OHOS::Camera {
 SinkNode::SinkNode(const std::string& name, const std::string& type)
     : NodeBase(name, type)
@@ -39,4 +40,4 @@ void SinkNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
 }
 
 REGISTERNODE(SinkNode, {"sink"})
-}// namespace OHOS::Camera
+}

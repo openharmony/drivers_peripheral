@@ -13,6 +13,8 @@
 
 #include "merge_node.h"
 #include <unistd.h>
+
+// namespace OHOS::Camera
 namespace OHOS::Camera {
 MergeNode::MergeNode(const std::string& name, const std::string& type) : NodeBase(name, type)
 {
@@ -124,4 +126,4 @@ void MergeNode::MergeBuffers()
     return;
 }
 REGISTERNODE(MergeNode, {"merge"})
-}// namespace OHOS::Camera
+}
