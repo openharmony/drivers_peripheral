@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,17 @@
 
 #define MAX_FILE_NAME_LENGTH        256
 #define TYPE_NAME_LENGTH            256
+#define CODEC_NAME_ALIAS_NUM        2
+#define CODEC_NAME_AVC_HW_DECODER   "codec.avc.hardware.decoder"
+#define CODEC_NAME_HEVC_HW_DECODER  "codec.hevc.hardware.decoder"
+#define CODEC_NAME_VP9_HW_DECODER   "codec.vp9.hardware.decoder"
+#define CODEC_NAME_VP8_HW_DECODER   "codec.vp8.hardware.decoder"
+#define CODEC_NAME_MPEG4_HW_DECODER "codec.mpeg4.hardware.decoder"
+#define CODEC_NAME_AVC_HW_ENCODER   "codec.avc.hardware.encoder"
+#define CODEC_NAME_HEVC_HW_ENCODER  "codec.hevc.hardware.encoder"
+#define CODEC_NAME_VP9_HW_ENCODER   "codec.vp9.hardware.encoder"
+#define CODEC_NAME_VP8_HW_ENCODER   "codec.vp8.hardware.encoder"
+#define CODEC_NAME_MPEG4_HW_ENCODER "codec.mpeg4.hardware.encoder"
 
 /* For overall configure setup */
 typedef struct {
@@ -31,6 +42,11 @@ typedef struct {
     int32_t     width;
     int32_t     height;
 } CodecCmd;
+
+typedef struct {
+    char    *codecType[CODEC_NAME_ALIAS_NUM];
+    char    *codecName;
+} CodecTypeAndName;
 
 int32_t ParseArguments(CodecCmd* cmd, int argc, char **argv);
 

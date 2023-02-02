@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,25 +24,44 @@
 
 static int32_t GetCodecName(CodecCmd* cmd)
 {
-    int32_t ret = HDF_SUCCESS;
-    if (strstr(cmd->codecName, "avc") || strstr(cmd->codecName, "AVC")) {
-        if (cmd->type == VIDEO_ENCODER) {
-            strcpy_s(cmd->codecName, TYPE_NAME_LENGTH, "codec.avc.hardware.encoder");
-        } else {
-            strcpy_s(cmd->codecName, TYPE_NAME_LENGTH, "codec.avc.hardware.decoder");
-        }
-    } else if (strstr(cmd->codecName, "hevc") || strstr(cmd->codecName, "HEVC")) {
-        if (cmd->type == VIDEO_ENCODER) {
-            strcpy_s(cmd->codecName, TYPE_NAME_LENGTH, "codec.hevc.hardware.encoder");
-        } else {
-            strcpy_s(cmd->codecName, TYPE_NAME_LENGTH, "codec.hevc.hardware.decoder");
-        }
-    } else {
-        memset_s(cmd->codecName, TYPE_NAME_LENGTH, 0, TYPE_NAME_LENGTH);
-        HDF_LOGE("%{public}s: not support coding codecName", __func__);
-        ret = HDF_FAILURE;
+    int32_t codecNum = 0;
+    CodecTypeAndName *codecs;
+    CodecTypeAndName encoders[] = {
+        {{"avc", "AVC"}, CODEC_NAME_AVC_HW_ENCODER},
+        {{"hevc", "HEVC"}, CODEC_NAME_HEVC_HW_ENCODER},
+        {{"vp9", "VP9"}, CODEC_NAME_VP9_HW_ENCODER},
+        {{"vp8", "VP8"}, CODEC_NAME_VP8_HW_ENCODER},
+        {{"mpeg4", "MPEG4"}, CODEC_NAME_MPEG4_HW_ENCODER}
+    };
+    CodecTypeAndName decoders[] = {
+        {{"avc", "AVC"}, CODEC_NAME_AVC_HW_DECODER},
+        {{"hevc", "HEVC"}, CODEC_NAME_HEVC_HW_DECODER},
+        {{"vp9", "VP9"}, CODEC_NAME_VP9_HW_DECODER},
+        {{"vp8", "VP8"}, CODEC_NAME_VP8_HW_DECODER},
+        {{"mpeg4", "MPEG4"}, CODEC_NAME_MPEG4_HW_DECODER}
+    };
+
+    if (cmd->type == VIDEO_ENCODER) {
+        codecNum = sizeof(encoders) / sizeof(CodecTypeAndName);
+        codecs = encoders;
+    } else if (cmd->type == VIDEO_DECODER) {
+        codecNum = sizeof(decoders) / sizeof(CodecTypeAndName);
+        codecs = decoders;
     }
-    return ret;
+
+    for (int32_t i = 0; i < codecNum; i++) {
+        if (strstr(cmd->codecName, codecs[i].codecType[0]) || strstr(cmd->codecName, codecs[i].codecType[1])) {
+            int32_t ret = strcpy_s(cmd->codecName, TYPE_NAME_LENGTH, codecs[i].codecName);
+            if (ret != EOK) {
+                HDF_LOGE("%{public}s, failed to strcpy_s codecName. ret:%{public}d", __func__, ret);
+                return HDF_FAILURE;
+            }
+            return HDF_SUCCESS;
+        }
+    }
+
+    HDF_LOGE("%{public}s: not support coding codecName", __func__);
+    return HDF_FAILURE;
 }
 
 static int32_t ParseCmdOption(CodecCmd* cmd, const char *opt, const char *next)
@@ -94,8 +113,9 @@ int32_t ParseArguments(CodecCmd* cmd, int argc, char **argv)
     int32_t optindex = 1;
     int32_t ret = HDF_SUCCESS;
 
-    if ((argc <= 1) || (cmd == NULL))
+    if ((argc <= 1) || (cmd == NULL)) {
         return ret;
+    }
 
     /* parse options */
     while (optindex < argc) {
