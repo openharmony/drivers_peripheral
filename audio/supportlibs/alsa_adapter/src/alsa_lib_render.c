@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,14 +23,49 @@
 #define MAX_PERIOD_SIZE            (8 * 1024)
 #define MIN_PERIOD_SIZE            (4 * 1024)
 #define AUDIO_RENDER_RECOVER_DELAY (10 * 1000)
+#define CHMAP_NAME_LENGHT_MAX      256
+
+/* channel map list type */
+#define CHANNEL_MAP_TYPE_FIXED    "FIXED"  /* fixed channel position */
+#define CHANNEL_MAP_TYPE_VAR      "VAR"    /* freely swappable channel position */
+#define CHANNEL_MAP_TYPE_PAIRED   "PAIRED" /* pair-wise swappable channel position */
 
 static snd_pcm_sframes_t g_bufferSize = 0;
 static snd_pcm_sframes_t g_periodSize = 0;
 static unsigned int g_bufferTime = 500000; /* (0.5s): ring buffer length in us */
 static unsigned int g_periodTime = 100000; /* (0.1s): period time in us */
 static int g_resample = 1;                 /* enable alsa-lib resampling */
-static bool g_periodEvent = false;              /* produce poll event after each period */
+static bool g_periodEvent = false;         /* produce poll event after each period */
 static int g_canPause = 0;                 /* 0 Hardware doesn't support pause, 1 Hardware supports pause */
+
+#ifdef SUPPORT_ALSA_CHMAP
+static int32_t GetChannelsNameFromUser(struct AudioCardInfo *cardIns, const char *channelsName)
+{
+    if (channelsName == NULL) {
+        AUDIO_FUNC_LOGE("channelsName is NULL!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    if (cardIns->hwRenderParams.channelsName == NULL) {
+        cardIns->hwRenderParams.channelsName = (char *)OsalMemCalloc(CHMAP_NAME_LENGHT_MAX);
+        if (cardIns->hwRenderParams.channelsName == NULL) {
+            AUDIO_FUNC_LOGE("Failed to allocate memory!");
+            return HDF_ERR_MALLOC_FAIL;
+        }
+    }
+
+    (void)memset_s(cardIns->hwRenderParams.channelsName, CHMAP_NAME_LENGHT_MAX, 0, CHMAP_NAME_LENGHT_MAX);
+    int32_t ret = strncpy_s(cardIns->hwRenderParams.channelsName, CHMAP_NAME_LENGHT_MAX - 1,
+        channelsName, strlen(channelsName));
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("strncpy_s failed!");
+        AudioMemFree((void **)&(cardIns->hwRenderParams.channelsName));
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+#endif
 
 static int32_t GetHwParams(struct AudioCardInfo *cardIns, const struct AudioHwRenderParam *handleData)
 {
@@ -52,6 +87,13 @@ static int32_t GetHwParams(struct AudioCardInfo *cardIns, const struct AudioHwRe
     cardIns->hwRenderParams.startThreshold = handleData->frameRenderMode.attrs.startThreshold;
     cardIns->hwRenderParams.stopThreshold = handleData->frameRenderMode.attrs.stopThreshold;
     cardIns->hwRenderParams.silenceThreshold = handleData->frameRenderMode.attrs.silenceThreshold;
+#ifdef SUPPORT_ALSA_CHMAP
+    /* param 2 by handleData->frameRenderMode.attrs.channelsName, sample channelsName is "FL, FR" */
+    if (GetChannelsNameFromUser(cardIns, "FL, FR") != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("GetChannelsNameFromUser failed");
+        return HDF_FAILURE;
+    }
+#endif
     return HDF_SUCCESS;
 }
 
@@ -64,7 +106,7 @@ static int32_t AudioSetMixerVolume(snd_mixer_elem_t *pcmElemen, long vol)
         return HDF_FAILURE;
     }
 
-    // Judge whether it is mono or stereo
+    /* Judge whether it is mono or stereo */
     if (snd_mixer_selem_is_playback_mono(pcmElemen)) {
         ret = snd_mixer_selem_set_playback_volume(pcmElemen, SND_MIXER_SCHN_FRONT_LEFT, vol);
         if (ret < 0) {
@@ -82,10 +124,26 @@ static int32_t AudioSetMixerVolume(snd_mixer_elem_t *pcmElemen, long vol)
     return HDF_SUCCESS;
 }
 
+static int32_t AudioSetVolumeSub(snd_mixer_elem_t *CtlVolume, long vol)
+{
+    if (CtlVolume == NULL) {
+        AUDIO_FUNC_LOGE("CtlVolume is NULL!");
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = AudioSetMixerVolume(CtlVolume, vol);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioSetMixerVolume fail!");
+        return ret;
+    }
+    return HDF_SUCCESS;
+}
+
 int32_t AudioCtlRenderSetVolume(const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
 {
     long vol;
     int32_t ret;
+    int32_t index;
     struct AudioCardInfo *cardIns = NULL;
 
     (void)cmdId;
@@ -102,62 +160,97 @@ int32_t AudioCtlRenderSetVolume(const struct DevHandle *handle, int cmdId, const
     }
 
     vol = (long)handleData->renderMode.ctlParam.volume;
-    if (cardIns->ctrlLeftVolume != NULL) {
-        ret = AudioSetMixerVolume(cardIns->ctrlLeftVolume, vol);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("AudioSetMixerVolume left fail!");
+    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+        if (cardIns->volElemList == NULL) {
+            AUDIO_FUNC_LOGE("primaryVolElems is NULL!");
             return HDF_FAILURE;
         }
-    }
-
-    if (cardIns->ctrlRightVolume != NULL) {
-        ret = AudioSetMixerVolume(cardIns->ctrlRightVolume, vol);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("AudioSetMixerVolume right fail!");
-            return HDF_FAILURE;
+        for (index = 0; index < (int32_t)cardIns->volElemCount; index++) {
+            ret = AudioSetVolumeSub(cardIns->volElemList[index].elem, vol);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("primary set volume failed!");
+                return ret;
+            }
         }
+    } else if (strncmp(adapterName, USB, strlen(USB)) == 0) {
+        ret = AudioSetVolumeSub(cardIns->usbCtlVolume, vol);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("usb set volume failed!");
+            return ret;
+        }
+    } else if (strncmp(adapterName, HDMI, strlen(HDMI)) == 0) {
+        AUDIO_FUNC_LOGI("HDMI no control is present!");
+        return HDF_ERR_NOT_SUPPORT;
+    } else {
+        AUDIO_FUNC_LOGE("This type of sound card: %{public}s is not supported temporarily!", adapterName);
+        return HDF_ERR_NOT_SUPPORT;
     }
 
     return HDF_SUCCESS;
 }
 
-static int32_t AudioRenderGetVolumeSub(struct AudioCardInfo *cardIns, long *vol)
+static int32_t MixerGetVolume(snd_mixer_t *mixer, snd_mixer_elem_t *pcmElemen, long *vol)
 {
     long volLeft = MIN_VOLUME;
     long volRight = MIN_VOLUME;
 
-    if (cardIns == NULL || vol == NULL) {
+    if (mixer == NULL || pcmElemen == NULL || vol == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return HDF_FAILURE;
     }
-
-    if (cardIns->ctrlLeftVolume == NULL || cardIns->mixer == NULL) {
-        AUDIO_FUNC_LOGE("cardIns's ctrlLeftVolume or mixer is null!");
-        return HDF_FAILURE;
-    }
-
-    // Handling events
-    int32_t ret = snd_mixer_handle_events(cardIns->mixer);
+    /* Handling events */
+    int32_t ret = snd_mixer_handle_events(mixer);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("snd_mixer_handle_events fail!");
         return HDF_FAILURE;
     }
 
-    // Left channel
-    ret = snd_mixer_selem_get_playback_volume(cardIns->ctrlLeftVolume, SND_MIXER_SCHN_FRONT_LEFT, &volLeft);
+    /* Left channel */
+    ret = snd_mixer_selem_get_playback_volume(pcmElemen, SND_MIXER_SCHN_FRONT_LEFT, &volLeft);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("Set left channel fail!");
+        AUDIO_FUNC_LOGE("Get left channel fail!");
         return HDF_FAILURE;
     }
-    // right channel
-    ret = snd_mixer_selem_get_playback_volume(cardIns->ctrlLeftVolume, SND_MIXER_SCHN_FRONT_RIGHT, &volRight);
+    /* right channel */
+    ret = snd_mixer_selem_get_playback_volume(pcmElemen, SND_MIXER_SCHN_FRONT_RIGHT, &volRight);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("Set right channel fail!");
+        AUDIO_FUNC_LOGE("Get right channel fail!");
         return HDF_FAILURE;
     }
     *vol = (volLeft + volRight) >> 1;
 
     return HDF_SUCCESS;
+}
+
+static int32_t AudioRenderGetVolumeSub(struct AudioCardInfo *cardIns, long *vol, const char *adapterName)
+{
+    int32_t ret;
+
+    if (cardIns == NULL || cardIns->mixer == NULL || vol == NULL || adapterName == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return HDF_FAILURE;
+    }
+    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+        if (cardIns->volElemList == NULL || cardIns->volElemList[0].elem == NULL) {
+            AUDIO_FUNC_LOGE("ctrlVolumeList is NULL!");
+            return HDF_FAILURE;
+        }
+        ret = MixerGetVolume(cardIns->mixer, cardIns->volElemList[0].elem, vol);
+    } else if (strncmp(adapterName, USB, strlen(USB)) == 0) {
+        if (cardIns->usbCtlVolume == NULL) {
+            AUDIO_FUNC_LOGE("usbCtlVolume is NULL!");
+            return HDF_FAILURE;
+        }
+        ret = MixerGetVolume(cardIns->mixer, cardIns->usbCtlVolume, vol);
+    } else if (strncmp(adapterName, HDMI, strlen(HDMI)) == 0) {
+        AUDIO_FUNC_LOGI("HDMI no control is present.");
+        return HDF_ERR_NOT_SUPPORT;
+    } else {
+        AUDIO_FUNC_LOGE("This type of sound card: %{public}s is not supported temporarily!", adapterName);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+
+    return ret;
 }
 
 int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
@@ -174,10 +267,10 @@ int32_t AudioCtlRenderGetVolume(const struct DevHandle *handle, int cmdId, struc
 
     const char *adapterName = handleData->renderMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
-    ret = AudioRenderGetVolumeSub(cardIns, &vol);
+    ret = AudioRenderGetVolumeSub(cardIns, &vol, adapterName);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("AudioRenderGetVolumeSub failed!");
-        return HDF_FAILURE;
+        return ret;
     }
 
     handleData->renderMode.ctlParam.volume = (float)vol;
@@ -202,24 +295,18 @@ int32_t AudioCtlRenderSetPauseStu(
     return HDF_SUCCESS;
 }
 
-static int32_t RenderSetMuteStuSub(struct AudioCardInfo *cardIns, int32_t muteState)
+static int32_t RenderSetMuteStuSub(snd_mixer_elem_t *pcmElemen, int32_t muteState)
 {
     int32_t ret;
 
-    if (cardIns == NULL) {
+    if (pcmElemen == NULL) {
         AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
 
-    /* Mono (Front left alias) */
-    if (cardIns->ctrlLeftVolume == NULL) {
-        AUDIO_FUNC_LOGE("Unable to get Mono.");
-        return HDF_FAILURE;
-    }
-
-    ret = snd_mixer_selem_has_playback_switch(cardIns->ctrlLeftVolume);
+    ret = snd_mixer_selem_has_playback_switch(pcmElemen);
     if (ret == 1) { // 1: Controlled switch
-        ret = snd_mixer_selem_set_playback_switch_all(cardIns->ctrlLeftVolume, muteState);
+        ret = snd_mixer_selem_set_playback_switch_all(pcmElemen, muteState);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("Unable to play mixer  switch ");
             return HDF_FAILURE;
@@ -232,49 +319,39 @@ static int32_t RenderSetMuteStuSub(struct AudioCardInfo *cardIns, int32_t muteSt
     return HDF_SUCCESS;
 }
 
-static int32_t AudioPrimarySetMuteState(struct AudioCardInfo *cardIns, int32_t muteState, float volume)
+static int32_t AudioPrimarySetMuteState(
+    struct AudioCardInfo *cardIns, int32_t muteState, const char *adapterName, float volume)
 {
     long vol;
     long alsaVol;
     float volRangeMin = 0.0;
     float volRangeMax = 100.0;
-    if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("cardIns is NULL!");
+    if (cardIns == NULL || cardIns->volElemList == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
         return HDF_FAILURE;
     }
-    int32_t ret = RenderSetMuteStuSub(cardIns, muteState);
-    /* ret return HDF_FAILURE : no control is present */
+    int32_t ret = AudioRenderGetVolumeSub(cardIns, &vol, adapterName);
     if (ret != HDF_SUCCESS) {
-        /* Try to set the volume is 0 to change the mute state */
-        ret = AudioRenderGetVolumeSub(cardIns, &vol);
-        if (ret != HDF_SUCCESS) {
-            AUDIO_FUNC_LOGE("AudioRenderGetVolumeSub error!");
-            return HDF_FAILURE;
-        }
+        AUDIO_FUNC_LOGE("AudioRenderGetVolumeSub error!");
+        return HDF_FAILURE;
+    }
 
-        if (muteState == false) {
-            alsaVol = 0; /* 0 for mute */
-            cardIns->tempVolume = (float)vol;
+    if (muteState == false) {
+        alsaVol = 0; /* 0 for mute */
+        cardIns->tempVolume = (float)vol;
+    } else {
+        if (volume > volRangeMin && volume <= volRangeMax) {
+            alsaVol = (long)volume;
         } else {
-            if (volume > volRangeMin && volume <= volRangeMax) {
-                alsaVol = (long)volume;
-            } else {
-                alsaVol = (long)cardIns->tempVolume;
-            }
+            alsaVol = (long)cardIns->tempVolume;
         }
+    }
 
-        if (cardIns->ctrlLeftVolume != NULL) {
-            ret = AudioSetMixerVolume(cardIns->ctrlLeftVolume, alsaVol);
+    for (int i = 0; i < (int32_t)cardIns->volElemCount; i++) {
+        if (cardIns->volElemList[i].elem != NULL) {
+            ret = AudioSetMixerVolume(cardIns->volElemList[i].elem, alsaVol);
             if (ret < 0) {
                 AUDIO_FUNC_LOGE("AudioSetMixerVolume left fail!");
-                return HDF_FAILURE;
-            }
-        }
-
-        if (cardIns->ctrlRightVolume != NULL) {
-            ret = AudioSetMixerVolume(cardIns->ctrlRightVolume, alsaVol);
-            if (ret < 0) {
-                AUDIO_FUNC_LOGE("AudioSetMixerVolume right fail!");
                 return HDF_FAILURE;
             }
         }
@@ -303,7 +380,7 @@ int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle, int cmdId, cons
 
     muteState = cardIns->renderMuteValue;
     if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
-        ret = AudioPrimarySetMuteState(cardIns, muteState, handleData->renderMode.ctlParam.volume);
+        ret = AudioPrimarySetMuteState(cardIns, muteState, adapterName, handleData->renderMode.ctlParam.volume);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("Render primary sound card SetMute failed!");
             return HDF_FAILURE;
@@ -311,7 +388,11 @@ int32_t AudioCtlRenderSetMuteStu(const struct DevHandle *handle, int cmdId, cons
     }
 
     if (strncmp(adapterName, USB, strlen(USB)) == 0) {
-        ret = RenderSetMuteStuSub(cardIns, muteState);
+        if (cardIns->usbCtlVolume == NULL) {
+            AUDIO_FUNC_LOGE("usbCtlVolume is NULL!");
+            return HDF_FAILURE;
+        }
+        ret = RenderSetMuteStuSub(cardIns->usbCtlVolume, muteState);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("Render usb sound card SetMute failed!");
             return HDF_FAILURE;
@@ -368,38 +449,23 @@ int32_t AudioCtlRenderGetGainStu(const struct DevHandle *handle, int cmdId, stru
 int32_t AudioCtlRenderSceneSelect(
     const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
 {
-    enum AudioPortPin descPins;
-    struct AudioCardInfo *cardIns = NULL;
-
+    int32_t ret;
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("Invalid parameters!");
         return HDF_FAILURE;
     }
-
-    const char *adapterName = handleData->renderMode.hwInfo.adapterName;
-    cardIns = GetCardIns(adapterName);
-    if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("Cant't get card Instance!");
-        return HDF_FAILURE;
+    if (strcmp(handleData->renderMode.hwInfo.adapterName, USB) == 0 ||
+        strcmp(handleData->renderMode.hwInfo.adapterName, HDMI) == 0) {
+        return HDF_SUCCESS;
+    }
+    ret = EnableAudioRenderRoute(handleData);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("EnableAudioRoute failed!");
+        return ret;
     }
 
-    descPins = handleData->renderMode.hwInfo.deviceDescript.pins;
-    switch (descPins) {
-        case PIN_OUT_SPEAKER:
-            return AudioMixerSetCtrlMode(
-                cardIns, adapterName, "Digital Playback Path", SND_PLAY_PATH, SND_OUT_CARD_SPK);
-        case PIN_OUT_HEADSET:
-            return AudioMixerSetCtrlMode(cardIns, adapterName, "Digital Playback Path", SND_PLAY_PATH, SND_OUT_CARD_HP);
-        case PIN_OUT_HEADPHONE:
-            return AudioMixerSetCtrlMode(
-                cardIns, adapterName, "Digital Playback Path", SND_PLAY_PATH, SND_OUT_CARD_HP_NO_MIC);
-        default:
-            AUDIO_FUNC_LOGE("This mode is not currently supported!");
-            break;
-    }
-
-    return HDF_FAILURE;
+    return HDF_SUCCESS;
 }
 
 int32_t AudioCtlRenderSceneGetGainThreshold(
@@ -414,31 +480,65 @@ int32_t AudioCtlRenderSceneGetGainThreshold(
     return HDF_SUCCESS;
 }
 
+static int32_t MixerGetVolumeRange(snd_mixer_elem_t *ctlElem, long *volMin, long *volMax)
+{
+    if (ctlElem == NULL || volMin == NULL || volMax == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return HDF_FAILURE;
+    }
+
+    int32_t ret = snd_mixer_selem_get_playback_volume_range(ctlElem, volMin, volMax);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Failed to get playback volume range: %{public}s", snd_strerror(ret));
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle, int cmdId, struct AudioHwRenderParam *handleData)
 {
     int32_t ret;
     long volMin = MIN_VOLUME;
     long volMax = MIN_VOLUME;
     struct AudioCardInfo *cardIns = NULL;
-
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return HDF_FAILURE;
     }
 
-    char *adapterName = handleData->renderMode.hwInfo.adapterName;
+    const char *adapterName = handleData->renderMode.hwInfo.adapterName;
     cardIns = GetCardIns(adapterName);
     if (cardIns == NULL) {
         AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
-
-    ret = snd_mixer_selem_get_playback_volume_range(cardIns->ctrlLeftVolume, &volMin, &volMax);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("Get playback volume range fail: %{public}s.", snd_strerror(ret));
+    /* use simple mixer control */
+    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+        if (cardIns->volElemList[0].elem == NULL) {
+            AUDIO_FUNC_LOGE("simple mixer control is NULL.");
+            return HDF_FAILURE;
+        }
+        ret = MixerGetVolumeRange(cardIns->volElemList[0].elem, &volMin, &volMax);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("Get playback volume range fail.");
+            return HDF_FAILURE;
+        }
+    } else if (strncmp(adapterName, USB, strlen(USB)) == 0) {
+        ret = MixerGetVolumeRange(cardIns->usbCtlVolume, &volMin, &volMax);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("Get playback volume range fail.");
+            return HDF_FAILURE;
+        }
+    } else if (strncmp(adapterName, HDMI, strlen(HDMI)) == 0) {
+        AUDIO_FUNC_LOGI("HDMI not ctlElement.");
+        return HDF_SUCCESS;
+    } else {
+        AUDIO_FUNC_LOGE("This type of sound card: %{public}s is not supported temporarily!", adapterName);
         return HDF_FAILURE;
     }
+
     handleData->renderMode.ctlParam.volThreshold.volMin = (int)volMin;
     handleData->renderMode.ctlParam.volThreshold.volMax = (int)volMax;
 
@@ -542,7 +642,8 @@ static int32_t SetHWParamsSub(
     /* set the sample format */
     ret = snd_pcm_hw_params_set_format(handle, params, pcmFormat);
     if (ret < 0) {
-        AUDIO_FUNC_LOGE("Sample format not available for playback: %{public}s", snd_strerror(ret));
+        AUDIO_FUNC_LOGE(
+            "Sample format not available for playback: %{public}s, format: %{public}d.", snd_strerror(ret), pcmFormat);
         return HDF_FAILURE;
     }
     /* set the count of channels */
@@ -593,10 +694,12 @@ static int32_t SetHWParams(
 {
     int ret;
     int dir = 0; /* dir Value range (-1,0,1) */
+
     if (handle == NULL || params == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return HDF_FAILURE;
     }
+
     snd_pcm_uframes_t size;
     ret = snd_pcm_hw_params_any(handle, params); // choose all parameters
     if (ret < 0) {
@@ -723,6 +826,84 @@ static int32_t AudioResetParams(snd_pcm_t *handle, struct AudioPcmHwParams audio
     return HDF_SUCCESS;
 }
 
+#ifdef SUPPORT_ALSA_CHMAP
+static void PrintChannels(const snd_pcm_chmap_t *map)
+{
+    char tmp[CHMAP_NAME_LENGHT_MAX] = {0};
+    if (snd_pcm_chmap_print(map, sizeof(tmp), tmp) > 0) {
+        HDF_LOGI("print_channels: %{public}s.", tmp);
+    }
+}
+
+static int32_t QueryChmaps(snd_pcm_t *pcm)
+{
+    snd_pcm_chmap_query_t **pChmap = NULL;
+    snd_pcm_chmap_query_t *chmap = NULL;
+    const char *champType = NULL;
+    snd_pcm_chmap_query_t **hwChmap = snd_pcm_query_chmaps(pcm);
+    if (hwChmap == NULL) {
+        AUDIO_FUNC_LOGE("This sound card has no chmap component, cannot query maps.");
+        return HDF_FAILURE;
+    }
+
+    for (pChmap = hwChmap; (chmap = *pChmap) != NULL; pChmap++) {
+        champType = snd_pcm_chmap_type_name(chmap->type);
+        HDF_LOGI("Channel Type = %{public}s, Channels = %{public}d.", champType, chmap->map.channels);
+        if (strncmp(champType, CHANNEL_MAP_TYPE_FIXED, strlen(CHANNEL_MAP_TYPE_FIXED)) == 0) {
+            HDF_LOGW("Fixed channel type does not support modification temporarily!");
+        }
+        PrintChannels(&chmap->map);
+    }
+
+    snd_pcm_free_chmaps(hwChmap);
+    return HDF_SUCCESS;
+}
+
+static int32_t SetChmap(snd_pcm_t *pcm, struct AudioPcmHwParams *hwRenderParams)
+{
+    if (hwRenderParams == NULL || hwRenderParams->channelsName == NULL) {
+        AUDIO_FUNC_LOGE("Parameter is NULL!");
+        return HDF_FAILURE;
+    }
+
+    snd_pcm_chmap_t *chmap = snd_pcm_chmap_parse_string(hwRenderParams->channelsName);
+    if (chmap == NULL) {
+        AUDIO_FUNC_LOGE("parse chmap error!");
+        return HDF_FAILURE;
+    }
+
+    if (snd_pcm_set_chmap(pcm, chmap) < 0) {
+        AUDIO_FUNC_LOGE("Cannot set chmap!");
+        free((void *)chmap);
+        return HDF_ERR_NOT_SUPPORT;
+    }
+    free((void *)chmap);
+
+    chmap = snd_pcm_get_chmap(pcm);
+    if (chmap == NULL) {
+        AUDIO_FUNC_LOGE("Cannot get chmap!");
+        return HDF_ERR_NOT_SUPPORT;
+    }
+
+    PrintChannels(chmap);
+    free((void *)chmap);
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioOutputRenderHwParamsChmaps(struct AudioCardInfo *cardIns)
+{
+    if (QueryChmaps(cardIns->renderPcmHandle) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGW("QueryChmaps failed.");
+        return HDF_SUCCESS;
+    }
+    if (SetChmap(cardIns->renderPcmHandle, &cardIns->hwRenderParams) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGW("SetChmap failed.");
+    }
+
+    return HDF_SUCCESS;
+}
+#endif
+
 int32_t AudioOutputRenderHwParams(
     const struct DevHandle *handle, int cmdId, const struct AudioHwRenderParam *handleData)
 {
@@ -737,13 +918,15 @@ int32_t AudioOutputRenderHwParams(
         return HDF_FAILURE;
     }
 
-    const char *cardName = handleData->renderMode.hwInfo.adapterName;
-    cardIns = GetCardIns(cardName);
+    cardIns = GetCardIns(handleData->renderMode.hwInfo.adapterName);
     if (cardIns == NULL) {
         AUDIO_FUNC_LOGE("cardIns is NULL!");
         return HDF_FAILURE;
     }
-
+    if (cardIns->renderPcmHandle == NULL) {
+        AUDIO_FUNC_LOGE("pcm handle is null!");
+        return HDF_FAILURE;
+    }
     ret = (int32_t)snd_pcm_state(cardIns->renderPcmHandle);
     if (ret >= SND_PCM_STATE_RUNNING) {
         AUDIO_FUNC_LOGE("Unable to set parameters during playback!");
@@ -769,7 +952,9 @@ int32_t AudioOutputRenderHwParams(
         AUDIO_FUNC_LOGE("Setting of swparams failed.");
         return HDF_FAILURE;
     }
-
+#ifdef SUPPORT_ALSA_CHMAP
+    return AudioOutputRenderHwParamsChmaps(cardIns);
+#endif
     return HDF_SUCCESS;
 }
 
@@ -918,95 +1103,6 @@ int32_t AudioOutputRenderPrepare(const struct DevHandle *handle, int cmdId, cons
     return HDF_SUCCESS;
 }
 
-int32_t InitMixerCtrlVolumeRange(struct AudioCardInfo *cardIns)
-{
-    int32_t ret;
-    long volMin = MIN_VOLUME;
-    long volMax = MIN_VOLUME;
-
-    if (cardIns == NULL) {
-        AUDIO_FUNC_LOGE("Parameter error!");
-        return HDF_FAILURE;
-    }
-    /** cardIns->ctrlLeftVolume is Mono (Front left alias) */
-    if (cardIns->ctrlLeftVolume == NULL && cardIns->ctrlRightVolume == NULL) {
-        AUDIO_FUNC_LOGE("InitMixerCtrlVolumeRange error.");
-        return HDF_FAILURE;
-    }
-    if (cardIns->ctrlLeftVolume != NULL) {
-        ret = snd_mixer_selem_get_playback_volume_range(cardIns->ctrlLeftVolume, &volMin, &volMax);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("Failed to get playback volume range: %{public}s", snd_strerror(ret));
-            return HDF_FAILURE;
-        }
-
-        ret = snd_mixer_selem_set_playback_volume_range(cardIns->ctrlLeftVolume, MIN_VOLUME, MAX_VOLUME);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("Failed to set playback volume range: %{public}s", snd_strerror(ret));
-            return HDF_FAILURE;
-        }
-    }
-
-    if (cardIns->ctrlRightVolume != NULL) {
-        ret = snd_mixer_selem_get_playback_volume_range(cardIns->ctrlRightVolume, &volMin, &volMax);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("Failed to get playback volume range");
-            return HDF_FAILURE;
-        }
-        ret = snd_mixer_selem_set_playback_volume_range(cardIns->ctrlRightVolume, MIN_VOLUME, MAX_VOLUME);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("Failed to set playback volume range");
-            return HDF_FAILURE;
-        }
-    }
-
-    return HDF_SUCCESS;
-}
-
-static int32_t InitMixerCtlElement(const char *adapterName, struct AudioCardInfo *cardIns, snd_mixer_t *mixer)
-{
-    int32_t ret;
-    snd_mixer_elem_t *pcmElement = NULL;
-
-    if (adapterName == NULL || cardIns == NULL || mixer == NULL) {
-        AUDIO_FUNC_LOGE("Parameter error!");
-        return HDF_FAILURE;
-    }
-
-    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
-        pcmElement = snd_mixer_first_elem(mixer);
-        if (pcmElement == NULL) {
-            AUDIO_FUNC_LOGE("snd_mixer_first_elem failed.");
-            return HDF_FAILURE;
-        }
-
-        ret = GetPriMixerCtlElement(cardIns, pcmElement);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("Render GetPriMixerCtlElement failed.");
-            return HDF_FAILURE;
-        }
-    } else if (strncmp(adapterName, USB, strlen(USB)) == 0) {
-        cardIns->ctrlLeftVolume = AudioUsbFindElement(mixer);
-    } else {
-        AUDIO_FUNC_LOGE("The selected sound card not supported, please check!");
-        return HDF_FAILURE;
-    }
-
-    ret = InitMixerCtrlVolumeRange(cardIns);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("InitMixerCtrlVolumeRange failed!");
-        return HDF_FAILURE;
-    }
-
-    ret = AudioMixerSetCtrlMode(cardIns, adapterName, "Digital Playback Path", SND_PLAY_PATH, SND_OUT_CARD_SPK_HP);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioMixerSetCtrlMode failed!");
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
-
 /*
  * brief: Opens a PCM
  * param mode Open mode (see #SND_PCM_NONBLOCK, #SND_PCM_ASYNC)
@@ -1023,14 +1119,25 @@ int32_t AudioOutputRenderOpen(const struct DevHandle *handle, int cmdId, const s
     }
 
     const char *adapterName = handleData->renderMode.hwInfo.adapterName;
-    cardIns = AudioGetCardInfo(adapterName, SND_PCM_STREAM_PLAYBACK);
+    cardIns = AudioGetCardInstance(adapterName);
     if (cardIns == NULL) {
         AUDIO_FUNC_LOGE("AudioRenderGetCardIns failed.");
+        (void)DestroyCardList();
+        return HDF_FAILURE;
+    }
+
+    ret = AudioGetCardInfo(cardIns, adapterName, SND_PCM_STREAM_PLAYBACK);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("AudioGetCardInfo failed.");
+        CheckCardStatus(cardIns);
+        (void)DestroyCardList();
         return HDF_FAILURE;
     }
 
     if (cardIns->renderPcmHandle != NULL) {
         AUDIO_FUNC_LOGE("Resource busy!!");
+        CheckCardStatus(cardIns);
+        (void)DestroyCardList();
         return HDF_ERR_DEVICE_BUSY;
     }
 
@@ -1043,7 +1150,7 @@ int32_t AudioOutputRenderOpen(const struct DevHandle *handle, int cmdId, const s
     }
 
     InitSound(&cardIns->mixer, cardIns->ctrlName);
-    ret = InitMixerCtlElement(adapterName, cardIns, cardIns->mixer);
+    ret = InitMixerCtlElement(adapterName, cardIns, cardIns->mixer, SND_PCM_STREAM_PLAYBACK);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("InitMixerCtlElement failed!");
         (void)CloseMixerHandle(cardIns->mixer);
@@ -1100,7 +1207,10 @@ int32_t AudioOutputRenderClose(const struct DevHandle *handle, int cmdId, const 
         AUDIO_FUNC_LOGE("cardInstance is empty pointer!");
         return HDF_FAILURE;
     }
-
+    AudioMemFree((void **)&alsaCardIns->volElemList);
+#ifdef SUPPORT_ALSA_CHMAP
+    AudioMemFree((void **)&alsaCardIns->hwRenderParams.channelsName);
+#endif
     if (alsaCardIns->renderPcmHandle != NULL) {
         ret = snd_pcm_close(alsaCardIns->renderPcmHandle);
         if (ret < 0) {

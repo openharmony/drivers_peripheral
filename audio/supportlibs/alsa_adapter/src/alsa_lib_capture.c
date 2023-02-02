@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,43 +25,15 @@
 #define AUDIO_PERIOD         ((AUDIO_SAMPLE_FREQ) / (AUDIO_TIMESTAMP_FREQ))
 #define AUDIO_PCM_WAIT       100
 #define AUDIO_RESUME_POLL    (10 * (AUDIO_PCM_WAIT)) // 1s
-#define ALSA_CAP_BUFFER_SIZE (2 * 2 * 6000)        // format(S16LE) * channels(2) * period.
+#define ALSA_CAP_BUFFER_SIZE (2 * 2 * 6000)          // format(S16LE) * channels(2) * period.
 
 static unsigned int g_bufferTime = 500000; /* (0.5s): ring buffer length in us */
 static unsigned int g_periodTime = 100000; /* (0.1s): period time in us */
 static snd_pcm_sframes_t g_bufferSize = 0;
 static snd_pcm_sframes_t g_periodSize = 0;
-static int g_resample = 1;    /* enable alsa-lib resampling */
+static int g_resample = 1;         /* enable alsa-lib resampling */
 static bool g_periodEvent = false; /* produce poll event after each period */
-static int g_canPause = 0;    /* 0 Hardware doesn't support pause, 1 Hardware supports pause */
-
-static int32_t AudioSetMixerCapVolume(snd_mixer_elem_t *pcmElemen, long vol)
-{
-    int32_t ret;
-
-    if (pcmElemen == NULL) {
-        AUDIO_FUNC_LOGE("parameter is NULL!");
-        return HDF_FAILURE;
-    }
-
-    /* Judge whether it is mono or stereo */
-    ret = snd_mixer_selem_is_capture_mono(pcmElemen);
-    if (ret == 1) { // mono
-        ret = snd_mixer_selem_set_capture_volume(pcmElemen, SND_MIXER_SCHN_MONO, vol);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("Failed to set volume: %{public}s.", snd_strerror(ret));
-            return HDF_FAILURE;
-        }
-    } else { // ret == 0: is not mono. (stereo)
-        ret = snd_mixer_selem_set_capture_volume_all(pcmElemen, vol);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("Failed to set all channel volume: %{public}s.", snd_strerror(ret));
-            return HDF_FAILURE;
-        }
-    }
-
-    return HDF_SUCCESS;
-}
+static int g_canPause = 0;         /* 0 Hardware doesn't support pause, 1 Hardware supports pause */
 
 static int32_t AudioCaptureSetPauseState(snd_pcm_t *pcm, int32_t pause)
 {
@@ -83,14 +55,14 @@ static int32_t AudioCaptureSetPauseState(snd_pcm_t *pcm, int32_t pause)
             AUDIO_FUNC_LOGE("snd_pcm_start fail. %{public}s", snd_strerror(ret));
             return HDF_FAILURE;
         }
-    } else if (pause == AUDIO_ALSALIB_IOCTRL_PAUSE) {
+    }
+
+    if (pause == AUDIO_ALSALIB_IOCTRL_PAUSE) {
         ret = snd_pcm_drop(pcm);
         if (ret < 0) {
             AUDIO_FUNC_LOGE("Pause fail: %{public}s", snd_strerror(ret));
             return HDF_FAILURE;
         }
-    } else {
-        /* Nothing to do! */
     }
 
     return HDF_SUCCESS;
@@ -126,13 +98,43 @@ int32_t AudioCtlCaptureSetPauseStu(
     return HDF_SUCCESS;
 }
 
-int32_t AudioCtlCaptureGetVolume(
-    const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
+static int32_t AudioCaptureMixerGetVolume(snd_mixer_t *mixer, snd_mixer_elem_t *pcmElemen, long *vol)
+{
+    long volLeft = MIN_VOLUME;
+    long volRight = MIN_VOLUME;
+
+    if (mixer == NULL || pcmElemen == NULL || vol == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return HDF_FAILURE;
+    }
+    /* Handling events */
+    int32_t ret = snd_mixer_handle_events(mixer);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("snd_mixer_handle_events fail!");
+        return HDF_FAILURE;
+    }
+
+    /* Left channel */
+    ret = snd_mixer_selem_get_capture_volume(pcmElemen, SND_MIXER_SCHN_FRONT_LEFT, &volLeft);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Get left channel fail!");
+        return HDF_FAILURE;
+    }
+    /* right channel */
+    ret = snd_mixer_selem_get_capture_volume(pcmElemen, SND_MIXER_SCHN_FRONT_RIGHT, &volRight);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("Get right channel fail!");
+        return HDF_FAILURE;
+    }
+    *vol = (volLeft + volRight) >> 1;
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioCtlCaptureGetVolume(const struct DevHandle *handle, int cmdId, struct AudioHwCaptureParam *handleData)
 {
     int32_t ret;
-    long volEverage;
-    long volLeft = 0;
-    long volRight = 0;
+    long vol = 0;
     struct AudioCardInfo *cardIns;
 
     (void)cmdId;
@@ -148,28 +150,61 @@ int32_t AudioCtlCaptureGetVolume(
         return HDF_FAILURE;
     }
 
-    if (strncmp(adapterName, USB, strlen(USB)) == 0) {
-        handleData->captureMode.ctlParam.volume = MAX_VOLUME;
+    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+        if (cardIns->volElemList == NULL || cardIns->volElemList[0].elem == NULL) {
+            AUDIO_FUNC_LOGE("ctrlVolumeList is NULL!");
+            return HDF_FAILURE;
+        }
+        ret = AudioCaptureMixerGetVolume(cardIns->mixer, cardIns->volElemList[0].elem, &vol);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("Get primary volume failed!");
+            return ret;
+        }
+        handleData->captureMode.ctlParam.volume = (float)(vol);
         return HDF_SUCCESS;
     }
 
-    ret = snd_mixer_handle_events(cardIns->mixer);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("snd_mixer_handle_events fail: %{public}s.", snd_strerror(ret));
+    if (strncmp(adapterName, USB, strlen(USB)) == 0) {
+        if (cardIns->usbCtlVolume == NULL) {
+            AUDIO_FUNC_LOGE("usbCtlVolume is NULL, the volume setting may not be supported!");
+            return HDF_FAILURE;
+        }
+        ret = AudioCaptureMixerGetVolume(cardIns->mixer, cardIns->usbCtlVolume, &vol);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("Get usb volume failed!");
+            return ret;
+        }
+        handleData->captureMode.ctlParam.volume = (float)(vol);
+        return HDF_SUCCESS;
+    }
+    /* Special external sound recording card, no volume control, return not supported */
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+static int32_t AudioCaptureSetMixerVolume(snd_mixer_elem_t *pcmElemen, long vol)
+{
+    int32_t ret;
+
+    if (pcmElemen == NULL) {
+        AUDIO_FUNC_LOGE("parameter is NULL!");
         return HDF_FAILURE;
     }
 
-    /* Read the two channel volume */
-    ret = snd_mixer_selem_get_capture_volume(cardIns->ctrlLeftVolume, SND_MIXER_SCHN_FRONT_LEFT, &volLeft);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("Get left channel volume fail: %{public}s.", snd_strerror(ret));
+    /* Judge whether it is mono or stereo */
+    ret = snd_mixer_selem_is_capture_mono(pcmElemen);
+    if (ret == 1) { // mono
+        ret = snd_mixer_selem_set_capture_volume(pcmElemen, SND_MIXER_SCHN_MONO, vol);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("Failed to set volume: %{public}s.", snd_strerror(ret));
+            return HDF_FAILURE;
+        }
+    } else { // ret == 0: is not mono. (stereo)
+        ret = snd_mixer_selem_set_capture_volume_all(pcmElemen, vol);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("Failed to set all channel volume: %{public}s.", snd_strerror(ret));
+            return HDF_FAILURE;
+        }
     }
-    ret = snd_mixer_selem_get_capture_volume(cardIns->ctrlLeftVolume, SND_MIXER_SCHN_FRONT_RIGHT, &volRight);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("Get right channel volume fail: %{public}s.", snd_strerror(ret));
-    }
-    volEverage = (volLeft + volRight) >> 1;
-    handleData->captureMode.ctlParam.volume = (float)(volEverage);
 
     return HDF_SUCCESS;
 }
@@ -195,21 +230,100 @@ int32_t AudioCtlCaptureSetVolume(
         return HDF_FAILURE;
     }
 
-    if (strncmp(adapterName, USB, strlen(USB)) == 0) {
-        /* The external Settings. */
+    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+        if (cardIns->volElemList == NULL) {
+            AUDIO_FUNC_LOGE("Get capture ctrlVolumeList is NULL!");
+            return HDF_FAILURE;
+        }
+        for (int32_t index = 0; index < (int32_t)cardIns->volElemCount; index++) {
+            if (cardIns->volElemList[index].elem == NULL) {
+                AUDIO_FUNC_LOGE("Get capture ctrlVolume is NULL!");
+                return HDF_FAILURE;
+            }
+            ret = AudioCaptureSetMixerVolume(cardIns->volElemList[index].elem, vol);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("primary set volume failed!");
+                return ret;
+            }
+        }
         return HDF_SUCCESS;
     }
 
-    ret = AudioSetMixerCapVolume(cardIns->ctrlLeftVolume, vol);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("AudioSetMixerVolume left fail!");
+    if (strncmp(adapterName, USB, strlen(USB)) == 0) {
+        if (cardIns->usbCtlVolume != NULL) {
+            ret = AudioCaptureSetMixerVolume(cardIns->usbCtlVolume, vol);
+            if (ret < 0) {
+                AUDIO_FUNC_LOGE("usb set volume failed!");
+                return ret;
+            }
+            return HDF_SUCCESS;
+        }
+    }
+
+    /* Special external sound recording card, no volume control, return not supported */
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+static int32_t AudioCaptureSetMuteState(
+    struct AudioCardInfo *cardIns, int32_t muteState, const char *adapterName, float volume)
+{
+    long vol;
+    long setVol;
+    float volRangeMin = 0.0;
+    float volRangeMax = 100.0;
+    if (cardIns == NULL || cardIns->volElemList == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return HDF_FAILURE;
+    }
+    int32_t ret = AudioCaptureMixerGetVolume(cardIns->mixer, cardIns->volElemList[0].elem, &vol);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("AudioCaptureMixerGetVolume fail!");
         return ret;
     }
 
-    ret = AudioSetMixerCapVolume(cardIns->ctrlRightVolume, vol);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("AudioSetMixerVolume right fail!");
-        return ret;
+    if (muteState == false) {
+        setVol = 0; // 0 for mute
+        cardIns->tempVolume = (float)vol;
+    } else {
+        if (volume > volRangeMin && volume <= volRangeMax) {
+            setVol = (long)volume;
+        } else {
+            setVol = (long)cardIns->tempVolume;
+        }
+    }
+
+    for (int i = 0; i < (int32_t)cardIns->volElemCount; i++) {
+        if (cardIns->volElemList[i].elem == NULL) {
+            AUDIO_FUNC_LOGE("AudioCapture get volElemList fail!");
+            return HDF_FAILURE;
+        }
+        ret = AudioCaptureSetMixerVolume(cardIns->volElemList[i].elem, setVol);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("AudioCaptureSetMixerVolume fail!");
+            return HDF_FAILURE;
+        }
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioUsbSetMute(snd_mixer_elem_t *pcmElemen, int32_t muteState)
+{
+    int32_t ret;
+
+    if (pcmElemen == NULL) {
+        AUDIO_FUNC_LOGE("cardIns is NULL!");
+        return HDF_FAILURE;
+    }
+    ret = snd_mixer_selem_has_capture_switch(pcmElemen);
+    if (ret == 1) { // 1: Controlled switch
+        ret = snd_mixer_selem_set_capture_switch_all(pcmElemen, muteState);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("Unable to set mute: %{public}s.", snd_strerror(ret));
+            return HDF_FAILURE;
+        }
+    } else { // 0: no control
+        AUDIO_FUNC_LOGE("it's no control is present");
+        return HDF_FAILURE;
     }
 
     return HDF_SUCCESS;
@@ -233,21 +347,22 @@ int32_t AudioCtlCaptureSetMuteStu(
         AUDIO_FUNC_LOGE("cardIns is empty pointer!!!");
         return HDF_FAILURE;
     }
-
     muteState = (bool)cardIns->captureMuteValue;
-    if (muteState == false) {
-        ret =
-            AudioMixerSetCtrlMode(cardIns, adapterName, "Digital Capture mute", SND_CAP_MIC_PATH, SND_IN_CARD_MIC_OFF);
-    } else {
-        ret =
-            AudioMixerSetCtrlMode(cardIns, adapterName, "Digital Capture mute", SND_CAP_MIC_PATH, SND_IN_CARD_MAIN_MIC);
+    if (strncmp(adapterName, USB, strlen(USB)) == 0) {
+        if (AudioUsbSetMute(cardIns->usbCtlVolume, muteState) != HDF_SUCCESS) {
+            AUDIO_FUNC_LOGE("AudioUsbSetMute failed!");
+            return HDF_FAILURE;
+        }
     }
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("AudioMixerSetCtrlMode failed!");
-        return ret;
+    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
+        ret = AudioCaptureSetMuteState(cardIns, muteState, adapterName, handleData->captureMode.ctlParam.volume);
+        if (ret < 0) {
+            AUDIO_FUNC_LOGE("Render primary sound card SetMute failed!");
+            return HDF_FAILURE;
+        }
     }
-    cardIns->captureMuteValue = (int32_t)handleData->captureMode.ctlParam.mute;
 
+    cardIns->captureMuteValue = (int32_t)handleData->captureMode.ctlParam.mute;
     return HDF_SUCCESS;
 }
 
@@ -268,12 +383,7 @@ int32_t AudioCtlCaptureGetMuteStu(const struct DevHandle *handle, int cmdId, str
         return HDF_FAILURE;
     }
 
-    if (strncmp(adapterName, USB, strlen(USB)) == 0) {
-        /* The external Settings. */
-        return HDF_SUCCESS;
-    }
     handleData->captureMode.ctlParam.mute = (bool)cardInstance->captureMuteValue;
-
     return HDF_SUCCESS;
 }
 
@@ -303,20 +413,20 @@ int32_t AudioCtlCaptureGetGainStu(const struct DevHandle *handle, int cmdId, str
 int32_t AudioCtlCaptureSceneSelect(
     const struct DevHandle *handle, int cmdId, const struct AudioHwCaptureParam *handleData)
 {
-    int32_t deviceNum;
-
     (void)cmdId;
     if (handle == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("param is NULL!");
         return HDF_FAILURE;
     }
-
-    deviceNum = handleData->captureMode.hwInfo.pathSelect.deviceInfo.deviceNum;
-    if (deviceNum < AUDIO_MIN_CARD_NUM) {
-        AUDIO_FUNC_LOGE("Not find device!");
-        return HDF_FAILURE;
+    if (strcmp(handleData->captureMode.hwInfo.adapterName, USB) == 0 ||
+        strcmp(handleData->captureMode.hwInfo.adapterName, HDMI) == 0) {
+        return HDF_SUCCESS;
     }
-
+    int32_t ret = EnableAudioCaptureRoute(handleData);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("EnableAudioRoute failed!");
+        return ret;
+    }
     return HDF_SUCCESS;
 }
 
@@ -352,13 +462,13 @@ int32_t AudioCtlCaptureGetVolThreshold(
         return HDF_FAILURE;
     }
 
-    if (strncmp(adapterName, USB, strlen(USB)) == 0) {
+    if (strncmp(adapterName, USB, strlen(USB)) == 0 || strncmp(adapterName, HDMI, strlen(HDMI)) == 0) {
         handleData->captureMode.ctlParam.volThreshold.volMax = MAX_VOLUME;
         handleData->captureMode.ctlParam.volThreshold.volMin = MIN_VOLUME;
         return HDF_SUCCESS;
     }
 
-    ret = snd_mixer_selem_get_capture_volume_range(cardIns->ctrlLeftVolume, &volMin, &volMax);
+    ret = snd_mixer_selem_get_capture_volume_range(cardIns->volElemList[0].elem, &volMin, &volMax);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Get capture volume range fail: %{public}s.", snd_strerror(ret));
         return HDF_FAILURE;
@@ -732,77 +842,6 @@ int32_t AudioOutputCaptureHwParams(
     return HDF_SUCCESS;
 }
 
-static int32_t InitMixerCtrlCapVolumeRange(const char *adapterName, struct AudioCardInfo *cardIns)
-{
-    int32_t ret;
-
-    if (cardIns == NULL || adapterName == NULL) {
-        AUDIO_FUNC_LOGE("The parameter is NULL");
-        return HDF_FAILURE;
-    }
-
-    if (strncmp(adapterName, USB, strlen(USB)) == 0) {
-        /* The external Settings. */
-        return HDF_SUCCESS;
-    }
-
-    if (cardIns->ctrlLeftVolume != NULL) {
-        ret = snd_mixer_selem_set_capture_volume_range(cardIns->ctrlLeftVolume, MIN_VOLUME, MAX_VOLUME);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("Failed to set capture left volume range: %{public}s.", snd_strerror(ret));
-            return HDF_FAILURE;
-        }
-    }
-
-    if (cardIns->ctrlRightVolume != NULL) {
-        ret = snd_mixer_selem_set_capture_volume_range(cardIns->ctrlRightVolume, MIN_VOLUME, MAX_VOLUME);
-        if (ret < 0) {
-            AUDIO_FUNC_LOGE("Failed to set capture right volume range: %{public}s.", snd_strerror(ret));
-            return HDF_FAILURE;
-        }
-    }
-
-    return HDF_SUCCESS;
-}
-
-static int32_t InitMixerCtlElement(const char *adapterName, struct AudioCardInfo *cardIns, snd_mixer_t *mixer)
-{
-    int32_t ret;
-
-    if (adapterName == NULL || cardIns == NULL || mixer == NULL) {
-        AUDIO_FUNC_LOGE("The parameter is empty.");
-        return HDF_FAILURE;
-    }
-
-    snd_mixer_elem_t *pcmElement = snd_mixer_first_elem(mixer);
-    if (strncmp(adapterName, PRIMARY, strlen(PRIMARY)) == 0) {
-        ret = GetPriMixerCtlElement(cardIns, pcmElement);
-        if (ret != HDF_SUCCESS) {
-            AUDIO_FUNC_LOGE("Capture GetPriMixerCtlElement failed.");
-            return ret;
-        }
-    } else if (strncmp(adapterName, USB, strlen(USB)) == 0) {
-        cardIns->ctrlLeftVolume = AudioUsbFindElement(mixer);
-    } else {
-        AUDIO_FUNC_LOGE("The selected sound card not supported, please check!");
-        return HDF_FAILURE;
-    }
-
-    ret = InitMixerCtrlCapVolumeRange(adapterName, cardIns);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("InitMixerCtrlCapVolumeRange fail!");
-        return ret;
-    }
-
-    ret = AudioMixerSetCtrlMode(cardIns, adapterName, "Capture MIC Path", SND_CAP_MIC_PATH, SND_IN_CARD_MAIN_MIC);
-    if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGE("AudioMixerSetCtrlMode failed!");
-        return ret;
-    }
-
-    return HDF_SUCCESS;
-}
-
 /*
  * brief: Opens a capture PCM
  * param mode Open mode (see #SND_PCM_NONBLOCK, #SND_PCM_ASYNC)
@@ -819,14 +858,22 @@ int32_t AudioOutputCaptureOpen(const struct DevHandle *handle, int cmdId, const 
     }
 
     const char *adapterName = handleData->captureMode.hwInfo.adapterName;
-    cardIns = AudioGetCardInfo(adapterName, SND_PCM_STREAM_CAPTURE);
+    cardIns = AudioGetCardInstance(adapterName);
     if (cardIns == NULL) {
         AUDIO_FUNC_LOGE("AudioCaptureGetCardIns failed.");
+        (void)DestroyCardList();
         return HDF_FAILURE;
     }
-
+    ret = AudioGetCardInfo(cardIns, adapterName, SND_PCM_STREAM_CAPTURE);
+    if (ret != HDF_SUCCESS) {
+        CheckCardStatus(cardIns);
+        (void)DestroyCardList();
+        return HDF_FAILURE;
+    }
     if (cardIns->capturePcmHandle != NULL) {
         AUDIO_FUNC_LOGE("Resource busy!!");
+        CheckCardStatus(cardIns);
+        (void)DestroyCardList();
         return HDF_ERR_DEVICE_BUSY;
     }
     ret = snd_pcm_open(&cardIns->capturePcmHandle, cardIns->devName, SND_PCM_STREAM_CAPTURE, SND_PCM_NONBLOCK);
@@ -836,9 +883,8 @@ int32_t AudioOutputCaptureOpen(const struct DevHandle *handle, int cmdId, const 
         (void)DestroyCardList();
         return HDF_FAILURE;
     }
-
     InitSound(&cardIns->mixer, cardIns->ctrlName);
-    ret = InitMixerCtlElement(adapterName, cardIns, cardIns->mixer);
+    ret = InitMixerCtlElement(adapterName, cardIns, cardIns->mixer, SND_PCM_STREAM_CAPTURE);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("capture InitMixerCtlElement failed!");
         (void)CloseMixerHandle(cardIns->mixer);
@@ -1161,6 +1207,7 @@ int32_t AudioOutputCaptureClose(const struct DevHandle *handle, int cmdId, const
         return HDF_FAILURE;
     }
 
+    AudioMemFree((void **)&cardIns->volElemList);
     if (cardIns->capturePcmHandle != NULL) {
         (void)snd_pcm_close(cardIns->capturePcmHandle);
         cardIns->capturePcmHandle = NULL;
