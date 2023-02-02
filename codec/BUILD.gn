@@ -17,6 +17,7 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 group("hdf_media_codec") {
   deps = [
     "hal:codec_hdi_omx",
+    "hal/idl_service:codec_idl_omx_service",
     "hal/passthrough:codec_hdi_passthrough",
     "hal/v1.0/buffer_manager:codec_buffer_manager",
   ]
