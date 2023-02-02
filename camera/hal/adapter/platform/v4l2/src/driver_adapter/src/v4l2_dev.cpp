@@ -123,9 +123,9 @@ RetCode HosV4L2Dev::Init(std::vector<std::string>& cameraIDs)
 
 RetCode HosV4L2Dev::ReqBuffers(const std::string& cameraID, unsigned int buffCont)
 {
-    int rc, fd;
+    int rc;
 
-    fd = GetCurrentFd(cameraID);
+    int fd = GetCurrentFd(cameraID);
     if (fd < 0) {
         CAMERA_LOGE("error: ReqBuffers: GetCurrentFd error\n");
         return RC_ERROR;
@@ -182,9 +182,9 @@ RetCode HosV4L2Dev::CreatBuffer(const std::string& cameraID, const std::shared_p
 
 RetCode HosV4L2Dev::QueueBuffer(const std::string& cameraID, const std::shared_ptr<FrameSpec>& frameSpec)
 {
-    int rc, fd;
+    int rc;
 
-    fd = GetCurrentFd(cameraID);
+    int fd = GetCurrentFd(cameraID);
     if (fd < 0) {
         CAMERA_LOGE("QueueBuffer: GetCurrentFd error\n");
         return RC_ERROR;
@@ -231,7 +231,8 @@ RetCode HosV4L2Dev::ReleaseBuffers(const std::string& cameraID)
 
 void HosV4L2Dev::loopBuffers()
 {
-    int nfds, rc;
+    int nfds;
+    int rc;
     struct epoll_event events[MAXSTREAMCOUNT];
 
     CAMERA_LOGD("!!! loopBuffers enter, streamNumber_=%{public}d\n", streamNumber_);
@@ -312,9 +313,9 @@ void HosV4L2Dev::EraseEpoll(int fd)
 
 RetCode HosV4L2Dev::StartStream(const std::string& cameraID)
 {
-    int rc, fd;
+    int rc;
 
-    fd = GetCurrentFd(cameraID);
+    int fd = GetCurrentFd(cameraID);
     if (fd < 0) {
         CAMERA_LOGE("error: ReqBuffers: GetCurrentFd error\n");
         return RC_ERROR;
@@ -532,7 +533,8 @@ RetCode HosV4L2Dev::SetNumberCtrls(const std::string& cameraID, std::vector<Devi
 
 RetCode HosV4L2Dev::GetControls(const std::string& cameraID, std::vector<DeviceControl>& control)
 {
-    int fd, rc;
+    int fd = 0;
+    int rc = 0;
 
     if (myControl_ == nullptr) {
         myControl_ = std::make_shared<HosV4L2Control>();
@@ -559,7 +561,8 @@ RetCode HosV4L2Dev::GetControls(const std::string& cameraID, std::vector<DeviceC
 
 RetCode HosV4L2Dev::GetFmtDescs(const std::string& cameraID, std::vector<DeviceFormat>& fmtDesc)
 {
-    int fd, rc;
+    int fd = 0;
+    int rc = 0;
 
     if (myFileFormat_ == nullptr) {
         CAMERA_LOGE("GetFmtDescs: myFileFormat_ == nullptr\n");
@@ -608,7 +611,7 @@ RetCode HosV4L2Dev::ConfigFps(const int fd, DeviceFormat& format, V4l2FmtCmd com
 
 RetCode HosV4L2Dev::ConfigSys(const std::string& cameraID, V4l2FmtCmd command, DeviceFormat& format)
 {
-    int fd;
+    int fd = 0;
     RetCode rc = RC_OK;
 
     if (myFileFormat_ == nullptr) {
@@ -677,9 +680,9 @@ RetCode HosV4L2Dev::SetCallback(BufCallback cb)
 }
 RetCode HosV4L2Dev::Flush(const std::string& cameraID)
 {
-    int rc, fd;
+    int rc = 0;
 
-    fd = GetCurrentFd(cameraID);
+    int fd = GetCurrentFd(cameraID);
     if (fd < 0) {
         CAMERA_LOGE("HosV4L2Dev::Flush: GetCurrentFd error\n");
         return RC_ERROR;

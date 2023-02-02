@@ -18,6 +18,7 @@
 #include <gtest/gtest.h>
 #include "v4l2_device_manager.h"
 
+// namespace OHOS::Camera
 namespace OHOS::Camera {
 std::shared_ptr<IDeviceManager> DM = nullptr;
 void UtestV4l2DeviceManager::SetUpTestCase(void)
@@ -164,4 +165,4 @@ HWTEST_F(UtestV4l2DeviceManager, GetCameraId_Success, TestSize.Level0)
         EXPECT_EQ(true, (*iter) != CAMERA_MAX);
     }
 }
-}// namespace OHOS::Camera
+}
