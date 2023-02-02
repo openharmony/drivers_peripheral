@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,7 @@ public:
     static int32_t (*InterfaceLibCtlCapture)(struct DevHandle *, int, struct AudioHwCaptureParam *);
     static void *ptrHandle;
     static struct DevHandle *handle;
-    static struct DevHandle *(*BindServiceCapture)(const char *);
+    static struct DevHandle *(*AudioBindService)(const char *);
     static void (*CloseServiceCapture)(struct DevHandle *);
     int32_t CreatHwCapture(struct AudioHwCapture *&hwCapture, const std::string adapterNameCase) const;
     int32_t LibCaptureStart(struct AudioHwCapture *hwCapture, struct DevHandle *handleCapture) const;
@@ -44,7 +44,7 @@ int32_t (*AudioAlsaLibCaptureTest::InterfaceLibCtlCapture)(struct DevHandle *, i
     struct AudioHwCaptureParam *) = nullptr;
 void *AudioAlsaLibCaptureTest::ptrHandle = nullptr;
 struct DevHandle *AudioAlsaLibCaptureTest::handle = nullptr;
-struct DevHandle *(*AudioAlsaLibCaptureTest::BindServiceCapture)(const char *) = nullptr;
+struct DevHandle *(*AudioAlsaLibCaptureTest::AudioBindService)(const char *) = nullptr;
 void (*AudioAlsaLibCaptureTest::CloseServiceCapture)(struct DevHandle *) = nullptr;
 void AudioAlsaLibCaptureTest::SetUpTestCase(void)
 {
@@ -57,9 +57,9 @@ void AudioAlsaLibCaptureTest::SetUpTestCase(void)
     InterfaceLibCtlCapture = (int32_t (*)(struct DevHandle *, int,
                                           struct AudioHwCaptureParam *))dlsym(ptrHandle, "AudioInterfaceLibCtlCapture");
     ASSERT_NE(nullptr, InterfaceLibCtlCapture);
-    BindServiceCapture = reinterpret_cast<struct DevHandle* (*)(const char *)>(dlsym(ptrHandle,
-        "AudioBindServiceCapture"));
-    ASSERT_NE(nullptr, BindServiceCapture);
+    AudioBindService = reinterpret_cast<struct DevHandle* (*)(const char *)>(dlsym(ptrHandle,
+        "AudioBindService"));
+    ASSERT_NE(nullptr, AudioBindService);
     CloseServiceCapture = (void (*)(struct DevHandle *))dlsym(ptrHandle, "AudioCloseServiceCapture");
     ASSERT_NE(nullptr, CloseServiceCapture);
 }
@@ -80,7 +80,7 @@ void AudioAlsaLibCaptureTest::TearDownTestCase(void)
 
 void AudioAlsaLibCaptureTest::SetUp(void)
 {
-    handle = BindServiceCapture(BIND_CONTROL.c_str());
+    handle = AudioBindService(BIND_CONTROL.c_str());
     ASSERT_NE(nullptr, handle);
 }
 
