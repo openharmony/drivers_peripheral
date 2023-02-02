@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -50,6 +50,14 @@ static struct SensorCovertCoff g_sensorCovertCoff[] = {
     { SENSOR_TYPE_PROXIMITY, SENSOR_TYPE_MAX, DATA_X, { PROXIMITY_ACCURACY } },
 };
 
+static struct SensorDumpDate g_dumpDate = { 0 };
+static struct SensorDatePack g_listDump = { 0 };
+
+struct SensorDatePack *GetEventData(void)
+{
+    return &g_listDump;
+}
+
 void SetSensorIdBySensorType(enum SensorTypeTag type, int32_t sensorId)
 {
     uint32_t count = sizeof(g_sensorCovertCoff) / sizeof(g_sensorCovertCoff[0]);
@@ -59,6 +67,35 @@ void SetSensorIdBySensorType(enum SensorTypeTag type, int32_t sensorId)
             g_sensorCovertCoff[i].sensorId = sensorId;
             break;
         }
+    }
+}
+
+void CopyEventData(struct SensorEvents *event)
+{
+    if (event == NULL || event->data == NULL) {
+        HDF_LOGE("%{public}s: event==NULL || event->data==NULL !", __func__);
+        return;
+    }
+
+    for (uint32_t i = 0; i < event->dataLen; i++) {
+        g_dumpDate.data[i] = event->data[i];
+    }
+    g_dumpDate.dataLen = event->dataLen;
+    g_dumpDate.sensorId = event->sensorId;
+    g_dumpDate.version = event->version;
+    g_dumpDate.timestamp = event->timestamp;
+    g_dumpDate.option = event->option;
+    g_dumpDate.mode = event->mode;
+
+    g_listDump.listDumpArr[g_listDump.pos] = g_dumpDate;
+
+    if (g_listDump.pos + 1 >= MAX_DUMP_DATA_SIZE) {
+        g_listDump.pos = 0;
+    } else {
+        g_listDump.pos++;
+    }
+    if (g_listDump.count < MAX_DUMP_DATA_SIZE) {
+        g_listDump.count++;
     }
 }
 
@@ -118,6 +155,8 @@ static int OnSensorEventReceived(struct HdfDevEventlistener *listener,
     }
 
     ConvertSensorData(event);
+    CopyEventData(event);
+
     if (manager->recordDataCb[groupType] != NULL) {
         manager->recordDataCb[groupType](event);
     }
