@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <netinet/in.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
@@ -42,6 +43,7 @@
 #define START_CODE_SIZE_FRAME       4
 #define START_CODE_SIZE_SLICE       3
 #define START_CODE                  0x1
+#define VOP_START                   0xb6
 #define YUV_ALIGNMENT               16
 
 typedef struct {
@@ -95,7 +97,7 @@ static int32_t ReadInputFromFile(FILE *fp, uint8_t *buf)
     return fread(buf, 1, STREAM_PACKET_BUFFER_SIZE, fp);
 }
 
-static int32_t ReadOneFrameFromFile(FILE *fp, uint8_t *buf)
+static int32_t ReadAvcFrame(FILE *fp, uint8_t *buf)
 {
     int32_t readSize = 0;
     // read start code first
@@ -128,6 +130,67 @@ static int32_t ReadOneFrameFromFile(FILE *fp, uint8_t *buf)
     }
     readSize = (temp - buf);
     return readSize;
+}
+
+static int32_t ReadMpeg4Frame(FILE *fp, uint8_t *buf)
+{
+    int32_t readSize = 0;
+    fread(buf, 1, START_CODE_SIZE_SLICE, fp);
+    if (feof(fp)) {
+        return readSize;
+    }
+
+    uint8_t *temp = buf;
+    temp += START_CODE_SIZE_SLICE;
+    bool ret = true;
+    bool findVop = false;
+    while (!feof(fp)) {
+        fread(temp, 1, 1, fp);
+        // check start code
+        if ((*temp == VOP_START) && (temp[START_CODE_OFFSET_ONE] == START_CODE) && (temp[START_CODE_OFFSET_SEC] == 0) &&
+            (temp[START_CODE_OFFSET_THIRD] == 0)) {
+            findVop = true;
+        }
+        if (findVop && (*temp == START_CODE) && (temp[START_CODE_OFFSET_ONE] == 0) &&
+            (temp[START_CODE_OFFSET_SEC] == 0)) {
+            temp -= START_CODE_SIZE_SLICE - 1;
+            fseek(fp, START_CODE_OFFSET_THIRD, SEEK_CUR);
+            ret = false;
+            break;
+        }
+        temp++;
+    }
+    readSize = (temp - buf);
+    return readSize;
+}
+
+static int32_t ReadVp9Frame(FILE *fp, uint8_t *buf)
+{
+    // len(4 bytes, little-end, length of vp9 data) + vp9 data
+    int32_t readSize = 0;
+    fread(&readSize, 1, sizeof(readSize), fp);
+    if (feof(fp)) {
+        return 0;
+    }
+    readSize = ntohl(readSize);
+    readSize = fread(buf, 1, readSize, fp);
+    return readSize;
+}
+
+static int32_t ReadOneFrameFromFile(FILE *fp, uint8_t *buf)
+{
+    if (strstr(g_cmd.codecName, CODEC_NAME_AVC_HW_DECODER)) {
+        return ReadAvcFrame(fp, buf);
+    } else if (strstr(g_cmd.codecName, CODEC_NAME_HEVC_HW_DECODER)) {
+        return ReadAvcFrame(fp, buf);
+    } else if (strstr(g_cmd.codecName, CODEC_NAME_VP9_HW_DECODER) ||
+        strstr(g_cmd.codecName, CODEC_NAME_VP8_HW_DECODER)) {
+        return ReadVp9Frame(fp, buf);
+    } else if (strstr(g_cmd.codecName, CODEC_NAME_MPEG4_HW_DECODER)) {
+        return ReadMpeg4Frame(fp, buf);
+    } else {
+        return 0;
+    }
 }
 
 static ShareMemory* GetShareMemoryById(int32_t id)
