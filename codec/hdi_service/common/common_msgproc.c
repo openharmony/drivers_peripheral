@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,6 @@ bool PackBufferHandle(struct HdfSBuf *data, BufferHandle *handle)
         return false;
     }
 
-    uint8_t validFd = 0;
     if (!HdfSbufWriteUint32(data, handle->reserveFds) || !HdfSbufWriteUint32(data, handle->reserveInts) ||
         !HdfSbufWriteInt32(data, handle->width) || !HdfSbufWriteInt32(data, handle->stride) ||
         !HdfSbufWriteInt32(data, handle->height) || !HdfSbufWriteInt32(data, handle->size) ||
@@ -35,9 +34,9 @@ bool PackBufferHandle(struct HdfSBuf *data, BufferHandle *handle)
         return false;
     }
 
-    validFd = (handle->fd >= 0);
+    uint8_t validFd = handle->fd >= 0 ? 1 : 0;
     if (!HdfSbufWriteUint8(data, validFd)) {
-        HDF_LOGE("%{public}s: write uint8_t failed!", __func__);
+        HDF_LOGE("%{public}s: write validFd failed!", __func__);
         return false;
     }
     if (validFd && !HdfSbufWriteFileDescriptor(data, handle->fd)) {
