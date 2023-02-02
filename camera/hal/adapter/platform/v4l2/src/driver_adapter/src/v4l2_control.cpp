@@ -178,7 +178,8 @@ int HosV4L2Control::ExtControl(int fd, struct v4l2_queryctrl *ctrl)
 void HosV4L2Control::V4L2SetValue(int fd, std::vector<DeviceControl>& control,
     DeviceControl& ctrl, v4l2_queryctrl& qCtrl)
 {
-    int value, rc;
+    int value;
+    int rc;
 
     ctrl.id = qCtrl.id;
     ctrl.ctrl_class = V4L2_CTRL_ID2CLASS(qCtrl.id);

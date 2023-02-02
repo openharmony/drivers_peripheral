@@ -13,6 +13,7 @@
 
 #include "transform_node.h"
 
+// namespace OHOS::Camera
 namespace OHOS::Camera {
 TransformNode::TransformNode(const std::string& name, const std::string& type)
     :NodeBase(name, type, streamId)
@@ -34,4 +35,4 @@ void TransformNode::AllocateBuffers()
 {
 }
 REGISTERNODE(TransformNode, {"transform"})
-}// namespace OHOS::Camera
+}

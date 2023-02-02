@@ -23,6 +23,8 @@
 #include "vpss_controller.h"
 
 using namespace testing::ext;
+
+// namespace OHOS::Camera
 namespace OHOS::Camera {
 class TestNode {
 public:
@@ -321,4 +323,4 @@ HWTEST_F(UtestMpiDeviceManager, UnConnect_Failed2, TestSize.Level0)
     RetCode rc = DM->UnConnect("test#0", "out#0", "vpss#0", "in#0");
     EXPECT_EQ(RC_OK, rc);
 }
-}// namespace OHOS::Camera
+}

@@ -15,6 +15,7 @@
 #include <unistd.h>
 #include <fstream>
 
+// namespace OHOS::Camera
 namespace OHOS::Camera {
 SensorNode::SensorNode(const std::string& name, const std::string& type) : NodeBase(name, type)
 {
@@ -26,4 +27,4 @@ SensorNode::~SensorNode()
 }
 
 REGISTERNODE(SensorNode, {"sensor"})
-}// namespace OHOS::Camera
+}

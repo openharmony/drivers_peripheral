@@ -45,7 +45,7 @@ static ExifEntry *CreateTag(ExifData *exif, ExifIfd ifd, ExifTag tag, size_t len
     assert(entry != NULL);
 
     buf = exif_mem_alloc(mem, len);
-    assert(buf != NULL);
+    assert(buf != nullptr);
 
     entry->data = static_cast<unsigned char*>(buf);
     entry->size = len;
