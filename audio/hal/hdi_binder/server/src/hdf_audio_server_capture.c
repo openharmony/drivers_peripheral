@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -840,7 +840,37 @@ int32_t HdiServiceCaptureReqMmapBuffer(const struct HdfDeviceIoClient *client,
         AUDIO_FUNC_LOGE("capture or ReqMmapBuffer is NULL");
         return AUDIO_HAL_ERR_INTERNAL;
     }
-    return capture->attr.ReqMmapBuffer((AudioHandle)capture, reqSize, &desc);
+    ret = capture->attr.ReqMmapBuffer((AudioHandle)capture, reqSize, &desc);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("ReqMmapBuffer fail");
+        return ret;
+    }
+
+    if (!HdfSbufWriteFileDescriptor(reply, desc.memoryFd)) {
+        AUDIO_FUNC_LOGE("memoryFd write fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteInt32(reply, desc.totalBufferFrames)) {
+        AUDIO_FUNC_LOGE("totalBufferFrames write fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteInt32(reply, desc.transferFrameSize)) {
+        AUDIO_FUNC_LOGE("transferFrameSize write fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteInt32(reply, desc.isShareable)) {
+        AUDIO_FUNC_LOGE("isShareable write fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufWriteUint32(reply, desc.offset)) {
+        AUDIO_FUNC_LOGE("offset write fail");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    return AUDIO_HAL_SUCCESS;
 }
 
 int32_t HdiServiceCaptureGetMmapPosition(const struct HdfDeviceIoClient *client,

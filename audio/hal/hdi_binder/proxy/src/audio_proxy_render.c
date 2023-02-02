@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -644,8 +644,34 @@ int32_t AudioProxyRenderReqMmapBuffer(AudioHandle handle, int32_t reqSize, struc
         return ret;
     }
 
+    desc->memoryFd = HdfSbufReadFileDescriptor(reply);
+    if (desc->memoryFd < 0) {
+        AUDIO_FUNC_LOGE("memoryFd read failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufReadInt32(reply, &(desc->totalBufferFrames))) {
+        AUDIO_FUNC_LOGE("totalBufferFrames read failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufReadInt32(reply, &(desc->transferFrameSize))) {
+        AUDIO_FUNC_LOGE("transferFrameSize read failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufReadInt32(reply, &(desc->isShareable))) {
+        AUDIO_FUNC_LOGE("isShareable read failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
+    if (!HdfSbufReadUint32(reply, &(desc->offset))) {
+        AUDIO_FUNC_LOGE("offset read failed");
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+
     AudioProxyBufReplyRecycle(data, reply);
-    return ret;
+    return AUDIO_HAL_SUCCESS;
 }
 
 int32_t AudioProxyRenderGetMmapPosition(AudioHandle handle, uint64_t *frames, struct AudioTimeStamp *time)
