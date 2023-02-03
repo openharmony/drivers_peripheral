@@ -14,6 +14,7 @@
  */
 
 #include "sensor_dump.h"
+#include <inttypes.h>
 #include "devhost_dump_reg.h"
 #include "hdf_log.h"
 #include "sensor_channel.h"
@@ -72,8 +73,8 @@ int32_t SensorShowList(struct HdfSBuf *reply)
         maxRange: %f \n\r \
         accuracy: %f \n\r \
         power:    %f \n\r \
-        minDelay: %lld \n\r \
-        maxDelay: %lld \n\r",
+        minDelay: %" PRId64 "\n\r \
+        maxDelay: %" PRId64 "\n\r",
         sensorList->sensorInfoEntry[index].sensorName,
         sensorList->sensorInfoEntry[index].sensorId,
         sensorStatus[sensorList->sensorInfoEntry[index].sensorId],
