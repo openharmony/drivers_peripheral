@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,20 +17,26 @@
 #include <fcntl.h>
 #include <securec.h>
 #include <stdio.h>
+#include "osal_mem.h"
 #include "hdf_base.h"
 #include "hdf_dlist.h"
 #include "hdf_io_service_if.h"
 #include "hdf_log.h"
+#include "light_dump.h"
 #include "light_if.h"
 #include "light_type.h"
-#include "osal_mem.h"
 
 #define HDF_LOG_TAG           uhdf_light_service
 #define LIGHT_SERVICE_NAME    "hdf_light"
 
 #define MULTI_LIGHT_MAX_NUMBER    48
+#define LIGHT_ON    1
+#define LIGHT_OFF   0
 
-static struct LightDevice *GetLightDevicePriv(void)
+struct LightEffect g_lightEffect;
+uint8_t g_lightState[LIGHT_ID_BUTT] = {0};
+
+struct LightDevice *GetLightDevicePriv(void)
 {
     static struct LightDevice lightDeviceData = {
         .initState = false,
@@ -40,6 +46,16 @@ static struct LightDevice *GetLightDevicePriv(void)
     };
 
     return &lightDeviceData;
+}
+
+struct LightEffect *GetLightEffect(void)
+{
+    return &g_lightEffect;
+}
+
+uint8_t *GetLightState(void)
+{
+    return g_lightState;
 }
 
 static int32_t SendLightMsg(uint32_t cmd, struct HdfSBuf *msg, struct HdfSBuf *reply)
@@ -231,6 +247,12 @@ static int32_t OnLight(uint32_t lightId, struct LightEffect *effect)
     HdfSbufRecycle(msg);
     (void)OsalMutexUnlock(&priv->mutex);
 
+    if(!memcpy(&g_lightEffect, effect, sizeof(*effect))) {
+        HDF_LOGE("%{public}s: Light effect cpy faild", __func__);
+    }
+
+    g_lightState[lightId] = LIGHT_ON;
+
     return ret;
 }
 
@@ -307,6 +329,10 @@ EXIT:
     HdfSbufRecycle(sbuf);
     (void)OsalMutexUnlock(&priv->mutex);
 
+    if(!memcpy(&(g_lightEffect.lightColor), colors, sizeof(*colors))) {
+        HDF_LOGE("%{public}s: Light colors cpy faild", __func__);
+    }
+
     return ret;
 }
 
@@ -348,6 +374,8 @@ static int32_t OffLight(uint32_t lightId)
     HdfSbufRecycle(msg);
     (void)OsalMutexUnlock(&priv->mutex);
 
+    g_lightState[lightId] = LIGHT_OFF;
+
     return ret;
 }
 
@@ -375,6 +403,8 @@ const struct LightInterface *NewLightInterfaceInstance(void)
 
     priv->initState = true;
     HDF_LOGI("get light devInstance success");
+
+    LightDevRegisterDumpFunc();
 
     return &lightDevInstance;
 }
