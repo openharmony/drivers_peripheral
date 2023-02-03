@@ -107,7 +107,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_002, TestSiz
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     capture->control.Stop((AudioHandle)capture);
     adapter->DestroyCapture(adapter, capture);
@@ -133,7 +133,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureCheckSceneCapability_003, TestSiz
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     capture->control.Stop((AudioHandle)capture);
     adapter->DestroyCapture(adapter, capture);
@@ -200,7 +200,7 @@ HWTEST_F(AudioHdiCaptureSceneTest, AudioCaptureSelectScene_002, TestSize.Level1)
     ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     scenes.scene.id = 0;
     scenes.desc.pins = PIN_IN_MIC;

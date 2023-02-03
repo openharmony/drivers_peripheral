@@ -166,7 +166,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, AudioCaptureGetFrameCount_002, TestSize.Level1
     ASSERT_EQ(HDF_SUCCESS, ret);
 
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = capture->attr.GetFrameCount(capture, &count);
     EXPECT_EQ(HDF_SUCCESS, ret);
@@ -259,7 +259,7 @@ HWTEST_F(AudioHdiCaptureAttrTest, AudioCaptureGetCurrentChannelId_003, TestSize.
     ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
     ASSERT_EQ(HDF_SUCCESS, ret);
     ret = AudioCaptureStartAndOneFrame(capture);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = capture->attr.GetCurrentChannelId(capture, &channelId);
     EXPECT_EQ(HDF_SUCCESS, ret);
