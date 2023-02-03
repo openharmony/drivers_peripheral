@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,12 +21,22 @@
 #include "osal_mutex.h"
 #include "sensor_channel.h"
 #include "sensor_common.h"
+#include "sensor_dump.h"
 #include "sensor_if.h"
 #include "sensor_manager.h"
 
 #define HDF_LOG_TAG    uhdf_sensor_service
 
 #define HDF_SENSOR_INFO_MAX_SIZE (4 * 1024) // 4kB
+#define SENSOR_STATUS_LEN 10
+#define SENSOR_STATUS_ENABLE 1
+#define SENSOR_STATUS_DISENABLE 0
+
+static int32_t sensorStatusList[SENSOR_STATUS_LEN] = { 0 };
+int32_t *GetSensorStatus(void)
+{
+    return sensorStatusList;
+}
 
 void ReleaseAllSensorInfo(void)
 {
@@ -256,6 +266,8 @@ static int32_t EnableSensor(int32_t sensorId)
     }
     HdfSbufRecycle(msg);
 
+    sensorStatusList[sensorId] = SENSOR_STATUS_ENABLE;
+
     return ret;
 }
 
@@ -284,6 +296,8 @@ static int32_t DisableSensor(int32_t sensorId)
         HDF_LOGE("%{public}s: Sensor disable failed, ret[%{public}d]", __func__, ret);
     }
     HdfSbufRecycle(msg);
+
+    sensorStatusList[sensorId] = SENSOR_STATUS_DISENABLE;
 
     return ret;
 }
