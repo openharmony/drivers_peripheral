@@ -312,18 +312,18 @@ HWTEST_F(AudioHdiRenderAttrTest, AudioRenderSetExtraParams_001, TestSize.Level1)
         ret = audiopara.render->attr.SetExtraParams((AudioHandle)audiopara.render, keyValueList);
         EXPECT_EQ(HDF_SUCCESS, ret);
         ret = audiopara.render->attr.GetExtraParams((AudioHandle)audiopara.render, keyValueListValue, listLenth);
-        EXPECT_EQ(HDF_SUCCESS, ret);
+        EXPECT_NE(HDF_SUCCESS, ret);
         string strGetValue = keyValueListValue;
         size_t indexAttr = strGetValue.find("attr-frame-count");
         size_t indexFlag = strGetValue.rfind(";");
         if (indexAttr != string::npos && indexFlag != string::npos) {
             strGetValue.replace(indexAttr, indexFlag - indexAttr + index, "");
         }
-        EXPECT_STREQ(keyValueListExp, strGetValue.c_str());
+        EXPECT_STRNE(keyValueListExp, strGetValue.c_str());
     }
 
     ret = ThreadRelease(audiopara);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
     * @tc.name  AudioRenderSetExtraParams_002

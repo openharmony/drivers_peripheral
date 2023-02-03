@@ -169,7 +169,7 @@ HWTEST_F(AudioHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_004, Tes
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 
     ret = AudioRenderStartAndOneFrame(render);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = render->attr.GetFrameCount(render, &count);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_GT(count, INITIAL_VALUE);
@@ -198,7 +198,7 @@ HWTEST_F(AudioHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_005, Tes
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
 
     ret = AudioRenderStartAndOneFrame(render);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = render->attr.GetFrameCount(render, &count);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_GT(count, INITIAL_VALUE);
@@ -228,12 +228,13 @@ HWTEST_F(AudioHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_006, Tes
     EXPECT_NE(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 
     ret = AudioRenderStartAndOneFrame(render);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = render->attr.GetFrameCount(render, &count);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_GT(count, INITIAL_VALUE);
 
-    render->control.Stop((AudioHandle)render);
+    ret = render->control.Stop((AudioHandle)render);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
     * @tc.name  AudioRenderGetFrameCount_007
@@ -256,12 +257,13 @@ HWTEST_F(AudioHdiRenderHardwareDependenceTest, AudioRenderGetFrameCount_007, Tes
     EXPECT_NE(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
 
     ret = AudioRenderStartAndOneFrame(render);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = render->attr.GetFrameCount(render, &count);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_GT(count, INITIAL_VALUE);
 
-    render->control.Stop((AudioHandle)render);
+    ret = render->control.Stop((AudioHandle)render);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 #endif
 #ifndef PRODUCT_RK3568
@@ -321,12 +323,13 @@ HWTEST_F(AudioHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_009,
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
     EXPECT_EQ(DOUBLE_CHANNEL_COUNT, attrsValue.channelCount);
     ret = AudioRenderStartAndOneFrame(render);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = render->GetRenderPosition(render, &frames, &time);
     EXPECT_NE(HDF_SUCCESS, ret);
     EXPECT_EQ((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
     EXPECT_EQ(frames, INITIAL_VALUE);
-    render->control.Stop((AudioHandle)render);
+    ret = render->control.Stop((AudioHandle)render);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
     * @tc.name  AudioRenderGetRenderPosition_011
@@ -359,12 +362,13 @@ HWTEST_F(AudioHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_010,
     EXPECT_NE(AUDIO_FORMAT_PCM_16_BIT, attrsValue.format);
     EXPECT_NE(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
     ret = AudioRenderStartAndOneFrame(render);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = render->GetRenderPosition(render, &frames, &time);
     EXPECT_NE(HDF_SUCCESS, ret);
     EXPECT_EQ((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
     EXPECT_EQ(frames, INITIAL_VALUE);
-    render->control.Stop((AudioHandle)render);
+    ret = render->control.Stop((AudioHandle)render);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 /**
     * @tc.name  AudioRenderGetRenderPosition_012
@@ -397,11 +401,12 @@ HWTEST_F(AudioHdiRenderHardwareDependenceTest, AudioRenderGetRenderPosition_011,
     EXPECT_EQ(SAMPLE_RATE_48000, attrsValue.sampleRate);
     EXPECT_NE(SINGLE_CHANNEL_COUNT, attrsValue.channelCount);
     ret = AudioRenderStartAndOneFrame(render);
-    EXPECT_NE(HDF_SUCCESS, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
     ret = render->GetRenderPosition(render, &frames, &time);
     EXPECT_NE(HDF_SUCCESS, ret);
     EXPECT_EQ((time.tvSec) * SECTONSEC + (time.tvNSec), timeExp);
     EXPECT_EQ(frames, INITIAL_VALUE);
-    render->control.Stop((AudioHandle)render);
+    ret = render->control.Stop((AudioHandle)render);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 }
