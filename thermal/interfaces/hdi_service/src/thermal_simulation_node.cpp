@@ -148,7 +148,7 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
     std::string charger = "current";
     std::string gpu = "freq";
     std::string battery[] = {"current", "voltage"};
-    std::vector<std::string> vFile, vBattery(battery, battery + ARG_2);
+    std::vector<std::string> vFile;
     char nodeBuf[MAX_PATH] = {0};
     char fileBuf[MAX_PATH] = {0};
     int32_t temp = 0;
@@ -177,6 +177,7 @@ int32_t ThermalSimulationNode::AddMitigationDevice()
     }
     CreateNodeFile(static_cast<std::string>(fileBuf));
     WriteFile(fileBuf, sTemp, sTemp.length());
+    std::vector<std::string> vBattery(battery, battery + ARG_2);
     for (auto b : vBattery) {
         ret = snprintf_s(fileBuf, MAX_PATH, sizeof(fileBuf) - ARG_1, MITIGATION_NODE_FILE.c_str(),
             vFile[ARG_3].c_str(), b.c_str());
