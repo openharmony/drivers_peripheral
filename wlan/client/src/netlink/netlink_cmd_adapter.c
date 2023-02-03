@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,9 +28,11 @@
 #include <sys/time.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <linux/ethtool.h>
 #include <linux/if_arp.h>
 #include <linux/netlink.h>
 #include <linux/nl80211.h>
+#include <linux/sockios.h>
 #include <linux/wireless.h>
 #include <linux/version.h>
 
@@ -945,30 +947,47 @@ static int32_t ParserChipId(struct nl_msg *msg, void *arg)
 int32_t GetDevMacAddr(const char *ifName, int32_t type, uint8_t *mac, uint8_t len)
 {
     (void)type;
-    int32_t fd, ret;
+    int32_t fd;
+    int32_t ret;
     struct ifreq req;
 
     if (memset_s(&req, sizeof(req), 0, sizeof(req)) != EOK) {
         HILOG_ERROR(LOG_CORE, "%s: memset_s req failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    fd = socket(AF_INET, SOCK_DGRAM, 0);
+    fd = socket(PF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
     if (fd < 0) {
         HILOG_ERROR(LOG_CORE, "%s: open socket failed", __FUNCTION__);
         return RET_CODE_FAILURE;
     }
-    req.ifr_addr.sa_family = AF_INET;
-    strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName));
-    ret = ioctl(fd, SIOCGIFHWADDR, &req);
-    if (ret != 0) {
-        HILOG_ERROR(LOG_CORE, "%s: ioctl failed, errno = %d, (%s)", __FUNCTION__, errno, strerror(errno));
+
+    if (strncpy_s(req.ifr_name, IFNAMSIZ, ifName, strlen(ifName)) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%s: strncpy_s failed", __FUNCTION__);
         close(fd);
         return RET_CODE_FAILURE;
     }
-    if (memcpy_s(mac, len, (unsigned char *)req.ifr_hwaddr.sa_data, len) != EOK) {
+    struct ethtool_perm_addr *epaddr = (struct ethtool_perm_addr *)malloc(sizeof(struct ethtool_perm_addr) + ETH_ADDR_LEN);
+    if (epaddr == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: malloc failed", __FUNCTION__);
+        close(fd);
+        return RET_CODE_FAILURE;
+    }
+    epaddr->cmd = ETHTOOL_GPERMADDR;
+    epaddr->size = ETH_ADDR_LEN;
+    req.ifr_data = (char*)epaddr;
+    ret = ioctl(fd, SIOCETHTOOL, &req);
+    if (ret != 0) {
+        HILOG_ERROR(LOG_CORE, "%s: ioctl failed, errno = %d, (%s)", __FUNCTION__, errno, strerror(errno));
+        free(epaddr);
+        close(fd);
+        return RET_CODE_FAILURE;
+    }
+
+    if (memcpy_s(mac, len, (unsigned char *)epaddr->data, ETH_ADDR_LEN) != EOK) {
         HILOG_ERROR(LOG_CORE, "%s: memcpy_s mac failed", __FUNCTION__);
         ret = RET_CODE_FAILURE;
     }
+    free(epaddr);
     close(fd);
     return ret;
 }
