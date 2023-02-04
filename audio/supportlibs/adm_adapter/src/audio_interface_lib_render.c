@@ -360,6 +360,7 @@ int32_t AudioCtlRenderSetGainStu(const struct DevHandle *handle,
         return HDF_FAILURE;
     }
 
+    AudioFreeHdfSBuf(sBuf, NULL);
     return HDF_SUCCESS;
 }
 
@@ -562,9 +563,9 @@ int32_t AudioCtlRenderSceneGetGainThreshold(const struct DevHandle *handle,
         return HDF_FAILURE;
     }
 
-    AudioFreeHdfSBuf(sBuf, reply);
     handleData->renderMode.ctlParam.audioGain.gainMax = gainThreshold.max;
     handleData->renderMode.ctlParam.audioGain.gainMin = 0;
+    AudioFreeHdfSBuf(sBuf, reply);
     return HDF_SUCCESS;
 }
 
@@ -607,9 +608,9 @@ int32_t AudioCtlRenderGetVolThreshold(const struct DevHandle *handle, int cmdId,
         return HDF_FAILURE;
     }
 
-    AudioFreeHdfSBuf(sBuf, reply);
     handleData->renderMode.ctlParam.volThreshold.volMax = volThreshold.max;
     handleData->renderMode.ctlParam.volThreshold.volMin = volThreshold.min;
+    AudioFreeHdfSBuf(sBuf, reply);
     return HDF_SUCCESS;
 }
 
@@ -948,11 +949,13 @@ int32_t AudioOutputRenderWrite(const struct DevHandle *handle,
 
     service = (struct HdfIoService *)handle->object;
     int32_t ret = AudioOutputRenderWriteFrame(service, cmdId, sBuf, reply, handleData);
-    AudioFreeHdfSBuf(sBuf, reply);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("AudioOutputRenderWriteFrame is Fail!");
+        AudioFreeHdfSBuf(sBuf, reply);
         return HDF_FAILURE;
     }
+
+    AudioFreeHdfSBuf(sBuf, reply);
     return HDF_SUCCESS;
 }
 
@@ -976,10 +979,11 @@ int32_t AudioOutputRenderStartPrepare(const struct DevHandle *handle,
     }
 
     ret = AudioServiceDispatch(handle->object, cmdId, sBuf, NULL);
-    AudioFreeHdfSBuf(sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderStartPrepare Failed to send service call cmdId = %{public}d!", cmdId);
     }
+
+    AudioFreeHdfSBuf(sBuf, NULL);
     return ret;
 }
 
@@ -1004,10 +1008,11 @@ int32_t AudioOutputRenderOpen(const struct DevHandle *handle,
     }
 
     int32_t ret = AudioServiceDispatch(handle->object, cmdId, sBuf, NULL);
-    AudioFreeHdfSBuf(sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderStartPrepare Failed to send service call cmdId = %{public}d!", cmdId);
     }
+
+    AudioFreeHdfSBuf(sBuf, NULL);
     return ret;
 }
 
@@ -1037,10 +1042,11 @@ int32_t AudioOutputRenderStop(const struct DevHandle *handle,
     }
 
     int32_t ret = AudioServiceDispatch(handle->object, cmdId, sBuf, NULL);
-    AudioFreeHdfSBuf(sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("RenderStop Failed to send service call!");
     }
+
+    AudioFreeHdfSBuf(sBuf, NULL);
     return ret;
 }
 
@@ -1053,7 +1059,6 @@ int32_t MmapDescWriteBuffer(struct HdfSBuf *sBuf, const struct AudioHwRenderPara
     uint64_t mmapAddr = (uint64_t)(uintptr_t)(handleData->frameRenderMode.mmapBufDesc.memoryAddress);
     if (!HdfSbufWriteString(sBuf, handleData->renderMode.hwInfo.cardServiceName)) {
         AUDIO_FUNC_LOGE("HdfSbufWriteString cardServiceName failed!");
-        AudioFreeHdfSBuf(sBuf, NULL);
         return HDF_FAILURE;
     }
     if (!HdfSbufWriteUint64(sBuf, mmapAddr)) {
@@ -1102,10 +1107,11 @@ int32_t AudioOutputRenderReqMmapBuffer(const struct DevHandle *handle,
     }
 
     int32_t ret = AudioServiceDispatch(handle->object, cmdId, sBuf, NULL);
-    AudioFreeHdfSBuf(sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Failed to send service call!");
     }
+
+    AudioFreeHdfSBuf(sBuf, NULL);
     return ret;
 }
 
