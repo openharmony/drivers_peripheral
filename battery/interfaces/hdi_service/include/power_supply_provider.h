@@ -22,12 +22,12 @@
 #include <map>
 #include <vector>
 #include "batteryd_api.h"
-#include "v1_1/ibattery_interface.h"
+#include "v1_2/ibattery_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 class PowerSupplyProvider {
 public:
     // Keep it same as the BatteryHealthState in battery_info.h
@@ -59,11 +59,23 @@ public:
         PLUGGED_TYPE_BUTT
     };
 
+    // Keep it same as the ChargeType in charger.h
+    enum ChargeType {
+        CHARGE_TYPE_NONE = 0,
+        CHARGE_TYPE_WIRED_NORMAL,
+        CHARGE_TYPE_WIRED_QUICK,
+        CHARGE_TYPE_WIRED_SUPER_QUICK,
+        CHARGE_TYPE_WIRELESS_NORMAL,
+        CHARGE_TYPE_WIRELESS_QUICK,
+        CHARGE_TYPE_WIRELESS_SUPER_QUICK
+    };
+
     PowerSupplyProvider();
     virtual ~PowerSupplyProvider() = default;
 
     int32_t InitPowerSupplySysfs();
     void InitDefaultSysfs();
+    void InitChargerSysfs();
     int32_t ParseCapacity(int32_t* capacity) const;
     int32_t ParseTotalEnergy(int32_t* capacity) const;
     int32_t ParseCurrentAverage(int32_t* curAverage) const;
@@ -77,6 +89,7 @@ public:
     int32_t ParseChargeCounter(int32_t* chargeCounter) const;
     int32_t ParsePresent(int8_t* present) const;
     int32_t ParseTechnology(std::string& technology) const;
+    int32_t ParseChargeType(int32_t* chargeType, std::string& chargeTypePath) const;
     BatterydInfo GetBatteryInfo() const;
     void ParseUeventToBatterydInfo(const char* msg, struct BatterydInfo* info) const;
     void UpdateInfoByReadSysFile(struct BatterydInfo* info) const;
@@ -118,6 +131,7 @@ private:
     static inline void PresentAssigner(const char* str, struct BatterydInfo* info);
     static inline void TechnologyAssigner(const char* str, struct BatterydInfo* info);
     static inline void ChargeCounterAssigner(const char* str, struct BatterydInfo* info);
+    static int32_t ChargeTypeEumConverter(const char* str);
 
     void TraversalNode();
     void CheckSubfolderNode(const std::string& path);
@@ -134,6 +148,7 @@ private:
     void CreateMockTechPath(std::string& mockTechPath);
     void CreateMockChargerPath(std::string& mockChargerPath);
     void CreateMockBatteryPath(std::string& mockBatteryPath);
+    void CreateMockChargeTypePath(std::string& mockChargeTypePath);
     int32_t ReadFileToMap(std::map<std::string, std::string>& chargingLimitMap, std::string chargingLimitPath);
     int32_t WriteChargingLimit(std::string chargingLimitPath, std::string& configStr);
     std::vector<std::string> nodeNames_;
@@ -141,7 +156,7 @@ private:
     std::string path_;
     int32_t index_;
 };
-}  // namespace V1_1
+}  // namespace V1_2
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

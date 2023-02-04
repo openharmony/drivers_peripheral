@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 class BatteryConfig : public NoCopyable {
 public:
     struct LightConf {
@@ -56,7 +56,7 @@ private:
     static std::mutex mutex_;
     static std::shared_ptr<BatteryConfig> instance_;
 };
-}  // namespace V1_1
+}  // namespace V1_2
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

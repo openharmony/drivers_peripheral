@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 sptr<BatteryInterfaceImpl::BatteryDeathRecipient> g_deathRecipient = nullptr;
 bool g_isHdiStart = false;
@@ -29,7 +29,7 @@ bool g_isHdiStart = false;
 
 extern "C" IBatteryInterface *BatteryInterfaceImplGetInstance(void)
 {
-    using OHOS::HDI::Battery::V1_1::BatteryInterfaceImpl;
+    using OHOS::HDI::Battery::V1_2::BatteryInterfaceImpl;
     BatteryInterfaceImpl *service = new (std::nothrow) BatteryInterfaceImpl();
     if (service == nullptr) {
         return nullptr;
@@ -45,7 +45,7 @@ extern "C" IBatteryInterface *BatteryInterfaceImplGetInstance(void)
 
 int32_t BatteryInterfaceImpl::Init()
 {
-    provider_ = std::make_unique<OHOS::HDI::Battery::V1_1::PowerSupplyProvider>();
+    provider_ = std::make_unique<OHOS::HDI::Battery::V1_2::PowerSupplyProvider>();
     if (provider_ == nullptr) {
         BATTERY_HILOGE(COMP_HDI, "make_unique PowerSupplyProvider error");
         return HDF_ERR_MALLOC_FAIL;
@@ -57,11 +57,12 @@ int32_t BatteryInterfaceImpl::Init()
     batteryConfig.ParseConfig();
     currentPath_ = batteryConfig.GetString("charger.current_limit.path");
     voltagePath_ = batteryConfig.GetString("charger.voltage_limit.path");
+    chargeTypePath_ = batteryConfig.GetString("charger.type.path");
 
     // The configuration can be released when it is not needed
     BatteryConfig::DestroyInstance();
 
-    loop_ = std::make_unique<OHOS::HDI::Battery::V1_1::BatteryThread>();
+    loop_ = std::make_unique<OHOS::HDI::Battery::V1_2::BatteryThread>();
     if (loop_ == nullptr) {
         BATTERY_HILOGE(COMP_HDI, "make_unique BatteryThread error");
         return HDF_ERR_MALLOC_FAIL;
@@ -232,6 +233,18 @@ int32_t BatteryInterfaceImpl::SetChargingLimit(const std::vector<ChargingLimit>&
     return provider_->SetChargingLimit(chargingLimit, currentPath_, voltagePath_);
 }
 
+int32_t BatteryInterfaceImpl::GetChargeType(ChargeType& chargeType)
+{
+    int32_t type = static_cast<int32_t>(CHARGE_TYPE_NONE);
+    int32_t ret = provider_->ParseChargeType(&type, chargeTypePath_);
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+
+    chargeType = ChargeType(type);
+    return HDF_SUCCESS;
+}
+
 int32_t BatteryInterfaceImpl::AddBatteryDeathRecipient(const sptr<IBatteryCallback>& callback)
 {
     const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IBatteryCallback>(callback);
@@ -264,7 +277,7 @@ void BatteryInterfaceImpl::BatteryDeathRecipient::OnRemoteDied(const wptr<IRemot
 {
     interfaceImpl_->UnRegister();
 }
-}  // namespace V1_1
+}  // namespace V1_2
 }  // namespace Battery
 }  // namespace Hdi
 }  // namespace OHOS
