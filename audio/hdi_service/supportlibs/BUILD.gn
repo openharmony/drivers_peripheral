@@ -16,7 +16,7 @@ import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 if (defined(ohos_lite)) {
-  ohos_shared_library("hdi_audio_capture") {
+  ohos_shared_library("audio_capture_adapter") {
     sources = [
       "//drivers/peripheral/audio/hdi_service/passthrough/src/audio_common.c",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_capture.c",
@@ -42,7 +42,7 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_audio"
   }
 
-  ohos_shared_library("hdi_audio_render") {
+  ohos_shared_library("audio_render_adapter") {
     sources = [
       "//drivers/peripheral/audio/hdi_service/passthrough/src/audio_common.c",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
@@ -71,7 +71,7 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_audio"
   }
 } else {
-  ohos_shared_library("hdi_audio_capture") {
+  ohos_shared_library("audio_capture_adapter") {
     sources = [
       "//drivers/peripheral/audio/hdi_service/passthrough/src/audio_common.c",
     ]
@@ -129,7 +129,7 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_audio"
   }
 
-  ohos_shared_library("hdi_audio_render") {
+  ohos_shared_library("audio_render_adapter") {
     sources = [
       "//drivers/peripheral/audio/hdi_service/passthrough/src/audio_common.c",
     ]

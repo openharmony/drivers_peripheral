@@ -41,7 +41,6 @@
 #define INT_32_MAX                     0x7fffffff
 #define EXT_PARAMS_MAXLEN              107
 #define BITS_TO_FROMAT                 3
-#define SERVICE_NAME                   "audio_manager_service"
 
 struct StrPara {
     struct IAudioRender *render;
@@ -619,7 +618,7 @@ static int32_t GetManagerAndLoadAdapter(struct AudioPort *renderPort)
         return HDF_FAILURE;
     }
 
-    struct IAudioManager *audioManagerIns = IAudioManagerGetInstance(SERVICE_NAME, g_isDirect);
+    struct IAudioManager *audioManagerIns = IAudioManagerGet(g_isDirect);
     if (audioManagerIns == NULL) {
         AUDIO_FUNC_LOGE("Get audio Manager Fail");
         return HDF_FAILURE;

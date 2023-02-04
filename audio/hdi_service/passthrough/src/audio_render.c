@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,7 @@
 #include "audio_uhdf_log.h"
 #include "securec.h"
 
-#define HDF_LOG_TAG AUDIO_HDI_IMPL
+#define HDF_LOG_TAG HDF_AUDIO_PRIMARY_IMPL
 
 #define CONFIG_OUT_LATENCY_MS 100 // unit: ms
 

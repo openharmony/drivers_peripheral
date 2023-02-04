@@ -15,14 +15,12 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-ohos_shared_library("audio_manager_service") {
+ohos_shared_library("audio_primary_driver") {
   sources = [ "audio_manager_driver.c" ]
-  include_dirs =
-      [ "//drivers/peripheral/audio/hdi_service/passthrough/include" ]
 
-  public_deps = [ "//drivers/interface/audio/v1_0:libaudio_stub_1.0" ]
   if (is_standard_system) {
     external_deps = [
+      "drivers_interface_audio:audio_idl_headers",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
@@ -32,11 +30,31 @@ ohos_shared_library("audio_manager_service") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  if (enable_audio_hal_hdf_log) {
-    defines = [ "AUDIO_HDF_LOG" ]
-  }
+  deps = [ "//drivers/interface/audio/v1_0:libaudio_stub_1.0" ]
 
   shlib_type = "hdi"
+  install_images = [ chipset_base_dir ]
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_audio"
+}
+
+ohos_shared_library("audio_manager_service_1.0") {
+  sources = [ "audio_manager_service.c" ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "drivers_interface_audio:audio_idl_headers",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  deps = [ "//drivers/interface/audio/v1_0:libaudio_stub_1.0" ]
+
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_audio"

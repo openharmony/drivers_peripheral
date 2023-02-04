@@ -15,7 +15,7 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-ohos_shared_library("hdi_idl_audio_path_select") {
+ohos_shared_library("audio_path_select") {
   sources = [
     "//drivers/peripheral/audio/hal/pathselect/src/audio_pathselect.c",
     "//drivers/peripheral/audio/hdi_service/passthrough/src/audio_common.c",

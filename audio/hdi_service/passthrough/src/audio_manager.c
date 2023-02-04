@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@
 #include "audio_uhdf_log.h"
 #include "audio_internal.h"
 
-#define HDF_LOG_TAG AUDIO_HDI_IMPL
+#define HDF_LOG_TAG HDF_AUDIO_PRIMARY_IMPL
 
 BindServiceRenderPassthrough g_bindServiceRender = NULL;
 InterfaceLibModeRenderPassthrough g_interfaceLibModeRender = NULL;
@@ -43,11 +43,11 @@ PathSelGetConfToJsonObj g_pathSelGetConfToJsonObj = NULL;
 PathSelAnalysisJson g_pathSelAnalysisJson = NULL;
 #endif
 
-static const char *g_capturePassthroughPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_capture");
-static const char *g_renderPassthroughPath = HDF_LIBRARY_FULL_PATH("libhdi_audio_render");
+static const char *g_capturePassthroughPath = HDF_LIBRARY_FULL_PATH("libaudio_capture_adapter");
+static const char *g_renderPassthroughPath = HDF_LIBRARY_FULL_PATH("libaudio_render_adapter");
 
 #ifndef AUDIO_HAL_NOTSUPPORT_PATHSELECT
-static const char *g_pathSelectPassthroughPath = HDF_LIBRARY_FULL_PATH("libhdi_idl_audio_path_select");
+static const char *g_pathSelectPassthroughPath = HDF_LIBRARY_FULL_PATH("libaudio_path_select");
 #endif
 
 static void *g_ptrCaptureHandle = NULL;
@@ -528,26 +528,28 @@ int32_t AudioManagerUnloadAdapter(struct IAudioManager *manager, const char *ada
 
 int32_t ReleaseAudioManagerObject(struct IAudioManager *object)
 {
-    ReleaseAudioManagerObjectComm(object);
+    if (!ReleaseAudioManagerObjectComm(object)) {
+        AUDIO_FUNC_LOGE("AudioManager release object failed!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
     return AUDIO_SUCCESS;
 }
 
-struct IAudioManager *AudioManagerImplGetInstance(const char *serviceName)
+int32_t AudioManagerConstructFun(struct IAudioManager *interface)
 {
-    (void)serviceName;
-    struct AudioHwManager *service = (struct AudioHwManager *)OsalMemCalloc(sizeof(struct AudioHwManager));
-    if (service == NULL) {
-        AUDIO_FUNC_LOGE("OsalMemCalloc failed!");
-        return NULL;
+    if (interface == NULL) {
+        AUDIO_FUNC_LOGE("Input pointer is null!");
+        return AUDIO_ERR_INVALID_PARAM;
     }
-    service->interface.GetAllAdapters = AudioManagerGetAllAdapters;
-    service->interface.LoadAdapter = AudioManagerLoadAdapter;
-    service->interface.UnloadAdapter = AudioManagerUnloadAdapter;
-    service->interface.ReleaseAudioManagerObject = ReleaseAudioManagerObject;
-    return &(service->interface);
+    interface->GetAllAdapters = AudioManagerGetAllAdapters;
+    interface->LoadAdapter = AudioManagerLoadAdapter;
+    interface->UnloadAdapter = AudioManagerUnloadAdapter;
+    interface->ReleaseAudioManagerObject = ReleaseAudioManagerObject;
+
+    return AUDIO_SUCCESS;
 }
 
-void AudioManagerImplRelease(struct IAudioManager *instance)
+int32_t AudioManagerDestructFun(struct IAudioManager *interface)
 {
-    ReleaseAudioManagerObject(instance);
+    return ReleaseAudioManagerObject(interface);
 }
