@@ -16,12 +16,12 @@
 #include "hdi_interface_test.h"
 
 #include <fstream>
-#include "v1_1/battery_interface_proxy.h"
-#include "v1_1/types.h"
+#include "v1_2/battery_interface_proxy.h"
+#include "v1_2/types.h"
 #include "battery_log.h"
 
 using namespace OHOS::HDI::Battery;
-using namespace OHOS::HDI::Battery::V1_1;
+using namespace OHOS::HDI::Battery::V1_2;
 using namespace testing::ext;
 using namespace OHOS;
 

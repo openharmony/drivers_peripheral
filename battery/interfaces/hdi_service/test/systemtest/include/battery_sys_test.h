@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 class BatterySysTest : public testing::Test {
 public:
     static constexpr uint32_t RED_LIGHT = (255 << 16);
@@ -29,7 +29,7 @@ public:
     static constexpr uint32_t YELLOW_LIGHT = (255 << 16) | (255 << 8);
     static constexpr uint32_t LIGHT_OFF = 0;
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS

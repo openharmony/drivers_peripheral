@@ -20,7 +20,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 constexpr const char* VENDOR_BATTERY_CONFIG_PATH = "/vendor/etc/battery/battery_config.json";
 constexpr int32_t MAP_KEY_INDEX = 0;
@@ -175,7 +175,7 @@ Json::Value BatteryConfig::GetValue(std::string key) const
     }
     return value;
 }
-}  // namespace V1_1
+}  // namespace V1_2
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS
