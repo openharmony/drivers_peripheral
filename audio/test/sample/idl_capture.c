@@ -36,8 +36,6 @@
 #include "v1_0/iaudio_manager.h"
 #include "v1_0/audio_types.h"
 
-#define SERVICE_NAME "audio_manager_service"
-
 #define MOVE_LEFT_NUM                   8
 #define AUDIO_CHANNELCOUNT              2
 #define AUDIO_SAMPLE_RATE_48K           48000
@@ -622,7 +620,7 @@ static int32_t GetManagerAndLoadAdapter(struct AudioPort *capturePort)
         return HDF_FAILURE;
     }
 
-    struct IAudioManager *audioManager = IAudioManagerGetInstance(SERVICE_NAME, g_isDirect);
+    struct IAudioManager *audioManager = IAudioManagerGet(g_isDirect);
     if (audioManager == NULL) {
         AUDIO_FUNC_LOGE("Get audio Manager Fail");
         return HDF_FAILURE;

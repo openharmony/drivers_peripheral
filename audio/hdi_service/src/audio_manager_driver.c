@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,15 +13,16 @@
  * limitations under the License.
  */
 
-#include "audio_uhdf_log.h"
-#include "hdf_base.h"
-#include "hdf_device_object.h"
-#include "hdf_dlist.h"
-#include "osal_mem.h"
-#include "stub_collector.h"
+#include <hdf_base.h>
+#include <hdf_device_desc.h>
+#include <hdf_device_object.h>
+#include <hdf_log.h>
+#include <hdf_remote_service.h>
+#include <osal_mem.h>
+#include <stub_collector.h>
 #include "v1_0/iaudio_manager.h"
 
-#define HDF_LOG_TAG AUDIO_HDI_SVC
+#define HDF_LOG_TAG HDF_AUDIO_PRIMARY_DRIVER
 
 struct HdfAudioManagerHost {
     struct IDeviceIoService ioService;
@@ -33,14 +34,14 @@ static int32_t AudioManagerDriverDispatch(
     struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     if (client == NULL || client->device == NULL || client->device->service == NULL) {
-        AUDIO_FUNC_LOGE("Param is NULL!");
+        HDF_LOGE("%{public}s:Param is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     struct HdfAudioManagerHost *audiomanagerHost =
         CONTAINER_OF(client->device->service, struct HdfAudioManagerHost, ioService);
     if (audiomanagerHost->service == NULL || audiomanagerHost->stubObject == NULL) {
-        HDF_LOGE("%{public}s: invalid service obj", __func__);
+        HDF_LOGE("%{public}s:invalid service obj", __func__);
         return HDF_ERR_INVALID_OBJECT;
     }
 
@@ -54,47 +55,50 @@ static int32_t AudioManagerDriverDispatch(
 
 static int32_t HdfAudioManagerDriverInit(struct HdfDeviceObject *deviceObject)
 {
+    HDF_LOGI("%{public}s: driver init enter", __func__);
     if (deviceObject == NULL) {
-        AUDIO_FUNC_LOGE("deviceObject is null!");
+        HDF_LOGE("%{public}s:deviceObject is null!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO)) {
-        AUDIO_FUNC_LOGE("Set Primary DEVICE_CLASS_AUDIO fail!");
-    }
 
+    if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO)) {
+        HDF_LOGE("%{public}s:Set Primary DEVICE_CLASS_AUDIO fail!", __func__);
+    }
+    HDF_LOGI("%{public}s: driver init success", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    AUDIO_FUNC_LOGI("enter.");
+    HDF_LOGI("%{public}s:bind enter", __func__);
     if (deviceObject == NULL) {
-        AUDIO_FUNC_LOGE("Param is NULL!");
+        HDF_LOGE("%{public}s:Param is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     int32_t ret = HdfDeviceObjectSetInterfaceDesc(deviceObject, IAUDIOMANAGER_INTERFACE_DESC);
     if (ret != HDF_SUCCESS) {
-        AUDIO_FUNC_LOGI("failed to set interface descriptor object! ret = %{public}d", ret);
+        HDF_LOGI("%{public}s:failed to set interface descriptor object! ret = %{public}d", __func__, ret);
         return HDF_FAILURE;
     }
 
     struct HdfAudioManagerHost *audiomanagerHost =
         (struct HdfAudioManagerHost *)OsalMemCalloc(sizeof(struct HdfAudioManagerHost));
     if (audiomanagerHost == NULL) {
-        AUDIO_FUNC_LOGE("alloc HdfAudioManagerHost failed!");
+        HDF_LOGE("%{public}s:alloc HdfAudioManagerHost failed!", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
 
     struct IAudioManager *serviceImpl = IAudioManagerGet(true);
     if (serviceImpl == NULL) {
-        AUDIO_FUNC_LOGE("create serviceImpl failed!");
+        HDF_LOGE("%{public}s:create serviceImpl failed!", __func__);
         OsalMemFree(audiomanagerHost);
         return HDF_FAILURE;
     }
 
     struct HdfRemoteService **stubObj = StubCollectorGetOrNewObject(IAUDIOMANAGER_INTERFACE_DESC, serviceImpl);
     if (stubObj == NULL) {
+        HDF_LOGE("%{public}s:failed to get stub object", __func__);
         OsalMemFree(audiomanagerHost);
         IAudioManagerRelease(serviceImpl, true);
         return HDF_FAILURE;
@@ -106,33 +110,34 @@ static int32_t HdfAudioManagerDriverBind(struct HdfDeviceObject *deviceObject)
     audiomanagerHost->service = serviceImpl;
     audiomanagerHost->stubObject = stubObj;
     deviceObject->service = &audiomanagerHost->ioService;
-
+    HDF_LOGI("%{public}s:bind success", __func__);
     return HDF_SUCCESS;
 }
 
 static void HdfAudioManagerDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    AUDIO_FUNC_LOGI("enter.");
+    HDF_LOGI("%{public}s:driver release enter", __func__);
     if (deviceObject == NULL) {
-        AUDIO_FUNC_LOGE("Param is NULL!");
+        HDF_LOGE("%{public}s:Param is NULL!", __func__);
         return;
     }
 
     struct HdfAudioManagerHost *audiomanagerHost =
         CONTAINER_OF(deviceObject->service, struct HdfAudioManagerHost, ioService);
     if (audiomanagerHost == NULL) {
-        AUDIO_FUNC_LOGE("HdfAudioManagerHost is NULL!");
+        HDF_LOGE("%{public}s:HdfAudioManagerHost is NULL!", __func__);
         return;
     }
 
     StubCollectorRemoveObject(IAUDIOMANAGER_INTERFACE_DESC, audiomanagerHost->service);
     IAudioManagerRelease(audiomanagerHost->service, true);
     OsalMemFree(audiomanagerHost);
+    HDF_LOGI("%{public}s:release success", __func__);
 }
 
 static struct HdfDriverEntry g_audiomanagerDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "audio_manager_service",
+    .moduleName = "audio_primary_driver",
     .Bind = HdfAudioManagerDriverBind,
     .Init = HdfAudioManagerDriverInit,
     .Release = HdfAudioManagerDriverRelease,
