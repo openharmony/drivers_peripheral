@@ -18,11 +18,10 @@
 #include <hdf_dlist.h>
 #include <hdf_log.h>
 #include <osal_mem.h>
-#include <securec.h>
 
 #include "v1_0/iaudio_manager.h"
 
-#define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_SERVICE
+#define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_SRV
 
 typedef int32_t (*AudioManagerConstructFun)(struct IAudioManager *);
 typedef int32_t (*AudioManagerDestructFun)(struct IAudioManager *);

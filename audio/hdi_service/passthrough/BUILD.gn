@@ -34,7 +34,6 @@ ohos_shared_library("audio_primary_impl") {
     "//drivers/hdf_core/adapter/uhdf2/shared/include",
   ]
 
-  public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
   defines = []
   if (drivers_peripheral_audio_hal_notsupport_pathselect) {
     defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
@@ -47,6 +46,7 @@ ohos_shared_library("audio_primary_impl") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_interface_audio:audio_idl_headers",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
