@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -37,7 +37,6 @@ ohos_executable("dcamera_hdf_demo") {
     "${hdf_uhdf_path}/include/hdi",
     "${hdf_uhdf_path}/osal/include",
     "//drivers/peripheral/camera/interfaces/include",
-    "//drivers/peripheral/camera/interfaces/metadata/include",
     "//drivers/peripheral/camera/hal/utils",
     "//drivers/peripheral/camera/hal/include",
   ]
@@ -46,7 +45,6 @@ ohos_executable("dcamera_hdf_demo") {
     "$distributedcamera_hdf_path/hdi_service:libdistributed_camera_hdf_service_1.0",
     "${hdf_uhdf_path}/hdi:libhdi",
     "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
-    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/jsoncpp:jsoncpp",
   ]
 
@@ -61,6 +59,7 @@ ohos_executable("dcamera_hdf_demo") {
 
   external_deps = [
     "drivers_interface_camera:libcamera_proxy_1.0",
+    "drivers_interface_camera:metadata",
     "graphic_chipsetsdk:surface",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",

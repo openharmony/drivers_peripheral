@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -42,7 +42,6 @@ ohos_shared_library("libdistributed_camera_host_config") {
     "${distributedcamera_hdf_path}/hdi_service/include/dcamera_host",
     "${distributedcamera_hdf_path}/hdi_service/include/dstream_operator",
     "${distributedcamera_hdf_path}/hdi_service/include/utils",
-    "//drivers/peripheral/camera/interfaces/metadata/include",
     "//third_party/jsoncpp/include",
   ]
   sources = [ "./src/config/dcamera_host_config.cpp" ]
@@ -80,7 +79,6 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "${hdf_uhdf_path}/include/host",
     "//commonlibrary/c_utils/base/include",
     "//third_party/jsoncpp/include",
-    "//drivers/peripheral/camera/interfaces/metadata/include",
   ]
 
   sources = [
@@ -103,10 +101,7 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "//drivers/interface/distributed_camera/v1_0:libdistributed_camera_provider_stub_1.0",
   ]
 
-  deps = [
-    "//drivers/peripheral/camera/interfaces/metadata:metadata",
-    "//third_party/jsoncpp:jsoncpp",
-  ]
+  deps = [ "//third_party/jsoncpp:jsoncpp" ]
 
   defines = [
     "HI_LOG_ENABLE",
@@ -116,6 +111,7 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_camera:metadata",
     "graphic_chipsetsdk:buffer_handle",
     "graphic_chipsetsdk:surface",
     "hiviewdfx_hilog_native:libhilog",

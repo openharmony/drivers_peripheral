@@ -39,22 +39,7 @@
         "//drivers/peripheral/camera/hal/test/at:camera_test_at",
         "//drivers/peripheral/camera/hal/test/ut:camera_test_ut"
       ],
-      "inner_kits": [
-        {
-          "name": "//drivers/peripheral/camera/interfaces/metadata:metadata",
-          "header": {
-            "header_files": [
-              "camera_device_ability_items.h",
-              "camera_metadata_info.h",
-              "camera_metadata_item_info.h",
-              "camera_metadata_operator.h",
-              "metadata_log.h",
-              "metadata_utils.h"
-            ],
-            "header_base": "//drivers/peripheral/camera/interfaces/metadata/include"
-          }
-        }
-      ]
+      "inner_kits": []
     }
   }
 }

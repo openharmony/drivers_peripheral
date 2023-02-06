@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -41,16 +41,12 @@ if (!defined(ohos_lite)) {
     ]
     include_dirs = [
       "$camera_path/../interfaces/include",
-      "$camera_path/../interfaces/metadata/include",
       "$camera_path/include",
       "$camera_path/device_manager/include",
       "$camera_path/metadata_manager/include",
     ]
 
-    deps = [
-      "$camera_path/../interfaces/metadata:metadata",
-      "$camera_path/device_manager:camera_device_manager",
-    ]
+    deps = [ "$camera_path/device_manager:camera_device_manager" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -68,7 +64,10 @@ if (!defined(ohos_lite)) {
     } else {
       external_deps = [ "hilog:libhilog" ]
     }
-    external_deps += [ "ipc:ipc_single" ]
+    external_deps += [
+      "drivers_interface_camera:metadata",
+      "ipc:ipc_single",
+    ]
 
     public_configs = [ ":camera_metadata_manager_config" ]
     install_images = [ chipset_base_dir ]
