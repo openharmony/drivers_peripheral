@@ -25,6 +25,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/usb/ddk:libusb_core",
       "//drivers/peripheral/usb/gadget/function/acm:libusbfn_cdcacm",
       "//drivers/peripheral/usb/gadget/function/ecm:libusbfn_cdcecm",
+      "//drivers/peripheral/usb/gadget/function/mtp:hdi_usbfn_mtp_service",
       "//drivers/peripheral/usb/gadget/function/usbfn:libusbfn",
       "//drivers/peripheral/usb/hdi_service:hdi_usb_service",
       "//drivers/peripheral/usb/net:libusbhost_ecm",

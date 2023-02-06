@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -151,6 +151,10 @@ struct UsbFnDescriptorData {
     uint8_t functionMask;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Creates a USB device.
  *
@@ -191,5 +195,9 @@ int32_t UsbFnGetDeviceState(struct UsbFnDevice *fnDevice, UsbFnDeviceState *devS
  */
 const struct UsbFnInterface *UsbFnGetInterface(struct UsbFnDevice *fnDevice, uint8_t interfaceIndex);
 int32_t UsbFnMemTestTrigger(bool enable);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* USBFN_DEVICE_H */
