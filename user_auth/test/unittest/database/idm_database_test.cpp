@@ -340,9 +340,9 @@ HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_003, TestSize.Level0)
     userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
     userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
     EXPECT_NE(userInfo.credentialInfoList, nullptr);
-    CredentialInfoHal credInfo = {};
-    credInfo.credentialId = 10;
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo));
+    auto *credInfo = static_cast<CredentialInfoHal *>(Malloc(sizeof(CredentialInfoHal)));
+    credInfo->credentialId = 10;
+    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credInfo));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     CredentialInfoHal info = {};
     EXPECT_EQ(DeleteCredentialInfo(113, 10, &info), 10006);
@@ -359,17 +359,18 @@ HWTEST_F(IdmDatabaseTest, TestDeleteCredentialInfo_004, TestSize.Level0)
     userInfo.credentialInfoList = CreateLinkedList(DestroyCredentialNode);
     userInfo.enrolledInfoList = CreateLinkedList(DestroyEnrolledNode);
     EXPECT_NE(userInfo.credentialInfoList, nullptr);
-    CredentialInfoHal credInfo1 = {};
-    credInfo1.credentialId = 10;
-    credInfo1.authType = 2;
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo1));
-    CredentialInfoHal credInfo2 = {};
-    credInfo2.credentialId = 20;
-    credInfo2.authType = 2;
-    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(&credInfo2));
+    auto *credInfo1 = static_cast<CredentialInfoHal *>(Malloc(sizeof(CredentialInfoHal)));
+    credInfo1->credentialId = 10;
+    credInfo1->authType = 2;
+    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credInfo1));
+    auto *credInfo2 = static_cast<CredentialInfoHal *>(Malloc(sizeof(CredentialInfoHal)));
+    credInfo2->credentialId = 20;
+    credInfo2->authType = 2;
+    userInfo.credentialInfoList->insert(userInfo.credentialInfoList, static_cast<void *>(credInfo2));
     g_userInfoList->insert(g_userInfoList, static_cast<void *>(&userInfo));
     CredentialInfoHal info = {};
     EXPECT_EQ(DeleteCredentialInfo(115, 10, &info), RESULT_SUCCESS);
+    Free(credInfo2);
 }
 
 HWTEST_F(IdmDatabaseTest, TestQueryCredentialById, TestSize.Level0)
