@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -55,21 +55,29 @@ static int32_t UsbfnMtpInterfaceDriverDispatch(
 static int HdfUsbfnMtpInterfaceDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%{public}s: driver init start", __func__);
+    if (deviceObject == nullptr) {
+        HDF_LOGE("%{public}s:deviceObject is nullptr", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
     return HDF_SUCCESS;
 }
 
 static int HdfUsbfnMtpInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%{public}s: driver bind start", __func__);
+    if (deviceObject == nullptr) {
+        HDF_LOGE("%{public}s:deviceObject is nullptr", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
     auto *hdfUsbfnMtpInterfaceHost = new (std::nothrow) HdfUsbfnMtpInterfaceHost;
     if (hdfUsbfnMtpInterfaceHost == nullptr) {
-        HDF_LOGE("%{public}s: failed to create create HdfUsbfnMtpInterfaceHost object", __func__);
+        HDF_LOGE("%{public}s: failed to create HdfUsbfnMtpInterfaceHost object", __func__);
         return HDF_FAILURE;
     }
 
     hdfUsbfnMtpInterfaceHost->ioService.Dispatch = UsbfnMtpInterfaceDriverDispatch;
-    hdfUsbfnMtpInterfaceHost->ioService.Open = NULL;
-    hdfUsbfnMtpInterfaceHost->ioService.Release = NULL;
+    hdfUsbfnMtpInterfaceHost->ioService.Open = nullptr;
+    hdfUsbfnMtpInterfaceHost->ioService.Release = nullptr;
 
     auto serviceImpl = IUsbfnMtpInterface::Get(true);
     if (serviceImpl == nullptr) {
@@ -88,16 +96,9 @@ static int HdfUsbfnMtpInterfaceDriverBind(struct HdfDeviceObject *deviceObject)
 
     deviceObject->service = &hdfUsbfnMtpInterfaceHost->ioService;
 
-    struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
-    if (iface == NULL) {
-        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed\n", __func__);
-    }
-    const char *udcName = nullptr;
-    if (iface->GetString(deviceObject->property, "udc_name", &udcName, UDC_NAME) != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: read udc_name failed, use default: %{public}s", __func__, UDC_NAME);
-    }
     sptr<UsbfnMtpImpl> impl = static_cast<UsbfnMtpImpl *>(serviceImpl.GetRefPtr());
-    impl->udcName_ = udcName;
+    impl->deviceObject_ = deviceObject;
+
     return HDF_SUCCESS;
 }
 
@@ -105,6 +106,7 @@ static void HdfUsbfnMtpInterfaceDriverRelease(struct HdfDeviceObject *deviceObje
 {
     HDF_LOGI("%{public}s: driver release start", __func__);
     if (deviceObject->service == nullptr) {
+        HDF_LOGE("HdfUsbfnMtpInterfaceDriverRelease not initted");
         return;
     }
 
