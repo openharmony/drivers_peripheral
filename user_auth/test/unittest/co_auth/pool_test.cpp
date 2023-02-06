@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "adaptor_memory.h"
 #include "buffer.h"
 #include "linked_list.h"
 #include "pool.h"
@@ -98,13 +99,16 @@ HWTEST_F(PoolTest, TestRegisterExecutorToPool_002, TestSize.Level0)
     EXPECT_EQ(RegisterExecutorToPool(nullptr), RESULT_NEED_INIT);
     InitResourcePool();
     EXPECT_EQ(RegisterExecutorToPool(nullptr), RESULT_BAD_PARAM);
-    ExecutorInfoHal info1 = {};
-    info1.authType = 1;
-    info1.executorSensorHint = 20;
-    info1.executorRole = 50;
-    g_poolList->insert(g_poolList, static_cast<void *>(&info1));
-    ExecutorInfoHal info2 = info1;
-    EXPECT_EQ(RegisterExecutorToPool(&info2), 0);
+    auto *info1 = static_cast<ExecutorInfoHal *>(Malloc(sizeof(ExecutorInfoHal)));
+    info1->authType = 1;
+    info1->executorSensorHint = 20;
+    info1->executorRole = 50;
+    g_poolList->insert(g_poolList, static_cast<void *>(info1));
+    auto *info2 = static_cast<ExecutorInfoHal *>(Malloc(sizeof(ExecutorInfoHal)));
+    info2->authType = 1;
+    info2->executorSensorHint = 20;
+    info2->executorRole = 50;
+    EXPECT_EQ(RegisterExecutorToPool(info2), 0);
     DestroyResourcePool();
 }
 
