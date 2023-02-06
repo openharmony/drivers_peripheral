@@ -1,3 +1,16 @@
+# Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/camera/hal/camera.gni")
@@ -77,7 +90,6 @@ ohos_shared_library("camera_pipeline_core") {
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/v4l2_source_node",
     "$camera_path/adapter/platform/v4l2/src/pipeline_core/nodes/uvc_node",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include/",
-    "//drivers/peripheral/camera/interfaces/metadata/include",
 
     # hcs parser
     "//system/core/include/cutils",
@@ -86,7 +98,6 @@ ohos_shared_library("camera_pipeline_core") {
   deps = [
     "$camera_path/buffer_manager:camera_buffer_manager",
     "$camera_path/device_manager:camera_device_manager",
-    "//drivers/peripheral/camera/interfaces/metadata:metadata",
   ]
 
   if (is_standard_system) {
@@ -98,7 +109,7 @@ ohos_shared_library("camera_pipeline_core") {
   } else {
     external_deps = [ "hilog:libhilog" ]
   }
-  external_deps += []
+  external_deps += [ "drivers_interface_camera:metadata" ]
 
   public_configs = [ ":pipe_config" ]
   install_images = [ chipset_base_dir ]
