@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -253,6 +253,10 @@ struct UsbFnRegistInfo {
     UsbFnPropCallback setProp;
 };
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * @brief Defines the callback called when the USB interface starts a thread to receive EP0 events,
  * such as the setup event.
@@ -270,8 +274,8 @@ struct UsbFnRegistInfo {
  * @return Returns <b>0</b> if the operation is successful; returns a negative value
  * defined in {@link UsbErrorType} otherwise.
  */
-int32_t UsbFnStartRecvInterfaceEvent(struct UsbFnInterface *interface, uint32_t eventMask,
-    UsbFnEventCallback callback, void *context);
+int32_t UsbFnStartRecvInterfaceEvent(
+    struct UsbFnInterface *interface, uint32_t eventMask, UsbFnEventCallback callback, void *context);
 
 /**
  * @brief Defines the callback called when the USB interface stops receiving EP0 events.
@@ -331,8 +335,7 @@ int32_t UsbFnGetInterfacePipeInfo(struct UsbFnInterface *interface, uint8_t pipe
  * @return Returns <b>0</b> if the operation is successful; returns a negative
  * value defined in {@link UsbErrorType} otherwise.
  */
-int32_t UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
-    const struct UsbFnRegistInfo *registInfo);
+int32_t UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface, const struct UsbFnRegistInfo *registInfo);
 
 /**
  * @brief Obtains custom attributes of a USB interface.
@@ -351,8 +354,7 @@ int32_t UsbFnRegistInterfaceProp(const struct UsbFnInterface *interface,
  * @return Returns <b>0</b> if the operation is successful; returns a negative
  * value defined in {@link UsbErrorType} otherwise.
  */
-int32_t UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
-    const char *name, char *value);
+int32_t UsbFnGetInterfaceProp(const struct UsbFnInterface *interface, const char *name, char *value);
 
 /**
  * @brief Sets custom attributes of a USB interface.
@@ -371,7 +373,10 @@ int32_t UsbFnGetInterfaceProp(const struct UsbFnInterface *interface,
  * @return Returns <b>0</b> if the operation is successful; returns a negative
  * value defined in {@link UsbErrorType} otherwise.
  */
-int32_t UsbFnSetInterfaceProp(const struct UsbFnInterface *interface,
-    const char *name, const char *value);
+int32_t UsbFnSetInterfaceProp(const struct UsbFnInterface *interface, const char *name, const char *value);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* USBFN_INTERFACE_H */

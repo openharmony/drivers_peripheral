@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,6 +30,7 @@
 #include "securec.h"
 #include "string_ex.h"
 #include "usbd_type.h"
+#include "usbfn_mtp_impl.h"
 
 namespace OHOS {
 namespace HDI {
@@ -39,9 +40,13 @@ uint32_t UsbdFunction::currentFuncs_ = USB_FUNCTION_HDC;
 
 using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
 using OHOS::HDI::ServiceManager::V1_0::IServiceManager;
+using OHOS::HDI::Usb::Gadget::Mtp::V1_0::IUsbfnMtpInterface;
+using OHOS::HDI::Usb::Gadget::Mtp::V1_0::UsbfnMtpImpl;
 constexpr uint32_t UDC_NAME_MAX_LEN = 32;
 constexpr int32_t WAIT_UDC_MAX_LOOP = 30;
 constexpr uint32_t WAIT_UDC_TIME = 100000;
+/* mtp and ptp use same driver and same service */
+static std::string MTP_PTP_SERVICE_NAME {"usbfn_mtp_interface_service"};
 #define UDC_PATH "/config/usb_gadget/g1/UDC"
 
 int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned char funcMask)
@@ -78,6 +83,42 @@ int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned c
         return ret;
     }
     return HDF_SUCCESS;
+}
+
+int32_t UsbdFunction::InitMtp()
+{
+    auto serviceImpl = UsbfnMtpImpl::Get(true);
+    if (serviceImpl == nullptr) {
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t ret = UsbdRegisterDevice(MTP_PTP_SERVICE_NAME);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: register mtp device failed: %{public}d", __func__, ret);
+        return ret;
+    }
+    ret = serviceImpl->Init();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: init mtp device failed: %{public}d", __func__, ret);
+    }
+    HDF_LOGI("%{public}s: start Init done", __func__);
+    return ret;
+}
+
+int32_t UsbdFunction::ReleaseMtp()
+{
+    auto serviceImpl = UsbfnMtpImpl::Get(true);
+    if (serviceImpl == nullptr) {
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        return HDF_FAILURE;
+    }
+    int32_t ret = serviceImpl->Release();
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: release mtp device failed: %{public}d", __func__, ret);
+    }
+    UsbdUnregisterDevice(MTP_PTP_SERVICE_NAME);
+    HDF_LOGI("%{public}s: release Mtp done", __func__);
+    return ret;
 }
 
 int32_t UsbdFunction::RemoveHdc()
@@ -153,8 +194,9 @@ int32_t UsbdFunction::SetFunctionToNone()
             UsbdUnregisterDevice(std::string(ECM_SERVICE_NAME));
         }
         if ((ddkFuns & USB_FUNCTION_MTP) != 0 || (ddkFuns & USB_FUNCTION_PTP) != 0) {
-            UsbdFunction::SendCmdToService(MTP_PTP_SERVICE_NAME, MTP_PTP_RELEASE, USB_FUNCTION_MTP);
-            UsbdUnregisterDevice(std::string(MTP_PTP_SERVICE_NAME));
+            if (ReleaseMtp() != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s: release mtp failed", __func__);
+            }
         }
         UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_DDK_FUNCTION_SUPPORT);
         UsbdUnregisterDevice(std::string(DEV_SERVICE_NAME));
@@ -162,10 +204,10 @@ int32_t UsbdFunction::SetFunctionToNone()
     int32_t ret = RemoveHdc();
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: RemoveHdc error, ret = %{public}d", __func__, ret);
-        return HDF_FAILURE;
+        return ret;
     }
     currentFuncs_ = USB_FUNCTION_NONE;
-    return HDF_SUCCESS;
+    return ret;
 }
 
 int32_t UsbdFunction::SetDDKFunction(uint32_t funcs)
@@ -277,13 +319,9 @@ int32_t UsbdFunction::UsbdInitDDKFunction(uint32_t funcs)
         }
     }
     if ((funcs & USB_FUNCTION_MTP) != 0 || (funcs & USB_FUNCTION_PTP) != 0) {
-        ret = UsbdRegisterDevice(std::string(MTP_PTP_SERVICE_NAME));
+        ret = InitMtp();
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s: failed to register device", __func__);
-            return HDF_FAILURE;
-        }
-        if (SendCmdToService(MTP_PTP_SERVICE_NAME, MTP_PTP_INIT, USB_FUNCTION_MTP) != 0) {
-            HDF_LOGE("%{public}s: mtp ptp init error", __func__);
+            HDF_LOGE("%{public}s: failed to init mtp", __func__);
             return HDF_FAILURE;
         }
     }
@@ -349,6 +387,8 @@ int32_t UsbdFunction::UsbdSetFunction(uint32_t funcs)
     }
     if (UsbdInitDDKFunction(funcs) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, init ddk func failed", __func__);
+        UsbdFunction::SendCmdToService(DEV_SERVICE_NAME, FUNCTION_DEL, USB_DDK_FUNCTION_SUPPORT);
+        UsbdUnregisterDevice(std::string(DEV_SERVICE_NAME));
         return HDF_FAILURE;
     }
     currentFuncs_ = funcs;
