@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,8 @@
 #include <mutex>
 
 #include "data_fifo.h"
+#include "hdf_base.h"
+#include "hdf_device_desc.h"
 #include "usbfn_device.h"
 #include "usbfn_interface.h"
 #include "usbfn_request.h"
@@ -97,12 +99,13 @@ struct UsbMtpInterface {
 
 struct UsbMtpPort {
     struct UsbMtpDevice *mtpDev;
-    struct DListHead readPool;
-    struct DListHead readQueue;
+    struct DListHead readPool;  /* ready/idle read(bulk-out) req */
+    struct DListHead readQueue; /* async read(bulk-out) req complete */
     int32_t readStarted;
     int32_t readAllocated;
     struct DataFifo readFifo;
-    struct DListHead writePool;
+    struct DListHead writePool;  /* ready/idle write(bulk-in) req */
+    struct DListHead writeQueue; /* working async write(bulk-in) req */
     int32_t writeStarted;
     int32_t writeAllocated;
     struct DataFifo writeFifo;
@@ -117,22 +120,30 @@ struct UsbMtpDevice {
     struct UsbMtpInterface ctrlIface;
     struct UsbMtpInterface intrIface;
     struct UsbMtpInterface dataIface;
-    struct UsbMtpPipe notifyPipe;
-    struct UsbMtpPipe dataInPipe;
-    struct UsbMtpPipe dataOutPipe;
+    struct UsbMtpPipe notifyPipe;  /* intr-in */
+    struct UsbMtpPipe dataInPipe;  /* bulk-in */
+    struct UsbMtpPipe dataOutPipe; /* bulk-out */
     struct DListHead ctrlPool;
     int32_t ctrlReqNum;
     struct UsbFnRequest *notifyReq;
-    uint8_t mtpState; /* record mtp state, example: MTP_STATE_OFFLINE */
-    const char *udcName;
-    bool initFlag;
-    bool isSendEventDone;
     struct UsbMtpPort *mtpPort;
-    int64_t xferFileOffset;
-    int64_t xferFileLength;
+    const char *udcName;
+    uint8_t *asyncRecvFileContent;
+    uint32_t asyncRecvFileActual;
+    uint32_t asyncRecvFileExpect;
+    uint8_t *asyncSendFileContent;
+    uint32_t asyncSendFileActual; /* already send actual */
+    uint32_t asyncSendFileExpect; /* already send expect */
+    uint8_t asyncXferFile;
+    uint8_t sendZLP;
+    bool initFlag;
+    uint8_t mtpState;           /* record mtp state, example: MTP_STATE_OFFLINE */
     uint8_t xferSendHeader;     /* two value: 0 1 */
     uint16_t xferCommand;       /* refer to struct UsbMtpFileRange.command */
     uint32_t xferTransactionId; /* refer to struct UsbMtpFileRange.transactionId */
+    int32_t xferFd;
+    int64_t xferFileOffset;
+    int64_t xferFileLength;
 };
 
 struct CtrlInfo {
@@ -151,21 +162,21 @@ public:
     UsbfnMtpImpl();
     virtual ~UsbfnMtpImpl() = default;
 
-    const char *udcName_;
+    HdfDeviceObject *deviceObject_;
 
-    /* Return 0 if operation is successful, or -1 else */
-    int32_t Start(uint8_t ptp) override;
-    /* Return 0 if operation is successful, or -1 else */
-    int32_t Close() override;
-    /* Return number of bytes read/written, or -1 and errno is set */
+    /* Return 0 if operation is successful */
+    int32_t Start() override;
+    /* Return 0 if operation is successful  */
+    int32_t Stop() override;
+    /* Return number of bytes read/written  */
     int32_t Read(std::vector<uint8_t> &data) override;
-    /* Return number of bytes read/written, or -1 and errno is set */
+    /* Return number of bytes read/written  */
     int32_t Write(const std::vector<uint8_t> &data) override;
-    /* Return 0 if send/receive is successful, or -1 and errno is set */
-    int32_t ReceiveFile(const UsbFnMtpFileRange &mfr, sptr<Ashmem> &ashmem, uint8_t zeroPacket) override;
-    /* Return 0 if send/receive is successful, or -1 and errno is set */
-    int32_t SendFile(const UsbFnMtpFileRange &mfr, const sptr<Ashmem> &ashmem) override;
-    /* Return 0 if send/receive is successful, or -1 and errno is set */
+    /* Return 0 if send/receive is successful  */
+    int32_t ReceiveFile(const UsbFnMtpFileSlice &mfs) override;
+    /* Return 0 if send/receive is successful  */
+    int32_t SendFile(const UsbFnMtpFileSlice &mfs) override;
+    /* Return 0 if send/receive is successful  */
     int32_t SendEvent(const std::vector<uint8_t> &eventData) override;
 
     int32_t Init() override;
@@ -173,99 +184,83 @@ public:
 
 private:
     static void UsbFnRequestReadComplete(uint8_t pipe, struct UsbFnRequest *req);
-
     static void UsbFnRequestWriteComplete(uint8_t pipe, struct UsbFnRequest *req);
-
     static void UsbFnRequestNotifyComplete(uint8_t pipe, struct UsbFnRequest *req);
-
-    static int32_t UsbMtpPortStartTx(struct UsbMtpPort *mtpPort);
-
-    static int32_t UsbMtpPortStartRx(struct UsbMtpPort *mtpPort);
-
-    static void UsbMtpPortRxPush(struct UsbMtpPort *mtpPort);
-
     static void UsbFnRequestCtrlComplete(uint8_t pipe, struct UsbFnRequest *req);
 
-    static int32_t UsbMtpDeviceAllocCtrlRequests(struct UsbMtpDevice *mtpDev, int32_t num);
+    static int32_t UsbMtpPortCheckTxReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req);
+    static int32_t UsbMtpPortProcessLastTxPacket(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req);
+    static int32_t UsbMtpPortSubmitAsyncTxReq(
+        struct UsbMtpPort *mtpPort, struct UsbFnRequest *req, uint8_t *fileContent);
+    static int32_t UsbMtpPortStartTxAsync(struct UsbMtpPort *mtpPort, bool callByComplete);
+    static int32_t UsbMtpPortRxPush(struct UsbMtpPort *mtpPort);
+    static int32_t UsbMtpPortStartRxAsync(struct UsbMtpPort *mtpPort);
+    static int32_t UsbMtpPortRxCheckReq(
+        struct UsbMtpPort *mtpPort, struct UsbMtpDevice *mtpDev, struct UsbFnRequest *req);
 
+    static int32_t UsbMtpDeviceAllocCtrlRequests(struct UsbMtpDevice *mtpDev, int32_t num);
     static void UsbMtpDeviceFreeCtrlRequests(struct UsbMtpDevice *mtpDev);
 
-    static void UsbMtpPortFreeRequests(struct DListHead *head, int32_t *allocated);
+    static void UsbMtpPortFreeRequests(struct DListHead *head, int32_t &allocated);
 
-    static int32_t UsbMtpPortAllocReadWriteRequests(struct UsbMtpPort *mtpPort, int32_t num, uint8_t isRead);
+    static int32_t UsbMtpPortAllocReadWriteRequests(struct UsbMtpPort *mtpPort, int32_t readSize, int32_t writeSize);
+
+    static int32_t UsbMtpPortCancelAndFreeReq(
+        struct DListHead *queueHead, struct DListHead *poolHead, int32_t &allocated);
 
     static int32_t UsbMtpPortStartIo(struct UsbMtpPort *mtpPort);
-
     static int32_t UsbMtpPortCancelIo(struct UsbMtpPort *mtpPort);
-
-    static int32_t UsbMtpAllocReadWriteFifo(struct DataFifo *fifo, uint32_t size);
-
-    static void UsbMtpDeviceFreeReadWriteFifo(struct DataFifo *fifo);
-
-    static int32_t UsbMtpPortOpen(struct UsbMtpPort *mtpPort);
-
-    static int32_t UsbMtpPortClose(struct UsbMtpPort *mtpPort);
-
-    static int32_t UsbMtpPortBulkInData(
-        struct UsbMtpPort *mtpPort, const uint8_t *dataBuf, uint32_t dataSize, uint32_t *xferSize);
-
-    static int32_t UsbMtpPortBulkOutData(
-        struct UsbMtpPort *mtpPort, const uint8_t *dataBuf, uint32_t dataSize, uint32_t *xferSize);
 
     static struct UsbFnRequest *UsbMtpDeviceGetCtrlReq(struct UsbMtpDevice *mtpDev);
 
-    static int32_t UsbMtpDeviceBind(struct UsbMtpDevice *mtpDev);
-
-    static int32_t UsbMtpDeviceEnable(struct UsbMtpDevice *mtpDev);
-
-    static uint32_t UsbMtpDeviceDisable(struct UsbMtpDevice *mtpDev);
-
     static int32_t UsbMtpDeviceStandardRequest(
         struct UsbMtpDevice *mtpDev, struct UsbFnCtrlRequest *setup, struct UsbFnRequest *req);
-
     static int32_t UsbMtpDeviceClassRequest(
         struct UsbMtpDevice *mtpDev, struct UsbFnCtrlRequest *setup, struct UsbFnRequest *req);
-
     static int32_t UsbMtpDeviceVendorRequest(
         struct UsbMtpDevice *mtpDev, struct UsbFnCtrlRequest *setup, struct UsbFnRequest *req);
-
     static int32_t UsbMtpDeviceSetup(struct UsbMtpDevice *mtpDev, struct UsbFnCtrlRequest *setup);
 
     static void UsbMtpDeviceSuspend(struct UsbMtpDevice *mtpDev);
-
     static void UsbMtpDeviceResume(struct UsbMtpDevice *mtpDev);
+
+    static int32_t UsbMtpDeviceEnable(struct UsbMtpDevice *mtpDev);
+    static int32_t UsbMtpDeviceDisable(struct UsbMtpDevice *mtpDev);
 
     static void UsbMtpDeviceEp0EventDispatch(struct UsbFnEvent *event);
 
-    static int32_t UsbMtpDeviceParseEachPipe(struct UsbMtpDevice *mtpDev, struct UsbMtpInterface *iface);
-
+    static int32_t UsbMtpDeviceParseEachPipe(struct UsbMtpDevice *mtpDev, struct UsbMtpInterface &iface);
     static int32_t UsbMtpDeviceParseMtpIface(struct UsbMtpDevice *mtpDev, struct UsbFnInterface *fnIface);
-
     static bool UsbFnInterfaceIsUsbMtpPtpDevice(struct UsbFnInterface *iface);
-
     static int32_t UsbMtpDeviceParseEachIface(struct UsbMtpDevice *mtpDev, struct UsbFnDevice *fnDev);
 
     int32_t UsbMtpDeviceCreateFuncDevice(struct UsbMtpDevice *mtpDev);
-
     static int32_t UsbMtpDeviceReleaseFuncDevice(struct UsbMtpDevice *mtpDev);
 
     static int32_t UsbMtpDeviceAlloc(struct UsbMtpDevice *mtpDev);
-
-    static int32_t UsbMtpDeviceAllocNotifyRequest(struct UsbMtpDevice *mtpDev);
-
-    static void UsbMtpDeviceFreeNotifyRequest(struct UsbMtpDevice *mtpDev);
-
     static int32_t UsbMtpDeviceFree(struct UsbMtpDevice *mtpDev);
 
-    static int32_t UsbMtpPortSendFileNoHeader(
-        struct UsbMtpPort *mtpPort, uint8_t *dataBuf, uint32_t dataBufSize, uint32_t *xferActual);
+    static int32_t UsbMtpDeviceAllocNotifyRequest(struct UsbMtpDevice *mtpDev);
+    static void UsbMtpDeviceFreeNotifyRequest(struct UsbMtpDevice *mtpDev);
 
-    static int32_t UsbMtpPortSendFileWithHeader(struct UsbMtpPort *mtpPort, uint8_t *dataBuf, uint32_t dataBufSize,
-        const UsbFnMtpFileRange &mfr, uint32_t *xferActual);
+    static int32_t WriteEx(const std::vector<uint8_t> &data, uint8_t sendZLP, uint32_t &xferActual);
+
+    static int32_t UsbMtpPortSendFileFillFirstReq(struct UsbMtpPort *mtpPort, struct UsbFnRequest *req, void *dataBuf,
+        uint32_t dataBufSize, uint32_t &oneReqLeft);
+    static int32_t UsbMtpPortSendFileEx(void *dataBuf, uint32_t dataBufSize);
+    static int32_t UsbMtpPortSendFileLeftAsync(void *dataBuf, uint32_t oneReqLeft);
+
+    static uint32_t BufCopyToVector(void *buf, uint32_t bufSize, std::vector<uint8_t> &vectorData);
+    static uint32_t BufCopyFromVector(
+        void *buf, uint32_t bufSize, const std::vector<uint8_t> &vectorData, uint32_t vectorOffset);
+    static uint32_t BufCopyToFile(void *buf, uint32_t bufSize, int32_t fd);
+    static uint32_t BufCopyFromFile(void *buf, uint32_t bufSize, int32_t fd);
 
     static struct UsbMtpDevice *mtpDev_;
     static struct UsbMtpPort *mtpPort_;
     static std::mutex mtpRunning_;
+    static sem_t bulkOutAsyncReq_;
+    static sem_t bulkInAsyncReq_;
 };
 } // namespace V1_0
 } // namespace Mtp

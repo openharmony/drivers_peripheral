@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,6 +62,10 @@ struct UsbFnRequest {
     /** Pointer to the context for the callback */
     void             *context;
 };
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /**
  * @brief Defines a USB interface handle.
@@ -157,5 +161,9 @@ int32_t UsbFnCancelRequest(struct UsbFnRequest *req);
  * returns a negative value defined in {@link UsbErrorType} otherwise.
  */
 int32_t UsbFnSubmitRequestSync(struct UsbFnRequest *req, uint32_t timeout);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* USBFN_REQUEST_H */

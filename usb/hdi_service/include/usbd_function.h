@@ -34,8 +34,6 @@
 #define DEV_SERVICE_NAME "usbfn"
 #define ACM_SERVICE_NAME "usbfn_cdcacm"
 #define ECM_SERVICE_NAME "usbfn_cdcecm"
-/* mtp and ptp use same driver */
-#define MTP_PTP_SERVICE_NAME "usbfn_mtp"
 
 #define SYS_USB_CONFIGFS       "sys.usb.configfs"
 #define SYS_USB_CONFIG         "sys.usb.config"
@@ -51,10 +49,10 @@
 #define FUNCTION_ADD 1
 #define FUNCTION_DEL 2
 
-#define ACM_INIT    100
-#define ACM_RELEASE 101
-#define ECM_INIT    100
-#define ECM_RELEASE 101
+#define ACM_INIT        100
+#define ACM_RELEASE     101
+#define ECM_INIT        100
+#define ECM_RELEASE     101
 #define MTP_PTP_INIT    100
 #define MTP_PTP_RELEASE 101
 
@@ -71,6 +69,7 @@ public:
     ~UsbdFunction() = default;
     static int32_t UsbdSetFunction(uint32_t funcs);
     static int32_t UsbdGetFunction();
+
 private:
     static int32_t SendCmdToService(const char *name, int32_t cmd, unsigned char funcMask);
     static int32_t RemoveHdc();
@@ -87,7 +86,9 @@ private:
     static int32_t UsbdSetKernelFunction(int32_t kfuns);
     static void UsbdUnregisterDevice(const std::string &serviceName);
     static int32_t UsbdRegisterDevice(const std::string &serviceName);
-
+    static int32_t InitMtp();
+    static int32_t ReleaseMtp();
+    
     static uint32_t currentFuncs_;
 };
 } // namespace V1_0
