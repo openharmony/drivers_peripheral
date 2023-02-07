@@ -22,6 +22,7 @@
 #include "buffer_allocator_utils.h"
 #include "buffer_manager.h"
 #include "buffer_tracking.h"
+#include "iconsumer_surface.h"
 #include "image_buffer.h"
 #include "securec.h"
 
@@ -71,7 +72,7 @@ HWTEST_F(BufferManagerTest, TestBufferQueueLoop, TestSize.Level0)
     });
     std::shared_ptr<OHOS::Surface> producer = consumer;
 #else
-    OHOS::sptr<OHOS::Surface> consumer = Surface::CreateSurfaceAsConsumer();
+    OHOS::sptr<OHOS::IConsumerSurface> consumer = IConsumerSurface::Create();
     sptr<IBufferConsumerListener> listener = new TestBufferConsumerListener();
     consumer->RegisterConsumerListener(listener);
 
