@@ -1424,7 +1424,7 @@ int32_t UsbfnMtpImpl::SendEvent(const std::vector<uint8_t> &eventData)
     std::lock_guard<std::mutex> guard(mtpRunning_);
 
     if (eventData.size() > MTP_EVENT_PACKET_MAX_BYTES || eventData.size() == 0) {
-        HDF_LOGE("%{public}s: length is invald: %{public}d", __func__, eventData.size());
+        HDF_LOGE("%{public}s: length is invald: %{public}zu", __func__, eventData.size());
         return HDF_FAILURE;
     }
     if (mtpDev_->mtpState == MTP_STATE_OFFLINE) {
