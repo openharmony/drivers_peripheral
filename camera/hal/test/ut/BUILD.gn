@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -57,7 +57,6 @@ if (defined(ohos_lite)) {
       "$camera_path/include",
       "$camera_path/../interfaces/include",
       "$camera_path/../interfaces/hdi_passthrough",
-      "$camera_path/../interfaces/metadata/include",
       "$camera_path/utils/event",
 
       # device manager includes
@@ -95,11 +94,11 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/ipp/include",
     ]
     deps = [
-      "$camera_path/../interfaces/metadata:metadata",
       "$camera_path/buffer_manager:camera_buffer_manager",
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
     ]
+    external_deps = [ "drivers_interface_camera:metadata" ]
   }
 } else {
   import("//build/test.gni")
@@ -155,7 +154,6 @@ if (defined(ohos_lite)) {
       "$camera_path/include",
       "$camera_path/../interfaces/include",
       "$camera_path/../interfaces/hdi_ipc",
-      "$camera_path/../interfaces/metadata/include",
       "$camera_path/utils/event",
       "$camera_path/../interfaces/hdi_ipc/utils/include",
       "$camera_path/../interfaces/hdi_ipc/callback/host/include",
@@ -209,7 +207,6 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core:camera_pipeline_core",
       "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
       "//drivers/interface/camera/v1_0:libcamera_stub_1.0",
-      "//drivers/peripheral/camera/interfaces/metadata:metadata",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest",
       "//third_party/googletest:gtest_main",
@@ -227,6 +224,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps += [
+      "drivers_interface_camera:metadata",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
     ]

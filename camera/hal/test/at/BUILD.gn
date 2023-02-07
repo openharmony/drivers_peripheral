@@ -60,7 +60,6 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
       "//drivers/peripheral/base",
-      "//drivers/peripheral/camera/interfaces/metadata/include",
       "//drivers/peripheral/display/interfaces/include",
       "//foundation/graphic/surface/interfaces/kits",
       "//foundation/graphic/surface/interfaces/innerkits",
@@ -109,8 +108,8 @@ if (defined(ohos_lite)) {
       "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//drivers/hdf_core/adapter/uhdf/test/unittest/common:hdf_test_common",
-      "//drivers/peripheral/camera/interfaces/metadata:metadata",
     ]
+    external_deps = [ "drivers_interface_camera:metadata" ]
   }
 } else {
   import("//build/ohos.gni")
@@ -158,7 +157,6 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
       "$camera_path/utils/event",
-      "//drivers/peripheral/camera/interfaces/metadata/include",
 
       #producer
       "$camera_path/pipeline_core/utils",
@@ -186,7 +184,6 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl:camera_host_service_1.0_static",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
-      "//drivers/peripheral/camera/interfaces/metadata:metadata",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest",
       "//third_party/googletest:gtest_main",
@@ -206,7 +203,10 @@ if (defined(ohos_lite)) {
       external_deps = [ "hilog:libhilog" ]
     }
 
-    external_deps += [ "samgr:samgr_proxy" ]
+    external_deps += [
+      "drivers_interface_camera:metadata",
+      "samgr:samgr_proxy",
+    ]
     public_configs = [ ":camhdi_at_test_config" ]
   }
 }

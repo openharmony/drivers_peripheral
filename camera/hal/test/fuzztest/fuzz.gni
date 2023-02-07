@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -42,7 +42,6 @@ include_dirs = [
   "$camera_path/pipeline_core/ipp/include",
   "$camera_path/pipeline_core/nodes/include",
   "$camera_path/utils/event",
-  "//drivers/peripheral/camera/interfaces/metadata/include",
   "//drivers/peripheral/camera/hal/hdi_impl/src/stream_operator/stream_tunnel/standard",
 ]
 
@@ -59,10 +58,10 @@ deps = [
   "$camera_path/pipeline_core:camera_pipeline_core",
   "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
   "//drivers/interface/camera/v1_0:libcamera_stub_1.0",
-  "//drivers/peripheral/camera/interfaces/metadata:metadata",
 ]
 
 external_deps = [
+  "drivers_interface_camera:metadata",
   "hdf_core:libhdi",
   "hiviewdfx_hilog_native:libhilog",
   "ipc:ipc_core",

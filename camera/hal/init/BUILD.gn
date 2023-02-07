@@ -1,4 +1,15 @@
-# Copyright (c) Huawei Technologies Co., Ltd. 2021. All rights reserved.
+# Copyright (c) 2021 - 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 import("../camera.gni")
 
@@ -38,7 +49,6 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager/include/mpi",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
-      "//drivers/peripheral/camera/interfaces/metadata/include",
       "//drivers/peripheral/display/interfaces/include",
       "//drivers/peripheral/base",
 
@@ -66,10 +76,12 @@ if (defined(ohos_lite)) {
     deps = [
       "$camera_path/hdi_impl:camera_host_service_1.0",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/peripheral/camera/interfaces/metadata:metadata",
       "//foundation/graphic/surface:surface",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
+    external_deps = [
+      "drivers_interface_camera:metadata",
+      "hdf_core:libhdf_utils",
+    ]
     public_configs = [ ":ohos_camera_demo_config" ]
     install_enable = false
     subsystem_name = "hdf"
@@ -110,7 +122,6 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager/include/mpi",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
-      "//drivers/peripheral/camera/interfaces/metadata/include",
       "$board_camera_path/demo/include",
 
       #producer
@@ -140,7 +151,6 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl:camera_host_service_1.0",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
-      "//drivers/peripheral/camera/interfaces/metadata:metadata",
     ]
 
     if (is_standard_system) {
@@ -160,6 +170,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps += [
+      "drivers_interface_camera:metadata",
       "ipc:ipc_single",
       "samgr:samgr_proxy",
     ]
