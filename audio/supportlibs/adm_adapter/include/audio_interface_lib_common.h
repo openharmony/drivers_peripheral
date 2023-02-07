@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,27 +16,19 @@
 #ifndef AUDIO_INTERFACE_LIB_COMMON_H
 #define AUDIO_INTERFACE_LIB_COMMON_H
 
+#include "audio_interface_lib_mixer.h"
 #include "audio_internal.h"
 #include "hdf_sbuf.h"
 
-#define SERVIC_NAME_MAX_LEN             32
-#define AUDIO_MIN_DEVICENUM             1
+#define SERVIC_NAME_MAX_LEN 32
+#define AUDIO_MIN_DEVICENUM 1
 
-#define AUDIODRV_CTL_ELEM_IFACE_MIXER 2 /* virtual mixer control */
-
-#define AUDIO_WAIT_DELAY        (10 * 1000) // 10ms
-#define AUDIO_CAP_WAIT_DELAY    (5 * 1000)  // 5ms
-
-
-#define AUDIODRV_CTL_ACODEC_ENABLE  1
-#define AUDIODRV_CTL_ACODEC_DISABLE 0
-#define AUDIODRV_CTL_INTERNAL_ACODEC_ENABLE 1
-#define AUDIODRV_CTL_EXTERN_ACODEC_ENABLE   2
+#define AUDIODRV_CTL_ELEM_IFACE_MIXER   2 /* virtual mixer control */
 
 enum AudioCriBuffStatus {
-    CIR_BUFF_NORMAL    = -1,
-    CIR_BUFF_FULL      = -2,
-    CIR_BUFF_EMPTY     = -3,
+    CIR_BUFF_NORMAL = -1,
+    CIR_BUFF_FULL   = -2,
+    CIR_BUFF_EMPTY  = -3,
 };
 
 struct AudioCtlElemId {
@@ -53,9 +45,9 @@ struct AudioCtlElemValue {
 struct AudioCtrlElemInfo {
     struct AudioCtlElemId id;
     uint32_t count; /* count of values */
-    int32_t type;   /* R: value type - AUDIODRV_CTL_ELEM_IFACE_MIXER_* */
-    int32_t min;    /* R: minimum value */
-    int32_t max;    /* R: maximum value */
+    int32_t type;   /* Read: value type - AudioCtlElemType */
+    int32_t min;    /* Read: minimum value */
+    int32_t max;    /* Read: maximum value */
 };
 
 int32_t AudioServiceDispatch(void *obj, int cmdId, struct HdfSBuf *sBuf, struct HdfSBuf *reply);

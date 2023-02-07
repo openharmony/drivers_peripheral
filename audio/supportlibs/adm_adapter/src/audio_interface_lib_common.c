@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -35,22 +35,56 @@
 
 #define DECADE 10
 
+static int32_t AudioMixerCtlElemList(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
+static int32_t AudioMixerCtlGetElemProp(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
+static int32_t AudioMixerCtlSetElemProp(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
+static int32_t AudioGetAllCardList(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
+
+static struct AudioMixerOps g_AudioMixerOpsTbl[] = {
+    {MIXER_CTL_IOCTL_ELEM_INFO,     NULL                    },
+    {MIXER_CTL_IOCTL_ELEM_READ,     NULL                    },
+    {MIXER_CTL_IOCTL_ELEM_WRITE,    NULL                    },
+    {MIXER_CTL_IOCTL_ELEM_LIST,     AudioMixerCtlElemList   },
+    {MIXER_CTL_IOCTL_ELEM_GET_PROP, AudioMixerCtlGetElemProp},
+    {MIXER_CTL_IOCTL_ELEM_SET_PROP, AudioMixerCtlSetElemProp},
+    {MIXER_CTL_IOCTL_GET_CARDS,     AudioGetAllCardList     },
+    {MIXER_CTL_IOCTL_GET_CHMAP,     NULL                    },
+    {MIXER_CTL_IOCTL_SET_CHMAP,     NULL                    },
+    {MIXER_CTL_IOCTL_BUTT,          NULL                    },
+};
+
+static bool AudioCheckServiceIsAvailable(const struct HdfIoService *service)
+{
+    if (service == NULL || service->dispatcher == NULL || service->dispatcher->Dispatch == NULL) {
+        AUDIO_FUNC_LOGE("Invalid service handle!");
+        return false;
+    }
+
+    return true;
+}
+
 struct HdfIoService *HdfIoServiceBindName(const char *serviceName)
 {
+    uint32_t i;
+
     if (serviceName == NULL) {
         AUDIO_FUNC_LOGE("service name NULL!");
         return NULL;
     }
-    if (strcmp(serviceName, "hdf_audio_control") == 0) {
-        return (HdfIoServiceBind("hdf_audio_control"));
-    }
-    if (strcmp(serviceName, "hdf_audio_render") == 0) {
-        return (HdfIoServiceBind("hdf_audio_render"));
-    }
-    if (strcmp(serviceName, "hdf_audio_capture") == 0) {
-        return (HdfIoServiceBind("hdf_audio_capture"));
+
+    static const char *serviceNameList [] = {
+        "hdf_audio_control",
+        "hdf_audio_render",
+        "hdf_audio_capture"
+    };
+
+    for (i = 0; i < (uint32_t)HDF_ARRAY_SIZE(serviceNameList); i++) {
+        if (strcmp(serviceName, serviceNameList[i]) == 0) {
+            return HdfIoServiceBind(serviceName);
+        }
     }
     AUDIO_FUNC_LOGE("service name not support!");
+
     return NULL;
 }
 
@@ -441,4 +475,928 @@ int32_t AudioGetAllCardInfo(struct AudioAdapterDescriptor **descs, int32_t *sndC
     HdfSbufRecycle(reply);
     AudioCloseService(handle);
     return HDF_SUCCESS;
+}
+
+void AudioCloseServiceSub(struct HdfIoService *service)
+{
+    if (service != NULL) {
+        HdfIoServiceRecycle(service);
+    }
+}
+
+static int32_t AudioCtlElemRealDataSpace(struct AudioCtlElemList *eList)
+{
+    int32_t ret;
+    size_t dataSize = eList->count * sizeof(struct AudioHwCtlElemId);
+
+    struct AudioHwCtlElemId *ctlElemListAddr = OsalMemCalloc(dataSize);
+    if (ctlElemListAddr == NULL) {
+        AUDIO_FUNC_LOGE("Out of memory!");
+        return HDF_FAILURE;
+    }
+
+    ret = memcpy_s(ctlElemListAddr, dataSize, eList->ctlElemListAddr, dataSize);
+    if (ret != EOK) {
+        AUDIO_FUNC_LOGE("Failed to copy data.!");
+        AudioMemFree((void **)&ctlElemListAddr);
+        return HDF_FAILURE;
+    }
+    AudioMemFree((void **)&eList->ctlElemListAddr);
+    eList->ctlElemListAddr = ctlElemListAddr;
+    eList->space = eList->count;
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCtlElemParseData(struct AudioCtlElemList *eList, struct HdfSBuf *reply)
+{
+    int32_t ret;
+    uint32_t countTmp = 0;
+    uint32_t spaceTmp = 0;
+
+    const char *sndSvcName = HdfSbufReadString(reply);
+    if (sndSvcName == NULL) {
+        AUDIO_FUNC_LOGE("Failed to parse the cardServiceName!");
+        return HDF_FAILURE;
+    }
+    if (strcmp(eList->cardSrvName, sndSvcName) != 0) {
+        AUDIO_FUNC_LOGE("The service name does not match!");
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufReadUint32(reply, &countTmp)) {
+        AUDIO_FUNC_LOGE("Failed to parse the count!");
+        return HDF_FAILURE;
+    }
+    if (countTmp == 0) {
+        AUDIO_FUNC_LOGE("Can't find the element because count == 0!");
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufReadUint32(reply, &spaceTmp)) {
+        AUDIO_FUNC_LOGE("Failed to parse the space!");
+        return HDF_FAILURE;
+    }
+    if (eList->space != spaceTmp || spaceTmp <= countTmp) {
+        AUDIO_FUNC_LOGE("The data space does not match!");
+        return HDF_FAILURE;
+    }
+    eList->count = countTmp;
+
+    /* Space is allocated based on actual data */
+    ret = AudioCtlElemRealDataSpace(eList);
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static const char *AudioRenderCtlCmdId2String(int cmdId)
+{
+    static const char *audioRenderCtlCmdString[] = {
+        "MIXER_CTL_IOCTL_ELEM_INFO",
+        "MIXER_CTL_IOCTL_ELEM_READ",
+        "MIXER_CTL_IOCTL_ELEM_WRITE",
+        "MIXER_CTL_IOCTL_ELEM_LIST",
+        "MIXER_CTL_IOCTL_ELEM_GET_PROP",
+        "MIXER_CTL_IOCTL_ELEM_SET_PROP",
+        "MIXER_CTL_IOCTL_GET_CARDS",
+        "MIXER_CTL_IOCTL_GET_CHMAP",
+        "MIXER_CTL_IOCTL_SET_CHMAP"
+    };
+
+    if (cmdId < MIXER_CTL_IOCTL_ELEM_INFO || cmdId > MIXER_CTL_IOCTL_SET_CHMAP) {
+        AUDIO_FUNC_LOGE("cmdId Not Supported!");
+        return "Not found!";
+    }
+
+    return audioRenderCtlCmdString[cmdId - MIXER_CTL_IOCTL_ELEM_INFO];
+}
+
+static int32_t AudioCtlGetElemList(const struct HdfIoService *service, struct AudioCtlElemList *eList, int cmdId)
+{
+    int32_t ret;
+
+    struct HdfSBuf *sBuf = HdfSbufObtainDefaultSize();
+    if (sBuf == NULL) {
+        AUDIO_FUNC_LOGE("Failed to obtain sBuf!");
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufWriteString(sBuf, eList->cardSrvName)) {
+        AUDIO_FUNC_LOGE("CardServiceName Write Fail!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufWriteUint32(sBuf, eList->space)) {
+        AUDIO_FUNC_LOGE("Elem list space Write Fail!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufWriteUint64(sBuf, (uint64_t)eList->ctlElemListAddr)) {
+        AUDIO_FUNC_LOGE("Elem list addr Write Fail!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+
+    struct HdfSBuf *reply = HdfSbufObtainDefaultSize();
+    if (reply == NULL) {
+        AUDIO_FUNC_LOGE("Failed to obtain reply!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+
+    struct HdfObject *srv = (struct HdfObject *)(&service->object);
+    ret = service->dispatcher->Dispatch(srv, cmdId, sBuf, reply);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE(
+            "Failed to send service call cmdId: %{public}s!", AudioRenderCtlCmdId2String(cmdId + MIXER_CMD_ID_BASE));
+        AudioFreeHdfSBuf(sBuf, reply);
+        return ret;
+    }
+
+    ret = AudioCtlElemParseData(eList, reply);
+    if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(sBuf, reply);
+        return ret;
+    }
+    AudioFreeHdfSBuf(sBuf, reply);
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCtlElemListCts(const struct HdfIoService *service, int cmdId, struct AudioMixerContents *mData)
+{
+    int32_t ret;
+    struct AudioCtlElemList eList = {
+        .cardSrvName = mData->cardServiceName,
+        .count = 0,
+        .space = AUDIO_ELEMENT_NUM,
+        .ctlElemListAddr = NULL
+    };
+
+    eList.ctlElemListAddr = OsalMemCalloc(eList.space * sizeof(struct AudioHwCtlElemId));
+    if (eList.ctlElemListAddr == NULL) {
+        AUDIO_FUNC_LOGE("Out of memory!");
+        return HDF_FAILURE;
+    }
+
+    ret = AudioCtlGetElemList(service, &eList, cmdId);
+    if (ret != HDF_SUCCESS) {
+        AudioMemFree((void **)&eList.ctlElemListAddr);
+        return ret;
+    }
+    mData->data = eList.ctlElemListAddr;
+    mData->elemNum = eList.count;
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCtlRenderElemList(const struct HdfIoService *service, int cmdId, struct AudioMixerContents *data)
+{
+    int32_t ret;
+
+    ret = AudioCtlElemListCts(service, cmdId, data);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Failed to get the element list!");
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCtlCaptureElemList(const struct HdfIoService *service, int cmdId, struct AudioMixerContents *data)
+{
+    return AudioCtlRenderElemList(service, cmdId, data);
+}
+
+static bool AudioChkMixerRenderCmdId(OpCode cmd)
+{
+    if (cmd < MIXER_CTL_IOCTL_ELEM_INFO || cmd > MIXER_CTL_IOCTL_SET_CHMAP) {
+        AUDIO_FUNC_LOGE("cmdId Not Supported!");
+        return false;
+    }
+
+    return true;
+}
+
+static bool AudioChkMixerCaptureCmdId(OpCode cmd)
+{
+    return AudioChkMixerRenderCmdId(cmd);
+}
+
+static int32_t AudioMixerCtlElemList(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data)
+{
+    struct AudioMixerContents *mContents = (struct AudioMixerContents *)data;
+
+    if (pcm == PCM_CAPTURE) {
+        return AudioCtlCaptureElemList(service, cmd, mContents);
+    } else {
+        return AudioCtlRenderElemList(service, cmd, mContents);
+    }
+}
+
+static int32_t AudioFillAllAdapters(struct HdfSBuf *sbuf, int32_t num, struct AudioCardId *clist)
+{
+    int32_t i, j, ret;
+    uint8_t offset = 0;
+    uint8_t portNum = 0;
+    const char *sndName = NULL;
+
+    for (i = 0; i < num; i++) {
+        sndName = HdfSbufReadString(sbuf);
+        if (sndName == NULL) {
+            AUDIO_FUNC_LOGE("Failed to parse the cardServiceName!");
+            return HDF_FAILURE;
+        }
+
+        ret = memcpy_s(clist[i].cardName, AUDIO_CARD_SRV_NAME_LEN, sndName, strlen(sndName) + 1);
+        if (ret != EOK) {
+            AUDIO_FUNC_LOGE("Failed to copy card information!");
+            return HDF_FAILURE;
+        }
+
+        if (!HdfSbufReadUint8(sbuf, &portNum)) {
+            AUDIO_FUNC_LOGE("read portNum failed!");
+            return HDF_FAILURE;
+        }
+        if (portNum == PORT_IN || portNum == PORT_OUT) {
+            portNum = PORT_OUT;
+        } else if (portNum == PORT_OUT_IN) {
+            portNum = PORT_IN;
+        } else {
+            AUDIO_FUNC_LOGE("portNum error!");
+            return HDF_FAILURE;
+        }
+
+        for (j = 0; j < portNum; j++) {
+            if (!HdfSbufReadUint8(sbuf, &offset)) {
+                AUDIO_FUNC_LOGE("Failed to copy card information!");
+                return HDF_FAILURE;
+            }
+        }
+        /* The sound card number starts at 0, so it needs (num -1) */
+        clist[i].index = (num - 1) - i;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioParseAllAdaptersFromBuf(struct SndCardsList *sndCards, struct HdfSBuf *buf)
+{
+    int32_t ret;
+    int32_t cnumber = 0;
+    struct AudioCardId *clist = NULL;
+
+    if (!HdfSbufReadInt32(buf, &cnumber)) {
+        AUDIO_FUNC_LOGE("HdfSbufReadInt32 failed!");
+        return HDF_FAILURE;
+    }
+    if (cnumber <= 0) {
+        AUDIO_FUNC_LOGE("Card num error!");
+        return HDF_FAILURE;
+    }
+
+    clist = OsalMemCalloc(sizeof(struct AudioCardId) * cnumber);
+    if (clist == NULL) {
+        AUDIO_FUNC_LOGE("Out of memory!");
+        return HDF_FAILURE;
+    }
+
+    ret = AudioFillAllAdapters(buf, cnumber, clist);
+    if (ret != HDF_SUCCESS) {
+        AudioMemFree((void **)&clist);
+        return ret;
+    }
+    sndCards->cardNums = cnumber;
+    sndCards->cardsList = clist;
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCtlGetAllCards(const struct HdfIoService *service, int32_t cmdId, struct SndCardsList *sndCards)
+{
+    int32_t ret;
+    struct HdfSBuf *reply = NULL;
+    struct HdfObject *srv = NULL;
+
+    reply = HdfSbufObtainDefaultSize();
+    if (reply == NULL) {
+        AUDIO_FUNC_LOGE("HdfSbufObtainDefaultSize failed!");
+        return HDF_FAILURE;
+    }
+
+    srv = (struct HdfObject *)(&service->object);
+    ret = service->dispatcher->Dispatch(srv, cmdId, NULL, reply);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Failed to send service Dispatch!");
+        AudioFreeHdfSBuf(reply, NULL);
+        return ret;
+    }
+
+    ret = AudioParseAllAdaptersFromBuf(sndCards, reply);
+    if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(reply, NULL);
+        return ret;
+    }
+    AudioFreeHdfSBuf(reply, NULL);
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioGetAllCardList(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data)
+{
+    (void)pcm;
+    struct SndCardsList *sndCardsList = (struct SndCardsList *)data;
+
+    cmd -= (MIXER_CTL_IOCTL_GET_CARDS - MIXER_CTL_IOCTL_ELEM_GET_PROP);
+    if (service == NULL || sndCardsList == NULL) {
+        AUDIO_FUNC_LOGE("Invalid parameter!");
+        return HDF_FAILURE;
+    }
+
+    return AudioCtlGetAllCards(service, cmd, sndCardsList);
+}
+
+static int32_t AudioMixerCtlElemRoute(AudioPcmType pcm, const struct HdfIoService *service, OpCode cmd, void *data)
+{
+    uint32_t i, count;
+
+    if (!AudioCheckServiceIsAvailable(service)) {
+        return HDF_FAILURE;
+    }
+
+    if (pcm == PCM_CAPTURE) {
+        if (!AudioChkMixerCaptureCmdId(cmd)) {
+            return HDF_FAILURE;
+        }
+    } else {
+        if (!AudioChkMixerRenderCmdId(cmd)) {
+            return HDF_FAILURE;
+        }
+    }
+
+    count = (uint32_t)HDF_ARRAY_SIZE(g_AudioMixerOpsTbl);
+    if (count == 0) {
+        AUDIO_FUNC_LOGE("The audio mixer operation table is empty!!!");
+        return HDF_FAILURE;
+    }
+
+    for (i = 0; i < count; i++) {
+        if (cmd == g_AudioMixerOpsTbl[i].cmdId) {
+            /* Find the corresponding option */
+            break;
+        }
+    }
+    if (i == count) {
+        AUDIO_FUNC_LOGE("There's no corresponding option!!!");
+        return HDF_FAILURE;
+    }
+
+    if (g_AudioMixerOpsTbl[i].func == NULL) {
+        AUDIO_FUNC_LOGE("The function handle is empty!!!");
+        return HDF_FAILURE;
+    }
+
+    return g_AudioMixerOpsTbl[i].func(pcm, i, service, data);
+}
+
+static int32_t AudioFillDataBool(struct HdfSBuf *sBuf, struct AudioMixerCtlElemInfo *data)
+{
+    (void)sBuf;
+    (void)data;
+
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+static int32_t AudioFillDataInt(struct HdfSBuf *sBuf, struct AudioMixerCtlElemInfo *data)
+{
+    struct AudioCtlElemId eId = {
+        .cardServiceName = data->cardSrvName,
+        .itemName = data->eIndexId.eId.name,
+        .iface = data->eIndexId.eId.iface
+    };
+
+    if (!HdfSbufWriteInt32(sBuf, eId.iface)) {
+        AUDIO_FUNC_LOGE("Element iface Write Fail!");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(sBuf, eId.cardServiceName)) {
+        AUDIO_FUNC_LOGE("Element cardServiceName Write Fail!");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(sBuf, eId.itemName)) {
+        AUDIO_FUNC_LOGE("Element itemName Write Fail!");
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioFillDataEnum(struct HdfSBuf *sBuf, struct AudioMixerCtlElemInfo *data)
+{
+    (void)sBuf;
+    (void)data;
+
+    return HDF_ERR_NOT_SUPPORT;
+}
+static int32_t AudioFillDataBytes(struct HdfSBuf *sBuf, struct AudioMixerCtlElemInfo *data)
+{
+    (void)sBuf;
+    (void)data;
+
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+static int32_t AudioFillSendDataToBuf(struct HdfSBuf *sBuf, struct AudioMixerCtlElemInfo *data)
+{
+    int32_t ret;
+
+    switch (data->type) {
+        case AUDIO_CTL_ELEM_TYPE_BOOLEAN:
+            ret = AudioFillDataBool(sBuf, data);
+            break;
+        case AUDIO_CTL_ELEM_TYPE_INTEGER:
+            ret = AudioFillDataInt(sBuf, data);
+            break;
+        case AUDIO_CTL_ELEM_TYPE_ENUMERATED:
+            ret = AudioFillDataEnum(sBuf, data);
+            break;
+        case AUDIO_CTL_ELEM_TYPE_BYTES:
+            ret = AudioFillDataBytes(sBuf, data);
+            break;
+        default:
+            AUDIO_FUNC_LOGE("Unknown element value type!!!");
+            ret = HDF_FAILURE;
+            break;
+    }
+
+    return ret;
+}
+
+static int32_t AudioParseIntegerFromBufOnly(struct HdfSBuf *reply, struct AudioMixerCtlElemInfo *data)
+{
+    struct AudioCtlElemValue eVal;
+
+    (void)memset_s(&eVal, sizeof(struct AudioCtlElemValue), 0, sizeof(struct AudioCtlElemValue));
+    if (!HdfSbufReadInt32(reply, &eVal.value[0])) {
+        AUDIO_FUNC_LOGE("Failed to get the value0 of the CTL element!");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufReadInt32(reply, &eVal.value[1])) {
+        AUDIO_FUNC_LOGE("Failed to get the value1 of the CTL element!");
+        return HDF_FAILURE;
+    }
+    data->count = eVal.value[1] <= 0 ? 1 : 2;   // 2 for number of values.
+    data->value.intVal.vals[0] = (long)eVal.value[0];
+    data->value.intVal.vals[1] = (long)eVal.value[1];
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioParseIntegerFromBuf(struct HdfSBuf *reply, struct AudioMixerCtlElemInfo *data)
+{
+    struct AudioCtrlElemInfo eValue;
+
+    (void)memset_s(&eValue, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
+    if (!HdfSbufReadInt32(reply, &eValue.max)) {
+        AUDIO_FUNC_LOGE("Failed to get the max value of the CTL element!");
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufReadInt32(reply, &eValue.min)) {
+        AUDIO_FUNC_LOGE("Failed to get the min value of the CTL element!");
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufReadUint32(reply, &eValue.count)) {
+        AUDIO_FUNC_LOGE("Failed to get the count of the CTL element!");
+        return HDF_FAILURE;
+    }
+    data->count = eValue.count;
+    data->value.intVal.max = eValue.max;
+    data->value.intVal.min = eValue.min;
+    data->value.intVal.step = 0; /* reserved */
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioParseEnumeratedFromBuf(struct HdfSBuf *reply, struct AudioMixerCtlElemInfo *data)
+{
+    (void)reply;
+    (void)data;
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioParseBoolFromBuf(struct HdfSBuf *reply, struct AudioMixerCtlElemInfo *data)
+{
+    (void)reply;
+    (void)data;
+
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+static int32_t AudioParseStringFromBuf(struct HdfSBuf *reply, struct AudioMixerCtlElemInfo *data)
+{
+    (void)reply;
+    (void)data;
+
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+static int32_t AudioParseRecvDataFromBuf(struct HdfSBuf *reply, struct AudioMixerCtlElemInfo *data, int cmdId)
+{
+    int32_t ret;
+    int32_t type = 0;
+
+    if (cmdId == (MIXER_CTL_IOCTL_ELEM_INFO - MIXER_CMD_ID_BASE)) {
+        if (!HdfSbufReadInt32(reply, &type)) {
+            AUDIO_FUNC_LOGE("Failed to Get Volume type!");
+            return HDF_FAILURE;
+        }
+        data->type = (AudioCtlElemType)type;
+        switch (data->type) {
+            case AUDIO_CTL_ELEM_TYPE_INTEGER:
+                ret = AudioParseIntegerFromBuf(reply, data);
+                break;
+            case AUDIO_CTL_ELEM_TYPE_ENUMERATED:
+                ret = AudioParseEnumeratedFromBuf(reply, data);
+                break;
+            case AUDIO_CTL_ELEM_TYPE_BOOLEAN:
+                ret = AudioParseBoolFromBuf(reply, data);
+                break;
+            case AUDIO_CTL_ELEM_TYPE_BYTES:
+                ret = AudioParseStringFromBuf(reply, data);
+                break;
+            default:
+                AUDIO_FUNC_LOGE("An unsupported type!");
+                ret = HDF_FAILURE;
+                break;
+        }
+    } else {
+        ret = AudioParseIntegerFromBufOnly(reply, data);
+    }
+
+    return ret;
+}
+
+static int32_t AudioCtlElemGetProp(const struct HdfIoService *srv, int cmdId, struct AudioMixerCtlElemInfo *data)
+{
+    int32_t ret;
+    struct HdfSBuf *sBuf = NULL;
+    struct HdfSBuf *reply = NULL;
+
+    sBuf = HdfSbufObtainDefaultSize();
+    if (sBuf == NULL) {
+        AUDIO_FUNC_LOGE("Failed to obtain sBuf!!!");
+        return HDF_FAILURE;
+    }
+
+    ret = AudioFillSendDataToBuf(sBuf, data);
+    if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return ret;
+    }
+
+    reply = HdfSbufObtainDefaultSize();
+    if (reply == NULL) {
+        AUDIO_FUNC_LOGE("Failed to obtain reply!!!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+
+    struct HdfObject *service = (struct HdfObject *)(&srv->object);
+    ret = srv->dispatcher->Dispatch(service, cmdId, sBuf, reply);
+    if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(sBuf, reply);
+        return HDF_FAILURE;
+    }
+
+    ret = AudioParseRecvDataFromBuf(reply, data, cmdId);
+    if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(sBuf, reply);
+        return ret;
+    }
+    AudioFreeHdfSBuf(sBuf, reply);
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioFillInfoDataToBuf(struct HdfSBuf *sBuf, struct AudioMixerCtlElemInfo *data)
+{
+    struct AudioCtrlElemInfo eInfo = {
+        .id.cardServiceName = data->cardSrvName,
+        .id.itemName = data->eIndexId.eId.name,
+        .id.iface = data->eIndexId.eId.iface
+    };
+
+    if (!HdfSbufWriteInt32(sBuf, eInfo.id.iface)) {
+        AUDIO_FUNC_LOGE("Element iface Write Fail!");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(sBuf, eInfo.id.cardServiceName)) {
+        AUDIO_FUNC_LOGE("Element cardServiceName Write Fail!");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(sBuf, eInfo.id.itemName)) {
+        AUDIO_FUNC_LOGE("Element itemName Write Fail!");
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioParseInfoDataFromBuf(struct HdfSBuf *reply, struct AudioMixerCtlElemInfo *data)
+{
+    struct AudioCtrlElemInfo eValue;
+
+    (void)memset_s(&eValue, sizeof(struct AudioCtrlElemInfo), 0, sizeof(struct AudioCtrlElemInfo));
+    if (!HdfSbufReadInt32(reply, &eValue.type)) {
+        AUDIO_FUNC_LOGE("Failed to get the value0 of the CTL element!");
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufReadInt32(reply, &eValue.max)) {
+        AUDIO_FUNC_LOGE("Failed to get the value1 of the CTL element!");
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufReadInt32(reply, &eValue.min)) {
+        AUDIO_FUNC_LOGE("Failed to get the value1 of the CTL element!");
+        return HDF_FAILURE;
+    }
+
+    if (!HdfSbufReadUint32(reply, &eValue.count)) {
+        AUDIO_FUNC_LOGE("Failed to get the value1 of the CTL element!");
+        return HDF_FAILURE;
+    }
+    /* type: 0-AUDIO_CONTROL_MIXER (integer), 1-AUDIO_CONTROL_MUX (enum) */
+    if (eValue.type == AUDIO_CONTROL_MIXER) {
+        data->type = AUDIO_CTL_ELEM_TYPE_INTEGER;
+        data->count = eValue.count; /* channels */
+        data->value.intVal.min = eValue.min;
+        data->value.intVal.max = eValue.max;
+        data->value.intVal.step = 0; /* reserved */
+    } else if (eValue.type == AUDIO_CONTROL_ENUM) {
+        data->type = AUDIO_CTL_ELEM_TYPE_ENUMERATED;
+        data->count = eValue.count; /* channels */
+        data->value.intVal.min = eValue.min;
+        data->value.intVal.max = eValue.max;
+        data->value.intVal.step = 0; /* reserved */
+    } else {
+        AUDIO_FUNC_LOGI("type is AUDIO_CONTROL_MUX!");
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCtlElemInfoProp(const struct HdfIoService *srv, int cmdId, struct AudioMixerCtlElemInfo *data)
+{
+    int32_t ret;
+    struct HdfSBuf *sBuf = NULL;
+    struct HdfSBuf *reply = NULL;
+
+    sBuf = HdfSbufObtainDefaultSize();
+    if (sBuf == NULL) {
+        AUDIO_FUNC_LOGE("Failed to obtain sBuf!!!");
+        return HDF_FAILURE;
+    }
+
+    ret = AudioFillInfoDataToBuf(sBuf, data);
+    if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return ret;
+    }
+
+    reply = HdfSbufObtainDefaultSize();
+    if (reply == NULL) {
+        AUDIO_FUNC_LOGE("Failed to obtain reply!!!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+
+    struct HdfObject *service = (struct HdfObject *)(&srv->object);
+    ret = srv->dispatcher->Dispatch(service, cmdId, sBuf, reply);
+    if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(sBuf, reply);
+        return HDF_FAILURE;
+    }
+
+    ret = AudioParseInfoDataFromBuf(reply, data);
+    if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(sBuf, reply);
+        return ret;
+    }
+    AudioFreeHdfSBuf(sBuf, reply);
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioFillSetDataToBuf(struct HdfSBuf *sBuf, struct AudioMixerCtlElemInfo *data)
+{
+    struct AudioCtlElemValue eValue = {
+        .id.cardServiceName = data->cardSrvName,
+        .id.itemName = data->eIndexId.eId.name,
+        .id.iface = data->eIndexId.eId.iface,
+        .value[0] = data->value.intVal.vals[0],
+        .value[1] = data->value.intVal.vals[1]
+    };
+
+    if (!HdfSbufWriteInt32(sBuf, eValue.value[0])) {
+        AUDIO_FUNC_LOGE("Element iface Write Fail!");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteInt32(sBuf, eValue.id.iface)) {
+        AUDIO_FUNC_LOGE("Element iface Write Fail!");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(sBuf, eValue.id.cardServiceName)) {
+        AUDIO_FUNC_LOGE("Element cardServiceName Write Fail!");
+        return HDF_FAILURE;
+    }
+    if (!HdfSbufWriteString(sBuf, eValue.id.itemName)) {
+        AUDIO_FUNC_LOGE("Element itemName Write Fail!");
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCtlElemSetProp(const struct HdfIoService *srv, int cmdId, struct AudioMixerCtlElemInfo *data)
+{
+    int32_t ret;
+    struct HdfSBuf *sBuf = NULL;
+
+    sBuf = HdfSbufObtainDefaultSize();
+    if (sBuf == NULL) {
+        AUDIO_FUNC_LOGE("Failed to obtain sBuf!!!");
+        return HDF_FAILURE;
+    }
+
+    ret = AudioFillSetDataToBuf(sBuf, data);
+    if (ret != HDF_SUCCESS) {
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return ret;
+    }
+
+    struct HdfObject *service = (struct HdfObject *)(&srv->object);
+    ret = srv->dispatcher->Dispatch(service, cmdId, sBuf, NULL);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Dispatch failed!!!");
+        AudioFreeHdfSBuf(sBuf, NULL);
+        return HDF_FAILURE;
+    }
+    AudioFreeHdfSBuf(sBuf, NULL);
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCtlElemRoute(const struct HdfIoService *service, OpCode cmdId, struct AudioMixerCtlElemInfo *data)
+{
+    int32_t ret;
+    int32_t fOpcode = MIXER_CTL_IOCTL_ELEM_INFO - MIXER_CMD_ID_BASE;
+    int32_t rOpcode = MIXER_CTL_IOCTL_ELEM_READ - MIXER_CMD_ID_BASE;
+    int32_t wOpcode = MIXER_CTL_IOCTL_ELEM_WRITE - MIXER_CMD_ID_BASE;
+
+    if (cmdId == MIXER_CTL_IOCTL_ELEM_INFO) {
+        cmdId = fOpcode;
+        return AudioCtlElemInfoProp(service, cmdId, data);
+    }
+
+    cmdId -= MIXER_CTL_IOCTL_ELEM_LIST - MIXER_CMD_ID_BASE;
+    if (cmdId == rOpcode) { // Read element property.
+        ret = AudioCtlElemGetProp(service, cmdId, data);
+        if (ret != HDF_SUCCESS) {
+            return ret;
+        }
+        ret = AudioCtlElemGetProp(service, fOpcode, data);
+    } else if (cmdId == wOpcode) { // Write element property.
+        ret = AudioCtlElemSetProp(service, cmdId, data);
+    } else {
+        AUDIO_FUNC_LOGE("Invalid opcode for the control!");
+        ret = HDF_FAILURE;
+    }
+
+    return ret;
+}
+
+static int32_t AudioCtlGetElemCts(const struct HdfIoService *service, OpCode cmdId, struct AudioMixerCtlElemInfo *data)
+{
+    return AudioCtlElemRoute(service, cmdId, data);
+}
+
+static int32_t AudioCtlSetElemCts(const struct HdfIoService *srv, OpCode cmdId, struct AudioMixerCtlElemInfo *data)
+{
+    return AudioCtlElemRoute(srv, cmdId, data);
+}
+
+static int32_t AudioCtlRenderGetElemProp(
+    const struct HdfIoService *service, OpCode cmdId, struct AudioMixerCtlElemInfo *data)
+{
+    int32_t ret;
+
+    ret = AudioCtlGetElemCts(service, cmdId, data);
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCtlCaptureGetElemProp(
+    const struct HdfIoService *service, OpCode cmdId, struct AudioMixerCtlElemInfo *data)
+{
+    return AudioCtlRenderGetElemProp(service, cmdId, data);
+}
+
+static int32_t AudioMixerCtlGetElemProp(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data)
+{
+    struct AudioMixerCtlElemInfo *infoData = (struct AudioMixerCtlElemInfo *)data;
+
+    return (pcm == PCM_CAPTURE) ? AudioCtlCaptureGetElemProp(service, cmd, infoData) :
+                                  AudioCtlRenderGetElemProp(service, cmd, infoData);
+}
+
+static int32_t AudioCtlRenderSetElemProp(
+    const struct HdfIoService *service, OpCode cmdId, struct AudioMixerCtlElemInfo *data)
+{
+    int32_t ret;
+
+    ret = AudioCtlSetElemCts(service, cmdId, data);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("Failed to set the element!");
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+static int32_t AudioCtlCaptureSetElemProp(
+    const struct HdfIoService *service, int cmdId, struct AudioMixerCtlElemInfo *data)
+{
+    return AudioCtlRenderSetElemProp(service, cmdId, data);
+}
+
+static int32_t AudioMixerCtlSetElemProp(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data)
+{
+    struct AudioMixerCtlElemInfo *infoData = (struct AudioMixerCtlElemInfo *)data;
+
+    return (pcm == PCM_CAPTURE) ? AudioCtlCaptureSetElemProp(service, cmd, infoData) :
+                                  AudioCtlRenderSetElemProp(service, cmd, infoData);
+}
+
+int32_t AudioMixerCtlElem(AudioPcmType pcm, const struct HdfIoService *service, struct AudioMixerContents *mixerCts)
+{
+    OpCode cmd = MIXER_CTL_IOCTL_ELEM_LIST;
+    AudioPcmType stream = (pcm == PCM_CAPTURE) ? PCM_CAPTURE : PCM_RENDER;
+
+    if (service == NULL || mixerCts == NULL) {
+        AUDIO_FUNC_LOGE("Invalid parameters!");
+        return HDF_FAILURE;
+    }
+
+    return AudioMixerCtlElemRoute(stream, service, cmd, mixerCts);
+}
+
+int32_t AudioMixerCtlGetElem(AudioPcmType pcm, const struct HdfIoService *srv, struct AudioMixerCtlElemInfo *infoData)
+{
+    OpCode cmd = MIXER_CTL_IOCTL_ELEM_GET_PROP;
+    AudioPcmType stream = (pcm == PCM_CAPTURE) ? PCM_CAPTURE : PCM_RENDER;
+
+    if (srv == NULL || infoData == NULL) {
+        AUDIO_FUNC_LOGE("Invalid parameters!");
+        return HDF_FAILURE;
+    }
+
+    return AudioMixerCtlElemRoute(stream, srv, cmd, infoData);
+}
+
+int32_t AudioMixerCtlSetElem(
+    AudioPcmType pcm, const struct HdfIoService *service, struct AudioMixerCtlElemInfo *infoData)
+{
+    OpCode cmd = MIXER_CTL_IOCTL_ELEM_SET_PROP;
+    AudioPcmType stream = (pcm == PCM_CAPTURE) ? PCM_CAPTURE : PCM_RENDER;
+
+    if (service == NULL || infoData == NULL) {
+        AUDIO_FUNC_LOGE("Invalid parameters!");
+        return HDF_FAILURE;
+    }
+
+    return AudioMixerCtlElemRoute(stream, service, cmd, infoData);
+}
+
+int32_t AudioMixerGetAllAdapters(const struct HdfIoService *service, struct SndCardsList *clist)
+{
+    OpCode cmd = MIXER_CTL_IOCTL_GET_CARDS;
+
+    if (service == NULL || clist == NULL) {
+        AUDIO_FUNC_LOGE("Invalid parameters!");
+        return HDF_FAILURE;
+    }
+
+    return AudioMixerCtlElemRoute(PCM_BOTTOM, service, cmd, clist);
 }
