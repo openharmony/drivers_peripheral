@@ -29,6 +29,7 @@
 #include "camera_metadata_info.h"
 #include "metadata_utils.h"
 #include "ibuffer.h"
+#include "iconsumer_surface.h"
 #include "v1_0/ioffline_stream_operator.h"
 #include <surface.h>
 #include <display_type.h>

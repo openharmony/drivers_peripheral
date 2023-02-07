@@ -26,6 +26,7 @@
 #include "constants.h"
 #include "camera.h"
 #include "distributed_hardware_log.h"
+#include "iconsumer_surface.h"
 #include "v1_0/ioffline_stream_operator.h"
 
 namespace OHOS {
@@ -39,7 +40,7 @@ enum CaptureMode {
 
 class TestBuffersConsumerListener : public IBufferConsumerListener {
 public:
-    TestBuffersConsumerListener(const sptr<Surface>& surface,
+    TestBuffersConsumerListener(const sptr<IConsumerSurface>& surface,
         const std::function<void(void*, const uint32_t)> callback) : callback_(callback), consumer_(surface)
     {
     }
@@ -70,7 +71,7 @@ public:
 
 private:
     std::function<void(void*, uint32_t)> callback_;
-    sptr<Surface> consumer_;
+    sptr<IConsumerSurface> consumer_;
 };
 
 class StreamCustomer {
@@ -80,7 +81,7 @@ public:
     sptr<OHOS::IBufferProducer> CreateProducer(CaptureMode mode, const std::function<void(void*, uint32_t)> callback);
 
 private:
-    sptr<OHOS::Surface> consumer_ = nullptr;
+    sptr<OHOS::IConsumerSurface> consumer_ = nullptr;
 };
 
 } // namespace OHOS::DistributedHardware

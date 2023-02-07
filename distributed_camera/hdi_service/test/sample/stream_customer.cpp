@@ -26,7 +26,7 @@ StreamCustomer::~StreamCustomer() {}
 sptr<OHOS::IBufferProducer> StreamCustomer::CreateProducer(CaptureMode mode,
     const std::function<void(void*, uint32_t)> callback)
 {
-    consumer_ = OHOS::Surface::CreateSurfaceAsConsumer();
+    consumer_ = OHOS::IConsumerSurface::Create();
     if (consumer_ == nullptr) {
         return nullptr;
     }

@@ -81,7 +81,7 @@ sptr<OHOS::IBufferProducer> StreamCustomer::CreateProducer()
     }
     return consumer_;
 #else
-    consumer_ = OHOS::Surface::CreateSurfaceAsConsumer();
+    consumer_ = OHOS::IConsumerSurface::Create();
     if (consumer_ == nullptr) {
         return nullptr;
     }
