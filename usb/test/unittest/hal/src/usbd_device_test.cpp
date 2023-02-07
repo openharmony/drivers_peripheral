@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,8 +24,8 @@
 #include "v1_0/usb_types.h"
 
 const int SLEEP_TIME = 3;
-const uint8_t BUS_NUM_255 = 255;
-const uint8_t DEV_ADDR_255 = 255;
+const uint8_t BUS_NUM_INVALID = 255;
+const uint8_t DEV_ADDR_INVALID = 255;
 UsbDev UsbdDeviceTest::dev_ = {0, 0};
 
 using namespace testing::ext;
@@ -94,7 +94,7 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice001, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdOpenDevice002, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_255, dev_.devAddr};
+    struct UsbDev dev = {BUS_NUM_INVALID, dev_.devAddr};
     auto ret = g_usbInterface->OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -109,7 +109,7 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice002, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdOpenDevice003, TestSize.Level1)
 {
-    struct UsbDev dev = {dev_.busNum, DEV_ADDR_255};
+    struct UsbDev dev = {dev_.busNum, DEV_ADDR_INVALID};
     auto ret = g_usbInterface->OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -124,7 +124,7 @@ HWTEST_F(UsbdDeviceTest, UsbdOpenDevice003, TestSize.Level1)
  */
 HWTEST_F(UsbdDeviceTest, UsbdOpenDevice004, TestSize.Level1)
 {
-    struct UsbDev dev = {BUS_NUM_255, DEV_ADDR_255};
+    struct UsbDev dev = {BUS_NUM_INVALID, DEV_ADDR_INVALID};
     auto ret = g_usbInterface->OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -163,7 +163,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice002, TestSize.Level1)
     auto ret = g_usbInterface->OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    dev.busNum = BUS_NUM_255;
+    dev.busNum = BUS_NUM_INVALID;
     ret = g_usbInterface->CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -184,7 +184,7 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice003, TestSize.Level1)
     auto ret = g_usbInterface->OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    dev.devAddr = DEV_ADDR_255;
+    dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
@@ -205,8 +205,8 @@ HWTEST_F(UsbdDeviceTest, UsbdCloseDevice004, TestSize.Level1)
     auto ret = g_usbInterface->OpenDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d OpenDevice result=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
-    dev.busNum = BUS_NUM_255;
-    dev.devAddr = DEV_ADDR_255;
+    dev.busNum = BUS_NUM_INVALID;
+    dev.devAddr = DEV_ADDR_INVALID;
     ret = g_usbInterface->CloseDevice(dev);
     HDF_LOGI("UsbdDeviceTest:: Line:%{public}d Close result=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
