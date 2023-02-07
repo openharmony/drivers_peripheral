@@ -15,6 +15,7 @@
 
 #include "usbfn_mtp_impl.h"
 
+#include <cinttypes>
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -1214,8 +1215,9 @@ int32_t UsbfnMtpImpl::UsbMtpPortStartRxAsync(struct UsbMtpPort *mtpPort)
             break;
         }
         if (mtpDev->asyncRecvFileExpect >= mtpDev->xferFileLength) {
-            HDF_LOGE("%{public}s: no need submit rx req[%{public}d/%{public}d]: %{public}d vs %{public}lld", __func__,
-                mtpPort->readStarted, mtpPort->readAllocated, mtpDev->asyncRecvFileExpect, mtpDev->xferFileLength);
+            HDF_LOGE("%{public}s: no need submit rx req[%{public}d/%{public}d]: %{public}d vs %{public}" PRId64 "",
+                __func__, mtpPort->readStarted, mtpPort->readAllocated, mtpDev->asyncRecvFileExpect,
+                mtpDev->xferFileLength);
             return HDF_SUCCESS;
         }
         struct UsbFnRequest *req = DLIST_FIRST_ENTRY(pool, struct UsbFnRequest, list);
@@ -1245,7 +1247,8 @@ int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
         return HDF_DEV_ERR_DEV_INIT_FAIL;
     }
 
-    HDF_LOGI("%{public}s: info: cmd=%{public}d, transid=%{public}d, len=%{public}lld offset=%{public}lld fd=%{public}d",
+    HDF_LOGI("%{public}s: info: cmd=%{public}d, transid=%{public}d, len=%{public}" PRId64 " offset=%{public}" PRId64
+             " fd=%{public}d",
         __func__, mfs.command, mfs.transactionId, mfs.length, mfs.offset, mfs.fd);
 
     std::lock_guard<std::mutex> guard(mtpRunning_);
@@ -1262,7 +1265,7 @@ int32_t UsbfnMtpImpl::ReceiveFile(const UsbFnMtpFileSlice &mfs)
     ftruncate(mfs.fd, mfs.offset + (mfs.length == MTP_MAX_FILE_SIZE ? mtpDev_->dataOutPipe.maxPacketSize : mfs.length));
     void *fileContent = mmap(nullptr, mfs.length, PROT_WRITE, MAP_SHARED, mfs.fd, mfs.offset);
     if (fileContent == nullptr) {
-        HDF_LOGE("%{public}s: mmap failed: fd=%{public}d offset=%{public}lld len=%{public}lld", __func__,
+        HDF_LOGE("%{public}s: mmap failed: fd=%{public}d offset=%{public}" PRId64 " len=%{public}" PRId64 "", __func__,
             mtpDev_->xferFd, mtpDev_->xferFileOffset, mtpDev_->xferFileLength);
         return HDF_DEV_ERR_NO_MEMORY;
     }
@@ -1384,7 +1387,8 @@ int32_t UsbfnMtpImpl::SendFile(const UsbFnMtpFileSlice &mfs)
     mtpDev_->xferSendHeader = (mfs.command == 0 && mfs.transactionId == 0) ? 0 : 1;
     uint32_t hdrSize = (mtpDev_->xferSendHeader == 1) ? sizeof(struct UsbMtpDataHeader) : 0;
     uint32_t needXferCount = static_cast<uint32_t>(mfs.length) + hdrSize;
-    HDF_LOGI("%{public}s: info: cmd=%{public}d, transid=%{public}d, len=%{public}lld offset=%{public}lld; "
+    HDF_LOGI("%{public}s: info: cmd=%{public}d, transid=%{public}d, len=%{public}" PRId64 " offset=%{public}" PRId64
+             "; "
              "Xfer=%{public}d(header=%{public}u)",
         __func__, mfs.command, mfs.transactionId, mfs.length, mfs.offset, needXferCount, hdrSize);
 
