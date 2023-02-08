@@ -15,6 +15,7 @@
 
 #include <hdf_log.h>
 #include <memory.h>
+#include <malloc.h>
 #include <securec.h>
 #include "codec_adapter_interface.h"
 #include "component_mgr.h"
@@ -68,6 +69,10 @@ int32_t OmxAdapterDestroyComponent(struct CodecComponentNode *codecNode)
     codecNode->node = nullptr;
     delete codecNode;
     codecNode = nullptr;
+    err = mallopt(M_FLUSH_THREAD_CACHE, 0);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s :release cache error, m_purge = %{public}d", __func__, err);
+    }
     return HDF_SUCCESS;
 }
 
@@ -186,7 +191,12 @@ int32_t OmxAdapterFreeBuffer(struct CodecComponentNode *codecNode, uint32_t port
         HDF_LOGE("%{public}s codecNode, node or omxBuffer is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    return codecNode->node->FreeBuffer(portIndex, *omxBuffer);
+    int32_t ret = codecNode->node->FreeBuffer(portIndex, *omxBuffer);
+    int32_t err = mallopt(M_FLUSH_THREAD_CACHE, 0);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s :release cache error, m_purge = %{public}d", __func__, err);
+    }
+    return ret;
 }
 
 int32_t OmxAdapterEmptyThisBuffer(struct CodecComponentNode *codecNode, struct OmxCodecBuffer *omxBuffer)
