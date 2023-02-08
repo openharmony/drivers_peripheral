@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -346,12 +346,12 @@ HWTEST_F(UsbdFunctionTest, UsbdSetPortRole004, TestSize.Level1)
  * @tc.name: UsbdSetPortRole005
  * @tc.desc: Test functions to SetPortRole
  * @tc.desc: int32_t SetPortRole(int32_t portId,int32_t powerRole,int32_t dataRole)
- * @tc.desc: Negative test: parameters exception, dataRole && powerRole error
+ * @tc.desc: Negative test: parameters exception, powerRole error
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetPortRole005, TestSize.Level1)
 {
-    auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, USB_POWER_ROLE_INVALID, USB_DATA_ROLE_INVALID);
+    auto ret = g_usbInterface->SetPortRole(DEFAULT_PORT_ID, USB_POWER_ROLE_INVALID, DATA_ROLE_HOST);
     HDF_LOGI("UsbdFunctionTest::UsbdSetPortRole005 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_NE(ret, 0);
 }
