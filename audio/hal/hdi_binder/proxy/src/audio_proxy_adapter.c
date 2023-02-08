@@ -1074,7 +1074,7 @@ int32_t AudioProxyAdapterGetExtraParams(struct AudioAdapter *adapter, enum Audio
         return AUDIO_HAL_ERR_INTERNAL;
     }
 
-    if (length < strlen(strValue) + 1) {
+    if (length < (int32_t)(strlen(strValue) + 1)) {
         AUDIO_FUNC_LOGE("length less than strlen(strValue)!");
         return AUDIO_HAL_ERR_INVALID_PARAM;
     }
