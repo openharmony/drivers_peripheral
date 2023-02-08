@@ -251,7 +251,7 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions011, TestSize.Level1)
 {
     int32_t funcs = USB_FUNCTION_STORAGE | USB_FUNCTION_HDC;
     auto ret = g_usbInterface->SetCurrentFunctions(funcs);
-    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions0011 %{public}d ret=%{public}d", __LINE__, ret);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions011 %{public}d ret=%{public}d", __LINE__, ret);
     ASSERT_EQ(0, ret);
 }
 
@@ -259,14 +259,15 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions011, TestSize.Level1)
  * @tc.name: UsbdSetCurrentFunctions012
  * @tc.desc: Test functions to SetCurrentFunctions
  * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
- * @tc.desc: Negative test: parameters exception, funcs error
+ * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions012, TestSize.Level1)
 {
-    auto ret = g_usbInterface->SetCurrentFunctions(USB_FUNCTION_UNSUPPORTED);
-    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions008 %{public}d ret=%{public}d", __LINE__, ret);
-    ASSERT_NE(ret, 0);
+    int32_t funcs = USB_FUNCTION_MTP;
+    auto ret = g_usbInterface->SetCurrentFunctions(funcs);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions012 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
 }
 
 /**
@@ -277,6 +278,95 @@ HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions012, TestSize.Level1)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions013, TestSize.Level1)
+{
+    int32_t funcs = USB_FUNCTION_PTP;
+    auto ret = g_usbInterface->SetCurrentFunctions(funcs);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions013 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdSetCurrentFunctions014
+ * @tc.desc: Test functions to SetCurrentFunctions
+ * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions014, TestSize.Level1)
+{
+    int32_t funcs = USB_FUNCTION_MTP | USB_FUNCTION_HDC;
+    auto ret = g_usbInterface->SetCurrentFunctions(funcs);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions014 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdSetCurrentFunctions015
+ * @tc.desc: Test functions to SetCurrentFunctions
+ * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions015, TestSize.Level1)
+{
+    int32_t funcs = USB_FUNCTION_PTP | USB_FUNCTION_HDC;
+    auto ret = g_usbInterface->SetCurrentFunctions(funcs);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions015 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdSetCurrentFunctions016
+ * @tc.desc: Test functions to SetCurrentFunctions
+ * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions016, TestSize.Level1)
+{
+    int32_t funcs = USB_FUNCTION_MTP | USB_FUNCTION_RNDIS;
+    auto ret = g_usbInterface->SetCurrentFunctions(funcs);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions016 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdSetCurrentFunctions017
+ * @tc.desc: Test functions to SetCurrentFunctions
+ * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions017, TestSize.Level1)
+{
+    int32_t funcs = USB_FUNCTION_PTP | USB_FUNCTION_RNDIS;
+    auto ret = g_usbInterface->SetCurrentFunctions(funcs);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions017 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_EQ(0, ret);
+}
+
+/**
+ * @tc.name: UsbdSetCurrentFunctions018
+ * @tc.desc: Test functions to SetCurrentFunctions
+ * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
+ * @tc.desc: Negative test: parameters exception, funcs error
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions018, TestSize.Level1)
+{
+    auto ret = g_usbInterface->SetCurrentFunctions(USB_FUNCTION_UNSUPPORTED);
+    HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions018 %{public}d ret=%{public}d", __LINE__, ret);
+    ASSERT_NE(ret, 0);
+}
+
+/**
+ * @tc.name: UsbdSetCurrentFunctions019
+ * @tc.desc: Test functions to SetCurrentFunctions
+ * @tc.desc: int32_t SetCurrentFunctions(int32_t funcs)
+ * @tc.desc: Positive test: parameters correctly
+ * @tc.type: FUNC
+ */
+HWTEST_F(UsbdFunctionTest, UsbdSetCurrentFunctions019, TestSize.Level1)
 {
     auto ret = g_usbInterface->SetCurrentFunctions(USB_FUNCTION_NONE);
     HDF_LOGI("UsbdFunctionTest::UsbdSetCurrentFunctions013 ret=%{public}d", ret);
