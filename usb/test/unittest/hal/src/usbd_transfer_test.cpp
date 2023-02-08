@@ -143,7 +143,8 @@ void UsbdTransferTest::TearDown(void) {}
 
 /**
  * @tc.name: UsbdControlTransferRead001
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly, standard request: get configuration
  * @tc.type: FUNC
  */
@@ -159,7 +160,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead001, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead002
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error, standard request: get configuration
  * @tc.type: FUNC
  */
@@ -175,7 +177,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead002, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead003
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get configuration
  * @tc.type: FUNC
  */
@@ -191,7 +194,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead003, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead004
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly, standard request: get descriptor(device)
  * @tc.type: FUNC
  */
@@ -208,7 +212,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead004, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead005
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error, standard request: get descriptor(device)
  * @tc.type: FUNC
  */
@@ -225,7 +230,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead005, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead006
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get descriptor(device)
  * @tc.type: FUNC
  */
@@ -242,7 +248,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead006, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead007
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly, standard request: get interface
  * @tc.type: FUNC
  */
@@ -260,7 +267,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead007, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead008
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error, standard request: get interface
  * @tc.type: FUNC
  */
@@ -278,7 +286,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead008, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead009
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get interface
  * @tc.type: FUNC
  */
@@ -296,8 +305,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead009, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead010
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
- * Positive test: parameters correctly, standard request: get status(recipient device)
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly, standard request: get status(recipient device)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransferRead010, TestSize.Level1)
@@ -312,7 +322,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead010, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead011
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error, standard request: get status(device)
  * @tc.type: FUNC
  */
@@ -328,7 +339,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead011, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead012
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get status(device)
  * @tc.type: FUNC
  */
@@ -344,8 +356,9 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead012, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead013
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
- * Positive test: parameters correctly, standard request: get status(interface)
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Positive test: parameters correctly, standard request: get status(interface)
  * @tc.type: FUNC
  */
 HWTEST_F(UsbdTransferTest, UsbdControlTransferRead013, TestSize.Level1)
@@ -361,7 +374,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead013, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead014
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error, standard request: get status(interface)
  * @tc.type: FUNC
  */
@@ -378,7 +392,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead014, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead015
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get status(interface)
  * @tc.type: FUNC
  */
@@ -395,7 +410,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead015, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead016
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly, standard request: get status(endpoint)
  * @tc.type: FUNC
  */
@@ -412,7 +428,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead016, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead017
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error, standard request: get status(endpoint)
  * @tc.type: FUNC
  */
@@ -429,7 +446,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead017, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead018
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error, standard request: get status(endpoint)
  * @tc.type: FUNC
  */
@@ -446,7 +464,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead018, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead019
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly, standard request: sync frame
  * @tc.type: FUNC
  */
@@ -463,7 +482,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead019, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead020
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error, standard request: sync frame
  * @tc.type: FUNC
  */
@@ -480,7 +500,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead020, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferRead021
- * @tc.desc: Test functions to ControlTransfer(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferRead
+ * @tc.desc: int32_t ControlTransferRead(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error, standard request: sync frame
  * @tc.type: FUNC
  */
@@ -497,8 +518,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferRead021, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite001
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -518,8 +539,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite001, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite002
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
@@ -539,8 +560,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite002, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite003
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
@@ -560,8 +581,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite003, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite004
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -581,8 +602,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite004, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite005
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
@@ -602,8 +623,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite005, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite006
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
@@ -623,8 +644,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite006, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite007
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -644,8 +665,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite007, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite008
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
@@ -665,8 +686,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite008, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite009
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
@@ -686,8 +707,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite009, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite010
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -707,8 +728,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite010, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite011
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
@@ -728,8 +749,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite011, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite012
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
@@ -749,8 +770,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite012, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite013
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -769,8 +790,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite013, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite014
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
@@ -789,8 +810,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite014, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite015
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
@@ -809,8 +830,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite015, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite016
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -830,8 +851,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite016, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite017
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
@@ -851,8 +872,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite017, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite018
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
@@ -872,8 +893,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite018, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite019
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Positive test: parameters correctly
  * @tc.type: FUNC
  */
@@ -893,8 +914,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite019, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite020
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, busNum error
  * @tc.type: FUNC
  */
@@ -914,8 +935,8 @@ HWTEST_F(UsbdTransferTest, UsbdControlTransferWrite020, TestSize.Level1)
 
 /**
  * @tc.name: UsbdControlTransferWrite021
- * @tc.desc: Test functions to ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl,
- * std::vector<uint8_t> &data);
+ * @tc.desc: Test functions to ControlTransferWrite
+ * @tc.desc: int32_t ControlTransferWrite(const UsbDev &dev, UsbCtrlTransfer &ctrl, std::vector<uint8_t> &data);
  * @tc.desc: Negative test: parameters exception, devAddr error
  * @tc.type: FUNC
  */
