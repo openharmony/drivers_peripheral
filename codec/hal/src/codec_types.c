@@ -675,7 +675,9 @@ bool CodecCompCapabilityBlockMarshalling(struct HdfSBuf *data, const CodecCompCa
         return false;
     }
 
-    if (!HdfSbufWriteInt8(data, dataBlock->isSoftwareCodec ? 1 : 0)) {
+    int8_t isSoftwareCodec = dataBlock->isSoftwareCodec ? 1 : 0;
+    bool ret = HdfSbufWriteInt8(data, isSoftwareCodec);
+    if (!ret) {
         HDF_LOGE("%{public}s: write dataBlock->isSoftwareCodec failed!", __func__);
         return false;
     }
@@ -697,6 +699,12 @@ bool CodecCompCapabilityBlockMarshalling(struct HdfSBuf *data, const CodecCompCa
 
     if (!HdfSbufWriteUnpadBuffer(data, (const uint8_t *)&dataBlock->port, sizeof(PortCap))) {
         HDF_LOGE("%{public}s: write dataBlock->port failed!", __func__);
+        return false;
+    }
+    int8_t canSwapWidthHeight = dataBlock->canSwapWidthHeight ? 1 : 0;
+    ret = HdfSbufWriteInt8(data, canSwapWidthHeight);
+    if (!ret) {
+        HDF_LOGE("%{public}s: write dataBlock->canSwapWidthHeight failed!", __func__);
         return false;
     }
 
@@ -760,6 +768,11 @@ bool CodecCompCapabilityBlockUnmarshalling(struct HdfSBuf *data, CodecCompCapabi
         return false;
     }
     (void)memcpy_s(&dataBlock->port, sizeof(PortCap), portCp, sizeof(PortCap));
+
+    if (!HdfSbufReadInt8(data, (int8_t *)&dataBlock->canSwapWidthHeight)) {
+        HDF_LOGE("%{public}s: read dataBlock->canSwapWidthHeight failed!", __func__);
+        return false;
+    }
 
     return true;
 }
