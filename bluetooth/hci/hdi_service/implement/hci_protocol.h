@@ -19,6 +19,7 @@
 #include <cstdio>
 #include <vector>
 
+#include <functional>
 #include "hci_internal.h"
 
 namespace OHOS {
