@@ -165,7 +165,7 @@ const struct SensorInterface *NewSensorInterfaceInstance(void)
     }
     manager->initState = true;
     HDF_LOGD("%{public}s: Get sensor device instance success", __func__);
-    SensorDevRegisterDump();
+
     return &sensorDevInstance;
 }
 
