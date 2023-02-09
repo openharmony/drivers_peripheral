@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,8 +20,9 @@
 #include <iproxy_broker.h>
 #include <hdf_base.h>
 #include <hdf_log.h>
-#include "hitrace_meter.h"
 #include "callback_death_recipient.h"
+#include "hitrace_meter.h"
+#include "sensor_dump.h"
 
 #define HDF_LOG_TAG uhdf_sensor_service
 
@@ -47,6 +48,7 @@ extern "C" ISensorInterface *SensorInterfaceImplGetInstance(void)
     }
 
     service->Init();
+    SensorDevRegisterDump();
     return service;
 }
 
