@@ -63,7 +63,11 @@ ohos_shared_library("libcodec_hdi_omx_server") {
   if (drivers_peripheral_codec_support_role) {
     defines += [ "SUPPORT_ROLE" ]
   }
-
+  if (use_musl) {
+    if (use_jemalloc && use_jemalloc_dfx_intf) {
+      defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
+    }
+  }
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
@@ -115,7 +119,11 @@ ohos_static_library("libcodec_hdi_omx_server_static") {
   if (drivers_peripheral_codec_support_role) {
     defines += [ "SUPPORT_ROLE" ]
   }
-
+  if (use_musl) {
+    if (use_jemalloc && use_jemalloc_dfx_intf) {
+      defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
+    }
+  }
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_codec"
 }
