@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,6 +62,7 @@ enum WifiDriverClientResultCode {
     RET_CODE_NOT_AVAILABLE = -5,
     RET_CODE_NOMEM = -6,
     RET_CODE_DEVICE_BUSY = -16,
+    RET_CODE_NETDOWN = -211,
 };
 
 enum WifiIfType {
