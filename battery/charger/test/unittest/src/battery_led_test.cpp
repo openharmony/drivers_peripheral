@@ -15,8 +15,8 @@
 
 #include "battery_led_test.h"
 #include "battery_config.h"
-#include "battery_sys_test.h"
 #include "battery_led.h"
+#include "battery_sys_test.h"
 
 using namespace testing::ext;
 
