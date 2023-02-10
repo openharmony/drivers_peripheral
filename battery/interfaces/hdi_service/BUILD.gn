@@ -18,10 +18,8 @@ ohos_shared_library("libbattery_interface_service_1.2") {
     "include",
     "../include",
     "../../utils/include",
-    "//drivers/peripheral/battery/charger/led",
   ]
   sources = [
-    "//drivers/peripheral/battery/charger/led/battery_led.cpp",
     "src/battery_config.cpp",
     "src/battery_interface_impl.cpp",
     "src/battery_thread.cpp",
