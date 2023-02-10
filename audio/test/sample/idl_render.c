@@ -366,7 +366,21 @@ static int32_t InitPlayingAudioParam(struct IAudioRender *render)
     if (render == NULL) {
         return HDF_FAILURE;
     }
-    uint32_t bufferSize = PcmFramesToBytes(g_attrs);
+    uint64_t frameSize = 0;
+    uint64_t frameCount = 0;
+    uint64_t bufferSize = 0;
+    if (render->GetFrameSize(render, &frameSize) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("get frame size failed");
+    }
+    if (render->GetFrameCount(render, &frameCount) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("get frame count failed");
+    }
+
+    bufferSize = frameCount * frameSize;
+    if (bufferSize == 0) {
+        bufferSize = PcmFramesToBytes(g_attrs);
+        AUDIO_FUNC_LOGE("buffer size by calc is %" PRIu64 "", bufferSize);
+    }
 
     g_frame = (char *)OsalMemCalloc(bufferSize);
     if (g_frame == NULL) {
