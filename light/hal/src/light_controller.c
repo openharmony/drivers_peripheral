@@ -247,8 +247,9 @@ static int32_t OnLight(uint32_t lightId, struct LightEffect *effect)
     HdfSbufRecycle(msg);
     (void)OsalMutexUnlock(&priv->mutex);
 
-    if(!memcpy(&g_lightEffect, effect, sizeof(*effect))) {
+    if (memcpy_s(&g_lightEffect, sizeof(g_lightEffect), effect, sizeof(*effect)) != EOK) {
         HDF_LOGE("%{public}s: Light effect cpy faild", __func__);
+        return HDF_FAILURE;
     }
 
     g_lightState[lightId] = LIGHT_ON;
@@ -329,9 +330,13 @@ EXIT:
     HdfSbufRecycle(sbuf);
     (void)OsalMutexUnlock(&priv->mutex);
 
-    if(!memcpy(&(g_lightEffect.lightColor), colors, sizeof(*colors))) {
+    if (memcpy_s(&(g_lightEffect.lightColor), sizeof(g_lightEffect.lightColor),
+        colors, sizeof(*colors)) != EOK) {
         HDF_LOGE("%{public}s: Light colors cpy faild", __func__);
+        return HDF_FAILURE;
     }
+
+    g_lightState[lightId] = LIGHT_ON;
 
     return ret;
 }
@@ -404,7 +409,9 @@ const struct LightInterface *NewLightInterfaceInstance(void)
     priv->initState = true;
     HDF_LOGI("get light devInstance success");
 
+#ifndef __LITEOS__
     LightDevRegisterDumpFunc();
+#endif
 
     return &lightDevInstance;
 }
