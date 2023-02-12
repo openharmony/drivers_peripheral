@@ -18,13 +18,13 @@ import("//drivers/peripheral/audio/audio.gni")
 if (defined(ohos_lite)) {
   ohos_shared_library("audio_capture_adapter") {
     sources = [
-      "//drivers/peripheral/audio/hdi_service/passthrough/src/audio_common.c",
+      "//drivers/peripheral/audio/hdi_service/primary_impl/src/audio_common.c",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_capture.c",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/hdi_service/passthrough/include",
+      "//drivers/peripheral/audio/hdi_service/primary_impl/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
@@ -44,7 +44,7 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("audio_render_adapter") {
     sources = [
-      "//drivers/peripheral/audio/hdi_service/passthrough/src/audio_common.c",
+      "//drivers/peripheral/audio/hdi_service/primary_impl/src/audio_common.c",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_render.c",
     ]
@@ -52,7 +52,7 @@ if (defined(ohos_lite)) {
     public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/hdi_service/hdi_passthrough/include",
+      "//drivers/peripheral/audio/hdi_service/primary_impl/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
@@ -73,7 +73,7 @@ if (defined(ohos_lite)) {
 } else {
   ohos_shared_library("audio_capture_adapter") {
     sources = [
-      "//drivers/peripheral/audio/hdi_service/passthrough/src/audio_common.c",
+      "//drivers/peripheral/audio/hdi_service/primary_impl/src/audio_common.c",
     ]
     if (drivers_peripheral_audio_alsa_lib) {
       sources += [
@@ -89,13 +89,12 @@ if (defined(ohos_lite)) {
       ]
     }
     include_dirs = [
-      "//drivers/peripheral/audio/hdi_service/passthrough/include",
+      "//drivers/peripheral/audio/hdi_service/primary_impl/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
       "//drivers/hdf_core/adapter/uhdf2/shared/include",
     ]
-    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
 
     if (drivers_peripheral_audio_alsa_lib) {
       include_dirs += [
@@ -118,6 +117,7 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "drivers_interface_audio:audio_idl_headers",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
       ]
@@ -132,7 +132,7 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("audio_render_adapter") {
     sources = [
-      "//drivers/peripheral/audio/hdi_service/passthrough/src/audio_common.c",
+      "//drivers/peripheral/audio/hdi_service/primary_impl/src/audio_common.c",
     ]
     if (drivers_peripheral_audio_alsa_lib) {
       sources += [
@@ -149,13 +149,12 @@ if (defined(ohos_lite)) {
     }
 
     include_dirs = [
-      "//drivers/peripheral/audio/hdi_service/passthrough/include",
+      "//drivers/peripheral/audio/hdi_service/primary_impl/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
       "//drivers/hdf_core/adapter/uhdf2/shared/include",
     ]
-    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
 
     if (drivers_peripheral_audio_alsa_lib) {
       include_dirs += [
@@ -178,6 +177,7 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "drivers_interface_audio:audio_idl_headers",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
       ]
