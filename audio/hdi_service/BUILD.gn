@@ -13,10 +13,10 @@
 
 group("idl_audio") {
   deps = [
-    "passthrough:audio_primary_impl",
     "pathselect:audio_path_select",
-    "src:audio_manager_service_1.0",
-    "src:audio_primary_driver",
+    "primary:audio_manager_service_1.0",
+    "primary:audio_primary_driver",
+    "primary_impl:audio_primary_impl",
     "supportlibs:audio_capture_adapter",
     "supportlibs:audio_render_adapter",
   ]
