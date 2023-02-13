@@ -22,7 +22,7 @@
 #include <stub_collector.h>
 #include "v1_0/iaudio_manager.h"
 
-#define HDF_LOG_TAG HDF_AUDIO_PRIMARY_DRIVER
+#define HDF_LOG_TAG HDF_AUDIO_PRIMARY_DRV
 
 struct HdfAudioManagerHost {
     struct IDeviceIoService ioService;
@@ -56,15 +56,18 @@ static int32_t AudioManagerDriverDispatch(
 static int32_t HdfAudioManagerDriverInit(struct HdfDeviceObject *deviceObject)
 {
     HDF_LOGI("%{public}s: driver init enter", __func__);
+
     if (deviceObject == NULL) {
         HDF_LOGE("%{public}s:deviceObject is null!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
     if (!HdfDeviceSetClass(deviceObject, DEVICE_CLASS_AUDIO)) {
-        HDF_LOGE("%{public}s:Set Primary DEVICE_CLASS_AUDIO fail!", __func__);
+        HDF_LOGE("%{public}s:set primary DEVICE_CLASS_AUDIO fail!", __func__);
+        return HDF_ERR_INVALID_OBJECT;
     }
-    HDF_LOGI("%{public}s: driver init success", __func__);
+
+    HDF_LOGI("%{public}s:driver init success", __func__);
     return HDF_SUCCESS;
 }
 

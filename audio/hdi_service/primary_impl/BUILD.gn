@@ -26,15 +26,13 @@ ohos_shared_library("audio_primary_impl") {
   ]
 
   include_dirs = [
-    "//drivers/peripheral/audio/hdi_service/passthrough/include",
+    "//drivers/peripheral/audio/hdi_service/primary_impl/include",
     "//drivers/peripheral/audio/hdi_service/pathselect/include",
     "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
     "//drivers/peripheral/audio/supportlibs/interfaces/include",
     "//third_party/bounds_checking_function/include",
     "//drivers/hdf_core/adapter/uhdf2/shared/include",
   ]
-
-  public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
   defines = []
   if (drivers_peripheral_audio_hal_notsupport_pathselect) {
     defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
@@ -47,6 +45,7 @@ ohos_shared_library("audio_primary_impl") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_interface_audio:audio_idl_headers",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",

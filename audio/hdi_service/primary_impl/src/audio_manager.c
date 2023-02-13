@@ -526,30 +526,33 @@ int32_t AudioManagerUnloadAdapter(struct IAudioManager *manager, const char *ada
     return AUDIO_SUCCESS;
 }
 
-int32_t ReleaseAudioManagerObject(struct IAudioManager *object)
+int32_t ReleaseAudioManagerObject(struct IAudioManager *manager)
 {
-    if (!ReleaseAudioManagerObjectComm(object)) {
-        AUDIO_FUNC_LOGE("AudioManager release object failed!");
-        return AUDIO_ERR_INVALID_PARAM;
+    if (ReleaseAudioManagerObjectComm(manager)) {
+        OsalMemFree(manager);
+        manager = NULL;
     }
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioManagerConstructFun(struct IAudioManager *interface)
+struct IAudioManager *AudioManagerCreateIfInstance(void)
 {
-    if (interface == NULL) {
-        AUDIO_FUNC_LOGE("Input pointer is null!");
-        return AUDIO_ERR_INVALID_PARAM;
+    AUDIO_FUNC_LOGI("audio manager create if instance");
+    struct AudioHwManager *service = (struct AudioHwManager *)OsalMemCalloc(sizeof(struct AudioHwManager));
+    if (service == NULL) {
+        AUDIO_FUNC_LOGE("OsalMemCalloc service failed!");
+        return NULL;
     }
-    interface->GetAllAdapters = AudioManagerGetAllAdapters;
-    interface->LoadAdapter = AudioManagerLoadAdapter;
-    interface->UnloadAdapter = AudioManagerUnloadAdapter;
-    interface->ReleaseAudioManagerObject = ReleaseAudioManagerObject;
 
-    return AUDIO_SUCCESS;
+    service->interface.GetAllAdapters = AudioManagerGetAllAdapters;
+    service->interface.LoadAdapter = AudioManagerLoadAdapter;
+    service->interface.UnloadAdapter = AudioManagerUnloadAdapter;
+    service->interface.ReleaseAudioManagerObject = ReleaseAudioManagerObject;
+
+    return &(service->interface);
 }
 
-int32_t AudioManagerDestructFun(struct IAudioManager *interface)
+int32_t AudioManagerDestroyIfInstance(struct IAudioManager *manager)
 {
-    return ReleaseAudioManagerObject(interface);
+    return ReleaseAudioManagerObject(manager);
 }
