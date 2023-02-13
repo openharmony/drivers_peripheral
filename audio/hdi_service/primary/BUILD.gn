@@ -30,7 +30,10 @@ ohos_shared_library("audio_primary_driver") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  deps = [ "//drivers/interface/audio/v1_0:libaudio_stub_1.0" ]
+  deps = [
+    "//drivers/interface/audio/v1_0:libaudio_stub_1.0",
+    "//third_party/bounds_checking_function:libsec_shared",
+  ]
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
