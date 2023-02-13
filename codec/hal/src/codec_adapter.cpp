@@ -43,7 +43,7 @@ int32_t OMXAdapterCreateComponent(struct CodecComponentNode **codecNode, char *c
         HDF_LOGE("%{public}s create CodecComponentNode error", __func__);
         return HDF_ERR_MALLOC_FAIL;
     }
-    tempNode->node = std::make_shared<ComponentNode>(callbacks, appData);
+    tempNode->node = std::make_shared<ComponentNode>(callbacks, appData, compName);
     auto err = g_mgr.CreateComponentInstance(compName, &ComponentNode::callbacks_, tempNode->node.get(), &comp);
     if (err != OMX_ErrorNone) {
         HDF_LOGE("%{public}s create component instance err[%{public}d]", __func__, err);
@@ -316,11 +316,11 @@ int32_t OmxAdapterWriteDumperData(char *info, uint32_t size, uint32_t compId, st
         HDF_LOGE("%{public}s: OmxAdapterWriteDumperData error!", __func__);
         return HDF_FAILURE;
     }
-    std::string dump = "compId = ";
-    dump.append(std::to_string(compId));
-    dump.append(", state = ").append(std::to_string(state));
+    std::string dump = "compName = ";
     if (codecNode->node != nullptr) {
-        dump.append(", bufferCount = ").append(std::to_string(codecNode->node->getBufferCount()));
+        dump.append(codecNode->node->GetCompName()).append(", compId = ").append(std::to_string(compId))
+            .append(", state = ").append(std::to_string(state)).append(", bufferCount = ")
+            .append(std::to_string(codecNode->node->GetBufferCount()));
     }
     dump.append("\n");
     errno_t error = strncpy_s(info, size, dump.c_str(), dump.length());

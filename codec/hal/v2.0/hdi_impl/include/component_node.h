@@ -21,6 +21,7 @@
 #include <memory>
 #include <nocopyable.h>
 #include <osal_mem.h>
+#include <string>
 
 #include "icodec_buffer.h"
 #include "codec_callback_if.h"
@@ -31,7 +32,7 @@ namespace Codec {
 namespace Omx {
 class ComponentNode : NoCopyable {
 public:
-    ComponentNode(struct CodecCallbackType *callback, int64_t appData);
+    ComponentNode(struct CodecCallbackType *callback, int64_t appData, const std::string &compName);
 
     ~ComponentNode() override;
 
@@ -89,10 +90,16 @@ public:
         return comp_;
     }
 
-    uint32_t getBufferCount()
+    uint32_t GetBufferCount()
     {
         return codecBufferMap_.size();
     }
+
+    std::string GetCompName()
+    {
+        return name_;
+    }
+
 public:
     static OMX_CALLBACKTYPE callbacks_;  // callbacks
 
@@ -114,6 +121,7 @@ private:
     std::map<uint32_t, sptr<ICodecBuffer>> codecBufferMap_;       // Key is buffferID
     std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderMap_;  // Key is omx buffer header type
     uint32_t bufferIdCount_;
+    std::string name_;
 };
 }  // namespace Omx
 }  // namespace Codec
