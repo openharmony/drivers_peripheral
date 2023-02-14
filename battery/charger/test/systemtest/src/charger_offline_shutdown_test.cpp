@@ -25,7 +25,7 @@
 
 using namespace testing::ext;
 using namespace OHOS::HDI::Battery;
-using namespace OHOS::HDI::Battery::V1_1;
+using namespace OHOS::HDI::Battery::V1_2;
 using namespace std;
 
 namespace ChargerOfflineShutdownTest {
