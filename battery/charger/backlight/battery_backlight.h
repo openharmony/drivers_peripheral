@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 class BatteryBacklight {
 public:
     enum ScreenState {
@@ -38,7 +38,7 @@ private:
     DeviceFuncs* displayDevice_ = nullptr;
     enum ScreenState screenState_ = SCREEN_OFF;
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS

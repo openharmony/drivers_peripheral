@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 constexpr int32_t MAX_SYSFS_SIZE = 64;
 constexpr int32_t MAX_BUFF_SIZE = 128;
@@ -162,6 +162,28 @@ int32_t PowerSupplyProvider::ChargeStateEnumConverter(const char* str)
     }
 
     return CHARGE_STATE_RESERVED;
+}
+
+int32_t PowerSupplyProvider::ChargeTypeEumConverter(const char* str)
+{
+    struct StringEnumMap chargeTypeEnumMap[] = {
+        { "0", CHARGE_TYPE_NONE },
+        { "1", CHARGE_TYPE_WIRED_NORMAL },
+        { "2", CHARGE_TYPE_WIRED_QUICK },
+        { "3", CHARGE_TYPE_WIRED_SUPER_QUICK },
+        { "4", CHARGE_TYPE_WIRELESS_NORMAL },
+        { "5", CHARGE_TYPE_WIRELESS_QUICK },
+        { "6", CHARGE_TYPE_WIRELESS_SUPER_QUICK },
+        { nullptr, CHARGE_TYPE_NONE },
+    };
+
+    for (int32_t i = 0; chargeTypeEnumMap[i].str; ++i) {
+        if (strcmp(str, chargeTypeEnumMap[i].str) == 0) {
+            return chargeTypeEnumMap[i].enumVal;
+        }
+    }
+
+    return CHARGE_TYPE_NONE;
 }
 
 inline void PowerSupplyProvider::ChargeStateAssigner(const char* str, struct BatterydInfo* info)
@@ -516,6 +538,7 @@ void PowerSupplyProvider::InitBatteryPath()
         }
         InitDefaultSysfs();
     }
+    InitChargerSysfs();
 }
 
 int32_t PowerSupplyProvider::InitPowerSupplySysfs()
@@ -557,6 +580,27 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs()
     closedir(dir);
 
     return HDF_SUCCESS;
+}
+
+void PowerSupplyProvider::InitChargerSysfs()
+{
+    auto& batteryConfig = BatteryConfig::GetInstance();
+    batteryConfig.ParseConfig();
+    std::string mockCurrentLimitPath = batteryConfig.GetString("charger.current_limit.path");
+    std::string mockVoltageLimitPath = batteryConfig.GetString("charger.voltage_limit.path");
+    std::string mockChargeTypePath = batteryConfig.GetString("charger.type.path");
+
+    if (access(mockCurrentLimitPath.c_str(), 0) == -1) {
+        CreateFile(mockCurrentLimitPath, "0");
+    }
+
+    if (access(mockVoltageLimitPath.c_str(), 0) == -1) {
+        CreateFile(mockVoltageLimitPath, "0");
+    }
+
+    if (access(mockChargeTypePath.c_str(), 0) == -1) {
+        CreateFile(mockChargeTypePath, "0");
+    }
 }
 
 void PowerSupplyProvider::TraversalNode()
@@ -826,6 +870,19 @@ int32_t PowerSupplyProvider::ParseTechnology(std::string& technology) const
     return HDF_SUCCESS;
 }
 
+int32_t PowerSupplyProvider::ParseChargeType(int32_t* chargeType, std::string& chargeTypePath) const
+{
+    char buf[MAX_BUFF_SIZE] = {0};
+    int32_t ret = ReadBatterySysfsToBuff(chargeTypePath.c_str(), buf, sizeof(buf));
+    if (ret != HDF_SUCCESS) {
+        return ret;
+    }
+
+    Trim(buf);
+    *chargeType = ChargeTypeEumConverter(buf);
+    return HDF_SUCCESS;
+}
+
 BatterydInfo PowerSupplyProvider::GetBatteryInfo() const
 {
     UpdateInfoByReadSysFile(&g_batteryInfo);
@@ -854,7 +911,6 @@ void PowerSupplyProvider::CreateMockChargerPath(std::string& mockChargerPath)
     CreateFile(mockChargerPath + "/health", "Good");
     CreateFile(mockChargerPath + "/online", "1");
     CreateFile(mockChargerPath + "/status", "Charging");
-    CreateFile(mockChargerPath + "/type", "USB");
 }
 
 void PowerSupplyProvider::CreateMockBatteryPath(std::string& mockBatteryPath)
@@ -942,7 +998,7 @@ int32_t PowerSupplyProvider::WriteChargingLimit(std::string chargingLimitPath, s
     BATTERY_HILOGI(FEATURE_BATT_INFO, "Exit");
     return HDF_SUCCESS;
 }
-}  // namespace V1_1
+}  // namespace V1_2
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

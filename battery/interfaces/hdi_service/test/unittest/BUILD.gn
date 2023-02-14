@@ -72,7 +72,7 @@ ohos_unittest("test_hdisrv") {
 
   deps = [
     "//base/update/updater/services/ui:libui",
-    "//drivers/interface/battery/v1_1:libbattery_stub_1.1",
+    "//drivers/interface/battery/v1_2:libbattery_stub_1.2",
     "//drivers/peripheral/display/hal:hdi_display_device",
     "//foundation/graphic/ui/ext/updater:libupdater_layout",
     "//third_party/cJSON:cjson",
@@ -106,7 +106,7 @@ ohos_unittest("test_capacity_shutdown") {
 
   deps = [
     "//base/update/updater/services/ui:libui",
-    "//drivers/interface/battery/v1_1:libbattery_stub_1.1",
+    "//drivers/interface/battery/v1_2:libbattery_stub_1.2",
     "//drivers/peripheral/display/hal:hdi_display_device",
     "//foundation/graphic/ui/ext/updater:libupdater_layout",
     "//third_party/cJSON:cjson",
@@ -138,7 +138,7 @@ ohos_unittest("hdi_unittest_battery") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
-      "drivers_interface_battery:libbattery_proxy_1.1",
+      "drivers_interface_battery:libbattery_proxy_1.2",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
