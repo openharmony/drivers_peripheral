@@ -93,7 +93,7 @@ sptr<OHOS::IBufferProducer> StreamCustomer::CreateProducer()
         return nullptr;
     }
 
-    CAMERA_LOGI("demo test, create a buffer queue producer %{public}p", producer.GetRefPtr());
+    CAMERA_LOGI("demo test, create a buffer queue producer");
     return producer;
 #endif
 }

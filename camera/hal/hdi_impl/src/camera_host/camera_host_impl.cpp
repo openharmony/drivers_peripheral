@@ -37,12 +37,12 @@ extern "C" ICameraHost *CameraHostImplGetInstance(void)
 
 CameraHostImpl::CameraHostImpl()
 {
-    CAMERA_LOGD("ctor, instance = %{public}p", this);
+    CAMERA_LOGD("ctor, instance");
 }
 
 CameraHostImpl::~CameraHostImpl()
 {
-    CAMERA_LOGD("dtor, instance = %{public}p", this);
+    CAMERA_LOGD("dtor, instance");
 }
 
 CamRetCode CameraHostImpl::Init()

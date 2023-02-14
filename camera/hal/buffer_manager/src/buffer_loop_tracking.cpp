@@ -94,7 +94,6 @@ TrackingStream::~TrackingStream()
     {
         std::lock_guard<std::mutex> l(lock_);
         trackingNodeList_.clear();
-        CAMERA_LOGD("dtor TrackingStream %{public}p", this);
     }
 }
 

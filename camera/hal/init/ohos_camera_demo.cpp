@@ -344,7 +344,7 @@ void OhosCameraDemo::StoreImage(const void *bufStart, const uint32_t size) const
         return;
     }
 
-    CAMERA_LOGD("demo test:StoreImage %{public}s buf_start == %{public}p size == %{public}d\n", path, bufStart, size);
+    CAMERA_LOGD("demo test:StoreImage %{public}s size == %{public}d\n", path, size);
 
     ret = write(imgFD, bufStart, size);
     if (ret == -1) {
@@ -362,7 +362,7 @@ void OhosCameraDemo::StoreVideo(const void *bufStart, const uint32_t size) const
     if (ret == -1) {
         CAMERA_LOGE("demo test:write video file error %{public}s.....\n", strerror(errno));
     }
-    CAMERA_LOGD("demo test:StoreVideo buf_start == %{public}p size == %{public}d\n", bufStart, size);
+    CAMERA_LOGD("demo test:StoreVideo size == %{public}d\n", size);
 }
 
 void OhosCameraDemo::OpenVideoFile()
