@@ -151,7 +151,7 @@ int32_t CodecShareBuffer::EmptyOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
 int32_t CodecShareBuffer::FillOmxBufferDone(OMX_BUFFERHEADERTYPE &omxBuffer)
 {
     if (shMem_ == nullptr || !shMem_->WriteToAshmem(omxBuffer.pBuffer, omxBuffer.nFilledLen, omxBuffer.nOffset)) {
-        CODEC_LOGE("write to ashmem[%{public}p] fail", shMem_.get());
+        CODEC_LOGE("write to ashmem fail");
         return HDF_ERR_INVALID_PARAM;
     }
 
