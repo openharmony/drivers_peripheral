@@ -574,7 +574,7 @@ static bool AudioRouteNodeBlockMarshalling(struct HdfSBuf *data, const struct Au
     return true;
 }
 
-bool AudioRouteBlockMarshalling(struct HdfSBuf *data, const struct AudioRoute *dataBlock)
+bool HdiAudioRouteBlockMarshalling(struct HdfSBuf *data, const struct AudioRoute *dataBlock)
 {
     if (data == NULL || dataBlock == NULL) {
         HDF_LOGE("%{public}s: invalid sbuf or data block", __func__);
@@ -652,7 +652,7 @@ static bool AudioPortBlockUnmarshalling(struct HdfSBuf *data, struct AudioPort *
     return true;
 }
 
-bool AudioAdapterDescriptorBlockUnmarshalling(struct HdfSBuf *data, struct AudioAdapterDescriptor *dataBlock)
+bool HdiAudioAdapterDescriptorBlockUnmarshalling(struct HdfSBuf *data, struct AudioAdapterDescriptor *dataBlock)
 {
     if (data == NULL) {
         HDF_LOGE("%{public}s: invalid sbuf", __func__);
@@ -770,7 +770,7 @@ static bool AudioSubPortCapabilityBlockUnmarshalling(struct HdfSBuf *data, struc
     return true;
 }
 
-bool AudioPortCapabilityBlockUnmarshalling(struct HdfSBuf *data, struct AudioPortCapability *dataBlock)
+bool HdiAudioPortCapabilityBlockUnmarshalling(struct HdfSBuf *data, struct AudioPortCapability *dataBlock)
 {
     if (data == NULL || dataBlock == NULL) {
         HDF_LOGE("%{public}s: invalid sbuf or dataBlock", __func__);

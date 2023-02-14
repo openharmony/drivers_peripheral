@@ -84,7 +84,7 @@ static int32_t AudioProxySendGetAllAdapter(struct HdfRemoteService *remoteHandle
     }
 
     for (uint32_t i = 0; i < *size; i++) {
-        if (!AudioAdapterDescriptorBlockUnmarshalling(reply, &(*descs)[i])) {
+        if (!HdiAudioAdapterDescriptorBlockUnmarshalling(reply, &(*descs)[i])) {
             AudioAdapterDescriptorFreeArray(descs, size);
             AudioProxyBufReplyRecycle(data, reply);
             HDF_LOGE("read descs[%{public}d] failed!", i);
