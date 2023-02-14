@@ -819,7 +819,7 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *
     bool flag = HdfSbufReadBuffer(data, (const void **)(&infoTable), &infoSize);
     if (!flag || infoTable == nullptr) {
         HDF_LOGE(
-            "%{public}s: HdfSbufReadBuffer failed, flag=%{public}d, infoTable=%{public}p", __func__, flag, infoTable);
+            "%{public}s: HdfSbufReadBuffer failed, flag=%{public}d", __func__, flag);
         return HDF_ERR_INVALID_PARAM;
     }
 
