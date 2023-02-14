@@ -474,7 +474,7 @@ sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *bu
 
     auto iterHead = bufferHeaderMap_.find(buffer);
     if (iterHead == bufferHeaderMap_.end()) {
-        CODEC_LOGE("Can not find bufferID by pHeaderType = 0x%{public}p", buffer);
+        CODEC_LOGE("Can not find bufferID");
         return nullptr;
     }
 

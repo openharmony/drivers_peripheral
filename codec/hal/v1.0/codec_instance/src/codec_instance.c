@@ -475,7 +475,7 @@ bool CopyCodecBufferWithTypeSwitch(struct CodecInstance *instance, CodecBuffer *
     const CodecBuffer *src, bool ignoreBuf)
 {
     if (dst == NULL || src == NULL) {
-        HDF_LOGE("%{public}s: Nullpoint, dst: %{public}p, src: %{public}p", __func__, dst, src);
+        HDF_LOGE("%{public}s: dst or src is Nullpoint", __func__);
         return false;
     }
     if (dst->bufferCnt != src->bufferCnt) {
