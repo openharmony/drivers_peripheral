@@ -83,7 +83,7 @@ void TestDisplay::StoreImage(const unsigned char *bufStart, const uint32_t size)
         return;
     }
 
-    CAMERA_LOGD("demo test:StoreImage %{public}s buf_start == %{public}p size == %{public}d\n", path, bufStart, size);
+    CAMERA_LOGD("demo test:StoreImage %{public}s size == %{public}d\n", path, size);
 
     ret = write(imgFD, bufStart, size);
     if (ret == -1) {
@@ -101,7 +101,7 @@ void TestDisplay::StoreVideo(const unsigned char *bufStart, const uint32_t size)
     if (ret == -1) {
         CAMERA_LOGE("demo test:write video file error %{public}s.....\n", strerror(errno));
     }
-    CAMERA_LOGD("demo test:StoreVideo buf_start == %{public}p size == %{public}d\n", bufStart, size);
+    CAMERA_LOGD("demo test:StoreVideo size == %{public}d\n", size);
 }
 
 void TestDisplay::OpenVideoFile()
@@ -209,7 +209,7 @@ int TestDisplay::DoFbMunmap(unsigned char* addr)
 {
     int ret;
     unsigned int size = vinfo_.xres * vinfo_.yres * vinfo_.bits_per_pixel / 8; // 8:picture size;
-    CAMERA_LOGI("main test:munmapped size = %d, virt_addr = 0x%p\n", size, addr);
+    CAMERA_LOGI("main test:munmapped size = %d\n", size);
     ret = (munmap(addr, finfo_.smem_len));
     return ret;
 }
@@ -223,7 +223,7 @@ unsigned char* TestDisplay::DoFbMmap(int* pmemfd)
         CAMERA_LOGE("main test:do_mmap: pmem mmap() failed: %s (%d)\n", strerror(errno), errno);
         return nullptr;
     }
-    CAMERA_LOGI("main test:do_mmap: pmem mmap fd %d ptr %p len %u\n", *pmemfd, ret, screensize);
+    CAMERA_LOGI("main test:do_mmap: pmem mmap fd %d len %u\n", *pmemfd, screensize);
     return ret;
 }
 

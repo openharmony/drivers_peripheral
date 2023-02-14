@@ -19,12 +19,12 @@
 namespace OHOS::Camera {
 OfflineStreamOperator::OfflineStreamOperator()
 {
-    CAMERA_LOGV("ctor, instance = %{public}p", this);
+    CAMERA_LOGV("ctor, instance");
 }
 
 OfflineStreamOperator::~OfflineStreamOperator()
 {
-    CAMERA_LOGV("dtor, instance = %{public}p", this);
+    CAMERA_LOGV("dtor, instance");
     offlineStreamMap_.clear();
 }
 

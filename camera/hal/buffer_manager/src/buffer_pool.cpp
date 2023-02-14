@@ -22,7 +22,7 @@
 namespace OHOS::Camera {
 BufferPool::BufferPool()
 {
-    CAMERA_LOGI("BufferPool construct, instance = %{public}p", this);
+    CAMERA_LOGI("BufferPool construct");
 }
 
 BufferPool::~BufferPool()

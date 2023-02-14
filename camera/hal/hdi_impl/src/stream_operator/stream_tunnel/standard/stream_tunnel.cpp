@@ -184,7 +184,7 @@ void StreamTunnel::WaitForAllBufferReturned()
     std::unique_lock<std::mutex> l(finishLock_);
     auto timeout = std::chrono::system_clock::now() + std::chrono::microseconds(1000 * 200); // 200ms
     if (!finishCV_.wait_until(l, timeout, [this] {
-            CAMERA_LOGD("%{public}p restBuffers=%{public}u", this, restBuffers.load(std::memory_order_acquire));
+            CAMERA_LOGD("restBuffers=%{public}u", restBuffers.load(std::memory_order_acquire));
             return restBuffers.load(std::memory_order_acquire) == 0;
         })) {
         CAMERA_LOGW(
