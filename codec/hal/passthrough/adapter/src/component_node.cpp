@@ -498,7 +498,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
 int32_t ComponentNode::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ = %{public}p", __func__, comp_);
+        HDF_LOGE("%{public}s comp_ is nullptr", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     HDF_LOGW("%{public}s is not support!", __func__);
@@ -508,7 +508,7 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buff
 int32_t ComponentNode::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ = %{public}p", __func__, comp_);
+        HDF_LOGE("%{public}s comp_ is nullptr", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (buffer.bufferId >= bufferId_) {
@@ -535,7 +535,7 @@ int32_t ComponentNode::EmptyThisBuffer(const OmxCodecBuffer &buffer)
 int32_t ComponentNode::FillThisBuffer(const OmxCodecBuffer &buffer)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ = %{public}p", __func__, comp_);
+        HDF_LOGE("%{public}s comp_ is nullptr", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     if (buffer.bufferId >= bufferId_) {

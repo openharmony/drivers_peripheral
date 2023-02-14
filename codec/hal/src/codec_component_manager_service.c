@@ -117,7 +117,7 @@ static int32_t OmxManagerCreateComponent(struct CodecComponentType **component, 
 
     node->componentId = *componentId;
     node->service = comp;
-    HDF_LOGI("%{public}s: comp is %{public}p, componentId:%{public}d", __func__, comp, node->componentId);
+    HDF_LOGI("%{public}s: componentId:%{public}d", __func__, node->componentId);
     return err;
 }
 

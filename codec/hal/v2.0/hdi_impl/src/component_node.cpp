@@ -372,7 +372,7 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer 
 int32_t ComponentNode::FreeBuffer(uint32_t portIndex, struct OmxCodecBuffer &buffer)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ = %{public}p", __func__, comp_);
+        HDF_LOGE("%{public}s comp_ is nullptr", __func__);
         return OMX_ErrorInvalidComponent;
     }
 
@@ -411,7 +411,7 @@ int32_t ComponentNode::FreeBuffer(uint32_t portIndex, struct OmxCodecBuffer &buf
 int32_t ComponentNode::EmptyThisBuffer(struct OmxCodecBuffer &buffer)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ = %{public}p", __func__, comp_);
+        HDF_LOGE("%{public}s comp_ is nullptr", __func__);
         return OMX_ErrorInvalidComponent;
     }
     int32_t err = OMX_ErrorBadParameter;
@@ -434,7 +434,7 @@ int32_t ComponentNode::EmptyThisBuffer(struct OmxCodecBuffer &buffer)
 int32_t ComponentNode::FillThisBuffer(struct OmxCodecBuffer &buffer)
 {
     if (comp_ == nullptr) {
-        HDF_LOGE("%{public}s error, comp_ = %{public}p", __func__, comp_);
+        HDF_LOGE("%{public}s comp_ is nullptr", __func__);
         return OMX_ErrorInvalidComponent;
     }
     int32_t err = OMX_ErrorBadParameter;
@@ -476,7 +476,7 @@ sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *bu
 
     auto iterHead = bufferHeaderMap_.find(buffer);
     if (iterHead == bufferHeaderMap_.end()) {
-        HDF_LOGE("%{public}s can not find bufferID by pHeaderType = 0x%{public}p", __func__, buffer);
+        HDF_LOGE("%{public}s can not find bufferID", __func__);
         return nullptr;
     }
 

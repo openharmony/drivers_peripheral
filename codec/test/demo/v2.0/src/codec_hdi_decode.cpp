@@ -432,7 +432,7 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
         omxBuffer->bufferType = CODEC_BUFFER_TYPE_HANDLE;
         BufferHandle *bufferHandle = nullptr;
         ret = gralloc_->AllocMem(alloc, bufferHandle);
-        HDF_LOGI("%{public}s AlloceMem ret val err[%{public}d], buffer [%{public}p]", __func__, ret, bufferHandle);
+        HDF_LOGI("%{public}s AlloceMem ret val err[%{public}d]", __func__, ret);
         if (DISPLAY_SUCCESS != ret) {
             HDF_LOGE("%{public}s AllocMem error", __func__);
             return ret;
