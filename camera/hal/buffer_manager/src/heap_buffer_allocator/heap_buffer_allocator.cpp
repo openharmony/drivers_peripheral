@@ -19,7 +19,7 @@
 namespace OHOS::Camera {
 HeapBufferAllocator::HeapBufferAllocator()
 {
-    CAMERA_LOGD("buffer allocator construct, instance = %{public}p", this);
+    CAMERA_LOGD("buffer allocator construct");
 }
 
 HeapBufferAllocator::~HeapBufferAllocator() {}
