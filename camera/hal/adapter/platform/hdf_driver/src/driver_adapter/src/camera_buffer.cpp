@@ -248,9 +248,7 @@ RetCode CameraBuffer::CameraStreamDequeue(struct CameraFeature feature)
         return RC_ERROR;
     }
 
-    CAMERA_LOGD("bufferMap[id]->buffer_->GetVirAddress() = %{public}p, "
-        "mmapArray_[id] = %{public}p, lengthArray_[id] = %{public}u\n",
-        bufferMap[id]->buffer_->GetVirAddress(), mmapArray_[id], lengthArray_[id]);
+    CAMERA_LOGD("lengthArray_[id] = %{public}u\n", lengthArray_[id]);
 
     memcpy_s(bufferMap[id]->buffer_->GetVirAddress(), lengthArray_[id], mmapArray_[id], lengthArray_[id]);
     dequeueBuffer_(bufferMap[id]);

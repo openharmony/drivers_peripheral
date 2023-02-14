@@ -490,7 +490,6 @@ void MpiDeviceManager::SetSendflag(bool flag)
 
 void MpiDeviceManager::BufferCallback(std::shared_ptr<FrameSpec> buffer)
 {
-    CAMERA_LOGE("MpiDeviceManager::BufferCallback %{public}p enter", &nodeBufferCb_);
     nodeBufferCb_(buffer);
 
     const int ENTRY_CAPACITY = 30;

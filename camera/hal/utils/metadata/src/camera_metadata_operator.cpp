@@ -242,8 +242,8 @@ int AddCameraMetadataItem(common_metadata_header_t *dst, uint32_t item, const vo
     }
 
     if (dataCount && data == nullptr) {
-        METADATA_ERR_LOG("AddCameraMetadataItem data is not valid. dataCount: %{public}zu, data: %{public}p",
-                         dataCount, data);
+        METADATA_ERR_LOG("AddCameraMetadataItem data is not valid. dataCount: %{public}zu",
+                         dataCount);
         return CAM_META_INVALID_PARAM;
     }
 
