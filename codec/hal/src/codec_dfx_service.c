@@ -52,6 +52,7 @@ int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
                     return HDF_FAILURE;
                 }
                 HdfSbufWriteString(reply, dump);
+                HdfSbufWriteString(reply, "------------------------------------------------------------------------");
             }
         }
         HDF_LOGI("%{public}s: codec hidumper success!", __func__);

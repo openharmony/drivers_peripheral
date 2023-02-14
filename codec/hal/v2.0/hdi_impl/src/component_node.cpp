@@ -64,7 +64,7 @@ OMX_ERRORTYPE ComponentNode::OnFillBufferDone(OMX_HANDLETYPE component, void *ap
 OMX_CALLBACKTYPE ComponentNode::callbacks_ = {&ComponentNode::OnEvent, &ComponentNode::OnEmptyBufferDone,
                                               &ComponentNode::OnFillBufferDone};
 
-ComponentNode::ComponentNode(struct CodecCallbackType *callback, int64_t appData)
+ComponentNode::ComponentNode(struct CodecCallbackType *callback, int64_t appData, const std::string &compName)
 {
     appData_ = appData;
     comp_ = nullptr;
@@ -72,6 +72,7 @@ ComponentNode::ComponentNode(struct CodecCallbackType *callback, int64_t appData
     bufferHeaderMap_.clear();
     omxCallback_ = callback;
     bufferIdCount_ = 0;
+    name_ = compName;
 }
 
 ComponentNode::~ComponentNode()
@@ -83,6 +84,7 @@ ComponentNode::~ComponentNode()
     codecBufferMap_.clear();
     bufferHeaderMap_.clear();
     bufferIdCount_ = 0;
+    name_ = "";
 }
 
 int32_t ComponentNode::GetComponentVersion(struct CompVerInfo &verInfo)
