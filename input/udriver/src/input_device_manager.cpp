@@ -173,7 +173,7 @@ RetStatus InputDeviceManager::CloseInputDevice(string devPath)
             if (fd > 0) {
                 RemoveEpoll(mEpollId_, fd);
                 close(fd);
-                fd = -1;
+                inputDev.second.fd = -1;
                 inputDev.second.status = INPUT_DEVICE_STATUS_CLOSED;
                 return INPUT_SUCCESS;
             }
