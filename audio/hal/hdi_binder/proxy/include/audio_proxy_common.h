@@ -48,10 +48,10 @@ int32_t AudioProxyRenderAddEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioProxyRenderRemoveEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioProxyCaptureAddEffect(AudioHandle handle, uint64_t effectid);
 int32_t AudioProxyCaptureRemoveEffect(AudioHandle handle, uint64_t effectid);
-bool AudioRouteBlockMarshalling(struct HdfSBuf *data, const struct AudioRoute *dataBlock);
-bool AudioAdapterDescriptorBlockUnmarshalling(struct HdfSBuf *data, struct AudioAdapterDescriptor *dataBlock);
+bool HdiAudioRouteBlockMarshalling(struct HdfSBuf *data, const struct AudioRoute *dataBlock);
+bool HdiAudioAdapterDescriptorBlockUnmarshalling(struct HdfSBuf *data, struct AudioAdapterDescriptor *dataBlock);
 void AudioAdapterDescriptorFreeArray(struct AudioAdapterDescriptor **dataBlock, uint32_t *size);
-bool AudioPortCapabilityBlockUnmarshalling(struct HdfSBuf *data, struct AudioPortCapability *dataBlock);
+bool HdiAudioPortCapabilityBlockUnmarshalling(struct HdfSBuf *data, struct AudioPortCapability *dataBlock);
 #ifdef __cplusplus
 }
 #endif

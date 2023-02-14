@@ -637,8 +637,8 @@ int32_t AudioProxyAdapterGetPortCapability(struct AudioAdapter *adapter,
         goto ERROR;
     }
 
-    if (!AudioPortCapabilityBlockUnmarshalling(reply, &hwAdapter->portCapabilitys->capability)) {
-        AUDIO_FUNC_LOGE("AudioPortCapabilityBlockUnmarshalling failed");
+    if (!HdiAudioPortCapabilityBlockUnmarshalling(reply, &hwAdapter->portCapabilitys->capability)) {
+        AUDIO_FUNC_LOGE("HdiAudioPortCapabilityBlockUnmarshalling failed");
         goto ERROR;
     }
 
@@ -1058,7 +1058,7 @@ int32_t AudioProxyAdapterUpdateAudioRoute(struct AudioAdapter *adapter,
         goto FINISHED;
     }
 
-    if (!AudioRouteBlockMarshalling(audioAdapterData, route)) {
+    if (!HdiAudioRouteBlockMarshalling(audioAdapterData, route)) {
         HDF_LOGE("%{public}s: write route failed!", __func__);
         audioAdapterRet = HDF_ERR_INVALID_PARAM;
         goto FINISHED;
