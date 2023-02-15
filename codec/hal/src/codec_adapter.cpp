@@ -64,12 +64,14 @@ int32_t OmxAdapterDestroyComponent(struct CodecComponentNode *codecNode)
         HDF_LOGE("%{public}s codecNode is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    auto err = g_mgr.DeleteComponentInstance(static_cast<OMX_COMPONENTTYPE*>(codecNode->node->GetHandle()));
+    OMX_HANDLETYPE comp = codecNode->node->GetHandle();
+    codecNode->node = nullptr;
+    auto err = g_mgr.DeleteComponentInstance(static_cast<OMX_COMPONENTTYPE*>(comp));
     if (err != OMX_ErrorNone) {
         HDF_LOGE("%{public}s DeleteComponentInstance err[%{public}d]", __func__, err);
         return err;
     }
-    codecNode->node = nullptr;
+
     delete codecNode;
     codecNode = nullptr;
 #ifdef CONFIG_USE_JEMALLOC_DFX_INTF
