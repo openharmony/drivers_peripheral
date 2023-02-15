@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 class BatteryVibrate {
 public:
     bool InitVibration();
@@ -34,7 +34,7 @@ private:
     static void SetDuration(int32_t time);
     int32_t vibrateMode_ = -1;
 };
-}  // namespace V1_1
+}  // namespace V1_2
 }  // namespace Battery
 }  // namespace HDI
 }  // namespace OHOS

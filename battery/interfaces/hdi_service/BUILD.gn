@@ -13,7 +13,7 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libbattery_interface_service_1.1") {
+ohos_shared_library("libbattery_interface_service_1.2") {
   include_dirs = [
     "include",
     "../include",
@@ -61,7 +61,7 @@ ohos_shared_library("libbattery_driver") {
   sources = [ "src/battery_interface_driver.cpp" ]
 
   deps = [
-    "//drivers/interface/battery/v1_1:libbattery_stub_1.1",
+    "//drivers/interface/battery/v1_2:libbattery_stub_1.2",
     "//third_party/jsoncpp:jsoncpp",
   ]
 
@@ -90,6 +90,6 @@ ohos_shared_library("libbattery_driver") {
 group("hdf_battery") {
   deps = [
     ":libbattery_driver",
-    ":libbattery_interface_service_1.1",
+    ":libbattery_interface_service_1.2",
   ]
 }

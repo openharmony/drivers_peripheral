@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 constexpr const char* UI_CFG_FILE = "/vendor/etc/charger/resources/animation.json";
 constexpr const char* FONT_PATH = "/vendor/etc/charger/resources/";
@@ -150,7 +150,7 @@ void ChargerAnimation::LackPowerNotChargingPromptStop()
         notChargingPromptState_ = LACKPOWER_NOTCHARGING_PROMPT_STOP;
     }
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS
