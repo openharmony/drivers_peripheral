@@ -243,6 +243,11 @@ int32_t UserAuthInterfaceService::UpdateAuthenticationResult(uint64_t contextId,
         }
     }
     DestoryBuffer(authResult.rootSecret);
+    if (authTokenHal.authType != PIN_AUTH) {
+        IAM_LOGI("type not pin");
+        return RESULT_SUCCESS;
+    }
+    IAM_LOGI("type pin");
     return CreateExecutorCommand(info);
 }
 
