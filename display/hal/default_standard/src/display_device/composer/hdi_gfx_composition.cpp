@@ -122,8 +122,8 @@ void HdiGfxComposition::InitGfxSurface(ISurface &surface, HdiLayerBuffer &buffer
     surface.bAlphaMax255 = true;
     surface.alpha0 = 0XFF;
     surface.alpha1 = 0XFF;
-    DISPLAY_LOGD("surface w:%{public}d h:%{public}d addr:0x%{public}" PRIx64 " fmt:%{public}d stride:%{public}d",
-        surface.width, surface.height, surface.phyAddr, surface.enColorFmt, surface.stride);
+    DISPLAY_LOGD("surface w:%{public}d h:%{public}d fmt:%{public}d stride:%{public}d",
+        surface.width, surface.height, surface.enColorFmt, surface.stride);
 }
 
 // now not handle the alpha of layer
