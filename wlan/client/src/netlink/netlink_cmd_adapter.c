@@ -966,7 +966,8 @@ int32_t GetDevMacAddr(const char *ifName, int32_t type, uint8_t *mac, uint8_t le
         close(fd);
         return RET_CODE_FAILURE;
     }
-    struct ethtool_perm_addr *epaddr = (struct ethtool_perm_addr *)malloc(sizeof(struct ethtool_perm_addr) + ETH_ADDR_LEN);
+    struct ethtool_perm_addr *epaddr =
+        (struct ethtool_perm_addr *)malloc(sizeof(struct ethtool_perm_addr) + ETH_ADDR_LEN);
     if (epaddr == NULL) {
         HILOG_ERROR(LOG_CORE, "%s: malloc failed", __FUNCTION__);
         close(fd);
