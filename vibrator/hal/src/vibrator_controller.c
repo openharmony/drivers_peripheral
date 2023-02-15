@@ -21,6 +21,7 @@
 
 #define HDF_LOG_TAG    uhdf_vibrator_service
 #define EFFECT_SUN 64
+#define EFFECT_DURATION    2000
 #define VIBRATOR_SERVICE_NAME    "hdf_misc_vibrator"
 
 static struct VibratorDevice *GetVibratorDevicePriv(void)
@@ -259,6 +260,20 @@ static int32_t Start(const char *effect)
     return ret;
 }
 
+static int32_t GetEffectInfo(const char *effect, struct EffectInfo *effectInfo)
+{
+    if (!strcmp(effect, "haptic.clock.timer")) {
+        effectInfo->isSupportEffect = true;
+        effectInfo->duration = EFFECT_DURATION;
+    } else {
+        HDF_LOGE("%s: effect not support", __func__);
+        effectInfo->isSupportEffect = false;
+        effectInfo->duration = 0;
+    }
+
+    return HDF_SUCCESS;
+}
+
 static int32_t Stop(enum VibratorMode mode)
 {
     int32_t ret;
@@ -303,6 +318,7 @@ const struct VibratorInterface *NewVibratorInterfaceInstance(void)
     vibratorDevInstance.StartOnce = StartOnce;
     vibratorDevInstance.Stop = Stop;
     vibratorDevInstance.GetVibratorInfo = GetVibratorInfo;
+    vibratorDevInstance.GetEffectInfo = GetEffectInfo;
     vibratorDevInstance.EnableVibratorModulation = EnableVibratorModulation;
 
     priv->ioService = HdfIoServiceBind(VIBRATOR_SERVICE_NAME);
