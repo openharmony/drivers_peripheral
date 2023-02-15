@@ -161,7 +161,6 @@ int32_t FbDisplay::SetDisplayBacklight(uint32_t value)
 
 int32_t FbDisplay::RegDisplayVBlankCallback(VBlankCallback cb, void *data)
 {
-    DISPLAY_LOGD("the VBlankCallback %{public}p ", cb);
     std::shared_ptr<VsyncCallBack> vsyncCb = std::make_shared<VsyncCallBack>(cb, nullptr);
     SorftVsync::GetInstance().ReqesterVBlankCb(vsyncCb);
     return DISPLAY_SUCCESS;

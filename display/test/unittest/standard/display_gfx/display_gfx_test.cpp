@@ -96,8 +96,7 @@ static uint32_t CheckPixel(const BufferHandle &handle, int x, int y, uint32_t co
     }
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
     if (*pixel != color) {
-        DISPLAY_TEST_LOGD("the pixel color not match vAddr:%p position:%d pixel:%x color:%x", handle.virAddr, position,
-            *pixel, color);
+        DISPLAY_TEST_LOGD("the pixel color not match position:%d pixel:%x color:%x", position, *pixel, color);
         DISPLAY_TEST_LOGD("x:%d y:%d width:%d", x, y, handle.width);
     }
     return *pixel;
@@ -156,7 +155,7 @@ static BufferHandle *AllocateTestMemory(const GrallocFuncs &grallocFuncs, const 
         return nullptr;
     }
 
-    DISPLAY_TEST_LOGD(" vAddr %p buffer->size %d", vAddr, buffer->size);
+    DISPLAY_TEST_LOGD("buffer->size %d", buffer->size);
     for (int x = 0; x < buffer->width; x++) {
         for (int y = 0; y < buffer->height; y++) {
             SetPixel(*buffer, x, y, color);
@@ -187,7 +186,7 @@ static BufferHandle *AllocateRotateTestMemory(const GrallocFuncs &grallocFuncs, 
         return nullptr;
     }
 
-    DISPLAY_TEST_LOGD(" vAddr %p buffer->size %d", vAddr, buffer->size);
+    DISPLAY_TEST_LOGD("buffer->size %d", buffer->size);
     for (int x = 0; x < buffer->width; x++) {
         for (int y = 0; y < buffer->height; y++) {
             if (position_x == x && position_y == y) {

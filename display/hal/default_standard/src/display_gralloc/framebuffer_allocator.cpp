@@ -155,7 +155,6 @@ void* FramebufferAllocator::Mmap(BufferHandle &handle)
         return nullptr;
     }
     handle.virAddr = static_cast<uint8_t*>(virAddr) + handle.key;
-    DISPLAY_LOGD("virAddr %{public}p handle.virAddr %{public}p", handle.virAddr, virAddr);
 
     return handle.virAddr;
 }

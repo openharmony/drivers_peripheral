@@ -34,7 +34,6 @@ void DrmGemBuffer::Init(int drmFd, HdiLayerBuffer &hdl)
     uint32_t pitches[MAX_COUNT] = {0};
     uint32_t gemHandles[MAX_COUNT] = {0};
     uint32_t offsets[MAX_COUNT] = {0};
-    DISPLAY_LOGD("hdl %{public}" PRIx64 "", hdl.GetMemHandle());
     DISPLAY_CHK_RETURN_NOT_VALUE((drmFd < 0), DISPLAY_LOGE("can not init drmfd %{public}d", drmFd));
     mDrmFormat = DrmDevice::ConvertToDrmFormat(static_cast<PixelFormat>(hdl.GetFormat()));
     ret = drmPrimeFDToHandle(drmFd, hdl.GetFb(), &mGemHandle);
