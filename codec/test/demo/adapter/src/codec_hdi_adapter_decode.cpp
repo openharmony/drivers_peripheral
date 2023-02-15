@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -213,16 +213,6 @@ int32_t CodecHdiAdapterDecode::ConfigMppPassthrough()
         return ret;
     }
 
-    memset_s(&param, sizeof(Param), 0, sizeof(Param));
-    param.key = (ParamKey)KEY_EXT_DEFAULT_CFG_RK;
-    int32_t needDefault = 1;
-    param.val = &needDefault;
-    param.size = sizeof(int32_t);
-    ret = client_->GetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s errNo[%{public}d] key is KEY_EXT_DEFAULT_CFG_RK", __func__, ret);
-        return ret;
-    }
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
     param.key = (ParamKey)KEY_EXT_SPLIT_PARSE_RK;
 
