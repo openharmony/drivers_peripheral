@@ -141,7 +141,7 @@ int32_t VibratorInterfaceImpl::EnableCompositeEffect(const HdfCompositeEffect &e
 {
     HDF_LOGI("%{public}s: Enter the EnableCompositeEffect function.", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == nullptr || vibratorInterface->EnableVibratorModulation == nullptr) {
+    if (vibratorInterface == nullptr || vibratorInterface->EnableCompositeEffect == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
@@ -153,19 +153,28 @@ int32_t VibratorInterfaceImpl::GetEffectInfo(const std::string &effectType, HdfE
 {
     HDF_LOGI("%{public}s: Enter the GetEffectInfo function.", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == nullptr || vibratorInterface->EnableVibratorModulation == nullptr) {
+    if (vibratorInterface == nullptr || vibratorInterface->GetEffectInfo == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
 
-    return HDF_SUCCESS;
+    EffectInfo info;
+    int32_t ret = vibratorInterface->GetEffectInfo(effectType.c_str(), &info);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
+    }
+
+    effectInfo.isSupportEffect = info.isSupportEffect;
+    effectInfo.duration = info.duration;
+
+    return ret;
 }
 
 int32_t VibratorInterfaceImpl::IsVibratorRunning(bool& state)
 {
     HDF_LOGI("%{public}s: Enter the IsVibratorRunning function, state =  %{public}d\n", __func__, state);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
-    if (vibratorInterface == nullptr || vibratorInterface->EnableVibratorModulation == nullptr) {
+    if (vibratorInterface == nullptr || vibratorInterface->IsVibratorRunning == nullptr) {
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
