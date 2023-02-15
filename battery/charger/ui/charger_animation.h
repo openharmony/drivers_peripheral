@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 class ChargerAnimation {
     enum AnimationState {
         ANIMATION_STOP = 0,
@@ -55,7 +55,7 @@ private:
     enum AnimationState chargingPromptState_ = LACKPOWER_CHARGING_PROMPT_STOP;
     enum AnimationState notChargingPromptState_ = LACKPOWER_NOTCHARGING_PROMPT_STOP;
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS

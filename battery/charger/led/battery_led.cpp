@@ -22,7 +22,7 @@ using namespace std;
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 constexpr uint32_t MOVE_RIGHT_16 = 16;
 constexpr uint32_t MOVE_RIGHT_8 = 8;
@@ -109,7 +109,7 @@ uint32_t BatteryLed::GetLightColor() const
 {
     return lightColor_;
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS

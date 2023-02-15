@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 constexpr int32_t SEC_TO_MSEC = 1000;
 constexpr int32_t NSEC_TO_MSEC = 1000000;
@@ -440,7 +440,7 @@ void ChargerThread::Run(void* service)
     Init();
     std::make_unique<std::thread>(&ChargerThread::LoopingThreadEntry, this, service)->join();
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS
