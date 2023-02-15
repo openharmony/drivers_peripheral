@@ -23,7 +23,7 @@ using namespace testing::ext;
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 constexpr const char* VENDOR_BATTERY_CONFIG_PATH = "/vendor/etc/battery/battery_config.json";
 BatteryLed g_led;
@@ -136,7 +136,7 @@ HWTEST_F (BatteryLedTest, BatteryLight005, TestSize.Level1)
     GTEST_LOG_(INFO) << "actual:" << g_led.GetLightColor() << "=expect:" << BatterySysTest::GREEN_LIGHT;
     ASSERT_EQ(g_led.GetLightColor(), BatterySysTest::GREEN_LIGHT);
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS

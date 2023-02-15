@@ -21,13 +21,13 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 class BatteryLedTest : public testing::Test {
 public:
     static void SetUpTestCase();
     void TearDown();
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS

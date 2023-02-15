@@ -23,7 +23,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 constexpr uint32_t BACKLIGHT_ON = 128;
 }
@@ -67,7 +67,7 @@ int32_t BatteryBacklight::GetScreenState()
 {
     return screenState_;
 }
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS

@@ -24,7 +24,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 class BatteryLed {
 public:
     BatteryLed() = default;
@@ -42,7 +42,7 @@ private:
     bool available_ {false};
     uint32_t lightColor_ {0};
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS

@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 namespace {
 struct BatteryThreadUnitTest {};
 struct BatteryConfigUnitTest {};
@@ -229,7 +229,7 @@ public:
         ct.Init();
     }
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS
