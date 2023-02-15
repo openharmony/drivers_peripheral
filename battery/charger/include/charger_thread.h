@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-namespace V1_1 {
+namespace V1_2 {
 class ChargerThread : public BatteryThread {
 public:
     friend class BatteryThreadTest;
@@ -76,7 +76,7 @@ private:
     static bool isConfigParse_;
     static int32_t lackPowerCapacity_;
 };
-} // namespace V1_1
+} // namespace V1_2
 } // namespace Battery
 } // namespace HDI
 } // namespace OHOS
