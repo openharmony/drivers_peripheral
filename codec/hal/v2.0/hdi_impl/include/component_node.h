@@ -100,6 +100,12 @@ public:
         return name_;
     }
 
+    void WaitStateChange(uint32_t objState, OMX_STATETYPE *status);
+
+    void ReleaseOMXResource();
+
+    int32_t ReleaseAllBuffer();
+
 public:
     static OMX_CALLBACKTYPE callbacks_;  // callbacks
 
@@ -122,6 +128,9 @@ private:
     std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderMap_;  // Key is omx buffer header type
     uint32_t bufferIdCount_;
     std::string name_;
+    std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderPortMap_;
+    uint32_t maxStateWaitTime = 10000;
+    uint32_t maxStateWaitCount = 100;
 };
 }  // namespace Omx
 }  // namespace Codec
