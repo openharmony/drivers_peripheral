@@ -21,7 +21,6 @@
 #include "hdf_device_desc.h"
 #include "osal_sem.h"
 #include "refbase.h"
-#include "iremote_object.h"
 #include "usb_ddk.h"
 #include "usb_ddk_interface.h"
 #include "usb_session.h"
