@@ -22,6 +22,7 @@
 
 #include "iam_fuzz_test.h"
 #include "iam_logger.h"
+#include "iconsumer_surface.h"
 
 #include "executor_impl.h"
 
@@ -201,7 +202,7 @@ void FuzzSetBufferProducer(Parcel &parcel)
     IAM_LOGI("begin");
     sptr<IBufferProducer> bufferProducer = nullptr;
     if (parcel.ReadBool()) {
-        auto surface = Surface::CreateSurfaceAsConsumer();
+        auto surface = IConsumerSurface::Create();
         if (surface == nullptr) {
             IAM_LOGE("CreateSurfaceAsConsumer fail");
             return;

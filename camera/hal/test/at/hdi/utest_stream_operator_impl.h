@@ -87,7 +87,7 @@ public:
     public:
         OHOS::sptr<OHOS::IBufferProducer> CreateProducer(std::function<void(void*, uint32_t)> callback)
         {
-            consumer_ = OHOS::Surface::CreateSurfaceAsConsumer();
+            consumer_ = OHOS::IConsumerSurface::Create();
             if (consumer_ == nullptr) {
                 return nullptr;
             }
@@ -133,7 +133,7 @@ public:
 
     private:
         bool running_ = true;
-        OHOS::sptr<OHOS::Surface> consumer_ = nullptr;
+        OHOS::sptr<OHOS::IConsumerSurface> consumer_ = nullptr;
         std::thread* consumerThread_ = nullptr;
         std::function<void(void*, uint32_t)> callback_ = nullptr;
     };
