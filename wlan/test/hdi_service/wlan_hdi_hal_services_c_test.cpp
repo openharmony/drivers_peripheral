@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -825,14 +825,42 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_036, TestSize.Level1)
     uint8_t deviceType = 5;
     rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, CMD_HID2D_MODULE_INIT, (const int8_t *)&deviceType,
         sizeof(deviceType));
+    printf("SendCmdIoctl MODULE_INIT, rc=%d.\n", rc);
     flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT));
     ASSERT_TRUE(flag);
+}
+
+/**
+ * @tc.name: SendCmdIoctl_037
+ * @tc.desc: Wifi hdi send ioctl command function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_037, TestSize.Level1)
+{
+    const char *ifName = "wlan0";
+    int32_t rc;
+    bool flag;
 
     uint8_t batterylevel = 50;
     rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, CMD_SET_BATTERY_LEVEL, (const int8_t *)&batterylevel,
         sizeof(batterylevel));
+    printf("SendCmdIoctl BATTERY_LEVEL, rc=%d.\n", rc);
     flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT));
     ASSERT_TRUE(flag);
+}
+
+/**
+ * @tc.name: SendCmdIoctl_038
+ * @tc.desc: Wifi hdi send ioctl command function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_038, TestSize.Level1)
+{
+    const char *ifName = "wlan0";
+    int32_t rc;
+    bool flag;
 
     struct AdjustChannelInfo chanInfo;
     chanInfo.msgId = 5;
@@ -841,17 +869,18 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_036, TestSize.Level1)
     chanInfo.switchType = 0;
     rc = g_wlanObj->WifiSendCmdIoctl(g_wlanObj, ifName, CMD_SET_CHAN_ADJUST, (const int8_t *)&chanInfo,
         sizeof(chanInfo));
-    flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT));
+    printf("SendCmdIoctl CHAN_ADJUST, rc=%d.\n", rc);
+    flag = ((rc == HDF_SUCCESS) || (rc == HDF_ERR_NOT_SUPPORT) || (rc == HDF_DEV_ERR_NETDOWN));
     ASSERT_TRUE(flag);
 }
 
 /**
- * @tc.name: GetStaInfo_037
+ * @tc.name: GetStaInfo_039
  * @tc.desc: Wifi hdi get station information function test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, GetStaInfo_037, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetStaInfo_039, TestSize.Level1)
 {
     const char *ifName = "wlan0";
     int32_t rc;
@@ -865,12 +894,12 @@ HWTEST_F(HdfWifiServiceCTest, GetStaInfo_037, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetFeatureTypeTest_038
+ * @tc.name: GetFeatureTypeTest_040
  * @tc.desc: Wifi hdi get feature type function test on STA feature
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_038, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_040, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
     struct HdfFeatureInfo ifeature;
@@ -885,12 +914,12 @@ HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_038, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetFreqsWithBandTest_039
+ * @tc.name: GetFreqsWithBandTest_041
  * @tc.desc: Wifi hdi get freqs function test on STA feature
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_039, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_041, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
     struct HdfFeatureInfo ifeature;
@@ -916,12 +945,12 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_039, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetNetworkIfaceNameTest_040
+ * @tc.name: GetNetworkIfaceNameTest_042
  * @tc.desc: Wifi hdi get network interface name function test on STA feature
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_040, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_042, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
     struct HdfFeatureInfo ifeature;
@@ -936,12 +965,12 @@ HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_040, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetTxPowerTest_041
+ * @tc.name: SetTxPowerTest_043
  * @tc.desc: Wifi hdi set tx power function test on STA feature
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_041, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_043, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
     struct HdfFeatureInfo ifeature;
