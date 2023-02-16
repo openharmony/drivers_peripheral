@@ -120,8 +120,7 @@ uint32_t CheckPixel(const BufferHandle &handle, int x, int y, uint32_t color)
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
     uint32_t checkColor = ConverToRGBA(static_cast<PixelFormat>(handle.format), GetUint32(*pixel));
     if (checkColor != color) {
-        DISPLAY_TEST_LOGD("the pixel color not match vAddr:%p position:%d pixel:%08x color:%08x", handle.virAddr,
-            position, checkColor, color);
+        DISPLAY_TEST_LOGD("the pixel color not match position:%d pixel:%08x color:%08x", position, checkColor, color);
         DISPLAY_TEST_LOGD("x:%d y:%d width:%d", x, y, handle.width);
         SaveFile("/data/display_test_bitmap_", static_cast<uint8_t *>(handle.virAddr), handle.size);
         return DISPLAY_FAILURE;

@@ -90,7 +90,6 @@ int32_t MapperInterfaceService::Mmap(const sptr<BufferHandleParcelable> &handle)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(hwiImpl_, HDF_FAILURE);
     void *retPtr = hwiImpl_->Mmap(*handle->GetBufferHandle());
-    HDF_LOGD("%{public}s@%{public}d virAddr=%{public}p", __func__, __LINE__, handle->GetBufferHandle()->virAddr);
     CHECK_NULLPOINTER_RETURN_VALUE(retPtr, HDF_FAILURE);
     return HDF_SUCCESS;
 }

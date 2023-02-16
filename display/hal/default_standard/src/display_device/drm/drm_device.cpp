@@ -305,7 +305,6 @@ std::unordered_map<uint32_t, std::shared_ptr<HdiDisplay>> DrmDevice::DiscoveryDi
         }
         DISPLAY_LOGD();
         auto crtc = crtcIter->second;
-        DISPLAY_LOGD("crtc %{public}p", crtc.get());
         // create the display
         std::shared_ptr<HdiDisplay> display = std::make_shared<DrmDisplay>(connector, crtc, mInstance);
         DISPLAY_LOGD();

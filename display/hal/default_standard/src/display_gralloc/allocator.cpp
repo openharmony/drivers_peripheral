@@ -20,10 +20,9 @@ namespace HDI {
 namespace DISPLAY {
 void Allocator::DumpBufferHandle(BufferHandle &handle) const
 {
-    DISPLAY_LOGD("size %{public}d, width  %{public}d height  %{public}d stride  %{public}d fd  %{public}d format: %d "
-                 "phy 0x%{public}" PRIx64 " usage 0x%{public}" PRIx64 "  viraddr 0x%{public}p",
-        handle.size, handle.width, handle.height, handle.stride, handle.fd, handle.format, handle.phyAddr,
-        handle.usage, handle.virAddr);
+    DISPLAY_LOGD("size %{public}d, width  %{public}d height  %{public}d stride  %{public}d fd  %{public}d format: %d",
+        handle.size, handle.width, handle.height, handle.stride, handle.fd, handle.format);
+    DISPLAY_LOGD("usage = 0x%{public}" PRIx64 "", handle.usage);
 }
 
 bool Allocator::IsYuv(PixelFormat format)

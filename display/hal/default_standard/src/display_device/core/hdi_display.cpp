@@ -75,10 +75,8 @@ int32_t HdiDisplay::SetLayerZorder(uint32_t layerId, uint32_t zorder)
     }
     // reset to sort
     auto zRange = mLayers.equal_range(layer);
-    DISPLAY_LOGD("zorder range : zRange.first %{public}p  zRange.second %{public}p", *zRange.first, *zRange.second);
     for (auto c = zRange.first; c != zRange.second; c++) {
         if (*c == layer) {
-            DISPLAY_LOGD("erase layer:%{public}p", layer);
             mLayers.erase(c);
             break;
         }
@@ -122,10 +120,8 @@ int32_t HdiDisplay::CloseLayer(uint32_t layerId)
         DISPLAY_LOGE("can not find the layer id %{public}d", layerId));
     auto layer = iter->second.get();
     auto zRange = mLayers.equal_range(layer);
-    DISPLAY_LOGD("zorder range:zRange.first %{public}p, zRange.second %{public}p", *zRange.first, *zRange.second);
     for (auto c = zRange.first; c != zRange.second; c++) {
         if (*c == layer) {
-            DISPLAY_LOGD("erase layer:%{public}p", layer);
             mLayers.erase(c);
             break;
         }
@@ -226,7 +222,7 @@ HdiLayer *HdiDisplay::GetHdiLayer(uint32_t id)
 
 VsyncCallBack::VsyncCallBack(VBlankCallback cb, void *data) : mVBlankCb(cb), mData(data)
 {
-    DISPLAY_LOGD("VsyncCallBack %{public}p", cb);
+    DISPLAY_LOGD("VsyncCallBack");
 }
 
 void VsyncCallBack::Vsync(unsigned int sequence, uint64_t ns)
