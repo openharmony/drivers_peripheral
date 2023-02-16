@@ -19,6 +19,7 @@
 #include <functional>
 #include <string>
 #include <vector>
+#include <errno.h>
 namespace OHOS {
 namespace Codec {
 namespace Omx {
