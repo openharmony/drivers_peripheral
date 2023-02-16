@@ -35,6 +35,9 @@
 
 #define DECADE 10
 
+#define PORTNUM_FIRST  1
+#define PORTNUM_SECOND 2
+
 static int32_t AudioMixerCtlElemList(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
 static int32_t AudioMixerCtlGetElemProp(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
 static int32_t AudioMixerCtlSetElemProp(AudioPcmType pcm, OpCode cmd, const struct HdfIoService *service, void *data);
@@ -274,7 +277,7 @@ static int8_t AudioCardParsePortId(const char *name)
     uint8_t portId = 0;
     size_t nameLen = strlen(name);
 
-    for (i = 2; i > 0; i--) {
+    for (i = PORTNUM_SECOND; i > 0; i--) {
         if (name[nameLen - i] > '9' || name[nameLen - i] < '0') {
             continue;
         }
@@ -325,9 +328,9 @@ static int32_t AudioReadCardPortToDesc(struct HdfSBuf *reply, struct AudioAdapte
     }
 
     if (portNum == PORT_IN || portNum == PORT_OUT) {
-        portNum = 1; // support capture | render
+        portNum = PORTNUM_FIRST; // support capture | render
     } else if (portNum == PORT_OUT_IN) {
-        portNum = 2; // support capture & render
+        portNum = PORTNUM_SECOND; // support capture & render
     } else {
         AUDIO_FUNC_LOGE("portNum value failed!");
         return HDF_FAILURE;

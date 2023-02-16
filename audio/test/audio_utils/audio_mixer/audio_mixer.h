@@ -155,10 +155,10 @@ void AudioMixerOpsInit(void);
 int32_t MctlInfo(const struct HdfIoService *service, const char *cardSrv);
 int32_t MctlList(const struct HdfIoService *service, const char *cardSrv);
 int32_t MctlGetElem(const struct HdfIoService *service, struct MixerCardCtlInfo *ctlInfo);
-int32_t MctlSetElem(const struct HdfIoService *service,
+int32_t MctlSetElem(const struct HdfIoService *srv,
                     struct MixerCardCtlInfo *ctlInfo,
                     unsigned int argc, char *argv[]);
-bool MixerFindSelem(const struct HdfIoService *service, const char *cardSrv, const struct AudioHwCtlElemId *eId);
+bool MixerFindSelem(const struct HdfIoService *srv, const char *cardSrv, const struct AudioHwCtlElemId *eId);
 int32_t SetChannels(const struct HdfIoService *srv, const char *cardSrv, unsigned int argc, char *argv);
 int32_t GetLibsoHandle(AudioPcmType pcm);
 void ReleaseCtlElemList(void);
