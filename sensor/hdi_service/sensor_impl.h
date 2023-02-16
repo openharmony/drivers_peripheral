@@ -17,7 +17,6 @@
 #define OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H
 
 #include "sensor_if.h"
-#include "iremote_object.h"
 #include "v1_0/isensor_interface.h"
 
 namespace OHOS {
