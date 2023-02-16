@@ -52,13 +52,12 @@ static int32_t CodecComponentTypeProxyCall(struct CodecComponentType *self, int3
 }
 static int32_t ReadValuesForGetComponentVersion(struct HdfSBuf *reply, struct CompVerInfo *verInfo)
 {
-    int32_t ret;
     struct CompVerInfo *verInfoCp = (struct CompVerInfo *)HdfSbufReadUnpadBuffer(reply, sizeof(struct CompVerInfo));
     if (verInfoCp == NULL) {
         HDF_LOGE("%{public}s: read compVerInfo failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = memcpy_s(verInfo, sizeof(struct CompVerInfo), verInfoCp, sizeof(struct CompVerInfo));
+    int32_t ret = memcpy_s(verInfo, sizeof(struct CompVerInfo), verInfoCp, sizeof(struct CompVerInfo));
     if (ret != EOK) {
         HDF_LOGE("%{public}s: memcpy_s compVersion failed, error code: %{public}d", __func__, ret);
         return HDF_FAILURE;
@@ -68,8 +67,6 @@ static int32_t ReadValuesForGetComponentVersion(struct HdfSBuf *reply, struct Co
 
 static int32_t CodecComponentTypeProxyGetComponentVersion(struct CodecComponentType *self, struct CompVerInfo *verInfo)
 {
-    int32_t ret;
-
     struct HdfSBuf *data = HdfSbufTypedObtain(SBUF_IPC);
     struct HdfSBuf *reply = HdfSbufTypedObtain(SBUF_IPC);
     if (data == NULL || reply == NULL) {
@@ -84,7 +81,7 @@ static int32_t CodecComponentTypeProxyGetComponentVersion(struct CodecComponentT
         return HDF_FAILURE;
     }
 
-    ret = CodecComponentTypeProxyCall(self, CMD_GET_COMPONENT_VERSION, data, reply);
+    int32_t ret = CodecComponentTypeProxyCall(self, CMD_GET_COMPONENT_VERSION, data, reply);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call failed! error code is %{public}d", __func__, ret);
         ReleaseSbuf(data, reply);
