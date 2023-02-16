@@ -795,7 +795,6 @@ bool HdiAudioPortCapabilityBlockUnmarshalling(struct HdfSBuf *data, struct Audio
         return false;
     }
 
-
     if (dataBlock->formats == NULL) {
         dataBlock->formats = (enum AudioFormat *)OsalMemCalloc(sizeof(enum AudioFormat));
     }
