@@ -17,6 +17,7 @@
 #define DISTRIBUTED_UT_STREAM_CONSUMER_H
 
 #include <surface.h>
+#include "iconsumer_surface.h"
 #include "v1_0/ioffline_stream_operator.h"
 
 namespace OHOS {
@@ -44,7 +45,7 @@ public:
     };
 
 private:
-    sptr<OHOS::Surface> consumer_ = nullptr;
+    sptr<OHOS::IConsumerSurface> consumer_ = nullptr;
 };
 } // namespace OHOS
 } // namespace DistributedHardware

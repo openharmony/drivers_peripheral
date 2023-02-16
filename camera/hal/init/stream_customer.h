@@ -21,7 +21,7 @@
 #include <vector>
 #include <map>
 #include <hdf_log.h>
-#include <surface.h>
+#include <iconsumer_surface.h>
 #include <display_type.h>
 #include "camera_metadata_info.h"
 #include "ibuffer.h"
@@ -70,7 +70,7 @@ private:
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
     std::shared_ptr<OHOS::Surface> consumer_ = nullptr;
 #else
-    sptr<OHOS::Surface> consumer_ = nullptr;
+    sptr<OHOS::IConsumerSurface> consumer_ = nullptr;
 #endif
     std::thread* previewThreadId_ = nullptr;
 };
