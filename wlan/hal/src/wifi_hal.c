@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -315,7 +315,7 @@ static int32_t GetChannelMeasResultInner(const char *ifName, struct MeasResult *
     return HDF_ERR_NOT_SUPPORT;
 }
 
-static int32_t SetProjectionScreenParamInner(const char *ifName, const ProjScrnCmdParam *param)
+static int32_t SetProjectionScreenParamInner(const char *ifName, const ProjectionScreenParam *param)
 {
     if (ifName == NULL || param == NULL) {
         HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
@@ -478,7 +478,7 @@ static int32_t WifiGetChannelMeasResult(const char *ifName, struct MeasResult *m
     return ret;
 }
 
-static int32_t WifiSetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *param)
+static int32_t WifiSetProjectionScreenParam(const char *ifName, const ProjectionScreenParam *param)
 {
     HalMutexLock();
     int32_t ret = SetProjectionScreenParamInner(ifName, param);
