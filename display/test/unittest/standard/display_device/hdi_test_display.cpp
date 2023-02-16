@@ -178,7 +178,6 @@ int32_t HdiTestDisplay::Commit()
         ClearColor(*handle, 0); // need clear the fb first
         ret = HdiTestDevice::GetInstance().GetDeviceFuncs().SetDisplayClientBuffer(mId, handle, -1);
         mCurrentFb = handle;
-        DISPLAY_TEST_LOGD("client fb phyaddr %" PRIx64 " virtual addr %p", handle->phyAddr, handle->virAddr);
         DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
             DISPLAY_TEST_LOGE("set client buffer handle failed"));
     }

@@ -234,7 +234,6 @@ int32_t DrmDisplay::ChosePreferenceMode()
 
 int32_t DrmDisplay::RegDisplayVBlankCallback(VBlankCallback cb, void *data)
 {
-    DISPLAY_LOGD("the VBlankCallback %{public}p ", cb);
     std::shared_ptr<VsyncCallBack> vsyncCb = std::make_shared<VsyncCallBack>(cb, data);
     DrmVsyncWorker::GetInstance().ReqesterVBlankCb(vsyncCb);
     return DISPLAY_SUCCESS;
