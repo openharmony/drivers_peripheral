@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1031,7 +1031,7 @@ int32_t WlanInterfaceSetProjectionScreenParam(struct IWlanInterface *self, const
     const struct ProjectionScreenCmdParam *param)
 {
     int32_t ret;
-    ProjScrnCmdParam *projScrnCmdParam = NULL;
+    ProjectionScreenParam *projectionScreenParam = NULL;
 
     (void)self;
     if (ifName == NULL || param == NULL) {
@@ -1043,26 +1043,26 @@ int32_t WlanInterfaceSetProjectionScreenParam(struct IWlanInterface *self, const
         return HDF_FAILURE;
     }
 
-    projScrnCmdParam = OsalMemCalloc(sizeof(ProjScrnCmdParam) + param->bufLen);
-    if (projScrnCmdParam == NULL) {
+    projectionScreenParam = OsalMemCalloc(sizeof(ProjectionScreenParam) + param->bufLen);
+    if (projectionScreenParam == NULL) {
         HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
         return HDF_FAILURE;
     }
-    projScrnCmdParam->cmdId = param->cmdId;
-    projScrnCmdParam->bufLen = param->bufLen;
+    projectionScreenParam->cmdId = param->cmdId;
+    projectionScreenParam->bufLen = param->bufLen;
     do {
-        if (memcpy_s(projScrnCmdParam->buf, projScrnCmdParam->bufLen, param->buf, param->bufLen) != EOK) {
+        if (memcpy_s(projectionScreenParam->buf, projectionScreenParam->bufLen, param->buf, param->bufLen) != EOK) {
             HDF_LOGE("%{public}s: memcpy_s failed", __func__);
             ret = HDF_FAILURE;
             break;
         }
-        ret = g_wifi->setProjectionScreenParam(ifName, projScrnCmdParam);
+        ret = g_wifi->setProjectionScreenParam(ifName, projectionScreenParam);
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: get channel meas result failed!, error code: %{public}d", __func__, ret);
         }
     } while (0);
     
-    OsalMemFree(projScrnCmdParam);
+    OsalMemFree(projectionScreenParam);
     return ret;
 }
 

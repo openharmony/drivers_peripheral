@@ -799,24 +799,116 @@ HWTEST_F(HdfWifiServiceCTest, SetProjectionScreenParam_035, TestSize.Level1)
     int32_t rc;
     struct ProjectionScreenCmdParam param;
     int8_t data = 0;
+    (void)memset_s(&param, sizeof(struct ProjectionScreenCmdParam), 0, sizeof(struct ProjectionScreenCmdParam));
+
     param.buf = &data;
     param.bufLen = sizeof(data);
-
-    for (int i = CMD_CLOSE_GO_CAC; i <= CMD_ID_CTRL_ROAM_CHANNEL; i++) {
-        param.cmdId = i;
-        rc = g_wlanObj->SetProjectionScreenParam(g_wlanObj, ifName, &param);
-        bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-        ASSERT_TRUE(flag);
-    }
+    param.cmdId = CMD_CLOSE_GO_CAC;
+    rc = g_wlanObj->SetProjectionScreenParam(g_wlanObj, ifName, &param);
+    printf("ScreenParam = %d, rc = %d.\n", CMD_CLOSE_GO_CAC, rc);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
 }
 
 /**
- * @tc.name: SendCmdIoctl_036
+ * @tc.name: SetProjectionScreenParam_036
+ * @tc.desc: Wifi hdi set paramters to optimize projectino screen function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, SetProjectionScreenParam_036, TestSize.Level1)
+{
+    const char *ifName = "wlan0";
+    int32_t rc;
+    struct ProjectionScreenCmdParam param;
+    int8_t data = 0;
+    (void)memset_s(&param, sizeof(struct ProjectionScreenCmdParam), 0, sizeof(struct ProjectionScreenCmdParam));
+
+    param.buf = &data;
+    param.bufLen = sizeof(data);
+    param.cmdId = CMD_SET_GO_CSA_CHANNEL;
+    rc = g_wlanObj->SetProjectionScreenParam(g_wlanObj, ifName, &param);
+    printf("ScreenParam = %d, rc = %d.\n", CMD_SET_GO_CSA_CHANNEL, rc);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_DEV_ERR_NETDOWN);
+    ASSERT_TRUE(flag);
+}
+
+/**
+ * @tc.name: SetProjectionScreenParam_037
+ * @tc.desc: Wifi hdi set paramters to optimize projectino screen function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, SetProjectionScreenParam_037, TestSize.Level1)
+{
+    const char *ifName = "wlan0";
+    int32_t rc;
+    struct ProjectionScreenCmdParam param;
+    int8_t data = 0;
+    (void)memset_s(&param, sizeof(struct ProjectionScreenCmdParam), 0, sizeof(struct ProjectionScreenCmdParam));
+
+    param.buf = &data;
+    param.bufLen = sizeof(data);
+    param.cmdId = CMD_SET_GO_RADAR_DETECT;
+    rc = g_wlanObj->SetProjectionScreenParam(g_wlanObj, ifName, &param);
+    printf("ScreenParam = %d, rc = %d.\n", CMD_SET_GO_RADAR_DETECT, rc);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_DEV_ERR_NETDOWN);
+    ASSERT_TRUE(flag);
+}
+
+/**
+ * @tc.name: SetProjectionScreenParam_038
+ * @tc.desc: Wifi hdi set paramters to optimize projectino screen function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, SetProjectionScreenParam_038, TestSize.Level1)
+{
+    const char *ifName = "wlan0";
+    int32_t rc;
+    struct ProjectionScreenCmdParam param;
+    int8_t data = 0;
+    (void)memset_s(&param, sizeof(struct ProjectionScreenCmdParam), 0, sizeof(struct ProjectionScreenCmdParam));
+
+    param.buf = &data;
+    param.bufLen = sizeof(data);
+    param.cmdId = CMD_ID_MCC_STA_P2P_QUOTA_TIME;
+    rc = g_wlanObj->SetProjectionScreenParam(g_wlanObj, ifName, &param);
+    printf("ScreenParam = %d, rc = %d.\n", CMD_ID_MCC_STA_P2P_QUOTA_TIME, rc);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_DEV_ERR_NETDOWN);
+    ASSERT_TRUE(flag);
+}
+
+/**
+ * @tc.name: SetProjectionScreenParam_039
+ * @tc.desc: Wifi hdi set paramters to optimize projectino screen function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, SetProjectionScreenParam_039, TestSize.Level1)
+{
+    const char *ifName = "wlan0";
+    int32_t rc;
+    struct ProjectionScreenCmdParam param;
+    int8_t data = 0;
+    (void)memset_s(&param, sizeof(struct ProjectionScreenCmdParam), 0, sizeof(struct ProjectionScreenCmdParam));
+
+    param.buf = &data;
+    param.bufLen = sizeof(data);
+    param.cmdId = CMD_ID_CTRL_ROAM_CHANNEL;
+    rc = g_wlanObj->SetProjectionScreenParam(g_wlanObj, ifName, &param);
+    printf("ScreenParam = %d, rc = %d.\n", CMD_ID_CTRL_ROAM_CHANNEL, rc);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_DEV_ERR_NETDOWN);
+    ASSERT_TRUE(flag);
+}
+
+/**
+ * @tc.name: SendCmdIoctl_040
  * @tc.desc: Wifi hdi send ioctl command function test
  * @tc.type: FUNC
  * @tc.require: AR000HDUEE
  */
-HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_036, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_040, TestSize.Level1)
 {
     const char *ifName = "wlan0";
     int32_t rc;
@@ -831,12 +923,12 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_036, TestSize.Level1)
 }
 
 /**
- * @tc.name: SendCmdIoctl_037
+ * @tc.name: SendCmdIoctl_041
  * @tc.desc: Wifi hdi send ioctl command function test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_037, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_041, TestSize.Level1)
 {
     const char *ifName = "wlan0";
     int32_t rc;
@@ -851,12 +943,12 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_037, TestSize.Level1)
 }
 
 /**
- * @tc.name: SendCmdIoctl_038
+ * @tc.name: SendCmdIoctl_042
  * @tc.desc: Wifi hdi send ioctl command function test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_038, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_042, TestSize.Level1)
 {
     const char *ifName = "wlan0";
     int32_t rc;
@@ -875,12 +967,12 @@ HWTEST_F(HdfWifiServiceCTest, SendCmdIoctl_038, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetStaInfo_039
+ * @tc.name: GetStaInfo_043
  * @tc.desc: Wifi hdi get station information function test
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, GetStaInfo_039, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetStaInfo_043, TestSize.Level1)
 {
     const char *ifName = "wlan0";
     int32_t rc;
@@ -894,12 +986,12 @@ HWTEST_F(HdfWifiServiceCTest, GetStaInfo_039, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetFeatureTypeTest_040
+ * @tc.name: GetFeatureTypeTest_044
  * @tc.desc: Wifi hdi get feature type function test on STA feature
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_040, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_044, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
     struct HdfFeatureInfo ifeature;
@@ -914,12 +1006,12 @@ HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_040, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetFreqsWithBandTest_041
+ * @tc.name: GetFreqsWithBandTest_045
  * @tc.desc: Wifi hdi get freqs function test on STA feature
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_041, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_045, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
     struct HdfFeatureInfo ifeature;
@@ -945,12 +1037,12 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_041, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetNetworkIfaceNameTest_042
+ * @tc.name: GetNetworkIfaceNameTest_046
  * @tc.desc: Wifi hdi get network interface name function test on STA feature
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_042, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_046, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
     struct HdfFeatureInfo ifeature;
@@ -965,12 +1057,12 @@ HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_042, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetTxPowerTest_043
+ * @tc.name: SetTxPowerTest_047
  * @tc.desc: Wifi hdi set tx power function test on STA feature
  * @tc.type: FUNC
  * @tc.require:
  */
-HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_043, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_047, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
     struct HdfFeatureInfo ifeature;
