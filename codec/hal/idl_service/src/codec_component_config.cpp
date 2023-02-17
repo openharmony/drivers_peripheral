@@ -70,7 +70,14 @@ namespace Codec {
 namespace Omx {
 CodecComponentConfig CodecComponentConfig::config_;
 CodecComponentConfig::CodecComponentConfig()
-{}
+{
+    node_.name = nullptr;
+    node_.hashValue = 0;
+    node_.attrData = nullptr;
+    node_.parent = nullptr;
+    node_.child = nullptr;
+    node_.sibling = nullptr;
+}
 
 void CodecComponentConfig::Init(const DeviceResourceNode &node)
 {
@@ -95,7 +102,7 @@ CodecComponentConfig *CodecComponentConfig::GetInstance()
 
 int32_t CodecComponentConfig::GetComponentNum(int32_t &count)
 {
-    count = capList_.size();
+    count = static_cast<int32_t>(capList_.size());
     CODEC_LOGD("enter, count = %{public}d", count);
     return HDF_SUCCESS;
 }
@@ -103,9 +110,9 @@ int32_t CodecComponentConfig::GetComponentNum(int32_t &count)
 int32_t CodecComponentConfig::GetComponentCapabilityList(std::vector<CodecCompCapability> &capList, int32_t count)
 {
     CODEC_LOGD("count[%{public}d], size[%{public}zu]", count, capList_.size());
-    if ((size_t)count > capList_.size()) {
+    if (count > static_cast<int32_t>(capList_.size())) {
         CODEC_LOGW("count[%{public}d] is too large", count);
-        count = capList_.size();
+        count = static_cast<int32_t>(capList_.size());
     }
     auto first = capList_.begin();
     auto last = capList_.begin() + count;

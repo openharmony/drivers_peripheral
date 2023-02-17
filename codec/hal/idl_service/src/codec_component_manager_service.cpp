@@ -31,6 +31,12 @@ extern "C" ICodecComponentManager *CodecComponentManagerImplGetInstance(void)
 
 CodecComponentManagerService::CodecComponentManagerService() : componentId_(0)
 {
+    resourceNode_.name = nullptr;
+    resourceNode_.hashValue = 0;
+    resourceNode_.attrData = nullptr;
+    resourceNode_.parent = nullptr;
+    resourceNode_.child = nullptr;
+    resourceNode_.sibling = nullptr;
     mgr_ = std::make_shared<OHOS::Codec::Omx::ComponentMgr>();
 }
 

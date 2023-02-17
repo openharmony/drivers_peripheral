@@ -124,9 +124,17 @@ int32_t ComponentNode::GetComponentVersion(CompVerInfo &verInfo)
 
     verInfo.compName = name;
     verInfo.compUUID.insert(verInfo.compUUID.end(), uuid, uuid + sizeof(OMX_UUIDTYPE));
-    (void)memcpy_s(&verInfo.compVersion, sizeof(verInfo.compVersion), &compVersion, sizeof(sepcVersion));
-    (void)memcpy_s(&verInfo.specVersion, sizeof(verInfo.specVersion), &sepcVersion, sizeof(sepcVersion));
+    err = memcpy_s(&verInfo.compVersion, sizeof(verInfo.compVersion), &compVersion, sizeof(sepcVersion));
+    if (err != HDF_SUCCESS) {
+        CODEC_LOGE("memset_s return err [%{public}x].", err);
+        return err;
+    }
 
+    err = memcpy_s(&verInfo.specVersion, sizeof(verInfo.specVersion), &sepcVersion, sizeof(sepcVersion));
+    if (err != HDF_SUCCESS) {
+        CODEC_LOGE("memset_s return err [%{public}x].", err);
+        return err;
+    }
     return err;
 }
 

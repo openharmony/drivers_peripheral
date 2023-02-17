@@ -31,7 +31,13 @@ CodecOMXCore::~CodecOMXCore()
 }
 int32_t CodecOMXCore::Init(const std::string &libName)
 {
-    libHandle_ = dlopen(libName.c_str(), RTLD_LAZY);
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(libName.c_str(), pathBuf) == nullptr) {
+        HDF_LOGE("%{public}s: realpath failed! error code: %{public}d", __func__, errno);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    libHandle_ = dlopen(pathBuf, RTLD_LAZY);
     if (libHandle_ == NULL) {
         CODEC_LOGE("Failed to dlopen %{public}s.", libName.c_str());
         return HDF_ERR_INVALID_PARAM;
@@ -107,10 +113,10 @@ int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::st
 
     char role[roleCount][OMX_MAX_STRINGNAME_SIZE];
     uint32_t bufferSize = sizeof(char) * (roleCount * OMX_MAX_STRINGNAME_SIZE);
-    err = memset_s(role, sizeof(role), 0, bufferSize);
-    if (err != EOK) {
-        CODEC_LOGE("memset_s return err [%{public}x].", err);
-        return err;
+    int32_t ret = memset_s(role, sizeof(role), 0, bufferSize);
+    if (ret != EOK) {
+        CODEC_LOGE("memset_s return err [%{public}x].", ret);
+        return ret;
     }
 
     uint32_t roleLen = roleCount;
