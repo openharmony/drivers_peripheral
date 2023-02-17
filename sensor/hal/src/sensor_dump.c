@@ -52,37 +52,52 @@ struct SensorDevelopmentList g_sensorList[] = {
 int32_t SensorShowList(struct HdfSBuf *reply)
 {
     int32_t index = -1;
+    int32_t ret = 0;
     int32_t *sensorStatus = NULL;
     struct SensorDevManager *sensorList = NULL;
     char sensorInfoDate[STRING_LEN] = { 0 };
 
     sensorList = GetSensorDevManager();
-    sensorStatus = GetSensorStatus();
-
     if ((sensorList == NULL) || (sensorList->sensorInfoEntry == NULL) || (sensorList->sensorSum == 0)) {
         HDF_LOGE("%{publuc}s: sensorList is failed\n", __func__);
         return DUMP_NULL_PTR;
     }
-    for (index = 0; index < sensorList->sensorSum ; index++) {
-        memset(sensorInfoDate, 0, STRING_LEN);
-        sprintf(sensorInfoDate,
-        "=================================================\n\r \
-        sensorName: %s \n\r \
-        sensorId: %d \n\r \
-        sensorStatus: %d \n\r \
-        maxRange: %f \n\r \
-        accuracy: %f \n\r \
-        power:    %f \n\r \
-        minDelay: %" PRId64 "\n\r \
-        maxDelay: %" PRId64 "\n\r",
-        sensorList->sensorInfoEntry[index].sensorName,
-        sensorList->sensorInfoEntry[index].sensorId,
-        sensorStatus[sensorList->sensorInfoEntry[index].sensorId],
-        sensorList->sensorInfoEntry[index].maxRange,
-        sensorList->sensorInfoEntry[index].accuracy,
-        sensorList->sensorInfoEntry[index].power,
-        sensorList->sensorInfoEntry[index].minDelay,
-        sensorList->sensorInfoEntry[index].maxDelay);
+
+    sensorStatus = GetSensorStatus();
+    if (sensorStatus == NULL) {
+        HDF_LOGE("%{publuc}s: sensorStatus is failed\n", __func__);
+        return DUMP_NULL_PTR;
+    }
+
+    for (index = 0; index < sensorList->sensorSum; index++) {
+        ret = memset_s(sensorInfoDate, STRING_LEN, 0, STRING_LEN);
+        if (ret != DUMP_SUCCESS) {
+            HDF_LOGE("%{publuc}s: memset sensorInfoList is failed\n", __func__);
+            return DUMP_FAILURE;
+        }
+
+        ret = sprintf_s(sensorInfoDate, STRING_LEN,
+            "=================================================\n\r \
+            sensorName: %s \n\r \
+            sensorId: %d \n\r \
+            sensorStatus: %d \n\r \
+            maxRange: %f \n\r \
+            accuracy: %f \n\r \
+            power:    %f \n\r \
+            minDelay: %" PRId64 "\n\r \
+            maxDelay: %" PRId64 "\n\r",
+            sensorList->sensorInfoEntry[index].sensorName,
+            sensorList->sensorInfoEntry[index].sensorId,
+            sensorStatus[sensorList->sensorInfoEntry[index].sensorId],
+            sensorList->sensorInfoEntry[index].maxRange,
+            sensorList->sensorInfoEntry[index].accuracy,
+            sensorList->sensorInfoEntry[index].power,
+            sensorList->sensorInfoEntry[index].minDelay,
+            sensorList->sensorInfoEntry[index].maxDelay);
+        if (ret < DUMP_SUCCESS) {
+            HDF_LOGE("%{publuc}s: sprintf sensorList is failed\n", __func__);
+            return DUMP_FAILURE;
+        }
 
         (void)HdfSbufWriteString(reply, sensorInfoDate);
     }
@@ -93,15 +108,24 @@ int32_t SensorShowList(struct HdfSBuf *reply)
 static void ShowData(const float *data, int64_t timesTamp, const struct SensorDevelopmentList sensorNode,
     struct HdfSBuf *reply)
 {
+    int32_t ret = 0;
     char sensorInfoDate[STRING_LEN] = { 0 };
 
     if (sensorNode.dataDimension == DATA_X) {
-        sprintf(sensorInfoDate, "sensor name :[%s], sensor id :[%d], ts=[%0.9f], data= [%f]\n\r",
+        ret = sprintf_s(sensorInfoDate, STRING_LEN,
+            "sensor name :[%s], sensor id :[%d], ts=[%0.9f], data= [%f]\n\r",
             sensorNode.sensorName, sensorNode.sensorTypeId, timesTamp / 1e9, *(data));
+        if (ret < DUMP_SUCCESS) {
+            HDF_LOGE("%{publuc}s: sprintf sensorInfoDate is failed\n", __func__);
+        }
     } else {
-        sprintf(sensorInfoDate, "sensor name :[%s], sensor id :[%d], ts=[%0.9f], data= [%f], [%f], [%f]\n\r",
+        ret = sprintf_s(sensorInfoDate, STRING_LEN,
+            "sensor name :[%s], sensor id :[%d], ts=[%0.9f], data= [%f], [%f], [%f]\n\r",
             sensorNode.sensorName, sensorNode.sensorTypeId, timesTamp / 1e9, *(data), *(data + DATA_X),
-                *(data + DATA_XY));
+            *(data + DATA_XY));
+        if (ret < DUMP_SUCCESS) {
+            HDF_LOGE("%{publuc}s: sprintf ShowData is failed\n", __func__);
+        }
     }
     (void)HdfSbufWriteString(reply, sensorInfoDate);
 }
@@ -109,12 +133,17 @@ static void ShowData(const float *data, int64_t timesTamp, const struct SensorDe
 int32_t SensorShowData(struct HdfSBuf *reply)
 {
     int32_t len;
+    int32_t ret = 0;
     struct SensorDatePack *eventDumpList;
     char sensorInfoDate[STRING_LEN] = { 0 };
 
     eventDumpList = GetEventData();
 
-    sprintf(sensorInfoDate, "======The last 10 data records======\n\r");
+    ret = sprintf_s(sensorInfoDate, STRING_LEN, "======The last 10 data records======\n\r");
+    if (ret < DUMP_SUCCESS) {
+        HDF_LOGE("%{publuc}s: sprintf SensorShowData is failed\n", __func__);
+        return DUMP_NULL_PTR;
+    }
     (void)HdfSbufWriteString(reply, sensorInfoDate);
 
     if (eventDumpList->count < MAX_DUMP_DATA_SIZE) {
