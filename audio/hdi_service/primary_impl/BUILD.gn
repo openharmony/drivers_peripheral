@@ -32,6 +32,7 @@ ohos_shared_library("audio_primary_impl") {
     "//drivers/peripheral/audio/supportlibs/interfaces/include",
     "//third_party/bounds_checking_function/include",
     "//drivers/hdf_core/adapter/uhdf2/shared/include",
+    "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
   ]
   defines = []
   if (drivers_peripheral_audio_hal_notsupport_pathselect) {

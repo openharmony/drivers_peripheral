@@ -28,6 +28,7 @@ ohos_shared_library("audio_path_select") {
     "//third_party/cJSON",
     "//third_party/bounds_checking_function/include",
     "//drivers/hdf_core/adapter/uhdf2/shared/include",
+    "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
   ]
 
   defines = [ "IDL_MODE" ]
