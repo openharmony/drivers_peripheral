@@ -19,12 +19,12 @@
 #include <functional>
 #include "iremote_object.h"
 #include "refbase.h"
-#include "v1_0/ipower_interface.h"
+#include "v1_1/ipower_interface.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_0 {
+namespace V1_1 {
 class PowerInterfaceImpl : public IPowerInterface {
 public:
     ~PowerInterfaceImpl() override {};

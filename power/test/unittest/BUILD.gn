@@ -22,7 +22,7 @@ ohos_unittest("hdi_unittest_power") {
 
   include_dirs = [ "//drivers/peripheral/power/interfaces/hdi_service/include" ]
 
-  sources = [ "./hdf_power_hdi_test.cpp" ]
+  sources = [ "src/hdf_power_hdi_test.cpp" ]
 
   cflags = [
     "-Wall",
@@ -33,7 +33,7 @@ ohos_unittest("hdi_unittest_power") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [ "//drivers/interface/power/v1_0:libpower_stub_1.0" ]
+  deps = [ "//drivers/interface/power/v1_1:libpower_stub_1.1" ]
 
   external_deps = [
     "c_utils:utils",
