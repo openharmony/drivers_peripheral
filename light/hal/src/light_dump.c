@@ -34,6 +34,7 @@ static const char *DUMP_HELP =
 static int32_t ShowLightInfo(struct HdfSBuf *reply)
 {
     uint32_t i;
+    int32_t ret;
     uint8_t *lightState = NULL;
     struct LightDevice *lightDevice = NULL;
     char lightInfo[STRING_LEN] = {0};
@@ -51,12 +52,23 @@ static int32_t ShowLightInfo(struct HdfSBuf *reply)
         return HDF_FAILURE;
     }
     for (i = 0; i < lightDevice->lightNum; i++) {
-        sprintf(lightInfo, " lightId: %d\n state: %d\n lightNumber: %d\n lightName: %s\n lightType: %d\n",
+        ret = memset_s(lightInfo, STRING_LEN, 0, STRING_LEN);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{publuc}s: memset sensorInfoList is failed\n", __func__);
+            return HDF_FAILURE;
+        }
+
+        ret = sprintf_s(lightInfo, STRING_LEN,
+            " lightId: %d\n state: %d\n lightNumber: %d\n lightName: %s\n lightType: %d\n",
             lightDevice->lightInfoEntry->lightId,
             lightState[lightDevice->lightInfoEntry->lightId],
             lightDevice->lightInfoEntry->lightNumber,
             lightDevice->lightInfoEntry->lightName,
             lightDevice->lightInfoEntry->lightType);
+        if (ret < 0) {
+            HDF_LOGE("%{public}s: sprintf light info failed", __func__);
+            return HDF_FAILURE;
+        }
 
         if (!HdfSbufWriteString(reply, lightInfo)) {
             HDF_LOGE("%{public}s: write lightInfo failed", __func__);
@@ -69,6 +81,7 @@ static int32_t ShowLightInfo(struct HdfSBuf *reply)
 
 static int32_t ShowLightEffectInfo(struct HdfSBuf *reply)
 {
+    int32_t ret;
     struct LightEffect *lightEffect = NULL;
     char lightEffectInfo[STRING_LEN] = {0};
 
@@ -77,13 +90,25 @@ static int32_t ShowLightEffectInfo(struct HdfSBuf *reply)
         HDF_LOGE("%{public}s: get light effect info failed", __func__);
         return HDF_FAILURE;
     }
-    sprintf(lightEffectInfo, " r: %d\n g: %d\n b: %d\n flashMode: %d\n onTime: %d\n offTime: %d\n",
+
+    ret = memset_s(lightEffectInfo, STRING_LEN, 0, STRING_LEN);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{publuc}s: memset sensorInfoList is failed\n", __func__);
+        return HDF_FAILURE;
+    }
+
+    ret = sprintf_s(lightEffectInfo, STRING_LEN,
+        " r: %d\n g: %d\n b: %d\n flashMode: %d\n onTime: %d\n offTime: %d\n",
         lightEffect->lightColor.colorValue.rgbColor.r,
         lightEffect->lightColor.colorValue.rgbColor.g,
         lightEffect->lightColor.colorValue.rgbColor.b,
         lightEffect->flashEffect.flashMode,
         lightEffect->flashEffect.onTime,
         lightEffect->flashEffect.offTime);
+    if (ret < 0) {
+        HDF_LOGE("%{public}s: sprintf light effect info failed", __func__);
+        return HDF_FAILURE;
+    }
 
     if (!HdfSbufWriteString(reply, lightEffectInfo)) {
         HDF_LOGE("%{public}s: write lightEffectInfo failed", __func__);
