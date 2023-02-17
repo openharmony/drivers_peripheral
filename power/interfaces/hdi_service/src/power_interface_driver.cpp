@@ -17,12 +17,11 @@
 #include <hdf_device_desc.h>
 #include <hdf_log.h>
 #include <hdf_sbuf_ipc.h>
-#include <osal_mem.h>
-#include "v1_0/power_interface_stub.h"
+#include "v1_1/power_interface_stub.h"
 
 #define HDF_LOG_TAG PowerInterfaceDriver
 
-using namespace OHOS::HDI::Power::V1_0;
+using namespace OHOS::HDI::Power::V1_1;
 
 namespace {
 struct HdfPowerInterfaceHost {

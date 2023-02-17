@@ -41,7 +41,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_0 {
+namespace V1_1 {
 static constexpr const int32_t MAX_FILE_LENGTH = 32 * 1024 * 1024;
 static constexpr const char * const SUSPEND_STATE = "mem";
 static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
