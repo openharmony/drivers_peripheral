@@ -17,6 +17,7 @@
 #define CODEC_COMPONENT_MANAGER_SERVICE_H
 
 #include <hdf_dlist.h>
+#include <hdf_remote_service.h>
 #include <pthread.h>
 #include "codec_component_if.h"
 #include "codec_component_manager_stub.h"
@@ -37,8 +38,14 @@ struct CodecComponentManagerSerivce {
     pthread_mutex_t listMute;
     struct DListHead head;
 };
+
+struct RemoteServiceDeathRecipient {
+    struct HdfDeathRecipient recipient;
+};
+
 struct CodecComponentManagerSerivce *CodecComponentManagerSerivceGet(void);
 void OmxComponentManagerSeriveRelease(struct CodecComponentManagerSerivce *instance);
+void cleanRemoteServiceResource(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

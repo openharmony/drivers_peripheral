@@ -22,11 +22,34 @@
 #include "codec_component_capability_config.h"
 #include "codec_component_manager_stub.h"
 #include "codec_component_type_service.h"
+#include "codec_death_recipient.h"
 
 #define HDF_LOG_TAG codec_hdi_server
-
+#define MAX_COMPONENT_SIZE 32
 struct CodecComponentManagerSerivce *g_service = NULL;
 uint32_t g_componentId = 0;
+
+static void OnRemoteServiceDied(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
+{
+    cleanRemoteServiceResource(deathRecipient, remote);
+}
+
+static struct RemoteServiceDeathRecipient g_deathRecipient = {
+    .recipient = {
+        .OnRemoteDied = OnRemoteServiceDied,
+    }
+};
+
+static void AddDeathRecipientForService(struct CodecCallbackType *callbacks, uint32_t componentId,
+                                        struct CodecComponentNode *codecNode)
+{
+    bool needAdd = RegisterService(callbacks, componentId, codecNode);
+    if (needAdd) {
+        HDF_LOGI("%{public}s: add deathRecipient for remoteService!", __func__);
+        HdfRemoteServiceAddDeathRecipient(callbacks->remote, &g_deathRecipient.recipient);
+    }
+}
+
 static uint32_t GetNextComponentId()
 {
     uint32_t tempId = 0;
@@ -69,6 +92,46 @@ static int32_t OmxManagerGetComponentCapabilityList(CodecCompCapability *capList
     return err;
 }
 
+static int32_t OmxManagerDestroyComponent(uint32_t componentId)
+{
+    HDF_LOGI("%{public}s, service impl, %{public}d!", __func__, componentId);
+    if (g_service == NULL) {
+        HDF_LOGE("%{public}s, g_service is not init!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    struct ComponentTypeNode *pos = NULL;
+    struct ComponentTypeNode *next = NULL;
+    int32_t err = HDF_SUCCESS;
+    pthread_mutex_lock(&g_service->listMute);
+
+    DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &g_service->head, struct ComponentTypeNode, node)
+    {
+        if (pos == NULL || componentId != pos->componentId) {
+            continue;
+        }
+
+        struct CodecComponentNode *codecNode = CodecComponentTypeServiceGetCodecNode(pos->service);
+        if (codecNode != NULL) {
+            err = OmxAdapterDestroyComponent(codecNode);
+            if (err != HDF_SUCCESS) {
+                HDF_LOGE("%{public}s, OmxAdapterDestroyComponent ret err[%{public}d]!", __func__, err);
+                break;
+            }
+            RemoveDestoryedComponent(componentId);
+        }
+
+        DListRemove(&pos->node);
+        CodecComponentTypeServiceRelease(pos->service);
+        OsalMemFree(pos);
+        pos = NULL;
+        break;
+    }
+
+    pthread_mutex_unlock(&g_service->listMute);
+    return err;
+}
+
 static int32_t OmxManagerCreateComponent(struct CodecComponentType **component, uint32_t *componentId, char *compName,
                                          int64_t appData, struct CodecCallbackType *callbacks)
 {
@@ -103,6 +166,7 @@ static int32_t OmxManagerCreateComponent(struct CodecComponentType **component, 
     err = OmxAdapterSetComponentRole(codecNode, compName);
     if (err != HDF_SUCCESS) {
         HDF_LOGE("%{public}s, OMXAdapterSetComponentRole err [%{public}x]", __func__, err);
+        OmxManagerDestroyComponent(*componentId);
         CodecComponentTypeServiceRelease(comp);
         OsalMemFree(node);
         return HDF_ERR_INVALID_PARAM;
@@ -118,40 +182,7 @@ static int32_t OmxManagerCreateComponent(struct CodecComponentType **component, 
     node->componentId = *componentId;
     node->service = comp;
     HDF_LOGI("%{public}s: componentId:%{public}d", __func__, node->componentId);
-    return err;
-}
-
-static int32_t OmxManagerDestroyComponent(uint32_t componentId)
-{
-    HDF_LOGI("%{public}s, service impl, %{public}d!", __func__, componentId);
-    if (g_service == NULL) {
-        HDF_LOGE("%{public}s, g_service is not init!", __func__);
-        return HDF_ERR_INVALID_PARAM;
-    }
-    struct ComponentTypeNode *pos = NULL;
-    struct ComponentTypeNode *next = NULL;
-    int32_t err = HDF_SUCCESS;
-    pthread_mutex_lock(&g_service->listMute);
-    DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &g_service->head, struct ComponentTypeNode, node)
-    {
-        if (pos == NULL || componentId != pos->componentId) {
-            continue;
-        }
-        struct CodecComponentNode *codecNode = CodecComponentTypeServiceGetCodecNode(pos->service);
-        if (codecNode != NULL) {
-            err = OmxAdapterDestroyComponent(codecNode);
-            if (err != HDF_SUCCESS) {
-                HDF_LOGE("%{public}s, OmxAdapterDestroyComponent ret err[%{public}d]!", __func__, err);
-                break;
-            }
-        }
-        DListRemove(&pos->node);
-        CodecComponentTypeServiceRelease(pos->service);
-        OsalMemFree(pos);
-        pos = NULL;
-        break;
-    }
-    pthread_mutex_unlock(&g_service->listMute);
+    AddDeathRecipientForService(callbacks, *componentId, codecNode);
     return err;
 }
 
@@ -193,4 +224,26 @@ void OmxComponentManagerSeriveRelease(struct CodecComponentManagerSerivce *insta
         g_service = NULL;
     }
     OsalMemFree(instance);
+}
+
+void cleanRemoteServiceResource(struct HdfDeathRecipient *deathRecipient, struct HdfRemoteService *remote)
+{
+    uint32_t compIds[MAX_COMPONENT_SIZE];
+    uint32_t size = 0;
+    int32_t ret = CleanMapperOfDiedService(remote, compIds, &size);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: clearn remote resource error!", __func__);
+        return;
+    }
+
+    if (size == 0) {
+        HDF_LOGE("%{public}s: remoteService no componment resource need to be release!", __func__);
+        return;
+    }
+    for (uint32_t i = 0; i < size; i++) {
+        OmxManagerDestroyComponent(compIds[i]);
+        HDF_LOGI("%{public}s: destroyComponent done, compId=[%{public}d]", __func__, compIds[i]);
+    }
+
+    HDF_LOGI("%{public}s: remote service died , clean resource success!", __func__);
 }
