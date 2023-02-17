@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,7 +62,8 @@ static int32_t ReadVibratorInfo(struct HdfSBuf *reply, struct VibratorDevice *pr
     }
 
     if (buf == NULL || len != sizeof(struct VibratorInfo)) {
-        HDF_LOGE("%s: read size is error", __func__);
+        HDF_LOGE("%{public}s: read size is error, len = %{public}d, size = %{public}zu\n",\
+            __func__, len, sizeof(struct VibratorInfo));
         HdfSbufRecycle(reply);
         return HDF_FAILURE;
     }
@@ -115,7 +116,7 @@ static int32_t GetVibratorInfo(struct VibratorInfo **vibratorInfo)
     return HDF_SUCCESS;
 }
 
-static int32_t ValidityJudgment(uint32_t duration, int32_t intensity, int32_t frequency)
+static int32_t ValidityJudgment(uint32_t duration, uint16_t intensity, int16_t frequency)
 {
     struct VibratorDevice *priv = GetVibratorDevicePriv();
     if (duration == 0) {
@@ -138,7 +139,7 @@ static int32_t ValidityJudgment(uint32_t duration, int32_t intensity, int32_t fr
     return VIBRATOR_SUCCESS;
 }
 
-static int32_t EnableVibratorModulation(uint32_t duration, int32_t intensity, int32_t frequency)
+static int32_t EnableVibratorModulation(uint32_t duration, uint16_t intensity, int16_t frequency)
 {
     int32_t ret;
     struct VibratorDevice *priv = GetVibratorDevicePriv();
@@ -164,14 +165,14 @@ static int32_t EnableVibratorModulation(uint32_t duration, int32_t intensity, in
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteInt32(msg, intensity)) {
+    if (!HdfSbufWriteUint16(msg, intensity)) {
         HDF_LOGE("%{public}s: write intensity failed.", __func__);
         HdfSbufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);
         return HDF_FAILURE;
     }
 
-    if (!HdfSbufWriteInt32(msg, frequency)) {
+    if (!HdfSbufWriteInt16(msg, frequency)) {
         HDF_LOGE("%{public}s: write frequency failed.", __func__);
         HdfSbufRecycle(msg);
         (void)OsalMutexUnlock(&priv->mutex);

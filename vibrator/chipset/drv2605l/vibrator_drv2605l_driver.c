@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  *
  * HDF is dual licensed: you can use it either under the terms of
  * the GPL, or the BSD license, at your option.
@@ -181,7 +181,7 @@ static int32_t InitDrv2605lChip(struct VibratorCfgData *drv2605lCfgData)
     return HDF_SUCCESS;
 }
 
-static void SetModulationParameter(int32_t intensity, int32_t frequency)
+static int32_t SetModulationParameter(uint16_t intensity, int16_t frequency)
 {
     uint8_t value[DRV2605L_VALUE_BUTT];
     struct Drv2605lDriverData *drvData = NULL;
