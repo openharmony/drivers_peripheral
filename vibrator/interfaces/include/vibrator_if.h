@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -117,7 +117,47 @@ struct VibratorInterface {
      * @since 3.2
      * @version 1.1
      */
-    int32_t (*EnableVibratorModulation)(uint32_t duration, int32_t intensity, int32_t frequency);
+    int32_t (*EnableVibratorModulation)(uint32_t duration, uint16_t intensity, int16_t frequency);
+    /**
+     * @brief Controls the vibrator to perform a periodic vibration with the custom composite effect.
+     *
+     * @param effect Indicates the pointer to the custom composite effect type. For details,
+     * see {@link CompositeEffect}.
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     *
+     * @since 3.2
+     * @version 1.1
+     */
+    int32_t (*EnableCompositeEffect)(struct CompositeEffect *effect);
+    /**
+     * @brief Obtains the vibration effect information with the specified effect type.
+     *
+     * @param effectType Indicates the pointer to the preset effect type. It is recommended that the
+     * maximum length be 64 bytes.
+     *
+     * @param effectInfo Indicates the pointer to the vibration effect information. For details,
+     * see {@link EffectInfo}.
+     *
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns negative value if the get failed.
+     *
+     * @since 3.2
+     * @version 1.1
+     */
+    int32_t (*GetEffectInfo)(const char *effectType, struct EffectInfo *effectInfo);
+    /**
+     * @brief Obtains whether the vibrator is currently vibrating.
+     *
+     * @param state Indicates current vibration state of the vibrator.
+     *
+     * @return Returns <b>0</b> if the operation is successful.
+     * @return Returns negative value if the get failed.
+     *
+     * @since 3.2
+     * @version 1.1
+     */
+    int32_t (*IsVibratorRunning)(bool state);
 };
 
 /**
