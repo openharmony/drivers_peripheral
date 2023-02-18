@@ -528,10 +528,12 @@ int32_t AudioManagerUnloadAdapter(struct IAudioManager *manager, const char *ada
 
 int32_t ReleaseAudioManagerObject(struct IAudioManager *manager)
 {
+    struct AudioHwManager *service = (struct AudioHwManager *)manager;
     if (ReleaseAudioManagerObjectComm(manager)) {
-        OsalMemFree(manager);
-        manager = NULL;
+        OsalMemFree(service);
+        service = NULL;
     }
+
     return AUDIO_SUCCESS;
 }
 
