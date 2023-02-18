@@ -96,17 +96,20 @@ ERROR:
 struct IAudioManager *AudioManagerImplGetInstance(void)
 {
     struct AudioManagerPriv *priv = GetAudioManagerPriv();
+
     int32_t ret = AudioManagerLoadPrimaryLib(priv);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s:Audio manager load lib failed, ret[%{public}d]", __func__, ret);
         return NULL;
     }
+
     if (priv->createIfInstance == NULL) {
         HDF_LOGE("%{public}s:Audio manager createIfInstance is NULL", __func__);
         dlclose(priv->handle);
         priv->handle = NULL;
         return NULL;
     }
+
     struct IAudioManager *interface = priv->createIfInstance();
     if (interface == NULL) {
         HDF_LOGE("%{public}s:call createIfInstance fail", __func__);
