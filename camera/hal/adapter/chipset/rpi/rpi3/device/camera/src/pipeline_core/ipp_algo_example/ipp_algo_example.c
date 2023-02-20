@@ -47,7 +47,7 @@ int Process(IppAlgoBuffer *inBuffer[], int inBufferCount, IppAlgoBuffer *outBuff
 
     for (int i = 0; i < inBufferCount; i++) {
         if (inBuffer[i] != NULL) {
-            printf("in buffer addr = %p, width = %u, height = %u, stride = %u, size = %u, id = %d\n", inBuffer[i]->addr,
+            printf("in buffer width = %u, height = %u, stride = %u, size = %u, id = %d\n",
                    inBuffer[i]->width, inBuffer[i]->height, inBuffer[i]->stride, inBuffer[i]->size, inBuffer[i]->id);
         } else {
             printf("in buffer %d is NULL\n", i);
@@ -55,7 +55,7 @@ int Process(IppAlgoBuffer *inBuffer[], int inBufferCount, IppAlgoBuffer *outBuff
     }
 
     if (outBuffer != NULL && outBuffer->addr != NULL) {
-        printf("out buffer addr = %p, size = %u, id = %d\n", outBuffer->addr, outBuffer->size, outBuffer->id);
+        printf("out buffer size = %u, id = %d\n", outBuffer->size, outBuffer->id);
     } else {
         printf("out buffer is NULL\n");
     }
