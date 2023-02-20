@@ -16,15 +16,13 @@
 #ifndef BATTERY_LOG_H
 #define BATTERY_LOG_H
 
-#ifndef ENABLE_INIT_LOG
-
 #include "hilog/log.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Battery {
-#define FILE_NAME         (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
-#define FORMAT(fmt, ...)  "[%{public}s:%{public}d] %{public}s# " fmt, FILE_NAME, __LINE__, __FUNCTION__, ##__VA_ARGS__
+#define FILE_NAME        (__builtin_strrchr(__FILE__, '/') ? __builtin_strrchr(__FILE__, '/') + 1 : __FILE__)
+#define FORMAT(fmt, ...) "[%{public}s:%{public}d] %{public}s# " fmt, FILE_NAME, __LINE__, __FUNCTION__, ##__VA_ARGS__
 
 #ifdef BATTERY_HILOGF
 #undef BATTERY_HILOGF
@@ -51,7 +49,7 @@ namespace {
 constexpr unsigned int BATTERY_DOMAIN_ID_START = 0xD002920;
 constexpr unsigned int BATTERY_DOMAIN_ID_END = BATTERY_DOMAIN_ID_START + 32;
 constexpr unsigned int TEST_DOMAIN_ID = 0xD000F00;
-}
+} // namespace
 
 enum BatteryManagerLogLabel {
     // Component labels, you can add if needed
@@ -71,26 +69,26 @@ enum BatteryManagerLogLabel {
 
 enum BatteryManagerLogDomain {
     DOMAIN_APP = BATTERY_DOMAIN_ID_START + COMP_APP, // 0xD002920
-    DOMAIN_FRAMEWORK, // 0xD002921
-    DOMAIN_SERVICE, // 0xD002922
-    DOMAIN_HDI, // 0xD002923
-    DOMAIN_DRIVER, // 0xD002924
+    DOMAIN_FRAMEWORK,                                // 0xD002921
+    DOMAIN_SERVICE,                                  // 0xD002922
+    DOMAIN_HDI,                                      // 0xD002923
+    DOMAIN_DRIVER,                                   // 0xD002924
     DOMAIN_FEATURE_CHARGING,
     DOMAIN_FEATURE_BATT_INFO,
-    DOMAIN_TEST = TEST_DOMAIN_ID, // 0xD000F00
+    DOMAIN_TEST = TEST_DOMAIN_ID,       // 0xD000F00
     DOMAIN_END = BATTERY_DOMAIN_ID_END, // Max to 0xD002940, keep the sequence and length same as BatteryManagerLogLabel
 };
 
 // Keep the sequence and length same as BatteryManagerLogDomain
 static constexpr OHOS::HiviewDFX::HiLogLabel BATTERY_LABEL[LABEL_END] = {
-    {LOG_CORE, DOMAIN_APP,               "BatteryApp"},
-    {LOG_CORE, DOMAIN_FRAMEWORK,         "BatteryFwk"},
-    {LOG_CORE, DOMAIN_SERVICE,           "BatterySvc"},
-    {LOG_CORE, DOMAIN_HDI,               "BatteryHdi"},
-    {LOG_CORE, DOMAIN_DRIVER,            "BatteryDrv"},
+    {LOG_CORE, DOMAIN_APP,               "BatteryApp"     },
+    {LOG_CORE, DOMAIN_FRAMEWORK,         "BatteryFwk"     },
+    {LOG_CORE, DOMAIN_SERVICE,           "BatterySvc"     },
+    {LOG_CORE, DOMAIN_HDI,               "BatteryHdi"     },
+    {LOG_CORE, DOMAIN_DRIVER,            "BatteryDrv"     },
     {LOG_CORE, DOMAIN_FEATURE_CHARGING,  "BatteryCharging"},
-    {LOG_CORE, DOMAIN_FEATURE_BATT_INFO, "BatteryInfo"},
-    {LOG_CORE, DOMAIN_TEST,              "BatteryTest"},
+    {LOG_CORE, DOMAIN_FEATURE_BATT_INFO, "BatteryInfo"    },
+    {LOG_CORE, DOMAIN_TEST,              "BatteryTest"    },
 };
 
 #define BATTERY_HILOGF(domain, ...) (void)OHOS::HiviewDFX::HiLog::Fatal(BATTERY_LABEL[domain], FORMAT(__VA_ARGS__))
@@ -98,59 +96,8 @@ static constexpr OHOS::HiviewDFX::HiLogLabel BATTERY_LABEL[LABEL_END] = {
 #define BATTERY_HILOGW(domain, ...) (void)OHOS::HiviewDFX::HiLog::Warn(BATTERY_LABEL[domain], FORMAT(__VA_ARGS__))
 #define BATTERY_HILOGI(domain, ...) (void)OHOS::HiviewDFX::HiLog::Info(BATTERY_LABEL[domain], FORMAT(__VA_ARGS__))
 #define BATTERY_HILOGD(domain, ...) (void)OHOS::HiviewDFX::HiLog::Debug(BATTERY_LABEL[domain], FORMAT(__VA_ARGS__))
-}  // namespace Battery
-}  // namespace HDI
-}  // namespace OHOS
-
-#else
-
-#include <string>
-#include "beget_ext.h"
-
-#define CHARGER_LOG_FILE "charger.log"
-#define FEATURE_CHARGING "charger: "
-#define FEATURE_BATT_INFO FEATURE_CHARGING
-#define COMP_HDI FEATURE_CHARGING
-
-inline void ReplaceHolder(std::string& str, const std::string& holder)
-{
-    size_t index = 0;
-    size_t holderLen = holder.size();
-    while ((index = str.find(holder, index)) != std::string::npos) {
-        str = str.replace(index, holderLen, "");
-        index++;
-    }
-}
-
-inline std::string ReplaceHolders(const char* fmt)
-{
-    std::string str(fmt);
-    ReplaceHolder(str, "{public}");
-    ReplaceHolder(str, "{private}");
-    return "[%s:%d] %s# " + str + "\n";
-}
-
-#define BATTERY_HILOGE(label, fmt, ...) \
-    do {    \
-        InitLogPrint(INIT_LOG_PATH CHARGER_LOG_FILE, INIT_ERROR, label, (ReplaceHolders(fmt).c_str()), \
-            (FILE_NAME), (__LINE__), (__FUNCTION__), ##__VA_ARGS__); \
-    } while (0)
-#define BATTERY_HILOGW(label, fmt, ...) \
-    do {    \
-        InitLogPrint(INIT_LOG_PATH CHARGER_LOG_FILE, INIT_WARN, label, (ReplaceHolders(fmt).c_str()), \
-            (FILE_NAME), (__LINE__), (__FUNCTION__), ##__VA_ARGS__); \
-    } while (0)
-#define BATTERY_HILOGI(label, fmt, ...) \
-    do {    \
-        InitLogPrint(INIT_LOG_PATH CHARGER_LOG_FILE, INIT_INFO, label, (ReplaceHolders(fmt).c_str()), \
-            (FILE_NAME), (__LINE__), (__FUNCTION__), ##__VA_ARGS__); \
-    } while (0)
-#define BATTERY_HILOGD(label, fmt, ...) \
-    do {    \
-        InitLogPrint(INIT_LOG_PATH CHARGER_LOG_FILE, INIT_DEBUG, label, (ReplaceHolders(fmt).c_str()), \
-            (FILE_NAME), (__LINE__), (__FUNCTION__), ##__VA_ARGS__); \
-    } while (0)
-
-#endif // ENABLE_INIT_LOG
+} // namespace Battery
+} // namespace HDI
+} // namespace OHOS
 
 #endif // BATTERY_LOG_H
