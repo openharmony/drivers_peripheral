@@ -96,7 +96,7 @@ void StoreImage(const unsigned char *bufStart, const unsigned int size, const in
         CAMERA_LOGE("open image file error %s.....\n", strerror(errno));
     }
 
-    CAMERA_LOGD("store_image  buf_start == %p size == %d index %d\n", bufStart, size, index);
+    CAMERA_LOGD("store_image size == %d index %d\n", size, index);
 
     ret = write(imgFD, bufStart, size);
     if (ret == -1) {
@@ -111,7 +111,7 @@ int DoFbMunmap(unsigned char* addr)
     constexpr uint32_t bit = 8;
     unsigned int size = g_vInfo.xres * g_vInfo.yres * g_vInfo.bits_per_pixel / bit;
 
-    CAMERA_LOGD("main test:munmapped size = %d, virt_addr = 0x%p\n", size, addr);
+    CAMERA_LOGD("main test:munmapped size = %d\n", size);
 
     return munmap(addr, size);
 }
@@ -128,7 +128,7 @@ unsigned char* DoFbMmap(const int pmemfd)
         return nullptr;
     }
 
-    CAMERA_LOGD("main test:do_mmap: pmem mmap fd %d ptr %p len %u\n", pmemfd, ret, screensize);
+    CAMERA_LOGD("main test:do_mmap: pmem mmap fd %d len %u\n", pmemfd, screensize);
 
     return ret;
 }
