@@ -44,7 +44,7 @@ int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
         DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &managerService->head, struct ComponentTypeNode, node)
         {
             struct CodecComponentNode *codecNode = CodecComponentTypeServiceGetCodecNode(pos->service);
-            if (codecNode != NULL) {
+            if (codecNode != NULL && pos != NULL) {
                 char dump[CODEC_MAX_DFX_DUMP_LEN + 1] = { 0 };
                 int32_t ret = OmxAdapterWriteDumperData(dump, CODEC_MAX_DFX_DUMP_LEN, pos->componentId, codecNode);
                 if (ret != HDF_SUCCESS) {

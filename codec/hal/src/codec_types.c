@@ -767,7 +767,11 @@ bool CodecCompCapabilityBlockUnmarshalling(struct HdfSBuf *data, CodecCompCapabi
         HDF_LOGE("%{public}s: read portCp failed!", __func__);
         return false;
     }
-    (void)memcpy_s(&dataBlock->port, sizeof(PortCap), portCp, sizeof(PortCap));
+
+    if (memcpy_s(&dataBlock->port, sizeof(PortCap), portCp, sizeof(PortCap)) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s dataBlock->port failed!", __func__);
+        return false;
+    }
 
     if (!HdfSbufReadInt8(data, (int8_t *)&dataBlock->canSwapWidthHeight)) {
         HDF_LOGE("%{public}s: read dataBlock->canSwapWidthHeight failed!", __func__);
