@@ -45,6 +45,7 @@
 #define START_CODE                  0x1
 #define VOP_START                   0xb6
 #define YUV_ALIGNMENT               16
+#define READ_SIZE_FRAME             1
 
 typedef struct {
     char            *codecName;
@@ -135,17 +136,24 @@ static int32_t ReadAvcFrame(FILE *fp, uint8_t *buf)
 static int32_t ReadMpeg4Frame(FILE *fp, uint8_t *buf)
 {
     int32_t readSize = 0;
-    fread(buf, 1, START_CODE_SIZE_SLICE, fp);
+    size_t length = fread(buf, READ_SIZE_FRAME, START_CODE_SIZE_SLICE, fp);
+    if (length != START_CODE_SIZE_SLICE) {
+        HDF_LOGE("%{public}s: fread failed!", __func__);
+        return 0;
+    }
     if (feof(fp)) {
         return readSize;
     }
 
     uint8_t *temp = buf;
     temp += START_CODE_SIZE_SLICE;
-    bool ret = true;
     bool findVop = false;
     while (!feof(fp)) {
-        fread(temp, 1, 1, fp);
+        length = fread(temp, READ_SIZE_FRAME, READ_SIZE_FRAME, fp);
+        if (length != READ_SIZE_FRAME) {
+            HDF_LOGE("%{public}s: fread failed!", __func__);
+            continue;
+        }
         // check start code
         if ((*temp == VOP_START) && (temp[START_CODE_OFFSET_ONE] == START_CODE) && (temp[START_CODE_OFFSET_SEC] == 0) &&
             (temp[START_CODE_OFFSET_THIRD] == 0)) {
@@ -153,9 +161,8 @@ static int32_t ReadMpeg4Frame(FILE *fp, uint8_t *buf)
         }
         if (findVop && (*temp == START_CODE) && (temp[START_CODE_OFFSET_ONE] == 0) &&
             (temp[START_CODE_OFFSET_SEC] == 0)) {
-            temp -= START_CODE_SIZE_SLICE - 1;
+            temp -= START_CODE_SIZE_SLICE - READ_SIZE_FRAME;
             fseek(fp, START_CODE_OFFSET_THIRD, SEEK_CUR);
-            ret = false;
             break;
         }
         temp++;
@@ -168,12 +175,20 @@ static int32_t ReadVp9Frame(FILE *fp, uint8_t *buf)
 {
     // len(4 bytes, little-end, length of vp9 data) + vp9 data
     int32_t readSize = 0;
-    fread(&readSize, 1, sizeof(readSize), fp);
+    size_t length = fread(&readSize, READ_SIZE_FRAME, sizeof(readSize), fp);
+    if (length != sizeof(readSize)) {
+        HDF_LOGE("%{public}s: fread failed!", __func__);
+        return 0;
+    }
     if (feof(fp)) {
         return 0;
     }
     readSize = ntohl(readSize);
-    readSize = fread(buf, 1, readSize, fp);
+    length = fread(buf, READ_SIZE_FRAME, readSize, fp);
+    if (length != (size_t)readSize) {
+        HDF_LOGE("%{public}s: fread failed!", __func__);
+        return 0;
+    }
     return readSize;
 }
 
