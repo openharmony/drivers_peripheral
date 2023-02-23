@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 
 #include "ddk_pnp_listener_mgr.h"
 #include "hdf_slist.h"
+#include "hisysevent.h"
 #include "osal_mutex.h"
 #include "usb_ddk_interface.h"
 #include "usb_ddk_pnp_loader.h"
@@ -32,6 +33,8 @@
 #include "usbd_function.h"
 #include "usbd_load_usb_service.h"
 #include "usbd_port.h"
+using namespace OHOS::HiviewDFX;
+constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
 
 namespace OHOS {
 namespace HDI {
@@ -40,6 +43,8 @@ namespace V1_0 {
 HdfDevEventlistener UsbImpl::listenerForLoadService_ = {nullptr};
 UsbdSubscriber UsbImpl::subscribers_[MAX_SUBSCRIBER] = {{0}};
 bool UsbImpl::isGadgetConnected_ = false;
+uint32_t UsbImpl::attachCount_ = 0;
+uint32_t UsbImpl::attachFailedCount_ = 0;
 
 extern "C" IUsbInterface *UsbInterfaceImplGetInstance(void)
 {
@@ -801,6 +806,29 @@ int32_t UsbImpl::BulkRequestCancel(UsbdBulkASyncList *list)
     return HDF_SUCCESS;
 }
 
+void UsbImpl::ReportUsbdSysEvent(int32_t code, UsbPnpNotifyMatchInfoTable *infoTable)
+{
+    if (code == HDF_SUCCESS) {
+        HDF_LOGI("%{public}s: UsbdDeviceCreateAndAttach successed", __func__);
+        attachCount_++;
+    } else if (code != HDF_ERR_DEVICE_BUSY) {
+        attachFailedCount_++;
+        attachCount_++;
+        HDF_LOGI("%{public}s: UsbdDeviceCreateAndAttach failed", __func__);
+        HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL", HiSysEvent::EventType::FAULT,
+            "DEVICE_NAME", std::to_string(infoTable->busNum) + "-" + std::to_string(infoTable->devNum),
+            "DEVICE_PROTOCOL", infoTable->deviceInfo.deviceProtocol, "DEVICE_CLASS", infoTable->deviceInfo.deviceClass,
+            "VENDOR_ID", infoTable->deviceInfo.vendorId, "PRODUCT_ID", infoTable->deviceInfo.productId,
+            "VERSION", "1.0.0", "FAIL_REASON", 0, "FAIL_INFO", "USB device recognition failed");
+        HiSysEventWrite(HiSysEvent::Domain::HDF_USB, "RECOGNITION_FAIL_STATISTICS", HiSysEvent::EventType::FAULT,
+            "EXCEPTION_CNT", attachFailedCount_, "TOTAL_CNT", attachCount_,
+            "FAIL_RATE", (static_cast<double>(attachFailedCount_)) / (static_cast<double>(attachCount_)
+            * USB_RECOGNITION_FAIL_RATE_BASE), "QUALITY_STATISTICAL", "Failure rate statistics");
+    } else {
+        HDF_LOGI("%{public}s:device already add", __func__);
+    }
+}
+
 int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *usbdSubscriber, uint32_t id)
 {
     if (data == nullptr) {
@@ -834,7 +862,8 @@ int32_t UsbImpl::UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *
 
     int32_t ret = HDF_SUCCESS;
     if (id == USB_PNP_NOTIFY_ADD_DEVICE) {
-        UsbdDispatcher::UsbdDeviceCreateAndAttach(super, infoTable->busNum, infoTable->devNum);
+        ret = UsbdDispatcher::UsbdDeviceCreateAndAttach(super, infoTable->busNum, infoTable->devNum);
+        ReportUsbdSysEvent(ret, infoTable);
         USBDeviceInfo info = {ACT_DEVUP, infoTable->busNum, infoTable->devNum};
         if (subscriber == nullptr) {
             HDF_LOGE("%{public}s: subscriber is nullptr, %{public}d", __func__, __LINE__);

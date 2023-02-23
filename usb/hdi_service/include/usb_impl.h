@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define OHOS_HDI_USB_V1_0_USBIMPL_H
 
 #include "hdf_slist.h"
+#include "hdf_usb_pnp_manage.h"
 #include "iproxy_broker.h"
 #include "iremote_object.h"
 #include "osal_mutex.h"
@@ -128,7 +129,7 @@ private:
     int32_t BulkRequestCancel(UsbdBulkASyncList *list);
     int32_t HdfReadDevice(int32_t *count, int32_t *size, HdfSBuf *reply);
     int32_t UsbdReleaseDevices();
-
+    static void ReportUsbdSysEvent(int32_t code, UsbPnpNotifyMatchInfoTable *infoTable);
     static int32_t UsbdPnpNotifyAddAndRemoveDevice(HdfSBuf *data, UsbdSubscriber *usbdSubscriber, uint32_t id);
     static int32_t UsbdPnpLoaderEventReceived(void *priv, uint32_t id, HdfSBuf *data);
     static int32_t UsbdLoadServiceCallback(void *priv, uint32_t id, HdfSBuf *data);
@@ -146,6 +147,8 @@ private:
     static HdfDevEventlistener listenerForLoadService_;
     static UsbdSubscriber subscribers_[MAX_SUBSCRIBER];
     static bool isGadgetConnected_;
+    static uint32_t attachCount_;
+    static uint32_t attachFailedCount_;
 };
 } // namespace V1_0
 } // namespace Usb
