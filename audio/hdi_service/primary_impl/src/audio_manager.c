@@ -242,7 +242,10 @@ static int32_t AudioManagerServiceAddAdapter(
         return AUDIO_ERR_INTERNAL;
     }
 
+    hwManager->adapterInfos[pos].refCnt = 1; // first init set 1
     hwManager->adapterInfos[pos].adapterServicePtr = hwAdapter;
+    AUDIO_FUNC_LOGI("load adaptername[%{public}s], refCount[1]", hwManager->adapterInfos[pos].adapterName);
+
     return AUDIO_SUCCESS;
 }
 
@@ -258,7 +261,7 @@ static uint32_t AudioManagerServiceFindAdapterPos(struct IAudioManager *manager,
         }
     }
 
-    AUDIO_FUNC_LOGE("can not find adapterName(%{public}s)!", adapterName);
+    AUDIO_FUNC_LOGI("can not find adapterName(%{public}s), malloc new pos", adapterName);
     return SUPPORT_ADAPTER_NUM_MAX;
 }
 
@@ -321,6 +324,7 @@ int32_t AudioManagerGetAllAdapters(struct IAudioManager *manager,
         AUDIO_FUNC_LOGE("AudioAdaptersForUser FAIL!");
         return AUDIO_ERR_NOTREADY;
     }
+
     return AUDIO_SUCCESS;
 }
 
@@ -429,6 +433,45 @@ static int32_t SelectAppropriateAdapter(
     return AUDIO_SUCCESS;
 }
 
+static int32_t AudioManagerIncreaseAdapterRef(struct IAudioManager *manager, uint32_t infoIndex,
+    struct IAudioAdapter **adapter)
+{
+    struct AudioHwManager *audioManagerSer = (struct AudioHwManager *)manager;
+
+    if (audioManagerSer->adapterInfos[infoIndex].adapterServicePtr == NULL) {
+        AUDIO_FUNC_LOGE("Invalid adapterServicePtr param!");
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+
+    audioManagerSer->adapterInfos[infoIndex].refCnt++;
+    *adapter = &(audioManagerSer->adapterInfos[infoIndex].adapterServicePtr->common);
+
+    AUDIO_FUNC_LOGI("load adaptername[%{public}s], refCount[%{public}d] increase",
+    audioManagerSer->adapterInfos[infoIndex].adapterName, audioManagerSer->adapterInfos[infoIndex].refCnt);
+    return AUDIO_SUCCESS;
+}
+
+static int32_t AudioManagerDecreaseAdapterRef(struct IAudioManager *manager, uint32_t infoIndex)
+{
+    struct AudioHwManager *audioManagerSer = (struct AudioHwManager *)manager;
+
+    if (audioManagerSer->adapterInfos[infoIndex].refCnt == 0) {
+        AUDIO_FUNC_LOGE("Invalid adapterInfos[%{public}d] had released", infoIndex);
+        return AUDIO_ERR_INVALID_PARAM;
+    }
+
+    audioManagerSer->adapterInfos[infoIndex].refCnt--;
+    AUDIO_FUNC_LOGI("unload adaptername[%{public}s], refCount[%{public}d] decrease",
+    audioManagerSer->adapterInfos[infoIndex].adapterName, audioManagerSer->adapterInfos[infoIndex].refCnt);
+    return AUDIO_SUCCESS;
+}
+
+static void AudioManagerEnforceClearRef(struct IAudioManager *manager, uint32_t infoIndex)
+{
+    struct AudioHwManager *audioManagerSer = (struct AudioHwManager *)manager;
+    audioManagerSer->adapterInfos[infoIndex].refCnt = 0;
+}
+
 static int32_t AudioManagerServiceRemvAdapter(struct IAudioManager *manager, uint32_t pos)
 {
     if (manager == NULL || pos >= SUPPORT_ADAPTER_NUM_MAX) {
@@ -438,6 +481,10 @@ static int32_t AudioManagerServiceRemvAdapter(struct IAudioManager *manager, uin
 
     struct AudioHwManager *audioManagerSer = (struct AudioHwManager *)manager;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)audioManagerSer->adapterInfos[pos].adapterServicePtr;
+
+    if (audioManagerSer->adapterInfos[pos].refCnt != 0) {
+        return AudioManagerDecreaseAdapterRef(manager, pos);
+    }
 
     StubCollectorRemoveObject(IAUDIOADAPTER_INTERFACE_DESC, hwAdapter);
 
@@ -459,6 +506,7 @@ static int32_t AudioManagerServiceRemvAdapter(struct IAudioManager *manager, uin
 
     AudioMemFree((void **)&hwAdapter);
     audioManagerSer->adapterInfos[pos].adapterServicePtr = NULL;
+    AUDIO_FUNC_LOGI("audio unload adapterName[%{public}s] success", audioManagerSer->adapterInfos[pos].adapterName);
 
     (void)memset_s(audioManagerSer->adapterInfos[pos].adapterName, ADAPTER_NAME_LEN, 0, ADAPTER_NAME_LEN);
 
@@ -480,7 +528,12 @@ int32_t AudioManagerLoadAdapter(
         return AUDIO_ERR_INVALID_PARAM;
     }
 
-    int32_t pos = AudioManagerServiceGetFreeAdapterPos(manager, desc->adapterName);
+    uint32_t pos = AudioManagerServiceFindAdapterPos(manager, desc->adapterName);
+    if (pos < SUPPORT_ADAPTER_NUM_MAX) {
+        return AudioManagerIncreaseAdapterRef(manager, pos, adapter);
+    }
+
+    pos = AudioManagerServiceGetFreeAdapterPos(manager, desc->adapterName);
     if (pos >= SUPPORT_ADAPTER_NUM_MAX) {
         AUDIO_FUNC_LOGE("AudioManagerServiceGetFreeAdapterPos failed!");
         return HDF_FAILURE;
@@ -496,6 +549,7 @@ int32_t AudioManagerLoadAdapter(
     ret = AudioManagerServiceAddAdapter(manager, *adapter, pos);
     if (ret != AUDIO_SUCCESS) {
         AUDIO_FUNC_LOGE("Add adapter to list failed.");
+        AudioManagerEnforceClearRef(manager, pos);
         AudioManagerServiceRemvAdapter(manager, pos);
         return ret;
     }

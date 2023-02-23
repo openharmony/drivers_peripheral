@@ -319,6 +319,7 @@ struct AudioHwAdapter {
 struct AudioAdapterInfo {
     char adapterName[ADAPTER_NAME_LEN];
     struct AudioHwAdapter *adapterServicePtr;
+    uint32_t refCnt;
 };
 
 struct AudioHwManager {
