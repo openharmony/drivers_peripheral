@@ -420,6 +420,12 @@ int32_t SetValue(struct ExtraParams mExtraParams, struct AudioHwRender *render)
     if (mExtraParams.sampleRate != 0) {
         render->renderParam.frameRenderMode.attrs.sampleRate = mExtraParams.sampleRate;
     }
+#ifdef A2DP_HDI_SERVICE
+    if (mExtraParams.audioStreamCtl == 1) {
+        HDF_LOGI("SetValue, try to suspendPlaying");
+        OHOS::Bluetooth::SuspendPlaying();
+    }
+#endif
     return HDF_SUCCESS;
 }
 
