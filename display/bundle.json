@@ -16,6 +16,9 @@
     "adapter_system_type": ["standard", "small"],
     "rom": "1260KB",
     "ram": "7700KB",
+    "features": [
+      "drivers_peripheral_display_community"
+    ],
     "deps": {
       "components": [
         "graphic_standard",
