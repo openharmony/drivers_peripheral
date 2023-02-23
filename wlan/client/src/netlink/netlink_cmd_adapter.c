@@ -74,6 +74,8 @@
 #define HIGH_LIMIT_FREQ_2_4G      2500
 #define LOW_LIMIT_FREQ_5G         5100
 #define HIGH_LIMIT_FREQ_5G        5900
+#define INTERFACE_UP              0x1 /* interface is up */
+#define MAX_INTERFACE_NAME_SIZE   16
 
 static inline uint32_t BIT(uint8_t x)
 {
@@ -1602,6 +1604,41 @@ static int32_t SendCommandToDriver(const char *cmd, uint32_t len, const char *if
     return ret;
 }
 
+static int32_t GetInterfaceState(const char *interfaceName, uint16_t *state)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct ifreq ifr;
+    int32_t fd;
+
+    if (memset_s(&ifr, sizeof(ifr), 0, sizeof(ifr)) != EOK) {
+        HILOG_ERROR(LOG_CORE, "%s: memset_s req failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+
+    fd = socket(PF_INET, SOCK_DGRAM | SOCK_CLOEXEC, 0);
+    if (fd < 0) {
+        HILOG_ERROR(LOG_CORE, "%s: open socket failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    do {
+        if (strncpy_s(ifr.ifr_name, MAX_INTERFACE_NAME_SIZE, interfaceName, strlen(interfaceName)) != EOK) {
+            HILOG_ERROR(LOG_CORE, "%s: strncpy_s failed", __FUNCTION__);
+            break;
+        }
+        ret = ioctl(fd, SIOCGIFFLAGS, &ifr);
+        if (ret < 0) {
+            HILOG_ERROR(LOG_CORE, "%s:could not read interface state for %s, errno = %d, (%s)", __FUNCTION__,
+                interfaceName, errno, strerror(errno));
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        *state = ifr.ifr_flags;
+    } while (0);
+
+    close(fd);
+    return ret;
+}
+
 static int32_t DisableNextCacOnce(const char *ifName)
 {
     char cmdBuf[P2P_BUF_SIZE] = {CMD_SET_CLOSE_GO_CAC};
@@ -1614,6 +1651,7 @@ static int32_t SetGoChannel(const char *ifName, const int8_t *data, uint32_t len
     int32_t ret = RET_CODE_FAILURE;
     char cmdBuf[P2P_BUF_SIZE] = {0};
     uint32_t cmdLen;
+    uint16_t state;
 
     cmdLen = strlen(CMD_SET_CHANGE_GO_CHANNEL);
     if ((cmdLen + len) >= P2P_BUF_SIZE) {
@@ -1625,6 +1663,10 @@ static int32_t SetGoChannel(const char *ifName, const int8_t *data, uint32_t len
         HILOG_ERROR(LOG_CORE, "%{public}s: ifName: %{public}s, ret = %{public}d", __FUNCTION__, ifName, ret);
         return RET_CODE_FAILURE;
     }
+    if ((GetInterfaceState(ifName, &state) != RET_CODE_SUCCESS) || (state & INTERFACE_UP) == 0) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: interface state is not OK.", __FUNCTION__);
+        return RET_CODE_NETDOWN;
+    }
     return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
 }
 
@@ -1633,6 +1675,7 @@ static int32_t SetGoDetectRadar(const char *ifName, const int8_t *data, uint32_t
     int32_t ret = RET_CODE_FAILURE;
     char cmdBuf[P2P_BUF_SIZE] = {0};
     uint32_t cmdLen;
+    uint16_t state;
 
     cmdLen = strlen(CMD_SET_GO_DETECT_RADAR);
     if ((cmdLen + len) >= P2P_BUF_SIZE) {
@@ -1644,6 +1687,10 @@ static int32_t SetGoDetectRadar(const char *ifName, const int8_t *data, uint32_t
         HILOG_ERROR(LOG_CORE, "%{public}s: ifName: %{public}s, ret = %{public}d", __FUNCTION__, ifName, ret);
         return RET_CODE_FAILURE;
     }
+    if ((GetInterfaceState(ifName, &state) != RET_CODE_SUCCESS) || (state & INTERFACE_UP) == 0) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: interface state is not OK.", __FUNCTION__);
+        return RET_CODE_NETDOWN;
+    }
     return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
 }
 
@@ -1652,6 +1699,7 @@ static int32_t SetP2pScenes(const char *ifName, const int8_t *data, uint32_t len
     int32_t ret = RET_CODE_FAILURE;
     char cmdBuf[P2P_BUF_SIZE] = {0};
     uint32_t cmdLen;
+    uint16_t state;
 
     cmdLen = strlen(CMD_SET_P2P_SCENES);
     if ((cmdLen + len) >= P2P_BUF_SIZE) {
@@ -1663,6 +1711,10 @@ static int32_t SetP2pScenes(const char *ifName, const int8_t *data, uint32_t len
         HILOG_ERROR(LOG_CORE, "%{public}s: ifName: %{public}s, ret = %{public}d", __FUNCTION__, ifName, ret);
         return RET_CODE_FAILURE;
     }
+    if ((GetInterfaceState(ifName, &state) != RET_CODE_SUCCESS) || (state & INTERFACE_UP) == 0) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: interface state is not OK.", __FUNCTION__);
+        return RET_CODE_NETDOWN;
+    }
     return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
 }
 
@@ -1671,6 +1723,7 @@ static int32_t SetDynamicDbacMode(const char *ifName, const int8_t *data, uint32
     int32_t ret = RET_CODE_FAILURE;
     char cmdBuf[P2P_BUF_SIZE] = {0};
     uint32_t cmdLen;
+    uint16_t state;
 
     cmdLen = strlen(CMD_SET_DYNAMIC_DBAC_MODE);
     if ((cmdLen + len) >= P2P_BUF_SIZE) {
@@ -1682,10 +1735,14 @@ static int32_t SetDynamicDbacMode(const char *ifName, const int8_t *data, uint32
         HILOG_ERROR(LOG_CORE, "%{public}s: ifName: %{public}s, ret = %{public}d", __FUNCTION__, ifName, ret);
         return RET_CODE_FAILURE;
     }
+    if ((GetInterfaceState(ifName, &state) != RET_CODE_SUCCESS) || (state & INTERFACE_UP) == 0) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: interface state is not OK.", __FUNCTION__);
+        return RET_CODE_NETDOWN;
+    }
     return SendCommandToDriver(cmdBuf, P2P_BUF_SIZE, ifName);
 }
 
-int32_t SetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *param)
+int32_t SetProjectionScreenParam(const char *ifName, const ProjectionScreenParam *param)
 {
     int32_t ret;
 

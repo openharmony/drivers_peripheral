@@ -247,7 +247,7 @@ typedef struct {
     int32_t cmdId;
     uint32_t bufLen;
     int8_t buf[0];
-} ProjScrnCmdParam;
+} ProjectionScreenParam;
 
 typedef struct {
     uint32_t rxRate;
@@ -283,7 +283,7 @@ int32_t GetCurrentPowerMode(const char *ifName, uint8_t *mode);
 int32_t SetPowerMode(const char *ifName, uint8_t mode);
 int32_t StartChannelMeas(const char *ifName, const struct MeasParam *measParam);
 int32_t GetChannelMeasResult(const char *ifName, struct MeasResult *measResult);
-int32_t SetProjectionScreenParam(const char *ifName, const ProjScrnCmdParam *param);
+int32_t SetProjectionScreenParam(const char *ifName, const ProjectionScreenParam *param);
 int32_t SendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t *paramBuf, uint32_t paramBufLen);
 int32_t GetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen);
 
