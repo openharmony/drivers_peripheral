@@ -45,7 +45,6 @@ public:
     virtual int32_t GetDisplayCompChange(
         uint32_t devId, std::vector<uint32_t> &layers, std::vector<int32_t> &types) = 0;
     virtual int32_t SetDisplayClientCrop(uint32_t devId, const IRect &rect) = 0;
-    virtual int32_t SetDisplayClientDestRect(uint32_t devId, const IRect &rect) = 0;
     virtual int32_t SetDisplayClientBuffer(uint32_t devId, const BufferHandle &buffer, int32_t fence) = 0;
     virtual int32_t SetDisplayClientDamage(uint32_t devId, std::vector<IRect> &rects) = 0;
     virtual int32_t SetDisplayVsyncEnabled(uint32_t devId, bool enabled) = 0;
@@ -72,7 +71,6 @@ public:
     virtual int32_t SetLayerBuffer(uint32_t devId, uint32_t layerId, const BufferHandle &buffer, int32_t fence) = 0;
     virtual int32_t SetLayerCompositionType(uint32_t devId, uint32_t layerId, CompositionType type) = 0;
     virtual int32_t SetLayerBlendType(uint32_t devId, uint32_t layerId, BlendType type) = 0;
-    virtual int32_t SetLayerVisible(uint32_t devId, uint32_t layerId, bool visible) = 0;
 };
 
 using CreateComposerVdiFunc = IDisplayComposerVdi* (*)();

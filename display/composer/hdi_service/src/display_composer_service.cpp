@@ -71,22 +71,18 @@ int32_t DisplayComposerService::LoadVdi()
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 
     createVdiFunc_ = reinterpret_cast<CreateComposerVdiFunc>(dlsym(libHandle_, "CreateComposerVdi"));
-    if (createVdiFunc_ == nullptr) {
-        HDF_LOGE("%{public}s: composer createVdiFunc_ is nullptr", __func__);
+    errStr = dlerror();
+    if (errStr == nullptr || createVdiFunc_ == nullptr) {
+        HDF_LOGE("%{public}s: composer CreateComposerVdi dlsym error: %{public}s", __func__, errStr);
         dlclose(libHandle_);
         return HDF_FAILURE;
     }
 
     destroyVdiFunc_ = reinterpret_cast<DestroyComposerVdiFunc>(dlsym(libHandle_, "DestroyComposerVdi"));
-    if (destroyVdiFunc_ == nullptr) {
-        HDF_LOGE("%{public}s: composer destroyVdiFunc_ is nullptr", __func__);
-        dlclose(libHandle_);
-        return HDF_FAILURE;
-    }
-
     errStr = dlerror();
-    if (errStr) {
-        HDF_LOGE("%{public}s: composer dlerror: %{public}s", __func__, errStr);
+    if (errStr == nullptr || destroyVdiFunc_ == nullptr) {
+        HDF_LOGE("%{public}s: composer DestroyComposerVdi dlsym error: %{public}s", __func__, errStr);
+        dlclose(libHandle_);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
