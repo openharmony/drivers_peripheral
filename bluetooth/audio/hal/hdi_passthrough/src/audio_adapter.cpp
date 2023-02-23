@@ -488,4 +488,26 @@ int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struc
     }
     return AUDIO_HAL_ERR_INTERNAL;
 }
+
+int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                   const char *condition, const char *value)
+{
+    (void)adapter;
+    (void)key;
+    (void)condition;
+    (void)value;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                   const char *condition, char *value, int32_t length)
+{
+    (void)adapter;
+    (void)key;
+    (void)condition;
+    (void)value;
+    (void)length;
+    return HDF_ERR_NOT_SUPPORT;
+}
+
 }

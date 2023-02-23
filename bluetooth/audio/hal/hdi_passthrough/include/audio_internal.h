@@ -124,6 +124,10 @@ typedef enum {
 #define SAMPLING_RATE_SAMPLE "attr-sampling-rate=xxxxx"
 #define AUDIO_ATTR_PARAM_CONNECT "usb-connect"
 #define AUDIO_ATTR_PARAM_DISCONNECT "usb-disconnect"
+#ifdef A2DP_HDI_SERVICE
+#define A2DP_SUSPEND "A2dpSuspended"
+#endif
+
 #define TELHPONE_RATE 8000
 #define BROADCAST_AM_RATE 11025
 #define BROADCAST_FM_RATE 22050
@@ -313,6 +317,9 @@ struct ExtraParams {
     uint64_t frames;
     uint32_t sampleRate;
     bool flag;
+#ifdef A2DP_HDI_SERVICE
+    uint32_t audioStreamCtl;
+#endif
 };
 
 enum ErrorDumpCode {
@@ -347,6 +354,10 @@ int32_t AudioAdapterSetPassthroughMode(struct AudioAdapter *adapter, const struc
                                        AudioPortPassthroughMode mode);
 int32_t AudioAdapterGetPassthroughMode(struct AudioAdapter *adapter, const struct AudioPort *port,
                                        AudioPortPassthroughMode *mode);
+int32_t AudioAdapterSetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                   const char *condition, const char *value);
+int32_t AudioAdapterGetExtraParams(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                                   const char *condition, char *value, int32_t length);
 int32_t PcmBytesToFrames(const struct AudioFrameRenderMode *frameRenderMode, uint64_t bytes, uint32_t *frameCount);
 int32_t AudioRenderStart(AudioHandle handle);
 int32_t AudioRenderStop(AudioHandle handle);
