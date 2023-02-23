@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/peripheral/display/display_config.gni")
 
 group("display_buffer_entry") {
   deps = [ "hdi_service:hdf_display_buffer_service" ]
