@@ -247,6 +247,7 @@ struct DevHandle *AudioBindService(const char *name)
         handle->object = object;
     } else {
         AUDIO_FUNC_LOGE("handle->object is NULL!");
+        AudioMemFree((void **)&handle);
         return NULL;
     }
     AUDIO_FUNC_LOGI("BIND SERVICE SUCCESS!");
@@ -774,7 +775,7 @@ static int32_t AudioParseAllAdaptersFromBuf(struct SndCardsList *sndCards, struc
         AudioMemFree((void **)&clist);
         return ret;
     }
-    sndCards->cardNums = cnumber;
+    sndCards->cardNums = (uint32_t)cnumber;
     sndCards->cardsList = clist;
 
     return HDF_SUCCESS;
