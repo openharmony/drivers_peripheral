@@ -30,17 +30,17 @@ public:
     MapperService();
     virtual ~MapperService();
 
-    int32_t FreeMem(const sptr<NativeBuffer> &handle) override;
-    int32_t Mmap(const sptr<NativeBuffer> &handle) override;
-    int32_t Unmap(const sptr<NativeBuffer> &handle) override;
-    int32_t FlushCache(const sptr<NativeBuffer> &handle) override;
-    int32_t InvalidateCache(const sptr<NativeBuffer> &handle) override;
+    int32_t FreeMem(const sptr<NativeBuffer>& handle) override;
+    int32_t Mmap(const sptr<NativeBuffer>& handle) override;
+    int32_t Unmap(const sptr<NativeBuffer>& handle) override;
+    int32_t FlushCache(const sptr<NativeBuffer>& handle) override;
+    int32_t InvalidateCache(const sptr<NativeBuffer>& handle) override;
 
 private:
     int32_t LoadVdi();
 
-    void *libHandle_;
-    IDisplayBufferVdi *vdiImpl_;
+    void* libHandle_;
+    IDisplayBufferVdi* vdiImpl_;
     CreateDisplayBufferVdiFunc createVdi_;
     DestroyDisplayBufferVdiFunc destroyVdi_;
 };

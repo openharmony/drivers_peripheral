@@ -29,7 +29,7 @@ class AllocatorService : public IAllocator {
 public:
     AllocatorService();
     virtual ~AllocatorService();
-    int32_t AllocMem(const AllocInfo &info, sptr<NativeBuffer> &handle) override;
+    int32_t AllocMem(const AllocInfo& info, sptr<NativeBuffer>& handle) override;
 
 private:
     int32_t LoadVdi();

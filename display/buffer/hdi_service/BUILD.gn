@@ -26,7 +26,7 @@ group("hdf_display_buffer_service") {
 ohos_shared_library("liballocator_service_1.0") {
   include_dirs = [
     "include",
-    "//drivers/peripheral/display/utils/include",
+    "../../utils/include",
   ]
   sources = [ "src/allocator_service.cpp" ]
 
@@ -66,7 +66,7 @@ ohos_shared_library("liballocator_driver_1.0") {
 ohos_shared_library("libmapper_service_1.0") {
   include_dirs = [
     "include",
-    "//drivers/peripheral/display/utils/include",
+    "../../utils/include",
   ]
   sources = [ "src/mapper_service.cpp" ]
 

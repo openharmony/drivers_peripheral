@@ -27,16 +27,16 @@ struct HdfDisplayComposerHost {
 };
 
 static int32_t DisplayComposerDriverDispatch(
-    struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
+    struct HdfDeviceIoClient* client, int cmdId, struct HdfSBuf* data, struct HdfSBuf* reply)
 {
     if ((client == nullptr) || (client->device == nullptr)) {
         HDF_LOGE("%{public}s: param is nullptr", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    auto *hdfDisplayComposerHost = CONTAINER_OF(client->device->service, struct HdfDisplayComposerHost, ioService);
+    auto* hdfDisplayComposerHost = CONTAINER_OF(client->device->service, struct HdfDisplayComposerHost, ioService);
 
-    OHOS::MessageParcel *dataParcel = nullptr;
-    OHOS::MessageParcel *replyParcel = nullptr;
+    OHOS::MessageParcel* dataParcel = nullptr;
+    OHOS::MessageParcel* replyParcel = nullptr;
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
@@ -51,16 +51,16 @@ static int32_t DisplayComposerDriverDispatch(
     return hdfDisplayComposerHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int HdfDisplayComposerDriverInit(struct HdfDeviceObject *deviceObject)
+static int HdfDisplayComposerDriverInit(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     return HDF_SUCCESS;
 }
 
-static int HdfDisplayComposerDriverBind(struct HdfDeviceObject *deviceObject)
+static int HdfDisplayComposerDriverBind(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    auto *hdfDisplayComposerHost = new (std::nothrow) HdfDisplayComposerHost;
+    auto* hdfDisplayComposerHost = new (std::nothrow) HdfDisplayComposerHost;
     if (hdfDisplayComposerHost == nullptr) {
         HDF_LOGE("%{public}s: failed to create HdfDisplayComposerHost object", __func__);
         return HDF_FAILURE;
@@ -89,15 +89,15 @@ static int HdfDisplayComposerDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-static void HdfDisplayComposerDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfDisplayComposerDriverRelease(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     if (deviceObject->service == nullptr) {
-        HDF_LOGE("%{public}s: service is nullprt", __func__);
+        HDF_LOGE("%{public}s: service is nullptr", __func__);
         return;
     }
 
-    auto *hdfDisplayComposerHost = CONTAINER_OF(deviceObject->service, struct HdfDisplayComposerHost, ioService);
+    auto* hdfDisplayComposerHost = CONTAINER_OF(deviceObject->service, struct HdfDisplayComposerHost, ioService);
     delete hdfDisplayComposerHost;
 }
 

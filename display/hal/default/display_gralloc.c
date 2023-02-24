@@ -206,7 +206,6 @@ static int32_t AllocShm(BufferHandle *buffer)
 static int32_t AllocMem(const AllocInfo* info, BufferHandle **buffer)
 {
     int32_t ret;
-
     DISPLAY_CHK_RETURN((buffer == NULL), DISPLAY_NULL_PTR, HDF_LOGE("%s: in buffer is null", __func__));
     DISPLAY_CHK_RETURN((info == NULL), DISPLAY_NULL_PTR, HDF_LOGE("%s: in info is null", __func__));
     PriBufferHandle* priBuffer = (PriBufferHandle*)calloc(1, sizeof(PriBufferHandle));
