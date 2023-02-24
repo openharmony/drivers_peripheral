@@ -44,7 +44,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    virtual int32_t AllocMem(const AllocInfo &info, BufferHandle *&handle) const = 0;
+    virtual int32_t AllocMem(const AllocInfo& info, BufferHandle*& handle) const = 0;
 
     /**
      * @brief Releases memory.
@@ -54,7 +54,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    virtual void FreeMem(const BufferHandle &handle) const = 0;
+    virtual void FreeMem(const BufferHandle& handle) const = 0;
 
     /**
      * @brief Maps memory to memory without cache in the process's address space.
@@ -65,7 +65,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    virtual void *Mmap(const BufferHandle &handle) const = 0;
+    virtual void *Mmap(const BufferHandle& handle) const = 0;
 
     /**
      * @brief Unmaps memory, that is, removes mappings from the process's address space.
@@ -77,7 +77,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    virtual int32_t Unmap(const BufferHandle &handle) const = 0;
+    virtual int32_t Unmap(const BufferHandle& handle) const = 0;
 
     /**
      * @brief Flushes data from the cache to memory and invalidates the data in the cache.
@@ -89,7 +89,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    virtual int32_t FlushCache(const BufferHandle &handle) const = 0;
+    virtual int32_t FlushCache(const BufferHandle& handle) const = 0;
 
     /**
      * @brief Invalidates the cache to update it from memory.
@@ -101,7 +101,7 @@ public:
      * @since 1.0
      * @version 1.0
      */
-    virtual int32_t InvalidateCache(const BufferHandle &handle) const = 0;
+    virtual int32_t InvalidateCache(const BufferHandle& handle) const = 0;
 
     /**
      * @brief Checks whether the given VerifyAllocInfo array is allocatable.
@@ -115,13 +115,13 @@ public:
      * @version 1.0
      */
     virtual int32_t IsSupportedAlloc(
-        const std::vector<VerifyAllocInfo> &infos, std::vector<bool> &supporteds) const = 0;
+        const std::vector<VerifyAllocInfo>& infos, std::vector<bool>& supporteds) const = 0;
 };
 
 using CreateDisplayBufferVdiFunc = IDisplayBufferVdi* (*)();
-using DestroyDisplayBufferVdiFunc = void (*)(IDisplayBufferVdi *vdi);
-extern "C" IDisplayBufferVdi *CreateDisplayBufferVdi();
-extern "C" void DestroyDisplayBufferVdi(IDisplayBufferVdi *vdi);
+using DestroyDisplayBufferVdiFunc = void (*)(IDisplayBufferVdi* vdi);
+extern "C" IDisplayBufferVdi* CreateDisplayBufferVdi();
+extern "C" void DestroyDisplayBufferVdi(IDisplayBufferVdi* vdi);
 } // namespace V1_0
 } // namespace Buffer
 } // namespace Display

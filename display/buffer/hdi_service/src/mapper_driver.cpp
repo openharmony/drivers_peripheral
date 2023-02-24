@@ -27,16 +27,16 @@ struct HdfMapperHost {
 };
 
 static int32_t MapperDriverDispatch(
-    struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
+    struct HdfDeviceIoClient* client, int cmdId, struct HdfSBuf* data, struct HdfSBuf* reply)
 {
     if ((client == nullptr) || (client->device == nullptr)) {
         HDF_LOGE("%{public}s: param is nullptr", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    auto *hdfMapperHost = CONTAINER_OF(client->device->service, struct HdfMapperHost, ioService);
+    auto* hdfMapperHost = CONTAINER_OF(client->device->service, struct HdfMapperHost, ioService);
 
-    OHOS::MessageParcel *dataParcel = nullptr;
-    OHOS::MessageParcel *replyParcel = nullptr;
+    OHOS::MessageParcel* dataParcel = nullptr;
+    OHOS::MessageParcel* replyParcel = nullptr;
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
@@ -51,16 +51,16 @@ static int32_t MapperDriverDispatch(
     return hdfMapperHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int HdfMapperDriverInit(struct HdfDeviceObject *deviceObject)
+static int HdfMapperDriverInit(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     return HDF_SUCCESS;
 }
 
-static int HdfMapperDriverBind(struct HdfDeviceObject *deviceObject)
+static int HdfMapperDriverBind(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    auto *hdfMapperHost = new (std::nothrow) HdfMapperHost;
+    auto* hdfMapperHost = new (std::nothrow) HdfMapperHost;
     if (hdfMapperHost == nullptr) {
         HDF_LOGE("%{public}s: failed to create HdfMapperHost object", __func__);
         return HDF_FAILURE;
@@ -89,15 +89,15 @@ static int HdfMapperDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-static void HdfMapperDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfMapperDriverRelease(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     if (deviceObject->service == nullptr) {
-        HDF_LOGE("%{public}s: service is nullprt", __func__);
+        HDF_LOGE("%{public}s: service is nullptr", __func__);
         return;
     }
 
-    auto *hdfMapperHost = CONTAINER_OF(deviceObject->service, struct HdfMapperHost, ioService);
+    auto* hdfMapperHost = CONTAINER_OF(deviceObject->service, struct HdfMapperHost, ioService);
     delete hdfMapperHost;
 }
 

@@ -27,17 +27,17 @@ struct HdfAllocatorHost {
 };
 
 static int32_t AllocatorDriverDispatch(
-    struct HdfDeviceIoClient *client, int cmdId, struct HdfSBuf *data, struct HdfSBuf *reply)
+    struct HdfDeviceIoClient* client, int cmdId, struct HdfSBuf* data, struct HdfSBuf* reply)
 {
     if ((client == nullptr) || (client->device == nullptr)) {
         HDF_LOGE("%{public}s: param is nullptr", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
-    auto *hdfAllocatorHost =
+    auto* hdfAllocatorHost =
         CONTAINER_OF(client->device->service, struct HdfAllocatorHost, ioService);
 
-    OHOS::MessageParcel *dataParcel = nullptr;
-    OHOS::MessageParcel *replyParcel = nullptr;
+    OHOS::MessageParcel* dataParcel = nullptr;
+    OHOS::MessageParcel* replyParcel = nullptr;
     OHOS::MessageOption option;
 
     if (SbufToParcel(data, &dataParcel) != HDF_SUCCESS) {
@@ -52,16 +52,16 @@ static int32_t AllocatorDriverDispatch(
     return hdfAllocatorHost->stub->SendRequest(cmdId, *dataParcel, *replyParcel, option);
 }
 
-static int HdfAllocatorDriverInit(struct HdfDeviceObject *deviceObject)
+static int HdfAllocatorDriverInit(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     return HDF_SUCCESS;
 }
 
-static int HdfAllocatorDriverBind(struct HdfDeviceObject *deviceObject)
+static int HdfAllocatorDriverBind(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
-    auto *hdfAllocatorHost = new (std::nothrow) HdfAllocatorHost;
+    auto* hdfAllocatorHost = new (std::nothrow) HdfAllocatorHost;
     if (hdfAllocatorHost == nullptr) {
         HDF_LOGE("%{public}s: failed to create HdfAllocatorHost object", __func__);
         return HDF_FAILURE;
@@ -69,6 +69,7 @@ static int HdfAllocatorDriverBind(struct HdfDeviceObject *deviceObject)
 
     hdfAllocatorHost->ioService.Dispatch = AllocatorDriverDispatch;
     hdfAllocatorHost->ioService.Open = NULL;
+
     hdfAllocatorHost->ioService.Release = NULL;
 
     auto serviceImpl = IAllocator::Get(true);
@@ -90,15 +91,15 @@ static int HdfAllocatorDriverBind(struct HdfDeviceObject *deviceObject)
     return HDF_SUCCESS;
 }
 
-static void HdfAllocatorDriverRelease(struct HdfDeviceObject *deviceObject)
+static void HdfAllocatorDriverRelease(struct HdfDeviceObject* deviceObject)
 {
     HDF_LOGI("%{public}s: enter", __func__);
     if (deviceObject->service == nullptr) {
-        HDF_LOGE("%{public}s: service is nullprt", __func__);
+        HDF_LOGE("%{public}s: service is nullptr", __func__);
         return;
     }
 
-    auto *hdfAllocatorHost = CONTAINER_OF(deviceObject->service, struct HdfAllocatorHost, ioService);
+    auto* hdfAllocatorHost = CONTAINER_OF(deviceObject->service, struct HdfAllocatorHost, ioService);
     delete hdfAllocatorHost;
 }
 
