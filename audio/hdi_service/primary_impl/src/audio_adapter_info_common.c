@@ -151,14 +151,14 @@ int32_t AudioAdaptersForUser(InterfaceLibModeGetAllCardInfo getAllCardInfo,
         return HDF_FAILURE;
     }
 
-    if (realSize > *size) {
+    if ((uint32_t)realSize > *size) {
         AUDIO_FUNC_LOGE("A larger buffer is required! realSize=%{public}d;requestSize=%{public}d", realSize, *size);
         return HDF_FAILURE;
     }
 
-    *size = realSize;
+    *size = (uint32_t)realSize;
 
-    if (g_audioAdapterDescs == NULL || g_adapterNum != realSize) {
+    if (g_audioAdapterDescs == NULL || g_adapterNum != (uint32_t)realSize) {
         AudioAdapterReleaseDescs(g_audioAdapterDescs, g_adapterNum);
         AudioMemFree((void **)&g_audioAdapterDescs);
         if (getAllCardInfo(&g_audioAdapterDescs, (int *)&g_adapterNum) != HDF_SUCCESS) {
