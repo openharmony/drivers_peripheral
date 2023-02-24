@@ -51,7 +51,7 @@ struct AudioHwiAdapter *AudioHwiGetHwiAdapterByDescIndex(uint32_t descIndex)
     return priv->adapterInfo[descIndex].hwiAdapter;
 }
 
-struct AudioHwiAdapter *AudioHwiGetHwiAdapter(struct IAudioAdapter *adapter)
+struct AudioHwiAdapter *AudioHwiGetHwiAdapter(const struct IAudioAdapter *adapter)
 {
     struct AudioHwiAdapterPriv *priv = GetAudioHwiAdapterPriv();
 

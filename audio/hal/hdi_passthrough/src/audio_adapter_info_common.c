@@ -192,7 +192,12 @@ int32_t AudioAdapterCheckPortId(const char *adapterName, uint32_t portId)
 
 static InterfaceLibGetCardInfoSo AudioGetCardInfoFunc(void)
 {
-    void *handle = dlopen(g_captureSoPath, RTLD_LAZY);
+    char pathBuf[PATH_MAX] = {'\0'};
+    if (realpath(g_captureSoPath, pathBuf) == NULL) {
+        AUDIO_FUNC_LOGE("file path verification failed");
+        return NULL;
+    }
+    void *handle = dlopen(pathBuf, RTLD_LAZY);
     if (handle == NULL) {
         AUDIO_FUNC_LOGE("open lib capture so fail, reason:%{public}s", dlerror());
         return NULL;

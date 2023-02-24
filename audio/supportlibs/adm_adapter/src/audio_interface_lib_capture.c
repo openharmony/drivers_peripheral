@@ -513,7 +513,7 @@ int32_t AudioCtlCaptureSceneSelect(const struct DevHandle *handle,
 {
     int32_t deviceNum;
     struct HdfSBuf *sBuf = NULL;
-    uint32_t index;
+    int32_t index;
 
     if (handle == NULL || handle->object == NULL || handleData == NULL) {
         AUDIO_FUNC_LOGE("CaptureSceneSelect parameter is empty!");
@@ -783,7 +783,7 @@ int32_t AudioOutputCaptureOpen(const struct DevHandle *handle,
         return HDF_FAILURE;
     }
 
-    uint32_t ret = AudioServiceDispatch(handle->object, cmdId, sBuf, NULL);
+    int32_t ret = AudioServiceDispatch(handle->object, cmdId, sBuf, NULL);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("Failed to send service call!");
         AudioFreeHdfSBuf(sBuf, NULL);
