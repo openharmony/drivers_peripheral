@@ -41,7 +41,6 @@ config("hdi_service_config") {
 
 ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
   include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/bluetooth/audio/interfaces/include",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough/include",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_binder/server/include",
@@ -54,15 +53,16 @@ ohos_shared_library("audio_bluetooth_hdi_adapter_server") {
     "src/hdf_audio_server_render.cpp",
   ]
 
-  deps = [
-    "$hdf_uhdf_path/host:libhdf_host",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-    "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough:hdi_audio_bluetooth",
-  ]
+  deps = [ "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough:hdi_audio_bluetooth" ]
 
   defines = []
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

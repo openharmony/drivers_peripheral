@@ -54,16 +54,14 @@ ohos_unittest("input_udriver_unittest") {
     "$hdi_input_base_path/udriver/include",
   ]
 
-  deps = [
-    "//drivers/hdf_core/adapter/uhdf2//hdi:libhdi",
-    "//drivers/hdf_core/adapter/uhdf2//utils:libhdf_utils",
-    "//drivers/peripheral/input/udriver:hdi_input_udriver",
-  ]
+  deps = [ "//drivers/peripheral/input/udriver:hdi_input_udriver" ]
 
   if (is_standard_system) {
     external_deps = [
-      "hiviewdfx_hilog_native:libhilog",
       "c_utils:utils",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
     external_deps = [ "hilog:libhilog" ]

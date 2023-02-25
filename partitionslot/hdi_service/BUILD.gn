@@ -37,7 +37,6 @@ ohos_shared_library("libpartition_slot_service_1.0") {
 ohos_shared_library("libpartitionslot_driver") {
   include_dirs = [
     "include",
-    "//drivers/hdf_core/adapter/uhdf2/include/host",
     "//base/user_iam/user_auth/common/logs",
   ]
   sources = [ "src/partition_slot_driver.cpp" ]
@@ -45,6 +44,7 @@ ohos_shared_library("libpartitionslot_driver") {
 
   external_deps = [
     "c_utils:utils",
+    "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",

@@ -54,10 +54,7 @@ ohos_shared_library("libsensor_interface_service_1.0") {
 }
 
 ohos_shared_library("libsensor_driver") {
-  include_dirs = [
-    "//drivers/peripheral/sensor/interfaces/include/",
-    "//drivers/hdf_core/adapter/uhdf2/include/host",
-  ]
+  include_dirs = [ "//drivers/peripheral/sensor/interfaces/include/" ]
 
   sources = [ "sensor_interface_driver.cpp" ]
 
@@ -75,6 +72,7 @@ ohos_shared_library("libsensor_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",

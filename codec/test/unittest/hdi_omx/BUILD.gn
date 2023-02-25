@@ -22,7 +22,6 @@ declare_args() {
 ohos_unittest("codec_hdi_omx_test") {
   module_out_path = "drivers_peripheral_codec/codec"
   include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",

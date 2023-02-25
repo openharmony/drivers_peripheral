@@ -33,9 +33,6 @@ ohos_executable("dcamera_hdf_demo") {
     "$distributedcamera_hdf_path/hdi_service/include/dstream_operator",
     "$distributedcamera_hdf_path/hdi_service/include/dstream_provider",
     "$distributedcamera_hdf_path/hdi_service/include/utils",
-    "${hdf_framework_path}/include/utils",
-    "${hdf_uhdf_path}/include/hdi",
-    "${hdf_uhdf_path}/osal/include",
     "//drivers/peripheral/camera/interfaces/include",
     "//drivers/peripheral/camera/hal/utils",
     "//drivers/peripheral/camera/hal/include",
@@ -43,8 +40,6 @@ ohos_executable("dcamera_hdf_demo") {
 
   deps = [
     "$distributedcamera_hdf_path/hdi_service:libdistributed_camera_hdf_service_1.0",
-    "${hdf_uhdf_path}/hdi:libhdi",
-    "//drivers/hdf_core/adapter/uhdf2/ipc:libhdf_ipc_adapter",
     "//third_party/jsoncpp:jsoncpp",
   ]
 
@@ -61,6 +56,9 @@ ohos_executable("dcamera_hdf_demo") {
     "drivers_interface_camera:libcamera_proxy_1.0",
     "drivers_interface_camera:metadata",
     "graphic_chipsetsdk:surface",
+    "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",
     "samgr:samgr_proxy",
