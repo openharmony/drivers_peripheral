@@ -14,7 +14,10 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libpower_interface_service_1.1") {
-  sources = [ "src/power_interface_impl.cpp" ]
+  sources = [
+    "src/power_interface_impl.cpp",
+    "src/running_lock_impl.cpp",
+  ]
 
   deps = [ "//third_party/libxml2:xml2" ]
 
