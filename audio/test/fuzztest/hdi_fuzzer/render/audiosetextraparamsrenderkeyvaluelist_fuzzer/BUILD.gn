@@ -38,13 +38,14 @@ ohos_fuzztest("AudioSetextraparamsRenderKeyvaluelistFuzzTest") {
     "//drivers/peripheral/audio/interfaces/include",
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
     "//third_party/bounds_checking_function/include",
-    "//drivers/hdf_core/framework/include/utils",
-    "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi/",
     "//drivers/peripheral/audio/test/fuzztest/hdi_fuzzer/render/audiosetextraparamsrenderkeyvaluelist_fuzzer/include",
     "//drivers/peripheral/audio/test/fuzztest/common/include",
   ]
-  external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+  external_deps = [
+    "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
   defines = []
   if (enable_audio_adm_passthrough) {
     defines += [ "AUDIO_ADM_SO" ]

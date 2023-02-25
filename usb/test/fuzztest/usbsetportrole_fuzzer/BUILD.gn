@@ -24,7 +24,6 @@ ohos_fuzztest("UsbSetPortRoleFuzzTest") {
 
   include_dirs = [
     "//drivers/peripheral/usb/test/fuzztest/usbsetportrole_fuzzer",
-    "//drivers/hdf_core/framework/include/utils",
     "//base/usb/usb_manager/utils/native/include",
   ]
 

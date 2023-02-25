@@ -140,7 +140,6 @@ ohos_shared_library("def_display_layer_video") {
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/base",
     "//drivers/peripheral/display/hdi_service/video_layer/client",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
   ]
 
   external_deps = [

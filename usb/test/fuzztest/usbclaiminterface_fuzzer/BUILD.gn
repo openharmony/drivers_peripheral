@@ -26,7 +26,6 @@ ohos_fuzztest("UsbClaimInterfaceFuzzTest") {
     "//drivers/peripheral/usb/test/fuzztest/usbclaiminterface_fuzzer",
     "//drivers/peripheral/usb/test/UsbSubscriberTest",
     "//drivers/peripheral/usb/test/fuzztest/usbcommonfunction_fuzzer",
-    "//drivers/hdf_core/framework/include/utils",
     "//base/usb/usb_manager/utils/native/include",
   ]
 

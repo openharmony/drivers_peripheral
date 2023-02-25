@@ -23,7 +23,6 @@ ohos_fuzztest("UsbdeviceFuzzTest") {
 
   include_dirs = [
     "//drivers/peripheral/usb/hdi_service/include",
-    "//drivers/hdf_core/framework/include/utils",
     "//drivers/peripheral/usb/interfaces/ddk/host",
     "//drivers/peripheral/usb/interfaces/ddk/common",
     "//drivers/peripheral/usb/gadget/function/include",

@@ -34,7 +34,6 @@ if (!defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
       "//drivers/peripheral/audio/hal/hdi_binder/server/include",
-      "//drivers/hdf_core/adapter/uhdf2/include/hdi",
       "//drivers/hdf_core/adapter/uhdf2/shared/include",
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",

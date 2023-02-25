@@ -17,7 +17,7 @@
 #include <osal_mem.h>
 #include <unistd.h>
 #include "hdf_log.h"
-#include "hdi/idevmgr_hdi.h"
+#include "idevmgr_hdi.h"
 #include "v1_0/ipartition_slot.h"
 
 namespace OHOS {
