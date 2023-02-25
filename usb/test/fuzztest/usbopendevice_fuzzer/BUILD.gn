@@ -25,9 +25,7 @@ ohos_fuzztest("UsbOpenDeviceFuzzTest") {
   include_dirs = [
     "//drivers/peripheral/usb/test/fuzztest/usbopendevice_fuzzer",
     "//drivers/peripheral/usb/test/UsbSubscriberTest",
-    "//drivers/hdf_core/framework/include/utils",
     "//drivers/peripheral/usb/test/fuzztest/usbcommonfunction_fuzzer",
-    "//drivers/hdf_core/framework/include/utils",
     "//base/usb/usb_manager/utils/native/include",
   ]
 

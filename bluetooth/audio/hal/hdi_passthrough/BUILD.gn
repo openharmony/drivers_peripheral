@@ -64,7 +64,6 @@ ohos_shared_library("hdi_audio_bluetooth") {
   ]
 
   include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/hdf_core/adapter/uhdf2/shared/include",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_passthrough/include",
     "//drivers/peripheral/bluetooth/audio/supportlibs/adm_adapter/include",
@@ -76,18 +75,20 @@ ohos_shared_library("hdi_audio_bluetooth") {
     "//foundation/communication/bluetooth/frameworks/inner/common",
     "//foundation/communication/bluetooth/interfaces/inner_api/include/c_header",
     "//third_party/bounds_checking_function/include",
-    "$hdf_uhdf_path/osal/include",
-    "$hdf_uhdf_path/common/include/core",
   ]
 
   deps = [
-    "$hdf_uhdf_path/utils:libhdf_utils",
     "${samgr_dir}/interfaces/innerkits/samgr_proxy:samgr_proxy",
     "//foundation/communication/bluetooth/services/bluetooth/ipc:btipc_static",
   ]
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

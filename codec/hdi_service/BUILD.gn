@@ -15,7 +15,6 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libcodec_client") {
   include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/hdi_service/common",
     "//drivers/peripheral/codec/interfaces/include",
   ]

@@ -45,18 +45,14 @@ ohos_shared_library("audio_bluetooth_hdi_proxy_server") {
     "//drivers/peripheral/bluetooth/audio/hal/hdi_binder/proxy/include",
     "//drivers/peripheral/bluetooth/audio/hal/hdi_binder/server/include",
     "//third_party/cJSON",
-    "$hdf_framework_path/include/core",
     "$hdf_framework_path/include/utils",
-    "$hdf_framework_path/include/osal",
     "$hdf_framework_path/include",
     "//third_party/bounds_checking_function/include",
     "$hdf_framework_path/ability/sbuf/include",
     "$hdf_framework_path/utils/include",
     "$hdf_framework_path/ability/sbuf/include",
-    "$hdf_uhdf_path/osal/include",
     "$hdf_framework_path/include",
     "$hdf_framework_path/core/sec/include",
-    "$hdf_framework_path/core/shared/include",
     "$hdf_framework_path/core/host/include",
     "$hdf_framework_path/core/manager/include",
     "$hdf_uhdf_path/include/devhost",
@@ -64,7 +60,6 @@ ohos_shared_library("audio_bluetooth_hdi_proxy_server") {
     "$hdf_uhdf_path/devmgr/include",
     "$hdf_uhdf_path/host/include",
     "$hdf_uhdf_path/manager/include",
-    "$hdf_uhdf_path/include/host",
   ]
 
   sources = [
@@ -77,14 +72,16 @@ ohos_shared_library("audio_bluetooth_hdi_proxy_server") {
     "src/audio_proxy_render.cpp",
   ]
 
-  deps = [
-    "$hdf_uhdf_path/hdi:libhdi",
-    "$hdf_uhdf_path/ipc:libhdf_ipc_adapter",
-    "$hdf_uhdf_path/utils:libhdf_utils",
-  ]
+  deps = []
 
   if (is_standard_system) {
-    external_deps = [ "hiviewdfx_hilog_native:libhilog" ]
+    external_deps = [
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+    ]
   } else {
     external_deps = [ "hilog:libhilog" ]
   }

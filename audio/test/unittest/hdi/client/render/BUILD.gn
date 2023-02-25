@@ -28,7 +28,6 @@ ohos_unittest("hdf_audio_proxy_render_test") {
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
     "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
     "//drivers/peripheral/audio/hal/hdi_binder/server/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/hdf_core/adapter/uhdf2/shared/include",
     "//third_party/googletest/googletest/include/gtest",
   ]
@@ -43,5 +42,6 @@ ohos_unittest("hdf_audio_proxy_render_test") {
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
   ]
 }

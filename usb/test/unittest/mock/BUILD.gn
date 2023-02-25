@@ -22,7 +22,6 @@ config("module_private_config") {
   include_dirs = [
     "include",
     "//drivers/peripheral/usb/hdi_service/include",
-    "//drivers/hdf_core/framework/include",
     "//drivers/peripheral/usb/ddk/host/include",
     "//third_party/googletest/googlemock/include",
     "//drivers/peripheral/usb/test/unittest/mock/include",
