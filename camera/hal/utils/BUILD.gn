@@ -56,8 +56,6 @@ if (defined(ohos_lite)) {
       "//third_party/libexif",
       "watchdog",
       "exif",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/adapter/uhdf2/osal/include",
     ]
     libs = []
     defines = []
@@ -66,6 +64,7 @@ if (defined(ohos_lite)) {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_camera:metadata",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
     if (enable_camera_device_utest) {

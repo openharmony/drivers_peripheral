@@ -41,13 +41,12 @@ ohos_executable("v4l2_main") {
     "$board_camera_path/driver_adapter/test/v4l2_test/include",
     "$camera_path/include",
     "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include",
-    "//drivers/hdf_core/framework/include/utils",
-    "//drivers/hdf_core/adapter/uhdf2/osal/include",
   ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_camera:metadata",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
   defines += [ "V4L2_MAIN_TEST" ]

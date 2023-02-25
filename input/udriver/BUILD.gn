@@ -27,7 +27,6 @@ ohos_shared_library("hdi_input_udriver") {
     "$INPUT_ROOT_DIR/interfaces/include",
     "//third_party/FreeBSD/sys/dev/evdev",
   ]
-  deps = [ "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils" ]
 
   cflags = [
     "-Wall",
@@ -39,6 +38,7 @@ ohos_shared_library("hdi_input_udriver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {

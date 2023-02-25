@@ -31,8 +31,6 @@ if (defined(ohos_lite)) {
       "$LIGHT_ROOT_DIR/interfaces/include",
       "$FWK_ROOT_DIR/include",
       "$FWK_ROOT_DIR/include/utils",
-      "$FWK_ROOT_DIR/include/osal",
-      "$FWK_ROOT_DIR/include/core",
       "//third_party/bounds_checking_function/include",
     ]
 
@@ -71,7 +69,6 @@ if (defined(ohos_lite)) {
       "$LIGHT_ROOT_DIR/hal/include",
       "//third_party/bounds_checking_function/include",
     ]
-    deps = [ "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host" ]
     cflags = [
       "-Wall",
       "-Wextra",
@@ -86,6 +83,7 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "hdf_core:libhdf_host",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
       ]

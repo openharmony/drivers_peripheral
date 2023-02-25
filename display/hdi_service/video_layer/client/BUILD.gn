@@ -18,7 +18,6 @@ config("video_layer_public_config") {
   include_dirs = [
     "//drivers/peripheral/display/interfaces/include",
     "//drivers/peripheral/display/hdi_service/video_layer/client",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
   ]
 }
 

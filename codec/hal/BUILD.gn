@@ -162,7 +162,6 @@ ohos_shared_library("libcodec_hdi_omx_client") {
 
 ohos_shared_library("libcodec_hdi_omx_callback_type_service_impl") {
   include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
@@ -173,6 +172,7 @@ ohos_shared_library("libcodec_hdi_omx_callback_type_service_impl") {
     external_deps = [
       "c_utils:utils",
       "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {

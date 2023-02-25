@@ -59,7 +59,6 @@ if (!drivers_peripheral_input_feature_passthrough) {
     include_dirs = [
       "//drivers/peripheral/input/interfaces/include/",
       "//drivers/peripheral/input/hal/include/",
-      "//drivers/hdf_core/adapter/uhdf2/include/host/",
     ]
 
     sources = [ "input_interfaces_driver.cpp" ]
@@ -69,6 +68,7 @@ if (!drivers_peripheral_input_feature_passthrough) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "hdf_core:libhdf_host",
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",

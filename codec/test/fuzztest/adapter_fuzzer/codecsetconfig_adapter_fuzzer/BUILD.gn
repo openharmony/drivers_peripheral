@@ -21,7 +21,6 @@ ohos_fuzztest("CodecAdapterSetConfigFuzzTest") {
   fuzz_config_file = "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecsetconfig_adapter_fuzzer"
 
   include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
     "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
@@ -34,6 +33,7 @@ ohos_fuzztest("CodecAdapterSetConfigFuzzTest") {
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
+    "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
   ]
 

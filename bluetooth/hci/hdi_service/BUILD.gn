@@ -18,7 +18,6 @@ root_path = "//drivers/peripheral/bluetooth/hci/hdi_service"
 ohos_shared_library("libhci_interface_service_1.0") {
   include_dirs = [
     "//foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/host",
     "$root_path",
     "$root_path/implement",
   ]
@@ -37,6 +36,7 @@ ohos_shared_library("libhci_interface_service_1.0") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_bluetooth:bluetooth_hci_idl_headers",
+      "hdf_core:libhdf_host",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
@@ -49,10 +49,7 @@ ohos_shared_library("libhci_interface_service_1.0") {
 }
 
 ohos_shared_library("libbluetooth_hci_hdi_driver") {
-  include_dirs = [
-    "//drivers/hdf_core/adapter/uhdf2/include/host",
-    "$root_path",
-  ]
+  include_dirs = [ "$root_path" ]
 
   sources = [ "$root_path/hci_interface_driver.cpp" ]
 
@@ -61,6 +58,7 @@ ohos_shared_library("libbluetooth_hci_hdi_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",

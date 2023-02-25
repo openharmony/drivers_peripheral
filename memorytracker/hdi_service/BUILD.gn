@@ -33,7 +33,6 @@ ohos_shared_library("libmemory_tracker_interface_service_1.0") {
 ohos_shared_library("libmemorytracker_driver") {
   include_dirs = [
     "//drivers/hdf_core/adapter/uhdf2/shared/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi/",
     "include",
   ]
   sources = [ "src/memorytracker_interface_driver.cpp" ]

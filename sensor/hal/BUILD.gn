@@ -79,7 +79,6 @@ if (defined(ohos_lite)) {
       "$SENSOR_ROOT_DIR/interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
-    deps = [ "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host" ]
     defines = [ "__OHOS__USER__" ]
     cflags = [
       "-Wall",
@@ -95,6 +94,7 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "hdf_core:libhdf_host",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
       ]
