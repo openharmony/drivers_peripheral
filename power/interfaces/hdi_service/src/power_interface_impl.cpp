@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,7 @@
 #include "hdf_remote_service.h"
 #include "hdf_sbuf.h"
 #include "pubdef.h"
+#include "running_lock_impl.h"
 #include "securec.h"
 #include "unique_fd.h"
 #include "utils/hdf_log.h"
@@ -321,12 +322,12 @@ int32_t PowerInterfaceImpl::PowerDump(std::string &info)
 
 int32_t PowerInterfaceImpl::HoldRunningLock(const RunningLockInfo &info)
 {
-    return HDF_SUCCESS;
+    return RunningLockImpl::Hold(info);
 }
 
 int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
 {
-    return HDF_SUCCESS;
+    return RunningLockImpl::Unhold(info);
 }
 } // namespace V1_1
 } // namespace Power
