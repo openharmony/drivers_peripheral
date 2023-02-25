@@ -90,33 +90,32 @@ int32_t DisplayComposerService::LoadVdi()
 
 void DisplayComposerService::OnHotPlug(uint32_t outputId, bool connected, void* data)
 {
-    if (data != nullptr) {
-        sptr<IHotPlugCallback> remoteCb = reinterpret_cast<DisplayComposerService*>(data)->hotPlugCb_;
-        if (remoteCb != nullptr) {
-            remoteCb->OnHotPlug(outputId, connected);
-        } else {
-            HDF_LOGE("%{public}s: hotPlugCb_ is nullptr", __func__);
-        }
-    } else {
+    if (data == nullptr) {
         HDF_LOGE("%{public}s: cb data is nullptr", __func__);
+        return;
     }
-    return;
+
+    sptr<IHotPlugCallback> remoteCb = reinterpret_cast<DisplayComposerService*>(data)->hotPlugCb_;
+    if (remoteCb == nullptr) {
+        HDF_LOGE("%{public}s: hotPlugCb_ is nullptr", __func__);
+        return;
+    }
+    remoteCb->OnHotPlug(outputId, connected);
 }
 
 void DisplayComposerService::OnVBlank(unsigned int sequence, uint64_t ns, void* data)
 {
-    IVBlankCallback* remoteCb;
-    if (data != nullptr) {
-        remoteCb = reinterpret_cast<IVBlankCallback*>(data);
-        if (remoteCb != nullptr) {
-            remoteCb->OnVBlank(sequence, ns);
-        } else {
-            HDF_LOGE("%{public}s: vblankCb_ is nullptr", __func__);
-        }
-    } else {
+    if (data == nullptr) {
         HDF_LOGE("%{public}s: cb data is nullptr", __func__);
+        return;
     }
-    return;
+
+    IVBlankCallback* remoteCb = reinterpret_cast<IVBlankCallback*>(data);
+    if (remoteCb == nullptr) {
+        HDF_LOGE("%{public}s: vblankCb_ is nullptr", __func__);
+        return;
+    }
+    remoteCb->OnVBlank(sequence, ns);
 }
 
 int32_t DisplayComposerService::RegHotPlugCallback(const sptr<IHotPlugCallback>& cb)
