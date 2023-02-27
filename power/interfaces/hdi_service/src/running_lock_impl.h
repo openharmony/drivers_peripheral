@@ -16,8 +16,14 @@
 #ifndef OHOS_HDI_POWER_V1_1_RUNNINGLOCKIMPL_H
 #define OHOS_HDI_POWER_V1_1_RUNNINGLOCKIMPL_H
 
-#include "v1_1/running_lock_types.h"
 #include <cstdint>
+#include <map>
+#include <mutex>
+
+#include "running_lock_counter.h"
+#include "running_lock_timer_handler.h"
+#include "v1_1/power_types.h"
+#include "v1_1/running_lock_types.h"
 
 namespace OHOS {
 namespace HDI {
@@ -25,12 +31,17 @@ namespace Power {
 namespace V1_1 {
 class RunningLockImpl {
 public:
-    static int32_t Hold(const RunningLockInfo &info);
+    static int32_t Hold(const RunningLockInfo &info, PowerHdfState state);
     static int32_t Unhold(const RunningLockInfo &info);
+    static uint32_t GetCount(RunningLockType type);
 
 private:
-    static bool IsValidType(RunningLockType type);
+    static bool IsValidType(RunningLockType type, PowerHdfState state = PowerHdfState::AWAKE);
     static RunningLockInfo FillRunningLockInfo(const RunningLockInfo &info);
+    static std::string GetRunningLockTag(RunningLockType type);
+    static std::mutex mutex_;
+    static std::unique_ptr<RunningLockTimerHandler> timerHandler_;
+    static std::map<RunningLockType, std::shared_ptr<RunningLockCounter>> lockCounters_;
 };
 
 } // namespace V1_1
