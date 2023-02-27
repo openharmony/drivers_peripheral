@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -287,21 +287,6 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetPixelFormatTest_001, TestSize.Level1)
     params->size = sizeof(format);
 
     int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
-    OsalMemFree(params);
-    ASSERT_EQ(errorCode, HDF_SUCCESS);
-}
-
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetDefaultCfgTest_001, TestSize.Level1)
-{
-    Param *params;
-    int paramCnt = 1;
-    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
-    ASSERT_TRUE(params != nullptr);
-    params->key = (ParamKey)ParamExtKey::KEY_EXT_DEFAULT_CFG_RK;
-    params->val = nullptr;
-    params->size = 0;
-
-    int32_t errorCode = g_codecObj->CodecGetParameter(g_codecObj, g_handle, params, paramCnt);
     OsalMemFree(params);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }

@@ -428,19 +428,6 @@ static int32_t SetDecParameter(void)
         return HDF_FAILURE;
     }
 
-    // get default config
-    memset_s(&param, sizeof(Param), 0, sizeof(Param));
-    paramCnt = 1;
-    param.key = (ParamKey)KEY_EXT_DEFAULT_CFG_RK;
-    int32_t needDefault = 1;
-    param.val = &needDefault;
-    param.size = sizeof(int32_t);
-    ret = g_codecProxy->CodecGetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: CodecSetParameter failed", __func__);
-        return HDF_FAILURE;
-    }
-
     // get format
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
     paramCnt = 1;

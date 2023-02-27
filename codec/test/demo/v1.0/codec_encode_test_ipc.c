@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,38 +32,12 @@
 #define HDF_LOG_TAG codec_hdi_demo_encode
 #define TEST_SERVICE_NAME   "codec_hdi_service"
 #define QUEUE_TIME_OUT              10
-#define READ_SEGMENT_SIZE           8192
 #define FRAME_SIZE_MULTI         	3
 #define FRAME_SIZE_OPERATOR         2
-#define BPS_BASE		            16
-#define BPS_MAX			            17
-#define BPS_MEDIUM			        15
-#define BPS_MIN            			1
-#define BPS_TARGET         			2
-#define FIXQP_INIT_VALUE            20
-#define FIXQP_MAX_VALUE             20
-#define FIXQP_MIN_VALUE             20
-#define FIXQP_MAX_I_VALUE           20
-#define FIXQP_MIN_I_VALUE           20
-#define FIXQP_IP_VALUE              2
-#define OTHER_QP_INIT_VALUE         26
-#define OTHER_QP_MAX_VALUE          51
-#define OTHER_QP_MIN_VALUE          10
-#define OTHER_QP_MAX_I_VALUE        51
-#define OTHER_QP_MIN_I_VALUE        10
-#define OTHER_QP_IP_VALUE           2
-#define AVC_SETUP_LEVEL_DEFAULT     40
-#define AVC_SETUP_CABAC_EN_DEFAULT  1
-#define AVC_SETUP_CABAC_IDC_DEFAULT 0
-#define AVC_SETUP_TRANS_DEFAULT     1
-#define AVC_SETUP_PROFILE_DEFAULT   100
-#define FPS_OUT_NUM_OPERATOR        2
+#define ENC_DEFAULT_FRAME_RATE      24
 #define INPUT_BUFFER_NUM            4
 #define INPUT_BUFFER_SIZE_OPERATOR  2
 #define OUTPUT_BUFFER_NUM           4
-#define ENC_SETUP_DROP_THD          20
-#define ENC_SETUP_FPS_IN_NUM        24
-#define ENC_SETUP_FPS_OUT_NUM       24
 #define PARAM_ARRAY_LEN             20
 #define YUV_ALIGNMENT               16
 
@@ -289,111 +263,6 @@ int32_t TestOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t
     return HDF_SUCCESS;
 }
 
-static void SetQpValue(RKHdiEncodeSetup *encSetup)
-{
-    switch (encSetup->rc.rcMode) {
-        case MPP_ENC_RC_MODE_FIXQP: {
-            encSetup->rc.qpInit = FIXQP_INIT_VALUE;
-            encSetup->rc.qpMax = FIXQP_MAX_VALUE;
-            encSetup->rc.qpMin = FIXQP_MIN_VALUE;
-            encSetup->rc.qpMaxI = FIXQP_MAX_I_VALUE;
-            encSetup->rc.qpMinI = FIXQP_MIN_I_VALUE;
-            encSetup->rc.qpIp = FIXQP_IP_VALUE;
-            break;
-        }
-        case MPP_ENC_RC_MODE_CBR:
-        case MPP_ENC_RC_MODE_VBR:
-        case MPP_ENC_RC_MODE_AVBR: {
-            encSetup->rc.qpInit = OTHER_QP_INIT_VALUE;
-            encSetup->rc.qpMax = OTHER_QP_MAX_VALUE;
-            encSetup->rc.qpMin = OTHER_QP_MIN_VALUE;
-            encSetup->rc.qpMaxI = OTHER_QP_MAX_I_VALUE;
-            encSetup->rc.qpMinI = OTHER_QP_MIN_I_VALUE;
-            encSetup->rc.qpIp = OTHER_QP_IP_VALUE;
-            break;
-        }
-        default: {
-            HDF_LOGE("%{public}s: unsupported encoder rc mode %{public}d", __func__, encSetup->rc.rcMode);
-            break;
-        }
-    }
-}
-
-static void CalcBpsRange(RKHdiEncodeSetup *encSetup)
-{
-    switch (encSetup->rc.rcMode) {
-        case MPP_ENC_RC_MODE_FIXQP: {
-            /* do not setup bitrate on FIXQP mode */
-            break;
-        }
-        case MPP_ENC_RC_MODE_CBR: {
-            /* CBR mode has narrow bound */
-            encSetup->rc.bpsMax = encSetup->rc.bpsTarget * BPS_MAX / BPS_BASE;
-            encSetup->rc.bpsMin = encSetup->rc.bpsTarget * BPS_MEDIUM / BPS_BASE;
-            break;
-        }
-        case MPP_ENC_RC_MODE_VBR:
-        case MPP_ENC_RC_MODE_AVBR: {
-            /* VBR mode has wide bound */
-            encSetup->rc.bpsMax = encSetup->rc.bpsTarget * BPS_MAX / BPS_BASE;
-            encSetup->rc.bpsMin = encSetup->rc.bpsTarget * BPS_MIN / BPS_BASE;
-            break;
-        }
-        default: {
-            /* default use CBR mode */
-            encSetup->rc.bpsMax = encSetup->rc.bpsTarget * BPS_MAX / BPS_BASE;
-            encSetup->rc.bpsMin = encSetup->rc.bpsTarget * BPS_MEDIUM / BPS_BASE;
-            break;
-        }
-    }
-    /* setup qp for different codec and rc_mode */
-    switch (encSetup->codecMime.mimeCodecType) {
-        case MPP_VIDEO_CodingAVC:
-        case MPP_VIDEO_CodingHEVC: {
-            SetQpValue(encSetup);
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-}
-
-static void SetCodecTypeData(RKHdiCodecMimeSetup *codecMimeSet)
-{
-    switch (codecMimeSet->mimeCodecType) {
-        case MEDIA_MIMETYPE_VIDEO_AVC: {
-            /*
-            * H.264 profile_idc parameter
-            * 66  - Baseline profile
-            * 77  - Main profile
-            * 100 - High profile
-            */
-            codecMimeSet->avcSetup.profile = AVC_SETUP_PROFILE_DEFAULT;
-            /*
-            * H.264 level_idc parameter
-            * 10 / 11 / 12 / 13    - qcif@15fps / cif@7.5fps / cif@15fps / cif@30fps
-            * 20 / 21 / 22         - cif@30fps / half-D1@@25fps / D1@12.5fps
-            * 30 / 31 / 32         - D1@25fps / 720p@30fps / 720p@60fps
-            * 40 / 41 / 42         - 1080p@30fps / 1080p@30fps / 1080p@60fps
-            * 50 / 51 / 52         - 4K@30fps
-            */
-            codecMimeSet->avcSetup.level = AVC_SETUP_LEVEL_DEFAULT;
-            codecMimeSet->avcSetup.cabacEn = AVC_SETUP_CABAC_EN_DEFAULT;
-            codecMimeSet->avcSetup.cabacIdc = AVC_SETUP_CABAC_IDC_DEFAULT;
-            codecMimeSet->avcSetup.trans8x8 = AVC_SETUP_TRANS_DEFAULT;
-            break;
-        }
-        case MEDIA_MIMETYPE_VIDEO_HEVC: {
-            break;
-        }
-        default: {
-            HDF_LOGE("%{public}s: unsupport encoder coding type %{public}d", __func__, codecMimeSet->mimeCodecType);
-            break;
-        }
-    }
-}
-
 static void FreeParams(Param *params, int32_t paramCnt)
 {
     if (params == NULL || paramCnt <= 0) {
@@ -455,17 +324,14 @@ static int32_t SetupExtEncParams(Param *params, RKHdiEncodeSetup *encSetup, int3
     param = &params[paramCount++];
     param->key = (ParamKey)KEY_EXT_SETUP_DROP_MODE_RK;
     encSetup->drop.dropMode = MPP_ENC_RC_DROP_FRM_DISABLED;
-    encSetup->drop.dropThd = ENC_SETUP_DROP_THD;
-    encSetup->drop.dropGap = 1;
-    param->val = &(encSetup->drop);
-    param->size = sizeof(encSetup->drop);
+    param->val = &(encSetup->drop.dropMode);
+    param->size = sizeof(encSetup->drop.dropMode);
 
     param = &params[paramCount++];
     param->key = KEY_MIMETYPE;
     encSetup->codecMime.mimeCodecType = MEDIA_MIMETYPE_VIDEO_AVC;
-    SetCodecTypeData(&encSetup->codecMime);
-    param->val = &(encSetup->codecMime);
-    param->size = sizeof(encSetup->codecMime);
+    param->val = &(encSetup->codecMime.mimeCodecType);
+    param->size = sizeof(encSetup->codecMime.mimeCodecType);
 
     param = &params[paramCount++];
     param->key = KEY_CODEC_TYPE;
@@ -476,23 +342,14 @@ static int32_t SetupExtEncParams(Param *params, RKHdiEncodeSetup *encSetup, int3
     param = &params[paramCount++];
     param->key = KEY_VIDEO_RC_MODE;
     encSetup->rc.rcMode = VID_CODEC_RC_VBR;
-    encSetup->rc.bpsTarget = g_cmd.width * g_cmd.height * BPS_TARGET / BPS_BASE *
-        (encSetup->fps.fpsOutNum / encSetup->fps.fpsOutDen);
-    CalcBpsRange(encSetup);
-    param->val = &(encSetup->rc);
-    param->size = sizeof(encSetup->rc);
+    param->val = &(encSetup->rc.rcMode);
+    param->size = sizeof(encSetup->rc.rcMode);
 
     param = &params[paramCount++];
     param->key = KEY_VIDEO_GOP_MODE;
     encSetup->gop.gopMode = VID_CODEC_GOPMODE_NORMALP;
-    encSetup->gop.gopLen = 0;
-    encSetup->gop.viLen = 0;
-    encSetup->gop.gop = encSetup->fps.fpsOutNum * FPS_OUT_NUM_OPERATOR;
-    param->val = &(encSetup->gop);
-    param->size = sizeof(encSetup->gop);
-
-    param = &params[paramCount++];
-    param->key = (ParamKey)KEY_EXT_ENC_VALIDATE_SETUP_RK;
+    param->val = &(encSetup->gop.gopMode);
+    param->size = sizeof(encSetup->gop.gopMode);
 
     return paramCount;
 }
@@ -524,20 +381,14 @@ static int32_t SetupEncParams(RKHdiEncodeSetup *encSetup)
     param = &params[paramCount++];
     param->key = KEY_VIDEO_STRIDE;
     encSetup->stride.horStride = GetDefaultHorStride(g_cmd.width, encSetup->fmt);
-    encSetup->stride.verStride = g_cmd.height;
-    param->val = &(encSetup->stride);
-    param->size = sizeof(encSetup->stride);
+    param->val = &(encSetup->stride.horStride);
+    param->size = sizeof(encSetup->stride.horStride);
 
     param = &params[paramCount++];
+    int32_t defaultFps = ENC_DEFAULT_FRAME_RATE;
     param->key = KEY_VIDEO_FRAME_RATE;
-    encSetup->fps.fpsInFlex = 0;
-    encSetup->fps.fpsInNum = ENC_SETUP_FPS_IN_NUM;
-    encSetup->fps.fpsOutNum = ENC_SETUP_FPS_OUT_NUM;
-    encSetup->fps.fpsInDen = 1;
-    encSetup->fps.fpsOutDen = 1;
-    encSetup->fps.fpsOutFlex = 0;
-    param->val = &(encSetup->fps);
-    param->size = sizeof(encSetup->fps);
+    param->val = &defaultFps;
+    param->size = sizeof(defaultFps);
 
     paramCount = SetupExtEncParams(params, encSetup, paramCount);
     int32_t ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, params, paramCount);

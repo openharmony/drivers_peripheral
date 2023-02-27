@@ -177,7 +177,7 @@ int32_t CodecInit(void)
     OsalMutexLock(&g_oemIfaceLock);
 #endif
     if (g_codecOemIface == NULL) {
-        HDF_LOGE("%{public}s: g_codecOemIface is NULL, do init!", __func__);
+        HDF_LOGI("%{public}s: g_codecOemIface is NULL, do init!", __func__);
         if (InitCodecOemIf(&g_codecOemIface) != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: InitCodecOemIf failed!", __func__);
 #ifndef CODEC_HAL_PASSTHROUGH
@@ -391,6 +391,9 @@ int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
 
 int32_t CodecStart(CODEC_HANDLETYPE handle)
 {
+    if (g_codecOemIface->codecStart(handle) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
     struct CodecInstance *instance = FindInCodecInstanceManager(handle);
     if (instance == NULL || g_codecOemIface == NULL) {
         HDF_LOGE("%{public}s: instance or g_codecOemIface is NULL!", __func__);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -31,30 +31,8 @@ using namespace OHOS;
 #define HDF_LOG_TAG codec_omx_hdi_enc
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiAdapterEncode::gralloc_ = nullptr;
 namespace {
-    constexpr int16_t BPS_BASE = 16;
-    constexpr int16_t BPS_MAX = 17;
-    constexpr int16_t BPS_MEDIUM = 15;
-    constexpr int16_t BPS_MIN = 1;
-    constexpr int16_t BPS_TARGET = 2;
-    constexpr int16_t FIXQP_INIT_VALUE = 20;
-    constexpr int16_t FIXQP_MAX_VALUE = 20;
-    constexpr int16_t FIXQP_MIN_VALUE = 20;
-    constexpr int16_t FIXQP_MAX_I_VALUE = 20;
-    constexpr int16_t FIXQP_MIN_I_VALUE = 20;
-    constexpr int16_t FIXQP_IP_VALUE = 2;
-    constexpr int16_t OTHER_QP_INIT_VALUE = 26;
-    constexpr int16_t OTHER_QP_MAX_VALUE = 51;
-    constexpr int16_t OTHER_QP_MIN_VALUE = 10;
-    constexpr int16_t OTHER_QP_MAX_I_VALUE = 51;
-    constexpr int16_t OTHER_QP_MIN_I_VALUE = 10;
-    constexpr int16_t OTHER_QP_IP_VALUE = 2;
-    constexpr int16_t AVC_SETUP_LEVEL_DEFAULT = 40;
-    constexpr int16_t AVC_SETUP_CABAC_EN_DEFAULT = 1;
-    constexpr int16_t AVC_SETUP_CABAC_IDC_DEFAULT = 0;
-    constexpr int16_t AVC_SETUP_TRANS_DEFAULT = 1;
-    constexpr int16_t AVC_SETUP_PROFILE_DEFAULT = 100;
-    constexpr int16_t ENC_SETUP_FPS_IN_NUM = 24;
-    constexpr int16_t ENC_SETUP_FPS_OUT_NUM = 24;
+    constexpr int16_t ENC_DEFAULT_FRAME_RATE = 24;
+
     constexpr int32_t FRAME = (30 << 16);
     constexpr int32_t BUFFER_COUNT = 10;
     constexpr int32_t FD_SIZE = sizeof(int);
@@ -641,76 +619,6 @@ int32_t CodecHdiAdapterEncode::OnFillBufferDone(const struct OmxCodecBuffer &buf
     return HDF_SUCCESS;
 }
 
-void CodecHdiAdapterEncode::CalcBpsRange(RKHdiRcSetup *rateControl, int32_t codecType)
-{
-    switch (rateControl->rcMode) {
-        case MPP_ENC_RC_MODE_FIXQP: {
-            /* do not setup bitrate on FIXQP mode */
-            break;
-        }
-        case MPP_ENC_RC_MODE_CBR: {
-            /* CBR mode has narrow bound */
-            rateControl->bpsMax = rateControl->bpsTarget * BPS_MAX / BPS_BASE;
-            rateControl->bpsMin = rateControl->bpsTarget * BPS_MEDIUM / BPS_BASE;
-            break;
-        }
-        case MPP_ENC_RC_MODE_VBR:
-        case MPP_ENC_RC_MODE_AVBR: {
-            /* VBR mode has wide bound */
-            rateControl->bpsMax = rateControl->bpsTarget * BPS_MAX / BPS_BASE;
-            rateControl->bpsMin = rateControl->bpsTarget * BPS_MIN / BPS_BASE;
-            break;
-        }
-        default: {
-            /* default use CBR mode */
-            rateControl->bpsMax = rateControl->bpsTarget * BPS_MAX / BPS_BASE;
-            rateControl->bpsMin = rateControl->bpsTarget * BPS_MEDIUM / BPS_BASE;
-            break;
-        }
-    }
-    /* setup qp for different codec and rc_mode */
-    switch (codecType) {
-        case MPP_VIDEO_CodingAVC:
-        case MPP_VIDEO_CodingHEVC: {
-            SetQpValue(rateControl);
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-}
-
-void CodecHdiAdapterEncode::SetQpValue(RKHdiRcSetup *rateControl)
-{
-    switch (rateControl->rcMode) {
-        case MPP_ENC_RC_MODE_FIXQP: {
-            rateControl->qpInit = FIXQP_INIT_VALUE;
-            rateControl->qpMax = FIXQP_MAX_VALUE;
-            rateControl->qpMin = FIXQP_MIN_VALUE;
-            rateControl->qpMaxI = FIXQP_MAX_I_VALUE;
-            rateControl->qpMinI = FIXQP_MIN_I_VALUE;
-            rateControl->qpIp = FIXQP_IP_VALUE;
-            break;
-        }
-        case MPP_ENC_RC_MODE_CBR:
-        case MPP_ENC_RC_MODE_VBR:
-        case MPP_ENC_RC_MODE_AVBR: {
-            rateControl->qpInit = OTHER_QP_INIT_VALUE;
-            rateControl->qpMax = OTHER_QP_MAX_VALUE;
-            rateControl->qpMin = OTHER_QP_MIN_VALUE;
-            rateControl->qpMaxI = OTHER_QP_MAX_I_VALUE;
-            rateControl->qpMinI = OTHER_QP_MIN_I_VALUE;
-            rateControl->qpIp = OTHER_QP_IP_VALUE;
-            break;
-        }
-        default: {
-            HDF_LOGE("%{public}s: unsupport encoder rc mode %{public}d", __func__, rateControl->rcMode);
-            break;
-        }
-    }
-}
-
 int32_t CodecHdiAdapterEncode::ConfigMppPassthrough()
 {
     if (client_ == nullptr) {
@@ -731,16 +639,10 @@ int32_t CodecHdiAdapterEncode::ConfigMppPassthrough()
     }
 
     memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
-    RKHdiCodecMimeSetup mimeType;
     param.key = KEY_MIMETYPE;
-    mimeType.mimeCodecType = MEDIA_MIMETYPE_VIDEO_AVC;
-    mimeType.avcSetup.profile = AVC_SETUP_PROFILE_DEFAULT;
-    mimeType.avcSetup.level = AVC_SETUP_LEVEL_DEFAULT;
-    mimeType.avcSetup.cabacEn = AVC_SETUP_CABAC_EN_DEFAULT;
-    mimeType.avcSetup.cabacIdc = AVC_SETUP_CABAC_IDC_DEFAULT;
-    mimeType.avcSetup.trans8x8 = AVC_SETUP_TRANS_DEFAULT;
-    param.val = &mimeType;
-    param.size = sizeof(mimeType);
+    int32_t mimeCodecType = MEDIA_MIMETYPE_VIDEO_AVC;
+    param.val = &mimeCodecType;
+    param.size = sizeof(mimeCodecType);
 
     ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
     if (ret != HDF_SUCCESS) {
@@ -748,7 +650,7 @@ int32_t CodecHdiAdapterEncode::ConfigMppPassthrough()
         return ret;
     }
 
-    ret = ConfigMppExtPassthrough(mimeType.mimeCodecType);
+    ret = ConfigMppExtPassthrough(mimeCodecType);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d] ConfigMppExtPassthrough error", __func__, ret);
         return ret;
@@ -765,16 +667,10 @@ int32_t CodecHdiAdapterEncode::ConfigMppExtPassthrough(int32_t codecType)
     }
     PassthroughParam param;
     memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
-    RKHdiFpsSetup fps;
+    int32_t defaultFps = ENC_DEFAULT_FRAME_RATE;
     param.key = KEY_VIDEO_FRAME_RATE;
-    fps.fpsInFlex = 0;
-    fps.fpsInNum = ENC_SETUP_FPS_IN_NUM;
-    fps.fpsOutNum = ENC_SETUP_FPS_OUT_NUM;
-    fps.fpsInDen = 1;
-    fps.fpsOutDen = 1;
-    fps.fpsOutFlex = 0;
-    param.val = &fps;
-    param.size = sizeof(fps);
+    param.val = &defaultFps;
+    param.size = sizeof(defaultFps);
 
     auto ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
     if (ret != HDF_SUCCESS) {
@@ -783,25 +679,15 @@ int32_t CodecHdiAdapterEncode::ConfigMppExtPassthrough(int32_t codecType)
     }
 
     memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
-    RKHdiRcSetup rc;
     param.key = KEY_VIDEO_RC_MODE;
-    rc.rcMode = VID_CODEC_RC_VBR;
-    rc.bpsTarget = width_ * height_ * BPS_TARGET / BPS_BASE * (fps.fpsOutNum / fps.fpsOutDen);
-    CalcBpsRange(&rc, codecType);
-    param.val = &rc;
-    param.size = sizeof(rc);
+    int32_t rcMode = VID_CODEC_RC_VBR;
+    param.val = &rcMode;
+    param.size = sizeof(rcMode);
 
     ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s errNo[%{public}d], key is KEY_VIDEO_RC_MODE", __func__, ret);
         return ret;
-    }
-
-    memset_s(&param, sizeof(PassthroughParam), 0, sizeof(PassthroughParam));
-    param.key = KEY_EXT_ENC_VALIDATE_SETUP_RK;
-    ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s errNo[%{public}d], key is KEY_EXT_ENC_VALIDATE_SETUP_RK", __func__, ret);
     }
 
     return ret;
