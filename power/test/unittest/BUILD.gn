@@ -16,6 +16,7 @@ import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "drivers_peripheral_power/power"
+power_hdi_service_path = "//drivers/peripheral/power/interfaces/hdi_service"
 
 ohos_unittest("hdi_unittest_power") {
   module_out_path = module_output_path
@@ -37,6 +38,38 @@ ohos_unittest("hdi_unittest_power") {
 
   external_deps = [
     "c_utils:utils",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_single",
+  ]
+}
+
+ohos_unittest("hdi_unittest_power_runninglock") {
+  module_out_path = module_output_path
+
+  include_dirs = [ "${power_hdi_service_path}/src" ]
+
+  defines = [ "HDF_RUNNINGLOCK_UNIT_TEST" ]
+
+  sources = [
+    "${power_hdi_service_path}/src/running_lock_counter.cpp",
+    "${power_hdi_service_path}/src/running_lock_impl.cpp",
+    "${power_hdi_service_path}/src/running_lock_timer_handler.cpp",
+    "src/hdf_power_runninglock_test.cpp",
+  ]
+
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_power:power_idl_headers",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",

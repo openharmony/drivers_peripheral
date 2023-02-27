@@ -16,11 +16,12 @@
 #ifndef OHOS_HDI_POWER_V1_1_POWERINTERFACEIMPL_H
 #define OHOS_HDI_POWER_V1_1_POWERINTERFACEIMPL_H
 
+#include <functional>
+
 #include "iremote_object.h"
 #include "refbase.h"
 #include "v1_1/ipower_interface.h"
 #include "v1_1/running_lock_types.h"
-#include <functional>
 
 namespace OHOS {
 namespace HDI {

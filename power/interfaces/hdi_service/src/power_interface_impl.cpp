@@ -24,6 +24,7 @@
 #include "securec.h"
 #include "unique_fd.h"
 #include "utils/hdf_log.h"
+#include "v1_1/power_types.h"
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
@@ -58,6 +59,7 @@ static std::atomic_bool g_suspending;
 static std::atomic_bool g_suspendRetry;
 static sptr<IPowerHdiCallback> g_callback;
 static UniqueFd wakeupCountFd;
+static PowerHdfState g_powerState {PowerHdfState::AWAKE};
 static void AutoSuspendLoop();
 static int32_t DoSuspend();
 static void LoadStringFd(int32_t fd, std::string &content);
@@ -106,6 +108,7 @@ int32_t PowerInterfaceImpl::StartSuspend()
     std::lock_guard<std::mutex> lock(g_mutex);
     g_suspendRetry = true;
     if (g_suspending) {
+        g_powerState = PowerHdfState::INACTIVE;
         g_suspendCv.notify_one();
         return HDF_SUCCESS;
     }
@@ -133,7 +136,9 @@ void AutoSuspendLoop()
         }
 
         NotifyCallback(CMD_ON_SUSPEND);
+        g_powerState = PowerHdfState::SLEEP;
         DoSuspend();
+        g_powerState = PowerHdfState::AWAKE;
         NotifyCallback(CMD_ON_WAKEUP);
     }
     g_suspending = false;
@@ -185,7 +190,9 @@ int32_t PowerInterfaceImpl::ForceSuspend()
     g_suspendRetry = false;
 
     NotifyCallback(CMD_ON_SUSPEND);
+    g_powerState = PowerHdfState::SLEEP;
     DoSuspend();
+    g_powerState = PowerHdfState::AWAKE;
     NotifyCallback(CMD_ON_WAKEUP);
     return HDF_SUCCESS;
 }
@@ -322,7 +329,7 @@ int32_t PowerInterfaceImpl::PowerDump(std::string &info)
 
 int32_t PowerInterfaceImpl::HoldRunningLock(const RunningLockInfo &info)
 {
-    return RunningLockImpl::Hold(info);
+    return RunningLockImpl::Hold(info, g_powerState);
 }
 
 int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)

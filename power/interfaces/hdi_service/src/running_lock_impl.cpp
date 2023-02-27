@@ -14,39 +14,119 @@
  */
 
 #include "running_lock_impl.h"
+
 #include "hdf_base.h"
+#include "utils/hdf_log.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
 namespace V1_1 {
+namespace {
+const std::string RUNNINGLOCK_TAG_BACKGROUND_PHONE = "OHOS.RunningLock.Background.Phone";
+const std::string RUNNINGLOCK_TAG_BACKGROUND_NOTIFICATION = "OHOS.RunningLock.Background.Notification";
+const std::string RUNNINGLOCK_TAG_BACKGROUND_AUDIO = "OHOS.RunningLock.Background.Audio";
+const std::string RUNNINGLOCK_TAG_BACKGROUND_SPORT = "OHOS.RunningLock.Background.Sport";
+const std::string RUNNINGLOCK_TAG_BACKGROUND_NAVIGATION = "OHOS.RunningLock.Background.Navigation";
+const std::string RUNNINGLOCK_TAG_BACKGROUND_TASK = "OHOS.RunningLock.Background.Task";
+#ifndef HDF_RUNNINGLOCK_UNIT_TEST
 constexpr int32_t DEFAULT_TIMEOUT = 3000;
-int32_t RunningLockImpl::Hold(const RunningLockInfo &info)
-{
-    if (info.name.empty()) {
-        return HDF_ERR_INVALID_PARAM;
-    }
-    if (!IsValidType(info.type)) {
-        return HDF_ERR_INVALID_PARAM;
-    }
-    struct RunningLockInfo filledInfo = FillRunningLockInfo(info);
-    (void)filledInfo;
-    return HDF_SUCCESS;
-}
+#else
+constexpr int32_t DEFAULT_TIMEOUT = 100;
+#endif
+} // namespace
+std::mutex RunningLockImpl::mutex_;
+std::unique_ptr<RunningLockTimerHandler> RunningLockImpl::timerHandler_ = nullptr;
+std::map<RunningLockType, std::shared_ptr<RunningLockCounter>> RunningLockImpl::lockCounters_ = {};
 
-bool RunningLockImpl::IsValidType(RunningLockType type)
+int32_t RunningLockImpl::Hold(const RunningLockInfo &info, PowerHdfState state)
 {
-    return type == RUNNINGLOCK_BACKGROUND_PHONE || type == RUNNINGLOCK_BACKGROUND_NOTIFICATION ||
-        type == RUNNINGLOCK_BACKGROUND_AUDIO || type == RUNNINGLOCK_BACKGROUND_SPORT ||
-        type == RUNNINGLOCK_BACKGROUND_NAVIGATION || type == RUNNINGLOCK_BACKGROUND_TASK;
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (info.name.empty()) {
+        HDF_LOGW("Runninglock hold failed, name is empty");
+        return HDF_ERR_INVALID_PARAM;
+    }
+    RunningLockInfo filledInfo = FillRunningLockInfo(info);
+    if (!IsValidType(filledInfo.type, state)) {
+        HDF_LOGW("Runninglock hold failed, type=%{public}d or state=%{public}d is invalid", filledInfo.type, state);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    auto iterator = lockCounters_.find(filledInfo.type);
+    if (iterator == lockCounters_.end()) {
+        auto pair = lockCounters_.emplace(filledInfo.type,
+            std::make_shared<RunningLockCounter>(filledInfo.type, GetRunningLockTag(filledInfo.type)));
+        if (pair.second == false) {
+            HDF_LOGW("Runninglock hold failed, type=%{public}d is not in lockCounters", filledInfo.type);
+            return HDF_FAILURE;
+        }
+        iterator = pair.first;
+    }
+    std::shared_ptr<RunningLockCounter> lockCounter = iterator->second;
+    if (lockCounter->Increase(filledInfo) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
+    if (filledInfo.timeoutMs > 0) {
+        if (timerHandler_ == nullptr) {
+            timerHandler_ = std::make_unique<RunningLockTimerHandler>();
+        }
+        std::function<void()> unholdFunc = std::bind(&RunningLockImpl::Unhold, filledInfo);
+        timerHandler_->RegisterRunningLockTimer(filledInfo, unholdFunc);
+    }
+    return HDF_SUCCESS;
 }
 
 int32_t RunningLockImpl::Unhold(const RunningLockInfo &info)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (info.name.empty()) {
+        HDF_LOGW("Runninglock unhold failed, name is empty");
         return HDF_ERR_INVALID_PARAM;
     }
+    RunningLockInfo filledInfo = FillRunningLockInfo(info);
+    if (!IsValidType(filledInfo.type)) {
+        HDF_LOGW("Runninglock unhold failed, type=%{public}d is invalid", filledInfo.type);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    auto iterator = lockCounters_.find(filledInfo.type);
+    if (iterator == lockCounters_.end()) {
+        HDF_LOGW("Runninglock unhold failed, type=%{public}d is not in lockCounters", filledInfo.type);
+        return HDF_SUCCESS;
+    }
+    if (timerHandler_ != nullptr) {
+        timerHandler_->UnregisterRunningLockTimer(filledInfo);
+    }
+    std::shared_ptr<RunningLockCounter> lockCounter = iterator->second;
+    if (lockCounter->Decrease(filledInfo) != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
     return HDF_SUCCESS;
+}
+
+uint32_t RunningLockImpl::GetCount(RunningLockType type)
+{
+    int32_t count = 0;
+    auto iterator = lockCounters_.find(type);
+    if (iterator != lockCounters_.end()) {
+        count = iterator->second->GetCount();
+    }
+    return count;
+}
+
+bool RunningLockImpl::IsValidType(RunningLockType type, PowerHdfState state)
+{
+    switch (state) {
+        case PowerHdfState::SLEEP:
+            return false;
+        case PowerHdfState::INACTIVE:
+            return type == RUNNINGLOCK_BACKGROUND_PHONE || type == RUNNINGLOCK_BACKGROUND_NOTIFICATION;
+        case PowerHdfState::AWAKE:
+            return type == RUNNINGLOCK_BACKGROUND_PHONE || type == RUNNINGLOCK_BACKGROUND_NOTIFICATION ||
+                type == RUNNINGLOCK_BACKGROUND_AUDIO || type == RUNNINGLOCK_BACKGROUND_SPORT ||
+                type == RUNNINGLOCK_BACKGROUND_NAVIGATION || type == RUNNINGLOCK_BACKGROUND_TASK;
+        default:
+            break;
+    }
+    return false;
 }
 
 RunningLockInfo RunningLockImpl::FillRunningLockInfo(const RunningLockInfo &info)
@@ -65,6 +145,27 @@ RunningLockInfo RunningLockImpl::FillRunningLockInfo(const RunningLockInfo &info
         filledInfo.timeoutMs = DEFAULT_TIMEOUT;
     }
     return filledInfo;
+}
+
+std::string RunningLockImpl::GetRunningLockTag(RunningLockType type)
+{
+    switch (type) {
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE:
+            return RUNNINGLOCK_TAG_BACKGROUND_PHONE;
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_NOTIFICATION:
+            return RUNNINGLOCK_TAG_BACKGROUND_NOTIFICATION;
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_AUDIO:
+            return RUNNINGLOCK_TAG_BACKGROUND_AUDIO;
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_SPORT:
+            return RUNNINGLOCK_TAG_BACKGROUND_SPORT;
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_NAVIGATION:
+            return RUNNINGLOCK_TAG_BACKGROUND_NAVIGATION;
+        case RunningLockType::RUNNINGLOCK_BACKGROUND_TASK:
+            return RUNNINGLOCK_TAG_BACKGROUND_TASK;
+        default:
+            break;
+    }
+    return "";
 }
 } // namespace V1_1
 } // namespace Power
