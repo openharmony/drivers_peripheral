@@ -39,6 +39,7 @@ dcamera_external_deps = [
   "c_utils:utils",
   "drivers_interface_camera:libcamera_proxy_1.0",
   "drivers_interface_camera:metadata",
+  "hdf_core:libhdi",
   "ipc:ipc_core",
 ]
 
