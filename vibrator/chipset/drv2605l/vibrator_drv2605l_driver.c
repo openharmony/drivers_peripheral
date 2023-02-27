@@ -194,7 +194,7 @@ static int32_t SetModulationParameter(uint16_t intensity, int16_t frequency)
         value[DRV2605L_VALUE_INDEX] = (uint8_t)INTENSITY_MAPPING_VALUE(intensity);
         if (WriteDrv2605l(&drvData->drv2605lCfgData->vibratorBus.i2cCfg, value, sizeof(value)) != HDF_SUCCESS) {
             HDF_LOGE("%s: i2c addr [%0X] write failed", __func__, value[DRV2605L_ADDR_INDEX]);
-            return;
+            return HDF_FAILURE;
         }
     } else {
         HDF_LOGD("%s: the setting of intensity 0 is not supported and \
@@ -206,12 +206,14 @@ static int32_t SetModulationParameter(uint16_t intensity, int16_t frequency)
         value[DRV2605L_VALUE_INDEX] = (uint8_t)FREQUENCY_MAPPING_VALUE(frequency);
         if (WriteDrv2605l(&drvData->drv2605lCfgData->vibratorBus.i2cCfg, value, sizeof(value)) != HDF_SUCCESS) {
             HDF_LOGE("%s: i2c addr [%0X] write failed", __func__, value[DRV2605L_ADDR_INDEX]);
-            return;
+            return HDF_FAILURE;
         }
     } else {
         HDF_LOGD("%s: the setting of frequency 0 is not supported and \
             will be set as the system default frequency", __func__);
     }
+
+    return HDF_SUCCESS;
 }
 
 static int32_t StartModulationParameter()
