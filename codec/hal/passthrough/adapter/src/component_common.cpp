@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -685,8 +685,7 @@ static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, i
         validCount++;
         switch (paramIn[i].key) {
             case KEY_BUFFERSIZE: {
-                param->nBufferSize =
-                         param->nPortIndex == INPUT_PORTINDEX ? info.inputBufferSize : info.outputBufferSize;
+                param->nBufferSize = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 param->nBufferCountActual =
                          param->nPortIndex == INPUT_PORTINDEX ? info.inputBufferCount : info.outputBufferCount;
                 param->bEnabled = OMX_TRUE;
