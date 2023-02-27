@@ -38,7 +38,7 @@ void DcameraShutterBufferFuzzTest(const uint8_t* data, size_t size)
     DCameraBuffer buffer;
     buffer.index_ = *(reinterpret_cast<const int32_t*>(data));
     buffer.size_ = *(reinterpret_cast<const unsigned int*>(data));
-    buffer.bufferHandle_ = new BufferHandleSequenceable();
+    buffer.bufferHandle_ = new NativeBuffer();
 
     DCameraProvider::GetInstance()->ShutterBuffer(dhBase, streamId, buffer);
 }

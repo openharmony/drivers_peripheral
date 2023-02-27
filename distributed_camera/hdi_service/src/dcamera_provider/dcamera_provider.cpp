@@ -144,10 +144,6 @@ int32_t DCameraProvider::ShutterBuffer(const DHBase& dhBase, int32_t streamId, c
     DHLOGD("DCameraProvider::ShutterBuffer for {devId: %s, dhId: %s}, streamId = %d, buffer index = %d.",
         GetAnonyString(dhBase.deviceId_).c_str(), GetAnonyString(dhBase.dhId_).c_str(), streamId, buffer.index_);
 
-    /* ShutterBuffer don't need buffer handle */
-    if (buffer.bufferHandle_ != nullptr) {
-        FreeBufferHandle(buffer.bufferHandle_->GetBufferHandle());
-    }
     OHOS::sptr<DCameraDevice> device = GetDCameraDevice(dhBase);
     if (device == nullptr) {
         DHLOGE("DCameraProvider::ShutterBuffer failed, dcamera device not found.");
