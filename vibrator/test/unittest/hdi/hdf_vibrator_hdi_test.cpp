@@ -34,6 +34,8 @@ namespace {
     int32_t g_intensity2 = -30;
     int32_t g_frequency1 = 200;
     int32_t g_frequency2 = -200;
+    constexpr int32_t MIN_DURATION = 0;
+    constexpr int32_t MAX_DURATION = 3600000;
     std::string g_timeSequence = "haptic.clock.timer";
     std::string g_builtIn = "haptic.default.effect";
     std::string g_arbitraryStr = "arbitraryString";
@@ -408,4 +410,44 @@ HWTEST_F(HdfVibratorHdiTest, EnableVibratorModulation_004, TestSize.Level1)
         startRet = g_vibratorInterface->EnableVibratorModulation(g_duration, g_intensity1, g_frequency2);
         EXPECT_EQ(startRet, VIBRATOR_NOT_FREQUENCY);
     }
+}
+
+/**
+  * @tc.name: GetEffectInfo_001
+  * @tc.desc: Get effect information with the given effect type.
+  * @tc.type: FUNC
+  * @tc.require:I6FBDQ
+  */
+HWTEST_F(HdfVibratorHdiTest, GetEffectInfo_001, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    HdfEffectInfo effectInfo;
+    int32_t ret = g_vibratorInterface->GetEffectInfo("haptic.clock.timer", effectInfo);
+    printf("isSupportEffect = [%d]\n\r", effectInfo.isSupportEffect);
+    printf("duration = [%d]\n\r", effectInfo.duration);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    if (effectInfo.isSupportEffect) {
+        EXPECT_GT(effectInfo.duration, MIN_DURATION);
+        EXPECT_LE(effectInfo.duration, MAX_DURATION);
+    }
+}
+
+/**
+  * @tc.name: GetEffectInfo_002
+  * @tc.desc: Get effect information with the given effect type.
+  * @tc.type: FUNC
+  * @tc.require:#I6FBDQ
+  */
+HWTEST_F(HdfVibratorHdiTest, GetEffectInfo_002, TestSize.Level1)
+{
+    ASSERT_NE(nullptr, g_vibratorInterface);
+
+    HdfEffectInfo effectInfo;
+    int32_t ret = g_vibratorInterface->GetEffectInfo("invaild effect id", effectInfo);
+    printf("isSupportEffect = [%d]\n\r", effectInfo.isSupportEffect);
+    printf("duration = [%d]\n\r", effectInfo.duration);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(effectInfo.isSupportEffect, false);
+    EXPECT_EQ(effectInfo.duration, 0);
 }
