@@ -28,11 +28,10 @@
 #define HDF_LOG_TAG    uhdf_sensor_service
 
 #define HDF_SENSOR_INFO_MAX_SIZE (4 * 1024) // 4kB
-#define SENSOR_STATUS_LEN 10
 #define SENSOR_STATUS_ENABLE 1
 #define SENSOR_STATUS_DISENABLE 0
 
-static int32_t sensorStatusList[SENSOR_STATUS_LEN] = { 0 };
+static int32_t sensorStatusList[SENSOR_TYPE_MAX] = { 0 };
 int32_t *GetSensorStatus(void)
 {
     return sensorStatusList;
