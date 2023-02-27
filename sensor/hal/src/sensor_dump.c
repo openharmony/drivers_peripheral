@@ -117,6 +117,7 @@ static void ShowData(const float *data, int64_t timesTamp, const struct SensorDe
             sensorNode.sensorName, sensorNode.sensorTypeId, timesTamp / 1e9, *(data));
         if (ret < DUMP_SUCCESS) {
             HDF_LOGE("%{publuc}s: sprintf sensorInfoDate is failed\n", __func__);
+            return;
         }
     } else {
         ret = sprintf_s(sensorInfoDate, STRING_LEN,
@@ -125,6 +126,7 @@ static void ShowData(const float *data, int64_t timesTamp, const struct SensorDe
             *(data + DATA_XY));
         if (ret < DUMP_SUCCESS) {
             HDF_LOGE("%{publuc}s: sprintf ShowData is failed\n", __func__);
+            return;
         }
     }
     (void)HdfSbufWriteString(reply, sensorInfoDate);
