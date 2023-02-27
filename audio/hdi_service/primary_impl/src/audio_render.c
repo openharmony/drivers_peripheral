@@ -1022,7 +1022,7 @@ int32_t AudioRenderGetExtraParams(struct IAudioRender *handle, char *keyValueLis
 }
 
 static int32_t AudioRenderReqMmapBufferInit(
-    struct AudioHwRender *render, int32_t reqSize, const struct AudioMmapBufferDescriptor *tempDesc)
+    struct AudioHwRender *render, int32_t reqSize, struct AudioMmapBufferDescriptor *tempDesc)
 {
     if (render == NULL || render->devDataHandle == NULL || tempDesc == NULL) {
         return AUDIO_ERR_INVALID_PARAM;
@@ -1073,7 +1073,7 @@ static int32_t AudioRenderReqMmapBufferInit(
 }
 
 int32_t AudioRenderReqMmapBuffer(
-    struct IAudioRender *handle, int32_t reqSize, const struct AudioMmapBufferDescriptor *desc)
+    struct IAudioRender *handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
     int32_t ret = 0;
     struct AudioHwRender *render = (struct AudioHwRender *)handle;

@@ -83,9 +83,10 @@ void CaptureFucSwitch(struct IAudioCapture *&capture, uint32_t cmd, const uint8_
             capture->SetGain(capture, *(reinterpret_cast<float *>(data)));
             break;
         case AUDIO_CAPTURE_CAPTURE_FRAME: {
-            uint32_t replyBytes = 0;
+            uint32_t frameLen = 0;
+            uint64_t replyBytes = 0;
             int8_t frame[BUFFER_LENTH] = {0};
-            capture->CaptureFrame(capture, frame, &replyBytes, reinterpret_cast<uint64_t>(data));
+            capture->CaptureFrame(capture, frame, &frameLen, &replyBytes);
             break;
         }
         case AUDIO_CAPTURE_SET_EXTRA_PARAMS:

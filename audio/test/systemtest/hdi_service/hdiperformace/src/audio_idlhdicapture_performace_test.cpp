@@ -227,7 +227,7 @@ HWTEST_F(AudioIdlHdiCapturePerformaceTest, AudioCaptureCaptureFramePerformance_0
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.capture->CaptureFrame(audiopara.capture, (int8_t*) audiopara.frame, &audiopara.replyBytes,
-                                              audiopara.requestBytes);
+                                              &audiopara.requestBytes);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -

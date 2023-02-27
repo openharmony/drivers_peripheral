@@ -331,7 +331,7 @@ static int32_t FrameStartCapture(const struct StrParaCapture *param)
     }
 
     do {
-        int32_t ret = capture->CaptureFrame(capture, (int8_t *)frame, &bufferSize, requestBytes);
+        int32_t ret = capture->CaptureFrame(capture, (int8_t *)frame, &bufferSize, &requestBytes);
         if (ret < 0) {
             if (ret == HDF_ERR_INVALID_OBJECT) {
                 AUDIO_FUNC_LOGE("Record already stop!");
