@@ -534,7 +534,7 @@ int32_t FrameStartCapture(struct IAudioCapture *capture, FILE *file, const struc
     }
     requestBytes = bufferSize;
     replyBytes = bufferSize;
-    ret = capture->CaptureFrame(capture, reinterpret_cast<int8_t *>(frame), &replyBytes, requestBytes);
+    ret = capture->CaptureFrame(capture, reinterpret_cast<int8_t *>(frame), &replyBytes, &requestBytes);
     if (ret < 0) {
         HDF_LOGE("%{public}s: AUDIO_TEST:CaptureFrame failed\n", __func__);
         free(frame);
@@ -596,7 +596,7 @@ void FrameStatus(int status)
 }
 
 static int32_t CaptureTryOneFrame(struct IAudioCapture *capture,
-    int8_t *frame, uint32_t *replyBytes, uint64_t requestBytes)
+    int8_t *frame, uint32_t *replyBytes, uint64_t *requestBytes)
 {
     int32_t tryNum = 0;
     int32_t ret;
@@ -640,7 +640,7 @@ int32_t StartRecord(struct IAudioCapture *capture, FILE *file, uint64_t filesize
     }
     do {
         if (g_frameStatus) {
-            ret = CaptureTryOneFrame(capture, reinterpret_cast<int8_t *>(frame), &replyBytes, requestBytes);
+            ret = CaptureTryOneFrame(capture, reinterpret_cast<int8_t *>(frame), &replyBytes, &requestBytes);
             if (ret < 0) {
                 free(frame);
                 return ret;
