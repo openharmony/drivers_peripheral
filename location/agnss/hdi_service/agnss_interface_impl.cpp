@@ -21,6 +21,8 @@
 #include <mutex>
 #include <unordered_map>
 
+#include "idevmgr_hdi.h"
+
 #include "location_vendor_interface.h"
 #include "location_vendor_lib.h"
 
@@ -30,17 +32,21 @@ namespace Location {
 namespace Agnss {
 namespace V1_0 {
 namespace {
-using AgnssCallBackMap = std::unordered_map<IRemoteObject *, sptr<IAGnssCallback>>;
+using AgnssCallBackMap = std::unordered_map<IRemoteObject*, sptr<IAGnssCallback>>;
+using AgnssDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;
+using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
+constexpr const char* AGNSS_SERVICE_NAME = "agnss_interface_service";
 AgnssCallBackMap g_agnssCallBackMap;
+AgnssDeathRecipientMap g_agnssCallBackDeathRecipientMap;
 std::mutex g_mutex;
 } // namespace
 
-extern "C" IAGnssInterface *AGnssInterfaceImplGetInstance(void)
+extern "C" IAGnssInterface* AGnssInterfaceImplGetInstance(void)
 {
     return new (std::nothrow) AGnssInterfaceImpl();
 }
 
-static void OnStatusChangedCb(const AGnssStatusInfo *status)
+static void OnStatusChangedCb(const AGnssStatusInfo* status)
 {
     if (status == nullptr) {
         HDF_LOGE("%{public}s:status is nullptr.", __func__);
@@ -51,8 +57,8 @@ static void OnStatusChangedCb(const AGnssStatusInfo *status)
     agnssStatus.agnssType = static_cast<AGnssUserPlaneProtocol>(status->agnssType);
     agnssStatus.setUpType = static_cast<DataLinkSetUpType>(status->connStatus);
 
-    for (const auto &iter : g_agnssCallBackMap) {
-        auto &callback = iter.second;
+    for (const auto& iter : g_agnssCallBackMap) {
+        auto& callback = iter.second;
         if (callback != nullptr) {
             callback->RequestSetUpAgnssDataLink(agnssStatus);
         }
@@ -62,8 +68,8 @@ static void OnStatusChangedCb(const AGnssStatusInfo *status)
 static void GetSetidCb(uint16_t type)
 {
     HDF_LOGI("%{public}s.", __func__);
-    for (const auto &iter : g_agnssCallBackMap) {
-        auto &callback = iter.second;
+    for (const auto& iter : g_agnssCallBackMap) {
+        auto& callback = iter.second;
         if (callback != nullptr) {
             callback->RequestSubscriberSetId(static_cast<SubscriberSetIdType>(type));
         }
@@ -72,15 +78,15 @@ static void GetSetidCb(uint16_t type)
 static void GetRefLocationidCb(uint32_t type)
 {
     HDF_LOGI("%{public}s.", __func__);
-    for (const auto &iter : g_agnssCallBackMap) {
-        auto &callback = iter.second;
+    for (const auto& iter : g_agnssCallBackMap) {
+        auto& callback = iter.second;
         if (callback != nullptr) {
             callback->RequestAgnssRefInfo();
         }
     }
 }
 
-static void GetAGnssCallbackMethods(AGnssCallbackIfaces *device)
+static void GetAGnssCallbackMethods(AGnssCallbackIfaces* device)
 {
     if (device == nullptr) {
         return;
@@ -97,6 +103,7 @@ AGnssInterfaceImpl::AGnssInterfaceImpl()
 
 AGnssInterfaceImpl::~AGnssInterfaceImpl()
 {
+    ResetAgnssDeathRecipient();
     g_agnssCallBackMap.clear();
 }
 
@@ -108,15 +115,15 @@ int32_t AGnssInterfaceImpl::SetAgnssCallback(const sptr<IAGnssCallback>& callbac
         return HDF_ERR_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(g_mutex);
-    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IAGnssCallback>(callbackObj);
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IAGnssCallback>(callbackObj);
     if (remote == nullptr) {
         HDF_LOGE("%{public}s:invalid remote", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     auto callBackIter = g_agnssCallBackMap.find(remote.GetRefPtr());
     if (callBackIter != g_agnssCallBackMap.end()) {
-        const sptr<IRemoteObject> &lhs = OHOS::HDI::hdi_objcast<IAGnssCallback>(callbackObj);
-        const sptr<IRemoteObject> &rhs = OHOS::HDI::hdi_objcast<IAGnssCallback>(callBackIter->second);
+        const sptr<IRemoteObject>& lhs = OHOS::HDI::hdi_objcast<IAGnssCallback>(callbackObj);
+        const sptr<IRemoteObject>& rhs = OHOS::HDI::hdi_objcast<IAGnssCallback>(callBackIter->second);
         return lhs == rhs ? HDF_SUCCESS : HDF_FAILURE;
     }
 
@@ -126,7 +133,7 @@ int32_t AGnssInterfaceImpl::SetAgnssCallback(const sptr<IAGnssCallback>& callbac
     int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
-        static_cast<const AGnssModuleInterface *>(interface->GetModuleInterface(moduleType));
+        static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -136,6 +143,7 @@ int32_t AGnssInterfaceImpl::SetAgnssCallback(const sptr<IAGnssCallback>& callbac
         HDF_LOGE("set_agnss_callback failed.");
         return HDF_FAILURE;
     }
+    AddAgnssDeathRecipient(callbackObj);
     g_agnssCallBackMap[remote.GetRefPtr()] = callbackObj;
     return HDF_SUCCESS;
 }
@@ -146,7 +154,7 @@ int32_t AGnssInterfaceImpl::SetAgnssServer(const AGnssServerInfo& server)
     int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
-        static_cast<const AGnssModuleInterface *>(interface->GetModuleInterface(moduleType));
+        static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -165,7 +173,7 @@ int32_t AGnssInterfaceImpl::SetAgnssRefInfo(const AGnssRefInfo& refInfo)
     int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
-        static_cast<const AGnssModuleInterface *>(interface->GetModuleInterface(moduleType));
+        static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -209,7 +217,7 @@ int32_t AGnssInterfaceImpl::SetSubscriberSetId(const SubscriberSetId& id)
     int moduleType = static_cast<int>(GnssModuleIfaceClass::AGPS_INTERFACE);
     LocationVendorInterface* interface = LocationVendorInterface::GetInstance();
     auto agnssInterface =
-        static_cast<const AGnssModuleInterface *>(interface->GetModuleInterface(moduleType));
+        static_cast<const AGnssModuleInterface*>(interface->GetModuleInterface(moduleType));
     if (agnssInterface == nullptr) {
         HDF_LOGE("%{public}s:can not get agnssInterface.", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -221,6 +229,69 @@ int32_t AGnssInterfaceImpl::SetSubscriberSetId(const SubscriberSetId& id)
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
+}
+
+int32_t AGnssInterfaceImpl::AddAgnssDeathRecipient(const sptr<IAGnssCallback>& callbackObj)
+{
+    sptr<IRemoteObject::DeathRecipient> death(new (std::nothrow) AgnssCallBackDeathRecipient(this));
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IAGnssCallback>(callbackObj);
+    bool result = remote->AddDeathRecipient(death);
+    if (!result) {
+        HDF_LOGE("%{public}s: AGnssInterfaceImpl add deathRecipient fail", __func__);
+        return HDF_FAILURE;
+    }
+    g_agnssCallBackDeathRecipientMap[remote.GetRefPtr()] = death;
+    return HDF_SUCCESS;
+}
+
+int32_t AGnssInterfaceImpl::RemoveAgnssDeathRecipient(const sptr<IAGnssCallback>& callbackObj)
+{
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IAGnssCallback>(callbackObj);
+    auto iter = g_agnssCallBackDeathRecipientMap.find(remote.GetRefPtr());
+    if (iter == g_agnssCallBackDeathRecipientMap.end()) {
+        HDF_LOGE("%{public}s: AgnssInterfaceImpl can not find deathRecipient", __func__);
+        return HDF_FAILURE;
+    }
+    auto recipient = iter->second;
+    bool result = remote->RemoveDeathRecipient(recipient);
+    g_agnssCallBackDeathRecipientMap.erase(iter);
+    if (!result) {
+        HDF_LOGE("%{public}s: AgnssInterfaceImpl remove deathRecipient fail", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+void AGnssInterfaceImpl::ResetAgnssDeathRecipient()
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    for (const auto& iter : g_agnssCallBackMap) {
+        auto& callback = iter.second;
+        if (callback != nullptr) {
+            RemoveAgnssDeathRecipient(callback);
+        }
+    }
+}
+
+void AGnssInterfaceImpl::UnloadAgnssDevice()
+{
+    auto devmgr = IDeviceManager::Get();
+    if (devmgr == nullptr) {
+        HDF_LOGE("fail to get devmgr.");
+        return;
+    }
+    if (devmgr->UnloadDevice(AGNSS_SERVICE_NAME) != 0) {
+        HDF_LOGE("unload agnss service failed!");
+    }
+    return;
+}
+
+void AGnssInterfaceImpl::ResetAgnss()
+{
+    HDF_LOGI("%{public}s called.", __func__);
+    ResetAgnssDeathRecipient();
+    g_agnssCallBackMap.clear();
+    UnloadAgnssDevice();
 }
 } // V1_0
 } // Agnss

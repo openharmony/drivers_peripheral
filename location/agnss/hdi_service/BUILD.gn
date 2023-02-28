@@ -35,6 +35,7 @@ ohos_shared_library("libagnss_interface_service_1.0") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_location_agnss:location_agnss_idl_headers",
+      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
     ]
