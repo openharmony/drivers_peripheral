@@ -29,13 +29,13 @@ namespace V1_0 {
 
 constexpr int32_t UPDATE_PARTITION_B = 2;
 
-constexpr off_t MISC_PARTITION_ACTIVE_SLOT_OFFSET = 4096;
+constexpr off_t MISC_PARTITION_ACTIVE_SLOT_OFFSET = 1024;
 constexpr off_t MISC_PARTITION_ACTIVE_SLOT_SIZE = 4;
 
 constexpr off_t MISC_PARTITION_UNBOOT_SLOT_OFFSET = MISC_PARTITION_ACTIVE_SLOT_OFFSET + MISC_PARTITION_ACTIVE_SLOT_SIZE;
 constexpr off_t MISC_PARTITION_UNBOOT_SLOT_SIZE = 4;
 
-#define MISC_DEVICE_NODE "/dev/block/by-name/misc"
+#define MISC_DEVICE_NODE "/dev/block/by-name/bootctrl"
 
 int32_t PartitionSlotManager::GetCurrentSlot(int32_t& currentSlot, int32_t& numOfSlots)
 {
