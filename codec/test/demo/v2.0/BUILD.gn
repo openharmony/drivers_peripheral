@@ -16,11 +16,7 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 ohos_executable("codec_hdi_omx_decode") {
   include_dirs = [
     "./include",
-    "//drivers/peripheral/codec/hal/include",
-    "//drivers/peripheral/codec/omx/include",
-    "//drivers/peripheral/codec/interfaces/include",
     "//third_party/openmax/api/1.1.2",
-    "//drivers/peripheral/display/hdi_service/gralloc/include",
   ]
 
   sources = [
@@ -29,18 +25,14 @@ ohos_executable("codec_hdi_omx_decode") {
     "src/command_parse.cpp",
   ]
 
-  deps = [
-    "//drivers/peripheral/codec/hal:libcodec_hdi_omx_callback_type_service_impl",
-    "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
+  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_peripheral_codec:libcodec_hdi_omx_client",
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
-      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
@@ -58,11 +50,7 @@ ohos_executable("codec_hdi_omx_decode") {
 ohos_executable("codec_hdi_omx_encode") {
   include_dirs = [
     "./include",
-    "//drivers/peripheral/codec/hal/include",
-    "//drivers/peripheral/codec/omx/include",
-    "//drivers/peripheral/codec/interfaces/include",
     "//third_party/openmax/api/1.1.2",
-    "//drivers/peripheral/display/hdi_service/gralloc/include",
   ]
 
   sources = [
@@ -70,18 +58,14 @@ ohos_executable("codec_hdi_omx_encode") {
     "src/command_parse.cpp",
   ]
 
-  deps = [
-    "//drivers/peripheral/codec/hal:libcodec_hdi_omx_callback_type_service_impl",
-    "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
+  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_peripheral_codec:libcodec_hdi_omx_client",
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
-      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",

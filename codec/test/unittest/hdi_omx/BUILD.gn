@@ -21,24 +21,17 @@ declare_args() {
 
 ohos_unittest("codec_hdi_omx_test") {
   module_out_path = "drivers_peripheral_codec/codec"
-  include_dirs = [
-    "//drivers/peripheral/codec/interfaces/include",
-    "//drivers/peripheral/codec/hal/include",
-    "//third_party/openmax/api/1.1.2",
-    "//drivers/peripheral/display/hdi_service/gralloc/include",
-  ]
+  include_dirs = [ "//third_party/openmax/api/1.1.2" ]
   sources = [
     "codec_hdi_manger_test.cpp",
     "codec_hdi_omx_test.cpp",
   ]
-  deps = [
-    "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
-    "//third_party/googletest:gtest_main",
-  ]
+  deps = [ "//third_party/googletest:gtest_main" ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_peripheral_codec:libcodec_hdi_omx_client",
       "drivers_peripheral_display:hdi_gralloc_client",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
