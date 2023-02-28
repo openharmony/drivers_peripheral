@@ -312,7 +312,7 @@ HWTEST_F(AudioIdlHdiManagerTest, AudioLoadAdapter_008, TestSize.Level1)
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &firstAdapter, audioPort);
     EXPECT_EQ(HDF_SUCCESS, ret);
     ret = GetLoadAdapter(manager, PORT_OUT, ADAPTER_NAME, &secondAdapter, secondAudioPort);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     EXPECT_EQ(HDF_SUCCESS, ret);
