@@ -14,9 +14,11 @@
  */
 
 #include "codec_hdi_encode.h"
+#include <hdf_base.h>
 #include <hdf_log.h>
 #include <securec.h>
 #include <unistd.h>
+#include "codec_component_manager.h"
 #include "codec_omx_ext.h"
 
 using namespace std;
@@ -108,7 +110,7 @@ bool CodecHdiEncode::Init(CommandOpt &opt)
     }
     // Interface init
     omxMgr_ = GetCodecComponentManager();
-    callback_ = CodecCallbackTypeStubGetInstance();
+    callback_ = CodecCallbackTypeGet(nullptr);
     if ((omxMgr_ == nullptr) || (callback_ == nullptr)) {
         HDF_LOGE("%{public}s:omxMgr_ or callback_ is null", __func__);
         return false;

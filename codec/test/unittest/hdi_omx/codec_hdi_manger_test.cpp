@@ -15,7 +15,6 @@
 #include <gtest/gtest.h>
 #include <osal_mem.h>
 #include "codec_callback_if.h"
-#include "codec_callback_type_stub.h"
 #include "codec_component_manager.h"
 using namespace std;
 using namespace testing::ext;
@@ -62,7 +61,7 @@ HWTEST_F(CodecHdiManagerTest, HdfCodecHdiGetCapabilityListTest_001, TestSize.Lev
 
 HWTEST_F(CodecHdiManagerTest, HdfCodecHdiCreateComponentTest_001, TestSize.Level1)
 {
-    struct CodecCallbackType *callback = CodecCallbackTypeStubGetInstance();
+    struct CodecCallbackType *callback = CodecCallbackTypeGet(nullptr);
     ASSERT_TRUE(callback != nullptr);
     ASSERT_TRUE(manager_ != nullptr);
     struct CodecComponentType *component = nullptr;
@@ -70,7 +69,7 @@ HWTEST_F(CodecHdiManagerTest, HdfCodecHdiCreateComponentTest_001, TestSize.Level
     int32_t ret = manager_->CreateComponent(&component, &componentId, nullptr, (int64_t)this, callback);
     EXPECT_NE(ret, HDF_SUCCESS);
     EXPECT_EQ(component, nullptr);
-    CodecCallbackTypeStubRelease(callback);
+    CodecCallbackTypeRelease(callback);
     callback = nullptr;
 }
 
@@ -89,7 +88,7 @@ HWTEST_F(CodecHdiManagerTest, HdfCodecHdiCreateComponentTest_002, TestSize.Level
     capList = nullptr;
 
     ASSERT_FALSE(compName.empty());
-    struct CodecCallbackType *callback = CodecCallbackTypeStubGetInstance();
+    struct CodecCallbackType *callback = CodecCallbackTypeGet(nullptr);
     struct CodecComponentType *component = nullptr;
     uint32_t componentId = 0;
     ASSERT_TRUE(callback != nullptr);
@@ -98,7 +97,7 @@ HWTEST_F(CodecHdiManagerTest, HdfCodecHdiCreateComponentTest_002, TestSize.Level
     if (componentId != 0) {
         manager_->DestroyComponent(componentId);
     }
-    CodecCallbackTypeStubRelease(callback);
+    CodecCallbackTypeRelease(callback);
     callback = nullptr;
 }
 
