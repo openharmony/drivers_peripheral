@@ -18,6 +18,8 @@
 
 #include "v1_0/ignss_interface.h"
 
+#include "iremote_object.h"
+
 namespace OHOS {
 namespace HDI {
 namespace Location {
@@ -47,6 +49,31 @@ public:
     int32_t GetCachedGnssLocationsSize(int32_t& size) override;
 
     int32_t GetCachedGnssLocations() override;
+
+    void ResetGnss();
+private:
+    int32_t AddGnssDeathRecipient(const sptr<IGnssCallback>& callbackObj);
+
+    int32_t RemoveGnssDeathRecipient(const sptr<IGnssCallback>& callbackObj);
+
+    void ResetGnssDeathRecipient();
+    
+    void UnloadGnssDevice();
+};
+
+class GnssCallBackDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    explicit GnssCallBackDeathRecipient(const wptr<GnssInterfaceImpl>& impl) : gnssInterfaceImpl_(impl) {};
+    ~GnssCallBackDeathRecipient() = default;
+    void OnRemoteDied(const wptr<IRemoteObject>& remote) override
+    {
+        sptr<GnssInterfaceImpl> impl = gnssInterfaceImpl_.promote();
+        if (impl != nullptr) {
+            impl->ResetGnss();
+        }
+    };
+private:
+    wptr<GnssInterfaceImpl> gnssInterfaceImpl_;
 };
 } // V1_0
 } // Gnss

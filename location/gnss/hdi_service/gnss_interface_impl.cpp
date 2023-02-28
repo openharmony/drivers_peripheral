@@ -21,6 +21,8 @@
 #include <mutex>
 #include <unordered_map>
 
+#include "idevmgr_hdi.h"
+
 #include "location_vendor_interface.h"
 #include "location_vendor_lib.h"
 
@@ -30,17 +32,21 @@ namespace Location {
 namespace Gnss {
 namespace V1_0 {
 namespace {
-using LocationCallBackMap = std::unordered_map<IRemoteObject *, sptr<IGnssCallback>>;
+using LocationCallBackMap = std::unordered_map<IRemoteObject*, sptr<IGnssCallback>>;
+using GnssDeathRecipientMap = std::unordered_map<IRemoteObject*, sptr<IRemoteObject::DeathRecipient>>;
+using OHOS::HDI::DeviceManager::V1_0::IDeviceManager;
+constexpr const char* GNSS_SERVICE_NAME = "gnss_interface_service";
 LocationCallBackMap g_locationCallBackMap;
+GnssDeathRecipientMap g_gnssCallBackDeathRecipientMap;
 std::mutex g_mutex;
 } // namespace
 
-extern "C" IGnssInterface *GnssInterfaceImplGetInstance(void)
+extern "C" IGnssInterface* GnssInterfaceImplGetInstance(void)
 {
     return new (std::nothrow) GnssInterfaceImpl();
 }
 
-static void LocationUpdate(GnssLocation *location)
+static void LocationUpdate(GnssLocation* location)
 {
     if (location == nullptr) {
         HDF_LOGE("%{public}s:location is nullptr.", __func__);
@@ -56,30 +62,30 @@ static void LocationUpdate(GnssLocation *location)
     locationNew.direction = location->bearing;
     locationNew.timeStamp = location->timestamp;
     locationNew.timeSinceBoot = location->timestampSinceBoot;
-    for (const auto &iter : g_locationCallBackMap) {
-        auto &callback = iter.second;
+    for (const auto& iter : g_locationCallBackMap) {
+        auto& callback = iter.second;
         if (callback != nullptr) {
             callback->ReportLocation(locationNew);
         }
     }
 }
 
-static void StatusCallback(uint16_t *status)
+static void StatusCallback(uint16_t* status)
 {
     if (status == nullptr) {
         HDF_LOGE("%{public}s:param is nullptr.", __func__);
         return;
     }
     GnssWorkingStatus gnssStatus = static_cast<GnssWorkingStatus>(*status);
-    for (const auto &iter : g_locationCallBackMap) {
-        auto &callback = iter.second;
+    for (const auto& iter : g_locationCallBackMap) {
+        auto& callback = iter.second;
         if (callback != nullptr) {
             callback->ReportGnssWorkingStatus(gnssStatus);
         }
     }
 }
 
-static void SvStatusCallback(GnssSatelliteStatus *svInfo)
+static void SvStatusCallback(GnssSatelliteStatus* svInfo)
 {
     if (svInfo == nullptr) {
         HDF_LOGE("%{public}s:sv_info is null.", __func__);
@@ -100,29 +106,29 @@ static void SvStatusCallback(GnssSatelliteStatus *svInfo)
         svStatus.carrierFrequencies.push_back(svInfo->satellitesList[i].carrierFrequencie);
         svStatus.carrierToNoiseDensitys.push_back(svInfo->satellitesList[i].cn0);
     }
-    for (const auto &iter : g_locationCallBackMap) {
-        auto &callback = iter.second;
+    for (const auto& iter : g_locationCallBackMap) {
+        auto& callback = iter.second;
         if (callback != nullptr) {
             callback->ReportSatelliteStatusInfo(svStatus);
         }
     }
 }
 
-static void NmeaCallback(int64_t timestamp, const char *nmea, int length)
+static void NmeaCallback(int64_t timestamp, const char* nmea, int length)
 {
     if (nmea == nullptr) {
         HDF_LOGE("%{public}s:nmea is nullptr.", __func__);
         return;
     }
-    for (const auto &iter : g_locationCallBackMap) {
-        auto &callback = iter.second;
+    for (const auto& iter : g_locationCallBackMap) {
+        auto& callback = iter.second;
         if (callback != nullptr) {
             callback->ReportNmea(timestamp, nmea, length);
         }
     }
 }
 
-static void GetGnssBasicCallbackMethods(GnssBasicCallbackIfaces *device)
+static void GetGnssBasicCallbackMethods(GnssBasicCallbackIfaces* device)
 {
     if (device == nullptr) {
         return;
@@ -137,7 +143,7 @@ static void GetGnssBasicCallbackMethods(GnssBasicCallbackIfaces *device)
     device->downloadRequestCb = nullptr;
 }
 
-static void GetGnssCacheCallbackMethods(GnssCacheCallbackIfaces *device)
+static void GetGnssCacheCallbackMethods(GnssCacheCallbackIfaces* device)
 {
     if (device == nullptr) {
         return;
@@ -146,7 +152,7 @@ static void GetGnssCacheCallbackMethods(GnssCacheCallbackIfaces *device)
     device->cachedLocationCb = nullptr;
 }
 
-static void GetGnssCallbackMethods(GnssCallbackStruct *device)
+static void GetGnssCallbackMethods(GnssCallbackStruct* device)
 {
     if (device == nullptr) {
         return;
@@ -166,6 +172,7 @@ GnssInterfaceImpl::GnssInterfaceImpl()
 
 GnssInterfaceImpl::~GnssInterfaceImpl()
 {
+    ResetGnssDeathRecipient();
 }
 
 int32_t GnssInterfaceImpl::SetGnssConfigPara(const GnssConfigPara& para)
@@ -182,15 +189,15 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
         return HDF_ERR_INVALID_PARAM;
     }
     std::lock_guard<std::mutex> lock(g_mutex);
-    const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<IGnssCallback>(callbackObj);
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IGnssCallback>(callbackObj);
     if (remote == nullptr) {
         HDF_LOGE("%{public}s:invalid remote", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     auto callBackIter = g_locationCallBackMap.find(remote.GetRefPtr());
     if (callBackIter != g_locationCallBackMap.end()) {
-        const sptr<IRemoteObject> &lhs = OHOS::HDI::hdi_objcast<IGnssCallback>(callbackObj);
-        const sptr<IRemoteObject> &rhs = OHOS::HDI::hdi_objcast<IGnssCallback>(callBackIter->second);
+        const sptr<IRemoteObject>& lhs = OHOS::HDI::hdi_objcast<IGnssCallback>(callbackObj);
+        const sptr<IRemoteObject>& rhs = OHOS::HDI::hdi_objcast<IGnssCallback>(callBackIter->second);
         return lhs == rhs ? HDF_SUCCESS : HDF_FAILURE;
     }
     static GnssCallbackStruct gnssCallback;
@@ -200,6 +207,7 @@ int32_t GnssInterfaceImpl::EnableGnss(const sptr<IGnssCallback>& callbackObj)
         HDF_LOGE("%{public}s:GetGnssVendorInterface return nullptr.", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
+    AddGnssDeathRecipient(callbackObj);
     int ret = gnssInterface->enable_gnss(&gnssCallback);
     g_locationCallBackMap[remote.GetRefPtr()] = callbackObj;
     return ret;
@@ -273,6 +281,69 @@ int32_t GnssInterfaceImpl::GetCachedGnssLocations()
 {
     HDF_LOGI("%{public}s.", __func__);
     return HDF_SUCCESS;
+}
+
+int32_t GnssInterfaceImpl::AddGnssDeathRecipient(const sptr<IGnssCallback>& callbackObj)
+{
+    sptr<IRemoteObject::DeathRecipient> death(new (std::nothrow) GnssCallBackDeathRecipient(this));
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IGnssCallback>(callbackObj);
+    bool result = remote->AddDeathRecipient(death);
+    if (!result) {
+        HDF_LOGE("%{public}s: GnssInterfaceImpl add deathRecipient fail", __func__);
+        return HDF_FAILURE;
+    }
+    g_gnssCallBackDeathRecipientMap[remote.GetRefPtr()] = death;
+    return HDF_SUCCESS;
+}
+
+int32_t GnssInterfaceImpl::RemoveGnssDeathRecipient(const sptr<IGnssCallback>& callbackObj)
+{
+    const sptr<IRemoteObject>& remote = OHOS::HDI::hdi_objcast<IGnssCallback>(callbackObj);
+    auto iter = g_gnssCallBackDeathRecipientMap.find(remote.GetRefPtr());
+    if (iter == g_gnssCallBackDeathRecipientMap.end()) {
+        HDF_LOGE("%{public}s: GnssInterfaceImpl can not find deathRecipient", __func__);
+        return HDF_FAILURE;
+    }
+    auto recipient = iter->second;
+    bool result = remote->RemoveDeathRecipient(recipient);
+    g_gnssCallBackDeathRecipientMap.erase(iter);
+    if (!result) {
+        HDF_LOGE("%{public}s: GnssInterfaceImpl remove deathRecipient fail", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+void GnssInterfaceImpl::ResetGnssDeathRecipient()
+{
+    std::lock_guard<std::mutex> lock(g_mutex);
+    for (const auto& iter : g_locationCallBackMap) {
+        auto& callback = iter.second;
+        if (callback != nullptr) {
+            RemoveGnssDeathRecipient(callback);
+        }
+    }
+}
+
+void GnssInterfaceImpl::UnloadGnssDevice()
+{
+    auto devmgr = IDeviceManager::Get();
+    if (devmgr == nullptr) {
+        HDF_LOGE("fail to get devmgr.");
+        return;
+    }
+    if (devmgr->UnloadDevice(GNSS_SERVICE_NAME) != 0) {
+        HDF_LOGE("unload gnss service failed!");
+    }
+    return;
+}
+
+void GnssInterfaceImpl::ResetGnss()
+{
+    HDF_LOGI("%{public}s called.", __func__);
+    ResetGnssDeathRecipient();
+    DisableGnss();
+    UnloadGnssDevice();
 }
 } // V1_0
 } // Gnss
