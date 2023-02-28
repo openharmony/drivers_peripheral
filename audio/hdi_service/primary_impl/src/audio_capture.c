@@ -712,7 +712,7 @@ static void LogErrorCapture(AudioHandle handle, int errorCode, int reason)
 }
 
 int32_t AudioCaptureCaptureFrame(
-    struct IAudioCapture *capture, int8_t *frame, uint32_t *frameLen, uint64_t requestBytes)
+    struct IAudioCapture *capture, int8_t *frame, uint32_t *frameLen, uint64_t *replyBytes)
 {
     struct AudioHwCapture *hwCapture = (struct AudioHwCapture *)capture;
     if (hwCapture == NULL || frame == NULL || frameLen == NULL ||
@@ -737,19 +737,19 @@ int32_t AudioCaptureCaptureFrame(
         LogErrorCapture(capture, WRITE_FRAME_ERROR_CODE, ret);
         return AUDIO_ERR_INTERNAL;
     }
-    if (requestBytes < hwCapture->captureParam.frameCaptureMode.bufferSize) {
-        AUDIO_FUNC_LOGE("Capture Frame requestBytes too little!");
+    if (*frameLen < hwCapture->captureParam.frameCaptureMode.bufferSize) {
+        AUDIO_FUNC_LOGE("Capture Frame frameLen too little!");
         return AUDIO_ERR_INTERNAL;
     }
 
-    ret = memcpy_s(frame, (size_t)requestBytes, hwCapture->captureParam.frameCaptureMode.buffer,
+    ret = memcpy_s(frame, (size_t)*frameLen, hwCapture->captureParam.frameCaptureMode.buffer,
         (size_t)hwCapture->captureParam.frameCaptureMode.bufferSize);
     if (ret != EOK) {
         AUDIO_FUNC_LOGE("memcpy_s fail");
         return AUDIO_ERR_INTERNAL;
     }
 
-    *frameLen = (uint32_t)hwCapture->captureParam.frameCaptureMode.bufferSize;
+    *replyBytes = (uint32_t)hwCapture->captureParam.frameCaptureMode.bufferSize;
 
     hwCapture->captureParam.frameCaptureMode.frames += hwCapture->captureParam.frameCaptureMode.bufferFrameSize;
     if (hwCapture->captureParam.frameCaptureMode.attrs.sampleRate == 0) {
@@ -880,7 +880,7 @@ int32_t AudioCaptureGetExtraParams(struct IAudioCapture *handle, char *keyValueL
 }
 
 static int32_t AudioCaptureReqMmapBufferInit(
-    struct AudioHwCapture *capture, int32_t reqSize, const struct AudioMmapBufferDescriptor *tempDesc)
+    struct AudioHwCapture *capture, int32_t reqSize, struct AudioMmapBufferDescriptor *tempDesc)
 {
     if (capture == NULL || capture->devDataHandle == NULL || tempDesc == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -931,7 +931,7 @@ static int32_t AudioCaptureReqMmapBufferInit(
 }
 
 int32_t AudioCaptureReqMmapBuffer(
-    struct IAudioCapture *handle, int32_t reqSize, const struct AudioMmapBufferDescriptor *desc)
+    struct IAudioCapture *handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
     struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
     if (capture == NULL || capture->devDataHandle == NULL || desc == NULL) {

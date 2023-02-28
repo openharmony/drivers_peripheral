@@ -80,7 +80,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_001, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     int8_t *frame = (int8_t *)calloc(1, BUFFER_SIZE);
     EXPECT_NE(nullptr, frame);
-    ret = capture->CaptureFrame(capture, frame, &replyBytes, requestBytes);
+    ret = capture->CaptureFrame(capture, frame, &replyBytes, &requestBytes);
     EXPECT_EQ(HDF_SUCCESS, ret);
     capture->Stop(capture);
 
@@ -103,7 +103,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrameNull_002, TestSize.Level1)
     ASSERT_NE(nullptr, capture);
     ret = capture->Start(capture);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = capture->CaptureFrame(capture, frame, &replyBytes, requestBytes);
+    ret = capture->CaptureFrame(capture, frame, &replyBytes, &requestBytes);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
     capture->Stop(capture);
 }
@@ -123,7 +123,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrameNull_003, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     int8_t *frame = (int8_t *)calloc(1, BUFFER_SIZE);
     EXPECT_NE(nullptr, frame);
-    ret = capture->CaptureFrame(capture, frame, replyBytes, requestBytes);
+    ret = capture->CaptureFrame(capture, frame, replyBytes, &requestBytes);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 
     capture->Stop(capture);
@@ -150,7 +150,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrameNull_004, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     int8_t *frame = (int8_t *)calloc(1, BUFFER_SIZE);
     EXPECT_NE(nullptr, frame);
-    ret = capture->CaptureFrame(captureNull, frame, &replyBytes, requestBytes);
+    ret = capture->CaptureFrame(captureNull, frame, &replyBytes, &requestBytes);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
 
     capture->Stop(capture);
@@ -173,7 +173,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_005, TestSize.Level1)
     ASSERT_NE(nullptr, capture);
     int8_t *frame = (int8_t *)calloc(1, BUFFER_SIZE);
     EXPECT_NE(nullptr, frame);
-    ret = capture->CaptureFrame(capture, frame, &replyBytes, requestBytes);
+    ret = capture->CaptureFrame(capture, frame, &replyBytes, &requestBytes);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
 
     if (frame != nullptr) {
@@ -199,7 +199,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_006, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
     int8_t *frame = (int8_t *)calloc(1, BUFFER_SIZE);
     EXPECT_NE(nullptr, frame);
-    ret = capture->CaptureFrame(capture, frame, &replyBytes, requestBytes);
+    ret = capture->CaptureFrame(capture, frame, &replyBytes, &requestBytes);
     EXPECT_EQ(HDF_FAILURE, ret);
 
     capture->Stop(capture);
