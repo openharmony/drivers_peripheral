@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,33 +15,34 @@
 
 #include "power_interface_impl.h"
 
-#include <atomic>
-#include <hdf_base.h>
-#include <file_ex.h>
-#include <iremote_object.h>
-#include <iproxy_broker.h>
-#include <sys/eventfd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <chrono>
-#include <condition_variable>
-#include <mutex>
-#include <cstdlib>
-#include <thread>
 #include "errors.h"
-#include "hdf_sbuf.h"
-#include "pubdef.h"
-#include "securec.h"
-#include "utils/hdf_log.h"
 #include "hdf_device_desc.h"
 #include "hdf_remote_service.h"
+#include "hdf_sbuf.h"
+#include "pubdef.h"
+#include "running_lock_impl.h"
+#include "securec.h"
 #include "unique_fd.h"
+#include "utils/hdf_log.h"
+#include <atomic>
+#include <chrono>
+#include <condition_variable>
+#include <cstdlib>
+#include <file_ex.h>
+#include <hdf_base.h>
+#include <iproxy_broker.h>
+#include <iremote_object.h>
+#include <mutex>
+#include <sys/eventfd.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <thread>
+#include <unistd.h>
 
 namespace OHOS {
 namespace HDI {
 namespace Power {
-namespace V1_0 {
+namespace V1_1 {
 static constexpr const int32_t MAX_FILE_LENGTH = 32 * 1024 * 1024;
 static constexpr const char * const SUSPEND_STATE = "mem";
 static constexpr const char * const SUSPEND_STATE_PATH = "/sys/power/state";
@@ -59,21 +60,21 @@ static sptr<IPowerHdiCallback> g_callback;
 static UniqueFd wakeupCountFd;
 static void AutoSuspendLoop();
 static int32_t DoSuspend();
-static void LoadStringFd(int32_t fd, std::string& content);
+static void LoadStringFd(int32_t fd, std::string &content);
 static std::string ReadWakeCount();
-static bool WriteWakeCount(const std::string& count);
+static bool WriteWakeCount(const std::string &count);
 static void NotifyCallback(int code);
 namespace {
-    sptr<PowerInterfaceImpl::PowerDeathRecipient> g_deathRecipient = nullptr;
-    bool g_isHdiStart = false;
-}
+sptr<PowerInterfaceImpl::PowerDeathRecipient> g_deathRecipient = nullptr;
+bool g_isHdiStart = false;
+} // namespace
 
 extern "C" IPowerInterface *PowerInterfaceImplGetInstance(void)
 {
     return new (std::nothrow) PowerInterfaceImpl();
 }
 
-int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback>& ipowerHdiCallback)
+int32_t PowerInterfaceImpl::RegisterCallback(const sptr<IPowerHdiCallback> &ipowerHdiCallback)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     if (!g_isHdiStart) {
@@ -189,7 +190,7 @@ int32_t PowerInterfaceImpl::ForceSuspend()
     return HDF_SUCCESS;
 }
 
-int32_t PowerInterfaceImpl::SuspendBlock(const std::string& name)
+int32_t PowerInterfaceImpl::SuspendBlock(const std::string &name)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     if (name.empty()) {
@@ -203,7 +204,7 @@ int32_t PowerInterfaceImpl::SuspendBlock(const std::string& name)
     return HDF_SUCCESS;
 }
 
-int32_t PowerInterfaceImpl::SuspendUnblock(const std::string& name)
+int32_t PowerInterfaceImpl::SuspendUnblock(const std::string &name)
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     if (name.empty()) {
@@ -246,7 +247,7 @@ void PowerInterfaceImpl::PowerDeathRecipient::OnRemoteDied(const wptr<IRemoteObj
     powerInterfaceImpl_->UnRegister();
 }
 
-void LoadStringFd(int32_t fd, std::string& content)
+void LoadStringFd(int32_t fd, std::string &content)
 {
     if (fd <= 0) {
         HDF_LOGW("invalid fd: %{public}d", fd);
@@ -266,8 +267,7 @@ void LoadStringFd(int32_t fd, std::string& content)
     content.resize(fileLength);
     const int32_t len = static_cast<int32_t>(read(fd, content.data(), fileLength));
     if (len <= 0) {
-        HDF_LOGW("the length read from file is failed, len: %{public}d, fileLen: %{public}d",
-            len, fileLength);
+        HDF_LOGW("the length read from file is failed, len: %{public}d, fileLen: %{public}d", len, fileLength);
         content.clear();
     }
 }
@@ -283,7 +283,7 @@ std::string ReadWakeCount()
     return wakeupCount;
 }
 
-bool WriteWakeCount(const std::string& count)
+bool WriteWakeCount(const std::string &count)
 {
     if (wakeupCountFd < 0) {
         wakeupCountFd = UniqueFd(TEMP_FAILURE_RETRY(open(WAKEUP_COUNT_PATH, O_RDWR | O_CLOEXEC)));
@@ -292,7 +292,7 @@ bool WriteWakeCount(const std::string& count)
     return ret;
 }
 
-static void LoadSystemInfo(const std::string& path, std::string& info)
+static void LoadSystemInfo(const std::string &path, std::string &info)
 {
     UniqueFd fd(TEMP_FAILURE_RETRY(open(path.c_str(), O_RDWR | O_CLOEXEC)));
     std::string str;
@@ -308,7 +308,7 @@ static void LoadSystemInfo(const std::string& path, std::string& info)
     info.append(": " + str + "\n");
 }
 
-int32_t PowerInterfaceImpl::PowerDump(std::string& info)
+int32_t PowerInterfaceImpl::PowerDump(std::string &info)
 {
     std::string dumpInfo("");
     LoadSystemInfo(SUSPEND_STATE_PATH, dumpInfo);
@@ -319,7 +319,17 @@ int32_t PowerInterfaceImpl::PowerDump(std::string& info)
 
     return HDF_SUCCESS;
 }
-} // V1_0
-} // Power
-} // HDI
-} // OHOS
+
+int32_t PowerInterfaceImpl::HoldRunningLock(const RunningLockInfo &info)
+{
+    return RunningLockImpl::Hold(info);
+}
+
+int32_t PowerInterfaceImpl::UnholdRunningLock(const RunningLockInfo &info)
+{
+    return RunningLockImpl::Unhold(info);
+}
+} // namespace V1_1
+} // namespace Power
+} // namespace HDI
+} // namespace OHOS
