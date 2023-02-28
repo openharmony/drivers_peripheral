@@ -355,11 +355,6 @@ RetCode StreamBase::Capture(const std::shared_ptr<CaptureRequest>& request)
         } while (rc != RC_OK && state_ == STREAM_STATE_BUSY);
     }
 
-    if (request->NeedCancel()) {
-        CAMERA_LOGE("StreamBase::Capture stream [id:%{public}d] request->NeedCancel", streamId_);
-        return RC_OK;
-    }
-
     rc = pipeline_->Config({streamId_}, request->GetCaptureSetting());
     if (rc != RC_OK) {
         CAMERA_LOGE("stream [id:%{public}d] config pipeline failed.", streamId_);
