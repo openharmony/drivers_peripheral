@@ -12,12 +12,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+#include <securec.h>
+#include <string.h>
 #include "effect_core.h"
 #include "hdf_log.h"
 #include "osal_mem.h"
+#include "parse_effect_config.h"
 
+#define AUDIO_EFFECT_CONFIG  HDF_CONFIG_DIR"/audio_effect.json"
 #define HDF_LOG_TAG HDF_AUDIO_EFFECT
+struct ConfigDescriptor *g_cfgDescs = NULL;
 
 static int32_t EffectModelIsSupplyEffectLibs(struct IEffectModel *self, bool *supply)
 {
@@ -33,23 +37,73 @@ static int32_t EffectModelIsSupplyEffectLibs(struct IEffectModel *self, bool *su
 static int32_t EffectModelGetAllEffectDescriptors(struct IEffectModel *self,
                                                   struct EffectControllerDescriptor *descs, uint32_t *descsLen)
 {
+    HDF_LOGI("enter to %{public}s", __func__);
+    int32_t ret;
+    uint32_t i;
+    uint32_t descNum = 0;
+    struct EffectFactory *factLib = NULL;
+
     if (self == NULL || descs == NULL || descsLen == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
+    if (g_cfgDescs == NULL) {
+        HDF_LOGE("%{public}s: point is null!", __func__);
+        return HDF_FAILURE;
+    }
+
+    for (i = 0; i < g_cfgDescs->effectNum; i++) {
+        factLib = GetEffectLibFromList(g_cfgDescs->effectCfgDescs[i].library);
+        if (factLib == NULL) {
+            HDF_LOGE("%{public}s: GetEffectLibFromList fail!", __func__);
+            continue;
+        }
+        ret = factLib->GetDescriptor(factLib, g_cfgDescs->effectCfgDescs[i].effectId, &descs[descNum]);
+        if (ret != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: GetDescriptor fail!", __func__);
+            continue;
+        }
+        descNum++;
+    }
+    *descsLen = descNum;
+
+    HDF_LOGI("%{public}s success", __func__);
     return HDF_SUCCESS;
 }
 
 static int32_t EffectModelGetEffectDescriptor(struct IEffectModel *self, const char *uuid,
      struct EffectControllerDescriptor *desc)
 {
+    HDF_LOGI("enter to %{public}s", __func__);
+    uint32_t i;
+    struct EffectFactory *factLib = NULL;
     if (self == NULL || uuid == NULL || desc == NULL) {
         HDF_LOGE("%{public}s: invailid input params", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
 
-    return HDF_SUCCESS;
+    for (i = 0; i < g_cfgDescs->effectNum; i++) {
+        if (strcmp(uuid, g_cfgDescs->effectCfgDescs[i].effectId) != 0) {
+            continue;
+        }
+
+        factLib = GetEffectLibFromList(g_cfgDescs->effectCfgDescs[i].library);
+        if (factLib == NULL) {
+            HDF_LOGE("%{public}s: GetEffectLibFromList fail!", __func__);
+            return HDF_FAILURE;
+        }
+
+        if (factLib->GetDescriptor(factLib, uuid, desc) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: GetDescriptor fail!", __func__);
+            return HDF_FAILURE;
+        }
+        HDF_LOGI("%{public}s success", __func__);
+        return HDF_SUCCESS;
+    }
+
+    HDF_LOGE("%{public}s fail!", __func__);
+    return HDF_FAILURE;
 }
 
 static int32_t EffectModelCreateEffectController(struct IEffectModel *self, const struct EffectInfo *info,
@@ -176,13 +230,64 @@ static int32_t RegLibraryInstByName(char *libPath)
         dlclose(libHandle);
         return HDF_FAILURE;
     }
+    return HDF_SUCCESS;
+}
 
+static int32_t RegLibraryInst(struct LibraryConfigDescriptor **libCfgDescs, const uint32_t libNum)
+{
+    int32_t ret;
+    uint32_t i;
+    char path[PATH_MAX];
+    char pathBuf[PATH_MAX];
+    if (libCfgDescs == NULL || libNum == 0 || libNum > HDF_EFFECT_LIB_NUM_MAX) {
+        HDF_LOGE("Invalid parameter!");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    for (i = 0; i < libNum; i++) {
+#ifdef __aarch64__
+ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib64/%s.z.so", (*libCfgDescs)[i].libPath);
+#else
+ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib/%s.z.so", (*libCfgDescs)[i].libPath);
+#endif
+        if (ret < 0) {
+            HDF_LOGE("%{public}s: get libPath failed", __func__);
+            continue;
+        }
+        
+        if (realpath(path, pathBuf) == NULL) {
+            HDF_LOGE("%{public}s: realpath is null! [%{public}d]", __func__, errno);
+            continue;
+        }
+
+        if (RegLibraryInstByName(path) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: regist library[%{private}s] failed", __func__, path);
+        }
+    }
     return HDF_SUCCESS;
 }
 
 void ModelInit()
 {
-    RegLibraryInstByName(HDF_LIBRARY_FULL_PATH("libmock_effect_lib"));
+    struct ConfigDescriptor *cfgDesc = NULL;
+    if (AudioEffectGetConfigDescriptor(AUDIO_EFFECT_CONFIG, &cfgDesc) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: AudioEffectGetConfigDescriptor fail!", __func__);
+        return;
+    }
+
+    if (cfgDesc == NULL || cfgDesc->effectCfgDescs == NULL || cfgDesc->libCfgDescs == NULL) {
+        HDF_LOGE("cfgDesc is null!");
+        return;
+    }
+    
+    g_cfgDescs = cfgDesc;
+    if (RegLibraryInst(&(cfgDesc->libCfgDescs), cfgDesc->libNum) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: RegLibraryInst failed", __func__);
+        AudioEffectReleaseCfgDesc(cfgDesc);
+        return;
+    }
+
+    HDF_LOGI("%{public}s end!", __func__);
 }
 
 struct IEffectModel *EffectModelImplGetInstance(void)
@@ -209,6 +314,7 @@ void EffectModelImplRelease(struct IEffectModel *instance)
         return;
     }
 
+    AudioEffectReleaseCfgDesc(g_cfgDescs);
     ReleaseLibFromList();
     OsalMemFree(instance);
 }
