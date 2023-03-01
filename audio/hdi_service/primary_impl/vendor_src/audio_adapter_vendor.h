@@ -22,5 +22,9 @@
 struct IAudioAdapter *AudioHwiCreateAdapter(uint32_t descIndex, struct AudioHwiAdapter *hwiAdapter);
 void AudioHwiReleaseAdapter(uint32_t descIndex);
 struct AudioHwiAdapter *AudioHwiGetHwiAdapterByDescIndex(uint32_t descIndex);
+int32_t AudioHwiIncreaseAdapterRef(uint32_t descIndex, struct IAudioAdapter **adapter);
+void AudioHwiDecreaseAdapterRef(uint32_t descIndex);
+uint32_t AudioHwiGetAdapterRefCnt(uint32_t descIndex);
+void AudioHwiEnforceClearAdapterRefCnt(uint32_t descIndex);
 
 #endif // AUDIO_ADAPTER_VENDOR_H

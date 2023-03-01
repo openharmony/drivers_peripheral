@@ -42,7 +42,7 @@
 
 #define AUDIO_HW_ADAPTER_NUM_MAX        8 // Limit the number of sound cards supported to a maximum of 8
 #define AUDIO_HW_PORT_NUM_MAX    10
-
+#define AUDIO_HW_STREAM_NUM_MAX  6
 /**
  * @brief Defines the audio handle.
  */
@@ -430,9 +430,9 @@ struct AudioHwiRouteNode {
  */
 struct AudioHwiRoute {
     uint32_t sourcesNum;
-    const struct AudioHwiRouteNode *sources;
+    struct AudioHwiRouteNode *sources;
     uint32_t sinksNum;
-    const struct AudioHwiRouteNode *sinks;
+    struct AudioHwiRouteNode *sinks;
 };
 
 /**
