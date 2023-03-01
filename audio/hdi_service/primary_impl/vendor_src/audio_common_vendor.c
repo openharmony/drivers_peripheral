@@ -26,7 +26,7 @@
 #define AUDIO_SUB_PORT_NUM_MAX 10
 #define AUDIO_ROUTE_NUM_MAX 2
 
-void AudioHwiCommonDescToHwiDesc(const struct AudioDeviceDescriptor *desc, struct AudioHwiDeviceDescriptor *hwiDesc)
+void AudioHwiCommonDevDescToHwiDevDesc(const struct AudioDeviceDescriptor *desc, struct AudioHwiDeviceDescriptor *hwiDesc)
 {
     CHECK_NULL_PTR_RETURN(desc);
     CHECK_NULL_PTR_RETURN(hwiDesc);
@@ -375,6 +375,64 @@ int32_t AudioHwiCommonRouteToHwiRoute(const struct AudioRoute *route, struct Aud
         AudioHwiCommonFreeHwiRoute(hwiRoute);
         return HDF_FAILURE;
     }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCommonSceneToHwiScene(const struct AudioSceneDescriptor *scene,
+    struct AudioHwiSceneDescriptor *hwiScene)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiScene, HDF_ERR_INVALID_PARAM);
+
+    hwiScene->scene.id = scene->scene.id;
+    AudioHwiCommonDevDescToHwiDevDesc(&scene->desc, &hwiScene->desc);
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCommonSampleAttrToHwiSampleAttr(const struct AudioSampleAttributes *attrs,
+    struct AudioHwiSampleAttributes *hwiAttrs)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiAttrs, HDF_ERR_INVALID_PARAM);
+
+    hwiAttrs->type = (enum AudioHwiCategory)attrs->type;
+    hwiAttrs->interleaved = attrs->interleaved;
+    hwiAttrs->format = (enum AudioHwiFormat)attrs->format;
+    hwiAttrs->sampleRate = attrs->sampleRate;
+    hwiAttrs->channelCount = attrs->channelCount;
+    hwiAttrs->period = attrs->period;
+    hwiAttrs->frameSize = attrs->frameSize;
+    hwiAttrs->isBigEndian = attrs->isBigEndian;
+    hwiAttrs->isSignedData = attrs->isSignedData;
+    hwiAttrs->startThreshold = attrs->startThreshold;
+    hwiAttrs->stopThreshold = attrs->stopThreshold;
+    hwiAttrs->silenceThreshold = attrs->silenceThreshold;
+    hwiAttrs->streamId = attrs->streamId;
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCommonHwiSampleAttrToSampleAttr(const struct AudioHwiSampleAttributes *hwiAttrs,
+    struct AudioSampleAttributes *attrs)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiAttrs, HDF_ERR_INVALID_PARAM);
+
+    attrs->type = (enum AudioCategory)hwiAttrs->type;
+    attrs->interleaved = hwiAttrs->interleaved;
+    attrs->format = (enum AudioFormat)hwiAttrs->format;
+    attrs->sampleRate = hwiAttrs->sampleRate;
+    attrs->channelCount = hwiAttrs->channelCount;
+    attrs->period = hwiAttrs->period;
+    attrs->frameSize = hwiAttrs->frameSize;
+    attrs->isBigEndian = hwiAttrs->isBigEndian;
+    attrs->isSignedData = hwiAttrs->isSignedData;
+    attrs->startThreshold = hwiAttrs->startThreshold;
+    attrs->stopThreshold = hwiAttrs->stopThreshold;
+    attrs->silenceThreshold = hwiAttrs->silenceThreshold;
+    attrs->streamId = hwiAttrs->streamId;
 
     return HDF_SUCCESS;
 }

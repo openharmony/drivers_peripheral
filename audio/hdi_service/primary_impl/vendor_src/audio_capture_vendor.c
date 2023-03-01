@@ -20,6 +20,7 @@
 #include "audio_common_vendor.h"
 #include "audio_uhdf_log.h"
 #include "osal_mem.h"
+#include "securec.h"
 
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
@@ -128,6 +129,550 @@ int32_t AudioHwiGetCapturePosition(struct IAudioCapture *capture, uint64_t *fram
     return HDF_SUCCESS;
 }
 
+int32_t AudioHwiCaptureCheckSceneCapability(struct IAudioCapture *capture, const struct AudioSceneDescriptor* scene,
+    bool* supported)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(supported, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->scene.CheckSceneCapability, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiSceneDescriptor hwiScene;
+    (void)memset_s((void *)&hwiScene, sizeof(hwiScene), 0, sizeof(hwiScene));
+    int32_t ret = AudioHwiCommonSceneToHwiScene(scene, &hwiScene);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture scene To hwiScene fail");
+        return HDF_FAILURE;
+    }
+
+    ret = hwiCapture->scene.CheckSceneCapability(hwiCapture, &hwiScene, supported);
+    OsalMemFree((void *)hwiScene.desc.desc);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture CheckSceneCapability fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureSelectScene(struct IAudioCapture *capture, const struct AudioSceneDescriptor* scene)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->scene.SelectScene, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiSceneDescriptor hwiScene;
+    (void)memset_s((void *)&hwiScene, sizeof(hwiScene), 0, sizeof(hwiScene));
+    int32_t ret = AudioHwiCommonSceneToHwiScene(scene, &hwiScene);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio hwiAdapter scene To hwiScene fail");
+        return HDF_FAILURE;
+    }
+
+    ret = hwiCapture->scene.SelectScene(hwiCapture, &hwiScene);
+    OsalMemFree((void *)hwiScene.desc.desc);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture select scene fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureSetMute(struct IAudioCapture *capture, bool mute)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.SetMute, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->volume.SetMute(hwiCapture, mute);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture SetMute fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureGetMute(struct IAudioCapture *capture, bool *mute)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(mute, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.GetMute, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->volume.GetMute(hwiCapture, mute);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture GetMute fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureSetVolume(struct IAudioCapture *capture, float volume)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.SetVolume, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->volume.SetVolume(hwiCapture, volume);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture SetVolume fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureGetVolume(struct IAudioCapture *capture, float *volume)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(volume, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.GetVolume, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->volume.GetVolume(hwiCapture, volume);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture GetVolume fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureGetGainThreshold(struct IAudioCapture *capture, float *min, float *max)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(min, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(max, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.GetGainThreshold, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->volume.GetGainThreshold(hwiCapture, min, max);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture GetGainThreshold fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureGetGain(struct IAudioCapture *capture, float *gain)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(gain, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.GetGain, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->volume.GetGain(hwiCapture, gain);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture GetGain fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureSetGain(struct IAudioCapture *capture, float gain)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.SetGain, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->volume.SetGain(hwiCapture, gain);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture SetGain fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureGetFrameSize(struct IAudioCapture *capture, uint64_t *size)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(size, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetFrameSize, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->attr.GetFrameSize(hwiCapture, size);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture GetFrameSize fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureGetFrameCount(struct IAudioCapture *capture, uint64_t *count)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(count, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetFrameCount, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->attr.GetFrameCount(hwiCapture, count);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture GetFrameCount fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureSetSampleAttributes(struct IAudioCapture *capture, const struct AudioSampleAttributes *attrs)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.SetSampleAttributes, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiSampleAttributes hwiAttrs;
+    (void)memset_s((void *)&hwiAttrs, sizeof(hwiAttrs), 0, sizeof(hwiAttrs));
+    int32_t ret = AudioHwiCommonSampleAttrToHwiSampleAttr(attrs, &hwiAttrs);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture SampleAttr to hwisampleAttr fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    ret = hwiCapture->attr.SetSampleAttributes(hwiCapture, &hwiAttrs);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture SetSampleAttributes fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureGetSampleAttributes(struct IAudioCapture *capture, struct AudioSampleAttributes *attrs)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetSampleAttributes, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiSampleAttributes hwiAttrs;
+    (void)memset_s((void *)&hwiAttrs, sizeof(hwiAttrs), 0, sizeof(hwiAttrs));
+    int32_t ret = hwiCapture->attr.GetSampleAttributes(hwiCapture, &hwiAttrs);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture GetSampleAttributes fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    ret = AudioHwiCommonHwiSampleAttrToSampleAttr(&hwiAttrs, attrs);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture hwiSampleAttr to SampleAttr fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureGetCurrentChannelId(struct IAudioCapture *capture, uint32_t *channelId)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(channelId, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetCurrentChannelId, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->attr.GetCurrentChannelId(hwiCapture, channelId);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture GetCurrentChannelId fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureSetExtraParams(struct IAudioCapture *capture, const char *keyValueList)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(keyValueList, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.SetExtraParams, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->attr.SetExtraParams(hwiCapture, keyValueList);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture SetExtraParams fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureGetExtraParams(struct IAudioCapture *capture, char *keyValueList, uint32_t keyValueListLen)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(keyValueList, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetExtraParams, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->attr.GetExtraParams(hwiCapture, keyValueList, keyValueListLen);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture GetExtraParams fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureReqMmapBuffer(struct IAudioCapture *capture, int32_t reqSize,
+    struct AudioMmapBufferDescriptor *desc)
+{
+    return HDF_ERR_NOT_SUPPORT;
+}
+
+int32_t AudioHwiCaptureGetMmapPosition(struct IAudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(frames, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(time, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiTimeStamp hwiTime;
+    hwiTime.tvSec = 0;
+    hwiTime.tvNSec = 0;
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetMmapPosition, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->attr.GetMmapPosition(hwiCapture, frames, &hwiTime);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture GetMmapPosition fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    time->tvSec = hwiTime.tvSec;
+    time->tvNSec = hwiTime.tvNSec;
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureAddAudioEffect(struct IAudioCapture *capture, uint64_t effectid)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.AddAudioEffect, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->attr.AddAudioEffect(hwiCapture, effectid);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture AddAudioEffect fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureRemoveAudioEffect(struct IAudioCapture *capture, uint64_t effectid)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.RemoveAudioEffect, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->attr.RemoveAudioEffect(hwiCapture, effectid);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture RemoveAudioEffect fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureGetFrameBufferSize(struct IAudioCapture *capture, uint64_t *bufferSize)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(bufferSize, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetFrameBufferSize, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->attr.GetFrameBufferSize(hwiCapture, bufferSize);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture GetFrameBufferSize fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureStart(struct IAudioCapture *capture)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.Start, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->control.Start(hwiCapture);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture Start fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureStop(struct IAudioCapture *capture)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.Stop, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->control.Stop(hwiCapture);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture Stop fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCapturePause(struct IAudioCapture *capture)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.Pause, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->control.Pause(hwiCapture);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture Pause fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureResume(struct IAudioCapture *capture)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.Resume, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->control.Resume(hwiCapture);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture Resume fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureFlush(struct IAudioCapture *capture)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.Flush, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->control.Flush(hwiCapture);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture Flush fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureTurnStandbyMode(struct IAudioCapture *capture)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.TurnStandbyMode, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->control.TurnStandbyMode(hwiCapture);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture TurnStandbyMode fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureAudioDevDump(struct IAudioCapture *capture, int32_t range, int32_t fd)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.AudioDevDump, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->control.AudioDevDump(hwiCapture, range, fd);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture AudioDevDump fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCaptureIsSupportsPauseAndResume(struct IAudioCapture *capture, bool *supportPause, bool *supportResume)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(supportPause, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(supportResume, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.IsSupportsPauseAndResume, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiCapture->control.IsSupportsPauseAndResume(hwiCapture, supportPause, supportResume);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture IsSupportsPauseAndResume fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    return HDF_SUCCESS;
+}
+
 int32_t AudioHwiCaptureGetVersion(struct IAudioCapture *capture, uint32_t *majorVer, uint32_t *minorVer)
 {
     (void)capture;
@@ -144,6 +689,35 @@ static void AudioHwiInitCaptureInstance(struct IAudioCapture *capture)
 {
     capture->CaptureFrame = AudioHwiCaptureFrame;
     capture->GetCapturePosition = AudioHwiGetCapturePosition;
+    capture->CheckSceneCapability = AudioHwiCaptureCheckSceneCapability;
+    capture->SelectScene = AudioHwiCaptureSelectScene;
+    capture->SetMute = AudioHwiCaptureSetMute;
+    capture->GetMute = AudioHwiCaptureGetMute;
+    capture->SetVolume = AudioHwiCaptureSetVolume;
+    capture->GetVolume = AudioHwiCaptureGetVolume;
+    capture->GetGainThreshold = AudioHwiCaptureGetGainThreshold;
+    capture->GetGain = AudioHwiCaptureGetGain;
+    capture->SetGain = AudioHwiCaptureSetGain;
+    capture->GetFrameSize = AudioHwiCaptureGetFrameSize;
+    capture->GetFrameCount = AudioHwiCaptureGetFrameCount;
+    capture->SetSampleAttributes = AudioHwiCaptureSetSampleAttributes;
+    capture->GetSampleAttributes = AudioHwiCaptureGetSampleAttributes;
+    capture->GetCurrentChannelId = AudioHwiCaptureGetCurrentChannelId;
+    capture->SetExtraParams = AudioHwiCaptureSetExtraParams;
+    capture->GetExtraParams = AudioHwiCaptureGetExtraParams;
+    capture->ReqMmapBuffer = AudioHwiCaptureReqMmapBuffer;
+    capture->GetMmapPosition = AudioHwiCaptureGetMmapPosition;
+    capture->AddAudioEffect = AudioHwiCaptureAddAudioEffect;
+    capture->RemoveAudioEffect = AudioHwiCaptureRemoveAudioEffect;
+    capture->GetFrameBufferSize = AudioHwiCaptureGetFrameBufferSize;
+    capture->Start = AudioHwiCaptureStart;
+    capture->Stop = AudioHwiCaptureStop;
+    capture->Pause = AudioHwiCapturePause;
+    capture->Resume = AudioHwiCaptureResume;
+    capture->Flush = AudioHwiCaptureFlush;
+    capture->TurnStandbyMode = AudioHwiCaptureTurnStandbyMode;
+    capture->AudioDevDump = AudioHwiCaptureAudioDevDump;
+    capture->IsSupportsPauseAndResume = AudioHwiCaptureIsSupportsPauseAndResume;
     capture->GetVersion = AudioHwiCaptureGetVersion;
 }
 

@@ -19,7 +19,7 @@
 #include "i_audio_types.h"
 #include "v1_0/audio_types.h"
 
-void AudioHwiCommonDescToHwiDesc(const struct AudioDeviceDescriptor *desc,
+void AudioHwiCommonDevDescToHwiDevDesc(const struct AudioDeviceDescriptor *desc,
     struct AudioHwiDeviceDescriptor *hwiDesc);
 void AudioHwiCommonAttrsToHwiAttrs(const struct AudioSampleAttributes *attrs,
     struct AudioHwiSampleAttributes *hwiAttrs);
@@ -28,5 +28,11 @@ int32_t AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *h
     struct AudioPortCapability *portCap);
 int32_t AudioHwiCommonRouteToHwiRoute(const struct AudioRoute *route, struct AudioHwiRoute *hwiRoute);
 void AudioHwiCommonFreeHwiRoute(struct AudioHwiRoute *hwiRoute);
+int32_t AudioHwiCommonSceneToHwiScene(const struct AudioSceneDescriptor *scene,
+    struct AudioHwiSceneDescriptor *hwiScene);
+int32_t AudioHwiCommonSampleAttrToHwiSampleAttr(const struct AudioSampleAttributes *attrs,
+    struct AudioHwiSampleAttributes *hwiAttrs);
+int32_t AudioHwiCommonHwiSampleAttrToSampleAttr(const struct AudioHwiSampleAttributes *hwiAttrs,
+    struct AudioSampleAttributes *attrs);
 
 #endif // AUDIO_COMMON_VENDOR_H
