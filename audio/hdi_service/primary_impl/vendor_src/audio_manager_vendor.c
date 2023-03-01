@@ -27,14 +27,13 @@
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
 typedef struct AudioHwiManager* (*GetAudioHwiManagerFuncs)(void);
-static struct AudioHwiManagerPriv *g_AudioHwiManager = NULL;
 
 struct AudioHwiManagerPriv {
     struct IAudioManager interface;
     void *handle;
     GetAudioHwiManagerFuncs managerFuncs;
     struct AudioHwiManager *hwiManager;
-    struct AudioAdapterDescriptor *descs;
+    struct AudioAdapterDescriptor descs[AUDIO_HW_ADAPTER_NUM_MAX];
     uint32_t descsCount;
     struct AudioAdapterHwiDescriptor *hwiDescs;
     int32_t hwiDescsCount;
@@ -42,10 +41,7 @@ struct AudioHwiManagerPriv {
 
 static void AudioManagerReleasePort(struct AudioPort **ports, uint32_t portsLen)
 {
-    if (ports == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiManagerports is invalid");
-        return;
-    }
+    CHECK_NULL_PTR_RETURN(ports);
 
     if (portsLen == 0 || portsLen > AUDIO_HW_PORT_NUM_MAX) {
         AUDIO_FUNC_LOGE("audio hwiManager portsLen is invalid");
@@ -54,10 +50,20 @@ static void AudioManagerReleasePort(struct AudioPort **ports, uint32_t portsLen)
 
     struct AudioPort *portsTmp = *ports;
     for (uint32_t i = 0; i < portsLen; i++) {
-        OsalMemFree(portsTmp[i].portName);
+        OsalMemFree((void *)portsTmp[i].portName);
     }
-    OsalMemFree(portsTmp);
+    OsalMemFree((void *)portsTmp);
     *ports = NULL;
+}
+
+static void AudioManagerReleaseDesc(struct AudioAdapterDescriptor *desc)
+{
+    OsalMemFree((void *)desc->adapterName);
+    desc->adapterName = NULL;
+    if (desc->ports != NULL) {
+        AudioManagerReleasePort(&desc->ports, desc->portsLen);
+        desc->portsLen = 0;
+    }
 }
 
 static void AudioManagerReleaseDescs(struct AudioAdapterDescriptor *descs, uint32_t descsCount)
@@ -68,10 +74,7 @@ static void AudioManagerReleaseDescs(struct AudioAdapterDescriptor *descs, uint3
     }
 
     for (uint32_t i = 0; i < descsCount; i++) {
-        OsalMemFree(descs[i].adapterName);
-        if (descs[i].ports != NULL) {
-            AudioManagerReleasePort(&descs[i].ports, descs[i].portsLen);
-        }
+        AudioManagerReleaseDesc(&descs[i]);
     }
 }
 
@@ -82,6 +85,7 @@ static int32_t AudioManagerHwiPortToPort(struct AudioAdapterHwiDescriptor *hwiDe
         return HDF_ERR_NOT_SUPPORT;
     }
 
+    /* audio stub free ports */
     struct AudioPort *ports = (struct AudioPort *)OsalMemCalloc(sizeof(*ports) * hwiDesc->portNum);
     if (ports == NULL) {
         AUDIO_FUNC_LOGE("OsalMemCalloc AudioPort fail");
@@ -117,7 +121,7 @@ static int32_t AudioManagerHwiDescsToDescs(struct AudioAdapterHwiDescriptor *hwi
             AUDIO_FUNC_LOGE("audio hwiManager port fail");
             return HDF_FAILURE;
         }
-        descs[i].adapterName = strdup(hwiDescs[i].adapterName);
+        descs[i].adapterName = strdup(hwiDescs[i].adapterName); // audio stub free adapterName
         AUDIO_FUNC_LOGI("audio hwiManager get adapterName=%{public}s", descs[i].adapterName);
     }
 
@@ -129,10 +133,10 @@ static int32_t AudioManagerHwiDescsToDescs(struct AudioAdapterHwiDescriptor *hwi
 int32_t AudioManagerVendorGetAllAdapters(struct IAudioManager *manager,
     struct AudioAdapterDescriptor *descs, uint32_t *descsLen)
 {
-    if (manager == NULL || descs == NULL || descsLen == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiManager para is null");
-        return HDF_ERR_INVALID_PARAM;
-    }
+    int32_t ret;
+    CHECK_NULL_PTR_RETURN_VALUE(manager, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(descs, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(descsLen, HDF_ERR_INVALID_PARAM);
 
     struct AudioHwiManagerPriv *priv = (struct AudioHwiManagerPriv *)manager;
     if (priv->hwiManager == NULL) {
@@ -140,24 +144,23 @@ int32_t AudioManagerVendorGetAllAdapters(struct IAudioManager *manager,
         return HDF_ERR_INVALID_PARAM;
     }
 
-    if (priv->descs != NULL) {
-        AUDIO_FUNC_LOGI("audio hwiManager descs had existed");
-        AudioManagerReleaseDescs(priv->descs, priv->descsCount);
+    if (priv->hwiDescsCount != 0 && priv->hwiDescs != NULL) {
+        ret = AudioManagerHwiDescsToDescs(priv->hwiDescs, priv->hwiDescsCount, descs, descsLen);
+        if (ret != HDF_SUCCESS) {
+            AUDIO_FUNC_LOGE("audio hwiManager DescsHwi To Descs fail, ret=%{public}d", ret);
+            AudioManagerReleaseDescs(descs, *descsLen);
+            return HDF_FAILURE;
+        }
+        return HDF_SUCCESS;
     }
 
-    priv->hwiDescs = NULL;
-    priv->hwiDescsCount = 0;
-
-    int32_t ret = priv->hwiManager->GetAllAdapters(priv->hwiManager, &priv->hwiDescs, &priv->hwiDescsCount);
+    ret = priv->hwiManager->GetAllAdapters(priv->hwiManager, &priv->hwiDescs, &priv->hwiDescsCount);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio hwiManager call GetAllAdapters fail, ret=%{public}d", ret);
         return HDF_FAILURE;
     }
 
-    if (priv->hwiDescs == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiDescs is null");
-        return HDF_ERR_NOT_SUPPORT;
-    }
+    CHECK_NULL_PTR_RETURN_VALUE(priv->hwiDescs, HDF_ERR_NOT_SUPPORT);
 
     ret = AudioManagerHwiDescsToDescs(priv->hwiDescs, priv->hwiDescsCount, descs, descsLen);
     if (ret != HDF_SUCCESS) {
@@ -166,10 +169,31 @@ int32_t AudioManagerVendorGetAllAdapters(struct IAudioManager *manager,
         return HDF_FAILURE;
     }
 
-    priv->descs = descs;
-    priv->descsCount = *descsLen;
+    ret = AudioManagerHwiDescsToDescs(priv->hwiDescs, priv->hwiDescsCount, priv->descs, &priv->descsCount);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio hwiManager DescsHwi To Descs fail, ret=%{public}d", ret);
+        AudioManagerReleaseDescs(descs, *descsLen);
+        AudioManagerReleaseDescs(priv->descs, priv->descsCount);
+        priv->descsCount = 0;
+        return HDF_FAILURE;
+    }
 
     return HDF_SUCCESS;
+}
+
+static uint32_t AudioManagerVendorFindAdapterPos(struct IAudioManager *manager, const char *adapterName)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(adapterName, HDF_ERR_INVALID_PARAM);
+    struct AudioHwiManagerPriv *priv = (struct AudioHwiManagerPriv *)manager;
+    CHECK_NULL_PTR_RETURN_VALUE(priv->hwiManager, HDF_ERR_INVALID_PARAM);
+
+    for (uint32_t descIndex = 0; descIndex < priv->descsCount; descIndex++) {
+        if (strcmp(adapterName, priv->descs[descIndex].adapterName) == 0) {
+            return descIndex;
+        }
+    }
+    AUDIO_FUNC_LOGI("can not find adapterName(%{public}s) pos", adapterName);
+    return AUDIO_HW_ADAPTER_NUM_MAX;
 }
 
 int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struct AudioAdapterDescriptor *desc,
@@ -177,29 +201,18 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
 {
     struct AudioAdapterHwiDescriptor *hwiDesc = NULL;
     struct AudioHwiAdapter *hwiAdapter = NULL;
-    uint32_t descIndex;
 
-    if (manager == NULL || desc == NULL || adapter == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiManager para is null");
-        return HDF_ERR_INVALID_PARAM;
-    }
+    CHECK_NULL_PTR_RETURN_VALUE(manager, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
 
     struct AudioHwiManagerPriv *priv = (struct AudioHwiManagerPriv *)manager;
-    if (priv->hwiManager == NULL || priv->hwiManager->LoadAdapter == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiManager is null");
-        return HDF_ERR_INVALID_PARAM;
-    }
+    CHECK_NULL_PTR_RETURN_VALUE(priv->hwiManager, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(priv->hwiManager->LoadAdapter, HDF_ERR_INVALID_PARAM);
 
-    for (descIndex = 0; descIndex < priv->descsCount; descIndex++) {
-        if (desc == &priv->descs[descIndex]) {
-            hwiDesc = &priv->hwiDescs[descIndex];
-            break;
-        }
-    }
-
-    if (descIndex == priv->descsCount) {
-        AUDIO_FUNC_LOGE("audio hwiManager desc is error");
-        return HDF_ERR_INVALID_PARAM;
+    uint32_t descIndex = AudioManagerVendorFindAdapterPos(manager, desc->adapterName);
+    if (descIndex < AUDIO_HW_ADAPTER_NUM_MAX) {
+        return AudioHwiIncreaseAdapterRef(descIndex, adapter);
     }
 
     int32_t ret = priv->hwiManager->LoadAdapter(priv->hwiManager, hwiDesc, &hwiAdapter);
@@ -221,33 +234,28 @@ int32_t AudioManagerVendorLoadAdapter(struct IAudioManager *manager, const struc
 
 static int32_t AudioManagerVendorUnloadAdapter(struct IAudioManager *manager, const char *adapterName)
 {
-    uint32_t descIndex;
-
-    if (manager == NULL || adapterName == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiManager para is null");
-        return HDF_ERR_INVALID_PARAM;
-    }
+    CHECK_NULL_PTR_RETURN_VALUE(manager, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(adapterName, HDF_ERR_INVALID_PARAM);
 
     struct AudioHwiManagerPriv *priv = (struct AudioHwiManagerPriv *)manager;
-    if (priv->hwiManager == NULL || priv->hwiManager->UnloadAdapter == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiManager is null");
-        return HDF_ERR_INVALID_PARAM;
-    }
+    CHECK_NULL_PTR_RETURN_VALUE(priv->hwiManager, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(priv->hwiManager->UnloadAdapter, HDF_ERR_INVALID_PARAM);
 
-    for (descIndex = 0; descIndex < priv->descsCount; descIndex++) {
-        if (strcmp(adapterName, priv->descs[descIndex].adapterName) == 0) {
-            break;
-        }
-    }
-
-    if (descIndex == priv->descsCount) {
-        AUDIO_FUNC_LOGE("audio hwiManager adapterName is error");
+    uint32_t descIndex = AudioManagerVendorFindAdapterPos(manager, adapterName);
+    if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX) {
+        AUDIO_FUNC_LOGE("AudioManagerVendorUnloadAdapter descIndex error!");
         return HDF_ERR_INVALID_PARAM;
     }
 
     struct AudioHwiAdapter *hwiAdapter = AudioHwiGetHwiAdapterByDescIndex(descIndex);
     if (hwiAdapter == NULL) {
         AUDIO_FUNC_LOGW("audio hwiManager hwiAdapter had unloaded, index=%{public}d", descIndex);
+        return HDF_SUCCESS;
+    }
+
+    uint32_t cnt = AudioHwiGetAdapterRefCnt(descIndex);
+    if (cnt > 0) {
+        AudioHwiDecreaseAdapterRef(descIndex);
         return HDF_SUCCESS;
     }
 
@@ -275,6 +283,7 @@ int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
     }
 
     for (descIndex = 0; descIndex < priv->descsCount; descIndex++) {
+        AudioHwiEnforceClearAdapterRefCnt(descIndex);
         int32_t ret = AudioManagerVendorUnloadAdapter(manager, priv->descs[descIndex].adapterName);
         if (ret != HDF_SUCCESS) {
             AUDIO_FUNC_LOGW("audio unload adapter error, ret=%{pulbic}d, adaptername=%{pulbic}s", ret,
@@ -283,7 +292,7 @@ int32_t ReleaseAudioManagerVendorObject(struct IAudioManager *manager)
     }
 
     AudioManagerReleaseDescs(priv->descs, priv->descsCount);
-    OsalMemFree(priv);
+    OsalMemFree((void *)priv);
 
     return HDF_SUCCESS;
 }
@@ -328,14 +337,14 @@ struct IAudioManager *AudioManagerCreateIfInstance(void)
     int32_t ret = AudioManagerLoadVendorLib(priv);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("audio load lib failed ret=%{pulbic}d", ret);
-        OsalMemFree(priv);
+        OsalMemFree((void *)priv);
         return NULL;
     }
 
     priv->hwiManager = (struct AudioHwiManager *)priv->managerFuncs();
     if (priv->hwiManager == NULL) {
         AUDIO_FUNC_LOGE("audio call hwi manager func failed");
-        OsalMemFree(priv);
+        OsalMemFree((void *)priv);
         return NULL;
     }
 
@@ -343,8 +352,6 @@ struct IAudioManager *AudioManagerCreateIfInstance(void)
     priv->interface.LoadAdapter = AudioManagerVendorLoadAdapter;
     priv->interface.UnloadAdapter = AudioManagerVendorUnloadAdapter;
     priv->interface.ReleaseAudioManagerObject = ReleaseAudioManagerVendorObject;
-
-    g_AudioHwiManager = priv;
 
     return &(priv->interface);
 }
