@@ -50,3 +50,23 @@
     } while (0)
 
 #endif
+
+#ifndef CHECK_NULL_PTR_RETURN_VALUE
+#define CHECK_NULL_PTR_RETURN_VALUE(pointer, ret)          \
+    do {                                                      \
+        if ((pointer) == NULL) {                              \
+            AUDIO_FUNC_LOGE("pointer is null and return ret=%{public}d", ret); \
+            return (ret);                                     \
+        }                                                     \
+    } while (0)
+#endif
+
+#ifndef CHECK_NULL_PTR_RETURN
+#define CHECK_NULL_PTR_RETURN(pointer)          \
+    do {                                                      \
+        if ((pointer) == NULL) {                              \
+            AUDIO_FUNC_LOGE("pointer is null and return"); \
+            return;                                     \
+        }                                                     \
+    } while (0)
+#endif
