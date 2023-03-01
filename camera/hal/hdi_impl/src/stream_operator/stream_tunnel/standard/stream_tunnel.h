@@ -63,7 +63,7 @@ protected:
     uint64_t frameCount_ = 0;
     OHOS::sptr<OHOS::Surface> bufferQueue_ = nullptr;
     OHOS::BufferRequestConfig requestConfig_ = {0, 0, 0, 0, 0, 0};
-    OHOS::BufferFlushConfig flushConfig_ = {{0, 0, 0, 0}, {}, 0};
+    OHOS::BufferFlushConfig flushConfig_ = {{0, 0, 0, 0}, 0};
     std::unordered_map<std::shared_ptr<IBuffer>, OHOS::sptr<OHOS::SurfaceBuffer>> buffers = {};
     std::mutex lock_ = {};
     std::mutex waitLock_ = {};
