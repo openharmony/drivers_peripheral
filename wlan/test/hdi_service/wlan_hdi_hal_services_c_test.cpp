@@ -129,59 +129,12 @@ HWTEST_F(HdfWifiServiceCTest, GetFeatureByIfNameTest_003, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetAssociatedStasTest_004
- * @tc.desc: Wifi hdi get assoc stas function test
- * @tc.type: FUNC
- * @tc.require: AR000FRMJB
- */
-HWTEST_F(HdfWifiServiceCTest, GetAssociatedStasTest_004, TestSize.Level1)
-{
-    const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
-    struct HdfFeatureInfo ifeature;
-    struct HdfStaInfo staInfo[WLAN_MAX_NUM_STA_WITH_AP] = {{0}};
-    uint32_t staInfoLen = WLAN_MAX_NUM_STA_WITH_AP;
-    uint32_t num = 0;
-
-    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->GetAssociatedStas(g_wlanObj, &ifeature, staInfo, &staInfoLen, &num);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-}
-
-/**
- * @tc.name: SetCountryCodeTest_005
- * @tc.desc: Wifi hdi set country code function test
- * @tc.type: FUNC
- * @tc.require: AR000FRMJB
- */
-HWTEST_F(HdfWifiServiceCTest, SetCountryCodeTest_005, TestSize.Level1)
-{
-    const char *code = "CN";
-    const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
-    struct HdfFeatureInfo ifeature;
-    const char *codeDigital = "99";
-    uint32_t size = 2;
-
-    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, codeDigital, size);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
-    ASSERT_TRUE(flag);
-    rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, code, size);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
-    ASSERT_EQ(rc, HDF_SUCCESS);
-}
-
-/**
- * @tc.name: GetNetworkIfaceNameTest_006
+ * @tc.name: GetNetworkIfaceNameTest_004
  * @tc.desc: Wifi hdi get network interface name function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_006, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_004, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
     struct HdfFeatureInfo ifeature;
@@ -196,12 +149,12 @@ HWTEST_F(HdfWifiServiceCTest, GetNetworkIfaceNameTest_006, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetFeatureTypeTest_007
+ * @tc.name: GetFeatureTypeTest_005
  * @tc.desc: Wifi hdi get feature type function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_007, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_005, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
     struct HdfFeatureInfo ifeature;
@@ -216,12 +169,12 @@ HWTEST_F(HdfWifiServiceCTest, GetFeatureTypeTest_007, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetMacAddressTest_008
+ * @tc.name: SetMacAddressTest_006
  * @tc.desc: Wifi hdi set mac addr function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_008, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_006, TestSize.Level1)
 {
     uint8_t mac[ETH_ADDR_LEN] = {0x12, 0x34, 0x56, 0x78, 0xab, 0xcd};
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
@@ -241,12 +194,12 @@ HWTEST_F(HdfWifiServiceCTest, SetMacAddressTest_008, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetDeviceMacAddressTest_009
+ * @tc.name: GetDeviceMacAddressTest_007
  * @tc.desc: Wifi hdi get device mac addr function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, GetDeviceMacAddressTest_009, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetDeviceMacAddressTest_007, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
     struct HdfFeatureInfo ifeature;
@@ -262,12 +215,12 @@ HWTEST_F(HdfWifiServiceCTest, GetDeviceMacAddressTest_009, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetFreqsWithBandTest_010
+ * @tc.name: GetFreqsWithBandTest_008
  * @tc.desc: Wifi hdi get freqs function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_008, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
     struct HdfFeatureInfo ifeature;
@@ -298,12 +251,12 @@ HWTEST_F(HdfWifiServiceCTest, GetFreqsWithBandTest_010, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetTxPowerTest_011
+ * @tc.name: SetTxPowerTest_009
  * @tc.desc: Wifi hdi set tx power function test on AP feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_011, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_009, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
     struct HdfFeatureInfo ifeature;
@@ -318,12 +271,12 @@ HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_011, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetChipIdTest_012
+ * @tc.name: GetChipIdTest_010
  * @tc.desc: Wifi hdi get chip id function test on STA feature
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, GetChipIdTest_012, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetChipIdTest_010, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
     struct HdfFeatureInfo ifeature;
@@ -346,12 +299,12 @@ HWTEST_F(HdfWifiServiceCTest, GetChipIdTest_012, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetScanningMacAddressTest_013
+ * @tc.name: SetScanningMacAddressTest_011
  * @tc.desc: Wifi hdi set scanning mac addr function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, SetScanningMacAddressTest_013, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SetScanningMacAddressTest_011, TestSize.Level1)
 {
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
     struct HdfFeatureInfo ifeature;
@@ -367,12 +320,12 @@ HWTEST_F(HdfWifiServiceCTest, SetScanningMacAddressTest_013, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetNetdevInfoTest_014
+ * @tc.name: GetNetdevInfoTest_012
  * @tc.desc: Wifi hdi get netdev info function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, GetNetdevInfoTest_014, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetNetdevInfoTest_012, TestSize.Level1)
 {
     int32_t rc;
     struct HdfNetDeviceInfoResult netDeviceInfoResult;
@@ -384,12 +337,12 @@ HWTEST_F(HdfWifiServiceCTest, GetNetdevInfoTest_014, TestSize.Level1)
 }
 
 /**
- * @tc.name: GetPowerModeTest_015
+ * @tc.name: GetPowerModeTest_013
  * @tc.desc: Wifi hdi get power mode function test
  * @tc.type: FUNC
  * @tc.require: AR000H60O7
  */
-HWTEST_F(HdfWifiServiceCTest, GetPowerModeTest_015, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, GetPowerModeTest_013, TestSize.Level1)
 {
     struct HdfFeatureInfo ifeature;
     uint8_t mode = 0;
@@ -405,12 +358,12 @@ HWTEST_F(HdfWifiServiceCTest, GetPowerModeTest_015, TestSize.Level1)
 }
 
 /**
- * @tc.name: SetPowerModeTest_016
+ * @tc.name: SetPowerModeTest_014
  * @tc.desc: Wifi hdi set power mode function test
  * @tc.type: FUNC
  * @tc.require: AR000H60O7
  */
-HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_016, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_014, TestSize.Level1)
 {
     struct HdfFeatureInfo ifeature;
     uint8_t mode = WIFI_POWER_MODE_SLEEPING;
@@ -425,12 +378,12 @@ HWTEST_F(HdfWifiServiceCTest, SetPowerModeTest_016, TestSize.Level1)
 }
 
 /**
- * @tc.name: RegisterEventCallbackTest_017
+ * @tc.name: RegisterEventCallbackTest_015
  * @tc.desc: Wifi hdi register event call back function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, RegisterEventCallbackTest_017, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, RegisterEventCallbackTest_015, TestSize.Level1)
 {
     const char *ifName = "wlan0";
     int32_t rc = g_wlanObj->RegisterEventCallback(g_wlanObj, g_wlanCallbackObj, ifName);
@@ -438,12 +391,12 @@ HWTEST_F(HdfWifiServiceCTest, RegisterEventCallbackTest_017, TestSize.Level1)
 }
 
 /**
- * @tc.name: ResetDriverTest_018
+ * @tc.name: ResetDriverTest_016
  * @tc.desc: Wifi hdi reset driver function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, ResetDriverTest_018, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, ResetDriverTest_016, TestSize.Level1)
 {
     int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
     struct HdfFeatureInfo ifeature;
@@ -463,12 +416,12 @@ HWTEST_F(HdfWifiServiceCTest, ResetDriverTest_018, TestSize.Level1)
 }
 
 /**
- * @tc.name: StartScanTest_019
+ * @tc.name: StartScanTest_017
  * @tc.desc: Wifi hdi start scan function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, StartScanTest_019, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, StartScanTest_017, TestSize.Level1)
 {
     int32_t rc;
     const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
@@ -485,17 +438,65 @@ HWTEST_F(HdfWifiServiceCTest, StartScanTest_019, TestSize.Level1)
 }
 
 /**
- * @tc.name: UnregisterEventCallbackTest_020
+ * @tc.name: UnregisterEventCallbackTest_018
  * @tc.desc: Wifi hdi unreister event call back function test
  * @tc.type: FUNC
  * @tc.require: AR000FRMJB
  */
-HWTEST_F(HdfWifiServiceCTest, UnregisterEventCallbackTest_020, TestSize.Level1)
+HWTEST_F(HdfWifiServiceCTest, UnregisterEventCallbackTest_018, TestSize.Level1)
 {
     const char *ifName = "wlan0";
     int32_t rc = g_wlanObj->UnregisterEventCallback(g_wlanObj, g_wlanCallbackObj, ifName);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
+
+/**
+ * @tc.name: GetAssociatedStasTest_019
+ * @tc.desc: Wifi hdi get assoc stas function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, GetAssociatedStasTest_019, TestSize.Level1)
+{
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
+    struct HdfFeatureInfo ifeature;
+    struct HdfStaInfo staInfo[WLAN_MAX_NUM_STA_WITH_AP] = {{0}};
+    uint32_t staInfoLen = WLAN_MAX_NUM_STA_WITH_AP;
+    uint32_t num = 0;
+
+    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->GetAssociatedStas(g_wlanObj, &ifeature, staInfo, &staInfoLen, &num);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: SetCountryCodeTest_020
+ * @tc.desc: Wifi hdi set country code function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, SetCountryCodeTest_020, TestSize.Level1)
+{
+    const char *code = "CN";
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_AP;
+    struct HdfFeatureInfo ifeature;
+    const char *codeDigital = "99";
+    uint32_t size = 2;
+
+    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, codeDigital, size);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+    rc = g_wlanObj->SetCountryCode(g_wlanObj, &ifeature, code, size);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
 /**
  * @tc.name: CreateFeatureTest_021
  * @tc.desc: Wifi hdi create feature function test

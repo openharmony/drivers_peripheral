@@ -352,6 +352,68 @@ HWTEST_F(WifiHalTest, WifiHalSetTxPower001, TestSize.Level1)
 }
 
 /**
+ * @tc.name: ResetDriver001
+ * @tc.desc: wifi hal reset driver function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, ResetDriver001, TestSize.Level1)
+{
+    int32_t ret;
+    struct IWiFiSta *staFeature = nullptr;
+    uint8_t chipId = 0;
+    uint8_t chipIdInvalid = 20;
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
+    ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, &chipId);
+    ASSERT_TRUE(chipId < MAX_WLAN_DEVICE);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = g_wifi->resetDriver(chipIdInvalid, "wlan0");
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->resetDriver(chipId, nullptr);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->resetDriver(chipId, staFeature->baseFeature.ifName);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    sleep(RESET_TIME);
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
+ * @tc.name: ResetDriver002
+ * @tc.desc: wifi hal reset driver function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, ResetDriver002, TestSize.Level1)
+{
+    int32_t ret;
+    struct IWiFiAp *apFeature = nullptr;
+    uint8_t chipId = 0;
+    uint8_t chipIdInvalid = 20;
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, apFeature);
+    ret = apFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)apFeature, &chipId);
+    ASSERT_TRUE(chipId < MAX_WLAN_DEVICE);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+
+    ret = g_wifi->resetDriver(chipIdInvalid, "wlan0");
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->resetDriver(chipId, nullptr);
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    ret = g_wifi->resetDriver(chipId, apFeature->baseFeature.ifName);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    sleep(RESET_TIME);
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
+
+/**
  * @tc.name: WifiHalSetCountryCode001
  * @tc.desc: Wifi hal set country code function test
  * @tc.type: FUNC
@@ -1872,67 +1934,5 @@ HWTEST_F(WifiHalTest, GetStationInfo002, TestSize.Level1)
     ASSERT_TRUE(flag);
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
-}
-
-/**
- * @tc.name: ResetDriver001
- * @tc.desc: wifi hal reset driver function test
- * @tc.type: FUNC
- * @tc.require: AR000H603L
- */
-HWTEST_F(WifiHalTest, ResetDriver001, TestSize.Level1)
-{
-    int32_t ret;
-    struct IWiFiSta *staFeature = nullptr;
-    uint8_t chipId = 0;
-    uint8_t chipIdInvalid = 20;
-
-    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_NE(nullptr, staFeature);
-    ret = staFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)staFeature, &chipId);
-    ASSERT_TRUE(chipId < MAX_WLAN_DEVICE);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = g_wifi->resetDriver(chipIdInvalid, "wlan0");
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
-    ret = g_wifi->resetDriver(chipId, nullptr);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
-    ret = g_wifi->resetDriver(chipId, staFeature->baseFeature.ifName);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(RESET_TIME);
-    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-}
-
-/**
- * @tc.name: ResetDriver002
- * @tc.desc: wifi hal reset driver function test
- * @tc.type: FUNC
- * @tc.require: AR000H603L
- */
-HWTEST_F(WifiHalTest, ResetDriver002, TestSize.Level1)
-{
-    int32_t ret;
-    struct IWiFiAp *apFeature = nullptr;
-    uint8_t chipId = 0;
-    uint8_t chipIdInvalid = 20;
-
-    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_NE(nullptr, apFeature);
-    ret = apFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)apFeature, &chipId);
-    ASSERT_TRUE(chipId < MAX_WLAN_DEVICE);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-
-    ret = g_wifi->resetDriver(chipIdInvalid, "wlan0");
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
-    ret = g_wifi->resetDriver(chipId, nullptr);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
-    ret = g_wifi->resetDriver(chipId, apFeature->baseFeature.ifName);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(RESET_TIME);
-    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)apFeature);
-    EXPECT_EQ(HDF_SUCCESS, ret);
 }
 }; // namespace HalTest
