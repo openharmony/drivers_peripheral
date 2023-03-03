@@ -172,6 +172,11 @@ int32_t RilImpl::SetUssd(int32_t slotId, int32_t serialId, const std::string &st
     return TaskSchedule(&Telephony::HRilManager::SetUssd, slotId, serialId, str);
 }
 
+int32_t RilImpl::CloseUnFinishedUssd(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::CloseUnFinishedUssd, slotId, serialId);
+}
+
 int32_t RilImpl::GetUssd(int32_t slotId, int32_t serialId)
 {
     return TaskSchedule(&Telephony::HRilManager::GetUssd, slotId, serialId);
