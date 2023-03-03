@@ -26,7 +26,8 @@
 #define AUDIO_SUB_PORT_NUM_MAX 10
 #define AUDIO_ROUTE_NUM_MAX 2
 
-void AudioHwiCommonDevDescToHwiDevDesc(const struct AudioDeviceDescriptor *desc, struct AudioHwiDeviceDescriptor *hwiDesc)
+void AudioHwiCommonDevDescToHwiDevDesc(const struct AudioDeviceDescriptor *desc,
+    struct AudioHwiDeviceDescriptor *hwiDesc)
 {
     CHECK_NULL_PTR_RETURN(desc);
     CHECK_NULL_PTR_RETURN(hwiDesc);

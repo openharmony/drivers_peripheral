@@ -299,7 +299,6 @@ int32_t AudioHwiRenderIsSupportsDrain(struct IAudioRender *render, bool *support
 int32_t AudioHwiRenderCheckSceneCapability(struct IAudioRender *render, const struct AudioSceneDescriptor *scene,
     bool *supported)
 {
-
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supported, HDF_ERR_INVALID_PARAM);
@@ -983,6 +982,7 @@ struct IAudioRender *AudioHwiCreateRenderByDesc(uint32_t descIndex, const struct
     infos[nullRenderIndex].desc.desc = strdup(desc->desc);
     AudioHwiInitRenderInstance(render);
 
+    AUDIO_FUNC_LOGI("audio create adapter success");
     return render;
 };
 

@@ -806,6 +806,7 @@ struct IAudioCapture *AudioHwiCreateCaptureByDesc(uint32_t descIndex, const stru
     infos[nullCaptureIndex].desc.desc = strdup(desc->desc);
     AudioHwiInitCaptureInstance(capture);
 
+    AUDIO_FUNC_LOGI("audio create capture success");
     return capture;
 };
 
