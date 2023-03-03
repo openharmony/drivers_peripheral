@@ -325,7 +325,7 @@ static int32_t AudioManagerVendorUnloadAdapter(struct IAudioManager *manager, co
 
     uint32_t descIndex = AudioManagerVendorFindAdapterPos(manager, adapterName);
     if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("AudioManagerVendorUnloadAdapter descIndex error!");
+        AUDIO_FUNC_LOGE("AudioManagerVendorUnloadAdapter descIndex error");
         return HDF_ERR_INVALID_PARAM;
     }
 
