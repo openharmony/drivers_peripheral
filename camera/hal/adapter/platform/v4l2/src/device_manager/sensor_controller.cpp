@@ -147,7 +147,7 @@ void SensorController::BufferCallback(std::shared_ptr<FrameSpec> buffer)
     constexpr uint32_t UNIT_COUNT = 1000;
     struct timeval tv;
     gettimeofday(&tv, NULL);
-    int64_t timestamp = static_cast<uint64_t>(tv.tv_sec) * UNIT_COUNT * UNIT_COUNT + tv.tv_usec;
+    int64_t timestamp = static_cast<uint64_t>(tv.tv_sec) * UNIT_COUNT * UNIT_COUNT * UNIT_COUNT + tv.tv_usec;
     buffer->buffer_->SetEsTimestamp(timestamp);
     nodeBufferCb_(buffer);
 }
