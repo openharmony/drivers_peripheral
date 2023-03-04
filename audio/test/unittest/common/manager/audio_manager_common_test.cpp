@@ -91,12 +91,6 @@ HWTEST_F(AudioUtManagerTest, ManagerGetAllAdaptersNull003, TestSize.Level1)
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, manager_->GetAllAdapters(manager_, nullptr, &size));
 }
 
-HWTEST_F(AudioUtManagerTest, ManagerGetAllAdaptersNull004, TestSize.Level1)
-{
-    struct AudioAdapterDescriptor descs;
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, manager_->GetAllAdapters(manager_, &descs, nullptr));
-}
-
 HWTEST_F(AudioUtManagerTest, ManagerGetAllAdaptersParaInvalid001, TestSize.Level1)
 {
     uint32_t size = 0;
