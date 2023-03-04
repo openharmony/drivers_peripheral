@@ -20,7 +20,7 @@
 
 class HdfTrace {
 public:
-    inline HdfTrace(const std::string &value, const std::string &perfix = "")
+    inline HdfTrace(const std::string &value, const std::string &prefix = "")
     {
         StartTrace(HITRACE_TAG_HDF, prefix + value);
     }
