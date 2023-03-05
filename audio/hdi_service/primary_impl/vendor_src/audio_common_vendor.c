@@ -295,18 +295,18 @@ static int32_t AudioHwiCommonRouteNodeToHwiRouteNode(struct AudioRouteNode *rout
 static int32_t AudioHwiCommonSinkToHwiSink(const struct AudioRoute *route, struct AudioHwiRoute *hwiRoute)
 {
     struct AudioHwiRouteNode *nodes = NULL;
-    if (route->sinksLen / sizeof(struct AudioRouteNode) > AUDIO_ROUTE_NUM_MAX) {
+    if (route->sinksLen > AUDIO_ROUTE_NUM_MAX) {
         AUDIO_FUNC_LOGE("sinksLen para err");
         return HDF_ERR_INVALID_PARAM;
     }
 
-    nodes = (struct AudioHwiRouteNode *)OsalMemCalloc(route->sinksLen);
+    nodes = (struct AudioHwiRouteNode *)OsalMemCalloc(route->sinksLen * sizeof(struct AudioHwiRouteNode));
     if (nodes == NULL) {
         AUDIO_FUNC_LOGE("nodes null");
         return HDF_ERR_MALLOC_FAIL;
     }
     hwiRoute->sinks = nodes;
-    hwiRoute->sinksNum = route->sinksLen / sizeof(struct AudioRouteNode);
+    hwiRoute->sinksNum = route->sinksLen;
 
     for (uint32_t i = 0; i < hwiRoute->sinksNum; i++) {
         int32_t ret = AudioHwiCommonRouteNodeToHwiRouteNode(&route->sinks[i], &hwiRoute->sinks[i]);
@@ -323,18 +323,18 @@ static int32_t AudioHwiCommonSinkToHwiSink(const struct AudioRoute *route, struc
 static int32_t AudioHwiCommonSourceToHwiSource(const struct AudioRoute *route, struct AudioHwiRoute *hwiRoute)
 {
     struct AudioHwiRouteNode *nodes = NULL;
-    if (route->sourcesLen / sizeof(struct AudioRouteNode) > AUDIO_ROUTE_NUM_MAX) {
+    if (route->sourcesLen > AUDIO_ROUTE_NUM_MAX) {
         AUDIO_FUNC_LOGE("sinksLen para err");
         return HDF_ERR_INVALID_PARAM;
     }
 
-    nodes = (struct AudioHwiRouteNode *)OsalMemCalloc(route->sourcesLen);
+    nodes = (struct AudioHwiRouteNode *)OsalMemCalloc(route->sourcesLen * sizeof(struct AudioHwiRouteNode));
     if (nodes == NULL) {
         AUDIO_FUNC_LOGE("nodes null");
         return HDF_ERR_MALLOC_FAIL;
     }
     hwiRoute->sources = nodes;
-    hwiRoute->sourcesNum = route->sourcesLen / sizeof(struct AudioRouteNode);
+    hwiRoute->sourcesNum = route->sourcesLen;
 
     for (uint32_t i = 0; i < hwiRoute->sourcesNum; i++) {
         int32_t ret = AudioHwiCommonRouteNodeToHwiRouteNode(&route->sources[i], &hwiRoute->sources[i]);
