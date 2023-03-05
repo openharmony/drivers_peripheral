@@ -16,31 +16,48 @@ import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 ohos_shared_library("audio_primary_impl") {
-  sources = [
-    "src/audio_adapter.c",
-    "src/audio_adapter_info_common.c",
-    "src/audio_capture.c",
-    "src/audio_common.c",
-    "src/audio_manager.c",
-    "src/audio_render.c",
-  ]
+  if (drivers_peripheral_audio_community) {
+    sources = [
+      "src/audio_adapter.c",
+      "src/audio_adapter_info_common.c",
+      "src/audio_capture.c",
+      "src/audio_common.c",
+      "src/audio_manager.c",
+      "src/audio_render.c",
+    ]
 
-  include_dirs = [
-    "//drivers/peripheral/audio/hdi_service/primary_impl/include",
-    "//drivers/peripheral/audio/hdi_service/pathselect/include",
-    "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-    "//drivers/peripheral/audio/supportlibs/interfaces/include",
-    "//third_party/bounds_checking_function/include",
-    "//drivers/hdf_core/adapter/uhdf2/shared/include",
-    "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
-  ]
-  defines = []
-  if (drivers_peripheral_audio_hal_notsupport_pathselect) {
-    defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
-  }
+    include_dirs = [
+      "//drivers/peripheral/audio/hdi_service/primary_impl/include",
+      "//drivers/peripheral/audio/hdi_service/pathselect/include",
+      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
+      "//drivers/peripheral/audio/supportlibs/interfaces/include",
+      "//third_party/bounds_checking_function/include",
+      "//drivers/hdf_core/adapter/uhdf2/shared/include",
+      "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
+    ]
 
-  if (enable_audio_hal_hdf_log) {
-    defines += [ "AUDIO_HDF_LOG" ]
+    defines = []
+    if (drivers_peripheral_audio_hal_notsupport_pathselect) {
+      defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
+    }
+
+    if (enable_audio_hal_hdf_log) {
+      defines += [ "AUDIO_HDF_LOG" ]
+    }
+  } else {
+    sources = [
+      "vendor_src/audio_adapter_vendor.c",
+      "vendor_src/audio_capture_vendor.c",
+      "vendor_src/audio_common_vendor.c",
+      "vendor_src/audio_manager_vendor.c",
+      "vendor_src/audio_render_vendor.c",
+    ]
+
+    include_dirs = [
+      "//drivers/peripheral/audio/hdi_service/primary_impl/vendor_include/include",
+      "//third_party/bounds_checking_function/include",
+      "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
+    ]
   }
 
   if (is_standard_system) {

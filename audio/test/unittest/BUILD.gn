@@ -23,7 +23,7 @@ group("audiotest") {
   if (!defined(ohos_lite)) {
     testonly = true
   }
-  deps = []
+  deps = [ "common:hdi_base_common" ]
 
   # hal ut
   if (drivers_peripheral_audio_rich_device) {
