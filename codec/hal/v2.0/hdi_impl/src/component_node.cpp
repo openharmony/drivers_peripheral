@@ -339,9 +339,12 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, struct OmxCodecBuffer &buff
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
     codecBuffer->SetBufferId(bufferId);
-    codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
-    bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
-    bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
+    {
+        std::lock_guard<std::mutex> lk(mutex_);
+        codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
+        bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
+        bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
+    }
     return err;
 }
 
@@ -368,9 +371,12 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer 
 
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
-    codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
-    bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
-    bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
+    {
+        std::lock_guard<std::mutex> lk(mutex_);
+        codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
+        bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
+        bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
+    }
     return OMX_ErrorNone;
 }
 
@@ -506,6 +512,7 @@ sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *bu
 bool ComponentNode::GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBuffer,
                                   OMX_BUFFERHEADERTYPE *&bufferHdrType)
 {
+    std::lock_guard<std::mutex> lk(mutex_);
     auto iter = codecBufferMap_.find(bufferId);
     if ((iter == codecBufferMap_.end()) || (iter->second == nullptr)) {
         HDF_LOGE("%{public}s error, can not find bufferIndo by bufferID [%{public}d]", __func__, bufferId);
