@@ -24,7 +24,7 @@ public:
     {
         StartTrace(HITRACE_TAG_HDF, prefix + value);
     }
-    inline End() const
+    inline void End() const
     {
         FinishTrace(HITRACE_TAG_HDF);
     }
