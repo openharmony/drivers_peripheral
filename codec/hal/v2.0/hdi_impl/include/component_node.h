@@ -19,6 +19,7 @@
 #include <OMX_Types.h>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <nocopyable.h>
 #include <osal_mem.h>
 #include <string>
@@ -131,6 +132,7 @@ private:
     std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderPortMap_;
     uint32_t maxStateWaitTime = 10000;
     uint32_t maxStateWaitCount = 100;
+    std::mutex mutex_;
 };
 }  // namespace Omx
 }  // namespace Codec
