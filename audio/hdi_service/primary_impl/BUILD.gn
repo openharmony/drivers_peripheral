@@ -40,10 +40,6 @@ ohos_shared_library("audio_primary_impl") {
     if (drivers_peripheral_audio_hal_notsupport_pathselect) {
       defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
     }
-
-    if (enable_audio_hal_hdf_log) {
-      defines += [ "AUDIO_HDF_LOG" ]
-    }
   } else {
     sources = [
       "vendor_src/audio_adapter_vendor.c",
@@ -58,6 +54,10 @@ ohos_shared_library("audio_primary_impl") {
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
     ]
+  }
+
+  if (enable_audio_hal_hdf_log) {
+    defines += [ "AUDIO_HDF_LOG" ]
   }
 
   if (is_standard_system) {

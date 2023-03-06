@@ -608,7 +608,7 @@ int32_t AudioHwiIncreaseAdapterRef(uint32_t descIndex, struct IAudioAdapter **ad
 
     priv->adapterInfo[descIndex].refCnt++;
     *adapter = priv->adapterInfo[descIndex].adapter;
-    AUDIO_FUNC_LOGI("increase adapternameIndex[%{public}d], refCount[%{public}d]", infoIndex,
+    AUDIO_FUNC_LOGI("increase adapternameIndex[%{public}d], refCount[%{public}d]", descIndex,
         priv->adapterInfo[descIndex].refCnt);
 
     return HDF_SUCCESS;
@@ -626,7 +626,7 @@ void AudioHwiDecreaseAdapterRef(uint32_t descIndex)
         return;
     }
     priv->adapterInfo[descIndex].refCnt--;
-    AUDIO_FUNC_LOGI("decrease adapternameIndex[%{public}d], refCount[%{public}d]", infoIndex,
+    AUDIO_FUNC_LOGI("decrease adapternameIndex[%{public}d], refCount[%{public}d]", descIndex,
         priv->adapterInfo[descIndex].refCnt);
 }
 
