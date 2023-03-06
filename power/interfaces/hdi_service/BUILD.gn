@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -16,7 +16,9 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libpower_interface_service_1.1") {
   sources = [
     "src/power_interface_impl.cpp",
+    "src/running_lock_counter.cpp",
     "src/running_lock_impl.cpp",
+    "src/running_lock_timer_handler.cpp",
   ]
 
   deps = [ "//third_party/libxml2:xml2" ]
