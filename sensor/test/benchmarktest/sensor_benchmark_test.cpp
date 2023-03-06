@@ -116,10 +116,12 @@ BENCHMARK_F(SensorBenchmarkTest, DriverSystem_SensorBenchmark_003)(benchmark::St
     int32_t ret;
     for (auto _ : state) {
         ret = g_sensorInterface->Register(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        OsalMSleep(SENSOR_POLL_TIME);
         EXPECT_EQ(SENSOR_SUCCESS, ret);
         ret = g_sensorInterface->Unregister(TRADITIONAL_SENSOR_TYPE, g_traditionalCallback);
+        OsalMSleep(SENSOR_POLL_TIME);
+        EXPECT_EQ(SENSOR_SUCCESS, ret);
     }
-    EXPECT_EQ(SENSOR_SUCCESS, ret);
 }
 
 BENCHMARK_REGISTER_F(SensorBenchmarkTest, DriverSystem_SensorBenchmark_003)->
