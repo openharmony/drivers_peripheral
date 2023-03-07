@@ -65,6 +65,7 @@ ohos_shared_library("libusb_interface_service_1.0") {
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hisysevent_native:libhisysevent",
+      "hitrace_native:hitrace_meter",
       "hiviewdfx_hilog_native:libhilog",
       "init:libbegetutil",
       "ipc:ipc_single",
