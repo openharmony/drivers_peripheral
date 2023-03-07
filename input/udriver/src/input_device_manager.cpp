@@ -215,7 +215,7 @@ int32_t InputDeviceManager::GetInputDeviceInfo(int32_t fd, InputDeviceInfo *deta
     detailInfo->attrSet.id.vendor = inputId.vendor;
     detailInfo->attrSet.id.version = inputId.version;
     // ABS Info
-    for (uint32_t i = 0; i < ABS_CNT; i++) {
+    for (uint32_t i = 0; i < BITS_TO_UINT64(ABS_CNT); i++) {
         if (detailInfo->abilitySet.absCode[i] > 0) {
             if (ioctl(fd, EVIOCGABS(i), &detailInfo->attrSet.axisInfo[i])) {
                 HDF_LOGE("%{public}s: get axis info failed fd = %{public}d name = %{public}s errormsg = %{public}s",
