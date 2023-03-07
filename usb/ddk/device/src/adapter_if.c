@@ -1083,7 +1083,7 @@ static int32_t UsbFnAdapterPipeIo(int32_t ep, struct IoData *ioData)
         ret = ioctl(ep, FUNCTIONFS_ENDPOINT_WRITE, ioData);
     }
 
-    if (ret != HDF_SUCCESS) {
+    if (ret < 0) {
         HDF_LOGE("%{public}s: handle endpoint failed errno:%{public}d", __func__, errno);
     }
 
