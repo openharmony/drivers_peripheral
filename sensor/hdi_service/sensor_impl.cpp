@@ -423,6 +423,10 @@ int32_t SensorImpl::UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj)
 int32_t SensorImpl::AddSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj)
 {
     sptr<CallBackDeathRecipient> callBackDeathRecipient = new CallBackDeathRecipient(this);
+    if (callBackDeathRecipient == nullptr) {
+        HDF_LOGE("%{public}s: new CallBackDeathRecipient fail", __func__);
+        return HDF_FAILURE;
+    }
     const sptr<IRemoteObject> &remote = OHOS::HDI::hdi_objcast<ISensorCallback>(callbackObj);
     bool result = remote->AddDeathRecipient(callBackDeathRecipient);
     if (!result) {
