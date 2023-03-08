@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -66,6 +66,17 @@ HWTEST_F(BufferTest, CreateBufferBySize_test, TestSize.Level0)
     result = IsBufferValid(buffer3);
     EXPECT_EQ(result, true);
     DestoryBuffer(buffer3);
+}
+
+HWTEST_F(BufferTest, GetTmpBuffer_test, TestSize.Level0)
+{
+    Buffer buffer1 = GetTmpBuffer(nullptr, 0, 0);
+    Buffer buffer2 = {
+        .buf = nullptr,
+        .contentSize = 0,
+        .maxSize = 0,
+    };
+    EXPECT_EQ(memcmp(&buffer1, &buffer2, sizeof(Buffer)), 0);
 }
 
 /**
