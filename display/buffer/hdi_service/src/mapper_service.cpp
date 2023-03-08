@@ -17,6 +17,7 @@
 
 #include <dlfcn.h>
 #include <hdf_base.h>
+#include <hdf_log.h>
 #include "display_log.h"
 
 namespace OHOS {
