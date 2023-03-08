@@ -259,7 +259,7 @@ int32_t UsbfnMtpImpl::UsbMtpPortSubmitAsyncTxReq(struct UsbMtpPort *mtpPort, str
 {
     size_t readRet = read(mtpPort->mtpDev->xferFd, req->buf, req->length);
     if (readRet != req->length) {
-        HDF_LOGE("%{public}s: read failed: %{public}d < %{public}d", __func__, readRet, req->length);
+        HDF_LOGE("%{public}s: read failed: %{public}zu < %{public}d", __func__, readRet, req->length);
         return HDF_FAILURE;
     }
     DListRemove(&req->list);
