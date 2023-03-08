@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,35 +21,50 @@
 #include "buffer.h"
 #include "defines.h"
 #include "context_manager.h"
+#include "adaptor_algorithm.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define SHA256_SIGN_LEN 32
 #define AUTH_TOKEN_LEN sizeof(UserAuthTokenHal)
-#define AUTH_TOKEN_DATA_LEN (AUTH_TOKEN_LEN - SHA256_SIGN_LEN)
-#define SHA256_KEY_LEN 32
+#define AUTH_TOKEN_DATA_LEN (AUTH_TOKEN_LEN - SHA256_DIGEST_SIZE)
+#define AUTH_TOKEN_CIPHER_LEN sizeof(TokenDataToEncrypt)
 #define TOKEN_VERSION 0
 
 typedef struct {
-    uint32_t version;
     uint8_t challenge[CHALLENGE_LEN];
-    uint64_t secureUid;
-    uint64_t enrolledId;
-    uint64_t credentialId;
     uint64_t time;
     uint32_t authTrustLevel;
     uint32_t authType;
     uint32_t authMode;
     uint32_t securityLevel;
-    uint8_t sign[SHA256_SIGN_LEN];
+} __attribute__((__packed__)) TokenDataPlain;
+
+typedef struct {
+    int32_t userId;
+    uint64_t secureUid;
+    uint64_t enrolledId;
+    uint64_t credentialId;
+} __attribute__((__packed__)) TokenDataToEncrypt;
+
+typedef struct {
+    uint32_t version;
+    TokenDataPlain tokenDataPlain;
+    uint8_t tokenDataCipher[AUTH_TOKEN_CIPHER_LEN];
+    uint8_t tag[AES_GCM_TAG_SIZE];
+    uint8_t iv[AES_GCM_IV_SIZE];
+    uint8_t sign[SHA256_DIGEST_SIZE];
 } __attribute__((__packed__)) UserAuthTokenHal;
+
+typedef struct {
+    TokenDataPlain tokenDataPlain;
+    TokenDataToEncrypt tokenDataToEncrypt;
+} __attribute__((__packed__)) UserAuthTokenPlain;
 
 ResultCode GetTokenDataAndSign(const UserAuthContext *context,
     uint64_t credentialId, uint32_t authMode, UserAuthTokenHal *authToken);
-ResultCode UserAuthTokenSign(UserAuthTokenHal *userAuthToken);
-ResultCode UserAuthTokenVerify(const UserAuthTokenHal *userAuthToken);
+ResultCode UserAuthTokenVerify(const UserAuthTokenHal *userAuthToken, UserAuthTokenPlain *tokenPlain);
 
 #ifdef __cplusplus
 }

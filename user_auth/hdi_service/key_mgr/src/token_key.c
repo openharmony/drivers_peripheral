@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -22,7 +22,12 @@
 #define HKS_DEFAULT_USER_AT_KEY "huks_default_user_auth_token_key"
 #define HKS_DEFAULT_USER_AT_KEY_LEN 32
 
-Buffer *GetTokenKey(void)
+Buffer *GetTokenHmacKey(void)
+{
+    return CreateBufferByData((uint8_t *)HKS_DEFAULT_USER_AT_KEY, HKS_DEFAULT_USER_AT_KEY_LEN);
+}
+
+Buffer *GetTokenAesKey(void)
 {
     return CreateBufferByData((uint8_t *)HKS_DEFAULT_USER_AT_KEY, HKS_DEFAULT_USER_AT_KEY_LEN);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -165,6 +165,101 @@ HWTEST_F(AdaptorAlgorithmTest, TestSecureRandom, TestSize.Level0)
     uint8_t num = 0;
     buffer = &num;
     EXPECT_EQ(SecureRandom(buffer, 1), RESULT_SUCCESS);
+}
+
+HWTEST_F(AdaptorAlgorithmTest, TestAesGcmEncrypt, TestSize.Level0)
+{
+    Buffer *plaintext = nullptr;
+    AesGcmParam aesGcmParam = {};
+    Buffer *ciphertext = nullptr;
+    Buffer *tag = nullptr;
+    EXPECT_EQ(AesGcmEncrypt(plaintext, &aesGcmParam, &ciphertext, &tag), RESULT_BAD_PARAM);
+    plaintext = CreateBufferBySize(1001);
+    EXPECT_EQ(AesGcmEncrypt(plaintext, &aesGcmParam, &ciphertext, &tag), RESULT_BAD_PARAM);
+    plaintext->contentSize = 1001;
+    EXPECT_EQ(AesGcmEncrypt(plaintext, &aesGcmParam, &ciphertext, &tag), RESULT_BAD_PARAM);
+    plaintext->contentSize = 100;
+    EXPECT_EQ(AesGcmEncrypt(plaintext, nullptr, &ciphertext, &tag), RESULT_BAD_PARAM);
+    EXPECT_EQ(AesGcmEncrypt(plaintext, &aesGcmParam, &ciphertext, &tag), RESULT_BAD_PARAM);
+    aesGcmParam.key = CreateBufferBySize(32);
+    aesGcmParam.key->contentSize = 32;
+    EXPECT_EQ(AesGcmEncrypt(plaintext, &aesGcmParam, &ciphertext, &tag), RESULT_BAD_PARAM);
+    aesGcmParam.iv = CreateBufferBySize(12);
+    aesGcmParam.iv->contentSize = 12;
+    EXPECT_EQ(AesGcmEncrypt(plaintext, &aesGcmParam, nullptr, &tag), RESULT_BAD_PARAM);
+    EXPECT_EQ(AesGcmEncrypt(plaintext, &aesGcmParam, &ciphertext, nullptr), RESULT_BAD_PARAM);
+    DestoryBuffer(plaintext);
+    DestoryBuffer(aesGcmParam.key);
+    DestoryBuffer(aesGcmParam.iv);
+}
+
+HWTEST_F(AdaptorAlgorithmTest, TestAesGcmDecrypt, TestSize.Level0)
+{
+    Buffer *ciphertext = nullptr;
+    AesGcmParam aesGcmParam = {};
+    Buffer *plaintext = nullptr;
+    Buffer *tag = nullptr;
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, &aesGcmParam, tag, &plaintext), RESULT_BAD_PARAM);
+    ciphertext = CreateBufferBySize(1001);
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, &aesGcmParam, tag, &plaintext), RESULT_BAD_PARAM);
+    ciphertext->contentSize = 1001;
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, &aesGcmParam, tag, &plaintext), RESULT_BAD_PARAM);
+    ciphertext->contentSize = 100;
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, nullptr, tag, &plaintext), RESULT_BAD_PARAM);
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, &aesGcmParam, tag, &plaintext), RESULT_BAD_PARAM);
+    aesGcmParam.key = CreateBufferBySize(32);
+    aesGcmParam.key->contentSize = 32;
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, &aesGcmParam, tag, &plaintext), RESULT_BAD_PARAM);
+    aesGcmParam.iv = CreateBufferBySize(12);
+    aesGcmParam.iv->contentSize = 12;
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, &aesGcmParam, tag, &plaintext), RESULT_BAD_PARAM);
+    tag = CreateBufferBySize(16);
+    tag->contentSize = 16;
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, &aesGcmParam, tag, nullptr), RESULT_BAD_PARAM);
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, &aesGcmParam, tag, &plaintext), RESULT_GENERAL_ERROR);
+    aesGcmParam.aad = CreateBufferBySize(12);
+    aesGcmParam.aad->contentSize = 12;
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, &aesGcmParam, tag, &plaintext), RESULT_GENERAL_ERROR);
+    DestoryBuffer(ciphertext);
+    DestoryBuffer(tag);
+    DestoryBuffer(aesGcmParam.key);
+    DestoryBuffer(aesGcmParam.iv);
+    DestoryBuffer(aesGcmParam.aad);
+}
+
+HWTEST_F(AdaptorAlgorithmTest, TestAesGcm, TestSize.Level0)
+{
+    Buffer *plaintext = CreateBufferBySize(100);
+    plaintext->contentSize = 100;
+    AesGcmParam aesGcmParam = {};
+    aesGcmParam.key = CreateBufferBySize(32);
+    aesGcmParam.key->contentSize = 32;
+    aesGcmParam.iv = CreateBufferBySize(12);
+    aesGcmParam.iv->contentSize = 12;
+    Buffer *ciphertext = nullptr;
+    Buffer *tag = nullptr;
+    EXPECT_EQ(AesGcmEncrypt(plaintext, &aesGcmParam, &ciphertext, &tag), RESULT_SUCCESS);
+    Buffer *plaintext1 = nullptr;
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, &aesGcmParam, tag, &plaintext1), RESULT_SUCCESS);
+    EXPECT_EQ(CompareBuffer(plaintext, plaintext1), true);
+    DestoryBuffer(ciphertext);
+    ciphertext = nullptr;
+    DestoryBuffer(tag);
+    tag = nullptr;
+    DestoryBuffer(plaintext1);
+    plaintext1 = nullptr;
+    aesGcmParam.aad = CreateBufferBySize(12);
+    aesGcmParam.aad->contentSize = 12;
+    EXPECT_EQ(AesGcmEncrypt(plaintext, &aesGcmParam, &ciphertext, &tag), RESULT_SUCCESS);
+    EXPECT_EQ(AesGcmDecrypt(ciphertext, &aesGcmParam, tag, &plaintext1), RESULT_SUCCESS);
+    EXPECT_EQ(CompareBuffer(plaintext, plaintext1), true);
+    DestoryBuffer(plaintext);
+    DestoryBuffer(ciphertext);
+    DestoryBuffer(tag);
+    DestoryBuffer(plaintext1);
+    DestoryBuffer(aesGcmParam.key);
+    DestoryBuffer(aesGcmParam.iv);
+    DestoryBuffer(aesGcmParam.aad);
 }
 } // namespace UserAuth
 } // namespace UserIam
