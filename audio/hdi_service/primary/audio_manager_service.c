@@ -32,7 +32,7 @@ struct AudioManagerPriv {
     AudioManagerDestroyIfInstance destroyIfInstance;
 };
 
-static const char *g_hdiAudioLibPath = HDF_LIBRARY_FULL_PATH("libaudio_primary_impl");
+static const char *g_hdiAudioLibPath = HDF_LIBRARY_FULL_PATH("libaudio_primary_impl_vendor");
 
 static struct AudioManagerPriv *GetAudioManagerPriv(void)
 {
