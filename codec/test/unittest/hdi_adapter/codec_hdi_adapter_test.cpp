@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,6 +48,9 @@ constexpr int32_t INT_TO_STR_LEN = 32;
 constexpr int32_t ARRAY_TO_STR_LEN = 1000;
 
 union OMX_VERSIONTYPE g_version;
+constexpr int32_t FRAME_RATE = 24;
+constexpr int32_t VIDEO_WIDHT = 640;
+constexpr int32_t VIDEO_HEIGHT = 480;
 constexpr int32_t BUFFER_SIZE = (640 * 480 * 3);
 constexpr int32_t ROLE_LEN = 240;
 constexpr int32_t FRAMERATE = (30 << 16);
@@ -404,11 +407,29 @@ HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiGetParameterParamIndexUnusedTest_004, T
     ASSERT_NE(ret, HDF_SUCCESS);
 }
 
+HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetPortDefineSuccessTest_001, TestSize.Level1)
+{
+    ASSERT_TRUE(g_component != nullptr);
+    OMX_PARAM_PORTDEFINITIONTYPE param;
+    InitParam(param);
+    param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
+    auto ret = g_component->GetParameter(
+        g_component, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param), sizeof(param));
+    ASSERT_EQ(ret, HDF_SUCCESS);
+
+    param.format.video.nFrameWidth = VIDEO_WIDHT;
+    param.format.video.nFrameHeight = VIDEO_HEIGHT;
+    ret = g_component->SetParameter(
+        g_component, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param), sizeof(param));
+    ASSERT_EQ(ret, HDF_SUCCESS);
+}
+
 HWTEST_F(CodecHdiAdapterTest, HdfCodecHdiSetParameterSuccessTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(g_component != nullptr);
     OMX_VIDEO_PARAM_PORTFORMATTYPE param;
     InitParam(param);
+    param.xFramerate = FRAME_RATE;
     param.nPortIndex = (uint32_t)PortIndex::PORT_INDEX_INPUT;
     int32_t ret = g_component->SetParameter(
         g_component, OMX_IndexParamVideoPortFormat, reinterpret_cast<int8_t *>(&param), sizeof(param));
