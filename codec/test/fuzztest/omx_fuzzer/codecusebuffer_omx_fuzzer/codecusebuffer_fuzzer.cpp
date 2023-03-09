@@ -33,6 +33,7 @@ namespace Codec {
         if (ret != HDF_SUCCESS) {
             HDF_LOGE("%{public}s: UseBuffer failed, ret is [%{public}x]\n", __func__, ret);
         }
+        OsalMemFree(buffer.buffer);
 
         result = Destroy();
         if (!result) {
