@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -130,6 +130,10 @@ static int32_t CheckInputName(int type, void *val)
         case INPUT_INT:
             ret = scanf_s("%d", &capInputInt);
             if (capInputInt < 0 || capInputInt > GET_CAPTURE_POSITION + 1) {
+                if (g_frame != NULL) {
+                    OsalMemFree(g_frame);
+                    g_frame = NULL;
+                }
                 AUDIO_FUNC_LOGE("Input failure");
                 return HDF_FAILURE;
             }

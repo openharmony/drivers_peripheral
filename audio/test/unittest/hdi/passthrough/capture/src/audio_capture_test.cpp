@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -471,6 +471,8 @@ HWTEST_F(AudioCaptureTest, AudioCaptureCheckSceneCapabilityWhenPinsIsError, Test
     int32_t ret = AudioCaptureCheckSceneCapability(handle, &scene, &supported);
     if ((ret == AUDIO_HAL_ERR_NOT_SUPPORT) || (ret == AUDIO_HAL_ERR_INTERNAL)) {
         EXPECT_TRUE(true);
+    } else {
+        EXPECT_TRUE(false);
     }
 }
 
@@ -485,6 +487,8 @@ HWTEST_F(AudioCaptureTest, AudioCaptureCheckSceneCapabilityWhenParamIsValid, Tes
     int32_t ret = AudioCaptureCheckSceneCapability(handle, &scene, &supported);
     if ((ret == AUDIO_HAL_SUCCESS) || (ret == AUDIO_HAL_ERR_NOT_SUPPORT)) {
         EXPECT_TRUE(true);
+    } else {
+        EXPECT_TRUE(false);
     }
 }
 
@@ -532,6 +536,8 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSelectSceneWhenDevCtlHandleIsError, TestS
     int32_t ret = AudioCaptureSelectScene(handle, &scene);
     if ((ret == AUDIO_HAL_ERR_NOT_SUPPORT) || (ret == AUDIO_HAL_ERR_INTERNAL)) {
         EXPECT_TRUE(true);
+    } else {
+        EXPECT_TRUE(false);
     }
     hwCapture->devCtlHandle = devCtlHandle;
     delete(service);
@@ -548,6 +554,8 @@ HWTEST_F(AudioCaptureTest, AudioCaptureSelectSceneWhenParamValid, TestSize.Level
     int32_t ret =  AudioCaptureSelectScene(handle, &scene);
     if ((ret == AUDIO_HAL_ERR_NOT_SUPPORT) || (ret == AUDIO_HAL_SUCCESS)) {
         EXPECT_TRUE(true);
+    } else {
+        EXPECT_TRUE(false);
     }
 }
 
@@ -1021,6 +1029,8 @@ HWTEST_F(AudioCaptureTest, AudioCaptureCaptureFrameWhenParamIsValid, TestSize.Le
     int32_t ret = AudioCaptureCaptureFrame(capture, frame, requestBytes, &replyBytes);
     if ((ret == AUDIO_HAL_SUCCESS) || (ret == AUDIO_HAL_ERR_INTERNAL)) {
         EXPECT_TRUE(true);
+    } else {
+        EXPECT_TRUE(false);
     }
     free(frame);
     frame = nullptr;
