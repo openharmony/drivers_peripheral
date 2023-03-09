@@ -18,6 +18,8 @@
 
 #include "v1_0/ia_gnss_interface.h"
 
+#include "iremote_object.h"
+
 namespace OHOS {
 namespace HDI {
 namespace Location {
@@ -35,6 +37,30 @@ public:
     int32_t SetAgnssRefInfo(const AGnssRefInfo& refInfo) override;
 
     int32_t SetSubscriberSetId(const SubscriberSetId& id) override;
+
+    void ResetAgnss();
+private:
+    int32_t AddAgnssDeathRecipient(const sptr<IAGnssCallback>& callbackObj);
+
+    int32_t RemoveAgnssDeathRecipient(const sptr<IAGnssCallback>& callbackObj);
+
+    void ResetAgnssDeathRecipient();
+
+    void UnloadAgnssDevice();
+};
+class AgnssCallBackDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    explicit AgnssCallBackDeathRecipient(const wptr<AGnssInterfaceImpl>& impl) : agnssInterfaceImpl_(impl) {};
+    ~AgnssCallBackDeathRecipient() = default;
+    void OnRemoteDied(const wptr<IRemoteObject>& remote) override
+    {
+        sptr<AGnssInterfaceImpl> impl = agnssInterfaceImpl_.promote();
+        if (impl != nullptr) {
+            impl->ResetAgnss();
+        }
+    };
+private:
+    wptr<AGnssInterfaceImpl> agnssInterfaceImpl_;
 };
 } // V1_0
 } // Agnss
