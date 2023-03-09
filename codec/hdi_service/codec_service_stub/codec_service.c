@@ -291,6 +291,7 @@ int32_t CodecCreate(const char* name, CODEC_HANDLETYPE *handle)
     }
     ret = g_codecOemIface->codecCreate(name, handle);
     if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: g_codecOemIface->codecCreate failed!", __func__);
         return ret;
     }
     instance->handle = *handle;
@@ -332,6 +333,7 @@ int32_t CodecDestroy(CODEC_HANDLETYPE handle)
     }
 
     if (destroyInstanceResult != HDF_SUCCESS || destroyIfaceResult != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: destroyInstanceResult or destroyIfaceResult not HDF_SUCCESS!", __func__);
         return HDF_FAILURE;
     }
     return HDF_SUCCESS;
@@ -392,6 +394,7 @@ int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
 int32_t CodecStart(CODEC_HANDLETYPE handle)
 {
     if (g_codecOemIface->codecStart(handle) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: g_codecOemIface->codecStart(handle) is failed!", __func__);
         return HDF_FAILURE;
     }
     struct CodecInstance *instance = FindInCodecInstanceManager(handle);
