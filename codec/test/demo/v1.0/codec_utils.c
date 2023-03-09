@@ -27,18 +27,18 @@ static int32_t GetCodecName(CodecCmd* cmd)
     int32_t codecNum = 0;
     CodecTypeAndName *codecs;
     CodecTypeAndName encoders[] = {
-        {{"avc", "AVC"}, CODEC_NAME_AVC_HW_ENCODER},
-        {{"hevc", "HEVC"}, CODEC_NAME_HEVC_HW_ENCODER},
-        {{"vp9", "VP9"}, CODEC_NAME_VP9_HW_ENCODER},
-        {{"vp8", "VP8"}, CODEC_NAME_VP8_HW_ENCODER},
-        {{"mpeg4", "MPEG4"}, CODEC_NAME_MPEG4_HW_ENCODER}
+        {{"avc", "AVC"}, CODEC_NAME_AVC_HW_ENCODER, MEDIA_MIMETYPE_VIDEO_AVC},
+        {{"hevc", "HEVC"}, CODEC_NAME_HEVC_HW_ENCODER, MEDIA_MIMETYPE_VIDEO_HEVC},
+        {{"vp9", "VP9"}, CODEC_NAME_VP9_HW_ENCODER, MEDIA_MIMETYPE_INVALID},    // MIMETYPE NOT DEFINED YET
+        {{"vp8", "VP8"}, CODEC_NAME_VP8_HW_ENCODER, MEDIA_MIMETYPE_INVALID},    // MIMETYPE NOT DEFINED YET
+        {{"mpeg4", "MPEG4"}, CODEC_NAME_MPEG4_HW_ENCODER, MEDIA_MIMETYPE_VIDEO_MPEG4}
     };
     CodecTypeAndName decoders[] = {
-        {{"avc", "AVC"}, CODEC_NAME_AVC_HW_DECODER},
-        {{"hevc", "HEVC"}, CODEC_NAME_HEVC_HW_DECODER},
-        {{"vp9", "VP9"}, CODEC_NAME_VP9_HW_DECODER},
-        {{"vp8", "VP8"}, CODEC_NAME_VP8_HW_DECODER},
-        {{"mpeg4", "MPEG4"}, CODEC_NAME_MPEG4_HW_DECODER}
+        {{"avc", "AVC"}, CODEC_NAME_AVC_HW_DECODER, MEDIA_MIMETYPE_VIDEO_AVC},
+        {{"hevc", "HEVC"}, CODEC_NAME_HEVC_HW_DECODER, MEDIA_MIMETYPE_VIDEO_HEVC},
+        {{"vp9", "VP9"}, CODEC_NAME_VP9_HW_DECODER, MEDIA_MIMETYPE_INVALID},    // MIMETYPE NOT DEFINED YET
+        {{"vp8", "VP8"}, CODEC_NAME_VP8_HW_DECODER, MEDIA_MIMETYPE_INVALID},    // MIMETYPE NOT DEFINED YET
+        {{"mpeg4", "MPEG4"}, CODEC_NAME_MPEG4_HW_DECODER, MEDIA_MIMETYPE_VIDEO_MPEG4}
     };
 
     if (cmd->type == VIDEO_ENCODER) {
@@ -56,6 +56,7 @@ static int32_t GetCodecName(CodecCmd* cmd)
                 HDF_LOGE("%{public}s, failed to strcpy_s codecName. ret:%{public}d", __func__, ret);
                 return HDF_FAILURE;
             }
+            cmd->mime = codecs[i].mimeType;
             return HDF_SUCCESS;
         }
     }
@@ -102,6 +103,12 @@ static int32_t ParseCmdOption(CodecCmd* cmd, const char *opt, const char *next)
                 ret = HDF_FAILURE;
             }
             } break;
+        case 'f': {
+            cmd->fps = atoi(next);
+            } break;
+        case 'p': {
+            cmd->pixFmt = atoi(next);
+            } break;
         default:
             break;
     }
@@ -145,3 +152,19 @@ int32_t ParseArguments(CodecCmd* cmd, int argc, char **argv)
     }
     return ret;
 }
+
+void FreeParams(Param *params, int32_t paramCnt)
+{
+    if (params == NULL || paramCnt <= 0) {
+        HDF_LOGE("%{public}s: params is null or invalid count!", __func__);
+        return;
+    }
+    for (int32_t j = 0; j < paramCnt; j++) {
+        if (params[j].val != NULL && params[j].size > 0) {
+            OsalMemFree(params[j].val);
+            params[j].val = NULL;
+        }
+    }
+    OsalMemFree(params);
+}
+
