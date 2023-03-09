@@ -25,7 +25,7 @@
 #include <osal_mem.h>
 #include <securec.h>
 #include <servmgr_hdi.h>
-#include "codec_callback_type_stub.h"
+#include "codec_callback_if.h"
 #include "codec_component_manager.h"
 #include "codec_component_type.h"
 #include "codec_omx_ext.h"
@@ -206,7 +206,7 @@ public:
         if (manager_ == nullptr) {
             return;
         }
-        callback_ = CodecCallbackTypeStubGetInstance();
+        callback_ = CodecCallbackTypeGet(nullptr);
         if (callback_ == nullptr) {
             return;
         }
@@ -232,7 +232,7 @@ public:
             manager_->DestroyComponent(componentId_);
         }
         if (callback_ != nullptr) {
-            CodecCallbackTypeStubRelease(callback_);
+            CodecCallbackTypeRelease(callback_);
             callback_ = nullptr;
         }
     }
@@ -962,9 +962,9 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiSetCallbackTest_001, TestSize.Level1)
 {
     ASSERT_TRUE(component_ != nullptr);
     if (callback_ != nullptr) {
-        CodecCallbackTypeStubRelease(callback_);
+        CodecCallbackTypeRelease(callback_);
     }
-    callback_ = CodecCallbackTypeStubGetInstance();
+    callback_ = CodecCallbackTypeGet(nullptr);
     ASSERT_TRUE(callback_ != nullptr);
     auto ret = component_->SetCallbacks(component_, callback_, (int64_t)this);
     ASSERT_EQ(ret, HDF_SUCCESS);

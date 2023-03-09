@@ -14,8 +14,10 @@
  */
 
 #include "codec_hdi_decode.h"
+#include <hdf_base.h>
 #include <hdf_log.h>
 #include <securec.h>
+#include "codec_component_manager.h"
 #include "codec_omx_ext.h"
 
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiDecode::gralloc_ = nullptr;
@@ -97,7 +99,7 @@ bool CodecHdiDecode::Init(CommandOpt &opt)
 
     omxMgr_ = GetCodecComponentManager();
 
-    callback_ = CodecCallbackTypeStubGetInstance();
+    callback_ = CodecCallbackTypeGet(nullptr);
     if ((omxMgr_ == nullptr) || (callback_ == nullptr)) {
         HDF_LOGE("%{public}s omxMgr_ is null or callback_ is null", __func__);
         return false;
