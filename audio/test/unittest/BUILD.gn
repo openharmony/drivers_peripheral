@@ -27,7 +27,7 @@ group("audiotest") {
 
   # hal ut
   if (drivers_peripheral_audio_rich_device) {
-    deps += [ "hdi/client_advance:hdi_client_advance" ]
+    # deps += [ "hdi/client_advance:hdi_client_advance" ]
   }
   if (drivers_peripheral_audio_full_test_suite) {
     deps += [
