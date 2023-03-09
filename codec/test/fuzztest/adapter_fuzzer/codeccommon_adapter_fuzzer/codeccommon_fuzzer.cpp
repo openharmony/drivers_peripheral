@@ -46,6 +46,10 @@ void FillDataOmxCodecBuffer(struct OmxCodecBuffer *dataFuzz)
     dataFuzz->version.nVersion = DATA_VERSION_NVERSION;
     dataFuzz->bufferType = (enum CodecBufferType)DATA_BUFFERTYPE;
     dataFuzz->buffer = reinterpret_cast<uint8_t *>(OsalMemAlloc(DATA_BUFFERLEN));
+    if (dataFuzz->buffer == nullptr) {
+        HDF_LOGE("%{public}s: dataFuzz->buffer is nullptr", __func__);
+        return;
+    }
     dataFuzz->bufferLen = DATA_BUFFERLEN;
     dataFuzz->allocLen = DATA_ALLOCLEN;
     dataFuzz->filledLen = DATA_FILLEDLEN;
