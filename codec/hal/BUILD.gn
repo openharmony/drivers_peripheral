@@ -18,14 +18,19 @@ declare_args() {
   drivers_peripheral_codec_support_role = false
 }
 
+config("headers_config") {
+  include_dirs = [ "//drivers/peripheral/codec/interfaces/include" ]
+}
+
 ohos_shared_library("libcodec_hdi_omx_server") {
   include_dirs = [
-    "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/v2.0/hdi_impl/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
     "//drivers/peripheral/base",
   ]
+  configs = [ ":headers_config" ]
+
   sources = [
     "src/codec_adapter.cpp",
     "src/codec_callback_type_proxy.c",
@@ -132,10 +137,10 @@ ohos_static_library("libcodec_hdi_omx_server_static") {
 
 ohos_shared_library("libcodec_hdi_omx_client") {
   include_dirs = [
-    "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
   ]
+  public_configs = [ ":headers_config" ]
   sources = [
     "src/codec_callback_type_stub.c",
     "src/codec_component_manager_proxy.c",
@@ -162,10 +167,11 @@ ohos_shared_library("libcodec_hdi_omx_client") {
 
 ohos_shared_library("libcodec_hdi_omx_callback_type_service_impl") {
   include_dirs = [
-    "//drivers/peripheral/codec/interfaces/include",
     "//drivers/peripheral/codec/hal/include",
     "//third_party/openmax/api/1.1.2",
   ]
+  configs = [ ":headers_config" ]
+
   sources = [ "src/codec_callback_type_service.c" ]
 
   if (is_standard_system) {

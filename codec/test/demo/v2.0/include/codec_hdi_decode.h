@@ -27,12 +27,8 @@
 #include <map>
 #include <memory>
 #include <mutex>
-#include "codec_callback_type_service.h"
-#include "codec_callback_type_stub.h"
-#include "codec_component_manager.h"
 #include "codec_component_type.h"
 #include "codec_packet_reader.h"
-#include "codec_types.h"
 #include "command_parse.h"
 enum class PortIndex { PORT_INDEX_INPUT = 0, PORT_INDEX_OUTPUT = 1 };
 
