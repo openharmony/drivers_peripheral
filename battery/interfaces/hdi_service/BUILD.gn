@@ -32,6 +32,7 @@ ohos_shared_library("libbattery_interface_service_1.2") {
       "c_utils:utils",
       "drivers_interface_battery:battery_idl_headers",
       "drivers_interface_light:liblight_proxy_1.0",
+      "hdf_core:libpub_utils",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
     ]
@@ -68,6 +69,7 @@ ohos_shared_library("libbattery_driver") {
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",

@@ -27,17 +27,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//drivers/peripheral/usb/sample/host/include",
-      "//drivers/hdf_core/adapter/uhdf/posix/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
       "//drivers/hdf_core/adapter/khdf/liteos/model/usb/host/include",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/core/adapter/syscall/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/core/shared/include",
-      "//drivers/hdf_core/framework/core/common/include/host",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/framework/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//drivers/peripheral/usb/serial/include",
@@ -53,7 +43,7 @@ if (defined(ohos_lite)) {
       "./common/liteos/usb_host_serial_func_test.cpp",
       "//drivers/peripheral/usb/sample/host/src/usbhost_ddk_test.c",
     ]
-    deps = [
+    public_deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//commonlibrary/utils_lite:utils",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
@@ -68,17 +58,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//drivers/peripheral/usb/sample/host/include",
-      "//drivers/hdf_core/adapter/uhdf/posix/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
       "//drivers/hdf_core/adapter/khdf/liteos/model/usb/host/include",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/core/adapter/syscall/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/core/shared/include",
-      "//drivers/hdf_core/framework/core/common/include/host",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/framework/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//drivers/peripheral/usb/serial/include",
@@ -94,7 +74,7 @@ if (defined(ohos_lite)) {
       "./common/liteos/usb_host_raw_api_func_test.cpp",
       "//drivers/peripheral/usb/sample/host/src/usbhost_ddk_test.c",
     ]
-    deps = [
+    public_deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//commonlibrary/utils_lite:utils",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
@@ -109,17 +89,7 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//drivers/peripheral/usb/sample/host/include",
-      "//drivers/hdf_core/adapter/uhdf/posix/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
       "//drivers/hdf_core/adapter/khdf/liteos/model/usb/host/include",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/core/adapter/syscall/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/core/shared/include",
-      "//drivers/hdf_core/framework/core/common/include/host",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/framework/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//drivers/peripheral/usb/serial/include",
@@ -135,7 +105,7 @@ if (defined(ohos_lite)) {
       "./common/liteos/usb_host_serial_loopback.cpp",
       "//drivers/peripheral/usb/sample/host/src/usbhost_ddk_test.c",
     ]
-    deps = [
+    public_deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//commonlibrary/utils_lite:utils",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
@@ -150,14 +120,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//drivers/peripheral/usb/sample/device/liteos/lib/include",
-      "$hdf_framework_path/core/shared/include",
-      "$hdf_framework_path/core/host/include",
-      "$hdf_framework_path/core/master/include",
-      "$hdf_framework_path/include/core",
-      "$hdf_framework_path/include/utils",
-      "$hdf_framework_path/utils/include",
-      "$hdf_framework_path/include/osal",
-      "//drivers/hdf_core/adapter/uhdf/posix/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "common",
@@ -166,7 +128,7 @@ if (defined(ohos_lite)) {
       "./common/liteos/usb_device_serial_loopback.cpp",
       "//drivers/peripheral/usb/sample/device/liteos/lib/src/lib_acm_test.c",
     ]
-    deps = [
+    public_deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//commonlibrary/utils_lite:utils",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
@@ -180,14 +142,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//drivers/peripheral/usb/sample/device/liteos/lib/include",
-      "$hdf_framework_path/core/shared/include",
-      "$hdf_framework_path/core/host/include",
-      "$hdf_framework_path/core/master/include",
-      "$hdf_framework_path/include/core",
-      "$hdf_framework_path/include/utils",
-      "$hdf_framework_path/utils/include",
-      "$hdf_framework_path/include/osal",
-      "//drivers/hdf_core/adapter/uhdf/posix/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "common",
@@ -196,7 +150,7 @@ if (defined(ohos_lite)) {
       "./common/liteos/usb_device_serial_func_test.cpp",
       "//drivers/peripheral/usb/sample/device/liteos/lib/src/lib_acm_test.c",
     ]
-    deps = [
+    public_deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//commonlibrary/utils_lite:utils",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",

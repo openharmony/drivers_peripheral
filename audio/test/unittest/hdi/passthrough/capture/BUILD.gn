@@ -34,20 +34,13 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-      "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
 
-    deps = [
-      "//drivers/hdf_core/adapter/uhdf2/utils:libhdf_utils",
+    public_deps = [
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
       "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common",
       "//third_party/googletest:gmock_main",

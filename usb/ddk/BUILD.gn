@@ -26,6 +26,7 @@ group("libusb_core") {
 ohos_shared_library("libusb_ddk_host") {
   include_dirs = [
     "device/include",
+    "$hdf_framework_path/model/usb/include",
     "host/include",
     "//drivers/peripheral/usb/interfaces/ddk/common",
     "//drivers/peripheral/usb/interfaces/ddk/device",

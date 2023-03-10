@@ -15,7 +15,7 @@
 
 #include "codec_death_recipient.h"
 #include <hdf_log.h>
-#include <hdf_remote_adapter_if.h>
+#include <hdf_remote_service.h>
 #include <map>
 #include <mutex>
 #include <securec.h>

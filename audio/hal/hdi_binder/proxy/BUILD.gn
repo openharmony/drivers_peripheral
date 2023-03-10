@@ -24,7 +24,6 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
         "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
         "//drivers/peripheral/audio/hal/hdi_binder/server/include",
         "//third_party/bounds_checking_function/include",
-        "//drivers/hdf_core/adapter/uhdf2/shared/include",
       ]
 
       sources = [
@@ -67,8 +66,8 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
           "c_utils:utils",
           "hdf_core:libhdf_host",
           "hdf_core:libhdf_ipc_adapter",
-          "hdf_core:libhdf_utils",
           "hdf_core:libhdi",
+          "hdf_core:libpub_utils",
           "hiviewdfx_hilog_native:libhilog",
         ]
       } else {

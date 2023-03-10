@@ -62,6 +62,8 @@ deps = [
 
 external_deps = [
   "drivers_interface_camera:metadata",
+  "hdf_core:libhdf_ipc_adapter",
+  "hdf_core:libhdf_utils",
   "hdf_core:libhdi",
   "hiviewdfx_hilog_native:libhilog",
   "ipc:ipc_core",

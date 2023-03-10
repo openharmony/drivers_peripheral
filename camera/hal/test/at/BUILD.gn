@@ -81,23 +81,10 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/ipp/include",
 
       # HCS
-      "//drivers/hdf_core/framework/include/config",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/adapter/uhdf2/include/config",
-      "//drivers/hdf_core/framework/ability/config/hcs_parser/include",
       "//system/core/include/cutils",
-      "//drivers/hdf_core/adapter/uhdf2/osal/include",
-      "$hdf_framework_path/ability/sbuf/include",
-      "$hdf_uhdf_path/manager/include",
-      "$hdf_uhdf_path/include/hdi",
-
-      "$hdf_uhdf_path/devhost/include",
-      "$hdf_uhdf_path/devmgr/include",
-      "$hdf_uhdf_path/host/include",
     ]
 
-    deps = [
+    public_deps = [
       "$camera_path/buffer_manager:camera_buffer_manager",
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_host_service_1.0",

@@ -95,7 +95,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
       "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
     ]
 
@@ -156,7 +155,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
       "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
     ]
 

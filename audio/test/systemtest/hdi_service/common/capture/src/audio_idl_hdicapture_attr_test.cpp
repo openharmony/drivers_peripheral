@@ -14,7 +14,6 @@
  */
 
 #include <gtest/gtest.h>
-#include "hdf_remote_adapter_if.h"
 #include "hdi_service_common.h"
 
 using namespace std;

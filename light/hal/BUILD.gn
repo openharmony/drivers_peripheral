@@ -21,7 +21,6 @@ if (defined(ohos_lite)) {
     visibility = [ ":*" ]
   }
 
-  FWK_ROOT_DIR = "//drivers/hdf_core/framework"
   ohos_shared_library("hdi_light") {
     output_extension = "z.so"
     sources = [ "$LIGHT_ROOT_DIR/hal/src/light_controller.c" ]
@@ -29,8 +28,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$LIGHT_ROOT_DIR/hal/include",
       "$LIGHT_ROOT_DIR/interfaces/include",
-      "$FWK_ROOT_DIR/include",
-      "$FWK_ROOT_DIR/include/utils",
       "//third_party/bounds_checking_function/include",
     ]
 

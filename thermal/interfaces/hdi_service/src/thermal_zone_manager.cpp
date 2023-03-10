@@ -27,7 +27,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-#include "osal/osal_mem.h"
+#include "osal_mem.h"
 #include "thermal_hdf_utils.h"
 #include "thermal_log.h"
 
