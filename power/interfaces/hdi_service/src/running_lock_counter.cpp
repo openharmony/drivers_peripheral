@@ -19,7 +19,7 @@
 
 #include "hdf_base.h"
 #include "unique_fd.h"
-#include "utils/hdf_log.h"
+#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {

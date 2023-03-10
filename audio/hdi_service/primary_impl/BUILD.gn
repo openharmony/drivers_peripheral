@@ -33,7 +33,6 @@ ohos_shared_library("audio_primary_impl_vendor") {
       "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
       "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
     ]
 
@@ -64,8 +63,9 @@ ohos_shared_library("audio_primary_impl_vendor") {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_audio:audio_idl_headers",
-      "hdf_core:libhdf_utils",
+      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
+      "hdf_core:libpub_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {

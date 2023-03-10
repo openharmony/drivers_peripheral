@@ -29,25 +29,16 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/framework/include",
-      "//drivers/hdf_core/framework/core/sec/include",
-      "//drivers/hdf_core/framework/core/shared/include",
-      "//drivers/hdf_core/framework/core/host/include",
-      "//drivers/hdf_core/framework/core/manager/include",
-      "//drivers/hdf_core/framework/core/common/include/host/",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
-      "//drivers/hdf_core/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/common/capture/include",
     ]
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    public_deps = [
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+    ]
     if (!drivers_peripheral_audio_rich_device) {
       defines = [ "FEATURE_SMALL_DEVICE" ]
     }
@@ -61,25 +52,16 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/framework/include",
-      "//drivers/hdf_core/framework/core/sec/include",
-      "//drivers/hdf_core/framework/core/shared/include",
-      "//drivers/hdf_core/framework/core/host/include",
-      "//drivers/hdf_core/framework/core/manager/include",
-      "//drivers/hdf_core/framework/core/common/include/host/",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
-      "//drivers/hdf_core/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/common/capture/include",
     ]
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    public_deps = [
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+    ]
     if (!drivers_peripheral_audio_rich_device) {
       defines = [ "FEATURE_SMALL_DEVICE" ]
     }
@@ -93,25 +75,16 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/framework/include",
-      "//drivers/hdf_core/framework/core/sec/include",
-      "//drivers/hdf_core/framework/core/shared/include",
-      "//drivers/hdf_core/framework/core/host/include",
-      "//drivers/hdf_core/framework/core/manager/include",
-      "//drivers/hdf_core/framework/core/common/include/host/",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
-      "//drivers/hdf_core/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/common/capture/include",
     ]
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    public_deps = [
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+    ]
     if (!drivers_peripheral_audio_rich_device) {
       defines = [ "FEATURE_SMALL_DEVICE" ]
     }
@@ -125,25 +98,16 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/framework/include",
-      "//drivers/hdf_core/framework/core/sec/include",
-      "//drivers/hdf_core/framework/core/shared/include",
-      "//drivers/hdf_core/framework/core/host/include",
-      "//drivers/hdf_core/framework/core/manager/include",
-      "//drivers/hdf_core/framework/core/common/include/host/",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
-      "//drivers/hdf_core/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/common/capture/include",
     ]
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    public_deps = [
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+    ]
     if (!drivers_peripheral_audio_rich_device) {
       defines = [ "FEATURE_SMALL_DEVICE" ]
     }
@@ -157,25 +121,16 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/framework/include",
-      "//drivers/hdf_core/framework/core/sec/include",
-      "//drivers/hdf_core/framework/core/shared/include",
-      "//drivers/hdf_core/framework/core/host/include",
-      "//drivers/hdf_core/framework/core/manager/include",
-      "//drivers/hdf_core/framework/core/common/include/host/",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
-      "//drivers/hdf_core/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/common/capture/include",
     ]
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    public_deps = [
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+    ]
     if (!drivers_peripheral_audio_rich_device) {
       defines = [ "FEATURE_SMALL_DEVICE" ]
     }
@@ -193,7 +148,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
@@ -204,6 +158,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
     if (enable_audio_adm_passthrough) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
@@ -232,7 +187,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
@@ -243,6 +197,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
     if (enable_audio_adm_passthrough) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
@@ -271,7 +226,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
@@ -282,6 +236,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
     if (enable_audio_adm_passthrough) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
@@ -310,7 +265,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
@@ -321,6 +275,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
     if (enable_audio_adm_passthrough) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
@@ -349,7 +304,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
       "//third_party/bounds_checking_function/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
@@ -360,6 +314,7 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest_main",
     ]
+    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
     if (enable_audio_adm_passthrough) {
       deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]

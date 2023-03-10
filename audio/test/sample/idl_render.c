@@ -26,7 +26,6 @@
 #include <unistd.h>
 #include "framework_common.h"
 #include "hdf_base.h"
-#include "hdf_remote_adapter_if.h"
 #include "inttypes.h"
 #include "osal_mem.h"
 #include "v1_0/audio_types.h"

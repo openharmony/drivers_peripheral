@@ -23,7 +23,7 @@
 #include "running_lock_impl.h"
 #include "securec.h"
 #include "unique_fd.h"
-#include "utils/hdf_log.h"
+#include "hdf_log.h"
 #include "v1_1/power_types.h"
 #include <atomic>
 #include <chrono>

@@ -16,7 +16,6 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 ohos_shared_library("libthermal_interface_service_1.0") {
   include_dirs = [
     "//developtools/hiperf/include",
-    "//drivers/hdf_core/adapter/uhdf2/shared/include",
     "//third_party/libxml2/include",
     "include",
   ]
@@ -74,6 +73,7 @@ ohos_shared_library("libthermal_driver") {
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",

@@ -26,6 +26,7 @@ ohos_shared_library("libusbhost_ecm") {
     "//drivers/peripheral/usb/interfaces/ddk/common",
     "//drivers/peripheral/usb/interfaces/ddk/host",
     "//drivers/peripheral/usb/gadget/function/include",
+    "//drivers/hdf_core/framework/model/usb/include",
     "include",
   ]
 
@@ -34,6 +35,7 @@ ohos_shared_library("libusbhost_ecm") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]

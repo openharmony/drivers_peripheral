@@ -32,7 +32,6 @@ ohos_shared_library("libusbfn_mtp_interface_service_1.0") {
     "c_utils:utils",
     "drivers_interface_usb:usbfn_mtp_idl_headers",
     "hdf_core:libhdf_host",
-    "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",

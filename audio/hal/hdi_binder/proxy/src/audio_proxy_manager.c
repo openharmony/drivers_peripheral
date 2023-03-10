@@ -18,6 +18,7 @@
 #include "audio_proxy_internal.h"
 #include "audio_proxy_manager.h"
 #include "audio_uhdf_log.h"
+#include "hdf_dlist.h"
 #include "osal_mem.h"
 #include "servmgr_hdi.h"
 

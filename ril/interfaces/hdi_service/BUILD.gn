@@ -30,6 +30,7 @@ ohos_shared_library("libril_service_1.0") {
       "c_utils:utils",
       "drivers_interface_power:libpower_proxy_1.1",
       "drivers_interface_ril:ril_idl_headers",
+      "hdf_core:libhdf_ipc_adapter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
     ]
@@ -62,7 +63,9 @@ ohos_shared_library("libril_driver") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",

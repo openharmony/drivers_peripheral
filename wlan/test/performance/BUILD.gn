@@ -25,29 +25,23 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/framework/include/platform",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/adapter/uhdf/posix/include",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include",
       "//drivers/peripheral/wlan/client/include",
       "//drivers/peripheral/wlan/hal/include",
       "//drivers/peripheral/wlan/interfaces/include",
-      "//drivers/hdf_core/framework/test/unittest/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     ]
 
     sources = [ "//drivers/peripheral/wlan/test/performance/common/hdf_wlan_performance_test.cpp" ]
-    deps = [
+    public_deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//drivers/peripheral/wlan/client:wifi_driver_client",
       "//drivers/peripheral/wlan/hal:wifi_hal",
+      "//third_party/bounds_checking_function:libsec_shared",
     ]
-    public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+
     cflags = [
       "-Wall",
       "-Wextra",
@@ -82,6 +76,7 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
       ]
     } else {
