@@ -54,6 +54,7 @@ public:
     ~AgnssCallBackDeathRecipient() = default;
     void OnRemoteDied(const wptr<IRemoteObject>& remote) override
     {
+        (void)remote;
         sptr<AGnssInterfaceImpl> impl = agnssInterfaceImpl_.promote();
         if (impl != nullptr) {
             impl->ResetAgnss();
