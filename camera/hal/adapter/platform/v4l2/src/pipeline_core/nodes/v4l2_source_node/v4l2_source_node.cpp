@@ -14,6 +14,7 @@
 #include "v4l2_source_node.h"
 #include "metadata_controller.h"
 #include <unistd.h>
+#include "v4l2_utils.h"
 
 namespace OHOS::Camera {
 V4L2SourceNode::V4L2SourceNode(const std::string& name, const std::string& type)
@@ -66,7 +67,8 @@ RetCode V4L2SourceNode::Start(const int32_t streamId)
     std::vector<std::shared_ptr<IPort>> outPorts = GetOutPorts();
     for (const auto& it : outPorts) {
         DeviceFormat format;
-        format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUV420;
+        format.fmtdesc.pixelformat = V4L2Utils::ConvertPixfmtHal2V4l2(
+            static_cast<OHOS::Camera::CameraBufferFormat>(it->format_.format_));
         format.fmtdesc.width = it->format_.w_;
         format.fmtdesc.height = it->format_.h_;
         int bufCnt = it->format_.bufferCount_;
