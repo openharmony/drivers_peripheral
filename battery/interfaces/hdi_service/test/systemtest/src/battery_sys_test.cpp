@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,7 +33,6 @@ using namespace OHOS::HDI::Battery::V1_2;
 using namespace std;
 
 namespace {
-constexpr const char *VENDOR_LED_CONFIG_PATH = "/vendor/etc/battery/battery_config.json";
 static auto &g_batteryconfig = BatteryConfig::GetInstance();
 } // namespace
 
@@ -46,7 +45,7 @@ namespace {
 
 HWTEST_F(BatterySysTest, BatterySysTest_01, TestSize.Level1)
 {
-    ASSERT_TRUE(g_batteryconfig.ParseConfig(VENDOR_LED_CONFIG_PATH));
+    ASSERT_TRUE(g_batteryconfig.ParseConfig());
 }
 
 /**

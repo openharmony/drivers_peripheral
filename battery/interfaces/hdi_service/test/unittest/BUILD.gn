@@ -52,6 +52,7 @@ ohos_unittest("test_hdisrv") {
 
   external_deps = [
     "c_utils:utils",
+    "config_policy:configpolicy_util",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
     "hdf_core:libhdf_utils",
