@@ -851,6 +851,27 @@ int32_t TransferSampleRate(const char *value, uint32_t *sampleRate)
     return ret;
 }
 
+#ifdef A2DP_HDI_SERVICE
+int32_t TransferA2dpSuspended(const char *value, uint32_t *result)
+{
+    if (value == NULL || result == NULL) {
+        return HDF_FAILURE;
+    }
+    char *endptr = NULL;
+    errno = 0;
+    unsigned long toSuspend = strtoul(value, &endptr, DECIMAL_SYSTEM);
+    if (errno == ERANGE) {
+        return HDF_FAILURE;
+    }
+    if (toSuspend != 0 && toSuspend != 1) {
+        HDF_LOGE("TransferA2dpSuspended, wrong value");
+        return HDF_FAILURE;
+    }
+    *result = toSuspend;
+    return HDF_SUCCESS;
+}
+#endif
+
 int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamValMap[], int32_t *count)
 {
     if (keyValueList == NULL || mParamValMap == NULL || count == NULL) {
@@ -859,9 +880,9 @@ int32_t KeyValueListToMap(const char *keyValueList, struct ParamValMap mParamVal
     int i = 0;
     char *mParaMap[MAP_MAX];
     char buffer[ERROR_REASON_DESC_LEN] = {0};
-    errno_t ret = sprintf_s(buffer, ERROR_REASON_DESC_LEN - 1, "%s", keyValueList);
+    errno_t ret = strcpy_s(buffer, ERROR_REASON_DESC_LEN, keyValueList);
     if (ret != EOK) {
-        HDF_LOGE("sprintf_s failed!");
+        HDF_LOGE("strcpy_s failed!");
         return HDF_FAILURE;
     }
     char *tempBuf = buffer;
@@ -932,6 +953,7 @@ int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExt
     if (key == NULL || value == NULL || mExtraParams == NULL) {
         return HDF_FAILURE;
     }
+    HDF_LOGI("SetExtParam, key is:%{public}s", key);
     int ret = HDF_FAILURE;
     if (strcmp(key, AUDIO_ATTR_PARAM_ROUTE) == 0) {
         int32_t route = 0;
@@ -969,7 +991,18 @@ int32_t SetExtParam(const char *key, const char *value, struct ExtraParams *mExt
             return HDF_FAILURE;
         }
         mExtraParams->sampleRate = sampleRate;
-    } else {
+    }
+#ifdef A2DP_HDI_SERVICE
+      else if (strcmp(key, A2DP_SUSPEND) == 0) {
+        uint32_t result = 0;
+        ret = TransferA2dpSuspended(value, &result);
+        if (ret < 0) {
+            return HDF_FAILURE;
+        }
+        mExtraParams->audioStreamCtl = result;
+    }
+#endif
+    else {
         HDF_LOGE("NO this key correspond value or value is invalid!");
         return HDF_FAILURE;
     }
