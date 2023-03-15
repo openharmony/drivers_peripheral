@@ -52,7 +52,7 @@ int32_t PartitionSlotManager::GetSlotSuffix(int32_t slot, std::string& suffix)
     if (slot == UPDATE_PARTITION_B) {
         suffix = "_b";
     } else {
-        suffix = "";
+        suffix = "_a";
     }
     HILOG_INFO(LOG_CORE, "suffix is %{public}s", suffix.c_str());
     return 0;
