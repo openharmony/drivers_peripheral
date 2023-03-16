@@ -116,7 +116,7 @@ HWTEST_F(OffileStreamOperatorImplTest, UTestRelease, TestSize.Level0)
 {
     CamRetCode rc;
     OHOS::sptr<IOfflineStreamOperator> offlineStreamOperator = new OfflineStreamOperator();
-
+    ASSERT_NE(offlineStreamOperator, nullptr);
     rc = (CamRetCode)offlineStreamOperator->Release();
     ASSERT_EQ(HDI::Camera::V1_0::NO_ERROR, rc);
 }

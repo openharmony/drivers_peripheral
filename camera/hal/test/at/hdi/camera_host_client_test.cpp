@@ -79,6 +79,7 @@ class StreamConsumer {
                 return nullptr;
             }
             sptr<IBufferConsumerListener> listener = new TestStreamConsumerListener();
+            CHECK_IF_PTR_NULL_RETURN_VALUE(listener, nullptr);
             consumer_->RegisterConsumerListener(listener);
 
             auto producer = consumer_->GetProducer();
