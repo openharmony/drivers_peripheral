@@ -48,6 +48,10 @@ std::shared_ptr<IBufferPool> BufferManager::GetBufferPool(uint64_t id)
 
     if (bufferPoolMap_[id].expired()) {
         std::shared_ptr<IBufferPool> bufferPool = std::make_shared<BufferPool>();
+        if (bufferPool == nullptr) {
+            CAMERA_LOGE("bufferPool is nullptr id: [%{public}llu]", id);
+            return nullptr;
+        }
         bufferPoolMap_[id] = bufferPool;
         bufferPool->SetId(id);
         return bufferPool;
