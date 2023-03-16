@@ -45,10 +45,6 @@ if (defined(ohos_lite)) {
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "//system/core/include/cutils",
 
-      # graphic
-      "//foundation/graphic/surface/interfaces/kits",
-      "//foundation/graphic/surface/interfaces/innerkits",
-
       # camera common includes
       "$camera_path/include",
       "$camera_path/../interfaces/include",
@@ -64,8 +60,6 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include",
       "//drivers/peripheral/base",
       "//drivers/peripheral/display/interfaces/include",
-      "//foundation/graphic/surface/interfaces/kits",
-      "//foundation/graphic/surface/interfaces/innerkits",
 
       # pipeline core includes
       "$camera_path/pipeline_core",
@@ -94,7 +88,10 @@ if (defined(ohos_lite)) {
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
-    external_deps = [ "drivers_interface_camera:metadata" ]
+    external_deps = [
+      "drivers_interface_camera:metadata",
+      "graphic_chipsetsdk:surface",
+    ]
   }
 } else {
   import("//build/test.gni")
