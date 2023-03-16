@@ -80,7 +80,9 @@
 #define USB_AUDIO_CLASS         1
 #define USB_AUDIO_SUBCLASS_CTRL 1
 #define AUDIO_DEVICE_ONLINE     1
-#define AUDIO_DEVICE_WAIT_ONLINE 10
+#define AUDIO_DEVICE_WAIT_ONLINE 20
+#define AUDIO_DEVICE_WAIT_TRY_TIME 10
+#define AUDIO_DEVICE_WAIT_USB_ONLINE 950
 
 struct UsbDevice {
     int8_t devName[USB_DEV_NAME_LEN_MAX];
@@ -165,6 +167,7 @@ static int32_t ReadAndScanUsbDev(const char *devPath)
     struct UsbDevice usbDevice;
     size_t len;
     errno_t error;
+    uint32_t tryTime = 0;
     char realpathRes[PATH_MAX + 1] = {'\0'};
 
     if (devPath == NULL) {
@@ -172,15 +175,20 @@ static int32_t ReadAndScanUsbDev(const char *devPath)
         return HDF_FAILURE;
     }
 
-    OsalMSleep(AUDIO_DEVICE_WAIT_ONLINE);
-    if (realpath(devPath, realpathRes) == NULL) {
-        AUDIO_FUNC_LOGE("audio realpath fail[%{public}d]", errno);
-        return HDF_FAILURE;
+    while (tryTime < AUDIO_DEVICE_WAIT_TRY_TIME) {
+        if (realpath(devPath, realpathRes) != NULL) {
+            break;
+        }
+
+        tryTime++;
+        AUDIO_FUNC_LOGW("audio try[%{public}d] realpath fail[%{public}d]", tryTime, errno);
+        OsalMSleep(AUDIO_DEVICE_WAIT_ONLINE);
+        continue;
     }
 
     fp = fopen(realpathRes, "r");
     if (fp == NULL) {
-        AUDIO_FUNC_LOGE("audio realpath open fail");
+        AUDIO_FUNC_LOGE("audio realpath open fail[%{public}d]", errno);
         return HDF_FAILURE;
     }
 
@@ -317,7 +325,7 @@ static bool CheckAudioUsbDevice(const char *devName)
         return false;
     }
 
-    AUDIO_FUNC_LOGE("usb device name[%{public}s]", devName);
+    AUDIO_FUNC_LOGI("usb device name[%{public}s]", devName);
     state = ReadAndScanUsbDev(subDir);
     if ((state == AUDIO_DEVICE_ONLINE) && AddAudioUsbDevice(devName)) {
         return true;
@@ -368,6 +376,7 @@ static int32_t ScanUsbBusSubDir(const char *subDir)
             break;
         }
 
+        AUDIO_FUNC_LOGD("audio sub dir[%{public}s]", devName);
         state = ReadAndScanUsbDev(devName);
         if (state == AUDIO_DEVICE_ONLINE) {
             char *subDevName = devName + strlen("/dev/");
@@ -451,7 +460,7 @@ static int32_t AudioUsbHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUevent
         audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
     } else if (strcmp(audioPnpUevent->action, UEVENT_ACTION_REMOVE) == 0) {
         if (!DeleteAudioUsbDevice(audioPnpUevent->devName)) {
-            AUDIO_FUNC_LOGW("check audio usb device not exist, not delete");
+            AUDIO_FUNC_LOGW("check audio usb device[%{public}s] not exist, not delete", audioPnpUevent->devName);
             return HDF_ERR_INVALID_PARAM;
         }
         audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
@@ -673,6 +682,7 @@ void DetectAudioDevice(struct HdfDeviceObject *device)
     struct AudioEvent audioEvent = {0};
     char pnpInfo[AUDIO_EVENT_INFO_LEN_MAX] = {0};
 
+    OsalMSleep(AUDIO_DEVICE_WAIT_USB_ONLINE); // Wait until the usb node is successfully created
     ret = DetectAnalogHeadsetState(&audioEvent);
     if ((ret == HDF_SUCCESS) && (audioEvent.eventType == HDF_AUDIO_DEVICE_ADD)) {
         AUDIO_FUNC_LOGI("audio detect analog headset");
