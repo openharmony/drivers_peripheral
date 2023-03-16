@@ -100,6 +100,7 @@ HWTEST_F(StreamOperatorImplTest, UTestCapture, TestSize.Level0)
     });
 #endif
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     streamInfo.bufferQueue_->producer_->SetQueueSize(8);
     streamInfo.tunneledMode_ = 5;
     streamInfos.push_back(streamInfo);
@@ -162,6 +163,7 @@ HWTEST_F(StreamOperatorImplTest, UTestCreateStreams, TestSize.Level0)
     });
 #endif
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     streamInfos.push_back(streamInfo);
 
     StreamInfo streamInfoSnapshot = {};
@@ -182,6 +184,7 @@ HWTEST_F(StreamOperatorImplTest, UTestCreateStreams, TestSize.Level0)
     });
 #endif
     streamInfoSnapshot.bufferQueue_ = new BufferProducerSequenceable(producer_);
+    ASSERT_NE(streamInfoSnapshot.bufferQueue_, nullptr);
     streamInfoSnapshot.tunneledMode_ = 5;
     streamInfos.push_back(streamInfoSnapshot);
 
@@ -213,6 +216,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
         SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
     });
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     streamInfo.tunneledMode_ = 5;
     streamInfos.push_back(streamInfo);
 
@@ -228,6 +232,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
         SaveYUV("preview", buffer->GetVirAddr(), buffer->GetSize());
     });
     streamInfoSnapshot.bufferQueue_ = new BufferProducerSequenceable(producer_);
+    ASSERT_NE(streamInfoSnapshot.bufferQueue_, nullptr);
     streamInfoSnapshot.tunneledMode_ = 5;
     streamInfos.push_back(streamInfoSnapshot);
 
@@ -271,6 +276,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
         SaveYUV("preview", addr, size);
     });
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     streamInfo.tunneledMode_ = 5;
     streamInfos.push_back(streamInfo);
 
@@ -286,6 +292,7 @@ HWTEST_F(StreamOperatorImplTest, UTestAttachBufferQueue, TestSize.Level0)
         SaveYUV("preview", addr, size);
     });
     streamInfoSnapshot.bufferQueue_ = new BufferProducerSequenceable(producer_);
+    ASSERT_NE(streamInfoSnapshot.bufferQueue_, nullptr);
     streamInfoSnapshot.tunneledMode_ = 5;
     streamInfos.push_back(streamInfoSnapshot);
 
@@ -329,6 +336,7 @@ HWTEST_F(StreamOperatorImplTest, UTestChangeToOfflineStream, TestSize.Level0)
         SaveYUV("preview", addr, size);
     });
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     streamInfo.bufferQueue_->producer_->SetQueueSize(8);
     streamInfo.tunneledMode_ = 5;
     streamInfos.push_back(streamInfo);

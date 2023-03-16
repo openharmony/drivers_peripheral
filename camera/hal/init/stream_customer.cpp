@@ -85,7 +85,7 @@ sptr<OHOS::IBufferProducer> StreamCustomer::CreateProducer()
     if (consumer_ == nullptr) {
         return nullptr;
     }
-    sptr<IBufferConsumerListener> listener = new TestBuffersConsumerListener();
+    sptr<IBufferConsumerListener> listener = new(std::nothrow) TestBuffersConsumerListener();
     consumer_->RegisterConsumerListener(listener);
 
     auto producer = consumer_->GetProducer();

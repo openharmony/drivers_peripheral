@@ -47,6 +47,10 @@ void StreamCBOnCaptureEnded(int captureId, CaptureEndedInfoCIF* info, int count)
     std::vector<std::shared_ptr<OHOS::Camera::CaptureEndedInfo>> ends;
     for (int i = 0; i < count; i++) {
         std::shared_ptr<OHOS::Camera::CaptureEndedInfo> it = std::make_shared<OHOS::Camera::CaptureEndedInfo>();
+        if (it == nullptr) {
+            CAMERA_LOGE("it is nullptr captureId: %{public}d streamId: %{public}d", captureId, info[i].streamId);
+            continue;
+        }
         it->streamId_ = info[i].streamId;
         it->frameCount_ = info[i].frameCount;
         ends.push_back(it);
@@ -66,6 +70,10 @@ void StreamCBOnCaptureError(int captureId, CaptureErrorInfoCIF* info, int count)
     std::vector<std::shared_ptr<OHOS::Camera::CaptureErrorInfo>> errors = {};
     for (int i = 0; i < count; i++) {
         std::shared_ptr<OHOS::Camera::CaptureErrorInfo> it = std::make_shared<OHOS::Camera::CaptureErrorInfo>();
+        if (it == nullptr) {
+            CAMERA_LOGE("it is nullptr captureId: %{public}d streamId: %{public}d", captureId, info[i].streamId);
+            continue;
+        }
         it->streamId_ = info[i].streamId;
         it->error_ = static_cast<OHOS::Camera::StreamError>(info[i].error);
         errors.push_back(it);

@@ -63,6 +63,7 @@ void OhosCameraDemo::SetStreamInfo(StreamInfo& streamInfo,
 
     producer = streamCustomer->CreateProducer();
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    CHECK_IF_PTR_NULL_RETURN_VOID(streamInfo.bufferQueue_);
     streamInfo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
 }
 
