@@ -492,6 +492,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoPre.intent_ = intent;
             streamInfoPre.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoPre.bufferQueue_ = new BufferProducerSequenceable(streamCustomerPreview_->CreateProducer());
+            ASSERT_NE(streamInfoPre.bufferQueue_, nullptr);
             streamInfoPre.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
             CAMERA_LOGD("preview success.");
             std::vector<StreamInfo>().swap(streamInfos);
@@ -509,6 +510,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoVideo.encodeType_ = ENCODE_TYPE_H264;
             streamInfoVideo.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoVideo.bufferQueue_ = new BufferProducerSequenceable(streamCustomerVideo_->CreateProducer());
+            ASSERT_NE(streamInfoVideo.bufferQueue_, nullptr);
             streamInfoVideo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
             CAMERA_LOGD("video success.");
             std::vector<StreamInfo>().swap(streamInfos);
@@ -526,6 +528,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoCapture.encodeType_ = ENCODE_TYPE_JPEG;
             streamInfoCapture.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoCapture.bufferQueue_ = new BufferProducerSequenceable(streamCustomerCapture_->CreateProducer());
+            ASSERT_NE(streamInfoCapture.bufferQueue_, nullptr);
             streamInfoCapture.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
             CAMERA_LOGD("capture success.");
             std::vector<StreamInfo>().swap(streamInfos);
@@ -542,6 +545,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoAnalyze.intent_ = intent;
             streamInfoAnalyze.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoAnalyze.bufferQueue_ = new BufferProducerSequenceable(streamCustomerAnalyze_->CreateProducer());
+            ASSERT_NE(streamInfoAnalyze.bufferQueue_, nullptr);
             streamInfoAnalyze.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
             CAMERA_LOGD("analyze success.");
             std::vector<StreamInfo>().swap(streamInfos);

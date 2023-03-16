@@ -132,6 +132,10 @@ int32_t CameraDeviceImpl::UpdateSettings(const std::vector<uint8_t>& settings)
 int32_t CameraDeviceImpl::GetSettings(std::vector<uint8_t> &settings)
 {
     std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    if (meta == nullptr) {
+        CAMERA_LOGE("meta is nullptr.");
+        return DEVICE_ERROR;
+    }
     MetadataController &metaDataController = MetadataController::GetInstance();
     metaDataController.GetSettingsConfig(meta);
     MetadataUtils::ConvertMetadataToVec(meta, settings);

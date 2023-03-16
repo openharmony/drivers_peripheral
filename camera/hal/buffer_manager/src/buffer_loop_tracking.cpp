@@ -290,6 +290,10 @@ void BufferLoopTracking::AddTrackingStreamBegin(const int32_t trackingId, const 
     {
         std::lock_guard<std::mutex> l(lock_);
         stream = std::make_shared<TrackingStream>(trackingId);
+        if (stream == nullptr) {
+            CAMERA_LOGE("stream is nullptr");
+            return;
+        }
         trackingStreamList_.emplace_back(stream);
         CAMERA_LOGD("add tracking stream %{public}d begin", trackingId);
     }
@@ -346,6 +350,10 @@ void BufferLoopTracking::AddTrackingNode(const int32_t trackingId, const std::st
         return;
     }
     auto n = std::make_shared<TrackingNode>(node);
+    if (n == nullptr) {
+        CAMERA_LOGE("n is nullptr");
+        return;
+    }
     return stream->AttachTrackingNode(n);
 }
 

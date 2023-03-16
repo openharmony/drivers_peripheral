@@ -59,6 +59,7 @@ void CameraVideoTest::SetStreamInfo(StreamInfo &streamInfo, const std::shared_pt
     streamInfo.tunneledMode_ = TUNNEL_MODE;
     producer = streamCustomer->CreateProducer();
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     streamInfo.bufferQueue_->producer_->SetQueueSize(BUFFER_QUEUE_SIZE);
 }
 
@@ -544,6 +545,7 @@ HWTEST_F(CameraVideoTest, camera_video_030, TestSize.Level2)
     display_->streamInfo.intent_ = VIDEO;
     display_->streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(display_->streamInfo.bufferQueue_, nullptr);
     streamInfos.push_back(display_->streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(false, display_->rc == OHOS::Camera::METHOD_NOT_SUPPORTED);
