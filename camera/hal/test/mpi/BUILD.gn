@@ -71,8 +71,6 @@ if (defined(ohos_lite)) {
       "$camera_path/utils/event",
       "//drivers/peripheral/base",
       "//drivers/peripheral/display/interfaces/include",
-      "//foundation/graphic/surface/interfaces/kits",
-      "//foundation/graphic/surface/interfaces/innerkits",
       "//base/startup/init/interfaces/innerkits/include/syspara",
 
       #producer
@@ -104,7 +102,10 @@ if (defined(ohos_lite)) {
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
-    external_deps = [ "drivers_interface_camera:metadata" ]
+    external_deps = [
+      "drivers_interface_camera:metadata",
+      "graphic_chipsetsdk:surface",
+    ]
   }
 } else {
   import("//build/ohos.gni")
