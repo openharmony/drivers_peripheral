@@ -45,6 +45,8 @@ ohos_shared_library("libwlan_service_extend") {
     external_deps = [
       "c_utils:utils",
       "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {

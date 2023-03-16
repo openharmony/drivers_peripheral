@@ -16,7 +16,7 @@
 #include "wifi_hal_util.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
-#include "osal.h"
+#include "osal_mutex.h"
 #include "wifi_driver_client.h"
 
 #ifdef __cplusplus

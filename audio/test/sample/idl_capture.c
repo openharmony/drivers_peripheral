@@ -27,7 +27,6 @@
 #include "framework_common.h"
 #include "hdf_base.h"
 #include "hdf_io_service_if.h"
-#include "hdf_remote_adapter_if.h"
 #include "hdf_service_status.h"
 #include "inttypes.h"
 #include "ioservstat_listener.h"

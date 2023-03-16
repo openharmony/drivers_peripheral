@@ -43,10 +43,6 @@ if (defined(ohos_lite)) {
       # common includes
       "//commonlibrary/utils_lite/include",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "//system/core/include/cutils",
 
       # graphic
@@ -66,8 +62,6 @@ if (defined(ohos_lite)) {
       "$camera_path/buffer_manager/include",
       "$camera_path/buffer_manager/src/buffer_adapter/lite",
       "//third_party/googletest/googletest/include",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "//drivers/peripheral/base",
       "//drivers/peripheral/display/interfaces/include",
       "//foundation/graphic/surface/interfaces/kits",
@@ -93,10 +87,12 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/strategy/config",
       "$camera_path/pipeline_core/ipp/include",
     ]
-    deps = [
+    public_deps = [
       "$camera_path/buffer_manager:camera_buffer_manager",
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
     external_deps = [ "drivers_interface_camera:metadata" ]
   }

@@ -91,22 +91,18 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/strategy",
       "$camera_path/pipeline_core/ipp/include",
 
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "//system/core/include/cutils",
-      "$hdf_uhdf_path/manager/include",
-      "$hdf_uhdf_path/include/hdi",
     ]
 
-    deps = [
+    public_deps = [
       "$camera_path/buffer_manager:camera_buffer_manager",
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_host_service_1.0",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "$hdf_uhdf_path/utils:libhdf_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//base/startup/init/interfaces/innerkits:libbegetutil",
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
     external_deps = [ "drivers_interface_camera:metadata" ]
   }
@@ -206,6 +202,7 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
         "hiviewdfx_hilog_native:libhilog",

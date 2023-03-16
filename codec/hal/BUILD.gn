@@ -153,8 +153,8 @@ ohos_shared_library("libcodec_hdi_omx_client") {
       "c_utils:utils",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_ipc_adapter",
-      "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
+      "hdf_core:libpub_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
@@ -177,6 +177,7 @@ ohos_shared_library("libcodec_hdi_omx_callback_type_service_impl") {
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
