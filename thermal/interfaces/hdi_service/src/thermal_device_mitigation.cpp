@@ -23,7 +23,7 @@
 
 #include "hdf_base.h"
 #include "securec.h"
-#include "utils/hdf_log.h"
+#include "hdf_log.h"
 #include "thermal_log.h"
 
 #define HDF_LOG_TAG ThermalDeviceMitigation

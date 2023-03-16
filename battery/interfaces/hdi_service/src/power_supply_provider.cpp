@@ -21,9 +21,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "osal/osal_mem.h"
 #include "battery_log.h"
 #include "battery_config.h"
+#include "osal_mem.h"
 
 namespace OHOS {
 namespace HDI {

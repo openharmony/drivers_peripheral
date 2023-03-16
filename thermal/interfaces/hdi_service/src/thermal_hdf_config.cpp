@@ -18,7 +18,7 @@
 #include "thermal_hdf_utils.h"
 #include "thermal_log.h"
 #include "hdf_remote_service.h"
-#include "osal/osal_mem.h"
+#include "osal_mem.h"
 
 namespace OHOS {
 namespace HDI {

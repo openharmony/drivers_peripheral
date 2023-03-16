@@ -37,21 +37,18 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/utils/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
-      "//drivers/hdf_core/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/lib_common/include",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//drivers/peripheral/audio/test/systemtest/supportlibs/common/render/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
 
-    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    public_deps = [
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "//third_party/bounds_checking_function:libsec_shared",
+    ]
   }
 } else {
   module_output_path = "drivers_peripheral_audio/audio"

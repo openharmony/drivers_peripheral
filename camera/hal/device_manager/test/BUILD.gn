@@ -42,22 +42,19 @@ if (defined(ohos_lite)) {
       "$camera_path/include",
       "$camera_path/device_manager/test/unittest/mpi",
       "$camera_path/utils/event",
-      "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "$board_camera_path/device_manager/include",
       "$camera_path/adapter/platform/mpp/src/device_manager/include",
-      "//drivers/hdf_core/framework/include/config",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/include/utils",
     ]
 
     hispark_taurus_lib_path = "//device/soc/hisilicon/common/hal/media/camera/hi3516dv300/liteos_a/libs/"
     outdir = rebase_path("$hispark_taurus_lib_path")
     ldflags = [ "-L$outdir" ]
     ldflags += [ "-ldriver_adapter" ]
-    deps = [
+    public_deps = [
       "$camera_path/device_manager:camera_device_manager",
-      "$hdf_uhdf_path/utils:libhdf_utils",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
     external_deps = [ "drivers_interface_camera:metadata" ]
   }

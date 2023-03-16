@@ -15,7 +15,6 @@
 
 #include "hdf_audio_events.h"
 #include "hdf_io_service_if.h"
-#include "hdf_remote_adapter_if.h"
 #include "hdf_service_status.h"
 #include "ioservstat_listener.h"
 #include "servstat_listener_hdi.h"

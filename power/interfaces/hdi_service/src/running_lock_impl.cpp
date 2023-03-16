@@ -16,7 +16,7 @@
 #include "running_lock_impl.h"
 
 #include "hdf_base.h"
-#include "utils/hdf_log.h"
+#include "hdf_log.h"
 
 namespace OHOS {
 namespace HDI {

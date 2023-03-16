@@ -21,14 +21,16 @@ ohos_executable("liteos_host_speed_test") {
     "include",
     "$ohos_current_sysroot/usr/include/arm-liteos/netinet",
   ]
-  deps = [
-    "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-    "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-  ]
+  deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
 
-  public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
-  external_deps = [ "hdf_core:libhdf_utils" ]
+  public_deps = [
+    "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+    "//third_party/bounds_checking_function:libsec_shared",
+  ]
+  external_deps = [
+    "hdf_core:hdf_posix_osal",
+    "hdf_core:libhdf_utils",
+  ]
   defines = [ "__USER__" ]
 
   cflags = [
