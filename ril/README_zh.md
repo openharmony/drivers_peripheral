@@ -64,16 +64,16 @@ Ril驱动提供给framework层可直接调用的能力接口，主要功能有�
 #include "v1_0/iril.h"
 
 /* Ril回调类 */
-class RilCallback : public HDI::Ril::V1_0::IRilCallback {
-    int32_t DialResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
-    int32_t HangupResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
-    int32_t RejectResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
-    int32_t AnswerResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
+class RilCallback : public HDI::Ril::V1_1::IRilCallback {
+    int32_t DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t HangupResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t RejectResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t AnswerResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     ...
 }
 
 /* 回调函数 */
-int32_t RilCallback::DialResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
+int32_t RilCallback::DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     printf("DialResponse");
     return 0;
@@ -82,18 +82,18 @@ int32_t RilCallback::DialResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &re
 void RilSample(void)
 {
     /* 创建Ril接口实例 */
-    sptr<OHOS::HDI::Ril::V1_0::IRil> g_rilInterface = OHOS::HDI::Ril::V1_0::IRil::Get();
+    sptr<OHOS::HDI::Ril::V1_1::IRil> g_rilInterface = OHOS::HDI::Ril::V1_1::IRil::Get();
     if (g_rilInterface == nullptr) {
         return;
     }
     /* 设置回调*/
-    sptr<HDI::Ril::V1_0::IRilCallback> g_cbObj = new RilCallback();
+    sptr<HDI::Ril::V1_1::IRilCallback> g_cbObj = new RilCallback();
     g_rilInterface->SetCallback(RilCallback());
 
     /**拨打电话**/
     int32_t slotId = 0;
     int32_t serialId = 1;
-    HDI::Ril::V1_0::DialInfo dialInfo = {};
+    HDI::Ril::V1_1::DialInfo dialInfo = {};
     dialInfo.address = "10086";
     dialInfo.clir = 0;
     int32_t ret = g_rilInterface->Dial(slotId, serialId, dialInfo);
