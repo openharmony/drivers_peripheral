@@ -42,7 +42,11 @@ static struct AudioManagerPriv *GetAudioManagerPriv(void)
 
 static int32_t AudioManagerGetVersion(struct IAudioManager *manager, uint32_t *majorVer, uint32_t *minorVer)
 {
-    (void)manager;
+    if (manager == NULL || majorVer == NULL || minorVer == NULL) {
+        HDF_LOGE("%{public}s:para is null", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
     *majorVer = IAUDIO_MANAGER_MAJOR_VERSION;
     *minorVer = IAUDIO_MANAGER_MINOR_VERSION;
     return HDF_SUCCESS;
