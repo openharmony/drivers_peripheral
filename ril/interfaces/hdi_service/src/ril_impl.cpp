@@ -672,7 +672,7 @@ int32_t RilImpl::Init()
     }
     return HDF_SUCCESS;
 }
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS

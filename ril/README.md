@@ -52,7 +52,7 @@ The Ril driver provides capability APIs that can be directly called by the frame
 | int32_t ActivatePdpContext(int32_t slotId, int32_t serialId, const DataCallInfo &dataCallInfo) | Activates the PDP context. **slotId** indicates the card slot ID, and **dataCallInfo** indicates the data service information.|
 | int32_t SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst) | Sets the radio state. **slotId** indicates the card slot ID, **serialId** indicates the serial ID of the request, **fun** indicates the function mode, and **rst** indicates whether to perform a reset.|
 
-For details about the APIs, access [drivers_interface_ril](https://gitee.com/openharmony/drivers_interface/blob/master/ril/v1_0/IRil.idl).
+For details about the APIs, access [drivers_interface_ril](https://gitee.com/openharmony/drivers_interface/blob/master/ril/V1_1/IRil.idl).
 
 ### How to Use
 
@@ -61,7 +61,7 @@ This section uses the call service implementation as an example.
 Sample code:
 
 ```c++
-#include "v1_0/iril.h"
+#include "V1_1/iril.h"
 
 /* Ril callback class */
 class RilCallback : public HDI::Ril::V1_1::IRilCallback {

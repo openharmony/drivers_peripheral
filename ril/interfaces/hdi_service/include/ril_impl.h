@@ -193,7 +193,7 @@ private:
     int32_t AddRilDeathRecipient(const sptr<IRilCallback> &callback);
     int32_t RemoveRilDeathRecipient(const sptr<IRilCallback> &callback);
 };
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS
