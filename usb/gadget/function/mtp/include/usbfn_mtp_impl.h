@@ -17,6 +17,7 @@
 #define OHOS_HDI_USB_GADGET_MTP_V1_0_USBFNMTPIMPL_H
 
 #include <mutex>
+#include <semaphore.h>
 
 #include "data_fifo.h"
 #include "hdf_base.h"
@@ -126,11 +127,10 @@ struct UsbMtpDevice {
     struct UsbFnRequest *notifyReq;
     struct UsbMtpPort *mtpPort;
     const char *udcName;
-    int64_t asyncRecvFileActual;
-    int64_t asyncRecvFileExpect;
-    int64_t asyncRecvFileTruncate; /* total file length: offset + length */
-    int64_t asyncSendFileActual;   /* already send actual */
-    int64_t asyncSendFileExpect;   /* already send expect */
+    uint64_t asyncRecvFileActual;
+    uint64_t asyncRecvFileExpect;
+    uint64_t asyncSendFileActual;   /* already send actual */
+    uint64_t asyncSendFileExpect;   /* already send expect */
     uint8_t asyncXferFile;
     uint8_t needZLP;
     uint32_t asyncRecvWriteTempCount;
@@ -141,8 +141,8 @@ struct UsbMtpDevice {
     uint16_t xferCommand;       /* refer to struct UsbMtpFileRange.command */
     uint32_t xferTransactionId; /* refer to struct UsbMtpFileRange.transactionId */
     int32_t xferFd;
-    int64_t xferFileOffset;
-    int64_t xferFileLength;
+    uint64_t xferFileOffset;
+    uint64_t xferFileLength;
 };
 
 struct CtrlInfo {
@@ -232,16 +232,14 @@ private:
     void UsbMtpDeviceFreeNotifyRequest();
 
     int32_t WriteEx(const std::vector<uint8_t> &data, uint8_t sendZLP, uint32_t &xferActual);
-    int32_t UsbMtpPortSendFileFillFirstReq(struct UsbFnRequest *req, int64_t &oneReqLeft);
+    int32_t UsbMtpPortSendFileFillFirstReq(struct UsbFnRequest *req, uint64_t &oneReqLeft);
     int32_t UsbMtpPortSendFileEx();
-    int32_t UsbMtpPortSendFileLeftAsync(int64_t oneReqLeft);
+    int32_t UsbMtpPortSendFileLeftAsync(uint64_t oneReqLeft);
     int32_t ReceiveFileEx();
 
     uint32_t BufCopyToVector(void *buf, uint32_t bufSize, std::vector<uint8_t> &vectorData);
     uint32_t BufCopyFromVector(
         void *buf, uint32_t bufSize, const std::vector<uint8_t> &vectorData, uint32_t vectorOffset);
-    uint32_t BufCopyToFile(void *buf, uint32_t bufSize, int32_t fd);
-    uint32_t BufCopyFromFile(void *buf, uint32_t bufSize, int32_t fd);
 
     static struct UsbMtpDevice *mtpDev_;
     static struct UsbMtpPort *mtpPort_;
