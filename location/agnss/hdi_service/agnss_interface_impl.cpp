@@ -266,7 +266,7 @@ void AGnssInterfaceImpl::ResetAgnssDeathRecipient()
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     for (const auto& iter : g_agnssCallBackMap) {
-        auto& callback = iter.second;
+        const auto& callback = iter.second;
         if (callback != nullptr) {
             RemoveAgnssDeathRecipient(callback);
         }

@@ -318,7 +318,7 @@ void GnssInterfaceImpl::ResetGnssDeathRecipient()
 {
     std::lock_guard<std::mutex> lock(g_mutex);
     for (const auto& iter : g_locationCallBackMap) {
-        auto& callback = iter.second;
+        const auto& callback = iter.second;
         if (callback != nullptr) {
             RemoveGnssDeathRecipient(callback);
         }
