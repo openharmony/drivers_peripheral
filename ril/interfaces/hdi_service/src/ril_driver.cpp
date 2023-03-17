@@ -18,10 +18,10 @@
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_sbuf_ipc.h"
-#include "v1_0/ril_stub.h"
+#include "v1_1/ril_stub.h"
 #include "hril_hdf.h"
 
-using namespace OHOS::HDI::Ril::V1_0;
+using namespace OHOS::HDI::Ril::V1_1;
 using namespace OHOS::HDI::Ril;
 
 struct HdfRilHost {

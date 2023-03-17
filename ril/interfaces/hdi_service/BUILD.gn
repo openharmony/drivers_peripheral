@@ -56,7 +56,7 @@ ohos_shared_library("libril_driver") {
 
   deps = [
     "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
-    "//drivers/interface/ril/v1_0:libril_stub_1.0",
+    "//drivers/interface/ril/v1_1:libril_stub_1.1",
   ]
 
   if (is_standard_system) {
