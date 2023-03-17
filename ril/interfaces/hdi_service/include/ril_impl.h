@@ -28,7 +28,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_0 {
+namespace V1_1 {
 class RilImpl : public IRil {
 public:
     RilImpl() = default;

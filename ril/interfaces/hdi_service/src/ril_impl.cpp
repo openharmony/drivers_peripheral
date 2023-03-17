@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_0 {
+namespace V1_1 {
 static std::mutex mutex_;
 static sptr<IRilCallback> callback_;
 namespace {
