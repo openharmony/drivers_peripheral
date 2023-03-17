@@ -26,7 +26,6 @@ ohos_unittest("codec_hdi_omx_test") {
     "codec_hdi_manger_test.cpp",
     "codec_hdi_omx_test.cpp",
   ]
-  deps = [ "//third_party/googletest:gtest_main" ]
 
   if (is_standard_system) {
     external_deps = [
