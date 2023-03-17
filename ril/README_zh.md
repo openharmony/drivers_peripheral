@@ -52,7 +52,7 @@ Ril驱动提供给framework层可直接调用的能力接口，主要功能有�
 | int32_t ActivatePdpContext(int32_t slotId, int32_t serialId, const DataCallInfo &dataCallInfo) | 查询运营商名称信息，slotId 表示卡槽ID，dataCallInfo 表示数据业务信息。 |
 | int32_t SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst) | 给Modem上下电，slotId 表示卡槽ID，serialId 表示请求的序列化ID，fun 表示功能模式，rst 表示是否复位。 |
 
-完整的接口说明请参考：[ drivers_interface_ril](https://gitee.com/openharmony/drivers_interface/blob/master/ril/v1_0/IRil.idl)。
+完整的接口说明请参考：[ drivers_interface_ril](https://gitee.com/openharmony/drivers_interface/blob/master/ril/V1_1/IRil.idl)。
 
 ### 使用说明
 
@@ -61,7 +61,7 @@ Ril驱动提供给framework层可直接调用的能力接口，主要功能有�
 代码示例
 
 ```c++
-#include "v1_0/iril.h"
+#include "V1_1/iril.h"
 
 /* Ril回调类 */
 class RilCallback : public HDI::Ril::V1_1::IRilCallback {
