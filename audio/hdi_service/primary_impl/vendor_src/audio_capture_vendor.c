@@ -41,7 +41,7 @@ static struct AudioHwiCapturePriv *AudioHwiCaptureGetPriv(void)
     return &g_audioHwiCapturePriv;
 }
 
-struct AudioHwiCapture *AudioHwiGetHwiCapture(struct IAudioCapture *capture)
+struct AudioHwiCapture *AudioHwiGetHwiCapture(const struct IAudioCapture *capture)
 {
     if (capture == NULL) {
         AUDIO_FUNC_LOGE("audio HwiCapture get HwiCapture fail, capture null");

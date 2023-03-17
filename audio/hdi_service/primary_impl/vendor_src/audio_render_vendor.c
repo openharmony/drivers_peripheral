@@ -43,7 +43,7 @@ static struct AudioHwiRenderPriv *AudioHwiRenderGetPriv(void)
     return &g_audioHwiRenderPriv;
 }
 
-struct AudioHwiRender *AudioHwiGetHwiRender(struct IAudioRender *render)
+struct AudioHwiRender *AudioHwiGetHwiRender(const struct IAudioRender *render)
 {
     if (render == NULL) {
         AUDIO_FUNC_LOGE("audio render desc null");
