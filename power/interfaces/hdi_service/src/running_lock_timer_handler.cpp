@@ -43,18 +43,18 @@ bool RunningLockTimerHandler::RegisterRunningLockTimer(const RunningLockInfo &in
     uint32_t timeoutMs = info.timeoutMs;
     uint32_t lastTimerId = GetRunningLockTimerId(runninglockType, runninglockName);
     if (lastTimerId != OHOS::Utils::TIMER_ERR_DEAL_FAILED) {
-        HDF_LOGI("Running lock timer is exist, unregister old timerId = %{public}d, register new timer", lastTimerId);
+        HDF_LOGI("Running lock timer is exist, unregister old timerId=%{public}d, register new timer", lastTimerId);
         UnregisterTimer(lastTimerId);
     }
     uint32_t curTimerId = handlerTimer_->Register(callback, timeoutMs, once);
     if (curTimerId == OHOS::Utils::TIMER_ERR_DEAL_FAILED) {
         HDF_LOGW("Register running lock timer failed");
         if (lastTimerId != OHOS::Utils::TIMER_ERR_DEAL_FAILED) {
-            UpdateRunninglockTimerMap(runninglockType, runninglockName, lastTimerId, true);
+            RemoveRunningLockTimerMap(runninglockType, runninglockName);
         }
         return false;
     }
-    UpdateRunninglockTimerMap(runninglockType, runninglockName, curTimerId, false);
+    AddRunningLockTimerMap(runninglockType, runninglockName, curTimerId);
     return true;
 }
 
@@ -64,22 +64,11 @@ bool RunningLockTimerHandler::UnregisterRunningLockTimer(const RunningLockInfo &
     std::string runninglockName = info.name;
     uint32_t timerId = GetRunningLockTimerId(runninglockType, runninglockName);
     if (timerId != OHOS::Utils::TIMER_ERR_DEAL_FAILED) {
-        HDF_LOGI("Running lock timer is exist, unregister timerId = %{public}d", timerId);
+        HDF_LOGI("Running lock timer is exist, unregister timerId=%{public}d", timerId);
         UnregisterTimer(timerId);
-        UpdateRunninglockTimerMap(runninglockType, runninglockName, timerId, true);
+        RemoveRunningLockTimerMap(runninglockType, runninglockName);
     }
     return true;
-}
-
-uint32_t RunningLockTimerHandler::GetRunningLockTimerCount()
-{
-    uint32_t lockCount = 0;
-    for (auto typeIter : runninglockTimerMap_) {
-        for (auto nameIter : typeIter.second) {
-            lockCount++;
-        }
-    }
-    return lockCount;
 }
 
 uint32_t RunningLockTimerHandler::GetRunningLockTimerId(RunningLockType type, std::string name)
@@ -95,22 +84,8 @@ uint32_t RunningLockTimerHandler::GetRunningLockTimerId(RunningLockType type, st
     return timerId;
 }
 
-void RunningLockTimerHandler::UpdateRunninglockTimerMap(RunningLockType type, std::string name,
-    uint32_t timerId, bool remove)
+void RunningLockTimerHandler::AddRunningLockTimerMap(RunningLockType type, std::string name, uint32_t timerId)
 {
-    if (remove) {
-        auto typeIter = runninglockTimerMap_.find(type);
-        if (typeIter != runninglockTimerMap_.end()) {
-            auto nameIter = typeIter->second.find(name);
-            if(nameIter != typeIter->second.end()) {
-                typeIter->second.erase(name);
-                if (typeIter->second.size() == 0) {
-                    runninglockTimerMap_.erase(type);
-                }
-            }
-        }
-        return;
-    }
     auto typeIter = runninglockTimerMap_.find(type);
     if (typeIter == runninglockTimerMap_.end()) {
         std::map<std::string, uint32_t> timerIdMap;
@@ -123,8 +98,20 @@ void RunningLockTimerHandler::UpdateRunninglockTimerMap(RunningLockType type, st
         typeIter->second.emplace(name, timerId);
         return;
     }
-    if (nameIter->second != timerId) {
-        nameIter->second = timerId;
+    nameIter->second = timerId;
+}
+
+void RunningLockTimerHandler::RemoveRunningLockTimerMap(RunningLockType type, std::string name)
+{
+    auto typeIter = runninglockTimerMap_.find(type);
+    if (typeIter != runninglockTimerMap_.end()) {
+        auto nameIter = typeIter->second.find(name);
+        if(nameIter != typeIter->second.end()) {
+            typeIter->second.erase(name);
+            if (typeIter->second.size() == 0) {
+                runninglockTimerMap_.erase(type);
+            }
+        }
     }
 }
 

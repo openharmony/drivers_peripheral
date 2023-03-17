@@ -19,6 +19,7 @@ ohos_shared_library("libpower_interface_service_1.1") {
     "src/running_lock_counter.cpp",
     "src/running_lock_impl.cpp",
     "src/running_lock_timer_handler.cpp",
+    "src/system_operation.cpp",
   ]
 
   deps = [ "//third_party/libxml2:xml2" ]
