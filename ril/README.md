@@ -64,16 +64,16 @@ Sample code:
 #include "v1_0/iril.h"
 
 /* Ril callback class */
-class RilCallback : public HDI::Ril::V1_0::IRilCallback {
-    int32_t DialResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
-    int32_t HangupResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
-    int32_t RejectResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
-    int32_t AnswerResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
+class RilCallback : public HDI::Ril::V1_1::IRilCallback {
+    int32_t DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t HangupResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t RejectResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+    int32_t AnswerResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
     ...
 }
 
 /* Callback */
-int32_t RilCallback::DialResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
+int32_t RilCallback::DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
 {
     printf("DialResponse");
     return 0;
@@ -82,18 +82,18 @@ int32_t RilCallback::DialResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &re
 void RilSample(void)
 {
     /* Create a Ril interface instance. */
-    sptr<OHOS::HDI::Ril::V1_0::IRil> g_rilInterface = OHOS::HDI::Ril::V1_0::IRil::Get();
+    sptr<OHOS::HDI::Ril::V1_1::IRil> g_rilInterface = OHOS::HDI::Ril::V1_1::IRil::Get();
     if (g_rilInterface == nullptr) {
         return;
     }
     /* Set a callback. */
-    sptr<HDI::Ril::V1_0::IRilCallback> g_cbObj = new RilCallback();
+    sptr<HDI::Ril::V1_1::IRilCallback> g_cbObj = new RilCallback();
     g_rilInterface->SetCallback(RilCallback());
 
     /** Make a call. **/
     int32_t slotId = 0;
     int32_t serialId = 1;
-    HDI::Ril::V1_0::DialInfo dialInfo = {};
+    HDI::Ril::V1_1::DialInfo dialInfo = {};
     dialInfo.address = "10086";
     dialInfo.clir = 0;
     int32_t ret = g_rilInterface->Dial(slotId, serialId, dialInfo);
