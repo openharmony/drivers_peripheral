@@ -71,7 +71,7 @@ void EffectControlTest::TearDown()
         effectId_ = nullptr;
     }
 
-    if (controller_ != nullptr) {
+    if (controller_ != nullptr && model_ != nullptr) {
         int32_t ret = model_->DestroyEffectController(model_, &contollerId_);
         ASSERT_EQ(ret, HDF_SUCCESS);
     }
