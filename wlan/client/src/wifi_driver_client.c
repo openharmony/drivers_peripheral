@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,8 +41,7 @@ void WifiEventReport(const char *ifName, uint32_t event, void *data)
     for (i = 0; i < MAX_CALL_BACK_COUNT; i++) {
         if (g_callbackEventMap[i] != NULL && (strcmp(g_callbackEventMap[i]->ifName, ifName) == 0) &&
             (((1 << event) & g_callbackEventMap[i]->eventType) != 0)) {
-            HDF_LOGI("%s: WifiEventReport send event = %u, ifName = %s",
-                __FUNCTION__, event, ifName);
+            HDF_LOGI("%s: send event = %u, ifName = %s", __FUNCTION__, event, ifName);
             g_callbackEventMap[i]->onRecFunc(event, data, ifName);
         }
     }
