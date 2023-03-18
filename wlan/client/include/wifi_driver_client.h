@@ -44,6 +44,8 @@ extern "C" {
 #define WIFI_POWER_MODE_THROUGH_WALL 2
 #define WIFI_POWER_MODE_NUM 3
 
+#define MAX_SCAN_RES_NUM 200
+
 typedef enum {
     CMD_CLOSE_GO_CAC,
     CMD_SET_GO_CSA_CHANNEL,
@@ -97,6 +99,7 @@ typedef enum {
     WIFI_EVENT_EAPOL_RECV,
     WIFI_EVENT_TIMEOUT_DISCONN,
     WIFI_EVENT_RESET_DRIVER = 15,
+    WIFI_EVENT_SCAN_RESULTS,
     WIFI_EVENT_BUTT
 } WifiEventType;
 
@@ -136,14 +139,20 @@ typedef struct {
     uint32_t freq;
     uint16_t beaconInt;
     int32_t qual;
-    uint32_t beaconIeLen;
     int32_t level;
     uint32_t age;
+    uint64_t tsf;
     uint32_t ieLen;
+    uint32_t beaconIeLen;
     uint8_t *variable;
     uint8_t *ie;
     uint8_t *beaconIe;
 } WifiScanResult;
+
+typedef struct {
+    WifiScanResult scanResult[MAX_SCAN_RES_NUM];
+    uint32_t num;
+} WifiScanResults;
 
 typedef struct {
     uint8_t *reqIe;
@@ -166,8 +175,8 @@ typedef struct {
 enum WifiClientType {
     /* 1<<0 | 1<<1 | 1<<2 | 1<<3 | 1<<4 | 1<<5 | 1<<6 | 1<<7 | 1<<10 | 1<<11 | 1<<13 */
     WIFI_KERNEL_TO_WPA_CLIENT = 11519,
-    /* 1<<15 | 1<<5 | 1<<4 */
-    WIFI_KERNEL_TO_HAL_CLIENT = 32816,
+    /* 1<<16 | 1<<15 | 1<<5 | 1<<4 */
+    WIFI_KERNEL_TO_HAL_CLIENT = 98352,
     WIFI_CLIENT_BUTT
 };
 

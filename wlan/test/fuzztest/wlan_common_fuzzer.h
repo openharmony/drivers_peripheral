@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,8 +16,8 @@
 #ifndef WLAN_COMMON_FUZZER_H
 #define WLAN_COMMON_FUZZER_H
 #include "hdf_log.h"
-#include "v1_0/iwlan_interface.h"
-#include "v1_0/wlan_types.h"
+#include "v1_1/iwlan_interface.h"
+#include "v1_1/wlan_types.h"
 #include "wlan_callback_impl.h"
 #include "wifi_hal_base_feature.h"
 #include "securec.h"
