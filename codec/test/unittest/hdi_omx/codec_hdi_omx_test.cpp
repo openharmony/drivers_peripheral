@@ -822,7 +822,6 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseBufferTest_010, TestSize.Level1)
     FreeBufferOnPort(PortIndex::PORT_INDEX_OUTPUT);
     ASSERT_FALSE(ret);
 }
-#endif
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_005, TestSize.Level1)
 {
@@ -845,9 +844,10 @@ HWTEST_F(CodecHdiOmxTest, HdfCodecHdiAllocateBufferTest_006, TestSize.Level1)
     allocBuffer.type = READ_WRITE_TYPE;
     err = component_->AllocateBuffer(component_, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, &allocBuffer);
     ASSERT_EQ(err, HDF_SUCCESS);
-    err = component_->FreeBuffer(component_, (uint32_t)PortIndex::PORT_INDEX_INPUT, &allocBuffer);
+    err = component_->FreeBuffer(component_, (uint32_t)PortIndex::PORT_INDEX_OUTPUT, &allocBuffer);
     ASSERT_EQ(err, HDF_SUCCESS);
 }
+#endif
 
 HWTEST_F(CodecHdiOmxTest, HdfCodecHdiUseEglImageTest_001, TestSize.Level1)
 {
