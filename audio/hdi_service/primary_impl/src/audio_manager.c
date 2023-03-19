@@ -339,6 +339,7 @@ static int32_t LoadAdapterImpl(const struct AudioAdapterDescriptor *desc, struct
         return AUDIO_ERR_MALLOC_FAIL;
     }
 
+    (void)memset_s(hwAdapter, sizeof(struct AudioHwAdapter), 0, sizeof(struct AudioHwAdapter));
     hwAdapter->common.InitAllPorts = AudioAdapterInitAllPorts;
     hwAdapter->common.CreateRender = AudioAdapterCreateRender;
     hwAdapter->common.DestroyRender = AudioAdapterDestroyRender;

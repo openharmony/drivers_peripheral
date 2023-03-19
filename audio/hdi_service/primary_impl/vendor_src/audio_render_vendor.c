@@ -26,12 +26,14 @@
 
 struct AudioRenderInfo {
     struct AudioDeviceDescriptor desc;
+    enum AudioCategory streamType;
     struct IAudioRender *render;
     struct AudioHwiRender *hwiRender;
 };
 
 struct AudioHwiRenderPriv {
-    struct AudioRenderInfo *renderInfos[AUDIO_HW_ADAPTER_NUM_MAX];
+    struct AudioRenderInfo *renderInfos[AUDIO_HW_STREAM_NUM_MAX];
+    uint32_t renderCnt;
     struct IAudioCallback *callback;
     bool isRegCb;
 };
@@ -66,29 +68,15 @@ struct AudioHwiRender *AudioHwiGetHwiRender(struct IAudioRender *render)
     return NULL;
 }
 
-struct AudioHwiRender *AudioHwiGetHwiRenderByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc)
+struct AudioHwiRender *AudioHwiGetHwiRenderById(uint32_t renderId)
 {
-    if (desc == NULL) {
-        AUDIO_FUNC_LOGE("audio render get hwiRender fail, desc null");
-        return NULL;
-    }
-
     struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
-    if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX || priv->renderInfos[descIndex] == NULL) {
-        AUDIO_FUNC_LOGE("audio render get hwiRender fail, descIndex=%{public}d", descIndex);
+    if (priv->renderInfos[renderId] == NULL) {
+        AUDIO_FUNC_LOGE("not match render");
         return NULL;
     }
 
-    for (uint32_t i = 0; i < AUDIO_HW_STREAM_NUM_MAX; i++) {
-        if ((desc->portId == priv->renderInfos[descIndex][i].desc.portId) &&
-            (desc->pins == priv->renderInfos[descIndex][i].desc.pins) &&
-            (strcmp(desc->desc, priv->renderInfos[descIndex][i].desc.desc) == 0)) {
-            return priv->renderInfos[descIndex][i].hwiRender;
-        }
-    }
-
-    AUDIO_FUNC_LOGE("audio get hwiRender fail");
-    return NULL;
+    return priv->renderInfos[renderId]->hwiRender;
 }
 
 int32_t AudioHwiGetLatency(struct IAudioRender *render, uint32_t *ms)
@@ -895,122 +883,121 @@ static void AudioHwiInitRenderInstance(struct IAudioRender *render)
     render->GetVersion = AudioHwiRenderGetVersion;
 }
 
-int32_t AudioHwiRenderInit(uint32_t descIndex)
+static struct IAudioRender *FindRenderCreated(struct AudioHwiRenderPriv *renderPriv, enum AudioPortPin pin,
+                                              enum AudioCategory streamType)
 {
-    if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiRender init fail, descIndex=%{public}d", descIndex);
-        return HDF_ERR_INVALID_PARAM;
+    uint32_t index = 0;
+    if (renderPriv == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return NULL;
     }
 
-    struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
-    if (priv->renderInfos[descIndex] != NULL) {
-        AUDIO_FUNC_LOGW("audio HwiRender renderInfos already init");
-        return HDF_SUCCESS;
+    if (renderPriv->renderCnt == 0) {
+        AUDIO_FUNC_LOGI("no render created");
+        return NULL;
     }
 
-    priv->renderInfos[descIndex] =
-        (struct AudioRenderInfo *)OsalMemCalloc(sizeof(struct AudioRenderInfo) * AUDIO_HW_STREAM_NUM_MAX);
-    if (priv->renderInfos[descIndex] == NULL) {
-        AUDIO_FUNC_LOGE("audio HwiRender malloc renderInfos fail");
-        return HDF_ERR_MALLOC_FAIL;
+    for (index = 0; index < AUDIO_HW_STREAM_NUM_MAX; index++) {
+        if ((renderPriv->renderInfos[index] != NULL) &&
+            (renderPriv->renderInfos[index]->desc.pins == pin) &&
+            (renderPriv->renderInfos[index]->streamType == streamType)) {
+            return renderPriv->renderInfos[index]->render;
+        }
     }
 
-    return HDF_SUCCESS;
+    return NULL;
 }
 
-void AudioHwiRenderDeinit(uint32_t descIndex)
+static uint32_t GetAvailableRenderId(struct AudioHwiRenderPriv *renderPriv)
 {
-    if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiRender deinit fail, descIndex=%{public}d", descIndex);
-        return;
+    uint32_t renderId = AUDIO_HW_STREAM_NUM_MAX;
+    uint32_t index = 0;
+    if (renderPriv == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return renderId;
     }
 
-    struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
+    if (renderPriv->renderCnt < AUDIO_HW_STREAM_NUM_MAX) {
+        renderId = renderPriv->renderCnt;
+        renderPriv->renderCnt++;
+    } else {
+        for (index = 0; index < AUDIO_HW_STREAM_NUM_MAX; index++) {
+            if (renderPriv->renderInfos[index] == NULL) {
+                renderId = index;
+                break;
+            }
+        }
+    }
 
-    OsalMemFree((void *)priv->renderInfos[descIndex]);
-    priv->renderInfos[descIndex] = NULL;
-    priv->isRegCb = false;
-    priv->callback = NULL;
+    return renderId;
 }
 
-struct IAudioRender *AudioHwiCreateRenderByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc,
-    struct AudioHwiRender *hwiRender)
+struct IAudioRender *AudioHwiCreateRenderById(enum AudioCategory streamType, uint32_t *renderId,
+    struct AudioHwiRender *hwiRender, const struct AudioDeviceDescriptor *desc)
 {
-    if (desc == NULL || hwiRender == NULL) {
+    struct IAudioRender *render = NULL;
+    if (renderId == NULL || hwiRender == NULL || desc == NULL) {
         AUDIO_FUNC_LOGE("audio render is null");
         return NULL;
     }
 
-    if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiRender create render index fail, descIndex=%{public}d", descIndex);
-        return NULL;
-    }
-
+    *renderId = AUDIO_HW_STREAM_NUM_MAX;
     struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
-    struct AudioRenderInfo *infos = priv->renderInfos[descIndex];
-    if (infos == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiRender render not init");
+    render = FindRenderCreated(priv, desc->pins, streamType);
+    if (render != NULL) {
+        AUDIO_FUNC_LOGE("already created");
+        return render;
+    }
+
+    *renderId = GetAvailableRenderId(priv);
+    if (*renderId >= AUDIO_HW_STREAM_NUM_MAX) {
+        AUDIO_FUNC_LOGE("audio hwiRender create render index fail, renderId=%{public}d", *renderId);
         return NULL;
     }
 
-    uint32_t nullRenderIndex = AUDIO_HW_STREAM_NUM_MAX;
-    for (uint32_t i = 0; i < AUDIO_HW_STREAM_NUM_MAX; i++) {
-        if ((infos[i].render != NULL) && (desc->portId == infos[i].desc.portId) && (desc->pins == infos[i].desc.pins) &&
-            (strcmp(desc->desc, infos[i].desc.desc) == 0)) {
-            return infos[i].render;
-        }
-
-        if ((infos[i].render == NULL) && (nullRenderIndex == AUDIO_HW_STREAM_NUM_MAX)) {
-            nullRenderIndex = i;
-        }
-    }
-
-    if (nullRenderIndex == AUDIO_HW_STREAM_NUM_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiRender render not space");
+    priv->renderInfos[*renderId] = (struct AudioRenderInfo *)OsalMemCalloc(sizeof(struct AudioRenderInfo));
+    if (priv->renderInfos[*renderId] == NULL) {
+        AUDIO_FUNC_LOGE("audio HwiRender malloc renderInfos fail");
         return NULL;
     }
 
-    struct IAudioRender *render = (struct IAudioRender *)OsalMemCalloc(sizeof(struct IAudioRender));
+    render = (struct IAudioRender *)OsalMemCalloc(sizeof(struct IAudioRender));
     if (render == NULL) {
         AUDIO_FUNC_LOGE("audio hwiRender render malloc fail");
         return NULL;
     }
-    infos[nullRenderIndex].render = render;
-    infos[nullRenderIndex].hwiRender = hwiRender;
-    infos[nullRenderIndex].desc.portId = desc->portId;
-    infos[nullRenderIndex].desc.pins = desc->pins;
-    infos[nullRenderIndex].desc.desc = strdup(desc->desc);
+    priv->renderInfos[*renderId]->render = render;
+    priv->renderInfos[*renderId]->hwiRender = hwiRender;
+    priv->renderInfos[*renderId]->streamType = streamType;
+    priv->renderInfos[*renderId]->desc.portId = desc->portId;
+    priv->renderInfos[*renderId]->desc.pins = desc->pins;
+    priv->renderInfos[*renderId]->desc.desc = strdup(desc->desc);
     AudioHwiInitRenderInstance(render);
 
     AUDIO_FUNC_LOGI("audio create adapter success");
     return render;
 };
 
-void AudioHwiDestroyRenderByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc)
+void AudioHwiDestroyRenderById(uint32_t renderId)
 {
-    CHECK_NULL_PTR_RETURN(desc);
-
-    if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiRender destroy render index fail, descIndex=%{public}d", descIndex);
+    if (renderId >= AUDIO_HW_STREAM_NUM_MAX) {
+        AUDIO_FUNC_LOGE("audio hwiRender destroy render index fail, descIndex=%{public}d", renderId);
+        return;
+    }
+    struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();    
+    if (priv->renderInfos[renderId] == NULL) {
+        AUDIO_FUNC_LOGE("audio hwiRender destroy render index fail, descIndex=%{public}d", renderId);
         return;
     }
 
-    struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
-    struct AudioRenderInfo *infos = priv->renderInfos[descIndex];
-    CHECK_NULL_PTR_RETURN(infos);
+    OsalMemFree((void *)priv->renderInfos[renderId]->render);
+    OsalMemFree((void *)priv->renderInfos[renderId]->desc.desc);
+    priv->renderInfos[renderId]->render = NULL;
+    priv->renderInfos[renderId]->hwiRender = NULL;
+    priv->renderInfos[renderId]->desc.desc = NULL;
+    priv->renderInfos[renderId]->desc.portId = UINT_MAX;
+    priv->renderInfos[renderId]->desc.pins = PIN_NONE;
 
-    for (uint32_t i = 0; i < AUDIO_HW_STREAM_NUM_MAX; i++) {
-        if ((infos[i].render != NULL) && (desc->portId == infos[i].desc.portId) && (desc->pins == infos[i].desc.pins) &&
-            (strcmp(desc->desc, infos[i].desc.desc) == 0)) {
-            OsalMemFree((void *)infos[i].render);
-            OsalMemFree((void *)infos[i].desc.desc);
-            infos[i].render = NULL;
-            infos[i].hwiRender = NULL;
-            infos[i].desc.desc = NULL;
-            infos[i].desc.portId = UINT_MAX;
-            infos[i].desc.pins = PIN_NONE;
-            return;
-        }
-    }
-    AUDIO_FUNC_LOGE("audio hwiRender not destroy render by desc");
+    OsalMemFree(priv->renderInfos[renderId]);
+    priv->renderInfos[renderId] = NULL;
 }
