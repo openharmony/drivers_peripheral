@@ -14,7 +14,8 @@
     "subsystem": "hdf",
     "features": [
       "drivers_peripheral_codec_support_omx",
-      "drivers_peripheral_codec_support_role"
+      "drivers_peripheral_codec_support_role",
+      "drivers_peripheral_codec_use_omx"
     ],
     "syscap": [ "" ],
     "adapter_system_type": ["standard"],
