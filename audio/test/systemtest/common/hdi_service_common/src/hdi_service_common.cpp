@@ -309,13 +309,13 @@ int32_t GetLoadAdapter(TestAudioManager *manager, int portType,
 }
 
 int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string &adapterName,
-    struct IAudioAdapter **adapter, struct IAudioRender **render)
+    struct IAudioAdapter **adapter, struct IAudioRender **render, unsigned *renderId)
 {
     int32_t ret = -1;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor devDesc = {};
     struct AudioPort audioPort = {};
-    if (adapter == nullptr || render == nullptr) {
+    if (adapter == nullptr || render == nullptr || renderId == nullptr) {
         return HDF_ERR_INVALID_PARAM;
     }
     ret = GetLoadAdapter(manager, PORT_OUT, adapterName, adapter, audioPort);
@@ -331,7 +331,7 @@ int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string
     }
     InitAttrs(attrs);
     InitDevDesc(devDesc, audioPort.portId, pins);
-    ret = (*adapter)->CreateRender(*adapter, &devDesc, &attrs, render);
+    ret = (*adapter)->CreateRender(*adapter, &devDesc, &attrs, render, renderId);
     if (ret < 0 || *render == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:Create render failed\n", __func__);
         manager->UnloadAdapter(manager, adapterName.c_str());
@@ -382,13 +382,13 @@ int32_t AudioRenderStartAndOneFrame(struct IAudioRender *render)
 }
 
 int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::string &adapterName,
-    struct IAudioAdapter **adapter, struct IAudioCapture **capture)
+    struct IAudioAdapter **adapter, struct IAudioCapture **capture, uint32_t *captureId)
 {
     int32_t ret = -1;
     struct AudioSampleAttributes attrs = {};
     struct AudioDeviceDescriptor devDesc = {};
     struct AudioPort audioPort = {};
-    if (adapter == nullptr || capture == nullptr) {
+    if (adapter == nullptr || capture == nullptr || captureId == nullptr) {
         return HDF_ERR_INVALID_PARAM;
     }
     ret = GetLoadAdapter(manager, PORT_IN, adapterName, adapter, audioPort);
@@ -403,7 +403,7 @@ int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::strin
     }
     InitAttrs(attrs);
     InitDevDesc(devDesc, audioPort.portId, pins);
-    ret = (*adapter)->CreateCapture(*adapter, &devDesc, &attrs, capture);
+    ret = (*adapter)->CreateCapture(*adapter, &devDesc, &attrs, capture, captureId);
     if (ret < 0 || *capture == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:Create capture failed\n", __func__);
         manager->UnloadAdapter(manager, adapterName.c_str());
@@ -920,7 +920,7 @@ void TestAudioPortCapabilityFree(struct AudioPortCapability *dataBlock, bool fre
 }
 
 int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&adapter,
-    struct IAudioCapture *&capture)
+    struct IAudioCapture *&capture, uint32_t captureId)
 {
     if (manager == nullptr || adapter == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:param is nullptr\n", __func__);
@@ -930,17 +930,13 @@ int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&a
         HDF_LOGE("%{public}s: AUDIO_TEST:fuction is nullptr\n", __func__);
         return HDF_FAILURE;
     }
-    struct AudioDeviceDescriptor devDesc;
-    InitDevDesc(devDesc, 0, PIN_IN_MIC);
-    int32_t ret = adapter->DestroyCapture(adapter, &devDesc);
+    int32_t ret = adapter->DestroyCapture(adapter, captureId);
     if (ret != HDF_SUCCESS) {
-        free(devDesc.desc);
         HDF_LOGE("%{public}s: AUDIO_TEST:DestroyCapture failed\n", __func__);
         return HDF_FAILURE;
     }
     IAudioCaptureRelease(capture, IS_STUB);
     capture = nullptr;
-    free(devDesc.desc);
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AUDIO_TEST:UnloadAdapter failed\n", __func__);
@@ -951,29 +947,26 @@ int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&a
     return HDF_SUCCESS;
 }
 
-int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioRender *&render)
+int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&adapter,
+                            struct IAudioRender *&render, uint32_t renderId)
 {
     if (manager == nullptr || adapter == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:param is nullptr\n", __func__);
         return HDF_FAILURE;
     }
 
-    struct AudioDeviceDescriptor devDesc;
-    InitDevDesc(devDesc, 0, PIN_OUT_SPEAKER);
     if (manager->UnloadAdapter == nullptr || adapter->DestroyRender == nullptr) {
         HDF_LOGE("%{public}s: AUDIO_TEST:fuction is nullptr\n", __func__);
         return HDF_FAILURE;
     }
 
-    int32_t ret = adapter->DestroyRender(adapter, &devDesc);
+    int32_t ret = adapter->DestroyRender(adapter, renderId);
     if (ret != HDF_SUCCESS) {
-        free(devDesc.desc);
         HDF_LOGE("%{public}s: AUDIO_TEST:DestroyRender failed\n", __func__);
         return HDF_FAILURE;
     }
     IAudioRenderRelease(render, IS_STUB);
     render = nullptr;
-    free(devDesc.desc);
     ret = manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: AUDIO_TEST:UnloadAdapter failed\n", __func__);

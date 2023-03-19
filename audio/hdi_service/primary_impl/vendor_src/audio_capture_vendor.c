@@ -26,12 +26,14 @@
 
 struct AudioCaptureInfo {
     struct AudioDeviceDescriptor desc;
+    enum AudioCategory streamType;
     struct IAudioCapture *capture;
     struct AudioHwiCapture *hwiCapture;
 };
 
 struct AudioHwiCapturePriv {
     struct AudioCaptureInfo *captureInfos[AUDIO_HW_ADAPTER_NUM_MAX];
+    uint32_t captureCnt;
 };
 
 static struct AudioHwiCapturePriv g_audioHwiCapturePriv;
@@ -65,29 +67,15 @@ struct AudioHwiCapture *AudioHwiGetHwiCapture(struct IAudioCapture *capture)
     return NULL;
 }
 
-struct AudioHwiCapture *AudioHwiGetHwiCaptureByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc)
+struct AudioHwiCapture *AudioHwiGetHwiCaptureById(uint32_t captureId)
 {
-    if (desc == NULL) {
-        AUDIO_FUNC_LOGE("audio HwiCapture get HwiCapture fail, desc null");
-        return NULL;
-    }
-
     struct AudioHwiCapturePriv *priv = AudioHwiCaptureGetPriv();
-    if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX || priv->captureInfos[descIndex] == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiCapture get hwiCapture fail, descIndex=%{public}d", descIndex);
+    if (priv->captureInfos[captureId] == NULL) {
+        AUDIO_FUNC_LOGE("not match capture");
         return NULL;
     }
 
-    for (uint32_t i = 0; i < AUDIO_HW_STREAM_NUM_MAX; i++) {
-        if ((desc->portId == priv->captureInfos[descIndex][i].desc.portId) &&
-            (desc->pins == priv->captureInfos[descIndex][i].desc.pins) &&
-            (strcmp(desc->desc, priv->captureInfos[descIndex][i].desc.desc) == 0)) {
-            return priv->captureInfos[descIndex][i].hwiCapture;
-        }
-    }
-
-    AUDIO_FUNC_LOGE("audio get hwuCapture fail");
-    return NULL;
+    return priv->captureInfos[captureId]->hwiCapture;
 }
 
 int32_t AudioHwiCaptureFrame(struct IAudioCapture *capture, int8_t *frame, uint32_t *frameLen, uint64_t *replyBytes)
@@ -721,120 +709,122 @@ static void AudioHwiInitCaptureInstance(struct IAudioCapture *capture)
     capture->GetVersion = AudioHwiCaptureGetVersion;
 }
 
-int32_t AudioHwiCaptureInit(uint32_t descIndex)
+static struct IAudioCapture *FindCaptureCreated(struct AudioHwiCapturePriv *capturePriv, enum AudioPortPin pin,
+                                               enum AudioCategory streamType)
 {
-    if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiCapture init fail, descIndex=%{public}d", descIndex);
-        return HDF_ERR_INVALID_PARAM;
+    uint32_t index = 0;
+    if (capturePriv == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return NULL;
     }
 
-    struct AudioHwiCapturePriv *priv = AudioHwiCaptureGetPriv();
-    if (priv->captureInfos[descIndex] != NULL) {
-        AUDIO_FUNC_LOGW("audio HwiCapture captureInfos already init");
-        return HDF_SUCCESS;
+    if (capturePriv->captureCnt == 0) {
+        AUDIO_FUNC_LOGI("no capture created");
+        return NULL;
     }
 
-    priv->captureInfos[descIndex] =
-        (struct AudioCaptureInfo *)OsalMemCalloc(sizeof(struct AudioCaptureInfo) * AUDIO_HW_STREAM_NUM_MAX);
-    if (priv->captureInfos[descIndex] == NULL) {
-        AUDIO_FUNC_LOGE("audio HwiCapture malloc captureInfos fail");
-        return HDF_ERR_MALLOC_FAIL;
+    for (index = 0; index < AUDIO_HW_STREAM_NUM_MAX; index++) {
+        if ((capturePriv->captureInfos[index] != NULL) &&
+            (capturePriv->captureInfos[index]->desc.pins == pin) &&
+            (capturePriv->captureInfos[index]->streamType == streamType)) {
+            return capturePriv->captureInfos[index]->capture;
+        }
     }
 
-    return HDF_SUCCESS;
+    return NULL;
 }
 
-void AudioHwiCaptureDeinit(uint32_t descIndex)
+static uint32_t GetAvailableCaptureId(struct AudioHwiCapturePriv *capturePriv)
 {
-    if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiCapture deinit fail, descIndex=%{public}d", descIndex);
-        return;
+    uint32_t captureId = AUDIO_HW_STREAM_NUM_MAX;
+    uint32_t index = 0;
+    if (capturePriv == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return captureId;
     }
 
-    struct AudioHwiCapturePriv *priv = AudioHwiCaptureGetPriv();
+    if (capturePriv->captureCnt < AUDIO_HW_STREAM_NUM_MAX) {
+        captureId = capturePriv->captureCnt;
+        capturePriv->captureCnt++;
+    } else {
+        for (index = 0; index < AUDIO_HW_STREAM_NUM_MAX; index++) {
+            if (capturePriv->captureInfos[index] == NULL) {
+                captureId = index;
+                break;
+            }
+        }
+    }
 
-    OsalMemFree((void *)priv->captureInfos[descIndex]);
-    priv->captureInfos[descIndex] = NULL;
+    return captureId;
 }
 
-struct IAudioCapture *AudioHwiCreateCaptureByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc,
-    struct AudioHwiCapture *hwiCapture)
+struct IAudioCapture *AudioHwiCreateCaptureById(enum AudioCategory streamType, uint32_t *captureId,
+    struct AudioHwiCapture *hwiCapture, const struct AudioDeviceDescriptor *desc)
 {
-    if (desc == NULL || hwiCapture == NULL) {
+    if (captureId == NULL || hwiCapture == NULL || desc == NULL) {
         AUDIO_FUNC_LOGE("audio capture is null");
         return NULL;
     }
 
-    if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiCapture create capture index fail, descIndex=%{public}d", descIndex);
-        return NULL;
-    }
-
+    *captureId = AUDIO_HW_STREAM_NUM_MAX;
+    struct IAudioCapture *capture = NULL;
     struct AudioHwiCapturePriv *priv = AudioHwiCaptureGetPriv();
-    struct AudioCaptureInfo *infos = priv->captureInfos[descIndex];
-    if (infos == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiCapture capture not init");
+    
+    capture = FindCaptureCreated(priv, desc->pins, streamType);
+    if (capture != NULL) {
+        AUDIO_FUNC_LOGE("already created");
+        return capture;
+    }
+
+    *captureId = GetAvailableCaptureId(priv);
+    if (*captureId >= AUDIO_HW_STREAM_NUM_MAX) {
+        AUDIO_FUNC_LOGE("audio hwicapture capture capture index fail, captureId=%{public}d", *captureId);
         return NULL;
     }
 
-    uint32_t nullCaptureIndex = AUDIO_HW_STREAM_NUM_MAX;
-    for (uint32_t i = 0; i < AUDIO_HW_STREAM_NUM_MAX; i++) {
-        if ((infos[i].capture != NULL) && (desc->portId == infos[i].desc.portId) &&
-            (desc->pins == infos[i].desc.pins) && (strcmp(desc->desc, infos[i].desc.desc) == 0)) {
-            return infos[i].capture;
-        }
-
-        if ((infos[i].capture == NULL) && (nullCaptureIndex == AUDIO_HW_STREAM_NUM_MAX)) {
-            nullCaptureIndex = i;
-        }
-    }
-
-    if (nullCaptureIndex == AUDIO_HW_STREAM_NUM_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiCapture capture not space");
+    priv->captureInfos[*captureId] = (struct AudioCaptureInfo *)OsalMemCalloc(sizeof(struct AudioCaptureInfo));
+    if (priv->captureInfos[*captureId] == NULL) {
+        AUDIO_FUNC_LOGE("audio Hwicapture malloc captureInfos fail");
         return NULL;
     }
 
-    struct IAudioCapture *capture = (struct IAudioCapture *)OsalMemCalloc(sizeof(struct IAudioCapture));
+    capture = (struct IAudioCapture *)OsalMemCalloc(sizeof(struct IAudioCapture));
     if (capture == NULL) {
         AUDIO_FUNC_LOGE("audio hwiCapture capture malloc fail");
         return NULL;
     }
-    infos[nullCaptureIndex].capture = capture;
-    infos[nullCaptureIndex].hwiCapture = hwiCapture;
-    infos[nullCaptureIndex].desc.portId = desc->portId;
-    infos[nullCaptureIndex].desc.pins = desc->pins;
-    infos[nullCaptureIndex].desc.desc = strdup(desc->desc);
+    priv->captureInfos[*captureId]->capture = capture;
+    priv->captureInfos[*captureId]->hwiCapture = hwiCapture;
+    priv->captureInfos[*captureId]->streamType = streamType;
+    priv->captureInfos[*captureId]->desc.portId = desc->portId;
+    priv->captureInfos[*captureId]->desc.pins = desc->pins;
+    priv->captureInfos[*captureId]->desc.desc = strdup(desc->desc);
     AudioHwiInitCaptureInstance(capture);
 
-    AUDIO_FUNC_LOGI("audio create capture success");
+    AUDIO_FUNC_LOGI("audio captureId capture success");
     return capture;
 };
 
-void AudioHwiDestroyCaptureByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc)
+void AudioHwiDestroyCaptureById(uint32_t captureId)
 {
-    CHECK_NULL_PTR_RETURN(desc);
-
-    if (descIndex >= AUDIO_HW_ADAPTER_NUM_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiCapture destroy capture index fail, descIndex=%{public}d", descIndex);
+    if (captureId >= AUDIO_HW_STREAM_NUM_MAX) {
+        AUDIO_FUNC_LOGE("audio hwiCapture destroy capture index fail, captureId=%{public}d", captureId);
+        return;
+    }
+    struct AudioHwiCapturePriv *priv = AudioHwiCaptureGetPriv();    
+    if (priv->captureInfos[captureId] == NULL) {
+        AUDIO_FUNC_LOGE("audio hwiCapture destroy capture index fail, captureId=%{public}d", captureId);
         return;
     }
 
-    struct AudioHwiCapturePriv *priv = AudioHwiCaptureGetPriv();
-    struct AudioCaptureInfo *infos = priv->captureInfos[descIndex];
-    CHECK_NULL_PTR_RETURN(infos);
+    OsalMemFree((void *)priv->captureInfos[captureId]->capture);
+    OsalMemFree((void *)priv->captureInfos[captureId]->desc.desc);
+    priv->captureInfos[captureId]->capture = NULL;
+    priv->captureInfos[captureId]->hwiCapture = NULL;
+    priv->captureInfos[captureId]->desc.desc = NULL;
+    priv->captureInfos[captureId]->desc.portId = UINT_MAX;
+    priv->captureInfos[captureId]->desc.pins = PIN_NONE;
 
-    for (uint32_t i = 0; i < AUDIO_HW_STREAM_NUM_MAX; i++) {
-        if ((infos[i].capture != NULL) && (desc->portId == infos[i].desc.portId) &&
-            (desc->pins == infos[i].desc.pins) && (strcmp(desc->desc, infos[i].desc.desc) == 0)) {
-            OsalMemFree((void *)infos[i].capture);
-            OsalMemFree((void *)infos[i].desc.desc);
-            infos[i].capture = NULL;
-            infos[i].hwiCapture = NULL;
-            infos[i].desc.desc = NULL;
-            infos[i].desc.portId = UINT_MAX;
-            infos[i].desc.pins = PIN_NONE;
-            return;
-        }
-    }
-    AUDIO_FUNC_LOGE("audio hwiCapture not destroy capture by desc");
+    OsalMemFree(priv->captureInfos[captureId]);
+    priv->captureInfos[captureId] = NULL;
 }

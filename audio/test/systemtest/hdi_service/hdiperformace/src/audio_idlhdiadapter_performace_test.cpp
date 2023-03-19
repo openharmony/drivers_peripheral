@@ -35,6 +35,8 @@ public:
     static struct IAudioAdapter *adapter;
     static struct AudioPort audioPort;
     static TestAudioManager *manager;
+    uint32_t captureId_ = 0;
+    uint32_t renderId_ = 0;
 };
 using THREAD_FUNC = void *(*)(void *);
 TestAudioManager *AudioIdlHdiAdapterPerformaceTest::manager = nullptr;
@@ -208,13 +210,13 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioCreateRenderPerformance_001, Tes
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.adapter->CreateRender(audiopara.adapter, &audiopara.devDesc, &audiopara.attrs,
-                                              &audiopara.render);
+                                              &audiopara.render, &renderId_);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
-        ret = audiopara.adapter->DestroyRender(audiopara.adapter, &audiopara.devDesc);
+        ret = audiopara.adapter->DestroyRender(audiopara.adapter, renderId_);
         IAudioRenderRelease(audiopara.render, IS_STUB);
         audiopara.render = nullptr;
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -241,10 +243,10 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioDestroyRenderPerformance_001, Te
 
     for (int i = 0; i < COUNT; ++i) {
         ret = audiopara.adapter->CreateRender(audiopara.adapter, &audiopara.devDesc, &audiopara.attrs,
-                                              &audiopara.render);
+                                              &audiopara.render, &renderId_);
         EXPECT_EQ(HDF_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
-        audiopara.adapter->DestroyRender(audiopara.adapter, &audiopara.devDesc);
+        audiopara.adapter->DestroyRender(audiopara.adapter, renderId_);
         gettimeofday(&audiopara.end, NULL);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
@@ -272,12 +274,12 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioCreateCapturePerformance_001, Te
     for (int i = 0; i < COUNT; ++i) {
         gettimeofday(&audiopara.start, NULL);
         ret = audiopara.adapter->CreateCapture(audiopara.adapter, &audiopara.devDesc, &audiopara.attrs,
-                                               &audiopara.capture);
+                                               &audiopara.capture, &captureId_);
         gettimeofday(&audiopara.end, NULL);
         audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
                               (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
         audiopara.totalTime += audiopara.delayTime;
-        ret = audiopara.adapter->DestroyCapture(audiopara.adapter, &audiopara.devDesc);
+        ret = audiopara.adapter->DestroyCapture(audiopara.adapter, captureId_);
         IAudioCaptureRelease(audiopara.capture, IS_STUB);
         audiopara.capture = nullptr;
         EXPECT_EQ(HDF_SUCCESS, ret);
@@ -303,10 +305,10 @@ HWTEST_F(AudioIdlHdiAdapterPerformaceTest, AudioDestroyCapturePerformance_001, T
     InitDevDesc(audiopara.devDesc, audioPort.portId, audiopara.pins);
     for (int i = 0; i < COUNT; ++i) {
         ret = audiopara.adapter->CreateCapture(audiopara.adapter, &audiopara.devDesc, &audiopara.attrs,
-                                               &audiopara.capture);
+                                               &audiopara.capture, &captureId_);
         ASSERT_EQ(HDF_SUCCESS, ret);
         gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.adapter->DestroyCapture(audiopara.adapter, &audiopara.devDesc);
+        ret = audiopara.adapter->DestroyCapture(audiopara.adapter, captureId_);
         IAudioCaptureRelease(audiopara.capture, IS_STUB);
         gettimeofday(&audiopara.end, NULL);
         EXPECT_EQ(HDF_SUCCESS, ret);

@@ -58,6 +58,7 @@ struct AudioSampleAttributes g_attrs;
 struct AudioPort g_audioPort;
 struct AudioHeadInfo g_wavHeadInfo;
 static struct StrPara g_str;
+uint32_t g_renderId = 0;
 
 pthread_t g_tids;
 char *g_frame = NULL;
@@ -227,7 +228,7 @@ static int32_t StopAudioFiles(struct IAudioRender **renderS)
         return HDF_FAILURE;
     }
 
-    ret = g_adapter->DestroyRender(g_adapter, &g_devDesc);
+    ret = g_adapter->DestroyRender(g_adapter, g_renderId);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Destroy Render!");
     }
@@ -501,7 +502,7 @@ static int32_t PlayingAudioInitRender(struct IAudioRender **renderTemp)
     if (g_adapter == NULL || g_adapter->CreateRender == NULL) {
         return HDF_FAILURE;
     }
-    int32_t ret = g_adapter->CreateRender(g_adapter, &g_devDesc, &g_attrs, &render);
+    int32_t ret = g_adapter->CreateRender(g_adapter, &g_devDesc, &g_attrs, &render, &g_renderId);
     if (render == NULL || ret < 0 || render->RenderFrame == NULL) {
         AUDIO_FUNC_LOGE("AudioDeviceCreateRender failed or RenderFrame is null");
         return HDF_FAILURE;
@@ -510,13 +511,13 @@ static int32_t PlayingAudioInitRender(struct IAudioRender **renderTemp)
     // Playing audio files
     if (render->Start((void *)render)) {
         AUDIO_FUNC_LOGE("Start Bind Fail!");
-        g_adapter->DestroyRender(g_adapter, &g_devDesc);
+        g_adapter->DestroyRender(g_adapter, g_renderId);
         IAudioRenderRelease(render, g_isDirect);
         return HDF_FAILURE;
     }
 
     if (InitPlayingAudioParam(render) < 0) {
-        g_adapter->DestroyRender(g_adapter, &g_devDesc);
+        g_adapter->DestroyRender(g_adapter, g_renderId);
         IAudioRenderRelease(render, g_isDirect);
         return HDF_FAILURE;
     }
@@ -552,7 +553,7 @@ static int32_t PlayingAudioFiles(struct IAudioRender **renderS)
     if (StartPlayThread(palyModeFlag) < 0) {
         FileClose(&g_file);
         if (g_adapter != NULL && g_adapter->DestroyRender != NULL) {
-            g_adapter->DestroyRender(g_adapter, &g_devDesc);
+            g_adapter->DestroyRender(g_adapter, g_renderId);
         }
         IAudioRenderRelease(render, g_isDirect);
         return HDF_FAILURE;

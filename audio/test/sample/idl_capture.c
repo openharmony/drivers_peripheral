@@ -62,6 +62,7 @@ struct AudioSampleAttributes g_attrs;
 struct IAudioCapture *g_capture = NULL;
 static struct IAudioManager *g_audioManager = NULL;
 static struct StrParaCapture g_str;
+uint32_t g_captureId = 0;
 
 pthread_t g_tids;
 FILE *g_file;
@@ -232,7 +233,7 @@ static int32_t StopButtonCapture(struct IAudioCapture **captureS)
         return HDF_FAILURE;
     }
 
-    ret = g_adapter->DestroyCapture(g_adapter, &g_devDesc);
+    ret = g_adapter->DestroyCapture(g_adapter, g_captureId);
     if (ret < 0) {
         AUDIO_FUNC_LOGE("Capture already destroy!");
     }
@@ -492,14 +493,14 @@ static int32_t RecordingAudioInitCapture(struct IAudioCapture **captureTemp)
     }
 
     struct IAudioCapture *capture = NULL;
-    int32_t ret = g_adapter->CreateCapture(g_adapter, &g_devDesc, &g_attrs, &capture);
+    int32_t ret = g_adapter->CreateCapture(g_adapter, &g_devDesc, &g_attrs, &capture, &g_captureId);
     if (capture == NULL || ret < 0) {
         return HDF_FAILURE;
     }
 
     ret = capture->Start((void *)capture);
     if (ret < 0) {
-        g_adapter->DestroyCapture(g_adapter, &g_devDesc);
+        g_adapter->DestroyCapture(g_adapter, g_captureId);
         IAudioCaptureRelease(capture, g_isDirect);
         return HDF_FAILURE;
     }
@@ -507,7 +508,7 @@ static int32_t RecordingAudioInitCapture(struct IAudioCapture **captureTemp)
     uint32_t bufferSize = PcmFramesToBytes(g_attrs);
     g_frame = (char *)OsalMemCalloc(bufferSize);
     if (g_frame == NULL) {
-        g_adapter->DestroyCapture(g_adapter, &g_devDesc);
+        g_adapter->DestroyCapture(g_adapter, g_captureId);
         IAudioCaptureRelease(capture, g_isDirect);
         return HDF_FAILURE;
     }
@@ -544,7 +545,7 @@ static int32_t StartButtonCapture(struct IAudioCapture **captureS)
         AUDIO_FUNC_LOGE("CaptureChoiceModeAndRecording failed");
         FileClose(&g_file);
         if (g_adapter != NULL && g_adapter->DestroyCapture != NULL) {
-            g_adapter->DestroyCapture(g_adapter, &g_devDesc);
+            g_adapter->DestroyCapture(g_adapter, g_captureId);
         }
         IAudioCaptureRelease(capture, g_isDirect);
         return HDF_FAILURE;
