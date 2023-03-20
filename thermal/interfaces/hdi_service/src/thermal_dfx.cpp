@@ -20,7 +20,6 @@
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
-#include <thread>
 #include <unistd.h>
 #include <hdf_log.h>
 #include <hdf_base.h>
@@ -91,6 +90,14 @@ static std::string GetCurrentTime(const int32_t format)
         return "";
     }
     return strTime;
+}
+
+ThermalDfx::~ThermalDfx()
+{
+    isRunning_ = false;
+    if (logThread_->joinable()) {
+        logThread_->join();
+    }
 }
 
 std::string ThermalDfx::GetFileNameIndex(const uint32_t index)
@@ -339,10 +346,10 @@ void ThermalDfx::InfoChangedCallback(const char* key, const char* value, void* c
     }
 }
 
-int32_t ThermalDfx::LoopingThreadEntry()
+void ThermalDfx::LoopingThreadEntry()
 {
     WatchParameter(THERMAL_LOG_ENABLE.c_str(), InfoChangedCallback, nullptr);
-    while (true) {
+    while (isRunning_) {
         std::this_thread::sleep_for(std::chrono::milliseconds(g_interval));
         CreateLogFile();
         CompressFile();
@@ -351,7 +358,7 @@ int32_t ThermalDfx::LoopingThreadEntry()
 
 void ThermalDfx::StartThread()
 {
-    std::make_unique<std::thread>(&ThermalDfx::LoopingThreadEntry, this)->detach();
+    logThread_ = std::make_unique<std::thread>(&ThermalDfx::LoopingThreadEntry, this);
 }
 
 int32_t ThermalDfx::Init()
