@@ -20,6 +20,8 @@ namespace Audio {
 
 constexpr size_t THRESHOLD = 10;
 constexpr int32_t OFFSET = 4;
+uint32_t g_captureId = 0;
+uint32_t g_renderId = 0;
 enum AdapterCmdId {
     AUDIO_ADAPTER_CREAT_RENDER,
     AUDIO_ADAPTER_DESTORY_RENDER,
@@ -48,20 +50,22 @@ static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const
         case AUDIO_ADAPTER_CREAT_RENDER: {
             struct IAudioRender *render = nullptr;
             adapter->CreateRender(adapter, reinterpret_cast<const struct AudioDeviceDescriptor *>(rawData),
-                                  reinterpret_cast<const struct AudioSampleAttributes *>(rawData), &render);
+                                  reinterpret_cast<const struct AudioSampleAttributes *>(rawData),
+                                  &render, &g_renderId);
             break;
         }
         case AUDIO_ADAPTER_DESTORY_RENDER:
-            adapter->DestroyRender(adapter, reinterpret_cast<const struct AudioDeviceDescriptor *>(rawData));
+            adapter->DestroyRender(adapter, reinterpret_cast<uint32_t>(rawData));
             break;
         case AUDIO_ADAPTER_CREAT_CAPTURE: {
             struct IAudioCapture *capture = nullptr;
             adapter->CreateCapture(adapter, reinterpret_cast<const struct AudioDeviceDescriptor *>(rawData),
-                                   reinterpret_cast<const struct AudioSampleAttributes *>(rawData), &capture);
+                                   reinterpret_cast<const struct AudioSampleAttributes *>(rawData),
+                                   &capture, &g_captureId);
             break;
         }
         case AUDIO_ADAPTER_DESTORY_CAPTURE:
-            adapter->DestroyCapture(adapter, reinterpret_cast<const struct AudioDeviceDescriptor *>(rawData));
+            adapter->DestroyCapture(adapter, reinterpret_cast<uint32_t>(rawData));
             break;
         case AUDIO_ADAPTER_GET_PORT_CAPABILITY: {
             struct AudioPortCapability capability = {};

@@ -46,20 +46,6 @@ static struct AudioHwiAdapterPriv *AudioHwiAdapterGetPriv(void)
     return &g_audioHwiAdapter;
 }
 
-static uint32_t AudioHwiGetDescIndexByAdapter(struct IAudioAdapter *adapter)
-{
-    struct AudioHwiAdapterPriv *priv = AudioHwiAdapterGetPriv();
-
-    for (uint32_t i = 0; i < AUDIO_HW_ADAPTER_NUM_MAX; i++) {
-        if (adapter == priv->adapterInfo[i].adapter) {
-            return i;
-        }
-    }
-
-    AUDIO_FUNC_LOGE("audio get desc index fail");
-    return UINT_MAX;
-}
-
 struct AudioHwiAdapter *AudioHwiGetHwiAdapterByDescIndex(uint32_t descIndex)
 {
     struct AudioHwiAdapterPriv *priv = AudioHwiAdapterGetPriv();
@@ -109,7 +95,7 @@ int32_t AudioHwiInitAllPorts(struct IAudioAdapter *adapter)
 }
 
 int32_t AudioHwiCreateRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct IAudioRender **render)
+    const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
 {
     struct AudioHwiDeviceDescriptor hwiDesc;
     struct AudioHwiSampleAttributes hwiAttrs;
@@ -119,6 +105,7 @@ int32_t AudioHwiCreateRender(struct IAudioAdapter *adapter, const struct AudioDe
     CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(renderId, HDF_ERR_INVALID_PARAM);
 
     struct AudioHwiAdapter *hwiAdapter = AudioHwiGetHwiAdapter(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter, HDF_ERR_INVALID_PARAM);
@@ -134,30 +121,18 @@ int32_t AudioHwiCreateRender(struct IAudioAdapter *adapter, const struct AudioDe
         return HDF_FAILURE;
     }
 
-    uint32_t descIndex = AudioHwiGetDescIndexByAdapter(adapter);
-    if (descIndex == UINT_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiAdapter get desc index fail");
-        return HDF_FAILURE;
-    }
-
-    *render = AudioHwiCreateRenderByDesc(descIndex, desc, hwiRender);
+    *render = AudioHwiCreateRenderById(attrs->type, renderId, hwiRender, desc);
     CHECK_NULL_PTR_RETURN_VALUE(*render, HDF_ERR_INVALID_PARAM);
 
     return HDF_SUCCESS;
 }
 
-int32_t AudioHwiDestroyRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc)
+int32_t AudioHwiDestroyRender(struct IAudioAdapter *adapter, uint32_t renderId)
 {
     struct AudioHwiAdapter *hwiAdapter = AudioHwiGetHwiAdapter(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter, HDF_ERR_INVALID_PARAM);
 
-    uint32_t descIndex = AudioHwiGetDescIndexByAdapter(adapter);
-    if (descIndex == UINT_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiAdapter get desc index fail");
-        return HDF_FAILURE;
-    }
-
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRenderByDesc(descIndex, desc);
+    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRenderById(renderId);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
 
     CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter->DestroyRender, HDF_ERR_INVALID_PARAM);
@@ -167,13 +142,13 @@ int32_t AudioHwiDestroyRender(struct IAudioAdapter *adapter, const struct AudioD
         return HDF_FAILURE;
     }
 
-    AudioHwiDestroyRenderByDesc(descIndex, desc);
+    AudioHwiDestroyRenderById(renderId);
 
     return HDF_SUCCESS;
 }
 
 int32_t AudioHwiCreateCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture)
+    const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture, uint32_t *captureId)
 {
     struct AudioHwiCapture *hwiCapture = NULL;
 
@@ -181,6 +156,7 @@ int32_t AudioHwiCreateCapture(struct IAudioAdapter *adapter, const struct AudioD
     CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(captureId, HDF_ERR_INVALID_PARAM);
 
     struct AudioHwiAdapter *hwiAdapter = AudioHwiGetHwiAdapter(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter, HDF_ERR_INVALID_PARAM);
@@ -200,33 +176,20 @@ int32_t AudioHwiCreateCapture(struct IAudioAdapter *adapter, const struct AudioD
         return HDF_FAILURE;
     }
 
-    uint32_t descIndex = AudioHwiGetDescIndexByAdapter(adapter);
-    if (descIndex == UINT_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiAdapter get desc index fail");
-        return HDF_FAILURE;
-    }
-
-    *capture = AudioHwiCreateCaptureByDesc(descIndex, desc, hwiCapture);
+    *capture = AudioHwiCreateCaptureById(attrs->type, captureId, hwiCapture, desc);
     CHECK_NULL_PTR_RETURN_VALUE(*capture, HDF_ERR_INVALID_PARAM);
 
     return HDF_SUCCESS;
 }
 
-int32_t AudioHwiDestroyCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc)
+int32_t AudioHwiDestroyCapture(struct IAudioAdapter *adapter, uint32_t captureId)
 {
     CHECK_NULL_PTR_RETURN_VALUE(adapter, HDF_ERR_INVALID_PARAM);
-    CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
 
     struct AudioHwiAdapter *hwiAdapter = AudioHwiGetHwiAdapter(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter, HDF_ERR_INVALID_PARAM);
 
-    uint32_t descIndex = AudioHwiGetDescIndexByAdapter(adapter);
-    if (descIndex == UINT_MAX) {
-        AUDIO_FUNC_LOGE("audio hwiAdapter get desc index fail");
-        return HDF_FAILURE;
-    }
-
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCaptureByDesc(descIndex, desc);
+    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCaptureById(captureId);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter->DestroyCapture, HDF_ERR_INVALID_PARAM);
     int32_t ret = hwiAdapter->DestroyCapture(hwiAdapter, hwiCapture);
@@ -235,7 +198,7 @@ int32_t AudioHwiDestroyCapture(struct IAudioAdapter *adapter, const struct Audio
         return HDF_FAILURE;
     }
 
-    AudioHwiDestroyCaptureByDesc(descIndex, desc);
+    AudioHwiDestroyCaptureById(captureId);
 
     return HDF_SUCCESS;
 }
@@ -666,20 +629,6 @@ struct IAudioAdapter *AudioHwiCreateAdapter(uint32_t descIndex, struct AudioHwiA
     }
 
     AudioHwiInitAdapterInstance(adapter);
-    int32_t ret = AudioHwiRenderInit(descIndex);
-    if (ret != HDF_SUCCESS) {
-        OsalMemFree(adapter);
-        AUDIO_FUNC_LOGE(" audio hwiAdapter init render fail");
-        return NULL;
-    }
-
-    ret = AudioHwiCaptureInit(descIndex);
-    if (ret != HDF_SUCCESS) {
-        OsalMemFree(adapter);
-        AudioHwiRenderDeinit(descIndex);
-        AUDIO_FUNC_LOGE(" audio hwiAdapter init capture fail");
-        return NULL;
-    }
     priv->adapterInfo[descIndex].hwiAdapter = hwiAdapter;
     priv->adapterInfo[descIndex].adapter = adapter;
     priv->adapterInfo[descIndex].refCnt = 1;
@@ -697,8 +646,6 @@ void AudioHwiReleaseAdapter(uint32_t descIndex)
 
     struct AudioHwiAdapterPriv *priv = AudioHwiAdapterGetPriv();
 
-    AudioHwiRenderDeinit(descIndex);
-    AudioHwiCaptureDeinit(descIndex);
     OsalMemFree((void *)priv->adapterInfo[descIndex].adapter);
     priv->adapterInfo[descIndex].adapter = NULL;
     priv->adapterInfo[descIndex].hwiAdapter = NULL;
