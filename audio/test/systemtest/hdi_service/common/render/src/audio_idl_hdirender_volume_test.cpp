@@ -29,6 +29,7 @@ public:
     static TestAudioManager *manager;
     struct IAudioRender *render = nullptr;
     struct IAudioAdapter *adapter = nullptr;
+    uint32_t renderId_ = 0;
 };
 
 TestAudioManager *AudioIdlHdiRendervolumeTest::manager = nullptr;
@@ -49,13 +50,13 @@ void AudioIdlHdiRendervolumeTest::TearDownTestCase(void)
 void AudioIdlHdiRendervolumeTest::SetUp(void)
 {
     ASSERT_NE(nullptr, manager);
-    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
+    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render, &renderId_);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiRendervolumeTest::TearDown(void)
 {
-    int32_t ret = ReleaseRenderSource(manager, adapter, render);
+    int32_t ret = ReleaseRenderSource(manager, adapter, render, renderId_);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 /**

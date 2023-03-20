@@ -198,10 +198,10 @@ int32_t GetLoadAdapter(TestAudioManager *manager, int portType,
     const std::string &adapterName, struct IAudioAdapter **adapter, struct AudioPort &audioPort);
 
 int32_t AudioCreateRender(TestAudioManager *manager, int pins, const std::string &adapterName,
-    struct IAudioAdapter **adapter, struct IAudioRender **render);
+    struct IAudioAdapter **adapter, struct IAudioRender **render, uint32_t *renderId);
 
 int32_t AudioCreateCapture(TestAudioManager *manager, int pins, const std::string &adapterName,
-    struct IAudioAdapter **adapter, struct IAudioCapture **capture);
+    struct IAudioAdapter **adapter, struct IAudioCapture **capture, uint32_t *captureId);
 
 int32_t FrameStart(struct AudioHeadInfo wavHeadInfo, struct IAudioRender *render, FILE *file,
     struct AudioSampleAttributes attrs);
@@ -255,9 +255,10 @@ void TestReleaseAdapterDescs(struct AudioAdapterDescriptor **descs, uint32_t des
 void TestAudioPortCapabilityFree(struct AudioPortCapability *dataBlock, bool freeSelf);
 
 int32_t ReleaseCaptureSource(TestAudioManager *manager, struct IAudioAdapter *&adapter,
-    struct IAudioCapture *&capture);
+    struct IAudioCapture *&capture, uint32_t captureId);
 
-int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioRender *&render);
+int32_t ReleaseRenderSource(TestAudioManager *manager, struct IAudioAdapter *&adapter, struct IAudioRender *&render,
+                            uint32_t renderId);
 }
 }
 #endif // AUDIO_IDLHDI_COMMON_H
