@@ -85,12 +85,11 @@ int32_t CameraDeviceImpl::GetStreamOperator(const sptr<IStreamOperatorCallback>&
         return INVALID_ARGUMENT;
     }
 
-    spCameraDeciceCallback_ = callbackObj;
     if (spStreamOperator_ == nullptr) {
 #ifdef CAMERA_BUILT_ON_OHOS_LITE
-        spStreamOperator_ = std::make_shared<StreamOperator>(spCameraDeciceCallback_, shared_from_this());
+        spStreamOperator_ = std::make_shared<StreamOperator>(callbackObj, shared_from_this());
 #else
-        spStreamOperator_ = new(std::nothrow) StreamOperator(spCameraDeciceCallback_, shared_from_this());
+        spStreamOperator_ = new(std::nothrow) StreamOperator(callbackObj, shared_from_this());
 #endif
         if (spStreamOperator_ == nullptr) {
             CAMERA_LOGW("create stream operator failed.");
@@ -311,6 +310,7 @@ int32_t CameraDeviceImpl::Close()
     }
 
     isOpened_ = false;
+    cameraDeciceCallback_ = nullptr;
     DFX_LOCAL_HITRACE_END;
     CAMERA_LOGD("camera close success.");
     return HDI::Camera::V1_0::NO_ERROR;
