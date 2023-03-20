@@ -47,14 +47,17 @@ ohos_unittest("hdi_unittest_power") {
 ohos_unittest("hdi_unittest_power_runninglock") {
   module_out_path = module_output_path
 
-  include_dirs = [ "${power_hdi_service_path}/src" ]
-
-  defines = [ "HDF_RUNNINGLOCK_UNIT_TEST" ]
+  include_dirs = [
+    "${power_hdi_service_path}/src",
+    "mock",
+  ]
 
   sources = [
     "${power_hdi_service_path}/src/running_lock_counter.cpp",
     "${power_hdi_service_path}/src/running_lock_impl.cpp",
     "${power_hdi_service_path}/src/running_lock_timer_handler.cpp",
+    "mock/mock_system_operation.cpp",
+    "mock/mock_wakelock_name.cpp",
     "src/hdf_power_runninglock_test.cpp",
   ]
 
