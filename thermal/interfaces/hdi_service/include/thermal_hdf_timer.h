@@ -16,7 +16,9 @@
 #ifndef THERMAL_HDF_TIMER_H
 #define THERMAL_HDF_TIMER_H
 
+#include <atomic>
 #include <map>
+#include <thread>
 #include "thermal_hdf_config.h"
 #include "thermal_simulation_node.h"
 #include "thermal_zone_manager.h"
@@ -36,11 +38,11 @@ public:
 
     ThermalHdfTimer(const std::shared_ptr<ThermalSimulationNode> &node,
         const std::shared_ptr<ThermalZoneManager> &thermalZoneMgr);
-    ~ThermalHdfTimer() {}
+    ~ThermalHdfTimer();
 
     int32_t Init();
     void ReportThermalData();
-    int32_t LoopingThreadEntry();
+    void LoopingThreadEntry();
     void Run();
     void StartThread();
     void ResetCount();
@@ -63,6 +65,8 @@ private:
     std::vector<int32_t> multipleList_;
     int32_t reportTime_;
     int32_t isSim_;
+    std::atomic_bool isRunning_ {true};
+    std::unique_ptr<std::thread> callbackThread_ {nullptr};
 };
 } // V1_0
 } // Thermal
