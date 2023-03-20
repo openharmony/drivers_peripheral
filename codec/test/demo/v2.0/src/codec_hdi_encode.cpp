@@ -409,20 +409,22 @@ void CodecHdiEncode::FreeBuffers()
     unUsedInBuffers_.clear();
     unUsedOutBuffers_.clear();
 
-    OMX_STATETYPE status;
-    auto err = client_->GetState(client_, &status);
-    if (err != HDF_SUCCESS) {
-        HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
-        return;
-    }
-
-    // wait
-    if (status != OMX_StateLoaded) {
-        HDF_LOGI("Wait for OMX_StateLoaded status");
-        this->WaitForStatusChanged();
-    } else {
-        HDF_LOGI(" status is %{public}d", status);
-    }
+    // wait loaded
+    OMX_STATETYPE status = OMX_StateLoaded;
+    int32_t err = HDF_SUCCESS;
+    int32_t tryCount = 3;
+    do {
+        err = client_->GetState(client_, &status);
+        if (err != HDF_SUCCESS) {
+            HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
+            break;
+        }
+        if (status != OMX_StateLoaded) {
+            HDF_LOGI("Wait for OMX_StateLoaded status");
+            this->WaitForStatusChanged();
+        }
+        tryCount--;
+    } while ((status != OMX_StateLoaded) && (tryCount > 0));
 }
 
 void CodecHdiEncode::Release()
