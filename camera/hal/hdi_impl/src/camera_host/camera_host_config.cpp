@@ -160,7 +160,7 @@ std::string CameraHostConfig::ReturnEnableLogicalCameraId()
         logicalCameraId = "lcam00";
         logicalCameraId = logicalCameraId + std::to_string(id);
         auto itr = cameraIdMap_.find(logicalCameraId);
-        if (itr == cameraIdMap_.end()) {
+        if (itr != cameraIdMap_.end()) {
             logicalCameraIdStatus = true;
             break;
         }
