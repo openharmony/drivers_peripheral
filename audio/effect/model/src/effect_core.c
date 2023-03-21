@@ -74,7 +74,7 @@ void ReleaseLibFromList()
 }
 
 // get the lib by libname
-struct EffectFactory *GetEffectLibFromList(char *effectLibName)
+struct EffectFactory *GetEffectLibFromList(const char *effectLibName)
 {
     struct EffectFactoryLibListNode *tmpNode = NULL;
     if (effectLibName == NULL) {

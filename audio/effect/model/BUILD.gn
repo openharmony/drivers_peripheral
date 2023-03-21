@@ -17,6 +17,7 @@ import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 if (!defined(ohos_lite)) {
   ohos_shared_library("effect_model_service_1.0") {
     sources = [
+      "//drivers/peripheral/audio/effect/config/src/parse_effect_config.c",
       "src/effect_control.c",
       "src/effect_core.c",
       "src/effect_model.c",
@@ -25,9 +26,12 @@ if (!defined(ohos_lite)) {
     include_dirs = [
       "./include",
       "//third_party/bounds_checking_function/include",
+      "//drivers/peripheral/audio/effect/config/include/",
+      "//third_party/cJSON/",
     ]
 
     defines = []
+    deps = [ "//third_party/cJSON:cjson" ]
 
     if (is_standard_system) {
       external_deps = [
