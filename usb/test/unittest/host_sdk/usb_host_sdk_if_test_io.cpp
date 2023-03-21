@@ -43,7 +43,7 @@ static void AcmReadBulk(struct UsbRequest *req)
 {
     uint32_t size = req->compInfo.actualLength;
     int32_t status = req->compInfo.status;
-    printf("Bulk status:%d,actualLength:%u\n", status, size);
+    HDF_LOGI("%{public}s: Bulk status:%{public}d,actualLength:%{public}u", __func__, status, size);
     return;
 }
 
@@ -52,12 +52,12 @@ static void AcmWriteBulk(struct UsbRequest *req)
     int32_t status;
 
     if (req == nullptr) {
-        printf("%s:%d req is nullptr!", __func__, __LINE__);
+        HDF_LOGE("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
 
     status = req->compInfo.status;
-    printf("Bulk Write status:%d\n", status);
+    HDF_LOGI("%{public}s: Bulk Write status:%{public}d", __func__, status);
     struct AcmWb *wb  = static_cast<struct AcmWb *>(req->compInfo.userData);
     switch (status) {
         case 0:
@@ -95,12 +95,12 @@ static int32_t AcmWriteBufAlloc(struct AcmDevice *acm)
 static void AcmCtrlIrq(struct UsbRequest *req)
 {
     if (req == nullptr) {
-        printf("%s:%d req is nullptr!", __func__, __LINE__);
+        HDF_LOGE("%s:%d req is nullptr!", __func__, __LINE__);
         return;
     }
     int32_t status = req->compInfo.status;
     unsigned int currentSize = req->compInfo.actualLength;
-    printf("Irqstatus:%d,actualLength:%u\n", status, currentSize);
+    HDF_LOGI("%{public}s: Irqstatus:%{public}d, actualLength:%{public}u", __func__, status, currentSize);
     switch (status) {
         case 0:
             break;
@@ -108,7 +108,7 @@ static void AcmCtrlIrq(struct UsbRequest *req)
             return;
     }
 
-    printf("%s:%d exit", __func__, __LINE__);
+    HDF_LOGI("%{public}s:%{public}d exit", __func__, __LINE__);
 }
 
 static struct UsbControlRequest UsbControlMsg(struct TestControlMsgData msgData)
@@ -130,6 +130,10 @@ static void AcmGetPipe()
     int32_t ret;
     UsbPipeInfo p;
     UsbPipeInfo *pi = (UsbPipeInfo *)OsalMemCalloc(sizeof(UsbPipeInfo));
+    if (pi == nullptr) {
+        HDF_LOGE("%{public}s: sosalmemcalloc failed", __func__);
+        return;
+    }
 
     for (int32_t i = 0;  i <= g_acm->dataIface->info.pipeNum; i++) {
         ret = UsbGetPipeInfo(g_acm->data_devHandle, g_acm->dataIface->info.curAltSetting, i, &p);
@@ -248,7 +252,7 @@ static void AcmFillWriteRequest()
         }
         ret = memcpy_s(g_acm->wb[i].buf, g_acm->writeSize, sendData, size);
         if (ret != EOK) {
-            printf("memcpy_s fial");
+            HDF_LOGE("%{public}s: memcpy_s failed", __func__);
             break;
         }
 
@@ -367,12 +371,15 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestSync001, TestSize.Level1
     int32_t ret;
     int32_t i;
     AcmInit();
-
     for (i = 0; i < 1; i++) {
-        printf("------UsbSubmitRequestSync i = [%d]------\n", i);
+        HDF_LOGI("%{public}s: ------UsbSubmitRequestSync i = [%{public}d]------", __func__, i);
         ret = UsbSubmitRequestSync(g_acm->readReq[i]);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }
+    OsalMemFree(g_acm->dataInPipe);
+    OsalMemFree(g_acm->dataOutPipe);
+    OsalMemFree(g_acm->intPipe);
+    OsalMemFree(g_acm->ctrPipe);
 }
 
 /**
@@ -387,7 +394,7 @@ HWTEST_F(UsbHostSdkIfTestIo, CheckHostSdkIfSubmitRequestSync002, TestSize.Level1
     int32_t i;
 
     for (i = 0; i < 1; i++) {
-        printf("------UsbSubmitRequestSync i = [%d]------\n", i);
+        HDF_LOGI("%{public}s: ------UsbSubmitRequestSync i = [%{public}d]------", __func__, i);
         ret = UsbSubmitRequestSync(g_acm->wb[i].request);
         EXPECT_EQ(HDF_SUCCESS, ret);
     }

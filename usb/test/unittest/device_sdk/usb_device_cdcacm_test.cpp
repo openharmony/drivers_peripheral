@@ -707,7 +707,7 @@ struct AcmDevice *SetUpAcmDevice(void)
     if (acmDevice == nullptr) {
         return nullptr;
     }
-    acmDevice->fnDev = UsbFnCreateDevice("100e0000.hidwc3_0", &descData);
+    acmDevice->fnDev = const_cast<struct UsbFnDevice *>(UsbFnCreateDevice("100e0000.hidwc3_0", &descData));
     if (acmDevice->fnDev == nullptr) {
         return nullptr;
     }
