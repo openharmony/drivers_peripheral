@@ -46,10 +46,11 @@ static int32_t GrMemCreate(AllocInfo *alloc, BufferHandle **bufferHandle)
         return HDF_FAILURE;
     }
     int32_t err = g_gralloc->AllocMem(*alloc, *bufferHandle);
-    if (err != HDF_SUCCESS) {
+    if (err != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s AllocMem fail", __func__);
+        return HDF_FAILURE;
     }
-    return err;
+    return HDF_SUCCESS;
 }
 
 static int32_t GrMemDestroy(BufferHandle *bufferHandle)

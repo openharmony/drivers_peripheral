@@ -52,6 +52,7 @@ void DoublePreviewTest::SetStreamInfo(StreamInfo &streamInfo,
     streamInfo.tunneledMode_ = TUNNEL_MODE;
     producer = streamCustomer->CreateProducer();
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     streamInfo.bufferQueue_->producer_->SetQueueSize(BUFFER_QUEUE_SIZE);
 }
 

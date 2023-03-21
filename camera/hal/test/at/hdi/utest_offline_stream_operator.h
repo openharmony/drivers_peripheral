@@ -49,6 +49,7 @@ public:
                 return nullptr;
             }
             sptr<IBufferConsumerListener> listener = new TestBufferConsumerListener();
+            CHECK_IF_PTR_NULL_RETURN_VALUE(listener, nullptr);
             consumer_->RegisterConsumerListener(listener);
 
             auto producer = consumer_->GetProducer();

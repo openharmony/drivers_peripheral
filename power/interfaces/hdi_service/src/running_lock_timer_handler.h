@@ -36,9 +36,9 @@ public:
         bool once = true);
     bool UnregisterRunningLockTimer(const RunningLockInfo &info);
 private:
-    uint32_t GetRunningLockTimerCount();
     uint32_t GetRunningLockTimerId(RunningLockType type, std::string name);
-    void UpdateRunninglockTimerMap(RunningLockType type, std::string name, uint32_t timerId, bool remove);
+    void AddRunningLockTimerMap(RunningLockType type, std::string name, uint32_t timerId);
+    void RemoveRunningLockTimerMap(RunningLockType type, std::string name);
     void UnregisterTimer(uint32_t timerId);
     std::unique_ptr<OHOS::Utils::Timer> handlerTimer_;
     std::map<RunningLockType, std::map<std::string, uint32_t>> runninglockTimerMap_;

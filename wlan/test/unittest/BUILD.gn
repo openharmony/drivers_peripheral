@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -101,7 +101,7 @@ if (defined(ohos_lite)) {
     cflags = configFlag
   }
 } else {
-  module_output_path = "hdf/wlan"
+  module_output_path = "drivers_peripheral_wlan/wlan"
   ohos_unittest("hdf_common_wifi") {
     module_out_path = module_output_path
     include_dirs = [

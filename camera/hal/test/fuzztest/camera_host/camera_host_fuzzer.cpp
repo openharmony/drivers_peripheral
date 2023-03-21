@@ -35,7 +35,9 @@ bool CameraHostFuzzTest(const uint8_t *rawData, size_t size)
     MessageOption option;
 
     sptr<ICameraHost> cameraHost = new OHOS::Camera::CameraHostImpl();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(cameraHost, false);
     sptr<CameraHostStub> IpcHost = new CameraHostStub(cameraHost);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(IpcHost, false);
     
     sleep(sleepTime); // sleep two second
     IpcHost->OnRemoteRequest(code, data, reply, option);

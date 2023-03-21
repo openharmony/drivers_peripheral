@@ -51,6 +51,7 @@ OHOS::sptr<OHOS::IBufferProducer> StreamCustomer::CreateProducer()
         return nullptr;
     }
     OHOS::sptr<OHOS::IBufferConsumerListener> listener = new TestBuffersConsumerListener();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(listener, nullptr);
     consumer_->RegisterConsumerListener(listener);
 
     auto producer = consumer_->GetProducer();
