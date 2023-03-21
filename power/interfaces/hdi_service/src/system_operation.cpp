@@ -15,6 +15,7 @@
 
 #include "system_operation.h"
 
+#include <fcntl.h>
 #include <file_ex.h>
 
 #include "hdf_base.h"
