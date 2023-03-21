@@ -150,6 +150,11 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
     const int ENTRY_CAPACITY = 30;
     const int DATA_CAPACITY = 2000;
     std::shared_ptr<CameraMetadata> metadata = std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+    if (metadata == nullptr) {
+        CAMERA_LOGE("metadata is nullptr cameraId: %{public}s, nodeName: %{public}s",
+            cameraId.c_str(), node.name);
+        return RC_ERROR;
+    }
     DealAeAvailableAntiBandingModes(node, metadata);
     DealAeAvailableModes(node, metadata);
     DealAvailableFpsRange(node, metadata);

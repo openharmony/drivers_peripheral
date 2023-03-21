@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -103,14 +103,8 @@ void ThermalHdfUtils::TrimStr(std::string& str)
     if (str.empty()) {
         return;
     }
-    std::string::iterator iter = str.begin();
-    while (iter != str.end()) {
-        if (*iter == '\n' || *iter == '\r') {
-            str.erase(iter);
-        } else {
-            iter++;
-        }
-    }
+    str.erase(std::remove(str.begin(), str.end(), '\n'), str.end());
+    str.erase(std::remove(str.begin(), str.end(), '\r'), str.end());
 }
 } // V1_0
 } // Thermal

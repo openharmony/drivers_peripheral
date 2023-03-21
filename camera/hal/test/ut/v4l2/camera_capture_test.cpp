@@ -305,6 +305,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_020, TestSize.Level1)
     display_->streamInfo.tunneledMode_ = 5; // tunnel mode
     display_->streamInfo.encodeType_ = ENCODE_TYPE_JPEG;
     display_->streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(display_->streamInfo.bufferQueue_, nullptr);
     streamInfos.push_back(display_->streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
     CAMERA_LOGE("CreateStreams! rc:0x%x\n", display_->rc);
@@ -358,6 +359,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_021, TestSize.Level1)
     display_->streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     display_->streamInfo.encodeType_ = ENCODE_TYPE_JPEG;
     display_->streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(display_->streamInfo.bufferQueue_, nullptr);
     streamInfos.push_back(display_->streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
     CAMERA_LOGE("CreateStreams! rc:0x%x\n", display_->rc);

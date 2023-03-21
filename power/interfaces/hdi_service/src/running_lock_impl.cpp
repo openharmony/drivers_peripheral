@@ -23,19 +23,17 @@ namespace HDI {
 namespace Power {
 namespace V1_1 {
 namespace {
+const std::string RUNNINGLOCK_TAG_BACKGROUND_INVALID = "OHOS.RunningLock.Background.Invalid";
 const std::string RUNNINGLOCK_TAG_BACKGROUND_PHONE = "OHOS.RunningLock.Background.Phone";
 const std::string RUNNINGLOCK_TAG_BACKGROUND_NOTIFICATION = "OHOS.RunningLock.Background.Notification";
 const std::string RUNNINGLOCK_TAG_BACKGROUND_AUDIO = "OHOS.RunningLock.Background.Audio";
 const std::string RUNNINGLOCK_TAG_BACKGROUND_SPORT = "OHOS.RunningLock.Background.Sport";
 const std::string RUNNINGLOCK_TAG_BACKGROUND_NAVIGATION = "OHOS.RunningLock.Background.Navigation";
 const std::string RUNNINGLOCK_TAG_BACKGROUND_TASK = "OHOS.RunningLock.Background.Task";
-#ifndef HDF_RUNNINGLOCK_UNIT_TEST
 constexpr int32_t DEFAULT_TIMEOUT = 3000;
-#else
-constexpr int32_t DEFAULT_TIMEOUT = 100;
-#endif
 } // namespace
 std::mutex RunningLockImpl::mutex_;
+int32_t RunningLockImpl::defaultTimeOutMs_ = DEFAULT_TIMEOUT;
 std::unique_ptr<RunningLockTimerHandler> RunningLockImpl::timerHandler_ = nullptr;
 std::map<RunningLockType, std::shared_ptr<RunningLockCounter>> RunningLockImpl::lockCounters_ = {};
 
@@ -89,7 +87,7 @@ int32_t RunningLockImpl::Unhold(const RunningLockInfo &info)
     }
     auto iterator = lockCounters_.find(filledInfo.type);
     if (iterator == lockCounters_.end()) {
-        HDF_LOGW("Runninglock unhold failed, type=%{public}d is not in lockCounters", filledInfo.type);
+        HDF_LOGW("type=%{public}d is not in lockCounters, no need to unhold", filledInfo.type);
         return HDF_SUCCESS;
     }
     if (timerHandler_ != nullptr) {
@@ -104,12 +102,21 @@ int32_t RunningLockImpl::Unhold(const RunningLockInfo &info)
 
 uint32_t RunningLockImpl::GetCount(RunningLockType type)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     int32_t count = 0;
     auto iterator = lockCounters_.find(type);
     if (iterator != lockCounters_.end()) {
         count = iterator->second->GetCount();
     }
     return count;
+}
+
+void RunningLockImpl::SetDefaultTimeOutMs(int32_t timeOutMs)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (timeOutMs > 0) {
+        defaultTimeOutMs_ = timeOutMs;
+    }
 }
 
 bool RunningLockImpl::IsValidType(RunningLockType type, PowerHdfState state)
@@ -142,7 +149,7 @@ RunningLockInfo RunningLockImpl::FillRunningLockInfo(const RunningLockInfo &info
         filledInfo.type = RunningLockType::RUNNINGLOCK_BACKGROUND_TASK;
     }
     if (filledInfo.timeoutMs == 0) {
-        filledInfo.timeoutMs = DEFAULT_TIMEOUT;
+        filledInfo.timeoutMs = defaultTimeOutMs_;
     }
     return filledInfo;
 }
@@ -162,10 +169,11 @@ std::string RunningLockImpl::GetRunningLockTag(RunningLockType type)
             return RUNNINGLOCK_TAG_BACKGROUND_NAVIGATION;
         case RunningLockType::RUNNINGLOCK_BACKGROUND_TASK:
             return RUNNINGLOCK_TAG_BACKGROUND_TASK;
-        default:
-            break;
+        default: {
+            HDF_LOGE("type=%{public}d is invalid, there is no corresponding tag", type);
+            return RUNNINGLOCK_TAG_BACKGROUND_INVALID;
+        }
     }
-    return "";
 }
 } // namespace V1_1
 } // namespace Power

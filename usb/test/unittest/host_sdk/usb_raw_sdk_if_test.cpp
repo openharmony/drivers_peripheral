@@ -147,7 +147,7 @@ void UsbRawSdkIfTest::TearDownTestCase()
 
 static void AcmWriteBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
+    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
 
     printf("%s:%d entry!", __func__, __LINE__);
     if (req == nullptr) {
@@ -169,7 +169,7 @@ static void AcmWriteBulkCallback(const void *requestArg)
 
 static void AcmReadBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
+    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
 
     printf("%s:%d entry!", __func__, __LINE__);
     if (req == nullptr) {
@@ -229,7 +229,7 @@ static void AcmProcessNotification(struct AcmDevice *acm, struct UsbCdcNotificat
 
 static void AcmNotifyReqCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
+    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
     if (req == nullptr) {
         return;
     }

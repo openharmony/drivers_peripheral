@@ -31,11 +31,13 @@ using namespace testing::ext;
 namespace {
 constexpr const char *TEST_SERVICE_NAME = "codec_hdi_service";
 constexpr const int TEST_PACKET_BUFFER_SIZE = 4096;
-constexpr const int TEST_FRAME_BUFFER_SIZE = 640 * 480 * 3 / 2;
+constexpr const int TEST_FRAME_BUFFER_SIZE = (640 * 480 * 3 / 2);
 constexpr const uint32_t QUEUE_TIME_OUT = 10;
 constexpr const int CAPABILITY_COUNT = 9;
 constexpr int32_t INT_TO_STR_LEN = 32;
 constexpr int32_t ARRAY_TO_STR_LEN = 1000;
+constexpr int32_t VIDEO_WIDHT = 640;
+constexpr int32_t VIDEO_HEIGHT = 480;
 struct ICodec *g_codecObj = nullptr;
 ShareMemory g_inputBuffer;
 ShareMemory g_outputBuffer;
@@ -220,6 +222,38 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetPortModeTest_001, TestSize.Level1)
     BufferType type;
     int32_t errorCode = g_codecObj->CodecGetPortMode(g_codecObj, g_handle, direct, &mode, &type);
     ASSERT_EQ(errorCode, HDF_ERR_NOT_SUPPORT);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetVideoWidthTest_001, TestSize.Level1)
+{
+    Param *params;
+    int paramCnt = 1;
+    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    ASSERT_TRUE(params != nullptr);
+    params->key = KEY_VIDEO_WIDTH;
+    int32_t width = VIDEO_WIDHT;
+    params->val = (void *)&width;
+    params->size = sizeof(width);
+
+    int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
+    OsalMemFree(params);
+    ASSERT_EQ(errorCode, HDF_SUCCESS);
+}
+
+HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetVideoHeightTest_001, TestSize.Level1)
+{
+    Param *params;
+    int paramCnt = 1;
+    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
+    ASSERT_TRUE(params != nullptr);
+    params->key = KEY_VIDEO_HEIGHT;
+    int32_t height = VIDEO_HEIGHT;
+    params->val = (void *)&height;
+    params->size = sizeof(height);
+
+    int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
+    OsalMemFree(params);
+    ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
 
 HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetCodecTypeTest_001, TestSize.Level1)

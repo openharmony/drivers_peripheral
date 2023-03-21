@@ -53,12 +53,10 @@ if (defined(ohos_lite)) {
 
     libs = []
     defines = []
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//foundation/graphic/surface:surface",
-    ]
+    deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
     external_deps = [
       "drivers_peripheral_display:hdi_display",
+      "graphic_chipsetsdk:surface",
       "hdf_core:libhdf_utils",
     ]
 

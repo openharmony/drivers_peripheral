@@ -78,15 +78,15 @@ static int32_t OpenDevice(void)
 
     ret = sprintf_s(path, sizeof(char) * PATH_MAX_LENGTH, USB_DEV_FS_PATH "/%03u/%03u", g_busNum, g_devAddr);
     if (ret < 0) {
-        printf("path error\n");
+        HDF_LOGE("%{public}s: sprintf_s path failed", __func__);
         return ret;
     }
 
-    printf("open: %s\n", path);
+    HDF_LOGI("%{public}s: open file action", __func__);
     g_fd = open(path, O_RDWR);
 
     if (g_fd < 0) {
-        printf("open device failed! errno=%2d(%s)\n", errno, strerror(errno));
+        HDF_LOGE("%{public}s: open device failed errno = %{public}d %{public}s", __func__, errno, strerror(errno));
     }
 
     return g_fd;
@@ -95,32 +95,34 @@ static int32_t OpenDevice(void)
 static int32_t ClaimInterface(unsigned int iface)
 {
     if (g_fd < 0 || iface == 0) {
-        printf("parameter error\n");
+        HDF_LOGE("%{public}s: parameter error", __func__);
         return -1;
     }
 
     int32_t ret = ioctl(g_fd, USBDEVFS_CLAIMINTERFACE, &iface);
     if (ret < 0) {
-        printf("claim failed: iface=%u, errno=%2d(%s)\n", iface, errno, strerror(errno));
+        HDF_LOGE("%{public}s: sprintf_s path failed claim failed: iface = %{public}u errno = %{public}d %{public}s",
+            __func__, iface, errno, strerror(errno));
         return HDF_FAILURE;
     }
-    printf("claim success: iface=%u\n", iface);
+    HDF_LOGI("%{public}s: claim success: iface = %{public}u", __func__, iface);
     return HDF_SUCCESS;
 }
 
 static void FillUrb(struct UsbAdapterUrb *urb, int32_t len)
 {
     if (urb == NULL) {
-        urb = OsalMemCalloc(sizeof(struct UsbAdapterUrb));
-        urb->userContext = (void *)(urb);
-        urb->type = USB_ADAPTER_URB_TYPE_BULK;
-        urb->streamId = 0;
-        urb->endPoint = g_endNum;
+        HDF_LOGE("%{public}s: urb is null", __func__);
+        return;
     }
+    urb->userContext = (void *)(urb);
+    urb->type = USB_ADAPTER_URB_TYPE_BULK;
+    urb->streamId = 0;
+    urb->endPoint = g_endNum;
     if ((g_endNum >> ENDPOINT_IN_OFFSET) == 0) {
         int32_t ret = memset_s(urb->buffer, len, 'c', len);
         if (ret != EOK) {
-            printf("memset_s failed: ret = %d\n", ret);
+            HDF_LOGE("%{public}s: memset_s failed: ret = %{public}d", __func__, ret);
         }
     }
 }
@@ -138,7 +140,6 @@ static void SignalHandler(int32_t signo)
                 break;
             }
             speed = (g_byteTotal * 1.0) / (sigCnt * TEST_PRINT_TIME * 1024 * 1024);
-            printf("\nSpeed:%f MB/s\n", speed);
             new_value.it_value.tv_sec = TEST_PRINT_TIME;
             new_value.it_value.tv_usec = 0;
             new_value.it_interval.tv_sec = TEST_PRINT_TIME;
@@ -174,7 +175,7 @@ static int32_t SendProcess(void *argurb)
         FillUrb(g_sendUrb, TEST_LENGTH);
         int32_t ret = ioctl(g_fd, USBDEVFS_SUBMITURB, g_sendUrb);
         if (ret < 0) {
-            printf("SubmitBulkRequest: ret:%d errno=%d\n", ret, errno);
+            HDF_LOGE("%{public}s: ret:%{public}d errno = %{public}d", __func__, ret, errno);
             urb[i].inUse = 0;
             continue;
         }
@@ -189,7 +190,7 @@ static int32_t ReapProcess(void * const argurb)
     struct UsbAdapterUrb *urbrecv = NULL;
     struct itimerval new_value, old_value;
     if (signal(SIGUSR1, SignalHandler) == SIG_ERR) {
-        printf("signal SIGUSR1 failed");
+        HDF_LOGE("%{public}s: signal SIGUSR1 failed", __func__);
         return HDF_ERR_IO;
     }
     g_tid = (pid_t)syscall(SYS_gettid);
@@ -217,11 +218,11 @@ static int32_t ReapProcess(void * const argurb)
 
         if (g_printData) {
             for (int32_t i = 0; i < urbrecv->actualLength; i++) {
-                printf("%c", recvBuf[i]);
+                HDF_LOGI("%{public}s: recvbuf %{public}c", __func__, recvBuf[i]);
             }
             fflush(stdout);
         } else if (g_recv_count % 10000 == 0) {
-            printf("#");
+            HDF_LOGI("%{public}s: #", __func__);
             fflush(stdout);
         }
 
@@ -268,13 +269,13 @@ static int32_t BeginProcess(unsigned char endPoint)
     int32_t i;
 
     if ((g_fd < 0) || (endPoint == 0)) {
-        HDF_LOGE("%s: g_fd or endPoint is invalied", __func__);
+        HDF_LOGE("%{public}s: g_fd or endPoint is invalied", __func__);
         return -1;
     }
 
     ret = FillUrbData(endPoint);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%s: Fill urb data failed", __func__);
+        HDF_LOGE("%{public}s: Fill urb data failed", __func__);
         return ret;
     }
     gettimeofday(&time, NULL);
@@ -311,9 +312,9 @@ static int32_t BeginProcess(unsigned char endPoint)
 
 static void ShowHelp(char *name)
 {
-    printf(">> usage:\n");
-    printf(">>      %s [<busNum> <devAddr>]  <g_ifaceNum> <endpoint> [<printdata>]\n", name);
-    printf("\n");
+    HDF_LOGI("%{public}s: usage:", __func__);
+    HDF_LOGI("%{public}s: name is %{public}s [<busNum> <devAddr>]  <g_ifaceNum> <endpoint> [<printdata>]",
+        __func__, name);
 }
 
 int32_t main(int32_t argc, char *argv[])
@@ -336,7 +337,7 @@ int32_t main(int32_t argc, char *argv[])
         g_ifaceNum = (unsigned int)atoi(argv[1]);
         g_endNum = (unsigned char)atoi(argv[2]); // 2 means get second char of argv
     } else {
-        printf("Error: parameter error!\n\n");
+        HDF_LOGE("%{public}s: parameter error!", __func__);
         ShowHelp(argv[0]);
         return -1;
     }
@@ -364,13 +365,13 @@ int32_t main(int32_t argc, char *argv[])
 
     ret = OsalThreadCreate(&urbReapProcess, (OsalThreadEntry)ReapProcess, NULL);
     if (ret != HDF_SUCCESS) {
-        printf("OsalThreadCreate fail, ret=%d\n", ret);
+        HDF_LOGE("%{public}s: OsalThreadCreate failed, ret=%{public}d", __func__, ret);
         goto ERR;
     }
 
     ret = OsalThreadStart(&urbReapProcess, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        printf("OsalThreadStart fail, ret=%d\n", ret);
+        HDF_LOGE("%{public}s: OsalThreadStart failed, ret=%{public}d", __func__, ret);
     }
 
     threadCfg.name = "urb send process";
@@ -379,13 +380,13 @@ int32_t main(int32_t argc, char *argv[])
 
     ret = OsalThreadCreate(&urbSendProcess, (OsalThreadEntry)SendProcess, NULL);
     if (ret != HDF_SUCCESS) {
-        printf("OsalThreadCreate fail, ret=%d\n", ret);
+        HDF_LOGE("%{public}s: OsalThreadCreate failed, ret=%{public}d", __func__, ret);
         goto ERR;
     }
 
     ret = OsalThreadStart(&urbSendProcess, &threadCfg);
     if (ret != HDF_SUCCESS) {
-        printf("OsalThreadStart fail, ret=%d\n", ret);
+        HDF_LOGE("%{public}s: OsalThreadStart failed, ret=%{public}d", __func__, ret);
     }
 
     ret = BeginProcess(g_endNum);
@@ -395,7 +396,8 @@ int32_t main(int32_t argc, char *argv[])
 
 ERR:
     if (ret != HDF_SUCCESS) {
-        printf("please check whether usb drv so is existing or not,like acm, ecm, if not, remove it and test again!\n");
+        HDF_LOGE("%{public}s: please check whether usb drv so is existing or not,like acm, ecm, if not,
+            remove it and test again!", __func__);
     }
     CloseDevice();
     return ret;

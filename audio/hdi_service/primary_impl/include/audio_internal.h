@@ -55,6 +55,7 @@ extern "C" {
 #define RANGE_MIN             4
 #define EXTPARAM_LEN          32
 #define KEY_VALUE_LIST_LEN    128
+#define MAX_AUDIO_STREAM_NUM  10
 
 #define HDF_AUDIO_CODEC_PRIMARY_DEV "hdf_audio_codec_primary_dev"
 #define HDF_AUDIO_CODEC_HDMI_DEV    "hdf_audio_codec_hdmi_dev"
@@ -303,8 +304,10 @@ struct AudioHwCapture {
 };
 
 struct AudioRenderAndCaptureInfo {
-    struct AudioHwRender *renderServicePtr;
-    struct AudioHwCapture *captureServicePtr;
+    struct AudioHwRender *renderServicePtr[MAX_AUDIO_STREAM_NUM];
+    uint32_t renderCnt;
+    struct AudioHwCapture *captureServicePtr[MAX_AUDIO_STREAM_NUM];
+    uint32_t captureCnt;
 };
 
 struct AudioHwAdapter {
@@ -444,8 +447,8 @@ int32_t AudioAdapterCreateRenderPre(struct AudioHwRender *hwRender, const struct
     const struct AudioSampleAttributes *attrs, const struct AudioHwAdapter *hwAdapter);
 int32_t AudioAdapterBindServiceRender(struct AudioHwRender *hwRender);
 int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct IAudioRender **render);
-int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc);
+    const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId);
+int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t renderId);
 int32_t GetAudioCaptureFunc(struct AudioHwCapture *hwCapture);
 int32_t InitHwCaptureParam(struct AudioHwCapture *hwCapture, const struct AudioDeviceDescriptor *desc,
     const struct AudioSampleAttributes *attrs);
@@ -454,8 +457,8 @@ int32_t AudioAdapterCreateCapturePre(struct AudioHwCapture *hwCapture, const str
     const struct AudioSampleAttributes *attrs, struct AudioHwAdapter *hwAdapter);
 int32_t AudioAdapterInterfaceLibModeCapture(struct AudioHwCapture *hwCapture);
 int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture);
-int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc);
+    const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture, uint32_t *captureId);
+int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, uint32_t captureId);
 int32_t AudioAdapterGetPortCapability(
     struct IAudioAdapter *adapter, const struct AudioPort *port, struct AudioPortCapability *capability);
 int32_t AudioAdapterSetPassthroughMode(

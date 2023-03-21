@@ -34,6 +34,7 @@ public:
     struct IAudioAdapter *adapter = nullptr;
     struct IAudioCapture *capture = nullptr;
     static TestAudioManager *manager;
+    uint32_t captureId_ = 0;
 };
 
 TestAudioManager *AudioIdlHdiCaptureTest::manager = nullptr;
@@ -55,13 +56,13 @@ void AudioIdlHdiCaptureTest::TearDownTestCase(void)
 void AudioIdlHdiCaptureTest::SetUp(void)
 {
     ASSERT_NE(nullptr, manager);
-    int32_t ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
+    int32_t ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture, &captureId_);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiCaptureTest::TearDown(void)
 {
-    int32_t ret = ReleaseCaptureSource(manager, adapter, capture);
+    int32_t ret = ReleaseCaptureSource(manager, adapter, capture, captureId_);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
