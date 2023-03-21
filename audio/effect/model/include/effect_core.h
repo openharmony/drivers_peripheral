@@ -36,7 +36,7 @@ struct ControllerManagerNode {
 /* declare the function here */
 bool IsEffectLibExist();
 int32_t RegisterEffectLibToList(void *handle, struct EffectFactory *factLib);
-struct EffectFactory *GetEffectLibFromList(char *effectLibName);
+struct EffectFactory *GetEffectLibFromList(const char *effectLibName);
 void ReleaseLibFromList();
 int32_t RegisterControllerToList(struct ControllerManager *ctrlMgr);
 struct ControllerManager *GetControllerFromList(char *effectId);
