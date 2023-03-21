@@ -20,6 +20,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <shared_mutex>
 #include <nocopyable.h>
 #include <osal_mem.h>
 #include <string>
@@ -133,6 +134,7 @@ private:
     uint32_t maxStateWaitTime = 10000;
     uint32_t maxStateWaitCount = 100;
     std::mutex mutex_;
+    std::shared_mutex callbackMutex_;
 };
 }  // namespace Omx
 }  // namespace Codec
