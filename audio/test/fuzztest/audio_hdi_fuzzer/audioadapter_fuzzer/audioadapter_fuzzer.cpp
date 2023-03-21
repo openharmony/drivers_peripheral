@@ -54,8 +54,10 @@ static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const
                                   &render, &g_renderId);
             break;
         }
-        case AUDIO_ADAPTER_DESTORY_RENDER:
-            adapter->DestroyRender(adapter, reinterpret_cast<uint32_t>(rawData));
+        case AUDIO_ADAPTER_DESTORY_RENDER: {
+            uint32_t renderId = *(reinterpret_cast<uint32_t *>(data));
+            adapter->DestroyRender(adapter, renderId);
+        }
             break;
         case AUDIO_ADAPTER_CREAT_CAPTURE: {
             struct IAudioCapture *capture = nullptr;
@@ -64,8 +66,10 @@ static void AdapterFucSwitch(struct IAudioAdapter *&adapter, uint32_t cmd, const
                                    &capture, &g_captureId);
             break;
         }
-        case AUDIO_ADAPTER_DESTORY_CAPTURE:
-            adapter->DestroyCapture(adapter, reinterpret_cast<uint32_t>(rawData));
+        case AUDIO_ADAPTER_DESTORY_CAPTURE: {
+            uint32_t captureId = *(reinterpret_cast<uint32_t *>(data));
+            adapter->DestroyCapture(adapter, captureId);
+        }
             break;
         case AUDIO_ADAPTER_GET_PORT_CAPABILITY: {
             struct AudioPortCapability capability = {};
