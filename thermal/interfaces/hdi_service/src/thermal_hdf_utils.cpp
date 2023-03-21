@@ -35,7 +35,7 @@ int32_t ThermalHdfUtils::ReadNodeToInt(const std::string& path)
     FILE* fp;
     int32_t out = INVALID_NUM;
     if ((fp = fopen(path.c_str(), "r")) == nullptr) {
-        THERMAL_HILOGI(COMP_HDI, "open file failed, path: %{private}s", path.c_str());
+        THERMAL_HILOGI(COMP_HDI, "open file failed");
         return out;
     }
 
@@ -57,7 +57,7 @@ int32_t ThermalHdfUtils::ReadNode(const std::string& path, std::string& out)
     FILE* fp;
     int32_t ret = HDF_FAILURE;
     if ((fp = fopen(path.c_str(), "r")) == nullptr) {
-        THERMAL_HILOGI(COMP_HDI, "open file failed, path: %{private}s", path.c_str());
+        THERMAL_HILOGI(COMP_HDI, "open file failed");
         return ret;
     }
 
@@ -82,12 +82,12 @@ int32_t ThermalHdfUtils::WriteNode(const std::string& path, std::string& data)
     FILE* fp;
     int32_t ret = HDF_FAILURE;
     if ((fp = fopen(path.c_str(), "r")) == nullptr) {
-        THERMAL_HILOGI(COMP_HDI, "open file failed, path: %{private}s", path.c_str());
+        THERMAL_HILOGI(COMP_HDI, "open file failed");
         return ret;
     }
 
     if (fwrite(data.c_str(), sizeof(data.c_str()), 1, fp) == 0) {
-        THERMAL_HILOGW(COMP_HDI, "write node failed, path: %{private}s", path.c_str());
+        THERMAL_HILOGW(COMP_HDI, "write node failed");
     } else {
         ret = HDF_SUCCESS;
     }
