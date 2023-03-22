@@ -360,8 +360,7 @@ int32_t ThermalDfx::Init()
     g_interval = config.interval > MIN_INTERVAL ? config.interval: MIN_INTERVAL;
     g_width = config.width > DEFAULT_WIDTH ? config.width : DEFAULT_WIDTH;
     g_outPath = config.outPath;
-    THERMAL_HILOGI(COMP_HDI, "tarce init interval: %{public}d width: %{public}d outpath: %{private}s",
-        g_interval, g_width, g_outPath.c_str());
+    THERMAL_HILOGI(COMP_HDI, "tarce init interval: %{public}d width: %{public}d", g_interval, g_width);
     StartThread();
     return HDF_SUCCESS;
 }
