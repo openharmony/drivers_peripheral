@@ -59,7 +59,7 @@ static int32_t ShowLightInfo(struct HdfSBuf *reply)
         }
 
         ret = sprintf_s(lightInfo, STRING_LEN,
-            " lightId: %d\n state: %d\n lightNumber: %d\n lightName: %s\n lightType: %d\n",
+            " lightId: %u\n state: %hhu\n lightNumber: %u\n lightName: %s\n lightType: %d\n",
             lightDevice->lightInfoEntry->lightId,
             lightState[lightDevice->lightInfoEntry->lightId],
             lightDevice->lightInfoEntry->lightNumber,
@@ -98,7 +98,7 @@ static int32_t ShowLightEffectInfo(struct HdfSBuf *reply)
     }
 
     ret = sprintf_s(lightEffectInfo, STRING_LEN,
-        " r: %d\n g: %d\n b: %d\n flashMode: %d\n onTime: %d\n offTime: %d\n",
+        " r: %hhu\n g: %hhu\n b: %hhu\n flashMode: %d\n onTime: %d\n offTime: %d\n",
         lightEffect->lightColor.colorValue.rgbColor.r,
         lightEffect->lightColor.colorValue.rgbColor.g,
         lightEffect->lightColor.colorValue.rgbColor.b,
