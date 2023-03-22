@@ -22,13 +22,13 @@
 #include <iproxy_broker.h>
 #include <iremote_object.h>
 
-#include "v1_1/iril.h"
+#include "v1_0/iril.h"
 #include "vector"
 
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_1 {
+namespace V1_0 {
 class RilImpl : public IRil {
 public:
     RilImpl() = default;
@@ -62,7 +62,6 @@ public:
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t serialId, int32_t mode) override;
     int32_t GetCallPreferenceMode(int32_t slotId, int32_t serialId) override;
     int32_t SetUssd(int32_t slotId, int32_t serialId, const std::string &str) override;
-    int32_t CloseUnFinishedUssd(int32_t slotId, int32_t serialId) override;
     int32_t GetUssd(int32_t slotId, int32_t serialId) override;
     int32_t SetMute(int32_t slotId, int32_t serialId, int32_t mute) override;
     int32_t GetMute(int32_t slotId, int32_t serialId) override;
@@ -193,7 +192,7 @@ private:
     int32_t AddRilDeathRecipient(const sptr<IRilCallback> &callback);
     int32_t RemoveRilDeathRecipient(const sptr<IRilCallback> &callback);
 };
-} // namespace V1_1
+} // namespace V1_0
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS
