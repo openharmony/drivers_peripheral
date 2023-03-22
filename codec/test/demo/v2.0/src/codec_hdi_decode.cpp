@@ -17,12 +17,14 @@
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include <securec.h>
+#include <unistd.h>
 #include "codec_component_manager.h"
 #include "codec_omx_ext.h"
 
-OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiDecode::gralloc_ = nullptr;
 using namespace std;
 using namespace OHOS;
+using namespace OHOS::HDI::Display::Buffer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_0;
 namespace {
 constexpr uint32_t FD_SIZE = sizeof(int);
 constexpr uint32_t FRAME = 30 << 16;
@@ -30,8 +32,8 @@ constexpr uint32_t DENOMINATOR = 2;
 constexpr uint32_t NUMERATOR = 3;
 constexpr uint32_t MAX_WAIT_COUNT = 3;
 }  // namespace
-
 #define HDF_LOG_TAG codec_omx_hdi_dec
+IDisplayBuffer *CodecHdiDecode::buffer_ = nullptr;
 
 #define AV_COLOR_FORMAT OMX_COLOR_FormatYUV420SemiPlanar
 
@@ -88,7 +90,7 @@ bool CodecHdiDecode::Init(CommandOpt &opt)
              height_, stride_, opt.fileInput.c_str(), opt.fileOutput.c_str());
 
     // gralloc init
-    gralloc_ = OHOS::HDI::Display::V1_0::IDisplayGralloc::Get();
+    buffer_ = IDisplayBuffer::Get();
     reader_ = CodecPacketReader::GetPacketReader(opt.codec);
     ioIn_.open(opt.fileInput, std::ios_base::binary);
     ioOut_.open(opt.fileOutput, std::ios_base::binary | std::ios_base::trunc);
@@ -419,7 +421,7 @@ int32_t CodecHdiDecode::UseBufferOnPort(PortIndex portIndex)
 
 int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
 {
-    if (bufferCount <= 0 || bufferSize <= 0 || gralloc_ == nullptr) {
+    if (bufferCount <= 0 || bufferSize <= 0 || buffer_ == nullptr) {
         return HDF_ERR_INVALID_PARAM;
     }
     AllocInfo alloc = {.width = this->stride_,
@@ -434,7 +436,7 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
         omxBuffer->version.s.nVersionMajor = 1;
         omxBuffer->bufferType = CODEC_BUFFER_TYPE_HANDLE;
         BufferHandle *bufferHandle = nullptr;
-        ret = gralloc_->AllocMem(alloc, bufferHandle);
+        ret = buffer_->AllocMem(alloc, bufferHandle);
         HDF_LOGI("%{public}s AlloceMem ret val err[%{public}d]", __func__, ret);
         if (DISPLAY_SUCCESS != ret) {
             HDF_LOGE("%{public}s AllocMem error", __func__);
@@ -691,11 +693,11 @@ int32_t CodecHdiDecode::OnFillBufferDone(const struct OmxCodecBuffer &buffer)
     if (bufferInfo->avSharedPtr != nullptr) {
         void *addr = const_cast<void *>(bufferInfo->avSharedPtr->ReadFromAshmem(buffer.filledLen, buffer.offset));
         ioOut_.write(static_cast<char *>(addr), buffer.filledLen);
-    } else if (bufferInfo->bufferHandle != nullptr && gralloc_ != nullptr) {
-        gralloc_->Mmap(*bufferInfo->bufferHandle);
+    } else if (bufferInfo->bufferHandle != nullptr && buffer_ != nullptr) {
+        buffer_->Mmap(*bufferInfo->bufferHandle);
         ioOut_.write(static_cast<char *>(bufferInfo->bufferHandle->virAddr),
                      bufferInfo->bufferHandle->width * bufferInfo->bufferHandle->height * NUMERATOR / DENOMINATOR);
-        gralloc_->Unmap(*bufferInfo->bufferHandle);
+        buffer_->Unmap(*bufferInfo->bufferHandle);
     }
 
     ioOut_.flush();

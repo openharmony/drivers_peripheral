@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,6 +37,7 @@ public:
     ComponentNode(const sptr<ICodecCallback> &callbacks, int64_t appData, std::shared_ptr<ComponentMgr>& mgr);
     ~ComponentNode();
     int32_t OpenHandle(const std::string& name);
+    int32_t CloseHandle();
     int32_t GetComponentVersion(CompVerInfo &verInfo);
     int32_t SendCommand(HDI::Codec::V1_0::CodecCommandType cmd, uint32_t param, int8_t *cmdData);
     int32_t GetParameter(OMX_INDEXTYPE paramIndex, int8_t *param);

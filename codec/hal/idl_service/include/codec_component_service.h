@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,7 +26,7 @@ class CodecComponentService : public ICodecComponent {
 public:
     CodecComponentService(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &node) : node_(node)
     {}
-    virtual ~CodecComponentService() = default;
+    ~CodecComponentService();
     int32_t GetComponentVersion(CompVerInfo &verInfo) override;
     int32_t SendCommand(CodecCommandType cmd, uint32_t param, const std::vector<int8_t> &cmdData) override;
     int32_t GetParameter(uint32_t index, const std::vector<int8_t> &inParamStruct,

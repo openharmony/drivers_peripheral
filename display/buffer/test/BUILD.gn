@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("hdf_test_display_buffer") {
+group("display_buffer_test") {
   testonly = true
   deps = [
     "moduletest:hdf_disp_buffer_moduletest",
