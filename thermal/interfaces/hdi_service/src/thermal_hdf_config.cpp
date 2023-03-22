@@ -148,8 +148,7 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
             } else if (!xmlStrcmp(subNode->name, BAD_CAST"thermal_node")) {
                 XMLThermalNodeInfo tn;
                 ParsePollingSubNode(subNode, tn);
-                THERMAL_HILOGI(COMP_HDI, "ParsePollingNode tntype: %{public}s, path: %{private}s",
-                    tn.type.c_str(), tn.path.c_str());
+                THERMAL_HILOGI(COMP_HDI, "ParsePollingNode tntype: %{public}s", tn.type.c_str());
                 xmlTnInfoList.push_back(tn);
             }
         }
@@ -190,7 +189,6 @@ void ThermalHdfConfig::ParseTracingNode(xmlNodePtr node)
     if (xmlOutpath != nullptr) {
         this->trace_.outpath = std::string(reinterpret_cast<char *>(xmlOutpath));
         xmlFree(xmlOutpath);
-        THERMAL_HILOGD(COMP_HDI, "outpath: %{private}s", this->trace_.outpath.c_str());
     }
 
     auto cur  = node->xmlChildrenNode;
@@ -211,14 +209,12 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
             xmlChar* titlePath = xmlGetProp(subNode, BAD_CAST"path");
             if (titlePath != nullptr) {
                 namePath = std::string(reinterpret_cast<char*>(titlePath));
-                THERMAL_HILOGD(COMP_HDI, "namePath in path: %{private}s", namePath.c_str());
                 xmlFree(titlePath);
             }
 
             xmlChar* titleName = xmlGetProp(subNode, BAD_CAST"name");
             if (titleName != nullptr) {
                 namePath = std::string(reinterpret_cast<char*>(titleName));
-                THERMAL_HILOGD(COMP_HDI, "namePath in name: %{private}s", namePath.c_str());
                 xmlFree(titleName);
             }
         }
