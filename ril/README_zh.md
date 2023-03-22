@@ -52,7 +52,7 @@ Ril驱动提供给framework层可直接调用的能力接口，主要功能有�
 | int32_t ActivatePdpContext(int32_t slotId, int32_t serialId, const DataCallInfo &dataCallInfo) | 查询运营商名称信息，slotId 表示卡槽ID，dataCallInfo 表示数据业务信息。 |
 | int32_t SetRadioState(int32_t slotId, int32_t serialId, int32_t fun, int32_t rst) | 给Modem上下电，slotId 表示卡槽ID，serialId 表示请求的序列化ID，fun 表示功能模式，rst 表示是否复位。 |
 
-完整的接口说明请参考：[ drivers_interface_ril](https://gitee.com/openharmony/drivers_interface/blob/master/ril/V1_1/IRil.idl)。
+完整的接口说明请参考：[ drivers_interface_ril](https://gitee.com/openharmony/drivers_interface/blob/master/ril/v1_0/IRil.idl)。
 
 ### 使用说明
 
@@ -61,19 +61,19 @@ Ril驱动提供给framework层可直接调用的能力接口，主要功能有�
 代码示例
 
 ```c++
-#include "V1_1/iril.h"
+#include "v1_0/iril.h"
 
 /* Ril回调类 */
-class RilCallback : public HDI::Ril::V1_1::IRilCallback {
-    int32_t DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
-    int32_t HangupResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
-    int32_t RejectResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
-    int32_t AnswerResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo) override;
+class RilCallback : public HDI::Ril::V1_0::IRilCallback {
+    int32_t DialResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
+    int32_t HangupResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
+    int32_t RejectResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
+    int32_t AnswerResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo) override;
     ...
 }
 
 /* 回调函数 */
-int32_t RilCallback::DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &responseInfo)
+int32_t RilCallback::DialResponse(const HDI::Ril::V1_0::RilRadioResponseInfo &responseInfo)
 {
     printf("DialResponse");
     return 0;
@@ -82,18 +82,18 @@ int32_t RilCallback::DialResponse(const HDI::Ril::V1_1::RilRadioResponseInfo &re
 void RilSample(void)
 {
     /* 创建Ril接口实例 */
-    sptr<OHOS::HDI::Ril::V1_1::IRil> g_rilInterface = OHOS::HDI::Ril::V1_1::IRil::Get();
+    sptr<OHOS::HDI::Ril::V1_0::IRil> g_rilInterface = OHOS::HDI::Ril::V1_0::IRil::Get();
     if (g_rilInterface == nullptr) {
         return;
     }
     /* 设置回调*/
-    sptr<HDI::Ril::V1_1::IRilCallback> g_cbObj = new RilCallback();
+    sptr<HDI::Ril::V1_0::IRilCallback> g_cbObj = new RilCallback();
     g_rilInterface->SetCallback(RilCallback());
 
     /**拨打电话**/
     int32_t slotId = 0;
     int32_t serialId = 1;
-    HDI::Ril::V1_1::DialInfo dialInfo = {};
+    HDI::Ril::V1_0::DialInfo dialInfo = {};
     dialInfo.address = "10086";
     dialInfo.clir = 0;
     int32_t ret = g_rilInterface->Dial(slotId, serialId, dialInfo);
