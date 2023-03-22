@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -87,10 +87,8 @@ ComponentNode::~ComponentNode()
     codecBufferMap_.clear();
     bufferHeaderMap_.clear();
     bufferIdCount_ = 0;
-    if (comp_ != nullptr) {
-        mgr_->DeleteComponentInstance(static_cast<OMX_COMPONENTTYPE *>(comp_));
-        comp_ = nullptr;
-    }
+    comp_ = nullptr;
+    mgr_ = nullptr;
 }
 
 int32_t ComponentNode::OpenHandle(const std::string &name)
@@ -106,6 +104,21 @@ int32_t ComponentNode::OpenHandle(const std::string &name)
         return err;
     }
     this->comp_ = (OMX_HANDLETYPE)comp;
+    return HDF_SUCCESS;
+}
+
+int32_t ComponentNode::CloseHandle()
+{
+    if (comp_ == nullptr) {
+        CODEC_LOGE("comp_ is null");
+        return HDF_FAILURE;
+    }
+
+    auto err = mgr_->DeleteComponentInstance(reinterpret_cast<OMX_COMPONENTTYPE *>(comp_));
+    if (err != OMX_ErrorNone) {
+        CODEC_LOGE("DeleteComponentInstance err = %{public}x ", err);
+        return err;
+    }
     return HDF_SUCCESS;
 }
 

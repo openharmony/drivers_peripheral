@@ -21,7 +21,6 @@
 #include <buffer_handle.h>
 #include <gtest/gtest.h>
 #include <hdf_log.h>
-#include <idisplay_gralloc.h>
 #include <osal_mem.h>
 #include <securec.h>
 #include <servmgr_hdi.h>
@@ -30,11 +29,15 @@
 #include "codec_component_type.h"
 #include "codec_omx_ext.h"
 #include "hdf_io_service_if.h"
-
+#include "v1_0/display_composer_type.h"
+#include "v1_0/display_buffer_type.h"
+#include "v1_0/include/idisplay_buffer.h"
 #define HDF_LOG_TAG codec_hdi_test
 
 using namespace std;
 using namespace testing::ext;
+using namespace OHOS::HDI::Display::Buffer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_0;
 namespace {
 constexpr int32_t WIDTH = 640;
 #ifdef SUPPORT_OMX
@@ -45,6 +48,7 @@ constexpr int32_t HEIGHT = 480;
 constexpr int32_t BUFFER_SIZE = WIDTH * HEIGHT * 3;
 constexpr int32_t FRAMERATE = 30 << 16;
 constexpr uint32_t BUFFER_ID_ERROR = 65000;
+static IDisplayBuffer *gralloc_ = nullptr;
 
 static void InitCodecBuffer(OmxCodecBuffer& buffer, CodecBufferType type, OMX_VERSIONTYPE& version)
 {
@@ -180,7 +184,7 @@ public:
     static void SetUpTestCase()
     {
         manager_ = GetCodecComponentManager();
-        gralloc_ = OHOS::HDI::Display::V1_0::IDisplayGralloc::Get();
+        gralloc_ = IDisplayBuffer::Get();
         if (manager_ == nullptr) {
             std::cout<<"GetCodecComponentManager ret nullptr"<<std::endl;
             return;
@@ -247,7 +251,6 @@ public:
     union OMX_VERSIONTYPE version_;
     std::map<int32_t, std::shared_ptr<BufferInfo>> inputBuffers_;
     std::map<int32_t, std::shared_ptr<BufferInfo>> outputBuffers_;
-    static inline OHOS::HDI::Display::V1_0::IDisplayGralloc *gralloc_ = nullptr;
 };
 
 // Test GetComponentVersion

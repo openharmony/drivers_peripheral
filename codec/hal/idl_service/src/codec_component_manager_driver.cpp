@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -104,7 +104,7 @@ static void HdfCodecComponentManagerDriverRelease(struct HdfDeviceObject *device
 
 static struct HdfDriverEntry g_codeccomponentmanagerDriverEntry = {
     .moduleVersion = 1,
-    .moduleName = "libcodec_driver.z.so",
+    .moduleName = "codec_component_manager_service",
     .Bind = HdfCodecComponentManagerDriverBind,
     .Init = HdfCodecComponentManagerDriverInit,
     .Release = HdfCodecComponentManagerDriverRelease,
