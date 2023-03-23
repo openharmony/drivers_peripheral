@@ -578,17 +578,37 @@ static int32_t AudioRenderBindService(struct AudioHwRender *hwRender, BindServic
     return AUDIO_SUCCESS;
 }
 
+static uint32_t GetAvailableRenderID(struct AudioHwAdapter *hwAdapter)
+{
+    uint32_t renderId = MAX_AUDIO_STREAM_NUM;
+    uint32_t index = 0;
+    if (hwAdapter == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return renderId;
+    }
+
+    if (hwAdapter->infos.renderCnt < MAX_AUDIO_STREAM_NUM) {
+        renderId = hwAdapter->infos.renderCnt;
+        hwAdapter->infos.renderCnt++;
+    } else {
+        for (index = 0; index < MAX_AUDIO_STREAM_NUM; index++) {
+            if (hwAdapter->infos.renderServicePtr[index] == NULL) {
+                renderId = index;
+                break;
+            }
+        }
+    }
+
+    return renderId;
+}
+
 int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct IAudioRender **render)
+    const struct AudioSampleAttributes *attrs, struct IAudioRender **render, uint32_t *renderId)
 {
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    if (hwAdapter == NULL || desc == NULL || attrs == NULL || render == NULL) {
+    if (hwAdapter == NULL || desc == NULL || attrs == NULL || render == NULL || renderId == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
-    }
-    if (hwAdapter->infos.renderServicePtr != NULL) {
-        AUDIO_FUNC_LOGE("Create render repeatedly!");
-        return AUDIO_ERR_INTERNAL;
     }
 
     BindServiceRenderPassthrough *pBindServiceRender = AudioPassthroughGetBindServiceRender();
@@ -616,15 +636,21 @@ int32_t AudioAdapterCreateRender(struct IAudioAdapter *adapter, const struct Aud
         return ret;
     }
 
-    hwAdapter->infos.renderServicePtr = hwRender;
+    *renderId = GetAvailableRenderID(hwAdapter);
+    if (*renderId == MAX_AUDIO_STREAM_NUM) {
+        AUDIO_FUNC_LOGE("there is no available renderId");
+        AudioReleaseRenderHandle(hwRender);
+        AudioMemFree((void **)&hwRender);
+        return HDF_FAILURE;
+    }
+    hwAdapter->infos.renderServicePtr[*renderId] = hwRender;
 
     *render = &hwRender->common;
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc)
+int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, uint32_t renderId)
 {
-    (void)desc;
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL) {
@@ -632,8 +658,7 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, const struct Au
         return AUDIO_ERR_INVALID_PARAM;
     }
 
-    struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr;
-
+    struct IAudioRender *render = (struct IAudioRender *)hwAdapter->infos.renderServicePtr[renderId];
     StubCollectorRemoveObject(IAUDIORENDER_INTERFACE_DESC, render);
 
     struct AudioHwRender *hwRender = (struct AudioHwRender *)render;
@@ -665,7 +690,7 @@ int32_t AudioAdapterDestroyRender(struct IAudioAdapter *adapter, const struct Au
         AudioMemFree((void **)&hwRender->errorLog.errorDump[i].currentTime);
     }
     AudioMemFree((void **)&render);
-    hwAdapter->infos.renderServicePtr = NULL;
+    hwAdapter->infos.renderServicePtr[renderId] = NULL;
     return AUDIO_SUCCESS;
 }
 
@@ -921,19 +946,39 @@ int32_t AudioCaptureBindService(struct AudioHwCapture *hwCapture, BindServiceCap
     return AUDIO_SUCCESS;
 }
 
+static uint32_t GetAvailableCaptureID(struct AudioHwAdapter *hwAdapter)
+{
+    uint32_t captureId = MAX_AUDIO_STREAM_NUM;
+    uint32_t index = 0;
+    if (hwAdapter == NULL) {
+        AUDIO_FUNC_LOGE("Parameter error!");
+        return captureId;
+    }
+
+    if (hwAdapter->infos.captureCnt < MAX_AUDIO_STREAM_NUM) {
+        captureId = hwAdapter->infos.captureCnt;
+        hwAdapter->infos.captureCnt++;
+    } else {
+        for (index = 0; index < MAX_AUDIO_STREAM_NUM; index++) {
+            if (hwAdapter->infos.captureServicePtr[index] == NULL) {
+                captureId = index;
+                break;
+            }
+        }
+    }
+
+    return captureId;
+}
+
 int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc,
-    const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture)
+    const struct AudioSampleAttributes *attrs, struct IAudioCapture **capture, uint32_t *captureId)
 {
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
-    if (hwAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL) {
+    if (hwAdapter == NULL || desc == NULL || attrs == NULL || capture == NULL || captureId == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
 
-    if (hwAdapter->infos.captureServicePtr != NULL) {
-        AUDIO_FUNC_LOGE("Create capture repeatedly!");
-        return AUDIO_ERR_INTERNAL;
-    }
     BindServiceCapturePassthrough *pBindServiceCapture = AudioPassthroughGetBindServiceCapture();
     if (pBindServiceCapture == NULL || *pBindServiceCapture == NULL) {
         AUDIO_FUNC_LOGE("lib capture func not exist");
@@ -955,21 +1000,29 @@ int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct Au
         AudioMemFree((void **)&hwCapture);
         return ret;
     }
-    hwAdapter->infos.captureServicePtr = hwCapture;
+
+    *captureId = GetAvailableCaptureID(hwAdapter);
+    if (*captureId == MAX_AUDIO_STREAM_NUM) {
+        AUDIO_FUNC_LOGE("there is no available captureId");
+        AudioReleaseCaptureHandle(hwCapture);
+        AudioMemFree((void **)&hwCapture);
+        return HDF_FAILURE;
+    }
+    hwAdapter->infos.captureServicePtr[*captureId] = hwCapture;
+
     *capture = &hwCapture->common;
     return AUDIO_SUCCESS;
 }
 
-int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, const struct AudioDeviceDescriptor *desc)
+int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, uint32_t captureId)
 {
-    (void)desc;
     int32_t ret = 0;
     struct AudioHwAdapter *hwAdapter = (struct AudioHwAdapter *)adapter;
     if (hwAdapter == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return AUDIO_ERR_INVALID_PARAM;
     }
-    struct IAudioCapture *capture = (struct IAudioCapture *)hwAdapter->infos.captureServicePtr;
+    struct IAudioCapture *capture = (struct IAudioCapture *)hwAdapter->infos.captureServicePtr[captureId];
 
     StubCollectorRemoveObject(IAUDIOCAPTURE_INTERFACE_DESC, capture);
 
@@ -1001,7 +1054,7 @@ int32_t AudioAdapterDestroyCapture(struct IAudioAdapter *adapter, const struct A
         AudioMemFree((void **)&hwCapture->errorLog.errorDump[i].currentTime);
     }
     AudioMemFree((void **)&capture);
-    hwAdapter->infos.captureServicePtr = NULL;
+    hwAdapter->infos.captureServicePtr[captureId] = NULL;
     return AUDIO_SUCCESS;
 }
 

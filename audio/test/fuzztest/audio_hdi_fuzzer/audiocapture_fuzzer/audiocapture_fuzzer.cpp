@@ -113,19 +113,21 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     }
     struct IAudioAdapter *adapter = nullptr;
     struct IAudioCapture *capture = nullptr;
+    uint32_t captureId = 0;
     uint32_t cmd = Convert2Uint32(rawData);
+
     rawData = rawData + OFFSET;
     size = size - OFFSET;
     struct IAudioManager *manager = IAudioManagerGet(true);
     if (manager == nullptr) {
         return false;
     }
-    int32_t ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
+    int32_t ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture, &captureId);
     if (ret != HDF_SUCCESS) {
         return false;
     }
     CaptureFucSwitch(capture, cmd, rawData);
-    adapter->DestroyCapture(adapter, nullptr);
+    adapter->DestroyCapture(adapter, captureId);
     manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     IAudioManagerRelease(manager, true);
     return true;

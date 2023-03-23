@@ -879,73 +879,12 @@ int32_t AudioCaptureGetExtraParams(struct IAudioCapture *handle, char *keyValueL
     return AUDIO_SUCCESS;
 }
 
-static int32_t AudioCaptureReqMmapBufferInit(
-    struct AudioHwCapture *capture, int32_t reqSize, struct AudioMmapBufferDescriptor *tempDesc)
-{
-    if (capture == NULL || capture->devDataHandle == NULL || tempDesc == NULL) {
-        AUDIO_FUNC_LOGE("Parameter error!");
-        return AUDIO_ERR_INVALID_PARAM;
-    }
-    int32_t flags = 0;
-    int64_t fileSize = 0;
-    struct AudioMmapBufferDescriptor desc = *tempDesc;
-    uint32_t formatBits = 0;
-    int32_t ret = FormatToBits(capture->captureParam.frameCaptureMode.attrs.format, &formatBits);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("FormatToBits failed!");
-        return ret;
-    }
-
-    FILE *fp = fopen(desc.filePath, "rb+");
-    if (fp == NULL) {
-        AUDIO_FUNC_LOGE("Open file failed!");
-        return AUDIO_ERR_INTERNAL;
-    }
-    ret = SetDescParam(&desc, fp, reqSize, &fileSize, &flags);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("SetDescParam failed!");
-        fclose(fp);
-        return AUDIO_ERR_INTERNAL;
-    }
-    // formatBits Move right 3
-    desc.totalBufferFrames = reqSize / (capture->captureParam.frameCaptureMode.attrs.channelCount * (formatBits >> 3));
-    InterfaceLibModeCapturePassthrough *pInterfaceLibModeCapture = AudioPassthroughGetInterfaceLibModeCapture();
-    if (pInterfaceLibModeCapture == NULL || *pInterfaceLibModeCapture == NULL) {
-        AUDIO_FUNC_LOGE("pInterfaceLibModeCapture Is NULL");
-        munmap(desc.memoryAddress, reqSize);
-        fclose(fp);
-        return AUDIO_ERR_INTERNAL;
-    }
-    capture->captureParam.frameCaptureMode.mmapBufDesc = desc;
-    ret = (*pInterfaceLibModeCapture)(
-        capture->devDataHandle, &capture->captureParam, AUDIO_DRV_PCM_IOCTL_MMAP_BUFFER_CAPTURE);
-    if (msync(desc.memoryAddress, fileSize, MS_ASYNC) < 0) {
-        AUDIO_FUNC_LOGE("sync fail!");
-    }
-    munmap(desc.memoryAddress, reqSize);
-    (void)fclose(fp);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioCaptureReqMmapBuffer FAIL!");
-    }
-    return ret;
-}
-
 int32_t AudioCaptureReqMmapBuffer(
     struct IAudioCapture *handle, int32_t reqSize, struct AudioMmapBufferDescriptor *desc)
 {
-    struct AudioHwCapture *capture = (struct AudioHwCapture *)handle;
-    if (capture == NULL || capture->devDataHandle == NULL || desc == NULL) {
-        AUDIO_FUNC_LOGE("Parameter error!");
-        return AUDIO_ERR_INVALID_PARAM;
-    }
-
-    int32_t ret = AudioCaptureReqMmapBufferInit(capture, reqSize, desc);
-    if (ret < 0) {
-        AUDIO_FUNC_LOGE("AudioCaptureReqMmapBufferInit failed!");
-        return ret;
-    }
-
-    AUDIO_FUNC_LOGI("AudioCaptureReqMmapBuffer Success!");
+    (void)handle;
+    (void)reqSize;
+    (void)desc;
     return AUDIO_SUCCESS;
 }
 

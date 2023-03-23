@@ -19,11 +19,9 @@
 #include "i_audio_capture.h"
 #include "v1_0/iaudio_capture.h"
 
-int32_t AudioHwiCaptureInit(uint32_t descIndex);
-void AudioHwiCaptureDeinit(uint32_t descIndex);
-struct IAudioCapture *AudioHwiCreateCaptureByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc,
-    struct AudioHwiCapture *hwiCapture);
-void AudioHwiDestroyCaptureByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc);
-struct AudioHwiCapture *AudioHwiGetHwiCaptureByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc);
+struct IAudioCapture *AudioHwiCreateCaptureById(enum AudioCategory streamType, uint32_t *captureId,
+    struct AudioHwiCapture *hwiCapture, const struct AudioDeviceDescriptor *desc);
+void AudioHwiDestroyCaptureById(uint32_t captureId);
+struct AudioHwiCapture *AudioHwiGetHwiCaptureById(uint32_t captureId);
 
 #endif // AUDIO_CAPTURE_VENDOR_H

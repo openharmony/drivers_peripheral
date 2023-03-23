@@ -63,7 +63,7 @@ int32_t CodecDynaBuffer::EmptyOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX_
     if (fence >= 0) {
         auto ret = SyncWait(fence, TIME_WAIT_MS);
         if (ret != EOK) {
-            HDF_LOGW("%{public}s : SyncWait ret err", __func__);
+            HDF_LOGE("%{public}s : SyncWait ret err [%{public}d]", __func__, ret);
         }
         close(codecBuffer.fenceFd);
         codecBuffer.fenceFd = -1;

@@ -109,6 +109,20 @@ struct EffectFactory {
      * @version 1.0
      */
     int32_t (*DestroyController)(struct EffectFactory *self, struct EffectControl *handle);
+
+    /**
+     * @brief Get the effect descriptor by effectId.
+     *
+     * @param self Indicates the pointer to the effect interfaces to operate.
+     * @param effectId Indicates the effectId of the effect.
+     * @param desc Indicates the descriptor of the effect controller.
+     *
+     * @return Returns <b>0</b> if the command send success; returns a non-zero value otherwise.
+     *
+     * @since 4.0
+     * @version 1.0
+     */
+    int32_t (*GetDescriptor)(struct EffectFactory *self, const char *effectId, struct EffectControllerDescriptor *desc);
 };
 
 /* this name is going to get effect lib, it has to be realized */

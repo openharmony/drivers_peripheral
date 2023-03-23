@@ -393,6 +393,10 @@ int32_t CodecGetParameter(CODEC_HANDLETYPE handle, Param *params, int32_t paramC
 
 int32_t CodecStart(CODEC_HANDLETYPE handle)
 {
+    if (g_codecOemIface == NULL) {
+        HDF_LOGE("%{public}s: g_codecOemIface is NULL!", __func__);
+        return HDF_FAILURE;
+    }
     if (g_codecOemIface->codecStart(handle) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: g_codecOemIface->codecStart(handle) is failed!", __func__);
         return HDF_FAILURE;

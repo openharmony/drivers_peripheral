@@ -27,23 +27,20 @@ namespace Power {
 namespace V1_1 {
 class RunningLockCounter {
 public:
-    RunningLockCounter(RunningLockType type, const std::string tag)
+    RunningLockCounter(RunningLockType type, const std::string &tag)
         : type_(type), tag_(tag), counter_(0) {}
     ~RunningLockCounter() = default;
     int32_t Increase(const RunningLockInfo &info);
     int32_t Decrease(const RunningLockInfo &info);
-    void Clear();
-    uint32_t GetCount()
+    uint32_t GetCount() const
     {
         return counter_;
     }
-    RunningLockType GetType()
+    RunningLockType GetType() const
     {
         return type_;
     }
 private:
-    int32_t SuspendBlock(const std::string &name);
-    int32_t SuspendUnblock(const std::string &name);
     const RunningLockType type_;
     const std::string tag_;
     uint32_t counter_;

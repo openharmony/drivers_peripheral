@@ -14,6 +14,7 @@
 group("effect_model") {
   if (!defined(ohos_lite)) {
     deps = [
+      "../config/linux:hdf_audio_effect_json",
       "host:effect_model_service",
       "model:effect_model_service_1.0",
       "model/src/mock_effect:mock_effect_lib",

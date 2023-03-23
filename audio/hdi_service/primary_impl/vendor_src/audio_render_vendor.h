@@ -19,11 +19,9 @@
 #include "i_audio_render.h"
 #include "v1_0/iaudio_render.h"
 
-int32_t AudioHwiRenderInit(uint32_t descIndex);
-void AudioHwiRenderDeinit(uint32_t descIndex);
-struct IAudioRender *AudioHwiCreateRenderByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc,
-    struct AudioHwiRender *hwiRender);
-void AudioHwiDestroyRenderByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc);
-struct AudioHwiRender *AudioHwiGetHwiRenderByDesc(uint32_t descIndex, const struct AudioDeviceDescriptor *desc);
+struct IAudioRender *AudioHwiCreateRenderById(enum AudioCategory streamType, uint32_t *renderId,
+    struct AudioHwiRender *hwiRender, const struct AudioDeviceDescriptor *desc);
+void AudioHwiDestroyRenderById(uint32_t renderId);
+struct AudioHwiRender *AudioHwiGetHwiRenderById(uint32_t renderId);
 
 #endif // AUDIO_RENDER_VENDOR_H
