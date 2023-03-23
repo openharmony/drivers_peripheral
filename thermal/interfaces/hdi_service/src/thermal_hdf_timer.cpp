@@ -42,6 +42,14 @@ ThermalHdfTimer::ThermalHdfTimer(const std::shared_ptr<ThermalSimulationNode> &n
     reportTime_ = 0;
 }
 
+ThermalHdfTimer::~ThermalHdfTimer()
+{
+    isRunning_ = false;
+    if (callbackThread_->joinable()) {
+        callbackThread_->join();
+    }
+}
+
 void ThermalHdfTimer::SetThermalEventCb(const sptr<IThermalCallback> &thermalCb)
 {
     thermalCb_ = thermalCb;
@@ -81,9 +89,9 @@ void ThermalHdfTimer::TimerProviderCallback()
     return;
 }
 
-int32_t ThermalHdfTimer::LoopingThreadEntry()
+void ThermalHdfTimer::LoopingThreadEntry()
 {
-    while (true) {
+    while (isRunning_) {
         std::this_thread::sleep_for(std::chrono::seconds(thermalZoneMgr_->maxCd_ / MS_PER_SECOND));
         TimerProviderCallback();
     }
@@ -91,7 +99,7 @@ int32_t ThermalHdfTimer::LoopingThreadEntry()
 
 void ThermalHdfTimer::Run()
 {
-    std::make_unique<std::thread>(&ThermalHdfTimer::LoopingThreadEntry, this)->detach();
+    callbackThread_ = std::make_unique<std::thread>(&ThermalHdfTimer::LoopingThreadEntry, this);
 }
 
 void ThermalHdfTimer::StartThread()
