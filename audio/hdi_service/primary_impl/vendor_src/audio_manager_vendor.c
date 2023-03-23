@@ -15,6 +15,7 @@
 #include "audio_manager_vendor.h"
 
 #include <dlfcn.h>
+#include <malloc.h>
 #include <hdf_base.h>
 #include "audio_adapter_vendor.h"
 #include "audio_uhdf_log.h"
@@ -91,6 +92,12 @@ static void AudioManagerReleaseHwiDesc(struct AudioAdapterHwiDescriptor *hwiDesc
         AudioManagerReleaseHwiPort(&hwiDesc->ports, hwiDesc->portNum);
         hwiDesc->portNum = 0;
     }
+#if defined CONFIG_USE_JEMALLOC_DFX_INTF
+    int err = mallopt(M_FLUSH_THREAD_CACHE, 0);
+    if (err != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("%{public}s :release cache error, m_purge = %{public}d", __func__, err);
+    }
+#endif
 }
 
 static void AudioManagerReleaseDescs(struct AudioAdapterDescriptor *descs, uint32_t descsCount)

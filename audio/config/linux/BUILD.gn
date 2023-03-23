@@ -61,4 +61,13 @@ if (is_standard_system) {
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
   }
+
+  ohos_prebuilt_etc("hdf_audio_effect_json") {
+    source = "${AUDIO_JSON_PATH}/audio_effect.json"
+
+    relative_install_dir = "hdfconfig"
+    install_images = [ chipset_base_dir ]
+    subsystem_name = "hdf"
+    part_name = "drivers_peripheral_audio"
+  }
 }

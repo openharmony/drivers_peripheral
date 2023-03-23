@@ -116,18 +116,20 @@ bool DoSomethingInterestingWithMyAPI(const uint8_t *rawData, size_t size)
     struct IAudioAdapter *adapter = nullptr;
     struct IAudioRender *render = nullptr;
     uint32_t cmd = Convert2Uint32(rawData);
+    uint32_t renderId = 0;
+
     rawData = rawData + OFFSET;
     size = size - OFFSET;
     struct IAudioManager *manager = IAudioManagerGet(true);
     if (manager == nullptr) {
         return false;
     }
-    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
+    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render, &renderId);
     if (ret != HDF_SUCCESS) {
         return false;
     }
     RenderFucSwitch(render, cmd, rawData, size);
-    adapter->DestroyRender(adapter, nullptr);
+    adapter->DestroyRender(adapter, renderId);
     manager->UnloadAdapter(manager, ADAPTER_NAME.c_str());
     IAudioManagerRelease(manager, true);
     return true;

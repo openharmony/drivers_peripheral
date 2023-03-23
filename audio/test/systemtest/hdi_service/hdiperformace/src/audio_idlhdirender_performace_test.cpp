@@ -35,6 +35,7 @@ public:
     static TestAudioManager *manager;
     struct IAudioAdapter *adapter = nullptr;
     struct IAudioRender *render = nullptr;
+    uint32_t renderId_ = 0;
 };
 using THREAD_FUNC = void *(*)(void *);
 TestAudioManager *AudioIdlHdiRenderPerformaceTest::manager = nullptr;
@@ -55,13 +56,13 @@ void AudioIdlHdiRenderPerformaceTest::TearDownTestCase(void)
 void AudioIdlHdiRenderPerformaceTest::SetUp(void)
 {
     ASSERT_NE(nullptr, manager);
-    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
+    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render, &renderId_);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiRenderPerformaceTest::TearDown(void)
 {
-    int32_t ret = ReleaseRenderSource(manager, adapter, render);
+    int32_t ret = ReleaseRenderSource(manager, adapter, render, renderId_);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 /**
@@ -885,81 +886,7 @@ HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetSampleAttributesPerforma
     audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
     EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
 }
-/**
-* @tc.name  AudioRenderReqMmapBufferPerformance_001
-* @tc.desc  tests the performace of RenderReqMmapBuffer interface by executing 1000 times,
-*           and calculates the delay time and average of Delay Time.
-* @tc.type: PERF
-*/
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderReqMmapBufferPerformance_001, TestSize.Level1)
-{
-    int32_t ret;
-    bool isRender = true;
-    int32_t reqSize = 0;
-    struct AudioMmapBufferDescriptor desc = {};
-    struct PrepareAudioPara audiopara = {
-        .render = render, .delayTime = 0, .totalTime = 0, .averageDelayTime =0,
-    };
-    ASSERT_NE(nullptr, audiopara.render);
 
-    for (int i = 0; i < COUNT; ++i) {
-        ret = InitMmapDesc(LOW_LATENCY_AUDIO_FILE, desc, reqSize, isRender);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        ret = audiopara.render->Start(audiopara.render);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.render->ReqMmapBuffer(audiopara.render, reqSize, &desc);
-        gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        if (ret == 0) {
-            munmap(desc.memoryAddress, reqSize);
-        }
-        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
-                              (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
-        audiopara.totalTime += audiopara.delayTime;
-        ret = audiopara.render->Stop(audiopara.render);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        free(desc.filePath);
-        usleep(500);
-    }
-    audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
-    EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-}
-/**
-* @tc.name  AudioRenderGetMmapPositionPerformance_001
-* @tc.desc  tests the performace of RenderRenderGetMmapPosition interface by executing 1000 times,
-*           and calculates the delay time and average of Delay Time.
-* @tc.type: PERF
-*/
-HWTEST_F(AudioIdlHdiRenderPerformaceTest, AudioRenderGetMmapPositionPerformance_001, TestSize.Level1)
-{
-    int32_t ret;
-    uint64_t framesRendering = 0;
-    int64_t timeExp = 0;
-    struct PrepareAudioPara audiopara = {
-        .render = render, .path = LOW_LATENCY_AUDIO_FILE.c_str(), .delayTime = 0,
-        .totalTime = 0, .averageDelayTime =0,
-    };
-    ASSERT_NE(nullptr, audiopara.render);
-
-    ret = PlayMapAudioFile(audiopara);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-    for (int i = 0; i < COUNT; ++i) {
-        gettimeofday(&audiopara.start, NULL);
-        ret = audiopara.render->GetMmapPosition(audiopara.render, &framesRendering, &(audiopara.time));
-        gettimeofday(&audiopara.end, NULL);
-        EXPECT_EQ(HDF_SUCCESS, ret);
-        EXPECT_GT((audiopara.time.tvSec) * SECTONSEC + (audiopara.time.tvNSec), timeExp);
-        EXPECT_GT(framesRendering, INITIAL_VALUE);
-        audiopara.delayTime = (audiopara.end.tv_sec * MICROSECOND + audiopara.end.tv_usec) -
-                              (audiopara.start.tv_sec * MICROSECOND + audiopara.start.tv_usec);
-        audiopara.totalTime += audiopara.delayTime;
-    }
-    audiopara.averageDelayTime = (float)audiopara.totalTime / COUNT;
-    EXPECT_GT(LOWLATENCY, audiopara.averageDelayTime);
-    ret = audiopara.render->Stop(audiopara.render);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-}
 /**
 * @tc.name  AudioRenderSetExtraParamsPerformance_001
 * @tc.desc  tests the performace of RenderSetExtraParams interface by executing 1000 times,

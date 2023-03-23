@@ -15,9 +15,25 @@ import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
+ohos_unittest("audio_ut_common_test") {
+  module_out_path = "drivers_peripheral_audio/audio"
+  sources = [ "manager/audio_manager_common_test.cpp" ]
+
+  include_dirs = []
+
+  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  external_deps = [
+    "c_utils:utils",
+    "drivers_interface_audio:audio_idl_headers",
+    "drivers_interface_audio:libaudio_proxy_1.0",
+    "hdf_core:libhdf_utils",
+    "hiviewdfx_hilog_native:libhilog",
+  ]
+}
+
 group("hdi_base_common") {
   if (!defined(ohos_lite)) {
     testonly = true
-    deps = [ "manager:audio_ut_manager_common_test" ]
+    deps = [ ":audio_ut_common_test" ]
   }
 }

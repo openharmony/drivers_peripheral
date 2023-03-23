@@ -142,7 +142,7 @@ void UsbRawSdkIfTestIo::TearDownTestCase()
 extern "C" {
 static void AcmWriteBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
+    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
     printf("%s:%d entry!", __func__, __LINE__);
     if (req == nullptr) {
         printf("%s:%d req is nullptr!", __func__, __LINE__);
@@ -163,7 +163,7 @@ static void AcmWriteBulkCallback(const void *requestArg)
 
 static void AcmReadBulkCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
+    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
     printf("%s:%d entry!", __func__, __LINE__);
     if (req == nullptr) {
         printf("%s:%d req is nullptr!", __func__, __LINE__);
@@ -205,7 +205,7 @@ static void AcmReadBulkCallback(const void *requestArg)
 
 static void AcmNotifyReqCallback(const void *requestArg)
 {
-    struct UsbRawRequest *req = static_cast<struct UsbRawRequest *>(requestArg);
+    struct UsbRawRequest *req = reinterpret_cast<struct UsbRawRequest *>(const_cast<void *>(requestArg));
     printf("%s:%d entry!", __func__, __LINE__);
     if (req == nullptr) {
         printf("%s:%d req is nullptr!", __func__, __LINE__);

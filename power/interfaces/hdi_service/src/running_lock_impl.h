@@ -34,12 +34,14 @@ public:
     static int32_t Hold(const RunningLockInfo &info, PowerHdfState state);
     static int32_t Unhold(const RunningLockInfo &info);
     static uint32_t GetCount(RunningLockType type);
+    static std::string GetRunningLockTag(RunningLockType type);
+    static void SetDefaultTimeOutMs(int32_t timeOutMs);
 
 private:
     static bool IsValidType(RunningLockType type, PowerHdfState state = PowerHdfState::AWAKE);
     static RunningLockInfo FillRunningLockInfo(const RunningLockInfo &info);
-    static std::string GetRunningLockTag(RunningLockType type);
     static std::mutex mutex_;
+    static int32_t defaultTimeOutMs_;
     static std::unique_ptr<RunningLockTimerHandler> timerHandler_;
     static std::map<RunningLockType, std::shared_ptr<RunningLockCounter>> lockCounters_;
 };

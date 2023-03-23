@@ -584,23 +584,15 @@ int32_t InputDeviceManager::GetDevice(int32_t deviceIndex, InputDeviceInfo **dev
 {
     std::lock_guard<std::mutex> guard(lock_);
     auto ret = INPUT_FAILURE;
-    std::shared_ptr<InputDeviceInfo> detailInfo;
 
     if (devInfo == nullptr || deviceIndex > MAX_SUPPORT_DEVS) {
         HDF_LOGE("%{public}s: param is wrong", __func__);
         return INPUT_FAILURE;
     }
-    for (size_t i = 0; i <= inputDevList_.size(); i++) {
-        auto it = inputDevList_.find(deviceIndex);
-        if (it != inputDevList_.end()) {
-            detailInfo = std::make_shared<InputDeviceInfo>();
-            (void)memset_s(detailInfo.get(), sizeof(InputDeviceInfo), 0, sizeof(InputDeviceInfo));
-            (void)memcpy_s(detailInfo.get(), sizeof(InputDeviceInfo), &it->second.detailInfo, sizeof(InputDeviceInfo));
-            *devInfo = detailInfo.get();
-            ret = INPUT_SUCCESS;
-        } else {
-            continue;
-        }
+    auto it = inputDevList_.find(deviceIndex);
+    if (it != inputDevList_.end()) {
+        (void)memcpy_s(*devInfo, sizeof(InputDeviceInfo), &it->second.detailInfo, sizeof(InputDeviceInfo));
+        ret = INPUT_SUCCESS;
     }
     HDF_LOGD("%{public}s: devIndex: %{public}d ret: %{public}d", __func__, deviceIndex, ret);
     return ret;

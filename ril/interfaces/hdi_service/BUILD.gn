@@ -13,7 +13,7 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libril_service_1.0") {
+ohos_shared_library("libril_service_1.1") {
   include_dirs = [
     "include",
     "//base/telephony/ril_adapter/services/hril/include",
@@ -57,7 +57,7 @@ ohos_shared_library("libril_driver") {
 
   deps = [
     "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
-    "//drivers/interface/ril/v1_0:libril_stub_1.0",
+    "//drivers/interface/ril/v1_1:libril_stub_1.1",
   ]
 
   if (is_standard_system) {
@@ -86,6 +86,6 @@ ohos_shared_library("libril_driver") {
 group("hdf_ril") {
   deps = [
     ":libril_driver",
-    ":libril_service_1.0",
+    ":libril_service_1.1",
   ]
 }

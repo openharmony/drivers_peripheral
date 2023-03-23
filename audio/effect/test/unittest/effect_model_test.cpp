@@ -13,13 +13,14 @@
  * limitations under the License.
  */
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include "hdf_base.h"
 #include "hdf_log.h"
 #include "v1_0/effect_types.h"
 #include "v1_0/ieffect_control.h"
 #include "v1_0/ieffect_model.h"
+#include "effect_common.h"
+#include "osal_mem.h"
 
 using namespace std;
 using namespace testing::ext;
@@ -39,6 +40,7 @@ public:
 
 void EffectModelTest::SetUp()
 {
+    // input testcase setup step,setup invoked before each testcases
     libName_ = strdup("libmock_effect_lib");
     effectId_ = strdup("aaaabbbb-8888-9999-6666-aabbccdd9966ff");
     model_ = IEffectModelGet(IS_DIRECTLY_CALL);
@@ -47,6 +49,7 @@ void EffectModelTest::SetUp()
 
 void EffectModelTest::TearDown()
 {
+    // input testcase teardown step,teardown invoked after each testcases
     if (libName_ != nullptr) {
         free(libName_);
         libName_ = nullptr;
@@ -62,17 +65,92 @@ void EffectModelTest::TearDown()
     }
 }
 
+/**
+ * @tc.name: HdfAudioIsSupplyEffectLibs001
+ * @tc.desc: Verify the EffectModelIsSupplyEffectLibs function when the input parameter is invalid.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
 HWTEST_F(EffectModelTest, HdfAudioIsSupplyEffectLibs001, TestSize.Level1)
 {
     bool isSupport = false;
-    int32_t ret = model_->IsSupplyEffectLibs(model_, &isSupport);
-    ASSERT_EQ(ret, HDF_SUCCESS);
-
-    if (isSupport == false) {
-        HDF_LOGE("remind that the vendor doesn't supply effect libs");
-    }
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, model_->IsSupplyEffectLibs(nullptr, &isSupport));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, model_->IsSupplyEffectLibs(model_, nullptr));
 }
 
+/**
+ * @tc.name: HdfAudioIsSupplyEffectLibs002
+ * @tc.desc: Verify the EffectModelIsSupplyEffectLibs function.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
+HWTEST_F(EffectModelTest, HdfAudioIsSupplyEffectLibs002, TestSize.Level1)
+{
+    bool isSupport = false;
+    int32_t ret = model_->IsSupplyEffectLibs(model_, &isSupport);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: HdfAudioGetAllEffectDescriptors001
+ * @tc.desc: Verify the EffectModelGetAllEffectDescriptors function when the input parameter is invalid.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
+HWTEST_F(EffectModelTest, HdfAudioGetAllEffectDescriptors001, TestSize.Level1)
+{
+    uint32_t descsLen = MAX_DESCRIPTOR_NUM;
+    struct EffectControllerDescriptor descs[MAX_DESCRIPTOR_NUM];
+
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, model_->GetAllEffectDescriptors(nullptr, descs, &descsLen));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, model_->GetAllEffectDescriptors(model_, nullptr, &descsLen));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, model_->GetAllEffectDescriptors(model_, descs, nullptr));
+}
+
+/**
+ * @tc.name: HdfAudioGetAllEffectDescriptors002
+ * @tc.desc: Verify the EffectModelGetAllEffectDescriptors function.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
+HWTEST_F(EffectModelTest, HdfAudioGetAllEffectDescriptors002, TestSize.Level1)
+{
+    uint32_t descsLen = MAX_DESCRIPTOR_NUM;
+    struct EffectControllerDescriptor descs[MAX_DESCRIPTOR_NUM];
+
+    int32_t ret = model_->GetAllEffectDescriptors(model_, descs, &descsLen);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    EXPECT_GE(MAX_DESCRIPTOR_NUM, descsLen);
+}
+
+/**
+ * @tc.name: HdfAudioGetAllEffectDescriptors003
+ * @tc.desc: Verify the descs of EffectModelGetAllEffectDescriptors function.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
+HWTEST_F(EffectModelTest, HdfAudioGetAllEffectDescriptors003, TestSize.Level1)
+{
+    uint32_t descsLen = MAX_DESCRIPTOR_NUM;
+    struct EffectControllerDescriptor descs[MAX_DESCRIPTOR_NUM];
+
+    int32_t ret = model_->GetAllEffectDescriptors(model_, descs, &descsLen);
+    ASSERT_EQ(ret, HDF_SUCCESS);
+    EXPECT_GE(MAX_DESCRIPTOR_NUM, descsLen);
+
+    for (uint32_t i = 0; i < descsLen; i++) {
+        EXPECT_NE(nullptr, descs[i].effectId);
+    }
+
+    EffectControllerReleaseDescs(descs, &descsLen);
+}
+
+/**
+ * @tc.name: HdfAudioCreateDestroyController001
+ * @tc.desc: Verify the EffectModelCreateEffectController and EffectModelDestroyEffectController function.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
 HWTEST_F(EffectModelTest, HdfAudioCreateDestroyController001, TestSize.Level1)
 {
     struct EffectInfo info = {
@@ -92,21 +170,37 @@ HWTEST_F(EffectModelTest, HdfAudioCreateDestroyController001, TestSize.Level1)
     }
 }
 
-HWTEST_F(EffectModelTest, HdfAudioGetAllEffecctDescriptor001, TestSize.Level1)
-{
-    uint32_t descsLen = MAX_DESCRIPTOR_NUM;
-    struct EffectControllerDescriptor descs[MAX_DESCRIPTOR_NUM];
-
-    int32_t ret = model_->GetAllEffectDescriptors(model_, descs, &descsLen);
-    ASSERT_EQ(ret, HDF_SUCCESS);
-}
-
+/**
+ * @tc.name: HdfAudioGetEffectDescriptor001
+ * @tc.desc: Verify the EffectModelGetEffectDescriptor function when the input parameter is invalid.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
 HWTEST_F(EffectModelTest, HdfAudioGetEffectDescriptor001, TestSize.Level1)
 {
     struct EffectControllerDescriptor desc;
 
-    int32_t ret = model_->GetEffectDescriptor(model_, effectId_, &desc);
-    ASSERT_EQ(ret, HDF_SUCCESS);
+    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, model_->GetEffectDescriptor(nullptr, effectId_, &desc));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, model_->GetEffectDescriptor(model_, nullptr, &desc));
+    EXPECT_EQ(HDF_ERR_INVALID_PARAM, model_->GetEffectDescriptor(model_, effectId_, nullptr));
 }
 
+/**
+ * @tc.name: HdfAudioGetEffectDescriptor002
+ * @tc.desc: Verify the EffectModelGetEffectDescriptor function.
+ * @tc.type: FUNC
+ * @tc.require: I6I658
+ */
+HWTEST_F(EffectModelTest, HdfAudioGetEffectDescriptor002, TestSize.Level1)
+{
+    struct EffectControllerDescriptor desc;
+
+    int32_t ret = model_->GetEffectDescriptor(model_, effectId_, &desc);
+    EXPECT_EQ(ret, HDF_SUCCESS);
+    EXPECT_STREQ(desc.effectId, effectId_);
+    EXPECT_STREQ(desc.effectName, "mock_effect");
+    EXPECT_STREQ(desc.libName, libName_);
+    EXPECT_STREQ(desc.supplier, "mock");
+    EffectControllerReleaseDesc(&desc);
+}
 } // end of namespace

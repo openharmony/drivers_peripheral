@@ -16,8 +16,10 @@
 #ifndef CODEC_UTILS_H
 #define CODEC_UTILS_H
 
+#include <stdio.h>
 #include "hdf_types.h"
 #include "codec_type.h"
+#include "osal_mem.h"
 
 #define MAX_FILE_NAME_LENGTH        256
 #define TYPE_NAME_LENGTH            256
@@ -33,21 +35,38 @@
 #define CODEC_NAME_VP8_HW_ENCODER   "codec.vp8.hardware.encoder"
 #define CODEC_NAME_MPEG4_HW_ENCODER "codec.mpeg4.hardware.encoder"
 
+typedef struct {
+    char            *codecName;
+    /* end of stream flag when set quit the loop */
+    unsigned int    loopEnd;
+    /* input and output */
+    FILE            *fpInput;
+    FILE            *fpOutput;
+    int32_t         frameNum;
+    uint32_t        bufferSize;
+    CodecCallback   cb;
+} CodecEnvData;
+
 /* For overall configure setup */
 typedef struct {
     CodecType   type;
     char        fileInput[MAX_FILE_NAME_LENGTH];
     char        fileOutput[MAX_FILE_NAME_LENGTH];
     char        codecName[TYPE_NAME_LENGTH];
+    AvCodecMime mime;
     int32_t     width;
     int32_t     height;
+    int32_t     fps;
+    PixelFormat pixFmt;
 } CodecCmd;
 
 typedef struct {
-    char    *codecType[CODEC_NAME_ALIAS_NUM];
-    char    *codecName;
+    char        *codecType[CODEC_NAME_ALIAS_NUM];
+    char        *codecName;
+    AvCodecMime mimeType;
 } CodecTypeAndName;
 
 int32_t ParseArguments(CodecCmd* cmd, int argc, char **argv);
+void FreeParams(Param *params, int32_t paramCnt);
 
 #endif  // CODEC_UTILS_H

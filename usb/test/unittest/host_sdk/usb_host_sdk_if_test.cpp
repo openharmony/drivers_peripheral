@@ -136,7 +136,7 @@ static void AcmCtrlIrq(struct UsbRequest *req)
     }
     struct AcmDevice *acm = static_cast<struct AcmDevice *>(req->compInfo.userData);
     int32_t status = req->compInfo.status;
-    struct UsbCdcNotification *dr = static_cast<struct UsbCdcNotification *>(req->compInfo.buffer);
+    struct UsbCdcNotification *dr = reinterpret_cast<struct UsbCdcNotification *>(req->compInfo.buffer);
     uint32_t currentSize = req->compInfo.actualLength;
     if (status != 0) {
         return;
