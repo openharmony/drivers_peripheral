@@ -56,8 +56,6 @@ int32_t AudioRenderStart(AudioHandle handle)
     if (OHOS::Bluetooth::GetPlayingState() == false) {
         OHOS::Bluetooth::StartPlaying();
     }
-#else
-    OHOS::Bluetooth::StartPlaying();
 #endif
 
     char *buffer = static_cast<char *>(calloc(1, FRAME_DATA));
@@ -141,8 +139,6 @@ int32_t AudioRenderResume(AudioHandle handle)
     if (OHOS::Bluetooth::GetPlayingState() == false) {
         OHOS::Bluetooth::StartPlaying();
     }
-#else
-    OHOS::Bluetooth::StartPlaying();
 #endif
 
     hwRender->renderParam.renderMode.ctlParam.pause = false;
