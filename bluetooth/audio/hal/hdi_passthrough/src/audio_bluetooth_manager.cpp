@@ -225,7 +225,9 @@ int WriteFrame(const uint8_t *data, uint32_t size)
 int StartPlaying()
 {
     HDF_LOGI("%{public}s", __func__);
-#ifndef A2DP_HDI_SERVICE
+#ifdef A2DP_HDI_SERVICE
+    return HDF_SUCCESS;
+#else
     if (!g_proxy_) {
         HDF_LOGE("%{public}s: g_proxy_ is null", __func__);
         return RET_BAD_STATUS;
