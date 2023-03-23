@@ -86,6 +86,6 @@ ohos_shared_library("libril_driver") {
 group("hdf_ril") {
   deps = [
     ":libril_driver",
-    ":libril_service_1.0",
+    ":libril_service_1.1",
   ]
 }
