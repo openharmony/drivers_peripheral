@@ -206,7 +206,6 @@ void PowerSupplyProvider::FormatPath(std::string& path,
         return;
     }
     path.assign(buff, strlen(buff));
-    HDF_LOGI("%{public}s: path is %{public}s", __func__, path.c_str());
 
     return;
 }
@@ -256,13 +255,13 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
     int32_t readSize;
     int fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, path);
+        HDF_LOGE("%{public}s: failed to open file", __func__);
         return HDF_ERR_IO;
     }
 
     readSize = read(fd, buf, size - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, path);
+        HDF_LOGE("%{public}s: failed to read filr", __func__);
         close(fd);
         return HDF_ERR_IO;
     }
@@ -278,7 +277,7 @@ int32_t PowerSupplyProvider::ReadBatterySysfsToBuff(const char* path, char* buf,
 {
     int32_t ret = ReadSysfsFile(path, buf, size);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGW("%{public}s: read path %{private}s failed, ret: %{public}d", __func__, path, ret);
+        HDF_LOGW("%{public}s: read path failed, ret: %{public}d", __func__, ret);
         return ret;
     }
 
@@ -307,7 +306,6 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
         iter++;
     }
 
-    HDF_LOGI("%{public}s: online path is: %{public}s", __func__, onlinePath.c_str());
     ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
     if (ret != HDF_SUCCESS) {
         HDF_LOGW("%{public}s: read online path failed, ret: %{public}d", __func__, ret);
@@ -322,7 +320,6 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
 
     std::string typeNode = onlineNode;
     std::string typePath = path_ + "/" + typeNode + "/" + "type";
-    HDF_LOGI("%{public}s: type path is: %{public}s", __func__, typePath.c_str());
     ret = ReadSysfsFile(typePath.c_str(), buf, size);
     if (ret != HDF_SUCCESS) {
         HDF_LOGW("%{public}s: read type path failed, ret: %{public}d", __func__, ret);
@@ -503,7 +500,7 @@ std::string PowerSupplyProvider::CreateFile(std::string path, std::string conten
 {
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        HDF_LOGE("%{public}s: Cannot create file %{public}s", __func__, path.c_str());
+        HDF_LOGE("%{public}s: Cannot create file", __func__);
         return nullptr;
     }
     stream << content.c_str() << std::endl;
@@ -535,7 +532,6 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs(void)
     struct dirent* entry = nullptr;
     index_ = 0;
 
-    HDF_LOGI("%{public}s: path_ is %{public}s", __func__, path_.c_str());
     dir = opendir(path_.c_str());
     if (dir == nullptr) {
         HDF_LOGE("%{public}s: cannot open POWER_SUPPLY_BASE_PATH", __func__);
@@ -620,7 +616,6 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
     DIR *dir = nullptr;
     struct dirent* entry = nullptr;
     std::string batteryPath = path_ + "/" + path;
-    HDF_LOGI("%{public}s: subfolder path is:%{public}s", __func__, batteryPath.c_str());
 
     dir = opendir(batteryPath.c_str());
     if (dir == nullptr) {
