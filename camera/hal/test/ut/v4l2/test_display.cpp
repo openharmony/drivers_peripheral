@@ -425,6 +425,31 @@ void TestDisplay::UsbInit()
     }
 }
 
+std::shared_ptr<CameraAbility> TestDisplay::GetCameraAbility()
+{
+    if (cameraDevice == nullptr) {
+        OHOS::Camera::RetCode ret = cameraHost->GetCameraIds(cameraIds);
+        if (ret != HDI::Camera::V1_0::NO_ERROR) {
+            std::cout << "==========[test log]GetCameraIds failed." << std::endl;
+            return ability;
+        } else {
+            std::cout << "==========[test log]GetCameraIds success." << std::endl;
+        }
+        if (cameraIds.size() == 0) {
+            std::cout << "==========[test log]camera device list is empty." << std::endl;
+            return ability;
+        }
+        if (cameraIds.size() > 1) {
+            ret = cameraHost->GetCameraAbility(cameraIds.back(), ability_);
+            if (ret != HDI::Camera::V1_0::NO_ERROR) {
+                std::cout << "==========[test log]GetCameraAbility failed, rc = " << rc << std::endl;
+            }
+            MetadataUtils::ConvertVecToMetadata(ability_, ability);
+        }
+    }
+    return ability;
+}
+
 void TestDisplay::Close()
 {
     CAMERA_LOGD("cameraDevice->Close().");
