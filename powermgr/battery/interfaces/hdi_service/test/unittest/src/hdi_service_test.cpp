@@ -82,7 +82,7 @@ std::string CreateFile(std::string path, std::string content)
 {
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        HDF_LOGI("%{public}s: Cannot create file %{public}s", __func__, path.c_str());
+        HDF_LOGI("%{public}s: Cannot create file", __func__);
         return nullptr;
     }
     stream << content.c_str() << std::endl;
@@ -95,7 +95,6 @@ static void CheckSubfolderNode(const std::string& path)
     DIR *dir = nullptr;
     struct dirent* entry = nullptr;
     std::string batteryPath = SYSTEM_BATTERY_PATH + "/" + path;
-    HDF_LOGI("%{public}s: subfolder path is:%{public}s", __func__, batteryPath.c_str());
 
     dir = opendir(batteryPath.c_str());
     if (dir == nullptr) {
@@ -229,17 +228,16 @@ static int32_t ReadTemperatureSysfs()
         }
     }
     std::string sysBattTemPath = SYSTEM_BATTERY_PATH + "/" + tempNode + "/" + "temp";
-    HDF_LOGE("%{public}s: sysBattTemPath is %{public}s", __func__, sysBattTemPath.c_str());
 
     int fd = open(sysBattTemPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattTemPath.c_str());
+        HDF_LOGE("%{public}s: failed to open TemperatureSysfs", __func__);
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattTemPath.c_str());
+        HDF_LOGE("%{public}s: failed to read TemperatureSysfs", __func__);
         close(fd);
         return HDF_FAILURE;
     }
@@ -267,17 +265,16 @@ static int32_t ReadVoltageSysfs()
         }
     }
     std::string sysBattVolPath = SYSTEM_BATTERY_PATH + "/" + voltageNode + "/" + "voltage_now";
-    HDF_LOGE("%{public}s: sysBattVolPath is %{public}s", __func__, sysBattVolPath.c_str());
 
     int fd = open(sysBattVolPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattVolPath.c_str());
+        HDF_LOGE("%{public}s: failed to open VoltageSysfs", __func__);
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattVolPath.c_str());
+        HDF_LOGE("%{public}s: failed to read VoltageSysfs", __func__);
         close(fd);
         return HDF_FAILURE;
     }
@@ -305,17 +302,16 @@ static int32_t ReadCapacitySysfs()
         }
     }
     std::string sysBattCapPath = SYSTEM_BATTERY_PATH + "/" + capacityNode + "/" + "capacity";
-    HDF_LOGE("%{public}s: sysBattCapPath is %{public}s", __func__, sysBattCapPath.c_str());
 
     int fd = open(sysBattCapPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattCapPath.c_str());
+        HDF_LOGE("%{public}s: failed to open CapacitySysfs", __func__);
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattCapPath.c_str());
+        HDF_LOGE("%{public}s: failed to read CapacitySysfs", __func__);
         close(fd);
         return HDF_FAILURE;
     }
@@ -344,17 +340,16 @@ static int32_t ReadTotalEnergySysfs()
         }
     }
     std::string sysBattTotalEnergyPath = SYSTEM_BATTERY_PATH + "/" + totalEnergyNode + "/" + "charge_full";
-    HDF_LOGE("%{public}s: sysBattTotalEnergyPath is %{public}s", __func__, sysBattTotalEnergyPath.c_str());
 
     int fd = open(sysBattTotalEnergyPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattTotalEnergyPath.c_str());
+        HDF_LOGE("%{public}s: failed to open TotalEnergySysfs", __func__);
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattTotalEnergyPath.c_str());
+        HDF_LOGE("%{public}s: failed to read TotalEnergySysfs", __func__);
         close(fd);
         return HDF_FAILURE;
     }
@@ -383,17 +378,16 @@ static int32_t ReadCurrentAverageSysfs()
         }
     }
     std::string sysBattCurrentAvgPath = SYSTEM_BATTERY_PATH + "/" + currentAvgNode + "/" + "current_avg";
-    HDF_LOGE("%{public}s: sysBattCurrentAvgPath is %{public}s", __func__, sysBattCurrentAvgPath.c_str());
 
     int fd = open(sysBattCurrentAvgPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattCurrentAvgPath.c_str());
+        HDF_LOGE("%{public}s: failed to open CurrentAverageSysfs", __func__);
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattCurrentAvgPath.c_str());
+        HDF_LOGE("%{public}s: failed to read CurrentAverageSysfs", __func__);
         close(fd);
         return HDF_FAILURE;
     }
@@ -422,17 +416,16 @@ static int32_t ReadCurrentNowSysfs()
         }
     }
     std::string sysBattCurrentNowPath = SYSTEM_BATTERY_PATH + "/" + currentNowNode + "/" + "current_now";
-    HDF_LOGE("%{public}s: sysBattCurrentNowPath is %{public}s", __func__, sysBattCurrentNowPath.c_str());
 
     int fd = open(sysBattCurrentNowPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattCurrentNowPath.c_str());
+        HDF_LOGE("%{public}s: failed to open CurrentNowSysfs", __func__);
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattCurrentNowPath.c_str());
+        HDF_LOGE("%{public}s: failed to read CurrentNowSysfs", __func__);
         close(fd);
         return HDF_FAILURE;
     }
@@ -461,17 +454,16 @@ static int32_t ReadRemainEnergySysfs()
         }
     }
     std::string sysBattChargeNowPath = SYSTEM_BATTERY_PATH + "/" + chargeNowNode + "/" + "charge_now";
-    HDF_LOGE("%{public}s: sysBattChargeNowPath is %{public}s", __func__, sysBattChargeNowPath.c_str());
 
     int fd = open(sysBattChargeNowPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysBattChargeNowPath.c_str());
+        HDF_LOGE("%{public}s: failed to open RemainEnergySysfs", __func__);
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysBattChargeNowPath.c_str());
+        HDF_LOGE("%{public}s: failed to read RemainEnergySysfs", __func__);
         close(fd);
         return HDF_FAILURE;
     }
@@ -531,17 +523,16 @@ static int32_t ReadHealthStateSysfs()
         }
     }
     std::string sysHealthStatePath = SYSTEM_BATTERY_PATH + "/" + healthNode + "/" + "health";
-    HDF_LOGE("%{public}s: sysHealthStatePath is %{public}s", __func__, sysHealthStatePath.c_str());
 
     int fd = open(sysHealthStatePath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysHealthStatePath.c_str());
+        HDF_LOGE("%{public}s: failed to open HealthStateSysfs", __func__);
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysHealthStatePath.c_str());
+        HDF_LOGE("%{public}s: failed to read HealthStateSysfs", __func__);
         close(fd);
         return HDF_FAILURE;
     }
@@ -585,13 +576,13 @@ int32_t ReadSysfsFile(const char* path, char* buf, size_t size)
 {
     int fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, path);
+        HDF_LOGE("%{public}s: failed to open file", __func__);
         return HDF_ERR_IO;
     }
 
     int32_t readSize = read(fd, buf, size - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, path);
+        HDF_LOGE("%{public}s: failed to read file", __func__);
         close(fd);
         return HDF_ERR_IO;
     }
@@ -629,7 +620,6 @@ static int32_t ReadPluggedTypeSysfs()
         return ERROR;
     }
     std::string typePath = SYSTEM_BATTERY_PATH + "/" + node + "/" + "type";
-    HDF_LOGI("%{public}s: type path is: %{public}s", __func__, typePath.c_str());
     if (ReadSysfsFile(typePath.c_str(), buf, MAX_BUFF_SIZE) != HDF_SUCCESS) {
         HDF_LOGW("%{public}s: read type path failed", __func__);
         return ERROR;
@@ -669,17 +659,16 @@ static int32_t ReadChargeStateSysfs()
         }
     }
     std::string sysChargeStatePath = SYSTEM_BATTERY_PATH + "/" + statusNode + "/" + "status";
-    HDF_LOGE("%{public}s: sysChargeStatePath is %{public}s", __func__, sysChargeStatePath.c_str());
 
     int fd = open(sysChargeStatePath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysChargeStatePath.c_str());
+        HDF_LOGE("%{public}s: failed to open ChargeStateSysfs", __func__);
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysChargeStatePath.c_str());
+        HDF_LOGE("%{public}s: failed to read ChargeStateSysfs", __func__);
         close(fd);
         return HDF_FAILURE;
     }
@@ -705,17 +694,16 @@ static int32_t ReadChargeCounterSysfs()
         }
     }
     std::string sysChargeCounterPath = SYSTEM_BATTERY_PATH + "/" + counterNode + "/" + "charge_counter";
-    HDF_LOGE("%{public}s: sysChargeCounterPath is %{public}s", __func__, sysChargeCounterPath.c_str());
 
     int fd = open(sysChargeCounterPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysChargeCounterPath.c_str());
+        HDF_LOGE("%{public}s: failed to open ChargeCounterSysfs", __func__);
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysChargeCounterPath.c_str());
+        HDF_LOGE("%{public}s: failed to read ChargeCounterSysfs", __func__);
         close(fd);
         return HDF_FAILURE;
     }
@@ -744,17 +732,16 @@ static int32_t ReadPresentSysfs()
         }
     }
     std::string sysPresentPath = SYSTEM_BATTERY_PATH + "/" + presentNode + "/" + "present";
-    HDF_LOGE("%{public}s: sysPresentPath is %{public}s", __func__, sysPresentPath.c_str());
 
     int fd = open(sysPresentPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysPresentPath.c_str());
+        HDF_LOGE("%{public}s: failed to open PresentSysfs", __func__);
         return HDF_FAILURE;
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysPresentPath.c_str());
+        HDF_LOGE("%{public}s: failed to read PresentSysfs", __func__);
         close(fd);
         return HDF_FAILURE;
     }
@@ -781,17 +768,16 @@ static std::string ReadTechnologySysfs(std::string& battTechnology)
         }
     }
     std::string sysTechnologyPath = SYSTEM_BATTERY_PATH + "/" + technologyNode + "/" + "technology";
-    HDF_LOGE("%{public}s: sysTechnologyPath is %{public}s", __func__, sysTechnologyPath.c_str());
 
     int fd = open(sysTechnologyPath.c_str(), O_RDONLY);
     if (fd < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to open %{public}s", __func__, sysTechnologyPath.c_str());
+        HDF_LOGE("%{public}s: failed to open TechnologySysfs", __func__);
         return "";
     }
 
     readSize = read(fd, buf, sizeof(buf) - 1);
     if (readSize < NUM_ZERO) {
-        HDF_LOGE("%{public}s: failed to read %{public}s", __func__, sysTechnologyPath.c_str());
+        HDF_LOGE("%{public}s: failed to read TechnologySysfs", __func__);
         close(fd);
         return "";
     }

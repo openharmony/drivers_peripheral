@@ -241,12 +241,10 @@ void ThermalHdfTimer::DumpSensorConfigInfo()
                 tzIter.replace.c_str());
         }
         for (auto tnIter : sensorIter.second->GetXMLThermalNodeInfo()) {
-            THERMAL_HILOGD(COMP_HDI, "type %{public}s, path %{public}s", tnIter.type.c_str(),
-                tnIter.path.c_str());
+            THERMAL_HILOGD(COMP_HDI, "type %{public}s", tnIter.type.c_str());
         }
         for (auto dataIter : sensorIter.second->thermalDataList_) {
-            THERMAL_HILOGD(COMP_HDI, "data type %{public}s, data temp path %{public}s", dataIter.type.c_str(),
-                dataIter.tempPath.c_str());
+            THERMAL_HILOGD(COMP_HDI, "data type %{public}s", dataIter.type.c_str());
         }
     }
 }

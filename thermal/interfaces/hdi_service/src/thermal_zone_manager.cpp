@@ -138,13 +138,13 @@ int32_t ThermalZoneManager::ReadSysfsFile(const char* path, char* buf, size_t si
     int32_t readSize;
     int32_t fd = open(path, O_RDONLY);
     if (fd < NUM_ZERO) {
-        THERMAL_HILOGE(COMP_HDI, "failed to open %{public}s", path);
+        THERMAL_HILOGE(COMP_HDI, "failed to open SysfsFile");
         return HDF_ERR_IO;
     }
 
     readSize = read(fd, buf, size - 1);
     if (readSize < NUM_ZERO) {
-        THERMAL_HILOGE(COMP_HDI, "failed to read %{public}s", path);
+        THERMAL_HILOGE(COMP_HDI, "failed to read SysfsFile");
         close(fd);
         return HDF_ERR_IO;
     }
@@ -160,7 +160,7 @@ int32_t ThermalZoneManager::ReadThermalSysfsToBuff(const char* path, char* buf, 
 {
     int32_t ret = ReadSysfsFile(path, buf, size);
     if (ret != HDF_SUCCESS) {
-        THERMAL_HILOGW(COMP_HDI, "read path %{private}s failed, ret: %{public}d", path, ret);
+        THERMAL_HILOGW(COMP_HDI, "read path failed, ret: %{public}d", ret);
         return ret;
     }
 
