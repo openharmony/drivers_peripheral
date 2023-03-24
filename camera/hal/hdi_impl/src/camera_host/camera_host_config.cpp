@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -170,6 +170,18 @@ std::string CameraHostConfig::ReturnEnableLogicalCameraId()
     } else {
         return std::string("");
     }
+}
+
+std::string CameraHostConfig::GenerateNewLogicalCameraId()
+{
+    for (int32_t id = 1; id < CAMERA_MAX + 1; id++) {
+        std::string logicalCameraId = "lcam00" + std::to_string(id);
+        auto itr = cameraIdMap_.find(logicalCameraId);
+        if (itr == cameraIdMap_.end()) {
+            return logicalCameraId;
+        }
+    }
+    return std::string("");
 }
 
 std::string CameraHostConfig::ReturnPhysicalCameraIdToString(const CameraId &physicalCameraId)
