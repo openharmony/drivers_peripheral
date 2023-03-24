@@ -183,7 +183,6 @@ static int32_t ReadAndScanUsbDev(const char *devPath)
         tryTime++;
         AUDIO_FUNC_LOGW("audio try[%{public}d] realpath fail[%{public}d]", tryTime, errno);
         OsalMSleep(AUDIO_DEVICE_WAIT_ONLINE);
-        continue;
     }
 
     fp = fopen(realpathRes, "r");

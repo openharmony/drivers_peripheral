@@ -32,7 +32,7 @@ struct AudioCaptureInfo {
 };
 
 struct AudioHwiCapturePriv {
-    struct AudioCaptureInfo *captureInfos[AUDIO_HW_ADAPTER_NUM_MAX];
+    struct AudioCaptureInfo *captureInfos[AUDIO_HW_STREAM_NUM_MAX];
     uint32_t captureCnt;
 };
 
