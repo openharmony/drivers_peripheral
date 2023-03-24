@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,6 +46,7 @@ sptr<ICameraHost> TestDisplay::CameraHostImplGetInstance(void)
     }
 
     service->Init();
+    sleep(3); // 3:sleep three second
     return service;
 }
 
@@ -367,11 +368,6 @@ void TestDisplay::BufferCallback(unsigned char* addr, int choice)
 
 void TestDisplay::Init()
 {
-    std::shared_ptr<OHOS::Camera::IDeviceManager> deviceManager = OHOS::Camera::IDeviceManager::GetInstance();
-    if (!initFlag) {
-        deviceManager->Init();
-        initFlag = 1;
-    }
     CAMERA_LOGD("TestDisplay::Init().");
     if (cameraHost == nullptr) {
         constexpr const char *DEMO_SERVICE_NAME = "camera_service";
@@ -409,11 +405,6 @@ void TestDisplay::Init()
 
 void TestDisplay::UsbInit()
 {
-    std::shared_ptr<OHOS::Camera::IDeviceManager> deviceManager = OHOS::Camera::IDeviceManager::GetInstance();
-    if (!initFlag) {
-        deviceManager->Init();
-        initFlag = 1;
-    }
     if (cameraHost == nullptr) {
         constexpr const char *DEMO_SERVICE_NAME = "camera_service";
         cameraHost = ICameraHost::Get(DEMO_SERVICE_NAME, false);
