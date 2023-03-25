@@ -29,6 +29,7 @@ struct AudioCaptureInfo {
     enum AudioCategory streamType;
     struct IAudioCapture *capture;
     struct AudioHwiCapture *hwiCapture;
+    uint32_t captureId;
 };
 
 struct AudioHwiCapturePriv {
@@ -709,10 +710,10 @@ static void AudioHwiInitCaptureInstance(struct IAudioCapture *capture)
     capture->GetVersion = AudioHwiCaptureGetVersion;
 }
 
-static struct IAudioCapture *FindCaptureCreated(struct AudioHwiCapturePriv *capturePriv, enum AudioPortPin pin,
-                                               enum AudioCategory streamType)
+struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, enum AudioCategory streamType, uint32_t *captureId)
 {
     uint32_t index = 0;
+    struct AudioHwiCapturePriv *capturePriv = AudioHwiCaptureGetPriv();
     if (capturePriv == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return NULL;
@@ -727,6 +728,7 @@ static struct IAudioCapture *FindCaptureCreated(struct AudioHwiCapturePriv *capt
         if ((capturePriv->captureInfos[index] != NULL) &&
             (capturePriv->captureInfos[index]->desc.pins == pin) &&
             (capturePriv->captureInfos[index]->streamType == streamType)) {
+            *captureId = capturePriv->captureInfos[index]->captureId;
             return capturePriv->captureInfos[index]->capture;
         }
     }
@@ -769,12 +771,6 @@ struct IAudioCapture *AudioHwiCreateCaptureById(enum AudioCategory streamType, u
     *captureId = AUDIO_HW_STREAM_NUM_MAX;
     struct IAudioCapture *capture = NULL;
     struct AudioHwiCapturePriv *priv = AudioHwiCaptureGetPriv();
-    
-    capture = FindCaptureCreated(priv, desc->pins, streamType);
-    if (capture != NULL) {
-        AUDIO_FUNC_LOGE("already created");
-        return capture;
-    }
 
     *captureId = GetAvailableCaptureId(priv);
     if (*captureId >= AUDIO_HW_STREAM_NUM_MAX) {
@@ -799,6 +795,7 @@ struct IAudioCapture *AudioHwiCreateCaptureById(enum AudioCategory streamType, u
     priv->captureInfos[*captureId]->desc.portId = desc->portId;
     priv->captureInfos[*captureId]->desc.pins = desc->pins;
     priv->captureInfos[*captureId]->desc.desc = strdup(desc->desc);
+    priv->captureInfos[*captureId]->captureId = *captureId;
     AudioHwiInitCaptureInstance(capture);
 
     AUDIO_FUNC_LOGI("audio captureId capture success");
