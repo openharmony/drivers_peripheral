@@ -67,7 +67,6 @@ public:
     ~GnssCallBackDeathRecipient() = default;
     void OnRemoteDied(const wptr<IRemoteObject>& remote) override
     {
-        (void)remote;
         sptr<GnssInterfaceImpl> impl = gnssInterfaceImpl_.promote();
         if (impl != nullptr) {
             impl->ResetGnss();
