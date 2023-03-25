@@ -28,6 +28,7 @@ constexpr uint32_t FD_SIZE = sizeof(int);
 constexpr uint32_t FRAME = 30 << 16;
 constexpr uint32_t DENOMINATOR = 2;
 constexpr uint32_t NUMERATOR = 3;
+constexpr uint32_t MAX_WAIT_COUNT = 3;
 }  // namespace
 
 #define HDF_LOG_TAG codec_omx_hdi_dec
@@ -485,7 +486,7 @@ void CodecHdiDecode::FreeBuffers()
     // wait loaded
     OMX_STATETYPE status = OMX_StateLoaded;
     int32_t err = HDF_SUCCESS;
-    int32_t tryCount = 3;
+    int32_t tryCount = MAX_WAIT_COUNT;
     do {
         err = client_->GetState(client_, &status);
         if (err != HDF_SUCCESS) {
