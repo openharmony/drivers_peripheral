@@ -117,8 +117,7 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
                 XMLThermalNodeInfo tn;
                 tn.type = (char *)xmlGetProp(subNode, BAD_CAST"type");
                 tn.path = (char *)xmlGetProp(subNode, BAD_CAST"path");
-                THERMAL_HILOGI(COMP_HDI, "ParsePollingNode tntype: %{public}s, path: %{public}s",
-                    tn.type.c_str(), tn.path.c_str());
+                THERMAL_HILOGI(COMP_HDI, "ParsePollingNode tntype: %{public}s", tn.type.c_str());
                 xmlTnInfoList.push_back(tn);
             }
         }
