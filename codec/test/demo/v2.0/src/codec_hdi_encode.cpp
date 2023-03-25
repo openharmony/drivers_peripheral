@@ -32,6 +32,7 @@ namespace {
     constexpr int32_t BUFFER_COUNT = 10;
     constexpr int32_t BITRATE = 3000000;
     constexpr int32_t FD_SIZE = sizeof(int);
+    constexpr uint32_t MAX_WAIT_COUNT = 3;
 }
 
 #define AV_COLOR_FORMAT (OMX_COLOR_FORMATTYPE) CODEC_COLOR_FORMAT_RGBA8888
@@ -412,7 +413,7 @@ void CodecHdiEncode::FreeBuffers()
     // wait loaded
     OMX_STATETYPE status = OMX_StateLoaded;
     int32_t err = HDF_SUCCESS;
-    int32_t tryCount = 3;
+    int32_t tryCount = MAX_WAIT_COUNT;
     do {
         err = client_->GetState(client_, &status);
         if (err != HDF_SUCCESS) {
