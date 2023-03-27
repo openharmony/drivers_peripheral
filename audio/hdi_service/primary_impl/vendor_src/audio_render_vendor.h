@@ -23,5 +23,6 @@ struct IAudioRender *AudioHwiCreateRenderById(enum AudioCategory streamType, uin
     struct AudioHwiRender *hwiRender, const struct AudioDeviceDescriptor *desc);
 void AudioHwiDestroyRenderById(uint32_t renderId);
 struct AudioHwiRender *AudioHwiGetHwiRenderById(uint32_t renderId);
+struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, enum AudioCategory streamType, uint32_t *rendrId);
 
 #endif // AUDIO_RENDER_VENDOR_H

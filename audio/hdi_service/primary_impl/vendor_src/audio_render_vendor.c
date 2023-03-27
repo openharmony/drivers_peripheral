@@ -29,6 +29,7 @@ struct AudioRenderInfo {
     enum AudioCategory streamType;
     struct IAudioRender *render;
     struct AudioHwiRender *hwiRender;
+    uint32_t renderId;
 };
 
 struct AudioHwiRenderPriv {
@@ -883,10 +884,10 @@ static void AudioHwiInitRenderInstance(struct IAudioRender *render)
     render->GetVersion = AudioHwiRenderGetVersion;
 }
 
-static struct IAudioRender *FindRenderCreated(struct AudioHwiRenderPriv *renderPriv, enum AudioPortPin pin,
-                                              enum AudioCategory streamType)
+struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, enum AudioCategory streamType, uint32_t *rendrId)
 {
     uint32_t index = 0;
+    struct AudioHwiRenderPriv *renderPriv = AudioHwiRenderGetPriv();
     if (renderPriv == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
         return NULL;
@@ -901,6 +902,7 @@ static struct IAudioRender *FindRenderCreated(struct AudioHwiRenderPriv *renderP
         if ((renderPriv->renderInfos[index] != NULL) &&
             (renderPriv->renderInfos[index]->desc.pins == pin) &&
             (renderPriv->renderInfos[index]->streamType == streamType)) {
+            *rendrId = renderPriv->renderInfos[index]->renderId;
             return renderPriv->renderInfos[index]->render;
         }
     }
@@ -943,11 +945,6 @@ struct IAudioRender *AudioHwiCreateRenderById(enum AudioCategory streamType, uin
 
     *renderId = AUDIO_HW_STREAM_NUM_MAX;
     struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
-    render = FindRenderCreated(priv, desc->pins, streamType);
-    if (render != NULL) {
-        AUDIO_FUNC_LOGE("already created");
-        return render;
-    }
 
     *renderId = GetAvailableRenderId(priv);
     if (*renderId >= AUDIO_HW_STREAM_NUM_MAX) {
@@ -972,6 +969,7 @@ struct IAudioRender *AudioHwiCreateRenderById(enum AudioCategory streamType, uin
     priv->renderInfos[*renderId]->desc.portId = desc->portId;
     priv->renderInfos[*renderId]->desc.pins = desc->pins;
     priv->renderInfos[*renderId]->desc.desc = strdup(desc->desc);
+    priv->renderInfos[*renderId]->renderId = *renderId;
     AudioHwiInitRenderInstance(render);
 
     AUDIO_FUNC_LOGI("audio create adapter success");

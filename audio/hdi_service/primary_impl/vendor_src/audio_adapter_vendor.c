@@ -107,9 +107,16 @@ int32_t AudioHwiCreateRender(struct IAudioAdapter *adapter, const struct AudioDe
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(renderId, HDF_ERR_INVALID_PARAM);
 
+    *render = FindRenderCreated(desc->pins, attrs->type, renderId);
+    if (*render != NULL) {
+        AUDIO_FUNC_LOGE("already created");
+        return HDF_SUCCESS;
+    }
+
     struct AudioHwiAdapter *hwiAdapter = AudioHwiGetHwiAdapter(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter->CreateRender, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter->DestroyRender, HDF_ERR_INVALID_PARAM);
 
     AudioHwiCommonDevDescToHwiDevDesc(desc, &hwiDesc);
     AudioHwiCommonAttrsToHwiAttrs(attrs, &hwiAttrs);
@@ -122,7 +129,11 @@ int32_t AudioHwiCreateRender(struct IAudioAdapter *adapter, const struct AudioDe
     }
 
     *render = AudioHwiCreateRenderById(attrs->type, renderId, hwiRender, desc);
-    CHECK_NULL_PTR_RETURN_VALUE(*render, HDF_ERR_INVALID_PARAM);
+    if (*render == NULL) {
+        (void)hwiAdapter->DestroyRender(hwiAdapter, hwiRender);
+        AUDIO_FUNC_LOGE("Create audio render failed");
+        return HDF_ERR_INVALID_PARAM;
+    }
 
     return HDF_SUCCESS;
 }
@@ -158,6 +169,12 @@ int32_t AudioHwiCreateCapture(struct IAudioAdapter *adapter, const struct AudioD
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(captureId, HDF_ERR_INVALID_PARAM);
 
+    *capture = FindCaptureCreated(desc->pins, attrs->type, captureId);
+    if (*capture != NULL) {
+        AUDIO_FUNC_LOGE("already created");
+        return HDF_SUCCESS;
+    }
+
     struct AudioHwiAdapter *hwiAdapter = AudioHwiGetHwiAdapter(adapter);
     CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter, HDF_ERR_INVALID_PARAM);
 
@@ -169,6 +186,7 @@ int32_t AudioHwiCreateCapture(struct IAudioAdapter *adapter, const struct AudioD
     AudioHwiCommonAttrsToHwiAttrs(attrs, &hwiAttrs);
 
     CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter->CreateCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiAdapter->DestroyCapture, HDF_ERR_INVALID_PARAM);
     int32_t ret = hwiAdapter->CreateCapture(hwiAdapter, &hwiDesc, &hwiAttrs, &hwiCapture);
     OsalMemFree((void *)hwiDesc.desc);
     if (ret != HDF_SUCCESS) {
@@ -177,7 +195,11 @@ int32_t AudioHwiCreateCapture(struct IAudioAdapter *adapter, const struct AudioD
     }
 
     *capture = AudioHwiCreateCaptureById(attrs->type, captureId, hwiCapture, desc);
-    CHECK_NULL_PTR_RETURN_VALUE(*capture, HDF_ERR_INVALID_PARAM);
+    if (*capture == NULL) {
+        (void)hwiAdapter->DestroyCapture(hwiAdapter, hwiCapture);
+        AUDIO_FUNC_LOGE("create audio capture failed");
+        return HDF_ERR_INVALID_PARAM;
+    }
 
     return HDF_SUCCESS;
 }
