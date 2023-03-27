@@ -1328,8 +1328,8 @@ void UsbdDispatcher::UsbdBulkASyncWriteCallbackAutoSubmit(UsbRequest *request)
         UsbdBulkASyncReqNodeSetNoUse(node);
         ret = UsbdBulkWriteRemoteCallback(node->list->pList->cb, status, &node->list->pList->asmHandle);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbdBulkWriteRemoteCallback failed, ret:%{public}d "
-                "req:%{public}p id:%{public}d status:%{public}d", __func__, __LINE__, ret, request, node->id, status);
+            HDF_LOGE("%{public}s:%{public}d UsbdBulkWriteRemoteCallback failed, ret:%{public}d"
+                "id:%{public}d status:%{public}d", __func__, __LINE__, ret, node->id, status);
         }
         return;
     }
@@ -1347,8 +1347,8 @@ void UsbdDispatcher::UsbdBulkASyncWriteCallbackAutoSubmit(UsbRequest *request)
     } else if (ret != HDF_SUCCESS) {
         ret = UsbdBulkWriteRemoteCallback(node->list->pList->cb, ret, &node->list->pList->asmHandle);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbdBulkWriteRemoteCallback failed "
-                "ret:%{public}d req:%{public}p id:%{public}d", __func__, __LINE__, ret, request, node->id);
+            HDF_LOGE("%{public}s:%{public}d UsbdBulkWriteRemoteCallback failed ret:%{public}d id:%{public}d",
+                __func__, __LINE__, ret, node->id);
         }
         return;
     }
@@ -1368,8 +1368,8 @@ void UsbdDispatcher::UsbdBulkASyncReadCallbackAutoSubmit(UsbRequest *request)
         UsbdBulkASyncReqNodeSetNoUse(node);
         ret = UsbdBulkReadRemoteCallback(node->list->pList->cb, status, &node->list->pList->asmHandle);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbdBulkReadRemoteCallback failed, ret:%{public}d "
-                "req:%{public}p id:%{public}d status:%{public}d", __func__, __LINE__, ret, request, node->id, status);
+            HDF_LOGE("%{public}s:%{public}d UsbdBulkReadRemoteCallback failed, ret:%{public}d"
+                "id:%{public}d status:%{public}d", __func__, __LINE__, ret, node->id, status);
         }
         return;
     }
@@ -1387,8 +1387,8 @@ void UsbdDispatcher::UsbdBulkASyncReadCallbackAutoSubmit(UsbRequest *request)
     } else if (ret != HDF_SUCCESS) {
         ret = UsbdBulkReadRemoteCallback(node->list->pList->cb, ret, &node->list->pList->asmHandle);
         if (ret != HDF_SUCCESS) {
-            HDF_LOGE("%{public}s:%{public}d UsbdBulkReadRemoteCallback failed "
-                "ret:%{public}d req:%{public}p id:%{public}d", __func__, __LINE__, ret, request, node->id);
+            HDF_LOGE("%{public}s:%{public}d UsbdBulkReadRemoteCallback failed ret:%{public}d id:%{public}d",
+                __func__, __LINE__, ret, node->id);
         }
         return;
     }
