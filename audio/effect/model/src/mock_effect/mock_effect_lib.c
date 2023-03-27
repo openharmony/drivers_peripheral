@@ -283,7 +283,7 @@ static int32_t MockDestroyController(struct EffectFactory *self, struct EffectCo
     return HDF_SUCCESS;
 }
 
-int32_t MockGetDescriptor(struct EffectFactory *self, const char *uuid, struct EffectControllerDescriptor *desc)
+int32_t MockGetDescriptor(const struct EffectFactory *self, const char *uuid, struct EffectControllerDescriptor *desc)
 {
     HDF_LOGI("enter to %{public}s", __func__);
     if (self == NULL || uuid == NULL || desc == NULL) {
