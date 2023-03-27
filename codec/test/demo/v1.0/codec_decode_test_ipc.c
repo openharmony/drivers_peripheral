@@ -565,7 +565,7 @@ static void DecodeLoopHandleInput(const CodecEnvData *decData)
             HDF_LOGI("%{public}s: client inputData reach STREAM_FLAG_EOS", __func__);
             inputData->flag = STREAM_FLAG_EOS;
         }
-    
+
         ShareMemory *sm = GetShareMemoryById(inputData->bufferId);
         memcpy_s(sm->virAddr, readSize, (uint8_t*)g_readFileBuf, readSize);
         inputData->buffer[0].length = readSize;
@@ -717,9 +717,6 @@ static void DecodeEnd(void)
     }
 
     RevertDecodeStep3();
-    if (g_readFileBuf != NULL) {
-        OsalMemFree(g_readFileBuf);
-    }
 }
 
 static int32_t Decode(void)
@@ -774,12 +771,14 @@ static int32_t Decode(void)
     if (ret != 0) {
         HDF_LOGE("%{public}s: failed to create thread for input ret %{public}d", __func__, ret);
         DecodeEnd();
+        OsalMemFree(g_readFileBuf);
         pthread_attr_destroy(&attr);
         return HDF_SUCCESS;
     }
 
     pthread_join(thd, NULL);
     DecodeEnd();
+    OsalMemFree(g_readFileBuf);
     pthread_attr_destroy(&attr);
 
     return HDF_SUCCESS;
