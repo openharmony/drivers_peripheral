@@ -274,7 +274,7 @@ static int32_t DdkUeventCallBack(void *priv, uint32_t id, struct HdfSBuf *data)
         uint32_t infoSize;
         bool flag = HdfSbufReadBuffer(data, (const void **)(&info), &infoSize);
         if (!flag || info == NULL) {
-            HDF_LOGE("%{public}s: HdfSbufReadBuffer failed, flag=%{public}d, info=%{public}p", __func__, flag, info);
+            HDF_LOGE("%{public}s: HdfSbufReadBuffer failed, flag=%{public}d", __func__, flag);
             return HDF_ERR_INVALID_PARAM;
         }
     }
