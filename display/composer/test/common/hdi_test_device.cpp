@@ -32,7 +32,7 @@ HdiTestDevice& HdiTestDevice::GetInstance()
 
 void HdiTestDevice::HotPlug(uint32_t outputId, bool connected, void* data)
 {
-    DISPLAY_TEST_LOGD("outputId %d connected %d", outputId, connected);
+    DISPLAY_TEST_LOGD("outputId %{public}u connected %{public}d", outputId, connected);
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((data == nullptr), DISPLAY_TEST_LOGE("the data is null ptr"));
     HdiTestDevice* device = static_cast<HdiTestDevice *>(data);
     if (connected) {
@@ -57,7 +57,8 @@ int32_t HdiTestDevice::InitDevice()
 std::shared_ptr<HdiTestDisplay> HdiTestDevice::GetDisplayFromId(uint32_t id)
 {
     auto iter = displays_.find(id);
-    DISPLAY_TEST_CHK_RETURN((iter == displays_.end()), nullptr, DISPLAY_TEST_LOGD("can not find the display %d", id));
+    DISPLAY_TEST_CHK_RETURN((iter == displays_.end()), nullptr, DISPLAY_TEST_LOGD("can not find the display %{public}u",
+        id));
     return displays_[id];
 }
 
@@ -90,7 +91,7 @@ void HdiTestDevice::Clear() const
     }
 }
 
-std::vector<uint32_t> HdiTestDevice::GetDevIds()
+std::vector<uint32_t> HdiTestDevice::GetDevIds() const
 {
     return displayIds_;
 }
