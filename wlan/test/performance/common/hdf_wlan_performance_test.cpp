@@ -34,7 +34,7 @@ const int32_t WLAN_BAND_2G = 0;
 const int32_t WLAN_FREQ_MAX_NUM = 14;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
 const uint32_t DEFAULT_COMBO_SIZE = 10;
-const uint32_t RESET_TIME = 20;
+const uint32_t RESET_TIME = 3;
 const uint32_t WLAN_MIN_CHIPID = 0;
 const uint32_t WLAN_MAX_CHIPID = 2;
 
