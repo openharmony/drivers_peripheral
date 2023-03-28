@@ -17,7 +17,10 @@ import("//drivers/peripheral/audio/audio.gni")
 
 ohos_unittest("audio_ut_common_test") {
   module_out_path = "drivers_peripheral_audio/audio"
-  sources = [ "manager/audio_manager_common_test.cpp" ]
+  sources = [
+    "manager/audio_manager_common_test.cpp",
+    "render/audio_render_common_test.cpp",
+  ]
 
   include_dirs = []
 

@@ -53,7 +53,7 @@ struct AudioHwiCapture *AudioHwiGetHwiCapture(const struct IAudioCapture *captur
 
     struct AudioHwiCapturePriv *priv = AudioHwiCaptureGetPriv();
 
-    for (uint32_t i = 0; i < AUDIO_HW_ADAPTER_NUM_MAX; i++) {
+    for (uint32_t i = 0; i < AUDIO_HW_STREAM_NUM_MAX; i++) {
         if (priv->captureInfos[i] == NULL) {
             continue;
         }
