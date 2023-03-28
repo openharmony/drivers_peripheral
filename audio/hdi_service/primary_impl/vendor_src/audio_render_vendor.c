@@ -54,7 +54,7 @@ struct AudioHwiRender *AudioHwiGetHwiRender(const struct IAudioRender *render)
     }
 
     struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
-    for (uint32_t i = 0; i < AUDIO_HW_ADAPTER_NUM_MAX; i++) {
+    for (uint32_t i = 0; i < AUDIO_HW_STREAM_NUM_MAX; i++) {
         if (priv->renderInfos[i] == NULL) {
             continue;
         }
@@ -854,6 +854,7 @@ static void AudioHwiInitRenderInstance(struct IAudioRender *render)
     render->DrainBuffer = AudioHwiRenderDrainBuffer;
     render->IsSupportsDrain = AudioHwiRenderIsSupportsDrain;
     render->CheckSceneCapability = AudioHwiRenderCheckSceneCapability;
+    render->SelectScene = AudioHwiRenderSelectScene;
     render->SetMute = AudioHwiRenderSetMute;
     render->GetMute = AudioHwiRenderGetMute;
     render->SetVolume = AudioHwiRenderSetVolume;
