@@ -279,7 +279,7 @@ static int PrepareAndPrensent()
 static void TestVBlankCallback(unsigned int sequence, uint64_t ns, void* data)
 {
     static uint64_t lastns;
-    DISPLAY_TEST_LOGD("seq %d  ns %" PRId64 " duration %" PRId64 " ns", sequence, ns, (ns - lastns));
+    DISPLAY_TEST_LOGD("seq %{public}d  ns %" PRId64 " duration %" PRId64 " ns", sequence, ns, (ns - lastns));
     lastns = ns;
     VblankCtr::GetInstance().NotifyVblank(sequence, ns, data);
 }
@@ -295,7 +295,7 @@ static void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w
             setting.displayRect.w = static_cast<uint32_t>(setting.rectRatio.w * w);
             setting.displayRect.x = static_cast<uint32_t>(setting.rectRatio.x * w);
             setting.displayRect.y = static_cast<uint32_t>(setting.rectRatio.y * h);
-            DISPLAY_TEST_LOGD("display rect adust form %f %f %f %f to %d %d %d %d ", setting.rectRatio.x,
+            DISPLAY_TEST_LOGD("display rect adust form %f %f %f %f to %{public}d %{public}d %{public}d %{public}d ", setting.rectRatio.x,
                 setting.rectRatio.y, setting.rectRatio.w, setting.rectRatio.h, setting.displayRect.x,
                 setting.displayRect.y, setting.displayRect.w, setting.displayRect.h);
         }
@@ -303,12 +303,12 @@ static void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w
         if ((setting.bufferRatio.h > 0.0f) || (setting.bufferRatio.w > 0.0f)) {
             setting.bufferSize.h = static_cast<uint32_t>(setting.bufferRatio.h * h);
             setting.bufferSize.w = static_cast<uint32_t>(setting.bufferRatio.w * w);
-            DISPLAY_TEST_LOGD("buffer size adjust for %f %f to %d %d", setting.bufferRatio.w, setting.bufferRatio.h,
+            DISPLAY_TEST_LOGD("buffer size adjust for %f %f to %{public}d %{public}d", setting.bufferRatio.w, setting.bufferRatio.h,
                 setting.bufferSize.w, setting.bufferSize.h);
         }
 
         if ((setting.bufferSize.w == 0) || (setting.bufferSize.h == 0)) {
-            DISPLAY_TEST_LOGD("buffer size adjust for %d %d to %d %d", setting.bufferSize.w, setting.bufferSize.h,
+            DISPLAY_TEST_LOGD("buffer size adjust for %{public}d %{public}d to %{public}d %{public}d", setting.bufferSize.w, setting.bufferSize.h,
                 setting.displayRect.w, setting.displayRect.h);
 
             setting.bufferSize.w = setting.displayRect.w;
@@ -319,7 +319,7 @@ static void AdjustLayerSettings(std::vector<LayerSettings> &settings, uint32_t w
 
 static std::vector<std::shared_ptr<HdiTestLayer>> CreateLayers(std::vector<LayerSettings> &settings)
 {
-    DISPLAY_TEST_LOGD("settings %zd", settings.size());
+    DISPLAY_TEST_LOGD("settings %{public}zd", settings.size());
     std::vector<std::shared_ptr<HdiTestLayer>> layers;
     DisplayModeInfo mode = GetFirstDisplay()->GetCurrentMode();
     AdjustLayerSettings(settings, mode.width, mode.height);
@@ -362,11 +362,11 @@ void DeviceLayerDisplay::TearDown()
     HdiTestDevice::GetInstance().Clear();
 }
 
-void VblankCtr::NotifyVblank(unsigned int sequence, uint64_t ns, void* data)
+void VblankCtr::NotifyVblank(unsigned int sequence, uint64_t ns, const void* data)
 {
     DISPLAY_TEST_LOGD();
     if (data != nullptr) {
-        DISPLAY_TEST_LOGD("sequence = %u, ns = %" PRIu64 "", sequence, ns);
+        DISPLAY_TEST_LOGD("sequence = %{public}u, ns = %" PRIu64 "", sequence, ns);
     }
     std::unique_lock<std::mutex> lg(vblankMutex_);
     hasVblank_ = true;

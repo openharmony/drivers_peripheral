@@ -20,7 +20,7 @@ namespace HDI {
 namespace Display {
 namespace TEST {
 using namespace OHOS::HDI::Display::Composer::V1_0;
-void HdiCompositionCheck::GetCheckPoints(Point center, std::vector<Point> &points)
+void HdiCompositionCheck::GetCheckPoints(Point center, std::vector<Point> &points) const
 {
     const uint32_t STEP = 3;
     points.push_back(center);
@@ -34,7 +34,7 @@ void HdiCompositionCheck::GetCheckPoints(Point center, std::vector<Point> &point
     points.push_back({center.x, center.y - STEP});
 }
 // simple hande the alpha it may not compatible with all scenarios
-void HdiCompositionCheck::SimpleHandleAlpha(const LayerSettings& layers, uint32_t& color)
+void HdiCompositionCheck::SimpleHandleAlpha(const LayerSettings& layers, uint32_t& color) const
 {
     const float INV = 1.0f / 255.0f;
     const uint32_t WHITE_TRANSPARENT = 0xffffff00;
@@ -54,18 +54,18 @@ void HdiCompositionCheck::SimpleHandleAlpha(const LayerSettings& layers, uint32_
     }
 }
 
-std::vector<uint32_t> HdiCompositionCheck::GetCheckColors(std::vector<LayerSettings> &layers,
-    std::vector<Point> &points)
+std::vector<uint32_t> HdiCompositionCheck::GetCheckColors(const std::vector<LayerSettings> &layers,
+    const std::vector<Point> &points)
 {
     std::vector<uint32_t> colors;
     for (auto point : points) {
         uint32_t color = 0;
         for (uint32_t i = layers.size(); i > 0; i--) {
             auto layer = layers[i - 1];
-            IRect& rect = layer.displayRect;
+            const IRect& RECT = layer.displayRect;
             // check whether the point is inside the rect
-            if ((point.x >= rect.x) && (point.x < (rect.x + rect.w)) && (point.y >= rect.y) &&
-                (point.y < (rect.y + rect.h))) {
+            if ((point.x >= RECT.x) && (point.x < (RECT.x + RECT.w)) && (point.y >= RECT.y) &&
+                (point.y < (RECT.y + RECT.h))) {
                 if (layer.compositionType != COMPOSITION_VIDEO) {
                     color = layer.color;
                     SimpleHandleAlpha(layer, color);
@@ -78,21 +78,21 @@ std::vector<uint32_t> HdiCompositionCheck::GetCheckColors(std::vector<LayerSetti
     return colors;
 }
 
-int32_t HdiCompositionCheck::Check(std::vector<LayerSettings> &layers, BufferHandle& clientBuffer, uint32_t checkType)
+int32_t HdiCompositionCheck::Check(std::vector<LayerSettings> &layers, const BufferHandle& clientBuffer, uint32_t checkType)
 {
     int ret = DISPLAY_SUCCESS;
     const int MID_POS = 2;
     // get the all check point
     std::vector<Point> points;
     for (auto layer : layers) {
-        IRect& rect = layer.displayRect;
+        const IRect& RECT = layer.displayRect;
         if (checkType == CHECK_VERTEX) {
-            GetCheckPoints({rect.x, rect.y}, points);
-            GetCheckPoints({rect.x, rect.y + rect.h}, points);
-            GetCheckPoints({rect.x + rect.w, rect.y}, points);
-            GetCheckPoints({rect.x + rect.w, rect.y + rect.h}, points);
+            GetCheckPoints({RECT.x, RECT.y}, points);
+            GetCheckPoints({RECT.x, RECT.y + RECT.h}, points);
+            GetCheckPoints({RECT.x + RECT.w, RECT.y}, points);
+            GetCheckPoints({RECT.x + RECT.w, RECT.y + RECT.h}, points);
         } else {
-            GetCheckPoints({rect.x + rect.w / MID_POS, rect.y + rect.h / MID_POS}, points); // center point
+            GetCheckPoints({RECT.x + RECT.w / MID_POS, RECT.y + RECT.h / MID_POS}, points); // center point
         }
     }
 

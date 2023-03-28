@@ -49,7 +49,7 @@ public:
     std::shared_ptr<HdiTestDisplay> GetDisplayFromId(uint32_t id);
     std::shared_ptr<HdiTestDisplay> GetFirstDisplay();
     void Clear() const;
-    std::vector<uint32_t> GetDevIds();
+    std::vector<uint32_t> GetDevIds() const;
 
 private:
     std::shared_ptr<HdiTestDisplay> FindDisplayOrCreate(uint32_t id);

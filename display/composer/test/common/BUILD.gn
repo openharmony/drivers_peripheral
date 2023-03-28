@@ -51,6 +51,7 @@ ohos_static_library("disp_dev_hdi_test_common") {
     "drivers_interface_display:display_composer_idl_headers",
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
     "drivers_interface_display:libdisplay_composer_hdi_impl",
+    "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
   ]
   subsystem_name = "hdf"
