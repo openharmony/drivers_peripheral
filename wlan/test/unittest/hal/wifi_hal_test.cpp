@@ -34,7 +34,8 @@ const uint32_t MAX_IF_NAME_LENGTH = 16;
 const uint32_t TEST_PARAM_BUF_SIZE = 64;
 const uint32_t SIZE = 4;
 const int32_t TEST_CMD = 123;
-const uint32_t RESET_TIME = 20;
+const uint32_t RESET_TIME = 3;
+const uint32_t SCAN_TIME = 3;
 const uint32_t TEST_BUF_SIZE = 64;
 
 class WifiHalTest : public testing::Test {
@@ -819,7 +820,7 @@ HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
     EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->startScan(ifName, &scan);
     EXPECT_EQ(HDF_SUCCESS, ret);
-    sleep(10);
+    sleep(SCAN_TIME);
 }
 
 /**
