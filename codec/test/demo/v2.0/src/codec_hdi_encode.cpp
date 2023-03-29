@@ -412,10 +412,9 @@ void CodecHdiEncode::FreeBuffers()
 
     // wait loaded
     OMX_STATETYPE status = OMX_StateLoaded;
-    int32_t err = HDF_SUCCESS;
     int32_t tryCount = MAX_WAIT_COUNT;
     do {
-        err = client_->GetState(client_, &status);
+        int32_t err = client_->GetState(client_, &status);
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
             break;
