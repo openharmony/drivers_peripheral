@@ -14,10 +14,10 @@
 group("hdf_fuzztest_media_codec") {
   testonly = true
   deps = [
-    "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecallocatebuffer_omx_fuzzer:fuzztest",
-    "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecfreebuffer_omx_fuzzer:fuzztest",
-    "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecsetcallbacks_omx_fuzzer:fuzztest",
-    "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecusebuffer_omx_fuzzer:fuzztest",
+    "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecallocatebufferomx_fuzzer:fuzztest",
+    "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecfreebufferomx_fuzzer:fuzztest",
+    "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecsetcallbacksomx_fuzzer:fuzztest",
+    "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecusebufferomx_fuzzer:fuzztest",
   ]
 
   OMX_IL_PATH = rebase_path(
@@ -28,17 +28,17 @@ group("hdf_fuzztest_media_codec") {
 
   if (HAVE_OMX_IL_PATH) {
     deps += [
-      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codec_omx_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codeccomponentroleenum_omx_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codeccomponenttunnelrequest_omx_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codeccreatecomponent_omx_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecgetconfig_omx_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecgetextensionIndex_omx_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecgetparameter_omx_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecsendcommand_omx_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecsetconfig_omx_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecsetparameter_omx_fuzzer:fuzztest",
-      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecuseeglimage_omx_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codeccomponentroleenumomx_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codeccomponenttunnelrequestomx_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codeccreatecomponentomx_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecgetconfigomx_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecgetextensionIndexomx_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecgetparameteromx_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecomx_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecsendcommandomx_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecsetconfigomx_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecsetparameteromx_fuzzer:fuzztest",
+      "//drivers/peripheral/codec/test/fuzztest/omx_fuzzer/codecuseeglimageomx_fuzzer:fuzztest",
     ]
   }
 }
