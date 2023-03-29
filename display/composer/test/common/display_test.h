@@ -17,6 +17,7 @@
 #define DISPLAY_TEST_H
 #include <cstring>
 #include <cstdio>
+#include <hdf_log.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,17 +45,14 @@ extern "C" {
     } while (0)
 #endif
 
-#define DISPLAY_TEST_LOGD(format, ...)                                                          \
-    do {                                                                                        \
-        printf("[%s@%s:%d] " format "\n", __FUNCTION__, __FILENAME__, __LINE__, ##__VA_ARGS__); \
+#define DISPLAY_TEST_LOGD(format, ...)                                                        \
+    do {                                                                                      \
+        HDF_LOGD("%{public}s:%{public}d " format "", __FUNCTION__, __LINE__, ##__VA_ARGS__);  \
     } while (0)
 
-#define DISPLAY_TEST_LOGE(format, ...)                            \
-    do {                                                          \
-        printf("\033[0;32;31m"                                    \
-            "[%s@%s:%d] " format "\033[m"                         \
-            "\n",                                                 \
-            __FUNCTION__, __FILENAME__, __LINE__, ##__VA_ARGS__); \
+#define DISPLAY_TEST_LOGE(format, ...)                                                        \
+    do {                                                                                      \
+        HDF_LOGE("%{public}s:%{public}d " format "", __FUNCTION__, __LINE__, ##__VA_ARGS__);  \
     } while (0)
 
 #ifdef __cplusplus
