@@ -19,8 +19,8 @@
 #include <osal_time.h>
 #include <osal_mem.h>
 #include "wlan_extend_cmd.h"
-#include "v1_0/iwlan_callback.h"
-#include "v1_0/iwlan_interface.h"
+#include "v1_1/iwlan_callback.h"
+#include "v1_1/iwlan_interface.h"
 
 struct IWiFi *g_wifi = NULL;
 struct IWiFiAp *g_apFeature = NULL;
@@ -490,8 +490,28 @@ static int32_t HdfWlanAddRemoteObj(struct IWlanCallback *self)
     return HDF_SUCCESS;
 }
 
+static int32_t FillData(uint8_t **dst, uint32_t *dstLen, uint8_t *src, uint32_t srcLen)
+{
+    if (src == NULL || dst == NULL || dstLen == NULL) {
+        HDF_LOGE("%{public}s: Invalid parameter!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    *dst = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * srcLen);
+    if (*dst == NULL) {
+        HDF_LOGE("%{public}s: OsalMemCalloc fail!", __func__);
+        return HDF_FAILURE;
+    }
+    if (memcpy_s(*dst, srcLen, src, srcLen) != EOK) {
+        HDF_LOGE("%{public}s: memcpy_s fail!", __func__);
+        return HDF_FAILURE;
+    }
+    *dstLen = srcLen;
+    return HDF_SUCCESS;
+}
+
 static int32_t WlanFillScanResultInfo(WifiScanResult *wifiScanResult, struct HdfWifiScanResult *scanResult)
 {
+    int32_t ret = HDF_SUCCESS;
     if (wifiScanResult == NULL || scanResult == NULL) {
         HDF_LOGE("%{public}s: wifiScanResult or scanResult is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -503,49 +523,157 @@ static int32_t WlanFillScanResultInfo(WifiScanResult *wifiScanResult, struct Hdf
     scanResult->qual = wifiScanResult->qual;
     scanResult->level = wifiScanResult->level;
     scanResult->age = wifiScanResult->age;
-    if (wifiScanResult->bssid != NULL) {
-        scanResult->bssid = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * ETH_ADDR_LEN);
+    do {
+        if (wifiScanResult->bssid != NULL &&
+            FillData(&scanResult->bssid, &scanResult->bssidLen, wifiScanResult->bssid, ETH_ADDR_LEN) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: fill bssid fail!", __func__);
+            ret = HDF_FAILURE;
+            break;
+        }
+        if ((wifiScanResult->ie != NULL) && (wifiScanResult->ieLen != 0) &&
+            FillData(&scanResult->ie, &scanResult->ieLen, wifiScanResult->ie, wifiScanResult->ieLen) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: fill ie fail!", __func__);
+            ret = HDF_FAILURE;
+            break;
+        }
+        if ((wifiScanResult->beaconIe != NULL) && (wifiScanResult->beaconIeLen != 0) &&
+            FillData(&scanResult->beaconIe, &scanResult->beaconIeLen, wifiScanResult->beaconIe,
+                wifiScanResult->beaconIeLen) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: fill beaconIe fail!", __func__);
+            ret = HDF_FAILURE;
+        }
+    } while (0);
+    if (ret != HDF_SUCCESS) {
         if (scanResult->bssid != NULL) {
-            if (memcpy_s(scanResult->bssid, ETH_ADDR_LEN, wifiScanResult->bssid, ETH_ADDR_LEN) != EOK) {
-                HDF_LOGE("%{public}s: memcpy_s bssid fail!", __func__);
-                OsalMemFree(scanResult->bssid);
-                return HDF_FAILURE;
-            }
-            scanResult->bssidLen = ETH_ADDR_LEN;
+            OsalMemFree(scanResult->bssid);
         }
-    }
-    if ((wifiScanResult->ie != NULL) && (wifiScanResult->ieLen != 0)) {
-        scanResult->ie = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * wifiScanResult->ieLen);
         if (scanResult->ie != NULL) {
-            if (memcpy_s(scanResult->ie, wifiScanResult->ieLen, wifiScanResult->ie,
-                wifiScanResult->ieLen) != EOK) {
-                HDF_LOGE("%{public}s: memcpy_s ie fail!", __func__);
-                OsalMemFree(scanResult->ie);
-                return HDF_FAILURE;
-            }
-            scanResult->ieLen = wifiScanResult->ieLen;
+            OsalMemFree(scanResult->ie);
         }
-    }
-    if ((wifiScanResult->ie != NULL) && (wifiScanResult->ieLen != 0)) {
-        scanResult->beaconIe = (uint8_t *)OsalMemCalloc(sizeof(uint8_t) * wifiScanResult->beaconIeLen);
         if (scanResult->beaconIe != NULL) {
-            if (memcpy_s(scanResult->beaconIe, wifiScanResult->beaconIeLen, wifiScanResult->beaconIe,
-                wifiScanResult->beaconIeLen) != EOK) {
-                HDF_LOGE("%{public}s: memcpy_s beaconIe fail!", __func__);
-                OsalMemFree(scanResult->beaconIe);
-                return HDF_FAILURE;
-            }
-            scanResult->beaconIeLen = wifiScanResult->beaconIeLen;
+            OsalMemFree(scanResult->beaconIe);
         }
     }
+    return ret;
+}
+
+static int32_t WlanFillScanResultInfoExt(WifiScanResult *wifiScanResult, struct HdfWifiScanResultExt *scanResult)
+{
+    int32_t ret = HDF_SUCCESS;
+    if (wifiScanResult == NULL || scanResult == NULL) {
+        HDF_LOGE("%{public}s: wifiScanResult or scanResult is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    scanResult->flags = wifiScanResult->flags;
+    scanResult->caps = wifiScanResult->caps;
+    scanResult->freq = wifiScanResult->freq;
+    scanResult->beaconInt = wifiScanResult->beaconInt;
+    scanResult->qual = wifiScanResult->qual;
+    scanResult->level = wifiScanResult->level;
+    scanResult->age = wifiScanResult->age;
+    scanResult->tsf = wifiScanResult->tsf;
+    do {
+        if (wifiScanResult->bssid != NULL &&
+            FillData(&scanResult->bssid, &scanResult->bssidLen, wifiScanResult->bssid, ETH_ADDR_LEN) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: fill bssid fail!", __func__);
+            ret = HDF_FAILURE;
+            break;
+        }
+        if ((wifiScanResult->ie != NULL) && (wifiScanResult->ieLen != 0) &&
+            FillData(&scanResult->ie, &scanResult->ieLen, wifiScanResult->ie, wifiScanResult->ieLen) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: fill ie fail!", __func__);
+            ret = HDF_FAILURE;
+            break;
+        }
+        if ((wifiScanResult->beaconIe != NULL) && (wifiScanResult->beaconIeLen != 0) &&
+            FillData(&scanResult->beaconIe, &scanResult->beaconIeLen, wifiScanResult->beaconIe,
+                wifiScanResult->beaconIeLen) != HDF_SUCCESS) {
+            HDF_LOGE("%{public}s: fill beaconIe fail!", __func__);
+            ret = HDF_FAILURE;
+        }
+    } while (0);
+    if (ret != HDF_SUCCESS) {
+        if (scanResult->bssid != NULL) {
+            OsalMemFree(scanResult->bssid);
+        }
+        if (scanResult->ie != NULL) {
+            OsalMemFree(scanResult->ie);
+        }
+        if (scanResult->beaconIe != NULL) {
+            OsalMemFree(scanResult->beaconIe);
+        }
+    }
+    return ret;
+}
+
+static int32_t WlanFillScanResultsInfo(WifiScanResults *wifiScanResults, struct HdfWifiScanResults *scanResults)
+{
+    uint32_t i;
+    if (wifiScanResults == NULL || scanResults == NULL) {
+        HDF_LOGE("%{public}s: wifiScanResults or scanResults is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    for (i = 0; i < wifiScanResults->num; i++) {
+        if (WlanFillScanResultInfoExt(&wifiScanResults->scanResult[i], &scanResults->res[i]) != HDF_SUCCESS) {
+            return HDF_FAILURE;
+        }
+    }
+    scanResults->resLen = wifiScanResults->num;
     return HDF_SUCCESS;
+}
+
+static int32_t ProcessEventScanResult(struct HdfWlanRemoteNode *node, uint32_t event, WifiScanResult *wifiScanResult,
+    const char *ifName)
+{
+    struct HdfWifiScanResult *scanResult = NULL;
+    int32_t ret = HDF_FAILURE;
+
+    if (node == NULL || node->callbackObj == NULL || node->callbackObj->ScanResult == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    scanResult = (struct HdfWifiScanResult *)OsalMemCalloc(sizeof(struct HdfWifiScanResult));
+    if ((scanResult == NULL) || (WlanFillScanResultInfo(wifiScanResult, scanResult) != HDF_SUCCESS)) {
+        HDF_LOGE("%{public}s: scanResult is NULL or WlanFillScanResultInfo fialed!", __func__);
+    } else {
+        ret = node->callbackObj->ScanResult(node->callbackObj, event, scanResult, ifName);
+    }
+    HdfWifiScanResultFree(scanResult, true);
+    return ret;
+}
+
+static int32_t ProcessEventScanResults(struct HdfWlanRemoteNode *node, uint32_t event,
+    WifiScanResults *wifiScanResults, const char *ifName)
+{
+    struct HdfWifiScanResults *scanResults = NULL;
+    uint32_t size;
+    int32_t ret = HDF_FAILURE;
+
+    if (node == NULL || node->callbackObj == NULL || node->callbackObj->ScanResults == NULL) {
+        HDF_LOGE("%{public}s: hdf wlan remote node or callbackObj is NULL!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    scanResults = (struct HdfWifiScanResults *)OsalMemCalloc(sizeof(struct HdfWifiScanResults));
+    if (scanResults == NULL) {
+        HDF_LOGE("%{public}s: scanResults is NULL!", __func__);
+        return HDF_ERR_MALLOC_FAIL;
+    }
+    scanResults->resLen = wifiScanResults->num;
+    size = sizeof(struct HdfWifiScanResultExt);
+    scanResults->res = (struct HdfWifiScanResultExt *)OsalMemCalloc(size * scanResults->resLen);
+    if ((scanResults->res == NULL) || (WlanFillScanResultsInfo(wifiScanResults, scanResults) != HDF_SUCCESS)) {
+        HDF_LOGE("%{public}s: scanResults->res is NULL or WlanFillScanResultsInfo fialed!", __func__);
+    } else {
+        ret = node->callbackObj->ScanResults(node->callbackObj, event, scanResults, ifName);
+    }
+    HdfWifiScanResultsFree(scanResults, true);
+    return ret;
 }
 
 static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName)
 {
     struct HdfWlanRemoteNode *pos = NULL;
     struct DListHead *head = &HdfStubDriver()->remoteListHead;
-    WifiScanResult *wifiScanResult = NULL;
     int32_t *code = NULL;
     int32_t ret = HDF_FAILURE;
 
@@ -560,22 +688,14 @@ static int32_t HdfWLanCallbackFun(uint32_t event, void *data, const char *ifName
         }
         switch (event) {
             case WIFI_EVENT_RESET_DRIVER:
-                if (data != NULL) {
-                    code = (int32_t *)data;
-                    ret = pos->callbackObj->ResetDriverResult(pos->callbackObj, event, *code, ifName);
-                }
+                code = (int32_t *)data;
+                ret = pos->callbackObj->ResetDriverResult(pos->callbackObj, event, *code, ifName);
                 break;
             case WIFI_EVENT_SCAN_RESULT:
-                wifiScanResult = (WifiScanResult *)data;
-                struct HdfWifiScanResult *scanResult =
-                    (struct HdfWifiScanResult *)OsalMemCalloc(sizeof(struct HdfWifiScanResult));
-                if ((scanResult == NULL) || (WlanFillScanResultInfo(wifiScanResult, scanResult) != HDF_SUCCESS)) {
-                    HDF_LOGE("%{public}s: scanResult is NULL or WlanFillScanResultInfo fialed!", __func__);
-                    HdfWifiScanResultFree(scanResult, true);
-                    break;
-                }
-                ret = pos->callbackObj->ScanResult(pos->callbackObj, event, scanResult, ifName);
-                HdfWifiScanResultFree(scanResult, true);
+                ret = ProcessEventScanResult(pos, event, (WifiScanResult *)data, ifName);
+                break;
+            case WIFI_EVENT_SCAN_RESULTS:
+                ret = ProcessEventScanResults(pos, event, (WifiScanResults *)data, ifName);
                 break;
             default:
                 HDF_LOGE("%{public}s: unknown eventId:%{public}d", __func__, event);
