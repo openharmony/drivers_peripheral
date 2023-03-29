@@ -202,11 +202,8 @@ int WriteFrame(const uint8_t *data, uint32_t size)
 #ifdef A2DP_HDI_SERVICE
     BTAudioStreamState state = getStateFunc();
     if (state != BTAudioStreamState::STARTED) {
-        HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
-        if (startPlayingFunc()) {
-            HDF_LOGE("%{public}s: fail to startPlaying", __func__);
-            return HDF_FAILURE;
-        }
+        HDF_LOGE("%{public}s: state=%{public}hhu is bad state", __func__, state);
+        return RET_BAD_STATUS;
     }
     return writeFrameFunc(data, size);
 #else
@@ -226,7 +223,15 @@ int StartPlaying()
 {
     HDF_LOGI("%{public}s", __func__);
 #ifdef A2DP_HDI_SERVICE
-    return HDF_SUCCESS;
+    int retval = 0;
+    BTAudioStreamState state = getStateFunc();
+    HDF_LOGE("%{public}s: state=%{public}hhu", __func__, state);
+    if (state == BTAudioStreamState::IDLE) {
+        retval = (startPlayingFunc() ? HDF_SUCCESS : HDF_FAILURE);
+    } else {
+        HDF_LOGE("%{public}s: state=%{public}hhu is bad state", __func__, state);
+    }
+    return retval;
 #else
     if (!g_proxy_) {
         HDF_LOGE("%{public}s: g_proxy_ is null", __func__);

@@ -56,6 +56,8 @@ int32_t AudioRenderStart(AudioHandle handle)
     if (OHOS::Bluetooth::GetPlayingState() == false) {
         OHOS::Bluetooth::StartPlaying();
     }
+#else
+    OHOS::Bluetooth::StartPlaying();
 #endif
 
     char *buffer = static_cast<char *>(calloc(1, FRAME_DATA));
@@ -133,12 +135,14 @@ int32_t AudioRenderResume(AudioHandle handle)
         HDF_LOGE("Audio is already Resume !");
         return AUDIO_HAL_ERR_NOT_SUPPORT;
     }
-
+    
     HDF_LOGI("%s, StartPlaying", __func__);
 #ifndef A2DP_HDI_SERVICE
     if (OHOS::Bluetooth::GetPlayingState() == false) {
         OHOS::Bluetooth::StartPlaying();
     }
+#else
+    OHOS::Bluetooth::StartPlaying();
 #endif
 
     hwRender->renderParam.renderMode.ctlParam.pause = false;
