@@ -21,6 +21,7 @@
 #include "buffer_manager_iface.h"
 #include "buffer_manager_wrapper.h"
 #include "codec_oem_if.h"
+#include "osal_mutex.h"
 #include "share_mem.h"
 
 #define MAX_BUFFER_NUM  64
@@ -34,7 +35,8 @@ extern "C"
 typedef enum {
     CODEC_STATUS_IDLE,
     CODEC_STATUS_STARTED,
-    CODEC_STATUS_STOPED,
+    CODEC_STATUS_STOPPING,
+    CODEC_STATUS_STOPPED,
 } CodecStatus;
 
 struct CodecInstance {
@@ -56,6 +58,8 @@ struct CodecInstance {
     CODEC_HANDLETYPE handle;
     CodecType codecType;
     volatile CodecStatus codecStatus;
+    struct OsalMutex codecStatusLock;
+    pthread_cond_t codecStatusCond;
     CodecCallback defaultCb;
     bool hasCallback;
 };
