@@ -31,13 +31,13 @@ void SetPixel(const BufferHandle& handle, int x, int y, uint32_t color)
 {
     const int32_t PIXEL_BYTES = 4;
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((handle.format <= 0),
-        DISPLAY_TEST_LOGE("CheckPixel do not support format %d", handle.format));
+        DISPLAY_TEST_LOGE("CheckPixel do not support format %{public}d", handle.format));
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((handle.virAddr == nullptr),
         DISPLAY_TEST_LOGE("CheckPixel viraddr is null must map it"));
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((x < 0 || x >= handle.width),
-        DISPLAY_TEST_LOGE("CheckPixel invalid parameter x:%d width:%d", x, handle.width));
+        DISPLAY_TEST_LOGE("CheckPixel invalid parameter x:%{public}d width:%{public}d", x, handle.width));
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((y < 0 || y >= handle.height),
-        DISPLAY_TEST_LOGE("CheckPixel invalid parameter y:%d height:%d", y, handle.height));
+        DISPLAY_TEST_LOGE("CheckPixel invalid parameter y:%{public}d height:%{public}d", y, handle.height));
 
     int32_t position = y * handle.width + x;
     if ((position * PIXEL_BYTES) > handle.size) {

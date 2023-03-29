@@ -67,11 +67,11 @@ void SaveFile(const char *fileName, uint8_t *data, int size)
 {
     int fileFd = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
     if (fileFd <= 0) {
-        DISPLAY_TEST_LOGE("Open file failed %d", fileFd);
+        DISPLAY_TEST_LOGE("Open file failed %{public}d", fileFd);
         return;
     }
     int hasWriten = write(fileFd, data, size);
-    DISPLAY_TEST_LOGD("SaveFile hasWriten %d", hasWriten);
+    DISPLAY_TEST_LOGD("SaveFile hasWriten %{public}d", hasWriten);
     close(fileFd);
 }
 
@@ -83,7 +83,7 @@ static uint32_t ConverToRGBA(PixelFormat fmt, uint32_t color)
         case PIXEL_FMT_RGBA_8888:
             return color;
         default:
-            DISPLAY_TEST_LOGE("the fmt can not convert %d", fmt);
+            DISPLAY_TEST_LOGE("the fmt can not convert %{public}d", fmt);
     }
     return color;
 }
@@ -92,13 +92,14 @@ uint32_t GetPixelValue(const BufferHandle &handle, int x, int y)
 {
     const int32_t PIXEL_BYTES = 4;
     int32_t bpp = GetPixelFormatBpp((PixelFormat)handle.format);
-    DISPLAY_TEST_CHK_RETURN((bpp <= 0), 0, DISPLAY_TEST_LOGE("CheckPixel do not support format %d", handle.format));
+    DISPLAY_TEST_CHK_RETURN((bpp <= 0), 0, DISPLAY_TEST_LOGE("CheckPixel do not support format %{public}d",
+        handle.format));
     DISPLAY_TEST_CHK_RETURN((handle.virAddr == nullptr), 0,
         DISPLAY_TEST_LOGE("CheckPixel viraddr is null must map it"));
     DISPLAY_TEST_CHK_RETURN((x < 0 || x >= handle.width), 0,
-        DISPLAY_TEST_LOGE("CheckPixel invalid parameter x:%d width:%d", x, handle.width));
+        DISPLAY_TEST_LOGE("CheckPixel invalid parameter x:%{public}d width:%{public}d", x, handle.width));
     DISPLAY_TEST_CHK_RETURN((y < 0 || y >= handle.height), 0,
-        DISPLAY_TEST_LOGE("CheckPixel invalid parameter y:%d height:%d", y, handle.height));
+        DISPLAY_TEST_LOGE("CheckPixel invalid parameter y:%{public}d height:%{public}d", y, handle.height));
 
     int32_t position = y * handle.width + x;
     if ((position * PIXEL_BYTES) > handle.size) {
@@ -122,13 +123,14 @@ uint32_t CheckPixel(const BufferHandle &handle, int x, int y, uint32_t color)
 {
     const int32_t PIXEL_BYTES = 4;
     int32_t bpp = GetPixelFormatBpp(static_cast<PixelFormat>(handle.format));
-    DISPLAY_TEST_CHK_RETURN((bpp <= 0), 0, DISPLAY_TEST_LOGE("CheckPixel do not support format %d", handle.format));
+    DISPLAY_TEST_CHK_RETURN((bpp <= 0), 0, DISPLAY_TEST_LOGE("CheckPixel do not support format %{public}d",
+        handle.format));
     DISPLAY_TEST_CHK_RETURN((handle.virAddr == nullptr), 0,
         DISPLAY_TEST_LOGE("CheckPixel viraddr is null must map it"));
     DISPLAY_TEST_CHK_RETURN((x < 0 || x >= handle.width), 0,
-        DISPLAY_TEST_LOGE("CheckPixel invalid parameter x:%d width:%d", x, handle.width));
+        DISPLAY_TEST_LOGE("CheckPixel invalid parameter x:%{public}d width:%{public}d", x, handle.width));
     DISPLAY_TEST_CHK_RETURN((y < 0 || y >= handle.height), 0,
-        DISPLAY_TEST_LOGE("CheckPixel invalid parameter y:%d height:%d", y, handle.height));
+        DISPLAY_TEST_LOGE("CheckPixel invalid parameter y:%{public}d height:%{public}d", y, handle.height));
 
     int32_t position = y * handle.width + x;
     if ((position * PIXEL_BYTES) > handle.size) {
@@ -137,7 +139,7 @@ uint32_t CheckPixel(const BufferHandle &handle, int x, int y, uint32_t color)
     uint32_t *pixel = reinterpret_cast<uint32_t *>(handle.virAddr) + position;
     uint32_t checkColor = ConverToRGBA(static_cast<PixelFormat>(handle.format), GetUint32(*pixel));
     if (checkColor != color) {
-        DISPLAY_TEST_LOGD("x:%d y:%d width:%d", x, y, handle.width);
+        DISPLAY_TEST_LOGD("x:%{public}d y:%{public}d width:%{public}d", x, y, handle.width);
         SaveFile("/data/display_test_bitmap_", static_cast<uint8_t *>(handle.virAddr), handle.size);
         return DISPLAY_FAILURE;
     }
@@ -157,13 +159,13 @@ void SetPixel(const BufferHandle &handle, int x, int y, uint32_t color)
     const int32_t PIXEL_BYTES = 4;
     const int32_t BPP = 32;
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((BPP <= 0),
-        DISPLAY_TEST_LOGE("CheckPixel do not support format %d", handle.format));
+        DISPLAY_TEST_LOGE("CheckPixel do not support format %{public}d", handle.format));
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((handle.virAddr == nullptr),
         DISPLAY_TEST_LOGE("CheckPixel viraddr is null must map it"));
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((x < 0 || x >= handle.width),
-        DISPLAY_TEST_LOGE("CheckPixel invalid parameter x:%d width:%d", x, handle.width));
+        DISPLAY_TEST_LOGE("CheckPixel invalid parameter x:%{public}d width:%{public}d", x, handle.width));
     DISPLAY_TEST_CHK_RETURN_NOT_VALUE((y < 0 || y >= handle.height),
-        DISPLAY_TEST_LOGE("CheckPixel invalid parameter y:%d height:%d", y, handle.height));
+        DISPLAY_TEST_LOGE("CheckPixel invalid parameter y:%{public}d height:%{public}d", y, handle.height));
 
     int32_t position = y * handle.width + x;
     if ((position * PIXEL_BYTES) > handle.size) {
@@ -182,9 +184,10 @@ void ClearColor(const BufferHandle &handle, uint32_t color)
     }
 }
 
-void ClearColorRect(const BufferHandle &handle, uint32_t color, IRect &rect)
+void ClearColorRect(const BufferHandle &handle, uint32_t color, const IRect &rect)
 {
-    DISPLAY_TEST_LOGD("x %d, y %d w %d h %d color %x ", rect.x, rect.y, rect.w, rect.h, color);
+    DISPLAY_TEST_LOGD("x %{public}d, y %{public}d w %{public}d h %{public}d color %x ", rect.x, rect.y, rect.w, rect.h,
+        color);
     for (int32_t x = 0; x < rect.w; x++) {
         for (int32_t y = 0; y < rect.h; y++) {
             SetPixel(handle, x + rect.x, y + rect.y, color);
@@ -200,18 +203,16 @@ std::vector<IRect> SplitBuffer(const BufferHandle &handle, std::vector<uint32_t>
     }
     const uint32_t ROW_NUM = sqrt(colors.size());
     const uint32_t COL_NUM = ROW_NUM;
-    if (COL_NUM == 0) {
-        DISPLAY_TEST_LOGD("COL_NUM is zero");
-        return splitRects;
-    }
     if (ROW_NUM == 0) {
         DISPLAY_TEST_LOGD("ROW_NUM is zero");
         return splitRects;
     }
+
     const uint32_t CELL_WIDTH = handle.width / ROW_NUM;
     const uint32_t CELL_HEIGHT = handle.height / COL_NUM;
     IRect rect = { 0, 0, CELL_WIDTH, CELL_HEIGHT };
-    DISPLAY_TEST_LOGD("ROW_NUM %u, COL_NUM %u CELL_WIDTH %u CELL_HEIGHT %u", ROW_NUM, COL_NUM, CELL_WIDTH, CELL_HEIGHT);
+    DISPLAY_TEST_LOGD("ROW_NUM %{public}u, COL_NUM %{public}u CELL_WIDTH %{public}u CELL_HEIGHT %{public}u",
+        ROW_NUM, COL_NUM, CELL_WIDTH, CELL_HEIGHT);
     uint32_t count = 0;
     for (uint32_t x = 0; x < ROW_NUM; x++) {
         for (uint32_t y = 0; y < COL_NUM; y++) {

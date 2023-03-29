@@ -73,8 +73,8 @@ public:
     int32_t SwapFrontToBackQ();
     int32_t SwapBackToFrontQ();
 
-    void SetLayerPosition(IRect& rect);
-    void SetLayerCrop(IRect& rect);
+    void SetLayerPosition(const IRect& rect);
+    void SetLayerCrop(const IRect& rect);
     void SetZorder(uint32_t zorder);
     void SetCompType(CompositionType type);
     void SetReleaseFence(int fd);

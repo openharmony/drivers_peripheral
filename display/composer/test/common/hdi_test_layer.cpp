@@ -65,17 +65,16 @@ HdiGrallocBuffer::~HdiGrallocBuffer()
 
 void HdiGrallocBuffer::SetReleaseFence(int fd)
 {
-    DISPLAY_TEST_LOGD("the fd is %d", fd);
+    DISPLAY_TEST_LOGD("the fd is %{public}d", fd);
     if (mReleaseFence != -1) {
         close(mReleaseFence);
         mReleaseFence = -1;
     }
-    mReleaseFence = fd;
 }
 
 void HdiGrallocBuffer::SetAcquirceFence(int fd)
 {
-    DISPLAY_TEST_LOGD("the fd is %d", fd);
+    DISPLAY_TEST_LOGD("the fd is %{public}d", fd);
     mAcquireFence = fd;
 }
 
@@ -148,15 +147,15 @@ int32_t HdiTestLayer::SwapBackToFrontQ()
     return DISPLAY_SUCCESS;
 }
 
-void HdiTestLayer::SetLayerPosition(IRect& rect)
+void HdiTestLayer::SetLayerPosition(const IRect& rect)
 {
-    DISPLAY_TEST_LOGD("x : %d y : %d w : %d h : %d", rect.x, rect.y, rect.w, rect.h);
+    DISPLAY_TEST_LOGD("x : %{public}d y : %{public}d w : %{public}d h : %{public}d", rect.x, rect.y, rect.w, rect.h);
     displayRect_ = rect;
 }
 
-void HdiTestLayer::SetLayerCrop(IRect& rect)
+void HdiTestLayer::SetLayerCrop(const IRect& rect)
 {
-    DISPLAY_TEST_LOGD("x : %d y : %d w : %d h : %d", rect.x, rect.y, rect.w, rect.h);
+    DISPLAY_TEST_LOGD("x : %{public}d y : %{public}d w : %{public}d h : %{public}d", rect.x, rect.y, rect.w, rect.h);
     cropRect_ = rect;
 }
 
@@ -181,6 +180,8 @@ int32_t HdiTestLayer::PreparePresent()
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("set transform mode failed"));
 
     ret = HdiTestDevice::GetInstance().GetDeviceInterface()->SetLayerAlpha(displayID_, id_, alpha_);
+    DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("set alpha failed"));
+
     HdiGrallocBuffer* buffer = AcquireBackBuffer();
     DISPLAY_TEST_CHK_RETURN((buffer == nullptr), DISPLAY_FAILURE, DISPLAY_TEST_LOGE("can not get back buffer"));
 
@@ -193,6 +194,7 @@ int32_t HdiTestLayer::PreparePresent()
     ret = HdiTestDevice::GetInstance().GetDeviceInterface()->SetLayerVisibleRegion(displayID_, id_, vRects);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
         DISPLAY_TEST_LOGE("SetLayerVisibleRegion failed"));
+
     ret = HdiTestDevice::GetInstance().GetDeviceInterface()->SetLayerDirtyRegion(displayID_, id_, vRects);
     DISPLAY_TEST_CHK_RETURN((ret != DISPLAY_SUCCESS), DISPLAY_FAILURE,
         DISPLAY_TEST_LOGE("SetLayerDirtyRegion failed"));
@@ -207,13 +209,13 @@ int32_t HdiTestLayer::PreparePresent()
 
 void HdiTestLayer::SetZorder(uint32_t zorder)
 {
-    DISPLAY_TEST_LOGD("the zorder is %d", zorder);
+    DISPLAY_TEST_LOGD("the zorder is %{public}u", zorder);
     zorder_ = zorder;
 }
 
 void HdiTestLayer::SetCompType(CompositionType type)
 {
-    DISPLAY_TEST_LOGD("layer id %d ,the type is : %d", id_, type);
+    DISPLAY_TEST_LOGD("layer id %{public}u ,the type is : %{public}d", id_, type);
     compType_ = type;
 }
 
@@ -230,13 +232,13 @@ void HdiTestLayer::SetAlpha(LayerAlpha alpha)
 
 void HdiTestLayer::SetBlendType(BlendType type)
 {
-    DISPLAY_TEST_LOGD("type %d", type);
+    DISPLAY_TEST_LOGD("type %{public}d", type);
     blendType_ = type;
 }
 
 void HdiTestLayer::SetReleaseFence(int fd)
 {
-    DISPLAY_TEST_LOGD("layer id %d , fd %d", id_, fd);
+    DISPLAY_TEST_LOGD("layer id %{public}u , fd %{public}d", id_, fd);
     if (currentBuffer_ != nullptr) {
         currentBuffer_->SetReleaseFence(fd);
     }
