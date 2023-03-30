@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,8 +28,12 @@
 #define ED25519_FIX_PUBKEY_BUFFER_SIZE 32
 #define ED25519_FIX_SIGN_BUFFER_SIZE 64
 
-#define SHA256_DIGEST_SIZE 32
 #define SHA512_DIGEST_SIZE 64
+
+#define AES_GCM_TEXT_MAX_SIZE 1000
+#define AES_GCM_AAD_MAX_SIZE 32
+#define AES_GCM_256_KEY_SIZE 32
+#define NO_PADDING 0
 
 #ifdef IAM_TEST_ENABLE
 #define IAM_STATIC
@@ -183,7 +187,7 @@ EXIT:
     return ret;
 }
 
-ResultCode Ed25519Verify(const Buffer *pubKey, const Buffer *data, const Buffer *sign)
+int32_t Ed25519Verify(const Buffer *pubKey, const Buffer *data, const Buffer *sign)
 {
     if (!CheckBufferWithSize(pubKey, ED25519_FIX_PUBKEY_BUFFER_SIZE) || !IsBufferValid(data) ||
         !CheckBufferWithSize(sign, ED25519_FIX_SIGN_BUFFER_SIZE)) {
@@ -272,4 +276,192 @@ int32_t SecureRandom(uint8_t *buffer, uint32_t size)
         return RESULT_GENERAL_ERROR;
     }
     return RESULT_SUCCESS;
+}
+
+IAM_STATIC bool CheckAesGcmParam(const AesGcmParam *aesGcmParam)
+{
+    if (aesGcmParam == NULL) {
+        LOG_ERROR("get null AesGcmParam");
+        return false;
+    }
+    if (!CheckBufferWithSize(aesGcmParam->key, AES_GCM_256_KEY_SIZE)) {
+        LOG_ERROR("invalid key");
+        return false;
+    }
+    if (!CheckBufferWithSize(aesGcmParam->iv, AES_GCM_IV_SIZE)) {
+        LOG_ERROR("invalid iv");
+        return false;
+    }
+    if (aesGcmParam->aad == NULL) {
+        LOG_INFO("get null aad");
+        return true;
+    }
+    if (!IsBufferValid(aesGcmParam->aad)) {
+        return false;
+    }
+    if (aesGcmParam->aad->contentSize == 0 || aesGcmParam->aad->contentSize > AES_GCM_AAD_MAX_SIZE) {
+        LOG_ERROR("invalid aad");
+        return false;
+    }
+    return true;
+}
+
+static bool SetAesEncryptParam(EVP_CIPHER_CTX *ctx, const AesGcmParam *aesGcmParam)
+{
+    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, (unsigned char *)aesGcmParam->key->buf, NULL) !=
+        OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to init ctx");
+        return false;
+    }
+    if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, aesGcmParam->iv->contentSize, NULL) != OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to set iv len");
+        return false;
+    }
+    if (EVP_EncryptInit_ex(ctx, NULL, NULL, NULL, aesGcmParam->iv->buf) != OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to init iv");
+        return false;
+    }
+    if (aesGcmParam->aad != NULL) {
+        int out;
+        if (EVP_EncryptUpdate(ctx, NULL, &out,
+            (unsigned char *)(aesGcmParam->aad->buf), aesGcmParam->aad->contentSize) != OPENSSL_SUCCESS) {
+            LOG_ERROR("failed to update aad");
+            return false;
+        }
+    }
+    if (EVP_CIPHER_CTX_set_padding(ctx, NO_PADDING) != OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to set padding");
+        return false;
+    }
+    return true;
+}
+
+int32_t AesGcmEncrypt(const Buffer *plaintext, const AesGcmParam *aesGcmParam, Buffer **ciphertext, Buffer **tag)
+{
+    if (!IsBufferValid(plaintext) ||
+        plaintext->contentSize == 0 || plaintext->contentSize > AES_GCM_TEXT_MAX_SIZE ||
+        !CheckAesGcmParam(aesGcmParam) || ciphertext == NULL || tag == NULL) {
+        LOG_ERROR("bad param");
+        return RESULT_BAD_PARAM;
+    }
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    (*ciphertext) = CreateBufferBySize(plaintext->contentSize);
+    (*tag) = CreateBufferBySize(AES_GCM_TAG_SIZE);
+    if (ctx == NULL || (*ciphertext) == NULL || (*tag) == NULL) {
+        LOG_ERROR("init fail");
+        goto FAIL;
+    }
+    if (!SetAesEncryptParam(ctx, aesGcmParam)) {
+        LOG_ERROR("SetAesEncryptParam fail");
+        goto FAIL;
+    }
+    int outLen = 0;
+    if (EVP_EncryptUpdate(ctx, (unsigned char *)((*ciphertext)->buf), &outLen,
+        (unsigned char *)plaintext->buf, plaintext->contentSize) != OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to update");
+        goto FAIL;
+    }
+    if (outLen < 0 || (uint32_t)outLen > (*ciphertext)->maxSize) {
+        LOG_ERROR("outLen out of range");
+        goto FAIL;
+    }
+    (*ciphertext)->contentSize = (uint32_t)outLen;
+    if (EVP_EncryptFinal_ex(ctx, NULL, &outLen) != OPENSSL_SUCCESS || outLen != 0) { // no padding no out
+        LOG_ERROR("failed to finish");
+        goto FAIL;
+    }
+    if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG, AES_GCM_TAG_SIZE, (*tag)->buf) != OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to get tag");
+        goto FAIL;
+    }
+    (*tag)->contentSize = AES_GCM_TAG_SIZE;
+    EVP_CIPHER_CTX_free(ctx);
+    return RESULT_SUCCESS;
+FAIL:
+    DestoryBuffer(*tag);
+    *tag = NULL;
+    DestoryBuffer(*ciphertext);
+    *ciphertext = NULL;
+    if (ctx != NULL) {
+        EVP_CIPHER_CTX_free(ctx);
+    }
+    return RESULT_GENERAL_ERROR;
+}
+
+static bool SetAesDecryptParam(EVP_CIPHER_CTX *ctx, const AesGcmParam *aesGcmParam)
+{
+    if (EVP_EncryptInit_ex(ctx, EVP_aes_256_gcm(), NULL, (unsigned char *)aesGcmParam->key->buf, NULL) !=
+        OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to init ctx");
+        return false;
+    }
+    if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_IVLEN, aesGcmParam->iv->contentSize, NULL) != OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to set iv len");
+        return false;
+    }
+    if (EVP_DecryptInit_ex(ctx, NULL, NULL, NULL, aesGcmParam->iv->buf) != OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to init iv");
+        return false;
+    }
+    if (aesGcmParam->aad != NULL) {
+        int out;
+        if (EVP_DecryptUpdate(ctx, NULL, &out,
+            (unsigned char *)(aesGcmParam->aad->buf), aesGcmParam->aad->contentSize) != OPENSSL_SUCCESS) {
+            LOG_ERROR("failed to update aad");
+            return false;
+        }
+    }
+    if (EVP_CIPHER_CTX_set_padding(ctx, NO_PADDING) != OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to set padding");
+        return false;
+    }
+    return true;
+}
+
+int32_t AesGcmDecrypt(const Buffer *ciphertext, const AesGcmParam *aesGcmParam, const Buffer *tag, Buffer **plaintext)
+{
+    if (!IsBufferValid(ciphertext) ||
+        ciphertext->contentSize == 0 || ciphertext->contentSize > AES_GCM_TEXT_MAX_SIZE ||
+        !CheckAesGcmParam(aesGcmParam) || !CheckBufferWithSize(tag, AES_GCM_TAG_SIZE) || plaintext == NULL) {
+        LOG_ERROR("bad param");
+        return RESULT_BAD_PARAM;
+    }
+    EVP_CIPHER_CTX *ctx = EVP_CIPHER_CTX_new();
+    (*plaintext) = CreateBufferBySize(ciphertext->contentSize);
+    if (ctx == NULL || (*plaintext) == NULL) {
+        LOG_ERROR("init fail");
+        goto FAIL;
+    }
+    if (!SetAesDecryptParam(ctx, aesGcmParam)) {
+        LOG_ERROR("SetAesEncryptParam fail");
+        goto FAIL;
+    }
+    int outLen = 0;
+    if (EVP_DecryptUpdate(ctx, (unsigned char *)((*plaintext)->buf), &outLen,
+        (unsigned char *)ciphertext->buf, ciphertext->contentSize) != OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to update");
+        goto FAIL;
+    }
+    if (outLen < 0 || (uint32_t)outLen > (*plaintext)->maxSize) {
+        LOG_ERROR("outLen out of range");
+        goto FAIL;
+    }
+    (*plaintext)->contentSize = (uint32_t)outLen;
+    if (EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, AES_GCM_TAG_SIZE, tag->buf) != OPENSSL_SUCCESS) {
+        LOG_ERROR("failed to get tag");
+        goto FAIL;
+    }
+    if (EVP_DecryptFinal_ex(ctx, NULL, &outLen) != OPENSSL_SUCCESS || outLen != 0) { // no padding no out
+        LOG_ERROR("failed to finish");
+        goto FAIL;
+    }
+    EVP_CIPHER_CTX_free(ctx);
+    return RESULT_SUCCESS;
+FAIL:
+    DestoryBuffer(*plaintext);
+    *plaintext = NULL;
+    if (ctx != NULL) {
+        EVP_CIPHER_CTX_free(ctx);
+    }
+    return RESULT_GENERAL_ERROR;
 }
