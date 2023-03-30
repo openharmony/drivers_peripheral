@@ -16,6 +16,7 @@
 #ifndef OHOS_HDI_USB_GADGET_MTP_V1_0_USBFNMTPIMPL_H
 #define OHOS_HDI_USB_GADGET_MTP_V1_0_USBFNMTPIMPL_H
 
+#include <semaphore.h>
 #include <mutex>
 
 #include "data_fifo.h"

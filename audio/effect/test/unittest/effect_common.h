@@ -19,6 +19,6 @@
 #include "v1_0/effect_types.h"
 
 void EffectControllerReleaseDesc(struct EffectControllerDescriptor *desc);
-void EffectControllerReleaseDescs(struct EffectControllerDescriptor *descs, uint32_t *descsLen);
+void EffectControllerReleaseDescs(struct EffectControllerDescriptor *descs, const uint32_t *descsLen);
 
 #endif

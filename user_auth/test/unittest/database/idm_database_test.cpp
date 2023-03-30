@@ -63,8 +63,7 @@ public:
 
 HWTEST_F(IdmDatabaseTest, TestInitUserInfoList, TestSize.Level0)
 {
-    InitUserInfoList();
-    InitUserInfoList();
+    EXPECT_EQ(InitUserInfoList(), RESULT_SUCCESS);
     DestroyUserInfoList();
 }
 

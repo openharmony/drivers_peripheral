@@ -149,8 +149,7 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
             } else if (!xmlStrcmp(subNode->name, BAD_CAST"thermal_node")) {
                 XMLThermalNodeInfo tn;
                 ParsePollingSubNode(subNode, tn);
-                THERMAL_HILOGI(COMP_HDI, "ParsePollingNode tntype: %{public}s, path: %{private}s",
-                    tn.type.c_str(), tn.path.c_str());
+                THERMAL_HILOGI(COMP_HDI, "ParsePollingNode tntype: %{public}s", tn.type.c_str());
                 xmlTnInfoList.push_back(tn);
             }
         }
@@ -198,7 +197,6 @@ void ThermalHdfConfig::ParseTracingNode(xmlNodePtr node)
     if (xmlOutpath != nullptr) {
         this->traceConfig_.outPath = std::string(reinterpret_cast<char *>(xmlOutpath));
         xmlFree(xmlOutpath);
-        THERMAL_HILOGD(COMP_HDI, "outpath: %{private}s", this->traceConfig_.outPath.c_str());
     }
 
     auto cur  = node->xmlChildrenNode;
@@ -220,14 +218,13 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
             if (titlePath != nullptr) {
                 ThermalHdfUtils::ReadNode(
                     std::string(reinterpret_cast<char*>(titlePath)), title);
-                THERMAL_HILOGD(COMP_HDI, "title form path is: %{private}s", title.c_str());
+                THERMAL_HILOGD(COMP_HDI, "title form path");
                 xmlFree(titlePath);
             }
 
             xmlChar* titleName = xmlGetProp(subNode, BAD_CAST"name");
             if (titleName != nullptr) {
                 title = std::string(reinterpret_cast<char*>(titleName));
-                THERMAL_HILOGD(COMP_HDI, "title is: %{private}s", title.c_str());
                 xmlFree(titleName);
             }
         }
@@ -246,8 +243,7 @@ void ThermalHdfConfig::ParseTracingSubNode(xmlNodePtr node)
     traceInfo_.emplace_back(info);
 
     for (const auto& item : traceInfo_) {
-        THERMAL_HILOGD(COMP_HDI, "item.title = %{public}s, item.valuePath = %{private}s",
-            item.title.c_str(), item.valuePath.c_str());
+        THERMAL_HILOGD(COMP_HDI, "item.title = %{public}s", item.title.c_str());
     }
 }
 

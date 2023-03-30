@@ -230,7 +230,6 @@ void PowerSupplyProvider::FormatPath(std::string& path,
         return;
     }
     path.assign(buff, strlen(buff));
-    BATTERY_HILOGD(FEATURE_BATT_INFO, "path is %{private}s", path.c_str());
 }
 
 void PowerSupplyProvider::FormatSysfsPaths()
@@ -266,7 +265,7 @@ int32_t PowerSupplyProvider::ReadSysfsFile(const char* path, char* buf, size_t s
 {
     int32_t fd = open(path, O_RDONLY, S_IRUSR | S_IRGRP | S_IROTH);
     if (fd < NUM_ZERO) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to open %{private}s", path);
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "failed to open file");
         return HDF_ERR_IO;
     }
 
@@ -282,7 +281,7 @@ int32_t PowerSupplyProvider::ReadBatterySysfsToBuff(const char* path, char* buf,
 {
     int32_t ret = ReadSysfsFile(path, buf, size);
     if (ret != HDF_SUCCESS) {
-        BATTERY_HILOGW(FEATURE_BATT_INFO, "read path %{private}s failed, ret: %{public}d", path, ret);
+        BATTERY_HILOGW(FEATURE_BATT_INFO, "read path failed, ret: %{public}d", ret);
         return ret;
     }
 
@@ -311,7 +310,6 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
         iter++;
     }
 
-    BATTERY_HILOGD(FEATURE_BATT_INFO, "online path is: %{private}s", onlinePath.c_str());
     ret = ReadSysfsFile(onlinePath.c_str(), buf, size);
     if (ret != HDF_SUCCESS) {
         BATTERY_HILOGW(FEATURE_BATT_INFO, "read online path failed, ret: %{public}d", ret);
@@ -326,7 +324,6 @@ void PowerSupplyProvider::GetPluggedTypeName(char* buf, size_t size) const
 
     std::string typeNode = onlineNode;
     std::string typePath = path_ + "/" + typeNode + "/" + "type";
-    BATTERY_HILOGD(FEATURE_BATT_INFO, "type path is: %{private}s", typePath.c_str());
     ret = ReadSysfsFile(typePath.c_str(), buf, size);
     if (ret != HDF_SUCCESS) {
         BATTERY_HILOGW(FEATURE_BATT_INFO, "read type path failed, ret: %{public}d", ret);
@@ -505,7 +502,6 @@ void PowerSupplyProvider::SetSysFilePath(const std::string& path)
         return;
     }
     path_ = path;
-    BATTERY_HILOGD(FEATURE_BATT_INFO, "path is %{private}s", path.c_str());
 }
 
 void PowerSupplyProvider::CreateFile(const std::string& path, const std::string& content)
@@ -516,7 +512,7 @@ void PowerSupplyProvider::CreateFile(const std::string& path, const std::string&
 
     std::ofstream stream(path.c_str());
     if (!stream.is_open()) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "cannot create file %{private}s", path.c_str());
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "cannot create file");
         return;
     }
     stream << content.c_str() << std::endl;
@@ -547,10 +543,9 @@ int32_t PowerSupplyProvider::InitPowerSupplySysfs()
     struct dirent* entry = nullptr;
     index_ = 0;
 
-    BATTERY_HILOGD(FEATURE_BATT_INFO, "path_ is %{private}s", path_.c_str());
     dir = opendir(path_.c_str());
     if (dir == nullptr) {
-        BATTERY_HILOGE(FEATURE_BATT_INFO, "cannot open path_ %{private}s", path_.c_str());
+        BATTERY_HILOGE(FEATURE_BATT_INFO, "cannot open path_");
         return HDF_ERR_IO;
     }
 
@@ -652,7 +647,6 @@ void PowerSupplyProvider::CheckSubfolderNode(const std::string& path)
     DIR *dir = nullptr;
     struct dirent* entry = nullptr;
     std::string batteryPath = path_ + "/" + path;
-    BATTERY_HILOGI(FEATURE_BATT_INFO, "subfolder path is:%{private}s", batteryPath.c_str());
 
     dir = opendir(batteryPath.c_str());
     if (dir == nullptr) {

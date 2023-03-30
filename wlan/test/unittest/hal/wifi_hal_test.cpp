@@ -89,6 +89,15 @@ static void ParseScanResult(WifiScanResult *scanResult)
         scanResult->beaconIeLen, scanResult->level, scanResult->age, scanResult->ieLen);
 }
 
+static void ParseScanResults(WifiScanResults *scanResults)
+{
+    uint32_t i;
+    printf("Receive %u scan results\n", scanResults->num);
+    for (i = 0 ; i < scanResults->num; i++) {
+        ParseScanResult(&scanResults->scanResult[i]);
+    }
+}
+
 /**
  * @tc.name: WifiHalCreateAndDestroyFeature001
  * @tc.desc: Wifi hal create and destroy feature function test
@@ -173,6 +182,8 @@ static int32_t HalCallbackEvent(uint32_t event, void *respData, const char *ifNa
         case WIFI_EVENT_SCAN_RESULT:
             ParseScanResult((WifiScanResult *)respData);
             break;
+        case WIFI_EVENT_SCAN_RESULTS:
+            ParseScanResults((WifiScanResults *)respData);
         default:
             break;
     }

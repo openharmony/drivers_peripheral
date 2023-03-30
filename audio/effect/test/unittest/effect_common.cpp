@@ -38,9 +38,9 @@ void EffectControllerReleaseDesc(struct EffectControllerDescriptor *desc)
     desc->supplier = nullptr;
 }
 
-void EffectControllerReleaseDescs(struct EffectControllerDescriptor *descs, uint32_t *descsLen)
+void EffectControllerReleaseDescs(struct EffectControllerDescriptor *descs, const uint32_t *descsLen)
 {
-    if (descs == nullptr || descsLen == nullptr || *descsLen <= 0 || *descsLen > HDF_EFFECT_NUM_MAX) {
+    if (descs == nullptr || descsLen == nullptr || *descsLen == 0 || *descsLen > HDF_EFFECT_NUM_MAX) {
         return;
     }
 

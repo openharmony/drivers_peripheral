@@ -23,5 +23,6 @@ struct IAudioCapture *AudioHwiCreateCaptureById(enum AudioCategory streamType, u
     struct AudioHwiCapture *hwiCapture, const struct AudioDeviceDescriptor *desc);
 void AudioHwiDestroyCaptureById(uint32_t captureId);
 struct AudioHwiCapture *AudioHwiGetHwiCaptureById(uint32_t captureId);
+struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, enum AudioCategory streamType, uint32_t *captureId);
 
 #endif // AUDIO_CAPTURE_VENDOR_H

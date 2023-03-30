@@ -345,9 +345,9 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         }
         std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE,
             DATA_CAPACITY_SIZE);
+        CHECK_IF_PTR_NULL_RETURN_VOID(meta);
         meta->addEntry(OHOS_SENSOR_INFO_PHYSICAL_SIZE, physicalSize.data(), physicalSize.size());
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
-        CHECK_IF_PTR_NULL_RETURN_VOID(meta);
 
         uvcCb_(meta, uvcState, id);
         CAMERA_LOGI("uvc plug in %{public}s end", hardwareName.c_str());
