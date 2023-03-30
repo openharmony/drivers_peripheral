@@ -360,7 +360,7 @@ void AudioEffectReleaseCfgDesc(struct ConfigDescriptor *cfgDesc)
         AudioEffectLibraryReleaseDescs(cfgDesc->libCfgDescs, cfgDesc->libNum);
         OsalMemFree((void *)cfgDesc->libCfgDescs);
     }
-    
+
     if (cfgDesc->effectCfgDescs != NULL) {
         AudioEffectReleaseDescs(cfgDesc->effectCfgDescs, cfgDesc->effectNum);
         OsalMemFree((void *)cfgDesc->effectCfgDescs);

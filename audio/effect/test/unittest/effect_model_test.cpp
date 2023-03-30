@@ -196,7 +196,7 @@ HWTEST_F(EffectModelTest, HdfAudioGetEffectDescriptor002, TestSize.Level1)
     struct EffectControllerDescriptor desc;
 
     int32_t ret = model_->GetEffectDescriptor(model_, effectId_, &desc);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    ASSERT_EQ(ret, HDF_SUCCESS);
     EXPECT_STREQ(desc.effectId, effectId_);
     EXPECT_STREQ(desc.effectName, "mock_effect");
     EXPECT_STREQ(desc.libName, libName_);

@@ -17,6 +17,8 @@
 #include <cstddef>
 #include <osal_mem.h>
 
+const int32_t HDF_EFFECT_NUM_MAX = 32;
+
 void EffectControllerReleaseDesc(struct EffectControllerDescriptor *desc)
 {
     if (desc == nullptr) {
