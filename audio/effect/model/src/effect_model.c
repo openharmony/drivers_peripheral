@@ -254,7 +254,7 @@ ret = snprintf_s(path, PATH_MAX, PATH_MAX, "/vendor/lib/%s.z.so", (*libCfgDescs)
             HDF_LOGE("%{public}s: get libPath failed", __func__);
             continue;
         }
-        
+
         if (realpath(path, pathBuf) == NULL) {
             HDF_LOGE("%{public}s: realpath is null! [%{public}d]", __func__, errno);
             continue;
@@ -279,7 +279,7 @@ void ModelInit()
         HDF_LOGE("cfgDesc is null!");
         return;
     }
-    
+
     g_cfgDescs = cfgDesc;
     if (RegLibraryInst(&(cfgDesc->libCfgDescs), cfgDesc->libNum) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: RegLibraryInst failed", __func__);
