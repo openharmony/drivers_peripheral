@@ -82,7 +82,7 @@
 #define AUDIO_DEVICE_ONLINE     1
 #define AUDIO_DEVICE_WAIT_ONLINE 20
 #define AUDIO_DEVICE_WAIT_TRY_TIME 10
-#define AUDIO_DEVICE_WAIT_USB_ONLINE 950
+#define AUDIO_DEVICE_WAIT_USB_ONLINE 1300
 
 struct UsbDevice {
     int8_t devName[USB_DEV_NAME_LEN_MAX];
@@ -183,7 +183,6 @@ static int32_t ReadAndScanUsbDev(const char *devPath)
         tryTime++;
         AUDIO_FUNC_LOGW("audio try[%{public}d] realpath fail[%{public}d]", tryTime, errno);
         OsalMSleep(AUDIO_DEVICE_WAIT_ONLINE);
-        continue;
     }
 
     fp = fopen(realpathRes, "r");

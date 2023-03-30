@@ -437,7 +437,7 @@ static int32_t SetupEncParams()
         HDF_LOGE("%{public}s: GetSetupParams failed", __func__);
         return ret;
     }
-    
+
     return HDF_SUCCESS;
 }
 
@@ -489,7 +489,7 @@ static void EncodeLoopHandleInput(const CodecEnvData *envData, uint8_t *readData
                 __func__, g_frameCount);
             inputData->flag = STREAM_FLAG_EOS;
         }
-    
+
         ShareMemory *sm = GetShareMemoryById(inputData->bufferId);
         memcpy_s(sm->virAddr, readSize, (uint8_t*)readData, readSize);
         inputData->buffer[0].length = readSize;

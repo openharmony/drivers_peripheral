@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,7 @@
 #include "hdf_dlist.h"
 #include "osal_mutex.h"
 #include "securec.h"
-#include "v1_0/wlan_interface_stub.h"
+#include "v1_1/wlan_interface_stub.h"
 #include "wifi_hal.h"
 #include "wifi_hal_ap_feature.h"
 #include "wifi_hal_base_feature.h"

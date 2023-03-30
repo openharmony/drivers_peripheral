@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,6 +42,27 @@ static int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event
     return HDF_SUCCESS;
 }
 
+static int32_t WlanCallbackScanResults(struct IWlanCallback *self, uint32_t event,
+    const struct HdfWifiScanResults *scanResults, const char *ifName)
+{
+    uint32_t i;
+    (void)self;
+    if (scanResults == NULL || ifName == NULL) {
+        HDF_LOGE("%{public}s: input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    HDF_LOGI("%{public}s: Receive %u scan results!", __func__, scanResults->resLen);
+    for (i = 0; i < scanResults->resLen; i++) {
+        struct HdfWifiScanResultExt *scanResult = &scanResults->res[i];
+        HDF_LOGI("HdiProcessScanResult: flags=%{public}d, caps=%{public}d, freq=%{public}d, beaconInt=%{public}d",
+            scanResult->flags, scanResult->caps, scanResult->freq, scanResult->beaconInt);
+        HDF_LOGI("HdiProcessScanResult: qual=%{public}d, beaconIeLen=%{public}d, level=%{public}d", scanResult->qual,
+            scanResult->beaconIeLen, scanResult->level);
+        HDF_LOGI("HdiProcessScanResult: age=%{public}d, ieLen=%{public}d", scanResult->age, scanResult->ieLen);
+    }
+    return HDF_SUCCESS;
+}
+
 static int32_t WlanCallbackNetlinkMessage(struct IWlanCallback *self, const uint8_t *msg, uint32_t msgLen)
 {
     uint32_t i;
@@ -70,6 +91,7 @@ struct IWlanCallback *WlanCallbackServiceGet(void)
     service->interface.ResetDriverResult = WlanCallbackResetDriver;
     service->interface.ScanResult = WlanCallbackScanResult;
     service->interface.WifiNetlinkMessage = WlanCallbackNetlinkMessage;
+    service->interface.ScanResults = WlanCallbackScanResults;
     return &service->interface;
 }
 
