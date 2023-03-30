@@ -24,13 +24,16 @@ using namespace std;
 using namespace testing::ext;
 
 namespace {
-const int32_t AUDIO_RENDER_CHANNELCOUNT = 2;
-const int32_t AUDIO_SAMPLE_RATE_48K = 48000;
-const uint64_t DEFAULT_BUFFER_SIZE = 16384;
-const int32_t MAX_AUDIO_ADAPTER_DESC = 5;
-const int32_t AUDIO_RENDER_BUF_TEST = 1024;
 const float MAX_GAINTHRESHOLD = 15.0;
 const float MIN_GAINTHRESHOLD = 0.0;
+const int BUFFER_LENTH = 1024 * 16;
+const int DEEP_BUFFER_RENDER_PERIOD_SIZE = 4 * 1024;
+const int MOVE_LEFT_NUM = 8;
+const int32_t AUDIO_RENDER_BUF_TEST = 1024;
+const int32_t AUDIO_RENDER_CHANNELCOUNT = 2;
+const int32_t AUDIO_SAMPLE_RATE_48K = 48000;
+const int32_t MAX_AUDIO_ADAPTER_DESC = 5;
+const uint64_t DEFAULT_BUFFER_SIZE = 16384;
 
 class AudioUtRenderTest : public testing::Test {
 public:
@@ -58,7 +61,7 @@ uint64_t AudioUtRenderTest::GetRenderBufferSize()
     uint64_t frameSize = 0;
     uint64_t frameCount = 0;
     uint64_t bufferSize = 0;
-    
+
     if (render_ == nullptr) {
         return DEFAULT_BUFFER_SIZE;
     }
@@ -87,13 +90,13 @@ void AudioUtRenderTest::InitRenderAttrs(struct AudioSampleAttributes &attrs)
     attrs.sampleRate = AUDIO_SAMPLE_RATE_48K;
     attrs.interleaved = 0;
     attrs.type = AUDIO_IN_MEDIA;
-    attrs.period = 4 * 1024;
-    attrs.frameSize = 16 * 2 / 8;
+    attrs.period = DEEP_BUFFER_RENDER_PERIOD_SIZE;
+    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * AUDIO_RENDER_CHANNELCOUNT / MOVE_LEFT_NUM;
     attrs.isBigEndian = false;
     attrs.isSignedData = true;
-    attrs.startThreshold = 4 * 1024 / (attrs.format * attrs.channelCount / 8);
+    attrs.startThreshold = DEEP_BUFFER_RENDER_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
     attrs.stopThreshold = INT_MAX;
-    attrs.silenceThreshold = 1024 * 16;
+    attrs.silenceThreshold = BUFFER_LENTH;
 }
 
 void AudioUtRenderTest::InitRenderDevDesc(struct AudioDeviceDescriptor &devDesc)
@@ -394,7 +397,8 @@ HWTEST_F(AudioUtRenderTest, RenderSetExtraParamsNull002, TestSize.Level1)
 
 HWTEST_F(AudioUtRenderTest, RenderSetExtraParamsIsValid001, TestSize.Level1)
 {
-    char keyValueList[AUDIO_RENDER_BUF_TEST] = "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
+    char keyValueList[AUDIO_RENDER_BUF_TEST] =
+        "attr-route=1;attr-format=32;attr-channels=2;attr-frame-count=82;attr-sampling-rate=48000";
     EXPECT_EQ(HDF_SUCCESS, render_->SetExtraParams(render_, keyValueList));
 }
 
