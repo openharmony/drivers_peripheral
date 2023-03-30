@@ -402,7 +402,12 @@ int32_t CodecHdiAdapterDecode::UseBufferOnPort(PortIndex portIndex)
 
     bufferSize = param.nBufferSize;
     if (portIndex == PortIndex::PORT_INDEX_INPUT) {
+        if (bufferSize == 0) {
+            bufferSize = width_ * height_;
+        }
         inputBufferSize_ = bufferSize;
+    } else if (portIndex == PortIndex::PORT_INDEX_OUTPUT) {
+        bufferSize = width_ * height_ * FRAME_SIZE_OPERATOR;
     }
     bufferCount = param.nBufferCountActual;
     portEnable = param.bEnabled;
