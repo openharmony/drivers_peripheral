@@ -354,49 +354,85 @@ static OMX_VIDEO_CONTROLRATETYPE ConvertRcModeToRateType(VideoCodecRcMode rcMode
     return rateType;
 }
 
-static void SplitParamPortDefinitionVideo(int8_t *paramIn, Param *paramOut, int32_t &paramCnt, bool setMark)
+static void SplitParamGettingPortDefinitionVideo(int8_t *paramIn, Param *paramOut, int32_t &paramCnt)
 {
     OMX_PARAM_PORTDEFINITIONTYPE *param = reinterpret_cast<OMX_PARAM_PORTDEFINITIONTYPE *>(paramIn);
     int32_t index = 0;
+
+    if (param->nPortIndex == INPUT_PORTINDEX) {
+        paramOut[index++].key = KEY_INPUT_BUFFER_COUNT;
+    } else if (param->nPortIndex == OUTPUT_PORTINDEX) {
+        paramOut[index++].key = KEY_OUTPUT_BUFFER_COUNT;
+    }
+    paramOut[index++].key = KEY_BUFFERSIZE;
+    paramOut[index++].key = KEY_MIMETYPE;
+    paramOut[index++].key = KEY_VIDEO_WIDTH;
+    paramOut[index++].key = KEY_VIDEO_HEIGHT;
+    paramOut[index++].key = KEY_VIDEO_STRIDE;
+    paramOut[index++].key = KEY_BITRATE;
+    paramOut[index++].key = KEY_VIDEO_FRAME_RATE;
+    paramOut[index++].key = KEY_PIXEL_FORMAT;
+    paramCnt = index;
+    for (index = 0; index < paramCnt; index++) {
+        paramOut[index].val = nullptr;
+        paramOut[index].size = 0;
+    }
+}
+
+static void SplitParamSettingPortDefinitionVideo(int8_t *paramIn, Param *paramOut, int32_t &paramCnt)
+{
+    OMX_PARAM_PORTDEFINITIONTYPE *param = reinterpret_cast<OMX_PARAM_PORTDEFINITIONTYPE *>(paramIn);
+    int32_t index = 0;
+
     paramOut[index].key = KEY_BUFFERSIZE;
-    paramOut[index].val = setMark ? (void *)&(param->nBufferSize) : nullptr;
-    paramOut[index].size = setMark ? sizeof(param->nBufferSize) : 0;
+    paramOut[index].val = (void *)&(param->nBufferSize);
+    paramOut[index].size = sizeof(param->nBufferSize);
     index++;
     paramOut[index].key = KEY_MIMETYPE;
     param->format.video.eCompressionFormat =
                 (OMX_VIDEO_CODINGTYPE)ConvertVideoCodingTypeToMimeType(param->format.video.eCompressionFormat);
-    paramOut[index].val = setMark ? (void *)&(param->format.video.eCompressionFormat) : nullptr;
-    paramOut[index].size = setMark ? sizeof(param->format.video.eCompressionFormat) : 0;
+    paramOut[index].val = (void *)&(param->format.video.eCompressionFormat);
+    paramOut[index].size = sizeof(param->format.video.eCompressionFormat);
     index++;
     paramOut[index].key = KEY_VIDEO_WIDTH;
-    paramOut[index].val = setMark ? (void *)&(param->format.video.nFrameWidth) : nullptr;
-    paramOut[index].size = setMark ? sizeof(param->format.video.nFrameWidth) : 0;
+    paramOut[index].val = (void *)&(param->format.video.nFrameWidth);
+    paramOut[index].size = sizeof(param->format.video.nFrameWidth);
     index++;
     paramOut[index].key = KEY_VIDEO_HEIGHT;
-    paramOut[index].val = setMark ? (void *)&(param->format.video.nFrameHeight) : nullptr;
-    paramOut[index].size = setMark ? sizeof(param->format.video.nFrameHeight) : 0;
+    paramOut[index].val = (void *)&(param->format.video.nFrameHeight);
+    paramOut[index].size = sizeof(param->format.video.nFrameHeight);
     index++;
     paramOut[index].key = KEY_VIDEO_STRIDE;
-    paramOut[index].val = setMark ? (void *)&(param->format.video.nStride) : nullptr;
-    paramOut[index].size = setMark ? sizeof(param->format.video.nStride) : 0;
+    paramOut[index].val = (void *)&(param->format.video.nStride);
+    paramOut[index].size = sizeof(param->format.video.nStride);
     index++;
     paramOut[index].key = KEY_BITRATE;
-    paramOut[index].val = setMark ? (void *)&(param->format.video.nBitrate) : nullptr;
-    paramOut[index].size = setMark ? sizeof(param->format.video.nBitrate) : 0;
+    paramOut[index].val = (void *)&(param->format.video.nBitrate);
+    paramOut[index].size = sizeof(param->format.video.nBitrate);
     index++;
     paramOut[index].key = KEY_VIDEO_FRAME_RATE;
-    paramOut[index].val = setMark ? (void *)&(param->format.video.xFramerate) : nullptr;
-    paramOut[index].size = setMark ? sizeof(param->format.video.xFramerate) : 0;
+    paramOut[index].val = (void *)&(param->format.video.xFramerate);
+    paramOut[index].size = sizeof(param->format.video.xFramerate);
     index++;
     param->format.video.eColorFormat =
         static_cast<OMX_COLOR_FORMATTYPE>(ConvertColorFormatToPixelFormat(param->format.video.eColorFormat));
-    if (static_cast<PixelFormat>(param->format.video.eColorFormat) != PIXEL_FMT_BUTT || !setMark) {
+    if (static_cast<PixelFormat>(param->format.video.eColorFormat) != PIXEL_FMT_BUTT) {
         paramOut[index].key = KEY_PIXEL_FORMAT;
-        paramOut[index].val = setMark ? (void *)&(param->format.video.eColorFormat) : nullptr;
-        paramOut[index].size = setMark ? sizeof(param->format.video.eColorFormat) : 0;
+        paramOut[index].val = (void *)&(param->format.video.eColorFormat);
+        paramOut[index].size = sizeof(param->format.video.eColorFormat);
         index++;
     }
+
     paramCnt = index;
+}
+
+static void SplitParamPortDefinitionVideo(int8_t *paramIn, Param *paramOut, int32_t &paramCnt, bool setMark)
+{
+    if (!setMark) {
+        SplitParamGettingPortDefinitionVideo(paramIn, paramOut, paramCnt);
+    } else {
+        SplitParamSettingPortDefinitionVideo(paramIn, paramOut, paramCnt);
+    }
 }
 
 static void SplitParamPortDefinitionAudio(int8_t *paramIn, Param *paramOut, int32_t &paramCnt, bool setMark)
@@ -679,10 +715,12 @@ static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, i
         }
         validCount++;
         switch (paramIn[i].key) {
+            case KEY_INPUT_BUFFER_COUNT:
+            case KEY_OUTPUT_BUFFER_COUNT:
+                param->nBufferCountActual = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
+                break;
             case KEY_BUFFERSIZE: {
                 param->nBufferSize = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
-                param->nBufferCountActual =
-                         param->nPortIndex == INPUT_PORTINDEX ? info.inputBufferCount : info.outputBufferCount;
                 param->bEnabled = OMX_TRUE;
                 break;
             }
