@@ -29,7 +29,6 @@ ohos_systemtest("hdf_audio_usb_adapter_test") {
   include_dirs = [
     "//drivers/peripheral/audio/hal/hdi_passthrough/include",
     "//drivers/peripheral/audio/interfaces/include",
-    "//drivers/hdf_core/adapter/uhdf2/shared/include",
     "//third_party/bounds_checking_function/include",
     "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
     "//third_party/googletest/googletest/include/gtest",

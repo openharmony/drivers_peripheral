@@ -25,6 +25,4 @@ ohos_fuzztest("CameraHostFuzzTest") {
     "../common/src/common.cpp",
     "camera_host_fuzzer.cpp",
   ]
-
-  external_deps += [ "hdf_core:libhdf_ipc_adapter" ]
 }

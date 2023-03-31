@@ -33,6 +33,7 @@
 #include "usbd_function.h"
 #include "usbd_load_usb_service.h"
 #include "usbd_port.h"
+#include "hitrace_meter.h"
 using namespace OHOS::HiviewDFX;
 constexpr double USB_RECOGNITION_FAIL_RATE_BASE = 100.00;
 
@@ -380,6 +381,7 @@ int32_t UsbImpl::UsbdBulkReadSyncBase(
         return HDF_ERR_INVALID_PARAM;
     }
 
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "UsbdBulkReadSyncBase");
     int32_t ret = HDF_FAILURE;
     uint64_t intTimeout = timeout < 0 ? 0 : static_cast<uint64_t>(timeout);
     uint64_t stime = OsalGetSysTimeMs();
@@ -434,6 +436,7 @@ int32_t UsbImpl::UsbdBulkWriteSyncBase(
         return HDF_ERR_INVALID_PARAM;
     }
 
+    HITRACE_METER_NAME(HITRACE_TAG_HDF, "UsbdBulkWriteSyncBase");
     int32_t ret = HDF_FAILURE;
     OsalMutexLock(&requestSync->lock);
     uint32_t initTimeout = timeout < 0 ? 0 : static_cast<uint32_t>(timeout);

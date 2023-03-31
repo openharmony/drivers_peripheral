@@ -37,6 +37,7 @@ ohos_shared_library("libhci_interface_service_1.0") {
       "c_utils:utils",
       "drivers_interface_bluetooth:bluetooth_hci_idl_headers",
       "hdf_core:libhdf_host",
+      "hdf_core:libhdf_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
@@ -60,6 +61,7 @@ ohos_shared_library("libbluetooth_hci_hdi_driver") {
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",

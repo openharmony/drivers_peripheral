@@ -25,10 +25,10 @@
 #include <memory>
 #include <vector>
 #include <camera/camera_product.h>
-#include <core/hdf_io_service_if.h>
-#include <utils/hdf_sbuf.h>
-#include <utils/hdf_log.h>
-#include "hdf_base.h"
+#include <hdf_base.h>
+#include <hdf_io_service_if.h>
+#include <hdf_log.h>
+#include <hdf_sbuf.h>
 
 namespace OHOS::Camera {
 

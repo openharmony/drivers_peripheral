@@ -212,6 +212,7 @@ void UtilsDataStub::ConvertVecToMetadata(const std::vector<uint8_t>& cameraAbili
     }
 
     metadata = std::make_shared<CameraMetadata>(itemCapacity, dataCapacity);
+    CHECK_IF_PTR_NULL_RETURN_VOID(metadata);
     common_metadata_header_t *meta = metadata->get();
     for (auto &item_ : items) {
         void *buffer = nullptr;
@@ -243,6 +244,7 @@ void UtilsDataStub::DecodeCameraMetadata(MessageParcel &data, std::shared_ptr<Ca
     }
 
     metadata = std::make_shared<CameraMetadata>(tagCount, metadataSize);
+    CHECK_IF_PTR_NULL_RETURN_VOID(metadata);
     common_metadata_header_t *meta = metadata->get();
     for (auto &entry : entrys) {
         void *buffer = nullptr;

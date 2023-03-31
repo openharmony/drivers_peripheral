@@ -23,33 +23,19 @@ if (defined(ohos_lite)) {
   moduletest("hdf_audio_hdi_path_route_test") {
     sources = [
       "../../common/hdi_common/src/audio_hdi_common.cpp",
-      "//drivers/hdf_core/framework/utils/src/hdf_sbuf.c",
       "src/audio_pathroute_test.cpp",
     ]
 
     include_dirs = [
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/framework/include",
-      "//drivers/hdf_core/framework/core/sec/include",
-      "//drivers/hdf_core/framework/core/shared/include",
-      "//drivers/hdf_core/framework/core/host/include",
-      "//drivers/hdf_core/framework/core/manager/include",
-      "//drivers/hdf_core/framework/core/common/include/host/",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
-      "//drivers/hdf_core/adapter/uhdf2/shared/include",
-      "//drivers/hdf_core/adapter/uhdf2/include/hdi/",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//drivers/peripheral/audio/test/systemtest/audio_function/audio_pathroute/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
 
-    deps = [
+    public_deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",

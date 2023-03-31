@@ -76,10 +76,10 @@ if (defined(ohos_lite)) {
     deps = [
       "$camera_path/hdi_impl:camera_host_service_1.0",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//foundation/graphic/surface:surface",
     ]
     external_deps = [
       "drivers_interface_camera:metadata",
+      "graphic_chipsetsdk:surface",
       "hdf_core:libhdf_utils",
     ]
     public_configs = [ ":ohos_camera_demo_config" ]

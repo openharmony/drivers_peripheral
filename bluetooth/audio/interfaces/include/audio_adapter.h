@@ -122,6 +122,47 @@ struct AudioAdapter {
      */
     int32_t (*GetPassthroughMode)(struct AudioAdapter *adapter, const struct AudioPort *port,
                                   enum AudioPortPassthroughMode *mode);
+
+    /**
+     * @brief Sets extra audio parameters.
+     *
+     * @param adapter Indicates the audio adapter.
+     * @param key Indicates what kind of parameter type will be set.
+     * @param condition Indicates the specific extend parameter condition of AudioExtParamKey.
+     * @param value Indicates the value of the specified condition.
+     *
+     * The format of condition is <i>key=value</i>. Separate multiple key-value pairs by semicolons (;).
+     * When key equals to AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME, the format of condition must be like this:
+     * <i>"EVENT_TYPE=xxx;VOLUME_GROUP_ID=xxx;AUDIO_VOLUME_TYPE=xxx;"</i>
+     * EVENT_TYPE indicates sub volume event type: SetVolume = 1; SetMute = 4;
+     * VOLUME_GROUP_ID indicates which volume group will be set;
+     * AUDIO_VOLUME_TYPE indicates which volume type will be set;
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*SetExtraParams)(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                              const char *condition, const char *value);
+
+    /**
+     * @brief Get extra audio parameters.
+     *
+     * @param adapter Indicates the audio adapter.
+     * @param key Indicates what kind of parameter type will be get.
+     * @param condition Indicates the specific extend parameter condition of AudioExtParamKey.
+     * @param value Indicates the value of the specified condition.
+     * @param lenth Indicates the length of the value pointer.
+     *
+     * The format of condition is <i>key=value</i>. Separate multiple key-value pairs by semicolons (;).
+     * When key equals to AudioExtParamKey::AUDIO_EXT_PARAM_KEY_VOLUME, the format of condition must be like this:
+     * <i>"EVENT_TYPE=xxx;VOLUME_GROUP_ID=xxx;AUDIO_VOLUME_TYPE=xxx;"</i>
+     * EVENT_TYPE indicates sub volume event type: GetVolume = 1; GetMinVolume = 2; GetMaxVolume = 3; IsStreamMute = 4;
+     * VOLUME_GROUP_ID indicates which volume group want get;
+     * AUDIO_VOLUME_TYPE indicates which volume type want get;
+     *
+     * @return Returns <b>0</b> if the operation is successful; returns a negative value otherwise.
+     */
+    int32_t (*GetExtraParams)(struct AudioAdapter *adapter, enum AudioExtParamKey key,
+                              const char *condition, char *value, int32_t lenth);
 };
 }
 #endif /* AUDIO_ADAPTER_H */

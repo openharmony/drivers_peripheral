@@ -96,7 +96,8 @@ static UsbDeviceHandle *OsGetDeviceHandle(UsbSession *session, uint8_t busNum, u
     }
     UsbDeviceHandle *handle = nullptr;
     OsalMutexLock(&session->lock);
-    UsbDevice *dev = (UsbDevice *)HdfSListSearch(&session->usbDevs, (busNum << BUS_OFFSET) | usbAddr, OsDeviceCompare);
+    UsbDevice *dev = reinterpret_cast<UsbDevice *>(
+        HdfSListSearch(&session->usbDevs, (busNum << BUS_OFFSET) | usbAddr, OsDeviceCompare));
     if (dev != nullptr) {
         handle = dev->devHandle;
         AdapterAtomicInc(&dev->refcnt);
@@ -146,13 +147,13 @@ static int32_t OsReadDescriptors(UsbDevice *dev)
 
 static int32_t OsParseConfigDescriptors(UsbDevice *dev)
 {
-    UsbDeviceDescriptor *deviceDesc = (UsbDeviceDescriptor *)dev->descriptors;
+    UsbDeviceDescriptor *deviceDesc = static_cast<UsbDeviceDescriptor *>(dev->descriptors);
     uint8_t numConfigs = deviceDesc->bNumConfigurations;
     if (numConfigs == 0) {
         return HDF_SUCCESS;
     }
-    dev->configDescriptors = static_cast<UsbDeviceConfigDescriptor *>
-        (RawUsbMemAlloc(numConfigs * sizeof(UsbDeviceConfigDescriptor)));
+    dev->configDescriptors =
+        static_cast<UsbDeviceConfigDescriptor *>(RawUsbMemAlloc(numConfigs * sizeof(UsbDeviceConfigDescriptor)));
     if (dev->configDescriptors == nullptr) {
         HDF_LOGE("%{public}s: RawUsbMemAlloc failed.", __func__);
         return HDF_ERR_MALLOC_FAIL;
@@ -167,8 +168,8 @@ static int32_t OsParseConfigDescriptors(UsbDevice *dev)
         }
         UsbConfigDescriptor *configDesc = reinterpret_cast<UsbConfigDescriptor *>(buffer);
         if ((configDesc->bDescriptorType != USB_DDK_DT_CONFIG) || (configDesc->bLength < USB_DDK_DT_CONFIG_SIZE)) {
-            HDF_LOGE("%{public}s: config desc error: type 0x%02x, length %u", __func__,
-                configDesc->bDescriptorType, configDesc->bLength);
+            HDF_LOGE("%{public}s: config desc error: type 0x%02x, length %u", __func__, configDesc->bDescriptorType,
+                configDesc->bLength);
             RawUsbMemFree(dev->configDescriptors);
             return HDF_ERR_IO;
         }
@@ -234,15 +235,19 @@ UsbDeviceHandle *FuncAdapterOpenDevice(UsbSession *session, uint8_t busNum, uint
         RawUsbMemFree(g_usbHandle);
         return nullptr;
     }
-    
+
     int32_t ret = OsInitDevice(g_dev, busNum, usbAddr);
+    if (ret != HDF_SUCCESS) {
+        RawUsbMemFree(g_dev);
+        return nullptr;
+    }
 
     OsalAtomicSet(&g_dev->refcnt, 1);
     // add the new device to the device list on session
     OsalMutexLock(&session->lock);
     HdfSListAdd(&session->usbDevs, &g_dev->list);
     OsalMutexUnlock(&session->lock);
-    ret = FillUsbDeviceHandle(g_usbHandle);
+    (void)FillUsbDeviceHandle(g_usbHandle);
     return g_usbHandle;
 }
 
@@ -464,14 +469,13 @@ int32_t RequestCompletion(UsbHostRequest *request, UsbRequestStatus status)
 
 int32_t FuncAdapterUrbCompleteHandle(const UsbDeviceHandle *devHandle)
 {
-    int32_t ret;
     uint32_t waitTime;
     if (devHandle == nullptr) {
         HDF_LOGE("%{public}s: invalid param", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     waitTime = SEM_WAIT_FOREVER;
-    ret = OsalSemWait(&g_completeSem, waitTime);
+    (void)OsalSemWait(&g_completeSem, waitTime);
     if (g_sprq == nullptr) {
         return HDF_SUCCESS;
     }

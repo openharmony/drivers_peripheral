@@ -14,8 +14,10 @@
  */
 
 #include "codec_hdi_decode.h"
+#include <hdf_base.h>
 #include <hdf_log.h>
 #include <securec.h>
+#include "codec_component_manager.h"
 #include "codec_omx_ext.h"
 
 OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiDecode::gralloc_ = nullptr;
@@ -26,6 +28,7 @@ constexpr uint32_t FD_SIZE = sizeof(int);
 constexpr uint32_t FRAME = 30 << 16;
 constexpr uint32_t DENOMINATOR = 2;
 constexpr uint32_t NUMERATOR = 3;
+constexpr uint32_t MAX_WAIT_COUNT = 3;
 }  // namespace
 
 #define HDF_LOG_TAG codec_omx_hdi_dec
@@ -97,7 +100,7 @@ bool CodecHdiDecode::Init(CommandOpt &opt)
 
     omxMgr_ = GetCodecComponentManager();
 
-    callback_ = CodecCallbackTypeStubGetInstance();
+    callback_ = CodecCallbackTypeGet(nullptr);
     if ((omxMgr_ == nullptr) || (callback_ == nullptr)) {
         HDF_LOGE("%{public}s omxMgr_ is null or callback_ is null", __func__);
         return false;
@@ -480,19 +483,22 @@ void CodecHdiDecode::FreeBuffers()
     unUsedInBuffers_.clear();
     unUsedOutBuffers_.clear();
 
-    OMX_STATETYPE status;
-    auto err = client_->GetState(client_, &status);
-    if (err != HDF_SUCCESS) {
-        HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
-        return;
-    }
     // wait loaded
-    if (status != OMX_StateLoaded) {
-        HDF_LOGI("Wait for OMX_StateLoaded status");
-        this->WaitForStatusChanged();
-    } else {
-        HDF_LOGI(" status is %{public}d", status);
-    }
+    OMX_STATETYPE status = OMX_StateLoaded;
+    int32_t err = HDF_SUCCESS;
+    int32_t tryCount = MAX_WAIT_COUNT;
+    do {
+        err = client_->GetState(client_, &status);
+        if (err != HDF_SUCCESS) {
+            HDF_LOGE("%s GetState error [%{public}x]", __func__, err);
+            break;
+        }
+        if (status != OMX_StateLoaded) {
+            HDF_LOGI("Wait for OMX_StateLoaded status");
+            this->WaitForStatusChanged();
+        }
+        tryCount--;
+    } while ((status != OMX_StateLoaded) && (tryCount > 0));
 }
 
 void CodecHdiDecode::Release()

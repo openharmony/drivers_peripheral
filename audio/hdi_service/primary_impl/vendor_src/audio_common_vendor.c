@@ -26,7 +26,8 @@
 #define AUDIO_SUB_PORT_NUM_MAX 10
 #define AUDIO_ROUTE_NUM_MAX 2
 
-void AudioHwiCommonDescToHwiDesc(const struct AudioDeviceDescriptor *desc, struct AudioHwiDeviceDescriptor *hwiDesc)
+void AudioHwiCommonDevDescToHwiDevDesc(const struct AudioDeviceDescriptor *desc,
+    struct AudioHwiDeviceDescriptor *hwiDesc)
 {
     CHECK_NULL_PTR_RETURN(desc);
     CHECK_NULL_PTR_RETURN(hwiDesc);
@@ -69,7 +70,7 @@ int32_t AudioHwiCommonPortToHwiPort(const struct AudioPort *port, struct AudioHw
 }
 
 static int32_t AudioHwiFormatsToFormats(const enum AudioHwiFormat *hwiFormats, uint32_t hwiFormatNum,
-    enum AudioFormat *formats, uint32_t *formatsLen)
+    enum AudioFormat **formats, uint32_t *formatsLen)
 {
     CHECK_NULL_PTR_RETURN_VALUE(hwiFormats, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(formats, HDF_ERR_INVALID_PARAM);
@@ -94,7 +95,7 @@ static int32_t AudioHwiFormatsToFormats(const enum AudioHwiFormat *hwiFormats, u
         return HDF_FAILURE;
     }
 
-    formats = formatTmp;
+    *formats = formatTmp;
     *formatsLen = size;
 
     return HDF_SUCCESS;
@@ -124,7 +125,7 @@ static void AudioHwiReleaseSubPorts(struct AudioSubPortCapability **subPorts, ui
 }
 
 static int32_t AudioHwiSubPortsToSubPorts(const struct AudioHwiSubPortCapability *hwiSubPorts, uint32_t hwiSubPortsNum,
-    struct AudioSubPortCapability *subPorts, uint32_t *subPortsLen)
+    struct AudioSubPortCapability **subPorts, uint32_t *subPortsLen)
 {
     CHECK_NULL_PTR_RETURN_VALUE(hwiSubPorts, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(subPorts, HDF_ERR_INVALID_PARAM);
@@ -148,14 +149,14 @@ static int32_t AudioHwiSubPortsToSubPorts(const struct AudioHwiSubPortCapability
         subPortsTmp[i].desc = strdup(hwiSubPorts[i].desc);
     }
 
-    subPorts = subPortsTmp;
+    *subPorts = subPortsTmp;
     *subPortsLen = size;
 
     return HDF_SUCCESS;
 }
 
 static int32_t AudioHwiSampleFormatToSampleFormats(const enum AudioHwiSampleFormat *hwiSampleFormat,
-    uint32_t hwiSupportSampleFormatNum, enum AudioSampleFormat *sampleFormat, uint32_t *sampleFormatsLen)
+    uint32_t hwiSupportSampleFormatNum, enum AudioSampleFormat **sampleFormat, uint32_t *sampleFormatsLen)
 {
     CHECK_NULL_PTR_RETURN_VALUE(hwiSampleFormat, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(sampleFormat, HDF_ERR_INVALID_PARAM);
@@ -181,7 +182,7 @@ static int32_t AudioHwiSampleFormatToSampleFormats(const enum AudioHwiSampleForm
         return HDF_FAILURE;
     }
 
-    sampleFormat = sampleFormatTmp;
+    *sampleFormat = sampleFormatTmp;
     *sampleFormatsLen = size;
 
     return HDF_SUCCESS;
@@ -200,7 +201,7 @@ int32_t AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *h
     portCap->channelMasks = (enum AudioChannelMask)hwiPortCap->channelMasks;
     portCap->channelCount = hwiPortCap->channelCount;
 
-    int32_t ret = AudioHwiFormatsToFormats(hwiPortCap->formats, hwiPortCap->formatNum, portCap->formats,
+    int32_t ret = AudioHwiFormatsToFormats(hwiPortCap->formats, hwiPortCap->formatNum, &portCap->formats,
         &portCap->formatsLen);
     if (ret != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("AudioHwiFormatsToFormats fail");
@@ -208,7 +209,7 @@ int32_t AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *h
     }
 
     ret = AudioHwiSubPortsToSubPorts(hwiPortCap->subPorts, hwiPortCap->subPortsNum,
-        portCap->subPorts, &portCap->subPortsLen);
+        &portCap->subPorts, &portCap->subPortsLen);
     if (ret != HDF_SUCCESS) {
         OsalMemFree((void *)portCap->formats);
         portCap->formats = NULL;
@@ -217,7 +218,7 @@ int32_t AudioHwiCommonHwiPortCapToPortCap(const struct AudioHwiPortCapability *h
     }
 
     ret = AudioHwiSampleFormatToSampleFormats(hwiPortCap->supportSampleFormats, hwiPortCap->supportSampleFormatNum,
-        portCap->supportSampleFormats, &portCap->supportSampleFormatsLen);
+        &portCap->supportSampleFormats, &portCap->supportSampleFormatsLen);
     if (ret != HDF_SUCCESS) {
         OsalMemFree((void *)portCap->formats);
         AudioHwiReleaseSubPorts(&portCap->subPorts, &portCap->subPortsLen);
@@ -294,18 +295,18 @@ static int32_t AudioHwiCommonRouteNodeToHwiRouteNode(struct AudioRouteNode *rout
 static int32_t AudioHwiCommonSinkToHwiSink(const struct AudioRoute *route, struct AudioHwiRoute *hwiRoute)
 {
     struct AudioHwiRouteNode *nodes = NULL;
-    if (route->sinksLen / sizeof(struct AudioRouteNode) > AUDIO_ROUTE_NUM_MAX) {
+    if (route->sinksLen > AUDIO_ROUTE_NUM_MAX) {
         AUDIO_FUNC_LOGE("sinksLen para err");
         return HDF_ERR_INVALID_PARAM;
     }
 
-    nodes = (struct AudioHwiRouteNode *)OsalMemCalloc(route->sinksLen);
+    nodes = (struct AudioHwiRouteNode *)OsalMemCalloc(route->sinksLen * sizeof(struct AudioHwiRouteNode));
     if (nodes == NULL) {
         AUDIO_FUNC_LOGE("nodes null");
         return HDF_ERR_MALLOC_FAIL;
     }
     hwiRoute->sinks = nodes;
-    hwiRoute->sinksNum = route->sinksLen / sizeof(struct AudioRouteNode);
+    hwiRoute->sinksNum = route->sinksLen;
 
     for (uint32_t i = 0; i < hwiRoute->sinksNum; i++) {
         int32_t ret = AudioHwiCommonRouteNodeToHwiRouteNode(&route->sinks[i], &hwiRoute->sinks[i]);
@@ -322,18 +323,18 @@ static int32_t AudioHwiCommonSinkToHwiSink(const struct AudioRoute *route, struc
 static int32_t AudioHwiCommonSourceToHwiSource(const struct AudioRoute *route, struct AudioHwiRoute *hwiRoute)
 {
     struct AudioHwiRouteNode *nodes = NULL;
-    if (route->sourcesLen / sizeof(struct AudioRouteNode) > AUDIO_ROUTE_NUM_MAX) {
+    if (route->sourcesLen > AUDIO_ROUTE_NUM_MAX) {
         AUDIO_FUNC_LOGE("sinksLen para err");
         return HDF_ERR_INVALID_PARAM;
     }
 
-    nodes = (struct AudioHwiRouteNode *)OsalMemCalloc(route->sourcesLen);
+    nodes = (struct AudioHwiRouteNode *)OsalMemCalloc(route->sourcesLen * sizeof(struct AudioHwiRouteNode));
     if (nodes == NULL) {
         AUDIO_FUNC_LOGE("nodes null");
         return HDF_ERR_MALLOC_FAIL;
     }
     hwiRoute->sources = nodes;
-    hwiRoute->sourcesNum = route->sourcesLen / sizeof(struct AudioRouteNode);
+    hwiRoute->sourcesNum = route->sourcesLen;
 
     for (uint32_t i = 0; i < hwiRoute->sourcesNum; i++) {
         int32_t ret = AudioHwiCommonRouteNodeToHwiRouteNode(&route->sources[i], &hwiRoute->sources[i]);
@@ -375,6 +376,64 @@ int32_t AudioHwiCommonRouteToHwiRoute(const struct AudioRoute *route, struct Aud
         AudioHwiCommonFreeHwiRoute(hwiRoute);
         return HDF_FAILURE;
     }
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCommonSceneToHwiScene(const struct AudioSceneDescriptor *scene,
+    struct AudioHwiSceneDescriptor *hwiScene)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiScene, HDF_ERR_INVALID_PARAM);
+
+    hwiScene->scene.id = scene->scene.id;
+    AudioHwiCommonDevDescToHwiDevDesc(&scene->desc, &hwiScene->desc);
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCommonSampleAttrToHwiSampleAttr(const struct AudioSampleAttributes *attrs,
+    struct AudioHwiSampleAttributes *hwiAttrs)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiAttrs, HDF_ERR_INVALID_PARAM);
+
+    hwiAttrs->type = (enum AudioHwiCategory)attrs->type;
+    hwiAttrs->interleaved = attrs->interleaved;
+    hwiAttrs->format = (enum AudioHwiFormat)attrs->format;
+    hwiAttrs->sampleRate = attrs->sampleRate;
+    hwiAttrs->channelCount = attrs->channelCount;
+    hwiAttrs->period = attrs->period;
+    hwiAttrs->frameSize = attrs->frameSize;
+    hwiAttrs->isBigEndian = attrs->isBigEndian;
+    hwiAttrs->isSignedData = attrs->isSignedData;
+    hwiAttrs->startThreshold = attrs->startThreshold;
+    hwiAttrs->stopThreshold = attrs->stopThreshold;
+    hwiAttrs->silenceThreshold = attrs->silenceThreshold;
+    hwiAttrs->streamId = attrs->streamId;
+
+    return HDF_SUCCESS;
+}
+
+int32_t AudioHwiCommonHwiSampleAttrToSampleAttr(const struct AudioHwiSampleAttributes *hwiAttrs,
+    struct AudioSampleAttributes *attrs)
+{
+    CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiAttrs, HDF_ERR_INVALID_PARAM);
+
+    attrs->type = (enum AudioCategory)hwiAttrs->type;
+    attrs->interleaved = hwiAttrs->interleaved;
+    attrs->format = (enum AudioFormat)hwiAttrs->format;
+    attrs->sampleRate = hwiAttrs->sampleRate;
+    attrs->channelCount = hwiAttrs->channelCount;
+    attrs->period = hwiAttrs->period;
+    attrs->frameSize = hwiAttrs->frameSize;
+    attrs->isBigEndian = hwiAttrs->isBigEndian;
+    attrs->isSignedData = hwiAttrs->isSignedData;
+    attrs->startThreshold = hwiAttrs->startThreshold;
+    attrs->stopThreshold = hwiAttrs->stopThreshold;
+    attrs->silenceThreshold = hwiAttrs->silenceThreshold;
+    attrs->streamId = hwiAttrs->streamId;
 
     return HDF_SUCCESS;
 }

@@ -50,6 +50,7 @@ ohos_systemtest("test_battery_sys_test") {
 
   external_deps = [
     "c_utils:utils",
+    "config_policy:configpolicy_util",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]

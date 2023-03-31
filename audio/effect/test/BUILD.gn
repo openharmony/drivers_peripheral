@@ -15,12 +15,11 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 if (defined(ohos_lite)) {
+  group("effect_test") {
+  }
 } else {
   group("effect_test") {
     testonly = true
-    deps = [
-      "sample:effect_demo",
-      "unittest:effect_hdi_ut",
-    ]
+    deps = [ "unittest:hdf_effect_hdi_ut" ]
   }
 }

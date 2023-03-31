@@ -247,7 +247,6 @@ struct DevHandle *AudioBindService(const char *name)
         handle->object = object;
     } else {
         AUDIO_FUNC_LOGE("handle->object is NULL!");
-        AudioMemFree((void **)&handle);
         return NULL;
     }
     AUDIO_FUNC_LOGI("BIND SERVICE SUCCESS!");

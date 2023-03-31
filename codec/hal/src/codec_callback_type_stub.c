@@ -295,3 +295,13 @@ void CodecCallbackTypeStubRelease(struct CodecCallbackType *instance)
     }
     OsalMemFree(stub);
 }
+struct CodecCallbackType *CodecCallbackTypeGet(struct HdfRemoteService *remote)
+{
+    (void)remote;
+    return CodecCallbackTypeStubGetInstance();
+}
+
+void CodecCallbackTypeRelease(struct CodecCallbackType *instance)
+{
+    return CodecCallbackTypeStubRelease(instance);
+}

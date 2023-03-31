@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -47,6 +47,26 @@ void WifiClientTest::SetUp()
 void WifiClientTest::TearDown()
 {
     WifiDriverClientDeinit();
+}
+
+/**
+ * @tc.name: WifiClientSetResetDriver001
+ * @tc.desc: Wifi client reset driver function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiClientTest, WifiClientSetResetDriver001, TestSize.Level1)
+{
+    int32_t ret;
+    uint8_t chipId = 0;
+
+    ret = AcquireChipId(WLAN_IFNAME, &chipId);
+    ASSERT_TRUE(chipId < MAX_WLAN_DEVICE);
+    EXPECT_EQ(RET_CODE_SUCCESS, ret);
+
+    ret = SetResetDriver(chipId, WLAN_IFNAME);
+    EXPECT_EQ(RET_CODE_SUCCESS, ret);
+    sleep(RESET_TIME);
 }
 
 /**
@@ -393,25 +413,5 @@ HWTEST_F(WifiClientTest, WifiClientSetPowerMode004, TestSize.Level1)
 
     ret = SetPowerMode(WLAN_IFNAME, WIFI_POWER_MODE_NUM);
     EXPECT_NE(RET_CODE_SUCCESS, ret);
-}
-
-/**
- * @tc.name: WifiClientSetResetDriver001
- * @tc.desc: Wifi client reset driver function test
- * @tc.type: FUNC
- * @tc.require: AR000H603L
- */
-HWTEST_F(WifiClientTest, WifiClientSetResetDriver001, TestSize.Level1)
-{
-    int32_t ret;
-    uint8_t chipId = 0;
-
-    ret = AcquireChipId(WLAN_IFNAME, &chipId);
-    ASSERT_TRUE(chipId < MAX_WLAN_DEVICE);
-    EXPECT_EQ(RET_CODE_SUCCESS, ret);
-
-    ret = SetResetDriver(chipId, WLAN_IFNAME);
-    EXPECT_EQ(RET_CODE_SUCCESS, ret);
-    sleep(RESET_TIME);
 }
 };

@@ -37,6 +37,7 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
       "c_utils:utils",
       "drivers_interface_codec:codec_idl_headers",
       "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",

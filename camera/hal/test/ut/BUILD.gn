@@ -43,15 +43,7 @@ if (defined(ohos_lite)) {
       # common includes
       "//commonlibrary/utils_lite/include",
       "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "//system/core/include/cutils",
-
-      # graphic
-      "//foundation/graphic/surface/interfaces/kits",
-      "//foundation/graphic/surface/interfaces/innerkits",
 
       # camera common includes
       "$camera_path/include",
@@ -66,12 +58,8 @@ if (defined(ohos_lite)) {
       "$camera_path/buffer_manager/include",
       "$camera_path/buffer_manager/src/buffer_adapter/lite",
       "//third_party/googletest/googletest/include",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/adapter/uhdf2/osal/include",
       "//drivers/peripheral/base",
       "//drivers/peripheral/display/interfaces/include",
-      "//foundation/graphic/surface/interfaces/kits",
-      "//foundation/graphic/surface/interfaces/innerkits",
 
       # pipeline core includes
       "$camera_path/pipeline_core",
@@ -93,12 +81,17 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/strategy/config",
       "$camera_path/pipeline_core/ipp/include",
     ]
-    deps = [
+    public_deps = [
       "$camera_path/buffer_manager:camera_buffer_manager",
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
-    external_deps = [ "drivers_interface_camera:metadata" ]
+    external_deps = [
+      "drivers_interface_camera:metadata",
+      "graphic_chipsetsdk:surface",
+    ]
   }
 } else {
   import("//build/test.gni")
@@ -139,6 +132,7 @@ if (defined(ohos_lite)) {
       "$ut_root_path/v4l2/open_camera_test.cpp",
       "$ut_root_path/v4l2/stream_customer.cpp",
       "$ut_root_path/v4l2/test_display.cpp",
+      "$ut_root_path/v4l2/usb_camera_test.cpp",
     ]
 
     include_dirs = [

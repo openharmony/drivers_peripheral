@@ -11,6 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//drivers/peripheral/display/display_config.gni")
+
 group("display_composer_entry") {
-  deps = [ "hdi_service:display_composer_hdi_service" ]
+  if (drivers_peripheral_display_community) {
+    deps = [
+      "hdi_service:display_composer_hdi_service",
+      "model:display_composer_model",
+    ]
+  } else {
+    deps = [ "hdi_service:display_composer_hdi_service" ]
+  }
 }

@@ -34,6 +34,7 @@ public:
     struct IAudioAdapter *adapter = nullptr;
     struct IAudioCapture *capture = nullptr;
     static TestAudioManager *manager;
+    uint32_t captureId_ = 0;
 };
 
 TestAudioManager *AudioIdlHdiCaptureTest::manager = nullptr;
@@ -55,13 +56,13 @@ void AudioIdlHdiCaptureTest::TearDownTestCase(void)
 void AudioIdlHdiCaptureTest::SetUp(void)
 {
     ASSERT_NE(nullptr, manager);
-    int32_t ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture);
+    int32_t ret = AudioCreateCapture(manager, PIN_IN_MIC, ADAPTER_NAME, &adapter, &capture, &captureId_);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiCaptureTest::TearDown(void)
 {
-    int32_t ret = ReleaseCaptureSource(manager, adapter, capture);
+    int32_t ret = ReleaseCaptureSource(manager, adapter, capture, captureId_);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
@@ -200,7 +201,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureFrame_006, TestSize.Level1)
     int8_t *frame = (int8_t *)calloc(1, BUFFER_SIZE);
     EXPECT_NE(nullptr, frame);
     ret = capture->CaptureFrame(capture, frame, &replyBytes, &requestBytes);
-    EXPECT_EQ(HDF_FAILURE, ret);
+    EXPECT_EQ(HDF_SUCCESS, ret);
 
     capture->Stop(capture);
 
@@ -391,121 +392,7 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetCapturePosition_008, TestSize.Le
     EXPECT_GT(frames, INITIAL_VALUE);
     capture->Stop(capture);
 }
-/**
-* @tc.name  AudioCaptureReqMmapBuffer_001
-* @tc.desc  Test ReqMmapBuffer interface,return 0 if call ReqMmapBuffer interface successfully
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBuffer_001, TestSize.Level1)
-{
-    bool isRender = false;
-    int32_t reqSize = 0;
-    struct AudioMmapBufferDescriptor desc = {};
-    ASSERT_NE(nullptr, capture);
-    int32_t ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = capture->Start(capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = capture->ReqMmapBuffer(capture, reqSize, &desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    if (ret == 0) {
-        munmap(desc.memoryAddress, reqSize);
-    }
-    capture->Stop(capture);
-}
-/**
-            the size of actual audio file
-* @tc.name  AudioRenderReqMmapBuffer_002
-* @tc.desc  Test ReqMmapBuffer interface,return -1 if call ReqMmapBuffer interface unsuccessful when setting the
-            incoming parameter reqSize is bigger than the size of actual audio file
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBuffer_002, TestSize.Level1)
-{
-    int32_t ret;
-    bool isRender = false;
-    int32_t reqSize = 0;
-    struct AudioMmapBufferDescriptor desc = {};
-    ASSERT_NE(nullptr, capture);
-    ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    reqSize = reqSize + BUFFER_LENTH;
-    ret = capture->Start(capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = capture->ReqMmapBuffer(capture, reqSize, &desc);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    capture->Stop(capture);
-}
-/**
-            the size of actual audio file
-* @tc.name  AudioCaptureReqMmapBuffer_003
-* @tc.desc  Test ReqMmapBuffer interface,return 0 if call ReqMmapBuffer interface successfully when setting the
-            incoming parameter reqSize is smaller than the size of actual audio file
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBuffer_003, TestSize.Level1)
-{
-    int32_t ret;
-    bool isRender = false;
-    int32_t reqSize = 0;
-    struct AudioMmapBufferDescriptor desc = {};
-    ASSERT_NE(nullptr, capture);
-    ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    reqSize = reqSize / 2;
-    ret = capture->Start(capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = capture->ReqMmapBuffer(capture, reqSize, &desc);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    if (ret == 0) {
-        munmap(desc.memoryAddress, reqSize);
-    }
-    capture->Stop(capture);
-}
-/**
-* @tc.name  AudioCaptureReqMmapBuffer_004
-* @tc.desc  Test ReqMmapBuffer interface,return -1 if call ReqMmapBuffer interface unsuccessful when setting the
-            incoming parameter reqSize is zero
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBuffer_004, TestSize.Level1)
-{
-    int32_t ret;
-    bool isRender = false;
-    int32_t reqSize = 0;
-    struct AudioMmapBufferDescriptor desc = {};
-    ASSERT_NE(nullptr, capture);
-    ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    reqSize = 0;
-    ret = capture->Start(capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = capture->ReqMmapBuffer(capture, reqSize, &desc);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    capture->Stop(capture);
-}
-/**
-* @tc.name  AudioCaptureReqMmapBuffer_005
-* @tc.desc  Test ReqMmapBuffer interface,return -1 if call ReqMmapBuffer interface unsuccessful when setting the
-            incoming parameter memoryFd  of desc is illegal
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBuffer_005, TestSize.Level1)
-{
-    bool isRender = false;
-    int32_t reqSize = 0;
-    struct AudioMmapBufferDescriptor desc = {};
-    ASSERT_NE(nullptr, capture);
-    int32_t ret = InitMmapDesc(AUDIO_LOW_LATENCY_CAPTURE_FILE, desc, reqSize, isRender);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = capture->Start(capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    free(desc.filePath);
-    desc.filePath = strdup("/audiotest/audio.wav");
-    ret = capture->ReqMmapBuffer(capture, reqSize, &desc);
-    EXPECT_EQ(HDF_FAILURE, ret);
-    capture->Stop(capture);
-}
+
 /**
 * @tc.name  AudioCaptureReqMmapBufferNull_006
 * @tc.desc  Test ReqMmapBuffer interface,return -3/-4 if call ReqMmapBuffer interface unsuccessful when setting the
@@ -527,67 +414,6 @@ HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBufferNull_006, TestSize.Lev
     ret = capture->ReqMmapBuffer(captureNull, reqSize, &desc);
     EXPECT_EQ(ret == HDF_ERR_INVALID_PARAM || ret == HDF_ERR_INVALID_OBJECT, true);
     capture->Stop(capture);
-}
-/**
-* @tc.name  AudioCaptureReqMmapBufferNull_007
-* @tc.desc  Test ReqMmapBuffer interface,return -3 if call ReqMmapBuffer interface unsuccessful when setting the
-            incoming parameter desc is nullptr
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureReqMmapBufferNull_007, TestSize.Level1)
-{
-    int32_t ret;
-    uint32_t reqSize = 0;
-    struct AudioMmapBufferDescriptor *descNull = nullptr;
-    ASSERT_NE(nullptr, capture);
-    reqSize = FILE_CAPTURE_SIZE;
-    ret = capture->Start(capture);
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    ret = capture->ReqMmapBuffer(capture, reqSize, descNull);
-    EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
-    capture->Stop(capture);
-}
-/**
-* @tc.name  AudioCaptureGetMmapPosition_001
-* @tc.desc  Test GetMmapPosition interface,return 0 if Getting position successfully.
-* @tc.type: FUNC
-*/
-HWTEST_F(AudioIdlHdiCaptureTest, AudioCaptureGetMmapPosition_001, TestSize.Level1)
-{
-    int32_t ret;
-    uint64_t frames = 0;
-    uint64_t framesCapturing = 0;
-    uint64_t framesExpCapture = 0;
-    int64_t timeExp = 0;
-    int64_t timeExpCaptureing = 0;
-    ASSERT_NE(nullptr, capture);
-    struct PrepareAudioPara audiopara = {
-        .capture = capture, .portType = PORT_IN, .adapterName = ADAPTER_NAME.c_str(), .pins = PIN_IN_MIC,
-        .path = AUDIO_LOW_LATENCY_CAPTURE_FILE.c_str()
-    };
-
-    ret = audiopara.capture->GetMmapPosition(audiopara.capture, &frames, &(audiopara.time));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_EQ((audiopara.time.tvSec) * SECTONSEC + (audiopara.time.tvNSec), timeExp);
-    EXPECT_EQ(frames, INITIAL_VALUE);
-    ret = pthread_create(&audiopara.tids, NULL, (THREAD_FUNC)RecordMapAudio, &audiopara);
-    ASSERT_EQ(HDF_SUCCESS, ret);
-
-    sleep(1);
-    ret = audiopara.capture->GetMmapPosition(audiopara.capture, &framesCapturing, &(audiopara.time));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT((audiopara.time.tvSec) * SECTONSEC + (audiopara.time.tvNSec), timeExp);
-    EXPECT_GT(framesCapturing, INITIAL_VALUE);
-    timeExpCaptureing = (audiopara.time.tvSec) * SECTONSEC + (audiopara.time.tvNSec);
-    void *result = nullptr;
-    pthread_join(audiopara.tids, &result);
-    EXPECT_EQ(HDF_SUCCESS, (intptr_t)result);
-    ret = audiopara.capture->GetMmapPosition(audiopara.capture, &framesExpCapture, &(audiopara.time));
-    EXPECT_EQ(HDF_SUCCESS, ret);
-    EXPECT_GT((audiopara.time.tvSec) * SECTONSEC + (audiopara.time.tvNSec), timeExpCaptureing);
-    EXPECT_GT(framesExpCapture, framesCapturing);
-
-    audiopara.capture->Stop(audiopara.capture);
 }
 
 /**

@@ -18,6 +18,7 @@
 #include "audio_internal.h"
 #include "audio_proxy_manager.h"
 #include "hdf_audio_server.h"
+#include "hdf_sbuf.h"
 
 #define CONFIG_CHANNEL_COUNT  2 // two channels
 #define GAIN_MAX 50.0

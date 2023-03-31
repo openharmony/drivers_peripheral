@@ -40,7 +40,6 @@ int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
         struct CodecComponentManagerSerivce *managerService = CodecComponentManagerSerivceGet();
         struct ComponentTypeNode *pos = NULL;
         struct ComponentTypeNode *next = NULL;
-        
         DLIST_FOR_EACH_ENTRY_SAFE(pos, next, &managerService->head, struct ComponentTypeNode, node)
         {
             if (pos == NULL) {
@@ -56,7 +55,7 @@ int32_t DevCodecHostDump(struct HdfSBuf *data, struct HdfSBuf *reply)
                     return HDF_FAILURE;
                 }
                 HdfSbufWriteString(reply, dump);
-                HdfSbufWriteString(reply, "------------------------------------------------------------------------");
+                HdfSbufWriteString(reply, "--------------------------------------------------------------------- \n");
             }
         }
         HDF_LOGI("%{public}s: codec hidumper success!", __func__);

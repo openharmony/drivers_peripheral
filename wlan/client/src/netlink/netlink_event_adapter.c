@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,6 +57,11 @@ static inline uint32_t BitLeftShift(uint8_t x)
 #define WLAN_ATTR_SCAN_MAX 11
 #define SCAN_STATUS_MAX 2
 #define NL80211_SCAN_DONE 107
+
+typedef struct {
+    WifiScanResults *scanResults;
+    const char *ifName;
+} WifiScanResultArg;
 
 static int g_familyId = 0;
 
@@ -165,6 +170,15 @@ static void DoGetScanResult(struct nlattr *attr[], int len, WifiScanResult *scan
     } else {
         scanResult->flags |= SCAN_LEVEL_INVALID | SCAN_QUAL_INVALID;
     }
+    if (attr[NL80211_BSS_TSF]) {
+        scanResult->tsf = nla_get_u64(attr[NL80211_BSS_TSF]);
+    }
+    if (attr[NL80211_BSS_BEACON_TSF]) {
+        uint64_t tsf = nla_get_u64(attr[NL80211_BSS_BEACON_TSF]);
+        if (tsf > scanResult->tsf) {
+            scanResult->tsf = tsf;
+        }
+    }
     if (attr[NL80211_BSS_SEEN_MS_AGO]) {
         scanResult->age = nla_get_u32(attr[NL80211_BSS_SEEN_MS_AGO]);
     }
@@ -172,9 +186,10 @@ static void DoGetScanResult(struct nlattr *attr[], int len, WifiScanResult *scan
 
 static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
 {
-    WifiScanResult scanResult = {0};
+    WifiScanResult *scanResult = NULL;
+    WifiScanResults *scanResults = NULL;
     struct genlmsghdr *hdr = nlmsg_data(nlmsg_hdr(msg));
-    const char *ifName = (const char *)arg;
+    WifiScanResultArg *handlerArg = (WifiScanResultArg *)arg;
     struct nlattr *attr[NL80211_ATTR_MAX + 1], *bssAttr[NL80211_BSS_MAX + 1];
     static struct nla_policy bssPolicy[NL80211_BSS_MAX + 1];
     memset_s(bssPolicy, sizeof(bssPolicy), 0, sizeof(bssPolicy));
@@ -187,11 +202,13 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
     bssPolicy[NL80211_BSS_STATUS].type = NLA_U32;
     bssPolicy[NL80211_BSS_SEEN_MS_AGO].type = NLA_U32;
 
-    if (ifName == NULL) {
-        HILOG_ERROR(LOG_CORE, "%s: ifName is null", __func__);
+    if (handlerArg == NULL || handlerArg->scanResults == NULL ||
+        handlerArg->scanResults->num >= MAX_SCAN_RES_NUM || handlerArg->ifName == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: Invalid param", __func__);
         return NL_SKIP;
     }
-
+    scanResults = handlerArg->scanResults;
+    scanResult = &scanResults->scanResult[scanResults->num];
     nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(hdr, 0), genlmsg_attrlen(hdr, 0), NULL);
     if (!attr[NL80211_ATTR_BSS]) {
         HILOG_ERROR(LOG_CORE, "%s: bss info missing", __func__);
@@ -201,26 +218,35 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
         HILOG_ERROR(LOG_CORE, "%s: failed to parse nested attributes", __func__);
         return NL_SKIP;
     }
-
-    DoGetScanResult(bssAttr, NL80211_BSS_MAX + 1, &scanResult);
-
-    WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULT, &scanResult);
+    DoGetScanResult(bssAttr, NL80211_BSS_MAX + 1, scanResult);
+    WifiEventReport(handlerArg->ifName, WIFI_EVENT_SCAN_RESULT, scanResult);
+    scanResults->num++;
+    if (scanResults->num == MAX_SCAN_RES_NUM) {
+        WifiEventReport(handlerArg->ifName, WIFI_EVENT_SCAN_RESULTS, scanResults);
+        (void)memset_s(scanResults, sizeof(WifiScanResults), 0, sizeof(WifiScanResults));
+    }
     return NL_SKIP;
 }
 
 static void WifiEventScanResultProcess(const char *ifName)
 {
     int32_t ret;
+    WifiScanResults scanResults = {0};
+    WifiScanResultArg arg;
     uint32_t ifaceId = if_nametoindex(ifName);
     struct nl_msg *msg = nlmsg_alloc();
 
+    arg.scanResults = &scanResults;
+    arg.ifName = ifName;
     genlmsg_put(msg, 0, 0, g_familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_SCAN, 0);
     nla_put_u32(msg, NL80211_ATTR_IFINDEX, ifaceId);
-    ret = NetlinkSendCmdSync(msg, WifiGetScanResultHandler, (void *)ifName);
+    ret = NetlinkSendCmdSync(msg, WifiGetScanResultHandler, (void *)&arg);
     if (ret != RET_CODE_SUCCESS) {
         HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __func__);
     }
-
+    if (scanResults.num != 0) {
+        WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &scanResults);
+    }
     nlmsg_free(msg);
 }
 

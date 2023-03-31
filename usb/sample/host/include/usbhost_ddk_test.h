@@ -21,10 +21,10 @@
 #include <sys/time.h>
 #include <hdf_sbuf.h>
 #ifdef __LITEOS_USB_HOST_DDK_TEST__
-#include "utils/hdf_base.h"
+#include "hdf_base.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
-#include "hdf_device_desc.h"
+#include "hdf_io_service_if.h"
 #include "osal_mem.h"
 #else
 #include <servmgr_hdi.h>

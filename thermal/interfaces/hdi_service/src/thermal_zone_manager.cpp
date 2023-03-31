@@ -27,7 +27,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-#include "osal/osal_mem.h"
+#include "osal_mem.h"
 #include "thermal_hdf_utils.h"
 #include "thermal_log.h"
 
@@ -70,9 +70,6 @@ void ThermalZoneManager::FormatThermalSysfsPaths(struct ThermalSysfsPathInfo *pT
 
     FormatThermalPaths(tzSysPathInfo_.typePath, sizeof(tzSysPathInfo_.typePath),
         THEERMAL_TYPE_PATH.c_str(), pTSysPathInfo->name);
-
-    THERMAL_HILOGI(COMP_HDI, "temp path: %{private}s, type path: %{private}s ",
-        tzSysPathInfo_.temperturePath, tzSysPathInfo_.typePath);
 
     tzSysPathInfo_.fd = pTSysPathInfo->fd;
     lTzSysPathInfo_.push_back(tzSysPathInfo_);
@@ -146,7 +143,7 @@ int32_t ThermalZoneManager::ParseThermalZoneInfo()
             std::string tzType;
             ret = ThermalHdfUtils::ReadNode(iter->typePath, tzType);
             if (ret != HDF_SUCCESS) {
-                THERMAL_HILOGE(COMP_HDI, "read tz type failed, path: %{private}s", iter->typePath);
+                THERMAL_HILOGE(COMP_HDI, "read tz type failed");
                 continue;
             }
             tzPathMap.insert(std::make_pair(tzType, iter->temperturePath));
@@ -289,8 +286,7 @@ void ThermalZoneManager::ReportThermalZoneData(int32_t reportTime, std::vector<i
                 ThermalZoneInfo info;
                 info.type = iter.type;
                 info.temp = ThermalHdfUtils::ReadNodeToInt(iter.tempPath);
-                THERMAL_HILOGD(COMP_HDI, "type: %{public}s temp: %{public}d path %{private}s",
-                    iter.type.c_str(), info.temp, iter.tempPath.c_str());
+                THERMAL_HILOGD(COMP_HDI, "type: %{public}s temp: %{public}d", iter.type.c_str(), info.temp);
                 tzInfoAcaualEvent_.info.push_back(info);
             }
         }

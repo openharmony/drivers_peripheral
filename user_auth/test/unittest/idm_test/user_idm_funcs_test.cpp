@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -102,14 +102,13 @@ HWTEST_F(UserIdmFuncsTest, TestCheckEnrollPermission_002, TestSize.Level0)
 
     g_userInfoList = CreateLinkedList(DestroyUserInfoNode);
     EXPECT_NE(g_userInfoList, nullptr);
-    UserAuthTokenHal token = {};
-    token.authType = 4;
     PermissionCheckParam param = {};
-    param.authType = 2;
-    param.userId = userId;
-    EXPECT_EQ(memcpy_s(param.token, sizeof(UserAuthTokenHal), &token, sizeof(UserAuthTokenHal)), EOK);
+    param.authType = FACE_AUTH;
     uint64_t scheduleId = 0;
-    EXPECT_EQ(CheckEnrollPermission(param, &scheduleId), RESULT_VERIFY_TOKEN_FAIL);
+    EXPECT_EQ(CheckEnrollPermission(param, &scheduleId), RESULT_BAD_PARAM);
+    param.userId = userId;
+    EXPECT_EQ(CheckEnrollPermission(param, &scheduleId), RESULT_BAD_MATCH);
+    DestroyLinkedList(g_userInfoList);
     g_userInfoList = nullptr;
     g_session = nullptr;
 }
@@ -205,9 +204,9 @@ HWTEST_F(UserIdmFuncsTest, TestDeleteCredentialFunc, TestSize.Level0)
 
     CredentialInfoHal credInfo = {};
     UserAuthTokenHal token = {};
-    token.authType = 4;
+    token.tokenDataPlain.authType = 4;
     EXPECT_EQ(memcpy_s(param.token, sizeof(UserAuthTokenHal), &token, sizeof(UserAuthTokenHal)), EOK);
-    EXPECT_EQ(DeleteCredentialFunc(param, &credInfo), RESULT_VERIFY_TOKEN_FAIL);
+    EXPECT_EQ(DeleteCredentialFunc(param, &credInfo), RESULT_BAD_MATCH);
 }
 
 HWTEST_F(UserIdmFuncsTest, TestQueryCredentialFunc, TestSize.Level0)

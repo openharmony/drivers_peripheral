@@ -14,22 +14,19 @@
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_unittest("effect_hdi_ut") {
+ohos_unittest("hdf_effect_hdi_ut") {
   module_out_path = "hdf/audio"
   sources = [
+    "effect_common.cpp",
     "effect_control_test.cpp",
     "effect_model_test.cpp",
   ]
 
-  include_dirs = [ "//third_party/googletest/googletest/include/gtest" ]
-
-  deps = [
-    "//third_party/googletest:gmock_main",
-    "//third_party/googletest:gtest_main",
-  ]
+  include_dirs = [ "//drivers/peripheral/audio/effect/test/unittest/" ]
 
   external_deps = [
     "c_utils:utils",
+    "drivers_interface_audio:effect_idl_headers",
     "drivers_interface_audio:libeffect_proxy_1.0",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",

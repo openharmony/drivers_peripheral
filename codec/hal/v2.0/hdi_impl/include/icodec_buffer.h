@@ -24,7 +24,7 @@
 #include <refbase.h>
 #include "codec_component_type.h"
 #include "codec_omx_ext.h"
-constexpr uint32_t TIME_WAIT_MS = 5;
+constexpr uint32_t TIME_WAIT_MS = 10;
 namespace OHOS {
 namespace Codec {
 namespace Omx {

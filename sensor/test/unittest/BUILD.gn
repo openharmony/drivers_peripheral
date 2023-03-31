@@ -26,13 +26,7 @@ if (defined(ohos_lite)) {
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/framework/include/platform",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/include/utils",
       "//drivers/peripheral/sensor/interfaces/include",
-      "//drivers/hdf_core/adapter/uhdf/posix/include",
-      "//drivers/hdf_core/framework/test/unittest/include",
     ]
 
     sources = [ "./common/hdf_sensor_test.cpp" ]
@@ -50,14 +44,14 @@ if (defined(ohos_lite)) {
         "-Wno-format-extra-args",
       ]
     }
-    deps = [
+    public_deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//drivers/peripheral/sensor/hal:hdi_sensor",
+      "//third_party/bounds_checking_function:libsec_shared",
     ]
-    public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   }
 } else {
   module_output_path = "drivers_peripheral_sensor/sensor"

@@ -42,7 +42,7 @@
 
 #define AUDIO_HW_ADAPTER_NUM_MAX        8 // Limit the number of sound cards supported to a maximum of 8
 #define AUDIO_HW_PORT_NUM_MAX    10
-#define AUDIO_HW_STREAM_NUM_MAX  6
+#define AUDIO_HW_STREAM_NUM_MAX  10
 /**
  * @brief Defines the audio handle.
  */

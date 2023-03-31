@@ -17,6 +17,7 @@
 
 #include <dlfcn.h>
 #include <hdf_base.h>
+#include <hdf_log.h>
 #include "display_log.h"
 
 namespace OHOS {
@@ -95,12 +96,12 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
     handle = new NativeBuffer();
     if (handle == nullptr) {
         HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
-        vdiImpl_->FreeMem(*handle);
+        delete handle;
         return HDF_FAILURE;
     }
 
-    handle->SetBufferHandle(buffer, true, [this](BufferHandle* handle) {
-        vdiImpl_->FreeMem(*handle);
+    handle->SetBufferHandle(buffer, true, [this](BufferHandle* freeBuffer) {
+        vdiImpl_->FreeMem(*freeBuffer);
     });
     return HDF_SUCCESS;
 }

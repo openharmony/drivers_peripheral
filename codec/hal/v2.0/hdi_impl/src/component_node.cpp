@@ -78,6 +78,7 @@ ComponentNode::ComponentNode(struct CodecCallbackType *callback, int64_t appData
 ComponentNode::~ComponentNode()
 {
     if (omxCallback_ != nullptr) {
+        std::unique_lock<std::shared_mutex> lk(callbackMutex_);
         CodecCallbackTypeRelease(omxCallback_);
         omxCallback_ = nullptr;
     }
@@ -256,6 +257,7 @@ int32_t ComponentNode::DeInit()
 
 int32_t ComponentNode::OnEvent(OMX_EVENTTYPE event, uint32_t data1, uint32_t data2, void *eventData)
 {
+    std::shared_lock<std::shared_mutex> lk(callbackMutex_);
     if (omxCallback_ == nullptr) {
         HDF_LOGE("%{public}s omxCallback_ is null", __func__);
         return OMX_ErrorNone;
@@ -273,6 +275,7 @@ int32_t ComponentNode::OnEvent(OMX_EVENTTYPE event, uint32_t data1, uint32_t dat
 
 int32_t ComponentNode::OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer)
 {
+    std::shared_lock<std::shared_mutex> lk(callbackMutex_);
     if ((omxCallback_ == nullptr) || (buffer == nullptr)) {
         HDF_LOGE("%{public}s error, omxCallback_ or buffer is null", __func__);
         return OMX_ErrorNone;
@@ -289,6 +292,7 @@ int32_t ComponentNode::OnEmptyBufferDone(OMX_BUFFERHEADERTYPE *buffer)
 
 int32_t ComponentNode::OnFillBufferDone(OMX_BUFFERHEADERTYPE *buffer)
 {
+    std::shared_lock<std::shared_mutex> lk(callbackMutex_);
     if ((omxCallback_ == nullptr) || (buffer == nullptr)) {
         HDF_LOGE("%{public}s error, omxCallback_ or buffer is null", __func__);
         return OMX_ErrorNone;
@@ -339,9 +343,12 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, struct OmxCodecBuffer &buff
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
     codecBuffer->SetBufferId(bufferId);
-    codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
-    bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
-    bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
+    {
+        std::lock_guard<std::mutex> lk(mutex_);
+        codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
+        bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
+        bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
+    }
     return err;
 }
 
@@ -368,9 +375,12 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, struct OmxCodecBuffer 
 
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
-    codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
-    bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
-    bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
+    {
+        std::lock_guard<std::mutex> lk(mutex_);
+        codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
+        bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
+        bufferHeaderPortMap_.emplace(std::make_pair(bufferHdrType, portIndex));
+    }
     return OMX_ErrorNone;
 }
 
@@ -506,6 +516,7 @@ sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *bu
 bool ComponentNode::GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBuffer,
                                   OMX_BUFFERHEADERTYPE *&bufferHdrType)
 {
+    std::lock_guard<std::mutex> lk(mutex_);
     auto iter = codecBufferMap_.find(bufferId);
     if ((iter == codecBufferMap_.end()) || (iter->second == nullptr)) {
         HDF_LOGE("%{public}s error, can not find bufferIndo by bufferID [%{public}d]", __func__, bufferId);

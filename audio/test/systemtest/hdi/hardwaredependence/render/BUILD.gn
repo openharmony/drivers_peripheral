@@ -30,16 +30,15 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/hal/hdi_passthrough/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/osal/include",
-      "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/include/core",
       "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
       "//third_party/googletest/googletest/include/gtest",
       "//drivers/peripheral/audio/test/systemtest/hdi/hardwaredependence/render/include",
     ]
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+    public_deps = [
+      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
+    ]
     if (!drivers_peripheral_audio_rich_device) {
       defines = [ "FEATURE_SMALL_DEVICE" ]
     }

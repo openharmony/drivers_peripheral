@@ -41,9 +41,15 @@ namespace OHOS {
         int32_t ret;
         sptr<ISensorInterface> sensorInterface = ISensorInterface::Get();
         sptr<ISensorCallback> registerCallback = new SensorRegisterAndUnregisterCallbackFuzzer();
+        if (registerCallback == nullptr) {
+            return false;
+        }
         ret = sensorInterface->Register(*(int32_t *)data, registerCallback);
         if (ret != HDF_SUCCESS) {
             registerCallback = new SensorRegisterAndUnregisterCallbackFuzzer();
+            if (registerCallback == nullptr) {
+                return false;
+            }
         }
 
         ret = sensorInterface->Unregister(*(int32_t *)data, registerCallback);

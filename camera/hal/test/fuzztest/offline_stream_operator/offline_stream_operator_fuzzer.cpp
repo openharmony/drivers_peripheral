@@ -35,7 +35,9 @@ bool CameraOfflineStreamOperatorFuzzTest(const uint8_t *rawData, size_t size)
     MessageOption option;
 
     sptr<IOfflineStreamOperator> offlineStreamOperator = new OHOS::Camera::OfflineStreamOperator();
+    CHECK_IF_PTR_NULL_RETURN_VALUE(offlineStreamOperator, false);
     sptr<OfflineStreamOperatorStub> IpcOfflineStream = new OfflineStreamOperatorStub(offlineStreamOperator);
+    CHECK_IF_PTR_NULL_RETURN_VALUE(IpcOfflineStream, false);
     
     sleep(sleepTime); // sleep two second
     IpcOfflineStream->OnRemoteRequest(code, data, reply, option);

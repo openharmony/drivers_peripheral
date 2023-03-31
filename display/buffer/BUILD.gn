@@ -12,7 +12,16 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+import("//drivers/peripheral/display/display_config.gni")
+import("//vendor/${product_company}/${product_name}/product.gni")
 
 group("display_buffer_entry") {
-  deps = [ "hdi_service:hdf_display_buffer_service" ]
+  if (drivers_peripheral_display_community) {
+    deps = [
+      "hdi_service:hdf_display_buffer_service",
+      "model:display_buffer_model",
+    ]
+  } else {
+    deps = [ "hdi_service:hdf_display_buffer_service" ]
+  }
 }

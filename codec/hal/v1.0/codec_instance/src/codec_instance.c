@@ -72,6 +72,23 @@ static int32_t PrepareInputDataBuffer(struct BufferManagerWrapper *bmWrapper,
     return HDF_SUCCESS;
 }
 
+static bool InitData(CodecBuffer **inputData, CodecBuffer **outputData)
+{
+    int32_t codecBufferSize = sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * BUFFER_COUNT;
+    *inputData = (CodecBuffer *)OsalMemCalloc(codecBufferSize);
+    if (inputData == NULL) {
+        HDF_LOGE("%{public}s: inputData is NULL!", __func__);
+        return false;
+    }
+    *outputData = (CodecBuffer *)OsalMemCalloc(codecBufferSize);
+    if (outputData == NULL) {
+        OsalMemFree(inputData);
+        HDF_LOGE("%{public}s: outputData is NULL!", __func__);
+        return false;
+    }
+    return true;
+}
+
 static void *CodecTaskThread(void *arg)
 {
     if (arg == NULL) {
@@ -86,14 +103,20 @@ static void *CodecTaskThread(void *arg)
     }
     HDF_LOGI("%{public}s: CodecTaskThread start!", __func__);
 
-    int32_t codecBufferSize = sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * BUFFER_COUNT;
-    CodecBuffer *inputData = (CodecBuffer *)OsalMemCalloc(codecBufferSize);
-    CodecBuffer *outputData = (CodecBuffer *)OsalMemCalloc(codecBufferSize);
+    CodecBuffer *inputData = NULL;
+    CodecBuffer *outputData = NULL;
     int32_t ret = HDF_FAILURE;
+    if (!InitData(&inputData, &outputData)) {
+        HDF_LOGE("%{public}s: InitData failed!", __func__);
+        return NULL;
+    }
 
     inputData->bufferCnt = BUFFER_COUNT;
     outputData->bufferCnt = BUFFER_COUNT;
     if (WaitForOutputDataBuffer(instance, outputData) != HDF_SUCCESS) {
+        OsalMemFree(inputData);
+        OsalMemFree(outputData);
+        HDF_LOGE("%{public}s: WaitForOutputDataBuffer failed!", __func__);
         return NULL;
     }
     while (instance->codecStatus == CODEC_STATUS_STARTED) {

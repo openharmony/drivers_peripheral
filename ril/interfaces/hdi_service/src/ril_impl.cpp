@@ -21,7 +21,7 @@
 namespace OHOS {
 namespace HDI {
 namespace Ril {
-namespace V1_0 {
+namespace V1_1 {
 static std::mutex mutex_;
 static sptr<IRilCallback> callback_;
 namespace {
@@ -29,7 +29,7 @@ sptr<RilImpl::RilDeathRecipient> g_deathRecipient = nullptr;
 }
 extern "C" IRil *RilImplGetInstance(void)
 {
-    using OHOS::HDI::Ril::V1_0::RilImpl;
+    using OHOS::HDI::Ril::V1_1::RilImpl;
     RilImpl *service = new (std::nothrow) RilImpl();
     if (service == nullptr) {
         return nullptr;
@@ -170,6 +170,11 @@ int32_t RilImpl::GetCallPreferenceMode(int32_t slotId, int32_t serialId)
 int32_t RilImpl::SetUssd(int32_t slotId, int32_t serialId, const std::string &str)
 {
     return TaskSchedule(&Telephony::HRilManager::SetUssd, slotId, serialId, str);
+}
+
+int32_t RilImpl::CloseUnFinishedUssd(int32_t slotId, int32_t serialId)
+{
+    return TaskSchedule(&Telephony::HRilManager::CloseUnFinishedUssd, slotId, serialId);
 }
 
 int32_t RilImpl::GetUssd(int32_t slotId, int32_t serialId)
@@ -667,7 +672,7 @@ int32_t RilImpl::Init()
     }
     return HDF_SUCCESS;
 }
-} // namespace V1_0
+} // namespace V1_1
 } // namespace Ril
 } // namespace HDI
 } // namespace OHOS

@@ -43,7 +43,6 @@ public:
     int32_t GetDisplayProperty(uint32_t devId, uint32_t id, uint64_t& value) override;
     int32_t GetDisplayCompChange(uint32_t devId, std::vector<uint32_t>& layers, std::vector<int32_t>& type) override;
     int32_t SetDisplayClientCrop(uint32_t devId, const IRect& rect) override;
-    int32_t SetDisplayClientDestRect(uint32_t devId, const IRect& rect) override;
     int32_t SetDisplayVsyncEnabled(uint32_t devId, bool enabled) override;
     int32_t RegDisplayVBlankCallback(uint32_t devId, const sptr<IVBlankCallback>& cb) override;
     int32_t GetDisplayReleaseFence(

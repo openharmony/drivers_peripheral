@@ -23,7 +23,7 @@
 
 #include "hdf_base.h"
 #include "securec.h"
-#include "utils/hdf_log.h"
+#include "hdf_log.h"
 #include "thermal_log.h"
 
 #define HDF_LOG_TAG ThermalDeviceMitigation
@@ -67,7 +67,7 @@ int32_t ThermalDeviceMitigation::OpenSysfsFile(std::string filePath, int32_t fla
 
     ret = open(filePath.c_str(), flags);
     if (ret < NUM_ZERO) {
-        THERMAL_HILOGE(COMP_HDI, "failed to open file %{private}s", filePath.c_str());
+        THERMAL_HILOGE(COMP_HDI, "failed to open file");
         return ret;
     }
     return ret;
@@ -79,7 +79,7 @@ int32_t ThermalDeviceMitigation::WriteSysfsFile(std::string filePath, std::strin
     file.close();
     int32_t fd = OpenSysfsFile(filePath.c_str(), O_RDWR);
     if (fd < NUM_ZERO) {
-        THERMAL_HILOGE(COMP_HDI, "failed to open %{private}s", filePath.c_str());
+        THERMAL_HILOGE(COMP_HDI, "failed to open SysfsFile");
         return HDF_ERR_IO;
     }
     int32_t ret = WriteSysfsFd(fd, buf.c_str(), bytesSize);

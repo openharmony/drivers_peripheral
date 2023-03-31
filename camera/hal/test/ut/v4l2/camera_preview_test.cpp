@@ -90,6 +90,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_003, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
     EXPECT_EQ(true, display_->rc != HDI::Camera::V1_0::NO_ERROR);
@@ -181,6 +182,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_020, TestSize.Level1)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -234,6 +236,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_021, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
     CAMERA_LOGD("CreateStreams's RetCode = %{public}d", display_->rc);
@@ -275,6 +278,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_022, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -328,6 +332,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_023, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -371,6 +376,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_025, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -413,6 +419,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_027, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -456,6 +463,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_030, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -581,6 +589,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_034, TestSize.Level2)
     streamInfo.intent_ = POST_VIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -634,6 +643,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_035, TestSize.Level2)
     streamInfo.intent_ = ANALYZE;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -685,6 +695,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_036, TestSize.Level2)
     streamInfo.intent_ = CUSTOM;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -728,6 +739,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_037, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = false;
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -772,6 +784,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_038, TestSize.Level2)
     streamInfo.tunneledMode_ = 0;
     streamInfo.minFrameDuration_ = -1;
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -813,6 +826,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_039, TestSize.Level2)
     streamInfo.tunneledMode_ = 0;
     streamInfo.minFrameDuration_ = 2147483647;
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -852,6 +866,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_040, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 0;
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -919,6 +934,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_060, TestSize.Level1)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -974,6 +990,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_061, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -1054,6 +1071,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_070, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -1113,6 +1131,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_071, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
@@ -1271,6 +1290,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_080, TestSize.Level2)
     streamInfo.intent_ = PREVIEW;
     streamInfo.tunneledMode_ = 5; // 5:tunnel mode
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
     std::vector<StreamInfo>().swap(streamInfos);
     streamInfos.push_back(streamInfo);
     display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);

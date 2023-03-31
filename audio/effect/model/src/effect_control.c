@@ -16,9 +16,8 @@
 #include "effect_core.h"
 #include "hdf_base.h"
 #include "hdf_log.h"
-#include "osal_mem.h"
 
-#define HDF_LOG_TAG HDF_EFFECT
+#define HDF_LOG_TAG HDF_AUDIO_EFFECT
 
 int32_t EffectControlEffectProcess(struct IEffectControl *self, const struct AudioEffectBuffer *input,
      struct AudioEffectBuffer *output)
@@ -63,7 +62,7 @@ int32_t EffectGetOwnDescriptor(struct IEffectControl *self, struct EffectControl
     }
 
     struct ControllerManager *manager = (struct ControllerManager *)self;
-    if (manager->ctrlOps == NULL || manager->ctrlOps->GetEffectDescriptor) {
+    if (manager->ctrlOps == NULL || manager->ctrlOps->GetEffectDescriptor == NULL) {
         HDF_LOGE("%{public}s: controller has no options", __func__);
         return HDF_FAILURE;
     }

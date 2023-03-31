@@ -16,5 +16,8 @@ import("//build/test.gni")
 
 group("hdf_test_power") {
   testonly = true
-  deps = [ "unittest:hdi_unittest_power" ]
+  deps = [
+    "unittest:hdi_unittest_power",
+    "unittest:hdi_unittest_power_runninglock",
+  ]
 }

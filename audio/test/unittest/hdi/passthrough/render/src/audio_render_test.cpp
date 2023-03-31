@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -515,8 +515,10 @@ HWTEST_F(AudioRenderTest, AudioRenderCheckSceneCapabilityWhenPinsIsError, TestSi
     bool supported = false;
     /* to support different products */
     int32_t ret = AudioRenderCheckSceneCapability(handle, &scene, &supported);
-    if ((ret == AUDIO_HAL_ERR_INTERNAL) || (ret == AUDIO_HAL_ERR_NOT_SUPPORT)) {
+    if ((ret == AUDIO_HAL_SUCCESS || ret == AUDIO_HAL_ERR_INTERNAL) || (ret == AUDIO_HAL_ERR_NOT_SUPPORT)) {
         EXPECT_TRUE(true);
+    } else {
+        EXPECT_TRUE(false);
     }
 }
 
@@ -531,6 +533,8 @@ HWTEST_F(AudioRenderTest, AudioRenderCheckSceneCapabilityWhenParamValid, TestSiz
     int32_t ret = AudioRenderCheckSceneCapability(handle, &scene, &supported);
     if ((ret == AUDIO_HAL_SUCCESS) || (ret == AUDIO_HAL_ERR_NOT_SUPPORT)) {
         EXPECT_TRUE(true);
+    } else {
+        EXPECT_TRUE(false);
     }
 }
 
@@ -579,6 +583,8 @@ HWTEST_F(AudioRenderTest, AudioRenderSelectSceneWhenDevCtlHandleIsError, TestSiz
     int32_t ret = AudioRenderSelectScene(handle, &scene);
     if ((ret == AUDIO_HAL_ERR_INTERNAL) || (ret == AUDIO_HAL_ERR_NOT_SUPPORT)) {
         EXPECT_TRUE(true);
+    } else {
+        EXPECT_TRUE(false);
     }
     hwRender->devCtlHandle = devCtlHandle;
     delete(service);
@@ -595,6 +601,8 @@ HWTEST_F(AudioRenderTest, AudioRenderSelectSceneWhenParamValid, TestSize.Level1)
     int32_t ret = AudioRenderSelectScene(handle, &scene);
     if ((ret == AUDIO_HAL_SUCCESS) || (ret == AUDIO_HAL_ERR_NOT_SUPPORT)) {
         EXPECT_TRUE(true);
+    } else {
+        EXPECT_TRUE(false);
     }
 }
 

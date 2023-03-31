@@ -30,6 +30,7 @@ public:
     struct IAudioRender *render = nullptr;
     struct IAudioAdapter *adapter = nullptr;
     static TestAudioManager *manager;
+    uint32_t renderId_ = 0;
 };
 
 TestAudioManager *AudioIdlHdiRenderControlTest::manager = nullptr;
@@ -51,13 +52,13 @@ void AudioIdlHdiRenderControlTest::TearDownTestCase(void)
 void AudioIdlHdiRenderControlTest::SetUp(void)
 {
     ASSERT_NE(nullptr, manager);
-    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render);
+    int32_t ret = AudioCreateRender(manager, PIN_OUT_SPEAKER, ADAPTER_NAME, &adapter, &render, &renderId_);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
 void AudioIdlHdiRenderControlTest::TearDown(void)
 {
-    int32_t ret = ReleaseRenderSource(manager, adapter, render);
+    int32_t ret = ReleaseRenderSource(manager, adapter, render, renderId_);
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 

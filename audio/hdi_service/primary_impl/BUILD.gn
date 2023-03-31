@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,40 +15,61 @@ import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
-ohos_shared_library("audio_primary_impl") {
-  sources = [
-    "src/audio_adapter.c",
-    "src/audio_adapter_info_common.c",
-    "src/audio_capture.c",
-    "src/audio_common.c",
-    "src/audio_manager.c",
-    "src/audio_render.c",
-  ]
-
-  include_dirs = [
-    "//drivers/peripheral/audio/hdi_service/primary_impl/include",
-    "//drivers/peripheral/audio/hdi_service/pathselect/include",
-    "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-    "//drivers/peripheral/audio/supportlibs/interfaces/include",
-    "//third_party/bounds_checking_function/include",
-    "//drivers/hdf_core/adapter/uhdf2/shared/include",
-    "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
-  ]
+ohos_shared_library("audio_primary_impl_vendor") {
   defines = []
-  if (drivers_peripheral_audio_hal_notsupport_pathselect) {
-    defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
+  if (drivers_peripheral_audio_community) {
+    sources = [
+      "src/audio_adapter.c",
+      "src/audio_adapter_info_common.c",
+      "src/audio_capture.c",
+      "src/audio_common.c",
+      "src/audio_manager.c",
+      "src/audio_render.c",
+    ]
+
+    include_dirs = [
+      "//drivers/peripheral/audio/hdi_service/primary_impl/include",
+      "//drivers/peripheral/audio/hdi_service/pathselect/include",
+      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
+      "//drivers/peripheral/audio/supportlibs/interfaces/include",
+      "//third_party/bounds_checking_function/include",
+      "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
+    ]
+
+    if (drivers_peripheral_audio_hal_notsupport_pathselect) {
+      defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
+    }
+  } else {
+    sources = [
+      "vendor_src/audio_adapter_vendor.c",
+      "vendor_src/audio_capture_vendor.c",
+      "vendor_src/audio_common_vendor.c",
+      "vendor_src/audio_manager_vendor.c",
+      "vendor_src/audio_render_vendor.c",
+    ]
+
+    include_dirs = [
+      "//drivers/peripheral/audio/hdi_service/primary_impl/vendor_include/include",
+      "//third_party/bounds_checking_function/include",
+      "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
+    ]
   }
 
   if (enable_audio_hal_hdf_log) {
     defines += [ "AUDIO_HDF_LOG" ]
   }
 
+  if (use_jemalloc && use_jemalloc_dfx_intf) {
+    defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
+  }
+
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
       "drivers_interface_audio:audio_idl_headers",
-      "hdf_core:libhdf_utils",
+      "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdi",
+      "hdf_core:libpub_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {

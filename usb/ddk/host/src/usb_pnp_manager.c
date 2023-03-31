@@ -20,7 +20,6 @@
 #include "ddk_device_manager.h"
 #include "ddk_pnp_listener_mgr.h"
 #include "ddk_uevent_handle.h"
-#include "devsvc_manager_clnt.h"
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_device_object.h"

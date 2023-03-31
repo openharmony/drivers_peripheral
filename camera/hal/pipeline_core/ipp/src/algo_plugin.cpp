@@ -101,12 +101,12 @@ RetCode AlgoPlugin::Process(std::shared_ptr<IBuffer>& outBuffer,
         }
     }
 
-    IppAlgoBuffer** inAlgoBuffers = new IppAlgoBuffer* [inBuffers.size()];
+    IppAlgoBuffer** inAlgoBuffers = new(std::nothrow) IppAlgoBuffer* [inBuffers.size()];
     for (uint32_t i = 0; i < inBuffers.size(); i++) {
         if (inBuffers[i] == nullptr) {
             inAlgoBuffers[i] = nullptr;
         } else {
-            inAlgoBuffers[i] = new IppAlgoBuffer();
+            inAlgoBuffers[i] = new(std::nothrow) IppAlgoBuffer();
             inAlgoBuffers[i]->addr = inBuffers[i]->GetVirAddress();
             inAlgoBuffers[i]->size = inBuffers[i]->GetSize();
             inAlgoBuffers[i]->width = inBuffers[i]->GetWidth();

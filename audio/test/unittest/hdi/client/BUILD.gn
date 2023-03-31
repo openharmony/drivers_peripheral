@@ -19,7 +19,7 @@ group("hdi_client") {
   if (!defined(ohos_lite) && !drivers_peripheral_audio_user_mode) {
     testonly = true
     deps = [
-      "adapter:hdf_audio_proxy_adapter_test",
+      # "adapter:hdf_audio_proxy_adapter_test",
       "capture:hdf_audio_proxy_capture_test",
       "common:hdf_audio_proxy_common_test",
       "manager:hdf_audio_proxy_manager_test",

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,6 +46,7 @@ sptr<ICameraHost> TestDisplay::CameraHostImplGetInstance(void)
     }
 
     service->Init();
+    sleep(3); // 3:sleep three second
     return service;
 }
 
@@ -367,11 +368,6 @@ void TestDisplay::BufferCallback(unsigned char* addr, int choice)
 
 void TestDisplay::Init()
 {
-    std::shared_ptr<OHOS::Camera::IDeviceManager> deviceManager = OHOS::Camera::IDeviceManager::GetInstance();
-    if (!initFlag) {
-        deviceManager->Init();
-        initFlag = 1;
-    }
     CAMERA_LOGD("TestDisplay::Init().");
     if (cameraHost == nullptr) {
         constexpr const char *DEMO_SERVICE_NAME = "camera_service";
@@ -409,11 +405,6 @@ void TestDisplay::Init()
 
 void TestDisplay::UsbInit()
 {
-    std::shared_ptr<OHOS::Camera::IDeviceManager> deviceManager = OHOS::Camera::IDeviceManager::GetInstance();
-    if (!initFlag) {
-        deviceManager->Init();
-        initFlag = 1;
-    }
     if (cameraHost == nullptr) {
         constexpr const char *DEMO_SERVICE_NAME = "camera_service";
         cameraHost = ICameraHost::Get(DEMO_SERVICE_NAME, false);
@@ -432,6 +423,31 @@ void TestDisplay::UsbInit()
     } else {
         std::cout << "==========[test log] SetCallback success." << std::endl;
     }
+}
+
+std::shared_ptr<CameraAbility> TestDisplay::GetCameraAbility()
+{
+    if (cameraDevice == nullptr) {
+        OHOS::Camera::RetCode ret = cameraHost->GetCameraIds(cameraIds);
+        if (ret != HDI::Camera::V1_0::NO_ERROR) {
+            std::cout << "==========[test log]GetCameraIds failed." << std::endl;
+            return ability;
+        } else {
+            std::cout << "==========[test log]GetCameraIds success." << std::endl;
+        }
+        if (cameraIds.size() == 0) {
+            std::cout << "==========[test log]camera device list is empty." << std::endl;
+            return ability;
+        }
+        if (cameraIds.size() > 1) {
+            ret = cameraHost->GetCameraAbility(cameraIds.back(), ability_);
+            if (ret != HDI::Camera::V1_0::NO_ERROR) {
+                std::cout << "==========[test log]GetCameraAbility failed, rc = " << rc << std::endl;
+            }
+            MetadataUtils::ConvertVecToMetadata(ability_, ability);
+        }
+    }
+    return ability;
 }
 
 void TestDisplay::Close()
@@ -492,6 +508,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoPre.intent_ = intent;
             streamInfoPre.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoPre.bufferQueue_ = new BufferProducerSequenceable(streamCustomerPreview_->CreateProducer());
+            ASSERT_NE(streamInfoPre.bufferQueue_, nullptr);
             streamInfoPre.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
             CAMERA_LOGD("preview success.");
             std::vector<StreamInfo>().swap(streamInfos);
@@ -509,6 +526,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoVideo.encodeType_ = ENCODE_TYPE_H264;
             streamInfoVideo.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoVideo.bufferQueue_ = new BufferProducerSequenceable(streamCustomerVideo_->CreateProducer());
+            ASSERT_NE(streamInfoVideo.bufferQueue_, nullptr);
             streamInfoVideo.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
             CAMERA_LOGD("video success.");
             std::vector<StreamInfo>().swap(streamInfos);
@@ -526,6 +544,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoCapture.encodeType_ = ENCODE_TYPE_JPEG;
             streamInfoCapture.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoCapture.bufferQueue_ = new BufferProducerSequenceable(streamCustomerCapture_->CreateProducer());
+            ASSERT_NE(streamInfoCapture.bufferQueue_, nullptr);
             streamInfoCapture.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
             CAMERA_LOGD("capture success.");
             std::vector<StreamInfo>().swap(streamInfos);
@@ -542,6 +561,7 @@ void TestDisplay::StartStream(std::vector<StreamIntent> intents)
             streamInfoAnalyze.intent_ = intent;
             streamInfoAnalyze.tunneledMode_ = 5; // 5:tunnel mode
             streamInfoAnalyze.bufferQueue_ = new BufferProducerSequenceable(streamCustomerAnalyze_->CreateProducer());
+            ASSERT_NE(streamInfoAnalyze.bufferQueue_, nullptr);
             streamInfoAnalyze.bufferQueue_->producer_->SetQueueSize(8); // 8:set bufferQueue size
             CAMERA_LOGD("analyze success.");
             std::vector<StreamInfo>().swap(streamInfos);

@@ -42,6 +42,14 @@ ThermalHdfTimer::ThermalHdfTimer(const std::shared_ptr<ThermalSimulationNode> &n
     reportTime_ = 0;
 }
 
+ThermalHdfTimer::~ThermalHdfTimer()
+{
+    isRunning_ = false;
+    if (callbackThread_->joinable()) {
+        callbackThread_->join();
+    }
+}
+
 void ThermalHdfTimer::SetThermalEventCb(const sptr<IThermalCallback> &thermalCb)
 {
     thermalCb_ = thermalCb;
@@ -81,9 +89,9 @@ void ThermalHdfTimer::TimerProviderCallback()
     return;
 }
 
-int32_t ThermalHdfTimer::LoopingThreadEntry()
+void ThermalHdfTimer::LoopingThreadEntry()
 {
-    while (true) {
+    while (isRunning_) {
         std::this_thread::sleep_for(std::chrono::seconds(thermalZoneMgr_->maxCd_ / MS_PER_SECOND));
         TimerProviderCallback();
     }
@@ -91,7 +99,7 @@ int32_t ThermalHdfTimer::LoopingThreadEntry()
 
 void ThermalHdfTimer::Run()
 {
-    std::make_unique<std::thread>(&ThermalHdfTimer::LoopingThreadEntry, this)->detach();
+    callbackThread_ = std::make_unique<std::thread>(&ThermalHdfTimer::LoopingThreadEntry, this);
 }
 
 void ThermalHdfTimer::StartThread()
@@ -146,12 +154,10 @@ void ThermalHdfTimer::DumpSensorConfigInfo()
                 tzIter.replace.c_str());
         }
         for (auto tnIter : sensorIter.second->GetXMLThermalNodeInfo()) {
-            THERMAL_HILOGI(COMP_HDI, "type %{public}s, path %{private}s", tnIter.type.c_str(),
-                tnIter.path.c_str());
+            THERMAL_HILOGI(COMP_HDI, "type %{public}s", tnIter.type.c_str());
         }
         for (auto dataIter : sensorIter.second->thermalDataList_) {
-            THERMAL_HILOGI(COMP_HDI, "data type %{public}s, data temp path %{private}s", dataIter.type.c_str(),
-                dataIter.tempPath.c_str());
+            THERMAL_HILOGI(COMP_HDI, "data type %{public}s", dataIter.type.c_str());
         }
     }
 }

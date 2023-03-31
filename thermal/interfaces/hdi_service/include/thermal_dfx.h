@@ -16,10 +16,12 @@
 #ifndef THERMAL_DFX_H
 #define THERMAL_DFX_H
 
+#include <atomic>
+#include <fstream>
 #include <map>
 #include <memory>
-#include <fstream>
 #include <string>
+#include <thread>
 #include "thermal_hdf_config.h"
 
 namespace OHOS {
@@ -29,7 +31,7 @@ namespace V1_0 {
 class ThermalDfx {
 public:
     ThermalDfx() {}
-    ~ThermalDfx() {}
+    ~ThermalDfx();
 
     int32_t Init();
 private:
@@ -44,8 +46,10 @@ private:
     void CompressFile();
     static void InfoChangedCallback(const char* key, const char* value, void* context);
     bool PrepareWriteDfxLog();
-    int32_t LoopingThreadEntry();
+    void LoopingThreadEntry();
     std::string GetFileNameIndex(const uint32_t index);
+    std::atomic_bool isRunning_ {true};
+    std::unique_ptr<std::thread> logThread_ {nullptr};
 };
 } // V1_0
 } // Thermal
