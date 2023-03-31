@@ -20,7 +20,6 @@
 #include "v1_0/ieffect_control.h"
 #include "v1_0/ieffect_model.h"
 #include "effect_common.h"
-#include "effect_core.h"
 #include "osal_mem.h"
 
 using namespace std;
@@ -161,7 +160,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandInit001, TestSize.Level1)
     int8_t input[SEND_COMMAND_LEN] = {0};
     int8_t output[GET_BUFFER_LEN] = {0};
     uint32_t replyLen = GET_BUFFER_LEN;
-    
+
     int32_t ret = controller_->SendCommand(controller_, AUDIO_EFFECT_COMMAND_INIT_CONTOLLER,
                                            input, SEND_COMMAND_LEN, output, &replyLen);
     EXPECT_EQ(ret, HDF_SUCCESS);
@@ -178,7 +177,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandSetConf001, TestSize.Level1)
     int8_t input[SEND_COMMAND_LEN] = {0};
     int8_t output[GET_BUFFER_LEN] = {0};
     uint32_t replyLen = GET_BUFFER_LEN;
-    
+
     int32_t ret = controller_->SendCommand(controller_, AUDIO_EFFECT_COMMAND_SET_CONFIG,
                                            input, SEND_COMMAND_LEN, output, &replyLen);
     EXPECT_EQ(ret, HDF_SUCCESS);
@@ -195,7 +194,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandGetConf001, TestSize.Level1)
     int8_t input[SEND_COMMAND_LEN] = {0};
     int8_t output[GET_BUFFER_LEN] = {0};
     uint32_t replyLen = GET_BUFFER_LEN;
-    
+
     int32_t ret = controller_->SendCommand(controller_, AUDIO_EFFECT_COMMAND_GET_CONFIG,
                                            input, SEND_COMMAND_LEN, output, &replyLen);
     EXPECT_EQ(ret, HDF_SUCCESS);
@@ -212,7 +211,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandRest001, TestSize.Level1)
     int8_t input[SEND_COMMAND_LEN] = {0};
     int8_t output[GET_BUFFER_LEN] = {0};
     uint32_t replyLen = GET_BUFFER_LEN;
-    
+
     int32_t ret = controller_->SendCommand(controller_, AUDIO_EFFECT_COMMAND_RESET,
                                            input, SEND_COMMAND_LEN, output, &replyLen);
     EXPECT_EQ(ret, HDF_SUCCESS);
@@ -229,7 +228,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandEnable001, TestSize.Level1)
     int8_t input[SEND_COMMAND_LEN] = {0};
     int8_t output[GET_BUFFER_LEN] = {0};
     uint32_t replyLen = GET_BUFFER_LEN;
-    
+
     int32_t ret = controller_->SendCommand(controller_, AUDIO_EFFECT_COMMAND_ENABLE,
                                            input, SEND_COMMAND_LEN, output, &replyLen);
     EXPECT_EQ(ret, HDF_SUCCESS);
@@ -262,7 +261,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandSetParam001, TestSize.Level1)
     int8_t input[SEND_COMMAND_LEN] = {0};
     int8_t output[GET_BUFFER_LEN] = {0};
     uint32_t replyLen = GET_BUFFER_LEN;
-    
+
     int32_t ret = controller_->SendCommand(controller_, AUDIO_EFFECT_COMMAND_SET_PARAM,
                                            input, SEND_COMMAND_LEN, output, &replyLen);
     EXPECT_EQ(ret, HDF_SUCCESS);
@@ -279,7 +278,7 @@ HWTEST_F(EffectControlTest, HdfAudioSendCommandGetParam001, TestSize.Level1)
     int8_t input[SEND_COMMAND_LEN] = {0};
     int8_t output[GET_BUFFER_LEN] = {0};
     uint32_t replyLen = GET_BUFFER_LEN;
-    
+
     int32_t ret = controller_->SendCommand(controller_, AUDIO_EFFECT_COMMAND_GET_PARAM,
                                            input, SEND_COMMAND_LEN, output, &replyLen);
     EXPECT_EQ(ret, HDF_SUCCESS);
@@ -309,7 +308,7 @@ HWTEST_F(EffectControlTest, HdfAudioGetDescriptor002, TestSize.Level1)
 {
     struct EffectControllerDescriptor desc;
     int32_t ret = controller_->GetEffectDescriptor(controller_, &desc);
-    EXPECT_EQ(ret, HDF_SUCCESS);
+    ASSERT_EQ(ret, HDF_SUCCESS);
     EXPECT_STREQ(desc.effectId, effectId_);
     EXPECT_STREQ(desc.effectName, "mock_effect");
     EXPECT_STREQ(desc.libName, libName_);
