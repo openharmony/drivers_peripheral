@@ -41,13 +41,15 @@
     },
     "build": {
       "sub_component": [
-        "//drivers/peripheral/audio:hdi_audio"
+        "//drivers/peripheral/audio:hdi_audio",
+        "//drivers/peripheral/audio/effect:effect_model"
       ],
       "test": [
         "//drivers/peripheral/audio/test:audio_test_entry",
         "//drivers/peripheral/audio/test/sample:audio_sample",
         "//drivers/peripheral/audio/test/sample:idl_audio_sample",
-        "//drivers/peripheral/audio/test/audio_utils/audio_mixer:audio_mixer"
+        "//drivers/peripheral/audio/test/audio_utils/audio_mixer:audio_mixer",
+        "//drivers/peripheral/audio/effect/test:effect_test"
       ],
       "inner_kits":[
         {
