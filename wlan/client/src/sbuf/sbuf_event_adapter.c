@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,6 +25,8 @@
 extern "C" {
 #endif
 #endif
+
+WifiScanResults g_scanResults = { 0 };
 
 static void WifiEventNewStaProcess(const char *ifName, uint32_t event, struct HdfSBuf *reqData)
 {
@@ -100,6 +102,10 @@ static void WifiEventScanDoneProcess(const char *ifName, uint32_t event, struct 
         HDF_LOGE("%s: fail to get status", __FUNCTION__);
         return;
     }
+    if (g_scanResults.num != 0) {
+        WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &g_scanResults);
+        (void)memset_s(&g_scanResults, sizeof(WifiScanResults), 0, sizeof(WifiScanResults));
+    }
     WifiEventReport(ifName, event, &status);
 }
 
@@ -141,6 +147,16 @@ static void WifiEventScanResultProcess(const char *ifName, uint32_t event, struc
         return;
     }
     WifiEventReport(ifName, event, &scanResult);
+    if (memcpy_s(&g_scanResults.scanResult[g_scanResults.num], sizeof(WifiScanResult), &scanResult,
+        sizeof(WifiScanResult)) != EOK) {
+        HDF_LOGE("%s: memcpy_s fail", __FUNCTION__);
+        return;
+    }
+    g_scanResults.num++;
+    if (g_scanResults.num == MAX_SCAN_RES_NUM) {
+        WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &g_scanResults);
+        (void)memset_s(&g_scanResults, sizeof(WifiScanResults), 0, sizeof(WifiScanResults));
+    }
 }
 
 static void WifiEventConnectResultProcess(const char *ifName, uint32_t event, struct HdfSBuf *reqData)

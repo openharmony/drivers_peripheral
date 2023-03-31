@@ -751,30 +751,31 @@ static bool IsWifiIface(const char *name)
 
 static int32_t GetAllIfaceInfo(struct NetworkInfoResult *infoResult)
 {
-    struct dirent *de;
-    DIR *dir = opendir(NET_DEVICE_INFO_PATH);
-    if (dir == NULL) {
+    struct dirent **namelist = NULL;
+    char *ifName = NULL;
+    int32_t num;
+    int32_t i;
+    int32_t ret = RET_CODE_SUCCESS;
+
+    num = scandir(NET_DEVICE_INFO_PATH, &namelist, NULL, alphasort);
+    if (num < 0) {
+        HILOG_ERROR(LOG_CORE, "%s: scandir failed, errno = %d, %s", __FUNCTION__, errno, strerror(errno));
         return RET_CODE_FAILURE;
     }
     infoResult->nums = 0;
-    while ((de = readdir(dir))) {
-        if (de->d_name[0] == '.') {
-            continue;
-        }
-        if (IsWifiIface(de->d_name)) {
-            if (strncpy_s(infoResult->infos[infoResult->nums].name, IFNAMSIZ, de->d_name, sizeof(de->d_name)) != EOK) {
+    for (i = 0; i < num; i++) {
+        if (infoResult->nums < MAX_IFACE_NUM && IsWifiIface(namelist[i]->d_name)) {
+            ifName = infoResult->infos[infoResult->nums].name;
+            if (strncpy_s(ifName, IFNAMSIZ, namelist[i]->d_name, strlen(namelist[i]->d_name)) != EOK) {
                 HILOG_ERROR(LOG_CORE, "%s: strncpy_s infoResult->infos failed", __FUNCTION__);
-                closedir(dir);
-                return RET_CODE_FAILURE;
+                ret = RET_CODE_FAILURE;
             }
             infoResult->nums++;
         }
+        free(namelist[i]);
     }
-    closedir(dir);
-    if (infoResult->nums == 0) {
-        return RET_CODE_NOT_AVAILABLE;
-    }
-    return RET_CODE_SUCCESS;
+    free(namelist);
+    return ret;
 }
 
 int32_t GetUsableNetworkInfo(struct NetworkInfoResult *result)

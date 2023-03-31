@@ -26,6 +26,4 @@ ohos_fuzztest("CameraStreamOperatorFuzzTest") {
     "../common/src/common.cpp",
     "stream_operator_fuzzer.cpp",
   ]
-
-  external_deps += [ "hdf_core:libhdf_ipc_adapter" ]
 }

@@ -27,13 +27,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//third_party/googletest/googletest/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/hdf_core/framework/include/platform",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/adapter/uhdf/posix/include",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/include",
-      "//drivers/hdf_core/framework/test/unittest/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "//drivers/peripheral/input/hal/include",
       "//drivers/peripheral/input/interfaces/include",
@@ -55,15 +48,15 @@ if (defined(ohos_lite)) {
         "-Wno-format-extra-args",
       ]
     }
-    deps = [
+    public_deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//drivers/peripheral/input/hal:hdi_input",
+      "//third_party/bounds_checking_function:libsec_shared",
     ]
-    public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
   }
 } else {
   module_output_path = "drivers_peripheral_input/input"

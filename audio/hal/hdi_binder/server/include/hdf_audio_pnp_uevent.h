@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,10 +16,11 @@
 #ifndef HDF_AUDIO_PNP_UEVENT_H
 #define HDF_AUDIO_PNP_UEVENT_H
 
+#include "hdf_device_desc.h"
 #include "hdf_types.h"
 
 /* start uevent to monitor USB headset/headphone */
 int32_t AudioUsbPnpUeventStartThread(void);
 void AudioUsbPnpUeventStopThread(void);
-
+void DetectAudioDevice(struct HdfDeviceObject *device);
 #endif

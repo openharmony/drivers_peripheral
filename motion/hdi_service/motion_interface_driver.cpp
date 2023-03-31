@@ -71,6 +71,7 @@ static int32_t HdfMotionInterfaceDriverBind(struct HdfDeviceObject *deviceObject
     auto serviceImpl = IMotionInterface::Get(true);
     if (serviceImpl == nullptr) {
         HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        delete hdfMotionInterfaceHost;
         return HDF_FAILURE;
     }
 
@@ -78,6 +79,7 @@ static int32_t HdfMotionInterfaceDriverBind(struct HdfDeviceObject *deviceObject
         IMotionInterface::GetDescriptor());
     if (hdfMotionInterfaceHost->stub == nullptr) {
         HDF_LOGE("%{public}s: failed to get stub object", __func__);
+        delete hdfMotionInterfaceHost;
         return HDF_FAILURE;
     }
 

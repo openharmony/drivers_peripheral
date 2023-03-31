@@ -14,7 +14,8 @@
     "subsystem": "hdf",
     "features": [
       "drivers_peripheral_codec_support_omx",
-      "drivers_peripheral_codec_support_role"
+      "drivers_peripheral_codec_support_role",
+      "drivers_peripheral_codec_use_omx"
     ],
     "syscap": [ "" ],
     "adapter_system_type": ["standard"],
@@ -39,7 +40,22 @@
       ],
       "test": [
         "//drivers/peripheral/codec/test:hdf_test_media_codec"
-      ]
+      ],
+      "inner_kits": [
+        {
+          "name": "//drivers/peripheral/codec/hal:libcodec_hdi_omx_client",
+            "header": {
+              "header_files": [
+                "codec_callback_if.h",
+                "codec_component_if.h",
+                "codec_component_manager.h",
+                "codec_component_type.h",
+                "codec_omx_ext.h"
+              ],
+              "header_base": "//drivers/peripheral/codec/interfaces/include"
+          }
+        }
+    ]
     }
   }
 }

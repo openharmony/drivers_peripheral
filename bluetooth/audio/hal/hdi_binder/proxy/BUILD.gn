@@ -78,8 +78,8 @@ ohos_shared_library("audio_bluetooth_hdi_proxy_server") {
     external_deps = [
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
-      "hdf_core:libhdf_utils",
       "hdf_core:libhdi",
+      "hdf_core:libpub_utils",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {

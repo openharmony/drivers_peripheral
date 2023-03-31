@@ -77,6 +77,7 @@ void MetaDataTest::SetStreamInfo(StreamInfo &streamInfo, const std::shared_ptr<S
     streamInfo.tunneledMode_ = TUNNEL_MODE;
     producer = streamCustomer->CreateProducer();
     streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    CHECK_IF_PTR_NULL_RETURN_VOID(streamInfo.bufferQueue_);
     streamInfo.bufferQueue_->producer_->SetQueueSize(BUFFER_QUEUE_SIZE);
 }
 

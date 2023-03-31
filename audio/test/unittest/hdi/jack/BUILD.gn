@@ -29,21 +29,13 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "//drivers/peripheral/audio/test/unittest/hdi/jack/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-      "//drivers/hdf_core/adapter/uhdf/posix/include",
-      "//drivers/hdf_core/framework/include",
-      "//drivers/hdf_core/framework/include/core",
-      "//drivers/hdf_core/framework/include/osal",
-      "//drivers/hdf_core/framework/include/platform",
-      "//drivers/hdf_core/framework/include/utils",
-      "//drivers/hdf_core/framework/utils/include",
-      "//drivers/hdf_core/framework/test/unittest/include",
       "//drivers/peripheral/input/hal/include",
       "//drivers/peripheral/input/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//third_party/FreeBSD/sys/dev/evdev",
     ]
 
-    deps = [
+    public_deps = [
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
@@ -51,8 +43,9 @@ if (defined(ohos_lite)) {
       "//drivers/hdf_core/adapter/uhdf/test/unittest/common:hdf_test_common",
       "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio",
       "//drivers/peripheral/input/hal:hdi_input",
+      "//third_party/bounds_checking_function:libsec_shared",
     ]
-    public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+
     cflags = [
       "-Wall",
       "-Wextra",

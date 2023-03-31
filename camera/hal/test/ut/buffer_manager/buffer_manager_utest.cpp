@@ -74,6 +74,7 @@ HWTEST_F(BufferManagerTest, TestBufferQueueLoop, TestSize.Level0)
 #else
     OHOS::sptr<OHOS::IConsumerSurface> consumer = IConsumerSurface::Create();
     sptr<IBufferConsumerListener> listener = new TestBufferConsumerListener();
+    ASSERT_NE(listener, nullptr);
     consumer->RegisterConsumerListener(listener);
 
     auto producer = consumer->GetProducer();
@@ -759,9 +760,14 @@ void BufferManagerTest::Pipeline::DeliverBuffer()
 void BufferManagerTest::Pipeline::StopStream()
 {
     running = false;
-    collectThread_->join();
+    if (collectThread_ != nullptr) {
+        collectThread_->join();
+    }
 
-    localStream_->deliverThread->join();
+    CHECK_IF_PTR_NULL_RETURN_VOID(localStream_);
+    if (localStream_->deliverThread != nullptr) {
+        localStream_->deliverThread->join();
+    }
 
     BufferTracking::DeleteTrackingStream(0);
     BufferTracking::StopTracking();

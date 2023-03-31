@@ -26,6 +26,4 @@ ohos_fuzztest("CameraDeviceFuzzTest") {
     "../common/src/common.cpp",
     "camera_device_fuzzer.cpp",
   ]
-
-  external_deps += [ "hdf_core:libhdf_ipc_adapter" ]
 }

@@ -289,6 +289,19 @@ struct AudioMmapBufferDescriptor {
 };
 
 /**
+ * @brief Enumerates the restricted key type of the parameters
+ */
+enum AudioExtParamKey {
+    AUDIO_EXT_PARAM_KEY_NONE = 0,     /**< Distributed audio extra param key none */
+    AUDIO_EXT_PARAM_KEY_VOLUME = 1,   /**< Distributed audio extra param key volume event */
+    AUDIO_EXT_PARAM_KEY_FOCUS = 2,    /**< Distributed audio extra param key focus event */
+    AUDIO_EXT_PARAM_KEY_BUTTON = 3,   /**< Distributed audio extra param key media button event */
+    AUDIO_EXT_PARAM_KEY_EFFECT = 4,   /**< Distributed audio extra param key audio effect event */
+    AUDIO_EXT_PARAM_KEY_STATUS = 5,   /**< Distributed audio extra param key device status event */
+    AUDIO_EXT_PARAM_KEY_LOWPOWER = 1000, /**< Low power event type */
+};
+
+/**
  * @brief Called when an event defined in {@link AudioCallbackType} occurs.
  *
  * @param AudioCallbackType Indicates the occurred event that triggers this callback.

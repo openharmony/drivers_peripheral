@@ -15,6 +15,7 @@
 
 #include "buffer_manager.h"
 #include <sys/time.h>
+#include <cinttypes>
 #include "buffer_pool.h"
 
 namespace OHOS::Camera {
@@ -48,6 +49,10 @@ std::shared_ptr<IBufferPool> BufferManager::GetBufferPool(uint64_t id)
 
     if (bufferPoolMap_[id].expired()) {
         std::shared_ptr<IBufferPool> bufferPool = std::make_shared<BufferPool>();
+        if (bufferPool == nullptr) {
+            CAMERA_LOGE("bufferPool is nullptr id: %{public}" PRIu64 "", id);
+            return nullptr;
+        }
         bufferPoolMap_[id] = bufferPool;
         bufferPool->SetId(id);
         return bufferPool;

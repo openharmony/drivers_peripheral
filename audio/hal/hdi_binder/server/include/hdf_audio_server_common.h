@@ -18,6 +18,7 @@
 
 #include "audio_events.h"
 #include "audio_internal.h"
+#include "hdf_audio_server.h"
 #include "hdf_device_desc.h"
 #include "hdf_log.h"
 
@@ -29,6 +30,12 @@ enum AudioServerType {
     AUDIO_SERVER_USB,
     AUDIO_SERVER_A2DP,
     AUDIO_SERVER_BOTTOM
+};
+
+typedef int32_t (*AudioAllfunc)(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply);
+struct HdiServiceDispatchCmdHandleList {
+    enum AudioHdiServerCmdId cmd;
+    AudioAllfunc func;
 };
 
 /* RenderManage Info */

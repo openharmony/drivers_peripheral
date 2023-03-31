@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -273,10 +273,17 @@ HWTEST_F(HdfWlanPerformanceTest, WifiHalGetAssociatedStas001, TestSize.Level1)
     struct timespec tv1 = (struct timespec){0};
     struct timespec tv2 = (struct timespec){0};
     int timeUsed = 0;
+    uint8_t chipId = 0;
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
     EXPECT_EQ(HDF_SUCCESS, ret);
     EXPECT_NE(nullptr, apFeature);
+    ret = apFeature->baseFeature.getChipId((struct IWiFiBaseFeature *)apFeature, &chipId);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    ret = g_wifi->resetDriver(chipId, apFeature->baseFeature.ifName);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    sleep(RESET_TIME);
+
     ret = apFeature->getAssociatedStas(apFeature, nullptr, 0, nullptr);
     EXPECT_NE(HDF_SUCCESS, ret);
     clock_gettime(CLOCK_REALTIME, &tv1);

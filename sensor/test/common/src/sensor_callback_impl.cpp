@@ -95,6 +95,9 @@ namespace {
 int32_t SensorCallbackImpl::OnDataEvent(const HdfSensorEvents& event)
 {
     void *origin = OsalMemCalloc(sizeof(uint8_t) * (event.dataLen));
+    if (origin == nullptr) {
+        return HDF_FAILURE;
+    }
     uint8_t *tmp = static_cast<uint8_t*>(origin);
     uint8_t *eventData = tmp;
     for (auto value : event.data) {

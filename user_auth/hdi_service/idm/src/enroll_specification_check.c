@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -52,32 +52,38 @@ ResultCode CheckIdmOperationToken(int32_t userId, UserAuthTokenHal *authToken)
         LOG_ERROR("auth token is null");
         return RESULT_BAD_PARAM;
     }
-    if (authToken->authType != PIN_AUTH) {
+    UserAuthTokenPlain tokenPlain = {0};
+    ResultCode ret = UserAuthTokenVerify(authToken, &tokenPlain);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("UserAuthTokenVerify fail");
+        return RESULT_BAD_MATCH;
+    }
+    if (tokenPlain.tokenDataPlain.authType != PIN_AUTH) {
         LOG_ERROR("need pin token");
         return RESULT_VERIFY_TOKEN_FAIL;
     }
-    ResultCode ret = CheckChallenge(authToken->challenge, CHALLENGE_LEN);
+    ret = CheckChallenge(tokenPlain.tokenDataPlain.challenge, CHALLENGE_LEN);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("check challenge failed, token is invalid");
         return RESULT_BAD_MATCH;
     }
     int32_t userIdGet;
     ret = GetUserId(&userIdGet);
-    if (ret != RESULT_SUCCESS || userIdGet != userId) {
+    if (ret != RESULT_SUCCESS || userIdGet != userId || userIdGet != tokenPlain.tokenDataToEncrypt.userId) {
         LOG_ERROR("check userId failed");
         return RESULT_BAD_MATCH;
     }
     uint64_t secureUid;
     ret = GetSecureUid(userId, &secureUid);
-    if (ret != RESULT_SUCCESS || secureUid != authToken->secureUid) {
+    if (ret != RESULT_SUCCESS || secureUid != tokenPlain.tokenDataToEncrypt.secureUid) {
         LOG_ERROR("check secureUid failed, token is invalid");
         return RESULT_BAD_MATCH;
     }
-    if (!IsValidTokenTime(authToken->time)) {
+    if (!IsValidTokenTime(tokenPlain.tokenDataPlain.time)) {
         LOG_ERROR("check token time failed, token is invalid");
         return RESULT_VERIFY_TOKEN_FAIL;
     }
-    return UserAuthTokenVerify(authToken);
+    return RESULT_SUCCESS;
 }
 
 ResultCode CheckSpecification(int32_t userId, uint32_t authType)

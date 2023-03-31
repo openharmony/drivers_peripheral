@@ -16,7 +16,6 @@
 #define HDF_AUDIO_SERVER_H
 
 #include "audio_types.h"
-#include "hdf_device_desc.h"
 
 enum AudioHdiServerCmdId {
     /*************public*************/
@@ -115,12 +114,6 @@ typedef union {
     struct AudioMixExtInfo mix;      /* Specific mix info */
     struct AudioSessionExtInfo session; /* session specific info */
 } RouteExtInfo;
-
-typedef int32_t (*AudioAllfunc)(const struct HdfDeviceIoClient *client, struct HdfSBuf *data, struct HdfSBuf *reply);
-struct HdiServiceDispatchCmdHandleList {
-    enum AudioHdiServerCmdId cmd;
-    AudioAllfunc func;
-};
 
 #endif
 

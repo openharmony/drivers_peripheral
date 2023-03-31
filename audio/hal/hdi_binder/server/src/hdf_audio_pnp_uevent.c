@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,6 +32,7 @@
 #include "audio_uhdf_log.h"
 #include "hdf_audio_pnp_server.h"
 #include "hdf_base.h"
+#include "hdf_device_object.h"
 #include "osal_time.h"
 #include "securec.h"
 
@@ -64,7 +65,7 @@
 #define UEVENT_SOCKET_BUFF_SIZE (64 * 1024)
 #define UEVENT_SOCKET_GROUPS    0xffffffff
 #define UEVENT_MSG_LEN          2048
-
+#define AUDIO_EVENT_INFO_LEN_MAX 256
 #define UEVENT_POLL_WAIT_TIME 100
 #define AUDIO_UEVENT_USB_DEVICE_COUNT 10
 
@@ -79,7 +80,9 @@
 #define USB_AUDIO_CLASS         1
 #define USB_AUDIO_SUBCLASS_CTRL 1
 #define AUDIO_DEVICE_ONLINE     1
-#define AUDIO_DEVICE_WAIT_ONLINE 10
+#define AUDIO_DEVICE_WAIT_ONLINE 20
+#define AUDIO_DEVICE_WAIT_TRY_TIME 10
+#define AUDIO_DEVICE_WAIT_USB_ONLINE 1300
 
 struct UsbDevice {
     int8_t devName[USB_DEV_NAME_LEN_MAX];
@@ -98,6 +101,26 @@ struct AudioPnpUevent {
     const char *hidName;
     const char *devName;
 };
+
+struct AudioEvent g_audioPnpDeviceState = {
+    .eventType = HDF_AUDIO_EVENT_UNKOWN,
+    .deviceType = HDF_AUDIO_DEVICE_UNKOWN,
+};
+
+static bool IsUpdatePnpDeviceState(struct AudioEvent *pnpDeviceEvent)
+{
+    if (pnpDeviceEvent->eventType == g_audioPnpDeviceState.eventType &&
+        pnpDeviceEvent->deviceType == g_audioPnpDeviceState.deviceType) {
+        return false;
+    }
+    return true;
+}
+
+static void UpdatePnpDeviceState(struct AudioEvent *pnpDeviceEvent)
+{
+    g_audioPnpDeviceState.eventType = pnpDeviceEvent->eventType;
+    g_audioPnpDeviceState.deviceType = pnpDeviceEvent->deviceType;
+}
 
 static int32_t CheckUsbDesc(struct UsbDevice *usbDevice)
 {
@@ -144,6 +167,7 @@ static int32_t ReadAndScanUsbDev(const char *devPath)
     struct UsbDevice usbDevice;
     size_t len;
     errno_t error;
+    uint32_t tryTime = 0;
     char realpathRes[PATH_MAX + 1] = {'\0'};
 
     if (devPath == NULL) {
@@ -151,15 +175,19 @@ static int32_t ReadAndScanUsbDev(const char *devPath)
         return HDF_FAILURE;
     }
 
-    OsalMSleep(AUDIO_DEVICE_WAIT_ONLINE);
-    if (realpath(devPath, realpathRes) == NULL) {
-        AUDIO_FUNC_LOGE("audio realpath fail[%{public}d]", errno);
-        return HDF_FAILURE;
+    while (tryTime < AUDIO_DEVICE_WAIT_TRY_TIME) {
+        if (realpath(devPath, realpathRes) != NULL) {
+            break;
+        }
+
+        tryTime++;
+        AUDIO_FUNC_LOGW("audio try[%{public}d] realpath fail[%{public}d]", tryTime, errno);
+        OsalMSleep(AUDIO_DEVICE_WAIT_ONLINE);
     }
 
     fp = fopen(realpathRes, "r");
     if (fp == NULL) {
-        AUDIO_FUNC_LOGE("audio realpath open fail");
+        AUDIO_FUNC_LOGE("audio realpath open fail[%{public}d]", errno);
         return HDF_FAILURE;
     }
 
@@ -296,12 +324,110 @@ static bool CheckAudioUsbDevice(const char *devName)
         return false;
     }
 
-    AUDIO_FUNC_LOGE("usb device name[%{public}s]", devName);
+    AUDIO_FUNC_LOGI("usb device name[%{public}s]", devName);
     state = ReadAndScanUsbDev(subDir);
     if ((state == AUDIO_DEVICE_ONLINE) && AddAudioUsbDevice(devName)) {
         return true;
     }
     return false;
+}
+
+static inline bool IsBadName(const char *name)
+{
+    if (*name == '\0') {
+        AUDIO_FUNC_LOGE("name is null");
+        return true;
+    }
+
+    while (*name != '\0') {
+        if (isdigit(*name++) == 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+static int32_t ScanUsbBusSubDir(const char *subDir)
+{
+    int32_t len;
+    DIR *devDir = NULL;
+    struct dirent *dirEnt = NULL;
+
+    char devName[USB_DEV_NAME_LEN_MAX] = {0};
+
+    devDir = opendir(subDir);
+    if (devDir == NULL) {
+        AUDIO_FUNC_LOGE("open usb sub dir failed");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    int32_t state = HDF_SUCCESS;
+    while (((dirEnt = readdir(devDir)) != NULL) && (state == HDF_SUCCESS)) {
+        if (IsBadName(dirEnt->d_name)) {
+            continue;
+        }
+
+        len = snprintf_s(devName, USB_DEV_NAME_LEN_MAX, USB_DEV_NAME_LEN_MAX - 1, "%s/%s", subDir, dirEnt->d_name);
+        if (len < 0) {
+            AUDIO_FUNC_LOGE("audio snprintf dev dir fail");
+            state = HDF_FAILURE;
+            break;
+        }
+
+        AUDIO_FUNC_LOGD("audio sub dir[%{public}s]", devName);
+        state = ReadAndScanUsbDev(devName);
+        if (state == AUDIO_DEVICE_ONLINE) {
+            char *subDevName = devName + strlen("/dev/");
+            AUDIO_FUNC_LOGI("audio sub dev dir=[%{public}s]", subDevName);
+            if (AddAudioUsbDevice(subDevName)) {
+                AUDIO_FUNC_LOGI("audio add usb audio device success");
+                break;
+            }
+        }
+    }
+
+    closedir(devDir);
+    return state;
+}
+
+static int32_t DetectUsbHeadsetState(struct AudioEvent *audioEvent)
+{
+    int32_t len;
+    DIR *busDir = NULL;
+    struct dirent *dirEnt = NULL;
+
+    char subDir[USB_DEV_NAME_LEN_MAX] = {0};
+
+    busDir = opendir(DEV_BUS_USB_DIR);
+    if (busDir == NULL) {
+        AUDIO_FUNC_LOGE("open usb dir failed");
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    int32_t state = HDF_SUCCESS;
+    while (((dirEnt = readdir(busDir)) != NULL) && (state == HDF_SUCCESS)) {
+        if (IsBadName(dirEnt->d_name)) {
+            continue;
+        }
+
+        len = snprintf_s(subDir, USB_DEV_NAME_LEN_MAX, USB_DEV_NAME_LEN_MAX - 1, DEV_BUS_USB_DIR "/%s", dirEnt->d_name);
+        if (len < 0) {
+            AUDIO_FUNC_LOGE("audio snprintf dev dir fail");
+            break;
+        }
+
+        state = ScanUsbBusSubDir(subDir);
+        if (state == AUDIO_DEVICE_ONLINE) {
+            audioEvent->eventType = HDF_AUDIO_DEVICE_ADD;
+            audioEvent->deviceType = HDF_AUDIO_USB_HEADSET;
+            closedir(busDir);
+            return HDF_SUCCESS;
+        }
+    }
+
+    closedir(busDir);
+    return HDF_FAILURE;
 }
 
 static int32_t AudioUsbHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUevent)
@@ -333,7 +459,7 @@ static int32_t AudioUsbHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUevent
         audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
     } else if (strcmp(audioPnpUevent->action, UEVENT_ACTION_REMOVE) == 0) {
         if (!DeleteAudioUsbDevice(audioPnpUevent->devName)) {
-            AUDIO_FUNC_LOGW("check audio usb device not exist, not delete");
+            AUDIO_FUNC_LOGW("check audio usb device[%{public}s] not exist, not delete", audioPnpUevent->devName);
             return HDF_ERR_INVALID_PARAM;
         }
         audioEvent.eventType = HDF_AUDIO_DEVICE_REMOVE;
@@ -343,6 +469,14 @@ static int32_t AudioUsbHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUevent
 
     audioEvent.deviceType = HDF_AUDIO_USB_HEADSET;
     AUDIO_FUNC_LOGI("audio usb headset [%{public}s]", audioEvent.eventType == HDF_AUDIO_DEVICE_ADD ? "add" : "removed");
+
+    if (!IsUpdatePnpDeviceState(&audioEvent)) {
+        AUDIO_FUNC_LOGI("audio usb device[%{public}u] state[%{public}u] not need flush !", audioEvent.deviceType,
+            audioEvent.eventType);
+        return HDF_SUCCESS;
+    }
+    UpdatePnpDeviceState(&audioEvent);
+
     return AudioPnpUpdateInfoOnly(audioEvent);
 }
 
@@ -395,6 +529,12 @@ static int32_t AudioAnalogHeadsetDetectDevice(struct AudioPnpUevent *audioPnpUev
         audioEvent.deviceType == HDF_AUDIO_HEADSET ? "headset" : "headphone",
         audioEvent.eventType == HDF_AUDIO_DEVICE_ADD ? "add" : "removed");
 
+    if (!IsUpdatePnpDeviceState(&audioEvent)) {
+        AUDIO_FUNC_LOGI("audio analog device[%{public}u] state[%{public}u] not need flush !", audioEvent.deviceType,
+            audioEvent.eventType);
+        return HDF_SUCCESS;
+    }
+    UpdatePnpDeviceState(&audioEvent);
     return AudioPnpUpdateInfoOnly(audioEvent);
 }
 
@@ -535,17 +675,45 @@ static ssize_t AudioPnpReadUeventMsg(int sockFd, char *buffer, size_t length)
     return len;
 }
 
-void DetectAudioDevice(void)
+void DetectAudioDevice(struct HdfDeviceObject *device)
 {
     int32_t ret;
     struct AudioEvent audioEvent = {0};
+    char pnpInfo[AUDIO_EVENT_INFO_LEN_MAX] = {0};
 
+    OsalMSleep(AUDIO_DEVICE_WAIT_USB_ONLINE); // Wait until the usb node is successfully created
     ret = DetectAnalogHeadsetState(&audioEvent);
     if ((ret == HDF_SUCCESS) && (audioEvent.eventType == HDF_AUDIO_DEVICE_ADD)) {
-        AUDIO_FUNC_LOGI("audio detect analog headset exist");
-        audioEvent.eventType = HDF_AUDIO_DEVICE_ADD;
-        audioEvent.deviceType = HDF_AUDIO_HEADSET;
-        AudioPnpUpdateInfoOnly(audioEvent);
+        AUDIO_FUNC_LOGI("audio detect analog headset");
+        goto FINISH;
+    }
+
+    audioEvent.eventType = HDF_AUDIO_EVENT_UNKOWN;
+    audioEvent.deviceType = HDF_AUDIO_DEVICE_UNKOWN;
+    ret = DetectUsbHeadsetState(&audioEvent);
+    if ((ret == HDF_SUCCESS) && (audioEvent.eventType == HDF_AUDIO_DEVICE_ADD)) {
+        AUDIO_FUNC_LOGI("audio detect usb headset");
+        goto FINISH;
+    }
+
+    return;
+
+FINISH:
+    if (!IsUpdatePnpDeviceState(&audioEvent)) {
+        AUDIO_FUNC_LOGI("audio first pnp device[%{public}u] state[%{public}u] not need flush !", audioEvent.deviceType,
+            audioEvent.eventType);
+        return;
+    }
+    ret = snprintf_s(pnpInfo, AUDIO_EVENT_INFO_LEN_MAX, AUDIO_EVENT_INFO_LEN_MAX - 1, "EVENT_TYPE=%u;DEVICE_TYPE=%u",
+        audioEvent.eventType, audioEvent.deviceType);
+    if (ret < 0) {
+        AUDIO_FUNC_LOGE("snprintf_s fail!");
+        return;
+    }
+
+    UpdatePnpDeviceState(&audioEvent);
+    if (HdfDeviceObjectSetServInfo(device, pnpInfo) != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("set audio event status info failed!");
     }
 }
 
@@ -559,7 +727,6 @@ static void *AudioPnpUeventStart(void *useless)
     char msg[UEVENT_MSG_LEN + 1] = {0};
 
     AUDIO_FUNC_LOGI("audio uevent start");
-    DetectAudioDevice();
     if (AudioPnpUeventOpen(&socketFd) != HDF_SUCCESS) {
         AUDIO_FUNC_LOGE("open audio pnp socket failed!");
         return NULL;

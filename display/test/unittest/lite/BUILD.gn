@@ -20,13 +20,6 @@ unittest("hdf_peripheral_display_test") {
   include_dirs = [
     "//third_party/googletest/googletest/include",
     "//third_party/bounds_checking_function/include",
-    "//drivers/hdf_core/framework/include/platform",
-    "//drivers/hdf_core/framework/include/core",
-    "//drivers/hdf_core/framework/include/osal",
-    "//drivers/hdf_core/adapter/uhdf/posix/include",
-    "//drivers/hdf_core/framework/include/utils",
-    "//drivers/hdf_core/framework/include",
-    "//drivers/hdf_core/framework/test/unittest/include",
     "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     "//drivers/peripheral/base",
     "//drivers/peripheral/display/interfaces/include",
@@ -38,7 +31,7 @@ unittest("hdf_peripheral_display_test") {
     "loadbmp_test.c",
   ]
 
-  deps = [
+  public_deps = [
     "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
     "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
     "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",

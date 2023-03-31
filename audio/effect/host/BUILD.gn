@@ -24,7 +24,6 @@ ohos_shared_library("effect_model_service") {
       "drivers_interface_audio:libeffect_stub_1.0",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_utils",
-      "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {

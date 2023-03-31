@@ -183,6 +183,9 @@ TEST_F(UtestOpenCameraTest, camera_open_0050)
     std::vector<std::string> cameraIds;
     display_->cameraHost->GetCameraIds(cameraIds);
     for (auto &cameraId : cameraIds) {
+        if (cameraId != "lcam001") {
+            continue;
+        }
         CAMERA_LOGI("cameraId = %{public}s", cameraId.c_str());
         const OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
         display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);

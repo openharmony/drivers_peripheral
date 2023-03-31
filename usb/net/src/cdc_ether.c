@@ -17,7 +17,6 @@
 
 #include "cdc_ether.h"
 #include "hdf_base.h"
-#include "hdf_device_info.h"
 #include "hdf_log.h"
 #include "hdf_usb_pnp_manage.h"
 #include "osal_mem.h"

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,7 @@
 #include <sys/stat.h>
 #include <osal_mem.h>
 #include <stub_collector.h>
-#include "v1_0/iwlan_interface.h"
+#include "v1_1/iwlan_interface.h"
 #include "wlan_impl.h"
 
 struct HdfWlanInterfaceHost {

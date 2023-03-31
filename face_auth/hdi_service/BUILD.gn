@@ -52,6 +52,7 @@ ohos_shared_library("libface_auth_driver") {
     "c_utils:utils",
     "hdf_core:libhdf_host",
     "hdf_core:libhdf_ipc_adapter",
+    "hdf_core:libhdf_utils",
     "hdf_core:libhdi",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_single",

@@ -67,7 +67,7 @@ static int32_t HdfEffectDriverInit(struct HdfDeviceObject *deviceObject)
 
 static int32_t HdfEffectModelDriverBind(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("enter.");
+    HDF_LOGI("enter to %{public}s.", __func__);
     if (deviceObject == NULL) {
         HDF_LOGE("%{public}s:Param is NULL!", __func__);
         return HDF_ERR_INVALID_PARAM;
@@ -112,7 +112,7 @@ static int32_t HdfEffectModelDriverBind(struct HdfDeviceObject *deviceObject)
 
 static void HdfEffectModelDriverRelease(struct HdfDeviceObject *deviceObject)
 {
-    HDF_LOGI("enter.");
+    HDF_LOGI("enter to %{public}s.", __func__);
     if (deviceObject == NULL) {
         HDF_LOGE("%{public}s:Param is NULL!", __func__);
         return;

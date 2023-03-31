@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,6 +18,8 @@
 
 #include <iostream>
 #include <vector>
+#include <set>
+#include <algorithm>
 #include "create_devicemanager_factory.h"
 #include "icontroller.h"
 #include "idevice_manager.h"
@@ -58,6 +60,78 @@ private:
     RetCode CreateManager();
     std::string CameraIdToHardware(CameraId cameraId, ManagerId managerId);
     CameraId ReturnEnableCameraId(std::string hardwareName);
+    void Convert(std::vector<DeviceControl>& deviceControlVec, std::vector<DeviceFormat>& deviceFmat,
+                 std::shared_ptr<CameraMetadata> cameraMeta);
+    int GetOhosMetaTag(uint32_t v4l2Tag);
+    void ConvertV4l2TagToOhos(std::vector<DeviceControl>& deviceControlVec, std::vector<DeviceFormat>& deviceFormat,
+                              std::shared_ptr<CameraMetadata> cameraMetadata);
+    void AddDefaultOhosTag(std::shared_ptr<CameraMetadata> cameraMetadata);
+    RetCode ConvertEntryToOhos(std::shared_ptr<CameraMetadata> metadata, int ohosTag,
+                               const DeviceControl& deviceControl);
+
+    template<typename T>
+    void MergeMetadata(camera_metadata_item_t& entry, std::vector<T>& ohosTagVec)
+    {
+        uint32_t data_type;
+        int32_t ret = GetCameraMetadataItemType(entry.item, &data_type);
+        if (ret != CAM_META_SUCCESS) {
+            return;
+        }
+        for (int i = 0; i < entry.count; i++) {
+            if (data_type == META_TYPE_BYTE) {
+                ohosTagVec.push_back(entry.data.u8[i]);
+            } else if (data_type == META_TYPE_INT32) {
+                ohosTagVec.push_back(entry.data.i32[i]);
+            } else if (data_type == META_TYPE_FLOAT) {
+                ohosTagVec.push_back(entry.data.f[i]);
+            }
+        }
+    }
+
+    template<typename T>
+    void AddOrUpdateOhosTag(std::shared_ptr<CameraMetadata> metadata, int ohosTag, std::vector<T> ohosTagVec)
+    {
+        if (ohosTagVec.empty()) {
+            return;
+        }
+        common_metadata_header_t *data = metadata->get();
+        camera_metadata_item_t entry;
+        int ret = FindCameraMetadataItem(data, ohosTag, &entry);
+        if (ret == CAM_META_ITEM_NOT_FOUND) {
+            if (!metadata->addEntry(ohosTag, ohosTagVec.data(), ohosTagVec.size())) {
+                CAMERA_LOGE("%{public}s(%{public}d) add failed", GetCameraMetadataItemName(ohosTag), ohosTag);
+                return;
+            }
+            CAMERA_LOGD("%{public}s(%{public}d) add success", GetCameraMetadataItemName(ohosTag), ohosTag);
+        } else if (ret == CAM_META_SUCCESS) {
+            MergeMetadata(entry, ohosTagVec);
+            std::sort(ohosTagVec.begin(), ohosTagVec.end());
+            if (!metadata->updateEntry(ohosTag, ohosTagVec.data(), ohosTagVec.size())) {
+                CAMERA_LOGE("%{public}s(%{public}d) update failed", GetCameraMetadataItemName(ohosTag), ohosTag);
+                return;
+            }
+            CAMERA_LOGD("%{public}s(%{public}d) update success", GetCameraMetadataItemName(ohosTag), ohosTag);
+        }
+    }
+
+    void Convert3aLockToOhos(std::shared_ptr<CameraMetadata> metadata, const DeviceControl& deviceControl);
+    void ConvertControlCaptureMirrorSupportedToOhos(std::shared_ptr<CameraMetadata> metadata,
+                                                    const DeviceControl& deviceControl);
+    void ConvertAbilityExposureModesToOhos(std::shared_ptr<CameraMetadata> metadata,
+                                           const DeviceControl& deviceControl);
+    void ConvertAbilityFocusModesToOhos(std::shared_ptr<CameraMetadata> metadata, const DeviceControl& deviceControl);
+    void ConvertAbilityFlashModesToOhos(std::shared_ptr<CameraMetadata> metadata, const DeviceControl& deviceControl);
+    void ConvertAbilityZoomRatioRangeToOhos(std::shared_ptr<CameraMetadata> metadata,
+                                            const DeviceControl& deviceControl);
+    void ConvertAbilityVideoStabilizationModesToOhos(std::shared_ptr<CameraMetadata> metadata);
+    void ConvertAbilityFpsRangesToOhos(std::shared_ptr<CameraMetadata> metadata,
+                                       std::vector<DeviceFormat>& deviceFormat);
+    void AddDefaultAbilityMuteModes(std::shared_ptr<CameraMetadata> metadata);
+    void AddDefaultControlCaptureMirrorSupport(std::shared_ptr<CameraMetadata> metadata);
+    void AddDefaultCameraConnectionType(std::shared_ptr<CameraMetadata> metadata);
+    void AddDefaultCameraPosition(std::shared_ptr<CameraMetadata> metadata);
+    void AddDefaultCameraType(std::shared_ptr<CameraMetadata> metadata);
+    void AddDefaultFlashAvailable(std::shared_ptr<CameraMetadata> metadata);
 
 private:
     HotplugDevCb uvcCb_ = nullptr;

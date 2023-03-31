@@ -66,6 +66,7 @@ CaptureMessageOperator::~CaptureMessageOperator()
 void CaptureMessageOperator::SendMessage(std::shared_ptr<ICaptureMessage>& message)
 {
     if (message == nullptr) {
+        CAMERA_LOGE("message is nullptr");
         return;
     }
 

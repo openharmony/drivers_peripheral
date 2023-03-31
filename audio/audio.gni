@@ -18,6 +18,7 @@ declare_args() {
   drivers_peripheral_audio_policy_config = true
   drivers_peripheral_audio_alsa_lib = false
   drivers_peripheral_audio_rich_device = false
+  drivers_peripheral_audio_community = true
 }
 
 if (product_name == "ohos-arm64") {

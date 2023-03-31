@@ -33,6 +33,10 @@ bool MetadataConfig::UpdateSettingsConfig(int32_t streamId, bool isNew, const st
 
     if (metadata_.count(streamId) == 0) {
         std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ENTRY_CAPACITY, DATA_CAPACITY);
+        if (meta == nullptr) {
+            CAMERA_LOGE("meta is null");
+            return false;
+        }
         metadata_[streamId] = meta;
     }
 

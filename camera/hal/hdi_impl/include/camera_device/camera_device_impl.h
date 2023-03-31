@@ -68,7 +68,6 @@ private:
     std::string cameraId_;
     std::shared_ptr<IPipelineCore> pipelineCore_;
     OHOS::sptr<ICameraDeviceCallback> cameraDeciceCallback_;
-    OHOS::sptr<IStreamOperatorCallback> spCameraDeciceCallback_;
     OHOS::sptr<StreamOperator> spStreamOperator_;
     ResultCallbackMode metaResultMode_;
     std::vector<MetaType> deviceMetaTypes_;

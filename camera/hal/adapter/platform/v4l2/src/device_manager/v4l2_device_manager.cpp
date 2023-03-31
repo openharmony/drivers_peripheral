@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include "sensor_manager.h"
 #include "enumerator_manager.h"
 #include "project_hardware.h"
+#include "v4l2_metadata.h"
 
 constexpr int ITEM_CAPACITY_SIZE = 30;
 constexpr int DATA_CAPACITY_SIZE = 2000;
@@ -345,7 +346,9 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         }
         std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE,
             DATA_CAPACITY_SIZE);
+        CHECK_IF_PTR_NULL_RETURN_VOID(meta);
         meta->addEntry(OHOS_SENSOR_INFO_PHYSICAL_SIZE, physicalSize.data(), physicalSize.size());
+        Convert(deviceControl, deviceFormat, meta);
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
 
         uvcCb_(meta, uvcState, id);
@@ -360,6 +363,7 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
             if ((*iter).hardwareName == hardwareName) {
                 std::shared_ptr<CameraMetadata> meta =
                     std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
+                CHECK_IF_PTR_NULL_RETURN_VOID(meta);
                 uvcCb_(meta, uvcState, id);
                 hardwareList_.erase(iter);
                 break;
@@ -410,5 +414,261 @@ void V4L2DeviceManager::SetMemoryType(uint8_t &memType)
         }
     }
     return;
+}
+
+void V4L2DeviceManager::Convert(std::vector<DeviceControl>& deviceControlVec, std::vector<DeviceFormat>& deviceFormat,
+    std::shared_ptr<CameraMetadata> cameraMetadata)
+{
+    CAMERA_LOGD("V4L2DeviceManager::Convert() start \n");
+    if (cameraMetadata == nullptr) {
+        CAMERA_LOGE("Invalid parameter metadata");
+        return;
+    }
+
+    ConvertV4l2TagToOhos(deviceControlVec, deviceFormat, cameraMetadata);
+    AddDefaultOhosTag(cameraMetadata);
+}
+
+void V4L2DeviceManager::ConvertV4l2TagToOhos(std::vector<DeviceControl>& deviceControlVec,
+    std::vector<DeviceFormat>& deviceFormat, std::shared_ptr<CameraMetadata> cameraMetadata)
+{
+    for (auto& it : deviceControlVec) {
+        int ohosTag = GetOhosMetaTag(it.id);
+        if (ohosTag != NO_EXIST_TAG) {
+            ConvertEntryToOhos(cameraMetadata, ohosTag, it);
+        }
+    }
+
+    ConvertAbilityFpsRangesToOhos(cameraMetadata, deviceFormat);
+}
+
+void V4L2DeviceManager::AddDefaultOhosTag(std::shared_ptr<CameraMetadata> cameraMetadata)
+{
+    AddDefaultAbilityMuteModes(cameraMetadata);
+    AddDefaultControlCaptureMirrorSupport(cameraMetadata);
+    AddDefaultCameraConnectionType(cameraMetadata);
+    AddDefaultCameraPosition(cameraMetadata);
+    AddDefaultCameraType(cameraMetadata);
+    AddDefaultFlashAvailable(cameraMetadata);
+}
+
+int V4L2DeviceManager::GetOhosMetaTag(uint32_t v4l2Tag)
+{
+    for (auto metatag : g_metadataTagList) {
+        if (metatag.v4l2Tag == v4l2Tag) {
+            return metatag.ohosTag;
+        }
+    }
+    return NO_EXIST_TAG;
+}
+
+RetCode V4L2DeviceManager::ConvertEntryToOhos(std::shared_ptr<CameraMetadata> metadata, int ohosTag,
+    const DeviceControl& deviceControl)
+{
+    switch (ohosTag) {
+        case CAMERA_3A_LOCK: {
+            Convert3aLockToOhos(metadata, deviceControl);
+            break;
+        }
+        case OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED: {
+            ConvertControlCaptureMirrorSupportedToOhos(metadata, deviceControl);
+            break;
+        }
+        case OHOS_ABILITY_EXPOSURE_MODES: {
+            ConvertAbilityExposureModesToOhos(metadata, deviceControl);
+            break;
+        }
+        case OHOS_ABILITY_FOCUS_MODES: {
+            ConvertAbilityFocusModesToOhos(metadata, deviceControl);
+            break;
+        }
+        case OHOS_ABILITY_FLASH_MODES: {
+            ConvertAbilityFlashModesToOhos(metadata, deviceControl);
+            break;
+        }
+        case OHOS_ABILITY_ZOOM_RATIO_RANGE: {
+            ConvertAbilityZoomRatioRangeToOhos(metadata, deviceControl);
+            break;
+        }
+        case OHOS_ABILITY_VIDEO_STABILIZATION_MODES: {
+            ConvertAbilityVideoStabilizationModesToOhos(metadata);
+            break;
+        }
+        default:
+            CAMERA_LOGE("There is no corresponding tag transformation");
+            break;
+    }
+    return RC_OK;
+}
+
+void V4L2DeviceManager::Convert3aLockToOhos(std::shared_ptr<CameraMetadata> metadata,
+    const DeviceControl& deviceControl)
+{
+    std::vector<uint8_t> lockModeVector;
+    const int EXPOSURE_MASK = 1 << 0;
+    const int FOCUS_MASK = 1 << 2;
+    if (deviceControl.default_value & FOCUS_MASK) {
+        lockModeVector.push_back(OHOS_CAMERA_FOCUS_MODE_LOCKED);
+        AddOrUpdateOhosTag(metadata, OHOS_ABILITY_FOCUS_MODES, lockModeVector);
+        std::vector<uint8_t>().swap(lockModeVector);
+    }
+    if (deviceControl.default_value & EXPOSURE_MASK) {
+        lockModeVector.push_back(OHOS_CAMERA_EXPOSURE_MODE_LOCKED);
+        AddOrUpdateOhosTag(metadata, OHOS_ABILITY_EXPOSURE_MODES, lockModeVector);
+    }
+}
+
+void V4L2DeviceManager::ConvertControlCaptureMirrorSupportedToOhos(std::shared_ptr<CameraMetadata> metadata,
+    const DeviceControl& deviceControl)
+{
+    common_metadata_header_t *data = metadata->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, &entry);
+    if (ret == CAM_META_ITEM_NOT_FOUND) {
+        if (deviceControl.id == V4L2_CID_HFLIP || deviceControl.id == V4L2_CID_VFLIP) {
+            std::vector<uint8_t> captureMirrorSupportedVector;
+            captureMirrorSupportedVector.push_back(OHOS_CAMERA_MIRROR_ON);
+            AddOrUpdateOhosTag(metadata, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, captureMirrorSupportedVector);
+        }
+    }
+}
+
+void V4L2DeviceManager::ConvertAbilityExposureModesToOhos(std::shared_ptr<CameraMetadata> metadata,
+    const DeviceControl& deviceControl)
+{
+    std::vector<uint8_t> abilityExposureModesVector;
+
+    for (int i = 0; i < deviceControl.menu.size(); i++) {
+        if (deviceControl.menu[i].id != V4L2_CID_EXPOSURE_AUTO) {
+            continue;
+        }
+        if (deviceControl.menu[i].index == V4L2_EXPOSURE_MANUAL) {
+            abilityExposureModesVector.push_back(OHOS_CAMERA_EXPOSURE_MODE_MANUAL);
+        } else if (deviceControl.menu[i].index == V4L2_EXPOSURE_AUTO) {
+            abilityExposureModesVector.push_back(OHOS_CAMERA_EXPOSURE_MODE_CONTINUOUS_AUTO);
+        }
+    }
+
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_EXPOSURE_MODES, abilityExposureModesVector);
+}
+
+void V4L2DeviceManager::ConvertAbilityFocusModesToOhos(std::shared_ptr<CameraMetadata> metadata,
+    const DeviceControl& deviceControl)
+{
+    std::vector<uint8_t> abilityFocusModesVector;
+
+    if (deviceControl.id == V4L2_CID_FOCUS_ABSOLUTE) {
+        abilityFocusModesVector.push_back(OHOS_CAMERA_FOCUS_MODE_MANUAL);
+    } else if (deviceControl.id == V4L2_CID_FOCUS_AUTO) {
+        abilityFocusModesVector.push_back(OHOS_CAMERA_FOCUS_MODE_CONTINUOUS_AUTO);
+    } else if (deviceControl.id == V4L2_CID_AUTO_FOCUS_START) {
+        abilityFocusModesVector.push_back(OHOS_CAMERA_FOCUS_MODE_AUTO);
+    }
+
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_FOCUS_MODES, abilityFocusModesVector);
+}
+
+void V4L2DeviceManager::ConvertAbilityFlashModesToOhos(std::shared_ptr<CameraMetadata> metadata,
+    const DeviceControl& deviceControl)
+{
+    std::vector<uint8_t> flashModesVector;
+
+    for (int i = 0; i < deviceControl.menu.size(); i++) {
+        if (deviceControl.menu[i].id != V4L2_CID_FLASH_LED_MODE) {
+            continue;
+        }
+        if (deviceControl.menu[i].index == V4L2_FLASH_LED_MODE_NONE) {
+            flashModesVector.push_back(OHOS_CAMERA_FLASH_MODE_CLOSE);
+        } else if (deviceControl.menu[i].index == V4L2_FLASH_LED_MODE_FLASH) {
+            flashModesVector.push_back(OHOS_CAMERA_FLASH_MODE_AUTO);
+        } else if (deviceControl.menu[i].index == V4L2_FLASH_LED_MODE_TORCH) {
+            flashModesVector.push_back(OHOS_CAMERA_FLASH_MODE_ALWAYS_OPEN);
+        }
+    }
+
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_FLASH_MODES, flashModesVector);
+}
+
+void V4L2DeviceManager::ConvertAbilityZoomRatioRangeToOhos(std::shared_ptr<CameraMetadata> metadata,
+    const DeviceControl& deviceControl)
+{
+    const float FACTOR = 100.0;
+    std::vector<float> zoomRangeVector;
+    zoomRangeVector.push_back(deviceControl.minimum / FACTOR);
+    zoomRangeVector.push_back(deviceControl.maximum / FACTOR);
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_ZOOM_RATIO_RANGE, zoomRangeVector);
+}
+
+void V4L2DeviceManager::ConvertAbilityVideoStabilizationModesToOhos(std::shared_ptr<CameraMetadata> metadata)
+{
+    std::vector<uint8_t> videoStabilizationModesVector;
+    videoStabilizationModesVector.push_back(OHOS_CAMERA_VIDEO_STABILIZATION_OFF);
+    videoStabilizationModesVector.push_back(OHOS_CAMERA_VIDEO_STABILIZATION_LOW);
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_VIDEO_STABILIZATION_MODES, videoStabilizationModesVector);
+}
+
+void V4L2DeviceManager::ConvertAbilityFpsRangesToOhos(std::shared_ptr<CameraMetadata> metadata,
+    std::vector<DeviceFormat>& deviceFormat)
+{
+    std::set<int32_t> fpsSet;
+    for (auto& it : deviceFormat) {
+        int32_t fpsValue = it.fmtdesc.fps.denominator / it.fmtdesc.fps.numerator;
+        fpsSet.insert(fpsValue);
+    }
+
+    std::vector<int32_t> fpsRangesVector;
+    fpsRangesVector.push_back(*fpsSet.begin());
+    fpsRangesVector.push_back(*fpsSet.rbegin());
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_FPS_RANGES, fpsRangesVector);
+}
+
+void V4L2DeviceManager::AddDefaultAbilityMuteModes(std::shared_ptr<CameraMetadata> metadata)
+{
+    std::vector<uint8_t> muteModesVector;
+    muteModesVector.push_back(OHOS_CAMERA_MUTE_MODE_OFF);
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_MUTE_MODES, muteModesVector);
+}
+
+void V4L2DeviceManager::AddDefaultControlCaptureMirrorSupport(std::shared_ptr<CameraMetadata> metadata)
+{
+    common_metadata_header_t *data = metadata->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, &entry);
+    if (ret == CAM_META_ITEM_NOT_FOUND) {
+        std::vector<uint8_t> controlCaptureMirrorSupportedVector;
+        controlCaptureMirrorSupportedVector.push_back(OHOS_CAMERA_MIRROR_OFF);
+        AddOrUpdateOhosTag(metadata, OHOS_CONTROL_CAPTURE_MIRROR_SUPPORTED, controlCaptureMirrorSupportedVector);
+    }
+}
+
+void V4L2DeviceManager::AddDefaultCameraConnectionType(std::shared_ptr<CameraMetadata> metadata)
+{
+    std::vector<uint8_t> cameraConnectionTypeVector;
+    cameraConnectionTypeVector.push_back(OHOS_CAMERA_CONNECTION_TYPE_USB_PLUGIN);
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_CAMERA_CONNECTION_TYPE, cameraConnectionTypeVector);
+}
+
+void V4L2DeviceManager::AddDefaultCameraPosition(std::shared_ptr<CameraMetadata> metadata)
+{
+    std::vector<uint8_t> cameraPositionVector;
+    cameraPositionVector.push_back(OHOS_CAMERA_POSITION_OTHER);
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_CAMERA_POSITION, cameraPositionVector);
+}
+
+void V4L2DeviceManager::AddDefaultCameraType(std::shared_ptr<CameraMetadata> metadata)
+{
+    std::vector<uint8_t> cameraTypeVector;
+    cameraTypeVector.push_back(OHOS_CAMERA_TYPE_UNSPECIFIED);
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_CAMERA_TYPE, cameraTypeVector);
+}
+
+void V4L2DeviceManager::AddDefaultFlashAvailable(std::shared_ptr<CameraMetadata> metadata)
+{
+    common_metadata_header_t *data = metadata->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_FLASH_MODES, &entry);
+    std::vector<uint8_t> flashAvailableVector;
+    flashAvailableVector.push_back((ret == CAM_META_SUCCESS) ? OHOS_CAMERA_FLASH_TRUE : OHOS_CAMERA_FLASH_FALSE);
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_FLASH_AVAILABLE, flashAvailableVector);
 }
 } // namespace OHOS::Camera

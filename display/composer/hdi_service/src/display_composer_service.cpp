@@ -216,14 +216,6 @@ int32_t DisplayComposerService::SetDisplayClientCrop(uint32_t devId, const IRect
     return ret;
 }
 
-int32_t DisplayComposerService::SetDisplayClientDestRect(uint32_t devId, const IRect& rect)
-{
-    CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = vdiImpl_->SetDisplayClientDestRect(devId, rect);
-    DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
-    return ret;
-}
-
 int32_t DisplayComposerService::SetDisplayVsyncEnabled(uint32_t devId, bool enabled)
 {
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
@@ -328,7 +320,6 @@ int32_t DisplayComposerService::CmdRequest(
 
 int32_t DisplayComposerService::GetCmdReply(std::shared_ptr<SharedMemQueue<int32_t>>& reply)
 {
-    CHECK_NULLPOINTER_RETURN_VALUE(reply, HDF_FAILURE);
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = cmdResponser_->GetCmdReply(reply);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
