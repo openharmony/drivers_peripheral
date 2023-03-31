@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,6 +59,9 @@ int32_t WlanInterfaceSetProjectionScreenParam(struct IWlanInterface *self, const
     const struct ProjectionScreenCmdParam *param);
 int32_t WlanInterfaceGetStaInfo(struct IWlanInterface *self, const char *ifName, struct WifiStationInfo *info,
     const uint8_t *mac, uint32_t macLen);
+int32_t WlanInterfaceStartPnoScan(struct IWlanInterface *self, const char *ifName,
+    const struct PnoSettings *pnoSettings);
+int32_t WlanInterfaceStopPnoScan(struct IWlanInterface *self, const char *ifName);
 int32_t WlanInterfaceWifiConstruct(void);
 int32_t WlanInterfaceWifiDestruct(void);
 #endif

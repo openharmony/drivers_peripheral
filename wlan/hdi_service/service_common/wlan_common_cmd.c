@@ -1207,6 +1207,131 @@ int32_t WlanInterfaceGetStaInfo(struct IWlanInterface *self, const char *ifName,
     return ret;
 }
 
+static int32_t FillPnoSettings(WifiPnoSettings *wifiPnoSettings, const struct PnoSettings *pnoSettings)
+{
+    wifiPnoSettings->min2gRssi = pnoSettings->min2gRssi;
+    wifiPnoSettings->min5gRssi = pnoSettings->min5gRssi;
+    wifiPnoSettings->scanIntervalMs = pnoSettings->scanIntervalMs;
+    wifiPnoSettings->scanIterations = pnoSettings->scanIterations;
+
+    if ((pnoSettings->pnoNetworks == NULL) || (pnoSettings->pnoNetworksLen == 0)) {
+        HDF_LOGE("%{public}s: scan networks is NULL.", __func__);
+        return HDF_FAILURE;
+    }
+
+    wifiPnoSettings->pnoNetworksLen = pnoSettings->pnoNetworksLen;
+    wifiPnoSettings->pnoNetworks =
+        (WifiPnoNetwork *)OsalMemCalloc(sizeof(WifiPnoNetwork) * (pnoSettings->pnoNetworksLen));
+    if (wifiPnoSettings->pnoNetworks == NULL) {
+        HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
+        return HDF_FAILURE;
+    }
+    for (uint32_t i = 0; i < pnoSettings->pnoNetworksLen; i++) {
+        wifiPnoSettings->pnoNetworks[i].isHidden = pnoSettings->pnoNetworks[i].isHidden;
+        wifiPnoSettings->pnoNetworks[i].ssid.ssidLen = pnoSettings->pnoNetworks[i].ssid.ssidLen;
+        if (memcpy_s(wifiPnoSettings->pnoNetworks[i].ssid.ssid, MAX_SSID_LEN, pnoSettings->pnoNetworks[i].ssid.ssid,
+                pnoSettings->pnoNetworks[i].ssid.ssidLen) != EOK) {
+            HDF_LOGE("%{public}s fail : memcpy_s ssids fail!", __func__);
+            return HDF_FAILURE;
+        }
+        wifiPnoSettings->pnoNetworks[i].freqs =
+            (int32_t *)OsalMemCalloc(sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen));
+        if (wifiPnoSettings->pnoNetworks[i].freqs == NULL) {
+            HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
+            return HDF_FAILURE;
+        }
+        wifiPnoSettings->pnoNetworks[i].freqsLen = pnoSettings->pnoNetworks[i].freqsLen;
+        if (memcpy_s(wifiPnoSettings->pnoNetworks[i].freqs,
+                sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen), pnoSettings->pnoNetworks[i].freqs,
+                sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen)) != EOK) {
+            HDF_LOGE("%{public}s fail : memcpy_s freqs fail!", __func__);
+            return HDF_FAILURE;
+        }
+    }
+    return HDF_SUCCESS;
+}
+
+static void WifiPnoSettingsFree(WifiPnoSettings *wifiPnoSettings)
+{
+    if (wifiPnoSettings == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return;
+    }
+    for (uint32_t i = 0; i < wifiPnoSettings->pnoNetworksLen; i++) {
+        if (wifiPnoSettings->pnoNetworks[i].freqs != NULL) {
+            OsalMemFree(wifiPnoSettings->pnoNetworks[i].freqs);
+            wifiPnoSettings->pnoNetworks[i].freqs = NULL;
+        }
+    }
+    OsalMemFree(wifiPnoSettings->pnoNetworks);
+    wifiPnoSettings->pnoNetworks = NULL;
+    OsalMemFree(wifiPnoSettings);
+}
+
+int32_t WlanInterfaceStartPnoScan(struct IWlanInterface *self, const char *ifName,
+    const struct PnoSettings *pnoSettings)
+{
+    int32_t ret;
+    (void)self;
+
+    if (ifName == NULL || pnoSettings == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_staFeature == NULL) {
+        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    WifiPnoSettings *wifiPnoSettings = (WifiPnoSettings *)OsalMemCalloc(sizeof(WifiPnoSettings));
+    if (wifiPnoSettings == NULL) {
+        HDF_LOGE("%{public}s: OsalMemCalloc failed", __func__);
+        return HDF_FAILURE;
+    }
+    if (FillPnoSettings(wifiPnoSettings, pnoSettings) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s fail : memcpy_s ssids fail!", __func__);
+        WifiPnoSettingsFree(wifiPnoSettings);
+        return HDF_FAILURE;
+    }
+
+    ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
+        WifiPnoSettingsFree(wifiPnoSettings);
+        return HDF_FAILURE;
+    }
+    ret = g_staFeature->startPnoScan(ifName, wifiPnoSettings);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: startPnoScan failed!, error code: %{public}d", __func__, ret);
+    }
+    WifiPnoSettingsFree(wifiPnoSettings);
+    return ret;
+}
+
+int32_t WlanInterfaceStopPnoScan(struct IWlanInterface *self, const char *ifName)
+{
+    int32_t ret;
+    (void)self;
+
+    if (ifName == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_staFeature == NULL) {
+        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    ret = g_staFeature->stopPnoScan(ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: stopPnoScan failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
 int32_t WlanInterfaceWifiConstruct(void)
 {
     int32_t ret;
