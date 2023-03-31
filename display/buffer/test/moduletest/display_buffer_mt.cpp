@@ -109,7 +109,7 @@ static void RunOnce(const AllocInfo& info)
     BufferHandle* bHandle = nullptr;
     // AllocMem
     int32_t ec = dispbuf->AllocMem(info, bHandle);
-    if (ec != HDF_SUCCESS) {
+    if (ec != HDF_SUCCESS || bHandle == nullptr) {
         HDF_LOGE("%{public}s, line=%{public}d, AllocMem failed. ec=0x%{public}x",
                  __func__, __LINE__, ec);
         delete dispbuf;
