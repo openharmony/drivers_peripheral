@@ -46,7 +46,6 @@ void HosV4L2UVC::V4L2UvcSearchCapability(const std::string devName, const std::s
             return;
         }
         int fd = open(name, O_RDWR | O_NONBLOCK, 0);
-        free(name);
         if (fd < 0) {
             CAMERA_LOGE("UVC:V4L2UvcSearchCapability open %s name %s error\n", v4l2Device.c_str(), devName.c_str());
         } else {
@@ -129,7 +128,6 @@ RetCode HosV4L2UVC::V4L2UvcGetCap(const std::string v4l2Device, struct v4l2_capa
     }
 
     fd = open(devName, O_RDWR | O_NONBLOCK, 0);
-    free(devName);
     if (fd < 0) {
         CAMERA_LOGE("UVC:ERROR opening V4L2 interface for %{public}s\n", v4l2Device.c_str());
         return RC_ERROR;
