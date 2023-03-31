@@ -16,6 +16,7 @@
 #include "buffer_adapter.h"
 #include "image_buffer.h"
 #include "video_key_info.h"
+#include "camera_dump.h"
 
 namespace {
 constexpr uint32_t REQUEST_TIMEOUT = 0;
@@ -121,6 +122,7 @@ RetCode StreamTunnel::PutBuffer(const std::shared_ptr<IBuffer>& buffer)
                 extraData->ExtraSet(OHOS::Camera::captureId, buffer->GetCaptureId());
             }
         }
+        CameraDumper::GetInstance().DumpBuffer(buffer);
         int ret = bufferQueue_->FlushBuffer(sb, fence, flushConfig_);
         stats_.FlushBufferResult(ret);
         frameCount_++;

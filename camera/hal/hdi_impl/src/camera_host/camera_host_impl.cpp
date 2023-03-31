@@ -21,6 +21,7 @@
 
 #include "v1_0/icamera_host_callback.h"
 #include "v1_0/icamera_device.h"
+#include "camera_dump.h"
 
 namespace OHOS::Camera {
 extern "C" ICameraHost *CameraHostImplGetInstance(void)
@@ -91,6 +92,8 @@ CamRetCode CameraHostImpl::Init()
             CameraStatus cameraStatus = status ? AVAILABLE : UN_AVAILABLE;
             OnCameraStatus(cameraId, cameraStatus, meta);
         });
+
+    (void)DevHostRegisterDumpHost(CameraDumpEvent);
     return HDI::Camera::V1_0::NO_ERROR;
 }
 
