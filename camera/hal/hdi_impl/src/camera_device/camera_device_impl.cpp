@@ -22,6 +22,7 @@
 #include "watchdog.h"
 #include "metadata_controller.h"
 #include "metadata_utils.h"
+#include "camera_dump.h"
 
 #define HDI_DEVICE_PLACE_A_WATCHDOG \
     PLACE_A_NOKILL_WATCHDOG(std::bind(&CameraDeviceImpl::OnRequestTimeout, this))
@@ -122,6 +123,7 @@ int32_t CameraDeviceImpl::UpdateSettings(const std::vector<uint8_t>& settings)
 
     std::shared_ptr<CameraMetadata> updateSettings;
     MetadataUtils::ConvertVecToMetadata(settings, updateSettings);
+    CameraDumper::GetInstance().DumpMetadata(updateSettings, "updatesetting");
     MetadataController& metaDataController = MetadataController::GetInstance();
     metaDataController.UpdateSettingsConfig(updateSettings);
     DFX_LOCAL_HITRACE_END;
@@ -375,6 +377,7 @@ void CameraDeviceImpl::OnMetadataChanged(const std::shared_ptr<CameraMetadata> &
     uint64_t timestamp = GetCurrentLocalTimeStamp();
     std::vector<uint8_t> result;
     MetadataUtils::ConvertMetadataToVec(metadata, result);
+    CameraDumper::GetInstance().DumpMetadata(metadata, "reportmeta");
     cameraDeciceCallback_->OnResult(timestamp, result);
 }
 
