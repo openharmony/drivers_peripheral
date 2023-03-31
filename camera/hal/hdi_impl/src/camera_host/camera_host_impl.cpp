@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -368,7 +368,7 @@ void CameraHostImpl::OnCameraStatus(CameraId cameraId,
     physicalCameraIds.push_back(physicalCameraId);
 
     if (status == AVAILABLE) {
-        std::string logicalCameraId = config->ReturnEnableLogicalCameraId();
+        std::string logicalCameraId = config->GenerateNewLogicalCameraId();
         RetCode rc = config->AddCameraId(logicalCameraId, physicalCameraIds, ability);
         if (rc == RC_OK && logicalCameraId.size() > 0) {
             CAMERA_LOGI("add physicalCameraIds %{public}d logicalCameraId %{public}s",
@@ -383,14 +383,14 @@ void CameraHostImpl::OnCameraStatus(CameraId cameraId,
             cameraDeviceMap_[logicalCameraId] = cameraDevice;
         }
     } else {
-        std::string logicalCameraId =
-            config->ReturnLogicalCameraIdToString(physicalCameraIds[0]);
+        std::string logicalCameraId = config->SubtractCameraId(physicalCameraIds);
         if (logicalCameraId.size() > 0) {
             CAMERA_LOGI("physicalCameraIds %{public}d logicalCameraId %{public}s",
                 static_cast<int>(cameraId), logicalCameraId.c_str());
             if (cameraHostCallback_ != nullptr) {
                 cameraHostCallback_->OnCameraStatus(logicalCameraId, status);
             }
+            cameraDeviceMap_.erase(logicalCameraId);
         }
     }
 }

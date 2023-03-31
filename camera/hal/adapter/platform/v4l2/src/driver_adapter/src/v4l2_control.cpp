@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -241,7 +241,7 @@ void HosV4L2Control::V4L2EnumExtControls(int fd, std::vector<DeviceControl>& con
                 ctrl.menu.push_back(menuTemp);
             }
         }
-
+        // Need fix: ctrl menu will keep old menu. Need clear ctrl every convert
         control.push_back(ctrl);
     }
 }
