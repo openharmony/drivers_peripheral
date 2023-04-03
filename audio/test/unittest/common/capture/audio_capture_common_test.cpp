@@ -23,8 +23,11 @@ using namespace std;
 using namespace testing::ext;
 namespace {
 static const uint32_t MAX_AUDIO_ADAPTER_NUM = 5;
+const int BUFFER_LENTH = 1024 * 16;
+const int DEEP_BUFFER_CAPTURE_PERIOD_SIZE = 4 * 1024;
 const int DEFAULT_BUFFER_SIZE = 16384;
 const float HALF_OF_MAX_VOLUME = 0.5;
+const int MOVE_LEFT_NUM = 8;
 const int TEST_SAMPLE_RATE_MASK_48000 = 48000;
 const int TEST_CHANNEL_COUNT = 2;
 
@@ -98,13 +101,13 @@ void AudioUtCaptureTest::InitCaptureAttrs(struct AudioSampleAttributes &attrs)
     attrs.sampleRate = TEST_SAMPLE_RATE_MASK_48000;
     attrs.interleaved = 0;
     attrs.type = AUDIO_IN_MEDIA;
-    attrs.period = 4 * 1024;
-    attrs.frameSize = 16 * 2 / 8;
+    attrs.period = DEEP_BUFFER_CAPTURE_PERIOD_SIZE;
+    attrs.frameSize = AUDIO_FORMAT_TYPE_PCM_16_BIT * TEST_CHANNEL_COUNT / MOVE_LEFT_NUM;
     attrs.isBigEndian = false;
     attrs.isSignedData = true;
-    attrs.startThreshold = 4 * 1024 / (AUDIO_FORMAT_TYPE_PCM_16_BIT * attrs.channelCount / 8);
+    attrs.startThreshold = DEEP_BUFFER_CAPTURE_PERIOD_SIZE / (attrs.format * attrs.channelCount / MOVE_LEFT_NUM);
     attrs.stopThreshold = INT_MAX;
-    attrs.silenceThreshold = 1024 * 16;
+    attrs.silenceThreshold = BUFFER_LENTH;
 }
 
 void AudioUtCaptureTest::FreeAdapterElements(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
@@ -176,7 +179,7 @@ void AudioUtCaptureTest::SetUp()
 void AudioUtCaptureTest::TearDown()
 {
     ASSERT_NE(devDescriptorName_, nullptr);
-    free(devDescriptorName_);    
+    free(devDescriptorName_);
 
     ASSERT_NE(capture_, nullptr);
     EXPECT_EQ(HDF_SUCCESS, adapter_->DestroyCapture(adapter_, captureId_));
@@ -227,6 +230,11 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureFrameExceptions001, TestSize.Level1)
     EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrame(capture_, frame, nullptr, nullptr));
     EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrame(capture_, frame, &frameLen, nullptr));
     EXPECT_NE(HDF_SUCCESS, capture_->CaptureFrame(nullptr, frame, &frameLen, &requestBytes));
+
+    if (frame != nullptr) {
+        free(frame);
+        frame = nullptr;
+    }
 }
 
 /* capture getposition cases */
@@ -277,7 +285,6 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioGetCapturePositionExceptions001, TestSize.L
 
 /**
  * @brief from here starts the control tests
- * 
  */
 
 /* capture start cases */
@@ -336,7 +343,7 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCapturePause001, TestSize.Level1)
     EXPECT_EQ(ret, HDF_SUCCESS);
 
     ret = capture_->Pause(capture_);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || HDF_ERR_INVALID_PARAM);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
 }
 
 HWTEST_F(AudioUtCaptureTest, HdfAudioCapturePauseException001, TestSize.Level1)
@@ -443,7 +450,7 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureAudioDevDump001, TestSize.Level1)
     ASSERT_NE(capture_->AudioDevDump, nullptr);
 
     int32_t range = 4;
-    char pathBuf[] = "./CaptureDump.log";
+    char pathBuf[] = "/data/CaptureDump.log";
 
     FILE *file = fopen(pathBuf, "wb+");
     ASSERT_NE(nullptr, file);
@@ -469,7 +476,6 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureAudioDevDumpExption001, TestSize.Lev
 
 /**
  * @brief here starts the volume test cases
- * 
  */
 /* capture SetMute cases */
 HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSetMute001, TestSize.Level1)
@@ -650,7 +656,6 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetGainThresholdException002, TestSi
 
 /**
  * @brief here starts the attributes cases
- * 
  */
 /* capture GetSampleAttributes cases */
 HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetSampleAttributes001, TestSize.Level1)
@@ -678,8 +683,8 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSetSampleAttributesException001, Tes
 {
     struct AudioSampleAttributes attrs = {
         .format = AUDIO_FORMAT_TYPE_PCM_16_BIT,
-        .channelCount = TEST_CHANNEL_COUNT,
         .sampleRate = TEST_SAMPLE_RATE_MASK_48000,
+        .channelCount = TEST_CHANNEL_COUNT,
     };
     EXPECT_NE(capture_->SetSampleAttributes, nullptr);
 
@@ -740,7 +745,6 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSetExtraParams001, TestSize.Level1)
     if (indexAttr != string::npos && indexFlag != string::npos) {
         strGetValue.replace(indexAttr, indexFlag - indexAttr + index, "");
     }
-
 }
 
 HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureSetExtraParamsException001, TestSize.Level1)
@@ -775,10 +779,5 @@ HWTEST_F(AudioUtCaptureTest, HdfAudioCaptureGetExtraParamsException001, TestSize
     ret = capture_->GetExtraParams(capture_, nullptr, listLenth);
     EXPECT_NE(ret, HDF_SUCCESS);
 }
-
-/**
- * @brief here starts the attributes cases
- * 
- */
 
 } // end of name space
