@@ -40,16 +40,20 @@ public:
     void CancelBufferResult(int32_t ret);
     void Clear();
     void DumpStats(int interval = 0);
+    void CalculateFps(int interval);
 
 private:
     int32_t streamId_;
     uint32_t requestBufferSuccessCount_;
+    uint32_t lastRequestBufferCount_;
     uint32_t requestBufferFailCount_;
     uint32_t flushBufferSuccessCount_;
     uint32_t flushBufferFailCount_;
     uint32_t cancelBufferSuccessCount_;
     uint32_t cancelBufferFailCount_;
+    uint32_t fpsValue_;
     uint64_t lastOutputTime_ = 0;
+    std::string streamInfo_;
     timespec timestamp_ = {0, 0};
 };
 } // end namespace OHOS::Camera

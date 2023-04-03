@@ -160,7 +160,7 @@ RetCode StreamBase::StartStream()
     handler_ = std::make_unique<std::thread>([this, &threadName] {
         prctl(PR_SET_NAME, threadName.c_str());
         while (state_ == STREAM_STATE_BUSY) {
-            tunnel_->DumpStats(30); // set output interval to 30 second
+            tunnel_->DumpStats(3); // set output interval to 30 second
             HandleRequest();
         }
     });
