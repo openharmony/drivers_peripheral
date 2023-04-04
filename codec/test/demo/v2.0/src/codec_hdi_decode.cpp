@@ -49,6 +49,8 @@ CodecHdiDecode::CodecHdiDecode()
     useBufferHandle_ = false;
     componentId_ = 0;
     reader_ = nullptr;
+    color_ = ColorFormat::YUV420SP;
+    omxColorFormat_ = OMX_COLOR_FormatYUV420SemiPlanar;
 }
 
 CodecHdiDecode::~CodecHdiDecode()
@@ -84,6 +86,12 @@ bool CodecHdiDecode::Init(CommandOpt &opt)
     this->codecMime_ = opt.codec;
     this->stride_ = AlignUp(opt.width);
     this->useBufferHandle_ = opt.useBuffer;
+    color_ = opt.colorForamt;
+    if (color_ == ColorFormat::RGBA8888) {
+        omxColorFormat_ = static_cast<OMX_COLOR_FORMATTYPE>(CODEC_COLOR_FORMAT_RGBA8888);
+    } else if (color_ == ColorFormat::BGRA8888) {
+        omxColorFormat_ = OMX_COLOR_Format32bitBGRA8888;
+    }
     HDF_LOGI("width[%{public}d], height[%{public}d],stride_[%{public}d],infile[%{public}s],outfile[%{public}s]", width_,
              height_, stride_, opt.fileInput.c_str(), opt.fileOutput.c_str());
 
@@ -167,7 +175,7 @@ int32_t CodecHdiDecode::ConfigPortDefine()
     param.format.video.nFrameHeight = height_;
     param.format.video.nStride = stride_;
     param.format.video.nSliceHeight = height_;
-    param.format.video.eColorFormat = AV_COLOR_FORMAT;  // YUV420SP
+    param.format.video.eColorFormat = omxColorFormat_;
     err =
         client_->SetParameter(client_, OMX_IndexParamPortDefinition, reinterpret_cast<int8_t *>(&param), sizeof(param));
     if (err != HDF_SUCCESS) {
@@ -422,10 +430,16 @@ int32_t CodecHdiDecode::UseBufferHandle(int bufferCount, int bufferSize)
     if (bufferCount <= 0 || bufferSize <= 0 || gralloc_ == nullptr) {
         return HDF_ERR_INVALID_PARAM;
     }
-    AllocInfo alloc = {.width = this->stride_,
-                       .height = this->height_,
-                       .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
-                       .format = PIXEL_FMT_YCBCR_420_SP};
+    PixelFormat pixForamt = PIXEL_FMT_YCBCR_420_SP;
+    if (color_ == ColorFormat::RGBA8888) {
+        pixForamt = PIXEL_FMT_RGBA_8888;
+    } else if (color_ == ColorFormat::BGRA8888) {
+        pixForamt = PIXEL_FMT_BGRA_8888;
+    }
+    AllocInfo alloc = {.width = this->width_,
+        .height = this->height_,
+        .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
+        .format = pixForamt};
 
     for (int i = 0; i < bufferCount; i++) {
         int32_t ret = HDF_SUCCESS;
@@ -693,8 +707,7 @@ int32_t CodecHdiDecode::OnFillBufferDone(const struct OmxCodecBuffer &buffer)
         ioOut_.write(static_cast<char *>(addr), buffer.filledLen);
     } else if (bufferInfo->bufferHandle != nullptr && gralloc_ != nullptr) {
         gralloc_->Mmap(*bufferInfo->bufferHandle);
-        ioOut_.write(static_cast<char *>(bufferInfo->bufferHandle->virAddr),
-                     bufferInfo->bufferHandle->width * bufferInfo->bufferHandle->height * NUMERATOR / DENOMINATOR);
+        ioOut_.write(static_cast<char *>(bufferInfo->bufferHandle->virAddr), bufferInfo->bufferHandle->size);
         gralloc_->Unmap(*bufferInfo->bufferHandle);
     }
 
