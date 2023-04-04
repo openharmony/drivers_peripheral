@@ -135,6 +135,8 @@ private:
     std::condition_variable statusCondition_;
     std::mutex statusLock_;
     bool exit_;
+    ColorFormat color_;
+    OMX_COLOR_FORMATTYPE omxColorFormat_;
     CodecMime codecMime_;
     bool useBufferHandle_;
     int count_;
