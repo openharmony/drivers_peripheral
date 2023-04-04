@@ -20,6 +20,7 @@
 #include "metadata_utils.h"
 #include <algorithm>
 #include <iterator>
+#include "camera_dump.h"
 
 namespace OHOS::Camera {
 StreamOperator::StreamOperator(const OHOS::sptr<IStreamOperatorCallback>& callback,
@@ -468,6 +469,7 @@ int32_t StreamOperator::Capture(int32_t captureId, const CaptureInfo& info, bool
 
     std::shared_ptr<CameraMetadata> captureSetting;
     MetadataUtils::ConvertVecToMetadata(info.captureSetting_, captureSetting);
+    CameraDumper::GetInstance().DumpMetadata(captureSetting, "capturesetting");
     CaptureSetting setting = captureSetting;
     auto request =
         std::make_shared<CaptureRequest>(captureId, info.streamIds_.size(), setting,
