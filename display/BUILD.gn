@@ -12,12 +12,25 @@
 # limitations under the License.
 
 if (defined(ohos_lite)) {
-  group("display_test_entry") {
-    deps = [ "test:hdf_test_display" ]
+  group("display_entry") {
+    deps = [ "hal:hdi_display" ]
   }
-} else {
   group("display_test_entry") {
     testonly = true
     deps = [ "test:hdf_test_display" ]
+  }
+} else {
+  group("display_entry") {
+    deps = [
+      "buffer:display_buffer_entry",
+      "composer:display_composer_entry",
+    ]
+  }
+  group("display_test_entry") {
+    testonly = true
+    deps = [
+      "buffer/test:display_buffer_test",
+      "composer/test:display_composer_test",
+    ]
   }
 }

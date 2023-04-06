@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #define DISPLAY_GRALLOC_WRAPPER_H
 
 #include "share_mem.h"
+#include "codec_utils.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -24,7 +25,7 @@ extern "C"
 #endif
 
 int32_t GrAllocatorInit(void);
-int32_t CreateGrShareMemory(BufferHandle **bufferHandle, AllocInfo *alloc, ShareMemory *shareMemory);
+int32_t CreateGrShareMemory(BufferHandle **bufferHandle, CodecCmd cmd, ShareMemory *shareMemory);
 int32_t DestroyGrShareMemory(BufferHandle *bufferHandle);
 int32_t OpenGrShareMemory(BufferHandle *bufferHandle, ShareMemory *shareMemory);
 int32_t ReleaseGrShareMemory(BufferHandle *bufferHandle, ShareMemory *shareMemory);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,7 +21,6 @@
 #include <ashmem.h>
 #include <buffer_handle.h>
 #include <buffer_handle_utils.h>
-#include <idisplay_gralloc.h>
 #include <condition_variable>
 #include <deque>
 #include <list>
@@ -35,7 +34,9 @@
 #include "codec_component_type.h"
 #include "command_adapter_parse.h"
 #include "hdi_mpp.h"
-
+#include "v1_0/display_composer_type.h"
+#include "v1_0/display_buffer_type.h"
+#include "v1_0/include/idisplay_buffer.h"
 enum class PortIndex { PORT_INDEX_INPUT = 0, PORT_INDEX_OUTPUT = 1 };
 
 class CodecHdiAdapterEncode {
@@ -144,7 +145,7 @@ private:
     std::list<int> freeBufferHandles_;
     bool useBufferHandle_;
     static constexpr uint32_t alignment_ = 16;
-    static OHOS::HDI::Display::V1_0::IDisplayGralloc *gralloc_;
+    static OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer *gralloc_;
 };
 
 #endif  // CODEC_HDI_ADAPTER_ENCODE_H

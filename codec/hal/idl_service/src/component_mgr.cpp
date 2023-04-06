@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -57,6 +57,7 @@ int32_t ComponentMgr::CreateComponentInstance(const char *componentName, const O
 
 int32_t ComponentMgr::DeleteComponentInstance(OMX_COMPONENTTYPE *component)
 {
+    std::lock_guard<std::mutex> lk(mutex_);
     int32_t err = OMX_ErrorInvalidComponent;
     for (size_t i = 0; i < components_.size(); i++) {
         if (components_[i].handle == component) {
