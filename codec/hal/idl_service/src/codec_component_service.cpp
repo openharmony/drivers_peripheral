@@ -20,6 +20,16 @@ namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace V1_0 {
+CodecComponentService::~CodecComponentService()
+{
+    if (node_ != nullptr) {
+        int32_t ret = node_->CloseHandle();
+        if (ret != HDF_SUCCESS) {
+            CODEC_LOGE("CloseHandle failed, err[%{public}d]", ret);
+        }
+        node_ = nullptr;
+    }
+}
 int32_t CodecComponentService::GetComponentVersion(CompVerInfo &verInfo)
 {
     return node_->GetComponentVersion(verInfo);

@@ -22,7 +22,6 @@
 #include <buffer_handle.h>
 #include <condition_variable>
 #include <fstream>
-#include <idisplay_gralloc.h>
 #include <list>
 #include <map>
 #include <memory>
@@ -30,6 +29,9 @@
 #include "codec_component_type.h"
 #include "codec_packet_reader.h"
 #include "command_parse.h"
+#include "v1_0/display_composer_type.h"
+#include "v1_0/display_buffer_type.h"
+#include "v1_0/include/idisplay_buffer.h"
 enum class PortIndex { PORT_INDEX_INPUT = 0, PORT_INDEX_OUTPUT = 1 };
 
 class CodecHdiDecode {
@@ -53,8 +55,8 @@ class CodecHdiDecode {
                 avSharedPtr->CloseAshmem();
                 avSharedPtr = nullptr;
             }
-            if (bufferHandle != nullptr && gralloc_ != nullptr) {
-                gralloc_->FreeMem(*bufferHandle);
+            if (bufferHandle != nullptr && buffer_ != nullptr) {
+                buffer_->FreeMem(*bufferHandle);
                 bufferHandle = nullptr;
             }
             portIndex = PortIndex::PORT_INDEX_INPUT;
@@ -62,8 +64,8 @@ class CodecHdiDecode {
         void setBufferHandle(BufferHandle *bufferHandle)
         {
             if (this->bufferHandle != nullptr) {
-                if (gralloc_ != nullptr) {
-                    gralloc_->FreeMem(*this->bufferHandle);
+                if (buffer_ != nullptr) {
+                    buffer_->FreeMem(*this->bufferHandle);
                 }
             }
             this->bufferHandle = bufferHandle;
@@ -139,7 +141,7 @@ private:
     bool useBufferHandle_;
     int count_;
     static constexpr uint32_t alignment_ = 16;
-    static OHOS::HDI::Display::V1_0::IDisplayGralloc *gralloc_;
+    static OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer *buffer_;
     CodecPacketReader::Ptr reader_;
 };
 #endif /* CODEC_HDI_DECODE_H */

@@ -23,14 +23,15 @@
 #include <buffer_handle.h>
 #include <condition_variable>
 #include <fstream>
-#include <idisplay_gralloc.h>
 #include <list>
 #include <map>
 #include <memory>
 #include <mutex>
 #include "codec_component_type.h"
 #include "command_parse.h"
-
+#include "v1_0/display_composer_type.h"
+#include "v1_0/display_buffer_type.h"
+#include "v1_0/include/idisplay_buffer.h"
 enum class PortIndex { PORT_INDEX_INPUT = 0, PORT_INDEX_OUTPUT = 1 };
 
 class CodecHdiEncode {
@@ -135,7 +136,7 @@ private:
     std::list<int> freeBufferHandles_;
     bool useBufferHandle_;
     static constexpr uint32_t alignment_ = 16;
-    static OHOS::HDI::Display::V1_0::IDisplayGralloc *gralloc_;
+    static OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer *buffer_;
     ColorFormat color_;
     int count_;
     CodecMime codecMime_;
