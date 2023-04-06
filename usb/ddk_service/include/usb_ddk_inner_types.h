@@ -19,6 +19,7 @@
 #endif
 
 struct HdfSBuf;
+bool WritePodArray(struct HdfSBuf *parcel, const void *data, uint32_t elementSize, uint32_t count);
 
 bool UsbControlRequestSetupBlockMarshalling(struct HdfSBuf *data, const struct UsbControlRequestSetup *dataBlock);
 
