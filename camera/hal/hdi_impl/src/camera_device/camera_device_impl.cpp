@@ -23,7 +23,9 @@
 #include "metadata_controller.h"
 #include "metadata_utils.h"
 #include "camera_dump.h"
+#include "hdf_trace.h"
 
+#define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
 #define HDI_DEVICE_PLACE_A_WATCHDOG \
     PLACE_A_NOKILL_WATCHDOG(std::bind(&CameraDeviceImpl::OnRequestTimeout, this))
 
@@ -42,6 +44,7 @@ CameraDeviceImpl::CameraDeviceImpl(const std::string &cameraId,
 
 std::shared_ptr<CameraDeviceImpl> CameraDeviceImpl::CreateCameraDevice(const std::string &cameraId)
 {
+    HDF_CAMERA_TRACE;
     // create pipelineCore
     std::shared_ptr<IPipelineCore> pipelineCore = IPipelineCore::Create();
     if (pipelineCore == nullptr) {
@@ -79,6 +82,7 @@ std::shared_ptr<CameraDeviceImpl> CameraDeviceImpl::CreateCameraDevice(const std
 int32_t CameraDeviceImpl::GetStreamOperator(const sptr<IStreamOperatorCallback>& callbackObj,
     sptr<IStreamOperator>& streamOperator)
 {
+    HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
     if (callbackObj == nullptr) {
@@ -109,6 +113,7 @@ int32_t CameraDeviceImpl::GetStreamOperator(const sptr<IStreamOperatorCallback>&
 
 int32_t CameraDeviceImpl::UpdateSettings(const std::vector<uint8_t>& settings)
 {
+    HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
     if (settings.empty()) {
@@ -167,6 +172,7 @@ ResultCallbackMode CameraDeviceImpl::GetMetaResultMode() const
 
 int32_t CameraDeviceImpl::GetEnabledResults(std::vector<int32_t>& results)
 {
+    HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
     if (deviceMetaTypes_.empty()) {
@@ -225,6 +231,7 @@ RetCode CameraDeviceImpl::GetEnabledFromCfg()
 
 int32_t CameraDeviceImpl::EnableResult(const std::vector<int32_t>& results)
 {
+    HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
     std::unique_lock<std::mutex> l(enabledRstMutex_);
@@ -244,6 +251,7 @@ int32_t CameraDeviceImpl::EnableResult(const std::vector<int32_t>& results)
 
 int32_t CameraDeviceImpl::DisableResult(const std::vector<int32_t>& results)
 {
+    HDF_CAMERA_TRACE;
     HDI_DEVICE_PLACE_A_WATCHDOG;
     DFX_LOCAL_HITRACE_BEGIN;
     CamRetCode ret = HDI::Camera::V1_0::NO_ERROR;
@@ -266,6 +274,7 @@ int32_t CameraDeviceImpl::DisableResult(const std::vector<int32_t>& results)
 int32_t CameraDeviceImpl::Close()
 {
     HDI_DEVICE_PLACE_A_WATCHDOG;
+    HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
 
     MetadataController& metaDataController = MetadataController::GetInstance();

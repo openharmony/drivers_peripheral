@@ -15,12 +15,16 @@
 
 #include "camera_device_impl.h"
 #include "camera_host_config.h"
+#include "hdf_trace.h"
 #include "ipipeline_core.h"
 #include "idevice_manager.h"
+
+#define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
 
 namespace OHOS::Camera {
 std::shared_ptr<CameraDevice> CameraDevice::CreateCameraDevice(const std::string &cameraId)
 {
+    HDF_CAMERA_TRACE; 
     // create pipelineCore
     std::shared_ptr<IPipelineCore> pipelineCore = IPipelineCore::Create();
     if (pipelineCore == nullptr) {
@@ -55,6 +59,7 @@ std::shared_ptr<CameraDevice> CameraDevice::CreateCameraDevice(const std::string
 
 void CameraDevice::SetMemoryType(std::shared_ptr<IDeviceManager> deviceManager, const std::string &cameraId)
 {
+    HDF_CAMERA_TRACE;
     std::shared_ptr<CameraAbility> ability = nullptr;
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     if (config == nullptr) {

@@ -154,7 +154,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_004, TestSize.Level1)
     display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
     display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE};
     display_->StopStream(display_->captureIds, display_->streamIds);
-    sleep(5);
+    sleep(3);
 
     CAMERA_LOGD("Next, switch to preview + video, rc = %{public}d", display_->rc);
     // Get the stream manager
@@ -189,7 +189,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_006, TestSize.Level1)
     display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
     display_->StartCapture(display_->STREAM_ID_CAPTURE, display_->CAPTURE_ID_CAPTURE, false, false);
 
-    sleep(5);
+    sleep(3);
     CAMERA_LOGD("frame off.");
     display_->streamCustomerPreview_->ReceiveFrameOff();
     display_->streamCustomerCapture_->ReceiveFrameOff();
@@ -320,7 +320,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_020, TestSize.Level1)
 
     display_->rc = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo, false);
     CAMERA_LOGE("Capture! rc:0x%x\n", display_->rc);
-    sleep(5);
+    sleep(3);
     streamCustomer->ReceiveFrameOff();
     display_->rc = (CamRetCode)display_->streamOperator->CancelCapture(captureId);
     CAMERA_LOGE("CancelCapture! rc:0x%x\n", display_->rc);
@@ -374,7 +374,7 @@ HWTEST_F(CameraCaptureTest, camera_capture_021, TestSize.Level1)
 
     display_->rc = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo, true);
     CAMERA_LOGE("Capture! rc:0x%x\n", display_->rc);
-    sleep(5);
+    sleep(3);
     streamCustomer->ReceiveFrameOff();
     display_->rc = (CamRetCode)display_->streamOperator->CancelCapture(captureId);
     CAMERA_LOGE("CancelCapture! rc:0x%x\n", display_->rc);
