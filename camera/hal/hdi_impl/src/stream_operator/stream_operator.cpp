@@ -468,9 +468,8 @@ int32_t StreamOperator::Capture(int32_t captureId, const CaptureInfo& info, bool
 
     std::shared_ptr<CameraMetadata> captureSetting;
     MetadataUtils::ConvertVecToMetadata(info.captureSetting_, captureSetting);
-    CaptureSetting setting = captureSetting;
     auto request =
-        std::make_shared<CaptureRequest>(captureId, info.streamIds_.size(), setting,
+        std::make_shared<CaptureRequest>(captureId, info.streamIds_.size(), captureSetting,
                                          info.enableShutterCallback_, isStreaming);
     for (auto id : info.streamIds_) {
         RetCode rc = streamMap_[id]->AddRequest(request);
