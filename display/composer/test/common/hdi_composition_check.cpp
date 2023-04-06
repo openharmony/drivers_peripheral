@@ -55,7 +55,7 @@ void HdiCompositionCheck::SimpleHandleAlpha(const LayerSettings& layers, uint32_
 }
 
 std::vector<uint32_t> HdiCompositionCheck::GetCheckColors(const std::vector<LayerSettings> &layers,
-    const std::vector<Point> &points)
+    const std::vector<Point> &points) const
 {
     std::vector<uint32_t> colors;
     for (auto point : points) {
@@ -78,7 +78,8 @@ std::vector<uint32_t> HdiCompositionCheck::GetCheckColors(const std::vector<Laye
     return colors;
 }
 
-int32_t HdiCompositionCheck::Check(std::vector<LayerSettings> &layers, const BufferHandle& clientBuffer, uint32_t checkType)
+int32_t HdiCompositionCheck::Check(const std::vector<LayerSettings> &layers,
+    const BufferHandle& clientBuffer, uint32_t checkType)
 {
     int ret = DISPLAY_SUCCESS;
     const int MID_POS = 2;

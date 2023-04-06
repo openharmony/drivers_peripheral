@@ -43,12 +43,14 @@ public:
         CHECK_CENTER,
         CHECK_VERTEX
     };
-    int32_t Check(std::vector<LayerSettings> &layers, const BufferHandle& clientBuffer, uint32_t checkType = CHECK_VERTEX);
+    int32_t Check(const std::vector<LayerSettings> &layers,
+        const BufferHandle& clientBuffer, uint32_t checkType = CHECK_VERTEX);
 
 private:
     void GetCheckPoints(Point center, std::vector<Point> &points) const;
     void SimpleHandleAlpha(const LayerSettings& layers, uint32_t& color) const;
-    std::vector<uint32_t> GetCheckColors(const std::vector<LayerSettings> &layers, const std::vector<Point> &points);
+    std::vector<uint32_t> GetCheckColors(const std::vector<LayerSettings> &layers,
+        const std::vector<Point> &points) const;
     HdiCompositionCheck() {}
     ~HdiCompositionCheck() {}
     uint32_t dispW_ = 0;
