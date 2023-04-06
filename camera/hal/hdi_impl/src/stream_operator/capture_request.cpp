@@ -19,7 +19,7 @@
 namespace OHOS::Camera {
 CaptureRequest::CaptureRequest(const int32_t id,
                                const int32_t n,
-                               CaptureSetting& setting,
+                               CaptureMeta& setting,
                                bool needReport,
                                bool isContinuous)
 {
@@ -148,7 +148,7 @@ bool CaptureRequest::IsFirstOne() const
 
 CaptureMeta CaptureRequest::GetCaptureSetting() const
 {
-    return settings_.lock();
+    return settings_;
 }
 
 CaptureRequest::RequestSemaphore::RequestSemaphore(const int32_t n)
