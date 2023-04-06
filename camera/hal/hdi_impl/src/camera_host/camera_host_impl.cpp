@@ -22,6 +22,8 @@
 #include "v1_0/icamera_host_callback.h"
 #include "v1_0/icamera_device.h"
 #include "camera_dump.h"
+#include "hdf_trace.h"
+#define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
 
 namespace OHOS::Camera {
 extern "C" ICameraHost *CameraHostImplGetInstance(void)
@@ -100,6 +102,7 @@ CamRetCode CameraHostImpl::Init()
 int32_t CameraHostImpl::SetCallback(const OHOS::sptr<ICameraHostCallback> &callbackObj)
 {
     DFX_LOCAL_HITRACE_BEGIN;
+    HDF_CAMERA_TRACE;
 
     if (callbackObj == nullptr) {
         CAMERA_LOGW("host callback is null.");
@@ -115,6 +118,7 @@ int32_t CameraHostImpl::SetCallback(const OHOS::sptr<ICameraHostCallback> &callb
 int32_t CameraHostImpl::GetCameraIds(std::vector<std::string> &cameraIds)
 {
     DFX_LOCAL_HITRACE_BEGIN;
+    HDF_CAMERA_TRACE;
 
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     if (config == nullptr) {
@@ -133,6 +137,7 @@ int32_t CameraHostImpl::GetCameraAbility(const std::string &cameraId,
     std::vector<uint8_t>& cameraAbility)
 {
     DFX_LOCAL_HITRACE_BEGIN;
+    HDF_CAMERA_TRACE;
     CameraHostConfig *config = CameraHostConfig::GetInstance();
     if (config == nullptr) {
         return INVALID_ARGUMENT;
@@ -153,6 +158,7 @@ int32_t CameraHostImpl::OpenCamera(const std::string& cameraId, const sptr<ICame
 {
     CAMERA_LOGD("OpenCamera entry");
     DFX_LOCAL_HITRACE_BEGIN;
+    HDF_CAMERA_TRACE;
     if (CameraIdInvalid(cameraId) != RC_OK || callbackObj == nullptr) {
         CAMERA_LOGW("open camera id is empty or callback is null.");
         return INVALID_ARGUMENT;
@@ -291,6 +297,7 @@ void CameraHostImpl::CameraPowerDown(const std::vector<std::string> &phyCameraId
 int32_t CameraHostImpl::SetFlashlight(const std::string &cameraId,  bool isEnable)
 {
     DFX_LOCAL_HITRACE_BEGIN;
+    HDF_CAMERA_TRACE;
     if (CameraIdInvalid(cameraId) != RC_OK) {
         CAMERA_LOGE("camera id is not found [cameraId = %{public}s].", cameraId.c_str());
         return INVALID_ARGUMENT;
