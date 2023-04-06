@@ -131,9 +131,13 @@ static void *CodecTaskThread(void *arg)
         }
         if (ret == HDF_SUCCESS || (outputData->flag & STREAM_FLAG_EOS)) {
             HDF_LOGI("%{public}s: output reach STREAM_FLAG_EOS!", __func__);
-            instance->codecStatus = CODEC_STATUS_STOPED;
+            break;
         }
     }
+    OsalMutexLock(&instance->codecStatusLock);
+    instance->codecStatus = CODEC_STATUS_STOPPED;
+    pthread_cond_signal(&instance->codecStatusCond);
+    OsalMutexUnlock(&instance->codecStatusLock);
 
     OsalMemFree(inputData);
     OsalMemFree(outputData);
@@ -167,6 +171,17 @@ int32_t InitCodecInstance(struct CodecInstance *instance, struct CodecOemIf *oem
         return HDF_FAILURE;
     }
 
+    int32_t ret = OsalMutexInit(&instance->codecStatusLock);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: OsalMutexInit failed, ret:%{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    ret = pthread_cond_init(&instance->codecStatusCond, NULL);
+    if (ret != 0) {
+        HDF_LOGE("%{public}s: pthread_cond_init failed, ret:%{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+
     return HDF_SUCCESS;
 }
 
@@ -196,7 +211,13 @@ int32_t StopCodecInstance(struct CodecInstance *instance)
         HDF_LOGE("%{public}s: Invalid param!", __func__);
         return HDF_FAILURE;
     }
-    instance->codecStatus = CODEC_STATUS_STOPED;
+    OsalMutexLock(&instance->codecStatusLock);
+    if (instance->codecStatus == CODEC_STATUS_STARTED) {
+        instance->codecStatus = CODEC_STATUS_STOPPING;
+    } else {
+        instance->codecStatus = CODEC_STATUS_STOPPED;
+    }
+    OsalMutexUnlock(&instance->codecStatusLock);
     return HDF_SUCCESS;
 }
 
@@ -207,11 +228,14 @@ int32_t DestroyCodecInstance(struct CodecInstance *instance)
         return HDF_FAILURE;
     }
 
-    if (instance->codecStatus == CODEC_STATUS_STARTED) {
-        HDF_LOGI("%{public}s: wait codec task stop!", __func__);
-        instance->codecStatus = CODEC_STATUS_STOPED;
-        pthread_join(instance->task, NULL);
+    OsalMutexLock(&instance->codecStatusLock);
+    if (instance->codecStatus == CODEC_STATUS_STARTED || instance->codecStatus == CODEC_STATUS_STOPPING) {
+        HDF_LOGI("%{public}s: wait codec task stop before destroy instance!", __func__);
+        pthread_cond_wait(&instance->codecStatusCond, (pthread_mutex_t *)instance->codecStatusLock.realMutex);
     }
+    OsalMutexUnlock(&instance->codecStatusLock);
+    pthread_cond_destroy(&instance->codecStatusCond);
+    OsalMutexDestroy(&instance->codecStatusLock);
 
     ReleaseInputShm(instance);
     ReleaseOutputShm(instance);
