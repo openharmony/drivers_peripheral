@@ -23,9 +23,10 @@
 
 using namespace std;
 using namespace OHOS;
-
+using namespace OHOS::HDI::Display::Buffer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_0;
 #define HDF_LOG_TAG codec_omx_hdi_enc
-OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiEncode::gralloc_ = nullptr;
+IDisplayBuffer *CodecHdiEncode::buffer_ = nullptr;
 
 namespace {
     constexpr int32_t FRAME = 30 << 16;
@@ -95,7 +96,7 @@ bool CodecHdiEncode::Init(CommandOpt &opt)
     // gralloc init
     codecMime_ = opt.codec;
 
-    gralloc_ = OHOS::HDI::Display::V1_0::IDisplayGralloc::Get();
+    buffer_ = IDisplayBuffer::Get();
     color_ = opt.colorForamt;
     if (color_ == ColorFormat::RGBA8888) {
         omxColorFormat_ = AV_COLOR_FORMAT;
@@ -512,8 +513,8 @@ void CodecHdiEncode::Run()
 
 bool CodecHdiEncode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, bool &endFlag)
 {
-    if (gralloc_ == nullptr) {
-        HDF_LOGE("%{public}s gralloc_ is null", __func__);
+    if (buffer_ == nullptr) {
+        HDF_LOGE("%{public}s buffer_ is null", __func__);
         return false;
     }
     if (useBufferHandle_) {
@@ -526,11 +527,11 @@ bool CodecHdiEncode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, boo
         bufferInfo->bufferHandleId = bufferHandleId;
         BufferHandle *bufferHandle = bufferHandles_[bufferHandleId];
         if (bufferHandle != nullptr) {
-            gralloc_->Mmap(*bufferHandle);
+            buffer_->Mmap(*bufferHandle);
             endFlag =
                 this->ReadOneFrame(reinterpret_cast<char *>(bufferHandle->virAddr), bufferInfo->omxBuffer->filledLen);
             bufferInfo->omxBuffer->filledLen = bufferHandle->stride * bufferHandle->height;
-            gralloc_->Unmap(*bufferHandle);
+            buffer_->Unmap(*bufferHandle);
             bufferInfo->omxBuffer->buffer = reinterpret_cast<uint8_t *>(bufferHandle);
             bufferInfo->omxBuffer->bufferLen =
                 sizeof(BufferHandle) + sizeof(int32_t) * (bufferHandle->reserveFds + bufferHandle->reserveInts);
@@ -550,8 +551,8 @@ bool CodecHdiEncode::FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, boo
 
 int32_t CodecHdiEncode::CreateBufferHandle()
 {
-    if (gralloc_ == nullptr) {
-        HDF_LOGE("%{public}s gralloc_ is null", __func__);
+    if (buffer_ == nullptr) {
+        HDF_LOGE("%{public}s buffer_ is null", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
     PixelFormat pixForamt = PIXEL_FMT_YCBCR_420_SP;
@@ -569,7 +570,7 @@ int32_t CodecHdiEncode::CreateBufferHandle()
     int32_t err = HDF_SUCCESS;
     for (size_t i = 0; i < BUFFER_COUNT; i++) {
         BufferHandle *bufferHandle = nullptr;
-        err = gralloc_->AllocMem(alloc, bufferHandle);
+        err = buffer_->AllocMem(alloc, bufferHandle);
         if (err != HDF_SUCCESS) {
             HDF_LOGE("%{public}s AllocMem fail", __func__);
             return err;

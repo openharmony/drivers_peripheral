@@ -70,14 +70,14 @@ static void WriteBuffer(const BufferHandle& handle)
     // verify buffer contents from strings written.
     for (i = 0; i < handle.size - SIZE_TIMES * strSize; i = i + strSize) {
         if (strncmp(VERIFY_MSG, &ptr[i], sizeof(VERIFY_MSG)) != 0) {
-            HDF_LOGD("%{public}s(%{public}d), buffer[%{public}d]->%{public}p:%{public}s",
-                     __func__, __LINE__, i, &ptr[i], &ptr[i]);
+            HDF_LOGD("%{public}s(%{public}d), buffer[%{public}d]:%{public}s",
+                     __func__, __LINE__, i, &ptr[i]);
         }
     }
 
     for (i = handle.size - HANDLE_NUM_1; i < (handle.size - HANDLE_NUM_2); i++) {
-        HDF_LOGD("%{public}s(%{public}d), i:%{public}d, addr=%{public}p, str:%{public}s",
-                 __func__, __LINE__, i, &ptr[i], &ptr[i]);
+        HDF_LOGD("%{public}s(%{public}d), i:%{public}d, str:%{public}s",
+                 __func__, __LINE__, i, &ptr[i]);
     }
 }
 
@@ -109,7 +109,7 @@ static void RunOnce(const AllocInfo& info)
     BufferHandle* bHandle = nullptr;
     // AllocMem
     int32_t ec = dispbuf->AllocMem(info, bHandle);
-    if (ec != HDF_SUCCESS) {
+    if (ec != HDF_SUCCESS || bHandle == nullptr) {
         HDF_LOGE("%{public}s, line=%{public}d, AllocMem failed. ec=0x%{public}x",
                  __func__, __LINE__, ec);
         delete dispbuf;

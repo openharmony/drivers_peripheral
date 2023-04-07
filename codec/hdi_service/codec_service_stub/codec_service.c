@@ -536,7 +536,7 @@ int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, CodecBuffer *outInfo, uint32_t
         EmptyCodecBuffer(info);
         instance->bufferManagerWrapper->PutUsedOutputDataBuffer(instance->bufferManagerWrapper, info);
         return HDF_SUCCESS;
-    } else if (instance->codecStatus == CODEC_STATUS_STOPED) {
+    } else if (instance->codecStatus == CODEC_STATUS_STOPPED || instance->codecStatus == CODEC_STATUS_STOPPING) {
         CodecBuffer *dup = DupCodecBuffer(outInfo);
         instance->bufferManagerWrapper->PutOutputDataBuffer(instance->bufferManagerWrapper, dup);
     }

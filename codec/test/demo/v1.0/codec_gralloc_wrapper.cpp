@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,9 @@
 #include <idisplay_gralloc.h>
 #include "hdf_base.h"
 #include "hdf_log.h"
+#include "v1_0/display_composer_type.h"
+#include "v1_0/display_buffer_type.h"
+#include "v1_0/include/idisplay_buffer.h"
 
 using namespace std;
 using namespace OHOS;
@@ -27,11 +30,10 @@ using namespace OHOS;
 extern "C"
 {
 #endif
-OHOS::HDI::Display::V1_0::IDisplayGralloc *g_gralloc = nullptr;
-
+OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer *g_gralloc = nullptr;
 int32_t GrAllocatorInit(void)
 {
-    g_gralloc = OHOS::HDI::Display::V1_0::IDisplayGralloc::Get();
+    g_gralloc = OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer::Get();
     if (g_gralloc == nullptr) {
         HDF_LOGE("%{public}s g_gralloc init failed!", __func__);
         return HDF_FAILURE;
@@ -39,13 +41,13 @@ int32_t GrAllocatorInit(void)
     return HDF_SUCCESS;
 }
 
-static int32_t GrMemCreate(AllocInfo *alloc, BufferHandle **bufferHandle)
+static int32_t GrMemCreate(OHOS::HDI::Display::Buffer::V1_0::AllocInfo alloc, BufferHandle **bufferHandle)
 {
     if (g_gralloc == nullptr) {
         HDF_LOGE("%{public}s g_gralloc null", __func__);
         return HDF_FAILURE;
     }
-    int32_t err = g_gralloc->AllocMem(*alloc, *bufferHandle);
+    int32_t err = g_gralloc->AllocMem(alloc, *bufferHandle);
     if (err != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s AllocMem fail", __func__);
         return HDF_FAILURE;
@@ -83,12 +85,19 @@ static int32_t GrMemUnmap(BufferHandle *bufferHandle)
     return HDF_SUCCESS;
 }
 
-int32_t CreateGrShareMemory(BufferHandle **bufferHandle, AllocInfo *alloc, ShareMemory *shareMemory)
+int32_t CreateGrShareMemory(BufferHandle **bufferHandle, CodecCmd cmd, ShareMemory *shareMemory)
 {
-    if (bufferHandle == NULL || alloc == NULL || shareMemory == NULL) {
+    if (bufferHandle == NULL || shareMemory == NULL) {
         HDF_LOGE("%{public}s invalid param", __func__);
         return HDF_FAILURE;
     }
+    OHOS::HDI::Display::Buffer::V1_0::AllocInfo alloc = {
+        .width = cmd.width,
+        .height = cmd.height,
+        .usage =  OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_READ
+            | OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE
+            | OHOS::HDI::Display::Composer::V1_0::HBM_USE_MEM_DMA,
+        .format = cmd.pixFmt};
 
     int32_t ret = GrMemCreate(alloc, bufferHandle);
     if (ret != HDF_SUCCESS) {

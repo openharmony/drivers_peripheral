@@ -313,18 +313,6 @@ static bool AllocateBuffer(int32_t inputBufferNum, int32_t outputBufferNum)
     return false;
 }
 
-static void InitAllocInfo(AllocInfo *alloc)
-{
-    if (alloc == NULL) {
-        HDF_LOGI("%{public}s: ignore null alloc!", __func__);
-        return;
-    }
-    alloc->width = g_cmd.width;
-    alloc->height = g_cmd.height;
-    alloc->usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA;
-    alloc->format = g_cmd.pixFmt;
-}
-
 static void FreeInfosData(CodecBuffer **g_InfosData, int32_t num)
 {
     for (int32_t n = 0; n < num; n++) {
@@ -390,13 +378,11 @@ static bool InitBuffer(int32_t inputBufferNum, int32_t inputBufferSize,
         }
     }
 
-    AllocInfo alloc;
-    InitAllocInfo(&alloc);
     for (int32_t j = 0; j < outputBufferNum; j++) {
         g_outputBuffers[j].id = inputBufferNum + j;
         g_outputBuffers[j].type = BUFFER_TYPE_HANDLE;
         BufferHandle *bufferHandle;
-        CreateGrShareMemory(&bufferHandle, &alloc, &g_outputBuffers[j]);
+        CreateGrShareMemory(&bufferHandle, g_cmd, &g_outputBuffers[j]);
         if (!InitOutputInfosData(inputBufferNum, bufferHandle, j)) {
             FreeInfosData(g_inputInfosData, inputBufferNum);
             HDF_LOGE("%{public}s: InitInput[%{public}d] failed!", __func__, j);
