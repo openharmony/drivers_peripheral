@@ -73,6 +73,16 @@ void StreamStatistics::Clear()
     cancelBufferFailCount_ = 0;
 }
 
+void StreamStatistics::CalculateFps(int interval)
+{
+    if (interval > 0) {
+        fpsValue_ = (requestBufferSuccessCount_ - lastRequestBufferCount_) / interval;
+        lastRequestBufferCount_ = requestBufferSuccessCount_;
+    } else {
+        return;
+    }
+}
+
 void StreamStatistics::DumpStats(int interval)
 {
     if (clock_gettime(CLOCK_MONOTONIC, &timestamp_) != 0) {
@@ -86,15 +96,14 @@ void StreamStatistics::DumpStats(int interval)
     }
 
     if (timestamp_.tv_sec - lastOutputTime_ > interval) {
+        CalculateFps(timestamp_.tv_sec - lastOutputTime_);
         std::stringstream ss;
-        ss << "streamId:" << streamId_ << ", requestBufferSuccessCount:" << requestBufferSuccessCount_ <<
-            ", requestBufferFailCount:" << requestBufferFailCount_ << ", flushBufferSuccessCount:" <<
-            flushBufferSuccessCount_ << ", flushBufferFailCount:" << flushBufferFailCount_ <<
-            ", cancelBufferSuccessCount:" << cancelBufferSuccessCount_ << ", cancelBufferFailCount:" <<
-            cancelBufferFailCount_;
-        std::string dumpInfo = ss.str();
-
-        CAMERA_LOGE("%{public}s", dumpInfo.c_str());
+        ss << "streamId:" << streamId_ << ", buf status(suc/fail) req:" << requestBufferSuccessCount_ <<
+            "/" << requestBufferFailCount_ << ", flush:" <<flushBufferSuccessCount_ << "/" << 
+            flushBufferFailCount_ <<", cancel:" << cancelBufferSuccessCount_ << "/" <<
+            cancelBufferFailCount_ << ", fps:" << fpsValue_;
+        streamInfo_ = ss.str();
+        CAMERA_LOGE("%{public}s", streamInfo_.c_str());
         lastOutputTime_ = timestamp_.tv_sec;
     }
 }

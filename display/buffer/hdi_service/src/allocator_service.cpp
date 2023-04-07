@@ -65,17 +65,21 @@ int32_t AllocatorService::LoadVdi()
     CHECK_NULLPOINTER_RETURN_VALUE(libHandle_, HDF_FAILURE);
 
     createVdi_ = reinterpret_cast<CreateDisplayBufferVdiFunc>(dlsym(libHandle_, "CreateDisplayBufferVdi"));
-    errStr = dlerror();
-    if (errStr != nullptr || createVdi_ == nullptr) {
-        HDF_LOGE("%{public}s: allocator CreateDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
+    if (createVdi_ == nullptr) {
+        errStr = dlerror();
+        if (errStr != nullptr) {
+            HDF_LOGE("%{public}s: allocator CreateDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
+        }
         dlclose(libHandle_);
         return HDF_FAILURE;
     }
 
     destroyVdi_ = reinterpret_cast<DestroyDisplayBufferVdiFunc>(dlsym(libHandle_, "DestroyDisplayBufferVdi"));
-    errStr = dlerror();
-    if (errStr != nullptr || destroyVdi_ == nullptr) {
-        HDF_LOGE("%{public}s: allocator DestroyDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
+    if (destroyVdi_ == nullptr) {
+        errStr = dlerror();
+        if (errStr != nullptr) {
+            HDF_LOGE("%{public}s: allocator DestroyDisplayBufferVdi dlsym error: %{public}s", __func__, errStr);
+        }
         dlclose(libHandle_);
         return HDF_FAILURE;
     }
@@ -97,6 +101,7 @@ int32_t AllocatorService::AllocMem(const AllocInfo& info, sptr<NativeBuffer>& ha
     if (handle == nullptr) {
         HDF_LOGE("%{public}s: new NativeBuffer failed", __func__);
         delete handle;
+        vdiImpl_->FreeMem(*buffer);
         return HDF_FAILURE;
     }
 

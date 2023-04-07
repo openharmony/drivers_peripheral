@@ -27,9 +27,10 @@
 
 using namespace std;
 using namespace OHOS;
-
+using namespace OHOS::HDI::Display::Buffer::V1_0;
+using namespace OHOS::HDI::Display::Composer::V1_0;
 #define HDF_LOG_TAG codec_omx_hdi_enc
-OHOS::HDI::Display::V1_0::IDisplayGralloc *CodecHdiAdapterEncode::gralloc_ = nullptr;
+IDisplayBuffer *CodecHdiAdapterEncode::gralloc_ = nullptr;
 namespace {
     constexpr int16_t ENC_DEFAULT_FRAME_RATE = 24;
 
@@ -102,7 +103,7 @@ bool CodecHdiAdapterEncode::Init(CommandOpt &opt)
     this->useBufferHandle_ = opt.useBuffer;
     HDF_LOGI("width[%{public}d], height[%{public}d],stride_[%{public}d]", width_, height_, stride_);
     // gralloc init
-    gralloc_ = OHOS::HDI::Display::V1_0::IDisplayGralloc::Get();
+    gralloc_ = IDisplayBuffer::Get();
     
     struct stat fileStat = {0};
     stat(opt.fileInput.c_str(), &fileStat);
@@ -512,10 +513,12 @@ int32_t CodecHdiAdapterEncode::CreateBufferHandle()
         return HDF_ERR_INVALID_PARAM;
     }
 
-    AllocInfo alloc = {.width = this->stride_,
-                       .height = this->height_,
-                       .usage = HBM_USE_CPU_READ | HBM_USE_CPU_WRITE | HBM_USE_MEM_DMA,
-                       .format = PIXEL_FMT_YCBCR_420_SP};
+    OHOS::HDI::Display::Buffer::V1_0::AllocInfo alloc = {.width = this->stride_,
+        .height = this->height_,
+        .usage = OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_READ
+            | OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE
+            | OHOS::HDI::Display::Composer::V1_0::HBM_USE_MEM_DMA,
+        .format = OHOS::HDI::Display::Composer::V1_0::PIXEL_FMT_YCBCR_420_SP};
 
     int32_t ret = HDF_SUCCESS;
     for (size_t i = 0; i < BUFFER_COUNT; i++) {

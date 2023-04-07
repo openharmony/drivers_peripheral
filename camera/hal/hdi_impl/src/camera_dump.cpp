@@ -29,7 +29,7 @@ const char *g_cameraDumpHelp =
     "     -h: camera dump help\n"
     "     -m: start dump metadata\n"
     "     -b: start dump buffer\n"
-    "     -s: start dump streamInfo\n";
+    "     -e: exit all dump\n";
 
 std::map<DumpType, bool> g_dumpInfoMap = {
     {MedataType, false},
@@ -107,13 +107,13 @@ bool CameraDumper::DumpMetadata(const std::shared_ptr<CameraMetadata>& metadata,
 void CameraDumper::UpdateDumpMode(DumpType type, bool isDump, HdfSBuf *reply)
 {
     std::string upRetStr;
-   
+
     auto it = g_dumpInfoMap.find(type);
     if (it != g_dumpInfoMap.end()) {
         g_dumpInfoMap[type] = isDump;
         upRetStr += " set dump mode success!\n";
     }
-    
+
     if (reply != nullptr) {
         (void)HdfSbufWriteString(reply, upRetStr.c_str());
     }
@@ -187,6 +187,9 @@ void CameraDumper::CameraHostDumpProcess(HdfSBuf *data, HdfSBuf *reply)
             UpdateDumpMode(MedataType, true, reply);
         } else if (strcmp(value, "-b") == 0) {
             UpdateDumpMode(BufferType, true, reply);
+        } else if (strcmp(value, "-e") == 0) {
+            UpdateDumpMode(BufferType, false, reply);
+            UpdateDumpMode(MedataType, false, reply);
         } else {
             ShowDumpMenu(reply);
         }
