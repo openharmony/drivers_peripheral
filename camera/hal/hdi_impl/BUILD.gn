@@ -235,6 +235,7 @@ if (defined(ohos_lite)) {
     }
     external_deps += [
       "drivers_interface_camera:metadata",
+      "hitrace_native:hitrace_meter",
       "ipc:ipc_single",
     ]
     shlib_type = "hdi"
@@ -274,6 +275,7 @@ if (defined(ohos_lite)) {
         "hdf_core:libhdf_ipc_adapter",
         "hdf_core:libhdf_utils",
         "hdf_core:libhdi",
+        "hitrace_native:hitrace_meter",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_single",
       ]
@@ -285,6 +287,7 @@ if (defined(ohos_lite)) {
     }
     external_deps += [
       "drivers_interface_camera:metadata",
+      "hitrace_native:hitrace_meter",
       "ipc:ipc_single",
     ]
 

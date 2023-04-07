@@ -950,7 +950,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_060, TestSize.Level1)
     captureInfo.enableShutterCallback_ = false;
     display_->rc = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo, true);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
-    sleep(5);
+    sleep(3);
     display_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     // release stream
@@ -1006,7 +1006,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_061, TestSize.Level2)
     captureInfo.enableShutterCallback_ = false;
     display_->rc = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo, true);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
-    sleep(5);
+    sleep(3);
     display_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     // release stream
@@ -1148,7 +1148,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_071, TestSize.Level2)
     bool isStreaming = true;
     display_->rc = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo, isStreaming);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
-    sleep(5);
+    sleep(3);
     display_->streamOperator->CancelCapture(captureId);
     // release stream
     display_->rc = (CamRetCode)display_->streamOperator->ReleaseStreams(captureInfo.streamIds_);
@@ -1201,7 +1201,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_073, TestSize.Level2)
     captureInfo.enableShutterCallback_ = true;
     display_->rc = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo, false);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
-    sleep(5);
+    sleep(3);
     display_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
     // release stream
@@ -1307,7 +1307,7 @@ HWTEST_F(CameraPreviewTest, camera_preview_080, TestSize.Level2)
     bool isStreaming = true;
     display_->rc = (CamRetCode)display_->streamOperator->Capture(captureId, captureInfo, isStreaming);
     EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
-    sleep(5);
+    sleep(3);
     display_->rc = (CamRetCode)display_->streamOperator->CancelCapture(-1);
     EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
     display_->rc = (CamRetCode)display_->streamOperator->CancelCapture(captureId);

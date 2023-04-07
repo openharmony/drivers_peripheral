@@ -133,6 +133,7 @@ void CameraAbilityTest::TearDown(void)
  */
 static HWTEST_F(CameraAbilityTest, camera_ability_001, TestSize.Level1)
 {
+    EXPECT_EQ(true, display_->ability != nullptr);
     if (display_->ability == nullptr) {
         CAMERA_LOGE("ability is null.");
         return;
