@@ -196,6 +196,47 @@ int32_t PinAuth::GetSalt(uint64_t templateId, std::vector<uint8_t> &salt)
     return RESULT_SUCCESS;
 }
 
+int32_t PinAuth::AuthPinInner(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &pinData,
+    std::vector<uint8_t> &resultTlv)
+{
+    if (pinData.size() != CONST_PIN_DATA_LEN) {
+        LOG_ERROR("bad pinData len!");
+        return PinResultToCoAuthResult(RESULT_BAD_PARAM);
+    }
+
+    PinAuthParam *pinAuthParam = new (std::nothrow) PinAuthParam();
+    if (pinAuthParam == nullptr) {
+        LOG_ERROR("pinAuthParam is nullptr!");
+        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
+    }
+    pinAuthParam->scheduleId = scheduleId;
+    pinAuthParam->templateId = templateId;
+    if (memcpy_s(&(pinAuthParam->pinData[0]), CONST_PIN_DATA_LEN, &pinData[0], pinData.size()) != EOK) {
+        LOG_ERROR("mem copy pinData to pinAuthParam fail!");
+        delete pinAuthParam;
+        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
+    }
+    Buffer *retTlv = CreateBufferBySize(RESULT_TLV_LEN);
+    ResultCode compareRet = RESULT_COMPARE_FAIL;
+    ResultCode result = DoAuthPin(pinAuthParam, retTlv, &compareRet);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("DoAuthPin fail!");
+        goto ERROR;
+    }
+    result = SetResultTlv(retTlv, resultTlv);
+    if (result != RESULT_SUCCESS) {
+        LOG_ERROR("SetRsultTlv fail!");
+        resultTlv.clear();
+        goto ERROR;
+    }
+    result = compareRet;
+
+ERROR:
+    DestoryBuffer(retTlv);
+    delete pinAuthParam;
+    return PinResultToCoAuthResult(result);
+}
+
 /* This is for example only, Should be implemented in trusted environment. */
 int32_t PinAuth::AuthPin(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &pinData,
     std::vector<uint8_t> &resultTlv)
@@ -204,47 +245,12 @@ int32_t PinAuth::AuthPin(uint64_t scheduleId, uint64_t templateId, const std::ve
         LOG_ERROR("pthread_mutex_lock fail!");
         return PinResultToCoAuthResult(RESULT_BAD_PARAM);
     }
-    if (pinData.size() != CONST_PIN_DATA_LEN) {
-        LOG_ERROR("bad pidData len!");
-        static_cast<void>(pthread_mutex_unlock(&g_mutex));
-        return PinResultToCoAuthResult(RESULT_BAD_PARAM);
-    }
-
-    PinAuthParam *pinAuthParam = new (std::nothrow) PinAuthParam();
-    if (pinAuthParam == nullptr) {
-        LOG_ERROR("pinAuthParam is nullptr!");
-        static_cast<void>(pthread_mutex_unlock(&g_mutex));
-        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
-    }
-    pinAuthParam->scheduleId = scheduleId;
-    pinAuthParam->templateId = templateId;
-    if (memcpy_s(&(pinAuthParam->pinData[0]), CONST_PIN_DATA_LEN, &pinData[0], pinData.size()) != EOK) {
-        LOG_ERROR("mem copy pinData to pinAuthParam fail!");
-        static_cast<void>(pthread_mutex_unlock(&g_mutex));
-        delete pinAuthParam;
-        return PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
-    }
-    Buffer *retTlv = CreateBufferBySize(RESULT_TLV_LEN);
-    ResultCode result = DoAuthPin(pinAuthParam, retTlv);
-    if (result != RESULT_SUCCESS) {
-        LOG_ERROR("DoAuthPin fail!");
-    }
-    ResultCode setRet = SetResultTlv(retTlv, resultTlv);
-    if (setRet != RESULT_SUCCESS) {
-        LOG_ERROR("SetRsultTlv fail!");
-        result = setRet;
-        resultTlv.clear();
-        goto ERROR;
-    }
-
-ERROR:
+    int32_t ret = AuthPinInner(scheduleId, templateId, pinData, resultTlv);
     if (pthread_mutex_unlock(&g_mutex) != 0) {
         LOG_ERROR("pthread_mutex_unlock fail!");
-        result = RESULT_GENERAL_ERROR;
+        ret = PinResultToCoAuthResult(RESULT_GENERAL_ERROR);
     }
-    DestoryBuffer(retTlv);
-    delete pinAuthParam;
-    return PinResultToCoAuthResult(result);
+    return ret;
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
@@ -353,6 +359,21 @@ int32_t PinAuth::VerifyTemplateData(std::vector<uint64_t> templateIdList)
         result = RESULT_GENERAL_ERROR;
     }
     return PinResultToCoAuthResult(result);
+}
+
+void PinAuth::WriteAntiBrute(uint64_t templateId)
+{
+    LOG_INFO("start");
+    if (pthread_mutex_lock(&g_mutex) != 0) {
+        LOG_ERROR("pthread_mutex_lock fail!");
+        return;
+    }
+    if (WriteAntiBruteInfoToFile(templateId) != RESULT_SUCCESS) {
+        LOG_ERROR("WriteAntiBruteInfoToFile fail!");
+    }
+    if (pthread_mutex_unlock(&g_mutex) != 0) {
+        LOG_ERROR("pthread_mutex_unlock fail!");
+    }
 }
 } // namespace PinAuth
 } // namespace UserIam

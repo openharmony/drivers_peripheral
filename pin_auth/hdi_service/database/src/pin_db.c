@@ -39,122 +39,6 @@ static ResultCode GetDataFromBuf(uint8_t **src, uint32_t *srcLen, uint8_t *dest,
     return RESULT_SUCCESS;
 }
 
-static ResultCode UnpackPinDb(uint8_t *data, uint32_t dataLen)
-{
-    if (data == NULL || dataLen == 0) {
-        LOG_ERROR("param is invalid.");
-        return RESULT_BAD_PARAM;
-    }
-
-    uint8_t *temp = data;
-    uint32_t tempLen = dataLen;
-    if (GetDataFromBuf(&temp, &tempLen, (uint8_t *)&(g_pinDbOp.version), sizeof(g_pinDbOp.version)) != RESULT_SUCCESS) {
-        LOG_ERROR("read version fail.");
-        goto ERROR;
-    }
-    if (GetDataFromBuf(&temp, &tempLen, (uint8_t *)&(g_pinDbOp.pinIndexLen),
-        sizeof(g_pinDbOp.pinIndexLen)) != RESULT_SUCCESS) {
-        LOG_ERROR("read pinIndexLen fail.");
-        goto ERROR;
-    }
-    if (g_pinDbOp.pinIndexLen > MAX_CRYPTO_INFO_SIZE) {
-        LOG_ERROR("pinIndexLen too large.");
-        goto ERROR;
-    }
-    if (g_pinDbOp.pinIndexLen == 0) {
-        g_pinDbOp.pinIndex = NULL;
-        return RESULT_SUCCESS;
-    }
-    uint32_t mallocSize = sizeof(PinIndex) * g_pinDbOp.pinIndexLen;
-    g_pinDbOp.pinIndex = (PinIndex *)Malloc(mallocSize);
-    if (g_pinDbOp.pinIndex == NULL) {
-        LOG_ERROR("pinIndex malloc fail.");
-        goto ERROR;
-    }
-    if (mallocSize != tempLen) {
-        LOG_ERROR("pinIndexLen too large.");
-        goto ERROR;
-    }
-    if (memcpy_s(g_pinDbOp.pinIndex, mallocSize, temp, tempLen) != EOK) {
-        LOG_ERROR("read pinIndex fail.");
-        goto ERROR;
-    }
-    return RESULT_SUCCESS;
-
-ERROR:
-    DestroyPinDb();
-    return RESULT_BAD_READ;
-}
-
-static ResultCode LoadPinDb()
-{
-    if (g_pinDbOp.isLoaded) {
-        return RESULT_SUCCESS;
-    }
-    FileOperator *fileOp = GetFileOperator(DEFAULT_FILE_OPERATOR);
-    if (!IsFileOperatorValid(fileOp)) {
-        LOG_ERROR("fileOp invalid.");
-        return RESULT_GENERAL_ERROR;
-    }
-
-    if (!fileOp->isFileExist(PIN_INDEX_NAME)) {
-        g_pinDbOp.isLoaded = true;
-        return RESULT_SUCCESS;
-    }
-
-    uint32_t dataLen = 0;
-    ResultCode ret = (ResultCode)(fileOp->getFileLen(PIN_INDEX_NAME, &dataLen));
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("get filelen failed");
-        return RESULT_BAD_READ;
-    }
-
-    uint8_t *data = Malloc(dataLen);
-    if (data == NULL) {
-        LOG_ERROR("parcel create failed");
-        return RESULT_GENERAL_ERROR;
-    }
-    ret = fileOp->readFile(PIN_INDEX_NAME, data, dataLen);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("read_parcel_from_file failed.");
-        goto EXIT;
-    }
-
-    ret = UnpackPinDb(data, dataLen);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("unpack db failed.");
-        goto EXIT;
-    }
-    g_pinDbOp.isLoaded = true;
-    LOG_INFO("LoadPinDb succ.");
-
-EXIT:
-    (void)memset_s(data, dataLen, 0, dataLen);
-    Free(data);
-    return ret;
-}
-
-void InitPinDb(void)
-{
-    ResultCode ret = LoadPinDb();
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("LoadPinDb fail.");
-    }
-    LOG_INFO("InitPinDb succ.");
-}
-
-void DestroyPinDb(void)
-{
-    if (g_pinDbOp.pinIndex != NULL) {
-        Free(g_pinDbOp.pinIndex);
-    }
-    g_pinDbOp.version = CURRENT_VERSION;
-    g_pinDbOp.pinIndexLen = 0;
-    g_pinDbOp.pinIndex = NULL;
-    g_pinDbOp.isLoaded = false;
-    LOG_INFO("DestroyPinDb succ.");
-}
-
 static ResultCode CopyDataToBuf(uint8_t *data, uint32_t dataLen, uint8_t **buf, uint32_t *bufLen)
 {
     if (memcpy_s(*buf, *bufLen, data, dataLen) != EOK) {
@@ -278,6 +162,146 @@ static ResultCode WritePinFile(const uint8_t *data, uint32_t dataLen, uint64_t t
     return RESULT_SUCCESS;
 }
 
+static ResultCode GetPinIndex(uint8_t *data, uint32_t dataLen)
+{
+    if (sizeof(PinInfo) * g_pinDbOp.pinIndexLen != dataLen) {
+        LOG_ERROR("bad data length.");
+        return RESULT_GENERAL_ERROR;
+    }
+    g_pinDbOp.pinIndex = (PinIndex *)Malloc(sizeof(PinIndex) * g_pinDbOp.pinIndexLen);
+    if (g_pinDbOp.pinIndex == NULL) {
+        LOG_ERROR("pinIndex malloc fail.");
+        return RESULT_NO_MEMORY;
+    }
+    uint8_t *temp = data;
+    uint32_t tempLen = dataLen;
+    for (uint32_t i = 0; i < g_pinDbOp.pinIndexLen; i++) {
+        if (GetDataFromBuf(&temp, &tempLen, (uint8_t *)(&(g_pinDbOp.pinIndex[i].pinInfo)),
+            sizeof(g_pinDbOp.pinIndex[i].pinInfo)) != RESULT_SUCCESS) {
+            LOG_ERROR("read pinInfo fail.");
+            Free(g_pinDbOp.pinIndex);
+            g_pinDbOp.pinIndex = NULL;
+            return RESULT_BAD_READ;
+        }
+        if (ReadPinFile((uint8_t *)(&(g_pinDbOp.pinIndex[i].antiBruteInfo)),
+            sizeof(g_pinDbOp.pinIndex[i].antiBruteInfo),
+            g_pinDbOp.pinIndex[i].pinInfo.templateId, ANTI_BRUTE_SUFFIX) != RESULT_SUCCESS) {
+            LOG_ERROR("read AntiBruteInfo fail.");
+            Free(g_pinDbOp.pinIndex);
+            g_pinDbOp.pinIndex = NULL;
+            return RESULT_BAD_READ;
+        }
+    }
+    return RESULT_SUCCESS;
+}
+
+static ResultCode UnpackPinDb(uint8_t *data, uint32_t dataLen)
+{
+    if (data == NULL || dataLen == 0) {
+        LOG_ERROR("param is invalid.");
+        return RESULT_BAD_PARAM;
+    }
+
+    uint8_t *temp = data;
+    uint32_t tempLen = dataLen;
+    if (GetDataFromBuf(&temp, &tempLen, (uint8_t *)&(g_pinDbOp.version), sizeof(g_pinDbOp.version)) != RESULT_SUCCESS) {
+        LOG_ERROR("read version fail.");
+        goto ERROR;
+    }
+    if (GetDataFromBuf(&temp, &tempLen, (uint8_t *)&(g_pinDbOp.pinIndexLen),
+        sizeof(g_pinDbOp.pinIndexLen)) != RESULT_SUCCESS) {
+        LOG_ERROR("read pinIndexLen fail.");
+        goto ERROR;
+    }
+    if (g_pinDbOp.pinIndexLen > MAX_CRYPTO_INFO_SIZE) {
+        LOG_ERROR("pinIndexLen too large.");
+        goto ERROR;
+    }
+    if (g_pinDbOp.pinIndexLen == 0) {
+        g_pinDbOp.pinIndex = NULL;
+        return RESULT_SUCCESS;
+    }
+    if (GetPinIndex(temp, tempLen) != RESULT_SUCCESS) {
+        LOG_ERROR("GetPinIndex fail.");
+        goto ERROR;
+    }
+    return RESULT_SUCCESS;
+
+ERROR:
+    DestroyPinDb();
+    return RESULT_BAD_READ;
+}
+
+static ResultCode LoadPinDb()
+{
+    if (g_pinDbOp.isLoaded) {
+        return RESULT_SUCCESS;
+    }
+    FileOperator *fileOp = GetFileOperator(DEFAULT_FILE_OPERATOR);
+    if (!IsFileOperatorValid(fileOp)) {
+        LOG_ERROR("fileOp invalid.");
+        return RESULT_GENERAL_ERROR;
+    }
+
+    if (!fileOp->isFileExist(PIN_INDEX_NAME)) {
+        g_pinDbOp.isLoaded = true;
+        return RESULT_SUCCESS;
+    }
+
+    uint32_t dataLen = 0;
+    ResultCode ret = (ResultCode)(fileOp->getFileLen(PIN_INDEX_NAME, &dataLen));
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("get filelen failed");
+        return RESULT_BAD_READ;
+    }
+
+    uint8_t *data = Malloc(dataLen);
+    if (data == NULL) {
+        LOG_ERROR("parcel create failed");
+        return RESULT_GENERAL_ERROR;
+    }
+    ret = fileOp->readFile(PIN_INDEX_NAME, data, dataLen);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("read_parcel_from_file failed.");
+        goto EXIT;
+    }
+
+    ret = UnpackPinDb(data, dataLen);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("unpack db failed.");
+        goto EXIT;
+    }
+    g_pinDbOp.isLoaded = true;
+    LOG_INFO("LoadPinDb succ.");
+
+EXIT:
+    (void)memset_s(data, dataLen, 0, dataLen);
+    Free(data);
+    return ret;
+}
+
+void InitPinDb(void)
+{
+    ResultCode ret = LoadPinDb();
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("LoadPinDb fail.");
+        return;
+    }
+    LOG_INFO("InitPinDb succ.");
+}
+
+void DestroyPinDb(void)
+{
+    if (g_pinDbOp.pinIndex != NULL) {
+        Free(g_pinDbOp.pinIndex);
+    }
+    g_pinDbOp.version = CURRENT_VERSION;
+    g_pinDbOp.pinIndexLen = 0;
+    g_pinDbOp.pinIndex = NULL;
+    g_pinDbOp.isLoaded = false;
+    LOG_INFO("DestroyPinDb succ.");
+}
+
 static ResultCode CoverData(const char *fileName, const FileOperator *fileOp)
 {
     uint32_t fileLen = 0;
@@ -370,7 +394,7 @@ static uint64_t GeneratePinTemplateId(void)
         }
         uint32_t j = 0;
         for (; j < g_pinDbOp.pinIndexLen; j++) {
-            if (templateId == g_pinDbOp.pinIndex[i].templateId) {
+            if (templateId == g_pinDbOp.pinIndex[i].pinInfo.templateId) {
                 break;
             }
         }
@@ -389,7 +413,7 @@ static uint32_t SearchPinById(const uint64_t templateId)
         return MAX_CRYPTO_INFO_SIZE;
     }
     for (uint32_t index = 0; index < g_pinDbOp.pinIndexLen; index++) {
-        if (g_pinDbOp.pinIndex[index].templateId == templateId) {
+        if (g_pinDbOp.pinIndex[index].pinInfo.templateId == templateId) {
             LOG_INFO("SearchPinById succ.");
             return index;
         }
@@ -401,7 +425,7 @@ static uint32_t SearchPinById(const uint64_t templateId)
 static ResultCode DelPin(const uint32_t index)
 {
     /* This is for example only, Should be implemented in trusted environment. */
-    ResultCode ret = RemoveAllFile(g_pinDbOp.pinIndex[index].templateId);
+    ResultCode ret = RemoveAllFile(g_pinDbOp.pinIndex[index].pinInfo.templateId);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("Remove pin file fail.");
         return ret;
@@ -447,6 +471,23 @@ static ResultCode GetBufFromData(uint8_t *src, uint32_t srcLen, uint8_t **dest, 
     return RESULT_SUCCESS;
 }
 
+static ResultCode WritePinInfo(uint8_t *data, uint32_t dataLen)
+{
+    if (g_pinDbOp.pinIndexLen == 0) {
+        return RESULT_SUCCESS;
+    }
+    uint8_t *temp = data;
+    uint32_t tempLen = dataLen;
+    for (uint32_t i = 0; i < g_pinDbOp.pinIndexLen; i++) {
+        if (GetBufFromData((uint8_t *)(&(g_pinDbOp.pinIndex[i].pinInfo)), sizeof(g_pinDbOp.pinIndex[i].pinInfo),
+            &temp, &tempLen) != RESULT_SUCCESS) {
+            LOG_ERROR("write pin info fail.");
+            return RESULT_BAD_WRITE;
+        }
+    }
+    return RESULT_SUCCESS;
+}
+
 static ResultCode WritePinDb()
 {
     if (!IsPinDbValid(&g_pinDbOp)) {
@@ -460,7 +501,7 @@ static ResultCode WritePinDb()
         return RESULT_GENERAL_ERROR;
     }
 
-    uint32_t dataLen = sizeof(PinIndex) * g_pinDbOp.pinIndexLen + sizeof(uint32_t) * PIN_DB_TWO_PARAMS;
+    uint32_t dataLen = sizeof(PinInfo) * g_pinDbOp.pinIndexLen + sizeof(uint32_t) * PIN_DB_TWO_PARAMS;
     uint8_t *data = Malloc(dataLen);
     if (data == NULL) {
         LOG_ERROR("malloc data fail.");
@@ -478,11 +519,10 @@ static ResultCode WritePinDb()
         ret = RESULT_BAD_WRITE;
         goto ERROR;
     }
-    if (g_pinDbOp.pinIndexLen != 0) {
-        if (memcpy_s(temp, tempLen, g_pinDbOp.pinIndex, (sizeof(PinIndex) * g_pinDbOp.pinIndexLen)) != EOK) {
-            ret = RESULT_BAD_WRITE;
-            goto ERROR;
-        }
+    ret = WritePinInfo(temp, tempLen);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("WritePinInfo failed.");
+        goto ERROR;
     }
 
     if (fileOp->writeFile(PIN_INDEX_NAME, data, dataLen) != RESULT_SUCCESS) {
@@ -563,15 +603,27 @@ ResultCode DelPinById(uint64_t templateId)
     return ret;
 }
 
+static void InitPinInfo(PinInfo *pinInfo, uint64_t templateId, uint64_t subType)
+{
+    pinInfo->templateId = templateId;
+    pinInfo->subType = subType;
+}
+
+static void InitAntiBruteInfo(AntiBruteInfo *info)
+{
+    info->authErrorConut = INIT_AUTH_ERROR_COUNT;
+    info->startFreezeTime = INIT_START_FREEZE_TIMES;
+}
+
 static void InitPinIndex(PinIndex *pinIndex, uint64_t templateId, uint64_t subType)
 {
-    pinIndex->templateId = templateId;
-    pinIndex->subType = subType;
+    InitPinInfo(&(pinIndex->pinInfo), templateId, subType);
+    InitAntiBruteInfo(&(pinIndex->antiBruteInfo));
 }
 
 static ResultCode AddPinInDb(uint64_t templateId, uint64_t subType)
 {
-    if (g_pinDbOp.pinIndexLen + 1 > MAX_CRYPTO_INFO_SIZE) {
+    if (g_pinDbOp.pinIndexLen > MAX_CRYPTO_INFO_SIZE - 1) {
         LOG_ERROR("pinIndexLen too large.");
         return RESULT_BAD_PARAM;
     }
@@ -628,13 +680,6 @@ static ResultCode RefreshPinDb(uint64_t *templateId, uint64_t subType)
     return ret;
 }
 
-static ResultCode InitAntiBruteInfo(AntiBruteInfo *info)
-{
-    info->authErrorConut = INIT_AUTH_ERROR_COUNT;
-    info->startFreezeTime = INIT_START_FREEZE_TIMES;
-    return RESULT_SUCCESS;
-}
-
 static ResultCode WriteAddPinInfo(const Buffer *secret, const Buffer *pinCredentialData, const uint8_t *salt,
     uint32_t saltLen, const uint64_t templateId)
 {
@@ -660,11 +705,7 @@ static ResultCode WriteAddPinInfo(const Buffer *secret, const Buffer *pinCredent
         LOG_ERROR("malloc PAntiBruteInfo data fail.");
         return RESULT_GENERAL_ERROR;
     }
-    ret = InitAntiBruteInfo(initAntiBrute);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("InitAntiBruteInfo fail.");
-        goto EXIT;
-    }
+    InitAntiBruteInfo(initAntiBrute);
     ret = WritePinFile((uint8_t *)initAntiBrute, sizeof(AntiBruteInfo), templateId, ANTI_BRUTE_SUFFIX);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("WriteAntiBruteFile fail.");
@@ -877,15 +918,28 @@ static ResultCode GetAntiBruteCountById(uint64_t templateId, uint32_t *count)
         LOG_ERROR("no pin index match.");
         return RESULT_BAD_MATCH;
     }
+    *count = g_pinDbOp.pinIndex[index].antiBruteInfo.authErrorConut;
+    return RESULT_SUCCESS;
+}
 
-    AntiBruteInfo initAntiBrute = {INIT_AUTH_ERROR_COUNT, INIT_START_FREEZE_TIMES};
-    ret = ReadPinFile((uint8_t *)&initAntiBrute, sizeof(AntiBruteInfo), templateId, ANTI_BRUTE_SUFFIX);
+ResultCode RefreshAntiBruteInfoToFile(uint64_t templateId)
+{
+    ResultCode ret = LoadPinDb();
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("read AntiBrute startFreezeTime fail.");
+        LOG_ERROR("LoadPinDb fail.");
         return ret;
     }
-    *count = initAntiBrute.authErrorConut;
-
+    uint32_t index = SearchPinById(templateId);
+    if (index == MAX_CRYPTO_INFO_SIZE) {
+        LOG_ERROR(" no pin match.");
+        return RESULT_BAD_MATCH;
+    }
+    ret = WritePinFile((uint8_t *)(&(g_pinDbOp.pinIndex[index].antiBruteInfo)), sizeof(AntiBruteInfo),
+        templateId, ANTI_BRUTE_SUFFIX);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("write anti brute fail.");
+        return ret;
+    }
     return ret;
 }
 
@@ -902,11 +956,12 @@ static ResultCode SetAntiBruteInfoById(uint64_t templateId, uint32_t count, uint
         LOG_ERROR(" no pin match.");
         return RESULT_BAD_MATCH;
     }
-
-    AntiBruteInfo initAntiBrute = {count, startFreezeTime};
-    ret = WritePinFile((uint8_t *)&initAntiBrute, sizeof(AntiBruteInfo), templateId, ANTI_BRUTE_SUFFIX);
+    g_pinDbOp.pinIndex[index].antiBruteInfo.authErrorConut = count;
+    g_pinDbOp.pinIndex[index].antiBruteInfo.startFreezeTime = startFreezeTime;
+    ret = WritePinFile((uint8_t *)(&(g_pinDbOp.pinIndex[index].antiBruteInfo)), sizeof(AntiBruteInfo),
+        templateId, ANTI_BRUTE_SUFFIX);
     if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("write AntiBruteFileName fail.");
+        LOG_ERROR("write anti brute fail.");
         return ret;
     }
     return ret;
@@ -924,7 +979,7 @@ ResultCode GetSubType(uint64_t templateId, uint64_t *subType)
         LOG_ERROR("no pin match.");
         return RESULT_BAD_MATCH;
     }
-    *subType = g_pinDbOp.pinIndex[index].subType;
+    *subType = g_pinDbOp.pinIndex[index].pinInfo.subType;
 
     LOG_INFO("GetSubType succ.");
     return RESULT_SUCCESS;
@@ -942,18 +997,11 @@ ResultCode GetAntiBruteInfo(uint64_t templateId, uint32_t *authErrorConut, uint6
         LOG_ERROR("no pin match.");
         return RESULT_BAD_MATCH;
     }
-
-    AntiBruteInfo initAntiBrute = {INIT_AUTH_ERROR_COUNT, INIT_START_FREEZE_TIMES};
-    ResultCode ret = ReadPinFile((uint8_t *)&initAntiBrute, sizeof(AntiBruteInfo), templateId, ANTI_BRUTE_SUFFIX);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("read AntiBrute startFreezeTime fail.");
-        return ret;
-    }
-    *authErrorConut = initAntiBrute.authErrorConut;
-    *startFreezeTime = initAntiBrute.startFreezeTime;
+    *authErrorConut = g_pinDbOp.pinIndex[index].antiBruteInfo.authErrorConut;
+    *startFreezeTime = g_pinDbOp.pinIndex[index].antiBruteInfo.startFreezeTime;
 
     LOG_INFO("GetAntiBruteInfo succ.");
-    return ret;
+    return RESULT_SUCCESS;
 }
 
 static uint64_t ExponentialFuncTime(uint32_t authErrorConut)
@@ -1048,11 +1096,8 @@ static ResultCode ClearAntiBruteInfoById(uint64_t templateId)
         LOG_ERROR(" no pin match.");
         return RESULT_BAD_MATCH;
     }
-    ResultCode ret = SetAntiBruteInfoById(templateId, 0, INIT_START_FREEZE_TIMES);
-    if (ret != RESULT_SUCCESS) {
-        LOG_ERROR("SetAntiBruteInfoById fail.");
-    }
-    return ret;
+    InitAntiBruteInfo(&(g_pinDbOp.pinIndex[index].antiBruteInfo));
+    return RESULT_SUCCESS;
 }
 
 static ResultCode UpdateAntiBruteFile(uint64_t templateId, bool authResultSucc)
@@ -1087,21 +1132,6 @@ static ResultCode UpdateAntiBruteFile(uint64_t templateId, bool authResultSucc)
     return ret;
 }
 
-static ResultCode CompareData(const uint8_t *inputData, const uint32_t inputDataLen, const uint8_t *storeData,
-    const uint32_t storeDataLen)
-{
-    if (inputDataLen != storeDataLen) {
-        LOG_ERROR("get false len.");
-        return RESULT_COMPARE_FAIL;
-    }
-    if (memcmp(inputData, storeData, inputDataLen) == 0) {
-        LOG_INFO("auth pin success.");
-        return RESULT_SUCCESS;
-    }
-    LOG_ERROR("auth pin fail.");
-    return RESULT_COMPARE_FAIL;
-}
-
 static Buffer *GenerateDecodeCredential(const Buffer *deviceKey, const Buffer *pinData)
 {
     Buffer *encryptionKey = GenerateEncryptionKey(deviceKey);
@@ -1120,61 +1150,67 @@ static Buffer *GenerateDecodeCredential(const Buffer *deviceKey, const Buffer *p
     return pinDecodeCredential;
 }
 
-static Buffer *ProcessAuthPin(const Buffer *storeData, const uint8_t *inputData, const uint32_t inputDataLen,
+static ResultCode ProcessAuthPin(const Buffer *storeData, const uint8_t *inputData, const uint32_t inputDataLen,
     uint64_t templateId, Buffer *outRootSecret)
 {
     Buffer *secret = CreateBufferBySize(SECRET_SIZE);
+    Buffer *deviceKey = NULL;
+    Buffer *rootSecret = NULL;
+    Buffer *pinDecodeCredential = NULL;
+    ResultCode ret = RESULT_COMPARE_FAIL;
     if (!IsBufferValid(secret)) {
         LOG_ERROR("generate secret fail.");
-        return NULL;
+        goto EXIT;
     }
     if (ReadPinFile(secret->buf, secret->maxSize, templateId, SECRET_SUFFIX) != RESULT_SUCCESS) {
         LOG_ERROR("read pin secret file fail.");
-        DestoryBuffer(secret);
-        return NULL;
+        goto EXIT;
     }
     secret->contentSize = secret->maxSize;
-    Buffer *deviceKey = DeriveDeviceKey(secret);
+    deviceKey = DeriveDeviceKey(secret);
     if (!IsBufferValid(deviceKey)) {
         LOG_ERROR("generate deviceKey fail.");
-        DestoryBuffer(secret);
-        return NULL;
+        goto EXIT;
     }
-    Buffer *temp = GenerateRootSecret(deviceKey, inputData, inputDataLen);
-    if (!IsBufferValid(temp)) {
+    rootSecret = GenerateRootSecret(deviceKey, inputData, inputDataLen);
+    if (!IsBufferValid(rootSecret)) {
         LOG_ERROR("generate rootSecret fail.");
-        DestoryBuffer(secret);
-        DestoryBuffer(deviceKey);
-        return NULL;
+        goto EXIT;
     }
-    if (memcpy_s(outRootSecret->buf, outRootSecret->maxSize, temp->buf, temp->contentSize) != EOK) {
+    if (memcpy_s(outRootSecret->buf, outRootSecret->maxSize, rootSecret->buf, rootSecret->contentSize) != EOK) {
         LOG_ERROR("copy temp buffer fail");
-        DestoryBuffer(secret);
-        DestoryBuffer(deviceKey);
-        DestoryBuffer(temp);
-        return NULL;
+        goto EXIT;
     }
-    outRootSecret->contentSize = temp->contentSize;
-    Buffer *pinDecodeCredential = GenerateDecodeCredential(deviceKey, storeData);
-    DestoryBuffer(secret);
-    DestoryBuffer(deviceKey);
-    DestoryBuffer(temp);
-    if (!IsBufferValid(pinDecodeCredential)) {
+    outRootSecret->contentSize = rootSecret->contentSize;
+    pinDecodeCredential = GenerateDecodeCredential(deviceKey, storeData);
+    if (!CheckBufferWithSize(pinDecodeCredential, inputDataLen)) {
         LOG_ERROR("generate pinDecodeCredential fail.");
-        return NULL;
+        goto EXIT;
+    }
+    if (memcmp(inputData, pinDecodeCredential->buf, inputDataLen) == 0) {
+        LOG_INFO("auth pin success.");
+        ret = RESULT_SUCCESS;
+        goto EXIT;
     }
 
-    return pinDecodeCredential;
+EXIT:
+    DestoryBuffer(pinDecodeCredential);
+    DestoryBuffer(rootSecret);
+    DestoryBuffer(deviceKey);
+    DestoryBuffer(secret);
+    return ret;
 }
 
 /* This is for example only, Should be implemented in trusted environment. */
 ResultCode AuthPinById(const uint8_t *inputData, const uint32_t inputDataLen, uint64_t templateId,
-    Buffer *outRootSecret)
+    Buffer *outRootSecret, ResultCode *compareRet)
 {
-    if (inputData == NULL || inputDataLen == 0 || templateId == INVALID_TEMPLATE_ID || !IsBufferValid(outRootSecret)) {
+    if (inputData == NULL || inputDataLen == 0 || templateId == INVALID_TEMPLATE_ID ||
+        !IsBufferValid(outRootSecret) || compareRet == NULL) {
         LOG_ERROR("get invalid params.");
         return RESULT_BAD_PARAM;
     }
+    *compareRet = RESULT_COMPARE_FAIL;
     if (SearchPinById(templateId) == MAX_CRYPTO_INFO_SIZE) {
         LOG_ERROR("no pin match.");
         return RESULT_BAD_MATCH;
@@ -1196,29 +1232,18 @@ ResultCode AuthPinById(const uint8_t *inputData, const uint32_t inputDataLen, ui
         return RESULT_BAD_READ;
     }
     storeData->contentSize = storeData->maxSize;
-    Buffer *pinDecodeCredential = ProcessAuthPin(storeData, inputData, inputDataLen, templateId, outRootSecret);
-    if (!IsBufferValid(pinDecodeCredential)) {
-        LOG_ERROR("process auth pin fail.");
-        ret = RESULT_GENERAL_ERROR;
-        goto EXIT;
-    }
-    ResultCode compareRet = CompareData(pinDecodeCredential->buf, pinDecodeCredential->contentSize,
-        inputData, inputDataLen);
-    if (compareRet == RESULT_SUCCESS) {
+    *compareRet = ProcessAuthPin(storeData, inputData, inputDataLen, templateId, outRootSecret);
+    if ((*compareRet) == RESULT_SUCCESS) {
         ret = UpdateAntiBruteFile(templateId, true);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("UpdateAntiBruteFile fail.");
             goto EXIT;
         }
-    } else {
-        LOG_ERROR("CompareData fail.");
-        ret = compareRet;
     }
     LOG_INFO("AuthPinById end.");
 
 EXIT:
     DestoryBuffer(storeData);
-    DestoryBuffer(pinDecodeCredential);
     return ret;
 }
 
@@ -1241,10 +1266,10 @@ ResultCode VerifyTemplateDataPin(const uint64_t *templateIdList, uint32_t templa
     }
     uint32_t i = 0;
     for (; i < g_pinDbOp.pinIndexLen; i++) {
-        if (FindTemplateIdFromList(g_pinDbOp.pinIndex[i].templateId, templateIdList, templateIdListLen)) {
+        if (FindTemplateIdFromList(g_pinDbOp.pinIndex[i].pinInfo.templateId, templateIdList, templateIdListLen)) {
             continue;
         }
-        ResultCode ret = DelPinById(g_pinDbOp.pinIndex[i].templateId);
+        ResultCode ret = DelPinById(g_pinDbOp.pinIndex[i].pinInfo.templateId);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("delete pin file fail.");
             return RESULT_BAD_DEL;
