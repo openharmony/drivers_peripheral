@@ -113,7 +113,7 @@ typedef struct {
 } PinExecutorInfo;
 
 ResultCode DoEnrollPin(PinEnrollParam *pinEnrollParam, Buffer *retTlv);
-ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *retTlv);
+ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *retTlv, ResultCode *compareRet);
 ResultCode DoQueryPinInfo(uint64_t templateId, PinCredentialInfos *pinCredentialInfo);
 ResultCode DoDeleteTemplate(uint64_t templateId);
 ResultCode GenerateRetTlv(uint32_t result, uint64_t scheduleId, uint64_t templatedId, Buffer *retTlv,
@@ -121,6 +121,7 @@ ResultCode GenerateRetTlv(uint32_t result, uint64_t scheduleId, uint64_t templat
 ResultCode GenerateKeyPair(void);
 ResultCode DoGetExecutorInfo(PinExecutorInfo *pinExecutorInfo);
 ResultCode DoVerifyTemplateData(const uint64_t *templateIdList, uint32_t templateIdListLen);
+ResultCode WriteAntiBruteInfoToFile(uint64_t templateId);
 
 #ifdef __cplusplus
 }
