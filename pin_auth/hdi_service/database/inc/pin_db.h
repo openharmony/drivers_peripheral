@@ -70,6 +70,16 @@ extern "C" {
 typedef struct {
     uint64_t templateId;
     uint64_t subType;
+} __attribute__((__packed__)) PinInfo;
+
+typedef struct {
+    uint32_t authErrorConut;
+    uint64_t startFreezeTime;
+} __attribute__((__packed__)) AntiBruteInfo;
+
+typedef struct {
+    PinInfo pinInfo;
+    AntiBruteInfo antiBruteInfo;
 } __attribute__((__packed__)) PinIndex;
 
 typedef struct {
@@ -78,11 +88,6 @@ typedef struct {
     PinIndex *pinIndex;
     bool isLoaded;
 } __attribute__((__packed__)) PinDb;
-
-typedef struct {
-    uint32_t authErrorConut;
-    uint64_t startFreezeTime;
-} __attribute__((__packed__)) AntiBruteInfo;
 
 typedef struct {
     uint64_t scheduleId;
@@ -98,11 +103,12 @@ ResultCode AddPin(PinEnrollParam *pinEnrollParam, uint64_t *templateId, Buffer *
 ResultCode DoGetSalt(uint64_t templateId, uint8_t *salt, uint32_t *saltLen);
 ResultCode DelPinById(uint64_t templateId);
 ResultCode AuthPinById(const uint8_t *inputData, const uint32_t inputDataLen, uint64_t templateId,
-    Buffer *outRootSecret);
+    Buffer *outRootSecret, ResultCode *compareRet);
 ResultCode ComputeFreezeTime(uint64_t templateId, uint32_t *freezeTime, uint32_t count, uint64_t startFreezeTime);
 ResultCode GetRemainTimes(uint64_t templateId, uint32_t *remainingAuthTimes, uint32_t authErrorConut);
 ResultCode GetSubType(uint64_t templateId, uint64_t *subType);
 ResultCode GetAntiBruteInfo(uint64_t templateId, uint32_t *authErrorConut, uint64_t *startFreezeTime);
+ResultCode RefreshAntiBruteInfoToFile(uint64_t templateId);
 ResultCode VerifyTemplateDataPin(const uint64_t *templateIdList, uint32_t templateIdListLen);
 
 #ifdef __cplusplus

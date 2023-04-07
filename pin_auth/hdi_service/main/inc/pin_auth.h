@@ -41,12 +41,15 @@ public:
     int32_t GetSalt(uint64_t templateId, std::vector<uint8_t> &salt);
     int32_t AuthPin(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &pinData,
         std::vector<uint8_t> &result);
+    void WriteAntiBrute(uint64_t templateId);
     int32_t QueryPinInfo(uint64_t templateId, PinCredentialInfo &pinCredentialInfoRet);
     int32_t DeleteTemplate(uint64_t templateId);
     int32_t GetExecutorInfo(std::vector<uint8_t> &pubKey, uint32_t &esl);
     int32_t VerifyTemplateData(std::vector<uint64_t> templateIdList);
 
 private:
+    int32_t AuthPinInner(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &pinData,
+        std::vector<uint8_t> &result);
     int32_t PinResultToCoAuthResult(int resultCode);
 };
 } // namespace PinAuth

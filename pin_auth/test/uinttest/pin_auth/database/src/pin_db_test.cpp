@@ -58,28 +58,43 @@ HWTEST_F(PinDataBaseTest, AddAndAuth_test, TestSize.Level1)
 
     pinEnrollParam->scheduleId = 1;
     pinEnrollParam->subType = 10010;
-    std::vector<uint8_t> salt(CONST_SALT_LEN, 1);
-    std::vector<uint8_t> pinData(CONST_PIN_DATA_LEN, 1);
-    (void)memcpy_s(&(pinEnrollParam->salt[0]), CONST_SALT_LEN, &salt[0], CONST_SALT_LEN);
-    (void)memcpy_s(&(pinEnrollParam->pinData[0]), CONST_PIN_DATA_LEN, &pinData[0], CONST_PIN_DATA_LEN);
-
+    (void)memset_s(pinEnrollParam->salt, CONST_SALT_LEN, 1, CONST_SALT_LEN);
+    (void)memset_s(pinEnrollParam->pinData, CONST_PIN_DATA_LEN, 1, CONST_PIN_DATA_LEN);
     uint64_t templateId = 0;
     Buffer *outRootSecret = CreateBufferBySize(ROOT_SECRET_LEN);
     uint32_t result = AddPin(pinEnrollParam, &templateId, outRootSecret);
     EXPECT_EQ(result, RESULT_SUCCESS);
     delete pinEnrollParam;
 
-    result = AuthPinById(&pinData[0], CONST_PIN_DATA_LEN, 0, outRootSecret);
+    uint8_t pinData[CONST_PIN_DATA_LEN] = {1};
+    (void)memset_s(pinData, CONST_PIN_DATA_LEN, 1, CONST_PIN_DATA_LEN);
+    ResultCode compareRet = RESULT_GENERAL_ERROR;
+    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, 0, outRootSecret, &compareRet);
     EXPECT_EQ(result, RESULT_BAD_MATCH);
 
-    result = AuthPinById(nullptr, CONST_PIN_DATA_LEN, 0, outRootSecret);
+    result = AuthPinById(nullptr, CONST_PIN_DATA_LEN, 0, outRootSecret, &compareRet);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    result = AuthPinById(&pinData[0], CONST_PIN_DATA_LEN, templateId, nullptr);
+    result = AuthPinById(pinData, 0, templateId, outRootSecret, &compareRet);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    result = AuthPinById(&pinData[0], CONST_PIN_DATA_LEN, templateId, outRootSecret);
+    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, INVALID_TEMPLATE_ID, outRootSecret, &compareRet);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+
+    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, templateId, nullptr, &compareRet);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+
+    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, templateId, outRootSecret, nullptr);
+    EXPECT_EQ(result, RESULT_BAD_PARAM);
+
+    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, templateId, outRootSecret, &compareRet);
     EXPECT_EQ(result, RESULT_SUCCESS);
+    EXPECT_EQ(compareRet, RESULT_SUCCESS);
+
+    (void)memset_s(pinData, CONST_PIN_DATA_LEN, 2, CONST_PIN_DATA_LEN);
+    result = AuthPinById(pinData, CONST_PIN_DATA_LEN, templateId, outRootSecret, &compareRet);
+    EXPECT_EQ(result, RESULT_SUCCESS);
+    EXPECT_EQ(compareRet, RESULT_COMPARE_FAIL);
 
     result = DelPinById(templateId);
     EXPECT_EQ(result, RESULT_SUCCESS);
