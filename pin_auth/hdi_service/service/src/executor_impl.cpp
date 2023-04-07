@@ -37,7 +37,17 @@ namespace {
     constexpr uint32_t SUCCESS = 0;
 } // namespace
 
-ExecutorImpl::ExecutorImpl(std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi) : pinHdi_(pinHdi) {}
+ExecutorImpl::ExecutorImpl(std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi)
+    : pinHdi_(pinHdi),
+      threadPool_("pin_async")
+{
+    threadPool_.Start(1);
+}
+
+ExecutorImpl::~ExecutorImpl()
+{
+    threadPool_.Stop();
+}
 
 int32_t ExecutorImpl::GetExecutorInfo(ExecutorInfo &info)
 {
@@ -203,6 +213,24 @@ int32_t ExecutorImpl::Authenticate(uint64_t scheduleId, uint64_t templateId, con
     return HDF_SUCCESS;
 }
 
+int32_t ExecutorImpl::AuthPin(uint64_t scheduleId, uint64_t templateId,
+    const std::vector<uint8_t> &data, std::vector<uint8_t> &resultTlv)
+{
+    int32_t result = pinHdi_->AuthPin(scheduleId, templateId, data, resultTlv);
+    if (result != SUCCESS) {
+        IAM_LOGE("Auth Pin failed, fail code : %{public}d", result);
+        return result;
+    }
+    threadPool_.AddTask([hdi = pinHdi_, id = templateId]() {
+        if (hdi == nullptr) {
+            return;
+        }
+        hdi->WriteAntiBrute(id);
+    });
+    IAM_LOGI("Auth Pin success");
+    return result;
+}
+
 int32_t ExecutorImpl::OnSetData(uint64_t scheduleId, uint64_t authSubType, const std::vector<uint8_t> &data)
 {
     IAM_LOGI("start");
@@ -229,10 +257,7 @@ int32_t ExecutorImpl::OnSetData(uint64_t scheduleId, uint64_t authSubType, const
             }
             break;
         case AUTH_PIN:
-            result = pinHdi_->AuthPin(scheduleId, templateId, data, resultTlv);
-            if (result != SUCCESS) {
-                IAM_LOGE("Auth Pin failed, fail code : %{public}d", result);
-            }
+            result = AuthPin(scheduleId, templateId, data, resultTlv);
             break;
         default:
             IAM_LOGE("Error commandId");

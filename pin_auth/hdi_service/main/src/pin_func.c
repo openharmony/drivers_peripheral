@@ -70,12 +70,13 @@ static ResultCode GetSubTypeAndFreezeTime(uint64_t *subType, uint64_t templateId
     return RESULT_SUCCESS;
 }
 
-ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *retTlv)
+ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *retTlv, ResultCode *compareRet)
 {
-    if (!IsBufferValid(retTlv) || pinAuthParam == NULL) {
+    if (!IsBufferValid(retTlv) || pinAuthParam == NULL || compareRet == NULL) {
         LOG_ERROR("check param fail!");
         return RESULT_BAD_PARAM;
     }
+    *compareRet = RESULT_COMPARE_FAIL;
 
     uint64_t subType = 0;
     uint32_t freezeTime = 0;
@@ -92,22 +93,22 @@ ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *retTlv)
         return RESULT_BAD_PARAM;
     }
     if (freezeTime == 0) {
-        ret = AuthPinById(pinAuthParam->pinData, CONST_PIN_DATA_LEN, pinAuthParam->templateId, rootSecret);
+        ret = AuthPinById(pinAuthParam->pinData, CONST_PIN_DATA_LEN, pinAuthParam->templateId, rootSecret, compareRet);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("AuthPinById fail.");
+            goto EXIT;
         }
     } else {
         LOG_ERROR("Pin is freezing.");
-        ret = RESULT_PIN_FREEZE;
+        *compareRet = RESULT_PIN_FREEZE;
     }
 
-    ResultCode result = GenerateRetTlv(ret, pinAuthParam->scheduleId, pinAuthParam->templateId, retTlv, rootSecret);
-    if (result != RESULT_SUCCESS) {
+    ret = GenerateRetTlv(*compareRet, pinAuthParam->scheduleId, pinAuthParam->templateId, retTlv, rootSecret);
+    if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GenerateRetTlv DoAuthPin fail.");
-        DestoryBuffer(rootSecret);
-        return result;
     }
 
+EXIT:
     DestoryBuffer(rootSecret);
     return ret;
 }
@@ -287,4 +288,13 @@ ResultCode DoVerifyTemplateData(const uint64_t *templateIdList, uint32_t templat
         return ret;
     }
     return RESULT_SUCCESS;
+}
+
+ResultCode WriteAntiBruteInfoToFile(uint64_t templateId)
+{
+    ResultCode ret = RefreshAntiBruteInfoToFile(templateId);
+    if (ret != RESULT_SUCCESS) {
+        LOG_ERROR("RefreshAntiBruteInfoToFile fail.");
+    }
+    return ret;
 }

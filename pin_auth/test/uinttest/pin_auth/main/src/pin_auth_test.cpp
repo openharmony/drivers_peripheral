@@ -106,7 +106,7 @@ HWTEST_F(PinAuthTest, AuthPin_test, TestSize.Level1)
     EXPECT_EQ(result, INVALID_PARAMETERS);
 
     result = pinAuth->AuthPin(0, INVALID_TEMPLATE_ID, pinData, resultTlv);
-    EXPECT_EQ(result, GENERAL_ERROR);
+    EXPECT_EQ(result, INVALID_PARAMETERS);
     delete pinAuth;
 }
 

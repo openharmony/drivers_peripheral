@@ -23,6 +23,7 @@
 #include "v1_0/iexecutor.h"
 #include "pin_auth.h"
 #include "nocopyable.h"
+#include "thread_pool.h"
 
 namespace OHOS {
 namespace HDI {
@@ -31,7 +32,7 @@ namespace V1_0 {
 class ExecutorImpl : public IExecutor, public NoCopyable {
 public:
     explicit ExecutorImpl(std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi);
-    ~ExecutorImpl() override = default;
+    ~ExecutorImpl() override;
     int32_t GetExecutorInfo(ExecutorInfo &info) override;
     int32_t GetTemplateInfo(uint64_t templateId, TemplateInfo &info) override;
     int32_t OnRegisterFinish(const std::vector<uint64_t> &templateIdList,
@@ -70,8 +71,11 @@ private:
 private:
     uint32_t NewSalt(std::vector<uint8_t> &salt);
     void CallError(const sptr<IExecutorCallback> &callbackObj, uint32_t errorCode);
+    int32_t AuthPin(uint64_t scheduleId, uint64_t templateId,
+        const std::vector<uint8_t> &data, std::vector<uint8_t> &resultTlv);
     std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi_;
     ScheduleMap scheduleMap_;
+    OHOS::ThreadPool threadPool_;
 };
 } // V1_0
 } // PinAuth
