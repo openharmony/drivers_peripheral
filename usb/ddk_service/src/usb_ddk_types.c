@@ -19,6 +19,25 @@
 #include <osal_mem.h>
 #include <securec.h>
 
+bool WritePodArray(struct HdfSBuf *parcel, const void *data, uint32_t elementSize, uint32_t count)
+{
+    if (!HdfSbufWriteUint32(parcel, count)) {
+        HDF_LOGE("%{public}s: failed to write array size", __func__);
+        return false;
+    }
+
+    if (data == NULL && count == 0) {
+        return true;
+    }
+
+    if (!HdfSbufWriteUnpadBuffer(parcel, (const uint8_t *)data, elementSize * count)) {
+        HDF_LOGE("%{public}s: failed to write array", __func__);
+        return false;
+    }
+
+    return true;
+}
+
 bool UsbControlRequestSetupBlockMarshalling(struct HdfSBuf *data, const struct UsbControlRequestSetup *dataBlock)
 {
     if (data == NULL) {
