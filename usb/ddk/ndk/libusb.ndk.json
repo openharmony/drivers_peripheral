@@ -1,0 +1,47 @@
+[
+    {
+        "name": "OH_Usb_Init"
+    },
+    {
+        "name": "OH_Usb_Release"
+    },
+    {
+        "name": "OH_Usb_RegisterNotification"
+    },
+    {
+        "name": "OH_Usb_UnRegisterNotification"
+    },
+    {
+        "name": "OH_Usb_GetDeviceDescriptor"
+    },
+    {
+        "name": "OH_Usb_GetConfigDescriptor"
+    },
+    {
+        "name": "OH_Usb_FreeConfigDescriptor"
+    },
+    {
+        "name": "OH_Usb_ClaimInterface"
+    },
+    {
+        "name": "OH_Usb_ReleaseInterface"
+    },
+    {
+        "name": "OH_Usb_SelectInterfaceSetting"
+    },
+    {
+        "name": "OH_Usb_GetCurrentInterfaceSetting"
+    },
+    {
+        "name": "OH_Usb_SendControlReadRequest"
+    },
+    {
+        "name": "OH_Usb_SendControlWriteRequest"
+    },
+    {
+        "name": "OH_Usb_SendPipeReadRequest"
+    },
+    {
+        "name": "OH_Usb_SendPipeWriteRequest"
+    }
+]
