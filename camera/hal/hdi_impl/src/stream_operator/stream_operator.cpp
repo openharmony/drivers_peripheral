@@ -21,6 +21,9 @@
 #include <algorithm>
 #include <iterator>
 #include "camera_dump.h"
+#include "hdf_trace.h"
+
+#define HDF_CAMERA_TRACE HdfTrace trace(__func__, "HDI:CAM:")
 
 namespace OHOS::Camera {
 StreamOperator::StreamOperator(const OHOS::sptr<IStreamOperatorCallback>& callback,
@@ -122,6 +125,7 @@ void StreamOperator::GetStreamSupportType(std::set<int32_t> inputIDSet,
 int32_t StreamOperator::IsStreamsSupported(OperationMode mode, const std::vector<uint8_t>& modeSetting,
                                            const std::vector<StreamInfo>& infos, StreamSupportType& type)
 {
+    HDF_CAMERA_TRACE;
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamPipeline_, DEVICE_ERROR);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
     if (infos.empty() || modeSetting.empty()) {
@@ -218,6 +222,7 @@ void StreamOperator::StreamInfoToStreamConfiguration(StreamConfiguration &scg, c
 int32_t StreamOperator::CreateStreams(const std::vector<StreamInfo>& streamInfos)
 {
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
+    HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
     for (const auto& it : streamInfos) {
         CHECK_IF_NOT_EQUAL_RETURN_VALUE(CheckStreamInfo(it), true, INVALID_ARGUMENT);
@@ -268,6 +273,7 @@ int32_t StreamOperator::CreateStreams(const std::vector<StreamInfo>& streamInfos
 int32_t StreamOperator::ReleaseStreams(const std::vector<int32_t>& streamIds)
 {
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
+    HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
     for (auto id : streamIds) {
         std::lock_guard<std::mutex> l(streamLock_);
@@ -303,6 +309,7 @@ RetCode StreamOperator::ReleaseStreams()
 
 int32_t StreamOperator::CommitStreams(OperationMode mode, const std::vector<uint8_t>& modeSetting)
 {
+    HDF_CAMERA_TRACE;
     CAMERA_LOGV("enter");
     CHECK_IF_PTR_NULL_RETURN_VALUE(streamPipeline_, DEVICE_ERROR);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
@@ -358,6 +365,7 @@ int32_t StreamOperator::CommitStreams(OperationMode mode, const std::vector<uint
 int32_t StreamOperator::GetStreamAttributes(std::vector<StreamAttribute>& attributes)
 {
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
+    HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
 
     attributes.clear();
@@ -384,6 +392,7 @@ int32_t StreamOperator::AttachBufferQueue(int32_t streamId, const sptr<BufferPro
     CHECK_IF_EQUAL_RETURN_VALUE(streamId < 0, true, INVALID_ARGUMENT);
     CHECK_IF_PTR_NULL_RETURN_VALUE(bufferProducer, INVALID_ARGUMENT);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
+    HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
 
     std::shared_ptr<IStream> stream = nullptr;
@@ -418,6 +427,7 @@ int32_t StreamOperator::DetachBufferQueue(int32_t streamId)
 {
     CHECK_IF_EQUAL_RETURN_VALUE(streamId < 0, true, INVALID_ARGUMENT);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
+    HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
 
     std::shared_ptr<IStream> stream = nullptr;
@@ -449,6 +459,7 @@ int32_t StreamOperator::Capture(int32_t captureId, const CaptureInfo& info, bool
 {
     CHECK_IF_EQUAL_RETURN_VALUE(captureId < 0, true, INVALID_ARGUMENT);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
+    HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
 
     for (auto id : info.streamIds_) {
@@ -491,6 +502,7 @@ int32_t StreamOperator::CancelCapture(int32_t captureId)
 {
     CHECK_IF_EQUAL_RETURN_VALUE(captureId < 0, true, INVALID_ARGUMENT);
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
+    HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
 
     std::lock_guard<std::mutex> l(requestLock_);
@@ -514,6 +526,7 @@ int32_t StreamOperator::ChangeToOfflineStream(const std::vector<int32_t>& stream
     const sptr<IStreamOperatorCallback>& callbackObj, sptr<IOfflineStreamOperator>& offlineOperator)
 {
     PLACE_A_NOKILL_WATCHDOG(requestTimeoutCB_);
+    HDF_CAMERA_TRACE;
     DFX_LOCAL_HITRACE_BEGIN;
     CHECK_IF_PTR_NULL_RETURN_VALUE(callbackObj, INVALID_ARGUMENT);
     // offlineOperator should not be null

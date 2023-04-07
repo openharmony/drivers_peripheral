@@ -38,6 +38,7 @@ void UtestUSBCameraTest::TearDown(void)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0001)
 {
+    uint32_t rc = 0;
     std::cout << "==========[test log] USB Camera, getCameraID success."<< std::endl;
     std::vector<std::string> cameraIds;
     std::cout << "==========[test log] 1. get current system cameraID."<< std::endl;
@@ -57,7 +58,8 @@ TEST_F(UtestUSBCameraTest, camera_usb_0001)
     if (cameraIds.size() == 1) {
         cameraIds.clear();
     }
-    display_->cameraHost->GetCameraIds(cameraIds);
+    rc = display_->cameraHost->GetCameraIds(cameraIds);
+    EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
     for (const auto &cameraId : cameraIds) {
         std::cout << "cameraId = " << cameraId << std::endl;
     }
