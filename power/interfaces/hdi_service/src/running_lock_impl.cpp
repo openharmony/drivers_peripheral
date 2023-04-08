@@ -88,16 +88,14 @@ int32_t RunningLockImpl::Unhold(const RunningLockInfo &info)
     auto iterator = lockCounters_.find(filledInfo.type);
     if (iterator == lockCounters_.end()) {
         HDF_LOGW("type=%{public}d is not in lockCounters, no need to unhold", filledInfo.type);
-        return HDF_SUCCESS;
+        return HDF_ERR_NOT_SUPPORT;
     }
     if (timerHandler_ != nullptr) {
         timerHandler_->UnregisterRunningLockTimer(filledInfo);
     }
     std::shared_ptr<RunningLockCounter> lockCounter = iterator->second;
-    if (lockCounter->Decrease(filledInfo) != HDF_SUCCESS) {
-        return HDF_FAILURE;
-    }
-    return HDF_SUCCESS;
+    int32_t status = lockCounter->Decrease(filledInfo);
+    return status;
 }
 
 uint32_t RunningLockImpl::GetCount(RunningLockType type)
