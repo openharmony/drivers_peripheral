@@ -48,7 +48,7 @@ int32_t RunningLockCounter::Decrease(const RunningLockInfo &info)
     auto iterator = runninglockInfos_.find(info.name);
     if (iterator == runninglockInfos_.end()) {
         HDF_LOGW("Runninglock name=%{public}s is not exist, no need to decrease lock counter", info.name.c_str());
-        return HDF_SUCCESS;
+        return HDF_ERR_NOT_SUPPORT;
     }
     --counter_;
     if (counter_ == 0) {
