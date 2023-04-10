@@ -28,7 +28,9 @@
 #include "hdf_base.h"
 #include "hdf_log.h"
 
-#define HDF_LOG_TAG display_buffer_module_test
+using namespace OHOS::HDI::Display::Composer::V1_0;
+using namespace OHOS::HDI::Display::Buffer::V1_0;
+using namespace OHOS;
 
 namespace {
     const int SIZE_TIMES = 3;
@@ -39,9 +41,7 @@ namespace {
     const int INFO_HEIGHT = 1024;
 }
 
-using namespace OHOS::HDI::Display::Composer::V1_0;
-using namespace OHOS::HDI::Display::Buffer::V1_0;
-using namespace OHOS;
+#define HDF_LOG_TAG display_buffer_module_test
 
 static void WriteBuffer(const BufferHandle& handle)
 {
@@ -98,10 +98,9 @@ static void DumpBufferHandle(const BufferHandle& handle)
     HDF_LOGD("-------------------------------------");
 }
 
-static void RunOnce(const AllocInfo& info)
+static void RunOnce(const AllocInfo& info, IDisplayBuffer* dispbuf)
 {
     static int32_t count = 0;
-    IDisplayBuffer* dispbuf = IDisplayBuffer::Get();
     if (dispbuf == nullptr) {
         HDF_LOGE("Can't get IDisplayBuffer interface.");
         return;
@@ -112,7 +111,7 @@ static void RunOnce(const AllocInfo& info)
     if (ec != HDF_SUCCESS || bHandle == nullptr) {
         HDF_LOGE("%{public}s, line=%{public}d, AllocMem failed. ec=0x%{public}x",
                  __func__, __LINE__, ec);
-        delete dispbuf;
+        
         return;
     }
 
@@ -121,7 +120,7 @@ static void RunOnce(const AllocInfo& info)
     if (buffer == nullptr) {
         HDF_LOGE("Mmap failed.");
         dispbuf->FreeMem(*bHandle);
-        delete dispbuf;
+        
         return;
     }
     HDF_LOGD("Mmap successful");
@@ -136,7 +135,7 @@ static void RunOnce(const AllocInfo& info)
         HDF_LOGE("InvalidateCache failed.");
         dispbuf->Unmap(*bHandle);
         dispbuf->FreeMem(*bHandle);
-        delete dispbuf;
+        
         return;
     }
     // InvalidateCache
@@ -145,7 +144,7 @@ static void RunOnce(const AllocInfo& info)
         HDF_LOGE("flushCache failed.");
         dispbuf->Unmap(*bHandle);
         dispbuf->FreeMem(*bHandle);
-        delete dispbuf;
+        
         return;
     }
     HDF_LOGD("flush Cache success.");
@@ -153,7 +152,7 @@ static void RunOnce(const AllocInfo& info)
     dispbuf->Unmap(*bHandle);
     dispbuf->FreeMem(*bHandle);
     HDF_LOGD("FreeMem, finished count = %{public}d", ++count);
-    delete dispbuf;
+    
 }
 
 int main()
@@ -167,8 +166,9 @@ int main()
             OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE;
     info.format = PIXEL_FMT_RGBA_8888;
 
+    IDisplayBuffer* dispbuf = IDisplayBuffer::Get();
     for (int i = 0; i < LOOP_COUNT; i++) {
-        RunOnce(info);
+        RunOnce(info, dispbuf);
     }
     HDF_LOGD("Main process end.");
     return 0;
