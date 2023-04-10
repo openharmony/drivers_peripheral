@@ -26,7 +26,7 @@ struct IWiFi *g_wifi = NULL;
 struct IWiFiAp *g_apFeature = NULL;
 struct IWiFiSta *g_staFeature = NULL;
 struct IWiFiBaseFeature *g_baseFeature = NULL;
-const uint32_t RESET_TIME = 20;
+const uint32_t RESET_TIME = 3;
 #define DEFAULT_COMBO_SIZE 10
 #define WLAN_FREQ_MAX_NUM 14
 #define WLAN_MAX_NUM_STA_WITH_AP 4
