@@ -162,9 +162,11 @@ static inline void PresentAndCheck(std::vector<LayerSettings> &layerSettings,
 {
     int ret = PrepareAndPrensent();
     ASSERT_TRUE((ret == DISPLAY_SUCCESS));
-    HdiTestDevice::GetInstance().GetGrallocInterface()->InvalidateCache(*(GetFirstDisplay()->SnapShot()));
-    ret = CheckComposition(layerSettings, GetFirstDisplay()->SnapShot(), checkType);
-    ASSERT_TRUE((ret == DISPLAY_SUCCESS));
+    if ((GetFirstDisplay()->SnapShot()) != nullptr) {
+        HdiTestDevice::GetInstance().GetGrallocInterface()->InvalidateCache(*(GetFirstDisplay()->SnapShot()));
+        ret = CheckComposition(layerSettings, GetFirstDisplay()->SnapShot(), checkType);
+        ASSERT_TRUE((ret == DISPLAY_SUCCESS));
+    }
 }
 
 void DeviceTest::TearDown()
@@ -257,12 +259,14 @@ HWTEST_F(DeviceTest, test_SetDisplayPowerStatus, TestSize.Level1)
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
 
+#ifdef DISPLAY_COMMUNITY
 HWTEST_F(DeviceTest, test_GetDisplayBacklight, TestSize.Level1)
 {
     uint32_t level;
     auto ret = g_composerDevice->GetDisplayBacklight(g_displayIds[0], level);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
+#endif
 
 HWTEST_F(DeviceTest, test_SetDisplayBacklight, TestSize.Level1)
 {

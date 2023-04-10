@@ -12,11 +12,14 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("//drivers/peripheral/display/display_config.gni")
 
 module_output_path = "hdf/display_buffer"
 base_root = "../../../../../../"
 
 ohos_unittest("hdf_disp_buffer_moduletest") {
+  defines = []
+  defines += display_defines
   module_out_path = module_output_path
   sources = [ "display_buffer_mt.cpp" ]
   deps = [ "$base_root/third_party/googletest:gtest_main" ]
