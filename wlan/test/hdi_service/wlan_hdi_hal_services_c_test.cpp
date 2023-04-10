@@ -26,8 +26,9 @@ const int32_t WLAN_FREQ_MAX_NUM = 35;
 const int32_t WLAN_TX_POWER = 160;
 const int32_t DEFAULT_COMBO_SIZE = 6;
 const int32_t WLAN_MAX_NUM_STA_WITH_AP = 4;
-const uint32_t RESET_TIME = 20;
-const uint32_t MEAS_CHANNEL_TIME = 10;
+const uint32_t RESET_TIME = 3;
+const uint32_t MEAS_CHANNEL_TIME = 1;
+const uint32_t SCAN_TIME = 3;
 const char *WLAN_SERVICE_NAME = "wlan_interface_service";
 
 class HdfWifiServiceCTest : public testing::Test {
@@ -434,7 +435,7 @@ HWTEST_F(HdfWifiServiceCTest, StartScanTest_017, TestSize.Level1)
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
-    sleep(10);
+    sleep(SCAN_TIME);
 }
 
 /**
