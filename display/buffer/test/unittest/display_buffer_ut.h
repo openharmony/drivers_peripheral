@@ -30,19 +30,13 @@ using OHOS::HDI::Display::Buffer::V1_0::IMapper;
 using OHOS::HDI::Display::Buffer::V1_0::AllocInfo;
 using OHOS::HDI::Display::Buffer::V1_0::IDisplayBuffer;
 
-struct AllocTestPrms {
-    AllocInfo allocInfo;
-    int32_t expectStride;
-    int32_t expectSize;
-};
-
-class DisplayBufferUt : public ::testing::TestWithParam<AllocTestPrms> {
+class DisplayBufferUt : public ::testing::TestWithParam<AllocInfo> {
 protected:
     virtual void SetUp();
     virtual void TearDown();
 public:
     IDisplayBuffer* displayBuffer_{ nullptr };
-    int32_t AllocMemTest(AllocTestPrms& info);
+    int32_t AllocMemTest(AllocInfo& info);
 };
 } // OHOS
 } // HDI
