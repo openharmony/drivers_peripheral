@@ -15,6 +15,7 @@
 #ifndef COMMAND_ADAPTER_PARSE_H
 #define COMMAND_ADAPTER_PARSE_H
 #include <iostream>
+#include <string>
 
 enum class codecMime { AVC, HEVC };
 

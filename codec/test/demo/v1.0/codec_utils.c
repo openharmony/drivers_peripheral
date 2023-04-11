@@ -21,6 +21,7 @@
 #define HDF_LOG_TAG codec_hdi_demo_utils
 #define CMD_OPTION_MARK_OFFSET  0
 #define CMD_OPTION_NAME_OFFSET  1
+#define STRTOL_BASE  10
 
 static int32_t GetCodecName(CodecCmd* cmd)
 {
@@ -89,10 +90,10 @@ static int32_t ParseCmdOption(CodecCmd* cmd, const char *opt, const char *next)
             }
             } break;
         case 'w': {
-            cmd->width = atoi(next);
+            cmd->width = (int32_t)strtol(next, NULL, STRTOL_BASE);
             } break;
         case 'h': {
-            cmd->height = atoi(next);
+            cmd->height = (int32_t)strtol(next, NULL, STRTOL_BASE);
             } break;
         case 't': {
             int32_t len = strnlen(next, TYPE_NAME_LENGTH);
@@ -104,10 +105,10 @@ static int32_t ParseCmdOption(CodecCmd* cmd, const char *opt, const char *next)
             }
             } break;
         case 'f': {
-            cmd->fps = atoi(next);
+            cmd->fps = (int32_t)strtol(next, NULL, STRTOL_BASE);
             } break;
         case 'p': {
-            cmd->pixFmt = atoi(next);
+            cmd->pixFmt = (int32_t)strtol(next, NULL, STRTOL_BASE);
             } break;
         default:
             break;

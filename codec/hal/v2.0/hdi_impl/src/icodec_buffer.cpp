@@ -54,13 +54,10 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
 sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer)
 {
     sptr<ICodecBuffer> buffer = nullptr;
-    switch (codecBuffer.bufferType) {
-        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
-            buffer = CodecShareBuffer::Allocate(codecBuffer);
-            break;
-        default:
-            HDF_LOGE("%s: bufferType[%{public}d] is unexpected", __func__, codecBuffer.bufferType);
-            break;
+    if (codecBuffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
+        buffer = CodecShareBuffer::Allocate(codecBuffer);
+    } else {
+        HDF_LOGE("%s: bufferType[%{public}d] is unexpected", __func__, codecBuffer.bufferType);
     }
     return buffer;
 }
