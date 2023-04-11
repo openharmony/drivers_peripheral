@@ -24,6 +24,7 @@ if (defined(ohos_lite)) {
     if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       testonly = true
       deps = [
+        "benchmarktest:hdf_audio_benchmark_test",
         "systemtest:systemtest",
         "unittest:audiotest",
       ]
