@@ -14,6 +14,7 @@
 group("hdf_test_media_codec") {
   testonly = true
   deps = [
+    "benchmarktest:hdf_codec_idl_benchmark_test",
     "demo:hdf_demo_codec",
     "fuzztest/adapter_fuzzer:hdf_fuzztest_media_codec_adapter",
     "fuzztest/omx_fuzzer:hdf_fuzztest_media_codec",
