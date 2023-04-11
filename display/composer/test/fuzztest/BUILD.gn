@@ -11,12 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-group("display_composer_test") {
+group("hdf_disp_composer_fuzztest") {
   testonly = true
   deps = [
-    "benchmark:hdf_display_benchmark_test",
-    "fuzztest:hdf_disp_composer_fuzztest",
-    "moduletest:hdf_disp_composer_moduletest",
-    "unittest:hdf_disp_composer_unittest",
+    "device_fuzzer:fuzztest",
+    "layer_fuzzer:fuzztest",
   ]
 }

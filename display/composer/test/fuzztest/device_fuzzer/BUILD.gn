@@ -11,17 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build/config/features.gni")
 import("//build/test.gni")
-import("//drivers/peripheral/display/display_config.gni")
 
-module_output_path = "drivers_peripheral_display/buffer"
+module_output_path = "drivers_peripheral_display/composer"
 
-ohos_unittest("hdf_disp_buffer_unittest") {
-  defines = []
-  defines += display_defines
+ohos_fuzztest("DeviceFuzzTest") {
   module_out_path = module_output_path
-  sources = [ "display_buffer_ut.cpp" ]
-
+  fuzz_config_file = "."
+  include_dirs = [ "../common" ]
   external_deps = [
     "c_utils:utils",
     "drivers_interface_display:display_buffer_idl_headers",
@@ -32,30 +30,21 @@ ohos_unittest("hdf_disp_buffer_unittest") {
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
-    "thirdparty_googletest:gtest",
   ]
-  subsystem_name = "hdf"
-  part_name = "drivers_peripheral_display"
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [ "device_fuzzer.cpp" ]
 }
 
-ohos_unittest("buffer_death_test") {
-  defines = []
-  defines += display_defines
-  module_out_path = module_output_path
-  sources = [ "death_test.cpp" ]
-
-  external_deps = [
-    "c_utils:utils",
-    "drivers_interface_display:display_buffer_idl_headers",
-    "drivers_interface_display:display_composer_idl_headers",
-    "drivers_interface_display:libdisplay_buffer_hdi_impl",
-    "drivers_interface_display:libdisplay_composer_hdi_impl",
-    "graphic_chipsetsdk:buffer_handle",
-    "hdf_core:libhdf_utils",
-    "hiviewdfx_hilog_native:libhilog",
-    "ipc:ipc_core",
-    "thirdparty_googletest:gtest",
+group("fuzztest") {
+  testonly = true
+  deps = []
+  deps += [
+    # deps file
+    ":DeviceFuzzTest",
   ]
-  subsystem_name = "hdf"
-  part_name = "drivers_peripheral_display"
 }
