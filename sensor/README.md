@@ -116,6 +116,7 @@ Sample code
 
 ```
 #include "sensor_if.h"
+#include "sensor_type.h"
 
 /* Create a callback. */
 void SensorDataCallback(struct SensorEvents *event)
@@ -135,7 +136,7 @@ void SensorSample(void)
     int32_t sensorInterval = 200000000; /* Set the data sampling rate to 200000000, in the unit of nanoseconds (200 ms). */
 
     /* 1. Create a SensorInterface instance. */
-    struct SensorInterface *sensorDev = NewSensorInterfaceInstance();
+    const struct SensorInterface *sensorDev = NewSensorInterfaceInstance();
     if (sensorDev == NULL) {
         return;
     }
@@ -145,27 +146,27 @@ void SensorSample(void)
         return;
     }
     /* 3. Obtain the list of sensors supported by the device. */
-    ret = GetAllSensors(&sensorInfo, &count);
+    ret = sensorDev->GetAllSensors(&sensorInfo, &count);
     if (ret != 0) {
         return;
     }
     /* 4. Set the sensor sampling rate. */
-    ret = SetBatch(SENSOR_TYPE_ACCELEROMETER, sensorInterval, 0);
+    ret = sensorDev->SetBatch(SENSOR_TYPE_ACCELEROMETER, sensorInterval, 0);
     if (ret != 0) {
         return;
     }
     /* 5. Enable the sensor. */
-    ret = Enable(SENSOR_TYPE_ACCELEROMETER);
+    ret = sensorDev->Enable(SENSOR_TYPE_ACCELEROMETER);
     if (ret != 0) {
         return;
     }
       /* 6. Disable the sensor. */
-    ret = Disable(SENSOR_TYPE_ACCELEROMETER);
+    ret = sensorDev->Disable(SENSOR_TYPE_ACCELEROMETER);
     if (ret != 0) {
         return;
     }
     /* 7. Unregister the sensor data callback. */
-    ret = Unregister(0);
+    ret = sensorDev->Unregister(0);
     if (ret != 0) {
         return;
     }
