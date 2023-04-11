@@ -27,6 +27,8 @@
 struct AudioRenderInfo {
     struct AudioDeviceDescriptor desc;
     enum AudioCategory streamType;
+    unsigned int sampleRate;
+    unsigned int channelCount;
     struct IAudioRender *render;
     struct AudioHwiRender *hwiRender;
     uint32_t renderId;
@@ -885,7 +887,8 @@ static void AudioHwiInitRenderInstance(struct IAudioRender *render)
     render->GetVersion = AudioHwiRenderGetVersion;
 }
 
-struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, enum AudioCategory streamType, uint32_t *rendrId)
+struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
+    uint32_t *rendrId)
 {
     uint32_t index = 0;
     struct AudioHwiRenderPriv *renderPriv = AudioHwiRenderGetPriv();
@@ -902,7 +905,9 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, enum AudioCategory
     for (index = 0; index < AUDIO_HW_STREAM_NUM_MAX; index++) {
         if ((renderPriv->renderInfos[index] != NULL) &&
             (renderPriv->renderInfos[index]->desc.pins == pin) &&
-            (renderPriv->renderInfos[index]->streamType == streamType)) {
+            (renderPriv->renderInfos[index]->streamType == attrs->type) &&
+            (renderPriv->renderInfos[index]->sampleRate == attrs->sampleRate) &&
+            (renderPriv->renderInfos[index]->channelCount == attrs->channelCount)) {
             *rendrId = renderPriv->renderInfos[index]->renderId;
             return renderPriv->renderInfos[index]->render;
         }
@@ -935,11 +940,11 @@ static uint32_t GetAvailableRenderId(struct AudioHwiRenderPriv *renderPriv)
     return renderId;
 }
 
-struct IAudioRender *AudioHwiCreateRenderById(enum AudioCategory streamType, uint32_t *renderId,
+struct IAudioRender *AudioHwiCreateRenderById(const struct AudioSampleAttributes *attrs, uint32_t *renderId,
     struct AudioHwiRender *hwiRender, const struct AudioDeviceDescriptor *desc)
 {
     struct IAudioRender *render = NULL;
-    if (renderId == NULL || hwiRender == NULL || desc == NULL) {
+    if (attrs == NULL || renderId == NULL || hwiRender == NULL || desc == NULL) {
         AUDIO_FUNC_LOGE("audio render is null");
         return NULL;
     }
@@ -966,7 +971,9 @@ struct IAudioRender *AudioHwiCreateRenderById(enum AudioCategory streamType, uin
     }
     priv->renderInfos[*renderId]->render = render;
     priv->renderInfos[*renderId]->hwiRender = hwiRender;
-    priv->renderInfos[*renderId]->streamType = streamType;
+    priv->renderInfos[*renderId]->streamType = attrs->type;
+    priv->renderInfos[*renderId]->sampleRate = attrs->sampleRate;
+    priv->renderInfos[*renderId]->channelCount = attrs->channelCount;
     priv->renderInfos[*renderId]->desc.portId = desc->portId;
     priv->renderInfos[*renderId]->desc.pins = desc->pins;
     priv->renderInfos[*renderId]->desc.desc = strdup(desc->desc);
