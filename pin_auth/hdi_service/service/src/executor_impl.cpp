@@ -34,6 +34,7 @@ namespace {
     constexpr uint32_t ENROLL_PIN = 0;
     constexpr uint32_t AUTH_PIN = 1;
     constexpr uint32_t OPENSSL_SUCCESS = 1;
+    constexpr uint32_t GENERAL_ERROR = 2;
     constexpr uint32_t SUCCESS = 0;
 } // namespace
 
@@ -239,7 +240,7 @@ int32_t ExecutorImpl::OnSetData(uint64_t scheduleId, uint64_t authSubType, const
         return HDF_FAILURE;
     }
     std::vector<uint8_t> resultTlv;
-    int32_t result = SUCCESS;
+    int32_t result = GENERAL_ERROR;
     constexpr uint32_t INVALID_ID = 2;
     uint32_t commandId = INVALID_ID;
     sptr<IExecutorCallback> callback = nullptr;
@@ -258,6 +259,9 @@ int32_t ExecutorImpl::OnSetData(uint64_t scheduleId, uint64_t authSubType, const
             break;
         case AUTH_PIN:
             result = AuthPin(scheduleId, templateId, data, resultTlv);
+            if (result != SUCCESS) {
+                IAM_LOGE("Auth Pin failed, fail code : %{public}d", result);
+            }
             break;
         default:
             IAM_LOGE("Error commandId");
