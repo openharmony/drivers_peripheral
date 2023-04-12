@@ -27,8 +27,6 @@
 struct AudioCaptureInfo {
     struct AudioDeviceDescriptor desc;
     enum AudioCategory streamType;
-    unsigned int sampleRate;
-    unsigned int channelCount;
     struct IAudioCapture *capture;
     struct AudioHwiCapture *hwiCapture;
     uint32_t captureId;
@@ -712,16 +710,9 @@ static void AudioHwiInitCaptureInstance(struct IAudioCapture *capture)
     capture->GetVersion = AudioHwiCaptureGetVersion;
 }
 
-struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
-    uint32_t *captureId)
+struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, enum AudioCategory streamType, uint32_t *captureId)
 {
     uint32_t index = 0;
-
-    if (captureId == NULL || attrs == NULL) {
-        AUDIO_FUNC_LOGE("audio params is null");
-        return NULL;
-    }
-
     struct AudioHwiCapturePriv *capturePriv = AudioHwiCaptureGetPriv();
     if (capturePriv == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -736,9 +727,7 @@ struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, const struct Aud
     for (index = 0; index < AUDIO_HW_STREAM_NUM_MAX; index++) {
         if ((capturePriv->captureInfos[index] != NULL) &&
             (capturePriv->captureInfos[index]->desc.pins == pin) &&
-            (capturePriv->captureInfos[index]->streamType == attrs->type) &&
-            (capturePriv->captureInfos[index]->sampleRate == attrs->sampleRate) &&
-            (capturePriv->captureInfos[index]->channelCount == attrs->channelCount)) {
+            (capturePriv->captureInfos[index]->streamType == streamType)) {
             *captureId = capturePriv->captureInfos[index]->captureId;
             return capturePriv->captureInfos[index]->capture;
         }
@@ -771,10 +760,10 @@ static uint32_t GetAvailableCaptureId(struct AudioHwiCapturePriv *capturePriv)
     return captureId;
 }
 
-struct IAudioCapture *AudioHwiCreateCaptureById(const struct AudioSampleAttributes *attrs, uint32_t *captureId,
+struct IAudioCapture *AudioHwiCreateCaptureById(enum AudioCategory streamType, uint32_t *captureId,
     struct AudioHwiCapture *hwiCapture, const struct AudioDeviceDescriptor *desc)
 {
-    if (attrs == NULL || captureId == NULL || hwiCapture == NULL || desc == NULL) {
+    if (captureId == NULL || hwiCapture == NULL || desc == NULL) {
         AUDIO_FUNC_LOGE("audio capture is null");
         return NULL;
     }
@@ -802,9 +791,7 @@ struct IAudioCapture *AudioHwiCreateCaptureById(const struct AudioSampleAttribut
     }
     priv->captureInfos[*captureId]->capture = capture;
     priv->captureInfos[*captureId]->hwiCapture = hwiCapture;
-    priv->captureInfos[*captureId]->streamType = attrs->type;
-    priv->captureInfos[*captureId]->sampleRate = attrs->sampleRate;
-    priv->captureInfos[*captureId]->channelCount = attrs->channelCount;
+    priv->captureInfos[*captureId]->streamType = streamType;
     priv->captureInfos[*captureId]->desc.portId = desc->portId;
     priv->captureInfos[*captureId]->desc.pins = desc->pins;
     priv->captureInfos[*captureId]->desc.desc = strdup(desc->desc);
