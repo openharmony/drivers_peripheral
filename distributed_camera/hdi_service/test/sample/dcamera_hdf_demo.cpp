@@ -301,7 +301,7 @@ RetCode DcameraHdfDemo::InitSensors()
 
 void DcameraHdfDemo::StoreImage(const void *bufStart, const uint32_t size) const
 {
-    DHLOGI("demo test:StoreImage buf_start == %p size == %d", bufStart, size);
+    DHLOGI("demo test:StoreImage size == %d", size);
     constexpr uint32_t pathLen = 64;
     char path[pathLen] = {0};
     char prefix[] = "/data/";
@@ -338,7 +338,7 @@ void DcameraHdfDemo::StoreVideo(const void *bufStart, const uint32_t size) const
     if (ret == -1) {
         DHLOGE("demo test:write video file error %s.....", strerror(errno));
     }
-    DHLOGI("demo test:StoreVideo buf_start == %p size == %d", bufStart, size);
+    DHLOGI("demo test:StoreVideo size == %d", size);
 }
 
 void DcameraHdfDemo::OpenVideoFile()
@@ -1109,6 +1109,8 @@ int32_t DemoCameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector
                 DHLOGI("demo test: exposureMode %d", exposureMode);
                 break;
             }
+            default:
+                return RC_ERROR;
         }
     }
 

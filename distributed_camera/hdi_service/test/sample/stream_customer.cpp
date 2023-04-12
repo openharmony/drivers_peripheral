@@ -43,7 +43,7 @@ sptr<OHOS::IBufferProducer> StreamCustomer::CreateProducer(CaptureMode mode,
         return nullptr;
     }
 
-    DHLOGI("demo test, create a buffer queue producer %p", producer.GetRefPtr());
+    DHLOGI("demo test, create a buffer queue");
     return producer;
 }
 }
