@@ -12,12 +12,11 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libcodec_buffer_manager") {
   include_dirs = [
-    "//drivers/peripheral/codec/interfaces/include",
-    "//drivers/peripheral/codec/hal/v1.0/buffer_manager/include",
+    "../../../interfaces/include",
+    "../../../hal/v1.0/buffer_manager/include",
   ]
   sources = [
     "src/buffer_manager.cpp",

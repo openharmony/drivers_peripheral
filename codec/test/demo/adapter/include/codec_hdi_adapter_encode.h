@@ -33,7 +33,6 @@
 #include "codec_component_manager.h"
 #include "codec_component_type.h"
 #include "command_adapter_parse.h"
-#include "hdi_mpp.h"
 #include "v1_0/display_composer_type.h"
 #include "v1_0/display_buffer_type.h"
 #include "v1_0/include/idisplay_buffer.h"
@@ -115,8 +114,6 @@ private:
     bool FillCodecBuffer(std::shared_ptr<BufferInfo> bufferInfo, bool &endFlag);
     int32_t CreateBufferHandle();
     void FreeBufferHandle();
-    void CalcBpsRange(RKHdiRcSetup *rateControl, int32_t codecType);
-    void SetQpValue(RKHdiRcSetup *rateControl);
     uint32_t inline AlignUp(uint32_t width)
     {
         return (((width) + alignment_ - 1) & (~(alignment_ - 1)));
