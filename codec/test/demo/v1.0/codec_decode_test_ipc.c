@@ -18,11 +18,9 @@
 #include <string.h>
 #include <securec.h>
 #include <sys/stat.h>
-#include "codec_callback_stub.h"
 #include "codec_utils.h"
 #include "codec_gralloc_wrapper.h"
 #include "hdf_log.h"
-#include "hdi_mpp_ext_param_keys.h"
 #include "icodec.h"
 #include "share_mem.h"
 
@@ -418,39 +416,6 @@ int32_t TestOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t
     return HDF_SUCCESS;
 }
 
-static int32_t SetExtDecParameter(void)
-{
-    Param param;
-    int32_t paramCnt;
-    int32_t ret;
-
-    // set split_parse enable mpp internal frame spliter when the input
-    paramCnt = 1;
-    memset_s(&param, sizeof(Param), 0, sizeof(Param));
-    param.key = (ParamKey)KEY_EXT_SPLIT_PARSE_RK;
-    param.val = &g_autoSplit;
-    param.size = sizeof(uint32_t);
-    ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: CodecSetParameter failed", __func__);
-        return HDF_FAILURE;
-    }
-
-    // set decode frame number
-    memset_s(&param, sizeof(Param), 0, sizeof(Param));
-    paramCnt = 1;
-    param.key = (ParamKey)KEY_EXT_DEC_FRAME_NUM_RK;
-    param.val = &g_data.frameNum;
-    param.size = sizeof(int32_t);
-    ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: CodecSetParameter failed", __func__);
-        return HDF_FAILURE;
-    }
-
-    return HDF_SUCCESS;
-}
-
 static int32_t SetDecParameter(void)
 {
     Param param;
@@ -489,10 +454,6 @@ static int32_t SetDecParameter(void)
     ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: CodecSetParameter failed", __func__);
-        return HDF_FAILURE;
-    }
-
-    if (SetExtDecParameter() != HDF_SUCCESS) {
         return HDF_FAILURE;
     }
 
