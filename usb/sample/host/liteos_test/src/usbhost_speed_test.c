@@ -30,6 +30,7 @@
 #define SERVER_NAME_SDKAPI "usb_sdkapispeed_service"
 #define SERVER_NAME_RAWAPI "usb_rawapispeed_service"
 #define SERVER_NAME_NOSDK  "usb_nosdkspeed_service"
+#define STRTOL_BASE  10
 
 enum UsbSerialCmd {
     USB_SERIAL_OPEN = 0,
@@ -89,6 +90,8 @@ static void SpeedInit(void)
             break;
         case NOSDK_SERVER:
             g_service = HdfIoServiceBind(SERVER_NAME_NOSDK);
+            break;
+        default:
             break;
     }
     if (g_service == NULL || g_service->dispatcher == NULL || g_service->dispatcher->Dispatch == NULL) {
@@ -197,7 +200,7 @@ static int32_t GetWriteOrReadFlag(const char *buffer)
     } else if (!strncmp(buffer, "w", 1)) {
         writeOrRead = TEST_WRITE;
     } else {
-        writeOrRead = atoi(buffer);
+        writeOrRead = (int32_t)strtol(buffer, NULL, STRTOL_BASE);
     }
 
     return writeOrRead;
@@ -215,9 +218,9 @@ static int32_t CheckParam(int32_t argc, const char *argv[], struct UsbSpeedTest 
         case 7:                                  // 7 is number of arguments supplied to the main function
         case 6:                                  // 6 is number of arguments supplied to the main function
             g_spdServer = checkServer(argv[1]);  // 1 is argv second element
-            speedTest->busNum = atoi(argv[2]);   // 2 is argv third element
-            speedTest->devAddr = atoi(argv[3]);  // 3 is argv fourth element
-            speedTest->ifaceNum = atoi(argv[4]); // 4 is argv fifth element
+            speedTest->busNum = (int32_t)strtol(argv[2], NULL, STRTOL_BASE);   // 2 is argv third element
+            speedTest->devAddr = (int32_t)strtol(argv[3], NULL, STRTOL_BASE);  // 3 is argv fourth element
+            speedTest->ifaceNum = (int32_t)strtol(argv[4], NULL, STRTOL_BASE); // 4 is argv fifth element
             speedTest->writeOrRead = GetWriteOrReadFlag(argv[5]); // 5 is argv sixth element
             // 7 is number of arguments supplied to the main function
             if ((argc == 7) && (speedTest->writeOrRead == TEST_READ)) {
@@ -228,7 +231,7 @@ static int32_t CheckParam(int32_t argc, const char *argv[], struct UsbSpeedTest 
             g_spdServer = checkServer(argv[1]); // 1 is argv second element
             speedTest->busNum = 1;
             speedTest->devAddr = 2;                               // 2 is device address
-            speedTest->ifaceNum = atoi(argv[2]);                  // 2 is argv third element
+            speedTest->ifaceNum = (int32_t)strtol(argv[2], NULL, STRTOL_BASE);         // 2 is argv third element
             speedTest->writeOrRead = GetWriteOrReadFlag(argv[3]); // 3 is argv fourth element
             break;
         default:

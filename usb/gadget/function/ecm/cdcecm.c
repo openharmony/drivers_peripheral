@@ -501,13 +501,10 @@ static void EcmNotifyComplete(uint8_t pipe, struct UsbFnRequest *req)
     struct UsbEcmDevice *ecm = req->context;
     struct UsbCdcNotification *event = req->buf;
     ecm->notifyReq = req;
-    switch (req->status) {
-        case 0:
-            EcmDoNotify(ecm);
-            break;
-        default:
-            HDF_LOGD("event %d --> %d\n", event->bNotificationType, req->status);
-            break;
+    if (req->status == 0) {
+        EcmDoNotify(ecm);
+    } else {
+        HDF_LOGD("event %d --> %d\n", event->bNotificationType, req->status);
     }
 }
 
