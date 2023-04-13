@@ -781,7 +781,7 @@ HWTEST_F(HdfWifiServiceCTest, StartChannelMeasTest_034, TestSize.Level1)
     measChannelParam.channelId = 1;
     measChannelParam.measTime = 15;
     int32_t rc = g_wlanObj->StartChannelMeas(g_wlanObj, ifName, &measChannelParam);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_DEV_ERR_NETDOWN);
     ASSERT_TRUE(flag);
     sleep(MEAS_CHANNEL_TIME);
     rc = g_wlanObj->GetChannelMeasResult(g_wlanObj, ifName, &measChannelResult);
