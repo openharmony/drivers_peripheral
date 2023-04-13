@@ -653,20 +653,13 @@ int32_t CodecHdiDecode::OnEvent(struct CodecCallbackType *self, OMX_EVENTTYPE ev
 {
     HDF_LOGI("%{public}s: appData[%{public}" PRId64 "] eEvent [%{public}d], nData1[%{public}d]", __func__,
              info->appData, event, info->data1);
-    switch (event) {
-        case OMX_EventCmdComplete: {
-            OMX_COMMANDTYPE cmd = static_cast<OMX_COMMANDTYPE>(info->data1);
-            if (OMX_CommandStateSet == cmd) {
-                HDF_LOGI("OMX_CommandStateSet reached, status is %{public}d", info->data2);
-                g_core->OnStatusChanged();
-            }
-            break;
+    if (event == OMX_EventCmdComplete) {
+        OMX_COMMANDTYPE cmd = static_cast<OMX_COMMANDTYPE>(info->data1);
+        if (OMX_CommandStateSet == cmd) {
+            HDF_LOGI("OMX_CommandStateSet reached, status is %{public}d", info->data2);
+            g_core->OnStatusChanged();
         }
-
-        default:
-            break;
     }
-
     return HDF_SUCCESS;
 }
 
