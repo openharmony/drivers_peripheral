@@ -256,6 +256,16 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
         case NL80211_CMD_VENDOR:
             WifiEventVendorProcess(ifName, attr);
             break;
+        case NL80211_CMD_START_SCHED_SCAN:
+            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_START_SCHED_SCAN, cmd = %d", __FUNCTION__, cmd);
+            break;
+        case NL80211_CMD_SCHED_SCAN_RESULTS:
+            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_SCHED_SCAN_RESULTS, cmd = %d", __FUNCTION__, cmd);
+            WifiEventScanResultProcess(ifName);
+            break;
+        case NL80211_CMD_STOP_SCHED_SCAN:
+            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_STOP_SCHED_SCAN, cmd = %d", __FUNCTION__, cmd);
+            break;
         case NL80211_CMD_NEW_SCAN_RESULTS:
             WifiEventScanResultProcess(ifName);
             break;
