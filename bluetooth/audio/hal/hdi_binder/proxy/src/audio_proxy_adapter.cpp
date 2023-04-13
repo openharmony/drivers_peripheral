@@ -430,11 +430,7 @@ int32_t AudioProxyAdapterGetPortCapability(struct AudioAdapter *adapter,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
-    if (!HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
-        AudioProxyBufReplyRecycle(data, reply);
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL) {
+    if (hwAdapter == NULL || !HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -503,12 +499,7 @@ int32_t AudioProxyAdapterSetPassthroughMode(struct AudioAdapter *adapter,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
-    if (!HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
-        AudioProxyBufReplyRecycle(data, reply);
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL ||
-        hwAdapter->adapterDescriptor.adapterName == NULL) {
+    if (hwAdapter == NULL || !HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
@@ -554,11 +545,7 @@ int32_t AudioProxyAdapterGetPassthroughMode(struct AudioAdapter *adapter,
         return AUDIO_HAL_ERR_INTERNAL;
     }
     struct AudioHwAdapter *hwAdapter = reinterpret_cast<struct AudioHwAdapter *>(adapter);
-    if (!HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
-        AudioProxyBufReplyRecycle(data, reply);
-        return AUDIO_HAL_ERR_INTERNAL;
-    }
-    if (hwAdapter == NULL || hwAdapter->proxyRemoteHandle == NULL) {
+    if (hwAdapter == NULL || !HdfRemoteServiceWriteInterfaceToken(hwAdapter->proxyRemoteHandle, data)) {
         AudioProxyBufReplyRecycle(data, reply);
         return AUDIO_HAL_ERR_INTERNAL;
     }
