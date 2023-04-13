@@ -84,6 +84,31 @@ struct IWiFiSta {
      * @version 1.0
      */
     int32_t (*startScan)(const char *ifName, WifiScan *scan);
+
+    /**
+     * @brief wlan hal start pno scan.
+     *
+     * @param ifName The interface name.
+     * @param pnoSettings pno scan parameters.
+     *
+     * @return Returns <b>0</b> if starting pno scan is successfully; returns a negative value otherwise.
+     *
+     * @since 4.0
+     * @version 1.1
+     */
+    int32_t (*startPnoScan)(const char *ifName, const WifiPnoSettings *pnoSettings);
+
+    /**
+     * @brief wlan hal start pno scan.
+     *
+     * @param ifName The interface name.
+     *
+     * @return Returns <b>0</b> if stopping pno scan is successfully; returns a negative value otherwise.
+     *
+     * @since 4.0
+     * @version 1.1
+     */
+    int32_t (*stopPnoScan)(const char *ifName);
 };
 
 /**

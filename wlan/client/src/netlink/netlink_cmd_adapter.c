@@ -1951,3 +1951,16 @@ int32_t GetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac
     nlmsg_free(msg);
     return ret;
 }
+
+int32_t WifiStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings)
+{
+    (void)ifName;
+    (void)pnoSettings;
+    return RET_CODE_SUCCESS;
+}
+
+int32_t WifiStopPnoScan(const char *ifName)
+{
+    (void)ifName;
+    return RET_CODE_SUCCESS;
+}
