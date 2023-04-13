@@ -71,14 +71,14 @@ bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
                 opt.fileOutput = optarg;
                 break;
             case MyOptIndex::OPT_INDEX_WIDTH:
-                opt.width = atoi(optarg);
+                opt.width = std::stoi(optarg);
                 break;
             case MyOptIndex::OPT_INDEX_HEIGHT:
-                opt.height = atoi(optarg);
+                opt.height = std::stoi(optarg);
                 break;
             case MyOptIndex::OPT_INDEX_COLOR:
                 if (optarg) {
-                    opt.colorForamt = static_cast<ColorFormat>(atoi(optarg));
+                    opt.colorForamt = static_cast<ColorFormat>(std::stoi(optarg));
                 }
                 break;
             default:
