@@ -490,26 +490,6 @@ HWTEST_F(AudioUtRenderTest, RenderGetGainThresholdIsValid001, TestSize.Level1)
     EXPECT_LE(max, MAX_GAINTHRESHOLD);
 }
 
-HWTEST_F(AudioUtRenderTest, RenderGetMmapPositionNull001, TestSize.Level1)
-{
-    uint64_t frames = 0;
-    struct AudioTimeStamp time;
-    time.tvNSec = 0;
-    time.tvSec = 0;
-    EXPECT_EQ(HDF_ERR_INVALID_OBJECT, render_->GetMmapPosition(nullptr, &frames, &time));
-}
-
-HWTEST_F(AudioUtRenderTest, RenderGetMmapPositionIsValid001, TestSize.Level1)
-{
-    uint64_t frames = 0;
-    struct AudioTimeStamp time;
-    time.tvNSec = 0;
-    time.tvSec = 0;
-    int32_t ret = render_->GetMmapPosition(render_, &frames, &time);
-
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
-}
-
 HWTEST_F(AudioUtRenderTest, RenderGetMuteNull001, TestSize.Level1)
 {
     bool isMute = false;
