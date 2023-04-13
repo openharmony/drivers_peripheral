@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -752,6 +752,7 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfGetConfigDescriptor002, TestSize.Level1)
 
     ret = UsbRawGetConfigDescriptor(g_dev, g_activeConfig, NULL);
     EXPECT_EQ(HDF_ERR_INVALID_PARAM, ret);
+    UsbRawFreeConfigDescriptor(NULL);
 }
 
 /**
@@ -1133,6 +1134,8 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfClaimInterface006, TestSize.Level1)
 
     ret = UsbParseConfigDescriptor(g_acm, g_acm->config);
     EXPECT_EQ(HDF_SUCCESS, ret);
+    UsbRawFreeConfigDescriptor(g_acm->config);
+    g_acm->config = nullptr;
 }
 
 /**
@@ -2087,26 +2090,4 @@ HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFillInterruptRequest005, TestSize.Level1)
     EXPECT_EQ(HDF_SUCCESS, ret);
 }
 
-/**
- * @tc.number    : CheckRawSdkIfFreeConfigDescriptor001
- * @tc.name      :
- * @tc.type      : PERF
- * @tc.level     : Level 1
- */
-HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFreeConfigDescriptor001, TestSize.Level1)
-{
-    UsbRawFreeConfigDescriptor(NULL);
-}
-
-/**
- * @tc.number    : CheckRawSdkIfFreeConfigDescriptor002
- * @tc.name      :
- * @tc.type      : PERF
- * @tc.level     : Level 1
- */
-HWTEST_F(UsbRawSdkIfTest, CheckRawSdkIfFreeConfigDescriptor002, TestSize.Level1)
-{
-    UsbRawFreeConfigDescriptor(g_acm->config);
-    g_acm->config = nullptr;
-}
 } // namespace

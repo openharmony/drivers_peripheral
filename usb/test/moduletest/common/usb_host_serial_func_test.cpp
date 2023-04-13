@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,6 +20,8 @@
 
 #include "securec.h"
 #include "usb_utils.h"
+
+#define SLEEP_TIME  2
 
 using namespace std;
 using namespace testing::ext;
@@ -413,16 +415,16 @@ HWTEST_F(UsbHostSerialFuncTest, KillHostSdkProcess, TestSize.Level1)
     printf("------start KillHostSdkProcess------\n");
     system("kill $(pidof pnp_host)");
     printf("Please waiting for restarting sdk process...\n");
-    sleep(5);
+    sleep(SLEEP_TIME);
     ASSERT_EQ(system("usbhost_ddk_test -Ar &"), 0) << "ErrInfo:  failed to start async read";
-    sleep(3);
+    sleep(SLEEP_TIME);
     const string data = "abc";
     double startTs = GetNowTs();
     string wlog, rlog;
     wlog = "send data[" + data + "] to device";
     rlog = "recv data[" + data + "] from device";
     ASSERT_EQ(system(("usbhost_ddk_test -Aw '" + data + "'").c_str()), 0);
-    sleep(3);
+    sleep(SLEEP_TIME);
     EXPECT_TRUE(HasLog(wlog, startTs)) << "ErrInfo: cannot find async write log";
     EXPECT_TRUE(HasLog(rlog, startTs, RLOG_FILE)) << "ErrInfo: cannot find async recv log";
     system("killall usbhost_ddk_test");
