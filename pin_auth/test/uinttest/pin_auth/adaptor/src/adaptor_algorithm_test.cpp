@@ -221,11 +221,17 @@ HWTEST_F(AdaptorAlgorithmTest, AdaptorAlgorithmDeriveDeviceKey, TestSize.Level1)
     ASSERT_NE(secret, nullptr);
     (void)SecureRandom(secret->buf, secret->maxSize);
     secret->contentSize = secret->maxSize;
-    Buffer *key = DeriveDeviceKey(secret);
+    constexpr uint32_t pinDataLen = 64;
+    Buffer *pinData = CreateBufferBySize(pinDataLen);
+    ASSERT_NE(pinData, nullptr);
+    (void)SecureRandom(pinData->buf, pinData->maxSize);
+    pinData->contentSize = pinData->maxSize;
+    Buffer *key = DeriveDeviceKey(pinData, secret);
     ASSERT_NE(key, nullptr);
     EXPECT_EQ(key->contentSize, SHA256_DIGEST_SIZE);
-    DestoryBuffer(secret);
     DestoryBuffer(key);
+    DestoryBuffer(pinData);
+    DestoryBuffer(secret);
 }
 
 /**

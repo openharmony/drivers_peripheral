@@ -22,7 +22,7 @@
 extern "C" {
 #endif // __cplusplus
 
-#define HDF_LOG_TAG PinAuthBase
+#define HDF_LOG_TAG PIN_AUTH_HDI
 
 #ifndef OHOS_DEBUG
 #define DECORATOR_HDFLOG(op, fmt, args...)             \

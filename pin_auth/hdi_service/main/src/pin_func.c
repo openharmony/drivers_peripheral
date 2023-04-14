@@ -80,8 +80,8 @@ ResultCode DoAuthPin(PinAuthParam *pinAuthParam, Buffer *retTlv, ResultCode *com
 
     uint64_t subType = 0;
     uint32_t freezeTime = 0;
-    uint32_t authErrorConut = INIT_AUTH_ERROR_COUNT;
-    ResultCode ret = GetSubTypeAndFreezeTime(&subType, pinAuthParam->templateId, &freezeTime, &authErrorConut);
+    uint32_t authErrorCount = INIT_AUTH_ERROR_COUNT;
+    ResultCode ret = GetSubTypeAndFreezeTime(&subType, pinAuthParam->templateId, &freezeTime, &authErrorCount);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetSubTypeAndFreezeTime fail.");
         return ret;
@@ -119,9 +119,9 @@ ResultCode DoQueryPinInfo(uint64_t templateId, PinCredentialInfos *pinCredential
         LOG_ERROR("check DoQueryPin param fail!");
         return RESULT_BAD_PARAM;
     }
-    uint32_t authErrorConut = INIT_AUTH_ERROR_COUNT;
+    uint32_t authErrorCount = INIT_AUTH_ERROR_COUNT;
     ResultCode ret = GetSubTypeAndFreezeTime(&(pinCredentialInfo->subType), templateId,
-        &(pinCredentialInfo->freezeTime), &authErrorConut);
+        &(pinCredentialInfo->freezeTime), &authErrorCount);
     if (ret != RESULT_SUCCESS) {
         LOG_ERROR("GetSubTypeAndFreezeTime fail.");
         return ret;
@@ -129,7 +129,7 @@ ResultCode DoQueryPinInfo(uint64_t templateId, PinCredentialInfos *pinCredential
     if (pinCredentialInfo->freezeTime > 0) {
         pinCredentialInfo->remainTimes = 0;
     } else {
-        ret = GetRemainTimes(templateId, &(pinCredentialInfo->remainTimes), authErrorConut);
+        ret = GetRemainTimes(templateId, &(pinCredentialInfo->remainTimes), authErrorCount);
         if (ret != RESULT_SUCCESS) {
             LOG_ERROR("GetRemainTimes fail.");
             return ret;
@@ -290,7 +290,7 @@ ResultCode DoVerifyTemplateData(const uint64_t *templateIdList, uint32_t templat
     return RESULT_SUCCESS;
 }
 
-ResultCode WriteAntiBruteInfoToFile(uint64_t templateId)
+ResultCode DoWriteAntiBruteInfoToFile(uint64_t templateId)
 {
     ResultCode ret = RefreshAntiBruteInfoToFile(templateId);
     if (ret != RESULT_SUCCESS) {
