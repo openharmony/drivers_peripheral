@@ -69,6 +69,7 @@ struct IWlanInterface *WlanInterfaceImplGetInstance(void)
     service->interface.GetStaInfo = WlanInterfaceGetStaInfo;
     service->interface.StartPnoScan = WlanInterfaceStartPnoScan;
     service->interface.StopPnoScan = WlanInterfaceStopPnoScan;
+    service->interface.GetSignalPollInfo = WlanInterfaceGetSignalPollInfo;
     return &service->interface;
 }
 

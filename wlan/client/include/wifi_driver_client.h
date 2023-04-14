@@ -272,6 +272,28 @@ typedef struct {
     uint8_t txVhtNss;
 } __attribute__ ((aligned(8))) StationInfo;
 
+#define BSS_STATUS_ASSOCIATED 1
+typedef struct {
+    uint8_t associatedBssid[ETH_ADDR_LEN];
+    uint32_t associatedFreq;
+} AssociatedInfo;
+
+struct SignalResult {
+    int32_t currentRssi;
+    int32_t associatedFreq;
+    int32_t txBitrate;
+    int32_t rxBitrate;
+    int32_t currentNoise;
+    int32_t currentSnr;
+    int32_t currentChload;
+    int32_t currentUlDelay;
+    int32_t currentTxBytes;
+    int32_t currentRxBytes;
+    int32_t currentTxFailed;
+    int32_t currentTxPackets;
+    int32_t currentRxPackets;
+};
+
 typedef struct {
     uint8_t ssid[MAX_SSID_LEN];
     uint32_t ssidLen;
@@ -320,6 +342,7 @@ int32_t SendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t *paramBuf, 
 int32_t GetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen);
 int32_t WifiStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings);
 int32_t WifiStopPnoScan(const char *ifName);
+int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult);
 
 /* wpa related interface */
 #define MAX_NR_CIPHER_SUITES 5

@@ -276,6 +276,16 @@ int32_t HalCmdStopPnoScan(const char *ifName)
     return ret;
 }
 
+int32_t HalCmdGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
+{
+    int32_t ret;
+    ret = WifiGetSignalPollInfo(ifName, signalResult);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiGetSignalInfo failed", __FUNCTION__);
+    }
+    return ret;
+}
+
 int32_t HalCmdSetResetDriver(const uint8_t chipId, const char *ifName)
 {
     int32_t ret;
