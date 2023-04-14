@@ -255,7 +255,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0067, TestSize.Level2)
     Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
     std::cout << "cameraDevice->UpdateSettings's rc " << Test_->rc << std::endl;
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
@@ -286,7 +286,7 @@ HWTEST_F(HdiDeviceTest, Camera_Hdi_0068, TestSize.Level2)
     Test_->rc = Test_->cameraDevice->UpdateSettings(meta);
     std::cout << "cameraDevice->UpdateSettings's rc " << Test_->rc << std::endl;
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // Release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};

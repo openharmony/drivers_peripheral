@@ -51,7 +51,7 @@ HWTEST_F(VideoTest, Camera_Video_0001, TestSize.Level0)
     // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
     // Post-processing
-    sleep(10);
+    sleep(3); // sleep for 3 seconds
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds.push_back(Test_->streamId_preview);
     Test_->streamIds.push_back(Test_->streamId_video);
@@ -86,7 +86,7 @@ HWTEST_F(VideoTest, Camera_Video_0002, TestSize.Level1)
     }
     // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
@@ -247,7 +247,7 @@ HWTEST_F(VideoTest, Camera_Video_0021, TestSize.Level1)
     }
     // Capture preview stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};
@@ -283,7 +283,7 @@ HWTEST_F(VideoTest, Camera_Video_0022, TestSize.Level2)
     }
     // Capture video stream
     Test_->StartCapture(Test_->streamId_video, Test_->captureId_video, false, true);
-    sleep(180);
+    sleep(3); // sleep for 3 seconds
     // Post-processing
     Test_->captureIds = {Test_->captureId_preview, Test_->captureId_video};
     Test_->streamIds = {Test_->streamId_preview, Test_->streamId_video};

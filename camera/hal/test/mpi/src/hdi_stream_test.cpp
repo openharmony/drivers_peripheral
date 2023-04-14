@@ -1296,7 +1296,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0191, TestSize.Level2)
     Test_->captureInfo->enableShutterCallback_ = true;
     Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, true);
     EXPECT_EQ(INVALID_ARGUMENT, Test_->rc);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     Test_->streamOperator->CancelCapture(captureId);
     // release stream
     Test_->captureIds = {};
@@ -1357,7 +1357,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0192, TestSize.Level2)
     bool isStreaming = true;
     Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, isStreaming);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    sleep(3);
+    sleep(3); // sleep for 3 seconds
     Test_->streamOperator->CancelCapture(captureId);
 
     // release stream
@@ -1441,7 +1441,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0195, TestSize.Level2)
     int captureId = -1;
     Test_->rc = Test_->streamOperator->Capture(captureId, Test_->captureInfo, isStreaming);
     EXPECT_EQ(INVALID_ARGUMENT, Test_->rc);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // release stream
     Test_->rc = Test_->streamOperator->ReleaseStreams({Test_->streamId_preview});
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
@@ -1727,7 +1727,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0220, TestSize.Level0)
     } else {
         std::cout << "==========[test log]Check hdi: AttachBufferQueue fail, rc = " << Test_->rc << std::endl;
     }
-    sleep(3);
+    sleep(3); // sleep for 3 seconds
     Test_->rc = Test_->streamOperator->DetachBufferQueue(Test_->streamInfo->streamId_);
     std::cout << "==========[test log]Check hdi: streamOperator->DetachBufferQueue's rc " << Test_->rc << std::endl;
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
@@ -1788,7 +1788,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0221, TestSize.Level2)
     } else {
         std::cout << "==========[test log]Check hdi: AttachBufferQueue fail, rc = " << Test_->rc << std::endl;
     }
-    sleep(3);
+    sleep(3); // sleep for 3 seconds
     Test_->rc = Test_->streamOperator->DetachBufferQueue(100);
     std::cout << "==========[test log]Check hdi: streamOperator->DetachBufferQueue's rc " << Test_->rc << std::endl;
     EXPECT_EQ(Test_->rc, Camera::INVALID_ARGUMENT);
@@ -1816,7 +1816,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0230, TestSize.Level0)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // 3. Capture the camera stream, continuous shooting
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // 4. Convert to offline stream
     Test_->CreateOfflineStreamOperatorCallback();
     std::vector<int> offlineIds;
@@ -1838,7 +1838,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0230, TestSize.Level0)
     // 6. Post-processing of offline streams
     Test_->cameraDevice->Close();
     std::cout << "==========[test log] Pretend to wait 5s for callback..." << std::endl;
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     Test_->StopOfflineStream(Test_->captureId_capture);
     Test_->StopConsumer(Test_->intents);
 }
@@ -1860,7 +1860,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0231, TestSize.Level2)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // Capture the photo stream, single capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-    sleep(10);
+    sleep(3); // sleep for 3 seconds
     // Convert to offline stream
     Test_->CreateOfflineStreamOperatorCallback();
     Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
@@ -1897,7 +1897,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0232, TestSize.Level2)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // Capture the photo stream, single capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-    sleep(10);
+    sleep(3); // sleep for 3 seconds
     // Convert to offline stream
     Test_->offlineStreamOperatorCallback = nullptr;
     Test_->rc = Test_->streamOperator->ChangeToOfflineStream(
@@ -1934,7 +1934,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0241, TestSize.Level2)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // 3. Capture the camera stream, continuous shooting
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // 4. Convert to offline stream
     Test_->CreateOfflineStreamOperatorCallback();
     std::vector<int> offlineIds;
@@ -1956,7 +1956,7 @@ HWTEST_F(HdiStreamTest, Camera_Hdi_0241, TestSize.Level2)
     // 6. Post-processing of offline streams
     Test_->cameraDevice->Close();
     std::cout << "==========[test log] Pretend to wait 5s for callback..." << std::endl;
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
 
     Test_->rc = Test_->offlineStreamOperator->CancelCapture(-1);
     EXPECT_EQ(Test_->rc, Camera::INVALID_ARGUMENT);

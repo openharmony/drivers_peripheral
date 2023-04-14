@@ -326,7 +326,7 @@ HWTEST_F(Camera3AUtTest, Camera_3a_012, TestSize.Level0)
     std::vector<uint8_t> metaVec;
     MetadataUtils::ConvertMetadataToVec(meta, metaVec);
     cameraTest->cameraDevice->UpdateSettings(metaVec);
-    sleep(10);
+    sleep(3); // sleep for 3 seconds
     cameraTest->captureIds = {cameraTest->captureIdPreview};
     cameraTest->streamIds = {cameraTest->streamIdPreview};
     cameraTest->StopStream(cameraTest->captureIds, cameraTest->streamIds);
