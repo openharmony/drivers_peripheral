@@ -66,13 +66,11 @@ int32_t AllocatorServiceStub::AllocaltorStubAllocMem(MessageParcel &data, Messag
 int32_t AllocatorServiceStub::OnRemoteRequest(
     uint32_t cmdId, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
-    switch (cmdId) {
-        case CMD_ALLOCATOR_ALLOCMEM:
-            return AllocaltorStubAllocMem(data, reply, option);
-        default: {
-            HDF_LOGE("%{public}s: not support cmd", __func__);
-            return HDF_ERR_INVALID_PARAM;
-        }
+    if (cmdId == CMD_ALLOCATOR_ALLOCMEM) {
+        return AllocaltorStubAllocMem(data, reply, option);
+    } else {
+        HDF_LOGE("%{public}s: not support cmd", __func__);
+        return HDF_ERR_INVALID_PARAM;
     }
     return HDF_SUCCESS;
 }
