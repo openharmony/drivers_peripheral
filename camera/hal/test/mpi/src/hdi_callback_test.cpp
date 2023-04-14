@@ -75,7 +75,7 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1002, TestSize.Level0)
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     Test_->status = false;
     Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     if (Test_->onFlashlightStatusFlag) {
         std::cout << "==========[test log]OnFlashlightStatus" << std::endl;
     }
