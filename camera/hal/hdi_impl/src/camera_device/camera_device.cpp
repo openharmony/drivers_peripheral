@@ -24,7 +24,7 @@
 namespace OHOS::Camera {
 std::shared_ptr<CameraDevice> CameraDevice::CreateCameraDevice(const std::string &cameraId)
 {
-    HDF_CAMERA_TRACE; 
+    HDF_CAMERA_TRACE;
     // create pipelineCore
     std::shared_ptr<IPipelineCore> pipelineCore = IPipelineCore::Create();
     if (pipelineCore == nullptr) {

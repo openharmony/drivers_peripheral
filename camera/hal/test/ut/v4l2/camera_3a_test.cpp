@@ -59,7 +59,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0001)
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     display_->cameraDevice->UpdateSettings(meta);
     std::cout << "==========[test log] UpdateSettings, exposure for 10s." << std::endl;
-    sleep(10); // update settings, exposure for 10s
+    sleep(3); // update settings, exposure for 3s
 
     // Post action of stream operation
     display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
@@ -230,7 +230,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0006)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     std::cout << "==========[test log] UpdateSettings, awb mode: OHOS_CAMERA_AWB_MODE_DAYLIGHT" << std::endl;
     display_->cameraDevice->UpdateSettings(meta);
-    sleep(5); // update settings, AWB mode daylight for 5s.
+    sleep(3); // update settings, AWB mode daylight for 3s.
 
     // Post action of stream operation
     display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
@@ -449,7 +449,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0031) // 3A mode white balance green scene
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     display_->cameraDevice->UpdateSettings(meta);
     std::cout << "==========[test log] UpdateSettings, exposure for 10s." << std::endl;
-    sleep(10); // update settings, exposure for 10s
+    sleep(3); // update settings, exposure for 3s
     // release stream
     display_->captureIds = {display_->CAPTURE_ID_PREVIEW, display_->CAPTURE_ID_CAPTURE};
     display_->streamIds = {display_->STREAM_ID_PREVIEW, display_->STREAM_ID_CAPTURE};
@@ -481,7 +481,7 @@ TEST_F(UtestCamera3ATest, camera_3a_0040)
     int32_t expo = 0xa0;
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     display_->cameraDevice->UpdateSettings(meta);
-    sleep(5); // waiting resource release for 5s.
+    sleep(3); // waiting resource release for 3s.
 }
 
 /**

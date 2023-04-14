@@ -50,7 +50,7 @@ HWTEST_F(OfflineStreamTest, Camera_Offline_0001, TestSize.Level0)
     Test_->StartCapture(Test_->streamId_preview, Test_->captureId_preview, false, true);
     // Capture the photo stream, continuous capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // Convert to offline stream
     Test_->CreateOfflineStreamOperatorCallback();
     std::vector<int> offlineIds;
