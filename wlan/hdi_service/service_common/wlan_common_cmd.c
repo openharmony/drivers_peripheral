@@ -1332,6 +1332,32 @@ int32_t WlanInterfaceStopPnoScan(struct IWlanInterface *self, const char *ifName
     return ret;
 }
 
+int32_t WlanInterfaceGetSignalPollInfo(struct IWlanInterface *self, const char *ifName,
+    struct SignalPollResult *signalResult)
+{
+    int32_t ret;
+    (void)self;
+    
+    if (ifName == NULL || signalResult == NULL) {
+        HDF_LOGE("%{public}s input parameter invalid!", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    if (g_staFeature == NULL) {
+        HDF_LOGE("%{public}s g_staFeature is NULL!", __func__);
+        return HDF_FAILURE;
+    }
+    ret = strcpy_s((g_staFeature->baseFeature).ifName, IFNAMSIZ, ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: strcpy_s is failed!, error code: %{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    ret = g_staFeature->getSignalPollInfo(ifName, (struct SignalResult *)signalResult);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: get signal information failed!, error code: %{public}d", __func__, ret);
+    }
+    return ret;
+}
+
 int32_t WlanInterfaceWifiConstruct(void)
 {
     int32_t ret;

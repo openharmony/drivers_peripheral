@@ -109,6 +109,19 @@ struct IWiFiSta {
      * @version 1.1
      */
     int32_t (*stopPnoScan)(const char *ifName);
+
+    /**
+     * @brief wlan hal get signal information.
+     *
+     * @param ifName The interface name.
+     * @param signalResult Signal information obtained.
+     *
+     * @return Returns <b>0</b> if getting signal information is successfully; returns a negative value otherwise.
+     *
+     * @since 4.0
+     * @version 1.1
+     */
+    int32_t (*getSignalPollInfo)(const char *ifName, struct SignalResult *signalResult);
 };
 
 /**

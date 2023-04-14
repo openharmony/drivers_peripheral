@@ -1964,3 +1964,223 @@ int32_t WifiStopPnoScan(const char *ifName)
     (void)ifName;
     return RET_CODE_SUCCESS;
 }
+
+static int32_t GetAssociatedInfoHandler(struct nl_msg *msg, void *arg)
+{
+    struct nlattr *attr[NL80211_ATTR_MAX + 1];
+    struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
+    struct nlattr *bss[NL80211_BSS_MAX + 1];
+    uint32_t status;
+    AssociatedInfo *associatedInfo = (AssociatedInfo *)arg;
+    struct nla_policy bssPolicy[NL80211_BSS_MAX + 1];
+    bssPolicy[NL80211_BSS_BSSID].type = NLA_UNSPEC;
+    bssPolicy[NL80211_BSS_FREQUENCY].type = NLA_U32;
+    bssPolicy[NL80211_BSS_STATUS].type = NLA_U32;
+
+    nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(gnlh, 0), genlmsg_attrlen(gnlh, 0), NULL);
+    if (!attr[NL80211_ATTR_BSS]) {
+        HILOG_ERROR(LOG_CORE, "%s: BSS info missing!", __FUNCTION__);
+        return NL_SKIP;
+    }
+    if (nla_parse_nested(bss, NL80211_BSS_MAX, attr[NL80211_ATTR_BSS], bssPolicy) < 0 ||
+        bss[NL80211_BSS_STATUS] == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: BSS attr or status missing!", __FUNCTION__);
+        return NL_SKIP;
+    }
+    status = nla_get_u32(bss[NL80211_BSS_STATUS]);
+    if (status == BSS_STATUS_ASSOCIATED && bss[NL80211_BSS_FREQUENCY]) {
+        associatedInfo->associatedFreq = nla_get_u32(bss[NL80211_BSS_FREQUENCY]);
+    }
+    if (status == BSS_STATUS_ASSOCIATED && bss[NL80211_BSS_BSSID]) {
+        if (memcpy_s(associatedInfo->associatedBssid, ETH_ADDR_LEN,
+            nla_data(bss[NL80211_BSS_BSSID]), ETH_ADDR_LEN) != EOK) {
+            HILOG_ERROR(LOG_CORE, "%s: memcpy_s failed!", __FUNCTION__);
+            return NL_SKIP;
+        }
+    }
+    return NL_SKIP;
+}
+
+static int32_t WifiGetAssociatedInfo(const char *ifName, AssociatedInfo *associatedInfo)
+{
+    struct nl_msg *msg = NULL;
+    uint32_t interfaceId;
+    int32_t ret = RET_CODE_FAILURE;
+
+    interfaceId = if_nametoindex(ifName);
+    if (interfaceId == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    msg = nlmsg_alloc();
+    if (msg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+    do {
+        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, NLM_F_DUMP, NL80211_CMD_GET_SCAN, 0)) {
+            HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
+            break;
+        }
+        if (nla_put_u32(msg, NL80211_ATTR_IFINDEX, interfaceId) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId faile", __FUNCTION__);
+            break;
+        }
+        ret = NetlinkSendCmdSync(msg, GetAssociatedInfoHandler, associatedInfo);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
+        }
+    } while (0);
+    nlmsg_free(msg);
+    return ret;
+}
+
+static void FillSignalExt(struct nlattr **stats, uint32_t size, struct SignalResult *signalResult)
+{
+    if (size < NL80211_STA_INFO_MAX + 1) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: size of stats is not enough", __FUNCTION__);
+        return;
+    }
+
+    if (stats[NL80211_STA_INFO_NOISE] != NULL) {
+        signalResult->currentNoise = nla_get_s32(stats[NL80211_STA_INFO_NOISE]);
+    }
+    if (stats[NL80211_STA_INFO_SNR] != NULL) {
+        signalResult->currentSnr = nla_get_s32(stats[NL80211_STA_INFO_SNR]);
+    }
+    if (stats[NL80211_STA_INFO_CNAHLOAD] != NULL) {
+        signalResult->currentChload = nla_get_s32(stats[NL80211_STA_INFO_CNAHLOAD]);
+    }
+    if (stats[NL80211_STA_INFO_UL_DELAY] != NULL) {
+        signalResult->currentUlDelay = nla_get_s32(stats[NL80211_STA_INFO_UL_DELAY]);
+    }
+}
+
+static void FillSignalRate(struct nlattr **stats, uint32_t size, struct SignalResult *signalResult)
+{
+    struct nlattr *rate[NL80211_RATE_INFO_MAX + 1];
+    struct nla_policy ratePolicy[NL80211_RATE_INFO_MAX + 1];
+    ratePolicy[NL80211_RATE_INFO_BITRATE].type = NLA_U16;
+    ratePolicy[NL80211_RATE_INFO_BITRATE32].type = NLA_U32;
+
+    if (size < NL80211_STA_INFO_MAX + 1) {
+        HILOG_ERROR(LOG_CORE, "%{public}s: size of stats is not enough", __FUNCTION__);
+        return;
+    }
+    if (stats[NL80211_STA_INFO_RX_BITRATE] != NULL &&
+        nla_parse_nested(rate, NL80211_RATE_INFO_MAX, stats[NL80211_STA_INFO_RX_BITRATE], ratePolicy) == 0) {
+        if (rate[NL80211_RATE_INFO_BITRATE32] != NULL) {
+            signalResult->rxBitrate = nla_get_u32(rate[NL80211_RATE_INFO_BITRATE32]);
+        } else if (rate[NL80211_RATE_INFO_BITRATE] != NULL) {
+            signalResult->rxBitrate = nla_get_u16(rate[NL80211_RATE_INFO_BITRATE]);
+        }
+    }
+    if (stats[NL80211_STA_INFO_TX_BITRATE] != NULL &&
+        nla_parse_nested(rate, NL80211_RATE_INFO_MAX, stats[NL80211_STA_INFO_TX_BITRATE], ratePolicy) == 0) {
+        if (rate[NL80211_RATE_INFO_BITRATE32] != NULL) {
+            signalResult->txBitrate = nla_get_u32(rate[NL80211_RATE_INFO_BITRATE32]);
+        } else if (rate[NL80211_RATE_INFO_BITRATE] != NULL) {
+            signalResult->txBitrate = nla_get_u16(rate[NL80211_RATE_INFO_BITRATE]);
+        }
+    }
+}
+
+static int32_t SignalInfoHandler(struct nl_msg *msg, void *arg)
+{
+    struct genlmsghdr *gnlh = nlmsg_data(nlmsg_hdr(msg));
+    struct nlattr *attr[NL80211_ATTR_MAX + 1];
+    struct nlattr *stats[NL80211_STA_INFO_MAX + 1];
+    struct nla_policy statsPolicy[NL80211_STA_INFO_MAX + 1];
+    struct SignalResult *signalResult = (struct SignalResult *)arg;
+    statsPolicy[NL80211_STA_INFO_SIGNAL].type = NLA_S8;
+    statsPolicy[NL80211_STA_INFO_RX_BYTES].type = NLA_U32;
+    statsPolicy[NL80211_STA_INFO_TX_BYTES].type = NLA_U32;
+    statsPolicy[NL80211_STA_INFO_RX_PACKETS].type = NLA_U32;
+    statsPolicy[NL80211_STA_INFO_TX_PACKETS].type = NLA_U32;
+    statsPolicy[NL80211_STA_INFO_TX_FAILED].type = NLA_U32;
+    statsPolicy[NL80211_STA_INFO_NOISE].type = NLA_S32;
+    statsPolicy[NL80211_STA_INFO_SNR].type = NLA_S32;
+    statsPolicy[NL80211_STA_INFO_CNAHLOAD].type = NLA_S32;
+    statsPolicy[NL80211_STA_INFO_UL_DELAY].type = NLA_S32;
+
+    nla_parse(attr, NL80211_ATTR_MAX, genlmsg_attrdata(gnlh, 0), genlmsg_attrlen(gnlh, 0), NULL);
+    if (!attr[NL80211_ATTR_STA_INFO]) {
+        HILOG_ERROR(LOG_CORE, "%s: sta stats missing!", __FUNCTION__);
+        return NL_SKIP;
+    }
+    if (nla_parse_nested(stats, NL80211_STA_INFO_MAX, attr[NL80211_ATTR_STA_INFO], statsPolicy) < 0) {
+        HILOG_ERROR(LOG_CORE, "%s: nla_parse_nested NL80211_ATTR_STA_INFO failed!", __FUNCTION__);
+        return NL_SKIP;
+    }
+    if (stats[NL80211_STA_INFO_SIGNAL] != NULL) {
+        signalResult->currentRssi = nla_get_s8(stats[NL80211_STA_INFO_SIGNAL]);
+    }
+    if (stats[NL80211_STA_INFO_TX_BYTES] != NULL) {
+        signalResult->currentTxBytes = nla_get_u32(stats[NL80211_STA_INFO_TX_BYTES]);
+    }
+    if (stats[NL80211_STA_INFO_RX_BYTES] != NULL) {
+        signalResult->currentRxBytes = nla_get_u32(stats[NL80211_STA_INFO_RX_BYTES]);
+    }
+    if (stats[NL80211_STA_INFO_TX_PACKETS] != NULL) {
+        signalResult->currentTxPackets = nla_get_u32(stats[NL80211_STA_INFO_TX_PACKETS]);
+    }
+    if (stats[NL80211_STA_INFO_RX_PACKETS] != NULL) {
+        signalResult->currentRxPackets = nla_get_u32(stats[NL80211_STA_INFO_RX_PACKETS]);
+    }
+    if (stats[NL80211_STA_INFO_TX_FAILED] != NULL) {
+        signalResult->currentTxFailed = nla_get_u32(stats[NL80211_STA_INFO_TX_FAILED]);
+    }
+    FillSignalExt(stats, NL80211_STA_INFO_MAX + 1, signalResult);
+    FillSignalRate(stats, NL80211_STA_INFO_MAX + 1, signalResult);
+
+    return NL_SKIP;
+}
+
+int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
+{
+    struct nl_msg *msg = NULL;
+    uint32_t interfaceId;
+    int32_t ret = RET_CODE_FAILURE;
+    AssociatedInfo associatedInfo;
+    (void)memset_s(&associatedInfo, sizeof(associatedInfo), 0, sizeof(associatedInfo));
+
+    if (ifName == NULL || signalResult == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: param is NULL.", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    interfaceId = if_nametoindex(ifName);
+    if (interfaceId == 0) {
+        HILOG_ERROR(LOG_CORE, "%s: if_nametoindex failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    if (WifiGetAssociatedInfo(ifName, &associatedInfo) != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: WifiGetAssociatedInfo failed", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    signalResult->associatedFreq = associatedInfo.associatedFreq;
+    msg = nlmsg_alloc();
+    if (msg == NULL) {
+        HILOG_ERROR(LOG_CORE, "%s: nlmsg alloc failed", __FUNCTION__);
+        return RET_CODE_NOMEM;
+    }
+    do {
+        if (!genlmsg_put(msg, 0, 0, g_wifiHalInfo.familyId, 0, 0, NL80211_CMD_GET_STATION, 0)) {
+            HILOG_ERROR(LOG_CORE, "%s: genlmsg_put faile", __FUNCTION__);
+            break;
+        }
+        if (nla_put_u32(msg, NL80211_ATTR_IFINDEX, interfaceId) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId faile", __FUNCTION__);
+            break;
+        }
+        if (nla_put(msg, NL80211_ATTR_MAC, ETH_ADDR_LEN, associatedInfo.associatedBssid) != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: nla_put_u32 interfaceId faile", __FUNCTION__);
+            break;
+        }
+        ret = NetlinkSendCmdSync(msg, SignalInfoHandler, signalResult);
+        if (ret != RET_CODE_SUCCESS) {
+            HILOG_ERROR(LOG_CORE, "%s: send cmd failed", __FUNCTION__);
+        }
+    } while (0);
+    nlmsg_free(msg);
+    return ret;
+}

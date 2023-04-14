@@ -43,6 +43,7 @@ int32_t HalCmdSetResetDriver(const uint8_t chipId, const char *ifName);
 int32_t HalCmdStartScanInner(const char *ifName, WifiScan *scan);
 int32_t HalCmdStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings);
 int32_t HalCmdStopPnoScan(const char *ifName);
+int32_t HalCmdGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult);
 
 struct DListHead *GetNetworkHead(void);
 void ClearIWiFiList(void);
