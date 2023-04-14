@@ -256,12 +256,10 @@ static void FreeMem(BufferHandle *buffer)
     }
 
     LockGrallocMgr();
-    switch (buffer->usage) {
-        case HBM_USE_MEM_SHARE:
-            FreeShm(buffer);
-            break;
-        default:
-            HDF_LOGE("%s: not support memory usage: 0x%" PRIx64 "", __func__, buffer->usage);
+    if (buffer->usage == HBM_USE_MEM_SHARE) {
+        FreeShm(buffer);
+    } else {
+        HDF_LOGE("%s: not support memory usage: 0x%" PRIx64 "", __func__, buffer->usage);
     }
     UnlockGrallocMgr();
 }
@@ -296,13 +294,10 @@ static void *Mmap(BufferHandle *buffer)
     }
 
     LockGrallocMgr();
-    switch (buffer->usage) {
-        case HBM_USE_MEM_SHARE:
-            temp = MmapShm(buffer);
-            break;
-        default:
-            HDF_LOGE("%s: not support memory usage: 0x%" PRIx64 "", __func__, buffer->usage);
-            break;
+    if (buffer->usage == HBM_USE_MEM_SHARE) {
+        temp = MmapShm(buffer);
+    } else {
+        HDF_LOGE("%s: not support memory usage: 0x%" PRIx64 "", __func__, buffer->usage);
     }
     UnlockGrallocMgr();
     return temp;
@@ -332,14 +327,11 @@ static int32_t Unmap(BufferHandle *buffer)
         return DISPLAY_FAILURE;
     }
     LockGrallocMgr();
-    switch (buffer->usage) {
-        case  HBM_USE_MEM_SHARE:
-            ret = UnmapShm(buffer);
-            break;
-        default:
-            HDF_LOGE("%s: not support memory usage: 0x%" PRIx64 "", __func__, buffer->usage);
-            ret = DISPLAY_FAILURE;
-            break;
+    if (buffer->usage == HBM_USE_MEM_SHARE) {
+        ret = UnmapShm(buffer);
+    } else {
+        HDF_LOGE("%s: not support memory usage: 0x%" PRIx64 "", __func__, buffer->usage);
+        ret = DISPLAY_FAILURE;
     }
     UnlockGrallocMgr();
     return ret;
