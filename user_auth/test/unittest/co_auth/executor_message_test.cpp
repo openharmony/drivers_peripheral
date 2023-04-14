@@ -15,6 +15,9 @@
 
 #include <gtest/gtest.h>
 
+#include "securec.h"
+
+#include "adaptor_memory.h"
 #include "coauth.h"
 #include "executor_message.h"
 #include "idm_common.h"
@@ -253,6 +256,11 @@ HWTEST_F(ExecutorMessageTest, TestCreateExecutorMsg, TestSize.Level0)
 HWTEST_F(ExecutorMessageTest, TestDestoryExecutorMsg, TestSize.Level0)
 {
     DestoryExecutorMsg(nullptr);
+    ExecutorMsg *msg = (ExecutorMsg *)Malloc(sizeof(ExecutorMsg));
+    EXPECT_NE(msg, nullptr);
+    ASSERT_NE(msg, nullptr);
+    (void)memset_s(msg, sizeof(ExecutorMsg), 0, sizeof(ExecutorMsg));
+    DestoryExecutorMsg(msg);
 }
 
 HWTEST_F(ExecutorMessageTest, TestGetExecutorTemplateList, TestSize.Level0)
