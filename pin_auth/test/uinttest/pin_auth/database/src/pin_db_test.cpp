@@ -297,21 +297,21 @@ HWTEST_F(PinDataBaseTest, GetAntiBruteInfo_test, TestSize.Level1)
     delete pinEnrollParam;
     DestoryBuffer(outRootSecret);
 
-    uint32_t authErrorConut = 0;
+    uint32_t authErrorCount = 0;
     uint64_t startFreezeTime = 0;
-    result = GetAntiBruteInfo(INVALID_TEMPLATE_ID, &authErrorConut, &startFreezeTime);
+    result = GetAntiBruteInfo(INVALID_TEMPLATE_ID, &authErrorCount, &startFreezeTime);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
     result = GetAntiBruteInfo(templateId, nullptr, &startFreezeTime);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    result = GetAntiBruteInfo(templateId, &authErrorConut, nullptr);
+    result = GetAntiBruteInfo(templateId, &authErrorCount, nullptr);
     EXPECT_EQ(result, RESULT_BAD_PARAM);
 
-    result = GetAntiBruteInfo(0, &authErrorConut, &startFreezeTime);
+    result = GetAntiBruteInfo(0, &authErrorCount, &startFreezeTime);
     EXPECT_EQ(result, RESULT_BAD_MATCH);
 
-    result = GetAntiBruteInfo(templateId, &authErrorConut, &startFreezeTime);
+    result = GetAntiBruteInfo(templateId, &authErrorCount, &startFreezeTime);
     EXPECT_EQ(result, RESULT_SUCCESS);
 
     result = DelPinById(templateId);
