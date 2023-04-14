@@ -15,6 +15,8 @@
 
 #include <gtest/gtest.h>
 
+#include "securec.h"
+
 #include "adaptor_memory.h"
 #include "buffer.h"
 #include "linked_list.h"
@@ -50,6 +52,11 @@ public:
 HWTEST_F(PoolTest, TestDestroyExecutorInfo, TestSize.Level0)
 {
     DestroyExecutorInfo(nullptr);
+    ExecutorInfoHal *executorInfo = (ExecutorInfoHal *)Malloc(sizeof(ExecutorInfoHal));
+    EXPECT_NE(executorInfo, nullptr);
+    ASSERT_NE(executorInfo, nullptr);
+    (void)memset_s(executorInfo, sizeof(ExecutorInfoHal), 0, sizeof(ExecutorInfoHal));
+    DestroyExecutorInfo(executorInfo);
 }
 
 HWTEST_F(PoolTest, TestIsExecutorIdMatchById, TestSize.Level0)
@@ -231,6 +238,8 @@ HWTEST_F(PoolTest, TestSetExecutorConditionExecutorIndex, TestSize.Level0)
     SetExecutorConditionExecutorIndex(nullptr, 10);
     ExecutorCondition condition = {};
     SetExecutorConditionExecutorIndex(&condition, 10);
+    EXPECT_EQ(condition.executorIndex, 10);
+    EXPECT_EQ(condition.conditonFactor & EXECUTOR_CONDITION_INDEX, EXECUTOR_CONDITION_INDEX);
 }
 
 HWTEST_F(PoolTest, TestSetExecutorConditionAuthType, TestSize.Level0)
@@ -238,6 +247,8 @@ HWTEST_F(PoolTest, TestSetExecutorConditionAuthType, TestSize.Level0)
     SetExecutorConditionAuthType(nullptr, 1);
     ExecutorCondition condition = {};
     SetExecutorConditionAuthType(&condition, 1);
+    EXPECT_EQ(condition.authType, 1);
+    EXPECT_EQ(condition.conditonFactor & EXECUTOR_CONDITION_AUTH_TYPE, EXECUTOR_CONDITION_AUTH_TYPE);
 }
 
 HWTEST_F(PoolTest, TestSetExecutorConditionSensorHint, TestSize.Level0)
@@ -245,6 +256,8 @@ HWTEST_F(PoolTest, TestSetExecutorConditionSensorHint, TestSize.Level0)
     SetExecutorConditionSensorHint(nullptr, 20);
     ExecutorCondition condition = {};
     SetExecutorConditionSensorHint(&condition, 20);
+    EXPECT_EQ(condition.executorSensorHint, 20);
+    EXPECT_EQ(condition.conditonFactor & EXECUTOR_CONDITION_SENSOR_HINT, EXECUTOR_CONDITION_SENSOR_HINT);
 }
 
 HWTEST_F(PoolTest, TestSetExecutorConditionExecutorRole, TestSize.Level0)
@@ -252,6 +265,8 @@ HWTEST_F(PoolTest, TestSetExecutorConditionExecutorRole, TestSize.Level0)
     SetExecutorConditionExecutorRole(nullptr, 2136);
     ExecutorCondition condition = {};
     SetExecutorConditionExecutorRole(&condition, 2136);
+    EXPECT_EQ(condition.executorRole, 2136);
+    EXPECT_EQ(condition.conditonFactor & EXECUTOR_CONDITION_ROLE, EXECUTOR_CONDITION_ROLE);
 }
 
 HWTEST_F(PoolTest, TestSetExecutorConditionExecutorMatcher, TestSize.Level0)
@@ -259,6 +274,8 @@ HWTEST_F(PoolTest, TestSetExecutorConditionExecutorMatcher, TestSize.Level0)
     SetExecutorConditionExecutorMatcher(nullptr, 2363);
     ExecutorCondition condition = {};
     SetExecutorConditionExecutorMatcher(&condition, 2363);
+    EXPECT_EQ(condition.executorMatcher, 2363);
+    EXPECT_EQ(condition.conditonFactor & EXECUTOR_CONDITION_MATCHER, EXECUTOR_CONDITION_MATCHER);
 }
 } // namespace UserAuth
 } // namespace UserIam

@@ -537,31 +537,55 @@ HWTEST_F(IdmDatabaseTest, TestGetPinSubType, TestSize.Level0)
 HWTEST_F(IdmDatabaseTest, TestSetCredentialConditionCredentialId, TestSize.Level0)
 {
     SetCredentialConditionCredentialId(nullptr, 10);
+    CredentialCondition condition = {};
+    SetCredentialConditionCredentialId(&condition, 10);
+    EXPECT_EQ(condition.credentialId, 10);
+    EXPECT_EQ(condition.conditionFactor & CREDENTIAL_CONDITION_CREDENTIAL_ID, CREDENTIAL_CONDITION_CREDENTIAL_ID);
 }
 
 HWTEST_F(IdmDatabaseTest, TestSetCredentialConditionTemplateId, TestSize.Level0)
 {
     SetCredentialConditionTemplateId(nullptr, 20);
+    CredentialCondition condition = {};
+    SetCredentialConditionTemplateId(&condition, 20);
+    EXPECT_EQ(condition.templateId, 20);
+    EXPECT_EQ(condition.conditionFactor & CREDENTIAL_CONDITION_TEMPLATE_ID, CREDENTIAL_CONDITION_TEMPLATE_ID);
 }
 
 HWTEST_F(IdmDatabaseTest, TestSetCredentialConditionAuthType, TestSize.Level0)
 {
     SetCredentialConditionAuthType(nullptr, 2);
+    CredentialCondition condition = {};
+    SetCredentialConditionAuthType(&condition, 2);
+    EXPECT_EQ(condition.authType, 2);
+    EXPECT_EQ(condition.conditionFactor & CREDENTIAL_CONDITION_AUTH_TYPE, CREDENTIAL_CONDITION_AUTH_TYPE);
 }
 
 HWTEST_F(IdmDatabaseTest, TestSetCredentialConditionExecutorSensorHint, TestSize.Level0)
 {
     SetCredentialConditionExecutorSensorHint(nullptr, 20);
+    CredentialCondition condition = {};
+    SetCredentialConditionExecutorSensorHint(&condition, 20);
+    EXPECT_EQ(condition.executorSensorHint, 20);
+    EXPECT_EQ(condition.conditionFactor & CREDENTIAL_CONDITION_SENSOR_HINT, CREDENTIAL_CONDITION_SENSOR_HINT);
 }
 
 HWTEST_F(IdmDatabaseTest, TestSetCredentialConditionExecutorMatcher, TestSize.Level0)
 {
     SetCredentialConditionExecutorMatcher(nullptr, 20);
+    CredentialCondition condition = {};
+    SetCredentialConditionExecutorMatcher(&condition, 20);
+    EXPECT_EQ(condition.executorMatcher, 20);
+    EXPECT_EQ(condition.conditionFactor & CREDENTIAL_CONDITION_EXECUTOR_MATCHER, CREDENTIAL_CONDITION_EXECUTOR_MATCHER);
 }
 
 HWTEST_F(IdmDatabaseTest, TestSetCredentialConditionUserId, TestSize.Level0)
 {
     SetCredentialConditionUserId(nullptr, 50);
+    CredentialCondition condition = {};
+    SetCredentialConditionUserId(&condition, 50);
+    EXPECT_EQ(condition.userId, 50);
+    EXPECT_EQ(condition.conditionFactor & CREDENTIAL_CONDITION_USER_ID, CREDENTIAL_CONDITION_USER_ID);
 }
 } // namespace UserAuth
 } // namespace UserIam
