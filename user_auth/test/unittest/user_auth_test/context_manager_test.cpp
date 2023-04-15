@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 
+#include "adaptor_memory.h"
 #include "coauth.h"
 #include "context_manager.h"
 #include "idm_common.h"
@@ -248,9 +249,18 @@ HWTEST_F(ContextManagerTest, TestScheduleOnceFinish, TestSize.Level0)
 HWTEST_F(ContextManagerTest, TestDestoryContext, TestSize.Level0)
 {
     DestoryContext(nullptr);
-    UserAuthContext context = {};
+    UserAuthContext *context = nullptr;
     g_contextList = nullptr;
-    DestoryContext(&context);
+    DestoryContext(context);
+
+    g_contextList = CreateLinkedList(DestroyContextNode);
+    EXPECT_NE(g_contextList, nullptr);
+    context = (UserAuthContext *)Malloc(sizeof(UserAuthContext));
+    g_contextList->insert(g_contextList, static_cast<void *>(context));
+    EXPECT_EQ(g_contextList->getSize(g_contextList), 1);
+    DestoryContext(context);
+    EXPECT_EQ(g_contextList->getSize(g_contextList), 0);
+    DestoryUserAuthContextList();
 }
 
 HWTEST_F(ContextManagerTest, TestDestroyContextNode, TestSize.Level0)
