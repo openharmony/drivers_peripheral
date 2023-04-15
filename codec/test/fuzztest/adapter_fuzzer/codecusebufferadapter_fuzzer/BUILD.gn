@@ -17,18 +17,18 @@ module_output_path = "drivers_peripheral_codec/codec"
 
 ohos_fuzztest("CodecUseBufferAdapterFuzzTest") {
   module_out_path = module_output_path
-
-  fuzz_config_file = "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecusebufferadapter_fuzzer"
+  codec_root = "../../../../"
+  fuzz_config_file = "../codecusebufferadapter_fuzzer"
 
   include_dirs = [
-    "//drivers/peripheral/codec/interfaces/include",
-    "//drivers/peripheral/codec/hal/include",
+    "${codec_root}/interfaces/include",
+    "${codec_root}/hal/include",
     "//third_party/openmax/api/1.1.2",
-    "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codecusebufferadapter_fuzzer",
-    "//drivers/peripheral/codec/test/fuzztest/adapter_fuzzer/codeccommonadapter_fuzzer",
+    "../codecusebufferadapter_fuzzer",
+    "../codeccommonadapter_fuzzer",
   ]
 
-  deps = [ "//drivers/peripheral/codec/hal/passthrough:codec_hdi_passthrough" ]
+  deps = [ "${codec_root}/hal/passthrough:codec_hdi_passthrough" ]
 
   external_deps = [
     "c_utils:utils",

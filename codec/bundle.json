@@ -1,7 +1,7 @@
 {
   "name": "@ohos/drivers_peripheral_codec",
   "description": "codec device driver",
-  "version": "3.1",
+  "version": "4.0",
   "license": "Apache License 2.0",
   "publishAs": "code-segment",
   "segment": {
@@ -13,12 +13,12 @@
     "name": "drivers_peripheral_codec",
     "subsystem": "hdf",
     "features": [
-      "drivers_peripheral_codec_support_omx",
-      "drivers_peripheral_codec_support_role",
-      "drivers_peripheral_codec_use_omx"
+      "drivers_peripheral_codec_feature_support_omx_extend_test",
+      "drivers_peripheral_codec_feature_set_omx_role",
+      "drivers_peripheral_codec_feature_support_hdi_v1"
     ],
-    "syscap": [ "" ],
-    "adapter_system_type": ["standard"],
+    "syscap": [],
+    "adapted_system_type": ["standard"],
     "rom": "675KB",
     "ram": "7400KB",
     "deps": {
@@ -51,6 +51,22 @@
                 "codec_component_manager.h",
                 "codec_component_type.h",
                 "codec_omx_ext.h"
+              ],
+              "header_base": "//drivers/peripheral/codec/interfaces/include"
+          }
+        },
+        {
+          "name": "//drivers/peripheral/codec/hal/passthrough:libcodec_hdi_passthrough_impl",
+            "header": {
+              "header_files": [
+              ],
+              "header_base": "//drivers/peripheral/codec/interfaces/include"
+          }
+        },
+        {
+          "name": "//drivers/peripheral/codec/hdi_service:libcodec_client",
+            "header": {
+              "header_files": [
               ],
               "header_base": "//drivers/peripheral/codec/interfaces/include"
           }

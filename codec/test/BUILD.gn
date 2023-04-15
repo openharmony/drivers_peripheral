@@ -11,13 +11,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("../codec.gni")
+
 group("hdf_test_media_codec") {
   testonly = true
   deps = [
     "benchmarktest:hdf_codec_idl_benchmark_test",
     "demo:hdf_demo_codec",
-    "fuzztest/adapter_fuzzer:hdf_fuzztest_media_codec_adapter",
     "fuzztest/omx_fuzzer:hdf_fuzztest_media_codec",
     "unittest:hdf_unittest_codec",
   ]
+
+  if (drivers_peripheral_codec_feature_support_hdi_v1) {
+    deps += [ "fuzztest/adapter_fuzzer:hdf_fuzztest_media_codec_adapter" ]
+  }
 }
