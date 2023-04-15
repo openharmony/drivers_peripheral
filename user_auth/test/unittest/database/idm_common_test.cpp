@@ -15,6 +15,9 @@
 
 #include <gtest/gtest.h>
 
+#include "securec.h"
+
+#include "adaptor_memory.h"
 #include "idm_common.h"
 
 namespace OHOS {
@@ -37,16 +40,31 @@ public:
 HWTEST_F(IdmCommonTest, TestDestroyUserInfoNode, TestSize.Level0)
 {
     DestroyUserInfoNode(nullptr);
+    UserInfo *node = (UserInfo *)Malloc(sizeof(UserInfo));
+    EXPECT_NE(node, nullptr);
+    ASSERT_NE(node, nullptr);
+    (void)memset_s(node, sizeof(UserInfo), 0, sizeof(UserInfo));
+    DestroyUserInfoNode(node);
 }
 
 HWTEST_F(IdmCommonTest, TestDestroyCredentialNode, TestSize.Level0)
 {
     DestroyCredentialNode(nullptr);
+    CredentialInfoHal *credentialInfoHal = (CredentialInfoHal *)Malloc(sizeof(CredentialInfoHal));
+    EXPECT_NE(credentialInfoHal, nullptr);
+    ASSERT_NE(credentialInfoHal, nullptr);
+    (void)memset_s(credentialInfoHal, sizeof(CredentialInfoHal), 0, sizeof(CredentialInfoHal));
+    DestroyCredentialNode(credentialInfoHal);
 }
 
 HWTEST_F(IdmCommonTest, TestDestroyEnrolledNode, TestSize.Level0)
 {
     DestroyEnrolledNode(nullptr);
+    EnrolledInfoHal *enrolledInfoHal = (EnrolledInfoHal *)Malloc(sizeof(EnrolledInfoHal));
+    EXPECT_NE(enrolledInfoHal, nullptr);
+    ASSERT_NE(enrolledInfoHal, nullptr);
+    (void)memset_s(enrolledInfoHal, sizeof(EnrolledInfoHal), 0, sizeof(EnrolledInfoHal));
+    DestroyEnrolledNode(enrolledInfoHal);
 }
 } // namespace UserAuth
 } // namespace UserIam

@@ -61,6 +61,11 @@ HWTEST_F(IdmSessionTest, TestRefreshValidTokenTime, TestSize.Level0)
 {
     g_session = nullptr;
     RefreshValidTokenTime();
+    struct SessionInfo session = {};
+    g_session = &session;
+    RefreshValidTokenTime();
+    EXPECT_LE(g_session->validAuthTokenTime, GetSystemTime());
+    g_session = nullptr;
 }
 
 HWTEST_F(IdmSessionTest, TestIsValidTokenTime, TestSize.Level0)

@@ -15,6 +15,9 @@
 
 #include <gtest/gtest.h>
 
+#include "securec.h"
+
+#include "adaptor_memory.h"
 #include "coauth.h"
 
 extern "C" {
@@ -49,6 +52,15 @@ public:
 HWTEST_F(CoAuthTest, TestDestroyScheduleNode, TestSize.Level0)
 {
     DestroyScheduleNode(nullptr);
+    CoAuthSchedule *schedule = (CoAuthSchedule *)Malloc(sizeof(CoAuthSchedule));
+    EXPECT_NE(schedule, nullptr);
+    ASSERT_NE(schedule, nullptr);
+    (void)memset_s(schedule, sizeof(CoAuthSchedule), 0, sizeof(CoAuthSchedule));
+    schedule->templateIds.value = (uint64_t *)Malloc(sizeof(uint64_t));
+    EXPECT_NE(schedule->templateIds.value, nullptr);
+    ASSERT_NE(schedule->templateIds.value, nullptr);
+    schedule->templateIds.num = 1;
+    DestroyScheduleNode(schedule);
 }
 
 HWTEST_F(CoAuthTest, TestCopyCoAuthSchedule, TestSize.Level0)
@@ -63,6 +75,15 @@ HWTEST_F(CoAuthTest, TestCopyCoAuthSchedule, TestSize.Level0)
 HWTEST_F(CoAuthTest, TestDestroyCoAuthSchedule, TestSize.Level0)
 {
     DestroyCoAuthSchedule(nullptr);
+    CoAuthSchedule *schedule = (CoAuthSchedule *)Malloc(sizeof(CoAuthSchedule));
+    EXPECT_NE(schedule, nullptr);
+    ASSERT_NE(schedule, nullptr);
+    (void)memset_s(schedule, sizeof(CoAuthSchedule), 0, sizeof(CoAuthSchedule));
+    schedule->templateIds.value = (uint64_t *)Malloc(sizeof(uint64_t));
+    EXPECT_NE(schedule->templateIds.value, nullptr);
+    ASSERT_NE(schedule->templateIds.value, nullptr);
+    schedule->templateIds.num = 1;
+    DestroyCoAuthSchedule(schedule);
 }
 
 HWTEST_F(CoAuthTest, TestInitCoAuth, TestSize.Level0)
