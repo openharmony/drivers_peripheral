@@ -19,7 +19,6 @@
 #include <unistd.h>
 #include "codec_callback_stub.h"
 #include "hdf_log.h"
-#include "hdi_mpp_ext_param_keys.h"
 #include "icodec.h"
 #include "share_mem.h"
 
@@ -324,69 +323,6 @@ HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetPixelFormatTest_001, TestSize.Level1)
     OsalMemFree(params);
     ASSERT_EQ(errorCode, HDF_SUCCESS);
 }
-
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetSplitModeTest_001, TestSize.Level1)
-{
-    Param *params;
-    int paramCnt = 1;
-    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
-    ASSERT_TRUE(params != nullptr);
-    params->key = (ParamKey)ParamExtKey::KEY_EXT_SPLIT_PARSE_RK;
-    int32_t needSplit = 1;
-    params->val = (void *)&needSplit;
-    params->size = sizeof(needSplit);
-
-    int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
-    OsalMemFree(params);
-    ASSERT_EQ(errorCode, HDF_SUCCESS);
-}
-
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetSplitParseTest_001, TestSize.Level1)
-{
-    Param *params;
-    int paramCnt = 1;
-    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
-    ASSERT_TRUE(params != nullptr);
-    params->key = (ParamKey)ParamExtKey::KEY_EXT_SPLIT_PARSE_RK;
-    params->val = nullptr;
-    params->size = 0;
-
-    int32_t errorCode = g_codecObj->CodecGetParameter(g_codecObj, g_handle, params, paramCnt);
-    OsalMemFree(params);
-    ASSERT_EQ(errorCode, HDF_SUCCESS);
-}
-
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1SetDecFrameNumTest_001, TestSize.Level1)
-{
-    Param *params;
-    int paramCnt = 1;
-    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
-    ASSERT_TRUE(params != nullptr);
-    params->key = (ParamKey)ParamExtKey::KEY_EXT_DEC_FRAME_NUM_RK;
-    int32_t frameNum = 1;
-    params->val = (void *)&frameNum;
-    params->size = sizeof(frameNum);
-
-    int32_t errorCode = g_codecObj->CodecSetParameter(g_codecObj, g_handle, params, paramCnt);
-    OsalMemFree(params);
-    ASSERT_EQ(errorCode, HDF_SUCCESS);
-}
-
-HWTEST_F(CodecProxyTest, HdfCodecHdiV1GetDecFrameTest_001, TestSize.Level1)
-{
-    Param *params;
-    int paramCnt = 1;
-    params = (Param *)OsalMemAlloc(sizeof(Param)*paramCnt);
-    ASSERT_TRUE(params != nullptr);
-    params->key = (ParamKey)ParamExtKey::KEY_EXT_DEC_FRAME_NUM_RK;
-    params->val = nullptr;
-    params->size = 0;
-
-    int32_t errorCode = g_codecObj->CodecGetParameter(g_codecObj, g_handle, params, paramCnt);
-    OsalMemFree(params);
-    ASSERT_EQ(errorCode, HDF_SUCCESS);
-}
-
 
 HWTEST_F(CodecProxyTest, HdfCodecHdiV1QueueInputTest_001, TestSize.Level1)
 {

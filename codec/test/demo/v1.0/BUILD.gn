@@ -12,26 +12,12 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_executable("codec_decode_test_ipc") {
   sources = [
-    "//drivers/peripheral/codec/hal/v1.0/share_mem/src/ashmem_wrapper.cpp",
-    "//drivers/peripheral/codec/hal/v1.0/share_mem/src/share_mem.c",
-    "//drivers/peripheral/codec/hdi_service/codec_service_stub/codec_callback_stub.c",
     "codec_decode_test_ipc.c",
     "codec_gralloc_wrapper.cpp",
     "codec_utils.c",
-  ]
-
-  include_dirs = [
-    "//device/soc/${device_company}/${product_name}/hardware/codec/include",
-    "//device/soc/${device_company}/${product_name}/hardware/mpp/include",
-    "//drivers/peripheral/codec/interfaces/include",
-    "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
-    "//drivers/peripheral/codec/hdi_service/codec_proxy",
-    "//drivers/peripheral/codec/hdi_service/codec_service_stub",
-    "//drivers/interface/display/composer/hdifd_parcelable",
   ]
 
   cflags_c = [
@@ -48,12 +34,6 @@ ohos_executable("codec_decode_test_ipc") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [
-    "//device/soc/${device_company}/${product_name}/hardware/codec:codec_oem_interface",
-    "//device/soc/${device_company}/${product_name}/hardware/mpp:mpp",
-    "//drivers/peripheral/codec/hdi_service:codec_client",
-  ]
-
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
@@ -61,6 +41,8 @@ ohos_executable("codec_decode_test_ipc") {
       "drivers_interface_display:display_composer_idl_headers",
       "drivers_interface_display:hdi_gralloc_client",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
+      "drivers_interface_display:libdisplay_composer_hdi_impl",
+      "drivers_peripheral_codec:libcodec_client",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -79,22 +61,9 @@ ohos_executable("codec_decode_test_ipc") {
 
 ohos_executable("codec_encode_test_ipc") {
   sources = [
-    "//drivers/peripheral/codec/hal/v1.0/share_mem/src/ashmem_wrapper.cpp",
-    "//drivers/peripheral/codec/hal/v1.0/share_mem/src/share_mem.c",
-    "//drivers/peripheral/codec/hdi_service/codec_service_stub/codec_callback_stub.c",
     "codec_encode_test_ipc.c",
     "codec_gralloc_wrapper.cpp",
     "codec_utils.c",
-  ]
-
-  include_dirs = [
-    "//device/soc/${device_company}/${product_name}/hardware/codec/include",
-    "//device/soc/${device_company}/${product_name}/hardware/mpp/include",
-    "//drivers/peripheral/codec/interfaces/include",
-    "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
-    "//drivers/peripheral/codec/hdi_service/codec_proxy",
-    "//drivers/peripheral/codec/hdi_service/codec_service_stub",
-    "//drivers/interface/display/composer/hdifd_parcelable",
   ]
 
   cflags_c = [
@@ -111,11 +80,6 @@ ohos_executable("codec_encode_test_ipc") {
     "-fno-strict-aliasing",
   ]
 
-  deps = [
-    "//device/soc/${device_company}/${product_name}/hardware/codec:codec_oem_interface",
-    "//device/soc/${device_company}/${product_name}/hardware/mpp:mpp",
-    "//drivers/peripheral/codec/hdi_service:codec_client",
-  ]
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
@@ -123,6 +87,8 @@ ohos_executable("codec_encode_test_ipc") {
       "drivers_interface_display:display_composer_idl_headers",
       "drivers_interface_display:hdi_gralloc_client",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
+      "drivers_interface_display:libdisplay_composer_hdi_impl",
+      "drivers_peripheral_codec:libcodec_client",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
