@@ -228,12 +228,10 @@ static inline int32_t ConvertFloatToint(float f)
 static int32_t GetPixelFormatBpp(PixelFormat format)
 {
     const int32_t bppRgba8888 = 32;
-    switch (format) {
-        case PIXEL_FMT_RGBA_8888:
-            return bppRgba8888;
-        default:
-            return -1;
+    if (format == PIXEL_FMT_RGBA_8888) {
+        return bppRgba8888;
     }
+    return -1;
 }
 
 static uint32_t GetPixelRGBA32(const BufferHandle &handle, int x, int y)
