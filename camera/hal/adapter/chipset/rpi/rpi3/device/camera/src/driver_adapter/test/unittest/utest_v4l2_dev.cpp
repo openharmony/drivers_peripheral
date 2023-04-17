@@ -180,8 +180,10 @@ HWTEST_F(UtestV4L2Dev, StreamStart, TestSize.Level0)
 HWTEST_F(UtestV4L2Dev, ReleaseAll, TestSize.Level0)
 {
     std::string devname = "bm2835 mmal";
+    int rc = 0;
 
-    V4L2Dev_->StopStream(devname);
+    rc = V4L2Dev_->StopStream(devname);
+    EXPECT_EQ(RC_OK, rc);
     V4L2Dev_->ReleaseBuffers(devname);
     V4L2Dev_->stop(devname);
 

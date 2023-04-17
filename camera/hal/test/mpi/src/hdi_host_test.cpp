@@ -33,17 +33,6 @@ void HdiHostTest::TearDown(void)
 }
 
 /**
-  * @tc.name: SetCallback
-  * @tc.desc: CamRetCode SetCallback([in] ICameraHostCallback callback);
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(HdiHostTest, Camera_Hdi_0001, TestSize.Level0)
-{
-    std::cout << "==========[test log]Check hdi_host: init setcallback success." << std::endl;
-}
-
-/**
   * @tc.name: GetCameraIds
   * @tc.desc: CamRetCode GetCameraIds([out] String[] ids);
   * @tc.size: MediumTest
