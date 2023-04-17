@@ -97,11 +97,11 @@ static void PrintSsid(const uint8_t *ie, uint32_t len)
     if (ie == NULL || len < sizeof(struct ElementHeader)) {
         return;
     }
-    while (ie + len - (uint8_t *)hdr >= sizeof(*hdr) + hdr->datalen) {
+    while (ie + len >= ((uint8_t *)hdr + sizeof(*hdr) + hdr->datalen)) {
         pos = (uint8_t *)hdr + sizeof(*hdr);
         if (hdr->id == WLAN_EID_SSID) {
             if (hdr->datalen < MAX_SSID_LEN && memcpy_s(ssid, MAX_SSID_LEN, pos, hdr->datalen) == EOK) {
-                printf("ssid: %{public}s", ssid);
+                printf("ssid: %s\n", ssid);
             }
             return;
         }
@@ -213,8 +213,9 @@ static int32_t HalCallbackEvent(uint32_t event, void *respData, const char *ifNa
             break;
         case WIFI_EVENT_SCAN_RESULTS:
             ParseScanResults((WifiScanResults *)respData);
-        default:
             break;
+        default:
+            printf("HalCallbackEvent: Invalid event\n");
     }
     return HDF_SUCCESS;
 }
