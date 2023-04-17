@@ -289,6 +289,7 @@ int32_t ComponentNode::ComponentDeInit()
 
 int32_t ComponentNode::OnEvent(CodecEventType event, uint32_t data1, uint32_t data2, void *eventData)
 {
+    CODEC_LOGI("eventType: [%{public}d], data1: [%{public}x], data2: [%{public}d]", event, data1, data2);
     if (omxCallback_ == nullptr) {
         CODEC_LOGE("omxCallback_ is null");
         return OMX_ErrorNone;
@@ -367,8 +368,11 @@ int32_t ComponentNode::UseBuffer(uint32_t portIndex, OmxCodecBuffer &buffer)
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
     codecBuffer->SetBufferId(bufferId);
-    codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
-    bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
+    {
+        std::lock_guard<std::mutex> lk(mutex_);
+        codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
+        bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
+    }
 
     return err;
 }
@@ -393,8 +397,11 @@ int32_t ComponentNode::AllocateBuffer(uint32_t portIndex, OmxCodecBuffer &buffer
 
     uint32_t bufferId = GenerateBufferId();
     buffer.bufferId = bufferId;
-    codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
-    bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
+    {
+        std::lock_guard<std::mutex> lk(mutex_);
+        codecBufferMap_.emplace(std::make_pair(bufferId, codecBuffer));
+        bufferHeaderMap_.emplace(std::make_pair(bufferHdrType, bufferId));
+    }
     return OMX_ErrorNone;
 }
 
@@ -511,6 +518,7 @@ sptr<ICodecBuffer> ComponentNode::GetBufferInfoByHeader(OMX_BUFFERHEADERTYPE *bu
 bool ComponentNode::GetBufferById(uint32_t bufferId, sptr<ICodecBuffer> &codecBuffer,
                                   OMX_BUFFERHEADERTYPE *&bufferHdrType)
 {
+    std::lock_guard<std::mutex> lk(mutex_);
     auto iter = codecBufferMap_.find(bufferId);
     if ((iter == codecBufferMap_.end()) || (iter->second == nullptr)) {
         CODEC_LOGE("Can not find bufferIndo by bufferID [%{public}d]", bufferId);
