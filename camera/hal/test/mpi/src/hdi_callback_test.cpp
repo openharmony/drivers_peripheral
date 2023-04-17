@@ -199,17 +199,6 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1021, TestSize.Level0)
 }
 
 /**
-  * @tc.name: OnCaptureError
-  * @tc.desc: IStreamOpereatorCallback, OnCaptureError
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(HdiCallbackTest, Camera_Hdi_1022, TestSize.Level0)
-{
-    std::cout << "==========[test log]IStreamOpereatorCallback, OnCaptureError" << std::endl;
-}
-
-/**
   * @tc.name: OnFrameShutter
   * @tc.desc: IStreamOpereatorCallback, OnFrameShutter
   * @tc.size: MediumTest
