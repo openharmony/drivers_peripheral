@@ -23,6 +23,11 @@
 #include "wifi_hal_sta_feature.h"
 #include "securec.h"
 
+struct ElementHeader {
+    uint8_t id;
+    uint8_t datalen;
+};
+
 using namespace testing::ext;
 
 namespace HalTest {
@@ -37,6 +42,7 @@ const int32_t TEST_CMD = 123;
 const uint32_t RESET_TIME = 3;
 const uint32_t SCAN_TIME = 3;
 const uint32_t TEST_BUF_SIZE = 64;
+const uint32_t WLAN_EID_SSID = 0;
 
 class WifiHalTest : public testing::Test {
 public:
@@ -82,12 +88,34 @@ void WifiHalTest::TearDown()
     ASSERT_EQ(HDF_SUCCESS, ret);
 }
 
+static void PrintSsid(const uint8_t *ie, uint32_t len)
+{
+    char ssid[MAX_SSID_LEN] = {0};
+    uint8_t *pos = NULL;
+    struct ElementHeader *hdr = (struct ElementHeader *)ie;
+
+    if (ie == NULL || len < sizeof(struct ElementHeader)) {
+        return;
+    }
+    while (ie + len - (uint8_t *)hdr >= sizeof(*hdr) + hdr->datalen) {
+        pos = (uint8_t *)hdr + sizeof(*hdr);
+        if (hdr->id == WLAN_EID_SSID) {
+            if (hdr->datalen < MAX_SSID_LEN && memcpy_s(ssid, MAX_SSID_LEN, pos, hdr->datalen) == EOK) {
+                printf("ssid: %{public}s", ssid);
+            }
+            return;
+        }
+        hdr = (struct ElementHeader *)(pos + hdr->datalen);
+    }
+}
+
 static void ParseScanResult(WifiScanResult *scanResult)
 {
     printf("ParseScanResult: flags=%d, caps=%d, freq=%d, beaconInt=%d,\n", scanResult->flags, scanResult->caps,
         scanResult->freq, scanResult->beaconInt);
     printf("ParseScanResult: qual=%d, beaconIeLen=%d, level=%d, age=%d, ieLen=%d,\n", scanResult->qual,
         scanResult->beaconIeLen, scanResult->level, scanResult->age, scanResult->ieLen);
+    PrintSsid(scanResult->ie, scanResult->ieLen);
 }
 
 static void ParseScanResults(WifiScanResults *scanResults)
@@ -1687,7 +1715,7 @@ HWTEST_F(WifiHalTest, SendCmdIoctl002, TestSize.Level1)
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
-    
+
     cmdId = CMD_SET_BATTERY_LEVEL;
     ret = g_wifi->sendCmdIoctl(ifName, cmdId, data, TEST_BUF_SIZE);
     printf("sendCmdIoctl_%d: ret = %d\n", __LINE__, ret);
@@ -1715,7 +1743,7 @@ HWTEST_F(WifiHalTest, SendCmdIoctl003, TestSize.Level1)
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
-    
+
     cmdId = CMD_SET_SUPP_COEX_CHAN_LIST;
     ret = g_wifi->sendCmdIoctl(ifName, cmdId, data, TEST_BUF_SIZE);
     printf("sendCmdIoctl_%d: ret = %d\n", __LINE__, ret);
@@ -1743,7 +1771,7 @@ HWTEST_F(WifiHalTest, SendCmdIoctl004, TestSize.Level1)
 
     ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_AP, (struct IWiFiBaseFeature **)&apFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
-    
+
     cmdId = CMD_SET_CHAN_ADJUST;
     ret = g_wifi->sendCmdIoctl(ifName, cmdId, data, TEST_BUF_SIZE);
     printf("sendCmdIoctl_%d: ret = %d\n", __LINE__, ret);

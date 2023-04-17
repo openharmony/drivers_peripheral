@@ -164,5 +164,7 @@ struct Hid2dEvent {
 
 void WifiEventReport(const char *ifName, uint32_t event, void *data);
 void Hid2dEventReport(const char *ifName, const uint8_t *msg, uint32_t msgLen);
+void FreeScanResult(WifiScanResult *res);
+void FreeScanResults(WifiScanResults *res);
 
 #endif /* end of wifi_common_cmd.h */

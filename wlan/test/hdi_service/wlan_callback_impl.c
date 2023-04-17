@@ -19,11 +19,40 @@
 #include <hdf_log.h>
 #include <osal_mem.h>
 
+#define WLAN_EID_SSID 0
+#define MAX_SSID_LEN 32
+
+struct ElementHeader {
+    uint8_t id;
+    uint8_t datalen;
+};
+
 static int32_t WlanCallbackResetDriver(struct IWlanCallback *self, uint32_t event, int32_t code, const char *ifName)
 {
     (void)self;
     HDF_LOGE("WlanCallbackResetDriver: receive resetStatus=%{public}d", code);
     return HDF_SUCCESS;
+}
+
+static void PrintSsid(const uint8_t *ie, uint32_t len)
+{
+    char ssid[MAX_SSID_LEN] = {0};
+    uint8_t *pos = NULL;
+    struct ElementHeader *hdr = (struct ElementHeader *)ie;
+
+    if (ie == NULL || len < sizeof(struct ElementHeader)) {
+        return;
+    }
+    while ((ie + len - (uint8_t *)hdr) >= (sizeof(*hdr) + hdr->datalen)) {
+        pos = (uint8_t *)hdr + sizeof(*hdr);
+        if (hdr->id == WLAN_EID_SSID) {
+            if (hdr->datalen < MAX_SSID_LEN && memcpy_s(ssid, MAX_SSID_LEN, pos, hdr->datalen) == EOK) {
+                HDF_LOGE("ssid: %{public}s", ssid);
+            }
+            return;
+        }
+        hdr = (struct ElementHeader *)(pos + hdr->datalen);
+    }
 }
 
 static int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event,
@@ -39,6 +68,7 @@ static int32_t WlanCallbackScanResult(struct IWlanCallback *self, uint32_t event
     HDF_LOGE("HdiProcessScanResult: qual=%{public}d, beaconIeLen=%{public}d, level=%{public}d", scanResult->qual,
         scanResult->beaconIeLen, scanResult->level);
     HDF_LOGE("HdiProcessScanResult: age=%{public}d, ieLen=%{public}d", scanResult->age, scanResult->ieLen);
+    PrintSsid(scanResult->ie, scanResult->ieLen);
     return HDF_SUCCESS;
 }
 
@@ -59,6 +89,7 @@ static int32_t WlanCallbackScanResults(struct IWlanCallback *self, uint32_t even
         HDF_LOGI("HdiProcessScanResult: qual=%{public}d, beaconIeLen=%{public}d, level=%{public}d", scanResult->qual,
             scanResult->beaconIeLen, scanResult->level);
         HDF_LOGI("HdiProcessScanResult: age=%{public}d, ieLen=%{public}d", scanResult->age, scanResult->ieLen);
+        PrintSsid(scanResult->ie, scanResult->ieLen);
     }
     return HDF_SUCCESS;
 }
