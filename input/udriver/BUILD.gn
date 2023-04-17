@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-INPUT_ROOT_DIR = "//drivers/peripheral/input"
+INPUT_ROOT_DIR = "./.."
 
 ohos_shared_library("hdi_input_udriver") {
   sources = [

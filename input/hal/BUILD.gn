@@ -12,13 +12,14 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
+INPUT_ROOT_DIR = "./.."
 
 if (defined(ohos_lite)) {
   config("input_hdi_public_config") {
     visibility = [ ":*" ]
     include_dirs = [
       "include",
-      "//drivers/peripheral/input/interfaces/include",
+      "$INPUT_ROOT_DIR/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//third_party/FreeBSD/sys/dev/evdev",
     ]
@@ -61,7 +62,6 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_input"
   }
 } else {
-  INPUT_ROOT_DIR = "//drivers/peripheral/input"
   config("input_hdi_public_config") {
     visibility = [ ":*" ]
     include_dirs = [
