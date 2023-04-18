@@ -19,6 +19,7 @@
 
 #define HDF_LOG_TAG USB_HOST_DDK_TEST
 #define STR_LEN     256
+#define STRTOL_BASE  10
 
 #define PARAM_CMD_LENGTH  3
 #define PARAM_SET_CMD_LEN 3
@@ -205,16 +206,16 @@ static void TestCmdLoopOther(int32_t cmdType, const char *param)
             TestStdGetInterface();
             break;
         case HOST_ACM_SET_BAUDRATE:
-            UsbHostDdkTestSetBaudrate(atoi(param));
+            UsbHostDdkTestSetBaudrate((uint32_t)(strtoul(param, NULL, STRTOL_BASE)));
             break;
         case HOST_ACM_GET_BAUDRATE:
             UsbHostDdkTestGetBaudrate(NULL);
             break;
         case HOST_ACM_ADD_INTERFACE:
-            UsbHostDdkTestAddInterface(atoi(param));
+            UsbHostDdkTestAddInterface((uint32_t)(strtoul(param, NULL, STRTOL_BASE)));
             break;
         case HOST_ACM_REMOVE_INTERFACE:
-            UsbHostDdkTestRemoveInterface(atoi(param));
+            UsbHostDdkTestRemoveInterface((uint32_t)(strtoul(param, NULL, STRTOL_BASE)));
             break;
         default:
             break;

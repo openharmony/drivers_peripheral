@@ -1122,26 +1122,22 @@ static void AcmReadBulkCallback(const void *requestArg)
     }
     size_t size = (size_t)req->actualLength;
 
-    switch (req->status) {
-        case USB_REQUEST_COMPLETED:
-            HDF_LOGD("Bulk status: %d+size:%zu", req->status, size);
-            if (size) {
-                uint8_t *data = req->buffer;
-
-                OsalMutexLock(&acm->readLock);
-                if (DataFifoIsFull(&acm->port->readFifo)) {
-                    DataFifoSkip(&acm->port->readFifo, size);
-                }
-                uint32_t count = DataFifoWrite(&acm->port->readFifo, data, size);
-                if (count != size) {
-                    HDF_LOGW("%s: write %u less than expected %zu", __func__, count, size);
-                }
-                OsalMutexUnlock(&acm->readLock);
-            }
-            break;
-        default:
-            HDF_LOGW("%s:%d the request is failed, status=%d", __func__, __LINE__, req->status);
-            return;
+    if (req->status != USB_REQUEST_COMPLETED) {
+        HDF_LOGW("%{public}s: the request is failed, status=%d", __func__, req->status);
+        return;
+    }
+    HDF_LOGD("Bulk status: %d+size:%zu", req->status, size);
+    if (size == 0) {
+        uint8_t *data = req->buffer;
+        OsalMutexLock(&acm->readLock);
+        if (DataFifoIsFull(&acm->port->readFifo)) {
+            DataFifoSkip(&acm->port->readFifo, size);
+        }
+        uint32_t count = DataFifoWrite(&acm->port->readFifo, data, size);
+        if (count != size) {
+            HDF_LOGW("%{public}s: write %u less than expected %zu", __func__, count, size);
+        }
+        OsalMutexUnlock(&acm->readLock);
     }
 
     if (UsbRawSubmitRequest(req) != HDF_SUCCESS) {
