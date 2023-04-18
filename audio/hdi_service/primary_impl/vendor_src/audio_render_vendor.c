@@ -612,7 +612,30 @@ int32_t AudioHwiRenderGetExtraParams(struct IAudioRender *render, char *keyValue
 int32_t AudioHwiRenderReqMmapBuffer(struct IAudioRender *render, int32_t reqSize,
     struct AudioMmapBufferDescriptor *desc)
 {
-    return HDF_ERR_NOT_SUPPORT;
+    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioHwiMmapBufferDescriptor hwiDesc;
+    CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.ReqMmapBuffer, HDF_ERR_INVALID_PARAM);
+
+    int32_t ret = hwiRender->attr.ReqMmapBuffer(hwiRender, reqSize, &hwiDesc);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio render ReqMmapBuffer fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    desc->memoryAddress = NULL;
+    desc->memoryFd = hwiDesc.memoryFd;
+    desc->totalBufferFrames = hwiDesc.totalBufferFrames;
+    desc->transferFrameSize = hwiDesc.transferFrameSize;
+    desc->isShareable = hwiDesc.isShareable;
+    desc->offset = hwiDesc.offset;
+    desc->filePath = strdup("");
+
+    AUDIO_FUNC_LOGI("%{public}s success", __func__);
+    return HDF_SUCCESS;
 }
 
 int32_t AudioHwiRenderGetMmapPosition(struct IAudioRender *render, uint64_t *frames, struct AudioTimeStamp *time)
