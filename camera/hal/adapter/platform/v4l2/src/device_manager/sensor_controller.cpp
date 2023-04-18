@@ -248,24 +248,19 @@ RetCode SensorController::GetAEMetaData(std::shared_ptr<CameraMetadata> meta)
     RetCode rc = RC_ERROR;
     std::lock_guard<std::mutex> metaDataLock(metaDataSetlock_);
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
-        switch (*iter) {
-            case OHOS_SENSOR_EXPOSURE_TIME: {
-                rc = sensorVideo_->QuerySetting(GetName(), CMD_AE_EXPO, (int*)&expoTime);
-                CAMERA_LOGD("%s Get CMD_AE_EXPOTIME [%" PRId64 "]", __FUNCTION__, expoTime);
-                if (rc == RC_ERROR) {
-                    CAMERA_LOGE("%s CMD_AE_EXPO QuerySetting fail", __FUNCTION__);
-                    return rc;
-                }
-                if (oldExpoTime != expoTime) {
-                    std::lock_guard<std::mutex> flagLock(metaDataFlaglock_);
-                    metaDataFlag_ = true;
-                    oldExpoTime = expoTime;
-                }
-                meta->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
-                break;
+        if (*iter == OHOS_SENSOR_EXPOSURE_TIME) {
+            rc = sensorVideo_->QuerySetting(GetName(), CMD_AE_EXPO, (int*)&expoTime);
+            CAMERA_LOGD("%s Get CMD_AE_EXPOTIME [%" PRId64 "]", __FUNCTION__, expoTime);
+            if (rc == RC_ERROR) {
+                CAMERA_LOGE("%s CMD_AE_EXPO QuerySetting fail", __FUNCTION__);
+                return rc;
             }
-            default:
-                break;
+            if (oldExpoTime != expoTime) {
+                std::lock_guard<std::mutex> flagLock(metaDataFlaglock_);
+                metaDataFlag_ = true;
+                oldExpoTime = expoTime;
+            }
+            meta->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
         }
     }
     return rc;
@@ -279,26 +274,21 @@ RetCode SensorController::GetAWBMetaData(std::shared_ptr<CameraMetadata> meta)
     RetCode rc = RC_ERROR;
     std::lock_guard<std::mutex> metaDataLock(metaDataSetlock_);
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
-        switch (*iter) {
-            case OHOS_SENSOR_COLOR_CORRECTION_GAINS: {
-                rc = sensorVideo_->QuerySetting(GetName(), CMD_AWB_COLORGAINS, &value);
-                if (rc == RC_ERROR) {
-                    CAMERA_LOGE("%s CMD_AWB_COLORGAINS QuerySetting fail", __FUNCTION__);
-                    return rc;
-                }
-                colorGains[0] = (float)value;
-                int gainsSize = 4;
-                if (!CheckNumequal(oldColorGains, colorGains, gainsSize)) {
-                    std::lock_guard<std::mutex> flagLock(metaDataFlaglock_);
-                    metaDataFlag_ = true;
-                    (void)memcpy_s(oldColorGains, sizeof(oldColorGains) / sizeof(float), colorGains,
-                        gainsSize * sizeof(float));
-                }
-                meta->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4); // 4:data size
-                break;
+        if (*iter == OHOS_SENSOR_COLOR_CORRECTION_GAINS) {
+            rc = sensorVideo_->QuerySetting(GetName(), CMD_AWB_COLORGAINS, &value);
+            if (rc == RC_ERROR) {
+                CAMERA_LOGE("%s CMD_AWB_COLORGAINS QuerySetting fail", __FUNCTION__);
+                return rc;
             }
-            default:
-                break;
+            colorGains[0] = (float)value;
+            int gainsSize = 4;
+            if (!CheckNumequal(oldColorGains, colorGains, gainsSize)) {
+                std::lock_guard<std::mutex> flagLock(metaDataFlaglock_);
+                metaDataFlag_ = true;
+                (void)memcpy_s(oldColorGains, sizeof(oldColorGains) / sizeof(float), colorGains,
+                    gainsSize * sizeof(float));
+            }
+            meta->addEntry(OHOS_SENSOR_COLOR_CORRECTION_GAINS, &colorGains, 4); // 4:data size
         }
     }
     return rc;
@@ -453,22 +443,17 @@ void SensorController::GetFpsRange(SensorController *sensorController,
     }
 
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
-        switch (*iter) {
-            case OHOS_CONTROL_FPS_RANGES: {
-                DeviceFormat format;
-                std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
-                sensorController->metaDataFlag_ = true;
-                RetCode rc = sensorVideo_->ConfigSys(GetName(), CMD_V4L2_GET_FPS, format);
-                if (rc == RC_ERROR) {
-                    CAMERA_LOGE("CMD_V4L2_GET_FPS ConfigSys fail");
-                }
-
-                // dummy data
-                meta->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange_.data(), fpsRange_.size());
-                break;
+        if (*iter == OHOS_CONTROL_FPS_RANGES) {
+            DeviceFormat format;
+            std::lock_guard<std::mutex> lock(sensorController->metaDataFlaglock_);
+            sensorController->metaDataFlag_ = true;
+            RetCode rc = sensorVideo_->ConfigSys(GetName(), CMD_V4L2_GET_FPS, format);
+            if (rc == RC_ERROR) {
+                CAMERA_LOGE("CMD_V4L2_GET_FPS ConfigSys fail");
             }
-            default:
-                break;
+
+            // dummy data
+            meta->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange_.data(), fpsRange_.size());
         }
     }
 }

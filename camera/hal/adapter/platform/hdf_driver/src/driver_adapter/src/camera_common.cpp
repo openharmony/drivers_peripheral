@@ -80,13 +80,10 @@ static int OnCameraEvents(struct HdfDevEventlistener *listener, struct HdfIoServ
         return HDF_ERR_INVALID_PARAM;
     }
 
-    switch (eventId) {
-        case CAMERA_UVC_EVENT:
-            CameraUvcEventResultProcess(data);
-            break;
-        default:
-            break;
+    if (eventId == CAMERA_UVC_EVENT) {
+        CameraUvcEventResultProcess(data);
     }
+
     return HDF_SUCCESS;
 }
 

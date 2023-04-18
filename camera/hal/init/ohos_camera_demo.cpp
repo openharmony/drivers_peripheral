@@ -1161,6 +1161,8 @@ int32_t DemoCameraDeviceCallback::OnResult(uint64_t timestamp, const std::vector
                 CAMERA_LOGI("demo test: exposureMode %{public}d\n", exposureMode);
                 break;
             }
+            default:
+                break;
         }
     }
 
