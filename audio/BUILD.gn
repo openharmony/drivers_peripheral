@@ -43,6 +43,11 @@ group("hdi_audio") {
     if (drivers_peripheral_audio_alsa_lib) {
       deps += [ "config/linux:hdf_alsa_adapter_json" ]
     }
+
+    deps += [
+      "../base:audio_hifi_watchdog.para",
+      "../base:audio_hifi_watchdog.para.dac",
+    ]
   }
 
   if (drivers_peripheral_audio_user_mode == false) {
