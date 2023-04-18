@@ -38,6 +38,7 @@
 #include "usb_ddk_interface.h"
 
 #define HDF_LOG_TAG USB_HOST_ACM
+#define STRTOL_BASE  10
 
 static unsigned int g_speedFlag = 0;
 static uint64_t g_recv_count = 0;
@@ -302,20 +303,20 @@ static struct AcmDevice *CheckParam(int32_t argc, const char *argv[])
     struct AcmDevice *acm = NULL;
 
     if (argc == TEST_SIX_TYPE) {
-        busNum = atoi(argv[TEST_ONE_TYPE]);
-        devAddr = atoi(argv[TEST_TWO_TYPE]);
-        ifaceNum = atoi(argv[TEST_THREE_TYPE]);
+        busNum = (int32_t)strtol(argv[TEST_ONE_TYPE], NULL, STRTOL_BASE);
+        devAddr = (int32_t)strtol(argv[TEST_TWO_TYPE], NULL, STRTOL_BASE);
+        ifaceNum = (int32_t)strtol(argv[TEST_THREE_TYPE], NULL, STRTOL_BASE);
         g_writeOrRead = (strncmp(argv[TEST_FOUR_TYPE], "r", TEST_ONE_TYPE)) ? TEST_WRITE : TEST_READ;
         if (g_writeOrRead == TEST_READ) {
             g_printData = (strncmp(argv[TEST_FIVE_TYPE], "printdata", TEST_ONE_TYPE)) ? false : true;
         }
     } else if (argc == TEST_FIVE_TYPE) {
-        busNum = atoi(argv[TEST_ONE_TYPE]);
-        devAddr = atoi(argv[TEST_TWO_TYPE]);
-        ifaceNum = atoi(argv[TEST_THREE_TYPE]);
+        busNum = (int32_t)strtol(argv[TEST_ONE_TYPE], NULL, STRTOL_BASE);
+        devAddr = (int32_t)strtol(argv[TEST_TWO_TYPE], NULL, STRTOL_BASE);
+        ifaceNum = (int32_t)strtol(argv[TEST_THREE_TYPE], NULL, STRTOL_BASE);
         g_writeOrRead = (strncmp(argv[TEST_FOUR_TYPE], "r", TEST_ONE_TYPE)) ? TEST_WRITE : TEST_READ;
     } else if (argc == TEST_THREE_TYPE) {
-        ifaceNum = atoi(argv[TEST_ONE_TYPE]);
+        ifaceNum = (int32_t)strtol(argv[TEST_ONE_TYPE], NULL, STRTOL_BASE);
         g_writeOrRead = (strncmp(argv[TEST_TWO_TYPE], "r", TEST_ONE_TYPE)) ? TEST_WRITE : TEST_READ;
     } else {
         printf("Error: parameter error!\n\n");
