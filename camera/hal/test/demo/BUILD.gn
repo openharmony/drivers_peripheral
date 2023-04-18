@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("../camera.gni")
+import("../../camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/ohos.gni")
@@ -25,9 +25,9 @@ if (defined(ohos_lite)) {
   ohos_executable("ohos_camera_demo") {
     output_extension = "bin"
     sources = [
-      "$camera_path/../interfaces/hdi_passthrough/callback/src/camera_device_callback.cpp",
-      "$camera_path/../interfaces/hdi_passthrough/callback/src/camera_host_callback.cpp",
-      "$camera_path/../interfaces/hdi_passthrough/callback/src/stream_operator_callback.cpp",
+      "$camera_path/test/common/callback/src/camera_device_callback.cpp",
+      "$camera_path/test/common/callback/src/camera_host_callback.cpp",
+      "$camera_path/test/common/callback/src/stream_operator_callback.cpp",
       "./demo_main.cpp",
       "./ohos_camera_demo.cpp",
       "./stream_customer.cpp",
@@ -36,7 +36,7 @@ if (defined(ohos_lite)) {
       "./include",
       "$camera_path/../interfaces/include",
       "$camera_path/../interfaces/hdi_passthrough",
-      "$camera_path/../interfaces/hdi_passthrough/callback/include",
+      "$camera_path/test/common/callback/include",
       "$camera_path/include",
       "$camera_path/hdi_impl",
       "$camera_path/hdi_impl/include",
@@ -108,9 +108,7 @@ if (defined(ohos_lite)) {
       "$camera_path/../interfaces/include",
       "$camera_path/../interfaces/hdi_ipc",
       "$camera_path/../interfaces/hdi_ipc/utils/include",
-      "$camera_path/../interfaces/hdi_ipc/callback/host/include",
-      "$camera_path/../interfaces/hdi_ipc/callback/device/include",
-      "$camera_path/../interfaces/hdi_ipc/callback/operator/include",
+      "$camera_path/test/common/callback/include",
       "$camera_path/include",
       "$camera_path/hdi_impl",
       "$camera_path/hdi_impl/include",
