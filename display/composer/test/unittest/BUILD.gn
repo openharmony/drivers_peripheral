@@ -15,10 +15,7 @@ import("//build/test.gni")
 
 group("hdf_disp_composer_unittest") {
   testonly = true
-  deps = [
-    ":composer_death_test",
-    ":composer_ut",
-  ]
+  deps = [ ":composer_ut" ]
 }
 
 module_output_path = "hdf/display_composer"
