@@ -19,6 +19,7 @@
 #include <vector>
 #include "hcs_dm_parser.h"
 #include "metadata_enum_map.h"
+#define STRTOL_BASE  10
 
 namespace OHOS::Camera {
 HcsDeal::HcsDeal(const std::string &pathName) : sPathName(pathName), pDevResIns(nullptr), pRootNode(nullptr) {}
@@ -383,7 +384,7 @@ RetCode HcsDeal::DealCameraFaceDetectMaxNum(
         return RC_ERROR;
     }
 
-    faceDetectMaxNum = atoi(pNodeValue);
+    faceDetectMaxNum = (uint8_t)strtol(pNodeValue, NULL, STRTOL_BASE);
     CAMERA_LOGD("faceDetectMaxNum  = %{public}f", faceDetectMaxNum);
 
     bool ret = metadata->addEntry(OHOS_STATISTICS_FACE_DETECT_MAX_NUM, static_cast<const void *>(&faceDetectMaxNum), 1);
@@ -545,7 +546,7 @@ RetCode HcsDeal::DealFocalLength(
         return RC_ERROR;
     }
 
-    focalLength = atof(pNodeValue);
+    focalLength = (float)strtol(pNodeValue, NULL, STRTOL_BASE);
     CAMERA_LOGD("focalLength  = %{public}f", focalLength);
 
     bool ret = metadata->addEntry(OHOS_ABILITY_FOCAL_LENGTH, static_cast<const void *>(&focalLength), 1);
@@ -738,7 +739,7 @@ RetCode HcsDeal::DealSensorOrientation(
         return RC_ERROR;
     }
 
-    sensorOrientation = atoi(nodeValue);
+    sensorOrientation = (int32_t)strtol(nodeValue, NULL, STRTOL_BASE);
     CAMERA_LOGI("sensorOrientation  = %{public}d", sensorOrientation);
 
     constexpr uint32_t DATA_COUNT = 1;
@@ -863,7 +864,7 @@ RetCode HcsDeal::DealZoomRationRange(
             continue;
         }
         CAMERA_LOGI("nodeValue = %{public}s", nodeValue);
-        zoomRatioRange.push_back(atof(nodeValue));
+        zoomRatioRange.push_back((float)strtol(nodeValue, NULL, STRTOL_BASE));
     }
 
     for (int i = 0; i < elemNum - 1;) {
@@ -896,7 +897,7 @@ RetCode HcsDeal::DealJpegOrientation(
         return RC_ERROR;
     }
 
-    jpegOrientation = atoi(nodeValue);
+    jpegOrientation = (int32_t)strtol(nodeValue, NULL, STRTOL_BASE);
     CAMERA_LOGI("jpegOrientation  = %{public}d", jpegOrientation);
 
     if (jpegOrientation != OHOS_CAMERA_JPEG_ROTATION_0 && jpegOrientation != OHOS_CAMERA_JPEG_ROTATION_90 &&
