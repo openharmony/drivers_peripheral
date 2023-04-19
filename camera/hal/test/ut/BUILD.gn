@@ -49,6 +49,7 @@ if (defined(ohos_lite)) {
       "$camera_path/include",
       "$camera_path/../interfaces/include",
       "$camera_path/../interfaces/hdi_passthrough",
+      "$camera_path/test/common/callback/include",
       "$camera_path/utils/event",
 
       # device manager includes
