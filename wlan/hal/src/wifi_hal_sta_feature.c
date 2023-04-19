@@ -94,6 +94,23 @@ static int32_t StopPnoScan(const char *ifName)
     return ret;
 }
 
+static int32_t GetSignalPollInfoInner(const char *ifName, struct SignalResult *signalResult)
+{
+    if (ifName == NULL || signalResult == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HalCmdGetSignalPollInfo(ifName, signalResult);
+}
+
+static int32_t GetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
+{
+    HalMutexLock();
+    int32_t ret = GetSignalPollInfoInner(ifName, signalResult);
+    HalMutexUnlock();
+    return ret;
+}
+
 int32_t InitStaFeature(struct IWiFiSta **fe)
 {
     if (fe == NULL || *fe == NULL) {
@@ -108,6 +125,7 @@ int32_t InitStaFeature(struct IWiFiSta **fe)
     (*fe)->startScan = StartScan;
     (*fe)->startPnoScan = StartPnoScan;
     (*fe)->stopPnoScan = StopPnoScan;
+    (*fe)->getSignalPollInfo = GetSignalPollInfo;
     return HDF_SUCCESS;
 }
 

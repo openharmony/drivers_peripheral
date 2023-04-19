@@ -1077,4 +1077,28 @@ HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_047, TestSize.Level1)
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }
+
+/**
+ * @tc.name: GetSignalPollInfo_048
+ * @tc.desc: Wifi hdi get signal information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, GetSignalPollInfo_048, TestSize.Level1)
+{
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
+    struct HdfFeatureInfo ifeature;
+    const char *ifName = "wlan0";
+    struct SignalPollResult signalResult;
+    (void)memset_s(&signalResult, sizeof(struct SignalPollResult), 0, sizeof(struct SignalPollResult));
+
+    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->GetSignalPollInfo(g_wlanObj, ifName, &signalResult);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    printf("GetSignalPollInfo rc = %d.\n", rc);
+    ASSERT_TRUE(flag);
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
 };
