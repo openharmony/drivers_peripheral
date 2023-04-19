@@ -64,19 +64,19 @@ int32_t CodecComponentManagerService::CreateComponent(sptr<ICodecComponent> &com
         return err;
     }
 
-    sptr<ICodecComponent> codecComponent = new CodecComponentService(node);
+    sptr<ICodecComponent> codecComponent = new CodecComponentService(node, mgr_, compName);
     std::unique_lock<std::mutex> autoLock(mutex_);
     componentId = GetNextComponentId();
     componentMap_.emplace(std::make_pair(componentId, codecComponent));
     component = codecComponent;
-    CODEC_LOGD("componentId[%{public}d]", componentId);
+    CODEC_LOGI("componentId[%{public}d]", componentId);
     return HDF_SUCCESS;
 }
 
 int32_t CodecComponentManagerService::DestoryComponent(uint32_t componentId)
 {
     std::unique_lock<std::mutex> autoLock(mutex_);
-    CODEC_LOGD("componentId[%{public}d]", componentId);
+    CODEC_LOGI("componentId[%{public}d]", componentId);
     auto iter = componentMap_.find(componentId);
     if (iter == componentMap_.end() || iter->second == nullptr) {
         CODEC_LOGE("can not find component service by componentId[%{public}d]", componentId);
