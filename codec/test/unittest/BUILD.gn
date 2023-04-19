@@ -15,7 +15,10 @@ import("../../codec.gni")
 
 group("hdf_unittest_codec") {
   testonly = true
-  deps = [ "hdi_omx:codec_hdi_2.0_test" ]
+  deps = [
+    "hdi_omx:codec_hdi_2.0_test",
+    "idl_omx:codec_idl_2.0_test",
+  ]
 
   if (drivers_peripheral_codec_feature_support_hdi_v1) {
     deps += [
