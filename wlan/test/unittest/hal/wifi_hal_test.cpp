@@ -1976,4 +1976,31 @@ HWTEST_F(WifiHalTest, GetStationInfo002, TestSize.Level1)
     ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
     EXPECT_EQ(ret, HDF_SUCCESS);
 }
+
+/**
+ * @tc.name: GetSignalPollInfo001
+ * @tc.desc: wifi hal get signal information function test
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(WifiHalTest, GetSignalPollInfo001, TestSize.Level1)
+{
+    int32_t ret;
+    struct IWiFiSta *staFeature = nullptr;
+    const char *interfaceName = "wlan0";
+    struct SignalResult signalResult;
+    (void)memset_s(&signalResult, sizeof(signalResult), 0, sizeof(signalResult));
+
+    ret = g_wifi->createFeature(PROTOCOL_80211_IFTYPE_STATION, (struct IWiFiBaseFeature **)&staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+    EXPECT_NE(nullptr, staFeature);
+
+    ret = staFeature->getSignalPollInfo(interfaceName, &signalResult);
+    printf("getSignalPollInfo ret = %d.\n", ret);
+    bool flag = (ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
+    ASSERT_TRUE(flag);
+
+    ret = g_wifi->destroyFeature((struct IWiFiBaseFeature *)staFeature);
+    EXPECT_EQ(HDF_SUCCESS, ret);
+}
 }; // namespace HalTest
