@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -15,23 +15,20 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-module_output_path = "drivers_peripheral_input/input"
-INPUT_ROOT_DIR = "./../../.."
+INPUT_ROOT_DIR = "./../.."
 
-ohos_unittest("hdi_unittest_input") {
-  module_out_path = module_output_path
-
+ohos_benchmarktest("hdf_input_benchmark_test") {
+  module_out_path = "drivers_peripheral_input/input"
   include_dirs = [
     "$INPUT_ROOT_DIR/hdi_service",
     "$INPUT_ROOT_DIR/interfaces/include",
-    "$INPUT_ROOT_DIR/interfaces",
     "$INPUT_ROOT_DIR/test/common/include",
     "//third_party/FreeBSD/sys/dev/evdev",
   ]
 
   sources = [
     "$INPUT_ROOT_DIR/test/common/src/input_callback_impl.cpp",
-    "hdf_input_hdi_test.cpp",
+    "input_benchmark_test.cpp",
   ]
   cflags = [
     "-Wall",
@@ -40,6 +37,11 @@ ohos_unittest("hdi_unittest_input") {
     "-fsigned-char",
     "-fno-common",
     "-fno-strict-aliasing",
+  ]
+
+  deps = [
+    "//third_party/benchmark",
+    "//third_party/googletest:gmock_main",
   ]
 
   if (is_standard_system) {
