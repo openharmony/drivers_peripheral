@@ -52,6 +52,20 @@ void DisplayBenchmarkTest::TearDown(const ::benchmark::State &state)
 }
 
 /**
+  * @tc.name: SetClientBufferCacheCountTest
+  * @tc.desc: Benchmarktest for interface SetClientBufferCacheCount.
+  */
+BENCHMARK_F(DisplayBenchmarkTest, SetClientBufferCacheCountTest)(benchmark::State &state)
+{
+    int32_t ret;
+    const uint32_t CACHE_COUNT = 5;
+    for (auto _ : state) {
+        ret = g_composerDevice->SetClientBufferCacheCount(g_displayIds[0], CACHE_COUNT);
+    }
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
+/**
   * @tc.name: GetDisplayCapabilityTest
   * @tc.desc: Benchmarktest for interface GetDisplayCapability.
   */
@@ -196,7 +210,8 @@ BENCHMARK_F(DisplayBenchmarkTest, CreateAndDestroyLayerTest)(benchmark::State &s
     LayerInfo layerInfo;
     uint32_t layerId;
     for (auto _ : state) {
-        ret = g_composerDevice->CreateLayer(g_displayIds[0], layerInfo, layerId);
+        uint32_t bufferCount = 3;
+        ret = g_composerDevice->CreateLayer(g_displayIds[0], layerInfo, bufferCount, layerId);
         EXPECT_EQ(DISPLAY_SUCCESS, ret);
         ret = g_composerDevice->DestroyLayer(g_displayIds[0], layerId);
     }

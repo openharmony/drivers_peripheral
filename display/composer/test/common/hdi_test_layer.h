@@ -27,11 +27,11 @@ using namespace OHOS::HDI::Display::Composer::V1_0;
 
 class HdiGrallocBuffer {
 public:
-    HdiGrallocBuffer(uint32_t w, uint32_t h, PixelFormat fmt);
+    HdiGrallocBuffer(uint32_t seqNo, uint32_t w, uint32_t h, PixelFormat fmt);
     ~HdiGrallocBuffer();
     BufferHandle* Get() const
     {
-        return mBufferHandle;
+        return buffer_;
     }
     void SetReleaseFence(int fd);
     void SetAcquirceFence(int fd);
@@ -43,18 +43,22 @@ public:
     {
         return mReleaseFence;
     }
+    int32_t SetGraphicBuffer(std::function<int32_t (const BufferHandle*, uint32_t)> realFunc);
 
 private:
-    BufferHandle* mBufferHandle = nullptr;
+    BufferHandle* buffer_ = nullptr;
     int mAcquireFence = -1;
     int mReleaseFence = -1;
+    uint32_t seqNo_ = UINT32_MAX;
+    bool cacheValid_ = false;
 };
 
 class HdiTestLayer {
 public:
+    static const uint32_t MAX_BUFFER_COUNT = 3;
     HdiTestLayer(LayerInfo& info, uint32_t id, uint32_t displayId);
     virtual ~HdiTestLayer();
-    int32_t Init();
+    int32_t Init(uint32_t bufferCount = MAX_BUFFER_COUNT);
     int32_t PreparePresent();
 
     uint32_t GetId() const
@@ -81,10 +85,18 @@ public:
     void SetAlpha(LayerAlpha alpha);
     void SetBlendType(BlendType type);
     void SetTransform(TransformType transform);
+    uint32_t GetLayerBuffercount() const;
 
 private:
+    uint32_t GenerateSeq() const
+    {
+        static uint32_t originSeq = 0;
+        return originSeq++;
+    }
+
     uint32_t id_;
     uint32_t displayID_;
+    uint32_t layerBufferCount_;
     std::queue<std::unique_ptr<HdiGrallocBuffer>> frontBuffers_;
     std::queue<std::unique_ptr<HdiGrallocBuffer>> backBuffers_;
     LayerInfo layerInfo_ = { 0 };
