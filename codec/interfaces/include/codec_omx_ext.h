@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,6 +16,7 @@
 #ifndef CODEC_OMX_EXT_H
 #define CODEC_OMX_EXT_H
 #include <OMX_IVCommon.h>
+#include <stdbool.h>
 #ifdef __cplusplus
 #if __cplusplus
 extern "C" {
@@ -198,6 +199,15 @@ struct CodecVideoParamHevc {
                                               1 means a stream of only I frams. other  means the real value. */
 };
 
+/**
+ * @brief Defines the <b>CodecEnableNativeBufferParams</b>.
+ */
+struct CodecEnableNativeBufferParams {
+    uint32_t size;                  /** Size of the structure */
+    union OMX_VERSIONTYPE version;  /** Component version */
+    uint32_t portIndex;             /** Port index */
+    bool enable;                    /** Enable NativeBuffer */
+};
 #ifdef __cplusplus
 #if __cplusplus
 }
