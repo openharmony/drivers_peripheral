@@ -26,11 +26,9 @@ group("hdi_audio") {
   }
 
   if (defined(ohos_lite)) {
-    deps += [ "config/lite:hdf_audio_adapter_json" ]
   } else {
     if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       deps += [
-        "config/linux:hdf_audio_adapter_json",
         "hal/hdi_binder/proxy:hdi_audio_client",
         "hal/hdi_binder/server:hdi_audio_a2dp_server",
         "hal/hdi_binder/server:hdi_audio_pnp_server",
@@ -39,10 +37,6 @@ group("hdi_audio") {
       ]
     }
     deps += [ "hdi_service:idl_audio" ]
-
-    if (drivers_peripheral_audio_alsa_lib) {
-      deps += [ "config/linux:hdf_alsa_adapter_json" ]
-    }
   }
 
   if (drivers_peripheral_audio_user_mode == false) {
@@ -54,16 +48,6 @@ group("hdi_audio") {
 
   if (drivers_peripheral_audio_hal_notsupport_pathselect == false) {
     deps += [ "hal/pathselect:hdi_audio_path_select" ]
-
-    if (defined(ohos_lite)) {
-      deps += [ "config/lite:hdf_audio_path_json" ]
-    } else {
-      if (drivers_peripheral_audio_alsa_lib == true) {
-        deps += [ "config/linux:hdf_alsa_path_json" ]
-      } else {
-        deps += [ "config/linux:hdf_audio_path_json" ]
-      }
-    }
   }
 
   if (drivers_peripheral_audio_policy_config == true) {
