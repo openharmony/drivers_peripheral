@@ -135,6 +135,17 @@ BufferHandle* UsingAllocmem()
     return handle;
 }
 
+int32_t TestSetClientBufferCacheCount(uint32_t devId)
+{
+    uint32_t cacheCount = GetData<uint32_t>();
+    int32_t ret = g_composerInterface->SetClientBufferCacheCount(devId, cacheCount);
+    if (ret != DISPLAY_SUCCESS) {
+        HDF_LOGE("%{public}s: function SetClientBufferCacheCount failed", __func__);
+        return DISPLAY_FAILURE;
+    }
+    return ret;
+}
+
 int32_t TestGetDisplayCapability(uint32_t devId)
 {
     DisplayCapability info = { 0 };
@@ -284,7 +295,8 @@ int32_t TestSetDisplayClientBuffer(uint32_t devId)
         HDF_LOGE("%{public}s: Failed to UsingAllocmem", __func__);
         return DISPLAY_FAILURE;
     }
-    int32_t ret = g_composerInterface->SetDisplayClientBuffer(devId, *buffer, fence);
+    uint32_t seqNo = GetData<uint32_t>();
+    int32_t ret = g_composerInterface->SetDisplayClientBuffer(devId, buffer, seqNo, fence);
     if (ret != DISPLAY_SUCCESS) {
         HDF_LOGE("%{public}s: function TestSetDisplayClientBuffer failed", __func__);
     }
@@ -400,6 +412,7 @@ int32_t TestCommit(uint32_t devId)
 typedef int32_t (*TestFuncs[])(uint32_t);
 
 TestFuncs g_testFuncs = {
+    TestSetClientBufferCacheCount,
     TestGetDisplayCapability,
     TestGetDisplaySupportedModes,
     TestSetGetDisplayMode,

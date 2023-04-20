@@ -217,6 +217,13 @@ int32_t VblankCtr::WaitVblank(uint32_t ms)
     return DISPLAY_SUCCESS;
 }
 
+HWTEST_F(DeviceTest, test_SetClientBufferCacheCount, TestSize.Level1)
+{
+    const uint32_t CACHE_COUNT = 5;
+    auto ret = g_composerDevice->SetClientBufferCacheCount(g_displayIds[0], CACHE_COUNT);
+    EXPECT_EQ(DISPLAY_SUCCESS, ret);
+}
+
 HWTEST_F(DeviceTest, test_GetDisplayCapability, TestSize.Level1)
 {
     DisplayCapability info;
@@ -329,7 +336,8 @@ HWTEST_F(DeviceTest, test_SetDisplayClientBuffer, TestSize.Level1)
     g_gralloc->AllocMem(info, buffer);
     ASSERT_TRUE(buffer != nullptr);
 
-    auto ret = g_composerDevice->SetDisplayClientBuffer(g_displayIds[0], *buffer, -1);
+    uint32_t bufferSeq = 1;
+    auto ret = g_composerDevice->SetDisplayClientBuffer(g_displayIds[0], buffer, bufferSeq, -1);
     g_gralloc->FreeMem(*buffer);
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
@@ -627,25 +635,14 @@ HWTEST_F(DeviceTest, test_SetLayerBuffer, TestSize.Level1)
 
     auto layer = layers[0];
 
-    BufferHandle* buffer = nullptr;
-    const int32_t WIDTH = 800;
-    const int32_t HEIGHT = 600;
-
-    AllocInfo info;
-    info.width  = WIDTH;
-    info.height = HEIGHT;
-    info.usage = OHOS::HDI::Display::Composer::V1_0::HBM_USE_MEM_DMA |
-            OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_READ |
-            OHOS::HDI::Display::Composer::V1_0::HBM_USE_CPU_WRITE;
-    info.format = PIXEL_FMT_RGBA_8888;
-
-    g_gralloc->AllocMem(info, buffer);
-    ASSERT_TRUE(buffer != nullptr);
-
-    auto ret = g_composerDevice->SetLayerBuffer(g_displayIds[0], layer->GetId(), *buffer, -1);
-
+    auto graphicBuffer = layer->AcquireBackBuffer();
+    int32_t ret = graphicBuffer->SetGraphicBuffer([&](const BufferHandle* buffer, uint32_t seqNo) -> int32_t {
+        std::vector<uint32_t> deletingList;
+        int32_t result = g_composerDevice->SetLayerBuffer(g_displayIds[0], layer->GetId(), buffer, seqNo, -1,
+            deletingList);
+        return result;
+    });
     PrepareAndPrensent();
-    g_gralloc->FreeMem(*buffer);
 
     EXPECT_EQ(DISPLAY_SUCCESS, ret);
 }
