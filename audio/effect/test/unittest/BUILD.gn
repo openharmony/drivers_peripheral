@@ -15,7 +15,7 @@ import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_unittest("hdf_effect_hdi_ut") {
-  module_out_path = "hdf/audio"
+  module_out_path = "drivers_peripheral_audio/audio"
   sources = [
     "effect_common.cpp",
     "effect_control_test.cpp",
