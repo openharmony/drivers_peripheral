@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -11,13 +11,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+hdf_audio_path = "./../../../../.."
+hdf_audio_test_path = "./../../.."
+
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
   import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 }
-import("//drivers/peripheral/audio/audio.gni")
+import("$hdf_audio_path/audio.gni")
 
 if (defined(ohos_lite)) {
   moduletest("hdf_audio_lib_render_hardwaredependence_test") {
@@ -27,20 +30,20 @@ if (defined(ohos_lite)) {
     }
 
     sources = [
-      "../../../common/hdi_common/src/audio_hdi_common.cpp",
-      "../../../common/lib_common/src/audio_lib_common.cpp",
+      "$hdf_audio_test_path/common/hdi_common/src/audio_hdi_common.cpp",
+      "$hdf_audio_test_path/common/lib_common/src/audio_lib_common.cpp",
       "src/audio_librender_hardwaredependence_test.cpp",
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-      "//drivers/peripheral/audio/supportlibs/interfaces/include",
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/interfaces/include",
+      "$hdf_audio_path/supportlibs/adm_adapter/include",
+      "$hdf_audio_path/supportlibs/interfaces/include",
+      "$hdf_audio_path/hal/hdi_passthrough/include",
+      "$hdf_audio_path/interfaces/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/peripheral/audio/test/systemtest/common/lib_common/include",
-      "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
-      "//drivers/peripheral/audio/test/systemtest/supportlibs/hardwaredependence/render/include",
+      "$hdf_audio_test_path/common/lib_common/include",
+      "$hdf_audio_test_path/common/hdi_common/include",
+      "$hdf_audio_test_path/supportlibs/hardwaredependence/render/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
 
@@ -55,23 +58,22 @@ if (defined(ohos_lite)) {
 
   ohos_systemtest("hdf_audio_lib_render_hardwaredependence_test") {
     module_out_path = module_output_path
-    resource_config_file =
-        "//drivers/peripheral/audio/test/resource/ohos_test.xml"
+    resource_config_file = "./../../../../resource/ohos_test.xml"
     sources = [
-      "../../../common/hdi_common/src/audio_hdi_common.cpp",
-      "../../../common/lib_common/src/audio_lib_common.cpp",
+      "$hdf_audio_test_path/common/hdi_common/src/audio_hdi_common.cpp",
+      "$hdf_audio_test_path/common/lib_common/src/audio_lib_common.cpp",
       "src/audio_librender_hardwaredependence_test.cpp",
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-      "//drivers/peripheral/audio/supportlibs/interfaces/include",
-      "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+      "$hdf_audio_path/supportlibs/adm_adapter/include",
+      "$hdf_audio_path/supportlibs/interfaces/include",
+      "$hdf_audio_path/interfaces/include",
+      "$hdf_audio_path/hal/hdi_passthrough/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/peripheral/audio/test/systemtest/common/lib_common/include",
-      "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
-      "//drivers/peripheral/audio/test/systemtest/supportlibs/hardwaredependence/render/include",
+      "$hdf_audio_test_path/common/lib_common/include",
+      "$hdf_audio_test_path/common/hdi_common/include",
+      "$hdf_audio_test_path/supportlibs/hardwaredependence/render/include",
       "//third_party/googletest/googletest/include/gtest",
     ]
 

@@ -13,7 +13,7 @@
 
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("./../../../audio.gni")
 
 ohos_unittest("audio_ut_common_test") {
   module_out_path = "drivers_peripheral_audio/audio"
