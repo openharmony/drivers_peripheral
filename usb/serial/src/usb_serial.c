@@ -1303,12 +1303,10 @@ static void AcmCtrlIrq(struct UsbRequest * const req)
     HDF_LOGD("Irqstatus:%d", status);
 
     struct UsbCdcNotification *dr = (struct UsbCdcNotification *)req->compInfo.buffer;
-    switch (status) {
-        case 0:
-            break;
-        default:
-            goto EXIT;
+    if (status != 0) {
+        goto EXIT;
     }
+
     if ((acm != NULL) && acm->nbIndex) {
         dr = (struct UsbCdcNotification *)acm->notificationBuffer;
     }
@@ -1343,26 +1341,23 @@ static void AcmReadBulk(struct UsbRequest *req)
         return;
     }
 
-    switch (status) {
-        case 0:
-            HDF_LOGD("Bulk status: %d+size:%zu\n", status, size);
-            if (size) {
-                uint8_t *data = req->compInfo.buffer;
-                OsalMutexLock(&acm->readLock);
-                if (DataFifoIsFull(&acm->port->readFifo)) {
-                    HDF_LOGD("%s:%d", __func__, __LINE__);
-                    DataFifoSkip(&acm->port->readFifo, size);
-                }
-                uint32_t count = DataFifoWrite(&acm->port->readFifo, data, size);
-                if (count != size) {
-                    HDF_LOGW("%s: write %u less than expected %zu", __func__, count, size);
-                }
-                OsalMutexUnlock(&acm->readLock);
-            }
-            break;
-        default:
-            HDF_LOGE("%s:%d status=%d", __func__, __LINE__, status);
-            return;
+    if (status != 0) {
+        HDF_LOGE("%{public}s: status is not null", __func__);
+        return;
+    }
+    HDF_LOGD("Bulk status: %d+size:%zu\n", status, size);
+    if (size == 0) {
+        uint8_t *data = req->compInfo.buffer;
+        OsalMutexLock(&acm->readLock);
+        if (DataFifoIsFull(&acm->port->readFifo)) {
+            HDF_LOGD("%{public}s: DataFifoIsFull is success", __func__);
+            DataFifoSkip(&acm->port->readFifo, size);
+        }
+        uint32_t count = DataFifoWrite(&acm->port->readFifo, data, size);
+        if (count != size) {
+            HDF_LOGW("%{public}s: write %u less than expected %zu", __func__, count, size);
+        }
+        OsalMutexUnlock(&acm->readLock);
     }
 
     retval = UsbSubmitRequestAsync(req);

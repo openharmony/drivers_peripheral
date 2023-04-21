@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Shenzhen Kaihong DID Co., Ltd..
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd..
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +38,7 @@ int32_t CodecOMXCore::Init(const std::string &libName)
     }
 
     libHandle_ = dlopen(pathBuf, RTLD_LAZY);
-    if (libHandle_ == NULL) {
+    if (libHandle_ == nullptr) {
         CODEC_LOGE("Failed to dlopen %{public}s.", libName.c_str());
         return HDF_ERR_INVALID_PARAM;
     }
@@ -104,25 +104,28 @@ int32_t CodecOMXCore::GetRolesOfComponent(std::string &name, std::vector<std::st
     uint32_t roleCount = 0;
     uint32_t err = (*getRoles_)(const_cast<char *>(name.c_str()), &roleCount, nullptr);
     if (err != HDF_SUCCESS) {
-        CODEC_LOGE("getRoles_ return err [%{public}x].", err);
+        CODEC_LOGE("get roleCount return err [%{public}x].", err);
         return err;
     }
     if (roleCount == 0) {
         return err;
     }
 
-    char role[roleCount][OMX_MAX_STRINGNAME_SIZE];
-    uint32_t bufferSize = sizeof(char) * (roleCount * OMX_MAX_STRINGNAME_SIZE);
-    int32_t ret = memset_s(role, sizeof(role), 0, bufferSize);
-    if (ret != EOK) {
-        CODEC_LOGE("memset_s return err [%{public}x].", ret);
-        return ret;
+    char *role[roleCount];
+    char array[roleCount][OMX_MAX_STRINGNAME_SIZE];
+    for (uint32_t i = 0; i < roleCount; i++) {
+        int32_t ret = memset_s(array[i], OMX_MAX_STRINGNAME_SIZE, 0, OMX_MAX_STRINGNAME_SIZE);
+        if (ret != EOK) {
+            HDF_LOGE("%{public}s: memset_s array err [%{public}x].", __func__, ret);
+            return ret;
+        }
+        role[i] = array[i];
     }
 
     uint32_t roleLen = roleCount;
     err = (*getRoles_)(const_cast<char *>(name.c_str()), &roleCount, reinterpret_cast<OMX_U8 **>(role));
     if (err != HDF_SUCCESS) {
-        CODEC_LOGE("getRoles_ return err [%{public}x].", err);
+        CODEC_LOGE("get roles return err [%{public}x].", err);
         return err;
     }
     for (uint32_t i = 0; i < roleLen; i++) {

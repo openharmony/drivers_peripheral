@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Shenzhen Kaihong DID Co., Ltd..
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd..
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -129,6 +129,7 @@ void CodecDynaBuffer::ResetBuffer(struct OmxCodecBuffer &codecBuffer, OMX_BUFFER
         FreeBufferHandle(dynaBuffer_->bufferHandle);
     }
     dynaBuffer_->bufferHandle = bufferHandle;
+    codecBuffer.filledLen = sizeof(DynamicBuffer);
 }
 }  // namespace Omx
 }  // namespace Codec

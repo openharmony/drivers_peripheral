@@ -12,12 +12,11 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+
 ohos_executable("codec_hdi_omx_decode") {
   include_dirs = [
     "./include",
     "//third_party/openmax/api/1.1.2",
-    "../../../../../interface/display/composer/hdifd_parcelable",
   ]
 
   sources = [
@@ -34,6 +33,7 @@ ohos_executable("codec_hdi_omx_decode") {
       "drivers_interface_display:display_buffer_idl_headers",
       "drivers_interface_display:display_composer_idl_headers",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
+      "drivers_interface_display:libdisplay_composer_hdi_impl",
       "drivers_peripheral_codec:libcodec_hdi_omx_client",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_ipc_adapter",
@@ -55,7 +55,6 @@ ohos_executable("codec_hdi_omx_encode") {
   include_dirs = [
     "./include",
     "//third_party/openmax/api/1.1.2",
-    "../../../../../interface/display/composer/hdifd_parcelable",
   ]
 
   sources = [
@@ -71,6 +70,7 @@ ohos_executable("codec_hdi_omx_encode") {
       "drivers_interface_display:display_buffer_idl_headers",
       "drivers_interface_display:display_composer_idl_headers",
       "drivers_interface_display:libdisplay_buffer_hdi_impl",
+      "drivers_interface_display:libdisplay_composer_hdi_impl",
       "drivers_peripheral_codec:libcodec_hdi_omx_client",
       "graphic_chipsetsdk:buffer_handle",
       "hdf_core:libhdf_ipc_adapter",

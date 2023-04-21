@@ -1320,12 +1320,8 @@ static struct UsbOsAdapterOps g_usbAdapter = {
 
 static void OsSignalHandler(int32_t signo)
 {
-    switch (signo) {
-        case SIGUSR1:
-            break;
-        default:
-            break;
-    }
+    (void)signo;
+    return;
 }
 
 struct UsbOsAdapterOps *UsbAdapterGetOps(void)
@@ -1351,11 +1347,6 @@ int32_t UsbAdapterRegisterSignal(void)
 int32_t UsbAdapterKillSignal(struct UsbDeviceHandle *devHandle, UsbRawTidType tid)
 {
     (void)devHandle;
-    if (kill(tid, SIGUSR1) == HDF_ERR_IO) {
-        HDF_LOGE("%{public}s:%d kill tid=%d SIGUSR1 failed", __func__, __LINE__, tid);
-        return HDF_ERR_IO;
-    }
-
     return HDF_SUCCESS;
 }
 

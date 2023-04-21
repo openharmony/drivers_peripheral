@@ -564,9 +564,9 @@ Buffer *Aes256GcmDecryptNoPadding(const Buffer *cipherInfo, const Buffer *key)
 }
 
 // Here is the piling code. The real implementation needs to call the security interface.
-Buffer *DeriveDeviceKey(const Buffer *secret)
+Buffer *DeriveDeviceKey(const Buffer *pinData, const Buffer *secret)
 {
-    if (!IsBufferValid(secret) || secret->contentSize != SECRET_SIZE) {
+    if (!IsBufferValid(secret) || secret->contentSize != SECRET_SIZE || !IsBufferValid(pinData)) {
         LOG_ERROR("bad param");
         return NULL;
     }

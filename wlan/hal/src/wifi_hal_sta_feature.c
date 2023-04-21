@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -60,6 +60,57 @@ static int32_t StartScan(const char *ifName, WifiScan *scan)
     return ret;
 }
 
+static int32_t StartPnoScanInner(const char *ifName, const WifiPnoSettings *pnoSettings)
+{
+    if (ifName == NULL || pnoSettings == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HalCmdStartPnoScan(ifName, pnoSettings);
+}
+
+static int32_t StartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings)
+{
+    HalMutexLock();
+    int32_t ret = StartPnoScanInner(ifName, pnoSettings);
+    HalMutexUnlock();
+    return ret;
+}
+
+static int32_t StopPnoScanInner(const char *ifName)
+{
+    if (ifName == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HalCmdStopPnoScan(ifName);
+}
+
+static int32_t StopPnoScan(const char *ifName)
+{
+    HalMutexLock();
+    int32_t ret = StopPnoScanInner(ifName);
+    HalMutexUnlock();
+    return ret;
+}
+
+static int32_t GetSignalPollInfoInner(const char *ifName, struct SignalResult *signalResult)
+{
+    if (ifName == NULL || signalResult == NULL) {
+        HDF_LOGE("%s: input parameter invalid, line: %d", __FUNCTION__, __LINE__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+    return HalCmdGetSignalPollInfo(ifName, signalResult);
+}
+
+static int32_t GetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
+{
+    HalMutexLock();
+    int32_t ret = GetSignalPollInfoInner(ifName, signalResult);
+    HalMutexUnlock();
+    return ret;
+}
+
 int32_t InitStaFeature(struct IWiFiSta **fe)
 {
     if (fe == NULL || *fe == NULL) {
@@ -72,6 +123,9 @@ int32_t InitStaFeature(struct IWiFiSta **fe)
     }
     (*fe)->setScanningMacAddress = SetScanningMacAddress;
     (*fe)->startScan = StartScan;
+    (*fe)->startPnoScan = StartPnoScan;
+    (*fe)->stopPnoScan = StopPnoScan;
+    (*fe)->getSignalPollInfo = GetSignalPollInfo;
     return HDF_SUCCESS;
 }
 

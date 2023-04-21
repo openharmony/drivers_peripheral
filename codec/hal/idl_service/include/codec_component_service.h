@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,9 +24,9 @@ namespace Codec {
 namespace V1_0 {
 class CodecComponentService : public ICodecComponent {
 public:
-    CodecComponentService(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &node) : node_(node)
-    {}
-    ~CodecComponentService();
+    CodecComponentService(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &node,
+                          const std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr, const std::string name);
+    virtual ~CodecComponentService();
     int32_t GetComponentVersion(CompVerInfo &verInfo) override;
     int32_t SendCommand(CodecCommandType cmd, uint32_t param, const std::vector<int8_t> &cmdData) override;
     int32_t GetParameter(uint32_t index, const std::vector<int8_t> &inParamStruct,
@@ -52,7 +52,11 @@ public:
     int32_t ComponentRoleEnum(std::vector<uint8_t> &role, uint32_t index) override;
 
 private:
+    void SetComponentRole();
+    void ReleaseCache();
+    std::string name_;
     std::shared_ptr<OHOS::Codec::Omx::ComponentNode> node_;
+    std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr_;
 };
 }  // namespace V1_0
 }  // namespace Codec

@@ -101,13 +101,9 @@ static void AcmCtrlIrq(struct UsbRequest *req)
     int32_t status = req->compInfo.status;
     unsigned int currentSize = req->compInfo.actualLength;
     HDF_LOGI("%{public}s: Irqstatus:%{public}d, actualLength:%{public}u", __func__, status, currentSize);
-    switch (status) {
-        case 0:
-            break;
-        default:
-            return;
+    if (status != 0) {
+        return;
     }
-
     HDF_LOGI("%{public}s:%{public}d exit", __func__, __LINE__);
 }
 

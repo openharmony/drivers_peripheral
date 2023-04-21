@@ -25,9 +25,11 @@
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
 struct AudioCaptureInfo {
+    struct IAudioCapture capture;
     struct AudioDeviceDescriptor desc;
     enum AudioCategory streamType;
-    struct IAudioCapture *capture;
+    unsigned int sampleRate;
+    unsigned int channelCount;
     struct AudioHwiCapture *hwiCapture;
     uint32_t captureId;
 };
@@ -44,29 +46,6 @@ static struct AudioHwiCapturePriv *AudioHwiCaptureGetPriv(void)
     return &g_audioHwiCapturePriv;
 }
 
-struct AudioHwiCapture *AudioHwiGetHwiCapture(const struct IAudioCapture *capture)
-{
-    if (capture == NULL) {
-        AUDIO_FUNC_LOGE("audio HwiCapture get HwiCapture fail, capture null");
-        return NULL;
-    }
-
-    struct AudioHwiCapturePriv *priv = AudioHwiCaptureGetPriv();
-
-    for (uint32_t i = 0; i < AUDIO_HW_STREAM_NUM_MAX; i++) {
-        if (priv->captureInfos[i] == NULL) {
-            continue;
-        }
-        for (uint32_t j = 0; j < AUDIO_HW_STREAM_NUM_MAX; j++) {
-            if (capture == priv->captureInfos[i][j].capture) {
-                return priv->captureInfos[i][j].hwiCapture;
-            }
-        }
-    }
-
-    AUDIO_FUNC_LOGE("audio get capture fail");
-    return NULL;
-}
 
 struct AudioHwiCapture *AudioHwiGetHwiCaptureById(uint32_t captureId)
 {
@@ -86,7 +65,8 @@ int32_t AudioHwiCaptureFrame(struct IAudioCapture *capture, int8_t *frame, uint3
     CHECK_NULL_PTR_RETURN_VALUE(frameLen, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(replyBytes, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->CaptureFrame, HDF_ERR_INVALID_PARAM);
 
@@ -105,7 +85,8 @@ int32_t AudioHwiGetCapturePosition(struct IAudioCapture *capture, uint64_t *fram
     CHECK_NULL_PTR_RETURN_VALUE(frames, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(time, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->GetCapturePosition, HDF_ERR_INVALID_PARAM);
 
@@ -125,7 +106,8 @@ int32_t AudioHwiCaptureCheckSceneCapability(struct IAudioCapture *capture, const
     CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supported, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->scene.CheckSceneCapability, HDF_ERR_INVALID_PARAM);
 
@@ -152,7 +134,8 @@ int32_t AudioHwiCaptureSelectScene(struct IAudioCapture *capture, const struct A
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->scene.SelectScene, HDF_ERR_INVALID_PARAM);
 
@@ -178,7 +161,8 @@ int32_t AudioHwiCaptureSetMute(struct IAudioCapture *capture, bool mute)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.SetMute, HDF_ERR_INVALID_PARAM);
 
@@ -196,7 +180,8 @@ int32_t AudioHwiCaptureGetMute(struct IAudioCapture *capture, bool *mute)
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(mute, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.GetMute, HDF_ERR_INVALID_PARAM);
 
@@ -213,7 +198,8 @@ int32_t AudioHwiCaptureSetVolume(struct IAudioCapture *capture, float volume)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.SetVolume, HDF_ERR_INVALID_PARAM);
 
@@ -231,7 +217,8 @@ int32_t AudioHwiCaptureGetVolume(struct IAudioCapture *capture, float *volume)
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(volume, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+    struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.GetVolume, HDF_ERR_INVALID_PARAM);
 
@@ -250,7 +237,8 @@ int32_t AudioHwiCaptureGetGainThreshold(struct IAudioCapture *capture, float *mi
     CHECK_NULL_PTR_RETURN_VALUE(min, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(max, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.GetGainThreshold, HDF_ERR_INVALID_PARAM);
 
@@ -268,7 +256,8 @@ int32_t AudioHwiCaptureGetGain(struct IAudioCapture *capture, float *gain)
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(gain, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.GetGain, HDF_ERR_INVALID_PARAM);
 
@@ -285,7 +274,8 @@ int32_t AudioHwiCaptureSetGain(struct IAudioCapture *capture, float gain)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->volume.SetGain, HDF_ERR_INVALID_PARAM);
 
@@ -303,7 +293,8 @@ int32_t AudioHwiCaptureGetFrameSize(struct IAudioCapture *capture, uint64_t *siz
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(size, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetFrameSize, HDF_ERR_INVALID_PARAM);
 
@@ -321,7 +312,8 @@ int32_t AudioHwiCaptureGetFrameCount(struct IAudioCapture *capture, uint64_t *co
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(count, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetFrameCount, HDF_ERR_INVALID_PARAM);
 
@@ -339,7 +331,8 @@ int32_t AudioHwiCaptureSetSampleAttributes(struct IAudioCapture *capture, const 
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.SetSampleAttributes, HDF_ERR_INVALID_PARAM);
 
@@ -365,7 +358,8 @@ int32_t AudioHwiCaptureGetSampleAttributes(struct IAudioCapture *capture, struct
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetSampleAttributes, HDF_ERR_INVALID_PARAM);
 
@@ -391,7 +385,8 @@ int32_t AudioHwiCaptureGetCurrentChannelId(struct IAudioCapture *capture, uint32
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(channelId, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetCurrentChannelId, HDF_ERR_INVALID_PARAM);
 
@@ -409,7 +404,8 @@ int32_t AudioHwiCaptureSetExtraParams(struct IAudioCapture *capture, const char 
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(keyValueList, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.SetExtraParams, HDF_ERR_INVALID_PARAM);
 
@@ -427,7 +423,8 @@ int32_t AudioHwiCaptureGetExtraParams(struct IAudioCapture *capture, char *keyVa
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(keyValueList, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetExtraParams, HDF_ERR_INVALID_PARAM);
 
@@ -456,7 +453,8 @@ int32_t AudioHwiCaptureGetMmapPosition(struct IAudioCapture *capture, uint64_t *
     hwiTime.tvSec = 0;
     hwiTime.tvNSec = 0;
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetMmapPosition, HDF_ERR_INVALID_PARAM);
 
@@ -476,7 +474,8 @@ int32_t AudioHwiCaptureAddAudioEffect(struct IAudioCapture *capture, uint64_t ef
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.AddAudioEffect, HDF_ERR_INVALID_PARAM);
 
@@ -493,7 +492,8 @@ int32_t AudioHwiCaptureRemoveAudioEffect(struct IAudioCapture *capture, uint64_t
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.RemoveAudioEffect, HDF_ERR_INVALID_PARAM);
 
@@ -511,7 +511,8 @@ int32_t AudioHwiCaptureGetFrameBufferSize(struct IAudioCapture *capture, uint64_
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(bufferSize, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.GetFrameBufferSize, HDF_ERR_INVALID_PARAM);
 
@@ -528,7 +529,8 @@ int32_t AudioHwiCaptureStart(struct IAudioCapture *capture)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.Start, HDF_ERR_INVALID_PARAM);
 
@@ -545,7 +547,8 @@ int32_t AudioHwiCaptureStop(struct IAudioCapture *capture)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.Stop, HDF_ERR_INVALID_PARAM);
 
@@ -562,7 +565,8 @@ int32_t AudioHwiCapturePause(struct IAudioCapture *capture)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.Pause, HDF_ERR_INVALID_PARAM);
 
@@ -579,7 +583,8 @@ int32_t AudioHwiCaptureResume(struct IAudioCapture *capture)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.Resume, HDF_ERR_INVALID_PARAM);
 
@@ -596,7 +601,8 @@ int32_t AudioHwiCaptureFlush(struct IAudioCapture *capture)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.Flush, HDF_ERR_INVALID_PARAM);
 
@@ -613,7 +619,8 @@ int32_t AudioHwiCaptureTurnStandbyMode(struct IAudioCapture *capture)
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.TurnStandbyMode, HDF_ERR_INVALID_PARAM);
 
@@ -630,7 +637,8 @@ int32_t AudioHwiCaptureAudioDevDump(struct IAudioCapture *capture, int32_t range
 {
     CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.AudioDevDump, HDF_ERR_INVALID_PARAM);
 
@@ -649,7 +657,8 @@ int32_t AudioHwiCaptureIsSupportsPauseAndResume(struct IAudioCapture *capture, b
     CHECK_NULL_PTR_RETURN_VALUE(supportPause, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supportResume, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiCapture *hwiCapture = AudioHwiGetHwiCapture(capture);
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->control.IsSupportsPauseAndResume, HDF_ERR_INVALID_PARAM);
 
@@ -710,9 +719,16 @@ static void AudioHwiInitCaptureInstance(struct IAudioCapture *capture)
     capture->GetVersion = AudioHwiCaptureGetVersion;
 }
 
-struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, enum AudioCategory streamType, uint32_t *captureId)
+struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
+    uint32_t *captureId)
 {
     uint32_t index = 0;
+
+    if (captureId == NULL || attrs == NULL) {
+        AUDIO_FUNC_LOGE("audio params is null");
+        return NULL;
+    }
+
     struct AudioHwiCapturePriv *capturePriv = AudioHwiCaptureGetPriv();
     if (capturePriv == NULL) {
         AUDIO_FUNC_LOGE("Parameter error!");
@@ -727,9 +743,11 @@ struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, enum AudioCatego
     for (index = 0; index < AUDIO_HW_STREAM_NUM_MAX; index++) {
         if ((capturePriv->captureInfos[index] != NULL) &&
             (capturePriv->captureInfos[index]->desc.pins == pin) &&
-            (capturePriv->captureInfos[index]->streamType == streamType)) {
+            (capturePriv->captureInfos[index]->streamType == attrs->type) &&
+            (capturePriv->captureInfos[index]->sampleRate == attrs->sampleRate) &&
+            (capturePriv->captureInfos[index]->channelCount == attrs->channelCount)) {
             *captureId = capturePriv->captureInfos[index]->captureId;
-            return capturePriv->captureInfos[index]->capture;
+            return &capturePriv->captureInfos[index]->capture;
         }
     }
 
@@ -760,10 +778,10 @@ static uint32_t GetAvailableCaptureId(struct AudioHwiCapturePriv *capturePriv)
     return captureId;
 }
 
-struct IAudioCapture *AudioHwiCreateCaptureById(enum AudioCategory streamType, uint32_t *captureId,
+struct IAudioCapture *AudioHwiCreateCaptureById(const struct AudioSampleAttributes *attrs, uint32_t *captureId,
     struct AudioHwiCapture *hwiCapture, const struct AudioDeviceDescriptor *desc)
 {
-    if (captureId == NULL || hwiCapture == NULL || desc == NULL) {
+    if (attrs == NULL || captureId == NULL || hwiCapture == NULL || desc == NULL) {
         AUDIO_FUNC_LOGE("audio capture is null");
         return NULL;
     }
@@ -784,18 +802,15 @@ struct IAudioCapture *AudioHwiCreateCaptureById(enum AudioCategory streamType, u
         return NULL;
     }
 
-    capture = (struct IAudioCapture *)OsalMemCalloc(sizeof(struct IAudioCapture));
-    if (capture == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiCapture capture malloc fail");
-        return NULL;
-    }
-    priv->captureInfos[*captureId]->capture = capture;
     priv->captureInfos[*captureId]->hwiCapture = hwiCapture;
-    priv->captureInfos[*captureId]->streamType = streamType;
+    priv->captureInfos[*captureId]->streamType = attrs->type;
+    priv->captureInfos[*captureId]->sampleRate = attrs->sampleRate;
+    priv->captureInfos[*captureId]->channelCount = attrs->channelCount;
     priv->captureInfos[*captureId]->desc.portId = desc->portId;
     priv->captureInfos[*captureId]->desc.pins = desc->pins;
     priv->captureInfos[*captureId]->desc.desc = strdup(desc->desc);
     priv->captureInfos[*captureId]->captureId = *captureId;
+    capture = &(priv->captureInfos[*captureId]->capture);
     AudioHwiInitCaptureInstance(capture);
 
     AUDIO_FUNC_LOGI("audio captureId capture success");
@@ -814,9 +829,7 @@ void AudioHwiDestroyCaptureById(uint32_t captureId)
         return;
     }
 
-    OsalMemFree((void *)priv->captureInfos[captureId]->capture);
     OsalMemFree((void *)priv->captureInfos[captureId]->desc.desc);
-    priv->captureInfos[captureId]->capture = NULL;
     priv->captureInfos[captureId]->hwiCapture = NULL;
     priv->captureInfos[captureId]->desc.desc = NULL;
     priv->captureInfos[captureId]->desc.portId = UINT_MAX;

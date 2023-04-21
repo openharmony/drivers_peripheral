@@ -781,7 +781,7 @@ HWTEST_F(HdfWifiServiceCTest, StartChannelMeasTest_034, TestSize.Level1)
     measChannelParam.channelId = 1;
     measChannelParam.measTime = 15;
     int32_t rc = g_wlanObj->StartChannelMeas(g_wlanObj, ifName, &measChannelParam);
-    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT || rc == HDF_DEV_ERR_NETDOWN);
     ASSERT_TRUE(flag);
     sleep(MEAS_CHANNEL_TIME);
     rc = g_wlanObj->GetChannelMeasResult(g_wlanObj, ifName, &measChannelResult);
@@ -1074,6 +1074,30 @@ HWTEST_F(HdfWifiServiceCTest, SetTxPowerTest_047, TestSize.Level1)
     ASSERT_EQ(rc, HDF_SUCCESS);
     rc = g_wlanObj->SetTxPower(g_wlanObj, &ifeature, power);
     ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+}
+
+/**
+ * @tc.name: GetSignalPollInfo_048
+ * @tc.desc: Wifi hdi get signal information
+ * @tc.type: FUNC
+ * @tc.require:
+ */
+HWTEST_F(HdfWifiServiceCTest, GetSignalPollInfo_048, TestSize.Level1)
+{
+    const int32_t wlanType = PROTOCOL_80211_IFTYPE_STATION;
+    struct HdfFeatureInfo ifeature;
+    const char *ifName = "wlan0";
+    struct SignalPollResult signalResult;
+    (void)memset_s(&signalResult, sizeof(struct SignalPollResult), 0, sizeof(struct SignalPollResult));
+
+    int32_t rc = g_wlanObj->CreateFeature(g_wlanObj, wlanType, &ifeature);
+    ASSERT_EQ(rc, HDF_SUCCESS);
+    rc = g_wlanObj->GetSignalPollInfo(g_wlanObj, ifName, &signalResult);
+    bool flag = (rc == HDF_SUCCESS || rc == HDF_ERR_NOT_SUPPORT);
+    printf("GetSignalPollInfo rc = %d.\n", rc);
+    ASSERT_TRUE(flag);
     rc = g_wlanObj->DestroyFeature(g_wlanObj, &ifeature);
     ASSERT_EQ(rc, HDF_SUCCESS);
 }

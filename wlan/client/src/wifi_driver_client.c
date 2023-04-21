@@ -153,7 +153,7 @@ int32_t WifiRegisterHid2dCallback(Hid2dCallback func, const char *ifName)
             }
         }
     } while (0);
-    
+
     OsalMemFree(event);
     HDF_LOGE("%s fail: register onRecFunc num more than %d!", __FUNCTION__, MAX_CALL_BACK_COUNT);
     return RET_CODE_FAILURE;
@@ -175,6 +175,33 @@ void WifiUnregisterHid2dCallback(Hid2dCallback func, const char *ifName)
             g_hid2dEventMap[i] = NULL;
             return;
         }
+    }
+}
+
+void FreeScanResult(WifiScanResult *res)
+{
+    if (res == NULL) {
+        return;
+    }
+    if (res->bssid != NULL) {
+        OsalMemFree(res->bssid);
+    }
+    if (res->ie != NULL) {
+        OsalMemFree(res->ie);
+    }
+    if (res->beaconIe != NULL) {
+        OsalMemFree(res->beaconIe);
+    }
+}
+
+void FreeScanResults(WifiScanResults *res)
+{
+    uint32_t i;
+    if (res == NULL) {
+        return;
+    }
+    for (i = 0; i < res->num; i++) {
+        FreeScanResult(&res->scanResult[i]);
     }
 }
 

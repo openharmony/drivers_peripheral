@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Shenzhen Kaihong DID Co., Ltd..
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd..
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -54,13 +54,10 @@ sptr<ICodecBuffer> ICodecBuffer::CreateCodeBuffer(struct OmxCodecBuffer &codecBu
 sptr<ICodecBuffer> ICodecBuffer::AllocateCodecBuffer(struct OmxCodecBuffer &codecBuffer)
 {
     sptr<ICodecBuffer> buffer = nullptr;
-    switch (codecBuffer.bufferType) {
-        case CODEC_BUFFER_TYPE_AVSHARE_MEM_FD:
-            buffer = CodecShareBuffer::Allocate(codecBuffer);
-            break;
-        default:
-            HDF_LOGE("%s: bufferType[%{public}d] is unexpected", __func__, codecBuffer.bufferType);
-            break;
+    if (codecBuffer.bufferType == CODEC_BUFFER_TYPE_AVSHARE_MEM_FD) {
+        buffer = CodecShareBuffer::Allocate(codecBuffer);
+    } else {
+        HDF_LOGE("%s: bufferType[%{public}d] is unexpected", __func__, codecBuffer.bufferType);
     }
     return buffer;
 }

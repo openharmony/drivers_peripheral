@@ -73,16 +73,11 @@ static AvCodecMime ConvertVideoCodingTypeToMimeType(int32_t codingType)
 static AvCodecMime ConvertImageCodingTypeToMimeType(OMX_IMAGE_CODINGTYPE codingType)
 {
     AvCodecMime codecMime = MEDIA_MIMETYPE_INVALID;
-    switch (codingType) {
-        case OMX_IMAGE_CodingJPEG:
-            codecMime = MEDIA_MIMETYPE_IMAGE_JPEG;
-            break;
-
-        default:
-            HDF_LOGW("%{public}s warn, unsupport codingType[%{public}d]", __func__, codingType);
-            break;
+    if (codingType == OMX_IMAGE_CodingJPEG) {
+        codecMime = MEDIA_MIMETYPE_IMAGE_JPEG;
+    } else {
+        HDF_LOGW("%{public}s warn, unsupport codingType[%{public}d]", __func__, codingType);
     }
-
     return codecMime;
 }
 
@@ -780,19 +775,12 @@ static int32_t ParseParamAudioPortFormat(Param *paramIn, int8_t *paramOut, int32
             continue;
         }
         validCount++;
-        switch (paramIn[i].key) {
-            case KEY_MIMETYPE: {
-                    int32_t codingType =
-                        ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
-                    param->eEncoding = (OMX_AUDIO_CODINGTYPE)codingType;
-                break;
-            }
-
-            default: {
-                validCount--;
-                HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
-                break;
-            }
+        if (paramIn[i].key == KEY_MIMETYPE) {
+            int32_t codingType = ConvertMimeTypeToCodingType(*(reinterpret_cast<AvCodecMime *>(paramIn[i].val)));
+            param->eEncoding = (OMX_AUDIO_CODINGTYPE)codingType;
+        } else {
+            validCount--;
+            HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
         }
     }
     return (validCount > 0) ? HDF_SUCCESS : HDF_FAILURE;
@@ -909,16 +897,11 @@ static int32_t ParseParamAudioG726(Param *paramIn, int8_t *paramOut, int32_t par
             continue;
         }
         validCount++;
-        switch (paramIn[i].key) {
-            case KEY_AUDIO_CHANNEL_COUNT:
-                param->nChannels = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
-                break;
-
-            default: {
-                validCount--;
-                HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
-                break;
-            }
+        if (paramIn[i].key == KEY_AUDIO_CHANNEL_COUNT) {
+            param->nChannels = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
+        } else {
+            validCount--;
+            HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
         }
     }
     return (validCount > 0) ? HDF_SUCCESS : HDF_FAILURE;
@@ -962,16 +945,11 @@ static int32_t ParseParamQfactor(Param *paramIn, int8_t *paramOut, int32_t param
             continue;
         }
         validCount++;
-        switch (paramIn[i].key) {
-            case KEY_IMAGE_Q_FACTOR:
-                param->nQFactor = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
-                break;
-
-            default: {
-                validCount--;
-                HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
-                break;
-            }
+        if (paramIn[i].key == KEY_IMAGE_Q_FACTOR) {
+            param->nQFactor = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
+        } else {
+            validCount--;
+            HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
         }
     }
     return (validCount > 0) ? HDF_SUCCESS : HDF_FAILURE;
@@ -1018,17 +996,12 @@ static int32_t ParseParamVideoAvc(Param *paramIn, int8_t *paramOut, int32_t para
             continue;
         }
         validCount++;
-        switch (paramIn[i].key) {
-            case KEY_VIDEO_PROFILE:
-                param->eProfile = static_cast<OMX_VIDEO_AVCPROFILETYPE>
-                    (ConvertProfileToOmxProfile(*(reinterpret_cast<Profile *>(paramIn[i].val))));
-                break;
-
-            default: {
-                validCount--;
-                HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
-                break;
-            }
+        if (paramIn[i].key == KEY_VIDEO_PROFILE) {
+            param->eProfile = static_cast<OMX_VIDEO_AVCPROFILETYPE>
+                (ConvertProfileToOmxProfile(*(reinterpret_cast<Profile *>(paramIn[i].val))));
+        } else {
+            validCount--;
+            HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
         }
     }
     return (validCount > 0) ? HDF_SUCCESS : HDF_FAILURE;
@@ -1043,17 +1016,11 @@ static int32_t ParseParamVideoBitrate(Param *paramIn, int8_t *paramOut, int32_t 
             continue;
         }
         validCount++;
-        switch (paramIn[i].key) {
-            case KEY_VIDEO_RC_MODE:
-                param->eControlRate =
-                    ConvertRcModeToRateType(*(reinterpret_cast<VideoCodecRcMode *>(paramIn[i].val)));
-                break;
-
-            default: {
-                validCount--;
-                HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
-                break;
-            }
+        if (paramIn[i].key == KEY_VIDEO_RC_MODE) {
+            param->eControlRate = ConvertRcModeToRateType(*(reinterpret_cast<VideoCodecRcMode *>(paramIn[i].val)));
+        } else {
+            validCount--;
+            HDF_LOGW("%{public}s warn, unsupport key[%{public}d]", __func__, paramIn[i].key);
         }
     }
     return (validCount > 0) ? HDF_SUCCESS : HDF_FAILURE;

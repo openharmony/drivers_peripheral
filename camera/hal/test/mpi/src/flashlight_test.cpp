@@ -44,7 +44,7 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0001, TestSize.Level0)
     Test_->status = true;
     Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
 }
 
 /**
@@ -60,7 +60,7 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0002, TestSize.Level0)
     Test_->status = true;
     Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
-    sleep(3);
+    sleep(3); // sleep for 3 seconds
     std::cout << "==========[test log]2. turn off flashlight." << std::endl;
     Test_->status = false;
     Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
@@ -118,7 +118,7 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0010, TestSize.Level1)
         std::cout << Test_->rc << std::endl;
     }
     std::cout << "==========[test log]turn off/on flashlight fail, preview go on, for 5s." << std::endl;
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
@@ -151,7 +151,7 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0011, TestSize.Level1)
         std::cout << "==========[test log]turn off the flashlight fail,rc = " << Test_->rc << std::endl;
     }
     std::cout << "==========[test log]turn off the flashlight fail, preview go on, for 5s." << std::endl;
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
@@ -171,10 +171,10 @@ HWTEST_F(FlashlightTest, Camera_Flashlight_0020, TestSize.Level1)
     std::cout <<" the light will turn off." << std::endl;
     Test_->status = true;
     Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // Open the camera, preview
     Test_->Open();
     // query the status of the flashlight, currently only supports callback reporting
     std::cout << "==========[test log]check the flashlight status is off." << std::endl;
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
 }

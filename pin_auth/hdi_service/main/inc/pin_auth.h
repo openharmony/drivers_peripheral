@@ -17,6 +17,7 @@
 #define PIN_AUTH_H
 
 #include <cstdint>
+#include <mutex>
 #include <vector>
 #include "nocopyable.h"
 
@@ -32,7 +33,7 @@ struct PinCredentialInfo {
 class PinAuth {
 public:
     DISALLOW_COPY_AND_MOVE(PinAuth);
-    explicit PinAuth();
+    PinAuth() = default;
     ~PinAuth() = default;
     int32_t Init();
     int32_t Close();
@@ -48,9 +49,8 @@ public:
     int32_t VerifyTemplateData(std::vector<uint64_t> templateIdList);
 
 private:
-    int32_t AuthPinInner(uint64_t scheduleId, uint64_t templateId, const std::vector<uint8_t> &pinData,
-        std::vector<uint8_t> &result);
     int32_t PinResultToCoAuthResult(int resultCode);
+    std::mutex mutex_;
 };
 } // namespace PinAuth
 } // namespace UserIam

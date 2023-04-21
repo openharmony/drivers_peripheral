@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -76,7 +76,10 @@ enum STACommands {
     CMD_STA_DISCONNECT,
     CMD_STA_SCAN,
     CMD_STA_ABORT_SCAN,
-    CMD_STA_SET_SCAN_MAC_ADDR
+    CMD_STA_SET_SCAN_MAC_ADDR,
+    CMD_STA_START_PNO_SCAN,
+    CMD_STA_STOP_PNO_SCAN,
+    CMD_STA_GET_SIGNAL_INFO
 };
 
 enum P2PCommands {
@@ -112,7 +115,10 @@ typedef enum {
     WIFI_HAL_CMD_START_CHANNEL_MEAS = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_START_CHANNEL_MEAS),
     WIFI_HAL_CMD_CONFIG_PROJECTION_SCREEN = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_SET_PROJECTION_SCREEN_PARAM),
     WIFI_HAL_CMD_SET_CMD_IOCTL = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_SEND_CMD_IOCTL),
-    WIFI_HAL_CMD_GET_STATION_INFO = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_GET_STATION_INFO)
+    WIFI_HAL_CMD_GET_STATION_INFO = HDF_WIFI_CMD(BASE_SERVICE_ID, CMD_BASE_GET_STATION_INFO),
+    WIFI_HAL_CMD_START_PNO_SCAN = HDF_WIFI_CMD(STA_SERVICE_ID, CMD_STA_START_PNO_SCAN),
+    WIFI_HAL_CMD_STOP_PNO_SCAN = HDF_WIFI_CMD(STA_SERVICE_ID, CMD_STA_STOP_PNO_SCAN),
+    WIFI_HAL_CMD_GET_SIGNAL_INFO = HDF_WIFI_CMD(STA_SERVICE_ID, CMD_STA_GET_SIGNAL_INFO),
 } WifiHalCmd;
 
 typedef enum {
@@ -160,5 +166,7 @@ struct Hid2dEvent {
 
 void WifiEventReport(const char *ifName, uint32_t event, void *data);
 void Hid2dEventReport(const char *ifName, const uint8_t *msg, uint32_t msgLen);
+void FreeScanResult(WifiScanResult *res);
+void FreeScanResults(WifiScanResults *res);
 
 #endif /* end of wifi_common_cmd.h */

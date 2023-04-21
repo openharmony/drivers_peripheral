@@ -12,36 +12,25 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("$hdf_framework_path/tools/hc-gen/hc_gen.gni")
 
-hc_gen("build_codec_adapter_capabilities") {
-  sources = [ rebase_path(
-          "//vendor/${product_company}/${product_name}/hdf_config/uhdf/media_codec/codec_adapter_capabilities.hcs") ]
-}
-
-ohos_prebuilt_etc("codec_adapter_capabilities.hcb") {
-  deps = [ ":build_codec_adapter_capabilities" ]
-  hcs_outputs = get_target_outputs(":build_codec_adapter_capabilities")
-  source = hcs_outputs[0]
-  relative_install_dir = "hdfconfig"
-  install_images = [ chipset_base_dir ]
-  subsystem_name = "hdf"
-  part_name = "drivers_peripheral_codec"
+config("headers_config") {
+  include_dirs = [ "../../interfaces/include" ]
 }
 
 ohos_shared_library("libcodec_hdi_passthrough_impl") {
   include_dirs = [
-    "//drivers/peripheral/codec/hal/include",
-    "//drivers/peripheral/codec/hal/passthrough/adapter/include",
-    "//drivers/peripheral/codec/hal/passthrough/include",
-    "//drivers/peripheral/codec/hal/v1.0/codec_instance/include",
-    "//drivers/peripheral/codec/hal/v1.0/share_mem/include",
-    "//drivers/peripheral/codec/hal/v1.0/oem_interface/include",
-    "//drivers/peripheral/codec/hal/v1.0/buffer_manager/include",
-    "//drivers/peripheral/codec/interfaces/include",
+    "../../hal/include",
+    "../../hal/passthrough/adapter/include",
+    "../../hal/passthrough/include",
+    "../../hal/v1.0/codec_instance/include",
+    "../../hal/v1.0/share_mem/include",
+    "../../hal/v1.0/oem_interface/include",
+    "../../hal/v1.0/buffer_manager/include",
     "//third_party/openmax/api/1.1.2",
   ]
+
+  public_configs = [ ":headers_config" ]
+
   sources = [
     "../../hdi_service/codec_service_stub/codec_service.c",
     "../src/codec_component_capability_config.c",
@@ -82,15 +71,5 @@ ohos_shared_library("libcodec_hdi_passthrough_impl") {
 }
 
 group("codec_hdi_passthrough") {
-  CODEC_HCS_PATH = rebase_path(
-          "//vendor/${product_company}/${product_name}/hdf_config/uhdf/media_codec")
-  cmd = "if [ -f ${CODEC_HCS_PATH}/codec_adapter_capabilities.hcs ]; then echo true; else echo false; fi"
-  HAVE_CODEC_HCS_PATH =
-      exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
-  if (HAVE_CODEC_HCS_PATH) {
-    deps = [
-      ":codec_adapter_capabilities.hcb",
-      ":libcodec_hdi_passthrough_impl",
-    ]
-  }
+  deps = [ ":libcodec_hdi_passthrough_impl" ]
 }

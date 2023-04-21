@@ -17,6 +17,7 @@
 #define CODEC_UTILS_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "hdf_types.h"
 #include "codec_type.h"
 #include "osal_mem.h"

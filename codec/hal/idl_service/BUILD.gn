@@ -11,11 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("../..//codec.gni")
 
 ohos_shared_library("libcodec_component_manager_service_1.0") {
   include_dirs = [
-    "//drivers/peripheral/codec/interfaces/include/",
+    "../../interfaces/include/",
     "//third_party/openmax/api/1.1.2",
     "include",
   ]
@@ -49,7 +49,13 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
       "ipc:ipc_single",
     ]
   }
-
+  defines = []
+  if (drivers_peripheral_codec_feature_set_omx_role) {
+    defines += [ "SUPPORT_ROLE" ]
+  }
+  if (use_musl && use_jemalloc && use_jemalloc_dfx_intf) {
+    defines += [ "CONFIG_USE_JEMALLOC_DFX_INTF" ]
+  }
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"
   part_name = "drivers_peripheral_codec"
@@ -57,7 +63,7 @@ ohos_shared_library("libcodec_component_manager_service_1.0") {
 
 ohos_shared_library("libcodec_driver") {
   include_dirs = [
-    "//drivers/peripheral/codec/interfaces/include/",
+    "../../codec/interfaces/include/",
     "include",
   ]
 

@@ -990,7 +990,8 @@ int32_t AudioAdapterCreateCapture(struct IAudioAdapter *adapter, const struct Au
         return AUDIO_ERR_MALLOC_FAIL;
     }
     int32_t ret = AudioAdapterCreateCapturePre(hwCapture, desc, attrs, hwAdapter);
-    if (ret != 0) {
+    if (ret != AUDIO_SUCCESS) {
+        AUDIO_FUNC_LOGE("call AudioAdapterCreateCapturePre failed %{public}d", ret);
         AudioMemFree((void **)&hwCapture);
         return AUDIO_ERR_INTERNAL;
     }

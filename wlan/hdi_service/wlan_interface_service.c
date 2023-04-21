@@ -67,6 +67,9 @@ struct IWlanInterface *WlanInterfaceImplGetInstance(void)
     service->interface.SetProjectionScreenParam = WlanInterfaceSetProjectionScreenParam;
     service->interface.WifiSendCmdIoctl = WlanInterfaceWifiSendCmdIoctl;
     service->interface.GetStaInfo = WlanInterfaceGetStaInfo;
+    service->interface.StartPnoScan = WlanInterfaceStartPnoScan;
+    service->interface.StopPnoScan = WlanInterfaceStopPnoScan;
+    service->interface.GetSignalPollInfo = WlanInterfaceGetSignalPollInfo;
     return &service->interface;
 }
 

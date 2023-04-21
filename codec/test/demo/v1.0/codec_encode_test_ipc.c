@@ -17,12 +17,10 @@
 #include <securec.h>
 #include <string.h>
 #include <sys/stat.h>
-#include "codec_callback_stub.h"
 #include "codec_type.h"
 #include "codec_utils.h"
 #include "codec_gralloc_wrapper.h"
 #include "hdf_log.h"
-#include "hdi_mpp.h"
 #include "icodec.h"
 #include "share_mem.h"
 
@@ -393,12 +391,6 @@ static int32_t SetupEncParams()
     int32_t paramCount = 0;
 
     paramCount = SetupBasicEncParams(params);
-    
-    param = &params[paramCount++];
-    param->key = (ParamKey)KEY_EXT_SETUP_DROP_MODE_RK;
-    int32_t dropMode = MPP_ENC_RC_DROP_FRM_DISABLED;
-    param->val = &dropMode;
-    param->size = sizeof(dropMode);
 
     param = &params[paramCount++];
     param->key = KEY_VIDEO_RC_MODE;

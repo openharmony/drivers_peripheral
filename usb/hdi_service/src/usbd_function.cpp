@@ -87,15 +87,15 @@ int32_t UsbdFunction::SendCmdToService(const char *name, int32_t cmd, unsigned c
 
 int32_t UsbdFunction::InitMtp()
 {
-    auto serviceImpl = UsbfnMtpImpl::Get(true);
-    if (serviceImpl == nullptr) {
-        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
-        return HDF_FAILURE;
-    }
     int32_t ret = UsbdRegisterDevice(MTP_PTP_SERVICE_NAME);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: register mtp device failed: %{public}d", __func__, ret);
         return ret;
+    }
+    auto serviceImpl = UsbfnMtpImpl::Get(true);
+    if (serviceImpl == nullptr) {
+        HDF_LOGE("%{public}s: failed to get of implement service", __func__);
+        return HDF_FAILURE;
     }
     ret = serviceImpl->Init();
     if (ret != HDF_SUCCESS) {

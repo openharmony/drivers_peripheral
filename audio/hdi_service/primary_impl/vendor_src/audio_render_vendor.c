@@ -25,9 +25,11 @@
 #define HDF_LOG_TAG    HDF_AUDIO_PRIMARY_IMPL
 
 struct AudioRenderInfo {
+    struct IAudioRender render;
     struct AudioDeviceDescriptor desc;
     enum AudioCategory streamType;
-    struct IAudioRender *render;
+    unsigned int sampleRate;
+    unsigned int channelCount;
     struct AudioHwiRender *hwiRender;
     uint32_t renderId;
 };
@@ -46,28 +48,6 @@ static struct AudioHwiRenderPriv *AudioHwiRenderGetPriv(void)
     return &g_audioHwiRenderPriv;
 }
 
-struct AudioHwiRender *AudioHwiGetHwiRender(const struct IAudioRender *render)
-{
-    if (render == NULL) {
-        AUDIO_FUNC_LOGE("audio render desc null");
-        return NULL;
-    }
-
-    struct AudioHwiRenderPriv *priv = AudioHwiRenderGetPriv();
-    for (uint32_t i = 0; i < AUDIO_HW_STREAM_NUM_MAX; i++) {
-        if (priv->renderInfos[i] == NULL) {
-            continue;
-        }
-        for (uint32_t j = 0; j < AUDIO_HW_STREAM_NUM_MAX; j++) {
-            if (render == priv->renderInfos[i][j].render) {
-                return priv->renderInfos[i][j].hwiRender;
-            }
-        }
-    }
-
-    AUDIO_FUNC_LOGE("audio get render fail");
-    return NULL;
-}
 
 struct AudioHwiRender *AudioHwiGetHwiRenderById(uint32_t renderId)
 {
@@ -85,7 +65,8 @@ int32_t AudioHwiGetLatency(struct IAudioRender *render, uint32_t *ms)
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(ms, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->GetLatency, HDF_ERR_INVALID_PARAM);
 
@@ -104,7 +85,8 @@ int32_t AudioHwiRenderFrame(struct IAudioRender *render, const int8_t *frame, ui
     CHECK_NULL_PTR_RETURN_VALUE(frame, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(replyBytes, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->RenderFrame, HDF_ERR_INVALID_PARAM);
 
@@ -123,7 +105,8 @@ int32_t AudioHwiGetRenderPosition(struct IAudioRender *render, uint64_t *frames,
     CHECK_NULL_PTR_RETURN_VALUE(frames, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(time, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->GetRenderPosition, HDF_ERR_INVALID_PARAM);
 
@@ -140,7 +123,8 @@ int32_t AudioHwiSetRenderSpeed(struct IAudioRender *render, float speed)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->SetRenderSpeed, HDF_ERR_INVALID_PARAM);
 
@@ -158,7 +142,8 @@ int32_t AudioHwiGetRenderSpeed(struct IAudioRender *render, float *speed)
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(speed, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->GetRenderSpeed, HDF_ERR_INVALID_PARAM);
 
@@ -175,7 +160,8 @@ int32_t AudioHwiRenderSetChannelMode(struct IAudioRender *render, enum AudioChan
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->SetChannelMode, HDF_ERR_INVALID_PARAM);
 
@@ -193,7 +179,8 @@ int32_t AudioHwiRenderGetChannelMode(struct IAudioRender *render, enum AudioChan
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(mode, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->GetChannelMode, HDF_ERR_INVALID_PARAM);
 
@@ -233,7 +220,8 @@ int32_t AudioHwiRenderRegCallback(struct IAudioRender *render, struct IAudioCall
         return HDF_SUCCESS;
     }
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->RegCallback, HDF_ERR_INVALID_PARAM);
 
@@ -254,7 +242,8 @@ int32_t AudioHwiRenderDrainBuffer(struct IAudioRender *render, enum AudioDrainNo
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(type, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->DrainBuffer, HDF_ERR_INVALID_PARAM);
 
@@ -272,7 +261,8 @@ int32_t AudioHwiRenderIsSupportsDrain(struct IAudioRender *render, bool *support
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(support, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->IsSupportsDrain, HDF_ERR_INVALID_PARAM);
 
@@ -292,7 +282,8 @@ int32_t AudioHwiRenderCheckSceneCapability(struct IAudioRender *render, const st
     CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supported, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->scene.CheckSceneCapability, HDF_ERR_INVALID_PARAM);
 
@@ -319,7 +310,8 @@ int32_t AudioHwiRenderSelectScene(struct IAudioRender *render, const struct Audi
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(scene, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->scene.SelectScene, HDF_ERR_INVALID_PARAM);
 
@@ -345,7 +337,8 @@ int32_t AudioHwiRenderSetMute(struct IAudioRender *render, bool mute)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->volume.SetMute, HDF_ERR_INVALID_PARAM);
 
@@ -363,7 +356,8 @@ int32_t AudioHwiRenderGetMute(struct IAudioRender *render, bool *mute)
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(mute, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->volume.GetMute, HDF_ERR_INVALID_PARAM);
 
@@ -380,7 +374,8 @@ int32_t AudioHwiRenderSetVolume(struct IAudioRender *render, float volume)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->volume.SetVolume, HDF_ERR_INVALID_PARAM);
 
@@ -398,7 +393,8 @@ int32_t AudioHwiRenderGetVolume(struct IAudioRender *render, float *volume)
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(volume, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->volume.GetVolume, HDF_ERR_INVALID_PARAM);
 
@@ -417,7 +413,8 @@ int32_t AudioHwiRenderGetGainThreshold(struct IAudioRender *render, float *min, 
     CHECK_NULL_PTR_RETURN_VALUE(min, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(max, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->volume.GetGainThreshold, HDF_ERR_INVALID_PARAM);
 
@@ -435,7 +432,8 @@ int32_t AudioHwiRenderGetGain(struct IAudioRender *render, float *gain)
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(gain, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->volume.GetGain, HDF_ERR_INVALID_PARAM);
 
@@ -452,7 +450,8 @@ int32_t AudioHwiRenderSetGain(struct IAudioRender *render, float gain)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->volume.SetGain, HDF_ERR_INVALID_PARAM);
 
@@ -470,7 +469,8 @@ int32_t AudioHwiRenderGetFrameSize(struct IAudioRender *render, uint64_t *size)
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(size, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.GetFrameSize, HDF_ERR_INVALID_PARAM);
 
@@ -488,7 +488,8 @@ int32_t AudioHwiRenderGetFrameCount(struct IAudioRender *render, uint64_t *count
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(count, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.GetFrameCount, HDF_ERR_INVALID_PARAM);
 
@@ -506,7 +507,8 @@ int32_t AudioHwiRenderSetSampleAttributes(struct IAudioRender *render, const str
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.SetSampleAttributes, HDF_ERR_INVALID_PARAM);
 
@@ -532,7 +534,8 @@ int32_t AudioHwiRenderGetSampleAttributes(struct IAudioRender *render, struct Au
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(attrs, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.GetSampleAttributes, HDF_ERR_INVALID_PARAM);
 
@@ -558,7 +561,8 @@ int32_t AudioHwiRenderGetCurrentChannelId(struct IAudioRender *render, uint32_t 
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(channelId, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.GetCurrentChannelId, HDF_ERR_INVALID_PARAM);
 
@@ -576,7 +580,8 @@ int32_t AudioHwiRenderSetExtraParams(struct IAudioRender *render, const char *ke
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(keyValueList, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.SetExtraParams, HDF_ERR_INVALID_PARAM);
 
@@ -594,7 +599,8 @@ int32_t AudioHwiRenderGetExtraParams(struct IAudioRender *render, char *keyValue
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(keyValueList, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.GetExtraParams, HDF_ERR_INVALID_PARAM);
 
@@ -610,7 +616,31 @@ int32_t AudioHwiRenderGetExtraParams(struct IAudioRender *render, char *keyValue
 int32_t AudioHwiRenderReqMmapBuffer(struct IAudioRender *render, int32_t reqSize,
     struct AudioMmapBufferDescriptor *desc)
 {
-    return HDF_ERR_NOT_SUPPORT;
+    CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
+
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
+    CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.ReqMmapBuffer, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiMmapBufferDescriptor hwiDesc = {0};
+    int32_t ret = hwiRender->attr.ReqMmapBuffer(hwiRender, reqSize, &hwiDesc);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio render ReqMmapBuffer fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    desc->memoryAddress = NULL;
+    desc->memoryFd = hwiDesc.memoryFd;
+    desc->totalBufferFrames = hwiDesc.totalBufferFrames;
+    desc->transferFrameSize = hwiDesc.transferFrameSize;
+    desc->isShareable = hwiDesc.isShareable;
+    desc->offset = hwiDesc.offset;
+    desc->filePath = strdup("");
+
+    AUDIO_FUNC_LOGI("%{public}s success", __func__);
+    return HDF_SUCCESS;
 }
 
 int32_t AudioHwiRenderGetMmapPosition(struct IAudioRender *render, uint64_t *frames, struct AudioTimeStamp *time)
@@ -623,7 +653,8 @@ int32_t AudioHwiRenderGetMmapPosition(struct IAudioRender *render, uint64_t *fra
     hwiTime.tvSec = 0;
     hwiTime.tvNSec = 0;
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.GetMmapPosition, HDF_ERR_INVALID_PARAM);
 
@@ -643,7 +674,8 @@ int32_t AudioHwiRenderAddAudioEffect(struct IAudioRender *render, uint64_t effec
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.AddAudioEffect, HDF_ERR_INVALID_PARAM);
 
@@ -660,7 +692,8 @@ int32_t AudioHwiRenderRemoveAudioEffect(struct IAudioRender *render, uint64_t ef
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.RemoveAudioEffect, HDF_ERR_INVALID_PARAM);
 
@@ -678,7 +711,8 @@ int32_t AudioHwiRenderGetFrameBufferSize(struct IAudioRender *render, uint64_t *
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(bufferSize, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->attr.GetFrameBufferSize, HDF_ERR_INVALID_PARAM);
 
@@ -695,7 +729,8 @@ int32_t AudioHwiRenderStart(struct IAudioRender *render)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->control.Start, HDF_ERR_INVALID_PARAM);
 
@@ -712,7 +747,8 @@ int32_t AudioHwiRenderStop(struct IAudioRender *render)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->control.Stop, HDF_ERR_INVALID_PARAM);
 
@@ -729,7 +765,8 @@ int32_t AudioHwiRenderPause(struct IAudioRender *render)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->control.Pause, HDF_ERR_INVALID_PARAM);
 
@@ -746,7 +783,8 @@ int32_t AudioHwiRenderResume(struct IAudioRender *render)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->control.Resume, HDF_ERR_INVALID_PARAM);
 
@@ -763,7 +801,8 @@ int32_t AudioHwiRenderFlush(struct IAudioRender *render)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->control.Flush, HDF_ERR_INVALID_PARAM);
 
@@ -780,7 +819,8 @@ int32_t AudioHwiRenderTurnStandbyMode(struct IAudioRender *render)
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->control.TurnStandbyMode, HDF_ERR_INVALID_PARAM);
 
@@ -797,7 +837,8 @@ int32_t AudioHwiRenderAudioDevDump(struct IAudioRender *render, int32_t range, i
 {
     CHECK_NULL_PTR_RETURN_VALUE(render, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->control.AudioDevDump, HDF_ERR_INVALID_PARAM);
 
@@ -816,7 +857,8 @@ int32_t AudioHwiRenderIsSupportsPauseAndResume(struct IAudioRender *render, bool
     CHECK_NULL_PTR_RETURN_VALUE(supportPause, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(supportResume, HDF_ERR_INVALID_PARAM);
 
-    struct AudioHwiRender *hwiRender = AudioHwiGetHwiRender(render);
+    struct AudioRenderInfo *renderInfo = (struct AudioRenderInfo *)render;
+    struct AudioHwiRender *hwiRender = renderInfo->hwiRender;
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender, HDF_ERR_INVALID_PARAM);
     CHECK_NULL_PTR_RETURN_VALUE(hwiRender->control.IsSupportsPauseAndResume, HDF_ERR_INVALID_PARAM);
 
@@ -885,7 +927,8 @@ static void AudioHwiInitRenderInstance(struct IAudioRender *render)
     render->GetVersion = AudioHwiRenderGetVersion;
 }
 
-struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, enum AudioCategory streamType, uint32_t *rendrId)
+struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
+    uint32_t *rendrId)
 {
     uint32_t index = 0;
     struct AudioHwiRenderPriv *renderPriv = AudioHwiRenderGetPriv();
@@ -902,9 +945,11 @@ struct IAudioRender *FindRenderCreated(enum AudioPortPin pin, enum AudioCategory
     for (index = 0; index < AUDIO_HW_STREAM_NUM_MAX; index++) {
         if ((renderPriv->renderInfos[index] != NULL) &&
             (renderPriv->renderInfos[index]->desc.pins == pin) &&
-            (renderPriv->renderInfos[index]->streamType == streamType)) {
+            (renderPriv->renderInfos[index]->streamType == attrs->type) &&
+            (renderPriv->renderInfos[index]->sampleRate == attrs->sampleRate) &&
+            (renderPriv->renderInfos[index]->channelCount == attrs->channelCount)) {
             *rendrId = renderPriv->renderInfos[index]->renderId;
-            return renderPriv->renderInfos[index]->render;
+            return &renderPriv->renderInfos[index]->render;
         }
     }
 
@@ -935,11 +980,11 @@ static uint32_t GetAvailableRenderId(struct AudioHwiRenderPriv *renderPriv)
     return renderId;
 }
 
-struct IAudioRender *AudioHwiCreateRenderById(enum AudioCategory streamType, uint32_t *renderId,
+struct IAudioRender *AudioHwiCreateRenderById(const struct AudioSampleAttributes *attrs, uint32_t *renderId,
     struct AudioHwiRender *hwiRender, const struct AudioDeviceDescriptor *desc)
 {
     struct IAudioRender *render = NULL;
-    if (renderId == NULL || hwiRender == NULL || desc == NULL) {
+    if (attrs == NULL || renderId == NULL || hwiRender == NULL || desc == NULL) {
         AUDIO_FUNC_LOGE("audio render is null");
         return NULL;
     }
@@ -959,18 +1004,15 @@ struct IAudioRender *AudioHwiCreateRenderById(enum AudioCategory streamType, uin
         return NULL;
     }
 
-    render = (struct IAudioRender *)OsalMemCalloc(sizeof(struct IAudioRender));
-    if (render == NULL) {
-        AUDIO_FUNC_LOGE("audio hwiRender render malloc fail");
-        return NULL;
-    }
-    priv->renderInfos[*renderId]->render = render;
     priv->renderInfos[*renderId]->hwiRender = hwiRender;
-    priv->renderInfos[*renderId]->streamType = streamType;
+    priv->renderInfos[*renderId]->streamType = attrs->type;
+    priv->renderInfos[*renderId]->sampleRate = attrs->sampleRate;
+    priv->renderInfos[*renderId]->channelCount = attrs->channelCount;
     priv->renderInfos[*renderId]->desc.portId = desc->portId;
     priv->renderInfos[*renderId]->desc.pins = desc->pins;
     priv->renderInfos[*renderId]->desc.desc = strdup(desc->desc);
     priv->renderInfos[*renderId]->renderId = *renderId;
+    render = &(priv->renderInfos[*renderId]->render);
     AudioHwiInitRenderInstance(render);
 
     AUDIO_FUNC_LOGI("audio create adapter success");
@@ -989,9 +1031,7 @@ void AudioHwiDestroyRenderById(uint32_t renderId)
         return;
     }
 
-    OsalMemFree((void *)priv->renderInfos[renderId]->render);
     OsalMemFree((void *)priv->renderInfos[renderId]->desc.desc);
-    priv->renderInfos[renderId]->render = NULL;
     priv->renderInfos[renderId]->hwiRender = NULL;
     priv->renderInfos[renderId]->desc.desc = NULL;
     priv->renderInfos[renderId]->desc.portId = UINT_MAX;

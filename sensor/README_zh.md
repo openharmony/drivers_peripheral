@@ -116,6 +116,7 @@ Sensor驱动HAL模块提供给Sensor服务可直接调用的能力接口，主�
 
 ```
 #include "sensor_if.h"
+#include "sensor_type.h"
 
 /* 创建回调函数 */
 void SensorDataCallback(struct SensorEvents *event)
@@ -135,7 +136,7 @@ void SensorSample(void)
     int32_t sensorInterval = 200000000; /* 数据采样率设置200毫秒，单位纳秒 */
 
     /* 1.创建传感器接口实例 */
-    struct SensorInterface *sensorDev = NewSensorInterfaceInstance();
+    const struct SensorInterface *sensorDev = NewSensorInterfaceInstance();
     if (sensorDev == NULL) {
         return;
     }
@@ -145,27 +146,27 @@ void SensorSample(void)
         return;
     }
     /* 3.获取设备支持的Sensor列表 */
-    ret = GetAllSensors(&sensorInfo, &count);
+    ret = sensorDev->GetAllSensors(&sensorInfo, &count);
     if (ret != 0) {
         return;
     }
     /* 4.设置传感器采样率 */
-    ret = SetBatch(SENSOR_TYPE_ACCELEROMETER, sensorInterval, 0);
+    ret = sensorDev->SetBatch(SENSOR_TYPE_ACCELEROMETER, sensorInterval, 0);
     if (ret != 0) {
         return;
     }
     /* 5.使能传感器 */
-    ret = Enable(SENSOR_TYPE_ACCELEROMETER);
+    ret = sensorDev->Enable(SENSOR_TYPE_ACCELEROMETER);
     if (ret != 0) {
         return;
     }
     /* 6.去使能传感器 */
-    ret = Disable(SENSOR_TYPE_ACCELEROMETER);
+    ret = sensorDev->Disable(SENSOR_TYPE_ACCELEROMETER);
     if (ret != 0) {
         return;
     }
     /* 7.取消传感器数据订阅函数 */
-    ret = Unregister(0);
+    ret = sensorDev->Unregister(0);
     if (ret != 0) {
         return;
     }
