@@ -15,6 +15,7 @@
 #include "command_adapter_parse.h"
 #include <getopt.h>
 
+
 namespace {
     enum class MyOptIndex {
         OPT_INDEX_UNKONWN = 0,
@@ -62,10 +63,10 @@ bool CommandAdapterParse::Parse(int argc, char *argv[], CommandOpt &opt)
                 opt.fileOutput = optarg;
                 break;
             case MyOptIndex::OPT_INDEX_WIDTH:
-                opt.width = atoi(optarg);
+                opt.width = std::stoi(optarg);
                 break;
             case MyOptIndex::OPT_INDEX_HEIGHT:
-                opt.height = atoi(optarg);
+                opt.height = std::stoi(optarg);
                 break;
             default:
                 ShowUsage();

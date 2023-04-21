@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Shenzhen Kaihong DID Co., Ltd..
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd..
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,7 +59,7 @@ int32_t CodecHandleBuffer::FillOmxBuffer(struct OmxCodecBuffer &codecBuffer, OMX
     if (fenceFd >= 0) {
         auto ret = SyncWait(fenceFd, TIME_WAIT_MS);
         if (ret != EOK) {
-            CODEC_LOGW("SyncWait ret err");
+            HDF_LOGE("%{public}s : SyncWait ret err [%{public}d]", __func__, ret);
         }
         close(codecBuffer.fenceFd);
         codecBuffer.fenceFd = -1;

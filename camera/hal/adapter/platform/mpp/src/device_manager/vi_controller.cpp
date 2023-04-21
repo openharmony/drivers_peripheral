@@ -211,24 +211,19 @@ RetCode ViController::GetAEMetaData(std::shared_ptr<CameraMetadata> meta)
     RetCode rc = RC_ERROR;
     std::lock_guard<std::mutex> metaDataLock(metaDataSetlock_);
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
-        switch (*iter) {
-            case OHOS_SENSOR_EXPOSURE_TIME: {
-                rc = viObject_->QuerySetting(OHOS_SENSOR_EXPOSURE_TIME, (char*)&expoTime);
-                if (rc == RC_ERROR) {
-                    CAMERA_LOGE("%{public}s CMD_AE_EXPOTIME QuerySetting fail", __FUNCTION__);
-                    return rc;
-                }
-                if (oldExpoTime != expoTime) {
-                    std::lock_guard<std::mutex> flagLock(metaDataFlaglock_);
-                    metaDataFlag_ = true;
-                    oldExpoTime = expoTime;
-                }
-                meta->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
-                CAMERA_LOGD("%{public}s Get CMD_AE_EXPOTIME [%{public}" PRId64 "]", __FUNCTION__, expoTime);
-                break;
+        if (*iter == OHOS_SENSOR_EXPOSURE_TIME) {
+            rc = viObject_->QuerySetting(OHOS_SENSOR_EXPOSURE_TIME, (char*)&expoTime);
+            if (rc == RC_ERROR) {
+                CAMERA_LOGE("%{public}s CMD_AE_EXPOTIME QuerySetting fail", __FUNCTION__);
+                return rc;
             }
-            default:
-                break;
+            if (oldExpoTime != expoTime) {
+                std::lock_guard<std::mutex> flagLock(metaDataFlaglock_);
+                metaDataFlag_ = true;
+                oldExpoTime = expoTime;
+            }
+            meta->addEntry(OHOS_SENSOR_EXPOSURE_TIME, &expoTime, 1);
+            CAMERA_LOGD("%{public}s Get CMD_AE_EXPOTIME [%{public}" PRId64 "]", __FUNCTION__, expoTime);
         }
     }
     return rc;
@@ -239,17 +234,12 @@ RetCode ViController::GetAWBMetaData(std::shared_ptr<CameraMetadata> meta)
     RetCode rc = RC_ERROR;
     std::lock_guard<std::mutex> l(metaDataSetlock_);
     for (auto iter = abilityMetaData_.cbegin(); iter != abilityMetaData_.cend(); iter++) {
-        switch (*iter) {
-            case OHOS_SENSOR_COLOR_CORRECTION_GAINS: {
-                rc = GetColorCorrectionGains(meta);
-                if (rc != RC_OK) {
-                    CAMERA_LOGE("%{public}s get sensor color correction gains fail", __FUNCTION__);
-                    return rc;
-                }
-                break;
+        if (*iter == OHOS_SENSOR_COLOR_CORRECTION_GAINS) {
+            rc = GetColorCorrectionGains(meta);
+            if (rc != RC_OK) {
+                CAMERA_LOGE("%{public}s get sensor color correction gains fail", __FUNCTION__);
+                return rc;
             }
-            default:
-                break;
         }
     }
     return rc;

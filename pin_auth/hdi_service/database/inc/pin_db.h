@@ -23,13 +23,12 @@
 extern "C" {
 #endif // __cplusplus
 
-#define MAX_USER_NAME_LEN 32
 #define INVALID_TEMPLATE_ID 0xFFFFFFFFFFFFFFFF
 #define PIN_DB_TWO_PARAMS 2
 #define MAX_RANDOM_TIME 10
 #define DEFAULT_FILE_HEAD "/data/service/el1/public/pinauth/"
 #define MAX_UINT_LEN 21
-#define MAX_CRYPTO_INFO_SIZE 100
+#define MAX_CRYPTO_INFO_SIZE 33
 #define CURRENT_VERSION 0
 #define PIN_INDEX_NAME "/data/service/el1/public/pinauth/PinIndexDb"
 #define MAX_FILE_NAME_LEN 256
@@ -73,7 +72,7 @@ typedef struct {
 } __attribute__((__packed__)) PinInfo;
 
 typedef struct {
-    uint32_t authErrorConut;
+    uint32_t authErrorCount;
     uint64_t startFreezeTime;
 } __attribute__((__packed__)) AntiBruteInfo;
 
@@ -105,9 +104,9 @@ ResultCode DelPinById(uint64_t templateId);
 ResultCode AuthPinById(const uint8_t *inputData, const uint32_t inputDataLen, uint64_t templateId,
     Buffer *outRootSecret, ResultCode *compareRet);
 ResultCode ComputeFreezeTime(uint64_t templateId, uint32_t *freezeTime, uint32_t count, uint64_t startFreezeTime);
-ResultCode GetRemainTimes(uint64_t templateId, uint32_t *remainingAuthTimes, uint32_t authErrorConut);
+ResultCode GetRemainTimes(uint64_t templateId, uint32_t *remainingAuthTimes, uint32_t authErrorCount);
 ResultCode GetSubType(uint64_t templateId, uint64_t *subType);
-ResultCode GetAntiBruteInfo(uint64_t templateId, uint32_t *authErrorConut, uint64_t *startFreezeTime);
+ResultCode GetAntiBruteInfo(uint64_t templateId, uint32_t *authErrorCount, uint64_t *startFreezeTime);
 ResultCode RefreshAntiBruteInfoToFile(uint64_t templateId);
 ResultCode VerifyTemplateDataPin(const uint64_t *templateIdList, uint32_t templateIdListLen);
 

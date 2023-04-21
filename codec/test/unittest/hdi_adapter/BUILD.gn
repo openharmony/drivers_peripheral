@@ -13,24 +13,16 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_unittest("codec_hdi_adapter_test") {
   module_out_path = "hdf/codec"
-  include_dirs = [
-    "//drivers/peripheral/codec/interfaces/include",
-    "//third_party/openmax/api/1.1.2",
-  ]
+  include_dirs = [ "//third_party/openmax/api/1.1.2" ]
   sources = [ "codec_hdi_adapter_test.cpp" ]
-
-  deps = [
-    "//drivers/peripheral/codec/hal/passthrough:codec_hdi_passthrough",
-    "//third_party/googletest:gtest_main",
-  ]
 
   if (is_standard_system) {
     external_deps = [
       "c_utils:utils",
+      "drivers_peripheral_codec:libcodec_hdi_passthrough_impl",
       "hdf_core:libhdf_ipc_adapter",
       "hdf_core:libhdf_utils",
       "hdf_core:libhdi",

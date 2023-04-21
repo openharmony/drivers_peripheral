@@ -19,10 +19,11 @@
 #include "i_audio_capture.h"
 #include "v1_0/iaudio_capture.h"
 
-struct IAudioCapture *AudioHwiCreateCaptureById(enum AudioCategory streamType, uint32_t *captureId,
+struct IAudioCapture *AudioHwiCreateCaptureById(const struct AudioSampleAttributes *attrs, uint32_t *captureId,
     struct AudioHwiCapture *hwiCapture, const struct AudioDeviceDescriptor *desc);
 void AudioHwiDestroyCaptureById(uint32_t captureId);
 struct AudioHwiCapture *AudioHwiGetHwiCaptureById(uint32_t captureId);
-struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, enum AudioCategory streamType, uint32_t *captureId);
+struct IAudioCapture *FindCaptureCreated(enum AudioPortPin pin, const struct AudioSampleAttributes *attrs,
+    uint32_t *captureId);
 
 #endif // AUDIO_CAPTURE_VENDOR_H

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Shenzhen Kaihong DID Co., Ltd..
+ * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd..
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,7 @@
 #include "codec_omx_ext.h"
 #include "v1_0/codec_types.h"
 using OHOS::HDI::Codec::V1_0::OmxCodecBuffer;
-constexpr uint32_t TIME_WAIT_MS = 5;
+constexpr uint32_t TIME_WAIT_MS = 10;
 namespace OHOS {
 namespace Codec {
 namespace Omx {

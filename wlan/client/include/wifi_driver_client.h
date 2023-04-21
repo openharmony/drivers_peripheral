@@ -17,6 +17,7 @@
 #define WIFI_DRIVER_CLIENT_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -45,6 +46,7 @@ extern "C" {
 #define WIFI_POWER_MODE_NUM 3
 
 #define MAX_SCAN_RES_NUM 200
+#define MAX_SSID_LEN 32
 
 typedef enum {
     CMD_CLOSE_GO_CAC,
@@ -270,6 +272,49 @@ typedef struct {
     uint8_t txVhtNss;
 } __attribute__ ((aligned(8))) StationInfo;
 
+#define BSS_STATUS_ASSOCIATED 1
+typedef struct {
+    uint8_t associatedBssid[ETH_ADDR_LEN];
+    uint32_t associatedFreq;
+} AssociatedInfo;
+
+struct SignalResult {
+    int32_t currentRssi;
+    int32_t associatedFreq;
+    int32_t txBitrate;
+    int32_t rxBitrate;
+    int32_t currentNoise;
+    int32_t currentSnr;
+    int32_t currentChload;
+    int32_t currentUlDelay;
+    int32_t currentTxBytes;
+    int32_t currentRxBytes;
+    int32_t currentTxFailed;
+    int32_t currentTxPackets;
+    int32_t currentRxPackets;
+};
+
+typedef struct {
+    uint8_t ssid[MAX_SSID_LEN];
+    uint32_t ssidLen;
+} WifiDriverScanSsid;
+
+typedef struct {
+    bool isHidden;
+    int32_t *freqs;
+    uint32_t freqsLen;
+    WifiDriverScanSsid ssid;
+} WifiPnoNetwork;
+
+typedef struct {
+    int32_t min2gRssi;
+    int32_t min5gRssi;
+    int32_t scanIntervalMs;
+    int32_t scanIterations;
+    WifiPnoNetwork *pnoNetworks;
+    uint32_t pnoNetworksLen;
+} WifiPnoSettings;
+
 int32_t WifiDriverClientInit(void);
 void WifiDriverClientDeinit(void);
 
@@ -295,9 +340,11 @@ int32_t GetChannelMeasResult(const char *ifName, struct MeasResult *measResult);
 int32_t SetProjectionScreenParam(const char *ifName, const ProjectionScreenParam *param);
 int32_t SendCmdIoctl(const char *ifName, int32_t cmdId, const int8_t *paramBuf, uint32_t paramBufLen);
 int32_t GetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac, uint32_t macLen);
+int32_t WifiStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings);
+int32_t WifiStopPnoScan(const char *ifName);
+int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult);
 
 /* wpa related interface */
-#define MAX_SSID_LEN 32
 #define MAX_NR_CIPHER_SUITES 5
 #define MAX_NR_AKM_SUITES 2
 
@@ -400,11 +447,6 @@ typedef struct {
     uint8_t resv[2];
     WlanBands bands[IEEE80211_NUM_BANDS];
 } WifiHwFeatureData;
-
-typedef struct {
-    uint8_t ssid[MAX_SSID_LEN];
-    uint32_t ssidLen;
-} WifiDriverScanSsid;
 
 typedef struct {
     WifiDriverScanSsid *ssids;

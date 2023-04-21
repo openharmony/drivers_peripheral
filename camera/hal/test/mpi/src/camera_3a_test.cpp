@@ -53,7 +53,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0001, TestSize.Level0)
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     Test_->cameraDevice->UpdateSettings(meta);
     std::cout << "==========[test log]UpdateSettings, exposure for 10s." << std::endl;
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     Test_->GetCameraMetadata();
     // release stream
     Test_->captureIds = {Test_->captureId_preview};
@@ -367,7 +367,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0030, TestSize.Level2)
     meta->addEntry(OHOS_CONTROL_AE_EXPOSURE_COMPENSATION, &expo, 1);
     Test_->cameraDevice->UpdateSettings(meta);
     std::cout << "==========[test log]UpdateSettings, exposure for 3s." << std::endl;
-    sleep(3);
+    sleep(3); // sleep for 3 seconds
     // release stream
     Test_->captureIds = {Test_->captureId_preview};
     Test_->streamIds = {Test_->streamId_preview};
@@ -416,7 +416,7 @@ HWTEST_F(Camera3ATest, Camera_3a_0031, TestSize.Level1)
     meta->addEntry(OHOS_CONTROL_AWB_MODE, &awbMode, 1);
     Test_->cameraDevice->UpdateSettings(meta);
     std::cout << "==========[test log]UpdateSettings, exposure for 10s." << std::endl;
-    sleep(10);
+    sleep(3); // sleep for 3 seconds
     std::cout << "==========[test log]GetCameraMetadata ..." << std::endl;
     Test_->GetCameraMetadata();
     // release stream

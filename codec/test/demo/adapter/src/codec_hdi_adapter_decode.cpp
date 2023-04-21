@@ -22,7 +22,6 @@
 #include <unistd.h>
 #include <chrono>
 #include <sys/stat.h>
-#include "hdi_mpp.h"
 #include "codec_type.h"
 #include "codec_omx_ext.h"
 
@@ -213,17 +212,6 @@ int32_t CodecHdiAdapterDecode::ConfigMppPassthrough()
         return ret;
     }
 
-    memset_s(&param, sizeof(Param), 0, sizeof(Param));
-    param.key = (ParamKey)KEY_EXT_SPLIT_PARSE_RK;
-
-    needSplit_ = 0;
-    param.val = &needSplit_;
-    param.size = sizeof(uint32_t);
-    ret = client_->SetParameter(client_, OMX_IndexParamPassthrough, (int8_t *)&param, sizeof(param));
-    if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s errNo[%{public}d] key is KEY_EXT_SPLIT_PARSE_RK", __func__, ret);
-        return ret;
-    }
     return ret;
 }
 
@@ -550,18 +538,12 @@ void CodecHdiAdapterDecode::Run()
 
 int32_t CodecHdiAdapterDecode::OnEvent(struct CodecCallbackType *self, OMX_EVENTTYPE event, struct EventInfo *info)
 {
-    switch (event) {
-        case OMX_EventCmdComplete: {
-            OMX_COMMANDTYPE cmd = (OMX_COMMANDTYPE)info->data1;
-            if (OMX_CommandStateSet == cmd) {
-                HDF_LOGI("OMX_CommandStateSet reached, status is %{public}d", info->data2);
-                g_core->OnStatusChanged();
-            }
-            break;
+    if (event == OMX_EventCmdComplete) {
+        OMX_COMMANDTYPE cmd = (OMX_COMMANDTYPE)info->data1;
+        if (OMX_CommandStateSet == cmd) {
+            HDF_LOGI("OMX_CommandStateSet reached, status is %{public}d", info->data2);
+            g_core->OnStatusChanged();
         }
-
-        default:
-            break;
     }
 
     return HDF_SUCCESS;

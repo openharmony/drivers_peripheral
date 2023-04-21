@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include <OMX_Types.h>
 #include <map>
 #include <memory>
+#include <mutex>
 #include <nocopyable.h>
 #include <osal_mem.h>
 #include <vector>
@@ -81,6 +82,7 @@ private:
     std::map<OMX_BUFFERHEADERTYPE *, uint32_t> bufferHeaderMap_;  // Key is omx buffer header type
     uint32_t bufferIdCount_;
     std::shared_ptr<ComponentMgr> mgr_;
+    std::mutex mutex_;
 };
 }  // namespace Omx
 }  // namespace Codec

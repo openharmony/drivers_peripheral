@@ -75,7 +75,7 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1002, TestSize.Level0)
     EXPECT_EQ(Test_->rc, Camera::NO_ERROR);
     Test_->status = false;
     Test_->rc = Test_->service->SetFlashlight(Test_->cameraIds.front(), Test_->status);
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     if (Test_->onFlashlightStatusFlag) {
         std::cout << "==========[test log]OnFlashlightStatus" << std::endl;
     }
@@ -196,17 +196,6 @@ HWTEST_F(HdiCallbackTest, Camera_Hdi_1021, TestSize.Level0)
         std::cout << "==========[test log]OnCaptureEnded" << std::endl;
     }
     EXPECT_EQ(Test_->captureEndFlag, true);
-}
-
-/**
-  * @tc.name: OnCaptureError
-  * @tc.desc: IStreamOpereatorCallback, OnCaptureError
-  * @tc.size: MediumTest
-  * @tc.type: Function
-  */
-HWTEST_F(HdiCallbackTest, Camera_Hdi_1022, TestSize.Level0)
-{
-    std::cout << "==========[test log]IStreamOpereatorCallback, OnCaptureError" << std::endl;
 }
 
 /**

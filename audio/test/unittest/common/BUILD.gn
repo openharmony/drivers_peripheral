@@ -22,6 +22,7 @@ ohos_unittest("audio_ut_common_test") {
     "capture/audio_capture_common_test.cpp",
     "manager/audio_manager_common_test.cpp",
     "render/audio_render_common_test.cpp",
+    "render/audio_render_mmap_test.cpp",
   ]
 
   include_dirs = []

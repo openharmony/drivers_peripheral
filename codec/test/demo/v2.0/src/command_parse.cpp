@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,14 +71,14 @@ bool CommandParse::Parse(int argc, char *argv[], CommandOpt &opt)
                 opt.fileOutput = optarg;
                 break;
             case MyOptIndex::OPT_INDEX_WIDTH:
-                opt.width = atoi(optarg);
+                opt.width = std::stoi(optarg);
                 break;
             case MyOptIndex::OPT_INDEX_HEIGHT:
-                opt.height = atoi(optarg);
+                opt.height = std::stoi(optarg);
                 break;
             case MyOptIndex::OPT_INDEX_COLOR:
                 if (optarg) {
-                    opt.colorForamt = static_cast<ColorFormat>(atoi(optarg));
+                    opt.colorForamt = static_cast<ColorFormat>(std::stoi(optarg));
                 }
                 break;
             default:

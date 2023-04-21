@@ -116,7 +116,7 @@ HWTEST_F(CaptureTest, Camera_Capture_0003, TestSize.Level1)
     } else {
         std::cout << "==========[test log]check Capture: UpdateSettings fail, rc = " << Test_->rc << std::endl;
     }
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // Capture the photo stream, continuous capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     // post-processing
@@ -358,7 +358,7 @@ HWTEST_F(CaptureTest, Camera_Capture_0040, TestSize.Level2)
     } else {
         std::cout << "==========[test log]check Capture: UpdateSettings fail, rc = " << Test_->rc << std::endl;
     }
-    sleep(5);
+    sleep(3); // sleep for 3 seconds
     // Capture the photo stream, continuous capture
     Test_->StartCapture(Test_->streamId_capture, Test_->captureId_capture, false, true);
     // post-processing

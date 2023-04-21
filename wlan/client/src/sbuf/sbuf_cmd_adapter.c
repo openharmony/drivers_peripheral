@@ -28,6 +28,7 @@ extern "C" {
 #define DRIVER_SERVICE_NAME "hdfwifi"
 static struct HdfDevEventlistener g_wifiDevEventListener;
 static bool g_isHasRegisterListener = false;
+#define PNO_SCAN_INFO_MAXSIZE 1500
 
 static int32_t ParserNetworkInfo(struct HdfSBuf *reply, struct NetworkInfoResult *result)
 {
@@ -982,6 +983,142 @@ int32_t GetStationInfo(const char *ifName, StationInfo *info, const uint8_t *mac
     HdfSbufRecycle(reply);
     return ret;
 }
+
+static int32_t SerializeSettingsToSbuf(struct HdfSBuf *req, const WifiPnoSettings *pnoSettings)
+{
+    if (!HdfSbufWriteInt32(req, pnoSettings->min2gRssi)) {
+        HDF_LOGE("%{public}s: write min2gRssi fail!", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    if (!HdfSbufWriteInt32(req, pnoSettings->min5gRssi)) {
+        HDF_LOGE("%{public}s: write min5gRssi fail!", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    if (!HdfSbufWriteInt32(req, pnoSettings->scanIntervalMs)) {
+        HDF_LOGE("%{public}s: write scanIntervalMs fail!", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    if (!HdfSbufWriteInt32(req, pnoSettings->scanIterations)) {
+        HDF_LOGE("%{public}s: write scanIterations fail!", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    if (!HdfSbufWriteUint32(req, pnoSettings->pnoNetworksLen)) {
+        HDF_LOGE("%{public}s: write pnoNetworksLen fail!", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    for (uint32_t i = 0; i < pnoSettings->pnoNetworksLen; i++) {
+        if (!HdfSbufWriteUint8(req, pnoSettings->pnoNetworks[i].isHidden)) {
+            HDF_LOGE("%{public}s: write isHidden fail!", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
+        if (!HdfSbufWriteBuffer(req, pnoSettings->pnoNetworks[i].freqs,
+            sizeof(int32_t) * (pnoSettings->pnoNetworks[i].freqsLen))) {
+            HDF_LOGE("%{public}s: write freqs fail!", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
+        if (!HdfSbufWriteBuffer(req, pnoSettings->pnoNetworks[i].ssid.ssid,
+            pnoSettings->pnoNetworks[i].ssid.ssidLen)) {
+            HDF_LOGE("%{public}s: write ssid fail!", __FUNCTION__);
+            return RET_CODE_FAILURE;
+        }
+    }
+    return RET_CODE_SUCCESS;
+}
+
+int32_t WifiStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct HdfSBuf *req = NULL;
+
+    if (ifName == NULL || pnoSettings == NULL) {
+        HDF_LOGE("%s: Input param is null", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
+    req = HdfSbufObtain(PNO_SCAN_INFO_MAXSIZE);
+    if (req == NULL) {
+        HDF_LOGE("%s: HdfSbufObtainDefaultSize fail", __FUNCTION__);
+        return RET_CODE_FAILURE;
+    }
+    do {
+        if (!HdfSbufWriteString(req, ifName)) {
+            HDF_LOGE("%{public}s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        if (SerializeSettingsToSbuf(req, pnoSettings) != RET_CODE_SUCCESS) {
+            HDF_LOGE("%{public}s:SerilizeSettingsToSbuf fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_START_PNO_SCAN, req, NULL);
+        if (ret != RET_CODE_SUCCESS) {
+            HDF_LOGE("%{public}s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
+        }
+    } while (0);
+    HdfSbufRecycle(req);
+    return ret;
+}
+
+int32_t WifiStopPnoScan(const char *ifName)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct HdfSBuf *req = NULL;
+
+    req = HdfSbufObtainDefaultSize();
+    if (req == NULL) {
+        HDF_LOGE("%{public}s: HdfSbufObtainDefaultSize fail!", __FUNCTION__);
+        return ret;
+    }
+
+    do {
+        if (!HdfSbufWriteString(req, ifName)) {
+            HDF_LOGE("%{public}s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_STOP_PNO_SCAN, req, NULL);
+        if (ret != RET_CODE_SUCCESS) {
+            HDF_LOGE("%{public}s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
+        }
+    } while (0);
+
+    HdfSbufRecycle(req);
+    return ret;
+}
+
+int32_t WifiGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
+{
+    int32_t ret = RET_CODE_FAILURE;
+    struct HdfSBuf *data = NULL;
+    struct HdfSBuf *reply = NULL;
+    const uint8_t *replayData = NULL;
+    uint32_t size;
+
+    if (HdfSbufObtainDefault(&data, &reply) != RET_CODE_SUCCESS) {
+        return RET_CODE_FAILURE;
+    }
+    do {
+        if (!HdfSbufWriteString(data, ifName)) {
+            HDF_LOGE("%{public}s: write ifName fail!", __FUNCTION__);
+            break;
+        }
+        ret = SendCmdSync(WIFI_HAL_CMD_GET_SIGNAL_INFO, data, reply);
+        if (ret != RET_CODE_SUCCESS) {
+            HDF_LOGE("%{public}s: SendCmdSync fail, ret = %{public}d!", __FUNCTION__, ret);
+            break;
+        }
+        if (!HdfSbufReadBuffer(reply, (const void **)(&replayData), &size)) {
+            HDF_LOGE("%{public}s: read signal information fail!", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+            break;
+        }
+        if (memcpy_s(signalResult, sizeof(struct SignalResult), replayData, size) != EOK) {
+            HDF_LOGE("%{public}s: memcpy_s fail", __FUNCTION__);
+            ret = RET_CODE_FAILURE;
+        }
+    } while (0);
+    HdfSbufRecycle(data);
+    HdfSbufRecycle(reply);
+    return ret;
+}
+
 #ifdef __cplusplus
 #if __cplusplus
 }

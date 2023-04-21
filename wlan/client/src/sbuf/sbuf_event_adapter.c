@@ -19,6 +19,7 @@
 #include "hdf_log.h"
 #include "securec.h"
 #include "wifi_driver_client.h"
+#include <osal_mem.h>
 
 #ifdef __cplusplus
 #if __cplusplus
@@ -104,9 +105,58 @@ static void WifiEventScanDoneProcess(const char *ifName, uint32_t event, struct 
     }
     if (g_scanResults.num != 0) {
         WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &g_scanResults);
+        FreeScanResults(&g_scanResults);
         (void)memset_s(&g_scanResults, sizeof(WifiScanResults), 0, sizeof(WifiScanResults));
     }
     WifiEventReport(ifName, event, &status);
+}
+
+static int32_t FillScanResult(WifiScanResult *dst, WifiScanResult *src)
+{
+    int32_t ret = RET_CODE_FAILURE;
+
+    if (dst == NULL || src == NULL || src->bssid == NULL || src->ie == NULL || src->beaconIe == NULL ||
+        src->ieLen == 0 || src->beaconIeLen == 0) {
+        HDF_LOGE("%s: Invalid parameters", __FUNCTION__);
+        return RET_CODE_INVALID_PARAM;
+    }
+    if (memcpy_s(dst, sizeof(WifiScanResult), src, sizeof(WifiScanResult)) != EOK) {
+        return RET_CODE_FAILURE;
+    }
+    do {
+        dst->bssid = OsalMemCalloc(ETH_ADDR_LEN);
+        if (dst->bssid == NULL) {
+            HDF_LOGE("%s: OsalMemCalloc bssid fail", __FUNCTION__);
+            break;
+        }
+        if (memcpy_s(dst->bssid, ETH_ADDR_LEN, src->bssid, ETH_ADDR_LEN) != EOK) {
+            HDF_LOGE("%s: memcpy_s bssid fail", __FUNCTION__);
+            break;
+        }
+        dst->ie = OsalMemCalloc(src->ieLen);
+        if (dst->ie == NULL) {
+            HDF_LOGE("%s: OsalMemCalloc ie fail", __FUNCTION__);
+            break;
+        }
+        if (memcpy_s(dst->ie, src->ieLen, src->ie, src->ieLen) != EOK) {
+            HDF_LOGE("%s: memcpy_s ie fail", __FUNCTION__);
+            break;
+        }
+        dst->beaconIe = OsalMemCalloc(src->beaconIeLen);
+        if (dst->beaconIe == NULL) {
+            HDF_LOGE("%s: OsalMemCalloc beaconIe fail", __FUNCTION__);
+            break;
+        }
+        if (memcpy_s(dst->beaconIe, src->beaconIeLen, src->beaconIe, src->beaconIeLen) != EOK) {
+            HDF_LOGE("%s: memcpy_s beaconIe fail", __FUNCTION__);
+            break;
+        }
+        ret = RET_CODE_SUCCESS;
+    } while (0);
+    if (ret != RET_CODE_SUCCESS) {
+        FreeScanResult(dst);
+    }
+    return ret;
 }
 
 static void WifiEventScanResultProcess(const char *ifName, uint32_t event, struct HdfSBuf *reqData)
@@ -147,14 +197,14 @@ static void WifiEventScanResultProcess(const char *ifName, uint32_t event, struc
         return;
     }
     WifiEventReport(ifName, event, &scanResult);
-    if (memcpy_s(&g_scanResults.scanResult[g_scanResults.num], sizeof(WifiScanResult), &scanResult,
-        sizeof(WifiScanResult)) != EOK) {
-        HDF_LOGE("%s: memcpy_s fail", __FUNCTION__);
+    if (FillScanResult(&g_scanResults.scanResult[g_scanResults.num], &scanResult) != EOK) {
+        HDF_LOGE("%s: fail to fill scan result", __FUNCTION__);
         return;
     }
     g_scanResults.num++;
     if (g_scanResults.num == MAX_SCAN_RES_NUM) {
         WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &g_scanResults);
+        FreeScanResults(&g_scanResults);
         (void)memset_s(&g_scanResults, sizeof(WifiScanResults), 0, sizeof(WifiScanResults));
     }
 }

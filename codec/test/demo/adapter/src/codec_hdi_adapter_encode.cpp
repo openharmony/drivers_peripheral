@@ -548,20 +548,13 @@ void CodecHdiAdapterEncode::FreeBufferHandle()
 
 int32_t CodecHdiAdapterEncode::OnEvent(struct CodecCallbackType *self, OMX_EVENTTYPE event, struct EventInfo *info)
 {
-    switch (event) {
-        case OMX_EventCmdComplete: {
-            OMX_COMMANDTYPE cmd = (OMX_COMMANDTYPE)info->data1;
-            if (OMX_CommandStateSet == cmd) {
-                HDF_LOGI("OMX_CommandStateSet reached");
-                g_core->OnStatusChanged();
-            }
-            break;
+    if (event == OMX_EventCmdComplete) {
+        OMX_COMMANDTYPE cmd = (OMX_COMMANDTYPE)info->data1;
+        if (OMX_CommandStateSet == cmd) {
+            HDF_LOGI("OMX_CommandStateSet reached");
+            g_core->OnStatusChanged();
         }
-
-        default:
-            break;
     }
-
     return HDF_SUCCESS;
 }
 

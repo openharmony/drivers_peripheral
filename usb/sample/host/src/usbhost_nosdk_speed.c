@@ -45,6 +45,7 @@
 #define TEST_PRINT_TIME_UINT 1000
 #define ENDPOINT_IN_OFFSET   7
 #define PATH_MAX_LENGTH      24
+#define STRTOL_BASE          10
 
 static pid_t g_tid;
 static int32_t g_exitOk = false;
@@ -321,21 +322,21 @@ int32_t main(int32_t argc, char *argv[])
 {
     int32_t ret;
     if (argc == 6) {
-        g_busNum = (unsigned int)atoi(argv[1]);
-        g_devAddr = (unsigned int)atoi(argv[2]); // 2 means get second char of argv
-        g_ifaceNum = (unsigned int)atoi(argv[3]);  // 3 means get third char of argv
-        g_endNum = (unsigned char)atoi(argv[4]);   // 4 means get fourth char of argv
+        g_busNum = (unsigned int)strtoul(argv[1], NULL, STRTOL_BASE);
+        g_devAddr = (unsigned int)strtoul(argv[2], NULL, STRTOL_BASE); // 2 means get second char of argv
+        g_ifaceNum = (unsigned int)strtoul(argv[3], NULL, STRTOL_BASE);  // 3 means get third char of argv
+        g_endNum = (unsigned char)strtoul(argv[4], NULL, STRTOL_BASE);   // 4 means get fourth char of argv
         if ((g_endNum >> 7) != 0) {                // the offset value is 7
             g_printData = (strncmp(argv[5], "printdata", 1)) ? false : true;
         }
     } else if (argc == 5) {
-        g_busNum = (unsigned int)atoi(argv[1]);
-        g_devAddr = (unsigned int)atoi(argv[2]); // 2 means get second char of argv
-        g_ifaceNum = (unsigned int)atoi(argv[3]);  // 3 means get third char of argv
-        g_endNum = (unsigned char)atoi(argv[4]);   // 4 means get fourth char of argv
+        g_busNum = (unsigned int)strtoul(argv[1], NULL, STRTOL_BASE);
+        g_devAddr = (unsigned int)strtoul(argv[2], NULL, STRTOL_BASE); // 2 means get second char of argv
+        g_ifaceNum = (unsigned int)strtoul(argv[3], NULL, STRTOL_BASE);  // 3 means get third char of argv
+        g_endNum = (unsigned char)strtoul(argv[4], NULL, STRTOL_BASE);   // 4 means get fourth char of argv
     } else if (argc == 3) {
-        g_ifaceNum = (unsigned int)atoi(argv[1]);
-        g_endNum = (unsigned char)atoi(argv[2]); // 2 means get second char of argv
+        g_ifaceNum = (unsigned int)strtoul(argv[1], NULL, STRTOL_BASE);
+        g_endNum = (unsigned char)strtoul(argv[2], NULL, STRTOL_BASE); // 2 means get second char of argv
     } else {
         HDF_LOGE("%{public}s: parameter error!", __func__);
         ShowHelp(argv[0]);

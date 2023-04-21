@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+
 ohos_benchmarktest("hdf_codec_benchmark_test") {
   module_out_path = "drivers_peripheral_codec/codec"
   include_dirs = [

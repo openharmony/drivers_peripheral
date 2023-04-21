@@ -23,6 +23,7 @@
 #include <netlink/genl/ctrl.h>
 #include <netlink/genl/genl.h>
 #include <netlink/handlers.h>
+#include <osal_mem.h>
 
 #include "hilog/log.h"
 #include "../wifi_common_cmd.h"
@@ -138,18 +139,53 @@ static void WifiEventVendorProcess(const char *ifName, struct nlattr **attr)
     QcaWifiEventScanDoneProcess(ifName, (struct nlattr *)data, len);
 }
 
-static void DoGetScanResult(struct nlattr *attr[], int len, WifiScanResult *scanResult)
+static int32_t GetNlaDataScanResult(struct nlattr *attr[], int len, WifiScanResult *scanResult)
 {
+    uint8_t *ie;
+    uint8_t *beaconIe;
+    uint8_t *bssid;
+
+    (void)len;
     if (attr[NL80211_BSS_INFORMATION_ELEMENTS]) {
-        scanResult->ie = nla_data(attr[NL80211_BSS_INFORMATION_ELEMENTS]);
+        ie = nla_data(attr[NL80211_BSS_INFORMATION_ELEMENTS]);
         scanResult->ieLen = (uint32_t)nla_len(attr[NL80211_BSS_INFORMATION_ELEMENTS]);
+        if (ie != NULL && scanResult->ieLen != 0) {
+            scanResult->ie = OsalMemCalloc(scanResult->ieLen);
+            if (scanResult->ie == NULL || memcpy_s(scanResult->ie, scanResult->ieLen, ie, scanResult->ieLen) != EOK) {
+                HILOG_ERROR(LOG_CORE, "%s: fill ie data fail", __FUNCTION__);
+                return RET_CODE_FAILURE;
+            }
+        }
     }
     if (attr[NL80211_BSS_BEACON_IES]) {
-        scanResult->beaconIe = nla_data(attr[NL80211_BSS_BEACON_IES]);
-        scanResult->beaconIeLen = (uint32_t)nla_len(attr[NL80211_BSS_BEACON_IES]);
+        beaconIe = nla_data(attr[NL80211_BSS_INFORMATION_ELEMENTS]);
+        scanResult->beaconIeLen = (uint32_t)nla_len(attr[NL80211_BSS_INFORMATION_ELEMENTS]);
+        if (beaconIe != NULL && scanResult->beaconIeLen != 0) {
+            scanResult->beaconIe = OsalMemCalloc(scanResult->beaconIeLen);
+            if (scanResult->beaconIe == NULL ||
+                memcpy_s(scanResult->beaconIe, scanResult->beaconIeLen, beaconIe, scanResult->beaconIeLen) != EOK) {
+                HILOG_ERROR(LOG_CORE, "%s: fill beacon ie data fail", __FUNCTION__);
+                return RET_CODE_FAILURE;
+            }
+        }
     }
     if (attr[NL80211_BSS_BSSID]) {
-        scanResult->bssid = nla_data(attr[NL80211_BSS_BSSID]);
+        bssid = nla_data(attr[NL80211_BSS_BSSID]);
+        if (bssid != NULL) {
+            scanResult->bssid = OsalMemCalloc(ETH_ADDR_LEN);
+            if (scanResult->bssid == NULL || memcpy_s(scanResult->bssid, ETH_ADDR_LEN, bssid, ETH_ADDR_LEN) != EOK) {
+                HILOG_ERROR(LOG_CORE, "%s: fill bssid fail", __FUNCTION__);
+                return RET_CODE_FAILURE;
+            }
+        }
+    }
+    return RET_CODE_SUCCESS;
+}
+
+static int32_t DoGetScanResult(struct nlattr *attr[], int len, WifiScanResult *scanResult)
+{
+    if (GetNlaDataScanResult(attr, len, scanResult) != RET_CODE_SUCCESS) {
+        return RET_CODE_FAILURE;
     }
     if (attr[NL80211_BSS_FREQUENCY]) {
         scanResult->freq = nla_get_u32(attr[NL80211_BSS_FREQUENCY]);
@@ -182,6 +218,7 @@ static void DoGetScanResult(struct nlattr *attr[], int len, WifiScanResult *scan
     if (attr[NL80211_BSS_SEEN_MS_AGO]) {
         scanResult->age = nla_get_u32(attr[NL80211_BSS_SEEN_MS_AGO]);
     }
+    return RET_CODE_SUCCESS;
 }
 
 static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
@@ -218,11 +255,16 @@ static int32_t WifiGetScanResultHandler(struct nl_msg *msg, void *arg)
         HILOG_ERROR(LOG_CORE, "%s: failed to parse nested attributes", __func__);
         return NL_SKIP;
     }
-    DoGetScanResult(bssAttr, NL80211_BSS_MAX + 1, scanResult);
+    if (DoGetScanResult(bssAttr, NL80211_BSS_MAX + 1, scanResult) != RET_CODE_SUCCESS) {
+        HILOG_ERROR(LOG_CORE, "%s: DoGetScanResult fail", __func__);
+        FreeScanResult(scanResult);
+        return NL_SKIP;
+    }
     WifiEventReport(handlerArg->ifName, WIFI_EVENT_SCAN_RESULT, scanResult);
     scanResults->num++;
     if (scanResults->num == MAX_SCAN_RES_NUM) {
         WifiEventReport(handlerArg->ifName, WIFI_EVENT_SCAN_RESULTS, scanResults);
+        FreeScanResults(scanResults);
         (void)memset_s(scanResults, sizeof(WifiScanResults), 0, sizeof(WifiScanResults));
     }
     return NL_SKIP;
@@ -247,6 +289,7 @@ static void WifiEventScanResultProcess(const char *ifName)
     if (scanResults.num != 0) {
         WifiEventReport(ifName, WIFI_EVENT_SCAN_RESULTS, &scanResults);
     }
+    FreeScanResults(&scanResults);
     nlmsg_free(msg);
 }
 
@@ -255,6 +298,16 @@ static void DoProcessEvent(const char *ifName, int cmd, struct nlattr **attr)
     switch (cmd) {
         case NL80211_CMD_VENDOR:
             WifiEventVendorProcess(ifName, attr);
+            break;
+        case NL80211_CMD_START_SCHED_SCAN:
+            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_START_SCHED_SCAN, cmd = %d", __FUNCTION__, cmd);
+            break;
+        case NL80211_CMD_SCHED_SCAN_RESULTS:
+            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_SCHED_SCAN_RESULTS, cmd = %d", __FUNCTION__, cmd);
+            WifiEventScanResultProcess(ifName);
+            break;
+        case NL80211_CMD_STOP_SCHED_SCAN:
+            HILOG_INFO(LOG_CORE, "%s: receive cmd NL80211_CMD_STOP_SCHED_SCAN, cmd = %d", __FUNCTION__, cmd);
             break;
         case NL80211_CMD_NEW_SCAN_RESULTS:
             WifiEventScanResultProcess(ifName);

@@ -14,6 +14,8 @@
  */
 #include "usb_camera_test.h"
 
+bool usbCameraExit_ = false;
+
 void UtestUSBCameraTest::SetUpTestCase(void)
 {}
 void UtestUSBCameraTest::TearDownTestCase(void)
@@ -49,11 +51,11 @@ TEST_F(UtestUSBCameraTest, camera_usb_0001)
         std::cout << "==========[test log] cameraId = " << cameraId << std::endl;
     }
     std::cout << "==========[test log] 2. please add or delete the usb camera, wait for 10s..."<< std::endl;
-    sleep(10); // judging add or delete the usb camera, wait for 10s.
+    sleep(3); // judging add or delete the usb camera, wait for 3s.
     std::cout << "==========[test log] r u ready? wait for 10s..."<< std::endl;
-    sleep(10); // judging r u ready, wait for 10s.
+    sleep(3); // judging r u ready, wait for 3s.
     std::cout << "==========[test log] 3. check the cameraID again... wait for 10s..."<< std::endl;
-    sleep(10); // checking the cameraID again, wait for 10s.
+    sleep(3); // checking the cameraID again, wait for 3s.
     std::cout << "==========[test log] Second cameraId.size = " << cameraIds.size() << std::endl;
     if (cameraIds.size() == 1) {
         cameraIds.clear();
@@ -62,6 +64,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0001)
     EXPECT_EQ(rc, HDI::Camera::V1_0::NO_ERROR);
     for (const auto &cameraId : cameraIds) {
         std::cout << "cameraId = " << cameraId << std::endl;
+    }
+    if (cameraIds.size() > 1) {
+        usbCameraExit_ = true;
     }
 }
 
@@ -74,6 +79,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0001)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0002)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
@@ -97,6 +105,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0002)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0003)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
@@ -117,6 +128,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0003)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0004)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
@@ -136,6 +150,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0004)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0005)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
@@ -154,6 +171,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0005)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0006)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
@@ -178,6 +198,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0006)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_007)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     common_metadata_header_t *data = ability_->get();
     camera_metadata_item_t entry;
@@ -202,6 +225,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_007)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_008)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
@@ -227,6 +253,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_008)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_009)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
@@ -252,6 +281,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_009)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0010)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
@@ -274,6 +306,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0010)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0011)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
@@ -299,6 +334,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0011)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0012)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();
@@ -319,6 +357,9 @@ TEST_F(UtestUSBCameraTest, camera_usb_0012)
   */
 TEST_F(UtestUSBCameraTest, camera_usb_0013)
 {
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
     ability_ = display_->GetCameraAbility();
     EXPECT_NE(ability_, nullptr);
     common_metadata_header_t *data = ability_->get();

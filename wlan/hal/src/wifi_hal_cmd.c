@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -252,6 +252,36 @@ int32_t HalCmdGetIfNamesByChipId(const uint8_t chipId, char **ifNames, uint32_t 
     ret = GetIfNamesByChipId(chipId, ifNames, num);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%s: GetIfNamesByChipId failed", __FUNCTION__);
+    }
+    return ret;
+}
+
+int32_t HalCmdStartPnoScan(const char *ifName, const WifiPnoSettings *pnoSettings)
+{
+    int32_t ret;
+    ret = WifiStartPnoScan(ifName, pnoSettings);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiStartPnoScan failed", __FUNCTION__);
+    }
+    return ret;
+}
+
+int32_t HalCmdStopPnoScan(const char *ifName)
+{
+    int32_t ret;
+    ret = WifiStopPnoScan(ifName);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiStopPnoScan failed", __FUNCTION__);
+    }
+    return ret;
+}
+
+int32_t HalCmdGetSignalPollInfo(const char *ifName, struct SignalResult *signalResult)
+{
+    int32_t ret;
+    ret = WifiGetSignalPollInfo(ifName, signalResult);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%s: WifiGetSignalInfo failed", __FUNCTION__);
     }
     return ret;
 }

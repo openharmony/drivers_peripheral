@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2023 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -113,6 +113,17 @@ void ComponentMgr::CleanComponent()
     cores_.clear();
 
     compoentsCore_.clear();
+}
+
+int32_t ComponentMgr::GetCoreOfComponent(CodecOMXCore* &core, const std::string compName)
+{
+    auto iter = compoentsCore_.find(compName);
+    if (iter == compoentsCore_.end() || iter->second == nullptr) {
+        CODEC_LOGE("%{public}s: can not find component[%{public}s] in core", __func__, compName.c_str());
+        return HDF_FAILURE;
+    }
+    core = iter->second.get();
+    return HDF_SUCCESS;
 }
 }  // namespace Omx
 }  // namespace Codec

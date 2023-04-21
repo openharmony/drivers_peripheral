@@ -14,6 +14,7 @@
 group("display_composer_test") {
   testonly = true
   deps = [
+    "benchmark:hdf_display_benchmark_test",
     "moduletest:hdf_disp_composer_moduletest",
     "unittest:hdf_disp_composer_unittest",
   ]

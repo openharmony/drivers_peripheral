@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,11 +15,23 @@
 
 #include "codec_component_service.h"
 #include <hdf_base.h>
+#include <securec.h>
+#include <malloc.h>
 #include "codec_log_wrapper.h"
 namespace OHOS {
 namespace HDI {
 namespace Codec {
 namespace V1_0 {
+CodecComponentService::CodecComponentService(const std::shared_ptr<OHOS::Codec::Omx::ComponentNode> &node,
+    const std::shared_ptr<OHOS::Codec::Omx::ComponentMgr> mgr, const std::string name)
+{
+    name_ = name;
+    node_ = node;
+    mgr_  = mgr;
+#ifdef SUPPORT_ROLE
+    SetComponentRole();
+#endif
+}
 CodecComponentService::~CodecComponentService()
 {
     if (node_ != nullptr) {
@@ -28,8 +40,22 @@ CodecComponentService::~CodecComponentService()
             CODEC_LOGE("CloseHandle failed, err[%{public}d]", ret);
         }
         node_ = nullptr;
+        ReleaseCache();
     }
+    name_ = "";
+    mgr_ = nullptr;
 }
+
+void CodecComponentService::ReleaseCache()
+{
+#ifdef CONFIG_USE_JEMALLOC_DFX_INTF
+    auto err = mallopt(M_FLUSH_THREAD_CACHE, 0);
+    if (err != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s :release cache error, m_purge = %{public}d", __func__, err);
+    }
+#endif
+}
+
 int32_t CodecComponentService::GetComponentVersion(CompVerInfo &verInfo)
 {
     return node_->GetComponentVersion(verInfo);
@@ -37,7 +63,7 @@ int32_t CodecComponentService::GetComponentVersion(CompVerInfo &verInfo)
 
 int32_t CodecComponentService::SendCommand(CodecCommandType cmd, uint32_t param, const std::vector<int8_t> &cmdData)
 {
-    CODEC_LOGD("cmd [%{public}d]", cmd);
+    CODEC_LOGI("commandType: [%{public}d], command [%{public}d]", cmd, param);
     return node_->SendCommand(cmd, param, const_cast<int8_t *>(cmdData.data()));
 }
 
@@ -91,7 +117,7 @@ int32_t CodecComponentService::ComponentTunnelRequest(uint32_t port, int32_t tun
 
 int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffer &inBuffer, OmxCodecBuffer &outBuffer)
 {
-    CODEC_LOGD("portIndex [%{public}d]", portIndex);
+    CODEC_LOGI("portIndex: [%{public}d], bufferId: [%{public}d]", portIndex, inBuffer.bufferId);
     outBuffer = inBuffer;
     return node_->UseBuffer(portIndex, outBuffer);
 }
@@ -99,15 +125,17 @@ int32_t CodecComponentService::UseBuffer(uint32_t portIndex, const OmxCodecBuffe
 int32_t CodecComponentService::AllocateBuffer(uint32_t portIndex, const OmxCodecBuffer &inBuffer,
                                               OmxCodecBuffer &outBuffer)
 {
-    CODEC_LOGD("portIndex [%{public}d]", portIndex);
+    CODEC_LOGI("portIndex: [%{public}d], bufferId: [%{public}d]", portIndex, inBuffer.bufferId);
     outBuffer = inBuffer;
     return node_->AllocateBuffer(portIndex, outBuffer);
 }
 
 int32_t CodecComponentService::FreeBuffer(uint32_t portIndex, const OmxCodecBuffer &buffer)
 {
-    CODEC_LOGD("portIndex [%{public}d]", portIndex);
-    return node_->FreeBuffer(portIndex, buffer);
+    CODEC_LOGI("portIndex: [%{public}d], bufferId: [%{public}d]", portIndex, buffer.bufferId);
+    int32_t ret = node_->FreeBuffer(portIndex, buffer);
+    ReleaseCache();
+    return ret;
 }
 
 int32_t CodecComponentService::EmptyThisBuffer(const OmxCodecBuffer &buffer)
@@ -142,6 +170,42 @@ int32_t CodecComponentService::ComponentRoleEnum(std::vector<uint8_t> &role, uin
 {
     CODEC_LOGD("index [%{public}d]", index);
     return node_->ComponentRoleEnum(role, index);
+}
+
+void CodecComponentService::SetComponentRole()
+{
+    if (name_ == "") {
+        CODEC_LOGE("compName is null");
+        return;
+    }
+    OHOS::Codec::Omx::CodecOMXCore *core;
+    auto err = mgr_->GetCoreOfComponent(core, name_);
+    if (err != HDF_SUCCESS) {
+        CODEC_LOGE("%{public}s core is null", __func__);
+        return;
+    }
+
+    std::vector<std::string> roles;
+    int32_t ret = core->GetRolesOfComponent(name_, roles);
+    if (ret != HDF_SUCCESS) {
+        CODEC_LOGE("GetRoleOfComponent return err [%{public}d]", ret);
+        return;
+    }
+    uint32_t roleIndex = 0;
+    CODEC_LOGI("RoleName = [%{public}s]", roles[roleIndex].c_str());
+
+    OMX_PARAM_COMPONENTROLETYPE role;
+    errno_t res = strncpy_s(reinterpret_cast<char *>(role.cRole), OMX_MAX_STRINGNAME_SIZE,
+                            roles[roleIndex].c_str(), roles[roleIndex].length());
+    if (res != EOK) {
+        CODEC_LOGE("strncpy_s return err [%{public}d]", err);
+        return;
+    }
+    role.nSize = sizeof(role);
+    ret = node_->SetParameter(OMX_IndexParamStandardComponentRole, reinterpret_cast<int8_t *>(&role));
+    if (ret != HDF_SUCCESS) {
+        CODEC_LOGE("OMX_IndexParamStandardComponentRole err [%{public}d]", ret);
+    }
 }
 }  // namespace V1_0
 }  // namespace Codec

@@ -48,7 +48,7 @@ int32_t Ed25519Verify(const Buffer *pubKey, const Buffer *data, const Buffer *si
 
 Buffer *Aes256GcmEncryptNoPadding(const Buffer *plaintext, const Buffer *key);
 Buffer *Aes256GcmDecryptNoPadding(const Buffer *cipherInfo, const Buffer *key);
-Buffer *DeriveDeviceKey(const Buffer *secret);
+Buffer *DeriveDeviceKey(const Buffer *pinData, const Buffer *secret);
 Buffer *Hkdf(const Buffer *salt, const Buffer *rootKey);
 Buffer *Sha256Adaptor(const Buffer *data);
 

@@ -22,15 +22,16 @@ ohos_unittest("hdi_unittest_input") {
   module_out_path = module_output_path
 
   include_dirs = [
+    "$INPUT_ROOT_DIR/hdi_service",
     "$INPUT_ROOT_DIR/interfaces/include",
     "$INPUT_ROOT_DIR/interfaces",
+    "$INPUT_ROOT_DIR/test/common/include",
     "//third_party/FreeBSD/sys/dev/evdev",
-    "$INPUT_ROOT_DIR/hdi_service",
   ]
 
   sources = [
+    "$INPUT_ROOT_DIR/test/common/src/input_callback_impl.cpp",
     "hdf_input_hdi_test.cpp",
-    "input_callback_impl.cpp",
   ]
   cflags = [
     "-Wall",

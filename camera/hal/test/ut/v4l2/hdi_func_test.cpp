@@ -113,7 +113,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0192)
     } else {
         std::cout << "==========[test log] Capture fail, rc = " << display_->rc << std::endl;
     }
-    sleep(5); // waiting function Capture execute for 5s.
+    sleep(3); // waiting function Capture execute for 3s.
     display_->rc = display_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, display_->rc == NO_ERROR);
     if (display_->rc == NO_ERROR) {
@@ -172,7 +172,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0194)
     captureInfo->enableShutterCallback_ = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, false);
     EXPECT_EQ(true, display_->rc == NO_ERROR);
-    sleep(5); // waiting 5s, prepare for execute function CancelCapture
+    sleep(3); // waiting 3s, prepare for execute function CancelCapture
     display_->streamOperator->CancelCapture(captureId);
     EXPECT_EQ(true, display_->rc == NO_ERROR);
     if (display_->rc == NO_ERROR) {
@@ -292,7 +292,7 @@ TEST_F(UtestHdiFuncTest, camera_hdi_0201)
     bool isStreaming = true;
     display_->rc = display_->streamOperator->Capture(captureId, captureInfo, isStreaming);
     EXPECT_EQ(true, display_->rc == NO_ERROR);
-    sleep(5); // waiting 5s, prepare for execute function CancelCapture
+    sleep(3); // waiting 3s, prepare for execute function CancelCapture
     display_->rc = display_->streamOperator->CancelCapture(-1);
     EXPECT_EQ(INVALID_ARGUMENT, display_->rc);
     display_->rc = display_->streamOperator->CancelCapture(captureId);

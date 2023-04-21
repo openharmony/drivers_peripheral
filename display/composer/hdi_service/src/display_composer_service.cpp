@@ -243,7 +243,7 @@ int32_t DisplayComposerService::GetDisplayReleaseFence(
     std::vector<int32_t> outFences;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
     int32_t ret = vdiImpl_->GetDisplayReleaseFence(devId, layers, outFences);
-    for (int i = 0; i < outFences.size(); i++) {
+    for (uint i = 0; i < outFences.size(); i++) {
         int32_t dupFd = outFences[i];
         sptr<HdifdParcelable> hdifd(new HdifdParcelable());
         hdifd->Init(dupFd);
