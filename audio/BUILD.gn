@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("audio.gni")
 
 group("hdi_audio") {
   deps = []
@@ -37,6 +37,11 @@ group("hdi_audio") {
       ]
     }
     deps += [ "hdi_service:idl_audio" ]
+
+    deps += [
+      "../base:audio_hifi_watchdog.para",
+      "../base:audio_hifi_watchdog.para.dac",
+    ]
   }
 
   if (drivers_peripheral_audio_user_mode == false) {
