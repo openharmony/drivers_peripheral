@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,8 +17,8 @@ if (defined(ohos_lite)) {
   lite_component("hdf_manual_test_usb_device") {
     if (ohos_build_type == "debug") {
       deps = [
+        "./../../performance:hdf_usb_device_sdk_io_test",
         "device_sdk:hdf_usb_device_sdk_if_test",
-        "//drivers/peripheral/usb/test/performance:hdf_usb_device_sdk_io_test",
       ]
     }
     features = []
@@ -37,25 +37,25 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/config/sanitizers/sanitizers.gni")
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("./../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
   module_output_path = "hdf/usb"
   ohos_unittest("usb_device_sdk_io_test") {
     module_out_path = module_output_path
     include_dirs = [
-      "//drivers/peripheral/usb/ddk/common/include",
-      "//drivers/peripheral/usb/ddk/device/include",
-      "//drivers/peripheral/usb/interfaces/ddk/common",
-      "//drivers/peripheral/usb/interfaces/ddk/device",
+      "./../../../ddk/common/include",
+      "./../../../ddk/device/include",
+      "./../../../interfaces/ddk/common",
+      "./../../../interfaces/ddk/device",
       "//third_party/googletest/googletest/include",
-      "//drivers/peripheral/usb/test/unittest/device_sdk",
+      "./../device_sdk",
     ]
 
     sources = [
-      "//drivers/peripheral/usb/test/unittest/device_sdk/usb_device_cdcacm_test.cpp",
-      "//drivers/peripheral/usb/test/unittest/device_sdk/usb_device_sdk_io_test.cpp",
+      "./../device_sdk/usb_device_cdcacm_test.cpp",
+      "./../device_sdk/usb_device_sdk_io_test.cpp",
     ]
-    deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
+    deps = [ "./../../../ddk:libusb_core" ]
 
     if (is_standard_system) {
       external_deps = [
