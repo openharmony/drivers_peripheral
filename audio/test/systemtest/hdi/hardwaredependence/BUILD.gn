@@ -16,7 +16,7 @@ if (defined(ohos_lite)) {
 } else {
   import("//build/test.gni")
   import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-  import("//drivers/peripheral/audio/audio.gni")
+  import("./../../../../audio.gni")
 }
 
 group("hdi_hardwaredependence") {

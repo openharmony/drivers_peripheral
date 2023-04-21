@@ -14,7 +14,7 @@
 import("//drivers/peripheral/audio/audio.gni")
 
 group("effect_model") {
-  if (!defined(ohos_lite) && !drivers_peripheral_audio_community) {
+  if (!defined(ohos_lite) && drivers_peripheral_audio_feature_effect) {
     deps = [
       "host:effect_model_service",
       "model:effect_model_service_1.0",
