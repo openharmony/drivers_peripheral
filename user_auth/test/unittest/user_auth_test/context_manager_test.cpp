@@ -15,6 +15,8 @@
 
 #include <gtest/gtest.h>
 
+#include "securec.h"
+
 #include "adaptor_memory.h"
 #include "coauth.h"
 #include "context_manager.h"
@@ -254,8 +256,10 @@ HWTEST_F(ContextManagerTest, TestDestoryContext, TestSize.Level0)
     DestoryContext(context);
 
     g_contextList = CreateLinkedList(DestroyContextNode);
-    EXPECT_NE(g_contextList, nullptr);
+    ASSERT_NE(g_contextList, nullptr);
     context = (UserAuthContext *)Malloc(sizeof(UserAuthContext));
+    ASSERT_NE(context, nullptr);
+    (void)memset_s(context, sizeof(UserAuthContext), 0, sizeof(UserAuthContext));
     g_contextList->insert(g_contextList, static_cast<void *>(context));
     EXPECT_EQ(g_contextList->getSize(g_contextList), 1);
     DestoryContext(context);
