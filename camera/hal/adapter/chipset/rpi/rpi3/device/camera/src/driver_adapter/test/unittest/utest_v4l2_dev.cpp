@@ -60,7 +60,9 @@ void UtestV4L2Dev::TearDown(void)
 
 HWTEST_F(UtestV4L2Dev, InitUvc, TestSize.Level0)
 {
-    V4L2UVC_->V4L2UvcDetectInit(V4L2UvcCallback);
+    int rc = 0;
+    rc = V4L2UVC_->V4L2UvcDetectInit(V4L2UvcCallback);
+    EXPECT_EQ(true, rc == RC_OK);
 }
 
 HWTEST_F(UtestV4L2Dev, InitCamera, TestSize.Level0)
