@@ -24,14 +24,16 @@
 #include "thermal_device_mitigation.h"
 #include "thermal_zone_manager.h"
 #include "thermal_log.h"
+#include "config_policy_utils.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
 namespace V1_0 {
 namespace {
-const std::string HDI_XML_PATH = HDF_ETC_DIR "/thermal_config/hdf/thermal_hdi_config.xml";
-const std::string HDI_CUST_XML_PATH = "/chip_prod/etc/thermal_config/cust/thermal_hdi_config.xml";
+
+const std::string HDI_XML_PATH = "etc/thermal_config/thermal_hdi_config.xml";
+const std::string VENDOR_HDI_XML_PATH = "/vendor/etc/thermal_config/thermal_hdi_config.xml";
 bool g_isHdiStart = false;
 }
 static sptr<IThermalCallback> theramalCb_ = nullptr;
@@ -53,10 +55,21 @@ ThermalInterfaceImpl::ThermalInterfaceImpl()
 
 int32_t ThermalInterfaceImpl::Init()
 {
-    int32_t ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(HDI_CUST_XML_PATH);
-    if (ret != HDF_SUCCESS) {
-        THERMAL_HILOGI(COMP_HDI, "init thermal hdi common XML");
-        ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(HDI_XML_PATH);
+    char buf[MAX_PATH_LEN];
+    bool parseConfigSuc = false;
+    int32_t ret;
+    char* path = GetOneCfgFile(HDI_XML_PATH.c_str(), buf, MAX_PATH_LEN);
+    if (path != nullptr && *path != '\0') {
+        ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(path);
+        if (ret != HDF_SUCCESS) {
+            THERMAL_HILOGE(COMP_HDI, "parse err pliocy thermal hdi XML");
+            return HDF_FAILURE;
+        }
+        parseConfigSuc = true;
+    }
+
+    if (!parseConfigSuc) {
+        ret = ThermalHdfConfig::GetInsance().ThermalHDIConfigInit(VENDOR_HDI_XML_PATH);
         if (ret != HDF_SUCCESS) {
             THERMAL_HILOGE(COMP_HDI, "failed to init XML, ret: %{public}d", ret);
             return HDF_FAILURE;
