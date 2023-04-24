@@ -32,15 +32,15 @@ if (defined(ohos_lite)) {
     output_extension = "bin"
     output_dir = "$root_out_dir/test/unittest/hdf"
     sources = [
-      "$camera_path/../interfaces/hdi_passthrough/callback/src/camera_device_callback.cpp",
-      "$camera_path/../interfaces/hdi_passthrough/callback/src/camera_host_callback.cpp",
-      "$camera_path/../interfaces/hdi_passthrough/callback/src/stream_operator_callback.cpp",
+      "$camera_path/test/common/callback/src/camera_device_callback.cpp",
+      "$camera_path/test/common/callback/src/camera_host_callback.cpp",
+      "$camera_path/test/common/callback/src/stream_operator_callback.cpp",
     ]
 
     include_dirs = [
       "$camera_path/../interfaces/include",
       "$camera_path/../interfaces/hdi_passthrough",
-      "$camera_path/../interfaces/hdi_passthrough/callback/include",
+      "$camera_path/test/common/callback/include",
       "$camera_path/include",
       "$camera_path/hdi_impl",
       "$camera_path/hdi_impl/test",
