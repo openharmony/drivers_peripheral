@@ -19,7 +19,6 @@ if (defined(ohos_lite)) {
       "buffer_manager:camera_buffer_manager",
       "device_manager:camera_device_manager",
       "hdi_impl:camera_host_service_1.0",
-      "init:ohos_camera_demo",
       "pipeline_core:camera_pipeline_core",
       "utils:camera_utils",
     ]
@@ -37,7 +36,6 @@ if (defined(ohos_lite)) {
         "buffer_manager:camera_buffer_manager",
         "device_manager:camera_device_manager",
         "hdi_impl:camera_host_service_1.0",
-        "init:ohos_camera_demo",
         "pipeline_core:camera_pipeline_core",
         "utils:camera_utils",
       ]
