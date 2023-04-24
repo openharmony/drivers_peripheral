@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/camera/hal/camera.gni")
+import("../../../../../camera.gni")
 
 config("v4l2_config") {
   visibility = [ ":*" ]
@@ -46,7 +46,7 @@ ohos_shared_library("camera_v4l2_adapter") {
 
   include_dirs = [
     "$camera_path/include",
-    "//drivers/peripheral/camera/hal/adapter/platform/v4l2/src/driver_adapter/include",
+    "$camera_path/adapter/platform/v4l2/src/driver_adapter/include",
   ]
 
   if (is_standard_system) {

@@ -11,9 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//drivers/peripheral/camera/hal/camera.gni")
+import("../../camera.gni")
 
-ut_root_path = "$camera_path/test/ut"
+ut_root_path = "."
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
@@ -40,11 +40,6 @@ if (defined(ohos_lite)) {
       "$ut_root_path/pipeline_core/stream_pipeline_strategy_test.cpp",
     ]
     include_dirs = [
-      # common includes
-      "//commonlibrary/utils_lite/include",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-      "//system/core/include/cutils",
-
       # camera common includes
       "$camera_path/include",
       "$camera_path/../interfaces/include",
@@ -59,8 +54,8 @@ if (defined(ohos_lite)) {
       "$camera_path/buffer_manager/include",
       "$camera_path/buffer_manager/src/buffer_adapter/lite",
       "//third_party/googletest/googletest/include",
-      "//drivers/peripheral/base",
-      "//drivers/peripheral/display/interfaces/include",
+      "$camera_path/../../base",
+      "$camera_path/../../display/interfaces/include",
 
       # pipeline core includes
       "$camera_path/pipeline_core",
@@ -87,11 +82,11 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
     external_deps = [
       "drivers_interface_camera:metadata",
       "graphic_chipsetsdk:surface",
+      "hdf_core:hdf_posix_osal",
     ]
   }
 } else {
@@ -138,12 +133,9 @@ if (defined(ohos_lite)) {
 
     include_dirs = [
       # common includes
-      "//system/core/include/cutils",
       "//third_party/googletest/googletest/include",
-      "//drivers/peripheral/display/interfaces/include",
-      "//drivers/peripheral/display/hdi_service/gralloc/include",
-
-      #"//base/hiviewdfx/interfaces/innerkits/libhilog/include",
+      "$camera_path/../../display/interfaces/include",
+      "$camera_path/../../display/hdi_service/gralloc/include",
 
       # camera common includes
       "$camera_path/include",
@@ -201,8 +193,6 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_host_service_1.0_static",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
-      "//drivers/interface/camera/v1_0:libcamera_stub_1.0",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest",
       "//third_party/googletest:gtest_main",
@@ -211,6 +201,8 @@ if (defined(ohos_lite)) {
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
+        "drivers_interface_camera:libcamera_stub_1.0",
+        "drivers_interface_camera:libcamera_proxy_1.0",
         "hdf_core:libhdf_utils",
         "hiviewdfx_hilog_native:libhilog",
         "samgr:samgr_proxy",

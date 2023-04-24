@@ -47,10 +47,9 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/include/offline_stream_operator",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
-      "//drivers/peripheral/display/interfaces/include",
-      "//drivers/peripheral/base",
+      "$camerc_path/../../display/interfaces/include",
+      "$camerc_path/../../base",
 
       #producer
       "$camera_path/pipeline_core/utils",
@@ -73,14 +72,12 @@ if (defined(ohos_lite)) {
       "//system/core/include/cutils",
     ]
 
-    deps = [
-      "$camera_path/hdi_impl:camera_host_service_1.0",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    ]
+    deps = [ "$camera_path/hdi_impl:camera_host_service_1.0" ]
     external_deps = [
       "drivers_interface_camera:metadata",
       "graphic_chipsetsdk:surface",
       "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
     ]
     public_configs = [ ":ohos_camera_demo_config" ]
     install_enable = false
@@ -118,7 +115,6 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/include/offline_stream_operator",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
       "$board_camera_path/demo/include",
 
@@ -148,7 +144,6 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_host_service_1.0",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
     ]
 
     if (is_standard_system) {
@@ -167,6 +162,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps += [
+      "drivers_interface_camera:libcamera_proxy_1.0",
       "drivers_interface_camera:metadata",
       "ipc:ipc_single",
       "samgr:samgr_proxy",

@@ -11,8 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//drivers/peripheral/camera/hal/camera.gni")
-camera_test_path = "//drivers/peripheral/camera/hal/test"
+import("../../camera.gni")
+camera_test_path = "."
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
@@ -52,10 +52,9 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/src/stream_operator/stream_tunnel/lite",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
-      "//drivers/peripheral/base",
-      "//drivers/peripheral/display/interfaces/include",
+      "$camera_path/../../base",
+      "$camera_path/../../display/interfaces/include",
 
       #producer
       "$camera_path/pipeline_core/utils",
@@ -72,9 +71,6 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/parser",
       "$camera_path/pipeline_core/pipeline_impl/src/strategy",
       "$camera_path/pipeline_core/ipp/include",
-
-      # HCS
-      "//system/core/include/cutils",
     ]
 
     public_deps = [
@@ -83,15 +79,14 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl:camera_host_service_1.0",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "$hdf_uhdf_path/utils:libhdf_utils",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//drivers/hdf_core/adapter/uhdf/test/unittest/common:hdf_test_common",
     ]
     external_deps = [
       "drivers_interface_camera:metadata",
       "graphic_chipsetsdk:surface",
+      "hdf_core:hdf_platform",
+      "hdf_core:hdf_posix_osal",
+      "hilog_featured_lite:hilog_shared",
     ]
   }
 } else {
@@ -114,27 +109,25 @@ if (defined(ohos_lite)) {
     testonly = true
     module_out_path = module_output_path
     sources = [
-      "$camera_test_path/at/src/camera_3a_uttest.cpp",
-      "$camera_test_path/at/src/device_ability_uttest.cpp",
-      "$camera_test_path/at/src/hdi_device_uttest.cpp",
-      "$camera_test_path/at/src/hdi_host_uttest.cpp",
-      "$camera_test_path/at/src/hdi_stream_uttest.cpp",
-      "$camera_test_path/at/src/ut_common.cpp",
+      "$camera_test_path/src/camera_3a_uttest.cpp",
+      "$camera_test_path/src/device_ability_uttest.cpp",
+      "$camera_test_path/src/hdi_device_uttest.cpp",
+      "$camera_test_path/src/hdi_host_uttest.cpp",
+      "$camera_test_path/src/hdi_stream_uttest.cpp",
+      "$camera_test_path/src/ut_common.cpp",
     ]
 
     include_dirs = [
       # common includes
       "./include",
-      "//system/core/include/cutils",
       "//third_party/googletest/googletest/include",
-      "//drivers/peripheral/display/interfaces/include",
-      "//drivers/peripheral/display/hdi_service/gralloc/include",
-      "//drivers/peripheral/camera/interfaces/include",
-      "//drivers/peripheral/camera/hal/include",
+      "$camera_path/../../display/interfaces/include",
+      "$camera_path/../../display/hdi_service/gralloc/include",
+      "$camera_path/../interfaces/include",
+      "$camera_path/include",
     ]
 
     deps = [
-      "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest",
       "//third_party/googletest:gtest_main",
@@ -155,6 +148,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps += [
+      "drivers_interface_camera:libcamera_proxy_1.0",
       "drivers_interface_camera:metadata",
       "samgr:samgr_proxy",
     ]

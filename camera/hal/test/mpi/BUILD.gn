@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//drivers/peripheral/camera/hal/camera.gni")
+import("../../camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
@@ -67,10 +67,9 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/include/offline_stream_operator",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
-      "//drivers/peripheral/base",
-      "//drivers/peripheral/display/interfaces/include",
+      "$camera_path/../../base",
+      "$camera_path/../../display/interfaces/include",
       "//base/startup/init/interfaces/innerkits/include/syspara",
 
       #producer
@@ -88,8 +87,6 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/parser",
       "$camera_path/pipeline_core/pipeline_impl/src/strategy",
       "$camera_path/pipeline_core/ipp/include",
-
-      "//system/core/include/cutils",
     ]
 
     public_deps = [
@@ -97,14 +94,14 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_host_service_1.0",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//base/startup/init/interfaces/innerkits:libbegetutil",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
     external_deps = [
       "drivers_interface_camera:metadata",
       "graphic_chipsetsdk:surface",
+      "hdf_core:hdf_posix_osal",
+      "init:libbegetutil",
+      "hilog_featured_lite:hilog_shared",
     ]
   }
 } else {
@@ -183,9 +180,6 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/parser",
       "$camera_path/pipeline_core/pipeline_impl/src/strategy",
       "$camera_path/pipeline_core/ipp/include",
-
-      # hcs parser
-      "//system/core/include/cutils",
     ]
 
     deps = [
@@ -193,7 +187,6 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_host_service_1.0_static",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
       "//third_party/googletest:gmock",
       "//third_party/googletest:gmock_main",
       "//third_party/googletest:gtest",
@@ -214,6 +207,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps += [
+      "drivers_interface_camera:libcamera_proxy_1.0",
       "drivers_interface_camera:metadata",
       "init:libbegetutil",
       "ipc:ipc_single",

@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 import("../camera.gni")
 
 config("hdi_cif_config") {
@@ -36,14 +36,14 @@ ohos_shared_library("hdi_cif") {
     "$camera_path/../interfaces/hdi_cpp/server/src/camera_host_stub.cpp",
     "$camera_path/../interfaces/hdi_cpp/server/src/offline_stream_operator_stub.cpp",
     "$camera_path/../interfaces/hdi_cpp/server/src/stream_operator_stub.cpp",
-    "src/buffer_producer_wrapper.cpp",
-    "src/camera_device.cpp",
-    "src/camera_device_callback_wrapper.cpp",
-    "src/camera_host.cpp",
-    "src/camera_host_callback_wrapper.cpp",
-    "src/offline_stream_operator.cpp",
-    "src/stream_operator.cpp",
-    "src/stream_operator_callback_wrapper.cpp",
+    "./src/buffer_producer_wrapper.cpp",
+    "./src/camera_device.cpp",
+    "./src/camera_device_callback_wrapper.cpp",
+    "./src/camera_host.cpp",
+    "./src/camera_host_callback_wrapper.cpp",
+    "./src/offline_stream_operator.cpp",
+    "./src/stream_operator.cpp",
+    "./src/stream_operator_callback_wrapper.cpp",
   ]
 
   include_dirs = [
