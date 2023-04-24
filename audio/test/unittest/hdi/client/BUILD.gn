@@ -12,11 +12,10 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("./../../../../audio.gni")
 
 group("hdi_client") {
-  if (!defined(ohos_lite) && !drivers_peripheral_audio_user_mode) {
+  if (!defined(ohos_lite) && !drivers_peripheral_audio_feature_user_mode) {
     testonly = true
     deps = [
       # "adapter:hdf_audio_proxy_adapter_test",

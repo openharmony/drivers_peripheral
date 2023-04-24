@@ -18,7 +18,6 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 }
 import("$hdf_audio_path/audio.gni")
 
@@ -81,9 +80,6 @@ if (defined(ohos_lite)) {
     }
     if (enable_audio_adm_service) {
       defines += [ "AUDIO_ADM_SERVICE" ]
-    }
-    if ("${product_name}" == "rk3568") {
-      defines += [ "PRODUCT_RK3568" ]
     }
   }
 }
