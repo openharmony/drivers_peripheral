@@ -120,7 +120,7 @@ void VibratorSample(void)
 
 ## Repositories Involved
 
-[Drive Subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/driver-subsystem.md)
+[Drive Subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/driver.md)
 
 [drivers_hdf_core](https://gitee.com/openharmony/drivers_hdf_core/blob/master/README_zh.md)
 

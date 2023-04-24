@@ -247,7 +247,7 @@ static void *hal_main()
 
 ## Repositories Involved<a name="section1371113476307"></a>
 
-[Driver subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/driver-subsystem.md)
+[Driver subsystem](https://gitee.com/openharmony/docs/blob/master/en/readme/driver.md)
 
 [drivers\_framework](https://gitee.com/openharmony/drivers_framework/blob/master/README.md)
 
