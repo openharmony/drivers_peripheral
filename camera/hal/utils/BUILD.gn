@@ -14,7 +14,7 @@
 if (defined(ohos_lite)) {
   import("//build/ohos.gni")
   import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
-  import("//drivers/peripheral/camera/hal/camera.gni")
+  import("../camera.gni")
   config("utils_config") {
     visibility = [ ":*" ]
     cflags = [
@@ -52,7 +52,7 @@ if (defined(ohos_lite)) {
       "watchdog/watchdog.cpp",
     ]
     include_dirs = [
-      "//drivers/peripheral/camera/hal/include",
+      "$camera_path/include",
       "//third_party/libexif",
       "watchdog",
       "exif",

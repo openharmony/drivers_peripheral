@@ -33,22 +33,22 @@ if (defined(ohos_lite)) {
   ohos_shared_library("camera_host_service_1.0") {
     output_extension = "z.so"
     sources = [
-      "src/camera_device/camera_device_impl.cpp",
-      "src/camera_host/camera_host_config.cpp",
-      "src/camera_host/camera_host_impl.cpp",
-      "src/camera_host/hcs_deal.cpp",
-      "src/offline_stream_operator/offline_stream.cpp",
-      "src/offline_stream_operator/offline_stream_operator.cpp",
-      "src/stream_operator/capture_message.cpp",
-      "src/stream_operator/capture_request.cpp",
-      "src/stream_operator/stream_base.cpp",
-      "src/stream_operator/stream_operator.cpp",
-      "src/stream_operator/stream_post_view.cpp",
-      "src/stream_operator/stream_preview.cpp",
-      "src/stream_operator/stream_statistics.cpp",
-      "src/stream_operator/stream_still_capture.cpp",
-      "src/stream_operator/stream_tunnel/lite/stream_tunnel.cpp",
-      "src/stream_operator/stream_video.cpp",
+      "./src/camera_device/camera_device_impl.cpp",
+      "./src/camera_host/camera_host_config.cpp",
+      "./src/camera_host/camera_host_impl.cpp",
+      "./src/camera_host/hcs_deal.cpp",
+      "./src/offline_stream_operator/offline_stream.cpp",
+      "./src/offline_stream_operator/offline_stream_operator.cpp",
+      "./src/stream_operator/capture_message.cpp",
+      "./src/stream_operator/capture_request.cpp",
+      "./src/stream_operator/stream_base.cpp",
+      "./src/stream_operator/stream_operator.cpp",
+      "./src/stream_operator/stream_post_view.cpp",
+      "./src/stream_operator/stream_preview.cpp",
+      "./src/stream_operator/stream_statistics.cpp",
+      "./src/stream_operator/stream_still_capture.cpp",
+      "./src/stream_operator/stream_tunnel/lite/stream_tunnel.cpp",
+      "./src/stream_operator/stream_video.cpp",
     ]
 
     include_dirs = [
@@ -66,12 +66,10 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager/include/",
       "$camera_path/buffer_manager/src/buffer_adapter/lite",
       "$camera_path/utils/event",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-      "//drivers/peripheral/display/interfaces/include",
-      "//drivers/peripheral/base",
+      "$camera_path/../../display/interfaces/include",
+      "$camera_path/../../base",
 
       #producer
-      "//commonlibrary/utils_lite/include",
       "$camera_path/pipeline_core/utils",
       "$camera_path/pipeline_core/include",
       "$camera_path/pipeline_core/host_stream/include",
@@ -94,12 +92,12 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "$camera_path/utils:camera_utils",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
     ]
     external_deps = [
       "drivers_interface_camera:metadata",
       "graphic_chipsetsdk:surface",
       "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
     ]
     public_configs = [ ":camhdi_impl_config" ]
     subsystem_name = "hdf"
@@ -130,8 +128,6 @@ if (defined(ohos_lite)) {
 
   host_sources = [
     "$camera_path/../interfaces/hdi_ipc/camera_host_driver.cpp",
-
-    #"$camera_path/../interfaces/hdi_ipc/utils/src/utils_data_stub.cpp",
     "$camera_path/hdi_impl/src/camera_device/camera_device_impl.cpp",
     "$camera_path/hdi_impl/src/camera_dump.cpp",
     "$camera_path/hdi_impl/src/camera_host/camera_host_config.cpp",
@@ -170,12 +166,10 @@ if (defined(ohos_lite)) {
     "$camera_path/hdi_impl/include/offline_stream_operator",
     "$camera_path/device_manager/include/",
     "$camera_path/buffer_manager/src/buffer_adapter/standard",
-    "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
     "$camera_path/utils/event",
-    "//drivers/peripheral/display/interfaces/include",
+    "$camera_path/../../display/interfaces/include",
 
     #producer
-    "//foundation/communication/ipc/ipc/native/src/core/include",
     "$camera_path/pipeline_core/utils",
     "$camera_path/pipeline_core/include",
     "$camera_path/pipeline_core/host_stream/include",
@@ -204,8 +198,6 @@ if (defined(ohos_lite)) {
       "$camera_path/metadata_manager:camera_metadata_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "$camera_path/utils:camera_utils",
-      "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host",
-      "//drivers/interface/camera/v1_0:libcamera_stub_1.0",
     ]
 
     defines = []
@@ -235,6 +227,7 @@ if (defined(ohos_lite)) {
     }
     external_deps += [
       "drivers_interface_camera:metadata",
+      "drivers_interface_camera:libcamera_stub_1.0",
       "hitrace_native:hitrace_meter",
       "ipc:ipc_single",
     ]
@@ -255,8 +248,6 @@ if (defined(ohos_lite)) {
       "$camera_path/metadata_manager:camera_metadata_manager",
       "$camera_path/pipeline_core:camera_pipeline_core",
       "$camera_path/utils:camera_utils",
-      "//drivers/hdf_core/adapter/uhdf2/host:libhdf_host",
-      "//drivers/interface/camera/v1_0:libcamera_stub_1.0",
     ]
 
     defines = []
@@ -287,6 +278,7 @@ if (defined(ohos_lite)) {
     }
     external_deps += [
       "drivers_interface_camera:metadata",
+      "drivers_interface_camera:libcamera_stub_1.0",
       "hitrace_native:hitrace_meter",
       "ipc:ipc_single",
     ]

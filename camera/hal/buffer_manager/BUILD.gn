@@ -29,26 +29,24 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("camera_buffer_manager") {
     sources = [
-      "src/buffer_adapter/lite/buffer_adapter.cpp",
-      "src/buffer_allocator.cpp",
-      "src/buffer_allocator_factory.cpp",
-      "src/buffer_allocator_utils.cpp",
-      "src/buffer_loop_tracking.cpp",
-      "src/buffer_manager.cpp",
-      "src/buffer_pool.cpp",
-      "src/buffer_tracking.cpp",
-      "src/heap_buffer_allocator/heap_buffer_allocator.cpp",
-      "src/image_buffer.cpp",
+      "./src/buffer_adapter/lite/buffer_adapter.cpp",
+      "./src/buffer_allocator.cpp",
+      "./src/buffer_allocator_factory.cpp",
+      "./src/buffer_allocator_utils.cpp",
+      "./src/buffer_loop_tracking.cpp",
+      "./src/buffer_manager.cpp",
+      "./src/buffer_pool.cpp",
+      "./src/buffer_tracking.cpp",
+      "./src/heap_buffer_allocator/heap_buffer_allocator.cpp",
+      "./src/image_buffer.cpp",
     ]
 
     include_dirs = [
-      "include",
+      "./include",
       "$camera_path/include",
-      "src/buffer_adapter/lite",
-      "//commonlibrary/utils_lite/include",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
-      "//drivers/peripheral/display/interfaces/include",
-      "//drivers/peripheral/base",
+      "./src/buffer_adapter/lite",
+      "$camera_path/../../display/interfaces/include",
+      "$camera_path/../../base",
     ]
 
     libs = []
@@ -88,21 +86,21 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("camera_buffer_manager") {
     sources = [
-      "src/buffer_adapter/standard/buffer_adapter.cpp",
-      "src/buffer_allocator.cpp",
-      "src/buffer_allocator_factory.cpp",
-      "src/buffer_allocator_utils.cpp",
-      "src/buffer_loop_tracking.cpp",
-      "src/buffer_manager.cpp",
-      "src/buffer_pool.cpp",
-      "src/buffer_tracking.cpp",
-      "src/heap_buffer_allocator/heap_buffer_allocator.cpp",
-      "src/image_buffer.cpp",
+      "./src/buffer_adapter/standard/buffer_adapter.cpp",
+      "./src/buffer_allocator.cpp",
+      "./src/buffer_allocator_factory.cpp",
+      "./src/buffer_allocator_utils.cpp",
+      "./src/buffer_loop_tracking.cpp",
+      "./src/buffer_manager.cpp",
+      "./src/buffer_pool.cpp",
+      "./src/buffer_tracking.cpp",
+      "./src/heap_buffer_allocator/heap_buffer_allocator.cpp",
+      "./src/image_buffer.cpp",
     ]
 
     include_dirs = [
-      "include",
-      "src/buffer_adapter/standard",
+      "./include",
+      "./src/buffer_adapter/standard",
       "$camera_path/include",
     ]
 
