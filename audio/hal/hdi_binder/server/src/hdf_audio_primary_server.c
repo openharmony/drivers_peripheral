@@ -28,7 +28,7 @@ static void AudioHdiPrimaryServerRelease(struct HdfDeviceObject *deviceObject)
     AUDIO_FUNC_LOGI("enter!");
     /* g_renderAndCaptureManage release */
     AdaptersServerManageInfomationRecycle();
-    ReleaseAudioManagerObjectComm(GetAudioManagerFuncs());
+    AudioHdiServerRelease();
 
     if (deviceObject == NULL) {
         AUDIO_FUNC_LOGE("Parameter is null!");

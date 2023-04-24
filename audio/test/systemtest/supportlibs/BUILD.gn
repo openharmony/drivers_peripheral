@@ -15,7 +15,6 @@ if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
 } else {
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
   import("./../../../audio.gni")
 }
 
@@ -25,8 +24,8 @@ group("supportlibs") {
     testonly = true
     if (enable_audio_adm_passthrough) {
       deps += [ "common:lib_common" ]
-      if (!defined(drivers_peripheral_audio_alsa_lib) ||
-          drivers_peripheral_audio_alsa_lib == false) {
+      if (!defined(drivers_peripheral_audio_feature_alsa_lib) ||
+          drivers_peripheral_audio_feature_alsa_lib == false) {
         deps += [ "hardwaredependence:lib_hardwaredependence" ]
       }
     }
