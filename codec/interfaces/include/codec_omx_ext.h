@@ -185,6 +185,13 @@ enum OmxIndexCodecExType {
     OMX_IndexParamVideoHevc,
 };
 
+enum OmxIndexCodecVendorExtType {
+    /** Extended Channel Attributes index */
+    OMX_IndexCodecExtChannelAttributes = OMX_IndexVendorStartUnused + 0x1,
+    /** CodecEnableNativeBufferParams */
+    OMX_IndexCodecExtEnableNativeBuffer,
+};
+
 /**
  * @brief Structure for controlling HEVC video encoding
  */
