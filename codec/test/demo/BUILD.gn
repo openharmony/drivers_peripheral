@@ -17,6 +17,7 @@ group("hdf_demo_codec") {
   testonly = true
   deps = [
     "idl:codec_idl_omx_demo",
+    "jpeg:codec_hdi_jpeg_demo",
     "v2.0:codec_hdi_omx_demo",
   ]
 
