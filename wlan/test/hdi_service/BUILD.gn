@@ -12,7 +12,8 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+
+TEST_ROOT_DIR = "../.."
 
 module_output_path = "drivers_peripheral_wlan/wlan"
 
@@ -26,17 +27,17 @@ ohos_unittest("WlanHdiServiceTestC") {
   ]
 
   deps = [
-    "//drivers/peripheral/wlan/hdi_service:hdi_wlan_service",
+    "$TEST_ROOT_DIR/hdi_service:hdi_wlan_service",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
   ]
 
   include_dirs = [
     "include",
-    "//drivers/peripheral/wlan/interfaces/include",
-    "//drivers/peripheral/wlan/hdi_service",
-    "//drivers/peripheral/wlan/client/include",
-    "//drivers/peripheral/wlan/hal/include",
+    "$TEST_ROOT_DIR/interfaces/include",
+    "$TEST_ROOT_DIR/hdi_service",
+    "$TEST_ROOT_DIR/client/include",
+    "$TEST_ROOT_DIR/hal/include",
   ]
 
   if (is_standard_system) {
