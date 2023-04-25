@@ -16,16 +16,16 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 
 module_output_path = "hdf/input"
+INPUT_ROOT_DIR = "./../../.."
 
 ohos_fuzztest("InputGetpowerStatusFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file =
-      "//drivers/peripheral/input/test/fuzztest/inputgetpowerstatus_fuzzer"
+  fuzz_config_file = "."
 
   include_dirs = [
-    "//drivers/peripheral/input/test/fuzztest/inputgetpowerstatus_fuzzer",
-    "//drivers/peripheral/input/interfaces/include",
+    "./",
+    "$INPUT_ROOT_DIR/interfaces/include",
   ]
 
   cflags = [
@@ -37,7 +37,7 @@ ohos_fuzztest("InputGetpowerStatusFuzzTest") {
 
   sources = [ "inputgetpowerstatus_fuzzer.cpp" ]
 
-  deps = [ "//drivers/peripheral/input/hal:hdi_input" ]
+  deps = [ "$INPUT_ROOT_DIR/hal:hdi_input" ]
   external_deps = [
     "c_utils:utils",
     "hdf_core:libhdf_utils",
