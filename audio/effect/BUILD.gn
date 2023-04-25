@@ -11,7 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//drivers/peripheral/audio/audio.gni")
+import("../audio.gni")
 
 group("effect_model") {
   if (!defined(ohos_lite) && drivers_peripheral_audio_feature_effect) {

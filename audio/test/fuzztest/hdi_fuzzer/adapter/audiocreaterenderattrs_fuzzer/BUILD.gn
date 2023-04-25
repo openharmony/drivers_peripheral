@@ -10,17 +10,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+hdf_fuzztest_path = "./../../.."
+hdf_audio_path = "./../../../../.."
+
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("$hdf_audio_path/audio.gni")
 
 module_output_path = "hdf/audio"
 
 ohos_fuzztest("AudioCreaterenderAttrsFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//drivers/peripheral/audio/test/fuzztest/hdi_fuzzer/adapter/audiocreaterenderattrs_fuzzer"
+  fuzz_config_file = "../audiocreaterenderattrs_fuzzer"
 
   include_dirs = []
   cflags = [
@@ -35,11 +39,11 @@ ohos_fuzztest("AudioCreaterenderAttrsFuzzTest") {
     "audiocreaterenderattrs_fuzzer.cpp",
   ]
   include_dirs = [
-    "//drivers/peripheral/audio/interfaces/include",
-    "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+    "$hdf_audio_path/interfaces/include",
+    "$hdf_audio_path/hal/hdi_passthrough/include",
     "//third_party/bounds_checking_function/include",
-    "//drivers/peripheral/audio/test/fuzztest/hdi_fuzzer/adapter/audiocreaterenderattrs_fuzzer/include",
-    "//drivers/peripheral/audio/test/fuzztest/common/include",
+    "include",
+    "$hdf_fuzztest_path/common/include",
   ]
   external_deps = [
     "c_utils:utils",
