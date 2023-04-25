@@ -11,9 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+hdf_audio_path = "./.."
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("$hdf_audio_path/audio.gni")
 
 config("audio_interface_config") {
   visibility = [ ":*" ]
@@ -29,16 +30,16 @@ config("audio_interface_config") {
 if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio_interface_lib_capture") {
     sources = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
+      "$hdf_audio_path/hal/hdi_passthrough/src/audio_common.c",
       "adm_adapter/src/audio_interface_lib_capture.c",
       "adm_adapter/src/audio_interface_lib_common.c",
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-      "//drivers/peripheral/audio/supportlibs/interfaces/include",
-      "//drivers/peripheral/audio/interfaces/include",
+      "$hdf_audio_path/hal/hdi_passthrough/include",
+      "adm_adapter/include",
+      "interfaces/include",
+      "$hdf_audio_path/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
@@ -57,16 +58,16 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("hdi_audio_interface_lib_render") {
     sources = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
+      "$hdf_audio_path/hal/hdi_passthrough/src/audio_common.c",
       "adm_adapter/src/audio_interface_lib_common.c",
       "adm_adapter/src/audio_interface_lib_render.c",
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-      "//drivers/peripheral/audio/supportlibs/interfaces/include",
-      "//drivers/peripheral/audio/interfaces/include",
+      "$hdf_audio_path/hal/hdi_passthrough/include",
+      "adm_adapter/include",
+      "interfaces/include",
+      "$hdf_audio_path/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
@@ -87,25 +88,24 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_shared_library("hdi_audio_interface_lib_capture") {
-    sources =
-        [ "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c" ]
+    sources = [ "$hdf_audio_path/hal/hdi_passthrough/src/audio_common.c" ]
     if (drivers_peripheral_audio_alsa_lib) {
       sources += [
-        "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_capture.c",
-        "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_common.c",
-        "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_mixer_path.c",
         "//third_party/cJSON/cJSON.c",
+        "alsa_adapter/src/alsa_lib_capture.c",
+        "alsa_adapter/src/alsa_lib_common.c",
+        "alsa_adapter/src/alsa_mixer_path.c",
       ]
     } else {
       sources += [
-        "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_capture.c",
-        "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
+        "adm_adapter/src/audio_interface_lib_capture.c",
+        "adm_adapter/src/audio_interface_lib_common.c",
       ]
     }
     include_dirs = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/supportlibs/interfaces/include",
+      "$hdf_audio_path/hal/hdi_passthrough/include",
+      "$hdf_audio_path/interfaces/include",
+      "interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
     ]
@@ -119,13 +119,12 @@ if (defined(ohos_lite)) {
     if (drivers_peripheral_audio_alsa_lib) {
       include_dirs += [
         "//third_party/alsa-lib/include",
-        "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
+        "alsa_adapter/include",
         "//third_party/cJSON",
       ]
       deps += [ "//third_party/alsa-lib:libasound" ]
     } else {
-      include_dirs +=
-          [ "//drivers/peripheral/audio/supportlibs/adm_adapter/include" ]
+      include_dirs += [ "adm_adapter/include" ]
     }
     if (is_standard_system) {
       external_deps = [
@@ -145,26 +144,25 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("hdi_audio_interface_lib_render") {
-    sources =
-        [ "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c" ]
+    sources = [ "$hdf_audio_path/hal/hdi_passthrough/src/audio_common.c" ]
     if (drivers_peripheral_audio_alsa_lib) {
       sources += [
-        "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_common.c",
-        "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_render.c",
-        "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_mixer_path.c",
         "//third_party/cJSON/cJSON.c",
+        "alsa_adapter/src/alsa_lib_common.c",
+        "alsa_adapter/src/alsa_lib_render.c",
+        "alsa_adapter/src/alsa_mixer_path.c",
       ]
     } else {
       sources += [
-        "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_common.c",
-        "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_render.c",
+        "adm_adapter/src/audio_interface_lib_common.c",
+        "adm_adapter/src/audio_interface_lib_render.c",
       ]
     }
 
     include_dirs = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/supportlibs/interfaces/include",
+      "$hdf_audio_path/hal/hdi_passthrough/include",
+      "$hdf_audio_path/interfaces/include",
+      "interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
     ]
@@ -177,14 +175,13 @@ if (defined(ohos_lite)) {
 
     if (drivers_peripheral_audio_alsa_lib) {
       include_dirs += [
-        "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
+        "alsa_adapter/include",
         "//third_party/alsa-lib/include",
         "//third_party/cJSON",
       ]
       deps += [ "//third_party/alsa-lib:libasound" ]
     } else {
-      include_dirs +=
-          [ "//drivers/peripheral/audio/supportlibs/adm_adapter/include" ]
+      include_dirs += [ "adm_adapter/include" ]
     }
     if (is_standard_system) {
       external_deps = [

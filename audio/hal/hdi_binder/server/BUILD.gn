@@ -11,16 +11,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+hdf_audio_path = "./../../.."
+hdf_hal_path = "./../.."
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("$hdf_audio_path/audio.gni")
 
 if (drivers_peripheral_audio_hdf_proxy_stub == true) {
   ohos_shared_library("hdi_audio_primary_server") {
     include_dirs = [
-      "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+      "$hdf_audio_path/interfaces/include",
+      "$hdf_hal_path/hdi_passthrough/include",
+      "include",
       "//third_party/bounds_checking_function/include",
     ]
 
@@ -32,10 +34,10 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       "src/hdf_audio_server_render.c",
     ]
 
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
+    deps = [ "$hdf_hal_path/hdi_passthrough:hdi_audio_common" ]
     if (!drivers_peripheral_audio_user_mode) {
       if (drivers_peripheral_audio_rich_device == false) {
-        deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+        deps += [ "$hdf_hal_path/hdi_passthrough:hdi_audio" ]
       } else {
         AUDIO_VENDOR_LIB_PATH = rebase_path(
                 "//vendor/$device_company/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi")
@@ -74,9 +76,9 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
 
   ohos_shared_library("hdi_audio_usb_server") {
     include_dirs = [
-      "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+      "$hdf_audio_path/interfaces/include",
+      "$hdf_hal_path/hdi_passthrough/include",
+      "include",
       "//third_party/bounds_checking_function/include",
     ]
 
@@ -88,10 +90,10 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       "src/hdf_audio_usb_server.c",
     ]
 
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
+    deps = [ "$hdf_hal_path/hdi_passthrough:hdi_audio_common" ]
     if (!drivers_peripheral_audio_user_mode) {
       if (drivers_peripheral_audio_rich_device == false) {
-        deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+        deps += [ "$hdf_hal_path/hdi_passthrough:hdi_audio" ]
       } else {
         AUDIO_VENDOR_LIB_PATH = rebase_path(
                 "//vendor/$device_company/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi")
@@ -128,9 +130,9 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
 
   ohos_shared_library("hdi_audio_a2dp_server") {
     include_dirs = [
-      "//drivers/peripheral/audio/interfaces/include",
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+      "$hdf_audio_path/interfaces/include",
+      "$hdf_hal_path/hdi_passthrough/include",
+      "include",
       "//third_party/bounds_checking_function/include",
     ]
 
@@ -142,10 +144,10 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
       "src/hdf_audio_server_render.c",
     ]
 
-    deps = [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
+    deps = [ "$hdf_hal_path/hdi_passthrough:hdi_audio_common" ]
     if (!drivers_peripheral_audio_user_mode) {
       if (drivers_peripheral_audio_rich_device == false) {
-        deps += [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio" ]
+        deps += [ "$hdf_hal_path/hdi_passthrough:hdi_audio" ]
       } else {
         AUDIO_VENDOR_LIB_PATH = rebase_path(
                 "//vendor/$device_company/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi")
@@ -182,9 +184,9 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
 
   ohos_shared_library("hdi_audio_pnp_server") {
     include_dirs = [
-      "//drivers/peripheral/audio/hal/hdi_binder/server/include",
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/interfaces/include",
+      "include",
+      "$hdf_hal_path/hdi_passthrough/include",
+      "$hdf_audio_path/interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
 
