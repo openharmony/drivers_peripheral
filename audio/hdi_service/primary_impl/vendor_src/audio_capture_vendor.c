@@ -440,7 +440,33 @@ int32_t AudioHwiCaptureGetExtraParams(struct IAudioCapture *capture, char *keyVa
 int32_t AudioHwiCaptureReqMmapBuffer(struct IAudioCapture *capture, int32_t reqSize,
     struct AudioMmapBufferDescriptor *desc)
 {
-    return HDF_ERR_NOT_SUPPORT;
+    CHECK_NULL_PTR_RETURN_VALUE(capture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(desc, HDF_ERR_INVALID_PARAM);
+
+    struct AudioCaptureInfo *captureInfo = (struct AudioCaptureInfo *)(capture);
+	struct AudioHwiCapture *hwiCapture = captureInfo->hwiCapture;
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture, HDF_ERR_INVALID_PARAM);
+    CHECK_NULL_PTR_RETURN_VALUE(hwiCapture->attr.ReqMmapBuffer, HDF_ERR_INVALID_PARAM);
+
+    struct AudioHwiMmapBufferDescriptor hwiDesc = {0};
+    int32_t ret = hwiCapture->attr.ReqMmapBuffer(hwiCapture, reqSize, &hwiDesc);
+    if (ret != HDF_SUCCESS) {
+        AUDIO_FUNC_LOGE("audio capture ReqMmapBuffer fail, ret=%{pubilc}d", ret);
+        return ret;
+    }
+
+    desc->memoryFd = hwiDesc.memoryFd;
+    desc->totalBufferFrames = hwiDesc.totalBufferFrames;
+    desc->transferFrameSize = hwiDesc.transferFrameSize;
+    desc->isShareable = hwiDesc.isShareable;
+    desc->filePath = strdup("");  // which will be released after send reply
+    if (desc->totalBufferFrames < 0) {
+        // make the totalBufferFrames valid
+        desc->totalBufferFrames *= -1;
+        desc->isShareable = 1;
+    }
+
+    return HDF_SUCCESS;
 }
 
 int32_t AudioHwiCaptureGetMmapPosition(struct IAudioCapture *capture, uint64_t *frames, struct AudioTimeStamp *time)
