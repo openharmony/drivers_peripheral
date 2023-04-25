@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+INPUT_ROOT_DIR = "./../.."
+
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
@@ -28,8 +30,8 @@ if (defined(ohos_lite)) {
       "//third_party/googletest/googletest/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-      "//drivers/peripheral/input/hal/include",
-      "//drivers/peripheral/input/interfaces/include",
+      "$INPUT_ROOT_DIR/hal/include",
+      "$INPUT_ROOT_DIR/interfaces/include",
       "//third_party/FreeBSD/sys/dev/evdev",
     ]
 
@@ -49,12 +51,12 @@ if (defined(ohos_lite)) {
       ]
     }
     public_deps = [
+      "$INPUT_ROOT_DIR/hal:hdi_input",
       "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//drivers/peripheral/input/hal:hdi_input",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
   }
@@ -63,8 +65,8 @@ if (defined(ohos_lite)) {
   ohos_unittest("hdf_unittest_input") {
     module_out_path = module_output_path
     include_dirs = [
-      "//drivers/peripheral/input/hal/include",
-      "//drivers/peripheral/input/interfaces/include",
+      "$INPUT_ROOT_DIR/hal/include",
+      "$INPUT_ROOT_DIR/interfaces/include",
     ]
     sources = [ "./common/hdi_input_test.cpp" ]
     cflags = [
@@ -76,8 +78,8 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     deps = [
+      "$INPUT_ROOT_DIR/hal:hdi_input",
       "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
-      "//drivers/peripheral/input/hal:hdi_input",
     ]
     if (is_standard_system) {
       external_deps = [
