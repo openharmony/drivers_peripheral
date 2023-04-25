@@ -1,7 +1,7 @@
 {
   "name": "@ohos/drivers_peripheral_wlan",
   "description": "wlan device driver",
-  "version": "3.1",
+  "version": "4.0",
   "license": "Apache License 2.0",
   "publishAs": "code-segment",
   "segment": {
@@ -12,8 +12,7 @@
   "component": {
     "name": "drivers_peripheral_wlan",
     "subsystem": "hdf",
-    "syscap": [ "" ],
-    "adapter_system_type": ["standard", "small"],
+    "adapted_system_type": ["standard", "small"],
     "rom": "660KB",
     "ram": "7600KB",
     "deps": {
