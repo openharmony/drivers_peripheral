@@ -411,6 +411,7 @@ int32_t AudioHwiCommonSampleAttrToHwiSampleAttr(const struct AudioSampleAttribut
     hwiAttrs->stopThreshold = attrs->stopThreshold;
     hwiAttrs->silenceThreshold = attrs->silenceThreshold;
     hwiAttrs->streamId = attrs->streamId;
+    hwiAttrs->sourceType = attrs->sourceType;
 
     return HDF_SUCCESS;
 }
