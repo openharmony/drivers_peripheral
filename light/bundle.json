@@ -13,7 +13,8 @@
     "name": "drivers_peripheral_light",
     "subsystem": "hdf",
     "features": [
-      "drivers_peripheral_light_feature_model"
+      "drivers_peripheral_light_feature_model",
+      "drivers_peripheral_light_community"
     ],
     "syscap": [""],
     "adapter_system_type": ["standard"],

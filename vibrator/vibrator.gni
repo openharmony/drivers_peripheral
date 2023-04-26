@@ -1,0 +1,3 @@
+declare_args() {
+  drivers_peripheral_vibrator_community = true
+}
