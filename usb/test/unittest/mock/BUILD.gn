@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/peripheral/usb/usb.gni")
+import("./../../../usb.gni")
 
 module_output_path = "hdf/usb"
 
@@ -21,11 +21,11 @@ config("module_private_config") {
 
   include_dirs = [
     "include",
-    "//drivers/peripheral/usb/hdi_service/include",
-    "//drivers/peripheral/usb/ddk/host/include",
+    "./../../../hdi_service/include",
+    "./../../../ddk/host/include",
     "//third_party/googletest/googlemock/include",
-    "//drivers/peripheral/usb/test/unittest/mock/include",
-    "//drivers/peripheral/usb/gadget/function/include",
+    "./include",
+    "./../../../gadget/function/include",
     "//utils/system/safwk/native/include",
     "${usb_driver_path}/test/UsbSubscriberTest",
   ]
