@@ -13,7 +13,8 @@
     "name": "drivers_peripheral_motion",
     "subsystem": "hdf",
     "features": [
-      "drivers_peripheral_motion_feature_model"
+      "drivers_peripheral_motion_feature_model",
+      "drivers_peripheral_motion_community"
     ],
     "syscap": [ "" ],
     "adapter_system_type": ["standard"],
