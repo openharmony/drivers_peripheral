@@ -120,9 +120,12 @@ static char *AudioEffectGetAndCheckName(const cJSON *cJSONObj, const char *name)
         return NULL;
     }
 
-    if (strcmp(name, "effectId") && !isalpha(*effectValue++)) { // Names must begin with a letter
-        HDF_LOGE("%{public}s: effectValue is illegal!", __func__);
-        return NULL;
+    if (strcmp(name, "effectId")) {
+        if (!isalpha(*effectValue)) { // Names must begin with a letter
+            HDF_LOGE("%{public}s: effectValue is illegal!", __func__);
+            return NULL;
+        }
+        effectValue++;
     }
 
     while (*effectValue != '\0') {
@@ -230,7 +233,7 @@ static int32_t AudioEffectGetEffectCfgDescs(cJSON *cJsonObj, const char *item, s
         return HDF_FAILURE;
     }
 
-    effectNum = cJSON_GetArraySize(effectsObj);
+    effectNum = (uint32_t)cJSON_GetArraySize(effectsObj);
     if (effectNum == 0) {
         HDF_LOGE("%{public}s: effectNum invalid, effectNum = %{public}d!", __func__, effectNum);
         return HDF_FAILURE;
@@ -317,7 +320,7 @@ static int32_t AudioEffectGetLibraryCfgDescs(cJSON *cJsonObj, const char *item, 
         return HDF_FAILURE;
     }
 
-    libNum = cJSON_GetArraySize(libsObj);
+    libNum = (uint32_t)cJSON_GetArraySize(libsObj);
     if (libNum == 0) {
         HDF_LOGE("%{public}s: libNum invalid, libNum = %{public}d!", __func__, libNum);
         return HDF_FAILURE;
