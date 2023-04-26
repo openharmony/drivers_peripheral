@@ -19,8 +19,10 @@
 #include <hdf_sbuf_ipc.h>
 #include "v1_0/mapper_stub.h"
 
-#undef HDF_LOG_TAG
-#define HDF_LOG_TAG MAPPER_DRV
+#undef LOG_TAG
+#define LOG_TAG "MAPPER_DRV"
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD002500
 
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 
