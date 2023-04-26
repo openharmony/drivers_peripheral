@@ -54,10 +54,4 @@ group("hdi_audio") {
   if (drivers_peripheral_audio_hal_notsupport_pathselect == false) {
     deps += [ "hal/pathselect:hdi_audio_path_select" ]
   }
-
-  if (drivers_peripheral_audio_policy_config == true) {
-    deps += [
-      "//vendor/${product_company}/${product_name}/audio:audio_policy_config",
-    ]
-  }
 }
