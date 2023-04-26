@@ -13,8 +13,8 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/usb/usb.gni")
+import("./../../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../../usb.gni")
 
 config("module_private_config") {
   visibility = [ ":*" ]

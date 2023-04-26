@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,14 +17,14 @@ if (defined(ohos_lite)) {
   ohos_executable("usbhost_ddk_test") {
     include_dirs = [
       "//third_party/bounds_checking_function/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-      "//drivers/peripheral/usb/sample/host/include",
-      "//drivers/peripheral/usb/ddk/common/include",
-      "//drivers/peripheral/usb/ddk/device/include",
-      "//drivers/peripheral/usb/ddk/host/include",
-      "//drivers/peripheral/usb/interfaces/ddk/common",
-      "//drivers/peripheral/usb/interfaces/ddk/host",
-      "//drivers/peripheral/usb/gadget/function/include",
+      "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "./include",
+      "./../../ddk/common/include",
+      "./../../ddk/device/include",
+      "./../../ddk/host/include",
+      "./../../interfaces/ddk/common",
+      "./../../interfaces/ddk/host",
+      "./../../gadget/function/include",
     ]
 
     sources = [
@@ -32,7 +32,7 @@ if (defined(ohos_lite)) {
       "src/usbhost_test.c",
     ]
 
-    deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+    deps = [ "./../../../../../base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
     external_deps = [ "hdf_core:libhdf_utils" ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
 
@@ -42,18 +42,18 @@ if (defined(ohos_lite)) {
   }
 } else {
   import("//build/ohos.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("./../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
   ohos_executable("usbhost_ddk_test") {
     include_dirs = [
       "include",
-      "//drivers/peripheral/usb/ddk/common/include",
-      "//drivers/peripheral/usb/ddk/device/include",
-      "//drivers/peripheral/usb/ddk/host/include",
-      "//drivers/peripheral/usb/interfaces/ddk/common",
-      "//drivers/peripheral/usb/interfaces/ddk/host",
-      "//drivers/peripheral/usb/gadget/function/include",
-      "//drivers/peripheral/usb/serial/include",
+      "./../../ddk/common/include",
+      "./../../ddk/device/include",
+      "./../../ddk/host/include",
+      "./../../interfaces/ddk/common",
+      "./../../interfaces/ddk/host",
+      "./../../gadget/function/include",
+      "./../../serial/include",
     ]
 
     sources = [
@@ -88,15 +88,15 @@ if (defined(ohos_lite)) {
     sources = [ "src/usb_pnp_sample.c" ]
 
     include_dirs = [
-      "//drivers/peripheral/usb/ddk/common/include",
-      "//drivers/peripheral/usb/ddk/host/include",
-      "//drivers/peripheral/usb/interfaces/ddk/common",
-      "//drivers/peripheral/usb/interfaces/ddk/host",
+      "./../../common/include",
+      "./../../ddk/host/include",
+      "./../../interfaces/ddk/common",
+      "./../../interfaces/ddk/host",
       "include",
-      "//drivers/peripheral/usb/serial/include",
+      "./../../serial/include",
     ]
 
-    deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
+    deps = [ "./../../ddk:libusb_core" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -118,7 +118,7 @@ if (defined(ohos_lite)) {
   ohos_executable("usbhost_pnp_test") {
     include_dirs = [
       "include",
-      "//drivers/peripheral/usb/serial/include",
+      "./../../serial/include",
     ]
 
     sources = [ "src/usbhost_pnp_test.c" ]
@@ -146,16 +146,16 @@ if (defined(ohos_lite)) {
     sources = [ "src/usbhost_sdkapi_speed.c" ]
 
     include_dirs = [
-      "//drivers/peripheral/usb/ddk/common/include",
-      "//drivers/peripheral/usb/ddk/host/include",
-      "//drivers/peripheral/usb/interfaces/ddk/common",
-      "//drivers/peripheral/usb/interfaces/ddk/host",
-      "//drivers/peripheral/usb/gadget/function/include",
+      "./../../common/include",
+      "./../../host/include",
+      "./../../interfaces/ddk/common",
+      "./../../interfaces/ddk/host",
+      "./../../gadget/function/include",
       "include",
-      "//drivers/peripheral/usb/serial/include",
+      "/./../../serial/include",
     ]
 
-    deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
+    deps = [ "./../../ddk:libusb_core" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -179,16 +179,16 @@ if (defined(ohos_lite)) {
     sources = [ "src/usbhost_sdkraw_speed.c" ]
 
     include_dirs = [
-      "//drivers/peripheral/usb/ddk/common/include",
-      "//drivers/peripheral/usb/ddk/host/include",
-      "//drivers/peripheral/usb/gadget/function/include",
-      "//drivers/peripheral/usb/interfaces/ddk/common",
-      "//drivers/peripheral/usb/interfaces/ddk/host",
+      "./../../common/include",
+      "./../../ddk/host/include",
+      "./../../gadget/function/include",
+      "./../../interfaces/ddk/common",
+      "./../../interfaces/ddk/host",
       "include",
-      "//drivers/peripheral/usb/serial/include",
+      "./../../serial/include",
     ]
 
-    deps = [ "//drivers/peripheral/usb/ddk:libusb_core" ]
+    deps = [ "./../../ddk:libusb_core" ]
 
     if (is_standard_system) {
       external_deps = [
@@ -211,13 +211,13 @@ if (defined(ohos_lite)) {
   ohos_executable("usbhost_nosdk_speed_test") {
     include_dirs = [
       "include",
-      "//drivers/peripheral/usb/ddk/common/include",
-      "//drivers/peripheral/usb/ddk/device/include",
-      "//drivers/peripheral/usb/ddk/host/include",
-      "//drivers/peripheral/usb/interfaces/ddk/common",
-      "//drivers/peripheral/usb/interfaces/ddk/host",
-      "//drivers/peripheral/usb/gadget/function/include",
-      "//drivers/peripheral/usb/serial/include",
+      "./../../ddk/common/include",
+      "./../../ddk/device/include",
+      "./../../ddk/host/include",
+      "./../../interfaces/ddk/common",
+      "./../../interfaces/ddk/host",
+      "./../../gadget/function/include",
+      "./../../serial/include",
     ]
 
     sources = [ "src/usbhost_nosdk_speed.c" ]
