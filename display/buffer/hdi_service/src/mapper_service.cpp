@@ -20,8 +20,10 @@
 #include <hdf_log.h>
 #include "display_log.h"
 
-#undef HDF_LOG_TAG
-#define HDF_LOG_TAG MAPPER_SRV
+#undef LOG_TAG
+#define LOG_TAG "MAPPER_SRV"
+#undef LOG_DOMAIN
+#define LOG_DOMAIN 0xD002500
 
 namespace OHOS {
 namespace HDI {
