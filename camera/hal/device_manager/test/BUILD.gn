@@ -15,7 +15,7 @@ import("../../camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
+  import("../../../../../hdf_core/adapter/uhdf/uhdf.gni")
 
   config("mpi_device_config") {
     visibility = [ ":*" ]
@@ -51,8 +51,8 @@ if (defined(ohos_lite)) {
     ldflags += [ "-ldriver_adapter" ]
     public_deps = [
       "$camera_path/device_manager:camera_device_manager",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      ]
+      "../../../../../hdf_core/adapter/uhdf/manager:hdf_core",
+    ]
     external_deps = [
       "drivers_interface_camera:metadata",
       "hdf_core:hdf_posix_osal",
@@ -61,7 +61,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
   need_link_hispark_taurus_lib = true
   if (need_link_hispark_taurus_lib) {
     if (use_musl) {

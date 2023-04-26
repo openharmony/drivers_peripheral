@@ -13,7 +13,7 @@
 
 if (defined(ohos_lite)) {
   import("//build/ohos.gni")
-  import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
+  import("../../../../hdf_core/adapter/uhdf/uhdf.gni")
   import("../camera.gni")
   config("utils_config") {
     visibility = [ ":*" ]

@@ -15,7 +15,7 @@ import("../../camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
+  import("../../../../../hdf_core/adapter/uhdf/uhdf.gni")
 
   config("cameraTest_config") {
     visibility = [ ":*" ]
@@ -70,7 +70,6 @@ if (defined(ohos_lite)) {
       "$camera_path/utils/event",
       "$camera_path/../../base",
       "$camera_path/../../display/interfaces/include",
-      "//base/startup/init/interfaces/innerkits/include/syspara",
 
       #producer
       "$camera_path/pipeline_core/utils",
@@ -94,20 +93,20 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_host_service_1.0",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+      "../../../../../hdf_core/adapter/uhdf/manager:hdf_core",
     ]
     external_deps = [
       "drivers_interface_camera:metadata",
       "graphic_chipsetsdk:surface",
       "hdf_core:hdf_posix_osal",
-      "init:libbegetutil",
       "hilog_featured_lite:hilog_shared",
+      "init:libbegetutil",
     ]
   }
 } else {
   import("//build/ohos.gni")
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
   module_output_path = "hdf/camera"
 
@@ -165,7 +164,6 @@ if (defined(ohos_lite)) {
       "$camera_path/utils/event",
 
       #producer
-      "//foundation/systemabilitymgr/samgr/interfaces/innerkits/samgr_proxy/include",
       "$camera_path/pipeline_core/utils",
       "$camera_path/pipeline_core/include",
       "$camera_path/pipeline_core/host_stream/include",
