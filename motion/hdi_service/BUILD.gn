@@ -11,11 +11,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+HDF_CORE_PATH = "../../../hdf_core"
+hdf_interface_path = "../../../interface"
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libmotion_interface_service_1.0") {
-  include_dirs = [ "//drivers/peripheral/motion/interfaces/include/" ]
+  include_dirs = [ "../interfaces/include/" ]
   sources = [ "motion_impl.cpp" ]
   cflags = [
     "-Wall",
@@ -42,11 +44,11 @@ ohos_shared_library("libmotion_interface_service_1.0") {
 }
 
 ohos_shared_library("libmotion_driver") {
-  include_dirs = [ "//drivers/peripheral/motion/interfaces/include/" ]
+  include_dirs = [ "../interfaces/include/" ]
 
   sources = [ "motion_interface_driver.cpp" ]
 
-  deps = [ "//drivers/interface/motion/v1_0:libmotion_stub_1.0" ]
+  deps = [ "$hdf_interface_path/motion/v1_0:libmotion_stub_1.0" ]
 
   cflags = [
     "-Wall",

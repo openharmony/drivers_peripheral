@@ -11,14 +11,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+HDF_CORE_PATH = "../../../../../hdf_core"
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "hdf/vibrator"
 ohos_unittest("hdf_unittest_hdi_vibrator") {
   module_out_path = module_output_path
-  include_dirs = [ "//drivers/peripheral/vibrator/interfaces/include" ]
+  include_dirs = [ "../../../interfaces/include" ]
 
   sources = [ "hdf_vibrator_hdi_test.cpp" ]
   cflags = [
