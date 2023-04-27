@@ -14,8 +14,6 @@
 
 import("//build/ohos.gni")
 
-VIBRATRO_ROOT_DIR = "//drivers/peripheral/vibrator"
-
 if (defined(ohos_lite)) {
   config("libhdi_vibrator_pub_config") {
     visibility = [ ":*" ]
@@ -24,19 +22,19 @@ if (defined(ohos_lite)) {
   ohos_shared_library("hdi_vibrator") {
     output_extension = "z.so"
     public_configs = [ ":libhdi_vibrator_pub_config" ]
-    sources = [ "$VIBRATRO_ROOT_DIR/hal/src/vibrator_controller.c" ]
+    sources = [ "src/vibrator_controller.c" ]
 
     include_dirs = [
-      "$VIBRATRO_ROOT_DIR/hal/include",
-      "$VIBRATRO_ROOT_DIR/interfaces/include",
+      "include",
+      "../interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
 
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
     public_deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
     cflags = [
@@ -53,14 +51,14 @@ if (defined(ohos_lite)) {
 } else {
   config("libhdi_vibrator_pub_config") {
     visibility = [ ":*" ]
-    include_dirs = [ "$VIBRATRO_ROOT_DIR/interfaces/include" ]
+    include_dirs = [ "../interfaces/include" ]
   }
   ohos_shared_library("hdi_vibrator") {
     public_configs = [ ":libhdi_vibrator_pub_config" ]
-    sources = [ "$VIBRATRO_ROOT_DIR/hal/src/vibrator_controller.c" ]
+    sources = [ "src/vibrator_controller.c" ]
 
     include_dirs = [
-      "$VIBRATRO_ROOT_DIR/hal/include",
+      "include",
       "//third_party/bounds_checking_function/include",
     ]
 

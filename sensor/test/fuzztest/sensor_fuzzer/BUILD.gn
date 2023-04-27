@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+DRIVERS_INTERFACE_PATH = "../../../../../interface"
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
@@ -19,18 +20,18 @@ module_output_path = "drivers_peripheral_sensor/sensor"
 ohos_fuzztest("SensorFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "//drivers/peripheral/sensor/test/fuzztest/sensor_fuzzer"
+  fuzz_config_file = "../sensor_fuzzer"
 
   include_dirs = [
-    "//drivers/peripheral/sensor/test/fuzztest/sensor_fuzzer",
-    "//drivers/peripheral/sensor/hdi_service",
+    "../sensor_fuzzer",
+    "../../../hdi_service",
   ]
 
   sources = [ "sensor_fuzzer.cpp" ]
 
   deps = [
-    "//drivers/interface/sensor/v1_0:libsensor_stub_1.0",
-    "//drivers/peripheral/sensor/hal:hdi_sensor",
+    "$DRIVERS_INTERFACE_PATH/sensor/v1_0:libsensor_stub_1.0",
+    "../../../hal:hdi_sensor",
   ]
 
   external_deps = [

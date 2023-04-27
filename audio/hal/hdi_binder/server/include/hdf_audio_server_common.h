@@ -101,6 +101,7 @@ int32_t HdiServicePositionWrite(struct HdfSBuf *reply,
 int32_t HdiServiceReqMmapBuffer(struct AudioMmapBufferDescriptor *desc, struct HdfSBuf *data);
 
 int32_t HdiServiceGetFuncs();
+void AudioHdiServerRelease();
 int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,
     struct HdfSBuf *data, struct HdfSBuf *reply);
 int32_t HdiServiceLoadAdapter(const struct HdfDeviceIoClient *client,

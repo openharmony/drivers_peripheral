@@ -71,8 +71,6 @@ ohos_shared_library("libdistributed_camera_hdf_service_1.0") {
     "include/dcamera_provider",
     "include/dstream_operator",
     "include/utils",
-    "//utils/system/safwk/native/include",
-    "//commonlibrary/c_utils/base/include",
     "//third_party/jsoncpp/include",
   ]
 

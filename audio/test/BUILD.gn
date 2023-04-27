@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("./../audio.gni")
 
 if (defined(ohos_lite)) {
@@ -21,7 +20,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("audio_test_entry") {
-    if (drivers_peripheral_audio_hdf_proxy_stub == true) {
+    if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       testonly = true
       deps = [
         "benchmarktest:hdf_audio_benchmark_test",
@@ -29,7 +28,7 @@ if (defined(ohos_lite)) {
         "unittest:audiotest",
       ]
 
-      if (!drivers_peripheral_audio_rich_device) {
+      if (!drivers_peripheral_audio_feature_rich_device) {
         deps += [ "fuzztest:fuzztest" ]
       }
     }

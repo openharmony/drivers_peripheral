@@ -77,7 +77,7 @@ if (defined(ohos_lite)) {
 } else {
   ohos_shared_library("audio_capture_adapter") {
     sources = [ "$hdf_hdi_service_path/primary_impl/src/audio_common.c" ]
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       sources += [
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_lib_capture.c",
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_lib_common.c",
@@ -98,7 +98,7 @@ if (defined(ohos_lite)) {
       "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       include_dirs += [
         "//third_party/cJSON",
         "//third_party/alsa-lib/include",
@@ -133,7 +133,7 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("audio_render_adapter") {
     sources = [ "$hdf_hdi_service_path/primary_impl/src/audio_common.c" ]
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       sources += [
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_lib_common.c",
         "$hdf_audio_path/supportlibs/alsa_adapter/src/alsa_lib_render.c",
@@ -155,7 +155,7 @@ if (defined(ohos_lite)) {
       "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       include_dirs += [
         "//third_party/cJSON",
         "//third_party/alsa-lib/include",

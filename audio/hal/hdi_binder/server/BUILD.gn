@@ -14,10 +14,9 @@
 hdf_audio_path = "./../../.."
 hdf_hal_path = "./../.."
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("$hdf_audio_path/audio.gni")
 
-if (drivers_peripheral_audio_hdf_proxy_stub == true) {
+if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
   ohos_shared_library("hdi_audio_primary_server") {
     include_dirs = [
       "$hdf_audio_path/interfaces/include",
@@ -35,22 +34,6 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     ]
 
     deps = [ "$hdf_hal_path/hdi_passthrough:hdi_audio_common" ]
-    if (!drivers_peripheral_audio_user_mode) {
-      if (drivers_peripheral_audio_rich_device == false) {
-        deps += [ "$hdf_hal_path/hdi_passthrough:hdi_audio" ]
-      } else {
-        AUDIO_VENDOR_LIB_PATH = rebase_path(
-                "//vendor/$device_company/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi")
-        cmd = "if [ -f ${AUDIO_VENDOR_LIB_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
-        HAVE_AUDIO_VENDOR_LIB =
-            exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
-        if (HAVE_AUDIO_VENDOR_LIB) {
-          deps += [ "${AUDIO_VENDOR_LIB_PATH}:hdi_audio" ]
-        }
-      }
-    } else {
-      deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
-    }
 
     defines = []
     if (is_standard_system) {
@@ -91,22 +74,6 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     ]
 
     deps = [ "$hdf_hal_path/hdi_passthrough:hdi_audio_common" ]
-    if (!drivers_peripheral_audio_user_mode) {
-      if (drivers_peripheral_audio_rich_device == false) {
-        deps += [ "$hdf_hal_path/hdi_passthrough:hdi_audio" ]
-      } else {
-        AUDIO_VENDOR_LIB_PATH = rebase_path(
-                "//vendor/$device_company/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi")
-        cmd = "if [ -f ${AUDIO_VENDOR_LIB_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
-        HAVE_AUDIO_VENDOR_LIB =
-            exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
-        if (HAVE_AUDIO_VENDOR_LIB) {
-          deps += [ "${AUDIO_VENDOR_LIB_PATH}:hdi_audio" ]
-        }
-      }
-    } else {
-      deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
-    }
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
@@ -145,22 +112,6 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
     ]
 
     deps = [ "$hdf_hal_path/hdi_passthrough:hdi_audio_common" ]
-    if (!drivers_peripheral_audio_user_mode) {
-      if (drivers_peripheral_audio_rich_device == false) {
-        deps += [ "$hdf_hal_path/hdi_passthrough:hdi_audio" ]
-      } else {
-        AUDIO_VENDOR_LIB_PATH = rebase_path(
-                "//vendor/$device_company/ap/prebuilt_scripts/ohos_vendor/vendorlibs/audio_hdi")
-        cmd = "if [ -f ${AUDIO_VENDOR_LIB_PATH}/BUILD.gn ]; then echo true; else echo false; fi"
-        HAVE_AUDIO_VENDOR_LIB =
-            exec_script("//build/lite/run_shell_cmd.py", [ cmd ], "value")
-        if (HAVE_AUDIO_VENDOR_LIB) {
-          deps += [ "${AUDIO_VENDOR_LIB_PATH}:hdi_audio" ]
-        }
-      }
-    } else {
-      deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
-    }
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",
