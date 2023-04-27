@@ -10,17 +10,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+HDF_CORE_PATH = "../../../hdf_core"
+DRIVERS_INTERFACE_PATH = "../../../interface"
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libsensor_interface_service_1.0") {
   include_dirs = [
-    "//drivers/peripheral/sensor/interfaces/include/",
-    "//drivers/peripheral/sensor/hal/include",
+    "../interfaces/include/",
+    "../hal/include",
   ]
 
   sources = [ "sensor_impl.cpp" ]
-  deps = [ "//drivers/peripheral/sensor/hal:hdi_sensor" ]
+  deps = [ "../hal:hdi_sensor" ]
 
   cflags = [
     "-Wall",
@@ -54,11 +57,11 @@ ohos_shared_library("libsensor_interface_service_1.0") {
 }
 
 ohos_shared_library("libsensor_driver") {
-  include_dirs = [ "//drivers/peripheral/sensor/interfaces/include/" ]
+  include_dirs = [ "../interfaces/include/" ]
 
   sources = [ "sensor_interface_driver.cpp" ]
 
-  deps = [ "//drivers/interface/sensor/v1_0:libsensor_stub_1.0" ]
+  deps = [ "$DRIVERS_INTERFACE_PATH/sensor/v1_0:libsensor_stub_1.0" ]
 
   cflags = [
     "-Wall",

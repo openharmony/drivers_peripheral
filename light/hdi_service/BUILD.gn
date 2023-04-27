@@ -10,13 +10,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+HDF_CORE_PATH = "../../../hdf_core"
+DRIVERS_INTERFACE_PATH = "../../../interface"
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("liblight_interface_service_1.0") {
-  include_dirs = [ "//drivers/peripheral/light/interfaces/include/" ]
+  include_dirs = [ "../interfaces/include/" ]
   sources = [ "light_interface_impl.cpp" ]
-  deps = [ "//drivers/peripheral/light/hal:hdi_light" ]
+  deps = [ "../hal:hdi_light" ]
   cflags = [
     "-Wall",
     "-Wextra",
@@ -44,10 +47,10 @@ ohos_shared_library("liblight_interface_service_1.0") {
 }
 
 ohos_shared_library("liblight_driver") {
-  include_dirs = [ "//drivers/peripheral/light/interfaces/include/" ]
+  include_dirs = [ "../interfaces/include/" ]
   sources = [ "light_interface_driver.cpp" ]
 
-  deps = [ "//drivers/interface/light/v1_0:liblight_stub_1.0" ]
+  deps = [ "$DRIVERS_INTERFACE_PATH/light/v1_0:liblight_stub_1.0" ]
 
   cflags = [
     "-Wall",

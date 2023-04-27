@@ -18,10 +18,8 @@ module_output_path = "hdf/vibrator"
 
 ohos_fuzztest("VibratorStopFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "//drivers/peripheral/vibrator/test/fuzztest/vibratorstop_fuzzer"
-  include_dirs =
-      [ "//drivers/peripheral/vibrator/test/fuzztest/vibratorstop_fuzzer" ]
+  fuzz_config_file = "../vibratorstop_fuzzer"
+  include_dirs = [ "../vibratorstop_fuzzer" ]
   cflags = [
     "-g",
     "-O0",
@@ -29,7 +27,7 @@ ohos_fuzztest("VibratorStopFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "vibratorstop_fuzzer.cpp" ]
-  deps = [ "//drivers/peripheral/vibrator/hal:hdi_vibrator" ]
+  deps = [ "../../../hal:hdi_vibrator" ]
   external_deps = [
     "c_utils:utils",
     "c_utils:utils",

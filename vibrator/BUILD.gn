@@ -26,8 +26,8 @@ group("vibrator_entry") {
       deps += [ "${HDI_VIBRATOR_SERVICE_PATH}:dal_service" ]
     } else {
       deps += [
-        "//drivers/peripheral/vibrator/hal:hdi_vibrator",
-        "//drivers/peripheral/vibrator/hdi_service:hdf_vibrator_service",
+        "hal:hdi_vibrator",
+        "hdi_service:hdf_vibrator_service",
       ]
     }
   }
