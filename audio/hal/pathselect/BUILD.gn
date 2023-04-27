@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 if (defined(ohos_lite)) {
@@ -61,7 +60,7 @@ if (defined(ohos_lite)) {
       defines += [ "AUDIO_HDF_LOG" ]
     }
 
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       defines += [ "ALSA_LIB_MODE" ]
     }
 

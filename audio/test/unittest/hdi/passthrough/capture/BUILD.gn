@@ -19,7 +19,6 @@ if (defined(ohos_lite)) {
   import("$hdf_audio_path/audio.gni")
 } else {
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
   import("$hdf_audio_path/audio.gni")
 }
 
@@ -74,18 +73,16 @@ if (defined(ohos_lite)) {
       "//third_party/googletest:gtest_main",
     ]
 
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       defines = [ "ALSA_LIB_MODE" ]
     }
 
-    if (!drivers_peripheral_audio_user_mode) {
+    if (!drivers_peripheral_audio_feature_user_mode) {
       deps += [ "$hdf_audio_path/hal/hdi_passthrough:hdi_audio" ]
       external_deps = [
         "c_utils:utils",
         "hdf_core:libhdf_utils",
       ]
-    } else {
-      deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
     }
   }
 }
