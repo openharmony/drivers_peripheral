@@ -1,7 +1,7 @@
 {
   "name": "@ohos/drivers_peripheral_motion",
   "description": "motion device driver",
-  "version": "3.2",
+  "version": "4.0",
   "license": "Apache License 2.0",
   "publishAs": "code-segment",
   "segment": {
@@ -16,8 +16,8 @@
       "drivers_peripheral_motion_feature_model",
       "drivers_peripheral_motion_community"
     ],
-    "syscap": [ "" ],
-    "adapter_system_type": ["standard"],
+    "syscap": [],
+    "adapted_system_type": ["standard"],
     "rom": "650KB",
     "ram": "7600KB",
     "deps": {

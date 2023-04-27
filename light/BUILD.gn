@@ -14,14 +14,14 @@
 import("//drivers/peripheral/light/light.gni")
 if (defined(ohos_lite)) {
   group("light_entry") {
-    deps = [ "//drivers/peripheral/light/hal:hdi_light" ]
+    deps = [ "hal:hdi_light" ]
   }
 } else {
   group("light_entry") {
     if (drivers_peripheral_light_community) {
       deps = [
-        "//drivers/peripheral/light/hal:hdi_light",
-        "//drivers/peripheral/light/hdi_service:hdf_light_service",
+        "hal:hdi_light",
+        "hdi_service:hdf_light_service",
       ]
     }
   }

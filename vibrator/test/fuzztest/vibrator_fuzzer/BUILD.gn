@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+DRIVERS_INTERFACE_PATH = "../../../../../interface"
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
@@ -19,19 +20,18 @@ module_output_path = "drivers_peripheral_vibrator/vibrator"
 ohos_fuzztest("VibratorFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file =
-      "//drivers/peripheral/vibrator/test/fuzztest/vibrator_fuzzer"
+  fuzz_config_file = "../vibrator_fuzzer"
 
   include_dirs = [
-    "//drivers/peripheral/vibrator/test/fuzztest/vibrator_fuzzer",
-    "//drivers/peripheral/vibrator/hdi_service",
+    "../vibrator_fuzzer",
+    "../../../hdi_service",
   ]
 
   sources = [ "vibrator_fuzzer.cpp" ]
 
   deps = [
-    "//drivers/interface/vibrator/v1_1:libvibrator_stub_1.1",
-    "//drivers/peripheral/vibrator/hal:hdi_vibrator",
+    "$DRIVERS_INTERFACE_PATH/vibrator/v1_1:libvibrator_stub_1.1",
+    "../../../hal:hdi_vibrator",
   ]
 
   external_deps = [

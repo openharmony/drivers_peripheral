@@ -21,7 +21,7 @@ group("sensor_entry") {
     if (drivers_peripheral_sensor_community) {
       deps += [
         "hal:hdi_sensor",
-        "//drivers/peripheral/sensor/hdi_service:hdi_sensor_service",
+        "hdi_service:hdi_sensor_service",
       ]
     }
   }
