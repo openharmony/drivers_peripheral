@@ -27,7 +27,7 @@ group("sensor_entry") {
     } else {
       deps += [
         "hal:hdi_sensor",
-        "//drivers/peripheral/sensor/hdi_service:hdi_sensor_service",
+        "hdi_service:hdi_sensor_service",
       ]
     }
   }
