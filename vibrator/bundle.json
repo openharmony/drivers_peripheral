@@ -13,7 +13,8 @@
     "name": "drivers_peripheral_vibrator",
     "subsystem": "hdf",
     "features": [
-      "drivers_peripheral_vibrator_feature_model"
+      "drivers_peripheral_vibrator_feature_model",
+      "drivers_peripheral_vibrator_community"
     ],
     "syscap": [""],
     "adapter_system_type": ["standard"],
