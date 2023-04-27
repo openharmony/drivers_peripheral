@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,8 +25,11 @@
 #include <hdf_base.h>
 
 #include "directory_ex.h"
+#include "param_wrapper.h"
 #include "parameter.h"
 #include "securec.h"
+#include "string_ex.h"
+#include "sysparam_errno.h"
 #include "thermal_hdf_utils.h"
 #include "thermal_log.h"
 #include "thermal_zone_manager.h"
@@ -44,20 +47,36 @@ constexpr int32_t MAX_TIME_LEN = 20;
 constexpr int32_t TIME_FORMAT_1 = 1;
 constexpr int32_t TIME_FORMAT_2 = 2;
 constexpr int32_t COMPRESS_READ_BUF_SIZE = 4096;
-constexpr uint8_t DEFAULT_WIDTH = 20;
-constexpr uint32_t DEFAULT_INTERVAL = 5000;
-constexpr uint32_t MIN_INTERVAL = 100;
+constexpr int32_t DEFAULT_WIDTH = 20;
+constexpr int32_t DEFAULT_INTERVAL = 5000;
+constexpr int32_t MIN_INTERVAL = 100;
 const std::string TIMESTAMP_TITLE = "timestamp";
-const std::string DEFAULT_ENABLE = "true";
 const std::string THERMAL_LOG_ENABLE = "persist.thermal.log.enable";
-uint8_t g_width = DEFAULT_WIDTH;
-uint32_t g_interval = DEFAULT_INTERVAL;
+const std::string THERMAL_LOG_WIDTH = "persist.thermal.log.width";
+const std::string THERMAL_LOG_INTERVAL = "persist.thermal.log.interval";
 uint32_t g_currentLogIndex = 0;
 bool g_firstCreate = true;
 std::deque<std::string> g_saveLogFile;
 std::string g_outPath = "";
 std::string g_logTime = "";
-std::string g_enable = DEFAULT_ENABLE;
+}
+
+std::shared_ptr<ThermalDfx> ThermalDfx::instance_ = nullptr;
+std::mutex ThermalDfx::mutexInstance_;
+
+ThermalDfx& ThermalDfx::GetInstance()
+{
+    std::lock_guard<std::mutex> lock(mutexInstance_);
+    if (instance_ == nullptr) {
+        instance_ = std::make_shared<ThermalDfx>();
+    }
+    return *(instance_.get());
+}
+
+void ThermalDfx::DestroyInstance()
+{
+    std::lock_guard<std::mutex> lock(mutexInstance_);
+    instance_ = nullptr;
 }
 
 static std::string GetCurrentTime(const int32_t format)
@@ -92,12 +111,14 @@ static std::string GetCurrentTime(const int32_t format)
     return strTime;
 }
 
+ThermalDfx::ThermalDfx() :
+    width_(static_cast<uint8_t>(DEFAULT_WIDTH)), interval_(static_cast<uint32_t>(DEFAULT_INTERVAL)), enable_(true)
+{
+}
+
 ThermalDfx::~ThermalDfx()
 {
-    isRunning_ = false;
-    if (logThread_->joinable()) {
-        logThread_->join();
-    }
+    StopThread();
 }
 
 std::string ThermalDfx::GetFileNameIndex(const uint32_t index)
@@ -234,7 +255,7 @@ bool ThermalDfx::PrepareWriteDfxLog()
         THERMAL_HILOGW(COMP_HDI, "parse thermal_hdi_config.xml outpath fail");
         return false;
     }
-    if (g_enable == "false") {
+    if (!enable_) {
         THERMAL_HILOGD(COMP_HDI, "param does not start recording");
         return false;
     }
@@ -295,7 +316,7 @@ void ThermalDfx::ProcessLogInfo(std::string& logFile, bool isEmpty)
 void ThermalDfx::WriteToEmptyFile(std::ofstream& wStream, std::string& currentTime)
 {
     wStream << TIMESTAMP_TITLE;
-    for (uint8_t i = 0; i < g_width; ++i) {
+    for (uint8_t i = 0; i < width_; ++i) {
         wStream << " ";
     }
 
@@ -305,7 +326,7 @@ void ThermalDfx::WriteToEmptyFile(std::ofstream& wStream, std::string& currentTi
         if (info.valuePath == logInfo.back().valuePath && info.title == logInfo.back().title) {
             break;
         }
-        for (uint8_t i = 0; i < g_width - info.title.length(); ++i) {
+        for (uint8_t i = 0; i < width_ - info.title.length(); ++i) {
             wStream << " ";
         }
     }
@@ -318,7 +339,7 @@ void ThermalDfx::WriteToEmptyFile(std::ofstream& wStream, std::string& currentTi
 void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime)
 {
     wStream << currentTime;
-    for (uint8_t i = 0; i < g_width + TIMESTAMP_TITLE.length() - currentTime.length(); ++i) {
+    for (uint8_t i = 0; i < width_ + TIMESTAMP_TITLE.length() - currentTime.length(); ++i) {
         wStream << " ";
     }
     std::vector<DfxTraceInfo>& logInfo = ThermalHdfConfig::GetInsance().GetTracingInfo();
@@ -329,7 +350,7 @@ void ThermalDfx::WriteToFile(std::ofstream& wStream, std::string& currentTime)
         if (info.valuePath == logInfo.back().valuePath && info.title == logInfo.back().title) {
             break;
         }
-        for (uint8_t i = 0; i < g_width - value.length(); ++i) {
+        for (uint8_t i = 0; i < width_ - value.length(); ++i) {
             wStream << " ";
         }
     }
@@ -341,16 +362,61 @@ void ThermalDfx::InfoChangedCallback(const char* key, const char* value, void* c
     if (key == nullptr || value == nullptr) {
         return;
     }
-    if (strcmp(key, THERMAL_LOG_ENABLE.c_str()) == 0) {
-        g_enable = value;
+    std::string keyStr(key);
+    std::string valueStr(value);
+    THERMAL_HILOGI(COMP_HDI, "thermal log param change, key = %{public}s, value = %{public}s", keyStr.c_str(),
+        valueStr.c_str());
+    auto& thermalDfx = ThermalDfx::GetInstance();
+    if (keyStr == THERMAL_LOG_ENABLE) {
+        thermalDfx.EnableWatchCallback(valueStr);
     }
+    if (keyStr == THERMAL_LOG_WIDTH) {
+        thermalDfx.WidthWatchCallback(valueStr);
+    }
+    if (keyStr == THERMAL_LOG_INTERVAL) {
+        thermalDfx.IntervalWatchCallback(valueStr);
+    }
+}
+
+void ThermalDfx::WidthWatchCallback(const std::string& value)
+{
+    int32_t width;
+    width = OHOS::StrToInt(value, width) ? width : DEFAULT_WIDTH;
+    width_ = static_cast<uint8_t>((width < DEFAULT_WIDTH) ? DEFAULT_WIDTH : width);
+}
+
+void ThermalDfx::IntervalWatchCallback(const std::string& value)
+{
+    int32_t interval;
+    interval = OHOS::StrToInt(value, interval) ? interval : DEFAULT_INTERVAL;
+    interval_ = static_cast<uint32_t>((interval < MIN_INTERVAL) ? MIN_INTERVAL : interval);
+}
+
+void ThermalDfx::EnableWatchCallback(const std::string& value)
+{
+    enable_ = (value == "true");
+    enable_ ? StartThread() : StopThread();
+}
+
+int32_t ThermalDfx::GetIntParameter(const std::string& key, const int32_t def, const int32_t minValue)
+{
+    int32_t value = OHOS::system::GetIntParameter(key, def);
+    return (value < minValue) ? def : value;
+}
+
+bool ThermalDfx::GetBoolParameter(const std::string& key, const bool def)
+{
+    std::string value;
+    if (OHOS::system::GetStringParameter(THERMAL_LOG_ENABLE, value) != 0) {
+        return def;
+    }
+    return (value == "true");
 }
 
 void ThermalDfx::LoopingThreadEntry()
 {
-    WatchParameter(THERMAL_LOG_ENABLE.c_str(), InfoChangedCallback, nullptr);
-    while (isRunning_) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(g_interval));
+    while (enable_) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(interval_));
         CreateLogFile();
         CompressFile();
     }
@@ -358,18 +424,42 @@ void ThermalDfx::LoopingThreadEntry()
 
 void ThermalDfx::StartThread()
 {
-    logThread_ = std::make_unique<std::thread>(&ThermalDfx::LoopingThreadEntry, this);
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (enable_ && logThread_ == nullptr) {
+        logThread_ = std::make_unique<std::thread>(&ThermalDfx::LoopingThreadEntry, this);
+        pthread_setname_np(logThread_->native_handle(), "thermal_log");
+    }
 }
 
-int32_t ThermalDfx::Init()
+void ThermalDfx::StopThread()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
+    enable_ = false;
+    if (logThread_ != nullptr && logThread_->joinable()) {
+        logThread_->join();
+    }
+    logThread_ = nullptr;
+}
+
+void ThermalDfx::Init()
+{
+    interval_ = static_cast<uint32_t>(GetIntParameter(THERMAL_LOG_INTERVAL, DEFAULT_INTERVAL, MIN_INTERVAL));
+    width_ = static_cast<uint8_t>(GetIntParameter(THERMAL_LOG_WIDTH, DEFAULT_WIDTH, DEFAULT_WIDTH));
+    enable_ = GetBoolParameter(THERMAL_LOG_ENABLE, true);
+    THERMAL_HILOGI(COMP_HDI,
+        "The thermal log param is init, interval_ = %{public}d, width = %{public}d, enable = %{public}d",
+        interval_.load(), width_.load(), enable_.load());
+
+    WatchParameter(THERMAL_LOG_ENABLE.c_str(), InfoChangedCallback, nullptr);
+    WatchParameter(THERMAL_LOG_WIDTH.c_str(), InfoChangedCallback, nullptr);
+    int32_t code = WatchParameter(THERMAL_LOG_INTERVAL.c_str(), InfoChangedCallback, nullptr);
+    if (code != OHOSStartUpSysParamErrorCode::EC_SUCCESS) {
+        THERMAL_HILOGW(COMP_HDI, "thermal log watch parameters failed. error = %{public}d", code);
+    }
+
     XmlTraceConfig& config = ThermalHdfConfig::GetInsance().GetXmlTraceConfig();
-    g_interval = config.interval > MIN_INTERVAL ? config.interval: MIN_INTERVAL;
-    g_width = config.width > DEFAULT_WIDTH ? config.width : DEFAULT_WIDTH;
     g_outPath = config.outPath;
-    THERMAL_HILOGI(COMP_HDI, "tarce init interval: %{public}d width: %{public}d", g_interval, g_width);
     StartThread();
-    return HDF_SUCCESS;
 }
 } // V1_0
 } // Thermal

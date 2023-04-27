@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -48,6 +48,7 @@ ThermalHdfTimer::~ThermalHdfTimer()
     if (callbackThread_->joinable()) {
         callbackThread_->join();
     }
+    ThermalDfx::DestroyInstance();
 }
 
 void ThermalHdfTimer::SetThermalEventCb(const sptr<IThermalCallback> &thermalCb)
@@ -109,10 +110,7 @@ void ThermalHdfTimer::StartThread()
 
 int32_t ThermalHdfTimer::Init()
 {
-    std::unique_ptr<ThermalDfx> thermalDfx = std::make_unique<ThermalDfx>();
-    if (thermalDfx != nullptr) {
-        thermalDfx->Init();
-    }
+    ThermalDfx::GetInstance().Init();
     StartThread();
     return HDF_SUCCESS;
 }
