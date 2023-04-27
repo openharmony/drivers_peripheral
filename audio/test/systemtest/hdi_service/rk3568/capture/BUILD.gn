@@ -43,7 +43,7 @@ ohos_systemtest("hdf_audio_idlhdi_capture_hardware_dependence_test") {
     defines += [ "AUDIO_ADM_SERVICE" ]
   }
 
-  if (drivers_peripheral_audio_alsa_lib) {
+  if (drivers_peripheral_audio_feature_alsa_lib) {
     defines += [ "ALSA_LIB_MODE" ]
   }
 }

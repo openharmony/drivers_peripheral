@@ -1166,13 +1166,40 @@ int32_t HdiServiceGetFuncs()
     if (g_serverManager != NULL) {
         return AUDIO_HAL_SUCCESS;
     }
-    g_serverManager = GetAudioManagerFuncs();
+
+    char *error = NULL;
+    struct AudioManager *(*managerFuncs)(void);
+    const char *hdiAudioVendorLibPath = HDF_LIBRARY_FULL_PATH("libhdi_audio");
+    void *handle = dlopen(hdiAudioVendorLibPath, RTLD_LAZY);
+    if (handle == NULL) {
+        error = dlerror();
+        AUDIO_FUNC_LOGE("audio load path %{public}s, dlopen err=%{public}s", hdiAudioVendorLibPath, error);
+        return AUDIO_HAL_ERR_INTERNAL;
+    }
+    managerFuncs = dlsym(handle, "GetAudioManagerFuncs");
+    g_serverManager = managerFuncs();
     if (g_serverManager == NULL) {
-        AUDIO_FUNC_LOGE("GetAudioManagerFuncs FAIL!");
+        error = dlerror();
+        AUDIO_FUNC_LOGE("dlsym GetAudioManagerFuncs err=%{public}s", error);
+        dlclose(handle);
+        handle = NULL;
         return AUDIO_HAL_ERR_INTERNAL;
     }
     AUDIO_FUNC_LOGD("end");
     return AUDIO_HAL_SUCCESS;
+}
+
+void AudioHdiServerRelease()
+{
+    AUDIO_FUNC_LOGI("enter to %{public}s!", __func__);
+
+    if (g_serverManager == NULL) {
+        AUDIO_FUNC_LOGE("manager func is null!");
+        return;
+    }
+    ReleaseAudioManagerObjectComm(g_serverManager);
+    AUDIO_FUNC_LOGD("%{public}s success", __func__);
+    return;
 }
 
 int32_t HdiServiceGetAllAdapter(const struct HdfDeviceIoClient *client,

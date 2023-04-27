@@ -15,7 +15,7 @@ hdf_audio_path = "./../../../.."
 hdf_audio_test_path = "./../.."
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+
 import("$hdf_audio_path/audio.gni")
 
 module_output_path = "drivers_peripheral_audio/audio"
@@ -50,7 +50,7 @@ ohos_systemtest("hdf_audio_usb_adapter_test") {
     deps += [ "$hdf_audio_path/hal/hdi_binder/proxy:hdi_audio_client" ]
     defines += [ "AUDIO_ADM_SERVICE" ]
   }
-  if (!drivers_peripheral_audio_rich_device) {
+  if (!drivers_peripheral_audio_feature_rich_device) {
     defines += [ "FEATURE_SMALL_DEVICE" ]
   }
 }
