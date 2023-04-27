@@ -12,8 +12,8 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/usb/usb.gni")
+import("./../../../hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../usb.gni")
 
 group("libusb_core") {
   deps = [
@@ -28,9 +28,9 @@ ohos_shared_library("libusb_ddk_host") {
     "device/include",
     "$hdf_framework_path/model/usb/include",
     "host/include",
-    "//drivers/peripheral/usb/interfaces/ddk/common",
-    "//drivers/peripheral/usb/interfaces/ddk/device",
-    "//drivers/peripheral/usb/interfaces/ddk/host",
+    "./../interfaces/ddk/common",
+    "./../interfaces/ddk/device",
+    "./../interfaces/ddk/host",
   ]
   sources = [
     "host/src/linux_adapter.c",
@@ -112,9 +112,9 @@ ohos_shared_library("libusb_ddk_device") {
   include_dirs = [
     "device/include",
     "host/include",
-    "//drivers/peripheral/usb/interfaces/ddk/common",
-    "//drivers/peripheral/usb/interfaces/ddk/device",
-    "//drivers/peripheral/usb/interfaces/ddk/host",
+    "./../interfaces/ddk/common",
+    "./../interfaces/ddk/device",
+    "./../interfaces/ddk/host",
   ]
 
   sources = [

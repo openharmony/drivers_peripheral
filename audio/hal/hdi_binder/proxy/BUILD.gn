@@ -15,10 +15,9 @@ hdf_audio_path = "./../../.."
 hdf_hal_path = "./../.."
 hdf_hdi_binder_path = "./.."
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("$hdf_audio_path/audio.gni")
 
-if (drivers_peripheral_audio_hdf_proxy_stub == true) {
+if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
   if (defined(ohos_lite)) {
     ohos_shared_library("hdi_audio_client") {
       include_dirs = [

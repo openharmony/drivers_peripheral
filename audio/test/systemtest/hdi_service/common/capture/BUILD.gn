@@ -50,7 +50,7 @@ if (!defined(ohos_lite)) {
     if (enable_audio_adm_service) {
       defines += [ "AUDIO_ADM_SERVICE" ]
     }
-    if (drivers_peripheral_audio_alsa_lib == true) {
+    if (drivers_peripheral_audio_feature_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
     }
   }

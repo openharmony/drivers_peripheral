@@ -12,22 +12,19 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("audio.gni")
 
 group("hdi_audio") {
   deps = []
-  if (drivers_peripheral_audio_user_mode == false) {
-    if (drivers_peripheral_audio_rich_device == false) {
+  if (drivers_peripheral_audio_feature_user_mode == false) {
+    if (drivers_peripheral_audio_feature_rich_device == false) {
       deps += [ "hal/hdi_passthrough:hdi_audio" ]
     }
-  } else {
-    deps += [ "//device/soc/${product_company}/common/hal/media:hdi_audio" ]
   }
 
   if (defined(ohos_lite)) {
   } else {
-    if (drivers_peripheral_audio_hdf_proxy_stub == true) {
+    if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
       deps += [
         "hal/hdi_binder/proxy:hdi_audio_client",
         "hal/hdi_binder/server:hdi_audio_a2dp_server",
@@ -44,18 +41,18 @@ group("hdi_audio") {
     ]
   }
 
-  if (drivers_peripheral_audio_user_mode == false) {
+  if (drivers_peripheral_audio_feature_user_mode == false) {
     deps += [
       "supportlibs:hdi_audio_interface_lib_capture",
       "supportlibs:hdi_audio_interface_lib_render",
     ]
   }
 
-  if (drivers_peripheral_audio_hal_notsupport_pathselect == false) {
+  if (drivers_peripheral_audio_feature_hal_notsupport_pathselect == false) {
     deps += [ "hal/pathselect:hdi_audio_path_select" ]
   }
 
-  if (drivers_peripheral_audio_policy_config == true) {
+  if (drivers_peripheral_audio_feature_policy_config == true) {
     deps += [
       "//vendor/${product_company}/${product_name}/audio:audio_policy_config",
     ]

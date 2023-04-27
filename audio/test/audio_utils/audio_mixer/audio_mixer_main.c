@@ -45,6 +45,7 @@
 
 #define SSET_WR 0
 #define SSET_RO 1
+#define STRTOL_BASE 10
 
 #define L_INACTIV (1 << 1)
 
@@ -215,7 +216,7 @@ static void UpdateCardName(const char *card)
 
     if ((isdigit(*card) && *(card + 1) == 0) ||
         (isdigit(*card) && isdigit(*(card + 1)) && *(card + 2) == 0)) { // 2 for offset
-        id = atoi(card);
+        id = (int32_t)strtol(card, NULL, STRTOL_BASE);
         DEBUG_LOG("card %i\n", id);
         UpdateCardSname(id, g_service, g_serviceName, CARD_SRV_NAME_LEN);
         DEBUG_LOG("cardServiceName:%s, dev:%s\n", g_serviceName, g_dev);
@@ -367,7 +368,7 @@ static int32_t ParseNumId(const char *s, uint32_t *idx)
         return U_FAILURE;
     }
 
-    numid = atoi(ptr);
+    numid = (int32_t)strtol(ptr, NULL, STRTOL_BASE);
     if (numid <= 0) {
         DEBUG_LOG("audio_mixer: Invalid numid %d\n", numid);
         return U_FAILURE;
@@ -525,7 +526,7 @@ static void GetPcm(const char *string)
 {
     int type;
 
-    type = atoi(string);
+    type = (int32_t)strtol(string, NULL, STRTOL_BASE);
     switch (type) {
         case PCM_RENDER:
             g_pcm = PCM_RENDER;

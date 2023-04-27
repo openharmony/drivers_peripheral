@@ -13,7 +13,6 @@
 
 hdf_audio_path = "./../.."
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("$hdf_audio_path/audio.gni")
 
 if (defined(ohos_lite)) {
@@ -40,7 +39,7 @@ if (defined(ohos_lite)) {
     ]
     external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
-    if (drivers_peripheral_audio_hal_notsupport_pathselect) {
+    if (drivers_peripheral_audio_feature_hal_notsupport_pathselect) {
       defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
     }
 
@@ -59,7 +58,7 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_audio"
   }
 } else {
-  if (!drivers_peripheral_audio_user_mode) {
+  if (!drivers_peripheral_audio_feature_user_mode) {
     ohos_shared_library("hdi_audio") {
       sources = [
         "src/audio_adapter.c",
@@ -79,7 +78,7 @@ if (defined(ohos_lite)) {
 
       defines = []
 
-      if (drivers_peripheral_audio_hal_notsupport_pathselect) {
+      if (drivers_peripheral_audio_feature_hal_notsupport_pathselect) {
         defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
       }
       if (enable_audio_hal_hdf_log) {
@@ -125,7 +124,7 @@ if (defined(ohos_lite)) {
     ]
     external_deps = [ "hdf_core:libhdf_utils" ]
     defines = []
-    if (drivers_peripheral_audio_hal_notsupport_pathselect) {
+    if (drivers_peripheral_audio_feature_hal_notsupport_pathselect) {
       defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
     }
 
@@ -159,7 +158,7 @@ if (defined(ohos_lite)) {
 
     defines = []
 
-    if (drivers_peripheral_audio_hal_notsupport_pathselect) {
+    if (drivers_peripheral_audio_feature_hal_notsupport_pathselect) {
       defines += [ "AUDIO_HAL_NOTSUPPORT_PATHSELECT" ]
     }
 

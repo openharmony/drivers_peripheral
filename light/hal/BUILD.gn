@@ -14,8 +14,6 @@
 
 import("//build/ohos.gni")
 
-LIGHT_ROOT_DIR = "//drivers/peripheral/light"
-
 if (defined(ohos_lite)) {
   config("libhdi_light_pub_config") {
     visibility = [ ":*" ]
@@ -23,20 +21,20 @@ if (defined(ohos_lite)) {
 
   ohos_shared_library("hdi_light") {
     output_extension = "z.so"
-    sources = [ "$LIGHT_ROOT_DIR/hal/src/light_controller.c" ]
+    sources = [ "src/light_controller.c" ]
 
     include_dirs = [
-      "$LIGHT_ROOT_DIR/hal/include",
-      "$LIGHT_ROOT_DIR/interfaces/include",
+      "include",
+      "../interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
 
     public_configs = [ ":libhdi_light_pub_config" ]
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
 
     cflags = [
       "-Wall",
@@ -53,17 +51,17 @@ if (defined(ohos_lite)) {
 } else {
   config("libhdi_light_pub_config") {
     visibility = [ ":*" ]
-    include_dirs = [ "$LIGHT_ROOT_DIR/interfaces/include" ]
+    include_dirs = [ "../interfaces/include" ]
   }
   ohos_shared_library("hdi_light") {
     public_configs = [ ":libhdi_light_pub_config" ]
     sources = [
-      "$LIGHT_ROOT_DIR/hal/src/light_controller.c",
-      "$LIGHT_ROOT_DIR/hal/src/light_dump.c",
+      "src/light_controller.c",
+      "src/light_dump.c",
     ]
 
     include_dirs = [
-      "$LIGHT_ROOT_DIR/hal/include",
+      "include",
       "//third_party/bounds_checking_function/include",
     ]
     cflags = [
