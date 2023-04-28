@@ -39,10 +39,7 @@ if (defined(ohos_lite)) {
       "src/sbuf/sbuf_wpa_cmd_adapter.c",
     ]
 
-    include_dirs = [
-      "include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-    ]
+    include_dirs = [ "include" ]
 
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
 
