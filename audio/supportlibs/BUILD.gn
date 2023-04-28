@@ -40,14 +40,13 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
-      "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
     ]
 
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
     public_configs = [ ":audio_interface_config" ]
     defines = [ "_GNU_SOURCE" ]
     subsystem_name = "hdf"
@@ -68,14 +67,13 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
-      "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
     ]
 
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = [ "_GNU_SOURCE" ]
     if (enable_audio_hal_hdf_log) {
       defines += [ "AUDIO_HDF_LOG" ]
@@ -106,7 +104,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
-      "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
     ]
 
     deps = []
@@ -165,7 +162,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/interfaces/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
-      "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
     ]
 
     deps = []

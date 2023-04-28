@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 ohos_shared_library("audio_primary_driver") {
@@ -31,10 +30,8 @@ ohos_shared_library("audio_primary_driver") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  deps = [
-    "//drivers/interface/audio/v1_0:libaudio_stub_1.0",
-    "//third_party/bounds_checking_function:libsec_shared",
-  ]
+  deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+  external_deps += [ "drivers_interface_audio:libaudio_stub_1.0" ]
 
   shlib_type = "hdi"
   install_images = [ chipset_base_dir ]
@@ -58,7 +55,7 @@ ohos_shared_library("audio_manager_service_1.0") {
     external_deps = [ "hilog:libhilog" ]
   }
 
-  deps = [ "//drivers/interface/audio/v1_0:libaudio_stub_1.0" ]
+  external_deps += [ "drivers_interface_audio:libaudio_stub_1.0" ]
 
   install_images = [ chipset_base_dir ]
   subsystem_name = "hdf"

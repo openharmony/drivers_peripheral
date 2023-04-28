@@ -47,7 +47,6 @@ if (defined(ohos_lite)) {
 
     public_deps = [
       "$hdf_audio_path/hal/hdi_passthrough:hdi_audio",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//third_party/bounds_checking_function:libsec_shared",

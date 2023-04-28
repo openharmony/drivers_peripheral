@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 if (defined(ohos_lite)) {
@@ -29,16 +28,15 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
-      "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
       "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
     ]
 
-    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
+    public_deps = [ "drivers_interface_audio:audio_idl_headers" ]
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_audio"
   }
@@ -50,7 +48,7 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/supportlibs/adm_adapter/src/audio_interface_lib_render.c",
     ]
 
-    public_deps = [ "//drivers/interface/audio/v1_0:audio_idl_headers" ]
+    public_deps = [ "drivers_interface_audio:audio_idl_headers" ]
 
     include_dirs = [
       "//drivers/peripheral/audio/hdi_service/primary_impl/include",
@@ -58,14 +56,12 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/kits/",
-      "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
       "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
     ]
 
-    deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//third_party/bounds_checking_function:libsec_shared",
-    ]
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+
+    external_deps = [ "hilog_featured_lite:hilog_shared" ]
     if (enable_audio_hal_hdf_log) {
       defines = [ "AUDIO_HDF_LOG" ]
     }
@@ -94,7 +90,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hdi_service/primary_impl/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
-      "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
       "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
     ]
 
@@ -154,7 +149,6 @@ if (defined(ohos_lite)) {
       "//drivers/peripheral/audio/hdi_service/primary_impl/include",
       "//drivers/peripheral/audio/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
-      "//device/hisilicon/hispark_taurus/sdk_linux/huawei_proprietary/include",
       "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
     ]
 
