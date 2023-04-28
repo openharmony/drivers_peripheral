@@ -30,7 +30,6 @@ if (defined(ohos_lite)) {
 
     include_dirs = [
       "./include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "$hdf_audio_test_path/input/hal/include",
       "$hdf_audio_test_path/input/interfaces/include",
       "//third_party/bounds_checking_function/include",
@@ -40,7 +39,6 @@ if (defined(ohos_lite)) {
     public_deps = [
       "$hdf_audio_path/hal/hdi_passthrough:hdi_audio",
       "$hdf_audio_test_path/input/hal:hdi_input",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
       "//drivers/hdf_core/adapter/uhdf/platform:hdf_platform",
       "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
