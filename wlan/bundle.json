@@ -19,7 +19,10 @@
       "components": [
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "utils_base"
+        "c_utils",
+        "hilog_featured_lite",
+        "drivers_interface_wlan",
+        "hilog"
       ],
       "third_party": [
         "bounds_checking_function",
