@@ -20,6 +20,9 @@
 #include <hdf_log.h>
 #include "display_log.h"
 
+#undef HDF_LOG_TAG
+#define HDF_LOG_TAG ALLOC_SRV
+
 namespace OHOS {
 namespace HDI {
 namespace Display {

@@ -20,6 +20,9 @@
 #include "display_log.h"
 #include "hdf_log.h"
 
+#undef HDF_LOG_TAG
+#define HDF_LOG_TAG COMPOSER_SRV
+
 namespace OHOS {
 namespace HDI {
 namespace Display {
@@ -124,8 +127,8 @@ void DisplayComposerService::OnVBlank(unsigned int sequence, uint64_t ns, void* 
 
 int32_t DisplayComposerService::RegHotPlugCallback(const sptr<IHotPlugCallback>& cb)
 {
-    hotPlugCb_ = cb;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
+    hotPlugCb_ = cb;
     int32_t ret = vdiImpl_->RegHotPlugCallback(OnHotPlug, this);
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
     return ret;
@@ -230,10 +233,10 @@ int32_t DisplayComposerService::SetDisplayVsyncEnabled(uint32_t devId, bool enab
 
 int32_t DisplayComposerService::RegDisplayVBlankCallback(uint32_t devId, const sptr<IVBlankCallback>& cb)
 {
-    vBlankCb_ = cb;
     CHECK_NULLPOINTER_RETURN_VALUE(vdiImpl_, HDF_FAILURE);
-    int32_t ret = vdiImpl_->RegDisplayVBlankCallback(devId, OnVBlank, vBlankCb_.GetRefPtr());
+    int32_t ret = vdiImpl_->RegDisplayVBlankCallback(devId, OnVBlank, cb.GetRefPtr());
     DISPLAY_CHK_RETURN(ret != HDF_SUCCESS, HDF_FAILURE, DISPLAY_LOGE(" fail"));
+    vBlankCb_ = cb;
     return ret;
 }
 
