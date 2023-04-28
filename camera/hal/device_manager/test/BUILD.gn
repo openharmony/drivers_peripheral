@@ -11,11 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//drivers/peripheral/camera/hal/camera.gni")
+import("../../camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/lite/config/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
+  import("../../../../../hdf_core/adapter/uhdf/uhdf.gni")
 
   config("mpi_device_config") {
     visibility = [ ":*" ]
@@ -38,7 +38,6 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager/src",
       "$camera_path/device_manager/src/mpi",
       "$board_camera_path/driver_adapter/include",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/include",
       "$camera_path/device_manager/test/unittest/mpi",
       "$camera_path/utils/event",
@@ -52,15 +51,17 @@ if (defined(ohos_lite)) {
     ldflags += [ "-ldriver_adapter" ]
     public_deps = [
       "$camera_path/device_manager:camera_device_manager",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
+      "../../../../../hdf_core/adapter/uhdf/manager:hdf_core",
     ]
-    external_deps = [ "drivers_interface_camera:metadata" ]
+    external_deps = [
+      "drivers_interface_camera:metadata",
+      "hdf_core:hdf_posix_osal",
+      "hilog_featured_lite:hilog_shared",
+    ]
   }
 } else {
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
   need_link_hispark_taurus_lib = true
   if (need_link_hispark_taurus_lib) {
     if (use_musl) {
