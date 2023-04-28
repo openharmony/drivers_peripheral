@@ -12,6 +12,10 @@
   "component": {
     "name": "drivers_peripheral_wlan",
     "subsystem": "hdf",
+    "features": [
+      "drivers_peripheral_wlan_feature_enable_HDF_NL80211",
+      "drivers_peripheral_wlan_feature_enable_HDF_UT"
+    ],
     "adapted_system_type": ["standard", "small"],
     "rom": "660KB",
     "ram": "7600KB",
