@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,11 +19,18 @@
 #include "thermal_log.h"
 #include "hdf_remote_service.h"
 #include "osal_mem.h"
+#include "string_ex.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Thermal {
 namespace V1_0 {
+namespace {
+const int32_t DEFAULT_POLLING_INTERVAL = 30000;
+const int32_t DEFAULT_TRACING_INTERVAL = 5000;
+const int32_t DEFAULT_TRACING_WIDTH = 20;
+}
+
 ThermalHdfConfig& ThermalHdfConfig::GetInsance()
 {
     static ThermalHdfConfig instance;
@@ -131,7 +138,9 @@ void ThermalHdfConfig::ParsePollingNode(xmlNodePtr node)
 
         xmlChar* xmlInterval = xmlGetProp(cur, BAD_CAST"interval");
         if (xmlInterval != nullptr) {
-            uint32_t interval = atoi(reinterpret_cast<char*>(xmlInterval));
+            std::string strInterval = reinterpret_cast<char *>(xmlInterval);
+            int32_t interval = DEFAULT_POLLING_INTERVAL;
+            StrToInt(TrimStr(strInterval), interval);
             xmlFree(xmlInterval);
             THERMAL_HILOGD(COMP_HDI, "ParsePollingNode interval: %{public}d", interval);
             sensorInfo->SetGroupInterval(interval);
@@ -181,14 +190,20 @@ void ThermalHdfConfig::ParseTracingNode(xmlNodePtr node)
 {
     xmlChar* xmlInterval = xmlGetProp(node, BAD_CAST"interval");
     if (xmlInterval != nullptr) {
-        this->traceConfig_.interval = static_cast<uint32_t>(atoi(reinterpret_cast<char *>(xmlInterval)));
+        std::string strInterval = reinterpret_cast<char *>(xmlInterval);
+        int32_t interval = DEFAULT_TRACING_INTERVAL;
+        StrToInt(TrimStr(strInterval), interval);
+        this->traceConfig_.interval = static_cast<uint32_t>(interval);
         xmlFree(xmlInterval);
         THERMAL_HILOGD(COMP_HDI, "interval: %{public}d", this->traceConfig_.interval);
     }
 
     xmlChar* xmlWidth = xmlGetProp(node, BAD_CAST"width");
     if (xmlWidth != nullptr) {
-        this->traceConfig_.width = static_cast<uint32_t>(atoi(reinterpret_cast<char *>(xmlWidth)));
+        std::string strWidth = reinterpret_cast<char *>(xmlWidth);
+        int32_t width = DEFAULT_TRACING_WIDTH;
+        StrToInt(TrimStr(strWidth), width);
+        this->traceConfig_.width = static_cast<uint8_t>(width);
         xmlFree(xmlWidth);
         THERMAL_HILOGD(COMP_HDI, "width: %{public}d", this->traceConfig_.width);
     }

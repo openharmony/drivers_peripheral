@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,17 +14,20 @@
  */
 
 #include "thermal_hdf_timer.h"
+
 #include <cerrno>
-#include <thread>
 #include <fcntl.h>
-#include <unistd.h>
-#include <hdf_base.h>
-#include <sys/socket.h>
-#include <sys/epoll.h>
-#include <sys/timerfd.h>
 #include <linux/netlink.h>
-#include "thermal_log.h"
+#include <sys/epoll.h>
+#include <sys/socket.h>
+#include <sys/timerfd.h>
+#include <thread>
+#include <unistd.h>
+
+#include "hdf_base.h"
+#include "string_ex.h"
 #include "thermal_dfx.h"
+#include "thermal_log.h"
 
 namespace OHOS {
 namespace HDI {
@@ -64,7 +67,7 @@ void ThermalHdfTimer::SetSimluationFlag()
     }
     auto baseIter = std::find(baseConfigList.begin(), baseConfigList.end(), THERMAL_SIMULATION_TAG);
     if (baseIter != baseConfigList.end()) {
-        isSim_ = atoi(baseIter->value.c_str());
+        StrToInt(TrimStr(baseIter->value), isSim_);
         THERMAL_HILOGI(COMP_HDI, "isSim value:%{public}d", isSim_);
     } else {
         THERMAL_HILOGI(COMP_HDI, "not found");
