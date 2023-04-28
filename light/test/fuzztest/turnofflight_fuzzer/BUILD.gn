@@ -18,11 +18,10 @@ module_output_path = "hdf/light"
 
 ohos_fuzztest("TurnOffLightFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file =
-      "//drivers/peripheral/light/test/fuzztest/turnofflight_fuzzer"
+  fuzz_config_file = "../turnofflight_fuzzer"
   include_dirs = [
-    "//drivers/peripheral/light/test/fuzztest/turnofflight_fuzzer",
-    "//drivers/peripheral/light/hdi_service",
+    "../turnofflight_fuzzer",
+    "../../../hdi_service",
   ]
   cflags = [
     "-g",
@@ -31,7 +30,7 @@ ohos_fuzztest("TurnOffLightFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [ "turnofflight_fuzzer.cpp" ]
-  deps = [ "//drivers/peripheral/light/hal:hdi_light" ]
+  deps = [ "../../../hal:hdi_light" ]
   external_deps = [
     "c_utils:utils",
     "drivers_interface_light:liblight_proxy_1.0",

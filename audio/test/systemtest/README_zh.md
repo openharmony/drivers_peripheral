@@ -250,8 +250,8 @@ LIB层存在硬件耦合接口：为音量，增益，场景切换相关接口�
       "../../../common/hdi_common/src/audio_hdi_common.cpp",
       "../../../common/lib_common/src/audio_lib_common.cpp",
     ]
-    #drivers_peripheral_audio_alsa_lib
-    if(defined(drivers_peripheral_audio_alsa_lib) && drivers_peripheral_audio_alsa_lib == true) {
+    #drivers_peripheral_audio_feature_alsa_lib
+    if(defined(drivers_peripheral_audio_feature_alsa_lib) && drivers_peripheral_audio_feature_alsa_lib == true) {
       sources += ["src/audio_alsa_libcapture_test.cpp"]
     }else {
       sources += ["src/audio_libcapture_test.cpp"]
@@ -332,7 +332,7 @@ LIB层存在硬件耦合接口：为音量，增益，场景切换相关接口�
 
   ````bash 
     #gn内添加编译宏ALSA_LIB_MODE用于区分测试用例
-    if(defined(drivers_peripheral_audio_alsa_lib) && drivers_peripheral_audio_alsa_lib == true) {
+    if(defined(drivers_peripheral_audio_feature_alsa_lib) && drivers_peripheral_audio_feature_alsa_lib == true) {
       defines += [ "ALSA_LIB_MODE" ]
     }
     #测试用例代码内使用示例
@@ -343,7 +343,7 @@ LIB层存在硬件耦合接口：为音量，增益，场景切换相关接口�
     EXPECT_EQ(AUDIO_HAL_ERR_INTERNAL, ret);
 #endif
   ````
-<b>注：编译ALSA测试用例是需要设置ALSA编译选项，由drivers_peripheral_audio_alsa_lib编译选项控制，当"drivers_peripheral_audio_alsa_lib = true"表示编译ALSA模式测试用例，编译配置文件路径为./drivers/peripheral/audio/audio.gni文件内。</b>
+<b>注：编译ALSA测试用例是需要设置ALSA编译选项，由drivers_peripheral_audio_feature_alsa_lib编译选项控制，当"drivers_peripheral_audio_feature_alsa_lib = true"表示编译ALSA模式测试用例，编译配置文件路径为./drivers/peripheral/audio/audio.gni文件内。</b>
 ##### 1.2.3 录音阈值上报测试用例
 
   码云上音频驱动模型默认不编译录音阈值上报功能代码，因此该功能对应的测试套（hdf_audio_threshold_report_test）默认不编译，如需编译需要手动修改gn文件，去掉“#”字符注释。gn文件路径为./audio_function/BUILD.gn

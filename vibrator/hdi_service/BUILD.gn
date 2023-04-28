@@ -10,8 +10,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+HDF_CORE_PATH = "../../../hdf_core"
+hdf_interface_path = "../../../interface"
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 if (defined(ohos_lite)) {
   group("hdf_vibrator_service") {
     deps = []
@@ -19,9 +22,9 @@ if (defined(ohos_lite)) {
   }
 } else {
   ohos_shared_library("libvibrator_interface_service_1.1") {
-    include_dirs = [ "//drivers/peripheral/vibrator/interfaces/include/" ]
+    include_dirs = [ "../interfaces/include/" ]
     sources = [ "vibrator_interface_impl.cpp" ]
-    deps = [ "//drivers/peripheral/vibrator/hal:hdi_vibrator" ]
+    deps = [ "../hal:hdi_vibrator" ]
 
     cflags = [
       "-Wall",
@@ -52,10 +55,10 @@ if (defined(ohos_lite)) {
   }
 
   ohos_shared_library("libvibrator_driver") {
-    include_dirs = [ "//drivers/peripheral/vibrator/interfaces/include/" ]
+    include_dirs = [ "../interfaces/include/" ]
     sources = [ "vibrator_interface_driver.cpp" ]
 
-    deps = [ "//drivers/interface/vibrator/v1_1:libvibrator_stub_1.1" ]
+    deps = [ "$hdf_interface_path/vibrator/v1_1:libvibrator_stub_1.1" ]
 
     cflags = [
       "-Wall",

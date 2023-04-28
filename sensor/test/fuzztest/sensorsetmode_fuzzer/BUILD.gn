@@ -19,12 +19,11 @@ module_output_path = "hdf/sensor"
 ohos_fuzztest("SensorSetModeFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file =
-      "//drivers/peripheral/sensor/test/fuzztest/sensorsetmode_fuzzer"
+  fuzz_config_file = "../sensorsetmode_fuzzer"
 
   include_dirs = [
-    "//drivers/peripheral/sensor/test/fuzztest/sensorsetmode_fuzzer",
-    "//drivers/peripheral/sensor/hdi_service",
+    "../sensorsetmode_fuzzer",
+    "../../../hdi_service",
   ]
 
   cflags = [
@@ -36,7 +35,7 @@ ohos_fuzztest("SensorSetModeFuzzTest") {
 
   sources = [ "sensorsetmode_fuzzer.cpp" ]
 
-  deps = [ "//drivers/peripheral/sensor/hal:hdi_sensor" ]
+  deps = [ "../../../hal:hdi_sensor" ]
 
   external_deps = [
     "c_utils:utils",

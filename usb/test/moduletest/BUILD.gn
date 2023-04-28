@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,7 +17,7 @@ if (defined(ohos_lite)) {
   import("//build/config/sanitizers/sanitizers.gni")
   import("//build/test.gni")
 }
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 if (defined(ohos_lite)) {
   output_path = "$root_out_dir/test/moduletest/hdf/usb"
@@ -26,28 +26,28 @@ if (defined(ohos_lite)) {
     output_dir = output_path
     include_dirs = [
       "//third_party/googletest/googletest/include",
-      "//drivers/peripheral/usb/sample/host/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/model/usb/host/include",
+      "./../../sample/host/include",
+      "./../../../../hdf_core/adapter/khdf/liteos/model/usb/host/include",
       "//third_party/bounds_checking_function/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-      "//drivers/peripheral/usb/serial/include",
-      "//drivers/peripheral/usb/ddk/common/include",
-      "//drivers/peripheral/usb/ddk/device/include",
-      "//drivers/peripheral/usb/ddk/host/include",
-      "//drivers/peripheral/usb/interfaces/ddk/common",
-      "//drivers/peripheral/usb/interfaces/ddk/host",
-      "//drivers/peripheral/usb/gadget/function/include",
+      "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "./../../serial/include",
+      "./../../ddk/common/include",
+      "./../../ddk/device/include",
+      "./../../ddk/host/include",
+      "./../../interfaces/ddk/common",
+      "./../../interfaces/ddk/host",
+      "./../../gadget/function/include",
       "common",
     ]
     sources = [
+      "./../../sample/host/src/usbhost_ddk_test.c",
       "./common/liteos/usb_host_serial_func_test.cpp",
-      "//drivers/peripheral/usb/sample/host/src/usbhost_ddk_test.c",
     ]
     public_deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "./../../../../../base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "./../../../../hdf_core/adapter/uhdf/manager:hdf_core",
+      "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
   }
@@ -57,28 +57,28 @@ if (defined(ohos_lite)) {
     output_dir = output_path
     include_dirs = [
       "//third_party/googletest/googletest/include",
-      "//drivers/peripheral/usb/sample/host/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/model/usb/host/include",
+      "./../../sample/host/include",
+      "./../../../../hdf_core/adapter/khdf/liteos/model/usb/host/include",
       "//third_party/bounds_checking_function/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-      "//drivers/peripheral/usb/serial/include",
-      "//drivers/peripheral/usb/ddk/common/include",
-      "//drivers/peripheral/usb/ddk/device/include",
-      "//drivers/peripheral/usb/ddk/host/include",
-      "//drivers/peripheral/usb/interfaces/ddk/common",
-      "//drivers/peripheral/usb/interfaces/ddk/host",
-      "//drivers/peripheral/usb/gadget/function/include",
+      "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "./../../serial/include",
+      "./../../ddk/common/include",
+      "./../../ddk/device/include",
+      "./../../ddk/host/include",
+      "./../../interfaces/ddk/common",
+      "./../../interfaces/ddk/host",
+      "./../../gadget/function/include",
       "common",
     ]
     sources = [
+      "./../../sample/host/src/usbhost_ddk_test.c",
       "./common/liteos/usb_host_raw_api_func_test.cpp",
-      "//drivers/peripheral/usb/sample/host/src/usbhost_ddk_test.c",
     ]
     public_deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "./../../../../../base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "./../../../../hdf_core/adapter/uhdf/manager:hdf_core",
+      "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
   }
@@ -88,28 +88,28 @@ if (defined(ohos_lite)) {
     output_dir = output_path
     include_dirs = [
       "//third_party/googletest/googletest/include",
-      "//drivers/peripheral/usb/sample/host/include",
-      "//drivers/hdf_core/adapter/khdf/liteos/model/usb/host/include",
+      "./../../sample/host/include",
+      "./../../../../hdf_core/adapter/khdf/liteos/model/usb/host/include",
       "//third_party/bounds_checking_function/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
-      "//drivers/peripheral/usb/serial/include",
-      "//drivers/peripheral/usb/ddk/common/include",
-      "//drivers/peripheral/usb/ddk/device/include",
-      "//drivers/peripheral/usb/ddk/host/include",
-      "//drivers/peripheral/usb/interfaces/ddk/common",
-      "//drivers/peripheral/usb/interfaces/ddk/host",
-      "//drivers/peripheral/usb/gadget/function/include",
+      "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "./../../serial/include",
+      "./../../ddk/common/include",
+      "./../../ddk/device/include",
+      "./../../ddk/host/include",
+      "./../../interfaces/ddk/common",
+      "./../../interfaces/ddk/host",
+      "./../../gadget/function/include",
       "common",
     ]
     sources = [
+      "./../../sample/host/src/usbhost_ddk_test.c",
       "./common/liteos/usb_host_serial_loopback.cpp",
-      "//drivers/peripheral/usb/sample/host/src/usbhost_ddk_test.c",
     ]
     public_deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "./../../../../../base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "./../../../../hdf_core/adapter/uhdf/manager:hdf_core",
+      "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
     defines = [ "__LITEOS_USB_HOST_DDK_TEST__" ]
   }
@@ -119,20 +119,20 @@ if (defined(ohos_lite)) {
     output_dir = output_path
     include_dirs = [
       "//third_party/googletest/googletest/include",
-      "//drivers/peripheral/usb/sample/device/liteos/lib/include",
+      "./../../sample/device/liteos/lib/include",
       "//third_party/bounds_checking_function/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "common",
     ]
     sources = [
+      "./../../sample/device/liteos/lib/src/lib_acm_test.c",
       "./common/liteos/usb_device_serial_loopback.cpp",
-      "//drivers/peripheral/usb/sample/device/liteos/lib/src/lib_acm_test.c",
     ]
     public_deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "./../../../../../base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "./../../../../hdf_core/adapter/uhdf/manager:hdf_core",
+      "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
   }
 
@@ -141,20 +141,20 @@ if (defined(ohos_lite)) {
     output_dir = output_path
     include_dirs = [
       "//third_party/googletest/googletest/include",
-      "//drivers/peripheral/usb/sample/device/liteos/lib/include",
+      "./../../sample/device/liteos/lib/include",
       "//third_party/bounds_checking_function/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+      "./../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "common",
     ]
     sources = [
+      "./../../sample/device/liteos/lib/src/lib_acm_test.c",
       "./common/liteos/usb_device_serial_func_test.cpp",
-      "//drivers/peripheral/usb/sample/device/liteos/lib/src/lib_acm_test.c",
     ]
     public_deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "./../../../../../base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
+      "./../../../../hdf_core/adapter/uhdf/manager:hdf_core",
+      "./../../../../hdf_core/adapter/uhdf/posix:hdf_posix_osal",
       "//commonlibrary/utils_lite:utils",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
     ]
   }
 
