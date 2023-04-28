@@ -45,6 +45,8 @@ typedef struct {
     FILE            *fpOutput;
     int32_t         frameNum;
     uint32_t        bufferSize;
+    uint32_t        inputBufferCount;
+    uint32_t        outputBufferCount;
     CodecCallback   cb;
 } CodecEnvData;
 
