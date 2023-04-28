@@ -682,7 +682,8 @@ static int32_t ParseParamPortDefinitionVideo(Param *paramIn, int8_t *paramOut, i
             case KEY_BUFFERSIZE: {
                 param->nBufferSize = *(reinterpret_cast<OMX_U32 *>(paramIn[i].val));
                 param->nBufferCountActual =
-                         param->nPortIndex == INPUT_PORTINDEX ? info.inputBufferCount : info.outputBufferCount;
+                         param->nPortIndex == static_cast<OMX_U32>(INPUT_PORTINDEX) ?
+                         static_cast<OMX_U32>(info.inputBufferCount) : static_cast<OMX_U32>(info.outputBufferCount);
                 param->bEnabled = OMX_TRUE;
                 break;
             }
@@ -733,9 +734,11 @@ static int32_t ParseParamPortDefinitionAudio(Param *paramIn, int8_t *paramOut, i
         switch (paramIn[i].key) {
             case KEY_BUFFERSIZE: {
                 param->nBufferSize =
-                         param->nPortIndex == INPUT_PORTINDEX ? info.inputBufferSize : info.outputBufferSize;
+                         param->nPortIndex == static_cast<OMX_U32>(INPUT_PORTINDEX) ?
+                         static_cast<OMX_U32>(info.inputBufferSize) : static_cast<OMX_U32>(info.outputBufferSize);
                 param->nBufferCountActual =
-                         param->nPortIndex == INPUT_PORTINDEX ? info.inputBufferCount : info.outputBufferCount;
+                         param->nPortIndex == static_cast<OMX_U32>(INPUT_PORTINDEX) ?
+                         static_cast<OMX_U32>(info.inputBufferCount) : static_cast<OMX_U32>(info.outputBufferCount);
                 param->bEnabled = OMX_TRUE;
                 break;
             }
