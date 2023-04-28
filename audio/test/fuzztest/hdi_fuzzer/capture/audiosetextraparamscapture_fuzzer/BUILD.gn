@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -10,16 +10,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+hdf_fuzztest_path = "./../../.."
+hdf_audio_path = "./../../../../.."
+
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("$hdf_audio_path/audio.gni")
 
 module_output_path = "hdf/audio"
 
 ohos_fuzztest("AudioSetextraparamsCaptureFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//drivers/peripheral/audio/test/fuzztest/hdi_fuzzer/capture/audiosetextraparamscapture_fuzzer"
+  fuzz_config_file = "../audiosetextraparamscapture_fuzzer"
 
   include_dirs = []
   cflags = [
@@ -34,11 +38,11 @@ ohos_fuzztest("AudioSetextraparamsCaptureFuzzTest") {
     "audiosetextraparamscapture_fuzzer.cpp",
   ]
   include_dirs = [
-    "//drivers/peripheral/audio/interfaces/include",
-    "//drivers/peripheral/audio/hal/hdi_passthrough/include",
+    "$hdf_audio_path/interfaces/include",
+    "$hdf_audio_path/hal/hdi_passthrough/include",
     "//third_party/bounds_checking_function/include",
-    "//drivers/peripheral/audio/test/fuzztest/hdi_fuzzer/capture/audiosetextraparamscapture_fuzzer/include",
-    "//drivers/peripheral/audio/test/fuzztest/common/include",
+    "include",
+    "$hdf_fuzztest_path/common/include",
   ]
   external_deps = [
     "hdf_core:libhdf_ipc_adapter",

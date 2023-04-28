@@ -1,7 +1,7 @@
 {
   "name": "@ohos/drivers_peripheral_audio",
   "description": "audio device driver",
-  "version": "3.1",
+  "version": "4.0",
   "license": "Apache License 2.0",
   "publishAs": "code-segment",
   "segment": {
@@ -24,8 +24,7 @@
       "drivers_peripheral_audio_feature_community",
       "drivers_peripheral_audio_feature_effect"
     ],
-    "syscap": [ "" ],
-    "adapter_system_type": ["standard", "small"],
+    "adapted_system_type": ["standard", "small"],
     "rom": "1035KB",
     "ram": "8600KB",
     "deps": {

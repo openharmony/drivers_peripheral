@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("../../audio.gni")
 
 ohos_shared_library("audio_primary_driver") {
   sources = [ "audio_manager_driver.c" ]

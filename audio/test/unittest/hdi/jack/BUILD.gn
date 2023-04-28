@@ -29,7 +29,7 @@ if (defined(ohos_lite)) {
     sources = [ "./src/analog_headset_test.cpp" ]
 
     include_dirs = [
-      "./include",
+      "include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
       "$hdf_audio_test_path/input/hal/include",
       "$hdf_audio_test_path/input/interfaces/include",
@@ -70,7 +70,7 @@ if (defined(ohos_lite)) {
     module_out_path = module_output_path
     sources = [ "./src/analog_headset_test.cpp" ]
 
-    include_dirs = [ "./include" ]
+    include_dirs = [ "include" ]
 
     deps = [
       "$hdf_audio_path/hal/hdi_passthrough:hdi_audio_common",
