@@ -69,6 +69,8 @@ typedef enum {
     KEY_INPUT_BUFFERS,        /**< External input buffer in preset mode, see {@link CodecBufferInfo}. */
     KEY_OUTPUT_BUFFERS,       /**< External output buffer in preset mode, see {@link CodecBufferInfo}. */
     KEY_DEVICE_ID,            /**< Device ID. The value type is uint32_t. */
+    KEY_INPUT_BUFFER_COUNT,   /**< Input Buffer count. The value type is uint32_t. */
+    KEY_OUTPUT_BUFFER_COUNT,  /**< Output Buffer count. The value type is uint32_t. */
     KEY_BITRATE = 0x500,      /**< Bit rate. The value type is uint32_t. */
 
     KEY_VIDEO_START_NONE = 0x1000,
@@ -83,6 +85,7 @@ typedef enum {
     KEY_VIDEO_PROFILE,        /**< Codec profile. The value type is uint32_t. */
     KEY_VIDEO_FRAME_RATE,     /**< Frame rate. The value type is uint32_t. */
     KEY_IMAGE_Q_FACTOR,       /**< Quality factor, range is [1, 99]. The value type is uint32_t */
+    KEY_VIDEO_LEVEL,          /**< Codec level. The value type is uint32_t. */
 
     KEY_AUDIO_START_NONE = 0x1500,
     KEY_AUDIO_SAMPLE_RATE,    /**< Sampling rate. The value type is uint32_t. */
