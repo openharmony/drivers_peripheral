@@ -17,7 +17,9 @@
 
 #include <securec.h>
 
+#include "file_ex.h"
 #include "hdf_base.h"
+#include "string_ex.h"
 #include "thermal_log.h"
 
 namespace OHOS {
@@ -25,54 +27,24 @@ namespace HDI {
 namespace Thermal {
 namespace V1_0 {
 namespace {
-constexpr int32_t MAX_INT_LEN = 32;
-constexpr int32_t MAX_STR_LEN = 128;
 constexpr int32_t INVALID_NUM = -100000;
 }
 
 int32_t ThermalHdfUtils::ReadNodeToInt(const std::string& path)
 {
-    FILE* fp;
-    int32_t out = INVALID_NUM;
-    if ((fp = fopen(path.c_str(), "r")) == nullptr) {
-        THERMAL_HILOGI(COMP_HDI, "open file failed");
-        return out;
-    }
-
-    char buf[MAX_INT_LEN];
-    if (fgets(buf, sizeof(buf) - 1, fp) == nullptr) {
+    std::string content;
+    if (!ReadNode(path, content)) {
         THERMAL_HILOGW(COMP_HDI, "get node failed");
-    } else {
-        out = atoi(buf);
+        return INVALID_NUM;
     }
-
-    if (fclose(fp) != 0) {
-        THERMAL_HILOGW(COMP_HDI, "close file stream failed");
-    }
-    return out;
+    int32_t value = INVALID_NUM;
+    StrToInt(content, value);
+    return value;
 }
 
-int32_t ThermalHdfUtils::ReadNode(const std::string& path, std::string& out)
+bool ThermalHdfUtils::ReadNode(const std::string& path, std::string& out)
 {
-    FILE* fp;
-    int32_t ret = HDF_FAILURE;
-    if ((fp = fopen(path.c_str(), "r")) == nullptr) {
-        THERMAL_HILOGI(COMP_HDI, "open file failed");
-        return ret;
-    }
-
-    char buf[MAX_STR_LEN];
-    if (fgets(buf, sizeof(buf) - 1, fp) == nullptr) {
-        THERMAL_HILOGW(COMP_HDI, "get node failed");
-    } else {
-        out = buf;
-        ret = HDF_SUCCESS;
-    }
-
-    if (fclose(fp) != 0) {
-        THERMAL_HILOGW(COMP_HDI, "close file stream failed");
-    }
-
+    bool ret = LoadStringFromFile(path, out);
     TrimStr(out);
     return ret;
 }

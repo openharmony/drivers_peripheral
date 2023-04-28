@@ -11,22 +11,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+hdf_audio_path = "./../.."
+hdf_hdi_service_path = "./.."
 import("//build/ohos.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("$hdf_audio_path/audio.gni")
 
 ohos_shared_library("audio_path_select") {
   sources = [
-    "//drivers/peripheral/audio/hal/pathselect/src/audio_pathselect.c",
-    "//drivers/peripheral/audio/hdi_service/primary_impl/src/audio_common.c",
+    "$hdf_audio_path/hal/pathselect/src/audio_pathselect.c",
+    "$hdf_hdi_service_path/primary_impl/src/audio_common.c",
     "//third_party/cJSON/cJSON.c",
   ]
 
   include_dirs = [
-    "//drivers/peripheral/audio/hdi_service/primary_impl/include",
-    "//drivers/peripheral/audio/hal/pathselect/include",
+    "$hdf_hdi_service_path/primary_impl/include",
+    "$hdf_audio_path/hal/pathselect/include",
     "//third_party/cJSON",
     "//third_party/bounds_checking_function/include",
-    "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
+    "$hdf_hdi_service_path/vendor_interface/utils",
   ]
 
   defines = [ "IDL_MODE" ]

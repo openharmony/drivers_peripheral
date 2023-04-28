@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("./../audio.gni")
 
 if (defined(ohos_lite)) {
   group("audio_test_entry") {

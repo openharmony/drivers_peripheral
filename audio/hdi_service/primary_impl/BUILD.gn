@@ -11,8 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+hdf_audio_path = "./../.."
+hdf_hdi_service_path = "./.."
 import("//build/ohos.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("$hdf_audio_path/audio.gni")
 
 ohos_shared_library("audio_primary_impl_vendor") {
   defines = []
@@ -27,12 +29,12 @@ ohos_shared_library("audio_primary_impl_vendor") {
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/hdi_service/primary_impl/include",
-      "//drivers/peripheral/audio/hdi_service/pathselect/include",
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-      "//drivers/peripheral/audio/supportlibs/interfaces/include",
+      "include",
+      "$hdf_hdi_service_path/pathselect/include",
+      "$hdf_audio_path/supportlibs/adm_adapter/include",
+      "$hdf_audio_path/supportlibs/interfaces/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
+      "$hdf_hdi_service_path/vendor_interface/utils",
     ]
 
     if (drivers_peripheral_audio_feature_hal_notsupport_pathselect) {
@@ -48,9 +50,9 @@ ohos_shared_library("audio_primary_impl_vendor") {
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/hdi_service/primary_impl/vendor_include/include",
+      "vendor_include/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/peripheral/audio/hdi_service/vendor_interface/utils",
+      "$hdf_hdi_service_path/vendor_interface/utils",
     ]
   }
 

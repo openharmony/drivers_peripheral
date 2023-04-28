@@ -21,7 +21,7 @@ ohos_unittest("hdf_effect_hdi_ut") {
     "effect_model_test.cpp",
   ]
 
-  include_dirs = [ "//drivers/peripheral/audio/effect/test/unittest/" ]
+  include_dirs = [ "./" ]
 
   external_deps = [
     "c_utils:utils",
