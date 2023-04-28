@@ -11,8 +11,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+hdf_audio_path = "./../.."
 import("//build/ohos.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("$hdf_audio_path/audio.gni")
 
 if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio") {
@@ -24,15 +25,15 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-      "//drivers/peripheral/audio/supportlibs/interfaces/include",
+      "include",
+      "$hdf_audio_path/supportlibs/adm_adapter/include",
+      "$hdf_audio_path/supportlibs/interfaces/include",
       "//third_party/cJSON",
-      "//drivers/peripheral/audio/interfaces/include",
+      "$hdf_audio_path/interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
     deps = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common",
+      ":hdi_audio_common",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
     external_deps = [
@@ -69,11 +70,11 @@ if (defined(ohos_lite)) {
       ]
 
       include_dirs = [
-        "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-        "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-        "//drivers/peripheral/audio/supportlibs/interfaces/include",
+        "include",
+        "$hdf_audio_path/supportlibs/adm_adapter/include",
+        "$hdf_audio_path/supportlibs/interfaces/include",
         "//third_party/cJSON",
-        "//drivers/peripheral/audio/interfaces/include",
+        "$hdf_audio_path/interfaces/include",
         "//third_party/bounds_checking_function/include",
       ]
 
@@ -95,8 +96,7 @@ if (defined(ohos_lite)) {
         external_deps = [ "hilog:libhilog" ]
       }
 
-      deps =
-          [ "//drivers/peripheral/audio/hal/hdi_passthrough:hdi_audio_common" ]
+      deps = [ ":hdi_audio_common" ]
 
       install_images = [ chipset_base_dir ]
       subsystem_name = "hdf"
@@ -114,10 +114,10 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/hal/common/include",
+      "include",
+      "../common/include",
       "//third_party/cJSON",
-      "//drivers/peripheral/audio/interfaces/include",
+      "$hdf_audio_path/interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
     deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
@@ -150,11 +150,11 @@ if (defined(ohos_lite)) {
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/supportlibs/adm_adapter/include",
-      "//drivers/peripheral/audio/supportlibs/interfaces/include",
+      "include",
+      "$hdf_audio_path/supportlibs/adm_adapter/include",
+      "$hdf_audio_path/supportlibs/interfaces/include",
       "//third_party/cJSON",
-      "//drivers/peripheral/audio/interfaces/include",
+      "$hdf_audio_path/interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
 

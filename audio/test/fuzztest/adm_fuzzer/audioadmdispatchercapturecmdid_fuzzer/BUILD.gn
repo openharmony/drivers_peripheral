@@ -10,16 +10,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+hdf_fuzztest_path = "./../.."
+hdf_test_path = "./../../.."
+hdf_audio_path = "./../../../.."
+
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("$hdf_audio_path/audio.gni")
 
 module_output_path = "hdf/audio"
 
 ohos_fuzztest("AudioAdmDispatcherCaptureCmdidFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//drivers/peripheral/audio/test/fuzztest/adm_fuzzer/audioadmdispatchercapturecmdid_fuzzer"
+  fuzz_config_file = "../audioadmdispatchercapturecmdid_fuzzer"
 
   include_dirs = []
   cflags = [
@@ -35,12 +40,12 @@ ohos_fuzztest("AudioAdmDispatcherCaptureCmdidFuzzTest") {
     "audioadmdispatchercapturecmdid_fuzzer.cpp",
   ]
   include_dirs = [
-    "//drivers/peripheral/audio/interfaces/include",
-    "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-    "//drivers/peripheral/audio/test/fuzztest/adm_fuzzer/audioadmdispatchercapturecmdid_fuzzer",
-    "//drivers/peripheral/audio/test/fuzztest/common/include",
-    "//drivers/peripheral/audio/test/systemtest/common/hdi_common/include",
-    "//drivers/peripheral/audio/test/systemtest/common/adm_common/include",
+    "$hdf_audio_path/interfaces/include",
+    "$hdf_audio_path/hal/hdi_passthrough/include",
+    "./",
+    "$hdf_fuzztest_path/common/include",
+    "$hdf_test_path/systemtest/common/hdi_common/include",
+    "$hdf_test_path/systemtest/common/adm_common/include",
     "//third_party/googletest/googletest/include",
     "//third_party/bounds_checking_function/include",
   ]

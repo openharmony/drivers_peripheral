@@ -141,8 +141,7 @@ int32_t ThermalZoneManager::ParseThermalZoneInfo()
         THERMAL_HILOGI(COMP_HDI, "thermal_zone size: %{public}zu", GetLTZPathInfo().size());
         for (auto iter = lTzSysPathInfo_.begin(); iter != lTzSysPathInfo_.end(); iter++) {
             std::string tzType;
-            ret = ThermalHdfUtils::ReadNode(iter->typePath, tzType);
-            if (ret != HDF_SUCCESS) {
+            if (!ThermalHdfUtils::ReadNode(iter->typePath, tzType)) {
                 THERMAL_HILOGE(COMP_HDI, "read tz type failed");
                 continue;
             }

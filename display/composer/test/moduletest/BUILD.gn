@@ -14,14 +14,12 @@
 import("//build/test.gni")
 import("//drivers/peripheral/display/display_config.gni")
 
-base_root = "../../../../../../"
-
 group("hdf_disp_composer_moduletest") {
   testonly = true
   deps = [ ":composer_mt" ]
 }
 
-module_output_path = "hdf/display_composer"
+module_output_path = "drivers_peripheral_display/composer"
 
 config("module_private_config") {
   visibility = [ ":*" ]
@@ -32,27 +30,19 @@ ohos_moduletest("composer_mt") {
   defines += display_defines
   module_out_path = module_output_path
   sources = [ "hdi_device_test.cpp" ]
-  deps = [
-    "$base_root/drivers/peripheral/display/composer/test/common:disp_dev_hdi_test_common",
-    "$base_root/third_party/googletest:gtest_main",
-  ]
-  include_dirs = [
-    "$base_root/drivers/interface/display/composer/hdifd_parcelable",
-    "$base_root/drivers/interface/display/composer/bufferhandle_parcelable",
-    "$base_root/drivers/peripheral/display/composer/test/common",
-    "$base_root/foundation/communication/ipc/interfaces/innerkits/ipc_core/include",
-    "$base_root/drivers/peripheral/base",
-    "utils",
-    ".",
-  ]
+  include_dirs = [ "../common" ]
+  deps = [ "../common:disp_dev_hdi_test_common" ]
   external_deps = [
     "c_utils:utils",
     "drivers_interface_display:display_buffer_idl_headers",
     "drivers_interface_display:display_composer_idl_headers",
     "drivers_interface_display:libdisplay_buffer_hdi_impl",
     "drivers_interface_display:libdisplay_composer_hdi_impl",
+    "graphic_chipsetsdk:buffer_handle",
     "hdf_core:libhdf_utils",
     "hiviewdfx_hilog_native:libhilog",
+    "ipc:ipc_core",
+    "thirdparty_googletest:gtest",
   ]
   cflags = [ "-Wno-unused-function" ]
   subsystem_name = "hdf"
