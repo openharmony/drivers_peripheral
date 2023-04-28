@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -183,9 +183,6 @@ TEST_F(UtestOpenCameraTest, camera_open_0050)
     std::vector<std::string> cameraIds;
     display_->cameraHost->GetCameraIds(cameraIds);
     for (auto &cameraId : cameraIds) {
-        if (cameraId != "lcam001") {
-            continue;
-        }
         CAMERA_LOGI("cameraId = %{public}s", cameraId.c_str());
         const OHOS::sptr<ICameraDeviceCallback> callback = new DemoCameraDeviceCallback();
         display_->rc = (CamRetCode)display_->cameraHost->OpenCamera(cameraId, callback, display_->cameraDevice);

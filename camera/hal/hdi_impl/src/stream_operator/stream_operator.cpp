@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #include "stream_operator.h"
 #include "buffer_adapter.h"
 #include "camera_device_impl.h"
+#include "camera_host_config.h"
 #include "metadata_utils.h"
 #include <algorithm>
 #include <iterator>
@@ -352,7 +353,16 @@ int32_t StreamOperator::CommitStreams(OperationMode mode, const std::vector<uint
         CAMERA_LOGE("prepare mode settings failed");
         return DEVICE_ERROR;
     }
-    rc = streamPipeline_->CreatePipeline(mode);
+    auto dev = std::static_pointer_cast<CameraDeviceImpl>(device_.lock());
+    CHECK_IF_PTR_NULL_RETURN_VALUE(dev, RC_ERROR);
+    std::string cameraId;
+    dev->GetCameraId(cameraId);
+    int32_t mode1 = mode;
+    CameraHostConfig *config = CameraHostConfig::GetInstance();
+    if (config->SearchUsbCameraId(cameraId)) {
+        mode1 = 2; // 2:uvc mode
+    }
+    rc = streamPipeline_->CreatePipeline(mode1);
     if (rc != RC_OK) {
         CAMERA_LOGE("create pipeline failed.");
         return INVALID_ARGUMENT;
