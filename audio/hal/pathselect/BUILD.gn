@@ -11,22 +11,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+hdf_audio_path = "./../.."
+hdf_hal_path = "./.."
 import("//build/ohos.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("$hdf_audio_path/audio.gni")
 
 if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio_path_select") {
     sources = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
+      "$hdf_hal_path/hdi_passthrough/src/audio_common.c",
       "//third_party/cJSON/cJSON.c",
       "src/audio_pathselect.c",
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/hal/pathselect/include",
+      "$hdf_hal_path/hdi_passthrough/include",
+      "include",
       "//third_party/cJSON",
-      "//drivers/peripheral/audio/interfaces/include",
+      "$hdf_audio_path/interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
 
@@ -42,16 +44,16 @@ if (defined(ohos_lite)) {
 } else {
   ohos_shared_library("hdi_audio_path_select") {
     sources = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c",
+      "$hdf_hal_path/hdi_passthrough/src/audio_common.c",
       "//third_party/cJSON/cJSON.c",
       "src/audio_pathselect.c",
     ]
 
     include_dirs = [
-      "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-      "//drivers/peripheral/audio/hal/pathselect/include",
+      "$hdf_hal_path/hdi_passthrough/include",
+      "include",
       "//third_party/cJSON",
-      "//drivers/peripheral/audio/interfaces/include",
+      "$hdf_audio_path/interfaces/include",
       "//third_party/bounds_checking_function/include",
     ]
 
