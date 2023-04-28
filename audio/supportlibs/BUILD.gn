@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("//drivers/peripheral/audio/audio.gni")
 
 config("audio_interface_config") {
@@ -89,7 +88,7 @@ if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio_interface_lib_capture") {
     sources =
         [ "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c" ]
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       sources += [
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_capture.c",
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_common.c",
@@ -116,7 +115,7 @@ if (defined(ohos_lite)) {
       defines = [ "AUDIO_HDF_LOG" ]
     }
 
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       include_dirs += [
         "//third_party/alsa-lib/include",
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
@@ -147,7 +146,7 @@ if (defined(ohos_lite)) {
   ohos_shared_library("hdi_audio_interface_lib_render") {
     sources =
         [ "//drivers/peripheral/audio/hal/hdi_passthrough/src/audio_common.c" ]
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       sources += [
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_common.c",
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/src/alsa_lib_render.c",
@@ -175,7 +174,7 @@ if (defined(ohos_lite)) {
       defines = [ "AUDIO_HDF_LOG" ]
     }
 
-    if (drivers_peripheral_audio_alsa_lib) {
+    if (drivers_peripheral_audio_feature_alsa_lib) {
       include_dirs += [
         "//drivers/peripheral/audio/supportlibs/alsa_adapter/include",
         "//third_party/alsa-lib/include",

@@ -11,13 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+HDF_CORE_PATH = "../../../../hdf_core"
 if (defined(ohos_lite)) {
   import("//build/lite/config/component/lite_component.gni")
   import("//build/lite/config/test.gni")
 } else {
   import("//build/ohos.gni")
   import("//build/test.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 }
 
 if (defined(ohos_lite)) {
@@ -26,10 +27,10 @@ if (defined(ohos_lite)) {
     output_dir = "$root_out_dir/test/unittest/hdf"
     include_dirs = [
       "//third_party/bounds_checking_function/include",
-      "//drivers/peripheral/vibrator/interfaces/include",
+      "../../interfaces/include",
     ]
 
-    sources = [ "./common/hdf_vibrator_test.cpp" ]
+    sources = [ "common/hdf_vibrator_test.cpp" ]
     cflags = [
       "-Wall",
       "-Wextra",
@@ -39,13 +40,13 @@ if (defined(ohos_lite)) {
       "-fno-strict-aliasing",
     ]
     public_deps = [
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-      "//drivers/hdf_core/adapter/build/test_common:libhdf_test_common",
-      "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//drivers/peripheral/vibrator/hal:hdi_vibrator",
+      "$HDF_CORE_PATH/adapter/build/test_common:libhdf_test_common",
+      "$HDF_CORE_PATH/adapter/uhdf/manager:hdf_core",
+      "$HDF_CORE_PATH/adapter/uhdf/posix:hdf_posix_osal",
+      "../../hal:hdi_vibrator",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
+    external_deps = [ "hilog_featured_lite:hilog_shared" ]
   }
 } else {
   module_output_path = "hdf/vibrator"
@@ -53,7 +54,7 @@ if (defined(ohos_lite)) {
     module_out_path = module_output_path
     include_dirs = []
 
-    sources = [ "./common/hdf_vibrator_test.cpp" ]
+    sources = [ "common/hdf_vibrator_test.cpp" ]
     cflags = [
       "-Wall",
       "-Wextra",
@@ -62,7 +63,7 @@ if (defined(ohos_lite)) {
       "-fno-common",
       "-fno-strict-aliasing",
     ]
-    deps = [ "//drivers/peripheral/vibrator/hal:hdi_vibrator" ]
+    deps = [ "../../hal:hdi_vibrator" ]
     if (is_standard_system) {
       external_deps = [
         "c_utils:utils",

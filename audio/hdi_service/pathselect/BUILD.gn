@@ -34,7 +34,7 @@ ohos_shared_library("audio_path_select") {
   if (enable_audio_hal_hdf_log) {
     defines += [ "AUDIO_HDF_LOG" ]
   }
-  if (drivers_peripheral_audio_alsa_lib) {
+  if (drivers_peripheral_audio_feature_alsa_lib) {
     defines += [ "ALSA_LIB_MODE" ]
   }
   if (is_standard_system) {

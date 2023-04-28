@@ -1,4 +1,4 @@
-# Copyright (c) 2021 Huawei Device Co., Ltd.
+# Copyright (c) 2021-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -13,6 +13,8 @@
 
 import("//build/ohos.gni")
 
+HAL_ROOT_DIR = "./.."
+
 if (defined(ohos_lite)) {
   ohos_shared_library("wifi_hal") {
     sources = [
@@ -26,17 +28,17 @@ if (defined(ohos_lite)) {
 
     include_dirs = [
       "include",
-      "//drivers/peripheral/wlan/interfaces/include",
-      "//drivers/peripheral/wlan/client/include",
+      "$HAL_ROOT_DIR/interfaces/include",
+      "$HAL_ROOT_DIR/client/include",
       "//third_party/bounds_checking_function/include",
       "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     ]
 
-    deps = [
-      "//drivers/hdf_core/adapter/uhdf/posix:hdf_posix_osal",
-      "//third_party/bounds_checking_function:libsec_shared",
+    deps = [ "//third_party/bounds_checking_function:libsec_shared" ]
+    external_deps = [
+      "hdf_core:hdf_posix_osal",
+      "hdf_core:libhdf_utils",
     ]
-    external_deps = [ "hdf_core:libhdf_utils" ]
     defines = [ "__USER__" ]
 
     cflags = [
@@ -53,24 +55,22 @@ if (defined(ohos_lite)) {
     part_name = "drivers_peripheral_wlan"
   }
 } else {
-  HAL_ROOT_DIR = "//drivers/peripheral/wlan"
-
   ohos_shared_library("wifi_hal") {
     sources = [
-      "$HAL_ROOT_DIR/hal/src/wifi_hal.c",
-      "$HAL_ROOT_DIR/hal/src/wifi_hal_ap_feature.c",
-      "$HAL_ROOT_DIR/hal/src/wifi_hal_base_feature.c",
-      "$HAL_ROOT_DIR/hal/src/wifi_hal_cmd.c",
-      "$HAL_ROOT_DIR/hal/src/wifi_hal_sta_feature.c",
-      "$HAL_ROOT_DIR/hal/src/wifi_hal_util.c",
+      "src/wifi_hal.c",
+      "src/wifi_hal_ap_feature.c",
+      "src/wifi_hal_base_feature.c",
+      "src/wifi_hal_cmd.c",
+      "src/wifi_hal_sta_feature.c",
+      "src/wifi_hal_util.c",
     ]
     include_dirs = [
-      "$HAL_ROOT_DIR/hal/include",
+      "include",
       "$HAL_ROOT_DIR/interfaces/include",
       "//third_party/bounds_checking_function/include",
-      "//drivers/peripheral/wlan/client/include",
+      "$HAL_ROOT_DIR/client/include",
     ]
-    deps = [ "//drivers/peripheral/wlan/client:wifi_driver_client" ]
+    deps = [ "$HAL_ROOT_DIR/client:wifi_driver_client" ]
     defines = [ "__OHOS__USER__" ]
     cflags = [
       "-Wall",
