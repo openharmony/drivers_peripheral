@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -33,6 +33,7 @@ public:
     RetCode PowerUp();
     RetCode PowerDown();
     RetCode Configure(std::shared_ptr<CameraMetadata> meta);
+    RetCode ConfigFps(std::shared_ptr<CameraMetadata> meta);
     RetCode Start(int buffCont, DeviceFormat& format);
     RetCode Stop();
 

@@ -369,3 +369,223 @@ TEST_F(UtestUSBCameraTest, camera_usb_0013)
     std::cout << "OHOS_ABILITY_CAMERA_TYPE value is " << static_cast<int>(entry.data.u8[0]) << std::endl;
     EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_TYPE_UNSPECIFIED);
 }
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_JPEG_ORIENTATION
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0014)
+{
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    ability_ = display_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_JPEG_ORIENTATION, &entry);
+    EXPECT_EQ(ret, CAM_META_SUCCESS);
+    std::cout << "OHOS_JPEG_ORIENTATION value is " << static_cast<int>(entry.data.i32[0]) << std::endl;
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_JPEG_QUALITY
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0015)
+{
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    ability_ = display_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_JPEG_QUALITY, &entry);
+    EXPECT_EQ(ret, CAM_META_SUCCESS);
+    std::cout << "OHOS_JPEG_ORIENTATION value is " << static_cast<int>(entry.data.u8[0]) << std::endl;
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0016)
+{
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    ability_ = display_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS, &entry);
+    EXPECT_EQ(ret, CAM_META_SUCCESS);
+    std::cout << "OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS value is "
+        << static_cast<int>(entry.data.u8[0]) << std::endl;
+    EXPECT_TRUE(entry.data.u8[0] == OHOS_CAMERA_FORMAT_RGBA_8888);
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: get value of OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0017)
+{
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    ability_ = display_->GetCameraAbility();
+    EXPECT_NE(ability_, nullptr);
+    common_metadata_header_t *data = ability_->get();
+    EXPECT_NE(data, nullptr);
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS, &entry);
+    if (ret == 0 && entry.data.i32 != nullptr && entry.count > 0) {
+        std::cout << "print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value start." << std::endl;
+        const size_t STEP = 10; // print step
+        std::cout << "count" << entry.count << std::endl;
+        for (size_t i = 0; i < entry.count; i++) {
+            std::cout << entry.data.i32[i] << " ";
+            if ((i != 0) && (i % STEP == 0 || i == entry.count - 1)) {
+                std::cout << std::endl;
+            }
+        }
+        std::cout << "print tag<OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS> value end." << std::endl;
+    }
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Preview stream, expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0018)
+{
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    // Get the device manager
+    display_->OpenUsbCamera();
+    // Get the stream manager
+    display_->AchieveStreamOperator();
+    // start stream
+    display_->intents = {PREVIEW};
+    display_->StartStream(display_->intents);
+    // Get preview
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    // release stream
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
+    display_->StopStream(display_->captureIds, display_->streamIds);
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: Preview stream, width = 1280, height = 720, expected success.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0019)
+{
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    // Get the device manager
+    display_->OpenUsbCamera();
+    // Create and get streamOperator information
+    display_->AchieveStreamOperator();
+    // Create data stream
+    if (display_->streamCustomerPreview_ == nullptr) {
+        display_->streamCustomerPreview_ = std::make_shared<StreamCustomer>();
+    }
+    OHOS::sptr<OHOS::IBufferProducer> producer = display_->streamCustomerPreview_->CreateProducer();
+    producer->SetQueueSize(8); // 8:set bufferQueue size
+
+    std::vector<StreamInfo> streamInfos;
+    StreamInfo streamInfo = {};
+    streamInfo.streamId_ = display_->STREAM_ID_PREVIEW;
+    streamInfo.width_ = 1280; // 1280:picture width
+    streamInfo.height_ = 720; // 720:picture height
+    streamInfo.format_ = PIXEL_FMT_RGBA_8888;
+    streamInfo.dataspace_ = 8; // 8:picture dataspace
+    streamInfo.intent_ = PREVIEW;
+    streamInfo.tunneledMode_ = 5; // 5:tunnel mode
+    streamInfo.bufferQueue_ = new BufferProducerSequenceable(producer);
+    ASSERT_NE(streamInfo.bufferQueue_, nullptr);
+    std::vector<StreamInfo>().swap(streamInfos);
+    streamInfos.push_back(streamInfo);
+    display_->rc = (CamRetCode)display_->streamOperator->CreateStreams(streamInfos);
+    EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
+    // Submit stream information
+    display_->rc = (CamRetCode)display_->streamOperator->CommitStreams(NORMAL, display_->ability_);
+    EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
+    // capture
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+    // release stream
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
+    display_->StopStream(display_->captureIds, display_->streamIds);
+}
+
+/**
+  * @tc.name: USB Camera
+  * @tc.desc: UpdateSettings, fps.
+  * @tc.level: Level0
+  * @tc.size: MediumTest
+  * @tc.type: Function
+  */
+TEST_F(UtestUSBCameraTest, camera_usb_0020)
+{
+    if (!usbCameraExit_) {
+        GTEST_SKIP() << "No usb camera plugged in" << std::endl;
+    }
+    // Get the device manager
+    display_->OpenUsbCamera();
+    // get the stream manager
+    display_->AchieveStreamOperator();
+
+    // start stream
+    display_->intents = {PREVIEW};
+    display_->StartStream(display_->intents);
+
+    // updateSettings
+    const uint32_t ITEM_CAPACITY = 100;
+    const uint32_t DATA_CAPACITY = 2000;
+    const int32_t FPS_VALUE = 10;
+    std::shared_ptr<CameraSetting> meta = std::make_shared<CameraSetting>(
+        ITEM_CAPACITY, DATA_CAPACITY);
+    std::vector<int32_t> fpsRange;
+    fpsRange.push_back(FPS_VALUE);
+    fpsRange.push_back(FPS_VALUE);
+    meta->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
+    const int32_t DEVICE_STREAM_ID = 0;
+    meta->addEntry(OHOS_CAMERA_STREAM_ID, &DEVICE_STREAM_ID, 1);
+    std::vector<uint8_t> setting;
+    MetadataUtils::ConvertMetadataToVec(meta, setting);
+    display_->rc = (CamRetCode)display_->cameraDevice->UpdateSettings(setting);
+    EXPECT_EQ(true, display_->rc == HDI::Camera::V1_0::NO_ERROR);
+
+    // get preview
+    display_->StartCapture(display_->STREAM_ID_PREVIEW, display_->CAPTURE_ID_PREVIEW, false, true);
+
+    // release stream
+    display_->captureIds = {display_->CAPTURE_ID_PREVIEW};
+    display_->streamIds = {display_->STREAM_ID_PREVIEW};
+    display_->StopStream(display_->captureIds, display_->streamIds);
+}
