@@ -70,7 +70,7 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_GetCameraIds_benchmark_002)(
 {
     //std::cout << "==========[test log] GetCameraIds, success."<< std::endl;
     for (auto _ : st) {
-    cameraTest->rc = cameraTest->service->GetCameraIds(cameraTest->cameraIds);
+        cameraTest->rc = cameraTest->service->GetCameraIds(cameraTest->cameraIds);
     }
 }
 BENCHMARK_REGISTER_F(CameraBenchmarkTest, SUB_GetCameraIds_benchmark_002)->Iterations(ITERATION_FREQUENCY)->
@@ -181,9 +181,11 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_CreateStreams_benchmark_007)(
     streamInfoPre->tunneledMode_ = OHOS::Camera::UT_TUNNEL_MODE;
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer_pre =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
-    streamInfoPre->bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
-        CAMERA_LOGD("On Buffer Available: size = %{public}zu", size);
-    });
+    if (streamInfoPre->bufferQueue_ == nullptr) {
+        streamInfoPre->bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
+            CAMERA_LOGD("On Buffer Available: size = %{public}zu", size);
+        });
+    }
     streamInfoPre->bufferQueue_->producer_->SetQueueSize(OHOS::Camera::UT_DATA_SIZE);
     std::vector<StreamInfo> streamInfos;
     streamInfos.push_back(*streamInfoPre);
