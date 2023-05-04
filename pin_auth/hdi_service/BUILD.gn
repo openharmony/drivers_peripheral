@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libpin_auth_interface_service_1.0") {
+ohos_shared_library("libpin_auth_interface_service_1.1") {
   include_dirs = [
     "service/inc",
     "adaptor/inc",
@@ -64,8 +64,8 @@ ohos_shared_library("libpin_auth_driver") {
   ]
   sources = [ "service/src/pin_auth_interface_driver.cpp" ]
   deps = [
-    "../../../interface/pin_auth/v1_0:libpin_auth_stub_1.0",
-    "../hdi_service:libpin_auth_interface_service_1.0",
+    "../../../interface/pin_auth/v1_1:libpin_auth_stub_1.1",
+    "../hdi_service:libpin_auth_interface_service_1.1",
   ]
 
   external_deps = [
@@ -88,6 +88,6 @@ ohos_shared_library("libpin_auth_driver") {
 group("hdf_pin_auth_service") {
   deps = [
     ":libpin_auth_driver",
-    ":libpin_auth_interface_service_1.0",
+    ":libpin_auth_interface_service_1.1",
   ]
 }

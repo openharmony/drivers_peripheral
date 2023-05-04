@@ -36,7 +36,6 @@ using namespace OHOS::UserIam::Common;
 namespace OHOS {
 namespace HDI {
 namespace FaceAuth {
-namespace V1_0 {
 namespace {
 class DummyIExecutorCallback : public IExecutorCallback {
 public:
@@ -59,6 +58,21 @@ public:
 private:
     int32_t result_;
     int32_t tip_;
+};
+
+class DummyISaCommandCallback : public ISaCommandCallback {
+public:
+    explicit DummyISaCommandCallback(int32_t result) : result_(result)
+    {
+    }
+
+    int32_t OnSaCommands(const std::vector<SaCommand> &commands) override
+    {
+        return result_;
+    }
+
+private:
+    int32_t result_;
 };
 
 ExecutorImpl g_executorImpl;
@@ -95,6 +109,42 @@ void FillFuzzIExecutorCallback(Parcel &parcel, sptr<IExecutorCallback> &callback
             IAM_LOGE("callbackObj construct fail");
         }
     }
+    IAM_LOGI("success");
+}
+
+void FillFuzzISaCommandCallback(Parcel &parcel, sptr<ISaCommandCallback> &callbackObj)
+{
+    bool isNull = parcel.ReadBool();
+    if (isNull) {
+        callbackObj = nullptr;
+    } else {
+        callbackObj = new (std::nothrow) DummyISaCommandCallback(parcel.ReadInt32());
+        if (callbackObj == nullptr) {
+            IAM_LOGE("callbackObj construct fail");
+        }
+    }
+    IAM_LOGI("success");
+}
+
+void FillFuzzGetPropertyTypeVector(Parcel &parcel, std::vector<GetPropertyType> &types)
+{
+    std::vector<uint32_t> propertyTypeUint32;
+    FillFuzzUint32Vector(parcel, propertyTypeUint32);
+    for (const auto& val : propertyTypeUint32) {
+        types.push_back(static_cast<GetPropertyType>(val));
+    }
+
+    IAM_LOGI("success");
+}
+
+void FillFuzzProperty(Parcel &parcel, Property &property)
+{
+    property.authSubType = parcel.ReadUint64();
+    property.lockoutDuration = parcel.ReadInt32();
+    property.remainAttempts = parcel.ReadInt32();
+    FillFuzzString(parcel, property.enrollmentProgress);
+    FillFuzzString(parcel, property.sensorInfo);
+
     IAM_LOGI("success");
 }
 
@@ -215,6 +265,40 @@ void FuzzSetBufferProducer(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+void FuzzGetProperty(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    std::vector<uint64_t> templateIdList;
+    FillFuzzUint64Vector(parcel, templateIdList);
+    std::vector<GetPropertyType> propertyTypes;
+    FillFuzzGetPropertyTypeVector(parcel, propertyTypes);
+    Property property;
+    FillFuzzProperty(parcel, property);
+
+    g_executorImpl.GetProperty(templateIdList, propertyTypes, property);
+    IAM_LOGI("end");
+}
+
+void FuzzSetCachedTemplates(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    std::vector<uint64_t> templateIdList;
+    FillFuzzUint64Vector(parcel, templateIdList);
+
+    g_executorImpl.SetCachedTemplates(templateIdList);
+    IAM_LOGI("end");
+}
+
+void FuzzRegisterSaCommandCallback(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    sptr<ISaCommandCallback> callbackObj = nullptr;
+    FillFuzzISaCommandCallback(parcel, callbackObj);
+
+    g_executorImpl.RegisterSaCommandCallback(callbackObj);
+    IAM_LOGI("end");
+}
+
 using FuzzFunc = decltype(FuzzGetExecutorInfo);
 FuzzFunc *g_fuzzFuncs[] = {
     FuzzGetExecutorInfo,
@@ -227,6 +311,9 @@ FuzzFunc *g_fuzzFuncs[] = {
     FuzzCancel,
     FuzzSendCommand,
     FuzzSetBufferProducer,
+    FuzzGetProperty,
+    FuzzSetCachedTemplates,
+    FuzzRegisterSaCommandCallback,
 };
 
 void FaceAuthHdiFuzzTest(const uint8_t *data, size_t size)
@@ -240,7 +327,6 @@ void FaceAuthHdiFuzzTest(const uint8_t *data, size_t size)
     return;
 }
 } // namespace
-} // namespace V1_0
 } // namespace FaceAuth
 } // namespace HDI
 } // namespace OHOS
@@ -248,6 +334,6 @@ void FaceAuthHdiFuzzTest(const uint8_t *data, size_t size)
 /* Fuzzer entry point */
 extern "C" int32_t LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    OHOS::HDI::FaceAuth::V1_0::FaceAuthHdiFuzzTest(data, size);
+    OHOS::HDI::FaceAuth::FaceAuthHdiFuzzTest(data, size);
     return 0;
 }

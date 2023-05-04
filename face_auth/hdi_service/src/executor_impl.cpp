@@ -26,7 +26,6 @@
 namespace OHOS {
 namespace HDI {
 namespace FaceAuth {
-namespace V1_0 {
 namespace {
 constexpr uint16_t SENSOR_ID = 123;
 constexpr uint32_t EXECUTOR_TYPE = 123;
@@ -159,7 +158,7 @@ int32_t ExecutorImpl::SendCommand(
     }
     int32_t ret;
     switch (commandId) {
-        case LOCK_TEMPLATE:
+        case CommandId::LOCK_TEMPLATE:
             IAM_LOGI("lock template, result is %{public}d", ResultCode::SUCCESS);
             ret = callbackObj->OnResult(ResultCode::SUCCESS, {});
             if (ret != HDF_SUCCESS) {
@@ -167,7 +166,7 @@ int32_t ExecutorImpl::SendCommand(
                 return HDF_FAILURE;
             }
             break;
-        case UNLOCK_TEMPLATE:
+        case CommandId::UNLOCK_TEMPLATE:
             IAM_LOGI("unlock template, result is %{public}d", ResultCode::SUCCESS);
             ret = callbackObj->OnResult(ResultCode::SUCCESS, {});
             if (ret != HDF_SUCCESS) {
@@ -192,7 +191,30 @@ int32_t ExecutorImpl::SetBufferProducer(const sptr<BufferProducerSequenceable> &
         UserIam::Common::GetPointerNullStateString(bufferProducer.GetRefPtr()).c_str());
     return HDF_SUCCESS;
 }
-} // namespace V1_0
+
+int32_t ExecutorImpl::GetProperty(
+    const std::vector<uint64_t> &templateIdList, const std::vector<GetPropertyType> &propertyTypes, Property &property)
+{
+    IAM_LOGI("interface mock start");
+    property = {};
+    IAM_LOGI("get property success");
+    return HDF_SUCCESS;
+}
+
+int32_t ExecutorImpl::SetCachedTemplates(const std::vector<uint64_t> &templateIdList)
+{
+    IAM_LOGI("interface mock start");
+    IAM_LOGI("set cached templates success");
+    return HDF_SUCCESS;
+}
+
+int32_t ExecutorImpl::RegisterSaCommandCallback(const sptr<ISaCommandCallback> &callbackObj)
+{
+    IAM_LOGI("interface mock start");
+    IAM_LOGI("register sa command callback success");
+    return HDF_SUCCESS;
+}
+
 } // namespace FaceAuth
 } // namespace HDI
 } // namespace OHOS

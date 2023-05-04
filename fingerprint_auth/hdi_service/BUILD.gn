@@ -14,7 +14,7 @@
 import("//build/ohos.gni")
 import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
-ohos_shared_library("libfingerprint_auth_interface_service_1.0") {
+ohos_shared_library("libfingerprint_auth_interface_service_1.1") {
   include_dirs = [
     "include",
     "../common/logs",
@@ -43,7 +43,7 @@ ohos_shared_library("libfingerprint_auth_driver") {
   ]
   sources = [ "src/fingerprint_auth_interface_driver.cpp" ]
   deps = [
-    "../../../interface/fingerprint_auth/v1_0:libfingerprint_auth_stub_1.0",
+    "../../../interface/fingerprint_auth/v1_1:libfingerprint_auth_stub_1.1",
   ]
 
   external_deps = [
@@ -66,6 +66,6 @@ ohos_shared_library("libfingerprint_auth_driver") {
 group("hdf_fingerprint_auth_service") {
   deps = [
     ":libfingerprint_auth_driver",
-    ":libfingerprint_auth_interface_service_1.0",
+    ":libfingerprint_auth_interface_service_1.1",
   ]
 }
