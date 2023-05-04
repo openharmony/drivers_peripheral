@@ -30,14 +30,13 @@
 #define FRAME_SIZE_MULTI                    3
 #define FRAME_SIZE_OPERATOR                 2
 #define ENC_DEFAULT_FRAME_RATE              24
-#define INPUT_BUFFER_NUM                    4
-#define OUTPUT_BUFFER_NUM                   4
 #define PARAM_ARRAY_LEN                     20
 #define YUV_ALIGNMENT                       16
 #define BUF_COUNT                           1
 #define TIME_OUTMS                          0
 #define RELEASE_FENCEFD                     (-1)
 #define FOUR_BYTE_PIX_BUF_SIZE_OPERATOR     4
+#define ENC_GET_PARAM_COUNT                 3
 
 static struct ICodec *g_codecProxy = NULL;
 static CODEC_HANDLETYPE g_handle = NULL;
@@ -101,13 +100,13 @@ static int32_t ReadInputFromFile(FILE *fp, uint8_t *addr)
 
 static ShareMemory* GetShareMemoryById(int32_t id)
 {
-    int32_t i;
-    for (i = 0; i < INPUT_BUFFER_NUM; i++) {
+    uint32_t i;
+    for (i = 0; i < g_data.inputBufferCount; i++) {
         if (g_inputBuffers[i].id == id) {
             return &g_inputBuffers[i];
         }
     }
-    for (i = 0; i < OUTPUT_BUFFER_NUM; i++) {
+    for (i = 0; i < g_data.outputBufferCount; i++) {
         if (g_outputBuffers[i].id == id) {
             return &g_outputBuffers[i];
         }
@@ -117,15 +116,15 @@ static ShareMemory* GetShareMemoryById(int32_t id)
 
 static void ReleaseShm(void)
 {
-    int32_t i;
+    uint32_t i;
     if (g_inputBuffers != NULL) {
-        for (i = 0; i < INPUT_BUFFER_NUM; i++) {
+        for (i = 0; i < g_data.inputBufferCount; i++) {
             CodecBuffer *info = g_inputInfosData[i];
             ReleaseGrShareMemory((BufferHandle *)info->buffer[0].buf, &g_inputBuffers[i]);
         }
     }
     if (g_outputBuffers != NULL) {
-        for (i = 0; i < OUTPUT_BUFFER_NUM; i++) {
+        for (i = 0; i < g_data.outputBufferCount; i++) {
             ReleaseFdShareMemory(&g_outputBuffers[i]);
         }
     }
@@ -147,15 +146,15 @@ void ReleaseCodecBuffer(CodecBuffer *info)
 
 static void ReleaseCodecBuffers(void)
 {
-    int32_t i;
+    uint32_t i;
     if (g_inputInfosData != NULL) {
-        for (i = 0; i < INPUT_BUFFER_NUM; i++) {
+        for (i = 0; i < g_data.inputBufferCount; i++) {
             ReleaseCodecBuffer(g_inputInfosData[i]);
             g_inputInfosData[i] = NULL;
         }
     }
     if (g_outputInfosData != NULL) {
-        for (i = 0; i < OUTPUT_BUFFER_NUM; i++) {
+        for (i = 0; i < g_data.outputBufferCount; i++) {
             ReleaseCodecBuffer(g_outputInfosData[i]);
             g_outputInfosData[i] = NULL;
         }
@@ -421,23 +420,30 @@ static int32_t SetupEncParams()
 
 static int32_t GetEncParameter(void)
 {
-    int32_t paramCnt = 1;
+    int32_t paramIndex = 0;
     int32_t ret;
 
-    // set CodecType
-    Param *param = (Param *)OsalMemCalloc(sizeof(Param));
+    // get buffer size and count
+    Param *param = (Param *)OsalMemCalloc(sizeof(Param) * ENC_GET_PARAM_COUNT);
     if (param == NULL) {
         HDF_LOGE("%{public}s: param malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    param->key = KEY_BUFFERSIZE;
-    ret = g_codecProxy->CodecGetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, param, paramCnt);
+    param[paramIndex++].key = KEY_BUFFERSIZE;
+    param[paramIndex++].key = KEY_INPUT_BUFFER_COUNT;
+    param[paramIndex++].key = KEY_OUTPUT_BUFFER_COUNT;
+    ret = g_codecProxy->CodecGetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, param, ENC_GET_PARAM_COUNT);
     if (ret != HDF_SUCCESS) {
-        HDF_LOGE("%{public}s: CodecSetParameter failed", __func__);
+        HDF_LOGE("%{public}s: CodecGetParameter failed", __func__);
+        FreeParams(param, ENC_GET_PARAM_COUNT);
         return HDF_FAILURE;
     }
-    g_data.bufferSize = *(uint32_t *)param->val;
-    FreeParams(param, paramCnt);
+    paramIndex = 0;
+    g_data.bufferSize = *(uint32_t *)param[paramIndex++].val;
+    g_data.inputBufferCount = *(uint32_t *)param[paramIndex++].val;
+    g_data.outputBufferCount = *(uint32_t *)param[paramIndex++].val;
+
+    FreeParams(param, ENC_GET_PARAM_COUNT);
     return HDF_SUCCESS;
 }
 
@@ -659,7 +665,7 @@ static int32_t Encode(void)
         return HDF_FAILURE;
     }
 
-    if (!InitBuffer(INPUT_BUFFER_NUM, g_frameSize, OUTPUT_BUFFER_NUM, g_data.bufferSize)) {
+    if (!InitBuffer(g_data.inputBufferCount, g_frameSize, g_data.outputBufferCount, g_data.bufferSize)) {
         HDF_LOGE("%{public}s: InitBuffer failed", __func__);
         RevertEncodeStep3();
         return HDF_FAILURE;

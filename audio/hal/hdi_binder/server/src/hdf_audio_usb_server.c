@@ -26,7 +26,7 @@ static void AudioHdiUsbServerRelease(struct HdfDeviceObject *deviceObject)
     AUDIO_FUNC_LOGI("enter!");
     /* g_renderAndCaptureManage release */
     AdaptersServerManageInfomationRecycle();
-    ReleaseAudioManagerObjectComm(GetAudioManagerFuncs());
+    AudioHdiServerRelease();
 
     if (deviceObject == NULL) {
         AUDIO_FUNC_LOGE("deviceObject is null!");

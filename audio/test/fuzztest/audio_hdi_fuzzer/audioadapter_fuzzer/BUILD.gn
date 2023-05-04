@@ -10,25 +10,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+hdf_test_path = "./../../.."
+
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("./../../../../audio.gni")
 
 module_output_path = "drivers_peripheral_audio/audio"
 
 ohos_fuzztest("AudioAdapterFuzzTest") {
   module_out_path = module_output_path
-  fuzz_config_file = "//drivers/peripheral/audio/test/fuzztest/audio_hdi_fuzzer/audioadapter_fuzzer"
+  fuzz_config_file = "../audioadapter_fuzzer"
 
   sources = [
-    "//drivers/peripheral/audio/test/systemtest/common/hdi_service_common/src/hdi_service_common.cpp",
+    "$hdf_test_path/systemtest/common/hdi_service_common/src/hdi_service_common.cpp",
     "audioadapter_fuzzer.cpp",
   ]
   include_dirs = [
-    "//drivers/peripheral/audio/test/systemtest/common/hdi_service_common/include/",
-    "//drivers/peripheral/audio/test/fuzztest/audio_hdi_fuzzer/audioadapter_fuzzer/include",
+    "$hdf_test_path/systemtest/common/hdi_service_common/include/",
+    "include",
   ]
 
   external_deps = [

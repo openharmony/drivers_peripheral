@@ -15,7 +15,7 @@ import("../camera.gni")
 
 if (!defined(ohos_lite)) {
   import("//build/ohos.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
   config("camera_metadata_manager_config") {
     visibility = [ ":*" ]

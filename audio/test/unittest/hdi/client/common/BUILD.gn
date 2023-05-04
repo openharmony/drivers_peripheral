@@ -14,7 +14,6 @@
 hdf_audio_path = "./../../../../.."
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 import("$hdf_audio_path/audio.gni")
 
 ohos_unittest("hdf_audio_proxy_common_test") {

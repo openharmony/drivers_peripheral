@@ -26,8 +26,6 @@
 
 #define HDF_LOG_TAG                         codec_hdi_demo_decode
 #define TEST_SERVICE_NAME                   "codec_hdi_service"
-#define INPUT_BUFFER_NUM                    4
-#define OUTPUT_BUFFER_NUM                   10
 #define STREAM_PACKET_BUFFER_SIZE           (4 * 1024)
 #define QUEUE_TIME_OUT                      10
 #define FRAME_SIZE_OPERATOR                 2
@@ -45,6 +43,7 @@
 #define TINE_OUTMS                          0
 #define RELEASE_FENCEFD                     (-1)
 #define FOUR_BYTE_PIX_BUF_SIZE_OPERATOR     4
+#define DEC_GET_PARAM_COUNT                 3
 
 static struct ICodec *g_codecProxy = NULL;
 static CODEC_HANDLETYPE g_handle = NULL;
@@ -216,13 +215,13 @@ static int32_t ReadOneFrameFromFile(FILE *fp, uint8_t *buf)
 
 static ShareMemory* GetShareMemoryById(int32_t id)
 {
-    int32_t i;
-    for (i = 0; i < INPUT_BUFFER_NUM; i++) {
+    uint32_t i;
+    for (i = 0; i < g_data.inputBufferCount; i++) {
         if (g_inputBuffers[i].id == id) {
             return &g_inputBuffers[i];
         }
     }
-    for (i = 0; i < OUTPUT_BUFFER_NUM; i++) {
+    for (i = 0; i < g_data.outputBufferCount; i++) {
         if (g_outputBuffers[i].id == id) {
             return &g_outputBuffers[i];
         }
@@ -232,14 +231,14 @@ static ShareMemory* GetShareMemoryById(int32_t id)
 
 static void ReleaseShm(void)
 {
-    int32_t i;
+    uint32_t i;
     if (g_inputBuffers != NULL) {
-        for (i = 0; i < INPUT_BUFFER_NUM; i++) {
+        for (i = 0; i < g_data.inputBufferCount; i++) {
             ReleaseFdShareMemory(&g_inputBuffers[i]);
         }
     }
     if (g_outputBuffers != NULL) {
-        for (i = 0; i < OUTPUT_BUFFER_NUM; i++) {
+        for (i = 0; i < g_data.outputBufferCount; i++) {
             CodecBuffer *info = g_outputInfosData[i];
             ReleaseGrShareMemory((BufferHandle *)info->buffer[0].buf, &g_outputBuffers[i]);
         }
@@ -262,15 +261,15 @@ void ReleaseCodecBuffer(CodecBuffer *info)
 
 static void ReleaseCodecBuffers(void)
 {
-    int32_t i;
+    uint32_t i;
     if (g_inputInfosData != NULL) {
-        for (i = 0; i < INPUT_BUFFER_NUM; i++) {
+        for (i = 0; i < g_data.inputBufferCount; i++) {
             ReleaseCodecBuffer(g_inputInfosData[i]);
             g_inputInfosData[i] = NULL;
         }
     }
     if (g_outputInfosData != NULL) {
-        for (i = 0; i < OUTPUT_BUFFER_NUM; i++) {
+        for (i = 0; i < g_data.outputBufferCount; i++) {
             ReleaseCodecBuffer(g_outputInfosData[i]);
             g_outputInfosData[i] = NULL;
         }
@@ -416,11 +415,56 @@ int32_t TestOutputBufferAvailable(UINTPTR userData, CodecBuffer *outBuf, int32_t
     return HDF_SUCCESS;
 }
 
+static int32_t SetBasicDecParameter(void)
+{
+    Param param;
+    int32_t paramCnt;
+    int32_t ret;
+
+    // set width
+    paramCnt = 1;
+    ret = memset_s(&param, sizeof(Param), 0, sizeof(Param));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s, memset_s width failed!", __func__);
+        return HDF_FAILURE;
+    }
+    param.key = (ParamKey)KEY_VIDEO_WIDTH;
+    param.val = &g_cmd.width;
+    param.size = sizeof(g_cmd.width);
+    ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: CodecSetParameter failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    // set height
+    ret = memset_s(&param, sizeof(Param), 0, sizeof(Param));
+    if (ret != EOK) {
+        HDF_LOGE("%{public}s, memset_s height failed!", __func__);
+        return HDF_FAILURE;
+    }
+    paramCnt = 1;
+    param.key = (ParamKey)KEY_VIDEO_HEIGHT;
+    param.val = &g_cmd.height;
+    param.size = sizeof(g_cmd.height);
+    ret = g_codecProxy->CodecSetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, &param, paramCnt);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: CodecSetParameter failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
+}
+
 static int32_t SetDecParameter(void)
 {
     Param param;
     int32_t paramCnt = 1;
     int32_t ret;
+
+    if (SetBasicDecParameter() != HDF_SUCCESS) {
+        return HDF_FAILURE;
+    }
 
     // set CodecType
     memset_s(&param, sizeof(Param), 0, sizeof(Param));
@@ -462,23 +506,30 @@ static int32_t SetDecParameter(void)
 
 static int32_t GetDecParameter(void)
 {
-    int32_t paramCnt = 1;
+    int32_t paramIndex = 0;
     int32_t ret;
 
-    // set CodecType
-    Param *param = (Param *)OsalMemCalloc(sizeof(Param) * paramCnt);
+    // get buffer size and count
+    Param *param = (Param *)OsalMemCalloc(sizeof(Param) * DEC_GET_PARAM_COUNT);
     if (param == NULL) {
-        HDF_LOGE("%{public}s: param is NULL", __func__);
+        HDF_LOGE("%{public}s: param malloc failed!", __func__);
         return HDF_FAILURE;
     }
-    param->key = KEY_BUFFERSIZE;
-    ret = g_codecProxy->CodecGetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, param, paramCnt);
+    param[paramIndex++].key = KEY_BUFFERSIZE;
+    param[paramIndex++].key = KEY_INPUT_BUFFER_COUNT;
+    param[paramIndex++].key = KEY_OUTPUT_BUFFER_COUNT;
+    ret = g_codecProxy->CodecGetParameter(g_codecProxy, (CODEC_HANDLETYPE)g_handle, param, DEC_GET_PARAM_COUNT);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: CodecGetParameter failed", __func__);
+        FreeParams(param, DEC_GET_PARAM_COUNT);
         return HDF_FAILURE;
     }
-    g_data.bufferSize = *(uint32_t *)param->val;
-    FreeParams(param, paramCnt);
+    paramIndex = 0;
+    g_data.bufferSize = *(uint32_t *)param[paramIndex++].val;
+    g_data.inputBufferCount = *(uint32_t *)param[paramIndex++].val;
+    g_data.outputBufferCount = *(uint32_t *)param[paramIndex++].val;
+
+    FreeParams(param, DEC_GET_PARAM_COUNT);
     return HDF_SUCCESS;
 }
 
@@ -697,7 +748,7 @@ static int32_t Decode(void)
         return HDF_FAILURE;
     }
 
-    if (!InitBuffer(INPUT_BUFFER_NUM, g_data.bufferSize, OUTPUT_BUFFER_NUM, g_frameSize)) {
+    if (!InitBuffer(g_data.inputBufferCount, g_data.bufferSize, g_data.outputBufferCount, g_frameSize)) {
         HDF_LOGE("%{public}s: InitBuffer failed", __func__);
         RevertDecodeStep3();
         return HDF_FAILURE;

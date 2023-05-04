@@ -17,14 +17,14 @@ ohos_executable("liteos_host_speed_test") {
   sources = [ "src/usbhost_speed_test.c" ]
   include_dirs = [
     "//third_party/bounds_checking_function/include",
-    "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
+    "./../../../../../../base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     "include",
     "$ohos_current_sysroot/usr/include/arm-liteos/netinet",
   ]
-  deps = [ "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
+  deps = [ "./../../../../../../base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared" ]
 
   public_deps = [
-    "//drivers/hdf_core/adapter/uhdf/manager:hdf_core",
+    "./../../../../../hdf_core/adapter/uhdf/manager:hdf_core",
     "//third_party/bounds_checking_function:libsec_shared",
   ]
   external_deps = [

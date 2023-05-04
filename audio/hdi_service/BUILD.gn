@@ -12,8 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("../audio.gni")
 
 group("idl_audio") {
   deps = [
@@ -22,7 +21,7 @@ group("idl_audio") {
     "primary_impl:audio_primary_impl_vendor",
   ]
 
-  if (drivers_peripheral_audio_community) {
+  if (drivers_peripheral_audio_feature_community) {
     deps += [
       "pathselect:audio_path_select",
       "supportlibs:audio_capture_adapter",
