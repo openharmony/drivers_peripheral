@@ -111,7 +111,6 @@ static void RunOnce(const AllocInfo& info, IDisplayBuffer* dispbuf)
     if (ec != HDF_SUCCESS || bHandle == nullptr) {
         HDF_LOGE("%{public}s, line=%{public}d, AllocMem failed. ec=0x%{public}x",
                  __func__, __LINE__, ec);
-        
         return;
     }
 
@@ -120,13 +119,11 @@ static void RunOnce(const AllocInfo& info, IDisplayBuffer* dispbuf)
     if (buffer == nullptr) {
         HDF_LOGE("Mmap failed.");
         dispbuf->FreeMem(*bHandle);
-        
         return;
     }
     HDF_LOGD("Mmap successful");
 
     DumpBufferHandle(*bHandle);
-
     WriteBuffer(*bHandle);
 
     // InvalidateCache
@@ -135,7 +132,6 @@ static void RunOnce(const AllocInfo& info, IDisplayBuffer* dispbuf)
         HDF_LOGE("InvalidateCache failed.");
         dispbuf->Unmap(*bHandle);
         dispbuf->FreeMem(*bHandle);
-        
         return;
     }
     // InvalidateCache
@@ -144,7 +140,6 @@ static void RunOnce(const AllocInfo& info, IDisplayBuffer* dispbuf)
         HDF_LOGE("flushCache failed.");
         dispbuf->Unmap(*bHandle);
         dispbuf->FreeMem(*bHandle);
-        
         return;
     }
     HDF_LOGD("flush Cache success.");
@@ -152,7 +147,6 @@ static void RunOnce(const AllocInfo& info, IDisplayBuffer* dispbuf)
     dispbuf->Unmap(*bHandle);
     dispbuf->FreeMem(*bHandle);
     HDF_LOGD("FreeMem, finished count = %{public}d", ++count);
-    
 }
 
 int main()

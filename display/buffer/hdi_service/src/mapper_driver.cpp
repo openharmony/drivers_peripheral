@@ -19,6 +19,9 @@
 #include <hdf_sbuf_ipc.h>
 #include "v1_0/mapper_stub.h"
 
+#undef HDF_LOG_TAG
+#define HDF_LOG_TAG MAPPER_DRV
+
 using namespace OHOS::HDI::Display::Buffer::V1_0;
 
 struct HdfMapperHost {

@@ -1,4 +1,4 @@
-# Copyright (C) 2022 Huawei Device Co., Ltd.
+# Copyright (C) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -22,7 +22,8 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
     "database/inc",
     "main/inc",
     "//third_party/openssl/include",
-    "//base/useriam/user_auth_framework/common/logs",
+    "../common/logs",
+    "../common/utils",
   ]
   sources = [
     "adaptor/src/adaptor_algorithm.c",
@@ -38,10 +39,7 @@ ohos_shared_library("libpin_auth_interface_service_1.0") {
     "service/src/pin_auth_interface_service.cpp",
   ]
 
-  deps = [
-    "//base/useriam/user_auth_framework/common:iam_utils",
-    "//third_party/openssl:libcrypto_shared",
-  ]
+  deps = [ "//third_party/openssl:libcrypto_shared" ]
 
   external_deps = [
     "c_utils:utils",
@@ -61,13 +59,13 @@ ohos_shared_library("libpin_auth_driver") {
   include_dirs = [
     "service/inc",
     "main/inc",
-    "//base/useriam/user_auth_framework/common/logs",
+    "../common/logs",
+    "../common/utils",
   ]
   sources = [ "service/src/pin_auth_interface_driver.cpp" ]
   deps = [
-    "//base/useriam/user_auth_framework/common:iam_utils",
-    "//drivers/interface/pin_auth/v1_0:libpin_auth_stub_1.0",
-    "//drivers/peripheral/pin_auth/hdi_service:libpin_auth_interface_service_1.0",
+    "../../../interface/pin_auth/v1_0:libpin_auth_stub_1.0",
+    "../hdi_service:libpin_auth_interface_service_1.0",
   ]
 
   external_deps = [

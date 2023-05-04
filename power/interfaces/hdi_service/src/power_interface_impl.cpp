@@ -175,6 +175,8 @@ void NotifyCallback(int code)
         case CMD_ON_WAKEUP:
             g_callback->OnWakeup();
             break;
+        default:
+            break;
     }
 }
 

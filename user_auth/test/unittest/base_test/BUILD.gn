@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -19,14 +19,16 @@ ohos_unittest("UserAuthBaseTest") {
 
   include_dirs = [
     "inc",
-    "//drivers/peripheral/user_auth/hdi_service/adaptor/inc",
-    "//drivers/peripheral/user_auth/hdi_service/coauth/inc",
-    "//drivers/peripheral/user_auth/hdi_service/common/inc",
-    "//drivers/peripheral/user_auth/hdi_service/database/inc",
-    "//drivers/peripheral/user_auth/hdi_service/idm/inc",
-    "//drivers/peripheral/user_auth/hdi_service/interface/inc",
-    "//drivers/peripheral/user_auth/hdi_service/key_mgr/inc",
-    "//drivers/peripheral/user_auth/hdi_service/user_auth/inc",
+    "../../../hdi_service/adaptor/inc",
+    "../../../hdi_service/coauth/inc",
+    "../../../hdi_service/common/inc",
+    "../../../hdi_service/database/inc",
+    "../../../hdi_service/idm/inc",
+    "../../../hdi_service/interface/inc",
+    "../../../hdi_service/key_mgr/inc",
+    "../../../hdi_service/user_auth/inc",
+    "../../../common/logs",
+    "../../../common/utils",
   ]
 
   sources = [
@@ -39,19 +41,19 @@ ohos_unittest("UserAuthBaseTest") {
     "src/tlv_base_test.cpp",
   ]
 
-  deps = [ "//drivers/peripheral/user_auth/hdi_service:libuser_auth_interface_service_1.0" ]
+  deps = [ "../../../hdi_service:libuser_auth_interface_service_1.0" ]
 
-  configs = [
-    "//base/useriam/user_auth_framework/common:iam_utils_config",
-    "//base/useriam/user_auth_framework/common:iam_log_config",
-  ]
   remove_configs = [ "//build/config/compiler:no_exceptions" ]
 
   external_deps = [
     "c_utils:utils",
     "drivers_interface_user_auth:libuser_auth_proxy_1.0",
     "hdf_core:libhdf_utils",
+    "hilog_native:libhilog",
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
+
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_user_auth"
 }

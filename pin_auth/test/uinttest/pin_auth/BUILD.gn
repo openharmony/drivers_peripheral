@@ -1,4 +1,4 @@
-# Copyright (c) 2022 Huawei Device Co., Ltd.
+# Copyright (c) 2022-2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -23,11 +23,11 @@ ohos_unittest("PinAuthHdiUtTest") {
     "database/inc",
     "main/inc",
     "service/inc",
-    "//drivers/peripheral/pin_auth/hdi_service/adaptor/inc",
-    "//drivers/peripheral/pin_auth/hdi_service/common/inc",
-    "//drivers/peripheral/pin_auth/hdi_service/database/inc",
-    "//drivers/peripheral/pin_auth/hdi_service/main/inc",
-    "//drivers/peripheral/pin_auth/hdi_service/service/inc",
+    "../../../hdi_service/adaptor/inc",
+    "../../../hdi_service/common/inc",
+    "../../../hdi_service/database/inc",
+    "../../../hdi_service/main/inc",
+    "../../../hdi_service/service/inc",
   ]
 
   sources = [
@@ -42,10 +42,7 @@ ohos_unittest("PinAuthHdiUtTest") {
     "service/src/executor_impl_test.cpp",
   ]
 
-  deps = [
-    "//base/useriam/user_auth_framework/common:iam_test",
-    "//drivers/peripheral/pin_auth/hdi_service:libpin_auth_interface_service_1.0",
-  ]
+  deps = [ "../../../hdi_service:libpin_auth_interface_service_1.0" ]
 
   external_deps = [
     "c_utils:utils",
@@ -54,4 +51,7 @@ ohos_unittest("PinAuthHdiUtTest") {
     "hiviewdfx_hilog_native:libhilog",
     "ipc:ipc_core",
   ]
+
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_pin_auth"
 }

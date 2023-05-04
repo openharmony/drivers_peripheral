@@ -18,13 +18,7 @@ import("./../../../audio.gni")
 group("hdi_service_st") {
   testonly = true
   deps = [ "common:hdi_service_common" ]
-  if ("${product_name}" == "hispark_taurus_standard") {
-    deps += [ "hispark_taurus_standard:hdi_service_hardwaredependence" ]
-  }
-  if ("${product_name}" == "rk3568") {
-    deps += [ "rk3568:hdi_service_hardwaredependence" ]
-  }
-  if (drivers_peripheral_audio_alsa_lib == false) {
+  if (drivers_peripheral_audio_feature_alsa_lib == false) {
     deps += [ "hdiperformace:hdf_audio_idlhdi_performace_test" ]
   }
 }

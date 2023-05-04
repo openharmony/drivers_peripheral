@@ -15,7 +15,7 @@ import("../../camera.gni")
 
 if (defined(ohos_lite)) {
   import("//build/ohos.gni")
-  import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
+  import("../../../../../hdf_core/adapter/uhdf/uhdf.gni")
 
   config("ohos_camera_demo_config") {
     visibility = [ ":*" ]
@@ -47,10 +47,9 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/include/offline_stream_operator",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
-      "//drivers/peripheral/display/interfaces/include",
-      "//drivers/peripheral/base",
+      "$camerc_path/../../display/interfaces/include",
+      "$camerc_path/../../base",
 
       #producer
       "$camera_path/pipeline_core/utils",
@@ -68,19 +67,14 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/strategy",
       "$camera_path/pipeline_core/ipp/include",
       "$board_camera_path/demo/include",
-
-      # hcs parser
-      "//system/core/include/cutils",
     ]
 
-    deps = [
-      "$camera_path/hdi_impl:camera_host_service_1.0",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
-    ]
+    deps = [ "$camera_path/hdi_impl:camera_host_service_1.0" ]
     external_deps = [
       "drivers_interface_camera:metadata",
       "graphic_chipsetsdk:surface",
       "hdf_core:libhdf_utils",
+      "hilog_featured_lite:hilog_shared",
     ]
     public_configs = [ ":ohos_camera_demo_config" ]
     install_enable = false
@@ -89,7 +83,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   import("//build/ohos.gni")
-  import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+  import("../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
   config("ohos_camera_demo_config") {
     visibility = [ ":*" ]
@@ -118,12 +112,10 @@ if (defined(ohos_lite)) {
       "$camera_path/hdi_impl/include/offline_stream_operator",
       "$camera_path/device_manager/include/",
       "$camera_path/device_manager/include/mpi",
-      "//base/hiviewdfx/interfaces/innerkits/libhilog/include",
       "$camera_path/utils/event",
       "$board_camera_path/demo/include",
 
       #producer
-      "//foundation/graphic/standard/prebuilts/librarys/display_gralloc/include",
       "$camera_path/pipeline_core/utils",
       "$camera_path/pipeline_core/include",
       "$camera_path/pipeline_core/host_stream/include",
@@ -138,9 +130,6 @@ if (defined(ohos_lite)) {
       "$camera_path/pipeline_core/pipeline_impl/src/parser",
       "$camera_path/pipeline_core/pipeline_impl/src/strategy",
       "$camera_path/pipeline_core/ipp/include",
-
-      # hcs parser
-      "//system/core/include/cutils",
     ]
 
     deps = [
@@ -148,7 +137,6 @@ if (defined(ohos_lite)) {
       "$camera_path/device_manager:camera_device_manager",
       "$camera_path/hdi_impl:camera_host_service_1.0",
       "$camera_path/pipeline_core:camera_pipeline_core",
-      "//drivers/interface/camera/v1_0:libcamera_proxy_1.0",
     ]
 
     if (is_standard_system) {
@@ -167,6 +155,7 @@ if (defined(ohos_lite)) {
     }
 
     external_deps += [
+      "drivers_interface_camera:libcamera_proxy_1.0",
       "drivers_interface_camera:metadata",
       "ipc:ipc_single",
       "samgr:samgr_proxy",

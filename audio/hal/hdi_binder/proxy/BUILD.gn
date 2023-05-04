@@ -11,18 +11,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+hdf_audio_path = "./../../.."
+hdf_hal_path = "./../.."
+hdf_hdi_binder_path = "./.."
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
-import("//drivers/peripheral/audio/audio.gni")
+import("$hdf_audio_path/audio.gni")
 
-if (drivers_peripheral_audio_hdf_proxy_stub == true) {
+if (drivers_peripheral_audio_feature_hdf_proxy_stub == true) {
   if (defined(ohos_lite)) {
     ohos_shared_library("hdi_audio_client") {
       include_dirs = [
-        "//drivers/peripheral/audio/interfaces/include",
-        "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-        "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
-        "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+        "$hdf_audio_path/interfaces/include",
+        "$hdf_hal_path/hdi_passthrough/include",
+        "include",
+        "$hdf_hdi_binder_path/server/include",
         "//third_party/bounds_checking_function/include",
       ]
 
@@ -46,10 +48,10 @@ if (drivers_peripheral_audio_hdf_proxy_stub == true) {
   } else {
     ohos_shared_library("hdi_audio_client") {
       include_dirs = [
-        "//drivers/peripheral/audio/interfaces/include",
-        "//drivers/peripheral/audio/hal/hdi_passthrough/include",
-        "//drivers/peripheral/audio/hal/hdi_binder/proxy/include",
-        "//drivers/peripheral/audio/hal/hdi_binder/server/include",
+        "$hdf_audio_path/interfaces/include",
+        "$hdf_hal_path/hdi_passthrough/include",
+        "include",
+        "$hdf_hdi_binder_path/server/include",
         "//third_party/bounds_checking_function/include",
       ]
 
