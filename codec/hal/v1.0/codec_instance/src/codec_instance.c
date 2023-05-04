@@ -74,6 +74,10 @@ static int32_t PrepareInputDataBuffer(struct BufferManagerWrapper *bmWrapper,
 
 static bool InitData(CodecBuffer **inputData, CodecBuffer **outputData)
 {
+    if (*inputData != NULL || *outputData != NULL) {
+        HDF_LOGE("%{public}s: outputData or inputData not NULL!", __func__);
+        return false;
+    }
     int32_t codecBufferSize = sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * BUFFER_COUNT;
     *inputData = (CodecBuffer *)OsalMemCalloc(codecBufferSize);
     if (inputData == NULL) {
