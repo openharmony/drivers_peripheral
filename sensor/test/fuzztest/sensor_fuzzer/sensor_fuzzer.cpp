@@ -17,7 +17,6 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "sensor_impl.h"
 #include "v1_0/sensor_interface_stub.h"
 
 using namespace OHOS::HDI::Sensor::V1_0;
