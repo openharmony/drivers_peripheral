@@ -48,6 +48,9 @@ if (defined(ohos_lite)) {
     } else {
       testonly = true
       deps = [
+        #benchmark test
+        "test/benchmarktest:hdf_camera_benchmark_test",
+
         # acceptance unit test
         "device_manager/test:camera_hal_device_manager_unittest",
         "test/at:camera_test_at",
