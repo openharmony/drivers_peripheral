@@ -171,7 +171,7 @@ int32_t AGnssInterfaceImpl::SetAgnssRefInfo(const AGnssRefInfo& refInfo)
         return HDF_ERR_INVALID_PARAM;
     }
     AGnssRefLocInfo loc;
-    loc.type = static_cast<int>(refInfo.type);
+    loc.type = refInfo.type;
     switch (refInfo.cellId.type) {
         case CELLID_TYPE_GSM:
             loc.u.cellId.type = static_cast<uint16_t>(CellIdClass::GSM_CELLID);
