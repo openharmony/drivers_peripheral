@@ -36,7 +36,8 @@
       "test": [
         "//drivers/peripheral/camera/hal/test/demo:ohos_camera_demo",
         "//drivers/peripheral/camera/hal/test/at:camera_test_at",
-        "//drivers/peripheral/camera/hal/test/ut:camera_test_ut"
+        "//drivers/peripheral/camera/hal/test/ut:camera_test_ut",
+        "//drivers/peripheral/camera/hal/test/benchmarktest:hdf_camera_benchmark_test"
       ],
       "inner_kits": []
     }
