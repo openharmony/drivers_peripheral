@@ -35,7 +35,6 @@ using namespace OHOS::UserIam::Common;
 namespace OHOS {
 namespace HDI {
 namespace PinAuth {
-namespace V1_0 {
 namespace {
 class DummyIExecutorCallback : public IExecutorCallback {
 public:
@@ -96,6 +95,26 @@ void FillFuzzIExecutorCallback(Parcel &parcel, sptr<IExecutorCallback> &callback
             IAM_LOGE("callbackObj construct fail");
         }
     }
+    IAM_LOGI("success");
+}
+
+void FillFuzzGetPropertyTypeVector(Parcel &parcel, std::vector<GetPropertyType> &types)
+{
+    std::vector<uint32_t> propertyTypeUint32;
+    FillFuzzUint32Vector(parcel, propertyTypeUint32);
+    for (const auto& val : propertyTypeUint32) {
+        types.push_back(static_cast<GetPropertyType>(val));
+    }
+
+    IAM_LOGI("success");
+}
+
+void FillFuzzProperty(Parcel &parcel, Property &property)
+{
+    property.authSubType = parcel.ReadUint64();
+    property.lockoutDuration = parcel.ReadInt32();
+    property.remainAttempts = parcel.ReadInt32();
+
     IAM_LOGI("success");
 }
 
@@ -195,6 +214,21 @@ void FuzzSendCommand(Parcel &parcel)
     IAM_LOGI("end");
 }
 
+
+void FuzzGetProperty(Parcel &parcel)
+{
+    IAM_LOGI("begin");
+    std::vector<uint64_t> templateIdList;
+    FillFuzzUint64Vector(parcel, templateIdList);
+    std::vector<GetPropertyType> propertyTypes;
+    FillFuzzGetPropertyTypeVector(parcel, propertyTypes);
+    Property property;
+    FillFuzzProperty(parcel, property);
+
+    g_executorImpl.GetProperty(templateIdList, propertyTypes, property);
+    IAM_LOGI("end");
+}
+
 using FuzzFunc = decltype(FuzzGetExecutorInfo);
 FuzzFunc *g_fuzzFuncs[] = {
     FuzzGetExecutorInfo,
@@ -206,6 +240,7 @@ FuzzFunc *g_fuzzFuncs[] = {
     FuzzDelete,
     FuzzCancel,
     FuzzSendCommand,
+    FuzzGetProperty,
 };
 
 void PinAuthHdiFuzzTest(const uint8_t *data, size_t size)
@@ -219,7 +254,6 @@ void PinAuthHdiFuzzTest(const uint8_t *data, size_t size)
     return;
 }
 } // namespace
-} // namespace V1_0
 } // namespace PinAuth
 } // namespace HDI
 } // namespace OHOS
@@ -227,6 +261,6 @@ void PinAuthHdiFuzzTest(const uint8_t *data, size_t size)
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
-    OHOS::HDI::PinAuth::V1_0::PinAuthHdiFuzzTest(data, size);
+    OHOS::HDI::PinAuth::PinAuthHdiFuzzTest(data, size);
     return 0;
 }

@@ -18,23 +18,23 @@
 
 #include <vector>
 
-#include "v1_0/iface_auth_interface.h"
+#include "face_auth_hdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace FaceAuth {
-namespace V1_0 {
 class FaceAuthInterfaceService : public IFaceAuthInterface {
 public:
     FaceAuthInterfaceService();
     ~FaceAuthInterfaceService() override = default;
 
-    int32_t GetExecutorList(std::vector<sptr<IExecutor>> &executorList) override;
+    int32_t GetExecutorList(std::vector<sptr<IExecutorV1_0>> &executorList) override;
+
+    int32_t GetExecutorListV1_1(std::vector<sptr<IExecutor>> &executorList) override;
 
 private:
     std::vector<sptr<IExecutor>> executorList_;
 };
-} // namespace V1_0
 } // namespace FaceAuth
 } // namespace HDI
 } // namespace OHOS

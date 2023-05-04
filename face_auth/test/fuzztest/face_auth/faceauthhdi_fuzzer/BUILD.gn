@@ -35,7 +35,7 @@ ohos_fuzztest("FaceAuthHdiFuzzTest") {
 
   deps = [
     "../../../../../../hdf_core/adapter/uhdf2/model/camera/sequenceable/buffer_producer:libbuffer_producer_sequenceable_1.0",
-    "../../../../hdi_service:libface_auth_interface_service_1.0",
+    "../../../../hdi_service:libface_auth_interface_service_1.1",
   ]
 
   external_deps = [

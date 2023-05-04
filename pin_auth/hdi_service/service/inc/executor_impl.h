@@ -13,22 +13,23 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_PIN_AUTH_V1_0_EXECUTOR_IMPL_H
-#define OHOS_HDI_PIN_AUTH_V1_0_EXECUTOR_IMPL_H
+#ifndef OHOS_HDI_PIN_AUTH_EXECUTOR_IMPL_H
+#define OHOS_HDI_PIN_AUTH_EXECUTOR_IMPL_H
 
 #include <map>
 #include <mutex>
 #include <set>
 #include <vector>
-#include "v1_0/iexecutor.h"
-#include "pin_auth.h"
+
 #include "nocopyable.h"
 #include "thread_pool.h"
+
+#include "pin_auth_hdi.h"
+#include "pin_auth.h"
 
 namespace OHOS {
 namespace HDI {
 namespace PinAuth {
-namespace V1_0 {
 class ExecutorImpl : public IExecutor, public NoCopyable {
 public:
     explicit ExecutorImpl(std::shared_ptr<OHOS::UserIam::PinAuth::PinAuth> pinHdi);
@@ -46,6 +47,8 @@ public:
     int32_t Cancel(uint64_t scheduleId) override;
     int32_t SendCommand(int32_t commandId, const std::vector<uint8_t> &extraInfo,
         const sptr<IExecutorCallback> &callbackObj) override;
+    int32_t GetProperty(const std::vector<uint64_t> &templateIdList, const std::vector<GetPropertyType> &propertyTypes,
+        Property &property) override;
 
 private:
     class ScheduleMap {
@@ -77,9 +80,8 @@ private:
     ScheduleMap scheduleMap_;
     OHOS::ThreadPool threadPool_;
 };
-} // V1_0
 } // PinAuth
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_PIN_AUTH_V1_0_EXECUTOR_IMPL_H
+#endif // OHOS_HDI_PIN_AUTH_EXECUTOR_IMPL_H
