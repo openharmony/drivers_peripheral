@@ -31,7 +31,6 @@ if (defined(ohos_lite)) {
       "$TEST_ROOT_DIR/client/include",
       "$TEST_ROOT_DIR/hal/include",
       "$TEST_ROOT_DIR/interfaces/include",
-      "//base/hiviewdfx/hilog_lite/interfaces/native/innerkits",
     ]
 
     sources = [ "common/hdf_wlan_performance_test.cpp" ]
@@ -40,10 +39,12 @@ if (defined(ohos_lite)) {
       "$HDF_CORE_DIR/hdf_core/adapter/uhdf/platform:hdf_platform",
       "$TEST_ROOT_DIR/client:wifi_driver_client",
       "$TEST_ROOT_DIR/hal:wifi_hal",
-      "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_shared",
       "//third_party/bounds_checking_function:libsec_shared",
     ]
-    external_deps = [ "hdf_core:hdf_posix_osal" ]
+    external_deps = [
+      "hdf_core:hdf_posix_osal",
+      "hilog_featured_lite:hilog_shared",
+    ]
 
     cflags = [
       "-Wall",
