@@ -43,7 +43,7 @@ ohos_shared_library("libwlan_service_extend") {
   ]
 
   if (is_standard_system) {
-    external_deps = [
+    external_deps += [
       "c_utils:utils",
       "hdf_core:libhdf_host",
       "hdf_core:libhdf_ipc_adapter",
@@ -51,7 +51,7 @@ ohos_shared_library("libwlan_service_extend") {
       "hiviewdfx_hilog_native:libhilog",
     ]
   } else {
-    external_deps = [ "hilog:libhilog" ]
+    external_deps += [ "hilog:libhilog" ]
   }
 
   install_images = [ chipset_base_dir ]
