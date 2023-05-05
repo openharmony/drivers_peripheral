@@ -189,7 +189,7 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureControl001, TestSize.Level1)
     EXPECT_EQ(ret, HDF_SUCCESS);
 
     ret = mmapCapture_->Stop(mmapCapture_);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
 HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureControlException001, TestSize.Level1)
@@ -209,10 +209,10 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureControlException001, TestSize.Le
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
 
     ret = mmapCapture_->Stop(mmapCapture_);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 
     ret = mmapCapture_->Stop(mmapCapture_); // restop can be return two state
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
 HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureGetMmapPosition001, TestSize.Level1)
@@ -234,7 +234,7 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureGetMmapPosition001, TestSize.Lev
     ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT || ret == HDF_ERR_INVALID_PARAM);
 
     ret = mmapCapture_->Stop(mmapCapture_);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
 HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureGetMmapPositionException001, TestSize.Level1)
@@ -259,7 +259,7 @@ HWTEST_F(AudioUtCaptureMmapTest, HdfAudioCaptureGetMmapPositionException001, Tes
     ASSERT_NE(ret, HDF_SUCCESS);
 
     ret = mmapCapture_->Stop(mmapCapture_);
-    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_FAILURE);
+    ASSERT_TRUE(ret == HDF_SUCCESS || ret == HDF_ERR_NOT_SUPPORT);
 }
 
 } // end of namespace
