@@ -12,10 +12,7 @@
     "component":{
         "name":"drivers_peripheral_distributed_camera",
         "subsystem":"hdf",
-        "syscap":[
-            ""
-        ],
-        "adapter_system_type":[
+        "adapted_system_type":[
             "standard"
         ],
         "rom":"2440KB",
