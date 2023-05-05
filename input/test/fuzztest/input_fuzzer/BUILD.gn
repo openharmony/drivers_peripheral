@@ -28,8 +28,8 @@ ohos_fuzztest("InputFuzzTest") {
   sources = [ "input_fuzzer.cpp" ]
 
   deps = [
+    "$INPUT_ROOT_DIR/../interface/input/v1_0:libinput_stub_1.0",
     "$INPUT_ROOT_DIR/hal:hdi_input",
-    "//drivers/interface/input/v1_0:libinput_stub_1.0",
   ]
 
   external_deps = [
