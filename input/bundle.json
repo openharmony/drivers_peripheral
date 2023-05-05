@@ -15,7 +15,8 @@
     "features": [
       "drivers_peripheral_input_feature_model",
       "drivers_peripheral_input_feature_udriver",
-      "drivers_peripheral_input_feature_passthrough"
+      "drivers_peripheral_input_feature_passthrough",
+      "drivers_peripheral_input_feature_lite_support_test"
     ],
     "adapted_system_type": ["standard", "small"],
     "rom": "630KB",
@@ -23,14 +24,10 @@
     "deps": {
       "components": [
         "ipc",
+        "c_utils",
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "graphic_standard",
-        "utils_base"
-      ],
-      "third_party": [
-        "bounds_checking_function",
-        "googletest"
+        "drivers_interface_input"
       ]
     },
     "build": {
