@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("./../../../../../audio.gni")
 
 module_output_path = "drivers_peripheral_audio/audio"

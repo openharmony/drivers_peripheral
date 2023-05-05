@@ -14,7 +14,6 @@
 hdf_audio_path = "./../.."
 hdf_hdi_service_path = "./.."
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("$hdf_audio_path/audio.gni")
 
 ohos_shared_library("audio_primary_impl_vendor") {
