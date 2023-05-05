@@ -14,7 +14,6 @@
  */
 
 #include "cdcecm.h"
-#include "default_config.h"
 #include "device_resource_if.h"
 #include "hdf_base.h"
 #include "hdf_device_object.h"
@@ -28,6 +27,7 @@
 #include "usbfn_request.h"
 
 #define HDF_LOG_TAG cdc_ecm
+#define UDC_NAME "invalid_udc_name"
 
 #define QUEUE_SIZE           8
 #define WRITE_BUF_SIZE       8192
@@ -795,6 +795,7 @@ static int32_t EcmCreateFuncDevice(struct UsbEcmDevice *ecm, struct DeviceResour
 
     if (iface->GetString(ecm->device->property, "udc_name", (const char **)&ecm->udcName, UDC_NAME) != HDF_SUCCESS) {
         HDF_LOGE("%s: read udc_name failed, use default", __func__);
+        return HDF_FAILURE;
     }
 
     fnDev = (struct UsbFnDevice *)UsbFnGetDevice(ecm->udcName);
