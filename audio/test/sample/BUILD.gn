@@ -14,7 +14,6 @@
 hdf_audio_path = "./../.."
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("$hdf_audio_path/audio.gni")
 
 if (defined(ohos_lite)) {
@@ -22,7 +21,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$hdf_audio_path/interfaces/include",
       "./",
-      "//commonlibrary/utils_lite/include",
       "//third_party/bounds_checking_function/include",
     ]
 
@@ -43,7 +41,6 @@ if (defined(ohos_lite)) {
     include_dirs = [
       "$hdf_audio_path/interfaces/include",
       "./",
-      "//commonlibrary/utils_lite/include",
       "//third_party/bounds_checking_function/include",
       "$hdf_audio_path/hal/hdi_binder/server/include",
     ]

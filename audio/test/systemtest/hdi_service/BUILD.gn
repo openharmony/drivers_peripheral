@@ -12,7 +12,6 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("./../../../audio.gni")
 
 group("hdi_service_st") {

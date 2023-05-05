@@ -14,7 +14,6 @@
 hdf_audio_path = "./../../../../.."
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/hdi.gni")
 import("$hdf_audio_path/audio.gni")
 
 module_output_path = "drivers_peripheral_audio/audio"
