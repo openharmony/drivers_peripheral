@@ -183,7 +183,7 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_CreateStreams_benchmark_007)(
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
     if (streamInfoPre->bufferQueue_ == nullptr) {
         streamInfoPre->bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
-            CAMERA_LOGD("On Buffer Available: size = %{public}zu", size);
+            CAMERA_LOGD("On Buffer Available: size = %{public}u", size);
         });
     }
     streamInfoPre->bufferQueue_->producer_->SetQueueSize(OHOS::Camera::UT_DATA_SIZE);
@@ -222,7 +222,7 @@ BENCHMARK_F(CameraBenchmarkTest, SUB_CommitStreams_benchmark_008)(
     std::shared_ptr<OHOS::Camera::Test::StreamConsumer> consumer_pre =
         std::make_shared<OHOS::Camera::Test::StreamConsumer>();
     streamInfoPre->bufferQueue_ = consumer_pre->CreateProducerSeq([this](void* addr, uint32_t size) {
-        CAMERA_LOGD("On Buffer Available: size = %{public}zu", size);
+        CAMERA_LOGD("On Buffer Available: size = %{public}u", size);
     });
     streamInfoPre->bufferQueue_->producer_->SetQueueSize(OHOS::Camera::UT_DATA_SIZE);
     std::vector<StreamInfo> streamInfos;
