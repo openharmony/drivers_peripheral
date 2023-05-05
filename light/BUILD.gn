@@ -18,7 +18,7 @@ if (defined(ohos_lite)) {
   }
 } else {
   group("light_entry") {
-    if (drivers_peripheral_light_community) {
+    if (drivers_peripheral_light_feature_community) {
       deps = [
         "hal:hdi_light",
         "hdi_service:hdf_light_service",

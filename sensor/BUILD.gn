@@ -18,7 +18,7 @@ group("sensor_entry") {
   if (defined(ohos_lite)) {
     deps += [ "hal:hdi_sensor" ]
   } else {
-    if (drivers_peripheral_sensor_community) {
+    if (drivers_peripheral_sensor_feature_community) {
       deps += [
         "hal:hdi_sensor",
         "hdi_service:hdi_sensor_service",

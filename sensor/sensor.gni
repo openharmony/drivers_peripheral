@@ -1,3 +1,3 @@
 declare_args() {
-  drivers_peripheral_sensor_community = true
+  drivers_peripheral_sensor_feature_community = true
 }
