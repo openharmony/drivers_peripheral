@@ -28,7 +28,7 @@ public:
     using GetCodecJpegHwi = ICodecJpegHwi*(*)();
 
     explicit CodecJpegCore();
-    
+
     ~CodecJpegCore();
 
     int32_t Init();
