@@ -11,9 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//vendor/${product_company}/${product_name}/product.gni")
-default_config_path = usb_default_config_path
-
 usb_driver_path = "//drivers/peripheral/usb"
 usb_driver_part_name = "usb_driver"
 
