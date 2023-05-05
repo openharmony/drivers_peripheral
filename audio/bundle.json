@@ -18,6 +18,7 @@
       "drivers_peripheral_audio_feature_hdf_proxy_stub",
       "drivers_peripheral_audio_feature_user_mode",
       "drivers_peripheral_audio_feature_full_test_suite",
+      "drivers_peripheral_audio_feature_policy_config",
       "drivers_peripheral_audio_feature_alsa_lib",
       "drivers_peripheral_audio_feature_rich_device",
       "drivers_peripheral_audio_feature_community",
