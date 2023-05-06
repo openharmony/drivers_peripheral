@@ -409,10 +409,6 @@ const struct LightInterface *NewLightInterfaceInstance(void)
     priv->initState = true;
     HDF_LOGI("get light devInstance success");
 
-#ifndef __LITEOS__
-    LightDevRegisterDumpFunc();
-#endif
-
     return &lightDevInstance;
 }
 

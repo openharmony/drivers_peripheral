@@ -17,7 +17,6 @@
 #include <cstddef>
 #include <cstdint>
 #include "hdf_log.h"
-#include "vibrator_interface_impl.h"
 #include "v1_1/vibrator_interface_stub.h"
 
 using namespace OHOS::HDI::Vibrator::V1_1;
