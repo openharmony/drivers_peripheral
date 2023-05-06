@@ -10,16 +10,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+DRIVERS_DIR = "../../../.."
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libril_service_1.1") {
-  include_dirs = [
-    "include",
-    "//base/telephony/ril_adapter/services/hril/include",
-  ]
+  include_dirs = [ "include" ]
   sources = [ "src/ril_impl.cpp" ]
-  deps = [ "//base/telephony/ril_adapter/services/hril:hril" ]
 
   defines = [
     "LOG_TAG = \"RilService\"",
@@ -33,6 +29,7 @@ ohos_shared_library("libril_service_1.1") {
       "hdf_core:libhdf_ipc_adapter",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
+      "ril_adapter:hril",
     ]
   } else {
     external_deps = [
@@ -49,16 +46,10 @@ ohos_shared_library("libril_service_1.1") {
 ##############################################################################################
 
 ohos_shared_library("libril_driver") {
-  include_dirs = [
-    "include",
-    "//base/telephony/ril_adapter/services/hril_hdf/include",
-  ]
+  include_dirs = [ "include" ]
   sources = [ "src/ril_driver.cpp" ]
 
-  deps = [
-    "//base/telephony/ril_adapter/services/hril_hdf:hril_hdf",
-    "//drivers/interface/ril/v1_1:libril_stub_1.1",
-  ]
+  deps = [ "$DRIVERS_DIR/interface/ril/v1_1:libril_stub_1.1" ]
 
   if (is_standard_system) {
     external_deps = [
@@ -69,6 +60,7 @@ ohos_shared_library("libril_driver") {
       "hdf_core:libhdi",
       "hiviewdfx_hilog_native:libhilog",
       "ipc:ipc_single",
+      "ril_adapter:hril_hdf",
     ]
   } else {
     external_deps = [
