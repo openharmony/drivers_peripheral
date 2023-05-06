@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/peripheral/display/display_config.gni")
+import("./../../../display_config.gni")
 
 module_output_path = "drivers_peripheral_display/buffer"
 
