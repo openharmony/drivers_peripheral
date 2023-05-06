@@ -182,6 +182,7 @@ RetCode HcsDeal::DealMetadata(const std::string &cameraId, const struct DeviceRe
     DealAvalialbleAutoFocus(node, metadata);
     DealZoomRationRange(node, metadata);
     DealJpegOrientation(node, metadata);
+    DealAvaliableExtendConfigurations(node, metadata);
     cameraMetadataMap_.insert(std::make_pair(cameraId, metadata));
 
     return RC_OK;
@@ -925,6 +926,40 @@ RetCode HcsDeal::GetMetadata(CameraMetadataMap &metadataMap) const
 RetCode HcsDeal::GetCameraId(CameraIdMap &cameraIdMap) const
 {
     cameraIdMap = cameraIdMap_;
+    return RC_OK;
+}
+
+RetCode HcsDeal::DealAvaliableExtendConfigurations(
+    const struct DeviceResourceNode &metadataNode, std::shared_ptr<Camera::CameraMetadata> &metadata)
+{
+    int32_t elemNum = pDevResIns->GetElemNum(&metadataNode, "extendAvailableConfigurations");
+    CAMERA_LOGD("elemNum = %{public}d", elemNum);
+    if (elemNum <= 0) {
+        CAMERA_LOGD("elemNum <= 0");
+        return RC_ERROR;
+    }
+
+    int hcbRet;
+    uint32_t nodeValue;
+    std::vector<int32_t> extendConfigAvaliableInt32s;
+
+    for (int i = 0; i < elemNum; i++) {
+        hcbRet = pDevResIns->GetUint32ArrayElem(&metadataNode, "extendAvailableConfigurations", i, &nodeValue, -1);
+        if (hcbRet != 0 && nodeValue != UINT32_MAX) {
+            CAMERA_LOGE("get extendAvailableConfigurations failed");
+            continue;
+        }
+        extendConfigAvaliableInt32s.push_back(static_cast<int32_t>(nodeValue));
+        CAMERA_LOGD("nodeValue = %{public}u", nodeValue);
+    }
+
+    bool ret = metadata->addEntry(OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS,
+        extendConfigAvaliableInt32s.data(), extendConfigAvaliableInt32s.size());
+    if (!ret) {
+        CAMERA_LOGD("extendAvailableConfigurations add failed");
+        return RC_ERROR;
+    }
+    CAMERA_LOGI("extendAvailableConfigurations add success");
     return RC_OK;
 }
 } // namespace OHOS::Camera
