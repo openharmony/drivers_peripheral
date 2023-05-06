@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -21,6 +21,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#define CODEC_CALLBACK_DESC "ohos.hdi.codec_callback_service"
+
 struct HdfRemoteService;
 
 enum {
@@ -32,6 +34,16 @@ enum {
 struct ICodecCallback {
     struct HdfRemoteService *remote;
     CodecCallback callback;
+};
+
+struct ICodecCallbackProxy {
+    struct HdfRemoteService *remote;
+    int32_t (*OnEvent)(struct ICodecCallbackProxy *self, UINTPTR userData,
+        EventType event, uint32_t length, int32_t eventData[]);
+    int32_t (*InputBufferAvailable)(struct ICodecCallbackProxy *self, UINTPTR userData,
+        CodecBuffer *inBuf, int32_t *acquireFd);
+    int32_t (*OutputBufferAvailable)(struct ICodecCallbackProxy *self, UINTPTR userData,
+        CodecBuffer *outBuf, int32_t *acquireFd);
 };
 
 #ifdef __cplusplus

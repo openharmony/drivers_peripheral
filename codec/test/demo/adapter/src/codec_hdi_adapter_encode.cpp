@@ -302,11 +302,6 @@ int32_t CodecHdiAdapterEncode::UseBufferOnPort(PortIndex portIndex, int bufferCo
         bufferInfo->avSharedPtr = spSharedMem;
         bufferInfo->portIndex = portIndex;
         omxBuffers_.insert(std::make_pair(omxBuffer->bufferId, bufferInfo));
-        if (portIndex == PortIndex::PORT_INDEX_INPUT) {
-            unUsedInBuffers_.push_back(omxBuffer->bufferId);
-        } else {
-            unUsedOutBuffers_.push_back(omxBuffer->bufferId);
-        }
     }
     return HDF_SUCCESS;
 }
@@ -341,7 +336,6 @@ int32_t CodecHdiAdapterEncode::UseDynaBuffer(int bufferCount, int bufferSize)
         bufferInfo->omxBuffer = omxBuffer;
         bufferInfo->portIndex = PortIndex::PORT_INDEX_INPUT;
         omxBuffers_.insert(std::make_pair(omxBuffer->bufferId, bufferInfo));
-        unUsedInBuffers_.push_back(omxBuffer->bufferId);
     }
     return HDF_SUCCESS;
 }

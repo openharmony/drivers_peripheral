@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,9 @@
 #define CODEC_SERVICE_H
 
 #include "hdf_base.h"
+#ifndef CODEC_HAL_PASSTHROUGH
+#include "codec_callback.h"
+#endif
 #include "codec_type.h"
 #include "codec_instance.h"
 
@@ -44,8 +47,11 @@ int32_t CodecQueueInput(CODEC_HANDLETYPE handle, const CodecBuffer *inputData, u
 int32_t CodecDequeueInput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *inputData);
 int32_t CodecQueueOutput(CODEC_HANDLETYPE handle, CodecBuffer *outInfo, uint32_t timeoutMs, int releaseFenceFd);
 int32_t CodecDequeueOutput(CODEC_HANDLETYPE handle, uint32_t timeoutMs, int32_t *acquireFd, CodecBuffer *outInfo);
-int32_t CodecSetCallback(CODEC_HANDLETYPE handle, const CodecCallback *cb, UINTPTR instance);
-
+#ifndef CODEC_HAL_PASSTHROUGH
+int32_t CodecSetCallbackProxy(CODEC_HANDLETYPE handle, struct ICodecCallbackProxy *cb, UINTPTR instance);
+#else
+int32_t CodecSetCallback(CODEC_HANDLETYPE handle, CodecCallback *cb, UINTPTR instance);
+#endif
 #ifdef __cplusplus
 }
 #endif
