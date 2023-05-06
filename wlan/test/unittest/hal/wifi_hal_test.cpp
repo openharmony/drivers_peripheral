@@ -847,6 +847,7 @@ HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
     int ret;
     struct IWiFiSta *staFeature = nullptr;
     const char *ifName = "wlan0";
+    const char *ifNameInvalid = "wlanTest";
     WifiScan scan = {0};
 
     ret = g_wifi->registerEventCallback(HalCallbackEvent, ifName);
@@ -857,6 +858,8 @@ HWTEST_F(WifiHalTest, WifiHalStartScan001, TestSize.Level1)
     ret = staFeature->startScan(nullptr, &scan);
     EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->startScan(ifName, nullptr);
+    EXPECT_NE(HDF_SUCCESS, ret);
+    ret = staFeature->startScan(ifNameInvalid, &scan);
     EXPECT_NE(HDF_SUCCESS, ret);
     ret = staFeature->startScan(ifName, &scan);
     EXPECT_EQ(HDF_SUCCESS, ret);
