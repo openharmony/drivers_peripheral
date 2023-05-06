@@ -18,10 +18,10 @@ TEST_ROOT_DIR = "../../.."
 
 module_output_path = "drivers_peripheral_wlan/wlan"
 
-ohos_fuzztest("WlanStaFuzzTest") {
+ohos_fuzztest("StaFuzzTest") {
   module_out_path = module_output_path
 
-  fuzz_config_file = "$TEST_ROOT_DIR/test/fuzztest/wlan_sta_fuzzer"
+  fuzz_config_file = "$TEST_ROOT_DIR/test/fuzztest/sta_fuzzer"
 
   include_dirs = [
     "$TEST_ROOT_DIR/interfaces/include",
@@ -49,11 +49,11 @@ ohos_fuzztest("WlanStaFuzzTest") {
   sources = [
     "$TEST_ROOT_DIR/test/fuzztest/wlan_common_fuzzer.cpp",
     "$TEST_ROOT_DIR/test/hdi_service/wlan_callback_impl.c",
-    "wlan_sta_fuzzer.cpp",
+    "sta_fuzzer.cpp",
   ]
 }
 
-group("wlan_sta_fuzztest") {
+group("sta_fuzztest") {
   testonly = true
-  deps = [ ":WlanStaFuzzTest" ]
+  deps = [ ":StaFuzzTest" ]
 }

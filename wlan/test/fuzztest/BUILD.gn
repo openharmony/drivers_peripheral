@@ -14,7 +14,7 @@
 group("hdf_wlan_fuzztest") {
   testonly = true
   deps = [
-    "wlan_ap_fuzzer:wlan_ap_fuzztest",
-    "wlan_sta_fuzzer:wlan_sta_fuzztest",
+    "ap_fuzzer:ap_fuzztest",
+    "sta_fuzzer:sta_fuzztest",
   ]
 }
