@@ -16,22 +16,25 @@
 #ifndef OHOS_HDI_VIBRATOR_V1_1_VIBRATORINTERFACEIMPL_H
 #define OHOS_HDI_VIBRATOR_V1_1_VIBRATORINTERFACEIMPL_H
 
-#include "v1_1/ivibrator_interface.h"
+#include "ivibrator_interface_vdi.h"
+#include "ivibrator_type_vdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Vibrator {
 namespace V1_1 {
-class VibratorInterfaceImpl : public IVibratorInterface {
+class VibratorInterfaceImpl : public IVibratorInterfaceVdi {
 public:
-    virtual ~VibratorInterfaceImpl() {}
+    VibratorInterfaceImpl() {}
+    ~VibratorInterfaceImpl() {}
+    int32_t Init(void) override;
     int32_t StartOnce(uint32_t duration) override;
     int32_t Start(const std::string &effectType) override;
-    int32_t Stop(HdfVibratorMode mode) override;
-    int32_t GetVibratorInfo(std::vector<HdfVibratorInfo> &vibratorInfo) override;
+    int32_t Stop(HdfVibratorModeVdi mode) override;
+    int32_t GetVibratorInfo(std::vector<HdfVibratorInfoVdi> &vibratorInfo) override;
     int32_t EnableVibratorModulation(uint32_t duration, uint16_t intensity, int16_t frequency) override;
-    int32_t EnableCompositeEffect(const HdfCompositeEffect& effect) override;
-    int32_t GetEffectInfo(const std::string &effectType, HdfEffectInfo &effectInfo) override;
+    int32_t EnableCompositeEffect(const HdfCompositeEffectVdi& effect) override;
+    int32_t GetEffectInfo(const std::string &effectType, HdfEffectInfoVdi &effectInfo) override;
     int32_t IsVibratorRunning(bool& state) override;;
 };
 } // V1_1

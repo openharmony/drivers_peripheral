@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,23 +16,32 @@
 #include "light_interface_impl.h"
 #include <hdf_base.h>
 #include <hdf_log.h>
-#include "hitrace_meter.h"
+#include "devhost_dump_reg.h"
+#include "light_dump.h"
 #include "light_if.h"
 
-#define HDF_LOG_TAG           uhdf_light_service
+#define HDF_LOG_TAG     uhdf_light_service
 
 namespace OHOS {
 namespace HDI {
 namespace Light {
 namespace V1_0 {
-extern "C" ILightInterface *LightInterfaceImplGetInstance(void)
+
+int32_t LightInterfaceImpl::Init()
 {
-    return new (std::nothrow) LightInterfaceImpl();
+    const struct LightInterface *lightInterface = NewLightInterfaceInstance();
+    if (lightInterface == nullptr || lightInterface->GetLightInfo == nullptr) {
+        HDF_LOGE("%{public}s: get light Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    DevHostRegisterDumpHost(GetLightDump);
+
+    return HDF_SUCCESS;
 }
 
-int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
+int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfoVdi>& info)
 {
-    HDF_LOGI("%{public}s: Enter the GetLightInfo function.", __func__);
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
     if (lightInterface == nullptr || lightInterface->GetLightInfo == nullptr) {
         HDF_LOGE("%{public}s: get light Module instance failed", __func__);
@@ -41,19 +50,20 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
 
     struct LightInfo *lightInfo = nullptr;
     uint32_t count = 0;
-    StartTrace(HITRACE_TAG_MISC, "GetLightInfo");
     int32_t ret = lightInterface->GetLightInfo(&lightInfo, &count);
-    FinishTrace(HITRACE_TAG_MISC);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
         return ret;
     }
 
     while (count--) {
-        HdfLightInfo hdfLightInfo;
+        HdfLightInfoVdi hdfLightInfo;
         hdfLightInfo.lightId = lightInfo->lightId;
         hdfLightInfo.lightType = lightInfo->lightType;
-        hdfLightInfo.lightName = lightInfo->lightName;
+        if (strcpy_s(hdfLightInfo.lightName, LIGHT_NAME_MAX_LEN, lightInfo->lightName) != EOK) {
+            HDF_LOGE("%{public}s: Light name cpy faild", __func__);
+            return HDF_FAILURE;
+        }
         hdfLightInfo.lightNumber = lightInfo->lightNumber;
         info.push_back(hdfLightInfo);
         lightInfo++;
@@ -62,7 +72,7 @@ int32_t LightInterfaceImpl::GetLightInfo(std::vector<HdfLightInfo>& info)
     return HDF_SUCCESS;
 }
 
-int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffect& effect)
+int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffectVdi& effect)
 {
     HDF_LOGI("%{public}s: Enter the TurnOnLight function, lightId is %{public}d", __func__, lightId);
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
@@ -82,9 +92,7 @@ int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffect& e
     lightEffect.flashEffect.flashMode = effect.flashEffect.flashMode;
     lightEffect.flashEffect.onTime = effect.flashEffect.onTime;
     lightEffect.flashEffect.offTime = effect.flashEffect.offTime;
-    StartTrace(HITRACE_TAG_MISC, "TurnOnLight");
     int32_t ret = lightInterface->TurnOnLight(lightId, &lightEffect);
-    FinishTrace(HITRACE_TAG_MISC);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
@@ -92,7 +100,7 @@ int32_t LightInterfaceImpl::TurnOnLight(int32_t lightId, const HdfLightEffect& e
     return ret;
 }
 
-int32_t LightInterfaceImpl::TurnOnMultiLights(int32_t lightId, const std::vector<HdfLightColor>& colors)
+int32_t LightInterfaceImpl::TurnOnMultiLights(int32_t lightId, const std::vector<HdfLightColorVdi>& colors)
 {
     HDF_LOGI("%{public}s: Enter the TurnOnMultiLights function, lightId is %{public}d", __func__, lightId);
     const struct LightInterface *lightInterface = NewLightInterfaceInstance();
@@ -114,9 +122,7 @@ int32_t LightInterfaceImpl::TurnOnMultiLights(int32_t lightId, const std::vector
         lightColor[i++].colorValue.wrgbColor.w = iter.colorValue.wrgbColor.w;
     }
 
-    StartTrace(HITRACE_TAG_MISC, "TurnOnMultiLights");
     int32_t ret = lightInterface->TurnOnMultiLights(lightId, lightColor, num);
-    FinishTrace(HITRACE_TAG_MISC);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
@@ -132,15 +138,57 @@ int32_t LightInterfaceImpl::TurnOffLight(int32_t lightId)
         HDF_LOGE("%{public}s: get light Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    StartTrace(HITRACE_TAG_MISC, "TurnOffLight");
     int32_t ret = lightInterface->TurnOffLight(lightId);
-    FinishTrace(HITRACE_TAG_MISC);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s failed, error code is %{public}d", __func__, ret);
     }
 
     return ret;
 }
+
+static int32_t CreateLightVdiInstance(struct HdfVdiBase *vdiBase)
+{
+    HDF_LOGI("%{public}s: Enter the CreateLightVdiInstance function", __func__);
+    if (vdiBase == nullptr) {
+        HDF_LOGE("%{public}s parameter vdiBase is NULL", __func__);
+        return HDF_FAILURE;
+    }
+
+    struct VdiWrapperLight *lightVdi = reinterpret_cast<VdiWrapperLight *>(vdiBase);
+    lightVdi->lightModule = new LightInterfaceImpl();
+    if (lightVdi->lightModule == nullptr) {
+        HDF_LOGI("%{public}s: new lightModule failed!", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t DestoryLightVdiInstance(struct HdfVdiBase *vdiBase)
+{
+    HDF_LOGI("%{public}s: Enter the DestoryLightVdiInstance function", __func__);
+    if (vdiBase == nullptr) {
+        HDF_LOGE("%{public}s parameter vdiBase is NULL", __func__);
+        return HDF_FAILURE;
+    }
+
+    struct VdiWrapperLight *lightVdi = reinterpret_cast<VdiWrapperLight *>(vdiBase);
+    LightInterfaceImpl *lightImpl = reinterpret_cast<LightInterfaceImpl *>(lightVdi->lightModule);
+    delete lightImpl;
+    lightVdi->lightModule = nullptr;
+    return HDF_SUCCESS;
+}
+
+static struct VdiWrapperLight g_lightVdi = {
+    .base = {
+        .moduleVersion = 1,
+        .moduleName = "light_service",
+        .CreateVdiInstance = CreateLightVdiInstance,
+        .DestoryVdiInstance = DestoryLightVdiInstance,
+    },
+    .lightModule = nullptr,
+};
+
+extern "C" HDF_VDI_INIT(g_lightVdi);
 } // V1_0
 } // Light
 } // HDI
