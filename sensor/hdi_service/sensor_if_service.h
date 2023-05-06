@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,24 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H
-#define OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H
+#ifndef HDI_SENSOR_IF_SERVICE_H
+#define HDI_SENSOR_IF_SERVICE_H
 
-#include "sensor_if.h"
-#include "iremote_object.h"
+#include <map>
 #include "v1_0/isensor_interface.h"
+#include "isensor_interface_vdi.h"
+#include "sensor_callback_vdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Sensor {
 namespace V1_0 {
-class SensorImpl : public ISensorInterface {
+
+using GroupIdCallBackMap = std::unordered_map<int32_t, std::vector<sptr<ISensorCallback>>>;
+
+class SensorIfService : public ISensorInterface {
 public:
-    SensorImpl(): sensorInterface(NULL) {}
-
-    virtual ~SensorImpl();
-    void Init();
-
+    SensorIfService();
+    ~SensorIfService();
+    int32_t Init(void);
     int32_t GetAllSensorInfo(std::vector<HdfSensorInformation>& info) override;
     int32_t Enable(int32_t sensorId) override;
     int32_t Disable(int32_t sensorId) override;
@@ -39,17 +41,15 @@ public:
     int32_t SetOption(int32_t sensorId, uint32_t option) override;
     int32_t Register(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
     int32_t Unregister(int32_t groupId, const sptr<ISensorCallback>& callbackObj) override;
-    void OnRemoteDied(const wptr<IRemoteObject> &object);
+    int32_t GetSensorVdiImpl();
 private:
-    const SensorInterface *sensorInterface;
-    int32_t AddSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
-    int32_t RemoveSensorDeathRecipient(const sptr<ISensorCallback> &callbackObj);
-    int32_t UnregisterImpl(int32_t groupId, IRemoteObject *callbackObj);
-    void RemoveDeathNotice(int32_t sensorType);
+    std::shared_ptr<ISensorInterfaceVdi> sensorVdiImpl_ = nullptr;
+    struct HdfVdiObject *vdi_ = nullptr;
+    GroupIdCallBackMap callbackMap = {};
 };
 } // V1_0
 } // Sensor
 } // HDI
 } // OHOS
 
-#endif // OHOS_HDI_SENSOR_V1_0_SENSORIMPL_H
+#endif // HDI_SENSOR_IF_SERVICE_H
