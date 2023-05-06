@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,25 +13,26 @@
  * limitations under the License.
  */
 
+#include "codec_callback_stub.h"
 #include <hdf_log.h>
 #include <osal_mem.h>
-#include "hdf_remote_service.h"
-#include "codec_callback_service.h"
 #include "stub_msgproc.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
+#define HDF_LOG_TAG codec_callback_stub
+
 static int32_t SerCodecOnEvent(struct ICodecCallback *serviceImpl, struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     int32_t ret;
-    UINTPTR userData = 0;
+    uint64_t userData = 0;
     EventType event = 0;
     uint32_t length = 0;
     int32_t *eventData = NULL;
 
-    if (!HdfSbufReadUint32(data, (uint32_t *)&userData)) {
+    if (!HdfSbufReadUint64(data, &userData)) {
         HDF_LOGE("%{public}s: read comp data failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -57,7 +58,7 @@ static int32_t SerCodecOnEvent(struct ICodecCallback *serviceImpl, struct HdfSBu
             }
         }
     }
-    ret = serviceImpl->callback.OnEvent(userData, event, length, eventData);
+    ret = serviceImpl->callback.OnEvent((UINTPTR)userData, event, length, eventData);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call OnEvent fuc failed!", __func__);
         OsalMemFree(eventData);
@@ -72,11 +73,11 @@ static int32_t SerCodecInputBufferAvailable(struct ICodecCallback *serviceImpl,
 {
     int32_t ret = HDF_FAILURE;
     uint32_t bufCnt = 0;
-    UINTPTR userData = 0;
+    uint64_t userData = 0;
     CodecBuffer *inBuf = NULL;
     int32_t acquireFd;
 
-    if (!HdfSbufReadUint32(data, (uint32_t *)&userData)) {
+    if (!HdfSbufReadUint64(data, &userData)) {
         HDF_LOGE("%{public}s: read userData failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -99,7 +100,7 @@ static int32_t SerCodecInputBufferAvailable(struct ICodecCallback *serviceImpl,
         OsalMemFree(inBuf);
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = serviceImpl->callback.InputBufferAvailable(userData, inBuf, &acquireFd);
+    ret = serviceImpl->callback.InputBufferAvailable((UINTPTR)userData, inBuf, &acquireFd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call InputBufferAvailable fuc failed!", __func__);
         OsalMemFree(inBuf);
@@ -114,11 +115,11 @@ static int32_t SerCodecOutputBufferAvailable(struct ICodecCallback *serviceImpl,
 {
     int32_t ret = HDF_FAILURE;
     uint32_t bufCnt = 0;
-    UINTPTR userData = 0;
+    uint64_t userData = 0;
     CodecBuffer *outBuf = NULL;
     int32_t acquireFd;
 
-    if (!HdfSbufReadUint32(data, (uint32_t *)&userData)) {
+    if (!HdfSbufReadUint64(data, &userData)) {
         HDF_LOGE("%{public}s: read userData failed!", __func__);
         return HDF_ERR_INVALID_PARAM;
     }
@@ -141,7 +142,7 @@ static int32_t SerCodecOutputBufferAvailable(struct ICodecCallback *serviceImpl,
         OsalMemFree(outBuf);
         return HDF_ERR_INVALID_PARAM;
     }
-    ret = serviceImpl->callback.OutputBufferAvailable(userData, outBuf, &acquireFd);
+    ret = serviceImpl->callback.OutputBufferAvailable((UINTPTR)userData, outBuf, &acquireFd);
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: call OutputBufferAvailable fuc failed!", __func__);
         OsalMemFree(outBuf);
@@ -155,6 +156,14 @@ static int32_t CodecCallbackServiceOnRemoteRequest(struct HdfRemoteService *serv
                                                    struct HdfSBuf *data, struct HdfSBuf *reply)
 {
     struct ICodecCallback *serviceImpl = (struct ICodecCallback *)service;
+    if (serviceImpl == NULL || serviceImpl->remote == NULL) {
+        HDF_LOGE("%{public}s: invalid service object", __func__);
+        return HDF_ERR_INVALID_OBJECT;
+    }
+    if (!HdfRemoteServiceCheckInterfaceToken(serviceImpl->remote, data)) {
+        HDF_LOGE("%{public}s: interface token check failed", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
     switch (cmdId) {
         case CMD_CODEC_ON_EVENT:
             return SerCodecOnEvent(serviceImpl, data, reply);
@@ -169,33 +178,41 @@ static int32_t CodecCallbackServiceOnRemoteRequest(struct HdfRemoteService *serv
     }
 }
 
-struct CodecCallbackStub {
-    struct ICodecCallback service;
-    struct HdfRemoteDispatcher dispatcher;
-};
-
-struct ICodecCallback *CodecCallbackStubObtain(void)
+struct CodecCallbackStub *CodecCallbackStubObtain(CodecCallback *callback)
 {
+    if (callback == NULL) {
+        HDF_LOGE("%{public}s: callback is null!", __func__);
+        return NULL;
+    }
     struct CodecCallbackStub *stub = (struct CodecCallbackStub *)OsalMemAlloc(sizeof(struct CodecCallbackStub));
     if (stub == NULL) {
         HDF_LOGE("%{public}s: OsalMemAlloc CodecCallbackStub obj failed!", __func__);
         return NULL;
     }
     stub->dispatcher.Dispatch = CodecCallbackServiceOnRemoteRequest;
-    stub->service.remote = HdfRemoteServiceObtain((struct HdfObject *)stub, &(stub->dispatcher));
+    stub->service.remote = HdfRemoteServiceObtain((struct HdfObject *)(&stub->service), &(stub->dispatcher));
     if (stub->service.remote == NULL) {
         HDF_LOGE("%{public}s: stub->service.remote is null", __func__);
+        OsalMemFree(stub);
         return NULL;
     }
-    CodecCallbackServiceConstruct(&stub->service);
-    return &stub->service;
+    if (!HdfRemoteServiceSetInterfaceDesc(stub->service.remote, CODEC_CALLBACK_DESC)) {
+        HDF_LOGE("%{public}s: set interface token failed!", __func__);
+        HdfRemoteServiceRecycle(stub->service.remote);
+        OsalMemFree(stub);
+        return NULL;
+    }
+
+    stub->service.callback = *callback;
+    return stub;
 }
 
-void CodecCallbackStubRelease(struct ICodecCallback *stub)
+void CodecCallbackStubRelease(struct CodecCallbackStub *stub)
 {
     if (stub == NULL) {
         return;
     }
+    HdfRemoteServiceRecycle(stub->service.remote);
     OsalMemFree(stub);
 }
 

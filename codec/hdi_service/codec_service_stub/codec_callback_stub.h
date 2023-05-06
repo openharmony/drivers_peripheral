@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,13 +17,19 @@
 #define HDI_CODEC_CALLBACK_CODECCALLBACKSTUB_H
 
 #include "codec_callback.h"
+#include "hdf_remote_service.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
 
-struct ICodecCallback *CodecCallbackStubObtain(void);
-void CodecCallbackStubRelease(struct ICodecCallback *stub);
+struct CodecCallbackStub {
+    struct ICodecCallback service;
+    struct HdfRemoteDispatcher dispatcher;
+};
+
+struct CodecCallbackStub *CodecCallbackStubObtain(CodecCallback *callback);
+void CodecCallbackStubRelease(struct CodecCallbackStub *stub);
 
 #ifdef __cplusplus
 }

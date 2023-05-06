@@ -105,9 +105,103 @@ ohos_executable("codec_encode_test_ipc") {
   part_name = "drivers_peripheral_codec"
 }
 
+ohos_executable("codec_decode_test_async") {
+  sources = [
+    "codec_decode_test_async.c",
+    "codec_gralloc_wrapper.cpp",
+    "codec_utils.c",
+  ]
+
+  cflags_c = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-predefined-identifier-outside-function",
+    "-Wno-macro-redefined",
+    "-Wno-format",
+    "-Wno-unused-parameter",
+    "-Wno-unused-variable",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_display:display_buffer_idl_headers",
+      "drivers_interface_display:display_composer_idl_headers",
+      "drivers_interface_display:hdi_gralloc_client",
+      "drivers_interface_display:libdisplay_buffer_hdi_impl",
+      "drivers_interface_display:libdisplay_composer_hdi_impl",
+      "drivers_peripheral_codec:libcodec_client",
+      "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_single",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+}
+
+ohos_executable("codec_encode_test_async") {
+  sources = [
+    "codec_encode_test_async.c",
+    "codec_gralloc_wrapper.cpp",
+    "codec_utils.c",
+  ]
+
+  cflags_c = [
+    "-Wall",
+    "-Wextra",
+    "-Werror",
+    "-Wno-predefined-identifier-outside-function",
+    "-Wno-macro-redefined",
+    "-Wno-format",
+    "-Wno-unused-parameter",
+    "-Wno-unused-variable",
+    "-fsigned-char",
+    "-fno-common",
+    "-fno-strict-aliasing",
+  ]
+
+  if (is_standard_system) {
+    external_deps = [
+      "c_utils:utils",
+      "drivers_interface_display:display_buffer_idl_headers",
+      "drivers_interface_display:display_composer_idl_headers",
+      "drivers_interface_display:hdi_gralloc_client",
+      "drivers_interface_display:libdisplay_buffer_hdi_impl",
+      "drivers_interface_display:libdisplay_composer_hdi_impl",
+      "drivers_peripheral_codec:libcodec_client",
+      "graphic_chipsetsdk:buffer_handle",
+      "hdf_core:libhdf_host",
+      "hdf_core:libhdf_ipc_adapter",
+      "hdf_core:libhdf_utils",
+      "hdf_core:libhdi",
+      "hiviewdfx_hilog_native:libhilog",
+      "ipc:ipc_single",
+    ]
+  } else {
+    external_deps = [ "hilog:libhilog" ]
+  }
+
+  subsystem_name = "hdf"
+  part_name = "drivers_peripheral_codec"
+}
+
 group("codec_hdi_demo") {
   deps = [
+    ":codec_decode_test_async",
     ":codec_decode_test_ipc",
+    ":codec_encode_test_async",
     ":codec_encode_test_ipc",
   ]
 }

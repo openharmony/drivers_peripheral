@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Shenzhen Kaihong DID Co., Ltd.
+ * Copyright (c) 2022-2023 Shenzhen Kaihong DID Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,7 +23,29 @@
 #define HDF_LOG_TAG codec_hdi_instance
 
 #define CODEC_OEM_INTERFACE_LIB_NAME    "libcodec_oem_interface.z.so"
-#define BUFFER_COUNT    1
+#define BUFFER_COUNT                    1
+
+static bool InitData(CodecBuffer **inputData, CodecBuffer **outputData)
+{
+    if (inputData == NULL || outputData == NULL) {
+        HDF_LOGE("%{public}s: inputData or outputData NULL!", __func__);
+        return false;
+    }
+    int32_t codecBufferSize = sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * BUFFER_COUNT;
+    *inputData = (CodecBuffer *)OsalMemCalloc(codecBufferSize);
+    if (*inputData == NULL) {
+        HDF_LOGE("%{public}s: inputData is NULL!", __func__);
+        return false;
+    }
+    *outputData = (CodecBuffer *)OsalMemCalloc(codecBufferSize);
+    if (*outputData == NULL) {
+        OsalMemFree(*inputData);
+        *inputData = NULL;
+        HDF_LOGE("%{public}s: outputData is NULL!", __func__);
+        return false;
+    }
+    return true;
+}
 
 static int32_t WaitForOutputDataBuffer(struct CodecInstance *instance, CodecBuffer *outputData)
 {
@@ -72,27 +94,6 @@ static int32_t PrepareInputDataBuffer(struct BufferManagerWrapper *bmWrapper,
     return HDF_SUCCESS;
 }
 
-static bool InitData(CodecBuffer **inputData, CodecBuffer **outputData)
-{
-    if (*inputData != NULL || *outputData != NULL) {
-        HDF_LOGE("%{public}s: outputData or inputData not NULL!", __func__);
-        return false;
-    }
-    int32_t codecBufferSize = sizeof(CodecBuffer) + sizeof(CodecBufferInfo) * BUFFER_COUNT;
-    *inputData = (CodecBuffer *)OsalMemCalloc(codecBufferSize);
-    if (inputData == NULL) {
-        HDF_LOGE("%{public}s: inputData is NULL!", __func__);
-        return false;
-    }
-    *outputData = (CodecBuffer *)OsalMemCalloc(codecBufferSize);
-    if (outputData == NULL) {
-        OsalMemFree(inputData);
-        HDF_LOGE("%{public}s: outputData is NULL!", __func__);
-        return false;
-    }
-    return true;
-}
-
 static void *CodecTaskThread(void *arg)
 {
     if (arg == NULL) {
@@ -105,7 +106,7 @@ static void *CodecTaskThread(void *arg)
         HDF_LOGE("%{public}s: BufferManager not ready!", __func__);
         return NULL;
     }
-    HDF_LOGI("%{public}s: CodecTaskThread start!", __func__);
+    HDF_LOGI("%{public}s: codec task thread started!", __func__);
 
     CodecBuffer *inputData = NULL;
     CodecBuffer *outputData = NULL;
@@ -149,6 +150,143 @@ static void *CodecTaskThread(void *arg)
     return NULL;
 }
 
+static int32_t GetUsedInputInfo(struct CodecInstance *instance, CodecBuffer *inputInfoSendToClient)
+{
+    if (instance == NULL || instance->bufferManagerWrapper == NULL || inputInfoSendToClient == NULL) {
+        HDF_LOGE("%{public}s failed: invalid parameter!", __func__);
+        return HDF_FAILURE;
+    }
+    
+    CodecBuffer *inputInfo = instance->bufferManagerWrapper->GetUsedInputDataBuffer(
+        instance->bufferManagerWrapper, QUEUE_TIME_OUT);
+    if (inputInfo == NULL) {
+        return HDF_ERR_TIMEOUT;
+    }
+
+    inputInfoSendToClient->bufferCnt = inputInfo->bufferCnt;
+    inputInfoSendToClient->buffer[0].type = inputInfo->buffer[0].type;
+    if (!CopyCodecBufferWithTypeSwitch(instance, inputInfoSendToClient, inputInfo, false)) {
+        HDF_LOGE("%{public}s: copy CodecBuffer failed!", __func__);
+        return HDF_FAILURE;
+    }
+    // fd has been transmitted at the initial time, here set invalid to avoid being transmitted again
+    if (inputInfoSendToClient->buffer[0].type == BUFFER_TYPE_FD) {
+        inputInfoSendToClient->buffer[0].buf = NO_TRANSMIT_FD;
+    } else if (inputInfoSendToClient->buffer[0].type == BUFFER_TYPE_HANDLE) {
+        inputInfoSendToClient->buffer[0].buf = NO_TRANSMIT_BUFFERHANDLE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t GetFilledOutputInfo(struct CodecInstance *instance, CodecBuffer *outputInfoSendToClient)
+{
+    if (instance == NULL || instance->bufferManagerWrapper == NULL || outputInfoSendToClient == NULL) {
+        HDF_LOGE("%{public}s failed: invalid parameter!", __func__);
+        return HDF_FAILURE;
+    }
+    
+    CodecBuffer *outputInfo = instance->bufferManagerWrapper->GetOutputDataBuffer(
+        instance->bufferManagerWrapper, QUEUE_TIME_OUT);
+    if (outputInfo == NULL) {
+        return HDF_ERR_TIMEOUT;
+    }
+
+    outputInfoSendToClient->bufferCnt = outputInfo->bufferCnt;
+    outputInfoSendToClient->buffer[0].type = outputInfo->buffer[0].type;
+    if (!CopyCodecBufferWithTypeSwitch(instance, outputInfoSendToClient, outputInfo, false)) {
+        HDF_LOGE("%{public}s: copy CodecBuffer failed!", __func__);
+        return HDF_FAILURE;
+    }
+    // fd has been transmitted at the initial time, here set invalid to avoid being transmitted again
+    if (outputInfoSendToClient->buffer[0].type == BUFFER_TYPE_FD) {
+        outputInfoSendToClient->buffer[0].buf = NO_TRANSMIT_FD;
+    } else if (outputInfoSendToClient->buffer[0].type == BUFFER_TYPE_HANDLE) {
+        outputInfoSendToClient->buffer[0].buf = NO_TRANSMIT_BUFFERHANDLE;
+    }
+    return HDF_SUCCESS;
+}
+
+static void CallbackTaskLoop(struct CodecInstance *instance, CodecBuffer *inputInfoSendToClient,
+    CodecBuffer *outputInfoSendToClient)
+{
+    int32_t acquireFd = 1;
+    bool codecTaskFinished = false;
+    int32_t getResult;
+    if (instance == NULL || inputInfoSendToClient == NULL || outputInfoSendToClient == NULL) {
+        HDF_LOGE("%{public}s failed: invalid parameter!", __func__);
+        return;
+    }
+    while (instance->codecCallbackStatus == CODEC_STATUS_STARTED) {
+        if (instance->codecStatus != CODEC_STATUS_STARTED) {
+            codecTaskFinished = true;
+        }
+        if (!instance->inputEos && GetUsedInputInfo(instance, inputInfoSendToClient) == HDF_SUCCESS) {
+#ifndef CODEC_HAL_PASSTHROUGH
+            instance->callbackProxy->InputBufferAvailable(instance->callbackProxy, instance->callbackUserData,
+                inputInfoSendToClient, &acquireFd);
+#else
+            instance->codecCallback->InputBufferAvailable(instance->callbackUserData,
+                inputInfoSendToClient, &acquireFd);
+#endif
+        }
+        getResult = GetFilledOutputInfo(instance, outputInfoSendToClient);
+        if (getResult == HDF_SUCCESS) {
+#ifndef CODEC_HAL_PASSTHROUGH
+            instance->callbackProxy->OutputBufferAvailable(instance->callbackProxy, instance->callbackUserData,
+                outputInfoSendToClient, &acquireFd);
+#else
+            instance->codecCallback->OutputBufferAvailable(instance->callbackUserData,
+                outputInfoSendToClient, &acquireFd);
+#endif
+        } else if (getResult == HDF_ERR_TIMEOUT && codecTaskFinished) {
+            HDF_LOGI("%{public}s: no output any more!", __func__);
+            EmptyCodecBuffer(outputInfoSendToClient);
+            outputInfoSendToClient->flag = STREAM_FLAG_EOS;
+#ifndef CODEC_HAL_PASSTHROUGH
+            instance->callbackProxy->OutputBufferAvailable(instance->callbackProxy, instance->callbackUserData,
+                outputInfoSendToClient, &acquireFd);
+#else
+            instance->codecCallback->OutputBufferAvailable(instance->callbackUserData,
+                outputInfoSendToClient, &acquireFd);
+#endif
+            break;
+        }
+        if (outputInfoSendToClient->flag & STREAM_FLAG_EOS) {
+            HDF_LOGI("%{public}s: output reach STREAM_FLAG_EOS!", __func__);
+            break;
+        }
+    }
+}
+
+static void *CodecCallbackTaskThread(void *arg)
+{
+    HDF_LOGI("%{public}s: codec callback task thread started!", __func__);
+    if (arg == NULL) {
+        HDF_LOGE("%{public}s: Invalid arg, exit CodecTaskThread!", __func__);
+        return NULL;
+    }
+    struct CodecInstance *instance = (struct CodecInstance *)arg;
+
+    CodecBuffer *inputInfoSendToClient = NULL;
+    CodecBuffer *outputInfoSendToClient = NULL;
+    if (!InitData(&inputInfoSendToClient, &outputInfoSendToClient)) {
+        HDF_LOGE("%{public}s: InitData failed!", __func__);
+        return NULL;
+    }
+
+    CallbackTaskLoop(instance, inputInfoSendToClient, outputInfoSendToClient);
+
+    OsalMutexLock(&instance->codecCallbackStatusLock);
+    instance->codecCallbackStatus = CODEC_STATUS_STOPPED;
+    pthread_cond_signal(&instance->codecCallbackStatusCond);
+    OsalMutexUnlock(&instance->codecCallbackStatusLock);
+
+    OsalMemFree(inputInfoSendToClient);
+    OsalMemFree(outputInfoSendToClient);
+    HDF_LOGI("%{public}s: codec callback task thread finished!", __func__);
+    return NULL;
+}
+
 struct CodecInstance* GetCodecInstance(void)
 {
     struct CodecInstance *instance = (struct CodecInstance *)OsalMemCalloc(sizeof(struct CodecInstance));
@@ -158,7 +296,9 @@ struct CodecInstance* GetCodecInstance(void)
     }
 
     instance->codecStatus = CODEC_STATUS_IDLE;
-    instance->hasCallback = false;
+    instance->codecCallbackStatus = CODEC_STATUS_IDLE;
+    instance->inputEos = false;
+    instance->hasCustomerCallback = false;
     return instance;
 }
 
@@ -185,6 +325,16 @@ int32_t InitCodecInstance(struct CodecInstance *instance, struct CodecOemIf *oem
         HDF_LOGE("%{public}s: pthread_cond_init failed, ret:%{public}d", __func__, ret);
         return HDF_FAILURE;
     }
+    ret = OsalMutexInit(&instance->codecCallbackStatusLock);
+    if (ret != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: OsalMutexInit failed, ret:%{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
+    ret = pthread_cond_init(&instance->codecCallbackStatusCond, NULL);
+    if (ret != 0) {
+        HDF_LOGE("%{public}s: pthread_cond_init failed, ret:%{public}d", __func__, ret);
+        return HDF_FAILURE;
+    }
 
     return HDF_SUCCESS;
 }
@@ -196,15 +346,27 @@ int32_t RunCodecInstance(struct CodecInstance *instance)
         return HDF_FAILURE;
     }
 
-    pthread_attr_t attr;
-    pthread_attr_init(&attr);
-    pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
-
     instance->codecStatus = CODEC_STATUS_STARTED;
-    int32_t ret = pthread_create(&instance->task, NULL, CodecTaskThread, instance);
+    pthread_attr_init(&instance->codecTaskAttr);
+    pthread_attr_setdetachstate(&instance->codecTaskAttr, PTHREAD_CREATE_JOINABLE);
+    int32_t ret = pthread_create(&instance->codecTask, NULL, CodecTaskThread, instance);
     if (ret != 0) {
         HDF_LOGE("%{public}s: run codec task thread failed!", __func__);
+        instance->codecStatus = CODEC_STATUS_STOPPED;
         return HDF_FAILURE;
+    }
+
+    if (instance->hasCustomerCallback) {
+        instance->codecCallbackStatus = CODEC_STATUS_STARTED;
+        pthread_attr_init(&instance->codecCallbackTaskAttr);
+        pthread_attr_setdetachstate(&instance->codecCallbackTaskAttr, PTHREAD_CREATE_JOINABLE);
+        int32_t ret = pthread_create(&instance->codecCallbackTask, NULL, CodecCallbackTaskThread, instance);
+        if (ret != 0) {
+            HDF_LOGE("%{public}s: run codec callback task thread failed!", __func__);
+            instance->codecStatus = CODEC_STATUS_STOPPING;
+            instance->codecCallbackStatus = CODEC_STATUS_STOPPED;
+            return HDF_FAILURE;
+        }
     }
     return HDF_SUCCESS;
 }
@@ -215,6 +377,7 @@ int32_t StopCodecInstance(struct CodecInstance *instance)
         HDF_LOGE("%{public}s: Invalid param!", __func__);
         return HDF_FAILURE;
     }
+
     OsalMutexLock(&instance->codecStatusLock);
     if (instance->codecStatus == CODEC_STATUS_STARTED) {
         instance->codecStatus = CODEC_STATUS_STOPPING;
@@ -222,6 +385,15 @@ int32_t StopCodecInstance(struct CodecInstance *instance)
         instance->codecStatus = CODEC_STATUS_STOPPED;
     }
     OsalMutexUnlock(&instance->codecStatusLock);
+
+    OsalMutexLock(&instance->codecCallbackStatusLock);
+    if (instance->codecCallbackStatus == CODEC_STATUS_STARTED) {
+        instance->codecCallbackStatus = CODEC_STATUS_STOPPING;
+    } else {
+        instance->codecCallbackStatus = CODEC_STATUS_STOPPED;
+    }
+    OsalMutexUnlock(&instance->codecCallbackStatusLock);
+
     return HDF_SUCCESS;
 }
 
@@ -233,13 +405,32 @@ int32_t DestroyCodecInstance(struct CodecInstance *instance)
     }
 
     OsalMutexLock(&instance->codecStatusLock);
-    if (instance->codecStatus == CODEC_STATUS_STARTED || instance->codecStatus == CODEC_STATUS_STOPPING) {
-        HDF_LOGI("%{public}s: wait codec task stop before destroy instance!", __func__);
-        pthread_cond_wait(&instance->codecStatusCond, (pthread_mutex_t *)instance->codecStatusLock.realMutex);
+    if (instance->codecStatus == CODEC_STATUS_STARTED ||
+        instance->codecStatus == CODEC_STATUS_STOPPING) {
+        HDF_LOGI("%{public}s: wait codec task stop!", __func__);
+        if (instance->codecStatusLock.realMutex != NULL) {
+            pthread_cond_wait(&instance->codecStatusCond,
+                (pthread_mutex_t *)instance->codecStatusLock.realMutex);
+        }
     }
     OsalMutexUnlock(&instance->codecStatusLock);
     pthread_cond_destroy(&instance->codecStatusCond);
     OsalMutexDestroy(&instance->codecStatusLock);
+    pthread_attr_destroy(&instance->codecTaskAttr);
+
+    OsalMutexLock(&instance->codecCallbackStatusLock);
+    if (instance->codecCallbackStatus == CODEC_STATUS_STARTED ||
+        instance->codecCallbackStatus == CODEC_STATUS_STOPPING) {
+        HDF_LOGI("%{public}s: wait codec callback task stop!", __func__);
+        if (instance->codecStatusLock.realMutex != NULL) {
+            pthread_cond_wait(&instance->codecCallbackStatusCond,
+                (pthread_mutex_t *)instance->codecCallbackStatusLock.realMutex);
+        }
+    }
+    OsalMutexUnlock(&instance->codecCallbackStatusLock);
+    pthread_cond_destroy(&instance->codecCallbackStatusCond);
+    OsalMutexDestroy(&instance->codecCallbackStatusLock);
+    pthread_attr_destroy(&instance->codecCallbackTaskAttr);
 
     ReleaseInputShm(instance);
     ReleaseOutputShm(instance);
@@ -364,7 +555,7 @@ int32_t GetFdById(struct CodecInstance *instance, int32_t id)
             return instance->outputBuffers[i].fd;
         }
     }
-    HDF_LOGE("%{public}s: failed to find! bufferId:%{public}d!", __func__, id);
+    HDF_LOGE("%{public}s: not found bufferId:%{public}d!", __func__, id);
     return HDF_FAILURE;
 }
 
@@ -434,6 +625,7 @@ CodecBuffer* GetInputInfo(struct CodecInstance *instance, uint32_t id)
             return instance->inputInfos[i];
         }
     }
+    HDF_LOGE("%{public}s: not found bufferId:%{public}d!", __func__, id);
     return NULL;
 }
 
@@ -448,6 +640,7 @@ CodecBuffer* GetOutputInfo(struct CodecInstance *instance, uint32_t id)
             return instance->outputInfos[i];
         }
     }
+    HDF_LOGE("%{public}s: not found bufferId:%{public}d!", __func__, id);
     return NULL;
 }
 
@@ -560,7 +753,7 @@ bool CopyCodecBufferWithTypeSwitch(struct CodecInstance *instance, CodecBuffer *
 static BufferHandle *DupBufferHandle(const BufferHandle *handle)
 {
     if (handle == NULL) {
-        HDF_LOGE("%{public}s handle is NULL", __func__);
+        HDF_LOGE("%{public}s buffer handle is NULL", __func__);
         return NULL;
     }
 
