@@ -12,7 +12,6 @@
 # limitations under the License.
 
 HDF_CORE_PATH = "../../../hdf_core"
-DRIVERS_INTERFACE_PATH = "../../../interface"
 import("//build/ohos.gni")
 import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 if (defined(ohos_lite)) {
@@ -21,13 +20,12 @@ if (defined(ohos_lite)) {
     public_configs = []
   }
 } else {
-  ohos_shared_library("libvibrator_interface_service_1.1") {
+  ohos_shared_library("libhdi_vibrator_impl") {
     include_dirs = [
-      "../interfaces/include/",
-      ".",
       "../interfaces/v1_1/",
+      ".",
     ]
-    sources = [ "vibrator_if_service.cpp" ]
+    sources = [ "vibrator_interface_impl.cpp" ]
     deps = [ "../hal:hdi_vibrator" ]
 
     cflags = [
@@ -44,7 +42,6 @@ if (defined(ohos_lite)) {
         "c_utils:utils",
         "drivers_interface_vibrator:vibrator_idl_headers",
         "hdf_core:libhdf_host",
-        "hitrace_native:hitrace_meter",
         "hiviewdfx_hilog_native:libhilog",
         "ipc:ipc_single",
       ]
@@ -58,50 +55,5 @@ if (defined(ohos_lite)) {
     install_images = [ chipset_base_dir ]
     subsystem_name = "hdf"
     part_name = "drivers_peripheral_vibrator"
-  }
-
-  ohos_shared_library("libvibrator_driver") {
-    include_dirs = [ "../interfaces/include/" ]
-    sources = [ "vibrator_if_driver.cpp" ]
-
-    deps = [ "$DRIVERS_INTERFACE_PATH/vibrator/v1_1:libvibrator_stub_1.1" ]
-
-    cflags = [
-      "-Wall",
-      "-Wextra",
-      "-Werror",
-      "-fsigned-char",
-      "-fno-common",
-      "-fno-strict-aliasing",
-    ]
-
-    if (is_standard_system) {
-      external_deps = [
-        "c_utils:utils",
-        "hdf_core:libhdf_host",
-        "hdf_core:libhdf_ipc_adapter",
-        "hdf_core:libhdf_utils",
-        "hdf_core:libhdi",
-        "hiviewdfx_hilog_native:libhilog",
-        "ipc:ipc_single",
-      ]
-    } else {
-      external_deps = [
-        "hilog:libhilog",
-        "ipc:ipc_single",
-      ]
-    }
-
-    shlib_type = "hdi"
-    install_images = [ chipset_base_dir ]
-    subsystem_name = "hdf"
-    part_name = "drivers_peripheral_vibrator"
-  }
-
-  group("hdf_vibrator_service") {
-    deps = [
-      ":libvibrator_driver",
-      ":libvibrator_interface_service_1.1",
-    ]
   }
 }

@@ -14,6 +14,8 @@
  */
 
 #include "vibrator_interface_impl.h"
+#include <securec.h>
+#include <string>
 #include <hdf_base.h>
 #include <hdf_log.h>
 #include "vibrator_if.h"
@@ -24,9 +26,16 @@ namespace OHOS {
 namespace HDI {
 namespace Vibrator {
 namespace V1_1 {
-extern "C" IVibratorInterface *VibratorInterfaceImplGetInstance(void)
+
+int32_t VibratorInterfaceImpl::Init()
 {
-    return new (std::nothrow) VibratorInterfaceImpl();
+    const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
+    if (vibratorInterface == nullptr) {
+        HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
+        return HDF_FAILURE;
+    }
+
+    return HDF_SUCCESS;
 }
 
 int32_t VibratorInterfaceImpl::StartOnce(uint32_t duration)
@@ -59,7 +68,7 @@ int32_t VibratorInterfaceImpl::Start(const std::string &effectType)
     return ret;
 }
 
-int32_t VibratorInterfaceImpl::Stop(HdfVibratorMode mode)
+int32_t VibratorInterfaceImpl::Stop(HdfVibratorModeVdi mode)
 {
     HDF_LOGI("%{public}s: Enter the Stop function, mode is %{public}u", __func__, mode);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
@@ -69,11 +78,11 @@ int32_t VibratorInterfaceImpl::Stop(HdfVibratorMode mode)
     }
 
     VibratorMode tmp;
-    if (mode == HDF_VIBRATOR_MODE_ONCE) {
+    if (mode == VDI_VIBRATOR_MODE_ONCE) {
         tmp = VIBRATOR_MODE_ONCE;
-    } else if (mode == HDF_VIBRATOR_MODE_PRESET) {
+    } else if (mode == VDI_VIBRATOR_MODE_PRESET) {
         tmp = VIBRATOR_MODE_PRESET;
-    } else if (mode == HDF_VIBRATOR_MODE_BUTT) {
+    } else if (mode == VDI_VIBRATOR_MODE_BUTT) {
         tmp = VIBRATOR_MODE_BUTT;
     } else {
         HDF_LOGE("%{public}s: invalid param", __func__);
@@ -87,7 +96,7 @@ int32_t VibratorInterfaceImpl::Stop(HdfVibratorMode mode)
     return ret;
 }
 
-int32_t VibratorInterfaceImpl::GetVibratorInfo(std::vector<HdfVibratorInfo> &vibratorInfo)
+int32_t VibratorInterfaceImpl::GetVibratorInfo(std::vector<HdfVibratorInfoVdi> &vibratorInfo)
 {
     HDF_LOGI("%{public}s: Enter the GetVibratorInfo function.", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
@@ -95,7 +104,7 @@ int32_t VibratorInterfaceImpl::GetVibratorInfo(std::vector<HdfVibratorInfo> &vib
         HDF_LOGE("%{public}s: get vibrator Module instance failed", __func__);
         return HDF_FAILURE;
     }
-    HdfVibratorInfo hdfVibratorInfo;
+    HdfVibratorInfoVdi hdfVibratorInfo;
     struct VibratorInfo *tmp = nullptr;
 
     int32_t ret = vibratorInterface->GetVibratorInfo(&tmp);
@@ -137,7 +146,7 @@ int32_t VibratorInterfaceImpl::EnableVibratorModulation(uint32_t duration, uint1
     return ret;
 }
 
-int32_t VibratorInterfaceImpl::EnableCompositeEffect(const HdfCompositeEffect &effect)
+int32_t VibratorInterfaceImpl::EnableCompositeEffect(const HdfCompositeEffectVdi &effect)
 {
     HDF_LOGI("%{public}s: Enter the EnableCompositeEffect function.", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
@@ -149,7 +158,7 @@ int32_t VibratorInterfaceImpl::EnableCompositeEffect(const HdfCompositeEffect &e
     return HDF_SUCCESS;
 }
 
-int32_t VibratorInterfaceImpl::GetEffectInfo(const std::string &effectType, HdfEffectInfo &effectInfo)
+int32_t VibratorInterfaceImpl::GetEffectInfo(const std::string &effectType, HdfEffectInfoVdi &effectInfo)
 {
     HDF_LOGI("%{public}s: Enter the GetEffectInfo function.", __func__);
     const struct VibratorInterface *vibratorInterface = NewVibratorInterfaceInstance();
@@ -181,6 +190,50 @@ int32_t VibratorInterfaceImpl::IsVibratorRunning(bool& state)
 
     return HDF_SUCCESS;
 }
+
+static int32_t CreateLightVdiInstance(struct HdfVdiBase *vdiBase)
+{
+    HDF_LOGI("%{public}s: Enter the CreateLightVdiInstance function", __func__);
+    if (vdiBase == nullptr) {
+        HDF_LOGE("%{public}s parameter vdiBase is NULL", __func__);
+        return HDF_FAILURE;
+    }
+
+    struct VdiWrapperVibrator *vibratorVdi = reinterpret_cast<VdiWrapperVibrator *>(vdiBase);
+    vibratorVdi->vibratorModule = new VibratorInterfaceImpl();
+    if (vibratorVdi->vibratorModule == nullptr) {
+        HDF_LOGI("%{public}s: new vibratorModule failed!", __func__);
+        return HDF_FAILURE;
+    }
+    return HDF_SUCCESS;
+}
+
+static int32_t DestoryLightVdiInstance(struct HdfVdiBase *vdiBase)
+{
+    HDF_LOGI("%{public}s: Enter the DestoryLightVdiInstance function", __func__);
+    if (vdiBase == nullptr) {
+        HDF_LOGE("%{public}s parameter vdiBase is NULL", __func__);
+        return HDF_FAILURE;
+    }
+
+    struct VdiWrapperVibrator *vibratorVdi = reinterpret_cast<VdiWrapperVibrator *>(vdiBase);
+    VibratorInterfaceImpl *vibratorImpl = reinterpret_cast<VibratorInterfaceImpl *>(vibratorVdi->vibratorModule);
+    delete vibratorImpl;
+    vibratorVdi->vibratorModule = nullptr;
+    return HDF_SUCCESS;
+}
+
+static struct VdiWrapperVibrator g_vibratorVdi = {
+    .base = {
+        .moduleVersion = 1,
+        .moduleName = "vibrator_service",
+        .CreateVdiInstance = CreateLightVdiInstance,
+        .DestoryVdiInstance = DestoryLightVdiInstance,
+    },
+    .vibratorModule = nullptr,
+};
+
+extern "C" HDF_VDI_INIT(g_vibratorVdi);
 
 } // V1_1
 } // Vibrator
