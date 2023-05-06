@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Huawei Device Co., Ltd.
+ * Copyright (c) 2022-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,22 +16,21 @@
 #ifndef OHOS_HDI_LIGHT_V1_0_LIGHTINTERFACEIMPL_H
 #define OHOS_HDI_LIGHT_V1_0_LIGHTINTERFACEIMPL_H
 
-#include "v1_0/ilight_interface.h"
+#include "ilight_interface_vdi.h"
+#include "ilight_type_vdi.h"
 
 namespace OHOS {
 namespace HDI {
 namespace Light {
 namespace V1_0 {
-class LightInterfaceImpl : public ILightInterface {
+class LightInterfaceImpl : public ILightInterfaceVdi {
 public:
-    virtual ~LightInterfaceImpl() {}
-
-    int32_t GetLightInfo(std::vector<HdfLightInfo>& info) override;
-
-    int32_t TurnOnLight(int32_t lightId, const HdfLightEffect& effect) override;
-
-    int32_t TurnOnMultiLights(int32_t lightId, const std::vector<HdfLightColor>& colors) override;
-
+    LightInterfaceImpl() {}
+    ~LightInterfaceImpl() {}
+    int32_t Init(void) override;
+    int32_t GetLightInfo(std::vector<HdfLightInfoVdi>& info) override;
+    int32_t TurnOnLight(int32_t lightId, const HdfLightEffectVdi& effect) override;
+    int32_t TurnOnMultiLights(int32_t lightId, const std::vector<HdfLightColorVdi>& colors) override;
     int32_t TurnOffLight(int32_t lightId) override;
 };
 } // V1_0
