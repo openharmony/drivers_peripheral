@@ -29,14 +29,13 @@
     "ram": "8600KB",
     "deps": {
       "components": [
+        "c_utils",
         "hiviewdfx_hilog_native",
         "hdf_core",
-        "utils_base",
         "drivers_interface_audio"
       ],
       "third_party": [
-        "bounds_checking_function",
-        "googletest"
+        "bounds_checking_function"
       ]
     },
     "build": {
