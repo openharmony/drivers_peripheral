@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "drivers_peripheral_battery/battery"
 
@@ -22,11 +22,11 @@ config("module_private_config") {
 
   include_dirs = [
     "include",
-    "//drivers/peripheral/battery/interfaces/hdi_service/test/unittest/include",
+    "../unittest/include",
     "//drivers/peripheral/battery/interfaces/include/",
     "//drivers/peripheral/battery/include/",
-    "//drivers/peripheral/battery/interfaces/hdi_service/include",
-    "//drivers/peripheral/battery/utils/include",
+    "../../include",
+    "../../../../utils/include",
   ]
 }
 
@@ -34,10 +34,10 @@ config("module_private_config") {
 ohos_systemtest("test_battery_sys_test") {
   module_out_path = module_output_path
 
-  include_dirs = [ "//drivers/peripheral/battery/utils/include" ]
+  include_dirs = [ "../../../../utils/include" ]
 
   sources = [
-    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
+    "../../src/battery_config.cpp",
     "src/battery_sys_test.cpp",
   ]
 

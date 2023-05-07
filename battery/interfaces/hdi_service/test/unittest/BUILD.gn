@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf/uhdf.gni")
+import("../../../../../../hdf_core/adapter/uhdf/uhdf.gni")
 
 module_output_path = "drivers_peripheral_battery/battery"
 
@@ -22,10 +22,10 @@ config("module_private_config") {
 
   include_dirs = [
     "include",
-    "//drivers/peripheral/battery/interfaces/include",
-    "//drivers/peripheral/battery/interfaces/hdi_service/include",
-    "//drivers/peripheral/battery/interfaces/hdi_service/test/systemtest/include",
-    "//drivers/peripheral/battery/utils/include",
+    "../../../include",
+    "../../include",
+    "../systemtest/include",
+    "../../../../utils/include",
   ]
 }
 
@@ -34,16 +34,16 @@ ohos_unittest("test_hdisrv") {
   module_out_path = module_output_path
 
   sources = [
-    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_config.cpp",
-    "//drivers/peripheral/battery/interfaces/hdi_service/src/battery_thread.cpp",
-    "//drivers/peripheral/battery/interfaces/hdi_service/src/power_supply_provider.cpp",
+    "../../src/battery_config.cpp",
+    "../../src/battery_thread.cpp",
+    "../../src/power_supply_provider.cpp",
     "src/hdi_service_test.cpp",
   ]
 
   configs = [ ":module_private_config" ]
 
   deps = [
-    "//drivers/interface/battery/v1_2:libbattery_stub_1.2",
+    "../../../../../../interface/battery/v1_2:libbattery_stub_1.2",
     "//third_party/cJSON:cjson",
     "//third_party/googletest:gmock_main",
     "//third_party/googletest:gtest_main",
