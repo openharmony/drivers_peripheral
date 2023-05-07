@@ -13,15 +13,14 @@
 
 import("//build/ohos.gni")
 import("//build/test.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 module_output_path = "drivers_peripheral_thermal/thermal"
 
 ohos_unittest("hdi_unittest_thermal") {
   module_out_path = module_output_path
 
-  include_dirs =
-      [ "//drivers/peripheral/thermal/interfaces/hdi_service/include" ]
+  include_dirs = [ "../../interfaces/hdi_service/include" ]
 
   sources = [ "./hdf_thermal_hdi_test.cpp" ]
 
