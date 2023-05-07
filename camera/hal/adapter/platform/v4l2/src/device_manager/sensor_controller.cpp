@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -82,6 +82,24 @@ RetCode SensorController::Configure(std::shared_ptr<CameraMetadata> meta)
 {
     return SendSensorMetaData(meta);
 };
+
+RetCode SensorController::ConfigFps(std::shared_ptr<CameraMetadata> meta)
+{
+    if (meta == nullptr) {
+        CAMERA_LOGE("Meta is nullptr");
+        return RC_ERROR;
+    }
+    common_metadata_header_t *data = meta->get();
+    if (data == nullptr) {
+        CAMERA_LOGE("Data is nullptr");
+        return RC_ERROR;
+    }
+    RetCode rc = SendFpsMetaData(data);
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("SendFpsMetaData fail");
+    }
+    return rc;
+}
 
 RetCode SensorController::Start(int buffCont, DeviceFormat& format)
 {
@@ -488,10 +506,6 @@ RetCode SensorController::SendSensorMetaData(std::shared_ptr<CameraMetadata> met
     rc = SendFlashMetaData(data);
     if (rc == RC_ERROR) {
         CAMERA_LOGE("SendFlashMetaData fail");
-    }
-    rc = SendFpsMetaData(data);
-    if (rc == RC_ERROR) {
-        CAMERA_LOGE("SendFpsMetaData fail");
     }
     return rc;
 }

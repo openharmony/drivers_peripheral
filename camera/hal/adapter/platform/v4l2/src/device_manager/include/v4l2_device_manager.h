@@ -50,6 +50,7 @@ public:
     void SetMemoryType(uint8_t &memType);
 
 private:
+    void AddHardware(CameraId id, const std::string hardwareName);
     void UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl,
         std::vector<DeviceFormat>& deviceFormat, bool uvcState);
     void UvcinfoToMetaData();
@@ -65,7 +66,7 @@ private:
     int GetOhosMetaTag(uint32_t v4l2Tag);
     void ConvertV4l2TagToOhos(std::vector<DeviceControl>& deviceControlVec, std::vector<DeviceFormat>& deviceFormat,
                               std::shared_ptr<CameraMetadata> cameraMetadata);
-    void AddDefaultOhosTag(std::shared_ptr<CameraMetadata> cameraMetadata);
+    void AddDefaultOhosTag(std::shared_ptr<CameraMetadata> cameraMetadata, std::vector<DeviceFormat>& deviceFormat);
     RetCode ConvertEntryToOhos(std::shared_ptr<CameraMetadata> metadata, int ohosTag,
                                const DeviceControl& deviceControl);
 
@@ -126,12 +127,19 @@ private:
     void ConvertAbilityVideoStabilizationModesToOhos(std::shared_ptr<CameraMetadata> metadata);
     void ConvertAbilityFpsRangesToOhos(std::shared_ptr<CameraMetadata> metadata,
                                        std::vector<DeviceFormat>& deviceFormat);
+    void ConvertAbilityStreamAvailableExtendConfigurationsToOhos(std::shared_ptr<CameraMetadata> metadata,
+                                                                 const std::vector<DeviceFormat>& deviceFormat);
+    void AddDefaultSensorInfoPhysicalSize(std::shared_ptr<CameraMetadata> metadata,
+                                          std::vector<DeviceFormat>& deviceFormat);
     void AddDefaultAbilityMuteModes(std::shared_ptr<CameraMetadata> metadata);
     void AddDefaultControlCaptureMirrorSupport(std::shared_ptr<CameraMetadata> metadata);
     void AddDefaultCameraConnectionType(std::shared_ptr<CameraMetadata> metadata);
     void AddDefaultCameraPosition(std::shared_ptr<CameraMetadata> metadata);
     void AddDefaultCameraType(std::shared_ptr<CameraMetadata> metadata);
     void AddDefaultFlashAvailable(std::shared_ptr<CameraMetadata> metadata);
+    void AddDefaultJpegOrientation(std::shared_ptr<CameraMetadata> metadata);
+    void AddDefaultJpegQuality(std::shared_ptr<CameraMetadata> metadata);
+    void AddDefaultAbilityStreamAvailableBasicConfigurations(std::shared_ptr<CameraMetadata> metadata);
 
 private:
     HotplugDevCb uvcCb_ = nullptr;

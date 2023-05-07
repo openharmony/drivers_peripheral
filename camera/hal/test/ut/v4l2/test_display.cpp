@@ -450,6 +450,26 @@ std::shared_ptr<CameraAbility> TestDisplay::GetCameraAbility()
     return ability;
 }
 
+void TestDisplay::OpenUsbCamera()
+{
+    if (cameraDevice == nullptr) {
+        cameraHost->GetCameraIds(cameraIds);
+        if (cameraIds.size() > 1) {
+            cameraHost->GetCameraAbility(cameraIds.back(), ability_);
+            MetadataUtils::ConvertVecToMetadata(ability_, ability);
+            const OHOS::sptr<DemoCameraDeviceCallback> callback = new DemoCameraDeviceCallback();
+            rc = (CamRetCode)cameraHost->OpenCamera(cameraIds.back(), callback, cameraDevice);
+            if (rc != HDI::Camera::V1_0::NO_ERROR || cameraDevice == nullptr) {
+                std::cout << "OpenCamera failed, rc = " << rc << std::endl;
+                return;
+            }
+            std::cout << "OpenCamera success." << std::endl;
+        } else {
+            std::cout << "No usb camera plugged in" << std::endl;
+        }
+    }
+}
+
 void TestDisplay::Close()
 {
     CAMERA_LOGD("cameraDevice->Close().");

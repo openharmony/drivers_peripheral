@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Huawei Device Co., Ltd.
+ * Copyright (c) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,18 +13,32 @@
 
 #include "uvc_node.h"
 #include <unistd.h>
+#include "metadata_controller.h"
 
 namespace OHOS::Camera {
 UvcNode::UvcNode(const std::string& name, const std::string& type) : SourceNode(name, type), NodeBase(name, type)
 {
     CAMERA_LOGI("%s enter, type(%s)\n", name_.c_str(), type_.c_str());
+    RetCode rc = RC_OK;
+    constexpr int ITEM_CAPACITY_SIZE = 30;
+    constexpr int DATA_CAPACITY_SIZE = 1000;
+    deviceManager_ = IDeviceManager::GetInstance();
+    if (deviceManager_ == nullptr) {
+        CAMERA_LOGE("Get device manager failed.");
+        return;
+    }
+    rc = GetDeviceController();
+    if (rc == RC_ERROR) {
+        CAMERA_LOGE("GetDeviceController failed.");
+        return;
+    }
+    meta_ = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
 }
 
 UvcNode::~UvcNode()
 {
-    CAMERA_LOGI("~uvc Node exit.");
+    CAMERA_LOGI("~Uvc Node exit.");
 }
-
 
 RetCode UvcNode::GetDeviceController()
 {
@@ -32,7 +46,7 @@ RetCode UvcNode::GetDeviceController()
     sensorController_ = std::static_pointer_cast<SensorController>
         (deviceManager_->GetController(cameraId, DM_M_SENSOR, DM_C_SENSOR));
     if (sensorController_ == nullptr) {
-        CAMERA_LOGE("get device controller failed");
+        CAMERA_LOGE("Get device controller failed");
         return RC_ERROR;
     }
     return RC_OK;
@@ -46,96 +60,168 @@ RetCode UvcNode::Init(const int32_t streamId)
 RetCode UvcNode::Flush(const int32_t streamId)
 {
     RetCode rc = RC_OK;
+
+    if (sensorController_ != nullptr) {
+        rc = sensorController_->Flush(streamId);
+        CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+    }
     rc = SourceNode::Flush(streamId);
-    CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
 
-    rc = sensorController_->Flush(streamId);
     return rc;
-}
-
-RetCode UvcNode::StartCheck(int64_t &bufferPoolId)
-{
-    deviceManager_ = IDeviceManager::GetInstance();
-    if (deviceManager_ == nullptr) {
-        CAMERA_LOGE("get device manager failed.");
-        return RC_ERROR;
-    }
-    if (GetDeviceController() == RC_ERROR) {
-        CAMERA_LOGE("GetDeviceController failed.");
-        return RC_ERROR;
-    }
-
-    BufferManager* manager = Camera::BufferManager::GetInstance();
-    if (manager == nullptr) {
-        CAMERA_LOGE("buffer manager is null");
-        return RC_ERROR;
-    }
-    bufferPoolId = manager->GenerateBufferPoolId();
-    if (bufferPoolId == 0) {
-        CAMERA_LOGE("bufferpool id is 0");
-        return RC_ERROR;
-    }
-    bufferPool_ = manager->GetBufferPool(bufferPoolId);
-    if (bufferPool_ == nullptr) {
-        CAMERA_LOGE("bufferpool is null ");
-        return RC_ERROR;
-    }
-    GetOutPorts();
-    return RC_OK;
 }
 
 RetCode UvcNode::Start(const int32_t streamId)
 {
-    int64_t bufferPoolId;
-    if (StartCheck(bufferPoolId) == RC_ERROR) {
-        return RC_ERROR;
-    }
+    RetCode rc = RC_OK;
     std::vector<std::shared_ptr<IPort>> outPorts = GetOutPorts();
-    for (auto& iter : outPorts) {
-        RetCode ret = bufferPool_->Init(iter->format_.w_,
-            iter->format_.h_,
-            iter->format_.usage_,
-            iter->format_.format_,
-            iter->format_.bufferCount_,
-            CAMERA_BUFFER_SOURCE_TYPE_HEAP);
-        if (ret == RC_ERROR) {
-            CAMERA_LOGE("bufferpool init failed");
-            break;
-        }
-        iter->format_.bufferPoolId_ = bufferPoolId;
-
+    for (const auto& it : outPorts) {
         DeviceFormat format;
         format.fmtdesc.pixelformat = V4L2_PIX_FMT_YUYV;
-        format.fmtdesc.width = iter->format_.w_;
-        format.fmtdesc.height = iter->format_.h_;
-        int bufCnt = iter->format_.bufferCount_;
-        ret = sensorController_->Start(bufCnt, format);
-        if (ret == RC_ERROR) {
-            CAMERA_LOGE("start failed.");
+        format.fmtdesc.width = it->format_.w_;
+        format.fmtdesc.height = it->format_.h_;
+        int bufCnt = it->format_.bufferCount_;
+        rc = sensorController_->Start(bufCnt, format);
+        if (rc == RC_ERROR) {
+            CAMERA_LOGE("Start failed.");
             return RC_ERROR;
         }
     }
-    return SourceNode::Start(streamId);
+    if (meta_ != nullptr) {
+        sensorController_->ConfigFps(meta_);
+    }
+    rc = SourceNode::Start(streamId);
+    return rc;
 }
 
 RetCode UvcNode::Stop(const int32_t streamId)
 {
+    RetCode rc = RC_OK;
+
+    if (sensorController_ != nullptr) {
+        rc = sensorController_->Stop();
+        CHECK_IF_NOT_EQUAL_RETURN_VALUE(rc, RC_OK, RC_ERROR);
+    }
+
     return SourceNode::Stop(streamId);
+}
+
+RetCode UvcNode::SetCallback()
+{
+    MetadataController &metaDataController = MetadataController::GetInstance();
+    metaDataController.AddNodeCallback([this](const std::shared_ptr<CameraMetadata> &metadata) {
+        OnMetadataChanged(metadata);
+    });
+    return RC_OK;
+}
+
+int32_t UvcNode::GetStreamId(const CaptureMeta &meta)
+{
+    common_metadata_header_t *data = meta->get();
+    if (data == nullptr) {
+        CAMERA_LOGE("Data is nullptr");
+        return RC_ERROR;
+    }
+    camera_metadata_item_t entry;
+    int32_t streamId = -1;
+    int rc = FindCameraMetadataItem(data, OHOS_CAMERA_STREAM_ID, &entry);
+    if (rc == 0) {
+        streamId = *entry.data.i32;
+    }
+    return streamId;
+}
+
+void UvcNode::GetUpdateFps(const std::shared_ptr<CameraMetadata>& metadata)
+{
+    common_metadata_header_t *data = metadata->get();
+    camera_metadata_item_t entry;
+    int ret = FindCameraMetadataItem(data, OHOS_CONTROL_FPS_RANGES, &entry);
+    if (ret == 0) {
+        std::vector<int32_t> fpsRange;
+        for (int i = 0; i < entry.count; i++) {
+            fpsRange.push_back(*(entry.data.i32 + i));
+        }
+        meta_->addEntry(OHOS_CONTROL_FPS_RANGES, fpsRange.data(), fpsRange.size());
+    }
+}
+
+void UvcNode::OnMetadataChanged(const std::shared_ptr<CameraMetadata>& metadata)
+{
+    if (metadata == nullptr) {
+        CAMERA_LOGE("Meta is nullptr");
+        return;
+    }
+    constexpr uint32_t DEVICE_STREAM_ID = 0;
+    if (sensorController_ != nullptr) {
+        if (GetStreamId(metadata) == DEVICE_STREAM_ID) {
+            sensorController_->Configure(metadata);
+        }
+    } else {
+        CAMERA_LOGE("UvcNode sensorController_ is null");
+    }
+    GetUpdateFps(metadata);
 }
 
 void UvcNode::SetBufferCallback()
 {
     sensorController_->SetNodeCallBack([&](std::shared_ptr<FrameSpec> frameSpec) {
-            OnPackBuffer(frameSpec);
-            });
+        OnPackBuffer(frameSpec);
+    });
     return;
 }
 
+void UvcNode::YUV422To420(uint8_t yuv422[], uint8_t yuv420[], int width, int height)
+{
+    int yCount = width * height;
+    constexpr int POSITION_INTERVAL = 2;
+    constexpr int U_V_POSITION_INTERVAL = 4;
+    constexpr int U_START_POSITION = 1;
+    constexpr int V_START_POSITION = 3;
+    int uvGroupIndex = 0;
+
+    for (int i = 0; i < yCount; i++) {
+        yuv420[i] = yuv422[i * POSITION_INTERVAL];
+    }
+
+    for (int i = 0; i < height; i += POSITION_INTERVAL) {
+        for (int j = 0; j < (width / POSITION_INTERVAL); j++) {
+            yuv420[yCount + uvGroupIndex * POSITION_INTERVAL * width / U_V_POSITION_INTERVAL + j] =
+                yuv422[i * POSITION_INTERVAL * width + U_V_POSITION_INTERVAL * j + U_START_POSITION];
+            yuv420[yCount + yCount / U_V_POSITION_INTERVAL +
+                   uvGroupIndex * POSITION_INTERVAL * width / U_V_POSITION_INTERVAL + j] =
+                yuv422[i * POSITION_INTERVAL * width + U_V_POSITION_INTERVAL * j + V_START_POSITION];
+        }
+        uvGroupIndex++;
+    }
+}
+
+void UvcNode::DeliverBuffer(std::shared_ptr<IBuffer>& buffer)
+{
+    if (buffer == nullptr) {
+        CAMERA_LOGE("UvcNode::DeliverBuffer frameSpec is null");
+        return;
+    }
+
+    uint8_t* jBuf = (uint8_t *)malloc(buffer->GetSize());
+    YUV422To420((uint8_t *)buffer->GetVirAddress(), (uint8_t *)jBuf, buffer->GetWidth(), buffer->GetHeight());
+    int ret = memcpy_s((uint8_t *)buffer->GetVirAddress(), buffer->GetSize(), (uint8_t *)jBuf, buffer->GetSize());
+    if (ret == 0) {
+        buffer->SetEsFrameSize(buffer->GetSize());
+    } else {
+        CAMERA_LOGI("Memcpy_s failed, ret = %{public}d\n", ret);
+        buffer->SetEsFrameSize(0);
+    }
+    free(jBuf);
+
+    SourceNode::DeliverBuffer(buffer);
+    return;
+}
+
+
 RetCode UvcNode::ProvideBuffers(std::shared_ptr<FrameSpec> frameSpec)
 {
-    CAMERA_LOGI("provide buffers enter.");
+    CAMERA_LOGI("Provide buffers enter.");
     if (sensorController_->SendFrameBuffer(frameSpec) == RC_OK) {
-        CAMERA_LOGD("sendframebuffer success bufferpool id = %llu", frameSpec->bufferPoolId_);
+        CAMERA_LOGD("Sendframebuffer success bufferpool id = %llu", frameSpec->bufferPoolId_);
         return RC_OK;
     }
     return RC_ERROR;
