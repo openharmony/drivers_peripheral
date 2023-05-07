@@ -10,8 +10,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+HDF_CORE_PATH = "../../../hdf_core"
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("$HDF_CORE_PATH/adapter/uhdf2/uhdf.gni")
 
 ohos_shared_library("libhdi_sensor_impl") {
   include_dirs = [

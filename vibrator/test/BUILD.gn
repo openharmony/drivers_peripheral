@@ -11,6 +11,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("../vibrator.gni")
+
 declare_args() {
   drivers_peripheral_vibrator_feature_model = false
 }
@@ -22,10 +24,7 @@ if (defined(ohos_lite)) {
   lite_component("hdf_test_vibrator") {
     # add hdf subsystem unittest
     if (ohos_build_type == "debug") {
-      if (ohos_kernel_type == "linux" && board_name == "hispark_taurus") {
-        deps = [ "unittest:hdf_peripheral_test_vibrator" ]
-      } else if (ohos_kernel_type == "liteos_a" &&
-                 board_name == "hispark_taurus") {
+      if (drivers_peripheral_vibrator_feature_lite_support_test) {
         deps = [ "unittest:hdf_peripheral_test_vibrator" ]
       }
     }
