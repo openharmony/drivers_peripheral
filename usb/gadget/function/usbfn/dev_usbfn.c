@@ -13,7 +13,6 @@
  * limitations under the License.
  */
 
-#include "default_config.h"
 #include "device_resource_if.h"
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
@@ -27,6 +26,7 @@
 #include "usbfn_request.h"
 
 #define HDF_LOG_TAG dev_usbfn
+#define UDC_NAME "invalid_udc_name"
 
 enum DevUsbFnCmd {
     DEV_USBFN_INIT = 0x1,
@@ -166,6 +166,7 @@ static int32_t UsbFnDriverInit(struct HdfDeviceObject *device)
     devMgr = (struct DevUsbFnMgr *)device->service;
     if (iface->GetString(device->property, "udc_name", &devMgr->udcName, UDC_NAME) != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: read udc_name failed, use default: %{public}s", __func__, UDC_NAME);
+        return HDF_FAILURE;
     }
     HDF_LOGI("%{public}s: udcName=%{public}s", __func__, devMgr->udcName);
     if (iface->GetUint8(device->property, "use_hcs", &useHcs, 0) != HDF_SUCCESS) {

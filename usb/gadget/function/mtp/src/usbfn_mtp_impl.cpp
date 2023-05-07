@@ -20,12 +20,12 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "default_config.h"
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_log.h"
 
 #define HDF_LOG_TAG usbfn_mtp_impl
+#define UDC_NAME "invalid_udc_name"
 
 /* Compatible: Microsoft MTP OS String */
 static uint8_t g_mtpOsString[] = {18, /* sizeof(mtp_os_string) */
@@ -93,7 +93,13 @@ namespace Mtp {
 namespace V1_0 {
 extern "C" IUsbfnMtpInterface *UsbfnMtpInterfaceImplGetInstance(void)
 {
-    return new (std::nothrow) UsbfnMtpImpl();
+    using OHOS::HDI::Usb::Gadget::Mtp::V1_0::UsbfnMtpImpl;
+    UsbfnMtpImpl *service = new (std::nothrow) UsbfnMtpImpl();
+    if (service == nullptr) {
+        return nullptr;
+    }
+    service->Init();
+    return service;
 }
 
 struct UsbMtpDevice *UsbfnMtpImpl::mtpDev_ = nullptr;
