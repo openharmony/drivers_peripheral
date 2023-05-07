@@ -12,12 +12,17 @@
   "component": {
     "name": "drivers_peripheral_usb",
     "subsystem": "hdf",
-    "features": ["drivers_peripheral_usb_feature_linux_native_model"],
+    "features": [
+      "drivers_peripheral_usb_feature_linux_native_model"
+    ],
     "hisysevent_config": [
       "//drivers/peripheral/usb/hisysevent.yaml"
     ],
-    "syscap": [ "" ],
-    "adapter_system_type": ["standard", "small"],
+    "syscap": [],
+    "adapted_system_type": [
+      "standard",
+      "small"
+    ],
     "rom": "820KB",
     "ram": "12200KB",
     "deps": {
@@ -25,11 +30,15 @@
         "ipc",
         "hdf_core",
         "hiviewdfx_hilog_native",
-        "utils_base"
+        "utils_base",
+        "samgr",
+        "init",
+        "hitrace_native",
+        "c_utils",
+        "drivers_interface_usb",
+        "hisysevent_native"
       ],
-      "third_party": [
-        "bounds_checking_function"
-      ]
+      "third_party": []
     },
     "build": {
       "sub_component": [
@@ -38,8 +47,7 @@
       "test": [
         "//drivers/peripheral/usb/test:hdf_test_usb"
       ],
-      "inner_kits": [
-      ]
+      "inner_kits": []
     }
   }
 }
