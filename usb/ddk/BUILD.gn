@@ -70,7 +70,6 @@ ohos_shared_library("libusb_pnp_manager") {
     "$hdf_framework_path/model/usb/include",
     "host/include",
     "device/include",
-    default_config_path,
   ]
   sources = [
     "$hdf_framework_path/model/usb/src/usb_ddk_pnp_loader.c",

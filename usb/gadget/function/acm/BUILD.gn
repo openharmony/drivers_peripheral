@@ -24,7 +24,6 @@ ohos_shared_library("libusbfn_cdcacm") {
     "./../../../interfaces/ddk/device",
     "./../../../interfaces/ddk/common",
     "../include",
-    default_config_path,
   ]
 
   sources = [ "cdcacm.c" ]
