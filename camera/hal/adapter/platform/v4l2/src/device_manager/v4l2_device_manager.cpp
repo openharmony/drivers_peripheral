@@ -318,6 +318,26 @@ void V4L2DeviceManager::SetHotplugDevCallBack(HotplugDevCb cb)
     });
 }
 
+void V4L2DeviceManager::AddHardware(CameraId id, const std::string hardwareName)
+{
+    HardwareConfiguration hardware;
+    hardware.cameraId = id;
+    hardware.managerId = DM_M_SENSOR;
+    hardware.controllerId = DM_C_SENSOR;
+    hardware.hardwareName = hardwareName;
+    hardwareList_.push_back(hardware);
+    hardware.cameraId = id;
+    hardware.managerId = DM_M_ISP;
+    hardware.controllerId = DM_C_ISP;
+    hardware.hardwareName = std::string("isp");
+    hardwareList_.push_back(hardware);
+    hardware.cameraId = id;
+    hardware.managerId = DM_M_FLASH;
+    hardware.controllerId = DM_C_FLASH;
+    hardware.hardwareName = std::string("flash");
+    hardwareList_.push_back(hardware);
+}
+
 void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<DeviceControl>& deviceControl,
     std::vector<DeviceFormat>& deviceFormat, bool uvcState)
 {
@@ -329,25 +349,13 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         CAMERA_LOGI("uvc plug in %{public}s begin", hardwareName.c_str());
         CameraId id = ReturnEnableCameraId("");
         CHECK_IF_EQUAL_RETURN_VOID(id, CAMERA_MAX);
-
         RetCode rc = GetManager(DM_M_SENSOR)->CreateController(DM_C_SENSOR, hardwareName);
         CHECK_IF_EQUAL_RETURN_VOID(rc, RC_ERROR);
 
-        HardwareConfiguration hardware;
-        hardware.cameraId = id;
-        hardware.managerId = DM_M_SENSOR;
-        hardware.controllerId = DM_C_SENSOR;
-        hardware.hardwareName = hardwareName;
-        hardwareList_.push_back(hardware);
-        std::vector<float> physicalSize;
-        for (auto iter = deviceFormat.cbegin(); iter != deviceFormat.cend(); iter++) {
-            physicalSize.push_back((*iter).fmtdesc.width);
-            physicalSize.push_back((*iter).fmtdesc.height);
-        }
+        AddHardware(id, hardwareName);
         std::shared_ptr<CameraMetadata> meta = std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE,
             DATA_CAPACITY_SIZE);
         CHECK_IF_PTR_NULL_RETURN_VOID(meta);
-        meta->addEntry(OHOS_SENSOR_INFO_PHYSICAL_SIZE, physicalSize.data(), physicalSize.size());
         Convert(deviceControl, deviceFormat, meta);
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
 
@@ -359,15 +367,18 @@ void V4L2DeviceManager::UvcCallBack(const std::string hardwareName, std::vector<
         CHECK_IF_EQUAL_RETURN_VOID(id, CAMERA_MAX);
         CHECK_IF_PTR_NULL_RETURN_VOID(uvcCb_);
 
-        for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend(); iter++) {
+        for (auto iter = hardwareList_.cbegin(); iter != hardwareList_.cend();) {
+            if ((*iter).cameraId != id) {
+                iter++;
+                continue;
+            }
             if ((*iter).hardwareName == hardwareName) {
                 std::shared_ptr<CameraMetadata> meta =
                     std::make_shared<CameraMetadata>(ITEM_CAPACITY_SIZE, DATA_CAPACITY_SIZE);
                 CHECK_IF_PTR_NULL_RETURN_VOID(meta);
                 uvcCb_(meta, uvcState, id);
-                hardwareList_.erase(iter);
-                break;
             }
+            hardwareList_.erase(iter);
         }
         CAMERA_LOGI("uvc plug out %{public}s end", hardwareName.c_str());
     }
@@ -426,7 +437,7 @@ void V4L2DeviceManager::Convert(std::vector<DeviceControl>& deviceControlVec, st
     }
 
     ConvertV4l2TagToOhos(deviceControlVec, deviceFormat, cameraMetadata);
-    AddDefaultOhosTag(cameraMetadata);
+    AddDefaultOhosTag(cameraMetadata, deviceFormat);
 }
 
 void V4L2DeviceManager::ConvertV4l2TagToOhos(std::vector<DeviceControl>& deviceControlVec,
@@ -440,16 +451,22 @@ void V4L2DeviceManager::ConvertV4l2TagToOhos(std::vector<DeviceControl>& deviceC
     }
 
     ConvertAbilityFpsRangesToOhos(cameraMetadata, deviceFormat);
+    ConvertAbilityStreamAvailableExtendConfigurationsToOhos(cameraMetadata, deviceFormat);
 }
 
-void V4L2DeviceManager::AddDefaultOhosTag(std::shared_ptr<CameraMetadata> cameraMetadata)
+void V4L2DeviceManager::AddDefaultOhosTag(std::shared_ptr<CameraMetadata> cameraMetadata,
+    std::vector<DeviceFormat>& deviceFormat)
 {
+    AddDefaultSensorInfoPhysicalSize(cameraMetadata, deviceFormat);
     AddDefaultAbilityMuteModes(cameraMetadata);
     AddDefaultControlCaptureMirrorSupport(cameraMetadata);
     AddDefaultCameraConnectionType(cameraMetadata);
     AddDefaultCameraPosition(cameraMetadata);
     AddDefaultCameraType(cameraMetadata);
     AddDefaultFlashAvailable(cameraMetadata);
+    AddDefaultJpegOrientation(cameraMetadata);
+    AddDefaultJpegQuality(cameraMetadata);
+    AddDefaultAbilityStreamAvailableBasicConfigurations(cameraMetadata);
 }
 
 int V4L2DeviceManager::GetOhosMetaTag(uint32_t v4l2Tag)
@@ -622,6 +639,59 @@ void V4L2DeviceManager::ConvertAbilityFpsRangesToOhos(std::shared_ptr<CameraMeta
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_FPS_RANGES, fpsRangesVector);
 }
 
+void V4L2DeviceManager::ConvertAbilityStreamAvailableExtendConfigurationsToOhos(
+    std::shared_ptr<CameraMetadata> metadata, const std::vector<DeviceFormat>& deviceFormat)
+{
+    const int END_SYMBOL = -1;
+    const int MINIMUM_FPS = 5;
+    const int PREVIEW_STREAM = 0;
+    const int CAPTURE_STREAM = 1;
+    const int VIDEO_STREAM = 2;
+    const int FORMAT = 1;
+    std::string name = "YUYV 4:2:2";
+    std::vector<int32_t> formatVector;
+    int32_t fpsValue = 0;
+    for (auto& it : deviceFormat) {
+        if (it.fmtdesc.description != name || it.fmtdesc.fps.numerator == 0) {
+            continue;
+        }
+        fpsValue = it.fmtdesc.fps.denominator / it.fmtdesc.fps.numerator;
+        if (fpsValue > MINIMUM_FPS) {
+            formatVector.push_back(FORMAT);
+            formatVector.push_back(it.fmtdesc.width);
+            formatVector.push_back(it.fmtdesc.height);
+            formatVector.push_back(fpsValue);
+        }
+    }
+    formatVector.push_back(END_SYMBOL);
+
+    std::vector<int32_t> streamAvailableExtendConfigurationsVector;
+    streamAvailableExtendConfigurationsVector.push_back(0);
+    streamAvailableExtendConfigurationsVector.push_back(PREVIEW_STREAM);
+    streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
+                                                     formatVector.begin(), formatVector.end());
+    streamAvailableExtendConfigurationsVector.push_back(CAPTURE_STREAM);
+    streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
+                                                     formatVector.begin(), formatVector.end());
+    streamAvailableExtendConfigurationsVector.push_back(VIDEO_STREAM);
+    streamAvailableExtendConfigurationsVector.insert(streamAvailableExtendConfigurationsVector.end(),
+                                                     formatVector.begin(), formatVector.end());
+    streamAvailableExtendConfigurationsVector.push_back(END_SYMBOL);
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_STREAM_AVAILABLE_EXTEND_CONFIGURATIONS,
+                       streamAvailableExtendConfigurationsVector);
+}
+
+void V4L2DeviceManager::AddDefaultSensorInfoPhysicalSize(std::shared_ptr<CameraMetadata> metadata,
+    std::vector<DeviceFormat>& deviceFormat)
+{
+    std::vector<float> physicalSize;
+    for (auto iter = deviceFormat.cbegin(); iter != deviceFormat.cend(); iter++) {
+        physicalSize.push_back((*iter).fmtdesc.width);
+        physicalSize.push_back((*iter).fmtdesc.height);
+    }
+    AddOrUpdateOhosTag(metadata, OHOS_SENSOR_INFO_PHYSICAL_SIZE, physicalSize);
+}
+
 void V4L2DeviceManager::AddDefaultAbilityMuteModes(std::shared_ptr<CameraMetadata> metadata)
 {
     std::vector<uint8_t> muteModesVector;
@@ -670,5 +740,27 @@ void V4L2DeviceManager::AddDefaultFlashAvailable(std::shared_ptr<CameraMetadata>
     std::vector<uint8_t> flashAvailableVector;
     flashAvailableVector.push_back((ret == CAM_META_SUCCESS) ? OHOS_CAMERA_FLASH_TRUE : OHOS_CAMERA_FLASH_FALSE);
     AddOrUpdateOhosTag(metadata, OHOS_ABILITY_FLASH_AVAILABLE, flashAvailableVector);
+}
+
+void V4L2DeviceManager::AddDefaultJpegOrientation(std::shared_ptr<CameraMetadata> metadata)
+{
+    std::vector<int32_t> jpegOrientationVector;
+    jpegOrientationVector.push_back(OHOS_CAMERA_JPEG_ROTATION_270);
+    AddOrUpdateOhosTag(metadata, OHOS_JPEG_ORIENTATION, jpegOrientationVector);
+}
+
+void V4L2DeviceManager::AddDefaultJpegQuality(std::shared_ptr<CameraMetadata> metadata)
+{
+    std::vector<uint8_t> jpegQualityVector;
+    jpegQualityVector.push_back(OHOS_CAMERA_JPEG_LEVEL_HIGH);
+    AddOrUpdateOhosTag(metadata, OHOS_JPEG_QUALITY, jpegQualityVector);
+}
+
+void V4L2DeviceManager::AddDefaultAbilityStreamAvailableBasicConfigurations(std::shared_ptr<CameraMetadata> metadata)
+{
+    std::vector<uint8_t> abilityStreamAvailableBasicConfigurationsVector;
+    abilityStreamAvailableBasicConfigurationsVector.push_back(OHOS_CAMERA_FORMAT_RGBA_8888);
+    AddOrUpdateOhosTag(metadata, OHOS_ABILITY_STREAM_AVAILABLE_BASIC_CONFIGURATIONS,
+                       abilityStreamAvailableBasicConfigurationsVector);
 }
 } // namespace OHOS::Camera
