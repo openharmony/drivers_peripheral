@@ -19,7 +19,7 @@
 extern "C" {
 #endif
 void *DdkUeventMain(void *param);
-int32_t DdkUeventInit(void);
+int32_t DdkUeventInit(const char *gadgetEventPath);
 #ifdef __cplusplus
 }
 #endif

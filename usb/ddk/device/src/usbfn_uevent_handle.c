@@ -35,9 +35,7 @@
 
 #define HDF_LOG_TAG usbfn_uevent
 
-#ifndef USB_GADGET_UEVENT_PATH
-#define USB_GADGET_UEVENT_PATH "invalid_path"
-#endif
+char *g_gadgetEventPath = "invalid_path";
 
 struct UsbFnUeventInfo {
     const char *devPath;
@@ -48,14 +46,14 @@ struct UsbFnUeventInfo {
 
 static void UsbFnDispatchUevent(const struct UsbFnUeventInfo *info)
 {
-    bool isGadgetConnect = strcmp(info->devPath, USB_GADGET_UEVENT_PATH) == 0;
+    bool isGadgetConnect = strcmp(info->devPath, g_gadgetEventPath) == 0;
     isGadgetConnect = (isGadgetConnect && strcmp(info->usbState, "CONNECTED") == 0);
     if (isGadgetConnect) {
         DdkListenerMgrNotifyAll(NULL, USB_PNP_DRIVER_GADGET_ADD);
         return;
     }
 
-    bool isGadgetDisconnect = strcmp(info->devPath, USB_GADGET_UEVENT_PATH) == 0;
+    bool isGadgetDisconnect = strcmp(info->devPath, g_gadgetEventPath) == 0;
     isGadgetDisconnect = (isGadgetDisconnect && strcmp(info->usbState, "DISCONNECTED") == 0);
     if (isGadgetDisconnect) {
         DdkListenerMgrNotifyAll(NULL, USB_PNP_DRIVER_GADGET_REMOVE);
@@ -107,4 +105,15 @@ void UsbFnHandleUevent(const char msg[], ssize_t rcvLen)
 
     UsbFnDispatchUevent(&info);
     return;
+}
+
+int32_t UsbFnUeventInit(const char *gadgetEventPath)
+{
+    if (gadgetEventPath == NULL) {
+        HDF_LOGE("%{puiblic}s invalid param", __func__);
+        return HDF_ERR_INVALID_PARAM;
+    }
+
+    g_gadgetEventPath = (char *)gadgetEventPath;
+    return HDF_SUCCESS;
 }
