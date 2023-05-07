@@ -20,6 +20,7 @@
 #include "ddk_device_manager.h"
 #include "ddk_pnp_listener_mgr.h"
 #include "ddk_uevent_handle.h"
+#include "device_resource_if.h"
 #include "hdf_base.h"
 #include "hdf_device_desc.h"
 #include "hdf_device_object.h"
@@ -89,6 +90,27 @@ int32_t UsbPnpManagerStartUeventThread(void)
 }
 #endif
 
+static const char *UsbPnpMgrGetGadgetPath(struct HdfDeviceObject *device, const char *attrName)
+{
+    struct DeviceResourceIface *iface = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
+    if (iface == NULL) {
+        HDF_LOGE("%{public}s: DeviceResourceGetIfaceInstance failed\n", __func__);
+        return NULL;
+    }
+
+    const char *path = NULL;
+    const char *pathDef = NULL;
+    if (device == NULL) {
+        HDF_LOGE("%{public}s: device is empty\n", __func__);
+        return NULL;
+    }
+    if (iface->GetString(device->property, attrName, &path, pathDef) != HDF_SUCCESS) {
+        HDF_LOGE("%{public}s: read %{public}s failed", __func__, attrName);
+        return NULL;
+    }
+    return path;
+}
+
 static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
 {
     static struct HdfDevEventlistener usbPnpListener = {
@@ -96,7 +118,7 @@ static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
     };
     usbPnpListener.priv = (void *)(device);
 
-    int32_t ret = DdkDevMgrInit();
+    int32_t ret = DdkDevMgrInit(UsbPnpMgrGetGadgetPath(device, "gadget_state_path"));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: DdkDevMgrInit error", __func__);
         return HDF_FAILURE;
@@ -108,7 +130,7 @@ static int32_t UsbPnpManagerInit(struct HdfDeviceObject *device)
         return HDF_FAILURE;
     }
 
-    ret = DdkUeventInit();
+    ret = DdkUeventInit(UsbPnpMgrGetGadgetPath(device, "gadget_uevent_path"));
     if (ret != HDF_SUCCESS) {
         HDF_LOGE("%{public}s: DdkUeventInit error", __func__);
         return ret;
