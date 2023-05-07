@@ -19,6 +19,7 @@
 extern "C" {
 #endif
 void UsbFnHandleUevent(const char msg[], ssize_t rcvLen);
+int32_t UsbFnUeventInit(const char *gadgetEventPath);
 #ifdef __cplusplus
 }
 #endif

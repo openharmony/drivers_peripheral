@@ -27,7 +27,7 @@ typedef int32_t (*DdkDevMgrHandleGadget)(void *priv);
  * Init methed must be called before all other metheds
  * Success return 0, otherwise return non-zero
  */
-int32_t DdkDevMgrInit(void);
+int32_t DdkDevMgrInit(const char *gadgetStatePath);
 const struct UsbPnpNotifyMatchInfoTable *DdkDevMgrCreateDevice(const char *deviceDir);
 int32_t DdkDevMgrRemoveDevice(int32_t busNum, int32_t devNum, struct UsbPnpNotifyMatchInfoTable *info);
 int32_t DdkDevMgrForEachDeviceSafe(DdkDevMgrHandleDev handle, void *priv);
