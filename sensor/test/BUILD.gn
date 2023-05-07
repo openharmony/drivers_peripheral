@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("../sensor.gni")
 declare_args() {
   drivers_peripheral_sensor_feature_model = false
 }
@@ -22,7 +23,7 @@ if (defined(ohos_lite)) {
   lite_component("hdf_test_sensor") {
     # add hdf subsystem unittest
     if (ohos_build_type == "debug") {
-      if (board_name == "hispark_taurus") {
+      if (drivers_peripheral_sensor_feature_lite_support_test) {
         deps = [ "unittest:hdf_peripheral_sensor_test" ]
       }
     }
