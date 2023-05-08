@@ -45,6 +45,7 @@ public:
     struct AudioDeviceDescriptor devDescRender_ = {};
     struct AudioSampleAttributes attrsRender_ = {};
     uint32_t renderId_ = 0;
+    char *devDescriptorName_ = nullptr;
     uint32_t size_ = MAX_AUDIO_ADAPTER_DESC;
     virtual void SetUp();
     virtual void TearDown();
@@ -102,7 +103,8 @@ void AudioUtRenderTest::InitRenderAttrs(struct AudioSampleAttributes &attrs)
 void AudioUtRenderTest::InitRenderDevDesc(struct AudioDeviceDescriptor &devDesc)
 {
     devDesc.pins = PIN_OUT_SPEAKER;
-    devDesc.desc = strdup("cardname");
+    devDescriptorName_ = strdup("cardname");
+    devDesc.desc = devDescriptorName_;
 
     ASSERT_NE(desc_, nullptr);
     ASSERT_NE(desc_->ports, nullptr);
@@ -112,7 +114,6 @@ void AudioUtRenderTest::InitRenderDevDesc(struct AudioDeviceDescriptor &devDesc)
             return;
         }
     }
-    free(devDesc.desc);
 }
 
 void AudioUtRenderTest::FreeAdapterElements(struct AudioAdapterDescriptor *dataBlock, bool freeSelf)
@@ -166,6 +167,9 @@ void AudioUtRenderTest::SetUp()
 
 void AudioUtRenderTest::TearDown()
 {
+    ASSERT_NE(devDescriptorName_, nullptr);
+    free(devDescriptorName_);
+
     if (adapter_ != nullptr) {
         adapter_->DestroyRender(adapter_, renderId_);
         render_ = nullptr;
@@ -332,7 +336,8 @@ HWTEST_F(AudioUtRenderTest, RenderSelectSceneIsValid001, TestSize.Level1)
     struct AudioSceneDescriptor scene;
     scene.scene.id = AUDIO_IN_MEDIA;
     scene.desc.pins = PIN_OUT_HEADSET;
-    scene.desc.desc = strdup("mic");
+    devDescriptorName_ = strdup("mic");
+    scene.desc.desc = devDescriptorName_;
     EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
     scene.desc.pins = PIN_OUT_SPEAKER;
     EXPECT_EQ(HDF_SUCCESS, render_->SelectScene(render_, &scene));
