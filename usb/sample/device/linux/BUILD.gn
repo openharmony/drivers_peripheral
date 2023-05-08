@@ -12,13 +12,13 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-import("//drivers/hdf_core/adapter/uhdf2/uhdf.gni")
+import("./../../../../../hdf_core/adapter/uhdf2/uhdf.gni")
 
 ohos_executable("usb_dev_test") {
   include_dirs = [
-    "//drivers/peripheral/usb/interfaces/ddk/device",
-    "//drivers/peripheral/usb/interfaces/ddk/common",
-    "//drivers/peripheral/usb/gadget/function/include",
+    "./../../../interfaces/ddk/device",
+    "./../../../interfaces/ddk/common",
+    "./../../../gadget/function/include",
   ]
 
   sources = [
